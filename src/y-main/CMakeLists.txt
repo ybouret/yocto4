@@ -1,4 +1,4 @@
-
+PROJECT(y-main)
 FILE( GLOB top_decl yocto/*.hpp)
 FILE( GLOB top_impl yocto/*.cpp)
 SET( top_srcs ${top_decl} ${top_impl} )
@@ -15,7 +15,9 @@ SET( srcs ${top_srcs} ${threading_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
-ADD_LIBRARY(yocto STATIC ${srcs} )
+ADD_LIBRARY(yocto STATIC ${srcs} yocto/utest/driver.hpp yocto/utest/run.hpp)
 
 INSTALL( TARGETS yocto ARCHIVE DESTINATION lib )
+
+ADD_SUBDIRECTORY(tests)
 

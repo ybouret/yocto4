@@ -1,17 +1,21 @@
 #include "yocto/error.hpp"
 
-#if defined(YOCTO_WIN)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#define snprintf _snprintf
-#endif
+
 
 #include <cstdio>
 #include <cstring>
 #include <cctype>
 #include <cstdlib>
 
+#if defined(YOCTO_WIN)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
+
+#endif
 
 #include <iostream>
 
