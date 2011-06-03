@@ -1,13 +1,17 @@
 #include "yocto/error.hpp"
 
-#include <cstdio>
-#include <cstring>
-#include <cctype>
-
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#define snprintf _snprintf
 #endif
+
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
+
+
 
 #include <iostream>
 
@@ -25,6 +29,9 @@ namespace yocto
 	
 	namespace libc
 	{
+#if defined(_MSC_VER)
+#pragma warning (disable:4996)
+#endif
 		void format_error( char buffer[], size_t length, int err ) throw()
 		{
 			assert( !( buffer==NULL && length>0) );
@@ -98,14 +105,14 @@ namespace yocto
 #endif
 	}
 	
-	void critical_error( error_type err, const char when[] )
+	void critical_error( error_type err, const char when[] ) throw()
 	{
 #if defined(YOCTO_BSD)
 		libc::critical_error( err, when );
 #endif
 		
 #if defined(YOCTO_WIN)
-		win32::ritical_error( err, when );
+		win32::critical_error( err, when );
 #endif
 	}
 	
