@@ -36,7 +36,9 @@ namespace yocto
 			memset( &mutex_, 0, sizeof(mutex) );
 		}
 		
-		
+#if defined(_MSC_VER)
+#pragma warning (disable:4351)
+#endif
 		mutex:: mutex( const char *id ) throw() :
 		mutex_(),
 		name()
