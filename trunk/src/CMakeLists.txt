@@ -1,0 +1,21 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+PROJECT(yocto)
+INCLUDE(share/rules.cmake)
+
+SET(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/../sdk)
+
+ADD_SUBDIRECTORY(y-main)
+
+INSTALL( FILES share/rules.cmake DESTINATION share/yocto )
+
+########################################################################
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "yocto")
+SET(CPACK_PACKAGE_VENDOR "Yann Bouret")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Yann Bouret")
+
+SET(CPACK_PACKAGE_FILE_NAME "yocto")
+SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
+SET(CPACK_GENERATOR "ZIP")
+
+INCLUDE(CPack)
+
