@@ -1,0 +1,174 @@
+# !bash
+
+########################################################################
+## Display error and exit
+########################################################################
+function xerror
+{
+    cmake -E cmake_echo_color --red --bold "-- $1";
+    exit 1;
+}
+
+cmake -E cmake_echo_color --blue "-- Initialize Build System...";
+
+########################################################################
+## Check proper location
+########################################################################
+[ -d ./forge ] || xerror "Missing ./forge"
+
+case $# in
+  2) BUILD_TYPE=Debug;;
+  3) BUILD_TYPE=$3;;
+  *) xerror "Usage is $0 SourceDir BuildTools [BuildType=Debug]" ;;
+esac
+
+BUILD_SOURCE=$1
+[ -f $BUILD_SOURCE/CMakeLists.txt ] || xerror "Missing Top Level CMakeLists.txt";
+
+
+########################################################################
+## Check Build Type
+########################################################################
+case $BUILD_TYPE in
+  "Debug" | "Release") ;;
+  *) xerror "Invalid BuildType <$BUILD_TYPE>";;
+esac
+
+########################################################################
+## Check Build Tools
+########################################################################
+BUILD_TOOLS=$2
+
+if [ -z "$WINDIR" ];
+then
+  cmake -E cmake_echo_color --magenta "-- NOT building on Windows"
+  WITH_MAKEFILES="Unix Makefiles"
+else
+  cmake -E cmake_echo_color --magenta "-- building on Windows"
+  WITH_MAKEFILES="MSYS Makefiles"
+fi
+
+case $BUILD_TOOLS in
+  "gnu" )
+    export CC=gcc$GNU_VERSION; export CXX=g++$GNU_VERSION;
+    BUILD_SUBDIR=gnu$GNU_VERSION/$BUILD_TYPE;
+    BUILD_GENERATOR="$WITH_MAKEFILES"
+    cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
+    ;;
+    
+  "clang" )
+    export CC=clang; export CXX=clang++;
+    BUILD_SUBDIR=clang/$BUILD_TYPE;
+    BUILD_GENERATOR="$WITH_MAKEFILES"
+    cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
+    ;;
+    
+    "xcode")
+    BUILD_SUBDIR=xcode;
+    BUILD_GENERATOR="Xcode"
+    ;;
+    
+  *) xerror "Unsuported BuildTools <$BUILD_TOOLS>";;
+esac
+
+BUILD_SYSTEM=`uname -s`
+case $BUILD_SYSTEM in
+  "FreeBSD" | "Linux" | "SunOS" ) BUILD_TARGET=$BUILD_SYSTEM-`uname -m`;;
+  *) BUILD_TARGET=$BUILD_SYSTEM;;
+esac
+
+cmake -E cmake_echo_color --blue "-- BUILD_SOURCE = <$BUILD_SOURCE>"
+cmake -E cmake_echo_color --blue "-- BUILD_TOOLS  = <$BUILD_TOOLS>"
+cmake -E cmake_echo_color --blue "-- BUILD_TYPE   = <$BUILD_TYPE>"
+cmake -E cmake_echo_color --blue "-- BUILD_SYSTEM = <$BUILD_SYSTEM>"
+cmake -E cmake_echo_color --blue "-- BUILD_TARGET = <$BUILD_TARGET>"
+
+BUILD_ROOT=./forge/$BUILD_TARGET/$BUILD_SUBDIR
+cmake -E cmake_echo_color "-- creating $BUILD_ROOT";
+cmake -E make_directory $BUILD_ROOT || xerror "Cant' create $BUILD_ROOT";
+case $BUILD_TOOLS in
+  "xcode" | "vs9" ) 
+    BUILD_UP=../../..
+    BUILD_OPT=""
+    ;;
+  *) 
+    BUILD_UP=../../../..
+    BUILD_OPT=-DCMAKE_BUILD_TYPE:STRING="$BUILD_TYPE";
+    ;;
+esac
+
+cd $BUILD_ROOT &&  ( cmake "$BUILD_UP/$BUILD_SOURCE" -G"$BUILD_GENERATOR" $BUILD_OPT || xerror "CMake Failure!")
+
+JLEVEL=""
+case `uname -s` in
+	"Darwin")
+		NPROCS=`hwprefs cpu_count`; 
+		;;
+		
+	"Linux")
+		NPROCS=`grep ^processor /proc/cpuinfo | wc -l`;
+		;;
+		
+	"FreeBSD")
+		NPROCS=`sysctl hw.ncpu | cut -d ' ' -f 2`
+		;;
+		
+	"MINGW32_NT-5.1")
+		NPROCS=`env | grep NUMBER_OF_PROCESSORS | cut -d '=' -f 2`;
+		;;
+
+	"SunOS" )
+		NPROCS=`psrinfo -p`;
+		;;
+		
+	*)
+		NPROCS=1;
+	;;
+esac
+cmake -E cmake_echo_color --magenta "-- #CPU=$NPROCS";
+if (( $NPROCS > 8 )); then
+	NPROCS=8;
+fi
+JLEVEL="-j${NPROCS}"
+cmake -E cmake_echo_color --magenta "-- using $JLEVEL";
+
+################################################################################
+## Executing Remaining Commands: WE ARE in the BUILD_DIR !!
+################################################################################
+[ -z "$TARGETS" ] && cmake -E cmake_echo_color --blue "-- Configuring is now done" && exit 0;
+
+echo "-- Executing $TARGETS";
+
+
+function xtarget
+{
+    tgt=$1;
+    echo "-- executing [$1]";
+    case $BUILD_TOOLS in
+        "gnu" | "intel" | "path" | "clang"  )
+            make $JLEVEL -s $tgt || xerror "-- can't build [$1]"
+        ;;
+
+        "xcode")
+            [ "all" == "$tgt" ] && tgt="ALL_BUILD";
+            (xcodebuild -parallelizeTargets -target $tgt -configuration $BUILD_TYPE 2>&1 | grep '^[^ \t|(echo)|(Phase)|(make)]' )|| xerror "-- can't build $1"
+        ;;
+
+        "codeblocks")
+          codeblocks --no-log --build --target=$tgt *.cbp;
+        ;;
+
+        "vs9" | "vs10" )
+          [ "all" == "$tgt" ] && tgt="ALL_BUILD";
+          cmake --build . --target $tgt --config $BUILD_TYPE;
+        ;;
+
+        *)
+            xerror "can't directly build '$1' with '$BUILD_TOOLS'";
+        ;;
+    esac
+}
+
+for t in $TARGETS; do
+    xtarget $t;
+done;
