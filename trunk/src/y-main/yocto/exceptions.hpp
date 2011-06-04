@@ -50,7 +50,7 @@ namespace yocto {
 	}
 
 #if defined(YOCTO_WIN)
-	typedef windows::exception os_exception;
+	typedef win32::exception os_exception;
 #endif
 	
 #if defined(YOCTO_BSD)

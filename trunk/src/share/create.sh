@@ -63,9 +63,25 @@ case $BUILD_TOOLS in
     cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
-    "xcode")
+  "intel" )
+      export CC=icc; export CXX=icpc;
+      BUILD_SUBDIR=intel/$BUILD_TYPE;
+      BUILD_GENERATOR="$WITH_MAKEFILES"
+      cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
+    ;;
+    
+  "codeblocks") 
+    BUILD_GENERATOR="CodeBlocks - $WITH_MAKEFILES";
+    ;;
+    
+  "xcode")
     BUILD_SUBDIR=xcode;
     BUILD_GENERATOR="Xcode"
+    ;;
+    
+  "vs9" )
+    BUILD_SUBDIR=vs9;
+    BUILD_GENERATOR="Visual Studio 9 2008";
     ;;
     
   *) xerror "Unsuported BuildTools <$BUILD_TOOLS>";;
@@ -146,12 +162,12 @@ function xtarget
     echo "-- executing [$1]";
     case $BUILD_TOOLS in
         "gnu" | "intel" | "path" | "clang"  )
-            make $JLEVEL -s $tgt || xerror "-- can't build [$1]"
+            make $JLEVEL -s $tgt || xerror "can't build [$1]"
         ;;
 
         "xcode")
             [ "all" == "$tgt" ] && tgt="ALL_BUILD";
-            (xcodebuild -parallelizeTargets -target $tgt -configuration $BUILD_TYPE 2>&1 | grep '^[^ \t|(echo)|(Phase)|(make)]' )|| xerror "-- can't build $1"
+            (xcodebuild -parallelizeTargets -target $tgt -configuration $BUILD_TYPE 2>&1 | grep '^[^ \t|(echo)|(Phase)|(make)]' )|| xerror "can't build $1"
         ;;
 
         "codeblocks")
@@ -160,7 +176,7 @@ function xtarget
 
         "vs9" | "vs10" )
           [ "all" == "$tgt" ] && tgt="ALL_BUILD";
-          cmake --build . --target $tgt --config $BUILD_TYPE;
+          cmake --build . --target $tgt --config $BUILD_TYPE || xerror "can't build [$1]";
         ;;
 
         *)
