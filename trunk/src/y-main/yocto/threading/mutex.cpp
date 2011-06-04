@@ -1,7 +1,7 @@
 #include "yocto/threading/mutex.hpp"
 #include "yocto/error.hpp"
-#include "yocto/utils.hpp"
-#include "yocto/static-check.hpp"
+#include "yocto/code/utils.hpp"
+#include "yocto/code/static-check.hpp"
 
 #include <cstring>
 
