@@ -15,7 +15,7 @@ namespace yocto
 {
 	namespace threading
 	{
-		
+	
 		mutex:: ~mutex() throw()
 		{
 #if YOCTO_MUTEX_VERBOSE == 1

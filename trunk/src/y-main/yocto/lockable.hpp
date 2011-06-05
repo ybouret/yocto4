@@ -18,6 +18,22 @@ namespace yocto
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(lockable);
 	};
+	
+	class scoped_lock
+	{
+	public:
+		explicit scoped_lock( lockable &host ) throw();
+		virtual ~scoped_lock() throw();
+		
+	private:
+		lockable &host_;
+		YOCTO_DISABLE_COPY_AND_ASSIGN(scoped_lock);
+	};
+	
+#define YOCTO_LOCK__(ID) __yocto_lock ## ID
+#define YOCTO_LOCK_(ID) YOCTO_LOCK__(ID)
+#define YOCTO_LOCK(LOCKABLE) volatile scoped_lock YOCTO_LOCK_(__LINE__)(LOCKABLE)
+	
 }
 
 #endif

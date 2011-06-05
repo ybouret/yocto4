@@ -21,6 +21,7 @@ namespace yocto
 			inline  proc_type() : func(NULL), name(NULL) {}
 			inline ~proc_type() throw() {}
 			inline  proc_type( func_type f, const char *n) throw() : func(f), name(n) {}
+			inline  proc_type( const proc_type &other ) throw() : func(other.func), name(other.name) {}
 			inline  proc_type & operator=( const proc_type &other ) throw()
 			{
 				func = other.func;
