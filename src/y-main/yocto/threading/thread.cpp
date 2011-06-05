@@ -10,7 +10,7 @@ namespace yocto
 		
 		
 #if defined(YOCTO_WIN)
-		DWORD WINAPI thread::launch( LPVOID args )
+		DWORD WINAPI thread::launch( LPVOID args ) throw()
 		{
 			thread *thr= static_cast<thread *>(args);
 			assert( thr );
