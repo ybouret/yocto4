@@ -48,7 +48,7 @@ namespace yocto
 #endif
 			
 #if defined(YOCTO_WIN)
-			YOCTO_LOCK(giant_mutex());
+			//YOCTO_LOCK(giant_mutex());
 			handle_ = ::CreateThread(0 ,
 									 0 ,
 									 thread::launch,
@@ -76,7 +76,7 @@ namespace yocto
 #endif
 			
 #if defined(YOCTO_WIN)
-			YOCTO_LOCK(giant_mutex);
+			//YOCTO_LOCK(giant_mutex);
 			if( ::WaitForSingleObject( handle_ , INFINITE ) != WAIT_OBJECT_0 )
 			{
 				win32::critical_error( ::GetLastError(), "WaitForSingleObject" );

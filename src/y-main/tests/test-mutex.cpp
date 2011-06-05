@@ -9,12 +9,14 @@ YOCTO_UNIT_TEST_IMPL(mutex)
 {
 	threading::mutex m1( "First Mutex" );
 	threading::mutex m2(NULL);
-	
+
+
 	{
 		YOCTO_LOCK(m1);
 		YOCTO_LOCK(m2);
 	}
 	
+
 	{
 		if( m1.try_lock() )
 		{
@@ -28,7 +30,8 @@ YOCTO_UNIT_TEST_IMPL(mutex)
 			m2.unlock();
 		}
 	}
-	
+
+
 }
 YOCTO_UNIT_TEST_DONE()
 

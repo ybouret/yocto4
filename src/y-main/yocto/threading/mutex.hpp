@@ -42,6 +42,8 @@ namespace yocto
 #if	defined(YOCTO_WIN)
 			CRITICAL_SECTION mutex_;
 #endif
+			void clear() throw();
+
 		public:
 			char name[32];
 		};
