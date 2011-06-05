@@ -14,7 +14,8 @@ namespace yocto
 		void   start();
 		double query() const;
 		static uint64_t ticks();
-
+		static uint32_t seed();
+		
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(wtime);
 #if defined(YOCTO_BSD)

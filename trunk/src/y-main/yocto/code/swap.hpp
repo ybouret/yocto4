@@ -1,5 +1,7 @@
-#ifndef YOCTO_SWAP_INCLUDED
-#define YOCTO_SWAP_INCLUDED 1
+#ifndef YOCTO_CODE_SWAP_INCLUDED
+#define YOCTO_CODE_SWAP_INCLUDED 1
+
+#include "yocto/os.hpp"
 
 namespace yocto 
 {
