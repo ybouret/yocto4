@@ -1,5 +1,5 @@
 /** \file yce-unroll.h
-	\brief generic unrolling
+ \brief generic unrolling
  */
 
 #ifndef YCE_UNROLL_INCLUDED
@@ -8,47 +8,47 @@
 #include "yocto/os.hpp"
 
 /** N > 0 */
-#define YOCTO_LOOP_(N,CODE)   do          \
-{                                         \
-const    size_t iter_ = N;                \
-assert(iter_>0);                          \
-{                                         \
-register size_t loop_ = (iter_+7)>>3;     \
-switch (iter_&7) {                        \
-case 0: do { { CODE; }                    \
-case 7:      { CODE; }			   \
-case 6:      { CODE; }            \
-case 5:      { CODE; }            \
-case 4:      { CODE; }            \
-case 3:      { CODE; }            \
-case 2:      { CODE; }            \
-case 1:      { CODE; }            \
-} while (--loop_ > 0);             \
-}                                     \
-}                                         \
-} while(0)
+#define YOCTO_LOOP_(N,CODE)   do                       \
+/*	*/	{                                              \
+/*	*/		const    size_t iter_ = N;                 \
+/*	*/		assert(iter_>0);                           \
+/*	*/		{                                          \
+/*	*/			register size_t loop_ = (iter_+7)>>3;  \
+/*	*/			switch (iter_&7) {                     \
+/*	*/			case 0: do { { CODE; }                 \
+/*	*/			case 7:      { CODE; }			       \
+/*	*/			case 6:      { CODE; }                 \
+/*	*/			case 5:      { CODE; }                 \
+/*	*/			case 4:      { CODE; }                 \
+/*	*/			case 3:      { CODE; }                 \
+/*	*/			case 2:      { CODE; }                 \
+/*	*/			case 1:      { CODE; }                 \
+/*	*/						} while (--loop_ > 0);    \
+/*	*/			}                                     \
+/*	*/		}										  \
+/*	*/	} while(0)
 
 
 /**  N >= 0 */
-#define YOCTO_LOOP(N,CODE)   do                   \
-{                                             \
-const    size_t iter_ = N;                \
-if(iter_>0)                               \
-{                                         \
-register size_t loop_ = (iter_+7)>>3; \
-switch (iter_&7) {                    \
-case 0: do { { CODE; }                \
-case 7:      { CODE; }            \
-case 6:      { CODE; }            \
-case 5:      { CODE; }            \
-case 4:      { CODE; }            \
-case 3:      { CODE; }            \
-case 2:      { CODE; }            \
-case 1:      { CODE; }            \
-} while (--loop_ > 0);             \
-}                                     \
-}                                         \
-} while(0)
+#define YOCTO_LOOP(N,CODE)   do                       \
+/*	*/	{                                             \
+/*	*/		const    size_t iter_ = N;                \
+/*	*/		if(iter_>0)                               \
+/*	*/		{                                         \
+/*	*/			register size_t loop_ = (iter_+7)>>3; \
+/*	*/			switch (iter_&7) {                    \
+/*	*/			case 0: do { { CODE; }                \
+/*	*/			case 7:      { CODE; }                \
+/*	*/			case 6:      { CODE; }                \
+/*	*/			case 5:      { CODE; }                \
+/*	*/			case 4:      { CODE; }                \
+/*	*/			case 3:      { CODE; }                \
+/*	*/			case 2:      { CODE; }                \
+/*	*/			case 1:      { CODE; }                \
+/*	*/						} while (--loop_ > 0);    \
+/*	*/			}                                     \
+/*	*/		}                                         \
+/*	*/	} while(0)
 
 
 /** loop from SHIFT to (N-1+SHIFT), N>=0 */

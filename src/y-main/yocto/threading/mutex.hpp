@@ -44,13 +44,16 @@ namespace yocto
 #endif
 			void clear() throw();
 
+			
 		public:
-			char name[32];
+			char   name[32];
+			static mutex giant;
 		};
 		
 		
 	}
 	
+#define YOCTO_GIANT_LOCK() YOCTO_LOCK( yocto::threading::mutex::giant )
 }
 
 #endif

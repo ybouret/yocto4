@@ -15,6 +15,7 @@ namespace yocto
 {
 	namespace threading
 	{
+		mutex mutex::giant("GIANT_MUTEX");
 	
 		void mutex:: clear() throw()
 		{
@@ -83,7 +84,6 @@ namespace yocto
 			if( id )
 			{
 				const size_t len = min_of<size_t>( strlen(id), sizeof(name)-1);
-				std::cerr << "set name with " << len << " chars" << std::endl;
 				memcpy( name, id, len );
 			}
 			else 

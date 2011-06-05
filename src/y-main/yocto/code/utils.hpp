@@ -1,6 +1,7 @@
 #ifndef YOCTO_UTILS_INCLUDED
 #define YOCTO_UTILS_INCLUDED 1
 
+#include "yocto/os.hpp"
 
 namespace yocto 
 {
@@ -17,6 +18,8 @@ namespace yocto
 		return b < a ? a : b;
 	}
 
+	uint32_t ihash32( uint32_t );
+	
 	extern const char hexachar[16];
 	
 }
