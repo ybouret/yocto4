@@ -83,7 +83,6 @@ namespace yocto
 	const char *platform_name() throw();
 	uint32_t    hash32( const void *buffer, size_t buflen ) throw();
 	
-	
 #define YOCTO_DISABLE_COPY(CLASS)   private: CLASS(const CLASS &)
 #define YOCTO_DISABLE_ASSIGN(CLASS) private: CLASS &operator=( const CLASS & )
 #define YOCTO_DISABLE_COPY_AND_ASSIGN(CLASS) \

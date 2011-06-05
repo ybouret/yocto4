@@ -5,5 +5,6 @@ TARGET_LINK_LIBRARIES( test-main yocto )
 
 ENABLE_TESTING()
 ADD_TEST(Platform test-main platform)
+ADD_TEST(Mutex    test-main mutex)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-main)

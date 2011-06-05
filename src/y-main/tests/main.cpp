@@ -3,9 +3,11 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_INIT(4)
+YOCTO_UNIT_TEST_INIT(16)
 {
 	YOCTO_UNIT_TEST_DECL(platform);
+	YOCTO_UNIT_TEST_DECL(mutex);
+	
 }
 YOCTO_UNIT_TEST_EXEC()
 

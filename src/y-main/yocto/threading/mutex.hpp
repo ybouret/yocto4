@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_THREADING_MUTEX_INCLUDED
 #define YOCTO_THREADING_MUTEX_INCLUDED 1
 
@@ -42,8 +44,9 @@ namespace yocto
 #endif
 		public:
 			char name[32];
-			
 		};
+		
+		
 	}
 	
 }
