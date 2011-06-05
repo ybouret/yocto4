@@ -18,6 +18,12 @@ namespace yocto
 		return b < a ? a : b;
 	}
 
+	template <typename T>
+	inline T clamp( T amin, T a, T amax ) 
+	{
+		return a < amin ? amin : ( amax < a ? amax : a );
+	}
+	
 	uint32_t ihash32( uint32_t );
 	
 	extern const char hexachar[16];

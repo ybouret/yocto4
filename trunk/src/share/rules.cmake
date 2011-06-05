@@ -25,3 +25,39 @@ IF( "${CXX_NAME}" MATCHES "g[+][+].*" )
 
 ENDIF()
 
+########################################################################
+# Common Flags
+# Adjusting Linker Flags
+########################################################################
+MACRO(TARGET_LINK_YOCTO tgt)
+	MESSAGE( STATUS "${tgt} will use yocto libraries" )
+
+	####################################################################
+	## Reverse order extra libraries
+	####################################################################
+	FOREACH( extra ${ARGN} )
+		TARGET_LINK_LIBRARIES( ${tgt} y-${extra} )
+	ENDFOREACH()
+
+	####################################################################
+	## Yocto Core C/C++
+	####################################################################
+	TARGET_LINK_LIBRARIES( ${tgt} yocto )
+
+	####################################################################
+	## Platform Specific Flags
+	####################################################################
+	IF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+		TARGET_LINK_LIBRARIES( ${tgt} pthread )
+	ENDIF()
+	IF( ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" )
+		TARGET_LINK_LIBRARIES( ${tgt} pthread )
+	ENDIF()
+
+	####################################################################
+	## Compiler Specific Flags
+	####################################################################
+	IF( "${CXX_NAME}" MATCHES "g[+][+].*" )
+		SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
+	ENDIF()
+ENDMACRO()

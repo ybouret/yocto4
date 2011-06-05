@@ -1,5 +1,6 @@
 #include "yocto/wtime.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/code/utils.hpp"
 
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN 1
@@ -9,6 +10,7 @@
 #if defined(YOCTO_BSD)
 #include <cerrno>
 #include <sys/time.h>
+#include <cmath>
 #endif
 
 namespace yocto 
@@ -122,6 +124,37 @@ namespace yocto
 #endif
 		uint32_t seed = ihash32( ini.dw[0] ) ^ ihash32( ini.dw[1] );
 		return seed;
+	}
+	
+	void wtime:: sleep( double seconds ) throw()
+	{
+		static const double sleep_min = 0;     /*          */
+		static const double sleep_max = 86400; /*  one day */
+		
+		double s = clamp<double>(sleep_min,seconds,sleep_max);
+		
+#if defined(YOCTO_BSD)
+		struct timespec info = { 0, 0 };
+		struct timespec left = { 0, 0 };
+		double num_secs      = 0;
+		double num_nano      = modf(s,&num_secs);
+		num_nano             = floor( 1.0e9 * num_nano );
+		info.tv_sec  = (unsigned int)num_secs;
+		info.tv_nsec = (unsigned int)num_nano;
+		while( info.tv_nsec >= 1000000000 ) {
+			++info.tv_sec;
+			info.tv_nsec -= 1000000000;
+		}
+		while( nanosleep( &info, &left) < 0 ) {
+			assert( errno == EINTR );
+			info = left;
+		}
+#endif
+		
+		
+#if defined(YOCTO_WIN)
+		::Sleep( (DWORD)(s * 1000.0) );
+#endif
 	}
 	
 }
