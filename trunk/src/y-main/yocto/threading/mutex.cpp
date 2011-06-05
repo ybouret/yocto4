@@ -16,6 +16,13 @@ namespace yocto
 	namespace threading
 	{
 	
+		void mutex:: clear() throw()
+		{
+			//-- clean everything
+			memset( &mutex_, 0, sizeof(mutex_) );
+			memset( name,    0, sizeof(name)   );
+		}
+
 		mutex:: ~mutex() throw()
 		{
 #if YOCTO_MUTEX_VERBOSE == 1
@@ -33,7 +40,7 @@ namespace yocto
 					libc::critical_error( res, "pthread_mutex_destroy" );
 			}
 #endif
-			memset( &mutex_, 0, sizeof(mutex) );
+			clear();
 		}
 		
 #if defined(_MSC_VER)
@@ -43,10 +50,8 @@ namespace yocto
 		mutex_(),
 		name()
 		{
-			//-- clean everything
-			memset( &mutex_, 0, sizeof(mutex_) );
-			memset( name,    0, sizeof(name)   );
-			
+			clear();
+
 			//-- initialize the mutex
 #if defined(YOCTO_WIN)
 			::InitializeCriticalSection( & mutex_ );
@@ -78,6 +83,7 @@ namespace yocto
 			if( id )
 			{
 				const size_t len = min_of<size_t>( strlen(id), sizeof(name)-1);
+				std::cerr << "set name with " << len << " chars" << std::endl;
 				memcpy( name, id, len );
 			}
 			else 

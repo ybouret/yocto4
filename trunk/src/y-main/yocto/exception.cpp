@@ -27,6 +27,9 @@ namespace yocto
 
 	void exception:: format( const char *fmt, void *va_list_ptr ) throw()
     {
+#if defined(_MSC_VER)
+#pragma warning( disable : 4996 )
+#endif
 		assert(fmt);
         assert(va_list_ptr);
 		va_list &ap = *static_cast<va_list *>(va_list_ptr);

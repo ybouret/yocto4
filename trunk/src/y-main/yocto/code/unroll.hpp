@@ -5,7 +5,7 @@
 #ifndef YCE_UNROLL_INCLUDED
 #define YCE_UNROLL_INCLUDED 1
 
-#include "yocto/core/os.h"
+#include "yocto/os.hpp"
 
 /** N > 0 */
 #define YOCTO_LOOP_(N,CODE)   do          \
