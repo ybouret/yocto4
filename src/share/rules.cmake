@@ -10,12 +10,15 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS    ON)
 ##
 ########################################################################
 
-GET_FILENAME_COMPONENT(CXX_NAME ${CMAKE_CXX_COMPILER} NAME )
+GET_FILENAME_COMPONENT(CC_NAME ${CMAKE_C_COMPILER} NAME )
 
-IF( "${CXX_NAME}" MATCHES "g[+][+].*" )
+########################################################################
+## GNU
+########################################################################
+IF( "${CC_NAME}" MATCHES "gcc.*" )
   MESSAGE( STATUS "Using GNU compilers" )
+  
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
-
   SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS} -g" )
   SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -O2 -DNDEBUG=1")
   
@@ -24,6 +27,57 @@ IF( "${CXX_NAME}" MATCHES "g[+][+].*" )
   SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O2 -DNDEBUG=1")
 
 ENDIF()
+
+########################################################################
+## clang
+########################################################################
+IF( "${CC_NAME}" MATCHES "clang.*" )
+  MESSAGE( STATUS "Using CLANG compilers" )
+  
+  SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
+  SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS} -g" )
+  SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -O2 -DNDEBUG=1")
+  
+  SET(COMMON_CXX_FLAGS        "-Wall -pipe -fexceptions -Weffc++ ${MY_CXXFLAGS}" )
+  SET(CMAKE_CXX_FLAGS_DEBUG   "${COMMON_CXX_FLAGS} -g" )
+  SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O2 -DNDEBUG=1")
+ENDIF()
+
+
+
+########################################################################
+## clang
+########################################################################
+IF( "${CC_NAME}" MATCHES "icc.*" )
+  MESSAGE( STATUS "Using Intel compilers" )
+  
+  SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
+  SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS} -g" )
+  SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -O2 -DNDEBUG=1")
+  
+  SET(COMMON_CXX_FLAGS        "-Wall -pipe -fexceptions${MY_CXXFLAGS}" )
+  SET(CMAKE_CXX_FLAGS_DEBUG   "${COMMON_CXX_FLAGS} -g" )
+  SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O2 -DNDEBUG=1")
+ENDIF()
+
+
+
+########################################################################
+## miscrosoft cl
+########################################################################
+IF( "${CC_NAME}" STREQUAL "cl.exe" )
+  MESSAGE( STATUS "Using Microsoft cl.exe" )
+  
+  SET(COMMON_C_FLAGS      "${MY_CFLAGS}" )
+  SET(CMAKE_C_FLAGS_DEBUG   "${COMMON_C_FLAGS}" )
+  SET(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} -Ox -DNDEBUG=1")
+  
+  SET(COMMON_CXX_FLAGS        "${MY_CXXFLAGS} -EHsc -Wp64" )
+  SET(CMAKE_CXX_FLAGS_DEBUG   "${COMMON_CXX_FLAGS}" )
+  SET(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -Ob2git -DNDEBUG=1")
+  
+ENDIF()
+
 
 ########################################################################
 # Common Flags
@@ -57,7 +111,9 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	####################################################################
 	## Compiler Specific Flags
 	####################################################################
-	IF( "${CXX_NAME}" MATCHES "g[+][+].*" )
+	IF( "${CC_NAME}" MATCHES "gcc.*" )
+    MESSAGE( STATUS "adding extra LINK_FLAGS for ${CMAKE_CXX_COMPILER}" )
 		SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
 	ENDIF()
+  
 ENDMACRO()
