@@ -3,6 +3,7 @@
 #include "yocto/exceptions.hpp"
 #include <cerrno>
 #include "yocto/code/swap.hpp"
+#include <cstdlib>
 
 namespace yocto
 {

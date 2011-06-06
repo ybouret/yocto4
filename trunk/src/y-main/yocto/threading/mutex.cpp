@@ -5,7 +5,7 @@
 
 #include <cstring>
 
-#define YOCTO_MUTEX_VERBOSE 1
+#define YOCTO_MUTEX_VERBOSE 0
 
 #if YOCTO_MUTEX_VERBOSE == 1
 #include <iostream>
