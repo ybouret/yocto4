@@ -5,6 +5,7 @@ INCLUDE(share/rules.cmake)
 SET(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/../sdk)
 
 ADD_SUBDIRECTORY(y-main)
+ADD_SUBDIRECTORY(y-thr)
 
 INSTALL( FILES share/rules.cmake DESTINATION share/yocto )
 

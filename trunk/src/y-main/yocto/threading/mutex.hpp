@@ -22,6 +22,8 @@ namespace yocto
 {
 	namespace threading
 	{
+		class condition;
+		
 		//! recursive mutex
 		class mutex : public lockable
 		{
@@ -44,7 +46,7 @@ namespace yocto
 #endif
 			void clear() throw();
 
-			
+			friend class condition;
 		public:
 			char   name[32];
 			static mutex giant;
