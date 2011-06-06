@@ -54,17 +54,7 @@ namespace yocto
 			firstAvailable = *p;
 			--stillAvailable;
 			
-#if 1
-			memset( p, 0, block_size );
-#else
-			{
-				//uint8_t *q = p;
-				//YOCTO_LOOP_(block_size,*(q++) = 0 );
-#define YMC_ZERO(i) p[i] = 0
-				YOCTO_LOOP_FUNC_(block_size,YMC_ZERO,0);
-			}
-#endif
-			
+			memset( p, 0, block_size );			
 			return p;
 		}
 		
