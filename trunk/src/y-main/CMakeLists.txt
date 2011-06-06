@@ -16,8 +16,13 @@ SET( threading_srcs ${threading_decl} ${threading_impl} )
 INSTALL( FILES ${threading_decl} DESTINATION include/yocto/threading)
 SOURCE_GROUP(threading FILES ${threading_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs})
+FILE( GLOB core_decl yocto/core/*.hpp)
+FILE( GLOB core_impl yocto/core/*.cpp)
+SET( core_srcs ${core_decl} ${core_impl})
+SOURCE_GROUP( core FILES ${core_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
