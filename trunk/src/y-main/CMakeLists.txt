@@ -21,8 +21,15 @@ FILE( GLOB core_impl yocto/core/*.cpp)
 SET( core_srcs ${core_decl} ${core_impl})
 SOURCE_GROUP( core FILES ${core_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs})
+FILE( GLOB mem_decl yocto/memory/*.hpp)
+FILE( GLOB mem_impl yocto/memory/*.cpp)
+SET( mem_srcs ${mem_decl} ${mem_impl} )
+INSTALL( FILES ${mem_decl} DESTINATION include/yocto/memory )
+SOURCE_GROUP( memory FILES ${mem_srcs} )
+
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

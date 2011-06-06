@@ -13,5 +13,7 @@ ADD_TEST(Rand     test-main rand)
 ADD_TEST(Thread   test-main thread)
 ADD_TEST(CorePool test-main pool)
 ADD_TEST(CoreList test-main list)
+ADD_TEST(Chunk    test-main chunk)
+ADD_TEST(AtExit   test-main at_exit)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-main)
