@@ -1,11 +1,12 @@
 #ifndef YOCTO_UTEST_DRIVER_INCLUDED
 #define YOCTO_UTEST_DRIVER_INCLUDED 1
 
-#include "yocto/os.hpp"
+#include "yocto/code/rand.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+#include <ctime>
 
 namespace yocto
 {
@@ -80,6 +81,7 @@ namespace yocto
 				}
 				else
 				{
+					_rand.reset( uint32_t(time(NULL)) );
 					const char *name = argv[1];
 					const proc_type *proc = search( name );
 					if( !proc )

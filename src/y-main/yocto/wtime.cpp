@@ -1,14 +1,18 @@
+#if defined(YOCTO_BSD)
+#define _POSIX_C_SOURCE 199309 
+#endif
+
 #include "yocto/wtime.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/code/utils.hpp"
 
 #if defined(YOCTO_WIN)
-#define WIN32_LEAN_AND_MEAN 1
-#include <windows.h>
+#include "yocto/threading/mutex.hpp"
 #endif
 
 #if defined(YOCTO_BSD)
 #include <cerrno>
+#include <time.h>
 #include <sys/time.h>
 #include <cmath>
 #endif
@@ -61,6 +65,7 @@ namespace yocto
 		quad = 0;
 		freq = 0;
 		LARGE_INTEGER F;
+		YOCTO_GIANT_LOCK();
 		if( ! :: QueryPerformanceFrequency( &F ) )
 		{
 			throw win32::exception( ::GetLastError(), "::QueryPerformanceFrequency" );
