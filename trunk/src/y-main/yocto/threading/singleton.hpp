@@ -4,6 +4,8 @@
 #include "yocto/threading/mutex.hpp"
 #include "yocto/threading/at-exit.hpp"
 #include "yocto/code/round.hpp"
+#include <new>
+
 namespace yocto
 {
 	
@@ -71,6 +73,11 @@ namespace yocto
 		static inline bool exists() throw()
 		{
 			return instance_ != NULL;
+		}
+		
+		static const char * get_name() throw()
+		{
+			return T::name;
 		}
 		
 	protected:

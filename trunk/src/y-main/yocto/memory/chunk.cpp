@@ -2,24 +2,16 @@
 #include <cstring>
 #include "yocto/code/unroll.hpp"
 
-#if !defined(NDEBUG)
-#include <iostream>
-#endif
-
 namespace yocto
 {
 	
 	namespace memory
 	{
 		
+		bool chunk:: is_empty() const throw() { return stillAvailable >= providedNumber; }
+
 		chunk:: ~chunk() throw()
 		{
-#if !defined(NDEBUG)
-			if( stillAvailable < providedNumber )
-			{
-				std::cerr << "**[memory::chunk] missing " << (providedNumber-stillAvailable) << " blocks" << std::endl;
-			}
-#endif
 		}
 		
 		chunk:: chunk(void  *           data_entry,
@@ -27,7 +19,6 @@ namespace yocto
 					  size_t            num_blocks,
 					  size_t            chunk_size) throw() :
 		data( static_cast<uint8_t *>( data_entry ) ),
-		last( data + chunk_size ),
 		firstAvailable(0),
 		stillAvailable( num_blocks ),
 		providedNumber( stillAvailable )
@@ -50,7 +41,8 @@ namespace yocto
 			assert(block_size>0);
 			assert( stillAvailable > 0 );
 			assert( stillAvailable <= providedNumber);
-			uint8_t *p = data + ( firstAvailable * block_size );
+			
+			uint8_t     *p = data + ( firstAvailable * block_size );
 			firstAvailable = *p;
 			--stillAvailable;
 			
@@ -58,10 +50,10 @@ namespace yocto
 			return p;
 		}
 		
-		chunk::ownership chunk::whose( const void *addr ) const throw()
+		chunk::ownership chunk::whose( const void *addr, const size_t chunk_size ) const throw()
 		{
 			const uint8_t *p = (const uint8_t *)addr;
-			return (p < data) ? owned_by_prev : (  (addr >= last) ? owned_by_next : owned_by_this );
+			return (p < data) ? owned_by_prev : (  (addr >= data+chunk_size) ? owned_by_next : owned_by_this );
 		}
 		
 		
@@ -72,7 +64,6 @@ namespace yocto
 			assert( data != NULL );
 			assert( block_size > 0 );
 			assert( addr != NULL   );
-			assert( owned_by_this == whose(addr) );
 			assert( stillAvailable < providedNumber );
 			assert( static_cast<ptrdiff_t>(to_release - data) % block_size == 0 );
 			

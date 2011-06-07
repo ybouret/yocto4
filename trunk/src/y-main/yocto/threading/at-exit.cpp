@@ -1,6 +1,6 @@
 #include "yocto/threading/at-exit.hpp"
 #include "yocto/threading/mutex.hpp"
-#include "yocto/exceptions.hpp"
+#include "yocto/error.hpp"
 #include <cerrno>
 #include "yocto/code/swap.hpp"
 #include <cstdlib>
@@ -41,7 +41,7 @@ namespace yocto
 			}			
 		}
 		
-		void at_exit::perform( at_exit::callback procedure, threading::longevity life_time)
+		void at_exit::perform( at_exit::callback procedure, threading::longevity life_time) throw()
 		{
 			static bool registered = false;
 			
@@ -51,7 +51,7 @@ namespace yocto
 			{
 				YOCTO_GIANT_LOCK();
 				if( atexit( cb_all ) != 0 )
-					throw libc::exception( errno, "atexit" );
+					libc::critical_error( errno, "atexit" );
 				registered = true;
 			}
 			
@@ -59,7 +59,7 @@ namespace yocto
 			
 			//-- check room left
 			if( cb_num >= YOCTO_AT_EXIT_STACK_SIZE )
-				throw imported::exception( "YOCTO_AT_EXIT_STACK_SIZE too small", "reached #at_exit=%u", unsigned(YOCTO_AT_EXIT_STACK_SIZE) );
+				libc::critical_error( ERANGE, "YOCTO_AT_EXIT_STACK_SIZE overflow");
 			
 			//-- store at end of stack
 			cb_t *curr      = &cb_reg[cb_num++];
