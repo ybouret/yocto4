@@ -15,5 +15,7 @@ ADD_TEST(CorePool test-main pool)
 ADD_TEST(CoreList test-main list)
 ADD_TEST(Chunk    test-main chunk)
 ADD_TEST(AtExit   test-main at_exit)
+ADD_TEST(Global   test-main global)
+ADD_TEST(Arena    test-main arena)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-main)

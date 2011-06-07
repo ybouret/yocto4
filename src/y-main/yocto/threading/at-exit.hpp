@@ -18,7 +18,7 @@ namespace yocto
 		struct at_exit
 		{
 			typedef void (*callback)(void);
-			static void perform( at_exit::callback, threading::longevity );
+			static void perform( at_exit::callback, threading::longevity ) throw();
 		};
 		
 		
