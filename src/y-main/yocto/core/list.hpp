@@ -8,7 +8,7 @@ namespace yocto
 	
 	namespace core
 	{
-		
+		//! list of nodes
 		template <typename NODE>
 		class list_of
 		{

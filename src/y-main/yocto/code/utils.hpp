@@ -24,6 +24,7 @@ namespace yocto
 		return a < amin ? amin : ( amax < a ? amax : a );
 	}
 	
+	//! integer hash
 	uint32_t ihash32( uint32_t );
 	
 	extern const char hexachar[16];
