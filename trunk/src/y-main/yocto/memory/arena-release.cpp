@@ -1,6 +1,7 @@
 #include "yocto/memory/arena.hpp"
-
+#include "yocto/memory/global.hpp"
 #include <iostream>
+#include <cstring>
 
 namespace yocto
 {
@@ -77,12 +78,46 @@ namespace yocto
 			{
 				if( pAvailable_ )
 				{
+					//----------------------------------------------------------
+					// we have two empty chunks
+					//----------------------------------------------------------
 					assert( pAvailable_ != pReleasing_ );
+					assert( pAvailable_->is_empty()    );
 					std::cerr << "Two Chunks are Empty !" << std::endl;
-					exit(-1);
+
+					//-- choose the highest chunk,
+					chunk *to_release = NULL;
+					if( pAvailable_ > pReleasing_ )
+					{
+						assert( pAvailable_->data > pReleasing_->data );
+						to_release  = pAvailable_;
+						pAvailable_ = pReleasing_;
+					}
+					else
+					{
+						assert( pAvailable_->data < pReleasing_->data );
+						to_release = pReleasing_;
+					}
+					assert( pAvailable_ != NULL );
+					assert( pAvailable_ < to_release );
+					assert( pAvailable_->is_empty()  );
+
+					//-- remove to_release
+					size_t csz = chunk_size_;
+					kind<global>::release_as<uint8_t>( to_release->data, csz );
+					memmove( to_release, to_release+1, sizeof(chunk) * static_cast<size_t>( --chunk_last_ - to_release ) );
+					--size_;
+					accessible_ -= num_blocks_;
+
+					//-- update caching
+
+
 				}
 				else 
 				{
+					//----------------------------------------------------------
+					// register
+					//----------------------------------------------------------
 					pAvailable_ = pReleasing_;
 				}
 				
