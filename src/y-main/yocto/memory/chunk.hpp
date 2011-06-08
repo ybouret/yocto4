@@ -21,12 +21,19 @@ namespace yocto
 			const uint8_t  providedNumber; //!< inital num_blocks
 			uint8_t        padding[sizeof(uint8_t*)-3];
 			
+			//! prepare a chunk
+			/**
+				\param data_entry a valid memory area >= chunk_size bytes
+				\param block_size the block size
+				\param num_blocks initially available #blocks
+				\param chunk_size at least block_size * num_blocks
+			 */
 			chunk(void  *           data_entry,
 				  size_t            block_size,
 				  size_t            num_blocks,
 				  size_t            chunk_size) throw();
 			
-			~chunk() throw();
+			inline ~chunk() throw() {}
 			
 			enum ownership
 			{

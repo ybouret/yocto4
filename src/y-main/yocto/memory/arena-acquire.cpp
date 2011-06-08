@@ -8,7 +8,6 @@
 #include <cerrno>
 #include <cstring>
 
-#include <iostream>
 
 namespace yocto
 {
@@ -29,7 +28,9 @@ namespace yocto
 			if( accessible_ > 0 )
 			{
 				//==============================================================
+				//
 				// there is one free block somewhere
+				//
 				//==============================================================
 				assert( pAcquiring_ );
 				if( pAcquiring_->stillAvailable <= 0 )
@@ -100,12 +101,20 @@ namespace yocto
 				assert( pAcquiring_ != NULL );
 				assert( pAcquiring_->stillAvailable > 0 );
 				
+				//--------------------------------------------------------------
 				//-- update total #blocks
+				//--------------------------------------------------------------
 				--accessible_;
 				
+				//--------------------------------------------------------------
 				//-- check available cache
+				//--------------------------------------------------------------
 				if( pAcquiring_ == pAvailable_ )
 					pAvailable_ = NULL;
+				
+				//--------------------------------------------------------------
+				// done 
+				//--------------------------------------------------------------
 				return pAcquiring_->acquire(block_size_);
 				
 			}
@@ -116,14 +125,11 @@ namespace yocto
 				// we need some other memory
 				//
 				//==============================================================
-				assert( NULL == pAvailable_ );
+				assert( NULL == pAvailable_ ); // necessarily...
 				
-				//==============================================================
-				// check for the array of chunks
-				//==============================================================
+				
 				if( size_ >= maxi_ )
 				{
-					//std::cerr << "growing chunk array" << std::endl;
 					//----------------------------------------------------------
 					// time to increase the array of chunks
 					//----------------------------------------------------------
@@ -133,7 +139,7 @@ namespace yocto
 					memcpy( new_addr, chunk_, size_ * sizeof(chunk) );
 					
 					//----------------------------------------------------------
-					// keep the cache status
+					// keep the cache status in case of memory failure
 					//----------------------------------------------------------
 					if( pReleasing_ )
 					{
@@ -146,6 +152,10 @@ namespace yocto
 						assert( chunk_ != NULL );
 						pAcquiring_ = new_addr + static_cast<ptrdiff_t>( pAcquiring_ - chunk_ );
 					}
+					
+					//----------------------------------------------------------
+					// update the array
+					//----------------------------------------------------------
 					kind<global>::release_as<chunk>( chunk_, maxi_ );
 					
 					chunk_      = new_addr;
@@ -160,6 +170,9 @@ namespace yocto
 				//==============================================================
 				assert( size_ < maxi_ ); assert( chunk_ != NULL );
 				
+				//--------------------------------------------------------------
+				// cretate data
+				//--------------------------------------------------------------
 				size_t csz = chunk_size_;
 				void  *ptr = kind<global>::acquire( csz ); assert( csz >= chunk_size_ ); assert(ptr!=NULL);
 				
@@ -168,7 +181,6 @@ namespace yocto
 				//--------------------------------------------------------------
 				assert( chunk_last_ == chunk_ + size_ );
 				pAcquiring_  = new ( &chunk_[size_++]) chunk( ptr, block_size_, num_blocks_, chunk_size_ );
-				accessible_ += new_blocks_; //-- update the total number of blocks
 				++chunk_last_;
 				
 				//--------------------------------------------------------------
@@ -187,6 +199,12 @@ namespace yocto
 				//--------------------------------------------------------------
 				pReleasing_ = pAcquiring_;
 				
+				//--------------------------------------------------------------
+				// update total number of blocks (num_blocks-1)
+				// and return a valid block
+				//--------------------------------------------------------------
+				accessible_ += new_blocks_; 
+
 				return pAcquiring_->acquire( block_size_ );
 			}
 			
