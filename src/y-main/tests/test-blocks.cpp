@@ -5,6 +5,7 @@
 
 
 #include <cstring>
+#include <cstdlib>
 
 using namespace yocto;
 using namespace memory;
