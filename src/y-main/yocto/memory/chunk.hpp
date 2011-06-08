@@ -9,6 +9,9 @@ namespace yocto
 	namespace memory
 	{
 		//! a chunk of blocks
+		/**
+		 * should have a 2*sizeof(void *) size.
+		 */
 		class chunk
 		{
 		public:
@@ -23,10 +26,10 @@ namespace yocto
 			
 			//! prepare a chunk
 			/**
-				\param data_entry a valid memory area >= chunk_size bytes
-				\param block_size the block size
-				\param num_blocks initially available #blocks
-				\param chunk_size at least block_size * num_blocks
+			 \param data_entry a valid memory area >= chunk_size bytes
+			 \param block_size the block size
+			 \param num_blocks initially available #blocks
+			 \param chunk_size at least block_size * num_blocks
 			 */
 			chunk(void  *           data_entry,
 				  size_t            block_size,

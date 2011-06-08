@@ -5,6 +5,8 @@
 #include "yocto/code/swap.hpp"
 #include "yocto/exceptions.hpp"
 
+#include "yocto/memory/chunk.hpp"
+
 #include <cerrno>
 #include <cstring>
 
@@ -17,7 +19,7 @@ namespace yocto
 		
 		static inline size_t arena_new_maxi( size_t maxi )
 		{
-			const size_t new_maxi = max_of<size_t>( maxi, arena::initial_chunks ) << 1;
+			const size_t new_maxi = max_of<size_t>( maxi << 1, arena::initial_chunks );
 			if( new_maxi <= maxi )
 				throw libc::exception( ERANGE, "arena::new_maxi overflow@%u", unsigned(maxi) );
 			return new_maxi;
@@ -115,7 +117,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				// done 
 				//--------------------------------------------------------------
-				return pAcquiring_->acquire(block_size_);
+				return pAcquiring_->acquire(block_size);
 				
 			}
 			else 
@@ -173,14 +175,14 @@ namespace yocto
 				//--------------------------------------------------------------
 				// cretate data
 				//--------------------------------------------------------------
-				size_t csz = chunk_size_;
-				void  *ptr = kind<global>::acquire( csz ); assert( csz >= chunk_size_ ); assert(ptr!=NULL);
+				size_t csz = chunk_size;
+				void  *ptr = kind<global>::acquire( csz ); assert( csz >= chunk_size ); assert(ptr!=NULL);
 				
 				//--------------------------------------------------------------
 				// Append the new chunk
 				//--------------------------------------------------------------
 				assert( chunk_last_ == chunk_ + size_ );
-				pAcquiring_  = new ( &chunk_[size_++]) chunk( ptr, block_size_, num_blocks_, chunk_size_ );
+				pAcquiring_  = new ( &chunk_[size_++]) chunk( ptr, block_size, num_blocks, chunk_size );
 				++chunk_last_;
 				
 				//--------------------------------------------------------------
@@ -205,7 +207,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				accessible_ += new_blocks_; 
 
-				return pAcquiring_->acquire( block_size_ );
+				return pAcquiring_->acquire( block_size );
 			}
 			
 		}
