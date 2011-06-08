@@ -34,6 +34,7 @@ namespace yocto
 			virtual void lock()     throw();
 			virtual void unlock()   throw();
 			virtual bool try_lock() throw();
+			const char *name() const throw();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(mutex);
@@ -47,8 +48,9 @@ namespace yocto
 			void clear() throw();
 
 			friend class condition;
+			char   name_[32];
+
 		public:
-			char   name[32];
 			static mutex giant;
 		};
 		

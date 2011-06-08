@@ -20,13 +20,13 @@ YOCTO_UNIT_TEST_IMPL(mutex)
 	{
 		if( m1.try_lock() )
 		{
-			std::cerr << "lock(" << m1.name << ") success !" << std::endl;
+			std::cerr << "lock(" << m1.name() << ") success !" << std::endl;
 			m1.unlock();
 		}
 		
 		if( m2.try_lock() )
 		{
-			std::cerr << "lock(" << m2.name << ") success !" << std::endl;
+			std::cerr << "lock(" << m2.name() << ") success !" << std::endl;
 			m2.unlock();
 		}
 	}

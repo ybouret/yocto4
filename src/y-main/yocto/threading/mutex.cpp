@@ -15,19 +15,25 @@ namespace yocto
 {
 	namespace threading
 	{
+		
+		const char * mutex:: name() const throw()
+		{
+			return name_;
+		}
+		
 		mutex mutex::giant("GIANT_MUTEX");
 	
 		void mutex:: clear() throw()
 		{
 			//-- clean everything
-			memset( &mutex_, 0, sizeof(mutex_) );
-			memset( name,    0, sizeof(name)   );
+			memset( &mutex_,  0, sizeof(mutex_)  );
+			memset( name_,    0, sizeof(name_)   );
 		}
 
 		mutex:: ~mutex() throw()
 		{
 #if YOCTO_MUTEX_VERBOSE == 1
-			std::cerr << "[-mutex] '" << name << "'" << std::endl;
+			std::cerr << "[-mutex] '" << name_ << "'" << std::endl;
 #endif	
 			
 #if defined(YOCTO_WIN)
@@ -49,7 +55,7 @@ namespace yocto
 #endif
 		mutex:: mutex( const char *id ) throw() :
 		mutex_(),
-		name()
+		name_()
 		{
 			clear();
 
@@ -83,12 +89,12 @@ namespace yocto
 			//-- set the name
 			if( id )
 			{
-				const size_t len = min_of<size_t>( strlen(id), sizeof(name)-1);
-				memcpy( name, id, len );
+				const size_t len = min_of<size_t>( strlen(id), sizeof(name_)-1);
+				memcpy( name_, id, len );
 			}
 			else 
 			{
-				YOCTO_STATIC_CHECK(sizeof(name)>2*sizeof(void*),mutex_name_too_small);
+				YOCTO_STATIC_CHECK(sizeof(name_)>2*sizeof(void*),mutex_name_too_small);
 				union  {
 					void   *addr;
 					uint8_t data[sizeof(void*)]; 
@@ -96,13 +102,13 @@ namespace yocto
 				for( size_t i=0,j=0; i < sizeof(void*); ++i )
 				{
 					const uint8_t B = alias.data[i];
-					name[j++] = hexachar[ (B>>4) & 0xf ];
-					name[j++] = hexachar[ (B   ) & 0xf ];
+					name_[j++] = hexachar[ (B>>4) & 0xf ];
+					name_[j++] = hexachar[ (B   ) & 0xf ];
 				}
 			}
 			
 #if YOCTO_MUTEX_VERBOSE == 1
-			std::cerr << "[+mutex] '" << name << "'" << std::endl;
+			std::cerr << "[+mutex] '" << name_ << "'" << std::endl;
 #endif
 			
 		}
@@ -110,7 +116,7 @@ namespace yocto
 		void mutex::lock() throw()
 		{
 #if YOCTO_MUTEX_VERBOSE == 1
-			std::cerr << "[@mutex] '" << name << "' : LOCK" << std::endl;
+			std::cerr << "[@mutex] '" << name_ << "' : LOCK" << std::endl;
 #endif
 			
 #if defined(YOCTO_WIN)
@@ -129,7 +135,7 @@ namespace yocto
 		void mutex:: unlock() throw()
 		{
 #if YOCTO_MUTEX_VERBOSE == 1
-			std::cerr << "[@mutex] '" << name << "' : UNLOCK" << std::endl;
+			std::cerr << "[@mutex] '" << name_ << "' : UNLOCK" << std::endl;
 #endif
 			
 #if defined(YOCTO_WIN)
@@ -146,7 +152,7 @@ namespace yocto
 		bool mutex:: try_lock() throw()
 		{
 #if YOCTO_MUTEX_VERBOSE == 1
-			std::cerr << "[@mutex] '" << name << "' : TRY_LOCK" << std::endl;
+			std::cerr << "[@mutex] '" << name_ << "' : TRY_LOCK" << std::endl;
 #endif
 			
 #if defined(YOCTO_WIN)
