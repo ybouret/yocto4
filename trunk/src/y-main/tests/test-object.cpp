@@ -13,11 +13,30 @@ namespace
 	public:
 		explicit nothing() throw() {}
 		virtual ~nothing() throw() {}
+
+		static threading::mutex access;
+
+		static void * operator new( size_t block_size )
+		{
+			YOCTO_LOCK(access);
+			return :: operator new( block_size );
+		}
+
+		static void operator delete( void *p, size_t block_size ) throw()
+		{
+			YOCTO_LOCK(access);
+			:: operator delete( p );
+		}
+
+
 		
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(nothing);
 	};
 	
+
+	threading::mutex nothing::access( "nothing" );
+
 	template <size_t N, typename BASE>
 	class dummy : public BASE
 	{
