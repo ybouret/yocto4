@@ -1,6 +1,7 @@
 #include "yocto/memory/arena.hpp"
 #include "yocto/memory/global.hpp"
-#include <iostream>
+#include "yocto/code/swap.hpp"
+
 #include <cstring>
 
 namespace yocto
@@ -68,12 +69,16 @@ namespace yocto
 			}
 			
 			assert( pReleasing_ ); assert( chunk::owned_by_this == pReleasing_->whose(p, chunk_size_ ) );
+			
 			//------------------------------------------------------------------
 			// Release the block
 			//------------------------------------------------------------------			
 			++accessible_;
 			pReleasing_->release(p, block_size_);
 			
+			//------------------------------------------------------------------
+			// check memory status
+			//------------------------------------------------------------------
 			if( pReleasing_->is_empty() )
 			{
 				if( pAvailable_ )
@@ -83,43 +88,54 @@ namespace yocto
 					//----------------------------------------------------------
 					assert( pAvailable_ != pReleasing_ );
 					assert( pAvailable_->is_empty()    );
-					std::cerr << "Two Chunks are Empty !" << std::endl;
-
-					//-- choose the highest chunk,
-					chunk *to_release = NULL;
-					if( pAvailable_ > pReleasing_ )
-					{
-						assert( pAvailable_->data > pReleasing_->data );
-						to_release  = pAvailable_;
-						pAvailable_ = pReleasing_;
-					}
-					else
-					{
-						assert( pAvailable_->data < pReleasing_->data );
-						to_release = pReleasing_;
-					}
-					assert( pAvailable_ != NULL );
-					assert( pAvailable_ < to_release );
-					assert( pAvailable_->is_empty()  );
-
-					//-- remove to_release
-					size_t csz = chunk_size_;
+					
+					//----------------------------------------------------------
+					//-- choose the highest chunk
+					//----------------------------------------------------------
+					if( pAvailable_ <= pReleasing_ )
+						cswap<chunk *>( pAvailable_, pReleasing_ );
+					
+					assert( pAvailable_ > pReleasing_ );
+					assert( pAvailable_->data > pReleasing_->data );
+					
+					//----------------------------------------------------------
+					// remove to_release
+					//----------------------------------------------------------
+					chunk *to_release = pAvailable_;
+					size_t csz        = chunk_size_;
 					kind<global>::release_as<uint8_t>( to_release->data, csz );
 					memmove( to_release, to_release+1, sizeof(chunk) * static_cast<size_t>( --chunk_last_ - to_release ) );
 					--size_;
 					accessible_ -= num_blocks_;
-
+					
+					//----------------------------------------------------------
 					//-- update caching
-
-
-				}
-				else 
-				{
 					//----------------------------------------------------------
-					// register
-					//----------------------------------------------------------
-					pAvailable_ = pReleasing_;
+					if( pAcquiring_ >= to_release )
+					{
+						
+						if( pAcquiring_ > to_release ) 
+						{
+							/* acquiring was shifted down */
+							--pAcquiring_;
+						}
+						else
+						{
+							/* acquiring was destroyed ! */
+							assert( to_release == pAcquiring_ );
+							pAcquiring_ = pReleasing_;
+						}
+					}
+					
+					
 				}
+				
+				//--------------------------------------------------------------
+				// in any case, the new pAvailable_ is pReleasing_...
+				//--------------------------------------------------------------
+				assert(pReleasing_->is_empty());
+				pAvailable_ = pReleasing_;
+				
 				
 			}
 			

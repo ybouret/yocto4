@@ -10,9 +10,7 @@ namespace yocto
 		
 		bool chunk:: is_empty() const throw() { return stillAvailable >= providedNumber; }
 
-		chunk:: ~chunk() throw()
-		{
-		}
+		
 		
 		chunk:: chunk(void  *           data_entry,
 					  size_t            block_size,
