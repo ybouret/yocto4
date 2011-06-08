@@ -3,8 +3,9 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_INIT(16)
+YOCTO_UNIT_TEST_INIT(32)
 {
+	
 	YOCTO_UNIT_TEST_DECL(platform);
 	YOCTO_UNIT_TEST_DECL(mutex);
 	YOCTO_UNIT_TEST_DECL(round);
@@ -19,7 +20,10 @@ YOCTO_UNIT_TEST_INIT(16)
 	YOCTO_UNIT_TEST_DECL(singleton);
 	YOCTO_UNIT_TEST_DECL(global);
 	YOCTO_UNIT_TEST_DECL(arena);
-	
+	YOCTO_UNIT_TEST_DECL(blocks);
+	YOCTO_UNIT_TEST_DECL(small_object);
+	YOCTO_UNIT_TEST_DECL(object);
+
 	
 }
 YOCTO_UNIT_TEST_EXEC()

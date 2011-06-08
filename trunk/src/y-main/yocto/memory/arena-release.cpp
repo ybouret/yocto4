@@ -2,6 +2,8 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/code/swap.hpp"
 
+#include "yocto/memory/chunk.hpp"
+
 #include <cstring>
 
 namespace yocto
@@ -51,7 +53,7 @@ namespace yocto
 			//------------------------------------------------------------------
 			// Find The Owner
 			//------------------------------------------------------------------
-			switch( pReleasing_->whose(p, chunk_size_ ) )
+			switch( pReleasing_->whose(p, chunk_size ) )
 			{
 				case chunk::owned_by_this:
 					//-- cached
@@ -59,22 +61,22 @@ namespace yocto
 					
 				case chunk::owned_by_next:
 					//-- bisection hi
-					pReleasing_ = find_owner_of(p, chunk_size_, pReleasing_+1, chunk_last_ );
+					pReleasing_ = find_owner_of(p, chunk_size, pReleasing_+1, chunk_last_ );
 					break;
 					
 				case chunk::owned_by_prev:
 					//-- bisection lo
-					pReleasing_ = find_owner_of(p, chunk_size_, chunk_,        pReleasing_ );
+					pReleasing_ = find_owner_of(p, chunk_size, chunk_,        pReleasing_ );
 					break;
 			}
 			
-			assert( pReleasing_ ); assert( chunk::owned_by_this == pReleasing_->whose(p, chunk_size_ ) );
+			assert( pReleasing_ ); assert( chunk::owned_by_this == pReleasing_->whose(p, chunk_size ) );
 			
 			//------------------------------------------------------------------
 			// Release the block
 			//------------------------------------------------------------------			
 			++accessible_;
-			pReleasing_->release(p, block_size_);
+			pReleasing_->release(p, block_size );
 			
 			//------------------------------------------------------------------
 			// check memory status
@@ -102,11 +104,11 @@ namespace yocto
 					// remove to_release
 					//----------------------------------------------------------
 					chunk *to_release = pAvailable_;
-					size_t csz        = chunk_size_;
+					size_t csz        = chunk_size;
 					kind<global>::release_as<uint8_t>( to_release->data, csz );
 					memmove( to_release, to_release+1, sizeof(chunk) * static_cast<size_t>( --chunk_last_ - to_release ) );
 					--size_;
-					accessible_ -= num_blocks_;
+					accessible_ -= num_blocks;
 					
 					//----------------------------------------------------------
 					//-- update caching

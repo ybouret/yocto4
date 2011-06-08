@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/memory/arena.hpp"
+#include "yocto/memory/chunk.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/wtime.hpp"

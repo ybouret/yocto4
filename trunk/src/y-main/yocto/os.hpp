@@ -132,6 +132,8 @@ YOCTO_DISABLE_ASSIGN(CLASS)
 		item->~T();
 	}
 	
+	inline bool die( const char *) throw() { return false; }
+	
 }
 
 #endif
