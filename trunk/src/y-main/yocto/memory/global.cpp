@@ -39,15 +39,7 @@ namespace yocto
 #endif
 		}
 		
-		global:: allocator:: allocator() throw()
-		{
-			(void) global::instance();
-		}
 		
-		global:: allocator:: ~allocator() throw()
-		{
-			
-		}
 		
 		void * global:: acquire( size_t &n )
 		{
@@ -102,6 +94,15 @@ namespace yocto
 			
 		}
 		
+		global:: allocator:: allocator() throw()
+		{
+			(void) global::instance();
+		}
+		
+		global:: allocator:: ~allocator() throw()
+		{
+			
+		}
 		void * global:: allocator:: acquire( size_t &n )
 		{
 			static global &g = global::instance();

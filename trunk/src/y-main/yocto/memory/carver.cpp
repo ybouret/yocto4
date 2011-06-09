@@ -74,10 +74,11 @@ namespace yocto
 					}
 				}
 				
+				//-- free_ can be not NULL be without enough space
+				
 				//--------------------------------------------------------------
 				//  need a new slice !
 				//--------------------------------------------------------------
-				assert( NULL == free_ );
 				slice *s = pool_.size > 0 ? pool_.query() : acquire_slice();
 				try 
 				{

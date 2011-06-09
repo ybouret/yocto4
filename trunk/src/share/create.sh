@@ -167,7 +167,7 @@ function xtarget
 
         "xcode")
             [ "all" == "$tgt" ] && tgt="ALL_BUILD";
-            (xcodebuild -parallelizeTargets -target $tgt -configuration $BUILD_TYPE 2>&1 | grep '^[^ \t|(echo)|(Phase)|(make)]' )|| xerror "can't build $1"
+            (xcodebuild -parallelizeTargets -target $tgt -configuration $BUILD_TYPE 2>&1 | grep -v -E 'setenv|Phase|echo|^make|^Check|^cd|^Depend' ) || xerror "can't build $1"
         ;;
 
         "codeblocks")
