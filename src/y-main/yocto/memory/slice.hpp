@@ -41,10 +41,26 @@ namespace yocto
 			
 			bool is_empty() const throw();
 			
+			//! best fit acquire
+			void *acquire( size_t &bytes ) throw();
+			
+			//! release
+			/**
+				\param p a previously slice-acquired are
+				\return the owner slice
+			 */
+			static
+			slice *release( void *p ) throw();
+			
+			size_t	 count() const throw();
+			size_t   bytes() const throw();
+			
 		private:
 			size_t   count_;
 			block_t *entry_;
 			block_t *watch_;
+			size_t   ready_; //!< # ready blocks
+			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(slice);
 		};
 
