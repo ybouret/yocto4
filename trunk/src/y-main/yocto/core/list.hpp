@@ -179,6 +179,12 @@ namespace yocto
 				}
 			}
 			
+			inline void move_to_front( NODE *node ) throw()
+			{
+				assert( owns( node ) );
+				push_front( unlink(node) );
+			}
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(list_of);
 			inline void push_first( NODE *node ) throw()

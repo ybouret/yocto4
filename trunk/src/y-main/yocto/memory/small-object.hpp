@@ -98,8 +98,8 @@ namespace yocto
 			};
 			
 			
-			template <typename T> static inline T   *acquire()               { return small_object::operator new(sizeof(T));      }
-			template <typename T> static inline void release( T *p ) throw() {        small_object::operator delete(p,sizeof(T)); }
+			template <typename T> static inline T   *acquire() { return static_cast<T*>(small_object::operator new(sizeof(T)) );      }
+			template <typename T> static inline void release( T *p ) throw() { small_object::operator delete(p,sizeof(T)); }
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(small_object);

@@ -24,7 +24,7 @@ namespace yocto
 			
 						
 			//! push a valid node
-			inline void push( NODE *node ) throw()
+			inline void store( NODE *node ) throw()
 			{
 				assert( NULL != node       );
 				assert( NULL == node->next );
@@ -35,7 +35,7 @@ namespace yocto
 			}
 			
 			//! pop is size>0
-			inline NODE *pop() throw()
+			inline NODE *query() throw()
 			{
 				assert(top != NULL);
 				assert(size > 0   );
@@ -59,13 +59,13 @@ namespace yocto
 			inline void delete_with( void (*proc)( NODE *, void *), void *args ) throw()
 			{
 				assert(proc);
-				while(size>0) proc( pop(), args ); 
+				while(size>0) proc( query(), args ); 
 			}
 			
 			inline void delete_with( void (*proc)(NODE *) ) throw()
 			{
 				assert( proc );
-				while(size>0) proc( pop() );
+				while(size>0) proc( query() );
 			}
 			
 			inline void reset() throw() { top = NULL; size = 0; }
