@@ -8,6 +8,8 @@ namespace yocto
 	namespace memory
 	{
 
+		class carver;
+		
 		//! handle a slice of memory
 		class slice
 		{
@@ -60,8 +62,12 @@ namespace yocto
 			block_t *entry_;
 			block_t *watch_;
 			size_t   ready_; //!< # ready blocks
-			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(slice);
+			friend class carver;
+			
+		public:
+			slice *next;
+			slice *prev;
 		};
 
 	}

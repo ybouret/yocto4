@@ -3,6 +3,7 @@
 #include "yocto/code/ilog2.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/memory/global.hpp"
+#include "yocto/exceptions.hpp"
 
 #include <cstring>
 
@@ -45,21 +46,25 @@ namespace yocto
 		// Initializing
 		//
 		//======================================================================
-#define YOCTO_MEMORY_SLICE_BLOCKS_ROUND_LN2 2
 #define YOCTO_MEMORY_SLICE_BLOCKS_AVAILABLE 2
 		
-		static inline size_t slice_count( size_t length ) throw()
+		static inline size_t slice_count( size_t length )
 		{
 			//-- entry + watch + available blocks
 			const size_t raw_count = 2 + max_of<size_t>(YOCTO_MEMORY_SLICE_BLOCKS_AVAILABLE, slice::blocks_for(length));
-			return YOCTO_ROUND( YOCTO_MEMORY_SLICE_BLOCKS_ROUND_LN2, raw_count );	
+			const size_t count     = next_power_of_two( raw_count );
+			if( count < raw_count )
+				throw imported::exception("memory::slice::count overflow", "too many #blocks=%u", unsigned(raw_count) );
+			return count;
 		}
 		
 		slice:: slice( size_t data_size, size_t mini_size ) :
 		count_( slice_count( max_of(data_size,mini_size)  ) ),
 		entry_( kind<global>::acquire_as<block_t>( count_ ) ),
 		watch_( entry_+count_ ),
-		ready_( 1 )
+		ready_( 1 ),
+		next(NULL),
+		prev(NULL)
 		{
 			assert( is_a_power_of_two( sizeof(block_t) ) );
 			
@@ -204,20 +209,20 @@ namespace yocto
 		slice *slice:: release( void * p ) throw()
 		{
 			assert(p);
-			block_t *curr = static_cast<block_t*>(p) - 1;
-			slice   *from = curr->info.owner;
+			block_t *curr_block = static_cast<block_t*>(p) - 1;
+			slice   *from = curr_block->info.owner;
 			assert( from != NULL );
 			assert( from->entry_ != NULL );
 			assert( from->watch_ != NULL );
-			assert( curr >= from->entry_ );
-			assert( curr <  from->watch_ );
+			assert( curr_block >= from->entry_ );
+			assert( curr_block <  from->watch_ );
 			//std::cerr << "relasing a block of " << curr->size.value << " blk" << std::endl;
 			
-			block_t *prev = curr->prev.block;
-			block_t *next = curr->next.block;
+			block_t *prev_block = curr_block->prev.block;
+			block_t *next_block = curr_block->next.block;
 			
-			size_t fusion = (prev != NULL) && (prev->info.owner == NULL) ? YMSB_FUSION_LEFT : YMSB_FUSION_NONE;
-			if( next != from->watch_ && next->info.owner == NULL )
+			size_t fusion = (prev_block != NULL) && (prev_block->info.owner == NULL) ? YMSB_FUSION_LEFT : YMSB_FUSION_NONE;
+			if( next_block != from->watch_ && next_block->info.owner == NULL )
 			{
 				fusion |= YMSB_FUSION_RIGHT;
 			}
@@ -226,44 +231,44 @@ namespace yocto
 			switch( fusion )
 			{
 				case YMSB_FUSION_RIGHT: {
-					block_t *after = next->next.block;
-					assert(next!=from->watch_);
-					assert(next->info.owner == NULL);
+					block_t *after = next_block->next.block;
+					assert(next_block!=from->watch_);
+					assert(next_block->info.owner == NULL);
 					assert( after != NULL );
-					after->prev.block = curr;
-					curr->next.block  = after;
-					curr->info.owner  = NULL;
-					curr->size.value += next->size.value + 1;
-					assert( static_cast<size_t>(curr->next.block - curr ) == curr->size.value + 1 );
+					after->prev.block = curr_block;
+					curr_block->next.block  = after;
+					curr_block->info.owner  = NULL;
+					curr_block->size.value += next_block->size.value + 1;
+					assert( static_cast<size_t>(curr_block->next.block - curr_block ) == curr_block->size.value + 1 );
 				} break;
 					
 				case YMSB_FUSION_LEFT: {
-					assert(prev!=NULL);
-					assert(prev->info.owner == NULL );
-					prev->next.block = next;
-					next->prev.block = prev;
-					prev->size.value += 1 + curr->size.value;
-					assert( static_cast<size_t>(prev->next.block - prev ) == prev->size.value + 1 );
+					assert(prev_block!=NULL);
+					assert(prev_block->info.owner == NULL );
+					prev_block->next.block = next_block;
+					next_block->prev.block = prev_block;
+					prev_block->size.value += 1 + curr_block->size.value;
+					assert( static_cast<size_t>(prev_block->next.block - prev_block ) == prev_block->size.value + 1 );
 				} break;
-
+					
 				case YMSB_FUSION_BOTH:
 				{			
-					block_t *after = next->next.block;
-					assert(prev!=NULL);
-					assert(prev->info.owner == NULL );
-					assert(next!=from->watch_);
-					assert(next->info.owner == NULL);
+					block_t *after = next_block->next.block;
+					assert(prev_block!=NULL);
+					assert(prev_block->info.owner == NULL );
+					assert(next_block!=from->watch_);
+					assert(next_block->info.owner == NULL);
 					assert( after != NULL );
-					prev->next.block  = after;
-					after->prev.block = prev;
-					prev->size.value += 2 + curr->size.value + next->size.value;
-					assert( static_cast<size_t>(prev->next.block - prev ) == prev->size.value + 1 );
+					prev_block->next.block  = after;
+					after->prev.block = prev_block;
+					prev_block->size.value += 2 + curr_block->size.value + next_block->size.value;
+					assert( static_cast<size_t>(prev_block->next.block - prev_block ) == prev_block->size.value + 1 );
 					from->ready_--;
 				} break;
 					
 				default:
 					assert( YMSB_FUSION_NONE == fusion );
-					curr->info.owner = NULL;
+					curr_block->info.owner = NULL;
 					from->ready_++;
 					break;
 			}

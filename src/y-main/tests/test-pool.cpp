@@ -33,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(pool)
 	
 	for( size_t i=0; i < num; ++i )
 	{
-		pool.push( nodes+i );
+		pool.store( nodes+i );
 	}
 	
 	pool.delete_with( display );
