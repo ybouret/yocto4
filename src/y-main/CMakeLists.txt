@@ -27,9 +27,15 @@ SET( mem_srcs ${mem_decl} ${mem_impl} )
 INSTALL( FILES ${mem_decl} DESTINATION include/yocto/memory )
 SOURCE_GROUP( memory FILES ${mem_srcs} )
 
+FILE( GLOB string_decl yocto/string/*.hpp)
+FILE( GLOB string_impl yocto/string/*.cpp)
+SET( string_srcs ${string_decl} ${string_impl} )
+INSTALL( FILES ${string_decl} DESTINATION include/yocto/string )
+SOURCE_GROUP( string FILES ${string_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs})
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
