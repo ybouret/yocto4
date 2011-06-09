@@ -11,7 +11,7 @@ namespace yocto
 	namespace memory
 	{
 	
-		class pooled : singleton<pooled>, public allocator
+		class pooled : public singleton<pooled>, public allocator
 		{
 		public:			
 			virtual void *acquire( size_t &n );
