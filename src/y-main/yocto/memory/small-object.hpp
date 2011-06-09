@@ -92,9 +92,11 @@ namespace yocto
 				
 				blocks blocks_;
 				friend class singleton<provider>;
-				
-				static const threading::longevity life_time = global::life_time - 1;
 				static const char name[];
+				
+			public:
+				static const threading::longevity life_time = global::life_time - 1;
+
 			};
 			
 			

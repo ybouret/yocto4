@@ -22,5 +22,6 @@ ADD_TEST(SmallObject test-main small_object)
 ADD_TEST(Object      test-main object)
 ADD_TEST(Slice       test-main slice)
 ADD_TEST(Carver      test-main carver)
+ADD_TEST(Pooled      test-main pooled)
 
-ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-main)
+ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
