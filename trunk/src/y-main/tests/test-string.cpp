@@ -25,6 +25,8 @@ YOCTO_UNIT_TEST_IMPL(string)
 	c = "Hello";
 	d = " World";
 	a = c + d; display(a);
+	a = vformat( "now in '%s', line #%d, at '%s'", __FILE__, __LINE__, __DATE__ );
+	display(a);
 	
 }
 YOCTO_UNIT_TEST_DONE()
