@@ -70,6 +70,13 @@ case $BUILD_TOOLS in
       cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
+  "pathscale" )
+      export CC=pacthcc; export CXX=pathCC;
+      BUILD_SUBDIR=pathscale/$BUILD_TYPE;
+      BUILD_GENERATOR="$WITH_MAKEFILES"
+      cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
+    ;;
+    
   "codeblocks") 
     BUILD_GENERATOR="CodeBlocks - $WITH_MAKEFILES";
     ;;
