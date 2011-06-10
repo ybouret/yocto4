@@ -9,8 +9,19 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS    ON)
 ########################################################################
 ##
 ########################################################################
+EXEC_PROGRAM( uname ARGS "-m" OUTPUT_VARIABLE BUILD_MACHINE )
+#MESSAGE( STATUS "BUILD_MACHINE=${BUILD_MACHINE}" )
 
+SET(ON_MACOSX OFF)
+IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+  SET(ON_MACOSX ON)
+ENDIF()
+
+########################################################################
+## tuning compilers flags
+########################################################################
 GET_FILENAME_COMPONENT(CC_NAME ${CMAKE_C_COMPILER} NAME )
+
 
 ########################################################################
 ## GNU
