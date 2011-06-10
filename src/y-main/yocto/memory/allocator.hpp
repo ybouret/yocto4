@@ -70,8 +70,6 @@ namespace yocto
 				return h.release(p,n);
 			}
 			
-						
-			
 			
 			template <typename T>
 			static T * acquire_as( size_t &n )

@@ -23,7 +23,7 @@ namespace yocto {
 		{
 			count_lock_.lock();
 			++waiters_count_;
-			while( (count_ == 0 ) ) {
+			while( count_ == 0 ) {
 				count_nonzero_.wait( count_lock_ );
 			}
 			--waiters_count_;
