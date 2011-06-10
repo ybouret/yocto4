@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "yocto/string.hpp"
 #include "yocto/memory/buffers.hpp"
 #include "yocto/memory/global.hpp"
