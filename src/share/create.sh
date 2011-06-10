@@ -113,6 +113,17 @@ case $BUILD_TOOLS in
     ;;
 esac
 
+########################################################################
+## register the BUILD_TARGET
+########################################################################
+cmake -E cmake_echo_color --green --bold "-- registering $BUILD_TARGET"
+cmake -E touch ./forge/targets || xerror "-- can't create targets file"
+(grep $BUILD_TARGET ./forge/targets > /dev/null ) || (echo $BUILD_TARGET >> ./forge/targets)
+
+########################################################################
+## configuring
+########################################################################
+cmake -E cmake_echo_color --blue --bold "-- Configuring......"
 cd $BUILD_ROOT &&  ( cmake "$BUILD_UP/$BUILD_SOURCE" -G"$BUILD_GENERATOR" $BUILD_OPT || xerror "CMake Failure!")
 
 JLEVEL=""
@@ -151,9 +162,9 @@ cmake -E cmake_echo_color --magenta "-- using $JLEVEL";
 ################################################################################
 ## Executing Remaining Commands: WE ARE in the BUILD_DIR !!
 ################################################################################
-[ -z "$TARGETS" ] && cmake -E cmake_echo_color --blue "-- Configuring is now done" && exit 0;
+[ -z "$TARGETS" ] && cmake -E cmake_echo_color --blue --bold "-- Configuring is now done" && exit 0;
 
-echo "-- Executing $TARGETS";
+cmake -E cmake_echo_color --blue --bold  "-- Executing $TARGETS";
 
 
 function xtarget

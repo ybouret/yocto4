@@ -24,5 +24,7 @@ ADD_TEST(Slice       test-main slice)
 ADD_TEST(Carver      test-main carver)
 ADD_TEST(Pooled      test-main pooled)
 ADD_TEST(String      test-main string)
+ADD_TEST(TypeTraits  test-main type_traits)
+ADD_TEST(Functor     test-main functor)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
