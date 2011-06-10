@@ -22,7 +22,7 @@ namespace yocto
 			explicit ro_buffer() throw();
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ro_buffer);
-			virtual const void *get_address() const throw();
+			virtual const void *get_address() const throw() = 0;
 		};
 		
 		
