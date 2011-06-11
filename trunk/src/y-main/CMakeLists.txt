@@ -45,8 +45,14 @@ SET( sequence_srcs ${sequence_decl} ${sequence_impl} )
 INSTALL( FILES ${sequence_decl} DESTINATION include/yocto/sequence )
 SOURCE_GROUP( sequence FILES ${sequence_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs})
+FILE( GLOB hashing_decl yocto/hashing/*.hpp)
+FILE( GLOB hashing_impl yocto/hashing/*.cpp)
+SET( hashing_srcs ${hashing_decl} ${hashing_impl} )
+INSTALL( FILES ${hashing_decl} DESTINATION include/yocto/hashing )
+SOURCE_GROUP( hashing FILES ${hashing_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
