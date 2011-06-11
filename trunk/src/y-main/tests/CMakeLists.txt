@@ -1,5 +1,5 @@
 
-FILE(GLOB test_srcs test-*.cpp)
+FILE(GLOB test_srcs test-*.cpp *.hpp)
 ADD_EXECUTABLE(test-main main.cpp ${test_srcs})
 TARGET_LINK_YOCTO( test-main )
 
@@ -26,5 +26,7 @@ ADD_TEST(Pooled      test-main pooled)
 ADD_TEST(String      test-main string)
 ADD_TEST(TypeTraits  test-main type_traits)
 ADD_TEST(Functor     test-main functor)
+ADD_TEST(Container   test-main container)
+ADD_TEST(Sequence    test-main sequence)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)

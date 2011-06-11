@@ -55,7 +55,7 @@ YOCTO_UNIT_TEST_IMPL(chunk)
 				{
 					ch->release( addr[i], block_size);
 				}
-				self_destruct(ch);
+				destruct(ch);
 			}
 			
 			operator delete( data_entry );

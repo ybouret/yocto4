@@ -33,9 +33,20 @@ SET( string_srcs ${string_decl} ${string_impl} )
 INSTALL( FILES ${string_decl} DESTINATION include/yocto/string )
 SOURCE_GROUP( string FILES ${string_srcs} )
 
+FILE( GLOB container_decl yocto/container/*.hpp)
+FILE( GLOB container_impl yocto/container/*.cpp)
+SET( container_srcs ${container_decl} ${container_impl} )
+INSTALL( FILES ${container_decl} DESTINATION include/yocto/container )
+SOURCE_GROUP( container FILES ${container_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs})
+FILE( GLOB sequence_decl yocto/sequence/*.hpp)
+FILE( GLOB sequence_impl yocto/sequence/*.cpp)
+SET( sequence_srcs ${sequence_decl} ${sequence_impl} )
+INSTALL( FILES ${sequence_decl} DESTINATION include/yocto/sequence )
+SOURCE_GROUP( sequence FILES ${sequence_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

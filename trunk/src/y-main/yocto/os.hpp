@@ -122,11 +122,9 @@ YOCTO_DISABLE_ASSIGN(CLASS)
 		typedef U result; //!< flag is false
 	};
 	
-	
 		
-	
 	template <typename T>
-	inline void self_destruct( T *item ) throw()
+	inline void destruct( T *item ) throw()
 	{
 		assert(item);
 		item->~T();

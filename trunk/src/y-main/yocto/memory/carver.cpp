@@ -18,19 +18,19 @@ namespace yocto
 		//======================================================================
 		static inline slice *acquire_slice()
 		{
-			return object::acquire<slice>();
+			return object::acquire1<slice>();
 		}
 		
 		static inline void   release_slice( slice *s ) throw()
 		{
 			assert( NULL != s );
-			object::release<slice>(s);
+			object::release1<slice>(s);
 		}
 		
 		static inline void destroy_slice( slice *s ) throw()
 		{
 			assert( NULL != s );
-			self_destruct(s);
+			destruct(s);
 			release_slice(s);
 		}
 		
@@ -118,7 +118,7 @@ namespace yocto
 							cswap<slice*>( free_, s);
 						}
 						assert( free_->entry_ > s->entry_);
-						self_destruct( list_.unlink(free_) );
+						destruct( list_.unlink(free_) );
 						if( pool_.size >= max_in_pool )
 						{
 							release_slice(free_);

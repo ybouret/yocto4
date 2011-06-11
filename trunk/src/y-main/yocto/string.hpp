@@ -4,6 +4,7 @@
 
 #include "yocto/string/basic.hpp"
 #include "yocto/code/printf-check.hpp"
+#include "yocto/bitwise.hpp"
 
 namespace yocto
 {
@@ -12,5 +13,8 @@ namespace yocto
 	
 	string vformat( const char *fmt,... ) YOCTO_PRINTF_CHECK(1,2);
 }
+
+YOCTO_SUPPORT_BITWISE_OPS(string)
+YOCTO_SUPPORT_BITWISE_OPS(wstring)
 
 #endif
