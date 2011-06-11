@@ -54,6 +54,30 @@ namespace yocto
 				throw libc::exception( ERANGE, "next_prime(%u) overflow", unsigned(n) );
 			return q;
 		}
+	}
+	
+	size_t prev_prime( size_t n )
+	{
+		switch( n )
+		{
+			case 0:
+			case 1:
+				if( n < 2 )
+					throw libc::exception( ERANGE, "prev_prime(%u)", unsigned(n) );
+				
+			case 2: return 2;
+			case 3: return 3;
+			default:
+				break;
+		}
+		if( ! (n&1) ) --n;
+		assert( n > 2 );
+		while( ! _is_prime_above2(n) )
+		{
+			n -= 2;
+			assert( n > 2 );
+		}
+		return n;
 		
 	}
 	

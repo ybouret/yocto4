@@ -1,4 +1,7 @@
 #include "yocto/hashing/function.hpp"
+#include "yocto/memory/buffer.hpp"
+#include "yocto/chars.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -13,7 +16,7 @@ namespace yocto
 		}
 
 
-		void function:: fill( void *buffer, size_t buflen,	const void *output, size_t outlen )
+		void function:: fill( void *buffer, size_t buflen,	const void *output, size_t outlen ) throw()
 		{
 			assert( !(buffer==NULL && buflen > 0 ) );
 			assert( output != NULL );
@@ -34,6 +37,20 @@ namespace yocto
 				memcpy(p,output,buflen);
 			}
 		}
+
+		
+		function & function:: operator<<( const memory::ro_buffer &buf ) throw()
+		{
+			run( buf.ro(), buf.length() );
+			return *this;
+		}
+		
+		function &function:: operator<<( const char *buf ) throw()
+		{
+			run( buf, length_of(buf) );
+			return *this;
+		}
+
 
 	}
 
