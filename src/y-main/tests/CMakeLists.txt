@@ -28,5 +28,6 @@ ADD_TEST(TypeTraits  test-main type_traits)
 ADD_TEST(Functor     test-main functor)
 ADD_TEST(Container   test-main container)
 ADD_TEST(Sequence    test-main sequence)
+ADD_TEST(Primes      test-main primes)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
