@@ -1,0 +1,117 @@
+#ifndef YOCTO_SEQUENCE_LIST_INCLUDED
+#define YOCTO_SEQUENCE_LIST_INCLUDED 1
+
+#include "yocto/container/sequence.hpp"
+#include "yocto/core/list.hpp"
+#include "yocto/core/pool.hpp"
+#include "yocto/code/swap.hpp"
+
+namespace yocto
+{
+	
+	template <typename T>
+	class list : public sequence<T>
+	{
+	public:
+		YOCTO_ARGUMENTS_DECL_T;
+		
+		class node_type
+		{
+		public:
+			node_type    *next;
+			node_type    *prev;
+			mutable_type  data;
+			static inline node_type *acquire() { return object::acquire1<node_type>(); }
+			static inline void       release(node_type *node) throw() { object::release1<node_type>(node);       } 
+			static inline void       destroy(node_type *node) throw() { destruct( & node->data ); release(node); }
+		private:
+			node_type(); ~node_type()throw(); 
+			YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
+		};
+		
+		explicit list() throw() : list_(), pool_() {}
+		virtual ~list() throw() { this->kill(); }
+		
+		virtual void   free() throw() { while(list_.size>0) keep( list_.pop_back() ); }
+		virtual void   release() throw() { this->kill(); }
+		virtual size_t size()     const throw()     { return list_.size; }
+		virtual size_t capacity() const throw()     { return pool_.size + list_.size; }		
+		virtual void   push_back( param_type obj )  { list_.push_back( make(obj) ); }
+		virtual void   pop_back() throw()           { assert(list_.size>0); keep(list_.pop_back()); }
+		virtual void   push_front( param_type obj ) { list_.push_front( make(obj) ); }
+		virtual void   pop_front() throw()          { assert(list_.size>0); keep(list_.pop_front()); }
+		
+		virtual void   reserve( size_t n ) 
+		{
+			size_t m = 0;
+			try {
+				while( n-- > 0 )
+				{
+					pool_.store( node_type::acquire() );
+					++m;
+				}
+			}
+			catch(...)
+			{
+				while(m-->0) node_type::release( pool_.query() );
+				throw;
+			}
+		}
+		
+		void swap_with( list &other ) throw()
+		{
+			mswap( list_, other.list_ );
+			mswap( pool_, other.pool_ );
+		}
+		
+		list( const list &other ) : list_(), pool_()
+		{
+			try
+			{
+				for( const node_type *node = other.list_.head; node != NULL; node = node->next )
+				{
+					push_back( node->data );
+				}
+			}
+			catch(...)
+			{
+				list_.delete_with( node_type::destroy );
+				throw;
+			}
+		}
+		
+		list & operator=( const list & other ) 
+		{
+			if( this != &other )
+			{
+				list tmp( other );
+				swap_with( tmp  );
+			}
+			return *this;
+		}
+		
+	private:
+		core::list_of<node_type> list_;
+		core::pool_of<node_type> pool_;
+		inline void kill() throw() { list_.delete_with( node_type::destroy ); pool_.delete_with( node_type::release ); }
+		inline void keep( node_type *node ) throw() { destruct( &node->data ); pool_.store(node); }
+		inline node_type *make( param_type obj )
+		{
+			node_type *node = pool_.size ? pool_.query() : node_type::acquire();
+			try
+			{
+				new ( & node->data ) mutable_type( obj ); return node;
+			}
+			catch(...)
+			{
+				pool_.store(node); throw;
+			}
+		}
+		
+		virtual const_type &get_front() const throw() { assert(list_.size>0); return list_.head->data; }
+		virtual const_type &get_back()  const throw() { assert(list_.size>0); return list_.tail->data; }
+	};
+	
+}
+
+#endif

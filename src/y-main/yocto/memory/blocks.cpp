@@ -20,7 +20,7 @@ namespace yocto
 		{
 			while( count_ > 0 )
 			{
-				self_destruct( & arena_[--count_] );
+				destruct( & arena_[--count_] );
 			}
 			kind<global>::release_as<arena>(arena_,total_);
 			guard_ = NULL;

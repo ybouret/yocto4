@@ -51,38 +51,7 @@ namespace yocto {
 		YOCTO_SUPPORT_BITWISE_OPS(CLASS) \
 		YOCTO_SUPPORT_NO_DESTRUCT(CLASS)
 
-	namespace core
-	{
-		//! no_destruct = true
-		#if !defined(NDEBUG)
-		template <typename T>
-		inline void destruct_( T *item, int2type<true> ) throw()
-		{
-			assert(item);
-		}
-		#else
-		template <typename T>
-		inline void destruct_( T *, int2type<true> ) throw()
-		{
-		}
-		#endif
-
-		//! no_destruct = false
-		template <typename T>
-		inline void destruct_( T *item, int2type<false> ) throw()
-		{
-			assert(item);
-			item->~T();
-		}
-	}
-
-	//! automatic destruction call
-	template <typename T>
-	inline void destruct( T *item ) throw()
-	{
-		core::destruct_( item, int2type< support_no_destruct<T>::value >() );
-	}
-	
+		
 }
 
 #endif

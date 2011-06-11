@@ -3,6 +3,8 @@
 
 #include "yocto/os.hpp"
 
+//#include <iostream>
+
 namespace yocto
 {
 	
@@ -91,7 +93,7 @@ namespace yocto
 			
 			inline bool owns( const NODE *node ) const throw()
 			{
-				for( const NODE *scan = head; scan; scan = scan->next)
+				for( const NODE *scan = head; scan != NULL; scan = scan->next)
 				{
 					if( node == scan ) return true;
 				}
@@ -107,9 +109,9 @@ namespace yocto
 				while( node )
 				{
 					NODE *prev = node->prev;
-					proc(node);
 					node->next = NULL;
 					node->prev = NULL;
+					proc(node);
 					node = prev;
 				}
 				reset();
@@ -122,9 +124,9 @@ namespace yocto
 				while( node )
 				{
 					NODE *prev = node->prev;
-					proc(node,args);
 					node->next = NULL;
 					node->prev = NULL;
+					proc(node,args);
 					node = prev;
 				}
 				reset();
