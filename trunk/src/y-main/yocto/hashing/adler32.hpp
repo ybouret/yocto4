@@ -7,18 +7,17 @@ namespace yocto
 {
 	namespace hashing
 	{
-
+		
 		class adler32 : public function
 		{
 		public:
-			YOCTO_HASHING_FUNCTION_DECL(4,4);
-			explicit adler32() throw();
-			virtual ~adler32() throw();
-
+			YOCTO_HASHING_FUNCTION_DECL(adler32,4,4);
+			
 		private:
+			uint32_t a;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(adler32);
 		};
-
+		
 	}
 }
 
