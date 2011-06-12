@@ -143,6 +143,13 @@ friend inline bool operator OP ( const T       lhs, const string &rhs ) throw() 
 			YOCTO_STRING_OP(<=)
 			YOCTO_STRING_OP(>=)
 			
+			//------------------------------------------------------------------
+			//
+			// Transform
+			//
+			//------------------------------------------------------------------
+			void trim(size_t n) throw();
+			
 		private:
 			size_t size_; //!< #chars
 			size_t full_; //!< memory units
