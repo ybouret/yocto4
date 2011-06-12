@@ -51,8 +51,15 @@ SET( hashing_srcs ${hashing_decl} ${hashing_impl} )
 INSTALL( FILES ${hashing_decl} DESTINATION include/yocto/hashing )
 SOURCE_GROUP( hashing FILES ${hashing_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs})
+FILE( GLOB ios_decl yocto/ios/*.hpp)
+FILE( GLOB ios_impl yocto/ios/*.cpp)
+SET( ios_srcs ${ios_decl} ${ios_impl} )
+INSTALL( FILES ${ios_decl} DESTINATION include/yocto/ios )
+SOURCE_GROUP( ios FILES ${ios_srcs} )
+
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
