@@ -29,8 +29,7 @@ YOCTO_UNIT_TEST_IMPL(streams)
 		output->write(C);
 	}
 	
-	
-	
-	
 }
 YOCTO_UNIT_TEST_DONE()
+
+

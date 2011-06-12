@@ -3,7 +3,6 @@
 
 #include "yocto/ios/istream.hpp"
 #include "yocto/ios/cfile.hpp"
-#include "yocto/string.hpp"
 
 namespace yocto
 {
