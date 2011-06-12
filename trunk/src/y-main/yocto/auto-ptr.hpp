@@ -1,0 +1,88 @@
+#ifndef YOCTO_AUTO_PTR_INCLUDED
+#define YOCTO_AUTO_PTR_INCLUDED 1
+
+#include "yocto/type-traits.hpp"
+namespace yocto
+{
+	
+	template <typename T>
+	class auto_ptr
+	{
+	public:
+		YOCTO_ARGUMENTS_DECL_T;
+		
+		inline auto_ptr()       throw() : pointee_( NULL ) {}		
+		inline auto_ptr( T *p ) throw() : pointee_( (mutable_type *) p ) {}
+		
+		virtual ~auto_ptr() throw() { __kill(); }
+		
+		void reset( T *p ) throw()
+		{
+			assert( p != pointee_ );
+			__kill();
+			pointee_ = (mutable_type *)p;
+		}
+		
+		auto_ptr & operator=( T *p ) throw()
+		{
+			if( p != pointee_ )
+			{
+				reset(p);
+			}
+			return *this;
+		}
+		
+		inline T * yield() throw() 
+		{
+			T    *p  = pointee_;
+			pointee_ = NULL;
+			return p;
+		}
+		
+		inline type & operator*()  throw()
+		{
+			assert( is_valid() );
+			return *pointee_;
+		}
+		
+		inline const_type & operator*()  const throw()
+		{
+			assert( is_valid() );
+			return *pointee_;
+		}
+		
+		inline type * operator->() throw() 
+		{
+			assert( is_valid() );
+			return pointee_;
+		}
+		
+		inline const_type * operator->() const throw()
+		{
+			assert( is_valid() );
+			return pointee_;
+		}
+		
+		
+		inline bool is_valid() const throw() { return NULL != pointee_; }
+		
+		inline type       * __get() throw()       { return pointee_; }
+		inline const_type * __get() const throw() { return pointee_; }
+		
+	private:
+		mutable_type *pointee_;
+		YOCTO_DISABLE_COPY_AND_ASSIGN(auto_ptr);
+		inline void __kill() throw()
+		{
+			if( pointee_ )
+			{
+				delete pointee_;
+				pointee_ = NULL;
+			}
+		}
+		
+	};
+	
+}
+
+#endif
