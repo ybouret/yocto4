@@ -1,0 +1,41 @@
+#ifndef YOCTO_IOS_CFILE_INCLUDED
+#define YOCTO_IOS_CFILE_INCLUDED 1
+
+
+#include "yocto/ios/local-file.hpp"
+#include <cstdio>
+
+namespace yocto
+{
+
+	namespace memory
+	{
+		class rw_buffer;
+	}
+
+	namespace ios
+	{
+		
+
+		class cfile : public local_file
+		{
+		public:
+			explicit cfile( const char *filename, const char *mode );
+			explicit cfile( const cstdin_t  &);
+			explicit cfile( const cstdout_t &);
+			explicit cfile( const cstderr_t &);
+			virtual ~cfile() throw();
+			
+			static int last_close;
+			
+			void bufferize( memory::rw_buffer &buf );
+
+		protected:
+			FILE      *handle;
+			YOCTO_DISABLE_COPY_AND_ASSIGN(cfile);
+		};
+	}
+
+}
+
+#endif
