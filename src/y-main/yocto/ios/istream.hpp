@@ -15,6 +15,12 @@ namespace yocto
 			virtual bool query( char &C ) = 0;
 			virtual void store( char  C ) = 0;
 			
+			//! get at most buflen bytes
+			virtual size_t get( void *buffer, size_t buflen );
+			
+			//! must get exactly buflen bytes
+			void load( void *buffer, size_t buflen );
+			
 			
 			
 		protected:

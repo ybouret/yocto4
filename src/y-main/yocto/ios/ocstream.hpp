@@ -18,6 +18,10 @@ namespace yocto
 			ocstream( const cstdout_t & );
 			ocstream( const cstderr_t & );
 			
+			virtual void write( char C );
+			virtual void flush();
+			
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ocstream);
 		};

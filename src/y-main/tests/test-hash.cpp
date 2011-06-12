@@ -9,6 +9,7 @@
 #include "yocto/hashing/pjw.hpp"
 #include "yocto/hashing/sfh.hpp"
 #include "support.hpp"
+#include "yocto/ios/icstream.hpp"
 
 #include <iomanip>
 
@@ -33,7 +34,14 @@ YOCTO_UNIT_TEST_IMPL(hash)
 	
 	if( argc > 1 )
 	{
-		
+		ios::icstream input( argv[1] );
+		char buffer[512];
+		size_t loaded = 0;
+		while( (loaded=input.get(buffer,sizeof(buffer))) > 0 )
+		{
+			for( size_t i=0; i < h_num; ++i ) h_reg[i]->run(buffer, loaded);
+		}
+
 	}
 	else
 	{

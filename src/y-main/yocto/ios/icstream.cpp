@@ -4,34 +4,30 @@
 
 namespace yocto
 {
-
+	
 	namespace ios
 	{
-
+		
 		icstream:: ~icstream() throw() {}
-
+		
 		icstream:: icstream( const char   *filename ) : cfile( filename, "rb" ) {}
 		icstream:: icstream( const string &filename ) : cfile( filename.c_str(), "rb" ) {}
 		icstream:: icstream( const cstdin_t &x )      : cfile( x ) {}
-
-
+		
+		
 		bool icstream:: query( char &C )
 		{
-			const int ans = fgetc( handle );
-			if( EOF == ans )
+			if( 1 != fread( &C, 1, 1, handle) )
 			{
 				if( feof(handle) )
 					return false;
-				throw libc::exception( EIO, "icstream::query" );
+				throw libc::exception( EIO, "icstream::query()" );
 			}
-			else
-			{
-				C = char(ans);
+			else {
 				return true;
 			}
-
 		}
-
+		
 		void icstream:: store( char C )
 		{
 			const int ans = C;
@@ -40,7 +36,7 @@ namespace yocto
 				throw libc::exception( EIO, "icstream::store" );
 			}
 		}
-
+		
 	}
-
+	
 }
