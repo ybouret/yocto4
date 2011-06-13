@@ -102,8 +102,8 @@ namespace yocto
 				for( size_t i=0,j=0; i < sizeof(void*); ++i )
 				{
 					const uint8_t B = alias.data[i];
-					name_[j++] = hexachar[ (B>>4) & 0xf ];
-					name_[j++] = hexachar[ (B   ) & 0xf ];
+					name_[j++] = hexa_char[ (B>>4) & 0xf ];
+					name_[j++] = hexa_char[ (B   ) & 0xf ];
 				}
 			}
 			
