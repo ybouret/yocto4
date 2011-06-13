@@ -2,9 +2,12 @@
 #include "yocto/hashing/md2.hpp"
 #include "yocto/hashing/md4.hpp"
 #include "yocto/hashing/md5.hpp"
+#include "yocto/hashing/sha1.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/hashing/digest.hpp"
+#include "yocto/hashing/sha256.hpp"
+#include "yocto/hashing/sha512.hpp"
 
 #include <iomanip>
 
@@ -12,11 +15,68 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(hashing)
 {
-	hashing::md2 h_md2;
-	hashing::md4 h_md4;
-	hashing::md5 h_md5;
+	hashing::md2    h_md2;
+	hashing::md4    h_md4;
+	hashing::md5    h_md5;
+	hashing::sha1   h_sha1;
+	hashing::sha224 h_sha224;
+	hashing::sha256 h_sha256;
+	hashing::sha384 h_sha384;
+	hashing::sha512 h_sha512;
 	
-	hashing::function * h_reg[] = { &h_md2, &h_md4, &h_md5 };
+	{
+		const string wiki = "Wikipedia, l'encyclopedie libre et gratuite";
+		{
+			const digest o_md = digest::checksum( h_md2, wiki);
+			const digest i_md = digest::hex("c9b3cbbeb539034aac22567fa975f98e");
+			if( o_md != i_md ) throw exception("MD2 failure");
+		}
+		
+		{
+			const digest o_md = digest::checksum( h_md4, wiki);
+			const digest i_md = digest::hex("b94e66e0817dd34dc7858a0c131d4079");
+			if( o_md != i_md ) throw exception("MD4 failure");
+		}
+		
+		{
+			const digest o_md = digest::checksum( h_md5, wiki);
+			const digest i_md = digest::hex("d6aa97d33d459ea3670056e737c99a3d");
+			if( o_md != i_md ) throw exception("MD5 failure");
+		}
+		{
+			const digest o_md = digest::checksum( h_sha1, wiki);
+			const digest i_md = digest::hex("c18cc65028bbdc147288a2d136313287782b9c73");
+			if( o_md != i_md ) throw exception("SHA-1 failure");
+		}
+		
+		{
+			const digest o_md = digest::checksum( h_sha224, wiki);
+			const digest i_md = digest::hex("21a80161612f4625b5250e2fb3114bdcadf468e41390d5e61c37a4f8");
+			if( o_md != i_md ) throw exception("SHA-224 failure");
+		}
+		
+		
+		{
+			const digest o_md = digest::checksum( h_sha256, wiki);
+			const digest i_md = digest::hex("26e6a5869428afd4393ce9edff2fe70ec37725d2d81612e64fc9ce8effbf9a75");
+			if( o_md != i_md ) throw exception("SHA-256 failure");
+		}
+		
+		{
+			const digest o_md = digest::checksum( h_sha384, wiki);
+			const digest i_md = digest::hex("cda113c0c525d008285f8027936303d9f90e9c26553f267b451e8b695598f54cef65f6826b25d48bb428289c8fb5e736");
+			if( o_md != i_md ) throw exception("SHA-384 failure");
+		}
+		
+		{
+			const digest o_md = digest::checksum( h_sha512, wiki);
+			const digest i_md = digest::hex("73585d7c393cc548cfd6c4774a62f49c20bf16585a08a1e276f84fe3523538da12b61742f059ab56b05905eab6bab94b22b8b576ca7f5d8b612b2959083b84f3");
+			if( o_md != i_md ) throw exception("SHA-512 failure");
+		}
+		
+	}
+	
+	hashing::function * h_reg[] = { &h_md2, &h_md4, &h_md5, &h_sha1, &h_sha224, &h_sha256, &h_sha384, &h_sha512};
 	const size_t        h_num   = sizeof(h_reg)/sizeof(h_reg[0]);
 	
 	for( size_t i=0; i < h_num; ++i )
