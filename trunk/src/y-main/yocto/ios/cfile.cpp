@@ -7,12 +7,13 @@
 
 namespace yocto
 {
-
+	
 	namespace ios
 	{
-
-		int cfile::last_close = 0;
-
+		
+		
+		
+		
 		cfile:: ~cfile() throw()
 		{
 			if( is_regular == type )
@@ -20,40 +21,52 @@ namespace yocto
 				YOCTO_GIANT_LOCK();
 				last_close = 0;
 				if( fclose(handle) != 0 )
-					last_close = errno;
+				{
+					if( last_close )
+						*last_close = errno;
+				}
 			}
 		}
-
+		
 		cfile:: cfile( const char *filename, const char *mode ) :
 		local_file( is_regular ),
-			handle( NULL )
+		handle( NULL ),
+		last_close( NULL )
 		{
 			assert(filename);
 			assert(mode);
 			YOCTO_GIANT_LOCK();
 			handle = fopen( filename, mode );
-
+			
 			if( !handle )
 			{
 				throw libc::exception( errno, "fopen(%s,%s)", filename,mode );
 			}
+			
+#if defined(YOCTO_WIN)
+#if defined(_MSC_VER)
+			_setmode( _fileno(handle) , O_BINARY);
+#else
+			setmode( fileno(handle) , O_BINARY);
+#endif
+#endif
 		}
-
-		cfile:: cfile( const cstdin_t  &) : local_file( is_stdin ), handle( stdin )
+		
+		cfile:: cfile( const cstdin_t  &) : local_file( is_stdin ), handle( stdin ), last_close(NULL)
 		{
 			if( !handle ) throw exception("no STDIN!");
 		}
-
-		cfile:: cfile( const cstdout_t  &) : local_file( is_stdout ), handle( stdout )
+		
+		cfile:: cfile( const cstdout_t  &) : local_file( is_stdout ), handle( stdout ), last_close(NULL)
 		{
 			if( !handle ) throw exception("no STDOUT!");
 		}
-
-		cfile:: cfile( const cstderr_t  &) : local_file( is_stderr ), handle( stderr )
+		
+		cfile:: cfile( const cstderr_t  &) : local_file( is_stderr ), handle( stderr ), last_close(NULL)
 		{
 			if( !handle ) throw exception("no STDERR!");
 		}
-
+		
 		void cfile:: bufferize( memory::rw_buffer &buf )
 		{
 			YOCTO_GIANT_LOCK();
@@ -62,7 +75,7 @@ namespace yocto
 				throw libc::exception( errno, "setvbuf(@%p+%u)", buf.rw(), unsigned(buf.length()) );
 			}	
 		}
-
+		
 	}
-
+	
 }

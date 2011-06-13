@@ -1,6 +1,8 @@
 #include "yocto/ios/ostream.hpp"
 #include "yocto/exceptions.hpp"
+
 #include <cerrno>
+
 
 namespace yocto
 {
@@ -26,6 +28,7 @@ namespace yocto
 				throw libc::exception( EIO, "ostream::save(%u < %u)", unsigned(saved), unsigned(buflen) );
 		}
 
+		
 		
 	}
 	
