@@ -5,5 +5,6 @@ TARGET_LINK_YOCTO( test-kr kr )
 
 ENABLE_TESTING()
 ADD_TEST(Hashing test-kr hashing)
+ADD_TEST(HMAC    test-kr hmac)
 
 ADD_CUSTOM_TARGET(check-kr COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-kr )
