@@ -26,13 +26,13 @@ namespace yocto
 			explicit cfile( const cstderr_t &);
 			virtual ~cfile() throw();
 			
-			static int last_close;
-			
 			void bufferize( memory::rw_buffer &buf );
 
 		protected:
 			FILE      *handle;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(cfile);
+		public:
+			int *last_close;
 		};
 	}
 

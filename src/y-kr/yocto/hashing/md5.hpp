@@ -1,5 +1,5 @@
-#ifndef YOCTO_HASHING_ELF_INCLUDED
-#define YOCTO_HASHING_ELF_INCLUDED 1
+#ifndef YOCTO_HASHING_MD5_INCLUDED
+#define YOCTO_HASHING_MD5_INCLUDED 1
 
 #include "yocto/hashing/function.hpp"
 

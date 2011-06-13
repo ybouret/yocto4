@@ -1,4 +1,5 @@
 #include "yocto/hashing/md5.hpp"
+#include <cstring>
 
 namespace yocto
 {
