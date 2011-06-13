@@ -5,6 +5,11 @@
 
 #include <cerrno>
 
+#if defined(YOCTO_WIN)
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 namespace yocto
 {
 	
