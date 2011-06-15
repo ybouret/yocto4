@@ -5,9 +5,11 @@
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
 #include "yocto/code/swap.hpp"
+#include "yocto/container/iter-linked.hpp"
 
 namespace yocto
 {
+	namespace hidden { extern const char list_name[]; }
 	
 	template <typename T>
 	class list : public sequence<T>
@@ -32,6 +34,7 @@ namespace yocto
 		explicit list() throw() : list_(), pool_() {}
 		virtual ~list() throw() { this->kill(); }
 		
+		virtual const char *name() const throw() { return hidden::list_name; }
 		virtual void   free() throw() { while(list_.size>0) keep( list_.pop_back() ); }
 		virtual void   release() throw() { this->kill(); }
 		virtual size_t size()     const throw()     { return list_.size; }
@@ -80,6 +83,18 @@ namespace yocto
 			}
 		}
 		
+		list( size_t n, const as_capacity_t & ) : list_(), pool_()
+		{
+			try {
+				while( pool_.size < n ) pool_.store( node_type::acquire() );
+			}
+			catch (...) {
+				pool_.delete_with( node_type::release );
+				throw;
+			}
+		}
+		
+		
 		list & operator=( const list & other ) 
 		{
 			if( this != &other )
@@ -90,9 +105,30 @@ namespace yocto
 			return *this;
 		}
 		
-	private:
+		//======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::linked<type,node_type,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator( list_.head ); }
+		inline iterator end()   throw() { return iterator( NULL );       }
+		
+		typedef iterating::linked<const_type,const node_type,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return iterator( list_.head ); }
+		inline const_iterator end()   const throw() { return iterator( NULL );       }
+		
+		typedef iterating::linked<type,node_type,iterating::reverse> reverse_iterator;
+		inline reverse_iterator rbegin() throw() { return reverse_iterator( list_.tail ); }
+		inline reverse_iterator rend()   throw() { return reverse_iterator( NULL );       }
+		
+		typedef iterating::linked<const_type,const node_type, iterating::reverse> const_reverse_iterator;
+		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator( list_.tail ); }
+		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator( NULL   );     }
+		
+	protected:
 		core::list_of<node_type> list_;
 		core::pool_of<node_type> pool_;
+		
+	private:
 		inline void kill() throw() { list_.delete_with( node_type::destroy ); pool_.delete_with( node_type::release ); }
 		inline void keep( node_type *node ) throw() { destruct( &node->data ); pool_.store(node); }
 		inline node_type *make( param_type obj )

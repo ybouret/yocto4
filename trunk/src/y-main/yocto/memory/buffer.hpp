@@ -18,6 +18,8 @@ namespace yocto
 			const void * ro() const throw();
 			virtual size_t length() const throw() = 0; //!< in bytes
 			
+			uint8_t get_byte(size_t index) const throw(); //!< pad with 0
+			
 		protected:
 			explicit ro_buffer() throw();
 		private:

@@ -7,6 +7,7 @@ namespace yocto
 {
 	typedef uint32_t utf8_t;
 	
+	char   make_visible( char ) throw();
 	size_t length_of( const char   *s ) throw();
 	size_t length_of( const utf8_t *s ) throw();
 	

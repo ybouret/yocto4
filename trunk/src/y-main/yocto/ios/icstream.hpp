@@ -16,16 +16,17 @@ namespace yocto
 			icstream( const char   *filename );
 			icstream( const cstdin_t &);
 			virtual ~icstream() throw();
-	
+			
 			virtual bool query( char &C );
 			virtual void store( char  C );
-
+			virtual size_t get( void *buffer, size_t buflen );
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(icstream);
 		};
-
+		
 	}
-
+	
 }
 
 #endif

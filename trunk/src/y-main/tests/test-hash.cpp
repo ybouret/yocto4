@@ -8,6 +8,8 @@
 #include "yocto/hashing/fnv.hpp"
 #include "yocto/hashing/pjw.hpp"
 #include "yocto/hashing/sfh.hpp"
+#include "yocto/hashing/sha1.hpp"
+
 #include "support.hpp"
 #include "yocto/ios/icstream.hpp"
 
@@ -25,8 +27,9 @@ YOCTO_UNIT_TEST_IMPL(hash)
 	hashing::fnv       h_fnv;
 	hashing::pjw       h_pjw;
 	hashing::sfh       h_sfh;
+	hashing::sha1      h_sha1;
 	
-	hashing::function *h_reg[] = { & h_adler32,  & h_bjh32, &h_crc16, &h_crc32, &h_elf, &h_fnv, &h_pjw, &h_sfh };
+	hashing::function *h_reg[] = { & h_adler32,  & h_bjh32, &h_crc16, &h_crc32, &h_elf, &h_fnv, &h_pjw, &h_sfh, & h_sha1 };
 	const size_t       h_num   = sizeof(h_reg)/sizeof(h_reg[0]);
 	
 	
