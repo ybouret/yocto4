@@ -15,11 +15,12 @@ namespace yocto
 	public:
 		virtual ~container() throw();
 		
-		virtual size_t size()     const throw() = 0;
-		virtual size_t capacity() const throw() = 0;
-		virtual void   reserve(size_t n) = 0;
-		virtual void   free()    throw() = 0;
-		virtual void   release() throw() = 0;
+		virtual const char *name() const throw() = 0;
+		virtual size_t      size()     const throw() = 0;
+		virtual size_t      capacity() const throw() = 0;
+		virtual void        reserve(size_t n) = 0;
+		virtual void        free()    throw() = 0;
+		virtual void        release() throw() = 0;
 		
 		static size_t next_capacity( size_t n );
 		static size_t next_increase( size_t n );

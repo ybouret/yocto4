@@ -7,13 +7,17 @@
 #include "yocto/bitwise.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/container/iter-linear.hpp"
+#include "yocto/sequence/array.hpp"
 
 #include <cstring>
 
 namespace yocto
 {
+	namespace hidden { extern const char vector_name[]; }
+	
 	template <typename T, typename ALLOCATOR = memory::global::allocator >
-	class vector  : public sequence<T>
+	class vector  : public sequence<T>, public array<T>
 	{
 	public:
 		YOCTO_ARGUMENTS_DECL_T;
@@ -23,6 +27,7 @@ namespace yocto
 			no_destruct = support_no_destruct<mutable_type>::value,
 			c_style_ops = support_c_style_ops<mutable_type>::value
 		};
+		
 		
 		explicit vector() throw() : hmem_(),  size_(0), maxi_(0), item_(NULL) {--item_;}
 		virtual ~vector() throw() { this->release(); }
@@ -58,6 +63,7 @@ namespace yocto
 		//======================================================================
 		// container interface
 		//======================================================================
+		virtual const char *name() const throw() { return hidden::vector_name; }
 		virtual size_t size()     const throw() { return size_; }
 		virtual size_t capacity() const throw() { return maxi_; }
 		
@@ -130,6 +136,25 @@ namespace yocto
 				}
 			}
 		}
+		
+		//======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::linear<type,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator( &item_[1] );       }
+		inline iterator end()   throw() { return iterator( &item_[size_+1] ); }
+		
+		typedef iterating::linear<const_type,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return iterator( &item_[1] );       }
+		inline const_iterator end()   const throw() { return iterator( &item_[size_+1] ); }
+		
+		typedef iterating::linear<type,iterating::reverse> reverse_iterator;
+		inline reverse_iterator rbegin() throw() { return reverse_iterator( &item_[size_] ); }
+		inline reverse_iterator rend()   throw() { return reverse_iterator( &item_[0] );     }
+		
+		typedef iterating::linear<const_type,iterating::reverse> const_reverse_iterator;
+		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator( &item_[size_] ); }
+		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator( &item_[0] );     }
 		
 		
 	private:
@@ -285,6 +310,8 @@ namespace yocto
 		//----------------------------------------------------------------------
 		virtual const_type &get_front() const throw() { assert(size_>0); return item_[1];     }
 		virtual const_type &get_back()  const throw() { assert(size_>0); return item_[size_]; }
+		virtual const_type *get_item()  const throw() { return item_; }
+
 	};
 }
 

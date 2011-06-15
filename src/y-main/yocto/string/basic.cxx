@@ -20,10 +20,24 @@ assert( (S)->char_[(S)->size_] == 0 )
 		
 		
 		template <>
-		void string<YCHAR>:: output( std::ostream &os ) const
+		std::ostream &string<YCHAR>:: output( std::ostream &os ) const
 		{
 			os.write( (const char*)char_, size_*sizeof(YCHAR) ); 
+			return os;
 		}
+
+		template <>
+		std::ostream & string<YCHAR>::output_visible( std::ostream &os ) const
+		{
+			const char    *q = (const char *) char_;
+			const size_t   n = size_ * sizeof(YCHAR);
+			for( size_t i=0; i < n; ++i )
+			{
+				os << make_visible( q[i] );
+			}
+			return os;
+		}
+
 		
 		template <>
 		string<YCHAR>:: ~string() throw()
@@ -86,7 +100,7 @@ assert( (S)->char_[(S)->size_] == 0 )
 		//
 		//------------------------------------------------------------------
 		template <>
-		string<YCHAR>:: string( size_t n, as_capacity_t & ) :
+		string<YCHAR>:: string( size_t n, const as_capacity_t & ) :
 		size_(0),
 		full_(n+1),
 		char_( kind<pooled>::acquire_as<YCHAR>(full_) ),
@@ -94,6 +108,20 @@ assert( (S)->char_[(S)->size_] == 0 )
 		{
 			YCHECK_STRING(this);
 		}
+		
+		template <>
+		string<YCHAR>:: string( size_t n, const YCHAR C ) :
+		size_(n),
+		full_(n+1),
+		char_( kind<pooled>::acquire_as<YCHAR>(full_) ),
+		maxi_( full_ - 1 )
+		{
+			YCHECK_STRING(this);
+			for( size_t i=0; i < size_; ++i ) char_[i] = C;
+			YCHECK_STRING(this);
+		}
+		
+		
 		
 		template <>
 		string<YCHAR>:: string( const YCHAR C ) :
@@ -271,9 +299,22 @@ assert( (S)->char_[(S)->size_] == 0 )
 			{
 				clear();
 			}
-
 		}
 
+		template <>
+		void string<YCHAR>:: skip(size_t n) throw()
+		{
+			if( n < size_ )
+			{
+				memmove( char_, char_+n, (size_-n) * sizeof(YCHAR) );
+				size_ -= n;
+				memset(  char_+size_, 0, (full_-size_) * sizeof(YCHAR) );
+			}
+			else 
+			{
+				clear();
+			}
+		}
 		
 	}
 	

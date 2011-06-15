@@ -13,6 +13,7 @@
 
 using namespace yocto;
 
+
 YOCTO_UNIT_TEST_IMPL(hashing)
 {
 	hashing::md2    h_md2;

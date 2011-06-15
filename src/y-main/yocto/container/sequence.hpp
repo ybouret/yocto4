@@ -8,7 +8,7 @@ namespace yocto
 {
 	
 	template <typename T>
-	class sequence : public container
+	class sequence : public virtual container
 	{
 	public:
 		YOCTO_ARGUMENTS_DECL_T;
@@ -23,6 +23,9 @@ namespace yocto
 		inline type       & front() throw() { return *(type *) &get_front(); }
 		inline const_type & front() const throw() { return get_front(); }
 		
+		inline type       & back() throw() { return *(type *) &get_back(); }
+		inline const_type & back() const throw() { return get_back(); }
+		
 	protected:
 		inline explicit sequence() throw() {}
 		
@@ -30,7 +33,6 @@ namespace yocto
 		YOCTO_DISABLE_COPY_AND_ASSIGN(sequence);
 		virtual const_type &get_front() const throw() = 0;
 		virtual const_type &get_back()  const throw() = 0;
-		
 	};
 	
 }

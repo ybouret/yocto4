@@ -42,7 +42,8 @@ namespace yocto
 			// constructors
 			//
 			//------------------------------------------------------------------
-			string( size_t n, as_capacity_t & );
+			string( size_t n, const as_capacity_t & );
+			string( size_t n, const T C );
 			string( const T C );
 			string( const T *s );
 			string( const T *s, size_t n );
@@ -108,11 +109,15 @@ namespace yocto
 			// I/O
 			//
 			//------------------------------------------------------------------
+			std::ostream & output( std::ostream &) const;
+			std::ostream & output_visible( std::ostream &os ) const;
+			
 			friend inline std::ostream & operator<<( std::ostream &str_os, const string &str_arg)
 			{
-				str_arg.output( str_os );
-				return str_os;
+				return str_arg.output( str_os );
 			}
+			
+			
 			
 			inline T       & operator[](size_t index) throw()       { assert(index<=size_); return char_[index]; }
 			inline const T & operator[](size_t index) const throw() { assert(index<=size_); return char_[index]; }
@@ -149,6 +154,7 @@ friend inline bool operator OP ( const T       lhs, const string &rhs ) throw() 
 			//
 			//------------------------------------------------------------------
 			void trim(size_t n) throw();
+			void skip(size_t n) throw();
 			
 		private:
 			size_t size_; //!< #chars
@@ -157,7 +163,6 @@ friend inline bool operator OP ( const T       lhs, const string &rhs ) throw() 
 			size_t maxi_; //!< in units: full-1
 			
 			string( size_t sum_len, const T *a, size_t a_len, const T *b, size_t b_len );
-			void output( std::ostream &) const;
 			static int compare_blocks( const T *a, size_t p, const T *b, size_t q ) throw();
 			
 			virtual const void *get_address() const throw();

@@ -36,6 +36,12 @@ namespace  {
 			--num_dummy;
 		}
 		
+		friend inline std::ostream & operator<<( std::ostream &os, const dummy &d ) 
+		{
+			os << "d#" << d.a;
+			return os;
+		}
+		
 	private:
 		YOCTO_DISABLE_ASSIGN(dummy);
 	};
@@ -110,6 +116,33 @@ namespace {
 		seq.free();
 		std::cerr << ".. " << seq.size() << " / " << seq.capacity() << std::endl;
 		std::cerr << "...done" << std::endl;
+		seq2.free();
+		
+		for( size_t i=0; i < 8; ++i )
+		{
+			const T obj = gen<T>::get();
+			if( alea<float>() < 0.5f )
+			{
+				seq.push_front( obj );
+			}
+			else
+			{
+				seq.push_back( obj );
+			}
+		}
+		
+		for( typename SEQUENCE::iterator i = seq.begin(); i != seq.end(); ++i )
+		{
+			std::cerr << " '" << *i << "'";
+		}
+		std::cerr << std::endl;
+		
+		for( typename SEQUENCE::reverse_iterator i = seq.rbegin(); i != seq.rend(); ++i )
+		{
+			std::cerr << " '" << *i << "'";
+		}
+		std::cerr << std::endl;
+		
 		
 	}
 }

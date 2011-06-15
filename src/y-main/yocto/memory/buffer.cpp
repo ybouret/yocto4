@@ -23,7 +23,11 @@ namespace yocto
 		{
 			return (void *) ro();
 		}
-		
+	
+		uint8_t ro_buffer:: get_byte(size_t index) const throw()
+		{
+			return index < length() ? ((const uint8_t *)ro())[index] : 0;
+		}
 	}
 	
 }
