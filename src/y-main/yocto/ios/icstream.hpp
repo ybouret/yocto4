@@ -21,9 +21,13 @@ namespace yocto
 			virtual void store( char  C );
 			virtual size_t get( void *buffer, size_t buflen );
 			
+			bool gets( string &line );
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(icstream);
 		};
+		
+		
 		
 	}
 	

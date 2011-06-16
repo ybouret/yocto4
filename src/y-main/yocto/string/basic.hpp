@@ -129,7 +129,7 @@ namespace yocto
 			//
 			//------------------------------------------------------------------
 			static inline int compare( const string &lhs, const string &rhs ) throw() { return compare_blocks( lhs.char_, lhs.size_, rhs.char_, rhs.size_); }
-			static inline int compare( const string &lhs, const T      *rhs ) throw() { return compare_blocks( lhs.char_. lhs.size_, rhs, length_of(rhs) ); }
+			static inline int compare( const string &lhs, const T      *rhs ) throw() { return compare_blocks( lhs.char_, lhs.size_, rhs, length_of(rhs) ); }
 			static inline int compare( const T      *lhs, const string &rhs ) throw() {	return compare_blocks( lhs, length_of(lhs),  rhs.char_, rhs.size_); }																			
 			static inline int compare( const string &lhs, const T       rhs ) throw() { return compare_blocks( lhs.char_, lhs.size_, &rhs, 1);              }
 			static inline int compare( const T       lhs, const string &rhs ) throw() {	return compare_blocks( &lhs, 1,  rhs.char_, rhs.size_); }

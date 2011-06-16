@@ -31,9 +31,9 @@ namespace yocto {
 			P_._swp( Pp_ );
 		}
 
-		void block_cipher_ctr:: encrypter:: reset( const memory::ro_buffer &IV ) throw()
+		void block_cipher_ctr:: encrypter:: schedule( const memory::ro_buffer &IV ) throw()
 		{
-			this->operating_block_cipher::reset(IV);
+			this->operating_block_cipher::schedule(IV);
 			CTR_ = IV;
 		}
 		
@@ -62,9 +62,9 @@ namespace yocto {
 			P_._swp( Pp_ );
 		}
 
-		void block_cipher_ctr:: decrypter:: reset( const memory::ro_buffer &IV ) throw()
+		void block_cipher_ctr:: decrypter:: schedule( const memory::ro_buffer &IV ) throw()
 		{
-			this->operating_block_cipher::reset(IV);
+			this->operating_block_cipher::schedule(IV);
 			CTR_ = IV;
 		}
 		

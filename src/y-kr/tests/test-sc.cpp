@@ -41,9 +41,9 @@ YOCTO_UNIT_TEST_IMPL(sc)
 		{
 			encdec &C = reg[j];
 			string enc = org;
-			C.enc->cipher( enc );
+			(*C.enc)( enc );
 			string dec = enc;
-			C.dec->cipher( dec );
+			(*C.dec)( dec );
 			dec.output_visible( std::cerr ) << "  <=  ";
 			enc.output_visible( std::cerr ) << std::endl;
 		}

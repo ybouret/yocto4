@@ -2,7 +2,7 @@
 #define _YOCTO_OP_CIPHER_HPP_ 1
 
 #include "yocto/crypto/bc/block-cipher.hpp"
-
+#include "yocto/memory/blender.hpp"
 
 namespace yocto {
 
@@ -11,7 +11,7 @@ namespace yocto {
 
 
 		//! the crypt operation is still virtual !
-		class operating_block_cipher : public block_cipher
+		class operating_block_cipher : public block_cipher, public memory::blender
 		{
 		public:
 
@@ -25,9 +25,9 @@ namespace yocto {
 			//! helper for any block
 			void crypt_block( void *output, const void *input, const size_t len ) throw();
 			
-			//! scrambler/stream_cipher interface
-			virtual void apply( void *buf, const size_t length ) throw();
-			virtual void reset( const memory::ro_buffer &IV ) throw();
+			//! blender interface
+			virtual void scramble( void *buf, const size_t length ) throw();
+			virtual void schedule( const memory::ro_buffer &IV ) throw();
 			
 						
 		protected:
