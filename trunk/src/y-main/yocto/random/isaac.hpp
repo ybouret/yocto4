@@ -24,8 +24,8 @@ namespace yocto
 			static const size_t SIZE = ( 1<<ALPHA );
 			
 			virtual ~isaac() throw();
-			explicit isaac( ISAAC_INIT how = ISAAC_INIT_NULL ) throw();             //!< default init, with null workspace
-			explicit isaac( const memory::ro_buffer &key ) throw(); //!< fill and init
+			explicit isaac( ISAAC_INIT how = ISAAC_INIT_NULL ) throw(); //!< default init, with null workspace
+			explicit isaac( const memory::ro_buffer &key ) throw();     //!< fill and init
 			explicit isaac( const uint32_t wksp[], const size_t wlen ) throw();
 			
 			//-- manual access
@@ -38,7 +38,7 @@ namespace yocto
 			
 			//-- automatic access
 			uint32_t rand32() throw();
-			
+			void     reset( const memory::ro_buffer &key ) throw();  //!< fill and init
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(isaac);

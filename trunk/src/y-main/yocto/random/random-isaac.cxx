@@ -168,8 +168,7 @@ h^=a>>9;  c+=h; a+=b; \
 		}
 		
 		template <>
-		isaac<RANDSIZL>:: isaac( const memory::ro_buffer &key ) throw() :
-		ctx_()
+		void isaac<RANDSIZL>:: reset( const memory::ro_buffer &key ) throw()
 		{
 			memset( &ctx_, 0, sizeof(ctx_) );
 			for( size_t i=0; i < RANDSIZ; ++i )
@@ -184,6 +183,16 @@ h^=a>>9;  c+=h; a+=b; \
 			}
 			randinit( &ctx_, true );
 		}
+		
+		template <>
+		isaac<RANDSIZL>:: isaac( const memory::ro_buffer &key ) throw() :
+		ctx_()
+		{
+			reset(key);
+		}
+		
+		
+		
 		
 		
 		template <>

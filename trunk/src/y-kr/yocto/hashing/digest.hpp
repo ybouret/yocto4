@@ -57,8 +57,8 @@ namespace yocto
 			friend bool operator==( const digest &lhs, const digest &rhs ) throw();
 			friend bool operator!=( const digest &rhs, const digest &lsh ) throw();
 			
-			static digest get_from( hashing::function & );
-			static digest checksum( hashing::function &, const memory::ro_buffer & );
+			static digest get_from( hashing::function &h ); //!< length == h.length
+			static digest checksum( hashing::function &h, const memory::ro_buffer & );
 			
 			
 		private:
