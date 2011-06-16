@@ -18,7 +18,7 @@ namespace yocto {
 					virtual ~encrypter() throw();
 					
 					virtual void        crypt( void *output, const void *input ) throw();
-					virtual void        reset( const memory::ro_buffer &IV ) throw();
+					virtual void        schedule( const memory::ro_buffer &IV ) throw();
 					
 				private:
 					digest           CTR_;
@@ -33,7 +33,7 @@ namespace yocto {
 				virtual ~decrypter() throw();
 				
 				virtual void        crypt( void *output, const void *input ) throw();
-				virtual void        reset( const memory::ro_buffer &IV ) throw();
+				virtual void        schedule( const memory::ro_buffer &IV ) throw();
 				
 			private:
 				digest         CTR_;

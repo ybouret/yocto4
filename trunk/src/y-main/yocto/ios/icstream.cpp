@@ -44,6 +44,14 @@ namespace yocto
 				throw libc::exception( EIO, "icstream::get(%u)", unsigned(buflen) );
 			return ans;
 		}
+		
+		
+		bool icstream:: gets( string &line )
+		{
+			YOCTO_LOCK(*this);
+			line.clear();
+			return read_line( line ) >= 0;
+		}
 	}
 	
 }

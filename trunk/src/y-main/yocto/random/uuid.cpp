@@ -2,7 +2,7 @@
 
 #include "yocto/threading/singleton.hpp"
 
-//#include "yocto/string/env.hpp"
+#include "yocto/string/env.hpp"
 
 #include "yocto/hashing/sha1.hpp"
 
@@ -60,10 +60,10 @@ namespace yocto
 				hasher_.set();
 				
 				//-- node information
-				//hashing::function *pfn = &hasher_;
+				hashing::function *pfn = &hasher_;
 				try
 				{
-					//environment::get( env_cb, pfn );
+					environment::get( env_cb, pfn );
 				}
 				catch(...)
 				{
@@ -108,14 +108,11 @@ namespace yocto
 				
 			}
 			
-#if 0
 			static void env_cb( const string &name, const string &value, void *args )
 			{
-				hashing::function *pfn = (hashing::function *) args;
-				pfn->run( name  );
-				pfn->run( value );
+				hashing::function &H = *(hashing::function *) args;
+				H << name << value;
 			}
-#endif
 			
 			static const threading::longevity life_time = object::provider::life_time - 1;
 			static const char name[];

@@ -53,7 +53,7 @@ namespace yocto {
 			return size_;
 		}
 		
-		void operating_block_cipher:: reset( const memory::ro_buffer &IV ) throw()
+		void operating_block_cipher:: schedule( const memory::ro_buffer &IV ) throw()
 		{
 			P_._set(0);
 			C_._set(0);
@@ -62,7 +62,7 @@ namespace yocto {
 			Cp_ = IV;
 		}
 		
-		void operating_block_cipher:: apply( void *buf, size_t len ) throw()
+		void operating_block_cipher:: scramble( void *buf, size_t len ) throw()
 		{
 			assert( !(buf==NULL&&len>0) );
 			this->crypt_block(buf,buf,len);
