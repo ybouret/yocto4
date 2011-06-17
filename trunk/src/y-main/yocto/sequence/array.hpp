@@ -7,6 +7,11 @@
 namespace yocto
 {
 	
+	namespace hidden
+	{
+		extern const char array_name[];
+	}
+	
 	template <typename T>
 	class array : public virtual container
 	{

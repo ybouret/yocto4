@@ -63,8 +63,14 @@ SET( random_srcs ${random_decl} ${random_impl} )
 INSTALL( FILES ${random_decl} DESTINATION include/yocto/random )
 SOURCE_GROUP( random FILES ${random_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs})
+FILE( GLOB associative_decl yocto/associative/*.hpp)
+FILE( GLOB associative_impl yocto/associative/*.cpp)
+SET( associative_srcs ${associative_decl} ${associative_impl} )
+INSTALL( FILES ${associative_decl} DESTINATION include/yocto/associative )
+SOURCE_GROUP( associative FILES ${associative_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

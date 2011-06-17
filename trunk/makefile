@@ -14,3 +14,6 @@ xcode:
 vs9:
 	@bash ./src/share/create.sh src vs9
 
+gnu:
+	@bash ./src/share/create.sh src gnu 
+

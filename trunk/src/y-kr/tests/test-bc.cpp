@@ -124,7 +124,7 @@ YOCTO_UNIT_TEST_IMPL(bc)
 	
 	//-- auto test
 	string line;
-	for( size_t i=0; i < 32; ++i )
+	for( size_t i=0; i < 64; ++i )
 	{
 		line += char( 'a'+alea_less_than<int>(26) );
 		process_pair( e_aes128, d_aes128, line, usr_iv );

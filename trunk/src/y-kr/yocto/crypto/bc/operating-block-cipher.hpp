@@ -26,7 +26,7 @@ namespace yocto {
 			void crypt_block( void *output, const void *input, const size_t len ) throw();
 			
 			//! blender interface
-			virtual void scramble( void *buf, const size_t length ) throw();
+			virtual void scramble( void *buffer, size_t length ) throw();
 			virtual void schedule( const memory::ro_buffer &IV ) throw();
 			
 						
