@@ -7,7 +7,6 @@
 #include "yocto/bitwise.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/code/round.hpp"
-#include "yocto/container/iter-linear.hpp"
 #include "yocto/sequence/array.hpp"
 
 #include <cstring>
@@ -137,24 +136,7 @@ namespace yocto
 			}
 		}
 		
-		//======================================================================
-		// iterators
-		//======================================================================
-		typedef iterating::linear<type,iterating::forward> iterator;
-		inline iterator begin() throw() { return iterator( &item_[1] );       }
-		inline iterator end()   throw() { return iterator( &item_[size_+1] ); }
 		
-		typedef iterating::linear<const_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return iterator( &item_[1] );       }
-		inline const_iterator end()   const throw() { return iterator( &item_[size_+1] ); }
-		
-		typedef iterating::linear<type,iterating::reverse> reverse_iterator;
-		inline reverse_iterator rbegin() throw() { return reverse_iterator( &item_[size_] ); }
-		inline reverse_iterator rend()   throw() { return reverse_iterator( &item_[0] );     }
-		
-		typedef iterating::linear<const_type,iterating::reverse> const_reverse_iterator;
-		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator( &item_[size_] ); }
-		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator( &item_[0] );     }
 		
 		
 	private:

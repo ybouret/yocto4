@@ -21,6 +21,7 @@ namespace yocto
 			assert( !(buffer==NULL && buflen > 0 ) );
 			assert( output != NULL );
 			assert( outlen > 0 );
+			
 			if( buflen <= outlen )
 				memcpy( buffer, output, buflen );
 			else
