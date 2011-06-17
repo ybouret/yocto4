@@ -12,11 +12,11 @@ YOCTO_UNIT_TEST_IMPL(slab)
 	const size_t nb_max = 500;
 	void        *addr[nb_max];
 	
-	for( size_t bs=1; bs <= 100; bs += (1 + alea_less_than<size_t>(8) ) )
+	for( size_t bs=1; bs <= 100; bs += (1 + alea_less_than<size_t>(16) ) )
 	{
 		std::cerr << "bs=" << bs << " => " << slab::round_bs(bs) << std::endl;
 		
-		for( size_t num_blocks=0; num_blocks < nb_max; num_blocks += (1 + alea_less_than<size_t>(8) ) )
+		for( size_t num_blocks=0; num_blocks < nb_max; num_blocks += (1 + alea_less_than<size_t>(16) ) )
 		{
 			//(std::cerr << ".").flush();
 			size_t block_size = bs;

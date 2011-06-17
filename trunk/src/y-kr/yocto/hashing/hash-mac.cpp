@@ -29,7 +29,7 @@ namespace yocto
 			else
 			{
 				H.set();
-				H << key;
+				H(key);
 				H.get( key_.rw(), L );
 			}
 		}
@@ -40,7 +40,7 @@ namespace yocto
 			assert( B == H.window );
 			H.set();
 			for( size_t i=0; i < B; ++i ) tmp_[i] = key_[i] ^ 0x36;
-			H << tmp_;
+			H(tmp_);
 		}
 		
 		void hash_mac:: get( function &H, void *output, size_t outlen ) throw()
@@ -50,7 +50,9 @@ namespace yocto
 			H.get( end_.rw(), L );
 			H.set();
 			for( size_t i=0; i < B; ++i ) tmp_[i] = key_[i] ^ 0x5c;
-			( H << tmp_ << end_ ).get(output,outlen);
+			H( tmp_ );
+			H( end_ );
+			H.get(output,outlen);
 		}
 		
 	}

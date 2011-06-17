@@ -37,19 +37,23 @@ namespace yocto
 				memcpy(p,output,buflen);
 			}
 		}
-
 		
-		function & function:: operator<<( const memory::ro_buffer &buf ) throw()
+		void function:: operator()( const void *buffer, size_t buflen ) throw()
+		{
+			run( buffer, buflen );
+			
+		}
+		
+		void function:: operator()( const memory::ro_buffer &buf ) throw()
 		{
 			run( buf.ro(), buf.length() );
-			return *this;
 		}
 		
-		function &function:: operator<<( const char *buf ) throw()
+		void function:: operator()( const char *buf ) throw()
 		{
 			run( buf, length_of(buf) );
-			return *this;
 		}
+
 
 
 	}

@@ -5,6 +5,8 @@
 #include <iostream>
 #endif
 
+#include <cstring>
+
 namespace yocto
 {
 	
@@ -28,10 +30,10 @@ namespace yocto
 		}
 		
 		
-		size_t slab:: bytes_for( size_t & block_size, size_t num_blocks )
+
+		size_t slab:: bytes_for( size_t block_size, size_t num_blocks )
 		{
-			block_size = round_bs(block_size);
-			return block_size * num_blocks;
+			return round_bs(block_size) * num_blocks;
 		}
 		
 		
@@ -39,7 +41,7 @@ namespace yocto
 		data( static_cast<uint8_t*>(entry) ),
 		firstAvailable(0),
 		stillAvailable(num_blocks),
-		blockSize( block_size ),
+		blockSize( round_bs(block_size) ),
 		numBlocks( num_blocks )
 		{
 			assert( blockSize == round_bs(blockSize) );

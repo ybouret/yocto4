@@ -6,6 +6,8 @@
 #include <iostream>
 #endif
 
+#include <cstring>
+
 namespace yocto
 {
 	

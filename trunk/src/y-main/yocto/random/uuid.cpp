@@ -111,7 +111,8 @@ namespace yocto
 			static void env_cb( const string &name, const string &value, void *args )
 			{
 				hashing::function &H = *(hashing::function *) args;
-				H << name << value;
+				H( name  );
+				H( value );
 			}
 			
 			static const threading::longevity life_time = object::provider::life_time - 1;
