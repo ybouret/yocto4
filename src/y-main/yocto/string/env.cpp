@@ -22,6 +22,7 @@ extern char **environ;
 
 namespace yocto {
 	
+	using namespace memory;
 	
 	namespace
 	{
@@ -58,15 +59,15 @@ namespace yocto {
 				else 
 				{
 					//std::cerr << "[res1] = " << unsigned(res) << std::endl;
-					const size_t          len    = res-1;
-					const size_t          cnt    = res;
-					memory::global_buffer blk(cnt); assert( blk.length() >= cnt);
-					char                 *buf    = blk.of<char>();
-					const DWORD           res2   = ::GetEnvironmentVariable( &name[0], buf, res);
+					const size_t           len    = res-1;
+					const size_t           cnt    = res;
+					buffer_of<char,global> blk(cnt);
+					char                  *buf    = blk();
+					const DWORD           res2    = ::GetEnvironmentVariable( &name[0], buf, res);
 					//std::cerr << "[res2] = " << unsigned(res2) << std::endl;
 					if(  res2 != len ) 
 					{
-						throw windows::exception( ::GetLastError(), "::GetEnvironmentVariable");
+						throw win32::exception( ::GetLastError(), "::GetEnvironmentVariable");
 					}
 					value.assign( buf, len );
 					//std::cerr << "='" << value << "'" << std::endl;
@@ -87,8 +88,9 @@ namespace yocto {
 #endif
 				
 #if defined(YOCTO_WIN)
+				YOCTO_GIANT_LOCK();
 				if( ! ::SetEnvironmentVariable( &name[0], &value[0] ) ) {
-					throw windows::exception( ::GetLastError(),  "::SetEnvironmentVariable");
+					throw win32::exception( ::GetLastError(),  "::SetEnvironmentVariable");
 				}
 #endif
 			}

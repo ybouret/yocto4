@@ -56,6 +56,7 @@ namespace yocto
 #if !defined(NDEBUG)
 					__allocated__ += int64_t(n);
 #endif
+					memset( ptr, 0, n );
 					return ptr;
 				}
 				catch(...)
