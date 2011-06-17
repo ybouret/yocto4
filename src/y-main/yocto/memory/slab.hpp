@@ -15,7 +15,7 @@ namespace yocto
 		public:
 			static const size_t bs_round_ln2   = ilog2<sizeof(size_t)>::value;
 			
-			static size_t bytes_for( size_t & block_size, size_t num_blocks );
+			static size_t bytes_for( size_t block_size, size_t num_blocks );
 			static size_t round_bs( size_t block_size ) throw();
 			
 			~slab() throw();
@@ -24,17 +24,36 @@ namespace yocto
 			void *acquire() throw();
 			void  release(void *) throw();
 			
-			
-		private:
-			YOCTO_DISABLE_COPY_AND_ASSIGN(slab);
 			uint8_t      *data;
 			size_t        firstAvailable; //!< data index
 			size_t        stillAvailable; //!< bookeeping
 			
-		public:
 			const size_t  blockSize;
 			const size_t  numBlocks; //!< inital num_blocks
 			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(slab);
+		};
+		
+		template <typename T>
+		class slab_of
+		{
+		public:
+			static inline size_t bytes_for( size_t num_blocks ) { return slab::bytes_for( sizeof(T), num_blocks ); }
+			
+			inline  slab_of( void *entry, const size_t num_blocks ) throw() : slab_( entry, sizeof(T), num_blocks ) {}
+			inline ~slab_of() throw() {}
+			
+			inline T   *query() throw() { return static_cast<T *>( slab_.acquire() ); }
+			inline void store( T *p) throw() { slab_.release(p); }
+			
+			inline size_t capacity()  const throw() { return slab_.numBlocks;      }
+			inline size_t available() const throw() { return slab_.stillAvailable; }
+			inline size_t involved()  const throw() { return capacity() - available(); }
+			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(slab_of);
+			slab slab_;
 		};
 		
 	}

@@ -20,7 +20,8 @@ namespace yocto
 	{
 		digest ans( h.length, 0 );
 		h.set();
-		return digest::get_from(h<<b);
+		h(b);
+		return digest::get_from(h);
 	}
 	
 	static

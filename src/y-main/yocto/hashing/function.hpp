@@ -28,8 +28,14 @@ namespace yocto
 			virtual void run( const void *buffer, size_t buflen ) throw() = 0;
 			virtual void get( void *output, size_t outlen ) throw() = 0;
 			
+#if 0
 			function & operator<<( const memory::ro_buffer & ) throw();
 			function & operator<<( const char *) throw();
+#endif
+			
+			void operator()( const void *buffer, size_t buflen ) throw();
+			void operator()( const memory::ro_buffer &buf ) throw();
+			void operator()( const char *buf ) throw();
 			
 			static void fill( void *output, size_t outlen, const void *input, size_t inlen ) throw();
 			

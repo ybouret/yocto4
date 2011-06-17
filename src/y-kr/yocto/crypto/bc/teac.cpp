@@ -19,7 +19,8 @@ namespace yocto {
 		{
 			//-- build key
 			hashing::md5 alg;
-			(alg << k).get( k128_.rw(), k128_.length() );
+			alg(k);
+			alg.get( k128_.rw(), k128_.length() );
 		}
 		
 		size_t tea_cipher:: size() const throw() {
