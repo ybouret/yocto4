@@ -42,6 +42,12 @@ namespace yocto
 			template <typename T>
 			inline T key() throw() { T k(0); get( &k, sizeof(k) ); return k; }
 			
+			template <typename T>
+			inline T key( void *buffer, size_t buflen ) throw() { set(); run(buffer,buflen); return key<T>(); }
+			
+			template <typename T>
+			inline T key( const memory::ro_buffer &buf ) throw() { set(); (*this)(buf); return key<T>(); }
+			
 		protected:
 			explicit function( size_t L, size_t W) throw();
 			
