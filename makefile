@@ -9,11 +9,11 @@ veryclean: clean
 	@${MAKE} -s -C prj veryclean
 
 xcode:
-	@bash ./src/share/create.sh src xcode
+	@bash ./src/share/create.sh src xcode 
 	
 vs9:
 	@bash ./src/share/create.sh src vs9
 
 gnu:
-	@bash ./src/share/create.sh src gnu 
+	@bash ./src/share/create.sh src gnu ${BUILD_TYPE}
 
