@@ -41,13 +41,13 @@ namespace yocto
 		void embed:: dispatch( embed reg[], size_t num, void *workspace ) throw()
 		{
 			assert( !(num>0 && NULL == reg) );
-			assert( !(num>0 && workspace == NULL));
 			uint8_t *addr = static_cast<uint8_t*> (workspace);
 			for( size_t i=0; i < num; ++i )
 			{
 				embed *em = &reg[i];
 				assert( NULL != em->hook );
 				assert( NULL == *(em->hook) );
+				assert( !(workspace==NULL && em->offset>0) );
 				*(em->hook) = &addr[ em->offset ];
 			}
 		}

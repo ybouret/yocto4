@@ -11,7 +11,7 @@
 
 #include "yocto/code/pid.hpp"
 
-
+#include <cstdlib>
 
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN
