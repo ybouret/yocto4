@@ -32,7 +32,7 @@ namespace yocto
 			const size_t hkey;
 			NODE        *addr;
 			
-			inline knode( size_t k, NODE *n ) throw() : hkey(k), addr(n) {}
+			inline knode( size_t k, NODE *n ) throw() : next(NULL), prev(NULL), hkey(k), addr(n) {}
 		private:
 			~knode() throw();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(knode);
@@ -91,6 +91,104 @@ namespace yocto
 			}
 			
 			inline size_t num_bytes() const throw() { return buflen_; }
+			
+			inline void release_all( memory::allocator &alloc ) throw()
+			{
+				assert( 0 == kpool.involved() ); assert( 0 == cache.involved() );
+				alloc.release( buffer_, buflen_ );
+				nodes = 0;
+				count = 0;
+				kslot = NULL;
+				kslab_t tmp_kpool(NULL,0); mswap( kpool, tmp_kpool );
+				cache_t tmp_cache(NULL,0); mswap( cache, tmp_cache );
+			}
+			
+			inline size_t in_slots() const throw()
+			{
+				size_t num = 0; 
+				for( size_t i=0; i < count; ++i ) num += kslot[i].size; 
+				return num;
+			}
+			
+			//! insert a node extracted from cache
+			inline void insert( const size_t hkey, NODE *node ) throw()
+			{
+				assert( kpool.available() > 0 ); assert( count > 0 );
+				knode_t *kn = new (kpool.query()) knode_t( hkey, node );
+				kslot[ hkey % count ].push_front( kn );
+				nlist.push_back( node );
+			}
+			
+			//! free
+			inline void free_with( void (*proc)( NODE * ) throw() ) throw()
+			{
+				assert(proc);
+				for( size_t i=0; i < count; ++i )
+				{
+					kslot_t &slot = kslot[i];
+					while( slot.size > 0 )
+					{
+						//-- remove knode from slot
+						knode_t *kn = slot.pop_front(); assert( kn->addr != NULL ); assert( kn->hkey % count == i );
+						
+						//-- remove NODE from node list
+						NODE    *dn = nlist.unlink(kn->addr);
+						
+						//-- cleanup
+						proc( dn );
+						kn->addr = NULL;
+						
+						//-- store back
+						cache.store( dn );
+						kpool.store( kn );
+					}
+				}
+			}
+			
+			
+			//! search
+			inline NODE *search( size_t hkey, kslot_t * &slot, bool (*match)(const NODE *, const void *param), const void *param ) throw()
+			{
+				assert( NULL == slot );
+				if(count>0)
+				{
+					const size_t indx = hkey % count;
+					slot = &kslot[ indx ];
+					for( knode_t *kn = slot->head; kn != NULL; kn = kn->next )
+					{
+						NODE *node = kn->addr; assert(node); assert(kn->hkey % count == indx );
+						if( match(node,param) ) 
+						{
+							slot->move_to_front(kn);
+							return node;
+						}
+					}
+					return NULL;
+				}
+				else return NULL;
+			}
+			
+			//! insert at a slot found by a previous search
+			inline void insert2( size_t hkey, NODE *node, kslot_t *slot ) throw()
+			{
+				assert( kpool.available() > 0 ); assert( count > 0 );
+				assert( hkey % count == static_cast<size_t> (slot-kslot) );
+				knode_t *kn = new (kpool.query()) knode_t( hkey, node );
+				slot->push_front( kn  );
+				nlist.push_back( node );
+			}
+			
+			//! remove the front node from a previous search
+			inline void remove_front_of( kslot_t *slot, void (*proc)( NODE * ) throw() ) throw()
+			{
+				assert(slot); assert(slot->size>0);
+				assert(proc);
+				knode_t *kn  = slot->pop_front(); assert( kn->addr != NULL );
+				NODE    *dn  = nlist.unlink( kn->addr );
+				proc(dn);
+				kpool.store(kn);
+				cache.store(dn);
+			}
 			
 		private:
 			void  *buffer_;

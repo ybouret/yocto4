@@ -36,7 +36,7 @@ ADD_TEST(UTF8        test-main utf8)
 ADD_TEST(Scroll      test-main scroll)
 ADD_TEST(AutoScroll  test-main auto_scroll)
 #ADD_TEST(Streams     test-main streams)
-#ADD_TEST(KTable      test-main ktable)
+ADD_TEST(KTable      test-main ktable)
 ADD_TEST(Slab        test-main slab)
 ADD_TEST(Embed       test-main embed)
 

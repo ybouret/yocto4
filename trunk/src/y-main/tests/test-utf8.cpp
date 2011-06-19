@@ -1,12 +1,14 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/string/utf8.hpp"
 #include <cstdlib>
+#include <cstdio>
 
 using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(utf8)
 {
 	std::cerr << "Testing All " << unsigned(1<<21) << std::endl;
+	std::cerr.flush();
 	
 	string out;
 	for( utf8_t i=0; i < (1<<21); ++i )

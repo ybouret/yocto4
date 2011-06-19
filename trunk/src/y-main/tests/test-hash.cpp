@@ -17,6 +17,7 @@
 #include "yocto/wtime.hpp"
 
 #include <iomanip>
+#include <cstdlib>
 
 using namespace yocto;
 using namespace memory;
