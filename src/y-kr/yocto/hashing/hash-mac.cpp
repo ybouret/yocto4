@@ -1,5 +1,5 @@
 #include "yocto/hashing/hash-mac.hpp"
-
+#include <cstring>
 
 namespace yocto
 {
