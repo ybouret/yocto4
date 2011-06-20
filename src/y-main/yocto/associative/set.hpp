@@ -1,27 +1,28 @@
-#ifndef YOCTO_ASSOCIATIVE_MAP_INCLUDED
-#define YOCTO_ASSOCIATIVE_MAP_INCLUDED 1
+#ifndef YOCTO_ASSOCIATIVE_SET_INCLUDED
+#define YOCTO_ASSOCIATIVE_SET_INCLUDED 1
 
-#include "yocto/container/associative.hpp"
+#include "yocto/container/container.hpp"
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/associative/ktable.hpp"
 
 #include "yocto/container/iter-linked.hpp"
 
+
 namespace yocto
 {
-	
 	namespace hidden
 	{
-		extern const char map_name[];
+		extern const char set_name[];
 	}
+	
 	
 	template <
 	typename KEY,
 	typename T, 
 	typename KEY_HASHER = key_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
-	class map : public associative<KEY,T>
+	class set : public container
 	{
 	public:
 		YOCTO_ASSOCIATIVE_KEY_T;
@@ -32,25 +33,22 @@ namespace yocto
 		public:
 			node_type *next;
 			node_type *prev;
-			const_key  key;
 			type       data;
 			inline ~node_type() throw() {}
-			inline  node_type( param_key k, param_type args ) : next(NULL), prev(NULL), key(k), data(args) {}
+			inline  node_type( param_type args ) : next(NULL), prev(NULL), data(args) {}
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
 		};
 		
 		
+		explicit set() throw(): hash_(), hmem_(),ktab_() {}
+		explicit set( size_t n, const as_capacity_t & ) : hash_(), hmem_(), ktab_(n,hmem_) {}
+		virtual ~set() throw() { _kill(); }
 		
-		
-		explicit map() throw(): hash_(), hmem_(),ktab_() {}
-		explicit map( size_t n, const as_capacity_t & ) : hash_(), hmem_(), ktab_(n,hmem_) {}
-		virtual ~map() throw() { _kill(); }
-		
-		inline map( const map &other ) : hash_(), hmem_(), ktab_() 
+		inline set( const set &other ) : hash_(), hmem_(), ktab_() 
 		{
-			map tmp( other.size(), as_capacity );
+			set tmp( other.size(), as_capacity );
 			other._copy_into( tmp );
 			mswap( tmp.ktab_, ktab_ );
 		}
@@ -58,7 +56,7 @@ namespace yocto
 		//======================================================================
 		// container interface
 		//======================================================================
-		virtual const char *name() const throw()     { return hidden::map_name; }
+		virtual const char *name() const throw()     { return hidden::set_name; }
 		virtual size_t      size() const throw()     { return ktab_.nlist.size; }
 		virtual size_t      capacity() const throw() { return ktab_.nodes;      }
 		virtual void        free() throw()    { _free(); }
@@ -67,17 +65,18 @@ namespace yocto
 		{
 			if( n > 0 )
 			{
-				map other( this->capacity() + n, as_capacity );
+				set other( this->capacity() + n, as_capacity );
 				_copy_into( other );
 				mswap( ktab_, other.ktab_ );
 			}
 		}
 		
 		//======================================================================
-		// associative interface
+		// specific interface
 		//======================================================================
-		virtual bool insert( param_key key, param_type args )
+		virtual bool insert( param_type args )
 		{
+			const_key       &key  = args.key();
 			const size_t     hkey = hash_(key);
 			kslot_t         *slot = NULL;
 			const node_type *node = ktab_.search( hkey, slot, _match, &key );
@@ -90,13 +89,13 @@ namespace yocto
 				if( size() < capacity() )
 				{
 					assert(slot!=NULL);
-					_insert2( ktab_, hkey, key, args, slot );
+					_insert2( ktab_, hkey, args, slot );
 				}
 				else
 				{
-					map  other( next_capacity( capacity() ), as_capacity);
+					set  other( next_capacity( capacity() ), as_capacity);
 					_copy_into(other);
-					_insert( other.ktab_,  hkey, key, args );
+					_insert( other.ktab_,  hkey, args );
 					mswap( other.ktab_, ktab_ );
 				}
 				return true;
@@ -111,7 +110,7 @@ namespace yocto
 			if( node )
 			{
 				assert( slot != NULL); assert( slot->head );
-				assert( node == slot->head ->addr); assert( node->key == key );
+				assert( node == slot->head ->addr); assert( node->data.key() == key );
 				ktab_.remove_front_of(slot, destruct<node_type> );
 				return true;
 			}
@@ -131,7 +130,7 @@ namespace yocto
 		inline const_iterator end()   const throw() { return iterator( NULL );       }
 		
 	private:
-		YOCTO_DISABLE_ASSIGN(map);
+		YOCTO_DISABLE_ASSIGN(set);
 		
 		typedef core::ktable<node_type>    ktable_t;
 		typedef typename ktable_t::kslot_t kslot_t;
@@ -150,7 +149,7 @@ namespace yocto
 		
 		inline void _free() throw() { ktab_.free_with( destruct<node_type> ); }
 		inline void _kill() throw() { _free();  ktab_.release_all(hmem_);     }
-		inline void _copy_into( map &other ) const
+		inline void _copy_into( set &other ) const
 		{
 			assert( other.capacity() >= this->size() );
 			assert( other.size() == 0 );
@@ -169,32 +168,34 @@ namespace yocto
 					const node_type *src = kn->addr; assert(src);
 					
 					//-- dup/insert
-					_insert( other.ktab_, kn->hkey, src->key, src->data );
+					_insert( other.ktab_, kn->hkey, src->data );
 				}
 			}			
 			assert( other.size() == this->size() );
 		}
 		
-		static inline node_type *_create( ktable_t &tab, param_key key, param_type args )
+		static inline node_type *_create( ktable_t &tab, param_type args )
 		{
 			//-- atomic node creationg
 			node_type       *tgt = tab.cache.query();
-			try{ new (tgt) node_type(key,args); }
+			try{ new (tgt) node_type(args); }
 			catch(...) { tab.cache.store(tgt); throw; }
 			return tgt;
 		}
 		
-		static inline void _insert( ktable_t &tab, size_t hkey, param_key key, param_type args )
-		{ tab.insert( hkey, _create(tab,key,args) ); }
+		static inline void _insert( ktable_t &tab, size_t hkey, param_type args )
+		{ tab.insert( hkey, _create(tab,args) ); }
 		
-		static inline void _insert2( ktable_t &tab, size_t hkey, param_key key, param_type args, kslot_t *slot ) throw()
-		{ tab.insert2(hkey,_create(tab,key,args),slot); }
+		static inline void _insert2( ktable_t &tab, size_t hkey, param_type args, kslot_t *slot ) throw()
+		{ tab.insert2(hkey,_create(tab,args),slot); }
 		
 		
 		static inline bool _match( const node_type *node, const void *params ) throw()
 		{
-			return node->key == *(const_key*)params;
+			return node->data.key() == *(const_key*)params;
 		}
+		
+		
 	};
 	
 }

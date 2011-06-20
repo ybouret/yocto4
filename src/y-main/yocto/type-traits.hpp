@@ -231,7 +231,7 @@ static const size_t                              type_size = sizeof(type); \
 typedef typename type_traits<T>::mutable_type    mutable_type;        \
 typedef const mutable_type                       const_type;          \
 typedef typename                                                               \
-select<                                                                        \
+yocto::select<                                                                 \
 type_traits<mutable_type>::is_primitive, /* no references in containers */  \
 const_type  , /* pass primitive mutable types by const value            */  \
 const_type &  /* pass non primitive mutable types by const reference    */  \
@@ -242,7 +242,7 @@ typedef KEY                                      key_type;            \
 typedef typename type_traits<KEY>::mutable_type  mutable_key;        \
 typedef const mutable_key                        const_key;          \
 typedef typename                                                               \
-select<                                                                        \
+yocto::select<                                                                 \
 type_traits<mutable_key>::is_primitive, /* no references in containers */  \
 const_key  , /* pass primitive mutable types by const value            */  \
 const_key &  /* pass non primitive mutable types by const reference    */  \
