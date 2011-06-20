@@ -6,6 +6,7 @@
 #include "yocto/memory/pooled.hpp"
 
 #include "support.hpp"
+#include <typeinfo>
 
 
 using namespace yocto;

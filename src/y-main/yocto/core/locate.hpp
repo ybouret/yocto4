@@ -1,0 +1,62 @@
+#ifndef YOCTO_CORE_LOCATE_INCLUDED
+#define YOCTO_CORE_LOCATE_INCLUDED 1
+
+
+#include "yocto/os.hpp"
+
+namespace yocto
+{
+	
+	
+	namespace core
+	{
+		/**! locate the index */
+		/**
+		 \param  base    base address of and ordered array [0,size-1]
+		 \param  size    the number of items.
+		 \param  indx    where to insert if failure, location if success
+		 \param  compare comparison functionoid
+		 \return false if failure,  true if success.
+		 
+		 comparison are performed with user_proc( target, item_base+something, user_data),
+		 so that target can be compared to whatever item_base is pointing at.
+		 
+		 */
+		
+		template <typename U, typename T, typename CMP>
+		inline bool locate( U *target, T *base, size_t size, size_t &indx, CMP compare )
+		{
+			assert(!(NULL==base&&size>0) );
+			T *lo = base;
+			T *hi = base+size;
+			--hi;
+			while( lo <= hi )
+			{
+				T        *mid = &lo[static_cast<size_t>(hi-lo)>>1];
+				const int ans = compare(*target,*mid);
+				if( ans < 0 )
+				{
+					hi = mid-1;
+				}
+				else {
+					if( ans > 0 )
+					{
+						lo=mid+1;
+					}
+					else 
+					{
+						indx = static_cast<size_t>(mid-base);
+						return true;
+					}
+				}
+				
+			}
+			indx = static_cast<size_t>(lo-base);
+			return false;
+		}
+		
+	}
+	
+}
+
+#endif
