@@ -33,9 +33,11 @@ namespace yocto
 			
 			inline type       & operator*() throw()       { assert(node_); return node_->data; }
 			inline const_type & operator*() const throw() { assert(node_); return node_->data; }
-			
+						
 			inline friend bool operator==( const linked &lhs, const linked &rhs ) throw() { return lhs.node_ == rhs.node_; }
 			inline friend bool operator!=( const linked &lhs, const linked &rhs ) throw() { return lhs.node_ != rhs.node_; }
+			
+			NODE * operator->() throw(){ assert(node_); return node_; }
 			
 		private:
 			NODE *node_;

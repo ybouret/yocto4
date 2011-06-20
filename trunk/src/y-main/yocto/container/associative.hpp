@@ -16,12 +16,17 @@ namespace yocto
 		virtual ~associative() throw() {}
 		
 		virtual bool insert( param_key , param_type ) = 0;
+		virtual bool remove( param_key ) throw()      = 0;
+		
+		inline type       * search( param_key key ) throw() { return (type *)lookup(key); }
+		inline const_type * search( param_key key ) const throw() { return   lookup(key); }
 		
 	protected:
 		explicit associative() throw() {}
 		
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(associative);
+		virtual const_type *lookup( param_key ) const throw() = 0;
 	};
 	
 }
