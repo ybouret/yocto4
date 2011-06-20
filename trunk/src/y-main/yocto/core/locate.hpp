@@ -12,6 +12,7 @@ namespace yocto
 	{
 		/**! locate the index */
 		/**
+		 \param  target  LHS argument to compare
 		 \param  base    base address of and ordered array [0,size-1]
 		 \param  size    the number of items.
 		 \param  indx    where to insert if failure, location if success
@@ -24,7 +25,7 @@ namespace yocto
 		 */
 		
 		template <typename U, typename T, typename CMP>
-		inline bool locate( U *target, T *base, size_t size, size_t &indx, CMP compare )
+		inline bool locate( U *target, T *base, const size_t size, size_t &indx, CMP compare )
 		{
 			assert(!(NULL==base&&size>0) );
 			T *lo = base;
@@ -53,6 +54,21 @@ namespace yocto
 			}
 			indx = static_cast<size_t>(lo-base);
 			return false;
+		}
+		
+		/** memory insertion */
+		/**
+		 \param  base    base address of and ordered array [0,size-1]
+		 \param  size    the number of items, increased afterwards
+		 \param  indx    where to insert if failure, location if success
+		 */
+		template <typename T>
+		inline void insert( const T *target, T *base, size_t &size, const size_t indx ) throw()
+		{
+			assert(indx<=size);
+			T *dst = base + indx;
+			memmove( dst+1,  dst, ((size++)-indx) * sizeof(T) );
+			memcpy(  dst, target,                   sizeof(T) ); 
 		}
 		
 	}

@@ -41,5 +41,8 @@ ADD_TEST(Slab        test-main slab)
 ADD_TEST(Embed       test-main embed)
 ADD_TEST(Map         test-main map)
 ADD_TEST(Set         test-main set)
+ADD_TEST(Locate      test-main locate)
+ADD_TEST(SharedPtr   test-main share_ptr)
+
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
