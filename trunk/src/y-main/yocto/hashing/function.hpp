@@ -27,12 +27,7 @@ namespace yocto
 			virtual void set() throw() = 0;
 			virtual void run( const void *buffer, size_t buflen ) throw() = 0;
 			virtual void get( void *output, size_t outlen ) throw() = 0;
-			
-#if 0
-			function & operator<<( const memory::ro_buffer & ) throw();
-			function & operator<<( const char *) throw();
-#endif
-			
+		
 			void operator()( const void *buffer, size_t buflen ) throw();
 			void operator()( const memory::ro_buffer &buf ) throw();
 			void operator()( const char *buf ) throw();
@@ -43,7 +38,7 @@ namespace yocto
 			inline T key() throw() { T k(0); get( &k, sizeof(k) ); return k; }
 			
 			template <typename T>
-			inline T key( void *buffer, size_t buflen ) throw() { set(); run(buffer,buflen); return key<T>(); }
+			inline T key( const void *buffer, size_t buflen ) throw() { set(); run(buffer,buflen); return key<T>(); }
 			
 			template <typename T>
 			inline T key( const memory::ro_buffer &buf ) throw() { set(); (*this)(buf); return key<T>(); }
