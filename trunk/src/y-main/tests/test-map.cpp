@@ -43,6 +43,7 @@ static inline void test_map()
 		std::cerr << "---- size=" << M.size() << "/" << M.capacity() << std::endl;
 		std::cerr << "---- copy" << std::endl;
 		map_t M2(M);
+		std::cerr << "---- removing " << keys.size() << " keys" << std::endl;
 		for( size_t i=1; i <= keys.size(); ++i )
 		{
 			if( ! M2.remove( keys[i] ) )
