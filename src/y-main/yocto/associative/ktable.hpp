@@ -80,7 +80,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				buflen_ = memory::embed::prepare( reg, 3 );
 				try { buffer_ = alloc.acquire( buflen_ ); }
-				catch(...) { nodes = 0; throw; }
+				catch(...) { nodes = 0; count=0; throw; }
 				memory::embed::dispatch( reg, 3, buffer_ );
 				
 				//--------------------------------------------------------------
