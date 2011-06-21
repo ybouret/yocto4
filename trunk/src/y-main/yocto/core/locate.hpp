@@ -3,6 +3,7 @@
 
 
 #include "yocto/os.hpp"
+#include <cstring>
 
 namespace yocto
 {

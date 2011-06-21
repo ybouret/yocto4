@@ -69,8 +69,14 @@ SET( associative_srcs ${associative_decl} ${associative_impl} )
 INSTALL( FILES ${associative_decl} DESTINATION include/yocto/associative )
 SOURCE_GROUP( associative FILES ${associative_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs})
+FILE( GLOB stock_decl yocto/stock/*.hpp)
+FILE( GLOB stock_impl yocto/stock/*.cpp)
+SET( stock_srcs ${stock_decl} ${stock_impl} )
+INSTALL( FILES ${stock_decl} DESTINATION include/yocto/stock )
+SOURCE_GROUP( stock FILES ${stock_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

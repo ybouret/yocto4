@@ -16,6 +16,9 @@ namespace yocto
 		{
 		}
 		
+		barrier:: ~barrier() throw() {}
+		
+		
 		const char *barrier:: name() const throw() { return guard.name(); }
 		
 		
