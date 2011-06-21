@@ -8,3 +8,4 @@ namespace yocto
 		const char array_name[] = "array";
 	}
 }
+
