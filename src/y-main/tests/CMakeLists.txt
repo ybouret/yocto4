@@ -43,6 +43,7 @@ ADD_TEST(Map         test-main map)
 ADD_TEST(Set         test-main set)
 ADD_TEST(Locate      test-main locate)
 ADD_TEST(SharedPtr   test-main shared_ptr)
+ADD_TEST(Stock       test-main stock)
 
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
