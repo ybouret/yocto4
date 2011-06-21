@@ -75,8 +75,16 @@ SET( stock_srcs ${stock_decl} ${stock_impl} )
 INSTALL( FILES ${stock_decl} DESTINATION include/yocto/stock )
 SOURCE_GROUP( stock FILES ${stock_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs})
+FILE( GLOB fragment_decl yocto/fragment/*.hpp)
+FILE( GLOB fragment_impl yocto/fragment/*.cpp)
+SET( fragment_srcs ${fragment_decl} ${fragment_impl} )
+INSTALL( FILES ${fragment_decl} DESTINATION include/yocto/fragment )
+SOURCE_GROUP( fragment FILES ${fragment_srcs} )
+
+
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${fragment_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${fragment_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

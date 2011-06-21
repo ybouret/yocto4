@@ -94,7 +94,7 @@ namespace yocto
 				}
 				else
 				{
-					map  other( next_capacity( capacity() ), as_capacity);
+					map  other( container::next_capacity( capacity() ), as_capacity);
 					_copy_into(other);
 					_insert( other.ktab_,  hkey, key, args );
 					mswap( other.ktab_, ktab_ );
