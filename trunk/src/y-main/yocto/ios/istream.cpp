@@ -12,22 +12,22 @@ namespace yocto
 		istream:: ~istream() throw() {}
 		istream:: istream() throw()  {}
 		
-		size_t istream:: get( void *buffer, size_t buflen )
+		void istream:: get( void *data, size_t size, size_t &done )
 		{
-			assert( !(buffer==NULL&&buflen>0) );
-			char  *C = static_cast<char*> (buffer);
-			size_t n = 0;
-			while( n < buflen )
+			assert( !(data==NULL&&size>0) );
+			char  *C = static_cast<char*> (data);
+			done = 0;
+			while( done < size )
 			{
-				if( !query( *(C++) ) ) return n;
-				++n;
+				if( !query( *(C++) ) ) return;
+				++done;
 			}
-			return n;
 		}
 		
 		void istream:: load( void *buffer, size_t buflen )
 		{
-			const size_t loaded = get(buffer,buflen);
+			size_t loaded = 0;
+			get(buffer,buflen,loaded);
 			if(  loaded < buflen )
 				throw libc::exception( EIO, "istream::load( %u < %u )", unsigned(loaded), unsigned(buflen));
 		}

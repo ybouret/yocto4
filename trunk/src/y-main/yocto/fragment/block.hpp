@@ -22,6 +22,7 @@ namespace yocto
 			size_t length() const throw(); //!< last - curr
 			size_t unused() const throw(); //!< final - last
 			size_t offset() const throw(); //!< curr - first
+			void   clear() throw();
 			
 			//! write in unused bytes
 			/**
@@ -35,8 +36,10 @@ namespace yocto
 			 */
 			size_t read( void *buffer, size_t buflen ) throw();
 			
-			void   defrag() throw();
+			bool   back( uint8_t x ) throw();
 			
+			void   defrag() throw();
+			bool   try_steal( block &other ) throw(); //!< ok if other.length() <= this->unused()
 			
 		private:
 			const size_t   bytes; //!< memory bytes

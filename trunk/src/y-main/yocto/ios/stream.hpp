@@ -7,7 +7,7 @@ namespace yocto
 {
 	namespace ios 
 	{
-		class stream : public object
+		class stream : public virtual object
 		{
 		public:
 			virtual ~stream() throw();

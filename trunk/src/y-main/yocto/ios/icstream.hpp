@@ -19,7 +19,7 @@ namespace yocto
 			
 			virtual bool query( char &C );
 			virtual void store( char  C );
-			virtual size_t get( void *buffer, size_t buflen );
+			virtual void get( void *data, size_t size, size_t &done );
 			
 			bool gets( string &line );
 			
