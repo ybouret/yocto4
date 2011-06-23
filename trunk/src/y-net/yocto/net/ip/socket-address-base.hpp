@@ -69,7 +69,7 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_ASSIGN(socket_address);
 			friend class net;
-			virtual const void * base() const throw(); //!< buffer interface
+			virtual const void * get_address() const throw(); //!< buffer interface
 			friend std::ostream & operator<<( std::ostream &, const socket_address &sa );
 
 		};

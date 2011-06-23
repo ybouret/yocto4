@@ -29,7 +29,7 @@ namespace yocto {
 		
 		
 		//! the only net object, used for platform specific initialization
-		class net : public singleton<net,YOCTO_THREADING_MODEL>
+		class net : public singleton<net>
 		{
 		public:
 			
@@ -69,9 +69,9 @@ namespace yocto {
 		private:
 			explicit net();
 			virtual ~net() throw();
-			friend class singleton<net,YOCTO_THREADING_MODEL>;
-			static const threading::longevity life_time = object::self_allocator::life_time - 2;
-			
+			friend class singleton<net>;
+			static const threading::longevity life_time = object::provider::life_time - 2;
+			static const char name[];
 		};
 		
 		
