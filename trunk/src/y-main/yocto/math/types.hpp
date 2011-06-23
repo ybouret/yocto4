@@ -1,0 +1,118 @@
+#ifndef YOCTO_MATH_TYPES_INCLUDED
+#define YOCTO_MATH_TYPES_INCLUDED 1
+
+#include "yocto/math/complex.hpp"
+#include "yocto/sequence/array.hpp"
+#include "yocto/functor.hpp"
+
+#include <cmath>
+
+namespace yocto 
+{
+	namespace math 
+	{
+		template <typename T>
+		struct real_of;
+		
+		template <>
+		struct real_of<float>
+		{
+			typedef float type;
+		};
+		
+		template <>
+		struct real_of<double>
+		{
+			typedef double type;
+		};
+		
+		
+		template <>
+		struct real_of< complex<float> >
+		{
+			typedef float type;
+		};
+		
+		template <>
+		struct real_of< complex<double> >
+		{
+			typedef double type;
+		};
+		
+		
+		template <typename T>
+		struct numeric
+		{
+			static const T epsilon;
+			static const T sqrteps;
+			static const T minimum;
+			static const T maximum;
+			static const T pi;
+			static const T two_pi;
+			static const size_t dig;
+			static const T      ftol;
+			static const T      min_exp;
+			static const T      max_exp;
+			static const T      min_10_exp;
+			static const T      max_10_exp;
+			static const T      tiny; //!< 10^{min_10_exp}
+			static const T      huge; //!< 10^{max_10_exp}
+			
+			typedef functor<T,TL1(T)> function;
+			typedef functor<T,TL1(const array<T>&)> scalar_field; 
+			typedef functor<void,TL2(array<T>&,const array<T>&)> vector_field;
+		};
+		
+		
+		inline float  Fabs( float x  ) throw() { return fabsf( x ); }
+		inline double Fabs( double x ) throw() { return fabs( x );  }
+		
+		inline float  Square( float  x ) throw() { return x*x; }
+		inline double Square( double x ) throw() { return x*x; }
+		inline float  Square( const complex<float>  &x ) throw() { return x.re * x.re + x.im * x.im; }
+		inline double Square( const complex<double> &x ) throw() { return x.re * x.re + x.im * x.im; }
+		
+		
+		inline float  Sqrt( float  x ) throw()  { return sqrtf( x ); }
+		inline double Sqrt( double x ) throw()  { return sqrt(  x );  }
+		
+		inline float  Fabs( const complex<float>  &x ) throw() { return Sqrt( x.re * x.re + x.im * x.im ); }
+		inline double Fabs( const complex<double> &x ) throw() { return Sqrt( x.re * x.re + x.im * x.im ); }
+		
+
+		inline float  Cos( float  x ) throw()  { return cosf( x ); }
+		inline double Cos( double x ) throw()  { return cos(  x );  }
+
+		inline float  Sin( float  x ) throw()  { return sinf( x ); }
+		inline double Sin( double x ) throw()  { return sin(  x );  }
+		
+		inline float  Tan( float  x ) throw()  { return tanf( x ); }
+		inline double Tan( double x ) throw()  { return tan(  x );  }
+		
+		inline float  Pow( float  x, float  y ) throw() { return powf(x,y); }
+		inline double Pow( double x, double y ) throw() { return pow(x,y);  }
+
+		
+		
+		inline float  Exp( float  x ) throw()  { return expf( x ); }
+		inline double Exp( double x ) throw()  { return exp(  x );  }
+		
+		inline float  Log( float  x ) throw()  { return logf( x ); }
+		inline double Log( double x ) throw()  { return log(  x );  }
+		
+		inline float  Log10( float  x ) throw()  { return log10f( x ); }
+		inline double Log10( double x ) throw()  { return log10(  x );  }
+		
+		inline float  Ceil( float  x ) throw()  { return ceilf( x ); }
+		inline double Ceil( double x ) throw()  { return ceil(  x );  }
+		
+		inline float  Floor( float  x ) throw()  { return floorf( x ); }
+		inline double Floor( double x ) throw()  { return floor(  x );  }
+		
+		
+				
+	}
+	
+}
+
+#endif
