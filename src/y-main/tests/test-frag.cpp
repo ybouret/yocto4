@@ -15,7 +15,7 @@ static inline void frag_cb( void *frag_data, size_t frag_size, void *args )
 
 YOCTO_UNIT_TEST_IMPL(frag_layout)
 {
-
+	
 	
 	for( size_t block_size=1; block_size<=300; block_size += 1 + alea_less_than<size_t>(30) )
 	{
@@ -80,3 +80,64 @@ YOCTO_UNIT_TEST_IMPL(frag_block)
 	
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/fragment/queue.hpp"
+
+YOCTO_UNIT_TEST_IMPL(frag_queue)
+{
+
+	hashing::sha1 H;
+	const size_t size = 16 * 1024;
+	uint8_t     *huge = new uint8_t[ size ];
+	for( size_t i=0; i < size; ++i ) huge[i] = alea_of<uint8_t>();
+	
+	H.set();
+	H.run(huge,size);
+	H.run(huge,size);
+	const uint64_t k0 = H.key<uint64_t>();
+	
+	std::cerr << "k0=" << k0 << std::endl;
+	
+	try
+	{
+		for( size_t bs=10; bs < 1000; bs += 1 + alea_less_than<size_t>(100) )
+		{
+			fragment::queue Q(bs);
+			std::cerr << "block_size=" << Q.block_size << std::endl;
+			size_t done = 0;
+			Q.put( huge, size, done );
+			
+			for(size_t i=0; i < size; ++i )
+			{
+				Q.write( huge[i] );
+				++done;
+			}
+			
+			if( Q.bytes() != done ) throw exception("invalid Q.bytes");
+			
+			{
+				H.set();
+				char   buffer[512];
+				size_t buflen = 0;
+				while( Q.bytes() )
+				{
+					Q.get( buffer, 1+alea_less_than<size_t>(sizeof(buffer)), buflen );
+					//std::cerr << "+" << buflen << std::endl;
+					H.run( buffer, buflen );
+				}
+				
+				const uint64_t k1 = H.key<uint64_t>();
+				std::cerr << "k1=" << k1 << std::endl;
+				
+			}
+			
+		}
+	}
+	catch(...)
+	{
+		delete [] huge; throw;
+	}
+	delete [] huge;
+}
+YOCTO_UNIT_TEST_DONE()
+

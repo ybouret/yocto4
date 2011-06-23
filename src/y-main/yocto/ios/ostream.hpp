@@ -2,20 +2,21 @@
 #define YOCTO_IOS_OSTREAM_INCLUDED 1
 
 #include "yocto/ios/stream.hpp"
+#include "yocto/ios/ochannel.hpp"
 #include "yocto/code/endian.hpp"
 
 namespace yocto
 {
 	namespace ios 
 	{
-		class ostream : public stream
+		class ostream : public stream, public ochannel
 		{
 		public:
 			virtual ~ostream() throw();
 			
 			virtual void write( char C ) = 0;
 			virtual void flush()         = 0;
-			virtual size_t put( const void *buffer, size_t buflen );
+			virtual void put( const void *data, size_t size, size_t &done);
 			
 			void save( const void *buffer, size_t buflen );
 			template <typename T>

@@ -97,13 +97,16 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 			}
 			char   buf[512];
 			size_t len = 0;
-			while( (len = input.get(buf, sizeof(buf) ) ) > 0  )
+			for(;;)
 			{
+				input.get(buf,sizeof(buf),len);
+				if(!len) break;
 				for( size_t i=0; i < h_num; ++i )
 				{
 					h_reg[i]->run(buf,len);
 				}
 			}
+			
 			for( size_t i=0; i < h_num; ++i )
 			{
 				const digest D = digest::get_from(*h_reg[i]);

@@ -20,12 +20,19 @@ namespace yocto
 			last  = NULL;
 		}
 		
-		
 #define YFRAG_CHECK(B)                           \
 assert( (B)->first + (B)->bytes == (B)->final ); \
 assert( (B)->curr >= (B)->first );               \
 assert( (B)->last >= (B)->curr  );               \
 assert( (B)->last <= (B)->final )
+		
+		void block:: clear() throw()
+		{
+			YFRAG_CHECK(this);
+			curr = last = first;
+			YFRAG_CHECK(this);
+		}
+		
 		
 		block:: block( size_t len ) :
 		next(NULL),
@@ -72,11 +79,21 @@ assert( (B)->last <= (B)->final )
 		{
 			assert( !(buffer==NULL&&buflen>0) );
 			YFRAG_CHECK(this);
-			const size_t len = min_of(buflen,length());
-			memcpy(buffer,curr,len);
-			curr += len;
-			YFRAG_CHECK(this);
-			return len;
+			if( buflen < length() )
+			{
+				memcpy( buffer, curr, buflen );
+				curr += buflen;
+				YFRAG_CHECK(this);
+				return buflen;
+			}
+			else 
+			{
+				const size_t len = length();
+				memcpy( buffer, curr, len );
+				clear();
+				YFRAG_CHECK(this);
+				return len;
+			}
 		}
 		
 		void block:: defrag() throw()
@@ -89,6 +106,39 @@ assert( (B)->last <= (B)->final )
 			YFRAG_CHECK(this);
 		}
 		
+		bool   block:: try_steal( block &other ) throw()
+		{
+			assert( this != &other );
+			YFRAG_CHECK(this);
+			YFRAG_CHECK(&other);
+			const size_t len = other.length();
+			if( len <= unused() )
+			{
+				memcpy( last, other.curr, len );
+				last += len;
+				YFRAG_CHECK(this);
+				other.clear();
+				return true;
+			}
+			else 
+				return false;
+		}
+		
+		bool block:: back( uint8_t x ) throw()
+		{
+			YFRAG_CHECK(this);
+			if( curr > first )
+			{
+				*(--curr) = x;
+				YFRAG_CHECK(this);
+				return true;
+			}
+			else 
+			{
+				return false;
+			}
+			
+		}
 		
 	}
 	

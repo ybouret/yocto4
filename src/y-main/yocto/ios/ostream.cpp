@@ -13,17 +13,17 @@ namespace yocto
 		ostream:: ~ostream() throw() {}
 		ostream:: ostream() throw()  {}
 		
-		size_t ostream:: put( const void *buffer, size_t buflen )
+		void ostream:: put( const void *data, size_t size, size_t &done )
 		{
-			assert(!(NULL==buffer&&buflen>0) );
-			const char *C = (const char *)buffer;
-			for( size_t i=0; i < buflen; ++i ) write( *(C++) );
-			return buflen;
+			assert(!(NULL==data&&size>0) );
+			const char *C = (const char *)data;
+			for( done=0; done < size; ++done) write( *(C++) );
 		}
 		
 		void ostream:: save( const void *buffer, size_t buflen )
 		{
-			const size_t saved = put( buffer, buflen );
+			size_t saved = 0;
+			put( buffer, buflen, saved );
 			if( saved < buflen )
 				throw libc::exception( EIO, "ostream::save(%u < %u)", unsigned(saved), unsigned(buflen) );
 		}

@@ -2,6 +2,7 @@
 #define YOCTO_IOS_ISTREAM_INCLUDED 1
 
 #include "yocto/ios/stream.hpp"
+#include "yocto/ios/ichannel.hpp"
 #include "yocto/string.hpp"
 #include "yocto/code/endian.hpp"
 
@@ -10,7 +11,7 @@ namespace yocto
 	
 	namespace ios 
 	{
-		class istream : public stream
+		class istream : public stream, public ichannel
 		{
 		public:
 			virtual ~istream() throw();
@@ -19,7 +20,7 @@ namespace yocto
 			virtual void store( char  C ) = 0;
 			
 			//! get at most buflen bytes
-			virtual size_t get( void *buffer, size_t buflen );
+			virtual void get( void *data, size_t size, size_t &done );
 			
 			//! must get exactly buflen bytes
 			void load( void *buffer, size_t buflen );
