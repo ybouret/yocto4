@@ -81,10 +81,14 @@ SET( fragment_srcs ${fragment_decl} ${fragment_impl} )
 INSTALL( FILES ${fragment_decl} DESTINATION include/yocto/fragment )
 SOURCE_GROUP( fragment FILES ${fragment_srcs} )
 
+FILE( GLOB math_decl yocto/math/*.hpp)
+FILE( GLOB math_impl yocto/math/*.cpp)
+SET( math_srcs ${math_decl} ${math_impl} )
+INSTALL( FILES ${math_decl} DESTINATION include/yocto/math )
+SOURCE_GROUP( math FILES ${math_srcs} )
 
-
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${fragment_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${fragment_srcs})
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${fragment_decl}  ${math_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${fragment_srcs}  ${math_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
