@@ -6,7 +6,7 @@
 #ifndef YOCTO_SOCKET_ADDRESS_SYS_INCLUDED
 #define YOCTO_SOCKET_ADDRESS_SYS_INCLUDED 1
 
-#include "yocto/yocto.hpp"
+#include "yocto/os.hpp"
 
 #if defined(YOCTO_BSD)
 #	include <netinet/in.h> 

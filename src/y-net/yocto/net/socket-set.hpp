@@ -4,7 +4,7 @@
 #define YOCTO_SOCKET_SET_INCLUDED 1
 
 #include "yocto/net/socket.hpp"
-#include "yocto/ordered/catalog.hpp"
+//#include "yocto/ordered/catalog.hpp"
 
 #if defined(YOCTO_BSD)
 #include <cstdlib>
@@ -34,7 +34,7 @@ namespace yocto {
 			friend class socket_set;
 		};
 		
-		
+#if 0
 		//! manage some fd_set
 		class socket_set : public container<socket*> 
 		{
@@ -100,6 +100,7 @@ namespace yocto {
 			fd_set send_set_; //!< ready to send
 			
 		};
+#endif
 		
 	}
 	

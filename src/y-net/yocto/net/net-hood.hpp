@@ -3,8 +3,8 @@
 #ifndef YOCTO_NET_HOOD_INCLUDED
 #define YOCTO_NET_HOOD_INCLUDED 1
 
-#include "yocto/ilog2.hpp"
-#include "yocto/fragment/frag-queue.hpp"
+#include "yocto/code/ilog2.hpp"
+#include "yocto/fragment/queue.hpp"
 
 namespace yocto {
 	
@@ -18,7 +18,7 @@ namespace yocto {
 		 - When used with a UDP socket, each block is a raw Datagram,
 		 so that block_size has to be tuned to fit the application blocks size.
 		 */
-		class dataQ : public fragment::dataQ
+		class dataQ : public fragment::queue
 		{
 		public:
 			typedef uint64_t    align_type;

@@ -1,5 +1,6 @@
 #include "yocto/net/network.hpp"
-#include "yocto/memory/pooled-buffer.hpp"
+#include "yocto/memory/buffers.hpp"
+#include "yocto/memory/pooled.hpp"
 
 #if defined(YOCTO_WIN)
 #include "yocto/exceptions.hpp"
@@ -8,13 +9,6 @@
 #include <iostream>
 
 namespace yocto {
-	
-	namespace threading
-	{
-		
-		template <>
-		mutex threaded_class<network::net>::mutex_( "network" );
-	}
 	
 	namespace network {
 		
@@ -52,13 +46,13 @@ namespace yocto {
 #if defined(YOCTO_BSD)
 			for(;;)
 			{
-				memory::pooled_buffer blk( len );
-				if( ::gethostname( blk.of<char>(), blk.length() ) != 0)
+				memory::buffer_of<char,memory::pooled> blk( len );
+				if( ::gethostname( blk(), blk.length() ) != 0)
 				{
 					len *= 2;
 					continue;
 				}
-				return string( blk.of_const<char>() );
+				return string( blk() );
 			}
 #endif
 			

@@ -5,7 +5,7 @@
 
 #include "yocto/net/sys/bsd-socket.hpp"
 #include "yocto/net/ip/socket-address-format.hpp"
-#include "yocto/design/property.hpp"
+#include "yocto/code/property.hpp"
 
 namespace  yocto {
 
