@@ -1,7 +1,6 @@
 #ifndef YOCTO_ASSOCIATIVE_KTABLE_INCLUDED
 #define YOCTO_ASSOCIATIVE_KTABLE_INCLUDED 1
 
-#include "yocto/type-traits.hpp"
 #include "yocto/memory/slab.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/memory/embed.hpp"
