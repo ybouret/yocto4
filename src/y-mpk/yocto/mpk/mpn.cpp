@@ -1,0 +1,312 @@
+#include "yocto/mpk/natural.hpp"
+
+#include "yocto/code/binary.hpp"
+#include "yocto/code/unroll.hpp"
+#include "yocto/code/swap.hpp"
+#include "yocto/code/utils.hpp"
+
+#include <iostream>
+
+namespace yocto
+{
+	
+	namespace mpk
+	{
+		
+		
+		const uint8_t natural:: _bit[8] =
+		{
+			0x01,
+			0x02,
+			0x04,
+			0x08,
+			0x10,
+			0x20,
+			0x40,
+			0x80
+		};
+		
+		const uint8_t natural:: _msk[8] =
+		{
+			0xff - 0x01,
+			0xff - 0x02,
+			0xff - 0x04,
+			0xff - 0x08,
+			0xff - 0x10,
+			0xff - 0x20,
+			0xff - 0x40,
+			0xff - 0x80
+		};
+		
+#define YMPK_CHECK(MP) \
+/* */ assert( (MP)->maxi_ > 0 ); \
+/* */ assert( (MP)->byte_ != NULL ); \
+/* */ assert( (MP)->size_ <= (MP)->maxi_ ); \
+/* */ assert( 0 == (MP)->size_ || (MP)->byte_[ (MP)->size_ - 1] != 0 )
+		
+		natural:: ~natural() throw()
+		{
+			YMPK_CHECK(this);
+			mem_release( byte_, maxi_ );
+		}
+		
+		natural:: natural() :
+		size_(0),
+		maxi_(0),
+		byte_( mem_acquire(maxi_) )
+		{
+			YMPK_CHECK(this);
+		}
+		
+		size_t natural:: bits() const throw()
+		{
+			if( size_ > 0 )
+			{
+				const size_t   S = size_-1;
+				const unsigned B = byte_[S]; assert( B > 0 );
+				return (S << 3 ) + ceil_ln2_table[B];			
+			}
+			else 
+			{
+				return 0;
+			}
+			
+		}
+		
+		
+		void natural:: update() throw()
+		{
+			const uint8_t *B = byte_+size_;
+			while( size_ > 0 && *(--B) <= 0 ) --size_;
+			
+			YMPK_CHECK(this);
+			
+		}
+		
+		void natural:: rescan() throw()
+		{
+			size_ = maxi_;
+			update();
+		}
+		
+		void natural:: ldz() throw()
+		{
+			YMPK_CHECK(this);
+			size_ = 0;
+			YMPK_CHECK(this);
+		}
+		
+		
+		bool natural:: is_zero() const throw()
+		{
+			YMPK_CHECK(this);
+			return size_ <= 0;
+		}
+		
+		bool natural:: is_one() const throw()
+		{
+			YMPK_CHECK(this);
+			return size_ == 1 && byte_[0] == 1;
+		}
+		
+		bool natural:: is_two() const throw()
+		{
+			YMPK_CHECK(this);
+			return size_ == 1 && byte_[0] == 2;
+		}
+		
+		
+		bool natural:: is_positive() const throw()
+		{
+			YMPK_CHECK(this);
+			if( size_ > 0 )
+			{
+				assert( byte_[size_-1] > 0 );
+				return true;
+			}
+			else
+				return false;
+		}
+		
+		
+		
+		natural:: natural( const natural &other ) :
+		size_( other.size_ ),
+		maxi_( other.size_ ),
+		//bits_( other.bits_ ),
+		byte_( mem_acquire(maxi_) )
+		{
+#			define YMPK_CPY(J) byte_[J] = other.byte_[J]
+			YOCTO_LOOP_FUNC(size_,YMPK_CPY,0);
+		}
+		
+		void natural:: xch( natural &other ) throw()
+		{
+			cswap( size_, other.size_ );
+			cswap( maxi_, other.maxi_ );
+			cswap( byte_, other.byte_ );
+		}
+		
+		natural & natural:: operator=( const natural & other )
+		{
+			natural tmp( other );
+			xch( tmp );
+			return *this;
+		}
+		
+		size_t       natural:: length() const throw() { return size_; }
+		const void * natural:: get_address() const throw() { return byte_; }
+		
+		natural:: natural( const ro_buffer &buf ) :
+		size_( buf.length() ),
+		maxi_( size_ ),
+		byte_( mem_acquire( maxi_ ) )
+		{
+			const uint8_t *from = (uint8_t*)buf.ro();
+#			define YMPK_FROM(J) byte_[J] = from[J]
+			YOCTO_LOOP_FUNC(size_,YMPK_FROM,0);
+			update();
+		}
+		
+		
+		natural:: natural( const uint8_t &x ) :
+		size_( 1 ),
+		maxi_( size_ ),
+		byte_( mem_acquire(maxi_) )
+		{
+			byte_[ 0 ] = x;
+			update();
+		}
+		
+		natural:: natural( const uint16_t &x ) :
+		size_( 2 ),
+		maxi_( size_ ),
+		byte_( mem_acquire(maxi_) )
+		{
+			byte_[ 0 ] =  uint8_t( (x)    & 0xff );
+			byte_[ 1 ] =  uint8_t( (x>>8) & 0xff );
+			update();
+		}
+		
+		natural:: natural( const uint32_t &x ) :
+		size_( 4 ),
+		maxi_( size_ ),
+		byte_( mem_acquire(maxi_) )
+		{
+			byte_[ 0 ] =  uint8_t( (x)     & 0xff );
+			byte_[ 1 ] =  uint8_t( (x>>8)  & 0xff );
+			byte_[ 2 ] =  uint8_t( (x>>16) & 0xff );
+			byte_[ 3 ] =  uint8_t( (x>>24) & 0xff );
+			update();
+		}
+		
+		natural:: natural( const uint64_t &x ) :
+		size_( 8 ),
+		maxi_( size_ ),
+		byte_( mem_acquire(maxi_) )
+		{
+			byte_[ 0 ] =  uint8_t( (x)     & 0xff );
+			byte_[ 1 ] =  uint8_t( (x>>8)  & 0xff );
+			byte_[ 2 ] =  uint8_t( (x>>16) & 0xff );
+			byte_[ 3 ] =  uint8_t( (x>>24) & 0xff );
+			byte_[ 4 ] =  uint8_t( (x>>32) & 0xff );
+			byte_[ 5 ] =  uint8_t( (x>>40) & 0xff );
+			byte_[ 6 ] =  uint8_t( (x>>48) & 0xff );
+			byte_[ 7 ] =  uint8_t( (x>>56) & 0xff );
+			update();
+		}
+		
+		natural:: natural( size_t n, const as_capacity_t & ) :
+		size_(n),
+		maxi_(n),
+		byte_( mem_acquire(maxi_) )
+		{
+		}
+		
+		natural:: natural( const void *buffer, const size_t buflen ) :
+		size_( buflen ),
+		maxi_( buflen ),
+		byte_( mem_acquire(maxi_) )
+		{
+			assert( !(buffer==NULL && buflen>0) );
+			const uint8_t *from = (const uint8_t *)buffer;
+			//#			define YMPK_FROM(J) byte_[J] = from[J]
+			YOCTO_LOOP_FUNC(size_,YMPK_FROM,0);
+			update();
+			
+		}
+		
+		
+		natural natural:: one()
+		{
+			static const uint8_t _one = 1;
+			return natural( _one );
+		}
+		
+		natural natural:: two()
+		{
+			static const uint8_t _two = 2;
+			return natural( _two );
+		}
+		
+		bool natural:: is_even() const throw() 
+		{
+			return (byte_[0] & 0x01) == 0;
+		}
+		
+		bool natural:: is_odd() const throw()
+		{
+			return (byte_[0] & 0x01) != 0;
+		}
+		
+		
+	}
+	
+	
+}
+
+#include <iostream>
+namespace yocto
+{
+	namespace mpk
+	{
+		void natural:: out( std::ostream &os ) const
+		{
+			YMPK_CHECK(this);
+			if( is_zero() )
+			{
+				os << '0';
+			}
+			else 
+			{
+				assert( is_positive() );
+				{
+					// hexa
+					assert(size_>0);
+					const uint8_t *p = byte_ + size_;
+					
+					//-- first byte
+					{
+						const unsigned B = *(--p); assert( B!=0 );
+						const char hi = hexa_char[ (B>>4) & 0xf ];
+						if( hi != '0' ) os << hi;
+						const char lo = hexa_char[ ( B  ) & 0xf ];
+						os << lo;
+					}
+					
+					//-- last bytes
+					for( size_t i=size_-1;i>0;--i)
+					{
+						const unsigned B = *(--p);
+						os << hexa_char[ (B>>4) & 0xf ];
+						os << hexa_char[ ( B  ) & 0xf ];
+					}
+				}
+			}
+			
+			
+		}
+	}
+}
+
+

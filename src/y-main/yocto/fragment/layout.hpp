@@ -28,7 +28,7 @@ namespace yocto
 			
 			size_t round( size_t n ) const throw();
 			
-			typedef void (*callback)( void *frag_size, size_t frag_size, void *args ); 
+			typedef void (*callback)( void *frag_data, size_t frag_size, void *args ); 
 			
 			//! successive call to callback with optimized block sizes
 			/**
