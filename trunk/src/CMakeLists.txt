@@ -8,6 +8,7 @@ ADD_SUBDIRECTORY(y-main)
 ADD_SUBDIRECTORY(y-thr)
 ADD_SUBDIRECTORY(y-kr)
 ADD_SUBDIRECTORY(y-net)
+ADD_SUBDIRECTORY(y-mpk)
 
 INSTALL( FILES share/rules.cmake DESTINATION share/yocto )
 

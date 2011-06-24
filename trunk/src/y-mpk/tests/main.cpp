@@ -1,0 +1,22 @@
+#include "yocto/utest/driver.hpp"
+
+YOCTO_UNIT_TEST_INIT(16)
+{
+	YOCTO_UNIT_TEST_DECL(mem);
+	YOCTO_UNIT_TEST_DECL(natural);
+	
+	YOCTO_UNIT_TEST_DECL(addn_perf);
+	YOCTO_UNIT_TEST_DECL(cmpn_perf);
+	YOCTO_UNIT_TEST_DECL(muln_perf);
+	YOCTO_UNIT_TEST_DECL(fftn_perf);
+	YOCTO_UNIT_TEST_DECL(divn_perf);
+	YOCTO_UNIT_TEST_DECL(shrn_perf);
+
+	YOCTO_UNIT_TEST_DECL(xmul);
+	YOCTO_UNIT_TEST_DECL(xsqr);
+	
+	YOCTO_UNIT_TEST_DECL(primes);
+	YOCTO_UNIT_TEST_DECL(rsa0);
+	
+}
+YOCTO_UNIT_TEST_EXEC()
