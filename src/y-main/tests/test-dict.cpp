@@ -59,6 +59,21 @@ static inline void test_dict()
 			}
 		}
 		
+		const dict_t &D = M2;
+		for( dict_t::const_iterator i= D.begin(); i != D.end(); ++i )
+		{
+			(void) *i;
+		}
+
+		for( dict_t::iterator i = M2.begin(); i != M2.end(); ++i )
+		{
+			(void) *i;
+			if( ! M.remove( i->key ) )
+			{
+				std::cerr << "Unable to remove '" << i->key << "' !" << std::endl;
+			}
+
+		}
 	}
 	
 }

@@ -17,7 +17,7 @@ template <>
 struct gen<float> { static inline float get() { return alea<float>(); } };
 
 template <>
-struct gen<double> { static inline float get() { return alea<double>(); } };
+struct gen<double> { static inline double get() { return alea<double>(); } };
 
 
 template <>

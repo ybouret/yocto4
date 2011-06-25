@@ -6,6 +6,7 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/container/xarray.hpp"
 #include "yocto/core/locate.hpp"
+#include "yocto/container/iter-dict.hpp"
 
 namespace yocto
 {
@@ -121,7 +122,19 @@ namespace yocto
 			}
 		}
 		
+		//======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::dict<type,slot_t,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator( xarr_.table  );      }
+		inline iterator end()   throw() { return iterator( xarr_.table+size()); }
 		
+		typedef iterating::dict<const_type,slot_t,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return const_iterator( xarr_.table  );      }
+		inline const_iterator end()   const throw() { return const_iterator( xarr_.table+size()); }
+		
+
+
 	private:
 		ALLOCATOR  hmem_;
 		COMPARATOR comp_;
