@@ -21,10 +21,11 @@ namespace yocto {
 		{
 			std::cerr << "[network.startup";
 #			if defined(YOCTO_WIN)
+			YOCTO_GIANT_LOCK();
 			memset(&wsa, 0, sizeof(WSADATA) );
 			if( :: WSAStartup( MAKEWORD(2,2), &wsa ) !=  0 )
 			{
-				throw windows::exception( ::WSAGetLastError(), "WSAStartup" );
+				throw win32::exception( ::WSAGetLastError(), "WSAStartup" );
 			}
 #			endif
 			std::cerr << "]" << std::endl;
@@ -57,16 +58,17 @@ namespace yocto {
 #endif
 			
 #if defined(YOCTO_WIN)
+			YOCTO_GIANT_LOCK();
 			for(;;) {
-				memory::pooled_buffer blk( len );
-				if( ::gethostname( blk.of<char>(), blk.length() ) == SOCKET_ERROR ) {
+				memory::buffer_of<char,memory::pooled> blk( len );
+				if( ::gethostname( blk(), blk.length() ) == SOCKET_ERROR ) {
 					const DWORD err = ::WSAGetLastError();
 					if( err != WSAEFAULT )
-						throw   windows::exception( err, "::gethostname" );
+						throw   win32::exception( err, "::gethostname" );
 					len *= 2;
 					continue;
 				}
-				return string( blk.of_const<char>() );
+				return string( blk() );
 			}
 #endif
 			

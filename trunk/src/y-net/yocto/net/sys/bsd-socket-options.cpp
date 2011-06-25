@@ -65,7 +65,7 @@ namespace yocto {
 #if defined(YOCTO_WIN)
 				if( ::setsockopt( s, SOL_SOCKET, name, (const char *)args, size) == SOCKET_ERROR )
 				{
-					throw windows::exception( :: WSAGetLastError(), "::setsockopt(%s)", info);
+					throw win32::exception( :: WSAGetLastError(), "::setsockopt(%s)", info);
 				}
 #endif
 			}
@@ -160,7 +160,7 @@ break
 #if defined(YOCTO_WIN)
 				if( ::getsockopt( s, SOL_SOCKET, name, (char *)args, &size) == SOCKET_ERROR )
 				{
-					throw windows::exception( :: WSAGetLastError(), "::getsockopt(%s)", info);
+					throw win32::exception( :: WSAGetLastError(), "::getsockopt(%s)", info);
 				}
 #endif
 			}
