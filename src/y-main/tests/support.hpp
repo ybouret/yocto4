@@ -10,7 +10,7 @@ using namespace yocto;
 template <typename T>
 struct gen
 {
-	static inline T get() { return alea_of<int>(); }
+	static inline T get() { return alea_of<T>(); }
 };
 
 template <>
