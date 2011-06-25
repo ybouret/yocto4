@@ -49,6 +49,8 @@ namespace yocto
 				slab_t tmp_slots( NULL, 0 ); mswap( tmp_slots, slots );
 			}
 			
+			inline size_t bytes() const throw() { return buflen_; }
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(xarray);
 			void  *buffer_;
