@@ -48,5 +48,6 @@ ADD_TEST(FragLayout  test-main frag_layout)
 ADD_TEST(FragBlock   test-main frag_block)
 ADD_TEST(Bitio       test-main bitio)
 ADD_TEST(XArray      test-main xarray)
+ADD_TEST(Dict        test-main dict)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)

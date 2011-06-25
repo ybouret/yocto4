@@ -82,7 +82,7 @@ YOCTO_UNIT_TEST_IMPL(locate)
 			size_t    indx = 0;
 			if( !core::locate( &x, tab(), j, indx, compare ) )
 			{
-				core::insert( &x, tab(), j, indx );
+				core::insert( &x, tab(), j, indx ); ++j;
 				std::cerr << " " << x;
 			}
 		}

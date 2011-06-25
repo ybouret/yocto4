@@ -29,32 +29,41 @@ namespace yocto
 		inline bool locate( U *target, T *base, const size_t size, size_t &indx, CMP compare )
 		{
 			assert(!(NULL==base&&size>0) );
-			T *lo = base;
-			T *hi = base+size;
-			--hi;
-			while( lo <= hi )
+			if( size > 0 )
 			{
-				T        *mid = &lo[static_cast<size_t>(hi-lo)>>1];
-				const int ans = compare(*target,*mid);
-				if( ans < 0 )
+				T *lo = base;
+				T *hi = base+size;
+				--hi;
+				while( lo <= hi )
 				{
-					hi = mid-1;
-				}
-				else {
-					if( ans > 0 )
+					T        *mid = &lo[static_cast<size_t>(hi-lo)>>1];
+					
+					const int ans = compare(*target,*mid);
+					if( ans < 0 )
 					{
-						lo=mid+1;
+						hi = mid-1;
 					}
-					else 
-					{
-						indx = static_cast<size_t>(mid-base);
-						return true;
+					else {
+						if( ans > 0 )
+						{
+							lo=mid+1;
+						}
+						else 
+						{
+							indx = static_cast<size_t>(mid-base);
+							return true;
+						}
 					}
+					
 				}
-				
+				indx = static_cast<size_t>(lo-base);
+				return false;
 			}
-			indx = static_cast<size_t>(lo-base);
-			return false;
+			else {
+				indx = 0;
+				return false;
+			}
+			
 		}
 		
 		/** memory insertion */
@@ -64,12 +73,12 @@ namespace yocto
 		 \param  indx    where to insert if failure, location if success
 		 */
 		template <typename T>
-		inline void insert( const T *target, T *base, size_t &size, const size_t indx ) throw()
+		inline void insert( const T *target, T *base, const size_t size, const size_t indx ) throw()
 		{
 			assert(indx<=size);
 			T *dst = base + indx;
-			memmove( dst+1,  dst, ((size++)-indx) * sizeof(T) );
-			memcpy(  dst, target,                   sizeof(T) ); 
+			memmove( dst+1,  dst, (size-indx) * sizeof(T) );
+			memcpy(  dst, target,               sizeof(T) ); 
 		}
 		
 	}
