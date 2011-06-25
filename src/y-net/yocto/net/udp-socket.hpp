@@ -23,8 +23,8 @@ namespace yocto
 			const socket_address &peer() const throw(); //!< access peer address
 
 
-			virtual size_t send( const void *ptr, const size_t len);    //!< UDP send datagram
-			virtual size_t recv( void       *ptr, const size_t len);    //!< UDP recv datagram
+			virtual size_t send( const void *ptr, size_t len);    //!< UDP send datagram
+			virtual size_t recv( void       *ptr, size_t len);    //!< UDP recv datagram
 
 
 		protected:

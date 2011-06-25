@@ -1,7 +1,7 @@
 
 #include "yocto/net/ip/socket-address-format-v6.hpp"
 #include "yocto/net/ip/socket-address-sys.hpp"
-#include "yocto/core/offset.h"
+#include "yocto/core/offset.hpp"
 
 #include <iostream>
 #include <cstring>

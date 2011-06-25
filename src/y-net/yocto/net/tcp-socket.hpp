@@ -51,8 +51,8 @@ namespace yocto {
 			 */
 			explicit tcp_client( tcp_server &srv );    //!< accept.
 			
-			virtual size_t send( const void *ptr, const size_t len ); //!< BSD send to server
-			virtual size_t recv( void       *ptr, const size_t len ); //!< BSD recv from server
+			virtual size_t send( const void *ptr, size_t len ); //!< BSD send to server
+			virtual size_t recv( void       *ptr, size_t len ); //!< BSD recv from server
 			
 			
 		private:

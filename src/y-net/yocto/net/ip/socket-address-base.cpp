@@ -12,7 +12,7 @@ namespace yocto
 		}
 		
 		
-		const void * socket_address:: base() const throw()
+		const void * socket_address:: get_address() const throw()
 		{
 			return &addr_[0];
 		}
@@ -27,7 +27,9 @@ namespace yocto
 		
 		
 		#include "socket-address-ctor.cxx"
-		
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
 		socket_address:: socket_address( const socket_address_format &f, socket_address_type net_type, net16_t net_port ) throw() :
 			fmt( f ),
 			YOCTO_SOCKET_ADDRESS_CTOR()

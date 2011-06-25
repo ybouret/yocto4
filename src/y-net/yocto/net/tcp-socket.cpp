@@ -46,7 +46,7 @@ namespace yocto {
 
 		}
 
-		size_t tcp_client:: send( const void *ptr, const size_t len ) 
+		size_t tcp_client:: send( const void *ptr, size_t len ) 
 		{
 			assert(!(ptr==NULL&&len>0));
 			return bsd::socket_send( socket_, ptr, len, ioflag_ );
@@ -54,7 +54,7 @@ namespace yocto {
 
 		
 
-		size_t tcp_client:: recv( void *ptr, const size_t len ) 
+		size_t tcp_client:: recv( void *ptr, size_t len ) 
 		{
 			assert(!(ptr==NULL&&len>0));
 			return bsd::socket_recv( socket_, ptr, len, ioflag_ );

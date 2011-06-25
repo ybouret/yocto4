@@ -1,6 +1,6 @@
 #include "yocto/net/sys/bsd-socket.hpp"
 #include "yocto/exceptions.hpp"
-#include "yocto/utils.hpp"
+#include "yocto/code/utils.hpp"
 #include "yocto/net/ip/socket-address-base.hpp"
 #include "yocto/net/ip/socket-address-format.hpp"
 
@@ -41,6 +41,7 @@ namespace yocto
 			
 			
 #if defined(YOCTO_BSD)
+			YOCTO_GIANT_LOCK();
 			while( ::close(s) != 0 ) {
 				const int err = errno;
 				switch( err ) {
@@ -153,6 +154,7 @@ namespace yocto
 			assert(NULL!=level);
 			std::cerr << "<tcp socket," << level << ">" << std::endl;
 			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			socket_t s = ::socket( protocol, SOCK_STREAM, IPPROTO_TCP );
 			if( s == invalid_socket )
@@ -165,7 +167,7 @@ namespace yocto
 			socket_t s = ::socket( protocol, SOCK_STREAM, IPPROTO_TCP );
 			if( s == invalid_socket )
 			{
-				throw windows::exception( ::WSAGetLastError(), "::socket(tcp,%s)", level );
+				throw win32::exception( ::WSAGetLastError(), "::socket(tcp,%s)", level );
 			}
 #endif
 			
@@ -180,6 +182,7 @@ namespace yocto
 		{
 			assert(NULL != level );
 			std::cout << "<udp socket," << level << ">" << std::endl;
+			YOCTO_GIANT_LOCK();
 			
 #if defined(YOCTO_BSD)
 			socket_t s = ::socket( protocol, SOCK_DGRAM, IPPROTO_UDP );
@@ -193,7 +196,7 @@ namespace yocto
 			socket_t s = ::socket( protocol, SOCK_DGRAM, IPPROTO_UDP );
 			if( s == invalid_socket )
 			{
-				throw windows::exception( ::WSAGetLastError(), "::socket(udp,%s)", level );
+				throw win32::exception( ::WSAGetLastError(), "::socket(udp,%s)", level );
 			}
 #endif
 			
@@ -212,7 +215,7 @@ namespace yocto
 		socket_t bsd::socket_bind( socket_t s, const socket_address &ip ) {
 			assert( s != invalid_socket );
 			std::cout << "<bind#" <<  swap_be(ip.port) << ">" << std::endl;
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			while( ::bind( s, (struct sockaddr *)ip.ro(), ip.length() ) != 0 )
 			{
@@ -230,6 +233,9 @@ namespace yocto
 #endif
 			
 #if defined(YOCTO_WIN)
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4065 )
+#endif
 			while( ::bind( s, (struct sockaddr *)ip.ro(), ip.length() ) == SOCKET_ERROR )
 			{
 				const DWORD err = ::WSAGetLastError();
@@ -237,7 +243,7 @@ namespace yocto
 				{
 					default:
 						socket_close( s );
-						throw windows::exception(err,"::bind(%s)", ip.fmt.version );
+						throw win32::exception(err,"::bind(%s)", ip.fmt.version );
 				}
 			}
 #endif
@@ -252,7 +258,7 @@ namespace yocto
 		{
 			assert( s != invalid_socket );
 			std::cout << "<listen(" << max_pending << ")>" << std::endl;
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			if( ::listen( s, max_pending ) < 0 )
 			{
@@ -267,7 +273,7 @@ namespace yocto
 			{
 				const DWORD err = ::WSAGetLastError();
 				socket_close(s);
-				throw windows::exception( err, "::listen(%d)", max_pending );
+				throw win32::exception( err, "::listen(%d)", max_pending );
 			}
 #endif
 			
@@ -282,7 +288,7 @@ namespace yocto
 			assert( s != invalid_socket );
 			
 			std::cout << "<connect@" << ip << ":" << swap_be16(ip.port) << ">" << std::endl;
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			while( ::connect( s, (struct sockaddr *)ip.ro(), ip.length() ) != 0 )
 			{
@@ -307,7 +313,7 @@ namespace yocto
 				{
 					default:
 						socket_close( s );
-						throw windows::exception(err,"::connect(%s)", ip.fmt.version);
+						throw win32::exception(err,"::connect(%s)", ip.fmt.version);
 				}
 			}
 #endif
@@ -326,7 +332,7 @@ namespace yocto
 			
 			std::cout << "<accept>" << std::endl;
 			
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			socklen_t   tcp_client_len    = ip.length();
 			socket_t    tcp_client_socket = ::accept( s, (struct sockaddr *)ip.ro(), &tcp_client_len );
@@ -341,7 +347,7 @@ namespace yocto
 			socket_t    tcp_client_socket = ::accept( s, (struct sockaddr *)ip.ro(), &tcp_client_len );
 			if( tcp_client_socket == invalid_socket )
 			{
-				throw windows::exception( ::WSAGetLastError(), "::accept(%s)", ip.fmt.version );
+				throw win32::exception( ::WSAGetLastError(), "::accept(%s)", ip.fmt.version );
 			}
 #endif
 			
@@ -357,7 +363,7 @@ namespace yocto
 			assert( s != invalid_socket );
 			assert(!(ptr==NULL&&len>0));
 			
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			int res=0;
 			while( (res = ::send( s, ptr, len, flags ) ) < 0 ) {
@@ -378,7 +384,7 @@ namespace yocto
 			const int iln = min_of<size_t>(len,INT_MAX);
 			while( (res = ::send( s, (const char *)ptr, iln, flags) ) == SOCKET_ERROR ) {
 				const DWORD err = ::WSAGetLastError();
-				throw windows::exception( err, "::send");
+				throw win32::exception( err, "::send");
 			}
 			return res;
 #endif
@@ -392,7 +398,7 @@ namespace yocto
 		{
 			assert( s != invalid_socket );
 			assert(!(ptr==NULL&&len>0));
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			int res=0;
 			while( (res = ::recv( s, ptr, len, flags ) ) < 0 ) {
@@ -413,7 +419,7 @@ namespace yocto
 			const int iln = min_of<size_t>(len,INT_MAX);
 			while( (res = ::recv( s, (char *)ptr, iln, flags) ) == SOCKET_ERROR ) {
 				const DWORD err = ::WSAGetLastError();
-				throw windows::exception( err, "::recv");
+				throw win32::exception( err, "::recv");
 			}
 			return res;
 #endif
@@ -426,7 +432,7 @@ namespace yocto
 		{
 			assert(!(ptr==NULL&&len>0));
 			assert( s != invalid_socket );
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			int res=0;
 			while( (res= ::sendto( s , ptr, len, flags, (const sockaddr *)(ip.ro()), ip.length() )) < 0) {
@@ -446,7 +452,7 @@ namespace yocto
 			const int iln = min_of<size_t>(len,INT_MAX);
 			while( (res = ::sendto( s , (const char *)ptr, iln, flags, (const sockaddr *)(ip.ro()), ip.length() )) == SOCKET_ERROR) {
 				const DWORD err = ::WSAGetLastError();
-				throw windows::exception( err, "::sendto(%s)", ip.fmt.version );
+				throw win32::exception( err, "::sendto(%s)", ip.fmt.version );
 				
 			}
 			return res;
@@ -459,7 +465,7 @@ namespace yocto
 			assert( s != invalid_socket );
 			
 			int res = 0;
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			socklen_t slen = ip.length();
 			while( (res= ::recvfrom( s, ptr, len, flags, (struct sockaddr *)(ip.rw()), &slen )) < 0) {
@@ -477,7 +483,7 @@ namespace yocto
 			int slen = ip.length();
 			while( (res= ::recvfrom( s, (char *)ptr, len, flags, (struct sockaddr *)(ip.rw()), &slen )) == SOCKET_ERROR ) {
 				const int err = ::WSAGetLastError();
-				throw windows::exception( err, "::recvfrom(%s)", ip.fmt.version );
+				throw win32::exception( err, "::recvfrom(%s)", ip.fmt.version );
 			}
 #endif
 			
@@ -490,7 +496,7 @@ namespace yocto
 		void bsd:: socket_getpeername( socket_t s, socket_address &ip )
 		{
 			assert( s != invalid_socket );
-			
+			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
 			socklen_t peer_len = ip.length();
 			if( ::getpeername( s, (struct sockaddr *)ip.ro(), &peer_len ) < 0 )
@@ -500,7 +506,7 @@ namespace yocto
 #if defined(YOCTO_WIN)
 			int peer_len = ip.length();
 			if( ::getpeername( s, (struct sockaddr *)ip.ro(), &peer_len ) < 0 )
-				throw windows::exception( ::WSAGetLastError(), "::recvfrom(%s)", ip.fmt.version );
+				throw win32::exception( ::WSAGetLastError(), "::recvfrom(%s)", ip.fmt.version );
 #endif
 			
 		}

@@ -16,7 +16,7 @@ namespace yocto
 		public:
 			virtual ~io_socket() throw();
 			
-			virtual size_t send( const void *, size_t ) = 0; //!< TCP send or UDP sendtp
+			virtual size_t send( const void *, size_t ) = 0; //!< TCP send or UDP sendto
 			virtual size_t recv( void       *, size_t ) = 0; //!< TCP recv or UDP recvfrom
 			
 			

@@ -4,20 +4,23 @@
 #include <cstdlib>
 
 namespace yocto {
-	
+
 	namespace network
 	{
-	
-	#include "socket-address-ctor.cxx"
-	
-	socket_address::socket_address( const socket_address_format &f, const string &net_name, net16_t net_port  ) :
-		fmt( f ),
+
+#include "socket-address-ctor.cxx"
+
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
+		socket_address::socket_address( const socket_address_format &f, const string &net_name, net16_t net_port  ) :
+	fmt( f ),
 		YOCTO_SOCKET_ADDRESS_CTOR()
 	{
 		qw_zero<items64>( addr_ );
 		fmt.set_family( addr_ );
 		port = net_port;
-		
+
 		if( 0 == net_port )
 		{
 			char *       col = (char *)&net_name[0];
@@ -30,7 +33,7 @@ namespace yocto {
 					break;
 				}
 			}
-			
+
 			if( has_col )
 			{
 				net_port = uint16_t( atoi( col+1 ) );     //TODO: better
@@ -45,7 +48,7 @@ namespace yocto {
 					*col = ':';
 					throw; // revert hack
 				}
-				
+
 			}
 			else
 				net::instance().resolve( *this, net_name );
@@ -53,9 +56,9 @@ namespace yocto {
 		else
 			net::instance().resolve( *this, net_name );
 	}
-	
-	
-		
+
+
+
 	}
-	
+
 }

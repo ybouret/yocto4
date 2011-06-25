@@ -6,6 +6,9 @@ namespace yocto {
 	
 	namespace network {
 		
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
 		net128_t:: net128_t() throw() : h()
 		{
 			memset( h, 0, sizeof(h) );
