@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/container/xarray.hpp"
+#include "yocto/core/xarray.hpp"
 #include "yocto/memory/global.hpp"
 
 #include "support.hpp"

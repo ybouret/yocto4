@@ -75,6 +75,15 @@ SET( stock_srcs ${stock_decl} ${stock_impl} )
 INSTALL( FILES ${stock_decl} DESTINATION include/yocto/stock )
 SOURCE_GROUP( stock FILES ${stock_srcs} )
 
+
+FILE( GLOB ordered_decl yocto/ordered/*.hpp)
+FILE( GLOB ordered_impl yocto/ordered/*.cpp)
+SET( ordered_srcs ${ordered_decl} ${ordered_impl} )
+INSTALL( FILES ${ordered_decl} DESTINATION include/yocto/ordered )
+SOURCE_GROUP( ordered FILES ${ordered_srcs} )
+
+
+
 FILE( GLOB fragment_decl yocto/fragment/*.hpp)
 FILE( GLOB fragment_impl yocto/fragment/*.cpp)
 SET( fragment_srcs ${fragment_decl} ${fragment_impl} )
@@ -87,8 +96,8 @@ SET( math_srcs ${math_decl} ${math_impl} )
 INSTALL( FILES ${math_decl} DESTINATION include/yocto/math )
 SOURCE_GROUP( math FILES ${math_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${fragment_decl}  ${math_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${fragment_srcs}  ${math_srcs})
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
