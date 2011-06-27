@@ -4,7 +4,7 @@
 #include "yocto/container/associative.hpp"
 #include "yocto/comparator.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/container/xarray.hpp"
+#include "yocto/core/xarray.hpp"
 #include "yocto/core/locate.hpp"
 #include "yocto/container/iter-dict.hpp"
 
