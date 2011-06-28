@@ -4,7 +4,8 @@
 #define YOCTO_SOCKET_SET_INCLUDED 1
 
 #include "yocto/net/socket.hpp"
-//#include "yocto/ordered/catalog.hpp"
+#include "yocto/ordered/catalog.hpp"
+#include "yocto/memory/pooled.hpp"
 
 #if defined(YOCTO_BSD)
 #include <cstdlib>
@@ -34,9 +35,8 @@ namespace yocto {
 			friend class socket_set;
 		};
 		
-#if 0
 		//! manage some fd_set
-		class socket_set : public container<socket*> 
+		class socket_set : public container
 		{
 		public:
 			explicit socket_set() throw();
@@ -94,13 +94,12 @@ namespace yocto {
 				YOCTO_DISABLE_COPY_AND_ASSIGN(sock_cmp);
 			};
 			
-			typedef  catalog<socket_ptr,sock_cmp,pooled_item_allocator> fd_reg; //!< keep track AND order => highest fd at front !
+			typedef  catalog<socket_ptr,sock_cmp,memory::pooled::allocator> fd_reg; //!< keep track AND order => highest fd at front !
 			fd_reg sock_reg_; //!< user's registered sockets
 			fd_set recv_set_; //!< ready to recv
 			fd_set send_set_; //!< ready to send
 			
 		};
-#endif
 		
 	}
 	

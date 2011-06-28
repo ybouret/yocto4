@@ -45,7 +45,7 @@ void test_catalog()
 			std::cerr << "remove error level-3" << std::endl;
 	}
 	
-	for( typename cat_t::iterator i = C2.begin(); i != C2.end() ; ++i )
+	for( typename cat_t::const_iterator i = C2.begin(); i != C2.end() ; ++i )
 	{
 		if( ! C.remove( *i ) )
 		{
