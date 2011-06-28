@@ -132,13 +132,9 @@ namespace yocto
 		//======================================================================
 		// iterators
 		//======================================================================
-		typedef iterating::handle<type,iterating::forward> iterator;
-		inline iterator begin() throw() { return iterator( xarr_.table  );      }
-		inline iterator end()   throw() { return iterator( xarr_.table+size()); }
-		
 		typedef iterating::handle<const_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return const_iterator( xarr_.table  );      }
-		inline const_iterator end()   const throw() { return const_iterator( xarr_.table+size()); }
+		inline const_iterator begin() const throw() { return const_iterator( (const_type **)(xarr_.table)  );      }
+		inline const_iterator end()   const throw() { return const_iterator( (const_type **)(xarr_.table+size())); }
 		
 		
 		

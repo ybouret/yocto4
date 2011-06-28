@@ -21,7 +21,8 @@ namespace yocto
 			
 			
 			
-			
+			virtual void put( const void *ptr, size_t len, size_t &done ); //!< ios::ochannel implementation
+			virtual void get( void       *ptr, size_t len, size_t &done ); //!< ios::ichannel implementation
 			
 			
 		protected:
@@ -29,8 +30,7 @@ namespace yocto
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_socket);
-			virtual void do_put( const void *ptr, size_t len, size_t &done ); //!< ios::ochannel implementation
-			virtual void do_get( void       *ptr, size_t len, size_t &done ); //!< ios::ichannel implementation
+			
 		};
 	}
 	
