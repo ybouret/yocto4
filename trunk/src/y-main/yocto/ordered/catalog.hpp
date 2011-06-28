@@ -5,6 +5,8 @@
 #include "yocto/comparator.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/core/xarray.hpp"
+#include "yocto/core/locate.hpp"
+#include "yocto/container/iter-handle.hpp"
 
 namespace yocto
 {
@@ -68,6 +70,77 @@ namespace yocto
 			}
 		}
 		
+		//======================================================================
+		// special interface
+		//======================================================================
+		bool search( param_type args ) const throw()
+		{
+			size_t indx;
+			if( core::locate<const_type,type_ptr,const catalog&>( &args, (type_ptr *)xarr_.table, size(), indx, *this ) )
+			{
+				return true;
+			}
+			else 
+			{
+				return false;
+			}
+		}
+		
+		bool insert( param_type args ) 
+		{
+			size_t indx;
+			if( core::locate<const_type,type_ptr,const catalog&>( &args, (type_ptr *)xarr_.table, size(), indx, *this ) )
+			{
+				return false;
+			}
+			else 
+			{
+				if( xarr_.slots.available() > 0 )
+				{
+					_insert( args, indx );
+				}
+				else 
+				{
+					catalog C( container::next_capacity( this->capacity() ), as_capacity );
+					_copy_into(C); assert( C.xarr_.slots.available() > 0 );
+					C._insert(args,indx);
+					mswap( xarr_, C.xarr_ );
+				}
+				return true;
+			}
+		}
+		
+		bool remove( param_type args ) throw()
+		{
+			size_t indx;
+			if( core::locate<const_type,type_ptr,const catalog&>( &args, (type_ptr *)xarr_.table, size(), indx, *this ) )
+			{
+				type_ptr *addr = &xarr_.table[indx];
+				type_ptr  slot =  *addr;
+				destruct(slot);
+				xarr_.slots.store( slot );
+				memmove( addr, addr+1, (size()-indx) * sizeof(type_ptr) );
+				return true;
+			}
+			else 
+			{
+				return false;
+			}
+			
+		}
+		
+		//======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::handle<type,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator( xarr_.table  );      }
+		inline iterator end()   throw() { return iterator( xarr_.table+size()); }
+		
+		typedef iterating::handle<const_type,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return const_iterator( xarr_.table  );      }
+		inline const_iterator end()   const throw() { return const_iterator( xarr_.table+size()); }
+		
+		
 		
 	private:
 		ALLOCATOR  hmem_;
@@ -101,6 +174,23 @@ namespace yocto
 			}
 			assert( C.size() == this->size() );
 		}
+		
+		inline void _insert( param_type args, size_t indx )
+		{
+			const size_t num = size();
+			assert( xarr_.slots.available() > 0 );
+			mutable_type *dst = xarr_.slots.query();
+			try { new (dst) mutable_type( args ); }
+			catch(...) { xarr_.slots.store(dst); throw; }
+			core::insert<type_ptr>( &dst, xarr_.table, num, indx );
+		}
+		
+	public:
+		int operator()( const_type &lhs, type_ptr rhs ) const throw()
+		{
+			return comp_(lhs,*rhs);
+		}
+		
 	};
 	
 	

@@ -88,10 +88,11 @@ namespace yocto
 			size_t indx = 0;
 			if( core::locate<key_type,slot_ptr,const dictionary&>( (key_type *)&key, xarr_.table, size(), indx, *this ) )
 			{
-				slot_t *slot = xarr_.table[indx];
+				slot_ptr *addr = &xarr_.table[indx];
+				slot_t   *slot = *addr;
 				destruct(slot);
 				xarr_.slots.store(slot);
-				memmove( &xarr_.table[indx], &xarr_.table[indx+1], (size()-indx) * sizeof(slot_ptr) );
+				memmove( addr, addr+1, (size()-indx) * sizeof(slot_ptr) );
 				return true;
 			}
 			else
