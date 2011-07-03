@@ -50,5 +50,6 @@ ADD_TEST(Bitio       test-main bitio)
 ADD_TEST(XArray      test-main xarray)
 ADD_TEST(Dict        test-main dict)
 ADD_TEST(Catalog     test-main catalog)
+ADD_TEST(C-Array     test-main c_array)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
