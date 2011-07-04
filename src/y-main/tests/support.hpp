@@ -3,6 +3,7 @@
 
 #include "yocto/string.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/math/complex.hpp"
 
 using namespace yocto;
 
@@ -33,5 +34,16 @@ struct gen<string> {
 	}	
 };
 
+template <>
+struct gen< math::complex<float> >
+{
+	static inline math::complex<float> get() { return math::complex<float>( alea<float>(), alea<float>() ); }
+};
+
+template <>
+struct gen< math::complex<double> >
+{
+	static inline math::complex<double> get() { return math::complex<double>( alea<double>(), alea<double>() ); }
+};
 
 #endif

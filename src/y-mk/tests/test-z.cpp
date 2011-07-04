@@ -2,7 +2,8 @@
 #include "yocto/math/types.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
-#include <type>
+#include <typeinfo>
+#include "../../y-main/tests/support.hpp"
 
 #define SHOW(VAR) std::cerr << "numeric<" << name << ">::" #VAR " = " << numeric<T>::VAR << std::endl
 
@@ -32,10 +33,10 @@ static inline void test_ops()
 	vector<T> v( num, as_capacity );
 	for( size_t i=0; i < num; ++i )
 	{
-		const T tmp( alea<float>() );
+		const T tmp( gen<T>::get() );
 		v.push_back( tmp );
 	}
-	std::cerr << "Testing " << v.size() << std::endl;
+	std::cerr << "Testing " << v.size() << " of<" << typeid(T).name() << ">" << std::endl;
 	for( size_t i=2; i <= num; ++i )
 	{
 		v[i] += v[i-1];
