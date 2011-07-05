@@ -3,10 +3,9 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/ios/ocstream.hpp"
-//#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/rand.hpp"
 
-//#include "yocto/xfunctor.hpp"
 
 #include <cstdlib>
 
@@ -62,7 +61,7 @@ void perform_psd( const size_t p, const size_t q )
 
 	const size_t flags = 0; //normalize ? PSD_Normalize : 0;
 	
-#if 0
+#if 1
 	matrix<T> psd(ns,m);
 	PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n, flags );
 	PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
