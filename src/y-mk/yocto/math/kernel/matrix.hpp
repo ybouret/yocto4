@@ -2,7 +2,6 @@
 #define YOCTO_MATRIX_INCLUDED 1
 
 #include "yocto/sequence/array.hpp"
-#include <iostream>
 
 namespace yocto
 {

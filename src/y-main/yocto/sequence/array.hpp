@@ -4,6 +4,7 @@
 #include "yocto/container/sequence.hpp"
 #include "yocto/container/iter-linear.hpp"
 
+#include <iostream>
 
 namespace yocto
 {
@@ -47,6 +48,14 @@ namespace yocto
 		typedef iterating::linear<const_type,iterating::reverse> const_reverse_iterator;
 		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator( item(this->size()) ); }
 		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator( item(0) );     }
+		
+		inline friend std::ostream & operator<<( std::ostream &os, const array &a )
+		{
+			os << "[ ";
+			for( size_t i=1; i <= a.size(); ++i ) os <<  a[i] << ' ';
+			os << "]'";
+			return os;
+		}
 		
 	protected:
 		inline array() throw() {}

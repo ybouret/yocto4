@@ -36,9 +36,7 @@ namespace yocto {
 			vector<T>  wksp_;
 			size_t     nrot_;
 		};
-		
-		//YOCTO_DMC_MATH(class jacobi)
-		
+				
 	}
 }
 
