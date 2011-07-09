@@ -28,7 +28,7 @@ namespace yocto {
 			bool operator()( matrix<T> &a, array<T> &d, matrix<T> &v );
 			
 			//! sort eigenvalues by descending order
-			//! sort columns of v accrodingly
+			//! sort columns of v accordingly
 			static
 			void eigsrt( array<T> &d, matrix<T> &v ) throw();
 			

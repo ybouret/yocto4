@@ -28,6 +28,8 @@ static inline void test_jacobi()
 			continue;
 		}
 		Jacobi.eigsrt(d,v);
+		matrix<T> tv = v;
+		tv.transpose();
 		//std::cerr << "m=" << m << std::endl;
 		//std::cerr << "d=" << d << std::endl;
 	}
