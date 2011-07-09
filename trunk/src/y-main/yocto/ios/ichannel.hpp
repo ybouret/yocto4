@@ -9,7 +9,7 @@ namespace yocto
 	namespace ios
 	{
 		
-		class ichannel : public channel
+		class ichannel : public virtual channel
 		{
 		public:
 			virtual ~ichannel() throw();

@@ -37,6 +37,7 @@ namespace yocto
 			inline virtual bool try_lock() throw() { assert(access_); return access_->try_lock(); }
 
 			const   type_t            type;
+			
 		private:
 			mutable lockable         *access_;
 			static  threading::mutex  stdio_lock;

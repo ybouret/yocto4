@@ -85,10 +85,6 @@ namespace yocto
 				void mul( array<T> &out, const array<T> &in ) const throw();
 				void ldz() throw();
 				void ld1() throw(); //!< pseudo-id if not square
-				
-				//T *       get_row_item( size_t r ) throw();
-				//const T * get_row_item( size_t r ) const throw();
-				
 				void transpose();
 				
 			private:

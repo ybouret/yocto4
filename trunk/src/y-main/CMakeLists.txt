@@ -96,8 +96,14 @@ SET( math_srcs ${math_decl} ${math_impl} )
 INSTALL( FILES ${math_decl} DESTINATION include/yocto/math )
 SOURCE_GROUP( math FILES ${math_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs})
+FILE( GLOB rtld_decl yocto/rtld/*.hpp)
+FILE( GLOB rtld_impl yocto/rtld/*.cpp)
+SET( rtld_srcs ${rtld_decl} ${rtld_impl} )
+INSTALL( FILES ${rtld_decl} DESTINATION include/yocto/rtld )
+SOURCE_GROUP( rtld FILES ${rtld_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
