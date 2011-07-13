@@ -11,18 +11,25 @@ namespace yocto
 	namespace ios
 	{
 		
+		enum
+		{
+			readable = 0x01,
+			writable = 0x02,
+			truncate = 0x80
+		};
+		
 		class raw_file : public local_file
 		{
 		public:
-			static const size_t readable = 0x01;
-			static const size_t writable = 0x02;
-			static const size_t truncate = 0x80;
 			
 			inline bool is_readable() const throw() { return 0 != ( access & readable); }
 			inline bool is_writable() const throw() { return 0 != ( access & writable); }
 			
 			
 			explicit raw_file( const string &filename, size_t mode );
+			explicit raw_file( const cstdin_t  &);
+			explicit raw_file( const cstdout_t &);
+			explicit raw_file( const cstderr_t &);
 			virtual ~raw_file() throw();
 			
 #if defined(YOCTO_BSD)
@@ -33,6 +40,8 @@ namespace yocto
 			typedef void *handle_t;
 #endif			
 			
+			void get( void *data, size_t size, size_t &done );
+			void put( const void *data, size_t size, size_t &done );
 			
 		private:
 			handle_t       handle;

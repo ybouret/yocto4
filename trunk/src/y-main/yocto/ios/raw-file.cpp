@@ -182,37 +182,83 @@ namespace yocto
 		
 		raw_file:: ~raw_file() throw()
 		{
+			if( type == is_regular )
+			{
 #if defined(YOCTO_BSD)
-			YOCTO_GIANT_LOCK();
-			while( close( handle ) != 0 )
-			{
-				const int err = errno;
-				switch( err )
+				YOCTO_GIANT_LOCK();
+				while( close( handle ) != 0 )
 				{
-					case EINTR:
-						break;
-						
-					default:
-						if( status ) *status = err;
-						break;
+					const int err = errno;
+					switch( err )
+					{
+						case EINTR:
+							break;
+							
+						default:
+							if( status ) *status = err;
+							break;
+					}
 				}
-			}
 #endif			
-			
+				
 #if defined(YOCTO_WIN)
-			YOCTO_GIANT_LOCK();
-			if( ! ::CloseHandle( handle ) )
-			{
-				if( status ) *status = ::GetLastError();
-			}
+				YOCTO_GIANT_LOCK();
+				if( ! ::CloseHandle( handle ) )
+				{
+					if( status ) *status = ::GetLastError();
+				}
 #endif
-			
+			}
 			handle          = invalid_handle;
 			(size_t&)access = 0;
 		}
 		
 		
+		raw_file:: raw_file( const cstdin_t & ) :
+		local_file( is_stdin ),
+		handle( invalid_handle ),
+		access( readable ),
+		status( NULL )
+		{
+#if defined(YOCTO_BSD)
+			handle = STDIN_FILENO;
+#endif
+			
+#if defined(YOCTO_WIN)
+			handle = ::GetStdHandle(STD_INPUT_HANDLE);
+#endif
+		}
+		
+		raw_file:: raw_file( const cstdout_t & ) :
+		local_file( is_stdout ),
+		handle( invalid_handle ),
+		access( writable ),
+		status( NULL )
+		{
+#if defined(YOCTO_BSD)
+			handle = STDOUT_FILENO;
+#endif
+			
+#if defined(YOCTO_WIN)
+			handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
+		}
+		
+		raw_file:: raw_file( const cstderr_t & ) :
+		local_file( is_stderr ),
+		handle( invalid_handle ),
+		access( writable ),
+		status( NULL )
+		{
+#if defined(YOCTO_BSD)
+			handle = STDERR_FILENO;
+#endif
+			
+#if defined(YOCTO_WIN)
+			handle = ::GetStdHandle(STD_ERROR_HANDLE);
+#endif
+		}
 		
 	}
-	
+
 }
