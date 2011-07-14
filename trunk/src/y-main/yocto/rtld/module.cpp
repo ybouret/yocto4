@@ -78,6 +78,25 @@ namespace yocto
 		impl_ = NULL;
 	}
 	
+	
+	void * module:: query( const string &symbol ) throw()
+	{
+#if defined(YOCTO_BSD)
+		return dlsym( (impl_->handle), symbol.c_str() );
+#endif
+		
+#if defined(YOCTO_WIN)
+		return ::GetProcAddress( (HMODULE)(impl_->handle), symbol.c_str() );
+#endif
+	}
+	
+	void * module:: query( const char *symbol )
+	{
+		const string s = symbol;
+		return query( s );
+	}
+	
+	
 }
 
 

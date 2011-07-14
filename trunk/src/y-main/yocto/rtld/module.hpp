@@ -14,6 +14,9 @@ namespace yocto
 		
 		module( const module &other ) throw();
 		
+		void *query( const string & ) throw();
+		void *query( const char   * );
+		
 	private:
 		YOCTO_DISABLE_ASSIGN(module);
 		struct impl;
