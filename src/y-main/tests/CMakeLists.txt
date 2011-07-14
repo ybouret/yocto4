@@ -2,6 +2,9 @@
 FILE(GLOB test_srcs test-*.cpp *.hpp)
 ADD_EXECUTABLE(test-main main.cpp ${test_srcs})
 TARGET_LINK_YOCTO( test-main )
+IF( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
+	TARGET_LINK_LIBRARIES( test-main dl )
+ENDIF()
 
 ENABLE_TESTING()
 ADD_TEST(Platform    test-main platform)

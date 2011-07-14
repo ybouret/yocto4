@@ -88,11 +88,11 @@ namespace yocto
 				void transpose();
 				
 			private:
-				row          *row_; //!< stride proxy
-				T            *ptr_; //!< linear space
-				const size_t  len_; //!< linear size for copy/set operations
+				row          *row_;    //!< stride proxy
+				T            *ptr_;    //!< linear space
+				const size_t  len_;    //!< linear size for copy/set operations
 				void         *buffer_; //!< dynamic workspace
-				size_t        buflen_;
+				size_t        buflen_; //!< dynamic workspace size
 				void          build();
 				
 			};

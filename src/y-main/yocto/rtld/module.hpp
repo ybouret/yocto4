@@ -19,7 +19,7 @@ namespace yocto
 		
 	private:
 		YOCTO_DISABLE_ASSIGN(module);
-		struct impl;
+		class  impl;
 		impl  *impl_;
 		
 	};
