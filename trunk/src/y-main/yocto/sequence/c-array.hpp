@@ -21,6 +21,8 @@ namespace yocto
 		item_( (mutable_type *)addr-1 ),
 		size_( num_items ) {}
 		
+		explicit c_array() throw() : item_(NULL), size_(0) {}
+		
 		virtual const char *name()     const throw() { return hidden::c_array_name; }
 		virtual size_t      size()     const throw() { return size_; }
 		virtual size_t      capacity() const throw() { return size_; }
@@ -28,6 +30,12 @@ namespace yocto
 		virtual void free() throw() {}
 		virtual void release() throw() {}
 		virtual void reserve(size_t) { hidden::c_array_reserve( this->name() ); }
+		
+		void reset( T *addr, size_t num_items ) throw() 
+		{
+			item_          = (mutable_type *)addr-1;
+			(size_t&)size_ = num_items;
+		}
 		
 	private:
 		mutable_type *item_;
