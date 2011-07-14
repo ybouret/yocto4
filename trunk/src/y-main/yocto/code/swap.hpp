@@ -14,6 +14,13 @@ namespace yocto
 	}
 	
 	template <typename T>
+	inline void cswap_const( const T &a, const T &b ) throw()
+	{
+		cswap<T>( (T&)a, (T&)b );
+	}
+	
+	
+	template <typename T>
 	inline void mswap( T &a, T &b ) throw()
 	{
 		uint8_t *p = (uint8_t *)&a;

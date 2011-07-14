@@ -15,8 +15,8 @@ namespace yocto
 		
 		template <>
 		matrix<z_type>::row:: row( z_type *item, size_t c ) throw() :
-			cols( c     ),
-			item_( item )
+		cols( c     ),
+		item_( item )
 		{
 			
 		}
@@ -132,13 +132,22 @@ namespace yocto
 		template <>
 		void matrix<z_type>:: swap_with( matrix &M ) throw()
 		{
-			memswap( (void *) &rows, (void *) &M.rows, sizeof(matrix) - YOCTO_OFFSET_OF(matrix,rows) );
+			cswap_const( rows, M.rows );
+			cswap_const( cols, M.cols );
+			cswap_const( size, M.size );
+			cswap( row_, M.row_ );
+			cswap( ptr_, M.ptr_ );
+			cswap_const( len_, M.len_ );
+			cswap( buffer_, M.buffer_ );
+			cswap( buflen_, M.buflen_ );
+			
+			//memswap( (void *) &rows, (void *) &M.rows, sizeof(matrix) - YOCTO_OFFSET_OF(matrix,rows) );
 		}
 		
 		template <>
 		void matrix<z_type>:: release() throw()
 		{
-			matrix M;
+			matrix    M;
 			swap_with(M);
 		}
 		
@@ -276,7 +285,7 @@ namespace yocto
 				row_[i][i] = 1;
 			}
 		}
-
+		
 		template <>
 		void matrix<z_type>:: assign( const matrix &other ) throw()
 		{
@@ -325,8 +334,8 @@ namespace yocto
 			else {
 				assert( 0 == cols );
 			}
-
+			
 		}
-
+		
 	}
 }

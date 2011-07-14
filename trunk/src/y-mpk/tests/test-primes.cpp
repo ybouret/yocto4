@@ -7,6 +7,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/code/primes.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 
