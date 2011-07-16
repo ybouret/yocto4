@@ -23,7 +23,7 @@ namespace yocto
 #if defined(YOCTO_WIN)
 			void *h = ::LoadLibrary( soname );
 			if( !h )
-				throw win32:: exception( ::GetLastError(), "::LoadLibrary(%s)" );
+				throw win32:: exception( ::GetLastError(), "::LoadLibrary(%s)", soname );
 			return h;
 #endif
 		}
@@ -46,7 +46,7 @@ namespace yocto
 #endif
 			
 #if defined(YOCTO_WIN)
-			::FreeLibrary( handle );
+			::FreeLibrary( (HINSTANCE)handle );
 #endif
 			handle = NULL;
 		}
@@ -86,7 +86,7 @@ namespace yocto
 #endif
 		
 #if defined(YOCTO_WIN)
-		return ::GetProcAddress( (HMODULE)(impl_->handle), symbol.c_str() );
+		return (void*) ::GetProcAddress( (HMODULE)(impl_->handle), symbol.c_str() );
 #endif
 	}
 	

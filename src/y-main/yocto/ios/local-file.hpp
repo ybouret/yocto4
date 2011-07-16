@@ -12,7 +12,7 @@ namespace yocto
 
 		//! local_file handling
 		/**
-			smart pointer to an internam mutex
+			smart pointer to an internal mutex
 		*/
 		class local_file :  public lockable
 		{

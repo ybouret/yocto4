@@ -1,4 +1,4 @@
-#include "yocto/string/vfs-file-name.hpp"
+#include "yocto/string/vfs-utils.hpp"
 
 namespace yocto
 {

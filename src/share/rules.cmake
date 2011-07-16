@@ -137,7 +137,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	## Compiler Specific Flags
 	####################################################################
 	IF( "${CC_NAME}" MATCHES "gcc.*" )
-    MESSAGE( STATUS "adding extra LINK_FLAGS for ${CMAKE_CXX_COMPILER}" )
+    #MESSAGE( STATUS "adding extra LINK_FLAGS for ${CMAKE_CXX_COMPILER}" )
 		SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
 	ENDIF()
   
