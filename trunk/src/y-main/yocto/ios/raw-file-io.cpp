@@ -157,5 +157,97 @@ namespace yocto
 			}
 		}
 		
+		
+		offset_t raw_file:: seek( offset_t delta, whence_t whence )
+		{
+			YOCTO_GIANT_LOCK();
+#if defined(YOCTO_WIN)
+			LARGE_INTEGER mov;
+			LARGE_INTEGER res;
+			mov.QuadPart = delta;
+			res.QuadPart = 0;
+#endif
+			
+			switch( whence )
+			{
+				case from_set:
+				{
+#if defined(YOCTO_BSD)
+					const offset_t res = lseek( handle, delta, SEEK_SET);
+					if( res < 0 )
+						throw libc::exception( errno, "lseek(SEEK_SET)");
+					return res;
+#endif
+					
+#if defined(YOCTO_WIN)
+					if( ! ::SetFilePointerEx( handle, mov, &res, FILE_BEGIN) )
+						throw win32::exception( ::GetLastError(), "SetFilePointerEx(FILE_BEGIN)" );
+					return res.QuadPart;
+#endif
+					
+				}
+					
+				case from_cur:
+				{
+#if defined(YOCTO_BSD)
+					const offset_t res = lseek( handle, delta, SEEK_CUR);
+					if( res < 0 )
+						throw libc::exception( errno, "lseek(SEEK_CUR)");
+					return res;
+#endif
+					
+#if defined(YOCTO_WIN)
+					if( ! ::SetFilePointerEx( handle, mov, &res, FILE_CURRENT) )
+						throw win32::exception( ::GetLastError(), "SetFilePointerEx(FILE_CURRENT)" );
+					return res.QuadPart;
+#endif
+					
+				}
+					
+				case from_end:
+				{
+#if defined(YOCTO_BSD)
+					const offset_t res = lseek( handle, delta, SEEK_END);
+					if( res < 0 )
+						throw libc::exception( errno, "lseek(SEEK_END)");
+					return res;
+#endif
+					
+#if defined(YOCTO_WIN)
+					if( ! ::SetFilePointerEx( handle, mov, &res, FILE_END) )
+						throw win32::exception( ::GetLastError(), "SetFilePointerEx(FILE_END)" );
+					return res.QuadPart;
+#endif
+				}
+			}
+			return 0;
+		}
+		
+		
+		offset_t raw_file:: tell()
+		{
+			return this->seek(0,from_cur); 
+		}
+		
+		void raw_file:: rewind()
+		{
+			(void) this->seek(0,from_set);
+		}
+		
+		void raw_file:: unwind()
+		{
+			(void) this->seek(0,from_end);
+		}
+		
+		size_t raw_file:: length()
+		{
+			const offset_t now = this->tell();
+			const offset_t ans = this->seek(0,from_end);
+			if( now != this->seek( now, from_set ) )
+				throw exception( "raw_file::length(bad reset)");
+			return ans;
+		}
+		
+		
 	}
 }

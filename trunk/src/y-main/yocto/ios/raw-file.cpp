@@ -162,7 +162,7 @@ namespace yocto
 			
 #if defined(YOCTO_WIN)
 			YOCTO_GIANT_LOCK();
-			handle = CreateFile( TEXT(filename),
+			handle = CreateFile( TEXT(filename.c_str()),
 								dwDesiredAccess,
 								dwShareMode,
 								NULL,
@@ -171,7 +171,7 @@ namespace yocto
 								NULL);
 			if(  invalid_handle == handle )
 			{
-				return ( fd->status = GetLastError() );
+				//return ( fd->status = GetLastError() );
 				throw win32:: exception( ::GetLastError(), "::CreateFile('%s')", filename.c_str() );
 			}
 #endif

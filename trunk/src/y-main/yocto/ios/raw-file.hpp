@@ -18,6 +18,15 @@ namespace yocto
 			truncate = 0x80
 		};
 		
+		enum whence_t
+		{
+			from_set,
+			from_cur,
+			from_end
+		};
+		
+		typedef int64_t offset_t;
+		
 		class raw_file : public local_file
 		{
 		public:
@@ -42,6 +51,12 @@ namespace yocto
 			
 			void get( void *data, size_t size, size_t &done );
 			void put( const void *data, size_t size, size_t &done );
+			
+			offset_t seek( offset_t delta, whence_t whence );
+			offset_t tell();
+			void     rewind();
+			void     unwind();
+			size_t   length();
 			
 		private:
 			handle_t       handle;

@@ -260,7 +260,7 @@ namespace yocto {
 					const DWORD err = ::WSAGetLastError();
 					switch( err ) {
 						default:
-							throw windows::exception( err, "::select" );
+							throw win32::exception( err, "::select" );
 					}
 				}
 				return res;
