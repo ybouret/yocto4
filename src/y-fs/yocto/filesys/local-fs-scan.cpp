@@ -15,32 +15,35 @@
 
 namespace yocto
 {
-
+	
 	namespace filesys
 	{
 		namespace {
-
+			
 			class local_scanner : public vfs::scanner 
 			{
 			public:
-
+				
 				const char *local_dir() const throw() 
 				{
 					return &dir_[0];
 				}
-
+				
 #if defined(YOCTO_BSD)
 				explicit local_scanner( const string &dirname , const vfs &fs) :
 				vfs::scanner( dirname, fs),
-					handle_( opendir( local_dir() ) )
+				handle_( NULL )
 				{
+					YOCTO_GIANT_LOCK();
+					handle_ = opendir( local_dir() );
 					if( NULL == handle_ )
 					{
 						throw libc::exception( errno, "opendir(%s)", local_dir() );
 					}
 				}
-
+				
 				virtual const vfs::entry *next(void) {
+					YOCTO_GIANT_LOCK();
 					errno = 0;
 					struct dirent *ep = readdir( handle_ );
 					if( !ep ) {
@@ -55,34 +58,36 @@ namespace yocto
 					}
 				}
 #endif
-
+				
 #if defined(YOCTO_WIN)
 				explicit local_scanner( const string &dirname , const vfs &fs) :
 				vfs::scanner( dirname, fs),
-					hFind_( INVALID_HANDLE_VALUE ),
-					hData_(),
-					valid_( true )
+				hFind_( INVALID_HANDLE_VALUE ),
+				hData_(),
+				valid_( true )
 				{
-
+					
 					const string args = dir_ + '*';
+					YOCTO_GIANT_LOCK();
 					hFind_ = ::FindFirstFile( &args[0], &hData_ );
-
+					
 					if( hFind_ == INVALID_HANDLE_VALUE ) 
 					{
-						throw windows::exception( ::GetLastError(), "::FindFirstFile(%s)", local_dir() );
+						throw win32::exception( ::GetLastError(), "::FindFirstFile(%s)", local_dir() );
 					}
 					//std::cerr << "[WIN32] Opened handle to '" << dir_ << "'" << std::endl;
 					assert( NULL != hData_.cFileName );
-
-
+					
+					
 				}
-
+				
 				virtual const vfs::entry *next(void) 
 				{
 					if(valid_ ) 
 					{
 						//std::cerr << "[WIN32] has next entry '" << hData_.cFileName << "'" << std::endl;
 						make_entry( hData_.cFileName );
+						YOCTO_GIANT_LOCK();
 						if( ! ::FindNextFile( hFind_, &hData_ ) )
 						{
 							const DWORD err = ::GetLastError();
@@ -90,7 +95,7 @@ namespace yocto
 							
 							if( err != ERROR_NO_MORE_FILES )
 							{
-								throw windows::exception( err, "::FindNextFile(%s)",local_dir());
+								throw win32::exception( err, "::FindNextFile(%s)",local_dir());
 							}
 						}
 						return ent_;
@@ -103,28 +108,28 @@ namespace yocto
 					}
 				}
 #endif
-
+				
 				virtual ~local_scanner() throw()
 				{
 #if defined(YOCTO_BSD)
 					closedir( handle_ );
 #endif
-
+					
 #if defined(YOCTO_WIN)
 					//std::cerr << "[WIN32] Closing handle to '" << dir_ << "'" << std::endl;
 					::FindClose( hFind_ );
 #endif
 				}
-
-
-
+				
+				
+				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(local_scanner);
-
+				
 #if defined(YOCTO_BSD)
 				DIR *handle_;
 #endif
-
+				
 #if defined(YOCTO_WIN)
 				HANDLE           hFind_;
 				WIN32_FIND_DATA  hData_;
@@ -132,12 +137,12 @@ namespace yocto
 #endif
 			};
 		}
-
+		
 		vfs::scanner *local_fs:: new_scanner( const string &dirname ) const
 		{
 			return new local_scanner( dirname, *this );
 		}
-
+		
 	}
-
+	
 }

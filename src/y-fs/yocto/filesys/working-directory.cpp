@@ -45,6 +45,7 @@ namespace yocto
 			while( true )
 			{
 				memory::buffer_of<char,memory::pooled> buffer( length );
+				YOCTO_GIANT_LOCK();
 				const char   *wd = getcwd( buffer(), buffer.length() );
 				if( !wd )
 				{
@@ -62,17 +63,18 @@ namespace yocto
 #endif
 			
 #if defined(YOCTO_WIN)
+			YOCTO_GIANT_LOCK();
 			const DWORD len = ::GetCurrentDirectory(0,NULL);
 			if( !len )
-				throw windows::exception( GetLastError(), "::GetCurrentDirectory()" );
+				throw win32::exception( ::GetLastError(), "::GetCurrentDirectory()" );
 
-			memory::pooled_buffer buffer( len+1 ); assert( buffer.length() > len );
-			const DWORD res = GetCurrentDirectory( len, buffer.of<char>() );
+			memory::buffer_of<char,memory::pooled> buffer( len+1 ); assert( buffer.length() > len );
+			const DWORD res = ::GetCurrentDirectory( len, buffer() );
 			if( !res )
-				throw windows::exception( GetLastError(), "::GetCurrentDirectory()" );
+				throw win32::exception( ::GetLastError(), "::GetCurrentDirectory()" );
 			if( res > len )
 				throw exception( "CurrentDirectory changed!");
-			string ans( buffer.of<char>() );
+			string ans( buffer() );
 			return string( _vfs::as_directory( ans ) );
 #endif
 			
