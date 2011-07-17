@@ -2,7 +2,13 @@
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-net main.cpp ${test_srcs})
 TARGET_LINK_YOCTO( test-net net)
+IF(WIN32)
+	IF( "${CC_NAME}" MATCHES "gcc.*" )
+		TARGET_LINK_LIBRARIES( test-net ws2_32 )
+	ENDIF()
+ENDIF()
 
 ENABLE_TESTING()
+ADD_TEST(Resolve test-net resolve)
 
 ADD_CUSTOM_TARGET(check-net COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-net)
