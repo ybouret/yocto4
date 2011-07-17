@@ -83,6 +83,7 @@ namespace yocto {
 		
 		const uint16_t net:: user_port_width = (final_user_port-first_user_port)+1;
 		
+		const char net:: name[] = "net";
 		
 	}
 	
