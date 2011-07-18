@@ -3,6 +3,7 @@
 
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
+#include "yocto/string.hpp"
 
 namespace yocto
 {
@@ -33,6 +34,7 @@ namespace yocto
 			explicit t_pool() throw();
 			virtual ~t_pool() throw();
 			t_char  *create( char c );
+			t_char  *acquire();
 			void     release() throw();
 			void     reserve(size_t n);
 			
@@ -52,6 +54,7 @@ namespace yocto
 			void release() throw();
 			void back_to( t_pool &pool ) throw();
 			void at_head( token &other ) throw();
+			string to_string( size_t skip=0, size_t trim=0 ) const;
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(token);

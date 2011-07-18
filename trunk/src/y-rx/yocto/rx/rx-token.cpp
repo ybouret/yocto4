@@ -34,9 +34,14 @@ namespace yocto
 		
 		t_char * t_pool:: create( char c ) 
 		{
-			t_char *ch = size > 0 ? query() : t_char::acquire();
+			t_char *ch = acquire();
 			ch->data = c;
 			return ch;
+		}
+		
+		t_char * t_pool:: acquire()
+		{
+			return size > 0 ? query() : t_char::acquire();
 		}
 		
 		void t_pool:: release() throw()
@@ -101,6 +106,18 @@ namespace yocto
 		void token:: at_head( token &other ) throw()
 		{
 			while( size ) other.push_front( pop_back() );
+		}
+		
+		string token:: to_string( size_t skip, size_t trim) const
+		{
+			const size_t nz = skip+trim;
+			assert( nz <= size );
+			const t_char *ch = head;
+			while( skip-- > 0 ) ch = ch->next;
+			size_t        ns = size - nz;
+			string ans(ns,as_capacity);
+			while( ns-- > 0 ) { ans.append( ch->data ); ch = ch->next; }
+			return ans;
 		}
 		
 	}
