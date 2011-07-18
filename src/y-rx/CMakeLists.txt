@@ -19,5 +19,5 @@ INCLUDE_DIRECTORIES( . ../y-main )
 ADD_LIBRARY( y-rx STATIC ${rx_srcs} ${pat_srcs} )
 INSTALL( TARGETS y-rx ARCHIVE DESTINATION lib )
 
-#ADD_SUBDIRECTORY(tests)
+ADD_SUBDIRECTORY(tests)
 
