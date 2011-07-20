@@ -122,8 +122,15 @@ namespace yocto
 			return cache_.size;
 		}
 		
-		void source:: skip( t_char *ch ) throw() { pool.store( ch );  }
-		void source:: skip( token &tkn ) throw() { tkn.back_to(pool); }
+		void source:: drop( t_char *ch ) throw() { pool.store( ch );  }
+		void source:: drop( token &tkn ) throw() { tkn.back_to(pool); }
 		
+	
+		
+		void source:: skip(size_t n) throw()
+		{
+			assert( n <= in_cache() );
+			while(n-->0) pool.store( cache_.pop_front() );
+		}
 	}
 }

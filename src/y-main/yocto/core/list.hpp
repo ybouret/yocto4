@@ -3,8 +3,6 @@
 
 #include "yocto/os.hpp"
 
-//#include <iostream>
-
 namespace yocto
 {
 	
@@ -159,7 +157,7 @@ namespace yocto
 					}
 					
 				}
-			
+				
 			}
 			
 			//! fetch in 0..size-1
@@ -187,6 +185,7 @@ namespace yocto
 				push_front( unlink(node) );
 			}
 			
+					
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(list_of);
 			inline void push_first( NODE *node ) throw()

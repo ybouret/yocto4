@@ -52,9 +52,11 @@ namespace yocto
 			token( const token & );
 			token( const token &, t_pool &pool );
 			void release() throw();
-			void back_to( t_pool &pool ) throw();
-			void at_head( token &other ) throw();
+			void back_to( t_pool &pool ) throw(); //!< all t_chars back to pool
+			void at_head( token &other ) throw(); //!< for i/o caching
+			
 			string to_string( size_t skip=0, size_t trim=0 ) const;
+			friend std::ostream & operator<< ( std::ostream &, const token & );
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(token);

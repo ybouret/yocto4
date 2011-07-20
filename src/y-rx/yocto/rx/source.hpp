@@ -29,8 +29,9 @@ namespace yocto
 			void   prefetch(size_t n);
 			size_t in_cache() const throw();
 			
-			void skip( t_char *ch ) throw();// { pool.store( ch );  }
-			void skip( token &tkn ) throw();// { tkn.back_to(pool); }
+			void   drop( t_char *ch ) throw();//!< { pool.store( ch );  }
+			void   drop( token &tkn ) throw();//!< { tkn.back_to(pool); }
+			void   skip(size_t n) throw(); //!< n <= in_cache()
 			
 		private:
 			token         cache_;
