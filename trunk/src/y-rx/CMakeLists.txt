@@ -6,11 +6,11 @@ SET( rx_srcs ${rx_decl} ${rx_impl} )
 INSTALL( FILES ${rx_decl} DESTINATION yocto/rx )
 SOURCE_GROUP( rx FILES ${rx_srcs} )
 
-#FILE( GLOB pat_decl yocto/rx/pattern/*.hpp)
-#FILE( GLOB pat_impl yocto/rx/pattern/*.cpp)
-#SET( pat_srcs ${pat_decl} ${pat_impl} )
-#INSTALL( FILES ${rx_decl} DESTINATION yocto/rx/pattern )
-#SOURCE_GROUP( rx/pattern FILES ${pat_srcs} )
+FILE( GLOB pat_decl yocto/rx/pattern/*.hpp)
+FILE( GLOB pat_impl yocto/rx/pattern/*.cpp)
+SET( pat_srcs ${pat_decl} ${pat_impl} )
+INSTALL( FILES ${rx_decl} DESTINATION yocto/rx/pattern )
+SOURCE_GROUP( rx/pattern FILES ${pat_srcs} )
 
 
 INCLUDE_DIRECTORIES( . ../y-main )

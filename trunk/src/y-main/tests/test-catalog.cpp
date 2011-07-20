@@ -15,7 +15,7 @@ void test_catalog()
 	(void) type_size;
 
 	typedef catalog<T,comparator<mutable_type>,ALLOCATOR> cat_t;
-	std::cerr << "catalog<" << typeid(T).name() << ">" << std::endl;
+	std::cerr << "catalog<" << typeid(T).name() << ">: size=" << sizeof(cat_t) << std::endl;
 	
 	cat_t C;
 	vector<const_type> objs;

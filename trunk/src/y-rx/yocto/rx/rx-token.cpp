@@ -1,5 +1,6 @@
 #include "yocto/rx/token.hpp"
 #include "yocto/object.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -119,6 +120,16 @@ namespace yocto
 			while( ns-- > 0 ) { ans.append( ch->data ); ch = ch->next; }
 			return ans;
 		}
+		
+		std::ostream & operator<< ( std::ostream &os, const token &tkn )
+		{
+			for( const t_char *ch = tkn.head; ch; ch=ch->next)
+			{
+				os << ch->data;
+			}
+			return os;
+		}
+
 		
 	}
 	
