@@ -13,6 +13,7 @@ namespace yocto
 			
 			bool one_char:: accept( source &src )
 			{
+				assert( 0 == size );
 				t_char *ch = src.get();
 				if( ch )
 				{
