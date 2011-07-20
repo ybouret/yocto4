@@ -109,6 +109,11 @@ namespace yocto
 			while( size ) other.push_front( pop_back() );
 		}
 		
+		void token:: at_tail( token &other ) throw()
+		{
+			while( size ) other.push_back( pop_front() );
+		}
+		
 		string token:: to_string( size_t skip, size_t trim) const
 		{
 			const size_t nz = skip+trim;
