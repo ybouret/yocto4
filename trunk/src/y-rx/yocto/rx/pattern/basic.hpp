@@ -3,8 +3,7 @@
 
 #include "yocto/rx/pattern.hpp"
 #include "yocto/code/fourcc.hpp"
-#include "yocto/ordered/catalog.hpp"
-#include "yocto/memory/pooled.hpp"
+#include "yocto/rx/symbols.hpp"
 
 namespace yocto
 {
@@ -94,8 +93,6 @@ namespace yocto
 			class within : public one_char
 			{
 			public:
-				typedef catalog<uint8_t,comparator<uint8_t>,memory::pooled::allocator> impl_t;
-				impl_t impl;
 				static const uint32_t id = YOCTO_FOURCC('W','/','I','N');
 				static  within *create();
 				virtual ~within() throw();
@@ -107,7 +104,7 @@ namespace yocto
 				void add( char, char );
 				
 			private:
-				
+				symbols symbols_;
 				explicit within() throw();
 				within( const within &);
 				YOCTO_DISABLE_ASSIGN(within);
