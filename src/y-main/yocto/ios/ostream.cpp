@@ -1,5 +1,7 @@
 #include "yocto/ios/ostream.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/memory/buffer.hpp"
+#include "yocto/chars.hpp"
 
 #include <cerrno>
 
@@ -28,7 +30,26 @@ namespace yocto
 				throw libc::exception( EIO, "ostream::save(%u < %u)", unsigned(saved), unsigned(buflen) );
 		}
 
+		void ostream:: append( const char *buffer, size_t buflen )
+		{
+			while( buflen > 0 )
+			{
+				size_t done = 0;
+				put(buffer,buflen,done);
+				buffer += done;
+				buflen -= done;
+			}
+		}
 		
+		void ostream:: append( const char *buffer )
+		{
+			append( buffer, length_of(buffer) );
+		}
+		
+		void ostream:: append( const memory::ro_buffer &buffer )
+		{
+			append( (const char *) buffer.ro(), buffer.length() );
+		}
 		
 	}
 	

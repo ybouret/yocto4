@@ -7,6 +7,11 @@
 
 namespace yocto
 {
+	namespace memory
+	{
+		class ro_buffer;
+	}
+	
 	namespace ios 
 	{
 		class ostream : public stream, public ochannel
@@ -21,6 +26,10 @@ namespace yocto
 			void save( const void *buffer, size_t buflen );
 			template <typename T>
 			inline void emit( T x ) { x = swap_be<T>(x); save(&x,sizeof(T)); } 
+			
+			void append( const char *buffer);
+			void append( const char *buffer, size_t buflen );
+			void append( const memory::ro_buffer &buffer   );
 			
 		protected:
 			explicit ostream() throw();

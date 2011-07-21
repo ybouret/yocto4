@@ -9,7 +9,12 @@ namespace yocto
 {
 	namespace regex
 	{
-		typedef catalog<uint8_t,comparator<uint8_t>,memory::pooled::allocator> symbols;	
+		template <typename T>
+		struct catalog_of
+		{
+			typedef catalog<T,comparator<T>,memory::pooled::allocator> type;
+		};
+		typedef catalog_of<uint8_t>::type symbols;	
 		
 	}
 }
