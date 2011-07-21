@@ -7,6 +7,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/code/endian.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 
@@ -33,6 +34,16 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 	}
 	patterns.push_back( regex::logical::EQUAL( "world" ) );
 	patterns.push_back( regex::logical::AMONG( "hello" ) );
+	
+	{
+		size_t i=0;
+		for( const regex::pattern *p = patterns.head; p; p=p->next)
+		{
+			char buffer[32]; snprintf( buffer, sizeof(buffer)-1, "g%04x.dot", unsigned(i++) );
+			ios::ocstream fp( buffer, false );
+			p->graphviz( fp, "G" );
+		}
+	}
 	
 	regex::p_list pcpy( patterns );
 	assert( pcpy.size == patterns.size );

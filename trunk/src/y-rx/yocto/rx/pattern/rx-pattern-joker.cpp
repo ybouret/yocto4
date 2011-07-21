@@ -2,6 +2,7 @@
 #include "yocto/rx/source.hpp"
 
 #include "yocto/code/swap.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -93,7 +94,13 @@ namespace yocto
 				}
 				
 				virtual bool is_valid( size_t n ) const throw() { return n >= num; }
-				
+				virtual void viz( ios::ostream &os ) const
+				{
+					ppat->viz(os);
+					tag(os);
+					os.append(";\n");
+				}
+
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(jk_at_least);
 			};
@@ -130,7 +137,12 @@ namespace yocto
 				}
 				
 				virtual bool is_valid( size_t n ) const throw() { return n>=nmin && n <=nmax; }
-				
+				virtual void viz( ios::ostream &os ) const
+				{
+					ppat->viz(os);
+					tag(os);
+					os.append(";\n");
+				}
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(jk_counting);
 			};

@@ -42,7 +42,8 @@ namespace yocto
 
 				virtual pattern *clone() const { return new any1(); }
 				virtual bool     is_valid( char ) const throw(); //!< always true
-
+				virtual void     viz( ios::ostream & ) const;
+				
 			private:
 				any1() throw();
 				any1( const any1 & ) throw();
@@ -62,7 +63,8 @@ namespace yocto
 				
 				virtual pattern *clone() const  { return new single( value ); }
 				virtual bool     is_valid(char) const throw();
-				
+				virtual void     viz( ios::ostream & ) const;
+
 			private:
 				explicit single( char c ) throw();
 				YOCTO_DISABLE_COPY_AND_ASSIGN(single);
@@ -82,7 +84,8 @@ namespace yocto
 				
 				virtual pattern *clone() const { return new range(lower,upper); }
 				virtual bool     is_valid(char) const throw();
-				
+				virtual void     viz( ios::ostream & ) const;
+
 			private:
 				explicit range( uint8_t a, uint8_t b) throw();
 				YOCTO_DISABLE_COPY_AND_ASSIGN(range);
@@ -99,7 +102,8 @@ namespace yocto
 				
 				virtual pattern *clone() const { return new within( *this ); }
 				virtual bool     is_valid(char) const throw();
-				
+				virtual void     viz( ios::ostream & ) const;
+
 				void add( char );
 				void add( char, char );
 				

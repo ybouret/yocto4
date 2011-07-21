@@ -44,6 +44,7 @@ namespace yocto
 			any1:: ~any1() throw() {}
 			bool    any1:: is_valid( char ) const throw() { return true; }
 			
+
 			////////////////////////////////////////////////////////////////////
 			single *  single:: create(char c) { return new single(c); }
 			single::  single(char c) throw() : one_char(id),value(c) { data = (void*)&value; }

@@ -4,9 +4,16 @@
 
 #include "yocto/rx/token.hpp"
 #include "yocto/core/meta-list.hpp"
+#include "yocto/rx/symbols.hpp"
 
 namespace yocto
 {
+	
+	namespace ios
+	{
+		class ostream;
+	}
+	
 	namespace regex
 	{
 		
@@ -24,9 +31,16 @@ namespace yocto
 			virtual pattern *clone() const = 0;
 			virtual bool     accept( source &src) = 0;
 			virtual void     sendto( source &src); //!< can be overriden, default is back_to(src.pool)
-						
+			
+			void graphviz( ios::ostream &, const string &graph_name ) const;
+			virtual void viz( ios::ostream & ) const = 0;
+
+			
 		protected:
 			explicit pattern(uint32_t t) throw();
+			void         tag( ios::ostream & ) const;
+			static void  out( ios::ostream &, char c );
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
