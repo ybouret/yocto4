@@ -76,23 +76,21 @@ namespace yocto
 				return new within();
 			}
 					
-			within:: within() throw() : one_char(id), impl()
+			within:: within() throw() : one_char(id), symbols_()
 			{
-				data = &impl;
 			}
 			
-			within:: within( const within &w ) : one_char(id), impl( w.impl ) 
+			within:: within( const within &w ) : one_char(id), symbols_( w.symbols_ ) 
 			{
-				data = &impl;
 			}
 			
 			within:: ~within() throw() {}
 			
-			bool within:: is_valid( char c ) const throw() { return impl.search( uint8_t(c) ); }
+			bool within:: is_valid( char c ) const throw() { return symbols_.search( uint8_t(c) ); }
 			
 			void within::add( char x )
 			{
-				(void) impl.insert( uint8_t(x) );
+				(void) symbols_.insert( uint8_t(x) );
 			}
 			
 			void within:: add( char a, char b )
@@ -105,7 +103,7 @@ namespace yocto
 				}
 				for( size_t i=A; i <= size_t(B); ++i )
 				{
-					(void) impl.insert( uint8_t(i) );
+					(void) symbols_.insert( uint8_t(i) );
 				}
 			}
 			
