@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/rx/pattern/basic.hpp"
+#include "yocto/rx/pattern/logic.hpp"
 
 #include "yocto/rx/source.hpp"
 
@@ -18,8 +19,8 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 	src.prefetch( 1 + alea_less_than<size_t>(16) );
 	
 	regex::p_list patterns;
-	patterns.push_back( regex::basic::any1::create()      );
-	patterns.push_back( regex::basic::single::create('A') );
+	patterns.push_back( regex::basic::any1::create()         );
+	patterns.push_back( regex::basic::single::create('A')    );
 	patterns.push_back( regex::basic::range::create('a','z') );
 	{
 		regex::basic::within *w = regex::basic::within::create();
@@ -30,6 +31,8 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 		w->add('l');
 		w->add('o');
 	}
+	patterns.push_back( regex::logical::EQUAL( "world" ) );
+	patterns.push_back( regex::logical::AMONG( "hello" ) );
 	
 	regex::p_list pcpy( patterns );
 	assert( pcpy.size == patterns.size );

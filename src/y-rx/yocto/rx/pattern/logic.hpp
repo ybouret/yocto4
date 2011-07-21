@@ -31,38 +31,60 @@ namespace yocto
 			class AND : public Operator
 			{
 			public:
-				static const uint32_t id = YOCTO_FOURCC('<','&','&', '>');
+				static const uint32_t id = YOCTO_FOURCC('[','&','&', ']');
 				static AND *create();
 				virtual ~AND() throw();
 
 				virtual pattern *clone() const { return new AND( *this ); }
 				virtual bool     accept( source &src );
-				void    append( pattern *p ) throw(); //!< optimized push_back
 
 			private:
 				AND() throw();
 				AND( const AND & );
 				YOCTO_DISABLE_ASSIGN(AND);
 			};
+			
+			
 
 			//! logical OR
 			class OR : public Operator
 			{
 			public:
-				static const uint32_t id = YOCTO_FOURCC('<','|','|', '>');
+				static const uint32_t id = YOCTO_FOURCC('[','|','|', ']');
 				static OR *create();
 				virtual ~OR() throw();
 
 				virtual pattern *clone() const { return new OR( *this ); }
 				virtual bool     accept( source &src );
-				void    append( pattern *p ) throw(); //!< optimized push_back
 
 			private:
 				OR() throw();
 				OR( const OR & );
 				YOCTO_DISABLE_ASSIGN(OR);
 			};
+			
+			//! logical NONE
+			class NONE : public Operator
+			{
+			public:
+				static const uint32_t id = YOCTO_FOURCC('N','O','N','E');
+				static NONE *create();
+				virtual ~NONE() throw();
+				
+				virtual pattern *clone() const { return new NONE( *this ); }
+				virtual bool     accept( source &src );
+				
+			private:
+				NONE() throw();
+				NONE( const NONE & );
+				YOCTO_DISABLE_ASSIGN(NONE);
+			};
+			
 
+			
+			Operator *EQUAL( const string &s );
+			Operator *AMONG( const string &s );
+			Operator *EXCEPT( const string &s );
 		}
 
 	}
