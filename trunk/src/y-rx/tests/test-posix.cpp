@@ -2,6 +2,8 @@
 #include "yocto/rx/pattern/posix.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/auto-ptr.hpp"
+#include "yocto/rx/pattern/db.hpp"
+
 #include <cstdlib>
 
 using namespace yocto;
@@ -23,10 +25,15 @@ static inline void test_posix( const string &name, const regex::pattern &p )
 	
 }
 
-#define _TEST(NAME) do { auto_ptr<regex::pattern> p( regex::posix::NAME() ); test_posix( #NAME, *p); } while( false )
+#define _TEST(NAME) \
+do { auto_ptr<regex::pattern> p( regex::posix::NAME() ); \
+ test_posix( #NAME, *p); \
+ db.record( #NAME, p.yield() ); \
+ p.reset( db.create( #NAME ) ); } while( false )
 
 YOCTO_UNIT_TEST_IMPL(posix)
 {
+	regex::pattern_db db;
 	_TEST(lower);
 	_TEST(upper);
 	_TEST(digit);

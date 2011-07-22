@@ -9,10 +9,10 @@ veryclean: clean
 	@${MAKE} -s -C prj veryclean
 
 xcode:
-	@bash ./src/share/create.sh src xcode 
+	@bash ./src/share/create.sh src xcode ${BUILD_TYPE} 
 	
 vs9:
-	@bash ./src/share/create.sh src vs9
+	@bash ./src/share/create.sh src vs9 ${BUILD_TYPE}
 
 gnu:
 	@bash ./src/share/create.sh src gnu ${BUILD_TYPE}
@@ -20,3 +20,5 @@ gnu:
 clang:
 	@bash ./src/share/create.sh src clang ${BUILD_TYPE}
 
+intel:
+	@bash ./src/share/create.sh src intel ${BUILD_TYPE}
