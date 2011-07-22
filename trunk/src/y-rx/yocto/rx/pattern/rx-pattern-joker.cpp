@@ -4,6 +4,12 @@
 #include "yocto/code/swap.hpp"
 #include "yocto/ios/ostream.hpp"
 
+#include <cstdio>
+
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
+
 namespace yocto
 {
 	namespace regex

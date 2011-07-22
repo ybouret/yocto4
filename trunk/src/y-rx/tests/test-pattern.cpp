@@ -10,7 +10,10 @@
 #include "yocto/code/endian.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
-
+#include <cstdio>
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
 using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(pattern)

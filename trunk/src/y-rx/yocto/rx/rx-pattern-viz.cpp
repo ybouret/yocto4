@@ -5,6 +5,12 @@
 #include "yocto/rx/pattern/logic.hpp"
 #include "yocto/code/utils.hpp"
 
+#include <cstdio>
+
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
+
 namespace yocto
 {
 	
