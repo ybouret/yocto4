@@ -55,7 +55,8 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 			p->graphviz( fp, "G" );
 			snprintf( buffer, sizeof(buffer)-1, "dot -Tpng g%02x.dot -o g%02x.png", unsigned(i), unsigned(i));
 			std::cerr << "" << buffer << "" << std::endl;
-			system( buffer );
+			const string cmd = buffer;
+			system( cmd.c_str() );
 			++i;
 		}
 		std::cerr << "-- done" << std::endl;
