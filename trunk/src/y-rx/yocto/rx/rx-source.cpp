@@ -70,7 +70,7 @@ namespace yocto
 		
 		void source:: unget( token &tkn ) throw()
 		{
-			tkn.at_head( cache_ );
+			tkn.move_at_head_of( cache_ );
 		}
 		
 		void source:: uncpy( const token &tkn )

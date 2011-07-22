@@ -23,7 +23,7 @@ namespace yocto
 				{
 					for( const NODE *node = other.head; node; node=node->next )
 					{
-						push_back( node->clone() );
+						this->push_back( node->clone() );
 					}
 					
 				}

@@ -41,7 +41,7 @@ namespace yocto
 					assert( 0 == ppat->size );
 					while( ppat->accept(src) )
 					{
-						ppat->at_tail( *this );
+						ppat->move_at_tail_of( *this );
 						++npat;
 					}
 					if( is_valid( npat ) )

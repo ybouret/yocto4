@@ -14,6 +14,7 @@ namespace yocto
 		struct posix
 		{
 		
+			//-- standard
 			static pattern *upper();  //!< [A-Z]
 			static pattern *lower();  //!< [a-z]
 			static pattern *digit();  //!< [0-9]
@@ -25,10 +26,10 @@ namespace yocto
 			static pattern *punct();  //!< !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~
 			
 			//-- not standard
-			static pattern *word();   //!< [A-Za-z0-9_]
-			static pattern *endl();   //!< \n|\r|\r\n
-			static pattern *dot();    //!< [^\n\r]
-			static pattern *cstring();
+			static pattern *word();    //!< [A-Za-z0-9_]
+			static pattern *endl();    //!< \n|\r|\r\n
+			static pattern *dot();     //!< [^\n\r]
+			static pattern *cstring(); //!< ISO C string
 		};
 		
 	}

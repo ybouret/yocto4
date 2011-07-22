@@ -87,6 +87,17 @@ namespace yocto
 				}
 			}
 			
+			inline void merge_back( list_of &other ) throw()
+			{
+				assert( this != &other );
+				while( other.size ) push_back( other.pop_front() );
+			}
+			
+			inline void merge_front( list_of &other ) throw()
+			{
+				assert( this != &other );
+				while( other.size ) push_front( other.pop_back() );
+			}
 			
 			
 			inline bool owns( const NODE *node ) const throw()

@@ -17,11 +17,12 @@ namespace yocto
 			
 			Operator:: Operator( uint32_t t ) throw() : pattern( t ), operands()
 			{
+				data = & operands;
 			}
 			
 			Operator:: Operator( const Operator &op ) : pattern( op.type ), operands( op.operands )
 			{
-				
+				data = & operands;
 			}
 			
 			void Operator:: sendto( source &src ) throw()
@@ -56,7 +57,7 @@ namespace yocto
 					assert( 0 == p->size );
 					if( p->accept( src ) )
 					{
-						p->at_tail( *this );
+						p->move_at_tail_of( *this );
 						assert( 0 == p->size );
 					}
 					else 
@@ -96,7 +97,7 @@ namespace yocto
 					assert( 0 == p->size );
 					if( p->accept( src ) )
 					{
-						p->at_tail( *this );
+						p->move_at_tail_of( *this );
 						assert( 0 == p->size );
 						return true;
 					}

@@ -16,6 +16,7 @@ namespace yocto
 		};
 		typedef catalog_of<uint8_t>::type symbols;	
 		
+		
 	}
 }
 
