@@ -1,7 +1,9 @@
 #include "yocto/rx/pattern.hpp"
 #include "yocto/ios/ostream.hpp"
+
 #include "yocto/rx/pattern/basic.hpp"
 #include "yocto/rx/pattern/logic.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -22,9 +24,19 @@ namespace yocto
 		
 		void pattern:: tag( ios::ostream &os ) const
 		{
-			char buffer[32];
-			snprintf( buffer, sizeof(buffer)-1, "%p", this);
-			os.append( buffer );
+			union 
+			{
+				uint8_t k[sizeof(void*)];
+				void *  p;
+			} alias;
+			memset( &alias, 0, sizeof(alias) );
+			alias.p = (void*)this;
+			for( size_t i=0; i < sizeof(void*); ++i )
+			{
+				const uint8_t B = alias.k[i];
+				os.write( 'A' + ( (B>>4) & 0xf ) );
+				os.write( 'A' + (  B     & 0xf ) );
+			}
 		}
 		
 		void pattern:: out( ios::ostream &os, char c )
@@ -49,23 +61,25 @@ namespace yocto
 			void    any1:: viz( ios::ostream &os ) const
 			{
 				tag(os); 
-				os.append("[ label=\"any1\"];\n");
+				os.append(" [ label=\"any1\"];\n");
 			}
 			
 			void single:: viz( ios::ostream &os ) const
 			{
 				tag(os); 
-				os.append("[ label=\"'");
+				os.append(" [ label=\"'");
 				out(os,value );
-				os.append("\"];\n");
+				os.append("'\"];\n");
 			}
 			
 			void range:: viz( ios::ostream &os ) const
 			{
 				tag(os);
-				os.append("[ label=\"[");
-				
-				os.append("]\" ];\n");
+				os.append("[ label=\"['");
+				out(os,lower);
+				os.append("'-'");
+				out(os,upper);
+				os.append("']\" ];\n");
 				
 			}
 			
@@ -73,7 +87,10 @@ namespace yocto
 			{
 				tag(os);
 				os.append("[ label=\"<");
-				
+				for( symbols::const_iterator i = symbols_.begin(); i != symbols_.end(); ++i )
+				{
+					out(os, *i );
+				}
 				os.append(">\" ];\n");
 			}
 		
@@ -92,27 +109,38 @@ namespace yocto
 				}
 			}
 			
+			static inline void viz_op_link( ios::ostream &os, const p_list &op, const pattern &from )
+			{
+				for( const pattern *p = op.head; p; p=p->next )
+				{
+					from.tag(os); os.append(" -> "); p->tag(os); os.append(";\n");
+				}
+			}
+			
 			////////////////////////////////////////////////////////////////////
 			void AND:: viz( ios::ostream &os ) const
 			{
 				viz_op( os, operands );
-				tag(os);
+				tag(os); os.append( " [ label=\"AND\", shape=house ]");
 				os.append(";\n");
+				viz_op_link( os, operands, *this );
 			}
 			
 			
 			void OR:: viz( ios::ostream &os ) const
 			{
 				viz_op( os, operands );
-				tag(os);
+				tag(os); os.append( " [ label=\"OR\", shape=house ]");
 				os.append(";\n");
+				viz_op_link( os, operands, *this );
 			}
 			
 			void NONE:: viz( ios::ostream &os ) const
 			{
 				viz_op( os, operands );
-				tag(os);
+				tag(os); os.append( " [ label=\"NONE\", shape=house ]");
 				os.append(";\n");
+				viz_op_link( os, operands, *this );
 			}
 			
 			

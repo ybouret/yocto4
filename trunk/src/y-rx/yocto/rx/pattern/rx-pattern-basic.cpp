@@ -89,12 +89,18 @@ namespace yocto
 			
 			bool within:: is_valid( char c ) const throw() { return symbols_.search( uint8_t(c) ); }
 			
-			void within::add( char x )
+			
+			void within:: reserve( size_t n )
+			{
+				symbols_.reserve( n );
+			}
+			
+			void within:: insert( char x )
 			{
 				(void) symbols_.insert( uint8_t(x) );
 			}
 			
-			void within:: add( char a, char b )
+			void within:: insert( char a, char b )
 			{
 				uint8_t A = a;
 				uint8_t B = b;

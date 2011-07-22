@@ -21,6 +21,11 @@ namespace yocto
 				virtual ~Operator() throw();
 				virtual void sendto( source &src ) throw(); //!< clean this and all operands
 
+				friend inline Operator & operator<<( Operator &op, pattern *p ) throw()
+				{
+					op.operands.push_back(p);
+					return op;
+				}
 			protected:
 				Operator(uint32_t t) throw();
 				Operator( const Operator & );

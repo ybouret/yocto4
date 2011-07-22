@@ -104,8 +104,9 @@ namespace yocto
 				virtual bool     is_valid(char) const throw();
 				virtual void     viz( ios::ostream & ) const;
 
-				void add( char );
-				void add( char, char );
+				void reserve( size_t n );
+				void insert( char );
+				void insert( char, char );
 				
 			private:
 				symbols symbols_;

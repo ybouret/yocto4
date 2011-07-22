@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/rx/pattern/basic.hpp"
 #include "yocto/rx/pattern/logic.hpp"
+#include "yocto/rx/pattern/joker.hpp"
 
 #include "yocto/rx/source.hpp"
 
@@ -8,17 +9,13 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/code/endian.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(pattern)
 {
-	ios::icstream input( ios::cstdin );
-	regex::source src;
-	
-	src.connect( input );
-	src.prefetch( 1 + alea_less_than<size_t>(16) );
-	
+		
 	regex::p_list patterns;
 	patterns.push_back( regex::basic::any1::create()         );
 	patterns.push_back( regex::basic::single::create('A')    );
@@ -26,27 +23,52 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 	{
 		regex::basic::within *w = regex::basic::within::create();
 		patterns.push_back(w);
-		w->add('h');
-		w->add('e');
-		w->add('l');
-		w->add('l');
-		w->add('o');
+		w->insert('h');
+		w->insert('e');
+		w->insert('l');
+		w->insert('l');
+		w->insert('o');
 	}
 	patterns.push_back( regex::logical::EQUAL( "world" ) );
 	patterns.push_back( regex::logical::AMONG( "hello" ) );
 	
 	{
+		regex::basic::single   *s  = regex::basic::single::create('B');
+		regex::pattern         *j1 = regex::joker::at_least(s,1);
+		patterns.push_back( j1 );
+	}
+	
+	{
+		regex::basic::single   *s  = regex::basic::single::create('C');
+		regex::pattern         *j1 = regex::joker::counting(s,0,1);
+		patterns.push_back( j1 );
+	}
+	
+	
+	{
+		std::cerr << "-- saving patterns..." << std::endl;
 		size_t i=0;
 		for( const regex::pattern *p = patterns.head; p; p=p->next)
 		{
-			char buffer[32]; snprintf( buffer, sizeof(buffer)-1, "g%04x.dot", unsigned(i++) );
+			char buffer[128]; snprintf( buffer, sizeof(buffer)-1, "g%02x.dot", unsigned(i) );
 			ios::ocstream fp( buffer, false );
 			p->graphviz( fp, "G" );
+			snprintf( buffer, sizeof(buffer)-1, "dot -Tpng g%02x.dot -o g%02x.png", unsigned(i), unsigned(i));
+			std::cerr << "" << buffer << "" << std::endl;
+			system( buffer );
+			++i;
 		}
+		std::cerr << "-- done" << std::endl;
 	}
 	
 	regex::p_list pcpy( patterns );
 	assert( pcpy.size == patterns.size );
+	
+	ios::icstream input( ios::cstdin );
+	regex::source src;
+	
+	src.connect( input );
+	src.prefetch( 1 + alea_less_than<size_t>(16) );
 	
 	while( src.peek() )
 	{

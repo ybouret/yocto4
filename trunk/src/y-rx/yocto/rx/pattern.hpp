@@ -34,12 +34,12 @@ namespace yocto
 			
 			void graphviz( ios::ostream &, const string &graph_name ) const;
 			virtual void viz( ios::ostream & ) const = 0;
+			void         tag( ios::ostream & ) const;
+			static void  out( ios::ostream &, char c );
 
 			
 		protected:
 			explicit pattern(uint32_t t) throw();
-			void         tag( ios::ostream & ) const;
-			static void  out( ios::ostream &, char c );
 			
 			
 		private:
