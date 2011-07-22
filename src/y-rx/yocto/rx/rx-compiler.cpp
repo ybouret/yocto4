@@ -10,7 +10,7 @@
 
 namespace yocto
 {
-	
+
 	namespace regex
 	{
 		////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ namespace yocto
 		// the compiler class 
 		//
 		////////////////////////////////////////////////////////////////////////
-		
+
 		class compiler
 		{
 		public:
@@ -28,17 +28,17 @@ namespace yocto
 			const pattern_db  *dict;
 			int                depth;
 			static const char  fn[];
-			
+
 			compiler( const string &expr, const pattern_db *db ) throw() :
 			curr( expr.c_str()       ),
-			last( curr + expr.size() ),
-			dict( db ),
-			depth(0)
+				last( curr + expr.size() ),
+				dict( db ),
+				depth(0)
 			{
-				
+
 			}
 			~compiler() throw() {}
-			
+
 			//==================================================================
 			// sub-expression parsing
 			//==================================================================
@@ -49,7 +49,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				auto_ptr<logical::Operator> p(logical::AND::create());
 				const char                 *ini = curr;
-				
+
 				//--------------------------------------------------------------
 				// main loop
 				//--------------------------------------------------------------
@@ -58,85 +58,85 @@ namespace yocto
 					const char C = curr[0];
 					switch( C )
 					{
-							
-							//--------------------------------------------------
-							//
-							// sub-expressions
-							//
-							//--------------------------------------------------
-						case '(': {
-							//--------------------------------------------------
-							//-- start sub expression
-							//--------------------------------------------------
-							++depth; //-- global depth
-							++curr;  //-- skip LPAREN
-							p->operands.push_back( sub() );
-						} 
-							break;
-							
-						case ')':
-							//--------------------------------------------------
-							//-- end sub expression
-							//--------------------------------------------------
-							if( --depth < 0 ) 
-								throw excp( fn, "no sub-expression to end after '%s'", ini);
-							goto END_SUB;
-							
-							
-							//--------------------------------------------------
-							//
-							// alternation
-							//
-							//--------------------------------------------------
-						case '|': {
-							auto_ptr<pattern> lhs( p.yield() );
-							p.reset( logical::OR::create() );
-							++curr; //-- skip ALT
-							auto_ptr<pattern> rhs( sub() );
-							p->operands.push_back( lhs.yield() );
-							p->operands.push_back( rhs.yield() );
-						}
-							goto END_SUB;
-														
-							//--------------------------------------------------
-							//
-							// jokers
-							//
-							//--------------------------------------------------
-						case '?':
-						case '+':
-						case '*':
-							jokerize(*p,C);
-							break;
-							
-						default: 
-							//--------------------------------------------------
-							//-- a single simple char
-							//--------------------------------------------------
-							*p << basic::single::create( C );
+
+						//--------------------------------------------------
+						//
+						// sub-expressions
+						//
+						//--------------------------------------------------
+					case '(': {
+						//--------------------------------------------------
+						//-- start sub expression
+						//--------------------------------------------------
+						++depth; //-- global depth
+						++curr;  //-- skip LPAREN
+						p->operands.push_back( sub() );
+							  } 
+							  break;
+
+					case ')':
+						//--------------------------------------------------
+						//-- end sub expression
+						//--------------------------------------------------
+						if( --depth < 0 ) 
+							throw excp( fn, "no sub-expression to end after '%s'", ini);
+						goto END_SUB;
+
+
+						//--------------------------------------------------
+						//
+						// alternation
+						//
+						//--------------------------------------------------
+					case '|': {
+						auto_ptr<pattern> lhs( p.yield() );
+						p.reset( logical::OR::create() );
+						++curr; //-- skip ALT
+						auto_ptr<pattern> rhs( sub() );
+						p->operands.push_back( lhs.yield() );
+						p->operands.push_back( rhs.yield() );
+							  }
+							  goto END_SUB;
+
+							  //--------------------------------------------------
+							  //
+							  // jokers
+							  //
+							  //--------------------------------------------------
+					case '?':
+					case '+':
+					case '*':
+						jokerize(*p,C);
+						break;
+
+					default: 
+						//--------------------------------------------------
+						//-- a single simple char
+						//--------------------------------------------------
+						*p << basic::single::create( C );
 					}
-					
+
 					++curr;
 				}
-				
+
 				//--------------------------------------------------------------
 				// analyze end of sub-expression
 				//--------------------------------------------------------------
-			END_SUB:
+END_SUB:
 				switch( p->operands.size )
 				{
-				    case 0:
-						throw excp(fn,"empty sub-expression after '%s'", ini );
-						
-					case 1:
-						return p->operands.pop_back();
-						
-					default:
-						break;
+				case 0:
+					throw excp(fn,"empty sub-expression after '%s'", ini );
+
+				case 1:
+					return p->operands.pop_back();
+
+				default:
+					break;
 				}
 				return p.yield();
 			}
-			
+
 			//==================================================================
 			// extract last pattern for the joker
 			//==================================================================
@@ -147,49 +147,64 @@ namespace yocto
 				pattern *q = p.operands.pop_back();
 				switch( j )
 				{
-					case '+':
-						p.operands.push_back( joker::at_least(q,1) );
-						break;
-						
-					case '?':
-						p.operands.push_back( joker::counting(q,0,1) );
-						break;
-						
-					case '*':
-						p.operands.push_back( joker::at_least(q,0) );
-						break;
-						
-					default:
-						delete q;
-						throw excp( fn, "invalid joker '%c'", j );
+				case '+':
+					p.operands.push_back( joker::at_least(q,1) );
+					break;
+
+				case '?':
+					p.operands.push_back( joker::counting(q,0,1) );
+					break;
+
+				case '*':
+					p.operands.push_back( joker::at_least(q,0) );
+					break;
+
+				default:
+					delete q;
+					throw excp( fn, "invalid joker '%c'", j );
 				}
-				
+
 			}
-			
-			
-			
+
+
+
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
 		};
-		
+
 		const char compiler::fn[] = "regex::compiler exception";
-		
-		
-		
+
+
+
 		pattern *compile( const string &expr, const pattern_db *db )
 		{
 			compiler          cc( expr, db );
 			auto_ptr<pattern> pp( cc.sub() );
 			if( cc.depth > 0 )
 				throw compiler::excp( compiler::fn, "unfinished sub-expression in '%s'", expr.c_str() );
+			switch( pp->type )
+			{
+			case logical::AND::id:
+				assert(pp->data);
+				static_cast<logical::AND *>(pp->data)->optimize();
+				break;
+
+			case logical::OR::id:
+				assert(pp->data);
+				static_cast<logical::OR *>(pp->data)->optimize();
+				break;
+
+			default:
+				break;
+			}
 			return pp.yield();
 		}
-		
+
 		pattern *compile( const char *expr, const pattern_db *db )
 		{
 			const string xp( expr );
 			return compile( xp, db);
 		}
 	}
-	
+
 }

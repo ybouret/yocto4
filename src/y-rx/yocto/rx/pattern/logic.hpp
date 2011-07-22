@@ -43,6 +43,8 @@ namespace yocto
 				virtual pattern *clone() const { return new AND( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
+				
+				void optimize() throw();
 
 			private:
 				AND() throw();
@@ -63,6 +65,8 @@ namespace yocto
 				virtual pattern *clone() const { return new OR( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
+
+				void optimize() throw();
 
 			private:
 				OR() throw();

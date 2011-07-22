@@ -17,12 +17,12 @@ namespace yocto
 			
 			Operator:: Operator( uint32_t t ) throw() : pattern( t ), operands()
 			{
-				data = & operands;
+				//data = & operands;
 			}
 			
 			Operator:: Operator( const Operator &op ) : pattern( op.type ), operands( op.operands )
 			{
-				data = & operands;
+				//data = & operands;
 			}
 			
 			void Operator:: sendto( source &src ) throw()
@@ -38,6 +38,8 @@ namespace yocto
 			AND * AND::create() { return new AND(); }
 			AND:: AND() throw() : Operator( id )
 			{
+				AND *ptr = this;
+				data     = ptr;
 			}
 			
 			AND:: AND( const AND &op ) : Operator( op )
@@ -78,6 +80,8 @@ namespace yocto
 			
 			OR:: OR() throw() : Operator( id )
 			{
+				OR *ptr = this;
+				data    = ptr;
 			}
 			
 			OR:: OR( const OR &op ) : Operator( op )
