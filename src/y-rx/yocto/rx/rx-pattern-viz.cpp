@@ -44,7 +44,13 @@ namespace yocto
 			uint8_t C = c;
 			if( C >= 32 && C < 127 )
 			{
-				os.write( C );
+				switch( C )
+				{
+					case '\"': os.write('\\'); os.write( '\"'); break;
+					case '\\': os.write('\\'); os.write( '\\'); break;
+					default:
+						os.write( C );
+				}
 			}
 			else 
 			{
@@ -52,9 +58,9 @@ namespace yocto
 				snprintf( buffer, sizeof(buffer)-1, "0x%02x", C );
 				os.append( buffer );
 			}
-
+			
 		}
-				
+		
 		namespace basic
 		{
 			////////////////////////////////////////////////////////////////////
@@ -93,7 +99,7 @@ namespace yocto
 				}
 				os.append(">\" ];\n");
 			}
-		
+			
 			
 		}
 		
