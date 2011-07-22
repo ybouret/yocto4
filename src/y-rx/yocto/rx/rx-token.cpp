@@ -104,12 +104,12 @@ namespace yocto
 			}
 		}
 		
-		void token:: at_head( token &other ) throw()
+		void token:: move_at_head_of( token &other ) throw()
 		{
 			while( size ) other.push_front( pop_back() );
 		}
 		
-		void token:: at_tail( token &other ) throw()
+		void token:: move_at_tail_of( token &other ) throw()
 		{
 			while( size ) other.push_back( pop_front() );
 		}

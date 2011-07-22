@@ -53,8 +53,8 @@ namespace yocto
 			token( const token &, t_pool &pool );
 			void release() throw();
 			void back_to( t_pool &pool ) throw(); //!< all t_chars back to pool
-			void at_head( token &other ) throw(); //!< for i/o caching
-			void at_tail( token &other ) throw(); //!< 'tkncat'
+			void move_at_head_of( token &other ) throw(); //!< for i/o caching
+			void move_at_tail_of( token &other ) throw(); //!< 'tkncat'
 			string to_string( size_t skip=0, size_t trim=0 ) const;
 			friend std::ostream & operator<< ( std::ostream &, const token & );
 			
