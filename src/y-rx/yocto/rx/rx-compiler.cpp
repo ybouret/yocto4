@@ -9,6 +9,9 @@
 #include "yocto/auto-ptr.hpp"
 #include "yocto/code/utils.hpp"
 
+#include "yocto/string/tokenizer.hpp"
+#include "yocto/sequence/vector.hpp"
+
 #include <iostream>
 
 namespace yocto
@@ -16,6 +19,9 @@ namespace yocto
 	
 #define LBRACK '['
 #define RBRACK ']'
+	
+#define LBRACE '{'
+#define RBRACE '}'
 	
 	namespace regex
 	{
@@ -144,7 +150,7 @@ namespace yocto
 							
 							//--------------------------------------------------
 							//
-							// special
+							// group
 							//
 							//--------------------------------------------------
 						case LBRACK:
@@ -152,6 +158,16 @@ namespace yocto
 							assert( RBRACK == curr[0] );
 							break;
 							
+							
+							//--------------------------------------------------
+							//
+							// named expr or joker
+							//
+							//--------------------------------------------------
+						case LBRACE:
+							braces( *p );
+							assert( RBRACE == curr[0] );
+							break;
 							
 						default: 
 							//--------------------------------------------------
@@ -467,6 +483,61 @@ namespace yocto
 					
 				}
 				throw exception("unfinished posix group after ...'%s'", ini );
+			}
+			
+			
+			//==================================================================
+			// braces
+			//==================================================================
+			inline void braces( logical::Operator &p )
+			{
+				assert( LBRACE == curr[0] );
+				const char *org = ++curr;
+				while( curr <= last )
+				{
+					if( RBRACE == curr[0] )
+					{
+						const string key(org,curr-org);
+						if( 0 == key.size() )
+							throw excp( fn, "empty braces after ...'%s'", org-1);
+						
+						const char C = key[0];
+						if( C >= '0' && C <= '9' )
+						{
+							jokerize2( p.operands, key );
+						}
+						else 
+						{
+							if( !dict )
+								throw excp(fn, "no database for '%s'", key.c_str() );
+							p.operands.push_back( dict->create( key ) );
+						}
+
+						return;
+					}
+					++curr;
+				}
+				throw exception("unfinished braces after ...'%s'", org-1);
+			}
+			
+			static bool is_sep( char C ) throw() { return C == ','; }
+			
+			void jokerize2( p_list &ops, const string &jk )
+			{
+				vector<string,memory::pooled::allocator> arr(4,as_capacity);
+				tokenizer::split( arr, jk, is_sep );
+				std::cerr << "args=" << arr << std::endl;
+				switch( arr.size() )
+				{
+					case 1:
+						break;
+						
+					case 2:
+						break;
+						
+					default:
+						throw excp(fn, "bad argument count in braces" );
+				}
 			}
 			
 		private:
