@@ -36,7 +36,7 @@ namespace yocto
 			virtual void viz( ios::ostream & ) const = 0;
 			void         tag( ios::ostream & ) const;
 			static void  out( ios::ostream &, char c );
-
+			virtual void optimize();
 			
 		protected:
 			explicit pattern(uint32_t t) throw();
