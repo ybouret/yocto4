@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/rx/compiler.hpp"
+#include "yocto/rx/pattern/posix.hpp"
 #include "yocto/auto-ptr.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/icstream.hpp"
@@ -15,11 +16,13 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 {
 	if( argc > 1 )
 	{
-		
+		regex::pattern_db dict;
+		dict.record( "DIGIT", regex::posix::digit() );
 		const string expr = argv[1];
 		std::cerr << "-- compiling '" << expr << "'" << std::endl;
-		auto_ptr<regex::pattern> p( regex::compile( expr, NULL ) );
+		auto_ptr<regex::pattern> p( regex::compile( expr, &dict ) );
 		std::cerr << "-- done" << std::endl;
+		dict.release();
 		{
 			ios::ocstream fp( "expr.dot", false );
 			p->graphviz( fp, "G" );
@@ -31,6 +34,7 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 			ios::icstream input( ios::cstdin );
 			regex::source src;
 			string line;
+			
 			for(;;)
 			{
 				//-- read line
