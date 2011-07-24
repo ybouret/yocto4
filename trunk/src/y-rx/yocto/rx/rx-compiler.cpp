@@ -414,9 +414,8 @@ namespace yocto
 					case '\\':
 					case '[':
 					case ']':
-					case '{':
-					case '}':
 					case '^':
+					case '-':
 						return C;
 						
 					case 'n': return '\n';
@@ -484,21 +483,7 @@ namespace yocto
 			auto_ptr<pattern> pp( cc.sub() );
 			if( cc.depth > 0 )
 				throw compiler::excp( compiler::fn, "unfinished sub-expression in '%s'", expr.c_str() );
-			switch( pp->type )
-			{
-				case logical::AND::id:
-					assert(pp->data);
-					static_cast<logical::AND *>(pp->data)->optimize();
-					break;
-					
-				case logical::OR::id:
-					assert(pp->data);
-					static_cast<logical::OR *>(pp->data)->optimize();
-					break;
-					
-				default:
-					break;
-			}
+			pp->optimize();
 			return pp.yield();
 		}
 		

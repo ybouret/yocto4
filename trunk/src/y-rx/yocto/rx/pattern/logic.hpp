@@ -44,7 +44,7 @@ namespace yocto
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
 				
-				void optimize() throw();
+				virtual void optimize();
 
 			private:
 				AND() throw();
@@ -66,7 +66,7 @@ namespace yocto
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
 
-				void optimize() throw();
+				virtual void optimize();
 
 			private:
 				OR() throw();

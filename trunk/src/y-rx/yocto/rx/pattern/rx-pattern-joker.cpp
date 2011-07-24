@@ -57,6 +57,11 @@ namespace yocto
 					
 				}
 				
+				virtual void optimize()
+				{
+					ppat->optimize();
+				}
+				
 			protected:
 				explicit jk_pattern( uint32_t t, pattern *p ) throw() :
 				pattern(t),
