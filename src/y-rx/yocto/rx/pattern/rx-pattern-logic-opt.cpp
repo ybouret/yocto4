@@ -41,6 +41,7 @@ namespace yocto
 
 			void OR:: optimize() throw()
 			{
+				// TODO: no multiple single...
 				p_list tmp;
 				while( operands.size )
 				{
@@ -56,7 +57,7 @@ namespace yocto
 					case OR::id:
 						assert(p->data);
 						static_cast<OR *>(p->data)->optimize();
-						tmp.merge_back( static_cast<AND *>(p->data)->operands );
+						tmp.merge_back( static_cast<OR *>(p->data)->operands );
 						delete p;
 						break;
 
