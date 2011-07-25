@@ -6,3 +6,4 @@ namespace yocto
 	namespace hidden { const char dictionary_name[] = "dictionary"; }
 	
 }
+

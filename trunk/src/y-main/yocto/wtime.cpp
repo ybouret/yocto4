@@ -38,7 +38,7 @@ namespace yocto
 	}
 	
 #if defined(YOCTO_WIN)
-	void __wtime_fetch( int64_t &Q ) 
+	static void __wtime_fetch( int64_t &Q ) 
 	{
 		if( ! ::QueryPerformanceCounter( (LARGE_INTEGER *) &Q )  )
 		{
@@ -48,7 +48,7 @@ namespace yocto
 #endif
 	
 #if defined(YOCTO_BSD)
-	void __wtime_fetch( struct timeval *tv )
+	static void __wtime_fetch( struct timeval *tv )
 	{
 		if( 0 != gettimeofday( tv, NULL) )
 		{
@@ -86,7 +86,9 @@ namespace yocto
 		__wtime_fetch(now);
 		return static_cast<double>( freq * static_cast<long double>(now-quad) );
 #endif
-		
+#if defined(__ICC)
+#pragma warning ( disable : 2259 ) 
+#endif	
 #if defined(YOCTO_BSD)
 		const struct timeval *old = (const struct timeval *) data;
 		struct timeval now;
@@ -114,6 +116,10 @@ namespace yocto
 		return static_cast<uint64_t>(now.tv_usec) + mega * static_cast<uint64_t>(now.tv_sec);
 #endif
 	}
+
+#if defined(__ICC)
+#pragma warning ( disable : 1419 ) 
+#endif
 	
 	uint32_t ihash32(uint32_t);
 	
