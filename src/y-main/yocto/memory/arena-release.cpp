@@ -39,7 +39,6 @@ namespace yocto
 						break;
 				}
 			}
-			return NULL;
 		}
 		
 		void  arena:: release_block( void *p ) throw()

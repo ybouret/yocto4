@@ -166,9 +166,6 @@ YOCTO_UNIT_TEST_IMPL(sequence)
 	perform< vector<double> >(n);
 	perform< vector<string> >(n);
 	perform< vector<dummy>  >(n); if( num_dummy != 0 ) throw exception("vector: invalid dummy count");
-	
-	return 0;
-	
 	perform< vector<int,memory::pooled::allocator>  >(n);
 }
 YOCTO_UNIT_TEST_DONE()

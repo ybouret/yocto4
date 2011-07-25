@@ -36,7 +36,7 @@ namespace yocto
 			}
 			else
 				return 0;
-		};
+		}
 		
 		void embed:: dispatch( embed reg[], size_t num, void *workspace ) throw()
 		{

@@ -2,6 +2,9 @@
 #include "yocto/wtime.hpp"
 namespace yocto
 {
+#if defined(__ICC)
+#pragma warning ( disable : 1419 )
+#endif
 	extern uint32_t ihash32( uint32_t );
 	void urand:: wseed()
 	{
