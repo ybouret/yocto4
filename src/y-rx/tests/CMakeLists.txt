@@ -5,5 +5,5 @@ TARGET_LINK_YOCTO( test-rx rx)
 
 ENABLE_TESTING()
 ADD_TEST(Posix test-rx posix)
-
+ADD_TEST(Compiler test-rx compiler '[:digit:]+[.]?' no )
 ADD_CUSTOM_TARGET(check-rx COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-rx)

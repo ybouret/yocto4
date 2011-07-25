@@ -10,6 +10,7 @@
 #include "yocto/code/utils.hpp"
 
 #include "yocto/string/tokenizer.hpp"
+#include "yocto/string/conv.hpp"
 #include "yocto/sequence/vector.hpp"
 
 #include <iostream>
@@ -512,7 +513,7 @@ namespace yocto
 								throw excp(fn, "no database for '%s'", key.c_str() );
 							p.operands.push_back( dict->create( key ) );
 						}
-
+						
 						return;
 					}
 					++curr;
@@ -520,19 +521,35 @@ namespace yocto
 				throw exception("unfinished braces after ...'%s'", org-1);
 			}
 			
-			static bool is_sep( char C ) throw() { return C == ','; }
+			//==================================================================
+			// braces args for counting
+			//==================================================================
+			static inline bool is_sep( char C ) throw() { return C == ','; }
 			
 			void jokerize2( p_list &ops, const string &jk )
 			{
+				// prepare for joker
+				if( ops.size <= 0 )
+					throw excp( fn, "missing arguments before braces");
+				auto_ptr<pattern> q( ops.pop_back() ); 
+				
+				// parse args
 				vector<string,memory::pooled::allocator> arr(4,as_capacity);
 				tokenizer::split( arr, jk, is_sep );
-				std::cerr << "args=" << arr << std::endl;
+				
+				// create joker
 				switch( arr.size() )
 				{
-					case 1:
+					case 1: {
+						const size_t num = strconv::to_size( arr[1], fn );
+						ops.push_back( joker::counting( q.yield(), num, num ) ); }
 						break;
 						
-					case 2:
+					case 2: {
+						const size_t nmin = strconv::to_size( arr[1], fn );
+						const size_t nmax = strconv::to_size( arr[2], fn ); 
+						if( nmax < nmin ) throw excp( fn, "invalid braces args" );
+						ops.push_back( joker::counting( q.yield(), nmin, nmax ) ); }
 						break;
 						
 					default:
