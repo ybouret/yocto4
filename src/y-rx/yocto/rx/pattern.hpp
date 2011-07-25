@@ -28,14 +28,17 @@ namespace yocto
 			pattern       *prev; //!< for the list
 			
 			virtual ~pattern() throw();
-			virtual pattern *clone() const = 0;
-			virtual bool     accept( source &src) = 0;
-			virtual void     sendto( source &src); //!< can be overriden, default is back_to(src.pool)
+			virtual pattern *clone() const = 0;        //!< virtual copy constructor
+			virtual bool     accept( source &src) = 0; //!< matching ?
+			virtual void     sendto( source &src);     //!< can be overriden, default is back_to(src.pool)
 			
+			//! convert this pattern as a graphviz graph
 			void graphviz( ios::ostream &, const string &graph_name ) const;
-			virtual void viz( ios::ostream & ) const = 0;
-			void         tag( ios::ostream & ) const;
-			static void  out( ios::ostream &, char c );
+			virtual void viz( ios::ostream & ) const = 0; //!< for each pattern
+			void         tag( ios::ostream & ) const;     //!< uniq GraphViz node identifier
+			static void  out( ios::ostream &, char c );   //!< GrapViz node readable label
+			
+			//! logical optimization, default is do nothing
 			virtual void optimize();
 			
 		protected:
