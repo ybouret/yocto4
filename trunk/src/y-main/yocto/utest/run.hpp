@@ -4,6 +4,10 @@
 #include "yocto/exception.hpp"
 #include <iostream>
 
+#if defined(__ICC)
+#pragma warning ( disable : 1418 869 )
+#endif
+
 #define YOCTO_UNIT_TEST_IMPL(NAME)                            \
 /*	*/	int yocto_unit_test_##NAME( int argc, char **argv ) { \
 /*	*/		try 

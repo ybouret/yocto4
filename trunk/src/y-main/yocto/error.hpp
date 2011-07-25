@@ -26,7 +26,7 @@ namespace yocto
 	}
 	
 	void format_error( char buffer[], size_t length, error_type err ) throw();
-	void critical_error( uint32_t err, const char when[] ) throw();
+	void critical_error( error_type err, const char when[] ) throw();
 	
 }
 

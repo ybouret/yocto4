@@ -4,7 +4,7 @@ namespace yocto
 {
 	const as_capacity_t as_capacity = {};
 	
-	const char *platform() throw()
+	const char *platform_name() throw()
 	{
 		return YOCTO_PLATFORM;
 	}

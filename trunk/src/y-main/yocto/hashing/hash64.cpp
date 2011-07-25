@@ -19,6 +19,9 @@ namespace yocto
 		
 		void hash64:: BJ( uint32_t *lword, uint32_t *rword ) throw()
 		{
+#if defined(__ICC)
+#pragma warning ( disable : 280 )
+#endif
 			YOCTO_LOOP_(4,
 						const uint32_t swp = (*rword);
 						(*rword) = bj_hash32(*rword) ^ (*lword);

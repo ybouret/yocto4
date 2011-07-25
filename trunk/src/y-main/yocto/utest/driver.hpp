@@ -8,6 +8,10 @@
 #include <iomanip>
 #include <ctime>
 
+#if defined(__ICC)
+#pragma warning ( disable : 1419 )
+#endif
+
 namespace yocto
 {
 	
