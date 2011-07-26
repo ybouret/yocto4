@@ -139,10 +139,7 @@ namespace yocto
 				if( symbols_.size() > 0 )
 				{
 					fch.accept_empty = false;
-					for( symbols::const_iterator i = symbols_.begin(); i != symbols_.end(); ++i )
-					{
-						(void) fch.insert( *i );
-					}
+					fch.merge( symbols_ );
 				}
 				else 
 				{

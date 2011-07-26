@@ -75,6 +75,19 @@ namespace yocto
 			
 			void AND:: gather( first_chars &fch ) const
 			{
+				assert( 0 == fch.size() );
+				fch.accept_empty  = true;
+				for( const pattern *p  = operands.head; p; p=p->next )
+				{
+					first_chars sub;
+					p->gather(sub);
+					fch.merge( sub );
+					if( ! sub.accept_empty )
+					{
+						fch.accept_empty = false;
+						return;
+					}
+				}
 				
 			}
 			
@@ -114,7 +127,16 @@ namespace yocto
 			
 			void OR:: gather( first_chars &fch ) const
 			{
-				
+				assert( 0 == fch.size() );
+				fch.accept_empty = true;
+				for( const pattern *p  = operands.head; p; p=p->next )
+				{
+					first_chars sub;
+					p->gather(sub);
+					fch.merge( sub );
+					if( ! sub.accept_empty )
+						fch.accept_empty = false;
+				}
 			}
 			
 			////////////////////////////////////////////////////////////////////
@@ -160,7 +182,20 @@ namespace yocto
 			
 			void NONE:: gather( first_chars &fch ) const
 			{
-				
+				assert( 0 == fch.size() );
+				for( size_t i=0; i < 256; ++i )
+					(void) fch.insert( i );
+				for( const pattern *p = operands.head; p; p=p->next )
+				{
+					first_chars sub;
+					p->gather(sub);
+					for( symbols::const_iterator i = sub.begin(); i != sub.end(); ++i )
+					{
+						(void) fch.remove( *i ); 
+					}
+					// TODO: check sub.accept_empty == false ?
+				}
+				fch.accept_empty = ( fch.size() == 0 );
 			}
 			
 		}

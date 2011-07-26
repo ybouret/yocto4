@@ -4,6 +4,7 @@
 
 #include "yocto/ordered/catalog.hpp"
 #include "yocto/memory/pooled.hpp"
+#include <iosfwd>
 
 namespace yocto
 {
@@ -27,6 +28,11 @@ namespace yocto
 			virtual ~first_chars() throw();
 			
 			first_chars( const first_chars &other );
+			
+			//! leave accept_empty untouched
+			void  merge( const symbols &other );
+			
+			friend std::ostream & operator<<( std::ostream &os, const first_chars &fch );
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(first_chars);

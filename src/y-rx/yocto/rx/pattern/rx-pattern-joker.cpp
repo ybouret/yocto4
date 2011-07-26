@@ -118,7 +118,10 @@ namespace yocto
 				}
 				
 				virtual void     gather( first_chars &fch ) const 
-				{}
+				{
+					ppat->gather( fch );
+					if( num <= 0 ) fch.accept_empty = true;
+				}
 
 
 			private:
@@ -167,11 +170,12 @@ namespace yocto
 					os.append(buffer);
 					os.append("]\", shape=diamond];\n");
 					tag(os); os.append( " -> " ); ppat->tag(os); os.append( ";\n");
-					
 				}
 				
 				virtual void     gather( first_chars &fch ) const
 				{
+					ppat->gather( fch );
+					if( nmin <=0 ) fch.accept_empty = true;
 				}
 
 			private:
