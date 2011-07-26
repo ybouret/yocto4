@@ -28,7 +28,13 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 			p->graphviz( fp, "G" );
 		}
 		system("dot -Tpng expr.dot -o expr.png");
-		
+		{
+			regex::first_chars fch;
+			p->gather(fch);
+			std::cerr << "-- first chars" << std::endl;
+			std::cerr << fch << std::endl;
+			std::cerr << "-- done" << std::endl;
+		}
 		if( (argc<=2) || 0 != strcmp(argv[2],"no") )
 		{
 			ios::icstream input( ios::cstdin );
