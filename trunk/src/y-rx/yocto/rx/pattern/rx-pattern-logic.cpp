@@ -73,7 +73,10 @@ namespace yocto
 				return true;
 			}
 			
-			
+			void AND:: gather( first_chars &fch ) const
+			{
+				
+			}
 			
 			////////////////////////////////////////////////////////////////////
 			OR * OR::create() { return new OR(); }
@@ -107,6 +110,11 @@ namespace yocto
 					}
 				}
 				return false;
+			}
+			
+			void OR:: gather( first_chars &fch ) const
+			{
+				
 			}
 			
 			////////////////////////////////////////////////////////////////////
@@ -150,6 +158,10 @@ namespace yocto
 			}
 			
 			
+			void NONE:: gather( first_chars &fch ) const
+			{
+				
+			}
 			
 		}
 		

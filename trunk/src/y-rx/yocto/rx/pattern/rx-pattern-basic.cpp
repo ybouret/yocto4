@@ -43,13 +43,22 @@ namespace yocto
 			any1::  any1() throw() : one_char(id) {}
 			any1:: ~any1() throw() {}
 			bool    any1:: is_valid( char ) const throw() { return true; }
-			
+			void    any1:: gather( first_chars &fch ) const
+			{
+				fch.accept_empty = false;
+				for( size_t i=0; i < 256; ++i ) (void) fch.insert( i );
+			}
 
 			////////////////////////////////////////////////////////////////////
 			single *  single:: create(char c) { return new single(c); }
 			single::  single(char c) throw() : one_char(id),value(c) { data = (void*)&value; }
 			single:: ~single() throw() {}
 			bool      single:: is_valid( char c ) const throw() { return c == value; }
+			void      single:: gather( first_chars &fch ) const
+			{
+				fch.accept_empty = false;
+				(void) fch.insert( value );
+			}
 			
 			////////////////////////////////////////////////////////////////////
 			range *  range:: create(char a,char b) 
@@ -70,6 +79,17 @@ namespace yocto
 				const uint8_t C = c;
 				return C >= lower && C <= upper;
 			}
+			
+			void range:: gather( first_chars &fch ) const
+			{
+				fch.accept_empty = false;
+				for( size_t i=lower; i <= upper; ++i )
+				{
+					(void) fch.insert( i );
+				}
+				
+			}
+				
 			
 			////////////////////////////////////////////////////////////////////
 			within * within:: create()
@@ -112,6 +132,23 @@ namespace yocto
 				{
 					(void) symbols_.insert( uint8_t(i) );
 				}
+			}
+			
+			void within:: gather( first_chars &fch ) const
+			{
+				if( symbols_.size() > 0 )
+				{
+					fch.accept_empty = false;
+					for( symbols::const_iterator i = symbols_.begin(); i != symbols_.end(); ++i )
+					{
+						(void) fch.insert( *i );
+					}
+				}
+				else 
+				{
+					fch.accept_empty = true;
+				}
+
 			}
 			
 		}

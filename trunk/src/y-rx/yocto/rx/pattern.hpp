@@ -41,6 +41,9 @@ namespace yocto
 			//! logical optimization, default is do nothing
 			virtual void optimize();
 			
+			//! detect first acceptable symbols
+			virtual void gather( first_chars &fch ) const = 0;
+			
 		protected:
 			explicit pattern(uint32_t t) throw();
 			
