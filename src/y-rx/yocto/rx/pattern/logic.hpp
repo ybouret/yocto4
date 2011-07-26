@@ -43,7 +43,8 @@ namespace yocto
 				virtual pattern *clone() const { return new AND( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
-				
+				virtual void     gather( first_chars &fch ) const;
+
 				virtual void optimize();
 
 			private:
@@ -65,6 +66,7 @@ namespace yocto
 				virtual pattern *clone() const { return new OR( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
+				virtual void     gather( first_chars &fch ) const;
 
 				virtual void optimize();
 
@@ -85,6 +87,7 @@ namespace yocto
 				virtual pattern *clone() const { return new NONE( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
+				virtual void     gather( first_chars &fch ) const;
 
 			private:
 				NONE() throw();

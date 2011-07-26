@@ -116,6 +116,10 @@ namespace yocto
 					os.append("\", shape=diamond];\n");
 					tag(os); os.append( " -> " ); ppat->tag(os); os.append( ";\n");
 				}
+				
+				virtual void     gather( first_chars &fch ) const 
+				{}
+
 
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(jk_at_least);
@@ -165,6 +169,11 @@ namespace yocto
 					tag(os); os.append( " -> " ); ppat->tag(os); os.append( ";\n");
 					
 				}
+				
+				virtual void     gather( first_chars &fch ) const
+				{
+				}
+
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(jk_counting);
 			};
