@@ -8,6 +8,7 @@
 #include "yocto/rx/source.hpp"
 
 #include <cstring>
+#include <cstdlib>
 
 using namespace yocto;
 
