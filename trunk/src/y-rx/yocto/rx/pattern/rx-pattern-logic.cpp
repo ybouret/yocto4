@@ -1,5 +1,6 @@
 #include "yocto/rx/pattern/logic.hpp"
 #include "yocto/rx/source.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -31,6 +32,16 @@ namespace yocto
 				for( pattern *p = operands.head; p; p=p->next)
 				{
 					p->back_to( src.pool );
+				}
+			}
+			
+			void     Operator:: brx( ios::ostream &os ) const
+			{
+				os.emit(type);
+				os.emit<uint16_t>( operands.size );
+				for( const pattern *p = operands.head; p; p=p->next )
+				{
+					p->brx(os);
 				}
 			}
 			

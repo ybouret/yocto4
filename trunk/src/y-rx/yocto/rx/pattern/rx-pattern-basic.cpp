@@ -1,5 +1,6 @@
 #include "yocto/rx/pattern/basic.hpp"
 #include "yocto/rx/source.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -48,6 +49,12 @@ namespace yocto
 				fch.accept_empty = false;
 				for( size_t i=0; i < 256; ++i ) (void) fch.insert( i );
 			}
+			
+			void   any1:: brx( ios::ostream &os ) const
+			{
+				os.emit(type);
+			}
+
 
 			////////////////////////////////////////////////////////////////////
 			single *  single:: create(char c) { return new single(c); }
@@ -58,6 +65,12 @@ namespace yocto
 			{
 				fch.accept_empty = false;
 				(void) fch.insert( value );
+			}
+			
+			void   single:: brx( ios::ostream &os ) const
+			{
+				os.emit(type);
+				os.emit<uint8_t>( value );
 			}
 			
 			////////////////////////////////////////////////////////////////////
@@ -88,6 +101,13 @@ namespace yocto
 					(void) fch.insert( i );
 				}
 				
+			}
+			
+			void   range:: brx( ios::ostream &os ) const
+			{
+				os.emit(type);
+				os.emit(lower);
+				os.emit(upper);
 			}
 				
 			
@@ -147,6 +167,19 @@ namespace yocto
 				}
 
 			}
+			
+			void   within:: brx( ios::ostream &os ) const
+			{
+				os.emit(type);
+				os.emit<uint16_t>( symbols_.size() );
+				for( symbols::const_iterator i = symbols_.begin(); i != symbols_.end(); ++i )
+				{
+					os.emit<uint8_t>( *i );
+				}
+			}
+			
+			
+			
 			
 		}
 	}

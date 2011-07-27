@@ -26,6 +26,9 @@ namespace yocto
 					op.operands.push_back(p);
 					return op;
 				}
+				
+				virtual void     brx( ios::ostream & ) const;
+
 			protected:
 				Operator(uint32_t t) throw();
 				Operator( const Operator & );

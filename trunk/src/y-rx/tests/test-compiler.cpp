@@ -28,6 +28,7 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 			ios::ocstream fp( "expr.dot", false );
 			p->graphviz( fp, "G" );
 		}
+		
 		system("dot -Tpng expr.dot -o expr.png");
 		{
 			regex::first_chars fch;
@@ -36,6 +37,12 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 			std::cerr << fch << std::endl;
 			std::cerr << "-- done" << std::endl;
 		}
+		
+		{
+			ios::ocstream fp( "expr.bin", false );
+			p->brx( fp );
+		}
+		
 		if( (argc<=2) || 0 != strcmp(argv[2],"no") )
 		{
 			ios::icstream input( ios::cstdin );

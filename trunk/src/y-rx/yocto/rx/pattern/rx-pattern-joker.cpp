@@ -62,6 +62,9 @@ namespace yocto
 					ppat->optimize();
 				}
 				
+				
+				
+				
 			protected:
 				explicit jk_pattern( uint32_t t, pattern *p ) throw() :
 				pattern(t),
@@ -122,8 +125,14 @@ namespace yocto
 					ppat->gather( fch );
 					if( num <= 0 ) fch.accept_empty = true;
 				}
-
-
+				
+				virtual void     brx( ios::ostream &os ) const
+				{
+					os.emit(type);
+					os.emit<uint16_t>( num );
+					ppat->brx(os);
+				}
+				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(jk_at_least);
 			};
@@ -177,7 +186,15 @@ namespace yocto
 					ppat->gather( fch );
 					if( nmin <=0 ) fch.accept_empty = true;
 				}
-
+				
+				virtual void     brx( ios::ostream &os ) const
+				{
+					os.emit(type);
+					os.emit<uint16_t>( nmin );
+					os.emit<uint16_t>( nmax );
+					ppat->brx(os);
+				}
+				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(jk_counting);
 			};
