@@ -3,7 +3,7 @@ PROJECT(y-lua)
 FILE( GLOB lua_decl yocto/lua/*.h*)
 FILE( GLOB lua_impl yocto/lua/*.c*)
 SET( lua_srcs ${lua_decl} ${lua_impl} )
-INSTALL( FILES ${lua_decl} DESTINATION yocto/lua )
+INSTALL( FILES ${lua_decl} DESTINATION include/yocto/lua )
 SOURCE_GROUP( lua FILES ${lua_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main ./src/inc ./yocto/lua )
