@@ -3,7 +3,7 @@ PROJECT(y-thr)
 FILE( GLOB decl yocto/threading/*.hpp)
 FILE( GLOB impl yocto/threading/*.cpp)
 SET( srcs ${decl} ${impl} )
-INSTALL( FILES ${decl} DESTINATION yocto/threading )
+INSTALL( FILES ${decl} DESTINATION include/yocto/threading )
 SOURCE_GROUP( threading FILES ${srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main )

@@ -23,7 +23,8 @@ namespace yocto
 			virtual void flush()         = 0;
 			virtual void put( const void *data, size_t size, size_t &done);
 			
-			void save( const void *buffer, size_t buflen );
+			void save( const void *buffer, size_t buflen ); //!< put all
+			
 			template <typename T>
 			inline void emit( T x ) { x = swap_be<T>(x); save(&x,sizeof(T)); } 
 			
