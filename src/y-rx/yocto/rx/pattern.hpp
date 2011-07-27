@@ -44,10 +44,15 @@ namespace yocto
 			//! detect first acceptable symbols
 			virtual void gather( first_chars &fch ) const = 0;
 			
+			
+			//! binary output
+			virtual void brx( ios::ostream & ) const = 0;
+			
+			
 		protected:
 			explicit pattern(uint32_t t) throw();
-			
-			
+		
+						
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
 		};

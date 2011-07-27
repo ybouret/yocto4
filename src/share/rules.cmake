@@ -57,7 +57,7 @@ ENDIF()
 
 
 ########################################################################
-## clang
+## Intel 
 ########################################################################
 IF( "${CC_NAME}" MATCHES "icc.*" )
   MESSAGE( STATUS "Using Intel compilers" )
@@ -109,7 +109,7 @@ ENDIF()
 # Adjusting Linker Flags
 ########################################################################
 MACRO(TARGET_LINK_YOCTO tgt)
-	MESSAGE( STATUS "linking yocto libraries to ${tgt}" )
+	MESSAGE( STATUS "linking yocto to ${tgt}" )
 
 	####################################################################
 	## Reverse order extra libraries
