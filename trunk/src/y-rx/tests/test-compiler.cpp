@@ -49,8 +49,8 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 			ios::icstream fp( "expr.bin" );
 			auto_ptr<regex::pattern> q( regex::pattern::load(fp) );
 		
-			string bin_p;
-			string bin_q;
+			string        bin_p;
+			string        bin_q;
 			ios::osstream out_p( bin_p );
 			ios::osstream out_q( bin_q );
 			p->brx( out_p );
