@@ -12,6 +12,7 @@ namespace yocto
 	namespace ios
 	{
 		class ostream;
+		class istream;
 	}
 	
 	namespace regex
@@ -32,7 +33,7 @@ namespace yocto
 			virtual bool     accept( source &src) = 0; //!< matching ?
 			virtual void     sendto( source &src);     //!< can be overriden, default is back_to(src.pool)
 			
-			//! convert this pattern as a graphviz graph
+			//! convert this pattern as a GraphViz graph
 			void graphviz( ios::ostream &, const string &graph_name ) const;
 			virtual void viz( ios::ostream & ) const = 0; //!< for each pattern
 			void         tag( ios::ostream & ) const;     //!< uniq GraphViz node identifier
@@ -46,8 +47,10 @@ namespace yocto
 			
 			
 			//! binary output
-			virtual void brx( ios::ostream & ) const = 0;
+			virtual void     brx( ios::ostream & ) const = 0;
 			
+			//! load
+			static  pattern *load( ios::istream & );
 			
 		protected:
 			explicit pattern(uint32_t t) throw();

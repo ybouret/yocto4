@@ -26,7 +26,7 @@ namespace yocto
 			void save( const void *buffer, size_t buflen ); //!< put all
 			
 			template <typename T>
-			inline void emit( T x ) { x = swap_be<T>(x); save(&x,sizeof(T)); } 
+			inline void emit( T x ) { x = swap_be_as<T>(x); save(&x,sizeof(T)); } 
 			
 			void append( const char *buffer);
 			void append( const char *buffer, size_t buflen );
