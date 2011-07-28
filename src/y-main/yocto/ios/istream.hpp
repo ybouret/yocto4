@@ -27,7 +27,7 @@ namespace yocto
 			
 			//! big endian reading
 			template <typename T>
-			inline T read() { T x(0); load(&x, sizeof(T)); return swap_be<T>(x);}
+			inline T read() { T x(0); load(&x, sizeof(T)); return swap_be_as<T>(x);}
 			
 			//! use the read_line API
 			int read_line( string &s );

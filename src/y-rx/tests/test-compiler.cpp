@@ -3,6 +3,7 @@
 #include "yocto/rx/pattern/posix.hpp"
 #include "yocto/auto-ptr.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/osstream.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/imstream.hpp"
 #include "yocto/rx/source.hpp"
@@ -42,6 +43,24 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 			ios::ocstream fp( "expr.bin", false );
 			p->brx( fp );
 		}
+		
+		{
+			std::cerr << "-- pattern reloading..." << std::endl;
+			ios::icstream fp( "expr.bin" );
+			auto_ptr<regex::pattern> q( regex::pattern::load(fp) );
+		
+			string bin_p;
+			string bin_q;
+			ios::osstream out_p( bin_p );
+			ios::osstream out_q( bin_q );
+			p->brx( out_p );
+			q->brx( out_q );
+			if( bin_p != bin_q )
+				throw exception("pattern mismatch!");
+		}
+		
+		
+		
 		
 		if( (argc<=2) || 0 != strcmp(argv[2],"no") )
 		{
