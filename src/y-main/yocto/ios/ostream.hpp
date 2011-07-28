@@ -31,6 +31,7 @@ namespace yocto
 			void append( const char *buffer);
 			void append( const char *buffer, size_t buflen );
 			void append( const memory::ro_buffer &buffer   );
+			void append( char C );
 			
 		protected:
 			explicit ostream() throw();

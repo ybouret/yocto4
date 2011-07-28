@@ -51,6 +51,11 @@ namespace yocto
 			append( (const char *) buffer.ro(), buffer.length() );
 		}
 		
+		void ostream:: append( char C )
+		{
+			write(C);
+		}
+
 	}
 	
 }
