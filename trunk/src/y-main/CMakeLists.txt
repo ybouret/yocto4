@@ -19,6 +19,7 @@ SOURCE_GROUP(threading FILES ${threading_srcs} )
 FILE( GLOB core_decl yocto/core/*.hpp)
 FILE( GLOB core_impl yocto/core/*.cpp)
 SET( core_srcs ${core_decl} ${core_impl})
+INSTALL( FILES ${core_decl} DESTINATION include/yocto/core )
 SOURCE_GROUP( core FILES ${core_srcs} )
 
 FILE( GLOB mem_decl yocto/memory/*.hpp)
