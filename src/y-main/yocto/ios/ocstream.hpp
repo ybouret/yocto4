@@ -23,7 +23,7 @@ namespace yocto
 			virtual void write( char C );
 			virtual void flush();
 			
-			void operator()(const char *fmt,...) YOCTO_PRINTF_CHECK(2,3);
+			virtual void operator()(const char *fmt,...) YOCTO_PRINTF_CHECK(2,3);
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ocstream);

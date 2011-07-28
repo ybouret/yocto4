@@ -4,6 +4,7 @@
 #include "yocto/ios/stream.hpp"
 #include "yocto/ios/ochannel.hpp"
 #include "yocto/code/endian.hpp"
+#include "yocto/code/printf-check.hpp"
 
 namespace yocto
 {
@@ -32,6 +33,8 @@ namespace yocto
 			void append( const char *buffer, size_t buflen );
 			void append( const memory::ro_buffer &buffer   );
 			void append( char C );
+			
+			virtual void operator()(const char *fmt,...) YOCTO_PRINTF_CHECK(2,3);
 			
 		protected:
 			explicit ostream() throw();
