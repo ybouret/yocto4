@@ -109,7 +109,7 @@ ENDIF()
 # Adjusting Linker Flags
 ########################################################################
 MACRO(TARGET_LINK_YOCTO tgt)
-	MESSAGE( STATUS "linking yocto to ${tgt}" )
+	MESSAGE( STATUS "yocto --> ${tgt}" )
 
 	####################################################################
 	## Reverse order extra libraries
