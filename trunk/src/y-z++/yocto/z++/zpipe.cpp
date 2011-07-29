@@ -8,6 +8,7 @@
 
 
 #include <cstring>
+#include <cstdlib>
 
 namespace yocto
 {
