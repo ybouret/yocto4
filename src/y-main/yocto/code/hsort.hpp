@@ -3,6 +3,7 @@
 
 #include "yocto/sequence/array.hpp"
 #include "yocto/code/swap.hpp"
+#include "yocto/comparator.hpp"
 
 namespace yocto
 {
@@ -118,6 +119,9 @@ namespace yocto
 			mmove( rb[i], rrb );
 		}
 	}
+	
+	template <typename T>
+	inline void hsort( array<T> &ra ) throw() { hsort( ra, __compare<T> ); }
 	
 	
 }

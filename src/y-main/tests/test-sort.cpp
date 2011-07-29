@@ -1,17 +1,12 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/hsort.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/comparator.hpp"
 
 #include "support.hpp"
 
 using namespace yocto;
 
-template <typename T>
-static inline
-int fast_compare( const T &lhs, const T &rhs )
-{
-	return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
-}
 
 template <typename T>
 static inline void test_sort()
@@ -25,7 +20,7 @@ static inline void test_sort()
 		ra.push_back( tmp );
 	}
 	std::cerr << "raw=" << ra << std::endl;
-	hsort( ra, fast_compare<T> );
+	hsort( ra, __compare<T> );
 	std::cerr << "srt=" << ra << std::endl;
 }
 
@@ -49,7 +44,7 @@ static inline void test_cosort()
 	}
 	std::cerr << "rawa=" << ra << std::endl;
 	std::cerr << "rawb=" << rb << std::endl;
-	hsort( ra, rb, fast_compare<T> );
+	hsort( ra, rb, __compare<T> );
 	std::cerr << "srta=" << ra << std::endl;
 	std::cerr << "srtb=" << rb << std::endl;
 }
@@ -58,7 +53,6 @@ static inline void test_cosort()
 
 YOCTO_UNIT_TEST_IMPL(sort)
 {
-	
 	test_sort<int>();
 	test_sort<float>();
 	test_sort<string>();

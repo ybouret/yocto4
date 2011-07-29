@@ -5,6 +5,12 @@
 
 namespace yocto
 {
+	template<typename T>
+	inline int __compare( T const &lhs, T const &rhs ) throw()
+	{
+		return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
+	}
+	
 	template <typename T>
 	class comparator
 	{
@@ -16,7 +22,7 @@ namespace yocto
 		
 		inline int operator()( param_type lhs, param_type rhs ) const throw() 
 		{
-			return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
+			return __compare<T>(lhs,rhs);
 		}
 		
 	private:
