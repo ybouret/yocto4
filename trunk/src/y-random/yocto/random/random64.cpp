@@ -8,8 +8,8 @@ namespace yocto {
 		CLASS_NAME::CLASS_NAME(Bits &s) throw() : hprng<HASH_NAME>(s) {} \
 		CLASS_NAME::~CLASS_NAME() throw() {}
 
-		YOCTO_RANDOM_HASH64_IMPL(Uniform64_bj,hashing::hash64::BJ)
-		YOCTO_RANDOM_HASH64_IMPL(Uniform64_nr,hashing::hash64::NR)
+		YOCTO_RANDOM_HASH64_IMPL(Uniform64BJ,hashing::hash64::BJ)
+		YOCTO_RANDOM_HASH64_IMPL(Uniform64NR,hashing::hash64::NR)
 	}
 
 }

@@ -118,6 +118,32 @@ namespace yocto
 			return g.release(p,n);
 		}
 		
+		void * global:: __calloc( size_t count, size_t size )
+		{
+			
+			assert( size > 0 );
+			if( count > 0 )
+			{
+				YOCTO_GIANT_LOCK();
+				void *p = calloc( count, size );
+				if( !p )
+					throw libc::exception( ENOMEM, "calloc(%u,%u)", unsigned(count), unsigned(size) );
+				return p;
+			}
+			else
+				return NULL;
+		}
+		
+		void global::__free( void *p ) throw()
+		{
+			if( p )
+			{
+				YOCTO_GIANT_LOCK();
+				free(p);
+			}
+		}
+
+		
 		
 	}
 	

@@ -50,8 +50,8 @@ namespace yocto {
 /* */		CLASS_NAME&operator=( const CLASS_NAME & );    \
 }
 		
-		YOCTO_RANDOM_HASH64_DECL(Uniform64_bj,hashing::hash64::BJ);
-		YOCTO_RANDOM_HASH64_DECL(Uniform64_nr,hashing::hash64::NR);
+		YOCTO_RANDOM_HASH64_DECL(Uniform64BJ,hashing::hash64::BJ);
+		YOCTO_RANDOM_HASH64_DECL(Uniform64NR,hashing::hash64::NR);
 		
 	}
 	
