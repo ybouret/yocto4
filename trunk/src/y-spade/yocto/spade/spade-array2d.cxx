@@ -7,6 +7,7 @@
 #include "yocto/ios/ocstream.hpp"
 
 #include "yocto/code/utils.hpp"
+#include <cstring>
 
 namespace yocto
 {
