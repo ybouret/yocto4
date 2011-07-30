@@ -98,6 +98,6 @@ namespace yocto {
 
 YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<float>)
 YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<double>)
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<int>)
+YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<ptrdiff_t>)
 
 #endif

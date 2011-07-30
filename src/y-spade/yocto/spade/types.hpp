@@ -9,7 +9,7 @@ namespace yocto
 	namespace spade
 	{
 
-		typedef int unit_t; //!< base signed integer
+		typedef ptrdiff_t unit_t; //!< base signed integer
 
 		class layout_base : public object
 		{

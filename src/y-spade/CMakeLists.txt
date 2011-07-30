@@ -13,5 +13,5 @@ INCLUDE_DIRECTORIES( . ../y-main )
 ADD_LIBRARY( y-spade STATIC ${spade_srcs} ${pat_srcs} )
 INSTALL( TARGETS y-spade ARCHIVE DESTINATION lib )
 
-#ADD_SUBDIRECTORY(tests)
+ADD_SUBDIRECTORY(tests)
 
