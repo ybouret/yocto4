@@ -2,13 +2,13 @@
 #define YOCTO_LUA_X_V3D_INCLUDED 1
 
 #include "yocto/lua/lua-build.hpp"
-#include "yocto/math/gl/v3d.hpp"
+#include "yocto/geom/v3d.hpp"
 
 namespace yocto {
 
 	namespace Lua {
 
-		typedef math::v3d<lua_Number> VEC3;
+		typedef geom::v3d<lua_Number> VEC3;
 
 		//!
 		/** \brief class vec3, host VEC3
