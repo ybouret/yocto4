@@ -1,6 +1,7 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
+#include <cstdlib>
 
 #if !defined(NDEBUG)
 #include <iostream>
