@@ -16,7 +16,7 @@ namespace yocto {
 			virtual ~Default() throw();
 			
 			virtual void seed( Bits & ) throw();
-			virtual double operator()(void) throw() = 0;
+			virtual double operator()(void) throw();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(Default);

@@ -34,6 +34,10 @@ namespace yocto
 			virtual void *acquire( size_t &n );
 			virtual void  release( void * &p, size_t &n ) throw();
 			
+			//! simple wrappers for third party libs
+			static void * __calloc( size_t count, size_t size );
+			static void   __free( void * ) throw();
+			
 		private:
 			explicit global() throw();
 			virtual ~global() throw();

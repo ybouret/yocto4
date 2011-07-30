@@ -5,7 +5,7 @@
 
 #include "yocto/code/round.hpp"
 #include "yocto/code/unroll.hpp"
-
+#include "yocto/memory/global.hpp"
 
 #include <cstring>
 #include <cstdlib>
@@ -20,14 +20,12 @@ namespace yocto
 		
         static voidpf _zpipe_acquire( voidpf , uInt items, uInt size )
         {
-			YOCTO_GIANT_LOCK();
-            return malloc(items * size);
+            return memory::global:: __calloc(items,size);
         }
 		
         static void   _zpipe_release( voidpf, voidpf address ) throw()
         {
-			YOCTO_GIANT_LOCK();
-			free( address );
+			memory::global:: __free( address );
         }
 		
         static void _zpipe_init( z_stream & strm )
