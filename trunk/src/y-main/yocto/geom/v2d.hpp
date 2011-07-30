@@ -97,12 +97,6 @@ namespace yocto {
 		}
 		
 
-		#if defined(__DMC__)
-		template class v2d<float>;
-		template class v2d<double>;
-		template class v2d<int>;
-		#endif
-
 	}
 
 }
@@ -110,7 +104,7 @@ namespace yocto {
 
 YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<float>)
 YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<double>)
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<int>)
+YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<ptrdiff_t>)
 
 
 

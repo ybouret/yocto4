@@ -2,8 +2,8 @@
 #define YOCTO_SPADE_WORKSPACE_INCLUDED 1
 
 #include "yocto/spade/composition.hpp"
-#include "yocto/memory/malloc.hpp"
-#include "yocto/container/lw-sp.hpp"
+#include "yocto/memory/global.hpp"
+#include "yocto/memory/buffers.hpp"
 
 namespace yocto
 {
@@ -24,14 +24,16 @@ namespace yocto
 			composition( C ),
 			layout_type( L ),
 			arr_(NULL),
-			all_(NULL)
+			nrr_(0),
+			all_(NULL),
+			nll_(0)
 			{
-				
+				memory::allocator &hmem = memory::global::instance();
 				//--------------------------------------------------------------
 				//-- allocate memory for components
 				//--------------------------------------------------------------
-				const size_t nc = components;
-				arr_ = memory::global_allocate_as< ARRAY >( nc );
+				nrr_ = components;
+				arr_ = hmem.acquire_as< ARRAY >( nrr_ );
 				const ARRAY *a0 = arr_;
 				arr_ -= index_min;
 				for( unit_t i = index_min; i <= index_max; ++i )
@@ -55,11 +57,12 @@ namespace yocto
 				//-- allocate all the memory
 				//--------------------------------------------------------------
 				try {
-					all_ = memory::global_allocate( nc * bytes_per_array );
+					nll_ = components * bytes_per_array;
+					all_ = hmem.acquire( nll_ );
 				}
 				catch (...) {
 					arr_ += index_min;
-					memory::global_release_as< ARRAY >( arr_ );
+					hmem.release_as< ARRAY >( arr_ , nrr_ );
 					throw;
 				}
 				
@@ -91,9 +94,10 @@ namespace yocto
 			{
 				assert( all_ );
 				assert( arr_ );
+				memory::allocator &hmem = memory::global::instance();
 				arr_ += index_min;
-				memory::global_release( all_ );
-				memory::global_release_as<ARRAY>( arr_ );
+				hmem.release( all_, nll_ );
+				hmem.release_as<ARRAY>( arr_, nrr_ );
 			}
 			
 			inline ARRAY & operator[]( unit_t c ) throw()
@@ -143,8 +147,9 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
 			ARRAY *arr_;
+			size_t nrr_;
 			void  *all_;
-			
+			size_t nll_;
 		};
 		
 	}

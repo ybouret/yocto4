@@ -3,6 +3,7 @@
 
 #include "yocto/spade/array2d.hpp"
 #include "yocto/spade/workspace.hpp"
+#include "yocto/shared-ptr.hpp"
 
 namespace yocto
 {
@@ -14,8 +15,8 @@ namespace yocto
 		{
 		public:
 			YOCTO_ARGUMENTS_DECL_T;
-			typedef spointer<workspace2D>   pointer;
-			typedef workspace< array2D<T> > workspace_type;
+			typedef shared_ptr<workspace2D>  pointer;
+			typedef workspace< array2D<T> >  workspace_type;
 			
 			explicit workspace2D( const composition &C, const layout2D &L ) :
 			workspace_type( C, L )
