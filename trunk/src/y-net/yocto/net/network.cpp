@@ -6,6 +6,10 @@
 #include "yocto/exceptions.hpp"
 #endif
 
+#if defined(YOCTO_BSD)
+#include <csignal>
+#endif
+
 #include <iostream>
 
 namespace yocto {
@@ -19,15 +23,20 @@ namespace yocto {
 		
 		net:: net()
 		{
+			YOCTO_GIANT_LOCK();
 			std::cerr << "[network.startup";
 #			if defined(YOCTO_WIN)
-			YOCTO_GIANT_LOCK();
+			
 			memset(&wsa, 0, sizeof(WSADATA) );
 			if( :: WSAStartup( MAKEWORD(2,2), &wsa ) !=  0 )
 			{
 				throw win32::exception( ::WSAGetLastError(), "WSAStartup" );
 			}
 #			endif
+			
+#if			defined(YOCTO_BSD)
+			signal( SIGPIPE, SIG_IGN );
+#endif
 			std::cerr << "]" << std::endl;
 		}
 		

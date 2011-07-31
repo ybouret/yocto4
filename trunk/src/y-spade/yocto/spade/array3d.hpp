@@ -23,7 +23,7 @@ namespace yocto
 			typedef typename slice_type::row_type row_type;
 			
 			explicit array3D( const layout3D &L ) throw();			
-			virtual ~array3D() throw() {}
+			virtual ~array3D() throw();
 			
 			slice_type &       operator[]( unit_t y ) throw();
 			const slice_type & operator[]( unit_t y ) const throw();
