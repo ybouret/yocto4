@@ -14,9 +14,9 @@
 
 #define YOCTO_UNIT_TEST_DONE()  \
 /*	*/		catch( const yocto::exception &e ) \
-/*	*/		{ std::cerr << e.when() << std::endl; std::cerr << e.what() << std::endl; }\
+/*	*/		{ std::cerr << e.when() << std::endl; std::cerr << e.what() << std::endl; return -1;}\
 /*	*/		catch( const std::exception &e ) \
-/*	*/		{ std::cerr << "std::exception: " << e.what() << std::endl; } \
+/*	*/		{ std::cerr << "std::exception: " << e.what() << std::endl; return -1; } \
 /*	*/		catch(...) { std::cerr << "Unhandled exception!" << std::endl; return -1; }\
 /*	*/	return 0; \
 /*	*/	}

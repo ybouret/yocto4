@@ -365,8 +365,10 @@ namespace yocto
 			
 			YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
+			std::cerr << "[send len=" << len << "]" << std::endl;
 			int res=0;
 			while( (res = ::send( s, ptr, len, flags ) ) < 0 ) {
+				std::cerr << "send error!" << std::endl;
 				const int err = errno;
 				switch( err ) {
 					case EINTR:
@@ -376,6 +378,7 @@ namespace yocto
 						throw libc::exception( err, "::send");
 				}
 			}
+			std::cerr << "[send res=" << res << "]" << std::endl;
 			return res;
 #endif
 			
