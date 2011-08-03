@@ -2,7 +2,7 @@
 #define YOCTO_REGEX_MATCHER_INCLUDED 1
 
 #include "yocto/rx/source.hpp"
-#include "yocto/auto-ptr.hpp"
+
 
 namespace yocto 
 {
@@ -27,8 +27,8 @@ namespace yocto
 			bool partly( const string & );
 			
 		private:
-			source             source_;
-			auto_ptr<pattern>  pattern_;
+			source              source_;
+			pattern            *pattern_;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(matcher);
 			void init() throw();
 			
