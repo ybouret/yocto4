@@ -9,7 +9,9 @@ namespace yocto
 		
 		matcher:: ~matcher() throw() 
 		{
-			
+			assert( pattern_ );
+			delete pattern_;
+			pattern_ = NULL;
 		}
 		
 		
@@ -30,14 +32,18 @@ namespace yocto
 		
 		void matcher:: reset( const string &expr, pattern_db *dict )
 		{
+			assert( pattern_ );
 			pattern *p = compile(expr, dict);
-			pattern_.reset(p);
+			delete pattern_;
+			pattern_ = p;
 		}
 		
 		void matcher:: reset( const char *expr, pattern_db *dict )
 		{
+			assert( pattern_ );
 			pattern *p = compile(expr, dict);
-			pattern_.reset(p);
+			delete pattern_;
+			pattern_ = p;
 		}
 		
 		void matcher:: init() throw()

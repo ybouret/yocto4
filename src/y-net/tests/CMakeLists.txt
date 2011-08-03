@@ -8,6 +8,10 @@ IF(WIN32)
 	ENDIF()
 ENDIF()
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+  TARGET_LINK_LIBRARIES(test-net socket nsl)
+ENDIF()
+
 ENABLE_TESTING()
 ADD_TEST(Resolve test-net resolve)
 
