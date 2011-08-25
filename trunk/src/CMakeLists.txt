@@ -19,6 +19,8 @@ ADD_SUBDIRECTORY(y-lua)
 ADD_SUBDIRECTORY(y-lua++)
 ADD_SUBDIRECTORY(y-z)
 ADD_SUBDIRECTORY(y-z++)
+ADD_SUBDIRECTORY(y-mpi)
+
 
 INSTALL( FILES share/rules.cmake DESTINATION share/yocto )
 
