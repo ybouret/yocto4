@@ -2,6 +2,7 @@
 #include "yocto/mpi/mpi.hpp"
 
 using namespace yocto;
+#include <cstring>
 
 #define BLEN 16
 
