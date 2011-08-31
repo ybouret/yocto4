@@ -22,7 +22,7 @@ ADD_SUBDIRECTORY(y-z++)
 ADD_SUBDIRECTORY(y-mpi)
 
 
-INSTALL( FILES share/rules.cmake DESTINATION share/yocto )
+INSTALL( FILES share/rules.cmake share/fltk.cmake share/opencl.cmake DESTINATION share/yocto )
 
 ########################################################################
 IF(UNIX)
