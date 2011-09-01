@@ -2,6 +2,7 @@
 #define YOCTO_DURATION_INCLUDED 1
 
 #include "yocto/os.hpp"
+#include <iosfwd>
 
 namespace yocto
 {
@@ -15,9 +16,11 @@ namespace yocto
 		const unsigned m; //!< minutes
 		const double   s; //!< secondes
 		
-		duration( double seconds ) throw();
+		duration( double seconds ) throw(); //!< seconds >= 0
 		~duration() throw();
 		duration( const duration & ) throw();
+		
+		friend std::ostream & operator<<( std::ostream &os, const duration & );
 		
 	private:
 		YOCTO_DISABLE_ASSIGN(duration);
