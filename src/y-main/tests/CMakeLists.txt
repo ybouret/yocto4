@@ -56,5 +56,6 @@ ADD_TEST(Catalog     test-main catalog)
 ADD_TEST(C-Array     test-main c_array)
 ADD_TEST(Sort        test-main sort)
 ADD_TEST(Duration    test-main duration)
+ADD_TEST(ETA         test-main eta)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
