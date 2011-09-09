@@ -71,6 +71,15 @@ namespace yocto
 				
 			};
 			
+			
+			class call : public rule
+			{
+			public:
+				
+			private:
+				
+			};
+			
 		}
 	}
 	

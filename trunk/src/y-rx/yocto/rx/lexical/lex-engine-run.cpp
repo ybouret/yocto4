@@ -92,14 +92,20 @@ namespace yocto
 					//----------------------------------------------------------
 					assert( src.in_cache() >= best_p->size );
 
-					//-- skip source if there is a recursive all
-					src.skip( best_p->size );
+					//-- keep it local for recursive call
+					token output;
+					best_p->swap_with(output);
+					
+					//-- release the best_p
+					best_p->sendto(src);
+					
+					//-- skip source 
+					src.skip( output.size );
 
 					//-- apply the rule
-					best_r->apply( *best_p );
+					best_r->apply( output );
 					
-					//-- release the memory
-					best_p->sendto(src);
+				
 					
 				}
 				
