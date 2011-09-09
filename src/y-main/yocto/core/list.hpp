@@ -1,7 +1,7 @@
 #ifndef YOCTO_CORE_LIST_INCLUDED
 #define YOCTO_CORE_LIST_INCLUDED 1
 
-#include "yocto/os.hpp"
+#include "yocto/code/swap.hpp"
 
 namespace yocto
 {
@@ -20,6 +20,13 @@ namespace yocto
 			NODE  *tail;
 			size_t size;
 			
+			void swap_with( list_of &other ) throw()
+			{
+				cswap( head, other.head );
+				cswap( tail, other.tail );
+				cswap( size, other.size );
+			}
+						
 			inline void push_back( NODE *node ) throw()
 			{
 				assert(NULL!=node); assert(NULL==node->next); assert(NULL==node->prev); assert( !owns(node));
@@ -110,7 +117,7 @@ namespace yocto
 			}
 			
 			inline void reset() throw() { head = tail = NULL; size=0; }
-			
+					
 			inline void delete_with( void (*proc)( NODE * ) ) throw()
 			{
 				assert(proc);

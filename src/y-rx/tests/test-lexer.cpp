@@ -43,15 +43,22 @@ namespace
 YOCTO_UNIT_TEST_IMPL(lexer)
 {
 	lexical::engine l;
+	lexical::engine s;
 	dummy           d;
-
-	l.make( "[:endl:]",   d, & dummy:: newline );
-	l.make( "[:word:]+",  d, & dummy:: display );
-	l.make( "[:word:]+_", d, & dummy:: display );
-	l.make( "[:blank:]+", d, & dummy:: discard );
 	
-	l.stop( "@", d, & dummy::display );
-	l.make( ".", d, & dummy::display );
+	{
+		const lexical::action on_newline( &d, & dummy::newline );
+		const lexical::action on_display( &d, & dummy::display );
+		const lexical::action on_discard( &d, & dummy::discard );
+
+		l.make( "[:endl:]",   on_newline );
+		l.make( "[:word:]+",  on_display );
+		l.make( "[:word:]+_", on_display );
+		l.make( "[:blank:]+", on_discard );
+		
+		l.stop( "@", on_display );
+		l.make( ".", on_display );
+	}
 	
 	ios::icstream inp( ios::cstdin );
 	source        src;
@@ -65,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(lexer)
 	else {
 		std::cerr << std::endl << "normal exit" << std::endl;
 	}
-
+	
 	
 	
 	
