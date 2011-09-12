@@ -84,6 +84,11 @@ namespace yocto
 				const string ans( tmp(), max_of<size_t>(len,1) - 1 );
 				return ans;
 			}
+			
+			size_t  CountExtensions( const string & EXTENSIONS ) throw();
+			void    ParseExtensions( const string & EXTENSIONS, const Extensions &ext ) throw();
+
+			
 		}
 		
 	}

@@ -17,7 +17,11 @@ YOCTO_UNIT_TEST_IMPL(platform)
 		SHOWP(VERSION);
 		SHOWP(NAME);
 		SHOWP(VENDOR);
-		SHOWP(EXTENSIONS);
+		std::cerr << "\t#extensions=" << P.extensions.size << std::endl;
+		for( size_t j=0; j < P.extensions.size; ++j )
+		{
+			std::cerr << "\t\t" << P.extensions[j] << std::endl;
+		}
 	}
 }
 YOCTO_UNIT_TEST_DONE()

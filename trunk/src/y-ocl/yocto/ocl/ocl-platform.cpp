@@ -14,8 +14,10 @@ namespace yocto
 		YCLP_STR(VERSION),
 		YCLP_STR(NAME),
 		YCLP_STR(VENDOR),
-		YCLP_STR(EXTENSIONS)
+		YCLP_STR(EXTENSIONS),
+		extensions( Core::CountExtensions(EXTENSIONS) )
 		{
+			Core::ParseExtensions( EXTENSIONS, extensions );
 		}
 		
 		Platform:: ~Platform() throw() 

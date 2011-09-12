@@ -30,6 +30,8 @@ namespace yocto
 			
 		}
 		
+		typedef Core::ArrayOf<char*>::Type Extensions; 
+		
 	}
 
 	
