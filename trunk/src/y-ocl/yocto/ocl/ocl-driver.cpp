@@ -49,7 +49,7 @@ namespace yocto
 			//
 			//==================================================================
 			for( cl_uint i=0; i < num_platforms; ++i ) 
-				platforms( __build_platform, (void*) & platformIDs[i] );
+				((memory::records_of<Platform>&)platforms)( __build_platform, (void*) & platformIDs[i] );
 			assert( num_platforms == platforms.size );
 		}
 		
