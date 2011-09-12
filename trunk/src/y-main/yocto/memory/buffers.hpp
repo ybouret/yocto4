@@ -29,8 +29,9 @@ namespace yocto
 				size_ = 0;
 			}
 			
-			inline size_t         size()   const throw() { return size_; }
-			inline virtual size_t length() const throw() { return size_ * sizeof(T); }
+			const size_t         &size_ref() const throw() { return size_; }
+			inline size_t         size()     const throw() { return size_; }
+			inline virtual size_t length()   const throw() { return size_ * sizeof(T); }
 			
 			inline type       * operator()( const ptrdiff_t shift = 0 ) throw()       { return buff_ + shift; }
 			inline const_type * operator()( const ptrdiff_t shift = 0 ) const throw() { return buff_ + shift; }

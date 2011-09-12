@@ -4,13 +4,13 @@
 #include "yocto/sequence/array.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/comparator.hpp"
-
+#include "yocto/sequence/c-array.hpp"
 
 namespace yocto
 {
 	//! make index
 	template <typename T,typename FUNC>
-	void make_index( array<T> &ra, array<size_t> &idx, FUNC &compare ) throw()
+	inline void make_index( array<T> &ra, array<size_t> &idx, FUNC &compare ) throw()
 	{
 		const size_t n = idx.size(); assert( ra.size() == idx.size() );
 		for( size_t i=1; i <= n; ++i ) idx[i] = i;
@@ -45,7 +45,15 @@ namespace yocto
 			
 		}
 		while( inc > 1 );
-		
+	}
+	
+	template <typename T>
+	inline void make_c_index( T *addr, size_t num_items, size_t *indx )
+	{
+		c_array<T> ra(  addr, num_items );
+		c_array<T> idx( indx, num_items );
+		make_index( ra, idx, __compare<T> );
+		for( size_t i=1; i <= num_items; ++i ) --idx[i];
 	}
 	
 	
