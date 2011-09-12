@@ -16,10 +16,8 @@ namespace yocto
 		public:
 			const cl_uint                               num_platforms;
 			const Core::ArrayOf<cl_platform_id>::Type   platformIDs;
-		private:
-			Core::ArrayOf<Platform>::Type               platforms_;
-		public:
-			memory::records_of<Platform>                platforms;
+		private: Core::ArrayOf<Platform>::Type          platforms_;
+		public: const memory::records_of<Platform>      platforms;
 			
 		private:
 			explicit Driver();
