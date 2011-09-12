@@ -1,5 +1,6 @@
 #include "yocto/ios/raw-file.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/code/utils.hpp"
 
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN
@@ -248,6 +249,25 @@ namespace yocto
 			return ans;
 		}
 		
+		void raw_file:: get_all( void *data, size_t size )
+		{
+			assert( !( data==NULL && size>0 ) );
+			uint8_t *p = static_cast<uint8_t*>(data);
+			size_t   n = size;
+			
+			while( n > 0 )
+			{
+				size_t to_read = min_of<size_t>(n,BUFSIZ);
+				size_t done    = 0;
+				get(p,to_read,done);
+				p += done;
+				n -= done;
+				if( done <= 0 )
+					throw exception( "raw_file::get_all(unexpected EOF)");
+			}
+			
+		}
+
 		
 	}
 }

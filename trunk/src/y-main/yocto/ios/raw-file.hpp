@@ -58,6 +58,9 @@ namespace yocto
 			void     unwind();
 			size_t   length();
 			
+			
+			void get_all( void *data, size_t size );
+			
 		private:
 			handle_t       handle;
 			
