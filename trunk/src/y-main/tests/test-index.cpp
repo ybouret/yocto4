@@ -3,6 +3,7 @@
 #include "yocto/sequence/vector.hpp"
 
 #include "support.hpp"
+#include <typeinfo>
 
 using namespace yocto;
 
