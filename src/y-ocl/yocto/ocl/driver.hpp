@@ -2,7 +2,7 @@
 #define YOCTO_OCL_DRIVER_INCLUDED 1
 
 
-#include "yocto/ocl/types.hpp"
+#include "yocto/ocl/platform.hpp"
 #include "yocto/threading/singleton.hpp"
 
 
@@ -10,13 +10,16 @@ namespace yocto
 {
 	namespace  ocl 
 	{
-		typedef Core::ArrayOf<cl_platform_id>::Type PlatformIDs;
 		
 		class Driver : public singleton<Driver>
 		{
 		public:
-			const cl_uint       num_platforms;
-			const PlatformIDs   platforms;
+			const cl_uint                               num_platforms;
+			const Core::ArrayOf<cl_platform_id>::Type   platformIDs;
+		private:
+			Core::ArrayOf<Platform>::Type               platforms_;
+		public:
+			memory::records_of<Platform>                platforms;
 			
 		private:
 			explicit Driver();

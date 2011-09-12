@@ -7,6 +7,7 @@
 #define YOCTO_OPENCL_QUERY_INCLUDED 1
 
 #include "yocto/code/round.hpp"
+#include "yocto/code/utils.hpp"
 #include "yocto/ocl/exception.hpp"
 
 namespace yocto
@@ -80,7 +81,7 @@ namespace yocto
 					if( CL_SUCCESS != err )
 						throw Exception( err, "%s (%u->%u)", tag, unsigned(len), unsigned(chk) );
 				}
-				const string ans( tmp(), YOCTO_MAX_OF(len,1) - 1 );
+				const string ans( tmp(), max_of<size_t>(len,1) - 1 );
 				return ans;
 			}
 		}

@@ -20,16 +20,26 @@ namespace yocto
 		}
 		
 		
+		static inline void __build_platform( void *ptr, void *args )
+		{
+			assert(ptr!=NULL);
+			assert(args!=NULL);
+			const cl_platform_id p_id = *(cl_platform_id *)args;
+			new (ptr) Platform( p_id );
+		}
+		
 		Driver:: Driver( ) :
 		num_platforms( __num_platforms() ),
-		platforms( num_platforms )
+		platformIDs( num_platforms ),
+		platforms_( num_platforms  ),
+		platforms( platforms_(), num_platforms )
 		{
 			//==================================================================
 			//
 			// Load cl_platform_id
 			//
 			//==================================================================
-			const cl_int err = clGetPlatformIDs( num_platforms, (cl_platform_id *) platforms(), NULL);
+			const cl_int err = clGetPlatformIDs( num_platforms, (cl_platform_id *) platformIDs(), NULL);
 			if( CL_SUCCESS != err ) 
 				throw Exception( err, "clGetPlatformIDs(%u,platforms)", num_platforms);
 			
@@ -38,7 +48,9 @@ namespace yocto
 			// Build All Platforms
 			//
 			//==================================================================
-			
+			for( cl_uint i=0; i < num_platforms; ++i ) 
+				platforms( __build_platform, (void*) & platformIDs[i] );
+			assert( num_platforms == platforms.size );
 		}
 		
 	}
