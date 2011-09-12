@@ -14,6 +14,8 @@
 #include <sys/stat.h>
 #endif
 
+#include <cstdio>
+
 namespace yocto
 {
 	namespace ios
