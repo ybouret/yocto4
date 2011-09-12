@@ -22,3 +22,7 @@ clang:
 
 intel:
 	@bash ./src/share/create.sh src intel ${BUILD_TYPE}
+
+codeblocks:
+	@bash ./src/share/create.sh src codeblocks ${BUILD_TYPE}
+	
