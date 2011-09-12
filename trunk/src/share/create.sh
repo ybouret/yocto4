@@ -78,6 +78,7 @@ case $BUILD_TOOLS in
     ;;
     
   "codeblocks") 
+    BUILD_SUBDIR=cb/$BUILD_TYPE;
     BUILD_GENERATOR="CodeBlocks - $WITH_MAKEFILES";
     ;;
     
