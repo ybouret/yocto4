@@ -16,8 +16,8 @@ namespace yocto
 			~Platform() throw();
 			const cl_platform_id                     id;
 			const cl_uint                            num_devices;
-			const Core::ArrayOf<cl_device_id>::Type  deviceIDs;
-		private: Core::ArrayOf<Device>::Type         devices_;
+			const ArrayOf<cl_device_id>::Type        deviceIDs;
+		private: ArrayOf<Device>::Type               devices_;
 		public: const memory::records_of<Device>     devices;
 			const string                             PROFILE;    //!< CL_PLATFORM_PROFILE
 			const string                             VERSION;    //!< CL_PLATFORM_VERSION

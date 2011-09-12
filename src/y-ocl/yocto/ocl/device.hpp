@@ -32,7 +32,7 @@ namespace yocto
 			const cl_ulong                    MAX_MEM_ALLOC_SIZE;
 			const size_t                      MAX_WORK_GROUP_SIZE;
 			const cl_uint                     MAX_WORK_ITEM_DIMENSIONS;
-			const Core::ArrayOf<size_t>::Type MAX_WORK_ITEM_SIZES;
+			const ArrayOf<size_t>::Type       MAX_WORK_ITEM_SIZES;
 			const string                      NAME;
 			const cl_platform_id              PLATFORM;
 			const string                      PROFILE;

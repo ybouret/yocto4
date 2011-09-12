@@ -15,8 +15,8 @@ namespace yocto
 		{
 		public:
 			const cl_uint                               num_platforms;
-			const Core::ArrayOf<cl_platform_id>::Type   platformIDs;
-		private: Core::ArrayOf<Platform>::Type          platforms_;
+			const ArrayOf<cl_platform_id>::Type         platformIDs;
+		private: ArrayOf<Platform>::Type                platforms_;
 		public: const memory::records_of<Platform>      platforms;
 			
 		private:
