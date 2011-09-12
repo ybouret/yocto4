@@ -20,7 +20,7 @@ ADD_SUBDIRECTORY(y-lua++)
 ADD_SUBDIRECTORY(y-z)
 ADD_SUBDIRECTORY(y-z++)
 ADD_SUBDIRECTORY(y-mpi)
-
+ADD_SUBDIRECTORY(y-ocl)
 
 INSTALL( FILES share/rules.cmake share/fltk.cmake share/opencl.cmake DESTINATION share/yocto )
 
