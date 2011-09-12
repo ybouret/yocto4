@@ -2,7 +2,9 @@
 #define YOCTO_OCL_TYPES_INCLUDED 1
 
 #include "yocto/memory/buffers.hpp"
+#include "yocto/memory/records.hpp"
 #include "yocto/memory/pooled.hpp"
+#include "yocto/string.hpp"
 
 #if defined(YOCTO_APPLE)
 #	include <OpenCL/cl.h>
