@@ -24,7 +24,7 @@ namespace yocto
 #if defined(_MSC_VER)
 #	pragma warning ( disable : 4996 )
 #endif
-            strncpy( what_, Core::StrErr( code ), sizeof(what_)-1 );
+            strncpy( what_, StrErr( code ), sizeof(what_)-1 );
         }
 		
         Exception:: Exception( const Exception &other ) throw() :
