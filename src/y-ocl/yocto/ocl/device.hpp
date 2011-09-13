@@ -13,7 +13,7 @@ namespace yocto
 		public:
 			cl_device_id id;
 			
-			Device( cl_device_id device );
+			explicit Device( cl_device_id device );
 			~Device() throw();
 			
 			bool is_available() const;

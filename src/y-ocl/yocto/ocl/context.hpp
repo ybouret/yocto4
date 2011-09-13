@@ -12,12 +12,12 @@ namespace yocto
 		class Context : public Shared<cl_context>
 		{
 		public:
-			explicit Context( cl_uint num_devices, cl_device_id *devices );
+			explicit Context( const DeviceIDs &device_list );
 			virtual ~Context() throw();
 			
-			const cl_uint                          NUM_DEVICES;
-		private: ArrayOf<cl_device_id>::Type       devices_;
-		public:  const cl_device_id               *DEVICES;
+			const cl_uint               NUM_DEVICES;
+			const DeviceIDs             devices;
+			const cl_device_id         *DEVICES;
 			
 			virtual void Notify( const char *errinfo, const memory::ro_buffer &errdata) const throw();
 			
