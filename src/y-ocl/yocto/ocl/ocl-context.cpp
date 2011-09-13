@@ -29,11 +29,12 @@ namespace yocto
 		void __notify(const char *errinfo, 
 					  const void *private_info, 
 					  size_t      cb, 
-					  void       *user_data )
+					  void       *user_data ) throw()
 		{
 			assert( user_data != NULL );
-			const Context *ctx = static_cast<Context *>(user_data);
-			ctx->Notify(errinfo);
+			const Context             *ctx = static_cast<Context *>(user_data);
+			const memory::local_buffer errdata( private_info, cb );
+			ctx->Notify(errinfo, errdata);
 		}
 		
 		static inline
@@ -71,7 +72,7 @@ namespace yocto
 				throw Exception( err, "clGetContextInfo(DEVICES)" );
 		}
 		
-		void Context:: Notify( const char *errinfo ) const throw()
+		void Context:: Notify( const char *errinfo, const memory::ro_buffer &errdata ) const throw()
 		{
 			assert( errinfo != NULL );
 			std::cerr << "[Context.Notify][" << errinfo << "]" << std::endl;
