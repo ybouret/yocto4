@@ -8,6 +8,7 @@ namespace yocto
 	
 	namespace ocl
 	{
+		typedef ArrayOf<cl_device_id>::Type DeviceIDs;
 		
 		class Platform
 		{
@@ -16,7 +17,7 @@ namespace yocto
 			~Platform() throw();
 			const cl_platform_id                     id;
 			const cl_uint                            num_devices;
-			const ArrayOf<cl_device_id>::Type        deviceIDs;
+			const DeviceIDs                          deviceIDs;
 		private: ArrayOf<Device>::Type               devices_;
 		public: const memory::records_of<Device>     devices;
 			const string                             PROFILE;    //!< CL_PLATFORM_PROFILE
