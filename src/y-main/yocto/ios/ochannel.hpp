@@ -9,7 +9,7 @@ namespace yocto
 	namespace memory 
 	{
 		class ro_buffer;
-	};
+	}
 	
 	namespace ios
 	{
