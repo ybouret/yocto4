@@ -4,6 +4,9 @@
 #include "yocto/memory/buffer.hpp"
 #include "yocto/memory/allocator.hpp"
 #include "yocto/type-traits.hpp"
+
+#include <cstring>
+
 namespace yocto
 {
 	
@@ -26,6 +29,16 @@ namespace yocto
 			{
 			}
 			
+			inline explicit buffer_of( const buffer_of &other ) :
+			size(  other.size  ),
+			bytes( other.bytes ),
+			maxi_( other.maxi_ ),
+			buff_( kind<ALLOCATOR>:: template acquire_as<mutable_type>(maxi_) )
+			{
+				memcpy( buff_, other.buff_, bytes );
+			}
+			
+			
 			inline virtual ~buffer_of() throw()
 			{
 				kind<ALLOCATOR>:: template release_as<T>(buff_, maxi_);
@@ -41,7 +54,7 @@ namespace yocto
 			inline const_type & operator[]( size_t index ) const throw() { assert( index < size ); return buff_[index]; }
 			
 		private:
-			YOCTO_DISABLE_COPY_AND_ASSIGN(buffer_of);
+			YOCTO_DISABLE_ASSIGN(buffer_of);
 			virtual const void *get_address() const throw() { return buff_; }
 			size_t        maxi_;
 			mutable_type *buff_;
