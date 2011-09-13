@@ -21,10 +21,13 @@ namespace yocto
 		
 		const char * StrErr(const cl_int err) throw();
 		
-		typedef memory::pooled        MemoryType;
-		typedef MemoryType::allocator Allocator;
-		template <typename T> struct  ArrayOf { typedef memory::buffer_of<T,MemoryType> Type; };
-		typedef ArrayOf<char*>::Type  Extensions; 
+		typedef memory::pooled                   MemoryType;
+		typedef MemoryType::allocator            Allocator;
+		template <typename T> struct             ArrayOf { typedef memory::buffer_of<T,MemoryType> Type; };
+		typedef ArrayOf<char*>::Type             Extensions; 
+	
+		typedef memory::records_of<cl_device_id> DeviceMap;
+		typedef ArrayOf<cl_device_id>::Type      DeviceIDs;
 		
 		//! take care of OpenCL reference counted structs
 		template <typename T>

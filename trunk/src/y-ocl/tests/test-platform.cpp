@@ -14,7 +14,7 @@ YOCTO_UNIT_TEST_IMPL(platform)
 	std::cerr << "OpenCL.num_platforms=" << OpenCL.num_platforms << std::endl;
 	for( cl_uint p = 0; p < OpenCL.num_platforms; ++p )
 	{
-		const ocl::Platform &P = OpenCL.platforms[p];
+		const ocl::Platform &P = OpenCL.Platforms[p];
 		SHOWP(PROFILE);
 		SHOWP(VERSION);
 		SHOWP(NAME);
@@ -27,7 +27,7 @@ YOCTO_UNIT_TEST_IMPL(platform)
 		std::cerr << P.NAME << " #num_devices=" << P.num_devices << std::endl;
 		for( size_t k=0; k < P.num_devices; ++k )
 		{
-			const ocl::Device &D = P.devices[k];
+			const ocl::Device &D = P.Devices[k];
 			std::cerr << std::endl;
 			SHOWD(NAME);
 			SHOWD(COMPILER_AVAILABLE);

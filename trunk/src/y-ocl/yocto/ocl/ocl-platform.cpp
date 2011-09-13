@@ -30,9 +30,9 @@ namespace yocto
 		Platform:: Platform( cl_platform_id platform ) :
 		id(platform),
 		num_devices( __num_devices(platform) ),
-		deviceIDs( num_devices ),
-		devices_( num_devices  ),
-		devices( devices_(), num_devices ),
+		devices( num_devices ),
+		Devices_( num_devices  ),
+		Devices( Devices_(), num_devices ),
 		YCLP_STR(PROFILE),
 		YCLP_STR(VERSION),
 		YCLP_STR(NAME),
@@ -41,14 +41,14 @@ namespace yocto
 		extensions( Core::CountExtensions(EXTENSIONS) )
 		{
 			//== probe all the deviceIDs
-			const cl_int err = clGetDeviceIDs( platform, CL_DEVICE_TYPE_ALL, num_devices, (cl_device_id *) deviceIDs(), NULL);
+			const cl_int err = clGetDeviceIDs( platform, CL_DEVICE_TYPE_ALL, num_devices, (cl_device_id *) devices(), NULL);
 			if( CL_SUCCESS != err )
 				throw Exception( err, "clGetDeviceIDs(num_devices)" );
 		
 			//== construct the associated devices
 			for( cl_uint i=0; i < num_devices; ++i )
 			{
-				((memory::records_of<Device>&)devices)( __build_device, (void *)&deviceIDs[i] );
+				Devices( __build_device, (void *)&devices[i] );
 			}
 			
 			//== finalize by parsing extensions

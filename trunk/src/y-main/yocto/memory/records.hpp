@@ -37,7 +37,7 @@ namespace yocto
 				while(n>0) destruct( &base[--n] );
 			}
 			
-			void operator()( void (*build)(void *ptr,void *args), void *args )
+			void operator()( void (*build)(void *ptr,void *args), void *args ) const
 			{
 				assert( size < capacity );
 				assert( build != NULL   );
@@ -58,6 +58,9 @@ namespace yocto
 			inline type       & operator[]( size_t index ) throw()       { assert( index < size ); return base[index]; }
 			inline const_type & operator[]( size_t index ) const throw() { assert( index < size ); return base[index]; }
 			
+			inline type       * operator()( const ptrdiff_t shift = 0 ) throw()       { return base + shift; }
+			inline const_type * operator()( const ptrdiff_t shift = 0 ) const throw() { return base + shift; }
+
 		private:
 			mutable_type *base;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(records_of);
