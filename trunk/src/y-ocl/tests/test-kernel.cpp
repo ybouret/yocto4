@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/ocl/program.hpp"
+#include "yocto/ocl/kernel.hpp"
 #include "yocto/ocl/driver.hpp"
 
 using namespace yocto;
@@ -35,6 +35,11 @@ YOCTO_UNIT_TEST_IMPL(kernel)
 	std::cerr << "Results in   ";
 	for( size_t i=0; i < program.NUM_DEVICES; ++i ) std::cerr << "<" << OpenCL[ program.DEVICES[i] ].NAME << "> ";
 	std::cerr << std::endl;
+	
+	ocl::Kernel k1( program, "add" );
+	std::cerr << "k1.FUNCTION_NAME=" << k1.FUNCTION_NAME << std::endl;
+	std::cerr << "k1.NUM_ARGS     =" << k1.NUM_ARGS      << std::endl;
+	
 	
 }
 YOCTO_UNIT_TEST_DONE()
