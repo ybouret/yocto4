@@ -18,6 +18,9 @@ namespace yocto
 			const ArrayOf<cl_platform_id>::Type         platformIDs;
 		private: ArrayOf<Platform>::Type                platforms_;
 		public: const memory::records_of<Platform>      platforms;
+			const cl_uint                               num_devices;
+			
+			const Device & operator[]( const cl_device_id ) const;
 			
 		private:
 			explicit Driver();

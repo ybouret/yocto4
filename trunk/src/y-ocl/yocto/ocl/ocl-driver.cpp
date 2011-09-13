@@ -32,7 +32,8 @@ namespace yocto
 		num_platforms( __num_platforms() ),
 		platformIDs( num_platforms ),
 		platforms_( num_platforms  ),
-		platforms( platforms_(), num_platforms )
+		platforms( platforms_(), num_platforms ),
+		num_devices(0)
 		{
 			//==================================================================
 			//
@@ -49,8 +50,28 @@ namespace yocto
 			//
 			//==================================================================
 			for( cl_uint i=0; i < num_platforms; ++i ) 
+			{
 				((memory::records_of<Platform>&)platforms)( __build_platform, (void*) & platformIDs[i] );
+				(size_t &) num_devices += platforms[i].num_devices;	
+				
+			}
 			assert( num_platforms == platforms.size );
+			
+			
+		}
+		
+		
+		const Device & Driver:: operator[]( const cl_device_id device_id ) const
+		{
+			for( cl_uint i=0; i < num_platforms; ++i ) 
+			{
+				const Platform &P = platforms[i];
+				for( cl_uint j=0; j < P.num_devices; ++j )
+				{
+					if( P.deviceIDs[j] == device_id) return P.devices[j];
+				}
+			}
+			throw Exception( CL_INVALID_VALUE, "OpenCL[device_id]");
 		}
 		
 	}
