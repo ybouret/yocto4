@@ -48,6 +48,21 @@ namespace yocto
 		};
 		
 		
+		class local_buffer : public ro_buffer
+		{
+		public:
+			explicit local_buffer( const void *data, size_t size ) throw();
+			virtual ~local_buffer() throw();
+			
+			virtual size_t length() const throw();
+			
+		private:
+			const void  *data_;
+			const size_t size_;
+			virtual const void *get_address() const throw();
+			YOCTO_DISABLE_COPY_AND_ASSIGN(local_buffer);
+		};
+		
 	}
 	
 }

@@ -19,7 +19,7 @@ namespace yocto
 		private: ArrayOf<cl_device_id>::Type       devices_;
 		public:  const cl_device_id               *DEVICES;
 			
-			virtual void Notify( const char *errinfo ) const throw();
+			virtual void Notify( const char *errinfo, const memory::ro_buffer &errdata) const throw();
 			
 		private:			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(Context);
