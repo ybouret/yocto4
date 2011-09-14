@@ -18,6 +18,7 @@ namespace yocto
 			explicit Program( const Context &ctx, const Sources &src );
 			virtual ~Program() throw();
 		
+			void get_binaries( Binaries &bin ) const;
 			
 		private:
 			DeviceIDs            deviceIDs;   //!< max devices from context

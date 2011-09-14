@@ -25,9 +25,14 @@ namespace yocto
 		YOCTO_OPENCL_SHARED_IMPL(cl_program,clRetainProgram,clReleaseProgram, _ref_count);
 		
 		//======================================================================
+		//
+		// program creation
+		//
+		//======================================================================
 		static inline
 		cl_program __create_program_with_sources( const Context &ctx, const Sources &src )
 		{
+			YOCTO_GIANT_LOCK();
 			const size_t count = src.size();
 			
 			ArrayOf<char *>::Type sources( count );
@@ -60,7 +65,7 @@ namespace yocto
 		
 		//======================================================================
 		//
-		// Compilation
+		// program compilation
 		//
 		//======================================================================
 		
@@ -134,9 +139,6 @@ namespace yocto
 					//----------------------------------------------------------
 					program.devices( __build_dev, NULL );
 					program.devices[ i ] = dev;
-					
-					
-					
 				}
 				
 				{
@@ -173,6 +175,65 @@ namespace yocto
 			
 		}
 		
+		
+		//======================================================================
+		//
+		// get binaries
+		//
+		//======================================================================
+		void Program:: get_binaries( Binaries &binaries ) const
+		{
+			binaries.free();
+			try {
+				cl_program program = *(*this);
+				//--------------------------------------------------------------
+				// get the sizes
+				//--------------------------------------------------------------
+				size_t len = 0;
+				cl_int err = clGetProgramInfo( program, CL_PROGRAM_BINARY_SIZES, 0, NULL, &len);
+				
+				if( CL_SUCCESS != err )
+					throw Exception( err, "CL_PROGRAM_BINARY_SIZES length" );
+				
+				if( NUM_DEVICES * sizeof(size_t) != len )
+					throw Exception( CL_INVALID_VALUE, "CL_PROGRAM_BINARY_SIZES mismatch" );
+				
+				ArrayOf<size_t>::Type bin_sizes( NUM_DEVICES );
+				err = clGetProgramInfo( program, CL_PROGRAM_BINARY_SIZES, bin_sizes.bytes, bin_sizes(), NULL);
+				if( CL_SUCCESS != err )
+					throw Exception( err, "CL_PROGRAM_BINARY_SIZES value" );
+				
+				//--------------------------------------------------------------
+				// Memory Allocation
+				//--------------------------------------------------------------
+				binaries.reserve( NUM_DEVICES );
+				for( size_t i=0; i < NUM_DEVICES; ++i )
+				{
+					std::cerr << "Binary #device " << i << " : " << bin_sizes[i] << " bytes" << std::endl;
+					const Code code( bin_sizes[i] );
+					binaries.push_back( code );
+				}
+				
+				//--------------------------------------------------------------
+				// Fetch the binaries
+				//--------------------------------------------------------------
+				ArrayOf<unsigned char *>::Type bin_codes( NUM_DEVICES );
+				for( size_t i=0,j=1; i < NUM_DEVICES; ++i, ++j )
+				{
+					bin_codes[i] = (unsigned char *)(binaries[j]->data);
+				}
+				
+				err = clGetProgramInfo( program, CL_PROGRAM_BINARIES, bin_codes.bytes, bin_codes(), NULL);
+				if( CL_SUCCESS != err )
+					throw Exception( err, "CL_PROGRAM_BINARIES" );
+				
+			}
+			catch(...)
+			{
+				binaries.free();
+				throw;
+			}
+		}
 		
 	}
 	
