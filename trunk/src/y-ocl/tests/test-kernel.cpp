@@ -1,21 +1,31 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/ocl/kernel.hpp"
+#include "yocto/ocl/command-queue.hpp"
 #include "yocto/ocl/driver.hpp"
+#include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
 
 
-static const char ocl_add[] =
-" __kernel void add( __global float a[]) {} ";
+static const char ocl_add_prolog[] =
+" __kernel void add( __global float a[]) {\n";
+
+static const char ocl_add_code[] =
+"	const size_t i = get_global_id(0);\n"
+"	a[i] += i;\n"
+;
+
+static const char ocl_add_epilog[] =
+"}\n";
+
 
 YOCTO_UNIT_TEST_IMPL(kernel)
 {
-
+	
 	YOCTO_OPENCL;
 	const ocl::Platform &platform = OpenCL.Platforms[0];
 	ocl::Context         context( platform.devices );
 	ocl::Sources         sources;
-	sources << ocl::LoadData << ocl_add;
+	sources << ocl::LoadData  << ocl_add_prolog << ocl_add_code << ocl_add_epilog;
 	ocl::Program         program( context, sources );
 	
 	try {
@@ -39,6 +49,33 @@ YOCTO_UNIT_TEST_IMPL(kernel)
 	ocl::Kernel k1( program, "add" );
 	std::cerr << "k1.FUNCTION_NAME=" << k1.FUNCTION_NAME << std::endl;
 	std::cerr << "k1.NUM_ARGS     =" << k1.NUM_ARGS      << std::endl;
+	
+	size_t N = 32;
+	vector<cl_float>        vec_a( N, 0 );
+	ocl::BufferOf<cl_float> ocl_a( context, CL_MEM_READ_WRITE, N, NULL );
+	for( size_t i=1; i <= N; ++i ) vec_a[i] = i;
+	std::cerr << "a=" << vec_a << std::endl;
+	
+	cl_uint arg_index = 0;
+	k1.SetArg(arg_index++, ocl_a);
+	
+	const size_t global_work_size[] = { N };
+	
+	for( size_t idev = 0; idev < program.NUM_DEVICES; ++idev )
+	{
+		cl_device_id       device = program.DEVICES[idev];
+		const ocl::Device &D      = OpenCL[device];
+		std::cerr << std::endl;
+		std::cerr << "Executing on " << D.NAME << std::endl;
+		ocl::CommandQueue Q( context, device, 0 );
+		
+		Q.EnqueueWriteBuffer(ocl_a, CL_FALSE, 0, ocl_a.SIZE, vec_a(), YOCTO_OPENCL_NO_EVENT );
+		Q.EnqueueNDRangeKernel(k1, 1, NULL, global_work_size, NULL,   YOCTO_OPENCL_NO_EVENT);
+		Q.EnqueueReadBuffer(ocl_a, CL_FALSE, 0, ocl_a.SIZE, vec_a(),  YOCTO_OPENCL_NO_EVENT);
+		Q.Finish();
+		std::cerr << "a=" << vec_a << std::endl;
+		
+	}
 	
 	
 }

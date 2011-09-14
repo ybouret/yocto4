@@ -80,7 +80,32 @@ namespace yocto
 				throw Exception( err, "clFinish" );
 		}
 		
+		
+		void CommandQueue:: EnqueueBarrier()
+		{
+			const cl_int err = clEnqueueBarrier( *(*this) );
+			if( CL_SUCCESS != err )
+				throw Exception( err, "clEnqueueBarrier" );
+		}
+		
 		////////////////////////////////////////////////////////////////////////
+
+		cl_event CommandQueue:: EnqueueMarker()
+		{
+			cl_event     event = NULL;
+			const cl_int err   = clEnqueueMarker( *(*this), &event);
+			if( CL_SUCCESS != err )
+				throw Exception( err, "clEnqueueMarker" );
+			return event;
+		}
+		
+		void     CommandQueue:: EnqueueWaitForEvents( const Event::List &todo )
+		{
+			const cl_int err = clEnqueueWaitForEvents( *(*this), todo.num_events(), todo() );
+			if( CL_SUCCESS != err )
+				throw Exception( err, "clEnqueueWaitForEvents");
+		}
+		
 
 		
 		
