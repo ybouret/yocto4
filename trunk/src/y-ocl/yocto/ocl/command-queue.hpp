@@ -16,13 +16,25 @@ namespace yocto
 								  cl_command_queue_properties properties);
 			virtual ~CommandQueue() throw();
 			
+			//==================================================================
+			//
+			//==================================================================
 			const cl_device_id          DEVICE;
 			cl_command_queue_properties PROPERTIES() const;
+			
+			//==================================================================
+			//
+			//==================================================================
 			bool is_ooo() const;      //!< Out Of Order ?
 			bool can_profile() const; //!< Profiling Enabled ?
 			
+			//==================================================================
+			// global command
+			//==================================================================
 			void Flush();
 			void Finish();
+			
+			
 			
 			
 		private:

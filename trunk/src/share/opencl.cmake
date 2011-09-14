@@ -60,13 +60,13 @@ IF( NOT OPENCL_HAS_SDK )
 		# register the include path
 		#---------------------------------------------------------------
 		INCLUDE_DIRECTORIES( "${ATISTREAMSDKROOT}/include" )
-		IF( FORCE64 )
+		IF( YOCTO64 )
 			MESSAGE( STATUS "OpenCL 64 bits" )
 			LINK_DIRECTORIES( "${ATISTREAMSDKROOT}/lib/x86_64" )
-		ELSE( FORCE64 )
+		ELSE( YOCTO64 )
 			MESSAGE( STATUS "OpenCL 32 bits" )
 			LINK_DIRECTORIES( "${ATISTREAMSDKROOT}/lib/x86" )
-		ENDIF( FORCE64 )
+		ENDIF( YOCTO64 )
 		
 		#---------------------------------------------------------------
 		# Use OpenCL 
