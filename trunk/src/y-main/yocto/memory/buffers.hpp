@@ -29,7 +29,8 @@ namespace yocto
 			{
 			}
 			
-			inline explicit buffer_of( const buffer_of &other ) :
+			//! copy content
+			inline buffer_of( const buffer_of &other ) :
 			size(  other.size  ),
 			bytes( other.bytes ),
 			maxi_( other.maxi_ ),
