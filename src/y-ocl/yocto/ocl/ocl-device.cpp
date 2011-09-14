@@ -11,6 +11,32 @@ namespace yocto
 		}
 		
 		
+		static inline
+		string __name_for( const string &NAME )
+		{
+			string name( NAME.size(), as_capacity );
+			char   prev = 0;
+			for( size_t i=0; i < NAME.size(); ++i )
+			{
+				char curr = NAME[i];
+				switch( curr )
+				{
+					case ' ':
+					case '(':
+					case ')':
+						curr = '_';
+						break;
+						
+					default:
+						break;
+				}
+				if( curr != '_' || prev != '_' )
+					name.append( curr );
+				prev = curr;
+			}
+			return name;
+		}
+		
 #define YCLD_GET(TYPE,FIELD) FIELD( Core::GetInfoValue( type2type<TYPE>(), clGetDeviceInfo, id, CL_DEVICE_ ## FIELD, "CL_DEVICE_" #FIELD ) )
 #define YCLD_STR(FIELD)      FIELD( Core::GetInfoString( clGetDeviceInfo, id, CL_DEVICE_ ## FIELD, "CL_DEVICE_" #FIELD ) )
 	
@@ -32,6 +58,7 @@ namespace yocto
 		YCLD_GET(cl_uint,MAX_WORK_ITEM_DIMENSIONS),
 		MAX_WORK_ITEM_SIZES( MAX_WORK_ITEM_DIMENSIONS ),
 		YCLD_STR(NAME),
+		name( __name_for(NAME) ),
 		YCLD_GET(cl_platform_id,PLATFORM),
 		YCLD_STR(PROFILE),
 		YCLD_GET(size_t,PROFILING_TIMER_RESOLUTION),

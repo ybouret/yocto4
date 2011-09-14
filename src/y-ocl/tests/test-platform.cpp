@@ -30,6 +30,7 @@ YOCTO_UNIT_TEST_IMPL(platform)
 			const ocl::Device &D = P.Devices[k];
 			std::cerr << std::endl;
 			SHOWD(NAME);
+			SHOWD(name);
 			SHOWD(COMPILER_AVAILABLE);
 			SHOWD(ERROR_CORRECTION_SUPPORT);
 			std::cerr << "\t\t#extensions=" << D.extensions.size << std::endl;
