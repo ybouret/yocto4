@@ -3,6 +3,8 @@
 #include "yocto/ocl/driver.hpp"
 #include "yocto/sequence/vector.hpp"
 
+#include "yocto/ios/ocstream.hpp"
+
 using namespace yocto;
 
 
@@ -38,6 +40,19 @@ YOCTO_UNIT_TEST_IMPL(kernel)
 		OpenCL.BuildLogsOut( std::cerr );
 		throw;
 	}
+	
+	sources.release();
+	ocl::Binaries binaries;
+	program.get_binaries(binaries);
+	for( size_t i=1; i <= binaries.size(); ++i )
+	{
+		const ocl::Code   &bin = binaries[i];
+		const ocl::Device &dev = OpenCL[ program.DEVICES[i-1] ];
+		ios::ocstream      fp( dev.name + ".bin", false );
+		fp.append(bin->data, bin->size);
+	}
+	
+	
 	
 	std::cerr << "Compiled for ";
 	for( size_t i=0; i < context.NUM_DEVICES; ++i ) std::cerr << "<" << OpenCL[ context.DEVICES[i] ].NAME << "> ";
