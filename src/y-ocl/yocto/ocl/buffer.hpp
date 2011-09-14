@@ -12,7 +12,7 @@ namespace yocto
 		class Buffer : public MemObject
 		{
 		public:
-			explicit Buffer( const Context &ctx, 
+			explicit Buffer(const Context  &ctx, 
 							cl_mem_flags    flags,
 							size_t          size,
 							void           *host_ptr ); 
@@ -22,6 +22,26 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(Buffer);
 		};
+		
+		template <typename T>
+		class BufferOf : public Buffer
+		{
+		public:
+			inline explicit BufferOf(const Context &ctx,
+									 cl_mem_flags   flags,
+									 size_t         num_items,
+									 T        *     host_ptr) :
+			Buffer(ctx,flags,num_items*sizeof(T),host_ptr) 
+			{
+			}
+			
+			inline virtual ~BufferOf() throw() {}
+			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(BufferOf);
+		};
+		
+		
 	}
 	
 }
