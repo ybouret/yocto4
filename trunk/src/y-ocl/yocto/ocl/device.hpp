@@ -34,6 +34,7 @@ namespace yocto
 			const cl_uint                     MAX_WORK_ITEM_DIMENSIONS;
 			const ArrayOf<size_t>::Type       MAX_WORK_ITEM_SIZES;
 			const string                      NAME;
+			const string                      name;
 			const cl_platform_id              PLATFORM;
 			const string                      PROFILE;
 			const size_t                      PROFILING_TIMER_RESOLUTION;
