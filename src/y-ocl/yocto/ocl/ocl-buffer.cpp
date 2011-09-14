@@ -35,6 +35,13 @@ namespace yocto
 			
 		}
 		
+		
+		Buffer :: Buffer( const Buffer &other ) throw() :
+		MemObject( other )
+		{
+			
+		}
+		
 	}
 	
 }

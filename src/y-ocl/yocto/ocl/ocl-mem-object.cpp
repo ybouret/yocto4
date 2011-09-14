@@ -36,5 +36,14 @@ namespace yocto
 		{
 			
 		}
+		
+		MemObject:: MemObject( const MemObject &other ) throw() :
+		Shared<cl_mem>( other ),
+		TYPE(  other.TYPE  ),
+		FLAGS( other.FLAGS ),
+		SIZE(  other.SIZE  )
+		{
+		}
+		
 	}
 }

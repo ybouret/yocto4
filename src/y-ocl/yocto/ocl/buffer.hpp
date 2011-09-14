@@ -18,9 +18,10 @@ namespace yocto
 							void           *host_ptr ); 
 			
 			virtual ~Buffer() throw();
+			Buffer( const Buffer &other ) throw(); //!< shared copy
 			
 		private:
-			YOCTO_DISABLE_COPY_AND_ASSIGN(Buffer);
+			YOCTO_DISABLE_ASSIGN(Buffer);
 		};
 		
 		template <typename T>

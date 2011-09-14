@@ -17,12 +17,13 @@ namespace yocto
 			const cl_mem_object_type TYPE;
 			const cl_mem_flags       FLAGS;
 			const size_t             SIZE;
-			
+			MemObject( const MemObject &other) throw(); //!< shared copy
+
 		protected:
 			explicit MemObject( cl_mem );
 			
 		private:
-			YOCTO_DISABLE_COPY_AND_ASSIGN(MemObject);
+			YOCTO_DISABLE_ASSIGN(MemObject);
 		};
 		
 	}
