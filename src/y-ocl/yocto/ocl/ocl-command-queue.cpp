@@ -64,5 +64,25 @@ namespace yocto
 			return 0 != ( PROPERTIES() & CL_QUEUE_PROFILING_ENABLE );
 		}
 		
+		////////////////////////////////////////////////////////////////////////
+		
+		void CommandQueue:: Flush()
+		{
+			const cl_int err = clFlush( *(*this) );
+			if( CL_SUCCESS != err )
+				throw Exception( err, "clFlush" );
+		}
+		
+		void CommandQueue:: Finish()
+		{
+			const cl_int err = clFinish( *(*this) );
+			if( CL_SUCCESS != err )
+				throw Exception( err, "clFinish" );
+		}
+		
+		////////////////////////////////////////////////////////////////////////
+
+		
+		
 	}
 }

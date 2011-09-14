@@ -68,9 +68,9 @@ namespace yocto
 		
 		/** memory insertion */
 		/**
-		 \param  base    base address of and ordered array [0,size-1]
-		 \param  size    the number of items, increased afterwards
-		 \param  indx    where to insert if failure, location if success
+		 \param  base    base address of and ordered array [0,size (at least) ]
+		 \param  size    the number of items, UNTOUCHED
+		 \param  indx    where to insert 
 		 */
 		template <typename T>
 		inline void insert( const T *target, T *base, const size_t size, const size_t indx ) throw()
