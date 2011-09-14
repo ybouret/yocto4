@@ -10,7 +10,17 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS    ON)
 ##
 ########################################################################
 EXEC_PROGRAM( uname ARGS "-m" OUTPUT_VARIABLE BUILD_MACHINE )
-#MESSAGE( STATUS "BUILD_MACHINE=${BUILD_MACHINE}" )
+MESSAGE( STATUS "BUILD_MACHINE=${BUILD_MACHINE}" )
+
+SET(YOCTO64 OFF)
+IF( "${BUILD_MACHINE}" MATCHES ".*64" )
+  SET(YOCTO64 ON)
+  MESSAGE( STATUS "64-bits platform detected")
+ELSE()
+  MESSAGE( STATUS "32-bits platform detected" )
+ENDIF()
+
+
 
 SET(ON_MACOSX OFF)
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
