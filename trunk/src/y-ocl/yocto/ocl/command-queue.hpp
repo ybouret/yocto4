@@ -16,11 +16,14 @@ namespace yocto
 								  cl_command_queue_properties properties);
 			virtual ~CommandQueue() throw();
 			
-			const cl_device_id DEVICE;
-			
+			const cl_device_id          DEVICE;
 			cl_command_queue_properties PROPERTIES() const;
-			bool is_ooo() const;
-			bool can_profile() const;
+			bool is_ooo() const;      //!< Out Of Order ?
+			bool can_profile() const; //!< Profiling Enabled ?
+			
+			void Flush();
+			void Finish();
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(CommandQueue);
