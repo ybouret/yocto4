@@ -41,8 +41,6 @@ namespace yocto {
 			static void get( array<T> &yxtr, array<T> &yerr, const array<T> &xa, const matrix<T> &ya, size_t n, matrix<T> &c, matrix<T> &d ) throw();
 		};
 
-		//YOCTO_DMC_MATH(struct extrapolate)
-
 	} // math
 
 } //yocto
