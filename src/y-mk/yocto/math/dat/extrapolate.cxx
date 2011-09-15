@@ -9,7 +9,7 @@ namespace yocto {
 	namespace math {
 		
 		template <>
-		real_t extrapolate<real_t>:: get( size_t              n,
+		real_t extrapolate<real_t>:: get(size_t               n,
 										 const array<real_t> &xa,
 										 const array<real_t>  &ya,
 										 real_t               &dy,
@@ -18,9 +18,9 @@ namespace yocto {
 		{
 			assert( n > 0 );
 			assert(xa.size()>=n);
-			assert(ya.size()==xa.size());
-			assert(c.size()==xa.size());
-			assert(d.size()==xa.size());
+			assert(ya.size()== xa.size());
+			assert(c.size() == xa.size());
+			assert(d.size() == xa.size());
 			
 			
 			
@@ -37,8 +37,7 @@ namespace yocto {
 			YOCTO_LOOP_FUNC_(n,YOCTO_EXTR_SET,1);
 			
 			size_t ns = n;
-			
-			real_t y = ya[ns--];
+			real_t y  = ya[ns--];
 			
 			for(register size_t m=1;m<n;++m) 
 			{
@@ -124,15 +123,14 @@ namespace yocto {
 					for( size_t k=nvar;k>0;--k) 
 					{
 						const real_t w   = c_ip[k]-d_i[k];
-						
 						const real_t fac = w/den;
 						
 						d_i[k] = hp*fac;
 						c_i[k] = ho*fac;
-						
 					}
 					
 				}
+				
 				{
 					const matrix<real_t>::row &d_ns = d[ns];
 					for( size_t k=nvar;k>0;--k)

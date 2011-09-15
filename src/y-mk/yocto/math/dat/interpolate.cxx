@@ -33,7 +33,7 @@ namespace yocto {
 			real_t *c = wksp_(-1);
 			real_t *d = c+n;
 
-			real_t       ds = Fabs( x - xa[1] );
+			real_t  ds = Fabs( x - xa[1] );
 			size_t  ns = 1;
 
 			for( register size_t i = n; i>0; --i ) {
