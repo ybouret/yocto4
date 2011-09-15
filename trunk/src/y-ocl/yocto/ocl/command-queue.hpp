@@ -116,6 +116,18 @@ namespace yocto
 			
 			//==================================================================
 			//
+			// OptimizeNDRangeKernel
+			//
+			//==================================================================
+			
+			//! optimize according to kernel.WORK_GROUP_SIZE(DEVICE)
+			void OptimizeNDRangeKernel(Kernel        &kernel,
+									   cl_uint        work_dim,
+									   const size_t  *global_work_size,
+									   size_t        *local_work_size );
+			
+			//==================================================================
+			//
 			// EnqueueTask
 			//
 			//==================================================================
