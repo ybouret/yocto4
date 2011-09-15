@@ -39,11 +39,10 @@ namespace yocto
 			return ans;
 		}
 		
-		template <typename T>
-		inline T less_than( const T N )
+		inline size_t less_than( const size_t N )
 		{
 			assert(N>0);
-			return full<T>() % N;
+			return full<size_t>() % N;
 		}
 		
 		template <typename T>
@@ -55,7 +54,7 @@ namespace yocto
 				const size_t m=n-1;
 				for( size_t i=0; i < m; ++i, ++base )
 				{
-					mswap<T>(base[0],base[ less_than<size_t>(n-i) ]);
+					mswap<T>(base[0],base[ less_than(n-i) ]);
 				}
 			}
 		}
@@ -73,7 +72,7 @@ namespace yocto
 	template <typename T> inline T    alea_of(void) throw() { return _rand.full<T>(); }
 	
 	//! thread unsafe
-	template <typename T> inline T    alea_less_than( const T N )  throw() { return _rand.less_than<T>(N); }
+	inline size_t                     alea_less_than( const size_t N )  throw() { return _rand.less_than(N); }
 	
 	//! thread unsafe
 	template <typename T> inline void c_shuffle( T *base, size_t n ) throw() { _rand.c_shuffle(base,n);    }

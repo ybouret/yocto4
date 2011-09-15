@@ -12,7 +12,7 @@ template <typename T>
 static inline void test_sort()
 {
 	std::cerr << "-- sorting" << std::endl;
-	const size_t n = 1 + alea_less_than<size_t>( 20 );
+	const size_t n = 1 + alea_less_than( 20 );
 	vector<T>    ra(n,as_capacity);
 	for( size_t i=0; i < n; ++i )
 	{
@@ -28,7 +28,7 @@ template <typename T,typename U>
 static inline void test_cosort()
 {
 	std::cerr << "-- co-sorting" << std::endl;
-	const size_t n = 1 + alea_less_than<size_t>( 20 );
+	const size_t n = 1 + alea_less_than( 20 );
 	vector<T>    ra(n,as_capacity);
 	vector<U>    rb(n,as_capacity);
 	for( size_t i=0; i < n; ++i )

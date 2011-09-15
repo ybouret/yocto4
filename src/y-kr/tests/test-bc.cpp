@@ -126,7 +126,7 @@ YOCTO_UNIT_TEST_IMPL(bc)
 	string line;
 	for( size_t i=0; i < 64; ++i )
 	{
-		line += char( 'a'+alea_less_than<int>(26) );
+		line += char( 'a'+alea_less_than(26) );
 		process_pair( e_aes128, d_aes128, line, usr_iv );
 		process_pair( e_aes192, d_aes192, line, usr_iv );
 		process_pair( e_aes256, d_aes256, line, usr_iv );

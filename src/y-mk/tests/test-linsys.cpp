@@ -12,7 +12,7 @@ static inline void test_linsys()
 {
 	std::cerr << "linsys<" << typeid(T).name() << ">" << std::endl;
 	
-	for( size_t n=1; n <= 128; n += 1 + alea_less_than<size_t>(8) )
+	for( size_t n=1; n <= 128; n += 1 + alea_less_than(8) )
 	{
 		const  T  diag(n+1);
 		matrix<T> m(n,n);

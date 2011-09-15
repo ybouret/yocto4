@@ -27,8 +27,8 @@ namespace yocto
 		virtual size_t      size()     const throw() { return size_; }
 		virtual size_t      capacity() const throw() { return size_; }
 		
-		virtual void free() throw() {}
-		virtual void release() throw() {}
+		virtual void free()    throw() { /* do nothing */ } 
+		virtual void release() throw() { /* do nothing */ }
 		virtual void reserve(size_t) { hidden::c_array_reserve( this->name() ); }
 		
 		void reset( T *addr, size_t num_items ) throw() 
