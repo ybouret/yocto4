@@ -83,9 +83,14 @@ YOCTO_UNIT_TEST_IMPL(kernel)
 		std::cerr << std::endl;
 		std::cerr << "Executing on " << D.NAME << std::endl;
 		ocl::CommandQueue Q( context, device, 0 );
+		std::cerr << "k1.WORK_GROUP_SIZE=" << k1.WORK_GROUP_SIZE( device ) << std::endl;
+		std::cerr << "k1.LOCAL_MEM_SIZE =" << k1.LOCAL_MEM_SIZE(  device ) << std::endl;
+		size_t local_work_size[] = { 0 };
+		Q.OptimizeNDRangeKernel(k1, 1, global_work_size, local_work_size);
+		std::cerr << "local_work_size[0]=" << local_work_size[0] << std::endl;
 		
 		Q.EnqueueWriteBuffer(ocl_a, CL_FALSE, 0, ocl_a.SIZE, vec_a(), YOCTO_OPENCL_NO_EVENT );
-		Q.EnqueueNDRangeKernel(k1, 1, NULL, global_work_size, NULL,   YOCTO_OPENCL_NO_EVENT);
+		Q.EnqueueNDRangeKernel(k1, 1, NULL, global_work_size, local_work_size,   YOCTO_OPENCL_NO_EVENT);
 		Q.EnqueueReadBuffer(ocl_a, CL_FALSE, 0, ocl_a.SIZE, vec_a(),  YOCTO_OPENCL_NO_EVENT);
 		Q.Finish();
 		std::cerr << "a=" << vec_a << std::endl;

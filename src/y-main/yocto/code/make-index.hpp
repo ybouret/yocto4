@@ -48,10 +48,10 @@ namespace yocto
 	}
 	
 	template <typename T>
-	inline void make_c_index( T *addr, size_t num_items, size_t *indx )
+	inline void make_c_index( const T *addr, size_t num_items, size_t *indx )
 	{
-		c_array<T> ra(  addr, num_items );
-		c_array<T> idx( indx, num_items );
+		c_array<const T> ra(  addr, num_items );
+		c_array<size_t>  idx( indx, num_items );
 		make_index( ra, idx, __compare<T> );
 		for( size_t i=1; i <= num_items; ++i ) --idx[i];
 	}
