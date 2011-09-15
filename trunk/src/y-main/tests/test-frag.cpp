@@ -17,7 +17,7 @@ YOCTO_UNIT_TEST_IMPL(frag_layout)
 {
 	
 	
-	for( size_t block_size=1; block_size<=300; block_size += 1 + alea_less_than<size_t>(30) )
+	for( size_t block_size=1; block_size<=300; block_size += 1 + alea_less_than(30) )
 	{
 		std::cerr << "block_size=" << block_size << std::endl;
 		for( size_t ln2 = fragment::layout::round_log2_min; ln2 <= fragment::layout::round_log2_max; ++ln2 )
@@ -40,7 +40,7 @@ YOCTO_UNIT_TEST_IMPL(frag_block)
 	
 	hashing::sha1 H;
 	
-	for( size_t bs=0; bs<=1024; bs += 1 + alea_less_than<size_t>(100) )
+	for( size_t bs=0; bs<=1024; bs += 1 + alea_less_than(100) )
 	{
 		fragment::block B( bs );
 		std::cerr << std::dec << "length = " << B.length() << " | unused=" << B.unused() << std::endl;
@@ -48,8 +48,8 @@ YOCTO_UNIT_TEST_IMPL(frag_block)
 		while( B.unused() > 0 )
 		{
 			char buffer[32];
-			const size_t buflen = 1+alea_less_than<size_t>( sizeof(buffer) );
-			for( size_t j=0; j < buflen; ++j ) buffer[j] = char('A' + alea_less_than<size_t>(26) );
+			const size_t buflen = 1+alea_less_than( sizeof(buffer) );
+			for( size_t j=0; j < buflen; ++j ) buffer[j] = char('A' + alea_less_than(26) );
 			const size_t len = B.write(buffer, buflen);
 			std::cerr << ".";
 			H.run(buffer,len);
@@ -62,7 +62,7 @@ YOCTO_UNIT_TEST_IMPL(frag_block)
 		while( B.length() > 0 )
 		{
 			char buffer[32];
-			const size_t buflen = 1+alea_less_than<size_t>( sizeof(buffer) );
+			const size_t buflen = 1+alea_less_than( sizeof(buffer) );
 			const size_t len = B.read(buffer,buflen);
 			H.run(buffer,len);
 			if( alea<float>() > 0.66f ) 
@@ -100,7 +100,7 @@ YOCTO_UNIT_TEST_IMPL(frag_queue)
 	
 	try
 	{
-		for( size_t bs=10; bs < 1000; bs += 1 + alea_less_than<size_t>(100) )
+		for( size_t bs=10; bs < 1000; bs += 1 + alea_less_than(100) )
 		{
 			fragment::queue Q(bs);
 			std::cerr << "block_size=" << Q.block_size << std::endl;
@@ -121,7 +121,7 @@ YOCTO_UNIT_TEST_IMPL(frag_queue)
 				size_t buflen = 0;
 				while( Q.bytes() )
 				{
-					Q.get( buffer, 1+alea_less_than<size_t>(sizeof(buffer)), buflen );
+					Q.get( buffer, 1+alea_less_than(sizeof(buffer)), buflen );
 					//std::cerr << "+" << buflen << std::endl;
 					H.run( buffer, buflen );
 				}

@@ -72,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 	regex::source src;
 	
 	src.connect( input );
-	src.prefetch( 1 + alea_less_than<size_t>(16) );
+	src.prefetch( 1 + alea_less_than(16) );
 	
 	while( src.peek() )
 	{

@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(primes)
 	{
 		for( size_t j=0; j < 4; ++j )
 		{
-			const size_t n = 2 + alea_less_than<size_t>( 0xFFFFFF );
+			const size_t n = 2 + alea_less_than( 0xFFFFFF );
 			std::cerr << "(" << prev_prime(n) << "," << n << "," << next_prime(n) << ") ";
 		}
 		std::cerr << std::endl;

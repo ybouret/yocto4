@@ -96,7 +96,7 @@ YOCTO_UNIT_TEST_IMPL(list)
 		size_t j=0;
 		while( L.size )
 		{
-			node_type *node = L.unlink( L.fetch( _rand.less_than<size_t>( L.size ) ) );
+			node_type *node = L.unlink( L.fetch( _rand.less_than( L.size ) ) );
 			std::cerr << ++j << " : " << node->data << std::endl;	
 		}
 	}
@@ -119,7 +119,7 @@ YOCTO_UNIT_TEST_IMPL(list)
 	std::cerr << "--" << std::endl;
 	for( size_t i=0; i < 100 * num; ++i )
 	{
-		L.move_to_front( L.fetch( _rand.less_than<size_t>( L.size ) ) );
+		L.move_to_front( L.fetch( _rand.less_than( L.size ) ) );
 	}
 	L.reset();
 	delete [] nodes;

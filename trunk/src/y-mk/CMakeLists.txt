@@ -36,7 +36,13 @@ SET( io_srcs ${io_decl} ${io_impl} )
 INSTALL( FILES ${io_decl} DESTINATION include/yocto/math/io )
 SOURCE_GROUP( math/io FILES ${io_srcs} )
 
-SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs})
+FILE( GLOB ode_decl yocto/math/ode/*.hpp)
+FILE( GLOB ode_impl yocto/math/ode/*.cpp)
+SET( ode_srcs ${ode_decl} ${ode_impl} )
+INSTALL( FILES ${ode_decl} DESTINATION include/yocto/math/ode )
+SOURCE_GROUP( math/ode FILES ${ode_srcs} )
+
+SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main )
 

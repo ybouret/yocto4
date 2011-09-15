@@ -16,8 +16,8 @@ static inline void test_matrix()
 	{ matrix<T> m; }
 	for( size_t iter = 0; iter < 128; ++iter )
 	{
-		const size_t row = 1 + alea_less_than<size_t>(128);
-		const size_t col = 1 + alea_less_than<size_t>(128);
+		const size_t row = 1 + alea_less_than(128);
+		const size_t col = 1 + alea_less_than(128);
 		matrix<T> m(row,col);
 		//std::cerr << "matrix<" << typeid(matrix<T>).name() << "> " << row << "x" << col << std::endl;
 		H.set();

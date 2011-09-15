@@ -25,7 +25,7 @@ YOCTO_UNIT_TEST_IMPL(slice)
 	
 	for( size_t k = 0; k < 16; ++k )
 	{
-		const size_t mini_size = 100 + alea_less_than<size_t>(4000);
+		const size_t mini_size = 100 + alea_less_than(4000);
 		std::cerr << "#blocks for " << mini_size << " = " << slice::blocks_for( mini_size ) << std::endl;
 		slice S(0,mini_size);
 		std::cerr << "S.count=" << S.count() << std::endl;
@@ -47,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(slice)
 		for(;;)
 		{
 			std::cerr << "+";
-			length = 1 + alea_less_than<size_t>(8*sizeof(slice::block_t));
+			length = 1 + alea_less_than(8*sizeof(slice::block_t));
 			//std::cerr << "? " << length << " => "; 
 			p      = S.acquire(length);
 			if( !p )
@@ -72,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(slice)
 			std::cerr << "+";
 			for(;;)
 			{
-				length = 1 + alea_less_than<size_t>(8*sizeof(slice::block_t));
+				length = 1 + alea_less_than(8*sizeof(slice::block_t));
 				//std::cerr << "? " << length << " => "; 
 				p      = S.acquire(length);
 				if( !p )
