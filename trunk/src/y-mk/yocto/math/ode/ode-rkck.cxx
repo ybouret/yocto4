@@ -19,12 +19,12 @@ namespace yocto
 			template <>
 			rkck<real_t>:: rkck() :
 			step<real_t>(6),
-			ytemp( next_array() ),
-			ak2( next_array()   ),
-			ak3( next_array()   ),
-			ak4( next_array()   ),
-			ak5( next_array()   ),
-			ak6( next_array()   )
+			ytmp( next_array() ),
+			ak2(  next_array()   ),
+			ak3(  next_array()   ),
+			ak4(  next_array()   ),
+			ak5(  next_array()   ),
+			ak6(  next_array()   )
 			{
 			}
 			
@@ -53,28 +53,28 @@ namespace yocto
 				//std::cerr << "rkck@" << x << "+(" << h << ")" << std::endl;
 				
 				for (size_t i=n;i>0;--i) 
-					ytemp[i]=y[i]+b21*h*dydx[i];
+					ytmp[i]=y[i]+b21*h*dydx[i];
 				
-				drvs(ak2,x+a2*h,ytemp); 
+				drvs(ak2,x+a2*h,ytmp); 
 				for (size_t i=n;i>0;--i)
-					ytemp[i]=y[i]+h*(b31*dydx[i]+b32*ak2[i]);
+					ytmp[i]=y[i]+h*(b31*dydx[i]+b32*ak2[i]);
 				
-				drvs(ak3,x+a3*h,ytemp); 
-				
-				for (size_t i=n;i>0;--i)
-					ytemp[i]=y[i]+h*(b41*dydx[i]+b42*ak2[i]+b43*ak3[i]);
-				
-				drvs(ak4,x+a4*h,ytemp);
+				drvs(ak3,x+a3*h,ytmp); 
 				
 				for (size_t i=n;i>0;--i)
-					ytemp[i]=y[i]+h*(b51*dydx[i]+b52*ak2[i]+b53*ak3[i]+b54*ak4[i]);
+					ytmp[i]=y[i]+h*(b41*dydx[i]+b42*ak2[i]+b43*ak3[i]);
 				
-				drvs(ak5,x+a5*h,ytemp); 
+				drvs(ak4,x+a4*h,ytmp);
 				
 				for (size_t i=n;i>0;--i)
-					ytemp[i]=y[i]+h*(b61*dydx[i]+b62*ak2[i]+b63*ak3[i]+b64*ak4[i]+b65*ak5[i]);
+					ytmp[i]=y[i]+h*(b51*dydx[i]+b52*ak2[i]+b53*ak3[i]+b54*ak4[i]);
 				
-				drvs(ak6,x+a6*h,ytemp);
+				drvs(ak5,x+a5*h,ytmp); 
+				
+				for (size_t i=n;i>0;--i)
+					ytmp[i]=y[i]+h*(b61*dydx[i]+b62*ak2[i]+b63*ak3[i]+b64*ak4[i]+b65*ak5[i]);
+				
+				drvs(ak6,x+a6*h,ytmp);
 				
 				for (size_t i=n;i>0;--i) 
 					yout[i]=y[i]+h*(c1*dydx[i]+c3*ak3[i]+c4*ak4[i]+c6*ak6[i]);

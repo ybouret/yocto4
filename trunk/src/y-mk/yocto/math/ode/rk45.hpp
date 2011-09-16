@@ -35,7 +35,7 @@ namespace yocto
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rk45);
-				lw_array<T> &yerr,&ytemp;
+				lw_array<T> &yerr,&ytmp;
 			};
 		}
 		

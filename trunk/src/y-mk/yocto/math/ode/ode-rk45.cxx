@@ -27,7 +27,7 @@ namespace yocto
 			rk45<real_t>:: rk45() :
 			control<real_t>(2),
 			yerr( next_array() ),
-			ytemp( next_array() )
+			ytmp( next_array() )
 			{
 			}
 			
@@ -72,7 +72,7 @@ namespace yocto
 					//----------------------------------------------------------
 					// embbeded step+error
 					//----------------------------------------------------------
-					forward( ytemp, yerr, drvs, x, h, y, dydx );
+					forward( ytmp, yerr, drvs, x, h, y, dydx );
 					
 					//----------------------------------------------------------
 					// accuracy evaluation
@@ -109,7 +109,7 @@ namespace yocto
 					h_next=INC*h;
 				
 				for (size_t i=n;i>0;--i) 
-					y[i]=ytemp[i];
+					y[i]=ytmp[i];
 			}
 			
 			

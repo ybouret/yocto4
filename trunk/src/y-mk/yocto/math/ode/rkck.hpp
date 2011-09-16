@@ -32,7 +32,7 @@ namespace yocto
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rkck);
-				lw_array<T> &ytemp, &ak2, &ak3, &ak4, &ak5, &ak6;
+				lw_array<T> &ytmp, &ak2, &ak3, &ak4, &ak5, &ak6;
 			};
 		}
 		

@@ -18,11 +18,14 @@ namespace yocto
 			template <>
 			solver<real_t>:: solver() :
 			lw_arrays<real_t,memory_type>(3),
-			y( next_array() ),
-			dydx( next_array() ),
+			hmin( 0 ),
+			eps( numeric<real_t>::ftol ),
+			TINY( 1e-30 ),
+			y(     next_array() ),
+			dydx(  next_array() ),
 			yscal( next_array() )
 			{
-				
+			
 			}
 			
 			template <>   
@@ -32,12 +35,11 @@ namespace yocto
 											 array<real_t>   &ystart,
 											 const real_t     x1,
 											 const real_t     x2,
-											 real_t          &h1,
-											 const real_t     hmin,
-											 const real_t     eps
+											 real_t          &h1
 											 )
 			{
-				const size_t n = ystart.size();
+				const size_t   n    = ystart.size();
+				const real_t  _TINY = Fabs( TINY );
 				
 				//--------------------------------------------------------------
 				// sanity check
@@ -64,7 +66,7 @@ namespace yocto
 					//----------------------------------------------------------
 					drvs( dydx, x, y );
 					for( size_t i=n; i>0; --i )
-						yscal[i] = y[i] + Fabs( h * dydx[i] ) + 1e-30;
+						yscal[i] = Fabs(y[i]) + Fabs( h * dydx[i] ) + _TINY;
 					
 					//----------------------------------------------------------
 					// check no overshooting
@@ -103,8 +105,9 @@ namespace yocto
 				//--------------------------------------------------------------
 				// success
 				//--------------------------------------------------------------
-				for( size_t i=n; i >0; --i ) ystart[i] = y[i];
-				
+				for( size_t i=n; i >0; --i ) 
+					ystart[i] = y[i];
+				h1 = h;
 				
 			}
 			
