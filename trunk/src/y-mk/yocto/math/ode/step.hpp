@@ -28,7 +28,7 @@ namespace yocto
 										 const T          h,    //-- required step
 										 const array<T>  &y,    //-- initial value      @x
 										 const array<T>  &dydx  //-- initial derivative @x
-										 ) throw() = 0;
+										 ) = 0;
 				
 				
 			protected:

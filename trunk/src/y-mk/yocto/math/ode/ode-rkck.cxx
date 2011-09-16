@@ -34,7 +34,7 @@ namespace yocto
 										   const real_t          h,    
 										   const array<real_t>  &y,    
 										   const array<real_t>  &dydx 
-										   ) throw()
+										   )
 			{
 				static const real_t a2=0.2,a3=0.3,a4=0.6,a5=1.0,a6=0.875,b21=0.2,
 				b31=3.0/40.0,b32=9.0/40.0,b41=0.3,b42 = -0.9,b43=1.2,
