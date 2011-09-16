@@ -13,6 +13,7 @@ namespace yocto
 		namespace ode
 		{
 			
+			//! control algorithm, depends on step order
 			template <typename T>
 			class control : public lw_arrays<T,memory_type>
 			{
@@ -20,7 +21,8 @@ namespace yocto
 				typedef typename field<T>::type equation;
 				virtual ~control() throw();
 				
-				virtual void operator()(array<T>       &y, 
+				virtual void operator()(step<T>        &forward,
+										array<T>       &y, 
 										const array<T> &dydx,
 										equation       &drvs,
 										T              &x,
@@ -28,7 +30,7 @@ namespace yocto
 										T              &h_did,
 										T              &h_next,
 										const array<T> &yscal,
-										const T         eps);
+										const T         eps) = 0;
 										
 				
 			protected:

@@ -11,7 +11,7 @@ namespace yocto
 		
 		namespace ode
 		{
-
+			
 			//! Runge-Kutta Cash-Karp 4/5 step
 			template <typename T>
 			class rkck : public step<T>
@@ -21,23 +21,23 @@ namespace yocto
 				explicit rkck();
 				virtual ~rkck() throw();
 				
-				void operator()(array<T>        &yout, //-- output
-								array<T>        &yerr, //-- embeded error
-								equation        &drvs, //-- equation
-								const T          x,    //-- starting point
-								const T          h,    //-- required step
-								const array<T>  &y,    //-- initial value      @x
-								const array<T>  &dydx  //-- initial derivative @x
-								);
+				virtual void operator()(array<T>        &yout, //-- output
+										array<T>        &yerr, //-- embeded error
+										equation        &drvs, //-- equation
+										const T          x,    //-- starting point
+										const T          h,    //-- required step
+										const array<T>  &y,    //-- initial value      @x
+										const array<T>  &dydx  //-- initial derivative @x
+										);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rkck);
 				lw_array<T> &ytemp, &ak2, &ak3, &ak4, &ak5, &ak6;
 			};
 		}
-
+		
 	}
-
+	
 }
 
 #endif
