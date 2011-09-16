@@ -1,6 +1,8 @@
 #include "yocto/math/ode/rkck.hpp"
 #include "yocto/math/ztype.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	namespace math
@@ -48,17 +50,25 @@ namespace yocto
 				
 				const size_t n = y.size();
 				
+				//std::cerr << "rkck@" << x << "+(" << h << ")" << std::endl;
+				
 				for (size_t i=n;i>0;--i) 
 					ytemp[i]=y[i]+b21*h*dydx[i];
+				
 				drvs(ak2,x+a2*h,ytemp); 
 				for (size_t i=n;i>0;--i)
 					ytemp[i]=y[i]+h*(b31*dydx[i]+b32*ak2[i]);
+				
 				drvs(ak3,x+a3*h,ytemp); 
+				
 				for (size_t i=n;i>0;--i)
 					ytemp[i]=y[i]+h*(b41*dydx[i]+b42*ak2[i]+b43*ak3[i]);
+				
 				drvs(ak4,x+a4*h,ytemp);
+				
 				for (size_t i=n;i>0;--i)
 					ytemp[i]=y[i]+h*(b51*dydx[i]+b52*ak2[i]+b53*ak3[i]+b54*ak4[i]);
+				
 				drvs(ak5,x+a5*h,ytemp); 
 				
 				for (size_t i=n;i>0;--i)

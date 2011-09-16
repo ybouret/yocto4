@@ -7,6 +7,8 @@
 
 #include <cerrno>
 
+#include <iostream>
+
 namespace yocto
 {
 	
@@ -99,11 +101,13 @@ namespace yocto
 				//--------------------------------------------------------------
 				// sucess: finalize
 				//--------------------------------------------------------------
+				x += (h_did=h);
+				
 				if (errmax > ERRCON) 
 					h_next=SAFETY*h*Pow(errmax,PGROW);
 				else 
-					h_next=INC*h; 
-				x += (h_did=h);
+					h_next=INC*h;
+				
 				for (size_t i=n;i>0;--i) 
 					y[i]=ytemp[i];
 			}
