@@ -28,7 +28,7 @@ namespace yocto
 								const T          h,    //-- required step
 								const array<T>  &y,    //-- initial value      @x
 								const array<T>  &dydx  //-- initial derivative @x
-								) throw();
+								);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rkck);
