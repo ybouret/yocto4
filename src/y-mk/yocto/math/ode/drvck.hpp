@@ -12,7 +12,7 @@ namespace yocto
 		namespace ode
 		{
 		
-			//! Driver for Cash-Karp step
+			//! Driver for Runge-Kutta-Cash-Karp step
 			template <typename T>
 			struct drvck
 			{
