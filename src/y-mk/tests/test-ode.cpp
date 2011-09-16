@@ -1,7 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/ode/rkck.hpp"
-#include "yocto/math/ode/rk45.hpp"
-#include "yocto/math/ode/solver.hpp"
+#include "yocto/math/ode/drvck.hpp"
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -19,7 +17,7 @@ namespace {
 	class dummy 
 	{
 	public:
-		explicit dummy()
+		explicit dummy() : lam(0.1), w(1)
 		{
 		}
 		
@@ -27,10 +25,20 @@ namespace {
 		{
 		}
 		
+		T lam;
+		T w;
+		
 		void eval1( array<T> &dydx, T , const array<T> &y )
 		{
-			dydx[1] = -y[1];
+			dydx[1] = -lam*y[1];
 		}
+		
+		void eval2( array<T> &dydx, T , const array<T> &y )
+		{
+			dydx[1] = y[2];
+			dydx[2] = -(w*w) * y[1];
+		}
+		
 		
 		
 	private:
@@ -44,31 +52,50 @@ static inline
 void perform_ode( )
 {
 	dummy<T>                     dum;
-	ode::rkck<T>                 step;
-	ode::rk45<T>                 ctrl;
-	typename ode::field<T>::type drvs( &dum, & dummy<T>::eval1 );
-	ode::solver<T>               dsolve;
+	typename ode::drvck<T>::type odeint;
 	
-	const size_t nv = 1;
-	step.prepare( nv );
-	ctrl.prepare( nv );
-	dsolve.prepare( nv );
-	vector<T> y( nv, 0 );
-		
-	y[1] = 1;
-	T h  = 0.1;
-	T x  = 0;
-	T dx = 0.2;
+	typename ode::field<T>::type drvs1( &dum, & dummy<T>::eval1 );
+	typename ode::field<T>::type drvs2( &dum, & dummy<T>::eval2 );
 	
-	ios::ocstream fp( "exp.txt", false );
-	for( ; x <= 5; x += 0.2 )
 	{
+		const size_t nv = 1;
+		odeint.start( nv );
+		vector<T> y( nv, 0 );
+		
+		y[1] = 1;
+		T h  = 0.1;
+		T x  = 0;
+		T dx = 0.2;
+		
+		ios::ocstream fp( "exp.txt", false );
+		for( ; x <= 50; x += 0.2 )
+		{
+			fp("%g %g\n", x, y[1] );
+			odeint( drvs1, y, x, x+dx, h );
+		}
 		fp("%g %g\n", x, y[1] );
-		dsolve( drvs, ctrl, step, y, x, x+dx, h, 0, 1e-7 );
 	}
-	fp("%g %g\n", x, y[1] );
-
 	
+	{
+		const size_t nv = 2;
+		odeint.start( nv );
+		vector<T> y( nv, 0 );
+		
+		y[1] = 1;
+		y[2] = 0;
+		T h  = 0.1;
+		T x  = 0;
+		T dx = 0.2;
+		
+		ios::ocstream fp( "cos.txt", false );
+		for( ; x <= 50; x += 0.2 )
+		{
+			fp("%g %g\n", x, y[1] );
+			odeint( drvs2, y, x, x+dx, h );
+		}
+		fp("%g %g\n", x, y[1] );
+	}
+		
 }
 
 
