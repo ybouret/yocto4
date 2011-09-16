@@ -3,19 +3,26 @@
 
 #include "yocto/functor.hpp"
 #include "yocto/sequence/array.hpp"
+#include "yocto/memory/global.hpp"
 
 namespace yocto
 {
 	
 	namespace math
 	{
-	
-		template <typename T> ode
+		
+		namespace ode
 		{
-			//! field( dydx[], x, y[] )
-			typedef functor<void,TL3(array<T>&,T,const array<T>&)> field;
+			typedef memory::global memory_type;
 			
-		};
+			template <typename T> struct field
+			{
+				//! field( dydx[], x, y[] )
+				typedef functor<void,TL3(array<T>&,T,const array<T>&)> type;
+				
+			};
+			
+		}
 		
 	}
 	
