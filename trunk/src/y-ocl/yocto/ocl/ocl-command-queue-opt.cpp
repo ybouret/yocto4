@@ -20,7 +20,7 @@ namespace yocto
 			
 			if( local_work_size )
 			{
-				YOCTO_OPENCL;
+				YOCTO_OpenCL;
 				const Device &D = OpenCL[ DEVICE ];
 				if( work_dim > D.MAX_WORK_ITEM_DIMENSIONS )
 					throw Exception( CL_INVALID_VALUE, "%s(work_dim=%u)", fn, work_dim);

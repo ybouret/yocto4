@@ -9,6 +9,7 @@ namespace yocto
 	namespace ocl
 	{
 		
+		//! OpenCL buffer
 		class Buffer : public MemObject
 		{
 		public:

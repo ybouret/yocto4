@@ -23,7 +23,7 @@ static const char ocl_add_epilog[] =
 YOCTO_UNIT_TEST_IMPL(kernel)
 {
 	
-	YOCTO_OPENCL;
+	YOCTO_OpenCL;
 	const ocl::Platform &platform = OpenCL.Platforms[0];
 	ocl::Context         context( platform.devices );
 	ocl::Sources         sources;

@@ -7,7 +7,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(buffer)
 {
 	
-	YOCTO_OPENCL;
+	YOCTO_OpenCL;
 	const ocl::Platform &P = OpenCL.Platforms[0];
 	ocl::DeviceIDs       devices( P.devices );
 	ocl::Context         context( devices );

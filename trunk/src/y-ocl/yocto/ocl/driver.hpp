@@ -52,7 +52,7 @@ namespace yocto
 			
 		};
 		
-#define YOCTO_OPENCL ocl::Driver & OpenCL = ocl::Driver::instance()
+#define YOCTO_OpenCL ocl::Driver & OpenCL = ocl::Driver::instance()
 		
 	}
 }

@@ -9,7 +9,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(platform)
 {
-	YOCTO_OPENCL;
+	YOCTO_OpenCL;
 	
 	std::cerr << "OpenCL.num_platforms=" << OpenCL.num_platforms << std::endl;
 	for( cl_uint p = 0; p < OpenCL.num_platforms; ++p )
