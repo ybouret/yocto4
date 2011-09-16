@@ -19,7 +19,7 @@ static inline void display_fmt( const ocl::ImageFormats &fmt, const char *msg )
 YOCTO_UNIT_TEST_IMPL(images)
 {
 	
-	YOCTO_OPENCL;
+	YOCTO_OpenCL;
 	const ocl::Platform &platform = OpenCL.Platforms[0];
 	ocl::Context         context( platform.devices );
 	

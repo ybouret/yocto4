@@ -8,7 +8,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(context)
 {
 	std::cerr << "-- Loading OpenCL" << std::endl;
-	YOCTO_OPENCL;
+	YOCTO_OpenCL;
 	const ocl::Platform &platform  = OpenCL.Platforms[0];
 	std::cerr << "-- Using platform '" <<  platform.NAME << "'" << std::endl;
 
