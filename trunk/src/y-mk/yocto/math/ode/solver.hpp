@@ -24,9 +24,9 @@ namespace yocto
 								control<T> &ctrl,
 								step<T>    &forward,
 								array<T>   &ystart,
-								const T   x1,
-								const T   x2,
-								T        &h1
+								const T     x1,
+								const T     x2,
+								T          &h1
 								);
 				
 				T hmin; //!< initial=0
