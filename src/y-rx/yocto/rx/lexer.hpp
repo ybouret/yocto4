@@ -19,12 +19,33 @@ namespace yocto
 			lexeme       *prev;
 			const string &label;
 			
-			explicit lexeme( const token &tk, const string &id ) throw();
-			virtual ~lexeme() throw();
+			//! steal token
+			static lexeme *create( token &, const string &id );
+			
+			//! destroy with caching
+			static void    destroy( lexeme *lx, source &src ) throw();
+			
+			//! destroy without caching
+			static void    destroy( lexeme *lx ) throw();
 			
 		private:
+			explicit lexeme( token &tk, const string &id ) throw();
+			virtual ~lexeme() throw();
+
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lexeme);
 		};
+		
+		class lexemes : public core::list_of<lexeme>
+		{
+		public:
+			explicit lexemes() throw();
+			virtual ~lexemes() throw();
+			void     to( source & ) throw();
+			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(lexemes);
+		};
+		
 		
 		class lexer
 		{
