@@ -133,7 +133,8 @@ namespace yocto
 				reset();
 			}
 			
-			inline void delete_with( void (*proc)( NODE *args ), void *args ) throw()
+			template <typename ARGS>
+			inline void delete_with( void (*proc)( NODE *, ARGS args ), ARGS args ) throw()
 			{
 				assert(proc);
 				NODE *node = tail;

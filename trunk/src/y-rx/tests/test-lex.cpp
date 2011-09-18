@@ -1,5 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/rx/lexer.hpp"
+#include "yocto/rx/source.hpp"
+#include "yocto/ios/icstream.hpp"
 
 using namespace yocto;
 
@@ -13,6 +15,24 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	regex::lexer L;
 	L( "[:digit:]+", "Digit" );
 	L( "[:blank:]+", "WS"    );
+	L( "[:word:]+",  "Word"  );
+	L( "[:endl:]",   "ENDL"  );
+	
+	regex::source src;
+	ios::icstream inp( ios::cstdin );
+	
+	src.connect( inp );
+	regex::lexemes lxs;
+	for(;;)
+	{
+		regex::lexeme *lx = L( src );
+		if( !lx ) break;
+		lxs.push_back( lx );
+		std::cerr << "<" << *lx << "> @" << lx->label << std::endl;
+	}
+	
+	lxs.to(src);
+	
 	
 	
 }
