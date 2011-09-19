@@ -1,26 +1,62 @@
+########################################################################
+## Top level CMakeLists.txt for all projects
+########################################################################
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(yocto4)
+
+########################################################################
+# Main rules and helpes
+########################################################################
 INCLUDE(share/rules.cmake)
 
 SET(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/../sdk)
 
+########################################################################
+# mandatory project
+########################################################################
 ADD_SUBDIRECTORY(y-main)
-ADD_SUBDIRECTORY(y-thr)
-ADD_SUBDIRECTORY(y-rx)
-ADD_SUBDIRECTORY(y-fs)
-ADD_SUBDIRECTORY(y-kr)
-ADD_SUBDIRECTORY(y-net)
-ADD_SUBDIRECTORY(y-mpk)
-ADD_SUBDIRECTORY(y-mk)
-ADD_SUBDIRECTORY(y-random)
-ADD_SUBDIRECTORY(y-fft)
-ADD_SUBDIRECTORY(y-spade)
-ADD_SUBDIRECTORY(y-lua)
-ADD_SUBDIRECTORY(y-lua++)
-ADD_SUBDIRECTORY(y-z)
-ADD_SUBDIRECTORY(y-z++)
-ADD_SUBDIRECTORY(y-mpi)
-ADD_SUBDIRECTORY(y-ocl)
+
+########################################################################
+# Read projects to exclude
+########################################################################
+STRING( REGEX REPLACE "[ \t]+" ";" YOCTO_EXCLUDE "$ENV{YOCTO_EXCLUDE}")
+MESSAGE( STATUS "YOCTO_EXCLUDE=${YOCTO_EXCLUDE}")
+
+MACRO(YOCTO_IGNORE dir)
+  SET(no_${dir} ON)
+ENDMACRO(YOCTO_IGNORE)
+
+FOREACH(prj ${YOCTO_EXCLUDE})
+  YOCTO_IGNORE(${prj})
+ENDFOREACH()
+
+MACRO(YOCTO_BUILD dir)
+  IF( no_${dir} )
+    MESSAGE( STATUS "NOT BUILDING y-${dir}" )
+  ELSE()
+    ADD_SUBDIRECTORY(y-${dir})
+  ENDIF()
+ENDMACRO(YOCTO_BUILD)
+
+########################################################################
+# Record projects
+########################################################################
+YOCTO_BUILD(thr)
+YOCTO_BUILD(rx)
+YOCTO_BUILD(fs)
+YOCTO_BUILD(kr)
+YOCTO_BUILD(net)
+YOCTO_BUILD(mpk)
+YOCTO_BUILD(mk)
+YOCTO_BUILD(random)
+YOCTO_BUILD(fft)
+YOCTO_BUILD(spade)
+YOCTO_BUILD(lua)
+YOCTO_BUILD(lua++)
+YOCTO_BUILD(z)
+YOCTO_BUILD(z++)
+YOCTO_BUILD(mpi)
+YOCTO_BUILD(ocl)
 
 INSTALL( FILES share/rules.cmake share/fltk.cmake share/opencl.cmake DESTINATION share/yocto )
 
