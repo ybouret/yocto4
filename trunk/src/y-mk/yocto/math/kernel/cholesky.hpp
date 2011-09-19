@@ -21,17 +21,10 @@ namespace yocto
 			static bool apply( matrix<T> &a, array<T> &diag ) throw();
 			
 			//! after cholesky::apply(a,diag), b[1..n] and x[1..n], may be the same
-			static void solve( const matrix<T> &a, const array<T> &diag, const T *b, T *x ) throw(); 
+			static void solve( const matrix<T> &a, const array<T> &diag, const array<T> &b, array<T> &x ) throw(); 
 		};
 		
-		template <typename T, typename BVEC, typename XVEC>
-		inline void cholesky_solve( const matrix<T> &a, const array<T> &diag, const BVEC &b, XVEC &x ) throw()
-		{
-			assert( b.size() == x.size() );
-			assert( a.rows   == b.size() );
-			assert( diag.size() == a.rows );
-			cholesky<T>:: solve( a, diag, b(-1), x(-1) );
-		}
+		
 		
 	}
 	
