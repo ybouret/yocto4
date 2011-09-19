@@ -54,6 +54,14 @@ namespace yocto
 			}
 			cache_.to( src );
 		}
+		
+		void lexer:: unget( lexeme *lx ) throw()
+		{
+			assert( NULL != lx );
+			assert( NULL == lx->next );
+			assert( NULL == lx->prev );
+			cache_.push_front( lx );
+		}
 				
 	}
 }
