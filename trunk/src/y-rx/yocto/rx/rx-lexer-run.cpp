@@ -6,8 +6,9 @@ namespace yocto
 	namespace regex
 	{
 		
+	
 				
-		lexeme * lexer::operator()( source &src )
+		lexeme  *lexer:: consume( source &src )
 		{
 			//------------------------------------------------------------------
 			// find a matching rule
@@ -66,6 +67,19 @@ namespace yocto
 				src.skip(nx);
 				return lx;
 			}
+		}
+		
+		lexeme * lexer:: get( source &src )
+		{
+			if( cache_.size > 0 )
+			{
+				return cache_.pop_front();
+			}
+			else
+			{
+				return consume( src );
+			}
+
 		}
 		
 	}

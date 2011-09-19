@@ -25,13 +25,18 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	regex::lexemes lxs;
 	for(;;)
 	{
-		regex::lexeme *lx = L( src );
+		regex::lexeme *lx = L.get( src );
 		if( !lx ) break;
 		lxs.push_back( lx );
 		std::cerr << "<" << *lx << "> @" << lx->label << std::endl;
 	}
 	
 	lxs.to(src);
+	if( src.peek() )
+		std::cerr << "Unknown char '" << src.peek()->data << "'" << std::endl;
+	else {
+		std::cerr << "EOS" << std::endl;
+	}
 	
 	
 	
