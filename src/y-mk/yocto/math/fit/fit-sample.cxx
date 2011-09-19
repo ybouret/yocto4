@@ -16,7 +16,8 @@ namespace yocto
 			sample<real_t>:: sample( const array<real_t> &ax, const array<real_t> &ay, array<real_t> &az) throw() :
 			x(ax),
 			y(ay),
-			z(az)
+			z(az),
+			D(-1)
 			{}
 			
 			

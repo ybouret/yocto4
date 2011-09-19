@@ -38,13 +38,13 @@ namespace yocto
 		}
 		
 		template <>
-		void cholesky<real_t>:: solve( const matrix<real_t> &a, const array<real_t> &diag, const real_t *b, real_t *x ) throw()
+		void cholesky<real_t>:: solve( const matrix<real_t> &a, const array<real_t> &diag, const array<real_t> &b, array<real_t> &x ) throw()
 		{
 			assert( a.rows == diag.size() );
 			assert( a.is_square() );
 			const size_t n = a.rows;
-			assert( !(b==NULL && n>0 ) );
-			assert( !(x==NULL && n>0 ) );
+			assert( b.size() == n );
+			assert( x.size() == n );
 			
 			for( size_t i=1; i <=n; ++i )
 			{

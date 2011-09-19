@@ -14,5 +14,6 @@ ADD_TEST(Drvs   test-mk drvs)
 ADD_TEST(Zero   test-mk zero)
 ADD_TEST(Optim  test-mk opt)
 ADD_TEST(ODE    test-mk ode)
+ADD_TEST(LSF    test-mk lsf)
 
 ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )

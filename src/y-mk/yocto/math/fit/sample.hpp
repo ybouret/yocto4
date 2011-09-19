@@ -22,7 +22,7 @@ namespace yocto
 				const array<T> &x;
 				const array<T> &y;
 				array<T>       &z;
-				
+				T               D;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
