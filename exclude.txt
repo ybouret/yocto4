@@ -1,0 +1,1 @@
+YOCTO_EXCLUDE="fs kr lua lua++ ocl mpi z z++ random spade fft mpk mk net thr rx"

@@ -6,51 +6,13 @@ namespace yocto
 	namespace regex
 	{
 		
-		lexeme:: lexeme( token &tk, const string &id ) throw() :
-		token(),
-		next(NULL),
-		prev(NULL),
-		label( id )
-		{
-			swap_with( tk );
-		}
-		
-		lexeme:: ~lexeme() throw()
-		{
-			
-		}
-		
-		lexeme * lexeme:: create( token &tk, const string &id )
-		{
-			return new lexeme( tk, id );
-		}
-		
-		void     lexeme:: destroy( lexeme *lx, source &src ) throw()
-		{
-			lx->back_to( src.pool );
-			delete lx;
-		}
-		
-		void     lexeme:: destroy( lexeme *lx ) throw()
-		{
-			delete lx;
-		}
-		
-		lexemes:: lexemes() throw() {}
-		lexemes:: ~lexemes() throw() { delete_with( lexeme::destroy ); }
-		
-		void lexemes:: to( source &src ) throw()
-		{
-			delete_with<source &>( lexeme::destroy, src );
-		}
-		
-		
+				
 		lexeme * lexer::operator()( source &src )
 		{
 			//------------------------------------------------------------------
 			// find a matching rule
 			//------------------------------------------------------------------
-			lexical::rule *r = rules.head;
+			lexical::rule *r = rules_.head;
 			for( ; r; r = r->next )
 			{
 				if( r->motif->accept(src) )
@@ -97,7 +59,7 @@ namespace yocto
 				}
 				
 				
-				lexeme      *lx = lexeme::create( *(best->motif), best->label );	
+				lexeme      *lx = lexeme::create( *best );	
 				assert( 0 == best->motif->size );
 				const size_t nx = lx->size;
 				assert( src.in_cache() >= nx );

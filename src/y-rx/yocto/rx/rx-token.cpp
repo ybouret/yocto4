@@ -130,7 +130,9 @@ namespace yocto
 		{
 			for( const t_char *ch = tkn.head; ch; ch=ch->next)
 			{
-				os << ch->data;
+				char C = ch->data;
+				if( C < 32 || C >= 127 ) C = '.';
+				os << C;
 			}
 			return os;
 		}

@@ -10,11 +10,12 @@ namespace yocto
 		
 		lexer:: ~lexer() throw()
 		{
-			rules.delete_with( lexical::rule::destroy );
+			rules_.delete_with( lexical::rule::destroy );
 		}
 		
 		lexer:: lexer() throw() :
-		rules()
+		rules_(),
+		cache_()
 		{
 		}
 		
@@ -23,7 +24,7 @@ namespace yocto
 		{
 			assert( motif );
 
-			for( const lexical::rule *r = rules.tail; r; r=r->prev )
+			for( const lexical::rule *r = rules_.tail; r; r=r->prev )
 			{
 				if( r->label == label )
 				{
@@ -32,7 +33,7 @@ namespace yocto
 				}
 			}
 			
-			rules.push_back(  lexical::rule::create( motif, label ) );
+			rules_.push_back(  lexical::rule::create( motif, label ) );
 
 		}
 
@@ -47,10 +48,11 @@ namespace yocto
 		
 		void lexer:: reset( source &src ) throw()
 		{
-			for( lexical::rule *r = rules.tail; r; r=r->prev)
+			for( lexical::rule *r = rules_.tail; r; r=r->prev)
 			{
 				r->motif->sendto( src );
 			}
+			cache_.to( src );
 		}
 				
 	}
