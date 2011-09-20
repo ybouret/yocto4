@@ -24,7 +24,8 @@ namespace yocto
 				void operator()(sample<T>          &s,
 								field              &f,
 								array<T>           &aorg,
-								const array<bool>  &used);
+								const array<bool>  &used,
+								T                   ftol);
 				
 				explicit lsf();
 				virtual ~lsf() throw();
@@ -33,6 +34,11 @@ namespace yocto
 			private:
 				typedef lw_arrays<T,memory::global> arrays;
 				typedef lw_array<T> array_t;
+				typedef typename numeric<T>::function function_t;
+				
+				sample<T>         *samp_;
+				field             *func_;
+				const array<bool> *used_;
 				size_t             nvar_;
 				size_t             ndat_;
 				arrays             harr_;
@@ -40,10 +46,19 @@ namespace yocto
 				array_t           &beta_;
 				array_t           &aorg_;
 				array_t           &atry_;
+				array_t           &step_;
 				matrix<T>          alpha_;
-				derivative<T>      drvs_; //!< to compute gradient
-				void       gradient( field &func, T xi, array<T> &a, const array<bool> &used );
-				void       initialize( sample<T> &s, field &f, const array<bool> &used);
+				matrix<T>          curv_;
+				T                  xi_;    //!< to compute gradient
+				size_t             iA_;    //!< to compute gradient
+				derivative<T>      drvs_;  //!< to compute gradient
+				function_t         grad_;  //!< gradient function wrapper
+				function_t         eval_;  //!< least square wrapper
+				
+				T          grad_fn(T );
+				void       gradient(  T xi );
+				T          initialize();   //!< compute beta, alpha and sample.z, return intial D
+				T          eval_fn(T);
 				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(lsf);
 			};
