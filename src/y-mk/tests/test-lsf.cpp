@@ -13,7 +13,7 @@ using namespace math;
 
 namespace
 {
-
+	
 	template <typename T>
 	class Poly 
 	{
@@ -41,7 +41,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(lsf)
 {
 	
-	const size_t N = 10 + alea_less_than(91);
+	const size_t N = 10 + alea_less_than(291);
 	vector<double> X( N, 0 );
 	vector<double> Y( N, 0 );
 	vector<double> Z( N, 0 );
@@ -67,13 +67,23 @@ YOCTO_UNIT_TEST_IMPL(lsf)
 	fit::lsf<double>::field F( &P, & Poly<double>::Eval );
 	fit::lsf<double>        LeastSquare;
 	
-	for( size_t nv = 1; nv <= 4; ++nv )
+	for( size_t nv = 1; nv <= 5; ++nv )
 	{
+		std::cerr << "-- nvar=" << nv << std::endl;
 		vector<double> aorg(nv,0);
 		vector<bool>   used(nv,true);
-		if( nv > 2 ) used[ 1 + alea_less_than(nv)] = false;
-		LeastSquare( S, F, aorg, used );
+		if( nv > 2 && alea<double>() > 0.7 ) 
+			used[ 1 + alea_less_than(nv)] = false;
 		
+		LeastSquare( S, F, aorg, used, 1e-7);
+		{
+			
+			ios::ocstream fp( vformat("lsf%u.txt", unsigned(nv)), false );
+			for( size_t i=1; i <= N; ++i )
+			{
+				fp("%g %g %g\n", X[i], Y[i], Z[i] );
+			}
+		}
 	}
 	
 	

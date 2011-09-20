@@ -24,6 +24,7 @@ namespace yocto {
 			
 			
 			static const real_t fmax = numeric<real_t>::sqrteps; //!< numeric constraint
+			static const real_t dmax = numeric<real_t>::minimum; //!< numeric constraint
 			static const real_t R    = REAL(0.618034);
 			static const real_t C    = REAL(1.0)-R;
 			
@@ -48,11 +49,8 @@ namespace yocto {
 				f1 = func( x1 );
 			}
 			
-			while(Fabs( x3 - x0 ) > xtol * ( Fabs(x1) + Fabs(x2) )  /*&&
-				  Fabs( f3 - f0 ) > ftol * ( Fabs(f1) + Fabs(f2) ) */
-				  )
+			while(Fabs( x3 - x0 ) > max_of<real_t>(xtol * ( Fabs(x1) + Fabs(x2) ), dmax) )
 			{
-				
 				
 				if( f2 < f1 )
 				{
@@ -64,6 +62,8 @@ namespace yocto {
 					SHIFT3(x3,x2,x1,R*x2+C*x0);
 					SHIFT3(f3,f2,f1,func(x1));
 				}
+				std::cerr << "x=[ " << x0 << " " << x1 << " " << x2 << " " << x3 << " ]" << std::endl;
+				std::cerr << "del=" << Fabs( x3 - x0 ) << " | brk=" << xtol * ( Fabs(x1) + Fabs(x2) ) << std::endl;
 			}
 			
 			//std::cerr << "x=[ " << x0 << " " << x1 << " " << x2 << " " << x3 << " ]" << std::endl;
