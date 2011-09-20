@@ -12,11 +12,12 @@ namespace yocto
 		namespace fit
 		{
 			
-			enum fit_result
+			
+			enum result_type
 			{
-				fit_success,  //!< everything OK
-				fit_failure,  //!< singular point
-				fit_spurious  //!< not singular but no decrease
+				success,  //!< everything OK
+				failure,  //!< singular point
+				spurious  //!< not singular but no decrease
 			};
 			
 			template <typename T>
@@ -30,7 +31,7 @@ namespace yocto
 				const array<T> &y;
 				array<T>       &z;
 				T               D;
-				fit_result      status;
+				result_type     status;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
