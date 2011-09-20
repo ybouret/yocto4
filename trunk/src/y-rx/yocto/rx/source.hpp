@@ -26,6 +26,7 @@ namespace yocto
 			void    unget( token &  ) throw();
 			void    uncpy( const token & );
 			const t_char *peek(); //! try to fill cache and return cache head.
+			inline  bool is_active() { return NULL != peek(); }
 			
 			void   prefetch(size_t n);
 			size_t in_cache() const throw();
