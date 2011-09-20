@@ -37,23 +37,6 @@ namespace yocto
 				}
 			}
 			
-			template <>
-			real_t lsf<real_t>::eval_fn( real_t u )
-			{
-				for( size_t i=nvar_;i>0;--i)
-				{
-					atry_[i] = aorg_[i] + u * step_[i];
-				}
-				real_t ans = 0;
-				for( size_t i=ndat_;i>0;--i)
-				{
-					const real_t xi = samp_->x[i];
-					const real_t yi = samp_->y[i];
-					const real_t dy = yi - (*func_)( xi, atry_ );
-					ans += dy * dy;
-				}
-				return ans;
-			}
 			
 			template <>
 			lsf<real_t>:: lsf() :
@@ -73,8 +56,7 @@ namespace yocto
 			xi_(0),
 			iA_(0),
 			drvs_(),
-			grad_( this, & lsf<real_t>::grad_fn ),
-			eval_( this, & lsf<real_t>::eval_fn )
+			grad_( this, & lsf<real_t>::grad_fn )
 			{
 			}
 			
@@ -222,7 +204,7 @@ namespace yocto
 					// initial curvature and beta @aorg_
 					//----------------------------------------------------------
 					Dold=initialize();
-					std::cerr << "Dold=" << Dold << std::endl;
+					//std::cerr << "Dold=" << Dold << std::endl;
 					
 					//----------------------------------------------------------
 					//-- are we done ?
@@ -241,11 +223,13 @@ namespace yocto
 							}
 							curv_.ld1();
 							lss( alpha_, curv_ );
-							std::cerr << "covar=" << curv_ << std::endl;
 							const real_t residue = Dold/df;
 							for( size_t i=nvar_;i>0;--i)
 							{
-								aerr[i] = Sqrt( residue * max_of<real_t>( 0, curv_[i][i] ) );
+								if( used[i] )
+									aerr[i] = Sqrt( residue *  curv_[i][i] );
+								else 
+									aerr[i] = 0;
 							}
 						}
 						else 
@@ -291,13 +275,28 @@ namespace yocto
 					//----------------------------------------------------------
 					lss( curv_, step_ );
 					
-					std::cerr << "aorg="  << aorg_   << std::endl;
-					std::cerr << "lam="   << lam    << std::endl;
 					//----------------------------------------------------------
 					// take the full step
 					//----------------------------------------------------------
-					real_t Dnew = eval_( 1 ); //-- update atry_
-					std::cerr << "Dnew=" << Dnew << std::endl;
+					for( size_t i=nvar_;i>0;--i)
+					{
+						atry_[i] = aorg_[i] + step_[i];
+					}
+					
+					//----------------------------------------------------------
+					// where are we now ?
+					//----------------------------------------------------------
+					real_t Dnew = 0;
+					for( size_t i=ndat_;i>0;--i)
+					{
+						const real_t dy = s.y[i] - f( s.x[i], atry_ );
+						Dnew += dy * dy;
+					}
+					//std::cerr << "Dnew=" << Dnew << std::endl;
+					
+					//----------------------------------------------------------
+					// check
+					//----------------------------------------------------------
 					if( Dnew > Dold )
 					{
 						lam *= LAMBDA_INC;
@@ -326,7 +325,7 @@ namespace yocto
 					for( size_t i=nvar_;i>0;--i)
 					{
 						const real_t tol =  ftol * ( Fabs( atry_[i] ) + Fabs( aorg_[i] ) );
-						if( Fabs(aorg_[i]-atry_[i]) > tol )
+						if( Fabs(step_[i]) > tol )
 							converged = false;
 						aorg[i] = aorg_[i] = atry_[i];
 					}

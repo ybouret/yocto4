@@ -54,12 +54,10 @@ namespace yocto
 				size_t             iA_;    //!< to compute gradient
 				derivative<T>      drvs_;  //!< to compute gradient
 				function_t         grad_;  //!< gradient function wrapper
-				function_t         eval_;  //!< least square wrapper
 				
 				T          grad_fn(T );
 				void       gradient(  T xi );
 				T          initialize();   //!< compute beta, alpha and sample.z, return intial D
-				T          eval_fn(T);
 				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(lsf);
 			};
