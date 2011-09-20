@@ -18,7 +18,7 @@ namespace yocto
 			y(ay),
 			z(az),
 			D(-1),
-			status( fit_failure )
+			status( fit::failure )
 			{}
 			
 			

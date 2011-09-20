@@ -236,7 +236,7 @@ namespace yocto
 							if( ! lss.LU( alpha_ ) )
 							{
 								std::cerr << "[LeastSquareFit.Singular2]" << std::endl;
-								s.status = fit_failure;
+								s.status = failure;
 								return;
 							}
 							curv_.ld1();
@@ -253,7 +253,7 @@ namespace yocto
 							for( size_t i=1; i <= nvar_; ++i ) aerr[i] = 0;
 						}
 						
-						s.status = fit_success;
+						s.status = success;
 						return;
 					}
 				RESTART:
@@ -279,7 +279,7 @@ namespace yocto
 							{
 								//-- singular point...
 								std::cerr << "[LeastSquareFit.Singular]" << std::endl;
-								s.status = fit_failure;
+								s.status = fit::failure;
 								return;
 							}
 							goto RESTART;
@@ -304,7 +304,7 @@ namespace yocto
 						if( lam > LAMBDA_MAX )
 						{
 							std::cerr << "[LeastSquareFit.Spurious]" << std::endl;
-							s.status = fit_spurious;
+							s.status = fit::spurious;
 							return;
 						}
 						goto RESTART;

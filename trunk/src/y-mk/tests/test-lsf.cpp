@@ -79,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(lsf)
 		
 		LeastSquare( S, F, aorg, used, aerr, 1e-7);
 		
-		if( S.status == fit::fit_success )
+		if( S.status == fit::success )
 		{
 			for( size_t i=1; i <= nv; ++i )
 			{
