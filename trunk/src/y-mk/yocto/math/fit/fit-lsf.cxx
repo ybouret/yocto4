@@ -1,7 +1,7 @@
 #include "yocto/math/fit/lsf.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/kernel/linsys.hpp"
-
+#include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
@@ -62,7 +62,7 @@ namespace yocto
 			used_(NULL),
 			nvar_( 0 ),
 			ndat_( 0 ),
-			harr_( 10 ),
+			harr_( 5 ),
 			dFda_( harr_.next_array() ),
 			beta_( harr_.next_array() ),
 			aorg_( harr_.next_array() ),
@@ -159,6 +159,7 @@ namespace yocto
 										 field              &f,
 										 array<real_t>      &aorg,
 										 const array<bool>  &used,
+										 array<real_t>      &aerr,
 										 real_t              ftol)
 			{
 				static const real_t LAMBDA_EXP = Floor( -Log10( numeric<real_t>::epsilon ) );
@@ -191,6 +192,7 @@ namespace yocto
 				// sanity check
 				//--------------------------------------------------------------
 				assert( used.size() == nvar_ );
+				assert( aerr.size() == nvar_ );
 				assert( s.x.size()  == s.y.size() );
 				assert( s.x.size()  == s.z.size() );
 				
@@ -206,8 +208,10 @@ namespace yocto
 				// global init
 				//--------------------------------------------------------------
 				for( size_t i=nvar_; i>0; --i ) 
+				{
 					aorg_[i] = aorg[i];
-				
+					aerr[i]  = -1;
+				}
 				real_t lam        = LAMBDA_INI;
 				real_t &Dold      = s.D;
 				bool    converged = false;
@@ -219,7 +223,10 @@ namespace yocto
 					//----------------------------------------------------------
 					Dold=initialize();
 					std::cerr << "Dold=" << Dold << std::endl;
+					
+					//----------------------------------------------------------
 					//-- are we done ?
+					//----------------------------------------------------------
 					if( converged )
 					{
 						std::cerr << "[LeastSquareFit.Converged]" << std::endl;
@@ -235,10 +242,15 @@ namespace yocto
 							curv_.ld1();
 							lss( alpha_, curv_ );
 							std::cerr << "covar=" << curv_ << std::endl;
+							const real_t residue = Dold/df;
+							for( size_t i=nvar_;i>0;--i)
+							{
+								aerr[i] = Sqrt( residue * max_of<real_t>( 0, curv_[i][i] ) );
+							}
 						}
 						else 
 						{
-							
+							for( size_t i=1; i <= nvar_; ++i ) aerr[i] = 0;
 						}
 						
 						s.status = fit_success;
