@@ -25,6 +25,7 @@ namespace yocto
 								field              &f,
 								array<T>           &aorg,
 								const array<bool>  &used,
+								array<T>           &aerr,
 								T                   ftol);
 				
 				explicit lsf();

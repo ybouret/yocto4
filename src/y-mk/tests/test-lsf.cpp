@@ -72,12 +72,19 @@ YOCTO_UNIT_TEST_IMPL(lsf)
 		std::cerr << "-- nvar=" << nv << std::endl;
 		vector<double> aorg(nv,0);
 		vector<bool>   used(nv,true);
+		vector<double> aerr(nv,0);
+		
 		if( nv > 2 && alea<double>() > 0.7 ) 
 			used[ 1 + alea_less_than(nv)] = false;
 		
-		LeastSquare( S, F, aorg, used, 1e-7);
+		LeastSquare( S, F, aorg, used, aerr, 1e-7);
+		
+		if( S.status == fit::fit_success )
 		{
-			
+			for( size_t i=1; i <= nv; ++i )
+			{
+				std::cerr << "a[" << i << "]=" << aorg[i] << " +/- " << aerr[i] << std::endl;
+			}
 			ios::ocstream fp( vformat("lsf%u.txt", unsigned(nv)), false );
 			for( size_t i=1; i <= N; ++i )
 			{
