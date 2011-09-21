@@ -8,14 +8,11 @@ namespace yocto
 		namespace syntactic
 		{
 
-			rule:: ~rule() throw()
-			{
-			}
+			rule:: ~rule() throw() {}
 			
-			rule:: rule() throw()
-			{
-			}
+			rule:: rule( const string &id ) : name( id ) {}
 			
+			rule:: rule( const rule &other ) : name( other.name ) {}
 			
 			
 		}
