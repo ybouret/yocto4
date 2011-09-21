@@ -55,6 +55,8 @@ namespace yocto
 			
 			AND:: AND( const AND &op ) : Operator( op )
 			{
+				AND *ptr = this;
+				data     = ptr;
 			}
 			
 			AND:: ~AND() throw()
@@ -113,6 +115,8 @@ namespace yocto
 			
 			OR:: OR( const OR &op ) : Operator( op )
 			{
+				OR *ptr = this;
+				data    = ptr;
 			}
 			
 			OR:: ~OR() throw()
