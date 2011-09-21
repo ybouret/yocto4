@@ -40,6 +40,8 @@ namespace yocto
 			
 			template <>
 			lsf<real_t>:: lsf() :
+			ftol( numeric<real_t>::ftol ),
+			h( 1e-4 ),
 			samp_(NULL),
 			func_(NULL),
 			used_(NULL),
@@ -69,7 +71,7 @@ namespace yocto
 				for( i=nvar_;i>0;--i ) 
 				{
 					if( (*used_)[i] )
-						dFda_[i] = drvs_( grad_, aorg_[i], 1e-4 );				
+						dFda_[i] = drvs_( grad_, aorg_[i], Fabs( h ) );				
 				}
 			}
 			
@@ -142,7 +144,7 @@ namespace yocto
 										 array<real_t>      &aorg,
 										 const array<bool>  &used,
 										 array<real_t>      &aerr,
-										 real_t              ftol)
+										 callback           *cb)
 			{
 				static const real_t LAMBDA_EXP = Floor( -Log10( numeric<real_t>::epsilon ) );
 				static const real_t LAMBDA_MIN = Pow( real_t(10), -LAMBDA_EXP);
@@ -151,10 +153,6 @@ namespace yocto
 				static const real_t LAMBDA_DEC = 0.1;
 				static const real_t LAMBDA_INC = 10;
 				
-				//std::cerr << "LAMBDA_EXP=" << LAMBDA_EXP << std::endl;
-				//std::cerr << "LAMBDA_MIN=" << LAMBDA_MIN << std::endl;
-				//std::cerr << "LAMBDA_MAX=" << LAMBDA_MAX << std::endl;
-				//std::cerr << "LAMBDA_INI=" << LAMBDA_INI << std::endl;
 				
 				ftol = Fabs( ftol );
 				
@@ -198,13 +196,17 @@ namespace yocto
 				real_t &Dold      = s.D;
 				bool    converged = false;
 				
-				while( true )
+				for(;;)
 				{
 					//----------------------------------------------------------
 					// initial curvature and beta @aorg_
 					//----------------------------------------------------------
 					Dold=initialize();
-					//std::cerr << "Dold=" << Dold << std::endl;
+					if( cb && ! (*cb)( s, f, aorg_ ) )
+					{
+						s.status = failure;
+						return;
+					}
 					
 					//----------------------------------------------------------
 					//-- are we done ?

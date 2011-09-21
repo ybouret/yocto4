@@ -27,18 +27,18 @@ void perform()
 					M[i][i] += alea<T>();
 				}
 			}
-			std::cerr << "M=" << M <<  std::endl;
+			//std::cerr << "M=" << M <<  std::endl;
 		}
 		vector<T> d(n,0);
 		if(cholesky<T>::apply( M, d ))
 		{
-			std::cerr << "d=" << d << std::endl;
+			//std::cerr << "d=" << d << std::endl;
 			vector<T> b(n,0);
 			vector<T> x(n,0);
 			for( size_t i=1; i <= n; ++i ) b[i] = T(0.5) - alea<T>();
-			std::cerr << "b=" << b << std::endl;
+			//std::cerr << "b=" << b << std::endl;
 			cholesky<T>::solve( M,d,b,x);
-			std::cerr << "x=" << x << std::endl;
+			//std::cerr << "x=" << x << std::endl;
 		}
 		else {
 			std::cerr << "// FAILURE" << std::endl;
