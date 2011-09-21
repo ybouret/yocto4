@@ -13,15 +13,19 @@ namespace yocto
 			class rule : public object
 			{
 			public:
+				const string name;
 				virtual ~rule() throw();
 				virtual  bool match( lexer & ) = 0;
 				
 			protected:
-				explicit rule() throw();
+				explicit rule( const string &id );
+				rule( const rule & );
 				
 			private:
-				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
+				YOCTO_DISABLE_ASSIGN(rule);
 			};
+			
+			
 		}
 	}
 }
