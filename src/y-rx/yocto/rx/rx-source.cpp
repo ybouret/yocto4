@@ -105,7 +105,8 @@ namespace yocto
 		
 		const t_char  * source:: peek()
 		{
-			if( cache_.size <= 0 && ! cache1() ) return NULL;
+			if( cache_.size <= 0 && ! cache1() )
+				return NULL;
 			return cache_.head;
 		}
 		
