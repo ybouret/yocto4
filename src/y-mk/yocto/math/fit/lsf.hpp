@@ -19,18 +19,20 @@ namespace yocto
 			{
 			public:
 				typedef functor<T,TL2(T,const array<T>)> field;
-				
+				typedef functor<bool,TL3(const sample<T>&,field&,const array<T> &)> callback;
 				
 				void operator()(sample<T>          &s,
 								field              &f,
 								array<T>           &aorg,
 								const array<bool>  &used,
 								array<T>           &aerr,
-								T                   ftol);
+								callback           *cb = NULL);
 				
 				explicit lsf();
 				virtual ~lsf() throw();
 				
+				T ftol; //!< fractional tolerance on parameters     (numeric<T>::ftol)
+				T h;    //!< parameters length scale for derivative (1e-4)
 				
 			private:
 				typedef lw_arrays<T,memory::global> arrays;
@@ -50,8 +52,8 @@ namespace yocto
 				array_t           &step_;
 				matrix<T>          alpha_;
 				matrix<T>          curv_;
-				T                  xi_;    //!< to compute gradient
-				size_t             iA_;    //!< to compute gradient
+				T                  xi_;    //!< to compute gradient @x[i]
+				size_t             iA_;    //!< to compute gradient dF/da[iA]
 				derivative<T>      drvs_;  //!< to compute gradient
 				function_t         grad_;  //!< gradient function wrapper
 				
