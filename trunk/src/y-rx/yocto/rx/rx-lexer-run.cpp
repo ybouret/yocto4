@@ -1,8 +1,6 @@
 #include "yocto/rx/lexer.hpp"
 #include "yocto/rx/source.hpp"
 
-#include <iostream>
-
 namespace yocto
 {
 	namespace regex
@@ -16,14 +14,11 @@ namespace yocto
 			// find a matching rule
 			//------------------------------------------------------------------
 			lexical::rule *r = rules_.head;
-			if( src.is_active() )
+			for( ; r; r = r->next )
 			{
-				for( ; r; r = r->next )
+				if( r->motif->accept(src) )
 				{
-					if( r->motif->accept(src) )
-					{
-						goto FIND_BEST;
-					}
+					goto FIND_BEST;
 				}
 			}
 			return NULL; //-- no match || no source data
@@ -70,7 +65,6 @@ namespace yocto
 				const size_t nx = lx->size;
 				assert( src.in_cache() >= nx );
 				src.skip(nx);
-				std::cerr << "-- found..." << std::endl;
 				return lx;
 			}
 		}
