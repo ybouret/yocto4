@@ -40,7 +40,9 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	}
 	
 	if( src.peek() )
+	{
 		std::cerr << "Unknown char '" << src.peek()->data << "'" << std::endl;
+	}
 	else {
 		std::cerr << "EOS" << std::endl;
 	}

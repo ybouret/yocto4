@@ -1,27 +1,32 @@
 #include "yocto/rx/lexer.hpp"
 #include "yocto/rx/source.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	namespace regex
 	{
 		
-	
-				
+		
+		
 		lexeme  *lexer:: consume( source &src )
 		{
 			//------------------------------------------------------------------
 			// find a matching rule
 			//------------------------------------------------------------------
 			lexical::rule *r = rules_.head;
-			for( ; r; r = r->next )
+			if( src.is_active() )
 			{
-				if( r->motif->accept(src) )
+				for( ; r; r = r->next )
 				{
-					goto FIND_BEST;
+					if( r->motif->accept(src) )
+					{
+						goto FIND_BEST;
+					}
 				}
 			}
-			return NULL; //-- no match !
+			return NULL; //-- no match || no source data
 			
 			//------------------------------------------------------------------
 			// find the best possible rule
@@ -54,7 +59,7 @@ namespace yocto
 							best = r;                    // register new best
 							src.uncpy( *(best->motif) ); //.. and keep on probing
 						}
-
+						
 						
 					}
 				}
@@ -65,6 +70,7 @@ namespace yocto
 				const size_t nx = lx->size;
 				assert( src.in_cache() >= nx );
 				src.skip(nx);
+				std::cerr << "-- found..." << std::endl;
 				return lx;
 			}
 		}
@@ -79,7 +85,7 @@ namespace yocto
 			{
 				return consume( src );
 			}
-
+			
 		}
 		
 	}
