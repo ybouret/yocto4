@@ -33,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	regex::lexemes lxs;
 	for(;;)
 	{
-		regex::lexeme *lx = L.get( src );
+		regex::lexeme *lx = L.lookahead( src );
 		if( !lx ) break;
 		lxs.push_back( lx );
 		std::cerr << "<" << *lx << "> @" << lx->label << std::endl;
@@ -48,7 +48,7 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	}
 	
 	std::cerr << "recognized " << lxs.size << " lexemes" << std::endl;
-	lxs.to(src);
+	lxs.to(src.pool);
 
 	
 	

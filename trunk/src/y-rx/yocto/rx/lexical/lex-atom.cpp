@@ -1,5 +1,4 @@
 #include "yocto/rx/lexical/atom.hpp"
-#include "yocto/rx/source.hpp"
 
 namespace yocto
 {
@@ -34,10 +33,10 @@ namespace yocto
 				delete a;
 			}
 			
-			void atom:: destroy( atom *a, source &src ) throw()
+			void atom:: destroy( atom *a, t_pool &p ) throw()
 			{
 				assert( a );
-				a->back_to( src.pool );
+				a->back_to( p );
 				delete a;
 			}
 			
@@ -46,7 +45,7 @@ namespace yocto
 			atoms:: atoms() throw() {}
 			atoms:: ~atoms() throw() { delete_with( atom::destroy ); }
 			
-			void atoms:: to( source &src ) throw() { delete_with<source&>( atom::destroy, src); }
+			void atoms:: to( t_pool &p ) throw() { delete_with<t_pool&>( atom::destroy, p); }
 			
 			
 		}
