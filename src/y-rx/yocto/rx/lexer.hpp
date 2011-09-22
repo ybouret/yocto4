@@ -45,22 +45,22 @@ namespace yocto
 			//! reset all rules and cache
 			void reset( source &src ) throw();
 			
-			//! find next lexeme in src
+			//! return lexeme to cache
+			void     unget( lexeme *lx ) throw();
+			
+			//! get next lookahead in src
 			/**
 				\return not found => NULL
-				if( src.peek() != NULL ) => unknowm char !
+				if( src.peek() != NULL ) => unknown char !
 			 */
-			lexeme * get( source &src );
-
-			//! return lexeme to cache
-			void     unget( lexeme *lx ) throw(); 
+			lexeme  *lookahead( source &src );
 			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
-			core::list_of<lexical::rule> rules_;
-			lexemes                      cache_;
-			lexeme *consume( source &src ); //!< read next lexeme if possible
+			core::list_of<lexical::rule> rules_; //!< all the possible tokens
+			lexemes                      cache_; //!< lookahead cache
+			lexeme *consume( source &src );      //!< read next lexeme if possible
 				
 		};
 		

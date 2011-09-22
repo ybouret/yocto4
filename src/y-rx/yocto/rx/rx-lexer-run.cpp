@@ -59,17 +59,27 @@ namespace yocto
 					}
 				}
 				
-				
+				//--------------------------------------------------------------
+				// process the best rule
+				//--------------------------------------------------------------
 				lexeme      *lx = lexeme::create( *best );	
 				assert( 0 == best->motif->size );
+				
+				//--------------------------------------------------------------
+				// forward the source
+				//--------------------------------------------------------------
 				const size_t nx = lx->size;
 				assert( src.in_cache() >= nx );
 				src.skip(nx);
+				
+				//--------------------------------------------------------------
+				// all done: TODO best->motif->sendto( src ) ?
+				//--------------------------------------------------------------
 				return lx;
 			}
 		}
 		
-		lexeme * lexer:: get( source &src )
+		lexeme * lexer:: lookahead( source &src )
 		{
 			if( cache_.size > 0 )
 			{
@@ -77,7 +87,7 @@ namespace yocto
 			}
 			else
 			{
-				return consume( src );
+				return consume(src);
 			}
 			
 		}

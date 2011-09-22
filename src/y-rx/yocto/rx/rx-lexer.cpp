@@ -2,6 +2,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/rx/compiler.hpp"
 #include "yocto/auto-ptr.hpp"
+#include "yocto/rx/source.hpp"
 
 namespace yocto
 {
@@ -52,7 +53,7 @@ namespace yocto
 			{
 				r->motif->sendto( src );
 			}
-			cache_.to( src );
+			cache_.to( src.pool );
 		}
 		
 		void lexer:: unget( lexeme *lx ) throw()

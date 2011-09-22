@@ -20,7 +20,7 @@ namespace yocto
 				static atom *create( rule &r );
 				
 				//! destroy with caching
-				static void  destroy( atom *a, source &src ) throw();
+				static void  destroy( atom *a, t_pool & ) throw();
 				
 				//! destroy without caching
 				static void  destroy( atom *a ) throw();
@@ -39,7 +39,7 @@ namespace yocto
 			public:
 				explicit atoms() throw();
 				virtual ~atoms() throw();
-				void     to( source &src ) throw(); //!< return all tokens to source
+				void     to( t_pool &p ) throw();
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(atoms);
