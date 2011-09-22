@@ -18,10 +18,10 @@ namespace yocto
 			class rule 
 			{
 			public:
-				rule               *next;
-				rule               *prev;
-				pattern            *motif;
-				const string        label;
+				rule               *next;  //!< core::list binary layout
+				rule               *prev;  //!< core::list binary layout
+				pattern            *motif; //!< the one and only pattern
+				const string        label; //!< for lexer database
 					
 				//! rule creationg
 				/**

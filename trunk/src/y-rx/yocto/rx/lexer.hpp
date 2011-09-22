@@ -13,6 +13,7 @@ namespace yocto
 		typedef lexical::atom  lexeme;
 		typedef lexical::atoms lexemes;
 		
+		//! lexical analyzer
 		class lexer
 		{
 		public:

@@ -10,12 +10,13 @@ namespace yocto
 		namespace lexical
 		{
 			
+			//! a token with its label
 			class atom : public token
 			{
 			public:
-				atom         *next;
-				atom         *prev;
-				const string &label;
+				atom         *next; //!< for core::list binary layout
+				atom         *prev; //!< for core::list binary layout
+				const string &label; //!< from the lexer database: no duplicate memory
 				
 				static atom *create( rule &r );
 				
