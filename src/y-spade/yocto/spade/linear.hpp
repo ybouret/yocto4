@@ -4,6 +4,8 @@
 #include "yocto/spade/layout.hpp"
 #include "yocto/code/unroll.hpp"
 
+#include <cstring>
+
 namespace yocto
 {
 	
