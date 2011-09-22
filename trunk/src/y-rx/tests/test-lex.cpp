@@ -43,7 +43,8 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	{
 		std::cerr << "Unknown char '" << src.peek()->data << "'" << std::endl;
 	}
-	else {
+	else 
+	{
 		std::cerr << "EOS" << std::endl;
 	}
 	
