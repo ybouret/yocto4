@@ -22,25 +22,26 @@ namespace yocto
 			static t_char  *acquire();
 			static void     release( t_char *ch ) throw();
 			
+			
+			class pool : public core::pool_of<t_char>
+			{
+			public:
+				explicit pool() throw();
+				virtual ~pool() throw();
+				t_char  *create( char c );
+				t_char  *acquire();
+				void     release() throw();
+				void     reserve(size_t n);
+				
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(pool);
+			};
+			
 		private:
 			t_char(); ~t_char() throw();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(t_char);
 		};
 		
-		//! t_char pool
-		class t_pool : public core::pool_of<t_char>
-		{
-		public:
-			explicit t_pool() throw();
-			virtual ~t_pool() throw();
-			t_char  *create( char c );
-			t_char  *acquire();
-			void     release() throw();
-			void     reserve(size_t n);
-			
-		private:
-			YOCTO_DISABLE_COPY_AND_ASSIGN(t_pool);
-		};
 		
 		
 		//! token is a list of t_char
@@ -50,9 +51,9 @@ namespace yocto
 			explicit token() throw();
 			virtual ~token() throw();
 			token( const token & );
-			token( const token &, t_pool &pool );
+			token( const token &, t_char::pool &pool );
 			void release() throw();
-			void back_to( t_pool &pool ) throw(); //!< all t_chars back to pool
+			void back_to( t_char::pool &pool ) throw(); //!< all t_chars back to pool
 			void move_at_head_of( token &other ) throw(); //!< for i/o caching
 			void move_at_tail_of( token &other ) throw(); //!< 'tkncat'
 			string to_string( size_t skip=0, size_t trim=0 ) const;

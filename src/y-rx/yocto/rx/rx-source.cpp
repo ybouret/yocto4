@@ -10,13 +10,13 @@ namespace yocto
 		{
 		}
 		
-		source:: source() throw() : pool(), cache_(), input_(NULL)
+		source:: source() throw() : char_pool(), cache_(), input_(NULL)
 		{
 		}
 		
 		void source:: reset() throw()
 		{
-			cache_.back_to(pool);
+			cache_.back_to(char_pool);
 		}
 		
 		void source:: connect( ios::istream &input ) throw()
@@ -40,7 +40,7 @@ namespace yocto
 			}
 			else 
 			{
-				t_char *ch = pool.acquire();
+				t_char *ch = char_pool.acquire();
 				try 
 				{
 					if( input_->query( ch->data ) )
@@ -50,13 +50,13 @@ namespace yocto
 					}
 					else
 					{
-						pool.store( ch );
+						char_pool.store( ch );
 						return NULL;
 					}
 					
 				}
 				catch (...) {
-					pool.store(ch);
+					char_pool.store(ch);
 					throw;
 				}
 			}
@@ -75,19 +75,19 @@ namespace yocto
 		
 		void source:: uncpy( const token &tkn )
 		{
-			token  cpy( tkn, pool );
+			token  cpy( tkn, char_pool );
 			unget( cpy );
 		}
 		
 		
 		bool source:: cache1()
 		{
-			t_char *ch = pool.acquire();
+			t_char *ch = char_pool.acquire();
 			try {
 				
 				if( !input_->query( ch->data ) )
 				{
-					pool.store( ch );
+					char_pool.store( ch );
 					return false;
 				}
 				else {
@@ -97,7 +97,7 @@ namespace yocto
 				
 			}
 			catch (...) {
-				pool.store( ch );
+				char_pool.store( ch );
 				throw;
 			}
 			
@@ -123,15 +123,15 @@ namespace yocto
 			return cache_.size;
 		}
 		
-		void source:: drop( t_char *ch ) throw() { pool.store( ch );  }
-		void source:: drop( token &tkn ) throw() { tkn.back_to(pool); }
+		void source:: drop( t_char *ch ) throw() { char_pool.store( ch );  }
+		void source:: drop( token &tkn ) throw() { tkn.back_to(char_pool); }
 		
 	
 		
 		void source:: skip(size_t n) throw()
 		{
 			assert( n <= in_cache() );
-			while(n-->0) pool.store( cache_.pop_front() );
+			while(n-->0) char_pool.store( cache_.pop_front() );
 		}
 	}
 }

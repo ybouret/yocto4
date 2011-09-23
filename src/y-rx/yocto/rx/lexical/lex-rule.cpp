@@ -9,13 +9,13 @@ namespace yocto
 		
 		namespace lexical
 		{
-
+			
 			rule:: ~rule() throw()
 			{
 				assert( motif );
 				delete motif;
 			}
-		
+			
 			rule:: rule( pattern *p, const string &l) :
 			next(NULL),
 			prev(NULL),
@@ -25,14 +25,14 @@ namespace yocto
 				
 			}
 			
-			void  rule:: destroy( rule *r ) throw()
+			void  rule:: destroy(  rule *r ) throw()
 			{
 				assert( r );
 				r->~rule();
 				object::release1<rule>(r);
 			}
-		
-		
+			
+			
 			rule * rule::create( pattern *p, const string &l) 
 			{
 				//--------------------------------------------------------------
@@ -41,7 +41,7 @@ namespace yocto
 				rule *r = NULL;
 				try 
 				{
-					r = object::acquire1<rule>();
+					r = object::acquire1<rule>();					
 				}
 				catch(...)
 				{
@@ -65,8 +65,10 @@ namespace yocto
 				return r;
 			}
 			
+			
+			
 		}
-
+		
 	}
-
+	
 }

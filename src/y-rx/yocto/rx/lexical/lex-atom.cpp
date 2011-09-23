@@ -21,31 +21,48 @@ namespace yocto
 				r.motif->swap_with( *this );
 			}
 			
-			atom * atom:: create( rule &r )
+			atom * atom:: create( rule &r, atom::pool &ap )
 			{
-				return new atom( r );
+				atom *a = NULL;
+				if( ap.size <= 0 )
+				{
+					a = object::acquire1<atom>();
+				}
+				else 
+				{
+					a = ap.query();
+					memset( a, 0, sizeof(atom) );
+				}
+
+				return new (a) atom(r); //-- no throw
 			}
 			
 			
 			void atom:: destroy( atom *a ) throw()
 			{
 				assert( a );
-				delete a;
+				a->~atom();
+				object::release1<atom>(a);
 			}
 			
-			void atom:: destroy( atom *a, t_pool &p ) throw()
+			void atom:: destroy( atom *a, atom::pool &ap, t_char::pool &tp ) throw()
 			{
 				assert( a );
-				a->back_to( p );
-				delete a;
+				a->back_to( tp );
+				a->~atom();
+				ap.store(a);
 			}
 			
+			atom::pool::  pool() throw() {}
+			atom::pool:: ~pool() throw() { delete_with( object::release1<atom> ); }
 			
-			
-			atoms:: atoms() throw() {}
+			atoms:: atoms()  throw() {}
 			atoms:: ~atoms() throw() { delete_with( atom::destroy ); }
 			
-			void atoms:: to( t_pool &p ) throw() { delete_with<t_pool&>( atom::destroy, p); }
+			void atoms:: to( atom::pool &ap, t_char::pool &tp ) throw()
+			{ 
+				delete_with<atom::pool&,t_char::pool&>( atom::destroy, ap, tp );
+			}
 			
 			
 		}

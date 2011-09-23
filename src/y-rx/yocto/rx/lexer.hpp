@@ -9,9 +9,9 @@ namespace yocto
 	
 	namespace regex
 	{
-	
-		typedef lexical::atom  lexeme;
-		typedef lexical::atoms lexemes;
+		
+		typedef lexical::atom        lexeme;
+		typedef lexical::atoms       lexemes;
 		
 		//! lexical analyzer
 		class lexer
@@ -51,11 +51,12 @@ namespace yocto
 			
 			//! get next lookahead in src
 			/**
-				\return not found => NULL
-				if( src.peek() != NULL ) => unknown char !
+			 \return not found => NULL
+			 if( src.peek() != NULL ) => unknown char !
 			 */
 			lexeme  *lookahead( source &src );
-			
+			void     drop( lexeme  *, source &src ) throw();
+			void     drop( lexemes &, source &src ) throw();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
@@ -63,6 +64,9 @@ namespace yocto
 			lexemes                      cache_; //!< lookahead cache
 			lexeme *consume( source &src );      //!< read next lexeme if possible
 				
+		public:
+			lexical::atom::pool          atom_pool;
+
 		};
 		
 	}
