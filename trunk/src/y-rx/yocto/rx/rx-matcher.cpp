@@ -49,7 +49,7 @@ namespace yocto
 		void matcher:: init() throw()
 		{
 			pattern_->sendto(source_);
-			output.back_to(source_.pool);
+			output.back_to(source_.char_pool);
 		}
 		
 		bool matcher:: exactly( const string &input )

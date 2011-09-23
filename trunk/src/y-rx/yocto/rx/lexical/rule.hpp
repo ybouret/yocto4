@@ -14,6 +14,7 @@ namespace yocto
 		{
 			
 						
+			
 			//! pattern smart pointer
 			class rule 
 			{
@@ -28,8 +29,8 @@ namespace yocto
 					\param p a valid pattern, handled in case of error
 					\param l associated label
 				 */
-				static rule *create( pattern *p, const string &l );
-				static void  destroy( rule *r ) throw();			 
+				static rule *create(  pattern *p, const string &l );
+				static void  destroy(  rule *r ) throw();			 
 				
 			private:
 				rule( pattern *p, const string &l );
@@ -37,6 +38,7 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 			};
 			
+		
 			
 		}
 		

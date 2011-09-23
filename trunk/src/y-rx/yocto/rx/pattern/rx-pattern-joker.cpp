@@ -27,8 +27,8 @@ namespace yocto
 				
 				virtual void sendto( source &src ) throw() 
 				{
-					this->back_to( src.pool );
-					ppat->back_to( src.pool );
+					this->back_to( src.char_pool );
+					ppat->back_to( src.char_pool );
 				}
 				
 				virtual bool is_valid( size_t num ) const throw() = 0;

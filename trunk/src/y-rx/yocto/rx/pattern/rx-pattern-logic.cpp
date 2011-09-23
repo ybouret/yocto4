@@ -28,10 +28,10 @@ namespace yocto
 			
 			void Operator:: sendto( source &src ) throw()
 			{
-				back_to(src.pool);
+				back_to(src.char_pool);
 				for( pattern *p = operands.head; p; p=p->next)
 				{
-					p->back_to( src.pool );
+					p->back_to( src.char_pool );
 				}
 			}
 			

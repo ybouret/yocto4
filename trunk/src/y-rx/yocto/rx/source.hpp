@@ -16,7 +16,7 @@ namespace yocto
 			explicit source() throw();
 			virtual ~source() throw();
 			
-			t_pool pool; //!< public pool
+			t_char::pool char_pool; //!< public pool of t_char
 			
 			void connect( ios::istream &input ) throw();
 			void disconnect() throw();

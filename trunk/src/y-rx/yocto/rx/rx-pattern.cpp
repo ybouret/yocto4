@@ -19,7 +19,7 @@ namespace yocto
 		
 		void pattern:: sendto( source &src )
 		{
-			back_to( src.pool );
+			back_to( src.char_pool );
 		}
 		
 		void pattern:: optimize() 

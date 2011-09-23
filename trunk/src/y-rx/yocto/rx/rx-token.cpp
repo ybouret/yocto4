@@ -24,33 +24,33 @@ namespace yocto
 			object::release1<t_char>(ch);
 		}
 		
-		t_pool:: t_pool() throw() : core::pool_of<t_char>()
+		t_char::pool::pool() throw() : core::pool_of<t_char>()
 		{
 		}
 		
-		t_pool:: ~t_pool() throw()
+		t_char::pool:: ~pool() throw()
 		{
 			release();
 		}
 		
-		t_char * t_pool:: create( char c ) 
+		t_char * t_char::pool:: create( char c ) 
 		{
 			t_char *ch = acquire();
 			ch->data = c;
 			return ch;
 		}
 		
-		t_char * t_pool:: acquire()
+		t_char * t_char::pool:: acquire()
 		{
 			return size > 0 ? query() : t_char::acquire();
 		}
 		
-		void t_pool:: release() throw()
+		void t_char::pool:: release() throw()
 		{
 			delete_with( t_char::release );
 		}
 		
-		void t_pool:: reserve( size_t n )
+		void t_char::pool:: reserve( size_t n )
 		{
 			while( n-- > 0 ) store( t_char::acquire() );
 		}
@@ -64,7 +64,7 @@ namespace yocto
 			 delete_with( t_char::release );
 		}
 		
-		void token:: back_to( t_pool &pool ) throw()
+		void token:: back_to( t_char::pool &pool ) throw()
 		{
 			while( size ) pool.store( pop_back() );
 		}
@@ -87,7 +87,7 @@ namespace yocto
 			}
 		}
 		
-		token:: token( const token &other, t_pool &pool ) 
+		token:: token( const token &other, t_char::pool &pool ) 
 		{
 			try 
 			{

@@ -10,9 +10,8 @@ namespace yocto
 
 			rule:: ~rule() throw() {}
 			
-			rule:: rule( const string &id ) : name( id ) {}
+			rule:: rule( rule *p, const string &id ) : parent(p),name( id ) {}
 			
-			rule:: rule( const rule &other ) : name( other.name ) {}
 			
 			
 		}

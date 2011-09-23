@@ -16,7 +16,8 @@ namespace yocto
 		
 		lexer:: lexer() throw() :
 		rules_(),
-		cache_()
+		cache_(),
+		atom_pool()
 		{
 		}
 		
@@ -53,7 +54,7 @@ namespace yocto
 			{
 				r->motif->sendto( src );
 			}
-			cache_.to( src.pool );
+			cache_.to( atom_pool, src.char_pool );
 		}
 		
 		void lexer:: unget( lexeme *lx ) throw()
@@ -64,5 +65,15 @@ namespace yocto
 			cache_.push_front( lx );
 		}
 				
+		void  lexer:: drop( lexeme *lx, source &src ) throw()
+		{
+			assert(NULL != lx);
+			lexeme::destroy( lx, atom_pool, src.char_pool );
+		}
+		
+		void lexer:: drop( lexemes &lxs, source &src ) throw()
+		{
+			lxs.to( atom_pool, src.char_pool );
+		}
 	}
 }

@@ -62,7 +62,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				// process the best rule
 				//--------------------------------------------------------------
-				lexeme      *lx = lexeme::create( *best );	
+				lexeme      *lx = lexeme::create( *best, atom_pool );	
 				assert( 0 == best->motif->size );
 				
 				//--------------------------------------------------------------

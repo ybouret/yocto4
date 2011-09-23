@@ -134,7 +134,7 @@ namespace yocto
 			}
 			
 			template <typename ARGS>
-			inline void delete_with( void (*proc)( NODE *, ARGS args ), ARGS args ) throw()
+			inline void delete_with( void (*proc)( NODE *, ARGS), ARGS args ) throw()
 			{
 				assert(proc);
 				NODE *node = tail;
@@ -144,6 +144,22 @@ namespace yocto
 					node->next = NULL;
 					node->prev = NULL;
 					proc(node,args);
+					node = prev;
+				}
+				reset();
+			}
+			
+			template <typename ARGS1,typename ARGS2>
+			inline void delete_with( void (*proc)( NODE *, ARGS1, ARGS2 ), ARGS1 args1, ARGS2 args2 ) throw()
+			{
+				assert(proc);
+				NODE *node = tail;
+				while( node )
+				{
+					NODE *prev = node->prev;
+					node->next = NULL;
+					node->prev = NULL;
+					proc(node,args1,args2);
 					node = prev;
 				}
 				reset();
