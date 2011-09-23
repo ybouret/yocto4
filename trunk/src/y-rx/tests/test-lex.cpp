@@ -15,7 +15,7 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	regex::lexer      L;
 	regex::pattern_db dict;
 	
-	dict.record( "DBL", regex::compile("[:digit:]+.[:digit:]*",NULL) );
+	dict.record( "DBL", regex::compile("[:digit:]+[.][:digit:]*",NULL) );
 	
 	L( "[:digit:]+", "INT" );
 	L( "{DBL}",      "DBL", &dict );
