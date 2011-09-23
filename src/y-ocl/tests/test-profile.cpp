@@ -46,11 +46,11 @@ YOCTO_UNIT_TEST_IMPL(profile)
 		throw;
 	}
 	
-	const size_t N = 1024;
+	const size_t N = 16384;
 	ocl::Kernel kernel( program, "add" );
-	ocl::BufferOf<cl_float> ocl_A( context, N, CL_MEM_READ_WRITE, NULL );
-	ocl::BufferOf<cl_float> ocl_B( context, N, CL_MEM_READ_WRITE, NULL );
-	ocl::BufferOf<cl_float> ocl_C( context, N, CL_MEM_READ_WRITE, NULL );
+	ocl::BufferOf<cl_float> ocl_A( context, CL_MEM_READ_WRITE, N, NULL );
+	ocl::BufferOf<cl_float> ocl_B( context, CL_MEM_READ_WRITE, N, NULL );
+	ocl::BufferOf<cl_float> ocl_C( context, CL_MEM_READ_WRITE, N, NULL );
 	{
 		cl_uint arg_index = 0;
 		kernel.SetArg( arg_index++, ocl_A );
