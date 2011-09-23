@@ -99,6 +99,7 @@ YOCTO_UNIT_TEST_IMPL(profile)
 			Q.EnqueueNDRangeKernel(kernel, 1, NULL, global_work_size, NULL, YOCTO_OPENCL_NO_LIST, &event_kernel);    events.insert( event_kernel );
 			Q.EnqueueReadBuffer(ocl_A, CL_FALSE, 0, ocl_A.SIZE, vec_A(),    YOCTO_OPENCL_NO_LIST, &event_readA );    events.insert( event_readA  );
 		
+			
 			events.WaitFor();
 			Q.Finish();
 					
