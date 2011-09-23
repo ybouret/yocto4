@@ -2,6 +2,8 @@
 #include "yocto/ocl/exception.hpp"
 #include "yocto/core/locate.hpp"
 
+//#include <iostream>
+
 namespace yocto
 {
 	
@@ -15,12 +17,14 @@ namespace yocto
 		static inline
 		cl_event * __event_acquire( size_t &num_events )
 		{
+			//std::cerr << "event.acquire(" << num_events << ")" << std::endl;
 			return memory::kind<MemoryType>::acquire_as<cl_event>(num_events);
 		}
 		
 		static inline 
 		void __event_release( cl_event * &events, size_t &num_events ) throw()
 		{
+			//std::cerr << "event.release(" << num_events << ")" << std::endl;
 			memory::kind<MemoryType>::release_as<cl_event>(events,num_events);
 			assert( NULL == events     );
 			assert( 0    == num_events );
@@ -61,12 +65,8 @@ namespace yocto
 		
 		void Event:: List:: release() throw()
 		{
-			if( maxi_ )
-			{
-				assert( event_ );
-				free();
-				__event_release(event_, maxi_);
-			}
+			free();
+			__event_release(event_, maxi_);
 			assert( NULL == event_ );
 			assert( 0    == maxi_  );
 			assert( 0    == size_  );
@@ -109,7 +109,7 @@ namespace yocto
 			if( look_up( event, item_index ) )
 				throw exception("%s.insert( multiple event )", name() );
 			
-			if( size_ > maxi_ ) 
+			if( size_ >= maxi_ ) 
 			{
 				try 
 				{
