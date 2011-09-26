@@ -3,43 +3,57 @@
 
 #include "yocto/rx/lexer.hpp"
 #include "yocto/rx/source.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/exceptions.hpp"
 
 namespace yocto
 {
 	
 	namespace regex
 	{
-		enum syntax_result
+		
+		struct syntax
 		{
-			syntax_success, //!< found the right lexeme
-			syntax_nothing, //!< found nothing: End of Source
-			syntax_error,   //!< found unregistered token
-			syntax_invalid, //!< found unexpected   token
+			enum result
+			{
+				success       = 0x00, //!< normal return
+				nothing       = 0x01, //!< end of source
+				unexpected    = 0x02, //!< a valid lexeme, unexpected here
+				error         = 0x04  //!< an invalid lexeme
+			};
 		};
 		
 		namespace syntactic
 		{
-			
-			
+			typedef yocto::imported::exception                             exception;
+			typedef vector<const string * const,memory::pooled::allocator> context;
 			
 			class rule : public object
 			{
 			public:
 				
-				rule          *parent;
 				const uint32_t type;
 				const string   name;
 				rule          *next;
 				rule          *prev;
 				
 				virtual ~rule() throw();
-				virtual  syntax_result match( lexer &, source &) = 0;
+				
+				syntax::result match(lexer        &lxr, 
+									 source       &src,
+									 lexemes      &stk,
+									 const int     flags, 
+									 context      &ctx ); 
+				
+				static void unwind( const context &, exception & ) throw();
 				
 			protected:
-				explicit rule( rule *p, uint32_t t, const string &id );
+				explicit rule( uint32_t t, const string &id );
+				virtual  syntax::result analyze( lexer &, source &, lexemes &stk) = 0;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
+				
 			};
 			
 			class rules : public core::list_of<rule>

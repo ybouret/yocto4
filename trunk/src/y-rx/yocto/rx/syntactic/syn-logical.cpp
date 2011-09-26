@@ -12,15 +12,15 @@ namespace yocto
 			{
 			}
 			
-			logical:: logical( rule *p, uint32_t t, const string &n ) :
-			rule(p,t,n),
+			logical:: logical( uint32_t t, const string &n ) :
+			rule(t,n),
 			operands()
 			{
 			}
 			
 			
-			AND:: AND( rule *p, const string &n ) :
-			logical( p, ID, n )
+			AND:: AND( const string &n ) :
+			logical( ID, n )
 			{
 			}
 			

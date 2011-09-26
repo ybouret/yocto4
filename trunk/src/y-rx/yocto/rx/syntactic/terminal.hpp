@@ -18,11 +18,12 @@ namespace yocto
 			public:
 				static const uint32_t ID = YOCTO_FOURCC('T','E','R','M');
 				virtual ~terminal() throw();
-				explicit terminal( rule *p, const string &n );			
-				virtual syntax_result match( lexer &lxr, source &src);
+				explicit terminal(const string &n );			
 
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
+				virtual syntax::result analyze( lexer &lxr, source &src, lexemes &stk);
+
 			};
 			
 			

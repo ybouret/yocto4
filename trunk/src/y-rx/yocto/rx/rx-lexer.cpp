@@ -17,6 +17,7 @@ namespace yocto
 		lexer:: lexer() throw() :
 		rules_(),
 		cache_(),
+		cache( cache_ ),
 		atom_pool()
 		{
 		}
@@ -75,5 +76,6 @@ namespace yocto
 		{
 			lxs.to( atom_pool, src.char_pool );
 		}
+				
 	}
 }
