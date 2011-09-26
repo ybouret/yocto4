@@ -20,7 +20,7 @@ namespace yocto
 				virtual ~logical() throw();
 				
 			protected:
-				explicit logical( rule *p, uint32_t t, const string &id );
+				explicit logical( uint32_t t, const string &id );
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(logical);
@@ -30,11 +30,12 @@ namespace yocto
 			{
 			public:
 				static const uint32_t ID = YOCTO_FOURCC('L','G','&','&');
-				explicit AND( rule *p, const string &id );
+				explicit AND( const string &id );
 				virtual ~AND() throw();
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(AND);
+				virtual  syntax::result analyze( lexer &lxr, source &src, lexemes &stk);
 			};
 		}
 

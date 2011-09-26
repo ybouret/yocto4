@@ -13,26 +13,28 @@ namespace yocto
 
 			terminal:: ~terminal() throw() {}
 					
-			terminal:: terminal( rule *p, const string &n ) : 
-			rule( p, ID, n )
+			terminal:: terminal( const string &n ) : 
+			rule( ID, n )
 			{
 			}
 			
-			syntax_result terminal:: match( lexer &lxr, source &src)
+			syntax::result terminal:: analyze( lexer &lxr, source &src, lexemes &stk)
 			{
 				lexeme *lx = lxr.lookahead( src );
 				if( !lx )
-					return src.is_active() ? syntax_error : syntax_error;
+					return src.is_active() ? syntax::error : syntax::nothing;
 				else
 				{
 					if( lx->label == name )
 					{
 						std::cerr << "match '" << name << "'=<" << (*lx) << ">" << std::endl;
-						return syntax_success;
+						stk.push_back( lx );
+						return syntax::success;
 					}
 					else 
 					{
-						return syntax_invalid;
+						lxr.unget( lx );
+						return syntax::unexpected;
 					}
 				}
 			}
