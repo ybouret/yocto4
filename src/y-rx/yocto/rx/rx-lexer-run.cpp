@@ -1,5 +1,6 @@
 #include "yocto/rx/lexer.hpp"
 #include "yocto/rx/source.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -75,6 +76,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				// all done: TODO best->motif->sendto( src ) ?
 				//--------------------------------------------------------------
+				//std::cerr << "-- best lex=" << lx->label << std::endl;
 				return lx;
 			}
 		}

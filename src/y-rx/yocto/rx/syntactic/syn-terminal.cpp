@@ -18,13 +18,23 @@ namespace yocto
 			{
 			}
 			
-			syntax::result terminal:: analyze( lexer &lxr, source &src, lexemes &stk)
+			terminal * terminal:: create( const string &n )
 			{
+				return new terminal( n );
+			}
+			
+			syntax::result terminal:: analyze( lexer &lxr, source &src, lexemes &stk, context &)
+			{
+				std::cerr << "looking for " << name << std::endl;
 				lexeme *lx = lxr.lookahead( src );
 				if( !lx )
+				{
+					std::cerr << " ..not found" << std::endl;
 					return src.is_active() ? syntax::error : syntax::nothing;
+				}
 				else
 				{
+					std::cerr << " ..found " << lx->label << std::endl;
 					if( lx->label == name )
 					{
 						std::cerr << "match '" << name << "'=<" << (*lx) << ">" << std::endl;

@@ -5,6 +5,7 @@
 
 
 #include "yocto/rx/syntactic/terminal.hpp"
+#include "yocto/rx/syntactic/logical.hpp"
 
 using namespace yocto;
 using namespace regex;
@@ -20,14 +21,20 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	src.connect( inp );
 	lexer      lxr;
 
-	lxr( "([:digit:]+.*)", "INT" );
+	lxr( "[:digit:]+", "INT" );
+	//lxr( "[ \t]*",     "WS"  );
 	
-	parser  prs( new syntactic::terminal( "INT" ) );
+	auto_ptr<syntactic::logical> q( syntactic::AND::create( "expr" ) );
+	q->operands.push_back( syntactic::terminal::create( "INT" ) );
+	//q->operands.push_back( syntactic::terminal::create( "WS"  ) );
+	
+	parser  prs( q.yield() );
 	prs.restart(lxr, src);
 	
 	src.connect( inp );
 	const syntax::result res = prs( lxr, src, 0 );
 	std::cerr << "result=" << res << std::endl;
-	
+	if( src.is_active() )
+		std::cerr << "but source didn't end !!!" << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

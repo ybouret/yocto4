@@ -49,6 +49,9 @@ namespace yocto
 			//! return lexeme to cache
 			void     unget( lexeme *lx ) throw();
 			
+			//! return lexemes to cache
+			void     unget( lexemes & ) throw();
+			
 			//! get next lookahead in src
 			/**
 			 \return not found => NULL
