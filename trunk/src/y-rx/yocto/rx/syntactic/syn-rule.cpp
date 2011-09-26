@@ -36,8 +36,8 @@ namespace yocto
 			syntax::result rule:: match(lexer       &lxr, 
 										source      &src,
 										lexemes     &stk,
-										const int    flags, 
-										context     &ctx )
+										context     &ctx,
+										const int    flags)
 			{
 				//--------------------------------------------------------------
 				// register it in the context
@@ -50,7 +50,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				// analyze the lexer 
 				//--------------------------------------------------------------
-				const syntax::result ans = analyze(lxr, src, stk);
+				const syntax::result ans = analyze(lxr, src, stk, ctx);
 				switch( ans )
 				{
 						//------------------------------------------------------

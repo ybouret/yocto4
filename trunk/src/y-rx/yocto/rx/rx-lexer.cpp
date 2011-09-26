@@ -66,6 +66,11 @@ namespace yocto
 			cache_.push_front( lx );
 		}
 				
+		void lexer:: unget( lexemes &lxs ) throw()
+		{
+			while( lxs.size ) cache_.push_front( lxs.pop_back() );
+		}
+		
 		void  lexer:: drop( lexeme *lx, source &src ) throw()
 		{
 			assert(NULL != lx);

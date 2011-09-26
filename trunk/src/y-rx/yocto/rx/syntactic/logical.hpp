@@ -1,5 +1,5 @@
-#ifndef YOCTO_RX_SYN_TERMINAL_INCLUDED
-#define YOCTO_RX_SYN_TERMINAL_INCLUDED 1
+#ifndef YOCTO_RX_SYN_LOGICAL_INCLUDED
+#define YOCTO_RX_SYN_LOGICAL_INCLUDED 1
 
 #include "yocto/rx/syntactic/rule.hpp"
 #include "yocto/code/fourcc.hpp"
@@ -30,12 +30,15 @@ namespace yocto
 			{
 			public:
 				static const uint32_t ID = YOCTO_FOURCC('L','G','&','&');
-				explicit AND( const string &id );
 				virtual ~AND() throw();
 				
+				static AND * create( const string &id );
+				
 			private:
+				explicit AND( const string &id );
+
 				YOCTO_DISABLE_COPY_AND_ASSIGN(AND);
-				virtual  syntax::result analyze( lexer &lxr, source &src, lexemes &stk);
+				virtual  syntax::result analyze( lexer &lxr, source &src, lexemes &stk, context &ctx);
 			};
 		}
 

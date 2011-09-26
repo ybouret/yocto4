@@ -42,14 +42,14 @@ namespace yocto
 				syntax::result match(lexer        &lxr, 
 									 source       &src,
 									 lexemes      &stk,
-									 const int     flags, 
-									 context      &ctx ); 
+									 context      &ctx,
+									 const int     flags); 
 				
 				static void unwind( const context &, exception & ) throw();
 				
 			protected:
 				explicit rule( uint32_t t, const string &id );
-				virtual  syntax::result analyze( lexer &, source &, lexemes &stk) = 0;
+				virtual  syntax::result analyze( lexer &, source &, lexemes &stk, context &ctx) = 0;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);

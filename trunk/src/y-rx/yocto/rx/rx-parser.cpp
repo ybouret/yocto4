@@ -35,7 +35,7 @@ namespace yocto
 		
 		syntax::result parser:: operator()( lexer &lxr, source &src, const int flags)
 		{
-			return root_->match( lxr, src, stk_, flags, ctx_ );
+			return root_->match( lxr, src, stk_, ctx_, flags );
 		}
 
 		
