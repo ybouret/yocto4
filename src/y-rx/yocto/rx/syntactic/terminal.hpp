@@ -19,13 +19,13 @@ namespace yocto
 				static const uint32_t ID = YOCTO_FOURCC('T','E','R','M');
 				virtual ~terminal() throw();
 						
-				static terminal * create( const string &n );
-				static terminal * create( const char   *n );
+				static terminal * create( const string &n);
+				static terminal * create( const char   *n);
 				
 			private:
 				explicit terminal(const string &n );	
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
-				virtual syntax::result analyze( lexer &lxr, source &src, lexemes &stk, context &ctx);
+				virtual syntax::result match( lexer &lxr, source &src, lexemes &stk );
 
 			};
 			

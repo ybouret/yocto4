@@ -25,15 +25,17 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	lxr( "[:digit:]+", "INT" );
 	lxr( "[ \\t\\r\\n]",   "WS"  );
 	
+	/*
 	auto_ptr<s_logical> q( s_and::create( "expr" ) );
-	q->operands.push_back( s_terminal::create( "INT" ) );
-	q->operands.push_back( s_optional::create( "BLANKS", s_terminal::create("WS") ) );
-	
-	parser  prs( s_one_ore_more::create("list", q.yield()) );
+	*q <<  s_terminal::create( "INT" );
+	*q << s_optional::create( "BLANKS", s_terminal::create("WS") );
+	*/
+	//parser  prs( s_one_ore_more::create("list", q.yield()) );
+	parser prs( s_terminal::create( "INT" ) );
 	prs.restart(lxr, src);
 	
 	src.connect( inp );
-	const syntax::result res = prs( lxr, src, 0 );
+	const syntax::result res = prs( lxr, src );
 	std::cerr << "result=" << res << std::endl;
 	if( src.is_active() )
 		std::cerr << "but source didn't end !!!" << std::endl;

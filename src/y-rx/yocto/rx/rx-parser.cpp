@@ -12,8 +12,7 @@ namespace yocto
 
 		parser:: parser( syntactic::rule *root ) throw() :
 		root_( root ),
-		stk_(),
-		ctx_()
+		stk_()
 		{
 			assert( root != NULL );
 		}
@@ -22,7 +21,6 @@ namespace yocto
 		void parser:: restart( lexer &lxr, source &src ) throw()
 		{
 			lxr.drop( stk_, src ); //-- clear lexems
-			ctx_.free();           //-- clear call tree
 			on_restart();          //-- virtual call
 		}
 	
@@ -33,9 +31,9 @@ namespace yocto
 		
 	
 		
-		syntax::result parser:: operator()( lexer &lxr, source &src, const int flags)
+		syntax::result parser:: operator()( lexer &lxr, source &src)
 		{
-			return root_->match( lxr, src, stk_, ctx_, flags );
+			return root_->match( lxr, src, stk_ );
 		}
 
 		

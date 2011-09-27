@@ -3,7 +3,6 @@
 
 #include "yocto/rx/lexer.hpp"
 #include "yocto/rx/source.hpp"
-#include "yocto/sequence/vector.hpp"
 #include "yocto/exceptions.hpp"
 
 namespace yocto
@@ -18,15 +17,13 @@ namespace yocto
 			{
 				success       = 0x00, //!< normal return
 				nothing       = 0x01, //!< end of source
-				unexpected    = 0x02, //!< a valid lexeme, unexpected here
-				error         = 0x04  //!< an invalid lexeme
+				unexpected    = 0x02 //!< a valid lexeme, unexpected here
 			};
 		};
 		
 		namespace syntactic
 		{
 			typedef yocto::imported::exception                             exception;
-			typedef vector<const string * const,memory::pooled::allocator> context;
 			
 			class rule : public object
 			{
@@ -36,20 +33,19 @@ namespace yocto
 				const string   name;
 				rule          *next;
 				rule          *prev;
+				const rule    *parent;
 				
 				virtual ~rule() throw();
 				
-				syntax::result match(lexer        &lxr, 
-									 source       &src,
-									 lexemes      &stk,
-									 context      &ctx,
-									 const int     flags); 
+				virtual syntax::result match(lexer        &lxr, 
+											 source       &src,
+											 lexemes      &stk) = 0;
 				
-				static void unwind( const context &, exception & ) throw();
+				void unwind( exception & ) const throw();
+				
 				
 			protected:
 				explicit rule( uint32_t t, const string &id );
-				virtual  syntax::result analyze( lexer &, source &, lexemes &stk, context &ctx) = 0;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);

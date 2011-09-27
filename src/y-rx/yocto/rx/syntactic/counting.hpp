@@ -22,7 +22,7 @@ namespace yocto
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(counting);
-				virtual  syntax::result analyze( lexer &, source &, lexemes &stk, context &ctx);
+				virtual  syntax::result match( lexer &lxr, source &src, lexemes &stk );
 			};
 		
 			

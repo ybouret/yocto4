@@ -16,11 +16,13 @@ namespace yocto
 			class logical : public rule
 			{
 			public:
-				rules operands;
 				virtual ~logical() throw();
 				
+				logical & operator<<( rule *r ) throw();
+				
 			protected:
-				explicit logical( uint32_t t, const string &id );
+				rules operands;
+				explicit logical( uint32_t t, const string &id);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(logical);
@@ -32,14 +34,16 @@ namespace yocto
 				static const uint32_t ID = YOCTO_FOURCC('[','&','&', ']');
 				virtual ~AND() throw();
 				
-				static AND * create( const string &id );
-				static AND * create( const char   *id );
+				static AND * create( const string &id);
+				static AND * create( const char   *id);
+				
+				virtual  syntax::result match( lexer &lxr, source &src, lexemes &stk );
 				
 			private:
-				explicit AND( const string &id );
+				explicit AND( const string &id);
 
 				YOCTO_DISABLE_COPY_AND_ASSIGN(AND);
-				virtual  syntax::result analyze( lexer &lxr, source &src, lexemes &stk, context &ctx);
+				
 			};
 		}
 		
