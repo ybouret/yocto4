@@ -1,6 +1,8 @@
 #include "yocto/rx/syntactic/counting.hpp"
 #include "yocto/auto-ptr.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	namespace regex
@@ -21,7 +23,7 @@ namespace yocto
 			
 			
 			
-			syntax::result counting::analyze( lexer &lxr, source &src, lexemes &stk, context &ctx)
+			syntax::result counting::match( lexer &lxr, source &src, lexemes &stk )
 			{
 				lexemes   local_stk;
 				size_t    num = 0;
@@ -29,10 +31,9 @@ namespace yocto
 				while( true )
 				{
 					lexemes              stk1;
-					const syntax::result res = jk->match( lxr, src, stk1, ctx, int(syntax::unexpected) | int(syntax::nothing) );
+					const syntax::result res = jk->match( lxr, src, stk1 );
 					if( syntax::success != res )
 					{
-						assert( syntax::error != res );
 						assert( 0 == stk1.size );
 						break;
 					}
@@ -47,7 +48,7 @@ namespace yocto
 				{
 					lxr.unget( local_stk );
 					exception excp( "invalid lexeme count","%u<%u in ", unsigned(num), unsigned(min_number) );
-					unwind( ctx, excp );
+					unwind( excp );
 					throw excp;
 				}
 				stk.merge_back( local_stk );

@@ -12,10 +12,18 @@ namespace yocto
 			{
 			}
 			
-			logical:: logical( uint32_t t, const string &n ) :
-			rule(t,n),
+			logical:: logical( uint32_t t, const string &n  ):
+			rule(t,n ),
 			operands()
 			{
+			}
+			
+			logical & logical:: operator<<( rule *r ) throw()
+			{
+				assert( r != NULL );
+				operands.push_back(r);
+				r->parent = this;
+				return *this;
 			}
 			
 			
@@ -40,26 +48,26 @@ namespace yocto
 				
 			}
 			
-			syntax::result AND:: analyze( lexer &lxr, source &src, lexemes &stk, context &ctx)
+			syntax::result AND:: match( lexer &lxr, source &src, lexemes &stk )
 			{
 				lexemes local_stk;
-				for( rule *r = operands.head; r; r=r->next )
+				if( operands.size <= 0 )
+					return syntax::success;
+				else 
 				{
-					lexemes stk1;
-					const syntax::result res = r->match( lxr, src, stk1, ctx, int(syntax::unexpected) );
-					if( res != syntax::success )
+					
+					rule   *r = operands.head; assert( r != NULL );
+					//----------------------------------------------------------
+					// first rule
+					//----------------------------------------------------------
 					{
-						lxr.unget( local_stk );
-						return res;
+						const syntax::result res = r->match( lxr, src, local_stk );
+						
 					}
-					local_stk.merge_back( stk1 );
+					return syntax::nothing;
 				}
-				
-				std::cerr << "match '" << name << "'" << std::endl;
-				stk.merge_back(local_stk);
-				return syntax::success;
 			}
 		}
 	}
-
+	
 }
