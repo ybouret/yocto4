@@ -32,6 +32,8 @@ namespace yocto
 			syntax::result terminal:: match( lexer &lxr, source &src, lexemes &stk )
 			{
 				
+				std::cerr << "parse.terminal '" << name << "'" << std::endl;
+				
 				//--------------------------------------------------------------
 				//
 				// register
@@ -52,11 +54,13 @@ namespace yocto
 					//-- no lexeme
 					//
 					//----------------------------------------------------------
+					std::cerr << ".not found" << std::endl;
 					if( src.is_active() )
 					{
 						//------------------------------------------------------
 						//-- syntax error
 						//------------------------------------------------------
+						std::cerr << "..error!!" << std::endl;
 						char C = src.peek()->data;
 						exception excp( "syntax error", "'%c' in ", C );
 						unwind( excp );
@@ -64,6 +68,7 @@ namespace yocto
 					}
 					else
 					{
+						std::cerr << "..end-of-input" << std::endl;
 						return syntax::nothing;
 					}
 					
@@ -78,7 +83,7 @@ namespace yocto
 						//- - - - - - -
 						//-- matching !
 						//- - - - - - -
-						std::cerr << "match '" << name << "'=<" << (*lx) << ">" << std::endl;
+						std::cerr << ".match '" << name << "'=<" << (*lx) << ">" << std::endl;
 						local_stk.push_back( lx );
 						stk.merge_back( local_stk );
 						return syntax::success;
@@ -88,6 +93,7 @@ namespace yocto
 						//- - - - - - - -
 						//-- not matching
 						//- - - - - - - -
+						std::cerr << ".not matching: '" << lx->label << "'" << std::endl;
 						lxr.unget( lx );
 						return syntax::unexpected;						
 					}
