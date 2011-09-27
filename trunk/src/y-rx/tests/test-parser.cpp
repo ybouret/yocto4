@@ -6,6 +6,7 @@
 
 #include "yocto/rx/syntactic/terminal.hpp"
 #include "yocto/rx/syntactic/logical.hpp"
+#include "yocto/rx/syntactic/counting.hpp"
 
 using namespace yocto;
 using namespace regex;
@@ -22,13 +23,13 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	lexer      lxr;
 
 	lxr( "[:digit:]+", "INT" );
-	//lxr( "[ \t]*",     "WS"  );
+	lxr( "[ \\t\\r\\n]",   "WS"  );
 	
-	auto_ptr<syntactic::logical> q( syntactic::AND::create( "expr" ) );
-	q->operands.push_back( syntactic::terminal::create( "INT" ) );
-	//q->operands.push_back( syntactic::terminal::create( "WS"  ) );
+	auto_ptr<s_logical> q( s_and::create( "expr" ) );
+	q->operands.push_back( s_terminal::create( "INT" ) );
+	q->operands.push_back( s_optional::create( "BLANKS", s_terminal::create("WS") ) );
 	
-	parser  prs( q.yield() );
+	parser  prs( s_one_ore_more::create("list", q.yield()) );
 	prs.restart(lxr, src);
 	
 	src.connect( inp );

@@ -2,6 +2,7 @@
 #define YOCTO_RX_SYN_JOKER_INCLUDED 1
 
 #include "yocto/rx/syntactic/rule.hpp"
+#include "yocto/code/fourcc.hpp"
 
 namespace yocto
 {
@@ -10,7 +11,7 @@ namespace yocto
 		
 		namespace syntactic
 		{
-		
+			
 			//! rule smart pointer
 			class joker : public rule
 			{

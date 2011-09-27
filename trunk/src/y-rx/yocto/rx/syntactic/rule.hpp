@@ -67,6 +67,8 @@ namespace yocto
 			};
 			
 		}
+		
+		typedef syntactic::rule s_rule;
 	}
 }
 

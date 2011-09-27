@@ -23,6 +23,12 @@ namespace yocto
 				return new terminal( n );
 			}
 			
+			terminal * terminal:: create( const char *txt )
+			{
+				const string n( txt );
+				return new terminal( n );
+			}
+			
 			syntax::result terminal:: analyze( lexer &lxr, source &src, lexemes &stk, context &)
 			{
 				lexeme *lx = lxr.lookahead( src );
