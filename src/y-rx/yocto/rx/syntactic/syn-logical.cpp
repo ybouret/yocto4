@@ -29,6 +29,12 @@ namespace yocto
 				return new AND(id);
 			}
 			
+			AND * AND:: create( const char *txt )
+			{
+				const string id( txt );
+				return new AND(id);
+			}
+			
 			AND:: ~AND() throw()
 			{
 				

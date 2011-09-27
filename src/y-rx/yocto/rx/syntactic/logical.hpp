@@ -29,10 +29,11 @@ namespace yocto
 			class AND : public logical
 			{
 			public:
-				static const uint32_t ID = YOCTO_FOURCC('L','G','&','&');
+				static const uint32_t ID = YOCTO_FOURCC('[','&','&', ']');
 				virtual ~AND() throw();
 				
 				static AND * create( const string &id );
+				static AND * create( const char   *id );
 				
 			private:
 				explicit AND( const string &id );
@@ -41,6 +42,9 @@ namespace yocto
 				virtual  syntax::result analyze( lexer &lxr, source &src, lexemes &stk, context &ctx);
 			};
 		}
+		
+		typedef syntactic::logical s_logical;
+		typedef syntactic::AND     s_and;
 
 	}
 

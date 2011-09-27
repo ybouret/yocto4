@@ -7,8 +7,8 @@ namespace yocto
 		
 		namespace syntactic
 		{
-		
-
+			
+			
 			joker:: ~joker() throw() { assert(jk); delete jk; }
 			joker::  joker( uint32_t t, const string &n, rule *r ) : 
 			rule( t, n ),
@@ -16,7 +16,9 @@ namespace yocto
 			{
 			}
 			
+			
+						
 		}
-
+		
 	}
 }

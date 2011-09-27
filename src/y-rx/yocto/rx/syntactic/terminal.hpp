@@ -20,7 +20,8 @@ namespace yocto
 				virtual ~terminal() throw();
 						
 				static terminal * create( const string &n );
-
+				static terminal * create( const char   *n );
+				
 			private:
 				explicit terminal(const string &n );	
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
@@ -30,6 +31,8 @@ namespace yocto
 			
 			
 		}
+		
+		typedef syntactic::terminal s_terminal;
 		
 	}
 	
