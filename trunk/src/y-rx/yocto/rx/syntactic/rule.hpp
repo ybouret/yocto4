@@ -1,8 +1,7 @@
 #ifndef YOCTO_RX_SYN_RULE_INCLUDED
 #define YOCTO_RX_SYN_RULE_INCLUDED 1
 
-#include "yocto/rx/lexer.hpp"
-#include "yocto/rx/source.hpp"
+#include "yocto/rx/syntactic/s-node.hpp"
 #include "yocto/exceptions.hpp"
 
 namespace yocto
@@ -17,13 +16,16 @@ namespace yocto
 			{
 				success       = 0x00, //!< normal return
 				nothing       = 0x01, //!< end of source
-				unexpected    = 0x02 //!< a valid lexeme, unexpected here
+				unexpected    = 0x02  //!< a valid lexeme, unexpected here
 			};
+			static const char *get_info( syntax::result ) throw();
 		};
 		
 		namespace syntactic
 		{
-			typedef yocto::imported::exception                             exception;
+			typedef yocto::imported::exception exception;
+			
+			
 			
 			class rule : public object
 			{
