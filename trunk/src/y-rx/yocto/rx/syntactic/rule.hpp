@@ -2,6 +2,7 @@
 #define YOCTO_RX_SYN_RULE_INCLUDED 1
 
 #include "yocto/rx/syntactic/s-node.hpp"
+#include "yocto/rx/source.hpp"
 #include "yocto/exceptions.hpp"
 
 namespace yocto
@@ -26,6 +27,7 @@ namespace yocto
 			typedef yocto::imported::exception exception;
 			
 			
+#define YOCTO_RX_SYNTAX_RULE_MATCH_ARGS lexer &lxr, source &src, lexemes &stk
 			
 			class rule : public object
 			{
@@ -39,9 +41,7 @@ namespace yocto
 				
 				virtual ~rule() throw();
 				
-				virtual syntax::result match(lexer        &lxr, 
-											 source       &src,
-											 lexemes      &stk) = 0;
+				virtual syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS ) = 0;
 				
 				void unwind( exception & ) const throw();
 				

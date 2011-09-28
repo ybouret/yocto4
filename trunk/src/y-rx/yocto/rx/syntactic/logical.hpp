@@ -37,7 +37,7 @@ namespace yocto
 				static AND * create( const string &id);
 				static AND * create( const char   *id);
 				
-				virtual  syntax::result match( lexer &lxr, source &src, lexemes &stk );
+				virtual  syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS );
 				
 			private:
 				explicit AND( const string &id);
