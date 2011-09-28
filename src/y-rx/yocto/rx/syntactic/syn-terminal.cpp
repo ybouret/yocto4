@@ -29,7 +29,7 @@ namespace yocto
 				return new terminal( n );
 			}
 			
-			syntax::result terminal:: match( lexer &lxr, source &src, lexemes &stk )
+			syntax::result terminal:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
 				
 				std::cerr << "parse.terminal '" << name << "'" << std::endl;

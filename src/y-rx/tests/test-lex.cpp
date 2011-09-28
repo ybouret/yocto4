@@ -49,9 +49,9 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	}
 	
 	std::cerr << "recognized " << lxs.size << " lexemes" << std::endl;
-	L.drop( lxs, src );
-	std::cerr << "  lexer.atom_pool.size=" << L.atom_pool.size << std::endl;
+	lxs.to( src.char_pool );
 	std::cerr << " source.char_pool.size=" << src.char_pool.size << std::endl;
+	
 	
 	
 }

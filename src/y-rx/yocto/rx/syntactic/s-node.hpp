@@ -2,7 +2,6 @@
 #define YOCTO_RX_SYN_S_NODE_INCLUDED 1
 
 #include "yocto/rx/lexer.hpp"
-#include "yocto/rx/source.hpp"
 
 
 namespace yocto
@@ -30,15 +29,14 @@ namespace yocto
 				};
 				
 							
-				
-				void release( lexer &lxr, source &src ) throw()
+				//! no caching
+				void release() throw()
 				{
 					switch( type )
 					{
 						case terminal:
 							assert(0==ch_.size);
-							lxr.drop( lx_, src  );
-							lx_ = NULL;
+							lexeme::destroy( lx_ );
 							break;
 							
 						case internal:
@@ -46,7 +44,32 @@ namespace yocto
 							while( ch_.size )
 							{
 								s_node *n = ch_.pop_back();
-								n->release(lxr,src);
+								destroy(n);
+							}
+							break;
+							
+						case forsaken:
+							break;
+					}
+					(content &)type = forsaken;
+				}
+				
+				//! cache the used terminal token t_char
+				void to( t_char::pool &tp ) throw()
+				{
+					switch( type )
+					{
+						case terminal:
+							assert(0==ch_.size);
+							lexeme::destroy( lx_, tp );
+							break;
+							
+						case internal:
+							assert(NULL==lx_);
+							while( ch_.size )
+							{
+								s_node *n = ch_.pop_back();
+								n->to(tp);
 								destroy(n);
 							}
 							break;
@@ -62,9 +85,11 @@ namespace yocto
 				s_node       *next;
 				s_node       *prev;
 				
+				//! make a forsaken node
 				static s_node *create() { return new ( object::acquire1<s_node>() ) s_node(); }
 				static void    destroy( s_node *n ) throw() { assert(n); n->~s_node(); object::release1<s_node>(n); }
 				
+				//! make a terminal node
 				static s_node *create( lexeme *lx )
 				{
 					try
@@ -79,6 +104,14 @@ namespace yocto
 						lexeme::destroy( lx );
 						throw;
 					}
+				}
+				
+				void append( s_node *child ) throw()
+				{
+					assert( terminal != type );
+					assert( child != NULL );
+					(content &)type = internal;
+					ch_.push_back( child );
 				}
 				
 				
@@ -101,14 +134,15 @@ namespace yocto
 				
 				inline ~s_node() throw()
 				{
-					assert(0==ch_.size);
+					release();
 				}
 				
 			};
+		
+	
+						
 			
 		}
-		
 	}
-	
 }
 #endif

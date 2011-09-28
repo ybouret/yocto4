@@ -48,7 +48,7 @@ namespace yocto
 				
 			}
 			
-			syntax::result AND:: match( lexer &lxr, source &src, lexemes &stk )
+			syntax::result AND:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
 				lexemes local_stk;
 				if( operands.size <= 0 )

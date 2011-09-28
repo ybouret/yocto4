@@ -20,7 +20,7 @@ namespace yocto
 		
 		void parser:: restart( lexer &lxr, source &src ) throw()
 		{
-			lxr.drop( stk_, src ); //-- clear lexems
+			stk_.to( src.char_pool );
 			on_restart();          //-- virtual call
 		}
 	

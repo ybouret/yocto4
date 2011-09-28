@@ -25,7 +25,7 @@ namespace yocto
 			private:
 				explicit terminal(const string &n );	
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
-				virtual syntax::result match( lexer &lxr, source &src, lexemes &stk );
+				virtual syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS );
 
 			};
 			

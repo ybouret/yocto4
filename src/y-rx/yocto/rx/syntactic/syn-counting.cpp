@@ -23,7 +23,7 @@ namespace yocto
 			
 			
 			
-			syntax::result counting::match( lexer &lxr, source &src, lexemes &stk )
+			syntax::result counting::match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
 				lexemes   local_stk;
 				size_t    num = 0;

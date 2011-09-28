@@ -58,9 +58,7 @@ namespace yocto
 			 if( src.peek() != NULL ) => unknown char !
 			 */
 			lexeme  *lookahead( source &src );
-			void     drop( lexeme  *, source &src ) throw();
-			void     drop( lexemes &, source &src ) throw();
-			
+						
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
@@ -69,9 +67,7 @@ namespace yocto
 			lexeme *consume( source &src );      //!< read next lexeme if possible
 				
 		public:
-			const lexemes               &cache;
-			lexical::atom::pool          atom_pool;
-			
+			const lexemes               &cache;			
 		};
 		
 	}
