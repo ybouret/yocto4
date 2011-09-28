@@ -5,6 +5,24 @@ namespace yocto
 	
 	namespace regex
 	{
+		const char *syntax::get_info( syntax::result r) throw()
+		{
+			switch (r) {
+				case syntax::success:
+					return "syntax::success";
+					
+				case syntax::nothing:
+					return "syntax::nothing";
+					
+				case syntax::unexpected:
+					return "syntax::unexpected";
+					
+				default:
+					break;
+			}
+			return "syntax::unknown";
+		}
+		
 		namespace syntactic
 		{
 			

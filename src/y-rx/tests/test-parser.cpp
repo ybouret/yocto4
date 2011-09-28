@@ -14,7 +14,8 @@ using namespace regex;
 YOCTO_UNIT_TEST_IMPL(parser)
 {
 
-	std::cerr << "sizeof(syntactic::rule)=" << sizeof(regex::syntactic::rule) << std::endl;
+	std::cerr << "sizeof(syntactic::rule)  =" << sizeof(regex::syntactic::rule)   << std::endl;
+	std::cerr << "sizeof(syntactic::s_node)=" << sizeof(regex::syntactic::s_node) << std::endl;
 
 	ios::icstream     inp( ios::cstdin );
 	source            src;
