@@ -29,21 +29,22 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	
 	lxr( "\\[",         "LBRACK" );
 	lxr( "\\]",         "RBRACK" );
+	lxr( ",",           "COMMA"  );
 	lxr( "[:digit:]+",  "INT" );
-	lxr( "[ \\t]",      "WS"  );
+	lxr( "[ \\t]+",     "WS",   lexical::rule::skip );
+	lxr( "[:endl:]",    "ENDL", lexical::rule::skip );
 	
 	auto_ptr<s_logical> p( s_and::create( "list" ) );
 	*p <<   s_terminal::create( "LBRACK" );
-	
+	*p <<   s_terminal::create( "INT" );
+	{
+		auto_ptr<s_logical> q( s_and::create("other_elements") );
+		*q << s_terminal::create("COMMA") << s_terminal::create("INT");
+		*p << s_optional::create("any_other", q.yield());
+	}
 	*p <<   s_terminal::create( "RBRACK" );
 	
-	{
-		auto_ptr<s_logical> q( s_and::create( "sub_expr" ) );
-		*q <<  s_terminal::create( "COMMA" );
-		*q <<  s_optional::create( "BLANKS", s_terminal::create("WS") );
-		*q <<  s_terminal::create( "INT"   );
-		*p <<  s_optional::create( "following", q.yield() );
-	}
+	
 	
 	
 	parser prs( p.yield() );
