@@ -45,11 +45,32 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(AND);
 				
 			};
+			
+			class OR : public logical
+			{
+			public:
+				static const uint32_t ID = YOCTO_FOURCC('[','|','|', ']');
+				virtual ~OR() throw();
+				
+				static OR * create( const string &id);
+				static OR * create( const char   *id);
+				
+				virtual  syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS );
+				
+			private:
+				explicit OR( const string &id);
+				
+				YOCTO_DISABLE_COPY_AND_ASSIGN(OR);
+				
+			};
+			
+			
+			
 		}
 		
 		typedef syntactic::logical s_logical;
 		typedef syntactic::AND     s_and;
-
+		typedef syntactic::OR      s_or;
 	}
 
 }
