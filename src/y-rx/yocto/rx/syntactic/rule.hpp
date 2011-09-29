@@ -27,7 +27,7 @@ namespace yocto
 			typedef yocto::imported::exception exception;
 			
 			
-#define YOCTO_RX_SYNTAX_RULE_MATCH_ARGS lexer &lxr, source &src, lexemes &stk
+#define YOCTO_RX_SYNTAX_RULE_MATCH_ARGS lexer &lxr, source &src, s_node * &tree
 			
 			class rule : public object
 			{

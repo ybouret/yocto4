@@ -25,6 +25,7 @@ namespace yocto
 			
 			syntax::result counting::match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
+#if 0
 				lexemes   local_stk;
 				size_t    num = 0;
 				std::cerr << "'" << name << "' counting '" << jk->name << "'" << std::endl; 
@@ -52,6 +53,7 @@ namespace yocto
 					throw excp;
 				}
 				stk.merge_back( local_stk );
+#endif
 				return syntax::success;
 			}
 			

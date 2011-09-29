@@ -33,14 +33,6 @@ namespace yocto
 			{
 				
 				std::cerr << "parse.terminal '" << name << "'" << std::endl;
-				
-				//--------------------------------------------------------------
-				//
-				// register
-				//
-				//--------------------------------------------------------------
-				lexemes local_stk;
-				
 				//--------------------------------------------------------------
 				//
 				// find lookahead
@@ -84,8 +76,25 @@ namespace yocto
 						//-- matching !
 						//- - - - - - -
 						std::cerr << ".match '" << name << "'=<" << (*lx) << ">" << std::endl;
-						local_stk.push_back( lx );
-						stk.merge_back( local_stk );
+						s_node *node = s_node::create(lx);
+						if( tree )
+						{
+							switch( tree->type )
+							{
+								case s_node::terminal:
+									s_node::destroy(node,src.char_pool);
+									throw yocto::exception("bad tree!");
+									
+								case s_node::internal:
+									break;
+							}
+							
+						}
+						else
+						{
+							tree = node;
+						}
+						
 						return syntax::success;
 					}
 					else 

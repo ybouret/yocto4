@@ -50,7 +50,6 @@ namespace yocto
 			
 			syntax::result AND:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				lexemes local_stk;
 				if( operands.size <= 0 )
 					return syntax::success;
 				else 
@@ -61,7 +60,7 @@ namespace yocto
 					// first rule
 					//----------------------------------------------------------
 					{
-						const syntax::result res = r->match( lxr, src, local_stk );
+						//const syntax::result res = r->match( lxr, src, local_stk );
 						
 					}
 					return syntax::nothing;
