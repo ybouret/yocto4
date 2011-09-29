@@ -1,4 +1,5 @@
 #include "yocto/rx/syntactic/logical.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -50,20 +51,40 @@ namespace yocto
 			
 			syntax::result AND:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				if( operands.size <= 0 )
-					return syntax::success;
-				else 
+				std::cerr << "?<AND=" << name << ">" << std::endl;
+				
+				check(tree);
+				s_node *local_tree = s_node::create(*this);
+				try
 				{
-					
-					rule   *r = operands.head; assert( r != NULL );
-					//----------------------------------------------------------
-					// first rule
-					//----------------------------------------------------------
+					//-- must match all rules
+					for( rule *r = operands.head; r; r=r->next )
 					{
-						//const syntax::result res = r->match( lxr, src, local_stk );
-						
+						const syntax::result res = r->match(lxr, src, local_tree);
+						if( res != syntax::success )
+						{
+							s_node::restore( local_tree, lxr.cache );
+							return res;
+						}
 					}
-					return syntax::nothing;
+					
+					//-- all done !
+					if( tree )
+					{
+						assert( s_node::internal == tree->type );
+						tree->append( local_tree );
+					}
+					else 
+					{
+						tree = local_tree;
+					}
+					std::cerr << " </AND>" << std::endl;
+					return syntax::success;
+				}
+				catch(...)
+				{
+					s_node::restore( local_tree, lxr.cache );
+					throw;
 				}
 			}
 		}

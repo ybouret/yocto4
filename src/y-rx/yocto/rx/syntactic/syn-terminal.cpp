@@ -31,8 +31,8 @@ namespace yocto
 			
 			syntax::result terminal:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				
-				std::cerr << "parse.terminal '" << name << "'" << std::endl;
+				std::cerr << "?<TERM=" << name << ">" << std::endl;
+				check(tree);
 				//--------------------------------------------------------------
 				//
 				// find lookahead
@@ -76,19 +76,11 @@ namespace yocto
 						//-- matching !
 						//- - - - - - -
 						std::cerr << ".match '" << name << "'=<" << (*lx) << ">" << std::endl;
-						s_node *node = s_node::create(lx);
+						s_node *node = s_node::create(lx,*this);
 						if( tree )
 						{
-							switch( tree->type )
-							{
-								case s_node::terminal:
-									s_node::destroy(node,src.char_pool);
-									throw yocto::exception("bad tree!");
-									
-								case s_node::internal:
-									break;
-							}
-							
+							assert( s_node::internal == tree->type );
+							tree->append( node );
 						}
 						else
 						{

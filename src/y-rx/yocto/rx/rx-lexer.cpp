@@ -16,8 +16,7 @@ namespace yocto
 		
 		lexer:: lexer() throw() :
 		rules_(),
-		cache_(),
-		cache( cache_ )
+		cache()
 		{
 		}
 		
@@ -54,7 +53,7 @@ namespace yocto
 			{
 				r->motif->sendto( src );
 			}
-			cache_.to( src.char_pool );
+			cache.to( src.char_pool );
 		}
 		
 		void lexer:: unget( lexeme *lx ) throw()
@@ -62,12 +61,12 @@ namespace yocto
 			assert( NULL != lx );
 			assert( NULL == lx->next );
 			assert( NULL == lx->prev );
-			cache_.push_front( lx );
+			cache.push_front( lx );
 		}
 				
 		void lexer:: unget( lexemes &lxs ) throw()
 		{
-			while( lxs.size ) cache_.push_front( lxs.pop_back() );
+			while( lxs.size ) cache.push_front( lxs.pop_back() );
 		}
 		
 	

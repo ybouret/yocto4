@@ -83,9 +83,9 @@ namespace yocto
 		
 		lexeme * lexer:: lookahead( source &src )
 		{
-			if( cache_.size > 0 )
+			if( cache.size > 0 )
 			{
-				return cache_.pop_front();
+				return cache.pop_front();
 			}
 			else
 			{

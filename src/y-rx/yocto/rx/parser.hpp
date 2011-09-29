@@ -22,6 +22,8 @@ namespace yocto
 			
 			void release() throw();
 			
+			void graphviz( ios::ostream &os, const string &graph_name ) const;
+			
 		private:
 			auto_ptr<syntactic::rule> root_;
 			syntactic::s_node        *node_;

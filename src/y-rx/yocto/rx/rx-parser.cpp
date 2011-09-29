@@ -1,4 +1,5 @@
 #include "yocto/rx/parser.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -49,6 +50,19 @@ namespace yocto
 			return root_->match( lxr, src, node_ );
 		}
 		
+		
+		void parser:: graphviz( ios::ostream &os, const string &graph_name ) const
+		{
+			os.append("digraph ");
+			os.append( graph_name );
+			os.append( " {\n");
+			if( node_ )
+			{
+				node_->viz( os );
+			}
+			os.append( "}\n");
+		}
+
 		
 		
 	}

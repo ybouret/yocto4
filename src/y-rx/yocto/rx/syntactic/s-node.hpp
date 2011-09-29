@@ -3,6 +3,7 @@
 
 #include "yocto/rx/lexer.hpp"
 
+//#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -14,6 +15,7 @@ namespace yocto
 		{
 			
 			
+			class rule;
 			
 			class s_node 
 			{
@@ -31,28 +33,15 @@ namespace yocto
 				
 				const content type;
 				s_node       *next;
+				const rule   &link;
 				
 				//! make a terminal node
-				static s_node * create( lexeme *lx )
-				{
-					try
-					{
-						return new ( object::acquire1<s_node>() ) s_node( lx );
-					}
-					catch(...)
-					{
-						lexeme::destroy(lx);
-						throw;
-					}
-				}
+				static s_node * create( lexeme *lx, const rule &r  );
 				
 				//! make an internal node
-				static s_node *create()
-				{
-					return new ( object::acquire1<s_node>() ) s_node( );
-				}
+				static s_node *create(const rule &r);
 				
-				//! destroy with caching
+				//! destroy with t_char caching caching
 				static void destroy( s_node *node, t_char::pool &tp ) throw()
 				{
 					assert( node );
@@ -88,6 +77,25 @@ namespace yocto
 					object::release1<s_node>(node);
 				}
 				
+				
+				//! destroy with lexemes caching
+				static void restore( s_node *node, lexemes &cache ) throw()
+				{
+					assert( node );
+					switch( node->type )
+					{
+						case terminal:
+							cache.push_front(node->lx_);
+							break;
+							
+						case internal:
+							node->ch_.delete_with<lexemes&>( restore, cache );
+							break;
+					}
+					node->~s_node();
+					object::release1<s_node>(node);
+				}
+				
 				void append( s_node *node ) throw()
 				{
 					assert( internal == type );
@@ -95,23 +103,26 @@ namespace yocto
 					ch_.store(node);
 				}
 				
+				void viz( ios::ostream & os ) const;
 				
 			private:
 				lexeme      *lx_; //!< lexeme     if terminal
 				child_nodes  ch_; //!< child(ren) if internal
 				
-				explicit s_node( lexeme *lx ) throw() :
+				explicit s_node( lexeme *lx, const rule &r ) throw() :
 				type( terminal ),
 				next(NULL),
+				link( r  ),
 				lx_( lx ),
 				ch_()
 				{
 					
 				}
 				
-				explicit s_node() throw() :
+				explicit s_node( const rule &r) throw() :
 				type( internal ),
 				next(NULL),
+				link( r ),
 				lx_(NULL),
 				ch_()
 				{
@@ -119,7 +130,7 @@ namespace yocto
 				}
 				
 				~s_node() throw() { assert(0 == ch_.size); }
-								
+				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(s_node);
 				
 				

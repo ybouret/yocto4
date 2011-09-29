@@ -63,11 +63,10 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
 			core::list_of<lexical::rule> rules_; //!< all the possible tokens
-			lexemes                      cache_; //!< lookahead cache
 			lexeme *consume( source &src );      //!< read next lexeme if possible
 				
 		public:
-			const lexemes               &cache;			
+			lexemes                      cache; //!< already scanned lexemes
 		};
 		
 	}
