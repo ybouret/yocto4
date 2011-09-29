@@ -10,6 +10,8 @@
 
 #include "yocto/ios/ocstream.hpp"
 
+#include <cstdlib>
+
 using namespace yocto;
 using namespace regex;
 
