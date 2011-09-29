@@ -56,17 +56,21 @@ namespace yocto
 				return false;
 			}
 			
-			inline void delete_with( void (*proc)( NODE *, void *), void *args ) throw()
-			{
-				assert(proc);
-				while(size>0) proc( query(), args ); 
-			}
-			
+						
 			inline void delete_with( void (*proc)(NODE *) ) throw()
 			{
 				assert( proc );
 				while(size>0) proc( query() );
 			}
+			
+			
+			template <typename ARGS>
+			inline void delete_with( void (*proc)( NODE *, ARGS), ARGS args ) throw()
+			{
+				assert(proc);
+				while(size>0) proc( query(), args );
+			}
+			
 			
 			inline void reset() throw() { top = NULL; size = 0; }
 

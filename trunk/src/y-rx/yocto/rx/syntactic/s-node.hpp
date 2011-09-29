@@ -18,129 +18,116 @@ namespace yocto
 			class s_node 
 			{
 			public:
-				typedef core::list_of<s_node> child_nodes;
+				typedef core::pool_of<s_node> child_nodes;
 				
 				
 				enum content
 				{
 					terminal,
-					internal,
-					forsaken
+					internal
 				};
 				
-							
-				//! no caching
-				void release() throw()
-				{
-					switch( type )
-					{
-						case terminal:
-							assert(0==ch_.size);
-							lexeme::destroy( lx_ );
-							break;
-							
-						case internal:
-							assert(NULL==lx_);
-							while( ch_.size )
-							{
-								s_node *n = ch_.pop_back();
-								destroy(n);
-							}
-							break;
-							
-						case forsaken:
-							break;
-					}
-					(content &)type = forsaken;
-				}
-				
-				//! cache the used terminal token t_char
-				void to( t_char::pool &tp ) throw()
-				{
-					switch( type )
-					{
-						case terminal:
-							assert(0==ch_.size);
-							lexeme::destroy( lx_, tp );
-							break;
-							
-						case internal:
-							assert(NULL==lx_);
-							while( ch_.size )
-							{
-								s_node *n = ch_.pop_back();
-								n->to(tp);
-								destroy(n);
-							}
-							break;
-							
-						case forsaken:
-							break;
-					}
-					(content &)type = forsaken;
-				}
 				
 				
 				const content type;
 				s_node       *next;
-				s_node       *prev;
-				
-				//! make a forsaken node
-				static s_node *create() { return new ( object::acquire1<s_node>() ) s_node(); }
-				static void    destroy( s_node *n ) throw() { assert(n); n->~s_node(); object::release1<s_node>(n); }
 				
 				//! make a terminal node
-				static s_node *create( lexeme *lx )
+				static s_node * create( lexeme *lx )
 				{
 					try
 					{
-						s_node *n = create();
-						n->lx_    = lx;
-						(content &)(n->type) = terminal;
-						return n;
+						return new ( object::acquire1<s_node>() ) s_node( lx );
 					}
 					catch(...)
 					{
-						lexeme::destroy( lx );
+						lexeme::destroy(lx);
 						throw;
 					}
 				}
 				
-				void append( s_node *child ) throw()
+				//! make an internal node
+				static s_node *create()
 				{
-					assert( terminal != type );
-					assert( child != NULL );
-					(content &)type = internal;
-					ch_.push_back( child );
+					return new ( object::acquire1<s_node>() ) s_node( );
+				}
+				
+				//! destroy with caching
+				static void destroy( s_node *node, t_char::pool &tp ) throw()
+				{
+					assert( node );
+					switch( node->type )
+					{
+						case terminal:
+							lexeme::destroy(node->lx_,tp);
+							break;
+							
+						case internal:
+							node->ch_.delete_with<t_char::pool&>( destroy, tp );
+							break;
+					}
+					node->~s_node();
+					object::release1<s_node>(node);
+				}
+				
+				//! destroy without caching
+				static void destroy(s_node *node ) throw()
+				{
+					assert( node );
+					switch( node->type )
+					{
+						case terminal:
+							lexeme::destroy(node->lx_);
+							break;
+							
+						case internal:
+							node->ch_.delete_with( destroy );
+							break;
+					}
+					node->~s_node();
+					object::release1<s_node>(node);
+				}
+				
+				void append( s_node *node ) throw()
+				{
+					assert( internal == type );
+					assert( NULL     == lx_  );
+					ch_.store(node);
 				}
 				
 				
 			private:
-				lexeme      *lx_; //!< lexem if terminal
+				lexeme      *lx_; //!< lexeme     if terminal
 				child_nodes  ch_; //!< child(ren) if internal
 				
-				
-				YOCTO_DISABLE_COPY_AND_ASSIGN(s_node);
-				
-				
-				s_node() throw()  :
-				type( forsaken ),
+				explicit s_node( lexeme *lx ) throw() :
+				type( terminal ),
 				next(NULL),
-				prev(NULL),
+				lx_( lx ),
+				ch_()
+				{
+					
+				}
+				
+				explicit s_node() throw() :
+				type( internal ),
+				next(NULL),
 				lx_(NULL),
 				ch_()
 				{
+					
 				}
 				
-				inline ~s_node() throw()
-				{
-					release();
-				}
+				~s_node() throw() { assert(0 == ch_.size); }
+								
+				YOCTO_DISABLE_COPY_AND_ASSIGN(s_node);
+				
+				
 				
 			};
-		
-	
-						
+			
+			
+			
 			
 		}
 	}

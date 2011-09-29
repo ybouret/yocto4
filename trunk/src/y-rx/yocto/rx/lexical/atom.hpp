@@ -42,7 +42,7 @@ namespace yocto
 			public:
 				explicit atoms() throw();
 				virtual ~atoms() throw();
-				void     to( t_char::pool &tp ) throw();
+				void     to( t_char::pool &tp ) throw(); //!< all atoms back_to(to)
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(atoms);
