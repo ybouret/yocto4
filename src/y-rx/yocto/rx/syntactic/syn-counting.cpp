@@ -20,9 +20,6 @@ namespace yocto
 			}
 			
 			
-			
-			
-			
 			syntax::result counting::match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
 				std::cerr << "?<" << name << ".geq." << min_number << ">" << std::endl;
@@ -32,7 +29,7 @@ namespace yocto
 				{
 					
 					size_t num = 0;
-					//-- try to match
+					//-- try to match and accumulate
 					for(;;)
 					{
 						const int res  =  jk->match(lxr,src,local_tree);
