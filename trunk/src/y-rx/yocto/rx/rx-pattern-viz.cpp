@@ -28,7 +28,8 @@ namespace yocto
 			
 		}
 		
-		void pattern:: tag( ios::ostream &os ) const
+		
+		void  show_tag( ios::ostream &os, const void *self )
 		{
 			union 
 			{
@@ -36,13 +37,19 @@ namespace yocto
 				void *  p;
 			} alias;
 			memset( &alias, 0, sizeof(alias) );
-			alias.p = (void*)this;
+			alias.p = (void*)self;
+			
 			for( size_t i=0; i < sizeof(void*); ++i )
 			{
 				const uint8_t B = alias.k[i];
 				os.write( 'A' + ( (B>>4) & 0xf ) );
 				os.write( 'A' + (  B     & 0xf ) );
 			}
+		}
+		
+		void pattern:: tag( ios::ostream &os ) const
+		{
+			show_tag(os,this);
 		}
 		
 		void pattern:: out( ios::ostream &os, char c )

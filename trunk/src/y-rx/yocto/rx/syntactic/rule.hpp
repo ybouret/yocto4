@@ -26,6 +26,7 @@ namespace yocto
 		{
 			typedef yocto::imported::exception exception;
 			
+			class s_node;
 			
 #define YOCTO_RX_SYNTAX_RULE_MATCH_ARGS lexer &lxr, source &src, s_node * &tree
 			
@@ -48,6 +49,7 @@ namespace yocto
 				
 			protected:
 				explicit rule( uint32_t t, const string &id );
+				void check( const s_node *node ) const;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);

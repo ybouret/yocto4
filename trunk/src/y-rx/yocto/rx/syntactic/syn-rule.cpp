@@ -54,6 +54,11 @@ namespace yocto
 				}
 			}
 			
+			void rule:: check( const s_node *node ) const
+			{
+				if( node && s_node::terminal == node->type )
+					throw yocto::exception( "bad tree for '%s", name.c_str() );
+			}
 			
 		}
 		
