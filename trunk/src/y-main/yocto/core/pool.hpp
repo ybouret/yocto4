@@ -2,7 +2,7 @@
 #define YOCTO_CORE_POOL_INCLUDED 1
 
 
-#include "yocto/os.hpp"
+#include "yocto/code/swap.hpp"
 
 namespace yocto 
 {
@@ -34,7 +34,7 @@ namespace yocto
 				++size;
 			}
 			
-			//! pop is size>0
+			//! query is size>0
 			inline NODE *query() throw()
 			{
 				assert(top != NULL);
@@ -73,7 +73,14 @@ namespace yocto
 			
 			
 			inline void reset() throw() { top = NULL; size = 0; }
-
+			
+			inline void reverse() throw()
+			{
+				pool_of<NODE> tmp;
+				while( size ) tmp.store( query() );
+				cswap(size,tmp.size);
+				cswap(top, tmp.top );
+			}
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(pool_of);

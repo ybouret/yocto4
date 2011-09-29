@@ -20,7 +20,7 @@ namespace yocto
 			class s_node 
 			{
 			public:
-				typedef core::pool_of<s_node> child_nodes;
+				typedef core::list_of<s_node> child_nodes;
 				
 				
 				enum content
@@ -33,6 +33,7 @@ namespace yocto
 				
 				const content type;
 				s_node       *next;
+				s_node       *prev;
 				const rule   &link;
 				
 				//! make a terminal node
@@ -48,11 +49,11 @@ namespace yocto
 					switch( node->type )
 					{
 						case terminal:
-							lexeme::destroy(node->lx_,tp);
+							lexeme::destroy(node->data.lx,tp);
 							break;
 							
 						case internal:
-							node->ch_.delete_with<t_char::pool&>( destroy, tp );
+							while( node->children().size ) destroy( node->children().pop_back(), tp );
 							break;
 					}
 					node->~s_node();
@@ -66,11 +67,11 @@ namespace yocto
 					switch( node->type )
 					{
 						case terminal:
-							lexeme::destroy(node->lx_);
+							lexeme::destroy(node->data.lx);
 							break;
 							
 						case internal:
-							node->ch_.delete_with( destroy );
+							while( node->children().size ) destroy( node->children().pop_back() );
 							break;
 					}
 					node->~s_node();
@@ -85,11 +86,11 @@ namespace yocto
 					switch( node->type )
 					{
 						case terminal:
-							cache.push_front(node->lx_);
+							cache.push_front(node->data.lx);
 							break;
 							
 						case internal:
-							node->ch_.delete_with<lexemes&>( restore, cache );
+							while( node->children().size ) restore( node->children().pop_back(), cache );
 							break;
 					}
 					node->~s_node();
@@ -99,40 +100,45 @@ namespace yocto
 				void append( s_node *node ) throw()
 				{
 					assert( internal == type );
-					assert( NULL     == lx_  );
-					ch_.store(node);
+					children().push_back(node);
 				}
 				
 				void viz( ios::ostream & os ) const;
 				
 			private:
-				lexeme      *lx_; //!< lexeme     if terminal
-				child_nodes  ch_; //!< child(ren) if internal
+				//lexeme      *lx_; //!< lexeme     if terminal
+				//child_nodes  ch_; //!< child(ren) if internal
+				union  {
+					lexeme  *lx;
+					uint32_t wksp[ YOCTO_U32_FOR_ITEM(child_nodes) ];
+				} data;
 				
 				explicit s_node( lexeme *lx, const rule &r ) throw() :
 				type( terminal ),
 				next(NULL),
+				prev(NULL),
 				link( r  ),
-				lx_( lx ),
-				ch_()
+				data()
 				{
-					
+					data.lx = lx;
 				}
 				
 				explicit s_node( const rule &r) throw() :
 				type( internal ),
 				next(NULL),
+				prev(NULL),
 				link( r ),
-				lx_(NULL),
-				ch_()
+				data()
 				{
-					
+					memset( &data, 0, sizeof(data) );
 				}
 				
-				~s_node() throw() { assert(0 == ch_.size); }
+				~s_node() throw() { assert( terminal == type || 0 == children().size); }
 				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(s_node);
-				
+				inline child_nodes &children()       throw() { return *(child_nodes *)(data.wksp); }
+				inline child_nodes &children() const throw() { return *(child_nodes *)(data.wksp); }
+
 				
 				
 			};

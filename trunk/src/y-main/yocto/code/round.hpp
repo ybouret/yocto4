@@ -38,4 +38,7 @@
 #define YOCTO_U64_FOR_SIZE(N) ( YOCTO_ROUND8(N) >> 3 )
 #define YOCTO_U64_FOR_ITEM(T) YOCTO_U64_FOR_SIZE(sizeof(T))
 
+#define YOCTO_U32_FOR_SIZE(N) ( YOCTO_ROUND4(N) >> 2 )
+#define YOCTO_U32_FOR_ITEM(T) YOCTO_U32_FOR_SIZE(sizeof(T))
+
 #endif

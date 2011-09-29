@@ -25,36 +25,52 @@ namespace yocto
 			
 			syntax::result counting::match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-#if 0
-				lexemes   local_stk;
-				size_t    num = 0;
-				std::cerr << "'" << name << "' counting '" << jk->name << "'" << std::endl; 
-				while( true )
+				std::cerr << "?<" << name << ".geq." << min_number << ">" << std::endl;
+				check(tree);
+				s_node *local_tree = s_node::create( *this );
+				try
 				{
-					lexemes              stk1;
-					const syntax::result res = jk->match( lxr, src, stk1 );
-					if( syntax::success != res )
+					
+					size_t num = 0;
+					//-- try to match
+					for(;;)
 					{
-						assert( 0 == stk1.size );
-						break;
+						const int res  =  jk->match(lxr,src,local_tree);
+						if( res != syntax::success )
+						{
+							break;
+						}
+						++num;
+					}
+					
+					// done
+					if( num < min_number )
+					{
+						exception excp( "syntax mismatch", "#%s=%u<%u in ", name.c_str(), unsigned(num), unsigned(min_number));
+						unwind( excp );
+						throw excp;
+					}
+					
+					// slight optimzation
+					if( num > 0 )
+					{
+						if( tree ) 
+							tree->append(local_tree);
+						else 
+							tree = local_tree;
 					}
 					else 
 					{
-						++num;
-						local_stk.merge_back( stk1 );
+						s_node::destroy(local_tree);
 					}
+					
+					return syntax::success;
 				}
-				std::cerr << "#num=" << num << std::endl;
-				if( num < min_number )
+				catch(...)
 				{
-					lxr.unget( local_stk );
-					exception excp( "invalid lexeme count","%u<%u in ", unsigned(num), unsigned(min_number) );
-					unwind( excp );
-					throw excp;
+					s_node::restore( local_tree, lxr.cache );
+					throw;
 				}
-				stk.merge_back( local_stk );
-#endif
-				return syntax::success;
 			}
 			
 			
