@@ -27,13 +27,15 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	src.connect( inp );
 	lexer      lxr;
 	
-	lxr( "[:digit:]+",   "INT" );
-	lxr( "[ \\t\\r\\n]",  "WS"  );
-	lxr( ",", "COMMA" );
+	lxr( "\\[",         "LBRACK" );
+	lxr( "\\]",         "RBRACK" );
+	lxr( "[:digit:]+",  "INT" );
+	lxr( "[ \\t]",      "WS"  );
 	
-	auto_ptr<s_logical> p( s_and::create( "expr" ) );
-	*p <<   s_terminal::create( "INT" );
-	*p <<   s_optional::create( "BLANKS", s_terminal::create("WS") );
+	auto_ptr<s_logical> p( s_and::create( "list" ) );
+	*p <<   s_terminal::create( "LBRACK" );
+	
+	*p <<   s_terminal::create( "RBRACK" );
 	
 	{
 		auto_ptr<s_logical> q( s_and::create( "sub_expr" ) );
@@ -43,7 +45,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
 		*p <<  s_optional::create( "following", q.yield() );
 	}
 	
-	//parser  prs( s_one_ore_more::create("list", q.yield()) );
+	
 	parser prs( p.yield() );
 	prs.restart(lxr, src);
 	src.connect( inp );

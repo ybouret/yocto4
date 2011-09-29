@@ -16,11 +16,12 @@ namespace yocto
 				delete motif;
 			}
 			
-			rule:: rule( pattern *p, const string &l) :
+			rule:: rule( pattern *p, const string &l, const size_t f) :
 			next(NULL),
 			prev(NULL),
 			motif( p ),
-			label( l )
+			label( l ),
+			flags( f )
 			{
 				
 			}
@@ -33,7 +34,7 @@ namespace yocto
 			}
 			
 			
-			rule * rule::create( pattern *p, const string &l) 
+			rule * rule::create( pattern *p, const string &l, const size_t f) 
 			{
 				//--------------------------------------------------------------
 				// memory for rule
@@ -54,7 +55,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				try 
 				{
-					new (r) rule( p, l );
+					new (r) rule( p, l, f);
 				}
 				catch(...)
 				{
