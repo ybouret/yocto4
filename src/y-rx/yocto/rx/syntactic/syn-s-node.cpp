@@ -37,7 +37,7 @@ namespace yocto
 				os(" [ label=\"%s\",shape=%s];\n", link.name.c_str(),shape);
 				if( type == internal )
 				{
-					for( const s_node *node = ch_.top; node; node=node->next)
+					for( const s_node *node = children().head; node; node=node->next)
 					{
 						node->viz(os);
 						show_tag(os,this); os.append( " -> " ); show_tag(os,node); os.append( ";\n");
