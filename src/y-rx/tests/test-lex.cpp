@@ -18,8 +18,8 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	dict.record( "DBL", regex::compile("[:digit:]+[.][:digit:]*",NULL) );
 	
 	L( "[:digit:]+", "INT" );
-	L( "{DBL}",      "DBL", &dict );
-	L( "{DBL}f",     "FLT", &dict );
+	L( "{DBL}",      "DBL", 0, &dict );
+	L( "{DBL}f",     "FLT", 0, &dict );
  	L( "[:blank:]+", "WS"    );
 	L( "[:word:]+",  "Word"  );
 	L( "[:endl:]",   "ENDL"  );

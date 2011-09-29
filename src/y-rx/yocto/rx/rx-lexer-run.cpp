@@ -14,6 +14,7 @@ namespace yocto
 			//------------------------------------------------------------------
 			// find a matching rule
 			//------------------------------------------------------------------
+		FIND_RULE:
 			lexical::rule *r = rules_.head;
 			for( ; r; r = r->next )
 			{
@@ -60,6 +61,14 @@ namespace yocto
 					}
 				}
 				
+				if( best->flags & lexical::rule::skip )
+				{
+					assert( src.in_cache() >= best->motif->size );
+					src.skip(best->motif->size);
+					src.drop( *(best->motif)  );
+					goto FIND_RULE;
+				}
+												
 				//--------------------------------------------------------------
 				// process the best rule
 				//--------------------------------------------------------------

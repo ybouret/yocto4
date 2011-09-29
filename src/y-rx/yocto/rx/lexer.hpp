@@ -20,27 +20,27 @@ namespace yocto
 			explicit lexer() throw();
 			virtual ~lexer() throw();
 			
-			void operator()( pattern *motif, const string &label );
-			void operator()( pattern *motif, const char   *label );
+			void operator()( pattern *motif, const string &label, const lexical::ppty_t flags=0 );
+			void operator()( pattern *motif, const char   *label, const lexical::ppty_t flags=0  );
 			
-			inline void operator()( const string &expr, const string &label, const pattern_db *dict = NULL )
+			inline void operator()( const string &expr, const string &label, const lexical::ppty_t flags=0, const pattern_db *dict = NULL  )
 			{
-				(*this)( compile(expr,dict), label );
+				(*this)( compile(expr,dict), label, flags);
 			}
 			
-			inline void operator()( const char *expr, const string &label, const pattern_db *dict = NULL )
+			inline void operator()( const char *expr, const string &label, const lexical::ppty_t flags=0, const pattern_db *dict = NULL  )
 			{
-				(*this)( compile(expr,dict), label );
+				(*this)( compile(expr,dict), label, flags);
 			}
 			
-			inline void operator()( const string expr, const char *label, const pattern_db *dict = NULL )
+			inline void operator()( const string expr, const char *label, const lexical::ppty_t flags=0, const pattern_db *dict = NULL )
 			{
-				(*this)( compile(expr,dict), label );
+				(*this)( compile(expr,dict), label,flags);
 			}
 			
-			inline void operator()( const char *expr, const char *label, const pattern_db *dict = NULL )
+			inline void operator()( const char *expr, const char *label, const lexical::ppty_t flags=0, const pattern_db *dict = NULL )
 			{
-				(*this)( compile(expr,dict), label );
+				(*this)( compile(expr,dict), label,flags);
 			}
 			
 			//! reset all rules and cache
