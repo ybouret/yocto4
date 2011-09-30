@@ -125,6 +125,18 @@ namespace yocto
 						show_tag(os,this); os.append( " -> " ); show_tag(os,node); os.append( ";\n");
 					}
 				}
+				else
+				{
+					const lexeme *lx = data.lx;
+					if( lx->size > 0 )
+					{
+						show_tag( os, lx ); 
+						const string s = lx->to_string();
+						os(" [ label=\"%s\",shape=house ];", s.c_str() );
+						os.append("\n");
+						show_tag(os,this); os.append( " -> " ); show_tag(os,lx); os.append( ";\n");
+					}
+				}
 			}
 			
 		}

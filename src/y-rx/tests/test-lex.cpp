@@ -11,20 +11,20 @@ YOCTO_UNIT_TEST_IMPL(lex)
 	std::cerr << "sizeof(regex::token)="  << sizeof(regex::token)  << std::endl;
 	std::cerr << "sizeof(regex::lexeme)=" << sizeof(regex::lexeme) << std::endl;
 	std::cerr << "sizeof(regex::lexical::rule)=" << sizeof(regex::lexical::rule) << std::endl;
-	
+	std::cerr << "sizeof(regex::pattern_db)   =" << sizeof(regex::pattern_db) << std::endl;
 	regex::lexer      L;
-	regex::pattern_db dict;
 	
-	dict.record( "DBL", regex::compile("[:digit:]+[.][:digit:]*",NULL) );
+	L.dict().record( "DBL", regex::compile("[:digit:]+[.][:digit:]*",NULL) );
 	
-	L( "[:digit:]+", "INT" );
-	L( "{DBL}",      "DBL", 0, &dict );
-	L( "{DBL}f",     "FLT", 0, &dict );
- 	L( "[:blank:]+", "WS"    );
+	L( "[:digit:]+", "INT"   );
+	L( "{DBL}",      "DBL"   );
+	L( "{DBL}f",     "FLT"   );
+ 	L( "[:blank:]+", "WS"   , L, & regex::lexer::skip );
 	L( "[:word:]+",  "Word"  );
 	L( "[:endl:]",   "ENDL"  );
 	
-	dict.release();
+
+	L.no_dict();
 	
 	regex::source src;
 	ios::icstream inp( ios::cstdin );

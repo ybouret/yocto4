@@ -12,16 +12,18 @@ namespace yocto
 		lexer:: ~lexer() throw()
 		{
 			rules_.delete_with( lexical::rule::destroy );
+			no_dict();
 		}
 		
 		lexer:: lexer() throw() :
 		rules_(),
+		dict_(NULL),
 		cache()
 		{
 		}
 		
 		
-		void lexer:: operator()( pattern *motif, const string &label, const lexical::ppty_t flags )
+		void lexer:: operator()( pattern *motif, const string &label, const lexical::action *a)
 		{
 			assert( motif );
 
@@ -34,16 +36,16 @@ namespace yocto
 				}
 			}
 			
-			rules_.push_back(  lexical::rule::create( motif, label, flags ) );
+			rules_.push_back(  lexical::rule::create( motif, label,a ) );
 
 		}
 
-		void lexer:: operator()( pattern *motif, const char *label, const lexical::ppty_t flags )
+		void lexer:: operator()( pattern *motif, const char *label, const lexical::action *a)
 		{
 			auto_ptr<pattern> p( motif );
 			const string      l( label );
 			
-			(*this)( p.yield(),l,flags );
+			(*this)( p.yield(),l,a);
 		}
 		
 		
