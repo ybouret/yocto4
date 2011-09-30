@@ -13,22 +13,23 @@ namespace yocto
 			
 			terminal:: ~terminal() throw() {}
 			
-			terminal:: terminal( const string &n) : 
-			rule( ID, n )
+			terminal:: terminal( const string &n, bool k) : 
+			rule( ID, n ),
+			keeping( k )
 			{
 			}
 			
-			terminal * terminal:: create( const string &n )
+			terminal * terminal:: create( const string &n , bool k)
 			{
-				return new terminal( n );
+				return new terminal(n,k);
 			}
 			
-			rule * terminal:: clone() const { return new terminal(name); }
+			rule * terminal:: clone() const { return new terminal(name,keeping); }
 			
-			terminal * terminal:: create( const char *txt )
+			terminal * terminal:: create( const char *txt, bool k)
 			{
 				const string n( txt );
-				return new terminal( n );
+				return new terminal(n,k);
 			}
 			
 			syntax::result terminal:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
@@ -88,7 +89,7 @@ namespace yocto
 						{
 							tree = node;
 						}
-						
+						if( !keeping ) lx->back_to( src.char_pool );
 						return syntax::success;
 					}
 					else 
