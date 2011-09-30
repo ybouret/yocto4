@@ -30,6 +30,13 @@ namespace yocto
 				return *this;
 			}
 			
+			logical:: logical( const logical &other ) :
+			rule( type, name ),
+			operands( other.operands )
+			{
+				
+			}
+			
 		}
 	}
 	

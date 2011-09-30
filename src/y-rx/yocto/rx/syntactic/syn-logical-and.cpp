@@ -18,6 +18,12 @@ namespace yocto
 			{
 			}
 			
+			AND:: AND( const AND &other ) :
+			logical( *this )
+			{
+				
+			}
+			
 			AND * AND:: create( const string &id )
 			{
 				return new AND(id);
@@ -27,6 +33,12 @@ namespace yocto
 			{
 				const string id( txt );
 				return new AND(id);
+			}
+			
+			
+			rule * AND::clone() const
+			{
+				return new AND( *this );
 			}
 			
 			AND:: ~AND() throw()

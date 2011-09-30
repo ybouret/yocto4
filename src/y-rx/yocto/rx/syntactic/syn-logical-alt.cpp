@@ -19,6 +19,12 @@ namespace yocto
 			{
 			}
 			
+			OR:: OR( const OR &other ) :
+			logical( other )
+			{
+				
+			}
+			
 			OR * OR:: create( const string &id )
 			{
 				return new OR(id);
@@ -28,6 +34,11 @@ namespace yocto
 			{
 				const string id( txt );
 				return new OR(id);
+			}
+			
+			rule * OR:: clone() const 
+			{
+				return new OR( *this );
 			}
 			
 			OR:: ~OR() throw()

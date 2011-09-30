@@ -102,6 +102,11 @@ namespace yocto
 				return (count == 0) || (count == 1);
 			}
 
+			rule * optional:: clone() const 
+			{
+				return create( name, jk->clone() );
+			}
+			
 			//==================================================================
 			one_or_more:: ~one_or_more() throw() {}
 
@@ -134,6 +139,11 @@ namespace yocto
 				return count > 0;
 			}
 
+			rule * one_or_more:: clone() const 
+			{
+				return create( name, jk->clone() );
+			}
+			
 			//==================================================================
 			any_count:: ~any_count() throw() {}
 
@@ -165,6 +175,12 @@ namespace yocto
 			{
 				return count >= 0;
 			}
+			
+			rule * any_count:: clone() const 
+			{
+				return create( name, jk->clone() );
+			}
+			
 		}
 
 	}

@@ -23,6 +23,8 @@ namespace yocto
 				return new terminal( n );
 			}
 			
+			rule * terminal:: clone() const { return new terminal(name); }
+			
 			terminal * terminal:: create( const char *txt )
 			{
 				const string n( txt );

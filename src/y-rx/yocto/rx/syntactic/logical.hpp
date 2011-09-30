@@ -23,9 +23,10 @@ namespace yocto
 			protected:
 				rules operands;
 				explicit logical( uint32_t t, const string &id);
+				logical( const logical & );
 				
 			private:
-				YOCTO_DISABLE_COPY_AND_ASSIGN(logical);
+				YOCTO_DISABLE_ASSIGN(logical);
 			};
 			
 			class AND : public logical
@@ -38,6 +39,7 @@ namespace yocto
 				static AND * create( const char   *id);
 				
 				virtual  syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS );
+				virtual  rule *clone() const;
 				
 			private:
 				explicit AND( const string &id);
@@ -56,6 +58,7 @@ namespace yocto
 				static OR * create( const char   *id);
 				
 				virtual  syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS );
+				virtual  rule *clone() const;
 				
 			private:
 				explicit OR( const string &id);
