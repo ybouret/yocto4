@@ -44,8 +44,10 @@ namespace yocto
 				
 				virtual syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS ) = 0;
 				
+				//! append calling tree to exception
 				void unwind( exception & ) const throw();
 				
+				virtual rule *clone() const = 0;
 				
 			protected:
 				explicit rule( uint32_t t, const string &id );
@@ -56,15 +58,7 @@ namespace yocto
 				
 			};
 			
-			class rules : public core::list_of<rule>
-			{
-			public:
-				explicit rules() throw();
-				virtual ~rules() throw();
-				
-			private:
-				YOCTO_DISABLE_COPY_AND_ASSIGN(rules);
-			};
+			typedef core::meta_list<rule> rules;
 			
 		}
 		

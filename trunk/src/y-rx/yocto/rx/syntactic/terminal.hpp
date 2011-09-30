@@ -22,11 +22,13 @@ namespace yocto
 				static terminal * create( const string &n);
 				static terminal * create( const char   *n);
 				
+				virtual rule *clone() const;
+
+				
 			private:
 				explicit terminal(const string &n );	
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
 				virtual syntax::result match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS );
-
 			};
 			
 			
