@@ -40,7 +40,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	lxr( "[:endl:]",    "ENDL", lxr, & lexer::skip );
 	
 	auto_ptr<s_logical> p( s_and::create( "list" ) );
-	*p <<   s_terminal::create( "LBRACK" );
+	*p <<   s_symbol::create( "LBRACK" );
 	{
 		auto_ptr<s_logical> q( s_or::create("item") );
 		*q << s_terminal::create( "INT" );
@@ -49,15 +49,16 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	}
 	{
 		auto_ptr<s_logical> q( s_and::create("other_elements") );
-		*q << s_terminal::create("COMMA") << s_terminal::create("INT");
+		*q << s_symbol::create("COMMA") << s_terminal::create("INT");
 		*p << s_any_count::create("any_other", q.yield());
 	}
-	*p <<   s_terminal::create( "RBRACK" );
+	*p <<   s_symbol::create( "RBRACK" );
 	
 	
 	
 	
-	parser prs( s_any_count::create( "grammar", p.yield() ) );
+	//parser prs( s_any_count::create( "grammar", p.yield() ) );
+	parser prs( p.yield() );
 	prs.restart(lxr, src);
 	src.connect( inp );
 	

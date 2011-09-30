@@ -13,9 +13,9 @@ namespace yocto
 		namespace lexical
 		{
 			
-			
-			typedef functor<bool,TL2(token&,t_char::pool&)> action;
-#define YOCTO_RX_LEX_RULE_ACTION_ARGS regex::token &tkn, regex::t_char::pool &char_pool
+#define YOCTO_RX_LEX_RULE_ACTION_ARGS regex::token &
+
+			typedef functor<bool,TL1(YOCTO_RX_LEX_RULE_ACTION_ARGS)> action;
 			
 			//! pattern smart pointer
 			class rule 

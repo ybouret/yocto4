@@ -173,6 +173,7 @@ namespace yocto
 
 			bool any_count:: is_valid( size_t count ) const throw()
 			{
+				std::cerr << "any_count is_valid(" << count << ") ?" << std::endl;
 				return count >= 0;
 			}
 			

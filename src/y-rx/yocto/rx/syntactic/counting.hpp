@@ -85,9 +85,9 @@ namespace yocto
 			
 		}
 		
-		typedef syntactic::optional s_optional;
-		typedef syntactic::optional s_one_ore_more;
-		typedef syntactic::optional s_any_count;
+		typedef syntactic::optional     s_optional;
+		typedef syntactic::one_or_more  s_one_ore_more;
+		typedef syntactic::any_count    s_any_count;
 	}
 	
 }
