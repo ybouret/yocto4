@@ -16,12 +16,29 @@ namespace yocto
 				delete motif;
 			}
 			
-			rule:: rule( pattern *p, const string &l, const size_t f) :
+			
+			bool rule:: keep(YOCTO_RX_LEX_RULE_ACTION_ARGS) throw()
+			{
+				return true;
+			}
+			
+			
+			rule:: rule( pattern *p, const string &l) :
 			next(NULL),
 			prev(NULL),
 			motif( p ),
 			label( l ),
-			flags( f )
+			check( this, & rule::keep )
+			{
+				
+			}
+			
+			rule:: rule( pattern *p, const string &l, const action &a) :
+			next(NULL),
+			prev(NULL),
+			motif( p ),
+			label( l ),
+			check( a )
 			{
 				
 			}
@@ -34,7 +51,7 @@ namespace yocto
 			}
 			
 			
-			rule * rule::create( pattern *p, const string &l, const size_t f) 
+			rule * rule::create( pattern *p, const string &l, const action *a ) 
 			{
 				//--------------------------------------------------------------
 				// memory for rule
@@ -55,7 +72,10 @@ namespace yocto
 				//--------------------------------------------------------------
 				try 
 				{
-					new (r) rule( p, l, f);
+					if( a )
+						new (r) rule( p, l, *a );
+					else 
+						new (r) rule( p, l);
 				}
 				catch(...)
 				{

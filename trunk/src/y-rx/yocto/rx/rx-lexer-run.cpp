@@ -61,7 +61,7 @@ namespace yocto
 					}
 				}
 				
-				if( best->flags & lexical::rule::skip )
+				if( ! best->check( *(best->motif), src.char_pool ) )
 				{
 					assert( src.in_cache() >= best->motif->size );
 					src.skip(best->motif->size);

@@ -2,7 +2,7 @@
 #define YOCTO_RX_LEX_RULE_INCLUDED 1
 
 #include "yocto/rx/pattern.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -14,32 +14,33 @@ namespace yocto
 		{
 			
 			
-			typedef int32_t ppty_t;
+			typedef functor<bool,TL2(token&,t_char::pool&)> action;
+#define YOCTO_RX_LEX_RULE_ACTION_ARGS regex::token &tkn, regex::t_char::pool &char_pool
 			
 			//! pattern smart pointer
 			class rule 
 			{
 			public:
-				enum property
-				{
-					skip = 0x01
-				};
-				rule               *next;  //!< core::list binary layout
-				rule               *prev;  //!< core::list binary layout
-				pattern            *motif; //!< the one and only pattern
-				const string        label; //!< for lexer database
-				const ppty_t        flags; //!< properties
+				
+				rule               *next;   //!< core::list binary layout
+				rule               *prev;   //!< core::list binary layout
+				pattern            *motif;  //!< the one and only pattern
+				const string        label;  //!< for lexer database
+				action              check;  //!< false: doesn't send to parser
 				
 				//! rule creationg
 				/**
 				 \param p a valid pattern, handled in case of error
 				 \param l associated label
 				 */
-				static rule *create(  pattern *p, const string &l, const size_t f = 0);
+				static rule *create(  pattern *p, const string &l, const action *a = NULL);
 				static void  destroy(  rule *r ) throw();			 
 				
+				bool keep( YOCTO_RX_LEX_RULE_ACTION_ARGS  ) throw();
+				
 			private:
-				rule( pattern *p, const string &l, const size_t f);
+				rule( pattern *p, const string &l );
+				rule( pattern *p, const string &l, const action &a);
 				~rule() throw();
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 			};
