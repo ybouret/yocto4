@@ -19,7 +19,7 @@ namespace yocto
 				
 				
 			protected:
-				explicit counting( uint32_t t, const string &n, rule *r, size_t m );
+				explicit counting( uint32_t t, const string &n, rule *r);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(counting);
@@ -56,7 +56,7 @@ namespace yocto
 				//! rule is handled in case of error
 				static optional *create( const string &n, rule *r );
 				static optional *create( const char   *n, rule *r );
-				virtual rule *clone() const;;
+				virtual rule *clone() const;
 				
 			private:
 				explicit optional( const string &n, rule *r );

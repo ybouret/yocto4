@@ -13,7 +13,7 @@ namespace yocto
 
 			counting:: ~counting() throw() {}
 
-			counting:: counting( uint32_t t, const string &n, rule *r, size_t m ) :
+			counting:: counting( uint32_t t, const string &n, rule *r ) :
 			joker( t, n, r )
 			{
 			}
@@ -74,7 +74,7 @@ namespace yocto
 			optional:: ~optional() throw() {}
 
 			optional:: optional( const string &n, rule *r ) :
-			counting( ID, n, r,0)
+			counting( ID, n, r)
 			{
 			}
 
@@ -111,7 +111,7 @@ namespace yocto
 			one_or_more:: ~one_or_more() throw() {}
 
 			one_or_more:: one_or_more( const string &n, rule *r ) :
-			counting( ID, n, r,1)
+			counting( ID, n, r)
 			{
 			}
 
@@ -148,7 +148,7 @@ namespace yocto
 			any_count:: ~any_count() throw() {}
 
 			any_count:: any_count( const string &n, rule *r ) :
-			counting( ID, n, r,1)
+			counting( ID, n, r)
 			{
 			}
 
