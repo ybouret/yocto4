@@ -20,6 +20,7 @@ namespace yocto
 				
 				logical & operator<<( rule *r ) throw();
 				
+				
 			protected:
 				rules operands;
 				explicit logical( uint32_t t, const string &id);

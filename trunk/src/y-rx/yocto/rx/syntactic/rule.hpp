@@ -37,7 +37,8 @@ namespace yocto
 			public:
 				const uint32_t type;   //!< for specific hebavior
 				const string   name;   //!< for identification
-				rule          *next, *prev;
+				rule          *next;
+				rule          *prev;
 				const rule    *parent; //!< for parsing status
 				
 				virtual ~rule() throw();
@@ -49,19 +50,13 @@ namespace yocto
 				
 				virtual rule *clone() const = 0;
 				
-#if 0
-				inline void   withhold() throw() { ++nref_; }
-				inline bool   liberate() throw() { assert(nref_>0); return --nref_ <=0; }
-				inline size_t refcount() const throw() { return nref_; }
-				typedef intrusive_ptr<rule> ptr;
-#endif
+				std::ostream &space( std::ostream & ) const;
 				
 			protected:
 				explicit rule( uint32_t t, const string &id );
 				void check( const s_node *node ) const;
 				
 			private:
-				//size_t nref_;
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 				
 			};

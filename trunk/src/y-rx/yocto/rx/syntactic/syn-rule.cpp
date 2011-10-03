@@ -1,4 +1,5 @@
 #include "yocto/rx/syntactic/rule.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -54,6 +55,17 @@ namespace yocto
 					throw yocto::exception( "bad tree for '%s", name.c_str() );
 			}
 			
+			std::ostream & rule:: space( std::ostream &os ) const
+			{
+				const rule *r = this;
+				while(r->parent)
+				{
+					os << "  ";
+					r=r->parent;
+				}
+				return os;
+			}
+
 		}
 		
 	}

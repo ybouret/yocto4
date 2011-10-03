@@ -38,7 +38,7 @@ namespace yocto
 			
 			syntax::result terminal:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				std::cerr << "?<TERM=" << name << ">" << std::endl;
+				space(std::cerr) << "?TERM='" << name << "'" << std::endl;
 				check(tree);
 				//--------------------------------------------------------------
 				//
@@ -53,13 +53,13 @@ namespace yocto
 					//-- no lexeme
 					//
 					//----------------------------------------------------------
-					std::cerr << ".not found" << std::endl;
+					space(std::cerr) << ".not found" << std::endl;
 					if( src.is_active() )
 					{
 						//------------------------------------------------------
 						//-- syntax error
 						//------------------------------------------------------
-						std::cerr << "..error!!" << std::endl;
+						space(std::cerr) << "..error!!" << std::endl;
 						char C = src.peek()->data;
 						exception excp( "syntax error", "'%c' in ", C );
 						unwind( excp );
@@ -67,7 +67,7 @@ namespace yocto
 					}
 					else
 					{
-						std::cerr << "..end-of-input" << std::endl;
+						space(std::cerr) << "..end-of-input" << std::endl;
 						return syntax::nothing;
 					}
 					
@@ -82,7 +82,7 @@ namespace yocto
 						//- - - - - - -
 						//-- matching !
 						//- - - - - - -
-						std::cerr << ".match '" << name << "'=<" << (*lx) << ">" << std::endl;
+						space(std::cerr) << ".match '" << name << "'=<" << (*lx) << ">" << std::endl;
 						s_node *node = s_node::create(lx,*this);
 						if( tree )
 						{
@@ -101,7 +101,7 @@ namespace yocto
 						//- - - - - - - -
 						//-- not matching
 						//- - - - - - - -
-						std::cerr << ".not matching: '" << lx->label << "'" << std::endl;
+						space(std::cerr) << ".not matching: '" << lx->label << "'" << std::endl;
 						lxr.unget( lx );
 						return syntax::unexpected;						
 					}
