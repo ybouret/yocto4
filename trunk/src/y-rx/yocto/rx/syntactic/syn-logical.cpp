@@ -37,6 +37,7 @@ namespace yocto
 				assert( operands.size == other.operands.size );
 				assert( other.type == type );
 				assert( other.name == name );
+				
 				for( rule *r = operands.head; r; r=r->next )
 				{
 					r->parent = this;

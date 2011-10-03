@@ -22,6 +22,7 @@ namespace yocto
 			static const char *get_info( syntax::result ) throw();
 		};
 		
+		
 		namespace syntactic
 		{
 			typedef yocto::imported::exception exception;
@@ -33,7 +34,6 @@ namespace yocto
 			class rule : public object
 			{
 			public:
-				
 				const uint32_t type;   //!< for specific hebavior
 				const string   name;   //!< for identification
 				rule          *next;   //!< for rules binary layout

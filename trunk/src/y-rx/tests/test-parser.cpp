@@ -43,6 +43,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	*p <<   s_symbol::create( "LBRACK" );
 	{
 		auto_ptr<s_logical> item( s_or::create("item") );
+		*item << p->clone();
 		*item << s_terminal::create( "INT" );
 		*item << s_terminal::create( "WORD" );
 		*p    << item->clone();

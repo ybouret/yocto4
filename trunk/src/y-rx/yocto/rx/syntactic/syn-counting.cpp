@@ -104,6 +104,7 @@ namespace yocto
 
 			rule * optional:: clone() const 
 			{
+				std::cerr << ".clone.optional='" << name << "'" << std::endl;
 				return create( name, jk->clone() );
 			}
 			
@@ -141,6 +142,7 @@ namespace yocto
 
 			rule * one_or_more:: clone() const 
 			{
+				std::cerr << ".clone.one_or_more='" << name << "'" << std::endl;
 				return create( name, jk->clone() );
 			}
 			
@@ -179,6 +181,7 @@ namespace yocto
 			
 			rule * any_count:: clone() const 
 			{
+				std::cerr << ".clone.any_count='" << name << "'" << std::endl;
 				return create( name, jk->clone() );
 			}
 			
