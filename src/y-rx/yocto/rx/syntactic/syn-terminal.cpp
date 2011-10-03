@@ -24,7 +24,11 @@ namespace yocto
 				return new terminal(n,k);
 			}
 			
-			rule * terminal:: clone() const { return new terminal(name,keeping); }
+			rule * terminal:: clone() const 
+			{
+				std::cerr << ".clone.teminal='" << name << "'" << std::endl;
+				return new terminal(name,keeping); 
+			}
 			
 			terminal * terminal:: create( const char *txt, bool k)
 			{

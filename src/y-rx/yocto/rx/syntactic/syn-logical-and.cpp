@@ -38,6 +38,7 @@ namespace yocto
 			
 			rule * AND::clone() const
 			{
+				std::cerr << ".clone.AND='" << name << "'" << std::endl;
 				return new AND( *this );
 			}
 			

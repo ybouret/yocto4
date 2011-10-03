@@ -38,6 +38,7 @@ namespace yocto
 			
 			rule * OR:: clone() const 
 			{
+				std::cerr << ".clone.OR='" << name << "'" << std::endl;
 				return new OR( *this );
 			}
 			
