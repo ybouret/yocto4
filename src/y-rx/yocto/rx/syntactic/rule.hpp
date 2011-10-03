@@ -34,11 +34,11 @@ namespace yocto
 			{
 			public:
 				
-				const uint32_t type;
-				const string   name;
-				rule          *next;
-				rule          *prev;
-				const rule    *parent;
+				const uint32_t type;   //!< for specific hebavior
+				const string   name;   //!< for identification
+				rule          *next;   //!< for rules binary layout
+				rule          *prev;   //!< for rules binary layout
+				const rule    *parent; //!< for parsing status
 				
 				virtual ~rule() throw();
 				

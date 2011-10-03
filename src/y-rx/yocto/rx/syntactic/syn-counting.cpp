@@ -21,7 +21,7 @@ namespace yocto
 
 			syntax::result counting::match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				std::cerr << "?<" << name << ">" << std::endl;
+				std::cerr << "?<COUNTING=" << name << ">" << std::endl;
 				check(tree);
 				s_node *local_tree = s_node::create( *this );
 				try
@@ -59,7 +59,7 @@ namespace yocto
 					{
 						s_node::destroy(local_tree);
 					}
-
+					std::cerr << "</COUNTING=" << name << ">#" << num << std::endl;
 					return syntax::success;
 				}
 				catch(...)

@@ -36,21 +36,14 @@ namespace yocto
 			parent(NULL)
 			{}
 			
-#if 0
-			rules:: rules() throw() {}
-			
-			static inline 
-			void __delete_rule( rule *r ) throw() { assert(NULL!=r); delete r; }
-			
-			rules:: ~rules() throw() { delete_with( __delete_rule ); }
-#endif		
+	
 			
 			void rule:: unwind( exception &e ) const throw()
 			{
 				const rule *p = this;
 				while( p )
 				{
-					e.cat( "=>%s", p->name.c_str() );
+					e.cat( "<-%s", p->name.c_str() );
 					p = p->parent;
 				}
 			}
