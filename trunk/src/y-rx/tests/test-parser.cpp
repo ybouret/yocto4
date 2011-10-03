@@ -42,14 +42,13 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	auto_ptr<s_logical> p( s_and::create( "list" ) );
 	*p <<   s_symbol::create( "LBRACK" );
 	{
-		auto_ptr<s_logical> q( s_or::create("item") );
-		*q << s_terminal::create( "INT" );
-		*q << s_terminal::create( "WORD" );
-		*p << q.yield();
-	}
-	{
-		auto_ptr<s_logical> q( s_and::create("other_elements") );
-		*q << s_symbol::create("COMMA") << s_terminal::create("INT");
+		auto_ptr<s_logical> item( s_or::create("item") );
+		*item << s_terminal::create( "INT" );
+		*item << s_terminal::create( "WORD" );
+		*p    << item->clone();
+	
+		auto_ptr<s_logical> q( s_and::create("optional_item") );
+		*q << s_symbol::create("COMMA") << item->clone();
 		*p << s_any_count::create("any_other", q.yield());
 	}
 	*p <<   s_symbol::create( "RBRACK" );
@@ -63,7 +62,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	src.connect( inp );
 	
 	const syntax::result res = prs( lxr, src );
-	std::cerr << "result=" << res << std::endl;
+	std::cerr << "result=" << syntax::get_info(res) << std::endl;
 	if( src.is_active() )
 		std::cerr << "but source didn't end !!!" << std::endl;
 	std::cerr << "lxr.cache.size=" << lxr.cache.size << std::endl;

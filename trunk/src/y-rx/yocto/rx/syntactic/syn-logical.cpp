@@ -31,10 +31,16 @@ namespace yocto
 			}
 			
 			logical:: logical( const logical &other ) :
-			rule( type, name ),
+			rule( other.type, other.name ),
 			operands( other.operands )
 			{
-				
+				assert( operands.size == other.operands.size );
+				assert( other.type == type );
+				assert( other.name == name );
+				for( rule *r = operands.head; r; r=r->next )
+				{
+					r->parent = this;
+				}
 			}
 			
 		}
