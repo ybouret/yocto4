@@ -21,7 +21,7 @@ namespace yocto
 
 			syntax::result counting::match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				std::cerr << "?<COUNTING=" << name << ">" << std::endl;
+				space(std::cerr) << "?COUNTING='" << name << "'" << std::endl;
 				check(tree);
 				s_node *local_tree = s_node::create( *this );
 				try
@@ -59,7 +59,7 @@ namespace yocto
 					{
 						s_node::destroy(local_tree);
 					}
-					std::cerr << "</COUNTING=" << name << ">#" << num << std::endl;
+					space(std::cerr) << "/COUNTING='" << name << "' #" << num << std::endl;
 					return syntax::success;
 				}
 				catch(...)
@@ -104,7 +104,6 @@ namespace yocto
 
 			rule * optional:: clone() const 
 			{
-				std::cerr << ".clone.optional='" << name << "'" << std::endl;
 				return create( name, jk->clone() );
 			}
 			
@@ -142,7 +141,6 @@ namespace yocto
 
 			rule * one_or_more:: clone() const 
 			{
-				std::cerr << ".clone.one_or_more='" << name << "'" << std::endl;
 				return create( name, jk->clone() );
 			}
 			
@@ -175,13 +173,11 @@ namespace yocto
 
 			bool any_count:: is_valid( size_t count ) const throw()
 			{
-				std::cerr << "any_count is_valid(" << count << ") ?" << std::endl;
 				return count >= 0;
 			}
 			
 			rule * any_count:: clone() const 
 			{
-				std::cerr << ".clone.any_count='" << name << "'" << std::endl;
 				return create( name, jk->clone() );
 			}
 			

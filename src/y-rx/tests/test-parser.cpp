@@ -43,11 +43,10 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	*p <<   s_symbol::create( "LBRACK" );
 	{
 		auto_ptr<s_logical> item( s_or::create("item") );
-		*item << p->clone();
 		*item << s_terminal::create( "INT" );
 		*item << s_terminal::create( "WORD" );
-		*p    << item->clone();
-	
+		*p << item->clone();
+		
 		auto_ptr<s_logical> q( s_and::create("optional_item") );
 		*q << s_symbol::create("COMMA") << item->clone();
 		*p << s_any_count::create("any_other", q.yield());
@@ -67,7 +66,6 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	if( src.is_active() )
 		std::cerr << "but source didn't end !!!" << std::endl;
 	std::cerr << "lxr.cache.size=" << lxr.cache.size << std::endl;
-	
 	{
 		ios::ocstream fp( "parsed.dot", false );
 		prs.graphviz( fp, "G" );

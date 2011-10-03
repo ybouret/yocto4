@@ -38,7 +38,6 @@ namespace yocto
 			
 			rule * OR:: clone() const 
 			{
-				std::cerr << ".clone.OR='" << name << "'" << std::endl;
 				return new OR( *this );
 			}
 			
@@ -49,7 +48,7 @@ namespace yocto
 			
 			syntax::result OR:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				std::cerr << "?<OR=" << name << ">" << std::endl;
+				space(std::cerr) << "?OR='" << name << "'" << std::endl;
 				
 				check(tree);
 				s_node *local_tree = s_node::create( *this );
@@ -59,7 +58,7 @@ namespace yocto
 					res = r->match(lxr, src, local_tree);
 					if( res == syntax::success )
 					{
-						std::cerr << "</OR> = '" << r->name << "'" << std::endl;
+						space(std::cerr) << "/OR='" << r->name << "'" << std::endl;
 						if( tree )
 						{
 							assert( s_node::internal == tree->type );

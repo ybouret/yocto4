@@ -38,7 +38,6 @@ namespace yocto
 			
 			rule * AND::clone() const
 			{
-				std::cerr << ".clone.AND='" << name << "'" << std::endl;
 				return new AND( *this );
 			}
 			
@@ -49,7 +48,7 @@ namespace yocto
 			
 			syntax::result AND:: match( YOCTO_RX_SYNTAX_RULE_MATCH_ARGS )
 			{
-				std::cerr << "?<AND=" << name << ">" << std::endl;
+				space(std::cerr) << "?AND='" << name << "'" << std::endl;
 				
 				check(tree);
 				s_node *local_tree = s_node::create(*this);
@@ -76,7 +75,7 @@ namespace yocto
 					{
 						tree = local_tree;
 					}
-					std::cerr << " </AND>" << std::endl;
+					std::cerr << "/AND='" << name << "'" << std::endl;
 					return syntax::success;
 				}
 				catch(...)
