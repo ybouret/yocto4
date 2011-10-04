@@ -14,11 +14,11 @@ namespace yocto
 		- bool   liberate() throw()
 		- size_t refcount() const throw()
 	 */
-	template <typename T>
+	template <typename KEY,typename T>
 	class intrusive_ptr
 	{
 	public:
-		YOCTO_ARGUMENTS_DECL_T;
+		YOCTO_ASSOCIATIVE_KEY_T;
 		
 		inline intrusive_ptr( T *p ) : pointee_( (mutable_type*)p )\
 		{
@@ -67,6 +67,8 @@ namespace yocto
 		
 		inline type       * __get() throw()       { return pointee_; }
 		inline const_type * __get() const throw() { return pointee_; }
+		
+		inline const_key & key() const throw() { return pointee_->key(); }
 		
 	private:
 		mutable_type *pointee_;
