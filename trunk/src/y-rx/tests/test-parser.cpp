@@ -34,21 +34,32 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	lxr( "[ \\t]+",     "WS",   lxr, & lexer::skip );
 	lxr( "[:endl:]",    "ENDL", lxr, & lexer::skip );
 	
-	// root rule
-	syntax::logical  *p = new_aggregate( "item" );
-	grammar           G( p, "grammar" );
 	
-	// register sub rules
-	G << new_terminal( "INT" );
-	
-	*p << new_terminal( "LBRACK" );
-	*p << G[ "INT" ];
-	*p << new_terminal( "RBRACK" );
+	grammar G( "grammar" );
+	{
+		// registering root
+		syntax::logical &root = G.agg( "list" );
+		
+		// registering terminals
+		G.term( "INT" );
+		G.term( "RBRACK" );
+		G.term( "LBRACK" );
+		G.term( "COMMA"  );
+		
+		// create sub rules
+		 G.alt( "item" ) << "INT" << "list";
+		
+		G.agg( "other" ) << "COMMA" << "item";
+		G.counting("optional", "other", '*');
+		
+		// feed the root
+		root << "LBRACK" << "item" << "optional" << "RBRACK";
+		
+	}
 	
 	
 	const syntax_result res = G.parse(lxr, src);
 	std::cerr << "res=" << int(res) << std::endl;
-	
 	
 }
 YOCTO_UNIT_TEST_DONE()

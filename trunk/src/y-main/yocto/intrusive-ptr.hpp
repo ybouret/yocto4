@@ -6,13 +6,13 @@
 
 namespace yocto
 {
-		
+	
 	//! intrusive pointer
 	/**
-		T must have:
-		- void   withhold() throw()
-		- bool   liberate() throw()
-		- size_t refcount() const throw()
+	 T must have:
+	 - void   withhold() throw()
+	 - bool   liberate() throw()
+	 - size_t refcount() const throw()
 	 */
 	template <typename KEY,typename T>
 	class intrusive_ptr
@@ -20,7 +20,7 @@ namespace yocto
 	public:
 		YOCTO_ASSOCIATIVE_KEY_T;
 		
-		inline intrusive_ptr( T *p ) : pointee_( (mutable_type*)p )\
+		inline intrusive_ptr( T *p ) : pointee_( (mutable_type*)p )
 		{
 			assert( pointee_ );
 			pointee_->withhold();
@@ -28,6 +28,7 @@ namespace yocto
 		
 		inline ~intrusive_ptr() throw()
 		{
+			assert(pointee_);
 			if( pointee_->liberate() )
 			{
 				delete pointee_;
