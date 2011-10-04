@@ -20,7 +20,8 @@ namespace yocto
 			
 			grammar & operator<<( syntax::rule *r );
 			syntax::rule  * operator[]( const string & );
-			
+			syntax::rule  * operator[]( const char   * );
+
 			syntax_result parse( lexer &lxr, source &src );
 			
 		private:
