@@ -5,6 +5,7 @@
 
 #include "yocto/rx/grammar.hpp"
 #include "yocto/rx/syntax/terminal.hpp"
+#include "yocto/rx/syntax/logical.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 
@@ -33,8 +34,17 @@ YOCTO_UNIT_TEST_IMPL(parser)
 	lxr( "[ \\t]+",     "WS",   lxr, & lexer::skip );
 	lxr( "[:endl:]",    "ENDL", lxr, & lexer::skip );
 	
+	// root rule
+	syntax::logical  *p = new_aggregate( "item" );
+	grammar           G( p, "grammar" );
 	
-	grammar G( new_terminal( "INT"), "grammar" );
+	// register sub rules
+	G << new_terminal( "INT" );
+	
+	*p << new_terminal( "LBRACK" );
+	*p << G[ "INT" ];
+	*p << new_terminal( "RBRACK" );
+	
 	
 	const syntax_result res = G.parse(lxr, src);
 	std::cerr << "res=" << int(res) << std::endl;

@@ -36,6 +36,12 @@ namespace yocto
 			return p->__get();
 		}
 		
+		syntax::rule  * grammar:: operator[]( const char *txt )
+		{
+			const string id( txt );
+			return (*this)[ id ];
+		}
+		
 		syntax_result grammar:: parse( lexer &lxr, source &src )
 		{
 			const  syntax_result res = root_->match( lxr, src );
