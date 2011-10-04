@@ -11,31 +11,23 @@ namespace yocto
 	namespace regex
 	{
 		
+		class grammar;
+		
 		namespace syntax
 		{
-				
+			
+			
 			class logical : public rule
 			{
 			public:
 				virtual ~logical() throw();
 				
-				inline logical & operator << (  rule *r )
-				{
-					const rule::ptr p(r);
-					operands.push_back( p );
-					return *this;
-				}
-				
-				inline logical & operator << (  const rule::ptr &p )
-				{
-					operands.push_back( p );
-					return *this;
-				}
-				
+				logical & operator <<( const string &p );
+				logical & operator <<( const char   *p );
 				
 			protected:
-				explicit logical( uint32_t t, const string &n );
-				vector<rule::ptr,memory::pooled::allocator> operands;
+				explicit logical( uint32_t t, const string &n, grammar &G );
+				vector<rule *,memory::pooled::allocator> operands;
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(logical);
@@ -47,18 +39,33 @@ namespace yocto
 			public:
 				static const uint32_t ID = YOCTO_FOURCC( 'A','G','G','R' );
 				virtual ~aggregate() throw();
-				
-				static aggregate *create( const string &n );
+				explicit aggregate( const string &n, grammar &g);
 				
 			private:
-				aggregate( const string &n );
+				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(aggregate);
 				virtual syntax_result match( YOCTO_RX_SYNTAX_RULE_ARGS );
 			};
+			
+			class alternative : public logical
+			{
+			public:
+				static const uint32_t ID = YOCTO_FOURCC( 'A','L','T','R' );
+				virtual ~alternative() throw();
+				explicit alternative( const string &n, grammar &g);
+				
+				
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(alternative);
+				virtual syntax_result match( YOCTO_RX_SYNTAX_RULE_ARGS );
+			};
+			
+			
+			
 		}
 		
-		inline syntax::aggregate * new_aggregate( const string &n ) { return syntax::aggregate:: create(n); }
-		inline syntax::aggregate * new_aggregate( const char   *t ) { const string n(t); return syntax::aggregate::create(n); }
+	
+		
 	}
 }
 
