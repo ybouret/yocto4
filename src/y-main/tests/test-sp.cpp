@@ -26,12 +26,14 @@ YOCTO_UNIT_TEST_DONE()
 
 namespace 
 {
+	static uint32_t dummy_idx = 0;
 	
 	class dummy 
 	{
 	public:
 		int value;
-		dummy( int a ) : value(a), nref_(0)
+		const uint32_t id;
+		dummy( int a ) : value(a), id( ++dummy_idx), nref_(0)
 		{
 			std::cerr << "+[dummy " << value << "]" << std::endl;
 		}
@@ -41,7 +43,7 @@ namespace
 			std::cerr << "-[dummy " << value << "]" << std::endl;
 		}
 	
-		typedef intrusive_ptr<dummy> ptr;
+		typedef intrusive_ptr<uint32_t,dummy> ptr;
 		
 		void withhold() throw() { ++nref_; }
 		bool liberate() throw() { assert(nref_>0); return --nref_ <= 0; }

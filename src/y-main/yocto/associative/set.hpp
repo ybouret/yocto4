@@ -118,6 +118,16 @@ namespace yocto
 				return false;
 		}
 		
+		inline const_type *search( param_key key ) const throw()
+		{
+			return lookup(key);
+		}
+		
+		inline type *search( param_key key ) throw()
+		{
+			return (type *)lookup(key);
+		}
+		
 		//======================================================================
 		// iterators
 		//======================================================================

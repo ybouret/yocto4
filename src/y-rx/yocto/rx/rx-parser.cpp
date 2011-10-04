@@ -6,6 +6,7 @@ namespace yocto
 	
 	namespace regex
 	{
+#if 0
 		void parser:: release() throw()
 		{
 			if( node_ )
@@ -63,7 +64,7 @@ namespace yocto
 			os.append( "}\n");
 		}
 
-		
+#endif
 		
 	}
 	
