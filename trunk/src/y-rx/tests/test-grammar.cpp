@@ -16,7 +16,7 @@
 using namespace yocto;
 using namespace regex;
 
-YOCTO_UNIT_TEST_IMPL(parser)
+YOCTO_UNIT_TEST_IMPL(grammar)
 {
 	std::cerr << "sizeof(syntax::rule)=" << sizeof(syntax::rule) << std::endl;
 	
@@ -47,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
 		G.term( "COMMA"  );
 		
 		// create sub rules
-		 G.alt( "item" ) << "INT" << "list";
+		G.alt( "item" ) << "INT" << "WORD" << "list";
 		
 		G.agg( "other" ) << "COMMA" << "item";
 		G.counting("optional", "other", '*');
