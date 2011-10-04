@@ -53,20 +53,20 @@ namespace yocto
 			}
 		}
 		
-		void grammar:: term( const string &n )
+		void grammar:: terminal( const string &n )
 		{
 			syntax::terminal *r = new syntax::terminal(n,*this);
 			record(r);			
 		}
 		
-		syntax::aggregate & grammar:: agg( const string &n )
+		syntax::aggregate & grammar:: aggregate( const string &n )
 		{
 			syntax::aggregate *r = new syntax::aggregate(n,*this);
 			record(r);			
 			return *r;
 		}
 		
-		syntax::alternative & grammar:: alt( const string &n )
+		syntax::alternative & grammar:: alternative( const string &n )
 		{
 			syntax::alternative *r = new syntax::alternative(n,*this);
 			record(r);			
