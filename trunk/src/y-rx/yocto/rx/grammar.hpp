@@ -26,9 +26,9 @@ namespace yocto
 
 			syntax_result parse( lexer &lxr, source &src );
 			
-			void term( const string &n );
-			syntax::aggregate   & agg( const string &n );
-			syntax::alternative & alt( const string &n );
+			void terminal( const string &n );
+			syntax::aggregate   & aggregate( const string &n );
+			syntax::alternative & alternative( const string &n );
 			void counting( const string &n, const string &p, char kind );
 			
 			

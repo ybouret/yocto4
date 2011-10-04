@@ -38,18 +38,18 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	grammar G( "grammar" );
 	{
 		// registering root
-		syntax::logical &root = G.agg( "list" );
+		syntax::logical &root = G.aggregate( "list" );
 		
 		// registering terminals
-		G.term( "INT" );
-		G.term( "RBRACK" );
-		G.term( "LBRACK" );
-		G.term( "COMMA"  );
+		G.terminal( "INT"    );
+		G.terminal( "RBRACK" );
+		G.terminal( "LBRACK" );
+		G.terminal( "COMMA"  );
 		
 		// create sub rules
-		G.alt( "item" ) << "INT" << "WORD" << "list";
+		G.alternative( "item" ) << "INT" << "WORD" << "list";
 		
-		G.agg( "other" ) << "COMMA" << "item";
+		G.aggregate( "other" ) << "COMMA" << "item";
 		G.counting("optional", "other", '*');
 		
 		// feed the root
