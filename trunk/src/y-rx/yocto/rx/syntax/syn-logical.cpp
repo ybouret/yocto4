@@ -48,24 +48,34 @@ namespace yocto
 			
 			syntax_result aggregate:: match( YOCTO_RX_SYNTAX_RULE_ARGS )
 			{
-				c_node *local_tree = NULL;
-				std::cerr << "?match AGGR " << name << " [";
-				for( size_t i=1; i <= operands.size(); ++i )
+				c_node *local_tree = c_node::create( *this );
+				try
 				{
-					std::cerr << " " << operands[i]->name;
-				}
-				std::cerr << " ]" << std::endl;
-				for( size_t i=1; i <= operands.size(); ++i )
-				{
-					const syntax_result res = operands[i]->match( lxr, src, local_tree );
-					if( res != syntax_success )
+					std::cerr << "?match AGGR " << name << " [";
+					for( size_t i=1; i <= operands.size(); ++i )
 					{
-						std::cerr << "-match AGGR " << name  << std::endl;
-						return res;
+						std::cerr << " " << operands[i]->name;
 					}
+					std::cerr << " ]" << std::endl;
+					for( size_t i=1; i <= operands.size(); ++i )
+					{
+						const syntax_result res = operands[i]->match( lxr, src, local_tree );
+						if( res != syntax_success )
+						{
+							std::cerr << "-match AGGR " << name  << std::endl;
+							c_node::restore( local_tree, lxr );
+							return res;
+						}
+					}
+					std::cerr << "+match AGGR " << name  << std::endl;
+					c_node::append( tree, local_tree );
+					return syntax_success;
 				}
-				std::cerr << "+match AGGR " << name  << std::endl;
-				return syntax_success;
+				catch(...)
+				{
+					c_node::destroy( local_tree );
+					throw;
+				}
 			}
 			
 			////////////////////////////////////////////////////////////////////
@@ -83,7 +93,7 @@ namespace yocto
 			
 			syntax_result alternative:: match( YOCTO_RX_SYNTAX_RULE_ARGS )
 			{
-				//lexemes stk;
+				
 				std::cerr << "?match ALTR " << name << " [";
 				for( size_t i=1; i <= operands.size(); ++i )
 				{
@@ -97,16 +107,23 @@ namespace yocto
 					res = operands[i]->match( lxr, src, node );
 					if( res == syntax_success )
 					{
+						assert( node != NULL );
 						std::cerr << "+match ALTR " << name  << std::endl;
+						c_node::append( tree, node );
 						return syntax_success;
 					}
+#if !defined(NDEBUG)
+					else {
+						assert(node==NULL);
+					}
+#endif
 				}
 				std::cerr << "-match ALTR " << name  << std::endl;
 				return res;
 			}
 			
-			
 		}
+		
 		
 	}
 	

@@ -6,12 +6,23 @@ namespace yocto
 	namespace regex
 	{
 		
+		void grammar:: reset() throw()
+		{
+			if( tree_ ) 
+			{
+				syntax::c_node::destroy( tree_ );
+				tree_ = NULL;
+			}
+		}
+		
 		grammar:: ~grammar() throw()
 		{
+			reset();
 		}
 		
 		grammar:: grammar( const string &n) : 
 		name(n),
+		tree_(NULL),
 		rset_(8,as_capacity)
 		{
 			
@@ -34,14 +45,15 @@ namespace yocto
 			return (*this)[ id ];
 		}
 		
-		syntax_result grammar:: parse( lexer &lxr, source &src )
+		cst_node *grammar:: parse( lexer &lxr, source &src, syntax_result &res )
 		{
 			if( rset_.size() <= 0 )
 				throw exception("empty grammar '%s'", name.c_str());
 			rules_set::iterator root = rset_.begin();
-			syntax::c_node *tree = NULL;
-			const  syntax_result res = (*root)->match( lxr, src, tree);
-			return res;
+			
+			reset();
+			res = (*root)->match( lxr, src, tree_);
+			return tree_;
 		}
 		
 		

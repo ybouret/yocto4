@@ -27,24 +27,42 @@ namespace yocto
 			{
 				std::cerr << "? COUNT " << name << " #" << motif->name << std::endl;
 				size_t        num = 0;
-				c_node *local_tree = NULL;
-				while( true )
+				c_node *local_tree = c_node::create( *this );
+				try
 				{
-					const syntax_result res= motif->match(lxr,src,local_tree);
-					if( res != syntax_success )
+					while( true )
 					{
-						break;
+						const syntax_result res= motif->match(lxr,src,local_tree);
+						if( res != syntax_success )
+						{
+							break;
+						}
+						++num;
 					}
-					++num;
-				}
-				if( !is_valid( num ) )
-				{
-					throw exception("count mismatch","in #'%s'=%u", name.c_str(), unsigned(num) ); 
-				}
-				std::cerr << "+ COUNT " << name << " #" << motif->name << "= " << num << std::endl;
-				return syntax_success;
-			}
+					if( !is_valid( num ) )
+					{
+						c_node::restore(local_tree,lxr);
+						throw exception("count mismatch","in #'%s'=%u", name.c_str(), unsigned(num) ); 
+					}
+					std::cerr << "+ COUNT " << name << " #" << motif->name << "= " << num << std::endl;
+					if( num > 0 )
+					{
+						c_node::append(tree,local_tree);
+					}
+					else 
+					{
+						c_node:: destroy( local_tree );
+					}
 
+					return syntax_success;
+				}
+				catch(...)
+				{
+					c_node::destroy( local_tree );
+					throw;
+				}
+			}
+			
 			
 			////////////////////////////////////////////////////////////////////
 			optional:: ~optional() throw() {}
@@ -87,7 +105,7 @@ namespace yocto
 			
 			
 		}
-
+		
 	}
-
+	
 }
