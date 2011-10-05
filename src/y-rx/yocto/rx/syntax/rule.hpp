@@ -2,7 +2,7 @@
 #ifndef YOCTO_RX_SYNTAX_RULE_INCLUDED
 #define YOCTO_RX_SYNTAX_RULE_INCLUDED
 
-#include "yocto/rx/lexer.hpp"
+#include "yocto/rx/syntax/c-node.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/exceptions.hpp"
 
@@ -19,7 +19,8 @@ namespace yocto
 		};
 		
 		
-#define YOCTO_RX_SYNTAX_RULE_ARGS lexer &lxr, source &src
+#define YOCTO_RX_SYNTAX_RULE_ARGS lexer &lxr, source &src, c_node * &tree
+		
 		class grammar;
 		
 		namespace syntax

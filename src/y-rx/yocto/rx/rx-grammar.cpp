@@ -39,7 +39,8 @@ namespace yocto
 			if( rset_.size() <= 0 )
 				throw exception("empty grammar '%s'", name.c_str());
 			rules_set::iterator root = rset_.begin();
-			const  syntax_result res = (*root)->match( lxr, src );
+			syntax::c_node *tree = NULL;
+			const  syntax_result res = (*root)->match( lxr, src, tree);
 			return res;
 		}
 		

@@ -48,7 +48,7 @@ namespace yocto
 			
 			syntax_result aggregate:: match( YOCTO_RX_SYNTAX_RULE_ARGS )
 			{
-				//lexemes stk;
+				c_node *local_tree = NULL;
 				std::cerr << "?match AGGR " << name << " [";
 				for( size_t i=1; i <= operands.size(); ++i )
 				{
@@ -57,7 +57,7 @@ namespace yocto
 				std::cerr << " ]" << std::endl;
 				for( size_t i=1; i <= operands.size(); ++i )
 				{
-					const syntax_result res = operands[i]->match( lxr, src );
+					const syntax_result res = operands[i]->match( lxr, src, local_tree );
 					if( res != syntax_success )
 					{
 						std::cerr << "-match AGGR " << name  << std::endl;
@@ -93,7 +93,8 @@ namespace yocto
 				syntax_result res = syntax_success;
 				for( size_t i=1; i <= operands.size(); ++i )
 				{
-					res = operands[i]->match( lxr, src );
+					c_node *node = NULL;
+					res = operands[i]->match( lxr, src, node );
 					if( res == syntax_success )
 					{
 						std::cerr << "+match ALTR " << name  << std::endl;

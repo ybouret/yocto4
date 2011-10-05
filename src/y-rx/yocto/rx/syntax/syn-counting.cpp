@@ -27,9 +27,10 @@ namespace yocto
 			{
 				std::cerr << "? COUNT " << name << " #" << motif->name << std::endl;
 				size_t        num = 0;
+				c_node *local_tree = NULL;
 				while( true )
 				{
-					const syntax_result res= motif->match(lxr,src);
+					const syntax_result res= motif->match(lxr,src,local_tree);
 					if( res != syntax_success )
 					{
 						break;
