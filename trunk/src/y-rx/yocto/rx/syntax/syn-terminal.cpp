@@ -1,5 +1,6 @@
 #include "yocto/rx/syntax/terminal.hpp"
 #include <iostream>
+#include "yocto/rx/grammar.hpp"
 
 namespace yocto
 {
@@ -50,8 +51,10 @@ namespace yocto
 					{
 						//-- match !
 						std::cerr << "+TERM " << name << std::endl;
-						lexeme::destroy( lx, src.char_pool );
-						
+						//lexeme::destroy( lx );
+						c_node *node = c_node::create( lx, *this );
+
+						c_node::destroy( node );
 						return syntax_success;
 					}
 					else 

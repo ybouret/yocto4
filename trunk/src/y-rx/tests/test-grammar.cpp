@@ -16,9 +16,20 @@
 using namespace yocto;
 using namespace regex;
 
+#define SHOW_SIZE(TYPE) std::cerr << "-- sizeof(" #TYPE ") = " << sizeof(TYPE) << std::endl
+
 YOCTO_UNIT_TEST_IMPL(grammar)
 {
-	std::cerr << "sizeof(syntax::rule)=" << sizeof(syntax::rule) << std::endl;
+	SHOW_SIZE(syntax::rule);
+	SHOW_SIZE(syntax::terminal);
+	SHOW_SIZE(syntax::counting);
+	SHOW_SIZE(syntax::logical);
+	std::cerr << std::endl;
+	SHOW_SIZE(syntax::c_node);
+	SHOW_SIZE(lexeme);
+	std::cerr << std::endl;
+
+
 	
 	ios::icstream     inp( ios::cstdin );
 	source            src;
@@ -45,6 +56,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 		G.terminal( "RBRACK" );
 		G.terminal( "LBRACK" );
 		G.terminal( "COMMA"  );
+		G.terminal( "WORD"   );
 		
 		// create sub rules
 		G.alternative( "item" ) << "INT" << "WORD" << "list";
