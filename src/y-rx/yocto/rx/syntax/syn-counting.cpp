@@ -25,7 +25,7 @@ namespace yocto
 			
 			syntax_result counting:: match( YOCTO_RX_SYNTAX_RULE_ARGS )
 			{
-				
+				std::cerr << "? COUNT " << name << " #" << motif->name << std::endl;
 				size_t        num = 0;
 				while( true )
 				{
@@ -40,7 +40,7 @@ namespace yocto
 				{
 					throw exception("count mismatch","in #'%s'=%u", name.c_str(), unsigned(num) ); 
 				}
-				
+				std::cerr << "+ COUNT " << name << " #" << motif->name << "= " << num << std::endl;
 				return syntax_success;
 			}
 

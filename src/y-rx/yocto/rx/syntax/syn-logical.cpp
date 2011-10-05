@@ -97,11 +97,11 @@ namespace yocto
 					if( res == syntax_success )
 					{
 						std::cerr << "+match ALTR " << name  << std::endl;
-						return res;
+						return syntax_success;
 					}
 				}
 				std::cerr << "-match ALTR " << name  << std::endl;
-				return syntax_success;
+				return res;
 			}
 			
 			
