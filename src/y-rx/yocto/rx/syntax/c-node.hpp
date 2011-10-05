@@ -35,20 +35,9 @@ namespace yocto
 				static void destroy( c_node *node, t_char::pool &tp) throw();
 				static void restore( c_node *node, lexer &lxr      ) throw();
 				
-				static void append( c_node * &tree, c_node *node )
-				{
-					assert( NULL != node );
-					if( tree == NULL ) 
-					{
-						tree = node;
-					}
-					else 
-					{
-						assert(internal==tree->type);
-						tree->children().push_back(node);
-					}
-
-				}
+				static void append( c_node * &tree, c_node *node );
+					
+				void graphviz( const string &graph_name, ios::ostream &os ) const;
 				
 			private:
 				explicit c_node( lexeme *lx, rule &r ) throw();				
@@ -61,9 +50,11 @@ namespace yocto
 					uint32_t wksp[ YOCTO_U32_FOR_ITEM(child_nodes) ];
 				} data;
 				
-				child_nodes & children() throw();
+				child_nodes       & children() throw();
+				const child_nodes & children() const throw();
 				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(c_node);
+				void viz( ios::ostream & ) const;
 			};
 			
 		}

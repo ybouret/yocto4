@@ -51,10 +51,7 @@ namespace yocto
 					{
 						//-- match !
 						std::cerr << "+TERM " << name << std::endl;
-						//lexeme::destroy( lx );
-						c_node *node = c_node::create( lx, *this );
-
-						c_node::destroy( node );
+						c_node::append(tree,c_node::create( lx, *this ));
 						return syntax_success;
 					}
 					else 

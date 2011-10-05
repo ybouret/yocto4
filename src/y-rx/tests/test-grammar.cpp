@@ -28,8 +28,8 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	SHOW_SIZE(syntax::c_node);
 	SHOW_SIZE(lexeme);
 	std::cerr << std::endl;
-
-
+	
+	
 	
 	ios::icstream     inp( ios::cstdin );
 	source            src;
@@ -69,9 +69,18 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 		
 	}
 	
+	syntax_result res = syntax_success;
+	const cst_node *node = G.parse(lxr, src, res);
+	std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
+	if( node )
+	{
+		{
+			ios::ocstream fp( "parsed.dot", false );
+			node->graphviz( "G", fp );
+		}
+		system( "dot -Tpng parsed.dot -o parsed.png" );
+	}
 	
-	const syntax_result res = G.parse(lxr, src);
-	std::cerr << "res=" << int(res) << std::endl;
 	
 }
 YOCTO_UNIT_TEST_DONE()
