@@ -66,9 +66,15 @@ namespace yocto
 			}
 		}
 		
-		void grammar:: terminal( const string &n )
+		void grammar:: variant( const string &n )
 		{
-			syntax::terminal *r = new syntax::terminal(n,*this);
+			syntax::terminal *r = new syntax::variant(n,*this);
+			record(r);			
+		}
+		
+		void grammar:: certain( const string &n )
+		{
+			syntax::terminal *r = new syntax::certain(n,*this);
 			record(r);			
 		}
 		

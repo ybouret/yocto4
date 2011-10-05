@@ -31,6 +31,11 @@ namespace yocto
 			class rule : public object
 			{
 			public:
+				enum property
+				{
+					discard_token=0x01,
+					
+				};
 				virtual ~rule() throw();
 				
 				const uint32_t type;
@@ -51,6 +56,9 @@ namespace yocto
 			private:
 				size_t nref_;
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
+				
+			public:
+				const  int ppty;
 			};
 			
 			

@@ -29,12 +29,14 @@ namespace yocto
 			
 			cst_node *parse( lexer &lxr, source &src, syntax_result &res );
 			
-			void                  terminal( const string &n );
+			void                  variant( const string &n);
+			void                  certain( const string &n);
 			syntax::aggregate   & aggregate( const string &n );
 			syntax::alternative & alternative( const string &n );
 			void                  counting( const string &n, const string &p, char kind );
 			
-			inline void                  terminal( const char *t )    { const string n(t); terminal(n); }
+			inline void                  variant( const char *t )    { const string n(t); variant(n); }
+			inline void                  certain( const char *t )    { const string n(t); certain(n); }
 			inline syntax::aggregate   & aggregate( const char *t )   { const string n(t); return aggregate(n); }
 			inline syntax::alternative & alternative( const char *t ) { const string n(t); return alternative(n); }
 			inline void                  counting( const char *n, const char *p, char kind ) 
