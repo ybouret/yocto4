@@ -15,7 +15,8 @@ namespace yocto
 			type(t),
 			name(n),
 			G(g),
-			nref_(0)
+			nref_(0),
+			ppty(0)
 			{
 			}
 			
@@ -23,13 +24,11 @@ namespace yocto
 			void   rule:: withhold() throw() 
 			{
 				++nref_;
-				//std::cerr << ".. +rule '" << name << "'@" << nref_ << std::endl;
 			}
 			
 			bool   rule:: liberate() throw() 
 			{ 
 				assert( nref_ > 0 );
-				//std::cerr << ".. -rule '" << name << "'@" << nref_-1 << std::endl;
 				return --nref_ <= 0; 
 			}
 			

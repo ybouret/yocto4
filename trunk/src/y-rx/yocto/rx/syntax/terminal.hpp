@@ -16,13 +16,39 @@ namespace yocto
 			class terminal : public rule
 			{
 			public:
-				static const uint32_t ID = YOCTO_FOURCC('T','E','R','M');
+				//static const uint32_t ID = YOCTO_FOURCC('T','E','R','M');
 				virtual ~terminal() throw();
-				explicit terminal( const string &n, grammar &g);
+				
+			protected:
+				explicit terminal( uint32_t type, const string &n, grammar &g );
 
 			private:
 				virtual syntax_result match( YOCTO_RX_SYNTAX_RULE_ARGS );
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
+			};
+			
+			
+			class variant : public terminal
+			{
+			public:
+				static const uint32_t ID = YOCTO_FOURCC('T','V','A','R');
+				explicit variant( const string &n, grammar &g );
+				virtual ~variant() throw();
+				
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(variant);
+			};
+			
+			
+			class certain : public terminal
+			{
+			public:
+				static const uint32_t ID = YOCTO_FOURCC('T','C','E','R');
+				explicit certain( const string &n, grammar &g );
+				virtual ~certain() throw();
+				
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(certain);
 			};
 			
 		}
