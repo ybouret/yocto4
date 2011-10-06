@@ -27,6 +27,8 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	std::cerr << std::endl;
 	SHOW_SIZE(syntax::c_node);
 	SHOW_SIZE(lexeme);
+	SHOW_SIZE(grammar);
+	
 	std::cerr << std::endl;
 	
 	
@@ -87,22 +89,41 @@ YOCTO_UNIT_TEST_DONE()
 
 #include "yocto/rx/pattern/basic.hpp"
 
-YOCTO_UNIT_TEST_IMPL(gstr)
+YOCTO_UNIT_TEST_IMPL(expr)
 {
 	lexer lxr;
-	lxr( regex::basic::single::create( '\"' ), "QUOTE" );
-	lxr( "([:word:]| )+", "MIDDLE" );
+	lxr( "[:digit:]+", "INT" );
+	lxr( "\\(", "LPAREN" );
+	lxr( "\\)", "RPAREN" );
+	lxr( "[*/]", "F_OP");
+	lxr( "[-+]", "S_OP");
 	lxr( "[ \\t]+",     "WS",   lxr, & lexer::skip );
 	lxr( "[:endl:]",    "ENDL", lxr, & lexer::skip );
 	
-	grammar G( "gstr" );
+	grammar G( "expression" );
+	
 	{
-		syntax::logical &root = G.aggregate( "cstring" );
+		syntax::logical &expr   = G.aggregate( "expr" );
+		syntax::logical &atom   = G.alternative( "atom" );
+		syntax::logical &factor = G.aggregate("factor");
 		
-		G.terminal( "QUOTE", node_useless);
-		G.terminal( "MIDDLE" );
+		G.terminal( "INT" );
+		G.terminal( "LPAREN" , node_useless);
+		G.terminal( "RPAREN" , node_useless);
+		G.terminal( "F_OP" );
+		G.terminal( "S_OP" );
 		
-		root << "QUOTE" << "MIDDLE" << "QUOTE";
+		G.aggregate("sub_atom") << "LPAREN" << "expr" << "RPAREN";
+		atom << "INT" << "sub_atom";
+		
+		G.aggregate( "sub_factor" ) << "F_OP" << "atom";
+		G.counting(  "factor_rhs", "sub_factor", '*');
+		factor << "atom" << "factor_rhs";
+		
+		G.aggregate( "sub_expr" ) << "S_OP" << "factor";
+		G.counting( "expr_rhs", "sub_expr", '*' );
+		expr << "factor" << "expr_rhs";
+		
 		
 	}
 	
@@ -115,10 +136,10 @@ YOCTO_UNIT_TEST_IMPL(gstr)
 	{
 		node->format(src.char_pool);
 		{
-			ios::ocstream fp( "gstr.dot", false );
+			ios::ocstream fp( "expr.dot", false );
 			node->graphviz( "G", fp );
 		}
-		system( "dot -Tpng gstr.dot -o gstr.png" );
+		system( "dot -Tpng expr.dot -o expr.png" );
 	}
 	
 }

@@ -53,6 +53,7 @@ namespace yocto
 			const string      name;
 			
 		private:
+			syntax::rule     *root_;
 			syntax::c_node   *tree_;
 			rules_set         rset_;
 			
