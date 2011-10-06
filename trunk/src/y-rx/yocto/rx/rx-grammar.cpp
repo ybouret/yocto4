@@ -22,6 +22,7 @@ namespace yocto
 		
 		grammar:: grammar( const string &n) : 
 		name(n),
+		root_(NULL),
 		tree_(NULL),
 		rset_(8,as_capacity)
 		{
@@ -52,22 +53,28 @@ namespace yocto
 			// initialize
 			//
 			//==================================================================
-			if( rset_.size() <= 0 )
+			if( NULL==root_ )
 				throw exception("empty grammar '%s'", name.c_str());
-			rules_set::iterator root = rset_.begin();
 			reset();
-			
-			
+			std::cerr << std::endl << name << ".parsing from " << root_->name << std::endl;
+#if 0
+			{
+				for( rules_set::iterator i=rset_.begin(); i != rset_.end(); ++i )
+				{
+					std::cerr << "-- " << (*i)->name << std::endl;
+				}
+			}
+#endif
 			//==================================================================
 			//
 			// run
 			//
 			//==================================================================
-			const syntax_result res = (*root)->match( lxr, src, tree_);
+			const syntax_result res = root_->match( lxr, src, tree_);
 			switch( res )
 			{
 				case syntax_nothing:
-					throw exception("End Of File for '%s'", (*root)->name.c_str() );
+					throw exception("End Of File for '%s'", root_->name.c_str() );
 					
 				case syntax_unexpected:
 					assert( lxr.cache.size  > 0 );
@@ -92,10 +99,17 @@ namespace yocto
 		
 		void grammar:: record( syntax::rule *r )
 		{
+			std::cerr << name << ".recording " << r->name << std::endl;
 			syntax::rule::ptr p(r);
 			if( !rset_.insert(p) )
 			{
 				throw syntax::exception( "grammar::record failure", "mutiple rule '%s'", p->name.c_str() ); 
+			}
+			if( 1 == rset_.size() )
+			{
+				assert( NULL == root_ );
+				std::cerr << "\t(root)" << std::endl;
+				root_ = r;
 			}
 		}
 		
