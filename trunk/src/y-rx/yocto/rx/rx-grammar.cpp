@@ -24,7 +24,8 @@ namespace yocto
 		name(n),
 		root_(NULL),
 		tree_(NULL),
-		rset_(8,as_capacity)
+		rset_(8,as_capacity),
+		mset_(8,as_capacity)
 		{
 			
 		}
@@ -57,14 +58,7 @@ namespace yocto
 				throw exception("empty grammar '%s'", name.c_str());
 			reset();
 			std::cerr << std::endl << name << ".parsing from " << root_->name << std::endl;
-#if 0
-			{
-				for( rules_set::iterator i=rset_.begin(); i != rset_.end(); ++i )
-				{
-					std::cerr << "-- " << (*i)->name << std::endl;
-				}
-			}
-#endif
+
 			//==================================================================
 			//
 			// run
@@ -114,6 +108,9 @@ namespace yocto
 		}
 		
 		
+		//----------------------------------------------------------------------
+		// rules creation API
+		//----------------------------------------------------------------------
 		void grammar:: terminal( const string &n, int p)
 		{
 			syntax::terminal *r = new syntax::terminal(n,p,*this);
@@ -157,6 +154,25 @@ namespace yocto
 			}
 		}
 		
+		//----------------------------------------------------------------------
+		// action
+		//----------------------------------------------------------------------
+		void grammar:: operator()( const string &rule_name, const production &do_something )
+		{
+			if( ! mset_.insert( rule_name, do_something ) )
+			{
+				throw exception("%s.on(MUTLIPLE '%s')", name.c_str(), rule_name.c_str() );
+			}
+		}
+		
+		void grammar:: apply( const string &rule_name, const token &tkn )
+		{
+			production *a = mset_.search( rule_name );
+			if( a )
+			{
+				(void) (*a)(rule_name,tkn);
+			}
+		}
 		
 	}
 }

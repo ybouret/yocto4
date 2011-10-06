@@ -75,7 +75,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	//std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
 	if( node )
 	{
-		node->format(src.char_pool);
+		node->format(G,src.char_pool);
 		{
 			ios::ocstream fp( "parsed.dot", false );
 			node->graphviz( "G", fp );
@@ -134,7 +134,7 @@ YOCTO_UNIT_TEST_IMPL(expr)
 	syntax::c_node *node = G.parse(lxr, src);
 	if( node )
 	{
-		node->format(src.char_pool);
+		node->format(G,src.char_pool);
 		{
 			ios::ocstream fp( "expr.dot", false );
 			node->graphviz( "G", fp );

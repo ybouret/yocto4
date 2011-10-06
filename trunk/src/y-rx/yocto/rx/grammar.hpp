@@ -15,6 +15,8 @@ namespace yocto
 	namespace regex
 	{
 		
+		typedef functor<void,TL2(const string,const token &)> production;
+		
 		class grammar
 		{
 		public:
@@ -28,6 +30,9 @@ namespace yocto
 			
 			syntax::c_node *parse( lexer &lxr, source &src );
 			
+			//------------------------------------------------------------------
+			// rules creation API
+			//------------------------------------------------------------------
 			void                  terminal( const string &n, int p=0);
 			syntax::aggregate   & aggregate( const string &n, int p=0);
 			syntax::alternative & alternative( const string &n );
@@ -44,9 +49,39 @@ namespace yocto
 			
 			void reset() throw();
 			
+			//------------------------------------------------------------------
+			// action API
+			//------------------------------------------------------------------
+			void operator()( const string &rule_name, const production &do_something );
+			inline void operator()( const char *rule_name, const production &do_something) { const string rn(rule_name); (*this)(rn,do_something); }
+		
+#if 1
+			template <typename HOST>
+			inline void operator()( const string &rule_name, HOST &host, bool (HOST:: *method)( const string&,const token &) )
+			{
+				assert( method );
+				const production a( &host, method );
+				(*this)(rule_name,a);
+			}
+			
+			template <typename HOST>
+			inline void operator()( const char *rule_name, HOST &host, bool (HOST:: *method)(const string&,const token & ) )
+			{
+				assert( method );
+				const  production a( &host, method );
+				(*this)(rule_name,a);
+			}
+#endif
+			
+			void apply( const string &rule_name, const token &tkn);
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
-			typedef set<string,syntax::rule::ptr,key_hasher<string>,memory::pooled::allocator> rules_set;
+			typedef key_hasher<string>        keyHasher;
+			typedef memory::pooled::allocator memAlloc;
+			
+			typedef set<string,syntax::rule::ptr,keyHasher,memAlloc> rule_set;
+			typedef map<string,production,keyHasher,memAlloc>   make_set;
 			void record( syntax::rule *r );
 			
 		public:
@@ -55,8 +90,8 @@ namespace yocto
 		private:
 			syntax::rule     *root_;
 			syntax::c_node   *tree_;
-			rules_set         rset_;
-			
+			rule_set          rset_;
+			make_set          mset_;
 			
 		};
 		
