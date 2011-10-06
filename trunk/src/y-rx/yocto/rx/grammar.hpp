@@ -14,7 +14,6 @@ namespace yocto
 	
 	namespace regex
 	{
-		typedef syntax::c_node cst_node;
 		
 		class grammar
 		{
@@ -27,7 +26,7 @@ namespace yocto
 			syntax::rule  * operator[]( const string & );
 			syntax::rule  * operator[]( const char   * );
 			
-			cst_node *parse( lexer &lxr, source &src, syntax_result &res );
+			syntax::c_node *parse( lexer &lxr, source &src );
 			
 			void                  terminal( const string &n, int p=0);
 			syntax::aggregate   & aggregate( const string &n, int p=0);
@@ -54,7 +53,7 @@ namespace yocto
 			const string      name;
 			
 		private:
-			cst_node         *tree_;
+			syntax::c_node   *tree_;
 			rules_set         rset_;
 			
 			

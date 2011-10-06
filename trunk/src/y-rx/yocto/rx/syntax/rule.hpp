@@ -52,6 +52,7 @@ namespace yocto
 				typedef intrusive_ptr<string,rule> ptr;
 				const string & key() const throw() { return name; }
 				
+				//! todo: add a rule ** to get error context
 				virtual syntax_result match( YOCTO_RX_SYNTAX_RULE_ARGS ) = 0;
 				
 			protected:

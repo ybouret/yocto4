@@ -69,9 +69,8 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 		
 	}
 	
-	syntax_result res = syntax_success;
-	cst_node *node = G.parse(lxr, src, res);
-	std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
+	syntax::c_node *node = G.parse(lxr, src );
+	//std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
 	if( node )
 	{
 		node->format(src.char_pool);
@@ -111,9 +110,7 @@ YOCTO_UNIT_TEST_IMPL(gstr)
 	source            src;
 	
 	src.connect( inp );
-	syntax_result res = syntax_success;
-	cst_node *node = G.parse(lxr, src, res);
-	std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
+	syntax::c_node *node = G.parse(lxr, src);
 	if( node )
 	{
 		node->format(src.char_pool);
