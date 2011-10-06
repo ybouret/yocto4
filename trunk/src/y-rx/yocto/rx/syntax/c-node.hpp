@@ -8,9 +8,12 @@ namespace yocto
 	
 	namespace regex
 	{
+	
 		
 		namespace syntax
 		{
+			
+			
 			
 			class rule;
 			class c_node

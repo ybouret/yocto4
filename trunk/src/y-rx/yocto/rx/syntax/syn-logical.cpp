@@ -14,8 +14,8 @@ namespace yocto
 			{
 			}
 			
-			logical:: logical( uint32_t t, const string &n, grammar &g ) :
-			rule(t,n,g),
+			logical:: logical( uint32_t t, const string &n, int p, grammar &g ) :
+			rule(t,n,p,g),
 			operands(2,as_capacity)	
 			{
 			}
@@ -34,8 +34,8 @@ namespace yocto
 			
 			
 			////////////////////////////////////////////////////////////////////
-			aggregate:: aggregate( const string &n, grammar &g ) :
-			logical(ID,n,g)
+			aggregate:: aggregate( const string &n, int p, grammar &g ) :
+			logical(ID,n,p,g)
 			{
 				
 			}
@@ -80,7 +80,7 @@ namespace yocto
 			
 			////////////////////////////////////////////////////////////////////
 			alternative:: alternative( const string &n, grammar &g ) :
-			logical(ID,n,g)
+			logical(ID,n,0,g)
 			{
 				
 			}

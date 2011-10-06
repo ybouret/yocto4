@@ -15,9 +15,9 @@ namespace yocto
 			{
 			}
 			
-			counting:: counting( uint32_t t, const string &n, grammar &g, const string &p ) :
-			rule(t,n,g),
-			motif( g[p] )
+			counting:: counting( uint32_t t, const string &n, int p, grammar &g, const string &m ) :
+			rule(t,n,p | node_fusion,g),
+			motif( g[m] )
 			{
 				
 			}
@@ -67,8 +67,8 @@ namespace yocto
 			////////////////////////////////////////////////////////////////////
 			optional:: ~optional() throw() {}
 			
-			optional:: optional( const string &n, grammar &g, const string &p) :
-			counting( ID,n,g, p )
+			optional:: optional( const string &n, int p, grammar &g, const string &m) :
+			counting( ID,n, p, g,m )
 			{
 			}
 			
@@ -80,8 +80,8 @@ namespace yocto
 			////////////////////////////////////////////////////////////////////
 			any_count:: ~any_count() throw() {}
 			
-			any_count:: any_count( const string &n, grammar &g, const string &p) :
-			counting( ID,n,g, p )
+			any_count:: any_count( const string &n, int p, grammar &g, const string &m) :
+			counting( ID,n,p,g,m )
 			{
 			}
 			
@@ -93,8 +93,8 @@ namespace yocto
 			////////////////////////////////////////////////////////////////////
 			one_or_more:: ~one_or_more() throw() {}
 			
-			one_or_more:: one_or_more( const string &n, grammar &g, const string &p) :
-			counting( ID,n,g, p )
+			one_or_more:: one_or_more( const string &n, int p, grammar &g, const string &m) :
+			counting( ID,n,p,g,m )
 			{
 			}
 			

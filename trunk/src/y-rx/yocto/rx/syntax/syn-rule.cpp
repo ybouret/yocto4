@@ -11,9 +11,10 @@ namespace yocto
 			
 			rule:: ~rule() throw() {}
 			
-			rule:: rule( uint32_t t, const string &n, grammar &g) :
+			rule:: rule( uint32_t t, const string &n, int p, grammar &g) :
 			type(t),
 			name(n),
+			ppty(p),
 			G(g),
 			nref_(0)
 			{

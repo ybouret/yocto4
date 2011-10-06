@@ -52,17 +52,17 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 		syntax::logical &root = G.aggregate( "list" );
 		
 		// registering terminals
-		G.variant( "INT"    );
-		G.certain( "RBRACK" );
-		G.certain( "LBRACK" );
-		G.useless( "COMMA"  );
-		G.variant( "WORD"   );
+		G.terminal( "INT"    );
+		G.terminal( "RBRACK" , node_certain);
+		G.terminal( "LBRACK" , node_certain);
+		G.terminal( "COMMA"  , node_useless);
+		G.terminal( "WORD"   );
 		
 		// create sub rules
 		G.alternative( "item" ) << "INT" << "WORD" << "list";
 		
-		G.aggregate( "other" ) << "COMMA" << "item";
-		G.counting("optional", "other", '*');
+		G.aggregate( "other", node_fusion ) << "COMMA" << "item";
+		G.counting("optional","other", '*');
 		
 		// feed the root
 		root << "LBRACK" << "item" << "optional" << "RBRACK";

@@ -19,15 +19,8 @@ namespace yocto
 				{
 					case terminal:
 						std::cerr << "-- format '" << link.name << "'" << std::endl;
-						switch( link.type )
-					{
-						case certain::ID:
+						if( link.ppty & node_certain )
 							data.lx->back_to(tp);
-							break;
-							
-						default:
-							break;
-					}
 						break;
 						
 						
@@ -38,35 +31,30 @@ namespace yocto
 						while( node )
 						{
 							c_node * __next = node->next;
-							switch( node->link.type )
+							if( node->link.ppty & node_useless )
 							{
-								case useless::ID:
-									std::cerr << "-- remove '" << node->link.name << "'" << std::endl;
-									c_node::destroy( __children.unlink(node), tp );
-									break;
-									
-								case optional::   ID:
-								case any_count::  ID:
-								case one_or_more::ID:
-								//case alternative::ID:
-									std::cerr << "-- fusion '" << node->link.name << "'" << std::endl;
-								{
-									//-- take care of node
-									node->format(tp);
-									//-- fusion
-									child_nodes left;
-									while( node != __children.tail ) left.push_front( __children.pop_back() );
-									__children.merge_back( __children.unlink(node)->children() );
-									__children.merge_back( left );
-									c_node::destroy( node );
-								}
-									break;
-									
-								default:
-									node->format(tp);
-									break;
+								std::cerr << "-- remove '" << node->link.name << "'" << std::endl;
+								c_node::destroy( __children.unlink(node), tp );
+								node = __next;
+								continue;
 							}
 							
+							if( node->link.ppty & node_fusion )
+							{
+								std::cerr << "-- fusion '" << node->link.name << "'" << std::endl;
+								//-- take care of node
+								node->format(tp);
+								//-- fusion
+								child_nodes left;
+								while( node != __children.tail ) left.push_front( __children.pop_back() );
+								__children.merge_back( __children.unlink(node)->children() );
+								__children.merge_back( left );
+								c_node::destroy( node );
+								node = __next;
+								continue;
+							}
+							
+							node->format(tp);
 							node = __next;
 						}
 					}

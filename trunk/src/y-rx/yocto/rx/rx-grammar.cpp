@@ -77,28 +77,18 @@ namespace yocto
 			}
 		}
 		
-		void grammar:: variant( const string &n )
-		{
-			syntax::terminal *r = new syntax::variant(n,*this);
-			record(r);			
-		}
 		
-		void grammar:: certain( const string &n )
+		void grammar:: terminal( const string &n, int p)
 		{
-			syntax::terminal *r = new syntax::certain(n,*this);
-			record(r);			
-		}
-		
-		void grammar:: useless( const string &n )
-		{
-			syntax::terminal *r = new syntax::useless(n,*this);
+			syntax::terminal *r = new syntax::terminal(n,p,*this);
 			record(r);			
 		}
 		
 		
-		syntax::aggregate & grammar:: aggregate( const string &n )
+		
+		syntax::aggregate & grammar:: aggregate( const string &n, int p)
 		{
-			syntax::aggregate *r = new syntax::aggregate(n,*this);
+			syntax::aggregate *r = new syntax::aggregate(n,p,*this);
 			record(r);			
 			return *r;
 		}
@@ -110,20 +100,20 @@ namespace yocto
 			return *r;
 		}
 		
-		void grammar:: counting( const string &n, const string &p, char kind)
+		void grammar:: counting( const string &n, const string &m, char kind, int p)
 		{
 			switch( kind )
 			{
 				case '?':
-					record( new syntax::optional(n,*this,p) );
+					record( new syntax::optional(n,p,*this,m) );
 					break;
 					
 				case '+':
-					record( new syntax::one_or_more(n,*this,p) );
+					record( new syntax::one_or_more(n,p,*this,m) );
 					break;
 					
 				case '*':
-					record( new syntax::any_count(n,*this,p) );
+					record( new syntax::any_count(n,p,*this,m) );
 					break;
 					
 				default:
