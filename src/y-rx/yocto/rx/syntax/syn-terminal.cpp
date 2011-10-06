@@ -13,8 +13,8 @@ namespace yocto
 			
 			
 			////////////////////////////////////////////////////////////////////
-			terminal:: terminal( uint32_t t, const string &n, grammar &g ) :
-			rule( t, n, g )
+			terminal:: terminal( const string &n, int p, grammar &g ) :
+			rule( ID, n, p, g )
 			{
 			}
 			
@@ -66,6 +66,7 @@ namespace yocto
 				
 			}
 			
+#if 0
 			////////////////////////////////////////////////////////////////////
 			variant:: variant( const string &n, grammar &g ) : terminal( ID,n,g ) {}
 			variant:: ~variant() throw() {}
@@ -78,7 +79,7 @@ namespace yocto
 			////////////////////////////////////////////////////////////////////
 			useless:: useless( const string &n, grammar &g ) : terminal( ID,n,g ) {}
 			useless:: ~useless() throw() {}
-			
+#endif
 			
 			
 		}

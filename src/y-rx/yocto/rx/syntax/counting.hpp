@@ -19,7 +19,7 @@ namespace yocto
 				virtual ~counting() throw();
 				
 			protected:
-				explicit counting( uint32_t t, const string &n, grammar &g, const string &p);
+				explicit counting( uint32_t t, const string &n, int p, grammar &g, const string &m);
 
 			private:
 				rule::ptr motif;
@@ -34,7 +34,7 @@ namespace yocto
 			public:
 				static const uint32_t ID = YOCTO_FOURCC('#','0','|','1');
 				virtual ~optional() throw();
-				explicit optional( const string &n, grammar &g, const string &p);
+				explicit optional( const string &n, int p, grammar &g, const string &m);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(optional);
@@ -47,7 +47,7 @@ namespace yocto
 			public:
 				static const uint32_t ID = YOCTO_FOURCC('#','>', '=','0');
 				virtual ~any_count() throw();
-				explicit any_count( const string &n, grammar &g, const string &p);
+				explicit any_count( const string &n, int p, grammar &g, const string &m);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(any_count);
@@ -60,7 +60,7 @@ namespace yocto
 			public:
 				static const uint32_t ID = YOCTO_FOURCC('#','>','=','1');
 				virtual ~one_or_more() throw();
-				explicit one_or_more( const string &n, grammar &g, const string &p);
+				explicit one_or_more( const string &n, int p, grammar &g, const string &m);
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(one_or_more);

@@ -29,22 +29,18 @@ namespace yocto
 			
 			cst_node *parse( lexer &lxr, source &src, syntax_result &res );
 			
-			void                  variant( const string &n);
-			void                  certain( const string &n);
-			void                  useless( const string &n);
-			syntax::aggregate   & aggregate( const string &n );
+			void                  terminal( const string &n, int p=0);
+			syntax::aggregate   & aggregate( const string &n, int p=0);
 			syntax::alternative & alternative( const string &n );
-			void                  counting( const string &n, const string &p, char kind );
+			void                  counting( const string &n, const string &m, char kind, int p=0);
 			
-			inline void                  variant( const char *t )    { const string n(t); variant(n); }
-			inline void                  certain( const char *t )    { const string n(t); certain(n); }
-			inline void                  useless( const char *t )    { const string n(t); useless(n); }
-			inline syntax::aggregate   & aggregate( const char *t )   { const string n(t); return aggregate(n); }
+			inline void                  terminal( const char *t, int p=0 )   { const string n(t); terminal(n,p); }
+			inline syntax::aggregate   & aggregate( const char *t, int p=0)   { const string n(t); return aggregate(n,p); }
 			inline syntax::alternative & alternative( const char *t ) { const string n(t); return alternative(n); }
-			inline void                  counting( const char *n, const char *p, char kind ) 
+			inline void                  counting( const char *n, const char *m, char kind , int p=0) 
 			{ 
-				const string _n(n), _p(p);
-				counting(_n,_p,kind);
+				const string _n(n), _m(m);
+				counting(_n,m,kind,p);
 			}
 			
 			void reset() throw();

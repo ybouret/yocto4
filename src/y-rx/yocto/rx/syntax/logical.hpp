@@ -26,7 +26,7 @@ namespace yocto
 				logical & operator <<( const char   *p );
 				
 			protected:
-				explicit logical( uint32_t t, const string &n, grammar &G );
+				explicit logical( uint32_t t, const string &n, int p, grammar &G );
 				vector<rule *,memory::pooled::allocator> operands;
 				
 			private:
@@ -39,7 +39,7 @@ namespace yocto
 			public:
 				static const uint32_t ID = YOCTO_FOURCC( 'A','G','G','R' );
 				virtual ~aggregate() throw();
-				explicit aggregate( const string &n, grammar &g);
+				explicit aggregate( const string &n, int p, grammar &g);
 				
 			private:
 				
