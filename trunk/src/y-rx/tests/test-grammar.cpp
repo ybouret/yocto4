@@ -85,3 +85,44 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/rx/pattern/basic.hpp"
+
+YOCTO_UNIT_TEST_IMPL(gstr)
+{
+	lexer lxr;
+	lxr( regex::basic::single::create( '\"' ), "QUOTE" );
+	lxr( "([:word:]| )+", "MIDDLE" );
+	lxr( "[ \\t]+",     "WS",   lxr, & lexer::skip );
+	lxr( "[:endl:]",    "ENDL", lxr, & lexer::skip );
+	
+	grammar G( "gstr" );
+	{
+		syntax::logical &root = G.aggregate( "cstring" );
+		
+		G.terminal( "QUOTE", node_useless);
+		G.terminal( "MIDDLE" );
+		
+		root << "QUOTE" << "MIDDLE" << "QUOTE";
+		
+	}
+	
+	ios::icstream     inp( ios::cstdin );
+	source            src;
+	
+	src.connect( inp );
+	syntax_result res = syntax_success;
+	cst_node *node = G.parse(lxr, src, res);
+	std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
+	if( node )
+	{
+		node->format(src.char_pool);
+		{
+			ios::ocstream fp( "gstr.dot", false );
+			node->graphviz( "G", fp );
+		}
+		system( "dot -Tpng gstr.dot -o gstr.png" );
+	}
+	
+}
+YOCTO_UNIT_TEST_DONE()
