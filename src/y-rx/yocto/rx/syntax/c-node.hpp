@@ -28,16 +28,19 @@ namespace yocto
 				c_node       *prev;
 				const rule   &link;
 				
-				static c_node *create( lexeme *lx, rule &r );				
-				static c_node *create( rule &r );				
+				static c_node *create( lexeme *lx, rule &r ); //!< create terminal
+				static c_node *create( rule &r );		      //!< create internal
 				
-				static void destroy( c_node *node ) throw();				
-				static void destroy( c_node *node, t_char::pool &tp) throw();
-				static void restore( c_node *node, lexer &lxr      ) throw();
+				static void destroy( c_node *node ) throw();  //!< full destruction
+				static void destroy( c_node *node, t_char::pool &tp) throw(); //!< destruct with t_char caching
+				static void restore( c_node *node, lexer &lxr      ) throw(); //!< unget the node
 				
-				static void append( c_node * &tree, c_node *node );
+				static void append( c_node * &tree, c_node *node ); //!< grow the tree
 					
 				void graphviz( const string &graph_name, ios::ostream &os ) const;
+				void graphviz( const char   *graph_name, ios::ostream &os ) const { const string s(graph_name); graphviz(s,os); }
+				
+				void format( t_char::pool &tp ) throw();
 				
 			private:
 				explicit c_node( lexeme *lx, rule &r ) throw();				

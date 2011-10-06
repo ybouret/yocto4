@@ -55,7 +55,7 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 		G.variant( "INT"    );
 		G.certain( "RBRACK" );
 		G.certain( "LBRACK" );
-		G.certain( "COMMA"  );
+		G.useless( "COMMA"  );
 		G.variant( "WORD"   );
 		
 		// create sub rules
@@ -70,10 +70,11 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	}
 	
 	syntax_result res = syntax_success;
-	const cst_node *node = G.parse(lxr, src, res);
+	cst_node *node = G.parse(lxr, src, res);
 	std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
 	if( node )
 	{
+		node->format(src.char_pool);
 		{
 			ios::ocstream fp( "parsed.dot", false );
 			node->graphviz( "G", fp );

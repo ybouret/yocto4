@@ -28,6 +28,7 @@ namespace yocto
 			};
 			
 			
+			//! undefined terminal
 			class variant : public terminal
 			{
 			public:
@@ -39,7 +40,7 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(variant);
 			};
 			
-			
+			//! only one possible terminal
 			class certain : public terminal
 			{
 			public:
@@ -50,6 +51,21 @@ namespace yocto
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(certain);
 			};
+			
+			//! syntax only terminal, to drop
+			class useless : public terminal
+			{
+			public:
+				static const uint32_t ID = YOCTO_FOURCC('T','N','I','L');
+				explicit useless( const string &n, grammar &g );
+				virtual ~useless() throw();
+				
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(useless);
+				
+			};
+			
+			
 			
 		}
 				

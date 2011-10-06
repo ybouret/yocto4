@@ -47,11 +47,22 @@ namespace yocto
 		
 		cst_node *grammar:: parse( lexer &lxr, source &src, syntax_result &res )
 		{
+			//==================================================================
+			//
+			// initialize
+			//
+			//==================================================================
 			if( rset_.size() <= 0 )
 				throw exception("empty grammar '%s'", name.c_str());
 			rules_set::iterator root = rset_.begin();
-			
 			reset();
+			
+			
+			//==================================================================
+			//
+			// run
+			//
+			//==================================================================
 			res = (*root)->match( lxr, src, tree_);
 			return tree_;
 		}
@@ -77,6 +88,13 @@ namespace yocto
 			syntax::terminal *r = new syntax::certain(n,*this);
 			record(r);			
 		}
+		
+		void grammar:: useless( const string &n )
+		{
+			syntax::terminal *r = new syntax::useless(n,*this);
+			record(r);			
+		}
+		
 		
 		syntax::aggregate & grammar:: aggregate( const string &n )
 		{
