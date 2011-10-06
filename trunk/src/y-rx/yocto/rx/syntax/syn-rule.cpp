@@ -15,8 +15,7 @@ namespace yocto
 			type(t),
 			name(n),
 			G(g),
-			nref_(0),
-			ppty(0)
+			nref_(0)
 			{
 			}
 			

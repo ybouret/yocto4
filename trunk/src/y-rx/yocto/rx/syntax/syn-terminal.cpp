@@ -12,10 +12,10 @@ namespace yocto
 		{
 			
 			
+			////////////////////////////////////////////////////////////////////
 			terminal:: terminal( uint32_t t, const string &n, grammar &g ) :
 			rule( t, n, g )
 			{
-				//if( univocal ) (int &)ppty |= int( discard_token );
 			}
 			
 			terminal:: ~terminal() throw()
@@ -66,17 +66,18 @@ namespace yocto
 				
 			}
 			
-			
+			////////////////////////////////////////////////////////////////////
 			variant:: variant( const string &n, grammar &g ) : terminal( ID,n,g ) {}
 			variant:: ~variant() throw() {}
 			
-			certain:: certain( const string &n, grammar &g ) : terminal( ID,n,g ) 
-			{
-				(int&)ppty |= discard_token;
-			}
-			
+			////////////////////////////////////////////////////////////////////
+			certain:: certain( const string &n, grammar &g ) : terminal( ID,n,g ) {}
 			certain:: ~certain() throw() {}
 			
+			
+			////////////////////////////////////////////////////////////////////
+			useless:: useless( const string &n, grammar &g ) : terminal( ID,n,g ) {}
+			useless:: ~useless() throw() {}
 			
 			
 			
