@@ -13,7 +13,7 @@ namespace yocto
 		namespace lexical
 		{
 			
-#define YOCTO_RX_LEX_RULE_ACTION_ARGS regex::token &
+#define YOCTO_RX_LEX_RULE_ACTION_ARGS const regex::token &
 
 			typedef functor<bool,TL1(YOCTO_RX_LEX_RULE_ACTION_ARGS)> action;
 			
@@ -34,7 +34,7 @@ namespace yocto
 				 \param l associated label
 				 */
 				static rule *create(  pattern *p, const string &l, const action *a = NULL);
-				static void  destroy(  rule *r ) throw();			 
+				static void  destroy( rule *r ) throw();			 
 				
 				bool keep( YOCTO_RX_LEX_RULE_ACTION_ARGS  ) throw();
 				

@@ -1,6 +1,10 @@
+#if 0
 #include "yocto/rx/syntax/terminal.hpp"
 #include "yocto/rx/syntax/counting.hpp"
 #include "yocto/rx/syntax/logical.hpp"
+#endif
+
+#include "yocto/rx/grammar.hpp"
 
 #include <iostream>
 
@@ -10,10 +14,12 @@ namespace yocto
 	namespace regex
 	{
 		
+		
+		
 		namespace syntax
 		{
 			
-			void c_node:: format(  t_char::pool &tp ) throw()
+			void c_node:: format(  grammar &G, t_char::pool &tp ) throw()
 			{
 				switch( type )
 				{
@@ -21,6 +27,11 @@ namespace yocto
 						std::cerr << "-- format '" << link.name << "'" << std::endl;
 						if( link.ppty & node_certain )
 							data.lx->back_to(tp);
+						else 
+						{
+							G.apply( link.name, *(data.lx) );
+						}
+
 						break;
 						
 						
@@ -43,7 +54,7 @@ namespace yocto
 							{
 								std::cerr << "-- fusion '" << node->link.name << "'" << std::endl;
 								//-- take care of node
-								node->format(tp);
+								node->format(G,tp);
 								//-- fusion
 								child_nodes left;
 								while( node != __children.tail ) left.push_front( __children.pop_back() );
@@ -54,7 +65,7 @@ namespace yocto
 								continue;
 							}
 							
-							node->format(tp);
+							node->format(G,tp);
 							node = __next;
 						}
 					}
