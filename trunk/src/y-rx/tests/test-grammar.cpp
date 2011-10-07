@@ -142,3 +142,59 @@ YOCTO_UNIT_TEST_IMPL(expr)
 }
 YOCTO_UNIT_TEST_DONE()
 
+YOCTO_UNIT_TEST_IMPL(json)
+{
+	lexer   L;
+	grammar G("json");
+	
+	L( "\\{", "LBRACE" );
+	L( "\\}", "RBRACE" );
+	L( "[:cstring:]", "string" );
+	L( "[:digit:]+",  "number" );
+	L( ",", "COMMA" );
+	L( ":", "COLUMN");
+	L( "[ \\t]+",     "WS",   L, & lexer::skip );
+	L( "[:endl:]",    "ENDL", L, & lexer::skip );
+	{
+		syntax::logical &json = G.alternative( "json" );
+		syntax::logical &obj  = G.alternative( "object" );
+		
+		G.terminal( "LBRACE" );
+		G.terminal( "RBRACE" );
+		G.terminal( "string" );
+		G.terminal( "number" );
+		G.terminal( "COMMA" , node_certain );
+		G.terminal( "COLUMN", node_certain );
+		G.alternative( "value" ) << "string" << "number";
+		G.aggregate("pair") << "string" << "COLUMN" << "value";
+		syntax::logical &members = G.alternative( "members" );
+		G.aggregate( "other_members" ) << "pair" << "COMMA" << "members";
+		members << "pair" << "other_members";
+
+		
+		G.aggregate("empty_object") << "LBRACE" << "RBRACE";
+		G.aggregate("heavy_object") << "LBRACE" << "members" << "RBRACE";
+		
+		obj << "empty_object" << "heavy_object";
+		
+		json << "object";
+		
+	}
+	
+	ios::icstream     inp( ios::cstdin );
+	source            src;
+	
+	src.connect( inp );
+	syntax::c_node *node = G.parse(L, src);
+	assert(node);
+	{
+		ios::ocstream fp( "json.dot", false );
+		node->graphviz( "G", fp );
+	}
+	system( "dot -Tpng json.dot -o json.png" );
+	
+	
+}
+YOCTO_UNIT_TEST_DONE()
+
+
