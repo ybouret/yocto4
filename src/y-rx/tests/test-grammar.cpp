@@ -16,6 +16,7 @@
 using namespace yocto;
 using namespace regex;
 
+
 #define SHOW_SIZE(TYPE) std::cerr << "-- sizeof(" #TYPE ") = " << sizeof(TYPE) << std::endl
 
 YOCTO_UNIT_TEST_IMPL(grammar)
