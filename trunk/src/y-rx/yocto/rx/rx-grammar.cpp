@@ -24,8 +24,7 @@ namespace yocto
 		name(n),
 		root_(NULL),
 		tree_(NULL),
-		rset_(8,as_capacity),
-		mset_(8,as_capacity)
+		rset_(8,as_capacity) //,mset_(8,as_capacity)
 		{
 			
 		}
@@ -157,6 +156,7 @@ namespace yocto
 		//----------------------------------------------------------------------
 		// action
 		//----------------------------------------------------------------------
+#if 0
 		void grammar:: operator()( const string &rule_name, const production &do_something )
 		{
 			if( ! mset_.insert( rule_name, do_something ) )
@@ -173,6 +173,7 @@ namespace yocto
 				(void) (*a)(rule_name,tkn);
 			}
 		}
+#endif
 		
 	}
 }

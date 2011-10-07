@@ -52,10 +52,10 @@ namespace yocto
 			//------------------------------------------------------------------
 			// action API
 			//------------------------------------------------------------------
+#if 0
 			void operator()( const string &rule_name, const production &do_something );
 			inline void operator()( const char *rule_name, const production &do_something) { const string rn(rule_name); (*this)(rn,do_something); }
 		
-#if 1
 			template <typename HOST>
 			inline void operator()( const string &rule_name, HOST &host, bool (HOST:: *method)( const string&,const token &) )
 			{
@@ -71,9 +71,9 @@ namespace yocto
 				const  production a( &host, method );
 				(*this)(rule_name,a);
 			}
-#endif
 			
 			void apply( const string &rule_name, const token &tkn);
+#endif
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
@@ -81,7 +81,7 @@ namespace yocto
 			typedef memory::pooled::allocator memAlloc;
 			
 			typedef set<string,syntax::rule::ptr,keyHasher,memAlloc> rule_set;
-			typedef map<string,production,keyHasher,memAlloc>   make_set;
+			//typedef map<string,production,keyHasher,memAlloc>   make_set;
 			void record( syntax::rule *r );
 			
 		public:
@@ -91,7 +91,7 @@ namespace yocto
 			syntax::rule     *root_;
 			syntax::c_node   *tree_;
 			rule_set          rset_;
-			make_set          mset_;
+			//make_set          mset_;
 			
 		};
 		

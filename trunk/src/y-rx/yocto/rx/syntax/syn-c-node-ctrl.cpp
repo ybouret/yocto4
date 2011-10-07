@@ -1,10 +1,9 @@
-#if 0
+#if 1
 #include "yocto/rx/syntax/terminal.hpp"
 #include "yocto/rx/syntax/counting.hpp"
 #include "yocto/rx/syntax/logical.hpp"
 #endif
 
-#include "yocto/rx/grammar.hpp"
 
 #include <iostream>
 
@@ -27,11 +26,6 @@ namespace yocto
 						std::cerr << "-- format '" << link.name << "'" << std::endl;
 						if( link.ppty & node_certain )
 							data.lx->back_to(tp);
-						else 
-						{
-							G.apply( link.name, *(data.lx) );
-						}
-
 						break;
 						
 						
