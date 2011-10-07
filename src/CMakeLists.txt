@@ -58,7 +58,7 @@ YOCTO_BUILD(z++)
 YOCTO_BUILD(mpi)
 YOCTO_BUILD(ocl)
 
-INSTALL( FILES share/rules.cmake share/fltk.cmake share/opencl.cmake DESTINATION share/yocto )
+INSTALL( FILES share/create.sh share/rules.cmake share/fltk.cmake share/opencl.cmake DESTINATION share/yocto )
 
 ########################################################################
 IF(UNIX)

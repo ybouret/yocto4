@@ -1,6 +1,8 @@
 #include "yocto/rx/syntax/rule.hpp"
 #include "yocto/ios/ostream.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	
@@ -17,12 +19,25 @@ namespace yocto
 				if( type == terminal )
 				{
 					os( ",shape=oval];\n" );
-					if( data.lx->size > 0 )
+					if( !(link.ppty & node_certain) )
 					{
-						const string s = data.lx->to_string();
+						//std::cerr << "--lexeme= " << *(data.lx) << std::endl;
+						string s = data.lx->to_string();
+						for( size_t i=0; i < s.size(); ++i )
+						{
+							switch( s[i] )
+							{
+								case '"' :
+									s[i] = '.';
+									break;
+									
+								default:
+									break;
+							}
+						}
 						show_tag(os,data.lx);
-						os( "[label=\"%s\",shape=rect];\n", s.c_str() );
-						show_tag(os,this); os( " ->  " ); show_tag(os,data.lx); os(" [ arrowhead=dot ]\n;");
+						os( " [label=\"%s\",shape=rect];\n", s.c_str() );
+						show_tag(os,this); os( " ->  " ); show_tag(os,data.lx); os(" [ arrowhead=dot ];\n");
 					}
 				}
 				else {
@@ -30,7 +45,7 @@ namespace yocto
 					for( const c_node *node = children().head; node; node=node->next )
 					{
 						node->viz(os);
-						show_tag(os,this); os( " -> " ); show_tag(os,node); os("\n;");
+						show_tag(os,this); os( " -> " ); show_tag(os,node); os(";\n");
 					}
 				}
 				
