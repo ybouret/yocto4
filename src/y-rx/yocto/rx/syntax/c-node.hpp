@@ -9,7 +9,6 @@ namespace yocto
 	namespace regex
 	{
 	
-		class grammar;
 		
 		namespace syntax
 		{
@@ -44,7 +43,7 @@ namespace yocto
 				void graphviz( const string &graph_name, ios::ostream &os ) const;
 				void graphviz( const char   *graph_name, ios::ostream &os ) const { const string s(graph_name); graphviz(s,os); }
 				
-				void format( regex::grammar &G, t_char::pool &tp ) throw();
+				void compile(  t_char::pool &tp ) throw();
 				
 			private:
 				explicit c_node( lexeme *lx, rule &r ) throw();				

@@ -18,7 +18,7 @@ namespace yocto
 		namespace syntax
 		{
 			
-			void c_node:: format(  grammar &G, t_char::pool &tp ) throw()
+			void c_node:: compile( t_char::pool &tp ) throw()
 			{
 				switch( type )
 				{
@@ -48,7 +48,7 @@ namespace yocto
 							{
 								std::cerr << "-- fusion '" << node->link.name << "'" << std::endl;
 								//-- take care of node
-								node->format(G,tp);
+								node->compile(tp);
 								//-- fusion
 								child_nodes left;
 								while( node != __children.tail ) left.push_front( __children.pop_back() );
@@ -59,7 +59,7 @@ namespace yocto
 								continue;
 							}
 							
-							node->format(G,tp);
+							node->compile(tp);
 							node = __next;
 						}
 					}
