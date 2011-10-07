@@ -17,7 +17,7 @@ namespace yocto
 		
 		typedef functor<void,TL2(const string,const token &)> production;
 		
-		class grammar
+		class grammar : public object
 		{
 		public:
 			

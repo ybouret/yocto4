@@ -73,16 +73,14 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	}
 	
 	syntax::c_node *node = G.parse(lxr, src );
-	//std::cerr << "res=" << int(res) << ", node@" << (void *)node << std::endl;
-	if( node )
+	assert(node);
+	//node->format(G,src.char_pool);
 	{
-		node->format(G,src.char_pool);
-		{
-			ios::ocstream fp( "parsed.dot", false );
-			node->graphviz( "G", fp );
-		}
-		system( "dot -Tpng parsed.dot -o parsed.png" );
+		ios::ocstream fp( "parsed.dot", false );
+		node->graphviz( "G", fp );
 	}
+	system( "dot -Tpng parsed.dot -o parsed.png" );
+	
 	
 	
 }
@@ -133,15 +131,21 @@ YOCTO_UNIT_TEST_IMPL(expr)
 	
 	src.connect( inp );
 	syntax::c_node *node = G.parse(lxr, src);
-	if( node )
+	assert(node);
 	{
-		node->format(G,src.char_pool);
-		{
-			ios::ocstream fp( "expr.dot", false );
-			node->graphviz( "G", fp );
-		}
-		system( "dot -Tpng expr.dot -o expr.png" );
+		ios::ocstream fp( "expr.dot", false );
+		node->graphviz( "G", fp );
 	}
+	system( "dot -Tpng expr.dot -o expr.png" );
+	
 	
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+YOCTO_UNIT_TEST_IMPL(gramc)
+{
+	
+}
+YOCTO_UNIT_TEST_DONE()
+
