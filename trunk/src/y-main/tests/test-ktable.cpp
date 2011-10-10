@@ -10,11 +10,11 @@ namespace
 	class dummy
 	{
 	public:
-		dummy *next;
-		dummy *prev;
-		size_t a;
+		dummy       *next;
+		dummy       *prev;
+		const size_t hkey;
 		
-		dummy( size_t k ) : next(NULL), prev(NULL), a(k) 
+		dummy( size_t k ) : next(NULL), prev(NULL), hkey(k) 
 		{
 			//std::cerr << "+dummy[" << a << "]" << std::endl;
 			//(std::cerr << "+" ).flush();
@@ -32,7 +32,7 @@ namespace
 		
 		static inline bool match( const dummy *dn, const void *param ) throw()
 		{
-			return dn->a == *(size_t *)param;
+			return dn->hkey == *(size_t *)param;
 		}
 		
 	private:
@@ -65,7 +65,7 @@ YOCTO_UNIT_TEST_IMPL(ktable)
 		for( size_t j=0; j < tab.nodes; ++j )
 		{
 			dummy *dn = new(tab.cache.query()) dummy( alea_less_than(kmax) );
-			tab.insert(dn->a,dn);
+			tab.insert(dn);
 		}
 		
 		const size_t nmax = 64;
