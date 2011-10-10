@@ -82,13 +82,14 @@ namespace yocto
 			
 			typedef set<string,syntax::rule::ptr,keyHasher,memAlloc> rule_set;
 			//typedef map<string,production,keyHasher,memAlloc>   make_set;
+			
+			//! record in the set
 			void record( syntax::rule *r );
 			
 		public:
 			const string      name;
 			
 		private:
-			syntax::rule     *root_;
 			syntax::c_node   *tree_;
 			rule_set          rset_;
 			//make_set          mset_;

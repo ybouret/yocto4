@@ -181,9 +181,8 @@ namespace yocto
 		
 		
 		static inline bool _match( const node_type *node, const void *params ) throw()
-		{
-			return node->key == *(const_key*)params;
-		}
+		{ return node->key == *(const_key*)params; }
+		
 	};
 	
 }
