@@ -38,7 +38,7 @@ namespace yocto
 		};
 		
 		typedef core::xarray<slot_t> xarr_t;
-		typedef slot_t *            slot_ptr;
+		typedef slot_t *             slot_ptr;
 		
 		explicit dictionary() throw() : hmem_(), comp_(), xarr_() {}
 		virtual ~dictionary() throw() { _kill(); }
@@ -134,8 +134,8 @@ namespace yocto
 		inline const_iterator begin() const throw() { return const_iterator( xarr_.table  );      }
 		inline const_iterator end()   const throw() { return const_iterator( xarr_.table+size()); }
 		
-
-
+		
+		
 	private:
 		ALLOCATOR  hmem_;
 		COMPARATOR comp_;

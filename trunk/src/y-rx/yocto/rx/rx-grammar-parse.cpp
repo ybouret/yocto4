@@ -13,21 +13,22 @@ namespace yocto
 			// initialize
 			//
 			//==================================================================
-			if( NULL==root_ )
+			if( rset_.size() <= 0 )
 				throw exception("empty grammar '%s'", name.c_str());
 			reset();
-			std::cerr << std::endl << name << ".parsing from " << root_->name << std::endl;
+			syntax::rule     & root = ** rset_.begin();
+			std::cerr << std::endl << name << ".parsing from " << root.name << std::endl;
 			
 			//==================================================================
 			//
 			// run
 			//
 			//==================================================================
-			const syntax_result res = root_->match( lxr, src, tree_);
+			const syntax_result res = root.match( lxr, src, tree_);
 			switch( res )
 			{
 				case syntax_nothing:
-					throw exception("End Of File for '%s'", root_->name.c_str() );
+					throw exception("End Of File for '%s'", root.name.c_str() );
 					
 				case syntax_unexpected:
 					assert( lxr.cache.size  > 0 );

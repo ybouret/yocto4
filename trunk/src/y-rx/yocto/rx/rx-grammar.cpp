@@ -22,7 +22,6 @@ namespace yocto
 		
 		grammar:: grammar( const string &n) : 
 		name(n),
-		root_(NULL),
 		tree_(NULL),
 		rset_(8,as_capacity) //,mset_(8,as_capacity)
 		{
@@ -56,12 +55,7 @@ namespace yocto
 			{
 				throw syntax::exception( "grammar::record failure", "mutiple rule '%s'", p->name.c_str() ); 
 			}
-			if( 1 == rset_.size() )
-			{
-				assert( NULL == root_ );
-				std::cerr << "\t(root)" << std::endl;
-				root_ = r;
-			}
+			
 		}
 		
 		
