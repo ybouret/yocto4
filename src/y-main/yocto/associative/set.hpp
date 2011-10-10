@@ -41,11 +41,16 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
 		};
 		
-		
+		//! default nothrow constructor
 		explicit set() throw(): hash_(), hmem_(),ktab_() {}
+		
+		//! with a little memory
 		explicit set( size_t n, const as_capacity_t & ) : hash_(), hmem_(), ktab_(n,hmem_) {}
+		
+		//! destructor
 		virtual ~set() throw() { _kill(); }
 		
+		//! copy constructor
 		inline set( const set &other ) : hash_(), hmem_(), ktab_() 
 		{
 			set tmp( other.size(), as_capacity );
@@ -157,8 +162,12 @@ namespace yocto
 			return node ?  & node->data : NULL;
 		}
 		
+		//! detroy content, keep nodes
 		inline void _free() throw() { ktab_.free_with( destruct<node_type> ); }
+		
+		//! release all
 		inline void _kill() throw() { _free();  ktab_.release_all(hmem_);     }
+		
 		inline void _copy_into( set &other ) const
 		{
 			assert( other.capacity() >= this->size() );
@@ -181,6 +190,10 @@ namespace yocto
 					_insert( other.ktab_, kn->hkey, src->data );
 				}
 			}			
+			for( node_type *src = ktab_.nlist.head; src; src = src->next )
+			{
+				
+			}
 			assert( other.size() == this->size() );
 		}
 		

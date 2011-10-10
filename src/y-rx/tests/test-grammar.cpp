@@ -165,11 +165,12 @@ YOCTO_UNIT_TEST_IMPL(json)
 		G.terminal( "number" );
 		G.terminal( "COMMA" , node_certain );
 		G.terminal( "COLUMN", node_certain );
-		G.alternative( "value" ) << "string" << "number";
+		G.alternative( "value" ) << "string" << "number" << "object";
 		G.aggregate("pair") << "string" << "COLUMN" << "value";
-		syntax::logical &members = G.alternative( "members" );
-		G.aggregate( "other_members" ) << "pair" << "COMMA" << "members";
-		members << "pair" << "other_members";
+		syntax::logical &members = G.aggregate( "members" );
+		G.aggregate( "other_members" ) << "COMMA" << "members";
+		G.counting( "optional_members", "other_members", '*');
+		members << "pair" << "optional_members";
 
 		
 		G.aggregate("empty_object") << "LBRACE" << "RBRACE";
