@@ -6,6 +6,8 @@
 #include "yocto/memory/embed.hpp"
 #include "yocto/code/swap.hpp"
 
+#include "yocto/hashing/sha1.hpp"
+
 namespace yocto
 {
 	
@@ -22,16 +24,17 @@ namespace yocto
 		
 		
 		//! key meta-node
+		/** Node must have a hkey field */
 		template <typename NODE>
 		class knode
 		{
 		public:
 			knode       *next;
 			knode       *prev;
-			const size_t hkey;
 			NODE        *addr;
 			
-			inline knode( size_t k, NODE *n ) throw() : next(NULL), prev(NULL), hkey(k), addr(n) {}
+			inline knode( NODE *n ) throw() : next(NULL), prev(NULL), addr(n) {}
+			
 		private:
 			~knode() throw();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(knode);
@@ -110,13 +113,14 @@ namespace yocto
 			}
 			
 			//! insert a node extracted from cache
-			inline void insert( const size_t hkey, NODE *node ) throw()
+			inline void insert( NODE *node ) throw()
 			{
 				assert( kpool.available() > 0 ); assert( count > 0 );
-				knode_t *kn = new (kpool.query()) knode_t( hkey, node );
-				kslot[ hkey % count ].push_front( kn );
+				knode_t *kn = new (kpool.query()) knode_t( node );
+				kslot[ node->hkey % count ].push_front( kn );
 				nlist.push_back( node );
 			}
+			
 			
 			//! free
 			inline void free_with( void (*proc)( NODE * ) throw() ) throw()
@@ -128,7 +132,9 @@ namespace yocto
 					while( slot.size > 0 )
 					{
 						//-- remove knode from slot
-						knode_t *kn = slot.pop_front(); assert( kn->addr != NULL ); assert( kn->hkey % count == i );
+						knode_t *kn = slot.pop_front(); 
+						assert( kn->addr != NULL );
+						assert( kn->addr->hkey % count == i );
 						
 						//-- remove NODE from node list
 						NODE    *dn = nlist.unlink(kn->addr);
@@ -155,7 +161,7 @@ namespace yocto
 					slot = &kslot[ indx ];
 					for( knode_t *kn = slot->head; kn != NULL; kn = kn->next )
 					{
-						NODE *node = kn->addr; assert(node); assert(kn->hkey % count == indx );
+						NODE *node = kn->addr; assert(node); assert(node->hkey % count == indx );
 						if( match(node,param) ) 
 						{
 							slot->move_to_front(kn);
@@ -168,11 +174,12 @@ namespace yocto
 			}
 			
 			//! insert at a slot found by a previous search
-			inline void insert2( size_t hkey, NODE *node, kslot_t *slot ) throw()
+			inline void insert2( NODE *node, kslot_t *slot ) throw()
 			{
 				assert( kpool.available() > 0 ); assert( count > 0 );
-				assert( hkey % count == static_cast<size_t> (slot-kslot) );
-				knode_t *kn = new (kpool.query()) knode_t( hkey, node );
+				assert( node != NULL ); assert( slot != NULL );
+				assert( node->hkey % count == static_cast<size_t> (slot-kslot) );
+				knode_t *kn = new (kpool.query()) knode_t( node );
 				slot->push_front( kn  );
 				nlist.push_back( node );
 			}
@@ -187,6 +194,16 @@ namespace yocto
 				proc(dn);
 				kpool.store(kn);
 				cache.store(dn);
+			}
+			
+			//! get all hash
+			size_t signature() const throw()
+			{
+				hashing::sha1 H;
+				H.set();
+				for( const NODE *dn = nlist.head; dn; dn = dn->next )
+					H( & dn->hkey, sizeof(size_t) );
+				return H.key<size_t>();
 			}
 			
 		private:

@@ -30,12 +30,13 @@ namespace yocto
 		class node_type
 		{
 		public:
-			node_type *next;
-			node_type *prev;
-			const_key  key;
-			type       data;
+			node_type   *next;
+			node_type   *prev;
+			const size_t hkey; 
+			const_key    key;
+			type         data;
 			inline ~node_type() throw() {}
-			inline  node_type( param_key k, param_type args ) : next(NULL), prev(NULL), key(k), data(args) {}
+			inline  node_type( size_t h, param_key k,  param_type args ) : next(NULL), prev(NULL), hkey(h), key(k), data(args) {}
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
@@ -154,41 +155,29 @@ namespace yocto
 		{
 			assert( other.capacity() >= this->size() );
 			assert( other.size() == 0 );
-			//------------------------------------------------------------------
-			// loop over this slots
-			//------------------------------------------------------------------
-			for( size_t i=0; i < ktab_.count; ++i )
+			for( const node_type *src = ktab_.nlist.head; src; src = src->next )
 			{
-				const kslot_t &slot = ktab_.kslot[i];
-				//--------------------------------------------------------------
-				// loop over knodes in this slot
-				//--------------------------------------------------------------
-				for( const knode_t *kn = slot.tail; kn; kn = kn->prev )
-				{
-					//-- get source node
-					const node_type *src = kn->addr; assert(src);
-					
-					//-- dup/insert
-					_insert( other.ktab_, kn->hkey, src->key, src->data );
-				}
-			}			
+				//-- dup/insert
+				_insert( other.ktab_, src->hkey, src->key, src->data );
+			}
 			assert( other.size() == this->size() );
+			assert( other.ktab_.signature() == this->ktab_.signature() );
 		}
 		
-		static inline node_type *_create( ktable_t &tab, param_key key, param_type args )
+		static inline node_type *_create( ktable_t &tab, size_t hkey, param_key key, param_type args )
 		{
 			//-- atomic node creationg
 			node_type       *tgt = tab.cache.query();
-			try{ new (tgt) node_type(key,args); }
+			try{ new (tgt) node_type(hkey,key,args); }
 			catch(...) { tab.cache.store(tgt); throw; }
 			return tgt;
 		}
 		
 		static inline void _insert( ktable_t &tab, size_t hkey, param_key key, param_type args )
-		{ tab.insert( hkey, _create(tab,key,args) ); }
+		{ tab.insert( _create(tab,hkey,key,args) ); }
 		
 		static inline void _insert2( ktable_t &tab, size_t hkey, param_key key, param_type args, kslot_t *slot ) throw()
-		{ tab.insert2(hkey,_create(tab,key,args),slot); }
+		{ tab.insert2(_create(tab,hkey,key,args),slot); }
 		
 		
 		static inline bool _match( const node_type *node, const void *params ) throw()
