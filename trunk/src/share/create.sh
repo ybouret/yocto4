@@ -136,15 +136,11 @@ cd $BUILD_ROOT &&  ( cmake "$BUILD_UP/$BUILD_SOURCE" -G"$BUILD_GENERATOR" $BUILD
 
 JLEVEL=""
 case `uname -s` in
-	"Darwin")
-		NPROCS=`hwprefs cpu_count`; 
-		;;
-		
 	"Linux")
 		NPROCS=`grep ^processor /proc/cpuinfo | wc -l`;
 		;;
 		
-	"FreeBSD")
+	"FreeBSD" | "Darwin")
 		NPROCS=`sysctl hw.ncpu | cut -d ' ' -f 2`
 		;;
 		
