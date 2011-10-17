@@ -116,7 +116,9 @@ SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${
 INCLUDE_DIRECTORIES( . )
 
 SET( utest_decl yocto/utest/driver.hpp yocto/utest/run.hpp )
+INSTALL( FILES ${utest_decl} DESTINATION include/yocto/utest)
 SOURCE_GROUP( utest FILES ${utest_decl})
+
 ADD_LIBRARY(yocto STATIC ${srcs} ${utest_decl})
 
 INSTALL( TARGETS yocto ARCHIVE DESTINATION lib )
