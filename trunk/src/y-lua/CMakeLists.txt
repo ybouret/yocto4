@@ -5,7 +5,10 @@ FILE( GLOB lua_impl yocto/lua/*.c*)
 SET( lua_srcs ${lua_decl} ${lua_impl} )
 INSTALL( FILES ${lua_decl} DESTINATION include/yocto/lua )
 SOURCE_GROUP( lua FILES ${lua_srcs} )
-ADD_DEFINITIONS( -DLUA_USE_LINUX )
+
+IF( NOT WIN32 )
+	ADD_DEFINITIONS( -DLUA_USE_LINUX )
+ENDIF()
 
 INCLUDE_DIRECTORIES( . ../y-main ./src/inc ./yocto/lua )
 
