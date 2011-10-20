@@ -132,7 +132,13 @@ cmake -E touch ./forge/targets || xerror "-- can't create targets file"
 ## configuring
 ########################################################################
 cmake -E cmake_echo_color --blue --bold "-- Configuring......"
-cd $BUILD_ROOT &&  ( cmake "$BUILD_UP/$BUILD_SOURCE" -G"$BUILD_GENERATOR" $BUILD_OPT || xerror "CMake Failure!")
+cd $BUILD_ROOT && \
+( cmake "$BUILD_UP/$BUILD_SOURCE" \
+-G"$BUILD_GENERATOR" $BUILD_OPT   \
+-DMY_CFLAGS="${MY_CFLAGS}"        \
+-DMY_CXXFLAGS="${MY_CXXFLAGS}"    \
+-DMY_LDFLAGS="${MY_LDFLAGS}"      \
+|| xerror "CMake Failure!")
 
 JLEVEL=""
 case `uname -s` in
