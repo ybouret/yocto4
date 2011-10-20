@@ -131,7 +131,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	####################################################################
 	## Yocto Core C/C++
 	####################################################################
-	TARGET_LINK_LIBRARIES( ${tgt} yocto )
+	TARGET_LINK_LIBRARIES( ${tgt} yocto ${MY_LDFLAGS})
 
 	####################################################################
 	## Platform Specific Flags
