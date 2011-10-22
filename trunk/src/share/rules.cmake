@@ -37,6 +37,7 @@ GET_FILENAME_COMPONENT(CC_NAME ${CMAKE_C_COMPILER} NAME )
 ## GNU
 ########################################################################
 IF( "${CC_NAME}" MATCHES "gcc.*" )
+  SET(YOCTO_GNU ON)
   MESSAGE( STATUS "Using GNU compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
@@ -53,6 +54,7 @@ ENDIF()
 ## clang
 ########################################################################
 IF( "${CC_NAME}" MATCHES "clang.*" )
+  SET(YOCTO_CLANG ON)
   MESSAGE( STATUS "Using CLANG compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
@@ -70,6 +72,7 @@ ENDIF()
 ## Intel 
 ########################################################################
 IF( "${CC_NAME}" MATCHES "icc.*" )
+  SET(YOCTO_INTEL ON)
   MESSAGE( STATUS "Using Intel compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe -wd981 ${MY_CFLAGS}" )
@@ -85,6 +88,7 @@ ENDIF()
 ## PathScale
 ########################################################################
 IF( "${CC_NAME}" MATCHES "path.*" )
+  SET(YOCTO_PATHSCALE ON)
   MESSAGE( STATUS "Using PathScale compilers" )
   
   SET(COMMON_C_FLAGS        "-Wall -pipe ${MY_CFLAGS}" )
@@ -101,6 +105,7 @@ ENDIF()
 ## miscrosoft cl
 ########################################################################
 IF( "${CC_NAME}" STREQUAL "cl.exe" )
+  SET(YOCTO_MSC ON)
   MESSAGE( STATUS "Using Microsoft cl.exe" )
   
   SET(COMMON_C_FLAGS      "${MY_CFLAGS}" )

@@ -1,0 +1,29 @@
+## OpenMP settings: suppose that rules.cmake is included
+
+IF(YOCTO_GNU)
+  MESSAGE( STATUS "OpenMP for GNU")
+  SET(OpenMP_CFLAGS  "-fopenmp")
+  SET(OpenMP_LDFLAGS "-fopenmp")
+ENDIF()
+
+
+IF(YOCTO_CLANG)
+  MESSAGE( STATUS "OpenMP for Clang")
+  MESSAGE( FATAL_ERROR "Not Supported!" )
+  SET(OpenMP_CFLAGS  "-fopenmp")
+  SET(OpenMP_LDFLAGS "-fopenmp")
+ENDIF()
+
+IF(YOCTO_INTEL)
+  MESSAGE( STATUS "OpenMP for Intel")
+  SET(OpenMP_CFLAGS  "-openmp")
+  SET(OpenMP_LDFLAGS "-openmp")
+ENDIF()
+
+
+SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   ${OpenMP_CFLAGS}")
+SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${OpenMP_CFLAGS}")
+  
+SET(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   ${OpenMP_CFLAGS}")
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CFLAGS}")
+  
