@@ -25,7 +25,7 @@ namespace yocto
 			const size_t  threshold; /*!< count of threads to wait for         */
 			size_t        counter;   /*!< how many threads are waiting so far  */
 			size_t        cycle;     /*!< updated after each reached threshold */
-			mutex         guard;      /*!< to protect access                    */
+			mutex         guard;     /*!< to protect access                    */
 			condition     cv;        /*!< condition variable                   */
 		};
 		
