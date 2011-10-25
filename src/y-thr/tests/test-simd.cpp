@@ -2,9 +2,14 @@
 
 #include "yocto/threading/thread.hpp"
 #include "yocto/threading/condition.hpp"
+#include "yocto/threading/barrier.hpp"
+
 #include "yocto/code/utils.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/ios/icstream.hpp"
+
+#include "yocto/wtime.hpp"
+#include "yocto/code/rand.hpp"
 
 #include <cstdlib>
 #include <cstdio>
@@ -18,49 +23,63 @@ namespace {
 	{
 	public:
 		static const size_t MAX_THREADS = 32;
-		bool      run;
-		mutex     guard;
-		condition start;
-		condition ready;
-		condition reset;
-		size_t    num_ready;
-		size_t    num_done;
+		
 		struct Param
 		{
-			SIMD *simd;
+			SIMD  *simd;
+			size_t indx;
 		};
+		
+		bool          run;
+		mutex         guard;
+		condition     start;
+		size_t        num_start;
+		size_t        num_done;
 		const size_t  num_threads;
+		condition     done;
 		Param         params[MAX_THREADS];
 		uint64_t      wksp[ MAX_THREADS * YOCTO_U64_FOR_ITEM(thread) ];
 		thread       *threads;
 		size_t        counter;
+		size_t        num_cycles;
+		bool          do_work;
 		
-		SIMD( size_t np ) : 
+		SIMD( size_t np ) :
 		run( true ),
-		guard( "SIMD" ), 
+		guard( "SIMD" ),
 		start(),
-		ready(),
-		reset(),
-		num_ready(0),
+		num_start(0),
 		num_done(0),
 		num_threads( clamp<size_t>(1,np,MAX_THREADS) ),
+		done(),
 		params(),
 		wksp(),
 		threads( (thread *)&wksp[0] ),
-		counter(0)
+		counter(0),
+		num_cycles(0),
+		do_work(false)
 		{
 			try 
 			{
 				while( counter < num_threads )
 				{
-					params[counter].simd = this;
-					new (threads+counter) thread( SIMD::engine, & params[counter] );
+					Param *p = & params[counter];
+					p->simd = this;
+					p->indx = counter;
+					new (threads+counter) thread( SIMD::Engine, p );
 					++counter;
 				}
+				
 				guard.lock();
 				std::cerr << "[SIMD.waiting to be ready]" << std::endl;
-				ready.wait( guard );
+				start.wait( guard );
 				guard.unlock();
+				
+				{
+					YOCTO_LOCK(guard);
+					std::cerr << "[SIMD.constructed]" << std::endl;
+				}
+				
 			}
 			catch(...)
 			{
@@ -68,6 +87,8 @@ namespace {
 				throw;
 			}
 		}
+		
+		
 		
 		
 		
@@ -98,72 +119,86 @@ namespace {
 			terminate();
 		}
 		
-		static void engine( void *args ) throw()
+		
+		static void Engine( void *args ) throw()
 		{
-			Param *param = (Param *)args;
-			assert(param->simd!=NULL);
-			SIMD  &simd  = *(param->simd);
-			{
-				YOCTO_LOCK(simd.guard);
-				std::cerr << "in thread..." << thread::get_current_id() << std::endl;
-			}
-			
-			//------------------------------------------------------------------
-			// Wait until everybody is ready
-			//------------------------------------------------------------------
-			while( true )
-			{
-				simd.guard.lock();
-				assert( simd.num_ready < simd.num_threads );
-				if( ++simd.num_ready >= simd.num_threads )
-				{
-					std::cerr << "[SIMD.is_ready]" << std::endl;
-					simd.ready.signal();
-					simd.num_ready = 0 ;
-				}
-				simd.start.wait( simd.guard );
-				std::cerr << "Signaled..." << thread::get_current_id() << std::endl;
-				const bool all_done = ++simd.num_done >= simd.num_threads;
-				simd.guard.unlock();
-				
-#if 1
-				if( !simd.run )
-				{
-					{
-						YOCTO_LOCK(simd.guard);
-						std::cerr << "Stopping..." << thread::get_current_id() << std::endl;
-					}
-					if( all_done ) simd.reset.signal();
-					return;
-				}
-				
-				{
-					YOCTO_LOCK(simd.guard);
-					std::cerr << "Computing..." << thread::get_current_id() << std::endl;
-				}
-				
-				
-				
-				if( all_done )
-					simd.reset.signal();
-#endif
-				
-			}
-			
+			Param *param = (Param *)args; assert(param);
+			param->simd->engine( param->indx );
 		}
 		
-		void cycle()
+		
+		void engine( size_t indx ) throw()
 		{
 			{
 				YOCTO_LOCK(guard);
-				std::cerr << "[SIMD.cycle]" << std::endl;
+				std::cerr << "+engine #" << indx << std::endl;
 			}
+			
+			//==================================================================
+			//
+			// Wait for everyone to be constructed
+			//
+			//==================================================================
 			guard.lock();
-			start.broadcast();
-			reset.wait(guard);
+			if( ++num_start >= num_threads )
+			{
+				num_start = 0;
+				std::cerr << "[SIMD.all engines started]" << std::endl;
+				start.broadcast();
+			}
+			else
+				start.wait( guard );
 			guard.unlock();
 			
+			
+			//==================================================================
+			//
+			// Wait for Cycle|End
+			//
+			//==================================================================
+			guard.lock();
+		CYCLE:
+			//std::cerr << "\tengine #" << indx << " is waiting" << std::endl;
+			start.wait( guard );
+			//std::cerr << "\tengine #" << indx << " shall work!" << std::endl;
+			guard.unlock();
+			
+			if( !run )
+			{
+				// a call from terminate
+				return;
+			}
+			
+			// do some work
+			if(do_work)
+			{
+				guard.lock();
+				const double tmx = 0.1 * alea<double>();
+				guard.unlock();
+				wtime::sleep( tmx );
+			}
+			
+			// end
+			guard.lock();
+			++num_done;
+			std::cerr << "\tnum_done=" << num_done << "/engine #" << indx << std::endl;
+			if( num_done >= num_threads )
+				done.signal();
+			//guard.unlock();
+			goto CYCLE;
 		}
+		
+		void cycle() throw()
+		{
+			++num_cycles;
+			guard.lock();
+			std::cerr << "[SIMD.cycle " << num_cycles << " ]" << std::endl;
+			num_done = 0;
+			start.broadcast();
+			done.wait(guard);
+			guard.unlock();
+		}
+		
 		
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);
@@ -174,18 +209,27 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(SIMD)
 {
 	size_t np = 2;
+	size_t nc = 2;
 	if( argc > 1 ) np = atol( argv[1] );
+	if( argc > 2 ) nc = atol( argv[2] );
+	std::cerr << ">>>> SIMD " << np << " " << nc << std::endl;
 	SIMD simd(np);
-	std::cerr << "now in main: waiting for instructions:" << std::endl;
+	std::cerr << "Waiting for instructions:" << std::endl;
 	fflush(stderr);
 	ios::icstream in( ios::cstdin );
 	string line;
 	
-	while( line.clear(), in.read_line(line) >= 0 )
+	while( line.clear(), fprintf(stderr,">"), fflush(stderr), in.read_line(line) >= 0 )
 	{
 		if( line == 'c' )
 		{
-			simd.cycle();
+			for( size_t i=0; i < nc; ++i )
+			{
+				std::cerr << "[SIMD.enter cyle]" << std::endl;
+				simd.do_work = alea<double>() > 0.5;
+				simd.cycle();
+				std::cerr << "[SIMD.leave cyle]" << std::endl;
+			}
 			continue;
 		}
 		
@@ -194,7 +238,7 @@ YOCTO_UNIT_TEST_IMPL(SIMD)
 			break;
 		}
 	}
-
+	
 	
 }
 YOCTO_UNIT_TEST_DONE()

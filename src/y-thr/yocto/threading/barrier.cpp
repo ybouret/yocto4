@@ -46,7 +46,6 @@ namespace yocto
 			}
 			guard.unlock();
 			return status;
-			
 		}
 		
 		
