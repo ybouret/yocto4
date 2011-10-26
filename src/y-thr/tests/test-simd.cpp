@@ -61,6 +61,10 @@ namespace {
 		{
 			try 
 			{
+				//--------------------------------------------------------------
+				// AutoLock to wait and to block newly created threads
+				//--------------------------------------------------------------
+				YOCTO_LOCK(guard);
 				while( counter < num_threads )
 				{
 					Param *p = & params[counter];
@@ -70,15 +74,21 @@ namespace {
 					++counter;
 				}
 				
-				guard.lock();
 				std::cerr << "[SIMD.waiting to be ready]" << std::endl;
+				
+				//--------------------------------------------------------------
+				// wait => unlock guard
+				//--------------------------------------------------------------
 				start.wait( guard );
-				guard.unlock();
 				
 				{
 					YOCTO_LOCK(guard);
 					std::cerr << "[SIMD.constructed]" << std::endl;
 				}
+				
+				//--------------------------------------------------------------
+				//guard is automagically unlocked here
+				//--------------------------------------------------------------
 				
 			}
 			catch(...)
@@ -206,7 +216,7 @@ namespace {
 	
 }
 
-YOCTO_UNIT_TEST_IMPL(SIMD)
+YOCTO_UNIT_TEST_IMPL(SIMD1)
 {
 	size_t np = 2;
 	size_t nc = 2;
