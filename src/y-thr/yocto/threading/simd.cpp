@@ -107,6 +107,7 @@ namespace yocto
 		
 		void SIMD:: engine( size_t rank ) throw()
 		{
+			const Context ctx( rank, threads );
 			guard_.lock();
 			std::cerr << "[SIMD.engine #" << rank << "]" << std::endl;
 		CYCLE:
@@ -137,7 +138,7 @@ namespace yocto
 				std::cerr << "\t[SIMD.working #" << rank << " ]" << std::endl;
 			}
 			assert(proc_);
-			(*proc_)(rank);
+			(*proc_)(ctx);
 			//------------------------------------------------------------------
 			// Shall signal the main thread
 			//------------------------------------------------------------------
@@ -150,16 +151,15 @@ namespace yocto
 			
 		}
 		
-		void SIMD:: cycle( Proc *proc ) throw()
+		void SIMD:: cycle( Proc &proc ) throw()
 		{
-			assert( proc != NULL );
 			check_ready();
 			guard_.lock();
 			assert( ready_ == threads );
 			assert( false  == _stop_  );
 			ready_  = 0;
 			active_ = threads;
-			proc_   = proc;
+			proc_   = &proc;
 			std::cerr << "[SIMD.enter cycle]" << std::endl;
 			start_.broadcast();
 			final_.wait( guard_ );
@@ -167,10 +167,10 @@ namespace yocto
 			guard_.unlock();
 		}
 	
-		void SIMD:: idle_(size_t rank) throw()
+		void SIMD:: idle_( Args ctx ) throw()
 		{
 			YOCTO_LOCK(guard_);
-			std::cerr << "\t[SIMD.idle #" << rank << "]" << std::endl;
+			std::cerr << "\t[SIMD.idle #" << ctx.rank << "/" << ctx.size << " ]" << std::endl;
 		}
 		
 	}
