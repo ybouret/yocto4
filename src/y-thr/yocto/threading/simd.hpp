@@ -17,14 +17,16 @@ namespace yocto
 			class Context
 			{
 			public:
-				Context( const size_t thread_id, const size_t num_threads ) throw() :
+				Context( const size_t thread_id, const size_t num_threads, lockable &guard ) throw() :
 				rank( thread_id   ),
-				size( num_threads )
+				size( num_threads ),
+				access( guard )
 				{}
 				
 				~Context() throw() {}
 				const size_t      rank;   //!< in 0..size-1
 				const size_t      size;   //!< num threads
+				lockable         &access; //!< mutex
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Context);
 			};
@@ -45,9 +47,6 @@ namespace yocto
 			size_t    ready_;   //!< used for #ready  threads
 			size_t    active_;  //!< used for #active threads
 			Proc     *proc_;    //!< what to do during one cycle
-		public:
-			Proc      idle;    //!< do nothing proc
-		private:
 			size_t    wlen_;    //!< bytes for workspace
 			void     *wksp_;    //!< workspace for threads/data
 			size_t    counter_;
@@ -56,7 +55,6 @@ namespace yocto
 			static void CEngine(void*) throw();
 			void engine(size_t rank) throw();
 			void check_ready() throw();
-			void idle_( Args ) throw();
 		};
 		
 	}

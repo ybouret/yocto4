@@ -35,7 +35,7 @@ namespace yocto
 		void SIMD:: terminate() throw()
 		{
 			std::cerr << "[SIMD.terminate]" << std::endl;
-			_stop_    = true; //!< prepare shutdown
+			_stop_    = true;   //!< prepare shutdown
 			start_.broadcast(); //!< wake up all threads
 			Unit *unit = static_cast<Unit*> (wksp_);
 			while( counter_ > 0 )
@@ -45,12 +45,12 @@ namespace yocto
 				u.thr.~thread();
 			}
 			memory::kind<memory::global>::release( wksp_, wlen_ );
-			std::cerr << "[SIMD.terminated!]" << std::endl;
+			//std::cerr << "[SIMD.terminated!]" << std::endl;
 		}
 		
 		SIMD:: ~SIMD() throw()
 		{
-			std::cerr << "[SIMD.destroy]" << std::endl;
+			//std::cerr << "[SIMD.destroy]" << std::endl;
 			terminate();
 		}
 		
@@ -64,7 +64,6 @@ namespace yocto
 		ready_(0),
 		active_(),
 		proc_(NULL),
-		idle( this, & SIMD::idle_ ),
 		wlen_( threads * sizeof(Unit) ),
 		wksp_( memory::kind<memory::global>::acquire( wlen_ ) ),
 		counter_(0)
@@ -84,7 +83,7 @@ namespace yocto
 				
 				
 				check_ready();
-				std::cerr << "[SIMD.Achieved]" << std::endl;
+				std::cerr << "[SIMD.activated]" << std::endl;
 				
 			}
 			catch(...)
@@ -107,9 +106,9 @@ namespace yocto
 		
 		void SIMD:: engine( size_t rank ) throw()
 		{
-			const Context ctx( rank, threads );
+			const Context ctx( rank, threads, guard_);
 			guard_.lock();
-			std::cerr << "[SIMD.engine #" << rank << "]" << std::endl;
+			//std::cerr << "[SIMD.engine #" << rank << "]" << std::endl;
 		CYCLE:
 			//------------------------------------------------------------------
 			// guard is locked
@@ -117,7 +116,7 @@ namespace yocto
 			assert( ready_ < threads );
 			++ready_;
 			start_.wait( guard_ );
-			std::cerr << "\t[SIMD:engine #" << rank << " starting...]" << std::endl;
+			//std::cerr << "\t[SIMD:engine #" << rank << " starting...]" << std::endl;
 			guard_.unlock();
 			
 			//------------------------------------------------------------------
@@ -125,18 +124,20 @@ namespace yocto
 			//------------------------------------------------------------------
 			if( _stop_ )
 			{
-				YOCTO_LOCK(guard_);
-				std::cerr << "\t[SIMD.engine #" << rank << " stopped!]" << std::endl; 
+				//YOCTO_LOCK(guard_);
+				//std::cerr << "\t[SIMD.engine #" << rank << " stopped!]" << std::endl; 
 				return;
 			}
 			
 			//------------------------------------------------------------------
 			// Do the work
 			//------------------------------------------------------------------
-			{
-				YOCTO_LOCK(guard_);
-				std::cerr << "\t[SIMD.working #" << rank << " ]" << std::endl;
-			}
+			/*
+			 {
+			 YOCTO_LOCK(guard_);
+			 std::cerr << "\t[SIMD.working #" << rank << " ]" << std::endl;
+			 }
+			 */
 			assert(proc_);
 			(*proc_)(ctx);
 			//------------------------------------------------------------------
@@ -160,18 +161,13 @@ namespace yocto
 			ready_  = 0;
 			active_ = threads;
 			proc_   = &proc;
-			std::cerr << "[SIMD.enter cycle]" << std::endl;
+			//std::cerr << "[SIMD.enter cycle]" << std::endl;
 			start_.broadcast();
 			final_.wait( guard_ );
-			std::cerr << "[SIMD.leave cycle]" << std::endl;
+			//std::cerr << "[SIMD.leave cycle]" << std::endl;
 			guard_.unlock();
 		}
-	
-		void SIMD:: idle_( Args ctx ) throw()
-		{
-			YOCTO_LOCK(guard_);
-			std::cerr << "\t[SIMD.idle #" << ctx.rank << "/" << ctx.size << " ]" << std::endl;
-		}
+		
 		
 	}
 	
