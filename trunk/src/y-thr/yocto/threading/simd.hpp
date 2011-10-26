@@ -13,11 +13,28 @@ namespace yocto
 		class SIMD
 		{
 		public:
-			typedef  functor<void,TL1(size_t)> Proc;
+			
+			class Context
+			{
+			public:
+				Context( const size_t thread_id, const size_t num_threads ) throw() :
+				rank( thread_id   ),
+				size( num_threads )
+				{}
+				
+				~Context() throw() {}
+				const size_t      rank;   //!< in 0..size-1
+				const size_t      size;   //!< num threads
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(Context);
+			};
+			
+			typedef  const SIMD::Context &    Args;
+			typedef  functor<void,TL1(Args)>  Proc;
 			explicit SIMD( size_t np );
 			virtual ~SIMD() throw();
 			
-			void cycle( Proc *proc ) throw();
+			void cycle( Proc &proc ) throw();
 			
 			const size_t threads;
 		private:
@@ -39,7 +56,7 @@ namespace yocto
 			static void CEngine(void*) throw();
 			void engine(size_t rank) throw();
 			void check_ready() throw();
-			void idle_( size_t ) throw();
+			void idle_( Args ) throw();
 		};
 		
 	}
