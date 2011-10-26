@@ -32,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(SIMD2)
 			{
 				//std::cerr << "[SIMD.enter cyle]" << std::endl;
 				//simd.do_work = alea<double>() > 0.5;
-				simd.cycle();
+				simd.cycle( & simd.idle );
 				//std::cerr << "[SIMD.leave cyle]" << std::endl;
 			}
 			continue;
