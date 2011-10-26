@@ -3,6 +3,7 @@
 
 
 #include "yocto/threading/condition.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -12,10 +13,11 @@ namespace yocto
 		class SIMD
 		{
 		public:
+			typedef  functor<void,TL1(size_t)> Proc;
 			explicit SIMD( size_t np );
 			virtual ~SIMD() throw();
 			
-			void cycle() throw();
+			void cycle( Proc *proc ) throw();
 			
 			const size_t threads;
 		private:
@@ -24,7 +26,11 @@ namespace yocto
 			condition start_;   //!< constructed/ready to start condition
 			condition final_;   //!< final condition (no more working threads)
 			size_t    ready_;   //!< used for #ready  threads
-			size_t    active_;  //!< used for #active threads 
+			size_t    active_;  //!< used for #active threads
+			Proc     *proc_;    //!< what to do during one cycle
+		public:
+			Proc      idle;    //!< do nothing proc
+		private:
 			size_t    wlen_;    //!< bytes for workspace
 			void     *wksp_;    //!< workspace for threads/data
 			size_t    counter_;
@@ -33,6 +39,7 @@ namespace yocto
 			static void CEngine(void*) throw();
 			void engine(size_t rank) throw();
 			void check_ready() throw();
+			void idle_( size_t ) throw();
 		};
 		
 	}

@@ -63,6 +63,8 @@ namespace yocto
 		final_(),
 		ready_(0),
 		active_(),
+		proc_(NULL),
+		idle( this, & SIMD::idle_ ),
 		wlen_( threads * sizeof(Unit) ),
 		wksp_( memory::kind<memory::global>::acquire( wlen_ ) ),
 		counter_(0)
@@ -134,7 +136,8 @@ namespace yocto
 				YOCTO_LOCK(guard_);
 				std::cerr << "\t[SIMD.working #" << rank << " ]" << std::endl;
 			}
-			
+			assert(proc_);
+			(*proc_)(rank);
 			//------------------------------------------------------------------
 			// Shall signal the main thread
 			//------------------------------------------------------------------
@@ -147,19 +150,27 @@ namespace yocto
 			
 		}
 		
-		void SIMD:: cycle() throw()
+		void SIMD:: cycle( Proc *proc ) throw()
 		{
+			assert( proc != NULL );
 			check_ready();
 			guard_.lock();
 			assert( ready_ == threads );
 			assert( false  == _stop_  );
 			ready_  = 0;
 			active_ = threads;
+			proc_   = proc;
 			std::cerr << "[SIMD.enter cycle]" << std::endl;
 			start_.broadcast();
 			final_.wait( guard_ );
 			std::cerr << "[SIMD.leave cycle]" << std::endl;
 			guard_.unlock();
+		}
+	
+		void SIMD:: idle_(size_t rank) throw()
+		{
+			YOCTO_LOCK(guard_);
+			std::cerr << "\t[SIMD.idle #" << rank << "]" << std::endl;
 		}
 		
 	}
