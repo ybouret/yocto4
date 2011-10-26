@@ -7,7 +7,7 @@ using namespace threading;
 
 #include <cstdlib>
 
-YOCTO_UNIT_TEST_IMPL(SIMD2)
+YOCTO_UNIT_TEST_IMPL(SIMD)
 {
 	size_t np = 2;
 	size_t nc = 2;
