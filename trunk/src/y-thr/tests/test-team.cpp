@@ -45,7 +45,8 @@ namespace {
 			for( size_t i=init; i<last;  )
 			{
 				++i;
-				local_sum += 1.0 / (i*i);
+				const double den = i;
+				local_sum += 1.0 / (den*den);
 			}
 			
 			{
