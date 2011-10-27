@@ -38,7 +38,8 @@ namespace yocto
 			
 			void cycle( Proc &proc ) throw();
 			
-			const size_t threads;
+			const size_t size;
+			
 		private:
 			bool      _stop_;
 			mutex     guard_;   //!< shared mutex
