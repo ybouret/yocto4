@@ -1,4 +1,4 @@
-#include "yocto/threading/simd.hpp"
+#include "yocto/threading/team.hpp"
 
 #include "yocto/memory/global.hpp"
 #include "yocto/threading/thread.hpp"
@@ -12,78 +12,78 @@ namespace yocto
 		
 		namespace 
 		{
-			class Unit
+			class member
 			{
 			public:
-				SIMD   *simd;
+				team   *simd;
 				size_t  rank;
 				thread  thr;
 			};
 		}
 		
-		void SIMD:: check_ready() throw()
+		void team:: check_ready() throw()
 		{
 			while(true)
 			{
 				if(!guard_.try_lock()) continue;
-				const bool achieved = ready_ >= threads;
+				const bool achieved = ready_ >= size;
 				guard_.unlock();
 				if( achieved ) break;
 			}
 		}
 		
-		void SIMD:: terminate() throw()
+		void team:: terminate() throw()
 		{
-			std::cerr << "[SIMD.terminate]" << std::endl;
+			std::cerr << "[team.terminate]" << std::endl;
 			_stop_    = true;   //!< prepare shutdown
 			start_.broadcast(); //!< wake up all threads
-			Unit *unit = static_cast<Unit*> (wksp_);
+			member *addr = static_cast<member*> (wksp_);
 			while( counter_ > 0 )
 			{
-				Unit &u = unit[--counter_];
-				u.thr.join();
-				u.thr.~thread();
+				member &m = addr[--counter_];
+				m.thr.join();
+				m.thr.~thread();
 			}
 			memory::kind<memory::global>::release( wksp_, wlen_ );
-			//std::cerr << "[SIMD.terminated!]" << std::endl;
+			//std::cerr << "[team.terminated!]" << std::endl;
 		}
 		
-		SIMD:: ~SIMD() throw()
+		team:: ~team() throw()
 		{
-			//std::cerr << "[SIMD.destroy]" << std::endl;
+			//std::cerr << "[team.destroy]" << std::endl;
 			terminate();
 		}
 		
 		
-		SIMD:: SIMD( size_t np ) :
-		threads( np <= 1 ? 1 : np ),
+		team:: team( size_t np ) :
+		size( np <= 1 ? 1 : np ),
 		_stop_( false  ),
-		guard_( "SIMD" ),
+		guard_( "team" ),
 		start_(),
 		final_(),
 		ready_(0),
 		active_(),
-		proc_(NULL),
-		wlen_( threads * sizeof(Unit) ),
+		task_(NULL),
+		wlen_( size * sizeof(member) ),
 		wksp_( memory::kind<memory::global>::acquire( wlen_ ) ),
 		counter_(0)
 		{
 			try
 			{
 				
-				Unit *unit = static_cast<Unit*> (wksp_);
-				while( counter_ < threads )
+				member *m = static_cast<member*> (wksp_);
+				while( counter_ < size )
 				{
-					unit->simd = this;
-					unit->rank = counter_;
-					new ( &(unit->thr) ) thread( SIMD::CEngine, unit );
-					++unit;
+					m->simd = this;
+					m->rank = counter_;
+					new ( &(m->thr) ) thread( team::launcher, m );
+					++m;
 					++counter_;
 				}
 				
 				
 				check_ready();
-				std::cerr << "[SIMD.activated]" << std::endl;
+				std::cerr << "[team.activated]" << std::endl;
 				
 			}
 			catch(...)
@@ -94,29 +94,29 @@ namespace yocto
 			
 		}
 		
-		void SIMD::CEngine( void *args ) throw()
+		void team:: launcher( void *args ) throw()
 		{
 			assert( args );
-			Unit *unit = static_cast<Unit*>( args );
-			assert( unit->simd );
-			assert( unit->rank < unit->simd->threads );
-			unit->simd->engine( unit->rank );
+			member *m = static_cast<member*>( args );
+			assert( m->simd );
+			assert( m->rank < m->simd->size );
+			m->simd->engine( m->rank );
 		}
 		
 		
-		void SIMD:: engine( size_t rank ) throw()
+		void team:: engine( size_t rank ) throw()
 		{
-			const Context ctx( rank, threads, guard_);
+			context ctx( rank, size, guard_);
 			guard_.lock();
-			//std::cerr << "[SIMD.engine #" << rank << "]" << std::endl;
+			//std::cerr << "[team.engine #" << rank << "]" << std::endl;
 		CYCLE:
 			//------------------------------------------------------------------
 			// guard is locked
 			//------------------------------------------------------------------
-			assert( ready_ < threads );
+			assert( ready_ < size );
 			++ready_;
 			start_.wait( guard_ );
-			//std::cerr << "\t[SIMD:engine #" << rank << " starting...]" << std::endl;
+			//std::cerr << "\t[team:engine #" << rank << " starting...]" << std::endl;
 			guard_.unlock();
 			
 			//------------------------------------------------------------------
@@ -125,7 +125,7 @@ namespace yocto
 			if( _stop_ )
 			{
 				//YOCTO_LOCK(guard_);
-				//std::cerr << "\t[SIMD.engine #" << rank << " stopped!]" << std::endl; 
+				//std::cerr << "\t[team.engine #" << rank << " stopped!]" << std::endl; 
 				return;
 			}
 			
@@ -135,11 +135,11 @@ namespace yocto
 			/*
 			 {
 			 YOCTO_LOCK(guard_);
-			 std::cerr << "\t[SIMD.working #" << rank << " ]" << std::endl;
+			 std::cerr << "\t[team.working #" << rank << " ]" << std::endl;
 			 }
 			 */
-			assert(proc_);
-			(*proc_)(ctx);
+			assert(task_);
+			(*task_)(ctx);
 			//------------------------------------------------------------------
 			// Shall signal the main thread
 			//------------------------------------------------------------------
@@ -152,19 +152,36 @@ namespace yocto
 			
 		}
 		
-		void SIMD:: cycle( Proc &proc ) throw()
+		void team:: cycle( task &todo ) throw()
 		{
+			//------------------------------------------------------------------
+			// synchronize the threads: wait for #ready==size
+			//------------------------------------------------------------------
 			check_ready();
+			
+			//------------------------------------------------------------------
+			// prepare a loop
+			//------------------------------------------------------------------
 			guard_.lock();
-			assert( ready_ == threads );
+			assert( ready_ ==  size   );
 			assert( false  == _stop_  );
-			ready_  = 0;
-			active_ = threads;
-			proc_   = &proc;
-			//std::cerr << "[SIMD.enter cycle]" << std::endl;
+			ready_  =  0x00;
+			active_ =  size;
+			task_   = &todo;
+			
+			//------------------------------------------------------------------
+			// prepare to go, guard is locked
+			//------------------------------------------------------------------
 			start_.broadcast();
+			
+			//------------------------------------------------------------------
+			//  wait on final: unlock guard (everybody starts)
+			//------------------------------------------------------------------
 			final_.wait( guard_ );
-			//std::cerr << "[SIMD.leave cycle]" << std::endl;
+			
+			//------------------------------------------------------------------
+			// At this point, everybody is done
+			//------------------------------------------------------------------
 			guard_.unlock();
 		}
 		

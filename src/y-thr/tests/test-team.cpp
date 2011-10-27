@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/threading/simd.hpp"
+#include "yocto/threading/team.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/wtime.hpp"
 
@@ -26,7 +26,7 @@ namespace {
 			
 		}
 		
-		void Update( SIMD::Args ctx ) throw()
+		void Update( team::context & ctx ) throw()
 		{
 			
 			const size_t todo = iter_per_cycles / ctx.size;
@@ -64,7 +64,7 @@ namespace {
 }
 
 
-YOCTO_UNIT_TEST_IMPL(SIMD)
+YOCTO_UNIT_TEST_IMPL(team)
 {
 	size_t np = 2;
 	size_t nc = 2;
@@ -72,20 +72,20 @@ YOCTO_UNIT_TEST_IMPL(SIMD)
 	if( argc > 1 ) np = atol( argv[1] );
 	if( argc > 2 ) nc = atol( argv[2] );
 	if( argc > 3 ) nl = size_t( strtod(argv[3], NULL) );
-	std::cerr << ">>>> SIMD " << np << " " << nc << " " << nl << std::endl;
+	std::cerr << ">>>> team " << np << " " << nc << " " << nl << std::endl;
 	
 	
 	
 	std::cerr << "[Testing Alone]" << std::endl;
 	{
-		SIMD local_simd(np);
+		team local_simd(np);
 	}
 	
-	SIMD simd(np);
+	team simd(np);
 	//ios::icstream in( ios::cstdin );
 	//string        line;
 	Compute       comp; comp.iter_per_cycles = nl;
-	SIMD::Proc    proc( &comp, & Compute::Update );
+	team::task    proc( &comp, & Compute::Update );
 	wtime         chrono;
 	
 #if 0
@@ -100,7 +100,7 @@ YOCTO_UNIT_TEST_IMPL(SIMD)
 				comp.sum = 0;
 				simd.cycle( proc );
 				ell += chrono.query();
-				std::cerr << "sum=" << sqrt( 6.0 * comp.sum ) << std::endl;
+				std::cerr << "sum=" << sqrt( 6.0 * comp.sum ) << " @" << i+1 << std::endr;
 			}
 			ell /= nc;
 			std::cerr << "ell=" << ell * 1000.0 << " ms" << std::endl;
@@ -122,10 +122,11 @@ YOCTO_UNIT_TEST_IMPL(SIMD)
 			comp.sum = 0;
 			simd.cycle( proc );
 			ell += chrono.query();
-			std::cerr << "sum=" << sqrt( 6.0 * comp.sum ) << std::endl;
+			std::cerr << "sum=" << sqrt( 6.0 * comp.sum ) << " @" << i+1 << "\r";
+			std::cerr.flush();
 		}
 		ell /= nc;
-		std::cerr << std::endl << "ell=" << ell * 1000.0 << " ms" << std::endl << std::endl;
+		std::cerr << std::endl << std::endl << "ell=" << ell * 1000.0 << " ms" << std::endl << std::endl;
 	}
 	
 	
