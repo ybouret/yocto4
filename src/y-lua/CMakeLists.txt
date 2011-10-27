@@ -6,7 +6,7 @@ SET( lua_srcs ${lua_decl} ${lua_impl} )
 INSTALL( FILES ${lua_decl} DESTINATION include/yocto/lua )
 SOURCE_GROUP( lua FILES ${lua_srcs} )
 
-IF( NOT WIN32 )
+IF( YOCTO_MACOSX )
 	ADD_DEFINITIONS( -DLUA_USE_LINUX )
 ENDIF()
 

@@ -22,9 +22,9 @@ ENDIF()
 
 
 
-SET(ON_MACOSX OFF)
+SET(YOCTO_MACOSX OFF)
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-  SET(ON_MACOSX ON)
+  SET(YOCTO_MACOSX ON)
 ENDIF()
 
 ########################################################################
