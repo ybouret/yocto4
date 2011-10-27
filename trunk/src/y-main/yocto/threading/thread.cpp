@@ -106,6 +106,11 @@ namespace yocto
 			return id32_;
 #endif
 		}
+
+		thread::handle_t thread:: get_handle() const throw()
+		{
+			return handle_;
+		}
 		
 		thread::id_t thread:: get_current_id() throw()
 		{
