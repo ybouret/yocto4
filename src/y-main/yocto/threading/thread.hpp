@@ -27,10 +27,11 @@ namespace yocto
 			void     join()   throw();
 			virtual ~thread() throw(); //!< must be joined before !
 			
-			id_t get_id() const throw();
-			static
-			id_t get_current_id() throw();
-			
+			id_t     get_id() const throw();
+			handle_t get_handle() const throw();
+		
+			static id_t     get_current_id() throw();
+				
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(thread);
 			proc_t       proc_;
