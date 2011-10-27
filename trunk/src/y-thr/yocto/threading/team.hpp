@@ -32,12 +32,15 @@ namespace yocto
 			};
 			
 			typedef  functor<void,TL1(context&)> task;
-			explicit team( size_t np );
+			explicit team( size_t np, size_t cpu_start=0, size_t cpu_count=0);
 			virtual ~team() throw();
 			
 			void cycle( task &todo ) throw();
 			
 			const size_t size;
+			void place(	size_t cpu_start,
+						size_t cpu_count );
+			void flat(); // place(0,#ALL_CPU);
 			
 		private:
 			bool      _stop_;

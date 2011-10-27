@@ -10,16 +10,7 @@ namespace yocto
 	namespace threading
 	{
 		
-		namespace 
-		{
-			class member
-			{
-			public:
-				team   *simd;
-				size_t  rank;
-				thread  thr;
-			};
-		}
+		#include "./team-member.hxx"
 		
 		void team:: check_ready() throw()
 		{
@@ -55,7 +46,7 @@ namespace yocto
 		}
 		
 		
-		team:: team( size_t np ) :
+		team:: team( size_t np, size_t cpu_start, size_t cpu_count) :
 		size( np <= 1 ? 1 : np ),
 		_stop_( false  ),
 		guard_( "team" ),
@@ -84,7 +75,14 @@ namespace yocto
 				
 				check_ready();
 				std::cerr << "[team.activated]" << std::endl;
-				
+				if( cpu_count > 0 )
+				{
+					place(cpu_start,cpu_count);
+				}
+				else
+				{	
+					flat();
+				}
 			}
 			catch(...)
 			{
