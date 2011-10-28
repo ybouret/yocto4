@@ -64,7 +64,7 @@ namespace yocto
 									   const size_t        n ) throw()
 		{
 			const size_t j =  ( l.root + i % l.size ) % n;
-			std::cerr << "-- assign on CPU #" << j << "/" << n << std::endl;
+			std::cerr << " |_ assign on CPU #" << j << "/" << n << std::endl;
 			return j;
 		}
 		
@@ -72,7 +72,6 @@ namespace yocto
 		{
 			assert( size > 0 );
 #if defined(YOCTO_THREAD_AFFINITY)
-			std::cerr << "layout=" << size << "." << root << std::endl;
 			const size_t  cpu_setsize = hardware::nprocs();
 			member       *m           = static_cast<member *>(wksp_);
 			//------------------------------------------------------------------
