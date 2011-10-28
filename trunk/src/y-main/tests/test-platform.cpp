@@ -4,6 +4,8 @@
 #include "yocto/code/endian.hpp"
 #include "yocto/code/rand.hpp"
 
+#include "yocto/hw.hpp"
+
 using namespace yocto;
 
 template <typename T>
@@ -22,6 +24,8 @@ static inline void test_endian()
 
 YOCTO_UNIT_TEST_IMPL(platform)
 {
+	std::cerr << "#CPU=" << hardware::nprocs() << std::endl;
+	
 	char buffer[256];
 	libc::format_error( buffer, sizeof(buffer), 0 );
 	std::cerr << "** Libc:  " << buffer << std::endl;

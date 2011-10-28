@@ -9,21 +9,30 @@ namespace yocto
 {
 	namespace threading
 	{
-		
-		class team
+		class layout
 		{
 		public:
+			const size_t size; //!< #threads requested
+			const size_t root; //!< #CPU to start.
+			explicit layout(); //!< parse the YOCTO_TEAM=#threads[,offset]"
+			virtual ~layout() throw();
+			layout( const layout &other ) throw();
+			
+		private:
+			YOCTO_DISABLE_ASSIGN(layout);
+		};
+		
+		class team : public layout
+		{
+		public:
+			
+			
 			
 			class context
 			{
 			public:
-				context( const size_t thread_id, const size_t num_threads, lockable &guard ) throw() :
-				rank( thread_id   ),
-				size( num_threads ),
-				access( guard )
-				{}
-				
-				~context() throw() {}
+				context( const size_t thread_id, const size_t num_threads, lockable &guard ) throw();				
+				~context() throw();
 				const size_t      rank;   //!< in 0..size-1
 				const size_t      size;   //!< num threads
 				lockable         &access; //!< mutex
@@ -32,15 +41,12 @@ namespace yocto
 			};
 			
 			typedef  functor<void,TL1(context&)> task;
-			explicit team( size_t np, size_t cpu_start=0, size_t cpu_count=0);
+			explicit team();
 			virtual ~team() throw();
 			
 			void cycle( task &todo ) throw();
 			
-			const size_t size;
-			void place(	size_t cpu_start,
-						size_t cpu_count );
-			void flat(); // place(0,#ALL_CPU);
+			
 			
 		private:
 			bool      _stop_;
@@ -60,6 +66,8 @@ namespace yocto
 			
 			void engine(size_t rank) throw();
 			void check_ready() throw();
+			void place();
+			
 		};
 		
 	}
