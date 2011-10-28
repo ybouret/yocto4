@@ -5,7 +5,6 @@
 #else
 #	if defined(__GNUC__)
 #		if defined(__linux__)
-#			include <sys/sysinfo.h>
 #			define YOCTO_CPU_SET_PTHREAD 1
 #		endif
 #	endif
@@ -18,6 +17,7 @@
 #include "yocto/threading/team.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/threading/thread.hpp"
+#include "yocto/hw.hpp"
 
 #include <iostream>
 
@@ -30,15 +30,6 @@ namespace yocto
 		// Win32 API wrapper
 		//----------------------------------------------------------------------
 #if defined(_WIN32)
-		static inline size_t __numCPU()
-		{
-			SYSTEM_INFO sysinfo;
-			::GetSystemInfo( &sysinfo );
-			const DWORD n = sysinfo.dwNumberOfProcessors;
-			if( n <= 0 ) throw exception("sysinfo.dwNumberOfProcessors=0");
-			return n;
-		}
-		
 		static inline void __assign( thread::handle_t h, const size_t j )
 		{
 			const DWORD_PTR mask = DWORD_PTR(1) << j;
@@ -54,16 +45,6 @@ namespace yocto
 		// pthread wrapper
 		//----------------------------------------------------------------------
 #if defined(YOCTO_CPU_SET_PTHREAD)
-#	if defined (__linux__)
-		static inline size_t __numCPU() 
-		{
-			const int n = get_nprocs();
-			if( n <= 0 ) 
-				throw exception("No CPU Online!");
-			return n;
-		}
-#endif
-		
 		static  void __assign( thread::handle_t h, const size_t j )
 		{
 			cpu_set_t  cpu_set;
@@ -74,49 +55,43 @@ namespace yocto
 				throw libc::exception( err, "pthread_setaffinity_np" );
 		}
 #endif
-		
+	
 		
 #include "./team-member.hxx"
 		
-		static inline size_t cpu_index(const size_t cpu_idx, 
-									   const size_t cpu_count, 
-									   const size_t cpu_setsize ) throw()
+		static inline size_t cpu_index(const size_t        i,
+									   const team::layout &l,
+									   const size_t        n ) throw()
 		{
-			const size_t j = ( cpu_idx % cpu_count ) % cpu_setsize;
-			std::cerr << "-- assign on CPU #" << j << "/" << cpu_setsize << std::endl;
+			const size_t j =  ( l.root + i % l.size ) % n;
+			std::cerr << "-- assign on CPU #" << j << "/" << n << std::endl;
 			return j;
 		}
 		
-		void team:: place( size_t cpu_start, size_t cpu_count )
+		void team:: place(  )
 		{
-			if(cpu_count<=0)
-				throw exception("team.place(cpu_count=0)");
-			
+			assert( size > 0 );
 #if defined(YOCTO_THREAD_AFFINITY)
-			const size_t cpu_setsize = __numCPU();
-			member       *m          = static_cast<member *>(wksp_);
-			size_t        cpu_idx    = cpu_start;
+			std::cerr << "layout=" << size << "." << root << std::endl;
+			const size_t  cpu_setsize = hardware::nprocs();
+			member       *m           = static_cast<member *>(wksp_);
 			//------------------------------------------------------------------
 			// assign main thread
 			//------------------------------------------------------------------
-			__assign( thread::get_current_handle(), cpu_index( cpu_idx, cpu_count, cpu_setsize ) );
+			std::cerr << "-- main thread: " << std::endl;
+			__assign( thread::get_current_handle(), cpu_index( 0, *this, cpu_setsize ) );
 			
 			//------------------------------------------------------------------
 			// assign team thread
 			//------------------------------------------------------------------
+			std::cerr << "-- members    : " << std::endl;
 			for( size_t i=0; i < size; ++i )
-				__assign(  m[i].thr.get_handle(), cpu_index( cpu_idx++, cpu_count, cpu_setsize ) );
+				__assign(  m[i].thr.get_handle(), cpu_index( i, *this, cpu_setsize ) );
 #endif
 			
 			
 		}
-		
-		void team:: flat()
-		{
-#if defined(YOCTO_THREAD_AFFINITY)
-			place(0,__numCPU());
-#endif
-		}
+	
 		
 	}
 }

@@ -67,25 +67,23 @@ namespace {
 
 YOCTO_UNIT_TEST_IMPL(team)
 {
-	size_t np = 2;
-	size_t nc = 2;
-	size_t nl = 100000;
-	if( argc > 1 ) np = atol( argv[1] );
-	if( argc > 2 ) nc = atol( argv[2] );
-	if( argc > 3 ) nl = size_t( strtod(argv[3], NULL) );
-	std::cerr << ">>>> team " << np << " " << nc << " " << nl << std::endl;
+	size_t ncycle = 2;
+	size_t length = 100000;
+	if( argc > 1 ) ncycle = atol( argv[1] );
+	if( argc > 2 ) length = strtod( argv[2], NULL );
+	std::cerr << ">>>> team ncycle=" << ncycle << ", length=" << length << std::endl;
 	
 	
 	
 	std::cerr << "[Testing Alone]" << std::endl;
 	{
-		team local_simd(np);
+		team local_simd;
 	}
 	
-	team simd(np);
+	team simd;
 	//ios::icstream in( ios::cstdin );
 	//string        line;
-	Compute       comp; comp.iter_per_cycles = nl;
+	Compute       comp; comp.iter_per_cycles = length;
 	team::task    proc( &comp, & Compute::Update );
 	wtime         chrono;
 	
@@ -117,7 +115,7 @@ YOCTO_UNIT_TEST_IMPL(team)
 	
 	{
 		double ell = 0;
-		for( size_t i=0; i < nc; ++i )
+		for( size_t i=0; i < ncycle; ++i )
 		{
 			chrono.start();
 			comp.sum = 0;
@@ -126,7 +124,7 @@ YOCTO_UNIT_TEST_IMPL(team)
 			std::cerr << "sum=" << sqrt( 6.0 * comp.sum ) << " @" << i+1 << "\r";
 			std::cerr.flush();
 		}
-		ell /= nc;
+		ell /= ncycle;
 		std::cerr << std::endl << std::endl << "ell=" << ell * 1000.0 << " ms" << std::endl << std::endl;
 	}
 	
