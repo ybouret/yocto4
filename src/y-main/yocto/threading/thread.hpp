@@ -31,7 +31,8 @@ namespace yocto
 			handle_t get_handle() const throw();
 		
 			static id_t     get_current_id() throw();
-				
+			static handle_t get_current_handle() throw();
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(thread);
 			proc_t       proc_;

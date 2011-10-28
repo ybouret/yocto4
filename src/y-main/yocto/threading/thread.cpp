@@ -106,10 +106,22 @@ namespace yocto
 			return id32_;
 #endif
 		}
-
+		
 		thread::handle_t thread:: get_handle() const throw()
 		{
 			return handle_;
+		}
+		
+		thread::handle_t thread:: get_current_handle() throw()
+		{
+#if defined(YOCTO_BSD)
+			return pthread_self();
+#endif
+			
+#if defined(YOCTO_WIN)
+			return ::GetCurrentThread();
+#endif
+			
 		}
 		
 		thread::id_t thread:: get_current_id() throw()
