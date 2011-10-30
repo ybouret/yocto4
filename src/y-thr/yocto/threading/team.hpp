@@ -3,25 +3,14 @@
 
 
 #include "yocto/threading/condition.hpp"
+#include "yocto/threading/layout.hpp"
 #include "yocto/functor.hpp"
 
 namespace yocto
 {
 	namespace threading
 	{
-		class layout
-		{
-		public:
-			const size_t size; //!< #threads requested
-			const size_t root; //!< #CPU to start.
-			explicit layout(); //!< parse the YOCTO_TEAM=#threads[,offset]"
-			virtual ~layout() throw();
-			layout( const layout &other ) throw();
-			
-		private:
-			YOCTO_DISABLE_ASSIGN(layout);
-		};
-		
+				
 		class team : public layout
 		{
 		public:
