@@ -3,13 +3,8 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/threading/thread.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/hw.hpp"
-
-#include "yocto/string/env.hpp"
-#include "yocto/exception.hpp"
 
 #include <iostream>
-#include <cstdlib>
 
 namespace yocto
 {
@@ -31,79 +26,7 @@ namespace yocto
 		{
 		}
 		
-		//======================================================================
-		//
-		// layout
-		//
-		//======================================================================
-		static inline bool __next_field( char * &field )
-		{
-			assert(field!=NULL);
-			while( field[0] != '\0' )
-			{
-				if( !isspace( field[0] ) )
-				{
-					if( ',' == field[0] )
-					{
-						++field;
-						return true;
-					}
-					else 
-					{
-						throw exception("Invalid char '%c' in value", field[0]);
-					}
-
-				}
-				++field;
-			}
-			return false;
-		}
-		
-		layout:: layout( ) :
-		size( hardware::nprocs() ),
-		root(0)
-		{
-			const string name = "YOCTO_THREADING";
-			string       value;
-			if( environment::get( value, name ) )
-			{
-				std::cerr << "[layout parsing '" << value << "']" << std::endl;
-				//--------------------------------------------------------------
-				// #nproc
-				//--------------------------------------------------------------
-				const char *text  = value.c_str();
-				char       *field = NULL;
-				const long  nproc = strtol(text, &field, 10 );
-				if( nproc <= 0 )
-					throw exception("Invalid number of CPU");
-				(size_t&)size = size_t(nproc);
-				//--------------------------------------------------------------
-				// offset, optional
-				//--------------------------------------------------------------
-				if( __next_field(field) )
-				{
-					text = field;
-					const long ibase = strtol(text, &field, 10 );
-					if( ibase < 0 )
-						throw exception("Invalid base CPU");
-					(size_t&)root = size_t(ibase);
-				}
 				
-			}
-			std::cerr << "[layout=" << size << "," << root << "]" << std::endl;
-		}
-		
-		layout:: layout( const layout &other ) throw() :
-		size( other.size ),
-		root( other.root )
-		{
-		}
-		
-		layout:: ~layout() throw()
-		{
-		}
-		
-		
 		//======================================================================
 		//
 		// team members
