@@ -4,7 +4,7 @@
 #	include "yocto/code/utils.hpp"
 #else
 #	if defined(__GNUC__)
-#		if defined(__linux__)
+#		if defined(__linux__) 
 #			define YOCTO_CPU_SET_PTHREAD 1
 #			define YOCTO_CPU_SET cpu_set_t
 #		endif

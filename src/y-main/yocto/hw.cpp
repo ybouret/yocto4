@@ -10,7 +10,7 @@
 #include <windows.h>
 #endif
 
-#if YOCTO_LINUX == 1 || YOCTO_FREEBSD == 1
+#if YOCTO_LINUX == 1 || YOCTO_FREEBSD == 1 || YOCTO_SUNOS == 1
 #include <unistd.h>
 #endif
 
@@ -41,7 +41,7 @@ namespace yocto
 		return n <= 1 ? 1:n;
 #endif
 		
-#if YOCTO_LINUX == 1 || YOCTO_FREEBSD == 1
+#if YOCTO_LINUX == 1 || YOCTO_FREEBSD == 1 || YOCTO_SUNOS == 1
 		const long n = sysconf( _SC_NPROCESSORS_ONLN );
 		return n <= 0  ? 1 : n;
 #endif
