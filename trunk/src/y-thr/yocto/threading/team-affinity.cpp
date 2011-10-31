@@ -6,6 +6,12 @@
 #	if defined(__GNUC__)
 #		if defined(__linux__)
 #			define YOCTO_CPU_SET_PTHREAD 1
+#			define YOCTO_CPU_SET cpu_set_t
+#		endif
+#		if defined(__FreeBSD__)
+#			include <pthread_np.h>
+#			define YOCTO_CPU_SET_PTHREAD 1
+#			define YOCTO_CPU_SET cpuset_t
 #		endif
 #	endif
 #endif
@@ -47,10 +53,10 @@ namespace yocto
 #if defined(YOCTO_CPU_SET_PTHREAD)
 		static  void __assign( thread::handle_t h, const size_t j )
 		{
-			cpu_set_t  cpu_set;
+			YOCTO_CPU_SET cpu_set;
 			CPU_ZERO(  &cpu_set );
 			CPU_SET(j, &cpu_set );
-			const int err = pthread_setaffinity_np( h, sizeof(cpu_set_t), &cpu_set );
+			const int err = pthread_setaffinity_np( h, sizeof(YOCTO_CPU_SET), &cpu_set );
 			if( err != 0 )
 				throw libc::exception( err, "pthread_setaffinity_np" );
 		}
