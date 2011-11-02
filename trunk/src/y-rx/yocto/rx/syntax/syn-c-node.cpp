@@ -47,23 +47,6 @@ namespace yocto
 			}
 			
 			
-			void c_node:: destroy( c_node *node, t_char::pool &tp) throw()
-			{
-				assert(node);
-				switch( node->type )
-				{
-					case terminal:
-						lexeme::destroy( node->data.lx, tp );
-						break;
-						
-					case internal:
-						while( node->children().size > 0 ) destroy( node->children().pop_back(), tp );
-						break;
-				}
-				node->~c_node();
-				object::release1<c_node>(node);
-			}
-			
 			void c_node:: restore( c_node *node, lexer &lxr  ) throw()
 			{
 				assert(node);
@@ -106,7 +89,7 @@ namespace yocto
 			
 			c_node::child_nodes & c_node:: children() throw() { return *(child_nodes *) & data.wksp[0]; }
 			const c_node::child_nodes & c_node:: children() const throw() { return *(const child_nodes *) & data.wksp[0]; }
-
+			
 			
 			
 			void c_node::append( c_node * &tree, c_node *node )
@@ -126,7 +109,7 @@ namespace yocto
 				
 			}
 			
-						
+			
 		}
 		
 	}

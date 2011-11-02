@@ -53,7 +53,7 @@ namespace yocto
 			// finalize
 			//
 			//==================================================================
-			tree_->compile( src.char_pool );
+			tree_->compile();
 			return tree_;
 		}
 		

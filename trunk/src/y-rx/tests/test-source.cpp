@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(source)
 	while( NULL != ( ch = src.get() ) )
 	{
 		std::cerr << ch->data;
-		src.drop(ch);
+		regex::t_char::release(ch);
 		if( src.in_cache() <= 0 )
 			src.prefetch( 1 + alea_less_than(16) );
 	}

@@ -52,7 +52,7 @@ namespace yocto
 							//--------------------------------------------------
 							//-- new best !	
 							//--------------------------------------------------
-							best->motif->sendto( src );  //... forget it
+							best->motif->clear();        //... forget it
 							best = r;                    // register new best
 							src.uncpy( *(best->motif) ); //.. and keep on probing
 						}
@@ -61,11 +61,15 @@ namespace yocto
 					}
 				}
 				
+				//--------------------------------------------------------------
+				// lexical action 
+				//--------------------------------------------------------------
 				if( ! best->check( *(best->motif) ) )
 				{
+					//-- discard current lexeme...
 					assert( src.in_cache() >= best->motif->size );
 					src.skip(best->motif->size);
-					src.drop( *(best->motif)  );
+					best->motif->clear(); 
 					goto FIND_RULE;
 				}
 												
@@ -83,7 +87,7 @@ namespace yocto
 				src.skip(nx);
 				
 				//--------------------------------------------------------------
-				// all done: TODO best->motif->sendto( src ) ?
+				// all done: TODO best->motif->clear() ?
 				//--------------------------------------------------------------
 				//std::cerr << "-- best lex=" << lx->label << std::endl;
 				return lx;

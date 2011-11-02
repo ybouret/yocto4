@@ -32,7 +32,7 @@ namespace yocto
 			virtual ~pattern() throw();
 			virtual pattern *clone() const = 0;        //!< virtual copy constructor
 			virtual bool     accept( source &src) = 0; //!< matching ?
-			virtual void     sendto( source &src);     //!< can be overriden, default is back_to(src.char_pool)
+			virtual void     clear() throw();          //!< can be overriden, default is this->release();
 			
 			//! convert this pattern as a GraphViz graph
 			void graphviz( ios::ostream &, const string &graph_name ) const;

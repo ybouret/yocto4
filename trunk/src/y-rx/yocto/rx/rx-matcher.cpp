@@ -48,8 +48,8 @@ namespace yocto
 		
 		void matcher:: init() throw()
 		{
-			pattern_->sendto(source_);
-			output.back_to(source_.char_pool);
+			pattern_->clear();
+			output.release();
 		}
 		
 		bool matcher:: exactly( const string &input )

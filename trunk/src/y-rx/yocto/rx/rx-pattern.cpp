@@ -17,9 +17,9 @@ namespace yocto
 		{
 		}
 		
-		void pattern:: sendto( source &src )
+		void pattern:: clear() throw()
 		{
-			back_to( src.char_pool );
+			this->release();
 		}
 		
 		void pattern:: optimize() 

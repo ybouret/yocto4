@@ -49,13 +49,13 @@ namespace yocto
 		}
 		
 		
-		void lexer:: reset( source &src ) throw()
+		void lexer:: reset() throw()
 		{
 			for( lexical::rule *r = rules_.tail; r; r=r->prev)
 			{
-				r->motif->sendto( src );
+				r->motif->clear();
 			}
-			cache.to( src.char_pool );
+			cache.clear();
 		}
 		
 		void lexer:: unget( lexeme *lx ) throw()

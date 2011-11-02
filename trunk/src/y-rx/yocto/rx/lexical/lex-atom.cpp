@@ -33,20 +33,13 @@ namespace yocto
 				a->~atom();
 				object::release1<atom>(a);
 			}
-			
-			void atom:: destroy( atom *a, t_char::pool &tp ) throw()
-			{
-				assert( a );
-				a->back_to( tp );
-				destroy(a);
-			}
-			
+						
 			atoms:: atoms()  throw() {}
-			atoms:: ~atoms() throw() { delete_with( atom::destroy ); }
+			atoms:: ~atoms() throw() { clear(); }
 			
-			void atoms:: to( t_char::pool &tp ) throw()
+			void atoms:: clear() throw()
 			{ 
-				delete_with<t_char::pool&>( atom::destroy, tp );
+				delete_with( atom::destroy );
 			}
 			
 			

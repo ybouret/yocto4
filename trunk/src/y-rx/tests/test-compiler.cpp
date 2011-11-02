@@ -87,7 +87,7 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 					if( p->accept( src ) )
 					{
 						std::cerr << "<" << *p << ">";
-						src.drop( *p );
+						p->clear();
 					}
 					else {
 						std::cerr << src.peek()->data;
