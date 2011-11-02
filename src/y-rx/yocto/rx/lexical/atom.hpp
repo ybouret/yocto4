@@ -22,10 +22,8 @@ namespace yocto
 				
 				static atom *create( rule &r );
 				
-				//! destroy with caching used t_char
-				static void  destroy( atom *a, t_char::pool &tp) throw();
-				
-				//! destroy without caching
+								
+				//! destroy atom
 				static void  destroy( atom *a ) throw();
 				
 			private:
@@ -42,7 +40,7 @@ namespace yocto
 			public:
 				explicit atoms() throw();
 				virtual ~atoms() throw();
-				void     to( t_char::pool &tp ) throw(); //!< all atoms back_to(tp)
+				void     clear() throw(); //!< clear all atoms
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(atoms);

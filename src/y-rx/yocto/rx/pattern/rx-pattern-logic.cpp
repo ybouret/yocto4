@@ -26,12 +26,12 @@ namespace yocto
 				//data = & operands;
 			}
 			
-			void Operator:: sendto( source &src ) throw()
+			void Operator:: clear() throw()
 			{
-				back_to(src.char_pool);
+				this->release();
 				for( pattern *p = operands.head; p; p=p->next)
 				{
-					p->back_to( src.char_pool );
+					p->release();
 				}
 			}
 			

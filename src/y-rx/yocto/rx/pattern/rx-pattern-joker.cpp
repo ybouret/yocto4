@@ -25,10 +25,10 @@ namespace yocto
 				
 				
 				
-				virtual void sendto( source &src ) throw() 
+				virtual void clear() throw() 
 				{
-					this->back_to( src.char_pool );
-					ppat->back_to( src.char_pool );
+					this->release();
+					ppat->clear();
 				}
 				
 				virtual bool is_valid( size_t num ) const throw() = 0;

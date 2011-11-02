@@ -19,7 +19,7 @@ namespace yocto
 				p_list operands;
 
 				virtual ~Operator() throw();
-				virtual void sendto( source &src ) throw(); //!< clean this and all operands
+				virtual void clear() throw(); //!< clear this and all operands
 
 				friend inline Operator & operator<<( Operator &op, pattern *p ) throw()
 				{

@@ -24,6 +24,7 @@ namespace yocto
 			object::release1<t_char>(ch);
 		}
 		
+#if 0
 		t_char::pool::pool() throw() : core::pool_of<t_char>()
 		{
 		}
@@ -54,7 +55,7 @@ namespace yocto
 		{
 			while( n-- > 0 ) store( t_char::acquire() );
 		}
-		
+#endif	
 		
 		token::  token() throw() {}
 		token:: ~token() throw() { release(); }
@@ -64,10 +65,6 @@ namespace yocto
 			 delete_with( t_char::release );
 		}
 		
-		void token:: back_to( t_char::pool &pool ) throw()
-		{
-			while( size ) pool.store( pop_back() );
-		}
 		
 		token:: token( const token &other ) 
 		{
@@ -87,22 +84,6 @@ namespace yocto
 			}
 		}
 		
-		token:: token( const token &other, t_char::pool &pool ) 
-		{
-			try 
-			{
-				for( const t_char *ch = other.head; ch; ch=ch->next )
-				{
-					t_char *C = pool.create( ch->data );
-					push_back( C );
-				}
-			}
-			catch(...)
-			{
-				back_to(pool);
-				throw;
-			}
-		}
 		
 		void token:: move_at_head_of( token &other ) throw()
 		{

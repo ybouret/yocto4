@@ -18,14 +18,14 @@ namespace yocto
 		namespace syntax
 		{
 			
-			void c_node:: compile( t_char::pool &tp ) throw()
+			void c_node:: compile() throw()
 			{
 				switch( type )
 				{
 					case terminal:
 						std::cerr << "-- format '" << link.name << "'" << std::endl;
 						if( link.ppty & node_certain )
-							data.lx->back_to(tp);
+							data.lx->release();
 						break;
 						
 						
@@ -39,7 +39,7 @@ namespace yocto
 							if( node->link.ppty & node_useless )
 							{
 								std::cerr << "-- remove '" << node->link.name << "'" << std::endl;
-								c_node::destroy( __children.unlink(node), tp );
+								c_node::destroy( __children.unlink(node)  );
 								node = __next;
 								continue;
 							}
@@ -48,7 +48,7 @@ namespace yocto
 							{
 								std::cerr << "-- fusion '" << node->link.name << "'" << std::endl;
 								//-- take care of node
-								node->compile(tp);
+								node->compile();
 								//-- fusion
 								child_nodes left;
 								while( node != __children.tail ) left.push_front( __children.pop_back() );
@@ -59,7 +59,7 @@ namespace yocto
 								continue;
 							}
 							
-							node->compile(tp);
+							node->compile();
 							node = __next;
 						}
 					}

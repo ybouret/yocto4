@@ -88,7 +88,7 @@ namespace yocto
 			
 						
 			//! reset all rules and cache
-			void reset( source &src ) throw();
+			void reset() throw();
 			
 			//! return lexeme to cache
 			void     unget( lexeme *lx ) throw();
