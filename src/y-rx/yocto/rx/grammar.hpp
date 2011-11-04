@@ -44,7 +44,7 @@ namespace yocto
 			inline void                  counting( const char *n, const char *m, char kind , int p=0) 
 			{ 
 				const string _n(n), _m(m);
-				counting(_n,m,kind,p);
+				counting(_n,_m,kind,p);
 			}
 			
 			void reset() throw();

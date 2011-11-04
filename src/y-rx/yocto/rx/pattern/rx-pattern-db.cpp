@@ -26,7 +26,7 @@ namespace yocto
 			pattern_ptr  pp( p ); 
 			const string id(name);
 			
-			if( ! pattern_map::insert( name, pp ) )
+			if( ! pattern_map::insert( id, pp ) )
 			{
 				throw exception("%s(multiple '%s')", fn, name );
 			}

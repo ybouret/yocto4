@@ -35,7 +35,7 @@ namespace yocto
 		{
 			double         intpart = 0;
 			const double   frcpart = modf( seconds, &intpart );
-			unsigned       num_seconds = static_cast<unsigned>( intpart );
+			unsigned       num_seconds = unsigned( intpart );
 			(unsigned&)d = num_seconds / seconds_per_day;
 			num_seconds -= d * seconds_per_day;
 			(unsigned&)h = num_seconds / seconds_per_hour;

@@ -42,8 +42,8 @@ namespace yocto
 			for( size_t i=0; i < sizeof(void*); ++i )
 			{
 				const uint8_t B = alias.k[i];
-				os.write( 'A' + ( (B>>4) & 0xf ) );
-				os.write( 'A' + (  B     & 0xf ) );
+				os.write( char('A' + ( (B>>4) & 0xf )) );
+				os.write( char('A' + (  B     & 0xf )) );
 			}
 		}
 		

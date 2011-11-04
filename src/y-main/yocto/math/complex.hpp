@@ -98,10 +98,10 @@ namespace yocto
 				return complex(lhs)/rhs;
 			}
 			
-			friend std::ostream & operator<<( std::ostream &os, const complex &C )
+			friend std::ostream & operator<<( std::ostream &_os, const complex &C )
 			{
-				os << '(' << C.re << ',' << C.im << ')';
-				return os;
+				_os << '(' << C.re << ',' << C.im << ')';
+				return _os;
 			}
 			
 			friend 

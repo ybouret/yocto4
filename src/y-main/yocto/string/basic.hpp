@@ -135,11 +135,11 @@ namespace yocto
 			static inline int compare( const T       lhs, const string &rhs ) throw() {	return compare_blocks( &lhs, 1,  rhs.char_, rhs.size_); }
 			
 #define YOCTO_STRING_OP(OP) \
-friend inline bool operator OP ( const string &lhs, const string &rhs ) throw() { return compare(lhs,rhs) OP 0; }\
-friend inline bool operator OP ( const string &lhs, const T      *rhs ) throw() { return compare(lhs,rhs) OP 0; }\
-friend inline bool operator OP ( const T      *lhs, const string &rhs ) throw() { return compare(lhs,rhs) OP 0; }\
-friend inline bool operator OP ( const string &lhs, const T       rhs ) throw() { return compare(lhs,rhs) OP 0; }\
-friend inline bool operator OP ( const T       lhs, const string &rhs ) throw() { return compare(lhs,rhs) OP 0; }
+friend inline bool operator OP ( const string &_lhs, const string &_rhs ) throw() { return compare(_lhs,_rhs) OP 0; }\
+friend inline bool operator OP ( const string &_lhs, const T      *_rhs ) throw() { return compare(_lhs,_rhs) OP 0; }\
+friend inline bool operator OP ( const T      *_lhs, const string &_rhs ) throw() { return compare(_lhs,_rhs) OP 0; }\
+friend inline bool operator OP ( const string &_lhs, const T       _rhs ) throw() { return compare(_lhs,_rhs) OP 0; }\
+friend inline bool operator OP ( const T       _lhs, const string &_rhs ) throw() { return compare(_lhs,_rhs) OP 0; }
 			
 			YOCTO_STRING_OP(==)
 			YOCTO_STRING_OP(!=)

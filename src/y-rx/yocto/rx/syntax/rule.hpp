@@ -15,7 +15,7 @@ namespace yocto
 		{
 			syntax_success,    //!< alright...
 			syntax_nothing,    //!< met end of input
-			syntax_unexpected, //!< got a valid lexeme, not expected
+			syntax_unexpected  //!< got a valid lexeme, not expected
 		};
 	
 		
@@ -23,7 +23,7 @@ namespace yocto
 		{
 			node_certain = 0x0001, //!< univocal terminal => drop chars
 			node_useless = 0x0002, //!< syntax only terminal => drop node
-			node_fusion  = 0x0100, //!< fusion content with parent children
+			node_fusion  = 0x0100  //!< fusion content with parent children
 		};
 				
 #define YOCTO_RX_SYNTAX_RULE_ARGS lexer &lxr, source &src, c_node * &tree
