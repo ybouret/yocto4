@@ -227,7 +227,6 @@ namespace yocto
 		 */
 #define	YOCTO_ARGUMENTS_DECL_T                                        \
 typedef T                                        type;                \
-static const size_t                              type_size = sizeof(type); \
 typedef typename type_traits<T>::mutable_type    mutable_type;        \
 typedef const mutable_type                       const_type;          \
 typedef typename                                                               \

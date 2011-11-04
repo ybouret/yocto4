@@ -10,7 +10,7 @@ using namespace math;
 template <typename T>
 static inline T F( T x )
 {
-	return -Cos(x+0.23) + 7;
+	return -Cos(x+T(0.23)) + T(7);
 }
 
 YOCTO_UNIT_TEST_IMPL(opt)

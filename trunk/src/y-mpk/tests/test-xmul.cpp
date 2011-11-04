@@ -34,7 +34,7 @@ namespace {
 		std::cerr << "-- initializing for " << N << " bytes (" << (N<<3) << " bits)" << std::endl;
 		{
 			vector<uint8_t> buffer(N,0);
-			for( size_t i=NPERF;i>0;--i)
+			for( size_t iter=NPERF;iter>0;--iter)
 			{
 				const size_t nL = max_of<size_t>( gen.within<size_t>(N), 1 );
 				const size_t nR = N - nL;
@@ -132,7 +132,7 @@ void test_sqr( size_t N, double &tmul, double &tfft, double &tsqr, Random::Bits 
 	std::cerr << "-- initializing for " << N << " bytes (" << (N<<3) << " bits)" << std::endl;
 	{
 		vector<uint8_t> buffer(N,0);
-		for( size_t i=NPERF;i>0;--i)
+		for( size_t iter=NPERF;iter>0;--iter)
 		{
 			for( size_t i=1; i <= N; ++i )
 			{

@@ -12,7 +12,6 @@ template <typename T,typename ALLOCATOR>
 void test_catalog()
 {
 	YOCTO_ARGUMENTS_DECL_T;
-	(void) type_size;
 
 	typedef catalog<T,comparator<mutable_type>,ALLOCATOR> cat_t;
 	std::cerr << "catalog<" << typeid(T).name() << ">: size=" << sizeof(cat_t) << std::endl;

@@ -39,7 +39,7 @@ namespace yocto
 			assert( L == H.length );
 			assert( B == H.window );
 			H.set();
-			for( size_t i=0; i < B; ++i ) tmp_[i] = key_[i] ^ 0x36;
+			for( size_t i=0; i < B; ++i ) tmp_[i] = uint8_t(key_[i] ^ 0x36);
 			H(tmp_);
 		}
 		
@@ -49,7 +49,7 @@ namespace yocto
 			assert( B == H.window );
 			H.get( end_.rw(), L );
 			H.set();
-			for( size_t i=0; i < B; ++i ) tmp_[i] = key_[i] ^ 0x5c;
+			for( size_t i=0; i < B; ++i ) tmp_[i] = uint8_t(key_[i] ^ 0x5c);
 			H( tmp_ );
 			H( end_ );
 			H.get(output,outlen);

@@ -85,9 +85,9 @@ namespace yocto
 			{
 			}
 			
-			bool any_count:: is_valid( size_t n ) const throw()
+			bool any_count:: is_valid( size_t ) const throw()
 			{
-				return n >= 0;
+				return true; 
 			}
 			
 			////////////////////////////////////////////////////////////////////

@@ -79,7 +79,7 @@ namespace yocto
 	float urand:: get<float>() throw() 
 	{ 
 		static const float fac= 1.0f / 4294967296.0f;
-		return ( 0.5f + static_cast<float>( KISS() ) ) * fac;
+		return ( 0.5f + float( KISS() ) ) * fac;
 	}
 	
 	static   urand   __rand;

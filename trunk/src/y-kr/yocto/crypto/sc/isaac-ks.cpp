@@ -22,7 +22,7 @@ namespace yocto
 		
 		uint8_t isaac_key_stream:: call() throw()
 		{
-			return isaac_.rand32();
+			return uint8_t(isaac_.rand32());
 		}
 
 	}
