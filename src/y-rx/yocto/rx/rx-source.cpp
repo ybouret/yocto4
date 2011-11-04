@@ -130,5 +130,10 @@ namespace yocto
 			assert( n <= in_cache() );
 			while(n-->0) t_char::release( cache_.pop_front() );
 		}
+		
+		bool source:: is_active() 
+		{
+			 return NULL != peek();
+		}
 	}
 }
