@@ -14,10 +14,8 @@ namespace yocto
 			class atom : public token
 			{
 			public:
-				
-								
-				atom         *next; //!< for core::list binary layout
-				atom         *prev; //!< for core::list binary layout
+				atom         *next;  //!< for core::list  
+				atom         *prev;  //!< for core::list  
 				const string &label; //!< from the lexer database: no duplicate memory
 				
 				static atom *create( rule &r );

@@ -32,7 +32,7 @@ namespace yocto
 			virtual ~pattern() throw();
 			virtual pattern *clone() const = 0;        //!< virtual copy constructor
 			virtual bool     accept( source &src) = 0; //!< matching ?
-			virtual void     clear() throw();          //!< can be overriden, default is this->release();
+			virtual void     clear() throw();          //!< should recursively release t_char
 			
 			//! convert this pattern as a GraphViz graph
 			void graphviz( ios::ostream &, const string &graph_name ) const;
@@ -45,7 +45,6 @@ namespace yocto
 			
 			//! detect first acceptable symbols
 			virtual void gather( first_chars &fch ) const = 0;
-			
 			
 			//! binary output
 			virtual void     brx( ios::ostream & ) const = 0;

@@ -1,3 +1,5 @@
+//!\file
+
 #ifndef YOCTO_RX_TOKEN_INCLUDED
 #define YOCTO_RX_TOKEN_INCLUDED 1
 
@@ -15,9 +17,9 @@ namespace yocto
 		class t_char 
 		{
 		public:
-			t_char *next;
-			t_char *prev;
-			char    data;
+			t_char *next; //!< for list 
+			t_char *prev; //!< for list 
+			char    data; //!< actual char
 			
 			static t_char  *acquire();
 			static void     release( t_char *ch ) throw();

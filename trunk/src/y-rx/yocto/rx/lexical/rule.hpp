@@ -14,7 +14,7 @@ namespace yocto
 		{
 			
 #define YOCTO_RX_LEX_RULE_ACTION_ARGS const regex::token &
-
+			
 			typedef functor<bool,TL1(YOCTO_RX_LEX_RULE_ACTION_ARGS)> action;
 			
 			//! pattern smart pointer
@@ -26,9 +26,9 @@ namespace yocto
 				rule               *prev;   //!< core::list binary layout
 				pattern            *motif;  //!< the one and only pattern
 				const string        label;  //!< for lexer database
-				action              check;  //!< false: doesn't send to parser
+				action              check;  //!< if check returns false: doesn't send to parser
 				
-				//! rule creationg
+				//! rule creating
 				/**
 				 \param p a valid pattern, handled in case of error
 				 \param l associated label
@@ -36,6 +36,7 @@ namespace yocto
 				static rule *create(  pattern *p, const string &l, const action *a = NULL);
 				static void  destroy( rule *r ) throw();			 
 				
+				//! always returns true.
 				bool keep( YOCTO_RX_LEX_RULE_ACTION_ARGS  ) throw();
 				
 			private:
