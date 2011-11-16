@@ -10,6 +10,7 @@ namespace yocto
 	{
 	public:
 		explicit module( const string &soname );
+		explicit module( const char   *soname );
 		virtual ~module() throw();
 		
 		module( const module &other ) throw();
