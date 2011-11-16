@@ -13,6 +13,7 @@ namespace yocto
 		static inline void *load_library( const char *soname )
 		{
 			YOCTO_GIANT_LOCK();
+			assert(soname);
 #if defined(YOCTO_BSD)
 			void *h = dlopen( soname, RTLD_NOW );
 			if( !h )
@@ -34,6 +35,15 @@ namespace yocto
 		{
 			
 		}
+		
+		explicit impl( const char *soname ) :
+		handle( load_library( soname ) ),
+		count(1)
+		{
+			
+		}
+		
+		
 		
 		virtual ~impl() throw() 
 		{
@@ -60,6 +70,11 @@ namespace yocto
 	
 	module:: module( const string &soname ) : impl_( new impl(soname) )
 	{
+	}
+	
+	module:: module( const char   *soname ) : impl_( new impl(soname) )
+	{
+		
 	}
 	
 	module:: module( const module &other ) throw() : impl_( other.impl_ )
