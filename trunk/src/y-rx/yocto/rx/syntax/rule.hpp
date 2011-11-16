@@ -17,15 +17,15 @@ namespace yocto
 			syntax_nothing,    //!< met end of input
 			syntax_unexpected  //!< got a valid lexeme, not expected
 		};
-	
+		
 		
 		enum node_ppty
 		{
-			node_certain = 0x0001, //!< univocal terminal => drop chars
+			node_certain = 0x0001, //!< univocal terminal    => drop chars
 			node_useless = 0x0002, //!< syntax only terminal => drop node
 			node_fusion  = 0x0100  //!< fusion content with parent children
 		};
-				
+		
 #define YOCTO_RX_SYNTAX_RULE_ARGS lexer &lxr, source &src, c_node * &tree
 		
 		class grammar;
@@ -33,7 +33,7 @@ namespace yocto
 		namespace syntax
 		{
 			typedef imported::exception exception;
-						
+			
 			//! generic rule
 			class rule : public object
 			{
@@ -63,7 +63,7 @@ namespace yocto
 				size_t nref_;
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 				
-			
+				
 			};
 			
 			

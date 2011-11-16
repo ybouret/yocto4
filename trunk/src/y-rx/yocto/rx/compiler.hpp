@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_RX_COMPILER_INCLUDED
 #define YOCTO_RX_COMPILER_INCLUDED 1
 

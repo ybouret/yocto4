@@ -11,8 +11,8 @@ namespace yocto
 	namespace regex
 	{
 		
-		typedef lexical::atom        lexeme;
-		typedef lexical::atoms       lexemes;
+		typedef lexical::atom        lexeme;   //!< a lexical atom
+		typedef lexical::atoms       lexemes;  //!< a list of lexemes
 		
 		//! lexical analyzer
 		class lexer
@@ -23,8 +23,8 @@ namespace yocto
 			
 			void operator()( pattern *motif, const string &label, const lexical::action *a = NULL);
 			void operator()( pattern *motif, const char   *label, const lexical::action *a = NULL);
-	
-						
+			
+			
 			inline void operator()( const string &expr, const string &label )
 			{
 				(*this)( compile(expr,dict_), label, NULL );
@@ -69,7 +69,7 @@ namespace yocto
 				const lexical::action a( &host, method );
 				(*this)( compile(expr,dict_), label, &a );
 			}
-
+			
 			template <typename HOST>
 			inline void operator()( const char *expr, const char *label, HOST &host, bool (HOST:: *method)( YOCTO_RX_LEX_RULE_ACTION_ARGS) )
 			{
@@ -79,14 +79,14 @@ namespace yocto
 			}
 			
 			
-						
+			
 			inline bool skip( YOCTO_RX_LEX_RULE_ACTION_ARGS ) throw()
 			{
 				return false;
 			}
 			
 			
-						
+			
 			//! reset all rules and cache
 			void reset() throw();
 			
@@ -102,7 +102,7 @@ namespace yocto
 			 if( src.peek() != NULL ) => unknown char !
 			 */
 			lexeme  *lookahead( source &src );
-						
+			
 			inline pattern_db       &dict()       { if( !dict_ ) dict_ = new pattern_db(); return *dict_; }
 			inline const pattern_db &dict() const { if( !dict_ ) dict_ = new pattern_db(); return *dict_; }
 			inline void              no_dict() throw() { if( dict_ ) { delete dict_; dict_=NULL; } }
