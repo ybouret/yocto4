@@ -26,10 +26,9 @@ YOCTO_UNIT_TEST_IMPL(lex)
 
 	L.no_dict();
 	
-	regex::source src;
 	ios::icstream inp( ios::cstdin );
-	
-	src.connect( inp );
+	regex::source src(inp);
+
 	regex::lexemes lxs;
 	for(;;)
 	{

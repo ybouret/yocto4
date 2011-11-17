@@ -10,30 +10,13 @@ namespace yocto
 		{
 		}
 		
-		source:: source() throw() : cache_(), input_(NULL)
+		source:: source( ios::istream &input ) throw() : cache_(), input_(input)
 		{
 		}
 		
-		void source:: reset() throw()
-		{
-			cache_.release();
-		}
-		
-		void source:: connect( ios::istream &input ) throw()
-		{
-			reset();
-			input_ = &input;
-		}
-		
-		void source:: disconnect() throw()
-		{
-			reset();
-			input_ = NULL;
-		}
-		
+				
 		t_char * source:: get()
 		{
-			assert( input_ );
 			if( cache_.size > 0 )
 			{
 				return cache_.pop_front();
@@ -43,7 +26,7 @@ namespace yocto
 				t_char *ch = t_char::acquire();
 				try 
 				{
-					if( input_->query( ch->data ) )
+					if( input_.query( ch->data ) )
 					{
 						
 						return ch;
@@ -85,7 +68,7 @@ namespace yocto
 			t_char *ch = t_char::acquire();
 			try {
 				
-				if( !input_->query( ch->data ) )
+				if( !input_.query( ch->data ) )
 				{
 					t_char::release( ch );
 					return false;

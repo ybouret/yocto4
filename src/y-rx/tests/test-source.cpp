@@ -8,9 +8,9 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(source)
 {
 	ios::icstream input( ios::cstdin );
-	regex::source src;
+	regex::source src(input);
 	
-	src.connect( input );
+	
 	src.prefetch( 1 + alea_less_than(16) );
 	regex::t_char *ch = NULL;
 	while( NULL != ( ch = src.get() ) )

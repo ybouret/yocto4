@@ -36,13 +36,17 @@ namespace yocto
 		class token : public object, public core::list_of<t_char>
 		{
 		public:
-			explicit token() throw();
-			virtual ~token() throw();
-			token( const token & );
+			explicit token() throw(); //!< construct an empty token
+			virtual ~token() throw(); //!< destructor
+			token( const token & );   //!< dynamic copy
 			void release() throw();
 			void move_at_head_of( token &other ) throw(); //!< for i/o caching
 			void move_at_tail_of( token &other ) throw(); //!< 'tkncat'
+			
+			//! conversion to a string
 			string to_string( size_t skip=0, size_t trim=0 ) const;
+			
+			//! for debugging
 			friend std::ostream & operator<< ( std::ostream &, const token & );
 			
 		private:

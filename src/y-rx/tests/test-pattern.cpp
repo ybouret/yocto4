@@ -69,9 +69,8 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 	assert( pcpy.size == patterns.size );
 	
 	ios::icstream input( ios::cstdin );
-	regex::source src;
+	regex::source src(input);
 	
-	src.connect( input );
 	src.prefetch( 1 + alea_less_than(16) );
 	
 	while( src.peek() )

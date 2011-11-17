@@ -56,7 +56,7 @@ namespace yocto
 				case CL_INVALID_GL_OBJECT:                return YOCTO_CL_STRERR("Invalid OpenGL object");
 				case CL_INVALID_BUFFER_SIZE:              return YOCTO_CL_STRERR("Invalid buffer size");
 				case CL_INVALID_MIP_LEVEL:                return YOCTO_CL_STRERR("Invalid mip-map level");
-				default:                                  return YOCTO_CL_STRERR("Unknown");
+				default:                                  return YOCTO_CL_STRERR("Unknown Error");
 			}
 		}
 	}
