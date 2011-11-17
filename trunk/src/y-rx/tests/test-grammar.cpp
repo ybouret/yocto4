@@ -35,9 +35,8 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	
 	
 	ios::icstream     inp( ios::cstdin );
-	source            src;
+	source            src(inp);
 	
-	src.connect( inp );
 	lexer      lxr;
 	
 	lxr( "\\[",         "LBRACK" );
@@ -127,9 +126,8 @@ YOCTO_UNIT_TEST_IMPL(expr)
 	}
 	
 	ios::icstream     inp( ios::cstdin );
-	source            src;
+	source            src(inp);
 	
-	src.connect( inp );
 	syntax::c_node *node = G.parse(lxr, src);
 	assert(node);
 	{
@@ -183,9 +181,8 @@ YOCTO_UNIT_TEST_IMPL(json)
 	}
 	
 	ios::icstream     inp( ios::cstdin );
-	source            src;
+	source            src(inp);
 	
-	src.connect( inp );
 	syntax::c_node *node = G.parse(L, src);
 	assert(node);
 	{

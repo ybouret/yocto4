@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_RX_PATTERN_INCLUDED
 #define YOCTO_RX_PATTERN_INCLUDED 1
 

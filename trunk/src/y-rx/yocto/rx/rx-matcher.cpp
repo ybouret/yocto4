@@ -16,14 +16,12 @@ namespace yocto
 		
 		
 		matcher:: matcher( const string &expr, pattern_db *dict ) :
-		source_(),
 		pattern_( compile( expr, dict ) ),
 		output()
 		{
 		}
 		
 		matcher:: matcher( const char *expr, pattern_db *dict ) :
-		source_(),
 		pattern_( compile( expr, dict ) ),
 		output()
 		{
@@ -57,8 +55,8 @@ namespace yocto
 			ios::imstream in( input );
 			init();
 			
-			source_.connect( in );
-			if( pattern_->accept( source_ ) )
+			source src( in );
+			if( pattern_->accept( src ) )
 			{
 				output.merge_back( *pattern_ );
 				return true;
@@ -72,17 +70,17 @@ namespace yocto
 			ios::imstream in( input );
 			init();
 			
-			source_.connect( in );
-			while( source_.peek() )
+			source src( in );
+			while( src.peek() )
 			{
-				if( pattern_->accept( source_ ) )
+				if( pattern_->accept( src ) )
 				{
 					output.merge_back( *pattern_ );
 					return true;
 				}
 				else
 				{
-					source_.skip(1);
+					src.skip(1);
 				}
 				
 			}

@@ -65,7 +65,6 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 		if( (argc<=2) || 0 != strcmp(argv[2],"no") )
 		{
 			ios::icstream input( ios::cstdin );
-			regex::source src;
 			string line;
 			
 			for(;;)
@@ -81,7 +80,8 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 				//-- read input
 				std::cerr << "# ";
 				ios::imstream im( line );
-				src.connect( im );
+				regex::source src(im);
+
 				while( src.peek() )
 				{
 					if( p->accept( src ) )

@@ -13,12 +13,10 @@ namespace yocto
 		class source 
 		{
 		public:
-			explicit source() throw();
+			explicit source( ios::istream &input ) throw();
 			virtual ~source() throw();
 						
-			void connect( ios::istream &input ) throw();
-			void disconnect() throw();
-			
+						
 			t_char       *get(); 
 			void          unget( t_char * ) throw();
 			void          unget( token &  ) throw();
@@ -31,9 +29,8 @@ namespace yocto
 			
 		private:
 			token         cache_;
-			ios::istream *input_;
+			ios::istream &input_;
 			
-			void reset() throw();
 			bool cache1();
 			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(source);

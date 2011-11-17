@@ -27,7 +27,6 @@ namespace yocto
 			bool partly( const string & );
 			
 		private:
-			source              source_;
 			pattern            *pattern_;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(matcher);
 			void init() throw();
