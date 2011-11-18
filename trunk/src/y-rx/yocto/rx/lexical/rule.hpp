@@ -18,20 +18,24 @@ namespace yocto
 			typedef functor<bool,TL1(YOCTO_RX_LEX_RULE_ACTION_ARGS)> action;
 			
 			//! pattern smart pointer
+			/**
+			 Used to associate a pattern to a label.
+			 */
 			class rule 
 			{
 			public:
 				
 				rule               *next;   //!< core::list binary layout
 				rule               *prev;   //!< core::list binary layout
-				pattern            *motif;  //!< the one and only pattern
-				const string        label;  //!< for lexer database
+				pattern            *motif;  //!< the one and only pattern associated to the rule
+				const string        label;  //!< for lexer database: must be unique
 				action              check;  //!< if check returns false: doesn't send to parser
 				
 				//! rule creating
 				/**
 				 \param p a valid pattern, handled in case of error
 				 \param l associated label
+				 \param a if not NULL, duplicated as action
 				 */
 				static rule *create(  pattern *p, const string &l, const action *a = NULL);
 				static void  destroy( rule *r ) throw();			 
