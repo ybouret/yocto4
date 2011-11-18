@@ -11,16 +11,19 @@ namespace yocto
 		{
 			
 			//! a token with its label
+			/**
+			 Created by a lexer from a lexical::rule.
+			 */
 			class atom : public token
 			{
 			public:
 				atom         *next;  //!< for core::list  
 				atom         *prev;  //!< for core::list  
-				const string &label; //!< from the lexer database: no duplicate memory
+				const string &label; //!< from a rule in a lexer database: no duplicate memory
 				
 				static atom *create( rule &r );
 				
-								
+				
 				//! destroy atom
 				static void  destroy( atom *a ) throw();
 				
@@ -32,7 +35,7 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(atom);
 			};
 			
-						
+			//! a list of atoms
 			class atoms : public core::list_of<atom>
 			{
 			public:

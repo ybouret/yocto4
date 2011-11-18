@@ -15,13 +15,20 @@ namespace yocto
 		typedef lexical::atoms       lexemes;  //!< a list of lexemes
 		
 		//! lexical analyzer
+		/**
+		 Base on an ordered set of name rules, following the 'flex'
+		 engine behavior.
+		 */
 		class lexer
 		{
 		public:
 			explicit lexer() throw();
 			virtual ~lexer() throw();
 			
+			//! create a lexical::rule named 'label' for 'motif'
 			void operator()( pattern *motif, const string &label, const lexical::action *a = NULL);
+			
+			//! create a lexical::rule named 'label' for 'motif'
 			void operator()( pattern *motif, const char   *label, const lexical::action *a = NULL);
 			
 			
