@@ -6,21 +6,21 @@
 
 namespace yocto
 {
-
+	
 	namespace regex
 	{
-
+		
 		namespace logical
 		{
-
+			
 			class Operator : public pattern
 			{
 			public:
 				p_list operands;
-
+				
 				virtual ~Operator() throw();
 				virtual void clear() throw(); //!< clear this and all operands
-
+				
 				friend inline Operator & operator<<( Operator &op, pattern *p ) throw()
 				{
 					op.operands.push_back(p);
@@ -28,13 +28,13 @@ namespace yocto
 				}
 				
 				virtual void     brx( ios::ostream & ) const;
-
+				
 			protected:
 				Operator(uint32_t t) throw();
 				Operator( const Operator & );
 				YOCTO_DISABLE_ASSIGN(Operator);
 			};
-
+			
 			//! logical AND
 			class AND : public Operator
 			{
@@ -42,14 +42,14 @@ namespace yocto
 				static const uint32_t id = YOCTO_FOURCC('[','&','&', ']');
 				static AND *create();
 				virtual ~AND() throw();
-
+				
 				virtual pattern *clone() const { return new AND( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
 				virtual void     gather( first_chars &fch ) const;
-
+				
 				virtual void optimize();
-
+				
 			private:
 				AND() throw();
 				AND( const AND & );
@@ -57,7 +57,7 @@ namespace yocto
 			};
 			
 			
-
+			
 			//! logical OR
 			class OR : public Operator
 			{
@@ -65,14 +65,14 @@ namespace yocto
 				static const uint32_t id = YOCTO_FOURCC('[','|','|', ']');
 				static OR *create();
 				virtual ~OR() throw();
-
+				
 				virtual pattern *clone() const { return new OR( *this ); }
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
 				virtual void     gather( first_chars &fch ) const;
-
+				
 				virtual void optimize();
-
+				
 			private:
 				OR() throw();
 				OR( const OR & );
@@ -91,22 +91,26 @@ namespace yocto
 				virtual bool     accept( source &src );
 				virtual void     viz( ios::ostream & ) const;
 				virtual void     gather( first_chars &fch ) const;
-
+				
 			private:
 				NONE() throw();
 				NONE( const NONE & );
 				YOCTO_DISABLE_ASSIGN(NONE);
 			};
 			
-
+			
 			
 			Operator *EQUAL( const string &s );
 			Operator *AMONG( const string &s );
 			Operator *EXCEPT( const string &s );
+			
+			inline Operator *EQUAL(  const char *t ) { const string s(t); return EQUAL(s);  }
+			inline Operator *AMONG(  const char *t ) { const string s(t); return AMONG(s);  }
+			inline Operator *EXCEPT( const char *t ) { const string s(t); return EXCEPT(s); }
 		}
-
+		
 	}
-
+	
 }
 
 
