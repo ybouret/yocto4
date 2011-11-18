@@ -17,7 +17,7 @@ namespace yocto
 				throw exception("empty grammar '%s'", name.c_str());
 			reset();
 			syntax::rule     & root = ** rset_.begin();
-			std::cerr << std::endl << name << ".parsing from " << root.name << std::endl;
+			std::cerr << std::endl << "-- <" << name << ">.parsing from " << root.name << std::endl;
 			
 			//==================================================================
 			//
@@ -35,13 +35,13 @@ namespace yocto
 					switch( lxr.cache.size )
 				{
 					case 0:
-						throw syntax::exception("Internal Unexpected Failure!","parsing '%s'", name.c_str());
+						throw syntax::exception("Internal Unexpected Failure!","parsing <%s>", name.c_str());
 					case 1:
-						throw syntax::exception("Unexpected Lexeme", "Invalid '%s'", lxr.cache.head->label.c_str() );
+						throw syntax::exception("Unexpected Lexeme", "Invalid '%s', in <%s>", lxr.cache.head->label.c_str(), name.c_str() );
 						
 					default:
 						assert( lxr.cache.size>1 );
-						throw syntax::exception("Unexpected Lexeme", "Invalid '%s' after '%s'", lxr.cache.tail->label.c_str(), lxr.cache.tail->prev->label.c_str() );
+						throw syntax::exception("Unexpected Lexeme", "Invalid '%s' after '%s', in <%s>", lxr.cache.tail->label.c_str(), lxr.cache.tail->prev->label.c_str(), name.c_str());
 						break;
 				}
 				default:
@@ -53,6 +53,7 @@ namespace yocto
 			// finalize
 			//
 			//==================================================================
+			std::cerr << std::endl << "-- <" << name << ">.compiling tree '" << tree_->link.name << "'" << std::endl;
 			tree_->compile();
 			return tree_;
 		}

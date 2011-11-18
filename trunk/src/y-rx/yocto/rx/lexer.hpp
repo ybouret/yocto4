@@ -110,9 +110,9 @@ namespace yocto
 			 */
 			lexeme  *lookahead( source &src );
 			
-			inline pattern_db       &dict()       { if( !dict_ ) dict_ = new pattern_db(); return *dict_; }
-			inline const pattern_db &dict() const { if( !dict_ ) dict_ = new pattern_db(); return *dict_; }
-			inline void              no_dict() throw() { if( dict_ ) { delete dict_; dict_=NULL; } }
+			pattern_db       &dict() ;		
+			const pattern_db &dict() const;
+			void           no_dict() throw();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);

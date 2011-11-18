@@ -23,6 +23,7 @@ namespace yocto
 			
 			
 			explicit grammar( const string &  );
+			explicit grammar( const char   *  );
 			virtual ~grammar() throw();
 			
 			syntax::rule  * operator[]( const string & );
@@ -33,15 +34,20 @@ namespace yocto
 			//------------------------------------------------------------------
 			// rules creation API
 			//------------------------------------------------------------------
-			void                  terminal( const string &n, int p=0);
-			syntax::aggregate   & aggregate( const string &n, int p=0);
+			//! create a new terminal rule
+			/**
+				\param n the concrete name of the terminal
+				\param p optional property
+			 */
+			void                  terminal(    const string &n, int p=0);
+			syntax::aggregate   & aggregate(   const string &n, int p=0);
 			syntax::alternative & alternative( const string &n );
-			void                  counting( const string &n, const string &m, char kind, int p=0);
+			void                  counting(    const string &n, const string &m, char kind, int p=0);
 			
-			inline void                  terminal( const char *t, int p=0 )   { const string n(t); terminal(n,p); }
-			inline syntax::aggregate   & aggregate( const char *t, int p=0)   { const string n(t); return aggregate(n,p); }
-			inline syntax::alternative & alternative( const char *t ) { const string n(t); return alternative(n); }
-			inline void                  counting( const char *n, const char *m, char kind , int p=0) 
+			inline void                  terminal(    const char *t, int p=0 ) { const string n(t);        terminal(n,p);  }
+			inline syntax::aggregate   & aggregate(   const char *t, int p=0)  { const string n(t); return aggregate(n,p); }
+			inline syntax::alternative & alternative( const char *t )          { const string n(t); return alternative(n); }
+			inline void                  counting(    const char *n, const char *m, char kind , int p=0) 
 			{ 
 				const string _n(n), _m(m);
 				counting(_n,_m,kind,p);

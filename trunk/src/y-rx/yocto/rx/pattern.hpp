@@ -41,6 +41,7 @@ namespace yocto
 			virtual void viz( ios::ostream & ) const = 0; //!< for each pattern
 			void         tag( ios::ostream & ) const;     //!< uniq GraphViz node identifier
 			static void  out( ios::ostream &, char c );   //!< GrapViz node readable label
+			inline void  graphviz( ios::ostream &fp, const char *gn ) const { const string graph_name(gn); graphviz(fp,graph_name); }
 			
 			//! logical optimization, default is do nothing
 			virtual void optimize();

@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_RX_SYN_C_NODE_INCLUDED
 #define YOCTO_RX_SYN_C_NODE_INCLUDED 1
 
@@ -16,6 +18,8 @@ namespace yocto
 			
 			
 			class rule;
+			
+			//! concrete syntax node
 			class c_node
 			{
 			public:

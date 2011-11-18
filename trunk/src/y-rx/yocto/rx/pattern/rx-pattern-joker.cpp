@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "yocto/rx/pattern/joker.hpp"
 #include "yocto/rx/source.hpp"
 
