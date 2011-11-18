@@ -28,12 +28,12 @@ namespace
 {
 	static uint32_t dummy_idx = 0;
 	
-	class dummy 
+	class dummy : public counted
 	{
 	public:
 		int value;
 		const uint32_t id;
-		dummy( int a ) : value(a), id( ++dummy_idx), nref_(0)
+		dummy( int a ) : value(a), id( ++dummy_idx)
 		{
 			std::cerr << "+[dummy " << value << "]" << std::endl;
 		}
@@ -45,11 +45,9 @@ namespace
 	
 		typedef intrusive_ptr<uint32_t,dummy> ptr;
 		
-		void withhold() throw() { ++nref_; }
-		bool liberate() throw() { assert(nref_>0); return --nref_ <= 0; }
+	
 		
 	private:
-		size_t nref_;
 		YOCTO_DISABLE_COPY_AND_ASSIGN(dummy);
 	};
 	

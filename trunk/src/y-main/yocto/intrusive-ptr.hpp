@@ -77,6 +77,23 @@ namespace yocto
 	};
 	
 	
+	class counted 
+	{
+	public:
+		inline virtual ~counted() throw() { assert(nref_==0); }
+		
+		inline void withhold() throw() { ++nref_; }
+		inline bool liberate() throw() { assert(nref_>0); return --nref_ <= 0; }
+		
+	protected:
+		inline explicit counted() throw() : nref_(0) {}
+		
+	private:
+		size_t nref_;
+		YOCTO_DISABLE_COPY_AND_ASSIGN(counted);
+	};
+	
+	
 }
 
 #endif
