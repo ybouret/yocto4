@@ -73,7 +73,6 @@ YOCTO_UNIT_TEST_IMPL(grammar)
 	
 	syntax::c_node *node = G.parse(lxr, src );
 	assert(node);
-	//node->format(G,src.char_pool);
 	{
 		ios::ocstream fp( "parsed.dot", false );
 		node->graphviz( "G", fp );

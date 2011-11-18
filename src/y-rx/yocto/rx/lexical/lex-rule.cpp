@@ -28,6 +28,9 @@ namespace yocto
 			prev(NULL),
 			motif( p ),
 			label( l ),
+#if defined(_MSC_VER)
+#	pragma warning ( disable : 4355 )
+#endif
 			check( this, & rule::keep )
 			{
 				

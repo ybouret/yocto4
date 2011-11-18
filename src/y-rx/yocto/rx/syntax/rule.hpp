@@ -1,3 +1,4 @@
+//! \file 
 
 #ifndef YOCTO_RX_SYNTAX_RULE_INCLUDED
 #define YOCTO_RX_SYNTAX_RULE_INCLUDED
@@ -52,7 +53,12 @@ namespace yocto
 				typedef intrusive_ptr<string,rule> ptr;
 				const string & key() const throw() { return name; }
 				
-				//! todo: add a rule ** to get error context
+				//! matching API
+				/**
+				 Take lexemes from the lexer and the source.
+				 Set/Add to the current tree of concrete nodes.
+				 \todo: add a rule ** to get error context
+				 */
 				virtual syntax_result match( YOCTO_RX_SYNTAX_RULE_ARGS ) = 0;
 				
 			protected:

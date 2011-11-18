@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "yocto/utest/run.hpp"
 #include "yocto/rx/pattern/basic.hpp"
 #include "yocto/rx/pattern/logic.hpp"

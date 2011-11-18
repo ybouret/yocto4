@@ -22,11 +22,27 @@ namespace yocto
 		{
 		}
 		
+		void lexer:: no_dict() throw() { if( dict_ ) { delete dict_; dict_=NULL; } }
+		
+		pattern_db       & lexer:: dict()        
+		{ 
+			if( !dict_ ) 
+				dict_ = new pattern_db(); 
+			return *dict_; 
+		}
+		
+		const pattern_db       & lexer:: dict() const
+		{ 
+			if( !dict_ ) 
+				dict_ = new pattern_db(); 
+			return *dict_; 
+		}
+		
 		
 		void lexer:: operator()( pattern *motif, const string &label, const lexical::action *a)
 		{
 			assert( motif );
-
+			
 			for( const lexical::rule *r = rules_.tail; r; r=r->prev )
 			{
 				if( r->label == label )
@@ -37,9 +53,9 @@ namespace yocto
 			}
 			
 			rules_.push_back(  lexical::rule::create( motif, label,a ) );
-
+			
 		}
-
+		
 		void lexer:: operator()( pattern *motif, const char *label, const lexical::action *a)
 		{
 			auto_ptr<pattern> p( motif );
@@ -65,13 +81,13 @@ namespace yocto
 			assert( NULL == lx->prev );
 			cache.push_front( lx );
 		}
-				
+		
 		void lexer:: unget( lexemes &lxs ) throw()
 		{
 			while( lxs.size ) cache.push_front( lxs.pop_back() );
 		}
 		
-	
-				
+		
+		
 	}
 }

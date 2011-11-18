@@ -20,13 +20,23 @@ namespace yocto
 			reset();
 		}
 		
+#define YOCTO_RX_GRAMMAR_RULES_INIT_COUNT 8
 		grammar:: grammar( const string &n) : 
 		name(n),
 		tree_(NULL),
-		rset_(8,as_capacity) //,mset_(8,as_capacity)
+		rset_(YOCTO_RX_GRAMMAR_RULES_INIT_COUNT,as_capacity) 		
 		{
 			
 		}
+		
+		grammar:: grammar( const char *n) : 
+		name(n),
+		tree_(NULL),
+		rset_(YOCTO_RX_GRAMMAR_RULES_INIT_COUNT,as_capacity) 
+		{
+			
+		}
+		
 		
 		
 		syntax::rule  * grammar:: operator[]( const string &id )
@@ -34,7 +44,7 @@ namespace yocto
 			syntax::rule::ptr *p = rset_.search( id );
 			if( !p )
 			{
-				throw syntax::exception( "grammar lookup","no rule '%s'",id.c_str() );
+				throw syntax::exception( "grammar lookup","no rule '%s' in <%s>",id.c_str(),name.c_str() );
 			}
 			return p->__get();
 		}
@@ -45,7 +55,7 @@ namespace yocto
 			return (*this)[ id ];
 		}
 		
-				
+		
 		
 		void grammar:: record( syntax::rule *r )
 		{
@@ -53,7 +63,7 @@ namespace yocto
 			syntax::rule::ptr p(r);
 			if( !rset_.insert(p) )
 			{
-				throw syntax::exception( "grammar::record failure", "mutiple rule '%s'", p->name.c_str() ); 
+				throw syntax::exception( "grammar::record failure", "mutiple rule '%s' in <%s>", p->name.c_str(), name.c_str() ); 
 			}
 			
 		}
@@ -101,31 +111,10 @@ namespace yocto
 					break;
 					
 				default:
-					throw syntax::exception("grammar::counting failure", "invalid kind '%c'", kind );
+					throw syntax::exception("grammar::counting failure", "invalid kind '%c' in <%s>", kind, name.c_str() );
 			}
 		}
 		
-		//----------------------------------------------------------------------
-		// action
-		//----------------------------------------------------------------------
-#if 0
-		void grammar:: operator()( const string &rule_name, const production &do_something )
-		{
-			if( ! mset_.insert( rule_name, do_something ) )
-			{
-				throw exception("%s.on(MUTLIPLE '%s')", name.c_str(), rule_name.c_str() );
-			}
-		}
-		
-		void grammar:: apply( const string &rule_name, const token &tkn )
-		{
-			production *a = mset_.search( rule_name );
-			if( a )
-			{
-				(void) (*a)(rule_name,tkn);
-			}
-		}
-#endif
 		
 	}
 }
