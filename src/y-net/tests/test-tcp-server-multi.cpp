@@ -5,6 +5,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/net/socket-set.hpp"
+#include "yocto/associative/set.hpp"
 
 #include <cstdlib>
 
@@ -26,9 +27,9 @@ namespace  {
 		
 		virtual ~Client() throw() {}
 		
-		typedef intrusive_ptr<network::socket,Client> Ptr; 
+		typedef intrusive_ptr<ClientID,Client> Ptr; 
 		
-		const network::socket & sock_ref() const throw() { return sock_; }
+		tcp_client     & sock_ref()  throw() { return sock_; }
 		const ClientID & key() const throw() { return id_; }
 		
 	private:
@@ -40,15 +41,20 @@ namespace  {
 	
 }
 
+typedef set<ClientID,Client::Ptr> cln_set_t;
+
 static inline void handle_tcp_server( socket_address &ip )
 {
 	// start up !
 	std::cerr << "-- tcp_server@" << ip << " port " << swap_be(ip.port) << std::endl;
 	tcp_server srv( ip, 2 );
-	//memory::buffer_of<char,memory::global> iobuff( 128 );
+	memory::buffer_of<char,memory::global> iobuff( 128 );
 	//string     line;
-	socket_set   the_set;
-	const delay  the_delay(1);
+	
+	socket_set   the_set;      // socket set
+	const delay  the_delay(2); // default wait delay
+	
+	cln_set_t cln_set;
 	
 	//-- insert the server
 	the_set.insert( srv );
@@ -64,12 +70,59 @@ static inline void handle_tcp_server( socket_address &ip )
 			std::cerr << "#activity=" << nup << std::endl;
 			if( the_set.is_ready( srv ) )
 			{
+				//-- server activity
 				std::cerr << "-- new connection!" << std::endl;
 				Client::Ptr pCln( new Client(srv) );
+				if( !cln_set.insert( pCln ) )
+				{
+					throw exception("Multiple ClientID!");
+				}
 				
+				try
+				{
+					the_set.insert( pCln->sock_ref() );
+				}
+				catch(...)
+				{
+					(void) cln_set.remove( pCln->key() );
+					throw;
+				}
+				const socket_address &ipaddr = pCln->sock_ref().self();
+				std::cerr << ".. linked to " << ipaddr << std::endl;
 			}
+			else 
+			{
+				//-- client activity
+				std::cerr << "-- client activity:" << std::endl;
+				for( cln_set_t::iterator i = cln_set.begin(); i != cln_set.end(); ++i )
+				{
+					Client::Ptr          &pCln   = *i;
+					io_socket            &iosock = pCln->sock_ref();
+					network::socket      &ipsock = pCln->sock_ref();
+					const socket_address &ipaddr = pCln->sock_ref().self();
+					
+					if( the_set.is_ready( ipsock ) )
+					{
+						std::cerr << "<" << ipaddr << ":" << swap_be(ipaddr.port) << ">:";
+						const size_t nr =  iosock.recv( iobuff.rw(), iobuff.length() );
+						if( nr > 0 )
+						{
+							const string txt( (char *)iobuff.ro(), nr );
+							std::cerr << txt << std::endl;
+						}
+						else 
+						{
+							std::cerr << "...disconnecting" << std::endl;
+							the_set.remove( ipsock );
+							cln_set.remove( pCln->key() );
+						}
+
+					}
+				}
+			}
+
 		}
-	
+		
 		
 		
 #if 0
