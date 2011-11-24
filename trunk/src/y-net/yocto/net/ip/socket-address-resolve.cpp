@@ -17,7 +17,8 @@ namespace yocto {
 	fmt( f ),
 		YOCTO_SOCKET_ADDRESS_CTOR()
 	{
-		qw_zero<items64>( addr_ );
+		memset(addr_,0,sizeof(addr_));
+		//qw_zero<items64>( addr_ );
 		fmt.set_family( addr_ );
 		port = net_port;
 

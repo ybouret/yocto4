@@ -10,6 +10,7 @@
 			host_( YOCTO_SOCKET_ADDRESS_HOST ),  \
 			port(  YOCTO_SOCKET_ADDRESS_PORT )   
 
+#if 0
 		namespace
 		{
 			template <size_t N>
@@ -39,5 +40,6 @@
 			}
 
 		}
+#endif
 
 #endif

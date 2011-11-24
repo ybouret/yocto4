@@ -22,6 +22,15 @@ namespace yocto
 			return fmt.addrlen;
 		}
 		
+		bool operator==( const socket_address &lhs, const socket_address &rhs ) throw()
+		{
+			return lhs.port == rhs.port && 0 == memcmp( lhs.addr_, rhs.addr_, socket_address::storage  );
+		}
+		
+		bool operator!=( const socket_address &lhs, const socket_address &rhs ) throw()
+		{
+			return lhs.port != rhs.port || 0 != memcmp( lhs.addr_, rhs.addr_, socket_address::storage );
+		}
 		
 		
 		
@@ -34,7 +43,7 @@ namespace yocto
 			fmt( f ),
 			YOCTO_SOCKET_ADDRESS_CTOR()
 		{
-			qw_zero<items64>( addr_ );
+			memset(addr_,0,sizeof(addr_));
 			
 			fmt.set_inaddr( host_, net_type ); // set host value
 			fmt.set_family( addr_ );
@@ -46,7 +55,8 @@ namespace yocto
 			fmt( sa.fmt ),
 			YOCTO_SOCKET_ADDRESS_CTOR()
 		{
-			qw_copy<items64>( addr_, sa.addr_ );
+			//qw_copy<items64>( addr_, sa.addr_ );
+			memcpy(addr_, sa.addr_, sizeof(sa.addr_) );
 		}
 			
 		std::ostream & operator<<( std::ostream &os, const socket_address &sa )
