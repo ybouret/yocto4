@@ -17,6 +17,7 @@ namespace  yocto {
 		class udp_server;
 
 
+		//! send property (for socket which can perform I/O)
 		class sndppty : public property<bool>
 		{
 		public:
@@ -88,7 +89,6 @@ namespace  yocto {
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(socket);
 			friend class socket_set;
-
 		};
 
 	}

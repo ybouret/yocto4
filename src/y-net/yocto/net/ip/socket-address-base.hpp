@@ -65,6 +65,9 @@ namespace yocto
 			
 			//! copy constructor
 			socket_address( const socket_address &sa ) throw();
+			
+			friend bool operator==( const socket_address &lhs, const socket_address &rhs ) throw();
+			friend bool operator!=( const socket_address &lhs, const socket_address &rhs ) throw();
 
 		private:
 			YOCTO_DISABLE_ASSIGN(socket_address);
@@ -74,6 +77,8 @@ namespace yocto
 
 		};
 
+		
+		
 	}
 
 }

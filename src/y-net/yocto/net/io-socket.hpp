@@ -9,6 +9,7 @@ namespace yocto
 	namespace network
 	{
 		
+		//! virtual socket to send/recv
 		class io_socket : 
 		public ios::ichannel,
 		public ios::ochannel
