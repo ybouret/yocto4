@@ -69,7 +69,7 @@ namespace yocto
 			unit_t N = 1 + R - L;      // total remaining size
 			unit_t W = N / world_size; // first width
 			
-			
+			// todo: check i=1 or i=0 ?
 			for( size_t i=1; i <= world_rank; ++i )
 			{
 				L += W; // increase offset
