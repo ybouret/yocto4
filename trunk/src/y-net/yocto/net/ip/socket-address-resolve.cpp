@@ -2,6 +2,7 @@
 #include "yocto/net/ip/socket-address-format.hpp"
 #include "yocto/net/network.hpp"
 #include <cstdlib>
+#include <cstring>
 
 namespace yocto {
 

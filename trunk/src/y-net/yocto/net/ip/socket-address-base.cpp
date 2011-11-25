@@ -1,6 +1,7 @@
 #include "yocto/net/ip/socket-address-base.hpp"
 #include "yocto/net/ip/socket-address-format.hpp"
 #include <iostream>
+#include <cstring>
 
 namespace yocto 
 {
