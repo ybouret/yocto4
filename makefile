@@ -14,6 +14,10 @@ xcode:
 vs9:
 	@bash ./src/share/create.sh src vs9 ${BUILD_TYPE}
 
+vs10:
+	@bash ./src/share/create.sh src vs10 ${BUILD_TYPE}
+
+
 gnu:
 	@bash ./src/share/create.sh src gnu ${BUILD_TYPE}
 

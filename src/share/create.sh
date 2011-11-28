@@ -91,6 +91,12 @@ case $BUILD_TOOLS in
     BUILD_SUBDIR=vs9;
     BUILD_GENERATOR="Visual Studio 9 2008";
     ;;
+
+	"vs10" )
+    BUILD_SUBDIR=vs10;
+    BUILD_GENERATOR="Visual Studio 10";
+    ;;
+
     
   *) xerror "Unsuported BuildTools <$BUILD_TOOLS>";;
 esac
@@ -111,7 +117,7 @@ BUILD_ROOT=./forge/$BUILD_TARGET/$BUILD_SUBDIR
 cmake -E cmake_echo_color "-- creating $BUILD_ROOT";
 cmake -E make_directory $BUILD_ROOT || xerror "Cant' create $BUILD_ROOT";
 case $BUILD_TOOLS in
-  "xcode" | "vs9" ) 
+  "xcode" | "vs9"  | "vs10") 
     BUILD_UP=../../..
     BUILD_OPT=""
     ;;
