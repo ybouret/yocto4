@@ -8,18 +8,18 @@ namespace yocto
 	template <class T,class U>
 	class conversion {
 	private:
-		typedef uint8_t small;
-		class           large { uint32_t unused; };
+		typedef uint8_t small_type;
+		class           large_type { uint32_t unused; };
 		
-		static  small test( U );
-		static  large test(...);
+		static  small_type test( U );
+		static  large_type test(...);
 		static  T     makeT();
 		
 	public:
 		conversion(); //!< or some compiler will complain about all private...
 		enum
 		{
-			exists   = ( sizeof( test(makeT()) ) == sizeof(small) ),
+			exists   = ( sizeof( test(makeT()) ) == sizeof(small_type) ),
 			same_type = false
 		};
 	};
