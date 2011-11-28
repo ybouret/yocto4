@@ -42,8 +42,8 @@ namespace yocto
 	{
 		assert( !(NULL==target && length > 0 ) );
 		assert( !(NULL==source && length > 0 ) );
-		uint8_t *p = (uint8_t *)&target;
-		uint8_t *q = (uint8_t *)&source;
+		uint8_t *p = (uint8_t *)target;
+		uint8_t *q = (uint8_t *)source;
 		for( size_t i=length;i>0;--i,++p,++q) cswap( *p, *q );
 	}
 	

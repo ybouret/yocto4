@@ -26,15 +26,18 @@ namespace yocto
 		}
 		
 		template <>
-		Function<real_t>:: Function( lua_State *s, const string &id ) :
+		Function<real_t>:: Function( lua_State *s, const string &id, bool check ) :
 		L( s ),
 		name( id )
 		{
 			assert( L != NULL );
-			lua_getglobal( L, &name[0] );
-			if( !lua_isfunction(L,-1) )
-				throw exception("%s is not a function !", &id[0] );
-			lua_pop(L,1);
+			if( check )
+			{
+				lua_getglobal( L, &name[0] );
+				if( !lua_isfunction(L,-1) )
+					throw exception("%s is not a function !", &id[0] );
+				lua_pop(L,1);
+			}
 		}
 		
 		
@@ -63,7 +66,7 @@ namespace yocto
 		}
 		
 		
-				
+		
 		template<>
 		real_t Function<real_t>:: operator()( real_t x, real_t y )
 		{

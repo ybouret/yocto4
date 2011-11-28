@@ -142,9 +142,14 @@ namespace yocto
 		inline iterator end()   throw() { return iterator( NULL );       }
 		
 		typedef iterating::linked<const_type,const node_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return iterator( ktab_.nlist.head  ); }
-		inline const_iterator end()   const throw() { return iterator( NULL );       }
+		inline const_iterator begin() const throw() { return const_iterator( ktab_.nlist.head  ); }
+		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
 		
+		inline type       & front()       throw() { assert(size()>0); return ktab_.nlist.head->data; }
+		inline type       & back()        throw() { assert(size()>0); return ktab_.nlist.tail->data; }
+		inline const_type & front() const throw() { assert(size()>0); return ktab_.nlist.head->data; }
+		inline const_type & back()  const throw() { assert(size()>0); return ktab_.nlist.tail->data; }
+
 	private:
 		YOCTO_DISABLE_ASSIGN(set);
 		
