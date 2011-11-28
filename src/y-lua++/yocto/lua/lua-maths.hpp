@@ -15,7 +15,7 @@ namespace yocto {
 		class Function  : public object
 		{
 		public:
-			explicit Function( lua_State *, const string &id );
+			explicit Function( lua_State *, const string &id, bool check=true );
 			virtual ~Function() throw();
 			Function( const Function & );
 			Function & operator=( const Function & );
