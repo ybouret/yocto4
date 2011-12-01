@@ -12,6 +12,8 @@ namespace yocto
 		struct algebra
 		{
 			static void mul( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
+			static void muladd( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
+
 			static void mul_trn( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
 			static void mul( matrix<T> &M, const matrix<T> &lhs, const matrix<T> &rhs) throw();
 			static void mul_ltrn( matrix<T> &M, const matrix<T> &lhs, const matrix<T> &rhs) throw();

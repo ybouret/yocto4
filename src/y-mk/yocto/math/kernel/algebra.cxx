@@ -28,6 +28,27 @@ namespace yocto
 		}
 		
 		template <>
+		void algebra<z_type>:: muladd( array<z_type> &v, const matrix<z_type> &M, const array<z_type> &u ) throw()
+		{
+			assert( v.size() == M.rows );
+			assert( u.size() == M.cols );
+			const size_t r = M.rows;
+			const size_t c = M.cols;
+			for( size_t i=r; i>0; --i)
+			{
+				z_type sum(0);
+				for( size_t j=c; j>0; --j )
+				{
+					sum += M[i][j] * u[j];
+				}
+				v[i] += sum;
+			}
+		}
+		
+		
+		//----------------------------------------------------------------------
+		
+		template <>
 		void algebra<z_type>:: mul_trn( array<z_type> &v, const matrix<z_type> &M, const array<z_type> &u ) throw()
 		{
 			assert( u.size() == M.rows );
