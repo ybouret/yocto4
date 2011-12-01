@@ -8,6 +8,8 @@ IF(MPI_FOUND)
   
   FILE( GLOB decl yocto/mpi/*.hpp )
   FILE( GLOB impl yocto/mpi/*.cpp )
+  INSTALL( FILES ${decl} DESTINATION include/yocto/mpi )
+  
   SET( srcs ${decl} ${impl} )
 
   INCLUDE_DIRECTORIES( . ../y-main )
@@ -15,6 +17,7 @@ IF(MPI_FOUND)
 
 
   ADD_LIBRARY(y-mpi STATIC ${srcs} )
+  INSTALL( TARGETS y-mpi ARCHIVE DESTINATION lib )
   
   ADD_SUBDIRECTORY(tests)
   
