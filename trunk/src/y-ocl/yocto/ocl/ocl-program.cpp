@@ -104,7 +104,7 @@ namespace yocto
 			//==================================================================
 			try 
 			{
-				for( size_t i=0; i < num_devices; ++i )
+				for( size_t i=0; i < devices.size; ++i )
 				{
 					//----------------------------------------------------------
 					//-- extract the build log

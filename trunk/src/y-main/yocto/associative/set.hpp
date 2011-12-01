@@ -150,6 +150,13 @@ namespace yocto
 		inline const_type & front() const throw() { assert(size()>0); return ktab_.nlist.head->data; }
 		inline const_type & back()  const throw() { assert(size()>0); return ktab_.nlist.tail->data; }
 
+		//======================================================================
+		// indexed access
+		//======================================================================
+		type       & operator()( size_t index ) throw()       { assert(index>0); assert(index<=size()); return ktab_.nlist.fetch(--index)->data; }
+		const_type & operator()( size_t index ) const throw() { assert(index>0); assert(index<=size()); return ktab_.nlist.fetch(--index)->data; }
+												
+		
 	private:
 		YOCTO_DISABLE_ASSIGN(set);
 		
