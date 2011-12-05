@@ -11,6 +11,10 @@ namespace yocto
 		template <typename T>
 		struct algebra
 		{
+			static void copy(   array<T> &v, const array<T> &u ) throw();
+			static void add(    array<T> &v, const array<T> &u ) throw();
+			static void muladd( array<T> &v, T a, const array<T> &u ) throw();
+			
 			static void mul( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
 			static void muladd( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
 
