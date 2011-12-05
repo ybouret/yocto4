@@ -31,9 +31,9 @@ namespace yocto
 				explicit lsf();
 				virtual ~lsf() throw();
 				
-				T ftol; //!< fractional tolerance on parameters     (numeric<T>::ftol)
-				T h;    //!< parameters length scale for derivative (1e-4)
-				
+				T ftol;       //!< fractional tolerance on parameters     (numeric<T>::ftol)
+				T h;          //!< parameters length scale for derivative (1e-4)
+				bool verbose; //!< small printout if needed, false by default 
 			private:
 				typedef lw_arrays<T,memory::global> arrays;
 				typedef lw_array<T> array_t;
