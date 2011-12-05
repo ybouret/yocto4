@@ -87,7 +87,7 @@ namespace yocto
 				field             &f    = *func_;
 				const array<bool> &used = *used_;
 				
-				std::cerr << "[LSF:: Initialize @" << aorg_ << "]" << std::endl;
+				//std::cerr << "[LSF:: Initialize @" << aorg_ << "]" << std::endl;
 				real_t ans = 0;
 				alpha_.ldz();
 				for( size_t k=nvar_;k>0;--k)
