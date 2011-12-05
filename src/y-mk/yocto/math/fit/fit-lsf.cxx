@@ -87,6 +87,7 @@ namespace yocto
 				field             &f    = *func_;
 				const array<bool> &used = *used_;
 				
+				std::cerr << "[LSF:: Initialize @" << aorg_ << "]" << std::endl;
 				real_t ans = 0;
 				alpha_.ldz();
 				for( size_t k=nvar_;k>0;--k)
@@ -121,7 +122,6 @@ namespace yocto
 				//--------------------------------------------------------------
 				for( size_t j=nvar_;j>0;--j)
 				{
-					step_[j] = beta_[j];
 					if( used[j] )
 					{
 						for( size_t k=1; k < j; ++k )
@@ -253,7 +253,10 @@ namespace yocto
 						const real_t fac = real_t(1) + lam;
 						curv_.assign( alpha_ );
 						for( size_t i=nvar_;i>0;--i) 
+						{
 							curv_[i][i] *= fac;
+							
+						}
 						
 						//------------------------------------------------------
 						// try to solve it
@@ -261,6 +264,7 @@ namespace yocto
 						if( ! lss.LU( curv_ ) )
 						{
 							lam *= LAMBDA_INC;
+							//std::cerr << "lam=" << lam << std::endl;
 							if( lam > LAMBDA_MAX )
 							{
 								//-- singular point...
@@ -275,6 +279,7 @@ namespace yocto
 					//----------------------------------------------------------
 					// compute the step
 					//----------------------------------------------------------
+					for(size_t i=nvar_;i>0;--i) step_[i] = beta_[i];
 					lss( curv_, step_ );
 					
 					//----------------------------------------------------------
@@ -284,6 +289,7 @@ namespace yocto
 					{
 						atry_[i] = aorg_[i] + step_[i];
 					}
+					//std::cerr << "[LSF: lam=" << lam << ", atry@" << atry_ << "]" << std::endl;
 					
 					//----------------------------------------------------------
 					// where are we now ?
@@ -317,7 +323,8 @@ namespace yocto
 					//----------------------------------------------------------
 					std::cerr << "[LeastSquareFit.Step.Success]" << std::endl;
 					lam *= LAMBDA_DEC;
-					if( lam <= LAMBDA_MIN ) lam = LAMBDA_MIN;
+					if( lam <= LAMBDA_MIN ) 
+						lam = LAMBDA_MIN;
 					
 					//----------------------------------------------------------
 					// - at this point, atry_ must be OK and Dnew <= Dold
