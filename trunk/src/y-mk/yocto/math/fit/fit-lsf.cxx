@@ -42,6 +42,7 @@ namespace yocto
 			lsf<real_t>:: lsf() :
 			ftol( numeric<real_t>::ftol ),
 			h( 1e-4 ),
+			verbose(false),
 			samp_(NULL),
 			func_(NULL),
 			used_(NULL),
@@ -213,13 +214,13 @@ namespace yocto
 					//----------------------------------------------------------
 					if( converged )
 					{
-						std::cerr << "[LeastSquareFit.Converged]" << std::endl;
+						if(verbose) std::cerr << "[LeastSquareFit.Converged]" << std::endl;
 						const size_t df = ndat_ - nvar_;
 						if( df > 0 )
 						{
 							if( ! lss.LU( alpha_ ) )
 							{
-								std::cerr << "[LeastSquareFit.Singular2]" << std::endl;
+								if(verbose) std::cerr << "[LeastSquareFit.Singular2]" << std::endl;
 								s.status = failure;
 								return;
 							}
@@ -268,7 +269,7 @@ namespace yocto
 							if( lam > LAMBDA_MAX )
 							{
 								//-- singular point...
-								std::cerr << "[LeastSquareFit.Singular]" << std::endl;
+								if(verbose) std::cerr << "[LeastSquareFit.Singular]" << std::endl;
 								s.status = fit::failure;
 								return;
 							}
@@ -310,7 +311,7 @@ namespace yocto
 						lam *= LAMBDA_INC;
 						if( lam > LAMBDA_MAX )
 						{
-							std::cerr << "[LeastSquareFit.Spurious]" << std::endl;
+							if(verbose) std::cerr << "[LeastSquareFit.Spurious]" << std::endl;
 							s.status = fit::spurious;
 							return;
 						}
@@ -321,7 +322,7 @@ namespace yocto
 					//----------------------------------------------------------
 					// direct winner !
 					//----------------------------------------------------------
-					std::cerr << "[LeastSquareFit.Step.Success]" << std::endl;
+					if(verbose) std::cerr << "[LeastSquareFit.Step.Success]" << std::endl;
 					lam *= LAMBDA_DEC;
 					if( lam <= LAMBDA_MIN ) 
 						lam = LAMBDA_MIN;
