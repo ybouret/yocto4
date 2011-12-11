@@ -4,6 +4,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/math/complex.hpp"
 #include "yocto/wtime.hpp"
+#include <cstdio>
 
 using namespace yocto;
 using namespace math;
