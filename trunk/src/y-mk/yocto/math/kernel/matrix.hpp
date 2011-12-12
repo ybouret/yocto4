@@ -82,7 +82,7 @@ namespace yocto
 					return os;
 				}
 				
-				void mul( array<T> &out, const array<T> &in ) const throw();
+				//void mul( array<T> &out, const array<T> &in ) const throw();
 				void ldz() throw();
 				void ld1() throw(); //!< pseudo-id if not square
 				void transpose();

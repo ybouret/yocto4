@@ -10,7 +10,13 @@ namespace yocto
 	{
 
 		template <>
-		void algebra<z_type>:: copy( array<z_type> &v, const array<z_type> &u ) throw()
+		void algebra<z_type>:: set( array<z_type> &v, z_type a ) throw()
+		{
+			for( size_t i=v.size();i>0;--i) v[i] = a;
+		}
+		
+		template <>
+		void algebra<z_type>:: set( array<z_type> &v, const array<z_type> &u ) throw()
 		{
 			assert( v.size() == u.size() );
 			for( size_t i=v.size();i>0;--i) v[i] = u[i];
@@ -30,6 +36,12 @@ namespace yocto
 			for( size_t i=v.size();i>0;--i) v[i] += a * u[i];
 		}
 		
+		template <>
+		void algebra<z_type>:: mulset( array<z_type> &v, z_type a, const array<z_type> &u ) throw()
+		{
+			assert( v.size() == u.size() );
+			for( size_t i=v.size();i>0;--i) v[i] = a * u[i];
+		}
 		
 		
 		

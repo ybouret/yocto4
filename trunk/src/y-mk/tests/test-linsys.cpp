@@ -3,6 +3,7 @@
 #include "../../y-main/tests/support.hpp"
 #include <typeinfo>
 #include "yocto/sequence/vector.hpp"
+#include "yocto/math/kernel/algebra.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -43,7 +44,8 @@ static inline void test_linsys()
 			x[i] = b[i] = gen<T>::get();
 		}
 		lss( mLU, x );
-		m.mul( lss, x );
+		algebra<T>::mul(lss,m,x);
+		//m.mul( lss, x );
 		double res = 0;
 		for(size_t i=1; i <=n; ++i )
 		{
