@@ -249,8 +249,8 @@ namespace yocto
 		}
 		
 		
+#if 0
 #define YOCTO_MATMUL(INDEX) ans += r_i[INDEX] * in[INDEX]
-		
 		template <>
 		void matrix<z_type>::mul( array<z_type> &out, const array<z_type> &in ) const throw()
 		{
@@ -269,6 +269,7 @@ namespace yocto
 			}
 			
 		}
+#endif
 		
 		template <>
 		void matrix<z_type>:: ldz() throw()

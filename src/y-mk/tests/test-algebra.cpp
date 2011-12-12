@@ -22,7 +22,7 @@ static inline double test_copy( size_t N )
 		for( size_t i=N;i>0; --i ) 
 			X[i] = alea<float>();
 		chrono.start();
-		algebra<T>::copy(Y,X);
+		algebra<T>::set(Y,X);
 		t += chrono.query();
 	}
 	return t / num_iter;
