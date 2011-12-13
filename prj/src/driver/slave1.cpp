@@ -27,3 +27,4 @@ int main()
 	putc('\n',stdout);
 	return 0;
 }
+
