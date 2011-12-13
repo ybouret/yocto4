@@ -1,0 +1,10 @@
+PROJECT(driver)
+
+ADD_EXECUTABLE(master master.cpp)
+ADD_EXECUTABLE(slave1 slave1.cpp)
+TARGET_LINK_YOCTO(master)
+TARGET_LINK_YOCTO(slave1)
+
+#INSTALL( TARGETS file2data RUNTIME DESTINATION bin )
+
+
