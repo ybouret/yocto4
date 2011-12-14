@@ -5,11 +5,12 @@
 
 #include "yocto/threading/singleton.hpp"
 
+#define YOCTO_CPLUSPLUS __cplusplus
 #undef __cplusplus
 extern "C" {
 #include <mpi.h>
 }
-#define __cplusplus
+#define __cplusplus YOCTO_CPLUSPLUS
 
 
 namespace yocto
