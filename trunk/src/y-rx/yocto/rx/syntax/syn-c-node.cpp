@@ -87,8 +87,8 @@ namespace yocto
 			
 			c_node:: ~c_node() throw() { assert( type == terminal || children().size <= 0 ); }
 			
-			c_node::child_nodes & c_node:: children() throw() { return *(child_nodes *) & data.wksp[0]; }
-			const c_node::child_nodes & c_node:: children() const throw() { return *(const child_nodes *) & data.wksp[0]; }
+			c_node::child_nodes & c_node:: children() throw() { return *(child_nodes *)(void*) & data.wksp[0]; }
+			const c_node::child_nodes & c_node:: children() const throw() { return *(const child_nodes *)(void*) & data.wksp[0]; }
 			
 			
 			

@@ -229,9 +229,7 @@ namespace yocto
 				// keep a binary ghost if obj is in this vector
 				//--------------------------------------------------------------
 				uint64_t      wksp[ YOCTO_U64_FOR_ITEM(T) ];
-				void         *addr = &wksp[0];
-				mutable_type &temp = *static_cast<mutable_type*>(addr);
-				memcpy(addr, &obj, sizeof(T));
+				memcpy( &wksp[0], &obj, sizeof(T));
 				mutable_type *target = &item_[1];
 				const size_t  nbytes = size_ * sizeof(T);
 				
@@ -240,7 +238,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				memmove( target+1, target, nbytes );
 				try {
-					new (target) mutable_type( temp );
+					new (target) mutable_type( *reinterpret_cast<mutable_type*>((void*)&wksp[0]) );
 				}
 				catch (...) {
 					memmove( target, target+1, nbytes );

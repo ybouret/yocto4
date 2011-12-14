@@ -20,7 +20,7 @@ namespace yocto
 			static void  *build_with( allocator &alloc, embed reg[], size_t num, size_t &bytes );
 		};
 		
-#define YOCTO_EMBED(PTR,NUM) { (void **)&(PTR), NUM * sizeof( *PTR ), 0 }
+#define YOCTO_EMBED(PTR,NUM) { (void **)(void*)&(PTR), NUM * sizeof( *PTR ), 0 }
 		
 #define YOCTO_EMBED_START() do { yocto::memory::embed __em_reg[] = 
 		
