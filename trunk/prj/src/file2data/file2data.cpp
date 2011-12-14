@@ -4,6 +4,7 @@
 #include "yocto/auto-ptr.hpp"
 
 #include <iostream>
+#include <cstring>
 
 using namespace yocto;
 
