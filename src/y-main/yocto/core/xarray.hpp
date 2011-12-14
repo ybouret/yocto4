@@ -30,8 +30,8 @@ namespace yocto
 					void *entry = NULL;
 					memory::embed reg[] =
 					{
-						{ (void **) &table, n * sizeof(SLOT_PTR), 0 },
-						{           &entry, slab_t::bytes_for(n), 0 }
+						{ (void **)(void*)&table, n * sizeof(SLOT_PTR), 0 },
+						{                 &entry, slab_t::bytes_for(n), 0 }
 					};
 					const size_t num = sizeof(reg)/sizeof(reg[0]);
 					buflen_ = memory::embed::prepare( reg, num );

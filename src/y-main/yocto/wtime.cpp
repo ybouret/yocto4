@@ -75,7 +75,7 @@ namespace yocto
 #endif
 		
 #if defined(YOCTO_BSD)
-		__wtime_fetch( (struct timeval *)data );
+		__wtime_fetch( (struct timeval *)(void*)data );
 #endif
 	}
 	
@@ -90,7 +90,7 @@ namespace yocto
 #pragma warning ( disable : 2259 ) 
 #endif	
 #if defined(YOCTO_BSD)
-		const struct timeval *old = (const struct timeval *) data;
+		const struct timeval *old = (const struct timeval *)(void*)data;
 		struct timeval now;
 		__wtime_fetch( &now );
 		const long int sec_old  = old->tv_sec;

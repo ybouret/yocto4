@@ -72,7 +72,7 @@ namespace yocto
 				void *cache_entry = NULL;
 				memory::embed reg[] = 
 				{
-					{ (void **) & kslot, count * sizeof(kslot_t),      0 },
+					{ (void**)(void *) & kslot, count * sizeof(kslot_t),      0 },
 					{  & kpool_entry,    kslab_t::bytes_for(nodes),    0 },
 					{  & cache_entry,    cache_t::bytes_for(nodes),    0 }
 				};
