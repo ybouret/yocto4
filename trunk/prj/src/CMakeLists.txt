@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(projects)
+PROJECT(yprojects)
 
 SET(SDK ${PROJECT_SOURCE_DIR}/../../sdk)
 INCLUDE(${SDK}/share/yocto/rules.cmake)
