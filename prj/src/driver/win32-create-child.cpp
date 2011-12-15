@@ -1,7 +1,7 @@
 #include <windows.h> 
 #include <tchar.h>
 #include <stdio.h> 
-#include <strsafe.h>
+#include <string.h>
 
 #define BUFSIZE 4096 
 
@@ -215,10 +215,15 @@ void ErrorExit(PTSTR lpszFunction)
 
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
 		(lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
+
+	/*
 	StringCchPrintf((LPTSTR)lpDisplayBuf, 
-		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-		TEXT("%s failed with error %d: %s"), 
-		lpszFunction, dw, lpMsgBuf); 
+	LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+	TEXT("%s failed with error %d: %s"), 
+	lpszFunction, dw, lpMsgBuf); 
+	*/
+	sprintf((char*)lpDisplayBuf,"%s failed with error %d: %s", lpszFunction, dw, lpMsgBuf); 
+
 	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
 
 	LocalFree(lpMsgBuf);
