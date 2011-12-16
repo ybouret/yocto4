@@ -50,15 +50,15 @@ fi
 
 case $BUILD_TOOLS in
   "gnu" )
-    export CC=gcc$GNU_VERSION; export CXX=g++$GNU_VERSION;
-    BUILD_SUBDIR=gnu$GNU_VERSION/$BUILD_TYPE;
+    export CC=gcc$VERSION; export CXX=g++$VERSION;
+    BUILD_SUBDIR=gnu$VERSION/$BUILD_TYPE;
     BUILD_GENERATOR="$WITH_MAKEFILES"
     cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
   "clang" )
-    export CC=clang; export CXX=clang++;
-    BUILD_SUBDIR=clang/$BUILD_TYPE;
+    export CC=clang$VERSION; export CXX=clang++$VERSION;
+    BUILD_SUBDIR=clang$VERSION/$BUILD_TYPE;
     BUILD_GENERATOR="$WITH_MAKEFILES"
     cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
