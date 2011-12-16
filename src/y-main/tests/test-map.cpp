@@ -54,7 +54,7 @@ static inline void test_map()
 		
 		for( typename map_t::iterator i = M2.begin(); i != M2.end(); ++i )
 		{
-			if( !M.remove( i->hkey ) )
+			if( !M.remove( i->key ) )
 			{
 				std::cerr << "Unable to remove '" << i->hkey << "' !" << std::endl;
 			}
