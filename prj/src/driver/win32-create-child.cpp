@@ -94,7 +94,7 @@ int _tmain(int argc, TCHAR *argv[])
 void CreateChildProcess()
 // Create a child process that uses the previously created pipes for STDIN and STDOUT.
 { 
-	TCHAR szCmdline[]=TEXT("child");
+	TCHAR szCmdline[]=TEXT("win32-child");
 	PROCESS_INFORMATION piProcInfo; 
 	STARTUPINFO siStartInfo;
 	BOOL bSuccess = FALSE; 
