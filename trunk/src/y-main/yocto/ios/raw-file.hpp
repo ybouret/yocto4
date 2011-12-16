@@ -2,6 +2,7 @@
 #define YOCTO_IOS_RAW_FILE_INCLUDED 1
 
 #include "yocto/ios/local-file.hpp"
+#include "yocto/ios/file-descriptor.hpp"
 #include "yocto/string.hpp"
 #include "yocto/error.hpp"
 
@@ -41,13 +42,7 @@ namespace yocto
 			explicit raw_file( const cstderr_t &);
 			virtual ~raw_file() throw();
 			
-#if defined(YOCTO_BSD)
-			typedef int handle_t;
-#endif
-			
-#if defined(YOCTO_WIN)
-			typedef void *handle_t;
-#endif			
+			typedef file_descriptor::type handle_t;
 			
 			void get( void *data, size_t size, size_t &done );
 			void put( const void *data, size_t size, size_t &done );

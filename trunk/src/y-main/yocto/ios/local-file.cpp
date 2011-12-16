@@ -1,5 +1,5 @@
 #include "yocto/ios/local-file.hpp"
-#include "yocto/threading/singleton.hpp"
+//#include "yocto/threading/singleton.hpp"
 
 namespace yocto
 {
