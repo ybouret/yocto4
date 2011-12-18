@@ -156,4 +156,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 		SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
 	ENDIF()
   
+  IF( "${CC_NAME}" MATCHES "clang.*" )
+		TARGET_LINK_LIBRARIES( ${tgt} stdc++ )
+  ENDIF()
 ENDMACRO()
