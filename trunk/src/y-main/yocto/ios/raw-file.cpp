@@ -30,7 +30,7 @@ namespace yocto
 				
 		raw_file:: raw_file( const string &filename, size_t mode ) :
 		local_file( is_regular ),
-		handle( file_descriptor::invalid() ),
+		handle( _fd::invalid() ),
 		access( mode & ( readable|writable) ),
 		status(NULL)
 		{
@@ -137,7 +137,7 @@ namespace yocto
 			/* system calls */
 #if defined(YOCTO_BSD)
 			YOCTO_GIANT_LOCK();
-			while( (handle = open( filename.c_str(), flags, unix_flags) ) == file_descriptor::invalid() )
+			while( (handle = open( filename.c_str(), flags, unix_flags) ) == _fd::invalid() )
 			{
 				const int err = errno;
 				switch( err )
@@ -160,7 +160,7 @@ namespace yocto
 								dwCreationDisposition,
 								dwFlagsAndAttributes,
 								NULL);
-			if(  file_descriptor::invalid() == handle )
+			if(  _fd::invalid() == handle )
 			{
 				throw win32:: exception( ::GetLastError(), "::CreateFile('%s')", filename.c_str() );
 			}
@@ -174,17 +174,17 @@ namespace yocto
 		{
 			if( type == is_regular )
 			{
-				const error_type err = file_descriptor::close( handle );
+				const error_type err = _fd::close( handle );
 				if( status ) *status = err;
 			}
-			handle          = file_descriptor::invalid();
+			handle          = _fd::invalid();
 			(size_t&)access = 0;
 		}
 		
 		
 		raw_file:: raw_file( const cstdin_t & ) :
 		local_file( is_stdin ),
-		handle(  file_descriptor::invalid() ),
+		handle(  _fd::invalid() ),
 		access( readable ),
 		status( NULL )
 		{
@@ -199,7 +199,7 @@ namespace yocto
 		
 		raw_file:: raw_file( const cstdout_t & ) :
 		local_file( is_stdout ),
-		handle( file_descriptor::invalid() ),
+		handle( _fd::invalid() ),
 		access( writable ),
 		status( NULL )
 		{
@@ -214,7 +214,7 @@ namespace yocto
 		
 		raw_file:: raw_file( const cstderr_t & ) :
 		local_file( is_stderr ),
-		handle( file_descriptor::invalid() ),
+		handle( _fd::invalid() ),
 		access( writable ),
 		status( NULL )
 		{

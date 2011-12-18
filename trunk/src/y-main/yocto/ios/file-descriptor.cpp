@@ -18,12 +18,12 @@ namespace yocto
 {
 	
 #if defined(YOCTO_WIN)
-	file_descriptor::type file_descriptor::invalid() throw()
+	_fd::type _fd::invalid() throw()
 	{
 		return NULL;
 	}
 	
-	error_type file_descriptor::close(type handle) throw()
+	error_type _fd::close(type handle) throw()
 	{
 		YOCTO_GIANT_LOCK();
 		if( ! ::CloseHandle( handle ) )
@@ -36,12 +36,12 @@ namespace yocto
 #endif
 	
 #if defined(YOCTO_BSD)
-	file_descriptor::type file_descriptor::invalid() throw()
+	_fd::type _fd::invalid() throw()
 	{
 		return -1;
 	}
 	
-	error_type file_descriptor::close(type handle) throw()
+	error_type _fd::close(type handle) throw()
 	{
 		YOCTO_GIANT_LOCK();
 		while( ::close( handle ) != 0 )
@@ -65,7 +65,7 @@ namespace yocto
 	
 	
 	
-	void file_descriptor:: get( type handle, void *data, size_t size, size_t &done )
+	void _fd:: get( type handle, void *data, size_t size, size_t &done )
 	{
 		assert( !(data==NULL&&size>0) );
 		uint8_t   *ptr = (uint8_t *)data;
@@ -129,13 +129,13 @@ namespace yocto
 		done = static_cast<size_t>(ptr - (uint8_t *)data);
 		if( ans != 0 )
 		{
-			throw os_exception( ans, "file_descriptor::get" );
+			throw os_exception( ans, "_fd::get" );
 		}
 		
 	}
 	
 	
-	void file_descriptor:: put( type handle, const void *data, size_t size, size_t &done )
+	void _fd:: put( type handle, const void *data, size_t size, size_t &done )
 	{
 		assert( !(data==NULL&&size>0) );
 		const uint8_t *ptr = (const uint8_t *)data;
@@ -200,7 +200,7 @@ namespace yocto
 		done = static_cast<size_t>(ptr - (const uint8_t *) data);
 		if( ans != 0 )
 		{
-			throw os_exception( ans, "file_descriptor::put" );
+			throw os_exception( ans, "_fd::put" );
 		}
 	}
 	

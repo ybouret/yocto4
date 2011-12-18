@@ -9,7 +9,7 @@
 namespace yocto
 {
 	
-	struct file_descriptor
+	struct _fd
 	{
 		
 #if defined(YOCTO_BSD)

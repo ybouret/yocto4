@@ -42,7 +42,7 @@ namespace yocto
 			explicit raw_file( const cstderr_t &);
 			virtual ~raw_file() throw();
 			
-			typedef file_descriptor::type handle_t;
+			typedef _fd::type handle_t;
 			
 			void get( void *data, size_t size, size_t &done );
 			void put( const void *data, size_t size, size_t &done );

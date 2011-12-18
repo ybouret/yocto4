@@ -23,13 +23,13 @@ namespace yocto
 		
 		void raw_file:: get( void *data, size_t size, size_t &done )
 		{
-			file_descriptor::get(handle,data,size,done);			
+			_fd::get(handle,data,size,done);			
 		}
 		
 		
 		void raw_file:: put( const void *data, size_t size, size_t &done )
 		{
-			file_descriptor::put(handle,data,size,done);
+			_fd::put(handle,data,size,done);
 		}
 		
 		
