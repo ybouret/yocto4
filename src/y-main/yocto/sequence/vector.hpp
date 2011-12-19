@@ -7,6 +7,7 @@
 #include "yocto/bitwise.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/code/cast.hpp"
 #include "yocto/sequence/array.hpp"
 
 #include <cstring>
@@ -229,6 +230,7 @@ namespace yocto
 				// keep a binary ghost if obj is in this vector
 				//--------------------------------------------------------------
 				uint64_t      wksp[ YOCTO_U64_FOR_ITEM(T) ];
+				void         *addr = _cast<uint64_t>::load( wksp );
 				memcpy( &wksp[0], &obj, sizeof(T));
 				mutable_type *target = &item_[1];
 				const size_t  nbytes = size_ * sizeof(T);
@@ -238,7 +240,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				memmove( target+1, target, nbytes );
 				try {
-					new (target) mutable_type( *reinterpret_cast<mutable_type*>((void*)&wksp[0]) );
+					new (target) mutable_type( *_cast<type>::from(addr) );
 				}
 				catch (...) {
 					memmove( target, target+1, nbytes );
