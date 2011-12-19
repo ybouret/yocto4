@@ -8,13 +8,17 @@
 namespace yocto
 {
 	
-	template <typename T>
-	struct _cast
+	class _cast
 	{
+	public:
+		template <typename T>
+		static inline void *load( T *item )    throw() { return addr2addr(item); }
 		
-		static inline void *load( T *item )    throw() { return (void*)item; }
+		template <typename T>
 		static inline T    *from( void *addr ) throw() { return (T*)addr; }
 		
+	private:
+		static void * addr2addr( void * ) throw();
 	};
 }
 
