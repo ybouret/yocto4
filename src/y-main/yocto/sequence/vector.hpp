@@ -188,7 +188,7 @@ namespace yocto
 		void _reserve( size_t n, int2type<true> ) {
 			assert(n>0);
 			vector tmp( n+maxi_, as_capacity );
-			memcpy( & tmp.item_[1], &item_[1], size_ * sizeof(T) );
+			memcpy( (void*)& tmp.item_[1], (void*) &item_[1], size_ * sizeof(T) );
 			mswap( maxi_, tmp.maxi_ );
 			mswap( item_, tmp.item_ );
 		}
@@ -205,7 +205,7 @@ namespace yocto
 		{
 			mutable_type *target = &item_[1];
 			destruct(target);
-			memmove( target, target+1, --size_ * sizeof(T));
+			memmove( (void*)target, (void*)(target+1), --size_ * sizeof(T));
 		}
 		
 		inline void _pop_front( int2type<false> ) 
@@ -230,20 +230,20 @@ namespace yocto
 				// keep a binary ghost if obj is in this vector
 				//--------------------------------------------------------------
 				uint64_t      wksp[ YOCTO_U64_FOR_ITEM(T) ];
-				void         *addr = _cast<uint64_t>::load( wksp );
-				memcpy( &wksp[0], &obj, sizeof(T));
+				void         *addr = _cast::load<uint64_t>( wksp );
+				memcpy( &wksp[0], (void*)&obj, sizeof(T));
 				mutable_type *target = &item_[1];
 				const size_t  nbytes = size_ * sizeof(T);
 				
 				//--------------------------------------------------------------
 				// move and construct
 				//--------------------------------------------------------------
-				memmove( target+1, target, nbytes );
+				memmove( (void*)(target+1), (void*)target, nbytes );
 				try {
-					new (target) mutable_type( *_cast<type>::from(addr) );
+					new (target) mutable_type( *_cast::from<type>(addr) );
 				}
 				catch (...) {
-					memmove( target, target+1, nbytes );
+					memmove( (void*)target, (void*)(target+1), nbytes );
 					throw;
 				}
 				++size_;
