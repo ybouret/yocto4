@@ -27,6 +27,18 @@ IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
   SET(YOCTO_MACOSX ON)
 ENDIF()
 
+SET(YOCTO_LINUX OFF)
+IF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+  SET(YOCTO_LINUX ON)
+ENDIF()
+
+
+SET(YOCTO_FREEBSD OFF)
+IF( ${CMAKE_SYSTEM_NAME} MATCHES "FreeBDS" )
+  SET(YOCTO_FREEBSD ON)
+ENDIF()
+
+
 ########################################################################
 ## tuning compilers flags
 ########################################################################
@@ -141,22 +153,23 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	####################################################################
 	## Platform Specific Flags
 	####################################################################
-	IF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+	IF( YOCTO_LINUX )
 		TARGET_LINK_LIBRARIES( ${tgt} pthread )
 	ENDIF()
-	IF( ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" )
+	IF( YOCTO_FREEBSD )
 		TARGET_LINK_LIBRARIES( ${tgt} pthread )
 	ENDIF()
 
 	####################################################################
 	## Compiler Specific Flags
 	####################################################################
-	IF( "${CC_NAME}" MATCHES "gcc.*" )
+	IF( YOCTO_GNU )
     #MESSAGE( STATUS "adding extra LINK_FLAGS for ${CMAKE_CXX_COMPILER}" )
 		SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
 	ENDIF()
   
-  IF( "${CC_NAME}" MATCHES "clang.*" )
+  IF( YOCTO_CLANG )
 		TARGET_LINK_LIBRARIES( ${tgt} stdc++ )
   ENDIF()
+  
 ENDMACRO()
