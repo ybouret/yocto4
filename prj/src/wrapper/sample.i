@@ -3,3 +3,5 @@
 %{
         #include "sample.hpp"
 %}
+
+%include "sample.hpp"
