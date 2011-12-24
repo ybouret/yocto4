@@ -14,8 +14,16 @@ ELSE()
 	ADD_CUSTOM_COMMAND( OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/sample_wrapper.cpp
 											COMMAND ${SWIG} -c++ -python -o ${CMAKE_CURRENT_BINARY_DIR}/sample_wrapper.cpp ${CMAKE_CURRENT_SOURCE_DIR}/sample.i
 											DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/sample.hpp ${CMAKE_CURRENT_SOURCE_DIR}/sample.i )
-	ADD_LIBRARY(sample MODULE sample.cpp sample_wrapper.cpp)
+	ADD_LIBRARY(sample MODULE sample.hpp sample.cpp sample_wrapper.cpp)
 	TARGET_LINK_LIBRARIES(sample ${PYTHON_LIBRARIES})
+	
+	GET_TARGET_PROPERTY(LIB_NAME  sample LOCATION)
+	MESSAGE( STATUS "LIB_NAME=${LIB_NAME}")
+	ADD_CUSTOM_COMMAND(
+		TARGET sample
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy ${LIB_NAME} _sample.so
+		)
 	#SET_TARGET_PROPERTIES(sample PROPERTIES OUTPUT_NAME _sample.so)
 ENDIF()
 
