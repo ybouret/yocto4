@@ -21,7 +21,7 @@ ELSE()
 ENDIF()
 
 
-
+MESSAGE( STATUS "CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 SET(YOCTO_MACOSX OFF)
 IF( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
   SET(YOCTO_MACOSX ON)
@@ -38,6 +38,10 @@ IF( ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" )
   SET(YOCTO_FREEBSD ON)
 ENDIF()
 
+SET(YOCTO_SUNOS OFF)
+IF( ${CMAKE_SYSTEM_NAME} MATCHES "SunOS" )
+  SET(YOCTO_SUNOS ON)
+ENDIF()
 
 ########################################################################
 ## tuning compilers flags
