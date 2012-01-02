@@ -13,6 +13,10 @@ namespace yocto
 		void              lw_array_reserve( const char * );
 	}
 	
+	//! converts a C-style [0:n-1] array into a C++ [1:n] array
+	/**
+		no resizing operations are allowed
+	 */
 	template <typename T>
 	class lw_array : public array<T>
 	{
