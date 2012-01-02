@@ -10,6 +10,7 @@
 
 
 #if defined(YOCTO_BSD)
+#include <unistd.h>
 #include <cerrno>
 #endif
 
