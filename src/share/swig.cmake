@@ -68,6 +68,7 @@ ELSE()
 		## default module to build
 		ADD_LIBRARY(${swig_target} MODULE "${swig_user_code}" "${swig_wrapper_code}")
 		
+
 		## and its exact location
 		GET_TARGET_PROPERTY(swig_target_name ${swig_target} LOCATION)
 		
@@ -90,7 +91,12 @@ ELSE()
 				COMMAND ${CMAKE_COMMAND} -E copy "${swig_target_name}" "${swig_output_dir}/_${name}.${swig_ext}"
 			)
 		ENDIF()
-		
+	
+		## system tuning
+		IF(YOCTO_SUNOS)
+			MESSAGE( STATUS "[SWIG]: explicit stdc++" )
+			TARGET_LINK_LIBRARIES(${swig_target} stdc++)
+		ENDIF()	
 	ENDMACRO(SWIG_WRAPPER)
 	
 ENDIF()
