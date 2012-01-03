@@ -7,6 +7,9 @@ veryclean:
 gnu:
 	@bash ../src/share/create.sh src gnu ${BUILD_TYPE}
 
+clang:
+	@bash ../src/share/create.sh src clang ${BUILD_TYPE}
+
 xcode:
 	@bash ../src/share/create.sh src xcode ${BUILD_TYPE}
 	
