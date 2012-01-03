@@ -1,3 +1,8 @@
+#if defined(_MSC_VER)
+#define _CRT_SECURE_NO_WARNINGS
+#define snprintf _snprintf
+#endif
+
 #include "yocto/rx/pattern.hpp"
 #include "yocto/ios/ostream.hpp"
 
@@ -7,9 +12,7 @@
 
 #include <cstdio>
 
-#if defined(_MSC_VER)
-#define snprintf _snprintf
-#endif
+
 
 namespace yocto
 {
