@@ -50,6 +50,15 @@ namespace yocto
 			
 			inline virtual ~layout() throw() {}
 			
+			
+			inline bool has( param_coord u ) const throw()
+			{
+				const unit_t *l = (const unit_t *) &lower;
+				const unit_t *h = (const unit_t *) &upper;
+				const unit_t *q = (const unit_t *) &u
+			}
+			
+			
 		private:
 			YOCTO_DISABLE_ASSIGN(layout);
 		};
