@@ -7,6 +7,11 @@
 #include <cerrno>
 #include <iostream>
 
+#if defined(_MSC_VER)
+#define popen  _popen
+#define pclose _pclose
+#endif
+
 using  namespace yocto;
 
 
