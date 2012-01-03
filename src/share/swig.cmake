@@ -53,9 +53,8 @@ ELSE()
 			OUTPUT_VARIABLE SWIG_DEPS
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 			)
-		STRING( REPLACE "\\" "" SWIG_DEPS "${SWIG_DEPS}")
-		STRING( REPLACE ":"  "" SWIG_DEPS "${SWIG_DEPS}")
 		STRING( REGEX REPLACE "\r|\n|\r\n" ";" SWIG_DEPS "${SWIG_DEPS}" )
+		STRING( REPLACE "\\;" ";" SWIG_DEPS "${SWIG_DEPS}" )
 		LIST( REMOVE_AT SWIG_DEPS 0 )
 		SET(SWIG_DEPENDS)
 		FOREACH( D1 IN LISTS SWIG_DEPS )
@@ -63,7 +62,6 @@ ELSE()
 			MESSAGE( STATUS "[SWIG]: depends on '${D2}'" )
 			LIST( APPEND SWIG_DEPENDS "${D2}"  )
 		ENDFOREACH()
-		
 		####################################################################
 		## generation
 		####################################################################
