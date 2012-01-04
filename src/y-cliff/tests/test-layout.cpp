@@ -1,6 +1,5 @@
 #include "yocto/utest/run.hpp"
 
-using namespace yocto;
 
 #include "yocto/cliff/layout.hpp"
 #include "yocto/cliff/in1d.hpp"
