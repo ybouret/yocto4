@@ -116,6 +116,51 @@ namespace yocto
 		}
 		
 		
+		template <>
+		void array2D<z_type>:: save( array2D<z_type> &target, const layout2D &sub) const throw()
+		{
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( target.has( sub.lower ) );
+			assert( target.has( sub.upper ) );
+			
+			const array2D<z_type> &self = *this;
+			for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+			{
+				const row_type &r_src = self[y];
+				row_type       &r_tgt = target[y];
+				for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+				{
+					r_tgt[x] = r_src[x];
+				}
+			}
+			
+		}
+		
+		template <>
+		void array2D<z_type>:: load( const array2D<z_type> &source, const layout2D &sub) throw()
+		{
+			
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( source.has( sub.lower ) );
+			assert( source.has( sub.upper ) );
+			
+			array2D<z_type> &self = *this;
+			for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+			{
+				const row_type &r_src = source[y];
+				row_type       &r_tgt = self[y];
+				for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+				{
+					r_tgt[x] = r_src[x];
+				}
+			}
+		}
+		
+		
+		
+		
 	}
 	
 }
