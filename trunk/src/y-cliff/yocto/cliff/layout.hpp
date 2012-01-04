@@ -64,6 +64,18 @@ namespace yocto
 				return true;
 			}
 			
+			inline layout split( size_t rank, size_t size ) const
+			{
+				const size_t i  = DIMENSIONS-1;
+				const unit_t Lo = *(static_cast<unit_t *>( (void*)&lower ) + i );
+				const unit_t Hi = *(static_cast<unit_t *>( (void*)&upper ) + i );
+				coord_type   s_lo(lower);
+				coord_type   s_hi(upper);
+				unit_t      &lo = *(static_cast<unit_t *>( (void*)&s_lo ) + i );
+				unit_t      &hi = *(static_cast<unit_t *>( (void*)&s_hi ) + i );
+				layout_base::split(lo,hi,Lo,Hi,rank,size);
+				return layout(s_lo,s_hi);
+			}
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(layout);

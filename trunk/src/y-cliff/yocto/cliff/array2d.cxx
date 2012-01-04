@@ -1,6 +1,8 @@
 #include "yocto/cliff/array2d.hpp"
 #include "yocto/math/ztype.hpp"
+
 #include "yocto/memory/global.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {
@@ -58,6 +60,61 @@ namespace yocto
 			assert( y <= upper.y );
 			return row[y];
 		}
+		
+		
+		template <>
+		void array2D<z_type>:: ppm( const string &filename,
+								   const string &comment, 
+								   double (*vproc)( const z_type & ),
+								   const color::rgba32 *colors,
+								   double               vmin,
+								   double               vmax) const
+		{
+			assert( vproc != NULL );
+			ios::ocstream fp( filename,false );
+			fp("P6\n");
+			
+			//-- comment
+			fp("#%s\n", &comment[0] );
+			
+			//-- size
+			fp("%u %u\n", unsigned(width.x), unsigned(width.y) );
+			
+			//-- #colors
+			fp("255\n");
+			
+			
+			//-- data
+			//-- #info
+			const z_type *p = entry;
+			if( NULL == colors )
+			{
+				for( size_t i=items; i>0; --i, ++p)
+				{
+					const color::rgba<double> c = color::rgba<double>::ramp( vproc(*p), vmin, vmax );
+					const uint8_t b[4] =  { uint8_t( 255 * c.r ), uint8_t( 255 * c.g ), uint8_t(255 * c.b ), 255 };
+					fp.write( b[0] );
+					fp.write( b[1] );
+					fp.write( b[2] );
+				}
+			}
+			else 
+			{
+				for( size_t i=items; i>0; --i, ++p)
+				{
+					const color::rgba32 c = color::rgba32:: ramp( colors,
+																 vproc(*p),
+																 vmin, 
+																 vmax );
+					fp.write( c.r );
+					fp.write( c.g );
+					fp.write( c.b );
+				}
+			}
+			
+			
+		}
+		
 		
 	}
 	

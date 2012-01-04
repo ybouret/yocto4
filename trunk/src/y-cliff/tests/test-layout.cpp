@@ -31,13 +31,32 @@ namespace
 		typename LAYOUT::coord_type U,V;
 		gen_coord(&U,LAYOUT::DIMENSIONS);
 		gen_coord(&V,LAYOUT::DIMENSIONS);
-
+		
 		LAYOUT L(U,V);
 		std::cerr << "#dims="  << L.dimensions << "/" << L.DIMENSIONS << std::endl;
 		std::cerr << "lower= " << L.lower << std::endl;
 		std::cerr << "upper= " << L.upper << std::endl;
 		std::cerr << "width= " << L.width << std::endl;
 		std::cerr << "items= " << L.items << std::endl;
+		
+		try
+		{
+			for( size_t size=1; size <= 8; ++size )
+			{
+				std::cerr << "-- spliting in " << size << std::endl;
+				for( size_t rank=0; rank < size; ++rank )
+				{
+					const LAYOUT sub( L.split(rank,size) );
+					std::cerr << "\t @" << rank << ": " << sub.lower << " -> " << sub.upper << " = " << sub.width << std::endl;
+				}
+			}
+		}
+		catch(const exception &e)
+		{
+			std::cerr << e.what() << std::endl;
+			std::cerr << e.when() << std::endl;
+		}
+		
 	}
 }
 

@@ -1,6 +1,6 @@
 //! \file
 /**
-	Cartesian Lightweight Implementation of Fields Fragmentation
+ Cartesian Lightweight Implementation of Fields Fragmentation
  */
 #ifndef YOCTO_CLIFF_TYPES_INCLUDED
 #define YOCTO_CLIFF_TYPES_INCLUDED 1
@@ -20,6 +20,14 @@ namespace yocto
 		public:
 			const size_t dimensions;
 			virtual ~layout_base() throw();
+			
+			//! MPI style splitting
+			static void split(unit_t      &lo, 
+							  unit_t      &hi, 
+							  const unit_t Lo, 
+							  const unit_t Hi, 
+							  const size_t rank, 
+							  const size_t size );
 			
 		protected:
 			explicit layout_base(const size_t ndim) throw();
