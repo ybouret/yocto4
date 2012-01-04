@@ -9,8 +9,12 @@ namespace yocto
 	
 	namespace cliff
 	{
-		typedef geom::v3d<unit_t> coord3D;
-		typedef layout<coord3D>   layout3D;		
+		typedef geom::v3d<unit_t>    coord3D;
+		typedef layout<coord3D>      layout3D;
+		template <typename U> struct vertex3D 
+		{
+			typedef geom::v3d<U> type;
+		};
 	}
 }
 
