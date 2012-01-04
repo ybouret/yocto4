@@ -109,9 +109,15 @@ SET( geom_srcs ${geom_decl} ${geom_impl} )
 INSTALL( FILES ${geom_decl} DESTINATION include/yocto/geom )
 SOURCE_GROUP( geom FILES ${geom_srcs} )
 
+FILE( GLOB ramp_decl yocto/geom/ramp/*.hpp)
+FILE( GLOB ramp_impl yocto/geom/ramp/*.cpp)
+SET( ramp_srcs ${ramp_decl} ${ramp_impl} )
+INSTALL( FILES ${ramp_decl} DESTINATION include/yocto/geom/ramp )
+SOURCE_GROUP( geom/ramp FILES ${ramp_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs})
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs})
 
 INCLUDE_DIRECTORIES( . )
 
