@@ -55,7 +55,13 @@ namespace yocto
 			{
 				const unit_t *l = (const unit_t *) &lower;
 				const unit_t *h = (const unit_t *) &upper;
-				const unit_t *q = (const unit_t *) &u
+				const unit_t *q = (const unit_t *) &u;
+				for( size_t i=0; i < DIMENSIONS; ++i )
+				{
+					const unit_t c = q[i];
+					if( c < l[i] || c > h[i] ) return false;
+				}
+				return true;
 			}
 			
 			
