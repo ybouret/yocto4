@@ -7,6 +7,8 @@ using namespace yocto;
 
 #include "yocto/code/rand.hpp"
 #include "yocto/math/complex.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/hashing/sha1.hpp"
 
 using namespace yocto;
 using namespace cliff;
@@ -26,10 +28,20 @@ namespace
 	template<typename LAYOUT>
 	static inline void display( const LAYOUT &L )
 	{
+		std::cerr << std::endl;
 		std::cerr << "-- " << LAYOUT::DIMENSIONS << "D" << std::endl;
 		std::cerr << "-- lower= " << L.lower << std::endl;
 		std::cerr << "-- upper= " << L.upper << std::endl;
 		std::cerr << "-- width= " << L.width << std::endl;
+		std::cerr << "-- items= " << L.items << std::endl;
+	}
+	
+	
+	template <typename ARRAY>
+	uint64_t chk( const ARRAY &A )
+	{
+		hashing::sha1 H;
+		return H.key<uint64_t>(A.entry, A.bytes);
 	}
 	
 	template <typename T>
@@ -41,6 +53,33 @@ namespace
 		const layout1D L(U,V);
 		display(L);
 		array1D<T>     A(L);
+		vector<T>      data(A.items, T(0));
+		A.link( &data[1] );
+		A.ldz();
+		
+		hashing::sha1 H;
+		H.set();
+		for( unit_t x=A.lower; x <= A.upper; ++x )
+		{
+			const T v = x;
+			H.run( &v, sizeof(T) );
+			A[x] = v;
+		}
+		const uint64_t k1 = H.key<uint64_t>();
+		const uint64_t k2 = chk(A);
+		if( k1 != k2 )
+			throw exception("array1D memory failure, level-1");
+
+		H.set();
+		for( unit_t x=A.lower; x <= A.upper; ++x )
+		{
+			H.run( &A[x], sizeof(T) );
+		}
+		const uint64_t k3 = H.key<uint64_t>();
+		if( k1 != k3 )
+			throw exception("array1D memory failure, level-2");
+
+		
 	}
 
 	template <typename T>
@@ -52,6 +91,40 @@ namespace
 		const layout2D L(U,V);
 		display(L);
 		array2D<T>     A(L);
+		vector<T>      data(A.items, T(0));
+		A.link( &data[1] );
+		A.ldz();
+		
+		hashing::sha1 H;
+		H.set();
+		for( unit_t y = A.lower.y; y <= A.upper.y; ++y )
+		{
+			for(unit_t x=A.lower.x; x <= A.upper.x; ++x )
+			{
+				const T v = x;
+				H.run( &v, sizeof(T) );
+				A[y][x] = v;
+			}
+		}
+		const uint64_t k1 = H.key<uint64_t>();
+		const uint64_t k2 = chk(A);
+		if( k1 != k2 )
+			throw exception("array2D memory failure, level-1");
+	
+		H.set();
+		for( unit_t y = A.lower.y; y <= A.upper.y; ++y )
+		{
+			for(unit_t x=A.lower.x; x <= A.upper.x; ++x )
+			{
+				const T v = x;
+				H.run( &v, sizeof(T) );
+				A[y][x] = v;
+			}
+		}
+		const uint64_t k3 = H.key<uint64_t>();
+		if( k1 != k3 )
+			throw exception("array2D memory failure, level-2");
+		
 	}
 	
 	

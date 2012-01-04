@@ -27,7 +27,8 @@ namespace yocto
 		{
 			assert( entry!=NULL  );
 			assert( item_!=NULL  );
-			assert( this->has(x) );
+			assert( x >= lower );
+			assert( x <= upper );
 			
 			return item_[x];
 		}
@@ -37,7 +38,8 @@ namespace yocto
 		{
 			assert( entry!=NULL  );
 			assert( item_!=NULL  );
-			assert( this->has(x) );
+			assert( x >= lower );
+			assert( x <= upper );
 			
 			return item_[x];
 		}

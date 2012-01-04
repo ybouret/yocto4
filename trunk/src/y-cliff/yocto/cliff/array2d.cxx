@@ -41,6 +41,24 @@ namespace yocto
 				row[y].link(addr);
 		}
 		
+		template<>
+		array2D<z_type>::row_type & array2D<z_type>:: operator[]( unit_t y ) throw()
+		{
+			assert( entry != NULL );
+			assert( y >= lower.y );
+			assert( y <= upper.y );
+			return row[y];
+		}
+		
+		template<>
+		const array2D<z_type>::row_type & array2D<z_type>:: operator[]( unit_t y ) const throw()
+		{
+			assert( entry != NULL );
+			assert( y >= lower.y );
+			assert( y <= upper.y );
+			return row[y];
+		}
+		
 	}
 	
 }
