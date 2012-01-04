@@ -59,6 +59,9 @@ namespace yocto
 		{
 			assert( this->has( sub.lower ) );
 			assert( this->has( sub.upper ) );
+			assert( target.has( sub.lower ) );
+			assert( target.has( sub.upper ) );
+			
 			const array1D<z_type> &self = *this;
 			z_type                *q    = &target[sub.lower];
 			const z_type          *p    = &self[sub.lower];
@@ -73,8 +76,11 @@ namespace yocto
 		template <>
 		void array1D<z_type>:: load( const array1D<z_type> &source, const layout1D &sub ) throw()
 		{
-			assert( this->has( sub.lower ) );
-			assert( this->has( sub.upper ) );
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( source.has( sub.lower ) );
+			assert( source.has( sub.upper ) );
+			
 			array1D<z_type> &self = *this;
 			z_type          *q    = &self[sub.lower];
 			const z_type    *p    = &source[sub.lower];

@@ -30,6 +30,14 @@ namespace yocto
 			const slice_type & operator[]( unit_t z ) const throw();
 			
 			
+			void save( array3D &target, const layout3D &sub) const throw();
+			inline 
+			void save( array3D &target) const throw() { save( target, target ); }
+			
+			void load( const array3D &source, const layout3D &sub ) throw();
+			inline
+			void load( const array3D &source ) throw() { load( source, source); }
+			
 		private:
 			size_t      slices;
 			slice_type *slice;
