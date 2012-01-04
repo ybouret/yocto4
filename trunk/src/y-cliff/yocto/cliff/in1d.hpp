@@ -8,8 +8,12 @@ namespace yocto
 	
 	namespace cliff
 	{
-		typedef unit_t            coord1D;
-		typedef layout<coord1D>   layout1D;		
+		typedef unit_t               coord1D;
+		typedef layout<coord1D>      layout1D;	
+		template <typename U> struct vertex1D 
+		{
+			typedef U type;
+		};
 	}
 }
 
