@@ -16,8 +16,8 @@ namespace yocto
 		{
 		public:
 			YOCTO_ARGUMENTS_DECL_T;
-			typedef linear<T,layout2D> linear_type;
-			typedef layout2D           layout_type;
+			typedef linear<T,layout3D> linear_type;
+			typedef layout3D           layout_type;
 			typedef array2D<T>         slice_type;
 			
 			explicit array3D( const layout_type &L );
@@ -29,9 +29,10 @@ namespace yocto
 			slice_type       & operator[]( unit_t z ) throw();
 			const slice_type & operator[]( unit_t z ) const throw();
 			
+			
 		private:
-			size_t    slices;
-			row_type *slice;
+			size_t      slices;
+			slice_type *slice;
 			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(array3D);
 		};
