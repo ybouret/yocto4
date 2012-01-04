@@ -27,6 +27,8 @@ namespace yocto
 		{
 		}
 		
+		virtual void link( T *addr ) throw() = 0;
+		
 		void ldz() throw() { assert(entry); memset( entry, 0, bytes); }
 		
 		

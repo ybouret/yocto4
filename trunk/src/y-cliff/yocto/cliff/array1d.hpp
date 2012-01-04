@@ -25,10 +25,12 @@ namespace yocto
 			type       & operator[]( unit_t x ) throw();
 			const_type & operator[]( unit_t x ) const throw();
 			
+			virtual void link( T *addr ) throw();
 			
 			
 			
 		private:
+			type *item_; //!< offseted entry
 			YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
 		};
 	}
