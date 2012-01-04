@@ -65,11 +65,13 @@ YOCTO_UNIT_TEST_IMPL(array)
 	perform1D< math::complex<float> >();
 	perform1D< math::complex<double> >();
 	
-	perform2D<float>();
-	perform2D<double>();
-	perform2D< math::complex<float> >();
-	perform2D< math::complex<double> >();
-	
+	if( true )
+	{
+		perform2D<float>();
+		perform2D<double>();
+		perform2D< math::complex<float> >();
+		perform2D< math::complex<double> >();
+	}
 
 }
 YOCTO_UNIT_TEST_DONE()

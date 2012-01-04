@@ -12,7 +12,7 @@ namespace yocto
 		array2D<z_type>:: array2D( const layout2D &L) :
 		linear_type(L),
 		row_layout( lower.x, upper.x ),
-		rows( row_layout.width ),
+		rows( width.y ),
 		row( memory::kind<memory::global>::acquire_as<row_type>(rows) - lower.y )
 		{
 			for( unit_t y = lower.y; y <= upper.y; ++y )

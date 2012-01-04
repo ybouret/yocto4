@@ -1,7 +1,7 @@
 #ifndef YOCTO_CLIFF_ARRAY2D_INCLUDED
 #define YOCTO_CLIFF_ARRAY2D_INCLUDED 1
 
-#include "yocto/cliff/array1D.hpp"
+#include "yocto/cliff/array1d.hpp"
 #include "yocto/cliff/in2d.hpp"
 
 
