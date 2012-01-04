@@ -4,6 +4,8 @@
 #include "yocto/cliff/array1d.hpp"
 #include "yocto/cliff/in2d.hpp"
 
+#include "yocto/geom/color.hpp"
+#include "yocto/string.hpp"
 
 namespace yocto
 {
@@ -27,7 +29,17 @@ namespace yocto
 			const layout1D row_layout;
 			
 			row_type       & operator[]( unit_t y ) throw();
-			const row_type & operator[]( unit_t y) const throw();
+			const row_type & operator[]( unit_t y ) const throw();
+			
+			
+			//! save a raw ppm
+			void ppm(const string &        filename, 
+					 const string &        comment, 
+					 double (*vproc)( const T & ),
+					 const color::rgba32 *colors = NULL,
+					 double               vmin   = 0,
+					 double               vmax   = 1
+					 ) const;
 			
 		private:
 			size_t    rows;

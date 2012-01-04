@@ -53,5 +53,38 @@ namespace yocto
 			item_ = addr-lower;
 		}
 		
+		
+		template <>
+		void array1D<z_type>:: save( array1D<z_type> &target, const layout1D &sub ) const throw()
+		{
+			assert( this->has( sub.lower ) );
+			assert( this->has( sub.upper ) );
+			const array1D<z_type> &self = *this;
+			z_type                *q    = &target[sub.lower];
+			const z_type          *p    = &self[sub.lower];
+			
+			for( size_t i=sub.items;i>0;--i)
+			{
+				*(q++) = *(p++);
+			}
+		}
+		
+		
+		template <>
+		void array1D<z_type>:: load( const array1D<z_type> &source, const layout1D &sub ) throw()
+		{
+			assert( this->has( sub.lower ) );
+			assert( this->has( sub.upper ) );
+			array1D<z_type> &self = *this;
+			z_type          *q    = &self[sub.lower];
+			const z_type    *p    = &source[sub.lower];
+			
+			for( size_t i=sub.items;i>0;--i)
+			{
+				*(q++) = *(p++);
+			}
+			
+		}
+		
 	}
 }
