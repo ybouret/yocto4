@@ -37,7 +37,7 @@ namespace yocto
 		void array2D<z_type>:: link( z_type *addr ) throw()
 		{
 			entry = addr;
-			for( unit_t y = lower.y; y <= upper.y; ++y, addr += width.x )
+			for( unit_t y = lower.y; y <= upper.y; ++y, addr += row_layout.items )
 				row[y].link(addr);
 		}
 		
