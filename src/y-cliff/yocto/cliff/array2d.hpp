@@ -26,6 +26,9 @@ namespace yocto
 			
 			const layout1D row_layout;
 			
+			row_type       & operator[]( unit_t y ) throw();
+			const row_type & operator[]( unit_t y) const throw();
+			
 		private:
 			size_t    rows;
 			row_type *row;
