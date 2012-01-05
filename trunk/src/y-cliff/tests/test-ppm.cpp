@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(ppm)
 	std::cerr << "amin= " << amin << std::endl;
 	std::cerr << "amax= " << amax << std::endl;
 
-	A.ppm("a.ppm", "full", vproc, NULL, amin, amax);
+	A.ppm("a.ppm", "full", A, vproc, NULL, amin, amax);
 	
 	for( size_t size=1; size<=3; ++size)
 	{
@@ -50,7 +50,7 @@ YOCTO_UNIT_TEST_IMPL(ppm)
 			vector<float>  tmp( B.items, 0 );
 			B.link( &tmp[1] );
 			A.save(B);
-			B.ppm( vformat("a%u%u.ppm", unsigned(size),unsigned(rank)), "full", vproc, NULL, amin, amax);
+			B.ppm( vformat("a%u%u.ppm", unsigned(size),unsigned(rank)), "full", B,  vproc, NULL, amin, amax);
 		}
 	}
 	
