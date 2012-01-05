@@ -64,6 +64,11 @@ static inline double vproc( const double &x )
 	return x;
 }
 
+static inline complex<float> f1( double x )
+{
+	return sin(x);
+}
+
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
 	{	
@@ -74,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 											);
 		
 		display_info( w1 );
-		wksp1D< complex<float>, double>::function F( cfunctor(sin) );
+		wksp1D< complex<float>, double>::function F( cfunctor(f1) );
 		w1.fill( 1, w1.outline, F );
 		std::cerr << "X=" << w1.X << std::endl;
 		ios::ocstream fp( "w1.dat", false );
@@ -87,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{
 		const char  *varnames[] = { "u", "v", "w" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp2D< double, float > w2( coord2D(-10,-10), coord2D(20,20),
+		wksp2D< double, float > w2( coord2D(-100,-100), coord2D(200,200),
 								   coord2D(0,1), coord2D(0,2),
 								   v2d<float>(-2,-2), v2d<float>(4,4),
 								   1,varcount, varnames );
@@ -103,7 +108,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{
 		const char  *varnames[] = { "A", "B", "C", "D" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp3D< complex<double>, float > w3( coord3D(-10,-10,-10), coord3D(20,20,20),
+		wksp3D< complex<double>, float > w3(coord3D(-10,-10,-10), coord3D(20,20,20),
 											coord3D(0,0,1), coord3D(0,0,2),
 											v3d<float>(-1,-1,-1), v3d<float>(2,2,2),
 											0,varcount, varnames );
