@@ -7,6 +7,7 @@
 
 #include "yocto/math/complex.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace cliff;
@@ -53,17 +54,34 @@ namespace {
 	
 }
 
+static inline double f2( double x, double y )
+{
+	return sin(x+fabs(y));
+}
+
+static inline double vproc( const double &x )
+{
+	return x;
+}
+
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
 	{	
 		wksp1D< complex<float>, double>  w1( -10, 20, 
 											1, 2, 
-											-1.0, 2.0,
+											-2.0, 4.0,
 											1,2,NULL
 											);
 		
 		display_info( w1 );
-		std::cerr << "X=" << w1.X() << std::endl;
+		wksp1D< complex<float>, double>::function F( cfunctor(sin) );
+		w1.fill( 1, w1.outline, F );
+		std::cerr << "X=" << w1.X << std::endl;
+		ios::ocstream fp( "w1.dat", false );
+		for( unit_t x = w1.lower; x <= w1.upper; ++x )
+		{
+			fp("%g %g\n", w1.X[x], w1[1][x].re);
+		}
 	}
 	
 	{
@@ -71,11 +89,15 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
 		wksp2D< double, float > w2( coord2D(-10,-10), coord2D(20,20),
 								   coord2D(0,1), coord2D(0,2),
-								   v2d<float>(-1,-1), v2d<float>(2,2),
+								   v2d<float>(-2,-2), v2d<float>(4,4),
 								   1,varcount, varnames );
 		display_info( w2 );
-		std::cerr << "X=" << w2.X() << std::endl;
-		std::cerr << "Y=" << w2.Y() << std::endl;
+		std::cerr << "X=" << w2.X << std::endl;
+		std::cerr << "Y=" << w2.Y << std::endl;
+		wksp2D< double, float >::function F( cfunctor(f2) );
+		w2.fill( "u", w2.outline, F );
+		w2["u"].ppm("w2.ppm","u",w2,vproc,NULL,-1,1);
+		
 	}
 	
 	{
@@ -86,9 +108,9 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 											v3d<float>(-1,-1,-1), v3d<float>(2,2,2),
 											0,varcount, varnames );
 		display_info( w3 );
-		std::cerr << "X=" << w3.X() << std::endl;
-		std::cerr << "Y=" << w3.Y() << std::endl;
-		std::cerr << "Z=" << w3.Z() << std::endl;
+		std::cerr << "X=" << w3.X << std::endl;
+		std::cerr << "Y=" << w3.Y << std::endl;
+		std::cerr << "Z=" << w3.Z << std::endl;
 
 	}
 	

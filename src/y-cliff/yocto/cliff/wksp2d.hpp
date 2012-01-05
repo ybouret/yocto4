@@ -3,6 +3,7 @@
 
 #include "yocto/cliff/workspace.hpp"
 #include "yocto/cliff/array2d.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -16,11 +17,13 @@ namespace yocto
 		class wksp2D : public workspace<T,array2D,U,region2D>
 		{
 		public:
+			YOCTO_ARGUMENTS_DECL_T;
 			typedef workspace<T,array2D,U,region2D>  wksp_type;
 			typedef typename wksp_type::param_coord  param_coord;
 			typedef typename wksp_type::param_vertex param_vertex;
 			typedef typename wksp_type::axis_type    axis_type;
 			
+			const axis_type &X, &Y;
 			explicit wksp2D(param_coord  lo, 
 							param_coord  hi, 
 							param_coord  ghosts_lo, 
@@ -31,7 +34,9 @@ namespace yocto
 							size_t       b,
 							const char  *names_list[] 
 							) :
-			wksp_type(lo,hi,ghosts_lo,ghosts_up,vmin,vmax,a,b,names_list)
+			wksp_type(lo,hi,ghosts_lo,ghosts_up,vmin,vmax,a,b,names_list),
+			X( this->axis(0) ),
+			Y( this->axis(1) )
 			{
 			}
 			
@@ -39,8 +44,39 @@ namespace yocto
 			{
 			}
 			
-			inline const axis_type & X() const throw() { return this->axis(0); }
-			inline const axis_type & Y() const throw() { return this->axis(1); }
+			typedef functor<type,TL2(U,U)> function;
+			
+			inline void fill( size_t var, const layout2D &L, function &f )
+			{
+				assert( this->outline.has(L.lower) );
+				assert( this->outline.has(L.upper) );
+				assert( var >= this->cmin );
+				assert( var <= this->cmax );
+				array2D<T>      & F = (*this)[ var ];
+				for( unit_t y=L.lower.y; y <= L.upper.y; ++y)
+				{
+					array1D<T> &F_y = F[y];
+					const U      _y = Y[y];
+					for( unit_t x=L.lower.x; x <= L.upper.x; ++x )
+					{
+						F_y[ x ] = f( X[x], _y );
+					}
+				}
+			}
+			
+			inline void fill( const string &id, const layout2D &L, function &f )
+			{
+				const components &comp = *this;
+				fill( comp(id), L, f );
+			}
+			
+			inline void fill( const char *id, const layout2D &L, function &f )
+			{
+				const components &comp = *this;
+				fill( comp(id), L, f );
+			}
+			
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp2D);

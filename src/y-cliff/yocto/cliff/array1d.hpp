@@ -3,6 +3,7 @@
 
 #include "yocto/cliff/linear.hpp"
 #include "yocto/cliff/in1d.hpp"
+#include "yocto/functor.hpp"
 
 #include <iosfwd>
 
@@ -38,7 +39,7 @@ namespace yocto
 
 			template <typename U>
 			friend std::ostream & operator<<( std::ostream &os, const array1D<U> &a);
-			
+				
 			
 		private:
 			type *item_; //!< offseted entry
