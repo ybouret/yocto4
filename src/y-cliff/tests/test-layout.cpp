@@ -27,7 +27,7 @@ namespace
 	template <typename LAYOUT>
 	static inline void perform()
 	{
-		typename LAYOUT::coord_type U,V;
+		typename LAYOUT::coord_t U,V;
 		gen_coord(&U,LAYOUT::DIMENSIONS);
 		gen_coord(&V,LAYOUT::DIMENSIONS);
 		

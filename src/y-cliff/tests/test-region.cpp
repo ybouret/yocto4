@@ -22,11 +22,11 @@ namespace
 	template <typename U,template <class> class REGION>
 	static inline void perform()
 	{
-		typedef typename REGION<U>::type     region_type;
-		typedef typename region_type::vertex vertex;
+		typedef typename REGION<U>::type       region_type;
+		typedef typename region_type::vertex_t vertex_t;
 		std::cerr << "-- Region " << region_type::DIMENSIONS << "D" << std::endl;
 		
-		vertex u,v;
+		vertex_t u,v;
 		gen_vtx<U>( &u, region_type::DIMENSIONS );
 		gen_vtx<U>( &v, region_type::DIMENSIONS );
 		region_type R(u,v);

@@ -30,15 +30,15 @@ namespace yocto
 		class region : public region_base<U>
 		{
 		public:
-			typedef typename VERTEX<U>::type                     vertex;
-			typedef typename type_traits<vertex>::parameter_type param_vertex;
+			typedef typename VERTEX<U>::type                       vertex_t;
+			typedef typename type_traits<vertex_t>::parameter_type param_vertex;
 			
-			static const size_t DIMENSIONS = sizeof(vertex)/sizeof(U);
+			static const size_t DIMENSIONS = sizeof(vertex_t)/sizeof(U);
 			
-			const vertex min;
-			const vertex max;
-			const vertex length;
-			const U      space;   //!< product of lengths (length,area,volume)
+			const vertex_t min;
+			const vertex_t max;
+			const vertex_t length;
+			const U        space;   //!< product of lengths (length,area,volume)
 			
 			explicit region( param_vertex inf, param_vertex sup) : 
 			region_base<U>( DIMENSIONS ),
