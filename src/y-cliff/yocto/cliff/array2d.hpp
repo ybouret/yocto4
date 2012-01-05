@@ -40,9 +40,10 @@ namespace yocto
 			void load( const array2D &source ) throw() { load( source, source); }
 			
 			//! save a raw ppm
-			void ppm(const string &        filename, 
-					 const string &        comment, 
-					 double (*vproc)( const T & ),
+			void ppm(const string &       filename, 
+					 const string &       comment,
+					 const layout2D      &region,
+					 double             (*vproc)( const T & ),
 					 const color::rgba32 *colors = NULL,
 					 double               vmin   = 0,
 					 double               vmax   = 1
