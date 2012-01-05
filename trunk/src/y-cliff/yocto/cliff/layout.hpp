@@ -14,7 +14,7 @@ namespace yocto
 		class layout : public layout_base
 		{
 		public:
-			typedef COORD                                        coord_type;
+			typedef COORD                                        coord_t;
 			typedef typename type_traits<COORD>::mutable_type    mutable_coord;
 			typedef const     mutable_coord                      const_coord;
 			typedef typename type_traits<COORD>::parameter_type  param_coord;
@@ -69,8 +69,8 @@ namespace yocto
 				const size_t i  = DIMENSIONS-1;
 				const unit_t Lo = *(static_cast<unit_t *>( (void*)&lower ) + i );
 				const unit_t Hi = *(static_cast<unit_t *>( (void*)&upper ) + i );
-				coord_type   s_lo(lower);
-				coord_type   s_hi(upper);
+				coord_t      s_lo(lower);
+				coord_t      s_hi(upper);
 				unit_t      &lo = *(static_cast<unit_t *>( (void*)&s_lo ) + i );
 				unit_t      &hi = *(static_cast<unit_t *>( (void*)&s_hi ) + i );
 				layout_base::split(lo,hi,Lo,Hi,rank,size);
