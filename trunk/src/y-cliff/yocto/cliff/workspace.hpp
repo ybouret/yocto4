@@ -15,13 +15,14 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! utilities for workspace setup
 		struct workspace_base
 		{
 			static void check_ghosts( const void *ghosts_value, size_t n, const char *ctx );
 			static void check_widths( const unit_t *w, size_t n );
 		};
 		
-		
+		//! template to procide memory to arrays
 		template <typename T,template <class> class ARRAY>
 		class block : public object, public ARRAY<T>
 		{
@@ -45,6 +46,8 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(block);
 		};
 		
+		
+		//! heavily templated workspace
 		template <
 		typename                  T,       // real/complex...
 		template <typename> class ARRAY,   // layout[1|2|3]D
@@ -184,7 +187,29 @@ namespace yocto
 				return * block_[c];
 			}
 			
+			inline data_block & operator[]( const string &id )
+			{
+				const components &comp = *this;
+				return * block_[ comp(id) ];
+			}
 			
+			inline const data_block & operator[]( const string &id ) const throw()
+			{
+				const components &comp = *this;
+				return * block_[ comp(id) ];
+			}
+			
+			inline data_block & operator[]( const char *id )
+			{
+				const components &comp = *this;
+				return * block_[ comp(id) ];
+			}
+			
+			inline const data_block & operator[]( const char *id ) const throw()
+			{
+				const components &comp = *this;
+				return * block_[ comp(id) ];
+			}
 			
 			
 			

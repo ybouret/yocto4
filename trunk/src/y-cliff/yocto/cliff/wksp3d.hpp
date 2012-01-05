@@ -21,6 +21,7 @@ namespace yocto
 			typedef typename wksp_type::param_vertex param_vertex;
 			typedef typename wksp_type::axis_type    axis_type;
 			
+			const axis_type &X, &Y, &Z;
 			explicit wksp3D(param_coord  lo, 
 							param_coord  hi, 
 							param_coord  ghosts_lo, 
@@ -31,7 +32,10 @@ namespace yocto
 							size_t       b,
 							const char  *names_list[] 
 							) :
-			wksp_type(lo,hi,ghosts_lo,ghosts_up,vmin,vmax,a,b,names_list)
+			wksp_type(lo,hi,ghosts_lo,ghosts_up,vmin,vmax,a,b,names_list),
+			X( this->axis(0) ),
+			Y( this->axis(1) ),
+			Z( this->axis(2) )
 			{
 			}
 			
@@ -39,10 +43,6 @@ namespace yocto
 			{
 			}
 			
-			inline const axis_type & X() const throw() { return this->axis(0); }
-			inline const axis_type & Y() const throw() { return this->axis(1); }
-			inline const axis_type & Z() const throw() { return this->axis(2); }
-
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp3D);
 		};
