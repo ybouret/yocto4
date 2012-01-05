@@ -1,6 +1,7 @@
 #include "yocto/cliff/array1d.hpp"
 #include "yocto/math/ztype.hpp"
 
+#include <iostream>
 
 namespace yocto
 {
@@ -92,5 +93,17 @@ namespace yocto
 			
 		}
 		
+		
+		template <>
+		std::ostream & operator<<( std::ostream &os, const array1D<z_type> &a )
+		{
+			os << '[';
+			for( unit_t x=a.lower; x <= a.upper; ++x )
+			{
+				os << ' ' << a[x];
+			}
+			os << ' ' << ']';
+			return os;
+		}
 	}
 }

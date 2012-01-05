@@ -40,7 +40,7 @@ namespace yocto
 					cswap( vmin[i], vmax[i] );
 				vlen[i] = vmax[i] - vmin[i];
 				if( vlen[i] <= 0 )
-					throw libc::exception( EDOM, "region( zero length in dimension #%u )", unsigned(i+1) );
+					throw libc::exception( EDOM, "region( zero length in dimension #%u )", unsigned(i) );
 				ans *= vlen[i];
 			}
 			
