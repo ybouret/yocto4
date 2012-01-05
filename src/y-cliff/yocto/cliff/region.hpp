@@ -38,7 +38,7 @@ namespace yocto
 			const vertex min;
 			const vertex max;
 			const vertex length;
-			const U      space;   //!< product of lengths
+			const U      space;   //!< product of lengths (length,area,volume)
 			
 			explicit region( param_vertex inf, param_vertex sup) : 
 			region_base<U>( DIMENSIONS ),
@@ -48,6 +48,16 @@ namespace yocto
 			space( region_base<U>::setup( &min, &max, &length ) ) 
 			{
 			}
+			
+			region( const region &r ) throw() :
+			region_base<U>( DIMENSIONS ),
+			min( r.min ),
+			max( r.max ),
+			length( r.length ),
+			space(  r.space  )
+			{
+			}
+			
 			
 			virtual ~region() throw()
 			{
