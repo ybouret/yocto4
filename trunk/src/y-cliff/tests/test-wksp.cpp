@@ -37,7 +37,7 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
 	
-	typedef workspace< complex<float>, layout1D, double, region1D > w1_t;
+	typedef workspace< complex<float>, array1D, double, region1D > w1_t;
 	
 	w1_t w1( -50, 100, 
 			1, 2, 
@@ -51,6 +51,8 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	display_l(w1.outline);
 	std::cerr << "components: " << std::endl;
 	display_c(w1);
+	
+	std::cerr << "sizeof(workspace::block): " << sizeof(w1_t::block) << std::endl;
 	
 }
 YOCTO_UNIT_TEST_DONE()
