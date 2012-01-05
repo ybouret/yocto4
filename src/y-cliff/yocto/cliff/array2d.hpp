@@ -42,7 +42,7 @@ namespace yocto
 			//! save a raw ppm
 			void ppm(const string &       filename, 
 					 const string &       comment,
-					 const layout2D      &region,
+					 const layout2D      &area,
 					 double             (*vproc)( const T & ),
 					 const color::rgba32 *colors = NULL,
 					 double               vmin   = 0,

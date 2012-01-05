@@ -65,15 +65,15 @@ namespace yocto
 		template <>
 		void array2D<z_type>:: ppm(const string   &filename,
 								   const string   &comment,
-								   const layout2D &region,
+								   const layout2D &area,
 								   double (*vproc)( const z_type & ),
 								   const color::rgba32 *colors,
 								   double               vmin,
 								   double               vmax) const
 		{
 			assert( vproc != NULL );
-			assert( this->has( region.lower ) );
-			assert( this->has( region.upper ) );
+			assert( this->has( area.lower ) );
+			assert( this->has( area.upper ) );
 			ios::ocstream fp( filename,false );
 			fp("P6\n");
 			
@@ -89,38 +89,11 @@ namespace yocto
 			
 			//-- data
 			//-- #info
-#if 0
-			const z_type *p = entry;
-			if( NULL == colors )
-			{
-				for( size_t i=items; i>0; --i, ++p)
-				{
-					const color::rgba<double> c = color::rgba<double>::ramp( vproc(*p), vmin, vmax );
-					const uint8_t b[4] =  { uint8_t( 255 * c.r ), uint8_t( 255 * c.g ), uint8_t(255 * c.b ), 255 };
-					fp.write( b[0] );
-					fp.write( b[1] );
-					fp.write( b[2] );
-				}
-			}
-			else 
-			{
-				for( size_t i=items; i>0; --i, ++p)
-				{
-					const color::rgba32 c = color::rgba32:: ramp( colors,
-																 vproc(*p),
-																 vmin, 
-																 vmax );
-					fp.write( c.r );
-					fp.write( c.g );
-					fp.write( c.b );
-				}
-			}
-#endif		
 			const bool default_ramp = NULL == colors;
-			for( unit_t y = region.lower.y; y <= region.upper.y; ++y )
+			for( unit_t y = area.lower.y; y <= area.upper.y; ++y )
 			{
 				const row_type &r_y = (*this)[y];
-				for( unit_t x = region.lower.x; x <= region.upper.x; ++x )
+				for( unit_t x = area.lower.x; x <= area.upper.x; ++x )
 				{
 					const double v = vproc( r_y[x] );
 					if( default_ramp )
