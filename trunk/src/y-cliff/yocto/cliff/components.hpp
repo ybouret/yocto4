@@ -32,8 +32,8 @@ namespace yocto
 			const char   * get_text( size_t i ) const throw();
 			void           set_name( size_t i, const string &id );
 			void           set_name( size_t i, const char   *id );
-			size_t operator[]( const string &id ) const;
-			size_t operator[]( const char   *id ) const;
+			size_t operator()( const string &id ) const;
+			size_t operator()( const char   *id ) const;
 			
 		private:
 			vector<string>     names;

@@ -88,17 +88,17 @@ namespace yocto
 			set_name(i,_id);
 		}
 		
-		size_t components:: operator[]( const string &id ) const
+		size_t components:: operator()( const string &id ) const
 		{
 			const size_t *p = idxDB.search( id );
 			if( !p ) throw exception("no cliff.components['%s']", id.c_str() );
 			return *p;
 		}
 		
-		size_t components:: operator[]( const char *id ) const
+		size_t components:: operator()( const char *id ) const
 		{
 			const string _id(id);
-			return (*this)[_id];
+			return (*this)(_id);
 		}
 		
 	}

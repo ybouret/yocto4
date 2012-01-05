@@ -51,8 +51,14 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	display_l(w1.outline);
 	std::cerr << "components: " << std::endl;
 	display_c(w1);
+	std::cerr << "min   = " << w1.region.min << std::endl;
+	std::cerr << "max   = " << w1.region.max << std::endl;
+	std::cerr << "delta = " << w1.delta << std::endl;
 	
-	std::cerr << "sizeof(workspace::block): " << sizeof(w1_t::block) << std::endl;
-	
+	std::cerr << "sizeof(workspace::data_block): " << sizeof(w1_t::data_block) << std::endl;
+	std::cerr << "sizeof(workspace::axis_type) : " << sizeof(w1_t::axis_type)  << std::endl;
+	const array1D<double> &X = w1.axis(0);
+	std::cerr << "X=" << X << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()

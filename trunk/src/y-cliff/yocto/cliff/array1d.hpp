@@ -4,6 +4,7 @@
 #include "yocto/cliff/linear.hpp"
 #include "yocto/cliff/in1d.hpp"
 
+#include <iosfwd>
 
 namespace yocto
 {
@@ -34,6 +35,10 @@ namespace yocto
 			void load( const array1D &source, const layout1D &sub ) throw();
 			inline
 			void load( const array1D &source ) throw() { load( source, source); }
+
+			template <typename U>
+			friend std::ostream & operator<<( std::ostream &os, const array1D<U> &a);
+			
 			
 		private:
 			type *item_; //!< offseted entry
