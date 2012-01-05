@@ -1,14 +1,17 @@
 #include "yocto/utest/run.hpp"
 
 
-#include "yocto/cliff/array3d.hpp"
-#include "yocto/cliff/workspace.hpp"
+#include "yocto/cliff/wksp1d.hpp"
+#include "yocto/cliff/wksp2d.hpp"
+#include "yocto/cliff/wksp3d.hpp"
 
+#include "yocto/math/complex.hpp"
 #include "yocto/code/rand.hpp"
+
 using namespace yocto;
 using namespace cliff;
 using namespace math;
-
+using namespace geom;
 
 namespace {
 	
@@ -31,34 +34,66 @@ namespace {
 		}
 	}
 	
+	template <typename WKSP>
+	static inline void display_info( const WKSP &wksp)
+	{
+		std::cerr << "---- layout:" << std::endl;
+		display_l(wksp);
+		std::cerr << "---- outline: " << std::endl;
+		display_l(wksp.outline);
+		std::cerr << "---- components: " << std::endl;
+		display_c(wksp);
+		std::cerr << "min   = " << wksp.region.min << std::endl;
+		std::cerr << "max   = " << wksp.region.max << std::endl;
+		std::cerr << "delta = " << wksp.delta << std::endl;
+		std::cerr << "sizeof(wksp::data_block)=" << sizeof( typename WKSP::data_block) << std::endl;
+		std::cerr << "sizeof(wksp::axis_type) =" << sizeof( typename WKSP::axis_type)  << std::endl;
+		std::cerr << std::endl;
+	}
 	
 }
 
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
+	{	
+		wksp1D< complex<float>, double>  w1( -10, 20, 
+											1, 2, 
+											-1.0, 2.0,
+											1,2,NULL
+											);
+		
+		display_info( w1 );
+		std::cerr << "X=" << w1.X() << std::endl;
+	}
 	
-	typedef workspace< complex<float>, array1D, double, region1D > w1_t;
+	{
+		const char  *varnames[] = { "u", "v", "w" };
+		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
+		wksp2D< double, float > w2( coord2D(-10,-10), coord2D(20,20),
+								   coord2D(0,1), coord2D(0,2),
+								   v2d<float>(-1,-1), v2d<float>(2,2),
+								   1,varcount, varnames );
+		display_info( w2 );
+		std::cerr << "X=" << w2.X() << std::endl;
+		std::cerr << "Y=" << w2.Y() << std::endl;
+	}
 	
-	w1_t w1( -50, 100, 
-			1, 2, 
-			-1.0, 2.0,
-			1,2,NULL
-			);
-	
-	std::cerr << "layout:" << std::endl;
-	display_l(w1);
-	std::cerr << "outline: " << std::endl;
-	display_l(w1.outline);
-	std::cerr << "components: " << std::endl;
-	display_c(w1);
-	std::cerr << "min   = " << w1.region.min << std::endl;
-	std::cerr << "max   = " << w1.region.max << std::endl;
-	std::cerr << "delta = " << w1.delta << std::endl;
-	
-	std::cerr << "sizeof(workspace::data_block): " << sizeof(w1_t::data_block) << std::endl;
-	std::cerr << "sizeof(workspace::axis_type) : " << sizeof(w1_t::axis_type)  << std::endl;
-	const array1D<double> &X = w1.axis(0);
-	std::cerr << "X=" << X << std::endl;
+	{
+		const char  *varnames[] = { "A", "B", "C", "D" };
+		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
+		wksp3D< complex<double>, float > w3( coord3D(-10,-10,-10), coord3D(20,20,20),
+											coord3D(0,0,1), coord3D(0,0,2),
+											v3d<float>(-1,-1,-1), v3d<float>(2,2,2),
+											0,varcount, varnames );
+		display_info( w3 );
+		std::cerr << "X=" << w3.X() << std::endl;
+		std::cerr << "Y=" << w3.Y() << std::endl;
+		std::cerr << "Z=" << w3.Z() << std::endl;
 
+	}
+	
+	
+	
+	
 }
 YOCTO_UNIT_TEST_DONE()
