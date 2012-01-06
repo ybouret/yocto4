@@ -16,6 +16,7 @@ namespace yocto
 		class wksp3D : public workspace<T,array3D,U,region3D>
 		{
 		public:
+			YOCTO_ARGUMENTS_DECL_T;
 			typedef workspace<T,array3D,U,region3D>  wksp_type;
 			typedef typename wksp_type::param_coord  param_coord;
 			typedef typename wksp_type::param_vertex param_vertex;
@@ -66,7 +67,7 @@ namespace yocto
 							F_zy[ x ] = f( X[x], _y, _z );
 						}
 					}
-				}|
+				}
 			}
 
 			inline void fill( const string &id, const layout2D &L, function &f )

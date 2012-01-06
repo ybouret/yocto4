@@ -92,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{
 		const char  *varnames[] = { "u", "v", "w" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp2D< double, float > w2( coord2D(-100,-100), coord2D(200,200),
+		wksp2D< double, float > w2( coord2D(-10,-10), coord2D(20,20),
 								   coord2D(0,1), coord2D(0,2),
 								   v2d<float>(-2,-2), v2d<float>(4,4),
 								   1,varcount, varnames );
@@ -102,6 +102,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		wksp2D< double, float >::function F( cfunctor(f2) );
 		w2.fill( "u", w2.outline, F );
 		w2["u"].ppm("w2.ppm","u",w2,vproc,NULL,-1,1);
+		//std::cerr << w2["u"] << std::endl;
 		
 	}
 	
