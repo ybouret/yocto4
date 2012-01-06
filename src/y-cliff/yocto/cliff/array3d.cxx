@@ -77,35 +77,9 @@ namespace yocto
 			assert( z <= upper.z );
 			return slice[z];
 		}
-		
+	
 		template <>
-		void array3D<z_type>:: save( array3D<z_type> &target, const layout3D &sub) const throw()
-		{
-			assert(  this->has( sub.lower ) );
-			assert(  this->has( sub.upper ) );
-			assert( target.has( sub.lower ) );
-			assert( target.has( sub.upper ) );
-			
-			const array3D<z_type> &self = *this;
-			for( unit_t z=sub.upper.z; z >= sub.lower.z; --z )
-			{
-				const slice_type &s_src = self[z];
-				slice_type       &s_tgt = target[z];
-				for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
-				{
-					const array1D<z_type> &r_src = s_src[y];
-					array1D<z_type>       &r_tgt = s_tgt[y];
-					for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
-					{
-						r_tgt[x] = r_src[x];
-					}
-				}
-			}
-			
-		}
-		
-		template <>
-		void array3D<z_type>:: load( const array3D<z_type> &source, const layout3D &sub) throw()
+		void array3D<z_type>:: copy( const array3D<z_type> &source, const layout3D &sub) throw()
 		{
 			
 			assert(  this->has( sub.lower ) );
@@ -131,6 +105,60 @@ namespace yocto
 			
 		}
 		
+		
+		template <>
+		void array3D<z_type>:: add( const array3D<z_type> &source, const layout3D &sub) throw()
+		{
+			
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( source.has( sub.lower ) );
+			assert( source.has( sub.upper ) );
+			
+			array3D<z_type> &self = *this;
+			for( unit_t z=sub.upper.z; z >= sub.lower.z; --z )
+			{
+				const slice_type &s_src = source[z];
+				slice_type       &s_tgt = self[z];
+				for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+				{
+					const array1D<z_type> &r_src = s_src[y];
+					array1D<z_type>       &r_tgt = s_tgt[y];
+					for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+					{
+						r_tgt[x] += r_src[x];
+					}
+				}
+			}
+			
+		}
+		
+		template <>
+		void array3D<z_type>:: muladd( array3D<z_type>::param_type k, const array3D<z_type> &source, const layout3D &sub) throw()
+		{
+			
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( source.has( sub.lower ) );
+			assert( source.has( sub.upper ) );
+			
+			array3D<z_type> &self = *this;
+			for( unit_t z=sub.upper.z; z >= sub.lower.z; --z )
+			{
+				const slice_type &s_src = source[z];
+				slice_type       &s_tgt = self[z];
+				for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+				{
+					const array1D<z_type> &r_src = s_src[y];
+					array1D<z_type>       &r_tgt = s_tgt[y];
+					for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+					{
+						r_tgt[x] += r_src[x] * k;
+					}
+				}
+			}
+			
+		}
 		
 	}
 	

@@ -29,15 +29,10 @@ namespace yocto
 			slice_type       & operator[]( unit_t z ) throw();
 			const slice_type & operator[]( unit_t z ) const throw();
 			
-			
-			void save( array3D &target, const layout3D &sub) const throw();
-			inline 
-			void save( array3D &target) const throw() { save( target, target ); }
-			
-			void load( const array3D &source, const layout3D &sub ) throw();
-			inline
-			void load( const array3D &source ) throw() { load( source, source); }
-			
+			void copy(   const array3D &source, const layout3D &sub ) throw();
+			void add(    const array3D &source, const layout3D &sub ) throw();
+			void muladd( param_type k, const array3D &source, const layout3D &sub ) throw();
+
 		private:
 			size_t      slices;
 			slice_type *slice;

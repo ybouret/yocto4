@@ -29,13 +29,10 @@ namespace yocto
 			
 			virtual void link( T *addr ) throw();
 			
-			void save( array1D &target, const layout1D &sub) const throw();
-			inline 
-			void save( array1D &target) const throw() { save( target, target ); }
-			
-			void load( const array1D &source, const layout1D &sub ) throw();
-			inline
-			void load( const array1D &source ) throw() { load( source, source); }
+						
+			void copy( const array1D &source, const layout1D &sub ) throw();
+			void add(  const array1D &source, const layout1D &sub ) throw();
+			void muladd( param_type k, const array1D &source, const layout1D &sub ) throw();
 			
 			template <typename U>
 			friend std::ostream & operator<<( std::ostream &os, const array1D<U> &a);

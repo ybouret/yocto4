@@ -208,7 +208,11 @@ namespace yocto
 	
 	//! make a functor from a C function
 	template <typename R,typename T,typename U>
-	inline functor<R,TL2(T,U)> cfunctor( R (*cfn)(T,U) ) { return functor<R,TL2(T,U)>( cfn ); }
+	inline functor<R,TL2(T,U)> cfunctor2( R (*cfn)(T,U) ) { return functor<R,TL2(T,U)>( cfn ); }
+	
+	//! make a functor from a C function
+	template <typename R,typename T,typename U,typename V>
+	inline functor<R,TL3(T,U,V)> cfunctor3( R (*cfn)(T,U,V) ) { return functor<R,TL3(T,U,V)>( cfn ); }
 	
 }
 

@@ -31,14 +31,10 @@ namespace yocto
 			row_type       & operator[]( unit_t y ) throw();
 			const row_type & operator[]( unit_t y ) const throw();
 			
-			void save( array2D &target, const layout2D &sub) const throw();
-			inline 
-			void save( array2D &target) const throw() { save( target, target ); }
-			
-			void load( const array2D &source, const layout2D &sub ) throw();
-			inline
-			void load( const array2D &source ) throw() { load( source, source); }
-			
+			void copy(   const array2D &source, const layout2D &sub ) throw();
+			void add(    const array2D &source, const layout2D &sub ) throw();
+			void muladd( param_type k, const array2D &source, const layout2D &sub ) throw();
+
 			//! save a raw ppm
 			void ppm(const string &       filename, 
 					 const string &       comment,

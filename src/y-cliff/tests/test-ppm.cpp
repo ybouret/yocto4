@@ -49,7 +49,7 @@ YOCTO_UNIT_TEST_IMPL(ppm)
 			array2D<float> B( Lr );
 			vector<float>  tmp( B.items, 0 );
 			B.link( &tmp[1] );
-			A.save(B);
+			B.copy(A,A);
 			B.ppm( vformat("a%u%u.ppm", unsigned(size),unsigned(rank)), "full", B,  vproc, NULL, amin, amax);
 		}
 	}
