@@ -69,7 +69,7 @@ namespace yocto
 				fill( comp(id), L, f );
 			}
 			
-					  
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp1D);
 		};

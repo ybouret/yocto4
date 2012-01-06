@@ -66,7 +66,7 @@ namespace yocto
 			
 			inline layout split( size_t rank, size_t size ) const
 			{
-				const size_t i  = DIMENSIONS-1;
+				const size_t i  = DIMENSIONS-1; //!< on the last dimension
 				const unit_t Lo = *(static_cast<unit_t *>( (void*)&lower ) + i );
 				const unit_t Hi = *(static_cast<unit_t *>( (void*)&upper ) + i );
 				coord_t      s_lo(lower);
@@ -75,6 +75,18 @@ namespace yocto
 				unit_t      &hi = *(static_cast<unit_t *>( (void*)&s_hi ) + i );
 				layout_base::split(lo,hi,Lo,Hi,rank,size);
 				return layout(s_lo,s_hi);
+			}
+			
+			//! strictly inside
+			inline layout inside() const
+			{
+				coord_t       in_lo(lower);
+				coord_t       in_up(upper);
+				unit_t       *lo = (unit_t *)&in_lo;
+				unit_t       *up = (unit_t *)&in_up;
+				const unit_t *w  = (const unit_t *) &width;
+				layout_base::inside( lo, up, w );
+				return layout(in_lo,in_up);
 			}
 			
 		private:
