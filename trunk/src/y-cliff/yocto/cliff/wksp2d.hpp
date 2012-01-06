@@ -44,7 +44,25 @@ namespace yocto
 			{
 			}
 			
-			
+			void scan( const layout2D &sub, const array<size_t> &comp )
+			{
+				assert( comp.size() > 0 );
+				assert( this->has(sub.lower) );
+				assert( this->has(sub.upper) );
+				const size_t n = comp.size();
+				vector<T>    a(n,T(0));
+				for( size_t y=sub.lower.y; y <= sub.upper.y; ++y )
+				{
+					for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+					{
+						for( size_t j=1; j <= n; ++j )
+						{
+							a[j] = (*this)[ comp[j] ][y][x];
+						}
+					}
+				}
+				
+			}
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp2D);

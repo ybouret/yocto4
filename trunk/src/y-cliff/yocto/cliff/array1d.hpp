@@ -43,7 +43,6 @@ inline void muladd( param_type k, const ARRAY &other, const layout_type &sub ) t
 			void         foreach( const array1D &other, const layout1D &sub, callback2_type proc, void *args);
 
 			
-			
 			template <typename U>
 			friend std::ostream & operator<<( std::ostream &os, const array1D<U> &a);
 			

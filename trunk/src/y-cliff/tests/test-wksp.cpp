@@ -80,6 +80,12 @@ static inline complex<double> f3( float x, float y, float z )
 	return sin(x+y+z);
 }
 
+
+static inline void proc1( array< complex<float> > &var, void * )
+{
+	
+}
+
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
 	{	
@@ -113,6 +119,15 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 				fp("%g %g\n", w1.X[x], w1[2][x].re);
 			}
 		}
+		
+		vector<size_t> cid;
+		for( size_t i=w1.cmin; i <= w1.cmax; ++i ) cid.push_back(i);
+		w1.check_indices(cid);
+		vector< complex<float> > var( cid.size(), 0 );
+		vector<size_t> off1;
+		w1.load_offsets( off1, w1.outline );
+		
+		
 	}
 	
 	{
@@ -135,7 +150,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		laplacian<double,float>::compute( w2["v"], 1, w2["u"], w2.inv_dsq, in2 );
 		w2["v"].ppm("l2.ppm", "v",in2,vproc,NULL,-1,1);
 		
-		w2["w"].linear_type::set( w2.outline, 0 );
+		w2["w"].set_all( w2.outline, 0 );
 		w2["w"].set( w2["u"], in2 );
 		w2["w"].add( w2["v"], in2 );
 		

@@ -1,5 +1,6 @@
 #include "yocto/cliff/workspace.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/code/hsort.hpp"
 #include <cerrno>
 
 namespace yocto
@@ -27,12 +28,35 @@ namespace yocto
 			}
 		}
 		
-#if 0
-		void workspace_base:: get_inside( void *plo, void *phi, const void *qlo, const void *qhi, size_t n )
+		void workspace_base:: check_indices( const array<size_t> &cid, const components &cdb )
 		{
-			
+			const size_t nc = cid.size();
+			if( nc <= 0 )
+				throw libc::exception( EDOM, "no component indices!" );
+			for( size_t i=1; i <= nc; ++i)
+			{
+				const size_t j = cid[i];
+				if( j > cdb.cmax || j < cdb.cmin )
+					throw libc::exception( EDOM, "component index #%u=%u not in [%u;%u]", unsigned(i), unsigned(j), unsigned(cdb.cmin), unsigned(cdb.cmax) );
+			}
 		}
-#endif
+		
+		void workspace_base:: check_offsets( offsets_type &offsets ) throw()
+		{
+			if( offsets.size() > 1 )
+			{
+				hsort( offsets );
+				for( size_t i = 1; i < offsets.size(); ++i )
+				{
+					const size_t u = offsets[i];
+					size_t       j = i+1;
+					while( j <= offsets.size() && u == offsets[j] ) ++j;
+					
+				}
+				
+			}
+		}
+
 		
 	}
 	
