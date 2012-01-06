@@ -6,6 +6,7 @@
 #include "yocto/cliff/wksp3d.hpp"
 
 #include "yocto/cliff/laplacian.hpp"
+#include "yocto/cliff/fill.hpp"
 
 #include "yocto/math/complex.hpp"
 #include "yocto/code/rand.hpp"
@@ -89,8 +90,10 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 											);
 		
 		display_info( w1 );
-		wksp1D< complex<float>, double>::function F( cfunctor(f1) );
-		w1.fill( 1, w1.outline, F );
+		fill< complex<float>, double >::function1 F( cfunctor(f1) );
+		fill< complex<float>, double >::with(F,w1[1],w1.outline,w1.X);
+		
+		
 		std::cerr << "X=" << w1.X << std::endl;
 		{
 			ios::ocstream fp( "w1.dat", false );
@@ -122,8 +125,9 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		display_info( w2 );
 		std::cerr << "X=" << w2.X << std::endl;
 		std::cerr << "Y=" << w2.Y << std::endl;
-		wksp2D< double, float >::function F( cfunctor2(f2) );
-		w2.fill( "u", w2.outline, F );
+		fill< double, float >::function2 F( cfunctor2(f2) );
+		fill<double,float>::with( F, w2["u"], w2.outline, w2.X, w2.Y );
+		
 		w2["u"].ppm("w2.ppm","u",w2,vproc,NULL,-1,1);
 		layout2D in2 = w2.outline.inside();
 		std::cerr << "---- inside:" << std::endl;
@@ -135,7 +139,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{
 		const char  *varnames[] = { "A", "B", "C", "D" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp3D< complex<double>, float > w3(coord3D(-10,-10,-10), coord3D(20,20,20),
+		wksp3D< complex<double>, float > w3(coord3D(-20,-20,-20), coord3D(40,40,40),
 											coord3D(0,0,1), coord3D(0,0,2),
 											v3d<float>(-1,-1,-1), v3d<float>(2,2,2),
 											0,varcount, varnames );
@@ -143,7 +147,9 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		std::cerr << "X=" << w3.X << std::endl;
 		std::cerr << "Y=" << w3.Y << std::endl;
 		std::cerr << "Z=" << w3.Z << std::endl;
-		wksp3D< complex<double>, float >::function F( cfunctor3(f3) );
+		fill< complex<double>, float >::function3 F( cfunctor3(f3) );
+		fill< complex<double>, float >::with( F, w3["A"], w3.outline, w3.X, w3.Y, w3.Z );
+		
 		layout3D in3 = w3.outline.inside();
 		
 		laplacian< complex<double>, float>::compute( w3["B"], 1, w3["A"],  w3.inv_dsq, in3 );
