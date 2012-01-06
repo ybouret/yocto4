@@ -35,16 +35,6 @@ namespace yocto
 			//! set every item to 0
 			inline void ldz() throw() { assert(entry); memset( entry, 0, bytes); }
 			
-			//! set every item to the same value
-			inline void ld(param_type value) throw()
-			{
-				assert(entry);
-				type *p = entry;
-				for( size_t i=this->items; i>0;--i )
-				{
-					*(p++) = value;
-				}
-			}
 			
 			//! find the minimum value (float/double)
 			inline type get_min( unit_t *offset  ) const throw()
@@ -113,7 +103,28 @@ namespace yocto
 				if(offmin) *offmin = imin;
 			}
 			
+			typedef void (*callback_type)(type&,void*);
+			typedef void (*const_cb_type)(const_type&,void*);
+			typedef void (*callback2_type)(type &,const type &,void *);
 			
+			virtual void foreach( const LAYOUT &sub, callback_type  proc, void *args) = 0;
+			virtual void foreach( const LAYOUT &sub, const_cb_type  proc, void *args) const  = 0;
+			
+			inline void set( const LAYOUT &sub, param_type v) throw() { foreach( sub, set_cb, &v); }
+			inline void add( const LAYOUT &sub, param_type v) throw() { foreach( sub, add_cb, &v); }
+			inline void mul( const LAYOUT &sub, param_type v) throw() { foreach( sub, mul_cb, &v); }									
+			inline type sum( const LAYOUT &sub ) throw() { type ans(0); foreach( sub, sum_cb, &ans); return ans; }
+			
+			
+		protected:
+			static inline void set_cb( type &v, void *args) throw() { v  = *(type*)args; }
+			static inline void add_cb( type &v, void *args) throw() { v += *(type*)args; }
+			static inline void mul_cb( type &v, void *args) throw() { v *= *(type*)args; }
+			static inline void sum_cb( const_type &v, void *args) throw() { *(type *)args += v; }
+			
+			static inline void set2_cb( type &v, const_type &u, void *) throw() { v = u; }
+			static inline void add2_cb( type &v, const_type &u, void *) throw() { v += u; }
+			static inline void muladd_cb( type &v,const_type &u, void *args) throw() { v += (*(const_type *)args) * u; }
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(linear);
 		};

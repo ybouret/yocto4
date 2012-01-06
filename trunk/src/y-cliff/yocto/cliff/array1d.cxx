@@ -56,61 +56,50 @@ namespace yocto
 		
 		
 		template <>
-		void array1D<z_type>:: copy( const array1D<z_type> &source, const layout1D &sub ) throw()
+		void array1D<z_type>:: foreach( const layout1D &sub, callback_type proc, void *args )
 		{
+			assert(proc);
 			assert(  this->has( sub.lower ) );
 			assert(  this->has( sub.upper ) );
-			assert( source.has( sub.lower ) );
-			assert( source.has( sub.upper ) );
-			
-			array1D<z_type> &self = *this;
-			z_type          *q    = &self[sub.lower];
-			const z_type    *p    = &source[sub.lower];
-			
+			z_type          *p = & (*this)[sub.lower];
 			for( size_t i=sub.items;i>0;--i)
 			{
-				*(q++) = *(p++);
+				proc(*(p++),args);
 			}
-			
 		}
 		
+
 		template <>
-		void array1D<z_type>:: add( const array1D<z_type> &source, const layout1D &sub ) throw()
+		void array1D<z_type>:: foreach( const layout1D &sub, const_cb_type proc, void *args ) const
 		{
+			assert(proc);
 			assert(  this->has( sub.lower ) );
 			assert(  this->has( sub.upper ) );
-			assert( source.has( sub.lower ) );
-			assert( source.has( sub.upper ) );
-			
-			array1D<z_type> &self = *this;
-			z_type          *q    = &self[sub.lower];
-			const z_type    *p    = &source[sub.lower];
-			
+			const z_type *p = & (*this)[sub.lower];
 			for( size_t i=sub.items;i>0;--i)
 			{
-				*(q++) += *(p++);
+				proc(*(p++),args);
 			}
-			
 		}
 		
+		
 		template <>
-		void array1D<z_type>:: muladd( array1D<z_type>::param_type k, const array1D<z_type> &source, const layout1D &sub ) throw()
+		void array1D<z_type>:: foreach( const array1D<z_type> &other, const layout1D &sub, callback2_type proc, void *args )
 		{
+			assert(proc);
 			assert(  this->has( sub.lower ) );
 			assert(  this->has( sub.upper ) );
-			assert( source.has( sub.lower ) );
-			assert( source.has( sub.upper ) );
+			assert(  other.has( sub.lower ) );
+			assert(  other.has( sub.upper ) );
 			
-			array1D<z_type> &self = *this;
-			z_type          *q    = &self[sub.lower];
-			const z_type    *p    = &source[sub.lower];
-			
+			z_type          *p = & (*this)[sub.lower];
+			const z_type    *q = &   other[sub.lower];
 			for( size_t i=sub.items;i>0;--i)
 			{
-				*(q++) += *(p++) * k;
+				proc(*(p++),*(q++),args);
 			}
-			
 		}
+		
 		
 		
 		
