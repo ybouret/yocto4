@@ -41,34 +41,7 @@ namespace yocto
 			{
 			}
 			
-			
-			typedef functor<type,TL1(U)> function;
-			
-			inline void fill( size_t var, const layout1D &L, function &f )
-			{
-				assert( this->outline.has(L.lower) );
-				assert( this->outline.has(L.upper) );
-				assert( var >= this->cmin );
-				assert( var <= this->cmax );
-				array1D<T>      & F = (*this)[ var ];
-				for( unit_t x=L.lower; x <= L.upper; ++x )
-				{
-					F[ x ] = f( X[x] );
-				}
-			}
-		
-			inline void fill( const string &id, const layout1D &L, function &f )
-			{
-				const components &comp = *this;
-				fill( comp(id), L, f );
-			}
-			
-			inline void fill( const char *id, const layout1D &L, function &f )
-			{
-				const components &comp = *this;
-				fill( comp(id), L, f );
-			}
-			
+						
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp1D);
