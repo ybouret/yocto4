@@ -54,7 +54,7 @@ namespace
 			for( size_t rank=0; rank < size; ++rank )
 			{
 				const layout1D Lr = L.split(rank,size);
-				B.copy(A,Lr);
+				B.set(A,Lr);
 			}
 			const uint64_t B_key = H.key<uint64_t>( B.entry, B.bytes );
 			if( A_key != B_key )
@@ -63,7 +63,7 @@ namespace
 			for( size_t rank=0; rank < size; ++rank )
 			{
 				const layout1D Lr = L.split(rank,size);
-				A.copy(B,Lr);
+				A.set(B,Lr);
 			}
 			const uint64_t C_key = H.key<uint64_t>( A.entry, A.bytes );
 			if( A_key != C_key )
@@ -75,8 +75,8 @@ namespace
 		{
 			B.ldz();
 			const layout1D L1( INSIDE, INSIDE );
-			B.copy(A,L1);
-			A.copy(B,L1);
+			B.set(A,L1);
+			A.set(B,L1);
 			if( H.key<uint64_t>( A.entry, A.bytes ) != A_key )
 				throw exception("random access error");
 		}
@@ -122,7 +122,7 @@ namespace
 			for( size_t rank=0; rank < size; ++rank )
 			{
 				const layout2D Lr = L.split(rank,size);
-				B.copy(A,Lr);
+				B.set(A,Lr);
 			}
 			const uint64_t B_key = H.key<uint64_t>( B.entry, B.bytes );
 			if( A_key != B_key )
@@ -131,7 +131,7 @@ namespace
 			for( size_t rank=0; rank < size; ++rank )
 			{
 				const layout2D Lr = L.split(rank,size);
-				A.copy(B,Lr);
+				A.set(B,Lr);
 			}
 			const uint64_t C_key = H.key<uint64_t>( A.entry, A.bytes );
 			if( A_key != C_key )
@@ -143,8 +143,8 @@ namespace
 		{
 			B.ldz();
 			const layout2D L1( coord2D(INSIDE, INSIDE), coord2D(INSIDE,INSIDE) );
-			B.copy(A,L1);
-			A.copy(A,L1);
+			B.set(A,L1);
+			A.set(A,L1);
 			if( H.key<uint64_t>( A.entry, A.bytes ) != A_key )
 				throw exception("random access error");
 		}
@@ -197,7 +197,7 @@ namespace
 			for( size_t rank=0; rank < size; ++rank )
 			{
 				const layout3D Lr = L.split(rank,size);
-				B.copy(A,Lr);
+				B.set(A,Lr);
 			}
 			const uint64_t B_key = H.key<uint64_t>( B.entry, B.bytes );
 			if( A_key != B_key )
@@ -206,7 +206,7 @@ namespace
 			for( size_t rank=0; rank < size; ++rank )
 			{
 				const layout3D Lr = L.split(rank,size);
-				A.copy(B,Lr);
+				A.set(B,Lr);
 			}
 			const uint64_t C_key = H.key<uint64_t>( A.entry, A.bytes );
 			if( A_key != C_key )
@@ -218,8 +218,8 @@ namespace
 		{
 			B.ldz();
 			const layout3D L1( coord3D(INSIDE, INSIDE, INSIDE), coord3D(INSIDE,INSIDE,INSIDE) );
-			B.copy(A,L1);
-			A.copy(B,L1);
+			B.set(A,L1);
+			A.set(B,L1);
 			if( H.key<uint64_t>( A.entry, A.bytes ) != A_key )
 				throw exception("random access error");
 		}

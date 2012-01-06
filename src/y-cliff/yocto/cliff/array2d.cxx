@@ -117,7 +117,62 @@ namespace yocto
 			
 			
 		}
+	
 		
+		template <>
+		void array2D<z_type>:: foreach( const layout2D &sub, callback_type proc, void *args )
+		{
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+			{
+				array1D<z_type> &r = (*this)[y];
+				for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+				{
+					proc( r[x], args );
+				}
+			}
+		}
+		
+		
+		template <>
+		void array2D<z_type>:: foreach( const layout2D &sub, const_cb_type proc, void *args ) const
+		{
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+			{
+				const array1D<z_type> &r = (*this)[y];
+				for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+				{
+					proc( r[x], args );
+				}
+			}
+		}
+						
+		
+		template <>
+		void array2D<z_type>:: foreach( const array2D<z_type> &other, const layout2D &sub, callback2_type proc, void *args )
+		{
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert(  other.has( sub.lower ) );
+			assert(  other.has( sub.upper ) );
+			
+			for( unit_t y=sub.upper.y; y >= sub.lower.y; --y )
+			{
+				array1D<z_type>        &p = (*this)[y];
+				const array1D<z_type>  &q =   other[y];
+				for( unit_t x=sub.upper.x; x >= sub.lower.x; --x )
+				{
+					proc( p[x], q[x], args );
+				}
+			}
+		}
+		
+		
+		
+#if 0
 		template <>
 		void array2D<z_type>:: copy( const array2D<z_type> &source, const layout2D &sub) throw()
 		{
@@ -181,7 +236,7 @@ namespace yocto
 				}
 			}
 		}
-		
+#endif
 		
 		
 		template <>

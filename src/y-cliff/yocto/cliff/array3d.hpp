@@ -29,10 +29,15 @@ namespace yocto
 			slice_type       & operator[]( unit_t z ) throw();
 			const slice_type & operator[]( unit_t z ) const throw();
 			
-			void copy(   const array3D &source, const layout3D &sub ) throw();
-			void add(    const array3D &source, const layout3D &sub ) throw();
-			void muladd( param_type k, const array3D &source, const layout3D &sub ) throw();
-
+			typedef typename linear_type::callback_type  callback_type;
+			typedef typename linear_type::const_cb_type  const_cb_type;
+			typedef typename linear_type::callback2_type callback2_type;			
+			virtual void foreach( const layout3D &sub, callback_type  proc, void *args);
+			virtual void foreach( const layout3D &sub, const_cb_type  proc, void *args) const;
+			void         foreach( const array3D<T> &other, const layout3D &sub, callback2_type proc, void *args);
+			
+			YOCTO_CLIFF_ARRAY_OPS(array3D)
+			
 		private:
 			size_t      slices;
 			slice_type *slice;
