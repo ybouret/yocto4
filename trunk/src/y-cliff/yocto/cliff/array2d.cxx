@@ -81,7 +81,7 @@ namespace yocto
 			fp("#%s\n", &comment[0] );
 			
 			//-- size
-			fp("%u %u\n", unsigned(width.x), unsigned(width.y) );
+			fp("%u %u\n", unsigned(area.width.x), unsigned(area.width.y) );
 			
 			//-- #colors
 			fp("255\n");
@@ -161,7 +161,23 @@ namespace yocto
 			}
 		}
 		
-		
+		template <>
+		std::ostream & operator<<( std::ostream &os, const array2D<z_type> &a)
+		{
+			os << '[';
+			for( unit_t y=a.lower.y; y <= a.upper.y; ++y )
+			{
+				const array1D<z_type> &r = a[y];
+				for( unit_t x=a.lower.x; x <= a.upper.x; ++x )
+				{
+					os << ' ' << r[x];
+				}
+				if( y < a.upper.y )
+					os << ' ' << ';';
+			}
+			os << ' ' << ']';
+			return os;
+		}
 		
 		
 	}

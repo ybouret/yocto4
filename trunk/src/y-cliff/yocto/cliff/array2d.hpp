@@ -49,6 +49,9 @@ namespace yocto
 					 double               vmax   = 1
 					 ) const;
 			
+			template <typename U>
+			friend std::ostream & operator<<( std::ostream &os, const array2D<U> &a);
+			
 		private:
 			size_t    rows;
 			row_type *row;
