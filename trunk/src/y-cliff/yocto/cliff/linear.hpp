@@ -110,9 +110,9 @@ namespace yocto
 			virtual void foreach( const LAYOUT &sub, callback_type  proc, void *args) = 0;
 			virtual void foreach( const LAYOUT &sub, const_cb_type  proc, void *args) const  = 0;
 			
-			inline void set( const LAYOUT &sub, param_type v) throw() { foreach( sub, set_cb, &v); }
-			inline void add( const LAYOUT &sub, param_type v) throw() { foreach( sub, add_cb, &v); }
-			inline void mul( const LAYOUT &sub, param_type v) throw() { foreach( sub, mul_cb, &v); }									
+			inline void set( const LAYOUT &sub, param_type v) throw() { foreach( sub, set_cb, (void*)&v); }
+			inline void add( const LAYOUT &sub, param_type v) throw() { foreach( sub, add_cb, (void*)&v); }
+			inline void mul( const LAYOUT &sub, param_type v) throw() { foreach( sub, mul_cb, (void*)&v); }									
 			inline type sum( const LAYOUT &sub ) throw() { type ans(0); foreach( sub, sum_cb, &ans); return ans; }
 			
 			
