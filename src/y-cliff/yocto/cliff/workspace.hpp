@@ -15,11 +15,15 @@ namespace yocto
 	namespace cliff
 	{
 		
+		typedef vector<size_t> offsets_type;
+		
 		//! utilities for workspace setup
 		struct workspace_base
 		{
 			static void check_ghosts( const void *ghosts_value, size_t n, const char *ctx );
 			static void check_widths( const unit_t *w, size_t n );
+			static void check_indices( const array<size_t> &cid, const components &cdb );
+			static void check_offsets( offsets_type &offsets ) throw();
 		};
 		
 		//! template to procide memory to arrays
@@ -219,7 +223,32 @@ namespace yocto
 				return * block_[ comp(id) ];
 			}
 			
+			inline void check_indices( const array<size_t> &cid )	
+			{
+				workspace_base::check_indices( cid, *this );
+			}
 			
+			inline void query( array<T> &var, const array<size_t> &cid, size_t offset ) const throw()
+			{
+				assert( offset < this->outline.items );
+				assert( var.size() >= cid.size() );
+				for( size_t j = cid.size(); j > 0 ; --j )
+				{
+					var[j] = (*this)[ cid[j] ].entry[offset];
+				}
+			}
+			
+			inline void store( const array<T> &var, const array<size_t> &cid, size_t offset ) throw()
+			{
+				assert( offset < this->outline.items );
+				assert( var.size() >= cid.size() );
+				for( size_t j = cid.size(); j > 0 ; --j )
+				{
+					(*this)[ cid[j] ].entry[offset] = var[j];
+				}
+			}
+			
+						
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
@@ -239,7 +268,7 @@ namespace yocto
 				return layout_type(out_lo,out_up);
 			}
 			
-		
+			
 		};
 	}
 	

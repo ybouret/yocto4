@@ -41,6 +41,16 @@ namespace yocto
 			{
 			}
 			
+			
+			void load_offsets( offsets_type offsets, const layout1D &sub )
+			{
+				assert( this->outline.has(sub.lower) );
+				assert( this->outline.has(sub.upper) );
+				assert( sub.lower >= this->outline.lower );
+				size_t xoff = sub.lower - this->outline.lower;
+				for( size_t i=sub.width; i>0; --i ) offsets.push_back( xoff++ );
+				workspace_base::check_offsets( offsets );
+			}
 						
 			
 		private:
