@@ -73,7 +73,7 @@ namespace yocto
 		//======================================================================
 		// special interface
 		//======================================================================
-		bool search( param_type args ) const throw()
+		virtual bool search( param_type args ) const throw()
 		{
 			size_t indx;
 			if( core::locate<const_type,type_ptr,const catalog&>( &args, (type_ptr *)xarr_.table, size(), indx, *this ) )
@@ -86,7 +86,7 @@ namespace yocto
 			}
 		}
 		
-		bool insert( param_type args ) 
+		virtual bool insert( param_type args ) 
 		{
 			size_t indx;
 			if( core::locate<const_type,type_ptr,const catalog&>( &args, (type_ptr *)xarr_.table, size(), indx, *this ) )
@@ -110,7 +110,7 @@ namespace yocto
 			}
 		}
 		
-		bool remove( param_type args ) throw()
+		virtual bool remove( param_type args ) throw()
 		{
 			size_t indx;
 			if( core::locate<const_type,type_ptr,const catalog&>( &args, (type_ptr *)xarr_.table, size(), indx, *this ) )
