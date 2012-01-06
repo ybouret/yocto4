@@ -63,7 +63,7 @@ YOCTO_UNIT_TEST_IMPL(functor)
 	functor<unsigned,TL1(string)> Fh( &d, & dummy::h32 );
 	std::cerr << "F(Hello)=" << Fh( "Hello" ) << std::endl;
 	
-	functor<double,TL2(double,double)> Fq( cfunctor(func) );
+	functor<double,TL2(double,double)> Fq( cfunctor2(func) );
 	
 	for( int i=-1; i <= 1; ++i )
 	{

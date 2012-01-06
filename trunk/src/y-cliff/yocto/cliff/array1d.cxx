@@ -56,26 +56,7 @@ namespace yocto
 		
 		
 		template <>
-		void array1D<z_type>:: save( array1D<z_type> &target, const layout1D &sub ) const throw()
-		{
-			assert( this->has( sub.lower ) );
-			assert( this->has( sub.upper ) );
-			assert( target.has( sub.lower ) );
-			assert( target.has( sub.upper ) );
-			
-			const array1D<z_type> &self = *this;
-			z_type                *q    = &target[sub.lower];
-			const z_type          *p    = &self[sub.lower];
-			
-			for( size_t i=sub.items;i>0;--i)
-			{
-				*(q++) = *(p++);
-			}
-		}
-		
-		
-		template <>
-		void array1D<z_type>:: load( const array1D<z_type> &source, const layout1D &sub ) throw()
+		void array1D<z_type>:: copy( const array1D<z_type> &source, const layout1D &sub ) throw()
 		{
 			assert(  this->has( sub.lower ) );
 			assert(  this->has( sub.upper ) );
@@ -92,6 +73,45 @@ namespace yocto
 			}
 			
 		}
+		
+		template <>
+		void array1D<z_type>:: add( const array1D<z_type> &source, const layout1D &sub ) throw()
+		{
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( source.has( sub.lower ) );
+			assert( source.has( sub.upper ) );
+			
+			array1D<z_type> &self = *this;
+			z_type          *q    = &self[sub.lower];
+			const z_type    *p    = &source[sub.lower];
+			
+			for( size_t i=sub.items;i>0;--i)
+			{
+				*(q++) += *(p++);
+			}
+			
+		}
+		
+		template <>
+		void array1D<z_type>:: muladd( array1D<z_type>::param_type k, const array1D<z_type> &source, const layout1D &sub ) throw()
+		{
+			assert(  this->has( sub.lower ) );
+			assert(  this->has( sub.upper ) );
+			assert( source.has( sub.lower ) );
+			assert( source.has( sub.upper ) );
+			
+			array1D<z_type> &self = *this;
+			z_type          *q    = &self[sub.lower];
+			const z_type    *p    = &source[sub.lower];
+			
+			for( size_t i=sub.items;i>0;--i)
+			{
+				*(q++) += *(p++) * k;
+			}
+			
+		}
+		
 		
 		
 		template <>

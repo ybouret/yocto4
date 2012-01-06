@@ -5,6 +5,8 @@
 #include "yocto/cliff/wksp2d.hpp"
 #include "yocto/cliff/wksp3d.hpp"
 
+#include "yocto/cliff/laplacian.hpp"
+
 #include "yocto/math/complex.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -59,7 +61,7 @@ namespace {
 
 static inline double f2( double x, double y )
 {
-	return sin(x+fabs(y));
+	return sin(x+y);
 }
 
 static inline double vproc( const double &x )
@@ -70,6 +72,11 @@ static inline double vproc( const double &x )
 static inline complex<float> f1( double x )
 {
 	return sin(x);
+}
+
+static inline complex<double> f3( float x, float y, float z )
+{
+	return sin(x+y+z);
 }
 
 YOCTO_UNIT_TEST_IMPL(wksp)
@@ -85,33 +92,44 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		wksp1D< complex<float>, double>::function F( cfunctor(f1) );
 		w1.fill( 1, w1.outline, F );
 		std::cerr << "X=" << w1.X << std::endl;
-		ios::ocstream fp( "w1.dat", false );
-		for( unit_t x = w1.lower; x <= w1.upper; ++x )
 		{
-			fp("%g %g\n", w1.X[x], w1[1][x].re);
+			ios::ocstream fp( "w1.dat", false );
+			for( unit_t x = w1.lower; x <= w1.upper; ++x )
+			{
+				fp("%g %g\n", w1.X[x], w1[1][x].re);
+			}
 		}
 		layout1D in1 = w1.outline.inside();
 		std::cerr << "---- inside:" << std::endl;
 		display_l(in1);
+		laplacian<complex<float>, double>::compute( w1[2], 1, w1[1], w1.inv_dsq, in1);
+		{
+			ios::ocstream fp( "l1.dat", false );
+			for( unit_t x = in1.lower; x <= in1.upper; ++x )
+			{
+				fp("%g %g\n", w1.X[x], w1[2][x].re);
+			}
+		}
 	}
 	
 	{
 		const char  *varnames[] = { "u", "v", "w" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp2D< double, float > w2( coord2D(-10,-10), coord2D(20,20),
+		wksp2D< double, float > w2( coord2D(-100,-100), coord2D(200,200),
 								   coord2D(0,1), coord2D(0,2),
 								   v2d<float>(-2,-2), v2d<float>(4,4),
 								   1,varcount, varnames );
 		display_info( w2 );
 		std::cerr << "X=" << w2.X << std::endl;
 		std::cerr << "Y=" << w2.Y << std::endl;
-		wksp2D< double, float >::function F( cfunctor(f2) );
+		wksp2D< double, float >::function F( cfunctor2(f2) );
 		w2.fill( "u", w2.outline, F );
 		w2["u"].ppm("w2.ppm","u",w2,vproc,NULL,-1,1);
 		layout2D in2 = w2.outline.inside();
 		std::cerr << "---- inside:" << std::endl;
 		display_l(in2);
-		
+		laplacian<double,float>::compute( w2["v"], 1, w2["u"], w2.inv_dsq, in2 );
+		w2["v"].ppm("l2.ppm", "v",in2,vproc,NULL,-1,1);
 	}
 	
 	{
@@ -125,7 +143,10 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		std::cerr << "X=" << w3.X << std::endl;
 		std::cerr << "Y=" << w3.Y << std::endl;
 		std::cerr << "Z=" << w3.Z << std::endl;
-
+		wksp3D< complex<double>, float >::function F( cfunctor3(f3) );
+		layout3D in3 = w3.outline.inside();
+		
+		laplacian< complex<double>, float>::compute( w3["B"], 1, w3["A"],  w3.inv_dsq, in3 );
 	}
 	
 	
