@@ -134,6 +134,11 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		display_l(in2);
 		laplacian<double,float>::compute( w2["v"], 1, w2["u"], w2.inv_dsq, in2 );
 		w2["v"].ppm("l2.ppm", "v",in2,vproc,NULL,-1,1);
+		
+		w2["w"].linear_type::set( w2.outline, 0 );
+		w2["w"].set( w2["u"], in2 );
+		w2["w"].add( w2["v"], in2 );
+		
 	}
 	
 	{
@@ -153,6 +158,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		layout3D in3 = w3.outline.inside();
 		
 		laplacian< complex<double>, float>::compute( w3["B"], 1, w3["A"],  w3.inv_dsq, in3 );
+		w3["A"].muladd( 1, w3["B"], in3 );
 	}
 	
 	
