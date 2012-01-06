@@ -2,7 +2,7 @@
 #define YOCTO_CONTAINER_ORDERED_INCLUDED 1
 
 #include "yocto/container/container.hpp"
-
+#include "yocto/type-traits.hpp"
 
 namespace yocto
 {
@@ -11,9 +11,14 @@ namespace yocto
 	class ordered : public container
 	{
 	public:
+		YOCTO_ARGUMENTS_DECL_T;
+		
 		virtual ~ordered() throw() {}
 		
-		
+		virtual bool search( param_type args ) const throw() = 0;
+		virtual bool insert( param_type args )               = 0;
+		virtual bool remove( param_type args ) throw()       = 0;
+
 	protected:
 		explicit ordered() throw() {}
 		

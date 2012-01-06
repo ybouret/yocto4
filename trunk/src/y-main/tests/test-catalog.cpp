@@ -60,6 +60,6 @@ YOCTO_UNIT_TEST_IMPL(catalog)
 
 	test_catalog<int,memory::global::allocator>();
 	test_catalog<string,memory::global::allocator>();
-
+	
 }
 YOCTO_UNIT_TEST_DONE()
