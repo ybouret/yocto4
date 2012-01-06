@@ -44,9 +44,12 @@ namespace {
 		display_l(wksp.outline);
 		std::cerr << "---- components: " << std::endl;
 		display_c(wksp);
-		std::cerr << "min   = " << wksp.region.min << std::endl;
-		std::cerr << "max   = " << wksp.region.max << std::endl;
-		std::cerr << "delta = " << wksp.delta << std::endl;
+		std::cerr << "min     = " << wksp.region.min << std::endl;
+		std::cerr << "max     = " << wksp.region.max << std::endl;
+		std::cerr << "delta   = " << wksp.delta      << std::endl;
+		std::cerr << "inv_d   = " << wksp.inv_d      << std::endl;
+		std::cerr << "inv_dsq = " << wksp.inv_dsq    << std::endl;
+		
 		std::cerr << "sizeof(wksp::data_block)=" << sizeof( typename WKSP::data_block) << std::endl;
 		std::cerr << "sizeof(wksp::axis_type) =" << sizeof( typename WKSP::axis_type)  << std::endl;
 		std::cerr << std::endl;
@@ -87,6 +90,9 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		{
 			fp("%g %g\n", w1.X[x], w1[1][x].re);
 		}
+		layout1D in1 = w1.outline.inside();
+		std::cerr << "---- inside:" << std::endl;
+		display_l(in1);
 	}
 	
 	{
@@ -102,7 +108,9 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		wksp2D< double, float >::function F( cfunctor(f2) );
 		w2.fill( "u", w2.outline, F );
 		w2["u"].ppm("w2.ppm","u",w2,vproc,NULL,-1,1);
-		//std::cerr << w2["u"] << std::endl;
+		layout2D in2 = w2.outline.inside();
+		std::cerr << "---- inside:" << std::endl;
+		display_l(in2);
 		
 	}
 	

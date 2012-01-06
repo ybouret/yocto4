@@ -32,8 +32,8 @@ namespace yocto
 		protected:
 			explicit layout_base(const size_t ndim) throw();
 			//! order coordinates, compute width and return #items
-			size_t   setup( const void *lo, const void *hi, const void *w );
-			
+			size_t   setup( const void *lo, const void *up, const void *w );
+			void     inside( unit_t *lo, unit_t *up, const unit_t *w ) const;
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(layout_base);
 		};

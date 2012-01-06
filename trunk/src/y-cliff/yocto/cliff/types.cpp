@@ -52,7 +52,7 @@ namespace yocto
 			assert(rank<size);
 			unit_t W = Hi - Lo + 1;
 			if( unit_t(size) > W )
-				throw libc::exception( ERANGE, "layout_base::split(size=%u>#divisions=%u)", unsigned(size), unsigned(W));
+				throw libc::exception( EDOM, "layout_base::split(size=%u>#divisions=%u)", unsigned(size), unsigned(W));
 			unit_t todo = W/size; // first packet
 			lo = Lo;              // first offset
 			for( size_t i=1; i <= rank; ++i )
@@ -65,6 +65,18 @@ namespace yocto
 			
 		}
 		
+		
+		void layout_base:: inside( unit_t *lo, unit_t *up, const unit_t *w ) const
+		{
+			for( size_t i=0; i < dimensions; ++i )
+			{
+				assert( up[i] - lo[i] + 1 == w[i] );
+				if( w[i] < 3 )
+					throw libc::exception( EDOM, "layout_base::inside( too small in dimension #%u", unsigned(i) );
+				++lo[i];
+				--up[i];
+			}
+		}
 		
 	}
 	

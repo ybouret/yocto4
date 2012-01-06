@@ -84,6 +84,8 @@ namespace yocto
 			const layout_type outline; //!< original layout+ghosts
 			const region_type region;  //!< real space associated to layout (NOT outline)
 			const vertex_t    delta;   //!< step for each dimension
+			const vertex_t    inv_d;   //!< 1/delta
+			const vertex_t    inv_dsq; //!< 1/delta^2
 			
 			//! construct a workspace
 			explicit workspace(param_coord  lo, 
@@ -101,6 +103,8 @@ namespace yocto
 			outline( compute_outline( *this, ghosts_lo, ghosts_up) ),
 			region(vmin,vmax),
 			delta(),
+			inv_d(),
+			inv_dsq(),
 			blocks( this->size, as_capacity ),
 			block_(NULL),
 			vaxis( DIMENSIONS, as_capacity ),
@@ -108,16 +112,20 @@ namespace yocto
 			{
 				YOCTO_STATIC_CHECK(DIMENSIONS==region_type::DIMENSIONS,cliff_workspace);
 				//--------------------------------------------------------------
-				// post-compute
+				// post-compute delta
 				//--------------------------------------------------------------
 				{
-					U             *d = (U *           ) &delta;
-					const  unit_t *w = (const unit_t *) &(this->width);
-					const U       *L = (const U *     ) &(region.length);
+					U             *d   = (U *           ) &delta;
+					U             *id  = (U *           ) &inv_d;
+					U             *id2 = (U *           ) &inv_dsq;
+					const  unit_t *w   = (const unit_t *) &(this->width);
+					const U       *L   = (const U *     ) &(region.length);
 					workspace_base::check_widths(w,DIMENSIONS);
 					for( size_t i=0; i < DIMENSIONS; ++i )
 					{
-						d[i] = L[i] / ( w[i]-1);
+						const U del = (d[i]  = L[i] / ( w[i]-1));
+						id[i]  = U(1)/del;
+						id2[i] = U(1)/(del*del); 
 					}
 				}
 				
@@ -230,6 +238,8 @@ namespace yocto
 				const_coord out_up = L.upper + ghosts_up;
 				return layout_type(out_lo,out_up);
 			}
+			
+		
 		};
 	}
 	
