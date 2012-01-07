@@ -50,6 +50,7 @@ namespace yocto
 		item_(addr_-1),
 		comp_()
 		{
+			YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 			other.duplicate_into( *this );
 		}
 		
@@ -64,7 +65,7 @@ namespace yocto
 		virtual void        free() throw()            { _free(); }
 		virtual void        release() throw()         { _release(); }
 		
-		inline void swap_with( sorted_vector &other )
+		inline void swap_with( sorted_vector &other ) throw()
 		{
 			cswap( size_, other.size_ );
 			cswap( maxi_, other.maxi_ );
@@ -91,23 +92,64 @@ namespace yocto
 		
 		virtual bool insert( param_type args )               
 		{
-			
-			return true;
+			size_t indx=0;
+			if( core::locate<const_type,const_type,COMPARATOR&>( &args, addr_, size_, indx, comp_) )
+			{
+				return false;
+			}
+			else
+			{
+				uint64_t      stk[ YOCTO_U64_FOR_ITEM(T) ];
+				mutable_type *tmp = (mutable_type *)stk;
+				new (tmp) T(args);
+				if( size_ >= maxi_ )
+				{ 
+					try 
+					{
+						sorted_vector vec( this->next_capacity(maxi_), as_capacity );
+						this->duplicate_into(vec);
+						this->swap_with(vec);
+					}
+					catch(...){ destruct(tmp); } 
+				}
+				core::insert<mutable_type>( tmp, addr_, size_, indx );
+				++size_;
+				return true;
+			}
 		}
 		
 		virtual bool remove( param_type args ) throw() 
 		{
-			return true;
+			size_t indx=0;
+			if( core::locate<const_type,const_type,COMPARATOR&>( &args, addr_, size_, indx, comp_) )
+			{
+				mutable_type *target = &addr_[indx];
+				destruct(target);
+				memmove(target,target+1, (--size_-indx) * sizeof(T) );
+				return true;
+			}
+			else 
+			{
+				return false;
+			}
+			
+		}
+		
+		inline const_type & operator[]( size_t index ) const throw()
+		{
+			assert( index>0 );
+			assert( index <= size_ );
+			return item_[ index ];
 		}
 		
 	private:
 		YOCTO_DISABLE_ASSIGN(sorted_vector);
-		ALLOCATOR     hmem_; //!< handle memory
-		size_t        size_; //!< objects inside
-		size_t        maxi_; //!< capacity
-		mutable_type *addr_; //!< linear memory
-		mutable_type *item_; //!< addr_-1;
-		COMPARATOR    comp_; //!< the comparator
+		ALLOCATOR          hmem_; //!< handle memory
+		size_t             size_; //!< objects inside
+		size_t             maxi_; //!< capacity
+		mutable_type      *addr_; //!< linear memory
+		mutable_type      *item_; //!< addr_-1;
+		mutable COMPARATOR comp_; //!< the comparator
 		
 		inline void _free() throw()
 		{
