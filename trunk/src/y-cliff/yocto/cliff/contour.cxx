@@ -2,6 +2,8 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	namespace cliff
@@ -14,29 +16,30 @@ namespace yocto
 									   const array1D<real_t> &y,
 									   const layout2D        &sub,
 									   const array<real_t>   &z,
-									   callback_t            proc,
-									   void                 *args)
+									   callback               proc)
 		{
 			assert( d.has( sub.lower ) );
 			assert( d.has( sub.upper ) );
 			assert( sub.lower.x >= x.lower );
 			assert( sub.upper.x <= x.upper );
-			assert( sub.lower.x >= y.lower );
-			assert( sub.upper.x <= y.upper );
+			assert( sub.lower.y >= y.lower );
+			assert( sub.upper.y <= y.upper );
 			assert( z.size() > 0 );
-			assert( proc );
 			
 			const unit_t jub=sub.upper.y;
 			const unit_t jlb=sub.lower.y;
 			const unit_t iub=sub.upper.x;
 			const unit_t ilb=sub.lower.x;
 			const size_t nc =z.size();
+			
+			
 #if !defined(NDEBUG)
 			for( size_t iz=1; iz < nc; ++iz )
 			{
 				assert(z[iz]<z[iz+1]);
 			}
 #endif
+			
 #define xsect(p1,p2) (h[p2]*xh[p1]-h[p1]*xh[p2])/(h[p2]-h[p1])
 #define ysect(p1,p2) (h[p2]*yh[p1]-h[p1]*yh[p2])/(h[p2]-h[p1])
 			
@@ -55,25 +58,34 @@ namespace yocto
 			};
 			double temp1,temp2;
 			
-			for (j=(jub-1);j>=jlb;j--) {
-				for (i=ilb;i<=iub-1;i++) {
-					temp1 = min_of(d[i][j],d[i][j+1]);
-					temp2 = min_of(d[i+1][j],d[i+1][j+1]);
+			for (j=(jub-1);j>=jlb;j--) 
+			{
+				for (i=ilb;i<=iub-1;i++) 
+				{
+					temp1 = min_of(d[j][i],d[j+1][i]);
+					temp2 = min_of(d[j][i+1],d[j+1][i+1]);
 					dmin  = min_of(temp1,temp2);
-					temp1 = max_of(d[i][j],d[i][j+1]);
-					temp2 = max_of(d[i+1][j],d[i+1][j+1]);
+					temp1 = max_of(d[j][i],d[j+1][i]);
+					temp2 = max_of(d[j][i+1],d[j+1][i+1]);
 					dmax  = max_of(temp1,temp2);
+					
 					if (dmax < z[1] || dmin > z[nc])
 						continue;
-					for (k=1;k<=nc;k++) {
+					
+					for (k=1;k<=nc;k++) 
+					{
 						if (z[k] < dmin || z[k] > dmax)
 							continue;
-						for (m=4;m>=0;m--) {
-							if (m > 0) {
-								h[m]  = d[i+im[m-1]][j+jm[m-1]]-z[k];
+						for (m=4;m>=0;m--)
+						{
+							if (m > 0) 
+							{
+								h[m]  = d[j+jm[m-1]][i+im[m-1]]-z[k];
 								xh[m] = x[i+im[m-1]];
 								yh[m] = y[j+jm[m-1]];
-							} else {
+							} 
+							else
+							{
 								h[0]  = 0.25 * (h[1]+h[2]+h[3]+h[4]);
 								xh[0] = 0.50 * (x[i]+x[i+1]);
 								yh[0] = 0.50 * (y[j]+y[j+1]);
@@ -110,7 +122,8 @@ namespace yocto
 						 vertex 1 +-------------------+ vertex 2
 						 */
 						/* Scan each triangle in the box */
-						for (m=1;m<=4;m++) {
+						for (m=1;m<=4;m++) 
+						{
 							m1 = m;
 							m2 = 0;
 							if (m != 4)
@@ -181,7 +194,7 @@ namespace yocto
 							/* Finally draw the line */
 							const vertex_t v1(x1,y1);
 							const vertex_t v2(x2,y2);
-							proc(v1,v2,z[k],args);
+							proc(v1,v2,z[k]);
 							//ConrecLine(x1,y1,x2,y2,z[k]);
 							
 						} /* m */
