@@ -45,7 +45,7 @@ namespace yocto
 		sorted_vector( const sorted_vector &other ) :
 		hmem_(),
 		size_(0),
-		maxi_(other.size),
+		maxi_(other.size_),
 		addr_(static_cast<memory::allocator&>(hmem_).acquire_as<T>(maxi_)),
 		item_(addr_-1),
 		comp_()
