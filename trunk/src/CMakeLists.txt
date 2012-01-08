@@ -102,7 +102,13 @@ ELSE()
 ENDIF()
 
 SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
+
+## default generator
 SET(CPACK_GENERATOR "ZIP")
+
+IF( ON_MACOSX )
+	SET(CPACK_GENERATOR "DragNDrop" )
+ENDIF()
 
 INCLUDE(CPack)
 
