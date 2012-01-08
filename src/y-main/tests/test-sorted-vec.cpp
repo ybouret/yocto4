@@ -30,6 +30,8 @@ YOCTO_UNIT_TEST_IMPL(sorted_vec)
 		{
 			std::cerr << sv[i] << std::endl;
 		}
+		sorted_vector<size_t> sv2( sv );
+		sv2.free();
 	}
 	
 	{
@@ -51,7 +53,8 @@ YOCTO_UNIT_TEST_IMPL(sorted_vec)
 		{
 			std::cerr << sv[i] << std::endl;
 		}
-		
+		sorted_vector<string> sv2( sv );
+		sv2.free();
 	}
 }
 YOCTO_UNIT_TEST_DONE()

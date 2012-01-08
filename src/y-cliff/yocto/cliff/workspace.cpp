@@ -41,22 +41,7 @@ namespace yocto
 			}
 		}
 		
-		void workspace_base:: check_offsets( offsets_type &offsets ) throw()
-		{
-			if( offsets.size() > 1 )
-			{
-				hsort( offsets );
-				for( size_t i = 1; i < offsets.size(); ++i )
-				{
-					const size_t u = offsets[i];
-					size_t       j = i+1;
-					while( j <= offsets.size() && u == offsets[j] ) ++j;
-					
-				}
-				
-			}
-		}
-
+		
 		
 	}
 	

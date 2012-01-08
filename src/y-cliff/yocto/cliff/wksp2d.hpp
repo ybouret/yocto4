@@ -44,24 +44,22 @@ namespace yocto
 			{
 			}
 			
-			void scan( const layout2D &sub, const array<size_t> &comp )
+			virtual void load_offsets( offsets_type offsets, const layout2D &sub )
 			{
-				assert( comp.size() > 0 );
-				assert( this->has(sub.lower) );
-				assert( this->has(sub.upper) );
-				const size_t n = comp.size();
-				vector<T>    a(n,T(0));
-				for( size_t y=sub.lower.y; y <= sub.upper.y; ++y )
+				assert( this->outline.has(sub.lower) );
+				assert( this->outline.has(sub.upper) );
+				const unit_t xoff0 = sub.lower.x - this->outline.lower.x;
+				size_t       yoff  = sub.lower.y - this->outline.lower.y;
+				const size_t dy    = this->outline.width.x;
+				for( size_t j =  sub.width.y; j>0; --j, yoff += dy )
 				{
-					for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+					size_t ans = yoff + xoff0;
+					for( size_t i = sub.width.x; i>0;--i, ++ans )
 					{
-						for( size_t j=1; j <= n; ++j )
-						{
-							a[j] = (*this)[ comp[j] ][y][x];
-						}
+						assert( ans < this->outline.items );
+						(void) offsets.insert( ans );
 					}
 				}
-				
 			}
 			
 		private:

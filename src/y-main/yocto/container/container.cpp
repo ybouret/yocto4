@@ -35,4 +35,8 @@ namespace yocto
 	}
 	
 	
+	void container:: ensure( size_t n )
+	{
+		if( capacity() < n ) reserve(n-capacity());
+	}
 }

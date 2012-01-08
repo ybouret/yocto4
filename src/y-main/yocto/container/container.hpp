@@ -25,7 +25,8 @@ namespace yocto
 		static size_t next_capacity( size_t n );
 		static size_t next_increase( size_t n );
 		size_t available() const throw();
-		
+		void   ensure( size_t n );
+					  
 	protected:
 		explicit container() throw();
 		
