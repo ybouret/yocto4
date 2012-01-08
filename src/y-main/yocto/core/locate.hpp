@@ -77,8 +77,8 @@ namespace yocto
 		{
 			assert(indx<=size);
 			T *dst = base + indx;
-			memmove( dst+1,  dst, (size-indx) * sizeof(T) );
-			memcpy(  dst, target,               sizeof(T) ); 
+			memmove( (void*)(dst+1),  (void*)dst, (size-indx) * sizeof(T) );
+			memcpy(  (void*)dst,   (void*)target,               sizeof(T) ); 
 		}
 		
 	}

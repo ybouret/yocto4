@@ -5,7 +5,7 @@
 #include "yocto/comparator.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/core/locate.hpp"
-
+#include "yocto/code/swap.hpp"
 #include "yocto/bitwise.hpp"
 #include "yocto/code/static-check.hpp"
 
@@ -125,7 +125,7 @@ namespace yocto
 			{
 				mutable_type *target = &addr_[indx];
 				destruct(target);
-				memmove(target,target+1, (--size_-indx) * sizeof(T) );
+				memmove((void*)target,(void*)(target+1), (--size_-indx) * sizeof(T) );
 				return true;
 			}
 			else 
