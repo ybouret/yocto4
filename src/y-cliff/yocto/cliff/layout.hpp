@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_CLIFF_LAYOUT_INCLUDED
 #define YOCTO_CLIFF_LAYOUT_INCLUDED 1
 
@@ -9,7 +11,8 @@ namespace yocto
 	
 	namespace cliff
 	{
-		
+
+		//! layout of coordinates
 		template <typename COORD>
 		class layout : public layout_base
 		{
@@ -19,6 +22,7 @@ namespace yocto
 			typedef const     mutable_coord                      const_coord;
 			typedef typename type_traits<COORD>::parameter_type  param_coord;
 			
+			//! #COORD = 1|2|3
 			static const size_t DIMENSIONS = sizeof(COORD)/sizeof(unit_t);
 			
 			const_coord   lower; //!< lower coordinate
@@ -48,9 +52,10 @@ namespace yocto
 			{
 			}
 			
+			//! destruct layout
 			inline virtual ~layout() throw() {}
 			
-			
+			//! test if a coordinate is inside the layout
 			inline bool has( param_coord u ) const throw()
 			{
 				const unit_t *l = (const unit_t *) &lower;
@@ -64,6 +69,8 @@ namespace yocto
 				return true;
 			}
 			
+			
+			//! MPI style splitting along the last dimesion
 			inline layout split( size_t rank, size_t size ) const
 			{
 				const size_t i  = DIMENSIONS-1; //!< on the last dimension
