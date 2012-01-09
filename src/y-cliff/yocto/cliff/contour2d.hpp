@@ -1,7 +1,7 @@
 //! \file
 
-#ifndef YOCTO_CLIFF_CONTOUR_INCLUDED
-#define YOCTO_CLIFF_CONTOUR_INCLUDED 1
+#ifndef YOCTO_CLIFF_CONTOUR2D_INCLUDED
+#define YOCTO_CLIFF_CONTOUR2D_INCLUDED 1
 
 #include "yocto/cliff/array2d.hpp"
 #include "yocto/cliff/level-set.hpp"
@@ -13,7 +13,7 @@ namespace yocto
 	{
 		//! contouring algorithm
 		template <typename T>
-		struct contour
+		struct contour2D
 		{
 			typedef typename level_set<T>::level level_type;
 			typedef typename vertex2D<T>::type   vertex_t;
