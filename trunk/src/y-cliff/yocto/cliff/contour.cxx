@@ -11,12 +11,12 @@ namespace yocto
 		using math::real_t;
 		
 		template <>
-		void contour<real_t>:: compute(const array2D<real_t> &d,
-									   const array1D<real_t> &x, 
-									   const array1D<real_t> &y,
-									   const layout2D        &sub,
-									   const array<real_t>   &z,
-									   callback               proc)
+		void contour<real_t>:: compute(const array2D<real_t>     &d,
+									   const array1D<real_t>     &x, 
+									   const array1D<real_t>     &y,
+									   const layout2D            &sub,
+									   const level_set<real_t>   &levels,
+									   callback                   proc)
 		{
 			assert( d.has( sub.lower ) );
 			assert( d.has( sub.upper ) );
@@ -24,19 +24,19 @@ namespace yocto
 			assert( sub.upper.x <= x.upper );
 			assert( sub.lower.y >= y.lower );
 			assert( sub.upper.y <= y.upper );
-			assert( z.size() > 0 );
+			assert( levels.size() > 0 );
 			
 			const unit_t jub=sub.upper.y;
 			const unit_t jlb=sub.lower.y;
 			const unit_t iub=sub.upper.x;
 			const unit_t ilb=sub.lower.x;
-			const size_t nc =z.size();
+			const size_t nc =levels.size();
 			
 			
 #if !defined(NDEBUG)
 			for( size_t iz=1; iz < nc; ++iz )
 			{
-				assert(z[iz]<z[iz+1]);
+				assert(levels[iz].value<levels[iz+1].value);
 			}
 #endif
 			
@@ -69,18 +69,18 @@ namespace yocto
 					temp2 = max_of(d[j][i+1],d[j+1][i+1]);
 					dmax  = max_of(temp1,temp2);
 					
-					if (dmax < z[1] || dmin > z[nc])
+					if (dmax < levels[1].value || dmin > levels[nc].value )
 						continue;
 					
 					for (k=1;k<=nc;k++) 
 					{
-						if (z[k] < dmin || z[k] > dmax)
+						if ( levels[k].value < dmin || levels[k].value > dmax)
 							continue;
 						for (m=4;m>=0;m--)
 						{
 							if (m > 0) 
 							{
-								h[m]  = d[j+jm[m-1]][i+im[m-1]]-z[k];
+								h[m]  = d[j+jm[m-1]][i+im[m-1]]-levels[k].value;
 								xh[m] = x[i+im[m-1]];
 								yh[m] = y[j+jm[m-1]];
 							} 
@@ -194,7 +194,7 @@ namespace yocto
 							/* Finally draw the line */
 							const vertex_t v1(x1,y1);
 							const vertex_t v2(x2,y2);
-							proc(v1,v2,z[k]);
+							proc(v1,v2,levels[k]);
 							//ConrecLine(x1,y1,x2,y2,z[k]);
 							
 						} /* m */
