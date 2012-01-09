@@ -10,13 +10,15 @@ namespace yocto
 	
 	namespace cliff
 	{
+		
+		//! linear space  on a layout
 		template <typename T, typename LAYOUT>
 		class linear : public LAYOUT
 		{
 		public:
 			YOCTO_ARGUMENTS_DECL_T;
 			
-			const size_t bytes;
+			const size_t bytes; //!< linear bytes
 			T           *entry; //!< must be linked to an array of LAYOUT::items
 			
 			
@@ -125,6 +127,7 @@ namespace yocto
 			static inline void set2_cb( type &v, const_type &u, void *) throw() { v = u; }
 			static inline void add2_cb( type &v, const_type &u, void *) throw() { v += u; }
 			static inline void muladd_cb( type &v,const_type &u, void *args) throw() { v += (*(const_type *)args) * u; }
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(linear);
 		};
