@@ -11,12 +11,14 @@ namespace yocto
 	{
 
 				
+		//! database of ordered levels
 		template <typename T>
 		class level_set 
 		{
 		public:
-			typedef int KEY;
+			typedef int KEY; //!< key type to identify level
 			YOCTO_ASSOCIATIVE_KEY_T;
+			
 			class level
 			{
 			public:
@@ -24,10 +26,11 @@ namespace yocto
 				~level() throw();
 				level( const level &other );		
 				
-				const_key   key;
-				const_type  value;
-				mutable int flags;
+				const_key   key;    //!< unique identifier
+				const_type  value;  //!< unique value
+				mutable int flags;  //!< for pre/post processing status
 				
+				//! wrapper for comparator
 				friend inline bool operator<( const level &lhs, const level &rhs ) throw()
 				{
 					return  lhs.value < rhs.value;

@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_CLIFF_COMPONENTS_INCLUDED
 #define YOCTO_CLIFF_COMPONENTS_INCLUDED 1
 
@@ -12,6 +14,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! database for components indices/name
 		class components
 		{
 		public:

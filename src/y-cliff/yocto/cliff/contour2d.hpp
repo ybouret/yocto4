@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_CLIFF_CONTOUR_INCLUDED
 #define YOCTO_CLIFF_CONTOUR_INCLUDED 1
 
@@ -9,6 +11,7 @@ namespace yocto
 	
 	namespace cliff
 	{
+		//! contouring algorithm
 		template <typename T>
 		struct contour
 		{
