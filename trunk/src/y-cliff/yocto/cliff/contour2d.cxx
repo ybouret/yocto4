@@ -44,39 +44,37 @@ namespace yocto
 #define ysect(p1,p2) (h[p2]*yh[p1]-h[p1]*yh[p2])/(h[p2]-h[p1])
 			
 			int m1,m2,m3,case_value;
-			double dmin,dmax,x1=0,x2=0,y1=0,y2=0;
-			int i,j,m;
-			size_t k;
-			double h[5];
-			int sh[5];
-			double xh[5],yh[5];
-			int im[4] = {0,1,1,0},jm[4]={0,0,1,1};
-			int castab[3][3][3] = {
+			real_t x1=0,x2=0,y1=0,y2=0;
+			real_t h[5];
+			int    sh[5];
+			real_t xh[5],yh[5];
+			static const int im[4] = {0,1,1,0},jm[4]={0,0,1,1};
+			static const int castab[3][3][3] = {
 				{ {0,0,8},{0,2,5},{7,6,9} },
 				{ {0,3,4},{1,3,1},{4,3,0} },
 				{ {9,6,7},{5,2,0},{8,0,0} }
 			};
-			double temp1,temp2;
 			
-			for (j=(jub-1);j>=jlb;j--) 
+			
+			for (int j=(jub-1);j>=jlb;j--) 
 			{
-				for (i=ilb;i<=iub-1;i++) 
+				for (int i=ilb;i<=iub-1;i++) 
 				{
-					temp1 = min_of(d[j][i],d[j+1][i]);
-					temp2 = min_of(d[j][i+1],d[j+1][i+1]);
-					dmin  = min_of(temp1,temp2);
-					temp1 = max_of(d[j][i],d[j+1][i]);
-					temp2 = max_of(d[j][i+1],d[j+1][i+1]);
-					dmax  = max_of(temp1,temp2);
+					//real_t temp1 = min_of(d[j][i],d[j+1][i]);
+					//real_t temp2 = min_of(d[j][i+1],d[j+1][i+1]);
+					const real_t dmin  = min_of(min_of(d[j][i],d[j+1][i]),min_of(d[j][i+1],d[j+1][i+1]));
+					//temp1 = max_of(d[j][i],d[j+1][i]);
+					//temp2 = max_of(d[j][i+1],d[j+1][i+1]);
+					const real_t dmax  = max_of(max_of(d[j][i],d[j+1][i]),max_of(d[j][i+1],d[j+1][i+1]));
 					
 					if (dmax < levels[1].value || dmin > levels[nc].value )
 						continue;
 					
-					for (k=1;k<=nc;k++) 
+					for (size_t k=1;k<=nc;k++) 
 					{
 						if ( levels[k].value < dmin || levels[k].value > dmax)
 							continue;
-						for (m=4;m>=0;m--)
+						for (int m=4;m>=0;m--)
 						{
 							if (m > 0) 
 							{
@@ -86,9 +84,9 @@ namespace yocto
 							} 
 							else
 							{
-								h[0]  = 0.25 * (h[1]+h[2]+h[3]+h[4]);
-								xh[0] = 0.50 * (x[i]+x[i+1]);
-								yh[0] = 0.50 * (y[j]+y[j+1]);
+								h[0]  = real_t(0.25) * (h[1]+h[2]+h[3]+h[4]);
+								xh[0] = real_t(0.50) * (x[i]+x[i+1]);
+								yh[0] = real_t(0.50) * (y[j]+y[j+1]);
 							}
 							if (h[m] > 0.0)
 								sh[m] = 1;
@@ -122,7 +120,7 @@ namespace yocto
 						 vertex 1 +-------------------+ vertex 2
 						 */
 						/* Scan each triangle in the box */
-						for (m=1;m<=4;m++) 
+						for (int m=1;m<=4;m++) 
 						{
 							m1 = m;
 							m2 = 0;
@@ -191,11 +189,10 @@ namespace yocto
 									break;
 							}
 							
-							/* Finally draw the line */
+							/* Finally process the line */
 							const vertex_t v1(x1,y1);
 							const vertex_t v2(x2,y2);
 							proc(v1,v2,levels[k]);
-							//ConrecLine(x1,y1,x2,y2,z[k]);
 							
 						} /* m */
 					} /* k - contour */

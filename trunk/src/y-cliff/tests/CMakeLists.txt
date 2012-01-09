@@ -11,5 +11,7 @@ ADD_TEST(Split     test-cliff split  )
 ADD_TEST(PPM       test-cliff ppm    )
 ADD_TEST(Region    test-cliff region )
 ADD_TEST(Workspace test-cliff wksp   )
+ADD_TEST(Contour   test-cliff contour)
+
 
 ADD_CUSTOM_TARGET(check-cliff COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-cliff)
