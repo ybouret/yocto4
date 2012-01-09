@@ -7,7 +7,6 @@
 #include "yocto/core/locate.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/bitwise.hpp"
-#include "yocto/code/static-check.hpp"
 
 namespace yocto
 {
@@ -17,6 +16,7 @@ namespace yocto
 		extern const char sorted_vector_name[];
 	}
 	
+	//! a sorted vector of bitwise ops supporting object
 	template <
 	typename T,
 	typename COMPARATOR = comparator<T>,
@@ -30,7 +30,7 @@ namespace yocto
 		explicit sorted_vector() throw() :
 		hmem_(), size_(0), maxi_(0), addr_(NULL), item_(addr_-1), comp_()
 		{
-			YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
+			//YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 		}
 		
 		explicit sorted_vector( size_t n, const as_capacity_t & ) :
@@ -39,7 +39,7 @@ namespace yocto
 		item_(addr_-1),
 		comp_()
 		{
-			YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
+			//YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 		}
 		
 		sorted_vector( const sorted_vector &other ) :
@@ -50,7 +50,7 @@ namespace yocto
 		item_(addr_-1),
 		comp_()
 		{
-			YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
+			//YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 			other.duplicate_into( *this );
 		}
 		
