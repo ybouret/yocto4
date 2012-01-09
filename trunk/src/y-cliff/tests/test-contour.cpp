@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/cliff/contour.hpp"
+#include "yocto/cliff/contour2d.hpp"
 #include "yocto/cliff/fill.hpp"
 #include "yocto/cliff/wksp2d.hpp"
 #include "yocto/code/hsort.hpp"
@@ -86,8 +86,8 @@ YOCTO_UNIT_TEST_IMPL(contour)
 		
 	
 	isoline lines;
-	contour<double>::callback countour_process( &lines, & isoline::process );
-	contour<double>::compute( d, w.X, w.Y, d, levels, countour_process );
+	contour2D<double>::callback countour_process( &lines, & isoline::process );
+	contour2D<double>::compute( d, w.X, w.Y, d, levels, countour_process );
 	
 	
 	

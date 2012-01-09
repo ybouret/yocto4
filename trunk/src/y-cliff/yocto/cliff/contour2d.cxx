@@ -1,4 +1,4 @@
-#include "yocto/cliff/contour.hpp"
+#include "yocto/cliff/contour2d.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
 
@@ -11,7 +11,7 @@ namespace yocto
 		using math::real_t;
 		
 		template <>
-		void contour<real_t>:: compute(const array2D<real_t>     &d,
+		void contour2D<real_t>:: compute(const array2D<real_t>     &d,
 									   const array1D<real_t>     &x, 
 									   const array1D<real_t>     &y,
 									   const layout2D            &sub,
