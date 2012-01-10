@@ -42,7 +42,7 @@ namespace yocto
 			
 			static inline void with( function3 &f, array3D<T> &a, const layout3D &sub, const array1D<U> &X, const array1D<U> &Y, const array1D<U> &Z )
 			{
-				for( unit_t z=sub.lower.z; z <= sub.lower.z; ++z )
+				for( unit_t z=sub.lower.z; z <= sub.upper.z; ++z )
 				{
 					const U      _Z = Z[z];
 					array2D<T> &a_z = a[z];
