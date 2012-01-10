@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_THREADING_BARRIER_INCLUDED
 #define YOCTO_THREDAING_BARRIER_INCLUDED 1
 
@@ -9,12 +11,20 @@ namespace yocto
 	namespace threading
 	{
 		
+		//! synchronization by barrier
 		class barrier 
 		{
 		public:
+			
+			//! default constructor
+			/**
+				\param threshold_value release the barrier when that many threads are waiting
+				\param id identifier for the internal mutex
+			 */
 			explicit barrier( size_t threshold_value, const char *id ) throw();
 			virtual ~barrier() throw();
 			
+			//! return the mutex name
 			const char *name() const throw();
 			
 			//! true if the last one to wait => everybody runs!

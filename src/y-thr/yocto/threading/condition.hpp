@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_THREADING_CONDITION_INCLUDED
 #define YOCTO_THREADING_CONDITION_INCLUDED 1
 
@@ -24,15 +26,20 @@ namespace yocto
 #endif
 	namespace threading
 	{
+		
+		//! portable condition variable
 		class condition 
 		{
 		public:
 			explicit condition() throw();
 			virtual ~condition() throw();
+			
+			//! wait on a locked mutex, returns on  the lockaed mutex
 			void     wait( mutex & ) throw();
 			void     signal()    throw();
 			void     broadcast() throw();
 		private:
+			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(condition);
 #if defined(YOCTO_BSD)
 			pthread_cond_t cond;
