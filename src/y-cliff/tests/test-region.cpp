@@ -16,7 +16,7 @@ namespace
 		assert(p);
 		U *q = (U*)p;
 		for( size_t i=0; i < n; ++i )
-			q[i] = 10 * (0.5-alea<U>());
+			q[i] = U(10) * (U(0.5)-alea<U>());
 	}
 	
 	template <typename U,template <class> class REGION>

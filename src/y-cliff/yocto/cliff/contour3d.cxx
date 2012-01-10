@@ -70,6 +70,7 @@ namespace yocto
 		 0 will be returned if the grid cell is either totally above
 		 of totally below the isolevel.
 		 */
+		static inline
 		int Polygonise(const GRIDCELL &grid,real_t isolevel,TRIANGLE *triangles)
 		{
 			int i,ntriang;
