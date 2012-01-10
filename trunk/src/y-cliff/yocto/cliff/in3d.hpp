@@ -29,6 +29,8 @@ namespace yocto
 				return *this;
 			}
 			
+			inline ~triangle3D() throw() {}
+			
 			inline vertex_t       & operator[](size_t i) throw()       { assert(i<3); return *(&p0 + i); }
 			inline const vertex_t & operator[](size_t i) const throw() { assert(i<3); return *(&p0 + i); }
 		};
