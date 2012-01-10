@@ -30,9 +30,9 @@ namespace yocto
 				const_type  value;  //!< unique value
 				
 				//! wrapper for comparator
-				friend inline bool operator<( const level &lhs, const level &rhs ) throw()
+				friend inline bool operator<( const level &lhs_level, const level &rhs_level ) throw()
 				{
-					return  lhs.value < rhs.value;
+					return  lhs_level.value < rhs_level.value;
 				}
 				
 			private:
