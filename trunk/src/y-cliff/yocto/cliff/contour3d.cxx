@@ -11,12 +11,23 @@ namespace yocto
 		using math::real_t;
 		
 		typedef vertex3D<real_t>::type XYZ;
-		typedef facet<real_t>          TRIANGLE;             
+		typedef triangle3D<real_t>     TRIANGLE;             
 		
-		typedef struct {
+		class GRIDCELL {
+		public:
 			XYZ    p[8];
 			real_t val[8];
-		} GRIDCELL;
+			
+			inline GRIDCELL() throw() : p(), val() 
+			{
+				
+			}
+			
+			inline ~GRIDCELL() throw() {}
+			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(GRIDCELL);
+		};
 		
 		/*
 		 Linearly interpolate the position where an isosurface cuts
@@ -25,15 +36,29 @@ namespace yocto
 		static inline 
 		XYZ VertexInterp(real_t isolevel, const XYZ &p1, const XYZ &p2, real_t valp1, real_t valp2)
 		{
-			
+			//std::cerr << "interp " << isolevel << " : " << valp1 << "@" << p1 << " -> " << valp2 << "@" << p2 << std::endl;
 			if (math::Fabs(isolevel-valp1) < 0.00001)
+			{
+				//std::cerr << " =>" << p1 << std::endl; 
 				return(p1);
+			}
+			
 			if (math::Fabs(isolevel-valp2) < 0.00001)
+			{
+				//std::cerr << " =>" << p2 << std::endl; 
 				return(p2);
+			}
+			
 			if (math::Fabs(valp1-valp2) < 0.00001)
+			{
+				//std::cerr << " =>" << p1 << std::endl; 
 				return(p1);
+			}
+			
 			const real_t mu = (isolevel - valp1) / (valp2 - valp1);
-			return XYZ( p1.x + mu * (p2.x - p1.x), p1.y + mu * (p2.y - p1.y),  p1.z + mu * (p2.z - p1.z) );
+			const XYZ ans( p1.x + mu * (p2.x - p1.x), p1.y + mu * (p2.y - p1.y),  p1.z + mu * (p2.z - p1.z) );
+			//std::cerr << " =>" << ans << std::endl; 
+			return ans;
 		}
 		
 		
@@ -400,16 +425,27 @@ namespace yocto
 			
 			/* Create the triangle */
 			ntriang = 0;
-			for (i=0;triTable[cubeindex][i]!=-1;i+=3) {
+			for (i=0;triTable[cubeindex][i]!=-1;i+=3) 
+			{
+				assert( triTable[cubeindex][i  ] >= 0 );
+				assert( triTable[cubeindex][i  ] < 12 );
+				assert( triTable[cubeindex][i+1] >= 0 );
+				assert( triTable[cubeindex][i+1] < 12 );
+				assert( triTable[cubeindex][i+2] >= 0 );
+				assert( triTable[cubeindex][i+2] < 12 );
+
+				
 				triangles[ntriang].p0 = vertlist[triTable[cubeindex][i  ]];
 				triangles[ntriang].p1 = vertlist[triTable[cubeindex][i+1]];
 				triangles[ntriang].p2 = vertlist[triTable[cubeindex][i+2]];
+				//std::cout << "p0= " << triangles[ntriang].p0 << " ; p1= " << triangles[ntriang].p1 << " ; p2=" << triangles[ntriang].p2 << std::endl;
 				ntriang++;
 				assert( ntriang <= 5 );
 			}
 			
 			return(ntriang);
 		}
+		
 		
 		template <>
 		void contour3D<real_t>:: compute(const array3D<real_t>   &d, 
@@ -443,26 +479,36 @@ namespace yocto
 				const unit_t k1 = k+1;
 				grid.p[0].z = grid.p[1].z = grid.p[2].z = grid.p[3].z = z[k];
 				grid.p[4].z = grid.p[5].z = grid.p[6].z = grid.p[7].z = z[k1];
+				const array2D<real_t> &slice0 = d[k];
+				const array2D<real_t> &slice1 = d[k1];
 				
 				for( unit_t j=sub.lower.y; j<sub.upper.y; ++j)
 				{
 					const unit_t j1 = j+1;
 					grid.p[0].y = grid.p[3].y = grid.p[4].y = grid.p[7].y = y[j];
 					grid.p[1].y = grid.p[2].y = grid.p[5].y = grid.p[6].y = y[j1];
+					
+					const array1D<real_t> &row00 = slice0[j ];
+					const array1D<real_t> &row01 = slice0[j1];
+					
+					const array1D<real_t> &row10 = slice1[j ];
+					const array1D<real_t> &row11 = slice1[j1];
+					
 					for( unit_t i=sub.lower.x; i <sub.upper.x; ++i )
 					{
 						const unit_t i1 = i+1;
 						grid.p[0].x = grid.p[1].x = grid.p[4].x = grid.p[5].x = x[i];
 						grid.p[2].x = grid.p[3].x = grid.p[6].x = grid.p[7].x = x[i1];
 						
-						grid.val[0] = d[k ][j ][i ];
-						grid.val[1] = d[k ][j1][i ];
-						grid.val[2] = d[k ][j1][i1];
-						grid.val[3] = d[k ][j ][i1];
-						grid.val[4] = d[k1][j ][i ];
-						grid.val[5] = d[k1][j1][i ];
-						grid.val[6] = d[k1][j1][i1];
-						grid.val[7] = d[k1][j ][i1];
+						grid.val[0] = row00[i ];
+						grid.val[1] = row01[i ];
+						grid.val[2] = row01[i1];
+						grid.val[3] = row00[i1];
+						
+						grid.val[4] = row10[i ];
+						grid.val[5] = row11[i ];
+						grid.val[6] = row11[i1];
+						grid.val[7] = row10[i1];
 						
 						for( size_t l=nl;l>0;--l)
 						{
@@ -470,6 +516,7 @@ namespace yocto
 							const int    nt = Polygonise(grid, L.value, triangles);
 							for( int  it=0; it<nt; ++it )
 							{
+								std::cout << "send: " << triangles[it].p0 << "  " << triangles[it].p1 << " " << triangles[it].p2 << std::endl;
 								proc( triangles[i], L );
 							}
 						}

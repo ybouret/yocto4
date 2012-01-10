@@ -1,2 +1,2 @@
-#define YOCTO_ZTYPE 's'
+#define YOCTO_ZTYPE 'd'
 #include "contour3d.cxx"

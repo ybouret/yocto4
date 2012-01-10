@@ -11,21 +11,18 @@ namespace yocto
 	{
 		
 		template <typename T>
-		class contour3D
+		struct contour3D
 		{
 			typedef typename level_set<T>::level level_type;
-			typedef functor<void,TL2(const facet<T> &, const level_type &)> callback;
+			typedef functor<void,TL2(const triangle3D<T> &, const level_type &)> callback;
 			
-			void compute(const array3D<T>   &d, 
-						 const array1D<T>   &x, 
-						 const array1D<T>   &y,
-						 const array1D<T>   &z,
-						 const layout3D     &sub,
-						 const level_set<T> &levels,
-						 callback           &proc);
-			
-			
-			
+			static void compute(const array3D<T>   &d, 
+								const array1D<T>   &x, 
+								const array1D<T>   &y,
+								const array1D<T>   &z,
+								const layout3D     &sub,
+								const level_set<T> &levels,
+								callback           &proc);
 		};
 	}
 	
