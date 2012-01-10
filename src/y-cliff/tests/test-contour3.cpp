@@ -17,8 +17,72 @@ namespace
 		const double y2 = y*y;
 		const double z2 = z*z;
 		const double r2 = x2 + y2 + z2;
-		return z2 * exp( -sqrt(r2) );
+		return (x2-y2) * exp( -2.0 * sqrt(r2) );
 	}
+	
+	class isosurf
+	{
+	public:
+		typedef level_set<double>::KEY KEY;
+		typedef triangle3D<double>     T3D;
+		
+		explicit isosurf() throw() : tdb()
+		{
+		}
+		
+		virtual ~isosurf() throw()
+		{
+		}
+		
+		typedef map<KEY,vector<T3D> > tdb_type;
+		tdb_type tdb;
+		
+		void prolog( const level_set<double> &levels )
+		{
+			for( size_t i=1; i <= levels.size(); ++i )
+			{
+				const vector<T3D> tmp;
+				if( ! tdb.insert( levels[i].key, tmp ) )
+					throw exception("unexpected prolog failure");
+			}
+		}
+		
+		
+		void process( const T3D &t, const level_set<double>::level &l )
+		{
+			vector<T3D> *pv = tdb.search( l.key );
+			if( !pv ) throw exception("invalid level key");
+			std::cout << "recv: " << t.p0 << " " << t.p1 << " " << t.p2 << std::endl;
+			pv->push_back( t );
+		}
+		
+		void epilog(const level_set<double> &levels )
+		{
+			for( size_t i=1; i <= levels.size(); ++i )
+			{
+				const level_set<double>::level &l = levels[i];
+				vector<T3D> *pv = tdb.search( l.key );
+				if( !pv ) throw exception("invalid level key");
+				
+#if 0
+				const vector<T3D> &tr = *pv;
+				for( size_t j=1; j <= tr.size(); ++j )
+				{
+					const T3D &t = tr[j];
+				}
+#endif			
+				
+				const string &fn = vformat( "iso%d.vtk", l.key );
+				rwops<double>::save_vtk( fn, "iso surface", *pv );
+				
+			}
+		}
+		
+		
+	private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(isosurf);
+	};
+	
 	
 }
 
@@ -37,9 +101,21 @@ YOCTO_UNIT_TEST_IMPL(contour3)
 	fill_type::function3 f( cfunctor3(f3) );
 	fill_type::with( f, d, w, w.X, w.Y, w.Z);
 	
-	rwops<double>::save_vtk("field3.vtk", w.get_name(1), d, w, w.region.min, w.delta );
+	rwops<double>::save_vtk("field3.vtk", "example field", "A", d, w, w.region.min, w.delta );
 	
+	double vmin=0,vmax=0;
+	d.get_min_max(vmin,NULL,vmax,NULL);
 	
+	level_set<double> levels;
+	levels.add(0, 0.0 );
+	
+	isosurf                     surfaces;
+	surfaces.prolog( levels );
+	
+	contour3D<double>::callback proc( &surfaces, & isosurf::process);
+	contour3D<double>::compute( d, w.X, w.Y, w.Z, d, levels, proc );
+	
+	surfaces.epilog( levels );
 	
 }
 YOCTO_UNIT_TEST_DONE()
