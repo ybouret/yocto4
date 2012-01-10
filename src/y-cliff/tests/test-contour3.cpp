@@ -52,7 +52,7 @@ namespace
 		{
 			vector<T3D> *pv = tdb.search( l.key );
 			if( !pv ) throw exception("invalid level key");
-			std::cout << "recv: " << t.p0 << " " << t.p1 << " " << t.p2 << std::endl;
+			//std::cout << "recv: " << t.p0 << " " << t.p1 << " " << t.p2 << std::endl;
 			pv->push_back( t );
 		}
 		
@@ -64,14 +64,7 @@ namespace
 				vector<T3D> *pv = tdb.search( l.key );
 				if( !pv ) throw exception("invalid level key");
 				
-#if 0
-				const vector<T3D> &tr = *pv;
-				for( size_t j=1; j <= tr.size(); ++j )
-				{
-					const T3D &t = tr[j];
-				}
-#endif			
-				
+
 				const string &fn = vformat( "iso%d.vtk", l.key );
 				rwops<double>::save_vtk( fn, "iso surface", *pv );
 				
@@ -107,12 +100,21 @@ YOCTO_UNIT_TEST_IMPL(contour3)
 	d.get_min_max(vmin,NULL,vmax,NULL);
 	
 	level_set<double> levels;
-	levels.add(0, 0.0 );
+	levels.add(0, 0.01 );
 	
 	isosurf                     surfaces;
 	surfaces.prolog( levels );
 	
 	contour3D<double>::callback proc( &surfaces, & isosurf::process);
+	
+	{
+		triangle3D<double> tmp;
+		tmp.p0 = vertex_t(1,2,3);
+		tmp.p1 = vertex_t(3,4,5);
+		tmp.p2 = vertex_t(6,7,8);
+		proc( tmp, levels[1] );
+	}
+		
 	contour3D<double>::compute( d, w.X, w.Y, w.Z, d, levels, proc );
 	
 	surfaces.epilog( levels );

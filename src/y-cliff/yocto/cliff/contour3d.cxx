@@ -516,8 +516,8 @@ namespace yocto
 							const int    nt = Polygonise(grid, L.value, triangles);
 							for( int  it=0; it<nt; ++it )
 							{
-								std::cout << "send: " << triangles[it].p0 << "  " << triangles[it].p1 << " " << triangles[it].p2 << std::endl;
-								proc( triangles[i], L );
+								//std::cout << "send: " << triangles[it].p0 << "  " << triangles[it].p1 << " " << triangles[it].p2 << std::endl;
+								proc( triangles[it], L );
 							}
 						}
 					}
