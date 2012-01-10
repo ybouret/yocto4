@@ -28,7 +28,6 @@ namespace yocto
 				
 				const_key   key;    //!< unique identifier
 				const_type  value;  //!< unique value
-				mutable int flags;  //!< for pre/post processing status
 				
 				//! wrapper for comparator
 				friend inline bool operator<( const level &lhs, const level &rhs ) throw()

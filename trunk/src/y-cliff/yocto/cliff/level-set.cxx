@@ -17,16 +17,14 @@ namespace yocto
 		template<>
 		level_set<real_t>:: level:: level( param_key id, param_type v ) :
 		key(  id ),
-		value( v ),
-		flags( 0 )
+		value( v )
 		{
 		}
 		
 		template<>
 		level_set<real_t>:: level::   level( const level &other ) :
 		key(   other.key   ),
-		value( other.value ),
-		flags( other.flags )
+		value( other.value )
 		{
 		}
 		

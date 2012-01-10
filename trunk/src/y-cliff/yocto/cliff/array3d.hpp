@@ -38,6 +38,7 @@ namespace yocto
 			
 			YOCTO_CLIFF_ARRAY_OPS(array3D)
 			
+			
 		private:
 			size_t      slices;
 			slice_type *slice;
