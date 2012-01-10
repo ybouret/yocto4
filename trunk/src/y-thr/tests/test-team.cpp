@@ -67,8 +67,8 @@ namespace {
 
 YOCTO_UNIT_TEST_IMPL(team)
 {
-	size_t ncycle = 2;
-	size_t length = 100000;
+	size_t ncycle = 8;
+	size_t length = 800000;
 	if( argc > 1 ) ncycle = atol( argv[1] );
 	if( argc > 2 ) length = strtod( argv[2], NULL );
 	std::cerr << ">>>> team ncycle=" << ncycle << ", length=" << length << std::endl;
