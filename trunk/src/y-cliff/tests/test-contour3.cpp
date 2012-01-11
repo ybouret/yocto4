@@ -17,7 +17,7 @@ namespace
 		const double y2 = y*y;
 		const double z2 = z*z;
 		const double r2 = x2 + y2 + z2;
-		return (x2-y2) * exp( -2.0 * sqrt(r2) );
+		return (x2+sin(y2)) * exp( -2.0 * sqrt(r2) );
 	}
 	
 	class isosurf
