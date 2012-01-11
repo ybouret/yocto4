@@ -31,11 +31,12 @@ namespace yocto
 			fp("POINT_DATA %u\n", unsigned(sub.items) );
 			fp("SCALARS %s float\n", name.c_str());
 			fp("LOOKUP_TABLE default\n");
-			for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+			
+			for( unit_t z=sub.lower.z; z <= sub.upper.z; ++z )
 			{
 				for( unit_t y=sub.lower.y; y <= sub.upper.y; ++y )
 				{
-					for( unit_t z=sub.lower.z; z <= sub.upper.z; ++z )
+					for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
 					{
 						fp("%g\n", field[z][y][x] );
 					}
