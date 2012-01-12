@@ -45,6 +45,41 @@ namespace yocto
 		}
 		
 		template <>
+		void rwops<real_t> :: save_vtk(const string          &filename,
+									   const string          &title,
+									   const string          &name,
+									   const array2D<real_t> &field,
+									   const layout2D        &sub,
+									   const vertex2D_t      &origin,
+									   const vertex2D_t      &spacing )
+		{
+			
+			assert( field.has(sub.lower) );
+			assert( field.has(sub.upper) );
+			ios::ocstream fp( filename, false );
+			fp("# vtk DataFile Version 3.0\n");
+			fp("%s\n", title.c_str());
+			fp("ASCII\n");
+			fp("DATASET STRUCTURED_POINTS\n");
+			fp("DIMENSIONS %u %u 1\n", unsigned(sub.width.x), unsigned(sub.width.y) );
+			fp("ORIGIN %g %g 0\n", origin.x, origin.y);
+			fp("SPACING %g %g 0\n", spacing.x, spacing.y);
+			fp("POINT_DATA %u\n", unsigned(sub.items) );
+			fp("SCALARS %s float\n", name.c_str());
+			fp("LOOKUP_TABLE default\n");
+			
+			
+			for( unit_t y=sub.lower.y; y <= sub.upper.y; ++y )
+			{
+				for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+				{
+					fp("%g\n", field[y][x] );
+				}
+			}
+		}
+		
+		
+		template <>
 		void rwops<real_t> ::save_vtk( const string &filename, const string &title, const array<triangle3D_t> &triangles)
 		{
 			const unsigned nt = triangles.size();
