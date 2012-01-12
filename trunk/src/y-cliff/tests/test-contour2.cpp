@@ -4,6 +4,7 @@
 #include "yocto/cliff/wksp2d.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/cliff/level-set.hpp"
+#include "yocto/cliff/rwops.hpp"
 
 using namespace yocto;
 using namespace cliff;
@@ -97,6 +98,8 @@ YOCTO_UNIT_TEST_IMPL(contour2)
 	lines.prolog( levels );
 	contour2D<double>::callback countour_process( &lines, & isoline::process );
 	contour2D<double>::compute( d, w.X, w.Y, d, levels, countour_process );
+	
+	rwops<double>::save_vtk( "field2.vtk", "field2", "A", d, d, w.region.min, w.delta );
 	
 	
 }
