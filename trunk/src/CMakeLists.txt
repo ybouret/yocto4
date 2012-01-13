@@ -95,20 +95,36 @@ SET(CPACK_PACKAGE_DESCRIPTION          "Yocto Offerts C++ Tools ans Objects" )
 SET(CPACK_DEBIAN_PACKAGE_SECTION       "Development" )
 EXEC_PROGRAM( dpkg ARGS "--print-architecture" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE )
 
-IF( ON_MACOSX OR WIN32 )
+IF( YOCTO_MACOSX OR WIN32 )
   SET(CPACK_PACKAGE_FILE_NAME "yocto-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CXX_NICKNAME}")
 ELSE()
   SET(CPACK_PACKAGE_FILE_NAME "yocto-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${BUILD_MACHINE}-${CXX_NICKNAME}")
 ENDIF()
 
-SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
+########################################################################
+## where to install
+########################################################################
+SET(HAS_INSTALL OFF)
+IF( YOCTO_MACOSX )
+	SET(HAS_INSTALL ON)
+	SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
+ENDIF()
 
+IF( NOT HAS_INSTALL )
+	SET(HAS_INSTALL ON)
+	SET(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+ENDIF()
+
+########################################################################
 ## default generator
-IF( ON_MACOSX )
+########################################################################
+IF( YOCTO_MACOSX )
 	SET(CPACK_GENERATOR "DragNDrop" )
 ELSE()
 	SET(CPACK_GENERATOR "ZIP")
 ENDIF()
+
+MESSAGE( STATUS "CPACK_GENERATOR='${CPACK_GENERATOR}'" )
 
 INCLUDE(CPack)
 
