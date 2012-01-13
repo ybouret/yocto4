@@ -1,5 +1,6 @@
 #include "yocto/string/conv.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/code/ipower.hpp"
 
 #include <cerrno>
 
@@ -11,7 +12,8 @@ namespace yocto
 
 	size_t strconv:: to_size( const string &txt, const char *ctx  )
 	{
-		static const char fmt[] = "strconv::to_size(invalid char '%c')";
+		static const char fmt[] = "strconv::to_size(invalid char '%c') for <%s>";
+		if( !ctx )        ctx   = "";
 		assert( txt.size() > 0 );
 		size_t ans = 0;
 		for( size_t i=0; i < txt.size(); ++i )
@@ -34,11 +36,11 @@ namespace yocto
 				default:
 					if( ctx )
 					{
-						throw imported::exception( ctx, fmt, C );
+						throw imported::exception( ctx, fmt, C, ctx );
 					}
 					else
 					{
-						throw libc::exception( EINVAL, fmt, C );
+						throw libc::exception( EINVAL, fmt, C, ctx );
 					}
 
 			}
@@ -46,5 +48,12 @@ namespace yocto
 		return ans;
 	}
 
+#define real_t float
+#include "conv.cxx"
+	
+#undef real_t
+#define real_t double
+#include "conv.cxx"
+	
 }
 
