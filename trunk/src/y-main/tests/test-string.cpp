@@ -31,3 +31,35 @@ YOCTO_UNIT_TEST_IMPL(string)
 }
 YOCTO_UNIT_TEST_DONE()
 
+
+#include "yocto/string/conv.hpp"
+
+YOCTO_UNIT_TEST_IMPL(strconv)
+{
+
+	for( int i=1; i < argc; ++i )
+	{
+	
+		const string txt = argv[i];
+		const string ctx = vformat( "argv[%d]", i );
+		std::cerr << "'" << txt << "'" << std::endl;
+		try
+		{
+			std::cerr << "to_real: " << strconv::to_real<double>( txt, ctx.c_str() ) << std::endl;
+			std::cerr << "to_size: " << strconv::to_size( txt, ctx.c_str() ) << std::endl;
+		}
+		catch( const exception &e )
+		{
+			std::cerr << e.what() << std::endl;
+			std::cerr << e.when() << std::endl;
+		}
+		catch(...)
+		{
+			throw;
+		}
+		
+		
+	}
+	
+}
+YOCTO_UNIT_TEST_DONE()
