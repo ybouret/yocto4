@@ -1,3 +1,4 @@
+//! \file 
 #ifndef YOCTO_THREADING_TEAM_INCLUDED
 #define YOCTO_THREADING_TEAM_INCLUDED 1
 
@@ -11,28 +12,35 @@ namespace yocto
 	namespace threading
 	{
 				
+		//! easy multi threading
 		class team : public layout
 		{
 		public:
 			
-			
-			
+			//! MPI style info for one thread
 			class context
 			{
 			public:
 				context( const size_t thread_id, const size_t num_threads, lockable &guard ) throw();				
 				~context() throw();
 				const size_t      rank;   //!< in 0..size-1
-				const size_t      size;   //!< num threads
+				const size_t      size;   //!< number of thread in the team
 				lockable         &access; //!< mutex
+				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(context);
 			};
 			
+			//! what to do for each context
 			typedef  functor<void,TL1(context&)> task;
-			explicit team();
+			
+			//! build a team based on a layout
+			explicit team(const char *mutex_id = NULL);
+			
+			//! clean up
 			virtual ~team() throw();
 			
+			//! perform task to do on each context
 			void cycle( task &todo ) throw();
 			
 			

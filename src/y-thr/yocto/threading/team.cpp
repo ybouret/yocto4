@@ -74,10 +74,10 @@ namespace yocto
 		}
 		
 		
-		team:: team() :
+		team:: team( const char *mutex_id) :
 		layout(),
-		_stop_( false  ),
-		guard_( "team" ),
+		_stop_( false    ),
+		guard_( mutex_id ),
 		start_(),
 		final_(),
 		ready_(0),
@@ -103,7 +103,6 @@ namespace yocto
 				
 				check_ready();
 				std::cerr << "[team.activated]" << std::endl;
-								
 				place();
 			}
 			catch(...)
@@ -160,6 +159,7 @@ namespace yocto
 			 */
 			assert(task_);
 			(*task_)(ctx);
+			
 			//------------------------------------------------------------------
 			// Shall signal the main thread
 			//------------------------------------------------------------------
