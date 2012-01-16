@@ -33,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(arena)
 	void **addr = kind<global>::acquire_as<void*>(num);
 	
 	wtime chrono;
-	FILE *fp = fopen( "bs.txt", "wb" );
+	FILE *fp = fopen( "bs.dat", "wb" );
 	std::cerr << "sizeof(arena)=" << sizeof(arena) << std::endl;
 	try
 	{

@@ -40,7 +40,7 @@ void perform_psd( const size_t p, const size_t q )
 	}
 
 	{
-		ios::ocstream fp("inp.txt",false);
+		ios::ocstream fp("inp.dat",false);
 		for( size_t i=1; i < n; ++i )
 		{
 			fp("%g %g\n", times[i], data[i] );
@@ -75,7 +75,7 @@ void perform_psd( const size_t p, const size_t q )
 	PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
 
 	{
-		const char *filename = "psd.txt";
+		const char *filename = "psd.dat";
 		ios::ocstream fp( filename, false );
 		for( size_t i=1; i < m; ++i )
 		{

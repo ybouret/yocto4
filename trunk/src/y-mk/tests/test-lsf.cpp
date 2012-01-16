@@ -67,7 +67,7 @@ YOCTO_UNIT_TEST_IMPL(lsf)
 	
 	{
 		hsort( X, Y, __compare<double> );
-		ios::ocstream fp( "lsf.txt", false );
+		ios::ocstream fp( "lsf.dat", false );
 		for( size_t i=1; i <= N; ++i )
 		{
 			fp("%g %g\n", X[i], Y[i] );
@@ -99,7 +99,7 @@ YOCTO_UNIT_TEST_IMPL(lsf)
 			{
 				std::cerr << "a[" << i << "]=" << aorg[i] << " +/- " << aerr[i] << std::endl;
 			}
-			ios::ocstream fp( vformat("lsf.%u.txt", unsigned(nv)), false );
+			ios::ocstream fp( vformat("lsf.%u.dat", unsigned(nv)), false );
 			for( size_t i=1; i <= N; ++i )
 			{
 				fp("%g %g %g\n", X[i], Y[i], Z[i] );
@@ -188,7 +188,7 @@ YOCTO_UNIT_TEST_IMPL(lsf2)
 	}
 	
 	{
-		ios::ocstream fp( "mexp.txt", false );
+		ios::ocstream fp( "mexp.dat", false );
 		for( size_t i=1; i <= N; ++i )
 		{
 			fp("%g %g\n", X[i], Y[i] );
@@ -221,7 +221,7 @@ YOCTO_UNIT_TEST_IMPL(lsf2)
 		{
 			std::cerr << "a[" << i << "]=" << a[i] << " +/- " << aerr[i] << std::endl;
 		}
-		ios::ocstream fp( "mexp.6.txt", false );
+		ios::ocstream fp( "mexp.6.dat", false );
 		for( size_t i=1; i <= N; ++i )
 		{
 			fp("%g %g %g\n", X[i], Y[i], Z[i] );

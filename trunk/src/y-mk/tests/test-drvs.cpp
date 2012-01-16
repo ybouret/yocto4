@@ -43,7 +43,7 @@ namespace {
 		integrate<T> intg = { 2*numeric<T>::sqrteps };
 		dummy<T>     dum;
 		typename numeric<T>::function dF( &dum, & dummy<T>::compute );
-		const string out = string("drvs-") + typeid(T).name() + ".txt";
+		const string out = string("drvs-") + typeid(T).name() + ".dat";
 		ios::ocstream fp( out, false );
 		T z = 0;
 		fp("%g %g\n", 0.0, z );
