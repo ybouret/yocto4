@@ -17,6 +17,8 @@ namespace yocto
 			explicit bitio( size_t n, const as_capacity_t & );
 			virtual ~bitio() throw();
 			
+			void     fill_to_byte_with( bool b ); //!< atomic filling to byte boundary
+			
 			//! FIFO push
 			void push(bool);
 			

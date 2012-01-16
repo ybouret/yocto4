@@ -61,13 +61,13 @@ namespace yocto
 			}
 		}
 		
-		void swap_with( list &other ) throw()
+		inline void swap_with( list &other ) throw()
 		{
 			mswap( list_, other.list_ );
 			mswap( pool_, other.pool_ );
 		}
 		
-		list( const list &other ) : list_(), pool_()
+		inline list( const list &other ) : list_(), pool_()
 		{
 			try
 			{
@@ -83,7 +83,7 @@ namespace yocto
 			}
 		}
 		
-		list( size_t n, const as_capacity_t & ) : list_(), pool_()
+		inline list( size_t n, const as_capacity_t & ) : list_(), pool_()
 		{
 			try {
 				while( pool_.size < n ) pool_.store( node_type::acquire() );
@@ -95,7 +95,7 @@ namespace yocto
 		}
 		
 		
-		list & operator=( const list & other ) 
+		inline list & operator=( const list & other ) 
 		{
 			if( this != &other )
 			{
@@ -123,6 +123,14 @@ namespace yocto
 		typedef iterating::linked<const_type,const node_type, iterating::reverse> const_reverse_iterator;
 		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator( list_.tail ); }
 		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator( NULL   );     }
+		
+		//======================================================================
+		// misc
+		//======================================================================
+		inline void max_available( size_t n ) throw()
+		{
+			while( pool_.size > n ) node_type::release( pool_.query() );
+		}
 		
 	protected:
 		core::list_of<node_type> list_;
