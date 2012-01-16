@@ -20,10 +20,13 @@ namespace yocto
 		{
 		public:
 			virtual ~filter() throw();
+			virtual const char * name() const throw() = 0;
+			
+			writer output; //!< to be used by algortihm
 			
 		protected:
 			explicit filter( const writer &out );
-			writer output;
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(filter);

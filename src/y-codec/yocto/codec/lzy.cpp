@@ -70,6 +70,14 @@ namespace yocto
 			}
 			
 		}
+		
+		const char   lzy:: encoder:: ID[] = "lzy-encoder";
+		
+		const char * lzy:: encoder:: name() const throw()
+		{
+			return ID;
+		}
+		
 	}
 	
 }

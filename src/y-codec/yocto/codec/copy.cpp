@@ -39,6 +39,30 @@ namespace yocto
 			list_.max_available( keep_ );
 		}
 		
+		const char   copy:: encoder:: ID[] = "copy-encoder";
+		const char * copy:: encoder:: name() const throw()
+		{
+			return ID;
+		}
+		
+		
+		const char   copy:: decoder:: ID[] = "copy-decoder";
+
+		copy::decoder:: ~decoder() throw()
+		{
+		}
+		
+		const char * copy:: decoder:: name() const throw()
+		{
+			return ID;
+		}
+		
+		copy:: decoder:: decoder( const writer &w, const size_t cache_max ) :
+		encoder( w, cache_max )
+		{
+			
+		}
+		
 		
 	}
 	

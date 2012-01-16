@@ -16,11 +16,13 @@ namespace yocto
 			class encoder : public filter
 			{
 			public:
+				static const char ID[];
 				explicit encoder( const writer &w );
 				virtual ~encoder() throw();
 				
-				virtual void write( char C );
-				virtual void flush();
+				virtual void        write( char C );
+				virtual void        flush();
+				virtual const char *name() const throw();
 				
 			private:
 				ios::bitio queue_; //!< temporary queue
