@@ -5,6 +5,7 @@
 #include "yocto/code/unroll.hpp"
 #include "yocto/string/tokenizer.hpp"
 #include "yocto/chars.hpp"
+#include "yocto/string/conv.hpp"
 
 #include <cstdlib>
 
@@ -49,11 +50,9 @@ namespace yocto
 		void data_set<z_type>:: parse_line( const string &line ) const
 		{
 			tokenizer tkn( line );
-			//std::cerr << "[pasing '" << line << "']" << std::endl;
 			
 			if( !tkn.get_next( character<char>::is_space ) )
 			{
-				//std::cerr << "empty line" << std::endl;
 				return; //! empty line
 			}
 			assert( tkn.token() != NULL );
@@ -73,8 +72,8 @@ namespace yocto
 				}
 				
 				const string res( tkn.token(), tkn.units() );
-				//std::cerr << res << std::endl;
-				(*p)->push_back( z_type( atof( &res[0] ) ) );
+				const z_type ans = strconv::to_real<real_t>( res );
+				(*p)->push_back( ans );
 			}
 			
 		}
