@@ -42,7 +42,7 @@ namespace yocto
 			bool peek() const throw();
 			bool pop()  throw();
 			void skip() throw();
-			void skip( size_t n ) throw();
+			void skip( size_t nbits ) throw();
 			
 			template <typename T>
 			inline T peek( size_t nbits ) const throw()
