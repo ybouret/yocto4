@@ -32,7 +32,7 @@ void perform()
 		iFFT( data(0), data.size() );
 		
 #if FFT_SAVE == 1
-		const string filename = string("fft") + string( char( 'A' + p ) ) + "-" + typeid(T).name() + ".txt";
+		const string filename = string("fft") + string( char( 'A' + p ) ) + "-" + typeid(T).name() + ".dat";
 		ios::ocstream fp( filename );
 #endif
 		

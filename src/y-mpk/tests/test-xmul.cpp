@@ -106,14 +106,14 @@ YOCTO_UNIT_TEST_IMPL(xmul)
 	double tmul=0,tfft=0;
 	
 	{
-		ios::ocstream fp("xmul.txt",false);
+		ios::ocstream fp("xmul.dat",false);
 	}
 	
 
 	for( size_t N=2; N <= NMAX; N <<= 1 )
 	{
 		test_mul(N,tmul,tfft,gen);
-		ios::ocstream fp("xmul.txt",true);
+		ios::ocstream fp("xmul.dat",true);
 		fp("%u %.6g %.6g\n", (unsigned)N, tmul, tfft );
 	}
 	
@@ -212,13 +212,13 @@ YOCTO_UNIT_TEST_IMPL(xsqr)
 	double tmul=0,tfft=0,tsqr=0;
 	
 	{
-		ios::ocstream fp("xsqr.txt",false);
+		ios::ocstream fp("xsqr.dat",false);
 	}
 	
 	for( size_t N=2; N <= NMAX; N <<= 1 )
 	{
 		test_sqr(N,tmul,tfft,tsqr,gen);
-		ios::ocstream fp("xsqr.txt",true);
+		ios::ocstream fp("xsqr.dat",true);
 		fp("%u %.6g %.6g %.6g\n", (unsigned)N, tmul, tfft, tsqr);
 	}
 	
