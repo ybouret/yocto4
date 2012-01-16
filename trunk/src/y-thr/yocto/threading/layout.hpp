@@ -1,3 +1,4 @@
+//! \file
 #ifndef YOCTO_THREADING_LAYOUT_INCLUDED
 #define YOCTO_THREADING_LAYOUT_INCLUDED 1
 
@@ -10,13 +11,30 @@ namespace yocto
 	namespace threading
 	{
 		
+		//! How many threads, from which CPU
+		/**
+		 Prepare a threading layout from a
+		 default configuration or from the YOCTO_THREADING environment
+		 variable.
+		 */
 		class layout
 		{
 		public:
 			const size_t size; //!< #threads requested
 			const size_t root; //!< #CPU to start.
-			explicit layout(); //!< parse the YOCTO_THREADING=#threads[,offset]"
+			
+			//! parse the YOCTO_THREADING=#threads[,offset]"
+			/**
+			 - if YOCTO_THREADING is undefined then size = hardware::nprocs(), root=0
+			 - if YOCTO_THREADING is defined, then the first field is #threads (mandatory)
+			 while the optional second field is the CPU offset.
+			 */
+			explicit layout(); 
+			
+			//! destructor.
 			virtual ~layout() throw();
+			
+			//! copy size and root.
 			layout( const layout &other ) throw();
 			
 		private:

@@ -34,10 +34,15 @@ namespace yocto
 			explicit condition() throw();
 			virtual ~condition() throw();
 			
-			//! wait on a locked mutex, returns on  the lockaed mutex
+			//! wait on a locked mutex, returns on  the locked mutex
 			void     wait( mutex & ) throw();
+			
+			//! allow one blocked thread to wake up
 			void     signal()    throw();
+			
+			//! allow to blocked thread to wake up
 			void     broadcast() throw();
+			
 		private:
 			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(condition);
