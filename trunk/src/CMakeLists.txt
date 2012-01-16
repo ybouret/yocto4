@@ -50,7 +50,6 @@ YOCTO_BUILD(mpk)
 YOCTO_BUILD(mk)
 YOCTO_BUILD(random)
 YOCTO_BUILD(fft)
-#YOCTO_BUILD(spade)
 YOCTO_BUILD(cliff)
 YOCTO_BUILD(lua)
 YOCTO_BUILD(lua++)
@@ -58,6 +57,7 @@ YOCTO_BUILD(z)
 YOCTO_BUILD(z++)
 YOCTO_BUILD(mpi)
 YOCTO_BUILD(ocl)
+YOCTO_BUILD(codec)
 
 INSTALL( FILES 
 	share/create.sh 

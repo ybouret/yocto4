@@ -52,6 +52,21 @@ namespace yocto {
 				pool_.store( list_.pop_front() );
 		}
 		
+		void bitio:: fill_to_byte_with( bool b )
+		{
+			const size_t mark = list_.size;
+			try
+			{
+				while( list_.size & 7 )
+					push_back( b );
+			}
+			catch(...)
+			{
+				while( list_.size > mark ) pop_back();
+				throw;
+			}
+		}
+		
 	}
 	
 }
