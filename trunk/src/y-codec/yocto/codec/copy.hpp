@@ -16,11 +16,13 @@ namespace yocto
 			class encoder : public filter
 			{
 			public:
+				static const char ID[];
 				explicit encoder( const writer &w, size_t cache_max = 0);
 				virtual ~encoder() throw();
 			
 				virtual void write( char C );
 				virtual void flush();
+				virtual const char *name() const throw();
 				
 			private:
 				list<char>   list_;
@@ -29,7 +31,18 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(encoder);
 			};
 			
-			typedef encoder decoder;
+			class decoder : public encoder
+			{
+			public:
+				static const char ID[];
+				explicit decoder( const writer &w, size_t cache_max = 0 );
+				virtual ~decoder() throw();
+				
+				virtual const char *name() const throw();
+				
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
+			};
 			
 		};
 		
