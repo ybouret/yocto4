@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_CLIFF_ARRAY2D_INCLUDED
 #define YOCTO_CLIFF_ARRAY2D_INCLUDED 1
 
@@ -13,6 +15,7 @@ namespace yocto
 	namespace cliff
 	{	
 		
+		//! two dimensions array of float/double/complex...
 		template <typename T>
 		class array2D : public linear<T,layout2D>
 		{

@@ -31,10 +31,10 @@ namespace yocto
 			const size_t cmax;
 			const size_t size;
 			
-			const string & get_name( size_t i ) const throw();
-			const char   * get_text( size_t i ) const throw();
-			void           set_name( size_t i, const string &id );
-			void           set_name( size_t i, const char   *id );
+			const string & name( size_t i ) const throw();
+			const char   * text( size_t i ) const throw();
+			void           name( size_t i, const string &id );
+			void           name( size_t i, const char   *id );
 			size_t operator()( const string &id ) const;
 			size_t operator()( const char   *id ) const;
 			

@@ -26,7 +26,7 @@ namespace yocto
 			static void check_indices( const array<size_t> &cid, const components &cdb );
 		};
 		
-		//! template to procide memory to arrays
+		//! template to provide memory to arrays
 		template <typename T,template <class> class ARRAY>
 		class block : public object, public ARRAY<T>
 		{

@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_CLIFF_ARRAY1D_INCLUDED
 #define YOCTO_CLIFF_ARRAY1D_INCLUDED 1
 
@@ -18,6 +20,7 @@ inline void set( const ARRAY &other, const layout_type &sub ) throw() { foreach(
 inline void add( const ARRAY &other, const layout_type &sub ) throw() { foreach( other, sub, linear_type::add2_cb, NULL); } \
 inline void muladd( param_type k, const ARRAY &other, const layout_type &sub ) throw() { foreach( other, sub, linear_type::muladd_cb, (void*)&k); }
 		
+		//! one dimension array of float/double/complex...
 		template <typename T>
 		class array1D : public linear<T,layout1D>
 		{

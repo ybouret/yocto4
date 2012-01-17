@@ -10,6 +10,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! filling arrays with a function
 		template <typename T, typename U>
 		struct fill
 		{

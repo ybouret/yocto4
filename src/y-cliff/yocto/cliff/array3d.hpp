@@ -10,7 +10,7 @@ namespace yocto
 	
 	namespace cliff
 	{	
-		
+		//! three dimensions array of float/double/complex...
 		template <typename T>
 		class array3D : public linear<T,layout3D>
 		{

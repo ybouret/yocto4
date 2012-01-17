@@ -12,7 +12,7 @@ namespace  {
 	{
 		for( size_t i=C.cmin; i <= C.cmax; ++i )
 		{
-			std::cerr << "component #" << i << " = " << C.get_name(i) << std::endl;
+			std::cerr << "component #" << i << " = " << C.name(i) << std::endl;
 		}
 		std::cerr << std::endl;
 	}
@@ -25,7 +25,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
 	{
 		components C(1,10,NULL);
 		display(C);
-		C.set_name(3,"toto");
+		C.name(3,"toto");
 		display(C);
 	}
 	

@@ -34,7 +34,7 @@ namespace {
 	{
 		for( size_t i=C.cmin; i <= C.cmax; ++i )
 		{
-			std::cerr << "component #" << i << " = " << C.get_name(i) << std::endl;
+			std::cerr << "component #" << i << " = " << C.name(i) << std::endl;
 		}
 	}
 	

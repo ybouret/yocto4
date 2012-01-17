@@ -50,19 +50,19 @@ namespace yocto
 		}
 		
 		
-		const string & components:: get_name( size_t i ) const throw()
+		const string & components:: name( size_t i ) const throw()
 		{
 			assert( i >= cmin );
 			assert( i <= cmax );
 			return names[++i-cmin];
 		}
 		
-		const char * components:: get_text( size_t i ) const throw()
+		const char * components:: text( size_t i ) const throw()
 		{
-			return get_name(i).c_str();
+			return name(i).c_str();
 		}
 		
-		void components:: set_name( size_t i, const string &id )
+		void components:: name( size_t i, const string &id )
 		{
 			assert( i >= cmin );
 			assert( i <= cmax );
@@ -82,10 +82,10 @@ namespace yocto
 		}
 		
 		
-		void components:: set_name( size_t i, const char *id )
+		void components:: name( size_t i, const char *id )
 		{
 			const string _id(id);
-			set_name(i,_id);
+			name(i,_id);
 		}
 		
 		size_t components:: operator()( const string &id ) const

@@ -10,6 +10,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! marching cubes algortihm
 		template <typename T>
 		struct contour3D
 		{
