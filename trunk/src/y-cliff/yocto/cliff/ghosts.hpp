@@ -34,7 +34,6 @@ namespace yocto
 			typedef typename layout<COORD>::param_coord param_coord;
 			
 			
-			
 			explicit ghosts( param_coord lo, param_coord hi , const layout <COORD> &outline ) :
 			layout<COORD>( lo, hi ),
 			ghosts_base( this->items ),
@@ -57,8 +56,7 @@ namespace yocto
 		};
 		
 		
-		
-		
+			
 	}
 	
 }

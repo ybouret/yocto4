@@ -3,6 +3,7 @@
 
 #include "yocto/cliff/array1d.hpp"
 #include "yocto/cliff/components.hpp"
+#include "yocto/cliff/ghosts.hpp"
 
 #include "yocto/type-traits.hpp"
 #include "yocto/code/static-check.hpp"
@@ -82,6 +83,11 @@ namespace yocto
 			typedef block<T,ARRAY>         data_block;		
 			typedef shared_ptr<data_block> data_block_ptr;
 			
+			//==================================================================
+			// ghosts
+			//==================================================================
+			typedef ghosts<T,coord_t>       ghosts_type;
+			typedef shared_ptr<ghosts_type> ghosts_ptr;
 			
 			const layout_type outline; //!< original layout+ghosts
 			const region_type region;  //!< real space associated to layout (NOT outline)
@@ -110,7 +116,8 @@ namespace yocto
 			blocks( this->size, as_capacity ),
 			block_(NULL),
 			vaxis( DIMENSIONS, as_capacity ),
-			axis_(NULL)
+			axis_(NULL),
+			outer_ghosts()
 			{
 				YOCTO_STATIC_CHECK(DIMENSIONS==region_type::DIMENSIONS,cliff_workspace);
 				//--------------------------------------------------------------
@@ -170,6 +177,11 @@ namespace yocto
 					}
 					axis_ = & vaxis[1];
 				}
+				
+				//--------------------------------------------------------------
+				// create ghosts
+				//--------------------------------------------------------------
+				create_ghosts(ghosts_lo,ghosts_up);
 			}
 			
 			
@@ -245,7 +257,7 @@ namespace yocto
 					(*this)[ cid[j] ].entry[offset] = var[j];
 				}
 			}
-						
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
@@ -256,6 +268,8 @@ namespace yocto
 			vector<axis_ptr> vaxis;
 			axis_ptr        *axis_;
 			
+			vector<ghosts_ptr> outer_ghosts;
+			
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
 				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
@@ -264,6 +278,23 @@ namespace yocto
 				return layout_type(out_lo,out_up);
 			}
 			
+			inline void create_ghosts(param_coord ghosts_lo, param_coord ghosts_up)
+			{
+				{
+					const unit_t *lo = (const unit_t *) &(this->lower);
+					const unit_t *ng = (const unit_t *) &ghosts_lo;
+					for( size_t i=0; i < DIMENSIONS; ++i )
+					{
+						assert(ng[i]>=0); //-- checked in compute_outline
+						if( ng[i] > 0 )
+						{
+							//-- outer
+							{
+							}
+						}
+					}
+				}
+			}
 			
 		};
 	}
