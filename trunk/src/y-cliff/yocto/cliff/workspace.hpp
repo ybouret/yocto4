@@ -8,7 +8,6 @@
 #include "yocto/code/static-check.hpp"
 #include "yocto/shared-ptr.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -16,7 +15,6 @@ namespace yocto
 	namespace cliff
 	{
 		
-		typedef sorted_vector<size_t> offsets_type;
 		
 		//! utilities for workspace setup
 		struct workspace_base
@@ -248,7 +246,7 @@ namespace yocto
 				}
 			}
 			
-			virtual void load_offsets( offsets_type offsets, const layout_type &sub ) = 0;			
+			virtual void load_offsets( offsets_list &offsets, const layout_type &sub ) = 0;			
 			
 			
 		private:

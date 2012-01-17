@@ -124,7 +124,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		for( size_t i=w1.cmin; i <= w1.cmax; ++i ) cid.push_back(i);
 		w1.check_indices(cid);
 		vector< complex<float> > var( cid.size(), 0 );
-		offsets_type off1;
+		offsets_list off1;
 		w1.load_offsets( off1, w1.outline );
 		for( size_t i=off1.size();i>0;--i)
 		{
@@ -162,7 +162,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		w2["w"].set_all( w2.outline, 0 );
 		w2["w"].set( w2["u"], in2 );
 		w2["w"].add( w2["v"], in2 );
-		offsets_type off2;
+		offsets_list off2;
 		vector<size_t> cid;
 		cid.push_back( w2("u") );
 		cid.push_back( w2("v") );
@@ -200,7 +200,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		laplacian< complex<double>, float>::compute( w3["B"], 1, w3["A"],  w3.inv_dsq, in3 );
 		w3["A"].muladd( 1, w3["B"], in3 );
 		
-		offsets_type   off3;
+		offsets_list   off3;
 		vector<size_t> cid;
 		cid.push_back( w3("A") );
 		cid.push_back( w3("C") );

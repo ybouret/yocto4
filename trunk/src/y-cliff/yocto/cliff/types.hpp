@@ -5,13 +5,15 @@
 #ifndef YOCTO_CLIFF_TYPES_INCLUDED
 #define YOCTO_CLIFF_TYPES_INCLUDED 1
 
-#include "yocto/os.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
 	
 	namespace cliff
 	{
+
+
 		
 		//! signed integer type for indexing
 		typedef ptrdiff_t unit_t;
@@ -50,6 +52,8 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(layout_base);
 		};
 		
+		typedef sorted_vector<size_t> offsets_list; //!< database of offsets
+
 		
 	}
 	

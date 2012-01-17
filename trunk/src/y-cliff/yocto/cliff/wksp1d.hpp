@@ -42,7 +42,7 @@ namespace yocto
 			}
 			
 			
-			virtual void load_offsets( offsets_type offsets, const layout1D &sub )
+			virtual void load_offsets( offsets_list &offsets, const layout1D &sub )
 			{
 				assert( this->outline.has(sub.lower) );
 				assert( this->outline.has(sub.upper) );
