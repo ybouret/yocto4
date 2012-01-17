@@ -11,6 +11,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! base class for ghosts: their offset
 		class ghosts_base
 		{
 		public:
@@ -25,6 +26,7 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts_base);
 		};
 		
+		//! ghosts: sub layout and offsets
 		template <typename COORD>
 		class ghosts :  public layout<COORD>, public ghosts_base
 		{
@@ -40,9 +42,13 @@ namespace yocto
 				layout<COORD>::load_offsets( this->offsets, *this, outline );
 			}
 			
+			virtual ~ghosts() throw() {}
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts);
 		};
+		
+		
 		
 	}
 	

@@ -19,7 +19,7 @@ namespace yocto
 		//! utilities for workspace setup
 		struct workspace_base
 		{
-			static void check_ghosts( const void *ghosts_value, size_t n, const char *ctx );
+			static void check_ghosts( const void *ghosts_lo, const void *ghosts_up, const void *w, size_t n);
 			static void check_widths( const unit_t *w, size_t n );
 			static void check_indices( const array<size_t> &cid, const components &cdb );
 		};
@@ -258,8 +258,7 @@ namespace yocto
 			
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
-				workspace_base::check_ghosts( &ghosts_lo, DIMENSIONS, "lower ghosts" );
-				workspace_base::check_ghosts( &ghosts_up, DIMENSIONS, "upper ghosts" );
+				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
 				const_coord out_lo = L.lower - ghosts_lo;
 				const_coord out_up = L.upper + ghosts_up;
 				return layout_type(out_lo,out_up);
