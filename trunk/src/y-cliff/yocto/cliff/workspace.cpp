@@ -28,7 +28,7 @@ namespace yocto
 				if( ng_up_i < 0 ) 
 					throw libc::exception( EDOM, "upper ghosts: negative value in dimension %u", i );
 				
-				if( ng_lo_i + ng_up_i > width_i-2 )
+				if( ng_lo_i + ng_up_i > width_i )
 					throw libc::exception( EDOM, "too many ghosts in dimension %u", i );
 			}
 		}
