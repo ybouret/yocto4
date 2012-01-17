@@ -27,6 +27,7 @@ namespace yocto
 			private:
 				ios::bitio queue_; //!< temporary queue
 				list<char> cache_; //!< 8 bits from queue
+				bool       flush_; //!< are we flushing ?
 				void emit();
 				YOCTO_DISABLE_COPY_AND_ASSIGN(encoder);
 				

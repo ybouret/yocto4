@@ -1,4 +1,5 @@
 #include "yocto/codec/lzy.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -9,7 +10,8 @@ namespace yocto
 		lzy:: encoder:: encoder( const writer &w ) :
 		filter(w),
 		queue_(),
-		cache_()
+		cache_(),
+		flush_( false )
 		{
 		}
 		
@@ -22,6 +24,8 @@ namespace yocto
 		
 		void lzy:: encoder:: write( char C )
 		{
+			if( flush_ )
+				throw exception("lzy::encoder:: flushing mode!");
 			emit();
 			const size_t mark = queue_.size();
 			try 
@@ -39,18 +43,23 @@ namespace yocto
 		
 		void lzy:: encoder:: flush()
 		{
-			try
+			if( !flush_ )
 			{
-				queue_.push( false );            //-- this is the end
-				queue_.fill_to_byte_with(false); //-- fill, atomic
+				try
+				{
+					queue_.push( false );            //-- this is the end
+					queue_.fill_to_byte_with(false); //-- fill, atomic
+				}
+				catch(...)
+				{
+					queue_.pop_back(); //-- end marker
+					throw;
+				}
+				flush_ = true;
 			}
-			catch(...)
-			{
-				queue_.pop_back(); //-- end marker
-				throw;
-			}
-			assert( 0 == ( queue_.size() && 7 ) );
+			assert( 0 == ( queue_.size() & 7 ) );
 			emit();
+			flush_ = false;
 		}
 		
 		void lzy:: encoder:: emit()

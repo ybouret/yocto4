@@ -25,7 +25,7 @@ namespace
 		
 		void write( char C )
 		{
-			
+			fp.append(C);
 		}
 		
 	private:
