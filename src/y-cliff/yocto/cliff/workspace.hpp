@@ -245,9 +245,7 @@ namespace yocto
 					(*this)[ cid[j] ].entry[offset] = var[j];
 				}
 			}
-			
-			virtual void load_offsets( offsets_list &offsets, const layout_type &sub ) = 0;			
-			
+						
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);

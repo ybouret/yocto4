@@ -96,6 +96,8 @@ namespace yocto
 				return layout(in_lo,in_up);
 			}
 			
+			static void load_offsets( offsets_list &offsets, const layout &sub, const layout &outline );
+			
 		private:
 			YOCTO_DISABLE_ASSIGN(layout);
 		};

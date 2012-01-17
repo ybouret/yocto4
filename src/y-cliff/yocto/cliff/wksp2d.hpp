@@ -44,24 +44,7 @@ namespace yocto
 			{
 			}
 			
-			virtual void load_offsets( offsets_list &offsets, const layout2D &sub )
-			{
-				assert( this->outline.has(sub.lower) );
-				assert( this->outline.has(sub.upper) );
-				const unit_t xoff0 = sub.lower.x - this->outline.lower.x;
-				size_t       yoff  = sub.lower.y - this->outline.lower.y;
-				const size_t dy    = this->outline.width.x;
-				for( size_t j =  sub.width.y; j>0; --j, yoff += dy )
-				{
-					size_t ans = yoff + xoff0;
-					for( size_t i = sub.width.x; i>0;--i, ++ans )
-					{
-						assert( ans < this->outline.items );
-						(void) offsets.insert( ans );
-					}
-				}
-			}
-			
+						
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp2D);
 		};
