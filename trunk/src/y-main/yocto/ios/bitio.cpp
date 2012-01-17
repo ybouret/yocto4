@@ -57,8 +57,10 @@ namespace yocto {
 			const size_t mark = list_.size;
 			try
 			{
-				while( list_.size & 7 )
+				while( 0 != (list_.size & 7) )
 					push_back( b );
+				
+				assert( 0 == ( size() & 7 ) );
 			}
 			catch(...)
 			{
