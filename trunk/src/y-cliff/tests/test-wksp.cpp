@@ -125,7 +125,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		w1.check_indices(cid);
 		vector< complex<float> > var( cid.size(), 0 );
 		offsets_list off1;
-		w1.load_offsets( off1, w1.outline );
+		layout1D::load_offsets( off1, w1.outline, w1.outline );
 		for( size_t i=off1.size();i>0;--i)
 		{
 			const size_t j = off1[i];
@@ -167,7 +167,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		cid.push_back( w2("u") );
 		cid.push_back( w2("v") );
 		vector<double> var( cid.size(), 0 );
-		w2.load_offsets( off2, w2.outline );
+		layout2D::load_offsets( off2, w2.outline, w2.outline );
 		for( size_t i=off2.size();i>0;--i)
 		{
 			const size_t j = off2[i];
@@ -205,7 +205,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		cid.push_back( w3("A") );
 		cid.push_back( w3("C") );
 		vector<complex<double> > var( cid.size(), 0 );
-		w3.load_offsets( off3, w3.outline );
+		layout3D::load_offsets( off3, w3.outline, w3.outline );
 		for( size_t i=off3.size();i>0;--i)
 		{
 			const size_t j = off3[i];
