@@ -14,7 +14,8 @@ namespace
 	static inline double f2( double x, double y )
 	{
 		const double dx = (x-1);
-		return sin( sqrt( x*x + 1.5 * y*y ) ) + 1/(dx*dx+1);
+		const double dy = (y-1);
+		return sin( sqrt( x*x + 1.5 * y*y ) ) + sin(1/(dx*dx+0.3)+1/(dy*dy+0.3));
 		
 	
 	}

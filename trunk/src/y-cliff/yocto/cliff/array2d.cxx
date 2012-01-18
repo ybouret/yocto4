@@ -90,7 +90,7 @@ namespace yocto
 			//-- data
 			//-- #info
 			const bool default_ramp = NULL == colors;
-			for( unit_t y = area.lower.y; y <= area.upper.y; ++y )
+			for( unit_t y = area.upper.y; y >= area.lower.y; --y )
 			{
 				const row_type &r_y = (*this)[y];
 				for( unit_t x = area.lower.x; x <= area.upper.x; ++x )
