@@ -32,8 +32,10 @@ namespace
 	}
 	
 	template <typename WKSP>
-	static inline void display_info( const WKSP &wksp)
+	static inline void display_info( WKSP &wksp)
 	{
+		typedef typename WKSP::ghost_type Ghost;
+		
 		std::cerr << "---- layout:" << std::endl;
 		display_l(wksp);
 		std::cerr << "---- outline: " << std::endl;
@@ -48,13 +50,15 @@ namespace
 		std::cerr << "ghosts    = " << wksp.ghosts     << std::endl;
 		for( size_t i=1; i <= wksp.ghosts; ++i )
 		{
+			Ghost &G = wksp.outer_ghost(i);
+			Ghost &H = wksp.inner_ghost(i);
 			std::cerr << "**** Ghosts #" << i << std::endl;
-			std::cerr << "   |_position    : " << wksp.outer_ghost(i).label() << std::endl;
+			std::cerr << "   |_outer position: " << G.label() << std::endl;
 			std::cerr << "   |_outer layout:" << std::endl;
-			display_l( wksp.outer_ghost(i) );
+			display_l( G );
 			if( WKSP::DIMENSIONS <= 2 )
 			{
-				const offsets_list &offsets = wksp.outer_ghost(i).offsets;
+				const offsets_list &offsets = G.offsets;
 				std::cerr << "offsets:";
 				for( size_t j=1; j <= offsets.size(); ++j )
 				{
@@ -63,9 +67,31 @@ namespace
 				std::cerr << std::endl;
 			}
 			
+			std::cerr << "   |_inner position: " << H.label() << std::endl;
+			std::cerr << "   |_inner layout:" << std::endl;
+			display_l(H);
+			if( WKSP::DIMENSIONS <= 2 )
+			{
+				const offsets_list &offsets = H.offsets;
+				std::cerr << "offsets:";
+				for( size_t j=1; j <= offsets.size(); ++j )
+				{
+					std::cerr << ' ' << offsets[j];
+				}
+				std::cerr << std::endl;
+			}
+			
+			
+			std::cerr << "   |_pull/push..." << std::endl;
 			for( size_t j= wksp.cmin; j <= wksp.cmax; ++j )
 			{
-				wksp.outer_ghost(i).fetch( wksp[j] );
+				memset( G.data, 0, G.bytes );
+				G.pull( wksp[j] );
+				G.push( wksp[j] );
+				
+				memset( H.data, 0, H.bytes );
+				H.pull( wksp[j] );
+				H.push( wksp[j] );
 			}
 			
 		}
@@ -121,7 +147,6 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		for( size_t i=W.cmin; i <= W.cmax; ++i )
 			fill<double,double>::with( F3, W[i], W.outline, W.X, W.Y, W.Z);
 		display_info(W);		
-		
 	}
 	
 	

@@ -119,7 +119,8 @@ namespace yocto
 			block_(NULL),
 			vaxis( DIMENSIONS, as_capacity ),
 			axis_(NULL),
-			outer_ghosts()
+			outer_ghosts(),
+			inner_ghosts()
 			{
 				YOCTO_STATIC_CHECK(DIMENSIONS==region_type::DIMENSIONS,cliff_workspace);
 				//--------------------------------------------------------------
@@ -272,6 +273,19 @@ namespace yocto
 				return *outer_ghosts[ghost_index];
 			}
 			
+			inline ghost_type &inner_ghost( size_t ghost_index ) throw() 
+			{
+				assert( ghost_index > 0 ); assert( ghost_index <= ghosts );
+				return *inner_ghosts[ghost_index];
+			}
+			
+			inline const ghost_type &inner_ghost( size_t ghost_index ) const throw() 
+			{
+				assert( ghost_index > 0 ); assert( ghost_index <= ghosts );
+				return *inner_ghosts[ghost_index];
+			}
+			
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
@@ -283,7 +297,8 @@ namespace yocto
 			axis_ptr        *axis_;
 			
 			vector<ghost_ptr> outer_ghosts;
-			
+			vector<ghost_ptr> inner_ghosts;
+
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
 				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
@@ -303,11 +318,13 @@ namespace yocto
 			{
 				
 				{
-					//const unit_t *lo = (const unit_t *) &(this->lower);
 					const unit_t *glo = (const unit_t *) &ghosts_lo;
 					const unit_t *gup = (const unit_t *) &ghosts_up;
-					for( size_t i=0, pos=0; i < DIMENSIONS; ++i )
+					for( size_t i=0; i < DIMENSIONS; ++i )
 					{
+						const size_t i2 = (i << 1);
+						const ghost_position pos_lo = ghost_position(i2);
+						const ghost_position pos_up = ghost_position(i2+1);
 						//------------------------------------------------------
 						// lower coordinate
 						//------------------------------------------------------
@@ -315,19 +332,30 @@ namespace yocto
 						if( glo[i] > 0 )
 						{
 							const unit_t    ng = glo[i];
-							//-- outer ghost
+							//-- => lower outer ghost
 							{
-								coord_t         lo(this->lower); 
-								coord_t         up(this->upper); 
+								coord_t lo(this->lower); 
+								coord_t up(this->upper); 
+								
 								__get(up,i)  = __get(lo,i) - 1;
 								__get(lo,i) -= ng;
 								
-								const ghost_ptr G( new ghost_type( (ghost_position)pos,lo,up,this->outline) );
+								const ghost_ptr G( new ghost_type( pos_lo,lo,up,this->outline) );
 								outer_ghosts.push_back( G );
 							}
 							
+							//-- => inner upper ghost
+							{
+								coord_t lo(this->lower); 
+								coord_t up(this->upper); 
+								
+								__get(lo,i) = __get(up,i) - (ng-1);
+								
+								const ghost_ptr G( new ghost_type( pos_up,lo,up,this->outline) );
+								inner_ghosts.push_back( G );
+							}
+							
 						}
-						++pos;
 						
 						//------------------------------------------------------
 						// upper coordinate
@@ -336,19 +364,32 @@ namespace yocto
 						if( gup[i] > 0 )
 						{
 							const unit_t    ng = gup[i];
-							//-- outer ghost
+							//-- => upper outer ghost
 							{
-								coord_t         lo(this->lower); 
-								coord_t         up(this->upper);
+								coord_t lo(this->lower); 
+								coord_t up(this->upper);
+								
 								__get(lo,i) = __get(up,i) + 1;
 								__get(up,i) += ng;
-								const ghost_ptr G( new ghost_type( (ghost_position)pos,lo,up,this->outline) );
+								
+								const ghost_ptr G( new ghost_type( pos_up,lo,up,this->outline) );
 								outer_ghosts.push_back( G );
 							}
+							
+							//-- => inner lower ghost
+							{
+								coord_t lo(this->lower); 
+								coord_t up(this->upper); 
+								
+								__get(up,i) = __get(lo,i) + (ng-1);
+								
+								const ghost_ptr G( new ghost_type( pos_lo,lo,up,this->outline) );
+								inner_ghosts.push_back( G );
+							}
 						}
-						++pos;
 					}
 					
+					assert( inner_ghosts.size() == outer_ghosts.size() );
 					(size_t &)ghosts = outer_ghosts.size();
 				}
 			}
