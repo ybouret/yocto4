@@ -45,7 +45,7 @@ namespace yocto
 		
 		//! ghost: sub layout and offsets
 		template <typename T,typename COORD>
-		class ghost :  public layout<COORD>, public ghost_base
+		class ghost :  public object, public layout<COORD>, public ghost_base
 		{
 		public:
 			typedef typename layout<COORD>::param_coord param_coord;
@@ -77,7 +77,8 @@ namespace yocto
 			
 			virtual ~ghost() throw() {}
 			
-			void fetch( const linear_type &src ) const throw()
+			//! pull data from source
+			inline void pull( const linear_type &src ) const throw()
 			{
 				assert(src.entry!=NULL);
 				const T *p = src.entry;
@@ -86,6 +87,19 @@ namespace yocto
 					const size_t j = offsets[i];
 					assert(j<src.items);
 					iodata_[i] = p[j];
+				}
+			}
+			
+			//! push data into source
+			inline void push( linear_type &src ) const throw()
+			{
+				assert(src.entry!=NULL);
+				T *p = src.entry;
+				for( size_t i = count; i >0; --i  )
+				{
+					const size_t j = offsets[i];
+					assert(j<src.items);
+					p[j] = iodata_[i];
 				}
 			}
 			
