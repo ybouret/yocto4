@@ -86,14 +86,15 @@ namespace yocto
 			//==================================================================
 			// ghosts
 			//==================================================================
-			typedef ghosts<T,coord_t>       ghosts_type;
-			typedef shared_ptr<ghosts_type> ghosts_ptr;
+			typedef ghost<T,coord_t>       ghost_type;
+			typedef shared_ptr<ghost_type> ghost_ptr;
 			
 			const layout_type outline; //!< original layout+ghosts
 			const region_type region;  //!< real space associated to layout (NOT outline)
 			const vertex_t    delta;   //!< step for each dimension
 			const vertex_t    inv_d;   //!< 1/delta
 			const vertex_t    inv_dsq; //!< 1/delta^2
+			const size_t      ghosts;  //!< number of ghosts (outer,inner)
 			
 			//! construct a workspace
 			explicit workspace(param_coord  lo, 
@@ -113,6 +114,7 @@ namespace yocto
 			delta(),
 			inv_d(),
 			inv_dsq(),
+			ghosts(0),
 			blocks( this->size, as_capacity ),
 			block_(NULL),
 			vaxis( DIMENSIONS, as_capacity ),
@@ -258,6 +260,18 @@ namespace yocto
 				}
 			}
 			
+			inline ghost_type &outer_ghost( size_t ghost_index ) throw() 
+			{
+				assert( ghost_index > 0 ); assert( ghost_index <= ghosts );
+				return *outer_ghosts[ghost_index];
+			}
+			
+			inline const ghost_type &outer_ghost( size_t ghost_index ) const throw() 
+			{
+				assert( ghost_index > 0 ); assert( ghost_index <= ghosts );
+				return *outer_ghosts[ghost_index];
+			}
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
@@ -268,7 +282,7 @@ namespace yocto
 			vector<axis_ptr> vaxis;
 			axis_ptr        *axis_;
 			
-			vector<ghosts_ptr> outer_ghosts;
+			vector<ghost_ptr> outer_ghosts;
 			
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
@@ -278,23 +292,67 @@ namespace yocto
 				return layout_type(out_lo,out_up);
 			}
 			
+					
+			static inline unit_t & __get( coord_t &coord, size_t dim ) throw()
+			{
+				assert(dim>=0); assert(dim<layout_type::DIMENSIONS);
+				return *(((unit_t *)&coord)+dim);
+			}
+			
 			inline void create_ghosts(param_coord ghosts_lo, param_coord ghosts_up)
 			{
+				
 				{
-					const unit_t *lo = (const unit_t *) &(this->lower);
-					const unit_t *ng = (const unit_t *) &ghosts_lo;
-					for( size_t i=0; i < DIMENSIONS; ++i )
+					//const unit_t *lo = (const unit_t *) &(this->lower);
+					const unit_t *glo = (const unit_t *) &ghosts_lo;
+					const unit_t *gup = (const unit_t *) &ghosts_up;
+					for( size_t i=0, pos=0; i < DIMENSIONS; ++i )
 					{
-						assert(ng[i]>=0); //-- checked in compute_outline
-						if( ng[i] > 0 )
+						//------------------------------------------------------
+						// lower coordinate
+						//------------------------------------------------------
+						assert(glo[i]>=0); //-- checked in compute_outline
+						if( glo[i] > 0 )
 						{
-							//-- outer
+							const unit_t    ng = glo[i];
+							//-- outer ghost
 							{
+								coord_t         lo(this->lower); 
+								coord_t         up(this->upper); 
+								__get(up,i)  = __get(lo,i) - 1;
+								__get(lo,i) -= ng;
+								
+								const ghost_ptr G( new ghost_type( (ghost_position)pos,lo,up,this->outline) );
+								outer_ghosts.push_back( G );
+							}
+							
+						}
+						++pos;
+						
+						//------------------------------------------------------
+						// upper coordinate
+						//------------------------------------------------------
+						assert(gup[i]>=0); //-- checked in compute_outline
+						if( gup[i] > 0 )
+						{
+							const unit_t    ng = gup[i];
+							//-- outer ghost
+							{
+								coord_t         lo(this->lower); 
+								coord_t         up(this->upper);
+								__get(lo,i) = __get(up,i) + 1;
+								__get(up,i) += ng;
+								const ghost_ptr G( new ghost_type( (ghost_position)pos,lo,up,this->outline) );
+								outer_ghosts.push_back( G );
 							}
 						}
+						++pos;
 					}
+					
+					(size_t &)ghosts = outer_ghosts.size();
 				}
 			}
+			
 			
 		};
 	}
