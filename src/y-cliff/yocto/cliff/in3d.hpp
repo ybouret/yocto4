@@ -1,7 +1,7 @@
 #ifndef YOCTO_CLIFF_IN3D_INCLUDED
 #define YOCTO_CLIFF_IN3D_INCLUDED 1
 
-#include "yocto/cliff/layout.hpp"
+#include "yocto/cliff/region.hpp"
 #include "yocto/geom/v3d.hpp"
 
 namespace yocto

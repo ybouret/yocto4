@@ -53,13 +53,13 @@ namespace yocto
 			
 			mutable T *data;
 			
+			//! create ghosts without data
 			explicit ghost( const ghost_position pos, param_coord lo, param_coord hi , const layout <COORD> &outline ) :
 			layout<COORD>( lo, hi ),
 			ghost_base( this->items, pos ),
 			data( NULL ),
 			iodata_()
 			{
-				static const T __ini(0);
 				assert( outline.has(this->lower) );
 				assert( outline.has(this->upper) );
 				//-- prepare offsets
@@ -68,12 +68,18 @@ namespace yocto
 				//-- store info
 				(size_t&)(this->count) = this->offsets.size();
 				(size_t&)(this->bytes) = this->count * sizeof(T);
-				
-				//-- make data
+								
+			}
+			
+			//! acquire data for deferred copy
+			void acquire_data()
+			{
+				static const T __ini(0);
 				iodata_.make( this->count, __ini );
 				if( this->count > 0 )
 					data = &iodata_[1];
 			}
+			
 			
 			virtual ~ghost() throw() {}
 			
@@ -81,6 +87,8 @@ namespace yocto
 			inline void pull( const linear_type &src ) const throw()
 			{
 				assert(src.entry!=NULL);
+				assert(count==iodata_.size());
+				
 				const T *p = src.entry;
 				for( size_t i = count; i >0; --i  )
 				{
@@ -94,12 +102,28 @@ namespace yocto
 			inline void push( linear_type &src ) const throw()
 			{
 				assert(src.entry!=NULL);
+				assert(count==iodata_.size());
+
 				T *p = src.entry;
 				for( size_t i = count; i >0; --i  )
 				{
 					const size_t j = offsets[i];
 					assert(j<src.items);
 					p[j] = iodata_[i];
+				}
+			}
+
+			//! direct data exchange
+			static inline void direct_copy( const ghost &dst, const ghost &src, linear_type &lin ) throw()
+			{
+				assert(lin.entry!=NULL);
+				assert(dst.count == src.count);
+				T *p = lin.entry;
+				for( size_t i = dst.count; i>0; --i )
+				{
+					const size_t into = dst.offsets[i];
+					const size_t from = src.offsets[i];
+					p[into] = p[from];
 				}
 			}
 			

@@ -49,10 +49,15 @@ namespace yocto
 				for( unit_t z = inside.lower.z; z <= inside.upper.z; ++z )
 				{
 					for( unit_t y = inside.lower.y; y <= inside.upper.y; ++y )
-					{
-						
+					{						
 						for( unit_t x=inside.lower.x; x <= inside.upper.x; ++x )
 						{
+							const T mid( src[z][y][x] );
+							const T two_mid( mid + mid );
+							lap[z][y][x] =
+							xfac * ( src[z][y][x-1] - two_mid + src[z][y][x+1] ) +
+							yfac * ( src[z][y-1][x] - two_mid + src[z][y+1][x] ) +
+							zfac * ( src[z-1][y][x] - two_mid + src[z+1][y][x] );
 						}
 					}
 				}

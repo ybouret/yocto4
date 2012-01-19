@@ -2,7 +2,7 @@
 #define YOCTO_CLIFF_REGION_INCLUDED 1
 
 
-#include "yocto/cliff/types.hpp"
+#include "yocto/cliff/layout.hpp"
 #include "yocto/type-traits.hpp"
 
 namespace yocto
@@ -40,6 +40,7 @@ namespace yocto
 			const vertex_t length;
 			const U        space;   //!< product of lengths (length,area,volume)
 			
+			//! default region
 			explicit region( param_vertex inf, param_vertex sup) : 
 			region_base<U>( DIMENSIONS ),
 			min( inf ),
@@ -49,6 +50,7 @@ namespace yocto
 			{
 			}
 			
+			//! direct copy
 			region( const region &r ) throw() :
 			region_base<U>( DIMENSIONS ),
 			min( r.min ),
@@ -63,10 +65,39 @@ namespace yocto
 			{
 			}
 			
+			template <typename LAYOUT>
+			static region extract( const region &r, const LAYOUT &master, const LAYOUT &sub ) throw()
+			{
+				assert( master.has( sub.lower ) );
+				assert( master.has( sub.upper ) );
+				
+				vertex_t      sub_min, sub_max;
+				const U      *region_min    = (U *) &(r.min);
+				const U      *region_length = (U *) &(r.length);
+				const unit_t *master_lower  = (const unit_t *) &(master.lower);
+				const unit_t *master_width  = (const unit_t *) &(master.width);
+				const unit_t *sub_lower     = (const unit_t *) &(sub.lower);
+				const unit_t *sub_upper     = (const unit_t *) &(sub.upper);
+				U *           q_min         = (U*) &sub_min;
+				U *           q_max         = (U*) &sub_max;
+				for( size_t i=0; i < DIMENSIONS; ++i )
+				{
+					const U      num  = region_length[i]; 
+					const unit_t den  = master_width[i]-1; 
+					const U      vini = region_min[i]; 
+					const unit_t uini = master_lower[i];
+					
+					q_min[i] = vini + (num*(sub_lower[i] - uini))/den;
+					q_max[i] = vini + (num*(sub_upper[i] - uini))/den;
+				}
+				return region( sub_min, sub_max);
+			}
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(region);
 		};
+		
+		
 		
 	}
 }
