@@ -1,7 +1,6 @@
 #ifndef YOCTO_CLIFF_IN1D_INCLUDED
 #define YOCTO_CLIFF_IN1D_INCLUDED 1
 
-#include "yocto/cliff/layout.hpp"
 #include "yocto/cliff/region.hpp"
 
 namespace yocto

@@ -104,16 +104,9 @@ ENDIF()
 ########################################################################
 ## where to install
 ########################################################################
-SET(HAS_INSTALL OFF)
-IF( YOCTO_MACOSX )
-	SET(HAS_INSTALL ON)
-	SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
-ENDIF()
 
-IF( NOT HAS_INSTALL )
-	SET(HAS_INSTALL ON)
-	SET(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
-ENDIF()
+SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
+
 
 ########################################################################
 ## default generator

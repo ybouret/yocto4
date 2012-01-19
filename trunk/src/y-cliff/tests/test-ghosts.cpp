@@ -83,6 +83,8 @@ namespace
 			
 			
 			std::cerr << "   |_pull/push..." << std::endl;
+			H.acquire_data();
+			G.acquire_data();
 			for( size_t j= wksp.cmin; j <= wksp.cmax; ++j )
 			{
 				memset( G.data, 0, G.bytes );
