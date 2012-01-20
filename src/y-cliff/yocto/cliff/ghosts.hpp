@@ -46,6 +46,7 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ghost_base);
 		};
 		
+		//! number of ghosts and deferred type or not
 		template <typename COORD>
 		class ghosts_info
 		{
@@ -68,6 +69,7 @@ namespace yocto
 			YOCTO_DISABLE_ASSIGN(ghosts_info);
 		};
 		
+		//! info for lower and upper ghosts
 		template <typename COORD>
 		class ghosts_setup
 		{
@@ -104,7 +106,7 @@ namespace yocto
 			
 			mutable T *data;
 			
-			//! create ghosts without data
+			//! create ghosts
 			explicit ghost(ghost_position      pos, 
 						   param_coord         lo, 
 						   param_coord         hi ,
@@ -124,10 +126,12 @@ namespace yocto
 				(size_t&)(this->count) = this->offsets.size();
 				(size_t&)(this->bytes) = this->count * sizeof(T);
 				
+				if( is_deferred ) acquire_data();
+				
 			}
 			
 			//! acquire data for deferred copy
-			void acquire_data()
+			void acquire_data() const
 			{
 				static const T __ini(0);
 				iodata_.make( this->count, __ini );

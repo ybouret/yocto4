@@ -50,10 +50,11 @@ namespace
 		std::cerr << "ghosts    = " << wksp.ghosts     << std::endl;
 		for( size_t i=1; i <= wksp.ghosts; ++i )
 		{
-			Ghost &G = wksp.outer_ghost(i);
-			Ghost &H = wksp.inner_ghost(i);
+			const Ghost &G = wksp.outer_ghost(i);
+			const Ghost &H = wksp.inner_ghost(i);
 			std::cerr << "**** Ghosts #" << i << std::endl;
 			std::cerr << "   |_outer position: " << G.label() << std::endl;
+			std::cerr << "   |_outer deferred: " << G.deferred << std::endl;
 			std::cerr << "   |_outer layout:" << std::endl;
 			display_l( G );
 			if( WKSP::DIMENSIONS <= 2 )
@@ -68,6 +69,7 @@ namespace
 			}
 			
 			std::cerr << "   |_inner position: " << H.label() << std::endl;
+			std::cerr << "   |_outer deferred: " << H.deferred << std::endl;
 			std::cerr << "   |_inner layout:" << std::endl;
 			display_l(H);
 			if( WKSP::DIMENSIONS <= 2 )
@@ -151,10 +153,10 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 	{
 		typedef wksp3D<double,double>  w3D_t;
 		typedef vertex3D<double>::type v3D_t;
-		const w3D_t::layout_type L( coord3D(0,0,0), coord3D(10,15,20) );
-		const w3D_t::region_type R( v3D_t(-1,-1,-1), v3D_t(1,1,1) );
-		const ghosts_info<coord3D>  g_lo( coord3D(1,2,3), coord3D(0,0,0) );
-		const ghosts_info<coord3D>  g_up( coord3D(4,5,6), coord3D(0,0,0) );
+		const w3D_t::layout_type    L( coord3D(0,0,0), coord3D(10,15,20) );
+		const w3D_t::region_type    R( v3D_t(-1,-1,-1), v3D_t(1,1,1) );
+		const ghosts_info<coord3D>  g_lo( coord3D(1,2,3), coord3D(0,0,1) );
+		const ghosts_info<coord3D>  g_up( coord3D(4,5,6), coord3D(0,0,1) );
 		const ghosts_setup<coord3D> G( g_lo, g_up );
 		w3D_t W(L,
 				G,
