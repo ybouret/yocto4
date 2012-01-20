@@ -85,17 +85,16 @@ namespace
 			
 			
 			std::cerr << "   |_pull/push..." << std::endl;
-			H.acquire_data();
-			G.acquire_data();
-			for( size_t j= wksp.cmin; j <= wksp.cmax; ++j )
+			H.acquire_data( wksp.size );
+			G.acquire_data( wksp.size );
+			for( size_t j= wksp.cmin, k=1; j <= wksp.cmax; ++j, ++k )
 			{
-				memset( G.data, 0, G.bytes );
-				G.pull( wksp[j] );
-				G.push( wksp[j] );
+				G.pull( wksp[j],k );
+				G.push( wksp[j],k);
 				
-				memset( H.data, 0, H.bytes );
-				H.pull( wksp[j] );
-				H.push( wksp[j] );
+				//memset( H.data, 0, H.bytes );
+				H.pull( wksp[j],k );
+				H.push( wksp[j],k );
 			}
 			
 		}

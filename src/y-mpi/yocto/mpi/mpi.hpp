@@ -136,8 +136,8 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(Requests);
 		};
 		
-		void Startall( Requests & );
-		void Waitall( Requests & );
+		void Startall( Requests & ) const;
+		void Waitall( Requests & ) const;
 		
 	private:
 		friend class singleton<mpi>;                            //!< access mpi

@@ -29,12 +29,12 @@ namespace yocto
 	}
 
 	
-	void mpi:: Startall( Requests &requests )
+	void mpi:: Startall( Requests &requests ) const
 	{
 		Startall( requests.count, &requests[0] );
 	}
 	
-	void mpi:: Waitall( Requests &requests )
+	void mpi:: Waitall( Requests &requests ) const
 	{
 		Waitall( requests.count, &requests[0], &requests(0) );
 	}
