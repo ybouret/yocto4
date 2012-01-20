@@ -21,7 +21,7 @@ namespace yocto
 	 @MPI_Bsend				@MPI_Bsend_init			@MPI_Buffer_attach
 	 @MPI_Buffer_detach 	MPI_Cancel				@MPI_Get_count
 	 @MPI_Get_elements  	MPI_Ibsend				MPI_Iprobe
-	 MPI_Irecv				MPI_Irsend				MPI_Isend
+	 MPI_Irecv				MPI_Irsend				@MPI_Isend
 	 MPI_Issend				MPI_Probe				@MPI_Recv
 	 @MPI_Recv_init			MPI_Request_free		@MPI_Rsend
 	 @MPI_Rsend_init		@MPI_Send				@MPI_Send_init
@@ -82,6 +82,8 @@ namespace yocto
 		void       Bsend( const void *buffer, size_t count, MPI_Datatype datatype, int dest,  int tag, MPI_Comm comm ) const;
 		void       Ssend( const void *buffer, size_t count, MPI_Datatype datatype, int dest,  int tag, MPI_Comm comm ) const;
 		void       Recv(  void       *buffer, size_t count, MPI_Datatype datatype, int source,int tag, MPI_Comm comm, MPI_Status &status) const;
+		void       Isend( const void *buffer, size_t count, MPI_Datatype datatype, int dest,  int tag, MPI_Comm comm, MPI_Request &request) const;
+		void       Irecv( void       *buffer, size_t count, MPI_Datatype datatype, int source,int tag, MPI_Comm comm, MPI_Request &request) const;
 		
 		size_t     Get_count( const MPI_Status *status, MPI_Datatype datatype ) const;
 		size_t     Get_elements( const MPI_Status *status, MPI_Datatype datatype ) const;
@@ -114,7 +116,28 @@ namespace yocto
 		int  CommWorldNext() const throw(); //!< CommWorldSize should be >= 2
 		int  CommWorldPrev() const throw(); //!< CommWorldSize should be >= 2
 		void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
+		void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
+		
+		//! MPI_Request/MPI_Status helper
+		class Requests
+		{
+		public:
+			explicit Requests( size_t num );
+			virtual ~Requests() throw();
+			const size_t count;
+			MPI_Request &operator[]( size_t index ) throw();       //!< 0 <= index <= count-1
+			MPI_Status  &operator()( size_t index ) const throw(); //!< 0 <= index << count-1
 			
+		private:
+			size_t       wlen_;
+			void        *wksp_;
+			MPI_Request *request;
+			MPI_Status  *status;
+			YOCTO_DISABLE_COPY_AND_ASSIGN(Requests);
+		};
+		
+		void Startall( Requests & );
+		void Waitall( Requests & );
 		
 	private:
 		friend class singleton<mpi>;                            //!< access mpi
