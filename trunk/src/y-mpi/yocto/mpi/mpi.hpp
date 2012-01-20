@@ -2,8 +2,9 @@
 #define YOCTO_MPI_INCLUDED 1
 
 #include "yocto/exception.hpp"
-
 #include "yocto/threading/singleton.hpp"
+#include "yocto/code/printf-check.hpp"
+#include <cstdio>
 
 #define YOCTO_CPLUSPLUS __cplusplus
 #undef __cplusplus
@@ -110,8 +111,10 @@ namespace yocto
 		//======================================================================
 		// Usefull helpers
 		//======================================================================
-		int CommWorldNext() const throw(); //!< CommWorldSize should be >= 2
-		int CommWorldPrev() const throw(); //!< CommWorldSize should be >= 2
+		int  CommWorldNext() const throw(); //!< CommWorldSize should be >= 2
+		int  CommWorldPrev() const throw(); //!< CommWorldSize should be >= 2
+		void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
+			
 		
 	private:
 		friend class singleton<mpi>;                            //!< access mpi
