@@ -16,7 +16,7 @@ namespace
 	template<typename LAYOUT>
 	static inline void display_l( const LAYOUT &L )
 	{
-		std::cerr << "-- " << LAYOUT::DIMENSIONS << "D" << std::endl;
+		//std::cerr << "-- " << LAYOUT::DIMENSIONS << "D" << std::endl;
 		std::cerr << "-- lower= " << L.lower << std::endl;
 		std::cerr << "-- upper= " << L.upper << std::endl;
 		std::cerr << "-- width= " << L.width << std::endl;
@@ -99,6 +99,8 @@ namespace
 			}
 			
 		}
+		std::cerr << "---- nucleus:" << std::endl;
+		display_l(wksp.nucleus);
 		
 		std::cerr << std::endl;
 	}
