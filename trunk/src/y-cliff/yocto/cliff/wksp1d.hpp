@@ -23,17 +23,17 @@ namespace yocto
 			typedef typename wksp_type::axis_type    axis_type;
 			typedef typename wksp_type::layout_type  layout_type;
 			typedef typename wksp_type::region_type  region_type;
+			typedef typename wksp_type::ghosts_type  ghosts_type;
 			
 			const axis_type &X;
 			explicit wksp1D(const layout_type &L,
-							param_coord  ghosts_lo, 
-							param_coord  ghosts_up,
+							const ghosts_type &G,
 							const region_type &R,
 							size_t       a,
 							size_t       b,
 							const char  *names_list[] 
 							) :
-			wksp_type(L,ghosts_lo,ghosts_up,R,a,b,names_list),
+			wksp_type(L,G,R,a,b,names_list),
 			X( this->axis(0) )
 			{
 			}

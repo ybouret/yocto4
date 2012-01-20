@@ -75,6 +75,7 @@ namespace yocto
 			typedef typename region_type::param_vertex param_vertex;
 			typedef memory::global                     memory_kind;
 			typedef block<U,array1D>                   axis_type;
+			typedef ghosts_setup<coord_t>              ghosts_type;
 			static  const    size_t                    DIMENSIONS = layout_type::DIMENSIONS;
 			
 			//==================================================================
@@ -98,8 +99,7 @@ namespace yocto
 			
 			//! construct a workspace
 			explicit workspace(const layout_type &L,
-							   param_coord        ghosts_lo, 
-							   param_coord        ghosts_up,
+							   const ghosts_type &G,
 							   const region_type &R,
 							   size_t       a,
 							   size_t       b,
@@ -107,7 +107,7 @@ namespace yocto
 							   ) :
 			layout_type( L ),
 			components(a,b,names_list),
-			outline( compute_outline( *this, ghosts_lo, ghosts_up) ),
+			outline( compute_outline( *this, G.lower.count, G.upper.count) ),
 			region(R),
 			delta(),
 			inv_d(),
@@ -182,7 +182,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				// create ghosts
 				//--------------------------------------------------------------
-				create_ghosts(ghosts_lo,ghosts_up);
+				create_ghosts(G);
 			}
 			
 			
@@ -312,12 +312,14 @@ namespace yocto
 				return *(((unit_t *)&coord)+dim);
 			}
 			
-			inline void create_ghosts(param_coord ghosts_lo, param_coord ghosts_up)
+			inline void create_ghosts(const ghosts_type &G)
 			{
+				const ghosts_info<coord_t> &ghosts_lo = G.lower;
+				const ghosts_info<coord_t> &ghosts_up = G.upper;
 				
 				{
-					const unit_t *glo = (const unit_t *) &ghosts_lo;
-					const unit_t *gup = (const unit_t *) &ghosts_up;
+					const unit_t *glo = (const unit_t *) &ghosts_lo.count;
+					const unit_t *gup = (const unit_t *) &ghosts_up.count;
 					for( size_t i=0; i < DIMENSIONS; ++i )
 					{
 						const size_t i2 = (i << 1);
@@ -338,8 +340,8 @@ namespace yocto
 								__get(up,i)  = __get(lo,i) - 1;
 								__get(lo,i) -= ng;
 								
-								const ghost_ptr G( new ghost_type( pos_lo,lo,up,this->outline) );
-								outer_ghosts.push_back( G );
+								const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,false) );
+								outer_ghosts.push_back( g );
 							}
 							
 							//-- => inner upper ghost
@@ -349,8 +351,8 @@ namespace yocto
 								
 								__get(lo,i) = __get(up,i) - (ng-1);
 								
-								const ghost_ptr G( new ghost_type( pos_up,lo,up,this->outline) );
-								inner_ghosts.push_back( G );
+								const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,false) );
+								inner_ghosts.push_back( g );
 							}
 							
 						}
@@ -370,8 +372,8 @@ namespace yocto
 								__get(lo,i) = __get(up,i) + 1;
 								__get(up,i) += ng;
 								
-								const ghost_ptr G( new ghost_type( pos_up,lo,up,this->outline) );
-								outer_ghosts.push_back( G );
+								const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,false) );
+								outer_ghosts.push_back( g );
 							}
 							
 							//-- => inner lower ghost
@@ -381,8 +383,8 @@ namespace yocto
 								
 								__get(up,i) = __get(lo,i) + (ng-1);
 								
-								const ghost_ptr G( new ghost_type( pos_lo,lo,up,this->outline) );
-								inner_ghosts.push_back( G );
+								const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,false) );
+								inner_ghosts.push_back( g );
 							}
 						}
 					}
