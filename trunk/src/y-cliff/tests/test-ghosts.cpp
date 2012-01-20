@@ -115,9 +115,11 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 	
 	{
 		typedef wksp1D<double,double> w1D_t;
-		w1D_t W(-10,10,
+		const w1D_t:: layout_type L( -10, 10 );
+		const w1D_t:: region_type R( -1, 1 );
+		w1D_t W(L,
 				1, 2,
-				-1, 1,
+				R,
 				cmin, cnum, names );
 		fill<double,double>::function1 F1( cfunctor(f1) );
 		for( size_t i=W.cmin; i <= W.cmax; ++i )
@@ -128,9 +130,11 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 	{
 		typedef wksp2D<double,double>  w2D_t;
 		typedef vertex2D<double>::type v2D_t;
-		w2D_t W(coord2D(-20,-10), coord2D(10,20),
+		const w2D_t::layout_type L( coord2D(-20,-10), coord2D(10,20) );
+		const w2D_t::region_type R( v2D_t(-1,-1), v2D_t(1,1) );
+		w2D_t W(L,
 				coord2D(1,2), coord2D(3,4),
-				v2D_t(-1,-1), v2D_t(1,1),
+				R,
 				cmin, cnum, names );
 		fill<double,double>::function2 F2( cfunctor2(f2) );
 		for( size_t i=W.cmin; i <= W.cmax; ++i )
@@ -141,9 +145,11 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 	{
 		typedef wksp3D<double,double>  w3D_t;
 		typedef vertex3D<double>::type v3D_t;
-		w3D_t W(coord3D(0,0,0), coord3D(10,15,20),
+		const w3D_t::layout_type L( coord3D(0,0,0), coord3D(10,15,20) );
+		const w3D_t::region_type R( v3D_t(-1,-1,-1), v3D_t(1,1,1) );
+		w3D_t W(L,
 				coord3D(1,2,3), coord3D(4,5,6),
-				v3D_t(-1,-1,-1), v3D_t(1,1,1),
+				R,
 				cmin, cnum, names );
 		fill<double,double>::function3 F3( cfunctor3(f3) );
 		for( size_t i=W.cmin; i <= W.cmax; ++i )

@@ -17,7 +17,7 @@ namespace
 		const double dy = (y-1);
 		return sin( sqrt( x*x + 1.5 * y*y ) ) + sin(1/(dx*dx+0.3)+1/(dy*dy+0.3));
 		
-	
+		
 	}
 	
 	
@@ -69,10 +69,11 @@ YOCTO_UNIT_TEST_IMPL(contour2)
 	typedef wksp2D<double,double> wksp_type;
 	typedef fill<double,double>   fill_type;
 	typedef wksp_type::vertex_t   vertex_t;
-	wksp_type w(coord2D(1,1), coord2D(200,200),
+	const layout2D               L( coord2D(1,1), coord2D(200,200) );
+	const region2D<double>::type R( vertex_t(-4.0,-4.0),  vertex_t(4.0,4.0) );
+	wksp_type w(L,
 				coord2D(0,0), coord2D(0,0),
-				vertex_t(-4.0,-4.0),
-				vertex_t(4.0,4.0),
+				R,
 				1,1,NULL);
 	
 	array2D<double>      &d = w[1];
@@ -93,7 +94,7 @@ YOCTO_UNIT_TEST_IMPL(contour2)
 	{
 		std::cerr << "level #" << i << " key=" << levels[i].key << ", value=" << levels[i].value << std::endl;
 	}
-		
+	
 	
 	isoline lines;
 	lines.prolog( levels );

@@ -22,19 +22,20 @@ namespace yocto
 			typedef typename wksp_type::param_coord  param_coord;
 			typedef typename wksp_type::param_vertex param_vertex;
 			typedef typename wksp_type::axis_type    axis_type;
+			typedef typename wksp_type::layout_type  layout_type;
+			typedef typename wksp_type::region_type  region_type;
 			
 			const axis_type &X, &Y;
-			explicit wksp2D(param_coord  lo, 
-							param_coord  hi, 
+			
+			explicit wksp2D(const layout_type &L,
 							param_coord  ghosts_lo, 
 							param_coord  ghosts_up,
-							param_vertex vmin,
-							param_vertex vmax,
+							const region_type &R,
 							size_t       a,
 							size_t       b,
 							const char  *names_list[] 
 							) :
-			wksp_type(lo,hi,ghosts_lo,ghosts_up,vmin,vmax,a,b,names_list),
+			wksp_type(L,ghosts_lo,ghosts_up,R,a,b,names_list),
 			X( this->axis(0) ),
 			Y( this->axis(1) )
 			{
@@ -44,7 +45,7 @@ namespace yocto
 			{
 			}
 			
-						
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(wksp2D);
 		};
