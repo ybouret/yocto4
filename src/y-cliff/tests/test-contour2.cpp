@@ -71,8 +71,10 @@ YOCTO_UNIT_TEST_IMPL(contour2)
 	typedef wksp_type::vertex_t   vertex_t;
 	const layout2D               L( coord2D(1,1), coord2D(200,200) );
 	const region2D<double>::type R( vertex_t(-4.0,-4.0),  vertex_t(4.0,4.0) );
+	const ghosts_info<coord2D>   g( coord2D(0,0), coord2D(0,0) );
+	const ghosts_setup<coord2D>  G( g,g);
 	wksp_type w(L,
-				coord2D(0,0), coord2D(0,0),
+				G,
 				R,
 				1,1,NULL);
 	
