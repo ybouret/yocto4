@@ -96,6 +96,9 @@ namespace yocto
 			YOCTO_DISABLE_ASSIGN(ghosts_setup);
 		};
 		
+		
+		
+		
 		//! ghost: sub layout and offsets
 		template <typename T,typename COORD>
 		class ghost :  public object, public layout<COORD>, public ghost_base
@@ -104,7 +107,10 @@ namespace yocto
 			typedef typename layout<COORD>::param_coord param_coord;
 			typedef linear<T,layout<COORD> >            linear_type;
 			
-			mutable T *data;
+			const size_t   nvar; //!< max number of storable variables
+		private:
+			mutable T    **slot; //!< matrix [1..nvar][0..count-1]
+		public:
 			
 			//! create ghosts
 			explicit ghost(ghost_position      pos, 
@@ -114,8 +120,8 @@ namespace yocto
 						   const bool           is_deferred) :
 			layout<COORD>( lo, hi ),
 			ghost_base( this->items, pos, is_deferred ),
-			data( NULL ),
-			iodata_()
+			nvar(0),
+			slot(NULL)
 			{
 				assert( outline.has(this->lower) );
 				assert( outline.has(this->upper) );
@@ -126,49 +132,94 @@ namespace yocto
 				(size_t&)(this->count) = this->offsets.size();
 				(size_t&)(this->bytes) = this->count * sizeof(T);
 				
-				if( is_deferred ) acquire_data();
 				
 			}
 			
 			//! acquire data for deferred copy
-			void acquire_data() const
+			void acquire_data( size_t num_slots ) const
 			{
-				static const T __ini(0);
-				iodata_.make( this->count, __ini );
-				if( this->count > 0 )
-					data = &iodata_[1];
+				assert(num_slots>0);
+				assert(count>0);
+				if( num_slots != nvar )
+				{
+					release_data();
+					size_t &nv = (size_t &)nvar;
+					nv   = num_slots;
+					slot = memory::kind<memory::global>::acquire_as<T*>( nv )-1;
+					try
+					{
+						size_t ndata = count * nvar;
+						slot[1] = memory::kind<memory::global>::acquire_as<T>( ndata );
+						for( size_t k=2; k <= nvar; ++k )
+							slot[k] = slot[k-1] + count;
+					}
+					catch(...)
+					{
+						memory::kind<memory::global>::release_as<T*>( ++slot, nv );
+						assert(NULL==slot);
+						assert(0   ==nvar);
+						throw;
+					}
+				}
 			}
 			
+			void release_data() const
+			{
+				assert(count>0);
+				if( nvar > 0 )
+				{
+					assert(slot!=NULL);
+					size_t ndata = count * nvar;
+					memory::kind<memory::global>::release_as<T>( slot[1], ndata );
+					memory::kind<memory::global>::release_as<T*>( ++slot, (size_t&)nvar);
+					assert( NULL == slot );
+					assert( 0    == nvar );
+				}
+			}
 			
-			virtual ~ghost() throw() {}
+			//! return a 0..count-1 of T
+			T * operator[]( size_t ivar ) const throw()
+			{
+				assert(ivar>=1);
+				assert(ivar<=nvar);
+				return slot[ivar];
+			}
+			
+			virtual ~ghost() throw() { release_data(); }
 			
 			//! pull data from source
-			inline void pull( const linear_type &src ) const throw()
+			inline void pull( const linear_type &src, size_t ivar ) const throw()
 			{
 				assert(src.entry!=NULL);
-				assert(count==iodata_.size());
+				assert(slot!=NULL);
+				assert(ivar>=1);
+				assert(ivar<=nvar);
 				
 				const T *p = src.entry;
+				T       *q = slot[ivar];
 				for( size_t i = count; i >0; --i  )
 				{
 					const size_t j = offsets[i];
 					assert(j<src.items);
-					iodata_[i] = p[j];
+					*(q++) = p[j];
 				}
 			}
 			
 			//! push data into source
-			inline void push( linear_type &src ) const throw()
+			inline void push( linear_type &src, size_t ivar ) const throw()
 			{
 				assert(src.entry!=NULL);
-				assert(count==iodata_.size());
+				assert(NULL!=slot);
+				assert(ivar>=1);
+				assert(ivar<=nvar);
 				
-				T *p = src.entry;
+				T       *p = src.entry;
+				const T *q = slot[ivar];
 				for( size_t i = count; i >0; --i  )
 				{
 					const size_t j = offsets[i];
 					assert(j<src.items);
-					p[j] = iodata_[i];
+					p[j] = *(q++);
 				}
 			}
 			
@@ -186,8 +237,7 @@ namespace yocto
 				}
 			}
 			
-		private:
-			mutable vector<T> iodata_;
+			
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);

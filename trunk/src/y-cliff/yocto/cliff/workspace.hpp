@@ -25,6 +25,7 @@ namespace yocto
 			static void check_indices( const array<size_t> &cid, const components &cdb );
 		};
 		
+		
 		//! template to provide memory to arrays
 		template <typename T,template <class> class ARRAY>
 		class block : public object, public ARRAY<T>
@@ -290,12 +291,23 @@ namespace yocto
 				return *inner_ghosts[ghost_index];
 			}
 			
+			//! get inner deferred ghosts
 			inline const ghost_type &deferred_ghost( size_t ghost_index ) const throw()
 			{
 				assert( ghost_index > 0 ); assert( ghost_index <= deferred_ghosts );
 				return *async_ghosts[ghost_index];
 			}
 			
+			
+			//! acquire memory for deferred ghosts
+			void acquire_ghosts_data( size_t nvar )
+			{
+				for( size_t g=1; g <= ghosts; ++g )
+				{
+					if( inner_ghost(g).deferred ) inner_ghost(g).acquire_data(nvar);
+					if( outer_ghost(g).deferred ) outer_ghost(g).acquire_data(nvar);
+				}
+			}
 			
 			
 		private:
