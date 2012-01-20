@@ -95,6 +95,7 @@ namespace yocto
 			const vertex_t    delta;   //!< step for each dimension
 			const vertex_t    inv_d;   //!< 1/delta
 			const vertex_t    inv_dsq; //!< 1/delta^2
+			const layout_type nucleus; //!< original layout - deferred ghosts
 			const size_t      ghosts;  //!< number of ghosts (outer,inner)
 			const size_t      deferred_ghosts; //!< inner deferred ghosts
 			
@@ -113,6 +114,7 @@ namespace yocto
 			delta(),
 			inv_d(),
 			inv_dsq(),
+			nucleus( *this ),
 			ghosts(0),
 			deferred_ghosts(0),
 			blocks( this->size, as_capacity ),
@@ -183,7 +185,8 @@ namespace yocto
 				}
 				
 				//--------------------------------------------------------------
-				// create ghosts
+				// create ghosts and compute nucleus from the
+				// inner deferred ghosts
 				//--------------------------------------------------------------
 				create_ghosts(G);
 			}
@@ -193,12 +196,14 @@ namespace yocto
 			{
 			}
 			
+			//! return an axis
 			inline const axis_type & axis(size_t idim) const throw()
 			{
 				assert(idim<DIMENSIONS);
 				return *axis_[idim];
 			}
 			
+			//! returns an array of valid component
 			inline data_block & operator[]( const size_t c ) throw()
 			{
 				assert(c>=this->cmin);
@@ -206,6 +211,7 @@ namespace yocto
 				return * block_[c];
 			}
 			
+			//! returns an array of valid component
 			inline const data_block & operator[]( const size_t c ) const throw()
 			{
 				assert(c>=this->cmin);
@@ -213,35 +219,42 @@ namespace yocto
 				return * block_[c];
 			}
 			
+			
+			//! returns an array of valid component
 			inline data_block & operator[]( const string &id )
 			{
 				const components &comp = *this;
 				return * block_[ comp(id) ];
 			}
 			
+			//! returns an array of valid component
 			inline const data_block & operator[]( const string &id ) const throw()
 			{
 				const components &comp = *this;
 				return * block_[ comp(id) ];
 			}
 			
+			//! returns an array of valid component
 			inline data_block & operator[]( const char *id )
 			{
 				const components &comp = *this;
 				return * block_[ comp(id) ];
 			}
 			
+			//! returns an array of valid component
 			inline const data_block & operator[]( const char *id ) const throw()
 			{
 				const components &comp = *this;
 				return * block_[ comp(id) ];
 			}
 			
+			//! check that the indices are valid
 			inline void check_indices( const array<size_t> &cid )	
 			{
 				workspace_base::check_indices( cid, *this );
 			}
 			
+			//! query and array of variables
 			inline void query( array<T> &var, const array<size_t> &cid, size_t offset ) const throw()
 			{
 				assert( offset < this->outline.items );
@@ -252,6 +265,7 @@ namespace yocto
 				}
 			}
 			
+			//! store an array of variables
 			inline void store( const array<T> &var, const array<size_t> &cid, size_t offset ) throw()
 			{
 				assert( offset < this->outline.items );
@@ -317,90 +331,97 @@ namespace yocto
 				const ghosts_info<coord_t> &ghosts_lo = G.lower;
 				const ghosts_info<coord_t> &ghosts_up = G.upper;
 				
+				const unit_t *glo      = (const unit_t *) &ghosts_lo.count;
+				const unit_t *gup      = (const unit_t *) &ghosts_up.count;
+				const unit_t *async_lo = (const unit_t *) &ghosts_lo.deferred;
+				const unit_t *async_up = (const unit_t *) &ghosts_up.deferred;
+				
+				unit_t       *limit_lo = (unit_t *) & nucleus.lower;
+				unit_t       *limit_up = (unit_t *) & nucleus.upper;
+				
+				for( size_t i=0; i < DIMENSIONS; ++i )
 				{
-					const unit_t *glo      = (const unit_t *) &ghosts_lo.count;
-					const unit_t *gup      = (const unit_t *) &ghosts_up.count;
-					const unit_t *async_lo = (const unit_t *) &ghosts_lo.deferred;
-					const unit_t *async_up = (const unit_t *) &ghosts_up.deferred;
-					
-					for( size_t i=0; i < DIMENSIONS; ++i )
+					const size_t i2 = (i << 1);
+					const ghost_position pos_lo = ghost_position(i2);
+					const ghost_position pos_up = ghost_position(i2+1);
+					const bool           deferred_lo = async_lo[i] != 0;
+					const bool           deferred_up = async_up[i] != 0;
+					//----------------------------------------------------------
+					// lower coordinate
+					//----------------------------------------------------------
+					assert(glo[i]>=0); //-- checked in compute_outline
+					if( glo[i] > 0 )
 					{
-						const size_t i2 = (i << 1);
-						const ghost_position pos_lo = ghost_position(i2);
-						const ghost_position pos_up = ghost_position(i2+1);
-						const bool           deferred_lo = async_lo[i] != 0;
-						const bool           deferred_up = async_up[i] != 0;
-						//------------------------------------------------------
-						// lower coordinate
-						//------------------------------------------------------
-						assert(glo[i]>=0); //-- checked in compute_outline
-						if( glo[i] > 0 )
+						const unit_t    ng = glo[i];
+						//-- => lower outer ghost
 						{
-							const unit_t    ng = glo[i];
-							//-- => lower outer ghost
-							{
-								coord_t lo(this->lower); 
-								coord_t up(this->upper); 
-								
-								__get(up,i)  = __get(lo,i) - 1;
-								__get(lo,i) -= ng;
-								
-								const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_lo) );
-								outer_ghosts.push_back( g );
-							}
+							coord_t lo(this->lower); 
+							coord_t up(this->upper); 
 							
-							//-- => inner upper ghost, corresponding deferred status
-							{
-								coord_t lo(this->lower); 
-								coord_t up(this->upper); 
-								
-								__get(lo,i) = __get(up,i) - (ng-1);
-								
-								const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_lo) );
-								inner_ghosts.push_back( g );
-								if( deferred_lo )
-									async_ghosts.push_back( g );
-							}
+							__get(up,i)  = __get(lo,i) - 1;
+							__get(lo,i) -= ng;
 							
+							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_lo) );
+							outer_ghosts.push_back( g );
 						}
 						
-						//------------------------------------------------------
-						// upper coordinate
-						//------------------------------------------------------
-						assert(gup[i]>=0); //-- checked in compute_outline
-						if( gup[i] > 0 )
+						//-- => inner upper ghost, corresponding deferred status
 						{
-							const unit_t    ng = gup[i];
-							//-- => upper outer ghost
-							{
-								coord_t lo(this->lower); 
-								coord_t up(this->upper);
-								
-								__get(lo,i) = __get(up,i) + 1;
-								__get(up,i) += ng;
-								
-								const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_up) );
-								outer_ghosts.push_back( g );
-							}
+							coord_t lo(this->lower); 
+							coord_t up(this->upper); 
 							
-							//-- => inner lower ghost, corresponding deferred status
+							__get(lo,i) = __get(up,i) - (ng-1);
+							
+							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_lo) );
+							inner_ghosts.push_back( g );
+							if( deferred_lo )
 							{
-								coord_t lo(this->lower); 
-								coord_t up(this->upper); 
-								
-								__get(up,i) = __get(lo,i) + (ng-1);
-								
-								const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_up) );
-								inner_ghosts.push_back( g );
-								if( deferred_up )
-									async_ghosts.push_back( g );
+								async_ghosts.push_back( g );
+								limit_up[i] -= ng;
+							}
+						}
+						
+					}
+					
+					//----------------------------------------------------------
+					// upper coordinate
+					//----------------------------------------------------------
+					assert(gup[i]>=0); //-- checked in compute_outline
+					if( gup[i] > 0 )
+					{
+						const unit_t    ng = gup[i];
+						//-- => upper outer ghost
+						{
+							coord_t lo(this->lower); 
+							coord_t up(this->upper);
+							
+							__get(lo,i) = __get(up,i) + 1;
+							__get(up,i) += ng;
+							
+							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_up) );
+							outer_ghosts.push_back( g );
+						}
+						
+						//-- => inner lower ghost, corresponding deferred status
+						{
+							coord_t lo(this->lower); 
+							coord_t up(this->upper); 
+							
+							__get(up,i) = __get(lo,i) + (ng-1);
+							
+							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_up) );
+							inner_ghosts.push_back( g );
+							if( deferred_up )
+							{
+								async_ghosts.push_back( g );
+								limit_lo[i] += ng;
 							}
 						}
 					}
-					
-					assert( inner_ghosts.size() == outer_ghosts.size() );
-					(size_t &)ghosts = outer_ghosts.size();
 				}
+				
+				assert( inner_ghosts.size() == outer_ghosts.size() );
+				(size_t &)ghosts = outer_ghosts.size();
 			}
 			
 			
