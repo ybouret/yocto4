@@ -89,9 +89,11 @@ static inline void proc1( array< complex<float> > &var, void * )
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
 	{	
-		wksp1D< complex<float>, double>  w1( -10, 20, 
+		const layout1D L(-10,20);
+		const region1D<double>::type R(-2.0,4.0);
+		wksp1D< complex<float>, double>  w1( L, 
 											1, 2, 
-											-2.0, 4.0,
+											R,
 											1,2,NULL
 											);
 		
@@ -142,9 +144,11 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{
 		const char  *varnames[] = { "u", "v", "w" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp2D< double, float > w2( coord2D(-100,-100), coord2D(200,200),
+		const layout2D              L( coord2D(-100,-100), coord2D(200,200) );
+		const region2D<float>::type R( v2d<float>(-2,-2), v2d<float>(4,4) );
+		wksp2D< double, float > w2( L,
 								   coord2D(0,1), coord2D(0,2),
-								   v2d<float>(-2,-2), v2d<float>(4,4),
+								   R,
 								   1,varcount, varnames );
 		display_info( w2 );
 		std::cerr << "X=" << w2.X << std::endl;
@@ -184,9 +188,11 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{
 		const char  *varnames[] = { "A", "B", "C", "D" };
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
-		wksp3D< complex<double>, float > w3(coord3D(-20,-20,-20), coord3D(40,40,40),
+		const layout3D L( coord3D(-20,-20,-20), coord3D(40,40,40) );
+		const region3D<float>::type R( v3d<float>(-1,-1,-1), v3d<float>(2,2,2) );
+		wksp3D< complex<double>, float > w3(L,
 											coord3D(0,0,1), coord3D(0,0,2),
-											v3d<float>(-1,-1,-1), v3d<float>(2,2,2),
+											R,
 											0,varcount, varnames );
 		display_info( w3 );
 		std::cerr << "X=" << w3.X << std::endl;

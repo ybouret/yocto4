@@ -84,10 +84,11 @@ YOCTO_UNIT_TEST_IMPL(contour3)
 	typedef wksp3D<double,double> wksp_type;
 	typedef fill<double,double>   fill_type;
 	typedef wksp_type::vertex_t   vertex_t;
-	wksp_type w(coord3D(1,1,1), coord3D(50,50,50),
+	const   wksp_type::layout_type L( coord3D(1,1,1), coord3D(50,50,50) );
+	const   wksp_type::region_type R( vertex_t(-4.0,-4.0,-4.0),vertex_t(4.0,4.0,4.0));
+	wksp_type w(L,
 				coord3D(0,0,0), coord3D(0,0,0),
-				vertex_t(-4.0,-4.0,-4.0),
-				vertex_t(4.0,4.0,4.0),
+				R,
 				1,1,NULL);
 	
 	array3D<double> &d = w[1];

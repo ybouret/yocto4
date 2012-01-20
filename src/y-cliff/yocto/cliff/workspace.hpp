@@ -97,20 +97,18 @@ namespace yocto
 			const size_t      ghosts;  //!< number of ghosts (outer,inner)
 			
 			//! construct a workspace
-			explicit workspace(param_coord  lo, 
-							   param_coord  hi, 
-							   param_coord  ghosts_lo, 
-							   param_coord  ghosts_up,
-							   param_vertex vmin,
-							   param_vertex vmax,
+			explicit workspace(const layout_type &L,
+							   param_coord        ghosts_lo, 
+							   param_coord        ghosts_up,
+							   const region_type &R,
 							   size_t       a,
 							   size_t       b,
 							   const char  *names_list[]
 							   ) :
-			layout_type( lo, hi ),
+			layout_type( L ),
 			components(a,b,names_list),
 			outline( compute_outline( *this, ghosts_lo, ghosts_up) ),
-			region(vmin,vmax),
+			region(R),
 			delta(),
 			inv_d(),
 			inv_dsq(),
@@ -298,7 +296,7 @@ namespace yocto
 			
 			vector<ghost_ptr> outer_ghosts;
 			vector<ghost_ptr> inner_ghosts;
-
+			
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
 				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
@@ -307,7 +305,7 @@ namespace yocto
 				return layout_type(out_lo,out_up);
 			}
 			
-					
+			
 			static inline unit_t & __get( coord_t &coord, size_t dim ) throw()
 			{
 				assert(dim>=0); assert(dim<layout_type::DIMENSIONS);
