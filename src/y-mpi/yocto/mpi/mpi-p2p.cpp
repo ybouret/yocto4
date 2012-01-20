@@ -22,6 +22,8 @@ throw mpi::exception( err, #SEND"()" );\
 	YOCTO_MPI_XSEND(Bsend)
 	YOCTO_MPI_XSEND(Ssend)
 	
+		
+	
 	void       mpi::Recv( void       *buffer, size_t count, MPI_Datatype datatype, int source,int tag, MPI_Comm comm, MPI_Status &status) const
 	{
 		assert( !(NULL==buffer && count > 0 ) );
@@ -130,6 +132,26 @@ throw mpi::exception( err, "MPI_" #SEND "()" );\
 			throw mpi::exception( err, "MPI_Waitall()" );
 		}
 	}
+	
+	
+	void mpi:: Isend( const void *buffer, size_t count, MPI_Datatype datatype, int dest,  int tag, MPI_Comm comm, MPI_Request &request) const
+	{
+		assert( !( NULL == buffer && count > 0 ) );
+		const int err = MPI_Isend( (void *)buffer, int(count), datatype, dest, tag, comm, &request );
+		if( err != MPI_SUCCESS )
+			throw mpi::exception( err, "Isend()" );
+	}
+	
+	void  mpi:: Irecv( void       *buffer, size_t count, MPI_Datatype datatype, int source,int tag, MPI_Comm comm, MPI_Request &request) const
+	{
+		assert( !( NULL == buffer && count > 0 ) );
+		const int err = MPI_Irecv( buffer, int(count), datatype, source, tag, comm, &request );
+		if( err != MPI_SUCCESS )
+			throw mpi::exception( err, "Irecv()" );
+		
+	}
+	
+	
 	
 	
 }

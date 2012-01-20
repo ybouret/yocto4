@@ -421,7 +421,8 @@ namespace yocto
 				}
 				
 				assert( inner_ghosts.size() == outer_ghosts.size() );
-				(size_t &)ghosts = outer_ghosts.size();
+				(size_t &)ghosts          = outer_ghosts.size();
+				(size_t &)deferred_ghosts = async_ghosts.size(); 
 			}
 			
 			
