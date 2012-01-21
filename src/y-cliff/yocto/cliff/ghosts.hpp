@@ -111,7 +111,7 @@ namespace yocto
 		private:
 			mutable T    **slot; //!< matrix [1..nvar][0..count-1]
 		public:
-			int            peer; //!< MPI source/destination, initially -1
+			mutable int    peer; //!< MPI source/destination, initially -1
 			
 			//! create ghosts from coordinates and outline
 			explicit ghost(ghost_position      pos, 
