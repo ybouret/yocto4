@@ -54,7 +54,7 @@ namespace
 			const Ghost &H = wksp.inner_ghost(i);
 			std::cerr << "**** Ghosts #" << i << std::endl;
 			std::cerr << "   |_outer position: " << G.label() << std::endl;
-			std::cerr << "   |_outer deferred: " << G.deferred << std::endl;
+			std::cerr << "   |_outer is async: " << G.is_async << std::endl;
 			std::cerr << "   |_outer layout:" << std::endl;
 			display_l( G );
 			if( WKSP::DIMENSIONS <= 2 )
@@ -69,7 +69,7 @@ namespace
 			}
 			
 			std::cerr << "   |_inner position: " << H.label() << std::endl;
-			std::cerr << "   |_outer deferred: " << H.deferred << std::endl;
+			std::cerr << "   |_outer is async: " << H.is_async << std::endl;
 			std::cerr << "   |_inner layout:" << std::endl;
 			display_l(H);
 			if( WKSP::DIMENSIONS <= 2 )

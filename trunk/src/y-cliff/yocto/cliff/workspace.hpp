@@ -98,7 +98,7 @@ namespace yocto
 			const vertex_t    inv_dsq; //!< 1/delta^2
 			const layout_type nucleus; //!< original layout - deferred ghosts
 			const size_t      ghosts;  //!< number of ghosts (outer,inner)
-			const size_t      deferred_ghosts; //!< inner deferred ghosts
+			const size_t      async_ghosts; //!< number of async hosts (outer,inner)
 			
 			//! construct a workspace
 			explicit workspace(const layout_type &L,
@@ -117,14 +117,15 @@ namespace yocto
 			inv_dsq(),
 			nucleus( *this ),
 			ghosts(0),
-			deferred_ghosts(0),
+			async_ghosts(0),
 			blocks( this->size, as_capacity ),
 			block_(NULL),
 			vaxis( DIMENSIONS, as_capacity ),
 			axis_(NULL),
 			outer_ghosts(),
 			inner_ghosts(),
-			async_ghosts()
+			async_outer_ghosts(),
+			async_inner_ghosts()
 			{
 				YOCTO_STATIC_CHECK(DIMENSIONS==region_type::DIMENSIONS,cliff_workspace);
 				//--------------------------------------------------------------
@@ -291,11 +292,10 @@ namespace yocto
 				return *inner_ghosts[ghost_index];
 			}
 			
-			//! get inner deferred ghosts
-			inline const ghost_type &deferred_ghost( size_t ghost_index ) const throw()
+			inline const ghost_type &async_inner_ghost( size_t ghost_index ) const throw()
 			{
-				assert( ghost_index > 0 ); assert( ghost_index <= deferred_ghosts );
-				return *async_ghosts[ghost_index];
+				assert( ghost_index > 0 ); assert( ghost_index <= async_ghosts );
+				return *async_inner_ghosts[ghost_index];
 			}
 			
 			
@@ -321,8 +321,8 @@ namespace yocto
 			
 			vector<ghost_ptr> outer_ghosts;
 			vector<ghost_ptr> inner_ghosts;
-			vector<ghost_ptr> async_ghosts;
-			
+			vector<ghost_ptr> async_outer_ghosts;
+			vector<ghost_ptr> async_inner_ghosts;
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
 				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
@@ -345,8 +345,8 @@ namespace yocto
 				
 				const unit_t *glo      = (const unit_t *) &ghosts_lo.count;
 				const unit_t *gup      = (const unit_t *) &ghosts_up.count;
-				const unit_t *async_lo = (const unit_t *) &ghosts_lo.deferred;
-				const unit_t *async_up = (const unit_t *) &ghosts_up.deferred;
+				const unit_t *async_lo = (const unit_t *) &ghosts_lo.async;
+				const unit_t *async_up = (const unit_t *) &ghosts_up.async;
 				
 				unit_t       *limit_lo = (unit_t *) & nucleus.lower;
 				unit_t       *limit_up = (unit_t *) & nucleus.upper;
@@ -375,6 +375,10 @@ namespace yocto
 							
 							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_lo) );
 							outer_ghosts.push_back( g );
+							if( g->is_async )
+							{
+								async_outer_ghosts.push_back(g);
+							}
 						}
 						
 						//-- => inner upper ghost, corresponding deferred status
@@ -386,9 +390,9 @@ namespace yocto
 							
 							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_lo) );
 							inner_ghosts.push_back( g );
-							if( deferred_lo )
+							if( g->is_async )
 							{
-								async_ghosts.push_back( g );
+								async_inner_ghosts.push_back( g );
 								limit_up[i] -= ng;
 							}
 						}
@@ -412,6 +416,10 @@ namespace yocto
 							
 							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_up) );
 							outer_ghosts.push_back( g );
+							if( g->is_async )
+							{
+								async_outer_ghosts.push_back(g);
+							}
 						}
 						
 						//-- => inner lower ghost, corresponding deferred status
@@ -423,9 +431,9 @@ namespace yocto
 							
 							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_up) );
 							inner_ghosts.push_back( g );
-							if( deferred_up )
+							if( g->is_async )
 							{
-								async_ghosts.push_back( g );
+								async_inner_ghosts.push_back( g );
 								limit_lo[i] += ng;
 							}
 						}
@@ -433,8 +441,9 @@ namespace yocto
 				}
 				
 				assert( inner_ghosts.size() == outer_ghosts.size() );
-				(size_t &)ghosts          = outer_ghosts.size();
-				(size_t &)deferred_ghosts = async_ghosts.size(); 
+				assert( async_inner_ghosts.size() == async_outer_ghosts.size() );
+				(size_t &)ghosts       = outer_ghosts.size();
+				(size_t &)async_ghosts = async_outer_ghosts.size(); 
 			}
 			
 			

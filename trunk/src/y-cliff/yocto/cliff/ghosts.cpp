@@ -32,10 +32,10 @@ namespace yocto
 			return "";
 		}
 		
-		ghost_base:: ghost_base( size_t max_offsets, ghost_position pos, bool is_deferred ) :
+		ghost_base:: ghost_base( size_t max_offsets, ghost_position pos, bool async ) :
 		offsets(max_offsets,as_capacity),
 		position( pos ),
-		deferred( is_deferred ),
+		is_async( async ),
 		count(0),
 		bytes(0)
 		{
