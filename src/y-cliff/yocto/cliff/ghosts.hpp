@@ -32,15 +32,15 @@ namespace yocto
 			
 			const offsets_list    offsets;   //!< where the workspace data are
 			const ghost_position  position;  //!< for data I/O
-			const bool            deferred;  //!< for MPI I/O and computation overlapping
-			const size_t          count;     //!< number of I/O items
+			const bool            is_async;  //!< for MPI I/O and computation overlapping
+ 			const size_t          count;     //!< number of I/O items
 			const size_t          bytes;     //!< bytes for this count
 			const char           *label() const throw();
 			
 		protected:
 			explicit ghost_base(size_t         max_offsets, 
 								ghost_position pos, 
-								bool           is_deferred);
+								bool           async);
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ghost_base);
@@ -51,15 +51,15 @@ namespace yocto
 		class ghosts_info
 		{
 		public:
-			const COORD count;    //!< count in each dimension
-			const COORD deferred; //!< not 0 => true
-			inline ghosts_info( const COORD &num, const COORD &which ) throw() :
-			count( num ), deferred(which)
+			const COORD count; //!< count in each dimension
+			const COORD async; //!< not 0 => true
+			inline ghosts_info( const COORD &num, const COORD &status ) throw() :
+			count( num ), async(status)
 			{
 			}
 			inline ghosts_info( const ghosts_info &other ) throw() :
 			count( other.count ),
-			deferred( other.deferred )
+			async( other.async )
 			{
 			}
 			
@@ -117,9 +117,9 @@ namespace yocto
 						   param_coord         lo, 
 						   param_coord         hi ,
 						   const layout<COORD> &outline,
-						   const bool           is_deferred) :
+						   const bool           async) :
 			layout<COORD>( lo, hi ),
-			ghost_base( this->items, pos, is_deferred ),
+			ghost_base( this->items, pos, async ),
 			nvar(0),
 			slot(NULL)
 			{
