@@ -112,7 +112,7 @@ namespace yocto
 			mutable T    **slot; //!< matrix [1..nvar][0..count-1]
 		public:
 			
-			//! create ghosts
+			//! create ghosts from coordinates and outline
 			explicit ghost(ghost_position      pos, 
 						   param_coord         lo, 
 						   param_coord         hi ,
@@ -131,7 +131,6 @@ namespace yocto
 				//-- store info
 				(size_t&)(this->count) = this->offsets.size();
 				(size_t&)(this->bytes) = this->count * sizeof(T);
-				
 				
 			}
 			
@@ -197,12 +196,13 @@ namespace yocto
 				
 				const T *p = src.entry;
 				T       *q = slot[ivar];
-				for( size_t i = count; i >0; --i  )
+				for( size_t i = count; i >0; --i, ++q  )
 				{
 					const size_t j = offsets[i];
 					assert(j<src.items);
-					*(q++) = p[j];
+					*q = p[j];
 				}
+				
 			}
 			
 			//! push data into source

@@ -24,8 +24,8 @@ namespace yocto
 			assert( outline.has( sub.lower ) );
 			assert( outline.has( sub.upper ) );
 			const unit_t xoff0 = sub.lower.x - outline.lower.x;
-			size_t       yoff  = sub.lower.y - outline.lower.y;
 			const size_t dy    = outline.width.x;
+			size_t       yoff  = dy*(sub.lower.y - outline.lower.y);
 			for( size_t j =  sub.width.y; j>0; --j, yoff += dy )
 			{
 				size_t ans = yoff + xoff0;
@@ -43,11 +43,11 @@ namespace yocto
 		{
 			assert( outline.has( sub.lower ) );
 			assert( outline.has( sub.upper ) );
-			size_t        zoff  = sub.lower.z - outline.lower.z;
 			const  size_t dz    = outline.width.x * outline.width.y;
-			const size_t  yoff0 = sub.lower.y - outline.lower.y;
-			const size_t dy     = outline.width.x;
-			const size_t xoff0  = sub.lower.x - outline.lower.x;
+			size_t        zoff  = (sub.lower.z - outline.lower.z)*dz;
+			const size_t  dy    = outline.width.x;
+			const size_t  yoff0 = (sub.lower.y - outline.lower.y)*dy;
+			const size_t  xoff0 = sub.lower.x - outline.lower.x;
 			for( size_t k = sub.width.z; k>0; --k, zoff += dz )
 			{
 				size_t yoff = zoff + yoff0;
