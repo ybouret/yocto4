@@ -298,14 +298,20 @@ namespace yocto
 				return *async_inner_ghosts[ghost_index];
 			}
 			
+			inline const ghost_type &async_outer_ghost( size_t ghost_index ) const throw()
+			{
+				assert( ghost_index > 0 ); assert( ghost_index <= async_ghosts );
+				return *async_outer_ghosts[ghost_index];
+			}
+			
 			
 			//! acquire memory for deferred ghosts
 			void acquire_ghosts_data( size_t nvar )
 			{
-				for( size_t g=1; g <= ghosts; ++g )
+				for( size_t g=1; g <= async_ghosts; ++g )
 				{
-					if( inner_ghost(g).deferred ) inner_ghost(g).acquire_data(nvar);
-					if( outer_ghost(g).deferred ) outer_ghost(g).acquire_data(nvar);
+					async_inner_ghost(g).acquire_data(nvar);
+					async_outer_ghost(g).acquire_data(nvar);
 				}
 			}
 			
