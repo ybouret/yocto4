@@ -111,6 +111,7 @@ namespace yocto
 		private:
 			mutable T    **slot; //!< matrix [1..nvar][0..count-1]
 		public:
+			int            peer; //!< MPI source/destination, initially -1
 			
 			//! create ghosts from coordinates and outline
 			explicit ghost(ghost_position      pos, 
@@ -121,7 +122,8 @@ namespace yocto
 			layout<COORD>( lo, hi ),
 			ghost_base( this->items, pos, async ),
 			nvar(0),
-			slot(NULL)
+			slot(NULL),
+			peer(-1)
 			{
 				assert( outline.has(this->lower) );
 				assert( outline.has(this->upper) );
