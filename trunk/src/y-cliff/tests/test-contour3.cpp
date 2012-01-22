@@ -86,7 +86,7 @@ YOCTO_UNIT_TEST_IMPL(contour3)
 	typedef wksp_type::vertex_t   vertex_t;
 	const   wksp_type::layout_type L( coord3D(1,1,1), coord3D(50,50,50) );
 	const   wksp_type::region_type R( vertex_t(-4.0,-4.0,-4.0),vertex_t(4.0,4.0,4.0));
-	const ghosts_info<coord3D>     g( coord3D(0,0,0), coord3D(0,0,0) );
+	const ghosts_infos<coord3D>    g( coord3D(0,0,0), coord3D(0,0,0) );
 	const ghosts_setup<coord3D>    G(g,g);
 	wksp_type w(L,
 				G,
