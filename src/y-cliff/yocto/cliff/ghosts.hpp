@@ -48,25 +48,25 @@ namespace yocto
 		
 		//! number of ghosts and deferred type or not
 		template <typename COORD>
-		class ghosts_info
+		class ghosts_infos
 		{
 		public:
 			const COORD count; //!< count in each dimension
 			const COORD async; //!< not 0 => true
-			inline ghosts_info( const COORD &num, const COORD &status ) throw() :
+			inline ghosts_infos( const COORD &num, const COORD &status ) throw() :
 			count( num ), async(status)
 			{
 			}
-			inline ghosts_info( const ghosts_info &other ) throw() :
+			inline ghosts_infos( const ghosts_infos &other ) throw() :
 			count( other.count ),
 			async( other.async )
 			{
 			}
 			
-			inline ~ghosts_info() throw() {}
+			inline ~ghosts_infos() throw() {}
 			
 		private:
-			YOCTO_DISABLE_ASSIGN(ghosts_info);
+			YOCTO_DISABLE_ASSIGN(ghosts_infos);
 		};
 		
 		//! info for lower and upper ghosts
@@ -74,11 +74,11 @@ namespace yocto
 		class ghosts_setup
 		{
 		public:
-			typedef ghosts_info<COORD> info_type;
-			const info_type lower;
-			const info_type upper;
+			typedef ghosts_infos<COORD> infos_type;
+			const infos_type lower;
+			const infos_type upper;
 			
-			inline ghosts_setup( const info_type &lo, const info_type &up ) throw() :
+			inline ghosts_setup( const infos_type &lo, const infos_type &up ) throw() :
 			lower(lo),
 			upper(up)
 			{

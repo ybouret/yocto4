@@ -91,8 +91,8 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 	{	
 		const layout1D L(-10,20);
 		const region1D<double>::type R(-2.0,4.0);
-		const ghosts_info<coord1D>   g_lo(1,0);
-		const ghosts_info<coord1D>   g_up(2,0);
+		const ghosts_infos<coord1D>  g_lo(1,0);
+		const ghosts_infos<coord1D>  g_up(2,0);
 		const ghosts_setup<coord1D>  G( g_lo, g_up );
 		wksp1D< complex<float>, double>  w1(L, 
 											G, 
@@ -149,8 +149,8 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
 		const layout2D              L( coord2D(-100,-100), coord2D(200,200) );
 		const region2D<float>::type R( v2d<float>(-2,-2), v2d<float>(4,4) );
-		const ghosts_info<coord2D>  g_lo( coord2D(0,1), coord2D(0,0) );
-		const ghosts_info<coord2D>  g_up( coord2D(0,2), coord2D(0,0) );
+		const ghosts_infos<coord2D> g_lo( coord2D(0,1), coord2D(0,0) );
+		const ghosts_infos<coord2D> g_up( coord2D(0,2), coord2D(0,0) );
 		const ghosts_setup<coord2D> G( g_lo, g_up );
 		wksp2D< double, float > w2(L,
 								   G,
@@ -196,8 +196,8 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		const size_t varcount   = sizeof(varnames)/sizeof(varnames[0]);
 		const layout3D L( coord3D(-20,-20,-20), coord3D(40,40,40) );
 		const region3D<float>::type R( v3d<float>(-1,-1,-1), v3d<float>(2,2,2) );
-		const ghosts_info<coord3D> g_lo(coord3D(0,0,1), coord3D());
-		const ghosts_info<coord3D> g_up(coord3D(0,0,2), coord3D());
+		const ghosts_infos<coord3D> g_lo(coord3D(0,0,1), coord3D());
+		const ghosts_infos<coord3D> g_up(coord3D(0,0,2), coord3D());
 		const ghosts_setup<coord3D> G(g_lo,g_up);
 		wksp3D< complex<double>, float > w3(L,
 											G,

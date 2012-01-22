@@ -97,7 +97,7 @@ namespace yocto
 			const vertex_t    inv_d;   //!< 1/delta
 			const vertex_t    inv_dsq; //!< 1/delta^2
 			const layout_type nucleus; //!< original layout - deferred ghosts
-			const size_t      ghosts;  //!< number of ghosts (outer,inner)
+			const size_t      plain_ghosts; //!< number of plain ghosts (outer,inner)
 			const size_t      async_ghosts; //!< number of async hosts (outer,inner)
 			
 			//! construct a workspace
@@ -116,14 +116,14 @@ namespace yocto
 			inv_d(),
 			inv_dsq(),
 			nucleus( *this ),
-			ghosts(0),
+			plain_ghosts(0),
 			async_ghosts(0),
 			blocks( this->size, as_capacity ),
 			block_(NULL),
 			vaxis( DIMENSIONS, as_capacity ),
 			axis_(NULL),
-			outer_ghosts(),
-			inner_ghosts(),
+			plain_outer_ghosts(),
+			plain_inner_ghosts(),
 			async_outer_ghosts(),
 			async_inner_ghosts()
 			{
@@ -278,18 +278,17 @@ namespace yocto
 				}
 			}
 			
-			inline const ghost_type &outer_ghost( size_t ghost_index ) const throw() 
+			inline const ghost_type &plain_outer_ghost( size_t ghost_index ) const throw() 
 			{
-				assert( ghost_index > 0 ); assert( ghost_index <= ghosts );
-				return *outer_ghosts[ghost_index];
+				assert( ghost_index > 0 ); assert( ghost_index <= plain_ghosts );
+				return *plain_outer_ghosts[ghost_index];
 			}
 			
 			
-			
-			inline const ghost_type &inner_ghost( size_t ghost_index ) const throw() 
+			inline const ghost_type &plain_inner_ghost( size_t ghost_index ) const throw() 
 			{
-				assert( ghost_index > 0 ); assert( ghost_index <= ghosts );
-				return *inner_ghosts[ghost_index];
+				assert( ghost_index > 0 ); assert( ghost_index <= plain_ghosts );
+				return *plain_inner_ghosts[ghost_index];
 			}
 			
 			inline const ghost_type &async_inner_ghost( size_t ghost_index ) const throw()
@@ -325,8 +324,8 @@ namespace yocto
 			vector<axis_ptr> vaxis;
 			axis_ptr        *axis_;
 			
-			vector<ghost_ptr> outer_ghosts;
-			vector<ghost_ptr> inner_ghosts;
+			vector<ghost_ptr> plain_outer_ghosts;
+			vector<ghost_ptr> plain_inner_ghosts;
 			vector<ghost_ptr> async_outer_ghosts;
 			vector<ghost_ptr> async_inner_ghosts;
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
@@ -346,8 +345,8 @@ namespace yocto
 			
 			inline void create_ghosts(const ghosts_type &G)
 			{
-				const ghosts_info<coord_t> &ghosts_lo = G.lower;
-				const ghosts_info<coord_t> &ghosts_up = G.upper;
+				const ghosts_infos<coord_t> &ghosts_lo = G.lower;
+				const ghosts_infos<coord_t> &ghosts_up = G.upper;
 				
 				const unit_t *glo      = (const unit_t *) &ghosts_lo.count;
 				const unit_t *gup      = (const unit_t *) &ghosts_up.count;
@@ -380,10 +379,13 @@ namespace yocto
 							__get(lo,i) -= ng;
 							
 							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_lo) );
-							outer_ghosts.push_back( g );
 							if( g->is_async )
 							{
 								async_outer_ghosts.push_back(g);
+							}
+							else
+							{
+								plain_outer_ghosts.push_back( g );
 							}
 						}
 						
@@ -395,11 +397,14 @@ namespace yocto
 							__get(lo,i) = __get(up,i) - (ng-1);
 							
 							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_lo) );
-							inner_ghosts.push_back( g );
 							if( g->is_async )
 							{
 								async_inner_ghosts.push_back( g );
 								limit_up[i] -= ng;
+							}
+							else
+							{
+								plain_inner_ghosts.push_back( g );
 							}
 						}
 						
@@ -421,14 +426,18 @@ namespace yocto
 							__get(up,i) += ng;
 							
 							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_up) );
-							outer_ghosts.push_back( g );
+							
 							if( g->is_async )
 							{
 								async_outer_ghosts.push_back(g);
 							}
+							else
+							{
+								plain_outer_ghosts.push_back( g );
+							}
 						}
 						
-						//-- => inner lower ghost, corresponding deferred status
+						//-- => inner lower ghost, corresponding async status
 						{
 							coord_t lo(this->lower); 
 							coord_t up(this->upper); 
@@ -436,19 +445,23 @@ namespace yocto
 							__get(up,i) = __get(lo,i) + (ng-1);
 							
 							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_up) );
-							inner_ghosts.push_back( g );
+							
 							if( g->is_async )
 							{
 								async_inner_ghosts.push_back( g );
 								limit_lo[i] += ng;
 							}
+							else
+							{
+								plain_inner_ghosts.push_back( g );
+							}
 						}
 					}
 				}
 				
-				assert( inner_ghosts.size() == outer_ghosts.size() );
+				assert( plain_inner_ghosts.size() == plain_outer_ghosts.size() );
 				assert( async_inner_ghosts.size() == async_outer_ghosts.size() );
-				(size_t &)ghosts       = outer_ghosts.size();
+				(size_t &)plain_ghosts = plain_outer_ghosts.size();
 				(size_t &)async_ghosts = async_outer_ghosts.size(); 
 			}
 			

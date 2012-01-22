@@ -31,6 +31,8 @@ namespace
 		}
 	}
 	
+
+	
 	template <typename WKSP>
 	static inline void display_info( WKSP &wksp)
 	{
@@ -47,14 +49,14 @@ namespace
 		std::cerr << "delta     = " << wksp.delta      << std::endl;
 		std::cerr << "inv_d     = " << wksp.inv_d      << std::endl;
 		std::cerr << "inv_dsq   = " << wksp.inv_dsq    << std::endl;
-		std::cerr << "ghosts    = " << wksp.ghosts     << std::endl;
-		for( size_t i=1; i <= wksp.ghosts; ++i )
+		std::cerr << "plain_ghosts  = " << wksp.plain_ghosts  << std::endl;
+		std::cerr << "async_ghosts  = " << wksp.async_ghosts  << std::endl;
+		for( size_t i=1; i <= wksp.plain_ghosts; ++i )
 		{
-			const Ghost &G = wksp.outer_ghost(i);
-			const Ghost &H = wksp.inner_ghost(i);
-			std::cerr << "**** Ghosts #" << i << std::endl;
+			const Ghost &G = wksp.plain_outer_ghost(i);
+			const Ghost &H = wksp.plain_inner_ghost(i);
+			std::cerr << "**** Plain Ghosts #" << i << std::endl;
 			std::cerr << "   |_outer position: " << G.label() << std::endl;
-			std::cerr << "   |_outer is async: " << G.is_async << std::endl;
 			std::cerr << "   |_outer layout:" << std::endl;
 			display_l( G );
 			if( WKSP::DIMENSIONS <= 2 )
@@ -95,9 +97,67 @@ namespace
 				//memset( H.data, 0, H.bytes );
 				H.pull( wksp[j],k );
 				H.push( wksp[j],k );
+				
+				Ghost::direct_copy( G,H, wksp[j] );
+				Ghost::direct_copy( H,G, wksp[j] );
 			}
 			
 		}
+		
+		for( size_t i=1; i <= wksp.async_ghosts; ++i )
+		{
+			const Ghost &G = wksp.async_outer_ghost(i);
+			const Ghost &H = wksp.async_inner_ghost(i);
+			std::cerr << "**** ASync Ghosts #" << i << std::endl;
+			std::cerr << "   |_outer position: " << G.label() << std::endl;
+			std::cerr << "   |_outer layout:" << std::endl;
+			display_l( G );
+			if( WKSP::DIMENSIONS <= 2 )
+			{
+				const offsets_list &offsets = G.offsets;
+				std::cerr << "offsets:";
+				for( size_t j=1; j <= offsets.size(); ++j )
+				{
+					std::cerr << ' ' << offsets[j];
+				}
+				std::cerr << std::endl;
+			}
+			
+			std::cerr << "   |_inner position: " << H.label() << std::endl;
+			std::cerr << "   |_outer is async: " << H.is_async << std::endl;
+			std::cerr << "   |_inner layout:" << std::endl;
+			display_l(H);
+			if( WKSP::DIMENSIONS <= 2 )
+			{
+				const offsets_list &offsets = H.offsets;
+				std::cerr << "offsets:";
+				for( size_t j=1; j <= offsets.size(); ++j )
+				{
+					std::cerr << ' ' << offsets[j];
+				}
+				std::cerr << std::endl;
+			}
+			
+			
+			std::cerr << "   |_pull/push..." << std::endl;
+			H.acquire_data( wksp.size );
+			G.acquire_data( wksp.size );
+			for( size_t j= wksp.cmin, k=1; j <= wksp.cmax; ++j, ++k )
+			{
+				G.pull( wksp[j],k );
+				G.push( wksp[j],k);
+				
+				//memset( H.data, 0, H.bytes );
+				H.pull( wksp[j],k );
+				H.push( wksp[j],k );
+				
+				
+				Ghost::direct_copy( G,H, wksp[j] );
+				Ghost::direct_copy( H,G, wksp[j] );
+			}
+			
+		}
+		
 		std::cerr << "---- nucleus:" << std::endl;
 		display_l(wksp.nucleus);
 		
@@ -118,11 +178,11 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 	
 	{
 		typedef wksp1D<double,double> w1D_t;
-		const w1D_t:: layout_type L( -10, 10 );
-		const w1D_t:: region_type R( -1, 1 );
-		const ghosts_info<coord1D>  g_lo( 1, 0 ); //! one, not deferred
-		const ghosts_info<coord1D>  g_up( 2, 1 ); //! two, deferred
-		const ghosts_setup<coord1D> G( g_lo, g_up );
+		const w1D_t:: layout_type    L( -10, 10 );
+		const w1D_t:: region_type    R( -1, 1 );
+		const ghosts_infos<coord1D>  g_lo( 1, 0 ); //! one, not deferred
+		const ghosts_infos<coord1D>  g_up( 2, 1 ); //! two, deferred
+		const ghosts_setup<coord1D>  G( g_lo, g_up );
 		w1D_t W(L,
 				G,
 				R,
@@ -136,10 +196,10 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 	{
 		typedef wksp2D<double,double>  w2D_t;
 		typedef vertex2D<double>::type v2D_t;
-		const w2D_t::layout_type L( coord2D(-20,-10), coord2D(10,20) );
-		const w2D_t::region_type R( v2D_t(-1,-1), v2D_t(1,1) );
-		const ghosts_info<coord2D>  g_lo( coord2D(1,2), coord2D(0,0) ); //! 1 lower_x, 2 lower_y, not deferred
-		const ghosts_info<coord2D>  g_up( coord2D(3,4), coord2D(1,0) ); //! 3 upper_x, 4 upper_y, upper_x is deffered
+		const w2D_t::layout_type    L( coord2D(-20,-10), coord2D(10,20) );
+		const w2D_t::region_type    R( v2D_t(-1,-1), v2D_t(1,1) );
+		const ghosts_infos<coord2D> g_lo( coord2D(1,2), coord2D(0,0) ); //! 1 lower_x, 2 lower_y, not deferred
+		const ghosts_infos<coord2D> g_up( coord2D(3,4), coord2D(1,0) ); //! 3 upper_x, 4 upper_y, upper_x is deffered
 		const ghosts_setup<coord2D> G( g_lo, g_up );
 		w2D_t W(L,
 				G,
@@ -156,8 +216,8 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		typedef vertex3D<double>::type v3D_t;
 		const w3D_t::layout_type    L( coord3D(0,0,0), coord3D(10,15,20) );
 		const w3D_t::region_type    R( v3D_t(-1,-1,-1), v3D_t(1,1,1) );
-		const ghosts_info<coord3D>  g_lo( coord3D(1,2,3), coord3D(0,0,1) );
-		const ghosts_info<coord3D>  g_up( coord3D(4,5,6), coord3D(0,0,1) );
+		const ghosts_infos<coord3D> g_lo( coord3D(1,2,3), coord3D(0,0,1) );
+		const ghosts_infos<coord3D> g_up( coord3D(4,5,6), coord3D(0,0,1) );
 		const ghosts_setup<coord3D> G( g_lo, g_up );
 		w3D_t W(L,
 				G,
