@@ -52,6 +52,9 @@ namespace yocto
 		
 		
 		//! heavily templated workspace
+		/**
+		 Manage arrays, region and ghosts.
+		 */
 		template <
 		typename                  T,       // real/complex...
 		template <typename> class ARRAY,   // layout[1|2|3]D
@@ -64,7 +67,7 @@ namespace yocto
 			//==================================================================
 			// compute types
 			//==================================================================
-			YOCTO_ARGUMENTS_DECL_T; //!< for data handling
+			YOCTO_ARGUMENTS_DECL_T; 
 			typedef workspace<T,ARRAY,U,REGION>        wksp_type;
 			typedef ARRAY<T>                           array_type;
 			typedef typename array_type::layout_type   layout_type;
@@ -92,16 +95,21 @@ namespace yocto
 			typedef ghost<T,coord_t>       ghost_type;
 			typedef shared_ptr<ghost_type> ghost_ptr;
 			
-			const layout_type outline; //!< original layout+ghosts
-			const region_type region;  //!< real space associated to layout (NOT outline)
-			const vertex_t    delta;   //!< step for each dimension
-			const vertex_t    inv_d;   //!< 1/delta
-			const vertex_t    inv_dsq; //!< 1/delta^2
-			const layout_type nucleus; //!< original layout - deferred ghosts
+			const layout_type outline;      //!< original layout+ghosts
+			const region_type region;       //!< real space associated to layout (NOT outline)
+			const vertex_t    delta;        //!< step for each dimension
+			const vertex_t    inv_d;        //!< 1/delta
+			const vertex_t    inv_dsq;      //!< 1/delta^2
+			const layout_type nucleus;      //!< original layout - deferred ghosts
 			const size_t      plain_ghosts; //!< number of plain ghosts (outer,inner)
 			const size_t      async_ghosts; //!< number of async hosts (outer,inner)
 			
 			//! construct a workspace
+			/**
+			 \param L working layout
+			 \param G ghosts information
+			 \param R working region
+			 */
 			explicit workspace(const layout_type &L,
 							   const ghosts_type &G,
 							   const region_type &R,
@@ -197,6 +205,9 @@ namespace yocto
 			}
 			
 			//! return an axis
+			/**
+			 \param idim 0..DIMENSIONS-1
+			 */
 			inline const axis_type & axis(size_t idim) const throw()
 			{
 				assert(idim<DIMENSIONS);
@@ -204,15 +215,21 @@ namespace yocto
 			}
 			
 			//! returns an array of valid component
-			inline data_block & operator[]( const size_t c ) throw()
+			/**
+			 \param c in [1..number] of components
+			 */
+			inline array_type & operator[]( size_t c ) throw()
 			{
 				assert(c>=1);
 				assert(c<=this->number);
 				return * blocks[c];
 			}
 			
-			//! returns an array of valid component
-			inline const data_block & operator[]( const size_t c ) const throw()
+			//! returns a const array of valid component
+			/**
+			 \param c in [1..number] of components
+			 */
+			inline const array_type & operator[]( const size_t c ) const throw()
 			{
 				assert(c>=1);
 				assert(c<=this->number);
@@ -221,28 +238,40 @@ namespace yocto
 			
 			
 			//! returns an array of valid component
-			inline data_block & operator[]( const string &id )
+			/**
+			 \param id a valid component id
+			 */
+			inline array_type & operator[]( const string &id )
 			{
 				const components &comp = *this;
 				return * blocks[ comp(id) ];
 			}
 			
 			//! returns an array of valid component
-			inline const data_block & operator[]( const string &id ) const throw()
+			/**
+			 \param id a valid component id
+			 */
+			inline const array_type & operator[]( const string &id ) const throw()
 			{
 				const components &comp = *this;
 				return * blocks[ comp(id) ];
 			}
 			
 			//! returns an array of valid component
-			inline data_block & operator[]( const char *id )
+			/**
+			 \param id a valid component id
+			 */
+			inline array_type & operator[]( const char *id )
 			{
 				const components &comp = *this;
 				return * blocks[ comp(id) ];
 			}
 			
 			//! returns an array of valid component
-			inline const data_block & operator[]( const char *id ) const throw()
+			/**
+			 \param id a valid component id
+			 */
+			inline const array_type & operator[]( const char *id ) const throw()
 			{
 				const components &comp = *this;
 				return * blocks[ comp(id) ];
@@ -255,6 +284,11 @@ namespace yocto
 			}
 			
 			//! query and array of variables
+			/**
+			 \param var vector or float/double/complex values
+			 \param cid vector of components indices
+			 \param offset offset to query in this->outline.
+			 */
 			inline void query( array<T> &var, const array<size_t> &cid, size_t offset ) const throw()
 			{
 				assert( offset < this->outline.items );
@@ -267,6 +301,11 @@ namespace yocto
 			}
 			
 			//! store an array of variables
+			/**
+			 \param var vector or float/double/complex values
+			 \param cid vector of components indices
+			 \param offset offset to store in this->outline.
+			 */
 			inline void store( const array<T> &var, const array<size_t> &cid, size_t offset ) throw()
 			{
 				assert( offset < this->outline.items );
@@ -278,25 +317,28 @@ namespace yocto
 				}
 			}
 			
+			//!
 			inline const ghost_type &plain_outer_ghost( size_t ghost_index ) const throw() 
 			{
 				assert( ghost_index > 0 ); assert( ghost_index <= plain_ghosts );
 				return *plain_outer_ghosts[ghost_index];
 			}
 			
-			
+			//!
 			inline const ghost_type &plain_inner_ghost( size_t ghost_index ) const throw() 
 			{
 				assert( ghost_index > 0 ); assert( ghost_index <= plain_ghosts );
 				return *plain_inner_ghosts[ghost_index];
 			}
 			
+			//!
 			inline const ghost_type &async_inner_ghost( size_t ghost_index ) const throw()
 			{
 				assert( ghost_index > 0 ); assert( ghost_index <= async_ghosts );
 				return *async_inner_ghosts[ghost_index];
 			}
 			
+			//!
 			inline const ghost_type &async_outer_ghost( size_t ghost_index ) const throw()
 			{
 				assert( ghost_index > 0 ); assert( ghost_index <= async_ghosts );
@@ -304,7 +346,7 @@ namespace yocto
 			}
 			
 			
-			//! acquire memory for deferred ghosts
+			//! acquire memory for asynchronous ghosts
 			void acquire_ghosts_data( size_t nvar )
 			{
 				for( size_t g=1; g <= async_ghosts; ++g )
@@ -327,6 +369,8 @@ namespace yocto
 			vector<ghost_ptr> plain_inner_ghosts;
 			vector<ghost_ptr> async_outer_ghosts;
 			vector<ghost_ptr> async_inner_ghosts;
+			
+			
 			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
 			{
 				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
@@ -342,6 +386,7 @@ namespace yocto
 				return *(((unit_t *)&coord)+dim);
 			}
 			
+			//! automatic ghosts creation
 			inline void create_ghosts(const ghosts_type &G)
 			{
 				const ghosts_infos<coord_t> &ghosts_lo = G.lower;

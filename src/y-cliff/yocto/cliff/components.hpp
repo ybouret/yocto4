@@ -26,14 +26,14 @@ namespace yocto
 			explicit components( size_t num, const char *name_list[] );
 			virtual ~components() throw();
 			
-			const size_t number;
+			const size_t number; //!< number of components
 			
 			const string & name( size_t i ) const throw();
 			const char   * text( size_t i ) const throw();
 			void           name( size_t i, const string &id );
 			void           name( size_t i, const char   *id );
-			size_t operator()( const string &id ) const;
-			size_t operator()( const char   *id ) const;
+			size_t operator()( const string &id ) const; //!< index of id
+			size_t operator()( const char   *id ) const; //!< index of id
 			
 		private:
 			vector<string>     names;

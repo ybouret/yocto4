@@ -1,3 +1,5 @@
+// \file
+
 #ifndef YOCTO_CLIFF_LINEAR_INCLUDED
 #define YOCTO_CLIFF_LINEAR_INCLUDED 1
 
@@ -12,7 +14,12 @@ namespace yocto
 	namespace cliff
 	{
 		
-		//! linear space  on a layout
+		//! linear space for a layout
+		/**
+		 Prepare data over a layout.
+		 No memory is allocated.
+		 Implements abstract 'foreach'.
+		 */
 		template <typename T, typename LAYOUT>
 		class linear : public LAYOUT
 		{
@@ -100,7 +107,7 @@ namespace yocto
 							imin = i;
 						}
 					}
-
+					
 				}
 				if(offmax) *offmax = imax;
 				if(offmin) *offmin = imin;

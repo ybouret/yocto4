@@ -10,6 +10,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! base class for region
 		template <typename U>
 		class region_base 
 		{
@@ -19,6 +20,7 @@ namespace yocto
 			
 		protected:
 			explicit region_base(const size_t n) throw();
+			
 			//! order pmin and pmax, compute plen, return product of plen
 			U        setup( const void *pmin, const void *pmax, const void *plen );
 			
@@ -26,6 +28,7 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(region_base);
 		};
 		
+		//! region of float/double
 		template <typename U, template <class> class VERTEX>
 		class region : public region_base<U>
 		{
@@ -35,9 +38,9 @@ namespace yocto
 			
 			static const size_t DIMENSIONS = sizeof(vertex_t)/sizeof(U);
 			
-			const vertex_t min;
-			const vertex_t max;
-			const vertex_t length;
+			const vertex_t min;     //!< minimal x[,y[,z]]
+			const vertex_t max;     //!< maximal x[,y[,z]]
+			const vertex_t length;  //!< max-min
 			const U        space;   //!< product of lengths (length,area,volume)
 			
 			//! default region
@@ -51,7 +54,7 @@ namespace yocto
 			}
 			
 			//! direct copy
-			region( const region &r ) throw() :
+			inline region( const region &r ) throw() :
 			region_base<U>( DIMENSIONS ),
 			min( r.min ),
 			max( r.max ),
@@ -65,6 +68,12 @@ namespace yocto
 			{
 			}
 			
+			//! extract a sub region
+			/**
+				\param r      original region
+				\param master corresponding layout
+				\param sub    sub layout of master layout.
+			 */
 			template <typename LAYOUT>
 			static region extract( const region &r, const LAYOUT &master, const LAYOUT &sub ) throw()
 			{

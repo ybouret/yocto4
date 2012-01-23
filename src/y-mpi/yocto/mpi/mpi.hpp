@@ -42,11 +42,12 @@ namespace yocto
 	 MPI_Scatterv 	  	  
 	 */
 	
+	//! MPI functions wrappers
 	class mpi : public singleton<mpi>
 	{
 	public:
 		
-		//! error handling
+		//! dedicated error handling
 		class exception : public yocto::exception
 		{
 		public:
@@ -67,8 +68,8 @@ namespace yocto
 		void   Finalize() throw();
 		
 		
-		const int CommWorldSize;
-		const int CommWorldRank;
+		const int CommWorldSize;    //!< size of MPI_COMM_WORLD
+		const int CommWorldRank;    //!< rank in MPI_COMM_WORLD
 		const int CommWorldRankMax; //!< CommWorldSize-1;
 		
 		const int    ProcessorNameLength;
@@ -113,8 +114,8 @@ namespace yocto
 		//======================================================================
 		// Usefull helpers
 		//======================================================================
-		int  CommWorldNext() const throw(); //!< CommWorldSize should be >= 2
-		int  CommWorldPrev() const throw(); //!< CommWorldSize should be >= 2
+		int  CommWorldNext() const throw(); //!< modulus the CommWorldSize
+		int  CommWorldPrev() const throw(); //!< modulus the CommWorldSize
 		
 		
 		//! parallel printf, in order in MPI_COMM_WORLD

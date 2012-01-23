@@ -11,16 +11,20 @@ namespace yocto
 	
 	namespace cliff
 	{
-
+		
 		//! layout of coordinates
+		/**
+		 Information about index coordinates.
+		 No memory is allocated.
+		 */
 		template <typename COORD>
 		class layout : public layout_base
 		{
 		public:
-			typedef COORD                                        coord_t;
-			typedef typename type_traits<COORD>::mutable_type    mutable_coord;
-			typedef const     mutable_coord                      const_coord;
-			typedef typename type_traits<COORD>::parameter_type  param_coord;
+			typedef COORD                                         coord_t;
+			typedef typename  type_traits<COORD>::mutable_type    mutable_coord;
+			typedef const     mutable_coord                       const_coord;
+			typedef typename  type_traits<COORD>::parameter_type  param_coord;
 			
 			//! #COORD = 1|2|3
 			static const size_t DIMENSIONS = sizeof(COORD)/sizeof(unit_t);
@@ -32,6 +36,12 @@ namespace yocto
 			
 			
 			//! prepare layout
+			/** 
+			 \param lo lower coordinates
+			 \param up upper coordinates
+			 
+			 The coordinates are ordered.
+			 */
 			inline explicit layout( param_coord lo, param_coord hi ) throw() :
 			layout_base( DIMENSIONS ),
 			lower( lo ),
@@ -96,11 +106,20 @@ namespace yocto
 				return layout(in_lo,in_up);
 			}
 			
-			static void load_offsets( offsets_list &offsets, const layout &sub, const layout &outline );
+			//! compute the offsets of a sub layout
+			/**
+				\param offsets where the offsets are stored.
+				\param outline the source layout.
+				\param sub     a part of the outline
+			 */
+			static void load_offsets( offsets_list &offsets, const layout &outline, const layout &sub );
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(layout);
 		};
+		
+		template <typename LAYOUT,typename SUBCLASS>
+		inline const LAYOUT & to_layout( const SUBCLASS &C ) throw() { return C; }
 		
 	}
 }

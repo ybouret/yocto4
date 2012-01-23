@@ -32,7 +32,7 @@ namespace yocto
 			return "";
 		}
 		
-		ghost_base:: ghost_base( size_t max_offsets, ghost_position pos, bool async ) :
+		ghost_base:: ghost_base( size_t max_offsets, ghost_position pos, bool async ) throw():
 		offsets(max_offsets,as_capacity),
 		position( pos ),
 		is_async( async ),

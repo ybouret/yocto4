@@ -2,8 +2,12 @@
 #define YOCTO_CLIFF_GHOSTS_INCLUDED 1
 
 
+// \file
+
 #include "yocto/cliff/linear.hpp"
 #include "yocto/sequence/vector.hpp"
+
+#include <cstring>
 
 namespace yocto
 {
@@ -11,6 +15,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! geometrical information
 		enum ghost_position
 		{
 			ghost_lower_x = 0,
@@ -33,14 +38,14 @@ namespace yocto
 			const offsets_list    offsets;   //!< where the workspace data are
 			const ghost_position  position;  //!< for data I/O
 			const bool            is_async;  //!< for MPI I/O and computation overlapping
- 			const size_t          count;     //!< number of I/O items
+ 			const size_t          count;     //!< number of items (float,double,complex...)
 			const size_t          bytes;     //!< bytes for this count
-			const char           *label() const throw();
+			const char           *label() const throw(); //!< from position
 			
 		protected:
 			explicit ghost_base(size_t         max_offsets, 
 								ghost_position pos, 
-								bool           async);
+								bool           async) throw();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ghost_base);
@@ -51,22 +56,36 @@ namespace yocto
 		class ghosts_infos
 		{
 		public:
-			const COORD count; //!< count in each dimension
-			const COORD async; //!< not 0 => true
+			COORD count; //!< count in each dimension
+			COORD async; //!< not 0 => asynchronous
+			
+			inline ghosts_infos() throw() : count(), async() 
+			{ 
+				memset( (void*) &count, 0, sizeof(COORD) );
+				memset( (void*) &async, 0, sizeof(COORD) );
+			}
+		
 			inline ghosts_infos( const COORD &num, const COORD &status ) throw() :
 			count( num ), async(status)
 			{
 			}
+			
 			inline ghosts_infos( const ghosts_infos &other ) throw() :
 			count( other.count ),
 			async( other.async )
 			{
 			}
 			
-			inline ~ghosts_infos() throw() {}
+			inline ghosts_infos & operator=( const ghosts_infos &other ) throw()
+			{
+				count = other.count;
+				async = other.async;
+				return *this;
+			}
 			
-		private:
-			YOCTO_DISABLE_ASSIGN(ghosts_infos);
+			inline ~ghosts_infos() throw() {}
+		
+			
 		};
 		
 		//! info for lower and upper ghosts
@@ -99,7 +118,10 @@ namespace yocto
 		
 		
 		
-		//! ghost: sub layout and offsets
+		//! ghost
+		/**
+			Manage information for one ghost.
+		 */
 		template <typename T,typename COORD>
 		class ghost :  public object, public layout<COORD>, public ghost_base
 		{
@@ -107,7 +129,7 @@ namespace yocto
 			typedef typename layout<COORD>::param_coord param_coord;
 			typedef linear<T,layout<COORD> >            linear_type;
 			
-			const size_t   nvar; //!< max number of storable variables
+			const size_t   nvar; //!< max number of storable variables, initially 0
 		private:
 			mutable T    **slot; //!< matrix [1..nvar][0..count-1]
 		public:
@@ -127,8 +149,9 @@ namespace yocto
 			{
 				assert( outline.has(this->lower) );
 				assert( outline.has(this->upper) );
+				
 				//-- prepare offsets
-				layout<COORD>::load_offsets( (offsets_list &)(this->offsets), *this, outline );
+				layout<COORD>::load_offsets( (offsets_list &)(this->offsets), outline, *this );
 				
 				//-- store info
 				(size_t&)(this->count) = this->offsets.size();
@@ -136,16 +159,20 @@ namespace yocto
 				
 			}
 			
-			//! acquire data for deferred copy
-			void acquire_data( size_t num_slots ) const
+			//! acquire data for asynchronous copy
+			/**
+				\param nvar > 0
+				prepar nvar slots of this->count float/double/...
+			 */
+			void acquire_data( size_t num_var ) const
 			{
-				assert(num_slots>0);
+				assert(num_var>0);
 				assert(count>0);
-				if( num_slots != nvar )
+				if( num_var != nvar )
 				{
 					release_data();
 					size_t &nv = (size_t &)nvar;
-					nv   = num_slots;
+					nv   = num_var;
 					slot = memory::kind<memory::global>::acquire_as<T*>( nv )-1;
 					try
 					{
@@ -164,6 +191,7 @@ namespace yocto
 				}
 			}
 			
+			//! release data
 			void release_data() const
 			{
 				assert(count>0);
