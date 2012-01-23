@@ -10,7 +10,7 @@ namespace  {
 	
 	static inline void display( const components &C )
 	{
-		for( size_t i=C.cmin; i <= C.cmax; ++i )
+		for( size_t i=1; i <= C.number; ++i )
 		{
 			std::cerr << "component #" << i << " = " << C.name(i) << std::endl;
 		}
@@ -23,7 +23,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
 {
 
 	{
-		components C(1,10,NULL);
+		components C(10,NULL);
 		display(C);
 		C.name(3,"toto");
 		display(C);
@@ -31,7 +31,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
 	
 	{
 		const char *varnames[] = { "u", "v" };
-		components C(0,sizeof(varnames)/sizeof(varnames[0]),varnames);
+		components C(sizeof(varnames)/sizeof(varnames[0]),varnames);
 		display(C);
 	}
 	

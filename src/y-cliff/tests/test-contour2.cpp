@@ -76,7 +76,7 @@ YOCTO_UNIT_TEST_IMPL(contour2)
 	wksp_type w(L,
 				G,
 				R,
-				1,1,NULL);
+				1,NULL);
 	
 	array2D<double>      &d = w[1];
 	fill_type::function2  f( cfunctor2(f2) );

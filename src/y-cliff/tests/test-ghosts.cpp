@@ -25,13 +25,13 @@ namespace
 	
 	static inline void display_c( const components &C )
 	{
-		for( size_t i=C.cmin; i <= C.cmax; ++i )
+		for( size_t i=1; i <= C.number; ++i )
 		{
 			std::cerr << "component #" << i << " = " << C.name(i) << std::endl;
 		}
 	}
 	
-
+	
 	
 	template <typename WKSP>
 	static inline void display_info( WKSP &wksp)
@@ -87,9 +87,9 @@ namespace
 			
 			
 			std::cerr << "   |_pull/push..." << std::endl;
-			H.acquire_data( wksp.size );
-			G.acquire_data( wksp.size );
-			for( size_t j= wksp.cmin, k=1; j <= wksp.cmax; ++j, ++k )
+			H.acquire_data( wksp.number );
+			G.acquire_data( wksp.number );
+			for( size_t j= 1, k=1; j <= wksp.number; ++j, ++k )
 			{
 				G.pull( wksp[j],k );
 				G.push( wksp[j],k);
@@ -140,9 +140,9 @@ namespace
 			
 			
 			std::cerr << "   |_pull/push..." << std::endl;
-			H.acquire_data( wksp.size );
-			G.acquire_data( wksp.size );
-			for( size_t j= wksp.cmin, k=1; j <= wksp.cmax; ++j, ++k )
+			H.acquire_data( wksp.number );
+			G.acquire_data( wksp.number );
+			for( size_t j= 1, k=1; j <= wksp.number; ++j, ++k )
 			{
 				G.pull( wksp[j],k );
 				G.push( wksp[j],k);
@@ -167,12 +167,11 @@ namespace
 	static inline double f1(double)        { return alea<double>(); }
 	static inline double f2(double,double) { return alea<double>(); }
 	static inline double f3(double,double,double) { return alea<double>(); }
-
+	
 }
 
 YOCTO_UNIT_TEST_IMPL(ghosts)
 {
-	const size_t cmin    = 1;
 	const char  *names[] = { "u", "v" };
 	const size_t cnum    = sizeof(names)/sizeof(names[0]);
 	
@@ -186,9 +185,9 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		w1D_t W(L,
 				G,
 				R,
-				cmin, cnum, names );
+				cnum, names );
 		fill<double,double>::function1 F1( cfunctor(f1) );
-		for( size_t i=W.cmin; i <= W.cmax; ++i )
+		for( size_t i=1; i <= W.number; ++i )
 			fill<double,double>::with( F1, W[i], W.outline, W.X );
 		display_info(W);		
 	}
@@ -204,9 +203,9 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		w2D_t W(L,
 				G,
 				R,
-				cmin, cnum, names );
+				cnum, names );
 		fill<double,double>::function2 F2( cfunctor2(f2) );
-		for( size_t i=W.cmin; i <= W.cmax; ++i )
+		for( size_t i=1; i <= W.number; ++i )
 			fill<double,double>::with( F2, W[i], W.outline, W.X, W.Y );
 		display_info(W);		
 	}
@@ -222,9 +221,9 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		w3D_t W(L,
 				G,
 				R,
-				cmin, cnum, names );
+				cnum, names );
 		fill<double,double>::function3 F3( cfunctor3(f3) );
-		for( size_t i=W.cmin; i <= W.cmax; ++i )
+		for( size_t i=1; i <= W.number; ++i )
 			fill<double,double>::with( F3, W[i], W.outline, W.X, W.Y, W.Z);
 		display_info(W);		
 	}

@@ -32,7 +32,7 @@ namespace {
 	
 	static inline void display_c( const components &C )
 	{
-		for( size_t i=C.cmin; i <= C.cmax; ++i )
+		for( size_t i=1; i <= C.number; ++i )
 		{
 			std::cerr << "component #" << i << " = " << C.name(i) << std::endl;
 		}
@@ -97,7 +97,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		wksp1D< complex<float>, double>  w1(L, 
 											G, 
 											R,
-											1,2,NULL
+											2,NULL
 											);
 		
 		display_info( w1 );
@@ -126,7 +126,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		}
 		
 		vector<size_t> cid;
-		for( size_t i=w1.cmin; i <= w1.cmax; ++i ) cid.push_back(i);
+		for( size_t i=1; i <= w1.number; ++i ) cid.push_back(i);
 		w1.check_indices(cid);
 		vector< complex<float> > var( cid.size(), 0 );
 		offsets_list off1;
@@ -155,7 +155,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		wksp2D< double, float > w2(L,
 								   G,
 								   R,
-								   1,varcount, varnames );
+								   varcount, varnames );
 		display_info( w2 );
 		std::cerr << "X=" << w2.X << std::endl;
 		std::cerr << "Y=" << w2.Y << std::endl;
@@ -202,7 +202,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
 		wksp3D< complex<double>, float > w3(L,
 											G,
 											R,
-											0,varcount, varnames );
+											varcount, varnames );
 		display_info( w3 );
 		std::cerr << "X=" << w3.X << std::endl;
 		std::cerr << "Y=" << w3.Y << std::endl;
