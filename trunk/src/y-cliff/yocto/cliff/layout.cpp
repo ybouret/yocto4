@@ -9,7 +9,7 @@ namespace yocto
 	{
 		
 		template <>
-		void layout<coord1D>:: load_offsets( offsets_list &offsets, const layout<coord1D> &sub, const layout<coord1D> &outline ) 
+		void layout<coord1D>:: load_offsets( offsets_list &offsets, const layout<coord1D> &outline, const layout<coord1D> &sub ) 
 		{
 			assert( outline.has( sub.lower ) );
 			assert( outline.has( sub.upper ) );
@@ -19,7 +19,7 @@ namespace yocto
 		}
 		
 		template <>
-		void layout<coord2D>:: load_offsets( offsets_list &offsets, const layout<coord2D> &sub, const layout<coord2D> &outline ) 
+		void layout<coord2D>:: load_offsets( offsets_list &offsets, const layout<coord2D> &outline, const layout<coord2D> &sub ) 
 		{
 			assert( outline.has( sub.lower ) );
 			assert( outline.has( sub.upper ) );
@@ -39,7 +39,7 @@ namespace yocto
 		
 		
 		template <>
-		void layout<coord3D>:: load_offsets( offsets_list &offsets, const layout<coord3D> &sub, const layout<coord3D> &outline ) 
+		void layout<coord3D>:: load_offsets( offsets_list &offsets, const layout<coord3D> &outline, const layout<coord3D> &sub ) 
 		{
 			assert( outline.has( sub.lower ) );
 			assert( outline.has( sub.upper ) );
