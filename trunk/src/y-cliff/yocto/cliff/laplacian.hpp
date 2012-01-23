@@ -8,6 +8,7 @@ namespace yocto
 	namespace cliff
 	{
 		
+		//! compute laplacians
 		template <typename T, typename U>
 		struct laplacian
 		{
@@ -48,16 +49,26 @@ namespace yocto
 				const_type zfac = idsq.z * fac;
 				for( unit_t z = inside.lower.z; z <= inside.upper.z; ++z )
 				{
+					const array2D<T> &s_z  = src[z];
+					const array2D<T> &s_zp = src[z+1];
+					const array2D<T> &s_zm = src[z-1];
+					array2D<T>       &l_z  = lap[z];
 					for( unit_t y = inside.lower.y; y <= inside.upper.y; ++y )
 					{						
+						const array1D<T> &r_zy  = s_z[y];
+						const array1D<T> &r_zym = s_z[y-1];
+						const array1D<T> &r_zyp = s_z[y+1];
+						const array1D<T> &r_zmy = s_zm[y];
+						const array1D<T> &r_zpy = s_zp[y];
+						array1D<T>       &l_zy  = l_z[y];
 						for( unit_t x=inside.lower.x; x <= inside.upper.x; ++x )
 						{
-							const T mid( src[z][y][x] );
+							const T mid( r_zy[x] );
 							const T two_mid( mid + mid );
-							lap[z][y][x] =
-							xfac * ( src[z][y][x-1] - two_mid + src[z][y][x+1] ) +
-							yfac * ( src[z][y-1][x] - two_mid + src[z][y+1][x] ) +
-							zfac * ( src[z-1][y][x] - two_mid + src[z+1][y][x] );
+							l_zy[x] =
+							xfac * ( r_zy[x-1] - two_mid + r_zy[x+1] ) +
+							yfac * ( r_zym[x]  - two_mid + r_zyp[x]  ) +
+							zfac * ( r_zmy[x]  - two_mid + r_zpy[x]  );
 						}
 					}
 				}

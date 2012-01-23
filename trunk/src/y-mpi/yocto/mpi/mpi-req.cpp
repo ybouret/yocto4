@@ -19,6 +19,7 @@ namespace yocto
 	request( NULL ),
 	status( NULL )
 	{
+		// memory for requests and status is allocated
 		uint8_t *p = (uint8_t *)wksp_;
 		
 		request    = (MPI_Request *) (void*) &p[0];

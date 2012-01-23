@@ -14,32 +14,29 @@ namespace yocto
 		static inline size_t __check( size_t length )
 		{
 			if( length <= 0 )
-				throw exception("cliff.components(empty name_list)");
+				throw exception("cliff.components(number=0)");
 			return length;
 		}
 		
 		
-		components:: components( size_t a, size_t b, const char *name_list[] ) :
-		cmin( name_list ? a : min_of(a,b) ),
-		cmax( name_list ? (a + __check(b))-1 : max_of(a,b) ),
-		size( cmax+1 - cmin ),
-		names(size,as_capacity),
-		idxDB(size+1,as_capacity)
+		components:: components( size_t num, const char *name_list[] ) :
+		number( __check(num) ),
+		names(number,as_capacity),
+		idxDB(number+1,as_capacity)
 		{
 			if( name_list )
 			{
-				assert(b>0);
-				for( size_t i=0; i < b; ++i )
+				for( size_t i=0; i < number; ++i )
 				{
 					const string id( name_list[i] );
-					if( !idxDB.insert( id, cmin+i ) )
+					if( !idxDB.insert( id, i+1 ) )
 						throw exception("cliff.components: multiple provided '%s'", id.c_str());
 					names.push_back( id );
 				}
 			}
 			else
 			{
-				for( size_t i=cmin; i <= cmax; ++i )
+				for( size_t i=1; i <= number; ++i )
 				{
 					const string tmp( vformat("%u", unsigned(i) ) );
 					names.push_back( tmp );
@@ -52,9 +49,9 @@ namespace yocto
 		
 		const string & components:: name( size_t i ) const throw()
 		{
-			assert( i >= cmin );
-			assert( i <= cmax );
-			return names[++i-cmin];
+			assert( i >= 1 );
+			assert( i <= number );
+			return names[i];
 		}
 		
 		const char * components:: text( size_t i ) const throw()
@@ -64,8 +61,8 @@ namespace yocto
 		
 		void components:: name( size_t i, const string &id )
 		{
-			assert( i >= cmin );
-			assert( i <= cmax );
+			assert( i >= 1);
+			assert( i <= number );
 			if( idxDB.search(id) )
 				throw exception("cliff.components.set_name(%u,%s): already in use", unsigned(i), id.c_str());
 			

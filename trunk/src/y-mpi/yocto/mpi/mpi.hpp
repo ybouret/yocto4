@@ -115,7 +115,12 @@ namespace yocto
 		//======================================================================
 		int  CommWorldNext() const throw(); //!< CommWorldSize should be >= 2
 		int  CommWorldPrev() const throw(); //!< CommWorldSize should be >= 2
+		
+		
+		//! parallel printf, in order in MPI_COMM_WORLD
 		void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
+		
+		//! printf only on rank 0, with protecting barriers
 		void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
 		
 		//! MPI_Request/MPI_Status helper
@@ -126,7 +131,7 @@ namespace yocto
 			virtual ~Requests() throw();
 			const size_t count;
 			MPI_Request &operator[]( size_t index ) throw();       //!< 0 <= index <= count-1
-			MPI_Status  &operator()( size_t index ) const throw(); //!< 0 <= index << count-1
+			MPI_Status  &operator()( size_t index ) const throw(); //!< 0 <= index <= count-1
 			
 		private:
 			size_t       wlen_;

@@ -65,6 +65,7 @@ namespace yocto
 			// compute types
 			//==================================================================
 			YOCTO_ARGUMENTS_DECL_T; //!< for data handling
+			typedef workspace<T,ARRAY,U,REGION>        wksp_type;
 			typedef ARRAY<T>                           array_type;
 			typedef typename array_type::layout_type   layout_type;
 			typedef typename layout_type::coord_t      coord_t;
@@ -104,12 +105,11 @@ namespace yocto
 			explicit workspace(const layout_type &L,
 							   const ghosts_type &G,
 							   const region_type &R,
-							   size_t       a,
-							   size_t       b,
+							   size_t       num,
 							   const char  *names_list[]
 							   ) :
 			layout_type( L ),
-			components(a,b,names_list),
+			components(num,names_list),
 			outline( compute_outline( *this, G.lower.count, G.upper.count) ),
 			region(R),
 			delta(),
@@ -118,8 +118,7 @@ namespace yocto
 			nucleus( *this ),
 			plain_ghosts(0),
 			async_ghosts(0),
-			blocks( this->size, as_capacity ),
-			block_(NULL),
+			blocks( this->number, as_capacity ),
 			vaxis( DIMENSIONS, as_capacity ),
 			axis_(NULL),
 			plain_outer_ghosts(),
@@ -150,12 +149,11 @@ namespace yocto
 				//--------------------------------------------------------------
 				// allocate memory for each component
 				//--------------------------------------------------------------
-				for( size_t i=1; i <= size; ++i )
+				for( size_t i=1; i <= this->number; ++i )
 				{
 					const data_block_ptr blk( new data_block( outline ) );
 					blocks.push_back( blk );
 				}
-				block_ = &blocks[1] - this->cmin;
 				
 				//--------------------------------------------------------------
 				// allocate memory for each axis, and compute values
@@ -208,17 +206,17 @@ namespace yocto
 			//! returns an array of valid component
 			inline data_block & operator[]( const size_t c ) throw()
 			{
-				assert(c>=this->cmin);
-				assert(c<=this->cmax);
-				return * block_[c];
+				assert(c>=1);
+				assert(c<=this->number);
+				return * blocks[c];
 			}
 			
 			//! returns an array of valid component
 			inline const data_block & operator[]( const size_t c ) const throw()
 			{
-				assert(c>=this->cmin);
-				assert(c<=this->cmax);
-				return * block_[c];
+				assert(c>=1);
+				assert(c<=this->number);
+				return * blocks[c];
 			}
 			
 			
@@ -226,28 +224,28 @@ namespace yocto
 			inline data_block & operator[]( const string &id )
 			{
 				const components &comp = *this;
-				return * block_[ comp(id) ];
+				return * blocks[ comp(id) ];
 			}
 			
 			//! returns an array of valid component
 			inline const data_block & operator[]( const string &id ) const throw()
 			{
 				const components &comp = *this;
-				return * block_[ comp(id) ];
+				return * blocks[ comp(id) ];
 			}
 			
 			//! returns an array of valid component
 			inline data_block & operator[]( const char *id )
 			{
 				const components &comp = *this;
-				return * block_[ comp(id) ];
+				return * blocks[ comp(id) ];
 			}
 			
 			//! returns an array of valid component
 			inline const data_block & operator[]( const char *id ) const throw()
 			{
 				const components &comp = *this;
-				return * block_[ comp(id) ];
+				return * blocks[ comp(id) ];
 			}
 			
 			//! check that the indices are valid
@@ -261,9 +259,10 @@ namespace yocto
 			{
 				assert( offset < this->outline.items );
 				assert( var.size() >= cid.size() );
+				const wksp_type &field = *this;
 				for( size_t j = cid.size(); j > 0 ; --j )
 				{
-					var[j] = (*this)[ cid[j] ].entry[offset];
+					var[j] = field[ cid[j] ].entry[offset];
 				}
 			}
 			
@@ -272,9 +271,10 @@ namespace yocto
 			{
 				assert( offset < this->outline.items );
 				assert( var.size() >= cid.size() );
+				wksp_type &field = *this;
 				for( size_t j = cid.size(); j > 0 ; --j )
 				{
-					(*this)[ cid[j] ].entry[offset] = var[j];
+					field[ cid[j] ].entry[offset] = var[j];
 				}
 			}
 			
@@ -318,7 +318,6 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
 			vector<data_block_ptr> blocks;
-			data_block_ptr        *block_;
 			
 			typedef shared_ptr<axis_type> axis_ptr;
 			vector<axis_ptr> vaxis;

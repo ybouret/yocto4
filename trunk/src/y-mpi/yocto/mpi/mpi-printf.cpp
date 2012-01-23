@@ -8,7 +8,7 @@ namespace yocto
 	{
 		
 		static const int tag = 1000;
-		int              msg = 1000;
+		int              msg = tag;
 		
 		assert(fp!=NULL);
 		assert(fmt!=NULL);

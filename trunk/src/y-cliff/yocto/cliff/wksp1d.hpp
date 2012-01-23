@@ -29,11 +29,10 @@ namespace yocto
 			explicit wksp1D(const layout_type &L,
 							const ghosts_type &G,
 							const region_type &R,
-							size_t       a,
-							size_t       b,
+							size_t       num,
 							const char  *names_list[] 
 							) :
-			wksp_type(L,G,R,a,b,names_list),
+			wksp_type(L,G,R,num,names_list),
 			X( this->axis(0) )
 			{
 			}

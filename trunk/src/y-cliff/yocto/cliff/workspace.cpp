@@ -50,8 +50,8 @@ namespace yocto
 			for( size_t i=1; i <= nc; ++i)
 			{
 				const size_t j = cid[i];
-				if( j > cdb.cmax || j < cdb.cmin )
-					throw libc::exception( EDOM, "component index #%u=%u not in [%u;%u]", unsigned(i), unsigned(j), unsigned(cdb.cmin), unsigned(cdb.cmax) );
+				if( j > cdb.number || j < 1 )
+					throw libc::exception( EDOM, "component index #%u=%u not in [1;%u]", unsigned(i), unsigned(j),  unsigned(cdb.number) );
 			}
 		}
 		
