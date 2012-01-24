@@ -59,7 +59,7 @@ namespace yocto
 	{
 		*(int *) & CommWorldSize    = 0;
 		*(int *) & CommWorldRank    = 0;
-		*(int *) & CommWorldRankMax = 0;
+		*(int *) & CommWorldLast    = 0;
 		clear_pname();
 		(void) MPI_Finalize();
 	}
@@ -67,7 +67,7 @@ namespace yocto
 	mpi:: mpi() :
 	CommWorldSize(0),
 	CommWorldRank(0),
-	CommWorldRankMax(0),
+	CommWorldLast(0),
 	ProcessorNameLength(0),
 	ProcessorName()
 	{
@@ -92,14 +92,14 @@ namespace yocto
 				throw mpi::exception( err, "MPI_Comm_size(MPI_COMM_WORLD)");
 			}
 			
-			*(int *) & CommWorldRankMax = CommWorldSize - 1;
+			*(int *) & CommWorldLast = CommWorldSize - 1;
 			
 			err = MPI_Comm_rank( MPI_COMM_WORLD, (int *) & CommWorldRank );
 			if( err != MPI_SUCCESS )
 			{
 				throw mpi::exception( err, "MPI_Comm_rank(MPI_COMM_WORLD)");
 			}
-			assert( CommWorldRank <= CommWorldRankMax );
+			assert( CommWorldRank <= CommWorldLast );
 			
 			
 			clear_pname();
@@ -148,13 +148,13 @@ namespace yocto
 	int mpi:: CommWorldNext() const throw()
 	{
 		assert( CommWorldSize > 0 );
-		return CommWorldRank >= CommWorldRankMax ? 0 : CommWorldRank+1;
+		return CommWorldRank >= CommWorldLast ? 0 : CommWorldRank+1;
 	}
 	
 	int mpi:: CommWorldPrev() const throw()
 	{
 		assert( CommWorldSize > 0 );
-		return CommWorldRank > 0 ? CommWorldRank-1 : CommWorldRankMax;
+		return CommWorldRank > 0 ? CommWorldRank-1 : CommWorldLast;
 	}
 	
 	const char mpi::name[] = "MPI";	

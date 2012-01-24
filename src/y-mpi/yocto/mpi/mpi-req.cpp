@@ -32,12 +32,14 @@ namespace yocto
 	
 	void mpi:: Startall( Requests &requests ) const
 	{
-		Startall( requests.count, &requests[0] );
+		if( requests.count )
+			Startall( requests.count, &requests[0] );
 	}
 	
 	void mpi:: Waitall( Requests &requests ) const
 	{
-		Waitall( requests.count, &requests[0], &requests(0) );
+		if( requests.count )
+			Waitall( requests.count, &requests[0], &requests(0) );
 	}
 	
 	MPI_Request & mpi:: Requests:: operator[]( size_t indx ) throw()

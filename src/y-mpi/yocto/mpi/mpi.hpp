@@ -70,7 +70,7 @@ namespace yocto
 		
 		const int CommWorldSize;    //!< size of MPI_COMM_WORLD
 		const int CommWorldRank;    //!< rank in MPI_COMM_WORLD
-		const int CommWorldRankMax; //!< CommWorldSize-1;
+		const int CommWorldLast;    //!< CommWorldSize-1;
 		
 		const int    ProcessorNameLength;
 		const char   ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
