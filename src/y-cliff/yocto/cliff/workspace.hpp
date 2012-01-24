@@ -10,6 +10,8 @@
 #include "yocto/shared-ptr.hpp"
 #include "yocto/memory/global.hpp"
 
+#include "yocto/exception.hpp"
+
 namespace yocto
 {
 	
@@ -20,7 +22,7 @@ namespace yocto
 		//! utilities for workspace setup
 		struct workspace_base
 		{
-			static void check_ghosts( const void *ghosts_lo, const void *ghosts_up, const void *w, size_t n);
+			static void check_ghosts( const void *outer_lo, const void *outer_up, const void *inner_lo, const void *inner_up,  const void *w, size_t n );
 			static void check_widths( const unit_t *w, size_t n );
 			static void check_indices( const array<size_t> &cid, const components &cdb );
 		};
@@ -100,7 +102,7 @@ namespace yocto
 			const vertex_t    delta;        //!< step for each dimension
 			const vertex_t    inv_d;        //!< 1/delta
 			const vertex_t    inv_dsq;      //!< 1/delta^2
-			const layout_type nucleus;      //!< original layout - deferred ghosts
+			const layout_type nucleus;      //!< original layout - asynchrnous inner ghosts
 			const size_t      plain_ghosts; //!< number of plain ghosts (outer,inner)
 			const size_t      async_ghosts; //!< number of async hosts (outer,inner)
 			
@@ -118,7 +120,7 @@ namespace yocto
 							   ) :
 			layout_type( L ),
 			components(num,names_list),
-			outline( compute_outline( *this, G.lower.count, G.upper.count) ),
+			outline( compute_outline( *this, G) ),
 			region(R),
 			delta(),
 			inv_d(),
@@ -370,12 +372,19 @@ namespace yocto
 			vector<ghost_ptr> async_outer_ghosts;
 			vector<ghost_ptr> async_inner_ghosts;
 			
-			
-			static inline layout_type compute_outline( const layout_type &L, param_coord ghosts_lo, param_coord ghosts_up )
+			//! compute outline from outer ghosts
+			/**
+			 TODO: check inner async only ?
+			 */
+			static inline layout_type compute_outline( const layout_type &L, const ghosts_type &G )
 			{
-				workspace_base::check_ghosts( &ghosts_lo, &ghosts_up, &L.width, DIMENSIONS );
-				const_coord out_lo = L.lower - ghosts_lo;
-				const_coord out_up = L.upper + ghosts_up;
+				const coord_t &outer_lo = G.outer.lower.count;
+				const coord_t &outer_up = G.outer.upper.count;
+				const coord_t &inner_lo = G.inner.lower.count;
+				const coord_t &inner_up = G.inner.upper.count;
+				workspace_base::check_ghosts( &outer_lo, &outer_up, &inner_lo, &inner_up, &L.width, DIMENSIONS );
+				const_coord out_lo = L.lower - outer_lo;
+				const_coord out_up = L.upper + outer_up;
 				return layout_type(out_lo,out_up);
 			}
 			
@@ -386,127 +395,192 @@ namespace yocto
 				return *(((unit_t *)&coord)+dim);
 			}
 			
-			//! automatic ghosts creation
-			inline void create_ghosts(const ghosts_type &G)
+			inline void create_ghosts( const ghosts_type &G )
 			{
-				const ghosts_infos<coord_t> &ghosts_lo = G.lower;
-				const ghosts_infos<coord_t> &ghosts_up = G.upper;
+				//-- setup has been checked in compute_outline
+				const ghosts_group<coord_t> &outer_group = G.outer;
+				const ghosts_group<coord_t> &inner_group = G.inner;
 				
-				const unit_t *glo      = (const unit_t *) &ghosts_lo.count;
-				const unit_t *gup      = (const unit_t *) &ghosts_up.count;
-				const unit_t *async_lo = (const unit_t *) &ghosts_lo.async;
-				const unit_t *async_up = (const unit_t *) &ghosts_up.async;
+				const ghosts_infos<coord_t> &outer_lo    = outer_group.lower;
+				const ghosts_infos<coord_t> &outer_up    = outer_group.upper;
 				
-				unit_t       *limit_lo = (unit_t *) & nucleus.lower;
-				unit_t       *limit_up = (unit_t *) & nucleus.upper;
+				const ghosts_infos<coord_t> &inner_lo    = inner_group.lower;
+				const ghosts_infos<coord_t> &inner_up    = inner_group.upper;
 				
-				for( size_t i=0; i < DIMENSIONS; ++i )
+				const unit_t *outer_lo_count = (unit_t*) &outer_lo.count;
+				const unit_t *outer_lo_async = (unit_t*) &outer_lo.async;
+				const unit_t *outer_lo_peers = (unit_t*) &outer_lo.peers;
+				
+				const unit_t *outer_up_count = (unit_t*) &outer_up.count;
+				const unit_t *outer_up_async = (unit_t*) &outer_up.async;
+				const unit_t *outer_up_peers = (unit_t*) &outer_up.peers;
+				
+				const unit_t *inner_lo_count = (unit_t*) &inner_lo.count;
+				const unit_t *inner_lo_async = (unit_t*) &inner_lo.async;
+				const unit_t *inner_lo_peers = (unit_t*) &inner_lo.peers;
+				
+				const unit_t *inner_up_count = (unit_t*) &inner_up.count;
+				const unit_t *inner_up_async = (unit_t*) &inner_up.async;
+				const unit_t *inner_up_peers = (unit_t*) &inner_up.peers;
+				
+				coord_t       nucleus_lo( nucleus.lower);
+				coord_t       nucleus_up( nucleus.upper);
+				unit_t       *limit_lo = (unit_t *) & nucleus_lo;
+				unit_t       *limit_up = (unit_t *) & nucleus_up;
+				
+				for( unsigned i=0; i < DIMENSIONS; ++i )
 				{
 					const size_t i2 = (i << 1);
 					const ghost_position pos_lo = ghost_position(i2);
 					const ghost_position pos_up = ghost_position(i2+1);
-					const bool           deferred_lo = async_lo[i] != 0;
-					const bool           deferred_up = async_up[i] != 0;
-					//----------------------------------------------------------
-					// lower coordinate
-					//----------------------------------------------------------
-					assert(glo[i]>=0); //-- checked in compute_outline
-					if( glo[i] > 0 )
+					//==========================================================
+					// outer: lower then upper
+					//==========================================================
 					{
-						const unit_t    ng = glo[i];
-						//-- => lower outer ghost
+						//------------------------------------------------------
+						// outer.lower
+						//------------------------------------------------------
 						{
-							coord_t lo(this->lower); 
-							coord_t up(this->upper); 
-							
-							__get(up,i)  = __get(lo,i) - 1;
-							__get(lo,i) -= ng;
-							
-							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_lo) );
-							if( g->is_async )
+							const unit_t ng = outer_lo_count[i];
+							if( ng > 0 )
 							{
-								async_outer_ghosts.push_back(g);
-							}
-							else
-							{
-								plain_outer_ghosts.push_back( g );
+								coord_t lo( this->lower );
+								coord_t up( this->upper );
+								__get(up,i)  = __get(lo,i) - ng;
+								__get(lo,i) -= 1;
+								const bool      async = outer_lo_async[i] != 0;
+								const int       peer  = outer_lo_peers[i];
+								const ghost_ptr g( new ghost_type(pos_lo,lo,up,this->outline,async,peer) );
+								if( async )
+								{
+									async_outer_ghosts.push_back(g);
+								}
+								else
+								{
+									plain_outer_ghosts.push_back(g);
+								}
 							}
 						}
 						
-						//-- => inner upper ghost, corresponding deferred status
+						//------------------------------------------------------
+						// outer.upper
+						//------------------------------------------------------
 						{
-							coord_t lo(this->lower); 
-							coord_t up(this->upper); 
-							
-							__get(lo,i) = __get(up,i) - (ng-1);
-							
-							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_lo) );
-							if( g->is_async )
+							const unit_t ng = outer_up_count[i];
+							if( ng > 0 )
 							{
-								async_inner_ghosts.push_back( g );
-								limit_up[i] -= ng;
-							}
-							else
-							{
-								plain_inner_ghosts.push_back( g );
+								coord_t lo( this->lower );
+								coord_t up( this->upper );
+								__get(lo,i)  = __get(up,i) + ng;
+								__get(up,i) += 1;
+								const bool      async = outer_up_async[i] != 0;
+								const int       peer  = outer_up_peers[i];
+								const ghost_ptr g( new ghost_type(pos_up,lo,up,this->outline,async,peer) );
+								if( async )
+								{
+									async_outer_ghosts.push_back(g);
+								}
+								else
+								{
+									plain_outer_ghosts.push_back(g);
+								}
 							}
 						}
+						
 						
 					}
 					
-					//----------------------------------------------------------
-					// upper coordinate
-					//----------------------------------------------------------
-					assert(gup[i]>=0); //-- checked in compute_outline
-					if( gup[i] > 0 )
+					//==========================================================
+					// inner : upper then lower to match outer peers 
+					//==========================================================
 					{
-						const unit_t    ng = gup[i];
-						//-- => upper outer ghost
+						
+						//------------------------------------------------------
+						// inner.upper
+						//------------------------------------------------------
 						{
-							coord_t lo(this->lower); 
-							coord_t up(this->upper);
-							
-							__get(lo,i) = __get(up,i) + 1;
-							__get(up,i) += ng;
-							
-							const ghost_ptr g( new ghost_type( pos_up,lo,up,this->outline,deferred_up) );
-							
-							if( g->is_async )
+							const unit_t ng = inner_up_count[i];
+							if( ng > 0 )
 							{
-								async_outer_ghosts.push_back(g);
-							}
-							else
-							{
-								plain_outer_ghosts.push_back( g );
+								coord_t lo( this->lower );
+								coord_t up( this->upper );
+								__get(lo,i)  = __get(up,i) - (ng-1);
+								
+								const bool      async = inner_up_async[i] != 0;
+								const int       peer  = inner_up_peers[i];
+								const ghost_ptr g( new ghost_type(pos_up,lo,up,this->outline,async,peer) );
+								if( async )
+								{
+									async_inner_ghosts.push_back(g);
+									limit_up[i] -= ng;
+								}
+								else
+								{
+									plain_inner_ghosts.push_back(g);
+								}
 							}
 						}
 						
-						//-- => inner lower ghost, corresponding async status
+						//------------------------------------------------------
+						// inner.lower
+						//------------------------------------------------------
 						{
-							coord_t lo(this->lower); 
-							coord_t up(this->upper); 
-							
-							__get(up,i) = __get(lo,i) + (ng-1);
-							
-							const ghost_ptr g( new ghost_type( pos_lo,lo,up,this->outline,deferred_up) );
-							
-							if( g->is_async )
+							const unit_t ng = inner_lo_count[i];
+							if( ng > 0 )
 							{
-								async_inner_ghosts.push_back( g );
-								limit_lo[i] += ng;
-							}
-							else
-							{
-								plain_inner_ghosts.push_back( g );
+								coord_t lo( this->lower );
+								coord_t up( this->upper );
+								__get(up,i)  = __get(lo,i) + (ng-1);
+								
+								const bool      async = inner_lo_async[i] != 0;
+								const int       peer  = inner_lo_peers[i];
+								const ghost_ptr g( new ghost_type(pos_lo,lo,up,this->outline,async,peer) );
+								
+								if( async )
+								{
+									async_inner_ghosts.push_back(g);
+									limit_lo[i] += ng;
+								}
+								else
+								{
+									plain_inner_ghosts.push_back(g);
+								}
 							}
 						}
+						
+						
+						
 					}
+					
+					//==========================================================
+					// checking user info are all right
+					//==========================================================
+					
+					if( async_inner_ghosts.size() != async_outer_ghosts.size() )
+						throw exception("mismtach async ghosts: outer=%u / inner=%u", unsigned( async_outer_ghosts.size() ), unsigned(async_inner_ghosts.size()) );
+					
+					if( plain_inner_ghosts.size() != plain_outer_ghosts.size() )
+						throw exception("mismtach plain ghosts: outer=%u / inner=%u", unsigned( plain_outer_ghosts.size() ), unsigned(plain_inner_ghosts.size()) );
+					
+					for( size_t g = plain_inner_ghosts.size(); g>0; --g )
+					{
+						const ghost_type &g_outer = *plain_outer_ghosts[g];
+						const ghost_type &g_inner = *plain_inner_ghosts[g];
+						if( ghost_position_mirror(g_outer.position) != g_inner.position )
+							throw exception("inner.%s sent to outer.%s", g_inner.label(), g_outer.label());
+						
+						if( g_outer.count != g_inner.count )
+							throw exception("#outer.%s=%u != #inner.%s=%u", g_outer.label(), unsigned(g_outer.count), g_inner.label(), unsigned(g_inner.count));
+					}
+					
+					//==========================================================
+					// update parameters
+					//==========================================================
+					(size_t&) async_ghosts = async_outer_ghosts.size();
+					(size_t&) plain_ghosts = plain_outer_ghosts.size();
+					new ( (void*)&nucleus ) layout_type(nucleus_lo,nucleus_up);
 				}
 				
-				assert( plain_inner_ghosts.size() == plain_outer_ghosts.size() );
-				assert( async_inner_ghosts.size() == async_outer_ghosts.size() );
-				(size_t &)plain_ghosts = plain_outer_ghosts.size();
-				(size_t &)async_ghosts = async_outer_ghosts.size(); 
 			}
 			
 			

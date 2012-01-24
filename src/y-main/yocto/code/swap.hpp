@@ -47,6 +47,20 @@ namespace yocto
 		for( size_t i=length;i>0;--i,++p,++q) cswap( *p, *q );
 	}
 	
+	template <typename T>
+	inline void reverse( T *base, size_t size ) throw()
+	{
+		if( size > 1 )
+		{
+			const size_t n = size/2;
+			const size_t m = size-1;
+			for( size_t i=0; i < n; ++i )
+			{
+				mswap( base[i], base[m-i]);
+			}
+		}
+		
+	}
 }
 
 

@@ -8,27 +8,40 @@ namespace yocto
 	namespace cliff
 	{
 		
-		void workspace_base:: check_ghosts( const void *ghosts_lo, const void *ghosts_up, const void *w, size_t n)
+		void workspace_base:: check_ghosts( const void *outer_lo, const void *outer_up, const void *inner_lo, const void *inner_up,  const void *w, size_t n )
 		{
-			assert( ghosts_lo );
-			assert( ghosts_up );
+			assert( inner_lo );
+			assert( inner_up );
+			assert( outer_lo );
+			assert( outer_up );
 			assert( w );
 			assert(n>0);
-			const unit_t *ng_lo = (const unit_t *) ghosts_lo;
-			const unit_t *ng_up = (const unit_t *) ghosts_lo;
+			
+			const unit_t *ng_outer_lo = (const unit_t *) outer_lo;
+			const unit_t *ng_outer_up = (const unit_t *) outer_up;
+			
+			const unit_t *ng_inner_lo = (const unit_t *) inner_lo;
+			const unit_t *ng_inner_up = (const unit_t *) inner_up;
+			
 			const unit_t *width = (const unit_t *) w;
+			
 			for( unsigned i=0; i < n; ++i )
 			{
-				const unit_t ng_lo_i = ng_lo[i];
-				const unit_t ng_up_i = ng_up[i];
+				
 				const unit_t width_i = width[i];
-				if( ng_lo_i < 0 ) 
-					throw libc::exception( EDOM, "lower ghosts: negative value in dimension %u", i );
+				if( ng_outer_lo[i] < 0 ) 
+					throw libc::exception( EDOM, "outer lower ghosts: negative value in dimension %u", i );
 				
-				if( ng_up_i < 0 ) 
-					throw libc::exception( EDOM, "upper ghosts: negative value in dimension %u", i );
+				if( ng_outer_up[i] < 0 ) 
+					throw libc::exception( EDOM, "outer upper ghosts: negative value in dimension %u", i );
 				
-				if( ng_lo_i + ng_up_i >= width_i )
+				if( ng_inner_lo[i] < 0 ) 
+					throw libc::exception( EDOM, "inner lower ghosts: negative value in dimension %u", i );
+				
+				if( ng_inner_up[i] < 0 ) 
+					throw libc::exception( EDOM, "inner upper ghosts: negative value in dimension %u", i );
+							
+				if( ng_inner_lo[i] + ng_inner_up[i] >= width_i )
 					throw libc::exception( EDOM, "too many ghosts in dimension %u", i );
 			}
 		}
