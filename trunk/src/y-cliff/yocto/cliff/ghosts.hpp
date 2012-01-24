@@ -26,8 +26,8 @@ namespace yocto
 			ghost_upper_z = 5
 		};
 		
-		const char * ghost_position_label( ghost_position p ) throw();
-		
+		const char *   ghost_position_label(  ghost_position p ) throw();
+		ghost_position ghost_position_mirror( ghost_position p ) throw();
 		
 		//! base class for ghost: offsets and position
 		class ghost_base
@@ -58,21 +58,21 @@ namespace yocto
 		public:
 			COORD count; //!< count in each dimension
 			COORD async; //!< not 0 => asynchronous
+			COORD peers; //!< MPI style peers
 			
-			inline ghosts_infos() throw() : count(), async() 
+			inline ghosts_infos() throw() : count(), async(), peers()
 			{ 
-				memset( (void*) &count, 0, sizeof(COORD) );
-				memset( (void*) &async, 0, sizeof(COORD) );
+				memset( (void*) &count, 0,    sizeof(COORD) );
+				memset( (void*) &async, 0,    sizeof(COORD) );
+				memset( (void*) &peers, 0xFF, sizeof(COORD) );
 			}
-		
-			inline ghosts_infos( const COORD &num, const COORD &status ) throw() :
-			count( num ), async(status)
-			{
-			}
+			
+			
 			
 			inline ghosts_infos( const ghosts_infos &other ) throw() :
 			count( other.count ),
-			async( other.async )
+			async( other.async ),
+			peers( other.peers )
 			{
 			}
 			
@@ -80,11 +80,36 @@ namespace yocto
 			{
 				count = other.count;
 				async = other.async;
+				peers = other.peers;
 				return *this;
 			}
 			
 			inline ~ghosts_infos() throw() {}
+			
+		};
 		
+		//! a group of ghosts
+		template <typename COORD>
+		class ghosts_group
+		{
+		public:
+			ghosts_infos<COORD> lower;
+			ghosts_infos<COORD> upper;
+			
+			inline  ghosts_group() throw() : lower(), upper() {}
+			inline ~ghosts_group() throw() {}
+			inline  ghosts_group( const ghosts_group &other ) throw() :
+			lower( other.lower ),
+			upper( other.upper )
+			{
+			}
+			
+			inline ghosts_group & operator=( const ghosts_group &other ) throw()
+			{
+				lower = other.lower;
+				upper = other.upper;
+				return *this;
+			}
 			
 		};
 		
@@ -93,19 +118,18 @@ namespace yocto
 		class ghosts_setup
 		{
 		public:
-			typedef ghosts_infos<COORD> infos_type;
-			const infos_type lower;
-			const infos_type upper;
+			ghosts_group<COORD> outer;
+			ghosts_group<COORD> inner;
 			
-			inline ghosts_setup( const infos_type &lo, const infos_type &up ) throw() :
-			lower(lo),
-			upper(up)
+			inline ghosts_setup() throw() :
+			outer(),
+			inner()
 			{
 			}
 			
 			inline ghosts_setup( const ghosts_setup &other ) throw() :
-			lower( other.lower ),
-			upper( other.upper )
+			outer(other.outer),
+			inner(other.inner)
 			{
 			}
 			
@@ -118,9 +142,9 @@ namespace yocto
 		
 		
 		
-		//! ghost
+		//! one ghost in a workspace outline
 		/**
-			Manage information for one ghost.
+		 Manage information for one ghost.
 		 */
 		template <typename T,typename COORD>
 		class ghost :  public object, public layout<COORD>, public ghost_base
@@ -140,12 +164,13 @@ namespace yocto
 						   param_coord         lo, 
 						   param_coord         hi ,
 						   const layout<COORD> &outline,
-						   const bool           async) :
+						   const bool           async,
+						   const int            p) :
 			layout<COORD>( lo, hi ),
 			ghost_base( this->items, pos, async ),
 			nvar(0),
 			slot(NULL),
-			peer(-1)
+			peer(p)
 			{
 				assert( outline.has(this->lower) );
 				assert( outline.has(this->upper) );
@@ -161,8 +186,8 @@ namespace yocto
 			
 			//! acquire data for asynchronous copy
 			/**
-				\param nvar > 0
-				prepar nvar slots of this->count float/double/...
+			 \param nvar > 0
+			 prepare 'nvar' slots of 'this->count' float/double/...
 			 */
 			void acquire_data( size_t num_var ) const
 			{

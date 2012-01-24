@@ -27,10 +27,38 @@ namespace yocto
 					
 				case ghost_upper_z:
 					return "upper z";
-				
+					
 			}
 			return "";
 		}
+		
+		ghost_position ghost_position_mirror( ghost_position p) throw()
+		{
+			switch( p )
+			{
+				case ghost_lower_x:
+					return ghost_upper_x;
+					
+				case ghost_upper_x:
+					return ghost_lower_x;
+					
+				case ghost_lower_y:
+					return ghost_upper_y;
+					
+				case ghost_upper_y:
+					return ghost_lower_y;
+					
+				case ghost_lower_z:
+					return ghost_upper_z;
+					
+				default:
+					break;
+					
+			}
+			assert( ghost_upper_z == p );
+			return ghost_lower_z;
+		}
+		
 		
 		ghost_base:: ghost_base( size_t max_offsets, ghost_position pos, bool async ) throw():
 		offsets(max_offsets,as_capacity),

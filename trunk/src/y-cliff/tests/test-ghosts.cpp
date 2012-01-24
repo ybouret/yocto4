@@ -49,117 +49,60 @@ namespace
 		std::cerr << "delta     = " << wksp.delta      << std::endl;
 		std::cerr << "inv_d     = " << wksp.inv_d      << std::endl;
 		std::cerr << "inv_dsq   = " << wksp.inv_dsq    << std::endl;
-		std::cerr << "plain_ghosts  = " << wksp.plain_ghosts  << std::endl;
-		std::cerr << "async_ghosts  = " << wksp.async_ghosts  << std::endl;
-		for( size_t i=1; i <= wksp.plain_ghosts; ++i )
+		
+		std::cerr << "#asyncGhosts= " << wksp.async_ghosts << std::endl;
+		std::cerr << "#plainGhosts= " << wksp.plain_ghosts << std::endl;
+		
+		std::cerr << "-------- Plain Ghosts --------" << std::endl;
+		for( size_t g = 1; g <= wksp.plain_ghosts; ++g )
 		{
-			const Ghost &G = wksp.plain_outer_ghost(i);
-			const Ghost &H = wksp.plain_inner_ghost(i);
-			std::cerr << "**** Plain Ghosts #" << i << std::endl;
-			std::cerr << "   |_outer position: " << G.label() << std::endl;
-			std::cerr << "   |_outer layout:" << std::endl;
-			display_l( G );
-			if( WKSP::DIMENSIONS <= 2 )
-			{
-				const offsets_list &offsets = G.offsets;
-				std::cerr << "offsets:";
-				for( size_t j=1; j <= offsets.size(); ++j )
-				{
-					std::cerr << ' ' << offsets[j];
-				}
-				std::cerr << std::endl;
-			}
+			const Ghost &outer = wksp.plain_outer_ghost(g);
+			const Ghost &inner = wksp.plain_inner_ghost(g);
 			
-			std::cerr << "   |_inner position: " << H.label() << std::endl;
-			std::cerr << "   |_outer is async: " << H.is_async << std::endl;
-			std::cerr << "   |_inner layout:" << std::endl;
-			display_l(H);
-			if( WKSP::DIMENSIONS <= 2 )
-			{
-				const offsets_list &offsets = H.offsets;
-				std::cerr << "offsets:";
-				for( size_t j=1; j <= offsets.size(); ++j )
-				{
-					std::cerr << ' ' << offsets[j];
-				}
-				std::cerr << std::endl;
-			}
+			std::cerr << "< outer ghost #" << g << " @" << outer.label() << " >" << std::endl;
+			display_l(outer);
+			std::cerr << "< inner ghost #" << g << " @" << inner.label() << " >" << std::endl;
+			display_l(inner);
 			
-			
-			std::cerr << "   |_pull/push..." << std::endl;
-			H.acquire_data( wksp.number );
-			G.acquire_data( wksp.number );
-			for( size_t j= 1, k=1; j <= wksp.number; ++j, ++k )
+			for( size_t j=wksp.number;j>0;--j)
 			{
-				G.pull( wksp[j],k );
-				G.push( wksp[j],k);
-				
-				//memset( H.data, 0, H.bytes );
-				H.pull( wksp[j],k );
-				H.push( wksp[j],k );
-				
-				Ghost::direct_copy( G,H, wksp[j] );
-				Ghost::direct_copy( H,G, wksp[j] );
+				Ghost::direct_copy( outer, inner, wksp[j] );
 			}
 			
 		}
 		
-		for( size_t i=1; i <= wksp.async_ghosts; ++i )
+		wksp.acquire_ghosts_data(wksp.number);
+		std::cerr << "-------- ASync Ghosts --------" << std::endl;
+		for( size_t g = 1; g <= wksp.async_ghosts; ++g )
 		{
-			const Ghost &G = wksp.async_outer_ghost(i);
-			const Ghost &H = wksp.async_inner_ghost(i);
-			std::cerr << "**** ASync Ghosts #" << i << std::endl;
-			std::cerr << "   |_outer position: " << G.label() << std::endl;
-			std::cerr << "   |_outer layout:" << std::endl;
-			display_l( G );
-			if( WKSP::DIMENSIONS <= 2 )
+			const Ghost &outer = wksp.async_outer_ghost(g);
+			const Ghost &inner = wksp.async_inner_ghost(g);
+			
+			std::cerr << "< outer ghost #" << g << " @" << outer.label() << " >" << std::endl;
+			display_l(outer);
+			std::cerr << "< inner ghost #" << g << " @" << inner.label() << " >" << std::endl;
+			display_l(inner);
+			
+			for( size_t j=wksp.number;j>0;--j)
 			{
-				const offsets_list &offsets = G.offsets;
-				std::cerr << "offsets:";
-				for( size_t j=1; j <= offsets.size(); ++j )
-				{
-					std::cerr << ' ' << offsets[j];
-				}
-				std::cerr << std::endl;
+				inner.pull( wksp[j], j );
 			}
 			
-			std::cerr << "   |_inner position: " << H.label() << std::endl;
-			std::cerr << "   |_outer is async: " << H.is_async << std::endl;
-			std::cerr << "   |_inner layout:" << std::endl;
-			display_l(H);
-			if( WKSP::DIMENSIONS <= 2 )
+			for( size_t j=wksp.number;j>0;--j)
 			{
-				const offsets_list &offsets = H.offsets;
-				std::cerr << "offsets:";
-				for( size_t j=1; j <= offsets.size(); ++j )
-				{
-					std::cerr << ' ' << offsets[j];
-				}
-				std::cerr << std::endl;
-			}
-			
-			
-			std::cerr << "   |_pull/push..." << std::endl;
-			H.acquire_data( wksp.number );
-			G.acquire_data( wksp.number );
-			for( size_t j= 1, k=1; j <= wksp.number; ++j, ++k )
-			{
-				G.pull( wksp[j],k );
-				G.push( wksp[j],k);
-				
-				//memset( H.data, 0, H.bytes );
-				H.pull( wksp[j],k );
-				H.push( wksp[j],k );
-				
-				
-				Ghost::direct_copy( G,H, wksp[j] );
-				Ghost::direct_copy( H,G, wksp[j] );
+				outer.push( wksp[j], j );
 			}
 			
 		}
 		
-		std::cerr << "---- nucleus:" << std::endl;
+		
+		std::cerr << "-------- Nucleus --------" << std::endl;
 		display_l(wksp.nucleus);
+		
+		
+		
+		
+		
 		
 		std::cerr << std::endl;
 	}
@@ -179,17 +122,37 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		typedef wksp1D<double,double> w1D_t;
 		const w1D_t:: layout_type    L( -10, 10 );
 		const w1D_t:: region_type    R( -1, 1 );
-		const ghosts_infos<coord1D>  g_lo( 1, 0 ); //! one, not deferred
-		const ghosts_infos<coord1D>  g_up( 2, 1 ); //! two, deferred
-		const ghosts_setup<coord1D>  G( g_lo, g_up );
-		w1D_t W(L,
-				G,
-				R,
-				cnum, names );
-		fill<double,double>::function1 F1( cfunctor(f1) );
-		for( size_t i=1; i <= W.number; ++i )
-			fill<double,double>::with( F1, W[i], W.outline, W.X );
-		display_info(W);		
+		
+		ghosts_setup<coord1D> G;
+		G.outer.lower.count = 2;
+		
+		G.outer.upper.count = 1;
+		
+		G.inner.lower.count = 1;
+		
+		G.inner.upper.count = 2;
+		
+		{
+			w1D_t W(L,
+					G,
+					R,
+					cnum, names );
+			fill<double,double>::function1 F1( cfunctor(f1) );
+			for( size_t i=1; i <= W.number; ++i )
+				fill<double,double>::with( F1, W[i], W.outline, W.X );
+			display_info(W);	
+		}
+		
+		G.outer.lower.async = 1;
+		G.inner.upper.async = 1;
+		
+		{
+			w1D_t W(L,
+					G,
+					R,
+					cnum, names );
+			display_info(W);
+		}
 	}
 	
 	{
@@ -197,9 +160,24 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		typedef vertex2D<double>::type v2D_t;
 		const w2D_t::layout_type    L( coord2D(-20,-10), coord2D(10,20) );
 		const w2D_t::region_type    R( v2D_t(-1,-1), v2D_t(1,1) );
-		const ghosts_infos<coord2D> g_lo( coord2D(1,2), coord2D(0,0) ); //! 1 lower_x, 2 lower_y, not deferred
-		const ghosts_infos<coord2D> g_up( coord2D(3,4), coord2D(1,0) ); //! 3 upper_x, 4 upper_y, upper_x is deffered
-		const ghosts_setup<coord2D> G( g_lo, g_up );
+		//const ghosts_infos<coord2D> g_lo( coord2D(1,2), coord2D(0,0) ); //! 1 lower_x, 2 lower_y, not deferred
+		//const ghosts_infos<coord2D> g_up( coord2D(3,4), coord2D(1,0) ); //! 3 upper_x, 4 upper_y, upper_x is deffered
+		//const ghosts_setup<coord2D> G( g_lo, g_up );
+		ghosts_setup<coord2D> G;
+		
+		G.outer.upper.count = coord2D(2,1); //! 2 at upper_x, 1 at upper_y
+		G.outer.upper.async = coord2D(0,1); //! plain on x, async on y
+		
+		G.inner.lower.count = coord2D(2,1); //! 2 at lower_x, 1 at lower_y
+		G.inner.lower.async = coord2D(0,1); //! plain on x, async on y
+		
+				
+		G.outer.lower.count = coord2D(3,1); //!< 3 at lower_x, 1 a lower_y
+		G.outer.lower.async = coord2D(0,1); //!< plain on x, async on y
+	
+		G.inner.upper.count = coord2D(3,1); 
+		G.inner.upper.async = coord2D(0,1);
+		
 		w2D_t W(L,
 				G,
 				R,
@@ -210,14 +188,28 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
 		display_info(W);		
 	}
 	
+	
 	{
 		typedef wksp3D<double,double>  w3D_t;
 		typedef vertex3D<double>::type v3D_t;
 		const w3D_t::layout_type    L( coord3D(0,0,0), coord3D(10,15,20) );
 		const w3D_t::region_type    R( v3D_t(-1,-1,-1), v3D_t(1,1,1) );
-		const ghosts_infos<coord3D> g_lo( coord3D(1,2,3), coord3D(0,0,1) );
-		const ghosts_infos<coord3D> g_up( coord3D(4,5,6), coord3D(0,0,1) );
-		const ghosts_setup<coord3D> G( g_lo, g_up );
+		//const ghosts_infos<coord3D> g_lo( coord3D(1,2,3), coord3D(0,0,1) );
+		//const ghosts_infos<coord3D> g_up( coord3D(4,5,6), coord3D(0,0,1) );
+		//const ghosts_setup<coord3D> G( g_lo, g_up );
+		ghosts_setup<coord3D> G;
+		
+		
+		G.outer.upper.count = coord3D(2,1,1);
+		G.outer.upper.async = coord3D(0,0,1);
+		G.inner.lower.count = coord3D(2,1,1);
+		G.inner.lower.async = coord3D(0,0,1);
+		
+		G.outer.lower.count = coord3D(3,1,1);
+		G.outer.lower.async = coord3D(0,0,1);
+		G.inner.upper.count = coord3D(3,1,1);
+		G.inner.upper.async = coord3D(0,0,1);
+		
 		w3D_t W(L,
 				G,
 				R,
