@@ -31,7 +31,7 @@ namespace yocto
 			va_end(ap);
 			fflush(fp);
 
-			if( CommWorldRank < CommWorldRankMax )
+			if( CommWorldRank < CommWorldLast )
 			{
 				Send( &msg, 1, MPI_INT, CommWorldRank+1, tag, MPI_COMM_WORLD);
 			}
