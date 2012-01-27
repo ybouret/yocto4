@@ -24,7 +24,7 @@ namespace yocto
 				MPI_Status status;
 				Recv( &msg, 1, MPI_INT, CommWorldRank-1, tag, MPI_COMM_WORLD,status);
 			}
-			
+			fflush( fp );
 			va_list ap;
 			va_start(ap,fmt);
 			vfprintf(fp, fmt, ap);
@@ -42,6 +42,7 @@ namespace yocto
 		else
 		{
 			// only one
+			fflush( fp );
 			va_list ap;
 			va_start(ap,fmt);
 			vfprintf(fp, fmt, ap);
