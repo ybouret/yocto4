@@ -105,7 +105,8 @@ YOCTO_UNIT_TEST_IMPL(contour2)
 	contour2D<double>::callback countour_process( &lines, & isoline::process );
 	contour2D<double>::compute( d, w.X, w.Y, d, levels, countour_process );
 	
-	rwops<double>::save_vtk( "field2.vtk", "field2", "A", d, d, w.region.min, w.delta );
+	vector<size_t> cid(1,1);
+	rwops<double>::save_vtk( "field2.vtk", "field2", w,cid,w );
 	
 	
 }

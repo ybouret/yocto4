@@ -20,6 +20,15 @@ namespace
 		return (x2+sin(y2)) * exp( -2.0 * sqrt(r2) );
 	}
 	
+	static inline float f3v( double x, double y, double z )
+	{
+		const double x2 = x*x;
+		const double y2 = y*y;
+		const double z2 = z*z;
+		const double r2 = x2 + y2 + z2;
+		return (x2+cos(y2)) * exp( -2.0 * sqrt(r2) );
+	}
+	
 	class isosurf
 	{
 	public:
@@ -90,19 +99,27 @@ YOCTO_UNIT_TEST_IMPL(contour3)
 	//const ghosts_infos<coord3D>    g( coord3D(0,0,0), coord3D(0,0,0) );
 	//const ghosts_setup<coord3D>    G(g,g);
 	const ghosts_setup<coord3D> G;
+	const char                 *vars[] = { "u", "v" };
 	wksp_type w(L,
 				G,
 				R,
-				1,NULL);
+				2,vars);
 	
-	array3D<double> &d = w[1];
-	fill_type::function3 f( cfunctor3(f3) );
-	fill_type::with( f, d, w, w.X, w.Y, w.Z);
+	array3D<double> &u = w["u"];
+	array3D<double> &v = w["v"];
+	fill_type::function3 fu( cfunctor3(f3) );
+	fill_type::function3 fv( cfunctor3(f3v) );
+
+	fill_type::with( fu, u, w, w.X, w.Y, w.Z);
+	fill_type::with( fv, v, w, w.X, w.Y, w.Z);
+	vector<size_t> cid;
+	cid.push_back( 1 );
+	cid.push_back( 2 );
 	
-	rwops<double>::save_vtk("field3.vtk", "example field", "A", d, w, w.region.min, w.delta );
+	rwops<double>::save_vtk("field3.vtk", "example field", w, cid, w);
 	
 	double vmin=0,vmax=0;
-	d.get_min_max(vmin,NULL,vmax,NULL);
+	u.get_min_max(vmin,NULL,vmax,NULL);
 	
 	level_set<double> levels;
 	levels.add(0, 0.01 );
@@ -120,7 +137,7 @@ YOCTO_UNIT_TEST_IMPL(contour3)
 		proc( tmp, levels[1] );
 	}
 		
-	contour3D<double>::compute( d, w.X, w.Y, w.Z, d, levels, proc );
+	contour3D<double>::compute( u, w.X, w.Y, w.Z, u, levels, proc );
 	
 	surfaces.epilog( levels );
 	
