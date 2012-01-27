@@ -9,18 +9,24 @@ namespace yocto
 		using math::real_t;
 		
 		template <>
-		void rwops<real_t> :: save_vtk(const string          &filename,
-									   const string          &title,
-									   const string          &name,
-									   const array3D<real_t> &field,
-									   const layout3D        &sub,
-									   const vertex3D_t      &origin,
-									   const vertex3D_t      &spacing )
+		void rwops<real_t> :: save_vtk(const string        &filename,
+									   const string        &title,
+									   const wksp3_type    &wksp,
+									   const array<size_t> &cid,
+									   const layout3D      &sub)
 		{
 			
-			assert( field.has(sub.lower) );
-			assert( field.has(sub.upper) );
+			assert( wksp.has(sub.lower) );
+			assert( wksp.has(sub.upper) );
+			assert( cid.size() > 0 );
+			
 			ios::ocstream fp( filename, false );
+			
+			const vertex3D_t              spacing = wksp.delta;
+			const layout3D               &inilay  = wksp;
+			const wksp3_type::region_type subreg  = wksp3_type::region_type::extract( wksp.region, inilay, sub );
+			const vertex3D_t              origin  = subreg.min;
+			
 			fp("# vtk DataFile Version 3.0\n");
 			fp("%s\n", title.c_str());
 			fp("ASCII\n");
@@ -29,33 +35,45 @@ namespace yocto
 			fp("ORIGIN %g %g %g\n", origin.x, origin.y, origin.z );
 			fp("SPACING %g %g %g\n", spacing.x, spacing.y, spacing.z );
 			fp("POINT_DATA %u\n", unsigned(sub.items) );
-			fp("SCALARS %s float\n", name.c_str());
-			fp("LOOKUP_TABLE default\n");
 			
-			for( unit_t z=sub.lower.z; z <= sub.upper.z; ++z )
+			for( size_t iv = 1; iv <= cid.size(); ++iv )
 			{
-				for( unit_t y=sub.lower.y; y <= sub.upper.y; ++y )
+				const size_t           jv    = cid[iv];
+				const string          &name  = wksp.name( jv );
+				const array3D<real_t> &field = wksp[jv]; 
+				fp("SCALARS %s float\n", name.c_str());
+				fp("LOOKUP_TABLE default\n");
+				
+				for( unit_t z=sub.lower.z; z <= sub.upper.z; ++z )
 				{
-					for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+					for( unit_t y=sub.lower.y; y <= sub.upper.y; ++y )
 					{
-						fp("%g\n", field[z][y][x] );
+						for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+						{
+							fp("%g\n", field[z][y][x] );
+						}
 					}
 				}
 			}
 		}
 		
 		template <>
-		void rwops<real_t> :: save_vtk(const string          &filename,
-									   const string          &title,
-									   const string          &name,
-									   const array2D<real_t> &field,
-									   const layout2D        &sub,
-									   const vertex2D_t      &origin,
-									   const vertex2D_t      &spacing )
+		void rwops<real_t> :: save_vtk(const string        &filename,
+									   const string        &title,
+									   const wksp2_type    &wksp,
+									   const array<size_t> &cid,
+									   const layout2D      &sub)
 		{
 			
-			assert( field.has(sub.lower) );
-			assert( field.has(sub.upper) );
+			assert( wksp.has(sub.lower) );
+			assert( wksp.has(sub.upper) );
+			assert( cid.size() > 0 );
+			const vertex2D_t              spacing = wksp.delta;
+			const layout2D               &inilay  = wksp;
+			const wksp2_type::region_type subreg  = wksp2_type::region_type::extract( wksp.region, inilay, sub );
+			const vertex2D_t              origin  = subreg.min;
+			
+			
 			ios::ocstream fp( filename, false );
 			fp("# vtk DataFile Version 3.0\n");
 			fp("%s\n", title.c_str());
@@ -65,15 +83,22 @@ namespace yocto
 			fp("ORIGIN %g %g 0\n", origin.x, origin.y);
 			fp("SPACING %g %g 0\n", spacing.x, spacing.y);
 			fp("POINT_DATA %u\n", unsigned(sub.items) );
-			fp("SCALARS %s float\n", name.c_str());
-			fp("LOOKUP_TABLE default\n");
 			
-			
-			for( unit_t y=sub.lower.y; y <= sub.upper.y; ++y )
+			for( size_t iv=1; iv <= cid.size(); ++iv )
 			{
-				for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+				const size_t           jv    = cid[iv];
+				const string          &name  = wksp.name(jv);
+				const array2D<real_t> &field = wksp[jv];
+				fp("SCALARS %s float\n", name.c_str());
+				fp("LOOKUP_TABLE default\n");
+				
+				
+				for( unit_t y=sub.lower.y; y <= sub.upper.y; ++y )
 				{
-					fp("%g\n", field[y][x] );
+					for( unit_t x=sub.lower.x; x <= sub.upper.x; ++x )
+					{
+						fp("%g\n", field[y][x] );
+					}
 				}
 			}
 		}
