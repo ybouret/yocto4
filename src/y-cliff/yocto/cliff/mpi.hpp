@@ -65,6 +65,7 @@ namespace yocto
 				}
 			}
 			
+			//! exchanges
 			static inline void exchanges_finish( WORKSPACE &w, const array<size_t> &cid, mpi::Requests &requests ) 
 			{
 				static const mpi & MPI = mpi::instance();
