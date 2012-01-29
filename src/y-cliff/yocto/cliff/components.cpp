@@ -63,6 +63,9 @@ namespace yocto
 		{
 			assert( i >= 1);
 			assert( i <= number );
+			if( id == name(i) )
+				return;
+			
 			if( idxDB.search(id) )
 				throw exception("cliff.components.set_name(%u,%s): already in use", unsigned(i), id.c_str());
 			
