@@ -11,15 +11,15 @@ namespace yocto
 	namespace cliff
 	{
 		
-		
+		//! MPI wrappers for currents tasks
 		struct _mpi
 		{
 			//! exchanges variables: start
 			/**
 			 \param w the workspace
 			 \param cid the list of components to exchange
-			 \param MPI the current MPI instance
-			 
+			 \param req the MPI requests used for Isend/Irecv
+			 \param tag users's tag for the exchange
 			 async ghosts are send/recv while the plain ghosts are directly copied
 			 */
 			template <typename WORKSPACE>
@@ -29,6 +29,23 @@ namespace yocto
 				assert( cid.size() > 0 );
 				assert( requests.count == (w.async_ghosts *2) * cid.size() );
 				
+				//==============================================================
+				// direct copy of plain ghosts for async ghosts overlapp
+				//==============================================================
+				for( size_t g = w.plain_ghosts; g>0; --g )
+				{
+					typename WORKSPACE::ghost_type const &outer_ghost = w.plain_outer_ghost(g); 
+					typename WORKSPACE::ghost_type const &inner_ghost = w.plain_inner_ghost(g); 
+					
+					for( size_t i=cid.size();i>0;--i)
+					{
+						WORKSPACE::ghost_type::direct_copy( outer_ghost, inner_ghost, w[ cid[i] ] );
+					}
+				}
+				
+				//==============================================================
+				// then send async ghosts
+				//==============================================================
 				size_t iRequest = 0;
 				for( size_t g = w.async_ghosts; g>0; --g )
 				{					
@@ -54,19 +71,20 @@ namespace yocto
 					}
 				}
 				
-				for( size_t g = w.plain_ghosts; g>0; --g )
-				{
-					typename WORKSPACE::ghost_type const &outer_ghost = w.plain_outer_ghost(g); 
-					typename WORKSPACE::ghost_type const &inner_ghost = w.plain_inner_ghost(g); 
-					
-					for( size_t i=cid.size();i>0;--i)
-					{
-						WORKSPACE::ghost_type::direct_copy( outer_ghost, inner_ghost, w[ cid[i] ] );
-					}
-				}
+				
 			}
 			
 			//! exchanges variables: finish
+			//! exchanges variables: start
+			/**
+			 \param w the workspace
+			 \param cid the list of components to exchange
+			 \param req the MPI requests used for Isend/Irecv
+			 
+			 Wait for all the request to complete. Then transfer the async outer ghosts
+			 values in the workspace.
+			 */
+			
 			template <typename WORKSPACE>
 			static inline void exchanges_finish( WORKSPACE &w, const array<size_t> &cid, mpi::Requests &requests ) 
 			{
@@ -86,7 +104,7 @@ namespace yocto
 			}
 			
 			
-			//! collect a global array in rank 0
+			//! 3D collect a global array in rank 0
 			template <typename T>
 			static inline
 			void collect0( array3D<T> *pA, const array3D<T> &B, const layout3D &full )
@@ -135,6 +153,7 @@ namespace yocto
 			}
 			
 			
+			//! 2D collect a global array in rank 0
 			template <typename T>
 			static inline
 			void collect0( array2D<T> *pA, const array2D<T> &B, const layout2D &full )
