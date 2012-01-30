@@ -444,10 +444,9 @@ namespace yocto
 							const unit_t ng = outer_lo_count[i];
 							if( ng > 0 )
 							{
-								coord_t lo( this->lower );
-								coord_t up( this->upper );
-								__get(up,i)  = __get(lo,i) - ng;
-								__get(lo,i) -= 1;
+								coord_t lo( this->outline.lower );
+								coord_t up( this->outline.upper );
+								__get(up,i)  = __get(lo,i) + (ng-1);
 								const bool      async = outer_lo_async[i] != 0;
 								const int       peer  = outer_lo_peers[i];
 								const ghost_ptr g( new ghost_type(pos_lo,lo,up,this->outline,async,peer) );
@@ -469,10 +468,9 @@ namespace yocto
 							const unit_t ng = outer_up_count[i];
 							if( ng > 0 )
 							{
-								coord_t lo( this->lower );
-								coord_t up( this->upper );
-								__get(lo,i)  = __get(up,i) + ng;
-								__get(up,i) += 1;
+								coord_t lo( this->outline.lower );
+								coord_t up( this->outline.upper );
+								__get(lo,i)  = __get(up,i) - (ng-1);
 								const bool      async = outer_up_async[i] != 0;
 								const int       peer  = outer_up_peers[i];
 								const ghost_ptr g( new ghost_type(pos_up,lo,up,this->outline,async,peer) );
@@ -502,8 +500,9 @@ namespace yocto
 							const unit_t ng = inner_up_count[i];
 							if( ng > 0 )
 							{
-								coord_t lo( this->lower );
-								coord_t up( this->upper );
+								coord_t lo( this->outline.lower );
+								coord_t up( this->outline.upper );
+								__get(up,i) -= ng;
 								__get(lo,i)  = __get(up,i) - (ng-1);
 								
 								const bool      async = inner_up_async[i] != 0;
@@ -528,8 +527,9 @@ namespace yocto
 							const unit_t ng = inner_lo_count[i];
 							if( ng > 0 )
 							{
-								coord_t lo( this->lower );
-								coord_t up( this->upper );
+								coord_t lo( this->outline.lower );
+								coord_t up( this->outline.upper );
+								__get(lo,i) += ng;
 								__get(up,i)  = __get(lo,i) + (ng-1);
 								
 								const bool      async = inner_lo_async[i] != 0;
