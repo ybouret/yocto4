@@ -35,6 +35,8 @@ namespace yocto
 			virtual bool query( char &C );
 			virtual void store( char  C );
 			
+			bool    recv( ios::ichannel & );
+			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(queue);
 			size_t               bytes_; //!< total bytes in queue
