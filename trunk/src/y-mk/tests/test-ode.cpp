@@ -84,7 +84,7 @@ void perform_ode( const string &drvid )
 		const T dx = 0.2;
 		
 		ios::ocstream fp( drvid + "-exp.dat", false );
-		for( ; x <= 50; x += 0.2 )
+		for( ; x <= 50; x += dx )
 		{
 			fp("%g %g\n", x, y[1] );
 			odeint( drvs1, y, x, x+dx, h );
@@ -107,7 +107,7 @@ void perform_ode( const string &drvid )
 		const T dx = 0.2;
 		
 		ios::ocstream fp( drvid + "-cos.dat", false );
-		for( ; x <= 50; x += 0.2 )
+		for( ; x <= 50; x += dx )
 		{
 			fp("%g %g\n", x, y[1] );
 			odeint( drvs2, y, x, x+dx, h );
@@ -129,7 +129,7 @@ void perform_ode( const string &drvid )
 		const T dx = 0.2;
 		
 		ios::ocstream fp( drvid + "-lv.dat", false );
-		for( ; x <= 50; x += 0.2 )
+		for( ; x <= 50; x += dx )
 		{
 			fp("%g %g %g\n", x, y[1], y[2] );
 			odeint( drvs2, y, x, x+dx, h );
