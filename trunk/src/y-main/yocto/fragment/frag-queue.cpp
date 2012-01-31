@@ -183,9 +183,10 @@ namespace yocto
 			block *blk = fetch_block();
 			try
 			{
-				if(true)
+				if( blk->recv(input) )
 				{
 					list_.push_back(blk);
+					return true;
 				}
 				else
 				{
