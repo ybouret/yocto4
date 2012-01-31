@@ -2,7 +2,7 @@
 #define YOCTO_FRAG_BLOCK_INCLUDED 1
 
 
-#include "yocto/os.hpp"
+#include "yocto/ios/ichannel.hpp"
 
 namespace yocto
 {
@@ -36,10 +36,15 @@ namespace yocto
 			 */
 			size_t read( void *buffer, size_t buflen ) throw();
 			
+			//! store back after a succesfull read
 			bool   back( uint8_t x ) throw();
 			
 			void   defrag() throw();
 			bool   try_steal( block &other ) throw(); //!< ok if other.length() <= this->unused()
+			
+			//! read an input channel
+			bool recv( ios::ichannel &input );
+			
 			
 		private:
 			const size_t   bytes; //!< memory bytes

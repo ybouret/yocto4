@@ -178,6 +178,28 @@ namespace yocto
 		}
 		
 		
+		bool queue:: recv( ios::ichannel &input )
+		{
+			block *blk = fetch_block();
+			try
+			{
+				if(true)
+				{
+					list_.push_back(blk);
+				}
+				else
+				{
+					pool_.store(blk);
+					return false;
+				}
+			}
+			catch(...)
+			{
+				pool_.store(blk);
+				throw;
+			}
+		}
+		
 	}
 	
 }
