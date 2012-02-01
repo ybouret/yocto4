@@ -5,7 +5,7 @@ function xerror
     exit 1;
 }
 
- Z_DIR="zlib-1.2.5";
+ Z_DIR="zlib-1.2.6";
 
 ################################################################################
 ## Extract
@@ -71,6 +71,6 @@ do
     cp "$Z_DIR/$S" ../yocto/zlib
 done;
 
-cp "$Z_DIR/example.c" ../yocto/zlib
+cp "$Z_DIR/test/example.c" ../yocto/zlib
 
 rm -Rf $Z_DIR $Z_TGZ
