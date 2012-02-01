@@ -1,0 +1,56 @@
+#ifndef YOCTO_NET_IO_BLOCK_INCLUDED
+#define YOCTO_NET_IO_BLOCK_INCLUDED 1
+
+#include "yocto/net/io-socket.hpp"
+#include "yocto/memory/buffer.hpp"
+
+namespace yocto
+{
+	
+	namespace network
+	{
+	
+		class io_queue;
+		class io_block : public memory::rw_buffer
+		{
+		public:
+			io_block    *next; //!< for list/pool
+			io_block    *prev; //!< for list
+					
+			void           clear() throw();
+			virtual size_t length() const throw(); //!< last-curr
+			size_t         unused() const throw(); //!< final - last
+			size_t         offset() const throw(); //!< curr - start
+			
+			virtual ~io_block() throw();
+			explicit io_block( size_t bs );
+		
+			//! return true if something is received
+			bool recv( io_socket &sock );
+		
+			//! return true if all content is sent
+			bool sent( io_socket &sock );
+			
+			void defrag() throw();
+			bool try_steal( io_block &blk ) throw();
+			
+			
+			
+		protected:
+			uint8_t       *curr;  //!< current available first byte
+			uint8_t       *last;  //!< first invalid byte
+			uint8_t       *start; //!< where memory is allocated
+			const uint8_t *final; //!< where memory ends...
+			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(io_block);
+			virtual const void * get_address() const throw();
+			friend class network::io_queue;
+		};
+		
+		
+	}
+	
+}
+
+#endif
