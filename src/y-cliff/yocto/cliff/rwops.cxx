@@ -25,7 +25,7 @@ namespace yocto
 			const vertex3D_t              spacing = wksp.delta;
 			const layout3D               &inilay  = wksp;
 			const wksp3_type::region_type subreg  = wksp3_type::region_type::extract( wksp.region, inilay, sub );
-			const vertex3D_t              origin  = subreg.min;
+			const vertex3D_t              origin  = subreg.vmin;
 			
 			fp("# vtk DataFile Version 3.0\n");
 			fp("%s\n", title.c_str());
@@ -71,7 +71,7 @@ namespace yocto
 			const vertex2D_t              spacing = wksp.delta;
 			const layout2D               &inilay  = wksp;
 			const wksp2_type::region_type subreg  = wksp2_type::region_type::extract( wksp.region, inilay, sub );
-			const vertex2D_t              origin  = subreg.min;
+			const vertex2D_t              origin  = subreg.vmin;
 			
 			
 			ios::ocstream fp( filename, false );

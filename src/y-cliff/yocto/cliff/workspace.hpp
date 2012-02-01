@@ -172,7 +172,7 @@ namespace yocto
 					const unit_t *lo  = (const unit_t *) & (outline.lower);
 					const unit_t *hi  = (const unit_t *) & (outline.upper);
 					const U      *d   = (const U *) &delta;
-					const U      *o   = (const U *) &region.min;
+					const U      *o   = (const U *) &region.vmin;
 					const unit_t *k   = (const unit_t *) & (this->lower);
 					for( size_t i=0; i < DIMENSIONS; ++i )
 					{

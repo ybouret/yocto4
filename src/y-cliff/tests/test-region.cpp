@@ -32,8 +32,8 @@ namespace
 	template <typename REGION>
 	static inline void display_r( const REGION &R )
 	{
-		std::cerr << "-- min   = " << R.min    << std::endl;
-		std::cerr << "-- max   = " << R.max    << std::endl;
+		std::cerr << "-- min   = " << R.vmin   << std::endl;
+		std::cerr << "-- max   = " << R.vmax   << std::endl;
 		std::cerr << "-- length= " << R.length << std::endl;
 		std::cerr << "-- space = " << R.space  << std::endl;
 	}

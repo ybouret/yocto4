@@ -44,8 +44,8 @@ namespace
 		display_l(wksp.outline);
 		std::cerr << "---- components: " << std::endl;
 		display_c(wksp);
-		std::cerr << "min       = " << wksp.region.min << std::endl;
-		std::cerr << "max       = " << wksp.region.max << std::endl;
+		std::cerr << "min       = " << wksp.region.vmin << std::endl;
+		std::cerr << "max       = " << wksp.region.vmax << std::endl;
 		std::cerr << "delta     = " << wksp.delta      << std::endl;
 		std::cerr << "inv_d     = " << wksp.inv_d      << std::endl;
 		std::cerr << "inv_dsq   = " << wksp.inv_dsq    << std::endl;

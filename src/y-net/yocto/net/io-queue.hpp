@@ -51,7 +51,7 @@ namespace yocto
 			//------------------------------------------------------------------
 			virtual void write( char C );
 			virtual void flush();
-		
+			virtual void put( const void *data, size_t size, size_t &done);
 			
 		private:
 			core::list_of<io_block>  send_blocks;
