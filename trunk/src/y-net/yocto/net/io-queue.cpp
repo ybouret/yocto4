@@ -193,6 +193,11 @@ namespace yocto
 			
 		}
 		
+		void io_queue:: put( const void *data, size_t size, size_t &done)
+		{
+			done = 0 ;
+			
+		}
 		
 	}
 	

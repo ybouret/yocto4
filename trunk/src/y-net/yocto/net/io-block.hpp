@@ -31,10 +31,13 @@ namespace yocto
 			//! return true if all content is sent
 			bool sent( io_socket &sock );
 			
+			//! defrag data
 			void defrag() throw();
+
+			//! collapse blocks if possible
 			bool try_steal( io_block &blk ) throw();
 			
-			
+			size_t append( const void *data, size_t size ) throw();
 			
 		protected:
 			uint8_t       *curr;  //!< current available first byte

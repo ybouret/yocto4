@@ -38,26 +38,26 @@ namespace yocto
 			
 			static const size_t DIMENSIONS = sizeof(vertex_t)/sizeof(U);
 			
-			const vertex_t min;     //!< minimal x[,y[,z]]
-			const vertex_t max;     //!< maximal x[,y[,z]]
-			const vertex_t length;  //!< max-min
+			const vertex_t vmin;    //!< minimal x[,y[,z]]
+			const vertex_t vmax;    //!< maximal x[,y[,z]]
+			const vertex_t length;  //!< vmax-vmin
 			const U        space;   //!< product of lengths (length,area,volume)
 			
 			//! default region
 			explicit region( param_vertex inf, param_vertex sup) : 
 			region_base<U>( DIMENSIONS ),
-			min( inf ),
-			max( sup ),
+			vmin( inf ),
+			vmax( sup ),
 			length(),
-			space( region_base<U>::setup( &min, &max, &length ) ) 
+			space( region_base<U>::setup( &vmin, &vmax, &length ) ) 
 			{
 			}
 			
 			//! direct copy
 			inline region( const region &r ) throw() :
 			region_base<U>( DIMENSIONS ),
-			min( r.min ),
-			max( r.max ),
+			vmin( r.vmin ),
+			vmax( r.vmax ),
 			length( r.length ),
 			space(  r.space  )
 			{
@@ -81,7 +81,7 @@ namespace yocto
 				assert( master.has( sub.upper ) );
 				
 				vertex_t      sub_min, sub_max;
-				const U      *region_min    = (U *) &(r.min);
+				const U      *region_min    = (U *) &(r.vmin);
 				const U      *region_length = (U *) &(r.length);
 				const unit_t *master_lower  = (const unit_t *) &(master.lower);
 				const unit_t *master_width  = (const unit_t *) &(master.width);
