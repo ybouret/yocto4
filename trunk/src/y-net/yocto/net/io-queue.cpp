@@ -1,4 +1,5 @@
 #include "yocto/net/io-queue.hpp"
+#include <cstring>
 
 namespace yocto
 {
