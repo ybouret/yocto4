@@ -2,7 +2,6 @@
 #include "yocto/code/round.hpp"
 
 #include <cstring>
-#include <iostream>
 
 namespace yocto
 {
@@ -34,7 +33,6 @@ namespace yocto
 		
 		io_block * io_queue:: fetch( )
 		{
-			static int cnt = 0;
 			if( pool_blocks.size > 0 )
 			{
 				io_block *blk = pool_blocks.query();
@@ -43,7 +41,6 @@ namespace yocto
 			}
 			else
 			{
-				std::cerr << "<" << ++cnt << ">" << std::endl;
 				return new io_block( block_size );
 			}
 			
@@ -66,20 +63,17 @@ namespace yocto
 					{
 						//-- compacted
 						pool_blocks.store(blk);
-						std::cerr << "recv:compacted" << std::endl;
 					}
 					else
 					{
 						//-- keep the new block
 						recv_blocks.push_back( blk );
-						std::cerr << "recv:+1" << std::endl;
 					}
 					
 					return true;
 				}
 				else
 				{
-					std::cerr << "recv:0" << std::endl;
 					pool_blocks.store(blk);
 					return false;
 				}
@@ -105,7 +99,6 @@ namespace yocto
 					//-- the head block is now empty
 					assert( 0 == blk->length() );
 					pool_blocks.store( send_blocks.pop_front() );
-					std::cerr << "sent:+1" << std::endl;
 					return send_blocks.size <= 0;
 				}
 				else
@@ -130,7 +123,6 @@ namespace yocto
 				C = *(blk->curr++);
 				if( blk->length() <= 0 )
 				{
-					std::cerr << "query:-1" << std::endl;
 					pool_blocks.store( recv_blocks.pop_front() );
 				}
 				return true;
@@ -146,7 +138,6 @@ namespace yocto
 			io_block *blk = NULL;
 			if( recv_blocks.size <=0 || recv_blocks.head->offset() <= 0 )
 			{
-				std::cerr << "store:+1" << std::endl;
 				blk       = fetch();
 				blk->curr = blk->last = (uint8_t*)(blk->final);
 			}
@@ -182,7 +173,6 @@ namespace yocto
 					// take the whole block and remove it
 					//----------------------------------------------------------
 					memcpy( &p[done], blk->curr, blen );
-					std::cerr << "get:-1" << std::endl;
 					pool_blocks.store( recv_blocks.pop_front() );
 					if( (done += blen) >= size )
 						return;
@@ -207,7 +197,6 @@ namespace yocto
 		{
 			if( send_blocks.size <= 0 || send_blocks.tail->unused() == 0 )
 			{
-				std::cerr << "write: +1" << std::endl;
 				send_blocks.push_back( fetch() );
 			}
 			io_block *blk = send_blocks.tail; 	assert( blk->unused() > 0 );
@@ -222,7 +211,6 @@ namespace yocto
 		
 		void io_queue:: put( const void *data, size_t size, size_t &done)
 		{
-			//std::cerr << "<put " << size << ">" << std::endl;
 			done = 0 ;
 			if( size > 0 )
 			{
@@ -230,7 +218,6 @@ namespace yocto
 				if( send_blocks.size <= 0 )
 				{
 					send_blocks.push_back( fetch() );
-					std::cerr << "put:+1" << std::endl;
 				}
 				
 				io_block *blk = send_blocks.tail;
@@ -242,7 +229,6 @@ namespace yocto
 					if( done >= size )
 						return;
 					send_blocks.push_back( fetch() );
-					std::cerr << "put:+1" << std::endl;
 					blk = send_blocks.tail;
 				}
 			}
@@ -250,8 +236,10 @@ namespace yocto
 		}
 		
 		
-		size_t io_queue:: cache_size() const throw() { return pool_blocks.size * block_size; }
-		
+		size_t io_queue:: pool_size() const throw() { return pool_blocks.size * block_size; }
+		size_t io_queue:: send_size() const throw() { return send_blocks.size * block_size; }
+		size_t io_queue:: recv_size() const throw() { return recv_blocks.size * block_size; }
+
 		
 	}
 	

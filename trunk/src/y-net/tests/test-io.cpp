@@ -32,26 +32,26 @@ static inline void handle_server( socket_address &ip )
 		string line;
 		while( Q.recv( cln ) )
 		{
-			if( Q.read_line( line ) > 0 )
+			while( Q.read_line( line ) > 0 )
 			{
-				std::cerr << "'" << line << "' / cache_size=" << Q.cache_size() << std::endl;
+				std::cerr << "'" << line << "'" << std::endl;
 				
 				if( ".bye" == line )
 				{
-					break;
+					goto DISCONNECT;
 				}
 				
 				if( ".quit" == line )
 				{
 					run = false;
-					break;
+					goto DISCONNECT;
 				}
 				
 				h.set();
 				h(line);
 				h.get(bin,sizeof(bin));
 				
-				if( false )
+				if( true )
 				{
 					for( size_t i=0; i < num; ++i )
 					{
@@ -63,8 +63,9 @@ static inline void handle_server( socket_address &ip )
 				line.clear();
 			}
 		}
+	DISCONNECT:
 		Q.reset();
-		std::cerr << "[cache size=" << Q.cache_size() << "]" << std::endl;
+		std::cerr << "[pool size=" << Q.pool_size() << "]" << std::endl;
 		
 	}
 	
