@@ -53,6 +53,8 @@ namespace yocto
 			virtual void flush();
 			virtual void put( const void *data, size_t size, size_t &done);
 			
+			size_t cache_size() const throw();
+			
 		private:
 			core::list_of<io_block>  send_blocks;
 			core::list_of<io_block>  recv_blocks;
