@@ -58,7 +58,7 @@ static inline void handle_server( socket_address &ip )
 				}
 				Q.write( '\n' );
 				while( ! Q.sent( cln ) );
-				
+				std::cerr << "[cache size=" << Q.cache_size() << "]" << std::endl;
 				line.clear();
 			}
 		}

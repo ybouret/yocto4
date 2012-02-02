@@ -196,8 +196,29 @@ namespace yocto
 		void io_queue:: put( const void *data, size_t size, size_t &done)
 		{
 			done = 0 ;
+			if( size > 0 )
+			{
+				const uint8_t *p = (uint8_t *) data;
+				if( send_blocks.size <= 0 )
+					send_blocks.push_back( fetch() );
+				io_block *blk = send_blocks.tail;
+				for(;;)
+				{
+					assert( done < size );
+					const size_t ns = blk->append( &p[done], size-done);
+					done += ns;
+					if( done >= size )
+						return;
+					send_blocks.push_back( fetch() );
+					blk = send_blocks.tail;
+				}
+			}
 			
 		}
+		
+		
+		size_t io_queue:: cache_size() const throw() { return pool_blocks.size * block_size; }
+		
 		
 	}
 	
