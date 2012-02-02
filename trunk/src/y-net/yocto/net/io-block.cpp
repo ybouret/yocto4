@@ -17,12 +17,12 @@ namespace yocto
 		}
 		
 		io_block:: io_block( size_t bs ) :
-		next(NULL),
-		prev(NULL),
 		curr(NULL),
 		last(NULL),
 		start(NULL),
-		final(NULL)
+		final(NULL),
+		next(NULL),
+		prev(NULL)
 		{
 			size_t n = bs;
 			start    = memory::kind<memory::global>::acquire_as<uint8_t>( n );

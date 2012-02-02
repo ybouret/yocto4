@@ -25,7 +25,9 @@ namespace yocto
 		block_size( __block_size(bs) ),
 		send_blocks(),
 		recv_blocks(),
-		pool_blocks()
+		pool_blocks(),
+		next(NULL),
+		prev(NULL)
 		{
 			
 		}

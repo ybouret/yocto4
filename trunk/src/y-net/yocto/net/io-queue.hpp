@@ -63,6 +63,10 @@ namespace yocto
 			core::pool_of<io_block>  pool_blocks;
 			io_block *fetch();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
+			
+		public:
+			io_queue *next;
+			io_queue *prev;
 		};
 		
 	}
