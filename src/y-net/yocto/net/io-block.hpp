@@ -14,8 +14,7 @@ namespace yocto
 		class io_block : public memory::rw_buffer
 		{
 		public:
-			io_block    *next; //!< for list/pool
-			io_block    *prev; //!< for list
+			
 					
 			void           clear() throw();
 			virtual size_t length() const throw(); //!< last-curr
@@ -49,6 +48,10 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_block);
 			virtual const void * get_address() const throw();
 			friend class network::io_queue;
+			
+		public:
+			io_block    *next; //!< for list/pool
+			io_block    *prev; //!< for list
 		};
 		
 		
