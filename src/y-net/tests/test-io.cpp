@@ -27,22 +27,21 @@ static inline void handle_server( socket_address &ip )
 		std::cerr << "-- listening..." << std::endl;
 		tcp_client cln( srv );
 		std::cerr << "-- accepting from " << cln.self() << std::endl;
-		
+		//std::cerr << "-- sndbuf=" << cln.sndbuf() << std::endl;
+		//std::cerr << "-- rcvbuf=" << cln.rcvbuf() << std::endl;
 		string line;
 		while( Q.recv( cln ) )
 		{
-			std::cerr << ".";
 			if( Q.read_line( line ) > 0 )
 			{
-				std::cerr << std::endl;
-				std::cerr << "'" << line << "'" << std::endl;
+				std::cerr << "'" << line << "' / cache_size=" << Q.cache_size() << std::endl;
 				
-				if( "bye" == line )
+				if( ".bye" == line )
 				{
 					break;
 				}
 				
-				if( "quit" == line )
+				if( ".quit" == line )
 				{
 					run = false;
 					break;
@@ -52,17 +51,20 @@ static inline void handle_server( socket_address &ip )
 				h(line);
 				h.get(bin,sizeof(bin));
 				
-				for( size_t i=0; i < num; ++i )
+				if( false )
 				{
-					Q("%02X", bin[i]);
+					for( size_t i=0; i < num; ++i )
+					{
+						Q("%02X", bin[i]);
+					}
+					Q.write( '\n' );
+					while( ! Q.sent( cln ) );
 				}
-				Q.write( '\n' );
-				while( ! Q.sent( cln ) );
-				std::cerr << "[cache size=" << Q.cache_size() << "]" << std::endl;
 				line.clear();
 			}
 		}
 		Q.reset();
+		std::cerr << "[cache size=" << Q.cache_size() << "]" << std::endl;
 		
 	}
 	
