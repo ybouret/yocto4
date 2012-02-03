@@ -12,10 +12,14 @@ namespace yocto
 		class connexion
 		{
 		public:
-			explicit connexion();
+			explicit connexion( io_cache &cache, tcp_server &srv );
 			virtual ~connexion() throw();
 			
 		private:
+			io_cache  &qmgr;
+			tcp_client sock;
+			io_queue  *Q;
+			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);
 		};
 	}
