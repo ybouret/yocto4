@@ -18,8 +18,15 @@ SET( ip_srcs ${ip_decl} ${ip_impl} )
 INSTALL( FILES ${ip_decl} DESTINATION include/yocto/net/ip )
 SOURCE_GROUP( net/ip FILES ${ip_srcs} )
 
-SET( decl ${net_decl} ${sys_decl} ${ip_decl} )
-SET( srcs ${net_srcs} ${sys_srcs} ${ip_srcs} )
+FILE( GLOB io_decl yocto/net/io/*.hpp)
+FILE( GLOB io_impl yocto/net/io/*.cpp)
+SET( io_srcs ${io_decl} ${io_impl} )
+INSTALL( FILES ${io_decl} DESTINATION include/yocto/net/io )
+SOURCE_GROUP( net/io FILES ${io_srcs} )
+
+
+SET( decl ${net_decl} ${sys_decl} ${ip_decl} ${io_decl} )
+SET( srcs ${net_srcs} ${sys_srcs} ${ip_srcs} ${io_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main )
 

@@ -1,4 +1,4 @@
-#include "yocto/net/io-queue.hpp"
+#include "yocto/net/io/queue.hpp"
 #include "yocto/code/round.hpp"
 
 #include <cstring>

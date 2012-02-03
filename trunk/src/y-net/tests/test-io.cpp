@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/net/ip-address.hpp"
 #include "yocto/net/tcp-socket.hpp"
-#include "yocto/net/io-queue.hpp"
+#include "yocto/net/io/queue.hpp"
 #include "yocto/hashing/sha1.hpp"
 
 #include <cstdlib>
