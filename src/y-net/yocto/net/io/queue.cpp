@@ -15,14 +15,14 @@ namespace yocto
 			while( pool_blocks.size ) delete pool_blocks.query();
 		}
 		
-		static inline size_t __block_size( size_t bs )
+		size_t io_queue:: validate( size_t bs ) throw()
 		{
 			if( bs < 16 ) bs = 16;
 			return YOCTO_ROUND16(bs);
 		}
 		
 		io_queue:: io_queue( size_t bs ) :
-		block_size( __block_size(bs) ),
+		block_size( validate(bs) ),
 		send_blocks(),
 		recv_blocks(),
 		pool_blocks(),
@@ -241,7 +241,7 @@ namespace yocto
 		size_t io_queue:: pool_size() const throw() { return pool_blocks.size * block_size; }
 		size_t io_queue:: send_size() const throw() { return send_blocks.size * block_size; }
 		size_t io_queue:: recv_size() const throw() { return recv_blocks.size * block_size; }
-
+		
 		
 	}
 	
