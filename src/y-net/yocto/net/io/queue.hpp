@@ -2,7 +2,7 @@
 #define YOCTO_NET_IO_QUEUE_INCLUDED 1
 
 
-#include "yocto/net/io-block.hpp"
+#include "yocto/net/io/block.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
 
