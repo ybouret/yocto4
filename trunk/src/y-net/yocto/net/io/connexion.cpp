@@ -5,20 +5,28 @@ namespace yocto
 	namespace network
 	{
 		
-		connexion:: ~connexion() throw()
+		io_link:: ~io_link() throw()
 		{
-			qmgr.collect(Q);
-			Q = NULL;
+			mgr.collect( ioQ );
+			ioQ = NULL;
 		}
 		
+		io_link:: io_link( io_cache &cache, tcp_server &srv, bool blocking_status ) :
+		mgr( cache ),
+		cln( srv   ),
+		ioQ( mgr.provide() ),
 		
-		connexion:: connexion( io_cache &cache, tcp_server &srv ) :
-		qmgr( cache ),
-		sock( srv   ),
-		Q( qmgr.provide() )
+		sock(    cln ),
+		input(  *ioQ ),
+		output( *ioQ )
 		{
+			cln.blocking( blocking_status );
 		}
-		
+	
+		const socket_address & io_link:: key() const throw()
+		{
+			return cln.self();
+		}
 		
 	}
 }

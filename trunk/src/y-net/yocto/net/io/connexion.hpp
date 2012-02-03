@@ -3,25 +3,36 @@
 
 #include "yocto/net/io/cache.hpp"
 #include "yocto/net/tcp-socket.hpp"
+#include "yocto/intrusive-ptr.hpp"
 
 namespace yocto
 {
 	
 	namespace network
 	{
-		class connexion
+		
+		class io_link : public object, public counted
 		{
 		public:
-			explicit connexion( io_cache &cache, tcp_server &srv );
-			virtual ~connexion() throw();
+			explicit io_link( io_cache &cache, tcp_server &srv, bool blocking = true );
+			virtual ~io_link() throw();
 			
 		private:
-			io_cache  &qmgr;
-			tcp_client sock;
-			io_queue  *Q;
+			io_cache   &mgr;
+			tcp_client  cln;
+			io_queue   *ioQ;
+			YOCTO_DISABLE_COPY_AND_ASSIGN(io_link);
 			
-			YOCTO_DISABLE_COPY_AND_ASSIGN(connexion);
+		public:
+			socket       &sock;
+			ios::istream &input;
+			ios::ostream &output;
+			
+			const socket_address & key() const throw();
 		};
+		
+		typedef intrusive_ptr<socket_address,io_link> connexion;
+		
 	}
 	
 }

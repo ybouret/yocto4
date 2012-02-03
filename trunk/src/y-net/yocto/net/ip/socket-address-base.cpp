@@ -56,7 +56,6 @@ namespace yocto
 			fmt( sa.fmt ),
 			YOCTO_SOCKET_ADDRESS_CTOR()
 		{
-			//qw_copy<items64>( addr_, sa.addr_ );
 			memcpy(addr_, sa.addr_, sizeof(sa.addr_) );
 		}
 			
