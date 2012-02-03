@@ -27,8 +27,6 @@ static inline void handle_server( socket_address &ip )
 		std::cerr << "-- listening..." << std::endl;
 		tcp_client cln( srv );
 		std::cerr << "-- accepting from " << cln.self() << std::endl;
-		//std::cerr << "-- sndbuf=" << cln.sndbuf() << std::endl;
-		//std::cerr << "-- rcvbuf=" << cln.rcvbuf() << std::endl;
 		string line;
 		while( Q.recv( cln ) )
 		{

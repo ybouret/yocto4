@@ -14,11 +14,14 @@ namespace yocto
 	namespace network
 	{
 		
+		class io_cache;
 		class io_queue : public ios::istream, public ios::ostream
 		{
 		public:
 			explicit io_queue( size_t bs );
 			virtual ~io_queue() throw();
+			
+			static size_t validate( size_t bs ) throw();
 			
 			const size_t block_size;
 			
@@ -64,9 +67,10 @@ namespace yocto
 			io_block *fetch();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
 			
-		public:
 			io_queue *next;
 			io_queue *prev;
+			friend class core::pool_of<io_queue>;
+			friend class io_cache;
 		};
 		
 	}
