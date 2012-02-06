@@ -13,7 +13,8 @@ using namespace network;
 static inline void handle_server( socket_address &ip )
 {
 	
-	io_queue      Q(16);
+	io_cache      ioDB( 16 );
+	io_queue      Q( ioDB );
 	tcp_server    srv( ip, 2 );
 	hashing::sha1 h;
 	
@@ -63,8 +64,7 @@ static inline void handle_server( socket_address &ip )
 		}
 	DISCONNECT:
 		Q.reset();
-		std::cerr << "[pool size=" << Q.pool_size() << "]" << std::endl;
-		
+		std::cerr << "cache count=" << ioDB.count() << std::endl;
 	}
 	
 }

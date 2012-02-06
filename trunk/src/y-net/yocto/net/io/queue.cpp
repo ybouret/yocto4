@@ -10,22 +10,14 @@ namespace yocto
 		
 		io_queue:: ~io_queue() throw()
 		{
-			while( send_blocks.size ) delete send_blocks.pop_back();
-			while( recv_blocks.size ) delete recv_blocks.pop_back();
-			while( pool_blocks.size ) delete pool_blocks.query();
+			reset();
 		}
 		
-		size_t io_queue:: validate( size_t bs ) throw()
-		{
-			if( bs < 16 ) bs = 16;
-			return YOCTO_ROUND16(bs);
-		}
 		
-		io_queue:: io_queue( size_t bs ) :
-		block_size( validate(bs) ),
+		io_queue:: io_queue( io_cache &db ) :
 		send_blocks(),
 		recv_blocks(),
-		pool_blocks(),
+		cache( db ),
 		next(NULL),
 		prev(NULL)
 		{
@@ -33,25 +25,9 @@ namespace yocto
 		}
 		
 		
-		io_block * io_queue:: fetch( )
-		{
-			if( pool_blocks.size > 0 )
-			{
-				io_block *blk = pool_blocks.query();
-				blk->clear();
-				return blk;
-			}
-			else
-			{
-				return new io_block( block_size );
-			}
-			
-		}
-		
-		
 		bool io_queue:: recv( io_socket &sock )
 		{
-			io_block *blk = fetch();
+			io_block *blk = cache.provide();
 			try
 			{
 				if( blk->recv(sock) )
@@ -64,7 +40,7 @@ namespace yocto
 					if( tail && tail->try_steal( *blk ) )
 					{
 						//-- compacted
-						pool_blocks.store(blk);
+						cache.collect(blk);
 					}
 					else
 					{
@@ -76,14 +52,14 @@ namespace yocto
 				}
 				else
 				{
-					pool_blocks.store(blk);
+					cache.collect(blk);
 					return false;
 				}
 				
 			}
 			catch(...)
 			{
-				pool_blocks.store(blk);
+				cache.collect(blk);
 				throw;
 			}
 		}
@@ -100,7 +76,7 @@ namespace yocto
 				{
 					//-- the head block is now empty
 					assert( 0 == blk->length() );
-					pool_blocks.store( send_blocks.pop_front() );
+					cache.collect( send_blocks.pop_front() );
 					return send_blocks.size <= 0;
 				}
 				else
@@ -125,7 +101,7 @@ namespace yocto
 				C = *(blk->curr++);
 				if( blk->length() <= 0 )
 				{
-					pool_blocks.store( recv_blocks.pop_front() );
+					cache.collect( recv_blocks.pop_front() );
 				}
 				return true;
 			}
@@ -140,7 +116,7 @@ namespace yocto
 			io_block *blk = NULL;
 			if( recv_blocks.size <=0 || recv_blocks.head->offset() <= 0 )
 			{
-				blk       = fetch();
+				blk       = cache.provide();
 				blk->curr = blk->last = (uint8_t*)(blk->final);
 			}
 			else
@@ -155,8 +131,8 @@ namespace yocto
 		
 		void io_queue:: reset() throw()
 		{
-			while( send_blocks.size ) pool_blocks.store( send_blocks.pop_back() );
-			while( recv_blocks.size ) pool_blocks.store( recv_blocks.pop_back() );
+			while( send_blocks.size ) cache.collect( send_blocks.pop_back() );
+			while( recv_blocks.size ) cache.collect( recv_blocks.pop_back() );
 		}
 		
 		void io_queue:: get( void *data, size_t size, size_t &done )
@@ -175,7 +151,7 @@ namespace yocto
 					// take the whole block and remove it
 					//----------------------------------------------------------
 					memcpy( &p[done], blk->curr, blen );
-					pool_blocks.store( recv_blocks.pop_front() );
+					cache.collect( recv_blocks.pop_front() );
 					if( (done += blen) >= size )
 						return;
 				}
@@ -199,7 +175,7 @@ namespace yocto
 		{
 			if( send_blocks.size <= 0 || send_blocks.tail->unused() == 0 )
 			{
-				send_blocks.push_back( fetch() );
+				send_blocks.push_back( cache.provide() );
 			}
 			io_block *blk = send_blocks.tail; 	assert( blk->unused() > 0 );
 			*(blk->last++) = C;
@@ -219,7 +195,7 @@ namespace yocto
 				const uint8_t *p = (uint8_t *) data;
 				if( send_blocks.size <= 0 )
 				{
-					send_blocks.push_back( fetch() );
+					send_blocks.push_back( cache.provide() );
 				}
 				
 				io_block *blk = send_blocks.tail;
@@ -230,19 +206,14 @@ namespace yocto
 					done += ns;
 					if( done >= size )
 						return;
-					send_blocks.push_back( fetch() );
+					send_blocks.push_back( cache.provide() );
 					blk = send_blocks.tail;
 				}
 			}
 			
 		}
 		
-		
-		size_t io_queue:: pool_size() const throw() { return pool_blocks.size * block_size; }
-		size_t io_queue:: send_size() const throw() { return send_blocks.size * block_size; }
-		size_t io_queue:: recv_size() const throw() { return recv_blocks.size * block_size; }
-		
-		
+				
 	}
 	
 	

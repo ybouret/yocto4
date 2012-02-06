@@ -34,10 +34,12 @@ namespace yocto
 		class server_protocol : public protocol
 		{
 		public:
-			
+			explicit server_protocol( const socket_address &ip, int pending, size_t bs );
+			virtual ~server_protocol() throw();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(server_protocol);
+			tcp_server server;
 		};
 		
 		

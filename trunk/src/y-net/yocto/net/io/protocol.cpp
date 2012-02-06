@@ -20,6 +20,18 @@ namespace yocto
 		}
 		
 		
+		server_protocol:: server_protocol( const socket_address &ip, int pending, size_t bs ) :
+		protocol( bs ),
+		server( ip, pending )
+		{
+		}
+		
+		server_protocol:: ~server_protocol() throw()
+		{
+			
+		}
+		
+		
 		
 	}
 }
