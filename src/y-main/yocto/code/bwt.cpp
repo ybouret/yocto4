@@ -2,6 +2,8 @@
 #include "yocto/sequence/c-array.hpp"
 #include "yocto/code/hsort.hpp"
 
+#include <cstring>
+
 namespace yocto
 {
 	
