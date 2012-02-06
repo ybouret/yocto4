@@ -10,13 +10,14 @@ namespace yocto
 			
 		}
 		
-		io_link:: io_link( io_cache &cache, tcp_server &srv ) :
+		io_link:: io_link( protocol &p, tcp_server &srv, io_cache &cache ) :
 		cln( srv   ),
 		ioQ( cache ),
 		
 		sock(   cln ),
 		input(  ioQ ),
-		output( ioQ )
+		output( ioQ ),
+		proto(p)
 		{
 			cln.blocking( false );
 		}

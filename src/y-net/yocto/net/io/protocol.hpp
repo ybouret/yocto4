@@ -16,13 +16,21 @@ namespace yocto
 			virtual ~protocol() throw();
 			explicit protocol(size_t bs);
 
+			virtual void on_init(connexion & );
+			//virtual void on_recv(connexion &);
+			//virtual void on_sent(connexion &);
+			virtual void on_quit(connexion &);
+			
+			bool would_send() const throw();
 			
 		protected:
 			typedef set<socket_address,connexion> connDB;
 			socket_set   sock_db;
 			connDB       conn_db;
+			
 		public:
 			delay        waiting;
+			
 		protected:
 			io_cache     cache; 
 			
@@ -36,6 +44,8 @@ namespace yocto
 		public:
 			explicit server_protocol( const socket_address &ip, int pending, size_t bs );
 			virtual ~server_protocol() throw();
+			
+			void run();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(server_protocol);
