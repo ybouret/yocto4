@@ -2,9 +2,8 @@
 #define YOCTO_NET_IO_QUEUE_INCLUDED 1
 
 
-#include "yocto/net/io/block.hpp"
+#include "yocto/net/io/cache.hpp"
 #include "yocto/core/list.hpp"
-#include "yocto/core/pool.hpp"
 
 #include "yocto/ios/istream.hpp"
 #include "yocto/ios/ostream.hpp"
@@ -14,16 +13,13 @@ namespace yocto
 	namespace network
 	{
 		
-		class io_cache;
 		class io_queue : public ios::istream, public ios::ostream
 		{
 		public:
-			explicit io_queue( size_t bs );
+			explicit io_queue( io_cache &db );
 			virtual ~io_queue() throw();
 			
-			static size_t validate( size_t bs ) throw();
 			
-			const size_t block_size;
 			
 			//! receive data from an io_socket
 			/**
@@ -56,21 +52,15 @@ namespace yocto
 			virtual void flush();
 			virtual void put( const void *data, size_t size, size_t &done);
 			
-			size_t send_size() const throw();
-			size_t recv_size() const throw();
-			size_t pool_size() const throw();
-			
+						
 		private:
 			core::list_of<io_block>  send_blocks;
 			core::list_of<io_block>  recv_blocks;
-			core::pool_of<io_block>  pool_blocks;
-			io_block *fetch();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
-			
+			io_cache                &cache;
 			io_queue *next;
 			io_queue *prev;
 			friend class core::pool_of<io_queue>;
-			friend class io_cache;
 		};
 		
 	}

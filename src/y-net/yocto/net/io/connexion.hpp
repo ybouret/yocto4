@@ -1,7 +1,7 @@
 #ifndef YOCTO_NET_IO_CONNEXION
 #define YOCTO_NET_IO_CONNEXION 1
 
-#include "yocto/net/io/cache.hpp"
+#include "yocto/net/io/queue.hpp"
 #include "yocto/net/tcp-socket.hpp"
 #include "yocto/intrusive-ptr.hpp"
 
@@ -14,13 +14,12 @@ namespace yocto
 		class io_link : public object, public counted
 		{
 		public:
-			explicit io_link( io_cache &cache, tcp_server &srv, bool blocking = true );
+			explicit io_link( io_cache &cache, tcp_server &srv);
 			virtual ~io_link() throw();
 			
 		private:
-			io_cache   &mgr;
 			tcp_client  cln;
-			io_queue   *ioQ;
+			io_queue    ioQ;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_link);
 			
 		public:

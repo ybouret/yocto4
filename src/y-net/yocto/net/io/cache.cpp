@@ -1,4 +1,5 @@
 #include "yocto/net/io/cache.hpp"
+#include "yocto/code/round.hpp"
 
 namespace yocto
 {
@@ -8,48 +9,47 @@ namespace yocto
 		
 		io_cache:: ~io_cache() throw()
 		{
-			while( queues.size ) delete queues.query();
+			while( blocks.size ) delete blocks.query();
+		}
+		
+		static inline size_t __check_bs( const size_t bs ) throw()
+		{
+			return bs < 16 ? 16 : YOCTO_ROUND16(bs) ;
 		}
 		
 		io_cache:: io_cache( const size_t bs ) throw() :
-		block_size( io_queue::validate(bs) ),
-		queues(),
+		block_size( __check_bs(bs) ),
 		blocks()
 		{
 			
 		}
 		
-		
-		void io_cache:: collect( io_queue *Q ) throw()
+		io_block * io_cache:: provide( )
 		{
-			
-			assert(Q);
-			assert(Q->next==NULL);
-			assert(Q->prev==NULL);
-			assert( block_size == Q->block_size );
-
-			//==================================================================
-			// collect all blocks
-			//==================================================================
-			while( Q->send_blocks.size ) blocks.store( Q->send_blocks.pop_back() );
-			while( Q->recv_blocks.size ) blocks.store( Q->recv_blocks.pop_back() );
-			while( Q->pool_blocks.size ) blocks.store( Q->pool_blocks.query()    );
-
-			//==================================================================
-			// cache queue
-			//================================================================== 
-			queues.store( Q );
+			if( blocks.size <= 0 )
+			{
+				return new io_block( block_size );
+			}
+			else
+			{
+				io_block *blk = blocks.query();
+				blk->clear();
+				return blk;
+			}
 		}
 		
-		io_queue * io_cache:: provide()
+		void io_cache:: collect( io_block *blk ) throw()
 		{
-			io_queue *Q = queues.size ? queues.query() : new io_queue( block_size );
-			
-			// TODO: provide some blocks...
-			
-			return Q;
+			assert( blk );
+			assert( NULL == blk->next );
+			assert( NULL == blk->prev );
+			blocks.store( blk );
 		}
-	
+		
+		size_t io_cache:: count() const throw() { return blocks.size; }
+		size_t io_cache:: bytes() const throw() { return blocks.size * block_size; }
+		
+			
 	
 	}
 

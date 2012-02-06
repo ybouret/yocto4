@@ -7,20 +7,18 @@ namespace yocto
 		
 		io_link:: ~io_link() throw()
 		{
-			mgr.collect( ioQ );
-			ioQ = NULL;
+			
 		}
 		
-		io_link:: io_link( io_cache &cache, tcp_server &srv, bool blocking_status ) :
-		mgr( cache ),
+		io_link:: io_link( io_cache &cache, tcp_server &srv ) :
 		cln( srv   ),
-		ioQ( mgr.provide() ),
+		ioQ( cache ),
 		
-		sock(    cln ),
-		input(  *ioQ ),
-		output( *ioQ )
+		sock(   cln ),
+		input(  ioQ ),
+		output( ioQ )
 		{
-			cln.blocking( blocking_status );
+			cln.blocking( false );
 		}
 	
 		const socket_address & io_link:: key() const throw()
