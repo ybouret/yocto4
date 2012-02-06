@@ -21,13 +21,17 @@ namespace yocto
 		private:
 			tcp_client  cln;
 			io_queue    ioQ;
-			YOCTO_DISABLE_COPY_AND_ASSIGN(io_link);
+			bool        closing;
 			
+			YOCTO_DISABLE_COPY_AND_ASSIGN(io_link);
+			friend class protocol;
 		public:
 			socket       &sock;
 			ios::istream &input;
 			ios::ostream &output;
 			protocol     &proto;
+			bool          close() throw(); //!< never come back
+			
 			
 			const socket_address & key() const throw();
 		};
