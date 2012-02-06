@@ -30,9 +30,10 @@ namespace yocto
 			socket_set   sock_db;
 			connDB       conn_db;
 			connStack    dropped;
+
 			bool         has_recv( connexion & );
 			bool         has_sent( connexion & );
-			
+			void         disconnect( connexion &) throw();
 			
 		public:
 			delay        waiting;
