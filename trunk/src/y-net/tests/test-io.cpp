@@ -100,3 +100,48 @@ YOCTO_UNIT_TEST_IMPL(ioQ)
 	
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+#include "yocto/net/io/protocol.hpp"
+
+static inline void handle_protocol( socket_address &ip )
+{
+	server_protocol proto( ip, 2, 16 );
+	proto.run();
+}
+
+YOCTO_UNIT_TEST_IMPL(protocol)
+{
+	if( argc < 2 )
+	{
+		throw exception("usage: %s port [4|6]", argv[0]);
+	}
+	
+	const uint16_t port     = strtol(argv[1],NULL,10);
+	const uint16_t net_port = swap_be(port);
+	int            version  = 4;
+	if( argc > 2 )
+	{
+		version = strtol(argv[2], NULL, 10);
+		if( version != 4 && version != 6 )
+			throw exception("bad version %d", version);
+	}
+	
+	if( version == 4 )
+	{
+		IPv4address addr( socket_address_any, net_port );
+		handle_protocol( addr );
+	}
+	else 
+	{
+		IPv6address addr( socket_address_any, net_port );
+		handle_protocol( addr );
+	}
+	
+	
+}
+YOCTO_UNIT_TEST_DONE()
+
+
+
+

@@ -13,7 +13,7 @@ namespace yocto
 		io_link:: io_link( protocol &p, tcp_server &srv, io_cache &cache ) :
 		cln( srv   ),
 		ioQ( cache ),
-		
+		closing( false ),
 		sock(   cln ),
 		input(  ioQ ),
 		output( ioQ ),
