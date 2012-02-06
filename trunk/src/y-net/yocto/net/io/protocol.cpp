@@ -66,6 +66,13 @@ namespace yocto
 			return cnx->ioQ.recv( cnx->cln );
 		}
 		
+		void protocol:: disconnect( connexion &cnx ) throw()
+		{
+			cnx->sock.shutdown( shutdown_both );
+			sock_db.remove( cnx->sock );
+			(void) conn_db.remove( cnx->key() );
+		}
+
 		////////////////////////////////////////////////////////////////////////
 		//
 		//
@@ -148,8 +155,7 @@ namespace yocto
 						}
 						catch(...)
 						{
-							sock_db.remove( cnx->sock );
-							(void)conn_db.remove( cnx->key() );
+							disconnect( cnx );
 							throw;
 						}
 					}
@@ -197,11 +203,15 @@ namespace yocto
 						//------------------------------------------------------
 						while( dropped.size() )
 						{
-							const connexion &cnx = dropped.peek();
-							sock_db.remove( cnx->sock );
-							(void)conn_db.remove( cnx->key() );
+							connexion &cnx = dropped.peek();
+							disconnect( cnx );
 							dropped.pop();
 						}
+
+						//------------------------------------------------------
+						// third pass: sending
+						//------------------------------------------------------
+
 						
 					}
 					
