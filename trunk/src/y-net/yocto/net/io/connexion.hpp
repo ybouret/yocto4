@@ -11,10 +11,11 @@ namespace yocto
 	namespace network
 	{
 		
+		class protocol;
 		class io_link : public object, public counted
 		{
 		public:
-			explicit io_link( io_cache &cache, tcp_server &srv);
+			explicit io_link( protocol &p, tcp_server &srv, io_cache &cache);
 			virtual ~io_link() throw();
 			
 		private:
@@ -26,6 +27,7 @@ namespace yocto
 			socket       &sock;
 			ios::istream &input;
 			ios::ostream &output;
+			protocol     &proto;
 			
 			const socket_address & key() const throw();
 		};
