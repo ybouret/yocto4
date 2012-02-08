@@ -141,6 +141,10 @@ namespace yocto
 			
 		}
 		
+		bool protocol:: has_sent( connexion &cnx )
+		{
+			return cnx->ioQ.sent( cnx->cln );
+		}
 		
 		void protocol:: process_send()
 		{
@@ -156,7 +160,7 @@ namespace yocto
 					assert( cnx->ioQ.would_send() );
 					if( sock_db.can_send( cnx->sock ) )
 					{
-						if( cnx->ioQ.sent( cnx->cln ) )
+						if( has_sent(cnx) )
 						{
 							//-- all is done
 							if(cnx->closing)
@@ -178,6 +182,17 @@ namespace yocto
 		}
 		
 		
+		void protocol:: shutdown_all() throw()
+		{
+			for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
+			{
+				(*i)->cln.shutdown( shutdown_both );
+			}
+			dropped.release();
+			conn_db.release();
+		}
+		
+		
 		////////////////////////////////////////////////////////////////////////
 		//
 		//
@@ -192,9 +207,49 @@ namespace yocto
 		
 		server_protocol:: ~server_protocol() throw()
 		{
-			
 		}
 		
+		
+		void server_protocol:: conn_create()
+		{
+			//------------------------------------------------------
+			// new connexion !
+			//------------------------------------------------------
+			connexion cnx( new io_link( *this, server, cache ) );
+			
+			//------------------------------------------------------
+			// register socket
+			//------------------------------------------------------
+			sock_db.insert( cnx->sock );
+			
+			//------------------------------------------------------
+			// register connexion
+			//------------------------------------------------------
+			try 
+			{
+				if( !conn_db.insert( cnx ) )
+					throw exception("server_protocol: unexpected multiple connexion!");
+			}
+			catch(...)
+			{
+				sock_db.remove( cnx->sock );
+				throw;
+			}
+			
+			//------------------------------------------------------
+			// welcome it !
+			//------------------------------------------------------
+			try
+			{
+				on_init( cnx );
+			}
+			catch(...)
+			{
+				disconnect( cnx );
+				throw;
+			}
+			
+		}
 		
 		void server_protocol:: run()
 		{
@@ -204,71 +259,23 @@ namespace yocto
 			while( running )
 			{
 				//==============================================================
-				//
 				// check if something is to be sent
-				//
 				//==============================================================
 				prepare_sock();
 				delay      lasting = sending  ? no_delay : waiting;
 				
 				//==============================================================
-				//
-				// check socket set accordingly
-				//
+				// check socket set for activity
 				//==============================================================
 				std::cerr << "checking..." << std::endl;
 				const size_t active = sock_db.check( lasting);
 				if( active > 0 )
 				{
-					//==========================================================
-					//
-					// do we have server activity ?
-					//
-					//==========================================================
+					
 					if( sock_db.is_ready( server ) )
 					{
-						//------------------------------------------------------
-						// new connexion !
-						//------------------------------------------------------
-						connexion cnx( new io_link( *this, server, cache ) );
-						
-						//------------------------------------------------------
-						// register socket
-						//------------------------------------------------------
-						sock_db.insert( cnx->sock );
-						
-						//------------------------------------------------------
-						// register connexion
-						//------------------------------------------------------
-						try 
-						{
-							if( !conn_db.insert( cnx ) )
-								throw exception("server_protocol: unexpected multiple connexion!");
-						}
-						catch(...)
-						{
-							sock_db.remove( cnx->sock );
-							throw;
-						}
-						
-						//------------------------------------------------------
-						// welcome it !
-						//------------------------------------------------------
-						try
-						{
-							on_init( cnx );
-						}
-						catch(...)
-						{
-							disconnect( cnx );
-							throw;
-						}
+						conn_create();
 					}
-					//==========================================================
-					//
-					// do we have clients activity
-					//
-					//==========================================================
 					else
 					{
 						process_recv();
@@ -277,14 +284,18 @@ namespace yocto
 				}
 				
 				//==============================================================
-				//
 				// check sending
-				//
 				//==============================================================
 				process_send();
 				
 			}
 			
+			//==================================================================
+			// close server and all clients
+			//==================================================================
+			server.shutdown(shutdown_both);
+			sock_db.remove( server );
+			shutdown_all();
 			
 		}
 		

@@ -11,13 +11,14 @@ namespace yocto
 	namespace network
 	{
 		
+		//! multiplexed protocol
 		class protocol 
 		{
 		public:
 			virtual ~protocol() throw();
 			explicit protocol(size_t bs);
 
-			virtual void on_init(connexion & );
+			virtual void on_init(connexion & ); //!< to allocate resources to connexion
 			virtual void on_recv(connexion &);
 			virtual void on_sent(connexion &);
 			virtual void on_quit(connexion &) throw();
@@ -36,12 +37,13 @@ namespace yocto
 			void         disconnect( connexion &) throw();
 			
 			void         prepare_sock() throw(); //!< set sending
-			void         process_recv(); //!< after check
-			void         process_send(); //!< after process_recv
-			void         kill_dropped() throw();
+			void         process_recv();         //!< after check
+			void         process_send();         //!< after process_recv
+			void         kill_dropped() throw(); //!< 
+			void         shutdown_all() throw(); //!< when all is done...
 			
 		public:
-			delay        waiting;
+			delay        waiting; //!< default is 1 second.
 			
 		protected:
 			io_cache     cache; 
@@ -62,6 +64,7 @@ namespace yocto
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(server_protocol);
+			void conn_create();
 			tcp_server server;
 		};
 		
