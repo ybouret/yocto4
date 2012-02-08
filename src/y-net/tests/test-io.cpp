@@ -104,9 +104,36 @@ YOCTO_UNIT_TEST_DONE()
 
 #include "yocto/net/io/protocol.hpp"
 
+
+class my_proto : public server_protocol
+{
+public:
+	explicit my_proto( socket_address &ip ) : server_protocol( ip, 2, 16 )
+	{
+	}
+	
+	virtual void on_recv( connexion &cnx )
+	{
+		protocol::on_recv(cnx);
+		char C;
+		while( cnx->input.query(C) )
+		{
+			C = make_visible(C);
+			cnx->output.write(C);
+		}
+	}
+	
+	virtual ~my_proto() throw() {}
+	
+	
+private:
+	YOCTO_DISABLE_COPY_AND_ASSIGN(my_proto);
+};
+
+
 static inline void handle_protocol( socket_address &ip )
 {
-	server_protocol proto( ip, 2, 16 );
+	my_proto proto( ip );
 	proto.run();
 }
 

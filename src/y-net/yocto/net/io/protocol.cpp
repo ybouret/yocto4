@@ -23,28 +23,31 @@ namespace yocto
 		{
 		}
 		
-				
+		
+		static inline void __show( const char *msg, const socket_address &ip )
+		{
+			std::cerr << msg << ' ' << ip << ':' << swap_be(ip.port) << std::endl;
+		}
+		
 		void protocol:: on_init( connexion &cnx )
 		{
-			std::cerr << "[INIT] " << cnx->key() << std::endl;
+			__show( "[INIT]", cnx->key() );
 		}
 		
 		void protocol:: on_quit( connexion &cnx ) throw()
 		{
-			std::cerr << "[QUIT]" << cnx->key() << std::endl;
+			__show("[QUIT]",cnx->key());
 		}
 		
 		
 		void protocol:: on_recv( connexion &cnx )
 		{
-			std::cerr << "[RECV]" << cnx->key() << std::endl;
-			
+			__show("[RECV]",cnx->key());
 		}
 		
 		void protocol:: on_sent( connexion &cnx )
 		{
-			std::cerr << "[SENT]" << cnx->key() << std::endl;
-			
+			__show("[SENT]",cnx->key());
 		}
 		
 		
@@ -156,10 +159,22 @@ namespace yocto
 						if( cnx->ioQ.sent( cnx->cln ) )
 						{
 							//-- all is done
+							if(cnx->closing)
+							{
+								//-- final sent !
+								dropped.push(cnx);
+							}
+							else
+							{
+								//-- what to do next ?
+								on_sent(cnx);
+							}
 						}
 					}
 				}
 			}
+			
+			kill_dropped();
 		}
 		
 		
