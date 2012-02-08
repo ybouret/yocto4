@@ -13,6 +13,7 @@ namespace yocto
 	namespace network
 	{
 		
+		//! buffer between network hardware and user space
 		class io_queue : public ios::istream, public ios::ostream
 		{
 		public:
@@ -41,22 +42,24 @@ namespace yocto
 			//------------------------------------------------------------------
 			// use recv blocks
 			//------------------------------------------------------------------
-			virtual bool query( char &C );
-			virtual void store( char  C );
-			virtual void get( void *data, size_t size, size_t &done );
-			void         clear_recv() throw();
+			virtual bool query( char &C );                             //!< from the head recv blocks.
+			virtual void store( char  C );                             //!< into the head recv blocks
+			virtual void get( void *data, size_t size, size_t &done ); //!< gather recv blocks
+			void         clear_recv() throw();                         //!< no more recv blocks...
 			
 			//------------------------------------------------------------------
 			// use send blocks
 			//------------------------------------------------------------------
-			virtual void write( char C );
-			virtual void flush();
-			virtual void put( const void *data, size_t size, size_t &done);
-			bool would_send() const throw();
+			virtual void write( char C );                                   //!< append at tail of send blocks
+			virtual void flush();                                           //!< here: do nothing special
+			virtual void put( const void *data, size_t size, size_t &done); //!< split at tail of send blocks
+			bool         would_send() const throw();                        //!< true if data in send_blocks
 						
 		private:
 			core::list_of<io_block>  send_blocks;
 			core::list_of<io_block>  recv_blocks;
+			size_t                   recv_length; //!< bookeeping of available #bytes
+
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
 			io_cache                &cache;
 		};

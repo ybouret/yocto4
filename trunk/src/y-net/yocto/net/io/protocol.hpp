@@ -17,12 +17,13 @@ namespace yocto
 		public:
 			virtual ~protocol() throw();
 			explicit protocol(size_t bs);
-
+			
 			virtual void on_init(connexion & ); //!< to allocate resources to connexion
 			virtual void on_recv(connexion &);
 			virtual void on_sent(connexion &);
 			virtual void on_quit(connexion &) throw();
 			
+			virtual void run() = 0;
 			void stop() throw(); //!< set running to false
 			
 		protected:
@@ -54,20 +55,23 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(protocol);
 		};
 		
-	
+		
+		//! protocol for a server
 		class server_protocol : public protocol
 		{
 		public:
 			explicit server_protocol( const socket_address &ip, int pending, size_t bs );
 			virtual ~server_protocol() throw();
 			
-			void run();
+			virtual void run();
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(server_protocol);
 			void conn_create();
 			tcp_server server;
 		};
+		
+		
 		
 		
 	}

@@ -17,6 +17,7 @@ namespace yocto
 		io_queue:: io_queue( io_cache &db ) :
 		send_blocks(),
 		recv_blocks(),
+		recv_length(0),
 		cache( db )
 		{
 			
@@ -30,6 +31,7 @@ namespace yocto
 		void io_queue:: clear_recv() throw()
 		{
 			while( recv_blocks.size ) cache.collect( recv_blocks.pop_back() );
+			recv_length = 0;
 		}
 		
 		bool io_queue:: recv( io_socket &sock )

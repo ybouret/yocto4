@@ -12,7 +12,6 @@ namespace yocto
 	{
 		
 		class protocol;
-		class server_protocol;
 		class io_link : public object, public counted
 		{
 		public:
@@ -26,7 +25,7 @@ namespace yocto
 			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_link);
 			friend class protocol;
-			friend class server_protocol;
+
 		public:
 			socket       &sock;
 			ios::istream &input;
