@@ -27,5 +27,11 @@ namespace yocto
 			return cln.self();
 		}
 		
+		void io_link:: close() throw()
+		{
+			cln.shutdown(shutdown_recv);
+			closing = true;
+		}
+		
 	}
 }

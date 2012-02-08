@@ -20,9 +20,8 @@ namespace yocto
 			virtual void on_init(connexion & );
 			virtual void on_recv(connexion &);
 			virtual void on_sent(connexion &);
-			virtual void on_quit(connexion &);
+			virtual void on_quit(connexion &) throw();
 			
-			bool would_send() const throw();
 			
 		protected:
 			typedef set<socket_address,connexion> connDB;
@@ -30,10 +29,16 @@ namespace yocto
 			socket_set   sock_db;
 			connDB       conn_db;
 			connStack    dropped;
-
+			bool         sending; //!< current status
+			
 			bool         has_recv( connexion & );
 			bool         has_sent( connexion & );
 			void         disconnect( connexion &) throw();
+			
+			void         prepare_sock() throw(); //!< set sending
+			void         process_recv(); //!< after check
+			void         process_send(); //!< after process_recv
+			void         kill_dropped() throw();
 			
 		public:
 			delay        waiting;

@@ -44,6 +44,7 @@ namespace yocto
 			virtual bool query( char &C );
 			virtual void store( char  C );
 			virtual void get( void *data, size_t size, size_t &done );
+			void         clear_recv() throw();
 			
 			//------------------------------------------------------------------
 			// use send blocks
@@ -51,16 +52,13 @@ namespace yocto
 			virtual void write( char C );
 			virtual void flush();
 			virtual void put( const void *data, size_t size, size_t &done);
-			
+			bool would_send() const throw();
 						
 		private:
 			core::list_of<io_block>  send_blocks;
 			core::list_of<io_block>  recv_blocks;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
 			io_cache                &cache;
-			io_queue *next;
-			io_queue *prev;
-			friend class core::pool_of<io_queue>;
 		};
 		
 	}
