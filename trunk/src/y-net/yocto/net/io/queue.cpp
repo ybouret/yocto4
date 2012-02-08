@@ -31,7 +31,7 @@ namespace yocto
 		void io_queue:: clear_recv() throw()
 		{
 			while( recv_blocks.size ) cache.collect( recv_blocks.pop_back() );
-			recv_length = 0;
+			(size_t&)recv_length = 0;
 		}
 		
 		bool io_queue:: recv( io_socket &sock )
@@ -39,7 +39,8 @@ namespace yocto
 			io_block *blk = cache.provide();
 			try
 			{
-				if( blk->recv(sock) )
+				const size_t nr = blk->recv(sock);
+				if(nr>0)
 				{
 					//----------------------------------------------------------
 					// append data to recv block
@@ -57,6 +58,7 @@ namespace yocto
 						recv_blocks.push_back( blk );
 					}
 					
+					(size_t&)recv_length += nr;
 					return true;
 				}
 				else
@@ -101,10 +103,13 @@ namespace yocto
 		}
 		
 		
+		
+		
 		bool io_queue:: query( char &C )
 		{
 			if( recv_blocks.size > 0 )
 			{
+				assert(recv_length>0);
 				io_block *blk = recv_blocks.head;
 				assert( blk->length() > 0 );
 				C = *(blk->curr++);
@@ -112,10 +117,12 @@ namespace yocto
 				{
 					cache.collect( recv_blocks.pop_front() );
 				}
+				--( (size_t&)recv_length );
 				return true;
 			}
 			else
 			{
+				assert(0==recv_length);
 				return false;
 			}
 		}
@@ -135,6 +142,7 @@ namespace yocto
 				assert( blk->offset() > 0 );
 			}
 			*( --(blk->curr) ) = C;
+			++( (size_t &)recv_length );
 			
 		}
 		
@@ -148,34 +156,49 @@ namespace yocto
 		{
 			uint8_t *p = (uint8_t *)data;
 			done = 0;
-			while( recv_blocks.size > 0 )
+			try
 			{
-				io_block *blk = recv_blocks.head;  //-- use the fist block
-				assert( blk->length() > 0 );
-				const size_t todo = size - done;   //-- we need those bytes
-				const size_t blen = blk->length(); //-- to take from the block
-				if( blen <= todo )
+				while( recv_blocks.size > 0 )
 				{
-					//----------------------------------------------------------
-					// take the whole block and remove it
-					//----------------------------------------------------------
-					memcpy( &p[done], blk->curr, blen );
-					cache.collect( recv_blocks.pop_front() );
-					if( (done += blen) >= size )
-						return;
-				}
-				else
-				{
-					//----------------------------------------------------------
-					// take todo bytes and update block
-					//----------------------------------------------------------
-					assert( blen > todo );
-					memcpy( &p[done], blk->curr, todo );
-					blk->curr += todo;
+					io_block *blk = recv_blocks.head;  //-- use the fist block
 					assert( blk->length() > 0 );
-					done += todo;
-					return;
+					const size_t todo = size - done;   //-- we need those bytes
+					const size_t blen = blk->length(); //-- to take from the block
+					if( blen <= todo )
+					{
+						//----------------------------------------------------------
+						// take the whole block and remove it
+						//----------------------------------------------------------
+						memcpy( &p[done], blk->curr, blen );
+						cache.collect( recv_blocks.pop_front() );
+						if( (done += blen) >= size )
+						{
+							//-- update length and return
+							(size_t&)recv_length += done;
+							return;
+						}
+					}
+					else
+					{
+						//----------------------------------------------------------
+						// take todo bytes and update block
+						//----------------------------------------------------------
+						assert( blen > todo );
+						memcpy( &p[done], blk->curr, todo );
+						blk->curr += todo;
+						assert( blk->length() > 0 );
+						done += todo;
+						
+						//-- update length and return
+						(size_t&)recv_length += done;
+						return;
+					}
 				}
+			}
+			catch(...)
+			{
+				(size_t&)recv_length += done;
+				throw;
 			}
 		}
 		
@@ -222,7 +245,7 @@ namespace yocto
 			
 		}
 		
-				
+		
 	}
 	
 	

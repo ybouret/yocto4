@@ -31,8 +31,8 @@ namespace yocto
 			ios::istream &input;
 			ios::ostream &output;
 			protocol     &proto;
-			void          close() throw(); //!< never come back
-			
+			void          close() throw();             //!< never come back
+			size_t        input_cache() const throw(); //!< ready for input
 			
 			const socket_address & key() const throw();
 		};

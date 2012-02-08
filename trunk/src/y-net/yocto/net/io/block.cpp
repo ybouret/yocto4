@@ -54,18 +54,11 @@ namespace yocto
 		const void * io_block:: get_address() const throw() { return curr; }
 		
 		
-		bool io_block:: recv( io_socket &sock )
+		size_t io_block:: recv( io_socket &sock )
 		{
 			size_t nr = sock.recv( last, unused() );
-			if( nr > 0 )
-			{
-				last += nr;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			last += nr;
+			return nr;
 		}
 		
 		void io_block:: defrag() throw()

@@ -54,12 +54,14 @@ namespace yocto
 			virtual void flush();                                           //!< here: do nothing special
 			virtual void put( const void *data, size_t size, size_t &done); //!< split at tail of send blocks
 			bool         would_send() const throw();                        //!< true if data in send_blocks
-						
+			
 		private:
 			core::list_of<io_block>  send_blocks;
 			core::list_of<io_block>  recv_blocks;
-			size_t                   recv_length; //!< bookeeping of available #bytes
+		public:
+			const size_t             recv_length; //!< bookeeping of available #bytes
 
+		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(io_queue);
 			io_cache                &cache;
 		};

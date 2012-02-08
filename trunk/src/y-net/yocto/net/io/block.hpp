@@ -24,8 +24,8 @@ namespace yocto
 			virtual ~io_block() throw();
 			explicit io_block( size_t bs );
 		
-			//! return true if something is received
-			bool recv( io_socket &sock );
+			//! return what was received
+			size_t recv( io_socket &sock );
 		
 			//! return true if all content is sent
 			bool sent( io_socket &sock );
