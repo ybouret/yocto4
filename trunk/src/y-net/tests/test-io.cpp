@@ -118,6 +118,8 @@ public:
 		char C;
 		while( cnx->input.query(C) )
 		{
+			if( C == '0' )
+				cnx->close();
 			C = make_visible(C);
 			cnx->output.write(C);
 		}
