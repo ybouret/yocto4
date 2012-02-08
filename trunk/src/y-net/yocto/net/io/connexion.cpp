@@ -29,7 +29,6 @@ namespace yocto
 		
 		void io_link:: close() throw()
 		{
-			cln.shutdown(shutdown_recv);
 			closing = true;
 		}
 		

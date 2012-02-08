@@ -110,6 +110,8 @@ class my_proto : public server_protocol
 public:
 	explicit my_proto( socket_address &ip ) : server_protocol( ip, 2, 16 )
 	{
+		
+		waiting = delay(5.0);
 	}
 	
 	virtual void on_recv( connexion &cnx )
@@ -118,10 +120,17 @@ public:
 		char C;
 		while( cnx->input.query(C) )
 		{
-			if( C == '0' )
-				cnx->close();
+			
 			C = make_visible(C);
 			cnx->output.write(C);
+			if( C == '0' )
+			{
+				cnx->output.write('\n');
+				cnx->close();
+			}
+			
+			if( C == '1' )
+				cnx->proto.stop();
 		}
 	}
 	

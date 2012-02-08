@@ -192,6 +192,10 @@ namespace yocto
 			conn_db.release();
 		}
 		
+		void protocol:: stop() throw()
+		{
+			running = false;
+		}
 		
 		////////////////////////////////////////////////////////////////////////
 		//

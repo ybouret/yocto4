@@ -23,6 +23,7 @@ namespace yocto
 			virtual void on_sent(connexion &);
 			virtual void on_quit(connexion &) throw();
 			
+			void stop() throw(); //!< set running to false
 			
 		protected:
 			typedef set<socket_address,connexion> connDB;
