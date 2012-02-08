@@ -16,33 +16,20 @@ namespace yocto
 		sock_db(),
 		conn_db(),
 		dropped(),
+		sending( false ),
 		waiting(1),
 		cache( bs ),
 		running(false)
 		{
 		}
 		
-		
-		bool protocol:: would_send() const throw()
-		{
-			for( connDB::const_iterator i = conn_db.begin(); i != conn_db.end(); ++i )
-			{
-				const connexion &cnx = *i;
-				if( cnx->sock.sending )
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		
+				
 		void protocol:: on_init( connexion &cnx )
 		{
 			std::cerr << "[INIT] " << cnx->key() << std::endl;
 		}
 		
-		void protocol:: on_quit( connexion &cnx )
+		void protocol:: on_quit( connexion &cnx ) throw()
 		{
 			std::cerr << "[QUIT]" << cnx->key() << std::endl;
 		}
@@ -71,8 +58,111 @@ namespace yocto
 			cnx->sock.shutdown( shutdown_both );
 			sock_db.remove( cnx->sock );
 			(void) conn_db.remove( cnx->key() );
+			on_quit( cnx );
 		}
-
+		
+		void protocol:: kill_dropped() throw()
+		{
+			while( dropped.size() )
+			{
+				connexion &cnx = dropped.peek();
+				disconnect( cnx );
+				dropped.pop();
+			}
+		}
+		
+		void protocol:: prepare_sock() throw()
+		{
+			sending = false;
+			for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
+			{
+				connexion &cnx = *i;
+				property<bool> &flag = cnx->cln.sending;
+				if( cnx->ioQ.would_send() )
+				{
+					flag    = true;
+					sending = true;
+				}
+				else
+				{
+					flag = false;
+				}
+			}
+		}
+		
+		void protocol:: process_recv()
+		{
+			//------------------------------------------------------------------
+			//  collect incoming
+			//------------------------------------------------------------------
+			dropped.free();
+			for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
+			{
+				//--------------------------------------------------------------
+				// check activity
+				//--------------------------------------------------------------
+				connexion &cnx = *i;
+				if( sock_db.is_ready(cnx->sock) )
+				{
+					//----------------------------------------------------------
+					// something arrived ?
+					//----------------------------------------------------------
+					if( has_recv( cnx ) )
+					{
+						//------------------------------------------------------
+						// yes => process
+						//------------------------------------------------------
+						if( cnx->closing )
+						{
+							cnx->ioQ.clear_recv();
+						}
+						else
+						{
+							on_recv( cnx );
+						}
+					}
+					else
+					{
+						//------------------------------------------------------
+						// no => disconnecting !
+						//------------------------------------------------------
+						dropped.push( cnx );
+					}
+				}
+			}
+			
+			//------------------------------------------------------------------
+			// second pass: remove dropped
+			//------------------------------------------------------------------
+			kill_dropped();
+			
+		}
+		
+		
+		void protocol:: process_send()
+		{
+			dropped.free();
+			for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
+			{
+				connexion &cnx = *i;
+				if( cnx->cln.sending )
+				{
+					//----------------------------------------------------------
+					// something to send !
+					//----------------------------------------------------------
+					assert( cnx->ioQ.would_send() );
+					if( sock_db.can_send( cnx->sock ) )
+					{
+						if( cnx->ioQ.sent( cnx->cln ) )
+						{
+							//-- all is done
+						}
+					}
+				}
+			}
+		}
+		
+		
 		////////////////////////////////////////////////////////////////////////
 		//
 		//
@@ -103,7 +193,7 @@ namespace yocto
 				// check if something is to be sent
 				//
 				//==============================================================
-				const bool sending = would_send();
+				prepare_sock();
 				delay      lasting = sending  ? no_delay : waiting;
 				
 				//==============================================================
@@ -166,56 +256,18 @@ namespace yocto
 					//==========================================================
 					else
 					{
-						//------------------------------------------------------
-						// first pass: collect incoming
-						//------------------------------------------------------
-						dropped.free();
-						for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
-						{
-							//--------------------------------------------------
-							// check activity
-							//--------------------------------------------------
-							connexion &cnx = *i;
-							if( sock_db.is_ready(cnx->sock) )
-							{
-								//----------------------------------------------
-								// something arrived ?
-								//----------------------------------------------
-								if( has_recv( cnx ) )
-								{
-									//------------------------------------------
-									// yes => process
-									//------------------------------------------
-									on_recv( cnx );
-								}
-								else
-								{
-									//------------------------------------------
-									// no => disconnecting !
-									//------------------------------------------
-									dropped.push( cnx );
-								}
-							}
-						}
-						
-						//------------------------------------------------------
-						// second pass: remove dropped
-						//------------------------------------------------------
-						while( dropped.size() )
-						{
-							connexion &cnx = dropped.peek();
-							disconnect( cnx );
-							dropped.pop();
-						}
-
-						//------------------------------------------------------
-						// third pass: sending
-						//------------------------------------------------------
-
-						
+						process_recv();
 					}
 					
 				}
+				
+				//==============================================================
+				//
+				// check sending
+				//
+				//==============================================================
+				process_send();
+				
 			}
 			
 			

@@ -17,13 +17,20 @@ namespace yocto
 		io_queue:: io_queue( io_cache &db ) :
 		send_blocks(),
 		recv_blocks(),
-		cache( db ),
-		next(NULL),
-		prev(NULL)
+		cache( db )
 		{
 			
 		}
 		
+		bool io_queue:: would_send() const throw() 
+		{
+			return send_blocks.size > 0;
+		}
+		
+		void io_queue:: clear_recv() throw()
+		{
+			while( recv_blocks.size ) cache.collect( recv_blocks.pop_back() );
+		}
 		
 		bool io_queue:: recv( io_socket &sock )
 		{
@@ -132,7 +139,7 @@ namespace yocto
 		void io_queue:: reset() throw()
 		{
 			while( send_blocks.size ) cache.collect( send_blocks.pop_back() );
-			while( recv_blocks.size ) cache.collect( recv_blocks.pop_back() );
+			clear_recv();
 		}
 		
 		void io_queue:: get( void *data, size_t size, size_t &done )
