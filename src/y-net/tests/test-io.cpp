@@ -118,6 +118,7 @@ public:
 	{
 		protocol::on_recv(cnx);
 		char C;
+		std::cerr << "cnx.input_cache=" << cnx->input_cache() << std::endl;
 		while( cnx->input.query(C) )
 		{
 			

@@ -32,5 +32,10 @@ namespace yocto
 			closing = true;
 		}
 		
+		size_t io_link:: input_cache() const throw()
+		{
+			return ioQ.recv_length;
+		}
+		
 	}
 }
