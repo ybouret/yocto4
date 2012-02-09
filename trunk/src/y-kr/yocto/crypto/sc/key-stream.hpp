@@ -13,7 +13,7 @@ namespace yocto
 			
 			virtual ~key_stream() throw();
 			
-			//virtual void      schedule( const memory::ro_buffer & ) throw() = 0;
+			virtual void      schedule( const memory::ro_buffer & ) throw() = 0;
 			virtual uint8_t   call() throw() = 0;
 			virtual void      scramble( void *buffer, size_t buflen ) throw();
 			

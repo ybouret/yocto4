@@ -81,6 +81,10 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 {
 	Random::ISAAC_FAST::BitsGenerator gen( Random::ISAAC_INIT_RAND );
 
+	
+	std::cerr << "sizeof(rsa_public_key)  = " << sizeof( mpk:: rsa_public_key ) << std::endl;
+	std::cerr << "sizeof(rsa_private_key) = " << sizeof( mpk:: rsa_private_key ) << std::endl;
+
 	mpn prime1 = gen.rand<uint64_t>(34);
 	mpn prime2 = gen.rand<uint64_t>(34);
 	std::cerr << "Generating prime1" << std::endl;
