@@ -7,6 +7,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/code/primes.hpp"
+#include "yocto/ios/icstream.hpp"
 
 using namespace yocto;
 
@@ -75,18 +76,20 @@ YOCTO_UNIT_TEST_IMPL(rsa0)
 YOCTO_UNIT_TEST_DONE()
 #endif
 
-#include "yocto/mpk/rsa/keys.hpp"
+#include "yocto/mpk/rsa/codec.hpp"
 
 YOCTO_UNIT_TEST_IMPL(rsa1)
 {
 	Random::ISAAC_FAST::BitsGenerator gen( Random::ISAAC_INIT_RAND );
-
+	
 	
 	std::cerr << "sizeof(rsa_public_key)  = " << sizeof( mpk:: rsa_public_key ) << std::endl;
 	std::cerr << "sizeof(rsa_private_key) = " << sizeof( mpk:: rsa_private_key ) << std::endl;
-
-	mpn prime1 = gen.rand<uint64_t>(34);
-	mpn prime2 = gen.rand<uint64_t>(34);
+	
+	
+	const size_t pbits = 30;
+	mpn prime1 = gen.rand<uint64_t>(pbits);
+	mpn prime2 = gen.rand<uint64_t>(pbits);
 	std::cerr << "Generating prime1" << std::endl;
 	prime1 = prime1.next_prime_();
 	
@@ -123,7 +126,9 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 	
 	const mpk::rsa_private_key prv( modulus, publicExponent, privateExponent, prime1, prime2, exponent1, exponent2, coefficient );
 	
-	for( int i=0; i < N; ++i )
+	std::cerr << "pub maxbits=" << pub.maxbits << std::endl;;
+	
+	for( int i=0; i < 8; ++i )
 	{
 		const mpn P = mpn( gen.full<uint64_t>() ) % modulus;
 		std::cerr << "P=" << P << " "; std::cerr.flush();
@@ -131,12 +136,31 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 		std::cerr << "C=" << C << " "; std::cerr.flush();
 		const mpn D = prv.compute( C );
 		std::cerr << "D=" << D;
-			
+		
 		std::cerr << std::endl;
 		if( P != D )
 			throw exception("RSA error...");
-
+		
 	}
+	std::cerr << std::endl;
+	
+	{
+		std::cerr << "-- codec" << std::endl;
+		std::cerr.flush();
+		
+		const mpk::rsa_key::pointer pk( new mpk::rsa_private_key( prv ) );
+		mpk::rsa_encoder encoder( pk );
+		
+		encoder("Hello, World!");
+		encoder.flush();
+		char C;
+		while( encoder.query(C) )
+		{
+			fprintf( stderr, "%02X", uint8_t(C) );
+		}
+		fprintf( stderr, "\n"); fflush(stderr);
+	}
+	
 	
 }
 YOCTO_UNIT_TEST_DONE()
