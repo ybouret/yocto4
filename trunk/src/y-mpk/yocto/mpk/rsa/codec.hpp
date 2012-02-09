@@ -13,12 +13,15 @@ namespace yocto
 	{
 		
 		
-		class rsa_codec
+		class rsa_codec : public ios::istream, public ios::ostream
 		{
 		public:
+			static const size_t prolog = 1;
+			static const size_t epilog = 1;
 			virtual ~rsa_codec() throw();
 			
-			
+			virtual bool query( char &C );
+			virtual void store( char  C );
 			
 		protected:
 			explicit rsa_codec( const rsa_key::pointer &);
@@ -26,6 +29,7 @@ namespace yocto
 			ios::bitio             in;
 			ios::bitio             out;
 			const rsa_key::pointer pk;
+			const size_t           maxbits;
 			natural                src;
 			natural                tgt;
 			int                    cache;
@@ -34,7 +38,7 @@ namespace yocto
 			YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_codec);
 		};
 		
-		class rsa_encoder : public ios::ostream, public ios::istream, public rsa_codec
+		class rsa_encoder :  public rsa_codec
 		{
 		public:
 			explicit rsa_encoder( const rsa_key::pointer & );
@@ -42,14 +46,26 @@ namespace yocto
 			
 			virtual void write(char C );
 			virtual void flush();
-			
-			virtual bool query( char &C );
-			virtual void store( char  C );
-			
+						
 		private:
 			void emit();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_encoder);
 		};
+		
+		class rsa_decoder :  public rsa_codec
+		{
+		public:
+			explicit rsa_decoder( const rsa_key::pointer & );
+			virtual ~rsa_decoder() throw();
+			
+			virtual void write(char C);
+			virtual void flush();
+			
+		private:
+			void emit();
+			YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_decoder);
+		};
+		
 		
 	}
 	
