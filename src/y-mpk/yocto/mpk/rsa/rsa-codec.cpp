@@ -170,6 +170,24 @@ namespace yocto
 		//
 		////////////////////////////////////////////////////////////////////////
 		
+		rsa_decoder:: rsa_decoder( const rsa_key::pointer &handle ) :
+		rsa_codec( handle )
+		{
+		}
+		
+		rsa_decoder:: ~rsa_decoder() throw()
+		{
+		}
+		
+		void rsa_decoder:: write( char C )
+		{
+			
+		}
+		
+		void rsa_decoder:: flush()
+		{
+			
+		}
 		
 	}
 	
