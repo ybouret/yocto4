@@ -10,13 +10,14 @@ namespace yocto
 	namespace mpk
 	{
 		
-		class rsa_key 
+		//! base class for RSA keys
+		class rsa_key : public object
 		{
 		public:
 			virtual ~rsa_key() throw();
 			rsa_key( const rsa_key & );
 			
-			const natural modulus;
+			const natural modulus; //!< a valid modulus
 			const size_t  maxbits; //!< #bits for modulus -1
 			
 			virtual natural compute( const natural & ) const = 0;
@@ -29,6 +30,7 @@ namespace yocto
 		};
 		
 		
+		//! RSA Public Key
 		class rsa_public_key : public rsa_key
 		{
 		public:
@@ -43,6 +45,7 @@ namespace yocto
 			YOCTO_DISABLE_ASSIGN(rsa_public_key);
 		};
 		
+		//! RSA Private Key
 		class rsa_private_key : public rsa_public_key
 		{
 		public:
