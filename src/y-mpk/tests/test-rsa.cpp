@@ -16,7 +16,6 @@ YOCTO_UNIT_TEST_IMPL(rsa0)
 {
 	Random::ISAAC_FAST::BitsGenerator gen( Random::ISAAC_INIT_RAND );
 	
-	//std::cerr << std::dec;
 	mpn p = gen.rand<uint64_t>(34);
 	mpn q = gen.rand<uint64_t>(34);
 	std::cerr << "Generating p" << std::endl;
@@ -76,3 +75,64 @@ YOCTO_UNIT_TEST_IMPL(rsa0)
 YOCTO_UNIT_TEST_DONE()
 #endif
 
+#include "yocto/mpk/rsa/keys.hpp"
+
+YOCTO_UNIT_TEST_IMPL(rsa1)
+{
+	Random::ISAAC_FAST::BitsGenerator gen( Random::ISAAC_INIT_RAND );
+
+	mpn prime1 = gen.rand<uint64_t>(34);
+	mpn prime2 = gen.rand<uint64_t>(34);
+	std::cerr << "Generating prime1" << std::endl;
+	prime1 = prime1.next_prime_();
+	
+	std::cerr << "Generating prime2" << std::endl;
+	prime2 = prime2.next_prime_();
+	if( prime1 < prime2 )
+		prime1.xch(prime2);
+	
+	std::cerr << "prime1=" << prime1 << std::endl;
+	std::cerr << "prime2=" << prime2 << std::endl;
+	
+	const mpn modulus  = prime1 * prime2;
+	mpn       p1m      = prime1; --p1m;
+	mpn       p2m      = prime2; --p2m;
+	const mpn z        = p1m * p2m;
+	mpn publicExponent = gen.full<uint32_t>();
+	if( !publicExponent.is_odd() )
+		++publicExponent;
+	while( !mpn::are_coprime(publicExponent,z) )
+		publicExponent.inc(2);
+	
+	std::cerr << "publicExponent  = " << publicExponent << std::endl;
+	
+	const mpk::rsa_public_key pub( modulus, publicExponent );
+	
+	const mpn privateExponent = mpn::mod_inv(publicExponent,z);
+	std::cerr << "privateExponent = " << privateExponent << std::endl;
+	const mpn exponent1       = privateExponent % p1m;
+	const mpn exponent2       = privateExponent % p2m;
+	const mpn coefficient     = mpn::mod_inv( prime2, prime1 );
+	std::cerr << "exponent1       = " << exponent1   << std::endl;
+	std::cerr << "exponent2       = " << exponent2   << std::endl;
+	std::cerr << "coefficient     = " << coefficient << std::endl;
+	
+	const mpk::rsa_private_key prv( modulus, publicExponent, privateExponent, prime1, prime2, exponent1, exponent2, coefficient );
+	
+	for( int i=0; i < N; ++i )
+	{
+		const mpn P = mpn( gen.full<uint64_t>() ) % modulus;
+		std::cerr << "P=" << P << " "; std::cerr.flush();
+		const mpn C = pub.compute( P );
+		std::cerr << "C=" << C << " "; std::cerr.flush();
+		const mpn D = prv.compute( C );
+		std::cerr << "D=" << D;
+			
+		std::cerr << std::endl;
+		if( P != D )
+			throw exception("RSA error...");
+
+	}
+	
+}
+YOCTO_UNIT_TEST_DONE()
