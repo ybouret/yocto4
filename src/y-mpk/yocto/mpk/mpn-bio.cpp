@@ -1,7 +1,7 @@
 #include "yocto/mpk/natural.hpp"
 #include "yocto/ios/bitio.hpp"
-
 #include "yocto/code/round.hpp"
+
 
 namespace yocto
 {
