@@ -2,7 +2,7 @@
 #define YOCTO_MPK_NATURAL_INCLUDED 1
 
 #include "yocto/type-ints.hpp"
-#include "yocto/memory/buffer.hpp"
+#include "yocto/string.hpp"
 
 #include <iosfwd>
 
@@ -185,6 +185,14 @@ namespace yocto
 			bool    is_prime_()   const; //!< sieve based algorithm
 			natural next_prime_() const;
 			
+            //==================================================================
+			// parsing
+			//==================================================================
+            static natural dec( const string & );
+            static natural dec( const char *txt );
+            static natural hex( const string & );
+            static natural hex( const char *txt );
+            
 		private:
 			size_t   size_;
 			size_t   maxi_;

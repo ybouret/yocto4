@@ -4,6 +4,7 @@
 #include "yocto/code/unroll.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/exception.hpp"
 
 #include <iostream>
 
@@ -259,10 +260,78 @@ namespace yocto
 			return (byte_[0] & 0x01) != 0;
 		}
 		
-		
-	}
-	
-	
+        
+        natural natural::dec( const string &str )
+        {
+            natural res;
+            const natural Ten( uint8_t(10) );
+            for( size_t i=0; i < str.size(); ++i )
+            {
+                res *= Ten;
+                const char C = str[i];
+                if( C >= '0' && C <= '9' )
+                {
+                    const natural X( uint8_t( C - '0' ) );
+                    res += X;
+                }
+                else
+                    throw exception("natural.dec(invalid '%c')", C );
+            }
+            return res;
+        }
+        
+        
+        natural natural:: dec( const char *txt )
+        {
+            const string str(txt);
+            return dec( str );
+        }
+        
+        natural natural::hex( const string &str )
+        {
+            natural res;
+            const natural Sixteen( uint8_t(16) );
+            for( size_t i=0; i < str.size(); ++i )
+            {
+                res *= Sixteen;
+                const char C = str[i];
+                if( C >= '0' && C <= '9' )
+                {
+                    const natural X( uint8_t( C - '0' ) );
+                    res += X;
+                    continue;
+                }
+                
+                if( C >= 'a' && C <= 'f' )
+                {
+                    const natural X( uint8_t( 10 + (C - 'a' ) ) );
+                    res += X;
+                    continue;
+                }
+                
+                if( C >= 'A' && C <= 'F' )
+                {
+                    const natural X( uint8_t( 10 + (C - 'A' ) ) );
+                    res += X;
+                    continue;
+                }
+                
+                
+                throw exception("natural.hex(invalid '%c')", C );
+            }
+            return res;
+        }
+        
+        
+        natural natural:: hex( const char *txt )
+        {
+            const string str(txt);
+            return hex( str );
+        }
+        
+    }
+    
+    
 }
 
 #include <iostream>
