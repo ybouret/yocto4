@@ -1,0 +1,138 @@
+#include "yocto/ios/icstream.hpp"
+#include "yocto/associative/map.hpp"
+#include "yocto/exception.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/mpk/rsa/keys.hpp"
+
+#include <iostream>
+
+using namespace yocto;
+using namespace mpk;
+
+static inline natural get_value( const string &data )
+{
+    string value;
+    bool   is_hex = false;
+    for( size_t i=0; i < data.size(); ++i )
+    {
+        const char C = data[i];
+        if( C >= '0' && C <= '9' )
+        {
+            value += C;
+            continue;
+        }
+        
+        if( (C >= 'a' && C <='f') || (C>='A' && C <= 'F') )
+        {
+            value += C;
+            is_hex = true;
+            continue;
+        }
+        
+        if( C == ':' )
+        {
+            is_hex = true;
+            continue;
+        }
+        
+        if( C == '(' || C == ')' )
+        {
+            goto GATHER;
+        }
+        
+    }
+GATHER:
+    //std::cerr << "#" << value << std::endl;
+    return is_hex ? natural::hex( value ) : natural::dec( value );
+}
+
+
+
+int  main( int argc, char *argv[] )
+{
+    
+    try {
+        ////////////////////////////////////////////////////////////////////////
+        // load lines
+        ////////////////////////////////////////////////////////////////////////
+        vector<string> lines;
+        {
+            string        line;
+            ios::icstream input( ios::cstdin );
+            while( input.read_line( line ) > 0 )
+            {
+                lines.push_back( line );
+                line.clear();
+            }
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        // parse lines
+        ////////////////////////////////////////////////////////////////////////
+        map<string,natural> db;
+        size_t iLine = 1;
+        while( iLine <= lines.size() )
+        {
+            string line = lines[iLine];
+            char *org = &line[0];
+            char *sep = strchr( org, ':' );
+            if( !sep )
+                throw exception("Invalid [KEY] on line '%s'" , line.c_str() );
+            const string key(org,sep-org);
+            std::cerr << "[KEY]=" << key << std::endl;
+            string data( sep+1 );
+            while( data.size() > 0 && character<char>::is_space( data[0] ) ) data.skip(1);
+            
+            if( data.size() > 0 )
+            {
+                // something on the line
+                //std::cerr << "@single: [" << data << "]" << std::endl;
+                ++iLine;
+            }
+            else
+            {
+                // nothing on the line : catenate following
+                for(;;) {
+                    if( ++iLine > lines.size() )
+                        break;
+                    const string &tmp = lines[ iLine ];
+                    if( !character<char>::is_space( tmp[0] ) )
+                        break;
+                    data += tmp;
+                }
+                //std::cerr << "@multi: ["  << data << "]" << std::endl;
+            }
+            const natural value = get_value( data );
+            std::cerr << "value=" << value << std::endl;
+            if( !db.insert( key, value) )
+                throw exception("multiple key '%s'", key.c_str() );
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        // construct the key
+        ////////////////////////////////////////////////////////////////////////
+#define __FETCH(NAME) const natural *NAME = db.search( #NAME ); if( !NAME ) throw exception("No %s", #NAME )
+        __FETCH(modulus);
+        __FETCH(publicExponent);
+        __FETCH(privateExponent);
+        __FETCH(prime1);
+        __FETCH(prime2);
+        __FETCH(exponent1);
+        __FETCH(exponent2);
+        __FETCH(coefficient);
+        
+        const rsa_private_key prv( *modulus, *publicExponent, *privateExponent, *prime1, *prime2, *exponent1, *exponent2, *coefficient);
+        std::cerr << "got RSA private key: maxbits=" << prv.maxbits << std::endl;
+        
+    }
+    catch( const exception &e )
+    {
+        std::cerr << e.what() << std::endl;
+        std::cerr << e.when() << std::endl;
+    }
+    catch(...)
+    {
+        std::cerr << "Exception!" << std::endl;
+    }
+    return 0;
+}
