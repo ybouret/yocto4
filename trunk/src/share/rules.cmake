@@ -169,8 +169,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	## Compiler Specific Flags
 	####################################################################
 	IF( YOCTO_GNU )
-    #MESSAGE( STATUS "adding extra LINK_FLAGS for ${CMAKE_CXX_COMPILER}" )
-		SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
+		#SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
 	ENDIF()
   
   IF( YOCTO_CLANG )
