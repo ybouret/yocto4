@@ -67,7 +67,7 @@ int main( int argc, char *argv[] )
 			}
 			++index;
 			++count;
-			if( C >= 32 && C < 127 )
+			if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
 			{
 				(*output)( "  '%c'", C );
 			}

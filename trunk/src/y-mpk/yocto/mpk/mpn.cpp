@@ -378,4 +378,30 @@ namespace yocto
 	}
 }
 
+#include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
+
+namespace yocto
+{
+	namespace mpk
+	{
+		void natural:: save( ios::ostream &out ) const
+        {
+            out.emit<uint32_t>( size_ );
+            out.append( *this );
+        }
+
+        natural natural:: load( ios::istream &fp )
+        {
+            const uint32_t len = fp.read<uint32_t>();
+            natural        ans( len, as_capacity );
+            fp.load( ans.byte_, len );
+            ans.rescan();
+            return ans;
+        }
+        
+    }
+    
+}
+
 

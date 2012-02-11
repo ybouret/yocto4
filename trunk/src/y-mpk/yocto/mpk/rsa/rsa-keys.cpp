@@ -1,5 +1,7 @@
 #include "yocto/mpk/rsa/keys.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
 
 #include <cerrno>
 
@@ -75,6 +77,43 @@ namespace yocto
 			return natural::mod_exp( C, publicExponent, modulus );
 		}
 		
+        void rsa_public_key:: save_pub( ios::ostream &fp ) const
+        {
+            fp.emit( PUB );
+            modulus.save( fp );
+            publicExponent.save( fp );
+        }
+        
+        rsa_public_key rsa_public_key::load_pub( ios::istream &fp )
+        {
+            const uint32_t type_of_key = fp.read<uint32_t>();
+            switch( type_of_key )
+            {
+                case PUB:
+                {
+                    const natural _modulus        = natural::load(fp);
+                    const natural _publicExponent = natural::load(fp);
+                    return rsa_public_key( _modulus, _publicExponent );
+                }
+                    
+                case PRV:
+                {
+                    const natural _modulus         = natural::load(fp);
+                    const natural _publicExponent  = natural::load(fp);
+                    const natural _privateExponent = natural::load(fp);
+                    const natural _prime1          = natural::load(fp);
+                    const natural _prime2          = natural::load(fp);
+                    const natural _exponent1       = natural::load(fp);
+                    const natural _exponent2       = natural::load(fp);
+                    const natural _coefficient     = natural::load(fp);
+                    return rsa_public_key( _modulus, _publicExponent );
+                }
+                    break;
+                default: break;
+            }
+            throw exception("rsa_public_key::load_pub( invalid key type )");
+        }
+        
 		////////////////////////////////////////////////////////////////////////
 		//
 		//
@@ -134,6 +173,43 @@ namespace yocto
 				M1 += prime1;
 			return  M2 + ( ( (M1-M2) * coefficient ) % prime1 ) * prime2;
 		}
+        
+        void rsa_private_key:: save_prv( ios::ostream &fp ) const
+        {
+            fp.emit( PRV );
+            modulus.save( fp );
+            publicExponent.save( fp );
+            privateExponent.save(fp);
+            prime1.save(fp);
+            prime2.save(fp);
+            exponent1.save(fp);
+            exponent2.save(fp);
+            coefficient.save(fp);
+        }
+        
+        rsa_private_key rsa_private_key::load_prv( ios::istream &fp )
+        {
+            if( PRV != fp.read<uint32_t>() )
+            {
+                throw exception("rsa_private_key::load_prv( invalid key type )");
+            }
+            
+            const natural _modulus         = natural::load(fp);
+            const natural _publicExponent  = natural::load(fp);
+            const natural _privateExponent = natural::load(fp);
+            const natural _prime1          = natural::load(fp);
+            const natural _prime2          = natural::load(fp);
+            const natural _exponent1       = natural::load(fp);
+            const natural _exponent2       = natural::load(fp);
+            const natural _coefficient     = natural::load(fp);
+            return rsa_private_key( _modulus, _publicExponent, _privateExponent, _prime1, _prime2, _exponent1, _exponent2, _coefficient);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+		//
+		//
+		//
+		////////////////////////////////////////////////////////////////////////
 		
 	}
 	
