@@ -174,8 +174,7 @@ using namespace mpk;
 
 YOCTO_UNIT_TEST_IMPL(rsa2)
 {
-    vector<rsa_public_key>  pub_keys;
-    vector<rsa_private_key> prv_keys;
+    vector<rsa_key::pointer>  pub_keys,prv_keys;
     {
         ios::imstream fp( keys_db, sizeof(keys_db) );
         char C;
@@ -183,8 +182,9 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
         {
             fp.store(C);
             const rsa_public_key pub = rsa_public_key:: load_pub(fp);
-            pub_keys.push_back( pub );
-            std::cerr << "+pub.key@" << pub.maxbits << std::endl;
+            const rsa_key::pointer pk( new rsa_public_key( pub ) );
+            pub_keys.push_back( pk );
+            std::cerr << "+pub.key@" << pub.maxbits << " => " << pub.maxbits/8 << " bytes" << std::endl;
         }
     }
     
@@ -194,14 +194,38 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
         while( fp.query(C) )
         {
             fp.store(C);
-            const rsa_private_key prv = rsa_private_key:: load_prv(fp);
-            prv_keys.push_back( prv );
+            const rsa_private_key  prv = rsa_private_key:: load_prv(fp);
+            const rsa_key::pointer pk( new rsa_private_key( prv ) );
+            prv_keys.push_back( pk );
             std::cerr << "+prv.key@" << prv.maxbits << std::endl;
         }
     }
+    std::cerr << "Waiting for input...." << std::endl;
+    ios::icstream fp( ios::cstdin );
+    string line;
+    while( fp.read_line( line ) > 0 )
+    {
+        for( size_t i=1; i <= pub_keys.size(); ++i )
+        {
+            const rsa_key::pointer &pk = prv_keys[i];
+            if( pk->maxbits <= 256 )
+            {
+                rsa_encoder enc( pk );
+                enc.append( line );
+                enc.flush();
+                char C;
+                while( enc.query(C) )
+                {
+                    std::cerr << make_visible(C);
+                }
+                std::cerr << std::endl;
+            }
+            
+        }
+        line.clear();
+    }
     
     
-
 }
 YOCTO_UNIT_TEST_DONE()
 
