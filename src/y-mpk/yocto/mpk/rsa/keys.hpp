@@ -4,6 +4,7 @@
 
 #include "yocto/mpk/natural.hpp"
 #include "yocto/shared-ptr.hpp"
+#include "yocto/code/fourcc.hpp"
 
 namespace yocto
 {
@@ -15,6 +16,8 @@ namespace yocto
 		class rsa_key : public object
 		{
 		public:
+            static const uint32_t PUB = YOCTO_FOURCC('P','U','B',':');
+            static const uint32_t PRV = YOCTO_FOURCC('P','R','V',':');
 			virtual ~rsa_key() throw();
 			rsa_key( const rsa_key & );
 			
@@ -42,7 +45,10 @@ namespace yocto
 			virtual ~rsa_public_key() throw();
 			rsa_public_key( const rsa_public_key &);
 			explicit rsa_public_key( const natural &rsa_modulus, const natural &rsa_publicExponent );
-			
+		
+            void                  save_pub( ios::ostream &fp ) const;
+            static rsa_public_key load_pub( ios::istream &fp );
+            
 		private:
 			YOCTO_DISABLE_ASSIGN(rsa_public_key);
 		};
@@ -64,7 +70,9 @@ namespace yocto
 			rsa_private_key( const rsa_private_key & );
 			
 			virtual natural compute( const natural &x ) const;
-			
+			void                   save_prv( ios::ostream &fp ) const;
+            static rsa_private_key load_prv( ios::istream &fp );
+            
 		private:
 			const natural privateExponent; //!< (1/publicExponent) %( (prime1-1) * (prime2-1) )
 			const natural prime1;          //!< bigger  prime

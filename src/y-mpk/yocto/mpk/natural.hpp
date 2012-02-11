@@ -9,7 +9,7 @@
 namespace yocto
 {
 
-	namespace ios { class bitio; }
+	namespace ios { class bitio; class ostream; class istream; }
 	
 	namespace mpk
 	{
@@ -53,7 +53,9 @@ namespace yocto
 			bool bit( size_t index ) const throw();
 			void store( ios::bitio &, size_t nbits ) const;
 			static natural query( ios::bitio &, size_t nbits );
-
+            void           save( ios::ostream &fp ) const;
+            static natural load( ios::istream &fp );
+            
 			//==================================================================
 			// ro_buffer interface
 			//==================================================================

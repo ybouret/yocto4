@@ -1,4 +1,3 @@
-#if 1
 #include "yocto/utest/run.hpp"
 #include "yocto/mpk/natural.hpp"
 #include "yocto/code/utils.hpp"
@@ -74,7 +73,6 @@ YOCTO_UNIT_TEST_IMPL(rsa0)
 	
 }
 YOCTO_UNIT_TEST_DONE()
-#endif
 
 #include "yocto/mpk/rsa/codec.hpp"
 
@@ -164,3 +162,46 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 	
 }
 YOCTO_UNIT_TEST_DONE()
+
+static const char keys_db[] =
+{
+#include "rsa-keys.inc"
+};
+
+#include "yocto/ios/imstream.hpp"
+#include "yocto/sequence/vector.hpp"
+using namespace mpk;
+
+YOCTO_UNIT_TEST_IMPL(rsa2)
+{
+    vector<rsa_public_key>  pub_keys;
+    vector<rsa_private_key> prv_keys;
+    {
+        ios::imstream fp( keys_db, sizeof(keys_db) );
+        char C;
+        while( fp.query(C) )
+        {
+            fp.store(C);
+            const rsa_public_key pub = rsa_public_key:: load_pub(fp);
+            pub_keys.push_back( pub );
+            std::cerr << "+pub.key@" << pub.maxbits << std::endl;
+        }
+    }
+    
+    {
+        ios::imstream fp( keys_db, sizeof(keys_db) );
+        char C;
+        while( fp.query(C) )
+        {
+            fp.store(C);
+            const rsa_private_key prv = rsa_private_key:: load_prv(fp);
+            prv_keys.push_back( prv );
+            std::cerr << "+prv.key@" << prv.maxbits << std::endl;
+        }
+    }
+    
+    
+
+}
+YOCTO_UNIT_TEST_DONE()
+

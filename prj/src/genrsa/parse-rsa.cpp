@@ -1,4 +1,6 @@
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ios/ocstream.hpp"
+
 #include "yocto/associative/map.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -86,7 +88,6 @@ int  main( int argc, char *argv[] )
             if( data.size() > 0 )
             {
                 // something on the line
-                //std::cerr << "@single: [" << data << "]" << std::endl;
                 ++iLine;
             }
             else
@@ -100,7 +101,6 @@ int  main( int argc, char *argv[] )
                         break;
                     data += tmp;
                 }
-                //std::cerr << "@multi: ["  << data << "]" << std::endl;
             }
             const natural value = get_value( data );
             std::cerr << "value=" << value << std::endl;
@@ -123,7 +123,17 @@ int  main( int argc, char *argv[] )
         
         const rsa_private_key prv( *modulus, *publicExponent, *privateExponent, *prime1, *prime2, *exponent1, *exponent2, *coefficient);
         std::cerr << "got RSA private key: maxbits=" << prv.maxbits << std::endl;
+        const string filename = vformat( "rsa-key-%08x.bin", unsigned( prv.maxbits ) );
+        {
+            ios::ocstream fp( filename, false );
+            prv.save_prv( fp );
+        }
         
+        {
+            ios::icstream fp( filename );
+            const rsa_private_key reload = rsa_private_key::load_prv( fp );
+            std::cerr << "Reload a key with maxbits=" << reload.maxbits << std::endl;
+        }
     }
     catch( const exception &e )
     {
