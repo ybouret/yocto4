@@ -173,7 +173,7 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
                 decoder.write( encoded[i] );
                 while( decoder.query(C) )
                 {
-                    std::cerr << make_visible(C);
+                    //std::cerr << make_visible(C);
                 }
             }
             

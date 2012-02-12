@@ -156,9 +156,11 @@ namespace yocto
 			while( in.size() >= maxbits )
 			{
 				src = natural::query( in, maxbits );
+                std::cerr << "encode.query: " << src << "/" << maxbits << std::endl;
 				tgt = pk->compute( src );
 				src.ldz();
 				tgt.store( out, maxbits );
+                std::cerr << "encode.store: " << tgt << "/" << maxbits << std::endl;
 				tgt.ldz();
 			}
 		}
@@ -196,28 +198,52 @@ namespace yocto
             while( in.size() >= maxbits )
             {
                 src = natural:: query( in, maxbits );
+                std::cerr << "decode.query: " << src << " / " << maxbits << std::endl;
                 tgt = pk->compute( src );
                 src.ldz();
                 //-- store into encoded state
+                std::cerr << "decode.store: " << tgt << " / " << maxbits << std::endl;
                 tgt.store(code,maxbits);
                 tgt.ldz();
+                decode();
             }
             
+        }
+        
+        void rsa_decoder:: decode()
+        {
             while( code.size() > 0  )
             {
                 if( code.peek() )
                 {
                     //----------------------------------------------------------
-                    // got a written
+                    // got a written byte
                     //----------------------------------------------------------   
                     if( code.size() >= quantum )
                     {
-                        for( size_t i=0; i <= prolog; ++i ) code.pop();     // remove flag+prolog noise
-                        out.push_full<uint8_t>( code.pop_full<uint8_t>() ); // transfert byte
-                        for( size_t i=0; i <  epilog; ++i ) code.pop();     // remove epilog noise
+                        // remove flag+prolog noise
+                        for( size_t i=0; i <= prolog; ++i )
+                        {
+                            assert( code.size() > 0 );
+                            code.pop();     
+                        }
+                        // transfert byte
+                        assert(code.size()>=8);
+                        const uint8_t C = code.pop_full<uint8_t>();
+                        std::cerr << "[" << make_visible(C) << "]" << std::endl;
+                        out.push_full<uint8_t>( C ); 
+                        // remove epilog noise
+                        for( size_t i=0; i <  epilog; ++i ) 
+                        {
+                            assert(code.size()>0);
+                            code.pop();     
+                        }
                     }
                     else
+                    {
+                        std::cerr << "<.>" << std::endl;
                         return; // not enoug bits so far
+                    }
                 }
                 else
                 {
@@ -225,6 +251,7 @@ namespace yocto
                     //----------------------------------------------------------
                     // got a flushed
                     //---------------------------------------------------------- 
+                    std::cerr << "Flushed: remaining " << code.size() << " bits in code" << std::endl;
                     break;
                 }
             }

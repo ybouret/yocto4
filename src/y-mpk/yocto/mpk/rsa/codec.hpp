@@ -55,7 +55,7 @@ namespace yocto
 		class rsa_decoder :  public rsa_codec
 		{
 		public:
-            static const size_t quantum = prolog+epilog+8;
+            static const size_t quantum = 1+prolog+epilog+8;
 			explicit rsa_decoder( const rsa_key::pointer & );
 			virtual ~rsa_decoder() throw();
 			
@@ -65,6 +65,7 @@ namespace yocto
 		private:
             ios::bitio code;
 			void emit();
+            void decode();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_decoder);
 		};
 		
