@@ -143,20 +143,43 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 	std::cerr << std::endl;
 	
 	{
-		std::cerr << "-- codec" << std::endl;
+		std::cerr << "-- codec: encoding" << std::endl;
 		std::cerr.flush();
 		
-		const mpk::rsa_key::pointer pk( new mpk::rsa_private_key( prv ) );
-		mpk::rsa_encoder encoder( pk );
-		
-		encoder("Hello, World!");
-		encoder.flush();
-		char C;
-		while( encoder.query(C) )
-		{
-			fprintf( stderr, "%02X", uint8_t(C) );
-		}
-		fprintf( stderr, "\n"); fflush(stderr);
+        string encoded;
+        char C;
+
+    
+        {
+            const mpk::rsa_key::pointer pk( new mpk::rsa_private_key( prv ) );
+            mpk::rsa_encoder encoder( pk );
+            
+            encoder("Hello, World!");
+            encoder.flush();
+            while( encoder.query(C) )
+            {
+                fprintf( stderr, "%02X", uint8_t(C) );
+                encoded.append( C );
+            }
+            fprintf( stderr, "\n"); fflush(stderr);
+        }
+        
+        std::cerr << "-- codec: decoding" << std::endl;
+        {
+            const mpk::rsa_key::pointer pk( new mpk::rsa_public_key( pub ) );
+            mpk::rsa_decoder decoder( pk );
+            for( size_t i=0; i < encoded.size(); ++i )
+            {
+                decoder.write( encoded[i] );
+                while( decoder.query(C) )
+                {
+                    std::cerr << make_visible(C);
+                }
+            }
+            
+            std::cerr << std::endl;
+        }
+        
 	}
 	
 	
@@ -205,10 +228,11 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
     string line;
     while( fp.read_line( line ) > 0 )
     {
+        std::cerr << "--------" << std::endl;
         for( size_t i=1; i <= pub_keys.size(); ++i )
         {
             const rsa_key::pointer &pk = prv_keys[i];
-            if( pk->maxbits <= 256 )
+            if( pk->maxbits <= 512 )
             {
                 rsa_encoder enc( pk );
                 enc.append( line );
@@ -222,6 +246,7 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
             }
             
         }
+        std::cerr << "--------" << std::endl;
         line.clear();
     }
     

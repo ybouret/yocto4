@@ -163,7 +163,7 @@ namespace yocto
 			}
 		}
 		
-				
+        
 		////////////////////////////////////////////////////////////////////////
 		//
 		//
@@ -181,14 +181,56 @@ namespace yocto
 		
 		void rsa_decoder:: write( char C )
 		{
-			
+            in.push_full<uint8_t>(C);
+            emit();
 		}
 		
 		void rsa_decoder:: flush()
 		{
 			
 		}
-		
-	}
-	
+        
+        
+        void rsa_decoder::emit()
+        {
+            while( in.size() >= maxbits )
+            {
+                src = natural:: query( in, maxbits );
+                tgt = pk->compute( src );
+                src.ldz();
+                //-- store into encoded state
+                tgt.store(code,maxbits);
+                tgt.ldz();
+            }
+            
+            while( code.size() > 0  )
+            {
+                if( code.peek() )
+                {
+                    //----------------------------------------------------------
+                    // got a written
+                    //----------------------------------------------------------   
+                    if( code.size() >= quantum )
+                    {
+                        for( size_t i=0; i <= prolog; ++i ) code.pop();     // remove flag+prolog noise
+                        out.push_full<uint8_t>( code.pop_full<uint8_t>() ); // transfert byte
+                        for( size_t i=0; i <  epilog; ++i ) code.pop();     // remove epilog noise
+                    }
+                    else
+                        return; // not enoug bits so far
+                }
+                else
+                {
+                    assert( !code.peek() );
+                    //----------------------------------------------------------
+                    // got a flushed
+                    //---------------------------------------------------------- 
+                    break;
+                }
+            }
+            
+        }
+        
+    }
+    
 }
