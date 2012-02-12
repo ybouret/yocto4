@@ -57,7 +57,6 @@ YOCTO_BUILD(z)
 YOCTO_BUILD(z++)
 YOCTO_BUILD(mpi)
 YOCTO_BUILD(ocl)
-YOCTO_BUILD(codec)
 
 INSTALL( FILES 
 	share/create.sh 
