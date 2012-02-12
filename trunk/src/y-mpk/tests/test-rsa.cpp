@@ -148,8 +148,8 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 		
         string encoded;
         char C;
-
-    
+        
+        
         {
             const mpk::rsa_key::pointer pk( new mpk::rsa_private_key( prv ) );
             mpk::rsa_encoder encoder( pk );
@@ -253,4 +253,37 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/code/rand.hpp"
+
+YOCTO_UNIT_TEST_IMPL(bitio)
+{
+    ios::bitio bio;
+    for( size_t iter=0; iter <= 16; ++ iter )
+    {
+        string s;
+        for( size_t i=0; i < iter; ++i )
+        {
+            if( alea<float>() > 0.5f )
+            {
+                s += char('0'+alea_less_than(10));
+            }
+            else
+                s += char('A'+alea_less_than(6));
+        }
+        const natural x = natural::hex( s );
+        std::cerr << "x=" << x << " / bits=" << x.bits() << std::endl;
+        for( size_t k=0; k <= 10; ++k )
+        {
+            bio.free();
+            x.store(bio, x.bits() + k );
+            const natural y = natural::query(bio, x.bits() + k );
+            if( x != y )
+                throw exception("bitio mismatch");
+        }
+        
+    }
+}
+YOCTO_UNIT_TEST_DONE()
+
 
