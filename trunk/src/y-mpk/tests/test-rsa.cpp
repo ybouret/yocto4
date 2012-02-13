@@ -124,8 +124,9 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 	
 	const mpk::rsa_private_key prv( modulus, publicExponent, privateExponent, prime1, prime2, exponent1, exponent2, coefficient );
 	
-	std::cerr << "pub maxbits=" << pub.maxbits << std::endl;;
-	
+	std::cerr << "pub ibits=" << pub.ibits << std::endl;;
+    std::cerr << "pub obits=" << pub.obits << std::endl;;
+
 	for( int i=0; i < 8; ++i )
 	{
 		const mpn P = mpn( gen.full<uint64_t>() ) % modulus;
@@ -140,8 +141,24 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 			throw exception("RSA error...");
 		
 	}
+    for( int i=0; i < 8; ++i )
+	{
+		const mpn P = mpn( gen.full<uint32_t>() ) % modulus;
+		std::cerr << "P=" << P << " "; std::cerr.flush();
+		const mpn C = pub.compute( P );
+		std::cerr << "C=" << C << " "; std::cerr.flush();
+		const mpn D = prv.compute( C );
+		std::cerr << "D=" << D;
+		
+		std::cerr << std::endl;
+		if( P != D )
+			throw exception("RSA error...");
+		
+	}
+
 	std::cerr << std::endl;
 	
+    std::cerr << "Modulus=" << pub.modulus << "/" << pub.modulus.bits() << std::endl;
 	{
 		std::cerr << "-- codec: encoding" << std::endl;
 		std::cerr.flush();
@@ -149,12 +166,14 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
         string encoded;
         char C;
         
-        
+    
         {
             const mpk::rsa_key::pointer pk( new mpk::rsa_private_key( prv ) );
             mpk::rsa_encoder encoder( pk );
             
             encoder("Hello, World!");
+            encoder.flush();
+            encoder("Y");
             encoder.flush();
             while( encoder.query(C) )
             {
@@ -173,12 +192,13 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
                 decoder.write( encoded[i] );
                 while( decoder.query(C) )
                 {
-                    //std::cerr << make_visible(C);
+                    std::cerr << make_visible(C);
                 }
             }
             
             std::cerr << std::endl;
         }
+        
         
 	}
 	
@@ -207,7 +227,7 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
             const rsa_public_key pub = rsa_public_key:: load_pub(fp);
             const rsa_key::pointer pk( new rsa_public_key( pub ) );
             pub_keys.push_back( pk );
-            std::cerr << "+pub.key@" << pub.maxbits << " => " << pub.maxbits/8 << " bytes" << std::endl;
+            std::cerr << "+pub.key@" << pub.obits << " => " << pub.obits/8 << " bytes" << std::endl;
         }
     }
     
@@ -220,25 +240,39 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
             const rsa_private_key  prv = rsa_private_key:: load_prv(fp);
             const rsa_key::pointer pk( new rsa_private_key( prv ) );
             prv_keys.push_back( pk );
-            std::cerr << "+prv.key@" << prv.maxbits << std::endl;
+            std::cerr << "+prv.key@" << prv.obits << std::endl;
         }
     }
+    
+#if 1
     std::cerr << "Waiting for input...." << std::endl;
     ios::icstream fp( ios::cstdin );
     string line;
-    while( fp.read_line( line ) > 0 )
+    while( fp.read_line( line ) > 0 && line != ".quit" )
     {
         std::cerr << "--------" << std::endl;
         for( size_t i=1; i <= pub_keys.size(); ++i )
         {
-            const rsa_key::pointer &pk = prv_keys[i];
-            if( pk->maxbits <= 512 )
+            const rsa_key::pointer &prv_k = prv_keys[i];
+            const rsa_key::pointer &pub_k = pub_keys[i];
+            if( prv_k->obits<= 512 )
             {
-                rsa_encoder enc( pk );
+                string crypted;
+                rsa_encoder enc( prv_k );
+                std::cerr << "encoding: "; std::cerr.flush();
                 enc.append( line );
                 enc.flush();
                 char C;
                 while( enc.query(C) )
+                {
+                    crypted.append(C);
+                    std::cerr << make_visible(C);
+                }
+                std::cerr << std::endl;
+                std::cerr << "decoding: "; std::cerr.flush();
+                rsa_decoder dec( pub_k );
+                dec.append( crypted );
+                while( dec.query(C) )
                 {
                     std::cerr << make_visible(C);
                 }
@@ -246,10 +280,11 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
             }
             
         }
+
         std::cerr << "--------" << std::endl;
         line.clear();
     }
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()

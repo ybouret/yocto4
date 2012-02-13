@@ -2,6 +2,7 @@
 #define YOCTO_BITIO_INCLUDED 1
 
 #include "yocto/sequence/list.hpp"
+#include <iosfwd>
 
 namespace yocto
 {
@@ -95,6 +96,8 @@ namespace yocto
 				return this->pop<T>( sizeof(T) * 8 );
 			}
 			
+            void output( std::ostream &os, size_t nbits) const;
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(bitio);
 			

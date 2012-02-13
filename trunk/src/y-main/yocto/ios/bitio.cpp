@@ -1,4 +1,5 @@
 #include "yocto/ios/bitio.hpp"
+#include <iostream>
 
 namespace yocto {
 	
@@ -69,6 +70,16 @@ namespace yocto {
 			}
 		}
 		
+        void bitio:: output( std::ostream &os, size_t nbits) const
+        {
+            assert( nbits <= list_.size );
+            const node_type *node = list_.head;
+            for( size_t i=0; i < nbits; ++i, node=node->next )
+            {
+                os << ( node->data ? "1" : "0" );
+            }
+        }
+
 	}
 	
 }
