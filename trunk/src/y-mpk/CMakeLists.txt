@@ -6,11 +6,11 @@ SET( mpk_srcs ${mpk_decl} ${mpk_impl} )
 INSTALL( FILES ${mpk_decl} DESTINATION include/yocto/mpk )
 SOURCE_GROUP( mpk FILES ${mpk_srcs} )
 
-FILE( GLOB rsa_decl yocto/mpk/rsa/*.hpp )
-FILE( GLOB rsa_impl yocto/mpk/rsa/*.cpp )
-SET( rsa_srcs ${rsa_decl} ${rsa_impl} )
-INSTALL( FILES ${rsa_decl} DESTINATION include/yocto/mpk/rsa )
-SOURCE_GROUP( mpk/rsa FILES ${rsa_srcs} )
+#FILE( GLOB rsa_decl yocto/mpk/rsa/*.hpp )
+#FILE( GLOB rsa_impl yocto/mpk/rsa/*.cpp )
+#SET( rsa_srcs ${rsa_decl} ${rsa_impl} )
+#INSTALL( FILES ${rsa_decl} DESTINATION include/yocto/mpk/rsa )
+#SOURCE_GROUP( mpk/rsa FILES ${rsa_srcs} )
 
 SET( srcs ${mpk_srcs} ${rsa_srcs} )
 

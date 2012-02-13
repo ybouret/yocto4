@@ -74,7 +74,7 @@ YOCTO_UNIT_TEST_IMPL(rsa0)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/mpk/rsa/codec.hpp"
+#include "yocto/mpk/rsa-codec.hpp"
 
 YOCTO_UNIT_TEST_IMPL(rsa1)
 {
