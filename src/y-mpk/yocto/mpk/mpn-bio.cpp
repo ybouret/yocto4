@@ -25,7 +25,7 @@ namespace yocto
 			{
 				for( ; count < nbits; ++count )
 				{
-					out.push_back( bit(count) );
+					out.push( bit(count) );
 				}
 			}
 			catch(...)
@@ -44,16 +44,15 @@ namespace yocto
 			uint8_t *b = ans.byte_;
 			for( size_t i = 0; i < nbits; ++i )
 			{
-				if(  in.front() )
+				if(  in.pop() )
 				{
 					assert( (i>>3) < ans.maxi_ );
 					b[i>>3] |= (1 << ( i & 7 ));
 					
 				}
-				in.pop_front();
 			}
 			
-			ans.update();
+			ans.rescan();
 			return ans;
 		}
 		

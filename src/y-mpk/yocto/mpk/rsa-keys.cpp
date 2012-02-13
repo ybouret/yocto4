@@ -23,26 +23,27 @@ namespace yocto
 			__LDZ(modulus);
 		}
 		
-		static inline size_t __maxbits_for( const natural &m )
+		static inline size_t __obits_for( const natural &m )
 		{
 			natural n = m;
 			--n;
 			const size_t ans = n.bits();
-			if( ans <= 2 ) 
+			if( ans <= 3 ) 
 				throw libc::exception( EINVAL, "rsa_key(invalid modulus)" );
 			return ans;
 		}
 		
 		rsa_key:: rsa_key( const natural &rsa_modulus ) :
 		modulus( rsa_modulus ),
-		maxbits( __maxbits_for(modulus) )
+		obits( __obits_for(modulus) ),
+        ibits( obits-1 )
 		{
-			//-- check
 		}
 		
 		rsa_key:: rsa_key( const rsa_key &k ) :
 		modulus( k.modulus ),
-		maxbits( k.maxbits )
+		obits( k.obits ),
+        ibits( k.ibits )
 		{
 		}
 		

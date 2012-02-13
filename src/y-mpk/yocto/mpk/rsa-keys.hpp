@@ -22,8 +22,9 @@ namespace yocto
 			rsa_key( const rsa_key & );
 			
 			const natural modulus; //!< a valid modulus
-			const size_t  maxbits; //!< #bits for modulus -1
-			
+			const size_t  obits;   //!< (modulus-1).bits
+			const size_t  ibits;   //!< obits-1;
+            
 			virtual natural compute( const natural & ) const = 0;
 			
 			typedef shared_ptr<rsa_key> pointer;
