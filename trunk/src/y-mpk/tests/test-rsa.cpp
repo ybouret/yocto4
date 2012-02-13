@@ -244,7 +244,6 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
         }
     }
     
-#if 1
     std::cerr << "Waiting for input...." << std::endl;
     ios::icstream fp( ios::cstdin );
     string line;
@@ -284,7 +283,6 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
         std::cerr << "--------" << std::endl;
         line.clear();
     }
-#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
