@@ -1,14 +1,14 @@
 #ifndef YOCTO_MPK_RSA_CODEC_INCLUDED
 #define YOCTO_MPK_RSA_CODEC_INCLUDED 1
 
-#include "yocto/mpk/rsa-keys.hpp"
+#include "yocto/pki/rsa-keys.hpp"
 #include "yocto/ios/bitio.hpp"
 #include "yocto/ios/codec.hpp"
 
 namespace yocto
 {
 	
-	namespace mpk
+	namespace pki
 	{
 		
 		
