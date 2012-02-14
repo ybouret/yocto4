@@ -1,4 +1,4 @@
-#include "yocto/mpk/rsa-codec.hpp"
+#include "yocto/pki/rsa-codec.hpp"
 #include "yocto/random/bits.hpp"
 #include "yocto/exception.hpp"
 
@@ -8,7 +8,7 @@
 namespace yocto
 {
 	
-	namespace mpk
+	namespace pki
 	{
 		
 		////////////////////////////////////////////////////////////////////////

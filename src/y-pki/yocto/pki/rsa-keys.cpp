@@ -1,4 +1,4 @@
-#include "yocto/mpk/rsa-keys.hpp"
+#include "yocto/pki/rsa-keys.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/ios/ostream.hpp"
 #include "yocto/ios/istream.hpp"
@@ -8,7 +8,7 @@
 namespace yocto
 {
 	
-	namespace mpk
+	namespace pki
 	{
 		
 		////////////////////////////////////////////////////////////////////////

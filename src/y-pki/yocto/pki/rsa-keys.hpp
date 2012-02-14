@@ -9,9 +9,10 @@
 namespace yocto
 {
 	
-	namespace mpk
+	namespace pki
 	{
-		
+		using mpk::natural;
+        
 		//! base class for RSA keys
 		class rsa_key : public object
 		{
