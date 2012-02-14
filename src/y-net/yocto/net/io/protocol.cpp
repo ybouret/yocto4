@@ -44,6 +44,11 @@ namespace yocto
 		{
 			__show("[QUIT]",cnx->key());
 		}
+        
+		void protocol:: on_fail( connexion &cnx ) throw()
+		{
+			__show("[QUIT]",cnx->key());
+		}
 		
 		
 		void protocol:: on_recv( connexion &cnx )
@@ -113,6 +118,7 @@ namespace yocto
 				connexion &cnx = *i;
 				if( sock_db.is_ready(cnx->sock) )
 				{
+                    
 					//----------------------------------------------------------
 					// something arrived ?
 					//----------------------------------------------------------
@@ -123,6 +129,7 @@ namespace yocto
 						//------------------------------------------------------
 						if( cnx->closing )
 						{
+                            //-- ignore closed connexion still incoming
 							cnx->ioQ.clear_recv();
 						}
 						else
@@ -258,6 +265,7 @@ namespace yocto
 			}
 			catch(...)
 			{
+                on_fail(cnx);
 				disconnect( cnx );
 				throw;
 			}
