@@ -7,8 +7,8 @@ namespace yocto
 	mpi::Requests:: ~Requests() throw()
 	{
 		memory::kind<memory::global>::release( wksp_, wlen_ );
-		request = NULL;
-		status  = NULL;
+		request = 0;
+		status  = 0;
 	}
 	
 	
@@ -16,8 +16,8 @@ namespace yocto
 	count( num ),
 	wlen_( count * ( sizeof(MPI_Request) + sizeof(MPI_Status) ) ),
 	wksp_( memory::kind<memory::global>::acquire( wlen_ ) ),
-	request( NULL ),
-	status( NULL )
+	request( 0 ),
+	status(  0 )
 	{
 		// memory for requests and status is allocated
 		uint8_t *p = (uint8_t *)wksp_;
