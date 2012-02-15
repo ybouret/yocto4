@@ -4,7 +4,7 @@
 
 using namespace yocto;
 
-typedef mpk::natural mpn;
+//typedef mpk::natural mpn;
 using namespace pki;
 
 YOCTO_UNIT_TEST_IMPL(rsa1)
