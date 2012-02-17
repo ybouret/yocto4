@@ -9,25 +9,36 @@ MESSAGE( STATUS "<FLTK>" )
 ########################################################################
 ## fltk-config and fluid
 ########################################################################
+SET(FLTK_FOUND OFF)
+
 SET(FLTK_BIN $ENV{FLTK_BIN} CACHE STRING "Overide fltk-config location" )
 IF( "" STREQUAL "${FLTK_BIN}" )
 	
+	# automatic detection
 	FIND_PROGRAM( FLTK-CONFIG fltk-config )
 	IF( FLTK-CONFIG-NOTFOUND )
-		MESSAGE( FATAL_ERROR "Can't find fltk-config" )
+		MESSAGE( STATUS "Can't find fltk-config" )
+	ELSE(FLTK-CONFIG-NOTFOUND)
+		# got fltk config
+		FIND_PROGRAM( FLUID fluid )
+		IF( FLUID-NOTFOUND )
+			MESSAGE( STATUS "Can't find fluid" )
+		ELSE(FLUID_NOTFOUND)
+			# got fluid
+			SET(FLTK_FOUND ON)
+		ENDIF(FLUID-NOTFOUND)
 	ENDIF(FLTK-CONFIG-NOTFOUND)
 	
-	FIND_PROGRAM( FLUID fluid )
-	IF( FLUID-NOTFOUND )
-		MESSAGE( FATAL_ERROR "Can't find fluid" )
-	ENDIF(FLUID-NOTFOUND)
+	
 
 ELSE()
-
+	# manual override
 	SET(FLTK-CONFIG "${FLTK_BIN}/fltk-config" )
 	SET(FLUID       "${FLTK_BIN}/fluid"       )
-	
+	SET(FLTK_FOUND ON)
 ENDIF()
+
+IF(FLTK_FOUND)
 
 MESSAGE( STATUS "  @FLTK fltk-config='${FLTK-CONFIG}'" )
 MESSAGE( STATUS "  @FLTK fluid='${FLUID}" )
@@ -73,7 +84,7 @@ LINK_DIRECTORIES( ${FLTK-LINK-DIR} )
 ## Linking
 ########################################################################
 ## Link with optional FLTK libraries
-MACRO(FLTK_LINK_TO THE_TARGET)
+MACRO(TARGET_LINK_FLTK THE_TARGET)
 
 	#initialize arguments for fltk-config
 	MESSAGE( STATUS "${THE_TARGET} will use FLTK libraries" )
@@ -97,7 +108,7 @@ MACRO(FLTK_LINK_TO THE_TARGET)
 	#and declare libraries to be linked !
 	#SET_TARGET_PROPERTIES( ${THE_TARGET} PROPERTIES LINK_FLAGS "${FLTK-LDFLAGS}" )
 	TARGET_LINK_LIBRARIES(${THE_TARGET} ${FLTK-LIBS})
-ENDMACRO(FLTK_LINK_TO)
+ENDMACRO(TARGET_LINK_FLTK)
 
 ########################################################################
 ## fluid compiler API
@@ -107,10 +118,10 @@ MACRO(FLUID_UIC THE_UI)
 	SET(_UI_FL     "${CMAKE_CURRENT_SOURCE_DIR}/${THE_UI}.fl" )
 	SET(_UI_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/${THE_UI}.cxx")
 	SET(_UI_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${THE_UI}.h")
-	MESSAGE( STATUS "${THE_UI} will compile"   )
-	MESSAGE( STATUS "fluid : ${_UI_FL}"     )
-	MESSAGE( STATUS "source: ${_UI_SOURCE}" )
-	MESSAGE( STATUS "header: ${_UI_HEADER}" )
+	MESSAGE( STATUS "**** <${THE_UI}> will compile"   )
+	MESSAGE( STATUS "**** fluid : ${_UI_FL}"     )
+	MESSAGE( STATUS "**** source: ${_UI_SOURCE}" )
+	MESSAGE( STATUS "**** header: ${_UI_HEADER}" )
 	
 	#create the command
 	ADD_CUSTOM_COMMAND( OUTPUT  ${_UI_SOURCE} ${_UI_HEADER}
@@ -125,5 +136,7 @@ MACRO(FLUID_UIC THE_UI)
 	SET( ${THE_UI}_HEADER  ${_UI_HEADER} )
 	SET( ${THE_UI}_SOURCES ${_UI_SOURCE} ${_UI_HEADER})
 ENDMACRO(FLUID_UIC)
+
+ENDIF(FLTK_FOUND)
 
 MESSAGE( STATUS "</FLTK>" )
