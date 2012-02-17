@@ -119,9 +119,9 @@ MACRO(FLUID_UIC THE_UI)
 	SET(_UI_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/${THE_UI}.cxx")
 	SET(_UI_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${THE_UI}.h")
 	MESSAGE( STATUS "**** <${THE_UI}> will compile"   )
-	MESSAGE( STATUS "**** fluid : ${_UI_FL}"     )
-	MESSAGE( STATUS "**** source: ${_UI_SOURCE}" )
-	MESSAGE( STATUS "**** header: ${_UI_HEADER}" )
+	MESSAGE( STATUS "** fluid : ${_UI_FL}"     )
+	MESSAGE( STATUS "** source: ${_UI_SOURCE}" )
+	MESSAGE( STATUS "** header: ${_UI_HEADER}" )
 	
 	#create the command
 	ADD_CUSTOM_COMMAND( OUTPUT  ${_UI_SOURCE} ${_UI_HEADER}

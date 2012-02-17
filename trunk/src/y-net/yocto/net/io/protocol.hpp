@@ -27,19 +27,19 @@ namespace yocto
 			virtual void run() = 0;
 			void stop() throw(); //!< set running to false
 			
+            
 		protected:
 			typedef set<socket_address,connexion> connDB;
 			typedef stack<connexion>              connStack;
 			socket_set   sock_db;
 			connDB       conn_db;
 			connStack    dropped;
-			bool         sending; //!< current status
 			
 			bool         has_recv( connexion & );
 			bool         has_sent( connexion & );
 			void         disconnect( connexion &) throw();
 			
-			void         prepare_sock() throw(); //!< set sending
+			bool         prepare_sock() throw(); //!< set sending
 			void         process_recv();         //!< after check
 			void         process_send();         //!< after process_recv
 			void         kill_dropped() throw(); //!< 
