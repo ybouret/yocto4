@@ -4,12 +4,13 @@
 #include "yocto/associative/map.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/mpk/rsa/keys.hpp"
+#include "yocto/pki/rsa-keys.hpp"
 
 #include <iostream>
 
 using namespace yocto;
 using namespace mpk;
+using namespace pki;
 
 static inline natural get_value( const string &data )
 {
@@ -122,8 +123,8 @@ int  main( int argc, char *argv[] )
         __FETCH(coefficient);
         
         const rsa_private_key prv( *modulus, *publicExponent, *privateExponent, *prime1, *prime2, *exponent1, *exponent2, *coefficient);
-        std::cerr << "got RSA private key: maxbits=" << prv.maxbits << std::endl;
-        const string filename = vformat( "rsa-key-%08x.bin", unsigned( prv.maxbits ) );
+        std::cerr << "got RSA private key: bits=" << prv.obits << std::endl;
+        const string filename = vformat( "rsa-key-%08x.bin", unsigned( prv.obits ) );
         {
             ios::ocstream fp( filename, false );
             prv.save_prv( fp );
@@ -132,7 +133,7 @@ int  main( int argc, char *argv[] )
         {
             ios::icstream fp( filename );
             const rsa_private_key reload = rsa_private_key::load_prv( fp );
-            std::cerr << "Reload a key with maxbits=" << reload.maxbits << std::endl;
+            std::cerr << "Reload a key with maxbits=" << reload.obits << std::endl;
         }
     }
     catch( const exception &e )
