@@ -22,7 +22,6 @@ namespace yocto
 		sock_db(),
 		conn_db(),
 		dropped(),
-		sending( false ),
 		waiting(1),
 		cache( bs ),
 		running(false)
@@ -85,9 +84,9 @@ namespace yocto
 			}
 		}
 		
-		void protocol:: prepare_sock() throw()
+		bool protocol:: prepare_sock() throw()
 		{
-			sending = false;
+            bool sending = false;
 			for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
 			{
 				connexion &cnx = *i;
@@ -102,6 +101,7 @@ namespace yocto
 					flag = false;
 				}
 			}
+            return sending;
 		}
 		
 		void protocol:: process_recv()
@@ -282,8 +282,7 @@ namespace yocto
 				//==============================================================
 				// check if something is to be sent
 				//==============================================================
-				prepare_sock();
-				delay      lasting = sending  ? no_delay : waiting;
+				delay      lasting = prepare_sock()  ? no_delay : waiting;
 				
 				//==============================================================
 				// check socket set for activity
