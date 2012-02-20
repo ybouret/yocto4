@@ -19,9 +19,12 @@ namespace yocto
             virtual void store( char  C );
             
             list<char> fifo;
+            void       reset() throw();
             
         protected:
             explicit common() throw();
+            uint8_t     buf[4]; //!< only 3 out of 4 are used
+            size_t      len;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(common);
@@ -41,12 +44,10 @@ namespace yocto
             
             void set_url() throw();
             void set_iso() throw();
-    
+            
             
             
         private:
-            uint8_t     buf[4]; //!< only 3 out of 4 are used
-            size_t      len;
             const char *tab;
             void    emit();
             
@@ -60,9 +61,15 @@ namespace yocto
         class decoder : public common
         {
         public:
-            static const char table[256];
+            static const uint8_t table[256];
+            explicit decoder() throw();
+            virtual ~decoder() throw();
+            
+            virtual void write( char C );
+            virtual void flush();
             
         private:
+            void emit();
             YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
         };
         

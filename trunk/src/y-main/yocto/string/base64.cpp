@@ -1,5 +1,6 @@
 #include "yocto/string/base64.hpp"
 #include "yocto/exception.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -9,9 +10,18 @@ namespace yocto
     }
     
     base64:: common:: common() throw() :
-    fifo()
+    fifo(),
+    buf(),
+    len(0)
     {
-        
+        reset();
+    }
+    
+    
+    void base64::common:: reset() throw()
+    {
+        len = 0;
+        memset(buf,0,sizeof(buf));
     }
     
     bool base64:: common:: query( char &C )
@@ -63,8 +73,6 @@ namespace yocto
     
     
     base64:: encoder:: encoder() throw() :
-    buf(),
-    len(0),
     tab( table_iso ),
     padding(true)
     {
@@ -172,12 +180,15 @@ namespace yocto
                 throw exception("base64::encoder(internal error)");
         }
         
-        
-        len = 0;
+        reset();
     }
     
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //
+    ////////////////////////////////////////////////////////////////////////////
     
-    const char base64:: decoder:: table[256] =
+    const uint8_t base64:: decoder:: table[256] =
     {
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -196,5 +207,93 @@ namespace yocto
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
     };
+    
+    base64:: decoder:: decoder() throw()
+    {
+    }
+    
+    base64:: decoder:: ~decoder() throw()
+    {
+    }
+    
+    void base64:: decoder:: write( char C )
+    {
+        
+        if( len >= 4 )
+            emit();
+        
+        const int B = table[ uint8_t(C) ];
+        if( B >= 0xff )
+            return;
+        else
+        {
+            if( 3 == len && 0x40 == buf[2] && 0x40 != B )
+                throw exception( "base64::decoder(invalid '=')");
+            buf[len++] = B;
+        }
+    }
+    
+    void base64:: decoder:: flush()
+    {
+        emit();
+    }
+    
+    
+#define __CODE1X(X)  ( ((X)&63) << 2 ) 
+#define __CODE1Y(Y)  ( ((Y)&63) >> 4 )
+#define __CODE1(X,Y) ( __CODE1X(X) | __CODE1Y(Y) )
+    
+#define __CODE2Y(Y)  ( ( (Y)&15 ) << 4 )
+#define __CODE2Z(Z)  ( ( (Z)&63 ) >> 2 )
+#define __CODE2(Y,Z) ( __CODE2Y(Y) | __CODE2Z(Z) )
+    
+#define __CODE3Z(Z)  ( ( (Z) & 3 ) << 6 )
+#define __CODE3(Z,W) ( __CODE3Z(Z) | (W&63) )
+    
+    
+    void base64:: decoder:: emit()
+    {
+        switch( len )
+        {
+            case 0:
+            case 1: // junk
+                return;
+                
+            case 2:
+            {
+                const uint8_t C0 = __CODE1(buf[0],buf[1]);
+                fifo.push_back(C0);
+            }
+                break;
+                
+            case 3:
+            {
+                const uint8_t C0 = __CODE1(buf[0],buf[1]);
+                const uint8_t C1 = __CODE2(buf[1],buf[2]);
+                fifo.push_back(C0);
+                fifo.push_back(C1);
+            }
+                break;
+                
+            case 4:
+            {
+                const uint8_t C0 = __CODE1(buf[0],buf[1]);
+                const uint8_t C1 = __CODE2(buf[1],buf[2]);
+                const uint8_t C2 = __CODE3(buf[2],buf[3]);
+
+                fifo.push_back(C0);
+                fifo.push_back(C1);
+                fifo.push_back(C2);
+            }
+                break;
+                
+            default:
+                throw exception("base64::decoder(internal error)");
+        }
+        reset();
+    }
+    
+    
+    
     
 }
