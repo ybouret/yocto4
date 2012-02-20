@@ -14,15 +14,13 @@ namespace yocto
         class rsa_auth 
         {
         public:
-            explicit rsa_auth( const rsa_private_key &prv );
+            explicit rsa_auth() throw();
             virtual ~rsa_auth() throw();
-
-            string encrypt( const void *data, size_t size, hashing::function &h);
             
+            string encrypt( const void *data, size_t size, const rsa_key &key );
+                           
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_auth);
-            rsa_key::pointer prv_k;
-            rsa_key::pointer pub_k;
             ios::bitio       plain;
             ios::bitio       coded;
         };
