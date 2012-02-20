@@ -26,23 +26,34 @@ namespace yocto
             static const size_t max_size = 0xFFFF;
             Random::Bits       &bits     = Random::CryptoBits();
             
+            assert( !(NULL==data&&size>0));
+            
             if( size > max_size )
                 throw exception("rsa_auth::encrypt(size overflow)");
             
             plain.free();
             coded.free();
+            
+            //------------------------------------------------------------------
             //! store the size
+            //------------------------------------------------------------------
             plain.push_full<uint16_t>( size );
             
+            //------------------------------------------------------------------
             //! store the key
+            //------------------------------------------------------------------
             const uint8_t *p = (const uint8_t *)data;
             for( size_t i=0; i < size; ++i )
                 plain.push_full<uint8_t>( p[i] );
             
+            //------------------------------------------------------------------
             //! pad with noise
+            //------------------------------------------------------------------
             while( 0 != ( plain.size() % key.ibits ) ) plain.push( bits() );
             
+            //------------------------------------------------------------------
             //! encrypt!
+            //------------------------------------------------------------------
             while( plain.size() > 0 )
             {
                 assert(plain.size()>=key.ibits);
@@ -51,7 +62,9 @@ namespace yocto
                 C.store( coded, key.obits );
             }
             
+            //------------------------------------------------------------------
             //! pad to 8 bits
+            //------------------------------------------------------------------
             while( coded.size() & 7 ) coded.push_back( bits() );
             
             string ans( coded.size() >> 3, as_capacity );
@@ -61,6 +74,19 @@ namespace yocto
                 ans.append( coded.pop_full<uint8_t>() );
             }
             return ans;
+        }
+        
+        string rsa_auth:: signature( const void *data, size_t size,  const rsa_key &key, hashing::function &h )
+        {
+            assert(!(NULL==data&&size>0));
+            
+            memory::buffer_of<uint8_t,memory::global> hkey(h.length);
+            
+            h.set();
+            h.run(data,size);
+            h.get( hkey.rw(), h.length);
+            
+            return encrypt( hkey.ro(), h.length, key ); 
         }
         
     }

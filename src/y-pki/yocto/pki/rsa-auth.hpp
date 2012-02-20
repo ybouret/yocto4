@@ -18,7 +18,8 @@ namespace yocto
             virtual ~rsa_auth() throw();
             
             string encrypt( const void *data, size_t size, const rsa_key &key );
-                           
+            string signature( const void *data, size_t size,  const rsa_key &key, hashing::function &h );
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_auth);
             ios::bitio       plain;
