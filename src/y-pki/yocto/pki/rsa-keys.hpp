@@ -75,6 +75,8 @@ namespace yocto
 			void                   save_prv( ios::ostream &fp ) const;
             static rsa_private_key load_prv( ios::istream &fp );
             
+            
+            
 		private:
 			const natural privateExponent; //!< (1/publicExponent) %( (prime1-1) * (prime2-1) )
 			const natural prime1;          //!< bigger  prime
