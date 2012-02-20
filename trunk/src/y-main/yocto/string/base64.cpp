@@ -115,20 +115,20 @@ namespace yocto
 #define __SHR(A,n) ( (A) >> (n) )
     
     //-- byte 0: 6 bits
-#define __BYTE0(X)   ( __SHR(X,2) & __MASK6 )  
+#define __BYTE0(X)   uint8_t( __SHR(X,2) & __MASK6 )  
     
     //-- byte 1: 2 + 4 bits
 #define __BYTE1X(X)  ( __SHL( (X) & __MASK2,4) )
 #define __BYTE1Y(Y)  ( __SHR(Y,4) & __MASK4    )
-#define __BYTE1(X,Y) ( __BYTE1X(X) | __BYTE1Y(Y) )   
+#define __BYTE1(X,Y) uint8_t( __BYTE1X(X) | __BYTE1Y(Y) )   
     
     //-- byte 2: 4 + 2 bits
 #define __BYTE2Y(Y)  ( __SHL((Y)&__MASK4,2)   )
 #define __BYTE2Z(Z)  ( __SHR((Z),6) & __MASK2 )
-#define __BYTE2(Y,Z) ( __BYTE2Y(Y) | __BYTE2Z(Z) )
+#define __BYTE2(Y,Z) uint8_t( __BYTE2Y(Y) | __BYTE2Z(Z) )
     
     //-- byte 1: 6 bits
-#define __BYTE3(Z)   ( (Z) & __MASK6 )
+#define __BYTE3(Z)   uint8_t( (Z) & __MASK6 )
     
     void base64:: encoder:: emit()
     {
@@ -229,7 +229,7 @@ namespace yocto
         {
             if( 3 == len && 0x40 == buf[2] && 0x40 != B )
                 throw exception( "base64::decoder(invalid '=')");
-            buf[len++] = B;
+            buf[len++] = uint8_t(B);
         }
     }
     
@@ -241,14 +241,14 @@ namespace yocto
     
 #define __CODE1X(X)  ( ((X)&63) << 2 ) 
 #define __CODE1Y(Y)  ( ((Y)&63) >> 4 )
-#define __CODE1(X,Y) ( __CODE1X(X) | __CODE1Y(Y) )
+#define __CODE1(X,Y) uint8_t( __CODE1X(X) | __CODE1Y(Y) )
     
 #define __CODE2Y(Y)  ( ( (Y)&15 ) << 4 )
 #define __CODE2Z(Z)  ( ( (Z)&63 ) >> 2 )
-#define __CODE2(Y,Z) ( __CODE2Y(Y) | __CODE2Z(Z) )
+#define __CODE2(Y,Z) uint8_t( __CODE2Y(Y) | __CODE2Z(Z) )
     
 #define __CODE3Z(Z)  ( ( (Z) & 3 ) << 6 )
-#define __CODE3(Z,W) ( __CODE3Z(Z) | (W&63) )
+#define __CODE3(Z,W) uint8_t( __CODE3Z(Z) | (W&63) )
     
     
     void base64:: decoder:: emit()

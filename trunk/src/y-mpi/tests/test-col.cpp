@@ -52,3 +52,4 @@ YOCTO_UNIT_TEST_IMPL(scatter)
 	
 }
 YOCTO_UNIT_TEST_DONE()
+

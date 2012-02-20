@@ -52,6 +52,12 @@ namespace yocto
 		return d;
 		
 	}
+
+	digest digest:: hex( const char *txt )
+	{
+		const string s(txt);
+		return 	digest::hex(s);
+	}
 	
 	
 }

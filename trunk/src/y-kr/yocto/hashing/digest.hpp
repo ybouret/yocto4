@@ -53,6 +53,7 @@ namespace yocto
 			}
 			
 			static digest hex( const string &s );
+			static digest hex( const char   *s );
 			
 			friend bool operator==( const digest &lhs, const digest &rhs ) throw();
 			friend bool operator!=( const digest &rhs, const digest &lsh ) throw();

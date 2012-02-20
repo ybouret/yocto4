@@ -10,7 +10,7 @@ namespace yocto
 	
 	//! heap sort
 	template <typename T,typename FUNC>
-	void hsort( array<T> &ra, FUNC &compare ) throw()
+	inline void hsort( array<T> &ra, FUNC &compare ) throw()
 	{
 		const size_t n = ra.size();
 		if (n < 2) return;
@@ -60,7 +60,7 @@ namespace yocto
 	
 	//! heap co sort
 	template <typename T, typename U, typename FUNC>
-	void hsort( array<T> &ra, array<U> &rb, FUNC &compare ) throw()
+	inline void hsort( array<T> &ra, array<U> &rb, FUNC &compare ) throw()
 	{
 		const size_t n = ra.size(); assert( ra.size() == rb.size() );
 		if (n < 2) return;
