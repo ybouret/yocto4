@@ -13,6 +13,8 @@ namespace yocto
         public:
             virtual ~codec() throw();
 
+            string to_string();
+            
         protected:
             explicit codec() throw();
             
