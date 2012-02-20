@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/pki/rsa-codec.hpp"
 #include "yocto/random/isaac.hpp"
+#include <cstdio>
 
 using namespace yocto;
 
