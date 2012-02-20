@@ -1,6 +1,7 @@
 #include "yocto/pki/rsa-auth.hpp"
 #include "yocto/memory/buffers.hpp"
 #include "yocto/random/bits.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -13,56 +14,53 @@ namespace yocto
         }
         
         
-        rsa_auth:: rsa_auth( const rsa_private_key &prv ) :
-        prv_k( new rsa_private_key(prv) ),
-        pub_k( new rsa_public_key(prv)  ),
+        rsa_auth:: rsa_auth() throw() :
         plain(),
         coded()
         {
         }
         
         
-        string rsa_auth::encrypt( const void *data, size_t size, hashing::function &h )
+        string rsa_auth::encrypt( const void *data, size_t size, const rsa_key &key )
         {
-            Random::Bits &bits = Random::CryptoBits();
-            assert( prv_k->modulus == pub_k->modulus );
-            h.set();
+            static const size_t max_size = 0xFFFF;
+            Random::Bits       &bits     = Random::CryptoBits();
+            
+            if( size > max_size )
+                throw exception("rsa_auth::encrypt(size overflow)");
+            
             plain.free();
             coded.free();
+            //! store the size
+            plain.push_full<uint16_t>( size );
             
-            //! aligned input bits
-            size_t data_bits    = size*8;
-            while( 0 != ( data_bits % prv_k->ibits ) ) ++data_bits;
+            //! store the key
+            const uint8_t *p = (const uint8_t *)data;
+            for( size_t i=0; i < size; ++i )
+                plain.push_full<uint8_t>( p[i] );
             
-            //! aligned input mpk::natural
-            const size_t data_units   = data_bits  / prv_k->ibits;
+            //! pad with noise
+            while( 0 != ( plain.size() % key.ibits ) ) plain.push( bits() );
             
-            //! aligned code bits
-            size_t       code_bits    = data_units * prv_k->obits;
-            while( 0 != ( code_bits & 7 ) ) ++code_bits;
-            
-            //! output bytes for data
-            const size_t code_bytes   = code_bits / 8;
-            
-            //-- fill plain bits with data
+            //! encrypt!
+            while( plain.size() > 0 )
             {
-                const uint8_t *p = (uint8_t*)data;
-                for( size_t i=0; i < size; ++i )
-                {
-                    plain.push_full<uint8_t>( p[i] );
-                }
+                assert(plain.size()>=key.ibits);
+                const natural P = natural::query( plain, key.ibits );
+                const natural C = key.compute( P );
+                C.store( coded, key.obits );
             }
             
-            //-- padd with noise
-            while( plain.size() < data_bits ) plain.push( bits() );
-
-            //-- 
-            //const size_t hash_bytes   = h.length;
+            //! pad to 8 bits
+            while( coded.size() & 7 ) coded.push_back( bits() );
             
-            
-            
-            
-            return string();
+            string ans( coded.size() >> 3, as_capacity );
+            while( coded.size() > 0 )
+            {
+                assert( coded.size() >= 8 );
+                ans.append( coded.pop_full<uint8_t>() );
+            }
+            return ans;
         }
         
     }
