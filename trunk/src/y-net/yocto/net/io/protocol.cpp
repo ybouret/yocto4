@@ -119,32 +119,39 @@ namespace yocto
 				if( sock_db.is_ready(cnx->sock) )
 				{
                     
-					//----------------------------------------------------------
-					// something arrived ?
-					//----------------------------------------------------------
-					if( has_recv( cnx ) )
-					{
-						//------------------------------------------------------
-						// yes => process
-						//------------------------------------------------------
-						if( cnx->closing )
-						{
-                            //-- ignore closed connexion still incoming
-							cnx->ioQ.clear_recv();
-						}
-						else
-						{
-							on_recv( cnx );
-						}
-					}
-					else
-					{
-						//------------------------------------------------------
-						// no => disconnecting !
-						//------------------------------------------------------
-						dropped.push( cnx );
-					}
-				}
+                    try {
+                        //------------------------------------------------------
+                        // something arrived ?
+                        //------------------------------------------------------
+                        if( has_recv( cnx ) )
+                        {
+                            //--------------------------------------------------
+                            // yes => process
+                            //--------------------------------------------------
+                            if( cnx->closing )
+                            {
+                                //-- ignore closed connexion still incoming
+                                cnx->ioQ.clear_recv();
+                            }
+                            else
+                            {
+                                on_recv( cnx );
+                            }
+                        }
+                        else
+                        {
+                            //--------------------------------------------------
+                            // no => disconnecting !
+                            //--------------------------------------------------
+                            dropped.push( cnx );
+                        }
+                    }
+                    catch(...)
+                    {
+                        on_fail(cnx);
+                        disconnect(cnx);
+                    }
+                }
 			}
 			
 			//------------------------------------------------------------------
@@ -173,20 +180,27 @@ namespace yocto
 					assert( cnx->ioQ.would_send() );
 					if( sock_db.can_send( cnx->sock ) )
 					{
-						if( has_sent(cnx) )
-						{
-							//-- all is done
-							if(cnx->closing)
-							{
-								//-- final sent !
-								dropped.push(cnx);
-							}
-							else
-							{
-								//-- what to do next ?
-								on_sent(cnx);
-							}
-						}
+                        try {
+                            if( has_sent(cnx) )
+                            {
+                                //-- all is done
+                                if(cnx->closing)
+                                {
+                                    //-- final sent !
+                                    dropped.push(cnx);
+                                }
+                                else
+                                {
+                                    //-- what to do next ?
+                                    on_sent(cnx);
+                                }
+                            }
+                        }
+                        catch(...)
+                        {
+                            on_fail(cnx);
+                            disconnect(cnx);
+                        }
 					}
 				}
 			}

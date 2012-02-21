@@ -22,7 +22,7 @@ namespace yocto
 			virtual void on_recv(connexion &);
 			virtual void on_sent(connexion &);
 			virtual void on_quit(connexion &) throw();
-			virtual void on_fail(connexion &) throw();
+			virtual void on_fail(connexion &) throw(); //!< during I/O phase => deconnexion
             
 			virtual void run() = 0;
 			void stop() throw(); //!< set running to false
