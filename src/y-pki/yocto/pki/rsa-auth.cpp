@@ -47,6 +47,11 @@ namespace yocto
             plain.push_full<uint16_t>( size );
             
             //------------------------------------------------------------------
+            // store the noise
+            //------------------------------------------------------------------
+            for( size_t i=0; i < header; ++i ) plain.push( bits() );
+            
+            //------------------------------------------------------------------
             //! store the key
             //------------------------------------------------------------------
             const uint8_t *p = (const uint8_t *)data;
@@ -137,11 +142,15 @@ namespace yocto
             //------------------------------------------------------------------
             // extract data
             //------------------------------------------------------------------
-            if( plain.size() < 2 )
+            const size_t info_bits = sizeof(uint16_t) + header;
+            if( plain.size() <  info_bits )
                 throw exception("rsa_auth.decrypt(only %u bits)", unsigned( plain.size() ) );
+            
             const size_t num = plain.pop_full<uint16_t>();
+            plain.skip(header);
             if( plain.size() < (num << 3 ) )
                 throw exception("rsa_auth.decrypt(missing data)");
+            
             
             string ans(num,as_capacity);
             for( size_t i=0; i < num; ++i )

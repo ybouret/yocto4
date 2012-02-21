@@ -17,6 +17,7 @@ namespace yocto
         public:
             explicit rsa_auth() throw();
             virtual ~rsa_auth() throw();
+            static const size_t header = 14; //!< extraneous random bits
             
             string encrypt( const void *data, size_t size, const rsa_key &key );
             string encrypt( const memory::ro_buffer &buff, const rsa_key &key );
