@@ -81,10 +81,6 @@ namespace yocto
             //------------------------------------------------------------------
             plain.push_full<uint8_t>( C );
             
-            //------------------------------------------------------------------
-            // make epilog noise
-            //------------------------------------------------------------------
-            for( size_t i=0; i < epilog; ++i ) plain.push( noise() );
             
             encode();
         }
@@ -198,8 +194,6 @@ namespace yocto
                         Q.push_back( plain.pop_full<uint8_t>() );
                         //std::cerr << "[" << char( Q.back() ) << "]" << std::endl;
                         
-                        //-- drop epilog
-                        plain.skip( epilog );
                     }
                     else
                     {
@@ -214,7 +208,7 @@ namespace yocto
                     // it was flushed
                     //----------------------------------------------------------
                     //std::cerr << "EOF/+#plain=" << plain.size() << " /+#coded=" << coded.size() << std::endl;
-                   // std::cerr << "EOF" << std::endl;
+                    // std::cerr << "EOF" << std::endl;
                     // remove meaning less plain bits
                     plain.free();
                     
