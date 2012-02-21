@@ -258,8 +258,13 @@ YOCTO_UNIT_TEST_IMPL(auth)
     ios::icstream fp( ios::cstdin );
     string   line;
     rsa_auth auth;
-    const rsa_key  &prv_k = *prv_keys[3];
-    const rsa_key  &pub_k = *pub_keys[1];
+    
+    const rsa_key  &self_prv_k = *prv_keys[2];
+    const rsa_key  &self_pub_k = *pub_keys[2];
+    
+    const rsa_key  &peer_pub_k = *pub_keys[1];
+    const rsa_key  &peer_prv_k = *prv_keys[1];
+    
     hashing::sha1   alg;
     
     base64::encoder b64;
@@ -268,18 +273,31 @@ YOCTO_UNIT_TEST_IMPL(auth)
     {
         
         std::cerr << "encrypt..." << std::endl;
-        string msg = auth.encrypt( line, pub_k);
+        const string msg = auth.encrypt( line, peer_pub_k);
         b64.append( msg );
         b64.flush();
         const string m64 = b64.to_string();
         std::cerr << m64 << std::endl;
         std::cerr << "signing..." << std::endl;
-        string sgn = auth.signature( line, prv_k, alg );
+        string sgn = auth.signature( line, self_prv_k, alg );
         b64.reset();
         b64.append( sgn );
         b64.flush();
         const string s64 = b64.to_string();
         std::cerr << s64 << std::endl;
+        std::cerr << "decrypt..." << std::endl;
+        const string dec = auth.decrypt( msg, peer_prv_k );
+        std::cerr << "dec=" << dec << std::endl;
+        const string hash_dec = rsa_auth::hash_string( dec, alg );
+        const string hash_sgn = auth.decrypt( sgn, self_pub_k );
+        if( hash_dec != hash_sgn )
+        {
+            std::cerr << "Mismatch!" << std::endl;
+        }
+        else
+        {
+            std::cerr << "Message is authenticated!" << std::endl;
+        }
         std::cerr << "...done" << std::endl;
         line.clear();
     }

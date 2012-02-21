@@ -3,6 +3,7 @@
 #include "yocto/random/bits.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
 
 namespace yocto
 {
@@ -25,7 +26,7 @@ namespace yocto
         {
             return encrypt( buff.ro(), buff.length(), key);
         }
-
+        
         
         string rsa_auth::encrypt( const void *data, size_t size, const rsa_key &key )
         {
@@ -100,7 +101,74 @@ namespace yocto
         {
             return signature(buff.ro(), buff.length(), key, h);
         }
+        
+        
+        string rsa_auth:: decrypt( const memory::ro_buffer &buff, const rsa_key &key )
+        {
+            return decrypt( buff.ro(), buff.length(), key );
+        }
+        
+        string rsa_auth:: decrypt( const void *data, size_t size, const rsa_key &key )
+        {
+            assert( !(NULL==data&&size>0));
+            plain.free();
+            coded.free();
+            
+            //------------------------------------------------------------------
+            // store coded bits
+            //------------------------------------------------------------------
+            {
+                const uint8_t *p = (const uint8_t *)data;
+                for(size_t i=0; i < size; ++i ) 
+                    coded.push_full<uint8_t>( p[i] );
+            }
+            
+            //------------------------------------------------------------------
+            // build plain bits
+            //------------------------------------------------------------------
+            const size_t items = coded.size() / key.obits;
+            for( size_t i=0; i < items; ++i )
+            {
+                const natural C = natural::query( coded, key.obits );
+                const natural P = key.compute(C);
+                P.store( plain, key.ibits );
+            }
+            
+            //------------------------------------------------------------------
+            // extract data
+            //------------------------------------------------------------------
+            if( plain.size() < 2 )
+                throw exception("rsa_auth.decrypt(only %u bits)", unsigned( plain.size() ) );
+            const size_t num = plain.pop_full<uint16_t>();
+            if( plain.size() < (num << 3 ) )
+                throw exception("rsa_auth.decrypt(missing data)");
+            
+            string ans(num,as_capacity);
+            for( size_t i=0; i < num; ++i )
+                ans.append( char(plain.pop_full<uint8_t>()) );
+            
+            return ans;
+        }
+     
+        string rsa_auth:: hash_string( const void *data, size_t size, hashing::function &h )
+        {
+            memory::buffer_of<uint8_t,memory::global> hkey(h.length);
+            assert( hkey.length() >= h.length );
+            
+            h.set();
+            h.run(data,size);
+            h.get( hkey.rw(), h.length);
+            
+            string ans( h.length, as_capacity );
+            for( size_t i=0; i < h.length; ++i )
+                ans.append( char( hkey[i] ) );
+            return ans;
+        }
 
+        string rsa_auth:: hash_string( const memory::ro_buffer &buff, hashing::function &h )
+        {
+            return hash_string( buff.ro(), buff.length(), h );
+        }
         
     }
     
