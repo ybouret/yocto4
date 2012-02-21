@@ -19,7 +19,7 @@ namespace yocto
             virtual void store( char  C );
             
             list<char> fifo;
-            void       reset() throw();
+            virtual void       reset() throw();
             
         protected:
             explicit common() throw();

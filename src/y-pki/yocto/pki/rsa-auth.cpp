@@ -3,6 +3,7 @@
 #include "yocto/random/bits.hpp"
 #include "yocto/exception.hpp"
 
+
 namespace yocto
 {
     
@@ -20,6 +21,11 @@ namespace yocto
         {
         }
         
+        string rsa_auth:: encrypt( const memory::ro_buffer &buff, const rsa_key &key )
+        {
+            return encrypt( buff.ro(), buff.length(), key);
+        }
+
         
         string rsa_auth::encrypt( const void *data, size_t size, const rsa_key &key )
         {
@@ -81,6 +87,7 @@ namespace yocto
             assert(!(NULL==data&&size>0));
             
             memory::buffer_of<uint8_t,memory::global> hkey(h.length);
+            assert( hkey.length() >= h.length );
             
             h.set();
             h.run(data,size);
@@ -88,6 +95,12 @@ namespace yocto
             
             return encrypt( hkey.ro(), h.length, key ); 
         }
+        
+        string rsa_auth:: signature( const memory::ro_buffer &buff, const rsa_key &key, hashing::function &h )
+        {
+            return signature(buff.ro(), buff.length(), key, h);
+        }
+
         
     }
     

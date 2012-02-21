@@ -220,3 +220,71 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/pki/rsa-auth.hpp"
+#include "yocto/hashing/sha1.hpp"
+#include "yocto/string/base64.hpp"
+
+YOCTO_UNIT_TEST_IMPL(auth)
+{
+    vector<rsa_key::pointer>  pub_keys,prv_keys;
+    {
+        ios::imstream fp( keys_db, sizeof(keys_db) );
+        char C;
+        while( fp.query(C) )
+        {
+            fp.store(C);
+            const rsa_public_key pub = rsa_public_key:: load_pub(fp);
+            const rsa_key::pointer pk( new rsa_public_key( pub ) );
+            pub_keys.push_back( pk );
+            std::cerr << "+pub.key@" << pub.obits << " => " << pub.obits/8 << " bytes" << std::endl;
+        }
+    }
+    
+    {
+        ios::imstream fp( keys_db, sizeof(keys_db) );
+        char C;
+        while( fp.query(C) )
+        {
+            fp.store(C);
+            const rsa_private_key  prv = rsa_private_key:: load_prv(fp);
+            const rsa_key::pointer pk( new rsa_private_key( prv ) );
+            prv_keys.push_back( pk );
+            std::cerr << "+prv.key@" << prv.obits << std::endl;
+        }
+    }
+    
+    std::cerr << "Enter Keys...." << std::endl;
+    ios::icstream fp( ios::cstdin );
+    string   line;
+    rsa_auth auth;
+    const rsa_key  &prv_k = *prv_keys[3];
+    const rsa_key  &pub_k = *pub_keys[1];
+    hashing::sha1   alg;
+    
+    base64::encoder b64;
+    
+    while( fp.read_line( line ) > 0 && line != ".quit" )
+    {
+        
+        std::cerr << "encrypt..." << std::endl;
+        string msg = auth.encrypt( line, pub_k);
+        b64.append( msg );
+        b64.flush();
+        const string m64 = b64.to_string();
+        std::cerr << m64 << std::endl;
+        std::cerr << "signing..." << std::endl;
+        string sgn = auth.signature( line, prv_k, alg );
+        b64.reset();
+        b64.append( sgn );
+        b64.flush();
+        const string s64 = b64.to_string();
+        std::cerr << s64 << std::endl;
+        std::cerr << "...done" << std::endl;
+        line.clear();
+    }
+    
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()

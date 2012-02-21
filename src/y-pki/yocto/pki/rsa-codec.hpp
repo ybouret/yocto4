@@ -16,8 +16,7 @@ namespace yocto
 		{
 		public:
 			static const size_t prolog = 1; //!< #random bits before byte
-			static const size_t epilog = 1; //!< #random bits after  byte
-            static const size_t dblock = 1 + prolog + epilog + 8; //!< #bits to encode one byte
+            static const size_t dblock = 1 + prolog + 8; //!< #bits to encode one byte
 			virtual ~rsa_codec() throw();
 			
             virtual bool query( char &C );
