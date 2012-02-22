@@ -13,8 +13,8 @@ namespace yocto
 		class memmgr : public singleton<memmgr>
 		{
 		public:
-			static const size_t limit_size = 512;
-			static const size_t chunk_size = 4096;
+			static const size_t limit_size = 1024;
+			static const size_t chunk_size = 8*1024;
 			
 			static inline void _round( size_t &n ) throw()
 			{
@@ -31,7 +31,7 @@ namespace yocto
 				
 			}
 			
-			uint8_t * acquire( size_t &n )
+			inline uint8_t * acquire( size_t &n )
 			{
 				YOCTO_LOCK(access);
 				_round(n);
@@ -46,7 +46,7 @@ namespace yocto
 				
 			}
 			
-			void      release( uint8_t * &p, size_t &n ) throw()
+			inline void      release( uint8_t * &p, size_t &n ) throw()
 			{
 				YOCTO_LOCK(access);
 				assert( p != NULL );

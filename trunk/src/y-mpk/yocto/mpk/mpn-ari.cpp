@@ -69,7 +69,6 @@ namespace yocto
 				const natural rhs = q*t;
 				
 				t0 = t;
-				//std::cout << "lhs=" << lhs << ", rhs=" << rhs << std::endl;
 				
 				if( compare(lhs,rhs) >= 0 )
 				{
@@ -87,9 +86,8 @@ namespace yocto
 				q  = n0/b0;
 				r  = n0 - q * b0;
 			}
-			//if( b0 != 1 ) error
-			return t;
-			
+            // normally an erro if b0 != 1
+			return t;			
 		}
 		
 		natural natural:: mod_exp( const natural &B, const natural &E, const natural &N )
@@ -118,7 +116,7 @@ namespace yocto
 						tmp1.xch( result );
 					}
 					//base = ( base * base ) % N;
-					natural tmp2( mod__( fft_( base, base ), N ) );
+                    natural tmp2( mod__( sqr_( base ), N ) );
 					base.xch( tmp2 );
 				}
 				
