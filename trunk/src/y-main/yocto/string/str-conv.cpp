@@ -83,7 +83,7 @@ namespace yocto
 					
 			}
 		}
-		return ans;
+		return neg ? -ans: ans;
 	}
 	
 	
