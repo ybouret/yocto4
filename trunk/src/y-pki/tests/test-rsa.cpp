@@ -296,7 +296,7 @@ YOCTO_UNIT_TEST_IMPL(auth)
         }
         else
         {
-            std::cerr << "Message is authenticated!" << std::endl;
+            std::cerr << "Key is authenticated!" << std::endl;
         }
         std::cerr << "...done" << std::endl;
         line.clear();
