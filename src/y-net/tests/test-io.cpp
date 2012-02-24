@@ -104,16 +104,49 @@ YOCTO_UNIT_TEST_DONE()
 
 #include "yocto/net/io/protocol.hpp"
 
+class my_link : public tcp_link
+{
+public:
+    explicit my_link( const connexion &cnx ) throw() : tcp_link(cnx) {}
+    virtual ~my_link() throw() {}
+    
+    
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(my_link);
+};
+
+typedef intrusive_ptr<socket_address,my_link> my_conn;
+
 
 class my_proto : public server_protocol
 {
 public:
-	explicit my_proto( socket_address &ip ) : server_protocol( ip, 2, 16 )
+    typedef set<socket_address,my_conn> cnx_set;
+    
+    cnx_set clients;
+    
+    
+	explicit my_proto( socket_address &ip ) : 
+    server_protocol( ip, 2, 16 ),
+    clients()
 	{
 		
 		waiting = delay(5.0);
 	}
 	
+    virtual void on_init( connexion &cnx )
+    {
+        const my_conn conn( new my_link( cnx ) );
+        std::cerr << "MyConn: [+]" << conn->key() << std::endl;
+        clients.insert( conn );
+    }
+    
+    virtual void on_quit( connexion &cnx ) throw()
+    {
+        std::cerr << "MyConn: [-]" << cnx->key() << std::endl;
+        (void) clients.remove( cnx->key() );
+    }
+    
 	virtual void on_recv( connexion &cnx )
 	{
 		protocol::on_recv(cnx);
