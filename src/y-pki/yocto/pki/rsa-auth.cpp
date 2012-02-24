@@ -179,6 +179,8 @@ namespace yocto
             return hash_string( buff.ro(), buff.length(), h );
         }
         
+        
+       
     }
     
 }
