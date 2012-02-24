@@ -13,6 +13,7 @@ namespace yocto
 		
 		class protocol;
         class server_protocol;
+        
 		class io_link : public object, public counted
 		{
 		public:
@@ -28,7 +29,7 @@ namespace yocto
 			friend class protocol;
             friend class server_protocol;
 			socket       &sock;
-
+            
 		public:
 			ios::istream &input;
 			ios::ostream &output;
@@ -41,6 +42,27 @@ namespace yocto
 		
 		typedef intrusive_ptr<socket_address,io_link> connexion;
 		
+        
+        //! base class for user connexion
+        /**
+         class derived_link : public tcp_link
+         typedef intrusive_ptr<socket_address,derived_link> derived_connexion;
+         */
+        class tcp_link : public object, public counted
+        {
+        public:
+            virtual ~tcp_link() throw();
+            const socket_address & key() const throw();
+            
+        protected:
+            explicit tcp_link( const connexion &cnx ) throw();
+            
+        private:
+            const socket_address key_;
+            YOCTO_DISABLE_ASSIGN(tcp_link);
+                 
+        };
+        
 	}
 	
 }

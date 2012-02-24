@@ -36,6 +36,16 @@ namespace yocto
 		{
 			return ioQ.recv_length;
 		}
-		
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        tcp_link:: ~tcp_link() throw() {}
+        tcp_link:: tcp_link( const connexion &cnx ) throw() : 
+        key_( cnx->key() )
+        {}
+        
+        const socket_address & tcp_link:: key() const throw() { return key_; }
+        
+        
 	}
 }
