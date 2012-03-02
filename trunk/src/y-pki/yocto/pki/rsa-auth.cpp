@@ -28,6 +28,12 @@ namespace yocto
         }
         
         
+        void rsa_auth:: reset() throw()
+        {
+            plain.free();
+            coded.free();
+        }
+        
         string rsa_auth::encrypt( const void *data, size_t size, const rsa_key &key )
         {
             static const size_t max_size = 0xFFFF;
@@ -38,8 +44,7 @@ namespace yocto
             if( size > max_size )
                 throw exception("rsa_auth::encrypt(size overflow)");
             
-            plain.free();
-            coded.free();
+            reset();
             
             //------------------------------------------------------------------
             //! store the size
@@ -79,12 +84,17 @@ namespace yocto
             //------------------------------------------------------------------
             while( coded.size() & 7 ) coded.push_back( bits() );
             
+            
+            //------------------------------------------------------------------
+            //! pack to bytes
+            //------------------------------------------------------------------
             string ans( coded.size() >> 3, as_capacity );
             while( coded.size() > 0 )
             {
                 assert( coded.size() >= 8 );
                 ans.append( coded.pop_full<uint8_t>() );
             }
+            reset();
             return ans;
         }
         
@@ -116,8 +126,8 @@ namespace yocto
         string rsa_auth:: decrypt( const void *data, size_t size, const rsa_key &key )
         {
             assert( !(NULL==data&&size>0));
-            plain.free();
-            coded.free();
+            
+            reset();
             
             //------------------------------------------------------------------
             // store coded bits
@@ -155,6 +165,8 @@ namespace yocto
             string ans(num,as_capacity);
             for( size_t i=0; i < num; ++i )
                 ans.append( char(plain.pop_full<uint8_t>()) );
+            
+            reset();
             
             return ans;
         }

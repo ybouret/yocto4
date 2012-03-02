@@ -35,6 +35,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_auth);
             ios::bitio       plain;
             ios::bitio       coded;
+            void             reset() throw();
         };
         
     }
