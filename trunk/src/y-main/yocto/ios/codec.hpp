@@ -19,6 +19,10 @@ namespace yocto
             //! must be called after a flush()
             string to_string();
             
+            //! block-wise behavior: reset, write, flush
+            string to_string( const void *data, size_t size );
+            string to_string( const memory::ro_buffer &data );
+            
         protected:
             explicit codec() throw();
             
