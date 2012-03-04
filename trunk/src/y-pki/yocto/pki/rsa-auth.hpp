@@ -18,6 +18,7 @@ namespace yocto
             explicit rsa_auth() throw();
             virtual ~rsa_auth() throw();
             static const size_t header = 32; //!< extraneous random bits
+
             
             string encrypt( const void *data, size_t size, const rsa_key &key );
             string encrypt( const memory::ro_buffer &buff, const rsa_key &key );
@@ -35,7 +36,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_auth);
             ios::bitio       plain;
             ios::bitio       coded;
-            void             reset() throw();
+            void reset() throw();
         };
         
     }

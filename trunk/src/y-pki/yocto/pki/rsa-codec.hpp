@@ -41,6 +41,8 @@ namespace yocto
             virtual void write( char C );
             virtual void flush();
             
+            virtual void reset() throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_encoder);
             void encode(); //!< plain->coded
@@ -59,6 +61,7 @@ namespace yocto
             
             virtual void write( char C );
             virtual void flush();
+            virtual void reset() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_decoder);
