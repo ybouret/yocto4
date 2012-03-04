@@ -12,7 +12,11 @@ namespace yocto
         {
         public:
             virtual ~codec() throw();
-
+            
+            //! reset codec state
+            virtual void reset() throw() = 0;
+            
+            //! must be called after a flush()
             string to_string();
             
         protected:

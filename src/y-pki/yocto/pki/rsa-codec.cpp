@@ -59,6 +59,13 @@ namespace yocto
         coded()
         {}
         
+        void rsa_encoder:: reset() throw()
+        {
+            Q.free();
+            plain.free();
+            coded.free();
+        }
+        
         rsa_encoder:: ~rsa_encoder() throw()
         {}
         
@@ -122,7 +129,6 @@ namespace yocto
                 assert( P < key->modulus );
                 const natural C = key->compute(P);
                 C.store( coded, key->obits );
-                //std::cerr << "rsa.encode : " << P << "/" << P.bits() << " => " << C << "/" << C.bits() << std::endl;
                 pack();
             }
         }
@@ -163,6 +169,14 @@ namespace yocto
             
         }
         
+        void rsa_decoder:: reset() throw()
+        {
+            Q.free();
+            plain.free();
+            coded.free();
+        }
+
+        
         void rsa_decoder:: decode()
         {
             while( coded.size() >= key->obits )
@@ -170,7 +184,6 @@ namespace yocto
                 const natural C = natural::query( coded, key->obits );
                 const natural P = key->compute( C );
                 P.store( plain, key->ibits );
-                //std::cerr << "rsa.decode : " << C << "/" << C.bits() << " => " << P << "/" << P.bits() << std::endl;
                 unpack();
             }
         }
@@ -192,13 +205,11 @@ namespace yocto
                         
                         //-- collect byte => Q
                         Q.push_back( plain.pop_full<uint8_t>() );
-                        //std::cerr << "[" << char( Q.back() ) << "]" << std::endl;
                         
                     }
                     else
                     {
                         //-- not enough bits so far
-                        //std::cerr << "<.>" << std::endl;
                         return;
                     }
                 }
@@ -207,14 +218,11 @@ namespace yocto
                     //----------------------------------------------------------
                     // it was flushed
                     //----------------------------------------------------------
-                    //std::cerr << "EOF/+#plain=" << plain.size() << " /+#coded=" << coded.size() << std::endl;
-                    // std::cerr << "EOF" << std::endl;
                     // remove meaning less plain bits
                     plain.free();
                     
                     //  remove padding bits
                     coded.free();
-                    //while( 0 != ( coded.size() & 7 ) ) coded.skip();
                     
                     return;
                 }
