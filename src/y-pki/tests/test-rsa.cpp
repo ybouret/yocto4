@@ -280,10 +280,10 @@ YOCTO_UNIT_TEST_IMPL(auth)
         std::cerr << m64 << std::endl;
         std::cerr << "signing..." << std::endl;
         string sgn = auth.signature( line, self_prv_k, alg );
-        b64.reset();
-        b64.append( sgn );
-        b64.flush();
-        const string s64 = b64.to_string();
+        //b64.reset();
+        //b64.append( sgn );
+        //b64.flush();
+        const string s64 = b64.to_string( sgn );
         std::cerr << s64 << std::endl;
         std::cerr << "decrypt..." << std::endl;
         const string dec = auth.decrypt( msg, peer_prv_k );
