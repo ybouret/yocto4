@@ -5,6 +5,7 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/container/container.hpp"
 #include "yocto/type-traits.hpp"
+#include <cstring>
 
 namespace yocto 
 {
@@ -40,18 +41,19 @@ namespace yocto
         virtual size_t capacity() const throw() { return maxi_; }
         virtual const char *name() const throw() { return hidden::heap_name; }
         
-        virtual void free()    throw() { size_ = 0; }
-        virtual void release() throw() { kill();    }
-        virtual void reserve( size_t n ) 
+        virtual void free()    throw()   { size_ = 0; }
+        virtual void release() throw()   { kill();    }
+        virtual void reserve( size_t n ) { if( n > 0 ) grow(n);}
+        
+        void push( param_type obj )
         {
-            if( n > 0 )
-            {
-                size_t  new_maxi = maxi_ + n;
-                slot_t *new_data = hmem_.template acquire_as<slot_t>( new_maxi );
-                hmem_.template release_as<slot_t>( data_, maxi_ );
-                data_ = new_data;
-                maxi_ = new_maxi;
-            }
+            //-- check memory
+            if( size_ >= maxi_ ) grow( next_increase(maxi_) );
+            //-- get the address of obj
+            mutable_type *args = (mutable_type *)&obj;
+            
+            //-- put it at the end
+            data_[ size_++ ] = args;
         }
         
     private:
@@ -66,6 +68,23 @@ namespace yocto
         { 
             size_ = 0;
             hmem_.template release_as<slot_t>( data_, maxi_ );
+        }
+        
+        inline void grow( size_t n )
+        {
+            assert(n>0);
+            //-- create new workspace
+            size_t  new_maxi = maxi_ + n;
+            slot_t *new_data = hmem_.template acquire_as<slot_t>( new_maxi );
+            //-- transfer workspace
+            memcpy( new_data, data_, sizeof(slot_t) * size_ );
+            
+            //-- remove old workspace
+            hmem_.template release_as<slot_t>( data_, maxi_ );
+            
+            //-- reaffect data
+            data_ = new_data;
+            maxi_ = new_maxi;
         }
     };
     
