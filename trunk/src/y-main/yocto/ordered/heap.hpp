@@ -5,7 +5,10 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/container/container.hpp"
 #include "yocto/type-traits.hpp"
+#include "yocto/code/swap.hpp"
 #include <cstring>
+
+//#include <iostream>
 
 namespace yocto 
 {
@@ -45,15 +48,88 @@ namespace yocto
         virtual void release() throw()   { kill();    }
         virtual void reserve( size_t n ) { if( n > 0 ) grow(n);}
         
-        void push( param_type obj )
+        //! insert the address
+        inline void push( T *pObj )
         {
-            //-- check memory
-            if( size_ >= maxi_ ) grow( next_increase(maxi_) );
-            //-- get the address of obj
-            mutable_type *args = (mutable_type *)&obj;
-            
+            if( size_ >= maxi_ )
+                grow( next_increase(maxi_) );
+            __push( pObj );
+        }
+        
+        //! insert the address, no memory check
+        inline void __push( T *pObj ) throw()
+        {
+            assert( size_ < maxi_ );
+            //------------------------------------------------------------------
             //-- put it at the end
-            data_[ size_++ ] = args;
+            //------------------------------------------------------------------
+            size_t ipos = size_;
+            size_t ppos = parent( ipos );
+            data_[ size_++ ] = (mutable_type *)pObj;
+            
+            //------------------------------------------------------------------
+            //-- organize heap
+            //------------------------------------------------------------------
+            while( ipos > 0 && comp_( *data_[ppos], *data_[ipos] ) < 0 )
+            {
+                cswap<slot_t>( data_[ppos], data_[ipos] );
+                ipos = ppos;
+                ppos = parent( ipos );
+            }
+            
+        }
+        
+        //! return the highest data
+        inline const_type & peek() const throw()
+        {
+            assert( size_ > 0 );
+            assert( data_ > 0 );
+            assert( data_[0] != NULL );
+            return *data_[0];
+        }
+        
+        //! remove the highest data
+        inline void pop() throw()
+        {
+            assert(size_>0);
+            //------------------------------------------------------------------
+            // promote the last element by replacing the top element
+            //------------------------------------------------------------------
+            data_[0] = data_[ --size_ ];
+            
+            //------------------------------------------------------------------
+            // reorganize the heap from the top
+            //------------------------------------------------------------------
+            size_t ipos = 0;
+            while( true )
+            {
+                const size_t lpos = at_left(  ipos );
+                const size_t rpos = at_right( ipos );
+                size_t       mpos = ipos;
+                //--------------------------------------------------------------
+                //-- test left
+                //--------------------------------------------------------------
+                if( lpos < size_ && comp_( *data_[ipos], *data_[lpos] ) < 0 )
+                    mpos = lpos;
+                
+                //--------------------------------------------------------------
+                //-- test right
+                //--------------------------------------------------------------
+                if( rpos < size_ && comp_( *data_[mpos], *data_[rpos] ) < 0 )
+                    mpos = rpos;
+                
+                //--------------------------------------------------------------
+                //-- are we done ?
+                //--------------------------------------------------------------
+                if( mpos == ipos )
+                    break; 
+                
+                //--------------------------------------------------------------
+                //-- update heap
+                //--------------------------------------------------------------
+                cswap<slot_t>( data_[ipos], data_[mpos] );
+                mpos = ipos;
+            }
         }
         
     private:
@@ -64,6 +140,22 @@ namespace yocto
         slot_t        *data_;
         COMPARATOR     comp_;
         YOCTO_DISABLE_COPY_AND_ASSIGN(heap);
+        
+        static inline size_t parent( size_t npos ) throw()
+        {
+            return (npos-1) >> 1;
+        }
+        
+        static inline size_t at_left( size_t npos ) throw()
+        {
+            return (npos<<1) + 1;
+        }
+        
+        static inline size_t at_right( size_t npos ) throw()
+        {
+            return (npos<<1) + 2;
+        }
+        
         inline void kill() throw()
         { 
             size_ = 0;
