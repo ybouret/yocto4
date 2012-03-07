@@ -15,10 +15,20 @@ YOCTO_UNIT_TEST_IMPL(heap)
     }
     
     c_shuffle<int>( &V[1], V.size() );
-    
+    std::cerr << "------------- insert heap -------------" << std::endl;
     for( size_t i=1; i <= V.size(); ++i )
     {
-        H.push( V[i] );
+        const int &X = V[i];
+        std::cerr << "push = " << X << std::endl;
+        H.push( &V[i] );
+        std::cerr << "\tpeek = " << H.peek() << std::endl;
+    }
+    
+    std::cerr << "------------- remove heap -------------" << std::endl;
+    while( H.size() )
+    {
+        std::cerr << "\tpeek = " << H.peek() << std::endl;
+        H.pop();
     }
 }
 YOCTO_UNIT_TEST_DONE()
