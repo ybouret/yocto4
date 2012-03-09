@@ -88,13 +88,15 @@ namespace yocto
             return *data_[0];
         }
         
+        
         //! remove the highest data
-        inline void pop() throw()
+        inline T * pop() throw()
         {
             assert(size_>0);
             //------------------------------------------------------------------
             // promote the last element by replacing the top element
             //------------------------------------------------------------------
+            T *ans = data_[0];
             data_[0] = data_[ --size_ ];
             
             //------------------------------------------------------------------
@@ -130,6 +132,7 @@ namespace yocto
                 cswap<slot_t>( data_[ipos], data_[mpos] );
                 mpos = ipos;
             }
+            return ans;
         }
         
     private:

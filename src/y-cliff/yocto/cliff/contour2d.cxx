@@ -12,11 +12,11 @@ namespace yocto
 		
 		template <>
 		void contour2D<real_t>:: compute(const array2D<real_t>     &d,
-									   const array1D<real_t>     &x, 
-									   const array1D<real_t>     &y,
-									   const layout2D            &sub,
-									   const level_set<real_t>   &levels,
-									   callback                   proc)
+                                         const array1D<real_t>     &x, 
+                                         const array1D<real_t>     &y,
+                                         const layout2D            &sub,
+                                         const level_set<real_t>   &levels,
+                                         callback                   proc)
 		{
 			assert( d.has( sub.lower ) );
 			assert( d.has( sub.upper ) );
