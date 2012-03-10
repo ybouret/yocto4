@@ -16,7 +16,7 @@ namespace yocto
         }
         
         huffman:: tree:: tree() :
-        Q( COUNT_MAX, as_capacity ),
+        prio( COUNT_MAX, as_capacity ),
         root(  NULL ),
         count( COUNT_MAX ),
         nodes( memory::kind<memory::global>::acquire_as<node_t>( count ) ),
@@ -79,23 +79,30 @@ namespace yocto
         void huffman:: tree:: build_tree() throw()
         {
             assert( alphabet.size > 0 );
+            prio.free();
             
             //------------------------------------------------------------------
             // enqueue all the alphabet
             //------------------------------------------------------------------
             for( node_t *node = alphabet.head; node; node = node->next )
-                Q.__push(node);
-           
+            {
+                node->bits = 0;
+                node->code = 0;
+                assert(NULL==node->left);
+                assert(NULL==node->right);
+                prio.__push(node);
+            }
+            
             //------------------------------------------------------------------
             // create the tree
             //------------------------------------------------------------------
             size_t inode = ALPHA_MAX;
-            while( Q.size() > 1 )
+            while( prio.size() > 1 )
             {
                 assert(inode<COUNT_MAX);
                 node_t *node  = &nodes[inode++];
-                node_t *left  = node->left  = Q.pop();
-                node_t *right = node->right = Q.pop();
+                node_t *left  = node->left  = prio.pop();
+                node_t *right = node->right = prio.pop();
                 
                 const size_t child_bits = node->bits+1;
                 left->parent  = right->parent = node;
@@ -103,13 +110,13 @@ namespace yocto
                 left->bits    = right->bits = child_bits;
                 left->code    = right->code = (node->code << 1);
                 right->code  |= 1;
-                Q.__push( node );
+                prio.__push( node );
             }
             
             //------------------------------------------------------------------
             // get the root
             //------------------------------------------------------------------
-            root = Q.pop();
+            root = prio.pop();
             
         }
         
