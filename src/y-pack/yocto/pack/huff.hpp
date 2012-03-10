@@ -67,7 +67,7 @@ namespace yocto
                 
                 
             private:
-                heap_t       Q;
+                heap_t       prio;
                 node_t      *root;
                 size_t       count;    //!< #nodes
                 node_t      *nodes;    //!< contiguous nodes
