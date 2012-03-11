@@ -22,8 +22,10 @@ namespace yocto
             static const int    FWD       = -3;            //!< tag for FWD
             static const size_t NYT_INDEX = ALPHA_NUM;
             static const size_t END_INDEX = NYT_INDEX+1;
-            typedef size_t   freq_t;
-            typedef uint32_t code_t;
+            typedef size_t      freq_t;
+            typedef uint32_t    code_t;
+            
+          
             
             struct node_t
             {
@@ -36,6 +38,7 @@ namespace yocto
                 size_t   bits;   //!< #bits in code
                 code_t   code;   //!<  code
                 int      ch;     //!< character
+                code_t   mask;   //!< partial mask
             };
             
             class node_comparator
@@ -45,7 +48,7 @@ namespace yocto
                 virtual ~node_comparator() throw() {}
                 inline int operator()( const node_t &lhs, const node_t &rhs ) throw()
                 {
-                    return lhs.freq < rhs.freq ? -1 : ( rhs.freq < lhs.freq ? 1 : 0 );
+                    return lhs.freq < rhs.freq ? 1 : ( rhs.freq < lhs.freq ? -1 : 0 );
                 }
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(node_comparator);
