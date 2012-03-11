@@ -86,8 +86,6 @@ namespace yocto
             //------------------------------------------------------------------
             for( node_t *node = alphabet.head; node; node = node->next )
             {
-                node->bits = 0;
-                node->code = 0;
                 assert(NULL==node->left);
                 assert(NULL==node->right);
                 prio.__push(node);
@@ -103,12 +101,11 @@ namespace yocto
                 node_t *node  = &nodes[inode++];
                 node_t *left  = node->left  = prio.pop();
                 node_t *right = node->right = prio.pop();
-                
-                const size_t child_bits = node->bits+1;
+                std::cerr << "left.freq=" << left->freq << "/right.freq=" << right->freq << std::endl;
+                left->mask  = 0;
+                right->mask = 1;
                 left->parent  = right->parent = node;
                 node->freq    = left->freq + right->freq;
-                left->bits    = right->bits = child_bits;
-                left->code    = right->code = (node->code << 1);
                 right->code  |= 1;
                 prio.__push( node );
             }
@@ -117,6 +114,21 @@ namespace yocto
             // get the root
             //------------------------------------------------------------------
             root = prio.pop();
+            
+            //------------------------------------------------------------------
+            // build the codes
+            //------------------------------------------------------------------
+            for( node_t *node = alphabet.tail; node; node=node->prev )
+            {
+                node->bits = 0;
+                node->code = 0;
+                const node_t *up = node;
+                while ( up != root ) 
+                {
+                    node->code |=  up->mask << (node->bits++);
+                    up = up->parent;
+                }
+            }
             
         }
         
@@ -146,6 +158,7 @@ namespace yocto
                         
                         break;
                 }
+                os << " [@" << std::setw(6) << node->freq << "]";
                 os << " : " << std::setw(3) << node->bits << " : ";
                 for( size_t ibit = 0; ibit < node->bits; ++ibit )
                 {
@@ -166,15 +179,16 @@ namespace yocto
             {
                 ++(node->freq);
                 assert( alphabet.owns(node) );
+                alphabet.move_to_front(node);
             }
             else
             {
                 node->freq = 1;
-                alphabet.push_back(node);
+                alphabet.push_front(node);
             }
             build_tree();
         }
-
+        
         
     }
     
