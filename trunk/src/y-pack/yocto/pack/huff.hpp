@@ -68,8 +68,11 @@ namespace yocto
                 
                 void reset() throw();
                 void show( std::ostream & ) const;
-                void update( uint8_t C ) throw(); //!< mostly to debug
+                //void update( uint8_t C ) throw(); //!< mostly to debug
                 void graph( const string &filename ) const;
+                
+                void encode( ios::bitio &out, uint8_t C ); //!< emit and update
+                void flush( ios::bitio &out );             //!< send end and pad
                 
             protected:
                 heap_t       prio;

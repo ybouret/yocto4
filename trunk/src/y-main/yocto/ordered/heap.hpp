@@ -130,7 +130,7 @@ namespace yocto
                 //-- update heap
                 //--------------------------------------------------------------
                 cswap<slot_t>( data_[ipos], data_[mpos] );
-                mpos = ipos;
+                ipos = mpos;
             }
             return ans;
         }
