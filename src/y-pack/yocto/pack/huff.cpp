@@ -106,11 +106,9 @@ namespace yocto
                 node_t *node  = &nodes[inode++];
                 node_t *right = node->left  = prio.pop(); // first  smallest frequency 
                 node_t *left  = node->right = prio.pop(); // second smallest frequency
-                std::cerr << "right=" << std::setw(4) << (right->ch) << "@" << right->freq << std::endl;
-                std::cerr << "left =" << std::setw(4) << (left->ch)  << "@" << left->freq  << std::endl;
                 
-                left->cbit  = 0;
-                right->cbit = 1;
+                left->cbit  = 0; //!< code bit for left
+                right->cbit = 1; //!< code bit for right
                 left->parent  = right->parent = node;
                 node->freq    = left->freq + right->freq;
                 prio.__push( node );
@@ -142,9 +140,15 @@ namespace yocto
         void huffman:: tree:: show( std::ostream &os ) const
         {
             os << "----------------" << std::endl;
+            heap_t &Q  = (heap_t &)prio;
+            Q.free();
             for( const node_t *node = alphabet.head; node; node=node->next )
+                Q.push( (node_t*)node );
+            
+            while( Q.size() > 0 )
             {
-                const int C = node->ch;
+                node_t *node = Q.pop();
+                const int C  = node->ch;
                 switch( C )
                 {
                     case NYT:
@@ -227,30 +231,66 @@ namespace yocto
         }
         
         
-        void huffman:: tree:: update( uint8_t C ) throw()
+        void huffman:: tree:: encode( ios::bitio &out, uint8_t C )
         {
             node_t *node = &nodes[C];
-            if( node->freq > 0 )
+            if( node->freq <= 0 )
             {
-                ++(node->freq);
-                assert( alphabet.owns(node) );
-                alphabet.move_to_front(node);
+                //==============================================================
+                // got a new char
+                //==============================================================
+                node_t *nyt = &nodes[NYT_INDEX];
+                if( alphabet.size <= 1 )
+                {
+                    //----------------------------------------------------------
+                    //-- first char ever: register NYT
+                    //----------------------------------------------------------
+                    alphabet.push_back( nyt );
+                }
+                else 
+                {
+                    //----------------------------------------------------------
+                    //-- a new char : emit NYT
+                    //----------------------------------------------------------
+                    out.push<code_t>( nyt->code, nyt->bits );
+                }
+                
+                alphabet.push_front( node );
+                
+                // TODO: remove NYT when all chars are present
             }
             else
             {
-                node->freq = 1;
-                alphabet.push_front(node);
+                //==============================================================
+                // heuristics
+                //==============================================================
+                assert( alphabet.owns(node) );
+                alphabet.move_to_front( node );
             }
+            
+            //==================================================================
+            // update frequency
+            //==================================================================
+            ++(node->freq);
+            
+            //==================================================================
+            // emit current model
+            //==================================================================
+            out.push<code_t>(node->code,node->bits);
+            
+            //==================================================================
+            // update model
+            //==================================================================
             build_tree();
+            
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        //
-        //
-        //
-        ////////////////////////////////////////////////////////////////////////
-        
-               
+        void huffman:: tree:: flush( ios::bitio &out )
+        {
+            node_t *end = &nodes[END_INDEX];
+            out.push<code_t>( end->code, end->bits );
+            while( out.size() & 7 ) out.push( false );
+        }
         
         
     }
