@@ -22,6 +22,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
             huff.update( line[i] );
         line.clear();
         huff.show( std::cerr );
+        huff.graph( "huff.viz" );
     }
     
 }

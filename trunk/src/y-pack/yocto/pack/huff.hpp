@@ -3,6 +3,7 @@
 
 #include "yocto/ordered/heap.hpp"
 #include "yocto/core/list.hpp"
+#include "yocto/string.hpp"
 
 #include <iosfwd>
 
@@ -67,7 +68,7 @@ namespace yocto
                 void reset() throw();
                 void show( std::ostream & ) const;
                 void update( uint8_t C ) throw();
-                
+                void graph( const string &filename ) const;
                 
             private:
                 heap_t       prio;

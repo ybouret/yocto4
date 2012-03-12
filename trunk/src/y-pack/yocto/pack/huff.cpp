@@ -1,6 +1,9 @@
 #include "yocto/pack/huff.hpp"
+
+
 #include <iostream>
 #include <iomanip>
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {
@@ -45,8 +48,10 @@ namespace yocto
             // prepare future internal nodes
             //------------------------------------------------------------------
             for( size_t i=ALPHA_MAX;i<count;++i )
+            {
                 nodes[i].ch = FWD;
-            
+                nodes[i].ch = i;
+            }
             //------------------------------------------------------------------
             // prepare future leaves
             //------------------------------------------------------------------
@@ -67,7 +72,7 @@ namespace yocto
             //------------------------------------------------------------------
             // initial alphabet
             //------------------------------------------------------------------
-            alphabet.push_back( &nodes[NYT_INDEX] );
+            //alphabet.push_back( &nodes[NYT_INDEX] );
             alphabet.push_back( &nodes[END_INDEX] );
             
             //------------------------------------------------------------------
@@ -99,9 +104,9 @@ namespace yocto
             {
                 assert(inode<COUNT_MAX);
                 node_t *node  = &nodes[inode++];
-                node_t *left  = node->left  = prio.pop();
                 node_t *right = node->right = prio.pop();
-                std::cerr << "left.freq=" << left->freq << "/right.freq=" << right->freq << std::endl;
+                node_t *left  = node->left  = prio.pop();
+                //std::cerr << "left.freq=" << left->freq << "/right.freq=" << right->freq << std::endl;
                 left->mask  = 0;
                 right->mask = 1;
                 left->parent  = right->parent = node;
@@ -171,6 +176,54 @@ namespace yocto
                 os << std::endl;
             }
         }
+        
+        static inline void __out( const huffman::node_t *node, ios::ostream &fp )
+        {
+            assert( node );
+            const int C = node->ch;
+            switch( C )
+            {
+                case huffman::NYT:
+                    fp("\"NYT\"");
+                    break;
+                    
+                case huffman::END:
+                    fp("\"END\"");
+                    break;
+                default:
+                    if( C >= 32 && C < 127 )
+                        fp("\"'%c'\"",C);
+                    else 
+                        fp("\"%3d\"",C);
+                    break;
+            }
+        }
+        
+        static inline void __graph( const huffman::node_t *node, ios::ostream &fp )
+        {
+            assert(node);
+            if(node->left)
+            {
+                __out(node,fp); fp(" -> "); __out(node->left,fp); fp(";\n");
+                __graph(node->left,fp);
+            }
+            if(node->right)
+            {
+                __out(node,fp); fp(" -> "); __out(node->right,fp); fp(";\n");
+                __graph(node->right,fp);
+            }
+                
+        }
+        
+        void huffman:: tree:: graph( const string &filename ) const
+        {
+            ios::ocstream fp( filename, false );
+            
+            fp("digraph G {\n");
+            __graph(root,fp);
+            fp("}\n");
+        }
+        
         
         void huffman:: tree:: update( uint8_t C ) throw()
         {
