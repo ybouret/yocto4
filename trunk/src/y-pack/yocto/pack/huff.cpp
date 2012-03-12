@@ -104,14 +104,15 @@ namespace yocto
             {
                 assert(inode<COUNT_MAX);
                 node_t *node  = &nodes[inode++];
-                node_t *right = node->right = prio.pop();
-                node_t *left  = node->left  = prio.pop();
-                //std::cerr << "left.freq=" << left->freq << "/right.freq=" << right->freq << std::endl;
-                left->mask  = 0;
-                right->mask = 1;
+                node_t *right = node->left  = prio.pop(); // first  smallest frequency 
+                node_t *left  = node->right = prio.pop(); // second smallest frequency
+                std::cerr << "right=" << std::setw(4) << (right->ch) << "@" << right->freq << std::endl;
+                std::cerr << "left =" << std::setw(4) << (left->ch)  << "@" << left->freq  << std::endl;
+                
+                left->cbit  = 0;
+                right->cbit = 1;
                 left->parent  = right->parent = node;
                 node->freq    = left->freq + right->freq;
-                right->code  |= 1;
                 prio.__push( node );
             }
             
@@ -130,7 +131,8 @@ namespace yocto
                 const node_t *up = node;
                 while ( up != root ) 
                 {
-                    node->code |=  up->mask << (node->bits++);
+                    const code_t part = (up->cbit << (node->bits++));
+                    node->code |=  part;
                     up = up->parent;
                 }
             }
@@ -165,9 +167,9 @@ namespace yocto
                 }
                 os << " [@" << std::setw(6) << node->freq << "]";
                 os << " : " << std::setw(3) << node->bits << " : ";
-                for( size_t ibit = 0; ibit < node->bits; ++ibit )
+                for( size_t ibit = 1; ibit <= node->bits; ++ibit )
                 {
-                    if( 0 != ( node->code & ( 1 << (ibit) ) ) )
+                    if( 0 != ( node->code & ( 1 << (node->bits-ibit) ) ) )
                         os << "1";
                     else 
                         os << "0";
@@ -212,7 +214,7 @@ namespace yocto
                 __out(node,fp); fp(" -> "); __out(node->right,fp); fp(";\n");
                 __graph(node->right,fp);
             }
-                
+            
         }
         
         void huffman:: tree:: graph( const string &filename ) const
@@ -241,6 +243,14 @@ namespace yocto
             }
             build_tree();
         }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        //
+        //
+        ////////////////////////////////////////////////////////////////////////
+        
+               
         
         
     }
