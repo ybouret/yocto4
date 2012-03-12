@@ -4,6 +4,7 @@
 #include "yocto/ordered/heap.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/string.hpp"
+#include "yocto/ios/bitio.hpp"
 
 #include <iosfwd>
 
@@ -39,7 +40,7 @@ namespace yocto
                 size_t   bits;   //!< #bits in code
                 code_t   code;   //!<  code
                 int      ch;     //!< character
-                code_t   mask;   //!< partial mask
+                code_t   cbit;   //!< coding bit
             };
             
             class node_comparator
@@ -67,10 +68,10 @@ namespace yocto
                 
                 void reset() throw();
                 void show( std::ostream & ) const;
-                void update( uint8_t C ) throw();
+                void update( uint8_t C ) throw(); //!< mostly to debug
                 void graph( const string &filename ) const;
                 
-            private:
+            protected:
                 heap_t       prio;
                 node_t      *root;
                 size_t       count;    //!< #nodes
@@ -81,6 +82,8 @@ namespace yocto
                 void initialize() throw(); //!< assign initial frequencies and codes
                 void build_tree() throw(); //!< build the tree
             };
+            
+                      
             
         };
         
