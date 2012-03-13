@@ -161,7 +161,7 @@ namespace yocto
                         
                     default:
                         assert( node->ch >=0 );
-                        assert( node->ch < ALPHA_NUM );
+                        assert( node->ch < int(ALPHA_NUM) );
                         if( C >= 32 && C < 127 )
                             os << "'" << char(C) << "'";
                         else 
@@ -298,6 +298,44 @@ namespace yocto
             assert( handle != NULL );
             assert( root   != NULL );
             *handle = root;
+        }
+        
+        
+        huffman::decode_status huffman:: tree:: decode( void **handle, ios::bitio &in, uint8_t &C ) throw()
+        {
+            assert(handle);
+            assert(*handle!=NULL);
+            node_t *curr = (node_t*)(*handle);
+            if( alphabet.size <= 1 )
+            {
+                assert(root==curr);
+                //==============================================================
+                // wait for the first bye
+                //==============================================================
+                if( in.size() < 8 )
+                    return decode_pending;
+                else
+                {
+                    C = in.pop_full<uint8_t>();
+                    alphabet.push_back( &nodes[NYT_INDEX] );
+                    node_t *node = &nodes[C];
+                    assert(0==node->freq);
+                    alphabet.push_front( node );
+                    node->freq++;
+                    build_tree();
+                    return decode_success;
+                }
+            }
+            else 
+            {
+                //==============================================================
+                // walk down the tree
+                //==============================================================
+                assert( NULL != curr->left && NULL != curr->right );
+                
+            }
+            
+            return decode_pending;
         }
 
         

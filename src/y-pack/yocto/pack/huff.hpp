@@ -21,13 +21,12 @@ namespace yocto
             static const size_t COUNT_MAX = 2*ALPHA_MAX;
             static const int    NYT       = -1;            //!< tag for NYT
             static const int    END       = -2;            //!< tag for END 
-            static const int    FWD       = -3;            //!< tag for FWD
             static const size_t NYT_INDEX = ALPHA_NUM;
             static const size_t END_INDEX = NYT_INDEX+1;
             typedef size_t      freq_t;
             typedef uint32_t    code_t;
             
-          
+            
             
             struct node_t
             {
@@ -38,7 +37,7 @@ namespace yocto
                 node_t  *next;   //!< for alphabet
                 node_t  *prev;   //!< for alphabet
                 size_t   bits;   //!< #bits in code
-                code_t   code;   //!<  code
+                code_t   code;   //!< code
                 int      ch;     //!< character
                 code_t   cbit;   //!< coding bit
             };
@@ -46,8 +45,8 @@ namespace yocto
             class node_comparator
             {
             public:
-                explicit node_comparator() throw() {}
-                virtual ~node_comparator() throw() {}
+                inline  node_comparator() throw() {}
+                inline ~node_comparator() throw() {}
                 inline int operator()( const node_t &lhs, const node_t &rhs ) throw()
                 {
                     return lhs.freq < rhs.freq ? 1 : ( rhs.freq < lhs.freq ? -1 : 0 );
@@ -60,6 +59,13 @@ namespace yocto
             
             typedef core::list_of<node_t>        list_t;
             typedef heap<node_t,node_comparator> heap_t;
+            enum decode_status
+            {
+                decode_success,
+                decode_pending,
+                decode_flushed
+            };
+            
             class tree
             {
             public:
@@ -73,8 +79,8 @@ namespace yocto
                 void    encode( ios::bitio &out, uint8_t C ); //!< emit and update
                 void    flush( ios::bitio &out );             //!< send end and pad
                 
-                void    decode_start( void **handle ) throw();
-                
+                void          decode_start( void **handle ) throw();
+                decode_status decode( void **handle, ios::bitio &in, uint8_t &C ) throw();
                 
             protected:
                 heap_t       prio;     //!< priority queue
@@ -89,7 +95,7 @@ namespace yocto
                 void build_tree() throw(); //!< build the tree
             };
             
-                      
+            
             
         };
         
