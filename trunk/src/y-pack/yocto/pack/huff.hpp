@@ -72,7 +72,9 @@ namespace yocto
                 
                 void    encode( ios::bitio &out, uint8_t C ); //!< emit and update
                 void    flush( ios::bitio &out );             //!< send end and pad
-                node_t *decode( ios::bitio &in );
+                
+                void    decode_start( void **handle ) throw();
+                
                 
             protected:
                 heap_t       prio;     //!< priority queue
