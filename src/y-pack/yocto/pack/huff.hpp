@@ -35,8 +35,8 @@ namespace yocto
                 node_t  *left;   //!< has highest frequency
                 node_t  *right;  //!< has lowest  frequency
                 freq_t   freq;   //!< cumulative  frequency
-                node_t  *next;   //!< for pool/list
-                node_t  *prev;   //!< for pool/list
+                node_t  *next;   //!< for alphabet
+                node_t  *prev;   //!< for alphabet
                 size_t   bits;   //!< #bits in code
                 code_t   code;   //!<  code
                 int      ch;     //!< character
@@ -68,19 +68,20 @@ namespace yocto
                 
                 void reset() throw();
                 void show( std::ostream & ) const;
-                //void update( uint8_t C ) throw(); //!< mostly to debug
                 void graph( const string &filename ) const;
                 
-                void encode( ios::bitio &out, uint8_t C ); //!< emit and update
-                void flush( ios::bitio &out );             //!< send end and pad
+                void    encode( ios::bitio &out, uint8_t C ); //!< emit and update
+                void    flush( ios::bitio &out );             //!< send end and pad
+                node_t *decode( ios::bitio &in );
                 
             protected:
-                heap_t       prio;
-                node_t      *root;
-                size_t       count;    //!< #nodes
+                heap_t       prio;     //!< priority queue
+                node_t      *root;     //!< tree root
+                size_t       count;    //!< #nodes, for memory
                 node_t      *nodes;    //!< contiguous nodes
                 size_t       msize;    //!< memory occupied by nodes
-                list_t       alphabet;
+                list_t       alphabet; //!< currently active nodes
+                
                 YOCTO_DISABLE_COPY_AND_ASSIGN(tree);
                 void initialize() throw(); //!< assign initial frequencies and codes
                 void build_tree() throw(); //!< build the tree
