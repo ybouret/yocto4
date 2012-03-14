@@ -17,42 +17,21 @@ namespace yocto
             {
             public:
                 virtual ~rosenbrock() throw();
+                void     start( size_t nv );
+                
                 
             protected:
                 explicit rosenbrock();
                 lw_array<T> &g1, &g2, &g3, &g4, &dfdx,&err,&ysav,&dysav;
+                matrix<T>    dfdy;
+                matrix<T>    a;
                 linsys<T>    lss;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rosenbrock);
             };
 
-            template <typename T>
-            class rosenbrock_shampine : public rosenbrock<T>
-            {
-            public:
-                virtual ~rosenbrock_shampine() throw();
-                explicit rosenbrock_shampine();
-                                
-                typedef typename stiff_step<T>::equation equation;
-                typedef typename stiff_step<T>::jacobian jacobian;
-
-                virtual void operator()(array<T>       &y,
-                                        const array<T> &dydx,
-                                        T              &x,
-                                        T               htry,
-                                        T               eps,
-                                        array<T>       &yscal,
-                                        T              &hdid,
-                                        T              &hnext,
-                                        equation       &derivs,
-                                        jacobian       &jacobn
-                                        );
-
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(rosenbrock_shampine);
-            };
-            
+                     
         }
         
     }
