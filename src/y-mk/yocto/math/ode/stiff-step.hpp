@@ -28,14 +28,15 @@ namespace yocto
                                         T               htry,
                                         T               eps,
                                         array<T>       &yscal,
-                                        real_t         &hdid,
-                                        real_t         &hnext,
+                                        T              &hdid,
+                                        T              &hnext,
                                         equation       &derivs,
                                         jacobian       &jacobn
                                         );
+            protected:
+                explicit stiff_step( const size_t num );
                 
             private:
-                explicit stiff_step( const size_t num );
                 YOCTO_DISABLE_COPY_AND_ASSIGN(stiff_step);
             };
             
