@@ -1,10 +1,7 @@
-#ifndef YOCTO_ODE_STIFF_STEP_INCLUDED
-#define YOCTO_ODE_STIFF_STEP_INCLUDED 1
+#ifndef YOCTO_ODE_SHAMPINE_INCLUDED
+#define YOCTO_ODE_SHAMPINE_INCLUDED 1
 
-#include "yocto/math/ode/types.hpp"
-#include "yocto/sequence/lw-arrays.hpp"
-#include "yocto/math/kernel/matrix.hpp"
-
+#include "yocto/math/ode/rosenbrock.hpp"
 namespace yocto
 {
     namespace math
@@ -14,13 +11,14 @@ namespace yocto
         {
             
             template <typename T>
-            class stiff_step : public lw_arrays<T,memory_type>
+            class shampine : public rosenbrock<T>
             {
             public:
-                typedef typename field<T>::type          equation;
-                typedef typename field<T>::jacobian_type jacobian;
+                virtual ~shampine() throw();
+                explicit shampine();
                 
-                virtual ~stiff_step() throw();
+                typedef typename stiff_step<T>::equation equation;
+                typedef typename stiff_step<T>::jacobian jacobian;
                 
                 virtual void operator()(array<T>       &y,
                                         array<T>       &dydx,
@@ -32,19 +30,17 @@ namespace yocto
                                         T              &hnext,
                                         equation       &derivs,
                                         jacobian       &jacobn
-                                        ) = 0;
-            protected:
-                explicit stiff_step( const size_t num );
+                                        );
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(stiff_step);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(shampine);
             };
-            
+
         }
         
     }
+    
 }
-
 
 
 #endif
