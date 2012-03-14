@@ -30,10 +30,10 @@ namespace yocto
             }
             
             template <>
-            void rosenbrock<real_t>:: start( size_t nv )
+            void rosenbrock<real_t>:: prepare( size_t nv )
             {
                 assert(nv>0);
-                prepare(nv);
+                stiff_step<real_t>::prepare(nv);
                 dfdy.make(nv,nv);
                 a.make(nv,nv);
                 lss.ensure(nv);

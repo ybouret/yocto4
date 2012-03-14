@@ -17,7 +17,7 @@ namespace yocto
             {
             public:
                 virtual ~rosenbrock() throw();
-                void     start( size_t nv );
+                void     prepare( size_t nv );
                 
                 
             protected:
