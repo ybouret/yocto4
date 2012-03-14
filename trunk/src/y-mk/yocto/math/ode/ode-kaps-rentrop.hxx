@@ -1,0 +1,28 @@
+#define STIFF_STEP kaps_rentrop
+
+
+#define GAM 0.231
+#define A21 2.0
+#define A31 4.52470820736
+#define A32 4.16352878860 
+#define C21 -5.07167533877 
+#define C31 6.02015272865 
+#define C32 0.159750684673 
+#define C41 -1.856343618677 
+#define C42 -8.50538085819 
+#define C43 -2.08407513602 
+#define B1 3.95750374663 
+#define B2 4.62489238836 
+#define B3 0.617477263873 
+#define B4 1.282612945268 
+#define E1 -2.30215540292 
+#define E2 -3.07363448539 
+#define E3 0.873280801802 
+#define E4 1.282612945268 
+#define C1X GAM
+#define C2X -0.396296677520e-01 
+#define C3X 0.550778939579 
+#define C4X -0.553509845700e-01 
+#define A2X 0.462
+#define A3X 0.880208333333
+
