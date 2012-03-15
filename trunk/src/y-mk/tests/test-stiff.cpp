@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/ode/stiff-solver.hpp"
-#include "yocto/math/ode/shampine.hpp"
+#include "yocto/math/ode/stiff-drvrs.hpp"
+#include "yocto/math/ode/stiff-drvkr.hpp"
+
 #include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
@@ -44,33 +45,63 @@ namespace  {
     };
     
 }
+
+
+
 YOCTO_UNIT_TEST_IMPL(stiff)
 {
     problem eq;
-    ode::stiff_driver<Real,ode::shampine> drv;
-    
+       
     ode::field<Real>::type derivs( &eq, & problem::derivs );
     ode::field<Real>::diff jacobn( &eq, & problem::jacobn );
     
-    drv.start(3);
-    drv.eps = 1e-4;
-    Real h  = 2.9e-4;
+   
     vector<Real> y(3,0.0);
-    y[1] = 1;
-    y[2] = 1;
-    y[3] = 0;
+    
     
     Real dx = 0.01;
-    ios::ocstream fp("stiff.dat",false);
-    fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
-    for( size_t i=0; i < 1000; ++i )
+    
     {
-        Real x1 = i     * dx;
-        Real x2 = (i+1) * dx;
-        drv(derivs,jacobn,y,x1,x2,h);
-        fp("%g %g %g %g\n", x2, y[1], y[2], y[3] );
+        ode::stiff_drvrs<Real>::type drv;
+        drv.start(3);
+        drv.eps = 1e-4;
+        Real h  = 2.9e-4;
+        y[1] = 1;
+        y[2] = 1;
+        y[3] = 0;
+        
+        ios::ocstream fp("stiff-rs.dat",false);
+        fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
+        for( size_t i=0; i < 1000; ++i )
+        {
+            Real x1 = i     * dx;
+            Real x2 = (i+1) * dx;
+            drv(derivs,jacobn,y,x1,x2,h);
+            fp("%g %g %g %g\n", x2, y[1], y[2], y[3] );
+        }
     }
     
+    
+    {
+        ode::stiff_drvkr<Real>::type drv;
+        drv.start(3);
+        drv.eps = 1e-4;
+        Real h  = 2.9e-4;
+        y[1] = 1;
+        y[2] = 1;
+        y[3] = 0;
+        
+        ios::ocstream fp("stiff-kr.dat",false);
+        fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
+        for( size_t i=0; i < 1000; ++i )
+        {
+            Real x1 = i     * dx;
+            Real x2 = (i+1) * dx;
+            drv(derivs,jacobn,y,x1,x2,h);
+            fp("%g %g %g %g\n", x2, y[1], y[2], y[3] );
+        }
+    }
+
     
 }
 YOCTO_UNIT_TEST_DONE()
