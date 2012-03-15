@@ -183,7 +183,7 @@ namespace yocto
             }
         }
         
-        static inline void __out( const huffman::node_t *node, ios::ostream &fp )
+        static inline void __show( const huffman::node_t *node, ios::ostream &fp )
         {
             assert( node );
             const int C = node->ch;
@@ -210,12 +210,12 @@ namespace yocto
             assert(node);
             if(node->left)
             {
-                __out(node,fp); fp(" -> "); __out(node->left,fp); fp(";\n");
+                __show(node,fp); fp(" -> "); __show(node->left,fp); fp(";\n");
                 __graph(node->left,fp);
             }
             if(node->right)
             {
-                __out(node,fp); fp(" -> "); __out(node->right,fp); fp(";\n");
+                __show(node,fp); fp(" -> "); __show(node->right,fp); fp(";\n");
                 __graph(node->right,fp);
             }
             
