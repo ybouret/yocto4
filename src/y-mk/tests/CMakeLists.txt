@@ -17,5 +17,6 @@ ADD_TEST(ODE      test-mk ode)
 ADD_TEST(LSF      test-mk lsf)
 ADD_TEST(LSF2     test-mk lsf2)
 ADD_TEST(Cholesky test-mk cholesky)
+ADD_TEST(Stiff    test-mk stiff)
 
 ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
