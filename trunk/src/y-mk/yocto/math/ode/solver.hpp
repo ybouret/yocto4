@@ -2,6 +2,7 @@
 #define YOCTO_MATH_ODE_SOLVER_INCLUDED 1
 
 #include "yocto/math/ode/control.hpp"
+#include "yocto/math/ode/solver-data.hpp"
 
 namespace yocto
 {
@@ -13,7 +14,7 @@ namespace yocto
 		{
 			
 			template <typename T>
-			class solver : public lw_arrays<T,memory_type>
+			class solver : public solver_data<T>
 			{
 			public:
 				typedef typename field<T>::type equation;
@@ -29,13 +30,10 @@ namespace yocto
 								T          &h1
 								);
 				
-				T hmin; //!< initial=0
-				T eps;  //!< initial=ftol
-				T TINY; //!< initial=1e-30, for yscal
+				
 				
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(solver);
-				lw_array<T> &y, &dydx, &yscal;
 			};
 			
 			
