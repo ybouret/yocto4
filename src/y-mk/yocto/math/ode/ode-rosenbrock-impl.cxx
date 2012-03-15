@@ -34,6 +34,7 @@ namespace yocto
                 static const real_t SHRNK  = 0.5;
                 static const real_t PSHRNK = (-1.0/3.0);
                 static const real_t ERRCON = Pow( GROW/SAFETY, (1/PGROW) );
+                //std::cerr << "ERRCON = " << ERRCON << std::endl;
                 
                 const size_t n = y.size();
                 assert( n > 0 );
@@ -45,12 +46,19 @@ namespace yocto
                 assert( n == a.rows );
                 assert( n == a.cols );
                 
+                //==============================================================
+                // Saving data
+                //==============================================================
                 real_t xsav = x;
                 for(size_t i=1;i<=n;i++) 
                 { 
-                    ysav[i]=y[i];
-                    dysav[i]=dydx[i]; 
+                    ysav[i]  =    y[i];
+                    dysav[i] = dydx[i]; 
                 }
+                
+                //==============================================================
+                // initial jacobian
+                //==============================================================
                 jacobn( dfdx,dfdy, xsav, ysav );
                 real_t h = htry;
                 for( size_t jtry=1;; ++jtry )
@@ -59,7 +67,7 @@ namespace yocto
                     for( size_t i=1;i<=n;++i)
                     {
                         for( size_t j=1; j <= n; ++j )
-                            a[i][j] = - dfdy[i][j];
+                            a[i][j] = -dfdy[i][j];
                         a[i][i] += __diag;
                     }
                     
@@ -105,17 +113,21 @@ namespace yocto
                     real_t errmax=0;
                     for(size_t i=1;i<=n;i++) 
                         errmax=max_of<real_t>(errmax,Fabs(err[i]/yscal[i]));
+                    //std::cerr << "errmax=" << errmax << std::endl;
                     errmax /= eps;
+                    //std::cerr << "errmax=" << errmax << std::endl;
                     if (errmax <= 1.0)
                     {
                         hdid  = h;
                         hnext = (errmax > ERRCON ? SAFETY*h*Pow(errmax,PGROW) : GROW*h);
+                        return;
                     }
                     else 
                     {
-                        hnext=SAFETY*h*pow(errmax,PSHRNK);
+                        hnext=SAFETY*h*Pow(errmax,PSHRNK);
                         h=(h >= 0.0 ? max_of<real_t>(hnext,SHRNK*h) : min_of<real_t>(hnext,SHRNK*h));
                     }
+                    //if( jtry >= 10 ) exit(1);
                 }
                 
             }

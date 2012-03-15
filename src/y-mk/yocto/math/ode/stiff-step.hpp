@@ -17,8 +17,8 @@ namespace yocto
             class stiff_step : public lw_arrays<T,memory_type>
             {
             public:
-                typedef typename field<T>::type          equation;
-                typedef typename field<T>::jacobian_type jacobian;
+                typedef typename field<T>::type  equation;
+                typedef typename field<T>::diff  jacobian;
                 
                 virtual ~stiff_step() throw();
                 

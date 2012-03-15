@@ -58,7 +58,7 @@ namespace yocto
 					//----------------------------------------------------------
 					derivs( dydx, x, y );
 					for( size_t i=n; i>0; --i )
-						yscal[i] = Fabs(y[i]) + Fabs( h * dydx[i] ) + _TINY;
+						yscal[i] = Fabs(y[i]) +  Fabs( h * dydx[i] )  + _TINY;
 					
 					//----------------------------------------------------------
 					// check no overshooting
@@ -90,7 +90,7 @@ namespace yocto
 					// check if not too small
 					//----------------------------------------------------------
 					if( Fabs(h_next) < Fabs(hmin) )
-						throw exception( "h=%g<hmin=%g in ode::solver", h, hmin );
+						throw exception( "h=%g<hmin=%g in ode::stiff_solver", h, hmin );
 					
 					h=h_next;
 				}

@@ -22,7 +22,7 @@ namespace yocto
 				typedef functor<void,TL3(array<T>&,T,const array<T>&)> type;
                 
                 //! jacobn( dfdx[], dfdy[][], x, y[] );
-				typedef functor<void,TL4(array<T> &, matrix<T> &, T, const array<T>&)> jacobian_type;
+				typedef functor<void,TL4(array<T> &, matrix<T> &, T, const array<T>&)> diff;
 			};
 			
 		}
