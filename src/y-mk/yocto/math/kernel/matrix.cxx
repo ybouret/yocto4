@@ -280,10 +280,11 @@ namespace yocto
 		template <>
 		void matrix<z_type>:: ld1() throw()
 		{
+			static const z_type __one(1);
 			memset(ptr_,0,len_);
 			for( size_t i = min_of<size_t>( rows, cols ); i>0; --i )
 			{
-				row_[i][i] = 1;
+				row_[i][i] = __one;
 			}
 		}
 		
