@@ -2,7 +2,7 @@
 
 
 #define GAM (1.0/2.0)
-#define A21 2.0
+#define A21 REAL(2.0)
 #define A31 (48.0/25.0) 
 #define A32 (6.0/25.0) 
 #define C21 -8.0
