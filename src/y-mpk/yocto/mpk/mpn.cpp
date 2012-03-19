@@ -231,7 +231,6 @@ namespace yocto
 		{
 			assert( !(buffer==NULL && buflen>0) );
 			const uint8_t *from = (const uint8_t *)buffer;
-			//#			define YMPK_FROM(J) byte_[J] = from[J]
 			YOCTO_LOOP_FUNC(size_,YMPK_FROM,0);
 			update();
 			
