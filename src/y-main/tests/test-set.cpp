@@ -83,7 +83,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(set)
 {
 	
-	test_set<int,key_hasher<int,hashing::bjh32>,memory::global::allocator>();
+	test_set<int,key_hasher<int,hashing::sfh>,memory::global::allocator>();
 	test_set<string,key_hasher<string,hashing::elf>,memory::global::allocator>();
 	test_set<const string,key_hasher<string,hashing::sha1>,memory::pooled::allocator>();
 	

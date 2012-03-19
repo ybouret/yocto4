@@ -3,7 +3,7 @@
 #ifndef YOCTO_KEY_HASHER_INCLUDED
 #define YOCTO_KEY_HASHER_INCLUDED 1
 
-#include "yocto/hashing/bjh32.hpp"
+#include "yocto/hashing/sfh.hpp"
 #include "yocto/type-traits.hpp"
 #include "yocto/code/class-conversion.hpp"
 
@@ -12,7 +12,7 @@ namespace yocto
 	
 	template <
 	typename T,
-	typename HASHING_FUNCTION = hashing::bjh32
+	typename HASHING_FUNCTION = hashing::sfh
 	>
 	class key_hasher
 	{
