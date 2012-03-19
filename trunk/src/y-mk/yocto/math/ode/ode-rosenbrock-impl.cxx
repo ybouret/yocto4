@@ -28,13 +28,12 @@ namespace yocto
                                                  equation            &derivs,
                                                  jacobian            &jacobn)
             {
-                static const real_t SAFETY = 0.9;
-                static const real_t GROW   = 1.5;
-                static const real_t PGROW  = -0.25;
-                static const real_t SHRNK  = 0.5;
-                static const real_t PSHRNK = (-1.0/3.0);
-                static const real_t ERRCON = Pow( GROW/SAFETY, (1/PGROW) );
-                //std::cerr << "ERRCON = " << ERRCON << std::endl;
+                static const real_t SAFETY = REAL(0.9);
+                static const real_t GROW   = REAL(1.5);
+                static const real_t PGROW  = REAL(-0.25);
+                static const real_t SHRNK  = REAL(0.5);
+                static const real_t PSHRNK = REAL(-1.0)/REAL(3.0);
+                static const real_t ERRCON = Pow( GROW/SAFETY, (REAL(1.0)/PGROW) );
                 
                 const size_t n = y.size();
                 assert( n > 0 );
@@ -63,7 +62,7 @@ namespace yocto
                 real_t h = htry;
                 for( size_t jtry=1;; ++jtry )
                 {
-                    const real_t __diag = 1.0/(GAM*h);
+                    const real_t __diag = REAL(1.0)/(GAM*h);
                     for( size_t i=1;i<=n;++i)
                     {
                         for( size_t j=1; j <= n; ++j )
@@ -102,8 +101,8 @@ namespace yocto
                     
                     for( size_t i=1; i <= n; ++i )
                     {
-                        y[i]=ysav[i]+B1*g1[i]+B2*g2[i]+B3*g3[i]+B4*g4[i];
-                        err[i]=E1*g1[i]+E2*g2[i]+E3*g3[i]+E4*g4[i];
+                        y[i]  = ysav[i]+B1*g1[i]+B2*g2[i]+B3*g3[i]+B4*g4[i];
+                        err[i]= E1*g1[i]+E2*g2[i]+E3*g3[i]+E4*g4[i];
                     }
                     
                     x=xsav+h;
@@ -113,10 +112,8 @@ namespace yocto
                     real_t errmax=0;
                     for(size_t i=1;i<=n;i++) 
                         errmax=max_of<real_t>(errmax,Fabs(err[i]/yscal[i]));
-                    //std::cerr << "errmax=" << errmax << std::endl;
                     errmax /= eps;
-                    //std::cerr << "errmax=" << errmax << std::endl;
-                    if (errmax <= 1.0)
+                    if (errmax <= REAL(1.0))
                     {
                         hdid  = h;
                         hnext = (errmax > ERRCON ? SAFETY*h*Pow(errmax,PGROW) : GROW*h);
@@ -125,7 +122,7 @@ namespace yocto
                     else 
                     {
                         hnext=SAFETY*h*Pow(errmax,PSHRNK);
-                        h=(h >= 0.0 ? max_of<real_t>(hnext,SHRNK*h) : min_of<real_t>(hnext,SHRNK*h));
+                        h=(h >= REAL(0.0) ? max_of<real_t>(hnext,SHRNK*h) : min_of<real_t>(hnext,SHRNK*h));
                     }
                     //if( jtry >= 10 ) exit(1);
                 }
