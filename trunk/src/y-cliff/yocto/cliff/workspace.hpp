@@ -145,11 +145,11 @@ namespace yocto
 					U             *id  = (U *           ) &inv_d;
 					U             *id2 = (U *           ) &inv_dsq;
 					const  unit_t *w   = (const unit_t *) &(this->width);
-					const U       *L   = (const U *     ) &(region.length);
+					const U       *l   = (const U *     ) &(region.length);
 					workspace_base::check_widths(w,DIMENSIONS);
 					for( size_t i=0; i < DIMENSIONS; ++i )
 					{
-						const U del = (d[i]  = L[i] / ( w[i]-1));
+						const U del = (d[i]  = l[i] / ( w[i]-1));
 						id[i]  = U(1)/del;
 						id2[i] = U(1)/(del*del); 
 					}

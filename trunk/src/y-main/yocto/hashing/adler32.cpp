@@ -29,7 +29,7 @@ namespace yocto
 			uint32_t       s1  =  a & 0xffff;
 			uint32_t       s2  = (a >> 16) & 0xffff;
 			size_t         n   = 0;
-			for(; n < length; ++n) 
+			for(; n < buflen; ++n) 
 			{
 				s1 = (s1 + buf[n]) % BASE;
 				s2 = (s2 + s1)     % BASE;
