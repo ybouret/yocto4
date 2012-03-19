@@ -27,7 +27,7 @@ namespace yocto
 			assert( !(buffer==NULL&&buflen>0) );
 			const uint8_t   *key   = (const uint8_t *)buffer;
 			
-			YOCTO_LOOP(length,
+			YOCTO_LOOP(buflen,
 					   hash += *(key++);
 					   hash += ( (hash) << 10);
 					   hash ^= ( (hash) >> 6 ) );

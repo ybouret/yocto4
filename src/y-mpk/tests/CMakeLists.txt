@@ -8,7 +8,6 @@ ADD_TEST(Memory  test-mpk mem)
 ADD_TEST(Natural test-mpk natural)
 ADD_TEST(Primes  test-mpk primes)
 ADD_TEST(RSA0    test-mpk rsa0)
-ADD_TEST(RSA1    test-mpk rsa1)
 ADD_TEST(BitIO   test-mpk bitio)
 
 ADD_CUSTOM_TARGET(check-mpk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mpk)
