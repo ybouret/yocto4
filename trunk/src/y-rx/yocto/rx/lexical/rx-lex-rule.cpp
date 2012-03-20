@@ -20,7 +20,8 @@ namespace yocto
             rule:: rule( const rule &r ) :
             next(NULL),
             prev(NULL),
-            motif( r.motif->clone() )            {
+            motif( r.motif->clone() )           
+            {
             }
             
             
@@ -47,6 +48,15 @@ namespace yocto
                 action_( *motif );
             }
             
+            rule * make::create( pattern *p, const action &a )
+            {
+                try {
+                    return new make(p,a);
+                } catch (...) {
+                    delete p;
+                    throw;
+                }
+            }
             
         }
     }

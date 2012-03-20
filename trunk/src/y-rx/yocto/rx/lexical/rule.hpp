@@ -20,7 +20,7 @@ namespace yocto
             public:
                 rule             *next;
                 rule             *prev;
-                auto_ptr<pattern> motif;
+                pattern          *motif;
                 
                 virtual rule *clone() const = 0;
                 virtual void  apply() = 0;
@@ -34,16 +34,18 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(rule);
             };
             
+            typedef core::meta_list<rule> rules;
+            
             class make : public rule
             {
             public:
-                explicit make( pattern *p, const action &a);
                 virtual ~make() throw();
-                
+                static  rule *create( pattern *p, const action &a );
                 virtual rule *clone() const;
                 virtual void  apply();
                 
             private:
+                explicit make( pattern *p, const action &a);
                 action action_;
                 make( const make & );
                 YOCTO_DISABLE_ASSIGN(make);
