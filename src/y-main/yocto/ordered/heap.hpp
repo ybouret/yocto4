@@ -19,6 +19,7 @@ namespace yocto
         extern const char heap_name[];
     }
     
+    //! heap of pointer to already existing objects
     template <
 	typename T,
 	typename COMPARATOR = comparator<T>,
