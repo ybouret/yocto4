@@ -28,8 +28,8 @@ namespace yocto
 		public:
 			const uint32_t type; //!< pattern class identifier
 			void          *data; //!< pattern special data address
-			pattern       *next; //!< for the list
-			pattern       *prev; //!< for the list
+			pattern       *next; //!< for a pattern list
+			pattern       *prev; //!< for a pattern list
 			
 			virtual ~pattern() throw();
 			virtual pattern *clone() const = 0;        //!< virtual copy constructor

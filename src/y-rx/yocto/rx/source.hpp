@@ -16,15 +16,31 @@ namespace yocto
 			explicit source( ios::istream &input ) throw();
 			virtual ~source() throw();
 						
-						
+			//! read a new t_char, NULL on end of source.			
 			t_char       *get(); 
+            
+            //! unread a previously read t_char.
 			void          unget( t_char * ) throw();
+            
+            //! unread a previously read token.
 			void          unget( token &  ) throw();
+            
+            //! unread a copy a a previouslyu read token.
 			void          uncpy( const token & );
-			const t_char *peek(); //! try to fill cache and return cache head.
+            
+            //! try to fill cache and return cache head.
+			const t_char *peek(); 
+            
+            //! true is more t_char available
 			bool          is_active();
+            
+            //! try to fill cache with n t_char
 			void          prefetch(size_t n);
+            
+            //! cache size
 			size_t        in_cache() const throw();
+            
+            //! skip n >= in_cache
 			void          skip(size_t n) throw();//!< n <= in_cache()
 			
 		private:
