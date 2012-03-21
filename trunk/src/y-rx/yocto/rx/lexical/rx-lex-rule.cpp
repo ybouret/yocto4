@@ -25,6 +25,9 @@ namespace yocto
             }
             
             
+            make:: ~make() throw()
+            {
+            }
             
             make:: make( pattern *p, const action &a ) :
             rule( p ),
