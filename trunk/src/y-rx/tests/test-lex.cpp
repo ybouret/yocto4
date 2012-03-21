@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(lex)
 {
     
     MyLexer Lex;
-   
+    Lex.reset();
     
     ios::icstream fp( ios::cstdin );
     regex::source src( fp );
