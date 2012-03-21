@@ -11,17 +11,25 @@ namespace yocto
             
         }
         
-        sub_lexer:: sub_lexer( const string &id ) :
+        sub_lexer:: sub_lexer( const string &id, lexer *lx) :
         name( id ),
-        rules_()
+        rules_(),
+        parent( lx )
         {
         }
         
-        sub_lexer:: sub_lexer( const char *id ) :
+        sub_lexer:: sub_lexer( const char *id, lexer *lx ) :
         name( id ),
-        rules_()
+        rules_(),
+        parent( lx )
         {
         }
+        
+        void sub_lexer:: attach( lexer *lx ) throw()
+        {
+            parent = lx;
+        }
+
         
         const string & sub_lexer:: key() const throw() { return name; }
         

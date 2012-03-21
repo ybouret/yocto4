@@ -10,6 +10,7 @@ namespace yocto
     namespace regex
     {
         
+        class lexer;
         namespace lexical
         {
             
@@ -40,7 +41,9 @@ namespace yocto
             {
             public:
                 virtual ~make() throw();
+              
                 static  rule *create( pattern *p, const action &a );
+               
                 virtual rule *clone() const;
                 virtual void  apply();
                 
@@ -50,6 +53,69 @@ namespace yocto
                 make( const make & );
                 YOCTO_DISABLE_ASSIGN(make);
             };
+            
+            class jump : public rule
+            {
+            public:
+                virtual ~jump() throw();
+                
+                static  rule *create( pattern *p, const action &a, lexer **ppLx, const string &name );
+                
+                virtual rule *clone() const;
+                virtual void  apply(); 
+                
+                
+            private:
+                explicit jump( pattern *p, const action &a, lexer **ppLx, const string &name );
+                jump( const jump & );
+                action        on_enter;
+                lexer       **pp_lexer;
+                const string &sub_name;
+                
+                YOCTO_DISABLE_ASSIGN(jump);
+            };
+            
+            
+            class call : public rule
+            {
+            public:
+                virtual ~call() throw();
+                
+                static  rule *create( pattern *p, const action &a, lexer **ppLx, const string &name );
+                
+                virtual rule *clone() const;
+                virtual void  apply(); 
+                
+                
+            private:
+                explicit call( pattern *p, const action &a, lexer **ppLx, const string &name );
+                call( const call & );
+                action        on_enter;
+                lexer       **pp_lexer;
+                const string &sub_name;
+                
+                YOCTO_DISABLE_ASSIGN(call);
+            };
+            
+            class back : public rule
+            {
+            public:
+                virtual ~back() throw();
+                
+                static  rule *create( pattern *p, const action &a, lexer **ppLx);
+            
+                virtual rule *clone() const;
+                virtual void  apply(); 
+                
+            private:
+                explicit back( pattern *p, const action &a, lexer **ppLx );
+                back( const back & );
+                action  on_leave;
+                lexer **pp_lexer;
+                YOCTO_DISABLE_ASSIGN(back);
+            };
+
+            
             
         }
         
