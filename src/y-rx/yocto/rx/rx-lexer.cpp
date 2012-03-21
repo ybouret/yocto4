@@ -34,6 +34,13 @@ init( active )
                 (*i)->reset();
             }
             active = init;
+            call_stack.free();
+        }
+        
+        sub_lexer & lexer:: main() throw()
+        {
+            assert( init != NULL );
+            return *init;
         }
         
         sub_lexer & lexer:: declare( const string &name )
