@@ -22,10 +22,19 @@ namespace
             const callback   __show( this, & MyLexer::show );
             const callback   __endl( this, & MyLexer::endl );
             const callback   __drop( this, & MyLexer::discard);
+            const callback   __comment( this, & MyLexer::ini_comment );
+            
             lex.make( "[:digit:]+",  __show );
             lex.make( "[:digit:]+f", __show );
             lex.make( "[:endl:]",    __endl );
+            lex.call( "comment", "//", __comment );
             lex.make( ".",           __drop );
+            
+            regex::sub_lexer &com = declare( "comment" );
+            
+            com.back( "[:endl:]", __endl );
+            com.make( ".",        __drop );
+            
             
         }
         
@@ -44,6 +53,13 @@ namespace
         {
             std::cerr << "[#" << iline++ << "]" << std::endl;
         }
+        
+        void ini_comment( const regex::token & )
+        {
+            std::cerr << "[COMMENT]" << std::endl;
+        }
+        
+        
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MyLexer);

@@ -30,7 +30,9 @@ namespace yocto
             void call( const string &name );
             void back();
             
-        
+            //! run until end of source
+            void run( source &src );
+            
             
         private:
             typedef set<string,sublex> sublex_set;

@@ -10,17 +10,19 @@ namespace yocto
         {
             rules_.push_back( lexical::jump::create(p,a,&parent,name) );
         }
-
+        
         void sub_lexer:: jump(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict )
         {
-            rules_.push_back( lexical::jump::create( compile(expr,dict),a,&parent,name) );
+            pattern *p = compile(expr,dict);
+            this->jump( name, p, a );
         }
-
-
+        
+        
         void sub_lexer::jump(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict )
         {
-            const string __name(name);
-            rules_.push_back( lexical::jump::create( compile(expr,dict),a,&parent,__name) );
+            const string   n(name);
+            pattern     *  p = compile(expr,dict);
+            this->jump( n, p, a );
         }
         
         
@@ -31,16 +33,18 @@ namespace yocto
         
         void sub_lexer:: call(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict )
         {
-            rules_.push_back( lexical::call::create( compile(expr,dict),a,&parent,name) );
+            pattern     *  p = compile(expr,dict);
+            this->call( name, p, a );
         }
         
         
         void sub_lexer::call(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict )
         {
-            const string __name(name);
-            rules_.push_back( lexical::call::create( compile(expr,dict),a,&parent,__name) );
+            const string   n(name);
+            pattern     *  p = compile(expr,dict);
+            this->call( n, p, a );
         }
-
+        
         //======================================================================
         // back API
         //======================================================================
@@ -60,9 +64,9 @@ namespace yocto
             pattern *p = compile(expr,dict);
             this->back( p, a );
         }
-
+        
         
     }
-
+    
 }
 
