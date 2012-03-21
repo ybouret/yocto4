@@ -17,15 +17,20 @@ namespace yocto
             explicit lexer( const char   *init_id);
             virtual ~lexer() throw();
             
+            sub_lexer & main() throw();
             sub_lexer & declare( const string & );
             sub_lexer & declare( const char   * );
-            void        reset() throw();
+        
+            virtual void reset() throw();
+            
             sub_lexer & operator[]( const string & );
             sub_lexer & operator[]( const char   * );
             
             void jump( const string &name );
             void call( const string &name );
             void back();
+            
+        
             
         private:
             typedef set<string,sublex> sublex_set;
