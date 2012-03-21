@@ -4,6 +4,7 @@
 #include "yocto/rx/lexical/sub-lexer.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"
+#include "yocto/hashing/elf.hpp"
 
 namespace yocto 
 {
@@ -35,7 +36,7 @@ namespace yocto
             
             
         private:
-            typedef set<string,sublex> sublex_set;
+            typedef set<string,sublex,key_hasher<string,hashing::elf> > sublex_set;
             typedef sub_lexer         *lxptr;
             typedef list<lxptr>        lxptr_stack;
             

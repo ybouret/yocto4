@@ -1,6 +1,7 @@
 #include "yocto/rx/lexer.hpp"
 #include "yocto/exception.hpp"
 
+
 namespace yocto 
 {
     
@@ -87,7 +88,7 @@ init( active )
             call_stack.push_back( active );
             active = &(**ppLx);
         }
-
+        
         void lexer:: back()
         {
             assert( NULL != active );

@@ -70,7 +70,7 @@ namespace yocto
                 jump( const jump & );
                 action        on_enter;
                 lexer       **pp_lexer;
-                const string &sub_name;
+                const string  sub_name;
                 
                 YOCTO_DISABLE_ASSIGN(jump);
             };
@@ -92,7 +92,7 @@ namespace yocto
                 call( const call & );
                 action        on_enter;
                 lexer       **pp_lexer;
-                const string &sub_name;
+                const string  sub_name;
                 
                 YOCTO_DISABLE_ASSIGN(call);
             };
