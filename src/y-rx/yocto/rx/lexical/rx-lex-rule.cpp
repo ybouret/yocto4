@@ -8,6 +8,8 @@ namespace yocto
         {
             rule:: ~rule() throw()
             {
+                assert(NULL != motif);
+                delete motif;
             }
             
             rule:: rule( pattern *p ) :
@@ -15,6 +17,7 @@ namespace yocto
             prev(NULL),
             motif( p )
             {
+                assert( NULL != motif );
             }
             
             rule:: rule( const rule &r ) :
