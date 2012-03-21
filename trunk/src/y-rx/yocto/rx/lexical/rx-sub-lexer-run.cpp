@@ -25,6 +25,9 @@ namespace yocto
             //==================================================================
             if( !src.is_active() )
             {
+                //--------------------------------------------------------------
+                // No more input
+                //--------------------------------------------------------------
                 return false;
             }
             else 
@@ -41,6 +44,7 @@ namespace yocto
                 while( r != NULL )
                 {
                     pattern *p = r->motif;
+                    assert( 0 == p->size );
                     if( p->accept(src) )
                     {
                         best = p;
@@ -75,6 +79,7 @@ namespace yocto
                 //-- restore source for next probe
                 //--------------------------------------------------------------
                 src.uncpy( *best );
+                r=r->next;
                 while( r != NULL )
                 {
                     pattern *p = r->motif;
