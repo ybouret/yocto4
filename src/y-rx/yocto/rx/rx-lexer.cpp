@@ -98,5 +98,12 @@ init( active )
         }
         
         
+        void lexer:: run( source &src )
+        {
+            assert(active!=NULL);
+            while( active->process(src) );
+        }
+        
+        
     }
 }

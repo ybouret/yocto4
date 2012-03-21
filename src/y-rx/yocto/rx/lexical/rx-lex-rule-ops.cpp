@@ -44,6 +44,11 @@ namespace yocto
                 assert( pp_lexer != NULL );
             }
             
+            rule * jump:: clone() const 
+            {
+                return new jump( *this );
+            }
+
             
             void jump:: apply() 
             {
@@ -95,6 +100,11 @@ namespace yocto
             }
             
             
+            rule * call:: clone() const 
+            {
+                return new call( *this );
+            }
+            
             void call:: apply() 
             {
                 assert( pp_lexer != NULL );
@@ -140,6 +150,10 @@ namespace yocto
                 assert( pp_lexer != NULL );
             }
             
+            rule * back:: clone() const
+            {
+                return new back( *this );
+            }
             
             void back:: apply() 
             {
