@@ -10,7 +10,7 @@ namespace yocto
     namespace regex
     {
         
-        class lexer;
+        class     lexer;
         namespace lexical
         {
             
