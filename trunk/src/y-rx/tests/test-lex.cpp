@@ -18,7 +18,7 @@ namespace
         regex::lexer("main"),
         iline(1)
         {
-            regex::sub_lexer &lex = main();
+            regex::sublexer &lex = main();
             const callback   __show( this, & MyLexer::show );
             const callback   __endl( this, & MyLexer::endl );
             const callback   __drop( this, & MyLexer::discard);
@@ -28,9 +28,9 @@ namespace
             lex.make( "[:digit:]+f", __show );
             lex.make( "[:endl:]",    __endl );
             lex.call( "comment", "//", __comment );
-            lex.make( ".",           __drop );
+            lex.make( ".", this, & MyLexer::discard);
             
-            regex::sub_lexer &com = declare( "comment" );
+            regex::sublexer &com = declare( "comment" );
             
             com.back( "[:endl:]", __endl );
             com.make( ".",        __drop );

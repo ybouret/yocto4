@@ -38,34 +38,34 @@ init( active )
             call_stack.free();
         }
         
-        sub_lexer & lexer:: main() throw()
+        sublexer & lexer:: main() throw()
         {
             assert( init != NULL );
             return *init;
         }
         
-        sub_lexer & lexer:: declare( const string &name )
+        sublexer & lexer:: declare( const string &name )
         {
-            sublex lx( new sub_lexer( name, this ) );
+            sublex lx( new sublexer( name, this ) );
             if( ! lexdb.insert( lx ) )
                 throw exception("lexer.declare( multiple '%s' )", &name[0] );
             return *lx;
         } 
         
-        sub_lexer & lexer:: declare( const char *name )
+        sublexer & lexer:: declare( const char *name )
         {
             const string __name(name);
             return declare( __name );
         }
         
-        sub_lexer & lexer:: operator[]( const string &name )
+        sublexer & lexer:: operator[]( const string &name )
         {
             sublex *ppLx = lexdb.search( name );
             if( !ppLx ) throw exception("no lexer['%s']", &name[0] );
             return **ppLx;
         }
         
-        sub_lexer & lexer:: operator[]( const char *name )
+        sublexer & lexer:: operator[]( const char *name )
         {
             const string __name( name );
             return (*this)[ __name ];
