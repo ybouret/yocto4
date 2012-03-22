@@ -16,6 +16,7 @@ namespace yocto
             
             typedef functor<void,TL1(const token &)> action;
             
+            //! a rule: motif => apply
             class rule : public object
             {
             public:
@@ -35,8 +36,10 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(rule);
             };
             
+            //! list of rules
             typedef core::meta_list<rule> rules;
             
+            //! motif => apply action
             class make : public rule
             {
             public:
@@ -54,6 +57,8 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(make);
             };
             
+            
+            //! motif => apply action and jump to new sub_lexer 'name'
             class jump : public rule
             {
             public:
@@ -75,7 +80,7 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(jump);
             };
             
-            
+            //! motif => apply action and call new sub_lexer 'name'
             class call : public rule
             {
             public:
@@ -97,6 +102,7 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(call);
             };
             
+            //! motif => apply action and back
             class back : public rule
             {
             public:

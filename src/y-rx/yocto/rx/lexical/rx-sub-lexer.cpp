@@ -6,34 +6,34 @@ namespace yocto
     namespace regex
     {
         
-        sub_lexer:: ~sub_lexer() throw()
+        sublexer:: ~sublexer() throw()
         {
             
         }
         
-        sub_lexer:: sub_lexer( const string &id, lexer *lx) :
+        sublexer:: sublexer( const string &id, lexer *lx) :
         name( id ),
         rules_(),
         parent( lx )
         {
         }
         
-        sub_lexer:: sub_lexer( const char *id, lexer *lx ) :
+        sublexer:: sublexer( const char *id, lexer *lx ) :
         name( id ),
         rules_(),
         parent( lx )
         {
         }
         
-        void sub_lexer:: attach( lexer *lx ) throw()
+        void sublexer:: attach( lexer *lx ) throw()
         {
             parent = lx;
         }
 
         
-        const string & sub_lexer:: key() const throw() { return name; }
+        const string & sublexer:: key() const throw() { return name; }
         
-        void sub_lexer:: reset() throw()
+        void sublexer:: reset() throw()
         {
             for( lexical::rule *r = rules_.head; r; r=r->next )
             {
@@ -44,18 +44,18 @@ namespace yocto
         //======================================================================
         // Make API
         //======================================================================
-        void sub_lexer:: make( pattern *p, const lexical::action &a )
+        void sublexer:: make( pattern *p, const lexical::action &a )
         {
             rules_.push_back( lexical::make::create(p,a) );
         }
         
-        void sub_lexer::  make( const string &expr, const lexical::action &a, pattern_dict *dict  )
+        void sublexer::  make( const string &expr, const lexical::action &a, pattern_dict *dict  )
         {
             pattern *p = compile(expr,dict);
             this->make( p, a );
         }
 
-        void sub_lexer::  make( const char *expr, const lexical::action &a, pattern_dict *dict  )
+        void sublexer::  make( const char *expr, const lexical::action &a, pattern_dict *dict  )
         {
             pattern *p = compile(expr,dict);
             this->make( p, a );

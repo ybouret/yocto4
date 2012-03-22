@@ -1,5 +1,5 @@
-#ifndef YOCTO_RX_SUB_LEXER_INCLUDED
-#define YOCTO_RX_SUB_LEXER_INCLUDED 1
+#ifndef YOCTO_RX_sublexer_INCLUDED
+#define YOCTO_RX_sublexer_INCLUDED 1
 
 #include "yocto/rx/lexical/rule.hpp"
 #include "yocto/intrusive-ptr.hpp"
@@ -10,12 +10,12 @@ namespace yocto
     {
         
         class pattern_dict;
-        class sub_lexer : public object, public counted
+        class sublexer : public object, public counted
         {
         public:
-            explicit sub_lexer( const string &id, lexer *lx = NULL );
-            explicit sub_lexer( const char   *id, lexer *lx = NULL );
-            virtual ~sub_lexer() throw();
+            explicit sublexer( const string &id, lexer *lx = NULL );
+            explicit sublexer( const char   *id, lexer *lx = NULL );
+            virtual ~sublexer() throw();
             
             const string   name;
             const string & key() const throw();
@@ -23,6 +23,14 @@ namespace yocto
             void make( pattern *p, const lexical::action &a );
             void make( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void make( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
+            
+            template <typename OBJECT>
+            void make( const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
+            {
+                const lexical::action a(obj,method);
+                this->make(expr,a,dict);
+            }
+            
             
             void jump(const string &name, pattern *p, const lexical::action &a  );
             void jump(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
@@ -50,10 +58,10 @@ namespace yocto
         private:
             lexical::rules rules_;
             lexer         *parent;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(sub_lexer);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(sublexer);
         };
         
-        typedef intrusive_ptr<string,sub_lexer> sublex;
+        typedef intrusive_ptr<string,sublexer> sublex;
         
         
     }

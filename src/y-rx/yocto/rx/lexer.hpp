@@ -18,14 +18,14 @@ namespace yocto
             explicit lexer( const char   *init_id);
             virtual ~lexer() throw();
             
-            sub_lexer & main() throw();
-            sub_lexer & declare( const string & );
-            sub_lexer & declare( const char   * );
+            sublexer & main() throw();
+            sublexer & declare( const string & );
+            sublexer & declare( const char   * );
         
             virtual void reset() throw();
             
-            sub_lexer & operator[]( const string & );
-            sub_lexer & operator[]( const char   * );
+            sublexer & operator[]( const string & );
+            sublexer & operator[]( const char   * );
             
             void jump( const string &name );
             void call( const string &name );
@@ -37,13 +37,13 @@ namespace yocto
             
         private:
             typedef set<string,sublex,key_hasher<string,hashing::elf> > sublex_set;
-            typedef sub_lexer         *lxptr;
+            typedef sublexer         *lxptr;
             typedef list<lxptr>        lxptr_stack;
             
             sublex_set  lexdb;
-            sub_lexer  *active;
+            sublexer   *active;
             lxptr_stack call_stack;
-            sub_lexer  *init;
+            sublexer   *init;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
         };

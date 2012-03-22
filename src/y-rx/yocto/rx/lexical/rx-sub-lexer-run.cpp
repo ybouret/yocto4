@@ -8,7 +8,7 @@ namespace yocto
     {
         
         
-        bool sub_lexer:: process( source &src )
+        bool sublexer:: process( source &src )
         {
             //==================================================================
             //
@@ -16,7 +16,7 @@ namespace yocto
             //
             //==================================================================
             if( rules_.size <= 0 )
-                throw exception("sub_lexer['%s'] is EMPTY", &name[0] );
+                throw exception("sublexer['%s'] is EMPTY", &name[0] );
             
             //==================================================================
             //
@@ -64,9 +64,9 @@ namespace yocto
                     assert( src.peek() );
                     const char C = src.peek()->data;
                     if( C >= 32 && C < 127 )
-                        throw exception( "in sub_lexer['%s']: invalid char '%c'", &name[0], C );
+                        throw exception( "in sublexer['%s']: invalid char '%c'", &name[0], C );
                     else
-                        throw exception("in sub_lexer['%s']: invalid char 0x%02x", &name[0], unsigned(C) );
+                        throw exception("in sublexer['%s']: invalid char 0x%02x", &name[0], unsigned(C) );
                 }
                 
                 //--------------------------------------------------------------
