@@ -1,7 +1,7 @@
 #ifndef YOCTO_RX_LEXER_INCLUDED
 #define YOCTO_RX_LEXER_INCLUDED 1
 
-#include "yocto/rx/lexical/sub-lexer.hpp"
+#include "yocto/rx/lexical/plugin.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"
 #include "yocto/hashing/elf.hpp"
@@ -38,7 +38,7 @@ namespace yocto
         private:
             typedef set<string,sublex,key_hasher<string,hashing::elf> > sublex_set;
             typedef sublexer         *lxptr;
-            typedef list<lxptr>        lxptr_stack;
+            typedef list<lxptr>       lxptr_stack;
             
             sublex_set  lexdb;
             sublexer   *active;

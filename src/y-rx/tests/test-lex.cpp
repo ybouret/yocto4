@@ -2,6 +2,7 @@
 #include "yocto/rx/lexer.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/rx/source.hpp"
+#include "yocto/rx/lexical/mod-ccomment.hpp"
 
 using namespace yocto;
 
@@ -40,8 +41,8 @@ namespace
         
         
         
-        size_t iline;
-        
+        size_t                       iline;
+        regex::lexical::mod_ccomment ccomment; 
         void show( const regex::token &p ) 
         {
             std::cerr << "<" << p << ">" << std::endl;

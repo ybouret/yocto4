@@ -20,12 +20,12 @@ namespace yocto
             const string   name;
             const string & key() const throw();
             
+            //==================================================================
+            // make API: append a rule
+            //==================================================================
             void make( pattern *p, const lexical::action &a );
             void make( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void make( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
-            
-            
-            
             
             template <typename OBJECT>
             void make( const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
@@ -35,15 +35,38 @@ namespace yocto
             }
             
             
+            //==================================================================
+            // join API: append a rule before the last one !
+            //==================================================================
+            void join( pattern *p, const lexical::action &a );
+            void join( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
+            void join( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
+            
+            template <typename OBJECT>
+            void join( const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
+            {
+                const lexical::action a(obj,method);
+                this->join(expr,a,dict);
+            }
+
+            
+            //==================================================================
+            // jump API
+            //==================================================================
             void jump(const string &name, pattern *p, const lexical::action &a  );
             void jump(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void jump(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
 
-            
+            //==================================================================
+            // call API
+            //==================================================================
             void call(const string &name, pattern *p, const lexical::action &a  );
             void call(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void call(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
             
+            //==================================================================
+            // back API
+            //==================================================================
             void back( pattern *p, const lexical::action &a );
             void back( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void back( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
