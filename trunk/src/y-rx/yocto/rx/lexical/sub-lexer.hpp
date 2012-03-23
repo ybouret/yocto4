@@ -24,6 +24,9 @@ namespace yocto
             void make( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void make( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
             
+            
+            
+            
             template <typename OBJECT>
             void make( const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
             {
