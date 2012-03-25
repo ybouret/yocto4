@@ -82,9 +82,10 @@ namespace yocto
 	public:
 		inline virtual ~counted() throw() { assert(nref_==0); }
 		
-		inline void withhold() throw() { ++nref_; }
-		inline bool liberate() throw() { assert(nref_>0); return --nref_ <= 0; }
-		
+		inline void   withhold() throw() { ++nref_; }
+		inline bool   liberate() throw() { assert(nref_>0); return --nref_ <= 0; }
+		inline size_t refcount() const throw() { return nref_; }
+        
 	protected:
 		inline explicit counted() throw() : nref_(0) {}
 		
