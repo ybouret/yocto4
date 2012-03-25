@@ -4,7 +4,6 @@
 #include "yocto/rx/lexical/plugin.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"
-#include "yocto/hashing/elf.hpp"
 #include "yocto/core/pool.hpp"
 
 namespace yocto 
@@ -32,7 +31,7 @@ namespace yocto
             void call( const string &name );
             void back();
             
-            void load( lexical::plugin &plg );
+            void load( lexical::plugin *plg );
             
             
             //! run until end of source
@@ -40,16 +39,15 @@ namespace yocto
             
             
         private:
-            typedef set<string,sublex,key_hasher<string,hashing::elf> > sublex_set;
-            typedef sublexer         *lxptr;
-            typedef list<lxptr>       lxptr_stack;
-            typedef core::pool_of<lexical::plugin> plugins;
-            
+            typedef set<string,sublex>          sublex_set;
+            typedef set<string,lexical::module> module_set;
+            typedef sublexer                   *lxptr;
+            typedef list<lxptr>                 lxptr_stack;
             sublex_set  lexdb;
             sublexer   *active;
             lxptr_stack call_stack;
             sublexer   *init;
-            plugins     loaded;
+            module_set  plugins;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
         };

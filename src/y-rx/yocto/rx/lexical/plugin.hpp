@@ -19,7 +19,7 @@ namespace yocto
                 
                 virtual pattern * trigger() const = 0;
                 
-                plugin *next;
+                
             protected:
                 explicit plugin( const char *id );
                 
@@ -27,6 +27,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);
             };
             
+            typedef intrusive_ptr<string,plugin> module;
         }
         
     }

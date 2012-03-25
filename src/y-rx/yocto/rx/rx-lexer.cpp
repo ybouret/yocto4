@@ -10,22 +10,14 @@ namespace yocto
     {
         lexer:: ~lexer() throw()
         {
-            std::cerr << "~lexer" << std::endl;
-            lexdb.release();
-            while( loaded.size )
-            {
-                lexical::plugin *p = loaded.query();
-                std::cerr << "~#refcount(" << p->name << ")=" << p->refcount() << std::endl;
-
-                p->liberate();
-            }
         }
         
 #define YOCTO_RX_LEXER_INIT() \
 lexdb(),\
 active(  &declare( init_id ) ),\
 call_stack(),\
-init( active )
+init( active ),\
+plugins()
         
         lexer:: lexer( const string &init_id) :
         YOCTO_RX_LEXER_INIT()
@@ -115,33 +107,26 @@ init( active )
             while( active->process(src) );
         }
         
-        void lexer:: load( lexical::plugin &plg )
+        void lexer:: load( lexical::plugin *plg )
         {
-            assert( 0 == plg.refcount() );
-            plg.withhold();
-            assert( 1 == plg.refcount() );
-            
-            try
+            assert( plg != NULL );
+            lexical::module Mod(plg);
+            sublex          Lex(plg);
+            if( ! plugins.insert( Mod ) )
             {
-                sublex lx( &plg );
-                //-- register in database
-                if( ! lexdb.insert( lx ) )
-                    throw exception("lexer.load( plugin '%s'  ): already loaded", &plg.name[0] );
-                
-                //-- register as loaded
-                loaded.store( &plg );
-                
-                //-- make part of the lexer
-                plg.attach(this);
+                throw exception("lexer::load( multiple '%s' )", & (plg->name[0] ) );
             }
-            catch(...)
+            
+            try 
             {
-                plg.liberate();
+                if( ! lexdb.insert( Lex ) )
+                    throw exception("plugin/lexer conflict for '%s'", & (plg->name[0] ) );
+            } catch (...) 
+            {
+                (void) lexdb.remove( plg->name );
                 throw;
             }
-            std::cerr << "#refcount(" << plg.name << ")=" << plg.refcount() << std::endl;
-
-                       
+            
             
         }
         
