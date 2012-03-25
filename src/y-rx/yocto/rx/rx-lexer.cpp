@@ -1,6 +1,7 @@
 #include "yocto/rx/lexer.hpp"
 #include "yocto/exception.hpp"
 
+#include <iostream>
 
 namespace yocto 
 {
@@ -9,6 +10,15 @@ namespace yocto
     {
         lexer:: ~lexer() throw()
         {
+            std::cerr << "~lexer" << std::endl;
+            lexdb.release();
+            while( loaded.size )
+            {
+                lexical::plugin *p = loaded.query();
+                std::cerr << "~#refcount(" << p->name << ")=" << p->refcount() << std::endl;
+
+                p->liberate();
+            }
         }
         
 #define YOCTO_RX_LEXER_INIT() \
@@ -105,6 +115,35 @@ init( active )
             while( active->process(src) );
         }
         
+        void lexer:: load( lexical::plugin &plg )
+        {
+            assert( 0 == plg.refcount() );
+            plg.withhold();
+            assert( 1 == plg.refcount() );
+            
+            try
+            {
+                sublex lx( &plg );
+                //-- register in database
+                if( ! lexdb.insert( lx ) )
+                    throw exception("lexer.load( plugin '%s'  ): already loaded", &plg.name[0] );
+                
+                //-- register as loaded
+                loaded.store( &plg );
+                
+                //-- make part of the lexer
+                plg.attach(this);
+            }
+            catch(...)
+            {
+                plg.liberate();
+                throw;
+            }
+            std::cerr << "#refcount(" << plg.name << ")=" << plg.refcount() << std::endl;
+
+                       
+            
+        }
         
     }
 }

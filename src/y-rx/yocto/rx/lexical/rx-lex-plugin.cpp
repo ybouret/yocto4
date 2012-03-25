@@ -12,7 +12,9 @@ namespace yocto
             {
             }
             
-            plugin:: plugin( const char *id ) : regex::sublexer(id)
+            plugin:: plugin( const char *id ) : 
+            regex::sublexer(id),
+            next(NULL)
             {
             }
             

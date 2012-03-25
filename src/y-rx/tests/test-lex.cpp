@@ -36,6 +36,7 @@ namespace
             com.back( "[:endl:]", __endl );
             com.make( ".",        __drop );
             
+            load( ccomment );
             
         }
         
@@ -74,6 +75,7 @@ YOCTO_UNIT_TEST_IMPL(lex)
     MyLexer Lex;
     Lex.reset();
     
+        
     ios::icstream fp( ios::cstdin );
     regex::source src( fp );
     while( Lex.main().process(src) )
