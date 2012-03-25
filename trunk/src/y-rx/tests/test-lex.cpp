@@ -36,14 +36,13 @@ namespace
             com.back( "[:endl:]", __endl );
             com.make( ".",        __drop );
             
-            load( ccomment );
+            load( new regex::lexical::mod_ccomment() );
             
         }
         
         
         
         size_t                       iline;
-        regex::lexical::mod_ccomment ccomment; 
         void show( const regex::token &p ) 
         {
             std::cerr << "<" << p << ">" << std::endl;
