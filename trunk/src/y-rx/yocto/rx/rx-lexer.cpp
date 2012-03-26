@@ -107,6 +107,14 @@ plugins()
             while( active->process(src) );
         }
         
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Plugin API for lexer
+        //
+        ////////////////////////////////////////////////////////////////////////
+
+        
         void lexer:: load( lexical::plugin *plg )
         {
             assert( plg != NULL );
@@ -129,6 +137,15 @@ plugins()
             
             
         }
+        
+        const lexical::plugin &lexer:: get_plugin( const string &name ) const
+        {
+            const lexical::module *pMod = plugins.search( name );
+            if( ! pMod )
+                throw exception("lexer::get_plugin(NO '%s')", & name[0] );
+            return **pMod;
+        }
+
         
     }
 }
