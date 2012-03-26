@@ -32,7 +32,7 @@ namespace yocto
             void back();
             
             void load( lexical::plugin *plg );
-            
+            const lexical::plugin &get_plugin( const string &name ) const;
             
             //! run until end of source
             void run( source &src );

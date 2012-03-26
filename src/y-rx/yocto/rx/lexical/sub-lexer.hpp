@@ -81,6 +81,11 @@ namespace yocto
             //! change parent lexer
             void attach( lexer *lx ) throw();
             
+            
+            //! append a plugin
+            void plug( const string &plugin_name );
+            void plug( const char   *plugin_name );
+            
         private:
             lexical::rules rules_;
             lexer         *parent;
