@@ -14,15 +14,20 @@ namespace yocto
             }
             
             mod_ccomment:: mod_ccomment() :
-            plugin( "C Comment" )
+            plugin( "C Comment", "/*", "*/" )
             {
             }
             
-            pattern * mod_ccomment:: trigger() const
+            void mod_ccomment:: enter() 
             {
-                return compile( "/*", NULL );
+                /* do nothing */
             }
             
+            void mod_ccomment:: leave() 
+            {
+                /* do nothing */
+            }
+                       
         }
     }
 }
