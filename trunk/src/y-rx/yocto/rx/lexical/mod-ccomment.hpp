@@ -17,11 +17,11 @@ namespace yocto
             public:
                 explicit mod_ccomment();
                 virtual ~mod_ccomment() throw();
-                
-                virtual pattern *trigger() const;
-                
+                                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(mod_ccomment);
+                virtual void enter();
+                virtual void leave();
             };
             
         }

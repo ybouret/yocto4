@@ -1,5 +1,5 @@
 #include "yocto/rx/lexical/plugin.hpp"
-
+#include "yocto/rx/compiler.hpp"
 
 namespace yocto 
 {
@@ -12,25 +12,37 @@ namespace yocto
             {
             }
             
-            plugin:: plugin( const char *id ) : 
+            plugin:: plugin( const char *id,
+                            const char *enter_expr,
+                            const char *leave_expr ) : 
             regex::sublexer(id),
-            __Enter( this, & plugin::on_enter ),
-            __Leave( this, & plugin::on_leave )
+            trigger_( compile(enter_expr,NULL) ),
+            enter_( this, & plugin:: on_enter )
             {
+                const action leave_( this, & plugin::on_leave );
+                back( leave_expr, leave_, NULL );
             }
             
+            const action & plugin:: on_call() const throw()
+            {
+                return enter_;
+            }
             
             void plugin:: on_enter( const token & )
             {
+                this->enter();
             }
             
             void plugin:: on_leave( const token & )
             {
+                this->leave();
             }
             
-            const action & plugin:: enter() const throw() { return __Enter; }
-            const action & plugin:: leave() const throw() { return __Leave; }
-            
+            pattern * plugin:: trigger() const
+            {
+                return trigger_->clone();
+            }
+                       
             
         }
     }
