@@ -34,7 +34,6 @@ namespace yocto
                  the constructor register a back(leave_expr,on_leave) instruction,
                  and the on_leave method will call the virtual leave() method,
                  then the user defined callback.
-                 
                  */
                 explicit plugin(const char *id,
                                 const char *enter_expr,

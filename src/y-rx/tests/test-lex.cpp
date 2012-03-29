@@ -17,9 +17,13 @@ namespace
         
         MyLexer() : 
         regex::lexer("main"),
-        iline(1)
+        iline(1),
+        plugCom( NULL )
         {
             regex::sublexer &lex = main();
+            
+            load( plugCom = new regex::lexical::mod_ccomment() );
+            
             const callback   __show( this, & MyLexer::show );
             const callback   __endl( this, & MyLexer::endl );
             const callback   __drop( this, & MyLexer::discard);
@@ -29,20 +33,20 @@ namespace
             lex.make( "[:digit:]+f", __show );
             lex.make( "[:endl:]",    __endl );
             lex.call( "comment", "//", __comment );
+            lex.plug( plugCom->name );
             lex.make( ".", this, & MyLexer::discard);
             
             regex::sublexer &com = declare( "comment" );
             
             com.back( "[:endl:]", __endl );
             com.make( ".",        __drop );
-            
-            load( new regex::lexical::mod_ccomment() );
-            
+                        
         }
         
         
         
-        size_t                       iline;
+        size_t                        iline;
+        regex::lexical::mod_ccomment *plugCom;
         void show( const regex::token &p ) 
         {
             std::cerr << "<" << p << ">" << std::endl;
