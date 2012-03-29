@@ -29,7 +29,7 @@ namespace yocto
         {
             parent = lx;
         }
-
+        
         
         const string & sublexer:: key() const throw() { return name; }
         
@@ -40,6 +40,9 @@ namespace yocto
                 r->motif->clear();
             }
         }
+     
+        void sublexer:: discard( const token & ) throw() {}
+
         
-          }
+    }
 }

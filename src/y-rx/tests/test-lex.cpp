@@ -81,9 +81,8 @@ YOCTO_UNIT_TEST_IMPL(lex)
         
     ios::icstream fp( ios::cstdin );
     regex::source src( fp );
-    while( Lex.main().process(src) )
-    {
-    }
+    Lex.run(src);
+   
     
 }
 YOCTO_UNIT_TEST_DONE()

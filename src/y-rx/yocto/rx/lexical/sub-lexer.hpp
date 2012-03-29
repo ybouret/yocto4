@@ -86,6 +86,8 @@ namespace yocto
             void plug( const string &plugin_name );
             void plug( const char   *plugin_name );
             
+            void discard( const token & ) throw();
+            
         private:
             lexical::rules rules_;
             lexer         *parent;

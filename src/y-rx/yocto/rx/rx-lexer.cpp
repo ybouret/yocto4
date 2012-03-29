@@ -108,7 +108,11 @@ plugins()
         void lexer:: run( source &src )
         {
             assert(active!=NULL);
-            while( active->process(src) );
+            //std::cerr << "lexer::run '" << active->name << "'" << std::endl;
+            while( active->process(src) )
+            {
+                //std::cerr << "lexer::run '" << active->name << "'" << std::endl;
+            }
         }
         
         
@@ -117,7 +121,7 @@ plugins()
         // Plugin API for lexer
         //
         ////////////////////////////////////////////////////////////////////////
-
+        
         
         void lexer:: load( lexical::plugin *plg )
         {
@@ -155,7 +159,7 @@ plugins()
                 throw exception("lexer::get_plugin(NO '%s')", & name[0] );
             return **pMod;
         }
-
+        
         
     }
 }
