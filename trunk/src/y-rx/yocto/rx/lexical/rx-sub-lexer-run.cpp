@@ -2,6 +2,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/rx/source.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace regex
@@ -15,6 +17,9 @@ namespace yocto
             // check lexer
             //
             //==================================================================
+            std::cerr << "[processing '" << name << "']" << std::endl;
+            
+            
             if( rules_.size <= 0 )
                 throw exception("sublexer['%s'] is EMPTY", &name[0] );
             

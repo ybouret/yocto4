@@ -11,10 +11,10 @@ namespace yocto
             assert(parent!=NULL);
             const lexical::plugin &plg = parent->get_plugin(name);
             
-            call( plg.name, plg.trigger(), plg.on_call());
-            
-            
+            call( plg.name, plg.trigger(), plg.on_call() );
         }
+        
+        
 
     }
 
