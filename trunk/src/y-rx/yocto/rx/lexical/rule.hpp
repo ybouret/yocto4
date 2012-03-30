@@ -55,7 +55,7 @@ namespace yocto
                 
             private:
                 explicit make( pattern *p, const action &a);
-                action action_;
+                actions  actions_;
                 make( const make & );
                 YOCTO_DISABLE_ASSIGN(make);
             };

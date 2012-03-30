@@ -43,13 +43,14 @@ namespace yocto
             
             make:: make( pattern *p, const action &a ) :
             rule( p ),
-            action_( a )
+            actions_(  )
             {
+                actions_.push_back(a);
             }
             
             make:: make( const make &other ) :
             rule( other ),
-            action_( other.action_ )
+            actions_( other.actions_ )
             {
             }
             
@@ -60,7 +61,10 @@ namespace yocto
             
             void make:: apply() 
             {
-                action_( *motif );
+                for( actions::iterator i = actions_.begin(); i != actions_.end(); ++i )
+                {
+                    (*i)( *motif );
+                }
             }
             
             rule * make::create( pattern *p, const action &a )
