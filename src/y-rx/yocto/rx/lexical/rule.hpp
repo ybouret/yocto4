@@ -55,6 +55,8 @@ namespace yocto
                 virtual rule *clone() const;
                 virtual void  apply();
                 
+                virtual actions *get_actions() throw();
+                
             private:
                 explicit make( pattern *p, const action &a);
                 actions  actions_;

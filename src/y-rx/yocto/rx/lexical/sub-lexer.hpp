@@ -23,6 +23,7 @@ namespace yocto
             //==================================================================
             // make API: append a rule
             //==================================================================
+            //! create or update a an action for a given pattern
             void make( pattern *p, const lexical::action &a );
             void make( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void make( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
@@ -38,6 +39,7 @@ namespace yocto
             //==================================================================
             // join API: append a rule before the last one !
             //==================================================================
+            //! create or update a an action for a given pattern
             void join( pattern *p, const lexical::action &a );
             void join( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void join( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );

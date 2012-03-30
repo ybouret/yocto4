@@ -40,7 +40,9 @@ namespace
             
             com.back( "[:endl:]", __endl );
             com.make( ".",        __drop );
-                        
+                      
+            
+            plugCom->join("[:endl:]", __endl );
         }
         
         
