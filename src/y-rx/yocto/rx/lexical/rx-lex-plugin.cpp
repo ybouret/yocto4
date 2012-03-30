@@ -12,12 +12,14 @@ namespace yocto
             {
             }
             
-            plugin:: plugin(const char *id,
-                            const char *enter_expr,
-                            const char *leave_expr ) : 
+            plugin:: plugin(const char     *id,
+                            const char     *enter_expr,
+                            const char     *leave_expr,
+                            const callback &cb) : 
             regex::sublexer(id),
             trigger_( compile(enter_expr,NULL) ),
-            enter_( this, & plugin:: on_enter )
+            enter_( this, & plugin:: on_enter ),
+            finish_( cb )
             {
                 const action leave_( this, & plugin::on_leave );
                 back( leave_expr, leave_, NULL );
@@ -36,6 +38,7 @@ namespace yocto
             void plugin:: on_leave( const token & )
             {
                 this->leave();
+                finish_( this->data() );
             }
             
             pattern * plugin:: trigger() const

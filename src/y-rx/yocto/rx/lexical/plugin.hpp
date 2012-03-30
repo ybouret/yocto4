@@ -12,7 +12,7 @@ namespace yocto
         namespace lexical
         {
             
-            typedef functor<void,null_type> callback;
+            typedef functor<void,TL1(void*)> callback;
             
             class plugin : public regex::sublexer
             {
@@ -32,26 +32,29 @@ namespace yocto
                  \param id name for  sublexer
                  \param enter_expr   regular expression that triggers the plugin
                  \param leave_expr   regular expression that finishes the plugin
-                 \param post_process  
+                 \param cb           a post-processing callback on this->data().
+                 
                  the constructor register a back(leave_expr,on_leave) instruction,
                  and the on_leave method will call the virtual leave() method,
                  then the user defined callback.
                  */
                 explicit plugin(const char     *id,
                                 const char     *enter_expr,
-                                const char     *leave_expr);
+                                const char     *leave_expr,
+                                const callback &cb);
                 
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);
                 auto_ptr<pattern> trigger_;
                 const action      enter_;
+                callback          finish_;
                 void on_enter( const token & );
                 void on_leave( const token & );
                 
                 virtual void  enter() = 0;
                 virtual void  leave() = 0;
-                
+                virtual void  *data() throw() = 0;
             };
             
             typedef intrusive_ptr<string,plugin> module;

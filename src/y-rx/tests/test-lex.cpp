@@ -13,7 +13,8 @@ namespace
     class MyLexer : public regex::lexer
     {
     public:
-        typedef regex::lexical::action callback;
+        typedef regex::lexical::action   Action;
+        typedef regex::lexical::callback Callback;
         
         MyLexer() : 
         regex::lexer("main"),
@@ -21,13 +22,13 @@ namespace
         plugCom( NULL )
         {
             regex::sublexer &lex = main();
+            const Callback  cb( this, & MyLexer::on_ccomment );
+            load( plugCom = new regex::lexical::mod_ccomment(cb) );
             
-            load( plugCom = new regex::lexical::mod_ccomment() );
-            
-            const callback   __show( this, & MyLexer::show );
-            const callback   __endl( this, & MyLexer::endl );
-            const callback   __drop( this, & MyLexer::discard);
-            const callback   __comment( this, & MyLexer::ini_comment );
+            const Action   __show( this, & MyLexer::show );
+            const Action   __endl( this, & MyLexer::endl );
+            const Action   __drop( this, & MyLexer::discard);
+            const Action   __comment( this, & MyLexer::ini_comment );
             
             lex.make( "[:digit:]+",  __show );
             lex.make( "[:digit:]+f", __show );
@@ -46,6 +47,13 @@ namespace
         }
         
         
+        void on_ccomment( void *data )
+        {
+            assert(data);
+            std::cerr << "Processing " << plugCom->name << std::endl;
+            const string &s = *(string *)data;
+            std::cerr << "[" << s << "]" << std::endl;
+        }
         
         size_t                        iline;
         regex::lexical::mod_ccomment *plugCom;
