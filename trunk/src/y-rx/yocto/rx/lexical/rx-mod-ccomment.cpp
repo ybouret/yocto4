@@ -16,8 +16,8 @@ namespace yocto
             {
             }
             
-            mod_ccomment:: mod_ccomment() :
-            plugin( "C Comment", "/\\*", "\\*/" )
+            mod_ccomment:: mod_ccomment( const callback &cb ) :
+            plugin( "C Comment", "/\\*", "\\*/", cb)
             {
                 make( "[:endl:]", this, & mod_ccomment::add, NULL );
                 make( ".",        this, & mod_ccomment::add, NULL );
@@ -36,6 +36,12 @@ namespace yocto
                 std::cerr << "End C Comment" << std::endl;
             }
          
+            void *mod_ccomment:: data() throw()
+            {
+                return &content;
+            }
+
+            
             void mod_ccomment:: add( const token &tkn )
             {
                 for(const t_char *t = tkn.head; t; t = t->next )

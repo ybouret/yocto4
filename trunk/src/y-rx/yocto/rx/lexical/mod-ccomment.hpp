@@ -15,7 +15,7 @@ namespace yocto
             class mod_ccomment : public plugin
             {
             public:
-                explicit mod_ccomment();
+                explicit mod_ccomment( const callback &cb );
                 virtual ~mod_ccomment() throw();
                 
                 string content;
@@ -24,6 +24,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(mod_ccomment);
                 virtual void enter();
                 virtual void leave();
+                virtual void *data() throw();
                 
                 void add( const token &tkn );
             };
