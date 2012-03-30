@@ -15,6 +15,12 @@ namespace yocto
             class mod_ccomment : public plugin
             {
             public:
+                //! constructor
+                /** 
+                 - back() on end of C comment
+                 - make( endl, add )
+                 - make( dot,  add )
+                 */
                 explicit mod_ccomment( const callback &cb );
                 virtual ~mod_ccomment() throw();
                 
