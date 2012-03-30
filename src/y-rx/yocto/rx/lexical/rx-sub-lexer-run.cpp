@@ -16,10 +16,7 @@ namespace yocto
             //
             // check lexer
             //
-            //==================================================================
-            std::cerr << "[processing '" << name << "']" << std::endl;
-            
-            
+            //==================================================================            
             if( rules_.size <= 0 )
                 throw exception("sublexer['%s'] is EMPTY", &name[0] );
             
@@ -120,7 +117,6 @@ namespace yocto
                 src.skip( best->size );   //! update the soruce
                 best->clear();            //! final clean up
                 
-            
                 
                 return true;
             }

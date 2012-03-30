@@ -4,6 +4,7 @@
 #include "yocto/rx/pattern.hpp"
 #include "yocto/functor.hpp"
 #include "yocto/auto-ptr.hpp"
+#include "yocto/sequence/list.hpp"
 
 namespace yocto
 {
@@ -15,6 +16,7 @@ namespace yocto
         {
             
             typedef functor<void,TL1(const token &)> action;
+            typedef list<action>                     actions;
             
             //! a rule: motif => apply
             class rule : public object
@@ -27,6 +29,7 @@ namespace yocto
                 virtual rule *clone() const = 0;
                 virtual void  apply() = 0;
                 virtual ~rule() throw();
+                virtual actions *get_actions() throw();
                 
             protected:
                 explicit rule( pattern *p );
