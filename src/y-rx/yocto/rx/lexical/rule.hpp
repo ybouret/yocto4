@@ -31,6 +31,7 @@ namespace yocto
                 virtual ~rule() throw();
                 virtual actions *get_actions() throw();
                 
+                
             protected:
                 explicit rule( pattern *p );
                 rule( const rule & );
@@ -41,6 +42,7 @@ namespace yocto
             
             //! list of rules
             typedef core::meta_list<rule> rules;
+            
             
             //! motif => apply action
             class make : public rule
