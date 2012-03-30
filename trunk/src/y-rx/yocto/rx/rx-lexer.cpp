@@ -108,10 +108,8 @@ plugins()
         void lexer:: run( source &src )
         {
             assert(active!=NULL);
-            //std::cerr << "lexer::run '" << active->name << "'" << std::endl;
             while( active->process(src) )
             {
-                //std::cerr << "lexer::run '" << active->name << "'" << std::endl;
             }
         }
         

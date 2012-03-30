@@ -55,6 +55,23 @@ namespace yocto
 			//! load
 			static  pattern *load( ios::istream & );
 			
+            //! testing equality by brx, binary representation
+            static bool is_same( const pattern &lhs, const pattern &rhs );
+            
+            //! equality wrapper
+            inline friend bool operator==( const pattern &lhs, const pattern &rhs )
+            {
+                return pattern::is_same( lhs, rhs );
+            }
+            
+            //! inequality wrapper
+            inline friend bool operator!=( const pattern &lhs, const pattern &rhs )
+            {
+                return !pattern::is_same( lhs, rhs );
+            }
+
+            
+            
 		protected:
 			explicit pattern(uint32_t t) throw();
 		

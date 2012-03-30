@@ -21,23 +21,25 @@ namespace yocto
                 
                 pattern *trigger() const;
                 
+                
                 //! will call this->enter() to initialize the plugin
                 const action &on_call() const throw();
+                void          do_nothing(void) throw();
                 
             protected:
                 //! constructor
                 /**
-                 \param id name for sublexer
-                 \param enter_expr regular expression that triggers the plugin
-                 \param leave_expr regular expression that finishes the plugin
-                 
+                 \param id name for  sublexer
+                 \param enter_expr   regular expression that triggers the plugin
+                 \param leave_expr   regular expression that finishes the plugin
+                 \param post_process  
                  the constructor register a back(leave_expr,on_leave) instruction,
                  and the on_leave method will call the virtual leave() method,
                  then the user defined callback.
                  */
-                explicit plugin(const char *id,
-                                const char *enter_expr,
-                                const char *leave_expr);
+                explicit plugin(const char     *id,
+                                const char     *enter_expr,
+                                const char     *leave_expr);
                 
                 
             private:
@@ -47,9 +49,8 @@ namespace yocto
                 void on_enter( const token & );
                 void on_leave( const token & );
                 
-                virtual void enter() = 0;
-                virtual void leave() = 0;
-                
+                virtual void  enter() = 0;
+                virtual void  leave() = 0;
                 
             };
             
