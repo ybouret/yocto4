@@ -77,6 +77,10 @@ namespace yocto
                 }
             }
             
+            actions *make:: get_actions() throw()
+            {
+                return & actions_;
+            }
             
             
         }
