@@ -11,23 +11,26 @@ namespace yocto
         //======================================================================
         void sublexer:: join( pattern *p, const lexical::action &a )
         {
-            if( rules_.tail )
+            if( !could_append(p, a))
             {
-                lexical::rule *r = rules_.pop_back();
-                try
+                if( rules_.tail )
                 {
+                    lexical::rule *r = rules_.pop_back();
+                    try
+                    {
+                        make( p, a );
+                        rules_.push_back(r);
+                    }
+                    catch(...)
+                    {
+                        rules_.push_back(r);
+                        throw;
+                    }
+                    
+                }
+                else
                     make( p, a );
-                    rules_.push_back(r);
-                }
-                catch(...)
-                {
-                    rules_.push_back(r);
-                    throw;
-                }
-                
             }
-            else
-                make( p, a );
         }
         
         void sublexer::  join( const string &expr, const lexical::action &a, pattern_dict *dict  )

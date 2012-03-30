@@ -48,7 +48,7 @@ namespace yocto
                 const lexical::action a(obj,method);
                 this->join(expr,a,dict);
             }
-
+            
             
             //==================================================================
             // jump API
@@ -56,7 +56,7 @@ namespace yocto
             void jump(const string &name, pattern *p, const lexical::action &a  );
             void jump(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void jump(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
-
+            
             //==================================================================
             // call API
             //==================================================================
@@ -89,6 +89,8 @@ namespace yocto
             void discard( const token & ) throw();
             
         private:
+            bool could_append( pattern *p, const lexical::action &a );
+            
             lexical::rules rules_;
             lexer         *parent;
             YOCTO_DISABLE_COPY_AND_ASSIGN(sublexer);
