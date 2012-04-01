@@ -21,7 +21,8 @@ namespace yocto
             }
             
             mod_cstring:: mod_cstring( const callback &cb ) :
-            plugin( "C String", "\"", "\"", cb )
+            plugin( "C String", "\"", "\"", cb ),
+            content()
             {
                 //--------------------------------------------------------------
                 //-- single, non escaped chars

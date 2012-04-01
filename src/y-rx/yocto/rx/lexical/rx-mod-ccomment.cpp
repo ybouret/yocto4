@@ -17,7 +17,8 @@ namespace yocto
             }
             
             mod_ccomment:: mod_ccomment( const callback &cb ) :
-            plugin( "C Comment", "/\\*", "\\*/", cb)
+            plugin( "C Comment", "/\\*", "\\*/", cb),
+            content()
             {
                 make( "[:endl:]", this, & mod_ccomment::add, NULL );
                 make( ".",        this, & mod_ccomment::add, NULL );

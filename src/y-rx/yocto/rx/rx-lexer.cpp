@@ -78,7 +78,7 @@ plugins()
             assert( NULL != active );
             sublex *ppLx = lexdb.search( name );
             if( !ppLx ) throw exception("no lexer.jump('%s')", &name[0] );
-            std::cerr << "jump '" << active->name << "' -> '" << (*ppLx)->name << "'" << std::endl;
+            //std::cerr << "jump '" << active->name << "' -> '" << (*ppLx)->name << "'" << std::endl;
             active = &(**ppLx);
             
         }
@@ -90,7 +90,7 @@ plugins()
             if( !ppLx ) 
                 throw exception("no lexer.call('%s')", &name[0] );
             call_stack.push_back( active );
-            std::cerr << "call '" << active->name << "' -> '" << (*ppLx)->name << "'" << std::endl;
+            //std::cerr << "call '" << active->name << "' -> '" << (*ppLx)->name << "'" << std::endl;
             active = &(**ppLx);
         }
         
@@ -99,7 +99,7 @@ plugins()
             assert( NULL != active );
             if( call_stack.size() <= 0 )
                 throw exception("no lexer.back(from '%s')", & (active->name[0]) );
-            std::cerr << "back from '" << active->name << "' to '" << call_stack.back()->name << "'" << std::endl;
+            //std::cerr << "back from '" << active->name << "' to '" << call_stack.back()->name << "'" << std::endl;
             active = call_stack.back();
             call_stack.pop_back();
         }
