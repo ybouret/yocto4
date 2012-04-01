@@ -24,14 +24,10 @@ namespace
         MyLexer() : 
         regex::lexer("main"),
         iline(1),
-        plugCom( NULL ),
-        plugStr( NULL )
+        plugCom( load<regex::lexical::mod_ccomment,MyLexer>(this,&MyLexer::on_ccomment)  ),
+        plugStr( load<regex::lexical::mod_cstring,MyLexer>(this, &MyLexer::on_cstring ) )
         {
             regex::sublexer &lex = main();
-            const Callback  cb( this, & MyLexer::on_ccomment );
-            const Callback  cb2( this, & MyLexer::on_cstring );
-            load( plugCom = new regex::lexical::mod_ccomment(cb) );
-            load( plugStr = new regex::lexical::mod_cstring(cb2) );
             
             const Action   __show( this, & MyLexer::show );
             const Action   __endl( this, & MyLexer::endl );
