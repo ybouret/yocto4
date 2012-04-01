@@ -3,6 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/rx/source.hpp"
 #include "yocto/rx/lexical/mod-ccomment.hpp"
+#include "yocto/rx/lexical/mod-cstring.hpp"
 
 using namespace yocto;
 
@@ -16,14 +17,21 @@ namespace
         typedef regex::lexical::action   Action;
         typedef regex::lexical::callback Callback;
         
+        size_t                        iline;
+        regex::lexical::mod_ccomment *plugCom;
+        regex::lexical::mod_cstring  *plugStr;
+        
         MyLexer() : 
         regex::lexer("main"),
         iline(1),
-        plugCom( NULL )
+        plugCom( NULL ),
+        plugStr( NULL )
         {
             regex::sublexer &lex = main();
             const Callback  cb( this, & MyLexer::on_ccomment );
+            const Callback  cb2( this, & MyLexer::on_cstring );
             load( plugCom = new regex::lexical::mod_ccomment(cb) );
+            load( plugStr = new regex::lexical::mod_cstring(cb2) );
             
             const Action   __show( this, & MyLexer::show );
             const Action   __endl( this, & MyLexer::endl );
@@ -35,6 +43,7 @@ namespace
             lex.make( "[:endl:]",    __endl );
             lex.call( "comment", "//", __comment );
             lex.plug( plugCom->name );
+            lex.plug( plugStr->name );
             lex.make( ".", this, & MyLexer::discard);
             
             regex::sublexer &com = declare( "comment" );
@@ -55,8 +64,15 @@ namespace
             std::cerr << "[" << s << "]" << std::endl;
         }
         
-        size_t                        iline;
-        regex::lexical::mod_ccomment *plugCom;
+        void on_cstring( void *data )
+        {
+            assert( data );
+            std::cerr << "Processing " << plugStr->name << std::endl;
+            const string &s = *(string *)data;
+            std::cerr << "[" << s << "]" << std::endl;
+        }
+        
+               
         void show( const regex::token &p ) 
         {
             std::cerr << "<" << p << ">" << std::endl;
