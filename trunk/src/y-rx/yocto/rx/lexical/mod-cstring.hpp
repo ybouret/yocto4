@@ -25,7 +25,10 @@ namespace yocto
                 virtual void leave();
                 virtual void *data() throw();
                 void add( const token &tkn );
-                
+                void esc_add( const token &tkn );
+                void esc_bin( const token &tkn );
+                void esc_hex( const token &tkn );
+                void esc_bad( const token &tkn );
             };
         }
     }

@@ -32,6 +32,14 @@ namespace yocto
             void back();
             
             void load( lexical::plugin *plg );
+            template <typename PLUGIN,typename OBJECT>
+            PLUGIN *load( OBJECT *host,void (OBJECT::*method)(void*) )
+            {
+                const lexical::callback cb(host,method);
+                PLUGIN *plg = new PLUGIN( cb );
+                load( plg );
+                return plg;
+            }
             const lexical::plugin &get_plugin( const string &name ) const;
             
             //! run until end of source
