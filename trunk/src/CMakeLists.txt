@@ -59,6 +59,7 @@ YOCTO_BUILD(mpi)
 YOCTO_BUILD(ocl)
 YOCTO_BUILD(pki)
 YOCTO_BUILD(pack)
+YOCTO_BUILD(json)
 
 INSTALL( FILES 
 	share/create.sh 
