@@ -10,6 +10,12 @@ namespace yocto
     
     namespace JSON
     {
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // type definitions
+        //
+        ////////////////////////////////////////////////////////////////////////
+        
         typedef bool   Bool;
         typedef string String;
         typedef double Number;
@@ -18,6 +24,7 @@ namespace yocto
         class Object;
         
         
+        //! JSON enumerated types.
         enum ValueType
         {
             IsString,
@@ -29,16 +36,20 @@ namespace yocto
             IsNull
         };
         
+        
+        //! Variant to hold any JSON value
         class Value
         {
         public:
+            static const char *GetTypeName( ValueType t ) throw();
+            
             ~Value() throw();
             
-            Value() throw();   //!< IsNull
-            Value( const String & );
-            Value( const char   * );
-            Value( const Number ) throw();
-            Value( const ValueType of );
+            Value() throw();          //!< IsNull
+            Value( const String & );  //!< IsString
+            Value( const char   * );  //!< IsString
+            Value( const Number ) throw(); //!< IsNumber
+            Value( const ValueType of );   //!< type = of, empty type
             
             
             Value( const Value & );
@@ -46,6 +57,18 @@ namespace yocto
             Value & operator=( const Value &other );
             
             const ValueType type;
+            
+            const char *type_name() const throw();
+            size_t length() const throw(); //!< #values in it, default is 1.
+            
+            Value & operator[]( size_t index ); //!< Object/Array wrapper
+            const Value & operator[]( size_t index ) const; //!< Object/Array wrapper
+            
+            Value       & operator[]( const String &); //!< Object wrapper
+            const Value & operator[]( const String &) const; //!< Object wrapper
+            
+            Value & operator[]( const char * ); //!< Object wrapper
+            const Value & operator[]( const char * ) const; //!< Object wrapper
             
         private:
             union 
@@ -127,6 +150,10 @@ namespace yocto
             const Value & operator[]( const char *   ) const;
             
             Value & operator[]( const String & );
+            Value & operator[]( const char   * );
+            
+            Value & operator[]( size_t index );
+            const Value & operator[]( size_t index ) const;
             
         private:
             set<String,Pair> pairs;
