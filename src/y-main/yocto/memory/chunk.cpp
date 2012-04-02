@@ -15,7 +15,12 @@ namespace yocto
 		chunk:: chunk(void  *           data_entry,
 					  size_t            block_size,
 					  size_t            num_blocks,
-					  size_t            chunk_size) throw() :
+					  #if defined(NDEBUG)
+					  size_t
+					  #else
+					  size_t            chunk_size
+					  #endif
+					  ) throw() :
 		data( static_cast<uint8_t *>( data_entry ) ),
 		firstAvailable(0),
 		stillAvailable( num_blocks ),
