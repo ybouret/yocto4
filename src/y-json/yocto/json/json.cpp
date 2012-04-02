@@ -1,0 +1,217 @@
+#include "yocto/json/json.hpp"
+#include "yocto/code/swap.hpp"
+#include "yocto/exceptions.hpp"
+
+namespace yocto 
+{
+    namespace JSON
+    {
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Value
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Value:: Value() throw() :
+        type( IsNull ),
+        data()
+        {
+            memset( &data, 0, sizeof(data) );
+        }
+        
+#define YJSON_KILL(TYPE) case Is##TYPE: delete data._##TYPE; break
+        
+        Value:: ~Value() throw()
+        {
+            switch( type )
+            {
+                    
+                    YJSON_KILL(String);     
+                    YJSON_KILL(Array);  
+                    YJSON_KILL(Object); 
+                    
+                default:
+                    break;
+            }
+            data.null = NULL;
+            (ValueType&)type = IsNull;
+        }
+        
+        
+        void Value::swap_with( Value &other ) throw()
+        {
+            cswap<ValueType>( (ValueType&)type, (ValueType&)other.type );
+            memswap(&data,&other.data,sizeof(data));
+        }
+        
+        Value:: Value( const String &s ) :
+        type( IsString )
+        {
+            data._String = new String(s);
+        }
+        
+        Value:: Value( const char *s ) :
+        type( IsString )
+        {
+            data._String = new String(s);
+        }
+        
+        Value:: Value( const Number x) throw() :
+        type( IsNumber ),
+        data()
+        {
+            data._Number = x;
+        }
+        
+        
+        Value:: Value( const ValueType of ) : 
+        type(of),
+        data()
+        {
+            switch( type )
+            {
+                case IsString: data._String = new String(); break;
+                case IsObject: data._Object = new Object(); break;
+                case IsArray:  data._Array  = new Array();  break;
+                default:
+                    break;
+            }
+        }
+        
+#define YJSON_COPY(TYPE) case Is##TYPE: data._##TYPE = new TYPE( *(other.data._##TYPE) ); break
+        
+        Value:: Value( const Value &other ) :
+        type( other.type )
+        {
+            switch( type )
+            {
+                    YJSON_COPY(String);
+                    YJSON_COPY(Object);
+                    YJSON_COPY(Array);
+                    
+                default:
+                    memcpy( &data, &other.data, sizeof(data) );
+                    
+            }
+        }
+        
+        Value & Value:: operator=( const Value &other )
+        {
+            if( this != &other )
+            {
+                Value tmp(other);
+                swap_with(tmp);
+            }
+            return *this;
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Array
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Array:: Array() throw() : values() {}
+        Array:: ~Array() throw() {}
+        
+        Array:: Array( const Array &other ) : values( other.values ) {}
+        
+        size_t Array:: length() const throw() { return values.size(); }
+        
+        Value &Array:: operator[]( size_t index )
+        {
+            if( index < length() )
+                return values[index+1];
+            else
+            {
+                const Value nil;
+                while( index < length() ) values.push_back( nil );
+                return values[index+1];
+            }
+        }
+        
+        const Value &Array:: operator[]( size_t index ) const
+        {
+            if( index >= length() )
+                throw exception("const JSON::Array[%u>=%u]", unsigned( index ), unsigned( length() ) );
+            return values[index+1];
+        }
+        
+        void Array:: push( const Value &v ) { values.push_back( v ); }
+        void Array:: pop()   { if( length() <= 0 ) throw exception("JSON::Array::pop(EMPTY)");   values.pop_back();  }
+        void Array:: shift() { if( length() <= 0 ) throw exception("JSON::Array::shift(EMPTY)"); values.pop_front(); }
+        void Array:: unshift( const Value &v ) { values.push_front(v); }
+        void Array:: reverse() throw()
+        {
+            if( length() > 0 )
+            {
+                yocto::reverse<Value>( &values[1], values.size() );
+            }
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Pair 
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Pair:: Pair( const string &id ) : name(id), value() {}
+        Pair:: Pair( const char   *id ) : name(id), value() {}
+        
+        Pair:: ~Pair() throw() {}
+        const String &Pair:: key() const throw() { return name; }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Object 
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Object::  Object() throw() : pairs() {}
+        Object:: ~Object() throw() {}
+        
+        Object:: Object( const Object &other ) : pairs( other.pairs ) {}
+        
+        size_t Object:: length() const throw() { return pairs.size(); }
+        
+        void Object:: push( const Pair &p )
+        {
+            if( ! pairs.insert(p) )
+                throw exception("JSON::Object.push(multiple '%s')", p.name.c_str() );
+        }
+        
+        void Object:: pop( const String &key )
+        {
+            (void) pairs.remove(key);
+        }
+        
+        const Value & Object:: operator[]( const String &id ) const
+        {
+            const Pair *p = pairs.search( id );
+            if( !p ) throw exception("No JSON::Object['%s']", &id[0] );
+            return p->value;
+        }
+        
+        const Value & Object:: operator[]( const char *id ) const
+        {
+            const String _id(id);
+            return (*this)[ _id ];
+        }
+        
+        Value & Object:: operator[]( const String &id )
+        {
+            Pair *p = pairs.search( id );
+            if( !p )
+            {
+                const Pair P( id );
+                if( ! pairs.insert( P ) )
+                    throw exception("JSON::Object[]: unexpected failure 1/2");
+                p = pairs.search( id  );
+                if( !p )
+                    throw exception("JSON::Object[]: unexpected failure 2/2");
+            }
+            return p->value;
+        }
+
+        
+    }
+    
+}
