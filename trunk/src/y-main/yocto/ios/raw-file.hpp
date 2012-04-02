@@ -37,6 +37,7 @@ namespace yocto
 			
 			
 			explicit raw_file( const string &filename, size_t mode );
+            explicit raw_file( const char   *filename, size_t mode );
 			explicit raw_file( const cstdin_t  &);
 			explicit raw_file( const cstdout_t &);
 			explicit raw_file( const cstderr_t &);

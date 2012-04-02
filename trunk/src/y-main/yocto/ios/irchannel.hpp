@@ -13,6 +13,7 @@ namespace yocto
 		{
 		public:
 			explicit irchannel( const string &filename, offset_t at=0, error_type *status=NULL );
+            explicit irchannel( const char   *filename, offset_t at=0, error_type *status=NULL );
 			virtual ~irchannel() throw();
 			virtual void get( void *data, size_t size, size_t &done );
 			inline virtual void lock()     throw() { file_.lock(); }

@@ -16,6 +16,13 @@ namespace yocto
 			file_.status = status;
 			file_.seek( at, from_set );
 		}
+        
+        irchannel:: irchannel( const char *filename, offset_t at, error_type *status ) :
+		file_( filename, readable )
+		{
+			file_.status = status;
+			file_.seek( at, from_set );
+		}
 		
 		void irchannel:: get( void *data, size_t size, size_t &done )
 		{
