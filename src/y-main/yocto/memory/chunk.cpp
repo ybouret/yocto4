@@ -9,17 +9,17 @@ namespace yocto
 	{
 		
 		bool chunk:: is_empty() const throw() { return stillAvailable >= providedNumber; }
-
+        
 		
 		
 		chunk:: chunk(void  *           data_entry,
 					  size_t            block_size,
 					  size_t            num_blocks,
-					  #if defined(NDEBUG)
+#if defined(NDEBUG)
 					  size_t
-					  #else
+#else
 					  size_t            chunk_size
-					  #endif
+#endif
 					  ) throw() :
 		data( static_cast<uint8_t *>( data_entry ) ),
 		firstAvailable(0),
