@@ -106,6 +106,96 @@ namespace yocto
         }
         
         
+        size_t Value:: length() const throw()
+        {
+            switch( type )
+            {
+                case IsArray:  return data._Array->length();
+                case IsObject: return data._Object->length();
+                default:
+                    break;
+            }
+            return 1;
+        }
+        
+#define YJSON_NAME(TYPE) case Is##TYPE: return #TYPE
+        
+        const char *Value:: GetTypeName( ValueType t ) throw()
+        {
+            switch( t )
+            {
+                    YJSON_NAME(String);
+                    YJSON_NAME(Number);
+                    YJSON_NAME(Object);
+                    YJSON_NAME(Array);
+                    YJSON_NAME(True);
+                    YJSON_NAME(False);
+                    YJSON_NAME(Null);
+                default:
+                    break;
+            }
+            return "Unknown";
+        }
+        
+        const char * Value:: type_name() const throw()
+        {
+            return Value::GetTypeName(type);
+        }
+        
+        Value & Value:: operator[]( size_t index )
+        {
+            switch( type )
+            {
+                case IsObject: return (* data._Object)[index];
+                case IsArray:  return (* data._Array) [index];
+                default:
+                    break;
+            }
+            if( index > 0 )
+                throw exception("invalid index>0 for JSON::%s", type_name());
+            return *this;
+        }
+       
+        const Value & Value:: operator[]( size_t index ) const
+        {
+            switch( type )
+            {
+                case IsObject: return (* data._Object)[index];
+                case IsArray:  return (* data._Array) [index];
+                default:
+                    break;
+            }
+            if( index > 0 )
+                throw exception("invalid index>0 for JSON::%s", type_name());
+            return *this;
+        }
+        
+        Value       & Value:: operator[]( const String &id )
+        {
+            if( type != IsObject ) throw exception("JSON::invalid type %s for ['%s']", type_name(), &id[0] );
+            return (* data._Object)[ id ];
+        }
+        
+        const Value       & Value:: operator[]( const String &id ) const
+        {
+            if( type != IsObject ) throw exception("JSON::invalid const type %s for ['%s']", type_name(), &id[0] );
+            return (* data._Object)[ id ];
+        }
+
+        Value & Value:: operator[]( const char *txt )
+        {
+            const String id( txt );
+            return (*this)[id];
+        }
+        
+        const Value & Value:: operator[]( const char *txt ) const
+        {
+            const String id( txt );
+            return (*this)[id];
+        }
+
+        
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // Array
@@ -210,7 +300,26 @@ namespace yocto
             }
             return p->value;
         }
-
+        
+        Value & Object:: operator[]( const char *id )
+        {
+            const String _id(id);
+            return (*this)[_id];
+        }
+        
+        Value & Object:: operator[]( size_t index )
+        {
+            if( index >= length() ) throw exception("JSON::Object[%u>=%u]", unsigned( index ), unsigned( length() ) );
+            return pairs(index+1).value;
+        }
+        
+        const Value & Object:: operator[]( size_t index ) const
+        {
+            if( index >= length() ) throw exception("const JSON::Object[%u>=%u]", unsigned( index ), unsigned( length() ) );
+            return pairs(index+1).value;
+        }
+        
+        
         
     }
     
