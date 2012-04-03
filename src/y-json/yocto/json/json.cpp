@@ -33,8 +33,8 @@ namespace yocto
                 default:
                     break;
             }
-            data.null = NULL;
             (ValueType&)type = IsNull;
+            memset( &data, 0, sizeof(data) );
         }
         
         
@@ -155,7 +155,7 @@ namespace yocto
                 throw exception("invalid index>0 for JSON::%s", type_name());
             return *this;
         }
-       
+        
         const Value & Value:: operator[]( size_t index ) const
         {
             switch( type )
@@ -181,7 +181,7 @@ namespace yocto
             if( type != IsObject ) throw exception("JSON::invalid const type %s for ['%s']", type_name(), &id[0] );
             return (* data._Object)[ id ];
         }
-
+        
         Value & Value:: operator[]( const char *txt )
         {
             const String id( txt );
@@ -193,8 +193,35 @@ namespace yocto
             const String id( txt );
             return (*this)[id];
         }
-
         
+        
+#define YJSON_AS(TYPE) \
+TYPE & Value::as##TYPE () {\
+if( type != Is##TYPE ) throw exception( "as" #TYPE "(%s)", type_name() ); \
+return * data._##TYPE; }\
+const TYPE & Value::as##TYPE () const {\
+if( type != Is##TYPE ) throw exception( "as" #TYPE "(%s) const", type_name() ); \
+return * data._##TYPE; }
+        
+        YJSON_AS(Array)
+        YJSON_AS(String)
+        YJSON_AS(Object)
+
+        Number       &Value:: asNumber()
+        {
+            if( type != IsNumber )
+                throw exception("asNumber(%s)", type_name());
+            return data._Number;
+        }
+        
+        const Number   &Value:: asNumber() const
+        {
+            if( type != IsNumber )
+                throw exception("asNumber(%s) const", type_name());
+            return data._Number;
+        }
+        
+              
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -249,6 +276,8 @@ namespace yocto
         
         Pair:: ~Pair() throw() {}
         const String &Pair:: key() const throw() { return name; }
+        
+        Pair:: Pair( const Pair &other ) : name( other.name ), value( other.value ) {}
         
         ////////////////////////////////////////////////////////////////////////
         //

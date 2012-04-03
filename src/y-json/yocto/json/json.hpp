@@ -45,9 +45,9 @@ namespace yocto
             
             ~Value() throw();
             
-            Value() throw();          //!< IsNull
-            Value( const String & );  //!< IsString
-            Value( const char   * );  //!< IsString
+            Value() throw();               //!< IsNull
+            Value( const String & );       //!< IsString
+            Value( const char   * );       //!< IsString
             Value( const Number ) throw(); //!< IsNumber
             Value( const ValueType of );   //!< type = of, empty type
             
@@ -61,14 +61,26 @@ namespace yocto
             const char *type_name() const throw();
             size_t length() const throw(); //!< #values in it, default is 1.
             
-            Value & operator[]( size_t index ); //!< Object/Array wrapper
+            Value & operator[]( size_t index );             //!< Object/Array wrapper
             const Value & operator[]( size_t index ) const; //!< Object/Array wrapper
             
-            Value       & operator[]( const String &); //!< Object wrapper
+            Value       & operator[]( const String &);       //!< Object wrapper
             const Value & operator[]( const String &) const; //!< Object wrapper
             
-            Value & operator[]( const char * ); //!< Object wrapper
-            const Value & operator[]( const char * ) const; //!< Object wrapper
+            Value & operator[]( const char * );              //!< Object wrapper
+            const Value & operator[]( const char * ) const;  //!< Object wrapper
+            
+            Object       &asObject();
+            const Object &asObject() const;
+           
+            Array        &asArray();
+            const Array  &asArray() const;
+            
+            String       &asString();
+            const String &asString() const;
+            
+            Number       &asNumber();
+            const Number &asNumber() const;
             
         private:
             union 
@@ -77,7 +89,6 @@ namespace yocto
                 Number  _Number;
                 Object *_Object;
                 Array  *_Array;
-                void   *null;
             } data;
         };
         
@@ -92,6 +103,7 @@ namespace yocto
     namespace JSON 
     {
         
+        //! an Array with a little JavaScript API
         class Array
         {
         public:
@@ -115,7 +127,7 @@ namespace yocto
         };
         
         
-        
+        //! for the Object
         class Pair 
         {
         public:
@@ -125,8 +137,8 @@ namespace yocto
             const String &key() const throw();
             Pair( const Pair &);
             
-            Pair( const string & );
-            Pair( const char   * );
+            Pair( const string & ); //!< with a Null value
+            Pair( const char   * ); //!< with a Null value
             ~Pair() throw();
             
         private:
@@ -134,7 +146,7 @@ namespace yocto
         };
         
         
-        
+        //! JavaScript like Object
         class Object 
         {
         public:
