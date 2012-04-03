@@ -167,8 +167,17 @@ namespace yocto
             Value & operator[]( size_t index );
             const Value & operator[]( size_t index ) const;
             
+            typedef set<String,Pair> pairs_type;
+            typedef pairs_type::iterator       iterator;
+            typedef pairs_type::const_iterator const_iterator;
+
+            inline iterator       begin() throw()       { return pairs.begin(); }
+            inline iterator       end()   throw()       { return pairs.end();   }
+            inline const_iterator begin() const throw() { return pairs.begin(); }
+            inline const_iterator end()   const throw() { return pairs.end();   }
+
         private:
-            set<String,Pair> pairs;
+            pairs_type pairs;
             YOCTO_DISABLE_ASSIGN(Object);
         };
         

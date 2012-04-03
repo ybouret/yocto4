@@ -7,6 +7,16 @@ YOCTO_UNIT_TEST_IMPL(value)
 {
     
     JSON::Value v( JSON::IsObject );
+    v["x"] = 2.0;
+    v["y"] = "world";
     
+    std::cerr << v.type_name() << std::endl;
+    std::cerr << "length=" << v.length() << std::endl;
+    
+    for( JSON::Object::iterator i = v.asObject().begin(); i != v.asObject().end(); ++i )
+    {
+        std::cerr << (*i).name << std::endl;
+        
+    }
 }
 YOCTO_UNIT_TEST_DONE()
