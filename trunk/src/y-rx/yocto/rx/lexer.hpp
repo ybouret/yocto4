@@ -21,14 +21,14 @@ namespace yocto
             sublexer & main() throw();
             sublexer & declare( const string & );
             sublexer & declare( const char   * );
-        
+            
             virtual void reset() throw();
             
             sublexer & operator[]( const string & );
             sublexer & operator[]( const char   * );
             
-            void jump( const string &name );
-            void call( const string &name );
+            void jump( const string &sub_name );
+            void call( const string &sub_name );
             void back();
             
             void load( lexical::plugin *plg );
@@ -40,7 +40,7 @@ namespace yocto
                 load( plg );
                 return plg;
             }
-            const lexical::plugin &get_plugin( const string &name ) const;
+            const lexical::plugin &get_plugin( const string &plugin_name ) const;
             
             //! run until end of source
             void run( source &src );

@@ -82,7 +82,7 @@ namespace yocto
             
             //! change parent lexer
             void attach( lexer *lx ) throw();
-            
+            bool is_attached() const throw();
             
             //! append a plugin
             void plug( const string &plugin_name );
