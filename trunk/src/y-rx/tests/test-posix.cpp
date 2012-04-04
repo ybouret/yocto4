@@ -27,9 +27,10 @@ static inline void test_posix( const string &name, const regex::pattern &p )
 
 #define _TEST(NAME) \
 do { auto_ptr<regex::pattern> p( regex::posix::NAME() ); \
- test_posix( #NAME, *p); \
- db.record( #NAME, p.yield() ); \
- p.reset( db.create( #NAME ) ); } while( false )
+ const string id(#NAME); \
+ test_posix( id, *p); \
+ db.record( id, p.yield() ); \
+ p.reset( db.create( id ) ); } while( false )
 
 YOCTO_UNIT_TEST_IMPL(posix)
 {
