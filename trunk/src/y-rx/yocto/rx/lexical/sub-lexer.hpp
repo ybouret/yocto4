@@ -65,6 +65,13 @@ namespace yocto
             void call(const string &name, pattern *p, const lexical::action &a  );
             void call(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void call(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
+            template <typename OBJECT>
+            void call( const string &name, const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
+            {
+                const lexical::action a(obj,method);
+                this->call(name,expr,a,dict);
+            }
+            
             
             //==================================================================
             // back API
@@ -72,7 +79,12 @@ namespace yocto
             void back( pattern *p, const lexical::action &a );
             void back( const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void back( const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
-            
+            template <typename OBJECT>
+            void back( const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
+            {
+                const lexical::action a(obj,method);
+                this->back(expr,a,dict);
+            }
             
             //! apply best rule
             bool process( source &src );

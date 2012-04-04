@@ -29,8 +29,35 @@ namespace yocto
             Impl() : lexer( "Waiting For First Object Or Array" ),
             iLine(1)
             {
+                static const char new_object[] = "\\{";
+                static const char new_array[]  = "\\[";
+                static const char end_object[] = "\\}";
+                static const char end_array[]  = "\\]";
+                
+                regex::sublexer &makeObject = declare("JSON::Object parser");
+                regex::sublexer &makeArray  = declare("JSON::Array parser");
+                
+                //--------------------------------------------------------------
+                // first=main
+                //--------------------------------------------------------------
                 regex::sublexer &first = main();
+                first.call( makeObject.name, new_object, this, & Impl:: NewObject );
+                first.call( makeArray.name,  new_array,  this, & Impl:: NewArray  );
                 makeBlanks(first);
+                
+                //--------------------------------------------------------------
+                // makeObject
+                //--------------------------------------------------------------
+                makeObject.back( end_object, this, & Impl:: EndObject );
+                makeBlanks( makeObject );
+                
+                //--------------------------------------------------------------
+                // makeArray
+                //--------------------------------------------------------------
+                makeArray.back( end_array, this, & Impl:: EndArray );
+                makeBlanks( makeArray );
+                
+                
             }
             
             virtual ~Impl() throw()
@@ -76,7 +103,32 @@ namespace yocto
                 throw exception("JSON(unexpected char '%c') in %s", tkn.head->data, active_cstr() );
             }
             
+            //==================================================================
+            // Object
+            //==================================================================
+            void NewObject( const regex::token & )
+            {
+                std::cerr << "NewObject" << std::endl;
+            }
             
+            void EndObject( const regex::token & )
+            {
+                std::cerr << "EndObject" << std::endl;
+            }
+            
+            
+            //==================================================================
+            // Array
+            //==================================================================
+            void NewArray( const regex::token & )
+            {
+                std::cerr << "NewArray" << std::endl;
+            }
+            
+            void EndArray( const regex::token & )
+            {
+                std::cerr << "EndArray" << std::endl;
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Impl);
