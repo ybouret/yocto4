@@ -26,7 +26,7 @@ namespace yocto
                 lx.make( regex::basic::any1::create(), ___bad );
             }
             
-            Impl() : lexer( "Waiting For First Object Or Array" ),
+            Impl() : lexer( "JSON:: First Object Or Array" ),
             iLine(1)
             {
                 static const char new_object[] = "\\{";
