@@ -129,7 +129,7 @@ namespace yocto
             void mod_cstring:: esc_bad( const token &tkn )
             {
                 assert( tkn.size == 2);
-                throw exception("invalid escape sequence");
+                throw exception("invalid escape sequence '\\%c'", tkn.tail->data);
             }
             
             void mod_cstring:: esc_bin( const token &tkn )
