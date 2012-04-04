@@ -20,6 +20,7 @@ namespace yocto
 				{
 				public:
 					change_lock( const string &target, bool *status );
+                    change_lock( const char   *target, bool *status );
 					~change_lock() throw();
 					
 				private:
