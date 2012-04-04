@@ -46,49 +46,49 @@ plugins()
             return *init;
         }
         
-        sublexer & lexer:: declare( const string &name )
+        sublexer & lexer:: declare( const string &sub_name )
         {
-            sublex lx( new sublexer( name, this ) );
+            sublex lx( new sublexer( sub_name, this ) );
             if( ! lexdb.insert( lx ) )
-                throw exception("lexer.declare( multiple '%s' )", &name[0] );
+                throw exception("lexer.declare( multiple '%s' )",  &sub_name[0] );
             return *lx;
         } 
         
-        sublexer & lexer:: declare( const char *name )
+        sublexer & lexer:: declare( const char *sub_name )
         {
-            const string __name(name);
+            const string __name(sub_name);
             return declare( __name );
         }
         
-        sublexer & lexer:: operator[]( const string &name )
+        sublexer & lexer:: operator[]( const string &sub_name )
         {
-            sublex *ppLx = lexdb.search( name );
-            if( !ppLx ) throw exception("no lexer['%s']", &name[0] );
+            sublex *ppLx = lexdb.search( sub_name );
+            if( !ppLx ) throw exception("no lexer['%s']", &sub_name[0] );
             return **ppLx;
         }
         
-        sublexer & lexer:: operator[]( const char *name )
+        sublexer & lexer:: operator[]( const char *sub_name )
         {
-            const string __name( name );
+            const string __name( sub_name );
             return (*this)[ __name ];
         }
         
-        void lexer:: jump( const string &name )
+        void lexer:: jump( const string &sub_name )
         {
             assert( NULL != active );
-            sublex *ppLx = lexdb.search( name );
-            if( !ppLx ) throw exception("no lexer.jump('%s')", &name[0] );
+            sublex *ppLx = lexdb.search( sub_name );
+            if( !ppLx ) throw exception("no lexer.jump('%s')", &sub_name[0] );
             //std::cerr << "jump '" << active->name << "' -> '" << (*ppLx)->name << "'" << std::endl;
             active = &(**ppLx);
             
         }
         
-        void lexer:: call( const string &name )
+        void lexer:: call( const string &sub_name )
         {
             assert( NULL != active );
-            sublex *ppLx = lexdb.search( name );
+            sublex *ppLx = lexdb.search( sub_name );
             if( !ppLx ) 
-                throw exception("no lexer.call('%s')", &name[0] );
+                throw exception("no lexer.call('%s')", &sub_name[0] );
             call_stack.push_back( active );
             //std::cerr << "call '" << active->name << "' -> '" << (*ppLx)->name << "'" << std::endl;
             active = &(**ppLx);
@@ -113,7 +113,7 @@ plugins()
             }
         }
         
-        
+               
         ////////////////////////////////////////////////////////////////////////
         //
         // Plugin API for lexer
@@ -126,35 +126,47 @@ plugins()
             assert( plg != NULL );
             lexical::module Mod(plg);
             sublex          Lex(plg);
+            const char     *pId = & (plg->name[0] );
             
-            // make a plugin
-            if( ! plugins.insert( Mod ) )
+            if( plg->is_attached() )
             {
-                throw exception("lexer::load( multiple '%s' )", & (plg->name[0] ) );
+                throw exception("lexer:: plugin '%s' is already attached", pId);
             }
             
+            //------------------------------------------------------------------
+            // make a plugin
+            //------------------------------------------------------------------
+            if( ! plugins.insert( Mod ) )
+            {
+                throw exception("lexer::load( multiple '%s' )",  pId);
+            }
+            
+            //------------------------------------------------------------------
             // make a lexer
+            //------------------------------------------------------------------
             try 
             {
                 if( ! lexdb.insert( Lex ) )
-                    throw exception("plugin/lexer conflict for '%s'", & (plg->name[0] ) );
+                    throw exception("plugin/lexer conflict for '%s'",pId );
             } catch (...) 
             {
                 (void) lexdb.remove( plg->name );
                 throw;
             }
             
-            // go
+            //------------------------------------------------------------------
+            // attach it to this
+            //------------------------------------------------------------------
             plg->attach(this);
             
             
         }
         
-        const lexical::plugin &lexer:: get_plugin( const string &name ) const
+        const lexical::plugin &lexer:: get_plugin( const string &plugin_name ) const
         {
-            const lexical::module *pMod = plugins.search( name );
+            const lexical::module *pMod = plugins.search( plugin_name );
             if( ! pMod )
-                throw exception("lexer::get_plugin(NO '%s')", & name[0] );
+                throw exception("lexer::get_plugin(NO '%s')", & plugin_name[0] );
             return **pMod;
         }
         

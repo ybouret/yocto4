@@ -30,6 +30,11 @@ namespace yocto
             parent = lx;
         }
         
+        bool sublexer:: is_attached() const throw()
+        {
+            return parent != NULL;
+        }
+        
         
         const string & sublexer:: key() const throw() { return name; }
         

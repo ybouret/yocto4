@@ -10,18 +10,10 @@ namespace yocto
     
     namespace JSON
     {
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // type definitions
-        //
-        ////////////////////////////////////////////////////////////////////////
-        
-        typedef bool   Bool;
-        typedef string String;
-        typedef double Number;
-        
-        class Array;
-        class Object;
+        typedef string String; //!< JSON String
+        typedef double Number; //!< JSON Number
+        class          Array;  //!< JSON Array
+        class          Object; //!< JSON Object
         
         
         //! JSON enumerated types.
@@ -76,7 +68,7 @@ namespace yocto
             
             Object       &asObject();
             const Object &asObject() const;
-           
+            
             Array        &asArray();
             const Array  &asArray() const;
             
@@ -133,7 +125,7 @@ namespace yocto
         };
         
         
-        //! for the Object
+        //! a name/value Pair for the Object
         class Pair 
         {
         public:
@@ -173,15 +165,15 @@ namespace yocto
             Value & operator[]( size_t index );
             const Value & operator[]( size_t index ) const;
             
-            typedef set<String,Pair> pairs_type;
+            typedef set<String,Pair>           pairs_type;
             typedef pairs_type::iterator       iterator;
             typedef pairs_type::const_iterator const_iterator;
-
+            
             inline iterator       begin() throw()       { return pairs.begin(); }
             inline iterator       end()   throw()       { return pairs.end();   }
             inline const_iterator begin() const throw() { return pairs.begin(); }
             inline const_iterator end()   const throw() { return pairs.end();   }
-
+            
         private:
             pairs_type pairs;
             YOCTO_DISABLE_ASSIGN(Object);
