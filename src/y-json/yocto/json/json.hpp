@@ -56,7 +56,11 @@ namespace yocto
             void swap_with( Value &other ) throw();
             Value & operator=( const Value &other );
             
-            const ValueType type;
+            Value & operator=( const String & );
+            Value & operator=( const char   * );
+            Value & operator=( const Number   );
+            
+            
             
             const char *type_name() const throw();
             size_t length() const throw(); //!< #values in it, default is 1.
@@ -81,6 +85,8 @@ namespace yocto
             
             Number       &asNumber();
             const Number &asNumber() const;
+            
+            const ValueType type;
             
         private:
             union 

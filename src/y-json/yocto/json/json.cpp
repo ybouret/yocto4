@@ -206,7 +206,7 @@ return * data._##TYPE; }
         YJSON_AS(Array)
         YJSON_AS(String)
         YJSON_AS(Object)
-
+        
         Number       &Value:: asNumber()
         {
             if( type != IsNumber )
@@ -221,7 +221,27 @@ return * data._##TYPE; }
             return data._Number;
         }
         
-              
+        
+        Value & Value:: operator=( const String &txt )
+        {
+            Value tmp(txt);
+            swap_with(tmp);
+            return *this;
+        }
+        
+        Value & Value:: operator=( const char *txt )
+        {
+            Value tmp(txt);
+            swap_with(tmp);
+            return *this;
+        }
+        
+        Value & Value:: operator=( const Number X )
+        {
+            Value tmp(X);
+            swap_with(tmp);
+            return *this;
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
