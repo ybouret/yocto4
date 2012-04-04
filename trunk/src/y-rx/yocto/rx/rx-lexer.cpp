@@ -169,7 +169,9 @@ plugins()
                 throw exception("lexer::get_plugin(NO '%s')", & plugin_name[0] );
             return **pMod;
         }
-        
+     
+        const string & lexer:: active_name() const throw() { assert(active); return active->name; }
+        const char *   lexer:: active_cstr() const throw() { assert(active); return active->name.c_str(); }
         
     }
 }
