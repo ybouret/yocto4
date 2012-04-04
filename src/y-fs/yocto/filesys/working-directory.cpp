@@ -67,7 +67,7 @@ namespace yocto
 			const DWORD len = ::GetCurrentDirectory(0,NULL);
 			if( !len )
 				throw win32::exception( ::GetLastError(), "::GetCurrentDirectory()" );
-
+            
 			memory::buffer_of<char,memory::pooled> buffer( len+1 ); assert( buffer.length() > len );
 			const DWORD res = ::GetCurrentDirectory( len, buffer() );
 			if( !res )
@@ -98,7 +98,7 @@ namespace yocto
 #endif
 		}
 		
-
+        
 		
 		
 		working_directory:: change_lock:: change_lock( const string &target, bool *status ) :
@@ -116,6 +116,27 @@ namespace yocto
 				throw;
 			}
 		}
+        
+        
+        working_directory:: change_lock:: change_lock( const char *target, bool *status ) :
+		source_( working_directory:: instance(). get() ),
+		status_( status )
+		{
+			if( status_ ) *status_ = true;
+			try
+			{
+                const string tgt(target);
+				working_directory:: instance().set( tgt );
+			}
+			catch(...)
+			{
+				if( status_ ) *status_ = false;
+				throw;
+			}
+		}
+        
+        
+        
 		
 		working_directory:: change_lock:: ~change_lock()throw()
 		{
