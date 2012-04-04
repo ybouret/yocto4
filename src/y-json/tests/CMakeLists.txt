@@ -1,7 +1,9 @@
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-json main.cpp ${test_srcs})
-TARGET_LINK_YOCTO( test-json json)
+TARGET_LINK_YOCTO( test-json json rx)
 
-#ENABLE_TESTING()
-#ADD_CUSTOM_TARGET(check-thr COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-thr)
+ENABLE_TESTING()
+ADD_TEST(JSON_Value test-json value)
+
+ADD_CUSTOM_TARGET(check-json COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-json)

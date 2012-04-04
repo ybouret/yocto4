@@ -45,6 +45,9 @@ namespace yocto
             //! run until end of source
             void run( source &src );
             
+            const string &active_name() const throw();
+            const char *  active_cstr() const throw();
+            
             
         private:
             typedef set<string,sublex>          sublex_set;
