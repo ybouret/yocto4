@@ -121,7 +121,7 @@ namespace yocto
 #pragma warning ( disable : 1419 ) 
 #endif
 	
-	uint32_t ihash32(uint32_t);
+	extern uint32_t ihash32(uint32_t);
 	
 	uint32_t wtime:: seed() 
 	{
