@@ -10,6 +10,10 @@ namespace yocto
     
     namespace JSON
     {
+        static const char new_object[] = "\\{";
+        static const char new_array[]  = "\\[";
+        static const char end_object[] = "\\}";
+        static const char end_array[]  = "\\]";
         
         class Parser:: Impl : public regex::lexer
         {
@@ -28,45 +32,51 @@ namespace yocto
                 lx.make( regex::basic::any1::create(), ___bad );
             }
             
+            inline void makeValues( regex::sublexer &lex )
+            {
+                
+                lex.call( "JSON::Object Init", new_object, this, & Impl:: NewObject );
+                lex.call( "JSON::Array Init",  new_array,  this, & Impl:: NewArray  );
+                lex.plug( modString->name );
+                lex.make( "true",  this, & Impl::NewTrue  );
+                lex.make( "false", this, & Impl::NewFalse );
+                lex.make( "null",  this, & Impl::NewNull  );
+            }
             
             Impl() : lexer( "JSON:: Wait for Value" ),
             iLine(1),
             modString( load<regex::lexical::mod_cstring,Impl>( this, & Impl::NewString ) )
             {
-                static const char new_object[] = "\\{";
-                static const char new_array[]  = "\\[";
-                static const char end_object[] = "\\}";
-                static const char end_array[]  = "\\]";
                 
-                regex::sublexer &makeObject      = declare("JSON::Object     parser");
-                regex::sublexer &makeArray       = declare("JSON::Array      parser");
+                regex::sublexer &ObjectInit      = declare("JSON::Object Init");
+                regex::sublexer &ArrayInit       = declare("JSON::Array Init");
+                regex::sublexer &ArrayNext       = declare("JSON::Array Next");
                 
                 //--------------------------------------------------------------
-                // first=main
+                // default: wait for value, should validate
                 //--------------------------------------------------------------
                 regex::sublexer &lex = main();
-                lex.call( makeObject.name, new_object, this, & Impl:: NewObject );
-                lex.call( makeArray.name,  new_array,  this, & Impl:: NewArray  );
-                lex.plug( modString->name );
-                lex.make( "true",  this, & Impl::NewTrue  );
-                lex.make( "false", this, & Impl::NewFalse );
-                lex.make( "null",  this, & Impl::NewNull  );
+                lex.call( "JSON::Object Init", new_object, this, & Impl:: NewObject );
+                lex.call( "JSON::Array Init",  new_array,  this, & Impl:: NewArray  );
                 makeBlanks(lex);
                 
                 //--------------------------------------------------------------
                 // makeObject
                 //--------------------------------------------------------------
-                makeObject.back( end_object, this, & Impl:: EndObject );
-                makeBlanks( makeObject );
+                ObjectInit.back( end_object, this, & Impl:: EndObject );
+                makeBlanks( ObjectInit );
                 
                 //--------------------------------------------------------------
-                // makeArray
+                //  ArrayInit
                 //--------------------------------------------------------------
-                makeArray.back( end_array, this, & Impl:: EndArray );
+                ArrayInit.back( end_array, this, & Impl:: EndArray );
                 
-                makeBlanks( makeArray );
+                makeBlanks( ArrayInit );
                 
-                
+                //--------------------------------------------------------------
+                //  ArrayNext
+                //--------------------------------------------------------------
+                makeBlanks(ArrayNext);
             }
             
             virtual ~Impl() throw()
@@ -158,7 +168,7 @@ namespace yocto
             {
                 std::cerr << "NewTrue" << std::endl;
             }
-        
+            
             void NewNull( const regex::token & )
             {
                 std::cerr << "NewNull" << std::endl;
