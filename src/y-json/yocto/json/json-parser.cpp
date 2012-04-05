@@ -3,6 +3,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/rx/pattern/basic.hpp"
 #include "yocto/rx/source.hpp"
+#include "yocto/rx/lexical/mod-cstring.hpp"
 
 namespace yocto 
 {
@@ -13,8 +14,9 @@ namespace yocto
         class Parser:: Impl : public regex::lexer
         {
         public:
-            typedef regex::lexical::action Action;
-            unsigned iLine;
+            typedef regex::lexical::action  Action;
+            unsigned                        iLine;
+            regex::lexical::mod_cstring    *modString;
             
             inline void makeBlanks( regex::sublexer &lx )
             {
@@ -26,24 +28,30 @@ namespace yocto
                 lx.make( regex::basic::any1::create(), ___bad );
             }
             
-            Impl() : lexer( "JSON:: First Object Or Array" ),
-            iLine(1)
+            
+            Impl() : lexer( "JSON:: Wait for Value" ),
+            iLine(1),
+            modString( load<regex::lexical::mod_cstring,Impl>( this, & Impl::NewString ) )
             {
                 static const char new_object[] = "\\{";
                 static const char new_array[]  = "\\[";
                 static const char end_object[] = "\\}";
                 static const char end_array[]  = "\\]";
                 
-                regex::sublexer &makeObject = declare("JSON::Object parser");
-                regex::sublexer &makeArray  = declare("JSON::Array parser");
+                regex::sublexer &makeObject      = declare("JSON::Object     parser");
+                regex::sublexer &makeArray       = declare("JSON::Array      parser");
                 
                 //--------------------------------------------------------------
                 // first=main
                 //--------------------------------------------------------------
-                regex::sublexer &first = main();
-                first.call( makeObject.name, new_object, this, & Impl:: NewObject );
-                first.call( makeArray.name,  new_array,  this, & Impl:: NewArray  );
-                makeBlanks(first);
+                regex::sublexer &lex = main();
+                lex.call( makeObject.name, new_object, this, & Impl:: NewObject );
+                lex.call( makeArray.name,  new_array,  this, & Impl:: NewArray  );
+                lex.plug( modString->name );
+                lex.make( "true",  this, & Impl::NewTrue  );
+                lex.make( "false", this, & Impl::NewFalse );
+                lex.make( "null",  this, & Impl::NewNull  );
+                makeBlanks(lex);
                 
                 //--------------------------------------------------------------
                 // makeObject
@@ -55,6 +63,7 @@ namespace yocto
                 // makeArray
                 //--------------------------------------------------------------
                 makeArray.back( end_array, this, & Impl:: EndArray );
+                
                 makeBlanks( makeArray );
                 
                 
@@ -128,6 +137,31 @@ namespace yocto
             void EndArray( const regex::token & )
             {
                 std::cerr << "EndArray" << std::endl;
+            }
+            
+            //==================================================================
+            // simple values
+            //==================================================================
+            void NewString( void *data )
+            {
+                assert(data!=NULL);
+                const String &s = *(String *)data;
+                std::cerr << "NewString: " << s << std::endl;
+            }
+            
+            void NewTrue( const regex::token & )
+            {
+                std::cerr << "NewTrue" << std::endl;
+            }
+            
+            void NewFalse( const regex::token & )
+            {
+                std::cerr << "NewTrue" << std::endl;
+            }
+        
+            void NewNull( const regex::token & )
+            {
+                std::cerr << "NewNull" << std::endl;
             }
             
         private:
