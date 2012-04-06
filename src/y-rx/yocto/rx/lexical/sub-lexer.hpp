@@ -58,6 +58,14 @@ namespace yocto
             void jump(const string &name, pattern *p, const lexical::action &a  );
             void jump(const string &name, const string &expr, const lexical::action &a, pattern_dict *dict = NULL );
             void jump(const char   *name, const char   *expr, const lexical::action &a, pattern_dict *dict = NULL );
+            template <typename OBJECT>
+            void jump( const string &name, const char *expr, OBJECT *obj, void (OBJECT::*method)( const token &), pattern_dict *dict = NULL )
+            {
+                const lexical::action a(obj,method);
+                this->jump(name,expr,a,dict);
+            }
+
+            
             
             //==================================================================
             // call API
@@ -100,6 +108,7 @@ namespace yocto
             void plug( const string &plugin_name );
             void plug( const char   *plugin_name );
             
+            //! a default discard method
             void discard( const token & ) throw();
             
         private:
