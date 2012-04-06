@@ -15,14 +15,22 @@ namespace yocto
             plugin:: plugin(const char     *id,
                             const char     *enter_expr,
                             const char     *leave_expr,
-                            const callback &cb) : 
+                            const callback &cb,
+                            const string   *will_jump) : 
             regex::sublexer(id),
             trigger_( compile(enter_expr,NULL) ),
             enter_( this, & plugin:: on_enter ),
             finish_( cb )
             {
                 const action leave_( this, & plugin::on_leave );
-                back( leave_expr, leave_, NULL );
+                if( will_jump )
+                {
+                    jump( *will_jump, leave_expr, leave_, NULL );
+                }
+                else
+                {
+                    back( leave_expr, leave_, NULL );
+                }
             }
             
             const action & plugin:: on_call() const throw()
@@ -45,7 +53,7 @@ namespace yocto
             {
                 return trigger_->clone();
             }
-                       
+            
             
         }
     }

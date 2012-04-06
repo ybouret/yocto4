@@ -45,7 +45,7 @@ namespace yocto
             
             Impl() : lexer( "JSON:: Wait for Value" ),
             iLine(1),
-            modString( load<regex::lexical::mod_cstring,Impl>( this, & Impl::NewString ) )
+            modString( load<regex::lexical::mod_cstring,Impl>( this, & Impl::NewString, NULL ) )
             {
                 
                 regex::sublexer &ObjectInit      = declare("JSON::Object Init");

@@ -20,8 +20,8 @@ namespace yocto
             {
             }
             
-            mod_cstring:: mod_cstring( const callback &cb ) :
-            plugin( "C String", "\"", "\"", cb ),
+            mod_cstring:: mod_cstring( const callback &cb, const string *will_jump ) :
+            plugin( "C String", "\"", "\"", cb, will_jump),
             content()
             {
                 //--------------------------------------------------------------
