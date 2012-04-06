@@ -41,7 +41,8 @@ namespace yocto
                 explicit plugin(const char     *id,
                                 const char     *enter_expr,
                                 const char     *leave_expr,
-                                const callback &cb);
+                                const callback &cb,
+                                const string   *will_jump);
                 
                 
             private:

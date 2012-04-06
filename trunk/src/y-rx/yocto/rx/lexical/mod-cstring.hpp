@@ -15,7 +15,7 @@ namespace yocto
             class mod_cstring : public plugin
             {
             public:
-                explicit mod_cstring( const callback &cb);
+                explicit mod_cstring( const callback &cb, const string *will_jump );
                 virtual ~mod_cstring() throw();
                 string content;
                 

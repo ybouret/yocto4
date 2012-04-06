@@ -21,7 +21,7 @@ namespace yocto
                  - make( endl, add )
                  - make( dot,  add )
                  */
-                explicit mod_ccomment( const callback &cb );
+                explicit mod_ccomment( const callback &cb, const string *will_jump);
                 virtual ~mod_ccomment() throw();
                 
                 string content;

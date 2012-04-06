@@ -33,10 +33,10 @@ namespace yocto
             
             void load( lexical::plugin *plg );
             template <typename PLUGIN,typename OBJECT>
-            PLUGIN *load( OBJECT *host,void (OBJECT::*method)(void*) )
+            PLUGIN *load( OBJECT *host,void (OBJECT::*method)(void*), const string *will_jump)
             {
                 const lexical::callback cb(host,method);
-                PLUGIN *plg = new PLUGIN( cb );
+                PLUGIN *plg = new PLUGIN( cb, will_jump  );
                 load( plg );
                 return plg;
             }

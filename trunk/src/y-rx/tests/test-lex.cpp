@@ -24,8 +24,8 @@ namespace
         MyLexer() : 
         regex::lexer("main"),
         iline(1),
-        plugCom( load<regex::lexical::mod_ccomment,MyLexer>(this,&MyLexer::on_ccomment)  ),
-        plugStr( load<regex::lexical::mod_cstring,MyLexer>(this, &MyLexer::on_cstring ) )
+        plugCom( load<regex::lexical::mod_ccomment,MyLexer>(this,&MyLexer::on_ccomment,NULL)  ),
+        plugStr( load<regex::lexical::mod_cstring,MyLexer>(this, &MyLexer::on_cstring, NULL) )
         {
             regex::sublexer &lex = main();
             
