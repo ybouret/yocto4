@@ -14,13 +14,17 @@ namespace yocto
         static const char new_array[]  = "\\[";
         static const char end_object[] = "\\}";
         static const char end_array[]  = "\\]";
+        static const char NumberRX[]   = "[:digit:]+";
         
         class Parser:: Impl : public regex::lexer
         {
         public:
-            typedef regex::lexical::action  Action;
-            unsigned                        iLine;
-            regex::lexical::mod_cstring    *modString;
+            typedef regex::lexical::mod_cstring StringPlugin;
+            typedef regex::lexical::action      Action;
+            unsigned                            iLine;
+            const string                        ArrayInitID;
+            const string                        ArrayCommaID;
+            StringPlugin                       *ArrayStringPlugin;
             
             inline void makeBlanks( regex::sublexer &lx )
             {
@@ -32,32 +36,36 @@ namespace yocto
                 lx.make( regex::basic::any1::create(), ___bad );
             }
             
-            inline void makeValues( regex::sublexer &lex )
+            inline void makeArray( regex::sublexer &lx )
             {
-                
-                lex.call( "JSON::Object Init", new_object, this, & Impl:: NewObject );
-                lex.call( "JSON::Array Init",  new_array,  this, & Impl:: NewArray  );
-                lex.plug( modString->name );
-                lex.make( "true",  this, & Impl::NewTrue  );
-                lex.make( "false", this, & Impl::NewFalse );
-                lex.make( "null",  this, & Impl::NewNull  );
+                //lx.jump( ArrayCommaID, new_array, this, & Impl::NewArray ); 
+                lx.call( ArrayInitID,  new_array,  this, & Impl:: NewArray  );
+                lx.jump( ArrayCommaID, "true",    this, & Impl::NewTrue  );
+                lx.jump( ArrayCommaID, "false",   this, & Impl::NewFalse );
+                lx.jump( ArrayCommaID, "null",    this, & Impl::NewNull  );
+                lx.jump( ArrayCommaID, NumberRX,  this, & Impl::NewNumber );
             }
+            
             
             Impl() : lexer( "JSON:: Wait for Value" ),
             iLine(1),
-            modString( load<regex::lexical::mod_cstring,Impl>( this, & Impl::NewString, NULL ) )
+            ArrayInitID("JSON::Array Init"),
+            ArrayCommaID( "JSON::Array Comma" ),
+            ArrayStringPlugin( load<StringPlugin,Impl>( this, & Impl::NewString, NULL ) )
             {
-                
+                const string    ArrayNextID("JSON::Array Next");
                 regex::sublexer &ObjectInit      = declare("JSON::Object Init");
-                regex::sublexer &ArrayInit       = declare("JSON::Array Init");
-                regex::sublexer &ArrayNext       = declare("JSON::Array Next");
+                regex::sublexer &ArrayInit       = declare( ArrayInitID  );
+                regex::sublexer &ArrayComma      = declare( ArrayCommaID );
+                regex::sublexer &ArrayNext       = declare( ArrayNextID  );
+                const Action __drop( this, &Impl::Drop );
                 
                 //--------------------------------------------------------------
                 // default: wait for value, should validate
                 //--------------------------------------------------------------
                 regex::sublexer &lex = main();
-                lex.call( "JSON::Object Init", new_object, this, & Impl:: NewObject );
-                lex.call( "JSON::Array Init",  new_array,  this, & Impl:: NewArray  );
+                //lex.call( "JSON::Object Init", new_object, this, & Impl:: NewObject );
+                lex.call( ArrayInitID,  new_array,  this, & Impl:: NewArray  );
                 makeBlanks(lex);
                 
                 //--------------------------------------------------------------
@@ -70,13 +78,21 @@ namespace yocto
                 //  ArrayInit
                 //--------------------------------------------------------------
                 ArrayInit.back( end_array, this, & Impl:: EndArray );
-                
+                makeArray(  ArrayInit );
                 makeBlanks( ArrayInit );
+                
+                //--------------------------------------------------------------
+                //  ArrayComma
+                //--------------------------------------------------------------
+                ArrayComma.back( end_array, this, & Impl:: EndArray );
+                ArrayComma.jump( ArrayNextID, ",",  __drop);
+                makeBlanks(ArrayComma);
                 
                 //--------------------------------------------------------------
                 //  ArrayNext
                 //--------------------------------------------------------------
-                makeBlanks(ArrayNext);
+                makeArray(  ArrayNext );
+                makeBlanks( ArrayNext ) ;
             }
             
             virtual ~Impl() throw()
@@ -172,6 +188,11 @@ namespace yocto
             void NewNull( const regex::token & )
             {
                 std::cerr << "NewNull" << std::endl;
+            }
+            
+            void NewNumber( const regex::token &tkn )
+            {
+                std::cerr << "NewNumber: " << tkn << std::endl;
             }
             
         private:
