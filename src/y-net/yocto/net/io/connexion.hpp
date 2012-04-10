@@ -46,7 +46,7 @@ namespace yocto
         //! base class for user connexion
         /**
          class derived_link : public tcp_link
-         typedef intrusive_ptr<socket_address,derived_link> derived_connexion;
+         typedef intrusive_ptr<socket_address,derived_link> derived_client;
          */
         class tcp_link : public object, public counted
         {
