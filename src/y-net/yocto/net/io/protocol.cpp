@@ -84,14 +84,19 @@ namespace yocto
 			}
 		}
 		
+        
+        //! count sending socket
+        /**
+         a closing socket would send 0 bytes.
+         */
 		bool protocol:: prepare_sock() throw()
 		{
             bool sending = false;
 			for( connDB::iterator i = conn_db.begin(); i != conn_db.end(); ++i )
 			{
-				connexion &cnx = *i;
+				connexion      &cnx  = *i;
 				property<bool> &flag = cnx->cln.sending;
-				if( cnx->ioQ.would_send() )
+				if( cnx->ioQ.would_send() || cnx->closing )
 				{
 					flag    = true;
 					sending = true;
@@ -175,9 +180,9 @@ namespace yocto
 				if( cnx->cln.sending )
 				{
 					//----------------------------------------------------------
-					// something to send !
+					// something to send or forced closing
 					//----------------------------------------------------------
-					assert( cnx->ioQ.would_send() );
+					assert( cnx->ioQ.would_send() || cnx->closing );
 					if( sock_db.can_send( cnx->sock ) )
 					{
                         try {
