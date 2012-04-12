@@ -10,6 +10,7 @@ namespace yocto
 	namespace network
 	{
 		
+        //! manage io_blocks with common block_size
 		class io_cache
 		{
 		public:

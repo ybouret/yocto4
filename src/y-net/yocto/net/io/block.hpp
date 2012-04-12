@@ -11,6 +11,8 @@ namespace yocto
 	{
 	
 		class io_queue;
+        
+        //! block with a fixed maximal length
 		class io_block : public memory::rw_buffer
 		{
 		public:
