@@ -13,17 +13,34 @@ namespace yocto
     {
     public:
         
+        class simulation
+        {
+        public:
+            explicit simulation() throw();
+            virtual ~simulation() throw();
+            
+            int  cycle;
+            int  runMode;
+            bool done;
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(simulation);
+        };
+        
         //! setup visit AND mpi
         static visit &SetupEnvironment( int *argc, 
                                        char ***argv,
                                        const string &sim_name,
                                        const string &sim_comment,
                                        const string &sim_path  );
-        
         const int  rank;
         const int  size;
         const bool is_parallel;
         const bool is_master;
+        
+        void MainLoop( simulation &sim );
+        
+        
         
     private:
         visit();
