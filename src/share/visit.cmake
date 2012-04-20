@@ -1,0 +1,16 @@
+# Wrapper to use VISIT
+
+SET(VISIT_FOUND OFF)
+
+SET(VISIT $ENV{VISIT} CACHE STRING "VISIT path" )
+
+IF(   "" STREQUAL $VISIT )
+	MESSAGE( STATUS "No VisIt detected" )
+ELSE( "" STREQUAL $VISIT )
+	SET(VISIT_FOUND ON)
+	MESSAGE( STATUS "Found VisIt in ${VISIT}" )
+	#INCLUDE(${VISIT}/include/VisItLibraryDependencies.cmake)
+	SET(LIBSIM_DIR ${VISIT}/libsim/V2)
+	INCLUDE_DIRECTORIES( ${LIBSIM_DIR}/include )
+	LINK_DIRECTORIES( ${LIBSIM_DIR}/lib )
+ENDIF("" STREQUAL $VISIT)
