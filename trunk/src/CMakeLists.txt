@@ -60,6 +60,7 @@ YOCTO_BUILD(ocl)
 YOCTO_BUILD(pki)
 YOCTO_BUILD(pack)
 YOCTO_BUILD(json)
+YOCTO_BUILD(visit)
 
 INSTALL( FILES 
 	share/create.sh 
@@ -68,6 +69,7 @@ INSTALL( FILES
 	share/opencl.cmake 
 	share/openmp.cmake
 	share/swig.cmake 
+	share/visit.cmake
 	DESTINATION share/yocto )
 
 ########################################################################
