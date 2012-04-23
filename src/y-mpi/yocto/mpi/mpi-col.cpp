@@ -15,7 +15,7 @@ namespace yocto
 		
 	}
 	
-	void mpi:: Bcast( const void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const
+	void mpi:: Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const
 	{
 		
 		const int err = MPI_Bcast( (void *)buffer, count, datatype, root, comm );

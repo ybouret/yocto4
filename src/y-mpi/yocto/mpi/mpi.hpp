@@ -109,7 +109,7 @@ namespace yocto
 		// Collective Communication Routines
 		//======================================================================
 		void Barrier(MPI_Comm comm) const;
-		void Bcast( const void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
+		void Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
 		void Scatter( const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
 		void Gather(  const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
 

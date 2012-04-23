@@ -3,53 +3,58 @@
 
 #include <VisItControlInterface_V2.h>
 #include <VisItDataInterface_V2.h>
+
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/string.hpp"
+#include "yocto/memory/buffers.hpp"
 
 namespace yocto 
 {
     
-    class visit   : public singleton<visit>
+    class VisIt
     {
     public:
         
-        class simulation
+        static void OpenTraceFile( const string &filename ); //!< VisItOpenTraceFile
+        static void SetDirectory( const string &path );      //!< VisItSetDirectory
+        static void SetOption(const string &options);        //!< VisItSetOptions
+        static void SetupEnvironment(); //!< VisItSetupEnvironment
+        static void SetupParallel( mpi &        MPI, 
+                                  const string &sim_name,
+                                  const string &sim_comment,
+                                  const string &sim_path
+                                  ); //!< auxiliary functions
+        
+        typedef memory::buffer_of<char,memory::global> IOBuffer;
+        static const size_t                            IOBufferSize = 1024;
+        
+        class Simulation
         {
         public:
-            explicit simulation() throw();
-            virtual ~simulation() throw();
+            explicit Simulation();
+            virtual ~Simulation() throw();
             
-            int  cycle;
-            int  runMode;
-            bool done;
+            int      cycle;
+            int      runMode;
+            bool     done;
+            bool     isConnected;
+            IOBuffer iobuff;
+            
+            bool performAlways( const string &cmd );
+            
+            virtual void step();
+            virtual void perform( const string &cmd );
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(simulation);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
+            
         };
         
-        //! setup visit AND mpi
-        static visit &SetupEnvironment( int *argc, 
-                                       char ***argv,
-                                       const string &sim_name,
-                                       const string &sim_comment,
-                                       const string &sim_path  );
-        const int  rank;
-        const int  size;
-        const bool is_parallel;
-        const bool is_master;
-        
-        void MainLoop( simulation &sim );
-        
-        
-        
-    private:
-        visit();
-        virtual ~visit() throw();
-        YOCTO_DISABLE_COPY_AND_ASSIGN(visit);
-        static const threading::longevity life_time = 1;       //!< TODO: set to a better value, greater than MPI
-		static const char                 name[];
-        friend class singleton<visit>;
+        static void MainLoop( mpi &MPI, Simulation &sim, bool WithConsole = true );
+        static void OneStep( Simulation &sim );
+        static void Perform( Simulation &sim, const string &cmd );
     };
+    
     
     
 }
