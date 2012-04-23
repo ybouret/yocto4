@@ -7,22 +7,19 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(init)
 {
  
-    const string sim_name    = "simulation";
+    VisIt:: OpenTraceFile( "trace.txt" );
+    VisIt:: SetupEnvironment();
+    
+    const string sim_name    = "Simulation";
     const string sim_comment = "Simulation Comment";
     const string sim_path    = ".";
+    mpi &MPI = mpi::init( &argc, &argv );
+    VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path);
     
-    visit &VisIt = visit::SetupEnvironment(&argc, &argv, sim_name, sim_comment, sim_path);
-    mpi   &MPI   = * mpi::location();
-    MPI.Printf( stderr, "proc %d/%d is ready\n", MPI.CommWorldRank, MPI.CommWorldSize);
-    if( VisIt.is_master )
-    {
-        VisItInitializeSocketAndDumpSimFile("simname",
-                                            "Simulation Comment",
-                                            "",
-                                            NULL, NULL, NULL);
-    }
+    VisIt::Simulation sim;
     
-    MPI.Barrier(MPI_COMM_WORLD);
+    VisIt:: MainLoop( MPI, sim, true);
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

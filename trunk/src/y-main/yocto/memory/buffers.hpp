@@ -4,7 +4,6 @@
 #include "yocto/memory/buffer.hpp"
 #include "yocto/memory/allocator.hpp"
 #include "yocto/type-traits.hpp"
-
 #include <cstring>
 
 namespace yocto
