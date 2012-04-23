@@ -116,7 +116,7 @@ namespace yocto
         // forward to the simulation
         //----------------------------------------------------------------------
         const string Cmd(cmd);
-        MPI.Printf0(stderr, "[VisIt::Console] '%s'", Cmd.c_str());
+        MPI.Printf0(stderr, "[VisIt::Console] '%s'\n", Cmd.c_str());
         VisIt::Perform(sim,Cmd);
         
     }
