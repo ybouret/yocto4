@@ -36,22 +36,27 @@ namespace yocto
             explicit Simulation( mpi &MPI );
             virtual ~Simulation() throw();
             
-            int      cycle;
-            int      runMode;
-            bool     done;
-            bool     isConnected;
-            IOBuffer iobuff;
-            const int par_rank;
-            const int par_size;
-            
+            int        cycle;
+            int        runMode;
+            bool       done;
+            bool       connected;
+            IOBuffer   iobuff;
+            const int  par_rank;
+            const int  par_size;
+            const bool parallel;
+            const bool master;
             
             virtual void step();
             virtual void perform( const string &cmd );
+            
+            static const char  *GenericCommandReg[];
+            static const size_t GenericCommandNum;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
             bool performAlways( const string &cmd );
             friend class VisIt;
+           
         };
         
         static void MainLoop( mpi &MPI, Simulation &sim, bool WithConsole = true );

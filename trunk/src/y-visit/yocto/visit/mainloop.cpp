@@ -76,10 +76,11 @@ namespace yocto
     //==========================================================================
     static inline void ProcessConsole( mpi &MPI, VisIt:: Simulation &sim )
     {
+        assert( sim.par_rank == MPI.CommWorldRank );
         char        *cmd = sim.iobuff();
         const size_t len = sim.iobuff.length();
         memset(cmd,len,0);
-        if( 0 == MPI.CommWorldRank )
+        if( sim.master )
         {
             //------------------------------------------------------------------
             // capture the line
@@ -118,7 +119,6 @@ namespace yocto
         const string __cmd(cmd);
         MPI.Printf0(stderr, "[VisIt::Console] '%s'\n", __cmd.c_str());
         VisIt::Perform(sim,__cmd);
-        
     }
     
     //==========================================================================
@@ -130,25 +130,26 @@ namespace yocto
         visit_handle       md  = VISIT_INVALID_HANDLE;
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
         
-        /* Create metadata with no variables. */
+        
         if(VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
         {
+            /* Meta Data for Simulation */
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
             VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,0);
-        }
-        
-        /* Create Generic Interface */
-        static const char *cmd_names[] = { "halt", "run", "step" };
-        for(int i = 0; i <  (sizeof(cmd_names)/sizeof(cmd_names[0])); ++i)
-        {
-            visit_handle cmd = VISIT_INVALID_HANDLE;
-            if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
+            
+            
+            /* Create Generic Interface/Commands */
+            for(size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
             {
-                VisIt_CommandMetaData_setName(cmd, cmd_names[i]);
-                VisIt_SimulationMetaData_addGenericCommand(md, cmd);
+                visit_handle cmd = VISIT_INVALID_HANDLE;
+                if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
+                {
+                    VisIt_CommandMetaData_setName(cmd, VisIt::Simulation::GenericCommandReg[i]);
+                    VisIt_SimulationMetaData_addGenericCommand(md, cmd);
+                }
             }
+            
         }
-        
         
         return md;
     }
@@ -159,7 +160,7 @@ namespace yocto
     static void
     ControlCommandCallback(const char *cmd, 
                            const char *args,
-                           void *cbdata)
+                           void       *cbdata)
     {
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
         const string       todo = cmd;
@@ -185,31 +186,35 @@ namespace yocto
     
     void VisIt:: MainLoop( mpi &MPI, Simulation &sim, bool WithConsole )
     {
-        const bool master = (0 == MPI.CommWorldRank);
         
-        MPI.Printf0(stderr, "[VisIt] MainLoop\n");
+        MPI.Printf0(stderr, "[VisIt] Main Loop\n");
         if( WithConsole )
             MPI.Printf0(stderr, "[VisIt] Console is Active\n");
-        int       visitstate=-1;
-        const int fd        = WithConsole ? fileno(stdin) : -1;
+        
+        int        visitstate = -1;
+        const int  fd         = WithConsole ? fileno(stdin) : -1;
+        
         do 
         {
-            const int blocking = ( sim.runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;
             //------------------------------------------------------------------
             // Get input from VisIt or timeout so the simulation can run.
             //------------------------------------------------------------------
-            if(master)
+            const int blocking = ( sim.runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;            
+            if(sim.master)
             {
                 visitstate = VisItDetectInput(blocking, fd );
             }
+            
             //------------------------------------------------------------------
             // broadcast status
             //------------------------------------------------------------------
             MPI.Bcast(&visitstate, 1, MPI_INT, 0, MPI_COMM_WORLD);
             
+            //------------------------------------------------------------------
+            // act according to status
+            //------------------------------------------------------------------
             switch( visitstate )
             {
-                    
                     
                 case 0:
                     //----------------------------------------------------------
@@ -226,15 +231,18 @@ namespace yocto
                     if(VisItAttemptToCompleteConnection())
                     {
                         MPI.Printf0(stderr, "[VisIt] Connected\n");
+                        //------------------------------------------------------
+                        // Setup callbacks for this connection
+                        //------------------------------------------------------
                         VisItSetSlaveProcessCallback(SlaveProcessCallback);
                         VisItSetCommandCallback(ControlCommandCallback,(void*) &sim);
                         VisItSetGetMetaData(SimGetMetaData, (void*) &sim);
-                        sim.isConnected = true;
+                        sim.connected = true;
                     }
                     else
                     {
                         MPI.Printf0(stderr, "[VisIt] Did not connect: %s\n", VisItGetLastError());
-                        sim.isConnected = false; // to be sure
+                        sim.connected = false; 
                     }
                     break;
                     
@@ -248,7 +256,7 @@ namespace yocto
                         /* Disconnect on an error or closed connection. */ 
                         MPI.Printf0(stderr,"[VisIt] Disconnected\n");
                         VisItDisconnect();
-                        sim.isConnected = false;
+                        sim.connected = false;
                         //sim.runMode     = VISIT_SIMMODE_RUNNING;
                     }
                     break;

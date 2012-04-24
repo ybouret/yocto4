@@ -3,6 +3,10 @@
 
 namespace yocto 
 {
+    
+    const char * VisIt:: Simulation:: GenericCommandReg[] = { "halt", "run", "step" };
+    const size_t VisIt:: Simulation:: GenericCommandNum = sizeof(VisIt:: Simulation::GenericCommandReg)/sizeof(VisIt:: Simulation::GenericCommandReg[0]);
+    
     VisIt:: Simulation:: ~Simulation() throw()
     {
     }
@@ -11,17 +15,19 @@ namespace yocto
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
     done(false),
-    isConnected(false),
+    connected(false),
     iobuff( VisIt::IOBufferSize ),
     par_rank( MPI.CommWorldRank ),
-    par_size( MPI.CommWorldSize )
+    par_size( MPI.CommWorldSize ),
+    parallel(par_size>0),
+    master(par_rank==0)
     {
     }
     
     void VisIt:: Simulation:: step()
     {
         mpi & MPI = *mpi::location();
-        const char *run_mode = isConnected ? "[CONNECTED]" : "[STANDALONE]";
+        const char *run_mode = connected ? "[VisIt ONLINE ]" : "[Visit OFFLINE]";
         MPI.Printf0(stderr, "%s cycle= %6d\n", run_mode, cycle);
     }
     

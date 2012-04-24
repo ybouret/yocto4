@@ -147,6 +147,9 @@ namespace yocto
 		void Startall( Requests & ) const;
 		void Waitall( Requests & ) const;
 		
+        void InitSync() const;
+        void QuitSync() const;
+        
 	private:
 		friend class singleton<mpi>;                            //!< access mpi
 		static const threading::longevity life_time = 0;       //!< TODO: set to a better value
