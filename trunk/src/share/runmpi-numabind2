@@ -1,0 +1,51 @@
+#!/bin/sh
+
+#------------------------------------------------------------------------------
+# The following instructions assume that your environment was properly defined.
+# for example: source /workspace IntelEnv-11.1.072
+#------------------------------------------------------------------------------
+
+#--------------------------------- Information ---------------------------
+# You can also have users login interactively to the system, and submit
+# jobs with numabind.
+# There is an option in numabind that allows you to identify if a certain
+# amount of consecutive cores are available, before you actually submit a
+# job, so your users can use that as well.
+# In this case you would not need any additional external job scheduler.
+#-------------------------------------------------------------------------
+
+prog=${0##*/}
+usage="-> Usage: $prog number_of_processes(type:integer) program_file(type:string) input_file(type:string)"
+
+# Number of MPI processes to invoke
+np="$1"
+
+# Binary executable
+prog="$2"
+
+# Input File
+input="$3"
+
+# Basic Checks...
+if [ $# -ne 3 ]; then
+    echo $usage
+    exit 1
+fi
+if [ $np -gt 64 ]; then
+    echo "-> number of process exceed maximum autorized."
+    exit 2
+fi
+
+# Using NUMABIND to return the set of consecutive free CPUs.
+# An empty string is returned if not enough CPUs are free in the system.
+
+cpus=`numabind --nooversub --offset $np`
+
+if [ -z "$cpus" ]; then
+        echo -e "\033[31m -> Not enough CPUs available to launch jobs !!  \033[0m"
+else
+        echo "-> Enough CPUs available. Launching jobs now."
+        /usr/bin/time mpirun -np $np $prog $input 
+fi
+
+exit 0
