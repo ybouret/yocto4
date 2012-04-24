@@ -115,9 +115,9 @@ namespace yocto
         //----------------------------------------------------------------------
         // forward to the simulation
         //----------------------------------------------------------------------
-        const string Cmd(cmd);
-        MPI.Printf0(stderr, "[VisIt::Console] '%s'\n", Cmd.c_str());
-        VisIt::Perform(sim,Cmd);
+        const string __cmd(cmd);
+        MPI.Printf0(stderr, "[VisIt::Console] '%s'\n", __cmd.c_str());
+        VisIt::Perform(sim,__cmd);
         
     }
     
@@ -185,7 +185,7 @@ namespace yocto
     
     void VisIt:: MainLoop( mpi &MPI, Simulation &sim, bool WithConsole )
     {
-        const bool master = 0 == MPI.CommWorldRank;
+        const bool master = (0 == MPI.CommWorldRank);
         
         MPI.Printf0(stderr, "[VisIt] MainLoop\n");
         if( WithConsole )
@@ -233,7 +233,7 @@ namespace yocto
                     }
                     else
                     {
-                        MPI.Printf0(stderr, "[VisIt] Did not connect\n");
+                        MPI.Printf0(stderr, "[VisIt] Did not connect: %s\n", VisItGetLastError());
                         sim.isConnected = false; // to be sure
                     }
                     break;
@@ -248,7 +248,6 @@ namespace yocto
                         /* Disconnect on an error or closed connection. */ 
                         MPI.Printf0(stderr,"[VisIt] Disconnected\n");
                         VisItDisconnect();
-                        /* Start running again if VisIt closes ? */ 
                         sim.isConnected = false;
                         //sim.runMode     = VISIT_SIMMODE_RUNNING;
                     }
@@ -258,14 +257,15 @@ namespace yocto
                     ProcessConsole(MPI, sim);
                     break;
                     
-                case -1: throw exception("VisItDetectInput EINTR");
-                case -2: throw exception("VisItDetectInput unknown error");
+                case -1: 
+                case -2:
                 case -3: 
                 case -4: 
                 case -5:
-                    throw exception("VisItDetectInput Logic Error(%d)",visitstate);
+                    throw exception("VisItDetectInput Error(%d): %s",visitstate,VisItGetLastError());
+                    
                 default:
-                    throw exception("VisItDetectInput error %d", visitstate );
+                    throw exception("VisItDetectInput Unexpected Error(%d): %s", visitstate, VisItGetLastError());
                     
             }
             

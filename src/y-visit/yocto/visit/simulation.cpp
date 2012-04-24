@@ -7,12 +7,14 @@ namespace yocto
     {
     }
     
-    VisIt:: Simulation:: Simulation() :
+    VisIt:: Simulation:: Simulation( mpi &MPI) :
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
     done(false),
     isConnected(false),
-    iobuff( VisIt::IOBufferSize )
+    iobuff( VisIt::IOBufferSize ),
+    par_rank( MPI.CommWorldRank ),
+    par_size( MPI.CommWorldSize )
     {
     }
     
