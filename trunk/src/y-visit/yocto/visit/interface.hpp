@@ -28,10 +28,12 @@ namespace yocto
         typedef memory::buffer_of<char,memory::global> IOBuffer;
         static const size_t                            IOBufferSize = 1024;
         
+        
+        
         class Simulation
         {
         public:
-            explicit Simulation();
+            explicit Simulation( mpi &MPI );
             virtual ~Simulation() throw();
             
             int      cycle;
@@ -39,15 +41,17 @@ namespace yocto
             bool     done;
             bool     isConnected;
             IOBuffer iobuff;
+            const int par_rank;
+            const int par_size;
             
-            bool performAlways( const string &cmd );
             
             virtual void step();
             virtual void perform( const string &cmd );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
-            
+            bool performAlways( const string &cmd );
+            friend class VisIt;
         };
         
         static void MainLoop( mpi &MPI, Simulation &sim, bool WithConsole = true );

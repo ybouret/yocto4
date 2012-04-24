@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(init)
     mpi &MPI = mpi::init( &argc, &argv );
     VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path);
     
-    VisIt::Simulation sim;
+    VisIt::Simulation sim(MPI);
     
     VisIt:: MainLoop( MPI, sim, true);
     
