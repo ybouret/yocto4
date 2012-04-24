@@ -30,7 +30,7 @@ namespace yocto
 			vfprintf(fp, fmt, ap);
 			va_end(ap);
 			fflush(fp);
-
+            
 			if( CommWorldRank < CommWorldLast )
 			{
 				Send( &msg, 1, MPI_INT, CommWorldRank+1, tag, MPI_COMM_WORLD);
@@ -65,9 +65,48 @@ namespace yocto
 			fflush(fp);
 		}
 		Barrier(MPI_COMM_WORLD);
-	
+        
 	}
-	
+    
+    
+    void mpi:: InitSync() const
+    {
+        static const int tag = 1001;
+		int              msg = tag;
+        if( CommWorldSize > 1 )
+        {
+            Barrier(MPI_COMM_WORLD);
+            if( CommWorldRank > 0 )
+			{
+                // wait from previous
+               // fprintf( stderr, "[MPI] rank %d InitSync\n", CommWorldRank ); fflush( stderr );
+				MPI_Status status;
+				Recv( &msg, 1, MPI_INT, CommWorldRank-1, tag, MPI_COMM_WORLD,status);
+                
+                // send to next
+                if( CommWorldRank < CommWorldLast )
+                {
+                    Send( &msg, 1, MPI_INT, CommWorldRank+1, tag, MPI_COMM_WORLD);
+                }
+                //fprintf( stderr, "[MPI] rank %d QuitSync\n", CommWorldRank ); fflush( stderr );
+			}
+        }
+    }
+    
+	void mpi:: QuitSync() const
+    {
+        static const int tag = 1001;
+		int              msg = tag;
+        if( CommWorldSize > 1 )
+        {
+            if( 0 == CommWorldRank )
+            {
+                Send( &msg, 1, MPI_INT, CommWorldRank+1, tag, MPI_COMM_WORLD);
+            }
+            Barrier(MPI_COMM_WORLD);
+        }
+    }
+    
 	
 }
 
