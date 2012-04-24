@@ -42,7 +42,8 @@ namespace yocto
     void VisIt:: SetupParallel( mpi &        MPI , 
                                const string &sim_name,
                                const string &sim_comment,
-                               const string &sim_path)
+                               const string &sim_path,
+                               const string *sim_ui)
     {
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
@@ -58,11 +59,15 @@ namespace yocto
         
         if( 0 == MPI.CommWorldRank )
         {
+            const char *ui_file = sim_ui ? sim_ui->c_str() : NULL;
             if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(), 
                                                       sim_comment.c_str(), 
                                                       sim_path.c_str(),
-                                                      NULL, NULL, NULL) )
-                throw exception("VisItInitializeSocketAndDumpSimFile Failure");
+                                                      NULL, 
+                                                      ui_file,
+                                                      NULL
+                                                      ) )
+                throw exception("VisItInitialize Failure: %s", VisItGetLastError() );
         }
     }
 }

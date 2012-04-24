@@ -22,7 +22,8 @@ namespace yocto
         static void SetupParallel( mpi &        MPI, 
                                   const string &sim_name,
                                   const string &sim_comment,
-                                  const string &sim_path
+                                  const string &sim_path,
+                                  const string *sim_ui = NULL
                                   ); //!< auxiliary functions
         
         typedef memory::buffer_of<char,memory::global> IOBuffer;
