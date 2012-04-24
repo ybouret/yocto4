@@ -17,6 +17,7 @@ namespace yocto
     done(false),
     connected(false),
     iobuff( VisIt::IOBufferSize ),
+    console(true),
     par_rank( MPI.CommWorldRank ),
     par_size( MPI.CommWorldSize ),
     parallel(par_size>0),

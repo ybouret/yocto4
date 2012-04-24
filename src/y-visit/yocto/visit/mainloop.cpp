@@ -171,6 +171,7 @@ namespace yocto
     }
     
     
+      
     void VisIt:: OneStep( Simulation &sim )
     {
         ++sim.cycle;
@@ -184,15 +185,19 @@ namespace yocto
         VisItTimeStepChanged();
     }
     
-    void VisIt:: MainLoop( mpi &MPI, Simulation &sim, bool WithConsole )
+    void VisIt:: MainLoop( mpi &MPI, Simulation &sim )
     {
         
         MPI.Printf0(stderr, "[VisIt] Main Loop\n");
-        if( WithConsole )
-            MPI.Printf0(stderr, "[VisIt] Console is Active\n");
+        
         
         int        visitstate = -1;
-        const int  fd         = WithConsole ? fileno(stdin) : -1;
+        const int  fd         = sim.console ? fileno(stdin) : -1;
+        if( sim.console )
+        {
+            MPI.Printf0(stderr, "[VisIt] Console is Active\n");
+            //__Invite(MPI);
+        }
         
         do 
         {
