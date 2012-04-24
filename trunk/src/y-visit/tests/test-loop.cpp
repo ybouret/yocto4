@@ -4,10 +4,10 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_IMPL(init)
+YOCTO_UNIT_TEST_IMPL(loop)
 {
  
-    VisIt:: OpenTraceFile( "trace.txt" );
+    VisIt:: OpenTraceFile( "trace.dat" );
     VisIt:: SetupEnvironment();
     
     const string sim_name    = "Simulation";
@@ -15,7 +15,6 @@ YOCTO_UNIT_TEST_IMPL(init)
     const string sim_path    = ".";
     mpi &MPI = mpi::init( &argc, &argv );
     VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path);
-    
     VisIt::Simulation sim(MPI);
     
     VisIt:: MainLoop( MPI, sim, true);
