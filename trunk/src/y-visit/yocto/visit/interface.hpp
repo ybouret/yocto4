@@ -42,6 +42,7 @@ namespace yocto
             bool       done;
             bool       connected;
             IOBuffer   iobuff;
+            const bool console;
             const int  par_rank;
             const int  par_size;
             const bool parallel;
@@ -60,7 +61,7 @@ namespace yocto
            
         };
         
-        static void MainLoop( mpi &MPI, Simulation &sim, bool WithConsole = true );
+        static void MainLoop( mpi &MPI, Simulation &sim );
         static void OneStep( Simulation &sim );
         static void Perform( Simulation &sim, const string &cmd );
     };

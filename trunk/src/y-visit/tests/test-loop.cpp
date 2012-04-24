@@ -67,7 +67,7 @@ YOCTO_UNIT_TEST_IMPL(loop)
     VisItUI_valueChanged("LEVELS", ui_levels_changed, &sim);
     VisItUI_stateChanged("OPTION", ui_option_changed, &sim);
     
-    VisIt:: MainLoop( MPI, sim, true);
+    VisIt:: MainLoop( MPI, sim );
     
     
 }
