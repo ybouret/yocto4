@@ -26,7 +26,7 @@ namespace yocto
         
         static void SetDirectory( const string &path );      //!< VisItSetDirectory
         static void SetOption(const string &options);        //!< VisItSetOptions
-        static void SetupEnvironment(); //!< VisItSetupEnvironment
+        static void SetupEnvironment();                      //!< VisItSetupEnvironment
         static void SetupParallel( mpi &        MPI, 
                                   const string &sim_name,
                                   const string &sim_comment,
@@ -42,19 +42,20 @@ namespace yocto
         class Simulation
         {
         public:
-            explicit Simulation( mpi &MPI );
+            explicit Simulation( const mpi & );
             virtual ~Simulation() throw();
             
             int        cycle;
             int        runMode;
             bool       done;
-            bool       connected;
-            IOBuffer   iobuff;
-            const bool console;
-            const int  par_rank;
-            const int  par_size;
-            const bool parallel;
-            const bool master;
+            bool       connected; //!< up to date VisIt status
+            IOBuffer   iobuff;    //!< buffer for console input
+            const mpi &MPI;       //!< MPI singleton reference
+            const bool console;   //!< shall use the interactive console
+            const int  par_rank;  //!< alias MPI.CommWorldRank 
+            const int  par_size;  //!< alias MPi.CommWorldSize
+            const bool parallel;  //!< par_size > 1
+            const bool master;    //!< 0 == par_rank
             
             virtual void step();
             virtual void perform( const string &cmd );
@@ -62,13 +63,15 @@ namespace yocto
             static const char  *GenericCommandReg[];
             static const size_t GenericCommandNum;
             
+            void invite() const;
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
-            bool performAlways( const string &cmd );
+            void   performAlways( const string &cmd );
             friend class VisIt;
         };
         
-        static void MainLoop( mpi &MPI, Simulation &sim );
+        static void MainLoop(Simulation &sim );
         static void OneStep( Simulation &sim );
         static void Perform( Simulation &sim, const string &cmd );
     };
