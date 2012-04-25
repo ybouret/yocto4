@@ -33,7 +33,7 @@ ELSE( "" STREQUAL "${VISIT}" )
 		###################
 		## Append libsimV2
 		###################
-		TARGET_LINK_LIBRARIES( ${tgt} simV2 simV2f y-visit y-mpi ${MPI_LIBRARIES} )
+		TARGET_LINK_LIBRARIES( ${tgt} y-visit simV2 simV2f y-mpi ${MPI_LIBRARIES} )
 		
 		#########################
 		## Append optional libdl
