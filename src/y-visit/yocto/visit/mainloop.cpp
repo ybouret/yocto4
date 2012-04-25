@@ -29,10 +29,10 @@ namespace yocto
     }
     
     
-    static int ProcessVisItCommand( mpi &MPI, VisIt:: Simulation &sim )
+    static int ProcessVisItCommand( VisIt:: Simulation &sim )
     {
         int command = -1;
-        if ( 0 == MPI.CommWorldRank )
+        if ( 0 == sim.par_rank )
         {
             const int success = VisItProcessEngineCommand();
             if (success)
@@ -74,9 +74,9 @@ namespace yocto
     //==========================================================================
     // Process Console.
     //==========================================================================
-    static inline void ProcessConsole( mpi &MPI, VisIt:: Simulation &sim )
+    static inline void ProcessConsole( VisIt:: Simulation &sim )
     {
-        assert( sim.par_rank == MPI.CommWorldRank );
+        const mpi &  MPI = sim.MPI;
         char        *cmd = sim.iobuff();
         const size_t len = sim.iobuff.length();
         memset(cmd,len,0);
@@ -121,6 +121,7 @@ namespace yocto
         VisIt::Perform(sim,__cmd);
     }
     
+    
     //==========================================================================
     // SimGetMetaData
     //==========================================================================
@@ -155,7 +156,7 @@ namespace yocto
     }
     
     //==========================================================================
-    // SimGetMetaData
+    // Control Command Callback
     //==========================================================================
     static void
     ControlCommandCallback(const char *cmd, 
@@ -166,28 +167,27 @@ namespace yocto
         const string       todo = cmd;
         
         static mpi &MPI = *mpi::location();
-        MPI.Printf0(stderr,"[VisIt::Command] '%s'\n", cmd );
+        MPI.Printf0(stderr,"[VisIt::Command] '%s' (%s) \n", cmd, args ? args : "NO ARGS" );
         VisIt::Perform( sim, cmd );
     }
     
     
-      
     void VisIt:: OneStep( Simulation &sim )
     {
         ++sim.cycle;
         sim.step();
     }
     
+    
     void VisIt:: Perform( Simulation &sim, const string &cmd )
     {
-        if( !sim.performAlways(cmd) )
-            sim.perform(cmd);
+        sim.performAlways(cmd);
         VisItTimeStepChanged();
     }
     
-    void VisIt:: MainLoop( mpi &MPI, Simulation &sim )
+    void VisIt:: MainLoop( Simulation &sim )
     {
-        
+        const mpi &MPI = sim.MPI;
         MPI.Printf0(stderr, "[VisIt] Main Loop\n");
         
         
@@ -200,6 +200,8 @@ namespace yocto
         
         do 
         {
+            //sim.invite();
+
             //------------------------------------------------------------------
             // Get input from VisIt or timeout so the simulation can run.
             //------------------------------------------------------------------
@@ -255,7 +257,7 @@ namespace yocto
                     // VisIt wants to tell the engine something.
                     //----------------------------------------------------------
                     //sim.runMode = VISIT_SIMMODE_STOPPED;
-                    if(!ProcessVisItCommand(MPI,sim))
+                    if(!ProcessVisItCommand(sim))
                     {
                         /* Disconnect on an error or closed connection. */ 
                         MPI.Printf0(stderr,"[VisIt] Disconnected\n");
@@ -266,7 +268,7 @@ namespace yocto
                     break;
                     
                 case 3: 
-                    ProcessConsole(MPI, sim);
+                    ProcessConsole(sim);
                     break;
                     
                 case -1: 

@@ -11,12 +11,13 @@ namespace yocto
     {
     }
     
-    VisIt:: Simulation:: Simulation( mpi &MPI) :
+    VisIt:: Simulation:: Simulation( const mpi &ref) :
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
     done(false),
     connected(false),
     iobuff( VisIt::IOBufferSize ),
+    MPI( ref ),
     console(true),
     par_rank( MPI.CommWorldRank ),
     par_size( MPI.CommWorldSize ),
@@ -27,45 +28,52 @@ namespace yocto
     
     void VisIt:: Simulation:: step()
     {
-        mpi & MPI = *mpi::location();
         const char *run_mode = connected ? "[VisIt ONLINE ]" : "[Visit OFFLINE]";
         MPI.Printf0(stderr, "%s cycle= %6d\n", run_mode, cycle);
     }
     
+    void VisIt:: Simulation:: invite() const
+    {
+        if( console && runMode == VISIT_SIMMODE_STOPPED )
+        {
+            MPI.Printf0( stderr, "command> ");
+        }
+    }
     
-    bool VisIt:: Simulation:: performAlways( const string &cmd )
+    void VisIt:: Simulation:: performAlways( const string &cmd )
     {
         if(  cmd == "run"  )
         {
             runMode = VISIT_SIMMODE_RUNNING;
-            return true;
+            return;
         }
         
         if( cmd == "halt" )
         {
             runMode = VISIT_SIMMODE_STOPPED;
-            return true;
+            return;
         }
         
         if( cmd == "step" )
         {
             runMode = VISIT_SIMMODE_STOPPED;
             VisIt::OneStep(*this);
-            return true;
+            return;
         }
         
         if( cmd == "quit" )
         {
             done = true;
-            return true;
+            return;
         }
-        return false;
+        
+        // virtual call
+        perform(cmd);
     }
     
     void VisIt:: Simulation:: perform( const string &cmd )
     {
-        mpi & MPI = *mpi::location();
-        MPI.Printf(stderr,"rank %d> '%s'\n", MPI.CommWorldRank, cmd.c_str());
+        MPI.Printf(stderr,"rank %d> '%s'\n", par_rank, cmd.c_str());
     }
     
 }
