@@ -196,7 +196,6 @@ namespace yocto
         if( sim.console )
         {
             MPI.Printf0(stderr, "[VisIt] Console is Active\n");
-            //__Invite(MPI);
         }
         
         do 

@@ -15,7 +15,15 @@ namespace yocto
     {
     public:
         
-        static void OpenTraceFile( const string &filename ); //!< VisItOpenTraceFile
+        class TraceFile
+        {
+        public:
+            TraceFile( const string &filename );
+            virtual ~TraceFile() throw();
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(TraceFile);
+        };
+        
         static void SetDirectory( const string &path );      //!< VisItSetDirectory
         static void SetOption(const string &options);        //!< VisItSetOptions
         static void SetupEnvironment(); //!< VisItSetupEnvironment
@@ -58,7 +66,6 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
             bool performAlways( const string &cmd );
             friend class VisIt;
-           
         };
         
         static void MainLoop( mpi &MPI, Simulation &sim );
