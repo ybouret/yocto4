@@ -49,7 +49,8 @@ ui_option_changed(int value, void *cbdata)
 YOCTO_UNIT_TEST_IMPL(loop)
 {
  
-    VisIt:: OpenTraceFile( "trace.dat" );
+    const string       trace_name = "trace.dat";
+    VisIt:: TraceFile  trace_file( trace_name );
     VisIt:: SetupEnvironment();
     
     const string sim_name    = "Simulation";

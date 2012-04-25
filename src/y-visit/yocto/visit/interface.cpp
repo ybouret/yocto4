@@ -5,9 +5,16 @@ namespace yocto
 {
     
     
-    void VisIt:: OpenTraceFile( const string &filename )
+    
+    VisIt:: TraceFile:: TraceFile( const string &filename  ) 
     {
         VisItOpenTraceFile( filename.c_str() );
+    }
+    
+    
+    VisIt:: TraceFile:: ~TraceFile() throw()
+    {
+        VisItCloseTraceFile();
     }
     
     void VisIt:: SetDirectory( const string &path )
