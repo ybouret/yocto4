@@ -15,7 +15,6 @@ namespace yocto
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
     done(false),
-    connected(false),
     iobuff( VisIt::IOBufferSize ),
     MPI( ref ),
     console(true),
@@ -28,7 +27,7 @@ namespace yocto
     
     void VisIt:: Simulation:: step()
     {
-        const char *run_mode = connected ? "[VisIt ONLINE ]" : "[Visit OFFLINE]";
+        const char *run_mode = VisItIsConnected() ? "[VisIt ONLINE ]" : "[Visit OFFLINE]";
         MPI.Printf0(stderr, "%s cycle= %6d\n", run_mode, cycle);
     }
     

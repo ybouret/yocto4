@@ -243,12 +243,10 @@ namespace yocto
                         VisItSetSlaveProcessCallback(SlaveProcessCallback);
                         VisItSetCommandCallback(ControlCommandCallback,(void*) &sim);
                         VisItSetGetMetaData(SimGetMetaData, (void*) &sim);
-                        sim.connected = true;
                     }
                     else
                     {
                         MPI.Printf0(stderr, "[VisIt] Did not connect: %s\n", VisItGetLastError());
-                        sim.connected = false; 
                     }
                     break;
                     
@@ -262,7 +260,6 @@ namespace yocto
                         /* Disconnect on an error or closed connection. */ 
                         MPI.Printf0(stderr,"[VisIt] Disconnected\n");
                         VisItDisconnect();
-                        sim.connected = false;
                         //sim.runMode     = VISIT_SIMMODE_RUNNING;
                     }
                     break;

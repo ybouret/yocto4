@@ -46,9 +46,38 @@ ui_option_changed(int value, void *cbdata)
     if(sim->master) fprintf(stderr,"ui_option_changed: %d\n", value);
 }
 
+class MySim : public VisIt:: Simulation
+{
+public:
+    explicit MySim( const mpi &ref ) : VisIt:: Simulation( ref )
+    {
+        
+    }
+    
+    virtual ~MySim() throw() 
+    {
+        
+    }
+    
+    virtual void step()
+    {
+        VisIt:: Simulation:: step();
+        if( VisItIsConnected() )
+        {
+           
+            MPI.Printf0(stderr, "update UI\n" );
+            VisItUI_setValueI("LEVELS", cycle % 100, 1);
+            //VisItTimeStepChanged();
+        }
+    }
+    
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
+};
+
 YOCTO_UNIT_TEST_IMPL(loop)
 {
- 
+    
     const string       trace_name = "trace.dat";
     VisIt:: TraceFile  trace_file( trace_name );
     VisIt:: SetupEnvironment();
@@ -59,12 +88,12 @@ YOCTO_UNIT_TEST_IMPL(loop)
     const string sim_ui      = "loop.ui";
     mpi &MPI = mpi::init( &argc, &argv );
     VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path, &sim_ui);
-    VisIt::Simulation sim(MPI);
+    MySim sim(MPI);
     
     VisItUI_clicked("RUN",         ui_run_clicked,     &sim);
     VisItUI_clicked("HALT",        ui_halt_clicked,    &sim);
     VisItUI_clicked("STEP",        ui_step_clicked,    &sim);
-
+    
     VisItUI_valueChanged("LEVELS", ui_levels_changed, &sim);
     VisItUI_stateChanged("OPTION", ui_option_changed, &sim);
     
