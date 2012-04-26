@@ -7,16 +7,28 @@
 
 namespace yocto 
 {
-        
+    
     namespace swamp
     {
+        
+        class linear_base
+        {
+        public:
+            virtual ~linear_base() throw();
+            
+        protected:
+            explicit linear_base() throw();
+            static size_t compute_bytes( size_t items, size_t item_size ) throw();
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(linear_base);
+        };
         
         //! linear bytes infos and ops for a layout
         /**
          No memory is allocated at this point
          */
         template <typename T, typename LAYOUT>
-        class linear : public LAYOUT
+        class linear : public LAYOUT, public linear_base
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
@@ -29,7 +41,7 @@ namespace yocto
 			
 			explicit linear( const LAYOUT &L ) throw() :
 			LAYOUT( L ),
-			bytes( this->items * sizeof(T) ),
+			bytes( linear_base::compute_bytes(this->items,sizeof(T)) ),
 			entry( NULL )
 			{
 			}
@@ -40,15 +52,15 @@ namespace yocto
             //==================================================================
             // virtual API
             //==================================================================
-            typedef void (*callback_t)( type &, void * );       //!< element wise r/w callback
-            typedef void (*const_cb_t)( const_type &, void * ); //!< element wise r/o callback 
+            typedef void (*callback)( type &, void * );       //!< element wise r/w callback
+            typedef void (*const_cb)( const_type &, void * ); //!< element wise r/o callback 
             
             //! link to data, dimension dependent
 			virtual void link( T *addr ) throw() = 0;
             
             
-            virtual void foreach( const LAYOUT &sub, callback_t proc, void *args ) = 0;
-            virtual void foreach( const LAYOUT &sub, const_cb_t proc, void *args ) const = 0;
+            virtual void foreach( const LAYOUT &sub, callback proc, void *args ) = 0;
+            virtual void foreach( const LAYOUT &sub, const_cb proc, void *args ) const = 0;
             
             //==================================================================
             // non virtual API
