@@ -102,7 +102,7 @@ namespace yocto
 			const vertex_t    delta;        //!< step for each dimension
 			const vertex_t    inv_d;        //!< 1/delta
 			const vertex_t    inv_dsq;      //!< 1/delta^2
-			const layout_type nucleus;      //!< original layout - asynchrnous inner ghosts
+			const layout_type nucleus;      //!< original layout - asynchronous inner ghosts
 			const size_t      plain_ghosts; //!< number of plain ghosts (outer,inner)
 			const size_t      async_ghosts; //!< number of async hosts (outer,inner)
 			

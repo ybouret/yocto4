@@ -48,7 +48,6 @@ namespace yocto
             int        cycle;
             int        runMode;
             bool       done;
-            bool       connected; //!< up to date VisIt status
             IOBuffer   iobuff;    //!< buffer for console input
             const mpi &MPI;       //!< MPI singleton reference
             const bool console;   //!< shall use the interactive console
