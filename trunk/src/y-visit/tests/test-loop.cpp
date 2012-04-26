@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/visit/interface.hpp"
+#include "yocto/wtime.hpp"
 
 using namespace yocto;
 
@@ -46,6 +47,13 @@ ui_option_changed(int value, void *cbdata)
     if(sim->master) fprintf(stderr,"ui_option_changed: %d\n", value);
 }
 
+
+static
+void ui_do_nothing(int,void*)
+{
+    
+}
+
 class MySim : public VisIt:: Simulation
 {
 public:
@@ -61,13 +69,20 @@ public:
     
     virtual void step()
     {
+        // simulate work
         VisIt:: Simulation:: step();
+        wtime::sleep( 0.2 );
+        
         if( VisItIsConnected() )
         {
-           
+            
             MPI.Printf0(stderr, "update UI\n" );
-            VisItUI_setValueI("LEVELS", cycle % 100, 1);
-            //VisItTimeStepChanged();
+            if(master)
+            {
+                VisItUI_setValueI("LEVELS",      cycle % 100, 1);
+                VisItUI_setValueI("progressBar", cycle % 100, 1);
+            }
+            VisItTimeStepChanged();
         }
     }
     
@@ -90,12 +105,15 @@ YOCTO_UNIT_TEST_IMPL(loop)
     VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path, &sim_ui);
     MySim sim(MPI);
     
+    //-- it looks like all widgets must be declared...
+    
     VisItUI_clicked("RUN",         ui_run_clicked,     &sim);
     VisItUI_clicked("HALT",        ui_halt_clicked,    &sim);
     VisItUI_clicked("STEP",        ui_step_clicked,    &sim);
     
     VisItUI_valueChanged("LEVELS", ui_levels_changed, &sim);
     VisItUI_stateChanged("OPTION", ui_option_changed, &sim);
+    VisItUI_valueChanged("progressBar", ui_do_nothing, &sim);
     
     VisIt:: MainLoop( sim );
     

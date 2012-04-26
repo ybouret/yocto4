@@ -14,10 +14,23 @@ namespace yocto
     namespace swamp
     {
         
-        //! signed integer for indices and offsets
-        typedef ptrdiff_t unit_t;
-        
-        
+        //! signed integer for indices
+        typedef ptrdiff_t              unit_t;
+        typedef sorted_vector<size_t>  sorted_offsets;
+       
+        class offsets : public sorted_offsets
+        {
+        public:
+            explicit offsets() throw();
+            explicit offsets(size_t num);
+            virtual ~offsets() throw();
+            offsets( const offsets & );
+            
+            void store( size_t indx );
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(offsets);
+        };
         
         
     }
