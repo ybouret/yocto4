@@ -16,6 +16,8 @@ namespace yocto
         
         //! signed integer for indices
         typedef ptrdiff_t              unit_t;
+       
+        //! base class for list of offsets
         typedef sorted_vector<size_t>  sorted_offsets;
        
         class offsets : public sorted_offsets
