@@ -6,7 +6,8 @@ namespace yocto
         
         template <>
         array1D<ZTYPE>:: array1D( const layout_type &L ) throw() :
-        linear_type(L)
+        linear_type(L),
+        item(NULL)
         {
         }
         

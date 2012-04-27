@@ -1,10 +1,8 @@
 #include "yocto/swamp/array2d.hpp"
+#define SOURCE "array2d.cxx"
+
 #include  <iostream>
+#include "yocto/math/complex.hpp"
 
-#define ZTYPE float
-#include "array2d.cxx"
-
-#undef ZTYPE
-#define ZTYPE double
-#include "array2d.cxx"
+#include "array-inc.cxx"
 
