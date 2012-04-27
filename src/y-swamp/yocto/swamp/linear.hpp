@@ -20,7 +20,7 @@ namespace yocto
             
             //! link to data, dimension dependent
 			virtual void link( void *data ) throw() = 0;
-                       
+            
         protected:
             explicit linear_base( size_t num_bytes ) throw();
             static size_t compute_bytes( size_t items, size_t item_size ) throw();
@@ -49,7 +49,7 @@ namespace yocto
 			entry( NULL )
 			{
 			}
-			            
+            
 			//! set every item to 0
 			inline void ldz() throw() { assert(entry); memset( entry, 0, bytes); }
             
@@ -59,7 +59,6 @@ namespace yocto
             typedef void (*callback)( type &, void * );           //!< element wise r/w callback
             typedef void (*const_cb)( const_type &, void * );     //!< element wise r/o callback 
             typedef void (*call_two)(type &,const type &,void *); //!< element pair-wise callback
-            
             
             
             
