@@ -82,7 +82,7 @@ namespace yocto
             inline bool has( param_coord c ) const throw() { return layout_base::is_inside( &c, &lower, &upper); }
             
             //! test that a sub layout is inside
-            inline bool is_sublayout( const layout &sub ) const throw() { return has(sub.lower) && has(sub.upper); }
+            inline bool contains( const layout &sub ) const throw() { return has(sub.lower) && has(sub.upper); }
             
         private:
             YOCTO_DISABLE_ASSIGN(layout);

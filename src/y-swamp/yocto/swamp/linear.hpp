@@ -4,6 +4,7 @@
 #include "yocto/swamp/layout.hpp"
 #include "yocto/ios/istream.hpp"
 #include "yocto/ios/ostream.hpp"
+#include "yocto/hashing/function.hpp"
 
 namespace yocto 
 {
@@ -15,9 +16,13 @@ namespace yocto
         {
         public:
             virtual ~linear_base() throw();
+            const size_t bytes;
             
+            //! link to data, dimension dependent
+			virtual void link( void *data ) throw() = 0;
+                       
         protected:
-            explicit linear_base() throw();
+            explicit linear_base( size_t num_bytes ) throw();
             static size_t compute_bytes( size_t items, size_t item_size ) throw();
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear_base);
@@ -33,7 +38,6 @@ namespace yocto
         public:
             YOCTO_ARGUMENTS_DECL_T;
             
-            const size_t bytes; //!< linear bytes
 			T           *entry; //!< must be linked to an array of LAYOUT::items
 			
 			
@@ -41,22 +45,22 @@ namespace yocto
 			
 			explicit linear( const LAYOUT &L ) throw() :
 			LAYOUT( L ),
-			bytes( linear_base::compute_bytes(this->items,sizeof(T)) ),
+            linear_base( linear_base::compute_bytes(this->items,sizeof(T)) ),
 			entry( NULL )
 			{
 			}
-			
+			            
 			//! set every item to 0
 			inline void ldz() throw() { assert(entry); memset( entry, 0, bytes); }
             
             //==================================================================
             // virtual API
             //==================================================================
-            typedef void (*callback)( type &, void * );       //!< element wise r/w callback
-            typedef void (*const_cb)( const_type &, void * ); //!< element wise r/o callback 
+            typedef void (*callback)( type &, void * );           //!< element wise r/w callback
+            typedef void (*const_cb)( const_type &, void * );     //!< element wise r/o callback 
+            typedef void (*call_two)(type &,const type &,void *); //!< element pair-wise callback
             
-            //! link to data, dimension dependent
-			virtual void link( T *addr ) throw() = 0;
+            
             
             
             virtual void foreach( const LAYOUT &sub, callback proc, void *args ) = 0;
@@ -74,6 +78,7 @@ namespace yocto
 			
 			inline void save( ios::ostream &fp, const LAYOUT &sub) const { foreach( sub, save_cb, &fp); }
 			inline void load( ios::istream &fp, const LAYOUT &sub)       { foreach( sub, load_cb, &fp); }
+            inline void hash( hashing::function &fn, const LAYOUT &sub ) const { fn.set(); foreach(sub, hash_cb, &fn); }
             
         protected:
 			static inline void set_cb( type &v, void *args) throw() { v  = *(type*)args; }
@@ -83,7 +88,7 @@ namespace yocto
 			
 			static inline void set2_cb( type &v, const_type &u, void *) throw() { v = u; }
 			static inline void add2_cb( type &v, const_type &u, void *) throw() { v += u; }
-			static inline void muladd_cb( type &v,const_type &u, void *args) throw() { v += (*(const_type *)args) * u; }
+			//static inline void muladd_cb( type &v,const_type &u, void *args) throw() { v += (*(const_type *)args) * u; }
 			
 			static inline void save_cb( const_type &v, void *args )
 			{
@@ -96,6 +101,12 @@ namespace yocto
 				ios::istream &fp = *(ios::istream *)args;
 				fp.load( &v, sizeof(type) );
 			}
+            
+            static inline void hash_cb( const_type &v, void *args )
+            {
+                hashing::function &fn = *(hashing::function *)args;
+                fn.run( &v, sizeof(type) );
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear);

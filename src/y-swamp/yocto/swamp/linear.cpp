@@ -4,7 +4,10 @@ namespace yocto
 {
     namespace swamp
     {
-        linear_base::  linear_base() throw() {}
+        linear_base::  linear_base( size_t num_bytes ) throw() : 
+        bytes(num_bytes )
+        {}
+        
         linear_base:: ~linear_base() throw() {}
 
         size_t linear_base:: compute_bytes( size_t items, size_t item_size ) throw()
