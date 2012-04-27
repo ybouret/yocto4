@@ -29,8 +29,8 @@ namespace yocto
             explicit array2D( const layout_type & L );           
             virtual ~array2D() throw();
             
-            row_type       & operator[]( size_t y ) throw();
-            const row_type & operator[]( size_t y ) const throw();
+            row_type       & operator[]( unit_t y ) throw();
+            const row_type & operator[]( unit_t y ) const throw();
             
             
             virtual void link( void *data ) throw();

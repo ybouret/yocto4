@@ -20,7 +20,7 @@ namespace yocto
         array2D<ZTYPE>:: ~array2D() throw() 
         {
             row += lower.y;
-            for( unit_t j = width.y; j>0; --j )
+            for( unit_t j = 0; j < width.y; ++j )
             {
                 row[j].~row_type();
             }
@@ -28,7 +28,7 @@ namespace yocto
         }
         
         template <>
-        array2D<ZTYPE>::row_type & array2D<ZTYPE>:: operator[]( size_t y ) throw()
+        array2D<ZTYPE>::row_type & array2D<ZTYPE>:: operator[]( unit_t y ) throw()
         {
             assert( y >= lower.y );
             assert( y <= upper.y );
@@ -36,7 +36,7 @@ namespace yocto
         }
         
         template <>
-        const array2D<ZTYPE>::row_type & array2D<ZTYPE>:: operator[]( size_t y ) const throw()
+        const array2D<ZTYPE>::row_type & array2D<ZTYPE>:: operator[]( unit_t y ) const throw()
         {
             assert( y >= lower.y );
             assert( y <= upper.y );
@@ -73,6 +73,23 @@ namespace yocto
             }
         }
 
+        template <>
+        void array2D<ZTYPE>:: foreach( const array_type  &other, const layout_type &sub, call_two proc, void *args)
+        {
+            assert( this->contains(sub) );
+            assert( other.contains(sub) );
+            assert( proc != NULL );
+            for( unit_t j=sub.lower.y; j <= sub.upper.y; ++j )
+            {
+                row_type       &self_j  = row[j];
+                const row_type &other_j = other.row[j];
+                for( unit_t i=sub.lower.x; i <= sub.upper.x; ++i )
+                {
+                    proc( self_j[i], other_j[i], args );
+                }
+            }
+
+        }
         
         template <>
         void array2D<ZTYPE>:: set( const array_type &other, const layout_type &sub ) throw()
@@ -91,7 +108,8 @@ namespace yocto
         void array2D<ZTYPE>:: link( void *data ) throw()
         {
             assert( data != NULL );
-            ZTYPE       *addr = (ZTYPE *)data;
+            entry = (ZTYPE *)data;
+            ZTYPE *addr = entry;
             const size_t step = row_layout.items;
             for( unit_t j=lower.y; j <= upper.y; ++j, addr += step )
             {

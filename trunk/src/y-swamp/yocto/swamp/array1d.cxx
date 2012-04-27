@@ -18,8 +18,8 @@ namespace yocto
         void array1D<ZTYPE>:: link( void *data ) throw()
         {
             assert( data != NULL );
-            ZTYPE *addr = (ZTYPE *)data;
-            item = addr - lower;
+            entry = (ZTYPE *)data;
+            item  = entry - lower;
         }
         
         template <>
