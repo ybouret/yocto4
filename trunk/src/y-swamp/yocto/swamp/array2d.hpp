@@ -46,7 +46,7 @@ namespace yocto
 
             const layout1D row_layout;
             
-            static inline void       *ctor( const layout_type &L);
+            static inline void       *ctor( const layout_type &L, linear_base **info);
             static inline void        dtor(void*) throw();
             
         private:

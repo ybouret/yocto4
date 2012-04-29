@@ -119,9 +119,13 @@ namespace yocto
         }
         
         template <>
-        void * array2D<ZTYPE>:: ctor( const layout_type &L )
+        void * array2D<ZTYPE>:: ctor( const layout_type &L, linear_base **info )
         {
-            return new array_type(L);
+            assert( info != NULL );
+            assert( NULL == *info );
+            array_type *arr = new array_type(L);
+            *info = arr;
+            return arr;
         }
 
         template <>
