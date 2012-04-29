@@ -46,6 +46,9 @@ namespace yocto
             
             const layout2D slice_layout;
             
+            static inline void       *ctor( const layout_type &L);
+            static inline void        dtor(void*) throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array3D);
             size_t      num_slices;
