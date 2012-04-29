@@ -13,8 +13,8 @@ namespace yocto
         {
         }
         
-        void array_db:: record(const string         &name, 
-                               const std::type_info &which, 
+        void array_db:: append(const string         &name, 
+                               const type_spec      &spec, 
                                void                 *addr,
                                linear_base          *info,
                                void                (*kill)( void *)
@@ -26,10 +26,10 @@ namespace yocto
             //------------------------------------------------------------------
             // create a raw array
             //------------------------------------------------------------------
-            array *arr = NULL;
+            varray *arr = NULL;
             try 
             {
-                arr = new array(name,which,addr,info,kill);
+                arr = new varray(name,spec,addr,info,kill);
             }
             catch(...)
             {
@@ -40,7 +40,7 @@ namespace yocto
             //------------------------------------------------------------------
             // take care of it
             //------------------------------------------------------------------
-            const array::ptr p( arr );
+            const varray::ptr p( arr );
             
             //------------------------------------------------------------------
             // record it
@@ -51,13 +51,22 @@ namespace yocto
             }
         }
         
-        array & array_db:: operator[]( const string &name ) 
+        varray & array_db:: operator[]( const string &name ) 
         {
-            array::ptr *pArr = arrays.search( name );
+            varray::ptr *pArr = arrays.search( name );
             if( !pArr )
                 throw exception("no array '%s'", name.c_str() );
             return **pArr;
         }
+        
+        const varray & array_db:: operator[]( const string &name ) const
+        {
+            varray::ptr const *pArr = arrays.search( name );
+            if( !pArr )
+                throw exception("no const array '%s'", name.c_str() );
+            return **pArr;
+        }
+        
         
     }
 }
