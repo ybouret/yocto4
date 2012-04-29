@@ -96,7 +96,24 @@ namespace yocto
 			os << ' ' << ']';
 			return os;
 		}
+        
+        template <>
+        void * array1D<ZTYPE>:: ctor( const layout_type &L, linear_base **info )
+        {
+            assert( info != NULL );
+            assert( NULL == *info );
+            array_type *arr = new array_type(L);
+            *info = arr;
+            return arr;
+        }
 
+        template <>
+        void array1D<ZTYPE>:: dtor( void *handle ) throw()
+        {
+            assert( handle );
+            array_type *a = (array_type *)handle;
+            delete a;
+        }
         
     }
 }

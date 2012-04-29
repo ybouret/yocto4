@@ -143,6 +143,21 @@ namespace yocto
             
         }
         
+        template <>
+        void * array3D<ZTYPE>:: ctor( const layout_type &L )
+        {
+            return new array_type(L);
+        }
+
+        template <>
+        void array3D<ZTYPE>:: dtor( void *handle ) throw()
+        {
+            assert( handle );
+            array_type *a = (array_type *)handle;
+            delete a;
+        }
+
+        
     }
     
 }
