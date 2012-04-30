@@ -141,7 +141,13 @@ namespace yocto
                         {
                             A[i] = amin + ( alen * (i-A.lower) ) / del;
                         }
+                        
                     }
+                    else
+                    {
+                        A[A.lower] = vmin[iAxis]; // set by map_to as the average.
+                    }
+                    
                 }
                 
                 compute_deltas();
