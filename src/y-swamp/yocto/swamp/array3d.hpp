@@ -55,6 +55,26 @@ namespace yocto
             slice_type *slice; //!< offseted slices
         };
         
+        template <typename T,size_t DIM>
+        struct __array;
+        
+        template <typename T>
+        struct __array<T,1> {
+            typedef array1D<T> type;
+        };
+        
+        template <typename T>
+        struct __array<T,2> {
+            typedef array2D<T> type;
+        };
+
+        template <typename T>
+        struct __array<T,3> {
+            typedef array3D<T> type;
+        };
+
+
+        
     }
 }
 
