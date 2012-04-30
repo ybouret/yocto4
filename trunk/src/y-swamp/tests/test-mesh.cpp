@@ -62,3 +62,19 @@ YOCTO_UNIT_TEST_IMPL(rmesh)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/swamp/curvilinear-mesh.hpp"
+
+YOCTO_UNIT_TEST_IMPL(cmesh)
+{
+    array_db ADB;
+    const layout3D L( coord3D(1,1,1), coord3D(5,10,15) );
+    curvilinear_mesh<double, layout3D> cmesh(ADB,L);
+    typedef vertex3D<double>::type vtx;
+    const region3D<double>::type   R( vtx(-2,-3,-4), vtx(4,6,8) );
+
+    cmesh.regular_map_to(R,L);
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
