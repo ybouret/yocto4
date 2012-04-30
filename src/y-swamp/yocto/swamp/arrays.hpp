@@ -42,8 +42,8 @@ namespace yocto
             template <typename ARRAY>
             inline ARRAY &as()
             {
-                const type_spec sp( typeid( ARRAY ) );
-                assert( sp == spec );
+                const type_spec required( typeid( ARRAY ) );
+                check_specs( spec, required);
                 return *(ARRAY *)( addr );
             }
             
@@ -58,6 +58,7 @@ namespace yocto
             void             *addr;
             void            (*kill)(void *);
             const data_block  data;
+            static void check_specs( const type_spec &self, const type_spec &required);
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(varray);
         };
@@ -68,6 +69,7 @@ namespace yocto
         {
         public:
             explicit array_db() throw();
+            explicit array_db( size_t n);
             virtual ~array_db() throw();
             
             //! take care of addr
