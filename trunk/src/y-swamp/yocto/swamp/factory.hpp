@@ -61,7 +61,7 @@ namespace yocto
             inline void make( const char *id, const LAYOUT &L, array_db &db )
             {
                 const string name(id);
-                produce( name, L, typeid(ARRAY), db );
+                make<ARRAY>( name, L, db );
             }
             
         private:

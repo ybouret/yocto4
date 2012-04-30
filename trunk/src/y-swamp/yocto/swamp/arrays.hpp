@@ -11,45 +11,49 @@ namespace yocto
     namespace swamp
     {
         
+        //! virtual array
+        /**
+         smart pointee on one array address
+         */
         class varray : public object, public counted
         {
         public:
+            //! default constructor
+            /**
+             \param array_name array identifier
+             \param array_spec array class type
+             \param array_addr handle to the array
+             \param array_info memory requirements for the array
+             \param array_kill array destructor wrapper
+             */
             explicit varray(const string         &array_name, 
                             const type_spec      &array_spec,
                             void *                array_addr,
                             linear_base          *array_info,
-                            void                (*array_kill)(void *)) :
-            name(  array_name ),
-            spec(  array_spec ),
-            addr(  array_addr ),
-            kill(  array_kill ),
-            data( *array_info )
-            {
-                assert( addr != NULL );
-                assert( kill != NULL );
-            }
+                            void                (*array_kill)(void *));
             
-            virtual ~varray() throw()
-            {
-                kill( addr );
-            }
+            //! default destructor
+            virtual ~varray() throw();
             
-            const string    name;
-            const type_spec spec;
+            //! for array::ptr
+            const string & key() const throw();
             
-            const string & key() const throw() { return name; }
-            
+            //! recover the original array
             template <typename ARRAY>
-            ARRAY &as()
+            inline ARRAY &as()
             {
                 const type_spec sp( typeid( ARRAY ) );
                 assert( sp == spec );
                 return *(ARRAY *)( addr );
             }
             
-            typedef intrusive_ptr<string,varray> ptr;
-            typedef set<string,varray::ptr>      db;
             
+            typedef intrusive_ptr<string,varray> ptr; //!< smart pointer for the database
+            typedef set<string,varray::ptr>      db;  //!< array database
+            
+            const string    name; //!< array unique name
+            const type_spec spec; //!< array class type
+
         private:
             void             *addr;
             void            (*kill)(void *);
@@ -58,6 +62,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(varray);
         };
         
+        
+        //! database of virtual arrays
         class array_db 
         {
         public:

@@ -5,6 +5,31 @@ namespace yocto
 {
     namespace swamp 
     {
+        
+        varray:: varray(const string         &array_name, 
+                        const type_spec      &array_spec,
+                        void *                array_addr,
+                        linear_base          *array_info,
+                        void                (*array_kill)(void *)) :
+        name(  array_name ),
+        spec(  array_spec ),
+        addr(  array_addr ),
+        kill(  array_kill ),
+        data( *array_info )
+        {
+            assert( addr != NULL );
+            assert( kill != NULL );
+        }
+        
+        
+        varray:: ~varray() throw()
+        {
+            kill( addr );
+        }
+
+        const string & varray:: key() const throw() { return name; }
+        
+        
         array_db:: array_db() throw() : arrays()
         {
         }
