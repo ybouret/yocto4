@@ -47,13 +47,22 @@ namespace yocto
                 return *(ARRAY *)( addr );
             }
             
+            template <typename ARRAY>
+            inline const ARRAY &as() const
+            {
+                const type_spec required( typeid( ARRAY ) );
+                check_specs( spec, required);
+                return *(ARRAY *)( addr );
+            }
+            
+            
             
             typedef intrusive_ptr<string,varray> ptr; //!< smart pointer for the database
             typedef set<string,varray::ptr>      db;  //!< array database
             
             const string    name; //!< array unique name
             const type_spec spec; //!< array class type
-
+            
         private:
             void             *addr;
             void            (*kill)(void *);
@@ -73,15 +82,19 @@ namespace yocto
             virtual ~array_db() throw();
             
             //! take care of addr
-            void append(const string         &name, 
-                        const type_spec      &spec, 
-                        void                 *addr,
-                        linear_base          *info,
-                        void                (*kill)( void *)
-                        );
+            void operator()(const string         &name, 
+                            const type_spec      &spec, 
+                            void                 *addr,
+                            linear_base          *info,
+                            void                (*kill)( void *)
+                            );
             
             varray       &operator[]( const string &name );
             const varray &operator[]( const string &name ) const;
+            
+            varray       &operator[]( const char *id );
+            const varray &operator[]( const char *id ) const;
+            
             
         private:
             varray::db arrays;

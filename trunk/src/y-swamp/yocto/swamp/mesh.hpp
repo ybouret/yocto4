@@ -14,6 +14,9 @@ namespace yocto
         public:
             virtual ~mesh() throw();
             
+            static const char *axis_name( size_t iAxis );
+            static const char *delta_name( size_t iAxis );
+            
         protected:
             explicit mesh( array_db &db ) throw();
             array_db &adb;

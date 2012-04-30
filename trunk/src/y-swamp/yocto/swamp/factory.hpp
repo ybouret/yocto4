@@ -18,13 +18,14 @@ namespace yocto
             typedef void  * (*array_ctor)( const LAYOUT & , linear_base **);
             typedef void    (*array_dtor)(void *);
             
+            //! permissive recording of type_spec
             inline void record( const type_spec  &spec, array_ctor ctor, array_dtor dtor )
             {
                 const shed param( spec, ctor, dtor );
-                if( ! sheds.insert( param ) )
-                    throw exception("swamp::factory(multiple '%s')", spec.name() );
+                (void) sheds.insert( param );
             }
             
+            //! permissive recording of std::type_info
             inline void record( const std::type_info &which, array_ctor ctor, array_dtor dtor )
             {
                 const type_spec spec( which );
@@ -32,6 +33,7 @@ namespace yocto
             }
             
             
+            //! templated recording of type ARRAY
             template <typename ARRAY>
             inline void use() { record( typeid( ARRAY ), ARRAY::ctor, ARRAY::dtor ); }
             
@@ -42,7 +44,7 @@ namespace yocto
                     throw exception("swam::factory(can't produce '%s')", spec.name() );
                 linear_base *info = NULL;
                 void        *addr = param->ctor( L, &info );
-                db.append(name, spec, addr, info, param->dtor);
+                db(name, spec, addr, info, param->dtor);
             }
             
             inline void produce( const string &name, const LAYOUT &L, const std::type_info &which, array_db &db )
