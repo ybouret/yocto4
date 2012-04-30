@@ -67,7 +67,12 @@ namespace yocto
                 for( size_t iAxis = 0; iAxis < LAYOUT::DIMENSIONS; ++iAxis )
                 {
                     array_type &A = (*this)[ iAxis ];
-                    
+                    const unit_t lo = pLower[iAxis];
+                    const unit_t up = pUpper[iAxis];
+                    if( lo < up )
+                    {
+                        
+                    }
                 }
                 
             }
