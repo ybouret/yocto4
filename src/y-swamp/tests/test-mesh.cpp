@@ -29,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(rmesh)
 {
     array_db ADB;
     
-    const layout2D L( rand2(), rand2() );
+    const layout2D L( coord2D(1,1), coord2D(5,10) );
     rectilinear_mesh<float, layout2D> rmesh(ADB,L);
     
     display( rmesh );
@@ -47,7 +47,17 @@ YOCTO_UNIT_TEST_IMPL(rmesh)
         std::cerr << e.what() << std::endl;
         std::cerr << e.when() << std::endl;
     }
+  
+    typedef vertex2D<float>::type vtx;
+    const region2D<float>::type   R( vtx(-2,-3), vtx(4,6) );
     
+    rmesh.regular_map_to(R,L);
+    
+    std::cerr << "X=" << rmesh.X() << std::endl;
+    std::cerr << "dX=" << rmesh.dX() << std::endl;
+    std::cerr << "Y=" << rmesh.Y() << std::endl;
+    std::cerr << "dY=" << rmesh.dY() << std::endl;
+
     
 }
 YOCTO_UNIT_TEST_DONE()

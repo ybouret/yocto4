@@ -9,7 +9,6 @@ namespace yocto
     namespace swamp 
     {
         
-        void check_possible_mapping( unit_t lo, unit_t up, size_t idim);
         
         //! base class for region
 		template <typename U>
@@ -65,8 +64,15 @@ namespace yocto
 			
 			virtual ~region() throw() {}
 			
+            //! map vertices
+            /**
+             \param target the logical layout of the new region
+             \param source the logical layout of this region
+             
+             For a degenerate dimension, set to half vmin+vmax.
+             */
             template <typename LAYOUT>
-            region map_to( const LAYOUT &target, const LAYOUT &source )
+            region map_to( const LAYOUT &target, const LAYOUT &source ) const
             {
                 YOCTO_STATIC_CHECK(DIMENSIONS==LAYOUT::DIMENSIONS,region_dim_error);
                 vertex new_vmin;
@@ -84,15 +90,21 @@ namespace yocto
                 
                 for( size_t i=0; i < DIMENSIONS; ++i )
                 {
-                    const unit_t lo = qLower[i];
-                    const unit_t up = qUpper[i];
-                    check_possible_mapping(lo,up,i);
-                    const unit_t del = up - lo;
+                    const unit_t lo  = qLower[i];
+                    const unit_t up  = qUpper[i];
                     const U      len = qLen[i];
                     const U      org = qMin[i];
                     
-                    pMin[i] = org + ( len * ( pLower[i] - lo ) ) / del;
-                    pMax[i] = org + ( len * ( pUpper[i] - lo ) ) / del;
+                    if( lo < up )
+                    {
+                        const unit_t del = up - lo;
+                        pMin[i] = org + ( len * ( pLower[i] - lo ) ) / del;
+                        pMax[i] = org + ( len * ( pUpper[i] - lo ) ) / del;
+                    }
+                    else 
+                    {
+                        pMin[i] = pMax[i] = org + len/2;
+                    }
                 }
                 
                 return region( new_vmin, new_vmax );
