@@ -42,8 +42,8 @@ namespace yocto
             template <typename U>
 			friend std::ostream & operator<<( std::ostream &os, const array1D<U> &a);
             
-            static inline void       *ctor( const layout_type &L, linear_base **info );
-            static inline void        dtor(void*) throw();
+            static void       *ctor( const layout_type &L, linear_base **info );
+            static void        dtor(void*) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);

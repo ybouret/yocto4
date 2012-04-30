@@ -6,6 +6,20 @@ namespace yocto
     namespace swamp 
     {
         
+        static inline void *varray_check_addr( void *array_addr )
+        {
+            if( !array_addr )
+                throw exception("varray: NULL address");
+            return array_addr;
+        }
+        
+        static inline linear_base *varray_check_info( linear_base *array_info )
+        {
+            if( !array_info )
+                throw exception("varray: NULL linear_base");
+            return array_info;
+        }
+        
         varray:: varray(const string         &array_name, 
                         const type_spec      &array_spec,
                         void *                array_addr,
@@ -13,12 +27,12 @@ namespace yocto
                         void                (*array_kill)(void *)) :
         name(  array_name ),
         spec(  array_spec ),
-        addr(  array_addr ),
+        addr(  varray_check_addr(array_addr) ),
         kill(  array_kill ),
-        data( *array_info )
+        data( *varray_check_info(array_info) )
         {
-            assert( addr != NULL );
-            assert( kill != NULL );
+            if(!kill)
+                throw exception("varray: NULL destructor");
         }
         
         
@@ -26,17 +40,21 @@ namespace yocto
         {
             kill( addr );
         }
-
+        
         const string & varray:: key() const throw() { return name; }
         
-        
-        array_db:: array_db() throw() : arrays()
+        void varray:: check_specs( const type_spec &self, const type_spec &required)
         {
+            if( self != required )
+                throw exception("varray: '%s' is not '%s'", self.name(), required.name());
         }
         
-        array_db:: ~array_db() throw()
-        {
-        }
+        
+        array_db:: array_db() throw() : arrays() {}
+        array_db:: array_db( size_t n) : arrays(n,as_capacity) {}
+        
+        array_db:: ~array_db() throw() {}
+        
         
         void array_db:: append(const string         &name, 
                                const type_spec      &spec, 
@@ -75,6 +93,8 @@ namespace yocto
                 throw exception("swamp::arrays(multiple '%s')", name.c_str() );
             }
         }
+        
+        
         
         varray & array_db:: operator[]( const string &name ) 
         {
