@@ -56,22 +56,25 @@ namespace yocto
         array_db:: ~array_db() throw() {}
         
         
-        void array_db:: append(const string         &name, 
-                               const type_spec      &spec, 
-                               void                 *addr,
-                               linear_base          *info,
-                               void                (*kill)( void *)
-                               )
+        void array_db:: operator()(const string         &name, 
+                                   const type_spec      &spec, 
+                                   void                 *addr,
+                                   linear_base          *info,
+                                   void                (*kill)( void *)
+                                   )
         {
             assert( addr != NULL );
             assert( kill != NULL );
             
             //------------------------------------------------------------------
-            // create a raw array
+            // create a raw varray
             //------------------------------------------------------------------
             varray *arr = NULL;
             try 
             {
+                //--------------------------------------------------------------
+                // create the array with its memory
+                //--------------------------------------------------------------
                 arr = new varray(name,spec,addr,info,kill);
             }
             catch(...)
@@ -112,6 +115,18 @@ namespace yocto
             return **pArr;
         }
         
+        varray       & array_db:: operator[]( const char *id )
+        {
+            const string name(id);
+            return (*this)[ name ];
+        }
+        
+        
+        const varray & array_db:: operator[]( const char *id ) const
+        {
+            const string name(id);
+            return (*this)[ name ];
+        }
         
     }
 }
