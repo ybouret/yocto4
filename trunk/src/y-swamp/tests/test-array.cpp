@@ -31,6 +31,8 @@ static inline coord3D rand3() {    return coord3D( rand1(), rand1(), rand1() ); 
 
 YOCTO_UNIT_TEST_IMPL(array)
 {
+    offsets offlist;
+    
     for( size_t iter=0; iter < 8; ++iter )
     {
         std::cerr << "iter=" << iter << std::endl;
@@ -46,7 +48,11 @@ YOCTO_UNIT_TEST_IMPL(array)
                 A[i] = i;
             }
             
+            //const layout1D sub( L.lower/2, L.upper/2 );
+            offlist.release();
+            A.load_offsets(L,offlist);
             
+            std::cerr << "#offsets=" << offlist.size() << std::endl;
             
         }  
         
