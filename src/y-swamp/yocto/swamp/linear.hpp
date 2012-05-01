@@ -70,25 +70,35 @@ namespace yocto
             //==================================================================
             inline void set_all( const LAYOUT &sub, param_type v) throw() { foreach( sub, set_cb, (void*)&v); }
 			inline void add_all( const LAYOUT &sub, param_type v) throw() { foreach( sub, add_cb, (void*)&v); }
-			
-            //inline void mul_all( const LAYOUT &sub, param_type v) throw() { foreach( sub, mul_cb, (void*)&v); }
-            
 			inline type sum( const LAYOUT &sub ) throw() { type ans(0); foreach( sub, sum_cb, &ans); return ans; }
 			
 			inline void save( ios::ostream &fp, const LAYOUT &sub) const { foreach( sub, save_cb, &fp); }
 			inline void load( ios::istream &fp, const LAYOUT &sub)       { foreach( sub, load_cb, &fp); }
             inline void hash( hashing::function &fn, const LAYOUT &sub ) const { fn.set(); foreach(sub, hash_cb, &fn); }
             
+            struct ld_off_t { offsets *off; const T *base; };
+            inline void load_offsets( const LAYOUT &sub, offsets &off) const 
+            { 
+                off.reserve( sub.items ); 
+                ld_off_t ld_off = { &off, entry };
+                foreach(sub, off_cb, (void*)&ld_off); 
+            }
+            
+            
         protected:
 			static inline void set_cb( type &v, void *args) throw() { v  = *(type*)args; }
 			static inline void add_cb( type &v, void *args) throw() { v += *(type*)args; }
-			//static inline void mul_cb( type &v, void *args) throw() { v *= *(type*)args; }
 			static inline void sum_cb( const_type &v, void *args) throw() { *(type *)args += v; }
 			
 			static inline void set2_cb( type &v, const_type &u, void *) throw() { v = u; }
 			static inline void add2_cb( type &v, const_type &u, void *) throw() { v += u; }
-			//static inline void muladd_cb( type &v,const_type &u, void *args) throw() { v += (*(const_type *)args) * u; }
 			
+            static inline void off_cb( const_type &v, void *args )
+            {
+                ld_off_t *ld_off = (ld_off_t *)args;
+                ld_off->off->store( static_cast<size_t>( &v - ld_off->base ) );
+            }
+            
 			static inline void save_cb( const_type &v, void *args )
 			{
 				ios::ostream &fp = *(ios::ostream *)args;
