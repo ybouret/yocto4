@@ -20,18 +20,18 @@ namespace yocto
         //! base class for list of offsets
         typedef sorted_vector<size_t>  sorted_offsets;
        
-        class offsets : public sorted_offsets
+        class offsets_list : public sorted_offsets
         {
         public:
-            explicit offsets() throw();
-            explicit offsets(size_t num);
-            virtual ~offsets() throw();
-            offsets( const offsets & );
+            explicit offsets_list() throw();
+            explicit offsets_list(size_t num);
+            virtual ~offsets_list() throw();
+            offsets_list( const offsets_list & );
             
             void store( size_t indx );
             
         private:
-            YOCTO_DISABLE_ASSIGN(offsets);
+            YOCTO_DISABLE_ASSIGN(offsets_list);
         };
         
         
