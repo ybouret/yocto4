@@ -48,11 +48,18 @@ YOCTO_UNIT_TEST_IMPL(array)
                 A[i] = i;
             }
             
-            //const layout1D sub( L.lower/2, L.upper/2 );
-            offlist.release();
-            A.load_offsets(L,offlist);
-            
-            std::cerr << "#offsets=" << offlist.size() << std::endl;
+            if( A.lower < A.upper -1 )
+            {
+                const layout1D sub( A.lower+1, A.upper-1);
+                offlist.release();
+                A.load_offsets(sub,offlist);
+                std::cerr << "#offsets=" << offlist.size() << std::endl;
+                for( size_t i=1; i <= offlist.size(); ++i )
+                {
+                    std::cerr << offlist[i] << " ";
+                }
+                std::cerr << std::endl;
+            }
             
         }  
         
