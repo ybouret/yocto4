@@ -1,7 +1,7 @@
 #ifndef YOCTO_SWAMP_GHOSTS_INCLUDED
 #define YOCTO_SWAMP_GHOSTS_INCLUDED 1
 
-#include "yocto/swamp/arrays.hpp"
+#include "yocto/swamp/linear.hpp"
 #include "yocto/sequence/array.hpp"
 #include "yocto/shared-ptr.hpp"
 
@@ -42,7 +42,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
         };
         
-        //! ghosts pair for communication
+        //! ghosts pair for local communication
         class local_ghosts_pair
         {
         public:
@@ -130,7 +130,7 @@ namespace yocto
         };
         
         
-        
+        //! ghosts pair for async communication
         class async_ghosts_pair
         {
         public:
@@ -152,13 +152,14 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts_pair);
         };
         
+        //! MPI style async ghosts
         class async_ghosts : public ghosts_base
         {
         public:            
-            async_ghosts( size_t num_ghosts, ghost::position source, int peer ) :
+            async_ghosts( size_t num_ghosts, ghost::position source, int a_peer ) :
             ghosts_base( num_ghosts ),
-            gpair(source),
-            gpeer( peer ),
+            gpair( source ),
+            peer(  a_peer ),
             inner_buf(NULL),
             outer_buf(NULL),
             iolen(0)
@@ -176,7 +177,7 @@ namespace yocto
             }
             
             async_ghosts_pair   gpair; //!< the I/O pair
-            const int           gpeer; //!< MPI peer
+            const int           peer;  //!< MPI peer
             
             
             //! allocate memory once offsets are computed

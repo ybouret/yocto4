@@ -3,7 +3,6 @@
 
 
 #include "yocto/swamp/types.hpp"
-
 namespace yocto 
 {
     
@@ -36,7 +35,7 @@ namespace yocto
         class layout : public layout_base
         {
         public:
-            typedef COORD                                         coord_t;       //!< POD coordinate
+            typedef COORD                                         coord;         //!< POD coordinate
 			typedef const     COORD                               const_coord;   //!< const coordinate
 			typedef typename  type_traits<COORD>::parameter_type  param_coord;   //!< coordinate as parameter
 			
