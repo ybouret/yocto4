@@ -2,7 +2,6 @@
 #define YOCTO_SWAMP_DATA_BLOCK_INCLUDED 1
 
 #include "yocto/swamp/linear.hpp"
-#include "yocto/shared-ptr.hpp"
 
 namespace yocto 
 {
@@ -13,9 +12,7 @@ namespace yocto
         public:
             explicit data_block( linear_base &linear_object );
             virtual ~data_block() throw();
-            
-            typedef shared_ptr<data_block> ptr;
-            
+                        
         private:
             size_t size;
             void  *base;

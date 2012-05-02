@@ -2,14 +2,15 @@
 #define YOCTO_SWAMP_GHOSTS_INCLUDED 1
 
 #include "yocto/swamp/arrays.hpp"
-#include "yocto/swamp/array3d.hpp"
 #include "yocto/sequence/array.hpp"
+#include "yocto/shared-ptr.hpp"
 
 namespace yocto 
 {
     namespace swamp 
     {
-        
+        typedef array<linear_base *>  linear_handles;
+
         class ghost 
         {
         public:
@@ -82,12 +83,9 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts_base);
         };
         
-        template <typename ARRAY>
         class local_ghosts : public ghosts_base
         {
         public:
-            typedef typename ARRAY::layout_type layout_type;
-            typedef array<ARRAY *>              array_handles;
             
             local_ghosts_pair  lower;
             local_ghosts_pair  upper;
@@ -102,7 +100,7 @@ namespace yocto
             
             
             //! direct copy transfert
-            inline void transfer( array_handles &handles ) const throw()
+            inline void transfer( linear_handles &handles ) const throw()
             {
                 assert( num_offsets == lower.inside.offsets.size() );
                 assert( num_offsets == lower.mirror.offsets.size() );
@@ -117,17 +115,17 @@ namespace yocto
                     const size_t upper_inside = upper.inside.offsets[i];
                     for( size_t j=num_handles; j>0; --j )
                     {
-                        ARRAY &A = *handles[j];
-                        A.entry[ lower_mirror ] = A.entry[ lower_inside ];
-                        A.entry[ upper_mirror ] = A.entry[ upper_inside ];
+                        linear_base *A = handles[j]; assert(A!=NULL);
+                        A->local_copy( lower_mirror, lower_inside );
+                        A->local_copy( upper_mirror, upper_inside );
                     }
                 }
             }
             
+            typedef shared_ptr<local_ghosts> ptr;
             
             
         private:
-            const size_t num_offsets;
             YOCTO_DISABLE_COPY_AND_ASSIGN(local_ghosts);
         };
         
@@ -154,102 +152,142 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts_pair);
         };
         
-        template <typename ARRAY>
         class async_ghosts : public ghosts_base
         {
-        public:
-            typedef typename ARRAY::layout_type layout_type;            
-            typedef array<ARRAY *>              array_handles;
-            typedef typename ARRAY::type        type;
-            typedef  array2D<type>              channels_type;
-            
-            async_ghosts( size_t num_ghosts, ghost::position source, int peer, array_db &db ) :
+        public:            
+            async_ghosts( size_t num_ghosts, ghost::position source, int peer ) :
             ghosts_base( num_ghosts ),
             gpair(source),
             gpeer( peer ),
-            channels(NULL),
-            spec( typeid( channels_type ) ),
-            adb(  db )
+            inner_buf(NULL),
+            outer_buf(NULL),
+            iolen(0)
             {
+            }
+            
+            virtual ~async_ghosts() throw()
+            {
+                if( inner_buf )
+                {
+                    assert( outer_buf != NULL );
+                    memory::kind<memory::global>::release_as<uint8_t>( inner_buf, iolen );
+                    outer_buf = NULL;
+                }
             }
             
             async_ghosts_pair   gpair; //!< the I/O pair
             const int           gpeer; //!< MPI peer
             
-            //! allocate I/O memory
-            void allocate( const size_t num_channels )
+            
+            //! allocate memory once offsets are computed
+            void allocate_for( linear_handles &handles )
             {
-                assert( NULL == channels   );
-                if(num_offsets>0)
+                assert( NULL == inner_buf );
+                assert( NULL == outer_buf );
+                assert( 0    == iolen );
+                for( size_t j=handles.size(); j>0; --j )
                 {
-                    const coord2D  lo(1,1);                                //-- start @1,1
-                    const coord2D  up(num_channels,num_offsets);           //-- num_channels rows of num_offsets items
-                    const layout2D L(lo,up);                               //-- corresponding 2D layout
-                    const string   name( gpair.inner.position_name() );    //-- its unique name in database
-                    linear_base   *info = NULL;                            //-- for memory allocation
-                    void          *addr = channels_type::ctor(L,&info);    //-- allocate the channels
-                    adb(name, spec, addr, info, channels_type::dtor);      //-- register the channels
-                    channels = & adb[ name ].template as<channels_type>(); //-- get them from the database
+                    iolen += handles[j]->item_size();
                 }
+                iolen *= num_offsets;
+                const size_t shift = iolen;
+                iolen *= 2;
+                inner_buf  = memory::kind<memory::global>::acquire_as<uint8_t>( iolen );
+                outer_buf  = inner_buf + shift;
             }
             
-            
-            //! store  inner data into channels
-            void store_inner(  array_handles &handles ) throw()
+            //! store inner data into inner_buf
+            void store_inner( linear_handles &handles ) throw()
             {
-                if( num_offsets > 0 )
+                uint8_t *ptr = inner_buf;
+                for( size_t i=num_offsets; i>0; --i )
                 {
-                    assert(channels!=NULL);
-                    assert(num_offsets    == gpair.inner.offsets.size());
-                    assert(num_offsets    == gpair.outer.offsets.size());
-                    assert(handles.size() == size_t(channels->width.y) );
-                    
-                    const size_t   num_handles = handles.size();
-                    channels_type &C           = *channels; 
-                    for( size_t i=num_offsets;i>0;--i)
+                    const size_t k = gpair.inner.offsets[i];
+                    for( size_t j=handles.size(); j>0; --j )
                     {
-                        const size_t inner_i = gpair.inner.offsets[i];
-                        for( size_t j = num_handles; j>0; --j )
-                        {
-                            C[j][i] = (*handles)[j][inner_i];
-                        }
+                        const linear_base &A = *handles[j];
+                        A.async_store(ptr,k);
+                        assert( ptr <= inner_buf + (iolen>>1) );
                     }
                 }
             }
             
-            //! load outer data from channels
-            void load_outer( array_handles &handles ) const throw()
+            //! query outer data from outer_buf
+            void query_outer( linear_handles &handles ) const throw()
             {
-                if( num_offsets > 0 )
+                const uint8_t *ptr = outer_buf;
+                for( size_t i=num_offsets; i>0; --i )
                 {
-                    assert(channels!=NULL);
-                    assert(num_offsets    == gpair.inner.offsets.size());
-                    assert(num_offsets    == gpair.outer.offsets.size());
-                    assert(handles.size() == size_t(channels->width.y) );
-                    
-                    const size_t   num_handles = handles.size();
-                    const channels_type &C     = *channels; 
-                    for( size_t i=num_offsets;i>0;--i)
+                    const size_t k = gpair.outer.offsets[i];
+                    for( size_t j=handles.size(); j>0; --j )
                     {
-                        const size_t inner_i = gpair.inner.offsets[i];
-                        for( size_t j = num_handles; j>0; --j )
-                        {
-                            (*handles)[j][inner_i] = C[j][i];
-                        }
+                        linear_base &A = *handles[j];
+                        A.async_query(ptr,k);
+                        assert( ptr <= outer_buf + (iolen>>1) );
                     }
                 }
-
+                
             }
             
+            typedef shared_ptr<async_ghosts> ptr;
             
+        private:
+            uint8_t       *inner_buf;
+            uint8_t       *outer_buf;
+            size_t         iolen;
+            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts);
+        };
+        
+        template <typename COORD>
+        class ghosts_setup
+        {
+        public:
+            class local_setup
+            {
+            public:
+                COORD count;
+                inline  local_setup() throw() : count() 
+                {
+                    memset( &count, 0x00, sizeof(count) ); 
+                }
+                inline ~local_setup() throw() {}
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(local_setup);
+            };
+            
+            class async_setup
+            {
+            public:
+                COORD count;
+                COORD peer;
+                inline async_setup() throw() : count(), peer() 
+                {
+                    memset( &count, 0x00, sizeof(count) );
+                    memset( &peer,  0xFF, sizeof(peer) );
+                }
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(async_setup);
+            };
+            
+            local_setup local;
+            async_setup lower;
+            async_setup upper;
+            
+            inline ghosts_setup() throw() :
+            local(),
+            lower(),
+            upper()
+            {
+            }
+            
+            inline ~ghosts_setup() throw()
+            {
+            }
             
             
         private:
-            channels_type  *channels;
-            const type_spec spec;
-            array_db       &adb;
-            
-            YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts_setup);
         };
         
     }

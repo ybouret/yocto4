@@ -21,6 +21,16 @@ namespace yocto
             //! link to data, dimension dependent
 			virtual void link( void *data ) throw() = 0;
             
+            //! internal copy for local ghosts
+            virtual void local_copy( size_t target, size_t source ) throw() = 0;
+            
+            //! copy entry[source] into ptr
+            virtual void async_store( uint8_t * &ptr, size_t source ) const throw()     = 0;
+            virtual void async_query( const uint8_t * &ptr, size_t source ) throw()     = 0;
+            
+            virtual void  *get_entry() throw() = 0;
+            virtual size_t item_size() const throw() = 0;
+            
         protected:
             explicit linear_base( size_t num_bytes ) throw();
             static size_t compute_bytes( size_t items, size_t item_size ) throw();
@@ -64,6 +74,37 @@ namespace yocto
             
             virtual void foreach( const LAYOUT &sub, callback proc, void *args ) = 0;
             virtual void foreach( const LAYOUT &sub, const_cb proc, void *args ) const = 0;
+            virtual void local_copy( size_t target, size_t source ) throw() 
+            {
+                assert(entry!=NULL);
+                assert(target<this->items);
+                assert(source<this->items);
+                entry[target]=entry[source];
+            }
+            
+            virtual void *get_entry() throw() 
+            {
+                return entry;
+            }
+            
+            virtual size_t item_size() const throw() { return sizeof(T); }
+            virtual void   async_store( uint8_t * &ptr, size_t source ) const throw() 
+            {
+                assert(entry!=NULL);
+                assert(source<this->items);
+                const uint8_t *q = (const uint8_t *) &entry[source];
+                for( size_t j=0; j < sizeof(T); ++j )
+                    *(ptr++) = *(q++);
+            }
+            
+            virtual void async_query( const uint8_t * &ptr, size_t source ) throw() 
+            {
+                assert(entry!=NULL);
+                assert(source<this->items);
+                uint8_t *q = (uint8_t *) &entry[source];
+                for( size_t j=0; j < sizeof(T); ++j )
+                    *(q++) = *(ptr++);
+            }
             
             //==================================================================
             // non virtual API
