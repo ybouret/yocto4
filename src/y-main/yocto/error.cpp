@@ -17,6 +17,10 @@
 
 #endif
 
+#if defined(YOCTO_BSD)
+#include <cerrno>
+#endif
+
 #include <iostream>
 
 namespace yocto 
@@ -119,6 +123,13 @@ namespace yocto
 		win32::critical_error( err, when );
 #endif
 	}
-	
+    
+#if defined(YOCTO_BSD)
+    const error_type error_invalid_data = EINVAL;
+#endif
+    
+#if defined(YOCTO_WIN)
+    const error_type error_invalid_data = ERROR_INVALID_DATA;
+#endif
 }
 
