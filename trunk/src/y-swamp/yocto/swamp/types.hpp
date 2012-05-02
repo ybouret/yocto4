@@ -17,6 +17,23 @@ namespace yocto
         //! signed integer for indices
         typedef ptrdiff_t              unit_t;
        
+        template <typename COORD>
+        inline unit_t & __coord( COORD &C, size_t dim ) throw()
+        {
+            assert( dim < sizeof(COORD)/sizeof(unit_t));
+            unit_t *c = (unit_t *) &C;
+            return  c[dim];
+        }
+        
+        template <typename COORD>
+        inline const unit_t & __coord( const COORD &C, size_t dim ) throw()
+        {
+            assert( dim < sizeof(COORD)/sizeof(unit_t));
+            unit_t *c = (unit_t *) &C;
+            return  c[dim];
+        }
+        
+        
         //! base class for list of offsets
         typedef sorted_vector<size_t>  sorted_offsets;
        
