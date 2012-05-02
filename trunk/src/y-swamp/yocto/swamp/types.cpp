@@ -5,21 +5,21 @@ namespace yocto
     
     namespace swamp
     {
-        offsets:: ~offsets() throw()
+        offsets_list:: ~offsets_list() throw()
         {
         }
         
-        offsets:: offsets() throw() : sorted_offsets() {}
+        offsets_list:: offsets_list() throw() : sorted_offsets() {}
         
-        offsets:: offsets( size_t num ) : sorted_offsets( num, as_capacity)
+        offsets_list:: offsets_list( size_t num ) : sorted_offsets( num, as_capacity)
         {
         }
         
-        offsets:: offsets( const offsets &other ) : sorted_offsets( other )
+        offsets_list:: offsets_list( const offsets_list &other ) : sorted_offsets( other )
         {
         }
         
-        void offsets:: store( size_t indx )
+        void offsets_list:: store( size_t indx )
         {
             (void) insert(indx);
         }

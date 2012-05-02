@@ -76,11 +76,11 @@ namespace yocto
 			inline void load( ios::istream &fp, const LAYOUT &sub)       { foreach( sub, load_cb, &fp); }
             inline void hash( hashing::function &fn, const LAYOUT &sub ) const { fn.set(); foreach(sub, hash_cb, &fn); }
             
-            struct ld_off_t { offsets *off; const T *base; };
-            inline void load_offsets( const LAYOUT &sub, offsets &off) const 
+            struct ld_off_t { offsets_list *offsets; const T *base; };
+            inline void load_offsets( const LAYOUT &sub, offsets_list &offsets) const 
             { 
-                off.reserve( sub.items ); 
-                ld_off_t ld_off = { &off, entry };
+                offsets.reserve( sub.items ); 
+                ld_off_t ld_off = { &offsets, entry };
                 foreach(sub, off_cb, (void*)&ld_off); 
             }
             
@@ -96,7 +96,7 @@ namespace yocto
             static inline void off_cb( const_type &v, void *args )
             {
                 ld_off_t *ld_off = (ld_off_t *)args;
-                ld_off->off->store( static_cast<size_t>( &v - ld_off->base ) );
+                ld_off->offsets->store( static_cast<size_t>( &v - ld_off->base ) );
             }
             
 			static inline void save_cb( const_type &v, void *args )

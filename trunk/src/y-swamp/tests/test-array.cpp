@@ -31,7 +31,7 @@ static inline coord3D rand3() {    return coord3D( rand1(), rand1(), rand1() ); 
 
 YOCTO_UNIT_TEST_IMPL(array)
 {
-    offsets offlist;
+    offsets_list offlist;
     
     for( size_t iter=0; iter < 8; ++iter )
     {
