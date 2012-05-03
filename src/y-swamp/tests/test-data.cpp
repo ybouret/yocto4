@@ -1,7 +1,7 @@
 
 #include "yocto/utest/run.hpp"
 
-#include "yocto/swamp/workspace.hpp"
+#include "yocto/swamp/dataspace.hpp"
 #include "yocto/swamp/array3d.hpp"
 #include "yocto/code/rand.hpp"
 
@@ -37,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         ghosts_setup<coord1D> G;
         G.local.count = 1; // +1 and -1
         
-        workspace<layout1D> W(L,G);
+        dataspace<layout1D> W(L,G);
         
         typedef array1D<float> A1Df;
         W.create<A1Df>( "a1df", true );
@@ -61,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         G.lower.count.x = 2;
         G.upper.count.x = 1;
         
-        workspace<layout2D>       W(L,G);
+        dataspace<layout2D>       W(L,G);
         typedef geom::v2d<double> vtx;
         typedef array2D<vtx>      A2Dv; 
         A2Dv &A1 = W.create<A2Dv>( "a2dv" );
@@ -114,7 +114,7 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         G.lower.count.z = 4;
         G.upper.count.z = 5;
         
-        workspace<layout3D>   W(L,G);
+        dataspace<layout3D>   W(L,G);
         
         std::cerr << "Test Communication 3D" << std::endl;
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )

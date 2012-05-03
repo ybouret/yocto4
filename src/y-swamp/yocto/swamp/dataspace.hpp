@@ -1,5 +1,5 @@
-#ifndef YOCTO_SWAMP_WORKSPACE_INCLUDED
-#define YOCTO_SWAMP_WORKSPACE_INCLUDED 1
+#ifndef YOCTO_SWAMP_DATASPACE_INCLUDED
+#define YOCTO_SWAMP_DATASPACE_INCLUDED 1
 
 #include "yocto/swamp/ghosts.hpp"
 #include "yocto/swamp/factory.hpp"
@@ -14,13 +14,13 @@ namespace yocto
     {
         
         template <typename LAYOUT>
-        class workspace : public LAYOUT,  public array_db
+        class dataspace : public LAYOUT,  public array_db
         {
         public:
             typedef typename LAYOUT::coord coord;
             
             //! prepare all layouts
-            explicit workspace(const LAYOUT              &L,
+            explicit dataspace(const LAYOUT              &L,
                                const ghosts_setup<coord> &G
                                ) :
             LAYOUT(L),
@@ -35,7 +35,7 @@ namespace yocto
                 apply( G );
             }
             
-            virtual ~workspace() throw() {}
+            virtual ~dataspace() throw() {}
             
             
             //! create a new array
@@ -90,7 +90,7 @@ namespace yocto
             
         private:
             factory<LAYOUT> F;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
             vector<local_ghosts::ptr> localGhosts;
             vector<async_ghosts::ptr> asyncGhosts;
             vector<linear_base *>     usingGhosts;
@@ -98,7 +98,7 @@ namespace yocto
             //! compute outline and ghosts from the setup
             inline void apply( const ghosts_setup<coord> &G )
             {
-                std::cerr << "######## workspace: layout=" << this->__layout() << std::endl;
+                std::cerr << "######## dataspace: layout=" << this->__layout() << std::endl;
                 const unit_t *local_g = (const unit_t *) &G.local.count;
                 const unit_t *lower_g = (const unit_t *) &G.lower.count;
                 const unit_t *upper_g = (const unit_t *) &G.upper.count;
@@ -183,8 +183,8 @@ namespace yocto
                     //==========================================================
                     new ((void*)&outline) LAYOUT( outLo,  outUp );
                     new ((void*)&sync)    LAYOUT( syncLo, syncUp);
-                    std::cerr << "######## workspace: outline=" << outline << std::endl;
-                    std::cerr << "######## workspace: sync   =" << sync     << std::endl;
+                    std::cerr << "######## dataspace: outline=" << outline << std::endl;
+                    std::cerr << "######## dataspace: sync   =" << sync     << std::endl;
                     
                 }
                 
