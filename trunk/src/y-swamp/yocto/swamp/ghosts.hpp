@@ -49,15 +49,8 @@ namespace yocto
             ghost inside; //!< inner source
             ghost mirror; //!< outer mirror target
             
-            explicit local_ghosts_pair( ghost::position source ) :
-            inside( source  ),
-            mirror(  inside.mirror_position()  )
-            {
-            }
-            
-            ~local_ghosts_pair() throw() {}
-            
-            
+            explicit local_ghosts_pair( ghost::position source );            
+            ~local_ghosts_pair() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(local_ghosts_pair);
@@ -100,7 +93,7 @@ namespace yocto
             
             
             //! direct copy transfert
-            inline void transfer( linear_handles &handles ) const throw()
+            inline void transfer( const linear_handles & handles ) const throw()
             {
                 assert( num_offsets == lower.inside.offsets.size() );
                 assert( num_offsets == lower.mirror.offsets.size() );

@@ -35,7 +35,14 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         workspace<layout1D> W(L,G);
         
         typedef array1D<float> A1Df;
-        W.create<A1Df>( "a1df" );
+        W.create<A1Df>( "a1df", true );
+        W.prepare_ghosts();
+        
+        for( size_t i=1; i <= W.local_ghosts_count(); ++i )
+        {
+            W.local_ghost(i).transfer( W.handles() );
+        }
+        
     }
     
     
@@ -56,6 +63,13 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         A2Dv &A2 = W["a2dv"].as<A2Dv>();
         if( &A1 != &A2 )
             throw exception("arrays mismatch!");
+        typedef array2D<double> A2D;
+        (void)W.create<A2D>( "a2d" );
+        W.prepare_ghosts();
+        for( size_t i=1; i <= W.local_ghosts_count(); ++i )
+        {
+            W.local_ghost(i).transfer( W.handles() );
+        }
     }
     
     

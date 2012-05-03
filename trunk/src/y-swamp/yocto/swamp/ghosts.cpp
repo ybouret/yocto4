@@ -6,6 +6,11 @@ namespace yocto
     namespace swamp 
     {
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // ghost
+        //
+        ////////////////////////////////////////////////////////////////////////
         ghost:: ~ghost() throw() {}
         
         ghost:: ghost( ghost::position p ) throw() :
@@ -45,7 +50,7 @@ namespace yocto
                 case at_upper_z: return at_lower_z;
             }
             critical_error(error_invalid_data, "invalid ghost::position mirror");
-
+            
         }
         
         ghost::position ghost:: mirror_position() const throw()
@@ -78,8 +83,22 @@ namespace yocto
             critical_error(error_invalid_data, "invalid ghost::upper_position dimension index");
             return ghost::position(-1);
         }
-
-
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // local_ghost_pair
+        //
+        ////////////////////////////////////////////////////////////////////////
+        local_ghosts_pair:: local_ghosts_pair( ghost::position source ) :
+        inside( source  ),
+        mirror(  inside.mirror_position()  )
+        {
+        }
+        
+        local_ghosts_pair:: ~local_ghosts_pair() throw() {}
+        
+        
         
     }
 }

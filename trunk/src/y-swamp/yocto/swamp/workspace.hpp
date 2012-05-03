@@ -29,39 +29,71 @@ namespace yocto
             sync(    *this ),
             F(8),
             localGhosts(4,as_capacity),
-            asyncGhosts(8,as_capacity)
+            asyncGhosts(8,as_capacity),
+            usingGhosts()
             {
                 apply( G );
             }
             
-            virtual ~workspace() throw()
+            virtual ~workspace() throw() {}
+            
+            
+            //! create a new array
+            /**
+             \param name the unique array name
+             \param async if true, will use ghosts exchange
+             */
+            template <typename ARRAY>
+            inline ARRAY &create( const string &name, bool async = true )
             {
+                array_db  &adb = *this;
+                F.template make<ARRAY>(name,outline,adb);
+                ARRAY    &ans = adb[ name ].as<ARRAY>();
+                if( async )
+                {
+                    usingGhosts.push_back( &ans );
+                }
+                return ans;
             }
             
-            
+            //! create a new array
             template <typename ARRAY>
-            inline ARRAY &create( const string &name )
-            {
-                F.template make<ARRAY>(name,outline,*this);
-                array_db &adb = *this;
-                return adb[ name ].as<ARRAY>();
-            }
-            
-            template <typename ARRAY>
-            inline ARRAY &create( const char *id )
+            inline ARRAY &create( const char *id, bool async = true )
             {
                 const string name(id);
                 return create<ARRAY>(name);
             }
             
+            //! allocate all data for communication
+            void  prepare_ghosts()
+            {
+                for( size_t i=1; i <= asyncGhosts.size(); ++i )
+                {
+                    asyncGhosts[i]->allocate_for( usingGhosts );
+                }
+            }
+            
             const LAYOUT outline;   //!< layout+ghosts
             const LAYOUT sync;      //!< layout - async ghosts: always synchronous
+            
+            inline size_t  local_ghosts_count() const throw() { return localGhosts.size(); }
+            inline size_t  async_ghosts_count() const throw() { return asyncGhosts.size(); }
+            
+            local_ghosts & local_ghost( size_t index ) throw() { return *localGhosts[index];}
+            async_ghosts & async_ghost( size_t index ) throw() { return *asyncGhosts[index];} 
+            
+            
+            const linear_handles & handles() const throw() { return usingGhosts; }
+           
+            size_t num_requests() const throw() { return asyncGhosts.size() *2 ; }
+
             
         private:
             factory<LAYOUT> F;
             YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
             vector<local_ghosts::ptr> localGhosts;
             vector<async_ghosts::ptr> asyncGhosts;
+            vector<linear_base *>     usingGhosts;
             
             //! compute outline and ghosts from the setup
             inline void apply( const ghosts_setup<coord> &G )
