@@ -109,7 +109,7 @@ namespace yocto
                     {
                         axis_type &D = delta( iAxis );
                         assert( A.lower == D.lower ); assert( A.upper-1 == D.upper );
-                        for( size_t i=A.lower; i < A.upper; ++i )
+                        for( unit_t i=A.lower; i < A.upper; ++i )
                         {
                             D[i] = A[i+1] - A[i];
                         }
