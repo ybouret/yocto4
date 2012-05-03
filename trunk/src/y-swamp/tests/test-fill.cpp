@@ -20,8 +20,13 @@ namespace {
         {
             return sin(3*sqrt(x*x+y*y));
         }
+        
+        double F3( double x, double y, double z )
+        {
+            return sin(3*sqrt(x*x+y*y+z*z));
+        }
     };
- 
+    
     static inline double vproc( const double &x ) { return x; }
 }
 
@@ -29,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(fill)
 {
     typedef fill<double,double> fill_type;
     filler           F;
-
+    
     {
         const layout1D  L(1,100);
         const ghosts_setup<coord1D> no_ghosts;
@@ -73,6 +78,33 @@ YOCTO_UNIT_TEST_IMPL(fill)
         A.ppm("a2.ppm", "fill", L, vproc, NULL, -1, 1);
         
     }
+    
+    {
+        const coord3D lo(1,1,1);
+        const coord3D hi(10,15,20);
+        const layout3D L(lo,hi);
+        const ghosts_setup<coord3D> no_ghosts;
+        workspace<layout3D,double,rectilinear_mesh> W(L,no_ghosts);
+        
+        const geom::v3d<double> vlo(-1,-1,-1);
+        const geom::v3d<double> vhi(1,1,1);
+        const region3D<double>::type R(vlo,vhi);
+        
+        W.mesh.regular_map_to(R,L);
+        
+        const array1D<double> &X = W.mesh.X();
+        const array1D<double> &Y = W.mesh.Y();
+        const array1D<double> &Z = W.mesh.Z();
+
+        fill_type::function3D f3( &F, & filler::F3 );
+        
+        array3D<double> &A = W.create< array3D<double> >( "A" );
+        
+        fill_type::in(A,L,f3,X,Y,Z);
+        
+        
+    }
+    
     
     
 }
