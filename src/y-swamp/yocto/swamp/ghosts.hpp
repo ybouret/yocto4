@@ -67,12 +67,12 @@ namespace yocto
         class ghosts_base : public object
         {
         public:
-            const size_t       count; //!< number of ghosts points/lines/slices
+            const size_t       count;       //!< number of ghosts points/lines/slices
+            const size_t       num_offsets; //!< to be set during allocation
+
             virtual ~ghosts_base() throw() {}
             
         protected:
-            const size_t num_offsets;
-            
             explicit ghosts_base( size_t num_ghosts ) throw() :
             count(num_ghosts),
             num_offsets(0)
