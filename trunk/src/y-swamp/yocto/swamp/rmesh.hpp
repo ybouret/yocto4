@@ -10,7 +10,7 @@ namespace yocto
     namespace swamp 
     {
         template <typename T,typename LAYOUT>
-        class rectilinear_mesh : public quadmesh, public LAYOUT
+        class rmesh : public quadmesh, public LAYOUT
         {
         public:
             typedef array1D<T> axis_type;   //!< one axis
@@ -21,7 +21,7 @@ namespace yocto
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type   region_type;
             typedef typename __region<T,LAYOUT::DIMENSIONS>::vertex vertex;
             
-            explicit rectilinear_mesh( array_db &db, const LAYOUT &L ) :
+            explicit rmesh( array_db &db, const LAYOUT &L ) :
             quadmesh( db ),
             LAYOUT( L ),
             axis_spec( typeid(axis_type) )
@@ -50,7 +50,7 @@ namespace yocto
                 }
             }
             
-            virtual ~rectilinear_mesh() throw() {}
+            virtual ~rmesh() throw() {}
             
            
             
@@ -156,7 +156,7 @@ namespace yocto
             
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(rmesh);
         };
     }
 }
