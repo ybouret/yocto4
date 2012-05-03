@@ -7,10 +7,10 @@ namespace yocto
     namespace swamp 
     {
         
-        mesh:: ~mesh() throw() {}
-        mesh::  mesh( array_db &db ) throw() :adb( db ) {}
+        quadmesh:: ~quadmesh() throw() {}
+        quadmesh::  quadmesh( array_db &db ) throw() :adb( db ) {}
         
-        const char *mesh:: axis_name( size_t iAxis )
+        const char *quadmesh:: axis_name( size_t iAxis )
         {
             switch( iAxis )
             {
@@ -26,10 +26,10 @@ namespace yocto
                 default:
                     break;
             }
-            throw exception("invalid mesh::axis_name(%u)", unsigned(iAxis) );
+            throw exception("invalid quadmesh::axis_name(%u)", unsigned(iAxis) );
         }
 
-        const char *mesh:: delta_name( size_t iAxis )
+        const char *quadmesh:: delta_name( size_t iAxis )
         {
             switch( iAxis )
             {
@@ -45,7 +45,7 @@ namespace yocto
                 default:
                     break;
             }
-            throw exception("invalid mes::delta_name(%u)", unsigned(iAxis) );
+            throw exception("invalid quadmesh::delta_name(%u)", unsigned(iAxis) );
         }
 
         

@@ -9,20 +9,20 @@ namespace yocto
     namespace swamp 
     {
         
-        class mesh : public object
+        class quadmesh : public object
         {
         public:
-            virtual ~mesh() throw();
+            virtual ~quadmesh() throw();
             
             static const char *axis_name( size_t iAxis );
             static const char *delta_name( size_t iAxis );
             
         protected:
-            explicit mesh( array_db &db ) throw();
+            explicit quadmesh( array_db &db ) throw();
             array_db &adb;
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(mesh);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(quadmesh);
         };
     }
     

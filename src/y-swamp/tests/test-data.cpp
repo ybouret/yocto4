@@ -5,7 +5,6 @@
 #include "yocto/swamp/array3d.hpp"
 #include "yocto/code/rand.hpp"
 
-#include <iostream>
 
 using namespace yocto;
 using namespace swamp;
@@ -30,7 +29,7 @@ static inline double vproc( const double &x )
     return x;
 }
 
-YOCTO_UNIT_TEST_IMPL(wksp)
+YOCTO_UNIT_TEST_IMPL(data)
 {
     {
         const layout1D        L( rand1()-2, rand1()+2 );
