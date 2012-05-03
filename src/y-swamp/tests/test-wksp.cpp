@@ -25,6 +25,11 @@ static inline coord3D rand3()
     return coord3D( rand1(), rand1(), rand1() );
 }
 
+static inline double vproc( const double &x )
+{
+    return x;
+}
+
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
     {
@@ -64,12 +69,23 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         if( &A1 != &A2 )
             throw exception("arrays mismatch!");
         typedef array2D<double> A2D;
-        (void)W.create<A2D>( "a2d" );
+        A2D &A = W.create<A2D>( "a2d" );
         W.prepare_ghosts();
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )
         {
             W.local_ghost(i).transfer( W.handles() );
         }
+        
+        std::cerr << "0: " << W.outline    << std::endl;
+        std::cerr << "1: " << W.__layout() << std::endl;
+        std::cerr << "2: " << W.sync       << std::endl;
+        A.set_all( W.outline,    0 );
+        A.set_all( W.__layout(), 1 );
+        A.set_all( W.sync,       2 );
+        
+        A.ppm("g2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
+        
+        
     }
     
     

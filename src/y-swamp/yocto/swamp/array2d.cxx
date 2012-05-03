@@ -72,7 +72,7 @@ namespace yocto
                 }
             }
         }
-
+        
         template <>
         void array2D<ZTYPE>:: foreach( const array_type  &other, const layout_type &sub, call_two proc, void *args)
         {
@@ -88,7 +88,7 @@ namespace yocto
                     proc( self_j[i], other_j[i], args );
                 }
             }
-
+            
         }
         
         template <>
@@ -102,7 +102,7 @@ namespace yocto
         {
             foreach( other, sub, add2_cb, NULL );
         }
-
+        
         
         template <>
         void array2D<ZTYPE>:: link( void *data ) throw()
@@ -127,7 +127,7 @@ namespace yocto
             *info = arr;
             return arr;
         }
-
+        
         template <>
         void array2D<ZTYPE>:: dtor( void *handle ) throw()
         {
@@ -135,7 +135,65 @@ namespace yocto
             array_type *a = (array_type *)handle;
             delete a;
         }
-
+        
+        template <>
+		void array2D<ZTYPE>:: ppm(const string   &filename,
+                                  const string   &comment,
+                                  const layout2D &area,
+                                  double (*vproc)( const ZTYPE & ),
+                                  const color::rgba32 *colors,
+                                  double               vmin,
+                                  double               vmax) const
+		{
+			assert( vproc != NULL );
+			assert( this->has( area.lower ) );
+			assert( this->has( area.upper ) );
+			ios::ocstream fp( filename,false );
+			fp("P6\n");
+			
+			//-- comment
+			fp("#%s\n", &comment[0] );
+			
+			//-- size
+			fp("%u %u\n", unsigned(area.width.x), unsigned(area.width.y) );
+			
+			//-- #colors
+			fp("255\n");
+			
+			
+			//-- data
+			//-- #info
+			const bool default_ramp = (NULL == colors);
+			for( unit_t y = area.upper.y; y >= area.lower.y; --y )
+			{
+				const row_type &r_y = (*this)[y];
+				for( unit_t x = area.lower.x; x <= area.upper.x; ++x )
+				{
+					const double v = vproc( r_y[x] );
+                    //std::cerr << "v[" << y << "][" << x << "]=" << v << std::endl;
+					if( default_ramp )
+					{
+						const color::rgba<double> c = color::rgba<double>::ramp( v, vmin, vmax );
+						const uint8_t b[4] =  { uint8_t( 255 * c.r ), uint8_t( 255 * c.g ), uint8_t(255 * c.b ), 0 };
+                        //std::cerr << v << "/(" << vmin << ":" << vmax <<") -> " << c.r << "," << c.g << "," << c.b << " = " << int(b[0]) << "," << int(b[1]) << "," << int(b[2]) << std::endl;
+						fp.write( b[0] );
+						fp.write( b[1] );
+						fp.write( b[2] );
+					}
+					else
+					{
+						const color::rgba32 c = color::rgba32:: ramp( colors, v, vmin, vmax );
+						fp.write( c.r );
+						fp.write( c.g );
+						fp.write( c.b );
+					}
+					
+				}
+			}
+			
+			
+		}
+        
     }
     
 }
