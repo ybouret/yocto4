@@ -83,9 +83,24 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         A.set_all( W.__layout(), 1 );
         A.set_all( W.sync,       2 );
         
-        A.ppm("g2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
+        A.ppm("ini2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
         
+        std::cerr << "Test Communication" << std::endl;
+        for( size_t i=1; i <= W.local_ghosts_count(); ++i )
+        {
+            W.local_ghost(i).transfer( W.handles() );
+        }
         
+        for( size_t i=1; i <= W.async_ghosts_count(); ++i )
+        {
+            async_ghosts &g = W.async_ghost(i);
+            g.store_inner( W.handles() );
+            memcpy( g.outer_buf, g.inner_buf, g.length );
+            g.query_outer( W.handles() );
+        }
+        
+        A.ppm("end2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
+
     }
     
     
