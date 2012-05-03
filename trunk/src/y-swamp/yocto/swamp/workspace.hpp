@@ -291,8 +291,8 @@ namespace yocto
                                     __coord(subUp,dim) = __coord(subLo,dim) + ns;
                                     const LAYOUT sub(subLo,subUp);
                                     std::cerr << "\t\tlowerGhosts[" << iLocal << "]=(" << lower_ng << ").lower.inner=" << sub << std::endl;
-                                    outline.load_offsets( sub, g.gpair.inner.offsets );
-                                    assert( sub.items == g.gpair.inner.offsets.size() );
+                                    outline.load_offsets( sub, g.self.inner.offsets );
+                                    assert( sub.items == g.self.inner.offsets.size() );
                                 }
                                 
                                 // lower.outer
@@ -302,13 +302,13 @@ namespace yocto
                                     __coord(subUp,dim) = __coord(layLo,dim) - 1;
                                     const LAYOUT sub(subLo,subUp);
                                     std::cerr << "\t\tlowerGhosts[" << iLocal << "]=(" << lower_ng << ").lower.outer=" << sub << std::endl;
-                                    outline.load_offsets( sub, g.gpair.outer.offsets );
-                                    assert( sub.items == g.gpair.outer.offsets.size() );
+                                    outline.load_offsets( sub, g.self.outer.offsets );
+                                    assert( sub.items == g.self.outer.offsets.size() );
                                 }
                                 
                                 // finalize
-                                (size_t&)(g.num_offsets) = g.gpair.inner.offsets.size();
-                                assert( g.gpair.outer.offsets.size() == g.num_offsets);
+                                (size_t&)(g.num_offsets) = g.self.inner.offsets.size();
+                                assert( g.self.outer.offsets.size() == g.num_offsets);
                             }
                         }
                         
@@ -330,8 +330,8 @@ namespace yocto
                                     __coord(subLo,dim) = __coord(subUp,dim) - ns;
                                     const LAYOUT sub(subLo,subUp);
                                     std::cerr << "\t\tupperGhosts[" << iLocal << "]=(" << upper_ng << ").upper.inner=" << sub << std::endl;
-                                    outline.load_offsets(sub, g.gpair.inner.offsets );
-                                    assert( sub.items ==  g.gpair.inner.offsets.size() );
+                                    outline.load_offsets(sub, g.self.inner.offsets );
+                                    assert( sub.items ==  g.self.inner.offsets.size() );
                                 }
                                 
                                 // upper.outer
@@ -341,13 +341,13 @@ namespace yocto
                                     __coord(subLo,dim) = __coord(layUp,dim) + 1;
                                     const LAYOUT sub(subLo,subUp);
                                     std::cerr << "\t\tupperGhosts[" << iLocal << "]=(" << upper_ng << ").upper.outer=" << sub << std::endl;
-                                    outline.load_offsets(sub, g.gpair.outer.offsets );
-                                    assert( sub.items ==  g.gpair.outer.offsets.size() );
+                                    outline.load_offsets(sub, g.self.outer.offsets );
+                                    assert( sub.items ==  g.self.outer.offsets.size() );
                                 }
                                 
                                 // finalize
-                                (size_t&)(g.num_offsets) = g.gpair.inner.offsets.size();
-                                assert( g.gpair.outer.offsets.size() == g.num_offsets);
+                                (size_t&)(g.num_offsets) = g.self.inner.offsets.size();
+                                assert( g.self.outer.offsets.size() == g.num_offsets);
                             }
                         }
                         

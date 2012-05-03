@@ -10,7 +10,7 @@ namespace yocto
     namespace swamp 
     {
         typedef array<linear_base *>  linear_handles;
-
+        
         class ghost 
         {
         public:
@@ -62,7 +62,7 @@ namespace yocto
         public:
             const size_t       count;       //!< number of ghosts points/lines/slices
             const size_t       num_offsets; //!< to be set during allocation
-
+            
             virtual ~ghosts_base() throw() {}
             
         protected:
@@ -151,10 +151,11 @@ namespace yocto
         public:            
             async_ghosts( size_t num_ghosts, ghost::position source, int a_peer ) :
             ghosts_base( num_ghosts ),
-            gpair( source ),
-            peer(  a_peer ),
+            self( source ),
+            peer( a_peer ),
             inner_buf(NULL),
             outer_buf(NULL),
+            length(0),
             iolen(0)
             {
             }
@@ -166,10 +167,11 @@ namespace yocto
                     assert( outer_buf != NULL );
                     memory::kind<memory::global>::release_as<uint8_t>( inner_buf, iolen );
                     outer_buf = NULL;
+                    length    = 0;
                 }
             }
             
-            async_ghosts_pair   gpair; //!< the I/O pair
+            async_ghosts_pair   self;  //!< the I/O pair
             const int           peer;  //!< MPI peer
             
             
@@ -179,56 +181,61 @@ namespace yocto
                 assert( NULL == inner_buf );
                 assert( NULL == outer_buf );
                 assert( 0    == iolen );
+                assert( 0    == length );
                 for( size_t j=handles.size(); j>0; --j )
                 {
-                    iolen += handles[j]->item_size();
+                    length += handles[j]->item_size();
                 }
-                iolen *= num_offsets;
-                const size_t shift = iolen;
-                iolen *= 2;
-                inner_buf  = memory::kind<memory::global>::acquire_as<uint8_t>( iolen );
-                outer_buf  = inner_buf + shift;
+                length *= num_offsets;
+                iolen   = length * 2;
+                try
+                {
+                    inner_buf  = memory::kind<memory::global>::acquire_as<uint8_t>( iolen );
+                }
+                catch(...) { length = 0; throw; }
+                outer_buf  = inner_buf + length;
             }
             
             //! store inner data into inner_buf
-            void store_inner( linear_handles &handles ) throw()
+            void store_inner( const linear_handles &handles ) throw()
             {
                 uint8_t *ptr = inner_buf;
                 for( size_t i=num_offsets; i>0; --i )
                 {
-                    const size_t k = gpair.inner.offsets[i];
+                    const size_t k = self.inner.offsets[i];
                     for( size_t j=handles.size(); j>0; --j )
                     {
                         const linear_base &A = *handles[j];
                         A.async_store(ptr,k);
-                        assert( ptr <= inner_buf + (iolen>>1) );
+                        assert( ptr <= inner_buf + length );
                     }
                 }
             }
             
             //! query outer data from outer_buf
-            void query_outer( linear_handles &handles ) const throw()
+            void query_outer( const linear_handles &handles ) const throw()
             {
                 const uint8_t *ptr = outer_buf;
                 for( size_t i=num_offsets; i>0; --i )
                 {
-                    const size_t k = gpair.outer.offsets[i];
+                    const size_t k = self.outer.offsets[i];
                     for( size_t j=handles.size(); j>0; --j )
                     {
                         linear_base &A = *handles[j];
                         A.async_query(ptr,k);
-                        assert( ptr <= outer_buf + (iolen>>1) );
+                        assert( ptr <= outer_buf + length );
                     }
                 }
                 
             }
             
             typedef shared_ptr<async_ghosts> ptr;
-            
-        private:
             uint8_t       *inner_buf;
             uint8_t       *outer_buf;
-            size_t         iolen;
+            size_t         length;
+            
+        private:
+            size_t         iolen;  //!< twice length
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts);
         };
