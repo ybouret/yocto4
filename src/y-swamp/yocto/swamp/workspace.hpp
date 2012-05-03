@@ -1,5 +1,5 @@
-#ifndef YOCTO_SWAMP_WORKSAPCE_INCLUDED
-#define YOCTO_SWAMP_WORKSAPCE_INCLUDED 1
+#ifndef YOCTO_SWAMP_WORKSPACE_INCLUDED
+#define YOCTO_SWAMP_WORKSPACE_INCLUDED 1
 
 #include "yocto/swamp/ghosts.hpp"
 #include "yocto/swamp/factory.hpp"
@@ -14,18 +14,22 @@ namespace yocto
     {
         
         template <typename LAYOUT>
-        class workspace : public LAYOUT, public factory<LAYOUT>, public array_db
+        class workspace : public LAYOUT,  public array_db
         {
         public:
             typedef typename LAYOUT::coord coord;
+            
+            //! prepare all layouts
             explicit workspace(const LAYOUT              &L,
                                const ghosts_setup<coord> &G
                                ) :
             LAYOUT(L),
-            factory<LAYOUT>(),
             array_db(),
             outline( *this ),
-            sync(    *this )
+            sync(    *this ),
+            F(8),
+            localGhosts(4,as_capacity),
+            asyncGhosts(8,as_capacity)
             {
                 apply( G );
             }
@@ -34,10 +38,27 @@ namespace yocto
             {
             }
             
+            
+            template <typename ARRAY>
+            inline ARRAY &create( const string &name )
+            {
+                F.template make<ARRAY>(name,outline,*this);
+                array_db &adb = *this;
+                return adb[ name ].as<ARRAY>();
+            }
+            
+            template <typename ARRAY>
+            inline ARRAY &create( const char *id )
+            {
+                const string name(id);
+                return create<ARRAY>(name);
+            }
+            
             const LAYOUT outline;   //!< layout+ghosts
             const LAYOUT sync;      //!< layout - async ghosts: always synchronous
             
         private:
+            factory<LAYOUT> F;
             YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
             vector<local_ghosts::ptr> localGhosts;
             vector<async_ghosts::ptr> asyncGhosts;
@@ -63,7 +84,7 @@ namespace yocto
                     coord         outUp( this->upper );
                     unit_t  *     pLower = (unit_t *) &outLo;
                     unit_t  *     pUpper = (unit_t *) &outUp;
-                                        
+                    
                     for( unsigned dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
                     {
                         std::cerr << "\t ---- dim #" << dim << std::endl;

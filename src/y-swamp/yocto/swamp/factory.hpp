@@ -13,6 +13,7 @@ namespace yocto
         {
         public:
             explicit factory() throw() : sheds()  {}
+            explicit factory( size_t n ) : sheds( n, as_capacity ) {}
             virtual ~factory() throw() {}
             
             typedef void  * (*array_ctor)( const LAYOUT & , linear_base **);
@@ -31,7 +32,6 @@ namespace yocto
                 const type_spec spec( which );
                 record(spec,ctor,dtor);
             }
-            
             
             //! templated recording of type ARRAY
             template <typename ARRAY>
@@ -53,10 +53,18 @@ namespace yocto
                 produce(name,L,spec,db);
             }
             
+            //! make with auto-registering
             template <typename ARRAY>
             inline void make( const string &name, const LAYOUT &L, array_db &db )
             {
-                produce( name, L, typeid(ARRAY), db );
+                const std::type_info &kind = typeid(ARRAY);
+                const type_spec       spec(kind);
+                if( !sheds.search(spec) )
+                {
+                    use<ARRAY>();
+                }
+                std::cerr << "Creating <" << name << ">='" << spec.name() << "'" << std::endl;
+                produce( name, L, spec, db );
             }
             
             template <typename ARRAY>

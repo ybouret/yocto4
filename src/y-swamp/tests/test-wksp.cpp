@@ -33,6 +33,9 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         G.local.count = 1; // +1 and -1
         
         workspace<layout1D> W(L,G);
+        
+        typedef array1D<float> A1Df;
+        W.create<A1Df>( "a1df" );
     }
     
     
@@ -47,6 +50,12 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         G.upper.count.x = 1;
         
         workspace<layout2D>   W(L,G);
+        typedef geom::v2d<double> vtx;
+        typedef array2D<vtx>      A2Dv; 
+        A2Dv &A1 = W.create<A2Dv>( "a2dv" );
+        A2Dv &A2 = W["a2dv"].as<A2Dv>();
+        if( &A1 != &A2 )
+            throw exception("arrays mismatch!");
     }
     
     
