@@ -10,20 +10,20 @@ namespace yocto
     namespace swamp
     {
         template <typename T,typename LAYOUT>
-        class curvilinear_mesh : public mesh, public LAYOUT
+        class curvilinear_mesh : public quadmesh, public LAYOUT
         {
         public:
             typedef typename __array<T,LAYOUT::DIMENSIONS>::type  array_type;
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type region_type;
             
             explicit curvilinear_mesh( array_db &db, const LAYOUT &L) :
-            mesh( db ),
+            quadmesh( db ),
             LAYOUT(L)
             {
                 const type_spec spec( typeid(array_type) );
                 for( size_t iAxis = 0; iAxis < LAYOUT::DIMENSIONS; ++iAxis )
                 {
-                    const string name( mesh::axis_name( iAxis ) );
+                    const string name( quadmesh::axis_name( iAxis ) );
                     linear_base *info = NULL;
                     void        *addr = array_type::ctor( L, &info );
                     adb(name, spec, addr, info, array_type::dtor);                    
@@ -34,22 +34,22 @@ namespace yocto
             
             array_type & operator[]( size_t iAxis ) 
             {
-                return adb[ mesh::axis_name(iAxis) ].template as<array_type>();
+                return adb[ quadmesh::axis_name(iAxis) ].template as<array_type>();
             }
             
             const array_type & operator[]( size_t iAxis ) const
             {
-                return adb[ mesh::axis_name(iAxis) ].template as<array_type>();
+                return adb[ quadmesh::axis_name(iAxis) ].template as<array_type>();
             }
             
-            inline array_type       &X()       { return adb[ mesh::axis_name(0) ].template as<array_type>(); }
-            inline const array_type &X() const { return adb[ mesh::axis_name(0) ].template as<array_type>(); }
+            inline array_type       &X()       { return adb[ quadmesh::axis_name(0) ].template as<array_type>(); }
+            inline const array_type &X() const { return adb[ quadmesh::axis_name(0) ].template as<array_type>(); }
             
-            inline array_type       &Y()       { return adb[ mesh::axis_name(1) ].template as<array_type>(); }
-            inline const array_type &Y() const { return adb[ mesh::axis_name(1) ].template as<array_type>(); }
+            inline array_type       &Y()       { return adb[ quadmesh::axis_name(1) ].template as<array_type>(); }
+            inline const array_type &Y() const { return adb[ quadmesh::axis_name(1) ].template as<array_type>(); }
             
-            inline array_type       &Z()       { return adb[ mesh::axis_name(2) ].template as<array_type>(); }
-            inline const array_type &Z() const { return adb[ mesh::axis_name(2) ].template as<array_type>(); }
+            inline array_type       &Z()       { return adb[ quadmesh::axis_name(2) ].template as<array_type>(); }
+            inline const array_type &Z() const { return adb[ quadmesh::axis_name(2) ].template as<array_type>(); }
             
             inline void regular_map_to( const region_type &r, const LAYOUT &l ) 
             {
