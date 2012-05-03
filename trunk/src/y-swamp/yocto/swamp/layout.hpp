@@ -28,6 +28,21 @@ namespace yocto
             //! detect is coord is inside
             bool     is_inside( const void *coord_addr, const void *lower_addr, const void *upper_addr) const throw();
             
+            //! MPI style splitting for one dimension
+			/**
+			 \param lo final lower coordinate
+			 \param hi final upper coordinate
+			 \param Lo source lower coordinate
+			 \param Hi source upper coordinate
+			 \param rank MPI style rank, 0 <= rank < size
+			 \param size MPI style size
+			 */
+			static void split(unit_t      &lo, 
+							  unit_t      &hi, 
+							  const unit_t Lo, 
+							  const unit_t Hi, 
+							  const size_t rank, 
+							  const size_t size );
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(layout_base);
         };
@@ -47,7 +62,7 @@ namespace yocto
 			const_coord   lower; //!< lower coordinate
 			const_coord   upper; //!< upper coordinate
 			const_coord   width; //!< coordinate width
-            const_coord   pitch; //!< coordinate pict: (1,nx,nx*ny)
+            const_coord   pitch; //!< coordinate pitch: (1,nx,nx*ny)
 			const size_t  items; //!< number of linear items within the layout 
 			
 			
@@ -110,6 +125,21 @@ namespace yocto
             }
             
             inline const layout & __layout() const throw() { return *this; }
+            
+            //! MPI style splitting along dimension dim
+			inline layout split( size_t rank, size_t size, size_t dim = DIMENSIONS-1 ) const
+			{
+                assert( dim < DIMENSIONS );
+				const unit_t Lo = __coord(lower,dim);
+				const unit_t Hi = __coord(upper,dim);
+				coord        s_lo(lower);
+				coord        s_hi(upper);
+				unit_t      &lo = __coord(s_lo,dim);
+				unit_t      &hi = __coord(s_hi,dim);
+				layout_base::split(lo,hi,Lo,Hi,rank,size);
+				return layout(s_lo,s_hi);
+			}
+
             
         private:
             inline void __ld( const layout &sub, offsets_list &offsets, int2type<1> ) const throw()

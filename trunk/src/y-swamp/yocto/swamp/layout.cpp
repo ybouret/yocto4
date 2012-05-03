@@ -1,6 +1,7 @@
 #include "yocto/swamp/layout.hpp"
 #include "yocto/code/swap.hpp"
-
+#include "yocto/exceptions.hpp"
+#include <cerrno>
 
 namespace yocto 
 {
@@ -57,6 +58,32 @@ namespace yocto
             }
             return true;
         }
+        
+        void layout_base:: split(unit_t      &lo, 
+								 unit_t      &hi, 
+								 const unit_t Lo, 
+								 const unit_t Hi, 
+								 const size_t rank, 
+								 const size_t size )
+		{
+			assert(Lo<=Hi);
+			assert(size>0);
+			assert(rank<size);
+			unit_t W = Hi - Lo + 1;
+			if( unit_t(size) > W )
+				throw libc::exception( EDOM, "layout_base::split(size=%u>#divisions=%u)", unsigned(size), unsigned(W));
+			unit_t todo = W/size; // first packet
+			lo = Lo;              // first offset
+			for( size_t i=1; i <= rank; ++i )
+			{
+				lo += todo;        // update offset
+				W  -= todo;        // decrease width
+				todo = W/(size-i); // next packet
+			}
+			hi = lo + (todo-1);
+			
+		}
+
         
     }
 }
