@@ -9,6 +9,7 @@ ADD_TEST(Array   test-swamp array)
 ADD_TEST(Arrays  test-swamp arrays)
 ADD_TEST(RMesh   test-swamp rmesh)
 ADD_TEST(CMesh   test-swamp cmesh)
+ADD_TEST(Data    test-swamp data)
 ADD_TEST(Wksp    test-swamp wksp)
 
 ADD_CUSTOM_TARGET(check-swamp COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-swamp)
