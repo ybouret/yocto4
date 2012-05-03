@@ -80,8 +80,8 @@ YOCTO_UNIT_TEST_IMPL(fill)
     }
     
     {
-        const coord3D lo(1,1,1);
-        const coord3D hi(10,15,20);
+        const coord3D  lo(1,1,1);
+        const coord3D  hi(10,15,20);
         const layout3D L(lo,hi);
         const ghosts_setup<coord3D> no_ghosts;
         workspace<layout3D,double,rectilinear_mesh> W(L,no_ghosts);
