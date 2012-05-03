@@ -18,8 +18,8 @@ namespace yocto
             const   type_spec  axis_spec;   //!< for array_db
             
             //! associated region type
-            typedef typename __region<T,LAYOUT::DIMENSIONS>::type region_type;
-            
+            typedef typename __region<T,LAYOUT::DIMENSIONS>::type   region_type;
+            typedef typename __region<T,LAYOUT::DIMENSIONS>::vertex vertex;
             
             explicit rectilinear_mesh( array_db &db, const LAYOUT &L ) :
             quadmesh( db ),
