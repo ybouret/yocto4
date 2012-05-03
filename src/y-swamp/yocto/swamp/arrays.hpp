@@ -54,9 +54,7 @@ namespace yocto
                 check_specs( spec, required);
                 return *(ARRAY *)( addr );
             }
-            
-            
-            
+                        
             typedef intrusive_ptr<string,varray> ptr; //!< smart pointer for the database
             typedef set<string,varray::ptr>      db;  //!< array database
             
