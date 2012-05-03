@@ -105,7 +105,7 @@ namespace yocto
                 
                 //==============================================================
                 //
-                // First pass: compute outline and register ghosts
+                // First pass: compute outline, sync zone and register ghosts
                 //
                 //==============================================================
                 {
@@ -116,6 +116,8 @@ namespace yocto
                     coord         outUp( this->upper );
                     unit_t  *     pLower = (unit_t *) &outLo;
                     unit_t  *     pUpper = (unit_t *) &outUp;
+                    coord         syncLo( this->lower );
+                    coord         syncUp( this->upper );
                     
                     for( unsigned dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
                     {
@@ -128,7 +130,7 @@ namespace yocto
                             // check layout width
                             //--------------------------------------------------
                             if( local_ng > w[dim] )
-                                throw exception("too many ghosts in dimension %u", dim);
+                                throw exception("too many local ghosts in dimension %u", dim);
                             
                             //--------------------------------------------------
                             // create the local ghosts
@@ -150,6 +152,7 @@ namespace yocto
                                 std::cerr << "\t  peer=" << pG->peer << std::endl;
                                 asyncGhosts.push_back( pG );
                                 pLower[dim] -= lower_ng;
+                                __coord(syncLo,dim) += lower_ng;
                             }
                         }
                         
@@ -164,18 +167,24 @@ namespace yocto
                                 std::cerr << "\t  peer=" << pG->peer << std::endl;
                                 asyncGhosts.push_back( pG );
                                 pUpper[dim] += upper_ng;
+                                __coord(syncUp,dim) -= upper_ng;
                             }
                         }
+                        
+                        if(  __coord(syncUp,dim) <  __coord(syncLo,dim))
+                            throw exception("too many async ghosts in dimension %u", dim );
                         
                     }
                     
                     //==========================================================
                     //
-                    // recreate outline
+                    // recreate outline and syn zone
                     //
                     //==========================================================
-                    new ((void*)&outline) LAYOUT( outLo, outUp );
-                    std::cerr << "######## workspace: outline=" <<  outline << std::endl;
+                    new ((void*)&outline) LAYOUT( outLo,  outUp );
+                    new ((void*)&sync)    LAYOUT( syncLo, syncUp);
+                    std::cerr << "######## workspace: outline=" << outline << std::endl;
+                    std::cerr << "######## workspace: sync   =" << sync     << std::endl;
                     
                 }
                 
