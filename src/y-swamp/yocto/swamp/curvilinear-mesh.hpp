@@ -15,7 +15,7 @@ namespace yocto
         public:
             typedef typename __array<T,LAYOUT::DIMENSIONS>::type  array_type;
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type region_type;
-
+            
             explicit curvilinear_mesh( array_db &db, const LAYOUT &L) :
             mesh( db ),
             LAYOUT(L)
@@ -53,31 +53,32 @@ namespace yocto
             
             inline void regular_map_to( const region_type &r, const LAYOUT &l ) 
             {
-                //--------------------------------------------------------------
-                //-- expand region to this layout
-                //--------------------------------------------------------------
-                const region_type self_r = r.template map_to<LAYOUT>( *this, l );
-                const T *vmin = (const T*) & self_r.vmin;
-                const T *vlen = (const T*) & self_r.length;
-                const unit_t *pLower = (const unit_t *) & this->lower;
-                const unit_t *pUpper = (const unit_t *) & this->upper;
-                //--------------------------------------------------------------
-                //-- map each array
-                //--------------------------------------------------------------
-                for( size_t iAxis = 0; iAxis < LAYOUT::DIMENSIONS; ++iAxis )
-                {
-                    array_type &A = (*this)[ iAxis ];
-                    const unit_t lo = pLower[iAxis];
-                    const unit_t up = pUpper[iAxis];
-                    if( lo < up )
-                    {
-                        
-                    }
-                }
-                
+                /*
+                 //--------------------------------------------------------------
+                 //-- expand region to this layout
+                 //--------------------------------------------------------------
+                 const region_type self_r = r.template map_to<LAYOUT>( *this, l );
+                 const T *vmin = (const T*) & self_r.vmin;
+                 const T *vlen = (const T*) & self_r.length;
+                 const unit_t *pLower = (const unit_t *) & this->lower;
+                 const unit_t *pUpper = (const unit_t *) & this->upper;
+                 //--------------------------------------------------------------
+                 //-- map each array
+                 //--------------------------------------------------------------
+                 for( size_t iAxis = 0; iAxis < LAYOUT::DIMENSIONS; ++iAxis )
+                 {
+                 array_type &A = (*this)[ iAxis ];
+                 const unit_t lo = pLower[iAxis];
+                 const unit_t up = pUpper[iAxis];
+                 if( lo < up )
+                 {
+                 
+                 }
+                 }
+                 */
             }
             
-
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(curvilinear_mesh);

@@ -118,7 +118,7 @@ namespace yocto
                 const unit_t xmax = __coord(sub.upper,0);
                 for( unit_t x = xmin; x <= xmax; ++x )
                 {
-                    const unit_t u = offset_of(x); assert(u>=0); assert(u<items);
+                    const unit_t u = offset_of(x); assert(u>=0); assert(size_t(u)<items);
                     offsets.store(u);
                 }
             }
@@ -134,7 +134,7 @@ namespace yocto
                     for(unit_t x = xmin; x <= xmax; ++x )
                     {
                         const coord  c(x,y);
-                        const unit_t u = offset_of(c); assert(u>=0); assert(u<items);
+                        const unit_t u = offset_of(c); assert(u>=0); assert(size_t(u)<items);
                         offsets.store(u);
                     }
                 }
@@ -156,7 +156,7 @@ namespace yocto
                         for(unit_t x = xmin; x <= xmax; ++x )
                         {
                             const coord  c(x,y,z);
-                            const unit_t u = offset_of(c); assert(u>=0); assert(u<items);
+                            const unit_t u = offset_of(c); assert(u>=0); assert(size_t(u)<items);
                             offsets.store(u);
                         }
                     }
