@@ -31,10 +31,10 @@ namespace  yocto  {
             
             typedef functor<type,TL2(U,U)> function2D;
             
-            static inline void in( array2D<T> &A, const layout2D &sub, function1D &f,   const axis_type &X, const axis_type &Y )
+            static inline void in( array2D<T> &A, const layout2D &sub, function2D &f, const axis_type &X, const axis_type &Y )
             {
                 assert( A.contains(sub) );
-                for(unit_t y=sub.lower.y; y<=sub.lower.y;++y)
+                for(unit_t y=sub.lower.y; y<=sub.upper.y;++y)
                 {
                     const U      _Y = Y[y];
                     array1D<T> & _R = A[y];
