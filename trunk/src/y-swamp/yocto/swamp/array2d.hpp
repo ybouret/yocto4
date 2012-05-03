@@ -3,8 +3,9 @@
 
 #include "yocto/swamp/in2d.hpp"
 #include "yocto/swamp/array1d.hpp"
+#include "yocto/geom/color.hpp"
+#include "yocto/string.hpp"
 
-#include <iosfwd>
 
 namespace yocto 
 {
@@ -48,6 +49,16 @@ namespace yocto
             
             static void       *ctor( const layout_type &L, linear_base **info);
             static void        dtor(void*) throw();
+            
+            //! save a raw ppm
+			void ppm(const string        &filename, 
+					 const string        &comment,
+					 const layout2D      &area,
+					 double             (*vproc)( const T & ),
+					 const color::rgba32 *colors = NULL,
+					 double               vmin   = 0,
+					 double               vmax   = 1
+					 ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array2D);
