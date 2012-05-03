@@ -51,7 +51,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             if( A.lower < A.upper -1 )
             {
                 const layout1D sub( A.lower+1, A.upper-1);
-                offlist.release();
+                offlist.free();
                 A.load_offsets(sub,offlist);
                 std::cerr << "#offsets=" << offlist.size() << std::endl;
                 for( size_t i=1; i <= offlist.size(); ++i )
@@ -77,6 +77,16 @@ YOCTO_UNIT_TEST_IMPL(array)
                     A[j][i] = i*j;
                 }
             }
+            
+            offlist.free();
+            
+            coord2D mid = (A.lower+A.upper)/unit_t(2);
+            const layout2D sub( mid - A.width/unit_t(4), mid + A.width/unit_t(4));
+            std::cerr << "sub: "; display(sub);
+            A.load_offsets(sub, offlist);
+            std::cerr << "#offsets=" << offlist.size() << std::endl;
+            
+            
         }
         
         {
@@ -96,6 +106,9 @@ YOCTO_UNIT_TEST_IMPL(array)
                     }
                 }
             }
+            offlist.free();
+            A.load_offsets(A, offlist);
+            std::cerr << "#offsets=" << offlist.size() << std::endl;
         }
         
         
