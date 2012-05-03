@@ -4,8 +4,6 @@
 #include "yocto/swamp/in1d.hpp"
 #include "yocto/swamp/linear.hpp"
 
-#include <iosfwd>
-
 namespace yocto 
 {
     namespace swamp

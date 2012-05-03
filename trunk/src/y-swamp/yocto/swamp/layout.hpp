@@ -84,7 +84,6 @@ namespace yocto
                 unit_t ans = __coord(c,0) - __coord(lower,0);
                 for( size_t i=1; i < DIMENSIONS; ++i )
                     ans += __coord(pitch,i) * ( __coord(c,i) - __coord(lower,i) );
-                // std::cerr << "offset of " << c << " = " << ans << std::endl;
                 return ans;
             }
             
@@ -97,12 +96,20 @@ namespace yocto
             //! test that a sub layout is inside
             inline bool contains( const layout &sub ) const throw() { return has(sub.lower) && has(sub.upper); }
             
-            inline void load_offsets( const layout &sub, offsets_list &offsets )
+            inline void load_offsets( const layout &sub, offsets_list &offsets ) const throw()
             {
                 assert( this->contains(sub) );
                 offsets.reserve( sub.items );
                 __ld(sub, offsets,int2type<DIMENSIONS>());
             }
+            
+            friend inline std::ostream & operator<<( std::ostream &os, const layout &L )
+            {
+                os << "{ " << L.lower << " -> " << L.upper << " : #" << L.width << "= " << L.items << " }"; 
+                return os;
+            }
+            
+            inline const layout & __layout() const throw() { return *this; }
             
         private:
             inline void __ld( const layout &sub, offsets_list &offsets, int2type<1> ) const throw()

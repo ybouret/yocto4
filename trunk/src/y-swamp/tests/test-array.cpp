@@ -9,12 +9,6 @@
 using namespace yocto;
 using namespace swamp;
 
-template <typename LAYOUT>
-static inline void display( const LAYOUT &L )
-{
-    std::cerr << "DIM= " << LAYOUT::DIMENSIONS << std::endl;
-    std::cerr << L.lower << " -> " << L.upper << " = " << L.width << " | #=" << L.items << std::endl;
-}
 
 static inline coord1D rand1()
 {
@@ -40,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             const layout1D L( rand1(), rand1() );
             array1D<float> A(L);
             data_block     mb(A);
-            display(A);
+            std::cerr << L << std::endl;
             A.ldz();
             
             for( unit_t i=A.lower; i <= A.upper; ++i )
@@ -67,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             const layout2D  L( rand2(), rand2() );
             array2D<double> A(L);
             data_block      mb(A);
-            display(A);
+            std::cerr << L << std::endl;
             A.ldz();
             
             for( unit_t j=A.lower.y; j <= A.upper.y; ++j )
@@ -82,7 +76,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             
             coord2D mid = (A.lower+A.upper)/unit_t(2);
             const layout2D sub( mid - A.width/unit_t(4), mid + A.width/unit_t(4));
-            std::cerr << "sub: "; display(sub);
+            std::cerr << "sub: " << sub << std::endl;
             A.load_offsets(sub, offlist);
             std::cerr << "#offsets=" << offlist.size() << std::endl;
             
@@ -93,7 +87,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             const layout3D  L( rand3(), rand3() );
             array3D<double> A(L);
             data_block      mb(A);
-            display(A);
+            std::cerr << L << std::endl;
             A.ldz();
             
             for( unit_t k=A.lower.z; k <= A.upper.z; ++k )

@@ -10,13 +10,6 @@
 using namespace yocto;
 using namespace swamp;
 
-template <typename LAYOUT>
-static inline void display( const LAYOUT &L )
-{
-    std::cerr << "DIM= " << LAYOUT::DIMENSIONS << std::endl;
-    std::cerr << L.lower << " -> " << L.upper << " = " << L.width << " | #=" << L.items << std::endl;
-}
-
 static inline coord1D rand1()
 {
     return 50 - 100 * alea<double>();
@@ -40,10 +33,6 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         G.local.count = 1; // +1 and -1
         
         workspace<layout1D> W(L,G);
-        std::cerr << "W.Layout: ";
-        display(W);
-        std::cerr << "W.outline: ";
-        display(W.outline);
     }
     
     
@@ -58,10 +47,6 @@ YOCTO_UNIT_TEST_IMPL(wksp)
         G.upper.count.x = 1;
         
         workspace<layout2D>   W(L,G);
-        std::cerr << "W.Layout: ";
-        display(W);
-        std::cerr << "W.outline: ";
-        display(W.outline);
     }
     
     

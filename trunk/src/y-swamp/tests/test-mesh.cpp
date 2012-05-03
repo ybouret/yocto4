@@ -5,12 +5,6 @@
 
 using namespace yocto;
 using namespace swamp;
-template <typename LAYOUT>
-static inline void display( const LAYOUT &L )
-{
-    std::cerr << "DIM= " << LAYOUT::DIMENSIONS << std::endl;
-    std::cerr << L.lower << " -> " << L.upper << " = " << L.width << " | #=" << L.items << std::endl;
-}
 
 static inline coord1D rand1()
 {
@@ -32,15 +26,16 @@ YOCTO_UNIT_TEST_IMPL(rmesh)
     const layout2D L( coord2D(1,1), coord2D(5,10) );
     rectilinear_mesh<float, layout2D> rmesh(ADB,L);
     
-    display( rmesh );
+    std::cerr << L << std::endl;
     
     const array1D<float> &X = rmesh[0];
-    display(X);
+    std::cerr << X.__layout() << std::endl;
+    
     const array1D<float> &Y = rmesh.Y();
-    display(Y);
+    std::cerr << Y.__layout() << std::endl;
     try
     {
-        display( rmesh.Z() );
+        std::cerr << rmesh.Z().__layout() << std::endl;
     }
     catch( const exception &e )
     {
