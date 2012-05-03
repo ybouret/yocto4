@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/swamp/rectilinear-mesh.hpp"
+#include "yocto/swamp/rmesh.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/swamp/array3d.hpp"
 
@@ -24,18 +24,18 @@ YOCTO_UNIT_TEST_IMPL(rmesh)
     array_db ADB;
     
     const layout2D L( coord2D(1,1), coord2D(5,10) );
-    rectilinear_mesh<float, layout2D> rmesh(ADB,L);
+    rmesh<float, layout2D> Rmesh(ADB,L);
     
     std::cerr << L << std::endl;
     
-    const array1D<float> &X = rmesh[0];
+    const array1D<float> &X = Rmesh[0];
     std::cerr << X.__layout() << std::endl;
     
-    const array1D<float> &Y = rmesh.Y();
+    const array1D<float> &Y = Rmesh.Y();
     std::cerr << Y.__layout() << std::endl;
     try
     {
-        std::cerr << rmesh.Z().__layout() << std::endl;
+        std::cerr << Rmesh.Z().__layout() << std::endl;
     }
     catch( const exception &e )
     {
@@ -46,28 +46,28 @@ YOCTO_UNIT_TEST_IMPL(rmesh)
     typedef vertex2D<float>::type vtx;
     const region2D<float>::type   R( vtx(-2,-3), vtx(4,6) );
     
-    rmesh.regular_map_to(R,L);
+    Rmesh.regular_map_to(R,L);
     
-    std::cerr << "X=" << rmesh.X() << std::endl;
-    std::cerr << "dX=" << rmesh.dX() << std::endl;
-    std::cerr << "Y=" << rmesh.Y() << std::endl;
-    std::cerr << "dY=" << rmesh.dY() << std::endl;
+    std::cerr << "X=" << Rmesh.X() << std::endl;
+    std::cerr << "dX=" << Rmesh.dX() << std::endl;
+    std::cerr << "Y=" << Rmesh.Y() << std::endl;
+    std::cerr << "dY=" << Rmesh.dY() << std::endl;
 
     
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/swamp/curvilinear-mesh.hpp"
+#include "yocto/swamp/cmesh.hpp"
 
 YOCTO_UNIT_TEST_IMPL(cmesh)
 {
     array_db ADB;
     const layout3D L( coord3D(1,1,1), coord3D(5,10,15) );
-    curvilinear_mesh<double, layout3D> cmesh(ADB,L);
+    cmesh<double, layout3D> Cmesh(ADB,L);
     typedef vertex3D<double>::type vtx;
     const region3D<double>::type   R( vtx(-2,-3,-4), vtx(4,6,8) );
 
-    cmesh.regular_map_to(R,L);
+    Cmesh.regular_map_to(R,L);
     
     
 }

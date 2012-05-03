@@ -10,13 +10,13 @@ namespace yocto
     namespace swamp
     {
         template <typename T,typename LAYOUT>
-        class curvilinear_mesh : public quadmesh, public LAYOUT
+        class cmesh : public quadmesh, public LAYOUT
         {
         public:
             typedef typename __array<T,LAYOUT::DIMENSIONS>::type  array_type;
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type region_type;
             
-            explicit curvilinear_mesh( array_db &db, const LAYOUT &L) :
+            explicit cmesh( array_db &db, const LAYOUT &L) :
             quadmesh( db ),
             LAYOUT(L)
             {
@@ -30,7 +30,7 @@ namespace yocto
                 }
             }
             
-            virtual ~curvilinear_mesh() throw() {}
+            virtual ~cmesh() throw() {}
             
             array_type & operator[]( size_t iAxis ) 
             {
@@ -81,7 +81,7 @@ namespace yocto
             
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(curvilinear_mesh);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(cmesh);
             
         };
     }

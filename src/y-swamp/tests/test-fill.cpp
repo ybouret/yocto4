@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/swamp/fill.hpp"
 #include "yocto/swamp/workspace.hpp"
-#include "yocto/swamp/rectilinear-mesh.hpp"
+#include "yocto/swamp/rmesh.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(fill)
     {
         const layout1D  L(1,100);
         const ghosts_setup<coord1D> no_ghosts;
-        workspace<layout1D,double,rectilinear_mesh> W(L,no_ghosts);
+        workspace<layout1D,double,rmesh> W(L,no_ghosts);
         const  region1D<double>::type R(-1,1);
         W.mesh.regular_map_to(R, L);
         
@@ -59,7 +59,7 @@ YOCTO_UNIT_TEST_IMPL(fill)
         const coord2D hi(100,100);
         const layout2D L(lo,hi);
         const ghosts_setup<coord2D> no_ghosts;
-        workspace<layout2D,double,rectilinear_mesh> W(L,no_ghosts);
+        workspace<layout2D,double,rmesh> W(L,no_ghosts);
         
         const geom::v2d<double> vlo(-1,-1);
         const geom::v2d<double> vhi(1,1);
@@ -84,7 +84,7 @@ YOCTO_UNIT_TEST_IMPL(fill)
         const coord3D  hi(10,15,20);
         const layout3D L(lo,hi);
         const ghosts_setup<coord3D> no_ghosts;
-        workspace<layout3D,double,rectilinear_mesh> W(L,no_ghosts);
+        workspace<layout3D,double,rmesh> W(L,no_ghosts);
         
         const geom::v3d<double> vlo(-1,-1,-1);
         const geom::v3d<double> vhi(1,1,1);
