@@ -11,6 +11,7 @@ namespace yocto
     {
         typedef array<linear_base *>  linear_handles;
         
+        //! a ghost is a list of offsets
         class ghost 
         {
         public:
@@ -30,13 +31,12 @@ namespace yocto
             
             virtual ~ghost() throw();
             
-            const position site;
-            offsets_list   offsets;
+            const position site;     //!< ghost position
+            offsets_list   offsets;  //!< initial empty list
             
             explicit ghost( ghost::position p ) throw();
             const char *position_name() const throw();
             ghost::position mirror_position() const throw();
-            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
@@ -56,67 +56,38 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(local_ghosts_pair);
         };
         
-        
+        //! common information for ghosts
         class ghosts_base : public object
         {
         public:
             const size_t       count;       //!< number of ghosts points/lines/slices
             const size_t       num_offsets; //!< to be set during allocation
             
-            virtual ~ghosts_base() throw() {}
+            virtual ~ghosts_base() throw();
             
         protected:
-            explicit ghosts_base( size_t num_ghosts ) throw() :
-            count(num_ghosts),
-            num_offsets(0)
-            {
-            }
-            
+            explicit ghosts_base( size_t num_ghosts ) throw();            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts_base);
         };
         
+        
+        //! local ghosts for local PBC
         class local_ghosts : public ghosts_base
         {
         public:
-            
             local_ghosts_pair  lower;
             local_ghosts_pair  upper;
             
             //! prepare ghosts pairs, no memory allocated
-            local_ghosts( size_t num_ghosts, size_t dim ) :
-            ghosts_base( num_ghosts ),
-            lower( ghost::get_lower_position(dim) ),
-            upper( ghost::get_upper_position(dim) )
-            {
-            }
-            
+            explicit local_ghosts( size_t num_ghosts, size_t dim );            
+            virtual ~local_ghosts() throw();
             
             //! direct copy transfert
-            inline void transfer( const linear_handles & handles ) const throw()
-            {
-                assert( num_offsets == lower.inside.offsets.size() );
-                assert( num_offsets == lower.mirror.offsets.size() );
-                assert( num_offsets == upper.inside.offsets.size() );
-                assert( num_offsets == upper.mirror.offsets.size() );                
-                const size_t num_handles = handles.size();
-                for( size_t i=num_offsets; i>0; --i )
-                {
-                    const size_t lower_mirror = lower.mirror.offsets[i];
-                    const size_t lower_inside = lower.inside.offsets[i];
-                    const size_t upper_mirror = upper.mirror.offsets[i];
-                    const size_t upper_inside = upper.inside.offsets[i];
-                    for( size_t j=num_handles; j>0; --j )
-                    {
-                        linear_base *A = handles[j]; assert(A!=NULL);
-                        A->local_copy( lower_mirror, lower_inside );
-                        A->local_copy( upper_mirror, upper_inside );
-                    }
-                }
-            }
+            void transfer( const linear_handles & handles ) const throw();
             
+            //! shared pointer
             typedef shared_ptr<local_ghosts> ptr;
-            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(local_ghosts);
@@ -130,16 +101,8 @@ namespace yocto
             ghost     inner;
             ghost     outer;
             
-            async_ghosts_pair( ghost::position source ) throw() :
-            inner( source ),
-            outer( source )
-            {
-            }
-            
-            ~async_ghosts_pair() throw()
-            {
-            }
-            
+            async_ghosts_pair( ghost::position source ) throw();            
+            ~async_ghosts_pair() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts_pair);
@@ -149,93 +112,29 @@ namespace yocto
         class async_ghosts : public ghosts_base
         {
         public:            
-            async_ghosts( size_t num_ghosts, ghost::position source, int a_peer ) :
-            ghosts_base( num_ghosts ),
-            self( source ),
-            peer( a_peer ),
-            inner_buf(NULL),
-            outer_buf(NULL),
-            length(0),
-            iolen(0)
-            {
-            }
-            
-            virtual ~async_ghosts() throw()
-            {
-                if( inner_buf )
-                {
-                    assert( outer_buf != NULL );
-                    memory::kind<memory::global>::release_as<uint8_t>( inner_buf, iolen );
-                    outer_buf = NULL;
-                    length    = 0;
-                }
-            }
-            
-            async_ghosts_pair   self;  //!< the I/O pair
-            const int           peer;  //!< MPI peer
+            async_ghosts( size_t num_ghosts, ghost::position source, int a_peer );            
+            virtual ~async_ghosts() throw();
             
             
             //! allocate memory once offsets are computed
-            void allocate_for( linear_handles &handles )
-            {
-                assert( NULL == inner_buf );
-                assert( NULL == outer_buf );
-                assert( 0    == iolen );
-                assert( 0    == length );
-                for( size_t j=handles.size(); j>0; --j )
-                {
-                    length += handles[j]->item_size();
-                }
-                length *= num_offsets;
-                iolen   = length * 2;
-                try
-                {
-                    inner_buf  = memory::kind<memory::global>::acquire_as<uint8_t>( iolen );
-                }
-                catch(...) { length = 0; throw; }
-                outer_buf  = inner_buf + length;
-            }
+            void allocate_for( linear_handles &handles );
             
             //! store inner data into inner_buf
-            void store_inner( const linear_handles &handles ) throw()
-            {
-                uint8_t *ptr = inner_buf;
-                for( size_t i=num_offsets; i>0; --i )
-                {
-                    const size_t k = self.inner.offsets[i];
-                    for( size_t j=handles.size(); j>0; --j )
-                    {
-                        const linear_base &A = *handles[j];
-                        A.async_store(ptr,k);
-                        assert( ptr <= inner_buf + length );
-                    }
-                }
-            }
+            void store_inner( const linear_handles &handles ) throw();
             
             //! query outer data from outer_buf
-            void query_outer( const linear_handles &handles ) const throw()
-            {
-                const uint8_t *ptr = outer_buf;
-                for( size_t i=num_offsets; i>0; --i )
-                {
-                    const size_t k = self.outer.offsets[i];
-                    for( size_t j=handles.size(); j>0; --j )
-                    {
-                        linear_base &A = *handles[j];
-                        A.async_query(ptr,k);
-                        assert( ptr <= outer_buf + length );
-                    }
-                }
-                
-            }
+            void query_outer( const linear_handles &handles ) const throw();
             
             typedef shared_ptr<async_ghosts> ptr;
-            uint8_t       *inner_buf;
-            uint8_t       *outer_buf;
-            size_t         length;
+            
+            async_ghosts_pair   self;  //!< the I/O pair
+            const int           peer;  //!< MPI peer
+            uint8_t            *inner_buf;
+            uint8_t            *outer_buf;
+            size_t              length;
             
         private:
-            size_t         iolen;  //!< twice length
+            size_t               iolen;  //!< twice length
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts);
         };
