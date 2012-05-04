@@ -29,13 +29,18 @@ namespace yocto
         spec(  array_spec ),
         addr(  varray_check_addr(array_addr) ),
         kill(  array_kill ),
-        data( *varray_check_info(array_info) )
+        info( varray_check_info(array_info) ),
+        data( *info )
         {
             if(!kill)
                 throw exception("varray: NULL destructor");
         }
         
-        
+        linear_base * varray:: handle() throw()
+        {
+            return info;
+        }
+
         varray:: ~varray() throw()
         {
             kill( addr );
