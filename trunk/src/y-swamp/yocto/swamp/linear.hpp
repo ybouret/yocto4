@@ -88,6 +88,7 @@ namespace yocto
             }
             
             virtual size_t item_size() const throw() { return sizeof(T); }
+            
             virtual void   async_store( uint8_t * &ptr, size_t source ) const throw() 
             {
                 assert(entry!=NULL);
