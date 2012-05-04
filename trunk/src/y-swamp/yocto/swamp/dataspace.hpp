@@ -367,7 +367,7 @@ namespace yocto
                 for( typename fields_setup<LAYOUT>::iterator i = F.begin(); i != F.end(); ++i )
                 {
                     const field_info<LAYOUT> &f = *i;
-                    fieldsMaker.record( f.spec, f.ctor, f.dtor );
+                    fieldsMaker.record(  f.spec, f.ctor,  f.dtor );
                     fieldsMaker.produce( f.name, outline, f.spec, *this );
                 }
             }
