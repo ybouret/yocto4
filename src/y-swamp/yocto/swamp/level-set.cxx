@@ -22,7 +22,7 @@ namespace yocto
         //template <>
         bool operator<( const level<ZTYPE> &lhs_level, const level<ZTYPE> &rhs_level ) throw()
         {
-            return lhs_level.key < rhs_level.key;
+            return lhs_level.value < rhs_level.value;
         }
         
         template <>
@@ -42,10 +42,16 @@ namespace yocto
         template <>
         void level_set<ZTYPE>:: add( param_key key, param_type value )
         {
+            for( size_t i=1; i <= size(); ++i )
+            {
+                if( (*this)[i].key == key )
+                    throw exception( "level_set( multiple key <%d> )", key  );
+            }
+            
             const level_type l(key,value);
             if( ! insert(l) )
             {
-                throw exception("level_set( multiple key <%d> )", key ); 
+                throw exception("level_set( multiple value <%g> )", value ); 
             }
         }
         
