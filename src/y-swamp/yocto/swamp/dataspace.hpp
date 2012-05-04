@@ -84,13 +84,13 @@ namespace yocto
             inline size_t  local_ghosts_count() const throw() { return localGhosts.size(); }
             inline size_t  async_ghosts_count() const throw() { return asyncGhosts.size(); }
             
-            local_ghosts & local_ghost( size_t index ) throw() { return *localGhosts[index];}
-            async_ghosts & async_ghost( size_t index ) throw() { return *asyncGhosts[index];} 
+            local_ghosts & __local_ghosts( size_t index ) throw() { return *localGhosts[index];}
+            async_ghosts & __async_ghosts( size_t index ) throw() { return *asyncGhosts[index];} 
             
             
             const linear_handles & handles() const throw() { return usingGhosts; }
             
-            size_t num_requests() const throw() { return usingGhosts.size() * asyncGhosts.size() *2 ; }
+            size_t num_requests() const throw() { return 2 * asyncGhosts.size() ; }
             
             
         private:

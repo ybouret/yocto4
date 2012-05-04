@@ -31,7 +31,7 @@ static inline double vproc( const double &x )
 
 YOCTO_UNIT_TEST_IMPL(data)
 {
-
+    
     {
         fields_setup<layout1D> F;
         const layout1D        L( rand1()-2, rand1()+2 );
@@ -46,7 +46,7 @@ YOCTO_UNIT_TEST_IMPL(data)
         
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )
         {
-            W.local_ghost(i).transfer( W.handles() );
+            W.__local_ghosts(i).transfer( W.handles() );
         }
         
     }
@@ -54,7 +54,8 @@ YOCTO_UNIT_TEST_IMPL(data)
     
     {
         fields_setup<layout2D> F;
-
+        
+        
         const coord2D         lo(1,1);
         const coord2D         hi(10,10);
         const layout2D        L(lo,hi);
@@ -76,7 +77,7 @@ YOCTO_UNIT_TEST_IMPL(data)
         W.prepare_ghosts();
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )
         {
-            W.local_ghost(i).transfer( W.handles() );
+            W.__local_ghosts(i).transfer( W.handles() );
         }
         
         std::cerr << "0: " << W.outline    << std::endl;
@@ -89,14 +90,17 @@ YOCTO_UNIT_TEST_IMPL(data)
         A.ppm("ini2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
         
         std::cerr << "Test Communication 2D" << std::endl;
+        std::cerr << " -- #localGhosts=" << W.local_ghosts_count() << std::endl;
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )
         {
-            W.local_ghost(i).transfer( W.handles() );
+            W.__local_ghosts(i).transfer( W.handles() );
         }
         
+        std::cerr << " -- #asyncGhosts=" << W.local_ghosts_count() << std::endl;
+        std::cerr << " -- #handles    =" << W.handles().size()     << std::endl;
         for( size_t i=1; i <= W.async_ghosts_count(); ++i )
         {
-            async_ghosts &g = W.async_ghost(i);
+            async_ghosts &g = W.__async_ghosts(i);
             g.store_inner( W.handles() );
             memcpy( g.outer_buf, g.inner_buf, g.length );
             g.query_outer( W.handles() );
@@ -104,10 +108,12 @@ YOCTO_UNIT_TEST_IMPL(data)
         
         A.ppm("end2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
     }
-
+    
     
     {
         fields_setup<layout3D> F;
+        Y_SWAMP_DECL_VAR(F, "A", array3D<double> );
+        Y_SWAMP_DECL_VAR(F, "B", array3D< geom::v3d<double> > );
 
         const coord3D  lo(1,1,1);
         const coord3D  hi(10,15,20);
@@ -120,21 +126,25 @@ YOCTO_UNIT_TEST_IMPL(data)
         G.upper.count.z = 5;
         
         dataspace<layout3D>   W(L,G,F);
+        W.prepare_ghosts();
         
         std::cerr << "Test Communication 3D" << std::endl;
+        std::cerr << " -- #localGhosts=" << W.local_ghosts_count() << std::endl;
+        std::cerr << " -- #asyncGhosts=" << W.local_ghosts_count() << std::endl;
+        std::cerr << " -- #handles    =" << W.handles().size()     << std::endl;
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )
         {
-            W.local_ghost(i).transfer( W.handles() );
+            W.__local_ghosts(i).transfer( W.handles() );
         }
-        
+      
         for( size_t i=1; i <= W.async_ghosts_count(); ++i )
         {
-            async_ghosts &g = W.async_ghost(i);
+            async_ghosts &g = W.__async_ghosts(i);
             g.store_inner( W.handles() );
             memcpy( g.outer_buf, g.inner_buf, g.length );
             g.query_outer( W.handles() );
         }
-
+        
     }
     
     

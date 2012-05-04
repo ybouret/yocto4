@@ -46,7 +46,7 @@ namespace yocto
                     throw exception("swamp::factory(can't produce '%s')", spec.name() );
                 linear_base *info = NULL;
                 void        *addr = param->ctor( L, &info );
-                std::cerr << "Creating <" << name << ">='" << spec.name() << "'" << std::endl;
+                //std::cerr << "Creating <" << name << ">='" << spec.name() << "'" << std::endl;
                 db(name, spec, addr, info, param->dtor);
             }
             
