@@ -35,15 +35,18 @@ namespace yocto
             
             //! templated recording of type ARRAY
             template <typename ARRAY>
-            inline void use() { record( typeid( ARRAY ), ARRAY::ctor, ARRAY::dtor ); }
+            inline void use() {
+                record( typeid( ARRAY ), ARRAY::ctor, ARRAY::dtor ); 
+            }
             
             inline void produce( const string &name, const LAYOUT &L, const type_spec &spec, array_db &db )
             {
                 const shed * param = sheds.search( spec );
                 if( !param )
-                    throw exception("swam::factory(can't produce '%s')", spec.name() );
+                    throw exception("swamp::factory(can't produce '%s')", spec.name() );
                 linear_base *info = NULL;
                 void        *addr = param->ctor( L, &info );
+                std::cerr << "Creating <" << name << ">='" << spec.name() << "'" << std::endl;
                 db(name, spec, addr, info, param->dtor);
             }
             
@@ -63,7 +66,6 @@ namespace yocto
                 {
                     use<ARRAY>();
                 }
-                std::cerr << "Creating <" << name << ">='" << spec.name() << "'" << std::endl;
                 produce( name, L, spec, db );
             }
             

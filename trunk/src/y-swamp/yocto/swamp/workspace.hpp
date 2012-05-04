@@ -21,7 +21,7 @@ namespace yocto
             
             explicit workspace( const LAYOUT              &L,
                                const ghosts_setup<coord>  &G,
-                               const field_layout         &F) :
+                               const fields_setup<LAYOUT> &F) :
             dataspace<LAYOUT>(L,G,F),
             mesh( *this, this->outline )
             {

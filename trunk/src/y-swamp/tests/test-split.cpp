@@ -29,8 +29,13 @@ static inline void do_split( const LAYOUT &L )
 
 YOCTO_UNIT_TEST_IMPL(split)
 {
-    field_layout F;
+    
     {
+        fields_setup<layout1D> F;
+        Y_SWAMP_DECL_VAR(F, "A", array1D<double> );
+        Y_SWAMP_DECL_VAR(F, "B", array1D<double> );
+        Y_SWAMP_DECL_AUX(F, "C", array1D<double> );
+        
         const layout1D L(1,100);
         do_split(L);
         const ghosts_setup<coord1D> no_ghosts;
@@ -45,10 +50,10 @@ YOCTO_UNIT_TEST_IMPL(split)
         dataspace<layout1D> D2(L2,no_ghosts,F);
         dataspace<layout1D> D3(L3,no_ghosts,F);
 
-        array1D<double> &A  = D.create< array1D<double> >( "A" );
-        array1D<double> &A1 = D1.create< array1D<double> >( "A" );
-        array1D<double> &A2 = D2.create< array1D<double> >( "A" );
-        array1D<double> &A3 = D3.create< array1D<double> >( "A" );
+        array1D<double> &A  = D["A"].as< array1D<double> >();
+        array1D<double> &A1 = D1["A"].as< array1D<double> >();
+        array1D<double> &A2 = D2["A"].as< array1D<double> >();
+        array1D<double> &A3 = D3["A"].as< array1D<double> >();
 
         A.set_all( L, 1 );
         A1.set(A,L1);
