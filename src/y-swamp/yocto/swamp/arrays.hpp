@@ -61,9 +61,12 @@ namespace yocto
             const string    name; //!< array unique name
             const type_spec spec; //!< array class type
             
+            linear_base *handle() throw();
+            
         private:
             void             *addr;
             void            (*kill)(void *);
+            linear_base      *info;
             const data_block  data;
             static void check_specs( const type_spec &self, const type_spec &required);
             
