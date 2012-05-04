@@ -84,3 +84,71 @@ YOCTO_UNIT_TEST_IMPL(d1)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+static inline double vproc( const float &x ) { return x; }
+
+YOCTO_UNIT_TEST_IMPL(d2)
+{
+    
+    mpi & MPI = mpi::init( &argc, &argv );
+    const int size = MPI.CommWorldSize;
+    const int rank = MPI.CommWorldRank;
+    MPI.Printf( stderr, "rank %d/%d: online\n", rank, size);
+    
+    //! prepare the fields setup
+    fields_setup<layout2D> F;
+    Y_SWAMP_DECL_VAR( F, "A", array2D<float>  );
+    Y_SWAMP_DECL_VAR( F, "B", array2D<double> );
+    Y_SWAMP_DECL_AUX( F, "C", array2D<double> );
+
+    //! prepare the layout
+    const coord2D  lo(1,1);
+    const coord2D  hi(100,100);
+    const layout2D full_layout( lo, hi );
+    const layout2D L( full_layout.split( rank, size ) );
+    
+    //! prepare the ghosts setup
+    ghosts_setup<coord2D> G;
+    if( size > 1 )
+    {
+        G.lower.count.y = 2;
+        G.lower.peer.y  = MPI.CommWorldPrev();
+        G.upper.count.y = 2;
+        G.upper.peer.y  = MPI.CommWorldNext();
+    }
+    else 
+    {
+        G.local.count.y = 2;
+    }
+    
+    //! create data
+    dataspace<layout2D> D( L, G, F );
+    array2D<float>  & A = D["A"].as< array2D<float> >();
+    array2D<double> & B = D["B"].as< array2D<double> >();
+    A.set_all( A, rank   );
+    B.set_all( B, rank+1 );
+
+    //! allocate communication data
+    D.prepare_ghosts();
+    mpi::Requests requests( D.num_requests() );
+    
+    
+    //! start exchange
+    _mpi::init_exchange(MPI,D,requests);
+    MPI.Printf(stderr,"rank %d> launched requests\n", rank);
+    //! do work on dataspace sync
+    
+    //! end exchange
+    _mpi::wait_exchange(MPI,D,requests);
+    MPI.Printf(stderr,"rank %d> received requests\n", rank);
+
+    
+    {
+        const string filename = vformat("end%d.%d.ppm",rank,size);
+        A.ppm( filename, filename, A, vproc,NULL,0,size);
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
