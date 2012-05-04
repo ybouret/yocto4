@@ -31,8 +31,9 @@ static inline double vproc( const double &x )
 
 YOCTO_UNIT_TEST_IMPL(data)
 {
-    field_layout F;
+
     {
+        fields_setup<layout1D> F;
         const layout1D        L( rand1()-2, rand1()+2 );
         ghosts_setup<coord1D> G;
         G.local.count = 1; // +1 and -1
@@ -52,6 +53,8 @@ YOCTO_UNIT_TEST_IMPL(data)
     
     
     {
+        fields_setup<layout2D> F;
+
         const coord2D         lo(1,1);
         const coord2D         hi(10,10);
         const layout2D        L(lo,hi);
@@ -104,6 +107,8 @@ YOCTO_UNIT_TEST_IMPL(data)
 
     
     {
+        fields_setup<layout3D> F;
+
         const coord3D  lo(1,1,1);
         const coord3D  hi(10,15,20);
         const layout3D L( lo, hi );

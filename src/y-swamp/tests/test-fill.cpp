@@ -34,8 +34,8 @@ YOCTO_UNIT_TEST_IMPL(fill)
 {
     typedef fill<double,double> fill_type;
     filler           F;
-    field_layout     fields;
     {
+        fields_setup<layout1D> fields;
         const layout1D  L(1,100);
         const ghosts_setup<coord1D> no_ghosts;
         workspace<layout1D,double,rmesh> W(L,no_ghosts,fields);
@@ -55,6 +55,8 @@ YOCTO_UNIT_TEST_IMPL(fill)
     }
     
     {
+        fields_setup<layout2D> fields;
+
         const coord2D lo(1,1);
         const coord2D hi(100,100);
         const layout2D L(lo,hi);
@@ -80,6 +82,8 @@ YOCTO_UNIT_TEST_IMPL(fill)
     }
     
     {
+        fields_setup<layout3D> fields;
+
         const coord3D  lo(1,1,1);
         const coord3D  hi(10,15,20);
         const layout3D L(lo,hi);

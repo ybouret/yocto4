@@ -12,8 +12,8 @@ using namespace swamp;
 
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
-    field_layout F;
     {
+        fields_setup<layout1D> F;
         const layout1D              L(1,11);
         ghosts_setup<coord1D>       G;
         G.local.count = 2;

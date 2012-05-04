@@ -3,7 +3,9 @@
 
 #include "yocto/swamp/ghosts.hpp"
 #include "yocto/swamp/factory.hpp"
-#include "yocto/swamp/field-layout.hpp"
+#include "yocto/swamp/fields.hpp"
+
+#include "yocto/sequence/vector.hpp"
 #include "yocto/exception.hpp"
 
 #include <iostream>
@@ -21,9 +23,9 @@ namespace yocto
             typedef typename LAYOUT::coord coord;
             
             //! prepare all layouts
-            explicit dataspace(const LAYOUT              &L,
-                               const ghosts_setup<coord> &G,
-                               const field_layout        &F
+            explicit dataspace(const LAYOUT               &L,
+                               const ghosts_setup<coord>  &G,
+                               const fields_setup<LAYOUT> &F
                                ) :
             LAYOUT(L),
             array_db(),
@@ -34,7 +36,8 @@ namespace yocto
             asyncGhosts(8,as_capacity),
             usingGhosts()
             {
-                apply( G );
+                record_ghosts(G);
+                record_fields(F);
             }
             
             virtual ~dataspace() throw() {}
@@ -98,7 +101,7 @@ namespace yocto
             vector<linear_base *>     usingGhosts;
             
             //! compute outline and ghosts from the setup
-            inline void apply( const ghosts_setup<coord> &G )
+            inline void record_ghosts( const ghosts_setup<coord> &G )
             {
                 std::cerr << "######## dataspace: layout=" << this->__layout() << std::endl;
                 const unit_t *local_g = (const unit_t *) &G.local.count;
@@ -357,6 +360,16 @@ namespace yocto
                     }
                 }
                 
+            }
+            
+            inline void record_fields( const fields_setup<LAYOUT> &F )
+            {
+                for( typename fields_setup<LAYOUT>::iterator i = F.begin(); i != F.end(); ++i )
+                {
+                    const field_info<LAYOUT> &f = *i;
+                    fieldsMaker.record( f.spec, f.ctor, f.dtor );
+                    fieldsMaker.produce( f.name, outline, f.spec, *this );
+                }
             }
         };
         
