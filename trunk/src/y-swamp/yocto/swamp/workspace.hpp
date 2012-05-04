@@ -20,8 +20,9 @@ namespace yocto
             mesh_type mesh;
             
             explicit workspace( const LAYOUT              &L,
-                               const ghosts_setup<coord> &G ) :
-            dataspace<LAYOUT>(L,G),
+                               const ghosts_setup<coord>  &G,
+                               const field_layout         &F) :
+            dataspace<LAYOUT>(L,G,F),
             mesh( *this, this->outline )
             {
             }
