@@ -12,11 +12,12 @@ using namespace swamp;
 
 YOCTO_UNIT_TEST_IMPL(wksp)
 {
+    field_layout F;
     {
         const layout1D              L(1,11);
         ghosts_setup<coord1D>       G;
         G.local.count = 2;
-        workspace<layout1D,double,rmesh> W(L,G);
+        workspace<layout1D,double,rmesh> W(L,G,F);
         const region1D<double>::type R(0,100);
         W.mesh.regular_map_to(R,W);
         std::cerr << "mesh.layout=" << W.mesh.__layout() << std::endl;

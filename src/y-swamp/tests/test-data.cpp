@@ -31,12 +31,13 @@ static inline double vproc( const double &x )
 
 YOCTO_UNIT_TEST_IMPL(data)
 {
+    field_layout F;
     {
         const layout1D        L( rand1()-2, rand1()+2 );
         ghosts_setup<coord1D> G;
         G.local.count = 1; // +1 and -1
         
-        dataspace<layout1D> W(L,G);
+        dataspace<layout1D> W(L,G,F);
         
         typedef array1D<float> A1Df;
         W.create<A1Df>( "a1df", true );
@@ -60,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(data)
         G.lower.count.x = 2;
         G.upper.count.x = 1;
         
-        dataspace<layout2D>       W(L,G);
+        dataspace<layout2D>       W(L,G,F);
         typedef geom::v2d<double> vtx;
         typedef array2D<vtx>      A2Dv; 
         A2Dv &A1 = W.create<A2Dv>( "a2dv" );
@@ -113,7 +114,7 @@ YOCTO_UNIT_TEST_IMPL(data)
         G.lower.count.z = 4;
         G.upper.count.z = 5;
         
-        dataspace<layout3D>   W(L,G);
+        dataspace<layout3D>   W(L,G,F);
         
         std::cerr << "Test Communication 3D" << std::endl;
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )

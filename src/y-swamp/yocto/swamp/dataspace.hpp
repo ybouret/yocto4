@@ -3,7 +3,7 @@
 
 #include "yocto/swamp/ghosts.hpp"
 #include "yocto/swamp/factory.hpp"
-#include "yocto/sequence/vector.hpp"
+#include "yocto/swamp/field-layout.hpp"
 #include "yocto/exception.hpp"
 
 #include <iostream>
@@ -13,6 +13,7 @@ namespace yocto
     namespace swamp 
     {
         
+        
         template <typename LAYOUT>
         class dataspace : public LAYOUT,  public array_db
         {
@@ -21,13 +22,14 @@ namespace yocto
             
             //! prepare all layouts
             explicit dataspace(const LAYOUT              &L,
-                               const ghosts_setup<coord> &G
+                               const ghosts_setup<coord> &G,
+                               const field_layout        &F
                                ) :
             LAYOUT(L),
             array_db(),
             outline( *this ),
             sync(    *this ),
-            F(8),
+            fieldsMaker(8),
             localGhosts(4,as_capacity),
             asyncGhosts(8,as_capacity),
             usingGhosts()
@@ -47,7 +49,7 @@ namespace yocto
             inline ARRAY &create( const string &name, bool async = true )
             {
                 array_db  &adb = *this;
-                F.template make<ARRAY>(name,outline,adb);
+                fieldsMaker.template make<ARRAY>(name,outline,adb);
                 ARRAY    &ans = adb[ name ].as<ARRAY>();
                 if( async )
                 {
@@ -84,13 +86,13 @@ namespace yocto
             
             
             const linear_handles & handles() const throw() { return usingGhosts; }
-           
-            size_t num_requests() const throw() { return asyncGhosts.size() *2 ; }
-
+            
+            size_t num_requests() const throw() { return usingGhosts.size() * asyncGhosts.size() *2 ; }
+            
             
         private:
-            factory<LAYOUT> F;
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
+            factory<LAYOUT>           fieldsMaker;
             vector<local_ghosts::ptr> localGhosts;
             vector<async_ghosts::ptr> asyncGhosts;
             vector<linear_base *>     usingGhosts;
