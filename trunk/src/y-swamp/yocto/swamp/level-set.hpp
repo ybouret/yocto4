@@ -7,6 +7,8 @@ namespace yocto
 {
     namespace swamp 
     {
+        
+        //! a level value, with an auxiliary key
         template <typename T>
         class level
         {
@@ -28,7 +30,7 @@ namespace yocto
         };
         
         template <typename T>
-        class level_set : public sorted_vector< level<T> >
+        class level_set 
         {
         public:
             typedef level<T>                        level_type;
@@ -40,9 +42,12 @@ namespace yocto
             virtual ~level_set() throw();
             level_set( const level_set &);
             
-            void add( param_key key, param_type value);
+            void   add( param_key key, param_type value);
+            size_t size() const throw();
+            const level_type & operator[]( size_t  ) const throw();
             
         private:
+            db_type levels;
             YOCTO_DISABLE_ASSIGN(level_set);
         };
         
