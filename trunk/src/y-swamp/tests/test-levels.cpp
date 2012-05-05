@@ -2,6 +2,7 @@
 
 #include "yocto/swamp/level-set.hpp"
 #include "yocto/swamp/workspace.hpp"
+#include "yocto/swamp/rwops.hpp"
 
 using namespace yocto;
 using namespace swamp;
@@ -93,7 +94,10 @@ YOCTO_UNIT_TEST_IMPL(C2D)
         }
     }
     
-    A.ppm("c2d.ppm", "c3d", A, vproc,NULL,-1,1);
+    A.ppm("c2d.ppm", "c2d", A, vproc,NULL,-1,1);
+    vector<string> vars;
+    vars.push_back( "A" );
+    rwops<double>::save_vtk( "c2d.vtk", "c2d", W,  vars , L);
     
     level_set<double> levels;
     levels.add(1,-0.1);
@@ -114,7 +118,6 @@ typedef region3D<double>::type   Region3D;
 typedef vertex3D<double>::type   V3D;
 
 #include "yocto/associative/map.hpp"
-#include "yocto/swamp/rwops.hpp"
 
 namespace 
 {
@@ -204,6 +207,11 @@ YOCTO_UNIT_TEST_IMPL(C3D)
     contour3D<double>::callback cb( &H, & handler3D:: process );
     contour3D<double>::compute(A, X, Y, Z, A, levels, cb);
     H.save();
+    
+    vector<string> vars;
+    vars.push_back( "A" );
+    rwops<double>::save_vtk( "c3d.vtk", "c3d", W,  vars , L);
+
     
 }
 YOCTO_UNIT_TEST_DONE()
