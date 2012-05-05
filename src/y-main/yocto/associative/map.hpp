@@ -128,8 +128,8 @@ namespace yocto
 		inline iterator end()   throw() { return iterator( NULL );       }
 		
 		typedef iterating::linked<const_type,const node_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return iterator( ktab_.nlist.head  ); }
-		inline const_iterator end()   const throw() { return iterator( NULL );       }
+		inline const_iterator begin() const throw() { return const_iterator( ktab_.nlist.head  ); }
+		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
 		
 	private:
 		YOCTO_DISABLE_ASSIGN(map);
