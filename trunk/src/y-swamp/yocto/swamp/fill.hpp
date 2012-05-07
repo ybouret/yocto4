@@ -51,12 +51,12 @@ namespace  yocto  {
                 assert( A.contains(sub) );
                 for(unit_t z=sub.lower.z; z<=sub.upper.z;++z)
                 {
-                    array2D<T> & _S = A[z];
-                    const U      _Z = Z[z];
+                    array2D<T> & _Slice = A[z];
+                    const U      _Z     = Z[z];
                     for(unit_t y=sub.lower.y; y<=sub.upper.y;++y)
                     {
                         const U      _Y =  Y[y];
-                        array1D<T> & _R = _S[y];
+                        array1D<T> & _R = _Slice[y];
                         for( unit_t x=sub.lower.x; x<=sub.upper.x; ++x )
                         {
                             _R[x] = f(X[x],_Y,_Z);

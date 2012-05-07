@@ -23,7 +23,8 @@ namespace yocto
             level( const level &) throw();
             ~level() throw();
             
-            friend bool operator<( const level &lhs_level, const level &rhs_level ) throw();
+	    template <typename U>
+            friend bool operator<( const level<U> &lhs_level, const level<U> &rhs_level ) throw();
             
         private:
             YOCTO_DISABLE_ASSIGN(level);
