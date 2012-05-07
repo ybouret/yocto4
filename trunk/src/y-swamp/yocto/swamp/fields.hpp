@@ -9,6 +9,7 @@ namespace yocto
     namespace swamp 
     {
         
+        //! information to create an array of a given dimension
         template <typename LAYOUT>
         class field_info 
         {
@@ -53,6 +54,7 @@ namespace yocto
         };
         
         
+        //! store information to create some fields in a dataspace
         template <typename LAYOUT>
         class fields_setup : public  field_info<LAYOUT>::db
         {

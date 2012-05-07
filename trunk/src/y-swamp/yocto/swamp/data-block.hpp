@@ -7,6 +7,7 @@ namespace yocto
 {
     namespace swamp 
     {
+        //! memory for an array
         class data_block : public object
         {
         public:
@@ -25,14 +26,9 @@ namespace yocto
         public:
             explicit standalone( const typename ARRAY::layout_type &L ) :
             ARRAY( L ),
-            blk( *this )
-            {
-            }
+            blk( *this ) {}
             
-            virtual ~standalone() throw()
-            {
-            }
-            
+            virtual ~standalone() throw() {}
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(standalone);

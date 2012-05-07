@@ -9,6 +9,7 @@ namespace yocto
 {
     namespace swamp
     {
+        //! curvilinear mesgh
         template <typename T,typename LAYOUT>
         class cmesh : public quadmesh, public LAYOUT
         {

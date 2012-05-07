@@ -11,7 +11,7 @@ namespace yocto
 	namespace swamp
 	{
 		
-		//! marching cubes algortihm
+		//! marching cubes algorithm to find the isosurfaces
 		template <typename T>
 		struct contour3D
 		{

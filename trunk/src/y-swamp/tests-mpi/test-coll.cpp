@@ -25,7 +25,8 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
         G.upper.count.y = 2;
         G.upper.peer.y  = MPI.CommWorldNext();
     }
-    else {
+    else 
+    {
         G.local.count.y = 2;
     }
     
@@ -56,3 +57,5 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
