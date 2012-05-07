@@ -83,22 +83,18 @@ namespace
         
         virtual void get_meta_data( visit_handle md ) const
         {
-            MPI.Printf0( stderr, "SIM: get_meta_data\n");
             assert( VISIT_INVALID_HANDLE != md );
+            
             visit_handle mmd = VISIT_INVALID_HANDLE;
             if( VisIt_MeshMetaData_alloc( &mmd ) == VISIT_OKAY )
             {
                 assert( VISIT_INVALID_HANDLE != mmd );
-                MPI.Printf( stderr, "\t @%d> Registering mesh2d\n", par_rank);
+                MPI.Printf( stderr, "\t @%d> Registering mesh2d /#%d\n", par_rank, par_size);
                 VisIt_MeshMetaData_setName( mmd, "mesh2d" );
                 VisIt_MeshMetaData_setMeshType( mmd, VISIT_MESHTYPE_RECTILINEAR );
                 VisIt_MeshMetaData_setTopologicalDimension( mmd, 2);
                 VisIt_MeshMetaData_setSpatialDimension(mmd, 2);
                 VisIt_MeshMetaData_setNumDomains(mmd, par_size);
-                //VisIt_MeshMetaData_setDomainTitle(mmd, "Domains");
-                //VisIt_MeshMetaData_setDomainPieceName(mmd, "domain");
-                //VisIt_MeshMetaData_setNumGroups(mmd, 0);
-                
                 VisIt_SimulationMetaData_addMesh(md, mmd);
             }
         }
@@ -107,8 +103,9 @@ namespace
         {
             MPI.Printf( stderr, "rank %d> SIM:get_mesh '%s', domain=%d\n", par_rank, name.c_str(), domain);
             visit_handle h = VISIT_INVALID_HANDLE;
-            if( VISIT_OKAY == VisIt_RectilinearMesh_alloc(&h) )
+            if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
             {
+                assert( h != VISIT_INVALID_HANDLE );
                 const Array1D &X  = mesh.X();
                 const Array1D &Y  = mesh.Y();
                 
@@ -144,8 +141,6 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // serial VisIt
     //--------------------------------------------------------------------------
-    const string       trace_name = "trace.dat";
-    VisIt:: TraceFile  trace_file( trace_name );
     VisIt:: SetupEnvironment();
     
     const string sim_name    = "Simulation2D";
@@ -158,7 +153,8 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     mpi &MPI = mpi::init( &argc, &argv );
     const int sim_rank = MPI.CommWorldRank;
     const int sim_size = MPI.CommWorldSize;
-    
+    const string       trace_name = "trace.dat";
+    VisIt:: TraceFile  trace_file(sim_rank,trace_name );
     //--------------------------------------------------------------------------
     // parallel VisIt
     //--------------------------------------------------------------------------

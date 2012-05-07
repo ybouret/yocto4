@@ -6,15 +6,18 @@ namespace yocto
     
     
     
-    VisIt:: TraceFile:: TraceFile( const string &filename  ) 
+    VisIt:: TraceFile:: TraceFile( int rank, const string &filename  ) : 
+    rank_(rank)
     {
-        VisItOpenTraceFile( filename.c_str() );
+        if( 0 == rank_)
+            VisItOpenTraceFile( filename.c_str() );
     }
     
     
     VisIt:: TraceFile:: ~TraceFile() throw()
     {
-        VisItCloseTraceFile();
+        if( 0 == rank_ )
+            VisItCloseTraceFile();
     }
     
     void VisIt:: SetDirectory( const string &path )
@@ -46,7 +49,7 @@ namespace yocto
         }
     }
     
-    void VisIt:: SetupParallel( mpi &        MPI , 
+    void VisIt:: SetupParallel(const mpi    &MPI , 
                                const string &sim_name,
                                const string &sim_comment,
                                const string &sim_path,
