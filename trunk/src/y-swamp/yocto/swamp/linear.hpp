@@ -121,9 +121,9 @@ namespace yocto
                      
             
         protected:
-			static inline void set_cb( type &v, void *args) throw() { v  = *(type*)args; }
-			static inline void add_cb( type &v, void *args) throw() { v += *(type*)args; }
-			static inline void sum_cb( const_type &v, void *args) throw() { *(type *)args += v; }
+			static inline void set_cb( type &v, void *args) throw() { assert(args); v  = *(type*)args; }
+			static inline void add_cb( type &v, void *args) throw() { assert(args); v += *(type*)args; }
+			static inline void sum_cb( const_type &v, void *args) throw() { assert(args); *(type *)args += v; }
 			
 			static inline void set2_cb( type &v, const_type &u, void *) throw() { v = u; }
 			static inline void add2_cb( type &v, const_type &u, void *) throw() { v += u; }
@@ -131,18 +131,21 @@ namespace yocto
                       
 			static inline void save_cb( const_type &v, void *args )
 			{
+                assert(args);
 				ios::ostream &fp = *(ios::ostream *)args;
 				fp.save( &v, sizeof(type) );
 			}
 			
 			static inline void load_cb( type &v, void *args )
 			{
+                assert(args);
 				ios::istream &fp = *(ios::istream *)args;
 				fp.load( &v, sizeof(type) );
 			}
             
             static inline void hash_cb( const_type &v, void *args )
             {
+                assert(args);
                 hashing::function &fn = *(hashing::function *)args;
                 fn.run( &v, sizeof(type) );
             }

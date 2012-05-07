@@ -7,6 +7,8 @@ using namespace yocto;
 using namespace swamp;
 
 
+double vproc( const double &x ) { return x; }
+
 YOCTO_UNIT_TEST_IMPL(coll2D)
 {
     
@@ -27,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
         G.local.count.y = 2;
     }
     
-    const layout2D full_layout( coord2D(1,1), coord2D(20,20) );
+    const layout2D full_layout( coord2D(1,1), coord2D(100,100) );
     const layout2D L = full_layout.split(rank,size);
     dataspace<layout2D> D( L, G, F );
     
@@ -36,7 +38,9 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     A.set_all( L, rank+1 );
     auto_ptr< array2D<double> > pA0;
     if( 0 == rank )
-        pA0.reset( new array2D<double>(full_layout) );
+    {
+        pA0.reset( new standalone< array2D<double> >(full_layout) );
+    }
     
     D.prepare_ghosts();
     mpi::Requests requests( D.num_requests() );
@@ -46,6 +50,8 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     
     _mpi::collect0(MPI, pA0.__get(), A, full_layout);
     
+    if( 0 == rank )
+        pA0->ppm( "full.ppm", "full", full_layout, vproc, NULL, 0, size );
     
     
 }

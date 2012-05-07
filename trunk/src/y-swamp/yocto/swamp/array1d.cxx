@@ -28,6 +28,8 @@ namespace yocto
         {
             assert(x>=lower);
             assert(x<=upper);
+            assert(entry!=NULL);
+            assert(item!=NULL);
             return item[x];
         }
         
@@ -36,6 +38,8 @@ namespace yocto
         {
             assert(x>=lower);
             assert(x<=upper);
+            assert(entry!=NULL);
+            assert(item!=NULL);
             return item[x];
         }
         
@@ -55,6 +59,7 @@ namespace yocto
         {
             assert( this->contains(sub) );
             assert( proc != NULL );
+            assert(item!=NULL);
             for( unit_t x = sub.lower; x <= sub.upper; ++x)
             {
                 proc( item[x], args );
@@ -67,6 +72,8 @@ namespace yocto
             assert( this->contains(sub) );
             assert( other.contains(sub) );
             assert(proc!=NULL);
+            assert(item!=NULL);
+            assert(other.item!=NULL);
             for( unit_t x = sub.lower; x <= sub.upper; ++x)
             {
                 proc( item[x], other.item[x], args );
