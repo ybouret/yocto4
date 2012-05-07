@@ -19,16 +19,17 @@ namespace yocto
         class TraceFile
         {
         public:
-            TraceFile( const string &filename );
+            TraceFile( int rank, const string &filename );
             virtual ~TraceFile() throw();
         private:
+            const int rank_;
             YOCTO_DISABLE_COPY_AND_ASSIGN(TraceFile);
         };
         
         static void SetDirectory( const string &path );      //!< VisItSetDirectory
         static void SetOption(const string &options);        //!< VisItSetOptions
         static void SetupEnvironment();                      //!< VisItSetupEnvironment
-        static void SetupParallel( mpi &        MPI, 
+        static void SetupParallel(const mpi &   MPI, 
                                   const string &sim_name,
                                   const string &sim_comment,
                                   const string &sim_path,

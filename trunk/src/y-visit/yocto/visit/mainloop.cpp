@@ -15,7 +15,8 @@ namespace yocto
     // Helper function for ProcessVisItCommand.
     //
     //==========================================================================
-    static void BroadcastSlaveCommand( int *command)
+    static inline
+    void BroadcastSlaveCommand( int *command)
     {
         static mpi &MPI = *mpi::location();
         MPI.Bcast(command, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -26,14 +27,16 @@ namespace yocto
     // Callback involved in command communication.
     //
     //==========================================================================
-    static void SlaveProcessCallback()
+    static inline
+    void SlaveProcessCallback()
     {
         int command = VISIT_COMMAND_PROCESS;
         BroadcastSlaveCommand(&command);
     }
     
     
-    static int ProcessVisItCommand( VisIt:: Simulation &sim )
+    static inline 
+    int ProcessVisItCommand( VisIt:: Simulation &sim )
     {
         int command = -1;
         if ( 0 == sim.par_rank )
@@ -80,7 +83,8 @@ namespace yocto
     // Process Console.
     //
     //==========================================================================
-    static inline void ProcessConsole( VisIt:: Simulation &sim )
+    static inline 
+    void ProcessConsole( VisIt:: Simulation &sim )
     {
         const mpi &  MPI = sim.MPI;
         char        *cmd = sim.iobuff();
@@ -136,31 +140,35 @@ namespace yocto
     static
     visit_handle SimGetMetaData(void *cbdata)
     {
-        fprintf(stderr, "SimGetMetaData(%p)",cbdata );
+        //fprintf(stderr, "SimGetMetaData(%p)",cbdata );
         assert(cbdata!=NULL);
         visit_handle       md  = VISIT_INVALID_HANDLE;
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
         
+        sim.MPI.Printf0( stderr, "SimGetMetaData\n" );
         
         if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
         {
             assert( VISIT_INVALID_HANDLE != md );
             
             /* Meta Data for Simulation */
+            sim.MPI.Printf0( stderr, "\tsimulation info\n");
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
             VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,0);
             
             /* Specific Meta Data for the simulation */
+            sim.MPI.Printf0( stderr, "\tuser's meta data\n");
             sim.get_meta_data(md);
             
             /* Create Generic Interface/Commands */
+            sim.MPI.Printf0( stderr,"\tcommands\n");
             for(size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
             {
                 visit_handle cmd = VISIT_INVALID_HANDLE;
                 if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
                 {
                     const char *cmd_name = VisIt::Simulation::GenericCommandReg[i];
-                    //MPI.Printf0("[VisIt::CommandMetaData] '%s'\n", cmd_name);
+                    //sim.MPI.Printf0(stderr,"SimGetMetaData +'%s'\n", cmd_name);
                     VisIt_CommandMetaData_setName(cmd, cmd_name);
                     VisIt_SimulationMetaData_addGenericCommand(md, cmd);
                 }
@@ -200,6 +208,11 @@ namespace yocto
     {
         ++sim.cycle;
         sim.step();
+        if( VisItIsConnected() )
+        {
+            VisItTimeStepChanged();
+            VisItUpdatePlots();
+        }
     }
     
     
@@ -211,7 +224,10 @@ namespace yocto
     void VisIt:: Perform( Simulation &sim, const string &cmd )
     {
         sim.performAlways(cmd);
-        VisItTimeStepChanged();
+        if( VisItIsConnected() )
+        {
+            VisItTimeStepChanged();
+        }
     }
     
     //==========================================================================
@@ -255,7 +271,7 @@ namespace yocto
             }
             
             //------------------------------------------------------------------
-            // broadcast status
+            // broadcast status from master rank=0
             //------------------------------------------------------------------
             MPI.Bcast(&visitstate, 1, MPI_INT, 0, MPI_COMM_WORLD);
             
@@ -287,7 +303,7 @@ namespace yocto
                         VisItSetSlaveProcessCallback(SlaveProcessCallback);
                         VisItSetCommandCallback(ControlCommandCallback,cbdata);
                         VisItSetGetMetaData(SimGetMetaData,cbdata);
-                        //VisItSetGetMesh(SimGetMesh, cbdata);
+                        VisItSetGetMesh(SimGetMesh, cbdata);
                     }
                     else
                     {
