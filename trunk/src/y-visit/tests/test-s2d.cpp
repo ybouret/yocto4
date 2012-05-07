@@ -139,7 +139,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
 {
     
     //--------------------------------------------------------------------------
-    // serial VisIt
+    // VisIt common environment
     //--------------------------------------------------------------------------
     VisIt:: SetupEnvironment();
     
@@ -153,8 +153,10 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     mpi &MPI = mpi::init( &argc, &argv );
     const int sim_rank = MPI.CommWorldRank;
     const int sim_size = MPI.CommWorldSize;
+    
     const string       trace_name = "trace.dat";
     VisIt:: TraceFile  trace_file(sim_rank,trace_name );
+    
     //--------------------------------------------------------------------------
     // parallel VisIt
     //--------------------------------------------------------------------------
@@ -196,6 +198,8 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // Initialize the simulation
     //--------------------------------------------------------------------------
+
+    
     
     //--------------------------------------------------------------------------
     // Initialize ghosts
