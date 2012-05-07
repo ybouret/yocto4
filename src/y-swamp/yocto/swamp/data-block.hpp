@@ -18,6 +18,28 @@ namespace yocto
             void  *base;
             YOCTO_DISABLE_COPY_AND_ASSIGN(data_block);
         };
+        
+        template <typename ARRAY>
+        class standalone : public ARRAY
+        {
+        public:
+            explicit standalone( const typename ARRAY::layout_type &L ) :
+            ARRAY( L ),
+            blk( *this )
+            {
+            }
+            
+            virtual ~standalone() throw()
+            {
+            }
+            
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(standalone);
+            data_block blk;
+            
+        };
+        
     }
     
 }

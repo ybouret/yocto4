@@ -140,6 +140,7 @@ namespace yocto
 			void collect0( const mpi &MPI, array2D<T> *pA, const array2D<T> &B, const layout2D &full, size_t dim = 1)
 			{
 				static const int   tag = 0x0C01;
+                MPI.Printf(stderr,"rank %d> collect2D\n", MPI.CommWorldRank );
 				if( 0 == MPI.CommWorldRank )
 				{
 					assert( NULL != pA );
@@ -149,6 +150,7 @@ namespace yocto
 						const layout2D sub = full.split(0, MPI.CommWorldSize,dim );
 						A.set( B, sub );
 					}
+                    
 					//-- fetch sub data
 					MPI_Status status;
 					for( int r=1; r < MPI.CommWorldSize; ++r )

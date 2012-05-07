@@ -32,6 +32,7 @@ namespace yocto
         {
             assert( y >= lower.y );
             assert( y <= upper.y );
+            assert( row != NULL );
             return row[y];
         }
         
@@ -40,6 +41,7 @@ namespace yocto
         {
             assert( y >= lower.y );
             assert( y <= upper.y );
+            assert( row != NULL );
             return row[y];
         }
         
@@ -74,17 +76,21 @@ namespace yocto
         }
         
         template <>
-        void array2D<ZTYPE>:: foreach( const array_type  &other, const layout_type &sub, call_two proc, void *args)
+        void array2D<ZTYPE>:: foreach( const array_type &other, const layout_type &sub, call_two proc, void *args)
         {
             assert( this->contains(sub) );
             assert( other.contains(sub) );
             assert( proc != NULL );
             for( unit_t j=sub.lower.y; j <= sub.upper.y; ++j )
             {
-                row_type       &self_j  = row[j];
-                const row_type &other_j = other.row[j];
+                row_type       &self_j  = (*this)[j];
+                const row_type &other_j = other[j];
+                //std::cerr << "self_j.entry =" << self_j.entry  << std::endl;
+                //std::cerr << "other_j.entry=" << other_j.entry << std::endl;
+                
                 for( unit_t i=sub.lower.x; i <= sub.upper.x; ++i )
                 {
+                    //std::cerr << other_j[i] << " -> " << self_j[i] << std::endl;
                     proc( self_j[i], other_j[i], args );
                 }
             }
