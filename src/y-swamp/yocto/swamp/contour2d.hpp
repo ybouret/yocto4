@@ -20,7 +20,7 @@ namespace yocto
                                 const array1D<T>   &y,
                                 const layout2D     &sub,
                                 const level_set<T> &levels,
-                                callback            proc);
+                                callback           &proc);
             
         };
     }

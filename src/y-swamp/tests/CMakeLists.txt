@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-swamp main.cpp ${test_srcs})
-TARGET_LINK_YOCTO( test-swamp swamp)
+TARGET_LINK_YOCTO( test-swamp swamp )
 
 ENABLE_TESTING()
 ADD_TEST(Layout  test-swamp layout)
