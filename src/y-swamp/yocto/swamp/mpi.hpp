@@ -18,7 +18,7 @@ namespace yocto
             
             //! initialize the exchanges
             template <typename LAYOUT> inline static 
-            void init_exchange( mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            void init_exchange( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
             {
                 static const int tag = 0xCALL;
                 assert( requests.count == D.num_requests() );
@@ -66,7 +66,7 @@ namespace yocto
             
             //! wait for all exchanges to be done
             template <typename LAYOUT> inline static 
-            void wait_exchange( mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests)
+            void wait_exchange( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests)
             {
                 assert( requests.count == D.num_requests() );
                 const linear_handles &handles = D.handles();

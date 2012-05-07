@@ -75,4 +75,17 @@ namespace yocto
         MPI.Printf(stderr,"rank %d> '%s'\n", par_rank, cmd.c_str());
     }
     
+    void VisIt:: Simulation::  get_meta_data( visit_handle md ) const
+    {
+        assert( VISIT_INVALID_HANDLE != md );
+    }
+    
+    visit_handle VisIt:: Simulation::  get_mesh( int domain, const string &name ) const
+    {
+        MPI.Printf0(stderr, "get_mesh(%d,'%s')\n", domain, name.c_str() );
+        return VISIT_INVALID_HANDLE;
+    }
+    
+    
+    
 }

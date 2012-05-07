@@ -11,7 +11,9 @@ namespace yocto
 #define VISIT_COMMAND_FAILURE 2
     
     //==========================================================================
+    //
     // Helper function for ProcessVisItCommand.
+    //
     //==========================================================================
     static void BroadcastSlaveCommand( int *command)
     {
@@ -20,7 +22,9 @@ namespace yocto
     }
     
     //==========================================================================
+    //
     // Callback involved in command communication.
+    //
     //==========================================================================
     static void SlaveProcessCallback()
     {
@@ -72,7 +76,9 @@ namespace yocto
     
     
     //==========================================================================
+    //
     // Process Console.
+    //
     //==========================================================================
     static inline void ProcessConsole( VisIt:: Simulation &sim )
     {
@@ -123,21 +129,29 @@ namespace yocto
     
     
     //==========================================================================
-    // SimGetMetaData
+    //
+    // SimGetMetaData callback
+    //
     //==========================================================================
     static
     visit_handle SimGetMetaData(void *cbdata)
     {
+        fprintf(stderr, "SimGetMetaData(%p)",cbdata );
+        assert(cbdata!=NULL);
         visit_handle       md  = VISIT_INVALID_HANDLE;
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
         
         
-        if(VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
+        if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
         {
+            assert( VISIT_INVALID_HANDLE != md );
+            
             /* Meta Data for Simulation */
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
             VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,0);
             
+            /* Specific Meta Data for the simulation */
+            sim.get_meta_data(md);
             
             /* Create Generic Interface/Commands */
             for(size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
@@ -145,7 +159,9 @@ namespace yocto
                 visit_handle cmd = VISIT_INVALID_HANDLE;
                 if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
                 {
-                    VisIt_CommandMetaData_setName(cmd, VisIt::Simulation::GenericCommandReg[i]);
+                    const char *cmd_name = VisIt::Simulation::GenericCommandReg[i];
+                    //MPI.Printf0("[VisIt::CommandMetaData] '%s'\n", cmd_name);
+                    VisIt_CommandMetaData_setName(cmd, cmd_name);
                     VisIt_SimulationMetaData_addGenericCommand(md, cmd);
                 }
             }
@@ -156,14 +172,17 @@ namespace yocto
     }
     
     //==========================================================================
+    //
     // Control Command Callback
+    //
     //==========================================================================
-    static void
-    ControlCommandCallback(const char *cmd, 
-                           const char *args,
-                           void       *cbdata)
+    static inline 
+    void ControlCommandCallback(const char *cmd, 
+                                const char *args,
+                                void       *cbdata)
     {
-        VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+        assert(cbdata!=NULL);
+        VisIt::Simulation &sim  = *(VisIt::Simulation *)cbdata;
         const string       todo = cmd;
         
         static mpi &MPI = *mpi::location();
@@ -172,6 +191,11 @@ namespace yocto
     }
     
     
+    //==========================================================================
+    //
+    //  make one step
+    //
+    //==========================================================================
     void VisIt:: OneStep( Simulation &sim )
     {
         ++sim.cycle;
@@ -179,11 +203,32 @@ namespace yocto
     }
     
     
+    //==========================================================================
+    //
+    //  process the command and forward to VisIt
+    //
+    //==========================================================================
     void VisIt:: Perform( Simulation &sim, const string &cmd )
     {
         sim.performAlways(cmd);
         VisItTimeStepChanged();
     }
+    
+    //==========================================================================
+    //
+    //  Getting the meshes
+    //
+    //==========================================================================
+    static inline
+    visit_handle SimGetMesh( int domain, const char *name, void *cbdata )
+    {
+        assert(cbdata!=NULL);
+        fprintf(stderr, "SimGetMesh\n"); fflush(stderr);
+        VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+        const string mesh_name(name);
+        return sim.get_mesh( domain, mesh_name );
+    }
+    
     
     void VisIt:: MainLoop( Simulation &sim )
     {
@@ -199,9 +244,7 @@ namespace yocto
         }
         
         do 
-        {
-            //sim.invite();
-
+        {            
             //------------------------------------------------------------------
             // Get input from VisIt or timeout so the simulation can run.
             //------------------------------------------------------------------
@@ -234,15 +277,17 @@ namespace yocto
                     //----------------------------------------------------------
                     // VisIt is trying to connect to sim
                     //----------------------------------------------------------
-                    if(VisItAttemptToCompleteConnection())
+                    if( VisItAttemptToCompleteConnection() )
                     {
                         MPI.Printf0(stderr, "[VisIt] Connected\n");
+                        void *cbdata = (void*) &sim;
                         //------------------------------------------------------
                         // Setup callbacks for this connection
                         //------------------------------------------------------
                         VisItSetSlaveProcessCallback(SlaveProcessCallback);
-                        VisItSetCommandCallback(ControlCommandCallback,(void*) &sim);
-                        VisItSetGetMetaData(SimGetMetaData, (void*) &sim);
+                        VisItSetCommandCallback(ControlCommandCallback,cbdata);
+                        VisItSetGetMetaData(SimGetMetaData,cbdata);
+                        //VisItSetGetMesh(SimGetMesh, cbdata);
                     }
                     else
                     {

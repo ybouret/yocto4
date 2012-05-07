@@ -15,6 +15,7 @@ namespace yocto
     {
     public:
         
+        //! auto open/close trace file
         class TraceFile
         {
         public:
@@ -56,8 +57,18 @@ namespace yocto
             const bool parallel;  //!< par_size > 1
             const bool master;    //!< 0 == par_rank
             
-            virtual void step();
-            virtual void perform( const string &cmd );
+            //! provide meta data information
+            virtual void get_meta_data( visit_handle md ) const;
+            
+            //! provide mesh
+            virtual visit_handle get_mesh( int domain, const string &name ) const;
+            
+            
+            //! the step function
+            virtual void step();  
+            
+            //! process the command to update the simulation
+            virtual void perform( const string &cmd ); 
             
             static const char  *GenericCommandReg[];
             static const size_t GenericCommandNum;
