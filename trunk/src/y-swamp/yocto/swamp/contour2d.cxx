@@ -5,7 +5,7 @@ namespace yocto
     namespace swamp
     {
         template <>
-        void contour2D<ZTYPE>:: compute(const array2D<ZTYPE> &d, const array1D<ZTYPE> &x, const array1D<ZTYPE> &y, const layout2D &sub, const level_set<ZTYPE> &levels, callback proc)
+        void contour2D<ZTYPE>:: compute(const array2D<ZTYPE> &d, const array1D<ZTYPE> &x, const array1D<ZTYPE> &y, const layout2D &sub, const level_set<ZTYPE> &levels, callback &proc)
         {
             assert( d.has( sub.lower ) );
 			assert( d.has( sub.upper ) );
