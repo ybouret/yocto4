@@ -18,8 +18,9 @@ namespace yocto
             
             //! initialize the exchanges
             template <typename LAYOUT> inline static 
-            void init_exchange( mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests, int tag = 100)
+            void init_exchange( mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
             {
+                static const int tag = 0xCALL;
                 assert( requests.count == D.num_requests() );
                 const linear_handles &handles = D.handles();
                 

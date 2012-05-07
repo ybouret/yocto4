@@ -66,7 +66,8 @@ namespace yocto
             virtual ~ghosts_base() throw();
             
         protected:
-            explicit ghosts_base( size_t num_ghosts ) throw();            
+            explicit ghosts_base( size_t num_ghosts ) throw(); 
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts_base);
         };
@@ -139,6 +140,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts);
         };
         
+        
+        //! describe all ghosts topology
         template <typename COORD>
         class ghosts_setup
         {

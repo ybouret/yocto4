@@ -15,7 +15,7 @@ namespace yocto
     namespace swamp 
     {
         
-        
+        //! multiple fields manager
         template <typename LAYOUT>
         class dataspace : public LAYOUT,  public array_db
         {
@@ -43,7 +43,7 @@ namespace yocto
             virtual ~dataspace() throw() {}
             
             
-            //! create a new array
+            //! manually create a new array
             /**
              \param name the unique array name
              \param async if true, will use ghosts exchange
@@ -61,7 +61,7 @@ namespace yocto
                 return ans;
             }
             
-            //! create a new array
+            //! manuallt create a new array
             template <typename ARRAY>
             inline ARRAY &create( const char *id, bool async = true )
             {
@@ -70,6 +70,10 @@ namespace yocto
             }
             
             //! allocate all data for communication
+            /**
+             This should be done only once, after all
+             arrays are created.
+             */
             void  prepare_ghosts()
             {
                 for( size_t i=1; i <= asyncGhosts.size(); ++i )
@@ -103,7 +107,6 @@ namespace yocto
             //! compute outline and ghosts from the setup
             inline void record_ghosts( const ghosts_setup<coord> &G )
             {
-                //std::cerr << "######## dataspace: layout=" << this->__layout() << std::endl;
                 const unit_t *local_g = (const unit_t *) &G.local.count;
                 const unit_t *lower_g = (const unit_t *) &G.lower.count;
                 const unit_t *upper_g = (const unit_t *) &G.upper.count;
@@ -126,11 +129,9 @@ namespace yocto
                     
                     for( unsigned dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
                     {
-                        //std::cerr << "\t ---- dim #" << dim << std::endl;
                         const unit_t local_ng = local_g[dim];
                         if( local_ng > 0 )
                         {
-                            //std::cerr << "\t#localGhosts=" << local_ng << std::endl;
                             //--------------------------------------------------
                             // check layout width
                             //--------------------------------------------------
@@ -150,11 +151,9 @@ namespace yocto
                             const unit_t lower_ng = lower_g[dim];
                             if( lower_ng > 0 )
                             {
-                                //std::cerr << "\t#lowerGhosts=" << lower_ng << std::endl;
                                 if( local_ng > 0 )
                                     throw exception("ghosts conflict in dimension %u", dim );
                                 async_ghosts::ptr pG( new async_ghosts(lower_ng, ghost::get_lower_position(dim), lower_p[dim] ) );
-                                //std::cerr << "\t  peer=" << pG->peer << std::endl;
                                 asyncGhosts.push_back( pG );
                                 pLower[dim] -= lower_ng;
                                 __coord(syncLo,dim) += lower_ng;
@@ -165,11 +164,9 @@ namespace yocto
                             const unit_t upper_ng = upper_g[dim];
                             if( upper_ng > 0 )
                             {
-                                //std::cerr << "\t#upperGhosts=" << upper_ng << std::endl;
                                 if( local_ng > 0 )
                                     throw exception("ghosts conflict in dimension %u", dim );
                                 async_ghosts::ptr pG( new async_ghosts(upper_ng, ghost::get_upper_position(dim), upper_p[dim] ) );
-                                //std::cerr << "\t  peer=" << pG->peer << std::endl;
                                 asyncGhosts.push_back( pG );
                                 pUpper[dim] += upper_ng;
                                 __coord(syncUp,dim) -= upper_ng;
@@ -188,8 +185,6 @@ namespace yocto
                     //==========================================================
                     new ((void*)&outline) LAYOUT( outLo,  outUp );
                     new ((void*)&sync)    LAYOUT( syncLo, syncUp);
-                    //std::cerr << "######## dataspace: outline=" << outline << std::endl;
-                    //std::cerr << "######## dataspace: sync   =" << sync     << std::endl;
                     
                 }
                 
@@ -209,7 +204,9 @@ namespace yocto
                     {
                         
                         //------------------------------------------------------
+                        //
                         // local ghosts
+                        //
                         //------------------------------------------------------
                         const unit_t local_ng = local_g[dim];
                         if( local_ng > 0 )
@@ -225,7 +222,6 @@ namespace yocto
                                 __coord(subLo,dim) = __coord(layLo,dim);
                                 __coord(subUp,dim) = __coord(subLo,dim) + ns;
                                 const LAYOUT sub(subLo,subUp);
-                                //std::cerr << "\t\tlocalGhosts[" << iLocal << "]=(" << local_ng << ").lower.inside=" << sub << std::endl;
                                 outline.load_offsets( sub, g.lower.inside.offsets );
                                 assert( sub.items == g.lower.inside.offsets.size() );
                             }
@@ -238,7 +234,6 @@ namespace yocto
                                 coord subUp( outUp );
                                 __coord(subLo,dim) = __coord(layUp,dim) + 1;
                                 const LAYOUT sub(subLo,subUp);
-                                //std::cerr << "\t\tlocalGhosts[" << iLocal << "]=(" << local_ng << ").lower.mirror=" << sub << std::endl;
                                 outline.load_offsets( sub, g.lower.mirror.offsets );
                                 assert( sub.items == g.lower.mirror.offsets.size() );
                             }
@@ -252,7 +247,6 @@ namespace yocto
                                 __coord(subUp,dim) = __coord(layUp,dim);
                                 __coord(subLo,dim) = __coord(subUp,dim) - ns;
                                 const LAYOUT sub(subLo,subUp);
-                                //std::cerr << "\t\tlocalGhosts[" << iLocal << "]=(" << local_ng << ").upper.inside=" << sub << std::endl;
                                 outline.load_offsets( sub, g.upper.inside.offsets );
                                 assert( sub.items == g.upper.inside.offsets.size() );
                             }
@@ -265,7 +259,6 @@ namespace yocto
                                 coord subUp( outUp );
                                 __coord(subUp,dim) = __coord(layLo,dim) - 1;
                                 const LAYOUT sub(subLo,subUp);
-                                //std::cerr << "\t\tlocalGhosts[" << iLocal << "]=(" << local_ng << ").upper.mirror=" << sub << std::endl;
                                 outline.load_offsets( sub, g.upper.mirror.offsets );
                                 assert( sub.items == g.upper.mirror.offsets.size() );
                             }
@@ -280,7 +273,9 @@ namespace yocto
                         }
                         
                         //------------------------------------------------------
+                        //
                         // lower ghosts
+                        //
                         //------------------------------------------------------
                         {
                             const unit_t lower_ng = lower_g[dim];
@@ -288,37 +283,43 @@ namespace yocto
                             {
                                 async_ghosts &g = * asyncGhosts[ ++iAsync ];
                                 const unit_t ns = lower_ng - 1;
+                                //----------------------------------------------
                                 // lower.inner
+                                //----------------------------------------------
                                 {
                                     coord subLo( outLo );
                                     coord subUp( outUp );
                                     __coord(subLo,dim) = __coord(layLo,dim);
                                     __coord(subUp,dim) = __coord(subLo,dim) + ns;
                                     const LAYOUT sub(subLo,subUp);
-                                    //std::cerr << "\t\tlowerGhosts[" << iLocal << "]=(" << lower_ng << ").lower.inner=" << sub << std::endl;
                                     outline.load_offsets( sub, g.self.inner.offsets );
                                     assert( sub.items == g.self.inner.offsets.size() );
                                 }
                                 
+                                //----------------------------------------------
                                 // lower.outer
+                                //----------------------------------------------
                                 {
                                     coord subLo( outLo );
                                     coord subUp( outUp );
                                     __coord(subUp,dim) = __coord(layLo,dim) - 1;
                                     const LAYOUT sub(subLo,subUp);
-                                    //std::cerr << "\t\tlowerGhosts[" << iLocal << "]=(" << lower_ng << ").lower.outer=" << sub << std::endl;
                                     outline.load_offsets( sub, g.self.outer.offsets );
                                     assert( sub.items == g.self.outer.offsets.size() );
                                 }
                                 
+                                //----------------------------------------------
                                 // finalize
+                                //----------------------------------------------
                                 (size_t&)(g.num_offsets) = g.self.inner.offsets.size();
                                 assert( g.self.outer.offsets.size() == g.num_offsets);
                             }
                         }
                         
                         //------------------------------------------------------
+                        //
                         // upper ghosts
+                        //
                         //------------------------------------------------------
                         {
                             const unit_t upper_ng = upper_g[dim];
@@ -327,30 +328,34 @@ namespace yocto
                                 async_ghosts &g = * asyncGhosts[ ++iAsync ];
                                 const unit_t ns = upper_ng - 1;
                                 
+                                //----------------------------------------------
                                 // upper.inner
+                                //----------------------------------------------
                                 {
                                     coord subLo( outLo );
                                     coord subUp( outUp );
                                     __coord(subUp,dim) = __coord(layUp,dim);
                                     __coord(subLo,dim) = __coord(subUp,dim) - ns;
                                     const LAYOUT sub(subLo,subUp);
-                                    //std::cerr << "\t\tupperGhosts[" << iLocal << "]=(" << upper_ng << ").upper.inner=" << sub << std::endl;
                                     outline.load_offsets(sub, g.self.inner.offsets );
                                     assert( sub.items ==  g.self.inner.offsets.size() );
                                 }
                                 
+                                //----------------------------------------------
                                 // upper.outer
+                                //----------------------------------------------
                                 {
                                     coord subLo( outLo );
                                     coord subUp( outUp );
                                     __coord(subLo,dim) = __coord(layUp,dim) + 1;
                                     const LAYOUT sub(subLo,subUp);
-                                    //std::cerr << "\t\tupperGhosts[" << iLocal << "]=(" << upper_ng << ").upper.outer=" << sub << std::endl;
                                     outline.load_offsets(sub, g.self.outer.offsets );
                                     assert( sub.items ==  g.self.outer.offsets.size() );
                                 }
                                 
+                                //----------------------------------------------
                                 // finalize
+                                //----------------------------------------------
                                 (size_t&)(g.num_offsets) = g.self.inner.offsets.size();
                                 assert( g.self.outer.offsets.size() == g.num_offsets);
                             }

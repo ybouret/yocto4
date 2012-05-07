@@ -8,6 +8,7 @@ namespace yocto
 {
     namespace swamp
     {
+        //! factory of any arrays for a given dimension
         template <typename LAYOUT>
         class factory 
         {
@@ -46,7 +47,6 @@ namespace yocto
                     throw exception("swamp::factory(can't produce '%s')", spec.name() );
                 linear_base *info = NULL;
                 void        *addr = param->ctor( L, &info );
-                //std::cerr << "Creating <" << name << ">='" << spec.name() << "'" << std::endl;
                 db(name, spec, addr, info, param->dtor);
             }
             

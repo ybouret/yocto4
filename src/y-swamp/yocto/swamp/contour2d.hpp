@@ -8,6 +8,7 @@ namespace yocto
 {
     namespace swamp
     {
+        //! algorithm to find the isolines
         template <typename T>
         struct contour2D
         {

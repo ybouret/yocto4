@@ -12,6 +12,7 @@ namespace yocto
     {
         
         
+        //! three dimensional array
         template <typename T>
         class array3D : public linear<T,layout3D>
         {

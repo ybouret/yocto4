@@ -9,7 +9,7 @@ namespace yocto
     namespace swamp
     {
         
-        
+        //! one dimensional array
         template <typename T>
         class array1D : public linear<T,layout1D>
         {
