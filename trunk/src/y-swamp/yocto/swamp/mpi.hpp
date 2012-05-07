@@ -87,6 +87,45 @@ namespace yocto
                 }
             }
             
+            //! 1D collect a global array in rank 0
+			template <typename T>
+			static inline
+			void collect0( const mpi &MPI, array1D<T> *pA, const array1D<T> &B, const layout1D &full)
+			{
+				static const int   tag = 0xC011;
+				if( 0 == MPI.CommWorldRank )
+				{
+					assert( NULL != pA );
+					array1D<T> &A = *pA;
+					//-- direct copy of B in A
+					{
+						const layout1D sub = full.split(0, MPI.CommWorldSize,0);
+						A.set( B, sub );
+					}
+                    
+					//-- fetch sub data
+					MPI_Status status;
+					for( int r=1; r < MPI.CommWorldSize; ++r )
+					{
+						const layout1D sub   = full.split(r, MPI.CommWorldSize,0);
+						const size_t   bytes = sub.width * sizeof(T);
+						
+                        MPI.Recv( &A[sub.lower], bytes, MPI_BYTE, r, tag, MPI_COMM_WORLD, status);						
+					}
+				}
+				else
+				{
+					assert( NULL == pA );
+					//-- send sub data
+					const layout1D sub   = full.split(MPI.CommWorldRank,MPI.CommWorldSize,0);
+					const size_t   bytes = sub.width * sizeof(T);
+					
+                    MPI.Send( &B[sub.lower], bytes, MPI_BYTE, 0, tag, MPI_COMM_WORLD );
+				}
+			}
+            
+            
+            
             //! 2D collect a global array in rank 0
 			template <typename T>
 			static inline
@@ -131,7 +170,7 @@ namespace yocto
 					
 				}
 			}
-
+            
             
             //! 3D collect a global array in rank 0
 			template <typename T>
