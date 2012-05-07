@@ -127,7 +127,7 @@ namespace
         typedef vector< triangle3D<double> > tvec;
         map<int,tvec> db;
         
-        handler3D()
+        handler3D() : db()
         {
         }
         
