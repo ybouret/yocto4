@@ -55,7 +55,7 @@ namespace yocto
                                const string &sim_path,
                                const string *sim_ui)
     {
-        MPI.Printf0( stderr, "[Visit] SetupParallel\n");
+        MPI.Printf( stderr, "[Visit] SetupParallel %d.%d\n", MPI.CommWorldRank, MPI.CommWorldSize);
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
         //----------------------------------------------------------------------
@@ -72,11 +72,10 @@ namespace yocto
         {
             
             const char *ui_file = sim_ui ? sim_ui->c_str() : NULL;
-            MPI.Printf0( stderr, "[Visit] sim name    = '%s'\n", sim_name.c_str() );
-            MPI.Printf0( stderr, "[Visit] sim comment = '%s'\n", sim_comment.c_str() );
-            MPI.Printf0( stderr, "[Visit] sim path    = '%s'\n", sim_path.c_str() );
-            if( ui_file )
-                MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
+            //MPI.Printf0( stderr, "[Visit] sim name    = '%s'\n", sim_name.c_str() );
+            //MPI.Printf0( stderr, "[Visit] sim comment = '%s'\n", sim_comment.c_str() );
+            //MPI.Printf0( stderr, "[Visit] sim path    = '%s'\n", sim_path.c_str() );
+            //if( ui_file ) MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
             if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(), 
                                                       sim_comment.c_str(), 
                                                       sim_path.c_str(),
