@@ -21,7 +21,7 @@ namespace yocto
             typedef typename linear_type::callback callback;
             typedef typename linear_type::const_cb const_cb;
             typedef typename linear_type::call_two call_two;
-
+            
             explicit array1D( const layout_type & L ) throw();            
             virtual ~array1D() throw();
             

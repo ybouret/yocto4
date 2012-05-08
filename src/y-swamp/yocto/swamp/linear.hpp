@@ -30,7 +30,7 @@ namespace yocto
             
             virtual void  *get_entry() throw() = 0;
             virtual size_t item_size() const throw() = 0;
-            
+
         protected:
             explicit linear_base( size_t num_bytes ) throw();
             static size_t compute_bytes( size_t items, size_t item_size ) throw();
@@ -71,9 +71,13 @@ namespace yocto
             typedef void (*call_two)(type &,const type &,void *); //!< element pair-wise callback
             
             
-            
+            //! iterator on a sub layout
             virtual void foreach( const LAYOUT &sub, callback proc, void *args ) = 0;
+            
+            //! iterator on a constant sub layout
             virtual void foreach( const LAYOUT &sub, const_cb proc, void *args ) const = 0;
+           
+            //! copy value at offset source into value at offset target
             virtual void local_copy( size_t target, size_t source ) throw() 
             {
                 assert(entry!=NULL);
@@ -107,6 +111,7 @@ namespace yocto
                     *(q++) = *(ptr++);
             }
             
+            
             //==================================================================
             // non virtual API
             //==================================================================
@@ -118,7 +123,8 @@ namespace yocto
 			inline void load( ios::istream &fp, const LAYOUT &sub)       { foreach( sub, load_cb, &fp); }
             inline void hash( hashing::function &fn, const LAYOUT &sub ) const { fn.set(); foreach(sub, hash_cb, &fn); }
             
-                     
+            
+
             
         protected:
 			static inline void set_cb( type &v, void *args) throw() { assert(args); v  = *(type*)args; }
@@ -149,6 +155,7 @@ namespace yocto
                 hashing::function &fn = *(hashing::function *)args;
                 fn.run( &v, sizeof(type) );
             }
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear);
