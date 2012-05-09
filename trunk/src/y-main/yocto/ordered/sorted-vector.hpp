@@ -8,6 +8,8 @@
 #include "yocto/code/swap.hpp"
 #include "yocto/bitwise.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	
@@ -142,6 +144,14 @@ namespace yocto
 			return item_[ index ];
 		}
 		
+        inline friend std::ostream & operator<<( std::ostream &os, const sorted_vector<T> &a )
+		{
+			os << "[ ";
+			for( size_t i=1; i <= a.size(); ++i ) os <<  a[i] << ' ';
+			os << "]'";
+			return os;
+		}
+        
 	private:
 		YOCTO_DISABLE_ASSIGN(sorted_vector);
 		ALLOCATOR          hmem_; //!< handle memory
