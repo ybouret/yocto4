@@ -75,7 +75,7 @@ namespace yocto
         MPI.Printf(stderr,"rank %d> '%s'\n", par_rank, cmd.c_str());
     }
     
-    void VisIt:: Simulation::  get_meta_data( visit_handle md ) const
+    void VisIt:: Simulation::  get_meta_data( visit_handle &md ) const
     {
         assert( VISIT_INVALID_HANDLE != md );
     }

@@ -29,12 +29,14 @@ namespace yocto
     {
         VisItSetOptions( (char *) options.c_str() );
     }
-    
+   
+#if 0
     void VisIt:: SetupEnvironment()
     {
         if( !VisItSetupEnvironment() )
             throw exception("VisItSetupEnvironment Failure!");
     }
+#endif
     
     namespace 
     {
@@ -57,6 +59,12 @@ namespace yocto
     {
         MPI.Printf( stderr, "[Visit] SetupParallel %d.%d\n", MPI.CommWorldRank, MPI.CommWorldSize);
         //----------------------------------------------------------------------
+        // startup VisIt
+        //----------------------------------------------------------------------
+        if( !VisItSetupEnvironment() )
+            throw exception("VisItSetupEnvironment Failure!");
+        
+        //----------------------------------------------------------------------
         // Install callback functions for global communication.
         //----------------------------------------------------------------------
         VisItSetBroadcastIntFunction(visit_broadcast_int_callback); 
@@ -68,14 +76,18 @@ namespace yocto
         VisItSetParallel(     MPI.CommWorldSize > 1 ); 
         VisItSetParallelRank( MPI.CommWorldRank     );
         
+        //----------------------------------------------------------------------
+        // Finish setting up the simulation
+        //----------------------------------------------------------------------
+        const char *ui_file = sim_ui ? sim_ui->c_str() : NULL;
+        MPI.Printf0( stderr, "[Visit] sim name    = '%s'\n", sim_name.c_str() );
+        MPI.Printf0( stderr, "[Visit] sim comment = '%s'\n", sim_comment.c_str() );
+        MPI.Printf0( stderr, "[Visit] sim path    = '%s'\n", sim_path.c_str() );
+        if( ui_file ) MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
         if( 0 == MPI.CommWorldRank )
         {
             
-            const char *ui_file = sim_ui ? sim_ui->c_str() : NULL;
-            //MPI.Printf0( stderr, "[Visit] sim name    = '%s'\n", sim_name.c_str() );
-            //MPI.Printf0( stderr, "[Visit] sim comment = '%s'\n", sim_comment.c_str() );
-            //MPI.Printf0( stderr, "[Visit] sim path    = '%s'\n", sim_path.c_str() );
-            //if( ui_file ) MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
+           
             if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(), 
                                                       sim_comment.c_str(), 
                                                       sim_path.c_str(),

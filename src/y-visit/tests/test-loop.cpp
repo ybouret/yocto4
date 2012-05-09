@@ -93,7 +93,7 @@ private:
 YOCTO_UNIT_TEST_IMPL(loop)
 {
     
-       VisIt:: SetupEnvironment();
+    //VisIt:: SetupEnvironment();
     
     const string sim_name    = "Simulation";
     const string sim_comment = "Simulation Comment";
@@ -102,7 +102,7 @@ YOCTO_UNIT_TEST_IMPL(loop)
     mpi &MPI = mpi::init( &argc, &argv );
     const string       trace_name = "trace.dat";
     VisIt:: TraceFile  trace_file( MPI.CommWorldRank, trace_name );
-
+    
     VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path, &sim_ui);
     MySim sim(MPI);
     

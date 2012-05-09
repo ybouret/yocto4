@@ -81,7 +81,7 @@ namespace
         }
         
         
-        virtual void get_meta_data( visit_handle md ) const
+        virtual void get_meta_data( visit_handle &md ) const
         {
             assert( VISIT_INVALID_HANDLE != md );
             
@@ -89,12 +89,13 @@ namespace
             if( VisIt_MeshMetaData_alloc( &mmd ) == VISIT_OKAY )
             {
                 assert( VISIT_INVALID_HANDLE != mmd );
-                MPI.Printf( stderr, "\t @%d> Registering mesh2d /#%d\n", par_rank, par_size);
+                MPI.Printf( stderr, "\t @%d.%d> Registering mesh2d\n", par_rank, par_size);
                 VisIt_MeshMetaData_setName( mmd, "mesh2d" );
                 VisIt_MeshMetaData_setMeshType( mmd, VISIT_MESHTYPE_RECTILINEAR );
                 VisIt_MeshMetaData_setTopologicalDimension( mmd, 2);
                 VisIt_MeshMetaData_setSpatialDimension(mmd, 2);
                 VisIt_MeshMetaData_setNumDomains(mmd, par_size);
+                
                 VisIt_SimulationMetaData_addMesh(md, mmd);
             }
         }
@@ -139,10 +140,8 @@ YOCTO_UNIT_TEST_IMPL(s2d)
 {
     
     //--------------------------------------------------------------------------
-    // VisIt common environment
+    //info for VisIt
     //--------------------------------------------------------------------------
-    VisIt:: SetupEnvironment();
-    
     const string sim_name    = "Simulation2D";
     const string sim_comment = "Simple Simulation 2D";
     const string sim_path    = ".";
@@ -198,7 +197,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // Initialize the simulation
     //--------------------------------------------------------------------------
-
+    
     
     //--------------------------------------------------------------------------
     // Initialize ghosts
