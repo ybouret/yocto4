@@ -3,6 +3,8 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/auto-ptr.hpp"
 
+#include <cstdlib>
+
 namespace yocto 
 {
     
@@ -184,6 +186,8 @@ namespace yocto
     // SimGetDomainList callback
     //
     //==========================================================================
+   
+ 
     static 
     visit_handle SimGetDomainList(const char *name, void *cbdata)
     {
