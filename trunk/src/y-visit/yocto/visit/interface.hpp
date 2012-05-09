@@ -53,7 +53,7 @@ namespace yocto
             const mpi &MPI;       //!< MPI singleton reference
             const bool console;   //!< shall use the interactive console
             const int  par_rank;  //!< alias MPI.CommWorldRank 
-            const int  par_size;  //!< alias MPi.CommWorldSize
+            const int  par_size;  //!< alias MPI.CommWorldSize
             const bool parallel;  //!< par_size > 1
             const bool master;    //!< 0 == par_rank
             
