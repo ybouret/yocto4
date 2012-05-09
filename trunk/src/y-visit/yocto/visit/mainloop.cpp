@@ -186,8 +186,6 @@ namespace yocto
     // SimGetDomainList callback
     //
     //==========================================================================
-   
- 
     static 
     visit_handle SimGetDomainList(const char *name, void *cbdata)
     {
@@ -209,6 +207,20 @@ namespace yocto
             }
         }
         return h;
+    }
+    
+    //==========================================================================
+    //
+    // SimGetVariable callback
+    //
+    //==========================================================================
+    static
+    visit_handle SimGetVariable(int domain, const char *name, void *cbdata)
+    {
+        assert(cbdata);
+        VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+        const string id(name);
+        return sim.get_variable(domain, id);
     }
     
     
@@ -338,6 +350,7 @@ namespace yocto
                         VisItSetGetMetaData(SimGetMetaData,cbdata);
                         VisItSetGetMesh(SimGetMesh, cbdata);
                         VisItSetGetDomainList(SimGetDomainList,cbdata);
+                        VisItSetGetVariable(SimGetVariable,cbdata);
                     }
                     else
                     {
