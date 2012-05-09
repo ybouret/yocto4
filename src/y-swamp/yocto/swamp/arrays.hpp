@@ -23,6 +23,7 @@ namespace yocto
             /**
              \param array_name array identifier
              \param array_spec array class type
+             \param array_held array content type
              \param array_addr handle to the array
              \param array_info memory requirements for the array
              \param array_kill array destructor wrapper

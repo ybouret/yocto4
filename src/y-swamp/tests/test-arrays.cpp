@@ -33,8 +33,8 @@ YOCTO_UNIT_TEST_IMPL(arrays)
 
     {
         const layout1D L( rand1(), rand1() );
-        F1.produce("flt1", L, typeid(array1D<float>), typeid(float), ADB);
-        F1.produce("dbl1", L, typeid(array1D<double>),typeid(double), ADB);
+        F1.produce("flt1", L, typeid(array1D<float>),  ADB);
+        F1.produce("dbl1", L, typeid(array1D<double>), ADB);
         F1.make< array1D<unit_t> > ("int1", L, ADB);
         array1D<float> &A = ADB["flt1"].as< array1D<float> >();
         (void)A;

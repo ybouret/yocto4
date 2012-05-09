@@ -7,13 +7,14 @@
 #include "yocto/string.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/type-spec.hpp"
-
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto 
 {
     namespace swamp 
     {
         
+        //! format for basic types
         class vtk_format
         {
         public:
@@ -29,7 +30,7 @@ namespace yocto
         
         
         
-        
+        //! write all arrays
         class vtk_writer
         {
         public:
@@ -64,7 +65,7 @@ namespace yocto
             //! write VTK header file
             void header( ios::ostream &fp, const string &title ) const;
             
-            //! write a rmesh
+            //! write a 2D rmesh
             template <typename T>
             void write_mesh( ios::ostream &fp, const rmesh<T,layout2D> &mesh , const layout2D &sub )
             {
@@ -73,25 +74,62 @@ namespace yocto
                 const array1D<T> &Y = mesh.Y(); assert(Y.lower>=sub.lower.y); assert(Y.upper<=sub.upper.y);
                 write_rmesh_sub(fp,sub);
                 write_axis_sub(fp, &X[sub.lower.x], sub.width.x, sizeof(T), r, 'X');
-                write_axis_sub(fp, &X[sub.lower.x], sub.width.x, sizeof(T), r, 'Y');
+                write_axis_sub(fp, &Y[sub.lower.y], sub.width.y, sizeof(T), r, 'Y');
                 const T Z = 0;
                 write_axis_sub(fp, &Z, 1, sizeof(T), r, 'Z' );
             }
             
+            //! write a 3D rmesh
+            template <typename T>
+            void write_mesh( ios::ostream &fp, const rmesh<T,layout3D> &mesh , const layout3D &sub )
+            {
+                const record     &r = (*this)[ typeid(T) ];
+                const array1D<T> &X = mesh.X(); assert(X.lower>=sub.lower.x); assert(X.upper<=sub.upper.x);
+                const array1D<T> &Y = mesh.Y(); assert(Y.lower>=sub.lower.y); assert(Y.upper<=sub.upper.y);
+                const array1D<T> &Z = mesh.Z(); assert(Z.lower>=sub.lower.z); assert(Z.upper<=sub.upper.z);
+
+                write_rmesh_sub(fp,sub);
+                write_axis_sub(fp, &X[sub.lower.x], sub.width.x, sizeof(T), r, 'X');
+                write_axis_sub(fp, &Y[sub.lower.y], sub.width.y, sizeof(T), r, 'Y');
+                write_axis_sub(fp, &Z[sub.lower.z], sub.width.z, sizeof(T), r, 'Z' );
+            }
+
+               
             //! write POINT_DATA
             void prolog( ios::ostream &fp, const string &name, size_t num, const record &r) const;
             
             //! write one item
             void write1( ios::ostream &fp, const void *data, const record &r) const;
             
-            
+            //! write a 2D array (after its mesh)
             void write_array( ios::ostream &fp, const string &name, const varray &arr, const layout2D &full, const layout2D &sub) const;
                        
+            //! write a 3D array (after its mesh)
+            void write_array( ios::ostream &fp, const string &name, const varray &arr, const layout3D &full, const layout3D &sub) const;
+            
+            
+            //! unique vtk save routine
+            template <typename U,typename LAYOUT>
+            void save( const string &filename, const string &title, const workspace<LAYOUT, U, rmesh> &wksp, const array<string> &var, const LAYOUT &sub )
+            {
+                ios::ocstream fp(filename,false);
+                header(fp, title);
+                write_mesh(fp,wksp.mesh,sub);
+                for( size_t q=1; q <= var.size(); ++q )
+                {
+                    const string &name = var[q];
+                    const varray &arr  = wksp[name];
+                    write_array(fp, name, arr, wksp.outline, sub);
+                }
+            }
+
             
         private:            
             vtk_format              format;
             set<type_spec,record>   out_db;
             void  write_rmesh_sub( ios::ostream &fp, const layout2D &sub ) const;
+            void  write_rmesh_sub( ios::ostream &fp, const layout3D &sub ) const;
+
             void  write_axis_sub( ios::ostream &fp, const void *data, size_t num, size_t item_size, const record &r, char axis_id ) const;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(vtk_writer);

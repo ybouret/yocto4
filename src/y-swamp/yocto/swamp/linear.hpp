@@ -26,15 +26,20 @@ namespace yocto
             
             //! copy entry[source] into ptr
             virtual void async_store( uint8_t * &ptr, size_t source ) const throw()     = 0;
+            
+            //! copy ptr intro entry[source]
             virtual void async_query( const uint8_t * &ptr, size_t source ) throw()     = 0;
             
-            //virtual void  *get_entry() throw() = 0;
+            //! item size
             virtual size_t item_size() const throw() = 0;
+            
+            //! &entry[source]
             virtual const  void *address_of( size_t source ) const throw() = 0;
             
         protected:
             explicit linear_base( size_t num_bytes ) throw();
-            static size_t compute_bytes( size_t items, size_t item_size ) throw();
+            static size_t compute_bytes( size_t items, size_t the_item_size ) throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear_base);
         };
@@ -87,9 +92,8 @@ namespace yocto
                 entry[target]=entry[source];
             }
             
-           // virtual void *get_entry() throw()  { return entry; }
             
-            virtual size_t item_size() const throw() { return sizeof(T); }
+            virtual size_t       item_size() const throw() { return sizeof(T); }
             virtual const  void *address_of( size_t source ) const throw() 
             {
                 assert(source>0);
@@ -97,7 +101,7 @@ namespace yocto
                 return entry+source;
             }
             
-            virtual void   async_store( uint8_t * &ptr, size_t source ) const throw() 
+            virtual void async_store( uint8_t * &ptr, size_t source ) const throw() 
             {
                 assert(entry!=NULL);
                 assert(source<this->items);
