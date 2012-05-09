@@ -7,6 +7,8 @@ namespace yocto
 {
     namespace swamp 
     {
+        
+        //! a workspace based on data+mesh
         template <
         typename LAYOUT,
         typename U,

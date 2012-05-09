@@ -43,12 +43,12 @@ namespace yocto
             
             inline ~field_info() throw() {}
             
-            const string     name;
-            const type_spec  spec;
-            const type_spec  held;
-            const bool       async;
-            const array_ctor ctor;
-            const array_dtor dtor;
+            const string     name;  //!< variable name
+            const type_spec  spec;  //!< field type
+            const type_spec  held;  //!< associated field content
+            const bool       async; //!< exchanged ?
+            const array_ctor ctor;  //!< the constructor
+            const array_dtor dtor;  //!< the destructor
             
             inline const string & key() const throw() { return name; }
             typedef set<string,field_info<LAYOUT> > db;

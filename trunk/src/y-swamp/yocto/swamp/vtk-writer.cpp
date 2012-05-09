@@ -120,6 +120,7 @@ do { const record r( typeid(TYPE), KIND, PROC); if( !out_db.insert(r) ) throw ex
             assert(data);
             assert(r.proc);
             r.proc( fp, data, format );
+            fp.write('\n');
         }
         
         
@@ -152,6 +153,13 @@ do { const record r( typeid(TYPE), KIND, PROC); if( !out_db.insert(r) ) throw ex
             fp("DIMENSIONS %u %u 1\n", unsigned(sub.width.x), unsigned(sub.width.y) );
         }
         
+        void  vtk_writer:: write_rmesh_sub( ios::ostream &fp, const layout3D &sub ) const
+        {
+            fp("DATASET RECTILINEAR_GRID\n");
+            fp("DIMENSIONS %u %u %u\n", unsigned(sub.width.x), unsigned(sub.width.y), unsigned(sub.width.z) );
+        }
+        
+        
         void  vtk_writer:: write_axis_sub( ios::ostream &fp, const void *data, size_t num, size_t item_size, const record &r, char axis_id ) const
         {
             assert(data!=NULL);
@@ -168,19 +176,64 @@ do { const record r( typeid(TYPE), KIND, PROC); if( !out_db.insert(r) ) throw ex
         void vtk_writer:: write_array( ios::ostream &fp, const string &name, const varray &arr, const layout2D &full, const layout2D &sub) const
         {
             assert(full.contains(sub));
+            
+            //------------------------------------------------------------------
+            // find how to write each item
+            //------------------------------------------------------------------
             const record &r = (*this)[arr.held];
+            
+            //------------------------------------------------------------------
+            // write the point data information
+            //------------------------------------------------------------------
             prolog(fp, name, sub.items, r);
+            
+            //------------------------------------------------------------------
+            // write all items of the sub layout
+            //------------------------------------------------------------------
             const linear_base &h = * arr.handle();
             for( unit_t j=sub.lower.y; j<=sub.upper.y; ++j)
             {
                 for( unit_t i=sub.lower.x; i<=sub.upper.x; ++i)
                 {
                     const coord2D c(i,j);
-                    r.proc(fp, h.address_of( full.offset_of(c) ), format );
+                    write1(fp, h.address_of( full.offset_of(c) ),r);
                 }
             }
         }
-
+        
+        void vtk_writer:: write_array( ios::ostream &fp, const string &name, const varray &arr, const layout3D &full, const layout3D &sub) const
+        {
+            assert(full.contains(sub));
+            
+            //------------------------------------------------------------------
+            // find how to write each item
+            //------------------------------------------------------------------
+            const record &r = (*this)[arr.held];
+            
+            //------------------------------------------------------------------
+            // write the point data information
+            //------------------------------------------------------------------
+            prolog(fp, name, sub.items, r);
+            
+            //------------------------------------------------------------------
+            // write all items of the sub layout
+            //------------------------------------------------------------------
+            const linear_base &h = * arr.handle();
+            for(unit_t k=sub.lower.z; k <= sub.upper.z; ++k )
+            {
+                
+                for( unit_t j=sub.lower.y; j<=sub.upper.y; ++j)
+                {
+                    for( unit_t i=sub.lower.x; i<=sub.upper.x; ++i)
+                    {
+                        const coord3D c(i,j,k);
+                        write1(fp, h.address_of( full.offset_of(c) ),r);
+                    }
+                }
+            }
+        }
+        
+        
         
     }
 }

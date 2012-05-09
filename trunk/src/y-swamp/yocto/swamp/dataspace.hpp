@@ -383,7 +383,7 @@ namespace yocto
                     array_db &adb = *this;
                     const field_info<LAYOUT> &f = *i;
                     fieldsMaker.record(  f.spec, f.held, f.ctor,  f.dtor );
-                    fieldsMaker.produce( f.name, outline, f.spec, f.held, adb );
+                    fieldsMaker.produce( f.name, outline, f.spec,  adb );
                     if( f.async )
                     {
                         usingGhosts.push_back( adb[ f.name ].handle() );
