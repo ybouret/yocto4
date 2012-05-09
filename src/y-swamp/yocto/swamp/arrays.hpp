@@ -29,6 +29,7 @@ namespace yocto
              */
             explicit varray(const string         &array_name, 
                             const type_spec      &array_spec,
+                            const type_spec      &array_held,
                             void *                array_addr,
                             linear_base          *array_info,
                             void                (*array_kill)(void *));
@@ -61,8 +62,10 @@ namespace yocto
             
             const string    name; //!< array unique name
             const type_spec spec; //!< array class type
+            const type_spec held; //!< array content type
             
             linear_base *handle() throw();
+            const linear_base *handle() const throw();
             
         private:
             void             *addr;
@@ -86,6 +89,7 @@ namespace yocto
             //! take care of addr
             void operator()(const string         &name, 
                             const type_spec      &spec, 
+                            const type_spec      &held,
                             void                 *addr,
                             linear_base          *info,
                             void                (*kill)( void *)

@@ -22,11 +22,13 @@ namespace yocto
         
         varray:: varray(const string         &array_name, 
                         const type_spec      &array_spec,
+                        const type_spec      &array_held,
                         void *                array_addr,
                         linear_base          *array_info,
                         void                (*array_kill)(void *)) :
         name(  array_name ),
         spec(  array_spec ),
+        held(  array_held ),
         addr(  varray_check_addr(array_addr) ),
         kill(  array_kill ),
         info( varray_check_info(array_info) ),
@@ -37,6 +39,11 @@ namespace yocto
         }
         
         linear_base * varray:: handle() throw()
+        {
+            return info;
+        }
+        
+        const linear_base * varray:: handle() const throw()
         {
             return info;
         }
@@ -63,6 +70,7 @@ namespace yocto
         
         void array_db:: operator()(const string         &name, 
                                    const type_spec      &spec, 
+                                   const type_spec      &held,
                                    void                 *addr,
                                    linear_base          *info,
                                    void                (*kill)( void *)
@@ -80,7 +88,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 // create the array with its memory
                 //--------------------------------------------------------------
-                arr = new varray(name,spec,addr,info,kill);
+                arr = new varray(name,spec,held,addr,info,kill);
             }
             catch(...)
             {

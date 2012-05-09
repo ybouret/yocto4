@@ -28,9 +28,10 @@ namespace yocto
             virtual void async_store( uint8_t * &ptr, size_t source ) const throw()     = 0;
             virtual void async_query( const uint8_t * &ptr, size_t source ) throw()     = 0;
             
-            virtual void  *get_entry() throw() = 0;
+            //virtual void  *get_entry() throw() = 0;
             virtual size_t item_size() const throw() = 0;
-
+            virtual const  void *address_of( size_t source ) const throw() = 0;
+            
         protected:
             explicit linear_base( size_t num_bytes ) throw();
             static size_t compute_bytes( size_t items, size_t item_size ) throw();
@@ -86,12 +87,15 @@ namespace yocto
                 entry[target]=entry[source];
             }
             
-            virtual void *get_entry() throw() 
-            {
-                return entry;
-            }
+           // virtual void *get_entry() throw()  { return entry; }
             
             virtual size_t item_size() const throw() { return sizeof(T); }
+            virtual const  void *address_of( size_t source ) const throw() 
+            {
+                assert(source>0);
+                assert(source<this->items);
+                return entry+source;
+            }
             
             virtual void   async_store( uint8_t * &ptr, size_t source ) const throw() 
             {

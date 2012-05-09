@@ -18,12 +18,14 @@ namespace yocto
             typedef typename factory<LAYOUT>::array_dtor array_dtor;
             
             inline field_info(const char           * _name,
-                              const std::type_info & _info,
+                              const std::type_info & _spec,
+                              const std::type_info & _held,
                               const bool             _async,
                               const array_ctor       _ctor,
                               const array_dtor       _dtor) :
             name(  _name  ),
-            spec(  _info  ),
+            spec(  _spec  ),
+            held(  _held  ),
             async( _async ),
             ctor(  _ctor  ),
             dtor(  _dtor  )
@@ -32,6 +34,7 @@ namespace yocto
             inline field_info( const field_info &other ) :
             name(  other.name  ),
             spec(  other.spec  ),
+            held(  other.held  ),
             async( other.async ),
             ctor(  other.ctor  ),
             dtor(  other.dtor  )
@@ -42,6 +45,7 @@ namespace yocto
             
             const string     name;
             const type_spec  spec;
+            const type_spec  held;
             const bool       async;
             const array_ctor ctor;
             const array_dtor dtor;
@@ -67,7 +71,7 @@ namespace yocto
             template <typename ARRAY>
             void add( const char *name, bool async )
             {
-                const field_info<LAYOUT> f( name, typeid(ARRAY), async, ARRAY::ctor, ARRAY::dtor );
+                const field_info<LAYOUT> f( name, typeid(ARRAY), typeid( typename ARRAY::type), async, ARRAY::ctor, ARRAY::dtor );
                 if( ! this->insert(f) )
                     throw exception("field_layout%uD( multiple '%s')", unsigned(LAYOUT::DIMENSIONS), f.name.c_str() );
             }

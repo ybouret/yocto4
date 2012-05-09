@@ -17,17 +17,21 @@ namespace yocto
             typedef typename __array<T,LAYOUT::DIMENSIONS>::type  array_type;
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type region_type;
             
+            const type_spec data_spec;
+            
             explicit cmesh( array_db &db, const LAYOUT &L) :
             quadmesh( db ),
             LAYOUT(L)
             {
                 const type_spec spec( typeid(array_type) );
+                const type_spec held( typeid(T)          );
+                
                 for( size_t iAxis = 0; iAxis < LAYOUT::DIMENSIONS; ++iAxis )
                 {
                     const string name( quadmesh::axis_name( iAxis ) );
                     linear_base *info = NULL;
                     void        *addr = array_type::ctor( L, &info );
-                    adb(name, spec, addr, info, array_type::dtor);                    
+                    adb(name, spec, held, addr, info, array_type::dtor);                    
                 }
             }
             

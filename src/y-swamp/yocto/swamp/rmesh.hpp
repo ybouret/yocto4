@@ -16,6 +16,7 @@ namespace yocto
             typedef array1D<T> axis_type;   //!< one axis
             typedef layout1D   axis_layout; //!< axis layout
             const   type_spec  axis_spec;   //!< for array_db
+            const   type_spec  data_spec;   //!< for array_db
             
             //! associated region type
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type   region_type;
@@ -24,7 +25,8 @@ namespace yocto
             explicit rmesh( array_db &db, const LAYOUT &L ) :
             quadmesh( db ),
             LAYOUT( L ),
-            axis_spec( typeid(axis_type) )
+            axis_spec( typeid(axis_type) ),
+            data_spec( typeid(T)         )
             {
                 const unit_t *pLower = (const unit_t *) & (this->lower);
                 const unit_t *pUpper = (const unit_t *) & (this->upper);
@@ -37,7 +39,7 @@ namespace yocto
                         const string      name( quadmesh::axis_name(iAxis) );       //!< find its name
                         linear_base *     info = NULL;                          //!< prepare memory info
                         void *            addr = axis_type::ctor( alay, &info); //!< create the axis
-                        adb(name, axis_spec, addr, info, axis_type::dtor);      //!< insert it in the database
+                        adb(name, axis_spec, data_spec, addr, info, axis_type::dtor);      //!< insert it in the database
                     }
                     if( up > lo )
                     {
@@ -45,7 +47,7 @@ namespace yocto
                         const string      name( quadmesh::delta_name(iAxis) );      //!< find its name
                         linear_base *     info = NULL;                          //!< prepare memory info
                         void *            addr = axis_type::ctor( alay, &info); //!< create the axis
-                        adb(name, axis_spec, addr, info, axis_type::dtor);      //!< insert it in the database
+                        adb(name, axis_spec, data_spec, addr, info, axis_type::dtor);      //!< insert it in the database
                     }
                 }
             }
