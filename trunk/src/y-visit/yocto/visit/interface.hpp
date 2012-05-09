@@ -11,6 +11,7 @@
 namespace yocto 
 {
     
+    //! VisIt wrapper
     class VisIt
     {
     public:
@@ -39,7 +40,7 @@ namespace yocto
         static const size_t                            IOBufferSize = 1024;
         
         
-        
+        //! base class for a simulation
         class Simulation
         {
         public:
@@ -58,12 +59,21 @@ namespace yocto
             const bool master;    //!< 0 == par_rank
             
             //! provide meta data information
+            /**
+             meta data for meshes, specific commands...
+             */
             virtual void get_meta_data( visit_handle &md ) const;
             
             //! provide mesh
+            /**
+             user's mesh data
+             */
             virtual visit_handle get_mesh( int domain, const string &name ) const;
             
             //! provide variable
+            /**
+             user's variable data
+             */
             virtual visit_handle get_variable( int domain, const string &name ) const;
             
             //! the step function

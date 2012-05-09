@@ -30,8 +30,10 @@ namespace
     public:
         explicit MyFields() : FieldsSetup(8)
         {
-            Y_SWAMP_DECL_VAR( *this, "U", Array);
-            Y_SWAMP_DECL_VAR( *this, "V", Array);
+            Y_SWAMP_DECL_VAR( *this, "U",  Array);
+            Y_SWAMP_DECL_VAR( *this, "V",  Array);
+            Y_SWAMP_DECL_AUX( *this, "LU", Array);
+            Y_SWAMP_DECL_AUX( *this, "LV", Array);
         }
         
         virtual ~MyFields() throw()
@@ -52,19 +54,32 @@ namespace
     public:
         Array &U;
         Array &V;
+        Array &LU;
+        Array &LV;
+        
         mpi::Requests requests;
         const Array1D &X;
         const Array1D &Y;
+        const Array1D &dX;
+        const Array1D &dY;
+        Real  alpha;
+        Real  beta;
         
         explicit MySim(  const mpi &ref, const Layout &L, const GhostsSetup &G ) :
         VisIt::Simulation( ref ),
         MyFields(),
         Workspace( L, G, *this ),
-        U( (*this)["U"].as<Array>() ),
-        V( (*this)["V"].as<Array>() ),
+        U(  (*this)["U" ].as<Array>() ),
+        V(  (*this)["V" ].as<Array>() ),
+        LU( (*this)["LU"].as<Array>() ),
+        LV( (*this)["LV"].as<Array>() ),
         requests( num_requests() ),
         X(mesh.X()),
-        Y(mesh.Y())
+        Y(mesh.Y()),
+        dX( mesh.dX() ),
+        dY( mesh.dY() ),
+        alpha( 1e-2 ),
+        beta( 1e-3 )
         {
             prepare_ghosts();
         }
@@ -82,8 +97,8 @@ namespace
                     const Real r2 = x*x+y*y;
                     const Real r  = sqrt(r2);
                     
-                    U[j][i] = cos(5*r);// +  (0.5 - alea<Real>());
-                    V[j][i] = Real(par_rank+1)/Real(par_size);
+                    U[j][i] = 2+cos(5*r) +  (0.5 - alea<Real>());
+                    V[j][i] = 1+(0.5 - alea<Real>());
                 }
             }
         }
@@ -103,9 +118,31 @@ namespace
         }
         
         
+        virtual void perform( const string &cmd )
+        {
+            MPI.Printf( stderr, "sim %d.%d> %s\n", par_rank, par_size, cmd.c_str() );
+            if( cmd == "raz" )
+            {
+                initialize();
+                init_exchange();
+                wait_exchange();
+                
+            }
+        }
+        
         virtual void get_meta_data( visit_handle &md ) const
         {
             assert( VISIT_INVALID_HANDLE != md );
+            
+            {
+                visit_handle cmd = VISIT_INVALID_HANDLE;
+                if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
+                {
+                    VisIt_CommandMetaData_setName(cmd, "raz" );
+                    VisIt_SimulationMetaData_addGenericCommand(md, cmd);
+                }
+            }
+            
             
             {
                 visit_handle mmd = VISIT_INVALID_HANDLE;
@@ -152,7 +189,6 @@ namespace
         
         virtual visit_handle get_mesh( int domain, const string &name ) const
         {
-            //MPI.Printf( stderr, "rank %d> SIM:get_mesh '%s', domain=%d\n", par_rank, name.c_str(), domain);
             visit_handle h = VISIT_INVALID_HANDLE;
             if( name == "mesh2d" )
             {
@@ -165,20 +201,20 @@ namespace
                     visit_handle   hx = VISIT_INVALID_HANDLE;
                     visit_handle   hy = VISIT_INVALID_HANDLE;
                     VisIt_VariableData_alloc(&hx);
-                    VisIt_VariableData_setDataD(hx, VISIT_OWNER_SIM, 1, X.items, (double *)&X[ X.lower ] );
+                    VisIt_VariableData_setDataD(hx, VISIT_OWNER_SIM, 1, X.items, X.entry );
                     VisIt_VariableData_alloc(&hy);
-                    VisIt_VariableData_setDataD(hy, VISIT_OWNER_SIM, 1, Y.items, (double *)&Y[ Y.lower ] );
+                    VisIt_VariableData_setDataD(hy, VISIT_OWNER_SIM, 1, Y.items, Y.entry );
                     
                     VisIt_RectilinearMesh_setCoordsXY(h, hx, hy);
                     
-                    int minRealIndex[3] = { 0,         2 ,        0 };
-                    int maxRealIndex[3] = { X.width-1, Y.width-3, 0 };
-                   
+                    int minRealIndex[3] = { 1,         2 ,        0 };
+                    int maxRealIndex[3] = { X.width-2, Y.width-3, 0 };
+                    
                     if(  par_rank < par_size - 1)
                         maxRealIndex[1]++;
                     
                     VisIt_RectilinearMesh_setRealIndices(h, minRealIndex, maxRealIndex);
-
+                    
                 }
             }
             return h;
@@ -217,9 +253,61 @@ namespace
             return h;
         }
         
+        
+        void computeLaplacian( Array &Lap, const Array &f, unit_t i, unit_t j )
+        {
+            const Real dx2 = dX[i]*dX[i];
+            const Real dy2 = dY[j]*dY[j];
+            const Real fac = 0.5 * ( dx2 + dy2 );
+            Lap[j][i] = fac * ( (f[j][i-1] - 2*f[j][i] + f[j][i+1])/dx2+ (f[j-1][i] - 2*f[j][i] + f[j+1][i])/dy2); 
+        }
+        
+        void computeLaplacians( unit_t i, unit_t j )
+        {
+            computeLaplacian(LU, U, i,j );
+            computeLaplacian(LV, V, i,j );            
+        }
+        
         virtual void step()
         {
             MPI.Printf0( stderr, "[Simulation Cycle %6d ]\n", cycle);
+            
+            //------------------------------------------------------------------
+            // at this point, all data are in place: compute laplacians
+            //------------------------------------------------------------------
+            for( unit_t j=lower.y; j <= upper.y; ++j )
+            {
+                for(unit_t i=lower.x; i <= upper.x; ++i )
+                {
+                    computeLaplacians(i,j);
+                }
+            }
+            
+            for( unit_t j=lower.y; j <= upper.y; ++j )
+            {
+                for(unit_t i=lower.x; i <= upper.x; ++i )
+                {
+                    U[j][i] += alpha * LU[j][i];
+                    V[j][i] += alpha * LV[j][i];
+                }
+            }
+            
+            //------------------------------------------------------------------
+            // reaction
+            //------------------------------------------------------------------
+            for( unit_t j=lower.y; j <= upper.y; ++j )
+            {
+                for(unit_t i=lower.x; i <= upper.x; ++i )
+                {
+                    const Real dU =  U[j][i] * (1 - V[j][i] );
+                    const Real dV = -V[j][i] * (1 - U[j][i] );
+                    
+                    U[j][i] += alpha * dU;
+                    V[j][i] += alpha * dV;
+                    
+                }
+            }
+            
             init_exchange();
             wait_exchange();
         }
@@ -258,7 +346,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // get the full layout
     //--------------------------------------------------------------------------
-    const Layout full_layout( Coord(1,1), Coord(21,21) );
+    const Layout full_layout( Coord(1,1), Coord(11,21) );
     
     //--------------------------------------------------------------------------
     // create the ghosts
@@ -275,6 +363,8 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     {
         sim_ghosts.local.count.y = 2;
     }
+    
+    sim_ghosts.local.count.x = 1; // PBC for x
     
     //--------------------------------------------------------------------------
     // create the sim layout

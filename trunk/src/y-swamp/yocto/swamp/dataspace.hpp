@@ -184,10 +184,7 @@ namespace yocto
                     //
                     //==========================================================
                     new ((void*)&outline) LAYOUT( outLo,  outUp );
-                    new ((void*)&sync)    LAYOUT( syncLo, syncUp);
-                    std::cerr << "dataspace layout=" << this-> __layout() << std::endl;
-                    std::cerr << "dataspace outline=" << outline  << std::endl;
-                    
+                    new ((void*)&sync)    LAYOUT( syncLo, syncUp);                    
                 }
                 
                 {
