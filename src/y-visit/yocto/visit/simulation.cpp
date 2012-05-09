@@ -86,6 +86,10 @@ namespace yocto
         return VISIT_INVALID_HANDLE;
     }
     
-    
+    visit_handle VisIt:: Simulation::  get_variable( int domain, const string &name ) const
+    { 
+        MPI.Printf0(stderr, "get_variable(%d,'%s')\n", domain, name.c_str() );
+        return VISIT_INVALID_HANDLE;
+    }
     
 }

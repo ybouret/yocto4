@@ -63,6 +63,8 @@ namespace yocto
             //! provide mesh
             virtual visit_handle get_mesh( int domain, const string &name ) const;
             
+            //! provide variable
+            virtual visit_handle get_variable( int domain, const string &name ) const;
             
             //! the step function
             virtual void step();  

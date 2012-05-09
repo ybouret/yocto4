@@ -4,7 +4,7 @@
 
 #include "yocto/swamp/common.hpp"
 #include "yocto/swamp/mpi.hpp"
-
+#include "yocto/code/rand.hpp"
 
 using namespace yocto;
 using namespace swamp;
@@ -53,6 +53,8 @@ namespace
         Array &U;
         Array &V;
         mpi::Requests requests;
+        const Array1D &X;
+        const Array1D &Y;
         
         explicit MySim(  const mpi &ref, const Layout &L, const GhostsSetup &G ) :
         VisIt::Simulation( ref ),
@@ -60,11 +62,31 @@ namespace
         Workspace( L, G, *this ),
         U( (*this)["U"].as<Array>() ),
         V( (*this)["V"].as<Array>() ),
-        requests( num_requests() )
+        requests( num_requests() ),
+        X(mesh.X()),
+        Y(mesh.Y())
         {
             prepare_ghosts();
         }
         
+        
+        void initialize()
+        {
+            MPI.Printf( stderr, "rank %d> Initializing U/V\n", par_rank);
+            for( unit_t j=lower.y; j<=upper.y; ++j )
+            {
+                const Real y = Y[j];
+                for( unit_t i=lower.x;i<=upper.x;++i)
+                {
+                    const Real x= X[i];
+                    const Real r2 = x*x+y*y;
+                    const Real r  = sqrt(r2);
+                    
+                    U[j][i] = cos(5*r);// +  (0.5 - alea<Real>());
+                    V[j][i] = Real(par_rank+1)/Real(par_size);
+                }
+            }
+        }
         
         virtual ~MySim() throw()
         {}
@@ -85,43 +107,106 @@ namespace
         {
             assert( VISIT_INVALID_HANDLE != md );
             
-            visit_handle mmd = VISIT_INVALID_HANDLE;
-            if( VisIt_MeshMetaData_alloc( &mmd ) == VISIT_OKAY )
             {
-                assert( VISIT_INVALID_HANDLE != mmd );
-                MPI.Printf( stderr, "\t @%d.%d> Registering mesh2d\n", par_rank, par_size);
-                VisIt_MeshMetaData_setName( mmd, "mesh2d" );
-                VisIt_MeshMetaData_setMeshType( mmd, VISIT_MESHTYPE_RECTILINEAR );
-                VisIt_MeshMetaData_setTopologicalDimension( mmd, 2);
-                VisIt_MeshMetaData_setSpatialDimension(mmd, 2);
-                VisIt_MeshMetaData_setNumDomains(mmd, par_size);
-                
-                VisIt_SimulationMetaData_addMesh(md, mmd);
+                visit_handle mmd = VISIT_INVALID_HANDLE;
+                if( VisIt_MeshMetaData_alloc( &mmd ) == VISIT_OKAY )
+                {
+                    assert( VISIT_INVALID_HANDLE != mmd );
+                    VisIt_MeshMetaData_setName( mmd, "mesh2d" );
+                    VisIt_MeshMetaData_setMeshType( mmd, VISIT_MESHTYPE_RECTILINEAR );
+                    VisIt_MeshMetaData_setTopologicalDimension( mmd, 2);
+                    VisIt_MeshMetaData_setSpatialDimension(mmd, 2);
+                    VisIt_MeshMetaData_setNumDomains(mmd, par_size);
+                    
+                    VisIt_SimulationMetaData_addMesh(md, mmd);
+                }
             }
+            
+            {
+                visit_handle vmd = VISIT_INVALID_HANDLE;
+                if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
+                {
+                    VisIt_VariableMetaData_setName(vmd, "U");
+                    VisIt_VariableMetaData_setMeshName(vmd, "mesh2d");
+                    VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR);
+                    VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
+                    VisIt_SimulationMetaData_addVariable(md, vmd);
+                }
+            }
+            
+            {
+                visit_handle vmd = VISIT_INVALID_HANDLE;
+                if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
+                {
+                    VisIt_VariableMetaData_setName(vmd, "V");
+                    VisIt_VariableMetaData_setMeshName(vmd, "mesh2d");
+                    VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR);
+                    VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
+                    VisIt_SimulationMetaData_addVariable(md, vmd);
+                }
+            }
+            
+            
+            
         }
         
         virtual visit_handle get_mesh( int domain, const string &name ) const
         {
-            MPI.Printf( stderr, "rank %d> SIM:get_mesh '%s', domain=%d\n", par_rank, name.c_str(), domain);
+            //MPI.Printf( stderr, "rank %d> SIM:get_mesh '%s', domain=%d\n", par_rank, name.c_str(), domain);
             visit_handle h = VISIT_INVALID_HANDLE;
-            if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
+            if( name == "mesh2d" )
             {
-                assert( h != VISIT_INVALID_HANDLE );
-                const Array1D &X  = mesh.X();
-                const Array1D &Y  = mesh.Y();
-                
-                visit_handle   hx = VISIT_INVALID_HANDLE;
-                visit_handle   hy = VISIT_INVALID_HANDLE;
-                VisIt_VariableData_alloc(&hx);
-                VisIt_VariableData_setDataD(hx, VISIT_OWNER_SIM, 1, X.items, (double *)&X[ X.lower ] );
-                VisIt_VariableData_alloc(&hy);
-                VisIt_VariableData_setDataD(hy, VISIT_OWNER_SIM, 1, Y.items, (double *)&Y[ Y.lower ] );
-                
-                VisIt_RectilinearMesh_setCoordsXY(h, hx, hy);
+                if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
+                {
+                    assert( h != VISIT_INVALID_HANDLE );
+                    const Array1D &X  = mesh.X();
+                    const Array1D &Y  = mesh.Y();
+                    
+                    visit_handle   hx = VISIT_INVALID_HANDLE;
+                    visit_handle   hy = VISIT_INVALID_HANDLE;
+                    VisIt_VariableData_alloc(&hx);
+                    VisIt_VariableData_setDataD(hx, VISIT_OWNER_SIM, 1, X.items, (double *)&X[ X.lower ] );
+                    VisIt_VariableData_alloc(&hy);
+                    VisIt_VariableData_setDataD(hy, VISIT_OWNER_SIM, 1, Y.items, (double *)&Y[ Y.lower ] );
+                    
+                    VisIt_RectilinearMesh_setCoordsXY(h, hx, hy);
+                }
             }
             return h;
         }
         
+        
+        virtual visit_handle get_variable( int domain, const string &name ) const
+        {
+            MPI.Printf( stderr, "rank %d> SIM:get_variable '%s', domain=%d\n", par_rank, name.c_str(), domain);
+            visit_handle h = VISIT_INVALID_HANDLE;
+            
+            if( name == "U" )
+            {
+                const int nComponents=1;
+                const int nTuples    =U.items;
+                MPI.Printf0( stderr, "Sending U: %dx%d\n", nComponents, nTuples);
+                assert(U.entry!=NULL);
+                if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
+                {
+                    VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, U.entry);
+                }
+            }
+            
+            if( name == "V" )
+            {
+                const int nComponents=1;
+                const int nTuples    =V.items;
+                MPI.Printf0( stderr, "Sending V: %dx%d\n", nComponents, nTuples);
+                assert(V.entry!=NULL);
+                if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
+                {
+                    VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, V.entry);
+                }
+            }
+            
+            return h;
+        }
         
         virtual void step()
         {
@@ -191,13 +276,13 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     // Ready to create the simulation !
     //--------------------------------------------------------------------------
     MySim  sim( MPI, sim_layout, sim_ghosts );
-    Region R( Vertex(0,0), Vertex(1,1) );
+    Region R( Vertex(-1,-1), Vertex(1,1) );
     sim.mesh.regular_map_to(R,full_layout);
     
     //--------------------------------------------------------------------------
     // Initialize the simulation
     //--------------------------------------------------------------------------
-    
+    sim.initialize();
     
     //--------------------------------------------------------------------------
     // Initialize ghosts
