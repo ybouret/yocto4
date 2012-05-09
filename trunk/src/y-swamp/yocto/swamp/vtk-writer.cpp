@@ -35,7 +35,7 @@ namespace yocto
         
         typedef geom::v3d<float>  v3d_flt;
         typedef geom::v3d<double> v3d_dbl;
-
+        
         
         namespace 
         {
@@ -81,7 +81,7 @@ namespace yocto
                 fp.write(' ');
                 fp( format.real_fmt.c_str(), (v.z) );
             }
-
+            
             
         }
         
@@ -101,7 +101,7 @@ do { const record r( typeid(TYPE), KIND, PROC); if( !out_db.insert(r) ) throw ex
             Y_SWAMP_SCALARS(unit_t,write_double);
             Y_SWAMP_VECTORS(v3d_flt,write_v3d_flt);
             Y_SWAMP_VECTORS(v3d_dbl,write_v3d_dbl);
-
+            
         }
         
         vtk_writer:: ~vtk_writer() throw()
@@ -114,14 +114,14 @@ do { const record r( typeid(TYPE), KIND, PROC); if( !out_db.insert(r) ) throw ex
             fp("%s %s float\n", r.kind.c_str(), name.c_str());
             fp("LOOKUP_TABLE default\n");
         }
-
+        
         void vtk_writer:: write1( ios::ostream &fp, const void *data, const record &r) const
         {
             assert(data);
             assert(r.proc);
             r.proc( fp, data, format );
         }
-
+        
         
         const vtk_writer:: record & vtk_writer:: operator[]( const type_spec &spec ) const
         {
@@ -129,6 +129,56 @@ do { const record r( typeid(TYPE), KIND, PROC); if( !out_db.insert(r) ) throw ex
             if( !r )
                 throw exception("vtk_writer[no '%s']", spec.name() );
             return *r;
+        }
+        
+        const vtk_writer:: record & vtk_writer:: operator[]( const std::type_info &id ) const
+        {
+            const type_spec spec(id);
+            return (*this)[spec];
+        }
+        
+        
+        void vtk_writer:: header( ios::ostream &fp, const string &title ) const
+        {
+            fp("# vtk DataFile Version 3.0\n");
+			fp("%s\n", title.c_str());
+			fp("ASCII\n");
+        }
+        
+        
+        void  vtk_writer:: write_rmesh_sub( ios::ostream &fp, const layout2D &sub ) const
+        {
+            fp("DATASET RECTILINEAR_GRID\n");
+            fp("DIMENSIONS %u %u 1\n", unsigned(sub.width.x), unsigned(sub.width.y) );
+        }
+        
+        void  vtk_writer:: write_axis_sub( ios::ostream &fp, const void *data, size_t num, size_t item_size, const record &r, char axis_id ) const
+        {
+            assert(data!=NULL);
+            fp("%c_COORDINATES %u float\n", unsigned(num));
+            const uint8_t *ptr = (const uint8_t *)data;
+            for( ; num>0; --num, ptr += item_size )
+            {
+                r.proc(fp,ptr,format);
+                if(num>1) fp.write(' ');
+            }
+            fp.write('\n');
+        }
+        
+        void vtk_writer:: write_array( ios::ostream &fp, const string &name, const varray &arr, const layout2D &full, const layout2D &sub) const
+        {
+            assert(full.contains(sub));
+            const record &r = (*this)[arr.held];
+            prolog(fp, name, sub.items, r);
+            const linear_base &h = * arr.handle();
+            for( unit_t j=sub.lower.y; j<=sub.upper.y; ++j)
+            {
+                for( unit_t i=sub.lower.x; i<=sub.upper.x; ++i)
+                {
+                    const coord2D c(i,j);
+                    r.proc(fp, h.address_of( full.offset_of(c) ), format );
+                }
+            }
         }
 
         
