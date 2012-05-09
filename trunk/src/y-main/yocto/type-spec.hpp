@@ -30,7 +30,7 @@ namespace yocto {
 		private:
 			const std::type_info *info_;
 			size_t                len_;
-			virtual const void *get_address() const throw();
+			virtual const void *  get_address() const throw();
 	};
 
 	bool operator==( const type_spec &lhs, const type_spec &rhs ) throw();
