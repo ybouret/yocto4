@@ -185,6 +185,8 @@ namespace yocto
                     //==========================================================
                     new ((void*)&outline) LAYOUT( outLo,  outUp );
                     new ((void*)&sync)    LAYOUT( syncLo, syncUp);
+                    std::cerr << "dataspace layout=" << this-> __layout() << std::endl;
+                    std::cerr << "dataspace outline=" << outline  << std::endl;
                     
                 }
                 
@@ -224,6 +226,8 @@ namespace yocto
                                 const LAYOUT sub(subLo,subUp);
                                 outline.load_offsets( sub, g.lower.inside.offsets );
                                 assert( sub.items == g.lower.inside.offsets.size() );
+                                //std::cerr << "local.lower.inside: " << sub << std::endl;
+                                //std::cerr << "@" << g.lower.inside.offsets << std::endl;
                             }
                             
                             //--------------------------------------------------
@@ -236,6 +240,8 @@ namespace yocto
                                 const LAYOUT sub(subLo,subUp);
                                 outline.load_offsets( sub, g.lower.mirror.offsets );
                                 assert( sub.items == g.lower.mirror.offsets.size() );
+                               // std::cerr << "local.lower.mirror: " << sub << std::endl;
+                               // std::cerr << "@" << g.lower.mirror.offsets << std::endl;
                             }
                             
                             //--------------------------------------------------
@@ -249,6 +255,9 @@ namespace yocto
                                 const LAYOUT sub(subLo,subUp);
                                 outline.load_offsets( sub, g.upper.inside.offsets );
                                 assert( sub.items == g.upper.inside.offsets.size() );
+                                //std::cerr << "local.upper.inside: " << sub << std::endl;
+                                //std::cerr << "@" << g.upper.inside.offsets << std::endl;
+
                             }
                             
                             //--------------------------------------------------
@@ -261,6 +270,9 @@ namespace yocto
                                 const LAYOUT sub(subLo,subUp);
                                 outline.load_offsets( sub, g.upper.mirror.offsets );
                                 assert( sub.items == g.upper.mirror.offsets.size() );
+                                //std::cerr << "local.upper.mirror: " << sub << std::endl;
+                                //std::cerr << "@" << g.upper.mirror.offsets << std::endl;
+
                             }
                             
                             //--------------------------------------------------
