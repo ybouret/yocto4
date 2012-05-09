@@ -140,44 +140,73 @@ namespace yocto
     static
     visit_handle SimGetMetaData(void *cbdata)
     {
-        //fprintf(stderr, "SimGetMetaData(%p)",cbdata );
         assert(cbdata!=NULL);
         visit_handle       md  = VISIT_INVALID_HANDLE;
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+        const mpi         &MPI = sim.MPI;
         
-        sim.MPI.Printf0( stderr, "SimGetMetaData\n" );
+        MPI.Printf0( stderr, "SimGetMetaData\n" );
         
         if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
         {
             assert( VISIT_INVALID_HANDLE != md );
             
             /* Meta Data for Simulation */
-            sim.MPI.Printf0( stderr, "\tsimulation info\n");
+            MPI.Printf0( stderr, "\tsimulation info\n");
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
             VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,0);
             
             /* Specific Meta Data for the simulation */
-            sim.MPI.Printf0( stderr, "\tuser's meta data\n");
+            MPI.Printf0( stderr, "\tuser's meta data\n");
             sim.get_meta_data(md);
             
             /* Create Generic Interface/Commands */
-            sim.MPI.Printf0( stderr,"\tcommands\n");
+            MPI.Printf0( stderr,"\tcommands: ");
             for(size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
             {
                 visit_handle cmd = VISIT_INVALID_HANDLE;
                 if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
                 {
                     const char *cmd_name = VisIt::Simulation::GenericCommandReg[i];
-                    //sim.MPI.Printf0(stderr,"SimGetMetaData +'%s'\n", cmd_name);
+                    MPI.Printf0(stderr,"'%s', ", cmd_name);
                     VisIt_CommandMetaData_setName(cmd, cmd_name);
                     VisIt_SimulationMetaData_addGenericCommand(md, cmd);
                 }
             }
-            
+            MPI.Printf0(stderr,"NULL\n");
         }
         
         return md;
     }
+    
+    //==========================================================================
+    //
+    // SimGetDomainList callback
+    //
+    //==========================================================================
+    static 
+    visit_handle SimGetDomainList(const char *name, void *cbdata)
+    {
+        assert(cbdata);
+        VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+        visit_handle h = VISIT_INVALID_HANDLE;
+        if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
+        {
+            visit_handle hdl;
+            int *iptr = NULL;
+            
+            iptr = (int *)malloc(sizeof(int));
+            *iptr = sim.par_rank;
+            
+            if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
+            {
+                VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, 1, iptr);
+                VisIt_DomainList_setDomains(h, sim.par_size, hdl);
+            }
+        }
+        return h;
+    }
+    
     
     //==========================================================================
     //
@@ -304,6 +333,7 @@ namespace yocto
                         VisItSetCommandCallback(ControlCommandCallback,cbdata);
                         VisItSetGetMetaData(SimGetMetaData,cbdata);
                         VisItSetGetMesh(SimGetMesh, cbdata);
+                        VisItSetGetDomainList(SimGetDomainList,cbdata);
                     }
                     else
                     {

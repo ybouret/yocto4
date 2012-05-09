@@ -28,7 +28,6 @@ namespace yocto
         
         static void SetDirectory( const string &path );      //!< VisItSetDirectory
         static void SetOption(const string &options);        //!< VisItSetOptions
-        static void SetupEnvironment();                      //!< VisItSetupEnvironment
         static void SetupParallel(const mpi &   MPI, 
                                   const string &sim_name,
                                   const string &sim_comment,
@@ -59,7 +58,7 @@ namespace yocto
             const bool master;    //!< 0 == par_rank
             
             //! provide meta data information
-            virtual void get_meta_data( visit_handle md ) const;
+            virtual void get_meta_data( visit_handle &md ) const;
             
             //! provide mesh
             virtual visit_handle get_mesh( int domain, const string &name ) const;
