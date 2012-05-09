@@ -145,37 +145,32 @@ namespace yocto
         assert(cbdata!=NULL);
         visit_handle       md  = VISIT_INVALID_HANDLE;
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
-        //const mpi         &MPI = sim.MPI;
         
-        //MPI.Printf0( stderr, "SimGetMetaData\n" );
         
         if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
         {
             assert( VISIT_INVALID_HANDLE != md );
             
             /* Meta Data for Simulation */
-            //MPI.Printf0( stderr, "\tsimulation info\n");
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
             VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,0);
             
-            /* Specific Meta Data for the simulation */
-            //MPI.Printf0( stderr, "\tuser's meta data\n");
-            sim.get_meta_data(md);
-            
+                       
             /* Create Generic Interface/Commands */
-            //MPI.Printf0( stderr,"\tcommands: ");
             for(size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
             {
                 visit_handle cmd = VISIT_INVALID_HANDLE;
                 if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
                 {
                     const char *cmd_name = VisIt::Simulation::GenericCommandReg[i];
-                    //MPI.Printf0(stderr,"'%s', ", cmd_name);
                     VisIt_CommandMetaData_setName(cmd, cmd_name);
                     VisIt_SimulationMetaData_addGenericCommand(md, cmd);
                 }
             }
-            //MPI.Printf0(stderr,"NULL\n");
+            
+            /* Specific Meta Data for the simulation */
+            sim.get_meta_data(md);
+
         }
         
         return md;
