@@ -27,17 +27,34 @@ namespace yocto
                 }
             }
             
+            
             template <typename T,typename ARRAY>
             static inline
-            void process( const array<varray*> &ld, dataspace<typename ARRAY::layout_type> &D )
+            void query( array<T> &values, const array<varray*> &ld, size_t source )
             {
-                const size_t num_var = ld.size();
-                for( size_t i=num_var;i>0;--i)
+                assert( values.size() >= ld.size() );
+                const size_t n = ld.size();
+                for( size_t i=n; i>0; --i )
                 {
-                    ARRAY &A = ld[i]->as<ARRAY>();
+                    const ARRAY &A = ld[i]->as<ARRAY>();
+                    values[i] = A(source);
                 }
-                
             }
+            
+            template <typename T,typename ARRAY>
+            static inline
+            void store( array<varray*> &ld, const array<T> &values, size_t source )
+            {
+                assert( values.size() >= ld.size() );
+                const size_t n = ld.size();
+                for( size_t i=n; i>0; --i )
+                {
+                    ARRAY &A  = ld[i]->as<ARRAY>();
+                    A(source) = values[i];
+                }
+            }
+            
+            
             
             
         };
