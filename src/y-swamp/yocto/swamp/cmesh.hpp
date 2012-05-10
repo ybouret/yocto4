@@ -17,7 +17,6 @@ namespace yocto
             typedef typename __array<T,LAYOUT::DIMENSIONS>::type  array_type;
             typedef typename __region<T,LAYOUT::DIMENSIONS>::type region_type;
             
-            const type_spec data_spec;
             
             explicit cmesh( array_db &db, const LAYOUT &L) :
             quadmesh( db ),
