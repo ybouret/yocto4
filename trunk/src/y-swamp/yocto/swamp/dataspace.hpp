@@ -20,7 +20,8 @@ namespace yocto
         class dataspace : public LAYOUT,  public array_db
         {
         public:
-            typedef typename LAYOUT::coord coord;
+            typedef typename LAYOUT::coord       coord;
+            typedef typename LAYOUT::param_coord param_coord;
             
             //! prepare all layouts
             explicit dataspace(const LAYOUT               &L,
@@ -69,7 +70,7 @@ namespace yocto
                 return create<ARRAY>(name);
             }
             
-            //! allocate all data for communication
+            //! allocate all data for communications
             /**
              This should be done only once, after all
              arrays are created.
@@ -85,17 +86,21 @@ namespace yocto
             const LAYOUT outline;   //!< layout+ghosts
             const LAYOUT sync;      //!< layout - async ghosts: always synchronous
             
+            //! number of local ghosts for PBC
             inline size_t  local_ghosts_count() const throw() { return localGhosts.size(); }
+            
+            //! number of async ghosts for communication 
             inline size_t  async_ghosts_count() const throw() { return asyncGhosts.size(); }
             
             local_ghosts & __local_ghosts( size_t index ) throw() { return *localGhosts[index];}
             async_ghosts & __async_ghosts( size_t index ) throw() { return *asyncGhosts[index];} 
             
-            
+            //! handles to array using communication
             const linear_handles & handles() const throw() { return usingGhosts; }
             
+            //! number of MPI requests for communication
             size_t num_requests() const throw() { return 2 * asyncGhosts.size() ; }
-            
+                        
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
@@ -237,8 +242,8 @@ namespace yocto
                                 const LAYOUT sub(subLo,subUp);
                                 outline.load_offsets( sub, g.lower.mirror.offsets );
                                 assert( sub.items == g.lower.mirror.offsets.size() );
-                               // std::cerr << "local.lower.mirror: " << sub << std::endl;
-                               // std::cerr << "@" << g.lower.mirror.offsets << std::endl;
+                                // std::cerr << "local.lower.mirror: " << sub << std::endl;
+                                // std::cerr << "@" << g.lower.mirror.offsets << std::endl;
                             }
                             
                             //--------------------------------------------------
@@ -254,7 +259,7 @@ namespace yocto
                                 assert( sub.items == g.upper.inside.offsets.size() );
                                 //std::cerr << "local.upper.inside: " << sub << std::endl;
                                 //std::cerr << "@" << g.upper.inside.offsets << std::endl;
-
+                                
                             }
                             
                             //--------------------------------------------------
@@ -269,7 +274,7 @@ namespace yocto
                                 assert( sub.items == g.upper.mirror.offsets.size() );
                                 //std::cerr << "local.upper.mirror: " << sub << std::endl;
                                 //std::cerr << "@" << g.upper.mirror.offsets << std::endl;
-
+                                
                             }
                             
                             //--------------------------------------------------
