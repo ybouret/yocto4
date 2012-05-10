@@ -16,6 +16,7 @@ namespace yocto
         struct _visit
         {
             
+            //! mesh meta data
             template <typename T,typename LAYOUT>
             static inline
             visit_handle mesh_meta_data(const rmesh<T,LAYOUT> & mesh, 
@@ -35,6 +36,7 @@ namespace yocto
                 return h;
             }
             
+            //! mesh meta data
             template <typename T,typename LAYOUT>
             static inline
             visit_handle mesh_meta_data(const rmesh<T,LAYOUT> & mesh, 
@@ -45,6 +47,7 @@ namespace yocto
                 return mesh_meta_data<T,LAYOUT>( mesh, name, num_domains );
             }
             
+                        
             
         };
         

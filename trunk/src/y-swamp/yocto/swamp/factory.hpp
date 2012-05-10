@@ -81,6 +81,8 @@ namespace yocto
                 make<ARRAY>( name, L, db );
             }
             
+            inline void clear() throw() { sheds.release(); }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(factory);
            

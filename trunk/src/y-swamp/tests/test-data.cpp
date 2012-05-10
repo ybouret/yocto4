@@ -82,10 +82,10 @@ YOCTO_UNIT_TEST_IMPL(data)
         
         std::cerr << "0: " << W.outline    << std::endl;
         std::cerr << "1: " << W.__layout() << std::endl;
-        std::cerr << "2: " << W.sync       << std::endl;
+        std::cerr << "2: " << W.nucleus    << std::endl;
         A.set_all( W.outline,    0 );
         A.set_all( W.__layout(), 1 );
-        A.set_all( W.sync,       2 );
+        A.set_all( W.nucleus,    2 );
         
         A.ppm("ini2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
         

@@ -92,14 +92,35 @@ namespace yocto
                 entry[target]=entry[source];
             }
             
-            
+            //! item size for interleaved ghosts size computation
             virtual size_t       item_size() const throw() { return sizeof(T); }
+            
+            //! anonymous address 
             virtual const  void *address_of( size_t source ) const throw() 
             {
+                assert(entry);
                 assert(source<this->items);
                 return entry+source;
             }
             
+            //! reference by offset
+            inline type & operator()(size_t source) throw()
+            {
+                assert(entry);
+                assert(source<this->items);
+                return entry[source];
+            }
+            
+            //! const reference by offset
+            inline const_type & operator()(size_t source) const throw()
+            {
+                assert(entry);
+                assert(source<this->items);
+                return entry[source];
+            }
+
+            
+            //! optimized copy in interleaved ghost
             virtual void async_store( uint8_t * &ptr, size_t source ) const throw() 
             {
                 assert(entry!=NULL);
@@ -109,6 +130,7 @@ namespace yocto
                     *(ptr++) = *(q++);
             }
             
+            //! optimized copy from interleaved ghost
             virtual void async_query( const uint8_t * &ptr, size_t source ) throw() 
             {
                 assert(entry!=NULL);

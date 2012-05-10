@@ -211,8 +211,8 @@ YOCTO_UNIT_TEST_IMPL(C3D)
     vtk_writer vtk;
     H.save(vtk);
     
-    vector<string> vars;
-    vars.push_back( "A" );
+    variables vars;
+    vars << "A";
 	vtk.save( "c3d.vtk", "c3d", W, vars, L );
     
 }

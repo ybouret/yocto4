@@ -23,7 +23,35 @@ namespace yocto
         {
             (void) insert(indx);
         }
-
+        
+        
+        variables:: ~variables() throw()
+        {
+        }
+        
+        variables:: variables() throw() : vector<string>()
+        {
+        }
+        
+        variables:: variables( size_t n ) : vector<string>(n,as_capacity)
+        {
+        }
+        
+        variables:: variables( const variables &other ) : vector<string>( other )
+        {
+        }
+        
+        variables & variables:: operator<<( const string &name ) 
+        {
+            push_back( name );
+            return *this;
+        }
+        variables & variables:: operator<<( const char *id ) 
+        {
+            const string name(id);
+            push_back(name);
+            return *this;
+        }
     }
     
 }

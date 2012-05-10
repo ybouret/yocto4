@@ -7,6 +7,8 @@
 #define YOCTO_SWAMP_TYPES_INCLUDED 1
 
 #include "yocto/ordered/sorted-vector.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/string.hpp"
 
 namespace yocto 
 {
@@ -49,6 +51,22 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_ASSIGN(offsets_list);
+        };
+        
+        class variables : public vector<string>
+        {
+        public:
+            virtual ~variables() throw();
+            explicit variables() throw();
+            explicit variables(size_t n);
+            variables( const variables & );
+            
+            variables & operator<<( const string & );
+            variables & operator<<( const char *id );
+            
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(variables);
         };
         
         
