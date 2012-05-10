@@ -31,6 +31,7 @@ namespace yocto
                 case at_upper_z: return "upper z";
             }
             critical_error(error_invalid_data, "invalid ghost::position name");
+            return "";
         }
         
         const char *ghost:: position_name() const throw()
@@ -50,7 +51,7 @@ namespace yocto
                 case at_upper_z: return at_lower_z;
             }
             critical_error(error_invalid_data, "invalid ghost::position mirror");
-            
+            return at_upper_x;
         }
         
         ghost::position ghost:: mirror_position() const throw()

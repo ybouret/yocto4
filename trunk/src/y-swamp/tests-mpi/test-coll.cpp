@@ -55,7 +55,7 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     _mpi::collect0(MPI, pA0.__get(), A, full_layout);
     
     if( 0 == rank )
-        pA0->ppm( "full.ppm", "full", full_layout, vproc, NULL, 0, size );
+        pA0->ppm( "full.ppm", "full", full_layout, vproc, 0, 0, size );
     
     
 }
@@ -98,7 +98,7 @@ YOCTO_UNIT_TEST_IMPL(coll3D)
     array3D<double> &A = D["A"].as< array3D<double> >();
     A.set_all( L, rank+1 );
     auto_ptr< W3 > pW;
-    array3D<double> *pA0 = NULL;
+    array3D<double> *pA0 = 0;
     if( 0 == rank )
     {
         const ghosts_setup<coord3D> no_ghosts;

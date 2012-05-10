@@ -146,7 +146,7 @@ YOCTO_UNIT_TEST_IMPL(d2)
     
     {
         const string filename = vformat("end%d.%d.ppm",rank,size);
-        A.ppm( filename, filename, A, vproc,NULL,0,size);
+        A.ppm( filename, filename, A, vproc,0,0,size);
     }
     
 }

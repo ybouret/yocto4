@@ -11,7 +11,7 @@ namespace yocto
 	public:
 		YOCTO_ARGUMENTS_DECL_T;
 		
-		inline auto_ptr()       throw() : pointee_( NULL ) {}		
+		inline auto_ptr()       throw() : pointee_( 0 ) {}		
 		inline auto_ptr( T *p ) throw() : pointee_( (mutable_type *) p ) {}
 		
 		virtual ~auto_ptr() throw() { __kill(); }
@@ -35,7 +35,7 @@ namespace yocto
 		inline T * yield() throw() 
 		{
 			T    *p  = pointee_;
-			pointee_ = NULL;
+			pointee_ = 0;
 			return p;
 		}
 		
@@ -64,7 +64,7 @@ namespace yocto
 		}
 		
 		
-		inline bool is_valid() const throw() { return NULL != pointee_; }
+		inline bool is_valid() const throw() { return 0 != pointee_; }
 		
 		inline type       * __get() throw()       { return pointee_; }
 		inline const_type * __get() const throw() { return pointee_; }
@@ -77,7 +77,7 @@ namespace yocto
 			if( pointee_ )
 			{
 				delete pointee_;
-				pointee_ = NULL;
+				pointee_ = 0;
 			}
 		}
 		
