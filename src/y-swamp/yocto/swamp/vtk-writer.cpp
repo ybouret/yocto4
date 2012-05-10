@@ -165,7 +165,7 @@ namespace yocto
 		void  vtk_writer:: write_axis_sub( ios::ostream &fp, const void *data, size_t num, size_t item_size, const record &r, char axis_id ) const
 		{
 			assert(data!=NULL);
-			fp("%c_COORDINATES %u float\n", unsigned(num));
+			fp("%c_COORDINATES %u float\n", axis_id, unsigned(num));
 			const uint8_t *ptr = (const uint8_t *)data;
 			for( ; num>0; --num, ptr += item_size )
 			{
@@ -178,7 +178,7 @@ namespace yocto
 		void vtk_writer:: write_array( ios::ostream &fp, const string &name, const varray &arr, const layout2D &full, const layout2D &sub) const
 		{
 			assert(full.contains(sub));
-
+            
 			//------------------------------------------------------------------
 			// find how to write each item
 			//------------------------------------------------------------------

@@ -65,7 +65,7 @@ namespace yocto
             const type_spec spec; //!< array class type
             const type_spec held; //!< array content type
             
-            linear_base *handle() throw();
+            linear_base       *handle() throw();
             const linear_base *handle() const throw();
             
         private:

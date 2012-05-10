@@ -96,7 +96,6 @@ namespace yocto
             virtual size_t       item_size() const throw() { return sizeof(T); }
             virtual const  void *address_of( size_t source ) const throw() 
             {
-                assert(source>0);
                 assert(source<this->items);
                 return entry+source;
             }

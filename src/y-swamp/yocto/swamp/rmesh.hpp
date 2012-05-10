@@ -35,19 +35,19 @@ namespace yocto
                     const unit_t      lo   = pLower[iAxis];
                     const unit_t      up   = pUpper[iAxis]; assert(up>=lo);
                     {
-                        const axis_layout alay( lo, up );                       //!< create the axis layout
-                        const string      name( quadmesh::axis_name(iAxis) );       //!< find its name
-                        linear_base *     info = NULL;                          //!< prepare memory info
-                        void *            addr = axis_type::ctor( alay, &info); //!< create the axis
-                        adb(name, axis_spec, data_spec, addr, info, axis_type::dtor);      //!< insert it in the database
+                        const axis_layout alay( lo, up );                             //!< create the axis layout
+                        const string      name( quadmesh::axis_name(iAxis) );         //!< find its name
+                        linear_base *     info = NULL;                                //!< prepare memory info
+                        void *            addr = axis_type::ctor( alay, &info);       //!< create the axis
+                        adb(name, axis_spec, data_spec, addr, info, axis_type::dtor); //!< insert it in the database
                     }
                     if( up > lo )
                     {
-                        const axis_layout alay( lo, up-1 );                     //!< create the delta axis layout
-                        const string      name( quadmesh::delta_name(iAxis) );      //!< find its name
-                        linear_base *     info = NULL;                          //!< prepare memory info
-                        void *            addr = axis_type::ctor( alay, &info); //!< create the axis
-                        adb(name, axis_spec, data_spec, addr, info, axis_type::dtor);      //!< insert it in the database
+                        const axis_layout alay( lo, up-1 );                           //!< create the delta axis layout
+                        const string      name( quadmesh::delta_name(iAxis) );        //!< find its name
+                        linear_base *     info = NULL;                                //!< prepare memory info
+                        void *            addr = axis_type::ctor( alay, &info);       //!< create the axis
+                        adb(name, axis_spec, data_spec, addr, info, axis_type::dtor); //!< insert it in the database
                     }
                 }
             }

@@ -109,7 +109,7 @@ namespace yocto
                 
                 inline ~shed() throw() {}
                 inline shed( const shed &other ) throw() :
-                spec( other.spec ), ctor(other.ctor), dtor(other.dtor) {}
+                spec( other.spec ), held(other.held), ctor(other.ctor), dtor(other.dtor) {}
                 
                 const type_spec &key() const throw() { return spec; }
                 
