@@ -3,6 +3,7 @@
 #include "yocto/swamp/level-set.hpp"
 #include "yocto/swamp/workspace.hpp"
 #include "yocto/swamp/rwops.hpp"
+#include "yocto/swamp/vtk-writer.hpp"
 
 using namespace yocto;
 using namespace swamp;
@@ -107,6 +108,9 @@ YOCTO_UNIT_TEST_IMPL(C2D)
     H.init(levels);
     contour2D<double>::callback cb( &H, & handler2D::process );
     contour2D<double>::compute(A, X, Y, A, levels, cb);
+
+	vtk_writer vtk;
+	vtk.save( "f2d.vtk", "f2d", W, vars, L );
     
 }
 YOCTO_UNIT_TEST_DONE()
