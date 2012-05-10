@@ -2,7 +2,7 @@
 #include "yocto/visit/interface.hpp"
 #include "yocto/wtime.hpp"
 
-#include "yocto/swamp/common.hpp"
+#include "yocto/swamp/visit.hpp"
 #include "yocto/swamp/mpi.hpp"
 #include "yocto/code/rand.hpp"
 
@@ -143,18 +143,10 @@ namespace
                 }
             }
             
-            
             {
-                visit_handle mmd = VISIT_INVALID_HANDLE;
-                if( VisIt_MeshMetaData_alloc( &mmd ) == VISIT_OKAY )
+                visit_handle mmd = _visit::mesh_meta_data(mesh, "mesh2d", par_size);
+                if( mmd != VISIT_INVALID_HANDLE )
                 {
-                    assert( VISIT_INVALID_HANDLE != mmd );
-                    VisIt_MeshMetaData_setName( mmd, "mesh2d" );
-                    VisIt_MeshMetaData_setMeshType( mmd, VISIT_MESHTYPE_RECTILINEAR );
-                    VisIt_MeshMetaData_setTopologicalDimension( mmd, 2);
-                    VisIt_MeshMetaData_setSpatialDimension(mmd, 2);
-                    VisIt_MeshMetaData_setNumDomains(mmd, par_size);
-                    
                     VisIt_SimulationMetaData_addMesh(md, mmd);
                 }
             }
