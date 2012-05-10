@@ -21,7 +21,6 @@ namespace yocto
         {
         public:
             typedef typename LAYOUT::coord       coord;
-            typedef typename LAYOUT::param_coord param_coord;
             
             //! prepare all layouts
             explicit dataspace(const LAYOUT               &L,
@@ -31,11 +30,11 @@ namespace yocto
             LAYOUT(L),
             array_db(),
             outline( *this ),
-            sync(    *this ),
-            fieldsMaker(8),
+            nucleus( *this ),
             localGhosts(4,as_capacity),
             asyncGhosts(8,as_capacity),
-            usingGhosts()
+            usingGhosts(),
+            fieldsMaker(8)
             {
                 record_ghosts(G);
                 record_fields(F);
@@ -62,7 +61,7 @@ namespace yocto
                 return ans;
             }
             
-            //! manuallt create a new array
+            //! manually create a new array, wrapper
             template <typename ARRAY>
             inline ARRAY &create( const char *id, bool async = true )
             {
@@ -83,8 +82,7 @@ namespace yocto
                 }
             }
             
-            const LAYOUT outline;   //!< layout+ghosts
-            const LAYOUT sync;      //!< layout - async ghosts: always synchronous
+           
             
             //! number of local ghosts for PBC
             inline size_t  local_ghosts_count() const throw() { return localGhosts.size(); }
@@ -100,15 +98,18 @@ namespace yocto
             
             //! number of MPI requests for communication
             size_t num_requests() const throw() { return 2 * asyncGhosts.size() ; }
-                        
+            
+            const LAYOUT       outline;    //!< layout+ghosts
+            const LAYOUT       nucleus;    //!< layout - async ghosts: always synchronous
+            const offsets_list in_layout;  //! layout offsets
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
-            factory<LAYOUT>           fieldsMaker;
             vector<local_ghosts::ptr> localGhosts;
             vector<async_ghosts::ptr> asyncGhosts;
             vector<linear_base *>     usingGhosts;
-            
+            factory<LAYOUT>           fieldsMaker;
+
             //! compute outline and ghosts from the setup
             inline void record_ghosts( const ghosts_setup<coord> &G )
             {
@@ -185,11 +186,13 @@ namespace yocto
                     
                     //==========================================================
                     //
-                    // recreate outline and syn zone
+                    // recreate outline and nucleus zone
                     //
                     //==========================================================
                     new ((void*)&outline) LAYOUT( outLo,  outUp );
-                    new ((void*)&sync)    LAYOUT( syncLo, syncUp);                    
+                    new ((void*)&nucleus) LAYOUT( syncLo, syncUp);
+                    outline.load_offsets( this->__layout(), (offsets_list &)in_layout);
+                    
                 }
                 
                 {
@@ -394,6 +397,7 @@ namespace yocto
                         usingGhosts.push_back( adb[ f.name ].handle() );
                     }
                 }
+                //fieldsMaker.clear();
             }
         };
         
