@@ -155,7 +155,7 @@ namespace
             v->push_back(t);
         }
         
-        void save() const
+        void save( const vtk_writer &vtk ) const
         {
             for( map<int,tvec>::const_iterator i = db.begin(); i != db.end(); ++i )
             {
@@ -163,6 +163,7 @@ namespace
                 const int    k = i->key;
                 const string filename = vformat( "iso%d.vtk", k);
                 rwops<double>::save_vtk(filename, filename, v);
+                vtk.save(filename,filename,v);
             }
         }
         
@@ -210,12 +211,12 @@ YOCTO_UNIT_TEST_IMPL(C3D)
     H.init( levels );
     contour3D<double>::callback cb( &H, & handler3D:: process );
     contour3D<double>::compute(A, X, Y, Z, A, levels, cb);
-    H.save();
+    vtk_writer vtk;
+    H.save(vtk);
     
     vector<string> vars;
     vars.push_back( "A" );
     rwops<double>::save_vtk( "c3d.vtk", "c3d", W,  vars , L);
-    vtk_writer vtk;
 	vtk.save( "f3d.vtk", "f3d", W, vars, L );
     
 }
