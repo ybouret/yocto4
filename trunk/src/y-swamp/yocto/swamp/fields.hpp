@@ -29,7 +29,8 @@ namespace yocto
             async( _async ),
             ctor(  _ctor  ),
             dtor(  _dtor  )
-            {}
+            {
+            }
             
             inline field_info( const field_info &other ) :
             name(  other.name  ),
@@ -39,6 +40,7 @@ namespace yocto
             ctor(  other.ctor  ),
             dtor(  other.dtor  )
             {
+
             }
             
             inline ~field_info() throw() {}

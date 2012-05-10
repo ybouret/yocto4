@@ -75,7 +75,7 @@ YOCTO_UNIT_TEST_IMPL(C2D)
     
     fields_setup<layout2D> F;
     Y_SWAMP_DECL_VAR(F,"A", Array2D );
-    const layout2D         L( coord2D(1,1), coord2D(20,20) );
+    const layout2D                   L( coord2D(1,1), coord2D(20,20) );
     const ghosts_setup<coord2D>      no_ghosts;
     workspace<layout2D,double,rmesh> W( L, no_ghosts, F );
     const region2D<double>::type     R( V2D(-1,-1), V2D(1,1) );
@@ -215,7 +215,8 @@ YOCTO_UNIT_TEST_IMPL(C3D)
     vector<string> vars;
     vars.push_back( "A" );
     rwops<double>::save_vtk( "c3d.vtk", "c3d", W,  vars , L);
-
+    vtk_writer vtk;
+	vtk.save( "f3d.vtk", "f3d", W, vars, L );
     
 }
 YOCTO_UNIT_TEST_DONE()
