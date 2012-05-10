@@ -2,7 +2,6 @@
 
 #include "yocto/swamp/common.hpp"
 #include "yocto/swamp/mpi.hpp"
-#include "yocto/swamp/rwops.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/auto-ptr.hpp"
@@ -62,6 +61,8 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/swamp/vtk-writer.hpp"
+
 YOCTO_UNIT_TEST_IMPL(coll3D)
 {
     
@@ -117,12 +118,13 @@ YOCTO_UNIT_TEST_IMPL(coll3D)
     vector<string> var;
     var.push_back( "A" );
     
+    vtk_writer vtk;
     if( 0 == rank )
     {
-        rwops<double>::save_vtk("full.vtk", "full3D", *pW, var, full_layout);
+        vtk.save("full.vtk", "full3D", *pW, var, full_layout);
     }
     
-    rwops<double>::save_vtk( vformat("part%d.vtk", rank), "part3D", D, var, L);
+    vtk.save( vformat("part%d.vtk", rank), "part3D", D, var, L);
     
     
 }

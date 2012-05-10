@@ -2,7 +2,6 @@
 
 #include "yocto/swamp/level-set.hpp"
 #include "yocto/swamp/workspace.hpp"
-#include "yocto/swamp/rwops.hpp"
 #include "yocto/swamp/vtk-writer.hpp"
 
 using namespace yocto;
@@ -98,7 +97,6 @@ YOCTO_UNIT_TEST_IMPL(C2D)
     A.ppm("c2d.ppm", "c2d", A, vproc,NULL,-1,1);
     vector<string> vars;
     vars.push_back( "A" );
-    rwops<double>::save_vtk( "c2d.vtk", "c2d", W,  vars , L);
     
     level_set<double> levels;
     levels.add(1,-0.1);
@@ -108,9 +106,9 @@ YOCTO_UNIT_TEST_IMPL(C2D)
     H.init(levels);
     contour2D<double>::callback cb( &H, & handler2D::process );
     contour2D<double>::compute(A, X, Y, A, levels, cb);
-
+    
 	vtk_writer vtk;
-	vtk.save( "f2d.vtk", "f2d", W, vars, L );
+	vtk.save( "c2d.vtk", "c2d", W, vars, L );
     
 }
 YOCTO_UNIT_TEST_DONE()
@@ -162,7 +160,6 @@ namespace
                 const tvec  &v = *i;
                 const int    k = i->key;
                 const string filename = vformat( "iso%d.vtk", k);
-                rwops<double>::save_vtk(filename, filename, v);
                 vtk.save(filename,filename,v);
             }
         }
@@ -216,8 +213,7 @@ YOCTO_UNIT_TEST_IMPL(C3D)
     
     vector<string> vars;
     vars.push_back( "A" );
-    rwops<double>::save_vtk( "c3d.vtk", "c3d", W,  vars , L);
-	vtk.save( "f3d.vtk", "f3d", W, vars, L );
+	vtk.save( "c3d.vtk", "c3d", W, vars, L );
     
 }
 YOCTO_UNIT_TEST_DONE()
