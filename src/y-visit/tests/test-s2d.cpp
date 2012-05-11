@@ -49,7 +49,8 @@ namespace
     class MySim : 
     public VisIt :: Simulation,
     public MyFields,
-    public Workspace
+    public Workspace,
+    public _visit
     {
     public:
         Array &U;
@@ -144,7 +145,7 @@ namespace
             }
             
             {
-                visit_handle mmd = _visit::mesh_meta_data(mesh, "mesh2d", par_size);
+                visit_handle mmd = mesh_meta_data(mesh, "mesh2d", par_size);
                 if( mmd != VISIT_INVALID_HANDLE )
                 {
                     VisIt_SimulationMetaData_addMesh(md, mmd);
@@ -338,7 +339,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // get the full layout
     //--------------------------------------------------------------------------
-    const Layout full_layout( Coord(1,1), Coord(11,21) );
+    const Layout full_layout( Coord(1,1), Coord(41,61) );
     
     //--------------------------------------------------------------------------
     // create the ghosts
