@@ -76,6 +76,8 @@ namespace yocto
                     VisIt_MeshMetaData_setSpatialDimension(h, LAYOUT::DIMENSIONS);
                     VisIt_MeshMetaData_setNumDomains(h,num_domains);
                 }
+                else 
+                    throw exception("_visit::mesh_meta_data error");
                 return h;
             }
             
@@ -107,6 +109,8 @@ namespace yocto
                     VisIt_VariableMetaData_setType(vmd, p->vartype);
                     VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
                 }
+                else 
+                    throw exception("_visit::variable_data error");
                 return vmd;
             }
             

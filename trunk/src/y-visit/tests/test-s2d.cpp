@@ -135,6 +135,7 @@ namespace
         {
             assert( VISIT_INVALID_HANDLE != md );
             
+            //! append an UI command
             {
                 visit_handle cmd = VISIT_INVALID_HANDLE;
                 if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
@@ -144,38 +145,24 @@ namespace
                 }
             }
             
+            //! append the mesh
             {
                 visit_handle mmd = mesh_meta_data(mesh, "mesh2d", par_size);
-                if( mmd != VISIT_INVALID_HANDLE )
-                {
-                    VisIt_SimulationMetaData_addMesh(md, mmd);
-                }
+                VisIt_SimulationMetaData_addMesh(md, mmd);
             }
             
+            
+            //! append U on mesh2d
             {
-                visit_handle vmd = VISIT_INVALID_HANDLE;
-                if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
-                {
-                    VisIt_VariableMetaData_setName(vmd, "U");
-                    VisIt_VariableMetaData_setMeshName(vmd, "mesh2d");
-                    VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR);
-                    VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
-                    VisIt_SimulationMetaData_addVariable(md, vmd);
-                }
+                visit_handle vmd = variable_meta_data<Real>("U", "mesh2d");                
+                VisIt_SimulationMetaData_addVariable(md, vmd);
             }
             
+            //! append V on mesh2d
             {
-                visit_handle vmd = VISIT_INVALID_HANDLE;
-                if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
-                {
-                    VisIt_VariableMetaData_setName(vmd, "V");
-                    VisIt_VariableMetaData_setMeshName(vmd, "mesh2d");
-                    VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR);
-                    VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
-                    VisIt_SimulationMetaData_addVariable(md, vmd);
-                }
+                visit_handle vmd = variable_meta_data<Real>("V", "mesh2d");                
+                VisIt_SimulationMetaData_addVariable(md, vmd);
             }
-            
             
             
         }
