@@ -200,6 +200,19 @@ namespace yocto
 			
 		}
         
+        template <>
+		void array2D<ZTYPE>:: ppm(const char     *the_filename,
+                                  const char     *the_comment,
+                                  const layout2D &area,
+                                  double (*vproc)( const ZTYPE & ),
+                                  const color::rgba32 *colors,
+                                  double               vmin,
+                                  double               vmax) const
+		{
+			const string filename(the_filename);
+			const string comment(the_comment);
+			ppm( filename, comment, area, vproc, colors, vmin, vmax );
+		}
     }
     
 }

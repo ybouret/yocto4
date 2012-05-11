@@ -58,10 +58,10 @@ namespace yocto {
 			T angle() const throw();
 			
 			friend inline
-			std::ostream &operator<<( std::ostream &os, const v2d<T> &v )
+			std::ostream &operator<<( std::ostream &v2d_os, const v2d<T> &v )
 			{
-				v.output(os);
-				return os;
+				v.output(v2d_os);
+				return v2d_os;
 			}
 
 			void output( std::ostream &os ) const;

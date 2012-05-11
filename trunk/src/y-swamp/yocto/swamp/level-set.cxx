@@ -19,7 +19,7 @@ namespace yocto
         {
         }
         
-        //template <>
+        template <>
         bool operator<( const level<ZTYPE> &lhs_level, const level<ZTYPE> &rhs_level ) throw()
         {
             return lhs_level.value < rhs_level.value;
