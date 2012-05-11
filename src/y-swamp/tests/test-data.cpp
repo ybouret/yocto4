@@ -43,11 +43,12 @@ YOCTO_UNIT_TEST_IMPL(data)
         typedef array1D<float> A1Df;
         W.create<A1Df>( "a1df", true );
         W.prepare_ghosts();
-        
+        std::cerr << "Test Communication 1D" << std::endl;
         for( size_t i=1; i <= W.local_ghosts_count(); ++i )
         {
             W.__local_ghosts(i).transfer( W.handles() );
         }
+        std::cerr << "in_ghosts=" << W.in_ghosts << std::endl;
         
     }
     
@@ -107,6 +108,18 @@ YOCTO_UNIT_TEST_IMPL(data)
         }
         
         A.ppm("end2.ppm", "ghosts-and-sync", A, vproc, NULL, 0, 2);
+        std::cerr << "in_ghosts=" << W.in_ghosts << std::endl;
+        
+        A.set_all( A, 0 );
+        for( size_t i = W.in_ghosts.size(); i >0; --i )
+        {
+            A.entry[ W.in_ghosts[i] ] = 1;
+        }
+        
+        A.set_all(W.nucleus,0.5);
+        A.ppm("g2.ppm", "ghosts-zone",A,vproc,NULL,0,1);
+        
+        
     }
     
     
@@ -114,7 +127,7 @@ YOCTO_UNIT_TEST_IMPL(data)
         fields_setup<layout3D> F;
         Y_SWAMP_DECL_VAR(F, "A", array3D<double> );
         Y_SWAMP_DECL_VAR(F, "B", array3D< geom::v3d<double> > );
-
+        
         const coord3D  lo(1,1,1);
         const coord3D  hi(10,15,20);
         const layout3D L( lo, hi );
@@ -136,7 +149,7 @@ YOCTO_UNIT_TEST_IMPL(data)
         {
             W.__local_ghosts(i).transfer( W.handles() );
         }
-      
+        
         for( size_t i=1; i <= W.async_ghosts_count(); ++i )
         {
             async_ghosts &g = W.__async_ghosts(i);
@@ -144,7 +157,8 @@ YOCTO_UNIT_TEST_IMPL(data)
             memcpy( g.outer_buf, g.inner_buf, g.length );
             g.query_outer( W.handles() );
         }
-        
+        std::cerr << "in_ghosts=" << W.in_ghosts << std::endl;
+
     }
     
     

@@ -83,7 +83,7 @@ namespace yocto
                 }
             }
             
-           
+            
             
             //! number of local ghosts for PBC
             inline size_t  local_ghosts_count() const throw() { return localGhosts.size(); }
@@ -102,7 +102,8 @@ namespace yocto
             
             const LAYOUT       outline;    //!< layout+ghosts
             const LAYOUT       nucleus;    //!< layout - async ghosts: always synchronous
-            const offsets_list in_layout;  //! layout offsets
+            const offsets_list in_layout;  //!< layout offsets
+            const offsets_list in_ghosts;  //!< offsets in layout BUT NOT in nucleus
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
@@ -110,7 +111,7 @@ namespace yocto
             vector<async_ghosts::ptr> asyncGhosts;
             vector<linear_base *>     usingGhosts;
             factory<LAYOUT>           fieldsMaker;
-
+            
             //! compute outline and ghosts from the setup
             inline void record_ghosts( const ghosts_setup<coord> &G )
             {
@@ -193,7 +194,10 @@ namespace yocto
                     new ((void*)&outline) LAYOUT( outLo,  outUp );
                     new ((void*)&nucleus) LAYOUT( syncLo, syncUp);
                     outline.load_offsets( this->__layout(), (offsets_list &)in_layout);
-                    
+                    offsets_list &goff = (offsets_list &)in_ghosts;
+                    assert(this->__layout().items >= nucleus.items );
+                    goff.reserve(this->__layout().items - nucleus.items );
+                    collect_in_ghosts(goff, int2type<LAYOUT::DIMENSIONS>() );
                 }
                 
                 {
@@ -384,6 +388,53 @@ namespace yocto
                 }
                 
             }
+            
+            inline void collect_in_ghosts( offsets_list &goff, int2type<1> )
+            {
+                for( unit_t i=this->lower;i<=this->upper;++i)
+                {
+                    if( !nucleus.has(i) )
+                    {
+                        goff.store( outline.offset_of(i) );
+                    }
+                }
+            }
+            
+            
+            inline void collect_in_ghosts( offsets_list &goff, int2type<2> )
+            {
+                for( unit_t j=this->lower.y;j<=this->upper.y;++j)
+                {
+                    for( unit_t i=this->lower.x;i<=this->upper.x;++i)
+                    {
+                        const coord c(i,j);
+                        if( !nucleus.has(c) )
+                        {
+                            goff.store( outline.offset_of(c) );
+                        }
+                    }
+                }
+            }
+            
+            inline void collect_in_ghosts( offsets_list &goff, int2type<3> )
+            {
+                for( unit_t k=this->lower.z;k<=this->upper.z;++k)
+                {
+                    for( unit_t j=this->lower.y;j<=this->upper.y;++j)
+                    {
+                        for( unit_t i=this->lower.x;i<=this->upper.x;++i)
+                        {
+                            const coord c(i,j,k);
+                            if( !nucleus.has(c) )
+                            {
+                                goff.store( outline.offset_of(c) );
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
             
             inline void record_fields( const fields_setup<LAYOUT> &F )
             {
