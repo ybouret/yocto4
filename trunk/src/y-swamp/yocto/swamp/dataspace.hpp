@@ -31,6 +31,7 @@ namespace yocto
             array_db(),
             outline( *this ),
             nucleus( *this ),
+            in_layout(),
             localGhosts(4,as_capacity),
             asyncGhosts(8,as_capacity),
             usingGhosts(),

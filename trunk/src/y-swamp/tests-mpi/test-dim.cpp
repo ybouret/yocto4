@@ -55,7 +55,7 @@ YOCTO_UNIT_TEST_IMPL(d1)
         ios::ocstream fp( filename, false );
         for( unit_t i= A.lower; i <= A.upper; ++i )
         {
-            fp("%d %g\n", i, A[i] );
+            fp("%d %g\n", int(i), A[i] );
         }
     }
     
@@ -77,7 +77,7 @@ YOCTO_UNIT_TEST_IMPL(d1)
         ios::ocstream fp( filename, false );
         for( unit_t i= A.lower; i <= A.upper; ++i )
         {
-            fp("%d %g\n", i, A[i] );
+            fp("%d %g\n", int(i), A[i] );
         }
     }
     MPI.Barrier(MPI_COMM_WORLD);
