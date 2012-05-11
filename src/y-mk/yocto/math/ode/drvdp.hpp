@@ -12,7 +12,7 @@ namespace yocto
 		namespace ode
 		{
 		
-			//! Driver for Runge-Kutta-Dormand-Price step
+			//! Driver for Runge-Kutta-Dormand-Prince step
 			template <typename T>
 			struct drvdp
 			{

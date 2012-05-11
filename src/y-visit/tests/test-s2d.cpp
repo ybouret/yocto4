@@ -203,7 +203,7 @@ namespace
         
         virtual visit_handle get_variable( int domain, const string &name ) const
         {
-            MPI.Printf( stderr, "rank %d> SIM:get_variable '%s', domain=%d\n", par_rank, name.c_str(), domain);
+            //MPI.Printf( stderr, "rank %d> SIM:get_variable '%s', domain=%d\n", par_rank, name.c_str(), domain);
             visit_handle h = VISIT_INVALID_HANDLE;
             
             if( name == "U" )
@@ -222,7 +222,7 @@ namespace
             {
                 const int nComponents=1;
                 const int nTuples    =V.items;
-                MPI.Printf0( stderr, "Sending V: %dx%d\n", nComponents, nTuples);
+                //MPI.Printf0( stderr, "Sending V: %dx%d\n", nComponents, nTuples);
                 assert(V.entry!=NULL);
                 if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
                 {
