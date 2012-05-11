@@ -115,16 +115,17 @@ YOCTO_UNIT_TEST_IMPL(coll3D)
     
     _mpi::collect0(MPI, pA0, A, full_layout);
     
-    vector<string> var;
-    var.push_back( "A" );
+    variables var;
+    var << "A" ;
     
     vtk_writer vtk;
     if( 0 == rank )
     {
         vtk.save("full.vtk", "full3D", *pW, var, full_layout);
     }
-    
-    vtk.save( vformat("part%d.vtk", rank), "part3D", D, var, L);
+   
+	const string fn = vformat("part%d.vtk",rank); 
+    vtk.save( fn, fn, D, var, L);
     
     
 }

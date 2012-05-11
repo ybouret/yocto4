@@ -118,10 +118,10 @@ namespace yocto
                 __ld(sub, offsets,int2type<DIMENSIONS>());
             }
             
-            friend inline std::ostream & operator<<( std::ostream &os, const layout &L )
+            friend inline std::ostream & operator<<( std::ostream &lay_os, const layout &the_layout )
             {
-                os << "{ " << L.lower << " -> " << L.upper << " : #" << L.width << "= " << L.items << " }"; 
-                return os;
+                lay_os << "{ " << the_layout.lower << " -> " << the_layout.upper << " : #" << the_layout.width << "= " << the_layout.items << " }"; 
+                return lay_os;
             }
             
             inline const layout & __layout() const throw() { return *this; }

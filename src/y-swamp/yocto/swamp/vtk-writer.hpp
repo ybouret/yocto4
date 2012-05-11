@@ -124,6 +124,16 @@ namespace yocto
                 }
             }
             
+             //! unique vtk save routine
+            template <typename U,typename LAYOUT>
+            void save( const char *the_filename, const char *the_title, const workspace<LAYOUT, U, rmesh> &wksp, const array<string> &var, const LAYOUT &sub )
+            {
+				const string filename(the_filename);
+				const string title(the_title);
+				this->save<U,LAYOUT>(filename,title,wksp,var,sub);
+			}
+			
+            
             template <typename T>
             inline void save( const string &filename, const string &title, const array< triangle3D<T> > &triangles ) const
             {

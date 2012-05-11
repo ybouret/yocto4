@@ -44,9 +44,9 @@ YOCTO_UNIT_TEST_IMPL(d1)
     array1D<float>  & A = D["A"].as< array1D<float> >();
     array1D<double> & B = D["B"].as< array1D<double> >();
     array1D<double> & C = D["C"].as< array1D<double> >();
-    A.set_all( A, rank   );
-    B.set_all( B, rank+1 );
-    C.set_all( C, 0 );
+    A.set_all( A, float(rank)   );
+    B.set_all( B, double(rank+1) );
+    C.set_all( C, 0.0 );
     
     MPI.Printf(stderr," rank %d> localGhosts=%u, asyncGhosts=%u, #handles= %u\n", rank, unsigned( D.local_ghosts_count()), unsigned(D.async_ghosts_count()), unsigned(D.handles().size()) );
     MPI.Printf(stderr, "rank %d> #Requests= %u\n", rank, unsigned( D.num_requests()) );
@@ -126,8 +126,8 @@ YOCTO_UNIT_TEST_IMPL(d2)
     dataspace<layout2D> D( L, G, F );
     array2D<float>  & A = D["A"].as< array2D<float> >();
     array2D<double> & B = D["B"].as< array2D<double> >();
-    A.set_all( A, rank   );
-    B.set_all( B, rank+1 );
+    A.set_all( A, float(rank)   );
+    B.set_all( B, double(rank+1) );
 
     //! allocate communication data
     D.prepare_ghosts();

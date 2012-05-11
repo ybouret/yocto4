@@ -95,8 +95,8 @@ YOCTO_UNIT_TEST_IMPL(C2D)
     }
     
     A.ppm("c2d.ppm", "c2d", A, vproc,NULL,-1,1);
-    vector<string> vars;
-    vars.push_back( "A" );
+    variables vars;
+    vars << "A";
     
     level_set<double> levels;
     levels.add(1,-0.1);

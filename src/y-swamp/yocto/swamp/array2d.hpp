@@ -59,7 +59,15 @@ namespace yocto
 					 double               vmin   = 0,
 					 double               vmax   = 1
 					 ) const;
-            
+					 
+            void ppm(const char          *filename, 
+					 const char          *comment,
+					 const layout2D      &area,
+					 double             (*vproc)( const T & ),
+					 const color::rgba32 *colors = NULL,
+					 double               vmin   = 0,
+					 double               vmax   = 1
+					 ) const;
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array2D);
             size_t    num_rows;

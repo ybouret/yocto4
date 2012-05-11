@@ -101,7 +101,7 @@ namespace yocto
 		{
 			Y_SWAMP_SCALARS(float,write_float);
 			Y_SWAMP_SCALARS(double,write_double);
-			Y_SWAMP_SCALARS(unit_t,write_double);
+			Y_SWAMP_SCALARS(unit_t,write_unit);
 			Y_SWAMP_VECTORS(v3d_flt,write_v3d_flt);
 			Y_SWAMP_VECTORS(v3d_dbl,write_v3d_dbl);
 		}

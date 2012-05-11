@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             
             for( unit_t i=A.lower; i <= A.upper; ++i )
             {
-                A[i] = i;
+                A[i] = float(i);
             }
             
             if( A.lower < A.upper -1 )
@@ -68,7 +68,7 @@ YOCTO_UNIT_TEST_IMPL(array)
             {
                 for( unit_t i=A.lower.x; i <= A.upper.x; ++i )
                 {
-                    A[j][i] = i*j;
+                    A[j][i] = double(i*j);
                 }
             }
             
@@ -96,7 +96,7 @@ YOCTO_UNIT_TEST_IMPL(array)
                 {
                     for( unit_t i=A.lower.x; i <= A.upper.x; ++i )
                     {
-                        A[k][j][i] = i*j*k;
+                        A[k][j][i] = double(i*j*k);
                     }
                 }
             }

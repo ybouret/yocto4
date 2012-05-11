@@ -55,10 +55,10 @@ namespace yocto {
 			
 			
 			friend
-			inline std::ostream & operator<<( std::ostream &os, const v3d &v )
+			inline std::ostream & operator<<( std::ostream &v3d_os, const v3d &v )
 			{
-				v.output(os);
-				return os;
+				v.output(v3d_os);
+				return v3d_os;
 			}
 			
 			v3d( Random::Uniform &ran) throw();
