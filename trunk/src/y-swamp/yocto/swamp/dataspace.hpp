@@ -14,7 +14,7 @@ namespace yocto
 {
 	namespace swamp 
 	{
-
+        
 #if defined(_MSC_VER)
 #pragma warning (push)
 		// this in ctor
@@ -26,34 +26,35 @@ namespace yocto
 		{
 		public:
 			typedef typename LAYOUT::coord       coord;
-
+            
 			//! prepare all layouts
 			explicit dataspace(const LAYOUT               &L,
-				const ghosts_setup<coord>  &G,
-				const fields_setup<LAYOUT> &F
-				) :
+                               const ghosts_setup<coord>  &G,
+                               const fields_setup<LAYOUT> &F
+                               ) :
 			LAYOUT(L),
-				array_db(),
-				outline( *this ),
-				nucleus( *this ),
-				in_layout(),
-				localGhosts(4,as_capacity),
-				asyncGhosts(8,as_capacity),
-				usingGhosts(),
-				fieldsMaker(8)
+            array_db(),
+            outline( *this ),
+            nucleus( *this ),
+            in_layout(),
+            in_ghosts(),
+            localGhosts(4,as_capacity),
+            asyncGhosts(8,as_capacity),
+            usingGhosts(),
+            fieldsMaker(8)
 			{
 				record_ghosts(G);
 				record_fields(F);
 			}
-
+            
 			virtual ~dataspace() throw() {}
-
-
+            
+            
 			//! manually create a new array
 			/**
-			\param name the unique array name
-			\param async if true, will use ghosts exchange
-			*/
+             \param name the unique array name
+             \param async if true, will use ghosts exchange
+             */
 			template <typename ARRAY>
 			inline ARRAY &create( const string &name, bool async = true )
 			{
@@ -66,7 +67,7 @@ namespace yocto
 				}
 				return ans;
 			}
-
+            
 			//! manually create a new array, wrapper
 			template <typename ARRAY>
 			inline ARRAY &create( const char *id, bool async = true )
@@ -74,12 +75,12 @@ namespace yocto
 				const string name(id);
 				return create<ARRAY>(name);
 			}
-
+            
 			//! allocate all data for communications
 			/**
-			This should be done only once, after all
-			arrays are created.
-			*/
+             This should be done only once, after all
+             arrays are created.
+             */
 			void  prepare_ghosts()
 			{
 				for( size_t i=1; i <= asyncGhosts.size(); ++i )
@@ -87,43 +88,43 @@ namespace yocto
 					asyncGhosts[i]->allocate_for( usingGhosts );
 				}
 			}
-
-
-
+            
+            
+            
 			//! number of local ghosts for PBC
 			inline size_t  local_ghosts_count() const throw() { return localGhosts.size(); }
-
+            
 			//! number of async ghosts for communication 
 			inline size_t  async_ghosts_count() const throw() { return asyncGhosts.size(); }
-
+            
 			local_ghosts & __local_ghosts( size_t index ) throw() { return *localGhosts[index];}
 			async_ghosts & __async_ghosts( size_t index ) throw() { return *asyncGhosts[index];} 
-
+            
 			//! handles to array using communication
 			const linear_handles & handles() const throw() { return usingGhosts; }
-
+            
 			//! number of MPI requests for communication
 			size_t num_requests() const throw() { return 2 * asyncGhosts.size() ; }
-
+            
 			const LAYOUT       outline;    //!< layout+ghosts
 			const LAYOUT       nucleus;    //!< layout - async ghosts: always synchronous
 			const offsets_list in_layout;  //!< layout offsets
 			const offsets_list in_ghosts;  //!< offsets in layout BUT NOT in nucleus
-
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
 			vector<local_ghosts::ptr> localGhosts;
 			vector<async_ghosts::ptr> asyncGhosts;
 			vector<linear_base *>     usingGhosts;
 			factory<LAYOUT>           fieldsMaker;
-
+            
 			//! compute outline and ghosts from the setup
 			inline void record_ghosts( const ghosts_setup<coord> &G )
 			{
 				const unit_t *local_g = (const unit_t *) &G.local.count;
 				const unit_t *lower_g = (const unit_t *) &G.lower.count;
 				const unit_t *upper_g = (const unit_t *) &G.upper.count;
-
+                
 				//==============================================================
 				//
 				// First pass: compute outline, sync zone and register ghosts
@@ -139,7 +140,7 @@ namespace yocto
 					unit_t  *     pUpper = (unit_t *) &outUp;
 					coord         syncLo( this->lower );
 					coord         syncUp( this->upper );
-
+                    
 					for( unsigned dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
 					{
 						const unit_t local_ng = local_g[dim];
@@ -150,7 +151,7 @@ namespace yocto
 							//--------------------------------------------------
 							if( local_ng > w[dim] )
 								throw exception("too many local ghosts in dimension %u", dim);
-
+                            
 							//--------------------------------------------------
 							// create the local ghosts
 							//--------------------------------------------------
@@ -159,7 +160,7 @@ namespace yocto
 							pLower[dim] -= local_ng;
 							pUpper[dim] += local_ng;
 						}
-
+                        
 						{
 							const unit_t lower_ng = lower_g[dim];
 							if( lower_ng > 0 )
@@ -172,7 +173,7 @@ namespace yocto
 								__coord(syncLo,dim) += lower_ng;
 							}
 						}
-
+                        
 						{
 							const unit_t upper_ng = upper_g[dim];
 							if( upper_ng > 0 )
@@ -185,12 +186,12 @@ namespace yocto
 								__coord(syncUp,dim) -= upper_ng;
 							}
 						}
-
+                        
 						if(  __coord(syncUp,dim) <  __coord(syncLo,dim))
 							throw exception("too many async ghosts in dimension %u", dim );
-
+                        
 					}
-
+                    
 					//==========================================================
 					//
 					// recreate outline and nucleus zone
@@ -204,7 +205,7 @@ namespace yocto
 					goff.reserve(this->__layout().items - nucleus.items );
 					collect_in_ghosts(goff, int2type<LAYOUT::DIMENSIONS>() );
 				}
-
+                
 				{
 					//==========================================================
 					//
@@ -215,11 +216,11 @@ namespace yocto
 					const coord outUp( outline.upper );
 					const coord layLo( this->lower );
 					const coord layUp( this->upper );
-
+                    
 					size_t iLocal=0, iAsync=0;
 					for( unsigned dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
 					{
-
+                        
 						//------------------------------------------------------
 						//
 						// local ghosts
@@ -244,7 +245,7 @@ namespace yocto
 								//std::cerr << "local.lower.inside: " << sub << std::endl;
 								//std::cerr << "@" << g.lower.inside.offsets << std::endl;
 							}
-
+                            
 							//--------------------------------------------------
 							//-- lower.mirror = upper.outside
 							//--------------------------------------------------
@@ -258,7 +259,7 @@ namespace yocto
 								// std::cerr << "local.lower.mirror: " << sub << std::endl;
 								// std::cerr << "@" << g.lower.mirror.offsets << std::endl;
 							}
-
+                            
 							//--------------------------------------------------
 							//-- upper.inside
 							//--------------------------------------------------
@@ -272,9 +273,9 @@ namespace yocto
 								assert( sub.items == g.upper.inside.offsets.size() );
 								//std::cerr << "local.upper.inside: " << sub << std::endl;
 								//std::cerr << "@" << g.upper.inside.offsets << std::endl;
-
+                                
 							}
-
+                            
 							//--------------------------------------------------
 							//-- upper.mirror = lower.outside
 							//--------------------------------------------------
@@ -287,9 +288,9 @@ namespace yocto
 								assert( sub.items == g.upper.mirror.offsets.size() );
 								//std::cerr << "local.upper.mirror: " << sub << std::endl;
 								//std::cerr << "@" << g.upper.mirror.offsets << std::endl;
-
+                                
 							}
-
+                            
 							//--------------------------------------------------
 							// finalize
 							//--------------------------------------------------
@@ -298,7 +299,7 @@ namespace yocto
 							assert( g.upper.inside.offsets.size() == g.num_offsets);
 							assert( g.upper.mirror.offsets.size() == g.num_offsets);
 						}
-
+                        
 						//------------------------------------------------------
 						//
 						// lower ghosts
@@ -322,7 +323,7 @@ namespace yocto
 									outline.load_offsets( sub, g.self.inner.offsets );
 									assert( sub.items == g.self.inner.offsets.size() );
 								}
-
+                                
 								//----------------------------------------------
 								// lower.outer
 								//----------------------------------------------
@@ -334,7 +335,7 @@ namespace yocto
 									outline.load_offsets( sub, g.self.outer.offsets );
 									assert( sub.items == g.self.outer.offsets.size() );
 								}
-
+                                
 								//----------------------------------------------
 								// finalize
 								//----------------------------------------------
@@ -342,7 +343,7 @@ namespace yocto
 								assert( g.self.outer.offsets.size() == g.num_offsets);
 							}
 						}
-
+                        
 						//------------------------------------------------------
 						//
 						// upper ghosts
@@ -354,7 +355,7 @@ namespace yocto
 							{
 								async_ghosts &g = * asyncGhosts[ ++iAsync ];
 								const unit_t ns = upper_ng - 1;
-
+                                
 								//----------------------------------------------
 								// upper.inner
 								//----------------------------------------------
@@ -367,7 +368,7 @@ namespace yocto
 									outline.load_offsets(sub, g.self.inner.offsets );
 									assert( sub.items ==  g.self.inner.offsets.size() );
 								}
-
+                                
 								//----------------------------------------------
 								// upper.outer
 								//----------------------------------------------
@@ -379,7 +380,7 @@ namespace yocto
 									outline.load_offsets(sub, g.self.outer.offsets );
 									assert( sub.items ==  g.self.outer.offsets.size() );
 								}
-
+                                
 								//----------------------------------------------
 								// finalize
 								//----------------------------------------------
@@ -387,13 +388,13 @@ namespace yocto
 								assert( g.self.outer.offsets.size() == g.num_offsets);
 							}
 						}
-
-
+                        
+                        
 					}
 				}
-
+                
 			}
-
+            
 			inline void collect_in_ghosts( offsets_list &goff, int2type<1> )
 			{
 				for( unit_t i=this->lower;i<=this->upper;++i)
@@ -404,8 +405,8 @@ namespace yocto
 					}
 				}
 			}
-
-
+            
+            
 			inline void collect_in_ghosts( offsets_list &goff, int2type<2> )
 			{
 				for( unit_t j=this->lower.y;j<=this->upper.y;++j)
@@ -420,7 +421,7 @@ namespace yocto
 					}
 				}
 			}
-
+            
 			inline void collect_in_ghosts( offsets_list &goff, int2type<3> )
 			{
 				for( unit_t k=this->lower.z;k<=this->upper.z;++k)
@@ -437,10 +438,10 @@ namespace yocto
 						}
 					}
 				}
-
+                
 			}
-
-
+            
+            
 			inline void record_fields( const fields_setup<LAYOUT> &F )
 			{
 				for( typename fields_setup<LAYOUT>::iterator i = F.begin(); i != F.end(); ++i )
@@ -460,7 +461,7 @@ namespace yocto
 #if defined(_MSC_VER)
 #pragma warning (pop)
 #endif
-
+        
 	}
 }
 
