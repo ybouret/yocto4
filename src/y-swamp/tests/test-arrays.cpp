@@ -10,7 +10,7 @@ using namespace swamp;
 
 static inline coord1D rand1()
 {
-    return 20 - 40 * alea<double>();
+    return coord1D(20 - 40 * alea<double>());
 }
 
 static inline coord2D rand2()

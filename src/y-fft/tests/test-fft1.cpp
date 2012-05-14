@@ -19,7 +19,7 @@ void perform()
 		vector<cplx_t> data( n, 0 );
 		for( size_t i=1; i <= n; ++i )
 		{
-			data[i].re = (i-1) * (n-i);
+			data[i].re = T( (i-1) * (n-i) );
 		}
 		vector<cplx_t> raw( data );
 		

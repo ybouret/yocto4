@@ -103,7 +103,7 @@ namespace yocto {
 			//------------------------------------------------------------------
 			for( size_t q=1; q <= ncoeff_; ++q )
 			{
-				ptrdiff_t j=-nl;
+				ptrdiff_t j=-ptrdiff_t(nl);
 				for( size_t i=1; i <= np_; ++i,++j )
 				{
 					real_t j_pow = 1;

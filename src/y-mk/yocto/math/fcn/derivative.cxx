@@ -10,8 +10,12 @@ namespace yocto
 	{
 		
 		template <>
-		const real_t derivative<real_t>:: hdiv_ = 1.4;
+		const real_t derivative<real_t>:: hdiv_ = REAL(1.4);
 		
+#if defined(_MSC_VER)
+		// init of wksp_
+#pragma warning ( disable : 4351 )
+#endif
 		template <>
 		derivative<real_t>:: derivative() throw() :
 		x_(),
@@ -46,7 +50,7 @@ namespace yocto
 		real_t derivative<real_t>:: operator()(  numeric<real_t>::function &proc, real_t x, real_t h )
 		{
 			
-			static const real_t hmin = numeric<real_t>::tiny * Pow( hdiv_,kmax_ );
+			static const real_t hmin = numeric<real_t>::tiny * Pow( hdiv_, real_t(kmax_) );
 			static const real_t dtol = Sqrt( numeric<real_t>:: ftol );
 			
 			h = max_of<real_t>( Fabs(h), hmin );

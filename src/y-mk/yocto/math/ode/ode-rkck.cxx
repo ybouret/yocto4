@@ -36,14 +36,14 @@ namespace yocto
 										   const array<real_t>  &dydx 
 										   )
 			{
-				static const real_t a2  = 0.2, a3=0.3, a4=0.6, a5=1.0, a6=0.875;
-				static const real_t b21 = 0.2;
-				static const real_t b31 = 3.0/40.0,        b32=9.0/40.0;
-				static const real_t b41 = 0.3,             b42 = -0.9,      b43=1.2;
-				static const real_t b51 = -11.0/54.0,      b52=2.5,         b53 = -70.0/27.0,  b54=35.0/27.0;
-				static const real_t b61 = 1631.0/55296.0,  b62=175.0/512.0, b63=575.0/13824.0, b64=44275.0/110592.0, b65=253.0/4096.0;
-				static const real_t c1=37.0/378.0, c3=250.0/621.0, c4=125.0/594.0, c6=512.0/1771.0;
-				static const real_t dc1=c1-2825.0/27648.0, dc3=c3-18575.0/48384.0, dc4=c4-13525.0/55296.0, dc5 = -277.00/14336.0, dc6=c6-0.25;
+				static const real_t a2  = REAL(0.2), a3=REAL(0.3), a4=REAL(0.6), a5=REAL(1.0), a6=REAL(0.875);
+				static const real_t b21 = REAL(0.2);
+				static const real_t b31 = REAL(3.0)/REAL(40.0),        b32=REAL(9.0)/REAL(40.0);
+				static const real_t b41 = REAL(0.3),             b42 = REAL(-0.9),      b43=REAL(1.2);
+				static const real_t b51 = REAL(-11.0)/REAL(54.0),      b52=REAL(2.5),         b53 = REAL(-70.0)/REAL(27.0),  b54=REAL(35.0)/REAL(27.0);
+				static const real_t b61 = REAL(1631.0)/REAL(55296.0),  b62=REAL(175.0)/REAL(512.0), b63=REAL(575.0)/REAL(13824.0), b64=REAL(44275.0)/REAL(110592.0), b65=(253.0)/REAL(4096.0);
+				static const real_t c1=REAL(37.0)/REAL(378.0), c3=REAL(250.0)/REAL(621.0), c4=REAL(125.0)/REAL(594.0), c6=REAL(512.0)/REAL(1771.0);
+				static const real_t dc1=c1-REAL(2825.0)/REAL(27648.0), dc3=c3-REAL(18575.0)/REAL(48384.0), dc4=c4-REAL(13525.0)/REAL(55296.0), dc5 = REAL(-277.0)/REAL(14336.0), dc6=c6-REAL(0.25);
 				
 				const size_t n = y.size();
 				
