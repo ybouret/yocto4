@@ -87,7 +87,7 @@ namespace yocto
 		void jacobian<real_t>:: operator()( matrix<real_t> &jac, numeric<real_t>::vector_field &F, const array<real_t> &X, real_t h0 )
 		{
 			
-			static const real_t hmin = numeric<real_t>::tiny * Pow( hdiv_,kmax_ );
+			static const real_t hmin = numeric<real_t>::tiny * Pow( real_t(hdiv_),real_t(kmax_) );
 			static const real_t dtol = Sqrt( numeric<real_t>:: ftol );
 			
 			const size_t nvar = X.size(); assert( nvar == this->size() );

@@ -43,13 +43,13 @@ namespace yocto
 										  const array<real_t> &yscal,
 										  const real_t         eps)
 			{
-				static const real_t SAFETY =  0.9;
-				static const real_t PGROW  = -0.2;
-				static const real_t PSHRNK = -0.25;
+				static const real_t SAFETY = REAL(0.9);
+				static const real_t PGROW  = REAL(-0.2);
+				static const real_t PSHRNK = REAL(-0.25);
 				//The value ERRCON equals (5/SAFETY) raised to the power (1/PGROW), see use below	
-				static const real_t ERRCON = Pow( real_t(5.0)/SAFETY, real_t(1)/PGROW);
-				static const real_t DEC    = 0.1;
-				static const real_t INC    = 5.0;
+				static const real_t ERRCON = Pow( REAL(5.0)/SAFETY, REAL(1.0)/PGROW);
+				static const real_t DEC    = REAL(0.1);
+				static const real_t INC    = REAL(5.0);
 				
 				
 				//--------------------------------------------------------------

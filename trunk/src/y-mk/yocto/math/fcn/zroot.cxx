@@ -36,6 +36,10 @@ namespace yocto
 		template <>
 		zroot<real_t>:: ~zroot() throw() {}
 		
+#if defined(_MSC_VER)
+// this in ctor
+#pragma warning ( disable : 4355 )
+#endif
 		template <>
 		zroot<real_t>:: zroot() :
 		ftol(0),
