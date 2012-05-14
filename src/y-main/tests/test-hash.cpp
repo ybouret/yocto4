@@ -116,7 +116,7 @@ static inline int cmpfast( const void *lhs, const void *rhs ) throw()
 {
 	const int64_t a = *(const T*)lhs;
 	const int64_t b = *(const T*)rhs;
-	return a-b;
+	return int(a-b);
 }
 
 YOCTO_UNIT_TEST_IMPL(hcol)

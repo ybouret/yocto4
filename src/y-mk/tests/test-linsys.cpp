@@ -15,7 +15,7 @@ static inline void test_linsys()
 	
 	for( size_t n=1; n <= 128; n += 1 + alea_less_than(8) )
 	{
-		const  T  diag(n+1);
+		const  T  diag(float(n+1));
 		matrix<T> m(n,n);
 		
 		for( size_t i=1; i <= n; ++i )

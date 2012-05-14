@@ -68,7 +68,7 @@ YOCTO_UNIT_TEST_IMPL(kernel)
 	size_t N = 32;
 	vector<cl_float>        vec_a( N, 0 );
 	ocl::BufferOf<cl_float> ocl_a( context, CL_MEM_READ_WRITE, N, NULL );
-	for( size_t i=1; i <= N; ++i ) vec_a[i] = i;
+	for( size_t i=1; i <= N; ++i ) vec_a[i] = float(i);
 	std::cerr << "a=" << vec_a << std::endl;
 	
 	cl_uint arg_index = 0;

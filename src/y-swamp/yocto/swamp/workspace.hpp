@@ -7,7 +7,11 @@ namespace yocto
 {
     namespace swamp 
     {
-        
+#if defined(_MSC_VER)
+		// this in ctor
+#pragma warning (push)
+#pragma warning ( disable : 4355 )
+#endif
         //! a workspace based on data+mesh
         template <
         typename LAYOUT,
@@ -33,6 +37,10 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(workspace);
         };
+
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
     }
 }
 

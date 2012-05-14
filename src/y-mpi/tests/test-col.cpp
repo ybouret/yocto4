@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(scatter)
 	if( rank == 0 ) 
 	{
 		src.make( N * size, 1.0f );
-		for( size_t i=1; i <= src.size(); ++i ) src[i] = i;
+		for( size_t i=1; i <= src.size(); ++i ) src[i] = float(i);
 	}
 	vector<float> dst(N,0.0);
 	

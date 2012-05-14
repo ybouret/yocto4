@@ -138,6 +138,10 @@ YOCTO_UNIT_TEST_IMPL(rsa1)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4309 )
+#endif
+
 static const char keys_db[] =
 {
 #include "rsa-keys.inc"

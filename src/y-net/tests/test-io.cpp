@@ -76,7 +76,7 @@ YOCTO_UNIT_TEST_IMPL(ioQ)
 		throw exception("usage: %s port [4|6]", argv[0]);
 	}
 	
-	const uint16_t port     = strtol(argv[1],NULL,10);
+	const uint16_t port     = uint16_t(strtol(argv[1],NULL,10));
 	const uint16_t net_port = swap_be(port);
 	int            version  = 4;
 	if( argc > 2 )
@@ -189,7 +189,7 @@ YOCTO_UNIT_TEST_IMPL(protocol)
 		throw exception("usage: %s port [4|6]", argv[0]);
 	}
 	
-	const uint16_t port     = strtol(argv[1],NULL,10);
+	const uint16_t port     = uint16_t(strtol(argv[1],NULL,10));
 	const uint16_t net_port = swap_be(port);
 	int            version  = 4;
 	if( argc > 2 )

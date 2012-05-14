@@ -17,7 +17,10 @@ using namespace yocto;
 
 namespace {
 	
-	
+#if defined(_MSC_VER)
+	// init of array_
+#pragma warning ( disable : 4351 )
+#endif
 	class computing : public threading::runnable, public object
 	{
 	public:
