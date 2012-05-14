@@ -148,7 +148,7 @@ PARSE_FP:
 			}
 			const real_t tmp = neg ? -(ip+fp) : (ip+fp) ;
 			
-			return tmp * (ep_neg ? ipower<real_t>(0.1,ep) : ipower(10,ep) );
+			return tmp * (ep_neg ? ipower<real_t>(real_t(0.1),ep) : ipower<real_t>(real_t(10),ep) );
 		}
 	}
 	

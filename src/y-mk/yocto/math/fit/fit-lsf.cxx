@@ -37,11 +37,14 @@ namespace yocto
 				}
 			}
 			
-			
+#if defined(_MSC_VER)
+			// this used in ctor
+#pragma warning  ( disable : 4355 )
+#endif
 			template <>
 			lsf<real_t>:: lsf() :
 			ftol( numeric<real_t>::ftol ),
-			h( 1e-4 ),
+			h( real_t(1e-4) ),
 			verbose(false),
 			samp_(NULL),
 			func_(NULL),
@@ -151,8 +154,8 @@ namespace yocto
 				static const real_t LAMBDA_MIN = Pow( real_t(10), -LAMBDA_EXP);
 				static const real_t LAMBDA_MAX = Pow( real_t(10),  LAMBDA_EXP);
 				static const real_t LAMBDA_INI = Pow( real_t(10), Ceil( -LAMBDA_EXP/2) );
-				static const real_t LAMBDA_DEC = 0.1;
-				static const real_t LAMBDA_INC = 10;
+				static const real_t LAMBDA_DEC = real_t(0.1);
+				static const real_t LAMBDA_INC = real_t(10);
 				
 				
 				ftol = Fabs( ftol );

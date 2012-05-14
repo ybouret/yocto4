@@ -255,6 +255,10 @@ namespace yocto {
 #endif
 				
 #if defined(YOCTO_WIN)
+#if defined(_MSC_VER)
+				// switch with only a default label
+#pragma warning ( disable : 4065 )
+#endif
 				int res = 0;
 				while( (res = ::select( 0, fd_recv, fd_send, NULL, d.wait_ ) ) == SOCKET_ERROR ) {
 					const DWORD err = ::WSAGetLastError();

@@ -9,6 +9,10 @@ namespace yocto
         
     }
     
+#if defined(_MSC_VER)
+	// init of buf
+#pragma warning ( disable : 4351 )
+#endif
     base64:: common:: common() throw() :
     fifo(),
     buf(),

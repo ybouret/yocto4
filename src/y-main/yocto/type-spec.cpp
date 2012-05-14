@@ -46,7 +46,10 @@ namespace yocto {
 		return info_->name();
 	}
 	
-	
+#if defined(_MSC_VER)
+	//! int to bool
+#pragma warning( disable : 4800 )
+#endif
 	bool type_spec:: before( const type_spec &other ) const throw() {
 		assert( other.info_ != NULL );
 		assert( this->info_ != NULL );

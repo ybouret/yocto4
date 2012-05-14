@@ -7,7 +7,10 @@ namespace yocto
 {
 	
 	
-	
+#if defined(_MSC_VER)
+	// init of string_
+#pragma warning ( disable : 4351 )
+#endif
 	mpi:: exception:: exception( int err, const char *fmt, ... ) throw() :
 	yocto::exception(),
 	code( err ),

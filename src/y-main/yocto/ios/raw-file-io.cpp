@@ -120,7 +120,7 @@ namespace yocto
 			const offset_t ans = this->seek(0,from_end);
 			if( now != this->seek( now, from_set ) )
 				throw exception( "raw_file::length(bad reset)");
-			return ans;
+			return size_t(ans);
 		}
 		
 		void raw_file:: get_all( void *data, size_t size )
