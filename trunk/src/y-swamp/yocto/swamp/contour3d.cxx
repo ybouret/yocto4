@@ -11,6 +11,10 @@ namespace yocto
             typedef vertex3D<ZTYPE>::type XYZ;
             typedef triangle3D<ZTYPE>     TRIANGLE;             
             
+#if defined(_MSC_VER)
+			//! default initialization of GRIDCELL:val
+#pragma warning ( disable : 4351 )
+#endif
             class GRIDCELL {
             public:
                 XYZ    p[8];

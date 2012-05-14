@@ -3,29 +3,32 @@
 #include <cstring>
 
 namespace yocto {
-	
+
 	namespace core {
-		
+
 		move_to_front:: ~move_to_front() throw()
 		{
 			list_.reset();
 		}
-		
-		
+
+#if defined(_MSC_VER)
+		// init of node_
+#pragma warning ( disable : 4351 )
+#endif
 		move_to_front:: move_to_front() throw() :
 		list_(),
 		node_()
 		{
 			build();
 		}
-	
-		
+
+
 		void move_to_front::reset() throw() 
 		{
 			list_.reset();
 			build();
 		}
-		
+
 		void move_to_front:: build() throw() 
 		{
 			memset( node_, 0, sizeof(node_) );
@@ -38,7 +41,7 @@ namespace yocto {
 			}
 			assert( 256 == list_.size );
 		}
-		
+
 		uint8_t move_to_front:: encode( uint8_t x ) throw()
 		{
 			assert(list_.size == 256 );
@@ -54,7 +57,7 @@ namespace yocto {
 			assert(list_.size == 256 );
 			return uint8_t(indx);
 		}
-		
+
 		uint8_t move_to_front:: decode( uint8_t x ) throw() 
 		{
 			assert(list_.size == 256 );
@@ -66,10 +69,10 @@ namespace yocto {
 			list_.move_to_front(node);
 			return node->data;
 		}
-		
-		
-		
+
+
+
 	}
-	
+
 }
 

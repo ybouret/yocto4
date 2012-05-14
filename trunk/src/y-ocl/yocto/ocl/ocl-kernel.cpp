@@ -59,6 +59,10 @@ namespace yocto
 		
 #			define YOCTO_CLK_(FIELD,OF) FIELD( Core::GetInfoValue( type2type<OF>(), clGetKernelInfo, *(*this), CL_KERNEL_##FIELD, "CL_KERNEL_" #FIELD ) )
 		
+#if defined(_MSC_VER)
+		// this in ctor
+#pragma warning ( disable : 4355 )
+#endif
 		Kernel:: Kernel( Program &program, const string &kernel_name ) :
 		Shared<cl_kernel>( __create_kernel( *program, kernel_name.c_str() )  ),
 		FUNCTION_NAME( Core::GetInfoString( clGetKernelInfo, *(*this), CL_KERNEL_FUNCTION_NAME, "CL_KERNEL_FUNCTION_NAME") ),

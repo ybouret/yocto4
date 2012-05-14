@@ -6,13 +6,16 @@
 #include "yocto/code/printf-check.hpp"
 #include <cstdio>
 
+#if !defined(_MSC_VER)
 #define YOCTO_CPLUSPLUS __cplusplus
 #undef __cplusplus
+#endif
 extern "C" {
 #include <mpi.h>
 }
+#if !defined(_MSC_VER)
 #define __cplusplus YOCTO_CPLUSPLUS
-
+#endif
 
 namespace yocto
 {

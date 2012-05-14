@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "yocto/ios/ostream.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/memory/buffers.hpp"

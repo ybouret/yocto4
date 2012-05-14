@@ -40,6 +40,10 @@ namespace yocto
 #define YCLD_GET(TYPE,FIELD) FIELD( Core::GetInfoValue( type2type<TYPE>(), clGetDeviceInfo, id, CL_DEVICE_ ## FIELD, "CL_DEVICE_" #FIELD ) )
 #define YCLD_STR(FIELD)      FIELD( Core::GetInfoString( clGetDeviceInfo, id, CL_DEVICE_ ## FIELD, "CL_DEVICE_" #FIELD ) )
 	
+#if defined(_MSC_VER)
+		// size_t to bool
+#pragma warning ( disable : 4800 )
+#endif
 		Device:: Device( cl_device_id device ) :
 		id( device ),
 		YCLD_GET(cl_bool,COMPILER_AVAILABLE),
