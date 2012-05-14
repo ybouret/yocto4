@@ -24,9 +24,22 @@ We want to solve the evolution of the field $u(t,x)$ with diffusion and source t
 	\end{array}
 \end{equation}
 
-We define a {\bf mesh} of $N+1$ vertices $x_0=0<x_1<\ldots<x_i<\ldots<x_{N-1}<x_N=L$.
-We associate to that mesh the $N-1$ {\bf control volumes} $\kappa_{i}=\left\rbrack x_{i-\half}, x_{i+\half}\right\lbrack$ with $1\leq i \leq N-1$.
-and we define the measure of $\kappa_i$ by $h_i=\vert \kappa_i \vert=x_{i+\half} - x_{i-\half}$.
+We define a {\bf mesh} of $N+1$ vertices:
+\begin{equation}
+x_0=0<x_1<\ldots<x_i<\ldots<x_{N-1}<x_N=L.
+\end{equation}
+We associate to that mesh the $N-1$ {\bf control volumes}:
+\begin{equation}
+ 1\leq i \leq N-1, \;\; \kappa_{i}=\left\rbrack x_{i-\half}, x_{i+\half}\right\lbrack.
+\end{equation}
+We define the $N-1$ measures of the volumes
+\begin{equation}
+ 1\leq i \leq N-1, \;\; h_i=\vert \kappa_i \vert=x_{i+\half} - x_{i-\half}.
+\end{equation}
+We define the $N$ distances between centers by
+\begin{equation}
+	0\leq i \leq N-1,\;\; h_{i+\half} = x_{i+1} - x_{i}
+\end{equation}
 We assume that $u_i$ is the average value of $u$ within the volume $\kappa_i$:
 \begin{equation}
 	u_i = \dfrac{1}{h_i}\int_{x_{i-\half}}^{x_{i+\half}} u\myd x.
@@ -35,9 +48,14 @@ We compute
 \begin{equation}
 	\partial_t u_i + \dfrac{1}{h_i} \int_{x_{i-\half}}^{x_{i+\half}} \nabla F \myd x = \dfrac{1}{h_i} \int_{x_{i-\half}}^{x_{i+\half}} f \myd x = f_i
 \end{equation}
-and accordingly
+where $f_i$ is the average value of $f$ in the volume $\kappa_i$.
+Moreover, we have
 \begin{equation}
 	\int_{x_{i-\half}}^{x_{i+\half}} \nabla F \myd x = F_{i+\half} - F_{i-\half}.
+\end{equation}
+and
+\begin{equation}
+	F_{i+\half} \simeq - D_{i+\half} \dfrac{u_{i+1}-u_{i}}{h_{i+\half}} 
 \end{equation}
 
 \end{document}
