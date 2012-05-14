@@ -98,7 +98,7 @@ namespace
                     const Real r2 = x*x+y*y;
                     const Real r  = sqrt(r2);
                     
-                    U[j][i] = 2+cos(5*r) +  (0.5 - alea<Real>());
+                    U[j][i] = 1+0.5*cos(5*r) +  0.5*(0.5 - alea<Real>());
                     V[j][i] = 1+(0.5 - alea<Real>());
                 }
             }
@@ -210,7 +210,7 @@ namespace
             {
                 const int nComponents=1;
                 const int nTuples    =U.items;
-                MPI.Printf0( stderr, "Sending U: %dx%d\n", nComponents, nTuples);
+                //MPI.Printf0( stderr, "Sending U: %dx%d\n", nComponents, nTuples);
                 assert(U.entry!=NULL);
                 if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
                 {
