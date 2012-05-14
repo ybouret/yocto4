@@ -75,14 +75,14 @@ namespace yocto
 			static T * acquire_as( size_t &n )
 			{
 				static ALLOCATOR &h = ALLOCATOR::instance(); 
-				return h.acquire_as<T>(n);
+				return h.template acquire_as<T>(n);
 			}
 			
 			template <typename T>
 			static void release_as( T * &p, size_t &n ) throw()
 			{
 				static ALLOCATOR &h = ALLOCATOR::instance(); 
-				h.release_as<T>(p,n);
+				h.template release_as<T>(p,n);
 			}
 		};
 	}
