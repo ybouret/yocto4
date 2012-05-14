@@ -91,7 +91,7 @@ YOCTO_UNIT_TEST_IMPL(natural)
 		for( size_t k=0; k< ITER; ++k )
 		{
 			const uint64_t lhs32 = gen.full<uint64_t>()/2;
-			const uint32_t rhs32 = gen.fuzz<uint64_t>()/2;
+			const uint32_t rhs32 = gen.fuzz<uint32_t>()/2;
 			const mpn      lhs   = lhs32;
 			const mpn      rhs   = rhs32;
 			const mpn      sum1  = mpn::add_( lhs, rhs );

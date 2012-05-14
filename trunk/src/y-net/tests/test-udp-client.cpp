@@ -40,7 +40,7 @@ YOCTO_UNIT_TEST_IMPL(udp_client)
 	}
 	
 	const string   hostname = argv[1];
-	const uint16_t port     = strtol(argv[2],NULL,10);
+	const uint16_t port     = uint16_t(strtol(argv[2],NULL,10));
 	const uint16_t net_port = swap_be(port);
 	int            version  = 4;
 	if( argc > 3 )

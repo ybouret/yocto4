@@ -72,8 +72,8 @@ YOCTO_UNIT_TEST_IMPL(profile)
 		
 		for( size_t i=1; i <= N; ++i )
 		{
-			vec_B[i] = 0.5 - alea<cl_float>();
-			vec_C[i] = 0.5 - alea<cl_float>();
+			vec_B[i] = 0.5f - alea<cl_float>();
+			vec_C[i] = 0.5f - alea<cl_float>();
 		}
 		const size_t global_work_size[] = { N };
 		
