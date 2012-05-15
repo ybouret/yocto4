@@ -23,6 +23,8 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/zlib )
 SOURCE_GROUP( zlib FILES ${srcs} )
 
+ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+
 
 INCLUDE(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 
