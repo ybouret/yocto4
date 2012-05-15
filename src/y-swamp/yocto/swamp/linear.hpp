@@ -159,8 +159,25 @@ namespace yocto
 			inline void hash( hashing::function &fn, const LAYOUT &sub ) const { fn.set(); foreach(sub, hash_cb, &fn); }
 
 
-
-
+            //==================================================================
+			// utils
+			//==================================================================
+            inline void get_min_max( T &vmin, size_t *pmin, T &vmax, size_t *pmax ) const
+            {
+                assert(entry!=NULL);
+                size_t imin=0; vmin = entry[imin];
+                size_t imax=0; vmax = entry[imax];
+                const size_t top(this->items);
+                for( size_t i=1; i < top; ++i )
+                {
+                    const T tmp( entry[i] );
+                    if( tmp < vmin )  { vmin = tmp; imin=i; }
+                    if( tmp > vmax )  { vmax = tmp; imax=i; }
+                }
+                if(pmin) *pmin = imin;
+                if(pmax) *pmax = imax;
+            }
+            
 		protected:
 			static inline void set_cb( type &v, void *args) throw() { assert(args); v  = *(type*)args; }
 			static inline void add_cb( type &v, void *args) throw() { assert(args); v += *(type*)args; }
