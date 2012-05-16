@@ -1,4 +1,5 @@
 #include "yocto/threading/thread.hpp"
+#include "yocto/exceptions.hpp"
 
 // thread placement is not supported on MacOSX
 #if defined(_WIN32)
@@ -59,7 +60,7 @@ namespace yocto
 #if defined(YOCTO_THREAD_AFFINITY)
         void thread:: assign_cpu( thread::handle_t h, size_t cpu_id )
         {
-            __assign(j,cpu_id);
+            __assign(h,cpu_id);
         }
 #else
         void thread:: assign_cpu( thread::handle_t, size_t )
