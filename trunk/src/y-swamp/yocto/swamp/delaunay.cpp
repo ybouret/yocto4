@@ -1,5 +1,6 @@
 #include "yocto/swamp/delaunay.hpp"
 #include "yocto/code/gsort.hpp"
+#include "yocto/geom/m2d.hpp"
 
 namespace yocto 
 {

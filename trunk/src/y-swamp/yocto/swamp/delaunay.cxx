@@ -16,26 +16,27 @@ namespace yocto
                                           const delaunay<ZTYPE>::vertex &C)
         {
             delaunay<ZTYPE>::vertex &cc = (delaunay<ZTYPE>::vertex &)center;
-            cc.x = cc.y = 0;
-            const ZTYPE ByCy = B.y - C.y;
-            const ZTYPE CyAy = C.y - A.y;
-            const ZTYPE AyBy = A.y - B.y;
-            const ZTYPE tmp  = A.x * ByCy + B.x * CyAy + C.x * AyBy;
-            const ZTYPE D    = tmp+tmp;
-            const ZTYPE A2   = A.norm2();
-            const ZTYPE B2   = B.norm2();
-            const ZTYPE C2   = C.norm2();
             
-            cc.x = (A2 * ByCy + B2 * CyAy + C2 * AyBy)/D;
-            cc.y = (A2 * (C.x - B.x) + B2 * (A.x - C.x ) + C2 * (B.x - A.x ) ) / D;
+            {
+                const  delaunay<ZTYPE>::vertex AB(A,B);
+                const  delaunay<ZTYPE>::vertex AC(A,C);
+                const  delaunay<ZTYPE>::vertex BC(B,C);
+                geom::m2d<ZTYPE> M_AB_AC;
+                M_AB_AC.ex.x = AB.x; M_AB_AC.ey.x = AB.y;
+                M_AB_AC.ex.y = AC.x; M_AB_AC.ey.y = AC.y;
+                M_AB_AC.inverse();
+                const delaunay<ZTYPE>::vertex U(ZTYPE(0.5) *( (A.x+B.x) * AB.x + (A.y+B.y) * AB.y ),
+                                                ZTYPE(0.5) *( (A.x+C.x) * AC.x + (A.y+C.y) * AC.y ) );
+                M_AB_AC.mul( cc, U );
+            }
+            const  delaunay<ZTYPE>::vertex MA(cc,A);
+            const  delaunay<ZTYPE>::vertex MB(cc,B);
+            const  delaunay<ZTYPE>::vertex MC(cc,C);
+            const  ZTYPE ra = MA.norm();
+            const  ZTYPE rb = MB.norm();
+            const  ZTYPE rc = MC.norm();
             
-            const ZTYPE a = Sqrt(A2);
-            const ZTYPE b = Sqrt(B2);
-            const ZTYPE c = Sqrt(C2);
-            const ZTYPE s = (a+b+c)/2;
-            const ZTYPE den = s*(s-a)*(s-b)*(s-c);
-            const ZTYPE num = a*b*c;
-            return num/(4*Sqrt(den));
+            return (ra+rb+rc)/3;
         }
         
         template <>
@@ -108,7 +109,7 @@ namespace yocto
         {
             return tr_list;
         }
-
+        
         
         template <>
         void delaunay<ZTYPE>:: build( const array<vertex> &vertices )
