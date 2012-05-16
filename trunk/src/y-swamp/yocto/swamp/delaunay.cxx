@@ -51,6 +51,8 @@ namespace yocto
         template <>
         delaunay<ZTYPE>:: triangle::triangle( const triangle &other ) throw() :
         iTriangle(other),
+        next(0),
+        prev(0),
         center( other.center ),
         radius( other.radius )
         {
@@ -58,16 +60,60 @@ namespace yocto
         
         
         template <>
-        delaunay<ZTYPE>:: delaunay() : tr() {}
+        delaunay<ZTYPE>:: delaunay() : tr_pool(), tr_list() {}
         
         template <>
-        delaunay<ZTYPE>:: ~delaunay() throw() {}
+        void delaunay<ZTYPE>:: destruct( triangle *tr ) throw()
+        {
+            assert(tr);
+            assert(tr->next == 0);
+            assert(tr->prev == 0);
+            tr->~triangle();
+            tr_pool.store(tr);
+        }
         
+        
+        template <>
+        void delaunay<ZTYPE>:: free() throw()
+        {
+            while( tr_list.size ) destruct( tr_list.pop_back() );
+        }
+        
+        template <>
+        void delaunay<ZTYPE>:: kill() throw()
+        {
+            while( tr_pool.size ) object::release1<triangle>( tr_pool.query() );
+        }
+        
+        
+        
+        template <>
+        delaunay<ZTYPE>:: ~delaunay() throw() 
+        {
+            free();
+            kill();
+        }
+        
+        
+        template <>
+        delaunay<ZTYPE>::triangle * delaunay<ZTYPE>:: create( const array<vertex> &vertices, size_t a, size_t b, size_t c )
+        {
+            triangle *tr = tr_pool.size ? tr_pool.query() : object::acquire1<triangle>();
+            try { new (tr) triangle(vertices,a,b,c); } catch(...) { tr_pool.store( tr ); throw; }
+            return tr;
+        }
+        
+        template <>
+        const delaunay<ZTYPE>::triangles & delaunay<ZTYPE>::operator()(void) const throw()
+        {
+            return tr_list;
+        }
+
         
         template <>
         void delaunay<ZTYPE>:: build( const array<vertex> &vertices )
         {
-            tr.free();
+            free();
             const size_t nv = vertices.size();
             if( nv < 3 )
                 return;
@@ -75,19 +121,10 @@ namespace yocto
             //------------------------------------------------------------------
             // push the first triangle
             //------------------------------------------------------------------
-            {
-                const triangle first(vertices,1,2,3);
-                tr.push_back( first );
-            }
-            
+            tr_list.push_back( create(vertices,1,2,3) );
         }
         
         
-        template <>
-        const delaunay<ZTYPE>::triangles & delaunay<ZTYPE>:: operator()(void) const throw()
-        {
-            return tr;
-        }
         
         
     }
