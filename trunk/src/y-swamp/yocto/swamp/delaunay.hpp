@@ -57,7 +57,7 @@ namespace yocto
                 triangle    *prev;
                 const vertex center;
                 const T      radius;
-                
+                const T      r2;
             private:
                 YOCTO_DISABLE_ASSIGN(triangle);
             };
@@ -78,8 +78,13 @@ namespace yocto
             void      kill() throw(); //!< remove dead triangles
             core::pool_of<triangle> tr_pool;
             core::list_of<triangle> tr_list;
+            vector<triangle*>       circum;
+            
+            
+            void insert( const array<vertex> &vertices, size_t v_index );
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(delaunay);
+            
         };
         
     }
