@@ -62,7 +62,6 @@ namespace yocto
             //! get the record for the type
             const record & operator[]( const std::type_info & ) const;
             
-            
             //! write VTK header file
             void header( ios::ostream &fp, const string &title ) const;
             
@@ -95,7 +94,6 @@ namespace yocto
                 write_axis_sub(fp, &Z[sub.lower.z], sub.width.z, sizeof(T), r, 'Z' );
             }
             
-            
             //! write POINT_DATA
             void prolog( ios::ostream &fp, const string &name, size_t num, const record &r) const;
             
@@ -124,7 +122,7 @@ namespace yocto
                 }
             }
             
-             //! unique vtk save routine
+            //! unique vtk save routine, wrapper
             template <typename U,typename LAYOUT>
             void save( const char *the_filename, const char *the_title, const workspace<LAYOUT, U, rmesh> &wksp, const array<string> &var, const LAYOUT &sub )
             {
@@ -133,7 +131,7 @@ namespace yocto
 				this->save<U,LAYOUT>(filename,title,wksp,var,sub);
 			}
 			
-            
+            //! save triangle3D, as computed by contour3D
             template <typename T>
             inline void save( const string &filename, const string &title, const array< triangle3D<T> > &triangles ) const
             {
