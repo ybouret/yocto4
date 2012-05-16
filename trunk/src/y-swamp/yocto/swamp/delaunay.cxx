@@ -47,5 +47,48 @@ namespace yocto
             
         }
         
+        
+        template <>
+        delaunay<ZTYPE>:: triangle::triangle( const triangle &other ) throw() :
+        iTriangle(other),
+        center( other.center ),
+        radius( other.radius )
+        {
+        }
+        
+        
+        template <>
+        delaunay<ZTYPE>:: delaunay() : tr() {}
+        
+        template <>
+        delaunay<ZTYPE>:: ~delaunay() throw() {}
+        
+        
+        template <>
+        void delaunay<ZTYPE>:: build( const array<vertex> &vertices )
+        {
+            tr.free();
+            const size_t nv = vertices.size();
+            if( nv < 3 )
+                return;
+            
+            //------------------------------------------------------------------
+            // push the first triangle
+            //------------------------------------------------------------------
+            {
+                const triangle first(vertices,1,2,3);
+                tr.push_back( first );
+            }
+            
+        }
+        
+        
+        template <>
+        const delaunay<ZTYPE>::triangles & delaunay<ZTYPE>:: operator()(void) const throw()
+        {
+            return tr;
+        }
+        
+        
     }
 }

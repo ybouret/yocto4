@@ -44,7 +44,6 @@ namespace yocto
         {
         public:
             typedef typename vertex2D<T>::type vertex;
-            
             class triangle : public iTriangle
             {
             public:
@@ -58,12 +57,17 @@ namespace yocto
             private:
                 YOCTO_DISABLE_ASSIGN(triangle);
             };
+            typedef array<triangle> triangles;
             
             explicit delaunay();
             virtual ~delaunay() throw();
             
+            void build( const array<vertex> &vertices );
+            
+            const triangles & operator()(void) const throw();
+            
         private:
-            vector<triangle> triangles;
+            vector<triangle> tr;
             YOCTO_DISABLE_COPY_AND_ASSIGN(delaunay);
         };
         
