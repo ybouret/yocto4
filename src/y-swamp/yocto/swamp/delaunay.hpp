@@ -3,6 +3,8 @@
 
 
 #include "yocto/swamp/in2d.hpp"
+#include "yocto/core/list.hpp"
+#include "yocto/core/pool.hpp"
 
 namespace yocto 
 {
@@ -51,13 +53,16 @@ namespace yocto
                 virtual ~triangle() throw();
                 triangle( const triangle &other ) throw();
                 
+                triangle    *next;
+                triangle    *prev;
                 const vertex center;
                 const T      radius;
                 
             private:
                 YOCTO_DISABLE_ASSIGN(triangle);
             };
-            typedef array<triangle> triangles;
+            
+            typedef core::list_of<triangle> triangles;
             
             explicit delaunay();
             virtual ~delaunay() throw();
@@ -67,7 +72,13 @@ namespace yocto
             const triangles & operator()(void) const throw();
             
         private:
-            vector<triangle> tr;
+            triangle *create( const array<vertex> &vertices, size_t a, size_t b, size_t c );
+            void      destruct( triangle *tr ) throw(); //! destruct and store
+            void      free() throw(); //!< remove alive triangles
+            void      kill() throw(); //!< remove dead triangles
+            core::pool_of<triangle> tr_pool;
+            core::list_of<triangle> tr_list;
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(delaunay);
         };
         
