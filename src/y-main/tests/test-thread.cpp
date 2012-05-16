@@ -54,6 +54,7 @@ YOCTO_UNIT_TEST_IMPL(place)
 	size_t cpu_id = 0;
 	if( argc > 1 ) cpu_id = atoi(argv[1]);
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
+    thread::assign_cpu( thread::get_current_handle(), cpu_id);
 	std::cerr << "Press Enter after check!" << std::endl;
 	fgetc(stdin);
 }
