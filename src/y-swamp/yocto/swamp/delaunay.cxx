@@ -1,4 +1,4 @@
-
+#include "yocto/code/utils.hpp"
 
 namespace yocto 
 {
@@ -43,7 +43,8 @@ namespace yocto
         delaunay<ZTYPE>:: triangle::triangle( const array<vertex> &vertices, size_t a, size_t b, size_t c ) :
         iTriangle(a,b,c),
         center(),
-        radius( __compute_radius_and_center(center, vertices[i0], vertices[i1], vertices[i2] ) )
+        radius( __compute_radius_and_center(center, vertices[i0], vertices[i1], vertices[i2] ) ),
+        r2( radius * radius )
         {
             
         }
@@ -55,13 +56,18 @@ namespace yocto
         next(0),
         prev(0),
         center( other.center ),
-        radius( other.radius )
+        radius( other.radius ),
+        r2( other.r2 )
         {
         }
         
         
         template <>
-        delaunay<ZTYPE>:: delaunay() : tr_pool(), tr_list() {}
+        delaunay<ZTYPE>:: delaunay() : 
+        tr_pool(), 
+        tr_list(),
+        circum()
+        {}
         
         template <>
         void delaunay<ZTYPE>:: destruct( triangle *tr ) throw()
@@ -110,6 +116,29 @@ namespace yocto
             return tr_list;
         }
         
+        template <>
+        void delaunay<ZTYPE>:: insert( const array<vertex> &vertices, size_t v_index )
+        {
+            assert(v_index>3);
+            assert(v_index<=vertices.size());
+            assert(tr_list.size>0);
+            std::cerr << "insert #" << v_index << std::endl;
+            circum.free();
+            const vertex &v = vertices[v_index];
+            triangle *inside = NULL;
+            for( triangle *tr = tr_list.head; tr; tr = tr->next )
+            {
+                const vertex R(tr->center,v);
+                if( R.norm2() <= tr->r2 )
+                {
+                    circum.push_back( tr );
+                }
+            }
+            
+            
+            
+        }
+        
         
         template <>
         void delaunay<ZTYPE>:: build( const array<vertex> &vertices )
@@ -123,6 +152,14 @@ namespace yocto
             // push the first triangle
             //------------------------------------------------------------------
             tr_list.push_back( create(vertices,1,2,3) );
+            
+            //------------------------------------------------------------------
+            // insert the other ones
+            //------------------------------------------------------------------
+            for( size_t i=4; 
+                i <= min_of<size_t>(4,vertices.size()); 
+                ++i )
+                insert( vertices, i );
         }
         
         
