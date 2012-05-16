@@ -32,7 +32,10 @@ namespace yocto
 		
 			static id_t     get_current_id() throw();
 			static handle_t get_current_handle() throw();
-			
+            
+            static void assign_cpu( thread::handle_t , size_t cpu_id );
+            void on_cpu( size_t cpu_id );
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(thread);
 			proc_t       proc_;
