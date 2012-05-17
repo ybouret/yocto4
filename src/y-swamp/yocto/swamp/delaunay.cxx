@@ -125,7 +125,7 @@ namespace yocto
             std::cerr << "insert #" << v_index << std::endl;
             circum.free();
             const vertex &v = vertices[v_index];
-            triangle *inside = NULL;
+            //triangle *inside = NULL;
             for( triangle *tr = tr_list.head; tr; tr = tr->next )
             {
                 const vertex R(tr->center,v);
