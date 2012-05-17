@@ -43,6 +43,7 @@ ENDMACRO(YOCTO_BUILD)
 ########################################################################
 YOCTO_BUILD(thr)
 YOCTO_BUILD(rx)
+YOCTO_BUILD(lex)
 YOCTO_BUILD(fs)
 YOCTO_BUILD(kr)
 YOCTO_BUILD(net)
