@@ -27,7 +27,7 @@ namespace yocto
         
         bool operator==( const iEdge &l, const iEdge &r) throw()
         {
-            return (l.p0 == r.p0) and (l.p1 == r.p1);
+            return (l.p0 == r.p0) && (l.p1 == r.p1);
         }
         
         static inline size_t __isort( size_t &a, size_t &b, size_t &c )

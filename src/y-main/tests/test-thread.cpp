@@ -48,6 +48,7 @@ YOCTO_UNIT_TEST_DONE()
 
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 
 YOCTO_UNIT_TEST_IMPL(place)
 {
@@ -55,8 +56,19 @@ YOCTO_UNIT_TEST_IMPL(place)
 	if( argc > 1 ) cpu_id = atoi(argv[1]);
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
     thread::assign_cpu( thread::get_current_handle(), cpu_id);
+
+#if 0
 	std::cerr << "Press Enter after check!" << std::endl;
 	fgetc(stdin);
+#endif
+	double res = 0;
+	for(size_t i=1; ; ++i)
+	{
+		const double tmp = double(i);
+		res += 1.0/(tmp*tmp);
+		if( 0 == (i%(1024*1024)) )
+			std::cerr << sqrt(6*res) << std::endl;
+	}
 }
 YOCTO_UNIT_TEST_DONE()
 
