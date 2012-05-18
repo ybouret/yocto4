@@ -1,4 +1,5 @@
 
+#if 0
 // thread placement is not supported on MacOSX
 #if defined(_WIN32)
 #	include "yocto/code/utils.hpp"
@@ -19,10 +20,12 @@
 #if defined(_WIN32) || defined(YOCTO_CPU_SET_PTHREAD)
 #	define YOCTO_THREAD_AFFINITY 1
 #endif
+#endif
 
 #include "yocto/threading/team.hpp"
-#include "yocto/exceptions.hpp"
 #include "yocto/threading/thread.hpp"
+
+#include "yocto/exceptions.hpp"
 #include "yocto/hw.hpp"
 
 #include <iostream>
@@ -32,6 +35,7 @@ namespace yocto
 	namespace threading
 	{
 		
+#if 0
 		//----------------------------------------------------------------------
 		// Win32 API wrapper
 		//----------------------------------------------------------------------
@@ -61,7 +65,7 @@ namespace yocto
 				throw libc::exception( err, "pthread_setaffinity_np" );
 		}
 #endif
-	
+#endif
 		
 #include "./team-member.hxx"
 		
@@ -77,26 +81,28 @@ namespace yocto
 		void team:: place(  )
 		{
 			assert( size > 0 );
-#if defined(YOCTO_THREAD_AFFINITY)
 			const size_t  cpu_setsize = hardware::nprocs();
 			member       *m           = static_cast<member *>(wksp_);
 			//------------------------------------------------------------------
 			// assign main thread
 			//------------------------------------------------------------------
 			std::cerr << "-- main thread: " << std::endl;
-			__assign( thread::get_current_handle(), cpu_index( 0, *this, cpu_setsize ) );
+            thread::assign_cpu( thread::get_current_handle(), cpu_index(0,*this,cpu_setsize) );
+			//__assign( thread::get_current_handle(), cpu_index( 0, *this, cpu_setsize ) );
 			
 			//------------------------------------------------------------------
 			// assign team thread
 			//------------------------------------------------------------------
 			std::cerr << "-- members    : " << std::endl;
 			for( size_t i=0; i < size; ++i )
-				__assign(  m[i].thr.get_handle(), cpu_index( i, *this, cpu_setsize ) );
-#endif
+            {
+                thread::assign_cpu( m[i].thr.get_handle(), cpu_index(i,*this,cpu_setsize) );
+            }
+            //__assign(  m[i].thr.get_handle(), cpu_index( i, *this, cpu_setsize ) );
 			
 			
 		}
-	
+        
 		
 	}
 }
