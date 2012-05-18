@@ -11,8 +11,8 @@ namespace yocto
 {
 	namespace threading
 	{
-				
-		//! easy multi threading
+        
+		//! easy multi threading, SIMD style
 		class team : public layout
 		{
 		public:
@@ -21,7 +21,9 @@ namespace yocto
 			class context
 			{
 			public:
-				context( const size_t thread_id, const size_t num_threads, lockable &guard ) throw();				
+				context(const size_t thread_id, 
+                        const size_t num_threads, 
+                        lockable    &guard ) throw();				
 				~context() throw();
 				const size_t      rank;   //!< in 0..size-1
 				const size_t      size;   //!< number of thread in the team
@@ -40,7 +42,7 @@ namespace yocto
 			//! clean up
 			virtual ~team() throw();
 			
-			//! perform task to do on each context
+			//! perform task todo on each context
 			void cycle( task &todo ) throw();
 			
 			
