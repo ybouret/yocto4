@@ -137,7 +137,7 @@ namespace yocto
 				p += done;
 				n -= done;
 				if( done <= 0 )
-					throw exception( "raw_file::get_all(unexpected EOF)");
+					throw exception( "raw_file::get_all(unexpected EOF @%u/%u)", unsigned(p-(uint8_t*)data), size);
 			}
 			
 		}
