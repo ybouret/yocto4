@@ -131,8 +131,8 @@ namespace yocto
 			
 			while( n > 0 )
 			{
-				size_t to_read = min_of<size_t>(n,BUFSIZ);
-				size_t done    = 0;
+				const size_t to_read = min_of<size_t>(n,BUFSIZ);
+				size_t       done    = 0;
 				get(p,to_read,done);
 				p += done;
 				n -= done;
@@ -141,7 +141,40 @@ namespace yocto
 			}
 			
 		}
-
+        
+        void raw_file:: put_all( const void *data, size_t size )
+        {
+            assert( !( data==NULL && size>0 ) );
+			const uint8_t *p = static_cast<const uint8_t*>(data);
+			size_t         n = size;
+			
+			while( n > 0 )
+			{
+                const size_t to_write = min_of<size_t>(n,BUFSIZ);
+				size_t       done     = 0;
+                put(p,to_write,done);
+                p += done;
+                n -= done;
+            }
+            
+        }
+        
+        
+        void   raw_file:: save_buffer( const memory::ro_buffer &buff )
+        {
+            emit<uint32_t>( buff.length() );
+            put_all( buff.ro(), buff.length());
+        }
+        
+        string raw_file:: load_string()
+        {
+            const size_t len = read<uint32_t>();
+            string       ans( len, as_capacity );
+            for( size_t i=0; i < len; ++i )
+                ans.append( read<char>() );
+            return ans;
+        }
+        
 		
 	}
 }

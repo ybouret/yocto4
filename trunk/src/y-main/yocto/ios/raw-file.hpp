@@ -3,9 +3,9 @@
 
 #include "yocto/ios/local-file.hpp"
 #include "yocto/ios/file-descriptor.hpp"
+#include "yocto/code/endian.hpp"
 #include "yocto/string.hpp"
 #include "yocto/error.hpp"
-
 namespace yocto
 {
 	
@@ -56,7 +56,20 @@ namespace yocto
 			
 			
 			void get_all( void *data, size_t size );
-			
+			void put_all( const void *data, size_t size );
+            
+            //! big endian read
+			template <typename T>
+			inline T read() { T x(0); get_all(&x, sizeof(T)); return swap_be_as<T>(x);}
+            
+            //! big endian emit
+            template <typename T>
+			inline void emit( T x ) { x = swap_be_as<T>(x); put_all(&x,sizeof(T)); } 
+           
+            void   save_buffer( const memory::ro_buffer &buff ); //!< 32 bits length
+            string load_string();
+
+            
 		private:
 			handle_t       handle;
 			
