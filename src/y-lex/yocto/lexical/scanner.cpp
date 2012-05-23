@@ -8,5 +8,19 @@ namespace yocto
         {
         }
         
+        
+        scanner:: scanner():
+        line(0),
+        rules_(),
+        cache_(),
+        newline( this, & scanner::on_newline)
+        {
+        }
+        
+        bool scanner:: on_newline( const regex::token &) throw()
+        {
+            ++line;
+            return false;
+        }
     }
 }
