@@ -24,6 +24,8 @@ namespace yocto
 					case ' ':
 					case '(':
 					case ')':
+                    case '-':
+                    case '@':
 						curr = '_';
 						break;
 						
