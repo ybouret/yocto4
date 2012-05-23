@@ -1,18 +1,23 @@
 #include "yocto/ios/rc.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ios/icstream.hpp"
+#include <iostream>
 
 namespace yocto
 {
     namespace ios 
     {
-        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // resources::packer
+        //
+        ////////////////////////////////////////////////////////////////////////
         
 #define Y_RC_PACK_CTOR()          \
 file_( filename, ios::writable ), \
 count(0),                         \
 start(0),                         \
-H()
+H(), db(16,as_capacity)
         
         
         resources:: packer:: packer( const string &filename, error_type &status ) :
@@ -37,21 +42,35 @@ H()
         
         void resources:: packer:: operator()( const string &rcname, const string &filename )
         {
+            
+            if( db.search(rcname) )
+                throw exception("resources::packer(multiple '%s')", rcname.c_str() );
+            
+            //------------------------------------------------------------------
             //-- initialize hasher
+            ///-----------------------------------------------------------------
             H.set();
             H(rcname);
             
+            //------------------------------------------------------------------
             //-- open the resource
+            //------------------------------------------------------------------
             ios::raw_file  source( filename, ios::readable );
             const uint64_t source_length = source.length();
             
+            //------------------------------------------------------------------
             //-- save MAGIC
+            //------------------------------------------------------------------
             file_.emit<uint32_t>( MAGIC );
             
+            //------------------------------------------------------------------
             //-- save the rcname
+            //------------------------------------------------------------------
             file_.save_buffer( rcname );
             
+            //------------------------------------------------------------------
             //-- save the resource by raw copy
+            //------------------------------------------------------------------
             file_.emit<uint64_t>( source_length );
             uint64_t written_length = 0;
             {
@@ -62,6 +81,7 @@ H()
                     source.get(buff,sizeof(buff),done);
                     if( done <= 0 )
                         break;
+                    file_.put_all(buff, done);
                     H.run( buff, done );
                     written_length += done;
                 }
@@ -69,16 +89,27 @@ H()
             if( source_length != written_length )
                 throw exception("copy error for '%s'", rcname.c_str());
             
-            //-- all done
-            ++count;
+            //------------------------------------------------------------------
+            //-- save hash-64
+            //------------------------------------------------------------------
+            const uint64_t hkey = H.key<uint64_t>();
+            file_.emit<uint64_t>( hkey );
             
+            //------------------------------------------------------------------
+            //-- all done
+            //------------------------------------------------------------------
+            (void)db.insert(rcname);
+            ++count;
+            assert( db.size() == count );
         }
         
         resources:: packer:: ~packer() throw() 
         {
             try
             {
+                //--------------------------------------------------------------
                 // write epilog
+                //--------------------------------------------------------------
                 file_.emit< int64_t>(start);
                 file_.emit<uint32_t>(count);
                 file_.emit<uint32_t>(MAGIC);
@@ -91,16 +122,47 @@ H()
         }
         
         ////////////////////////////////////////////////////////////////////////
+        //
+        // resources::item
+        //
+        ////////////////////////////////////////////////////////////////////////
+        resources::item:: item( const string &id, int64_t at, uint64_t nb ) :
+        label(id),
+        start(at),
+        bytes(nb) 
+        {
+        }
+        
+        resources::item:: ~item() throw() {}
+        
+        resources::item:: item( const item &other ) :
+        label( other.label ),
+        start( other.start ),
+        bytes( other.bytes )
+        {
+        }
+        
+        const string & resources::item:: key() const throw()
+        {
+            return label;
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // resources
+        //
+        ////////////////////////////////////////////////////////////////////////
         resources:: ~resources() throw() {}
         
         resources:: resources( const string &filename ) :
-        file_( filename, ios::readable )
+        file_( filename, ios::readable ), H()
         {
             extract();
         }
         
         resources:: resources( const char *filename ) :
-        file_( filename, ios::readable )
+        file_( filename, ios::readable ),
+        H()
         {
             extract();
         }
@@ -108,22 +170,74 @@ H()
         
         void resources:: extract()
         {
-            int64_t  start = 0;
-            uint32_t count = 0;
-            uint32_t magic = 0;
-            const size_t epilog_size = sizeof(count) + sizeof(start) + sizeof(magic);
+            int64_t       start = 0;
+            uint32_t      count = 0;
+            uint32_t      magic = 0;
+            const int64_t epilog_size = sizeof(count) + sizeof(start) + sizeof(magic);
             
-            file_.seek(epilog_size, from_end);
-            start = file_.read<int64_t>();
-            count = file_.read<uint32_t>();
+            file_.seek(-epilog_size, from_end);
+            start = file_.read<int64_t>();  
+            count = file_.read<uint32_t>(); 
             magic = file_.read<uint32_t>();
             if( MAGIC != magic )
                 throw exception("resources: invalid MAGIC tag");
             
+            //------------------------------------------------------------------
             //-- move at start
+            //------------------------------------------------------------------
             file_.seek( start, from_set );
+            db.reserve(count);
             
-            
+            for( unsigned i=1; i <= count; ++i )
+            {
+                H.set();
+                
+                //--------------------------------------------------------------
+                //-- read MAGIC
+                //--------------------------------------------------------------
+                magic = file_.read<uint32_t>();
+                if( MAGIC != magic )
+                    throw exception("resources: invalid item #%u", i );
+                
+                //--------------------------------------------------------------
+                //-- read resource name
+                //--------------------------------------------------------------
+                const string rcname = file_.load_string();
+                H( rcname );
+                std::cerr << "rc: load '" << rcname << "'" << std::endl;
+                
+                //--------------------------------------------------------------
+                // read resource length
+                //--------------------------------------------------------------
+                const uint64_t rclen = file_.read<uint64_t>();
+                
+                //--------------------------------------------------------------
+                // read resource offset
+                //--------------------------------------------------------------
+                const int64_t  rcoff = file_.tell();
+                
+                std::cerr << "rc: #" << i << "@" << int(rcoff) << "+" << int(rclen) << std::endl;
+                // create resource
+                const item rc( rcname, rcoff, rclen );
+                if( !db.insert(rc) )
+                    throw exception("resources: multiple '%s'", rcname.c_str());
+                
+                //--------------------------------------------------------------
+                // skip to next while hashing
+                //--------------------------------------------------------------
+                for( uint64_t j=0; j < rclen; ++j )
+                {
+                    const uint8_t C = file_.read<uint8_t>();
+                    H.run(&C,1);
+                }
+                
+                //--------------------------------------------------------------
+                // Basic integrity verification
+                //--------------------------------------------------------------
+                const uint64_t hkey = H.key<uint64_t>();
+                if( file_.read<uint64_t>() != hkey )
+                    throw exception("resources: corrupted item #%u",i);
+            }
         }
         
         

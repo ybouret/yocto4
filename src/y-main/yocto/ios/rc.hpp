@@ -5,6 +5,9 @@
 #include "yocto/ios/raw-file.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/hashing/sha1.hpp"
+#include "yocto/code/fourcc.hpp"
+#include "yocto/associative/set.hpp"
+#include "yocto/ordered/catalog.hpp"
 
 namespace yocto 
 {
@@ -21,7 +24,7 @@ namespace yocto
             explicit resources( const char   *filename );
             virtual ~resources() throw();
             
-            static const uint32_t MAGIC = 0x5171ca; // silica
+            static const uint32_t MAGIC = YOCTO_FOURCC('D','A','T','A');
             
             class packer
             {
@@ -40,12 +43,30 @@ namespace yocto
                 int64_t  start;
                 hasher   H;
                 void init( error_type &status );
+                catalog<string> db;
+            };
+
+            class item 
+            {
+            public:
+                const string   label;
+                const int64_t  start;
+                const uint64_t bytes;
                 
+                explicit item( const string &, int64_t at, uint64_t nb );
+                item( const item & );
+                const string & key() const throw();
+                ~item() throw();
+                
+            private:
+                YOCTO_DISABLE_ASSIGN(item);
             };
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(resources);
-            raw_file file_;
+            raw_file         file_;
+            hasher           H;
+            set<string,item> db;
             void     extract();
         };
     }
