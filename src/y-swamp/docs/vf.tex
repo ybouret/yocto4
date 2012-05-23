@@ -14,8 +14,10 @@
 \title{Vertex Centered Finite Volume Schemes}
 
 \maketitle
+\tableofcontents
 
-\section{1D, one field}
+\section{1D}
+\subsection{one field}
 We want to solve the evolution of the field $u(t,x)$ with diffusion and source terms.
 \begin{equation}
 	\begin{array}{l}
@@ -60,6 +62,23 @@ and
 with 
 \begin{equation}
 	\left(x_{i+1}-x_{i}\right) D_{i+\half}^{-1} = \left(x_{i+\half}-x_i\right) D_{i+1}^{-1} + \left(x_{i+1} - x_{i+\half}\right) D_{i}^{-1}
+\end{equation}
+
+
+\section{2D}
+\subsection{one field, rectilinear mesh}
+We define a rectilinear mesh of $N_x+1$ and $N_y+1$ vertices
+\begin{equation}
+\left\lbrace
+\begin{array}{l}
+x_0=0<x_1<\ldots<x_i<\ldots<x_{N_x-1}<x_{N_x}=L_x\\
+y_0=0<y_1<\ldots<y_j<\ldots<y_{N_y-1}<y_{N_y}=L_y.\\
+\end{array}
+\right.
+\end{equation}
+We associate the $(N_x-1)\times(N_y-1)$ control volumes
+\begin{equation}
+	\kappa_{1\leq i < N_x,1\leq j < N_y } =  \left\rbrack x_{i-\half}, x_{i+\half}\right\lbrack \times \left\rbrack y_{j-\half}, y_{j+\half}\right\lbrack.
 \end{equation}
 
 \end{document}
