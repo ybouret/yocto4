@@ -49,7 +49,7 @@ namespace yocto
                 catalog<string> db;
             };
             
-            
+                        
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(resources);
             
@@ -69,6 +69,8 @@ namespace yocto
             private:
                 YOCTO_DISABLE_ASSIGN(item);
             };
+            
+            
             
             raw_file         file_;
             hasher           H;
