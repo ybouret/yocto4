@@ -18,10 +18,24 @@ namespace yocto
             unit *         prev;
             explicit unit( const string &t, size_t l ) throw();
             virtual ~unit() throw();
+        
+            static void kill( unit *u ) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(unit);
         };
+        
+        class units : public core::list_of<unit>
+        {
+        public:
+            explicit units() throw();
+            virtual ~units() throw();
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(units);
+        };
+        
+        
         
     }
 }

@@ -18,6 +18,15 @@ namespace yocto
             
         }
         
+        void unit:: kill( unit *u ) throw()
+        {
+            assert(u!=NULL);
+            delete u;
+        }
+        
+        units:: units() throw() {}
+        units:: ~units() throw() { delete_with( unit::kill ); }
+        
     }
     
 }

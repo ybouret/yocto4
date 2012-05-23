@@ -10,7 +10,7 @@ namespace yocto
 	namespace ios
 	{
         
-        //! istream decorator, fron an ichannel
+        //! istream decorator, from an ichannel
 		class iflux : public istream
 		{
 		public:
