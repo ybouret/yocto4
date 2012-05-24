@@ -88,7 +88,7 @@ YOCTO_UNIT_TEST_IMPL(coll3D)
     
     const layout3D full_layout( coord3D(1,1,1), coord3D(10,10,100) );
     const layout3D L = full_layout.split(rank,size);
-    W3 D( L, G, F );
+    W3             D( L, G, F );
     typedef vertex3D<double>::type V3D;
     const   region3D<double>::type R( V3D(-1,-1,-1), V3D(1,1,1) );
     
