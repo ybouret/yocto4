@@ -112,7 +112,14 @@ where $f_{i,j}$ is the average value of $f$ in the volume $\kappa_{i,j}$.
 Moreover, we have
 \begin{equation}
 \int_{x_{i-\half}}^{x_{i+\half}} \int_{y_{j-\half}}^{y_{j+\half}} {\bm \nabla} \vec{F} \myd x \myd y = 
-\left( F_{x,i+\half,j} - F_{x,i-\half,j} \right) + \left( F_{y,i,j+\half} - F_{y,i,j-\half} \right) 
+h_{y,i,j}\left( F_{x,i+\half,j} - F_{x,i-\half,j} \right) + h_{x,i,j}\left( F_{y,i,j+\half} - F_{y,i,j-\half} \right).
 \end{equation}
-
+We have
+\begin{equation}
+F_{x,i+\half,j} = - D_{i+\half,j} \dfrac{u_{i+1,j}-u_{i,j}}{h_{x,i+\half,j}}
+\end{equation}
+and
+\begin{equation}
+F_{y,i,j+\half} = - D_{i,j+\half} \dfrac{u_{i,j+1}-u_{i,j}}{h_{y,i,j+\half}}
+\end{equation}
 \end{document}
