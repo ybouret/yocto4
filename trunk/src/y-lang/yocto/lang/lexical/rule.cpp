@@ -22,7 +22,7 @@ namespace yocto
             
             
             rule:: rule( const string &id, regex::pattern *p, const action &cb ) :
-            name(id),
+            label(id),
             motif(p),
             next(0),
             prev(0),

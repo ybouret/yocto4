@@ -17,7 +17,7 @@ namespace yocto
             class rule
             {
             public:
-                const string    name;  //!< terminal name
+                const string    label; //!< terminal label
                 regex::pattern *motif; //!< accepting pattern
                 rule           *next;  //!< for linked list
                 rule           *prev;  //!< for linked list
