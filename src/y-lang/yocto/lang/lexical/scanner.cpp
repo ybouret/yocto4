@@ -15,14 +15,20 @@ namespace yocto
             
 #define Y_LANG_LEX_SCANNER_CTOR() \
 name(id),\
-line(0),\
+line(1),\
 rules_(),\
+cache_(),\
 forward( this, &scanner::__forward ),\
 discard( this, &scanner::__discard ),\
 newline( this, &scanner::__newline ),\
 dict_(0)
             
             scanner:: scanner( const string &id ) :
+            Y_LANG_LEX_SCANNER_CTOR()
+            {
+            }
+            
+            scanner:: scanner( const char *id ) :
             Y_LANG_LEX_SCANNER_CTOR()
             {
             }
@@ -78,6 +84,15 @@ dict_(0)
                 (*this)(label, regex::compile(expr,dict_), proc);
             }
             
+            
+            void scanner:: reset() throw()
+            {
+                for( rule *r = rules_.head; r; r=r->next)
+                {
+                    r->motif->clear();
+                }
+                line = 1;
+            }
             
         }
         

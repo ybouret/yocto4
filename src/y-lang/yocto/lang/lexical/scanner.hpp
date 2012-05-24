@@ -4,6 +4,7 @@
 #include "yocto/lang/lexeme.hpp"
 #include "yocto/lang/lexical/rule.hpp"
 #include "yocto/rx/pattern/dict.hpp"
+#include "yocto/rx/source.hpp"
 
 namespace yocto 
 {
@@ -18,6 +19,7 @@ namespace yocto
             {
             public:
                 explicit scanner( const string &id);
+                explicit scanner( const char   *id);
                 virtual ~scanner() throw();
                 
                 const string name; //!< scanner identifier
@@ -25,7 +27,7 @@ namespace yocto
                 
             private:
                 rules         rules_;
-                
+                lexemes       cache_;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 bool __forward( const regex::token &) throw(); //!< return true
                 bool __discard( const regex::token &) throw(); //!< return false
@@ -60,6 +62,13 @@ namespace yocto
                 
                 //! release dictionary
                 void                 no_dict() throw();
+                
+                //! reset all rules/motif
+                void reset() throw();
+                
+                //! get next forwarded lexeme
+                lexeme * next_lexeme( regex::source &src );
+                
                 
             private:
                 regex::pattern_dict *dict_;
