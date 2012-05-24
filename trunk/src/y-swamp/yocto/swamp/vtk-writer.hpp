@@ -70,8 +70,8 @@ namespace yocto
             void write_mesh( ios::ostream &fp, const rmesh<T,layout2D> &mesh , const layout2D &sub )
             {
                 const record     &r = (*this)[ typeid(T) ];
-                const array1D<T> &X = mesh.X(); assert(X.lower>=sub.lower.x); assert(X.upper<=sub.upper.x);
-                const array1D<T> &Y = mesh.Y(); assert(Y.lower>=sub.lower.y); assert(Y.upper<=sub.upper.y);
+                const array1D<T> &X = mesh.X();  
+                const array1D<T> &Y = mesh.Y();  
                 write_rmesh_sub(fp,sub);
                 write_axis_sub(fp, &X[sub.lower.x], sub.width.x, sizeof(T), r, 'X');
                 write_axis_sub(fp, &Y[sub.lower.y], sub.width.y, sizeof(T), r, 'Y');
@@ -84,9 +84,10 @@ namespace yocto
             void write_mesh( ios::ostream &fp, const rmesh<T,layout3D> &mesh , const layout3D &sub )
             {
                 const record     &r = (*this)[ typeid(T) ];
-                const array1D<T> &X = mesh.X(); assert(X.lower>=sub.lower.x); assert(X.upper<=sub.upper.x);
-                const array1D<T> &Y = mesh.Y(); assert(Y.lower>=sub.lower.y); assert(Y.upper<=sub.upper.y);
-                const array1D<T> &Z = mesh.Z(); assert(Z.lower>=sub.lower.z); assert(Z.upper<=sub.upper.z);
+                
+                const array1D<T> &X = mesh.X();  
+                const array1D<T> &Y = mesh.Y();  
+                const array1D<T> &Z = mesh.Z();  
                 
                 write_rmesh_sub(fp,sub);
                 write_axis_sub(fp, &X[sub.lower.x], sub.width.x, sizeof(T), r, 'X');
