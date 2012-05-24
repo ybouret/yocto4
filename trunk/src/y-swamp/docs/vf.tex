@@ -67,6 +67,13 @@ with
 
 \section{2D}
 \subsection{one field, rectilinear mesh}
+We want to solve the evolution of the field $u(t,x,y)$ with diffusion and source terms.
+\begin{equation}
+	\begin{array}{l}
+		\partial_t u + {\bm \nabla} \vec{F} = f\\
+		\vec{F} = -D {\bm \nabla} u.\\
+	\end{array}
+\end{equation}
 We define a rectilinear mesh of $N_x+1$ and $N_y+1$ vertices
 \begin{equation}
 \left\lbrace
@@ -78,7 +85,34 @@ y_0=0<y_1<\ldots<y_j<\ldots<y_{N_y-1}<y_{N_y}=L_y.\\
 \end{equation}
 We associate the $(N_x-1)\times(N_y-1)$ control volumes
 \begin{equation}
-	\kappa_{1\leq i < N_x,1\leq j < N_y } =  \left\rbrack x_{i-\half}, x_{i+\half}\right\lbrack \times \left\rbrack y_{j-\half}, y_{j+\half}\right\lbrack.
+	1\leq i < N_x,\;1\leq j < N_y,\; \kappa_{i,j} =  \left\rbrack x_{i-\half}, x_{i+\half}\right\lbrack \times \left\rbrack y_{j-\half}, y_{j+\half}\right\lbrack.
+\end{equation}
+We define the measures
+\begin{equation}
+	\left\lbrace
+	\begin{array}{llcl}
+		1\leq i < N_x, &  h_{x,i} & = &x_{i+\half} - x_{i-\half}\\
+		1\leq j < N_y, &  h_{y,j} & = &y_{j+\half} - y_{j-\half} \\
+		1\leq i < N_x, &  h_{x,i+\half} & = & x_{i+1} - x_{i}\\
+		1\leq j < N_y, &  h_{y,j+\half} & = & y_{j+1} - y_{j} \\
+		& s_{i,j} & = &  h_{x,i} \times h_{y,j}.\\
+	\end{array}
+	\right.
+\end{equation}
+We assume that $u_{i,j}$ is the average of $u$ in the volume $\kappa_{i,j}$:
+\begin{equation}
+	u_{i,j} = \dfrac{1}{s_{i,j}} \int_{x_{i-\half}}^{x_{i+\half}} \int_{y_{j-\half}}^{y_{j+\half}} u \myd x \myd y
+\end{equation}
+We compute
+\begin{equation}
+	\partial_t u_{i,j} + \dfrac{1}{s_{i,j}} \int_{x_{i-\half}}^{x_{i+\half}} \int_{y_{j-\half}}^{y_{j+\half}} {\bm \nabla} \vec{F} \myd x \myd y
+	 = \dfrac{1}{s_{i,j}} \int_{x_{i-\half}}^{x_{i+\half}} \int_{y_{j-\half}}^{y_{j+\half}} f \myd x \myd y = f_{i,j}
+\end{equation}
+where $f_{i,j}$ is the average value of $f$ in the volume $\kappa_{i,j}$.
+Moreover, we have
+\begin{equation}
+\int_{x_{i-\half}}^{x_{i+\half}} \int_{y_{j-\half}}^{y_{j+\half}} {\bm \nabla} \vec{F} \myd x \myd y = 
+\left( F_{x,i+\half,j} - F_{x,i-\half,j} \right) + \left( F_{y,i,j+\half} - F_{y,i,j-\half} \right) 
 \end{equation}
 
 \end{document}
