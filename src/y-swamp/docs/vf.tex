@@ -116,10 +116,26 @@ h_{y,i,j}\left( F_{x,i+\half,j} - F_{x,i-\half,j} \right) + h_{x,i,j}\left( F_{y
 \end{equation}
 We have
 \begin{equation}
-F_{x,i+\half,j} = - D_{i+\half,j} \dfrac{u_{i+1,j}-u_{i,j}}{h_{x,i+\half,j}}
+\left\lbrace
+\begin{array}{rcl}
+	F_{x,i+\half,j} & = & - D_{i+\half,j} \dfrac{u_{i+1,j}-u_{i,j}}{h_{x,i+\half,j}}\\
+	\\
+	F_{y,i,j+\half} & = & - D_{i,j+\half} \dfrac{u_{i,j+1}-u_{i,j}}{h_{y,i,j+\half}}\\
+\end{array}
+\right.
 \end{equation}
 and
 \begin{equation}
-F_{y,i,j+\half} = - D_{i,j+\half} \dfrac{u_{i,j+1}-u_{i,j}}{h_{y,i,j+\half}}
+\left\lbrace
+\begin{array}{rcl}
+	\left(x_{i+1,j}-x_{i,j}\right) D_{i+\half,j}^{-1}  & = &
+		 \left(x_{i+\half,j}-x_{i,j}\right) D_{i+1,j}^{-1} + \left(x_{i+1,j} - x_{i+\half,j}\right) D_{i,j}^{-1} \\
+		 \\
+	\left(y_{i,j+1}-y_{i,j}\right) D_{i,j+\half}^{-1}  & = &
+		 \left(y_{i,j+\half}-y_{i,j}\right) D_{i,j+1}^{-1} + \left(y_{i,j+1} - y_{i,j+\half}\right) D_{i,j}^{-1} \\
+\end{array}
+\right.
 \end{equation}
+
+
 \end{document}
