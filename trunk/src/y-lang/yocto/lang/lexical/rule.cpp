@@ -49,6 +49,11 @@ namespace yocto
                 return r;
             }
             
+            bool rule:: produce()
+            {
+                return proc( *motif );
+            }
+            
             ////////////////////////////////////////////////////////////////////
             //
             //

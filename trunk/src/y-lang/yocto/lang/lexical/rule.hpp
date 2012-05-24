@@ -25,6 +25,8 @@ namespace yocto
                 static rule * create( const string &id, regex::pattern *p, const action &cb );
                 static void   kill( rule *r ) throw();
                 
+                bool produce(); //! proc( *motif )
+                
             private:
                 action proc;
                 rule( const string &id, regex::pattern *p, const action &cb);
