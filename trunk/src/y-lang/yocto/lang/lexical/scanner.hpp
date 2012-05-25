@@ -108,7 +108,7 @@ namespace yocto
                 void link_to( lexer &parent ) throw();
                 
                 //! cache an artificial lexeme
-                void cache( const string &data );
+                void cache( const scanner &plugin, const string &data );
                 
             private:
                 lexer               *lexer_;
