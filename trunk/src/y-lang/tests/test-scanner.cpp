@@ -1,6 +1,5 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lang/lexical/scanner.hpp"
-#include "yocto/rx/pattern/posix.hpp"
 #include "yocto/ios/icstream.hpp"
 
 using namespace yocto;
@@ -8,11 +7,18 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(scanner)
 {
 
-    lang::lexical::scanner scan("dummy");
+    size_t line = 0;
+    lang::lexical::scanner scan("dummy-scanner",line);
     
-    scan.dict().record( "DIGIT", regex::posix::digit() );
-    
-    scan( "INT",    "{DIGIT}+" );
+    scan.dict().record( "DIGIT", "[0-9]" );
+    scan.dict().record( "INT",   "{DIGIT}+");
+    scan.dict().record( "DBL",   "{INT}[.]{DIGIT}*");
+    scan.dict().record( "FLT",   "{DBL}f");
+
+    scan( "INT",    "{INT}" );
+    scan( "DBL",    "{DBL}" );
+    scan( "FLT",    "{FLT}" );
+    scan( "STR",    "[:cstring:]");
     scan( "BLANKS", "[ \t]",    & scan.discard );
     scan( "ENDL",   "[:endl:]", & scan.newline );
     scan.no_dict();
@@ -24,7 +30,7 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     lang::lexeme *lx = NULL;
     while( NULL != (lx=scan.next_lexeme(src)) )
     {
-		std::cerr << "line: " << scan.line << ": " << lx->name << std::endl;
+		std::cerr << "line: " << scan.line << ": " << lx->name << " [" << *lx << "]" << std::endl;
         lxs.push_back(lx);
     }
     

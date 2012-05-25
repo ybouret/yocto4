@@ -5,27 +5,19 @@ namespace yocto
 {
 	namespace lang
 	{
-
+        
 		namespace lexical
 		{
 			lexeme * scanner:: next_lexeme( regex::source &src )
 			{
-				//--------------------------------------------------------------
-				//
-				// check caching
-				//
-				//--------------------------------------------------------------
-				if( cache_.size > 0 )
-					return cache_.pop_front();
-
-				//--------------------------------------------------------------
+                //--------------------------------------------------------------
 				//
 				// check if there are some more chars
 				//
 				//--------------------------------------------------------------
 				if( !src.is_active() )
 					return NULL; // EOF
-
+                
 				//--------------------------------------------------------------
 				//
 				// find a rule that produces a lexeme
@@ -47,14 +39,14 @@ namespace yocto
 						}
 						r=r->next;
 					}
-
+                    
 					if( !best_rule )
 					{
 						//-- no accepting pattern !
 						assert( src.is_active() );
-						throw exception("%s:%u: unexpected char '%c'", name.c_str(), unsigned(line), src.peek()->data);
+						throw exception("%u:%s: unexpected char '%c'", unsigned(line), name.c_str(), src.peek()->data);
 					}
-
+                    
 					//----------------------------------------------------------
 					// scan other rules for a better match
 					//----------------------------------------------------------
@@ -87,13 +79,13 @@ namespace yocto
 						}
 						r=r->next;
 					}
-
+                    
 					//----------------------------------------------------------
 					// skip in the source
 					//----------------------------------------------------------
 					assert( src.in_cache() >= best_rule->motif->size );
 					src.skip(best_rule->motif->size);
-
+                    
 					//----------------------------------------------------------
 					// check is we keep the lexeme
 					//----------------------------------------------------------
@@ -101,11 +93,11 @@ namespace yocto
 					{
 						//-- create the lexeme
 						lexeme *lx = new lexeme( best_rule->label, line );
-
+                        
 						//-- steal the token
 						lx->swap_with( *(best_rule->motif) );
 						best_rule->motif->clear();
-
+                        
 						//-- done
 						return lx;
 					}
@@ -113,17 +105,17 @@ namespace yocto
 					{
 						best_rule->motif->clear();
 					}
-
+                    
 					//----------------------------------------------------------
 					// ready for next producing rule...
 					//----------------------------------------------------------
 				}
 				return NULL; // never get there
 			}
-
+            
 		}
-
+        
 	}
-
+    
 }
 

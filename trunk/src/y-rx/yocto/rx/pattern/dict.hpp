@@ -21,6 +21,8 @@ namespace yocto
 			
 			void     record( const string &name, pattern *p ); //!< pattern is handled...
 			void     record( const char   *name, pattern *p ); //!< pattern is handled...
+            void     record( const char   *name, const char *expr); //!< compiled with this
+            
 			pattern *create( const string &name ) const;
 			pattern *create( const char   *name ) const;
 			
