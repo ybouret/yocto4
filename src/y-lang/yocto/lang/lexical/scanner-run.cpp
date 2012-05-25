@@ -3,97 +3,127 @@
 
 namespace yocto 
 {
-    namespace lang
-    {
-        
-        namespace lexical
-        {
-            lexeme * scanner:: next_lexeme( regex::source &src )
-            {
-                if( cache_.size > 0 )
-                    return cache_.pop_front();
-                
-                while(true)
-                {
-                    //----------------------------------------------------------
-                    // find the first accepting rule => best_rule
-                    //----------------------------------------------------------
-                    rule    *best_rule = NULL;
-                    rule    *r = rules_.head;
-                    while(r)
-                    {
-                        if( r->motif->accept(src) )
-                        {
-                            best_rule = r;
-                            break;
-                        }
-                        r=r->next;
-                    }
-                    if( !best_rule )
-                        return NULL; //! EOF;
-                    
-                    //----------------------------------------------------------
-                    // scan other rules for a better match
-                    //----------------------------------------------------------
-                    r = r->next;
-                    src.uncpy( *(best_rule->motif) ); //! for subsequent researched
-                    while( r )
-                    {
-                        if( r->motif->accept(src) )
-                        {
-                            //--------------------------------------------------
-                            // we have a challenger !
-                            //--------------------------------------------------
-                            if( r->motif->size > best_rule->motif->size )
-                            {
-                                //----------------------------------------------
-                                // new winner !
-                                //----------------------------------------------
-                                best_rule->motif->clear();        //! forget current winner
-                                best_rule = r;                    //! and upgrade
-                                src.uncpy( *(best_rule->motif) ); //! for next rule
-                            }
-                            else 
-                            {
-                                //----------------------------------------------
-                                // too late !
-                                //----------------------------------------------
-                                src.unget( *(r->motif) ); //! for next rule
-                            }
-                        }
-                        r=r->next;
-                    }
-                    
-                    //----------------------------------------------------------
-                    // skip in the source
-                    //----------------------------------------------------------
-                    src.skip(best_rule->motif->size);
-                    if( best_rule->produce() )
-                    {
-                        //-- create the lexeme
-                        lexeme *lx = new lexeme( best_rule->label, line );
-                        
-                        //-- steal the token
-                        lx->swap_with( *(best_rule->motif) );
-                        
-                        //-- done
-                        return lx;
-                    }
-                    else
-                    {
-                        best_rule->motif->clear();
-                    }
-                    
-                    //----------------------------------------------------------
-                    // ready for next producing rule...
-                    //----------------------------------------------------------
-                }
-                return NULL;
-            }
-            
-        }
-        
-    }
-    
+	namespace lang
+	{
+
+		namespace lexical
+		{
+			lexeme * scanner:: next_lexeme( regex::source &src )
+			{
+				//--------------------------------------------------------------
+				//
+				// check caching
+				//
+				//--------------------------------------------------------------
+				if( cache_.size > 0 )
+					return cache_.pop_front();
+
+				//--------------------------------------------------------------
+				//
+				// check if there are some more chars
+				//
+				//--------------------------------------------------------------
+				if( !src.is_active() )
+					return NULL; // EOF
+
+				//--------------------------------------------------------------
+				//
+				// find a rule that produces a lexeme
+				//
+				//--------------------------------------------------------------
+				while(true)
+				{
+					//----------------------------------------------------------
+					// find the first accepting rule => best_rule
+					//----------------------------------------------------------
+					rule    *best_rule = NULL;
+					rule    *r = rules_.head;
+					while(r)
+					{
+						if( r->motif->accept(src) )
+						{
+							best_rule = r;
+							break;
+						}
+						r=r->next;
+					}
+
+					if( !best_rule )
+					{
+						//-- no accepting pattern !
+						assert( src.is_active() );
+						throw exception("%s:%u: unexpected char '%c'", name.c_str(), unsigned(line), src.peek()->data);
+					}
+
+					//----------------------------------------------------------
+					// scan other rules for a better match
+					//----------------------------------------------------------
+					r = r->next;
+					src.uncpy( *(best_rule->motif) ); //! for subsequent researched
+					while( r )
+					{
+						if( r->motif->accept(src) )
+						{
+							//--------------------------------------------------
+							// we have a challenger !
+							//--------------------------------------------------
+							if( r->motif->size > best_rule->motif->size )
+							{
+								//----------------------------------------------
+								// new winner !
+								//----------------------------------------------
+								best_rule->motif->clear();        //! forget current winner
+								best_rule = r;                    //! and upgrade
+								src.uncpy( *(best_rule->motif) ); //! for next rule
+							}
+							else 
+							{
+								//----------------------------------------------
+								// too late !
+								//----------------------------------------------
+								src.unget( *(r->motif) ); //! for next rule
+								r->motif->clear();
+							}
+						}
+						r=r->next;
+					}
+
+					//----------------------------------------------------------
+					// skip in the source
+					//----------------------------------------------------------
+					assert( src.in_cache() >= best_rule->motif->size );
+					src.skip(best_rule->motif->size);
+
+					//----------------------------------------------------------
+					// check is we keep the lexeme
+					//----------------------------------------------------------
+					if( best_rule->produce() )
+					{
+						//-- create the lexeme
+						lexeme *lx = new lexeme( best_rule->label, line );
+
+						//-- steal the token
+						lx->swap_with( *(best_rule->motif) );
+						best_rule->motif->clear();
+
+						//-- done
+						return lx;
+					}
+					else
+					{
+						best_rule->motif->clear();
+					}
+
+					//----------------------------------------------------------
+					// ready for next producing rule...
+					//----------------------------------------------------------
+				}
+				return NULL; // never get there
+			}
+
+		}
+
+	}
+
 }
 
