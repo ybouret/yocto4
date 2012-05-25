@@ -19,10 +19,16 @@ namespace yocto
             lexical::scanner & declare( const string &id );
             lexical::scanner & declare( const char   *id );
             
+            void jump( const string &id );
+            
         private:
-            size_t line;
-            set<string,lexical::scanner::ptr> scanners;
+            typedef set<string,lexical::scanner::ptr> scannerDB;
+            size_t            line;
+            scannerDB         scanners;
+            lexical::scanner *current;
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
+            lexical::scanner *fetch( const string &id ) const;
+            lexical::scanner *fetch( const char   *id ) const;
         };
         
     }

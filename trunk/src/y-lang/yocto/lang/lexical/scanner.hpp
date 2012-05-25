@@ -12,6 +12,8 @@ namespace yocto
     namespace lang
     {
         
+        class lexer;
+        
         namespace lexical
         {
             
@@ -76,7 +78,11 @@ namespace yocto
                 //! counted smart pointer
                 typedef  intrusive_ptr<string,scanner> ptr;
                 
+                //! set parent
+                void link_to( lexer &parent ) throw();
+                
             private:
+                lexer               *parent_;
                 regex::pattern_dict *dict_;
             };
         }

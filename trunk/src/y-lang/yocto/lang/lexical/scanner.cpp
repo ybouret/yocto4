@@ -20,6 +20,7 @@ rules_(),\
 forward( this, &scanner::__forward ),\
 discard( this, &scanner::__discard ),\
 newline( this, &scanner::__newline ),\
+parent_(0),\
 dict_(0)
             
             scanner:: scanner( const string &id, size_t &line_ref ) :
@@ -96,6 +97,11 @@ dict_(0)
                     r->motif->clear();
                 }
                 line = 1;
+            }
+            
+            void scanner:: link_to( lexer &parent ) throw()
+            {
+                parent_ = &parent;
             }
             
         }
