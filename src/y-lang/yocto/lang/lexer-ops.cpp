@@ -9,20 +9,26 @@ namespace yocto
 
         void lexer:: jump( const string &id )
         {
-            assert( current != NULL );
-            current = fetch(id);
+            assert( scan != NULL );
+            scan = fetch(id);
         }
         
+        void lexer:: call( const string &id )
+        {
+            assert(scan != NULL);
+            lexical::scanner *next_scan = fetch(id);
+            history.push(scan);
+            scan = next_scan;
+        }
         
         lexeme * lexer:: next_lexeme( regex::source &src )
         {
-            assert( current != NULL );
+            assert( scan != NULL );
             
             if( cache.size > 0 )
                 return cache.pop_front();
 
-            return current->next_lexeme(src);
-            
+            return scan->next_lexeme(src);
         }
 
         

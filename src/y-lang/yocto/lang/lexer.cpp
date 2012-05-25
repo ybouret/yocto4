@@ -14,12 +14,14 @@ namespace yocto
 #define Y_LEXER_CTOR() \
 line(1), \
 scanners(4,as_capacity), \
-current(NULL), \
-cache()
+scan(NULL), \
+cache(),\
+history()
+        
         
 #define Y_LEXER_INIT() \
 (void)  declare( main_id ); \
-current = & first()
+scan = & first()
         
         lexer:: lexer( const string &main_id ) :
         Y_LEXER_CTOR()
@@ -61,18 +63,23 @@ current = & first()
             const string ID(id);
             return fetch(ID);
         }
-     
+        
         void lexer:: reset() throw()
         {
             line    = 1;
-            current = & first();
+            scan    = & first();
             for( scannerDB::iterator i = scanners.begin(); i != scanners.end(); ++i )
             {
                 (*i)->reset();
             }
+            history.free();
         }
-
         
+        const lexical::scanner & lexer:: current() const throw()
+        {
+            assert(NULL!=scan);
+            return *scan;
+        }
     }
     
 }

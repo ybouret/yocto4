@@ -65,11 +65,18 @@ namespace yocto
                 }
                 
                 //==============================================================
-                // jump within lexer hierarchy
+                // jump within lexer's scanners
                 //==============================================================
                 void jump( const string &id, regex::pattern *motif, const callback &cb );
                 void jump( const string &id, const string &expr, const callback &cb );
                 void jump( const char   *id, const char   *expr, const callback &cb );
+                
+                //==============================================================
+                // call one of the lexer's scanners
+                //==============================================================
+                void call( const string &id, regex::pattern *motif, const callback &cb );
+                void call( const string &id, const string &expr, const callback &cb );
+                void call( const char   *id, const char   *expr, const callback &cb );
                 
                 
                 //! create dict if necessary
