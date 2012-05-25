@@ -6,7 +6,7 @@ namespace yocto
     
     namespace lang 
     {
-
+        
         void lexer:: jump( const string &id )
         {
             assert( scan != NULL );
@@ -38,11 +38,34 @@ namespace yocto
             
             if( cache.size > 0 )
                 return cache.pop_front();
+            
+            while(true)
+            {
+                bool    fctl = false;
+                lexeme *lx   = scan->next_lexeme(src,fctl);
 
-            return scan->next_lexeme(src);
+                //--------------------------------------------------------------
+                //-- do we have something ?
+                //--------------------------------------------------------------
+                if(lx) 
+                {
+                    assert(false==fctl);
+                    return lx;
+                }
+                
+                //--------------------------------------------------------------
+                //-- or do we have a control lexeme ?
+                //--------------------------------------------------------------
+                if( !fctl )
+                {
+                    //-- no: this is the end
+                    break;
+                }
+            }
+            return NULL;
         }
-
+        
         
     }
-
+    
 }

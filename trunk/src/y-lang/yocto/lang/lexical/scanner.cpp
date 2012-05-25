@@ -65,7 +65,7 @@ opid(0)
                 //--------------------------------------------------------------
                 //  append the rule
                 //--------------------------------------------------------------
-                rules_.push_back( rule::create(label,motif,proc? *proc: forward) );
+                rules_.push_back( rule::create(label,motif,proc? *proc: forward,false) );
                 
             }
             

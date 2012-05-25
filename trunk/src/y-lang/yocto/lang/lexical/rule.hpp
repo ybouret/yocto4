@@ -17,21 +17,24 @@ namespace yocto
             class rule
             {
             public:
-                const string    label; //!< terminal label
-                regex::pattern *motif; //!< accepting pattern
-                rule           *next;  //!< for linked list
-                rule           *prev;  //!< for linked list
+                const string    label;   //!< terminal label
+                regex::pattern *motif;   //!< accepting pattern
+                rule           *next;    //!< for linked list
+                rule           *prev;    //!< for linked list
+               
                 
-                static rule * create( const string &id, regex::pattern *p, const action &cb );
+                static rule * create( const string &id, regex::pattern *p, const action &cb, bool control);
                 static void   kill( rule *r ) throw();
                 
                 bool produce(); //! proc( *motif )
                 
             private:
                 action proc;
-                rule( const string &id, regex::pattern *p, const action &cb);
+                rule( const string &id, regex::pattern *p, const action &cb,bool control);
                 ~rule() throw();
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
+            public:
+                 const bool      fctl;    //!< control flag: rule is jump/call/back
             };
             
             class rules : public core::list_of<rule>

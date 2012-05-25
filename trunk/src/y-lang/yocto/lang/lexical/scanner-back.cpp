@@ -60,8 +60,8 @@ namespace yocto
                 const back_context ctx( lx, cb );
                 const action       fcn( ctx );
                 
-                //-- make the rule
-                make(label, p.yield(), &fcn);
+                //-- make the rule, marked as control
+                rules_.push_back( rule::create(label, p.yield(), fcn, true) );
             }
             
             void scanner:: back( const string &expr, const callback &cb)
