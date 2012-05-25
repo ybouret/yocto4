@@ -1,6 +1,7 @@
 #ifndef YOCTO_LANG_SCANNER_INCLUDED
 #define YOCTO_LANG_SCANNER_INCLUDED 1
 
+#include "yocto/intrusive-ptr.hpp"
 #include "yocto/lang/lexeme.hpp"
 #include "yocto/lang/lexical/rule.hpp"
 #include "yocto/rx/pattern/dict.hpp"
@@ -15,7 +16,7 @@ namespace yocto
         {
             
             
-            class scanner 
+            class scanner : public object, public counted
             {
             public:
                 explicit scanner( const string &id, size_t &line_ref);
@@ -25,6 +26,7 @@ namespace yocto
                 const string name; //!< scanner identifier
                 size_t      &line; //!< line index for lexemes
                 
+               
             private:
                 rules         rules_;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
@@ -68,6 +70,11 @@ namespace yocto
                 //! get next forwarded lexeme
                 lexeme * next_lexeme( regex::source &src );
                 
+                //! get key for set of scanner
+                const string & key() const throw();
+                
+                //! counted smart pointer
+                typedef  intrusive_ptr<string,scanner> ptr;
                 
             private:
                 regex::pattern_dict *dict_;

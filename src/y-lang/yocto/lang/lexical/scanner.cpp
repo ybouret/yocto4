@@ -33,6 +33,11 @@ dict_(0)
             }
             
             
+            const string & scanner:: key() const throw()
+            {
+                return name;
+            }
+            
             bool scanner:: __forward( const regex::token &) throw() { return true;  }
             bool scanner:: __discard( const regex::token &) throw() { return false; }
             bool scanner:: __newline( const regex::token &) throw() { ++line; return true; }
