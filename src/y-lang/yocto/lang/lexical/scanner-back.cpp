@@ -51,16 +51,17 @@ namespace yocto
                 auto_ptr<regex::pattern> p( motif );
                 
                 //-- make the label
-                const string label = vformat("back%u", ++opid);
+                const string label = vformat("back%u", ++opid_);
                 
                 //-- prepare the compound action
                 assert(motif);
-                assert(parent_);
-                lexer &lx = *parent_;
+                assert(lexer_);
+                lexer &lx = *lexer_;
                 const back_context ctx( lx, cb );
                 const action       fcn( ctx );
                 
                 //-- make the rule, marked as control
+                std::cerr << "'" << name << "' => [" << label << "]" << std::endl;
                 rules_.push_back( rule::create(label, p.yield(), fcn, true) );
             }
             

@@ -22,9 +22,10 @@ rules_(),\
 forward( this, &scanner::__forward ),\
 discard( this, &scanner::__discard ),\
 newline( this, &scanner::__newline ),\
-parent_(0),\
+lexer_(0),\
+cache_(), \
 dict_(0), \
-opid(0)
+opid_(0)
             
             scanner:: scanner( const string &id, size_t &line_ref ) :
             Y_LANG_LEX_SCANNER_CTOR()
@@ -63,7 +64,7 @@ opid(0)
                 }
                 
                 //--------------------------------------------------------------
-                //  append the rule
+                //  append the rule, control=false
                 //--------------------------------------------------------------
                 rules_.push_back( rule::create(label,motif,proc? *proc: forward,false) );
                 
@@ -84,7 +85,7 @@ opid(0)
             
             void scanner:: make( const string &label, const string &expr, const action *proc )
             {
-               make(label, regex::compile(expr,dict_), proc);
+                make(label, regex::compile(expr,dict_), proc);
             }
             
             void scanner:: make( const char *label, const char *expr, const action *proc )
@@ -96,6 +97,7 @@ opid(0)
             
             void scanner:: reset() throw()
             {
+                cache_.kill();
                 for( rule *r = rules_.head; r; r=r->next)
                 {
                     r->motif->clear();
@@ -105,7 +107,29 @@ opid(0)
             
             void scanner:: link_to( lexer &parent ) throw()
             {
-                parent_ = &parent;
+                lexer_ = &parent;
+            }
+            
+            void scanner:: cache( const string &data )
+            {
+                //-- create an empty lexeme
+                lexeme *lx = new lexeme( name, line );
+                
+                //-- store it
+                cache_.push_front(lx);
+                try 
+                {
+                    //-- create a corresponding token
+                    regex::token tmp( data );
+                    
+                    //-- steal it
+                    lx->swap_with(tmp);
+                }
+                catch(...)
+                {
+                    delete cache_.pop_front();
+                    throw;
+                }
             }
             
         }

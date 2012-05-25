@@ -38,6 +38,7 @@ namespace yocto
 		public:
 			explicit token() throw(); //!< construct an empty token
 			virtual ~token() throw(); //!< destructor
+            explicit token( const string &data); //!< construct and initialize token
 			token( const token & );   //!< dynamic copy
 			void release() throw();
 			void move_at_head_of( token &other ) throw(); //!< for i/o caching

@@ -84,6 +84,24 @@ namespace yocto
 			}
 		}
 		
+        token:: token( const string &data)
+        {
+            try
+            {
+                for( size_t i=0; i < data.size(); ++i )
+                {
+                    t_char *ch = t_char::acquire();
+                    ch->data = data[i];
+                    push_back(ch);
+                }
+            }
+            catch(...)
+            {
+                release();
+                throw;
+            }
+        }
+        
 		
 		void token:: move_at_head_of( token &other ) throw()
 		{

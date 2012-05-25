@@ -57,16 +57,17 @@ namespace yocto
                 auto_ptr<regex::pattern> p(motif);
                 
                 //-- create the label
-                const string label = vformat("jump%u@%s", ++opid, id.c_str());
+                const string label = vformat("jump%u@%s", ++opid_, id.c_str());
                 
                 //-- create the compound action
                 assert(motif   != NULL);
-                assert(parent_ != NULL);
-                lexer             &lx = *parent_;
+                assert(lexer_  != NULL);
+                lexer             &lx = *lexer_;
                 jump_return<false> ctx( lx, id, cb);
                 const action       fcn( ctx );
                 
-                //-- make the corresponding rule
+                //-- make the corresponding rule, control=true
+                std::cerr << "'" << name << "' => [" << label << "]" << std::endl;
                 rules_.push_back( rule::create(label, p.yield(), fcn, true) );
             }
             
@@ -89,17 +90,18 @@ namespace yocto
                 auto_ptr<regex::pattern> p(motif);
                 
                 //-- create the label
-                const string label = vformat("call%u:%s", ++opid, id.c_str());
+                const string label = vformat("call%u:%s", ++opid_, id.c_str());
                 
                 //-- create the compound action
                 assert(motif   != NULL);
-                assert(parent_ != NULL);
-                lexer            &lx = *parent_;
+                assert(lexer_  != NULL);
+                lexer            &lx = *lexer_;
                 jump_return<true> ctx( lx, id, cb );
                 const action      fcn( ctx );
                 
                 //-- make the corresponding rule
-                make(label, p.yield(), &fcn);
+                std::cerr << "'" << name << "' => [" << label << "]" << std::endl;
+                rules_.push_back( rule::create(label, p.yield(), fcn, true) );
                 
             }
             
