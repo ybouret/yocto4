@@ -15,12 +15,12 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     scan.dict().record( "DBL",   "{INT}[.]{DIGIT}*");
     scan.dict().record( "FLT",   "{DBL}f");
 
-    scan( "INT",    "{INT}" );
-    scan( "DBL",    "{DBL}" );
-    scan( "FLT",    "{FLT}" );
-    scan( "STR",    "[:cstring:]");
-    scan( "BLANKS", "[ \t]",    & scan.discard );
-    scan( "ENDL",   "[:endl:]", & scan.newline );
+    scan.make( "INT",    "{INT}" );
+    scan.make( "DBL",    "{DBL}" );
+    scan.make( "FLT",    "{FLT}" );
+    scan.make( "STR",    "[:cstring:]");
+    scan.make( "BLANKS", "[ \t]",    & scan.discard );
+    scan.make( "ENDL",   "[:endl:]", & scan.newline );
     scan.no_dict();
     
     ios::icstream fp( ios::cstdin );
@@ -28,6 +28,8 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     lang::lexemes lxs;
     
     lang::lexeme *lx = NULL;
+    
+    scan.reset();
     while( NULL != (lx=scan.next_lexeme(src)) )
     {
 		std::cerr << "line: " << scan.line << ": " << lx->label << " [" << *lx << "]" << std::endl;

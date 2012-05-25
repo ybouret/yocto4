@@ -3,6 +3,8 @@
 #include "yocto/auto-ptr.hpp"
 #include "yocto/rx/compiler.hpp"
 
+#include <iostream>
+
 namespace yocto 
 {
     namespace lang
@@ -21,7 +23,8 @@ forward( this, &scanner::__forward ),\
 discard( this, &scanner::__discard ),\
 newline( this, &scanner::__newline ),\
 parent_(0),\
-dict_(0)
+dict_(0), \
+opid(0)
             
             scanner:: scanner( const string &id, size_t &line_ref ) :
             Y_LANG_LEX_SCANNER_CTOR()
@@ -43,9 +46,10 @@ dict_(0)
             bool scanner:: __discard( const regex::token &) throw() { return false; }
             bool scanner:: __newline( const regex::token &) throw() { ++line; return true; }
             
-            void scanner:: operator()( const string &label, regex::pattern *motif, const action *proc  )
+            void scanner:: make( const string &label, regex::pattern *motif, const action *proc  )
             {
                 assert(motif);
+                std::cerr << "'"<< name <<"' => [" << label << "]" << std::endl;
                 //--------------------------------------------------------------
                 // no multiple rule
                 //--------------------------------------------------------------
@@ -78,15 +82,15 @@ dict_(0)
             
             
             
-            void scanner:: operator()( const string &label, const string &expr, const action *proc )
+            void scanner:: make( const string &label, const string &expr, const action *proc )
             {
-                (*this)(label, regex::compile(expr,dict_), proc);
+               make(label, regex::compile(expr,dict_), proc);
             }
             
-            void scanner:: operator()( const char *label, const char *expr, const action *proc )
+            void scanner:: make( const char *label, const char *expr, const action *proc )
             {
                 const string L(label);
-                (*this)(label, regex::compile(expr,dict_), proc);
+                make(label, regex::compile(expr,dict_), proc);
             }
             
             

@@ -10,13 +10,6 @@ namespace yocto
 		{
 			lexeme * scanner:: next_lexeme( regex::source &src )
 			{
-                //--------------------------------------------------------------
-				//
-				// check if there are some more chars
-				//
-				//--------------------------------------------------------------
-				if( !src.is_active() )
-					return NULL; // EOF
                 
 				//--------------------------------------------------------------
 				//
@@ -42,11 +35,28 @@ namespace yocto
                     
 					if( !best_rule )
 					{
+                        //------------------------------------------------------
 						//-- no accepting pattern !
-						assert( src.is_active() );
-						throw exception("%u:%s: unexpected char '%c'", unsigned(line), name.c_str(), src.peek()->data);
-					}
-                    
+                        //------------------------------------------------------
+                        const regex::t_char *ch = src.peek();
+                        
+                        if( ch )
+                        {
+                            //--------------------------------------------------
+                            // source is still active !
+                            //--------------------------------------------------
+                            throw exception("%u:%s: unexpected char '%c'", unsigned(line), name.c_str(), ch->data);
+                        }
+                        else 
+                        {
+                            //--------------------------------------------------
+                            // EOF
+                            //--------------------------------------------------
+                            return NULL;
+                        }
+                        
+                    }			
+                   
 					//----------------------------------------------------------
 					// scan other rules for a better match
 					//----------------------------------------------------------

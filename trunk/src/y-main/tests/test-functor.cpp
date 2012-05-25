@@ -59,6 +59,7 @@ YOCTO_UNIT_TEST_IMPL(functor)
 	d.factor = 3;
 	functor<int,TL1(float)> F2( d );
 	std::cerr << "F2(2.5)=" << F2(2.5) << std::endl;
+	std::cerr << "F1(2.5)=" << F1(2.5) << std::endl;
 
 	functor<unsigned,TL1(string)> Fh( &d, & dummy::h32 );
 	std::cerr << "F(Hello)=" << Fh( "Hello" ) << std::endl;
