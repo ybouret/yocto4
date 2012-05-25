@@ -26,6 +26,11 @@ current = fetch( main_id )
             Y_LEXER_INIT();
         }
         
+        lexical::scanner & lexer:: first() throw()
+        {
+            return *scanners.front();
+        }
+        
         lexical::scanner & lexer:: declare( const string &id )
         {
             lexical::scanner::ptr p( new lexical::scanner( id, line ) );
@@ -55,6 +60,17 @@ current = fetch( main_id )
             const string ID(id);
             return fetch(ID);
         }
+     
+        void lexer:: reset() throw()
+        {
+            line    = 1;
+            current = & first();
+            for( scannerDB::iterator i = scanners.begin(); i != scanners.end(); ++i )
+            {
+                (*i)->reset();
+            }
+        }
+
         
     }
     

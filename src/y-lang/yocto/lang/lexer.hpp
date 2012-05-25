@@ -16,10 +16,15 @@ namespace yocto
             explicit lexer( const string &main_id );
             virtual ~lexer() throw();
             
+            lexical::scanner & first() throw();
+            
             lexical::scanner & declare( const string &id );
             lexical::scanner & declare( const char   *id );
             
             void jump( const string &id );
+            void reset() throw();
+            
+            
             
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;
