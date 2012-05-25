@@ -24,13 +24,14 @@ namespace yocto
             void jump( const string &id );
             void reset() throw();
             
-            
-            
+            lexeme *next_lexeme(regex::source &src);
+
+            size_t            line;
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;
-            size_t            line;
             scannerDB         scanners;
             lexical::scanner *current;
+            lexemes           cache;
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             lexical::scanner *fetch( const string &id ) const;
             lexical::scanner *fetch( const char   *id ) const;

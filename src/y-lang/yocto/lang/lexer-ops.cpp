@@ -12,6 +12,20 @@ namespace yocto
             assert( current != NULL );
             current = fetch(id);
         }
+        
+        
+        lexeme * lexer:: next_lexeme( regex::source &src )
+        {
+            assert( current != NULL );
+            
+            if( cache.size > 0 )
+                return cache.pop_front();
+
+            return current->next_lexeme(src);
+            
+        }
+
+        
     }
 
 }
