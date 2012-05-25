@@ -110,10 +110,10 @@ opid_(0)
                 lexer_ = &parent;
             }
             
-            void scanner:: cache( const string &data )
+            void scanner:: cache( const scanner &plugin, const string &data )
             {
                 //-- create an empty lexeme
-                lexeme *lx = new lexeme( name, line );
+                lexeme *lx = new lexeme( plugin.name, line );
                 
                 //-- store it
                 cache_.push_front(lx);
