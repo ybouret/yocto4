@@ -1,4 +1,5 @@
 #include "yocto/rx/pattern/dict.hpp"
+#include "yocto/rx/compiler.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
@@ -48,6 +49,11 @@ namespace yocto
 			return create( id );
 		}
 		
+        void pattern_dict:: record( const char   *name, const char *expr)
+        {
+            pattern *p = compile(expr,this);
+            record(name,p);
+        }
 		
 	}
 }

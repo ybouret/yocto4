@@ -18,16 +18,15 @@ namespace yocto
             class scanner 
             {
             public:
-                explicit scanner( const string &id);
-                explicit scanner( const char   *id);
+                explicit scanner( const string &id, size_t &line_ref);
+                explicit scanner( const char   *id, size_t &line_ref);
                 virtual ~scanner() throw();
                 
                 const string name; //!< scanner identifier
-                size_t       line; //!< line index for lexemes
+                size_t      &line; //!< line index for lexemes
                 
             private:
                 rules         rules_;
-                lexemes       cache_;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 bool __forward( const regex::token &) throw(); //!< return true
                 bool __discard( const regex::token &) throw(); //!< return false

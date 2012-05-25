@@ -15,20 +15,19 @@ namespace yocto
             
 #define Y_LANG_LEX_SCANNER_CTOR() \
 name(id),\
-line(1),\
+line(line_ref),\
 rules_(),\
-cache_(),\
 forward( this, &scanner::__forward ),\
 discard( this, &scanner::__discard ),\
 newline( this, &scanner::__newline ),\
 dict_(0)
             
-            scanner:: scanner( const string &id ) :
+            scanner:: scanner( const string &id, size_t &line_ref ) :
             Y_LANG_LEX_SCANNER_CTOR()
             {
             }
             
-            scanner:: scanner( const char *id ) :
+            scanner:: scanner( const char *id, size_t &line_ref ) :
             Y_LANG_LEX_SCANNER_CTOR()
             {
             }
