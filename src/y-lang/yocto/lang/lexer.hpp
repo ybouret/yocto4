@@ -23,8 +23,9 @@ namespace yocto
             lexical::scanner & declare( const string &id );
             lexical::scanner & declare( const char   *id );
             
-            void jump( const string &id );
-            void call( const string &id );
+            void jump( const string &id ); //!< change current, no history record
+            void call( const string &id ); //!< change current, with history record 
+            void back();                   //!< change current to top of history
             void reset() throw();
             
             lexeme *next_lexeme(regex::source &src);

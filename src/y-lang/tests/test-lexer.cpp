@@ -14,13 +14,19 @@ namespace {
             lang::lexical::scanner &scan = first();
             
             scan.make( "INT",    "[:digit:]+" );
+            scan.make( "WORD",   "[:word:]+"  );
             scan.make( "BLANKS", "[ \t]",    & scan.discard );
             scan.make( "ENDL",   "[:endl:]", & scan.newline );
             
             const lang::lexical::callback EnterCommentC( this, & MyLex::OnEnterCommentC);
             const lang::lexical::callback LeaveCommentC( this, & MyLex::OnLeaveCommentC);
 
+            const lang::lexical::callback EnterCommentCXX( this, & MyLex:: OnEnterCommentCXX);
+            const lang::lexical::callback LeaveCommentCXX( this, & MyLex:: OnLeaveCommentCXX);
+
+            
             scan.jump( "C Comment", "/\\*", EnterCommentC);
+            //scan.jump( "C++ Comment", "//", EnterCommentCXX);
             
             lang::lexical::scanner &comC = declare("C Comment");
             comC.make( "BLANKS", "[ \t]",    & comC.discard );
@@ -28,6 +34,10 @@ namespace {
             comC.make( "ENDL",   "[:endl:]", & comC.newline );
             comC.make( "ANY1",   "." );
             
+            
+            lang::lexical::scanner &comCXX = declare("C++ Comment");
+            comCXX.back( "[:endl:]", LeaveCommentCXX);
+            comCXX.make( "ANY1", "." );
             
         }
         
@@ -41,6 +51,17 @@ namespace {
         void OnLeaveCommentC( const regex::token & ) throw()
         {
             std::cerr << "</C Comment>" << std::endl;
+        }
+        
+        void OnEnterCommentCXX( const regex::token & ) throw()
+        {
+            std::cerr << "<C++ Comment>" << std::endl;
+        }
+        
+        void OnLeaveCommentCXX( const regex::token & ) throw()
+        {
+            std::cerr << "</C++ Comment>" << std::endl;
+            ++line;
         }
         
     private:

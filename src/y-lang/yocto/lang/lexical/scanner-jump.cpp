@@ -10,34 +10,46 @@ namespace yocto
         
 		namespace lexical
 		{
-
-            class jump_context 
-            {
-            public:
-                inline jump_context( lexer &target, const string &sub, const callback &on_jump ) :
-                lx(target),
-                id(sub),
-                cb(on_jump)
+            
+            namespace {
+                template <bool is_calling>
+                class jump_return
                 {
-                }
+                public:
+                    inline jump_return(lexer          &target, 
+                                       const string   &sub, 
+                                       const callback &on_jump) :
+                    lx(target),
+                    id(sub),
+                    cb(on_jump)
+                    {
+                    }
+                    
+                    inline   jump_return( const jump_return &j ) : lx( j.lx ), id( j.id ), cb( j.cb ) {}
+                    inline  ~jump_return() throw() {}
+                    
+                    lexer        &lx; //!< reference to the parent lexer
+                    const string  id; //!< sub scanner to jump to...
+                    callback      cb; //!< what to do after jump
+                    
+                    bool operator()( const regex::token &trigger )
+                    {
+                        __perform();
+                        cb(trigger);
+                        return false; //! no more syntactic meaning
+                    }
+                    
+                private:
+                    void __perform();
+                    YOCTO_DISABLE_ASSIGN(jump_return);
+                };
                 
-                inline  jump_context( const jump_context &j ) : lx( j.lx ), id( j.id ), cb( j.cb ) {}
-                inline ~jump_context() throw() {}
+                template <>
+                void jump_return<false>:: __perform() { lx.jump(id); }
                 
-                lexer        &lx; //!< reference to the parent lexer
-                const string  id; //!< sub scanner to jump to...
-                callback      cb; //!< what to do after jump
-                
-                bool operator()( const regex::token &trigger )
-                {
-                    lx.jump(id);
-                    cb(trigger);
-                    return false; //! no more syntactic meaning
-                }
-                
-            private:
-                YOCTO_DISABLE_ASSIGN(jump_context);
-            };
+                template <>
+                void jump_return<true>:: __perform() { lx.call(id); }
+            }
             
             void scanner:: jump( const string &id, regex::pattern *motif, const callback &cb )
             {
@@ -50,15 +62,15 @@ namespace yocto
                 //-- create the compound action
                 assert(motif   != NULL);
                 assert(parent_ != NULL);
-                lexer &lx = *parent_;
-                jump_context ctx( lx, id, cb );
-                const action fcn( ctx );
+                lexer             &lx = *parent_;
+                jump_return<false> ctx( lx, id, cb);
+                const action       fcn( ctx );
                 
                 //-- make the corresponding rule
                 make(label, p.yield(), &fcn);
                 
             }
-
+            
             
             void scanner:: jump( const string &id, const string &expr, const callback &cb )
             {
@@ -70,9 +82,43 @@ namespace yocto
                 const string ID(id);
                 jump( ID, regex::compile(expr,dict_), cb );
             }
-
+            
+            
+            void scanner:: call( const string &id, regex::pattern *motif, const callback &cb )
+            {
+                //-- protect the motif
+                auto_ptr<regex::pattern> p(motif);
+                
+                //-- create the label
+                const string label = vformat("call%u->%s", ++opid, id.c_str());
+                
+                //-- create the compound action
+                assert(motif   != NULL);
+                assert(parent_ != NULL);
+                lexer            &lx = *parent_;
+                jump_return<true> ctx( lx, id, cb );
+                const action      fcn( ctx );
+                
+                //-- make the corresponding rule
+                make(label, p.yield(), &fcn);
+                
+            }
+            
+            
+            void scanner:: call( const string &id, const string &expr, const callback &cb )
+            {
+                call( id, regex::compile(expr,dict_), cb );
+            }
+            
+            void scanner:: call( const char *id, const char *expr, const callback &cb )
+            {
+                const string ID(id);
+                call( ID, regex::compile(expr,dict_), cb );
+            }
+            
+            
         }
-
+        
     }
-
+    
 }
