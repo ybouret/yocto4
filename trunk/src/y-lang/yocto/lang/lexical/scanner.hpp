@@ -75,9 +75,16 @@ namespace yocto
                 // call one of the lexer's scanners
                 //==============================================================
                 void call( const string &id, regex::pattern *motif, const callback &cb );
-                void call( const string &id, const string &expr, const callback &cb );
-                void call( const char   *id, const char   *expr, const callback &cb );
+                void call( const string &id, const string   &expr,  const callback &cb );
+                void call( const char   *id, const char     *expr,  const callback &cb );
                 
+                
+                //==============================================================
+                // back to the calling lexer's scanners
+                //==============================================================
+                void back( regex::pattern *motif, const callback &cb );
+                void back( const string   &expr,  const callback &cb );
+                void back( const char     *expr,  const callback &cb );
                 
                 //! create dict if necessary
                 regex::pattern_dict &dict();
