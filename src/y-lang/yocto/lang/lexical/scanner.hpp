@@ -17,6 +17,7 @@ namespace yocto
         namespace lexical
         {
             
+            typedef functor<void,TL1(const regex::token &)> callback;
             
             class scanner : public object, public counted
             {
@@ -41,23 +42,34 @@ namespace yocto
                 const action  discard; //!< predefined action
                 const action  newline; //!< predefined action
                 
+                //==============================================================
+                // lexemes recognition
+                //==============================================================
+                
                 //! create a new rule with label, motif and optional proc (forward if NULL==proc)
-                void operator()( const string &label, regex::pattern *motif, const action *proc = NULL );
+                void make( const string &label, regex::pattern *motif, const action *proc = NULL );
                 
                 //! create a new rule with the compiled expr, use internal dict
-                void operator()( const string &label, const string &expr, const action *proc =NULL);
+                void make( const string &label, const string &expr, const action *proc =NULL);
                 
                 //! create a new rule with the compiled expr, use internal dict
-                void operator()( const char *label, const char *expr, const action *proc = NULL );
+                void make( const char *label, const char *expr, const action *proc = NULL );
                 
                 template <typename  HOST>
-                void on( const char *label, const char *expr, HOST *host, bool (HOST::*method)( const regex::token &) )
+                void make( const char *label, const char *expr, HOST *host, bool (HOST::*method)( const regex::token &) )
                 {
                     assert(host); 
                     assert(method);
                     const action cb( host, method );
-                    (*this)(label,expr,&cb);
+                    make(label,expr,&cb);
                 }
+                
+                //==============================================================
+                // jump within lexer hierarchy
+                //==============================================================
+                void jump( const string &id, regex::pattern *motif, const callback &cb );
+                void jump( const string &id, const string &expr, const callback &cb );
+                void jump( const char   *id, const char   *expr, const callback &cb );
                 
                 
                 //! create dict if necessary
@@ -84,6 +96,7 @@ namespace yocto
             private:
                 lexer               *parent_;
                 regex::pattern_dict *dict_;
+                unsigned             opid;   //!< to create jump/call/back label
             };
         }
         
