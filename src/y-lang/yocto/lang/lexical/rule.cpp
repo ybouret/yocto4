@@ -21,24 +21,25 @@ namespace yocto
             }
             
             
-            rule:: rule( const string &id, regex::pattern *p, const action &cb ) :
+            rule:: rule( const string &id, regex::pattern *p, const action &cb, bool control_flag ) :
             label(id),
             motif(p),
             next(0),
             prev(0),
-            proc(cb)
+            proc(cb),
+            fctl(control_flag)
             {
             }
             
             void rule:: kill( rule *r ) throw() { assert(r); r->~rule(); object::release1(r); }
             
-            rule * rule:: create(const string &id, regex::pattern *p, const action &cb)
+            rule * rule:: create(const string &id, regex::pattern *p, const action &cb, bool control_flag)
             {
                 assert(p);
                 rule *r = object::acquire1<rule>();
                 try
                 {
-                    new (r) rule(id,p,cb);
+                    new (r) rule(id,p,cb,control_flag);
                 }
                 catch(...)
                 {

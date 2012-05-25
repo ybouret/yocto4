@@ -1,6 +1,6 @@
 #include "yocto/lang/lexical/scanner.hpp"
 #include "yocto/exception.hpp"
-
+#include <iostream>
 namespace yocto 
 {
 	namespace lang
@@ -8,7 +8,7 @@ namespace yocto
         
 		namespace lexical
 		{
-			lexeme * scanner:: next_lexeme( regex::source &src )
+			lexeme * scanner:: next_lexeme( regex::source &src, bool &fctl )
 			{
                 
 				//--------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace yocto
                         }
                         
                     }			
-                   
+                    
 					//----------------------------------------------------------
 					// scan other rules for a better match
 					//----------------------------------------------------------
@@ -99,22 +99,35 @@ namespace yocto
 					//----------------------------------------------------------
 					// check is we keep the lexeme
 					//----------------------------------------------------------
-					if( best_rule->produce() )
-					{
-						//-- create the lexeme
-						lexeme *lx = new lexeme( best_rule->label, line );
-                        
-						//-- steal the token
-						lx->swap_with( *(best_rule->motif) );
-						best_rule->motif->clear();
-                        
-						//-- done
-						return lx;
-					}
-					else
-					{
-						best_rule->motif->clear();
-					}
+                    std::cerr << name << ": best rule= " << best_rule->label << std::endl;
+                    if( best_rule->fctl == true )
+                    {
+                        std::cerr << "<CTRL>" << std::endl;
+                        if( best_rule->produce() )
+                            throw exception("%s: rule '%s' should not produce", name.c_str(),best_rule->label.c_str());
+                        best_rule->motif->clear();
+                        fctl = true;
+                        return NULL;
+                    }
+                    else 
+                    {
+                        if( best_rule->produce() )
+                        {
+                            //-- create the lexeme
+                            lexeme *lx = new lexeme( best_rule->label, line );
+                            
+                            //-- steal the token
+                            lx->swap_with( *(best_rule->motif) );
+                            best_rule->motif->clear();
+                            
+                            //-- done
+                            return lx;
+                        }
+                        else
+                        {
+                            best_rule->motif->clear();
+                        }
+                    }
                     
 					//----------------------------------------------------------
 					// ready for next producing rule...

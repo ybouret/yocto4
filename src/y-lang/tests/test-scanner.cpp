@@ -30,7 +30,8 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     lang::lexeme *lx = NULL;
     
     scan.reset();
-    while( NULL != (lx=scan.next_lexeme(src)) )
+    bool fctl = false;
+    while( NULL != (lx=scan.next_lexeme(src,fctl)) )
     {
 		std::cerr << "line: " << scan.line << ": " << lx->label << " [" << *lx << "]" << std::endl;
         lxs.push_back(lx);

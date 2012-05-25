@@ -26,7 +26,7 @@ namespace {
 
             
             scan.jump( "C Comment", "/\\*", EnterCommentC);
-            //scan.jump( "C++ Comment", "//", EnterCommentCXX);
+            scan.call( "C++ Comment", "//", EnterCommentCXX);
             
             lang::lexical::scanner &comC = declare("C Comment");
             comC.make( "BLANKS", "[ \t]",    & comC.discard );

@@ -96,7 +96,7 @@ namespace yocto
                 void reset() throw();
                 
                 //! get next forwarded lexeme
-                lexeme * next_lexeme( regex::source &src );
+                lexeme * next_lexeme( regex::source &src, bool &fctl);
                 
                 //! get key for set of scanner
                 const string & key() const throw();
@@ -106,6 +106,7 @@ namespace yocto
                 
                 //! set parent
                 void link_to( lexer &parent ) throw();
+                
                 
             private:
                 lexer               *parent_;

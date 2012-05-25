@@ -36,7 +36,7 @@ namespace yocto
                     {
                         __perform();
                         cb(trigger);
-                        return false; //! no more syntactic meaning
+                        return false;
                     }
                     
                 private:
@@ -57,7 +57,7 @@ namespace yocto
                 auto_ptr<regex::pattern> p(motif);
                 
                 //-- create the label
-                const string label = vformat("jump%u->%s", ++opid, id.c_str());
+                const string label = vformat("jump%u@%s", ++opid, id.c_str());
                 
                 //-- create the compound action
                 assert(motif   != NULL);
@@ -67,8 +67,7 @@ namespace yocto
                 const action       fcn( ctx );
                 
                 //-- make the corresponding rule
-                make(label, p.yield(), &fcn);
-                
+                rules_.push_back( rule::create(label, p.yield(), fcn, true) );
             }
             
             
@@ -90,7 +89,7 @@ namespace yocto
                 auto_ptr<regex::pattern> p(motif);
                 
                 //-- create the label
-                const string label = vformat("call%u->%s", ++opid, id.c_str());
+                const string label = vformat("call%u:%s", ++opid, id.c_str());
                 
                 //-- create the compound action
                 assert(motif   != NULL);
