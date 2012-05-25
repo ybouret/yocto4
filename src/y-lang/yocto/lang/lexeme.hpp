@@ -13,7 +13,7 @@ namespace yocto
         class lexeme : public regex::token
         {
         public:
-            const string &name; //!< reference to the terminal token
+            const string &label; //!< reference to the terminal token
             const size_t  line; //!< line of existence
             lexeme       *next; //!< for linked list 
             lexeme       *prev; //!< for linked list

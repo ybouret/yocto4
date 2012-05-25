@@ -9,7 +9,7 @@ namespace yocto
         
         lexeme:: lexeme( const string &n, size_t l ) throw() :
         regex::token(),
-        name(n),
+        label(n),
         line(l),
         next(0),
         prev(0)
@@ -19,7 +19,7 @@ namespace yocto
         
         lexeme:: lexeme( const lexeme &other ) :
         regex::token(other),
-        name( other.name ),
+        label( other.label ),
         line( other.line ),
         next(0),
         prev(0)
