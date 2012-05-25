@@ -90,7 +90,7 @@ namespace yocto
                 auto_ptr<regex::pattern> p(motif);
                 
                 //-- create the label
-                const string label = vformat("call%u:%s", ++opid_, id.c_str());
+                const string label = vformat("call%u@%s", ++opid_, id.c_str());
                 
                 //-- create the compound action
                 assert(motif   != NULL);
