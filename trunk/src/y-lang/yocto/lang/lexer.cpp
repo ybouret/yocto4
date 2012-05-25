@@ -12,13 +12,14 @@ namespace yocto
         
         
 #define Y_LEXER_CTOR() \
-line(0), \
+line(1), \
 scanners(4,as_capacity), \
-current(NULL)
+current(NULL), \
+cache()
         
 #define Y_LEXER_INIT() \
 (void)  declare( main_id ); \
-current = fetch( main_id )
+current = & first()
         
         lexer:: lexer( const string &main_id ) :
         Y_LEXER_CTOR()
