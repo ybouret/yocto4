@@ -23,7 +23,6 @@ forward( this, &scanner::__forward ),\
 discard( this, &scanner::__discard ),\
 newline( this, &scanner::__newline ),\
 lexer_(0),\
-cache_(), \
 dict_(0), \
 opid_(0)
             
@@ -97,7 +96,6 @@ opid_(0)
             
             void scanner:: reset() throw()
             {
-                cache_.kill();
                 for( rule *r = rules_.head; r; r=r->next)
                 {
                     r->motif->clear();
@@ -110,27 +108,6 @@ opid_(0)
                 lexer_ = &parent;
             }
             
-            void scanner:: cache( const scanner &plugin, const string &data )
-            {
-                //-- create an empty lexeme
-                lexeme *lx = new lexeme( plugin.name, line );
-                
-                //-- store it
-                cache_.push_front(lx);
-                try 
-                {
-                    //-- create a corresponding token
-                    regex::token tmp( data );
-                    
-                    //-- steal it
-                    lx->swap_with(tmp);
-                }
-                catch(...)
-                {
-                    delete cache_.pop_front();
-                    throw;
-                }
-            }
             
         }
         

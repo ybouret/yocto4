@@ -10,6 +10,7 @@ namespace yocto
     namespace lang
     {
         
+        //! generic lexeme
         class lexeme : public regex::token
         {
         public:
@@ -29,6 +30,7 @@ namespace yocto
         };
         
         
+        //! list of lexemes
         typedef core::meta_list<lexeme> lexemes;
         
     }

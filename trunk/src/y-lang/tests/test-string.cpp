@@ -57,7 +57,8 @@ namespace {
         
         void OnLeaveString( const regex::token & )
         {
-            std::cerr << "<Leave String>" << std::endl;
+            std::cerr << "<Leave String>[" << str << "]" << std::endl;
+            unget(cstr, str);
         }
         
         

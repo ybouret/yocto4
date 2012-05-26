@@ -107,12 +107,9 @@ namespace yocto
                 //! set parent
                 void link_to( lexer &parent ) throw();
                 
-                //! cache an artificial lexeme
-                void cache( const scanner &plugin, const string &data );
                 
             private:
                 lexer               *lexer_;
-                lexemes              cache_;
                 regex::pattern_dict *dict_;
                 unsigned             opid_;   //!< to create jump/call/back label
             };
