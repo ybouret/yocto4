@@ -26,10 +26,13 @@ namespace yocto
             void jump( const string &id ); //!< change current, no history record
             void call( const string &id ); //!< change current, with history record 
             void back();                   //!< change current to top of history
-            void reset() throw();
+            void reset() throw();          //!< restart lexer
             
-            lexeme *next_lexeme(regex::source &src);
+            lexeme *next_lexeme(regex::source &src); //! get next lexeme
             const lexical::scanner &current() const throw();
+            
+            //! put in cache an artificial lexeme with label from.name
+            void  unget( const lexical::scanner &from, const string &data );
             
             size_t            line;
         private:
@@ -37,10 +40,12 @@ namespace yocto
             typedef lexical::scanner *                scan_ptr;
             typedef list<scan_ptr>                    hsequence;
             typedef stack<scan_ptr,hsequence>         historyDB;
+            
             scannerDB         scanners;
             lexical::scanner *scan;
             lexemes           cache;
             historyDB         history;
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             lexical::scanner *fetch( const string &id ) const;
             lexical::scanner *fetch( const char   *id ) const;

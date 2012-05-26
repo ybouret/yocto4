@@ -36,14 +36,16 @@ namespace yocto
         {
             assert( scan != NULL );
             
-            if( cache.size > 0 )
-                return cache.pop_front();
+            
             
             while(true)
             {
+                if( cache.size > 0 )
+                    return cache.pop_front();
+                
                 bool    fctl = false;
                 lexeme *lx   = scan->next_lexeme(src,fctl);
-
+                
                 //--------------------------------------------------------------
                 //-- do we have something ?
                 //--------------------------------------------------------------
@@ -65,6 +67,28 @@ namespace yocto
             return NULL;
         }
         
+        void  lexer::unget( const lexical::scanner &from, const string &data )
+        {
+            //-- create an empty lexeme
+            lexeme *lx = new lexeme( from.name, line );
+            
+            //-- store it
+            cache.push_front(lx);
+            try 
+            {
+                //-- create a corresponding token
+                regex::token tmp( data );
+                
+                //-- steal it
+                lx->swap_with(tmp);
+            }
+            catch(...)
+            {
+                delete cache.pop_front();
+                throw;
+            }
+            
+        }
         
     }
     

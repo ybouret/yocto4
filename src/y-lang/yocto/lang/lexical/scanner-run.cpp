@@ -11,12 +11,6 @@ namespace yocto
 			lexeme * scanner:: next_lexeme( regex::source &src, bool &fctl )
 			{
                 
-                if( cache_.size > 0 )
-                {
-                    return cache_.pop_front();
-                }
-                
-                
 				//--------------------------------------------------------------
 				//
 				// find a rule that produces a lexeme
