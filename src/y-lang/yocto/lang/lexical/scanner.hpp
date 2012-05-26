@@ -29,14 +29,14 @@ namespace yocto
                 const string name; //!< scanner identifier
                 size_t      &line; //!< line index for lexemes
                 
-               
+                
             private:
                 rules         rules_;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 bool __forward( const regex::token &) throw(); //!< return true
                 bool __discard( const regex::token &) throw(); //!< return false
                 bool __newline( const regex::token &) throw(); //!< increase line, return true
-
+                
             public:
                 const action  forward; //!< predefined action
                 const action  discard; //!< predefined action
@@ -70,6 +70,14 @@ namespace yocto
                 void jump( const string &id, regex::pattern *motif, const callback &cb );
                 void jump( const string &id, const string &expr, const callback &cb );
                 void jump( const char   *id, const char   *expr, const callback &cb );
+                template <typename  HOST>
+                void jump( const char *id, const char *expr, HOST *host, void (HOST:: *method)(const regex::token &) )
+                {
+                    assert(host); 
+                    assert(method);
+                    const callback cb( host, method );
+                    jump(id,expr,cb);
+                }
                 
                 //==============================================================
                 // call one of the lexer's scanners
@@ -77,7 +85,14 @@ namespace yocto
                 void call( const string &id, regex::pattern *motif, const callback &cb );
                 void call( const string &id, const string   &expr,  const callback &cb );
                 void call( const char   *id, const char     *expr,  const callback &cb );
-                
+                template <typename  HOST>
+                void call( const char *id, const char *expr, HOST *host, void (HOST:: *method)(const regex::token &) )
+                {
+                    assert(host); 
+                    assert(method);
+                    const callback cb( host, method );
+                    call(id,expr,cb);
+                }
                 
                 //==============================================================
                 // back to the calling lexer's scanners
@@ -85,6 +100,14 @@ namespace yocto
                 void back( regex::pattern *motif, const callback &cb );
                 void back( const string   &expr,  const callback &cb );
                 void back( const char     *expr,  const callback &cb );
+                template <typename  HOST>
+                void back( const char *expr, HOST *host, void (HOST:: *method)(const regex::token &) )
+                {
+                    assert(host); 
+                    assert(method);
+                    const callback cb( host, method );
+                    back(expr,cb);
+                }
                 
                 //! create dict if necessary
                 regex::pattern_dict &dict();
