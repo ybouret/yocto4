@@ -22,18 +22,14 @@ namespace {
             
             scan.make("WORD",    "[:word:]+");
             scan.make("INT",     "[:digit:]+");
-            {
-                const lang::lexical::callback EnterString( this, &MyLex::OnEnterString);
-                scan.call("STRING",  "\"", EnterString);
-            }
+            
+            scan.call("STRING",  "\"", this, &MyLex::OnEnterString);
             scan.make("BLANKS",  "[ \t]+",    &scan.discard);
             scan.make("NEWLINE", "[:endl:]",  &scan.newline);
             
-            {
-                const lang::lexical::callback LeaveString(this, &MyLex:: OnLeaveString);
-                cstr.back("\"", LeaveString);
-                cstr.make("1CHAR", ".", this, &MyLex::OnChar);
-            }
+            
+            cstr.back("\"", this, & MyLex:: OnLeaveString);
+            cstr.make("1CHAR", ".", this, &MyLex::OnChar);
             
         }
         
@@ -82,6 +78,6 @@ YOCTO_UNIT_TEST_IMPL(string)
         std::cerr << "line: " << Lx.line << ": " << lx->label << " [" << *lx << "]" << std::endl;
         lxs.push_back(lx);
     }
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
