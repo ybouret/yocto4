@@ -30,6 +30,12 @@
 #	define YOCTO_FREEBSD     1
 #endif
 
+#if defined(__OpenBSD__)
+#	define YOCTO_PLATFORM	"OpenBSD"
+#	define YOCTO_BSD 		 1
+#	define YOCTO_OPENBSD     1
+#endif
+
 #if defined(__sun__)
 #	define YOCTO_PLATFORM	"SunOS"
 #	define YOCTO_BSD 		1
