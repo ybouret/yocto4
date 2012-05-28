@@ -19,6 +19,7 @@ namespace yocto
             
             typedef functor<void,TL1(const regex::token &)> callback;
             
+            //! a simple scanne
             class scanner : public object, public counted
             {
             public:
@@ -38,9 +39,9 @@ namespace yocto
                 bool __newline( const regex::token &) throw(); //!< increase line, return true
                 
             public:
-                const action  forward; //!< predefined action
-                const action  discard; //!< predefined action
-                const action  newline; //!< predefined action
+                const action  forward; //!< predefined action : forward lexeme (return true)
+                const action  discard; //!< predefined action : discard lexeme (return false)
+                const action  newline; //!< predefined action : increase line and discard lexeme (return false)
                 
                 //==============================================================
                 // lexemes recognition

@@ -102,11 +102,14 @@ namespace yocto
                     std::cerr << name << ": best rule= " << best_rule->label << std::endl;
                     if( best_rule->fctl == true )
                     {
+                        //------------------------------------------------------
+                        // we have a control rule !
+                        //------------------------------------------------------
                         std::cerr << "<CTRL>" << std::endl;
                         if( best_rule->produce() )
                             throw exception("%s: rule '%s' should not produce", name.c_str(),best_rule->label.c_str());
-                        best_rule->motif->clear();
-                        fctl = true;
+                        best_rule->motif->clear(); // discard the token
+                        fctl = true;               // inform the lexer
                         return NULL;
                     }
                     else 
