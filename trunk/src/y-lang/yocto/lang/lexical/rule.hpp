@@ -14,6 +14,7 @@ namespace yocto
             
             typedef functor<bool,TL1(const regex::token)> action;
             
+            //! generic rule
             class rule
             {
             public:
@@ -23,10 +24,21 @@ namespace yocto
                 rule           *prev;    //!< for linked list
                
                 
+                //! create a rule
+                /**
+                 \param id will be rule label
+                 \param p  will be rule motif: taken care of in case of error
+                 \param cb callback when motif is selected
+                 \param control will be the special fctl flag
+                 */
                 static rule * create( const string &id, regex::pattern *p, const action &cb, bool control);
                 static void   kill( rule *r ) throw();
                 
-                bool produce(); //! proc( *motif )
+                //! return proc( *motif )
+                /**
+                 when motif is selected, call this->proc( *motif );
+                 */
+                bool produce(); 
                 
             private:
                 action proc;

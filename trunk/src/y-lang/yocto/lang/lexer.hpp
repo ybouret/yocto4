@@ -12,6 +12,10 @@ namespace yocto
     namespace lang 
     {
         
+        //! convert a regex::source into a lexeme source
+        /**
+         use multiple scanner
+         */
         class lexer 
         {
         public:

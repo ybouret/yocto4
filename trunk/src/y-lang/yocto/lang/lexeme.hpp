@@ -15,9 +15,9 @@ namespace yocto
         {
         public:
             const string &label; //!< reference to the terminal token
-            const size_t  line; //!< line of existence
-            lexeme       *next; //!< for linked list 
-            lexeme       *prev; //!< for linked list
+            const size_t  line;  //!< line of existence
+            lexeme       *next;  //!< for linked list 
+            lexeme       *prev;  //!< for linked list
             
             explicit lexeme( const string &n, size_t l ) throw();
             virtual ~lexeme() throw();
