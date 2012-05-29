@@ -8,6 +8,7 @@
 #include "yocto/code/fourcc.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/ordered/catalog.hpp"
+#include "yocto/shared-ptr.hpp"
 
 namespace yocto 
 {
@@ -49,6 +50,22 @@ namespace yocto
                 catalog<string> db;
             };
             
+            class link : public ios::ichannel
+            {
+            public:
+                explicit link( const shared_ptr<raw_file> &fp, const int64_t pos, const uint64_t len ) throw();
+                virtual ~link() throw();
+                virtual void get( void *data, size_t size, size_t &done );
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(link);
+                shared_ptr<raw_file> rc;
+                const int64_t        at;
+                int64_t              curr;
+                const uint64_t       size;
+                const int64_t        last;
+            };
+            
                         
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(resources);
@@ -72,9 +89,9 @@ namespace yocto
             
             
             
-            raw_file         file_;
-            hasher           H;
-            set<string,item> db;
+            shared_ptr<raw_file> rc;
+            hasher               H;
+            set<string,item>     db;
             void     extract();
         };
     }
