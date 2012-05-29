@@ -27,7 +27,12 @@ namespace yocto
 		public:
 			typedef typename LAYOUT::coord       coord;
             
-			//! prepare all layouts
+			//! prepare all layouts/
+            /**
+             \param L the dataspace layout
+             \param G the ghosts setup
+             \param F the fields setup
+             */
 			explicit dataspace(const LAYOUT               &L,
                                const ghosts_setup<coord>  &G,
                                const fields_setup<LAYOUT> &F
