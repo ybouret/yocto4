@@ -1,13 +1,15 @@
 #ifndef YOCTO_IOS_RC_INCLUDED
 #define YOCTO_IOS_RC_INCLUDED 1
 
-#include "yocto/ios/ichannel.hpp"
+#include "yocto/ios/iflux.hpp"
 #include "yocto/ios/raw-file.hpp"
-#include "yocto/intrusive-ptr.hpp"
 #include "yocto/hashing/sha1.hpp"
 #include "yocto/code/fourcc.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/ordered/catalog.hpp"
+
+#include "yocto/memory/buffers.hpp"
+#include "yocto/memory/global.hpp"
 #include "yocto/shared-ptr.hpp"
 
 namespace yocto 
@@ -15,7 +17,7 @@ namespace yocto
     
     namespace ios
     {
-     
+        
         
         //! handling resources
         class resources
@@ -68,10 +70,13 @@ namespace yocto
             };
             typedef set<string,item> item_db;
             
-           
+            
             ios::ichannel *load_channel( const string &rcname ) const;
-                      
-                        
+            ios::ichannel *load_channel( const char   *rcname ) const;
+            ios::istream  *load_stream(  const string  &rcname ) const;
+            ios::istream  *load_stream(  const char    *rcname ) const;
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(resources);
             
@@ -81,22 +86,32 @@ namespace yocto
             void     extract();
             
             //! specialized input channel 
-            class link : public ios::ichannel
+            class rc_channel : public ios::ichannel
             {
             public:
-                explicit link( const shared_ptr<raw_file> &fp, const int64_t pos, const uint64_t len ) throw();
-                virtual ~link() throw();
+                explicit rc_channel( const shared_ptr<raw_file> &fp, const int64_t pos, const uint64_t len ) throw();
+                virtual ~rc_channel() throw();
                 virtual void get( void *data, size_t size, size_t &done );
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(link);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(rc_channel);
                 shared_ptr<raw_file> rc;
                 const int64_t        at;
                 int64_t              curr;
                 const uint64_t       size;
                 const int64_t        last;
             };
-
+            
+            typedef memory::buffer_of<char,memory::global> rc_buffer;
+            class rc_stream : public rc_channel, public rc_buffer, public iflux
+            {
+            public:
+                explicit rc_stream( const shared_ptr<raw_file> &fp, const int64_t pos, const uint64_t len );
+                virtual ~rc_stream() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(rc_stream);
+            };
             
         };
     }

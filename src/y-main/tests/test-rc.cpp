@@ -23,6 +23,7 @@ YOCTO_UNIT_TEST_IMPL(rcpack)
 YOCTO_UNIT_TEST_DONE()
 
 
+#include "yocto/auto-ptr.hpp"
 
 YOCTO_UNIT_TEST_IMPL(rcload)
 {
@@ -30,6 +31,18 @@ YOCTO_UNIT_TEST_IMPL(rcload)
     {
         const string   filename = argv[1];
         ios::resources rc(filename);
+        for( int i=2; i < argc; ++i )
+        {
+            auto_ptr<ios::ichannel> in( rc.load_channel( argv[i] ) );
+            auto_ptr<ios::istream>  fp( rc.load_stream( argv[i] ) );
+            char C = 0;
+            std::cerr << "-- " << argv[i] << " --" << std::endl;
+            while( fp->query(C) )
+            {
+                std::cerr << C;
+            }
+            std::cerr << std::endl;
+        }
     }
 
 }
