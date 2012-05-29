@@ -42,6 +42,8 @@ namespace yocto
         template <>
         delaunay<ZTYPE>:: triangle::triangle( const array<vertex> &vertices, size_t a, size_t b, size_t c ) :
         iTriangle(a,b,c),
+	next(0),
+	prev(0),
         center(),
         radius( __compute_radius_and_center(center, vertices[i0], vertices[i1], vertices[i2] ) ),
         r2( radius * radius )

@@ -45,13 +45,15 @@ namespace yocto
         }
         
         Value:: Value( const String &s ) :
-        type( IsString )
+        type( IsString ),
+	data()
         {
             data._String = new String(s);
         }
         
         Value:: Value( const char *s ) :
-        type( IsString )
+        type( IsString ),
+	data()
         {
             data._String = new String(s);
         }
@@ -81,7 +83,8 @@ namespace yocto
 #define YJSON_COPY(TYPE) case Is##TYPE: data._##TYPE = new TYPE( *(other.data._##TYPE) ); break
         
         Value:: Value( const Value &other ) :
-        type( other.type )
+        type( other.type ),
+	data()
         {
             switch( type )
             {
