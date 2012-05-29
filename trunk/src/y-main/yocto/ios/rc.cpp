@@ -155,14 +155,17 @@ H(), db(16,as_capacity)
         resources:: ~resources() throw() {}
         
         resources:: resources( const string &filename ) :
-        file_( filename, ios::readable ), H()
+        rc( new raw_file(filename, ios::readable) ), 
+        H(),
+        db()
         {
             extract();
         }
         
         resources:: resources( const char *filename ) :
-        file_( filename, ios::readable ),
-        H()
+        rc( new raw_file(filename, ios::readable) ),
+        H(),
+        db()
         {
             extract();
         }
@@ -175,51 +178,51 @@ H(), db(16,as_capacity)
             uint32_t      magic = 0;
             const int64_t epilog_size = sizeof(count) + sizeof(start) + sizeof(magic);
             
-            file_.seek(-epilog_size, from_end);
-            start = file_.read<int64_t>();  
-            count = file_.read<uint32_t>(); 
-            magic = file_.read<uint32_t>();
+            rc->seek(-epilog_size, from_end);
+            start = rc->read<int64_t>();  
+            count = rc->read<uint32_t>(); 
+            magic = rc->read<uint32_t>();
             if( MAGIC != magic )
                 throw exception("resources: invalid MAGIC tag");
             
             //------------------------------------------------------------------
             //-- move at start
             //------------------------------------------------------------------
-            file_.seek( start, from_set );
+            rc->seek( start, from_set );
             db.reserve(count);
             
-            for( unsigned i=1; i <= count; ++i )
+            for( unsigned int i=1; i <= count; ++i )
             {
                 H.set();
                 
                 //--------------------------------------------------------------
                 //-- read MAGIC
                 //--------------------------------------------------------------
-                magic = file_.read<uint32_t>();
+                magic = rc->read<uint32_t>();
                 if( MAGIC != magic )
                     throw exception("resources: invalid item #%u", i );
                 
                 //--------------------------------------------------------------
                 //-- read resource name
                 //--------------------------------------------------------------
-                const string rcname = file_.load_string();
+                const string rcname = rc->load_string();
                 H( rcname );
                 std::cerr << "rc: load '" << rcname << "'" << std::endl;
                 
                 //--------------------------------------------------------------
                 // read resource length
                 //--------------------------------------------------------------
-                const uint64_t rclen = file_.read<uint64_t>();
+                const uint64_t rclen = rc->read<uint64_t>();
                 
                 //--------------------------------------------------------------
                 // read resource offset
                 //--------------------------------------------------------------
-                const int64_t  rcoff = file_.tell();
+                const int64_t  rcoff = rc->tell();
                 
                 std::cerr << "rc: #" << i << "@" << int(rcoff) << "+" << int(rclen) << std::endl;
                 // create resource
-                const item rc( rcname, rcoff, rclen );
-                if( !db.insert(rc) )
+                const item it( rcname, rcoff, rclen );
+                if( !db.insert(it) )
                     throw exception("resources: multiple '%s'", rcname.c_str());
                 
                 //--------------------------------------------------------------
@@ -227,7 +230,7 @@ H(), db(16,as_capacity)
                 //--------------------------------------------------------------
                 for( uint64_t j=0; j < rclen; ++j )
                 {
-                    const uint8_t C = file_.read<uint8_t>();
+                    const uint8_t C = rc->read<uint8_t>();
                     H.run(&C,1);
                 }
                 
@@ -235,11 +238,36 @@ H(), db(16,as_capacity)
                 // Basic integrity verification
                 //--------------------------------------------------------------
                 const uint64_t hkey = H.key<uint64_t>();
-                if( file_.read<uint64_t>() != hkey )
+                if( rc->read<uint64_t>() != hkey )
                     throw exception("resources: corrupted item #%u",i);
             }
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // resources link
+        //
+        ////////////////////////////////////////////////////////////////////////
+        resources:: link:: ~link() throw()
+        {
+        }
         
+        resources:: link:: link( const shared_ptr<raw_file> &fp, int64_t pos, uint64_t len ) throw() :
+        rc(fp),
+        at(pos),
+        curr(at),
+        size(len),
+        last(at+size)
+        {
+        }
+        
+        void resources:: link:: get( void *data, size_t size, size_t &done )
+        {
+            assert( !(size>0 && data==0) );
+            volatile scoped_lock guard( *rc );
+            rc->seek( curr, from_set );
+            done = 0;
+            
+        }
     }
 }
