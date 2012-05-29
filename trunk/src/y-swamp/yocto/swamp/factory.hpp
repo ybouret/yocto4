@@ -13,7 +13,7 @@ namespace yocto
         class factory 
         {
         public:
-            explicit factory() throw() : sheds()  {}
+            explicit factory() throw()   : sheds()  {}
             explicit factory( size_t n ) : sheds( n, as_capacity ) {}
             virtual ~factory() throw() {}
             
@@ -55,6 +55,7 @@ namespace yocto
                 db(name, spec, param->held, addr, info, param->dtor);
             }
             
+            //! create and register an array, wrapper
             inline void produce( const string &name, const LAYOUT &L, const std::type_info &array_spec,  array_db &db )
             {
                 const type_spec spec(array_spec);
@@ -86,7 +87,6 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(factory);
            
-            
             class shed
             {
             public:

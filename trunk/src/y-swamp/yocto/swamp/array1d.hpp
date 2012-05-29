@@ -15,9 +15,10 @@ namespace yocto
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
-            typedef array1D<T>         array_type;
-            typedef linear<T,layout1D> linear_type;
-            typedef layout1D           layout_type;
+            typedef array1D<T>                     array_type;
+            typedef linear<T,layout1D>             linear_type;
+            typedef layout1D                       layout_type;
+            
             typedef typename linear_type::callback callback;
             typedef typename linear_type::const_cb const_cb;
             typedef typename linear_type::call_two call_two;

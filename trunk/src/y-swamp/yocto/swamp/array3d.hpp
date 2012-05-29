@@ -23,6 +23,7 @@ namespace yocto
             typedef layout3D                       layout_type;
             typedef array2D<T>                     slice_type;
             typedef array1D<T>                     row_type;
+            
             typedef typename linear_type::callback callback;
             typedef typename linear_type::const_cb const_cb;
             typedef typename linear_type::call_two call_two;

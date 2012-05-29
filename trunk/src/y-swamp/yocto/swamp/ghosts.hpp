@@ -77,8 +77,8 @@ namespace yocto
         class local_ghosts : public ghosts_base
         {
         public:
-            local_ghosts_pair  lower;
-            local_ghosts_pair  upper;
+            local_ghosts_pair  lower; //!< lower.inner and its mirror
+            local_ghosts_pair  upper; //!< upper.lower and its mirror
             
             //! prepare ghosts pairs, no memory allocated
             explicit local_ghosts( size_t num_ghosts, size_t dim );            
