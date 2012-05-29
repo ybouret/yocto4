@@ -347,6 +347,8 @@ namespace yocto
 			else 
 			{
 				assert( is_positive() );
+                
+                if( os.flags() & std::ios_base::hex )
 				{
 					// hexa
 					assert(size_>0);
