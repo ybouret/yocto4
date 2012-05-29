@@ -1,6 +1,7 @@
 #include "yocto/ios/rc.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/code/utils.hpp"
 #include <iostream>
 
 namespace yocto
@@ -267,7 +268,16 @@ H(), db(16,as_capacity)
             volatile scoped_lock guard( *rc );
             rc->seek( curr, from_set );
             done = 0;
-            
+            const uint64_t to_read = min_of<uint64_t>(size,last-curr);
+            rc->get(data, to_read, done);
         }
+        
+        ios::ichannel *resources:: load_channel( const string &rcname ) const
+        {
+            const item *it = db.search(rcname);
+            if( !it ) throw exception("resources(no '%s')", rcname.c_str());
+            return new link( rc, it->start, it->bytes );
+        }
+
     }
 }
