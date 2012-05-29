@@ -36,12 +36,14 @@ YOCTO_UNIT_TEST_IMPL(rcload)
             auto_ptr<ios::ichannel> in( rc.load_channel( argv[i] ) );
             auto_ptr<ios::istream>  fp( rc.load_stream( argv[i] ) );
             char C = 0;
-            std::cerr << "-- " << argv[i] << " --" << std::endl;
+            std::cerr << "<" << argv[i] << ">" << std::endl;
+            size_t count = 0;
             while( fp->query(C) )
             {
                 std::cerr << C;
+                ++count;
             }
-            std::cerr << std::endl;
+            std::cerr << "</" << argv[i] << " count=" << count << " >" << std::endl;
         }
     }
 
