@@ -113,8 +113,8 @@ namespace yocto
 		inline iterator end()   throw() { return iterator( NULL );       }
 		
 		typedef iterating::linked<const_type,const node_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return iterator( list_.head ); }
-		inline const_iterator end()   const throw() { return iterator( NULL );       }
+		inline const_iterator begin() const throw() { return const_iterator( list_.head ); }
+		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
 		
 		typedef iterating::linked<type,node_type,iterating::reverse> reverse_iterator;
 		inline reverse_iterator rbegin() throw() { return reverse_iterator( list_.tail ); }
