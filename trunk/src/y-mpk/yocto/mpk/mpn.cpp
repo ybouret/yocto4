@@ -134,7 +134,6 @@ namespace yocto
 		natural:: natural( const natural &other ) :
 		size_( other.size_ ),
 		maxi_( other.size_ ),
-		//bits_( other.bits_ ),
 		byte_( mem_acquire(maxi_) )
 		{
 #			define YMPK_CPY(J) byte_[J] = other.byte_[J]
