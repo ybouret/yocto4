@@ -63,7 +63,7 @@ namespace yocto {
 		template <class T>
 		struct CHI2
 		{
-			static T cdf( T nu, T t );  //!< CHI2 law of t with nu degrees of freedom
+			static T cdf( T nu, T t );   //!< CHI2 law of t with nu degrees of freedom
 			static T icdf(  T nu, T p ); //!< CHI2::cdf(nu,t) = p (0<=p<1)
 			static T delta( T nu, T p ); //!< gamma_q(nu/2,delta_chi2/2)=1-p (0<=p<1)
 		};

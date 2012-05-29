@@ -4,6 +4,8 @@
 #define YOCTO_STAT_DESCR_INCLUDED 1
 
 #include "yocto/math/types.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/code/hsort.hpp"
 
 namespace yocto {
 	
@@ -72,7 +74,7 @@ namespace yocto {
 				sig = Sqrt( sig );
 			}
 			
-			
+          
 			
 		} // kernel
 		
@@ -100,6 +102,34 @@ namespace yocto {
 			kernel::compute_average_and_stddev<typename SEQ::mutable_type, typename SEQ::const_iterator>( ave, sig, seq.begin(), seq.end() );
 		}
 		
+        template <
+		class SEQ
+		>
+		inline void compute_median_and_absdev( typename SEQ::mutable_type &median, typename SEQ::mutable_type &absdev, const SEQ &seq ) throw()
+		{
+			const size_t n = seq.size();
+            if( n > 0 )
+            {
+                typename SEQ::const_type __zero(0);
+                typename SEQ::const_type __half(0.5);
+                vector<typename SEQ::mutable_type> data(n,__zero);
+                {
+                    typename  SEQ::const_iterator j = seq.begin();
+                    for( size_t i=1; i <= n; ++i, ++j ) data[i] = *j;
+                }
+                hsort( data );
+                const size_t im = n >> 1;
+                if( 0 != (im & 1) )
+                    median = data[im+1];
+                else 
+                    median = __half * ( data[im] + data[im+1] );
+                absdev = 0;
+                for( size_t i=n; i >0; --i ) 
+                    absdev += Fabs( data[i] - median );
+                absdev /= n;
+            }
+		}
+
 		
 		namespace kernel  {
 			
