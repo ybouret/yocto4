@@ -2,6 +2,10 @@
 #include "yocto/exception.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/ios/iflux.hpp"
+
+
+
 #include <iostream>
 
 namespace yocto
@@ -249,11 +253,11 @@ H(), db(16,as_capacity)
         // resources link
         //
         ////////////////////////////////////////////////////////////////////////
-        resources:: link:: ~link() throw()
+        resources:: rc_channel:: ~rc_channel() throw()
         {
         }
         
-        resources:: link:: link( const shared_ptr<raw_file> &fp, int64_t pos, uint64_t len ) throw() :
+        resources:: rc_channel:: rc_channel( const shared_ptr<raw_file> &fp, int64_t pos, uint64_t len ) throw() :
         rc(fp),
         at(pos),
         curr(at),
@@ -262,22 +266,65 @@ H(), db(16,as_capacity)
         {
         }
         
-        void resources:: link:: get( void *data, size_t size, size_t &done )
+        void resources:: rc_channel:: get( void *data, size_t size, size_t &done )
         {
             assert( !(size>0 && data==0) );
             volatile scoped_lock guard( *rc );
             rc->seek( curr, from_set );
             done = 0;
             const uint64_t to_read = min_of<uint64_t>(size,last-curr);
-            rc->get(data, to_read, done);
+            try 
+            {
+                rc->get(data, to_read, done);
+                curr += done;
+            }
+            catch(...)
+            {
+                curr += done;
+                throw;
+            }
         }
         
         ios::ichannel *resources:: load_channel( const string &rcname ) const
         {
             const item *it = db.search(rcname);
-            if( !it ) throw exception("resources(no '%s')", rcname.c_str());
-            return new link( rc, it->start, it->bytes );
+            if( !it ) throw exception("resources(no channel '%s')", rcname.c_str());
+            return new rc_channel( rc, it->start, it->bytes );
         }
-
+        
+        ios::ichannel * resources:: load_channel( const char   *rcname ) const
+        {
+            const string id(rcname);
+            return load_channel(id);
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // resources stream
+        //
+        ////////////////////////////////////////////////////////////////////////
+        resources:: rc_stream:: ~rc_stream() throw() {}
+        
+        resources:: rc_stream:: rc_stream( const shared_ptr<raw_file> &fp, int64_t pos, uint64_t len ) :
+        rc_channel( fp, pos, len ),
+        rc_buffer( BUFSIZ ),
+        iflux( static_cast<rc_channel&>(*this), static_cast<memory::rw_buffer&>(*this) )
+        {
+        }
+        
+        ios::istream * resources:: load_stream(const string &rcname ) const
+        {
+            const item *it = db.search(rcname);
+            if( !it ) throw exception("resources(no stream '%s')", rcname.c_str());
+            return new rc_stream( rc, it->start, it->bytes );
+        }
+        
+        ios::istream  * resources:: load_stream(  const char    *rcname ) const
+        {
+            const string id(rcname);
+            return load_stream(id);
+        }
+        
     }
 }
