@@ -82,7 +82,7 @@ namespace yocto
 		
 		
 #	if YOCTO_ZTYPE == 'i'
-		typedef ptrdiff_t real_t;	
+		typedef ptrdiff_t real_t;
 #	endif
 		
 		
