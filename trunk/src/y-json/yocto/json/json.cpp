@@ -44,6 +44,12 @@ namespace yocto
             memswap(&data,&other.data,sizeof(data));
         }
         
+        void Value:: nullify() throw()
+        {
+            Value null;
+            swap_with(null);
+        }
+        
         Value:: Value( const String &s ) :
         type( IsString ),
 	data()

@@ -80,6 +80,8 @@ namespace yocto
             
             const ValueType type;
             
+            void nullify() throw();
+            
         private:
             union 
             {
