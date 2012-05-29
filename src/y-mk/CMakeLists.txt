@@ -49,8 +49,14 @@ SET( fit_srcs ${fit_decl} ${fit_impl} )
 INSTALL( FILES ${fit_decl} DESTINATION include/yocto/math/fit )
 SOURCE_GROUP( math/fit FILES ${fit_srcs} )
 
+FILE( GLOB stat_decl yocto/math/stat/*.hpp)
+FILE( GLOB stat_impl yocto/math/stat/*.cpp)
+SET( stat_srcs ${stat_decl} ${stat_impl} )
+INSTALL( FILES ${stat_decl} DESTINATION include/yocto/math/stat )
+SOURCE_GROUP( math/stat FILES ${stat_srcs} )
 
-SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} )
+
+SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} ${stat_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main )
 
