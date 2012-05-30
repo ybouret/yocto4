@@ -29,7 +29,7 @@ namespace yocto
 			void Build(Program            &program,
 					   const DeviceIDs    &devices,
 					   const char *        options );
-			
+			            
 		private:
 			explicit Driver();
 			virtual ~Driver() throw();
