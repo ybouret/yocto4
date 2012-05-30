@@ -275,7 +275,7 @@ H(), db(16,as_capacity)
             const uint64_t to_read = min_of<uint64_t>(size,last-curr);
             try 
             {
-                rc->get(data, to_read, done);
+                rc->get(data, size_t(to_read), done);
                 curr += done;
             }
             catch(...)
@@ -306,6 +306,10 @@ H(), db(16,as_capacity)
         ////////////////////////////////////////////////////////////////////////
         resources:: rc_stream:: ~rc_stream() throw() {}
         
+#if defined(_MSC_VER)
+		// this in ctor
+#pragma warning ( disable : 4355 )
+#endif
         resources:: rc_stream:: rc_stream( const shared_ptr<raw_file> &fp, int64_t pos, uint64_t len ) :
         rc_channel( fp, pos, len ),
         rc_buffer( BUFSIZ ),
