@@ -141,6 +141,20 @@ namespace yocto
             return (*this)[ name ];
         }
         
+        const varray::ptr & array_db:: query( const string &name ) const
+        {
+            varray::ptr const *pArr = arrays.search( name );
+            if( !pArr )
+                throw exception("query(no array '%s')", name.c_str());
+            return *pArr;
+        }
+        
+        const varray::ptr & array_db:: query( const char   *id   ) const
+        {
+            const string name(id);
+            return    query(name);
+        }
+        
     }
 }
 

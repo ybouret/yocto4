@@ -460,7 +460,6 @@ namespace yocto
 						usingGhosts.push_back( adb[ f.name ].handle() );
 					}
 				}
-				//fieldsMaker.clear();
 			}
 		};
 #if defined(_MSC_VER)

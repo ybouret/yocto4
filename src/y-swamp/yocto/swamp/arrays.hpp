@@ -102,6 +102,8 @@ namespace yocto
             varray       &operator[]( const char *id );
             const varray &operator[]( const char *id ) const;
             
+            const varray::ptr & query( const string &name ) const;
+            const varray::ptr & query( const char   *id   ) const;
             
         private:
             varray::db arrays;
