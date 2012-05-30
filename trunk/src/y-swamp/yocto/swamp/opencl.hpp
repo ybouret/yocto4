@@ -2,7 +2,7 @@
 #define YOCTO_SWAMP_OPENCL_INCLUDED 1
 
 #include "yocto/ocl/driver.hpp"
-#include "yocto/ocl/buffer.hpp"
+#include "yocto/ocl/command-queue.hpp"
 #include "yocto/swamp/common.hpp"
 
 namespace yocto 
@@ -23,6 +23,39 @@ namespace yocto
             }
             
             virtual ~OCL_Buffer() throw() {}
+            
+            inline void Write(ocl::CommandQueue  &queue, 
+                              cl_bool             blocking_write,
+                              cl_uint             num_events_in_wait_list,
+                              const cl_event *    event_wait_list,
+                              cl_event *          event )
+            {
+                queue.EnqueueWriteBuffer(*this, 
+                                         blocking_write, 
+                                         0,
+                                         SIZE, 
+                                         ptr_,
+                                         num_events_in_wait_list,
+                                         event_wait_list,
+                                         event);
+            }
+            
+            inline void Read(ocl::CommandQueue  &queue, 
+                             cl_bool             blocking_read,
+                             cl_uint             num_events_in_wait_list,
+                             const cl_event *    event_wait_list,
+                             cl_event *          event )
+            {
+                queue.EnqueueReadBuffer(*this, 
+                                        blocking_read, 
+                                        0,
+                                        SIZE, 
+                                        ptr_,
+                                        num_events_in_wait_list,
+                                        event_wait_list,
+                                        event);
+            }
+            
             
         private:
             varray::ptr arr_;
