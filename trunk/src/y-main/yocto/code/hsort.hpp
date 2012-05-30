@@ -65,15 +65,20 @@ namespace yocto
 		const size_t n = ra.size(); assert( ra.size() == rb.size() );
 		if (n < 2) return;
 		
+        //----------------------------------------------------------------------
 		//-- local memory
+        //----------------------------------------------------------------------
 		uint64_t     wksp[ YOCTO_U64_FOR_ITEM(T) ];
 		void        *addr = static_cast<void*>(wksp);
 		T           &rra  = *static_cast<T *>(addr);
+        
 		uint64_t     wksp2[ YOCTO_U64_FOR_ITEM(U) ];
 		void        *addr2 = static_cast<void*>(wksp2);
 		U           &rrb  = *static_cast<U *>(addr2);
 		
+        //----------------------------------------------------------------------
 		//-- algorithm
+        //----------------------------------------------------------------------
 		size_t l =(n >> 1)+1;
 		size_t ir=n;
 		for (;;)
@@ -103,9 +108,9 @@ namespace yocto
 			size_t j=l+l;
 			while (j <= ir) 
 			{
-				if (j < ir && compare(ra[j],ra[j+1]) < 0 )
+				if(j < ir && compare(ra[j],ra[j+1]) < 0 )
 					j++;
-				if ( compare(rra,ra[j]) < 0) 
+				if( compare(rra,ra[j]) < 0) 
 				{ 
 					mmove( ra[i], ra[j] );
 					mmove( rb[i], rb[j] );
@@ -123,6 +128,8 @@ namespace yocto
 	template <typename T>
 	inline void hsort( array<T> &ra ) throw() { hsort( ra, __compare<T> ); }
 	
+    template <typename T, typename U>
+	inline void co_hsort( array<T> &ra, array<U> &rb ) throw() { hsort( ra, rb, __compare<T> ); }
 	
 }
 
