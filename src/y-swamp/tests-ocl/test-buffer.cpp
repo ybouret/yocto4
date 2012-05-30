@@ -30,5 +30,17 @@ YOCTO_UNIT_TEST_IMPL(buffer)
     OCL_Buffer oclA( D.query( "A" ), context );
     OCL_Buffer oclB( D.query( "B" ), context );
     
+    
+    for( size_t j=0; j < context.NUM_DEVICES; ++j )
+    {
+        const cl_device_id dev = context.devices[j];
+        ocl::CommandQueue Q( context, dev, 0 );
+        
+        oclA.Write(Q, CL_FALSE, YOCTO_OPENCL_NO_EVENT );
+        oclA.Read(Q, CL_FALSE, YOCTO_OPENCL_NO_EVENT );
+        
+        Q.Flush();
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
