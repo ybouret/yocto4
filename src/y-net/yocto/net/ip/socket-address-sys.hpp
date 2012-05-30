@@ -9,6 +9,10 @@
 #include "yocto/os.hpp"
 
 #if defined(YOCTO_BSD)
+#	if defined(__OpenBSD__)
+#		include <sys/types.h>
+#		include <sys/socket.h>
+#	endif
 #	include <netinet/in.h> 
 #endif // defined(YOCTO_BSD)
 
