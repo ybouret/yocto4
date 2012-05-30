@@ -37,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(buffer)
         ocl::CommandQueue Q( context, dev, 0 );
         
         oclA.Write(Q, CL_FALSE, YOCTO_OPENCL_NO_EVENT );
-        oclA.Read(Q, CL_FALSE, YOCTO_OPENCL_NO_EVENT );
+        oclA.Read( Q, CL_FALSE, YOCTO_OPENCL_NO_EVENT );
         
         Q.Flush();
     }
