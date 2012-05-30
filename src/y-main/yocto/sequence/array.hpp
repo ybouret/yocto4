@@ -38,8 +38,8 @@ namespace yocto
 		inline iterator end()   throw() { return iterator( item(this->size()+1) ); }
 		
 		typedef iterating::linear<const_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return iterator( item(1) );              }
-		inline const_iterator end()   const throw() { return iterator( item[this->size()+1] ); }
+		inline const_iterator begin() const throw() { return const_iterator( item(1) );              }
+		inline const_iterator end()   const throw() { return const_iterator( item(this->size()+1) ); }
 		
 		typedef iterating::linear<type,iterating::reverse> reverse_iterator;
 		inline reverse_iterator rbegin() throw() { return reverse_iterator( item(this->size()) ); }
