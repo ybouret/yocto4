@@ -17,7 +17,7 @@ namespace yocto
 			YOCTO_ARGUMENTS_DECL_T;
 			
 			inline linear() throw()       : item_(NULL) {}
-			inline linear( T *p ) throw() : item_( p )  {}
+			inline linear( T *p ) throw() : item_((mutable_type*)p )  {}
 			inline linear( const linear &other) throw() : item_(other.item_) {}
 			inline linear & operator=( const linear &other ) throw() { item_ = other.item_; return *this; }
 			
