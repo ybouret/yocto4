@@ -22,8 +22,8 @@ YOCTO_UNIT_TEST_IMPL(buffer)
     const ocl::Platform &platform = OpenCL.Platforms[0];
     for( cl_uint j = 0; j < platform.num_devices; ++j )
 	{
-		const ocl::Device &D = platform.Devices[j];
-        std::cerr << "\t * " << D.NAME << std::endl;
+		const ocl::Device &Dev = platform.Devices[j];
+        std::cerr << "\t * " << Dev.NAME << std::endl;
     }
     ocl::Context context( platform.devices );
     
