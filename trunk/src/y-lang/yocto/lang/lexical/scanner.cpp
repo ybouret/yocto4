@@ -96,7 +96,7 @@ namespace yocto
 			void scanner:: make( const char *label, const char *expr, const action *proc )
 			{
 				const string L(label);
-				make(label, regex::compile(expr,dict_), proc);
+				make(L, regex::compile(expr,dict_), proc);
 			}
 
 
