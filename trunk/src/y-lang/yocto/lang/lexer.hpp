@@ -39,6 +39,9 @@ namespace yocto
             //! put in cache an artificial lexeme with label from.name
             void  unget( const lexical::scanner &from, const string &data );
             
+            //! put in cache a previously read lexeme
+            void unget( lexeme *lx ) throw();
+            
             size_t            line;
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;

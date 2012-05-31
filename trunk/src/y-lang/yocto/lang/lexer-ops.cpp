@@ -108,6 +108,12 @@ namespace yocto
             
         }
         
+        void lexer:: unget( lexeme *lx ) throw()
+        {
+            assert(lx);
+            cache.push_front( lx );
+        }
+        
     }
     
 }

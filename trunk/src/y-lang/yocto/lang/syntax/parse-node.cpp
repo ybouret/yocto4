@@ -8,12 +8,20 @@ namespace yocto
         
         namespace syntax
         {
+            
+            lexeme * & parse_node:: __lex() throw()
+            {
+                return *(lexeme **) &wksp[0];
+            }
+
+            
             parse_node:: ~parse_node() throw()
             {
                 if( terminal )
                 {
-                    lexeme *lx = lex();
-                    if( lx ) delete lx;
+                    lexeme * lx = __lex();
+                    if( lx ) 
+                        delete lx;
                 }
                 else
                 {
@@ -35,22 +43,38 @@ namespace yocto
                 memset(wksp,0,sizeof(wksp));
                 if( lx )
                 {
-                    lexeme **ppLx = (lexeme **) &wksp[0];
-                    *ppLx = lx;
+                    __lex() = lx;
                 }
             }
             
             lexeme * parse_node:: lex() throw()
             {
                 assert(terminal);
-                lexeme **ppLx = (lexeme **) &wksp[0];
-                return *ppLx;
+                return __lex();
             }
             
             parse_node::child_list & parse_node::children() throw()
             {
                 assert(!terminal);
                 return *(child_list *) &wksp[0];
+            }
+            
+            void parse_node:: restore( lexer &Lxr, parse_node *node ) throw()
+            {
+                assert(node!=NULL);
+                if( node->terminal )
+                {
+                    lexeme * &lx = node->__lex();
+                    assert( lx != NULL );
+                    Lxr.unget(lx);
+                    lx = 0;
+                }
+                else 
+                {
+                    child_list &ch = node->children();
+                    while( ch.size ) restore(Lxr,ch.pop_back());
+                }
+                delete node;
             }
             
         }
