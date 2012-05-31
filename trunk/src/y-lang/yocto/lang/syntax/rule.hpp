@@ -17,10 +17,8 @@ namespace yocto
                 virtual ~rule() throw();
                 
                 virtual rule *clone() const = 0;
-                virtual bool  accept( lexer &lx ) = 0;
-                
-                
-                
+                virtual bool  match( lexer &Lex ) = 0;
+                                
             protected:
                 explicit rule( const string &id );
                 rule( const rule & );
