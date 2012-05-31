@@ -8,7 +8,7 @@ namespace yocto
 	
 	namespace math 
 	{
-
+        
 		template <>
 		void algebra<z_type>:: set( array<z_type> &v, z_type a ) throw()
 		{
@@ -54,10 +54,11 @@ namespace yocto
 			const size_t c = M.cols;
 			for( size_t i=r; i>0; --i)
 			{
+                const matrix<z_type>::row &M_i = M[i];
 				z_type sum(0);
 				for( size_t j=c; j>0; --j )
 				{
-					sum += M[i][j] * u[j];
+					sum += M_i[j] * u[j];
 				}
 				v[i] = sum;
 			}
@@ -72,10 +73,11 @@ namespace yocto
 			const size_t c = M.cols;
 			for( size_t i=r; i>0; --i)
 			{
+                const matrix<z_type>::row &M_i = M[i];
 				z_type sum(0);
 				for( size_t j=c; j>0; --j )
 				{
-					sum += M[i][j] * u[j];
+					sum += M_i[j] * u[j];
 				}
 				v[i] += sum;
 			}
@@ -113,12 +115,14 @@ namespace yocto
 			assert( lhs.cols == rhs.rows );
 			for( size_t i=r; i>0; --i )
 			{
+                const matrix<z_type>::row &lhs_i = lhs[i];
+                matrix<z_type>::row       &M_i   = M[i];
 				for( size_t j=c;j>0;--j)
 				{
 					z_type sum(0);
 					for( size_t k=n; k>0; --k )
-						sum += lhs[i][k] * rhs[k][j];
-					M[i][j] = sum;
+						sum += lhs_i[k] * rhs[k][j];
+					M_i[j] = sum;
 				}
 			}
 		}
@@ -134,12 +138,13 @@ namespace yocto
 			assert( lhs.rows == rhs.rows );
 			for( size_t i=r; i>0; --i )
 			{
+                matrix<z_type>::row       &M_i   = M[i];
 				for( size_t j=c;j>0;--j)
 				{
 					z_type sum(0);
 					for( size_t k=n; k>0; --k )
 						sum += lhs[k][i] * rhs[k][j];
-					M[i][j] = sum;
+					M_i[j] = sum;
 				}
 			}
 		}
@@ -156,12 +161,15 @@ namespace yocto
 			assert( lhs.cols == rhs.cols );
 			for( size_t i=r; i>0; --i )
 			{
+                const matrix<z_type>::row &lhs_i = lhs[i];
+                matrix<z_type>::row       &M_i   = M[i];
 				for( size_t j=c;j>0;--j)
 				{
 					z_type sum(0);
+                    const matrix<z_type>::row &rhs_j = rhs[j];
 					for( size_t k=n; k>0; --k )
-						sum += lhs[i][k] * rhs[j][k];
-					M[i][j] = sum;
+						sum += lhs_i[k] * rhs_j[k];
+					M_i[j] = sum;
 				}
 			}
 		}
@@ -216,5 +224,5 @@ namespace yocto
 		}
 		
 	}
-
+    
 }
