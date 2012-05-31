@@ -4,7 +4,7 @@
 #include "yocto/memory/small-object.hpp"
 
 #if !defined(YOCTO_LIMIT_SIZE)
-#define YOCTO_LIMIT_SIZE 64
+#define YOCTO_LIMIT_SIZE 128
 #endif
 
 #if !defined(YOCTO_CHUNK_SIZE)

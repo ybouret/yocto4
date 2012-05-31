@@ -29,6 +29,12 @@ scan = & first()
             Y_LEXER_INIT();
         }
         
+        lexer:: lexer( const char *main_id ) :
+        Y_LEXER_CTOR()
+        {
+            Y_LEXER_INIT();
+        }
+        
         lexical::scanner & lexer:: first() throw()
         {
             return *scanners.front();
