@@ -18,19 +18,24 @@ namespace yocto
                 typedef core::list_of<parse_node> child_list;
                 const string &label;    //!< reference to the corresponding rule label
                 const bool    terminal; //!< true is terminal => one lexeme
-                parse_node   *prev;
-                parse_node   *next;
-                parse_node   *parent;
+                parse_node   *prev;     //!< for a child list
+                parse_node   *next;     //!< for a child list
+                parse_node   *parent;   //!< for a parse tree
                 
                 virtual ~parse_node() throw();
                 explicit parse_node( const string &label_ref, lexeme *lx ) throw();
                 
-                lexeme     * lex() throw();
-                child_list & children() throw();
+                lexeme     * lex() throw();       //!< lexeme if terminal==true
+                child_list & children() throw();  //!< children if terminal==false
+                
+                //! put back lexemes into lexer and delete node
+                static void restore( lexer &Lxr, parse_node *node ) throw();
                 
             private:
                 uint64_t wksp[ YOCTO_U64_FOR_ITEM(child_list) ];
                 YOCTO_DISABLE_COPY_AND_ASSIGN(parse_node);
+                lexeme * & __lex() throw();
+                
             };
         }
     }
