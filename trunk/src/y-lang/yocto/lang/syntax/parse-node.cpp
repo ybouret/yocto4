@@ -32,6 +32,9 @@ namespace yocto
             }
             
             
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
             parse_node:: parse_node( const string &label_ref, lexeme *lx ) throw() :
             label( label_ref ), 
             terminal( lx != 0 ),
