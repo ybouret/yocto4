@@ -33,7 +33,7 @@ namespace yocto
             void back();                   //!< change current to top of history
             void reset() throw();          //!< restart lexer
             
-            lexeme *next_lexeme(regex::source &src); //! get next lexeme
+            lexeme *next_lexeme(regex::source &src); //! get next lexeme, NULL if EOF
             const lexical::scanner &current() const throw();
             
             //! put in cache an artificial lexeme with label from.name
@@ -42,6 +42,10 @@ namespace yocto
             //! put in cache a previously read lexeme
             void unget( lexeme *lx ) throw();
             
+
+			//! try to cache one lexeme
+			bool is_active( regex::source &src );
+
             size_t            line;
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;

@@ -114,6 +114,23 @@ namespace yocto
             cache.push_front( lx );
         }
         
+		bool lexer:: is_active( regex::source &src )
+		{
+			if( cache.size > 0 )
+				return true;
+			else
+			{
+				lexeme *lx = next_lexeme(src);
+				if( lx )
+				{
+					cache.push_front(lx);
+					return true;
+				}
+				else
+					return false;
+			}
+		}
+
     }
     
 }
