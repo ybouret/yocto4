@@ -11,11 +11,11 @@ namespace yocto
             
             
             rule:: rule( const string &id ) : 
-            name(id) 
+            label(id) 
             {}
             
             rule:: rule( const rule &other ) :
-            name( other.name )
+            label( other.label )
             {
             }
             

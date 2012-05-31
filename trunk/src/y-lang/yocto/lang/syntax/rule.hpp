@@ -13,7 +13,7 @@ namespace yocto
             class rule : public object 
             {
             public:
-                const string name;
+                const string label;
                 virtual ~rule() throw();
                 
                 virtual rule *clone() const = 0;
