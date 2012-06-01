@@ -13,6 +13,12 @@ namespace yocto
 			rule( id )
 			{
 			}
+            
+            void compound:: add( rule *r ) throw()
+            {
+                assert(r);
+                operands.push_back(r);
+            }
 
 		}
 	}
