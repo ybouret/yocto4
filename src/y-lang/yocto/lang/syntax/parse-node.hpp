@@ -31,6 +31,8 @@ namespace yocto
                 //! put back lexemes into lexer and delete node
                 static void restore( lexer &Lxr, parse_node *node ) throw();
                 
+				static parse_node *create( const string &label_ref, lexeme *lx ); //!< take care of lexeme in case of failure
+
             private:
                 uint64_t wksp[ YOCTO_U64_FOR_ITEM(child_list) ];
                 YOCTO_DISABLE_COPY_AND_ASSIGN(parse_node);

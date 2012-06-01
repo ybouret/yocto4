@@ -20,16 +20,7 @@ namespace yocto
 
 				if( lx->label == this->label )
 				{
-					try 
-					{ 
-						parse_node *node = new parse_node(this->label,lx);
-
-					}
-					catch(...)
-					{
-						Lexer.unget(lx);
-						throw;
-					}
+					grow( Tree, parse_node::create(this->label,lx) );
 					return true;
 				}
 				else

@@ -3,24 +3,28 @@
 
 namespace yocto 
 {
-    namespace lang 
-    {
-        namespace syntax 
-        {
-            
-            rule:: ~rule() throw() {}
-            
-            
-            rule:: rule( const string &id ) : 
-            label(id) 
-            {}
-            
-            rule:: rule( const rule &other ) :
-            label( other.label )
-            {
-            }
-            
-            void rule:: grow( parse_node * & Tree, parse_node *node )
+	namespace lang 
+	{
+		namespace syntax 
+		{
+
+			rule:: ~rule() throw() {}
+
+
+			rule:: rule( const string &id ) : 
+			label(id),
+				next(0),
+				prev(0)
+			{}
+
+			rule:: rule( const rule &other ) :
+			label( other.label ),
+				next(0),
+				prev(0)
+			{
+			}
+
+			void rule:: grow( parse_node * & Tree, parse_node *node )
 			{
 				assert( node );
 				if( !Tree )
@@ -40,9 +44,14 @@ namespace yocto
 					Tree->children().push_back( node );
 				}
 			}
-            
-        }
 
-    }
+			void rule:: kill( rule *r ) throw() { assert(r!=NULL); delete r; }
+
+			rules:: ~rules() throw() { delete_with( rule::kill ); }
+
+
+		}
+
+	}
 
 }
