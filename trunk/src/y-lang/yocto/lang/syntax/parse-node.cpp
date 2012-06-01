@@ -79,6 +79,20 @@ namespace yocto
                 }
                 delete node;
             }
+
+			parse_node *parse_node:: create( const string &label_ref, lexeme *lx )
+			{
+				assert(0!=lx);
+				try 
+				{
+					return new parse_node(label_ref,lx);
+				}
+				catch(...)
+				{
+					delete lx;
+					throw;
+				}
+			}
             
         }
         

@@ -16,9 +16,13 @@ namespace yocto
 			{
 			public:
 				const string label;
+				rule        *next;
+				rule        *prev;
 				virtual ~rule() throw();
 
 				virtual bool  match( Y_SYNTAX_MATCH_ARGS ) = 0;
+
+				static void kill( rule *r ) throw();
 
 			protected:
 				explicit rule( const string &id );
@@ -29,6 +33,16 @@ namespace yocto
 
 			private:
 				YOCTO_DISABLE_ASSIGN(rule);
+			};
+
+			class rules : public core::list_of<rule>
+			{
+			public:
+				explicit rules() throw();
+				virtual ~rules() throw();
+
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(rules);
 			};
 
 		}
