@@ -17,16 +17,17 @@ namespace yocto
         
         species:: species(const string &id,
                           const int    charge,
-                          size_t       extra_bytes         ,
-                          void       (*extra_clean)(void*) 
+                          size_t       extra_bytes  
                           ) :
         name(id),
         z(charge),
         blen(extra_bytes),
         addr( memory::kind<memory::pooled>::acquire(blen) ),
-        kill( extra_clean )
+        kill(NULL)
         {
         }
+        
+        const string & species:: key() const throw() { return name; }
         
         
     }
