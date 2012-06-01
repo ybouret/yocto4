@@ -89,7 +89,7 @@ namespace yocto
 				}
 				catch(...)
 				{
-					delete lx;
+                    delete lx;
 					throw;
 				}
 			}

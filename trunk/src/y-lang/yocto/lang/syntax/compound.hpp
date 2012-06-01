@@ -14,7 +14,8 @@ namespace yocto
 			{
 			public:
 				virtual ~compound() throw();
-
+                void add( rule *r ) throw();
+                
 			protected:
 				explicit compound( const string &id);
 				rules operands;
@@ -24,6 +25,8 @@ namespace yocto
 			};
 		}
 	}
+    
+
 
 }
 
