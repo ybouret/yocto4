@@ -19,6 +19,7 @@ namespace yocto
             virtual ~grammar() throw();
             
         private:
+            syntax::rules rules;
             YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
         };
         
