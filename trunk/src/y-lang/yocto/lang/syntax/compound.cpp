@@ -10,7 +10,8 @@ namespace yocto
 			compound:: ~compound() throw() {}
 
 			compound:: compound( const string &id ) :
-			rule( id )
+			rule( id ),
+			operands()
 			{
 			}
             
