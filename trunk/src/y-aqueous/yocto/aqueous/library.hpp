@@ -18,17 +18,31 @@ namespace yocto
             
             
             template <typename T>
-            void ld(const string &name, int z)
+            inline void ld(const string &name, int z)
             {
                 add(name,z).make<T>();
             }
             
             template <typename T>
-            void ld( const string &name, int z, typename type_traits<T>::parameter_type args )
+            inline void ld( const string &name, int z, typename type_traits<T>::parameter_type args )
             {
                 add(name,z).make<T>(args);
             }
             
+            
+            template <typename T>
+            inline void ld( const char *id, int z )
+            {
+                const string name(id);
+                ld<T>(name,z);
+            }
+            
+            template <typename T>
+            inline void ld( const char *id, int z, typename type_traits<T>::parameter_type args )
+            {
+                const string name(id);
+                ld<T>(name,z,args);
+            }
             
             species       & operator[]( const string &name );
             const species & operator[]( const string &name ) const;
