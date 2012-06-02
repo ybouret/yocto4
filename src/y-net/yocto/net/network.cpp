@@ -8,6 +8,7 @@
 
 #if defined(YOCTO_BSD)
 #include <csignal>
+#include <unistd.h>
 #endif
 
 #include <iostream>
