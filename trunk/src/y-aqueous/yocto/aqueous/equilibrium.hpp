@@ -32,29 +32,40 @@ namespace yocto
         public:
             typedef functor<double,TL1(double)> constant;
             
-            explicit equilibrium( const string &id, const constant &eqK);
-            explicit equilibrium( const string &id, double eqK );
+            explicit equilibrium( const library &L, const string &id, const constant &eqK);
+            explicit equilibrium( const library &L, const string &id, double eqK );
             virtual ~equilibrium() throw();
             
             const string & key() const throw();
             
-            const string name;
-            constant     K;
+            const string     name;
+            mutable constant K;
             
             typedef intrusive_ptr<string,equilibrium> ptr;
             typedef set<string,ptr>                   db;
             
-            void add( const string &name, int nu );
-           
+            void add( const string &id, int nu );
+            void add( const char   *id, int nu );
+            
+            double Gamma( const solution &s, double t ) const;
+            
+            void fill( array<double> &row_nu, array<ptrdiff_t> &row_nuR, array<ptrdiff_t> &row_nuP ) const throw();
+            
+            friend std::ostream & operator<<( std::ostream &, const equilibrium & );
+            
         private:
-            actor::db    actors;
-            actor::db    reactants;
-            actor::db    products;
-            const double tmpK;
+            actor::db      actors;
+            actor::db      reactants;
+            actor::db      products;
+            const double   tmpK;
+                        
             double       getK(double) const throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
+        public:
+            const library &lib;
         };
         
+        typedef equilibrium::db equilibria;
        
         
     }
