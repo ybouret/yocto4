@@ -44,10 +44,12 @@ namespace yocto
             void put( array<double> &vec ) const throw();
             void get( const array<double> &vec ) throw();
             
-        private:
             const library  &lib;
+            
+        private:
             component::db   components;
             YOCTO_DISABLE_ASSIGN(solution);
+            
         public:
             const size_t size;
             
