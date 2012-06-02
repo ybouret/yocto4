@@ -1,6 +1,8 @@
 #include "yocto/aqueous/chemsys.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto 
 {
@@ -11,14 +13,19 @@ namespace yocto
         {
         }
         
-        chemsys:: chemsys( const library &L ) throw() :
+        chemsys:: chemsys( const library &L, const double frac_tol ) throw() :
         equilibria(),
+        ftol( Fabs(frac_tol) ),
         nu(),
         nuR(),
         nuP(),
         K(),
         Gamma(),
-	C(),
+        C(),
+        Phi(),
+        W(),
+        solver(),
+        xi(),
         lib(L)
         {
         }
@@ -52,7 +59,7 @@ namespace yocto
         {
             const size_t N = this->size();
             const size_t M = lib.size();
-                        
+            
             if( N > 0 && M > 0 )
             {
                 
@@ -62,7 +69,10 @@ namespace yocto
                 nuP.make(N,M);
                 K.make(N,0.0);
                 Gamma.make(N,0.0);
-                
+                Phi.make(N,M);
+                W.make(N,N);
+                solver.ensure(N);
+                xi.make(N,0.0);
                 //! compute topology
                 equilibria::iterator p = begin();
                 for( size_t i=1; i <= N; ++i, ++p )
@@ -75,31 +85,124 @@ namespace yocto
             
         }
         
-        void chemsys:: computeGamma( const solution &s, double t)
+        
+        void chemsys:: computeW( const solution &s, double t)
         {
             const size_t N = this->size();
             const size_t M = lib.size();
-#if !defined(NDEBUG)
-            
-#endif
-            s.put(C);
+                                  
+            //------------------------------------------------------------------
+            // simultaneous Gamma/Phi
+            //------------------------------------------------------------------
             equilibria::iterator p = begin();
             for( size_t i=1; i <= N; ++i, ++p )
             {
-                double lhs = (K[i] = (**p).K(t));
-                double rhs = 1;
-                const array<ptrdiff_t> &Ri = nuR[i];
-                const array<ptrdiff_t> &Pi = nuP[i];
+                const double            Ki  = (K[i] = (**p).K(t));
+                double                  lhs = Ki;
+                double                  rhs = 1;
+                const array<ptrdiff_t> &Ri  = nuR[i];
+                const array<ptrdiff_t> &Pi  = nuP[i];
+                
                 for( size_t j=1; j <= M; ++j )
                 {
-                    const int Rij = Ri[j]; assert(Rij>=0);
+                    const int    Rij  = Ri[j]; assert(Rij>=0);
+                    const double Cj   = C[j];
+                    double       PhiR = 0;
+                    double       PhiP = 0;
                     if(Rij>0)
-                        lhs *= ipower(C[j],Rij);
+                    {
+                        //------------------------------------------------------
+                        // Gamma Term
+                        //------------------------------------------------------
+                        const double Cpm1 = ipower(Cj,Rij-1);
+                        lhs *= Cpm1 * Cj;
+                        
+                        //------------------------------------------------------
+                        // Phi Term
+                        //------------------------------------------------------
+                        PhiR = Ki * Rij * Cpm1;
+                        for( size_t k=1; k <= M; ++k )
+                        {
+                            if( j != k )
+                            {
+                                const int Rik = Ri[k];
+                                if( Rik > 0 ) 
+                                    PhiR *= ipower( C[k], Rik );
+                            }
+                        }
+                    }
+                    
                     const int Pij = Pi[j]; assert(Pij>=0);
                     if(Pij>0)
-                        rhs *= ipower(C[j],Pij);
+                    {
+                        //------------------------------------------------------
+                        // Gamma Term
+                        //------------------------------------------------------
+                        const double Cpm1 = ipower(Cj, Pij-1);
+                        rhs *= Cpm1 * Cj;
+                        
+                        //------------------------------------------------------
+                        // Phi Term
+                        //------------------------------------------------------
+                        PhiP = Pij * Cpm1;
+                        for( size_t k=1; k <= M; ++k )
+                        {
+                            if( j != k )
+                            {
+                                const int Pik = Pi[k];
+                                if( Pik > 0 ) 
+                                    PhiP *= ipower( C[k], Pik );
+                            }
+                        }
+                        
+                    }
+                    Phi[i][j] = PhiR - PhiP;
                 }
                 Gamma[i] = lhs - rhs;
+            }
+            
+            //------------------------------------------------------------------
+            // compute W = Phi * trn(nu)
+            //------------------------------------------------------------------
+            algebra<double>::mul_rtrn(W, Phi, nu);
+            
+            //------------------------------------------------------------------
+            // prepare W
+            //------------------------------------------------------------------
+            if( !solver.LU(W) )
+                throw exception("Singular composition!");
+        }
+        
+        void chemsys:: normalize( solution &s, double t)
+        {
+            const size_t N = this->size();
+            const size_t M = lib.size();
+            
+            assert( M == s.size );
+            s.put(C);
+            if( N > 0 )
+            {
+                //! compute inverse jacobian
+                computeW(s,t);
+                
+                //! compute extent
+                for( size_t i=N;i>0;--i) xi[i] = -Gamma[i];
+                solver(W,xi);
+                
+                //! compute dC
+                algebra<double>::mul_trn(dC, nu, xi);
+                
+                //! update and check convergence
+                for( size_t j=M;j>0;--j)
+                {
+                    const double dC_j = dC[j];
+                    C[j] = max_of<double>(0.0,C[j]+dC_j);
+                }
+                
+                
+                // get the normalized C
+                s.get(C);
+               
             }
         }
         
