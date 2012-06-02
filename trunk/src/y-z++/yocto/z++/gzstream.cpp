@@ -80,7 +80,7 @@ namespace yocto
 		static inline void * __output_gz( const string &file_name, size_t level , bool append )
 		{
 			YOCTO_GIANT_LOCK();
-			const char mode[4] = { append ? 'a': 'w', 'b', '0' + ( level % 10 ), '\0' };
+			const char mode[4] = { append ? 'a': 'w', 'b', char('0' + ( level % 10 )), '\0' };
 			//std::cerr << "gz mode=" << mode << std::endl;
 			void *h = gzopen( &file_name[0], mode );
 			if( !h )

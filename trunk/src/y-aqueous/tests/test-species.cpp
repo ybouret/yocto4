@@ -7,7 +7,7 @@ using namespace aqueous;
 YOCTO_UNIT_TEST_IMPL(species)
 {
     species h("H+",1,100);
-    h.make<double>(NULL);
+    h.make<double>(0);
     h.make<uint64_t>(19);
     h.make<float>(3.0f);
     std::cerr << h.get<float>() << std::endl;

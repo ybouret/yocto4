@@ -18,6 +18,7 @@ namespace yocto
         nuP(),
         K(),
         Gamma(),
+	C(),
         lib(L)
         {
         }
