@@ -31,6 +31,7 @@ namespace yocto
             
             typedef intrusive_ptr<string,species> ptr;
             typedef set<string,ptr>               db;
+            typedef db::const_iterator            iterator;
             
             const string & key() const throw();
             
@@ -55,14 +56,11 @@ namespace yocto
                 new (addr) T(args); 
                 kill = __kill<T>;
             }
-            
-          
-            
+                        
             template <typename T>
-            inline T &get() throw() { assert(blen>=sizeof(T)); assert(addr!=0); return *(T*)addr; }
+            inline T &get() const throw() { assert(blen>=sizeof(T)); assert(addr!=0); return *(T*)addr; }
             
-            template <typename T>
-            inline const T &get() const throw()  { assert(blen>=sizeof(T)); assert(addr!=0); return *(const T*)addr; }
+           
                         
         private:
             size_t blen;

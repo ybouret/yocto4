@@ -2,6 +2,7 @@
 #define YOCTO_AQUEOUS_LIBRARY_INCLUDED 1
 
 #include "yocto/aqueous/species.hpp"
+#include "yocto/sequence/array.hpp"
 
 namespace yocto 
 {
@@ -49,6 +50,7 @@ namespace yocto
             
             species &       operator[]( const char *name );
             const species & operator[]( const char *name ) const;
+            
             
         private:
             const size_t nx;
