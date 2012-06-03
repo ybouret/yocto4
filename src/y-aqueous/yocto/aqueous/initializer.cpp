@@ -56,6 +56,25 @@ namespace yocto
             return num_pos > num_neg;
         }
         
+        static inline bool max_neg( const array<double> &C, size_t &pos )
+        {
+            assert( C.size() > 0 );
+            pos = 1;
+            double       ans = C[1];
+            const size_t num = C.size();
+            
+            for( size_t i=2;i<=num;++i)
+            {
+                const double tmp = C[i];
+                if( tmp < ans )
+                {
+                    ans = tmp;
+                    pos = i;
+                }
+            }
+            return  ans < 0;
+        }
+        
         void initializer:: operator()( chemsys &cs, double t )
         {
             std::cerr << "** Initializing system" << std::endl;
@@ -68,11 +87,12 @@ namespace yocto
             
             if( Nc > 0 )
             {
-                //--------------------------------------------------------------
+                linsys<double> &solver = cs.solver;
+                //==============================================================
                 //
                 // decode constraints
                 //
-                //--------------------------------------------------------------
+                //==============================================================
                 std::cerr << "** Decoding Linear Constraints" << std::endl;
                 matrix<double> P(Nc,M);
                 vector<double> V(Nc,0.0);
@@ -95,18 +115,18 @@ namespace yocto
                 std::cerr << "P=" << P << std::endl;
                 std::cerr << "V=" << V << std::endl;
                 
-                //--------------------------------------------------------------
+                //==============================================================
                 //
                 // compute constant part
                 //
-                //--------------------------------------------------------------
+                //==============================================================
                 {
                     matrix<double> P2(Nc,Nc);
-                    cs.solver.ensure(Nc);
+                    solver.ensure(Nc);
                     algebra<double>::mul_rtrn(P2, P, P);
-                    if( !cs.solver.LU(P2) )
+                    if( !solver.LU(P2) )
                         throw exception("Singular intializer");
-                    cs.solver(P2,U);
+                    solver(P2,U);
                     algebra<double>::mul_trn(C0, P, U);
                 }
                 std::cerr << "C0=" << C0 << std::endl;
@@ -127,7 +147,7 @@ namespace yocto
                             for( size_t j=1; j <= M; ++j )
                                 F2[i][j] = F[i][j] = alea<double>();
                     }
-                    while( !cs.solver.LU(F2) );
+                    while( !solver.LU(F2) );
                     
                     //--------------------------------------------------------------
                     // make an orthonormal sub-matrix
@@ -145,19 +165,20 @@ namespace yocto
                 std::cerr << "Q=" << Q << std::endl;
                 
                 
-                //--------------------------------------------------------------
+                //==============================================================
                 //
                 // modified newton
                 //
-                //--------------------------------------------------------------
+                //==============================================================
                 std::cerr << "** Modified Newton Step" << std::endl;
                 vector<double> Y(N,0.0);
-                array<double> &dY    = cs.xi;
-                matrix<double> &W    = cs.W;
-                matrix<double> &Phi  = cs.Phi;
-                const double    ftol = cs.ftol;
+                array<double> &dY     = cs.xi;
+                matrix<double> &W     = cs.W;
+                matrix<double> &Phi   = cs.Phi;
+                const double    ftol  = cs.ftol;
+                array<double>  &Gamma = cs.Gamma;
                 
-                cs.solver.ensure(N);
+                solver.ensure(N);
                 //--------------------------------------------------------------
                 // find a valid starting point
                 //--------------------------------------------------------------
@@ -178,11 +199,11 @@ namespace yocto
             NEWTON_STEP:
                 cs.computeGammaAndPhi(t);
                 algebra<double>::mul_rtrn(W, Phi, Q);
-                if( ! cs.solver.LU(W) )
+                if( ! solver.LU(W) )
                     goto NEWTON_INIT;
                 for( size_t i=N;i>0;--i)
-                    dY[i] = - cs.Gamma[i];
-                cs.solver(W,dY);
+                    dY[i] = -Gamma[i];
+                solver(W,dY);
                 
                 //--------------------------------------------------------------
                 // update Y
@@ -207,7 +228,20 @@ namespace yocto
                 std::cerr << "** Newton Result" << std::endl;
                 std::cerr << "C=" << C << std::endl;
                 cs.computeGammaAndPhi(t);
-                std::cerr << "Gamma=" << cs.Gamma << std::endl;
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                
+                //==============================================================
+                //
+                // numeric corrections
+                //
+                //==============================================================
+                size_t pos = 0;
+                while( max_neg(C, pos) )
+                {
+                    std::cerr << "neg@" << pos << "=" << C[pos] << std::endl;
+                    break;
+                }
+                
             }
             
         }
