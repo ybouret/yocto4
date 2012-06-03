@@ -43,12 +43,18 @@ YOCTO_UNIT_TEST_IMPL(chemsys)
     s["AcH"] = 0.1;
     s["Ac-"] = 0.01;
     
+    std::cerr << "s=" << std::endl << s << std::endl;
+    
     s.put(cs.C);
-    cs.computeW(s,0.0);
+    std::cerr << "C=" << cs.C << std::endl;
+    cs.computeW(0.0);
     std::cerr << "water: " << water.Gamma(s, 0.0) << std::endl;
     std::cerr << "Ac:    " << Ac.Gamma(s,0.0)     << std::endl;
     std::cerr << "Gamma="  << cs.Gamma << std::endl;
     std::cerr << "Phi="    << cs.Phi << std::endl;
     std::cerr << "W="      << cs.W   << std::endl;
+    cs.normalize(0.0);
+    std::cerr << "Gamma=" << cs.Gamma << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()
