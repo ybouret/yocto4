@@ -22,7 +22,6 @@ namespace yocto
             equilibrium & create( const string &name, double K );
             
             void build();
-            
             const double      ftol;   //!< fractional tolerance
             matrix<double>    nu;     //! topology matrix [NxM]
             matrix<ptrdiff_t> nuR;    //!< for reactants  [NxM]
@@ -36,7 +35,13 @@ namespace yocto
             vector<double>    xi;     //!< local extent               [N]
             vector<double>    dC;     //!< local modification         [M]
             
-            //! compute W for a given C
+            //! compute Gamma for a given C at time t
+            void computeGammaAndPhi( double t );
+            
+            //! compute W for a given C at time t
+            /**
+             call computeGammaAndPhi.
+             */
             void computeW( double t);
             
             //! normalize C

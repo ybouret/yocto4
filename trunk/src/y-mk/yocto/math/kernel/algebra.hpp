@@ -16,7 +16,7 @@ namespace yocto
 			static void add(    array<T> &v, const array<T> &u ) throw();       //!< v += u
 			static void muladd( array<T> &v, T a, const array<T> &u ) throw();  //!< v += a * u
 			static void mulset( array<T> &v, T a, const array<T> &u ) throw();  //!< v  = a * u
-			
+            
 			static void mul( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
 			static void muladd( array<T> &v, const matrix<T> &M, const array<T> &u ) throw();
 

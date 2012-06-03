@@ -41,7 +41,7 @@ namespace yocto
             
             constraint & create( double v );
             
-            void operator()( chemsys &cs );
+            void operator()( chemsys &cs , double t);
             
         private:
             vector< constraint::ptr > constraints;

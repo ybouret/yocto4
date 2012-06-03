@@ -65,8 +65,9 @@ namespace yocto
 	
 	extern urand &_rand;
 	
-	//! thread unsafe
+	//! thread unsafe: float, double uint32_t
 	template <typename T> inline T    alea(void)    throw() { return _rand.get<T>(); }	
+
 	
 	//! thread unsafe
 	template <typename T> inline T    alea_of(void) throw() { return _rand.full<T>(); }

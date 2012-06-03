@@ -37,5 +37,28 @@ YOCTO_UNIT_TEST_IMPL(init)
     std::cerr << "nuR=" << cs.nuR << std::endl;
     std::cerr << "nuP=" << cs.nuP << std::endl;
 
+    std::cerr << "N=" << cs.size() << std::endl;
+    std::cerr << "M=" << lib.size() << std::endl;
+    
+    initializer ini(lib);
+    {
+        //-- electroneutrality
+        constraint &en = ini.create(0.0);
+        for( size_t j=1; j <= lib.size(); ++j )
+        {
+            const species &sp = *lib(j);
+            en.add(sp.name, sp.z);
+        }
+    }
+    
+    {
+        //-- initial acid
+        constraint &ac = ini.create(0.00);
+        ac.add( "Ac-", 1);
+        ac.add( "AcH", 1);
+    }
+    
+    ini(cs,0.0);
+    
 }
 YOCTO_UNIT_TEST_DONE()
