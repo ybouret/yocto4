@@ -41,53 +41,19 @@ namespace yocto
             return *p;
         }
         
-        static inline
-        void __hypershere( double radius, array<double> &Y )
+        static inline bool is_acceptable( const array<double> &C )
         {
-            double sum = 0;
-            for( size_t i=Y.size(); i >0; --i )
+            size_t       num_pos = 0;
+            size_t       num_neg = 0;
+            const size_t count   = C.size();
+            
+            for( size_t i=count; i > 0 ; --i )
             {
-                const double u1 = alea<double>();
-                const double u2 = alea<double>();
-                const double l1 = -log(u1);
-                const double a2 = numeric<double>::two_pi * u2;
-                const double z  = sqrt( l1+l1 ) * cos( a2 );
-                Y[i] = z;
-                sum += z*z;
+                const double C_i = C[i];
+                if( C_i > 0 ) ++num_pos; else ++num_neg;
             }
-            const double fac = radius / sqrt(sum);
-            for( size_t i=Y.size(); i >0; --i )
-            {
-                Y[i] *= fac;
-            }
-        }
-        
-        static inline bool __valid( const array<double> &Y )
-        {
-            bool has_positive = false;
-            for( size_t i=Y.size();i>0;--i)
-            {
-                if( Y[i] < 0.0 )
-                {
-                    return false;
-                }
-                if( Y[i] > 0 )
-                {
-                    has_positive = true;
-                }
-            }
-            return has_positive;
-        }
-        
-        double __norm_sq( const array<double> &Y )
-        {
-            double sum = 0;
-            for( size_t i=Y.size();i>0;--i)
-            {
-                const double temp=Y[i];
-                sum += temp * temp;
-            }
-            return sum;
+            
+            return num_pos > num_neg;
         }
         
         void initializer:: operator()( chemsys &cs, double t )
@@ -185,63 +151,60 @@ namespace yocto
                 //
                 //--------------------------------------------------------------
                 std::cerr << "** Modified Newton Step" << std::endl;
-                const double radius = sqrt( __norm_sq(C0) ) + 1e-7;
                 vector<double> Y(N,0.0);
-                array<double> &dY = cs.xi;
-                array<double> &dC = cs.dC;
+                array<double> &dY    = cs.xi;
+                matrix<double> &W    = cs.W;
+                matrix<double> &Phi  = cs.Phi;
+                const double    ftol = cs.ftol;
                 
                 cs.solver.ensure(N);
-                
                 //--------------------------------------------------------------
                 // find a valid starting point
                 //--------------------------------------------------------------
             NEWTON_INIT:
                 std::cerr << "** Looking for a starting point" << std::endl;
-                do 
-                {
-                    __hypershere(radius, Y);
+                do {
+                    for( size_t j=N; j>0; --j )
+                        Y[j] = 1e-5 * ( 0.5 - alea<double>());
                     algebra<double>::mul_trn(C, Q, Y);
                     algebra<double>::add(C,C0);
-                    std::cerr << "Q=" << Q << std::endl;
-                    std::cerr << "Y=" << Y << std::endl;
-                    std::cerr << "C0=" << C0 << std::endl;
-                    std::cerr << "C=" << C << std::endl;
                 }
-                while( !__valid(C) );
-                //std::cerr << "Y=" << Y << std::endl;
-                //std::cerr << "C=" << C << std::endl;
+                while( !is_acceptable(C) );
+                
                 std::cerr << "** Newton iterations" << std::endl;
                 //--------------------------------------------------------------
                 // compute newton step
                 //--------------------------------------------------------------
             NEWTON_STEP:
                 cs.computeGammaAndPhi(t);
-                algebra<double>::mul_rtrn(cs.W, cs.Phi, Q);
-                if( ! cs.solver.LU(cs.W) )
+                algebra<double>::mul_rtrn(W, Phi, Q);
+                if( ! cs.solver.LU(W) )
                     goto NEWTON_INIT;
-                for( size_t i=N;i>0;--i) dY[i] = - cs.Gamma[i];
-                cs.solver(cs.W,dY);
+                for( size_t i=N;i>0;--i)
+                    dY[i] = - cs.Gamma[i];
+                cs.solver(W,dY);
                 
                 //--------------------------------------------------------------
                 // update Y
                 //--------------------------------------------------------------
+                bool converged = true;
+                
                 for( size_t i=N;i>0;--i)
-                    Y[i] += dY[i];
+                {
+                    const double dY_i = dY[i];
+                    const double Y_i  = (Y[i] += dY[i]);
+                    if( Fabs(dY_i) > Fabs( ftol * Y_i ) )
+                        converged = false;
+                }
                 
                 //--------------------------------------------------------------
                 // corresponding C and dC
                 //--------------------------------------------------------------
-                algebra<double>::mul_trn(dC, Q, dY);
                 algebra<double>::mul_trn(C, Q, Y);
                 algebra<double>::add(C,C0);
-                std::cerr << "C=" << C << std::endl;
-                bool converged = true;
-                for( size_t j=M;j>0;--j)
-                {
-                    if( Fabs(dC[j]) > Fabs( cs.ftol * C[j] ) )
-                        converged = false;
-                }
-                if( !converged ) goto NEWTON_STEP;
+                if( !converged ) 
+                    goto NEWTON_STEP;
+                std::cerr << "** Newton Result" << std::endl;
                 std::cerr << "C=" << C << std::endl;
                 cs.computeGammaAndPhi(t);
                 std::cerr << "Gamma=" << cs.Gamma << std::endl;
