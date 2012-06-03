@@ -88,7 +88,7 @@ namespace yocto
         }
         
         
-        void chemsys:: computeW(double t)
+        void chemsys:: computeGammaAndPhi(double t)
         {
             const size_t N = this->size();
             const size_t M = lib.size();
@@ -163,6 +163,11 @@ namespace yocto
                 Gamma[i] = lhs - rhs;
             }
             
+                   }
+        
+        void chemsys:: computeW(double t)
+        {
+            computeGammaAndPhi(t);
             //------------------------------------------------------------------
             // compute W = Phi * trn(nu)
             //------------------------------------------------------------------
@@ -173,6 +178,7 @@ namespace yocto
             //------------------------------------------------------------------
             if( !solver.LU(W) )
                 throw exception("Singular composition!");
+
         }
         
         void chemsys:: normalize( double t)
