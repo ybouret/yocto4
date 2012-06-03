@@ -45,6 +45,7 @@ namespace yocto
             void get( const array<double> &vec ) throw();
             
             const library  &lib;
+            friend std::ostream & operator<<( std::ostream &, const solution & );
             
         private:
             component::db   components;

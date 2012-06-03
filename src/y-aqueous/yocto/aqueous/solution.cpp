@@ -118,6 +118,22 @@ namespace yocto
             
         }
         
+        std::ostream & operator<<( std::ostream &os, const solution &s )
+        {
+            component::const_iterator i   = s.components.begin();
+            os << "/--------" << std::endl;
+            for( size_t k=1; k <= s.size; ++k, ++i )
+            {
+                const component &C = *i;
+                os << "| [";
+                os << C.name.c_str();
+                os << "] = " << C.C << std::endl;
+            }
+            os << "\\--------";
+            return os;
+        }
+
+        
     }
     
 }

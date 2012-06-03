@@ -35,8 +35,12 @@ namespace yocto
             linsys<double>    solver; //!< to solve system            [N]
             vector<double>    xi;     //!< local extent               [N]
             vector<double>    dC;     //!< local modification         [M]
-            void computeW( const solution &s, double t);
-            void normalize( solution &s, double t );
+            
+            //! compute W for a given C
+            void computeW( double t);
+            
+            //! normalize C
+            void normalize( double t );
             
             
         private:

@@ -26,6 +26,7 @@ namespace yocto
         W(),
         solver(),
         xi(),
+        dC(),
         lib(L)
         {
         }
@@ -73,6 +74,7 @@ namespace yocto
                 W.make(N,N);
                 solver.ensure(N);
                 xi.make(N,0.0);
+                dC.make(M,0.0);
                 //! compute topology
                 equilibria::iterator p = begin();
                 for( size_t i=1; i <= N; ++i, ++p )
@@ -86,11 +88,11 @@ namespace yocto
         }
         
         
-        void chemsys:: computeW( const solution &s, double t)
+        void chemsys:: computeW(double t)
         {
             const size_t N = this->size();
             const size_t M = lib.size();
-                                  
+            
             //------------------------------------------------------------------
             // simultaneous Gamma/Phi
             //------------------------------------------------------------------
@@ -173,17 +175,18 @@ namespace yocto
                 throw exception("Singular composition!");
         }
         
-        void chemsys:: normalize( solution &s, double t)
+        void chemsys:: normalize( double t)
         {
             const size_t N = this->size();
             const size_t M = lib.size();
             
-            assert( M == s.size );
-            s.put(C);
+           
+            //std::cerr << "normalizing " << C << std::endl;
             if( N > 0 )
             {
+            NEWTON_STEP:
                 //! compute inverse jacobian
-                computeW(s,t);
+                computeW(t);
                 
                 //! compute extent
                 for( size_t i=N;i>0;--i) xi[i] = -Gamma[i];
@@ -193,17 +196,20 @@ namespace yocto
                 algebra<double>::mul_trn(dC, nu, xi);
                 
                 //! update and check convergence
+                bool converged = true;
                 for( size_t j=M;j>0;--j)
                 {
                     const double dC_j = dC[j];
-                    C[j] = max_of<double>(0.0,C[j]+dC_j);
+                    const double C_j  = (C[j]+=dC_j);
+                    if( Fabs(dC_j) > Fabs( ftol * C_j ) )
+                        converged = false;
                 }
-                
-                
-                // get the normalized C
-                s.get(C);
-               
+                //std::cerr << converged << " : C=" << C << std::endl;
+                if( !converged ) 
+                    goto NEWTON_STEP;
             }
+            for( size_t j=M;j>0;--j) C[j] = max_of<double>(0.0,C[j]);
+            
         }
         
         
