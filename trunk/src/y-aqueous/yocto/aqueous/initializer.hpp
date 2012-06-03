@@ -10,6 +10,7 @@ namespace yocto
     namespace aqueous
     {
         
+        class initializer;
         
         class constraint 
         {
@@ -26,6 +27,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_ASSIGN(constraint);
             weights        W;
+            friend class initializer;
+            
         public:
             const library &lib;
         };
@@ -37,6 +40,8 @@ namespace yocto
             virtual ~initializer() throw();
             
             constraint & create( double v );
+            
+            void operator()( chemsys &cs );
             
         private:
             vector< constraint::ptr > constraints;
