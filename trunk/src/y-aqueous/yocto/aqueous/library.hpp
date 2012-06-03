@@ -8,6 +8,7 @@ namespace yocto
 {
     namespace aqueous
     {
+        //! library of species
         class library : public species::db
         {
         public:

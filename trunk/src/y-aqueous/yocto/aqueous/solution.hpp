@@ -8,6 +8,7 @@ namespace yocto
     namespace aqueous
     {
         
+        //! component for a solution
         class component
         {
         public:
@@ -27,6 +28,8 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(component);
         };
         
+        
+        //! database of components
         class solution
         {
         public:

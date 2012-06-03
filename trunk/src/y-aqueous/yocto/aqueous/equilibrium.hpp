@@ -10,6 +10,7 @@ namespace yocto
     namespace aqueous
     {
         
+        //! equilibrium actor: name + stochiometric coefficient
         class actor
         {
         public:
@@ -18,8 +19,8 @@ namespace yocto
             actor( const actor &);
             const string & key() const throw();
             
-            const string name;
-            const int    nu;
+            const string name; //!< identifier for library
+            const int    nu;   //!< its algebraic stochiometric coefficient
             
             typedef set<string,actor> db;
             
@@ -27,6 +28,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(actor);
         };
         
+        //! equilibirum
         class equilibrium : public counted, public object
         {
         public:
@@ -49,6 +51,7 @@ namespace yocto
             
             double Gamma( const solution &s, double t ) const;
             
+            //! fill topologies matrices
             void fill( array<double> &row_nu, array<ptrdiff_t> &row_nuR, array<ptrdiff_t> &row_nuP ) const throw();
             
             friend std::ostream & operator<<( std::ostream &, const equilibrium & );
