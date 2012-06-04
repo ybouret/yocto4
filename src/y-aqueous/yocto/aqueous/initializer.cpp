@@ -252,8 +252,8 @@ namespace yocto
                 }
                 
                 //! for information...
-                cs.computeGammaAndPhi(t);
-                std::cerr << "Gamma=" << Gamma << std::endl;
+                //cs.computeGammaAndPhi(t);
+                //std::cerr << "Gamma=" << Gamma << std::endl;
                 
                 //==============================================================
                 //
@@ -286,9 +286,29 @@ namespace yocto
                 }
                 std::cerr << "C=" << C << std::endl;
                 
-                //--------------------------------------------------------------
-                // ok, what is the error
-                //--------------------------------------------------------------
+                //==============================================================
+                //
+                // Find the cutoff
+                //
+                //==============================================================
+
+                // -- recompute Y
+                algebra<double>::mul(Y,Q,C);
+                
+                //-- compute the fractional Y
+                for( size_t i=N; i>0; --i ) Y[i] *= ftol;
+                
+                //- deduce the error on C
+                algebra<double>::mul_trn(dC,Q,Y);
+                std::cerr << "dC=" << dC << std::endl;
+                
+                //-- cutoff
+                for( size_t j=M; j>0; --j )
+                {
+                    if( C[j] <= fabs(dC[j]) ) C[j] = 0;
+                }
+                std::cerr << "C=" << C << std::endl;
+
                 
             }
             
