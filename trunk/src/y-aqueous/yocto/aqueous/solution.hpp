@@ -50,6 +50,10 @@ namespace yocto
             const library  &lib;
             friend std::ostream & operator<<( std::ostream &, const solution & );
             
+            void mul( double a ) throw();
+            
+            double pH() const;
+            
         private:
             component::db   components;
             YOCTO_DISABLE_ASSIGN(solution);
