@@ -96,14 +96,13 @@ namespace yocto
                 std::cerr << "** Decoding Linear Constraints" << std::endl;
                 matrix<double> P(Nc,M);
                 vector<double> V(Nc,0.0);
-                vector<double> U(Nc,0.0);
                 vector<double> C0(M,0.0);
                 matrix<double> Q(N,M);
                 
                 for( size_t i=1; i <= Nc; ++i )
                 {               
                     const constraint &c = *(constraints[i]);
-                    U[i] = V[i] = c.value;
+                    V[i] = c.value;
                     for( size_t j=1; j <= M; ++j )
                     {
                         const species &sp = *lib(j);
@@ -120,15 +119,20 @@ namespace yocto
                 // compute constant part
                 //
                 //==============================================================
+                matrix<double> J(M,Nc);
                 {
                     matrix<double> P2(Nc,Nc);
                     solver.ensure(Nc);
                     algebra<double>::mul_rtrn(P2, P, P);
                     if( !solver.LU(P2) )
                         throw exception("Singular intializer");
-                    solver(P2,U);
-                    algebra<double>::mul_trn(C0, P, U);
+                    matrix<double> iP2(Nc,Nc);
+                    iP2.ld1();
+                    solver(P2,iP2);
+                    algebra<double>::mul_ltrn(J, P, iP2);
                 }
+                algebra<double>::mul(C0, J, V);
+                std::cerr << "J="  << J  << std::endl;
                 std::cerr << "C0=" << C0 << std::endl;
                 
                 {
