@@ -1091,7 +1091,7 @@ LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n) {
 
  
 /*
-** $Id: lcode.c,v 2.25.1.3 2007/12/28 15:32:23 roberto Exp $
+** $Id: lcode.c,v 2.25.1.5 2011/01/31 14:53:16 roberto Exp $
 ** Code generator for Lua
 ** See Copyright Notice in lua.h
 */
@@ -1636,10 +1636,6 @@ void luaK_goiftrue (FuncState *fs, expdesc *e) {
       pc = NO_JUMP;  /* always true; do nothing */
       break;
     }
-    case VFALSE: {
-      pc = luaK_jump(fs);  /* always jump */
-      break;
-    }
     case VJMP: {
       invertjump(fs, e);
       pc = e->u.s.info;
@@ -1662,10 +1658,6 @@ static void luaK_goiffalse (FuncState *fs, expdesc *e) {
   switch (e->k) {
     case VNIL: case VFALSE: {
       pc = NO_JUMP;  /* always false; do nothing */
-      break;
-    }
-    case VTRUE: {
-      pc = luaK_jump(fs);  /* always jump */
       break;
     }
     case VJMP: {
@@ -2570,7 +2562,7 @@ void luaG_runerror (lua_State *L, const char *fmt, ...) {
 
  
 /*
-** $Id: ldo.c,v 2.38.1.3 2008/01/18 22:31:22 roberto Exp $
+** $Id: ldo.c,v 2.38.1.4 2012/01/18 02:27:10 roberto Exp $
 ** Stack and Call structure of Lua
 ** See Copyright Notice in lua.h
 */
@@ -2788,6 +2780,7 @@ static StkId adjust_varargs (lua_State *L, Proto *p, int actual) {
     int nvar = actual - nfixargs;  /* number of extra arguments */
     lua_assert(p->is_vararg & VARARG_HASARG);
     luaC_checkGC(L);
+    luaD_checkstack(L, p->maxstacksize);
     htab = luaH_new(L, nvar, 1);  /* create `arg' table */
     for (i=0; i<nvar; i++)  /* put extra arguments into `arg' table */
       setobj2n(L, luaH_setnum(L, htab, i+1), L->top - nvar + i);
@@ -3429,7 +3422,7 @@ const char *luaF_getlocalname (const Proto *f, int local_number, int pc) {
 
  
 /*
-** $Id: lgc.c,v 2.38.1.1 2007/12/27 13:02:25 roberto Exp $
+** $Id: lgc.c,v 2.38.1.2 2011/03/18 18:05:38 roberto Exp $
 ** Garbage Collector
 ** See Copyright Notice in lua.h
 */
@@ -4057,7 +4050,6 @@ void luaC_step (lua_State *L) {
     }
   }
   else {
-    lua_assert(g->totalbytes >= g->estimate);
     setthreshold(g);
   }
 }
@@ -4141,7 +4133,7 @@ void luaC_linkupval (lua_State *L, UpVal *uv) {
 
  
 /*
-** $Id: llex.c,v 2.20.1.1 2007/12/27 13:02:25 roberto Exp $
+** $Id: llex.c,v 2.20.1.2 2009/11/23 14:58:22 roberto Exp $
 ** Lexical Analyzer
 ** See Copyright Notice in lua.h
 */
@@ -4260,8 +4252,10 @@ TString *luaX_newstring (LexState *ls, const char *str, size_t l) {
   lua_State *L = ls->L;
   TString *ts = luaS_newlstr(L, str, l);
   TValue *o = luaH_setstr(L, ls->fs->h, ts);  /* entry for `str' */
-  if (ttisnil(o))
+  if (ttisnil(o)) {
     setbvalue(o, 1);  /* make sure `str' will not be collected */
+    luaC_checkGC(L);
+  }
   return ts;
 }
 
@@ -5008,7 +5002,7 @@ const lu_byte luaP_opmodes[NUM_OPCODES] = {
 
  
 /*
-** $Id: lparser.c,v 2.42.1.3 2007/12/28 15:32:23 roberto Exp $
+** $Id: lparser.c,v 2.42.1.4 2011/10/21 19:31:42 roberto Exp $
 ** Lua Parser
 ** See Copyright Notice in lua.h
 */
@@ -5383,9 +5377,9 @@ static void close_func (LexState *ls) {
   lua_assert(luaG_checkcode(f));
   lua_assert(fs->bl == NULL);
   ls->fs = fs->prev;
-  L->top -= 2;  /* remove table and prototype from the stack */
   /* last token read was anchored in defunct function; must reanchor it */
   if (fs) anchor_token(ls);
+  L->top -= 2;  /* remove table and prototype from the stack */
 }
 
 
@@ -7568,7 +7562,7 @@ void luaU_header (char* h)
 }
  
 /*
-** $Id: lvm.c,v 2.63.1.3 2007/12/28 15:32:23 roberto Exp $
+** $Id: lvm.c,v 2.63.1.5 2011/08/17 20:43:11 roberto Exp $
 ** Lua virtual machine
 ** See Copyright Notice in lua.h
 */
@@ -7702,6 +7696,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
 
 void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
   int loop;
+  TValue temp;
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
     const TValue *tm;
     if (ttistable(t)) {  /* `t' is a table? */
@@ -7710,6 +7705,7 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       if (!ttisnil(oldval) ||  /* result is no nil? */
           (tm = fasttm(L, h->metatable, TM_NEWINDEX)) == NULL) { /* or no TM? */
         setobj2t(L, oldval, val);
+        h->flags = 0;
         luaC_barriert(L, h, val);
         return;
       }
@@ -7721,7 +7717,9 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       callTM(L, tm, t, key, val);
       return;
     }
-    t = tm;  /* else repeat with `tm' */ 
+    /* else repeat with `tm' */
+    setobj(L, &temp, tm);  /* avoid pointing inside table (may rehash) */
+    t = &temp;
   }
   luaG_runerror(L, "loop in settable");
 }
@@ -9700,7 +9698,7 @@ static void base_open (lua_State *L) {
   luaL_register(L, "_G", base_funcs);
   lua_pushliteral(L, LUA_VERSION);
   lua_setglobal(L, "_VERSION");  /* set global _VERSION */
-  /* `ipairs' and `pairs' need auxliliary functions as upvalues */
+  /* `ipairs' and `pairs' need auxiliary functions as upvalues */
   auxopen(L, "ipairs", luaB_ipairs, ipairsaux);
   auxopen(L, "pairs", luaB_pairs, luaB_next);
   /* `newproxy' needs a weaktable as upvalue */
@@ -9722,7 +9720,7 @@ LUALIB_API int luaopen_base (lua_State *L) {
 
  
 /*
-** $Id: ldblib.c,v 1.104.1.3 2008/01/21 13:11:21 roberto Exp $
+** $Id: ldblib.c,v 1.104.1.4 2009/08/04 18:50:18 roberto Exp $
 ** Interface from Lua to its debug API
 ** See Copyright Notice in lua.h
 */
@@ -9768,6 +9766,7 @@ static int db_setmetatable (lua_State *L) {
 
 
 static int db_getfenv (lua_State *L) {
+  luaL_checkany(L, 1);
   lua_getfenv(L, 1);
   return 1;
 }
@@ -10120,7 +10119,7 @@ LUALIB_API int luaopen_debug (lua_State *L) {
 
  
 /*
-** $Id: liolib.c,v 2.73.1.3 2008/01/18 17:47:43 roberto Exp $
+** $Id: liolib.c,v 2.73.1.4 2010/05/14 15:33:51 roberto Exp $
 ** Standard I/O (and system) library
 ** See Copyright Notice in lua.h
 */
@@ -10397,7 +10396,10 @@ static int read_number (lua_State *L, FILE *f) {
     lua_pushnumber(L, d);
     return 1;
   }
-  else return 0;  /* read fails */
+  else {
+    lua_pushnil(L);  /* "result" to be removed */
+    return 0;  /* read fails */
+  }
 }
 
 
@@ -10977,7 +10979,7 @@ LUALIB_API int luaopen_math (lua_State *L) {
 
  
 /*
-** $Id: loadlib.c,v 1.52.1.3 2008/08/06 13:29:28 roberto Exp $
+** $Id: loadlib.c,v 1.52.1.4 2009/09/09 13:17:16 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -11617,7 +11619,7 @@ LUALIB_API int luaopen_package (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_replace(L, LUA_ENVIRONINDEX);
   /* create `loaders' table */
-  lua_createtable(L, 0, sizeof(loaders)/sizeof(loaders[0]) - 1);
+  lua_createtable(L, sizeof(loaders)/sizeof(loaders[0]) - 1, 0);
   /* fill it with pre-defined loaders */
   for (i=0; loaders[i] != NULL; i++) {
     lua_pushcfunction(L, loaders[i]);
@@ -11888,7 +11890,7 @@ LUALIB_API int luaopen_os (lua_State *L) {
 
  
 /*
-** $Id: lstrlib.c,v 1.132.1.4 2008/07/11 17:27:21 roberto Exp $
+** $Id: lstrlib.c,v 1.132.1.5 2010/05/14 15:34:19 roberto Exp $
 ** Standard library for string operations and pattern-matching
 ** See Copyright Notice in lua.h
 */
@@ -12643,6 +12645,7 @@ static void addintlen (char *form) {
 
 
 static int str_format (lua_State *L) {
+  int top = lua_gettop(L);
   int arg = 1;
   size_t sfl;
   const char *strfrmt = luaL_checklstring(L, arg, &sfl);
@@ -12657,7 +12660,8 @@ static int str_format (lua_State *L) {
     else { /* format item */
       char form[MAX_FORMAT];  /* to store the format (`%...') */
       char buff[MAX_ITEM];  /* to store the formatted item */
-      arg++;
+      if (++arg > top)
+        luaL_argerror(L, arg, "no value");
       strfrmt = scanformat(L, strfrmt, form);
       switch (*strfrmt++) {
         case 'c': {
