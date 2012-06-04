@@ -28,7 +28,7 @@ namespace yocto
 				rule( const rule & );
 
 				//! grow tree or take care of node and Tree upon failure
-				void grow( parse_node * & Tree, parse_node *node );
+				void grow( parse_node * & Tree, parse_node * &Node );
 
 			private:
 				YOCTO_DISABLE_ASSIGN(rule);

@@ -18,16 +18,24 @@ namespace yocto
 				lexeme *lx = Lexer.next_lexeme( Source );
 				if( !lx )
                 {
+                    std::cerr << "/EOF" << std::endl;
 					return false; //EOF
                 }
                 
+                std::cerr << "<==== <" << lx->label << ">" << std::endl;
 				if( lx->label == this->label )
 				{
-					grow( Tree, parse_node::create(this->label,lx) );
+                    std::cerr << "+TERM <" << label << ">" << std::endl;
+                    parse_node *Node = parse_node::create(this->label,lx);
+					grow( Tree, Node );
 					return true;
 				}
 				else
+                {
+                    std::cerr << "...no" << std::endl;
+                    Lexer.unget(lx);
 					return false;
+                }
 			}
             
             terminal:: terminal( const terminal &other ) :

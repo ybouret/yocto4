@@ -24,24 +24,26 @@ namespace yocto
 			{
 			}
             
-			void rule:: grow( parse_node * & Tree, parse_node *node )
+			void rule:: grow( parse_node * & Tree, parse_node * &Node )
 			{
-				assert( node );
+				assert( Node );
 				if( !Tree )
 				{
-					Tree = node;
+					Tree = Node;
+                    Node = NULL;
 				}
 				else
 				{
 					if( Tree->terminal )
 					{
-						const exception excp("Invalid Parse Tree: '%s' is terminal, can't append '%s'", Tree->label.c_str(), node->label.c_str());
-						delete node;
+						const exception excp("Invalid Parse Tree: '%s' is terminal, can't append '%s'", Tree->label.c_str(), Node->label.c_str());
+						delete Node;
 						delete Tree;
 						Tree = NULL;
+                        Node = NULL;
 						throw excp;
 					}
-					Tree->children().push_back( node );
+					Tree->children().push_back( Node );
 				}
 			}
             

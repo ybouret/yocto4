@@ -21,8 +21,8 @@ YOCTO_UNIT_TEST_IMPL(parse)
     
     
     syntax::aggregate & __vec = G.agg( "vec" );
-    __vec.add( G.term( "[" ) );
-    __vec.add( G.term( "]" ) );
+    __vec.add( G.term( "LBRACK" ) );
+    __vec.add( G.term( "RBRACK" ) );
     
     ios::icstream fp( ios::cstdin );
     regex::source Source( fp );

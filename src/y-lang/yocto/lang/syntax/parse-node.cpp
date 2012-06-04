@@ -75,7 +75,8 @@ namespace yocto
                 else 
                 {
                     child_list &ch = node->children();
-                    while( ch.size ) restore(Lxr,ch.pop_back());
+                    while( ch.size ) 
+                        restore(Lxr,ch.pop_back());
                 }
                 delete node;
             }
