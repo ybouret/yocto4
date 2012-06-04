@@ -21,6 +21,7 @@ namespace yocto
         nuP(),
         K(),
         Gamma(),
+	dtGam(),
         C(),
         Phi(),
         W(),
