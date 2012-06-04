@@ -163,7 +163,7 @@ namespace yocto
                 Gamma[i] = lhs - rhs;
             }
             
-                   }
+        }
         
         void chemsys:: computeW(double t)
         {
@@ -178,7 +178,7 @@ namespace yocto
             //------------------------------------------------------------------
             if( !solver.LU(W) )
                 throw exception("Singular composition!");
-
+            
         }
         
         void chemsys:: normalize( double t)
@@ -186,7 +186,7 @@ namespace yocto
             const size_t N = this->size();
             const size_t M = lib.size();
             
-           
+            
             //std::cerr << "normalizing " << C << std::endl;
             if( N > 0 )
             {
