@@ -8,7 +8,7 @@ function xerror
 ################################################################################
 ## Fetch
 ################################################################################
-LUA_DIR="lua-5.1.4"
+LUA_DIR="lua-5.1.5"
 LUA_TGZ="$LUA_DIR.tar.gz"
 LUA_URL="http://www.lua.org/ftp/$LUA_TGZ"
 cmake -E cmake_echo_color --blue "-- Downloading $LUA_URL"
