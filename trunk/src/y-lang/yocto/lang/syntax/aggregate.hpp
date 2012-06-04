@@ -16,6 +16,7 @@ namespace yocto
                 explicit aggregate( const string &id );
                 virtual ~aggregate() throw();
                 
+                virtual rule *clone() const;
                 virtual bool  match( Y_SYNTAX_MATCH_ARGS );
                 
             private:

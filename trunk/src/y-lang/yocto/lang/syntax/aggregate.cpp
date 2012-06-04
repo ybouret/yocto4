@@ -13,6 +13,16 @@ namespace yocto
             {
             }
             
+            aggregate:: aggregate( const aggregate &other ) : compound( other )
+            {
+            }
+            
+            
+            rule * aggregate:: clone() const
+            {
+                return new aggregate( *this );
+            }
+            
             bool  aggregate:: match( Y_SYNTAX_MATCH_ARGS )
             {
                 //--------------------------------------------------------------

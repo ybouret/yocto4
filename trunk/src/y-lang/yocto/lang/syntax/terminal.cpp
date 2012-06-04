@@ -26,6 +26,17 @@ namespace yocto
 				else
 					return false;
 			}
+            
+            terminal:: terminal( const terminal &other ) :
+            rule( other )
+            {
+            }
+            
+            
+            rule * terminal:: clone() const
+            {
+                return new terminal( *this );
+            }
 		}
 
 	}

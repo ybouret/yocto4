@@ -9,14 +9,35 @@ namespace yocto
 {
     namespace lang
     {
-        
+        //! simple grammar
+        /**
+         the first declared rule will be the root rule !
+         */
         class grammar 
         {
         public:
             const string name;
             
+            //! create an empty grammar
             explicit grammar( const string &id );
+            
+            //! default ctor
             virtual ~grammar() throw();
+            
+            //! new terminal
+            syntax::terminal &term( const string &id );
+            
+            //! new aggregate
+            syntax::aggregate &agg( const string &id );
+            
+            
+            
+            //! look up for rule 'id'
+            const syntax::rule & operator[]( const string &id ) const;
+            
+            //! look up for rule 'id'
+            const syntax::rule & operator[]( const char   *id ) const;
+            
             
             
         private:

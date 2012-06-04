@@ -20,6 +20,18 @@ namespace yocto
                 assert(r);
                 operands.push_back(r);
             }
+            
+            void compound:: add( const rule &r )
+            {
+                operands.push_back( r.clone() );
+            }
+            
+            compound:: compound( const compound &other ) :
+            rule( other ),
+            operands( other.operands )
+            {
+            }
+            
 
 		}
 	}
