@@ -87,7 +87,6 @@ namespace yocto
 			}
 
 
-
 			void scanner:: make( const string &label, const string &expr, const action *proc )
 			{
 				make(label, regex::compile(expr,dict_), proc);
