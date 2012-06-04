@@ -31,12 +31,13 @@ namespace yocto
             syntax::aggregate &agg( const string &id );
             
             
-            
             //! look up for rule 'id'
             const syntax::rule & operator[]( const string &id ) const;
             
             //! look up for rule 'id'
             const syntax::rule & operator[]( const char   *id ) const;
+            
+            bool accept( lexer &Lexer, regex::source &Source );
             
             
             

@@ -5,7 +5,12 @@ namespace yocto
 {
     namespace lang 
     {
-        
+     
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // grammar::item
+        //
+        ////////////////////////////////////////////////////////////////////////
         grammar:: item:: ~item() throw()
         {
         }
@@ -27,6 +32,11 @@ namespace yocto
             return rule->label;
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // grammar
+        //
+        ////////////////////////////////////////////////////////////////////////
         grammar:: ~grammar() throw()
         {
         }
@@ -78,6 +88,31 @@ namespace yocto
         {
             const string ID(id);
             return (*this)[ ID ];
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // grammar accept
+        //
+        ////////////////////////////////////////////////////////////////////////
+        bool grammar:: accept( lexer &Lexer, regex::source &Source )
+        {
+            if( rules.size <= 0 )
+                throw exception("empty grammar '%s'", name.c_str() );
+            
+            syntax::parse_node *Tree = NULL;
+            if( rules.head->match(Lexer, Source, Tree) ) 
+            {
+                if( Tree )
+                {
+                    delete Tree;
+                }
+                return true;
+            }
+            else 
+            {                
+                return false;
+            }
         }
         
     }

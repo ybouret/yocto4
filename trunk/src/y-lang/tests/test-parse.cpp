@@ -11,11 +11,24 @@ YOCTO_UNIT_TEST_IMPL(parse)
     std::cerr << "sizeof(syntax::parse_node) = " << sizeof(syntax::parse_node) << std::endl;
     
     grammar G("G");
+    lexer   Lexer("G");
     
+    lexical::scanner &scan = Lexer.first();
+    scan.make( "BLANKS", "[ \t]+", & scan.discard );
+    scan.make( "LBRACK", "\\[");
+    scan.make( "RBRACK", "\\]");
+    scan.make( "ENDL", "[:endl:]", & scan.newline );
     
     
     syntax::aggregate & __vec = G.agg( "vec" );
     __vec.add( G.term( "[" ) );
     __vec.add( G.term( "]" ) );
+    
+    ios::icstream fp( ios::cstdin );
+    regex::source Source( fp );
+    if( G.accept(Lexer, Source) )
+    {
+        
+    }
 }
 YOCTO_UNIT_TEST_DONE()
