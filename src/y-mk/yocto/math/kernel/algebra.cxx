@@ -91,10 +91,28 @@ namespace yocto
 				v[i] += sum;
 			}
 		}
+        
+        template <>
+		void algebra<z_type>:: mulsub( array<z_type> &v, const matrix<z_type> &M, const array<z_type> &u ) throw()
+		{
+			assert( v.size() == M.rows );
+			assert( u.size() == M.cols );
+			const size_t r = M.rows;
+			const size_t c = M.cols;
+			for( size_t i=r; i>0; --i)
+			{
+                const matrix<z_type>::row &M_i = M[i];
+				z_type sum(0);
+				for( size_t j=c; j>0; --j )
+				{
+					sum += M_i[j] * u[j];
+				}
+				v[i] -= sum;
+			}
+		}
 		
 		
 		//----------------------------------------------------------------------
-		
 		template <>
 		void algebra<z_type>:: mul_trn( array<z_type> &v, const matrix<z_type> &M, const array<z_type> &u ) throw()
 		{
@@ -110,6 +128,42 @@ namespace yocto
 					sum += M[j][i] * u[j];
 				}
 				v[i] = sum;
+			}
+		}
+        
+        template <>
+		void algebra<z_type>:: muladd_trn( array<z_type> &v, const matrix<z_type> &M, const array<z_type> &u ) throw()
+		{
+			assert( u.size() == M.rows );
+			assert( v.size() == M.cols );
+			const size_t r = M.rows;
+			const size_t c = M.cols;
+			for( size_t i=c; i>0; --i)
+			{
+				z_type sum(0);
+				for( size_t j=r; j>0; --j )
+				{
+					sum += M[j][i] * u[j];
+				}
+				v[i] += sum;
+			}
+		}
+        
+        template <>
+		void algebra<z_type>:: mulsub_trn( array<z_type> &v, const matrix<z_type> &M, const array<z_type> &u ) throw()
+		{
+			assert( u.size() == M.rows );
+			assert( v.size() == M.cols );
+			const size_t r = M.rows;
+			const size_t c = M.cols;
+			for( size_t i=c; i>0; --i)
+			{
+				z_type sum(0);
+				for( size_t j=r; j>0; --j )
+				{
+					sum += M[j][i] * u[j];
+				}
+				v[i] -= sum;
 			}
 		}
 		

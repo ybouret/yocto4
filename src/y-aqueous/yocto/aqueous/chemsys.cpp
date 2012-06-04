@@ -21,7 +21,7 @@ namespace yocto
         nuP(),
         K(),
         Gamma(),
-	dtGam(),
+        dtGam(),
         C(),
         Phi(),
         W(),
@@ -167,7 +167,7 @@ namespace yocto
                 }
                 
                 Gamma[i] = Ki * lhs - rhs;
-
+                
                 if( computeDerivative )
                     dtGam[i] = lhs * drvs( Fcn, t, t_scale );
                 else 
@@ -198,22 +198,28 @@ namespace yocto
             const size_t N = this->size();
             const size_t M = lib.size();
             
-            
-            //std::cerr << "normalizing " << C << std::endl;
             if( N > 0 )
             {
             NEWTON_STEP:
-                //! compute inverse jacobian
+                //==============================================================
+                // compute inverse jacobian
+                //==============================================================
                 computeW(t,false);
                 
-                //! compute extent
+                //==============================================================
+                // compute extent
+                //==============================================================
                 for( size_t i=N;i>0;--i) xi[i] = -Gamma[i];
                 solver(W,xi);
                 
-                //! compute dC
+                //==============================================================
+                // compute dC
+                //==============================================================
                 algebra<double>::mul_trn(dC, nu, xi);
                 
-                //! update and check convergence
+                //==============================================================
+                // update and check convergence
+                //==============================================================
                 bool converged = true;
                 for( size_t j=M;j>0;--j)
                 {
@@ -222,14 +228,41 @@ namespace yocto
                     if( Fabs(dC_j) > Fabs( ftol * C_j ) )
                         converged = false;
                 }
-                //std::cerr << converged << " : C=" << C << std::endl;
+                
                 if( !converged ) 
                     goto NEWTON_STEP;
             }
-            for( size_t j=M;j>0;--j) C[j] = max_of<double>(0.0,C[j]);
+            
+            for( size_t j=M;j>0;--j) 
+                C[j] = max_of<double>(0.0,C[j]);
             
         }
         
+        void chemsys:: reduce(double t)
+        {
+            const size_t N = this->size();
+            
+            if( N > 0 )
+            {
+                //--------------------------------------------------------------
+                // compute inverse jacobian for C, and dtGam
+                //--------------------------------------------------------------
+                computeGammaAndPhi(t,true);
+              
+                //--------------------------------------------------------------
+                // dtGam += Phi * dC
+                //--------------------------------------------------------------
+                algebra<double>::muladd(dtGam, Phi,dC);
+                
+                //--------------------------------------------------------------
+                // xi = inv(Phi*nu') * ( dtGam + Phi * dC ), in place
+                //--------------------------------------------------------------
+                solver(W,dtGam);
+                algebra<double>::mulsub_trn(dC, nu, dtGam);
+                
+            }
+            
+        }
         
     }
     

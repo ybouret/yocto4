@@ -47,9 +47,17 @@ namespace yocto
              */
             void computeW( double t, bool computeDerivative);
             
-            //! normalize C
+            //! normalize a loaded C
+            /**
+             advance all equilibria
+             */
             void normalize( double t );
             
+            //! reduce a loaded dC w.r.t a loaded C
+            /**
+             use the projection.
+             */
+            void reduce( double t );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(chemsys);

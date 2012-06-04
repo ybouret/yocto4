@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/aqueous/chemsys.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/code/rand.hpp"
 
 using namespace yocto;
 using namespace aqueous;
@@ -47,14 +48,27 @@ YOCTO_UNIT_TEST_IMPL(chemsys)
     
     s.put(cs.C);
     std::cerr << "C=" << cs.C << std::endl;
+    
+    
     cs.computeW(0.0,false);
     std::cerr << "water: " << water.Gamma(s, 0.0) << std::endl;
     std::cerr << "Ac:    " << Ac.Gamma(s,0.0)     << std::endl;
     std::cerr << "Gamma="  << cs.Gamma << std::endl;
     std::cerr << "Phi="    << cs.Phi << std::endl;
     std::cerr << "W="      << cs.W   << std::endl;
+    
+    std::cerr << "Normalizing..." << std::endl;
     cs.normalize(0.0);
     std::cerr << "Gamma=" << cs.Gamma << std::endl;
+    
+    std::cerr << "Reducing...." << std::endl;
+    for( size_t i=cs.dC.size(); i >0; --i )
+        cs.dC[i] = alea<double>();
+    
+    std::cerr << "C =" << cs.C << std::endl;
+    std::cerr << "dC=" << cs.dC << std::endl;
+    cs.reduce(0.0);
+    std::cerr << "dC=" << cs.dC << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
