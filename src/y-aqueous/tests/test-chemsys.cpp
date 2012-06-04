@@ -47,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(chemsys)
     
     s.put(cs.C);
     std::cerr << "C=" << cs.C << std::endl;
-    cs.computeW(0.0);
+    cs.computeW(0.0,false);
     std::cerr << "water: " << water.Gamma(s, 0.0) << std::endl;
     std::cerr << "Ac:    " << Ac.Gamma(s,0.0)     << std::endl;
     std::cerr << "Gamma="  << cs.Gamma << std::endl;
