@@ -14,14 +14,20 @@ namespace yocto
 			{
 			public:
 				virtual ~compound() throw();
+                
+                //! direct rule append
                 void add( rule *r ) throw();
+                
+                //! cloning rule
+                void add( const rule &r );
                 
 			protected:
 				explicit compound( const string &id);
+                compound( const compound &other );
 				rules operands;
 
 			private:
-				YOCTO_DISABLE_COPY_AND_ASSIGN(compound);
+				YOCTO_DISABLE_ASSIGN(compound);
 			};
 		}
 	}

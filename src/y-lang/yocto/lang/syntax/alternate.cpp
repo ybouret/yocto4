@@ -13,6 +13,13 @@ namespace yocto
             {
             }
             
+            alternate:: alternate( const alternate &other ) :
+            compound( other )
+            {
+            }
+            
+            
+            rule * alternate:: clone() const { return new alternate( *this ); }
             
         }
     }

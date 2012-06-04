@@ -34,7 +34,7 @@ namespace yocto
         grammar:: grammar( const string &id ) :
         name(id),
         rules(),
-	items()
+        items()
         {
         }
         
@@ -49,6 +49,35 @@ namespace yocto
             }
             catch(...){ delete r; throw; }
             rules.push_back(r);
+        }
+      
+        syntax::terminal & grammar:: term( const string &id )
+        {
+            syntax::terminal *r = new syntax::terminal(id);
+            add( r );
+            return *r;
+        }
+        
+        syntax::aggregate & grammar:: agg( const string &id )
+        {
+            syntax::aggregate *r = new syntax::aggregate(id);
+            add(r);
+            return *r;
+        }
+
+        
+        const syntax::rule & grammar:: operator[]( const string &id ) const
+        {
+            const item *it = items.search(id);
+            if( !it ) throw exception("%s(no rule '%s')", name.c_str(), id.c_str() );
+            assert(it->rule);
+            return *(it->rule);
+        }
+        
+        const syntax::rule & grammar:: operator[]( const char *id ) const
+        {
+            const string ID(id);
+            return (*this)[ ID ];
         }
         
     }

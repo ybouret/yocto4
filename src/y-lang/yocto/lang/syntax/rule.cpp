@@ -7,23 +7,23 @@ namespace yocto
 	{
 		namespace syntax 
 		{
-
+            
 			rule:: ~rule() throw() {}
-
-
+            
+            
 			rule:: rule( const string &id ) : 
 			label(id),
-				next(0),
-				prev(0)
+            next(0),
+            prev(0)
 			{}
-
+            
 			rule:: rule( const rule &other ) :
 			label( other.label ),
-				next(0),
-				prev(0)
+            next(0),
+            prev(0)
 			{
 			}
-
+            
 			void rule:: grow( parse_node * & Tree, parse_node *node )
 			{
 				assert( node );
@@ -44,14 +44,12 @@ namespace yocto
 					Tree->children().push_back( node );
 				}
 			}
-
-			void rule:: kill( rule *r ) throw() { assert(r!=NULL); delete r; }
-
-			rules:: ~rules() throw() { delete_with( rule::kill ); }
-
-
+            
+            
+            
+            
 		}
-
+        
 	}
-
+    
 }
