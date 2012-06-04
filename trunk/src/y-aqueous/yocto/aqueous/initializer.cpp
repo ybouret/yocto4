@@ -198,7 +198,7 @@ namespace yocto
                 // compute newton step
                 //--------------------------------------------------------------
             NEWTON_STEP:
-                cs.computeGammaAndPhi(t);
+                cs.computeGammaAndPhi(t,false);
                 algebra<double>::mul_rtrn(W, Phi, Q);
                 if( ! solver.LU(W) )
                     goto NEWTON_INIT;

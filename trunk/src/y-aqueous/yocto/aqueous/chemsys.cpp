@@ -27,6 +27,8 @@ namespace yocto
         solver(),
         xi(),
         dC(),
+        drvs(),
+        t_scale(1e-4),
         lib(L)
         {
         }
@@ -70,6 +72,7 @@ namespace yocto
                 nuP.make(N,M);
                 K.make(N,0.0);
                 Gamma.make(N,0.0);
+                dtGam.make(N,0.0);
                 Phi.make(N,M);
                 W.make(N,N);
                 solver.ensure(N);
@@ -88,7 +91,7 @@ namespace yocto
         }
         
         
-        void chemsys:: computeGammaAndPhi(double t)
+        void chemsys:: computeGammaAndPhi(double t, bool computeDerivative)
         {
             const size_t N = this->size();
             const size_t M = lib.size();
@@ -99,8 +102,9 @@ namespace yocto
             equilibria::iterator p = begin();
             for( size_t i=1; i <= N; ++i, ++p )
             {
-                const double            Ki  = (K[i] = (**p).K(t));
-                double                  lhs = Ki;
+                equilibrium::constant   Fcn = (**p).K;
+                const double            Ki  = (K[i] = Fcn(t));
+                double                  lhs = 1;
                 double                  rhs = 1;
                 const array<ptrdiff_t> &Ri  = nuR[i];
                 const array<ptrdiff_t> &Pi  = nuP[i];
@@ -160,14 +164,21 @@ namespace yocto
                     }
                     Phi[i][j] = PhiR - PhiP;
                 }
-                Gamma[i] = lhs - rhs;
+                
+                Gamma[i] = Ki * lhs - rhs;
+
+                if( computeDerivative )
+                    dtGam[i] = lhs * drvs( Fcn, t, t_scale );
+                else 
+                    dtGam[i] = 0;
+                
             }
             
         }
         
-        void chemsys:: computeW(double t)
+        void chemsys:: computeW(double t, bool computeDerivative )
         {
-            computeGammaAndPhi(t);
+            computeGammaAndPhi(t,computeDerivative);
             //------------------------------------------------------------------
             // compute W = Phi * trn(nu)
             //------------------------------------------------------------------
@@ -192,7 +203,7 @@ namespace yocto
             {
             NEWTON_STEP:
                 //! compute inverse jacobian
-                computeW(t);
+                computeW(t,false);
                 
                 //! compute extent
                 for( size_t i=N;i>0;--i) xi[i] = -Gamma[i];
