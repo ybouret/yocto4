@@ -17,12 +17,21 @@ YOCTO_UNIT_TEST_IMPL(parse)
     scan.make( "BLANKS", "[ \t]+", & scan.discard );
     scan.make( "LBRACK", "\\[");
     scan.make( "RBRACK", "\\]");
+    scan.make( "INT", "[:digit:]+" );
+    scan.make( "ID",  "[:word:]+");
     scan.make( "ENDL", "[:endl:]", & scan.newline );
     
     
     syntax::aggregate & __vec = G.agg( "vec" );
+    syntax::alternate & __mid = G.alt( "mid" );
+    __mid.add( G.term("INT") );
+    __mid.add( G.term("ID")  );
+    
     __vec.add( G.term( "LBRACK" ) );
+    __vec.add( __mid );
     __vec.add( G.term( "RBRACK" ) );
+    
+    
     
     ios::icstream fp( ios::cstdin );
     regex::source Source( fp );

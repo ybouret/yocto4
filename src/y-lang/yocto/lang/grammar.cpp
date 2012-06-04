@@ -75,6 +75,13 @@ namespace yocto
             return *r;
         }
         
+        syntax::alternate & grammar:: alt( const string &id )
+        {
+            syntax::alternate *r = new syntax::alternate(id);
+            add(r);
+            return *r;
+        }
+        
         
         const syntax::rule & grammar:: operator[]( const string &id ) const
         {
@@ -110,11 +117,8 @@ namespace yocto
                 return true;
             }
             else 
-            {      
-                if( Tree )
-                {
-                    delete Tree;
-                }         
+            {    
+                assert( NULL == Tree );
                 return false;
             }
         }
