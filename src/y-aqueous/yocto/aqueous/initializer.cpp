@@ -250,10 +250,7 @@ namespace yocto
                         goto BUILD_Q; //!< numeric problem
                     }
                 }
-                
-                //! for information...
-                //cs.computeGammaAndPhi(t);
-                //std::cerr << "Gamma=" << Gamma << std::endl;
+             
                 
                 //==============================================================
                 //
@@ -309,7 +306,14 @@ namespace yocto
                 }
                 std::cerr << "C=" << C << std::endl;
 
-                
+                //==============================================================
+                //
+                // normalize the solution
+                //
+                //==============================================================
+                cs.normalize(t);
+                std::cerr << "C=" << C << std::endl;
+
             }
             
         }

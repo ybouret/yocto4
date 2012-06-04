@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(init2)
     
     
     library lib;
-    chemsys cs(lib,1e-3);
+    chemsys cs(lib,1e-7);
     
     
     lib.add( "H+",   1 );
