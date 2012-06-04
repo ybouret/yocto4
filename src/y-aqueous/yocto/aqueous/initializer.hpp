@@ -41,7 +41,10 @@ namespace yocto
             
             constraint & create( double v );
             
-            void operator()( chemsys &cs , double t);
+            void electroneutrality();
+            
+            void   operator()( chemsys &cs , double t);
+            size_t size() const throw();
             
         private:
             vector< constraint::ptr > constraints;
