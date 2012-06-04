@@ -5,7 +5,7 @@ namespace yocto
 {
     namespace lang 
     {
-     
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar::item
@@ -60,7 +60,7 @@ namespace yocto
             catch(...){ delete r; throw; }
             rules.push_back(r);
         }
-      
+        
         syntax::terminal & grammar:: term( const string &id )
         {
             syntax::terminal *r = new syntax::terminal(id);
@@ -74,7 +74,7 @@ namespace yocto
             add(r);
             return *r;
         }
-
+        
         
         const syntax::rule & grammar:: operator[]( const string &id ) const
         {
@@ -110,7 +110,11 @@ namespace yocto
                 return true;
             }
             else 
-            {                
+            {      
+                if( Tree )
+                {
+                    delete Tree;
+                }         
                 return false;
             }
         }

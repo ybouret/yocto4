@@ -17,7 +17,7 @@ namespace yocto
 
 			bool scanner:: __forward( const regex::token &) throw() { return true;  }
 			bool scanner:: __discard( const regex::token &) throw() { return false; }
-			bool scanner:: __newline( const regex::token &) throw() { ++line; return true; }
+			bool scanner:: __newline( const regex::token &) throw() { ++line; return false; }
 
 
 #define Y_LANG_LEX_SCANNER_CTOR() \
