@@ -318,7 +318,19 @@ namespace yocto
             
         }
         
+        void initializer:: electroneutrality()
+        {
+            constraint &c = create(0.0);
+            for( library::const_iterator i = lib.begin(); i != lib.end(); ++i )
+            {
+                const species &sp = **i;
+                c.add(sp.name, sp.z);
+            }
+        }
         
+        size_t initializer:: size() const throw() { return constraints.size(); }
+        
+
     }
     
 }

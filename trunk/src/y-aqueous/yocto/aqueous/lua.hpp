@@ -1,7 +1,7 @@
 #ifndef YOCTO_AQUEOUS_LUA_INCLUDED
 #define YOCTO_AQUEOUS_LUA_INCLUDED 1
 
-#include "yocto/aqueous/chemsys.hpp"
+#include "yocto/aqueous/initializer.hpp"
 
 extern "C"
 {
@@ -19,8 +19,9 @@ namespace yocto
         struct _lua
         {
             
-            static void load( lua_State *L, library &lib, const string &libname);
-            static void load( lua_State *L, chemsys &cs,  const string &csname );
+            static void load( lua_State *L, library     &lib, const string &libname );
+            static void load( lua_State *L, chemsys     &cs,  const string &csname  );
+            static void load( lua_State *L, initializer &ini, const string &ininame );
         };
         
     }
