@@ -30,6 +30,10 @@ namespace yocto
             //! new aggregate
             syntax::aggregate &agg( const string &id );
             
+            //! new alternate
+            syntax::alternate &alt( const string &id );
+            
+
             
             //! look up for rule 'id'
             const syntax::rule & operator[]( const string &id ) const;
