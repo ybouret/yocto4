@@ -1,5 +1,6 @@
 #include "yocto/aqueous/solution.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto 
 {
@@ -132,6 +133,21 @@ namespace yocto
             os << "\\--------";
             return os;
         }
+        
+        void solution:: mul( double a ) throw()
+        {
+            component::iterator i     = components.begin();
+            for( size_t k=1; k <= size; ++k, ++i )
+            {
+                (*i).C *= a;
+            }
+        }
+        
+        double solution:: pH() const
+        {
+            return -log10( (*this)["H+"] );
+        }
+
 
         
     }
