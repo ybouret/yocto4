@@ -164,7 +164,7 @@ namespace yocto
             for( actor::db::const_iterator p = eq.products.begin(); p != eq.products.end(); ++p )
             {
                 const actor &a = *p; assert(a.nu>0);
-                os << a.nu << " {" << a.name << "} ";
+                os << a.nu << "{" << a.name << "} ";
             }
             os << "| K=" << eq.K(0);
             return os;
