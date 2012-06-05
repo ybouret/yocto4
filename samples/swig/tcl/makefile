@@ -8,7 +8,7 @@ mac: wrap
 	/usr/bin/tclsh main.tcl
 
 linux: wrap
-	gcc -shared -o example.so ../example.c example_wrap.c -ltcl -fPIC -Wall -O3
+	gcc -shared -o example.so ../example.c example_wrap.c -ltcl -fPIC -Wall -O3 -I/usr/include/tcl
 	tclsh main.tcl
 	
 clean:
