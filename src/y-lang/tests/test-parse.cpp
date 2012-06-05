@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lang/grammar.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/auto-ptr.hpp"
 
 using namespace yocto;
 using namespace lang;
@@ -50,9 +51,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
     
     ios::icstream fp( ios::cstdin );
     regex::source Source( fp );
-    if( G.accept(Lexer, Source) )
-    {
-        
-    }
+    auto_ptr<syntax::parse_node> Tree( G.accept(Lexer, Source) );
+    
 }
 YOCTO_UNIT_TEST_DONE()

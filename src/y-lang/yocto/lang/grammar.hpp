@@ -49,7 +49,7 @@ namespace yocto
             //! look up for rule 'id'
             syntax::rule & operator[]( const char   *id );
             
-            bool accept( lexer &Lexer, regex::source &Source );
+            syntax::parse_node *accept( lexer &Lexer, regex::source &Source );
             
             
             
