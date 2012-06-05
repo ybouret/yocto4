@@ -8,6 +8,7 @@ clean:
 	@echo "-- removing .dat, .ppm, .vtk, .png and .dot" && rm -f *.dat *.ppm *.vtk *.png *.dot
 	@echo "-- cleaning auxiliary files"
 	@${MAKE} -s -C src/y-swamp/docs clean
+	@${MAKE} -s -C samples clean
 
 preclean:
 	@echo "-- removing out of sources builds" && cd forge && touch targets &&  ( ( cat targets | xargs rm -rf ) && rm -f targets )
