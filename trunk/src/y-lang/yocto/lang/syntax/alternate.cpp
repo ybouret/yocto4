@@ -20,6 +20,7 @@ namespace yocto
                     std::cerr << operands[i]->label << " ";
                 std::cerr << "]" << std::endl;
                 
+                check(Tree);
                 parse_node *sub_tree = NULL;
                 //----------------------------------------------------------
                 // try to fill it with the operands

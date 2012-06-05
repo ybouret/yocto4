@@ -15,6 +15,8 @@ namespace yocto
 			bool  terminal:: match( Y_SYNTAX_MATCH_ARGS )
 			{
                 std::cerr << "?TERM <" << label << ">" << std::endl;
+                check(Tree);
+                
 				lexeme *lx = Lexer.next_lexeme( Source );
 				if( !lx )
                 {

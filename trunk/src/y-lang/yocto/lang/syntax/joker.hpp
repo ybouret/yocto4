@@ -24,6 +24,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(joker);
             };
             
+            //! 0 or 1
             class optional : public joker
             {
             public:
@@ -35,6 +36,44 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(optional);
             };
+            
+            
+            //! >= at_least
+            class repeating : public joker
+            {
+            public:
+                explicit repeating( const string &id, rule &r, size_t at_least );
+                virtual ~repeating() throw();
+                virtual bool  match( Y_SYNTAX_MATCH_ARGS );  
+                
+            private:
+                const size_t min_count;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(repeating);
+            };
+            
+            //! joker *
+            class zero_or_more : public repeating
+            {
+            public:
+                explicit zero_or_more( const string &id, rule &r );
+                virtual ~zero_or_more() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(zero_or_more);
+            };
+            
+            
+            //! joker +
+            class one_or_more : public repeating
+            {
+            public:
+                explicit one_or_more( const string &id, rule &r );
+                virtual ~one_or_more() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(one_or_more);
+            };
+
         }
         
     }
