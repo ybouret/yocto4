@@ -24,11 +24,13 @@ YOCTO_UNIT_TEST_IMPL(parse)
     
     syntax::aggregate & __vec = G.agg( "vec" );
     syntax::alternate & __mid = G.alt( "mid" );
+    syntax::optional  & __opt = G.opt( "tail", "mid" );
     __mid( G.term("INT") );
     __mid( G.term("ID")  );
     
     __vec( G.term( "LBRACK" ) );
     __vec( __mid );
+    __vec( __opt );
     __vec( G.term( "RBRACK" ) );
     
     

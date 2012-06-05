@@ -97,6 +97,14 @@ namespace yocto
             return (*this)[ ID ];
         }
         
+        syntax::optional & grammar:: opt( const string &id, const string &src )
+        {
+            syntax::rule     &ref = (*this)[ src ];
+            syntax::optional *jk  = new syntax::optional( id, ref );
+            add(jk);
+            return *jk;
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar accept

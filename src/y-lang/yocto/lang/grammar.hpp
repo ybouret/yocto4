@@ -4,6 +4,7 @@
 #include "yocto/lang/syntax/terminal.hpp"
 #include "yocto/lang/syntax/aggregate.hpp"
 #include "yocto/lang/syntax/alternate.hpp"
+#include "yocto/lang/syntax/joker.hpp"
 
 namespace yocto 
 {
@@ -33,6 +34,8 @@ namespace yocto
             //! new alternate
             syntax::alternate &alt( const string &id );
             
+            //! new optional
+            syntax::optional &opt( const string &id, const string &src );
             
             
             //! look up for rule 'id'
