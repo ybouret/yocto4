@@ -83,15 +83,15 @@ namespace yocto
         }
         
         
-        const syntax::rule & grammar:: operator[]( const string &id ) const
+        syntax::rule & grammar:: operator[]( const string &id ) 
         {
-            const item *it = items.search(id);
+            item *it = items.search(id);
             if( !it ) throw exception("%s(no rule '%s')", name.c_str(), id.c_str() );
             assert(it->rule);
             return *(it->rule);
         }
         
-        const syntax::rule & grammar:: operator[]( const char *id ) const
+        syntax::rule & grammar:: operator[]( const char *id ) 
         {
             const string ID(id);
             return (*this)[ ID ];

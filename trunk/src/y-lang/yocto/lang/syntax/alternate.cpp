@@ -13,24 +13,21 @@ namespace yocto
             {
             }
             
-            alternate:: alternate( const alternate &other ) :
-            compound( other )
-            {
-            }
-            
-            
-            rule * alternate:: clone() const { return new alternate( *this ); }
-            
             bool  alternate:: match( Y_SYNTAX_MATCH_ARGS )
             {
-                std::cerr << "?ALT <" << label << ">#=" << operands.size << std::endl;
+                std::cerr << "?ALT <" << label << ">=[ ";
+                for( size_t i=1; i <= operands.size(); ++i )
+                    std::cerr << operands[i]->label << " ";
+                std::cerr << "]" << std::endl;
                 
                 parse_node *sub_tree = NULL;
                 //----------------------------------------------------------
                 // try to fill it with the operands
                 //----------------------------------------------------------
-                for( rule *curr = operands.head; curr; curr = curr->next )
+                const size_t nr = operands.size();
+                for( size_t i=1; i <= nr; ++i )
                 {
+                    rule *curr = operands[i];
                     if( curr->match(Lexer,Source,sub_tree) )
                     {
                         assert( sub_tree != NULL);

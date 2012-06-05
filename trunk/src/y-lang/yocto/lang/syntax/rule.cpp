@@ -17,12 +17,7 @@ namespace yocto
             prev(0)
 			{}
             
-			rule:: rule( const rule &other ) :
-			label( other.label ),
-            next(0),
-            prev(0)
-			{
-			}
+			
             
 			void rule:: grow( parse_node * & Tree, parse_node * &Node )
 			{
@@ -48,6 +43,9 @@ namespace yocto
 			}
             
             
+            rules:: rules() throw() {}
+            static inline void __delete_rule( rule *r ) throw() { assert(r); delete r; }
+            rules:: ~rules() throw() { delete_with( __delete_rule ); }
             
             
 		}
