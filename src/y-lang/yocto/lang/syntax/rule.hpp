@@ -27,9 +27,14 @@ namespace yocto
 			protected:
 				explicit rule( const string &id );
 
-				//! grow tree or take care of node and Tree upon failure
-				void grow( parse_node * & Tree, parse_node * &Node );
-
+				//! grow tree
+                /**
+                 if Tree != NULL, Tree must be NOT terminal
+                 */
+				void grow( parse_node * & Tree, parse_node * &Node ) throw();
+                
+                void check( const parse_node *Tree);
+                
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 			};

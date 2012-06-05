@@ -18,8 +18,13 @@ namespace yocto
 			{}
             
 			
-            
-			void rule:: grow( parse_node * & Tree, parse_node * &Node )
+            void rule:: check( const parse_node *Tree)
+            {
+                if( Tree && Tree->terminal )
+                    throw exception("invalid terminal tree <%s> for rule <%s>", Tree->label.c_str(), label.c_str() );
+            }
+
+			void rule:: grow( parse_node * & Tree, parse_node * &Node ) throw()
 			{
 				assert( Node );
 				if( !Tree )
@@ -29,15 +34,7 @@ namespace yocto
 				}
 				else
 				{
-					if( Tree->terminal )
-					{
-						const exception excp("Invalid Parse Tree: '%s' is terminal, can't append '%s'", Tree->label.c_str(), Node->label.c_str());
-						delete Node;
-						delete Tree;
-						Tree = NULL;
-                        Node = NULL;
-						throw excp;
-					}
+					assert(! Tree->terminal );
 					Tree->children().push_back( Node );
                     Node->parent = Tree;
 				}

@@ -13,7 +13,7 @@ namespace yocto
             {
             }
             
-                     
+            
             bool  aggregate:: match( Y_SYNTAX_MATCH_ARGS )
             {
                 std::cerr << "?AGG <" << label << ">=[ ";
@@ -21,11 +21,11 @@ namespace yocto
                     std::cerr << operands[i]->label << " ";
                 std::cerr << "]" << std::endl;
                 
+                check(Tree);
                 //--------------------------------------------------------------
                 // make a sub-tree
                 //--------------------------------------------------------------
                 parse_node *sub_tree =  new parse_node(this->label,NULL);
-                
                 try 
                 {
                     //----------------------------------------------------------
@@ -41,18 +41,18 @@ namespace yocto
                             return false;
                         }
                     }
-                    
-                    //----------------------------------------------------------
-                    // OK
-                    //----------------------------------------------------------
-                    grow(Tree,sub_tree);
-                    return true;
                 }
                 catch(...)
                 {
-                    if( sub_tree ) delete sub_tree;
+                    delete sub_tree;
                     throw;
                 }
+                
+                //--------------------------------------------------------------
+                // OK
+                //--------------------------------------------------------------
+                grow(Tree,sub_tree);
+                return true;
             }
             
             

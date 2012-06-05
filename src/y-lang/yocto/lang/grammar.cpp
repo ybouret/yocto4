@@ -106,6 +106,32 @@ namespace yocto
             return *jk;
         }
         
+        syntax::optional &grammar:: opt( const string &id, syntax::rule &ref )
+        {
+            if( ! rules.owns( &ref ) )
+                throw exception("optional<%s>: unregistered rule <%s>", id.c_str(), ref.label.c_str() );
+            syntax::optional *jk  = new syntax::optional( id, ref );
+            add(jk);
+            return *jk;
+        }
+        
+        syntax::repeating  &grammar:: rep( const string &id, const string &src, size_t at_least)
+        {
+            syntax::rule      &ref = (*this)[ src ];
+            syntax::repeating *jk  = new syntax::repeating( id, ref, at_least );
+            add(jk);
+            return *jk;
+        }
+        
+        syntax::repeating &grammar:: rep( const string &id, syntax::rule &ref, size_t at_least)
+        {
+            if( ! rules.owns( &ref ) )
+                throw exception("repeating<%s>: unregistered rule <%s>", id.c_str(), ref.label.c_str() );
+            syntax::repeating *jk  = new syntax::repeating( id, ref, at_least );
+            add(jk);
+            return *jk;
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar accept

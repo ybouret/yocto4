@@ -19,19 +19,28 @@ YOCTO_UNIT_TEST_IMPL(parse)
     scan.make( "RBRACK", "\\]");
     scan.make( "INT", "[:digit:]+" );
     scan.make( "ID",  "[:word:]+");
+    scan.make( "COMA", ",");
     scan.make( "ENDL", "[:endl:]", & scan.newline );
     
-    
-    syntax::aggregate & __vec = G.agg( "vec" );
-    syntax::alternate & __mid = G.alt( "mid" );
-    syntax::optional  & __opt = G.opt( "tail", "mid" );
-    __mid( G.term("INT") );
-    __mid( G.term("ID")  );
-    
-    __vec( G.term( "LBRACK" ) );
-    __vec( __mid );
-    __vec( __opt );
-    __vec( G.term( "RBRACK" ) );
+    {
+        syntax::aggregate & List   = G.agg("List");      // root
+        syntax::terminal  & LBRACK = G.term( "LBRACK" );
+        syntax::terminal  & RBRACK = G.term( "RBRACK" );
+        syntax::alternate & ITEM   = G.alt("ITEM");
+        syntax::terminal  & INT    = G.term("INT");
+        syntax::terminal  & ID     = G.term("ID");
+        ITEM( INT );
+        ITEM( ID  );
+        
+        syntax::aggregate & TAIL = G.agg("TAIL");
+        TAIL( G.term("COMA") );
+        TAIL( ITEM           );
+        
+        List( LBRACK );
+        List( ITEM   );
+        List( G.rep( "REPTAIL", TAIL,0 ) );
+        List( RBRACK );
+    }
     
     
     

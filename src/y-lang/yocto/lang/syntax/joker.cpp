@@ -1,4 +1,6 @@
 #include "yocto/lang/syntax/joker.hpp"
+#include "yocto/exception.hpp"
+#include "yocto/auto-ptr.hpp"
 
 namespace yocto 
 {
@@ -6,7 +8,7 @@ namespace yocto
     {
         namespace syntax
         {
-
+            
             joker:: joker( const string &id, rule &r ) :
             rule(id),
             ref(r)
@@ -33,7 +35,8 @@ namespace yocto
             
             bool optional:: match( Y_SYNTAX_MATCH_ARGS )
             {
-                std::cerr << "?OPT <" << ref.label << "> (" << label << ")" << std::endl;
+                std::cerr << "?OPT <" << ref.label << "> @" << label << "" << std::endl;
+                
                 parse_node *Node = NULL;
                 
                 if( ref.match(Lexer, Source, Node) )
@@ -44,7 +47,104 @@ namespace yocto
                 return true;
             }
             
+            ////////////////////////////////////////////////////////////////////
+            //
+            // repeating
+            //
+            ////////////////////////////////////////////////////////////////////
+            repeating:: repeating( const string &id, rule &r, size_t at_least ) :
+            joker(id,r),
+            min_count(at_least)
+            {
+                
+            }
+            
+            repeating:: ~repeating() throw() {}
+            
+            bool repeating:: match( Y_SYNTAX_MATCH_ARGS )
+            {
+                std::cerr << "?REP>=" << min_count << " <" << ref.label << ">  @" << label << "" << std::endl;
+                check(Tree);
+                
+                
+                size_t count = 0;
+                // create a local tree
+                parse_node *sub_tree = new parse_node(label,NULL);
+                try
+                {
+                    // accept as many as possible
+                    while( ref.match(Lexer, Source, sub_tree) )
+                        ++count;
+                }
+                catch(...)
+                {
+                    delete sub_tree;
+                    throw;
+                }
+                
+                // check requirements
+                if( count < min_count )
+                {
+                    // forget it...
+                    parse_node::restore(Lexer, sub_tree);
+                    return false;
+                }
+                else 
+                {
+                    if( NULL == Tree )
+                    {
+                        // replacement
+                        Tree = sub_tree;
+                    }
+                    else
+                    {
+                        // direct fusion
+                        assert( ! Tree->terminal );
+                        parse_node::child_list &src = sub_tree->children();
+                        parse_node::child_list &tgt = Tree->children();
+                        while( src.size )
+                        {
+                            tgt.push_back( src.pop_front() );
+                        }
+                        delete sub_tree;
+                    }
+                    return true;
+                }
+            }
+            
+            ////////////////////////////////////////////////////////////////////
+            //
+            // zero_or_more
+            //
+            ////////////////////////////////////////////////////////////////////
+            zero_or_more:: zero_or_more( const string &id, rule &r ) :
+            repeating( id, r, 0 )
+            {
+            }
+            
+            zero_or_more:: ~zero_or_more() throw()
+            {
+            }
+            
+            
+            ////////////////////////////////////////////////////////////////////
+            //
+            // one or more
+            //
+            ////////////////////////////////////////////////////////////////////
+            one_or_more:: one_or_more( const string &id, rule &r ) :
+            repeating( id, r, 1 )
+            {
+            }
+            
+            one_or_more:: ~one_or_more() throw()
+            {
+            }
+
+            
+            
+            
         }
     }
-
+    
 }
