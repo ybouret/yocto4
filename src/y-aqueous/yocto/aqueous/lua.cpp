@@ -31,17 +31,17 @@ namespace yocto
                 
                 
                 if( ! lua_istable(L, -1) )
-                    throw exception("species #%u: not a table");
+                    throw exception("species #%u: not a table", i);
                 
                 //-- get the number of fields
                 const unsigned nf = lua_objlen(L, -1);
                 if( nf != 2 && nf != 3 )
-                    throw exception("species #%u: invalid #fields=%u, must be 2 or 3",nf);
+                    throw exception("species #%u: invalid #fields=%u, must be 2 or 3",i,nf);
                 
                 
                 lua_rawgeti(L, -1, 1);  //-------- get the id ------------------
                 if( !lua_isstring(L, -1) )
-                    throw exception("species #%u: first field is not a string");
+                    throw exception("species #%u: first field is not a string",i);
                 size_t       len = 0;
                 const char  *ptr = lua_tolstring(L, -1, &len);
                 const string id(ptr,len);
