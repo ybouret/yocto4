@@ -1,5 +1,6 @@
 #include "yocto/lang/grammar.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto 
 {
@@ -120,6 +121,8 @@ namespace yocto
             {
                 if( Tree )
                 {
+                    ios::ocstream fp( "g.dot", false );
+                    Tree->graphviz("G",fp);
                     delete Tree;
                 }
                 return true;
