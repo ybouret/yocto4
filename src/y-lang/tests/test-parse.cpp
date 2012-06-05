@@ -20,6 +20,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
     scan.make( "INT", "[:digit:]+" );
     scan.make( "ID",  "[:word:]+");
     scan.make( "COMA", ",");
+    scan.make( "APOS", "'");
     scan.make( "ENDL", "[:endl:]", & scan.newline );
     
     {
@@ -29,8 +30,10 @@ YOCTO_UNIT_TEST_IMPL(parse)
         syntax::alternate & ITEM   = G.alt("ITEM");
         syntax::terminal  & INT    = G.term("INT");
         syntax::terminal  & ID     = G.term("ID");
-        ITEM( INT );
-        ITEM( ID  );
+        syntax::terminal  & APOS   = G.term("APOS");
+        ITEM( INT  );
+        ITEM( ID   );
+        ITEM( List );
         
         syntax::aggregate & TAIL = G.agg("TAIL");
         TAIL( G.term("COMA") );
@@ -40,6 +43,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
         List( ITEM   );
         List( G.rep( "REPTAIL", TAIL,0 ) );
         List( RBRACK );
+        List( G.opt( "OPTTRN", APOS ) );
     }
     
     

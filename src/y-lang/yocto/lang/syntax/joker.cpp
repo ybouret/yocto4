@@ -104,7 +104,9 @@ namespace yocto
                         parse_node::child_list &tgt = Tree->children();
                         while( src.size )
                         {
-                            tgt.push_back( src.pop_front() );
+                            parse_node *node = src.pop_front();
+                            node->parent     = Tree;
+                            tgt.push_back( node );
                         }
                         delete sub_tree;
                     }

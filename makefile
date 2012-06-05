@@ -5,7 +5,7 @@ all:
 clean:
 	@echo "-- removing sdk" && rm -Rf sdk
 	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
-	@echo "-- removing .dat and .ppm and .vtk" && rm -f *.dat *.ppm *.vtk
+	@echo "-- removing .dat, .ppm, .vtk, .png and .dot" && rm -f *.dat *.ppm *.vtk *.png *.dot
 	@echo "-- cleaning auxiliary files"
 	@${MAKE} -s -C src/y-swamp/docs clean
 
