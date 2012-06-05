@@ -39,6 +39,7 @@ namespace yocto
 						throw excp;
 					}
 					Tree->children().push_back( Node );
+                    Node->parent = Tree;
 				}
 			}
             
