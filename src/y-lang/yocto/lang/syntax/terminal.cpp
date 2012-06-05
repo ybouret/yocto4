@@ -4,14 +4,14 @@ namespace yocto
 {
 	namespace lang
 	{
-
+        
 		namespace syntax
 		{
-
+            
 			terminal:: ~terminal() throw() {}
-
+            
 			terminal:: terminal( const string &id ) : rule( id ) {}
-
+            
 			bool  terminal:: match( Y_SYNTAX_MATCH_ARGS )
 			{
                 std::cerr << "?TERM <" << label << ">" << std::endl;
@@ -32,24 +32,13 @@ namespace yocto
 				}
 				else
                 {
-                    std::cerr << "...no" << std::endl;
+                    std::cerr << "-TERM <" << label << ">" << std::endl;
                     Lexer.unget(lx);
 					return false;
                 }
 			}
-            
-            terminal:: terminal( const terminal &other ) :
-            rule( other )
-            {
-            }
-            
-            
-            rule * terminal:: clone() const
-            {
-                return new terminal( *this );
-            }
-		}
-
+        }
+        
 	}
-
+    
 }

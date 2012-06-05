@@ -18,7 +18,6 @@ namespace yocto
 				explicit terminal( const string &id);
 				virtual ~terminal() throw();
 
-                virtual rule *clone() const;
 				virtual bool  match( Y_SYNTAX_MATCH_ARGS );
 
 			private:

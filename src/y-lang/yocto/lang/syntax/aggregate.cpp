@@ -13,19 +13,14 @@ namespace yocto
             {
             }
             
-            aggregate:: aggregate( const aggregate &other ) : compound( other )
-            {
-            }
-            
-            
-            rule * aggregate:: clone() const
-            {
-                return new aggregate( *this );
-            }
-            
+                     
             bool  aggregate:: match( Y_SYNTAX_MATCH_ARGS )
             {
-                std::cerr << "?AGG <" << label << ">" << std::endl;
+                std::cerr << "?AGG <" << label << ">=[ ";
+                for( size_t i=1; i <= operands.size(); ++i )
+                    std::cerr << operands[i]->label << " ";
+                std::cerr << "]" << std::endl;
+                
                 //--------------------------------------------------------------
                 // make a sub-tree
                 //--------------------------------------------------------------
@@ -36,8 +31,10 @@ namespace yocto
                     //----------------------------------------------------------
                     // try to fill it with the operands
                     //----------------------------------------------------------
-                    for( rule *curr = operands.head; curr; curr = curr->next )
+                    const size_t nr = operands.size();
+                    for( size_t i=1; i <= nr; ++i )
                     {
+                        rule *curr = operands[i];
                         if( !curr->match(Lexer, Source, sub_tree) )
                         {
                             parse_node::restore(Lexer,sub_tree);

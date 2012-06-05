@@ -33,13 +33,13 @@ namespace yocto
             //! new alternate
             syntax::alternate &alt( const string &id );
             
-
+            
             
             //! look up for rule 'id'
-            const syntax::rule & operator[]( const string &id ) const;
+            syntax::rule & operator[]( const string &id );
             
             //! look up for rule 'id'
-            const syntax::rule & operator[]( const char   *id ) const;
+            syntax::rule & operator[]( const char   *id );
             
             bool accept( lexer &Lexer, regex::source &Source );
             

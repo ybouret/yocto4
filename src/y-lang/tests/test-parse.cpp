@@ -10,8 +10,8 @@ YOCTO_UNIT_TEST_IMPL(parse)
     std::cerr << "sizeof(lexeme)             = " << sizeof(lexeme) << std::endl;
     std::cerr << "sizeof(syntax::parse_node) = " << sizeof(syntax::parse_node) << std::endl;
     
-    grammar G("G");
-    lexer   Lexer("G");
+    grammar G("Grammar");
+    lexer   Lexer("Lexer");
     
     lexical::scanner &scan = Lexer.first();
     scan.make( "BLANKS", "[ \t]+", & scan.discard );
@@ -24,12 +24,12 @@ YOCTO_UNIT_TEST_IMPL(parse)
     
     syntax::aggregate & __vec = G.agg( "vec" );
     syntax::alternate & __mid = G.alt( "mid" );
-    __mid.add( G.term("INT") );
-    __mid.add( G.term("ID")  );
+    __mid( G.term("INT") );
+    __mid( G.term("ID")  );
     
-    __vec.add( G.term( "LBRACK" ) );
-    __vec.add( __mid );
-    __vec.add( G.term( "RBRACK" ) );
+    __vec( G.term( "LBRACK" ) );
+    __vec( __mid );
+    __vec( G.term( "RBRACK" ) );
     
     
     

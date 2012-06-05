@@ -20,21 +20,29 @@ namespace yocto
 				rule        *prev;
 				virtual ~rule() throw();
 
-                virtual rule *clone() const                = 0;
 				virtual bool  match( Y_SYNTAX_MATCH_ARGS ) = 0;
-
+                
+                typedef rule *ptr;
+                
 			protected:
 				explicit rule( const string &id );
-				rule( const rule & );
 
 				//! grow tree or take care of node and Tree upon failure
 				void grow( parse_node * & Tree, parse_node * &Node );
 
 			private:
-				YOCTO_DISABLE_ASSIGN(rule);
+				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 			};
-
-            typedef core::meta_list<rule> rules;
+            
+            class rules : public core::list_of<rule>
+            {
+            public:
+                explicit rules() throw();
+                virtual ~rules() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(rules);
+            };
             
 		}
 	}
