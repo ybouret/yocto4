@@ -61,11 +61,17 @@ namespace yocto
             rules.push_back(r);
         }
         
-        syntax::terminal & grammar:: term( const string &id, bool meaningfull )
+        syntax::terminal & grammar:: term( const string &id, bool semantic )
         {
-            syntax::terminal *r = new syntax::terminal(id,meaningfull);
+            syntax::terminal *r = new syntax::terminal(id,semantic);
             add( r );
             return *r;
+        }
+        
+        syntax::terminal & grammar:: term( const char *id, bool semantic )
+        {
+            const string ID(id);
+            return term( ID, semantic );
         }
         
         syntax::aggregate & grammar:: agg( const string &id, bool fusion )

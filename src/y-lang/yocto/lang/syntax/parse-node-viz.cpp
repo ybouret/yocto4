@@ -35,7 +35,19 @@ namespace yocto
                     regex::show_tag(fp, lx);
                     fp.append(" [ label=\"'");
                     const string s = lx->to_string();
-                    fp.append(s);
+                    for( size_t i=0; i < s.size(); ++i )
+                    {
+                        char C = s[i];
+                        
+                        switch( C )
+                        {
+                            case '"':
+                                fp.write('\\');
+                            default:
+                                fp.write(C);
+                        };
+                    }
+                    
                     fp.append("'\", shape=house];\n");
                     regex::show_tag(fp,lx); fp.append(" -> "); regex::show_tag(fp,this); fp.append(" [arrowhead=box];\n");
                 }
@@ -55,8 +67,8 @@ namespace yocto
                 const string ID(id);
                 graphviz(ID,fp);
             }
-
+            
         }
     }
-
+    
 }

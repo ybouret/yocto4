@@ -27,7 +27,8 @@ namespace yocto
             virtual ~grammar() throw();
             
             //! new terminal
-            syntax::terminal &term( const string &id, bool meaningfull = true);
+            syntax::terminal &term( const string &id, bool semantic = true);
+            syntax::terminal &term( const char   *id, bool semantic = true); 
             
             //! new aggregate
             syntax::aggregate &agg( const string &id, bool fusion = false );
