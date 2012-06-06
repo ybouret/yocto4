@@ -27,7 +27,7 @@ namespace yocto
             virtual ~grammar() throw();
             
             //! new terminal
-            syntax::terminal &term( const string &id );
+            syntax::terminal &term( const string &id, bool meaningfull = true);
             
             //! new aggregate
             syntax::aggregate &agg( const string &id );
@@ -73,7 +73,6 @@ namespace yocto
             
             syntax::rules   rules;
             item::db        items;
-            catalog<string> markers; //!< terminal without semantic meaning
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
         };

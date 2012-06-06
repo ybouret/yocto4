@@ -17,7 +17,7 @@ namespace yocto
             
             parse_node:: ~parse_node() throw()
             {
-                if( terminal )
+                if( terminal!=0 )
                 {
                     lexeme * lx = __lex();
                     if( lx ) 
@@ -37,11 +37,12 @@ namespace yocto
 #endif
             parse_node:: parse_node( const string &label_ref, lexeme *lx ) throw() :
             label( label_ref ), 
-            terminal( lx != 0 ),
             prev(0),
             next(0), 
             parent(0),
-            wksp()
+            wksp(),
+            terminal( lx != 0 ? 1 : 0 ),
+            flags(0)
             {
                 memset(wksp,0,sizeof(wksp));
                 if( lx )
@@ -58,19 +59,19 @@ namespace yocto
             
             parse_node::child_list & parse_node::children() throw()
             {
-                assert(!terminal);
+                assert(0==terminal);
                 return *(child_list *) &wksp[0];
             }
             
             const lexeme * parse_node:: lex() const throw()
             {
-                assert(terminal);
+                assert(terminal!=0);
                 return *(lexeme **) &wksp[0];
             }
             
             const parse_node::child_list & parse_node::children() const throw()
             {
-                assert(!terminal);
+                assert(0==terminal);
                 return *(child_list *) &wksp[0];
             }
             
@@ -78,7 +79,7 @@ namespace yocto
             void parse_node:: restore( lexer &Lxr, parse_node *node ) throw()
             {
                 assert(node!=NULL);
-                if( node->terminal )
+                if( node->terminal != 0 )
                 {
                     lexeme * &lx = node->__lex();
                     assert( lx != NULL );
@@ -108,48 +109,7 @@ namespace yocto
 				}
 			}
             
-            void parse_node:: viz(ios::ostream &fp) const 
-            {
-                // declare the node
-                regex::show_tag(fp,this); 
-				fp.append(" [ label=\"'");
-				fp.append(label);
-				fp.append("'\"];\n");
-                
-                // link it to its parent
-                if( parent )
-                {
-                    regex::show_tag(fp, parent); fp.append(" -> "); regex::show_tag(fp,this); fp.append(";\n");
-                }
-                if( !terminal )
-                {
-                    const child_list &ch = children();
-                    for( const parse_node *node = ch.head; node; node=node->next )
-                    {
-                        node->viz(fp);
-                    }
-                    
-                }
-                else 
-                {
-                    const lexeme *lx = lex();
-                    regex::show_tag(fp, lx);
-                    fp.append(" [ label=\"'");
-                    const string s = lx->to_string();
-                    fp.append(s);
-                    fp.append("'\", shape=house];\n");
-                    regex::show_tag(fp,lx); fp.append(" -> "); regex::show_tag(fp,this); fp.append(" [arrowhead=box];\n");
-                }
-            }
-            
-            void  parse_node:: graphviz( const string &id, ios::ostream &fp ) const
-            {
-                fp.append("digraph "); fp.append(id); fp.append(" {\n");
-                fp.append("rankdir=TB;");
-                viz(fp);
-                fp.append("}\n");
-            }
-            
+                      
             
         }
         

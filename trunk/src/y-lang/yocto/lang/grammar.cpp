@@ -44,8 +44,7 @@ namespace yocto
         grammar:: grammar( const string &id ) :
         name(id),
         rules(),
-        items(),
-        markers()
+        items()
         {
         }
         
@@ -62,9 +61,9 @@ namespace yocto
             rules.push_back(r);
         }
         
-        syntax::terminal & grammar:: term( const string &id )
+        syntax::terminal & grammar:: term( const string &id, bool meaningfull )
         {
-            syntax::terminal *r = new syntax::terminal(id);
+            syntax::terminal *r = new syntax::terminal(id,meaningfull);
             add( r );
             return *r;
         }
@@ -132,7 +131,7 @@ namespace yocto
             return *jk;
         }
         
-               
+        
     }
     
 }

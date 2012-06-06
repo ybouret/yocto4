@@ -1,7 +1,6 @@
 
 #include "yocto/lang/grammar.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/ios/ocstream.hpp"
 
 namespace yocto 
 {
@@ -22,14 +21,11 @@ namespace yocto
             syntax::parse_node *Tree = NULL;
             if( rules.head->match(Lexer,Source,Tree) ) 
             {
-                if( Tree )
-                {
-                    ios::ocstream fp( "g.dot", false );
-                    Tree->graphviz("G",fp);
-                }
+                std::cerr << "[[ SUCCESS ]]" << std::endl;
                 return Tree; // may be NULL
             }
             
+            std::cerr << "[[ FAILURE ]]" << std::endl;
             return NULL;
         }
         
