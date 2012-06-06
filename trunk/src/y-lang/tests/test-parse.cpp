@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
         ITEM( ID   );
         ITEM( List );
         
-        syntax::aggregate & TAIL = G.agg("TAIL");
+        syntax::aggregate & TAIL = G.agg("TAIL",true);
         TAIL( G.term("COMA",false) );
         TAIL( ITEM           );
         

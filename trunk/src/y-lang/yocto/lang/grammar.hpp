@@ -30,7 +30,7 @@ namespace yocto
             syntax::terminal &term( const string &id, bool meaningfull = true);
             
             //! new aggregate
-            syntax::aggregate &agg( const string &id );
+            syntax::aggregate &agg( const string &id, bool fusion = false );
             
             //! new alternate
             syntax::alternate &alt( const string &id );
