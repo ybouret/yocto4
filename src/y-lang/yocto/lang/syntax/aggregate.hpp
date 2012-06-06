@@ -13,12 +13,12 @@ namespace yocto
             class aggregate : public compound
             {
             public:
-                explicit aggregate( const string &id, bool fusion = false );
+                explicit aggregate( const string &id, node_property ppty );
                 virtual ~aggregate() throw();
                 
                 virtual bool  match( Y_SYNTAX_MATCH_ARGS );
-                const bool merge;
                 
+                const node_property behavior;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(aggregate);

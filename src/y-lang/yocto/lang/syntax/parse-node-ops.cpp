@@ -12,7 +12,6 @@ namespace yocto
             {
                 if( terminal == 0 )
                 {
-                    std::cerr << "compress " << label << std::endl;
                     child_list &chl = children();
                     child_list  tmp;
                     
@@ -22,12 +21,13 @@ namespace yocto
                     while( chl.size > 0 )
                     {
                         parse_node *node = chl.pop_front();
-                        if( node->flags & discardable )
+                        if( node->flags == syntax::is_discardable )
                         {
                             delete node;
                         }
                         else 
                         {
+                            // TODO: specialized
                             node->compress();
                             tmp.push_back(node);
                         }
@@ -39,7 +39,7 @@ namespace yocto
                     while( tmp.size > 0 )
                     {
                         parse_node *node = tmp.pop_front();
-                        if( node->flags & shall_merge )
+                        if( node->flags == syntax::is_merging )
                         {
                             assert(node->terminal==0);
                             child_list &sub = node->children();

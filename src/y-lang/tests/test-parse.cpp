@@ -12,8 +12,6 @@ YOCTO_UNIT_TEST_IMPL(parse)
 {
     std::cerr << "sizeof(lexeme)                = " << sizeof(lexeme) << std::endl;
     std::cerr << "sizeof(syntax::parse_node)    = " << sizeof(syntax::parse_node) << std::endl;
-    std::cerr << "syntax::parse_node::data_size = " << syntax::parse_node::data_size << std::endl;
-    std::cerr << "syntax::parse_node::list_size = " << syntax::parse_node::list_size << std::endl;
     
     grammar G("Grammar");
     lexer   Lexer("Lexer");
@@ -30,8 +28,8 @@ YOCTO_UNIT_TEST_IMPL(parse)
     
     {
         syntax::aggregate & List   = G.agg("List");      // root
-        syntax::terminal  & LBRACK = G.term( "LBRACK", false);
-        syntax::terminal  & RBRACK = G.term( "RBRACK", false );
+        syntax::terminal  & LBRACK = G.term( "LBRACK", syntax::is_discardable);
+        syntax::terminal  & RBRACK = G.term( "RBRACK", syntax::is_discardable);
         syntax::alternate & ITEM   = G.alt("ITEM");
         syntax::terminal  & INT    = G.term("INT");
         syntax::terminal  & ID     = G.term("ID");
@@ -40,8 +38,8 @@ YOCTO_UNIT_TEST_IMPL(parse)
         ITEM( ID   );
         ITEM( List );
         
-        syntax::aggregate & TAIL = G.agg("TAIL",true);
-        TAIL( G.term("COMA",false) );
+        syntax::aggregate & TAIL = G.agg("TAIL",syntax::is_merging);
+        TAIL( G.term("COMA",syntax::is_discardable) );
         TAIL( ITEM           );
         
         List( LBRACK );

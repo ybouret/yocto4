@@ -61,22 +61,22 @@ namespace yocto
             rules.push_back(r);
         }
         
-        syntax::terminal & grammar:: term( const string &id, bool semantic )
+        syntax::terminal & grammar:: term( const string &id, syntax::node_property ppty )
         {
-            syntax::terminal *r = new syntax::terminal(id,semantic);
+            syntax::terminal *r = new syntax::terminal(id,ppty);
             add( r );
             return *r;
         }
         
-        syntax::terminal & grammar:: term( const char *id, bool semantic )
+        syntax::terminal & grammar:: term( const char *id, syntax::node_property ppty )
         {
             const string ID(id);
-            return term( ID, semantic );
+            return term( ID, ppty );
         }
         
-        syntax::aggregate & grammar:: agg( const string &id, bool fusion )
+        syntax::aggregate & grammar:: agg( const string &id, syntax::node_property ppty )
         {
-            syntax::aggregate *r = new syntax::aggregate(id,fusion);
+            syntax::aggregate *r = new syntax::aggregate(id,ppty);
             add(r);
             return *r;
         }
