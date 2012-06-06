@@ -24,9 +24,9 @@ YOCTO_UNIT_TEST_IMPL(json)
     scan.make("LBRACE", "\\{");
     scan.make("RBRACE", "\\}");
     scan.make("COMMA",  ","  );
-    scan.make("Null",   "null" );
-    scan.make("True",   "true" );
-    scan.make("False",  "false" );
+    scan.make("null",   "null" );
+    scan.make("true",   "true" );
+    scan.make("false",  "false" );
     scan.make("STRING", "[:cstring:]");
     scan.make("NUMBER", "[:digit:]+" );
     scan.make("COLUMN", ":");
@@ -41,9 +41,9 @@ YOCTO_UNIT_TEST_IMPL(json)
     syntax::terminal  &RBRACK    = G.term("RBRACK", syntax::is_discardable);
     syntax::terminal  &RBRACE    = G.term("RBRACE", syntax::is_discardable);
     syntax::terminal  &LBRACE    = G.term("LBRACE", syntax::is_discardable);
-    syntax::terminal  &Null      = G.term("Null",   syntax::is_specialized);
-    syntax::terminal  &True      = G.term("True",   syntax::is_specialized);
-    syntax::terminal  &False     = G.term("False",  syntax::is_specialized);
+    syntax::terminal  &Null      = G.term("null",   syntax::is_specialized);
+    syntax::terminal  &True      = G.term("true",   syntax::is_specialized);
+    syntax::terminal  &False     = G.term("false",  syntax::is_specialized);
     syntax::terminal  &COMMA     = G.term("COMMA",  syntax::is_discardable);
     syntax::terminal  &STRING    = G.term("STRING");
     syntax::terminal  &NUMBER    = G.term("NUMBER");

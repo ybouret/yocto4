@@ -32,24 +32,27 @@ namespace yocto
                 else 
                 {
                     const lexeme *lx = lex();
-                    regex::show_tag(fp, lx);
-                    fp.append(" [ label=\"'");
-                    const string s = lx->to_string();
-                    for( size_t i=0; i < s.size(); ++i )
+                    if( lx->size )
                     {
-                        char C = s[i];
-                        
-                        switch( C )
+                        regex::show_tag(fp, lx);
+                        fp.append(" [ label=\"'");
+                        const string s = lx->to_string();
+                        for( size_t i=0; i < s.size(); ++i )
                         {
-                            case '"':
-                                fp.write('\\');
-                            default:
-                                fp.write(C);
-                        };
+                            char C = s[i];
+                            
+                            switch( C )
+                            {
+                                case '"':
+                                    fp.write('\\');
+                                default:
+                                    fp.write(C);
+                            };
+                        }
+                        
+                        fp.append("'\", shape=house];\n");
+                        regex::show_tag(fp,lx); fp.append(" -> "); regex::show_tag(fp,this); fp.append(" [arrowhead=box];\n");
                     }
-                    
-                    fp.append("'\", shape=house];\n");
-                    regex::show_tag(fp,lx); fp.append(" -> "); regex::show_tag(fp,this); fp.append(" [arrowhead=box];\n");
                 }
             }
             
