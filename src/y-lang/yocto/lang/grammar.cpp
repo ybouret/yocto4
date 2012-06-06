@@ -68,9 +68,9 @@ namespace yocto
             return *r;
         }
         
-        syntax::aggregate & grammar:: agg( const string &id )
+        syntax::aggregate & grammar:: agg( const string &id, bool fusion )
         {
-            syntax::aggregate *r = new syntax::aggregate(id);
+            syntax::aggregate *r = new syntax::aggregate(id,fusion);
             add(r);
             return *r;
         }

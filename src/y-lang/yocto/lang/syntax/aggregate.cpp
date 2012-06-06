@@ -29,7 +29,10 @@ namespace yocto
                 //--------------------------------------------------------------
                 parse_node *sub_tree =  new parse_node(this->label,NULL);
                 if( merge )
+                {
+                    assert( sub_tree->terminal == 0 );
                     sub_tree->flags |= sub_tree->shall_merge;
+                }
                 try 
                 {
                     //----------------------------------------------------------

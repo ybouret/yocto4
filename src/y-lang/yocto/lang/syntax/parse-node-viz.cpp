@@ -44,7 +44,8 @@ namespace yocto
             void  parse_node:: graphviz( const string &id, ios::ostream &fp ) const
             {
                 fp.append("digraph "); fp.append(id); fp.append(" {\n");
-                fp.append("rankdir=TB;");
+                fp.append("rankdir=TB;\n");
+                fp.append("ordering=out;\n");
                 viz(fp);
                 fp.append("}\n");
             }

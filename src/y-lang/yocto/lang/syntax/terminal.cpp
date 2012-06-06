@@ -10,9 +10,9 @@ namespace yocto
             
 			terminal:: ~terminal() throw() {}
             
-			terminal:: terminal( const string &id, bool meaningfull) : 
+			terminal:: terminal( const string &id, bool meaningful) : 
             rule( id ),
-            semantic( meaningfull )
+            semantic( meaningful )
             {
             }
             

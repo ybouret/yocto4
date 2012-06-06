@@ -15,7 +15,7 @@ namespace yocto
 			class terminal : public rule
 			{
 			public:
-				explicit terminal( const string &id, bool meaningfull );
+				explicit terminal( const string &id, bool meaningful );
 				virtual ~terminal() throw();
 
 				virtual bool  match( Y_SYNTAX_MATCH_ARGS );

@@ -15,6 +15,10 @@ namespace yocto
                     std::cerr << "compress " << label << std::endl;
                     child_list &chl = children();
                     child_list  tmp;
+                    
+                    //==========================================================
+                    // Pass 1: remove discardable nodes
+                    //==========================================================
                     while( chl.size > 0 )
                     {
                         parse_node *node = chl.pop_front();
@@ -28,7 +32,28 @@ namespace yocto
                             tmp.push_back(node);
                         }
                     }
-                    chl.swap_with(tmp);
+                    
+                    //==========================================================
+                    // Pass 2: merge possible nodes
+                    //==========================================================
+                    while( tmp.size > 0 )
+                    {
+                        parse_node *node = tmp.pop_front();
+                        if( node->flags & shall_merge )
+                        {
+                            assert(node->terminal==0);
+                            child_list &sub = node->children();
+                            while( sub.size )
+                            {
+                                parse_node *child = sub.pop_front();
+                                child->parent = this;
+                                chl.push_back(child);
+                            }
+                            delete node;
+                        }
+                        else
+                            chl.push_back(node);
+                    }
                 }
             }
             
