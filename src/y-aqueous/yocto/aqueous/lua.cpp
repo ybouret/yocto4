@@ -255,16 +255,16 @@ namespace yocto
         {
             lua_createtable(L, s.size, s.size);
             assert( lua_istable(L,-1) );
-            const int tab = lua_gettop(L); std::cerr << "table@" << tab << std::endl;
+            const int tab = lua_gettop(L);
+            int index = 0;
             for( component::const_iterator i = s.begin(); i != s.end(); ++i )
             {
                 const component &I = *i;
-                const char  *index = I.name.c_str();
                 const double value = I.C;
-                std::cerr << "push [\"" << index << "\"]=" << value << std::endl;
-                lua_pushstring(L, index);
+                ++index;
+                lua_pushinteger(L, index);
                 lua_pushnumber(L, value);
-                lua_rawset(L,tab);
+                lua_settable(L,tab);
                 
                 assert( lua_istable(L,-1) );
             }

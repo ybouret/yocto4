@@ -40,7 +40,9 @@ YOCTO_UNIT_TEST_IMPL(lua)
     if( !lua_isfunction(L, -1) )
         throw exception("Invalid Lua Function");
     _lua::push(L,s);
-    if( lua_pcall(L,1,0,0) )
-        throw exception( "%s", lua_tostring(L,-1) );
+    
+    
+    std::cerr <<"#=" << lua_objlen(L, -1) << std::endl;
+    if( lua_pcall(L,1,0,0) ) throw exception( "%s", lua_tostring(L,-1) );
 }
 YOCTO_UNIT_TEST_DONE()
