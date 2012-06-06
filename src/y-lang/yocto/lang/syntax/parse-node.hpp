@@ -52,7 +52,7 @@ namespace yocto
                 void  graphviz( const string &id, ios::ostream &fp ) const;
                 void  graphviz( const char   *id, ios::ostream &fp ) const;
                 
-                void  compress() throw();
+                void  AST() throw();
                 
             private:
                 uint64_t wksp[ YOCTO_U64_FOR_ITEM(child_list) ];

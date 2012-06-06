@@ -8,7 +8,7 @@ namespace yocto
         namespace syntax
         {
             
-            void parse_node:: compress() throw()
+            void parse_node:: AST() throw()
             {
                 if( terminal != 0 )
                 {
@@ -34,7 +34,7 @@ namespace yocto
                         }
                         else 
                         {
-                            node->compress();
+                            node->AST();
                             tmp.push_back(node);
                         }
                     }
