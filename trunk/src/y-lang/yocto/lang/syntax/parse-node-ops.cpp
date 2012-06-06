@@ -10,7 +10,14 @@ namespace yocto
             
             void parse_node:: compress() throw()
             {
-                if( terminal == 0 )
+                if( terminal != 0 )
+                {
+                    if( flags == syntax::is_specialized )
+                    {
+                        lex()->release();
+                    }
+                }
+                else
                 {
                     child_list &chl = children();
                     child_list  tmp;
@@ -27,7 +34,6 @@ namespace yocto
                         }
                         else 
                         {
-                            // TODO: specialized
                             node->compress();
                             tmp.push_back(node);
                         }
