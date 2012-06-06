@@ -10,7 +10,10 @@ namespace yocto
 		namespace syntax 
 		{
 
-#define Y_SYNTAX_MATCH_ARGS lexer &Lexer, regex::source &Source, parse_node * & Tree
+#define Y_SYNTAX_MATCH_ARGS \
+lexer         &Lexer,       \
+regex::source &Source,      \
+parse_node *  &Tree
 
 			class rule : public object 
 			{
@@ -33,6 +36,7 @@ namespace yocto
                  */
 				void grow( parse_node * & Tree, parse_node * &Node ) throw();
                 
+                //! check the parent tree is valid
                 void check( const parse_node *Tree);
                 
 			private:
