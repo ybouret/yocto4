@@ -4,7 +4,7 @@ wrap:
 	swig -r -outcurrentdir ../example.i
 
 mac: wrap
-	PKG_LIBS="../example.c" R CMD SHLIB example_wrap.c -o example.so
+	R CMD SHLIB example_wrap.c ../example.c -o example.so
 	R --no-save < main.R
 
 linux: mac
