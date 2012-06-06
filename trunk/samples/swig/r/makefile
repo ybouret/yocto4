@@ -9,5 +9,8 @@ mac: wrap
 
 linux: mac
 
+openbsd: mac
+
+
 clean:
 	rm -f example.R example.so .RData example_wrap.*
