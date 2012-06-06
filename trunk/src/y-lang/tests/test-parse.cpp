@@ -3,6 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/auto-ptr.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 using namespace lang;
