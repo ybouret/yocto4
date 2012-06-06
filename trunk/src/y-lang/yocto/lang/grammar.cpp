@@ -81,11 +81,24 @@ namespace yocto
             return *r;
         }
         
+        syntax::aggregate & grammar:: agg( const char *id, syntax::node_property ppty )
+        {
+            const string ID(id);
+            return agg(ID,ppty);
+        }
+
+        
         syntax::alternate & grammar:: alt( const string &id )
         {
             syntax::alternate *r = new syntax::alternate(id);
             add(r);
             return *r;
+        }
+        
+        syntax::alternate & grammar:: alt( const char *id )
+        {
+            const string ID(id);
+            return alt(ID);
         }
         
         
