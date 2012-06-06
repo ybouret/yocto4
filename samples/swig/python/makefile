@@ -4,7 +4,7 @@ wrap:
 	swig -python -outcurrentdir ../example.i
 
 mac: wrap
-	gcc -shared -o _example.so ../example.c  example_wrap.c `python-config --cflags --ldflags` -Wall -O3
+	gcc -shared -o _example.so ../example.c  example_wrap.c `python-config --cflags --ldflags` -Wall -O3 -fPIC
 	python main.py
 	
 linux: mac
