@@ -64,7 +64,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
         }
         system( "dot -Tpng g.dot -o g.png" );
         std::cerr << "Compressing Tree" << std::endl;
-        Tree->compress();
+        Tree->AST();
         std::cerr << "Saving Final Parse Tree" << std::endl;
         {
             ios::ocstream fp( "q.dot", false );
