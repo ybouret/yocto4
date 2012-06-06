@@ -1,6 +1,7 @@
 
 #include "yocto/lang/grammar.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/auto-ptr.hpp"
 
 namespace yocto 
 {
@@ -21,12 +22,18 @@ namespace yocto
             syntax::parse_node *Tree = NULL;
             if( rules.head->match(Lexer,Source,Tree) ) 
             {
+                auto_ptr<syntax::parse_node> ans( Tree );
+                if( Lexer.is_active(Source) )
+                {
+                    const lexeme *lx = Lexer.peek();
+                    throw exception("%u: illegal token '%s'", lx->label.c_str() );
+                }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
-                return Tree; // may be NULL
+                return ans.yield();
             }
             
             //==================================================================
-            // error detection
+            // syntax error
             //==================================================================
             
             std::cerr << "[[ FAILURE ]]" << std::endl;

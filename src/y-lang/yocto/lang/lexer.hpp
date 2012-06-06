@@ -45,7 +45,8 @@ namespace yocto
 
 			//! try to cache one lexeme
 			bool is_active( regex::source &src );
-
+            const lexeme *peek() const throw();
+            
             size_t            line;
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;

@@ -4,6 +4,7 @@
 #include "yocto/auto-ptr.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
+#include "yocto/lang/ast.hpp"
 
 using namespace yocto;
 using namespace lang;
@@ -12,6 +13,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
 {
     std::cerr << "sizeof(lexeme)                = " << sizeof(lexeme) << std::endl;
     std::cerr << "sizeof(syntax::parse_node)    = " << sizeof(syntax::parse_node) << std::endl;
+    std::cerr << "sizeof(AST)                   = " << sizeof(AST) << std::endl;
     
     grammar G("Grammar");
     lexer   Lexer("Lexer");

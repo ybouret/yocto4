@@ -131,6 +131,11 @@ namespace yocto
 			}
 		}
 
+        const lexeme * lexer:: peek() const throw()
+        {
+            return cache.head;
+        }
+        
     }
     
 }
