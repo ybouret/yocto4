@@ -20,6 +20,8 @@ namespace yocto
                 
                 const node_property behavior;
                 
+                aggregate & operator &=( rule &r );
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(aggregate);
             };

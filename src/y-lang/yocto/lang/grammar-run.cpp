@@ -25,6 +25,10 @@ namespace yocto
                 return Tree; // may be NULL
             }
             
+            //==================================================================
+            // error detection
+            //==================================================================
+            
             std::cerr << "[[ FAILURE ]]" << std::endl;
             return NULL;
         }

@@ -43,7 +43,11 @@ namespace yocto
                 return false;
             }
             
-                       
+            alternate & alternate:: operator|=( rule &r )
+            {
+                (*this)(r);
+                return *this;
+            }
         }
     }
     

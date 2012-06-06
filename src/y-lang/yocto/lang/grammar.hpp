@@ -32,10 +32,12 @@ namespace yocto
             
             //! new aggregate
             syntax::aggregate &agg( const string &id, syntax::node_property = syntax::is_regular);
-            
+            syntax::aggregate &agg( const char   *id, syntax::node_property = syntax::is_regular);
+
             //! new alternate
             syntax::alternate &alt( const string &id );
-            
+            syntax::alternate &alt( const char   *id );
+
             //! new optional
             syntax::optional &opt( const string &id, const string &src );
             syntax::optional &opt( const string &id, syntax::rule &ref );

@@ -66,6 +66,12 @@ namespace yocto
                 return true;
             }
             
+            aggregate & aggregate:: operator &=( rule &r )
+            {
+                (*this)(r);
+                return *this;
+            }
+
                        
         }
     }
