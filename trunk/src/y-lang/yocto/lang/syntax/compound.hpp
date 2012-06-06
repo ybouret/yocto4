@@ -16,7 +16,9 @@ namespace yocto
 				virtual ~compound() throw();
                 
                 void operator()( rule &r );
-                              
+                
+                compound & operator<<( rule & );
+                
 			protected:
 				explicit compound( const string &id);
                 compound( const compound &other );

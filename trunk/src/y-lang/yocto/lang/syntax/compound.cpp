@@ -21,7 +21,11 @@ namespace yocto
                 operands.push_back( &r );
             }
 
-
+            compound & compound:: operator<<( rule &r )
+            {
+                (*this)(r);
+                return *this;
+            }
 		}
 	}
 

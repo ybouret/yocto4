@@ -18,6 +18,7 @@ namespace yocto
                 
                 virtual bool  match( Y_SYNTAX_MATCH_ARGS );
                 
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(alternate);
             };

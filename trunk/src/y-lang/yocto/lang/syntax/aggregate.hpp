@@ -18,6 +18,8 @@ namespace yocto
                 
                 virtual bool  match( Y_SYNTAX_MATCH_ARGS );
                 const bool merge;
+                
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(aggregate);
             };
