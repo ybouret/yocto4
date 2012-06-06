@@ -149,6 +149,27 @@ namespace yocto
         }
 
 
+        component::iterator solution::begin()
+        {
+            return components.begin();
+        }
+        
+        
+        component::iterator solution::end()
+        {
+            return components.end();
+        }
+        
+        component::const_iterator solution::begin() const
+        {
+            return components.begin();
+        }
+        
+        
+        component::const_iterator solution::end() const
+        {
+            return components.end();
+        }
         
     }
     
