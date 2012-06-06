@@ -15,11 +15,13 @@ namespace yocto
 			class terminal : public rule
 			{
 			public:
-				explicit terminal( const string &id);
+				explicit terminal( const string &id, bool meaningfull );
 				virtual ~terminal() throw();
 
 				virtual bool  match( Y_SYNTAX_MATCH_ARGS );
-
+                
+                const bool semantic;
+                
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
 			};
