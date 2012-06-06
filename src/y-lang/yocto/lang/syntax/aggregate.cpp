@@ -9,7 +9,9 @@ namespace yocto
             
             aggregate:: ~aggregate() throw() {}
             
-            aggregate:: aggregate( const string &id ) : compound(id) 
+            aggregate:: aggregate( const string &id, bool fusion ) : 
+            compound(id),
+            merge( fusion )
             {
             }
             
@@ -26,6 +28,8 @@ namespace yocto
                 // make a sub-tree
                 //--------------------------------------------------------------
                 parse_node *sub_tree =  new parse_node(this->label,NULL);
+                if( merge )
+                    sub_tree->flags |= sub_tree->shall_merge;
                 try 
                 {
                     //----------------------------------------------------------
