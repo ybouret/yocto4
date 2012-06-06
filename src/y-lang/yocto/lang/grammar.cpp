@@ -44,7 +44,8 @@ namespace yocto
         grammar:: grammar( const string &id ) :
         name(id),
         rules(),
-        items()
+        items(),
+        markers()
         {
         }
         

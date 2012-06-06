@@ -17,11 +17,11 @@ namespace yocto
             {
             public:
                 typedef core::list_of<parse_node> child_list;
-                const string &label;    //!< reference to the corresponding rule label
-                const bool    terminal; //!< true is terminal => one lexeme, else children
-                parse_node   *prev;     //!< for a child list
-                parse_node   *next;     //!< for a child list
-                parse_node   *parent;   //!< for a parse tree
+                const string  &label;    //!< reference to the corresponding rule label
+                const bool     terminal; //!< true is terminal => one lexeme, else children
+                parse_node    *prev;     //!< for a child list
+                parse_node    *next;     //!< for a child list
+                parse_node    *parent;   //!< for a parse tree
                 
                 virtual ~parse_node() throw();
                 explicit parse_node( const string &label_ref, lexeme *lx ) throw();

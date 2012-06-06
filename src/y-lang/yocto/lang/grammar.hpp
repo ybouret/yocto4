@@ -5,6 +5,7 @@
 #include "yocto/lang/syntax/aggregate.hpp"
 #include "yocto/lang/syntax/alternate.hpp"
 #include "yocto/lang/syntax/joker.hpp"
+#include "yocto/ordered/catalog.hpp"
 
 namespace yocto 
 {
@@ -70,8 +71,10 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(item);
             };
             
-            syntax::rules rules;
-            item::db      items;
+            syntax::rules   rules;
+            item::db        items;
+            catalog<string> markers; //!< terminal without semantic meaning
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
         };
         
