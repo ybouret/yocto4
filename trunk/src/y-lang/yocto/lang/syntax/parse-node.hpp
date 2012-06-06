@@ -54,6 +54,7 @@ namespace yocto
                 static const size_t   data_size   = sizeof(uint64_t) * ( YOCTO_U64_FOR_ITEM(child_list) );
                 static const size_t   list_size   = sizeof(child_list);
                 static const uint16_t discardable = 0x0001;
+                static const uint16_t shall_merge = 0x0002;
                 const uint16_t terminal;
                 uint16_t       flags;
             };
