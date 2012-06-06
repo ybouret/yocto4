@@ -37,17 +37,17 @@ YOCTO_UNIT_TEST_IMPL(json)
     syntax::alternate &ELEMENT  = G.alt("ELEMENT");
     
     //-- terminals
-    syntax::terminal  &LBRACK    = G.term("LBRACK",false);
-    syntax::terminal  &RBRACK    = G.term("RBRACK",false);
-    syntax::terminal  &RBRACE    = G.term("RBRACE",false);
-    syntax::terminal  &LBRACE    = G.term("LBRACE",false);
-    syntax::terminal  &Null      = G.term("Null");
-    syntax::terminal  &True      = G.term("True");
-    syntax::terminal  &False     = G.term("False");
-    syntax::terminal  &COMMA     = G.term("COMMA",false);
+    syntax::terminal  &LBRACK    = G.term("LBRACK", syntax::is_discardable);
+    syntax::terminal  &RBRACK    = G.term("RBRACK", syntax::is_discardable);
+    syntax::terminal  &RBRACE    = G.term("RBRACE", syntax::is_discardable);
+    syntax::terminal  &LBRACE    = G.term("LBRACE", syntax::is_discardable);
+    syntax::terminal  &Null      = G.term("Null",   syntax::is_specialized);
+    syntax::terminal  &True      = G.term("True",   syntax::is_specialized);
+    syntax::terminal  &False     = G.term("False",  syntax::is_specialized);
+    syntax::terminal  &COMMA     = G.term("COMMA",  syntax::is_discardable);
     syntax::terminal  &STRING    = G.term("STRING");
     syntax::terminal  &NUMBER    = G.term("NUMBER");
-    syntax::terminal  &COLUMN    = G.term("COLUMN");
+    syntax::terminal  &COLUMN    = G.term("COLUMN", syntax::is_discardable);
     
     //-- non terminal 
     syntax::alternate &VALUE       = G.alt("VALUE");
@@ -56,7 +56,7 @@ YOCTO_UNIT_TEST_IMPL(json)
     syntax::alternate &ARRAY    = G.alt("ARRAY");
     
     {
-        syntax::aggregate &OTHER_VALUE = G.agg("OTHER_VALUE", true);
+        syntax::aggregate &OTHER_VALUE = G.agg("OTHER_VALUE", syntax::is_merging);
         OTHER_VALUE << COMMA << VALUE;
         
         syntax::repeating &OTHER_VALUES = G.rep("OTHER_VALUES", OTHER_VALUE, 0);
@@ -77,7 +77,7 @@ YOCTO_UNIT_TEST_IMPL(json)
         syntax::aggregate &ITEM = G.agg("ITEM");
         ITEM << STRING << COLUMN << VALUE;
         
-        syntax::aggregate &OTHER_ITEM = G.agg("OTHER_ITEM");
+        syntax::aggregate &OTHER_ITEM = G.agg("OTHER_ITEM",syntax::is_merging);
         OTHER_ITEM << COMMA << ITEM;
         
         syntax::repeating &OTHER_ITEMS = G.rep("OTHER_ITEMS", OTHER_ITEM, 0 );

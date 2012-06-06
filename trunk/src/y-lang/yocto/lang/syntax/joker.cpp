@@ -69,7 +69,7 @@ namespace yocto
                 
                 size_t count = 0;
                 // create a local tree
-                parse_node *sub_tree = new parse_node(label,NULL);
+                parse_node *sub_tree = new parse_node(label,NULL,is_regular);
                 try
                 {
                     // accept as many as possible

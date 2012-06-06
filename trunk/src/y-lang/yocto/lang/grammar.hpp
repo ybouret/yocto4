@@ -27,11 +27,11 @@ namespace yocto
             virtual ~grammar() throw();
             
             //! new terminal
-            syntax::terminal &term( const string &id, bool semantic = true);
-            syntax::terminal &term( const char   *id, bool semantic = true); 
+            syntax::terminal &term( const string &id, syntax::node_property = syntax::is_regular);
+            syntax::terminal &term( const char   *id, syntax::node_property = syntax::is_regular); 
             
             //! new aggregate
-            syntax::aggregate &agg( const string &id, bool fusion = false );
+            syntax::aggregate &agg( const string &id, syntax::node_property = syntax::is_regular);
             
             //! new alternate
             syntax::alternate &alt( const string &id );

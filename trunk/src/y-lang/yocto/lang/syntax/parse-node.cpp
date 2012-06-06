@@ -35,14 +35,14 @@ namespace yocto
 #if defined(_MSC_VER)
 #pragma warning ( disable : 4351 )
 #endif
-            parse_node:: parse_node( const string &label_ref, lexeme *lx ) throw() :
+            parse_node:: parse_node( const string &label_ref, lexeme *lx, node_property ppty ) throw() :
             label( label_ref ), 
             prev(0),
             next(0), 
             parent(0),
             wksp(),
             terminal( lx != 0 ? 1 : 0 ),
-            flags(0)
+            flags( ppty )
             {
                 memset(wksp,0,sizeof(wksp));
                 if( lx )
@@ -95,12 +95,12 @@ namespace yocto
                 delete node;
             }
             
-			parse_node *parse_node:: create( const string &label_ref, lexeme *lx )
+			parse_node *parse_node:: create( const string &label_ref, lexeme *lx, node_property ppty )
 			{
 				assert(0!=lx);
 				try 
 				{
-					return new parse_node(label_ref,lx);
+					return new parse_node(label_ref,lx,ppty);
 				}
 				catch(...)
 				{

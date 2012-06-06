@@ -1,4 +1,5 @@
 #include "yocto/lang/syntax/terminal.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto 
 {
@@ -10,10 +11,17 @@ namespace yocto
             
 			terminal:: ~terminal() throw() {}
             
-			terminal:: terminal( const string &id, bool meaningful) : 
+			terminal:: terminal( const string &id, node_property ppty ) : 
             rule( id ),
-            semantic( meaningful )
+            semantic( ppty )
             {
+                switch( semantic )
+                {
+                    case is_merging:
+                        throw exception("terminal<%s>: invalid property", id.c_str());
+                    default:
+                        break;
+                }
             }
             
 			bool  terminal:: match( Y_SYNTAX_MATCH_ARGS )
@@ -32,10 +40,8 @@ namespace yocto
 				if( lx->label == this->label )
 				{
                     std::cerr << "+TERM <" << label << ">" << std::endl;
-                    parse_node *Node = parse_node::create(this->label,lx);
-                    if( !semantic )
-                        Node->flags |= Node->discardable;
-					grow( Tree, Node );
+                    parse_node *Node = parse_node::create(this->label,lx,semantic);
+                    grow( Tree, Node );
 					return true;
 				}
 				else

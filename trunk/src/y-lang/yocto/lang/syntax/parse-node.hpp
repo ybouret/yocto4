@@ -10,8 +10,16 @@ namespace yocto
     namespace lang 
     {
         
+        
         namespace syntax
         {
+            enum node_property
+            {
+                is_regular     = 0,
+                is_discardable = 1, //!< no semantic meaning
+                is_specialized = 2, //!< univocal meaning, erase content
+                is_merging     = 4  //!< merge with parent's children
+            };
             
             class parse_node : public object
             {
@@ -23,7 +31,7 @@ namespace yocto
                 parse_node    *parent;   //!< for a parse tree
                 
                 virtual ~parse_node() throw();
-                explicit parse_node( const string &label_ref, lexeme *lx ) throw();
+                explicit parse_node( const string &label_ref, lexeme *lx, node_property ppty ) throw();
                 
                 lexeme     * lex() throw();       //!< lexeme if terminal==true
                 child_list & children() throw();  //!< children if terminal==false
@@ -38,12 +46,12 @@ namespace yocto
                 /**
                  take care of lexeme in case of failure
                  */
-				static parse_node *create( const string &label_ref, lexeme *lx );
+				static parse_node *create( const string &label_ref, lexeme *lx , node_property ppty );
                 
                 void  viz( ios::ostream &fp ) const;
                 void  graphviz( const string &id, ios::ostream &fp ) const;
                 void  graphviz( const char   *id, ios::ostream &fp ) const;
-              
+                
                 void  compress() throw();
                 
             private:
@@ -51,12 +59,8 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(parse_node);
                 lexeme * & __lex() throw();
             public:
-                static const size_t   data_size   = sizeof(uint64_t) * ( YOCTO_U64_FOR_ITEM(child_list) );
-                static const size_t   list_size   = sizeof(child_list);
-                static const uint16_t discardable = 0x0001;
-                static const uint16_t shall_merge = 0x0002;
-                const uint16_t terminal;
-                uint16_t       flags;
+                const uint16_t terminal; //!< 1 or 0
+                const uint16_t flags;    //!< a node_property
             };
         }
     }
