@@ -26,7 +26,7 @@ namespace yocto
                 if( Lexer.is_active(Source) )
                 {
                     const lexeme *lx = Lexer.peek();
-                    throw exception("%u: illegal token '%s'", lx->label.c_str() );
+                    throw exception("%s: illegal token '%s'", name.c_str(), lx->label.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
                 return ans.yield();
