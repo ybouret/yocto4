@@ -44,7 +44,8 @@ namespace yocto
         grammar:: grammar( const string &id ) :
         name(id),
         rules(),
-        items()
+        items(),
+        __eof("EOF")
         {
         }
         
@@ -63,7 +64,7 @@ namespace yocto
         
         syntax::terminal & grammar:: term( const string &id, syntax::node_property ppty )
         {
-            syntax::terminal *r = new syntax::terminal(id,ppty);
+            syntax::terminal *r = new syntax::terminal(id,ppty,__eof);
             add( r );
             return *r;
         }

@@ -74,6 +74,7 @@ namespace yocto
             
             syntax::rules   rules;
             item::db        items;
+            const string    __eof;
             YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
         };
         
