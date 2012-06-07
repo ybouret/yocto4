@@ -11,9 +11,10 @@ namespace yocto
             
 			terminal:: ~terminal() throw() {}
             
-			terminal:: terminal( const string &id, node_property ppty ) : 
+			terminal:: terminal( const string &id, node_property ppty, const string &eof_ref ) : 
             rule( id ),
-            semantic( ppty )
+            semantic( ppty ),
+            eof(eof_ref)
             {
                 switch( semantic )
                 {
@@ -33,7 +34,15 @@ namespace yocto
 				if( !lx )
                 {
                     std::cerr << "</EOF>" << std::endl;
+                    lx = new lexeme(eof,Lexer.line);
+                    Lexer.unget(lx);
 					return false; //EOF
+                }
+                
+                if( lx->label == eof )
+                {
+                    Lexer.unget(lx);
+                    return false;
                 }
                 
                 std::cerr << "<==== <" << lx->label << ">" << std::endl;

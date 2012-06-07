@@ -9,22 +9,11 @@ namespace yocto
 	{
 		namespace syntax 
 		{
-            
-            class  rule;
-            class  context 
-            {
-            public:
-                context() throw()  {}
-                ~context() throw() {}
-                
-            };
-            
-            
+                     
 #define Y_SYNTAX_MATCH_ARGS \
 lexer         &Lexer,       \
 regex::source &Source,      \
-parse_node *  &Tree,        \
-context       &Context
+parse_node *  &Tree
             
 			class rule : public object 
 			{

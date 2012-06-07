@@ -22,7 +22,7 @@ namespace yocto
                 regex::pattern *motif;   //!< accepting pattern
                 rule           *next;    //!< for linked list
                 rule           *prev;    //!< for linked list
-               
+                
                 
                 //! create a rule
                 /**
@@ -30,6 +30,7 @@ namespace yocto
                  \param p  will be rule motif: taken care of in case of error
                  \param cb callback when motif is selected
                  \param control will be the special fctl flag
+                 the name cannot be EOF
                  */
                 static rule * create( const string &id, regex::pattern *p, const action &cb, bool control);
                 static void   kill( rule *r ) throw();
@@ -46,7 +47,7 @@ namespace yocto
                 ~rule() throw();
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
             public:
-                 const bool      fctl;    //!< control flag: rule is jump/call/back
+                const bool      fctl;    //!< control flag: rule is jump/call/back
             };
             
             class rules : public core::list_of<rule>

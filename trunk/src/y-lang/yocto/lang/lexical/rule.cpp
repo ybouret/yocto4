@@ -1,4 +1,5 @@
 #include "yocto/lang/lexical/rule.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto 
 {
@@ -36,6 +37,8 @@ namespace yocto
             rule * rule:: create(const string &id, regex::pattern *p, const action &cb, bool control_flag)
             {
                 assert(p);
+                if( id == "EOF" )
+                    throw exception("EOF is not allowed for syntax::rule");
                 rule *r = object::acquire1<rule>();
                 try
                 {

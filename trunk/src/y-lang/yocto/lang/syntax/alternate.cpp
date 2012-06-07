@@ -30,7 +30,7 @@ namespace yocto
                 {
                     rule *curr      = operands[i];
                     //Context.calling = this;
-                    if( curr->match(Lexer,Source,sub_tree,Context) )
+                    if( curr->match(Lexer,Source,sub_tree) )
                     {
                         assert( sub_tree != NULL);
                         grow(Tree,sub_tree);

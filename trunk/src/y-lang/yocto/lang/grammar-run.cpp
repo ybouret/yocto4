@@ -19,9 +19,8 @@ namespace yocto
             if( rules.size <= 0 )
                 throw exception("empty grammar '%s'", name.c_str() );
             
-            syntax::context     Context;
             syntax::parse_node *Tree = NULL;
-            if( rules.head->match(Lexer,Source,Tree,Context) ) 
+            if( rules.head->match(Lexer,Source,Tree) ) 
             {
                 auto_ptr<syntax::parse_node> ans( Tree );
                 if( Lexer.is_active(Source) )
@@ -38,13 +37,6 @@ namespace yocto
             //==================================================================
             
             std::cerr << "[[ FAILURE ]]" << std::endl << std::endl;
-            if( Source.is_active() )
-            {
-                std::cerr << "**** Active Source" << std::endl;
-            }
-            else {
-                std::cerr << "**** Inactive Source" << std::endl;
-            }
             const lexeme *lx =  Lexer.last();
             if( lx )
             {
