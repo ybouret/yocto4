@@ -37,7 +37,7 @@ namespace yocto
                 }
                 
                 std::cerr << "<==== <" << lx->label << ">" << std::endl;
-                Context.lx = lx;      //!< record the last accepted term
+                //Context.lx = lx;      //!< record the last accepted term
 				if( lx->label == this->label )
 				{
                     std::cerr << "+TERM <" << label << ">" << std::endl;

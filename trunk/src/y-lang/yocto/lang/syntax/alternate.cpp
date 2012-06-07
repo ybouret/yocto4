@@ -29,7 +29,7 @@ namespace yocto
                 for( size_t i=1; i <= nr; ++i )
                 {
                     rule *curr      = operands[i];
-                    Context.calling = this;
+                    //Context.calling = this;
                     if( curr->match(Lexer,Source,sub_tree,Context) )
                     {
                         assert( sub_tree != NULL);

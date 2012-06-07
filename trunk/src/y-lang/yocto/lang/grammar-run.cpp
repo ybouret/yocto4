@@ -37,25 +37,31 @@ namespace yocto
             // syntax error
             //==================================================================
             
-            std::cerr << "[[ FAILURE ]]" << std::endl;
-            const lexeme       *lx = Context.lx;
-            const syntax::rule *r  = Context.calling;
-            if( r )
+            std::cerr << "[[ FAILURE ]]" << std::endl << std::endl;
+            if( Source.is_active() )
             {
-                std::cerr << "During call to <" << r->label << ">" << std::endl;
+                std::cerr << "**** Active Source" << std::endl;
             }
-            else
-            {
-                std::cerr << "Undefined calling rule !" << std::endl;
+            else {
+                std::cerr << "**** Inactive Source" << std::endl;
             }
+            const lexeme *lx =  Lexer.last();
             if( lx )
             {
-                std::cerr << "last terminal= " << lx->label << " '"<< *lx << "', @line " << lx->line << std::endl;
+                std::cerr << name << ":" << lx->line << ": invalid " << lx->label;
+                if( lx->size > 0 )
+                    std::cerr << "='" << *lx << "'";
+                delete Lexer.prev_lexeme();
+                if( NULL != (lx=Lexer.last()) )
+                {
+                    std::cerr << " after " << lx->label;
+                    if( lx->size > 0 )
+                        std::cerr << "='" << *lx << "'";
+                    std::cerr << "@line " << lx->line;
+                }
+                std::cerr << std::endl;
             }
-            else 
-            {
-                std::cerr << "EMPTY source" << std::endl;
-            }
+            
             return NULL;
         }
         

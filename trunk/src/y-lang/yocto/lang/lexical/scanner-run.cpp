@@ -99,7 +99,7 @@ namespace yocto
 					//----------------------------------------------------------
 					// check is we keep the lexeme
 					//----------------------------------------------------------
-                    std::cerr << name << ": best rule= " << best_rule->label << std::endl;
+                    //std::cerr << name << ": best rule= " << best_rule->label << std::endl;
                     if( best_rule->fctl == true )
                     {
                         //------------------------------------------------------
