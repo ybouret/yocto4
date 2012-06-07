@@ -55,8 +55,6 @@ namespace yocto
             
             syntax::parse_node *accept( lexer &Lexer, regex::source &Source );
             
-            
-            
         private:
             void add( syntax::rule *r );
             

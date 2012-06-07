@@ -38,8 +38,7 @@ namespace yocto
                 std::cerr << "?OPT <" << ref.label << "> @" << label << "" << std::endl;
                 
                 parse_node *Node = NULL;
-                
-                if( ref.match(Lexer, Source, Node) )
+                if( ref.match(Lexer, Source, Node,Context) )
                 {
                     grow(Tree,Node);
                 }
@@ -73,7 +72,7 @@ namespace yocto
                 try
                 {
                     // accept as many as possible
-                    while( ref.match(Lexer, Source, sub_tree) )
+                    while( ref.match(Lexer, Source, sub_tree,Context) )
                         ++count;
                 }
                 catch(...)
@@ -87,7 +86,6 @@ namespace yocto
                 {
                     // forget it...
                     parse_node::restore(Lexer, sub_tree);
-                    std::cerr << "\t[[ NO REP " << label << " ]]" << std::endl;
                     return false;
                 }
                 else 

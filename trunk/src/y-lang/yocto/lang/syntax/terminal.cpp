@@ -32,12 +32,12 @@ namespace yocto
 				lexeme *lx = Lexer.next_lexeme( Source );
 				if( !lx )
                 {
-                    std::cerr << "\t[[ NO TERM " << label << " ]]" << std::endl;
                     std::cerr << "</EOF>" << std::endl;
 					return false; //EOF
                 }
                 
                 std::cerr << "<==== <" << lx->label << ">" << std::endl;
+                Context.lx = lx;      //!< record the last accepted term
 				if( lx->label == this->label )
 				{
                     std::cerr << "+TERM <" << label << ">" << std::endl;
@@ -48,7 +48,6 @@ namespace yocto
 				else
                 {
                     std::cerr << "-TERM <" << label << ">" << std::endl;
-                    std::cerr << "\t[[ NO TERM " << label << " but " << lx->label << " instead ]]" << std::endl;
                     Lexer.unget(lx);
 					return false;
                 }
