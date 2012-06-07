@@ -130,20 +130,42 @@ namespace yocto
 					return false;
 			}
 		}
-
+        
         const lexeme * lexer:: peek() const throw()
         {
             return cache.head;
         }
         
-        const lexeme * lexer:: last() const throw()
+        const lexeme * lexer:: get( int pos ) const throw()
         {
-            return cache.tail;
-        }
-
-        lexeme * lexer:: prev_lexeme() throw()
-        {
-            return cache.size ? cache.pop_back() : NULL;
+            if( pos > 0 )
+            {
+                size_t num = pos;
+                if( num > cache.size )
+                    return NULL;
+                const lexeme *lx = cache.head;
+                for( --num; num>0; --num )
+                    lx=lx->next;
+                return lx;
+            }
+            else
+            {
+                if( pos < 0 )
+                {
+                    size_t num = -pos;
+                    if( num > cache.size )
+                        return NULL;
+                    const lexeme *lx = cache.tail;
+                    for( --num; num>0; --num )
+                        lx = lx->prev;
+                    return lx;
+                }
+                else 
+                {
+                    assert(0==pos);
+                    return NULL;
+                }
+            }
         }
     }
     

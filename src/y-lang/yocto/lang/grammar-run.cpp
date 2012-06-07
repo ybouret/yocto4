@@ -37,23 +37,35 @@ namespace yocto
             //==================================================================
             
             std::cerr << "[[ FAILURE ]]" << std::endl << std::endl;
-            const lexeme *lx =  Lexer.last();
-            if( lx )
-            {
-                std::cerr << name << ":" << lx->line << ": invalid " << lx->label;
-                if( lx->size > 0 )
-                    std::cerr << "='" << *lx << "'";
-                delete Lexer.prev_lexeme();
-                if( NULL != (lx=Lexer.last()) )
-                {
-                    std::cerr << " after " << lx->label;
-                    if( lx->size > 0 )
-                        std::cerr << "='" << *lx << "'";
-                    std::cerr << "@line " << lx->line;
-                }
-                std::cerr << std::endl;
-            }
             
+            const lexeme *lx_last = Lexer.get(-1);
+            const lexeme *lx_prev = Lexer.get(-2);
+            const char   *id      = name.c_str();
+            if(lx_last )
+            {
+                exception    excp("%s: invalid <%s>",id, lx_last->label.c_str());
+                {
+                    const string str_last( lx_last->to_string() );
+                    if( str_last.size() )
+                        excp.cat("='%s'", str_last.c_str());
+                }
+                excp.cat(" (line %u)", unsigned(lx_last->line) );
+                if( lx_prev )
+                {
+                    excp.cat(" after <%s>", lx_prev->label.c_str() );
+                    {
+                        const string str_prev( lx_prev->to_string() );
+                        if( str_prev.size() )
+                            excp.cat("='%s'", str_prev.c_str() );
+                    }
+                    excp.cat(" (line %u)", unsigned(lx_prev->line) );
+                }
+                throw excp;
+            }
+            else
+            {
+                throw exception("%s: unexpected no lexeme!",id);
+            }
             return NULL;
         }
         

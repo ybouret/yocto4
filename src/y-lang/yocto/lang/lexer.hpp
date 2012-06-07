@@ -50,9 +50,7 @@ namespace yocto
             const lexeme *peek() const throw();
             
             //! return cache.tail
-            const lexeme *last() const throw();
-            lexeme       *prev_lexeme() throw(); //! get previous lexeme from cache, NULL => end
-            
+            const lexeme *get( int pos ) const throw();
             size_t            line;
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;
