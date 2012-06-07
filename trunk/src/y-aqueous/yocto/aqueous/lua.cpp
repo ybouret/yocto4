@@ -253,7 +253,7 @@ namespace yocto
         
         void _lua:: push( lua_State *L, const solution &s )
         {
-            lua_createtable(L, s.size, s.size);
+            lua_createtable(L, s.size, 0);
             assert( lua_istable(L,-1) );
             const int tab = lua_gettop(L);
             int index = 0;

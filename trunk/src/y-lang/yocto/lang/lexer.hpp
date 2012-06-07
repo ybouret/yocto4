@@ -45,7 +45,13 @@ namespace yocto
 
 			//! try to cache one lexeme
 			bool is_active( regex::source &src );
+            
+            //! return cache.head
             const lexeme *peek() const throw();
+            
+            //! return cache.tail
+            const lexeme *last() const throw();
+            lexeme       *prev_lexeme() throw(); //! get previous lexeme from cache, NULL => end
             
             size_t            line;
         private:

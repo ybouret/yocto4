@@ -136,6 +136,15 @@ namespace yocto
             return cache.head;
         }
         
+        const lexeme * lexer:: last() const throw()
+        {
+            return cache.tail;
+        }
+
+        lexeme * lexer:: prev_lexeme() throw()
+        {
+            return cache.size ? cache.pop_back() : NULL;
+        }
     }
     
 }
