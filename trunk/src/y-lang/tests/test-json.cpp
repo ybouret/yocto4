@@ -114,6 +114,10 @@ YOCTO_UNIT_TEST_IMPL(json)
             Tree->graphviz("Q", fp);
         }
         system( "dot -Tpng q.dot -o q.png" );
+        {
+            ios::ocstream fp( "ast.dat", false );
+            Tree->output(fp);
+        }
     }
     
     

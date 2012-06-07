@@ -51,7 +51,8 @@ namespace yocto
                 void  viz( ios::ostream &fp ) const;
                 void  graphviz( const string &id, ios::ostream &fp ) const;
                 void  graphviz( const char   *id, ios::ostream &fp ) const;
-                
+                void  out( ios::ostream &fp, size_t &depth ) const;
+                void  output( ios::ostream &fp ) const;
                 void  AST() throw();
                 
             private:

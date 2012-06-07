@@ -63,6 +63,42 @@ namespace yocto
                 }
             }
             
+            void  parse_node:: out( ios::ostream &fp, size_t &depth ) const
+            {
+                for( size_t i=0; i < depth; ++i ) fp.write(' ');
+                fp.write('<');
+                fp.append(label);
+                fp.write('>');
+                if( terminal )
+                {
+                    if( lex()->size )
+                    {
+                        fp.write('\t');
+                        fp.write('\'');
+                        const string s = lex()->to_string();
+                        fp.append(s);
+                        fp.write('\'');
+                    }
+                    fp.write('\n');
+                }
+                else 
+                {
+                    fp.write('\n');
+                    ++depth;
+                    const child_list &chl = children();
+                    for( const parse_node *node = chl.head; node; node=node->next )
+                    {
+                        node->out(fp,depth);
+                    }
+                    --depth;
+                }
+            }
+
+            void  parse_node:: output( ios::ostream &fp ) const
+            {
+                size_t depth = 0;
+                out(fp,depth);
+            }
         }
         
     }
