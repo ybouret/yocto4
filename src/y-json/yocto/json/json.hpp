@@ -88,7 +88,9 @@ namespace yocto
             
         private:
             void out( ios::ostream &, size_t depth ) const;
-            static void out( const Array &, ios::ostream &, size_t depth );
+            static void out( const Array  &, ios::ostream &, size_t depth );
+            static void out( const Object &, ios::ostream &, size_t depth );
+            static string j2s( const String &);
             union 
             {
                 String *_String;
