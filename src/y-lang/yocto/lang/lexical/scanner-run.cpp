@@ -105,7 +105,7 @@ namespace yocto
                         //------------------------------------------------------
                         // we have a control rule !
                         //------------------------------------------------------
-                        std::cerr << "<CTRL>" << std::endl;
+                        //std::cerr << "<CTRL>" << std::endl;
                         if( best_rule->produce() )
                             throw exception("%s: rule '%s' should not produce", name.c_str(),best_rule->label.c_str());
                         best_rule->motif->clear(); // discard the token

@@ -1,8 +1,7 @@
 #include "yocto/json/parser.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/rx/pattern/basic.hpp"
-#include "yocto/rx/source.hpp"
 #include "yocto/lang/lexer.hpp"
+#include "yocto/lang/grammar.hpp"
 #include "yocto/auto-ptr.hpp"
 
 namespace yocto 
@@ -11,33 +10,77 @@ namespace yocto
     
     namespace JSON
     {
-        static const char new_object[] = "\\{";
-        static const char new_array[]  = "\\[";
-        static const char end_object[] = "\\}";
-        static const char end_array[]  = "\\]";
-        static const char NumberRX[]   = "[:digit:]+";
         
-        class Parser :: Impl : public lexer
+        
+        class Parser :: Impl : public object, public lexer, public grammar
         {
         public:
-            enum status_type
-            {
-                WaitingForArrayOrObject
-            };
             
             
             lexical::scanner  &scan;
-            status_type        status;
+            lexical::scanner  &jstr;
+            string             _str;
             
-            Impl() : lexer( "JSON::Parser" ),
+            Impl() : 
+            lexer(   "JSON::Lexer" ),
+            grammar( "JSON::Parser" ),
             scan( first() ),
-            status( WaitingForArrayOrObject )
+            jstr( declare("JSON::String") ),
+            _str()
             {
                 
-                scan.make( "BLANKS", "[ \t\v\f]+", & scan.discard );
-                scan.make( "ENDL",   "[:endl:]",   & scan.newline );
-                scan.make( "NEW_ARRAY", new_array, this, & Impl::NewArray ); 
-                scan.make( "END_ARRAY", end_array, this, & Impl::NewArray ); 
+                //--------------------------------------------------------------
+                //
+                // declare JSON terminals
+                //
+                //--------------------------------------------------------------
+                scan.make("LBRACK","\\[" );
+                scan.make("RBRACK","\\]" );
+                scan.make("LBRACE", "\\{");
+                scan.make("RBRACE", "\\}");
+                scan.make("COMMA",  ","  );
+                scan.make("null",   "null" );
+                scan.make("true",   "true" );
+                scan.make("false",  "false" );
+                scan.make("NUMBER", "[:digit:]+" );
+                scan.make("COLUMN", ":");
+                scan.call("JSON::String",  "\"", this, &Impl::OnEnterString);
+                scan.make( "BLANKS", "[ \t]+", & scan.discard );
+                scan.make( "ENDL", "[:endl:]", & scan.newline );
+                
+                jstr.back("\"", this, &Impl::OnLeaveString);
+                jstr.make("1CHAR", ".", this, &Impl::OnChar);
+                
+                
+                //--------------------------------------------------------------
+                //
+                // declare JSON Grammar
+                //
+                //--------------------------------------------------------------
+                
+                //-- main rule
+                syntax::alternate & INSTANCE = alt("INSTANCE");
+                
+                //--------------------------------------------------------------
+                // terminals
+                //--------------------------------------------------------------
+                syntax::terminal &LBRACK = term( "LBRACK", syntax::is_discardable );
+                syntax::terminal &RBRACK = term( "RBRACK", syntax::is_discardable );
+                
+                //--------------------------------------------------------------
+                // ARRAY
+                //--------------------------------------------------------------
+                syntax::alternate &ARRAYS = alt( "ARRAYS" );
+                
+                {
+                    syntax::aggregate &EMPTY_ARRAY = agg( "EMPTY_ARRAY" );
+                    EMPTY_ARRAY << LBRACK << RBRACK;
+                    ARRAYS |= EMPTY_ARRAY;
+                }
+                
+                INSTANCE |= ARRAYS;
+                
+                
             }
             
             virtual ~Impl() throw()
@@ -45,6 +88,23 @@ namespace yocto
                 
             }
             
+            void OnEnterString( const regex::token & )
+            {
+                _str.clear();
+            }
+            
+            void OnLeaveString( const regex::token & )
+            {
+                unget( jstr, _str);
+            }
+            
+            bool OnChar( const regex::token &t )
+            {
+                for( regex::t_char *ch = t.head; ch; ch=ch->next )
+                    _str.append( ch->data );
+                
+                return false; // not a lexeme !
+            }
             
             //==================================================================
             // main call
@@ -54,29 +114,14 @@ namespace yocto
                 value.nullify();
                 reset();
                 regex::source src(fp);
-                
                 lexeme *lx = NULL;
-                while( 0 != (lx=next_lexeme(src)) )
+                while( (lx=next_lexeme(src)) != NULL )
                 {
+                    std::cerr << "line " << lx->line << "\t<" << lx->label << "> = '" << *lx << "'" << std::endl;
                     delete lx;
                 }
-                
             }
             
-            //==================================================================
-            // Array
-            //==================================================================
-            bool NewArray( const regex::token & )
-            {
-                std::cerr << "NewArray@line " << line << std::endl;
-                return false;
-            }
-            
-            bool EndArray( const regex::token & )
-            {
-                std::cerr << "EndArray@line" << line << std::endl;
-                return false;
-            }
             
             
         private:
