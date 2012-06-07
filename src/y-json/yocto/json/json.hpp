@@ -4,6 +4,7 @@
 #include "yocto/string.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto 
 {
@@ -83,7 +84,11 @@ namespace yocto
             void nullify() throw();
             void make( const ValueType of );
             
+            void output( ios::ostream &fp ) const;
+            
         private:
+            void out( ios::ostream &, size_t depth ) const;
+            static void out( const Array &, ios::ostream &, size_t depth );
             union 
             {
                 String *_String;

@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/json/parser.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 
@@ -11,5 +12,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
     JSON::Value  &j = json( in );
     std::cerr << "Got " << j.type_name() << std::endl;
     std::cerr << "length=" << j.length() << std::endl;
+    ios::ocstream fp( ios::cstderr );
+    j.output(fp);
 }
 YOCTO_UNIT_TEST_DONE()
