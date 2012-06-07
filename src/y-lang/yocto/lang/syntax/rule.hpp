@@ -14,11 +14,9 @@ namespace yocto
             class  context 
             {
             public:
-                context() throw() : calling(0), lx(0) {}
+                context() throw()  {}
                 ~context() throw() {}
                 
-                syntax::rule *calling;
-                lexeme       *lx;
             };
             
             

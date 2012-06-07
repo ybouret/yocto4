@@ -19,7 +19,7 @@ namespace yocto
             
             typedef functor<void,TL1(const regex::token &)> callback;
             
-            //! a simple scanne
+            //! a simple scanner
             class scanner : public object, public counted
             {
             public:
