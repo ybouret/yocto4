@@ -81,6 +81,7 @@ namespace yocto
             const ValueType type;
             
             void nullify() throw();
+            void make( const ValueType of );
             
         private:
             union 
@@ -175,6 +176,8 @@ namespace yocto
             inline iterator       end()   throw()       { return pairs.end();   }
             inline const_iterator begin() const throw() { return pairs.begin(); }
             inline const_iterator end()   const throw() { return pairs.end();   }
+            
+            bool has( const String &key ) const throw();
             
         private:
             pairs_type pairs;
