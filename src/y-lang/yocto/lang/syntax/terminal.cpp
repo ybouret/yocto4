@@ -32,7 +32,8 @@ namespace yocto
 				lexeme *lx = Lexer.next_lexeme( Source );
 				if( !lx )
                 {
-                    std::cerr << "/EOF" << std::endl;
+                    std::cerr << "\t[[ NO TERM " << label << " ]]" << std::endl;
+                    std::cerr << "</EOF>" << std::endl;
 					return false; //EOF
                 }
                 
@@ -47,6 +48,7 @@ namespace yocto
 				else
                 {
                     std::cerr << "-TERM <" << label << ">" << std::endl;
+                    std::cerr << "\t[[ NO TERM " << label << " but " << lx->label << " instead ]]" << std::endl;
                     Lexer.unget(lx);
 					return false;
                 }

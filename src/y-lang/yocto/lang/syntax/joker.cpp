@@ -43,7 +43,7 @@ namespace yocto
                 {
                     grow(Tree,Node);
                 }
-                
+                // always successfull
                 return true;
             }
             
@@ -87,6 +87,7 @@ namespace yocto
                 {
                     // forget it...
                     parse_node::restore(Lexer, sub_tree);
+                    std::cerr << "\t[[ NO REP " << label << " ]]" << std::endl;
                     return false;
                 }
                 else 

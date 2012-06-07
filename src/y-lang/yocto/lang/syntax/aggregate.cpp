@@ -49,6 +49,7 @@ namespace yocto
                         if( !curr->match(Lexer, Source, sub_tree) )
                         {
                             parse_node::restore(Lexer,sub_tree);
+                            std::cerr << "\t[[ NO AGG " << label << " ]]" << std::endl;
                             return false;
                         }
                     }
