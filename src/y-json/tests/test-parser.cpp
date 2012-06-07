@@ -10,5 +10,6 @@ YOCTO_UNIT_TEST_IMPL(parser)
     ios::icstream in( ios::cstdin );
     JSON::Value  &j = json( in );
     std::cerr << "Got " << j.type_name() << std::endl;
+    std::cerr << "length=" << j.length() << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

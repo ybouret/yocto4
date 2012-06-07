@@ -3,6 +3,7 @@
 #include "yocto/lang/lexer.hpp"
 #include "yocto/lang/grammar.hpp"
 #include "yocto/auto-ptr.hpp"
+#include "yocto/string/conv.hpp"
 
 #define Y_JSON_OUTPUT
 #if defined(Y_JSON_OUTPUT)
@@ -194,9 +195,106 @@ namespace yocto
             void walk( Value &value, const syntax::parse_node *node )
             {
                 assert(node!=NULL);
+                assert(value.type == IsNull);
+                
+                const string &label = node->label;
+                
+                if( label == "EMPTY_OBJECT" )
+                {
+                    value.make( IsObject );
+                    return;
+                }
+                
+                if( label == "EMPTY_ARRAY" )
+                {
+                    value.make( IsArray );
+                    return;
+                }
+                
+                if( label == "ARRAY") 
+                {
+                    value.make( IsArray );
+                    walk_array( value.asArray(), node->children() );
+                    return;
+                }
+                
+                if( label == "OBJECT" )
+                {
+                    value.make( IsObject );
+                    walk_object( value.asObject(), node->children() );
+                    return;
+                }
+                
+                if( label == "JSON::String" )
+                {
+                    value.make( IsString );
+                    string &str = value.asString();
+                    const lexeme *lx = node->lex();
+                    for( regex::t_char *t = lx->head; t; t=t->next )
+                    {
+                        const char C = t->data;
+                        str.append(C);
+                    }
+                    
+                    return;
+                }
+                
+                if( label == "NUMBER" )
+                {
+                    value.make( IsNumber );
+                    const string str = node->lex()->to_string();
+                    value.asNumber() = strconv::to_real<double>( str );
+                    return;
+                }
+                
+                if( label == "null" )
+                    return;
+                
+                if( label == "true" )
+                {
+                    value.make( IsTrue );
+                    return;
+                }
+                
+                if( label == "false" )
+                {
+                    value.make( IsFalse );
+                    return;
+                }
+                
+                throw exception("JSON::walk(Invalid Node <%s>)", label.c_str() );
             }
             
+            void walk_array( Array &arr, const syntax::parse_node::child_list &children )
+            {
+                for( const syntax::parse_node *node = children.head; node; node=node->next )
+                {
+                    { const Value nil; arr.push(nil); }
+                    walk( arr[ arr.length()-1 ], node);
+                }
+            }
             
+            void walk_object( Object &obj, const syntax::parse_node::child_list &children )
+            {
+                for( const syntax::parse_node *node = children.head; node; node=node->next )
+                {
+                    assert( node->label == "PAIR" );
+                    assert( ! node->terminal );
+                    const syntax::parse_node::child_list &pair = node->children();
+                    assert( pair.size == 2);
+                    assert(pair.head->label == "JSON::String" );
+                    assert(pair.head->terminal);
+                    const String key = pair.head->lex()->to_string();
+                    if( obj.has( key ) )
+                        throw exception("JSON: multiple object key '%s', line %u", key.c_str(), unsigned(pair.head->lex()->line) );
+                    {
+                        const Pair   P( key );
+                        obj.push(P);
+                    }
+                    Value &value = obj[ key ];
+                    walk(value, pair.tail );
+                }
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Impl);

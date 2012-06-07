@@ -377,7 +377,17 @@ return * data._##TYPE; }
             return pairs(index+1).value;
         }
         
+        bool Object:: has( const String &key ) const throw()
+        {
+            return pairs.search(key) != NULL;
+        }
         
+        
+        void Value:: make( const ValueType of )
+        {
+            Value tmp( of ); swap_with(tmp);
+        }
+
         
     }
     
