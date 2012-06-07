@@ -29,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(lua)
         "function display(S)\n"
         "print( \"#items=\" .. table.getn(S) );\n"
         "for i,line in ipairs(S) do\n"
-        "    print(line);\n"
+        "    print(i,line);\n"
         "end\n"
         "end\n";
         Lua::Config::DoString(L,code);
