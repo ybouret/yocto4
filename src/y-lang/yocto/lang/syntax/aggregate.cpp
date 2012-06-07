@@ -45,11 +45,11 @@ namespace yocto
                     const size_t nr = operands.size();
                     for( size_t i=1; i <= nr; ++i )
                     {
-                        rule *curr = operands[i];
-                        if( !curr->match(Lexer, Source, sub_tree) )
+                        rule *curr      = operands[i];
+                        Context.calling = this;
+                        if( !curr->match(Lexer, Source, sub_tree,Context) )
                         {
                             parse_node::restore(Lexer,sub_tree);
-                            std::cerr << "\t[[ NO AGG " << label << " ]]" << std::endl;
                             return false;
                         }
                     }

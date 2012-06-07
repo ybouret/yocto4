@@ -9,12 +9,25 @@ namespace yocto
 	{
 		namespace syntax 
 		{
-
+            
+            class  rule;
+            class  context 
+            {
+            public:
+                context() throw() : calling(0), lx(0) {}
+                ~context() throw() {}
+                
+                syntax::rule *calling;
+                lexeme       *lx;
+            };
+            
+            
 #define Y_SYNTAX_MATCH_ARGS \
 lexer         &Lexer,       \
 regex::source &Source,      \
-parse_node *  &Tree
-
+parse_node *  &Tree,        \
+context       &Context
+            
 			class rule : public object 
 			{
 			public:
@@ -22,14 +35,13 @@ parse_node *  &Tree
 				rule        *next;
 				rule        *prev;
 				virtual ~rule() throw();
-
+                
 				virtual bool  match( Y_SYNTAX_MATCH_ARGS ) = 0;
                 
                 typedef rule *ptr;
-                
 			protected:
 				explicit rule( const string &id );
-
+                
 				//! grow tree
                 /**
                  if Tree != NULL, Tree must be NOT terminal
