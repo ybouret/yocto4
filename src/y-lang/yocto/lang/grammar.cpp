@@ -87,7 +87,7 @@ namespace yocto
             const string ID(id);
             return agg(ID,ppty);
         }
-
+        
         
         syntax::alternate & grammar:: alt( const string &id )
         {
@@ -145,12 +145,33 @@ namespace yocto
         syntax::repeating &grammar:: rep( const string &id, syntax::rule &ref, size_t at_least)
         {
             if( ! rules.owns( &ref ) )
-                throw exception("repeating<%s>: unregistered rule <%s>", id.c_str(), ref.label.c_str() );
+                throw exception("%s.rep<%s>: unregistered rule <%s>", name.c_str(), id.c_str(), ref.label.c_str() );
             syntax::repeating *jk  = new syntax::repeating( id, ref, at_least );
             add(jk);
             return *jk;
         }
         
+        
+        void grammar:: set_root( const string &id )
+        {
+            item *it = items.search(id);
+            if( !it )
+                throw exception("%s.set_root( NO '%s' )", name.c_str(), id.c_str() );
+            rules.move_to_front( it->rule );
+        }
+        
+        void grammar:: set_root( const char   *id )
+        {
+            const string ID(id);
+            set_root(ID);
+        }
+        
+        void grammar:: set_root( syntax::rule &r  )
+        {
+            if( ! rules.owns( &r ) )
+                throw exception("%s.set_root(unregistered rule <%s>)", name.c_str(), r.label.c_str() );
+            rules.move_to_front( &r );
+        }
         
     }
     
