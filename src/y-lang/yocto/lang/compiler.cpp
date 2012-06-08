@@ -58,7 +58,6 @@ namespace yocto
         
         syntax::parse_node * compiler:: operator()( ios::istream &fp )
         {
-            
             regex::source       Source( fp );
             reset();
             syntax::parse_node *Tree = accept(*this, Source);
