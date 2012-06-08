@@ -13,7 +13,8 @@ namespace yocto
     {
         //! simple grammar
         /**
-         the first declared rule will be the root rule !
+         the first declared rule will be the default rule,
+         wich can be change by set_root
          */
         class grammar 
         {
@@ -54,6 +55,10 @@ namespace yocto
             syntax::rule & operator[]( const char   *id );
             
             syntax::parse_node *accept( lexer &Lexer, regex::source &Source );
+            
+            void set_root( const string &id );
+            void set_root( const char   *id );
+            void set_root( syntax::rule &r  );
             
         private:
             void add( syntax::rule *r );

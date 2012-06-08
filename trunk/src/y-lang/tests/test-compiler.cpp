@@ -13,5 +13,11 @@ using namespace lang;
 YOCTO_UNIT_TEST_IMPL(compiler)
 {
     compiler C;
+    ios::icstream fp( ios::cstdin );
+    auto_ptr<syntax::parse_node> Tree( C(fp) );
+    if( Tree.is_valid() )
+    {
+        
+    }
 }
 YOCTO_UNIT_TEST_DONE()

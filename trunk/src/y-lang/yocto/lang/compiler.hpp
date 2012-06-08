@@ -17,6 +17,9 @@ namespace yocto
             explicit  compiler();
             virtual  ~compiler() throw();
             
+            syntax::parse_node * operator()( ios::istream &fp );
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
         };
