@@ -54,7 +54,7 @@ namespace yocto
             
             double pH() const;
             
-            component::iterator      begin();
+            component::iterator       begin();
             component::iterator       end();
             component::const_iterator begin() const;
             component::const_iterator end() const;
