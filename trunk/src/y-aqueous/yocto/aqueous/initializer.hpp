@@ -27,7 +27,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_ASSIGN(constraint);
             weights        W;
-            friend class initializer;
+            friend class   initializer;
             
         public:
             const library &lib;
