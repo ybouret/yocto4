@@ -7,55 +7,64 @@
 
 namespace yocto 
 {
-    namespace aqueous
-    {
-        
-        class initializer;
-        
-        class constraint 
-        {
-        public:
-            typedef map<string,double>     weights;
-            typedef shared_ptr<constraint> ptr;
-            
-            explicit constraint( const library &L, double v ) throw();
-            virtual ~constraint() throw();
-            const double value;
-            
-            void add( const string &id, double w );
-            
-        private:
-            YOCTO_DISABLE_ASSIGN(constraint);
-            weights        W;
-            friend class   initializer;
-            
-        public:
-            const library &lib;
-        };
-        
-        class initializer
-        {
-        public:
-            explicit initializer(const library &L ) throw();
-            virtual ~initializer() throw();
-            
-            constraint & create( double v );
-            
-            void electroneutrality();
-            
-            void   operator()( chemsys &cs , double t);
-            size_t size() const throw();
-            
-        private:
-            vector< constraint::ptr > constraints;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
-        public:
-            const library &lib;
-        };
-        
-        
-    }
-    
+	namespace aqueous
+	{
+
+		class initializer;
+		typedef functor<double,TL1(double)> initproc;
+
+		class constraint 
+		{
+		public:
+			typedef map<string,double>     weights;
+			typedef shared_ptr<constraint> ptr;
+
+			//! fixed constant
+			explicit constraint( const library &L, double v );
+
+			//! with a time dependant value
+			explicit constraint( const library &L, const initproc &v);
+			virtual ~constraint() throw();
+			mutable initproc value;
+
+			void add( const string &id, double w );
+
+		private:
+			YOCTO_DISABLE_ASSIGN(constraint);
+			weights        coefficients;
+			friend class   initializer;
+			const double   fixedValue;
+			double         fixed( double ) const throw();
+
+		public:
+			const library &lib;
+		};
+
+		class initializer
+		{
+		public:
+			explicit initializer(const library &L ) throw();
+			virtual ~initializer() throw();
+
+			constraint & create( double v );
+			constraint & create( const initproc &v );
+
+			void electroneutrality();
+
+			void   operator()( chemsys &cs , double t);
+			size_t size() const throw();
+
+		private:
+			vector< constraint::ptr > constraints;
+			YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
+		public:
+			const library &lib;
+			const bool     is_variable; //!< default: false
+		};
+
+
+	}
+
 }
 
 #endif
