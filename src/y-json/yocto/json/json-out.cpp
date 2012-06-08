@@ -80,17 +80,31 @@ namespace yocto
         
         void Value:: out( const Object &obj, ios::ostream &fp, size_t depth )
         {
-            __indent(fp,depth); fp.write('{'); fp.write('\n');
-            size_t count = 0;
+            //__indent(fp,depth); 
+            fp.write('{'); fp.write('\n');
+            const size_t   start = depth+2;
+            vector<string> keys( obj.length(), as_capacity );
+            size_t         kmax = 0;
+            for( Object::const_iterator i = obj.begin(); i != obj.end(); ++i )
+            {
+                const string s = j2s( (*i).name );
+                keys.push_back(s);
+                if( keys.back().size() > kmax ) kmax = keys.back().size();
+            }
+            const size_t key_space   = kmax + 1;
+            const size_t child_start = start + key_space + 2; 
+            
+            size_t count = 1;
             for( Object::const_iterator i = obj.begin(); i != obj.end(); ++i, ++count )
             {
                 const Pair &P = *i;
-                const string s = j2s( P.name );
-                __indent(fp,1+depth);
-                fp.append(s);
-                fp.append(" : ");
-                P.value.out(fp,depth+1);
-                if( count < obj.length() -1 )
+                __indent(fp,start);
+                const string &key = keys[count];
+                fp.append(key);
+                __indent(fp,key_space - key.size());
+                fp.append(": ");
+                P.value.out(fp,child_start);
+                if( count < obj.length()  )
                 {
                     fp.write(',');
                 }
