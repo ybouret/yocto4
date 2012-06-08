@@ -17,7 +17,11 @@ YOCTO_UNIT_TEST_IMPL(compiler)
     auto_ptr<syntax::parse_node> Tree( C(fp) );
     if( Tree.is_valid() )
     {
-        
+        {
+            ios::ocstream out( "c.dot", false );
+            Tree->graphviz("G", out);
+        }
+        system("dot -Tpng c.dot -o c.png");
     }
 }
 YOCTO_UNIT_TEST_DONE()

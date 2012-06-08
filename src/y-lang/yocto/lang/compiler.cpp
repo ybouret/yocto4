@@ -23,19 +23,34 @@ namespace yocto
             //------------------------------------------------------------------
             // declare terminals
             //------------------------------------------------------------------
-            syntax::terminal &RULEID = terminal( "Rule Name", "[:word:]+" );
-            syntax::terminal &REGEXP = terminal( "Reg. Exp.", "[:cstring:]");
+            syntax::terminal &RULEID = terminal( "RULEID", "[:word:]+" );
+            syntax::terminal &REGEXP = terminal( "REGEXP", "[:cstring:]");
             syntax::terminal &COLUMN = terminal( ":",         ":", syntax::is_discardable );
             syntax::terminal &END    = terminal( ";",         ";", syntax::is_discardable );
+            syntax::terminal &LPAREN = terminal( "LPAREN",    "(", syntax::is_discardable );
+            syntax::terminal &RPAREN = terminal( "RPAREN",    ")", syntax::is_discardable );
             
             syntax::aggregate &RULE  = agg( "RULE" );
+            //------------------------------------------------------------------
+            // Rule prolog
+            //------------------------------------------------------------------
             RULE << RULEID << COLUMN;
             
-            RULE &= REGEXP;
             
+            
+            //------------------------------------------------------------------
+            // Rule body
+            //------------------------------------------------------------------
+            //RULE &= rep("ELEMENTS",ELEMENT,1);
+            
+            //------------------------------------------------------------------
+            // Rule epilog
+            //------------------------------------------------------------------
             RULE &= END;
             
-            
+            //------------------------------------------------------------------
+            // and the grammar
+            //------------------------------------------------------------------
             syntax::repeating &GRAMMAR = rep("RULES",RULE,1);
             set_root(GRAMMAR);
         }
@@ -43,14 +58,14 @@ namespace yocto
         
         syntax::parse_node * compiler:: operator()( ios::istream &fp )
         {
-           
+            
             regex::source       Source( fp );
             reset();
             syntax::parse_node *Tree = accept(*this, Source);
-            
+            Tree->AST();
             return Tree;
         }
-
+        
         
     }
     
