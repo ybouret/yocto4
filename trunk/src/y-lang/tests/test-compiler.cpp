@@ -21,6 +21,7 @@ YOCTO_UNIT_TEST_IMPL(compiler)
             ios::ocstream out( "c.dot", false );
             Tree->graphviz("G", out);
         }
+        std::cerr << "Graphviz..." << std::endl;
         system("dot -Tpng c.dot -o c.png");
     }
 }

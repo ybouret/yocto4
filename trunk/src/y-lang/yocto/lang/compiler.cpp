@@ -23,25 +23,25 @@ namespace yocto
             //------------------------------------------------------------------
             // declare terminals
             //------------------------------------------------------------------
-            syntax::terminal &RULEID = terminal( "RULEID", "[:word:]+" );
-            syntax::terminal &REGEXP = terminal( "REGEXP", "[:cstring:]");
-            syntax::terminal &COLUMN = terminal( ":",         ":", syntax::is_discardable );
-            syntax::terminal &END    = terminal( ";",         ";", syntax::is_discardable );
-            syntax::terminal &LPAREN = terminal( "LPAREN",    "(", syntax::is_discardable );
-            syntax::terminal &RPAREN = terminal( "RPAREN",    ")", syntax::is_discardable );
-            
+            syntax::terminal &RULEID   = terminal( "RULEID", "[:word:]+" );
+            syntax::terminal &REGEXP   = terminal( "REGEXP", "[:cstring:]");
+            syntax::terminal &COLUMN   = terminal( ":",         ":", syntax::is_discardable );
+            syntax::terminal &END      = terminal( ";",         ";", syntax::is_discardable );
+            //syntax::terminal &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
+            //syntax::terminal &RPAREN   = terminal( "RPAREN",    "\\)", syntax::is_discardable );
+            //syntax::terminal &MODIFIER = terminal( "MODIFIER", "[*+?]" ); 
+            //syntax::terminal &ALT      = terminal( "ALT",      "\\|", syntax::is_discardable);
             syntax::aggregate &RULE  = agg( "RULE" );
             //------------------------------------------------------------------
             // Rule prolog
             //------------------------------------------------------------------
             RULE << RULEID << COLUMN;
             
-            
-            
+                      
             //------------------------------------------------------------------
             // Rule body
             //------------------------------------------------------------------
-            //RULE &= rep("ELEMENTS",ELEMENT,1);
+            RULE &= REGEXP;
             
             //------------------------------------------------------------------
             // Rule epilog
@@ -67,6 +67,7 @@ namespace yocto
         }
         
         
+                
     }
     
 }
