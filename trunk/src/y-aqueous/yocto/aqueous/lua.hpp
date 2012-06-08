@@ -24,8 +24,6 @@ namespace yocto
             static void load( lua_State *L, chemsys     &cs,  const string &csname  );
             static void load( lua_State *L, initializer &ini, const string &ininame );
             
-            static void push( lua_State *L, const solution &s );
-            
         };
         
     }
