@@ -23,7 +23,7 @@ namespace yocto
             if( rules.head->match(Lexer,Source,Tree) ) 
             {
                 auto_ptr<syntax::parse_node> ans( Tree );
-                if( Lexer.is_active(Source) )
+                if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
                 {
                     const lexeme *lx = Lexer.peek();
                     throw exception("%s: illegal extraneous token '%s'", name.c_str(), lx->label.c_str() );
