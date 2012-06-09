@@ -7,63 +7,63 @@ namespace yocto
 {
 	namespace aqueous
 	{
-
+        
 		double constraint:: fixed( double ) const throw()
 		{
 			return fixedValue;
 		}
-
+        
 		constraint::~ constraint() throw() {}
-
+        
 #if defined(_MSC_VER)
 		// this in ctor
 #pragma warning ( disable : 4355 )
 #endif
 		constraint:: constraint( const library &L, double v ) :
 		value( this, & constraint::fixed ),
-			coefficients(),
-			lib(L),
-			fixedValue(v)
+        coefficients(),
+        fixedValue(v),
+        lib(L)
 		{}
-
+        
 		constraint:: constraint( const library &L, const initproc &v ) :
 		value( v ),
-			coefficients(),
-			lib(L),
-			fixedValue(0)
+        coefficients(),
+        fixedValue(0),
+        lib(L)
 		{}
-
-
-
+        
+        
+        
 		void constraint:: add( const string &id, double w )
 		{
 			if( ! lib.search(id) )
 				throw exception("constraint( no '%s' )", id.c_str() );
-
+            
 			if( ! coefficients.insert(id, w) )
 				throw exception("constraint( multiple '%s' )", id.c_str() );
 		}
-
-
+        
+        
 		initializer:: ~initializer() throw()
 		{
 		}
-
+        
 		initializer:: initializer( const library &L ) throw() :
 		constraints(),
-			lib(L),
-			is_variable( false )
+        lib(L),
+        is_variable( false )
 		{
 		}
-
-
+        
+        
 		constraint & initializer:: create( double v )
 		{
 			constraint::ptr p( new constraint(lib,v) );
 			constraints.push_back(p);
 			return *p;
 		}
-
+        
 		constraint & initializer:: create( const initproc &v )
 		{
 			constraint::ptr p( new constraint(lib,v) );
@@ -71,25 +71,25 @@ namespace yocto
 			(bool&)is_variable = true;
 			return *p;
 		}
-
-
-
+        
+        
+        
 		static inline bool is_acceptable( const array<double> &C )
 		{
 			size_t       num_pos = 0;
 			size_t       num_neg = 0;
 			const size_t count   = C.size();
-
+            
 			for( size_t i=count; i > 0 ; --i )
 			{
 				const double C_i = C[i];
 				if( C_i > 0 ) ++num_pos; else ++num_neg;
 			}
-
+            
 			return num_pos > num_neg;
 		}
-
-
+        
+        
 		static inline double get_max_of( const array<double> &U )
 		{
 			const size_t count = U.size();
@@ -102,17 +102,17 @@ namespace yocto
 			}
 			return ans;
 		}
-
+        
 		void initializer:: operator()( chemsys &cs, double t )
 		{
-			std::cerr << "# Initializing system" << std::endl;
+			//std::cerr << "# Initializing system" << std::endl;
 			array<double> &C  = cs.C;
 			const size_t   M  = C.size();
 			const size_t   N  = cs.size();
 			const size_t   Nc = constraints.size();
 			if( Nc+N != M )
 				throw exception("#constraints mismatch!");
-
+            
 			if( Nc > 0 )
 			{
 				//-- local variables
@@ -125,7 +125,7 @@ namespace yocto
 				matrix<double> F2(M,M);
 				matrix<double> G(M,M);
 				vector<double> Y(N,0.0);
-
+                
 				//-- aliased variables
 				array<double> &dY     = cs.xi;
 				matrix<double> &W     = cs.W;
@@ -133,13 +133,13 @@ namespace yocto
 				const double    ftol  = cs.ftol;
 				array<double>  &Gamma = cs.Gamma;
 				linsys<double> &solver = cs.solver;
-
+                
 				//==============================================================
 				//
 				// decode constraints
 				//
 				//==============================================================
-				std::cerr << "# Decoding Linear Constraints" << std::endl;
+				//std::cerr << "# Decoding Linear Constraints" << std::endl;
 				for( size_t i=1; i <= Nc; ++i )
 				{               
 					const constraint &c = *(constraints[i]);
@@ -152,9 +152,9 @@ namespace yocto
 							P[i][j] = *pW;
 					}
 				}
-				std::cerr << "P=" << P << std::endl;
-				std::cerr << "V=" << V << std::endl;
-
+				//std::cerr << "P=" << P << std::endl;
+				//std::cerr << "V=" << V << std::endl;
+                
 				//==============================================================
 				//
 				// compute constant part with J = P' * inv(P*P')
@@ -172,9 +172,9 @@ namespace yocto
 					algebra<double>::mul_ltrn(J, P, iP2);
 				}
 				algebra<double>::mul(C0, J, V);
-				std::cerr << "C0=" << C0 << std::endl;
-
-BUILD_Q:
+				//std::cerr << "C0=" << C0 << std::endl;
+                
+            BUILD_Q:
 				//--------------------------------------------------------------
 				// complete P into F = invertible matrix
 				//--------------------------------------------------------------
@@ -189,7 +189,7 @@ BUILD_Q:
 							F2[i][j] = F[i][j] = alea<double>();
 				}
 				while( !solver.LU(F2) );
-
+                
 				//--------------------------------------------------------------
 				// make an orthonormal sub-matrix => Q
 				//--------------------------------------------------------------
@@ -201,23 +201,23 @@ BUILD_Q:
 						Q[k][j] = G[i][j];
 					}
 				}
-				std::cerr << "Q=" << Q << std::endl;
-
-
+				//std::cerr << "Q=" << Q << std::endl;
+                
+                
 				//==============================================================
 				//
 				// modified newton
 				//
 				//==============================================================
-				std::cerr << "# Modified Newton Step" << std::endl;
-
-
+				//std::cerr << "# Modified Newton Step" << std::endl;
+                
+                
 				solver.ensure(N);
 				//--------------------------------------------------------------
 				// find a valid starting point
 				//--------------------------------------------------------------
-NEWTON_INIT:
-				std::cerr << "# Looking for a starting point" << std::endl;
+            NEWTON_INIT:
+				//std::cerr << "# Looking for a starting point" << std::endl;
 				do {
 					for( size_t j=N; j>0; --j )
 						Y[j] = 1e-5 * ( 0.5 - alea<double>());
@@ -225,12 +225,12 @@ NEWTON_INIT:
 					algebra<double>::add(C,C0);
 				}
 				while( !is_acceptable(C) );
-
-				std::cerr << "# Newton iterations" << std::endl;
+                
+				//std::cerr << "# Newton iterations" << std::endl;
 				//--------------------------------------------------------------
 				// compute newton step
 				//--------------------------------------------------------------
-NEWTON_STEP:
+            NEWTON_STEP:
 				cs.computeGammaAndPhi(t,false);
 				algebra<double>::mul_rtrn(W, Phi, Q);
 				if( ! solver.LU(W) )
@@ -238,12 +238,12 @@ NEWTON_STEP:
 				for( size_t i=N;i>0;--i)
 					dY[i] = -Gamma[i];
 				solver(W,dY);
-
+                
 				//--------------------------------------------------------------
 				// update Y
 				//--------------------------------------------------------------
 				bool converged = true;
-
+                
 				for( size_t i=N;i>0;--i)
 				{
 					const double dY_i = dY[i];
@@ -251,7 +251,7 @@ NEWTON_STEP:
 					if( Fabs(dY_i) > Fabs( ftol * Y_i ) )
 						converged = false;
 				}
-
+                
 				//--------------------------------------------------------------
 				// corresponding C
 				//--------------------------------------------------------------
@@ -259,16 +259,16 @@ NEWTON_STEP:
 				algebra<double>::add(C,C0);
 				if( !converged ) 
 					goto NEWTON_STEP;
-
+                
 				//==============================================================
 				//
 				// Check position and signess of solution
 				//
 				//==============================================================
-				std::cerr << "# Newton Result" << std::endl;
-				std::cerr << "Y=" << Y << std::endl;
-				std::cerr << "C=" << C << std::endl;
-
+				//std::cerr << "# Newton Result" << std::endl;
+				//std::cerr << "Y=" << Y << std::endl;
+				//std::cerr << "C=" << C << std::endl;
+                
 				{
 					double maxAbsC = 0;
 					for( size_t i=M; i >0; --i ) 
@@ -279,12 +279,12 @@ NEWTON_STEP:
 					}
 					if( maxAbsC < 0 )
 					{
-						std::cerr << "# SIGN RESTART!" << std::endl;
+						//std::cerr << "# SIGN RESTART!" << std::endl;
 						goto BUILD_Q; //!< numeric problem
 					}
 				}
-
-
+                
+                
 				//==============================================================
 				//
 				// numeric corrections : project onto P
@@ -292,14 +292,14 @@ NEWTON_STEP:
 				//==============================================================
 				vector<double> U(Nc,0.0);
 				array<double>  &dC    = cs.dC;
-
+                
 				//--------------------------------------------------------------
 				// how far are we, initially
 				//--------------------------------------------------------------
 				algebra<double>::mul(U,P,C);
 				algebra<double>::sub(U,V);
 				double old_norm = get_max_of(U);
-
+                
 				//--------------------------------------------------------------
 				// project as best as we can
 				//--------------------------------------------------------------
@@ -314,43 +314,43 @@ NEWTON_STEP:
 						break;
 					old_norm = new_norm;
 				}
-				std::cerr << "C=" << C << std::endl;
-
+				//std::cerr << "C=" << C << std::endl;
+                
 				//==============================================================
 				//
 				// Find the cutoff
 				//
 				//==============================================================
-
+                
 				// -- recompute Y
 				algebra<double>::mul(Y,Q,C);
-
+                
 				//-- compute the fractional Y
 				for( size_t i=N; i>0; --i ) Y[i] *= ftol;
-
+                
 				//- deduce the error on C
 				algebra<double>::mul_trn(dC,Q,Y);
-				std::cerr << "dC=" << dC << std::endl;
-
+				//std::cerr << "dC=" << dC << std::endl;
+                
 				//-- cutoff
 				for( size_t j=M; j>0; --j )
 				{
 					if( C[j] <= fabs(dC[j]) ) C[j] = 0;
 				}
-				std::cerr << "C=" << C << std::endl;
-
+				//std::cerr << "C=" << C << std::endl;
+                
 				//==============================================================
 				//
 				// normalize the solution
 				//
 				//==============================================================
 				cs.normalize(t);
-				std::cerr << "C=" << C << std::endl;
-
+				//std::cerr << "C=" << C << std::endl;
+                
 			}
-
+            
 		}
-
+        
 		void initializer:: electroneutrality()
 		{
 			constraint &c = create(0.0);
@@ -360,10 +360,10 @@ NEWTON_STEP:
 				c.add(sp.name, sp.z);
 			}
 		}
-
+        
 		size_t initializer:: size() const throw() { return constraints.size(); }
-
-
+        
+        
 	}
-
+    
 }

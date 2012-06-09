@@ -21,28 +21,6 @@ YOCTO_UNIT_TEST_IMPL(lua)
     
     solution s(lib);
     
-    Lua::State VM;
-    lua_State *L = VM();
     
-    {
-        const string code = 
-        "function display(S)\n"
-        "print( \"#items=\" .. table.getn(S) );\n"
-        "for i,line in ipairs(S) do\n"
-        "    print(i,line);\n"
-        "end\n"
-        "end\n";
-        Lua::Config::DoString(L,code);
-    }
-    
-    lua_settop(L,0);
-    lua_getglobal(L, "display");
-    if( !lua_isfunction(L, -1) )
-        throw exception("Invalid Lua Function");
-    _lua::push(L,s);
-    
-    
-    std::cerr <<"#=" << lua_objlen(L, -1) << std::endl;
-    if( lua_pcall(L,1,0,0) ) throw exception( "%s", lua_tostring(L,-1) );
 }
 YOCTO_UNIT_TEST_DONE()

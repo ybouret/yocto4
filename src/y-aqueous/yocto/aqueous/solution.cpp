@@ -143,6 +143,16 @@ namespace yocto
             }
         }
         
+        void solution:: ldz() throw()
+        {
+            component::iterator i     = components.begin();
+            for( size_t k=1; k <= size; ++k, ++i )
+            {
+                (*i).C = 0;
+            }
+        }
+
+        
         double solution:: pH() const
         {
             return -log10( (*this)["H+"] );
