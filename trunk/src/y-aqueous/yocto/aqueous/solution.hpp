@@ -51,6 +51,7 @@ namespace yocto
             friend std::ostream & operator<<( std::ostream &, const solution & );
             
             void mul( double a ) throw();
+            void ldz() throw(); //!< set to zero
             
             double pH() const;
             

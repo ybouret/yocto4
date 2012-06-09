@@ -48,7 +48,7 @@ namespace yocto
             return (*this)[id];
         }
         
-        
+                
     }
     
 }

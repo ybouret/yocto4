@@ -52,7 +52,7 @@ namespace yocto
             species &       operator[]( const char *name );
             const species & operator[]( const char *name ) const;
             
-            
+                      
         private:
             const size_t nx;
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
