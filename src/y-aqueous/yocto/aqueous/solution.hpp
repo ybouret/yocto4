@@ -42,6 +42,9 @@ namespace yocto
             double &       operator[]( const char *name );
             const double & operator[]( const char *name ) const;
             
+            double       & operator()( size_t i) throw();
+            const double & operator()(size_t i) const throw();
+            
             double sum_zC() const throw();
             
             void put( array<double> &vec ) const throw();
