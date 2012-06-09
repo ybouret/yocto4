@@ -7,11 +7,13 @@
 MESSAGE( STATUS "<FLTK>" )
 
 ########################################################################
+##
 ## fltk-config and fluid
+##
 ########################################################################
 SET(FLTK_FOUND OFF)
 
-SET(FLTK_BIN $ENV{FLTK_BIN} CACHE STRING "Overide fltk-config location" )
+SET(FLTK_BIN $ENV{FLTK_BIN} CACHE STRING "Override fltk-config location" )
 IF( "" STREQUAL "${FLTK_BIN}" )
 	
 	# automatic detection
@@ -44,14 +46,15 @@ MESSAGE( STATUS "  @FLTK fltk-config='${FLTK-CONFIG}'" )
 MESSAGE( STATUS "  @FLTK fluid='${FLUID}" )
 
 ########################################################################
+##
 ## Compilation
+##
 ########################################################################
 
 #-----------------------------------------------------------------------
 # get cxxflags 
 #-----------------------------------------------------------------------
 MESSAGE( STATUS "  @FLTK query cxxflags..." )
-#EXECUTE_PROCESS( COMMAND "bash ${FLTK-CONFIG} --cxxflags" OUTPUT_VARIABLE FLTK-CXXFLAGS ERROR_VARIABLE FLTK-BUG OUTPUT_STRIP_TRAILING_WHITESPACE )
 EXEC_PROGRAM( bash ARGS ${FLTK-CONFIG} --cxxflags OUTPUT_VARIABLE FLTK-CXXFLAGS)
 MESSAGE( STATUS "  @FLTK-CXXFLAGS='${FLTK-CXXFLAGS}'" )
 
@@ -106,7 +109,6 @@ MACRO(TARGET_LINK_FLTK THE_TARGET)
 	MESSAGE( STATUS "${THE_TARGET} needs '${FLTK-LIBS}'")
 	
 	#and declare libraries to be linked !
-	#SET_TARGET_PROPERTIES( ${THE_TARGET} PROPERTIES LINK_FLAGS "${FLTK-LDFLAGS}" )
 	TARGET_LINK_LIBRARIES(${THE_TARGET} ${FLTK-LIBS})
 ENDMACRO(TARGET_LINK_FLTK)
 
