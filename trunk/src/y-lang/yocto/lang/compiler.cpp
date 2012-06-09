@@ -27,10 +27,10 @@ namespace yocto
             syntax::terminal &REGEXP   = terminal( "REGEXP", "[:cstring:]");
             syntax::terminal &COLUMN   = terminal( ":",         ":", syntax::is_discardable );
             syntax::terminal &END      = terminal( ";",         ";", syntax::is_discardable );
-            //syntax::terminal &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
-            //syntax::terminal &RPAREN   = terminal( "RPAREN",    "\\)", syntax::is_discardable );
-            //syntax::terminal &MODIFIER = terminal( "MODIFIER", "[*+?]" ); 
-            //syntax::terminal &ALT      = terminal( "ALT",      "\\|", syntax::is_discardable);
+            syntax::terminal &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
+            syntax::terminal &RPAREN   = terminal( "RPAREN",    "\\)", syntax::is_discardable );
+            syntax::terminal &MODIFIER = terminal( "MODIFIER", "[*+?]" ); 
+            syntax::terminal &ALT      = terminal( "ALT",      "\\|", syntax::is_discardable);
             syntax::aggregate &RULE  = agg( "RULE" );
             //------------------------------------------------------------------
             // Rule prolog
@@ -39,9 +39,28 @@ namespace yocto
             
                       
             //------------------------------------------------------------------
-            // Rule body
+            // Rule content
             //------------------------------------------------------------------
-            RULE &= REGEXP;
+            syntax::aggregate &ELEMENT = agg("ELEMENT");
+            syntax::repeating &ELEMENTS = rep("ELEMENTS",ELEMENT,1);
+            syntax::alternate &ATOM = alt("ATOM");
+            ATOM |= RULEID;
+            ATOM |= REGEXP;
+            
+            syntax::alternate &ALT_EXPR = alt("ALT_EXPR");
+            ALT_EXPR |= ATOM;
+            syntax::aggregate &EXPR = agg("EXPR");
+            EXPR << LPAREN << ELEMENTS << RPAREN;
+            ALT_EXPR |= EXPR;
+            
+            ELEMENT &= ALT_EXPR;
+            ELEMENT &= opt("OPT_MODIFIER",MODIFIER);
+            
+            syntax::aggregate &ALTERNATE = agg("ALTERNATE");
+            ALTERNATE << ALT << ELEMENTS;
+            
+            RULE &= ELEMENTS;
+            RULE &= rep("OTHER_ELEMENTS",ALTERNATE,0);
             
             //------------------------------------------------------------------
             // Rule epilog

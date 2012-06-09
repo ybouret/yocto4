@@ -181,6 +181,16 @@ namespace yocto
             return components.end();
         }
         
+        double       & solution:: operator()( size_t i) throw()
+        {
+            return components(i).C;
+        }
+        
+        const double       & solution:: operator()( size_t i) const throw()
+        {
+            return components(i).C;
+        }
+
     }
     
 }
