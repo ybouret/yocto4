@@ -25,8 +25,8 @@ namespace yocto
 			
 			os.append("digraph ");
 			os.append( graph_name );
+            os.append(" {\n");
             os.append("rankdir=TB;\nordering=out;\n");
-			os.append(" {\n");
 			viz( os );
 			os.append("}\n");
 			
