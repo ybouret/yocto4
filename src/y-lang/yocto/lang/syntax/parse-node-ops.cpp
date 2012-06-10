@@ -45,20 +45,34 @@ namespace yocto
                     while( tmp.size > 0 )
                     {
                         parse_node *node = tmp.pop_front();
-                        if( node->flags == syntax::is_merging )
+                        switch( node->flags )
                         {
-                            assert(node->terminal==0);
-                            child_list &sub = node->children();
-                            while( sub.size )
+                            case syntax:: is_merging_one:
+                                assert(node->terminal==0);
+                                if(node->children().size > 1)
+                                {
+                                    chl.push_back(node);
+                                    break;
+                                }
+                                // else merge...
+                            case syntax:: is_merging_all:
+                                assert(node->terminal==0); 
                             {
-                                parse_node *child = sub.pop_front();
-                                child->parent = this;
-                                chl.push_back(child);
+                                child_list &sub = node->children();
+                                while( sub.size )
+                                {
+                                    parse_node *child = sub.pop_front();
+                                    child->parent = this;
+                                    chl.push_back(child);
+                                }
+                                delete node;
                             }
-                            delete node;
+                                break;
+                            default:
+                                chl.push_back(node);
+                                break;
                         }
-                        else
-                            chl.push_back(node);
+                        
                     }
                 }
             }
@@ -93,7 +107,7 @@ namespace yocto
                     --depth;
                 }
             }
-
+            
             void  parse_node:: output( ios::ostream &fp ) const
             {
                 size_t depth = 0;
