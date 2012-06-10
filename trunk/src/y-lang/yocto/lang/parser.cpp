@@ -1,4 +1,5 @@
 #include "yocto/lang/parser.hpp"
+#include "yocto/rx/pattern/basic.hpp"
 
 namespace yocto 
 {
@@ -18,14 +19,19 @@ namespace yocto
         {
         }
         
-
+        
         syntax::terminal &parser:: terminal( const string &id, const string &expr, syntax::node_property ppty   )
         {
             scan.make(id,expr);
             return term(id,ppty);
         }
-
-
+        
+        syntax::terminal & parser:: terminal( const string &id, const char    single, syntax::node_property ppty  )
+        {
+            scan.make(id, regex::basic::single::create(single));
+            return term(id,ppty);
+        }
+        
     }
-
+    
 }

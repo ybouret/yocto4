@@ -24,7 +24,8 @@ namespace yocto
             lexical::scanner &scan; 
             
             //! make a terminal for lexer and for grammar
-            syntax::terminal &terminal( const string &id, const string &expr, syntax::node_property ppty = syntax::is_regular );
+            syntax::terminal &terminal( const string &id, const string &expr,   syntax::node_property ppty = syntax::is_regular );
+            syntax::terminal &terminal( const string &id, const char    single, syntax::node_property ppty = syntax::is_regular );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);

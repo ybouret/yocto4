@@ -220,6 +220,41 @@ namespace yocto
 				push_front( unlink(node) );
 			}
 			
+            inline NODE* replace( NODE *mine, NODE *yours ) throw()
+            {
+                assert( owns(mine) );
+                assert( NULL == yours->prev );
+                assert( NULL == yours->next );
+                if( head == mine )
+                {
+                    NODE *node = pop_front();
+                    push_front(yours);
+                    return node;
+                }
+                else
+                {
+                    if( tail == mine )
+                    {
+                        NODE *node = pop_back();
+                        push_back(yours);
+                        return node;
+                    }
+                    else
+                    {
+                        assert( size > 2 );
+						NODE *next  = mine->next;
+						NODE *prev  = mine->prev;
+						next->prev  = yours;
+						prev->next  = yours;
+                        yours->prev = prev;
+                        yours->next = next;
+						mine->next  = NULL;
+						mine->prev  = NULL;
+						return mine;
+                    }
+                }
+            }
+            
 					
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(list_of);

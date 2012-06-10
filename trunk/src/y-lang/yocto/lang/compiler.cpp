@@ -23,8 +23,9 @@ namespace yocto
             //------------------------------------------------------------------
             // declare terminals
             //------------------------------------------------------------------
-            syntax::terminal  &RULEID   = terminal( "ID", "[:word:]+" );
-            syntax::terminal  &REGEXP   = terminal( "XP", "[:cstring:]");
+            syntax::terminal  &RULEID   = terminal( "RULEID", "[:word:]+" );
+            syntax::terminal  &REGEXP   = terminal( "REGEXP", "[:cstring:]");
+            syntax::terminal  &SINGLE   = terminal( "SINGLE", "'[\\x20-\\x7F]'");
             syntax::terminal  &COLUMN   = terminal( ":",         ":", syntax::is_discardable );
             syntax::terminal  &END      = terminal( ";",         ";", syntax::is_discardable );
             syntax::terminal  &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
@@ -55,12 +56,12 @@ namespace yocto
             ALT << BAR << ELEMENTS;
             syntax::repeating &OTHER= rep("OTHER", ALT,0);
             GROUP << LPAREN << ELEMENTS << RPAREN;
-            ATOM << RULEID << REGEXP << GROUP;
+            ATOM << RULEID << REGEXP << SINGLE << GROUP;
             ITEM << ATOM << MODIFIER << OTHER;
             
             RULE &= ELEMENTS;
             
-           
+            
             //------------------------------------------------------------------
             // Rule epilog
             //------------------------------------------------------------------
@@ -80,7 +81,23 @@ namespace yocto
             reset();
             syntax::parse_node *Tree = accept(*this, Source);
             Tree->AST();
+            rewrite(Tree);
             return Tree;
+        }
+        
+        
+        
+        void compiler::rewrite( syntax::parse_node *node )
+        {
+            assert(node!=NULL);
+            if( ! node->terminal )
+            {
+                //syntax::parse_node::child_list &children = node->children();
+                if( node->label == "ALT" )
+                {
+                    
+                }
+            }
         }
         
         
