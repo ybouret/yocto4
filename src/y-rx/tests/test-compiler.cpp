@@ -20,6 +20,7 @@ YOCTO_UNIT_TEST_IMPL(compiler)
 	{
 		regex::pattern_dict dict;
 		dict.record( "DIGIT", regex::posix::digit() );
+        dict.record( "DIGITS", "[1-9]{DIGIT}*" );
 		const string expr = argv[1];
 		std::cerr << "-- compiling '" << expr << "'" << std::endl;
 		auto_ptr<regex::pattern> p( regex::compile( expr, &dict ) );

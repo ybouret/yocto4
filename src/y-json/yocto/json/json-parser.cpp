@@ -41,6 +41,7 @@ namespace yocto
                 // declare JSON terminals
                 //
                 //--------------------------------------------------------------
+               
                 scan.make("LBRACK","\\[" );
                 scan.make("RBRACK","\\]" );
                 scan.make("LBRACE", "\\{");
@@ -49,7 +50,7 @@ namespace yocto
                 scan.make("null",   "null" );
                 scan.make("true",   "true" );
                 scan.make("false",  "false" );
-                scan.make("NUMBER", "[:digit:]+" );
+                scan.make("NUMBER", "-?[1-9][0-9]*([.][0-9]+)?([e|E][-+]?[0-9]+)?" );
                 scan.make("COLUMN", ":");
                 scan.call("JSON::String",  "\"", this, &Impl::OnEnterString);
                 scan.make( "BLANKS", "[ \t]+", & scan.discard );
@@ -243,7 +244,7 @@ namespace yocto
                 {
                     value.make( IsNumber );
                     const string str = node->lex()->to_string();
-                    value.asNumber() = strconv::to_real<double>( str );
+                    value.asNumber() = strconv::to_real<double>( str, "JSON::Number");
                     return;
                 }
                 
