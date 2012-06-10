@@ -191,6 +191,26 @@ namespace yocto
             return components(i).C;
         }
 
+        
+        void solution:: save_header( ios::ostream &fp ) const
+        {
+            component::const_iterator i     = components.begin();
+            for( size_t k=1; k <= size; ++k, ++i )
+            {
+                fp(" \"%s\"", (*i).name.c_str());
+            }
+        }
+        
+        void solution:: save_values( ios::ostream &fp ) const
+        {
+            component::const_iterator i     = components.begin();
+            for( size_t k=1; k <= size; ++k, ++i )
+            {
+                fp(" %.15g", (*i).C);
+            }
+        }
+
+
     }
     
 }

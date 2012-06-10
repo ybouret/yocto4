@@ -2,6 +2,7 @@
 #define YOCTO_AQUEOUS_SOLUTION_INCLUDED 1
 
 #include "yocto/aqueous/library.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto 
 {
@@ -63,6 +64,8 @@ namespace yocto
             component::const_iterator begin() const;
             component::const_iterator end() const;
             
+            void save_header( ios::ostream &fp ) const;
+            void save_values( ios::ostream &fp ) const;
             
         private:
             component::db   components;
