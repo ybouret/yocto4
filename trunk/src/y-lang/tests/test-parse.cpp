@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
         ITEM( ID   );
         ITEM( List );
         
-        syntax::aggregate & TAIL = G.agg("TAIL",syntax::is_merging);
+        syntax::aggregate & TAIL = G.agg("TAIL",syntax::is_merging_all);
         TAIL( G.term("COMA",syntax::is_discardable) );
         TAIL( ITEM           );
         

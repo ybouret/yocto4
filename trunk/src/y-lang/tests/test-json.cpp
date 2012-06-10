@@ -56,7 +56,7 @@ YOCTO_UNIT_TEST_IMPL(json)
     syntax::alternate &ARRAY    = G.alt("ARRAY");
     
     {
-        syntax::aggregate &OTHER_VALUE = G.agg("OTHER_VALUE", syntax::is_merging);
+        syntax::aggregate &OTHER_VALUE = G.agg("OTHER_VALUE", syntax::is_merging_all);
         OTHER_VALUE << COMMA << VALUE;
         
         syntax::repeating &OTHER_VALUES = G.rep("OTHER_VALUES", OTHER_VALUE, 0);
@@ -77,7 +77,7 @@ YOCTO_UNIT_TEST_IMPL(json)
         syntax::aggregate &ITEM = G.agg("ITEM");
         ITEM << STRING << COLUMN << VALUE;
         
-        syntax::aggregate &OTHER_ITEM = G.agg("OTHER_ITEM",syntax::is_merging);
+        syntax::aggregate &OTHER_ITEM = G.agg("OTHER_ITEM",syntax::is_merging_all);
         OTHER_ITEM << COMMA << ITEM;
         
         syntax::repeating &OTHER_ITEMS = G.rep("OTHER_ITEMS", OTHER_ITEM, 0 );

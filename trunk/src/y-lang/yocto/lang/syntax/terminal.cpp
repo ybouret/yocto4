@@ -18,7 +18,7 @@ namespace yocto
             {
                 switch( semantic )
                 {
-                    case is_merging:
+                    case is_merging_all:
                         throw exception("terminal<%s>: invalid property", id.c_str());
                     default:
                         break;

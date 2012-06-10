@@ -23,45 +23,44 @@ namespace yocto
             //------------------------------------------------------------------
             // declare terminals
             //------------------------------------------------------------------
-            syntax::terminal &RULEID   = terminal( "RULEID", "[:word:]+" );
-            syntax::terminal &REGEXP   = terminal( "REGEXP", "[:cstring:]");
-            syntax::terminal &COLUMN   = terminal( ":",         ":", syntax::is_discardable );
-            syntax::terminal &END      = terminal( ";",         ";", syntax::is_discardable );
-            syntax::terminal &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
-            syntax::terminal &RPAREN   = terminal( "RPAREN",    "\\)", syntax::is_discardable );
-            syntax::terminal &MODIFIER = terminal( "MODIFIER", "[*+?]" ); 
-            syntax::terminal &ALT      = terminal( "ALT",      "\\|", syntax::is_discardable);
-            syntax::aggregate &RULE  = agg( "RULE" );
+            syntax::terminal  &RULEID   = terminal( "ID", "[:word:]+" );
+            syntax::terminal  &REGEXP   = terminal( "XP", "[:cstring:]");
+            syntax::terminal  &COLUMN   = terminal( ":",         ":", syntax::is_discardable );
+            syntax::terminal  &END      = terminal( ";",         ";", syntax::is_discardable );
+            syntax::terminal  &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
+            syntax::terminal  &RPAREN   = terminal( "RPAREN",    "\\)", syntax::is_discardable );
+            syntax::terminal  &OPT      = terminal( "?", "\\?", syntax::is_specialized );
+            syntax::terminal  &REP0     = terminal( "*", "\\*", syntax::is_specialized );
+            syntax::terminal  &REP1     = terminal( "+", "\\+", syntax::is_specialized );
+            syntax::terminal  &BAR      = terminal( "BAR",      "\\|", syntax::is_discardable);
+            
+            syntax::alternate &MODIF  = alt("MODIF");
+            MODIF << OPT << REP0 << REP1;
+            syntax::optional  &MODIFIER = opt("MODIFIER",MODIF);
+            
+            syntax::aggregate &RULE     = agg( "RULE" );
             //------------------------------------------------------------------
             // Rule prolog
             //------------------------------------------------------------------
             RULE << RULEID << COLUMN;
             
-                      
             //------------------------------------------------------------------
             // Rule content
             //------------------------------------------------------------------
-            syntax::aggregate &ELEMENT = agg("ELEMENT");
-            syntax::repeating &ELEMENTS = rep("ELEMENTS",ELEMENT,1);
-            syntax::alternate &ATOM = alt("ATOM");
-            ATOM |= RULEID;
-            ATOM |= REGEXP;
-            
-            syntax::alternate &ALT_EXPR = alt("ALT_EXPR");
-            ALT_EXPR |= ATOM;
-            syntax::aggregate &EXPR = agg("EXPR");
-            EXPR << LPAREN << ELEMENTS << RPAREN;
-            ALT_EXPR |= EXPR;
-            
-            ELEMENT &= ALT_EXPR;
-            ELEMENT &= opt("OPT_MODIFIER",MODIFIER);
-            
-            syntax::aggregate &ALTERNATE = agg("ALTERNATE");
-            ALTERNATE << ALT << ELEMENTS;
+            syntax::alternate &ATOM     = alt("ATOM");
+            syntax::aggregate &ITEM     = agg("ITEM", syntax::is_merging_one );
+            syntax::repeating &ELEMENTS = rep("ELEMENTS", ITEM, 1);
+            syntax::aggregate &GROUP     = agg("GROUP", syntax::is_merging_one);
+            syntax::aggregate &ALT = agg("ALT");
+            ALT << BAR << ELEMENTS;
+            syntax::repeating &OTHER= rep("OTHER", ALT,0);
+            GROUP << LPAREN << ELEMENTS << RPAREN;
+            ATOM << RULEID << REGEXP << GROUP;
+            ITEM << ATOM << MODIFIER << OTHER;
             
             RULE &= ELEMENTS;
-            RULE &= rep("OTHER_ELEMENTS",ALTERNATE,0);
             
+           
             //------------------------------------------------------------------
             // Rule epilog
             //------------------------------------------------------------------
@@ -85,7 +84,7 @@ namespace yocto
         }
         
         
-                
+        
     }
     
 }

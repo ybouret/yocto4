@@ -102,7 +102,7 @@ namespace yocto
                     }
                     {
                         syntax::aggregate &ARRAY       = agg( "ARRAY" );
-                        syntax::aggregate &TAIL_VALUE  = agg( "TAIL_VALUE", syntax::is_merging );
+                        syntax::aggregate &TAIL_VALUE  = agg( "TAIL_VALUE", syntax::is_merging_all );
                         TAIL_VALUE << COMMA << VALUE;
                         
                         ARRAY << LBRACK << VALUE << rep( "ZERO_OR_MORE_TAIL_VALUE", TAIL_VALUE, 0 ) << RBRACK;
@@ -125,7 +125,7 @@ namespace yocto
                     {
                         syntax::aggregate &PAIR = agg("PAIR");
                         PAIR << STRING << COLUMN << VALUE;
-                        syntax::aggregate &TAIL_PAIR = agg("TAIL_PAIR", syntax::is_merging);
+                        syntax::aggregate &TAIL_PAIR = agg("TAIL_PAIR", syntax::is_merging_all);
                         TAIL_PAIR << COMMA << PAIR;
                         syntax::aggregate &OBJECT = agg("OBJECT");
                         OBJECT << LBRACE << PAIR << rep("ZERO_OR_MORE_TAIL_PAIR", TAIL_PAIR, 0 ) << RBRACE;
