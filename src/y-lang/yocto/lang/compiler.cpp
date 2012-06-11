@@ -45,7 +45,6 @@ namespace yocto
             //------------------------------------------------------------------
             RULE << RULEID << COLUMN;
             
-#if 0
             //------------------------------------------------------------------
             // Rule content
             //------------------------------------------------------------------
@@ -61,7 +60,6 @@ namespace yocto
             ITEM << ATOM << MODIFIER << OTHER;
             
             RULE &= ELEMENTS;
-#endif
             
             //------------------------------------------------------------------
             // Rule epilog
@@ -76,6 +74,8 @@ namespace yocto
         }
         
        
+        
+        
               
         syntax::parse_node * compiler:: operator()( ios::istream &fp )
         {
