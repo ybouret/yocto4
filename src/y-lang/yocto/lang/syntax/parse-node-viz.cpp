@@ -18,7 +18,10 @@ namespace yocto
                 // link it to its parent
                 if( parent )
                 {
-                    regex::show_tag(fp, parent); fp.append(" -> "); regex::show_tag(fp,this); fp.append(";\n");
+                    assert( ! parent->terminal );
+                    const unsigned u = parent->children().index_of(this);
+                    regex::show_tag(fp, parent); fp.append(" -> "); regex::show_tag(fp,this); 
+                    fp(" [label=\"%u\"];\n",u);
                 }
                 if( !terminal )
                 {

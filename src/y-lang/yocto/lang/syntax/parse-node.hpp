@@ -54,7 +54,12 @@ namespace yocto
                 void  graphviz( const char   *id, ios::ostream &fp ) const;
                 void  out( ios::ostream &fp, size_t &depth ) const;
                 void  output( ios::ostream &fp ) const;
+              
+                //! remove discardable, drop specialized
                 void  AST() throw();
+                
+                //! unlink from parent
+                parse_node *unlink() throw();
                 
             private:
                 uint64_t wksp[ YOCTO_U64_FOR_ITEM(child_list) ];

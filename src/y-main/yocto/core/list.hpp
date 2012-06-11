@@ -255,6 +255,16 @@ namespace yocto
                 }
             }
             
+            inline size_t index_of( const NODE *node ) const throw()
+            {
+                assert( owns(node) );
+                size_t ans = 1;
+                for( const NODE *scan = head; scan!=node; scan=scan->next,++ans)
+                    ;
+                return ans;
+            }
+            
+            
 					
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(list_of);

@@ -8,18 +8,18 @@ decl {\#include "yocto/FL/Fl_Matte_Button.hpp"} {public global
 Function {MakeWindowMatte()} {open
 } {
   Fl_Window {} {
-    label {Matte Testing} open selected
+    label {Matte Testing} open
     xywh {581 158 324 162} type Double visible
   } {
     Fl_Button {} {
-      label button
-      xywh {25 87 63 23}
+      label button selected
+      xywh {30 112 115 23}
       code0 {o->color(FL_ORANGE);}
       class Fl_Matte_Button
     }
     Fl_Button {} {
       label button
-      xywh {95 87 63 23}
+      xywh {155 112 108 23}
       code0 {o->color(FL_RED);}
       class Fl_Matte_Button
     }
