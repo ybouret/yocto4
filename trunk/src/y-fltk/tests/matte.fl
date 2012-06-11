@@ -2,10 +2,26 @@
 version 1.0300 
 header_name {.h} 
 code_name {.cxx}
-Function {MakeWindowMatte()} {open selected
+decl {\#include "yocto/FL/Fl_Matte_Button.hpp"} {public global
+} 
+
+Function {MakeWindowMatte()} {open
 } {
   Fl_Window {} {
-    label {Matte Testing} open
-    xywh {581 158 267 187} type Double visible
-  } {}
+    label {Matte Testing} open selected
+    xywh {581 158 324 162} type Double visible
+  } {
+    Fl_Button {} {
+      label button
+      xywh {25 87 63 23}
+      code0 {o->color(FL_ORANGE);}
+      class Fl_Matte_Button
+    }
+    Fl_Button {} {
+      label button
+      xywh {95 87 63 23}
+      code0 {o->color(FL_RED);}
+      class Fl_Matte_Button
+    }
+  }
 } 

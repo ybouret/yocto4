@@ -1,5 +1,5 @@
 /* XPM */
-static char * ct_gry_dn_xpm[] = {
+static const char * ct_gry_dn_xpm[] = {
 "5 23 23 1",
 " 	c None",
 ".	c #5A5A5A",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * ct_cyn_up_xpm[] = {
+static const char * ct_cyn_up_xpm[] = {
 "5 23 24 1",
 " 	c None",
 ".	c #2F3855",

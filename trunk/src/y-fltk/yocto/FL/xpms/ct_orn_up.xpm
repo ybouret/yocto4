@@ -1,5 +1,5 @@
 /* XPM */
-static char * ct_orn_up_xpm[] = {
+static const char * ct_orn_up_xpm[] = {
 "5 23 23 1",
 " 	c None",
 ".	c #3C1B00",
