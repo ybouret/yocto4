@@ -23,8 +23,8 @@ effectors = {
     { "MCT", { "H+", "Ac-" }, { "H+", "AcH", "Ac-"} }
     };
 
-function MCT(t,h,am)
-    print( "MCT@t=" .. t);
+function MCT(t,zeta,h,am)
+    print( "MCT@t=" .. t .. ", zeta=" .. zeta );
     print( "h=" .. h .. ", am=" .. am );
     return 1,2,3;
 end

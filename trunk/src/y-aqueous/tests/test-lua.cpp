@@ -50,7 +50,7 @@ YOCTO_UNIT_TEST_IMPL(lua)
             throw exception("Missing MCT");
         
         _lua::effector &MCT = **ppEff;
-        MCT.call(L, ds, 1.0, s);
+        MCT.call(L, ds, 1.0, 0.0, s);
         std::cerr << "ds=" << std::endl << ds << std::endl;
     }
     
