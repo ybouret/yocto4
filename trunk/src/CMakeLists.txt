@@ -42,7 +42,6 @@ ENDMACRO(YOCTO_BUILD)
 # Record projects
 ########################################################################
 YOCTO_BUILD(thr)
-#YOCTO_BUILD(rx)
 YOCTO_BUILD(lang)
 YOCTO_BUILD(fs)
 YOCTO_BUILD(kr)
