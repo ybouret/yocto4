@@ -19,11 +19,6 @@ SET( lex_srcs ${lex_decl} ${lex_impl} )
 INSTALL( FILES ${lex_decl} DESTINATION include/yocto/rx/lexical )
 SOURCE_GROUP( rx/lexical FILES ${lex_srcs} )
 
-#FILE( GLOB syn_decl yocto/rx/syntactic/*.hpp)
-#FILE( GLOB syn_impl yocto/rx/syntactic/*.cpp)
-#SET( syn_srcs ${syn_decl} ${syn_impl} )
-#INSTALL( FILES ${syn_decl} DESTINATION include/yocto/rx/syntactic )
-#SOURCE_GROUP( rx/syntactic FILES ${syn_srcs} )
 
 FILE( GLOB syn_decl yocto/rx/syntax/*.hpp)
 FILE( GLOB syn_impl yocto/rx/syntax/*.cpp)

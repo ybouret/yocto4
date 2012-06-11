@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-json main.cpp ${test_srcs})
-TARGET_LINK_YOCTO( test-json json lang rx)
+TARGET_LINK_YOCTO( test-json json lang)
 
 ENABLE_TESTING()
 ADD_TEST(JSON_Value test-json value)
