@@ -43,7 +43,7 @@ namespace yocto
                 virtual ~effector() throw();
                 
                 //! append results to dSdt
-                void call( lua_State *L, solution &dSdt, double t, const solution &S ) const;
+                void call( lua_State *L, solution &dSdt, double t, double zeta, const solution &S ) const;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(effector);

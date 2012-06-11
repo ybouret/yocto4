@@ -125,7 +125,7 @@ namespace yocto
             
         }
         
-        void _lua::effector:: call( lua_State *L, solution &dSdt, double t, const solution &S ) const
+        void _lua::effector:: call( lua_State *L, solution &dSdt, double t, double zeta, const solution &S ) const
         {
             //------------------------------------------------------------------
             // get the function
@@ -141,6 +141,7 @@ namespace yocto
             // push the arguments
             //------------------------------------------------------------------
             lua_pushnumber(L, t);
+            lua_pushnumber(L, zeta);
             const size_t nIn = input.size();
             for( size_t i=1; i <= nIn; ++i )
             {
@@ -151,7 +152,7 @@ namespace yocto
             // call the function
             //------------------------------------------------------------------
             const size_t nOut = output.size();
-            if( lua_pcall(L, 1+nIn, output.size(), 0) )
+            if( lua_pcall(L, 2+nIn, output.size(), 0) )
                 throw exception("%s: %s", fn, lua_tostring(L, -1) );
             
             //------------------------------------------------------------------
