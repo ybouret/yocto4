@@ -1,0 +1,11 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cxx}
+Function {MakeWindowMatte()} {open selected
+} {
+  Fl_Window {} {
+    label {Matte Testing} open
+    xywh {581 158 267 187} type Double visible
+  } {}
+} 

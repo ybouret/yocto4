@@ -62,6 +62,7 @@ YOCTO_BUILD(pack)
 YOCTO_BUILD(json)
 YOCTO_BUILD(aqueous)
 YOCTO_BUILD(visit)
+YOCTO_BUILD(fltk)
 
 INSTALL( FILES 
 	share/create.sh 
