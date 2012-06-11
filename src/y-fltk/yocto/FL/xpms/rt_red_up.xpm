@@ -1,5 +1,5 @@
 /* XPM */
-static char * rt_red_up_xpm[] = {
+static const char * rt_red_up_xpm[] = {
 "5 23 44 1",
 " 	c None",
 ".	c #3C0000",

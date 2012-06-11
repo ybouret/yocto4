@@ -1,5 +1,5 @@
 /* XPM */
-static char * lt_red_dn_xpm[] = {
+static const const char * lt_red_dn_xpm[] = {
 "5 23 49 1",
 " 	c None",
 ".	c #3C0000",

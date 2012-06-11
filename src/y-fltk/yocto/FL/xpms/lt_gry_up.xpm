@@ -1,5 +1,5 @@
 /* XPM */
-static char * lt_gry_up_xpm[] = {
+static const char * lt_gry_up_xpm[] = {
 "5 23 54 1",
 " 	c None",
 ".	c #5A5A5A",

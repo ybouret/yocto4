@@ -1,5 +1,5 @@
 /* XPM */
-static char * lt_grn_dn_xpm[] = {
+static const char * lt_grn_dn_xpm[] = {
 "5 23 49 1",
 " 	c None",
 ".	c #043C00",
