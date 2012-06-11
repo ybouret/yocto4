@@ -121,16 +121,30 @@ namespace yocto
         
         std::ostream & operator<<( std::ostream &os, const solution &s )
         {
-            component::const_iterator i   = s.components.begin();
-            os << "/--------" << std::endl;
-            for( size_t k=1; k <= s.size; ++k, ++i )
+            size_t max_len = 0;
             {
-                const component &C = *i;
-                os << "| [";
-                os << C.name.c_str();
-                os << "] = " << C.C << std::endl;
+                for( component::const_iterator i   = s.components.begin(); i != s.components.end(); ++i )
+                {
+                    const size_t len = (*i).name.size();
+                    if( len > max_len ) max_len = len;
+                }
             }
-            os << "\\--------";
+            
+            {
+                component::const_iterator i   = s.components.begin();
+                os << "/--------" << std::endl;
+                for( size_t k=1; k <= s.size; ++k, ++i )
+                {
+                    const component &C = *i;
+                    os << "| [";
+                    os << C.name.c_str();
+                    os << "]";
+                    for( size_t j=max_len-C.name.size();j>0;--j)
+                        os << ' ';
+                    os << " = " << C.C << std::endl;
+                }
+                os << "\\--------";
+            }
             return os;
         }
         
@@ -151,14 +165,14 @@ namespace yocto
                 (*i).C = 0;
             }
         }
-
+        
         
         double solution:: pH() const
         {
             return -log10( (*this)["H+"] );
         }
-
-
+        
+        
         component::iterator solution::begin()
         {
             return components.begin();
@@ -190,7 +204,7 @@ namespace yocto
         {
             return components(i).C;
         }
-
+        
         
         void solution:: save_header( ios::ostream &fp ) const
         {
@@ -209,8 +223,8 @@ namespace yocto
                 fp(" %.15g", (*i).C);
             }
         }
-
-
+        
+        
     }
     
 }
