@@ -74,25 +74,55 @@ namespace yocto
             set_root(GRAMMAR);
         }
         
-        
-        syntax::parse_node * compiler:: operator()( ios::istream &fp )
+        static inline bool __is_modifier( const string &label ) throw()
         {
-            regex::source       Source( fp );
-            reset();
-            syntax::parse_node *Tree = accept(*this, Source);
-            Tree->AST();
-            rewrite(Tree);
-            return Tree;
+            return (label == "+") || (label == "?") || (label == "*");
         }
+
         
-        
-        
-        void compiler::rewrite( syntax::parse_node *node )
+        static inline
+        void __rewrite( syntax::parse_node *node )
         {
             assert(node!=NULL);
             if( ! node->terminal )
             {
-                //syntax::parse_node::child_list &children = node->children();
+                syntax::parse_node::child_list &chl = node->children();
+                for( syntax::parse_node *sub = chl.head; sub; sub=sub->next )
+                {
+                    __rewrite(sub);
+                }
+                
+                if( node->label == "ALT" )
+                {
+                    while(true)
+                    {
+                        syntax::parse_node *prev = node->prev;
+                        assert( prev != NULL );
+                        assert( prev->parent == node->parent );
+                        std::cerr << "rewrite [ALT]: taking " << node->prev->label << std::endl;
+                        chl.push_front( node->prev->unlink() );
+                        prev->parent = node;
+                        if( __is_modifier(prev->label) )
+                            continue;
+                        break;
+                    }
+                    
+                }
+            }
+        }
+
+        static inline
+        void __fusion( syntax::parse_node *node )
+        {
+            assert(node!=NULL);
+            if( ! node->terminal )
+            {
+                syntax::parse_node::child_list &chl = node->children();
+                for( syntax::parse_node *sub = chl.head; sub; sub=sub->next )
+                {
+                    __fusion(sub);
+                }
+                
                 if( node->label == "ALT" )
                 {
                     
@@ -100,6 +130,20 @@ namespace yocto
             }
         }
         
+        syntax::parse_node * compiler:: operator()( ios::istream &fp )
+        {
+            regex::source       Source( fp );
+            reset();
+            syntax::parse_node *Tree = accept(*this, Source);
+            Tree->AST();
+            __rewrite(Tree);
+            Tree->AST();
+            __fusion(Tree);
+            return Tree;
+        }
+        
+              
+               
         
         
     }

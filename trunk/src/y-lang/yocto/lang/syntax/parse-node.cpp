@@ -109,6 +109,18 @@ namespace yocto
 				}
 			}
             
+            parse_node *parse_node:: unlink() throw()
+            {
+                if( parent )
+                {
+                    assert( !parent->terminal );
+                    return parent->children().unlink(this);
+                }
+                else 
+                {
+                    return this;
+                }
+            }
                       
             
         }
