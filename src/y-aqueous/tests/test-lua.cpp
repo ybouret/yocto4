@@ -12,14 +12,47 @@ YOCTO_UNIT_TEST_IMPL(lua)
 {
     
     
-    library lib;
+    library     lib;
+    chemsys     cs(lib,1e-7);
+    initializer ini(lib);
     
-    lib.add( "H+", 1 );
-    lib.add( "HO-", -1 );
-    lib.add( "AcH", 0 );
-    lib.add( "Ac-", -1);
     
-    solution s(lib);
+    Lua::State VM;
+    lua_State *L = VM();
+    
+    if( argc > 1 )
+    {
+        Lua::Config::DoFile(L, argv[1]);
+        _lua::load( L, lib, "species" );
+        _lua::load( L, cs,  "weak"    );
+        _lua::load( L, ini, "init"    );
+        
+        ini.electroneutrality();
+        
+        
+        cs.build();
+        ini(cs,0.0);
+        
+        solution s(lib);
+        s.get(cs.C);
+        
+        std::cerr << "Starting With" << std::endl;
+        std::cerr << s << std::endl;
+        
+        _lua::effector::db effectors;
+        _lua::load(L,effectors,"effectors");
+        
+        solution ds(lib);
+        ds.ldz();
+        
+        _lua::effector::ptr *ppEff = effectors.search("MCT");
+        if( !ppEff )
+            throw exception("Missing MCT");
+        
+        _lua::effector &MCT = **ppEff;
+        MCT.call(L, ds, 1.0, s);
+        
+    }
     
     
 }

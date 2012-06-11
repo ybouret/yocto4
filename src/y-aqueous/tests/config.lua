@@ -17,3 +17,13 @@ init =
     { 0,      { 1,  "Na+" } },
     { 0.005,  { 1 , "AcH" }, {1, "Ac-" } }
 };
+
+-- effector
+effectors = { 
+    { "MCT", { "H+", "Ac-" }, {} }
+    };
+
+function MCT(t,h,am)
+    print( "MCT@t=" .. t);
+    print( "h=" .. h .. ", am=" .. am );
+end
