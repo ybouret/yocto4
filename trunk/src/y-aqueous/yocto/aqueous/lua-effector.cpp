@@ -96,7 +96,7 @@ namespace yocto
                         throw exception("effector '%s': input is not a table",id);
                     
                     __load_strings(id, "input", eff->input, L);
-                    std::cerr << "***\t\tinput=" << eff->input << std::endl;
+                    std::cerr << "***\t\tinput  = " << eff->input << std::endl;
                     //----------------------------------------------------------
                     lua_pop(L, 1);         //-- pop the input table
                     //----------------------------------------------------------
@@ -108,7 +108,7 @@ namespace yocto
                         throw exception("effector '%s': output is not a table",id);
                     
                     __load_strings(id, "output", eff->output, L);
-                    std::cerr << "***\t\toutput=" << eff->output << std::endl;
+                    std::cerr << "***\t\toutput = " << eff->output << std::endl;
                     //----------------------------------------------------------
                     lua_pop(L, 1);         //-- pop the input table
                     //----------------------------------------------------------
