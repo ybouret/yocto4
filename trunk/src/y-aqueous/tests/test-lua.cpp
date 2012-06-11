@@ -51,7 +51,7 @@ YOCTO_UNIT_TEST_IMPL(lua)
         
         _lua::effector &MCT = **ppEff;
         MCT.call(L, ds, 1.0, s);
-        
+        std::cerr << "ds=" << std::endl << ds << std::endl;
     }
     
     

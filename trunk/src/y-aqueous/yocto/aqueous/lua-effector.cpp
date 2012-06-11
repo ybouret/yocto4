@@ -127,6 +127,9 @@ namespace yocto
         
         void _lua::effector:: call( lua_State *L, solution &dSdt, double t, const solution &S ) const
         {
+            //------------------------------------------------------------------
+            // get the function
+            //------------------------------------------------------------------
             const char *fn = name.c_str();
             assert(L);
             lua_settop(L,0);
@@ -134,14 +137,33 @@ namespace yocto
             if( ! lua_isfunction(L, -1) )
                 throw exception("no effector function '%s'", fn);
             
+            //------------------------------------------------------------------
+            // push the arguments
+            //------------------------------------------------------------------
             lua_pushnumber(L, t);
             const size_t nIn = input.size();
             for( size_t i=1; i <= nIn; ++i )
             {
                 lua_pushnumber(L, S[ input[i] ]);
             }
+            
+            //------------------------------------------------------------------
+            // call the function
+            //------------------------------------------------------------------
+            const size_t nOut = output.size();
             if( lua_pcall(L, 1+nIn, output.size(), 0) )
                 throw exception("%s: %s", fn, lua_tostring(L, -1) );
+            
+            //------------------------------------------------------------------
+            // pop the results
+            //------------------------------------------------------------------
+            for( size_t i=nOut;i>0;--i)
+            {
+                if( !lua_isnumber(L, -1) )
+                    throw exception("%s: invalid result #%u", fn, unsigned(i));
+                dSdt[ output[i] ] += lua_tonumber(L, -1);
+                lua_pop(L,1);
+            }
             
             
         }

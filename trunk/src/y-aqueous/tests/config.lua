@@ -20,10 +20,11 @@ init =
 
 -- effector
 effectors = { 
-    { "MCT", { "H+", "Ac-" }, {} }
+    { "MCT", { "H+", "Ac-" }, { "H+", "AcH", "Ac-"} }
     };
 
 function MCT(t,h,am)
     print( "MCT@t=" .. t);
     print( "h=" .. h .. ", am=" .. am );
+    return 1,2,3;
 end
