@@ -22,13 +22,15 @@ namespace yocto
             template <typename T>
             inline void ld(const string &name, int z)
             {
-                add(name,z).make<T>();
+		species &sp = add(name,z);
+                sp.make<T>();
             }
             
             template <typename T>
             inline void ld( const string &name, int z, typename type_traits<T>::parameter_type args )
             {
-                add(name,z).make<T>(args);
+		species &sp = add(name,z);
+              	sp.make<T>(args);
             }
             
             
