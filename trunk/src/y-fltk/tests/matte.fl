@@ -5,23 +5,40 @@ code_name {.cxx}
 decl {\#include "yocto/FL/Fl_Matte_Button.hpp"} {public global
 } 
 
+decl {\#include "yocto/FL/Fl_Gel_Tabs.hpp"} {public global
+} 
+
 Function {MakeWindowMatte()} {open
 } {
   Fl_Window {} {
     label {Matte Testing} open
-    xywh {581 158 324 162} type Double visible
+    xywh {551 182 389 271} type Double visible
   } {
     Fl_Button {} {
-      label button selected
-      xywh {30 112 115 23}
+      label button
+      xywh {75 202 115 23}
       code0 {o->color(FL_ORANGE);}
       class Fl_Matte_Button
     }
     Fl_Button {} {
       label button
-      xywh {155 112 108 23}
+      xywh {200 202 108 23}
       code0 {o->color(FL_RED);}
       class Fl_Matte_Button
+    }
+    Fl_Tabs {} {
+      label {Tabs:} open
+      xywh {80 40 235 130}
+      class Fl_Gel_Tabs
+    } {
+      Fl_Group {} {
+        label Tab1 open selected
+        xywh {80 55 235 115}
+      } {}
+      Fl_Group {} {
+        label Tab2 open
+        xywh {80 55 235 115} hide
+      } {}
     }
   }
 } 
