@@ -10,15 +10,25 @@ namespace yocto
             
         }
         
+        void compiler:: enter_comment(const regex::token &) throw()
+        {
+        }
+        
+        void compiler:: leave_comment(const regex::token &) throw()
+        {
+            ++line;
+        }
+        
         compiler:: compiler() :
-        parser( "lang.compiler.lexer", "compiler.grammar" )
+        parser( "lang.compiler.lexer", "lang.compiler.grammar" ),
+        comment( declare("lang.compiler.comment") )
         {
             
             //------------------------------------------------------------------
             // scanner specifics
             //------------------------------------------------------------------
             scan.make( "BLANKS", "[ \t]+",    & scan.discard );
-            scan.make( "ENDL"  , "[:endl:]+", & scan.newline );
+            scan.make( "ENDL"  , "[:endl:]+", & scan.no_endl );
             
             //------------------------------------------------------------------
             // declare terminals
@@ -34,9 +44,14 @@ namespace yocto
             syntax::terminal  &REP0     = terminal( "*",      '*', syntax::is_specialized );
             syntax::terminal  &REP1     = terminal( "+",      '+', syntax::is_specialized );
             syntax::terminal  &BAR      = terminal( "BAR",    '|', syntax::is_discardable);
-            syntax::terminal  &COMMA    = terminal( "COMMA",  ',', syntax::is_discardable);
-            syntax::terminal  &LBRACE   = terminal( "LBRACE", '{', syntax::is_discardable);
-            syntax::terminal  &RBRACE   = terminal( "RBRACE", '}', syntax::is_discardable);
+            
+            //------------------------------------------------------------------
+            // hand coded comment
+            //------------------------------------------------------------------
+            scan.call("lang.compiler.comment", "//", this, & compiler::enter_comment);
+            
+            comment.back("[:endl:]", this, & compiler::leave_comment );
+            comment.make( "ANY1", ".", & comment.discard );
             
             syntax::alternate &MODIF  = alt("MODIF");
             MODIF << OPT << REP0 << REP1;
@@ -57,19 +72,14 @@ namespace yocto
             syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
             syntax::aggregate &ALT      = agg("ALT");
             
-            syntax::terminal  &CODE       = terminal("CODE","@[:word:]+");
-            syntax::aggregate &OTHER_CODE = agg("OTHER_CODE", syntax::is_merging_all);
-            OTHER_CODE << COMMA <<  CODE;
-            syntax::repeating &REP_CODE   = rep("REP_CODE",OTHER_CODE,0);
-            syntax::aggregate &BLOCK      = agg("BLOCK");
-            BLOCK << LBRACE << CODE << REP_CODE << RBRACE;
-            syntax::optional  &OPT_BLOCK  = opt("OPT_BLOCK",BLOCK);
+            syntax::terminal  &CODE       = terminal("CODE","@[[:word:][:digit:]]+");
+            syntax::optional  &OPT_CODE  = opt("OPT_CODE",CODE);
             
             ALT << BAR << ELEMENTS;
             syntax::repeating &OTHER= rep("OTHER", ALT,0);
             GROUP << LPAREN << ELEMENTS << RPAREN;
             ATOM << RULEID << REGEXP << SINGLE << GROUP;
-            ITEM << ATOM << MODIFIER << OPT_BLOCK << OTHER;
+            ITEM << ATOM << MODIFIER << OPT_CODE << OTHER;
             
             RULE &= ELEMENTS;
             

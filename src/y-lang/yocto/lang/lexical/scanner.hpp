@@ -37,11 +37,13 @@ namespace yocto
                 bool __forward( const regex::token &) throw(); //!< return true
                 bool __discard( const regex::token &) throw(); //!< return false
                 bool __newline( const regex::token &) throw(); //!< increase line, return true
+                bool __no_endl( const regex::token &) throw(); //!< increase line, return false
                 
             public:
-                const action  forward; //!< predefined action : forward lexeme (return true)
+                const action  forward; //!< predefined action : forward lexeme (return true), DEFAULT
                 const action  discard; //!< predefined action : discard lexeme (return false)
-                const action  newline; //!< predefined action : increase line and discard lexeme (return false)
+                const action  newline; //!< predefined action : increase line and RETURN lexeme (return true)
+                const action  no_endl; //!< predefined action : increase line and DISCARD lexeme (return false)
                 
                 //==============================================================
                 // lexemes recognition

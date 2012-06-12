@@ -16,7 +16,7 @@ namespace {
             scan.make( "INT",    "[:digit:]+" );
             scan.make( "WORD",   "[:word:]+"  );
             scan.make( "BLANKS", "[ \t]",    & scan.discard );
-            scan.make( "ENDL",   "[:endl:]", & scan.newline );
+            scan.make( "ENDL",   "[:endl:]", & scan.no_endl );
             
             const lang::lexical::callback EnterCommentC( this, & MyLex::OnEnterCommentC);
             const lang::lexical::callback LeaveCommentC( this, & MyLex::OnLeaveCommentC);
@@ -30,7 +30,7 @@ namespace {
             
             lang::lexical::scanner &comC = declare("C Comment");
             comC.make( "BLANKS", "[ \t]",    & comC.discard );
-            comC.jump( "MyLex", "\\*/", LeaveCommentC);
+            comC.jump( "MyLex",  "\\*/",       LeaveCommentC);
             comC.make( "ENDL",   "[:endl:]", & comC.newline );
             comC.make( "ANY1",   "." );
             
