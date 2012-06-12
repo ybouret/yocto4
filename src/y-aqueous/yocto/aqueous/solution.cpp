@@ -224,6 +224,17 @@ namespace yocto
             }
         }
         
+        void solution:: copy( const solution &other )
+        {
+            assert( other.size == size );
+            component::iterator       p = components.begin();
+            component::const_iterator q = other.components.begin();
+            for( size_t k=size;k>0;--k,++p,++q)
+            {
+                assert( (*p).name == (*q).name );
+                (*p).C = (*q).C;
+            }
+        }
         
     }
     
