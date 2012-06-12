@@ -25,7 +25,7 @@ namespace {
             
             scan.call("STRING",  "\"", this, &MyLex::OnEnterString);
             scan.make("BLANKS",  "[ \t]+",    &scan.discard);
-            scan.make("NEWLINE", "[:endl:]",  &scan.newline);
+            scan.make("NEWLINE", "[:endl:]",  &scan.no_endl);
             
             
             cstr.back("\"", this, & MyLex:: OnLeaveString);

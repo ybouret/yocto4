@@ -53,8 +53,8 @@ namespace yocto
                 scan.make("NUMBER", "-?[1-9][0-9]*([.][0-9]+)?([e|E][-+]?[0-9]+)?" );
                 scan.make("COLUMN", ":");
                 scan.call("JSON::String",  "\"", this, &Impl::OnEnterString);
-                scan.make( "BLANKS", "[ \t]+", & scan.discard );
-                scan.make( "ENDL", "[:endl:]", & scan.newline );
+                scan.make( "BLANKS", "[ \t]+",   & scan.discard );
+                scan.make( "ENDL",   "[:endl:]", & scan.no_endl );
                 
                 jstr.back("\"", this, &Impl::OnLeaveString);
                 jstr.make("1CHAR", ".", this, &Impl::OnChar);

@@ -24,7 +24,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
     scan.make( "ID",  "[:word:]+");
     scan.make( "COMA", ",");
     scan.make( "APOS", "'");
-    scan.make( "ENDL", "[:endl:]", & scan.newline );
+    scan.make( "ENDL", "[:endl:]", & scan.no_endl );
     
     {
         syntax::aggregate & List   = G.agg("List");      // root

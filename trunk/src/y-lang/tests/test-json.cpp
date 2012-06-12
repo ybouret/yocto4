@@ -31,7 +31,7 @@ YOCTO_UNIT_TEST_IMPL(json)
     scan.make("NUMBER", "[:digit:]+" );
     scan.make("COLUMN", ":");
     scan.make( "BLANKS", "[ \t]+", & scan.discard );
-    scan.make( "ENDL", "[:endl:]", & scan.newline );
+    scan.make( "ENDL", "[:endl:]", & scan.no_endl );
     
     //-- root = ELEMENT: ARRAY | OBJECT
     syntax::alternate &ELEMENT  = G.alt("ELEMENT");

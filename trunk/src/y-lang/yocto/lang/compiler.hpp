@@ -22,6 +22,9 @@ namespace yocto
             
             
         private:
+            lexical::scanner &comment;
+            void              enter_comment( const regex::token &) throw();
+            void              leave_comment( const regex::token &) throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
             
         };

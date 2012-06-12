@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     scan.make( "FLT",    "{FLT}" );
     scan.make( "STR",    "[:cstring:]");
     scan.make( "BLANKS", "[ \t]",    & scan.discard );
-    scan.make( "ENDL",   "[:endl:]", & scan.newline );
+    scan.make( "ENDL",   "[:endl:]", & scan.no_endl );
     scan.no_dict();
     
     ios::icstream fp( ios::cstdin );
