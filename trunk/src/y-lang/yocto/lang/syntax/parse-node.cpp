@@ -41,8 +41,8 @@ namespace yocto
             next(0), 
             parent(0),
             wksp(),
-            terminal( lx != 0 ? 1 : 0 ),
-            flags( ppty )
+            terminal( uint16_t(lx != 0 ? 1 : 0) ),
+            flags(   uint16_t(ppty) )
             {
                 memset(wksp,0,sizeof(wksp));
                 if( lx )
@@ -127,3 +127,4 @@ namespace yocto
         
     }
 }
+
