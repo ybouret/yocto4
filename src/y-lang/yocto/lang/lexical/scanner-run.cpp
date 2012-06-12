@@ -136,7 +136,7 @@ namespace yocto
 					// ready for next producing rule...
 					//----------------------------------------------------------
 				}
-				return NULL; // never get there
+				//return NULL; // never get there
 			}
             
 		}

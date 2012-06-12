@@ -102,21 +102,21 @@ YOCTO_UNIT_TEST_IMPL(json)
         std::cerr << std::endl;
         std::cerr << "Saving Full Parse Tree" << std::endl;
         {
-            ios::ocstream fp( "g.dot", false );
-            Tree->graphviz("G", fp);
+            ios::ocstream out( "g.dot", false );
+            Tree->graphviz("G", out);
         }
         system( "dot -Tpng g.dot -o g.png" );
         std::cerr << "Compressing Tree" << std::endl;
         Tree->AST();
         std::cerr << "Saving Final Parse Tree" << std::endl;
         {
-            ios::ocstream fp( "q.dot", false );
-            Tree->graphviz("Q", fp);
+            ios::ocstream out( "q.dot", false );
+            Tree->graphviz("Q", out);
         }
         system( "dot -Tpng q.dot -o q.png" );
         {
-            ios::ocstream fp( "ast.dat", false );
-            Tree->output(fp);
+            ios::ocstream out( "ast.dat", false );
+            Tree->output(out);
         }
     }
     
