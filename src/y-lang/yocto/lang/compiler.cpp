@@ -73,21 +73,112 @@ namespace yocto
             set_root(GRAMMAR);
         }
         
-       
         
         
-              
+        static inline
+        void __rewrite( syntax::parse_node *node )
+        {
+            assert(node);
+            if( ! node->terminal )
+            {
+                syntax::parse_node::child_list &chl = node->children();
+                syntax::parse_node::child_list  tmp;
+                while( chl.size )
+                {
+                    syntax::parse_node *curr = chl.pop_front();
+                    if( curr->label == "ITEM" )
+                    {
+                        syntax::parse_node::child_list &sub = curr->children();
+                        if( sub.tail->label == "ALT" )
+                        {
+                            //-- effective rewriting
+                            syntax::parse_node *alt = sub.pop_back();
+                            alt->parent = node;
+                            tmp.push_back(alt);
+                            alt->children().push_front(curr);
+                            curr->parent = alt;
+                            continue;
+                        }
+                    }
+                    
+                    //-- default
+                    tmp.push_back( curr );
+                }
+                
+                while( tmp.size > 0 )
+                {
+                    syntax::parse_node *curr = tmp.pop_front();
+                    chl.push_back(curr);
+                    __rewrite(curr);
+                }
+            }
+        }
+        
+        static inline
+        void __fusion( syntax::parse_node *node )
+        {
+            assert(node);
+            if( ! node->terminal )
+            {
+                syntax::parse_node::child_list &chl = node->children();
+                
+                //-- depth first
+                for( syntax::parse_node *curr = chl.head; curr; curr=curr->next)
+                    __fusion(curr);
+                
+                //-- look for possible ALT fusion
+                if( node->label == "ALT" )
+                {
+                    syntax::parse_node::child_list tmp;
+                    while( chl.size )
+                    {
+                        syntax::parse_node *curr = chl.pop_front();
+                        
+                        if( curr->label == "ALT" )
+                        {
+                            syntax::parse_node::child_list &sub = curr->children();
+                            while( sub.size )
+                            {
+                                syntax::parse_node *n = sub.pop_front();
+                                n->parent = node;
+                                tmp.push_back(n);
+                            }
+                            delete curr;
+                        }
+                        else 
+                            tmp.push_back( curr );
+                    }
+                    chl.swap_with(tmp);
+                }
+                
+            }
+        }
+        
+        
+        
         syntax::parse_node * compiler:: operator()( ios::istream &fp )
         {
             regex::source       Source( fp );
             reset();
             syntax::parse_node *Tree = accept(*this, Source);
+            
+            //-- first pass: take care of specialized and discardable
             Tree->AST();
+            
+            //-- rewrite alternate
+            __rewrite(Tree);
+            
+            //-- second pass: fusion single new items
+            Tree->AST();
+            
+            //-- third pass: fusion
+            __fusion(Tree);
+            
             return Tree;
         }
         
-              
-               
+        
+        
         
         
     }
