@@ -26,14 +26,17 @@ namespace yocto
             syntax::terminal  &RULEID   = terminal( "RULEID", "[:word:]+" );
             syntax::terminal  &REGEXP   = terminal( "REGEXP", "[:cstring:]");
             syntax::terminal  &SINGLE   = terminal( "SINGLE", "'[\\x20-\\x7F]'");
-            syntax::terminal  &COLUMN   = terminal( ":",         ":", syntax::is_discardable );
-            syntax::terminal  &END      = terminal( ";",         ";", syntax::is_discardable );
-            syntax::terminal  &LPAREN   = terminal( "LPAREN",    "\\(", syntax::is_discardable );
-            syntax::terminal  &RPAREN   = terminal( "RPAREN",    "\\)", syntax::is_discardable );
-            syntax::terminal  &OPT      = terminal( "?", "\\?", syntax::is_specialized );
-            syntax::terminal  &REP0     = terminal( "*", "\\*", syntax::is_specialized );
-            syntax::terminal  &REP1     = terminal( "+", "\\+", syntax::is_specialized );
-            syntax::terminal  &BAR      = terminal( "BAR",      "\\|", syntax::is_discardable);
+            syntax::terminal  &COLUMN   = terminal( ":",      ':', syntax::is_discardable );
+            syntax::terminal  &END      = terminal( ";",      ';', syntax::is_discardable );
+            syntax::terminal  &LPAREN   = terminal( "LPAREN", '(', syntax::is_discardable );
+            syntax::terminal  &RPAREN   = terminal( "RPAREN", ')', syntax::is_discardable );
+            syntax::terminal  &OPT      = terminal( "?",      '?', syntax::is_specialized );
+            syntax::terminal  &REP0     = terminal( "*",      '*', syntax::is_specialized );
+            syntax::terminal  &REP1     = terminal( "+",      '+', syntax::is_specialized );
+            syntax::terminal  &BAR      = terminal( "BAR",    '|', syntax::is_discardable);
+            syntax::terminal  &COMMA    = terminal( "COMMA",  ',', syntax::is_discardable);
+            syntax::terminal  &LBRACE   = terminal( "LBRACE", '{', syntax::is_discardable);
+            syntax::terminal  &RBRACE   = terminal( "RBRACE", '}', syntax::is_discardable);
             
             syntax::alternate &MODIF  = alt("MODIF");
             MODIF << OPT << REP0 << REP1;
@@ -51,13 +54,22 @@ namespace yocto
             syntax::alternate &ATOM     = alt("ATOM");
             syntax::aggregate &ITEM     = agg("ITEM", syntax::is_merging_one );
             syntax::repeating &ELEMENTS = rep("ELEMENTS", ITEM, 1);
-            syntax::aggregate &GROUP     = agg("GROUP", syntax::is_merging_one);
-            syntax::aggregate &ALT = agg("ALT");
+            syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
+            syntax::aggregate &ALT      = agg("ALT");
+            
+            syntax::terminal  &CODE       = terminal("CODE","@[:word:]+");
+            syntax::aggregate &OTHER_CODE = agg("OTHER_CODE", syntax::is_merging_all);
+            OTHER_CODE << COMMA <<  CODE;
+            syntax::repeating &REP_CODE   = rep("REP_CODE",OTHER_CODE,0);
+            syntax::aggregate &BLOCK      = agg("BLOCK");
+            BLOCK << LBRACE << CODE << REP_CODE << RBRACE;
+            syntax::optional  &OPT_BLOCK  = opt("OPT_BLOCK",BLOCK);
+            
             ALT << BAR << ELEMENTS;
             syntax::repeating &OTHER= rep("OTHER", ALT,0);
             GROUP << LPAREN << ELEMENTS << RPAREN;
             ATOM << RULEID << REGEXP << SINGLE << GROUP;
-            ITEM << ATOM << MODIFIER << OTHER;
+            ITEM << ATOM << MODIFIER << OPT_BLOCK << OTHER;
             
             RULE &= ELEMENTS;
             
