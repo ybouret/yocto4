@@ -17,19 +17,20 @@ SET(FLTK_BIN $ENV{FLTK_BIN} CACHE STRING "Override fltk-config location" )
 IF( "" STREQUAL "${FLTK_BIN}" )
 	
 	# automatic detection
+	MESSAGE( STATUS "Looking for default FLTK")
 	FIND_PROGRAM( FLTK-CONFIG fltk-config )
-	IF( FLTK-CONFIG-NOTFOUND )
+	IF( ${FLTK-CONFIG} STREQUAL FLTK-CONFIG-NOTFOUND )
 		MESSAGE( STATUS "Can't find fltk-config" )
-	ELSE(FLTK-CONFIG-NOTFOUND)
+	ELSE()
 		# got fltk config
 		FIND_PROGRAM( FLUID fluid )
-		IF( FLUID-NOTFOUND )
+		IF( ${FLUID} STREQUAL FLUID-NOTFOUND )
 			MESSAGE( STATUS "Can't find fluid" )
-		ELSE(FLUID_NOTFOUND)
+		ELSE()
 			# got fluid
 			SET(FLTK_FOUND ON)
-		ENDIF(FLUID-NOTFOUND)
-	ENDIF(FLTK-CONFIG-NOTFOUND)
+		ENDIF()
+	ENDIF()
 	
 	
 
