@@ -27,7 +27,7 @@ namespace yocto
             
 			bool  terminal:: match( Y_SYNTAX_MATCH_ARGS )
 			{
-                std::cerr << "?TERM <" << label << ">" << std::endl;
+                //std::cerr << "?TERM <" << label << ">" << std::endl;
                 check(Tree);
                 
 				lexeme *lx = Lexer.next_lexeme( Source );
@@ -45,18 +45,18 @@ namespace yocto
                     return false;
                 }
                 
-                std::cerr << "<==== <" << lx->label << ">" << std::endl;
+                //std::cerr << "<==== <" << lx->label << ">" << std::endl;
                 //Context.lx = lx;      //!< record the last accepted term
 				if( lx->label == this->label )
 				{
-                    std::cerr << "+TERM <" << label << ">" << std::endl;
+                    //std::cerr << "+TERM <" << label << ">" << std::endl;
                     parse_node *Node = parse_node::create(this->label,lx,semantic);
                     grow( Tree, Node );
 					return true;
 				}
 				else
                 {
-                    std::cerr << "-TERM <" << label << ">" << std::endl;
+                    //std::cerr << "-TERM <" << label << ">" << std::endl;
                     Lexer.unget(lx);
 					return false;
                 }

@@ -35,7 +35,7 @@ namespace yocto
             
             bool optional:: match( Y_SYNTAX_MATCH_ARGS )
             {
-                std::cerr << "?OPT <" << ref.label << "> @" << label << "" << std::endl;
+                //std::cerr << "?OPT <" << ref.label << "> @" << label << "" << std::endl;
                 
                 parse_node *Node = NULL;
                 if( ref.match(Lexer, Source, Node) )
@@ -62,7 +62,7 @@ namespace yocto
             
             bool repeating:: match( Y_SYNTAX_MATCH_ARGS )
             {
-                std::cerr << "?REP>=" << min_count << " <" << ref.label << ">  @" << label << "" << std::endl;
+                //std::cerr << "?REP>=" << min_count << " <" << ref.label << ">  @" << label << "" << std::endl;
                 check(Tree);
                 
                 
