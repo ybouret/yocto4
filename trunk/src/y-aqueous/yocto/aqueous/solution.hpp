@@ -67,6 +67,8 @@ namespace yocto
             void save_header( ios::ostream &fp ) const;
             void save_values( ios::ostream &fp ) const;
             
+            void copy( const solution &other );
+            
         private:
             component::db   components;
             YOCTO_DISABLE_ASSIGN(solution);
