@@ -41,13 +41,23 @@ namespace yocto
         {
         }
         
+        
+#define Y_GRAMMAR_CTOR() \
+name(id),                \
+rules(),                 \
+items(),                 \
+__eof("EOF")
+        
         grammar:: grammar( const string &id ) :
-        name(id),
-        rules(),
-        items(),
-        __eof("EOF")
+        Y_GRAMMAR_CTOR() 
         {
         }
+        
+        grammar:: grammar( const char * id ) :
+        Y_GRAMMAR_CTOR()
+        {
+        }
+        
         
         void grammar:: add( syntax::rule *r )
         {
@@ -62,6 +72,9 @@ namespace yocto
             rules.push_back(r);
         }
         
+        //======================================================================
+        // term
+        //======================================================================
         syntax::terminal & grammar:: term( const string &id, syntax::node_property ppty )
         {
             syntax::terminal *r = new syntax::terminal(id,ppty,__eof);
@@ -75,6 +88,9 @@ namespace yocto
             return term( ID, ppty );
         }
         
+        //======================================================================
+        // agg
+        //======================================================================
         syntax::aggregate & grammar:: agg( const string &id, syntax::node_property ppty )
         {
             syntax::aggregate *r = new syntax::aggregate(id,ppty);
@@ -89,6 +105,9 @@ namespace yocto
         }
         
         
+        //======================================================================
+        // alt
+        //======================================================================
         syntax::alternate & grammar:: alt( const string &id )
         {
             syntax::alternate *r = new syntax::alternate(id);
@@ -102,7 +121,9 @@ namespace yocto
             return alt(ID);
         }
         
-        
+        //======================================================================
+        // access
+        //======================================================================
         syntax::rule & grammar:: operator[]( const string &id ) 
         {
             item *it = items.search(id);
@@ -117,6 +138,9 @@ namespace yocto
             return (*this)[ ID ];
         }
         
+        //======================================================================
+        // opt
+        //======================================================================
         syntax::optional & grammar:: opt( const string &id, const string &src )
         {
             syntax::rule     &ref = (*this)[ src ];
@@ -124,6 +148,14 @@ namespace yocto
             add(jk);
             return *jk;
         }
+        
+        syntax::optional & grammar:: opt( const char *id, const char *src )
+        {
+            const string ID(id);
+            const string SRC(src);
+            return opt(ID,SRC);
+        }
+
         
         syntax::optional &grammar:: opt( const string &id, syntax::rule &ref )
         {
@@ -134,12 +166,28 @@ namespace yocto
             return *jk;
         }
         
+        syntax::optional & grammar:: opt( const char *id, syntax::rule &ref )
+        {
+            const string ID(id);
+            return opt(ID,ref);
+        }
+        
+        //======================================================================
+        // rep
+        //======================================================================
         syntax::repeating  &grammar:: rep( const string &id, const string &src, size_t at_least)
         {
             syntax::rule      &ref = (*this)[ src ];
             syntax::repeating *jk  = new syntax::repeating( id, ref, at_least );
             add(jk);
             return *jk;
+        }
+        
+        syntax::repeating  &grammar:: rep( const char *id, const char *src, size_t at_least )
+        {
+            const string ID(id);
+            const string SRC(src);
+            return rep(ID,SRC,at_least);
         }
         
         syntax::repeating &grammar:: rep( const string &id, syntax::rule &ref, size_t at_least)
@@ -151,7 +199,15 @@ namespace yocto
             return *jk;
         }
         
+        syntax::repeating  &grammar:: rep( const char *id, syntax::rule &ref, size_t at_least)
+        {
+            const string ID(id);
+            return rep(ID,ref,at_least);
+        }
         
+        //======================================================================
+        // set_root
+        //======================================================================
         void grammar:: set_root( const string &id )
         {
             item *it = items.search(id);
