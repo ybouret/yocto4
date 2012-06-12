@@ -23,6 +23,7 @@ namespace yocto
             
             //! create an empty grammar
             explicit grammar( const string &id );
+            explicit grammar( const char   *id );
             
             //! default ctor
             virtual ~grammar() throw();
@@ -42,11 +43,16 @@ namespace yocto
             //! new optional
             syntax::optional &opt( const string &id, const string &src );
             syntax::optional &opt( const string &id, syntax::rule &ref );
+            syntax::optional &opt( const char   *id, const char   *src );
+            syntax::optional &opt( const char   *id, syntax::rule &ref );
+            
             
             //! new repeating
             syntax::repeating &rep( const string &id, const string &src, size_t at_least);
             syntax::repeating &rep( const string &id, syntax::rule &ref, size_t at_least);
-            
+            syntax::repeating &rep( const char   *id, const char   *src, size_t at_least);
+            syntax::repeating &rep( const char   *id, syntax::rule &ref, size_t at_least);
+
             
             //! look up for rule 'id'
             syntax::rule & operator[]( const string &id );
