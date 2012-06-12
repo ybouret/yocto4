@@ -11,6 +11,7 @@ namespace yocto
     namespace lang 
     {
         
+        //! compile a simple grammar from an input stream
         class compiler : public parser
         {
         public:

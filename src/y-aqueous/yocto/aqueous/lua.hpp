@@ -24,7 +24,7 @@ namespace yocto
             
             //! load a table of { "name", charge, EXTRA }
             static void load( lua_State *L, library     &lib, const string &libname, species_ctor *cb = NULL);
-
+            
             static void load( lua_State *L, chemsys     &cs,  const string &csname  );
             static void load( lua_State *L, initializer &ini, const string &ininame );
             
@@ -35,6 +35,7 @@ namespace yocto
                 const string   name;    //!< will be the function name
                 vector<string> input;   //!< input arguments
                 vector<string> output;  //!< output arguments
+                double         factor;  //!< scaling factor, default=1
                 
                 const string & key() const throw();
                 typedef intrusive_ptr<string,effector> ptr;
@@ -49,7 +50,19 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(effector);
             };
             
-            static void load( lua_State *L, effector::db &effectors, const string &effname );
+            class effectors : public effector::db
+            {
+            public:
+                explicit effectors() throw();
+                virtual ~effectors() throw();
+                
+                effector & operator[]( const string &name );
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
+            };
+            
+            static void load( lua_State *L, effectors &db, const string &effname );
             
         };
         

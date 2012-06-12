@@ -15,7 +15,8 @@ namespace yocto
         _lua:: effector:: effector( const string &id ) :
         name(id),
         input(),
-        output()
+        output(),
+        factor(1)
         {
             
         }
@@ -23,6 +24,17 @@ namespace yocto
         const string & _lua::effector:: key() const throw()
         {
             return name;
+        }
+        
+        _lua:: effectors:: effectors() throw() : effector::db() {}
+        _lua:: effectors::~effectors() throw() {}
+        
+        _lua::effector & _lua::effectors:: operator[]( const string &id )
+        {
+            _lua::effector::ptr *ppEff = search(id);
+            if( !ppEff )
+                throw exception("no effector '%s'", id.c_str() );
+            return  **ppEff;
         }
         
         
@@ -46,7 +58,7 @@ namespace yocto
             }
         }
         
-        void _lua:: load( lua_State *L, effector::db &effectors, const string &effname )
+        void _lua:: load( lua_State *L, effectors &edb, const string &effname )
         {
             //==================================================================
             // load the effectors table
@@ -82,7 +94,7 @@ namespace yocto
                     // create a new effector
                     //----------------------------------------------------------
                     effector::ptr eff( new effector(name) );
-                    if( ! effectors.insert(eff) )
+                    if( ! edb.insert(eff) )
                         throw exception("in [%s]: multiple effector '%s'", tabname, id);
                     std::cerr << "***\t" << eff->name << std::endl;
                     //----------------------------------------------------------
@@ -162,7 +174,7 @@ namespace yocto
             {
                 if( !lua_isnumber(L, -1) )
                     throw exception("%s: invalid result #%u", fn, unsigned(i));
-                dSdt[ output[i] ] += lua_tonumber(L, -1);
+                dSdt[ output[i] ] += factor * lua_tonumber(L, -1);
                 lua_pop(L,1);
             }
             

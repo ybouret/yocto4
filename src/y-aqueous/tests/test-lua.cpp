@@ -39,13 +39,13 @@ YOCTO_UNIT_TEST_IMPL(lua)
         std::cerr << "Starting With" << std::endl;
         std::cerr << s << std::endl;
         
-        _lua::effector::db effectors;
-        _lua::load(L,effectors,"effectors");
+        _lua::effectors  edb;
+        _lua::load(L,edb,"effectors");
         
         solution ds(lib);
         ds.ldz();
         
-        _lua::effector::ptr *ppEff = effectors.search("MCT");
+        _lua::effector::ptr *ppEff = edb.search("MCT");
         if( !ppEff )
             throw exception("Missing MCT");
         
