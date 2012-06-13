@@ -267,7 +267,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				algebra<double>::mul_trn(C, Q, Y);
 				algebra<double>::add(C,C0);
-                std::cerr << "C =" << C << std::endl;
+                //std::cerr << "C =" << C << std::endl;
                 
                 
 				if( !converged ) 
@@ -343,7 +343,6 @@ namespace yocto
                 
                 std::cerr << "#Improved:" << std::endl;
 				std::cerr << "C=" << C << std::endl;
-                std::cerr << "dC=" << dC << std::endl;
                 
                 //--------------------------------------------------------------
 				// Evaluate error on Y
@@ -358,7 +357,13 @@ namespace yocto
                 for( size_t i=N;i>0;--i)
 					dY[i] = -Gamma[i];
 				solver(W,dY);
-                std::cerr << "dY=" << dY << std::endl;
+                std::cerr << "ErrdY=" << dY << std::endl;
+                algebra<double>::mul_trn(dC,Q,dY);
+                for( size_t i=M;i>0;--i)
+                {
+                    dC[i] = Fabs(dC[i]);
+                }
+                std::cerr << "ErrdC=" << dC << std::endl;
                 
 				//==============================================================
 				//
