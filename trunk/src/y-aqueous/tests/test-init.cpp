@@ -1,16 +1,21 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/aqueous/initializer.hpp"
 #include "yocto/math/types.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 using namespace aqueous;
 
+
 YOCTO_UNIT_TEST_IMPL(init)
 {
     
+    double initAc = 0;
+    if( argc > 1 )
+        initAc = fabs(strtod(argv[1], NULL));
     
     library lib;
-    chemsys cs(lib,1e-7);
+    chemsys cs(lib,1e-4);
     
     lib.add( "H+", 1 );
     lib.add( "HO-", -1 );
@@ -53,13 +58,15 @@ YOCTO_UNIT_TEST_IMPL(init)
     
     {
         //-- initial acid
-        constraint &ac = ini.create(0.00);
+        constraint &ac = ini.create(initAc);
         ac.add( "Ac-", 1);
         ac.add( "AcH", 1);
     }
     
     ini(cs,0.0);
-    
+    solution s(lib);
+    s.get(cs.C);
+    std::cerr << s << std::endl;
     
     
 }
