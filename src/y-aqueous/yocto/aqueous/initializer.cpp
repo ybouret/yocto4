@@ -2,6 +2,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto 
 {
@@ -103,6 +104,8 @@ namespace yocto
 			return ans;
 		}
         
+        
+        
 		void initializer:: operator()( chemsys &cs, double t )
 		{
 			//std::cerr << "# Initializing system" << std::endl;
@@ -127,12 +130,14 @@ namespace yocto
 				vector<double> Y(N,0.0);
                 
 				//-- aliased variables
-				array<double> &dY     = cs.xi;
-				matrix<double> &W     = cs.W;
-				matrix<double> &Phi   = cs.Phi;
-				const double    ftol  = cs.ftol;
-				array<double>  &Gamma = cs.Gamma;
+				array<double>  &dY     = cs.xi;
+				matrix<double> &W      = cs.W;
+				matrix<double> &Phi    = cs.Phi;
+				const double    ftol   = cs.ftol;
+				array<double>  &Gamma  = cs.Gamma;
 				linsys<double> &solver = cs.solver;
+                array<double>  &dC     = cs.dC;
+                
                 
 				//==============================================================
 				//
@@ -152,8 +157,8 @@ namespace yocto
 							P[i][j] = *pW;
 					}
 				}
-				//std::cerr << "P=" << P << std::endl;
-				//std::cerr << "V=" << V << std::endl;
+				std::cerr << "P=" << P << std::endl;
+				std::cerr << "V=" << V << std::endl;
                 
 				//==============================================================
 				//
@@ -172,7 +177,9 @@ namespace yocto
 					algebra<double>::mul_ltrn(J, P, iP2);
 				}
 				algebra<double>::mul(C0, J, V);
-				//std::cerr << "C0=" << C0 << std::endl;
+				std::cerr << "C0=" << C0 << std::endl;
+                const double amplitude = max_of<double>(1e-5,get_max_of(C0));
+                std::cerr << "amplitude=" << amplitude << std::endl;
                 
             BUILD_Q:
 				//--------------------------------------------------------------
@@ -183,10 +190,11 @@ namespace yocto
 				{
 					for( size_t i=1; i <= Nc; ++i )
 						for( size_t j=1; j <= M; ++j )
-							F2[i][j] = F[i][j] = P[i][j];
+							F[i][j] = P[i][j];
 					for( size_t i=Nc+1; i <= M; ++i )
 						for( size_t j=1; j <= M; ++j )
-							F2[i][j] = F[i][j] = alea<double>();
+                            F[i][j] = alea<double>()-0.5;
+                    F2.assign(F);
 				}
 				while( !solver.LU(F2) );
                 
@@ -201,7 +209,7 @@ namespace yocto
 						Q[k][j] = G[i][j];
 					}
 				}
-				//std::cerr << "Q=" << Q << std::endl;
+				std::cerr << "Q=" << Q << std::endl;
                 
                 
 				//==============================================================
@@ -217,16 +225,18 @@ namespace yocto
 				// find a valid starting point
 				//--------------------------------------------------------------
             NEWTON_INIT:
-				//std::cerr << "# Looking for a starting point" << std::endl;
-				do {
-					for( size_t j=N; j>0; --j )
-						Y[j] = 1e-5 * ( 0.5 - alea<double>());
-					algebra<double>::mul_trn(C, Q, Y);
-					algebra<double>::add(C,C0);
-				}
-				while( !is_acceptable(C) );
-                
-				//std::cerr << "# Newton iterations" << std::endl;
+				std::cerr << "# Looking for a starting point" << std::endl;
+                {
+                    do {
+                        for( size_t j=N; j>0; --j )
+                            Y[j] = amplitude * ( 0.5 - alea<double>());
+                        algebra<double>::mul_trn(C, Q, Y);
+                        algebra<double>::add(C,C0);
+                    }
+                    while( !is_acceptable(C) );
+                }
+                std::cerr << "Cini=" << C << std::endl;
+				std::cerr << "# Newton iterations @ftol=" << ftol << std::endl;
 				//--------------------------------------------------------------
 				// compute newton step
 				//--------------------------------------------------------------
@@ -257,6 +267,9 @@ namespace yocto
 				//--------------------------------------------------------------
 				algebra<double>::mul_trn(C, Q, Y);
 				algebra<double>::add(C,C0);
+                std::cerr << "C =" << C << std::endl;
+                
+                
 				if( !converged ) 
 					goto NEWTON_STEP;
                 
@@ -265,9 +278,9 @@ namespace yocto
 				// Check position and signess of solution
 				//
 				//==============================================================
-				//std::cerr << "# Newton Result" << std::endl;
-				//std::cerr << "Y=" << Y << std::endl;
-				//std::cerr << "C=" << C << std::endl;
+				std::cerr << "# Newton Result" << std::endl;
+				std::cerr << "Y=" << Y << std::endl;
+				std::cerr << "C=" << C << std::endl;
                 
 				{
 					double maxAbsC = 0;
@@ -279,7 +292,11 @@ namespace yocto
 					}
 					if( maxAbsC < 0 )
 					{
-						//std::cerr << "# SIGN RESTART!" << std::endl;
+                        std::cerr << std::endl;
+                        std::cerr << "\t###############" << std::endl;
+						std::cerr << "\t# SIGN RESTART!" << std::endl;
+                        std::cerr << "\t###############" << std::endl;
+                        
 						goto BUILD_Q; //!< numeric problem
 					}
 				}
@@ -290,31 +307,58 @@ namespace yocto
 				// numeric corrections : project onto P
 				//
 				//==============================================================
+                std::cerr << "# Projection" << std::endl;
 				vector<double> U(Nc,0.0);
-				array<double>  &dC    = cs.dC;
                 
 				//--------------------------------------------------------------
 				// how far are we, initially
 				//--------------------------------------------------------------
 				algebra<double>::mul(U,P,C);
 				algebra<double>::sub(U,V);
-				double old_norm = get_max_of(U);
+				double old_norm = get_max_of(C);
+                algebra<double>::set(C0,C);
                 
 				//--------------------------------------------------------------
-				// project as best as we can
+				// project as best as we can: linear improvement
 				//--------------------------------------------------------------
+                converged = false;
 				while(true)
 				{
 					algebra<double>::mul(dC, J, U); // dC = J * U
 					algebra<double>::sub(C, dC);
+                    
+                    algebra<double>::set(C0,C);
 					algebra<double>::mul(U,P,C);    // U = P * C
 					algebra<double>::sub(U,V);
-					const double new_norm = get_max_of(U);
-					if( new_norm >= old_norm )
-						break;
+                    
+                    const double new_norm = get_max_of(dC);
+					if( new_norm >= old_norm ) 
+                    {
+                        break;
+                    }
 					old_norm = new_norm;
-				}
-				//std::cerr << "C=" << C << std::endl;
+                  
+                }
+
+                
+                std::cerr << "#Improved:" << std::endl;
+				std::cerr << "C=" << C << std::endl;
+                std::cerr << "dC=" << dC << std::endl;
+                
+                //--------------------------------------------------------------
+				// Evaluate error on Y
+				//--------------------------------------------------------------
+                std::cerr << "#Chemical Error" << std::endl;
+                cs.computeGammaAndPhi(t,false);
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                
+                algebra<double>::mul_rtrn(W, Phi, Q);
+				if( ! solver.LU(W) )
+                    throw exception("unexpected invalid improved composition");
+                for( size_t i=N;i>0;--i)
+					dY[i] = -Gamma[i];
+				solver(W,dY);
+                std::cerr << "dY=" << dY << std::endl;
                 
 				//==============================================================
 				//
@@ -324,20 +368,22 @@ namespace yocto
                 
 				// -- recompute Y
 				algebra<double>::mul(Y,Q,C);
+                std::cerr << "Y=" << Y << std::endl;
                 
+                std::cerr << "#Cutoff" << std::endl;
 				//-- compute the fractional Y
 				for( size_t i=N; i>0; --i ) Y[i] *= ftol;
                 
 				//- deduce the error on C
 				algebra<double>::mul_trn(dC,Q,Y);
-				//std::cerr << "dC=" << dC << std::endl;
+				std::cerr << "dC_err=" << dC << std::endl;
                 
 				//-- cutoff
 				for( size_t j=M; j>0; --j )
 				{
 					if( C[j] <= fabs(dC[j]) ) C[j] = 0;
 				}
-				//std::cerr << "C=" << C << std::endl;
+				std::cerr << "C=" << C << std::endl;
                 
 				//==============================================================
 				//
