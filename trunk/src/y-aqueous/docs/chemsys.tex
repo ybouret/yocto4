@@ -152,4 +152,12 @@ We iterate the projection
 \end{equation}
 until the numerical limit is reached.
 
+\subsubsection{Final Error Estimation}
+Let $\vecX_n$ the set of current values. The the error is about
+\begin{equation}
+	\delta \vecX_n = \mytrn{\mymat{Q}}\left(\mymat{\Phi}_n\mytrn{\mymat{Q}}\right)^{-1} \vec{\Gamma}_n
+\end{equation}
+This shall provide the cutoff for small concentrations.
+
+
 \end{document}
