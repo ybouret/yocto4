@@ -71,11 +71,17 @@ namespace yocto
             explicit fields_setup(size_t n) : db_type(n,as_capacity) {}
             
             template <typename ARRAY>
-            void add( const char *name, bool async )
+            inline void add( const char *name, bool async )
             {
                 const field_info<LAYOUT> f( name, typeid(ARRAY), typeid( typename ARRAY::type), async, ARRAY::ctor, ARRAY::dtor );
                 if( ! this->insert(f) )
                     throw exception("field_layout%uD( multiple '%s')", unsigned(LAYOUT::DIMENSIONS), f.name.c_str() );
+            }
+            
+            template <typename ARRAY>
+            inline void add( const string &name, bool async )
+            {
+                this->add<ARRAY>( name.c_str(), async );
             }
             
             typedef typename db_type::const_iterator iterator;
