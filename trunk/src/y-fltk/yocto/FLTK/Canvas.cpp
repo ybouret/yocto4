@@ -1,4 +1,4 @@
-#include "yocto/FL/canvas.hpp"
+#include "yocto/FLTK/Canvas.hpp"
 
 namespace yocto 
 {
@@ -8,5 +8,11 @@ namespace yocto
         {
             
         }
+        
+        Canvas:: Canvas( int X, int Y, int W, int H, const char *l ) :
+        Fl_Box(X,Y,W,H,l)
+        {
+        }
+        
     }
 }
