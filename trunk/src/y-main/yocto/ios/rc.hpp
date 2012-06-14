@@ -76,6 +76,10 @@ namespace yocto
             ios::istream  *load_stream(  const string  &rcname ) const;
             ios::istream  *load_stream(  const char    *rcname ) const;
             
+            typedef item_db::const_iterator iterator;
+            iterator begin() const;
+            iterator end()   const;
+            size_t   size() const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(resources);
