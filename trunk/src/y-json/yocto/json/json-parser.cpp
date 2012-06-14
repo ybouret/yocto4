@@ -1,7 +1,6 @@
 #include "yocto/json/parser.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/lang/lexer.hpp"
-#include "yocto/lang/grammar.hpp"
+#include "yocto/lang/parser.hpp"
 #include "yocto/auto-ptr.hpp"
 #include "yocto/string/conv.hpp"
 

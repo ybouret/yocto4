@@ -17,3 +17,4 @@ ADD_CUSTOM_COMMAND(
 	POST_BUILD
 	COMMAND yocto-rcpack ${the_exe} ${RESOURCES} )
 	
+INSTALL( TARGETS yocto-rcpack RUNTIME DESTINATION bin )

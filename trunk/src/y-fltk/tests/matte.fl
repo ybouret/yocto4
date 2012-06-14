@@ -32,13 +32,22 @@ Function {MakeWindowMatte()} {open
       class Fl_Gel_Tabs
     } {
       Fl_Group {} {
-        label Tab1 open selected
-        xywh {80 55 235 115}
-      } {}
+        label Tab1 open
+        xywh {80 55 235 115} labelfont 1 hide
+      } {
+        Fl_Box {} {
+          label {Content of table 1}
+          xywh {125 84 130 52}
+        }
+      }
       Fl_Group {} {
         label Tab2 open
-        xywh {80 55 235 115} hide
-      } {}
+        xywh {80 55 235 115}
+      } {
+        Fl_Clock {} {selected
+          xywh {155 80 75 75}
+        }
+      }
     }
   }
 } 
