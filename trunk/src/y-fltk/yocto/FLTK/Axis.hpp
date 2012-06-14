@@ -21,6 +21,8 @@ namespace yocto
             void set_max( double );
             void set_range( double amin, double amax );
             
+            void autoscaleY( const Curve &C, const double extra = 0.0 ); 
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Axis);
         };
