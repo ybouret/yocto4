@@ -42,6 +42,7 @@ namespace yocto
             if( W <= 0 || H <= 0 ) return;
             const double xscale = (W-1)/Xaxis.length;
             const double yscale = (H-1)/Yaxis.length;
+            const double ytop   = Y+H-1;
             
             fl_push_clip(X, Y, W, H);
             //------------------------------------------------------------------
@@ -59,10 +60,10 @@ namespace yocto
                         const Point &p1 = crv[j];
                         
                         const double x0 = X+(p0.x - Xaxis.vmin) * xscale;
-                        const double y0 = Y+(p0.y - Yaxis.vmin) * yscale;
+                        const double y0 = ytop-(p0.y - Yaxis.vmin) * yscale;
                         
                         const double x1 = X+(p1.x - Xaxis.vmin) * xscale;
-                        const double y1 = Y+(p1.y - Yaxis.vmin) * yscale;
+                        const double y1 = ytop-(p1.y - Yaxis.vmin) * yscale;
                         fl_line(x0, y0, x1, y1 );
                     }
                 }
