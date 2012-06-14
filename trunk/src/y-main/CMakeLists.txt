@@ -130,5 +130,4 @@ ADD_LIBRARY(yocto STATIC ${srcs} ${utest_decl})
 INSTALL( TARGETS yocto ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
-ADD_SUBDIRECTORY(rcpack)
 
