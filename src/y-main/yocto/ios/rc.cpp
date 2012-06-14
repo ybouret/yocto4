@@ -175,6 +175,9 @@ H(), db(16,as_capacity)
             extract();
         }
         
+        resources::iterator resources::begin() const { return db.begin(); }
+        resources::iterator resources::end()   const { return db.end();   }
+        size_t   resources::size() const throw() { return db.size(); }
         
         void resources:: extract()
         {
