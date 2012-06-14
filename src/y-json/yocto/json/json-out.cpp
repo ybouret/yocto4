@@ -14,7 +14,34 @@ namespace yocto
         string Value:: j2s( const String &s)
         {
             string ans = '"';
-            ans += s;
+            
+            for( size_t i=0; i < s.size(); ++i )
+            {
+                char C = s[i];
+                
+                switch( C )
+                {
+                        
+                    case '"':
+                    case '\\':
+                    case '/':
+                        ans.append( '\\' );
+                        break;
+                        
+                    case '\b': ans.append('\\'); C = 'b'; break;
+                    case '\f': ans.append('\\'); C = 'f'; break;
+                    case '\n': ans.append('\\'); C = 'n'; break;
+                    case '\r': ans.append('\\'); C = 'r'; break;
+                    case '\t': ans.append('\\'); C = 't'; break;
+
+                        
+                    default:
+                        break;
+                }
+                
+                ans.append(C);
+            }
+            
             ans += '"';
             return ans;
         }

@@ -18,45 +18,19 @@ namespace yocto
     {
         
         
-        class Parser :: Impl : public object, public lexer, public grammar
+        class Parser :: Impl : public object, public parser
         {
         public:
             
             
-            lexical::scanner  &scan;
             lexical::scanner  &jstr;
             string             _str;
             
             Impl() : 
-            lexer(   "JSON::Lexer" ),
-            grammar( "JSON::Parser" ),
-            scan( first() ),
+            parser( "JSON::Lexer" , "JSON::Parser" ),
             jstr( declare("JSON::String") ),
             _str()
             {
-                
-                //--------------------------------------------------------------
-                //
-                // declare JSON terminals
-                //
-                //--------------------------------------------------------------
-               
-                scan.make("LBRACK","\\[" );
-                scan.make("RBRACK","\\]" );
-                scan.make("LBRACE", "\\{");
-                scan.make("RBRACE", "\\}");
-                scan.make("COMMA",  ","  );
-                scan.make("null",   "null" );
-                scan.make("true",   "true" );
-                scan.make("false",  "false" );
-                scan.make("NUMBER", "-?[1-9][0-9]*([.][0-9]+)?([e|E][-+]?[0-9]+)?" );
-                scan.make("COLUMN", ":");
-                scan.call("JSON::String",  "\"", this, &Impl::OnEnterString);
-                scan.make( "BLANKS", "[ \t]+",   & scan.discard );
-                scan.make( "ENDL",   "[:endl:]", & scan.no_endl );
-                
-                jstr.back("\"", this, &Impl::OnLeaveString);
-                jstr.make("1CHAR", ".", this, &Impl::OnChar);
                 
                 
                 //--------------------------------------------------------------
@@ -71,17 +45,34 @@ namespace yocto
                 //--------------------------------------------------------------
                 // terminals
                 //--------------------------------------------------------------
-                syntax::terminal &LBRACK = term( "LBRACK", syntax::is_discardable );
-                syntax::terminal &RBRACK = term( "RBRACK", syntax::is_discardable );
-                syntax::terminal &LBRACE = term( "LBRACE", syntax::is_discardable );
-                syntax::terminal &RBRACE = term( "RBRACE", syntax::is_discardable );
-                syntax::terminal &COMMA  = term( "COMMA",  syntax::is_discardable );
-                syntax::terminal &NUMBER = term( "NUMBER" );
-                syntax::terminal &Null   = term( "null",   syntax::is_specialized );
-                syntax::terminal &True   = term( "true",   syntax::is_specialized );
-                syntax::terminal &False  = term( "false",  syntax::is_specialized );
+                syntax::terminal &LBRACK = terminal( "LBRACK", '[', syntax::is_discardable );
+                syntax::terminal &RBRACK = terminal( "RBRACK", ']', syntax::is_discardable );
+                syntax::terminal &LBRACE = terminal( "LBRACE", '{', syntax::is_discardable );
+                syntax::terminal &RBRACE = terminal( "RBRACE", '}', syntax::is_discardable );
+                syntax::terminal &COMMA  = terminal( "COMMA",  ',', syntax::is_discardable );
+                syntax::terminal &NUMBER = terminal( "NUMBER", "-?[1-9][0-9]*([.][0-9]+)?([e|E][-+]?[0-9]+)?" );
+                syntax::terminal &Null   = terminal( "null",  "null",  syntax::is_specialized );
+                syntax::terminal &True   = terminal( "true",  "true",  syntax::is_specialized );
+                syntax::terminal &False  = terminal( "false", "false", syntax::is_specialized );
                 syntax::terminal &STRING = term( "JSON::String" );
-                syntax::terminal &COLUMN = term( "COLUMN", syntax::is_discardable );
+                syntax::terminal &COLUMN = terminal( "COLUMN", ':', syntax::is_discardable );
+                
+                
+                //--------------------------------------------------------------
+                // other main rules
+                //--------------------------------------------------------------
+                scan.call("JSON::String",  "\"", this, &Impl::OnEnterString);
+                scan.make( "BLANKS", "[ \t]+",   & scan.discard );
+                scan.make( "ENDL",   "[:endl:]", & scan.no_endl );
+                
+                //--------------------------------------------------------------
+                // JSON:: String
+                //--------------------------------------------------------------
+                jstr.back("\"", this, &Impl::OnLeaveString);
+                jstr.make( "ESC",   "\\x5c.", this, &Impl::OnEscape);
+                jstr.make( "1CHAR", ".",     this, &Impl::OnChar);
+                
+                
                 
                 //--------------------------------------------------------------
                 // initialize value
@@ -161,6 +152,30 @@ namespace yocto
                     _str.append( ch->data );
                 
                 return false; // not a lexeme !
+            }
+            
+            bool OnEscape( const regex::token &t )
+            {
+                assert(t.size==2);
+                char C = t.tail->data;
+                switch( C )
+                {
+                    case '\\':
+                    case '/':
+                    case '"':
+                        break;
+                        
+                    case 'b': C = '\b'; break;
+                    case 'f': C = '\f'; break;
+                    case 'n': C = '\n'; break;
+                    case 'r': C = '\r'; break;
+                    case 't': C = '\t'; break;
+                        
+                    default:
+                        throw exception("%s: line %u: invalid escaped char '%c'", jstr.name.c_str(), line, C );
+                }
+                _str.append( C );
+                return false; // not a lexeme
             }
             
             //==================================================================
