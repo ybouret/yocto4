@@ -31,14 +31,27 @@
 #define FL_ORANGE Fl_Color(93)
 #endif
 
-class FL_EXPORT Fl_Matte_Button : public Fl_Button {
-protected:
-  void draw();
-  void resize(int x,int y,int w,int h) {
-      Fl_Button::resize(x,y,w,FL_MATTE_BUTTON_HEIGHT);	// no resizing of height
-  }
-public:
-  Fl_Matte_Button(int,int,int,int,const char * = 0);
-};
-
+namespace yocto 
+{
+    namespace FLTK
+    {
+        class  Matte_Button : public Fl_Button 
+        {
+        protected:
+            void draw();
+            void resize(int x,int y,int w,int h) 
+            {
+                Fl_Button::resize(x,y,w,FL_MATTE_BUTTON_HEIGHT);	// no resizing of height
+            }
+        public:
+            Matte_Button(int,int,int,int,const char * = 0);
+            virtual ~Matte_Button() throw();
+        private:
+            Matte_Button( const Matte_Button & );
+            Matte_Button &operator=( const Matte_Button & );
+        };
+        
+    }
+}
+    
 #endif 

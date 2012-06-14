@@ -25,24 +25,36 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Group.H>
 
-class FL_EXPORT Fl_Gel_Tabs : public Fl_Group {
-  Fl_Widget *value_;
-  Fl_Widget *push_;
-  int tab_positions(int*, int*, int &tw);
-  void tab_area(int&H, int&yedge);
-  void draw_tab(int i,int *,int tw,int W,int H,int yedge,Fl_Widget* o,int sel=0);
-protected:
-  void draw();
-
-public:
-  int handle(int);
-  Fl_Widget *value();
-  int value(Fl_Widget*);
-  Fl_Widget *push() const {return push_;}
-  int push(Fl_Widget*);
-  Fl_Gel_Tabs(int,int,int,int,const char * = 0);
-  Fl_Widget *which(int event_x, int event_y);
-};
+namespace yocto 
+{
+    
+    namespace FLTK 
+    {
+        class Gel_Tabs : public Fl_Group
+        {
+            Fl_Widget *value_;
+            Fl_Widget *push_;
+            int tab_positions(int*, int*, int &tw);
+            void tab_area(int&H, int&yedge);
+            void draw_tab(int i,int *,int tw,int W,int H,int yedge,Fl_Widget* o,int sel=0);
+            Gel_Tabs( const Gel_Tabs & );
+            Gel_Tabs &operator=( const Gel_Tabs &);
+                    
+        protected:
+            void draw();
+            
+        public:
+            int handle(int);
+            Fl_Widget *value();
+            int value(Fl_Widget*);
+            Fl_Widget *push() const {return push_;}
+            int push(Fl_Widget*);
+            Gel_Tabs(int,int,int,int,const char * = 0);
+            virtual ~Gel_Tabs() throw();
+            Fl_Widget *which(int event_x, int event_y);
+        };
+    }
+}
 
 #endif
 
