@@ -20,10 +20,11 @@ void __rcpack( const string &resdir, const string &root, ios::resources::packer 
         
         if( ep->attr == ep->is_dir )
         {
-            if( (strcmp(ep->base_name, ".") == 0) || strcmp(ep->base_name,"..") == 0  )
-            {
+            const string id = ep->base_name;
+            if( id.size() <= 0 )
+                throw exception("invalid sub directory name");
+            if( id[0] == '.' )
                 continue;
-            }
             std::cerr << "\t** subdir  " << ep->base_name << std::endl;
             string        sub_dir  = resdir + ep->base_name;
             string        sub_root = root    + ep->base_name;
