@@ -7,7 +7,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/associative/set.hpp"
 
-#include <Fl/fl_draw.H>
+#include <FL/fl_draw.H>
 
 namespace yocto 
 {
