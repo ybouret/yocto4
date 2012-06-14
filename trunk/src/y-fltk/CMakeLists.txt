@@ -4,11 +4,11 @@ INCLUDE(../share/fltk.cmake)
 
 IF(FLTK_FOUND)
 
-FILE( GLOB decl yocto/FL/*.hpp)
-FILE( GLOB impl yocto/FL/*.cpp)
+FILE( GLOB decl yocto/FLTK/*.hpp)
+FILE( GLOB impl yocto/FLTK/*.cpp)
 SET( srcs ${decl} ${impl} )
-INSTALL( FILES ${decl} DESTINATION include/yocto/FL )
-SOURCE_GROUP( FL FILES ${srcs} )
+INSTALL( FILES ${decl} DESTINATION include/yocto/FLTK )
+SOURCE_GROUP( FLTK FILES ${srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main )
 
