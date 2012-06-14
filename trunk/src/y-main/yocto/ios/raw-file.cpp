@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 #endif
 
-#define YOCTO_RAW_FILE_DEBUG
+//#define YOCTO_RAW_FILE_DEBUG
 
 #if defined(YOCTO_RAW_FILE_DEBUG)
 #include <iostream>

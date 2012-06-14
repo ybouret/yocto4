@@ -4,7 +4,7 @@
 #include "yocto/auto-ptr.hpp"
 #include "yocto/string/conv.hpp"
 
-#define Y_JSON_OUTPUT
+//#define Y_JSON_OUTPUT
 #if defined(Y_JSON_OUTPUT)
 #include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
