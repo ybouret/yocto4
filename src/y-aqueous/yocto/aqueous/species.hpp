@@ -39,7 +39,7 @@ namespace yocto
             static inline void __kill( void *addr ) throw() { assert(addr); static_cast<T*>(addr)->~T(); }
             
             template <typename T>
-            inline void make() 
+            inline void make()
             { 
                 assert(blen>=sizeof(T));
                 assert(addr!=0);
@@ -48,8 +48,8 @@ namespace yocto
                 kill = __kill<T>;
             }
             
-            template <typename T>
-            inline void make( typename type_traits<T>::parameter_type args) 
+            template <typename T, typename U>
+            inline void make( typename type_traits<U>::parameter_type args)
             {
                 assert(blen>=sizeof(T)); 
                 assert(addr); 

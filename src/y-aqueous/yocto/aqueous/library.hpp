@@ -22,15 +22,15 @@ namespace yocto
             template <typename T>
             inline void ld(const string &name, int z)
             {
-		species &sp = add(name,z);
+                species &sp = add(name,z);
                 sp.make<T>();
             }
             
-            template <typename T>
-            inline void ld( const string &name, int z, typename type_traits<T>::parameter_type args )
+            template <typename T,typename U>
+            inline void ld( const string &name, int z, typename type_traits<U>::parameter_type args )
             {
-		species &sp = add(name,z);
-              	sp.make<T>(args);
+                species &sp = add(name,z);
+              	sp.make<T,U>(args);
             }
             
             
@@ -41,11 +41,11 @@ namespace yocto
                 ld<T>(name,z);
             }
             
-            template <typename T>
-            inline void ld( const char *id, int z, typename type_traits<T>::parameter_type args )
+            template <typename T,typename U>
+            inline void ld( const char *id, int z, typename type_traits<U>::parameter_type args )
             {
                 const string name(id);
-                ld<T>(name,z,args);
+                ld<T,U>(name,z,args);
             }
             
             species       & operator[]( const string &name );
@@ -54,7 +54,7 @@ namespace yocto
             species &       operator[]( const char *name );
             const species & operator[]( const char *name ) const;
             
-                      
+            
         private:
             const size_t nx;
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
