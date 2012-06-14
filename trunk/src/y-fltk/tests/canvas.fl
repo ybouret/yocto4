@@ -1,0 +1,23 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include "yocto/FLTK/Canvas.hpp"} {public global
+} 
+
+decl {using namespace yocto;} {public global
+} 
+
+Function {MakeCanvasWindow()} {open
+} {
+  Fl_Window {} {
+    label {Test Canvas} open
+    xywh {637 168 359 209} type Double resizable visible
+  } {
+    Fl_Box Ca {
+      label Canvas selected
+      xywh {50 28 260 147} box ENGRAVED_BOX color 0 align 1 resizable
+      class {FLTK::Canvas}
+    }
+  }
+} 

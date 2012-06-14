@@ -4,7 +4,7 @@
 #include "yocto/string.hpp"
 #include "yocto/geom/v2d.hpp"
 #include "yocto/intrusive-ptr.hpp"
-#include "yocto/sequence/list.hpp"
+#include "yocto/sequence/vector.hpp"
 #include "yocto/associative/set.hpp"
 
 #include <Fl/fl_draw.H>
@@ -15,7 +15,7 @@ namespace yocto
     {
         
         typedef geom::v2d<double> Point;
-        typedef list<Point>       Points;
+        typedef vector<Point>     Points;
         
         class Curve : public Points, public counted
         {
