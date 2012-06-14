@@ -172,7 +172,7 @@ namespace yocto
                     case 't': C = '\t'; break;
                         
                     default:
-                        throw exception("%s: line %u: invalid escaped char '%c'", jstr.name.c_str(), line, C );
+                        throw exception("%s: line %u: invalid escaped char '%c'", jstr.name.c_str(), unsigned(line), C );
                 }
                 _str.append( C );
                 return false; // not a lexeme
