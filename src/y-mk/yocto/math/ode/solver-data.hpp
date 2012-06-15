@@ -24,7 +24,7 @@ namespace yocto
 				T TINY; //!< initial=1e-30, for yscal
                 
             protected:
-                explicit solver_data();
+                explicit solver_data( T user_eps );
                 lw_array<T> &y, &dydx, &yscal;
 
                 

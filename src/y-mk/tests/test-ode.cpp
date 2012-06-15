@@ -66,7 +66,7 @@ static inline
 void perform_ode( const string &drvid )
 {
 	dummy<T>                     dum;
-	DRIVER                       odeint;
+	DRIVER                       odeint(1e-4);
 	
 	typename ode::field<T>::type drvs1( &dum, & dummy<T>::eval1 );
 	typename ode::field<T>::type drvs2( &dum, & dummy<T>::eval2 );

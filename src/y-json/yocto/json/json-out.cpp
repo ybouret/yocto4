@@ -107,7 +107,6 @@ namespace yocto
         
         void Value:: out( const Object &obj, ios::ostream &fp, size_t depth )
         {
-            //__indent(fp,depth); 
             fp.write('{'); fp.write('\n');
             const size_t   start = depth+2;
             vector<string> keys( obj.length(), as_capacity );
@@ -118,7 +117,7 @@ namespace yocto
                 keys.push_back(s);
                 if( keys.back().size() > kmax ) kmax = keys.back().size();
             }
-            const size_t key_space   = kmax + 1;
+            const size_t key_space   = kmax  + 1;
             const size_t child_start = start + key_space + 2; 
             
             size_t count = 1;

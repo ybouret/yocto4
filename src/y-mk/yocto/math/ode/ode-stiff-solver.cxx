@@ -16,8 +16,8 @@ namespace yocto
             }
             
             template <>
-            stiff_solver<real_t>:: stiff_solver() : 
-            solver_data<real_t>()
+            stiff_solver<real_t>:: stiff_solver( real_t user_eps ) : 
+            solver_data<real_t>( user_eps )
             {
             }
             

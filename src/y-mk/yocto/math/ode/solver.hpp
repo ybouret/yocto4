@@ -18,7 +18,7 @@ namespace yocto
 			{
 			public:
 				typedef typename field<T>::type equation;
-				explicit solver();
+				explicit solver( T user_eps );
 				virtual ~solver() throw();
 				
 				void operator()(equation   &drvs,
@@ -46,7 +46,7 @@ namespace yocto
 			public:
 				typedef typename field<T>::type equation;
 				
-				explicit driver() : solver<T>(), ctrl_(), step_() {}
+				explicit driver( T user_eps ) : solver<T>( user_eps ), ctrl_(), step_() {}
 				virtual ~driver() throw()       {}
 				
 				inline void start( size_t nvar ) 

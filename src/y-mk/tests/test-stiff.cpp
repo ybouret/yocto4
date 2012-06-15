@@ -62,9 +62,8 @@ YOCTO_UNIT_TEST_IMPL(stiff)
     Real dx = 0.01;
     
     {
-        ode::stiff_drvrs<Real>::type drv;
+        ode::stiff_drvrs<Real>::type drv(1e-4);
         drv.start(3);
-        drv.eps = 1e-4;
         Real h  = 2.9e-4;
         y[1] = 1;
         y[2] = 1;
@@ -83,9 +82,8 @@ YOCTO_UNIT_TEST_IMPL(stiff)
     
     
     {
-        ode::stiff_drvkr<Real>::type drv;
+        ode::stiff_drvkr<Real>::type drv(1e-4);
         drv.start(3);
-        drv.eps = 1e-4;
         Real h  = 2.9e-4;
         y[1] = 1;
         y[2] = 1;
