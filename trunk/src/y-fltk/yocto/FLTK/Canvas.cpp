@@ -10,7 +10,12 @@ namespace yocto
         }
         
         Canvas:: Canvas( int X, int Y, int W, int H, const char *l ) :
-        Fl_Box(X,Y,W,H,l)
+        Fl_Box(X,Y,W,H,l),
+	xaxis(),
+	yaxis(),
+	y2axis(),
+	curves(),
+	curves2()
         {
         }
 
