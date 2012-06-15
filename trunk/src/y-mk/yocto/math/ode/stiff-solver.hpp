@@ -18,7 +18,7 @@ namespace yocto
                 typedef typename stiff_step<T>::equation equation;
                 typedef typename stiff_step<T>::jacobian jacobian;
                 
-                explicit stiff_solver();
+                explicit stiff_solver( T user_eps );
                 virtual ~stiff_solver() throw();
                 
                 void operator()(equation         &derivs,
@@ -43,7 +43,7 @@ namespace yocto
                 typedef typename stiff_step<T>::equation equation;
                 typedef typename stiff_step<T>::jacobian jacobian;
                 
-                explicit stiff_driver() : stiff_solver<T>(), step_() {}
+                explicit stiff_driver( T user_eps ) : stiff_solver<T>( user_eps ), step_() {}
                 virtual ~stiff_driver() throw() {}
                 
                 inline void start( size_t nv ) 

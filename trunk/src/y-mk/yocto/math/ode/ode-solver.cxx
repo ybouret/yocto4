@@ -16,8 +16,8 @@ namespace yocto
 			
 			
 			template <>
-			solver<real_t>:: solver() :
-			solver_data<real_t>()
+			solver<real_t>:: solver( real_t user_eps ) :
+			solver_data<real_t>( user_eps )
 			{
 			
 			}
