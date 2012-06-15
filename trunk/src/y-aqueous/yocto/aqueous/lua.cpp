@@ -249,6 +249,7 @@ namespace yocto
 						Lua::Function<double>       kfn(L,fn); // functionoid
 						const initproc              v( kfn );  // functor
 						pC = &ini.create( v );
+                        (bool&)(ini.is_variable)  = true;
 					}
 					else 
 						throw exception("%s: invalid type for constraint #%u value", ini_name, i);
