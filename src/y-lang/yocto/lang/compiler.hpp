@@ -12,6 +12,10 @@ namespace yocto
     {
         
         //! compile a simple grammar from an input stream
+        /**
+         parse a compact EBNF grammar
+         into an AST.
+         */
         class compiler : public parser
         {
         public:

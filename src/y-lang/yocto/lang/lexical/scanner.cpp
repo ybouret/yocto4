@@ -57,7 +57,7 @@ opid_(0)
 			void scanner:: make( const string &label, regex::pattern *motif, const action *proc  )
 			{
 				assert(motif);
-				std::cerr << "'"<< name <<"' => [" << label << "]" << std::endl;
+				//std::cerr << "'"<< name <<"' => [" << label << "]" << std::endl;
 				//--------------------------------------------------------------
 				// no multiple rule
 				//--------------------------------------------------------------

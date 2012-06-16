@@ -14,7 +14,7 @@ namespace yocto
         
         //! convert a regex::source into a lexeme source
         /**
-         use multiple scanner
+         use multiple scanners if needed
          */
         class lexer 
         {
@@ -42,7 +42,7 @@ namespace yocto
             //! put in cache a previously read lexeme
             void unget( lexeme *lx ) throw();
             
-
+            
 			//! try to cache one lexeme
 			bool is_active( regex::source &src );
             
