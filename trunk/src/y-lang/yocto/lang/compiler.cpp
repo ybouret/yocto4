@@ -95,12 +95,29 @@ namespace yocto
             set_root(GRAMMAR);
         }
         
+        /**
+         GRAMMAR : RULE+;
+         RULE : RULEID ';';
+         RULEID : "[:word:]+";
+         REGEXP : "[:cstring:]";
+         SINGLE : "'[\\x20-\\x7F]'"
+         */
         
+        
+        static inline
+        void __regroup( syntax::parse_node *node )
+        {
+            assert(node);
+            if( !node->terminal )
+            {
+                syntax::parse_node::child_list &chl = node->children();
+                
+            }
+        }
         
         static inline
         void __rewrite( syntax::parse_node *node )
         {
-            assert(node);
             if( ! node->terminal )
             {
                 syntax::parse_node::child_list &chl = node->children();
@@ -186,10 +203,11 @@ namespace yocto
             
             //-- first pass: take care of specialized and discardable
             Tree->AST();
-            
+            return Tree;
+
             //-- rewrite alternate
             __rewrite(Tree);
-            
+
             //-- second pass: fusion single new items
             Tree->AST();
             

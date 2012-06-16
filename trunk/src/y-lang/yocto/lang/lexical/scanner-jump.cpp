@@ -100,7 +100,7 @@ namespace yocto
                 const action      fcn( ctx );
                 
                 //-- make the corresponding rule
-                std::cerr << "'" << name << "' => [" << label << "]" << std::endl;
+                //std::cerr << "'" << name << "' => [" << label << "]" << std::endl;
                 rules_.push_back( rule::create(label, p.yield(), fcn, true) );
                 
             }
