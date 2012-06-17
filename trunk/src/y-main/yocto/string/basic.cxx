@@ -316,6 +316,30 @@ assert( (S)->char_[(S)->size_] == 0 )
 			}
 		}
 		
+        template <>
+		void string<YCHAR>:: to_lower() throw()
+        {
+            static const int shift = int('a') - int('A');
+            for( size_t i=0; i < size_; ++i )
+            {
+                int c = char_[i];
+                if( c >= 'A' && c <= 'Z' )
+                    char_[i] = c + shift;
+            }
+        }
+        
+        template <>
+		void string<YCHAR>:: to_upper() throw()
+        {
+            static const int shift = int('A') - int('a');
+            for( size_t i=0; i < size_; ++i )
+            {
+                int c = char_[i];
+                if( c >= 'a' && c <= 'z' )
+                    char_[i] = c + shift;
+            }
+        }
+
 	}
 	
 }

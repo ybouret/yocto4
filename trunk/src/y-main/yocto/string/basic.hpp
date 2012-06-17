@@ -155,7 +155,9 @@ friend inline bool operator OP ( const T       _lhs, const string &_rhs ) throw(
 			//------------------------------------------------------------------
 			void trim(size_t n) throw();
 			void skip(size_t n) throw();
-			
+			void to_upper() throw();
+            void to_lower() throw();
+            
 		private:
 			size_t size_; //!< #chars
 			size_t full_; //!< memory units
