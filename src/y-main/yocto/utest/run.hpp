@@ -10,6 +10,7 @@
 
 #define YOCTO_UNIT_TEST_IMPL(NAME)                            \
 /*	*/	int yocto_unit_test_##NAME( int argc, char **argv ) { \
+/*  */  (void)argc; (void)argv;                               \
 /*	*/		try 
 
 #define YOCTO_UNIT_TEST_DONE()  \
