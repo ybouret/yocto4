@@ -67,7 +67,9 @@ namespace yocto
             // Rule content
             //------------------------------------------------------------------
             syntax::alternate &ATOM     = alt("ATOM");
-            syntax::aggregate &ITEM     = agg("ITEM", syntax::is_merging_one );
+            //syntax::aggregate &ITEM     = agg("ITEM", syntax::is_merging_one );
+            syntax::aggregate &ITEM     = agg("ITEM");
+
             syntax::repeating &ELEMENTS = rep("ELEMENTS", ITEM, 1);
             syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
             syntax::aggregate &ALT      = agg("ALT");
