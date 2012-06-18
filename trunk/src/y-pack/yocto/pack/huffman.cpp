@@ -181,7 +181,7 @@ namespace yocto
             }
             
             root = prioQ.pop();
-            std::cerr << "root->bits=" << root->bits << std::endl;
+            //std::cerr << "root->bits=" << root->bits << std::endl;
             
             //------------------------------------------------------------------
             // assign codes
@@ -273,7 +273,33 @@ namespace yocto
         {
             Node *node = &nodes[b];
             assert(node->bits>0);
+            if( node->freq <= 0 )
+            {
+                assert( !alphabet.owns(node) );
+                //--------------------------------------------------------------
+                // a new char
+                //--------------------------------------------------------------
+                if( alphabet.size > 0 )
+                {
+                    nyt->emit(out);
+                }
+                // else first char ever, no need for NYT
+                node->emit(out);
+                alphabet.push_front(node);
+            }
+            else 
+            {
+                //--------------------------------------------------------------
+                // already encoded char
+                //--------------------------------------------------------------
+                node->emit(out);
+            }
             
+            //-- update frequency
+            ++(node->freq);
+            
+            //-- update tree
+            build_tree();
         }
         
     }
