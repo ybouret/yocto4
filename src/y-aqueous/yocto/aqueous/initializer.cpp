@@ -45,6 +45,12 @@ namespace yocto
 				throw exception("constraint( multiple '%s' )", id.c_str() );
 		}
         
+        void constraint:: add( const char   *id, double w )
+        {
+            const string ID(id);
+            add( ID, w );
+        }
+        
         
 		initializer:: ~initializer() throw()
 		{

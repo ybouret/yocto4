@@ -28,7 +28,8 @@ namespace yocto
 			mutable initproc value;
 
 			void add( const string &id, double w );
-
+            void add( const char   *id, double w );
+            
 		private:
 			YOCTO_DISABLE_ASSIGN(constraint);
 			weights        coefficients;
