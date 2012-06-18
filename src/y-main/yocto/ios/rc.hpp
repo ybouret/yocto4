@@ -11,6 +11,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/shared-ptr.hpp"
+#include "yocto/container/sequence.hpp"
 
 namespace yocto 
 {
@@ -75,7 +76,11 @@ namespace yocto
             ios::ichannel *load_channel( const char   *rcname ) const;
             ios::istream  *load_stream(  const string  &rcname ) const;
             ios::istream  *load_stream(  const char    *rcname ) const;
-            
+            void           load_chars( sequence<char> &seq, const string &rcname, size_t num_pad ) const;
+            void           load_chars( sequence<char> &seq, const char   *rcname, size_t num_pad ) const;
+            void           load_string( string &str, const string &rcname ) const;
+            void           load_string( string &str, const char   *rcname ) const;
+
             typedef item_db::const_iterator iterator;
             iterator begin() const;
             iterator end()   const;
