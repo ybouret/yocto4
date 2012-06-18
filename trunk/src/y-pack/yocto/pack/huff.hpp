@@ -21,6 +21,7 @@ namespace yocto
             static const size_t COUNT_MAX = 2*ALPHA_MAX;
             static const int    NYT       = -1;            //!< tag for NYT
             static const int    END       = -2;            //!< tag for END 
+            static const int    INSIDE    = -3;            //!< tag for Inside
             static const size_t NYT_INDEX = ALPHA_NUM;
             static const size_t END_INDEX = NYT_INDEX+1;
             typedef size_t      freq_t;

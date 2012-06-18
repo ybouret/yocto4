@@ -6,6 +6,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/string.hpp"
 #include "yocto/ios/bitio.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto 
 {
@@ -17,12 +18,14 @@ namespace yocto
         {
             
             static const size_t ALPHABET_NUM = 256;              //!< possible bytes
-            static const size_t ALPHABET_MAX = ALPHABET_NUM + 2; //!< +NYT +END
+            static const size_t NUM_CONTROLS = 2;                //!< +NYT, +END
+            static const size_t ALPHABET_MAX = ALPHABET_NUM + NUM_CONTROLS; 
             static const size_t NODES_MAX    = 2*ALPHABET_MAX;   //!< Max #nodes in tree
-            static const int    NYT       = -1;                  //!< tag for NYT
-            static const int    END       = -2;                  //!< tag for END 
-            static const size_t NYT_INDEX = ALPHABET_NUM;
-            static const size_t END_INDEX = NYT_INDEX+1;
+            static const int    NYT          = -1;               //!< tag for NYT
+            static const int    END          = -2;               //!< tag for END 
+            static const int    INSIDE       = -3;               //!< tag for inside
+            static const size_t NYT_INDEX    = ALPHABET_NUM;     //!< 
+            static const size_t END_INDEX    = NYT_INDEX+1;      //!<
             
             typedef size_t      FreqType;
             typedef uint32_t    CodeType;
@@ -53,6 +56,11 @@ namespace yocto
                 private:
                     YOCTO_DISABLE_COPY_AND_ASSIGN(Comparator);
                 };
+                
+                void       viz( ios::ostream &fp ) const;
+                void       encode() throw();
+                void       display( ios::ostream &fp ) const;
+                void       emit( ios::bitio &out ) const;
             };
             
             typedef core::list_of<Node>           List;
@@ -65,7 +73,29 @@ namespace yocto
                 explicit Tree();
                 virtual ~Tree() throw();
                 
+                void initialize() throw();
+                void build_tree() throw();
+                
+                void graphviz( const string &graphName, ios::ostream &fp ) const;
+                void display( ios::ostream &fp ) const;
+                
+                //! encode the byte b
+                void encode( ios::bitio &out, uint8_t b );
+                
+                
+                
             private:
+                Node        *root;      //!< tree root
+                List         alphabet;  //!< current #symbols
+                Heap         prioQ;     //!< to build tree
+                size_t       num_nodes; //!< for memory
+                Node        *nodes;     //!< all the nodes 
+                Node        *nyt;       //!< nodes + NYT_INDEX
+                Node        *end;       //!< nodes + END_INDEX
+                const size_t bytes;     //!< num_nodes * sizeof(Node)
+
+                void update( uint8_t b ) throw(); //! update tree
+
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
             };
             
