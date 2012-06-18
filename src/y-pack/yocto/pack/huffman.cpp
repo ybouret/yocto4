@@ -302,6 +302,14 @@ namespace yocto
             build_tree();
         }
         
+        void Huffman:: Tree:: decode_init(void **handle) throw()
+        {
+            assert(handle!=NULL);
+            assert(NULL == *handle );
+            assert( root != NULL );
+            *handle = root;
+        }
+        
     }
     
 }
