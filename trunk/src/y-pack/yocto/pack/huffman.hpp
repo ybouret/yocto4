@@ -82,6 +82,12 @@ namespace yocto
                 //! encode the byte b
                 void encode( ios::bitio &out, uint8_t b );
                 
+                //! initialize decoding
+                /**
+                 void *context = NULL;
+                 decode_init( &context );
+                 */
+                void decode_init( void **handle ) throw();
                 
                 
             private:
