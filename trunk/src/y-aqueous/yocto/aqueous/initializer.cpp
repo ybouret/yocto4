@@ -120,7 +120,7 @@ namespace yocto
 			const size_t   N  = cs.size();
 			const size_t   Nc = constraints.size();
 			if( Nc+N != M )
-				throw exception("#constraints mismatch!");
+				throw exception("#constraints mismatch: Nc=%u + N=%u != M=%u", unsigned(Nc), unsigned(N), unsigned(M) );
             
 			if( Nc > 0 )
 			{

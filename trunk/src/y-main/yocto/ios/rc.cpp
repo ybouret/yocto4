@@ -3,7 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/ios/iflux.hpp"
-
+#include "yocto/auto-ptr.hpp"
 
 
 #include <iostream>
@@ -331,6 +331,46 @@ H(), db(16,as_capacity)
         {
             const string id(rcname);
             return load_stream(id);
+        }
+        
+        void resources:: load_chars( sequence<char> &seq, const string &rcname, size_t num_pad ) const
+        {
+            const item *it = db.search(rcname);
+            if( !it ) 
+                throw exception("resources(no chars '%s')", rcname.c_str() );
+            const size_t len = size_t( it->bytes );
+            seq.free();
+            seq.reserve(len+num_pad);
+            auto_ptr<ios::istream> fp( new rc_stream(rc,it->start,len) );
+            char C = 0;
+            while( fp->query(C) ) seq.push_back(C);
+            for( size_t i=num_pad; i>0; --i ) seq.push_back(0);
+        }
+        
+        void resources:: load_chars( sequence<char> &seq, const char *id, size_t num_pad ) const
+        {
+            const string rcname(id);
+            load_chars(seq, rcname, num_pad);
+        }
+        
+        void resources:: load_string(string &str, const string &rcname ) const 
+        {
+            const item *it = db.search(rcname);
+            if( !it ) 
+                throw exception("resources(no string '%s')", rcname.c_str() );
+            const size_t len = size_t( it->bytes );
+            str.clear();
+            string tmp(len,as_capacity);
+            char C = 0;
+            auto_ptr<ios::istream> fp( new rc_stream(rc,it->start,len) );
+            while( fp->query(C) ) tmp.append(C);
+            str.swap_with(tmp);
+        }
+        
+        void resources:: load_string(string &str, const char *id ) const 
+        {
+            const string rcname(id);
+            load_string(str, rcname);
         }
         
     }
