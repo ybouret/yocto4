@@ -22,6 +22,10 @@ namespace yocto
         {
         }
         
+#if defined(_MSC_VER)
+		// this in ctor
+#pragma warning ( disable : 4355 )
+#endif
         equilibrium:: equilibrium( const library &L, const string &id, double eqK ) :
         name( id ),
         K( this, & equilibrium::getK ),

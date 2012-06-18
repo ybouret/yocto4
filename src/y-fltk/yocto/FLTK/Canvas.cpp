@@ -69,7 +69,7 @@ namespace yocto
                         
                         const double x1 = X+(p1.x - Xaxis.vmin) * xscale;
                         const double y1 = ytop-(p1.y - Yaxis.vmin) * yscale;
-                        fl_line(x0, y0, x1, y1 );
+                        fl_line( int(x0), int(y0), int(x1), int(y1) );
                     }
                 }
             }
