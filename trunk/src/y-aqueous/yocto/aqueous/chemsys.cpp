@@ -46,6 +46,14 @@ namespace yocto
             return *eq;
         }
         
+        
+        equilibrium & chemsys:: create( const char *id, const equilibrium::constant &K )
+        {
+            const string name(id);
+            return create(name,K);
+        }
+        
+        
         equilibrium & chemsys:: create( const string &name, double K )
         {
             equilibrium::ptr eq( new equilibrium(lib,name,K) );
@@ -56,6 +64,12 @@ namespace yocto
             }
             
             return *eq;
+        }
+        
+        equilibrium & chemsys:: create( const char *id, double K )
+        {
+            const string name(id);
+            return create(name,K);
         }
         
         
@@ -248,7 +262,7 @@ namespace yocto
                 // compute inverse jacobian for C, and dtGam
                 //--------------------------------------------------------------
                 computeW(t,true);
-              
+                
                 //--------------------------------------------------------------
                 // dtGam += Phi * dC
                 //--------------------------------------------------------------

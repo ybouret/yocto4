@@ -21,6 +21,10 @@ namespace yocto
             equilibrium & create( const string &name, const equilibrium::constant &K );
             equilibrium & create( const string &name, double K );
             
+            equilibrium & create( const char *name, const equilibrium::constant &K );
+            equilibrium & create( const char *name, double K );
+
+            
             void build();
             const double       ftol;    //!< fractional tolerance
             matrix<double>     nu;      //! topology matrix [NxM]
