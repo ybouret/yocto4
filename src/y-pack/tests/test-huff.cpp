@@ -1,8 +1,9 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/pack/huff.hpp"
+#include "yocto/pack/huffman.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/code/mtf.hpp"
+
+#include <cstdlib>
 
 using namespace yocto;
 using namespace packing;
@@ -10,66 +11,24 @@ using namespace packing;
 
 YOCTO_UNIT_TEST_IMPL(huff)
 {
+    Huffman::Tree tree;
+    ios::icstream in( ios::cstdin );
     ios::bitio    out;
-    huffman::tree huff;
     
-    huffman::tree       huff2;
-    core::move_to_front mtf;
-    ios::bitio          out2;
-
-    
-    ios::icstream fp( ios::cstdin );
-    ios::ocstream bin(  "huff.dat", false );
-    ios::ocstream bin2( "huff2.dat", false );
-
-    string line;
-    
-    std::cerr << "enter data:" << std::endl;
-    
-    char C = 0;
-    size_t num_in   = 0;
-    size_t num_out  = 0;
-    size_t num_out2 = 0;
-    
-    while( fp.query(C) )
+    char C=0;
+    while( in.query(C) )
     {
-        ++num_in;
-        huff.encode(out, C);
-        huff2.encode(out2, mtf.encode(C) );
-        while( out.size() >= 8 )
-        {
-            bin.write( out.pop_full<uint8_t>() );
-            ++num_out;
-        }
-        
-        while( out2.size() >= 8 )
-        {
-            bin2.write( out2.pop_full<uint8_t>() );
-            ++num_out2;
-        }
-        
+        tree.encode(out,uint8_t(C) );
     }
     
-    huff.flush( out );
-    while( out.size() >= 8 )
     {
-        bin.write( out.pop_full<uint8_t>() );
-        ++num_out;
+        ios::ocstream fp("huff.dot",false);
+        tree.graphviz("G", fp);
     }
-    
-    huff2.flush( out2 );
-    while( out2.size() >= 8 )
+    system( "dot -Tpng huff.dot -o huff.png" );
     {
-        bin2.write( out2.pop_full<uint8_t>() );
-        ++num_out2;
+        ios::ocstream fp( ios::cstderr );
+        tree.display(fp);
     }
-
-    std::cerr << "#in  = "  << num_in  << std::endl;
-    std::cerr << "#out = "  << num_out << std::endl;
-    std::cerr << "#out2 = " << num_out2 << std::endl;
-
-    huff.show( std::cerr );
-    huff2.show( std::cerr );
-    huff.graph( "huff.viz" );
 }
 YOCTO_UNIT_TEST_DONE()
