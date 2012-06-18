@@ -324,7 +324,7 @@ assert( (S)->char_[(S)->size_] == 0 )
             {
                 int c = char_[i];
                 if( c >= 'A' && c <= 'Z' )
-                    char_[i] = c + shift;
+                    char_[i] = char(c + shift);
             }
         }
         
@@ -336,7 +336,7 @@ assert( (S)->char_[(S)->size_] == 0 )
             {
                 int c = char_[i];
                 if( c >= 'a' && c <= 'z' )
-                    char_[i] = c + shift;
+                    char_[i] = char(c + shift);
             }
         }
 
