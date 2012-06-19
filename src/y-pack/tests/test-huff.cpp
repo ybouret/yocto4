@@ -94,8 +94,6 @@ YOCTO_UNIT_TEST_IMPL(huffdec)
     while( src.query(C) )
     {
         bio.push_full<uint8_t>(C);
-        //bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
-
         for(;;)
         {
             const Huffman::DecodeStatus status = tree.decode(h, bio, D);
