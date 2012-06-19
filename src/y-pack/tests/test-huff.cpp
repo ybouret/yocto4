@@ -66,13 +66,11 @@ YOCTO_UNIT_TEST_IMPL(huffenc)
         }
     }
     bio.fill_to_byte_with(false);
-    bio.output(std::cerr, bio.size());
-    std::cerr << std::endl;
-    //std::cerr << "remaining " << bio.size() << " bits" << std::endl;
+    //bio.output(std::cerr, bio.size());
+    //std::cerr << std::endl;
     if( bio.size() > 0 )
     {
         const uint8_t b = bio.pop_full<uint8_t>();
-        std::cerr << "write " << int(b) << std::endl;
         tgt.write( b );
     }
     
@@ -98,7 +96,6 @@ YOCTO_UNIT_TEST_IMPL(huffdec)
     while( src.query(C) )
     {
         bio.push_full<uint8_t>(C);
-        //bio.output(std::cerr<<std::endl, bio.size()); std::cerr << std::endl;
         for(;;)
         {
             const Huffman::DecodeStatus status = tree.decode(h, bio, D);

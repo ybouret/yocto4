@@ -33,7 +33,6 @@ namespace yocto
             
             struct Node
             {
-                Node      *parent; //!< parent
                 Node      *left;   //!< has highest frequency
                 Node      *right;  //!< has lowest  frequency
                 FreqType   freq;   //!< cumulative  frequency
