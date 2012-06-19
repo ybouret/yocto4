@@ -40,10 +40,10 @@ namespace yocto
             assert( handle.node == root );
             if( in.size() >= 8 )
             {
-                ios::ocstream fp( ios::cstderr );
+                //ios::ocstream fp( ios::cstderr );
                 const uint8_t b  = in.pop_full<uint8_t>();
                 C = char(b);
-                fp("read : "); nodes[b].display(fp);
+                //fp("read : "); nodes[b].display(fp);
                 update(b);
                 handle.node = root;
                 handle.flag = Y_HUFF_DECODE_ANY;
@@ -60,22 +60,11 @@ namespace yocto
                 //==============================================================
                 // walk down the tree
                 //==============================================================
-                ios::ocstream fp( ios::cstderr );
-                //fp("<Tree>\n");
-                //display(fp);
+                //ios::ocstream fp( ios::cstderr );
+                
                 
                 const bool at_right = in.pop();
-#if 0
-                fp("handle.node : "); handle.node->display(fp);
-                if(handle.node->right)
-                {
-                    fp("\tright : "); handle.node->right->display(fp);
-                }
-                if(handle.node->left)
-                {
-                    fp("\tleft  : "); handle.node->left->display(fp);
-                }
-#endif           
+      
                 
                 if( at_right )
                 {
@@ -93,7 +82,7 @@ namespace yocto
                 }
                 
                 const int ch = handle.node->ch;
-                fp("read : "); handle.node->display(fp);
+                //fp("read : "); handle.node->display(fp);
                 if( ch > INSIDE )
                 {
                     //==========================================================
