@@ -42,7 +42,6 @@ namespace yocto
                 size_t     bits;   //!< #bits in code
                 CodeType   code;   //!< code
                 int        ch;     //!< character
-                CodeType   cbit;   //!< coding bit
                 
                 class Comparator
                 {
@@ -67,6 +66,19 @@ namespace yocto
             typedef heap<Node,Node::Comparator>   Heap;
             
             
+            enum DecodeStatus
+            {
+                DecodeSuccess,
+                DecodePending,
+                DecodeFlushed
+            };
+            
+            struct DecodeHandle
+            {
+                Node *node;
+                int   flag;
+            };
+            
             class Tree
             {
             public:
@@ -87,8 +99,8 @@ namespace yocto
                  void *context = NULL;
                  decode_init( &context );
                  */
-                void decode_init( void **handle ) throw();
-                
+                void decode_init( DecodeHandle &handle ) throw();
+                DecodeStatus decode( DecodeHandle &handle, ios::bitio &in, char &C );
                 
             private:
                 Node        *root;      //!< tree root

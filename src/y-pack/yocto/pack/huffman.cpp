@@ -1,6 +1,7 @@
 #include "yocto/pack/huffman.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/exception.hpp"
 
 #include <iostream>
 
@@ -10,6 +11,11 @@ namespace yocto
     namespace packing
     {
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Node viz
+        //
+        ////////////////////////////////////////////////////////////////////////
         static inline
         void __tag( const void *p, ios::ostream &fp )
         {
@@ -28,8 +34,8 @@ namespace yocto
 				fp.write( char('A' + (  B     & 0xf )) );
 			}
             
-            
         }
+        
         
         void Huffman:: Node:: viz( ios::ostream &fp ) const
         {
@@ -73,7 +79,11 @@ namespace yocto
             
         }
         
-        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Tree Initialization
+        //
+        ////////////////////////////////////////////////////////////////////////
         Huffman:: Tree:: Tree() :
         root(NULL),
         alphabet(),
@@ -93,13 +103,19 @@ namespace yocto
             memory::kind<memory::global>::release_as<Node>(nodes,num_nodes);
         }
         
-        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Tree initialization
+        //
+        ////////////////////////////////////////////////////////////////////////
         void Huffman:: Tree:: initialize() throw()
         {
             alphabet.reset();
             memset( nodes, 0, bytes );
             
+            //------------------------------------------------------------------
             //-- prepare possible symbols
+            //------------------------------------------------------------------
             for( int i=0; i < ALPHABET_NUM; ++i )
             {
                 Node *node = nodes+i;
@@ -108,21 +124,32 @@ namespace yocto
                 node->code = i;
             }
             
+            //------------------------------------------------------------------
             //-- prepare control nodes
+            //------------------------------------------------------------------
             nyt->ch = NYT;
             end->ch = END;
             
+            //------------------------------------------------------------------
             //-- prepare inside nodes
+            //------------------------------------------------------------------
             for( int i=ALPHABET_MAX; i < NODES_MAX; ++i )
             {
                 nodes[i].ch = INSIDE;
             }
             
+            //------------------------------------------------------------------
             //-- initialize alphabet
+            //------------------------------------------------------------------
             build_tree();
         }
         
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // recursive tree encoding
+        //
+        ////////////////////////////////////////////////////////////////////////
         void Huffman::Node:: encode() throw()
         {
             const size_t child_bits = bits+1;
@@ -142,7 +169,11 @@ namespace yocto
             }
         }
         
-        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Build the huffman tree
+        //
+        ////////////////////////////////////////////////////////////////////////
         void Huffman:: Tree:: build_tree() throw()
         {
             root       = NULL;
@@ -181,7 +212,6 @@ namespace yocto
             }
             
             root = prioQ.pop();
-            //std::cerr << "root->bits=" << root->bits << std::endl;
             
             //------------------------------------------------------------------
             // assign codes
@@ -268,7 +298,7 @@ namespace yocto
             assert(bits>0);
             out.push<CodeType>(code,bits);
         }
-
+        
         void Huffman:: Tree:: encode( ios::bitio &out, uint8_t b )
         {
             Node *node = &nodes[b];
@@ -302,12 +332,92 @@ namespace yocto
             build_tree();
         }
         
-        void Huffman:: Tree:: decode_init(void **handle) throw()
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // decoding algorithm
+        //
+        ////////////////////////////////////////////////////////////////////////
+#define Y_HUFF_DECODE_ANY (0x01) 
+#define Y_HUFF_DECODE_SYM (0x02)
+        
+        void Huffman:: Tree:: decode_init( DecodeHandle &handle) throw()
         {
-            assert(handle!=NULL);
-            assert(NULL == *handle );
+            initialize();
             assert( root != NULL );
-            *handle = root;
+            handle.node = root;              //!< start at top
+            handle.flag = Y_HUFF_DECODE_SYM; //!< wait for the first symbol
+        }
+        
+        Huffman::DecodeStatus Huffman::Tree:: decode( DecodeHandle &handle, ios::bitio &in, char &C )
+        {
+            assert( handle.node != NULL );
+            assert( handle.node->ch == INSIDE);
+            switch( handle.flag )
+            {
+                case Y_HUFF_DECODE_SYM:
+                    if( in.size() >= 8 )
+                    {
+                        const uint8_t b  = in.pop_full<uint8_t>();
+                        C = char(b);
+                        update(b);
+                        handle.flag = Y_HUFF_DECODE_ANY;
+                        return DecodeSuccess;
+                    }
+                    return DecodePending;
+                    
+                case Y_HUFF_DECODE_ANY:
+                    while( in.size() > 0 )
+                    {
+                        const bool at_left = in.pop();
+                        if( at_left )
+                        {
+                            Node *left = handle.node->left;
+                            if(!left) throw  exception("corrupted input");
+                            handle.node = left;
+                        }
+                        else
+                        {
+                            Node *right = handle.node->right;
+                            if(!right) throw exception("currupted input");
+                            handle.node = right;
+                        }
+                        
+                        const int ch = handle.node->ch;
+                        if( ch >INSIDE )
+                        {
+                            //--------------------------------------------------
+                            // we have a leave
+                            //--------------------------------------------------
+                            switch( ch )
+                            {
+                                case END:
+                                    
+                                    break;
+                                    
+                                case NYT:
+                                    
+                                    break;
+                                    
+                                default:
+                                    assert(ch>=0);
+                                    assert(ch<ALPHABET_NUM);
+                                    C = char(ch);
+                                    handle.node = root;
+                                    update(ch);
+                                    break;
+                                    
+                            }
+                            
+                        }
+                        
+                    }
+                    break;
+                    
+                default:
+                    throw exception("Huffman: invalid handle flag=%d", handle.flag ); 
+            }
+            
+            return DecodePending;
         }
         
     }
