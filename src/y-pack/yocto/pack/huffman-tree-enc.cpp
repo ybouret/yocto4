@@ -11,8 +11,8 @@ namespace yocto
         void Huffman::Node:: emit( ios::bitio &out ) const
         {
             assert(bits>0);
-            ios::ocstream fp( ios::cstderr );
-            fp("emit : "); display(fp);
+            //ios::ocstream fp( ios::cstderr );
+            //fp("emit : "); display(fp);
             out.push<CodeType>(code,bits);
         }
         

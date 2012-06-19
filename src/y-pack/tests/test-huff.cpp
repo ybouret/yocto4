@@ -56,29 +56,27 @@ YOCTO_UNIT_TEST_IMPL(huffenc)
     ios::icstream src( ios::cstdin );
     ios::ocstream tgt( ios::cstdout );
     ios::bitio    bio;
+    size_t nIn = 0, nOut = 0;
     char C=0;
     while( src.query(C) )
     {
+        ++nIn;
         tree.encode(bio, C);
         while( bio.size() >= 8 )
         {
-            //bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
+            ++nOut;
             tgt.write( bio.pop_full<uint8_t>() );
         }
     }
     tree.flush(bio);
     while( bio.size() > 0 )
     {
-        //bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
         const uint8_t b = bio.pop_full<uint8_t>();
         tgt.write( b );
+        ++nOut;
     }
-    
-    {
-        ios::ocstream fp( ios::cstderr );
-        tree.display(fp);
-    }
-    
+    std::cerr << "input: " << nIn << " => output: " << nOut << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()
 
