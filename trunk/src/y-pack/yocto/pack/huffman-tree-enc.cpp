@@ -55,6 +55,11 @@ namespace yocto
             build_tree();
         }
         
+        void Huffman:: Tree:: flush( ios::bitio &out )
+        {
+            end->emit(out);
+            out.fill_to_byte_with(false);
+        }
         
     }
     

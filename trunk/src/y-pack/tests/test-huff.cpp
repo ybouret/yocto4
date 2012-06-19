@@ -62,14 +62,14 @@ YOCTO_UNIT_TEST_IMPL(huffenc)
         tree.encode(bio, C);
         while( bio.size() >= 8 )
         {
-            bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
+            //bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
             tgt.write( bio.pop_full<uint8_t>() );
         }
     }
-    bio.fill_to_byte_with(false);
-    if( bio.size() > 0 )
+    tree.flush(bio);
+    while( bio.size() > 0 )
     {
-        bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
+        //bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
         const uint8_t b = bio.pop_full<uint8_t>();
         tgt.write( b );
     }
@@ -96,7 +96,7 @@ YOCTO_UNIT_TEST_IMPL(huffdec)
     while( src.query(C) )
     {
         bio.push_full<uint8_t>(C);
-        bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
+        //bio.output(std::cerr << "bio:", bio.size());std::cerr << std::endl;
 
         for(;;)
         {
