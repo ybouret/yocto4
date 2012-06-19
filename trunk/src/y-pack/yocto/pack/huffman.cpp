@@ -348,6 +348,77 @@ namespace yocto
             handle.flag = Y_HUFF_DECODE_SYM; //!< wait for the first symbol
         }
         
+        Huffman::DecodeStatus Huffman::Tree:: decode_sym( DecodeHandle &handle, ios::bitio &in, char &C )
+        {
+            if( in.size() >= 8 )
+            {
+                const uint8_t b  = in.pop_full<uint8_t>();
+                C = char(b);
+                update(b);
+                handle.flag = Y_HUFF_DECODE_ANY;
+                return DecodeSuccess;
+            }
+            return DecodePending;
+        }
+        
+        Huffman::DecodeStatus Huffman::Tree:: decode_any( DecodeHandle &handle, ios::bitio &in, char &C )
+        {
+            while( in.size() > 0 )
+            {
+                //==============================================================
+                // walk down the tree
+                //==============================================================
+                const bool at_left = in.pop();
+                if( at_left )
+                {
+                    Node *left = handle.node->left;
+                    if(!left) throw  exception("corrupted input");
+                    handle.node = left;
+                }
+                else
+                {
+                    Node *right = handle.node->right;
+                    if(!right) throw exception("currupted input");
+                    handle.node = right;
+                }
+                
+                const int ch = handle.node->ch;
+                if( ch > INSIDE )
+                {
+                    //==========================================================
+                    // we have a leave
+                    //==========================================================
+                    switch( ch )
+                    {
+                            
+                        case END: //-- was flushed
+                            handle.node = root;
+                            return DecodeFlushed;
+                            
+                            
+                        case NYT: //-- a new char
+                            handle.node = root;
+                            handle.flag = Y_HUFF_DECODE_SYM;
+                            return decode_sym(handle, in, C);
+                            
+                            
+                        default: //-- an existing char
+                            assert(ch>=0);
+                            assert(ch<ALPHABET_NUM);
+                            C = char(ch);
+                            handle.node = root;
+                            update(ch);
+                            return DecodeSuccess;
+                            
+                    }
+                    
+                }
+                
+            }
+            return DecodePending;
+        }
+        
+        
         Huffman::DecodeStatus Huffman::Tree:: decode( DecodeHandle &handle, ios::bitio &in, char &C )
         {
             assert( handle.node != NULL );
@@ -355,70 +426,19 @@ namespace yocto
             switch( handle.flag )
             {
                 case Y_HUFF_DECODE_SYM:
-                    if( in.size() >= 8 )
-                    {
-                        const uint8_t b  = in.pop_full<uint8_t>();
-                        C = char(b);
-                        update(b);
-                        handle.flag = Y_HUFF_DECODE_ANY;
-                        return DecodeSuccess;
-                    }
-                    return DecodePending;
+                    return decode_sym( handle, in, C );
                     
                 case Y_HUFF_DECODE_ANY:
-                    while( in.size() > 0 )
-                    {
-                        const bool at_left = in.pop();
-                        if( at_left )
-                        {
-                            Node *left = handle.node->left;
-                            if(!left) throw  exception("corrupted input");
-                            handle.node = left;
-                        }
-                        else
-                        {
-                            Node *right = handle.node->right;
-                            if(!right) throw exception("currupted input");
-                            handle.node = right;
-                        }
-                        
-                        const int ch = handle.node->ch;
-                        if( ch >INSIDE )
-                        {
-                            //--------------------------------------------------
-                            // we have a leave
-                            //--------------------------------------------------
-                            switch( ch )
-                            {
-                                case END:
-                                    
-                                    break;
-                                    
-                                case NYT:
-                                    
-                                    break;
-                                    
-                                default:
-                                    assert(ch>=0);
-                                    assert(ch<ALPHABET_NUM);
-                                    C = char(ch);
-                                    handle.node = root;
-                                    update(ch);
-                                    break;
-                                    
-                            }
-                            
-                        }
-                        
-                    }
-                    break;
+                    return decode_any( handle, in, C );
                     
                 default:
-                    throw exception("Huffman: invalid handle flag=%d", handle.flag ); 
+                    break;
+                    
             }
-            
-            return DecodePending;
+            throw exception("Huffman: invalid handle flag=%d", handle.flag ); 
         }
+        
+        
         
     }
     
