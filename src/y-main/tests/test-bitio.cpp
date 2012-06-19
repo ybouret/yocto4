@@ -17,6 +17,10 @@ YOCTO_UNIT_TEST_IMPL(bitio)
 	{
 		std::cerr << "x=" << B.pop<int>(8) << std::endl;
 	}
+    
+    B.free();
+    B.push_full<uint8_t>(1);
+    B.output(std::cerr,B.size()); std::cerr << std::endl;
 	
 }
 YOCTO_UNIT_TEST_DONE()

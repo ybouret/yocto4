@@ -48,3 +48,74 @@ YOCTO_UNIT_TEST_IMPL(huff)
     }
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+YOCTO_UNIT_TEST_IMPL(huffenc)
+{
+    Huffman::Tree tree;
+    ios::icstream src( ios::cstdin );
+    ios::ocstream tgt( ios::cstdout );
+    ios::bitio    bio;
+    char C=0;
+    while( src.query(C) )
+    {
+        tree.encode(bio, C);
+        while( bio.size() >= 8 )
+        {
+            tgt.write( bio.pop_full<uint8_t>() );
+        }
+    }
+    bio.fill_to_byte_with(false);
+    bio.output(std::cerr, bio.size());
+    std::cerr << std::endl;
+    //std::cerr << "remaining " << bio.size() << " bits" << std::endl;
+    if( bio.size() > 0 )
+    {
+        const uint8_t b = bio.pop_full<uint8_t>();
+        std::cerr << "write " << int(b) << std::endl;
+        tgt.write( b );
+    }
+    
+    {
+        ios::ocstream fp( ios::cstderr );
+        tree.display(fp);
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(huffdec)
+{
+    Huffman::Tree tree;
+    ios::icstream src( ios::cstdin );
+    ios::ocstream tgt( ios::cstdout );
+    ios::bitio    bio;
+    
+    Huffman::DecodeHandle  h;
+    tree.decode_init(h);
+    
+    char C=0,D=0;
+    while( src.query(C) )
+    {
+        bio.push_full<uint8_t>(C);
+        //bio.output(std::cerr<<std::endl, bio.size()); std::cerr << std::endl;
+        for(;;)
+        {
+            const Huffman::DecodeStatus status = tree.decode(h, bio, D);
+            if( status == Huffman::DecodePending )
+                break;
+            if( status == Huffman::DecodeSuccess )
+            {
+                tgt.write(D);
+                continue;
+            }
+        }
+        
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+
+
+
