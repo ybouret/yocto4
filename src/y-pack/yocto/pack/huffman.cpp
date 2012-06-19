@@ -86,14 +86,16 @@ namespace yocto
             if( left )
             {
                 left->bits = child_bits;
-                left->code = code << 1;
+                //left->code = code << 1;
+                left->code = code;
                 left->encode();
             }
             
             if( right )
             {
                 right->bits = child_bits;
-                right->code = (code<<1)|1;
+                //right->code = (code<<1)|1;
+                right->code = code | (1<<bits);
                 right->encode();
             }
         }

@@ -65,6 +65,7 @@ namespace yocto
                 //display(fp);
                 
                 const bool at_right = in.pop();
+#if 0
                 fp("handle.node : "); handle.node->display(fp);
                 if(handle.node->right)
                 {
@@ -74,18 +75,18 @@ namespace yocto
                 {
                     fp("\tleft  : "); handle.node->left->display(fp);
                 }
-                
+#endif           
                 
                 if( at_right )
                 {
-                    fp("[1]\n");
+                    //fp("[1]\n");
                     Node *right = handle.node->right;
                     if(!right) throw exception("corrupted input");
                     handle.node = right;
                 }
                 else
                 {
-                    fp("[0]\n");
+                    //fp("[0]\n");
                     Node *left = handle.node->left;
                     if(!left) throw  exception("corrupted input");
                     handle.node = left;

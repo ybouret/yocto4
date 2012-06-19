@@ -92,6 +92,7 @@ namespace yocto
                 
                 //! encode the byte b
                 void encode( ios::bitio &out, uint8_t b );
+                void flush( ios::bitio &out );
                 
                 //! initialize decoding
                 /**
