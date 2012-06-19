@@ -368,18 +368,18 @@ namespace yocto
                 //==============================================================
                 // walk down the tree
                 //==============================================================
-                const bool at_left = in.pop();
-                if( at_left )
+                const bool at_right = in.pop();
+                if( at_right )
+                {
+                    Node *right = handle.node->right;
+                    if(!right) throw exception("corrupted input");
+                    handle.node = right;
+                }
+                else
                 {
                     Node *left = handle.node->left;
                     if(!left) throw  exception("corrupted input");
                     handle.node = left;
-                }
-                else
-                {
-                    Node *right = handle.node->right;
-                    if(!right) throw exception("currupted input");
-                    handle.node = right;
                 }
                 
                 const int ch = handle.node->ch;
