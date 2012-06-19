@@ -115,6 +115,8 @@ namespace yocto
                 void update( uint8_t b ) throw(); //! update tree
 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
+                DecodeStatus decode_sym( DecodeHandle &handle, ios::bitio &in, char &C );
+                DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
             };
             
         };
