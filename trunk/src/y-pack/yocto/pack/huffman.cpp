@@ -114,10 +114,10 @@ namespace yocto
             //------------------------------------------------------------------
             // enqueue alphabet
             //------------------------------------------------------------------
+        BUILD_TREE:
             prioQ.free();
             for( Node *node = alphabet.head; node; node=node->next )
             {
-                node->code = 0;
                 node->bits = 0;
                 prioQ.push(node);
             }
@@ -136,10 +136,15 @@ namespace yocto
                 Node *parent  = &nodes[idx++];
                 parent->left  = left;
                 parent->right = right;
-                //left->parent  = parent;
-                //right->parent = parent;
                 parent->freq  = left->freq + right->freq;
                 parent->bits  = max_of(left->bits,right->bits)+1;
+                if( parent->bits > 16 )
+                {
+                    idx  = ALPHABET_MAX;
+                    root = NULL;
+                    rescale();
+                    goto BUILD_TREE;
+                }
                 prioQ.push(parent);
             }
             
@@ -154,6 +159,15 @@ namespace yocto
             
         }
         
+        void Huffman:: Tree:: rescale() throw()
+        {
+            for( Node *node = alphabet.head; node; node=node->next )
+            {
+                FreqType &freq = node->freq;
+                freq >>= 1;
+                freq |=  1;
+            }
+        }
              
                 
         

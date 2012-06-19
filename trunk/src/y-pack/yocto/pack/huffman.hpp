@@ -113,7 +113,8 @@ namespace yocto
                 const size_t bytes;     //!< num_nodes * sizeof(Node)
 
                 void update( uint8_t b ) throw(); //! update tree
-
+                void rescale() throw(); //!< rescale frequencies
+                
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 DecodeStatus decode_sym( DecodeHandle &handle, ios::bitio &in, char &C );
                 DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
