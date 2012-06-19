@@ -10,7 +10,7 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/FLTK )
 SOURCE_GROUP( FLTK FILES ${srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../y-main ../y-mk)
 
 ADD_LIBRARY( y-fltk STATIC ${srcs} )
 INSTALL( TARGETS y-fltk ARCHIVE DESTINATION lib )

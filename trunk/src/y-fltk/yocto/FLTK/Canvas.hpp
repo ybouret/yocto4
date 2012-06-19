@@ -2,7 +2,6 @@
 #define YOCTO_FLTK_CANVAS_INCLUDED 1
 
 #include "yocto/FLTK/Axis.hpp"
-
 #include <FL/Fl_Box.H>
 
 namespace yocto 
