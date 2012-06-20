@@ -86,7 +86,6 @@ namespace yocto
             if( left )
             {
                 left->bits = child_bits;
-                //left->code = code << 1;
                 left->code = code;
                 left->encode();
             }
@@ -94,7 +93,6 @@ namespace yocto
             if( right )
             {
                 right->bits = child_bits;
-                //right->code = (code<<1)|1;
                 right->code = code | (1<<bits);
                 right->encode();
             }
@@ -159,13 +157,17 @@ namespace yocto
             
         }
         
+        
+        Huffman::FreqType Huffman:: Tree:: Down( FreqType f ) throw()
+        {
+            return (f>>1) | 1;
+        }
+        
         void Huffman:: Tree:: rescale() throw()
         {
             for( Node *node = alphabet.head; node; node=node->next )
             {
-                FreqType &freq = node->freq;
-                freq >>= 1;
-                freq |=  1;
+                node->freq = Down( node->freq );
             }
         }
              

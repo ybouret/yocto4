@@ -92,6 +92,8 @@ namespace yocto
                 
                 //! encode the byte b
                 void encode( ios::bitio &out, uint8_t b );
+                
+                //! send end
                 void flush( ios::bitio &out );
                 
                 //! initialize decoding
@@ -118,6 +120,9 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 DecodeStatus decode_sym( DecodeHandle &handle, ios::bitio &in, char &C );
                 DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
+                
+                static FreqType Down( FreqType f ) throw();
+                
             };
             
         };
