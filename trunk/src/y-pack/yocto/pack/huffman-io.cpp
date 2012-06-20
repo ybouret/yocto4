@@ -96,7 +96,7 @@ namespace yocto
             }
             fp(" [%4u] :", unsigned(freq));
             fp("<%2d> ", unsigned(bits));
-            for( size_t i=bits;i>0;--i)
+            for( size_t i=1;i<=bits;++i)
             {
                 const CodeType the_bit = 1 << (i-1);
                 if( code & the_bit ) fp("1"); else fp("0");

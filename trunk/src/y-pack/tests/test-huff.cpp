@@ -29,10 +29,12 @@ YOCTO_UNIT_TEST_IMPL(huff)
             ++nOut;
         }
     }
-    if( out.size() > 0 )
+    
+    tree.flush(out);
+    while( out.size() >= 8 )
     {
         ++nOut;
-        save.write( out.pop<uint8_t>(out.size()) );
+        save.write( out.pop_full<uint8_t>() );
     }
     
     std::cerr << "bytes: " << nIn << " => " << nOut << std::endl;
