@@ -9,7 +9,10 @@ namespace yocto
     
     namespace math
     {
-        //! assume x is ordered
+        //! assume X is ordered
+        /**
+         Find a linear interpolation
+         */
         template<typename T,typename U>
         inline U linear(  T x, const array<T> &X, const array<U> &Y )
         {
@@ -39,6 +42,9 @@ namespace yocto
         }
         
         //! assume order by x
+        /**
+         Find a linear interpolation
+         */
         template<typename T>
         inline T linear(  T x, const array< geom::v2d<T> > &V )
         {
@@ -64,8 +70,24 @@ namespace yocto
                     return V[klo].y + (x-V[klo].x) * (V[khi].y - V[klo].y) / (V[khi].x - V[klo].x);
 				}
 			}
-
-            
+        }
+        
+        template <typename T>
+        inline void linear_find( T y, sequence<T> &x, const array<T> &X, const array<T> &Y, const size_t nmax = 0 )
+        {
+            assert( X.size() == Y.size() );
+            const size_t n = X.size();
+            x.free();
+            for( size_t i=1; i < n; ++i )
+            {
+                const T Y1 = Y[i];
+                const T Y2 = Y[i+1];
+                if( (y-Y1) * (y-Y2) <= 0 )
+                {
+                    x.push_back(X[i] + (X[i+1] - X[i]) * (y-Y1) / (Y2-Y1));
+                    if( nmax > 0 && x.size() >= nmax ) return;
+                }
+            }
         }
     }
     
