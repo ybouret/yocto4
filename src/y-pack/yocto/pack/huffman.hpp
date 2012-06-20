@@ -20,7 +20,7 @@ namespace yocto
             static const size_t ALPHABET_NUM = 256;              //!< possible bytes
             static const size_t NUM_CONTROLS = 2;                //!< +NYT, +END
             static const size_t ALPHABET_MAX = ALPHABET_NUM + NUM_CONTROLS; 
-            static const size_t NODES_MAX    = 2*ALPHABET_MAX;   //!< Max #nodes in tree
+            static const size_t NODES_MAX    = 2*ALPHABET_MAX-1; //!< Max #nodes in tree
             static const int    NYT          = -1;               //!< tag for NYT
             static const int    END          = -2;               //!< tag for END 
             static const int    INSIDE       = -3;               //!< tag for inside
@@ -78,6 +78,11 @@ namespace yocto
                 int   flag;
             };
             
+            //! build a Huffman tree
+            static Node  *BuildTree( List &alphabet, Node *nyt, Node *end, Heap &prioQ, Node *nodes ) throw();
+            static void   MakeCodes(Node *root) throw();
+            static size_t GuessSize( const List &alphabet, const List &encoding ) throw();
+            
             class Tree
             {
             public:
@@ -122,6 +127,7 @@ namespace yocto
                 DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
                 
                 static FreqType Down( FreqType f ) throw();
+                
                 
             };
             

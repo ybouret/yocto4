@@ -12,8 +12,8 @@ namespace yocto
     namespace packing
     {
         
-       
-              
+        
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // Tree Initialization
@@ -97,22 +97,14 @@ namespace yocto
                 right->encode();
             }
         }
-
-               
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // Build the huffman tree
-        //
-        ////////////////////////////////////////////////////////////////////////
-        void Huffman:: Tree:: build_tree() throw()
+        
+        
+        
+        
+        Huffman::Node * Huffman:: BuildTree( List &alphabet, Node *nyt, Node *end, Heap &prioQ, Node *nodes ) throw()
         {
-            root       = NULL;
             size_t idx = ALPHABET_MAX;
             
-            //------------------------------------------------------------------
-            // enqueue alphabet
-            //------------------------------------------------------------------
-        BUILD_TREE:
             prioQ.free();
             for( Node *node = alphabet.head; node; node=node->next )
             {
@@ -120,7 +112,8 @@ namespace yocto
                 prioQ.push(node);
             }
             prioQ.push(end);
-            prioQ.push(nyt);
+            if( alphabet.size < ALPHABET_NUM )
+                prioQ.push(nyt);
             assert(prioQ.size()>0);
             
             //------------------------------------------------------------------
@@ -136,24 +129,56 @@ namespace yocto
                 parent->right = right;
                 parent->freq  = left->freq + right->freq;
                 parent->bits  = max_of(left->bits,right->bits)+1;
-                if( parent->bits > 16 )
+                if( parent->bits > 32 )
                 {
-                    idx  = ALPHABET_MAX;
-                    root = NULL;
-                    rescale();
-                    goto BUILD_TREE;
+                    return NULL;
                 }
                 prioQ.push(parent);
             }
             
-            root = prioQ.pop();
+            return prioQ.pop();
             
-            //------------------------------------------------------------------
-            // assign codes
-            //------------------------------------------------------------------
+        }
+        
+        void  Huffman:: MakeCodes(Node *root) throw()
+        {
+            assert(root!=NULL);
             root->bits = 0;
             root->code = 0;
             root->encode();
+        }
+
+        size_t Huffman:: GuessSize( const List &alphabet, const List &encoding ) throw()
+        {
+            assert( alphabet.size == encoding.size );
+            size_t bits = 0;
+            size_t bytes = 0;
+            for( const Node *cur = alphabet.head, *enc = encoding.head; cur; cur = cur->next, enc = enc->next )
+            {
+                bits += cur->freq * enc->bits;
+                while( bits >= 8 )
+                {
+                    bits -= 8;
+                    ++bytes;
+                }
+            }
+            return bytes;
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Build the huffman tree
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void Huffman:: Tree:: build_tree() throw()
+        {
+                        
+            while( NULL == ( root = BuildTree(alphabet, nyt, end, prioQ, nodes) ) )
+            {
+                rescale();
+            }
+            
+            MakeCodes(root);
             
         }
         
@@ -165,13 +190,14 @@ namespace yocto
         
         void Huffman:: Tree:: rescale() throw()
         {
+            
             for( Node *node = alphabet.head; node; node=node->next )
             {
                 node->freq = Down( node->freq );
             }
         }
-             
-                
+        
+        
         
         
     }
