@@ -192,7 +192,7 @@ namespace yocto
             out.fill_to_byte_with(false);
         }
 
-        
+
     }
     
 }

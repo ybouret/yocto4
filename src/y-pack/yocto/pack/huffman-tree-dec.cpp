@@ -9,30 +9,30 @@ namespace yocto
     {
        
         
-        
-        
 #define Y_HUFF_DECODE_ANY (0x01) 
 #define Y_HUFF_DECODE_SYM (0x02)
         
-        void Huffman:: Tree:: decode_init( DecodeHandle &handle) throw()
+        void Huffman:: Tree:: decode_init( DecodeHandle &handle ) throw()
         {
             initialize();
-            assert( root != NULL );
-            handle.node = root;              //!< start at top
+            handle.node = current->root;     //!< start at top
             handle.flag = Y_HUFF_DECODE_SYM; //!< wait for the first symbol
         }
         
-        Huffman::DecodeStatus Huffman::Tree:: decode_sym( DecodeHandle &handle, ios::bitio &in, char &C )
+        Huffman::DecodeStatus Huffman:: Tree:: decode_sym( DecodeHandle &handle, ios::bitio &in, char &C  )
         {
-            assert( handle.node == root );
+            assert( handle.node == current->root );
             if( in.size() >= 8 )
             {
                 //ios::ocstream fp( ios::cstderr );
                 const uint8_t b  = in.pop_full<uint8_t>();
                 C = char(b);
                 //fp("read : "); nodes[b].display(fp);
-                update(b);
-                handle.node = root;
+                current->update(b,Q);
+                
+                /** todo: check */
+                
+                handle.node = current->root;
                 handle.flag = Y_HUFF_DECODE_ANY;
                 return DecodeSuccess;
             }
@@ -51,7 +51,7 @@ namespace yocto
                 
                 
                 const bool at_right = in.pop();
-      
+                
                 
                 if( at_right )
                 {
@@ -79,12 +79,12 @@ namespace yocto
                     {
                             
                         case END: //-- was flushed
-                            handle.node = root;
+                            handle.node = current->root;
                             return DecodeFlushed;
                             
                             
                         case NYT: //-- a new char
-                            handle.node = root;
+                            handle.node = current->root;
                             handle.flag = Y_HUFF_DECODE_SYM;
                             return decode_sym(handle, in, C);
                             
@@ -93,8 +93,11 @@ namespace yocto
                             assert(ch>=0);
                             assert(ch<ALPHABET_NUM);
                             C = char(ch);
-                            update(ch);
-                            handle.node = root;
+                            current->update(ch,Q);
+                            
+                            /** todo : check */
+                            
+                            handle.node = current->root;
                             return DecodeSuccess;
                     }
                     
@@ -123,6 +126,8 @@ namespace yocto
             }
             throw exception("Huffman: invalid handle flag=%d", handle.flag ); 
         }
+
+        
         
     }
     

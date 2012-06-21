@@ -66,7 +66,21 @@ namespace yocto
             
             static size_t   GuessSize( const List &alphabet, const List &encoding ) throw();
             static FreqType FreqDown( FreqType f ) throw();
+            
+            enum DecodeStatus
+            {
+                DecodeSuccess,
+                DecodePending,
+                DecodeFlushed
+            };
+            
+            struct DecodeHandle
+            {
+                Node *node;
+                int   flag;
+            };
 
+            
             class Core 
             {
             public:
@@ -83,6 +97,8 @@ namespace yocto
                 
                 void write( ios::bitio &out, uint8_t b, Heap &Q);
                 void flush( ios::bitio &out ); 
+                
+                void decode_init( DecodeHandle &handle, Heap &Q) throw();
                 
                 Node  *root;
                 List   alphabet;
@@ -104,19 +120,7 @@ namespace yocto
             
             
             
-            enum DecodeStatus
-            {
-                DecodeSuccess,
-                DecodePending,
-                DecodeFlushed
-            };
-            
-            struct DecodeHandle
-            {
-                Node *node;
-                int   flag;
-            };
-            
+                       
             
             class Tree
             {
@@ -125,26 +129,23 @@ namespace yocto
                 virtual ~Tree() throw();
                 
                 void initialize() throw();
-                void build_tree() throw();
                 
                 
-                //! encode the byte b
-                void encode( ios::bitio &out, uint8_t b );
+                //! write the encoded byte b
+                void write( ios::bitio &out, uint8_t b );
                 
                 //! send end
                 void flush( ios::bitio &out );
                 
                 //! initialize decoding
-                /**
-                 void *context = NULL;
-                 decode_init( &context );
-                 */
                 void decode_init( DecodeHandle &handle ) throw();
                 DecodeStatus decode( DecodeHandle &handle, ios::bitio &in, char &C );
                 
+                const Core &get_current() const throw() { assert(current); return *current; }
+                
             private:
-              
-                Heap         prioQ;     //!< to build tree
+                
+                Heap         Q;        //!< to build tree
                 Core         core1;
                 Core        *current;
                 
