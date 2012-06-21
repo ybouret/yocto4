@@ -257,6 +257,7 @@ namespace yocto
 				assert(NULL!=pC);
 				lua_pop(L, 1);         //-------- pop the constraint value -----
                 
+                std::cerr << "***\t" << pC->value(0.0) << "=";
 				for( unsigned j=2,k=1; j <= nf; ++j, ++k )
 				{
                     
@@ -286,11 +287,12 @@ namespace yocto
                         
 						// create the constraint
 						pC->add( id, w);
+                        std::cerr << "+(" << w << ")[" << id << "]";
 					}
 					lua_pop(L,1);        //-------- pop the item table ---------
-                    
 				}
-                
+                std::cerr << std::endl;
+
 				lua_pop(L,1);          //-------- get  the constraint ----------
 			}
 		}
