@@ -55,6 +55,8 @@ namespace yocto
 			void   operator()( chemsys &cs , double t);
 			size_t size() const throw();
 
+            friend std::ostream & operator<<( std::ostream &, const initializer & );
+            
 		private:
 			vector< constraint::ptr > constraints;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);

@@ -79,7 +79,19 @@ namespace yocto
 			return *p;
 		}
         
-        
+        std::ostream & operator<<( std::ostream &os, const initializer &ini )
+        {
+            os << "/--------" << std::endl;
+            for( size_t i=1; i <= ini.constraints.size(); ++i )
+            {
+                const constraint &cn = *ini.constraints[i];
+                std::cerr << "| ";
+                
+                std::cerr << std::endl;
+            }
+            os << "\\--------";
+            return os;
+        }
         
 		static inline bool is_acceptable( const array<double> &C )
 		{
