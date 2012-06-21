@@ -22,7 +22,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
     while( in.query(C) )
     {
         ++nIn;
-        tree.encode(out,uint8_t(C) );
+        tree.write(out,uint8_t(C) );
         while( out.size() >= 8 )
         {
             save.write( out.pop_full<uint8_t>() );
@@ -41,12 +41,12 @@ YOCTO_UNIT_TEST_IMPL(huff)
     
     {
         ios::ocstream fp("huff.dot",false);
-        tree.graphviz("G", fp);
+        tree.get_current().graphviz("G", fp);
     }
     system( "dot -Tpng huff.dot -o huff.png" );
     {
         ios::ocstream fp( ios::cstderr );
-        tree.display(fp);
+        tree.get_current().display(fp);
     }
 }
 YOCTO_UNIT_TEST_DONE()
@@ -63,7 +63,7 @@ YOCTO_UNIT_TEST_IMPL(huffenc)
     while( src.query(C) )
     {
         ++nIn;
-        tree.encode(bio, C);
+        tree.write(bio, C);
         while( bio.size() >= 8 )
         {
             ++nOut;

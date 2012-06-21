@@ -21,7 +21,7 @@ namespace yocto
             assert(bits>0);
             out.push<CodeType>(code,bits);
         }
-
+        
         void Huffman::Node:: encode() throw()
         {
             const size_t child_bits = bits+1;
@@ -40,7 +40,7 @@ namespace yocto
                 right->encode();
             }
         }
-
+        
         
         
         ////////////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         Huffman:: Tree:: Tree() :
-        prioQ(ALPHABET_MAX,as_capacity),
-        core1( prioQ ),
+        Q(ALPHABET_MAX,as_capacity),
+        core1( Q ),
         current( &core1 )
         {
             
@@ -61,66 +61,13 @@ namespace yocto
             
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // Tree initialization
-        //
-        ////////////////////////////////////////////////////////////////////////
+        
         void Huffman:: Tree:: initialize() throw()
         {
-            current->initialize(prioQ);
+            current->initialize(Q);
         }
         
-               
         
-        
-        
-        Huffman::Node * Huffman:: BuildTree( List &alphabet, Node *nyt, Node *end, Heap &prioQ, Node *nodes ) throw()
-        {
-            size_t idx = ALPHABET_MAX;
-            
-            prioQ.free();
-            for( Node *node = alphabet.head; node; node=node->next )
-            {
-                node->bits = 0;
-                prioQ.push(node);
-            }
-            prioQ.push(end);
-            if( alphabet.size < ALPHABET_NUM )
-                prioQ.push(nyt);
-            assert(prioQ.size()>0);
-            
-            //------------------------------------------------------------------
-            // Hufmman's algorithm
-            //------------------------------------------------------------------
-            while( prioQ.size() >= 2 )
-            {
-                assert(idx<NODES_MAX);
-                Node *left    = prioQ.pop();
-                Node *right   = prioQ.pop();
-                Node *parent  = &nodes[idx++];
-                parent->left  = left;
-                parent->right = right;
-                parent->freq  = left->freq + right->freq;
-                parent->bits  = max_of(left->bits,right->bits)+1;
-                if( parent->bits > 32 )
-                {
-                    return NULL;
-                }
-                prioQ.push(parent);
-            }
-            
-            return prioQ.pop();
-            
-        }
-        
-        void  Huffman:: MakeCodes(Node *root) throw()
-        {
-            assert(root!=NULL);
-            root->bits = 0;
-            root->code = 0;
-            root->encode();
-        }
         
         size_t Huffman:: GuessSize( const List &alphabet, const List &encoding ) throw()
         {
@@ -139,23 +86,23 @@ namespace yocto
             return bytes;
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // Build the huffman tree
-        //
-        ////////////////////////////////////////////////////////////////////////
-        void Huffman:: Tree:: build_tree() throw()
-        {
-            current->build_tree(prioQ);            
-        }
-        
         
         Huffman::FreqType Huffman:: FreqDown( FreqType f ) throw()
         {
             return (f>>1) | 1;
         }
         
-      
+        void Huffman:: Tree:: write( ios::bitio &out, uint8_t b )
+        {
+            assert(current);
+            current->write(out, b, Q);
+        }
+        
+        void Huffman:: Tree:: flush( ios::bitio &out )
+        {
+            assert(current);
+            current->flush(out);
+        }
         
         
         
