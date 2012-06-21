@@ -7,20 +7,7 @@ namespace yocto
     
     namespace packing
     {
-        void Huffman:: Tree:: update( uint8_t b ) throw()
-        {
-            Node *node = nodes+b;
-            if( node->freq == 0 )
-            {
-                assert( !alphabet.owns(node) );
-                alphabet.push_front(node);
-            }
-#if !defined (NDEBUG)
-            else { assert(alphabet.owns(node)); }
-#endif
-            node->freq++;
-            build_tree();
-        }
+       
         
         
         
