@@ -11,6 +11,8 @@ using namespace packing;
 
 YOCTO_UNIT_TEST_IMPL(huff)
 {
+    std::cerr << "sizeof(Huffman::Node)= " << sizeof(Huffman::Node) << std::endl;
+    
     Huffman::Tree tree;
     ios::icstream in( ios::cstdin );
     ios::bitio    out;
@@ -41,12 +43,13 @@ YOCTO_UNIT_TEST_IMPL(huff)
     
     {
         ios::ocstream fp("huff.dot",false);
-        tree.get_current().graphviz("G", fp);
+        tree.core().graphviz("G", fp);
     }
     system( "dot -Tpng huff.dot -o huff.png" );
     {
         ios::ocstream fp( ios::cstderr );
-        tree.get_current().display(fp);
+        fp("Core Tree: \n");
+        tree.core().display(fp);
     }
 }
 YOCTO_UNIT_TEST_DONE()

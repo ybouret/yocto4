@@ -27,9 +27,10 @@ namespace yocto
             static const size_t NYT_INDEX    = ALPHABET_NUM;     //!< 
             static const size_t END_INDEX    = NYT_INDEX+1;      //!<
             
-            typedef size_t      FreqType;
+            typedef uint32_t    FreqType;
             typedef uint32_t    CodeType;
             static const size_t CodeBits = sizeof(CodeType) << 3;
+            static const size_t RootBits = 16;
             
             struct Node
             {
@@ -64,7 +65,6 @@ namespace yocto
             typedef core::list_of<Node>           List;
             typedef heap<Node,Node::Comparator>   Heap;
             
-            static size_t   GuessSize( const List &alphabet, const List &encoding ) throw();
             static FreqType FreqDown( FreqType f ) throw();
             
             enum DecodeStatus
@@ -99,28 +99,22 @@ namespace yocto
                 void flush( ios::bitio &out ); 
                 
                 void decode_init( DecodeHandle &handle, Heap &Q) throw();
+                size_t guess_size( const Core &other ) const throw();
+                
                 
                 Node  *root;
                 List   alphabet;
-                
-            private:
                 size_t num_nodes;
-                Node * nodes;
-                bool   try_build_tree( Heap &prioQ ) throw();
-                
-            public:
-                Node *nyt;
-                Node *end;
-                
-                
+                Node * nodes;                
+                Node * nyt;
+                Node * end;
                 
             private:
+                bool   try_build_tree( Heap &prioQ ) throw();
+
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Core);
             };
             
-            
-            
-                       
             
             class Tree
             {
@@ -141,19 +135,18 @@ namespace yocto
                 void decode_init( DecodeHandle &handle ) throw();
                 DecodeStatus decode( DecodeHandle &handle, ios::bitio &in, char &C );
                 
-                const Core &get_current() const throw() { assert(current); return *current; }
+                const Core & core() const throw() { return H; }
                 
             private:
-                
-                Heap         Q;        //!< to build tree
-                Core         core1;
-                Core        *current;
+                Heap         Q; //!< to build tree
+                Core         H;
                 
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 DecodeStatus decode_sym( DecodeHandle &handle, ios::bitio &in, char &C );
                 DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
                 
+                void check() throw();
                 
                 
             };

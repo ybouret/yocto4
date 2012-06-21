@@ -99,7 +99,7 @@ namespace yocto
                 parent->right = right;
                 parent->freq  = left->freq + right->freq;
                 parent->bits  = max_of(left->bits,right->bits)+1;
-                if( parent->bits > 32 )
+                if( parent->bits > RootBits )
                 {
                     return false;
                 }
@@ -193,6 +193,26 @@ namespace yocto
         }
 
 
+        size_t Huffman:: Core:: guess_size( const Core &other ) const throw()
+        {
+            const List &encoding  = other.alphabet;
+            assert( alphabet.size == encoding.size );
+            size_t bits  = 0;
+            size_t bytes = 0;
+            for( const Node *cur = alphabet.head, *enc = encoding.head; cur; cur = cur->next, enc = enc->next )
+            {
+                assert(cur->ch==enc->ch);
+                bits += cur->freq * enc->bits;
+                while( bits >= 8 )
+                {
+                    bits -= 8;
+                    ++bytes;
+                }
+            }
+            if( bits > 0 ) ++bytes;
+            return bytes;
+        }
+        
     }
     
 }

@@ -15,24 +15,23 @@ namespace yocto
         void Huffman:: Tree:: decode_init( DecodeHandle &handle ) throw()
         {
             initialize();
-            handle.node = current->root;     //!< start at top
+            handle.node = H.root;     //!< start at top
             handle.flag = Y_HUFF_DECODE_SYM; //!< wait for the first symbol
         }
         
         Huffman::DecodeStatus Huffman:: Tree:: decode_sym( DecodeHandle &handle, ios::bitio &in, char &C  )
         {
-            assert( handle.node == current->root );
+            assert( handle.node == H.root );
             if( in.size() >= 8 )
             {
                 //ios::ocstream fp( ios::cstderr );
                 const uint8_t b  = in.pop_full<uint8_t>();
                 C = char(b);
                 //fp("read : "); nodes[b].display(fp);
-                current->update(b,Q);
+                H.update(b,Q);
                 
-                /** todo: check */
                 
-                handle.node = current->root;
+                handle.node = H.root;
                 handle.flag = Y_HUFF_DECODE_ANY;
                 return DecodeSuccess;
             }
@@ -79,12 +78,12 @@ namespace yocto
                     {
                             
                         case END: //-- was flushed
-                            handle.node = current->root;
+                            handle.node = H.root;
                             return DecodeFlushed;
                             
                             
                         case NYT: //-- a new char
-                            handle.node = current->root;
+                            handle.node = H.root;
                             handle.flag = Y_HUFF_DECODE_SYM;
                             return decode_sym(handle, in, C);
                             
@@ -93,11 +92,11 @@ namespace yocto
                             assert(ch>=0);
                             assert(ch<ALPHABET_NUM);
                             C = char(ch);
-                            current->update(ch,Q);
+                            H.update(ch,Q);
                             
                             /** todo : check */
                             
-                            handle.node = current->root;
+                            handle.node = H.root;
                             return DecodeSuccess;
                     }
                     

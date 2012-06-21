@@ -50,8 +50,7 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         Huffman:: Tree:: Tree() :
         Q(ALPHABET_MAX,as_capacity),
-        core1( Q ),
-        current( &core1 )
+        H(Q)
         {
             
         }
@@ -64,26 +63,7 @@ namespace yocto
         
         void Huffman:: Tree:: initialize() throw()
         {
-            current->initialize(Q);
-        }
-        
-        
-        
-        size_t Huffman:: GuessSize( const List &alphabet, const List &encoding ) throw()
-        {
-            assert( alphabet.size == encoding.size );
-            size_t bits = 0;
-            size_t bytes = 0;
-            for( const Node *cur = alphabet.head, *enc = encoding.head; cur; cur = cur->next, enc = enc->next )
-            {
-                bits += cur->freq * enc->bits;
-                while( bits >= 8 )
-                {
-                    bits -= 8;
-                    ++bytes;
-                }
-            }
-            return bytes;
+            H.initialize(Q);
         }
         
         
@@ -94,17 +74,34 @@ namespace yocto
         
         void Huffman:: Tree:: write( ios::bitio &out, uint8_t b )
         {
-            assert(current);
-            current->write(out, b, Q);
+            H.write(out, b, Q);
         }
         
         void Huffman:: Tree:: flush( ios::bitio &out )
         {
-            assert(current);
-            current->flush(out);
+           H.flush(out);
         }
         
-        
+#if 0
+        void Huffman:: Tree:: check() throw()
+        {
+            const size_t ncurr = current->guess_size( *current );
+            control->alphabet.reset();
+            for( const Node *node = current->alphabet.head; node; node=node->next )
+            {
+                assert(node->ch>=0);
+                assert(node->ch<ALPHABET_NUM);
+                Node *sub  = control->nodes + node->ch;
+                sub->freq  = FreqDown(node->freq);
+                sub->next  = sub->prev = NULL;
+                control->alphabet.push_back(sub);
+            }
+            control->build_tree(Q);
+            const size_t nctrl = control->guess_size( *control );
+            // std::cerr << "current= " << ncurr << "/ guess=" << 2*nctrl << std::endl;
+            if(2*nctrl<ncurr) cswap<Core *>(control,current);
+        }
+#endif
         
     }
     
