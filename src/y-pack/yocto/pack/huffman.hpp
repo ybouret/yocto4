@@ -64,6 +64,45 @@ namespace yocto
             typedef core::list_of<Node>           List;
             typedef heap<Node,Node::Comparator>   Heap;
             
+            static size_t   GuessSize( const List &alphabet, const List &encoding ) throw();
+            static FreqType FreqDown( FreqType f ) throw();
+
+            class Core 
+            {
+            public:
+                Core( Heap &prioQ );
+                ~Core() throw();
+                
+                void   initialize(Heap &Q) throw();
+                void   build_tree(Heap &Q) throw();
+                void   rescale()    throw();
+                
+                void   graphviz( const string &graphName, ios::ostream &fp ) const;
+                void   display( ios::ostream &fp ) const;
+                void   update( uint8_t b, Heap &Q ) throw();
+                
+                void write( ios::bitio &out, uint8_t b, Heap &Q);
+                void flush( ios::bitio &out ); 
+                
+                Node  *root;
+                List   alphabet;
+                
+            private:
+                size_t num_nodes;
+                Node * nodes;
+                bool   try_build_tree( Heap &prioQ ) throw();
+                
+            public:
+                Node *nyt;
+                Node *end;
+                
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Core);
+            };
+            
+            
             
             enum DecodeStatus
             {
@@ -78,10 +117,6 @@ namespace yocto
                 int   flag;
             };
             
-            //! build a Huffman tree
-            static Node  *BuildTree( List &alphabet, Node *nyt, Node *end, Heap &prioQ, Node *nodes ) throw();
-            static void   MakeCodes(Node *root) throw();
-            static size_t GuessSize( const List &alphabet, const List &encoding ) throw();
             
             class Tree
             {
@@ -92,8 +127,6 @@ namespace yocto
                 void initialize() throw();
                 void build_tree() throw();
                 
-                void graphviz( const string &graphName, ios::ostream &fp ) const;
-                void display( ios::ostream &fp ) const;
                 
                 //! encode the byte b
                 void encode( ios::bitio &out, uint8_t b );
@@ -110,23 +143,16 @@ namespace yocto
                 DecodeStatus decode( DecodeHandle &handle, ios::bitio &in, char &C );
                 
             private:
-                Node        *root;      //!< tree root
-                List         alphabet;  //!< current #symbols
+              
                 Heap         prioQ;     //!< to build tree
-                size_t       num_nodes; //!< for memory
-                Node        *nodes;     //!< all the nodes 
-                Node        *nyt;       //!< nodes + NYT_INDEX
-                Node        *end;       //!< nodes + END_INDEX
-                const size_t bytes;     //!< num_nodes * sizeof(Node)
-
-                void update( uint8_t b ) throw(); //! update tree
-                void rescale() throw(); //!< rescale frequencies
+                Core         core1;
+                Core        *current;
+                
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 DecodeStatus decode_sym( DecodeHandle &handle, ios::bitio &in, char &C );
                 DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
                 
-                static FreqType Down( FreqType f ) throw();
                 
                 
             };

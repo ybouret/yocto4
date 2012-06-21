@@ -104,9 +104,9 @@ namespace yocto
             fp("\n");
             
         }
-
         
-        void  Huffman:: Tree:: graphviz( const string &graphName, ios::ostream &fp ) const
+        
+        void  Huffman:: Core:: graphviz( const string &graphName, ios::ostream &fp ) const
         {
             assert(root!=NULL);
             fp("digraph %s {\n", graphName.c_str());
@@ -116,7 +116,7 @@ namespace yocto
             fp("}\n");
         }
         
-        void Huffman:: Tree:: display( ios::ostream &fp ) const
+        void Huffman:: Core:: display( ios::ostream &fp ) const
         {
             for( const Node *node = alphabet.head; node; node=node->next )
             {
@@ -125,7 +125,7 @@ namespace yocto
             end->display(fp);
             nyt->display(fp);
         }
-
+        
         
         
     }

@@ -1,5 +1,4 @@
 #include "yocto/pack/huffman.hpp"
-#include "yocto/memory/global.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -11,74 +10,18 @@ namespace yocto
     
     namespace packing
     {
-        
-        
-        
         ////////////////////////////////////////////////////////////////////////
         //
-        // Tree Initialization
+        // Nodes internal ops
         //
         ////////////////////////////////////////////////////////////////////////
-        Huffman:: Tree:: Tree() :
-        root(NULL),
-        alphabet(),
-        prioQ(NODES_MAX,as_capacity),
-        num_nodes( NODES_MAX ),
-        nodes( memory::kind<memory::global>::acquire_as<Node>(num_nodes) ),
-        nyt(nodes + NYT_INDEX),
-        end(nodes + END_INDEX),
-        bytes( num_nodes * sizeof(Node) )
+        
+        void Huffman::Node:: emit( ios::bitio &out ) const
         {
-            initialize();
+            assert(bits>0);
+            out.push<CodeType>(code,bits);
         }
-        
-        Huffman:: Tree:: ~Tree() throw()
-        {
-            alphabet.reset();
-            memory::kind<memory::global>::release_as<Node>(nodes,num_nodes);
-        }
-        
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // Tree initialization
-        //
-        ////////////////////////////////////////////////////////////////////////
-        void Huffman:: Tree:: initialize() throw()
-        {
-            alphabet.reset();
-            memset( nodes, 0, bytes );
-            
-            //------------------------------------------------------------------
-            //-- prepare possible symbols
-            //------------------------------------------------------------------
-            for( int i=0; i < ALPHABET_NUM; ++i )
-            {
-                Node *node = nodes+i;
-                node->ch   = i;
-                node->bits = 8;
-                node->code = i;
-            }
-            
-            //------------------------------------------------------------------
-            //-- prepare control nodes
-            //------------------------------------------------------------------
-            nyt->ch = NYT;
-            end->ch = END;
-            
-            //------------------------------------------------------------------
-            //-- prepare inside nodes
-            //------------------------------------------------------------------
-            for( int i=ALPHABET_MAX; i < NODES_MAX; ++i )
-            {
-                nodes[i].ch = INSIDE;
-            }
-            
-            //------------------------------------------------------------------
-            //-- initialize alphabet
-            //------------------------------------------------------------------
-            build_tree();
-        }
-        
+
         void Huffman::Node:: encode() throw()
         {
             const size_t child_bits = bits+1;
@@ -97,7 +40,38 @@ namespace yocto
                 right->encode();
             }
         }
+
         
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Tree Initialization
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Huffman:: Tree:: Tree() :
+        prioQ(ALPHABET_MAX,as_capacity),
+        core1( prioQ ),
+        current( &core1 )
+        {
+            
+        }
+        
+        Huffman:: Tree:: ~Tree() throw()
+        {
+            
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Tree initialization
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void Huffman:: Tree:: initialize() throw()
+        {
+            current->initialize(prioQ);
+        }
+        
+               
         
         
         
@@ -147,7 +121,7 @@ namespace yocto
             root->code = 0;
             root->encode();
         }
-
+        
         size_t Huffman:: GuessSize( const List &alphabet, const List &encoding ) throw()
         {
             assert( alphabet.size == encoding.size );
@@ -172,31 +146,16 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         void Huffman:: Tree:: build_tree() throw()
         {
-                        
-            while( NULL == ( root = BuildTree(alphabet, nyt, end, prioQ, nodes) ) )
-            {
-                rescale();
-            }
-            
-            MakeCodes(root);
-            
+            current->build_tree(prioQ);            
         }
         
         
-        Huffman::FreqType Huffman:: Tree:: Down( FreqType f ) throw()
+        Huffman::FreqType Huffman:: FreqDown( FreqType f ) throw()
         {
             return (f>>1) | 1;
         }
         
-        void Huffman:: Tree:: rescale() throw()
-        {
-            
-            for( Node *node = alphabet.head; node; node=node->next )
-            {
-                node->freq = Down( node->freq );
-            }
-        }
-        
+      
         
         
         
