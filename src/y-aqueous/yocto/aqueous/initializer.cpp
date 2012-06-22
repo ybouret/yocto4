@@ -16,6 +16,23 @@ namespace yocto
         
 		constraint::~ constraint() throw() {}
         
+        size_t constraint:: size() const throw()
+        {
+            return coefficients.size();
+        }
+        
+        
+        constraint::iterator constraint:: begin() const throw()
+        {
+            return coefficients.begin();
+        }
+        
+        constraint::iterator constraint:: end() const throw()
+        {
+            return coefficients.end();
+        }
+        
+        
 #if defined(_MSC_VER)
 		// this in ctor
 #pragma warning ( disable : 4355 )
@@ -81,15 +98,23 @@ namespace yocto
         
         std::ostream & operator<<( std::ostream &os, const initializer &ini )
         {
-            os << "/--------" << std::endl;
+            os << "################################" << std::endl;
             for( size_t i=1; i <= ini.constraints.size(); ++i )
             {
                 const constraint &cn = *ini.constraints[i];
-                std::cerr << "| ";
-                
-                std::cerr << std::endl;
+                os << "# ";
+                os << cn.value(0.0) << " = ";
+                constraint::iterator it = cn.begin();
+                for( size_t j=1; j <= cn.size(); ++j, ++it )
+                {
+                    const string &id = it->key;
+                    const double  w  = *it;
+                    os << "(" << w << ")*[" << id << "]";
+                    if( j < cn.size() ) os << "+";
+                }
+                os << std::endl;
             }
-            os << "\\--------";
+            os << "################################" << std::endl;
             return os;
         }
         
@@ -107,6 +132,24 @@ namespace yocto
             
 			return num_pos > num_neg;
 		}
+        
+        static inline bool is_acceptable2( const array<double> &C )
+		{
+			size_t       num_pos = 0;
+			size_t       num_neg = 0;
+			const size_t count   = C.size();
+            
+			for( size_t i=count; i > 0 ; --i )
+			{
+				const double C_i = C[i];
+				if( C_i >= 0 ) ++num_pos; else ++num_neg;
+			}
+            
+			return num_pos > num_neg;
+		}
+
+        
+        
         
         
 		static inline double get_max_of( const array<double> &U )
@@ -126,6 +169,12 @@ namespace yocto
         
 		void initializer:: operator()( chemsys &cs, double t )
 		{
+            
+            //==================================================================
+            //
+            // initialize constants and sanity check
+            //
+            //==================================================================
 			//std::cerr << "# Initializing system" << std::endl;
 			array<double> &C  = cs.C;
 			const size_t   M  = C.size();
@@ -136,7 +185,9 @@ namespace yocto
             
 			if( Nc > 0 )
 			{
+                //==============================================================
 				//-- local variables
+                //==============================================================
 				matrix<double> P(Nc,M);
 				vector<double> V(Nc,0.0);
 				vector<double> C0(M,0.0);
@@ -147,7 +198,9 @@ namespace yocto
 				matrix<double> G(M,M);
 				vector<double> Y(N,0.0);
                 
+                //==============================================================
 				//-- aliased variables
+                //==============================================================
 				array<double>  &dY     = cs.xi;
 				matrix<double> &W      = cs.W;
 				matrix<double> &Phi    = cs.Phi;
@@ -299,6 +352,9 @@ namespace yocto
 				//std::cerr << "# Newton Result" << std::endl;
 				//std::cerr << "Y=" << Y << std::endl;
 				//std::cerr << "C=" << C << std::endl;
+                
+                if( ! is_acceptable2(C) )
+                    goto BUILD_Q;
                 
 				{
 					double maxAbsC = 0;

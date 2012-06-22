@@ -30,6 +30,13 @@ namespace yocto
 			void add( const string &id, double w );
             void add( const char   *id, double w );
             
+            size_t size() const throw();
+            
+            typedef weights::const_iterator iterator;
+            iterator begin() const throw();
+            iterator end() const throw();
+            
+            
 		private:
 			YOCTO_DISABLE_ASSIGN(constraint);
 			weights        coefficients;
