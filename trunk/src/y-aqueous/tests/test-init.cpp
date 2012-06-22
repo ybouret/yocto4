@@ -63,6 +63,9 @@ YOCTO_UNIT_TEST_IMPL(init)
         ac.add( "AcH", 1);
     }
     
+    std::cerr << "Constraints: " << std::endl;
+    std::cerr << ini << std::endl;
+    
     ini(cs,0.0);
     solution s(lib);
     s.get(cs.C);
@@ -153,7 +156,15 @@ YOCTO_UNIT_TEST_IMPL(init2)
         a2.add( "A2-", 1 );
     }
     
+    std::cerr << "Constraints=" << std::endl;
+    std::cerr << ini << std::endl;
+    
     ini(cs,0.0);
+    
+    solution s(lib);
+    s.get(cs.C);
+    std::cerr << s << std::endl;
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
