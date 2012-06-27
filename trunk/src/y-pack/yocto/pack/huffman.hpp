@@ -81,11 +81,11 @@ namespace yocto
             };
 
             
-            class Core 
+            class Tree
             {
             public:
-                Core( Heap &prioQ );
-                ~Core() throw();
+                Tree( Heap &prioQ );
+                ~Tree() throw();
                 
                 void   initialize(Heap &Q) throw();
                 void   build_tree(Heap &Q) throw();
@@ -99,7 +99,6 @@ namespace yocto
                 void flush( ios::bitio &out ); 
                 
                 void decode_init( DecodeHandle &handle, Heap &Q) throw();
-                size_t guess_size( const Core &other ) const throw();
                 
                 
                 Node  *root;
@@ -112,15 +111,15 @@ namespace yocto
             private:
                 bool   try_build_tree( Heap &prioQ ) throw();
 
-                YOCTO_DISABLE_COPY_AND_ASSIGN(Core);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
             };
             
             
-            class Tree
+            class Codec
             {
             public:
-                explicit Tree();
-                virtual ~Tree() throw();
+                explicit Codec();
+                virtual ~Codec() throw();
                 
                 void initialize() throw();
                 
@@ -135,14 +134,14 @@ namespace yocto
                 void decode_init( DecodeHandle &handle ) throw();
                 DecodeStatus decode( DecodeHandle &handle, ios::bitio &in, char &C );
                 
-                const Core & core() const throw() { return H; }
+                const Tree & tree() const throw() { return H; }
                 
             private:
                 Heap         Q; //!< to build tree
-                Core         H;
+                Tree         H; //!< Huffman's tree
                 
                 
-                YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Codec);
                 DecodeStatus decode_sym( DecodeHandle &handle, ios::bitio &in, char &C );
                 DecodeStatus decode_any( DecodeHandle &handle, ios::bitio &in, char &C );
                 

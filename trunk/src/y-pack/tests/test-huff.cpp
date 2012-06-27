@@ -13,7 +13,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
 {
     std::cerr << "sizeof(Huffman::Node)= " << sizeof(Huffman::Node) << std::endl;
     
-    Huffman::Tree tree;
+    Huffman::Codec tree;
     ios::icstream in( ios::cstdin );
     ios::bitio    out;
     
@@ -43,13 +43,13 @@ YOCTO_UNIT_TEST_IMPL(huff)
     
     {
         ios::ocstream fp("huff.dot",false);
-        tree.core().graphviz("G", fp);
+        tree.tree().graphviz("G", fp);
     }
     system( "dot -Tpng huff.dot -o huff.png" );
     {
         ios::ocstream fp( ios::cstderr );
         fp("Core Tree: \n");
-        tree.core().display(fp);
+        tree.tree().display(fp);
     }
 }
 YOCTO_UNIT_TEST_DONE()
@@ -57,7 +57,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(huffenc)
 {
-    Huffman::Tree tree;
+    Huffman::Codec tree;
     ios::icstream src( ios::cstdin );
     ios::ocstream tgt( ios::cstdout );
     ios::bitio    bio;
@@ -87,7 +87,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(huffdec)
 {
-    Huffman::Tree tree;
+    Huffman::Codec tree;
     ios::icstream src( ios::cstdin );
     ios::ocstream tgt( ios::cstdout );
     ios::bitio    bio;

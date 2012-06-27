@@ -12,7 +12,7 @@ namespace yocto
     namespace packing
     {
         
-        Huffman:: Core:: Core( Heap &prioQ ) :
+        Huffman:: Tree:: Tree( Heap &prioQ ) :
         root(NULL),
         alphabet(),
         num_nodes(NODES_MAX),
@@ -24,7 +24,7 @@ namespace yocto
         }
         
         
-        Huffman:: Core:: ~Core() throw()
+        Huffman:: Tree:: ~Tree() throw()
         {
             alphabet.reset();
             memory::kind<memory::global>::release_as<Node>( nodes, num_nodes );
@@ -33,7 +33,7 @@ namespace yocto
             root = NULL;
         }
         
-        void Huffman:: Core:: initialize( Heap &prioQ ) throw()
+        void Huffman:: Tree:: initialize( Heap &prioQ ) throw()
         {
             alphabet.reset();
             memset( nodes, 0, num_nodes * sizeof(Node) );
@@ -71,7 +71,7 @@ namespace yocto
         }
         
         
-        bool Huffman:: Core:: try_build_tree( Heap &prioQ ) throw()
+        bool Huffman:: Tree:: try_build_tree( Heap &prioQ ) throw()
         {
             size_t idx = ALPHABET_MAX;
             
@@ -110,7 +110,7 @@ namespace yocto
             return true;
         }
         
-        void Huffman:: Core:: build_tree( Heap &Q ) throw()
+        void Huffman:: Tree:: build_tree( Heap &Q ) throw()
         {
             while( ! try_build_tree(Q) )
             {
@@ -122,7 +122,7 @@ namespace yocto
             root->encode();
         }
         
-        void Huffman:: Core:: rescale() throw()
+        void Huffman:: Tree:: rescale() throw()
         {
             for( Node *node = alphabet.head; node; node = node->next )
             {
@@ -130,7 +130,7 @@ namespace yocto
             }
         }
         
-        void Huffman:: Core:: update( uint8_t b, Heap &Q ) throw()
+        void Huffman:: Tree:: update( uint8_t b, Heap &Q ) throw()
         {
             Node *node = nodes+b;
             if( node->freq == 0 )
@@ -146,7 +146,7 @@ namespace yocto
         }
         
         
-        void Huffman:: Core:: write( ios::bitio &out, uint8_t b, Heap &Q)
+        void Huffman:: Tree:: write( ios::bitio &out, uint8_t b, Heap &Q)
         {
             Node *node = &nodes[b];
             assert(node->bits>0);
@@ -186,33 +186,13 @@ namespace yocto
         }
 
         
-        void Huffman:: Core:: flush( ios::bitio &out )
+        void Huffman:: Tree:: flush( ios::bitio &out )
         {
             end->emit(out);
             out.fill_to_byte_with(false);
         }
 
-
-        size_t Huffman:: Core:: guess_size( const Core &other ) const throw()
-        {
-            const List &encoding  = other.alphabet;
-            assert( alphabet.size == encoding.size );
-            size_t bits  = 0;
-            size_t bytes = 0;
-            for( const Node *cur = alphabet.head, *enc = encoding.head; cur; cur = cur->next, enc = enc->next )
-            {
-                assert(cur->ch==enc->ch);
-                bits += cur->freq * enc->bits;
-                while( bits >= 8 )
-                {
-                    bits -= 8;
-                    ++bytes;
-                }
-            }
-            if( bits > 0 ) ++bytes;
-            return bytes;
-        }
-        
+             
     }
     
 }

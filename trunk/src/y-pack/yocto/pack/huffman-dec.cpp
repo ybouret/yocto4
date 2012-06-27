@@ -12,14 +12,14 @@ namespace yocto
 #define Y_HUFF_DECODE_ANY (0x01) 
 #define Y_HUFF_DECODE_SYM (0x02)
         
-        void Huffman:: Tree:: decode_init( DecodeHandle &handle ) throw()
+        void Huffman:: Codec:: decode_init( DecodeHandle &handle ) throw()
         {
             initialize();
             handle.node = H.root;            //!< start at top
             handle.flag = Y_HUFF_DECODE_SYM; //!< wait for the first symbol
         }
         
-        Huffman::DecodeStatus Huffman:: Tree:: decode_sym( DecodeHandle &handle, ios::bitio &in, char &C  )
+        Huffman::DecodeStatus Huffman:: Codec:: decode_sym( DecodeHandle &handle, ios::bitio &in, char &C  )
         {
             assert( handle.node == H.root );
             if( in.size() >= 8 )
@@ -37,7 +37,7 @@ namespace yocto
                 return DecodePending;
         }
         
-        Huffman::DecodeStatus Huffman::Tree:: decode_any( DecodeHandle &handle, ios::bitio &in, char &C )
+        Huffman::DecodeStatus Huffman::Codec:: decode_any( DecodeHandle &handle, ios::bitio &in, char &C )
         {
             while( in.size() > 0 )
             {
@@ -99,7 +99,7 @@ namespace yocto
         }
         
         
-        Huffman::DecodeStatus Huffman::Tree:: decode( DecodeHandle &handle, ios::bitio &in, char &C )
+        Huffman::DecodeStatus Huffman::Codec:: decode( DecodeHandle &handle, ios::bitio &in, char &C )
         {
             assert( handle.node != NULL );
             assert( handle.node->ch == INSIDE);
