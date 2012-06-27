@@ -63,6 +63,7 @@ namespace yocto
              */
             void reduce( double t );
             
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(chemsys);
 
