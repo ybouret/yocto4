@@ -18,4 +18,12 @@
      time(&ltime);
      return ctime(&ltime);
  }
- 
+
+double my_sum( const double *arr, int n )
+{
+	double ans = 0;
+	int i=0;
+	for( ; i < n; ++i ) ans += arr[i];	
+	return ans;
+} 
+
