@@ -136,6 +136,11 @@ namespace yocto
 				}
 			}
 		}
+        
+        inline void keep( size_t n ) throw()
+        {
+            while( size_ > n ) pop_back();
+        }
 		
 		
 	private:

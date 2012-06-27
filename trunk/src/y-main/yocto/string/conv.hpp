@@ -33,6 +33,17 @@ namespace yocto
             return to_real<T>( _txt, ctx );
         }
         
+        static inline double to_double( const char *txt, const char *ctx = NULL )
+        {
+            return to_real<double>(txt,ctx);
+        }
+        
+        static inline double to_float( const char *txt, const char *ctx = NULL )
+        {
+            return to_real<float>(txt,ctx);
+        }
+
+        
         
 	};
 	
