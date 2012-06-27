@@ -192,7 +192,9 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	## Compiler Specific Flags
 	####################################################################
 	IF( YOCTO_GNU )
-		#SET_TARGET_PROPERTIES( ${tgt} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++" )
+		IF("${GCC_VERSION}" VERSION_GREATER "4.5.0" )
+		TARGET_LINK_LIBRARIES( ${tgt} -static-libgcc -static-libstdc++ )
+		ENDIF()
 	ENDIF()
   
   IF( YOCTO_CLANG )
