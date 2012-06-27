@@ -7,7 +7,7 @@ namespace yocto
     
     namespace packing
     {
-       
+        
         
 #define Y_HUFF_DECODE_ANY (0x01) 
 #define Y_HUFF_DECODE_SYM (0x02)
@@ -15,7 +15,7 @@ namespace yocto
         void Huffman:: Tree:: decode_init( DecodeHandle &handle ) throw()
         {
             initialize();
-            handle.node = H.root;     //!< start at top
+            handle.node = H.root;            //!< start at top
             handle.flag = Y_HUFF_DECODE_SYM; //!< wait for the first symbol
         }
         
@@ -24,15 +24,13 @@ namespace yocto
             assert( handle.node == H.root );
             if( in.size() >= 8 )
             {
-                //ios::ocstream fp( ios::cstderr );
                 const uint8_t b  = in.pop_full<uint8_t>();
                 C = char(b);
-                //fp("read : "); nodes[b].display(fp);
                 H.update(b,Q);
-                
                 
                 handle.node = H.root;
                 handle.flag = Y_HUFF_DECODE_ANY;
+                
                 return DecodeSuccess;
             }
             else
@@ -46,29 +44,23 @@ namespace yocto
                 //==============================================================
                 // walk down the tree
                 //==============================================================
-                //ios::ocstream fp( ios::cstderr );
-                
-                
                 const bool at_right = in.pop();
                 
                 
                 if( at_right )
                 {
-                    //fp("[1]\n");
                     Node *right = handle.node->right;
                     if(!right) throw exception("corrupted input");
                     handle.node = right;
                 }
                 else
                 {
-                    //fp("[0]\n");
                     Node *left = handle.node->left;
                     if(!left) throw  exception("corrupted input");
                     handle.node = left;
                 }
                 
                 const int ch = handle.node->ch;
-                //fp("read : "); handle.node->display(fp);
                 if( ch > INSIDE )
                 {
                     //==========================================================
@@ -125,7 +117,7 @@ namespace yocto
             }
             throw exception("Huffman: invalid handle flag=%d", handle.flag ); 
         }
-
+        
         
         
     }
