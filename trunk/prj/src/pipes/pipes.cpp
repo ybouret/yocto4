@@ -6,6 +6,8 @@
 
 #include <cerrno>
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
 using namespace yocto;
 
@@ -95,7 +97,7 @@ int main(int argc, char *argv[] )
 				fputc(c,stdout);
 			close( fd[1] );
 			
-			wait(NULL);
+			//wait(NULL);
 		}
 	}
 	catch( const exception &e )
