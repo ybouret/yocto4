@@ -82,7 +82,7 @@ namespace yocto
                             
                         default: //-- an existing char
                             assert(ch>=0);
-                            assert(ch<ALPHABET_NUM);
+                            assert(ch<int(ALPHABET_NUM));
                             C = char(ch);
                             H.update(ch,Q);
                             
