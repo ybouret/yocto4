@@ -41,7 +41,7 @@ namespace yocto
             //------------------------------------------------------------------
             //-- prepare possible symbols
             //------------------------------------------------------------------
-            for( int i=0; i < ALPHABET_NUM; ++i )
+            for( unsigned i=0; i < ALPHABET_NUM; ++i )
             {
                 Node *node = nodes+i;
                 node->ch   = i;
@@ -58,7 +58,7 @@ namespace yocto
             //------------------------------------------------------------------
             //-- prepare inside nodes
             //------------------------------------------------------------------
-            for( int i=ALPHABET_MAX; i < NODES_MAX; ++i )
+            for( unsigned i=ALPHABET_MAX; i < NODES_MAX; ++i )
             {
                 nodes[i].ch = INSIDE;
             }
