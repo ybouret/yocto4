@@ -191,9 +191,9 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	####################################################################
 	## Compiler Specific Flags
 	####################################################################
-	IF( YOCTO_GNU )
+	IF( YOCTO_GNU AND WIN32)
 		IF("${GCC_VERSION}" VERSION_GREATER "4.5.0" )
-		#TARGET_LINK_LIBRARIES( ${tgt} -static-libgcc -static-libstdc++ )
+		TARGET_LINK_LIBRARIES( ${tgt} -static-libgcc -static-libstdc++ )
 		ENDIF()
 	ENDIF()
   
