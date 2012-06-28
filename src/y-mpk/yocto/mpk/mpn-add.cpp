@@ -6,6 +6,7 @@
 #endif
 
 #include "yocto/code/swap.hpp"
+#include "yocto/code/cast.hpp"
 
 #include <iostream>
 
@@ -105,7 +106,7 @@ namespace yocto
 		natural natural:: inc_( uint8_t x ) const
 		{
 			uint64_t wksp[ YOCTO_U64_FOR_ITEM(natural) ];
-			natural &rhs = *(natural *) &wksp[0];
+			natural &rhs = *_cast::from<natural>(&wksp[0]);
 			rhs.size_ = 1;
 			rhs.byte_ = &x;
 			return add_( *this, rhs );

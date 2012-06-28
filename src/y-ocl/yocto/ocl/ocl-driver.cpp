@@ -65,7 +65,7 @@ namespace yocto
 			for( cl_uint i=0; i < num_platforms; ++i ) 
 			{
 				Platforms( __build_platform, (void*) & platforms[i] );
-				*(size_t *)(void*)&num_devices += Platforms[i].num_devices;	
+				*(cl_uint *)(void*)&num_devices += Platforms[i].num_devices;	
 				
 			}
 			assert( num_platforms == platforms.size );

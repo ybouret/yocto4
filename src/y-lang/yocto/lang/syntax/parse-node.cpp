@@ -1,4 +1,5 @@
 #include "yocto/lang/syntax/parse-node.hpp"
+#include "yocto/code/cast.hpp"
 #include <cstring>
 
 namespace yocto 
@@ -11,7 +12,7 @@ namespace yocto
             
             lexeme * & parse_node:: __lex() throw()
             {
-                return *(lexeme **) &wksp[0];
+                return *_cast::from<lexeme *>(&wksp[0]);
             }
             
             
@@ -60,19 +61,19 @@ namespace yocto
             parse_node::child_list & parse_node::children() throw()
             {
                 assert(0==terminal);
-                return *(child_list *) &wksp[0];
+                return * _cast::from<child_list>( &wksp[0] );
             }
             
             const lexeme * parse_node:: lex() const throw()
             {
                 assert(terminal!=0);
-                return *(lexeme **) &wksp[0];
+                return *_cast::from<lexeme *>((void*)&wksp[0]);
             }
             
             const parse_node::child_list & parse_node::children() const throw()
             {
                 assert(0==terminal);
-                return *(child_list *) &wksp[0];
+                return * _cast::from<child_list>( (void*)&wksp[0] );
             }
             
             
@@ -121,7 +122,7 @@ namespace yocto
                     return this;
                 }
             }
-                      
+            
             
         }
         
