@@ -9,6 +9,7 @@
 #include "yocto/string.hpp"
 #include "yocto/ios/icstream.hpp"
 
+#include "yocto/wtime.hpp"
 
 using namespace yocto;
 
@@ -101,6 +102,8 @@ int main(int argc, char *argv[] )
             
             char         buffer[8];
             const size_t buflen = sizeof(buffer);
+            wtime chrono;
+            chrono.start();
             while(true)
             {
                 ssize_t len = read(fd[I_READ], buffer, buflen);
@@ -111,8 +114,11 @@ int main(int argc, char *argv[] )
                 if( 0 == len )
                     break;
                 fwrite(buffer, len, 1, stdout ); fflush(stdout);
+                if( chrono.query() > 3 )
+                    break;
             }
-            
+            int res = close( fd[I_READ] );
+            std::cerr << "---- done, res=" << res << std::endl;
             
         }
         return 0;
