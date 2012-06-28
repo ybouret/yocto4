@@ -1,6 +1,7 @@
 #include "yocto/wtime.hpp"
 
 #include <cstdio>
+#include <cstdlib>
 
 using namespace yocto;
 
