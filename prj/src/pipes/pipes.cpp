@@ -56,8 +56,8 @@ bool invoke( const string &cmd, int fd[2] )
 		default: // in parent
 			close(tube_in[I_READ]);
 			close(tube_out[I_WRITE]);
-			fd[0] = tube_in[I_WRITE];
-			fd[1] = tube_out[I_READ];
+			fd[I_WRITE] = tube_in[I_WRITE];
+			fd[I_READ] = tube_out[I_READ];
 			return true;
 	}
 	
@@ -87,15 +87,15 @@ int main(int argc, char *argv[] )
 				input.get_all(ptr, len);
 			}
 			
-			if( len != write( fd[0], ptr, len) )
+			if( len != write( fd[I_WRITE], ptr, len) )
 			{
 				throw libc::exception( errno, "write error");
 			}
-			close(fd[0]);
+			close(fd[I_WRITE]);
 			char c;
-			while( 1 == read( fd[1], &c, 1 ) )
+			while( 1 == read( fd[I_READ], &c, 1 ) )
 				fputc(c,stdout);
-			close( fd[1] );
+			close( fd[I_READ] );
 			
 			//wait(NULL);
 		}
