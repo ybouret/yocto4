@@ -67,23 +67,25 @@ namespace yocto
             // Rule content
             //------------------------------------------------------------------
             syntax::alternate &ATOM     = alt("ATOM");
-            //syntax::aggregate &ITEM     = agg("ITEM", syntax::is_merging_one );
             syntax::aggregate &ITEM     = agg("ITEM");
-
+            
             syntax::repeating &ELEMENTS = rep("ELEMENTS", ITEM, 1);
             syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
             syntax::aggregate &ALT      = agg("ALT");
             
-            syntax::terminal  &CODE       = terminal("CODE","@[[:word:][:digit:]]+");
+            syntax::terminal  &CODE      = terminal("CODE","@[[:word:][:digit:]]+");
             syntax::optional  &OPT_CODE  = opt("OPT_CODE",CODE);
             
-            ALT << BAR << ELEMENTS;
+            syntax::aggregate &SUB = agg("SUB");
+            SUB << ELEMENTS;
+            
+            ALT << BAR << SUB;
             syntax::repeating &OTHER= rep("OTHER", ALT,0);
-            GROUP << LPAREN << ELEMENTS << RPAREN;
+            GROUP << LPAREN << SUB << RPAREN;
             ATOM << RULEID << REGEXP << SINGLE << GROUP;
             ITEM << ATOM << MODIFIER << OPT_CODE << OTHER;
             
-            RULE &= ELEMENTS;
+            RULE &= SUB;
             
             //------------------------------------------------------------------
             // Rule epilog
@@ -97,14 +99,6 @@ namespace yocto
             set_root(GRAMMAR);
         }
         
-        /**
-         GRAMMAR : RULE+;
-         RULE : RULEID ';';
-         RULEID : "[:word:]+";
-         REGEXP : "[:cstring:]";
-         SINGLE : "'[\\x20-\\x7F]'"
-         */
-        
         
                
         
@@ -116,7 +110,7 @@ namespace yocto
             
             //-- first pass: take care of specialized and discardable
             Tree->AST();
-                                   
+            
             return Tree;
         }
         
