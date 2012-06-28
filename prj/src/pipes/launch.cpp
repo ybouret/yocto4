@@ -19,14 +19,16 @@ void launch( const string &option, const string &command, const vector<char*> &a
     
     if( option == "local" )
     {
+        YOCTO_GIANT_LOCK();
         execv(command.c_str(), xargv);
-        throw exception("Local Exec Error");
+        throw libc::exception( errno, "Local Exec Error");
     }
     
     if( option == "global" )
     {
+        YOCTO_GIANT_LOCK();
         execvp(command.c_str(), xargv);
-        throw exception("Global Exec Error");
+        throw libc::exception( errno, "Global Exec Error");
     }
     
     throw exception("Invalid Option");
