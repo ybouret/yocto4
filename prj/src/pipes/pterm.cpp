@@ -1,6 +1,7 @@
 
 
 #include <unistd.h>
+#include <sys/wait.h>
 #include <cstdlib>
 #include <cstdio>
 #include <cerrno>
@@ -26,7 +27,7 @@ void __pipe( int fd[2] )
 
 
 static
-void invoke( char *argv[], int fd[2] )
+pid_t invoke( char *argv[], int fd[2] )
 {
     
     //-- create the pipes
@@ -43,7 +44,8 @@ void invoke( char *argv[], int fd[2] )
 		close(tube_in[1]);
 	}
     
-    switch( fork() )
+    const pid_t p  = fork();
+    switch( p )
 	{
 		case -1:
 			close( tube_in[0]  );
@@ -66,9 +68,9 @@ void invoke( char *argv[], int fd[2] )
 			fd[I_WRITE] = tube_in[I_WRITE];
 			fd[I_READ]  = tube_out[I_READ];
 	}
+    return p;
     
     
-   
 }
 
 int main(int argc, char *argv[] )
@@ -85,7 +87,7 @@ int main(int argc, char *argv[] )
             std::cerr << std::endl;
             
             int fd[2] = { -1, -1 };
-            invoke( argv, fd);
+            const pid_t child = invoke( argv, fd);
             
 #if 0
             string line;
@@ -114,11 +116,16 @@ int main(int argc, char *argv[] )
                 if( 0 == len )
                     break;
                 fwrite(buffer, len, 1, stdout ); fflush(stdout);
-                if( chrono.query() > 3 )
+                if( chrono.query() > 10 )
                     break;
             }
-            int res = close( fd[I_READ] );
-            std::cerr << "---- done, res=" << res << std::endl;
+            close( fd[I_READ] );
+            std::cerr << "---- done: waiting... " << std::endl;
+            int status = -1;
+            waitpid(child, &status, 0);
+            std::cerr << "--- status=" << status << std::endl;
+            
+            
             
         }
         return 0;
