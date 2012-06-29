@@ -20,6 +20,7 @@ namespace yocto
         }
         
         
+        static inline
         void __fusion( syntax::parse_node *node )
         {
             assert(node);
