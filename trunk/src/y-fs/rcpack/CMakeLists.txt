@@ -7,7 +7,7 @@ TARGET_LINK_YOCTO(rcdemo)
 ADD_DEPENDENCIES(rcdemo yocto-rcpack)
 
 GET_TARGET_PROPERTY(the_exe rcdemo LOCATION )
-MESSAGE( STATUS "pacthing ${the_exe}" )
+MESSAGE( STATUS "patching ${the_exe}" )
 
 SET(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 MESSAGE( STATUS "resources@${RESOURCES}" )

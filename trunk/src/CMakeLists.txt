@@ -41,6 +41,7 @@ ENDMACRO(YOCTO_BUILD)
 ########################################################################
 # Record projects
 ########################################################################
+MESSAGE( STATUS "---------------- <modules>  ----------------" )
 YOCTO_BUILD(thr)
 YOCTO_BUILD(lang)
 YOCTO_BUILD(fs)
@@ -63,6 +64,8 @@ YOCTO_BUILD(json)
 YOCTO_BUILD(aqueous)
 YOCTO_BUILD(visit)
 YOCTO_BUILD(fltk)
+MESSAGE( STATUS "---------------- </modules> ----------------" )
+MESSAGE( STATUS "" )
 
 INSTALL( FILES 
 	share/create.sh 
@@ -75,6 +78,8 @@ INSTALL( FILES
 	DESTINATION share/yocto )
 
 ########################################################################
+MESSAGE( STATUS "---------------- <packaging>  ----------------" )
+
 IF(UNIX)
   GET_FILENAME_COMPONENT(CXX_NICKNAME ${CMAKE_CXX_COMPILER} NAME)
 ELSE()
@@ -126,4 +131,5 @@ ENDIF()
 MESSAGE( STATUS "CPACK_GENERATOR='${CPACK_GENERATOR}'" )
 
 INCLUDE(CPack)
+MESSAGE( STATUS "---------------- </packaging> ----------------" )
 
