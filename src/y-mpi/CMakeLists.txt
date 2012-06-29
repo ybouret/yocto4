@@ -3,8 +3,6 @@ PROJECT(y-mpi)
 FIND_PACKAGE(MPI)
 
 IF(MPI_FOUND)
-
-  MESSAGE( STATUS "[configuring y-mpi]" )
   
   FILE( GLOB decl yocto/mpi/*.hpp )
   FILE( GLOB impl yocto/mpi/*.cpp )

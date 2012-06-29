@@ -1,7 +1,7 @@
 ########################################################################
 ##
 ########################################################################
-MESSAGE( STATUS "--------------------------------" )
+MESSAGE( STATUS "---------------- <yocto>  ----------------" )
 SET(CMAKE_SKIP_PREPROCESSED_SOURCE_RULES ON)
 SET(CMAKE_SKIP_ASSEMBLY_SOURCE_RULES     ON)
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS    ON)
@@ -198,4 +198,4 @@ MACRO(TARGET_LINK_YOCTO tgt)
   
 ENDMACRO()
 
-MESSAGE( STATUS "--------------------------------" )
+MESSAGE( STATUS "---------------- </yocto> ----------------" )

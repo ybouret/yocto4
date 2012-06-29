@@ -1,4 +1,5 @@
 # Wrapper to use VISIT, parallel !
+MESSAGE( STATUS "---------------- <VisIt>  ----------------" )
 
 SET(VISIT_FOUND OFF)
 
@@ -66,3 +67,5 @@ ELSE( "" STREQUAL "${VISIT}" )
 	
 	
 ENDIF("" STREQUAL "${VISIT}")
+
+MESSAGE( STATUS "---------------- </VisIt> ----------------" )

@@ -3,6 +3,7 @@
 # add OpenCL include path and peprare the OPENCL_LINK_TO macro
 #
 ########################################################################
+MESSAGE( STATUS "---------------- <OpenCL>  ----------------" )
 
 SET( OPENCL_HAS_SDK OFF )
 SET( OPENCL_ON_DARWIN OFF )
@@ -136,3 +137,5 @@ IF( NOT OPENCL_HAS_SDK )
  SET(OPENCL_FOUND OFF)
  MESSAGE( STATUS "No OpenCL support was found" )
 ENDIF( NOT OPENCL_HAS_SDK )
+
+MESSAGE( STATUS "---------------- </OpenCL> ----------------" )
