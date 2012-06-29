@@ -67,7 +67,7 @@ namespace yocto
             //-- initialize alphabet
             //------------------------------------------------------------------
             build_tree(prioQ);
-
+            
         }
         
         
@@ -81,9 +81,14 @@ namespace yocto
                 node->bits = 0;
                 prioQ.push(node);
             }
+            end->bits = 0;
             prioQ.push(end);
             if( alphabet.size < ALPHABET_NUM )
+            {
+                nyt->bits = 0;
                 prioQ.push(nyt);
+            }
+            
             assert(prioQ.size()>0);
             
             //------------------------------------------------------------------
@@ -98,7 +103,7 @@ namespace yocto
                 parent->left  = left;
                 parent->right = right;
                 parent->freq  = left->freq + right->freq;
-                parent->bits  = max_of(left->bits,right->bits)+1;
+                parent->bits  = max_of<size_t>(left->bits,right->bits)+1;
                 if( parent->bits > RootBits )
                 {
                     return false;
@@ -184,15 +189,15 @@ namespace yocto
             //------------------------------------------------------------------
             build_tree(Q);
         }
-
+        
         
         void Huffman:: Tree:: flush( ios::bitio &out )
         {
             end->emit(out);
             out.fill_to_byte_with(false);
         }
-
-             
+        
+        
     }
     
 }

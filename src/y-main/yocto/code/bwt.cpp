@@ -36,7 +36,7 @@ namespace yocto
 			};
 		}
 		
-		size_t bwt::encode( void *output, const void *input, const size_t size, size_t *indices ) throw()
+		size_t bwt::encode( void *output, const void *input, const size_t size, size_t *indices, move_to_front *mtf ) throw()
 		{
 			const uint8_t    *buf_in  = (const uint8_t *)input;
 			uint8_t          *buf_out = (uint8_t *)output;
@@ -56,10 +56,17 @@ namespace yocto
 				if( 0 == idx )
 					pidx=i;
 			}
+            if( mtf )
+            {
+                for( size_t i=0; i < size; ++i )
+                {
+                    buf_out[i] = mtf->encode( buf_out[i] );
+                }
+            }
 			return pidx;
 		}
 		
-		void   bwt:: decode( void *output, const void *input, const size_t size, size_t *indices, size_t primary_index ) throw()
+		void   bwt:: decode( void *output, const void *input, const size_t size, size_t *indices, size_t primary_index, move_to_front *mtf ) throw()
 		{
 			size_t buckets[256];
 			const uint8_t *buf_in  = (const uint8_t *)input;
@@ -89,6 +96,14 @@ namespace yocto
 				*(--c) = bj;
 				j = buckets[bj] + indices[j];
 			}
+            
+            if( mtf )
+            {
+                for( size_t i=0; i < size; ++i )
+                {
+                    buf_out[i] = mtf->decode( buf_out[i] );
+                }
+            }
 			
 		}
 		
