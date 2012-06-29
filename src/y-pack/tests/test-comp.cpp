@@ -13,32 +13,37 @@ using namespace yocto;
 using namespace packing;
 
 
-static inline void emit( ios::ostream &fp, ios::bitio &bio )
+static inline size_t emit( ios::ostream &fp, ios::bitio &bio )
 {
+    size_t num = 0;
     while( bio.size() >= 8 )
+    {
         fp.write( bio.pop_full<char>() );
+        ++num;
+    }
+    return num;
 }
 
-static inline void emit( ios::ostream &fp, ios::bitio &bio, Huffman::Codec &huff, const size_t size, const size_t pidx, const char *coded )
+static inline size_t emit( ios::ostream &fp, ios::bitio &bio, Huffman::Codec &huff, const size_t size, const size_t pidx, const char *coded )
 {
-    std::cerr << "Emit " << size << "..."; std::cerr.flush();
+    size_t ans = 0;
     bio.push_full<uint32_t>( pidx );
     emit(fp,bio);
     for( size_t i=0; i < size; ++i )
     {
         huff.write(bio, coded[i] );
-        emit(fp,bio);
+        ans += emit(fp,bio);
     }
     huff.flush(bio);
-    emit(fp,bio);
+    ans += emit(fp,bio);
     assert(bio.size()==0);
-    std::cerr << "done" << std::endl;
+    return ans;
 }
 
 
 YOCTO_UNIT_TEST_IMPL(comp)
 {
-    const size_t        block_size = 32;
+    const size_t        block_size = 1024;
     char                block[ block_size ];
     char                coded[ block_size ];
     size_t              indices[ block_size ];
@@ -50,24 +55,29 @@ YOCTO_UNIT_TEST_IMPL(comp)
     ios::icstream input( ios::cstdin );
     ios::ocstream output( ios::cstdout );
     
+    
+    core::move_to_front *pMtf = &mtf;
     char C = 0;
+    size_t nIn = 0;
+    size_t nOut = 0;
     while( input.query(C) )
     {
+        ++nIn;
         block[ count++ ] = C;
         if( count >= block_size )
         {
-            const size_t pidx = core::bwt::encode(coded, block, count, indices, &mtf);
-            emit( output, bio, huff, count, pidx, coded );
+            const size_t pidx = core::bwt::encode(coded, block, count, indices, pMtf);
+            nOut += emit( output, bio, huff, count, pidx, coded );
             count = 0;
         }
     }
     
     if( count > 0 )
     {
-        const size_t pidx = core::bwt::encode(coded, block, count, indices, &mtf);
-        emit( output, bio, huff, count, pidx, coded );
+        const size_t pidx = core::bwt::encode(coded, block, count, indices, pMtf);
+        nOut += emit( output, bio, huff, count, pidx, coded );
     }
     
-    
+    std::cerr << "nIn=" << nIn << " => nOut=" << nOut << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
