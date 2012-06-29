@@ -1,7 +1,7 @@
 ########################################################################
 ##
 ########################################################################
-
+MESSAGE( STATUS "--------------------------------" )
 SET(CMAKE_SKIP_PREPROCESSED_SOURCE_RULES ON)
 SET(CMAKE_SKIP_ASSEMBLY_SOURCE_RULES     ON)
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS    ON)
@@ -73,16 +73,11 @@ IF( "${CC_NAME}" MATCHES "gcc.*" )
 
   EXEC_PROGRAM(${CMAKE_C_COMPILER} ARGS --version OUTPUT_VARIABLE GCC_CORE_VERSION)
   STRING( REGEX MATCH    "[0-9]+\\.[0-9]+\\.[0-9]+" GCC_VERSION "${GCC_CORE_VERSION}" )
-  MESSAGE( STATUS "GCC_VERSION=${GCC_VERSION}")
 
   STRING( REGEX REPLACE  "([0-9]+)\\.[0-9]+\\.[0-9]+" "\\1" GCC_MAJOR "${GCC_VERSION}")
   STRING( REGEX REPLACE  "[0-9]+\\.([0-9]+)\\.[0-9]+" "\\1" GCC_MINOR "${GCC_VERSION}")
   STRING( REGEX REPLACE  "[0-9]+\\.[0-9]+\\.([0-9]+)" "\\1" GCC_PATCH "${GCC_VERSION}")
-
-  MESSAGE( STATUS "GCC_MAJOR=${GCC_MAJOR}" )
-  MESSAGE( STATUS "GCC_MINOR=${GCC_MINOR}" )
-  MESSAGE( STATUS "GCC_PATCH=${GCC_PATCH}" )
-
+  MESSAGE( STATUS "GCC_VERSION=${GCC_MAJOR}.${GCC_MINOR}.${GCC_PATCH}" )
 ENDIF()
 
 ########################################################################
@@ -202,3 +197,5 @@ MACRO(TARGET_LINK_YOCTO tgt)
   ENDIF()
   
 ENDMACRO()
+
+MESSAGE( STATUS "--------------------------------" )

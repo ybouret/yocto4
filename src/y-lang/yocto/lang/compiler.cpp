@@ -25,13 +25,17 @@ namespace yocto
         {
             
             //------------------------------------------------------------------
+            //
             // scanner specifics
+            //
             //------------------------------------------------------------------
             scan.make( "BLANKS", "[ \t]+",    & scan.discard );
             scan.make( "ENDL"  , "[:endl:]+", & scan.no_endl );
             
             //------------------------------------------------------------------
+            //
             // declare terminals
+            //
             //------------------------------------------------------------------
             syntax::terminal  &RULEID   = terminal( "RULEID", "[:word:]+" );
             syntax::terminal  &REGEXP   = terminal( "REGEXP", "[:cstring:]");
@@ -46,23 +50,71 @@ namespace yocto
             syntax::terminal  &BAR      = terminal( "BAR",    '|', syntax::is_discardable);
             
             //------------------------------------------------------------------
+            //
             // hand coded comment
+            //
             //------------------------------------------------------------------
             scan.call("lang.compiler.comment", "//", this, & compiler::enter_comment);
             
             comment.back("[:endl:]", this, & compiler::leave_comment );
             comment.make( "ANY1", ".", & comment.discard );
             
-            syntax::alternate &MODIF  = alt("MODIF");
-            MODIF << OPT << REP0 << REP1;
-            syntax::optional  &MODIFIER = opt("MODIFIER",MODIF);
+            //------------------------------------------------------------------
+            //
+            // declare modifiers: joker
+            //
+            //------------------------------------------------------------------
+            syntax::alternate &MODIFIER  = alt("MODIFIER");
+            MODIFIER << OPT << REP0 << REP1;
+            syntax::optional  &OPT_MODIFIER = opt("OPT_MODIFIER",MODIFIER);
             
+            //------------------------------------------------------------------
+            //
+            // declare optional code
+            //
+            //------------------------------------------------------------------
+            syntax::terminal  &CODE      = terminal("CODE","@[[:word:][:digit:]]+");
+            syntax::optional  &OPT_CODE  = opt("OPT_CODE",CODE);
+            
+            //------------------------------------------------------------------
+            //
+            // Start the rule
+            //
+            //------------------------------------------------------------------
             syntax::aggregate &RULE     = agg( "RULE" );
+            
             //------------------------------------------------------------------
             // Rule prolog
             //------------------------------------------------------------------
             RULE << RULEID << COLUMN;
             
+            
+            //------------------------------------------------------------------
+            // top level: alternation
+            //------------------------------------------------------------------
+            syntax::aggregate &SUB     = agg("SUB", syntax::is_merging_one);
+            syntax::aggregate &BODY    = agg("BODY",syntax::is_merging_one);
+            syntax::aggregate &ALT     = agg("ALT");
+            ALT << BAR << BODY;
+            SUB << BODY << rep("REP_ALT",ALT,0);
+            
+            
+            
+            //------------------------------------------------------------------
+            // body description
+            //------------------------------------------------------------------
+            syntax::alternate &ATOM     = alt("ATOM");
+            syntax::aggregate &ITEM     = agg("ITEM");
+            syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
+            GROUP << LPAREN << SUB << RPAREN;
+            ATOM << RULEID << REGEXP << SINGLE << GROUP;
+            ITEM << ATOM << OPT_MODIFIER << OPT_CODE;
+            
+            BODY &= rep("ITEMS",ITEM,1);
+            
+            RULE &= SUB;
+            
+#if 0
             //------------------------------------------------------------------
             // Rule content
             //------------------------------------------------------------------
@@ -86,6 +138,7 @@ namespace yocto
             ITEM << ATOM << MODIFIER << OPT_CODE << OTHER;
             
             RULE &= SUB;
+#endif
             
             //------------------------------------------------------------------
             // Rule epilog
@@ -93,14 +146,14 @@ namespace yocto
             RULE &= END;
             
             //------------------------------------------------------------------
-            // and the grammar
+            // and the grammar is a set of rules...
             //------------------------------------------------------------------
             syntax::repeating &GRAMMAR = rep("RULES",RULE,1);
             set_root(GRAMMAR);
         }
         
         
-               
+        
         
         syntax::parse_node * compiler:: operator()( ios::istream &fp )
         {
