@@ -19,6 +19,45 @@ namespace yocto
             ++line;
         }
         
+        
+        void __fusion( syntax::parse_node *node )
+        {
+            assert(node);
+            if( ! node->terminal )
+            {
+                syntax::parse_node::child_list &chl = node->children();
+                for( syntax::parse_node *curr = chl.head; curr; curr=curr->next )
+                    __fusion(curr);
+                
+                if( node->label == "ALT" )
+                {
+                    syntax::parse_node::child_list tmp;
+                    while( chl.size )
+                    {
+                        syntax::parse_node *curr = chl.pop_front();
+                        if( curr->label == "ALT" )
+                        {
+                            syntax::parse_node::child_list &sub = curr->children();
+                            while( sub.size )
+                            {
+                                syntax::parse_node *n = sub.pop_front();
+                                n->parent = node;
+                                tmp.push_back(n);
+                            }
+                            delete curr;
+                        }
+                        else
+                        {
+                            tmp.push_back(curr);
+                        }
+                    }
+                    chl.swap_with(tmp);
+                }
+                
+            }
+        }
+        
+        
         compiler:: compiler() :
         parser( "lang.compiler.lexer", "lang.compiler.grammar" ),
         comment( declare("lang.compiler.comment") )
@@ -92,11 +131,11 @@ namespace yocto
             //------------------------------------------------------------------
             // top level: alternation
             //------------------------------------------------------------------
-            syntax::aggregate &SUB     = agg("SUB", syntax::is_merging_one);
-            syntax::aggregate &BODY    = agg("BODY",syntax::is_merging_one);
-            syntax::aggregate &ALT     = agg("ALT");
-            ALT << BAR << BODY;
-            SUB << BODY << rep("REP_ALT",ALT,0);
+            syntax::aggregate &ALT     = agg("ALT", syntax::is_merging_one);
+            syntax::aggregate &SUB     = agg("SUB",syntax::is_merging_one);
+            syntax::aggregate &OR      = agg("OR",  syntax::is_merging_one);
+            OR  << BAR << SUB;
+            ALT << SUB << rep("REP_OR",OR,0);
             
             
             
@@ -104,41 +143,15 @@ namespace yocto
             // body description
             //------------------------------------------------------------------
             syntax::alternate &ATOM     = alt("ATOM");
-            syntax::aggregate &ITEM     = agg("ITEM");
+            syntax::aggregate &ITEM     = agg("ITEM",  syntax::is_merging_one);
             syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
-            GROUP << LPAREN << SUB << RPAREN;
+            GROUP << LPAREN << ALT << RPAREN;
             ATOM << RULEID << REGEXP << SINGLE << GROUP;
             ITEM << ATOM << OPT_MODIFIER << OPT_CODE;
             
-            BODY &= rep("ITEMS",ITEM,1);
+            SUB  &= rep("ITEMS",ITEM,1);
             
-            RULE &= SUB;
-            
-#if 0
-            //------------------------------------------------------------------
-            // Rule content
-            //------------------------------------------------------------------
-            syntax::alternate &ATOM     = alt("ATOM");
-            syntax::aggregate &ITEM     = agg("ITEM");
-            
-            syntax::repeating &ELEMENTS = rep("ELEMENTS", ITEM, 1);
-            syntax::aggregate &GROUP    = agg("GROUP", syntax::is_merging_one);
-            syntax::aggregate &ALT      = agg("ALT");
-            
-            syntax::terminal  &CODE      = terminal("CODE","@[[:word:][:digit:]]+");
-            syntax::optional  &OPT_CODE  = opt("OPT_CODE",CODE);
-            
-            syntax::aggregate &SUB = agg("SUB");
-            SUB << ELEMENTS;
-            
-            ALT << BAR << SUB;
-            syntax::repeating &OTHER= rep("OTHER", ALT,0);
-            GROUP << LPAREN << SUB << RPAREN;
-            ATOM << RULEID << REGEXP << SINGLE << GROUP;
-            ITEM << ATOM << MODIFIER << OPT_CODE << OTHER;
-            
-            RULE &= SUB;
-#endif
+            RULE &= ALT;
             
             //------------------------------------------------------------------
             // Rule epilog
@@ -163,6 +176,9 @@ namespace yocto
             
             //-- first pass: take care of specialized and discardable
             Tree->AST();
+            
+            
+            __fusion(Tree);
             
             return Tree;
         }
