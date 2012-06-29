@@ -199,3 +199,4 @@ MACRO(TARGET_LINK_YOCTO tgt)
 ENDMACRO()
 
 MESSAGE( STATUS "---------------- </yocto> ----------------" )
+MESSAGE( STATUS "" )

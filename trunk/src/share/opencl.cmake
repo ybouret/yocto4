@@ -139,3 +139,4 @@ IF( NOT OPENCL_HAS_SDK )
 ENDIF( NOT OPENCL_HAS_SDK )
 
 MESSAGE( STATUS "---------------- </OpenCL> ----------------" )
+MESSAGE( STATUS "" )

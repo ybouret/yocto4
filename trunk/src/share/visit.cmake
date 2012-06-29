@@ -69,3 +69,4 @@ ELSE( "" STREQUAL "${VISIT}" )
 ENDIF("" STREQUAL "${VISIT}")
 
 MESSAGE( STATUS "---------------- </VisIt> ----------------" )
+MESSAGE( STATUS "" )
