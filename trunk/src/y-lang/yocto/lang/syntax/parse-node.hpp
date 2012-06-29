@@ -61,6 +61,7 @@ namespace yocto
                 //! unlink from parent
                 parse_node *unlink() throw();
                 
+                
             private:
                 uint64_t wksp[ YOCTO_U64_FOR_ITEM(child_list) ];
                 YOCTO_DISABLE_COPY_AND_ASSIGN(parse_node);
