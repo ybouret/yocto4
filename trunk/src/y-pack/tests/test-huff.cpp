@@ -13,9 +13,9 @@ YOCTO_UNIT_TEST_IMPL(huff)
 {
     std::cerr << "sizeof(Huffman::Node)= " << sizeof(Huffman::Node) << std::endl;
     
-    Huffman::Codec tree;
-    ios::icstream in( ios::cstdin );
-    ios::bitio    out;
+    Huffman::Codec huff;
+    ios::icstream  in( ios::cstdin );
+    ios::bitio     out;
     
     size_t       nIn = 0;
     size_t       nOut = 0;
@@ -24,7 +24,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
     while( in.query(C) )
     {
         ++nIn;
-        tree.write(out,uint8_t(C) );
+        huff.write(out,uint8_t(C) );
         while( out.size() >= 8 )
         {
             save.write( out.pop_full<uint8_t>() );
@@ -32,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
         }
     }
     
-    tree.flush(out);
+    huff.flush(out);
     while( out.size() >= 8 )
     {
         ++nOut;
@@ -43,13 +43,13 @@ YOCTO_UNIT_TEST_IMPL(huff)
     
     {
         ios::ocstream fp("huff.dot",false);
-        tree.tree().graphviz("G", fp);
+        huff.tree().graphviz("G", fp);
     }
     system( "dot -Tpng huff.dot -o huff.png" );
     {
         ios::ocstream fp( ios::cstderr );
         fp("Core Tree: \n");
-        tree.tree().display(fp);
+        huff.tree().display(fp);
     }
 }
 YOCTO_UNIT_TEST_DONE()
@@ -57,7 +57,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(huffenc)
 {
-    Huffman::Codec tree;
+    Huffman::Codec huff;
     ios::icstream src( ios::cstdin );
     ios::ocstream tgt( ios::cstdout );
     ios::bitio    bio;
@@ -66,14 +66,14 @@ YOCTO_UNIT_TEST_IMPL(huffenc)
     while( src.query(C) )
     {
         ++nIn;
-        tree.write(bio, C);
+        huff.write(bio, C);
         while( bio.size() >= 8 )
         {
             ++nOut;
             tgt.write( bio.pop_full<uint8_t>() );
         }
     }
-    tree.flush(bio);
+    huff.flush(bio);
     while( bio.size() > 0 )
     {
         const uint8_t b = bio.pop_full<uint8_t>();
@@ -87,13 +87,13 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(huffdec)
 {
-    Huffman::Codec tree;
-    ios::icstream src( ios::cstdin );
-    ios::ocstream tgt( ios::cstdout );
-    ios::bitio    bio;
+    Huffman::Codec huff;
+    ios::icstream  src( ios::cstdin );
+    ios::ocstream  tgt( ios::cstdout );
+    ios::bitio     bio;
     
     Huffman::DecodeHandle  h;
-    tree.decode_init(h);
+    huff.decode_init(h);
     
     char C=0,D=0;
     while( src.query(C) )
@@ -101,7 +101,7 @@ YOCTO_UNIT_TEST_IMPL(huffdec)
         bio.push_full<uint8_t>(C);
         for(;;)
         {
-            const Huffman::DecodeStatus status = tree.decode(h, bio, D);
+            const Huffman::DecodeStatus status = huff.decode(h, bio, D);
             if( status == Huffman::DecodePending )
                 break;
             
