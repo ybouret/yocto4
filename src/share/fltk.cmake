@@ -142,3 +142,4 @@ ENDMACRO(FLUID_UIC)
 ENDIF(FLTK_FOUND)
 
 MESSAGE( STATUS "---------------- </FLTK> ----------------" )
+MESSAGE( STATUS "" )

@@ -161,3 +161,4 @@ ELSE()
 ENDIF()
 
 MESSAGE( STATUS "---------------- </SWIG> ----------------" )
+MESSAGE( STATUS "" )
