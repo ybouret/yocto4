@@ -5,4 +5,6 @@ cacheMetaData(1)
 My_variable_get()
 fact(5)
 get_time()
+v <- c(1,2,3,4,5,6,7,8)
+my_sum( as.double(v), length(v) )
 
