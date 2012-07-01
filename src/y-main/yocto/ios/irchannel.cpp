@@ -29,6 +29,12 @@ namespace yocto
 			file_.get( data, size, done );
 		}
 		
+        
+        irchannel:: irchannel( raw_file::handle_t handle, error_type *status) :
+        file_( handle, readable )
+        {
+            file_.status = status;
+        }
 	}
 	
 }

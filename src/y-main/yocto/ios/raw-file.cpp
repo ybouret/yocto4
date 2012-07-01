@@ -27,7 +27,7 @@ namespace yocto
 	namespace ios
 	{
 		
-				
+        
 		raw_file:: raw_file( const string &filename, size_t mode ) :
 		local_file( is_regular ),
 		handle( _fd::invalid() ),
@@ -47,6 +47,16 @@ namespace yocto
 #include "raw-file-inc.cxx"
 		}
 		
+        
+        raw_file:: raw_file( handle_t user_handle, size_t user_access ) throw() :
+        local_file( is_pipe ),
+        handle( user_handle ),
+        access( user_access & (readable|writable) ),
+        status(NULL)
+        {
+            assert( handle != _fd::invalid() );
+            assert( (access&readable) || (access&writable) );
+        }
         
 		raw_file:: ~raw_file() throw()
 		{
@@ -106,5 +116,5 @@ namespace yocto
 		}
 		
 	}
-
+    
 }

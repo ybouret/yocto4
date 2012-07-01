@@ -22,7 +22,8 @@ namespace yocto
 				is_regular,
 				is_stdin,
 				is_stdout,
-				is_stderr
+				is_stderr,
+                is_pipe
 			};
 
 			typedef int2type<is_stdin>  cstdin_t;
