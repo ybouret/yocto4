@@ -27,3 +27,16 @@ double my_sum( const double *arr, int n )
 	return ans;
 } 
 
+
+void my_mat( double *m, int nr, int nc )
+{
+	int i,j;
+	for( int i=0; i < nr; ++i )
+	{
+		double *row = m + (i*nc);
+		for( int j=0; j< nc; ++j)
+		{
+			row[j] = i;
+		}
+	}
+}
