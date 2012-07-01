@@ -60,6 +60,7 @@ namespace yocto
             //! look up for rule 'id'
             syntax::rule & operator[]( const char   *id );
             
+            //! 
             syntax::parse_node *accept( lexer &Lexer, regex::source &Source );
             
             void set_root( const string &id );

@@ -6,6 +6,8 @@
 #include "yocto/code/endian.hpp"
 #include "yocto/string.hpp"
 #include "yocto/error.hpp"
+
+
 namespace yocto
 {
 	
@@ -65,22 +67,24 @@ namespace yocto
             //! big endian emit
             template <typename T>
 			inline void emit( T x ) { x = swap_be_as<T>(x); put_all(&x,sizeof(T)); } 
-           
+            
             void   save_buffer( const memory::ro_buffer &buff ); //!< 32 bits length
             string load_string();
-
             
-		private:
-			handle_t       handle;
-			
-		public:
-			const size_t   access; //!< readable | writable
-			error_type    *status; //!< maybe set by user, NULL by default
-			
-			YOCTO_DISABLE_COPY_AND_ASSIGN(raw_file);
-		};
-	}
-	
+            //! for pipe behavior
+            explicit raw_file( handle_t user_handle, size_t user_access ) throw();
+            
+        private:
+            handle_t       handle;
+            
+        public:
+            const size_t   access; //!< readable | writable
+            error_type    *status; //!< maybe set by user, NULL by default
+            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(raw_file);
+        };
+    }
+    
 }
 
 #endif
