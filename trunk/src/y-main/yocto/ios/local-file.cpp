@@ -19,8 +19,10 @@ namespace yocto
             {
                 case is_regular:
                 case is_pipe:
+                {
                     YOCTO_GIANT_LOCK();
                     delete access_;
+				}
                     break;
                     
                 
