@@ -71,6 +71,13 @@ namespace yocto
 			
 		}
 		
+		Kernel:: Kernel( Program &program, const char *kernel_name ) :
+                Shared<cl_kernel>( __create_kernel( *program, kernel_name )  ),
+                FUNCTION_NAME( Core::GetInfoString( clGetKernelInfo, *(*this), CL_KERNEL_FUNCTION_NAME, "CL_KERNEL_FUNCTION_NAME") ),
+                YOCTO_CLK_(NUM_ARGS,cl_uint)
+                {
+
+                }
 		
 		void Kernel::SetArg(cl_uint     arg_index,
 							size_t      arg_size,

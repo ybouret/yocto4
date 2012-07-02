@@ -169,7 +169,7 @@ namespace yocto
         }
         
         // CTOR
-        Matte_Button:: Matte_Button(int X,int Y,int W, int H, const char *l) : Fl_Button(X,Y,W,FL_MATTE_BUTTON_HEIGHT,l) {
+        Matte_Button:: Matte_Button(int X,int Y,int W, int , const char *l) : Fl_Button(X,Y,W,FL_MATTE_BUTTON_HEIGHT,l) {
         }
         
         Matte_Button:: ~Matte_Button() throw() {}

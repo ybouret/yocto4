@@ -39,7 +39,7 @@ namespace yocto
 			{
 				const double user_x = xaxis.vmin  + (xs*xaxis.length)/sw;
 				const double w      = clamp<double>(0,math::linear<double>(user_x,data),1);
-				fl_color( fl_color_average(color1, color2, w) );
+				fl_color( fl_color_average(color1, color2, float(w)) );
 				fl_yxline(sx0+xs, sy0, sy1);
 			}
 

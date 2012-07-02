@@ -52,7 +52,7 @@ namespace yocto
 		inline friend std::ostream & operator<<( std::ostream &os, const array &a )
 		{
 			os << "[ ";
-			for( size_t i=1; i <= a.size(); ++i ) os <<  a[i] << ' ';
+			for( size_t iao=1; iao <= a.size(); ++iao ) os <<  a[iao] << ' ';
 			os << "]'";
 			return os;
 		}

@@ -39,7 +39,7 @@ namespace yocto
         {
         protected:
             void draw();
-            void resize(int x,int y,int w,int h) 
+            void resize(int x,int y,int w,int) 
             {
                 Fl_Button::resize(x,y,w,FL_MATTE_BUTTON_HEIGHT);	// no resizing of height
             }
