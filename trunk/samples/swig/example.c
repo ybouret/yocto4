@@ -19,11 +19,15 @@
      return ctime(&ltime);
  }
 
-double my_sum( const double *arr, int n )
+double my_sum( double *arr, int n )
 {
 	double ans = 0;
 	int i=0;
-	for( ; i < n; ++i ) ans += arr[i];	
+	for( ; i < n; ++i ) 
+	{
+		ans += arr[i];
+		arr[i] = -i;
+	}
 	return ans;
 } 
 
