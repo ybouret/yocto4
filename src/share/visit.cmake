@@ -1,4 +1,5 @@
 # Wrapper to use VISIT, parallel !
+MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <VisIt>  ----------------" )
 
 SET(VISIT_FOUND OFF)

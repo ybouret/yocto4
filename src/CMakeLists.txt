@@ -41,6 +41,7 @@ ENDMACRO(YOCTO_BUILD)
 ########################################################################
 # Record projects
 ########################################################################
+MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <modules>  ----------------" )
 YOCTO_BUILD(thr)
 YOCTO_BUILD(lang)
@@ -78,6 +79,7 @@ INSTALL( FILES
 	DESTINATION share/yocto )
 
 ########################################################################
+MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <packaging>  ----------------" )
 
 IF(UNIX)
