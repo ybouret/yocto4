@@ -145,8 +145,9 @@ namespace yocto
 				auto_ptr<logical::Operator> q( logical:: OR::create() );
 
 				*q << basic::range::create(32,33);
-				*q << basic::range::create(35,38);
-				*q << basic::range::create(40,91);
+				//*q << basic::range::create(35,38);
+				//*q << basic::range::create(40,91);
+                *q << basic::range::create(35,91);
 				*q << basic::range::create(93,126);
 
 				{
