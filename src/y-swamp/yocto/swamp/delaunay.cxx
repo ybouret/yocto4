@@ -10,7 +10,8 @@ namespace yocto
         
         
         
-        ZTYPE __compute_radius_and_center(const delaunay<ZTYPE>::vertex &center,  
+        static inline 
+	ZTYPE __compute_radius_and_center(const delaunay<ZTYPE>::vertex &center,  
                                           const delaunay<ZTYPE>::vertex &A, 
                                           const delaunay<ZTYPE>::vertex &B,
                                           const delaunay<ZTYPE>::vertex &C)

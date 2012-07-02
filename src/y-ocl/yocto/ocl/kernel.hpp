@@ -15,6 +15,8 @@ namespace yocto
 		{
 		public:
 			explicit Kernel( Program &program, const string &kernel_name );
+                        explicit Kernel( Program &program, const char   *kernel_name );
+
 			virtual ~Kernel() throw();
 			
 			const string  FUNCTION_NAME;
