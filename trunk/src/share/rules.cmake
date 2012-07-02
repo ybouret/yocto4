@@ -1,6 +1,7 @@
 ########################################################################
 ##
 ########################################################################
+MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <yocto>  ----------------" )
 SET(CMAKE_SKIP_PREPROCESSED_SOURCE_RULES ON)
 SET(CMAKE_SKIP_ASSEMBLY_SOURCE_RULES     ON)

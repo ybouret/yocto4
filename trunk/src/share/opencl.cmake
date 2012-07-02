@@ -3,6 +3,7 @@
 # add OpenCL include path and peprare the OPENCL_LINK_TO macro
 #
 ########################################################################
+MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <OpenCL>  ----------------" )
 
 SET( OPENCL_HAS_SDK OFF )
