@@ -23,6 +23,7 @@ namespace yocto
             virtual  ~compiler() throw();
             
             syntax::parse_node * operator()( ios::istream &fp );
+            grammar            * build( syntax::parse_node *ast) const;
             
             
         private:
