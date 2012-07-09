@@ -72,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 	ios::icstream input( ios::cstdin );
 	regex::source src(input);
 	
-	src.prefetch( 1 + alea_less_than(16) );
+	src.prefetch( 1 + alea_lt(16) );
 	
 	while( src.peek() )
 	{

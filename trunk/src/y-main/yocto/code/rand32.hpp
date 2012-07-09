@@ -153,7 +153,7 @@ namespace yocto
     class grand32 : public urand32
     {
     public:
-        explicit grand32() throw() : urand32() {}
+        explicit grand32() throw() : urand32(), r() {}
         virtual ~grand32() throw() {}
         virtual uint32_t next() throw() { return (r.*G)(); }
         virtual void     seed(uint32_t s) throw() { r.reset(s); }

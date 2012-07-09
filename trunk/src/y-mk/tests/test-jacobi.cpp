@@ -8,7 +8,7 @@ using namespace math;
 template <typename T>
 static inline void test_jacobi()
 {
-	for( size_t n=1; n <= 64; n += 1 + alea_less_than(8) )
+	for( size_t n=1; n <= 64; n += 1 + alea_leq(8) )
 	{
 		matrix<T> m(n,n);
 		for( size_t i=1; i <=n; ++i )
