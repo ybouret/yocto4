@@ -31,7 +31,7 @@ YOCTO_UNIT_TEST_IMPL(carver)
 	{
 		for( size_t i=0; i < num; ++i )
 		{
-			size_t length = 1 + alea_less_than(100);
+			size_t length = 1 + alea_leq(100);
 			addr[i] = C.acquire( length );
 		}
 		std::cerr << "#slices=" << C.used_slices() << std::endl;
@@ -47,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(carver)
 			std::cerr << "#slices=" << C.used_slices() << std::endl;
 			for( size_t i=0; i < nfree; ++i )
 			{
-				size_t length = 1 + alea_less_than(100);
+				size_t length = 1 + alea_leq(100);
 				addr[i] = C.acquire( length );
 			}
 			

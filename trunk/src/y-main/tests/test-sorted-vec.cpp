@@ -18,7 +18,7 @@ YOCTO_UNIT_TEST_IMPL(sorted_vec)
 		const size_t nmax = 1000;
 		for( size_t i=0; i < nmax; ++i)
 		{
-			if( sv.insert( _rand.less_than(nmax) ) )
+			if( sv.insert( alea_lt(nmax) ) )
 			{
 				++count;
 			}

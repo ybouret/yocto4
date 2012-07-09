@@ -47,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(ktable)
 	
 	{ core::ktable<dummy> tab; }
 	
-	for( size_t i=0; i <= 3000; i += (1+alea_less_than(30)) )
+	for( size_t i=0; i <= 3000; i += (1+alea_leq(30)) )
 	{
 		core::ktable<dummy> tab(i,alloc);
 		std::cerr << "ktable #" << i << " : #nodes=" << tab.nodes << ", #slots=" << tab.count << " and " << tab.num_bytes() << " bytes" << std::endl;
@@ -64,7 +64,7 @@ YOCTO_UNIT_TEST_IMPL(ktable)
 		const size_t kmax = 2*i;
 		for( size_t j=0; j < tab.nodes; ++j )
 		{
-			dummy *dn = new(tab.cache.query()) dummy( alea_less_than(kmax) );
+			dummy *dn = new(tab.cache.query()) dummy( alea_lt(kmax) );
 			tab.insert(dn);
 		}
 		
@@ -74,7 +74,7 @@ YOCTO_UNIT_TEST_IMPL(ktable)
 		for( size_t j=0; j < tab.nodes; ++j )
 		{
 			core::ktable<dummy>::kslot_t *slot = NULL;
-			const size_t k  = alea_less_than(kmax);
+			const size_t k  = alea_lt(kmax);
 			const dummy *dn = tab.search(k, slot, dummy::match, &k);
 			if( dn )
 			{

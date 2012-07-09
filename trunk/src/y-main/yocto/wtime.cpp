@@ -128,7 +128,7 @@ namespace yocto
 		union 
 		{
 			uint64_t  ticks;
-			uint32_t dw[2];
+			uint32_t  dw[2];
 		} ini = { wtime::ticks() };
 #if defined(__INTEL_COMPILER)
 #	pragma warning ( disable : 981 )

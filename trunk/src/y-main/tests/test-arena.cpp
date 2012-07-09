@@ -38,12 +38,12 @@ YOCTO_UNIT_TEST_IMPL(arena)
 	std::cerr << "sizeof(arena)=" << sizeof(arena) << std::endl;
 	try
 	{
-		for( size_t block_size=1; block_size <= 20; block_size += ( 1 + alea_less_than(4) ) )
+		for( size_t block_size=1; block_size <= 20; block_size += ( 1 + alea_leq(4) ) )
 		{
 			std::cerr << "block_size =" << block_size << std::endl;
 			for( size_t num_blocks = chunk::num_blocks_min; 
 				num_blocks        <= chunk::num_blocks_max; 
-				num_blocks += ( 1 + alea_less_than(4) ))
+				num_blocks += ( 1 + alea_leq(4) ))
 			{
 				double tmx = 0;
 				arena A(block_size,num_blocks);

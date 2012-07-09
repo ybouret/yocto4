@@ -33,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(rand)
 		int tab[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 		const size_t num = sizeof(tab)/sizeof(tab[0]);
 		show( tab, num );
-		_rand.c_shuffle<int>(tab,num);
+		_rand.shuffle<int>(tab,num);
 		show( tab, num );
 	}
 	
