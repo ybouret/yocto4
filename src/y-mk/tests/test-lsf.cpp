@@ -53,7 +53,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(lsf)
 {
 	
-	const size_t N = 10 + alea_less_than(291);
+	const size_t N = 10 + alea_leq(290);
 	vector<double> X( N, 0 );
 	vector<double> Y( N, 0 );
 	vector<double> Z( N, 0 );
@@ -88,7 +88,7 @@ YOCTO_UNIT_TEST_IMPL(lsf)
 		vector<double> aerr(nv,0);
 		
 		if( nv > 2 && alea<double>() > 0.7 ) 
-			used[ 1 + alea_less_than(nv)] = false;
+			used[ 1 + alea_lt(nv)] = false;
 		
 		LeastSquare.ftol = 1e-7;
 		LeastSquare( S, F, aorg, used, aerr , &cb);
@@ -167,7 +167,7 @@ public:
 
 YOCTO_UNIT_TEST_IMPL(lsf2)
 {
-	const size_t   N = 10 + alea_less_than(1000);
+	const size_t   N = 10 + alea_leq(1000);
 	vector<double> X( N, 0 );
 	vector<double> Y( N, 0 );
 	vector<double> Z( N, 0 );

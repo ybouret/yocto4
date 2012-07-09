@@ -91,10 +91,10 @@ YOCTO_UNIT_TEST_IMPL(bitio)
         {
             if( alea<float>() > 0.5f )
             {
-                s += char('0'+alea_less_than(10));
+                s += char('0'+alea_lt(10));
             }
             else
-                s += char('A'+alea_less_than(6));
+                s += char('A'+alea_lt(6));
         }
         const natural x = natural::hex( s );
         std::cerr << "x=" << x << " / bits=" << x.bits() << std::endl;
