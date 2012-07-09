@@ -19,7 +19,6 @@ namespace yocto
 #define SWB   (c++,bro=(x<y),t[c]=(x=t[UC(c+34)])-(y=t[UC(c+19)]+bro)) 
 #define UNI   (KISS*2.328306e-10) 
 #define VNI   ((long) KISS)*4.656613e-10 
-        //#define UC    (unsigned char)  /*a cast operation*/ 
 #define UC    (uint8_t)  /*a cast operation*/ 
         
 #if 0

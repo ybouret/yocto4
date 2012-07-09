@@ -1,7 +1,7 @@
 #ifndef YOCTO_RANDOM_DEFAULT_INCLUDED
 #define YOCTO_RANDOM_DEFAULT_INCLUDED 1
 
-#include "yocto/code/rand.hpp"
+#include "yocto/code/rand32.hpp"
 #include "yocto/random/uniform.hpp"
 
 namespace yocto {
@@ -20,7 +20,7 @@ namespace yocto {
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(Default);
-			urand gen_;
+			rand32_kiss gen_;
 		};
 		
 	}

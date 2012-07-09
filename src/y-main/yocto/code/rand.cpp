@@ -2,6 +2,8 @@
 #include "yocto/wtime.hpp"
 namespace yocto
 {
+#if 0
+    
 #if defined(__ICC)
 #pragma warning ( disable : 1419 )
 #endif
@@ -81,8 +83,9 @@ namespace yocto
 		static const float fac= 1.0f / 4294967296.0f;
 		return ( 0.5f + float( KISS() ) ) * fac;
 	}
-	
-	static   urand   __rand;
-	urand  & _rand = __rand;
+#endif
+    
+	static   rand32_kiss   __rand;
+	urand32  & _rand = __rand;
 	
 }

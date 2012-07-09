@@ -79,20 +79,6 @@ namespace yocto
         
         template <typename T> T get() throw(); //!< valid for uin32_t, float, double
         
-#if 0
-        template <typename T>
-        T full() throw() 
-        {
-            T ans(0);
-            for( size_t i=0;i<8*sizeof(T);++i)
-            {
-                ans <<= 1;
-                ans |=  core::rand32::to_bit<T>( next() );
-            }
-            return ans;
-        }
-#endif
-        
         template <typename T>
         inline T full() throw()
         {
