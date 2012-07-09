@@ -85,7 +85,7 @@ namespace yocto
 				}
 				else
 				{
-					_rand.reset( uint32_t(time(NULL)) );
+					_rand.seed( uint32_t(time(NULL)) );
 					const char *name = argv[1];
 					const proc_type *proc = search( name );
 					if( !proc )

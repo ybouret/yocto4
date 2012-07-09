@@ -6,8 +6,9 @@ namespace yocto
 	namespace Random
 	{
 		
-		Default:: Default( Bits &bits ) throw() : gen_( bits.full<uint32_t>() )
+		Default:: Default( Bits &bits ) throw() : gen_(  )
 		{
+            gen_.seed(bits.full<uint32_t>());
 		}
 		
 		Default:: ~Default() throw()
@@ -17,7 +18,7 @@ namespace yocto
 		
 		void Default:: seed( Bits &bits ) throw() 
 		{
-			gen_.reset( bits.full<uint32_t>() );
+			gen_.seed( bits.full<uint32_t>() );
 		}
 		
 		double Default:: operator()( void ) throw()

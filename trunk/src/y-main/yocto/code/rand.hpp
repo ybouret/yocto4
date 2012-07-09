@@ -1,11 +1,12 @@
 #ifndef YOCTO_CODE_RAND_INCLUDED
 #define YOCTO_CODE_RAND_INCLUDED 1
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/rand32.hpp"
 
 namespace yocto
 {
 	
+#if 0
 	class urand
 	{
 	public:
@@ -62,21 +63,22 @@ namespace yocto
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(urand);
 	};
-	
-	extern urand &_rand;
+#endif
+    
+	extern urand32 &_rand;
 	
 	//! thread unsafe: float, double uint32_t
 	template <typename T> inline T    alea(void)    throw() { return _rand.get<T>(); }	
 
 	
-	//! thread unsafe
+	//! thread unsafe: integer type
 	template <typename T> inline T    alea_of(void) throw() { return _rand.full<T>(); }
 	
-	//! thread unsafe
+	//! thread unsafe: 0..some_number
 	inline size_t                     alea_less_than( const size_t some_number )  throw() { return _rand.less_than(some_number); }
 	
 	//! thread unsafe
-	template <typename T> inline void c_shuffle( T *base, size_t n ) throw() { _rand.c_shuffle(base,n);    }
+	template <typename T> inline void alea_shuffle( T *base, size_t n ) throw() { _rand.shuffle(base,n);    }
 }
 
 #endif
