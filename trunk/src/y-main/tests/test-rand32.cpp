@@ -4,6 +4,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include <cmath>
+#include <ctime>
 
 using namespace yocto;
 
@@ -150,7 +151,7 @@ namespace
                 std::cerr << "\t[CORRELATION]" << std::endl;
                 vector<double> v1;
                 vector<double> v2;
-                uint32_t seed = time(NULL);
+                uint32_t seed = uint32_t(time(NULL));
                 double corr = 0;
                 for( size_t iter=0; iter < ITER; ++iter )
                 {
