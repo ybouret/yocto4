@@ -78,7 +78,7 @@ YOCTO_UNIT_TEST_IMPL(locate)
 		std::cerr << "raw=";
 		for( size_t i=0; i < n; ++i )
 		{
-			const int x    = alea_less_than(1000);
+			const int x    = alea_leq(1000);
 			size_t    indx = 0;
 			if( !core::locate( &x, tab(), j, indx, compare ) )
 			{

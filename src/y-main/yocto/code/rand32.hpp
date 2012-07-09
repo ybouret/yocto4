@@ -76,8 +76,11 @@ namespace yocto
         
         virtual uint32_t next() throw() = 0;
         virtual void     seed(uint32_t) throw() = 0;
+        void             wseed() throw(); //!< seed( wtime::seed() )
         
-        template <typename T> T get() throw(); //!< valid for uin32_t, float, double
+        
+        template <typename T> 
+        T get() throw(); //!< valid for uin32_t, float, double
         
         template <typename T>
         inline T full() throw()
@@ -85,12 +88,22 @@ namespace yocto
             return __full<T>( int2type<(sizeof(T)>sizeof(uint32_t))>() ); 
         }
         
-        inline size_t less_than( size_t n ) throw() 
+        
+        //! returns in 0..n
+        inline size_t leq( size_t n ) throw() 
         {
             return full<size_t>() % (++n);
         }
         
-              
+        //! return in 0..n-1
+        inline size_t lt( size_t n ) throw()
+        {
+            assert(n>0);
+            return full<size_t>() % n;
+        }
+        
+         
+        //! Knuth shuffle
         template <typename T>
         inline void shuffle( T *a, size_t n ) throw()
         {
@@ -99,7 +112,7 @@ namespace yocto
             {
                 for( size_t i=n-1;i>0;--i)
                 {
-                    const size_t j   = less_than(i);
+                    const size_t j   = leq(i);
                     const T tmp(a[i]);
                     a[i] = a[j];
                     a[j] = tmp;
@@ -157,7 +170,6 @@ namespace yocto
     typedef grand32<&core::rand32::kiss>   rand32_kiss;
     typedef grand32<&core::rand32::lfib4>  rand32_lfib4;
     typedef grand32<&core::rand32::swb>    rand32_swb;
-    
 }
 
 #endif

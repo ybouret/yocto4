@@ -35,12 +35,12 @@ YOCTO_UNIT_TEST_IMPL(blocks)
 	{
 		for( size_t iter =0; iter < 16 ; ++iter )
 		{
-			const size_t chunk_size = 100 + alea_less_than(1000);
+			const size_t chunk_size = 100 + alea_leq(1000);
 			std::cerr << "blocks with chunk_size=" << chunk_size << std::endl;
 			blocks blk( chunk_size );
 			for( size_t i=0; i < num; ++i )
 			{
-				b[i].size = 1 + alea_less_than(50);
+				b[i].size = 1 + alea_leq(50);
 				b[i].addr = blk.acquire( b[i].size );
 			}
 			
@@ -56,7 +56,7 @@ YOCTO_UNIT_TEST_IMPL(blocks)
 				
 				for( size_t i=nfree; i < num; ++i )
 				{
-					b[i].size = 1 + alea_less_than(50);
+					b[i].size = 1 + alea_leq(50);
 					b[i].addr = blk.acquire( b[i].size );
 				}
 			}
@@ -103,7 +103,7 @@ YOCTO_UNIT_TEST_IMPL(small_object)
 		
 		for( size_t i=0; i < num; ++i )
 		{
-			b[i].size = 1 + alea_less_than( 2 * object::limit_size );
+			b[i].size = 1 + alea_leq( 2 * object::limit_size );
 			b[i].addr = object::operator new( b[i].size );
 		}
 		
@@ -119,7 +119,7 @@ YOCTO_UNIT_TEST_IMPL(small_object)
 			
 			for( size_t i=nfree; i < num; ++i )
 			{
-				b[i].size = 1 + alea_less_than( 2 * object::limit_size );
+				b[i].size = 1 + alea_leq( 2 * object::limit_size );
 				b[i].addr = object::operator new( b[i].size );
 			}
 		}

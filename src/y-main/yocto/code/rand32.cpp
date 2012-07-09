@@ -1,4 +1,5 @@
 #include "yocto/code/rand32.hpp"
+#include "yocto/wtime.hpp"
 
 #include <cstdio> 
 
@@ -177,6 +178,11 @@ namespace yocto
     float urand32::get<float>() throw()
     {
         return core::rand32::to_float( next() );
+    }
+    
+    void urand32:: wseed() throw()
+    {
+        seed( wtime::seed() );
     }
     
 }

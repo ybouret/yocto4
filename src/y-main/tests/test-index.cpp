@@ -10,7 +10,7 @@ using namespace yocto;
 template <typename T>
 static inline void test_index()
 {
-	const size_t N = 1 + alea_less_than(10);
+	const size_t N = 1 + alea_leq(10);
 	vector<T>      ra( N, as_capacity );
 	vector<size_t> idx(N,0);
 	

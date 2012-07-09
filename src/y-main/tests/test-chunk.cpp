@@ -16,10 +16,10 @@ YOCTO_UNIT_TEST_IMPL(chunk)
 	void *addr[ chunk::num_blocks_max ];
 	double ell = 0;
 	size_t naq = 0;
-	for( size_t block_size=1; block_size <= 40; block_size += (1+alea_less_than(4)) )
+	for( size_t block_size=1; block_size <= 40; block_size += (1+alea_lt(4)) )
 	{
 		std::cerr << "block_size=" << block_size << std::endl;
-		for( size_t num_blocks = chunk::num_blocks_min; num_blocks <= chunk::num_blocks_max; num_blocks += (1+alea_less_than(4)) )
+		for( size_t num_blocks = chunk::num_blocks_min; num_blocks <= chunk::num_blocks_max; num_blocks += (1+alea_lt(4)) )
 		{
 			const size_t chunk_size = block_size * num_blocks;
 			void        *data_entry = operator new( chunk_size );

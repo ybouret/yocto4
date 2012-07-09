@@ -26,9 +26,9 @@ struct gen<string> {
 	static inline string get()
 	{
 		string ans;
-		for( size_t i= 8 + alea_less_than(20); i > 0; --i )
+		for( size_t i= 8 + alea_leq(20); i > 0; --i )
 		{
-			ans += char('A' + alea_less_than(26) );
+			ans += char('A' + alea_lt(26) );
 		}
 		return ans;
 	}	
