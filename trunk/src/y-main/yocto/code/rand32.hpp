@@ -51,7 +51,7 @@ namespace yocto
             }
             
             //! convert to 0:1 exclusive
-            static inline double to_float( uint32_t u ) throw()
+            static inline float to_float( uint32_t u ) throw()
             {
                 return (0.5f+float(u))/4294967296.0f;
             }
