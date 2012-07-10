@@ -36,6 +36,15 @@ namespace yocto
             iterator begin() const throw();
             iterator end() const throw();
             
+            bool has( const string &id ) const throw();
+            bool has( const char   *id ) const throw();
+            
+            //! reset value to a new fixedValue
+            void set_value( double v );
+            
+            double & weight_of( const string &id );
+            double & weight_of( const char   *id );
+            
             
 		private:
 			YOCTO_DISABLE_ASSIGN(constraint);
@@ -64,9 +73,13 @@ namespace yocto
 
             friend std::ostream & operator<<( std::ostream &, const initializer & );
             
+            constraint & operator[]( size_t index ) throw();
+            const constraint & operator[]( size_t index ) const throw();
+
 		private:
 			vector< constraint::ptr > constraints;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
+            
 		public:
 			const library &lib;
 			const bool     is_variable; //!< default: false
