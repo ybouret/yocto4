@@ -69,6 +69,10 @@ namespace yocto
             for(i=1;i<1000001;i++){k=r.fib()  ;} printf("%u\n", k-3519793928U);
         }
         
+#if defined(_MSC_VER)
+		// init of t
+#pragma warning ( disable : 4351 )
+#endif
         rand32:: rand32() throw() :
         z(362436069),
         w(521288629),
