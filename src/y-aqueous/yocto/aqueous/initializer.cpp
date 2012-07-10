@@ -32,6 +32,17 @@ namespace yocto
             return coefficients.end();
         }
         
+        bool constraint:: has( const string &id ) const throw()
+        {
+            return coefficients.search( id ) != 0;
+        }
+        
+        bool constraint:: has( const char *id ) const throw()
+        {
+            const string ID(id);
+            return has(ID);
+        }
+        
         
 #if defined(_MSC_VER)
 		// this in ctor
@@ -52,6 +63,14 @@ namespace yocto
 		{}
         
         
+        void constraint:: set_value( double v )
+        {
+            const initproc new_v(this, & constraint::fixed );
+            value = new_v;
+            (double &)fixedValue = v;
+        }
+
+        
         
 		void constraint:: add( const string &id, double w )
 		{
@@ -67,6 +86,21 @@ namespace yocto
             const string ID(id);
             add( ID, w );
         }
+        
+        double & constraint:: weight_of( const string &id )
+        {
+            double *pW = coefficients.search( id );
+            if(!pW)
+                throw exception("now weight_of('%s')", id.c_str());
+            return *pW;
+        }
+        
+        double &constraint:: weight_of( const char * id )
+        {
+            const string ID(id);
+            return weight_of(ID);
+        }
+
         
         
 		initializer:: ~initializer() throw()
@@ -95,6 +129,20 @@ namespace yocto
 			(bool&)is_variable = true;
 			return *p;
 		}
+        
+        constraint & initializer:: operator[]( size_t index ) throw()
+        {
+            assert(index>0);
+            assert(index<size());
+            return *constraints[index];
+        }
+        
+        const constraint & initializer:: operator[]( size_t index ) const throw()
+        {
+            assert(index>0);
+            assert(index<size());
+            return *constraints[index];
+        }
         
         std::ostream & operator<<( std::ostream &os, const initializer &ini )
         {
