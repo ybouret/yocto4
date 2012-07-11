@@ -53,12 +53,9 @@ namespace yocto {
 				const real_t x = (real_t(i-1) + REAL(0.5))/real_t(np_); //-- reduced position
 				const real_t y = (x+x) - REAL(1.0);                     //-- kernel agument
 				weight_[i]     = K(y);
-				//*(real_t *)&wtotal_ += w;
 			}
-			//std::cout << "w=" << weight_ << std::endl;
             
-            
-			//------------------------------------------------------------------
+            //------------------------------------------------------------------
 			//
 			// compute the matrix of moments
 			//
