@@ -17,8 +17,12 @@ namespace yocto {
 			xerr>=0
 		*/
 		template <typename T>
-		struct zfind
+		class zfind
 		{
+        public:
+            explicit zfind( T default_xerr ) throw();
+            virtual ~zfind() throw();
+            
 			T xerr; //!< error on x
 
 			//! find zero between x.a and x.c
@@ -33,7 +37,8 @@ namespace yocto {
 				return this->get( proc, xlo, xhi );
 			}
 
-		
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(zfind);
 		};
 
 		//YOCTO_DMC_MATH(struct zfind)

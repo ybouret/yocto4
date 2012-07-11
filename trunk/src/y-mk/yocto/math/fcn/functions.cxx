@@ -58,7 +58,7 @@ namespace yocto {
 			real_t x_hi = 1;
 			while( zqerf(x_hi) <= 0) x_hi += x_hi;
 			
-			const zfind<real_t>        solve = { max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) };
+			const zfind<real_t>        solve( max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) );
 			return solve( zqerf, x_lo, x_hi );
 		}
 		
