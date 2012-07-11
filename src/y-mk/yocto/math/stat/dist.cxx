@@ -220,7 +220,7 @@ namespace yocto {
 				while( zstudent( thi ) <= 0 )
 					thi += thi;
 				
-				const zfind<real_t> solve = { max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) };
+				const zfind<real_t> solve(max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ));
 				return solve( zstudent, 0, thi );
 			}
 		}
@@ -281,7 +281,7 @@ namespace yocto {
 				while( zchi2( thi ) <= 0 )
 					++thi;
 				
-				const zfind<real_t> solve = { max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) };
+				const zfind<real_t> solve(max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ));
 				return solve( zchi2, 0, thi );
 			}
 		}
@@ -328,7 +328,7 @@ namespace yocto {
 			while( zchi2_delta(x) <= 0 ) {
 				x *= x;
 			}
-			const zfind<real_t> solve = { max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) };
+			const zfind<real_t> solve(max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ));
 			return solve(zchi2_delta,0,x);
 			
 		}

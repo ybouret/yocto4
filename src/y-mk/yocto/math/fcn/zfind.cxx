@@ -10,6 +10,20 @@ namespace yocto {
 
 	namespace math {
 
+        
+        template <>
+        zfind<real_t>:: ~zfind() throw()
+        {
+            
+        }
+        
+        template <>
+        zfind<real_t>:: zfind( real_t default_xerr ) throw() :
+        xerr( default_xerr )
+        {
+            
+        }
+        
 		template <>
 		void zfind<real_t>::run( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f) const {
 			assert(f.a*f.c<=0.0);
