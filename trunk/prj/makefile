@@ -16,7 +16,7 @@ clang:
 	@bash $(CREATE) src clang ${BUILD_TYPE}
 
 xcode:
-	@bash $(CREATE)src xcode ${BUILD_TYPE}
+	@bash $(CREATE) src xcode ${BUILD_TYPE}
 	
 vs9:
 	@bash $(CREATE) src vs9 ${BUILD_TYPE}

@@ -61,5 +61,6 @@ ADD_TEST(Records     test-main records)
 ADD_TEST(Index       test-main index)
 ADD_TEST(IntrPtr     test-main intrusive_ptr)
 ADD_TEST(SortedVec   test-main sorted_vec)
+ADD_TEST(CircList    test-main clist)
 
 ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)

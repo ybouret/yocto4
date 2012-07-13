@@ -7,7 +7,7 @@ namespace yocto
 {
 	
 	extern urand32 &_rand;
-	
+	    
 	//! thread unsafe: float, double uint32_t
 	template <typename T> inline T    alea(void)    throw() { return _rand.get<T>(); }	
 

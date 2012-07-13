@@ -21,7 +21,8 @@ YOCTO_UNIT_TEST_IMPL(bcast)
 	MPI.Printf0( stderr, "Broadcasting %d\n", msg );
 	MPI.Bcast(&msg, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	MPI.Printf( stderr, "Rank %d: msg=%d\n", rank, msg );
-		
+    MPI.Barrier(MPI_COMM_WORLD);
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
