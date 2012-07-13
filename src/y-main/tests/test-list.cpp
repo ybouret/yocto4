@@ -20,7 +20,7 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(list)
 {
-	const size_t num   = 30;
+	const size_t num   = 30 + alea_leq(100);
 	node_type   *nodes = new node_type[num];
 	core::list_of<node_type> L;
 	
@@ -123,5 +123,77 @@ YOCTO_UNIT_TEST_IMPL(list)
 	}
 	L.reset();
 	delete [] nodes;
+}
+YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/core/circular-list.hpp"
+YOCTO_UNIT_TEST_IMPL(clist)
+{
+    
+    for( size_t iter =1 ; iter <= 1024; ++iter )
+    {
+        const size_t num   = 20 + alea_leq(20);
+        node_type   *nodes = new node_type[num];
+        core::clist_of<node_type> L;
+        
+        
+        for( size_t i=0; i < num; ++i )
+        {
+            nodes[i].next = NULL;
+            nodes[i].prev = NULL;
+            nodes[i].data = i;
+        }
+        
+        for( size_t i=0; i < num; ++i )
+        {
+            if( alea<float>() > 0.5f )
+            {
+                L.push_back(nodes+i);
+            }
+            else 
+            {
+                L.push_front(nodes+i);
+            }
+            node_type *node = L.root;
+            for( size_t j=0; j < L.size; ++j, node=node->next )
+            {
+                std::cerr << " " << node->data;
+            }
+            if(node)
+                std::cerr << "->" << node->data;
+            std::cerr << std::endl;
+        }
+        
+        while( L.size > 0 )
+        {
+            if( alea<float>() > 0.5f )
+            {
+                node_type *node = L.pop_back();
+                std::cerr << "pop_back  = " << node->data << std::endl;
+            }
+            else 
+            { 
+                node_type *node = L.pop_front();
+                std::cerr << "pop_front = " << node->data << std::endl;
+            }
+        }
+        
+        c_shuffle(nodes, num);
+        for( size_t i=0; i < num; ++i )
+        {
+            L.push_back(nodes+i);
+        }
+        
+        while( L.size > 0 )
+        {
+            node_type *node = L.fetch( alea_lt(L.size) );
+            node_type *curr = L.unlink(node);
+            assert(curr==node);
+            std::cerr << "unlink = " << node->data << std::endl;
+        }
+        
+        //L.reset();
+        delete [] nodes;
+    }
 }
 YOCTO_UNIT_TEST_DONE()

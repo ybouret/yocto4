@@ -71,10 +71,10 @@ namespace yocto
 		void   Finalize() throw();
 		
 		
-		const int CommWorldSize;    //!< size of MPI_COMM_WORLD
-		const int CommWorldRank;    //!< rank in MPI_COMM_WORLD
-		const int CommWorldLast;    //!< CommWorldSize-1;
-		
+		const int    CommWorldSize;    //!< size of MPI_COMM_WORLD
+		const int    CommWorldRank;    //!< rank in MPI_COMM_WORLD
+		const int    CommWorldLast;    //!< CommWorldSize-1;
+		const bool   IsMaster;         //!< 0 == CommWorldRank
 		const int    ProcessorNameLength;
 		const char   ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
 		
@@ -115,7 +115,7 @@ namespace yocto
 		void Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
 		void Scatter( const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
 		void Gather(  const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
-
+        
 		//======================================================================
 		// Usefull helpers
 		//======================================================================
@@ -152,6 +152,8 @@ namespace yocto
 		
         void InitSync() const;
         void QuitSync() const;
+        
+        
         
 	private:
 		friend class singleton<mpi>;                            //!< access mpi

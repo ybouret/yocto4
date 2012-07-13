@@ -71,6 +71,7 @@ namespace yocto
 	CommWorldSize(0),
 	CommWorldRank(0),
 	CommWorldLast(0),
+    IsMaster(true),
 	ProcessorNameLength(0),
 	ProcessorName()
 	{
@@ -103,7 +104,7 @@ namespace yocto
 				throw mpi::exception( err, "MPI_Comm_rank(MPI_COMM_WORLD)");
 			}
 			assert( CommWorldRank <= CommWorldLast );
-			
+			(bool &)IsMaster = (CommWorldRank == 0);
 			
 			clear_pname();
 			err = MPI_Get_processor_name( (char *) ProcessorName, (int *) & ProcessorNameLength );
