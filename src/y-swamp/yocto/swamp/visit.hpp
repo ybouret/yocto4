@@ -60,6 +60,9 @@ namespace yocto
             virtual ~ _visit() throw() {}
             
             //! mesh meta data
+            /**
+             declare a rectilinear mesh for VisIt
+             */
             template <typename T,typename LAYOUT>
             inline
             visit_handle mesh_meta_data(const rmesh<T,LAYOUT> & mesh, 
@@ -81,7 +84,7 @@ namespace yocto
                 return h;
             }
             
-            //! mesh meta data
+            //! mesh meta data wrapper
             template <typename T,typename LAYOUT>
             inline
             visit_handle mesh_meta_data(const rmesh<T,LAYOUT> & mesh, 
@@ -93,6 +96,9 @@ namespace yocto
             }
             
             //! variable meta data
+            /**
+             declare a variable attached to a mesh.
+             */
             template <typename T>
             inline visit_handle variable_meta_data( const string &name, const string &mesh_id ) const
             {
@@ -114,6 +120,7 @@ namespace yocto
                 return vmd;
             }
             
+            //! variable meta data wrapper
             template <typename T>
             inline visit_handle variable_meta_data( const char *nid, const char *mid ) const
             {
