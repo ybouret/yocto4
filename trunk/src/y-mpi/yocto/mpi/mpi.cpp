@@ -162,4 +162,14 @@ namespace yocto
 	}
 	
 	const char mpi::name[] = "MPI";	
+    
+    int mpi:: Comm_rank( MPI_Comm comm ) const
+    {
+        int       r   = -1;
+        const int err = MPI_Comm_rank(comm, &r);
+        if( err != MPI_SUCCESS )
+			throw mpi::exception( err, "MPI_Comm_rank");
+        return r;
+    }
+
 }
