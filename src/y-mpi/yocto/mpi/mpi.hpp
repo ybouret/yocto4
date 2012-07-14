@@ -4,6 +4,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/threading/singleton.hpp"
 #include "yocto/code/printf-check.hpp"
+#include "yocto/code/endian.hpp"
+
 #include <cstdio>
 
 #if !defined(_MSC_VER)
@@ -78,6 +80,9 @@ namespace yocto
 		const int    ProcessorNameLength;
 		const char   ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
 		
+        int Comm_rank( MPI_Comm comm ) const;
+        
+        
 		//======================================================================
 		// Point-to-point Communication Routines
 		//======================================================================
@@ -153,7 +158,34 @@ namespace yocto
         void InitSync() const;
         void QuitSync() const;
         
+        //======================================================================
+        // Send/Recv templated integral types
+        //======================================================================
+        //! send ONE integral type
+        template <typename T>
+        inline void SendAs( const T x, int dest,  int tag, MPI_Comm comm ) const
+        {
+            const T y = swap_be_as<T>(x);
+            Send(&y, sizeof(T), MPI_BYTE, dest, tag, comm);
+        }
         
+        //! recv ONE integral type
+        template <typename T>
+        inline T RecvAs( int source,int tag, MPI_Comm comm, MPI_Status &status) const
+        {
+            T y(0);
+            Recv(&y, sizeof(T), MPI_BYTE, source, tag, comm, status);
+            return swap_be_as<T>(y);
+        }
+        
+        //! bcast ONE integral type
+        template <typename T>
+        inline void BcastAs( T &x, int root, MPI_Comm comm ) const
+        {
+            T y = swap_be_as<T>(x);
+            Bcast(&y, sizeof(T), MPI_BYTE, root, comm);
+            x = swap_be_as<T>(y);
+        }
         
 	private:
 		friend class singleton<mpi>;                            //!< access mpi
