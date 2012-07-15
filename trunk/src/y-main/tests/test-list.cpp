@@ -126,7 +126,7 @@ YOCTO_UNIT_TEST_IMPL(list)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/core/circular-list.hpp"
+#include "yocto/core/clist.hpp"
 YOCTO_UNIT_TEST_IMPL(clist)
 {
     
