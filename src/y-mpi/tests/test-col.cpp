@@ -24,7 +24,9 @@ YOCTO_UNIT_TEST_IMPL(bcast)
 	MPI.Printf( stderr, "Rank %d: msg=%d\n", rank, msg );
     MPI.Barrier(MPI_COMM_WORLD);
     
-    msg = 10101;
+    msg = 0;
+    if( 0 == rank )
+        msg = 10101;
     MPI.Printf0( stderr, "Broadcasting %d\n", msg );
     MPI.BcastAs<int>(msg, 0, MPI_COMM_WORLD);
     MPI.Barrier(MPI_COMM_WORLD);
@@ -42,7 +44,7 @@ YOCTO_UNIT_TEST_IMPL(scatter)
 	const int rank = MPI.CommWorldRank;
 	const int size = MPI.CommWorldSize;
 	MPI.Printf( stderr, "Scatter: Rank %d/%d is ready\n", rank, size ); 
-
+    
 	const size_t  N = 100;
 	vector<float> src;
 	if( rank == 0 ) 
