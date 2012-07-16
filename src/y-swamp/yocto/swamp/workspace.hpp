@@ -25,7 +25,7 @@ namespace yocto
             typedef typename dataspace<LAYOUT>::coord coord;
             mesh_type mesh;
             
-            explicit workspace( const LAYOUT              &L,
+            explicit workspace(const LAYOUT               &L,
                                const ghosts_setup<coord>  &G,
                                const fields_setup<LAYOUT> &F) :
             dataspace<LAYOUT>(L,G,F),

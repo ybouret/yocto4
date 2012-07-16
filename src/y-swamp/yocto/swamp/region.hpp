@@ -110,6 +110,24 @@ namespace yocto
                 return region( new_vmin, new_vmax );
             }
             
+            //! MPI style splitting along dimension dim
+            region split( int rank, int size, size_t dim = DIMENSIONS - 1 ) const
+            {
+                assert(dim<DIMENSIONS);
+                assert(size>0);
+                assert(rank<size);
+                assert(rank>=0);
+                vertex new_vmin(vmin);
+                vertex new_vmax(vmax);
+                U &     qmin  = *(((U *) &new_vmin)+dim);
+                U &     qmax  = *(((U *) &new_vmax)+dim);
+                const U dQ    = (*(((U *) &length)+dim)) / size;
+                const U q0    = qmin;
+                qmin = q0   + rank * dQ;
+                qmax = qmin + dQ;
+                return region(new_vmin,new_vmax);
+            }
+            
         private:
             YOCTO_DISABLE_ASSIGN(region);
         };
