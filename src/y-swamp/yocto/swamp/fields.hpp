@@ -90,9 +90,12 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(fields_setup);
         };
         
+
 #define Y_SWAMP_DECL_VAR(F,NAME,TYPE) (F).add<TYPE>( NAME, true  )
 #define Y_SWAMP_DECL_AUX(F,NAME,TYPE) (F).add<TYPE>( NAME, false )
         
+#define Y_SWAMP_DECL_SELF_VAR(NAME,TYPE) Y_SWAMP_DECL_VAR(*this,NAME,TYPE)
+#define Y_SWAMP_DECL_SELF_AUX(NAME,TYPE) Y_SWAMP_DECL_AUX(*this,NAME,TYPE)
         
     }
 }
