@@ -72,6 +72,7 @@ namespace yocto
 	CommWorldRank(0),
 	CommWorldLast(0),
     IsMaster(true),
+    IsParallel(false),
 	ProcessorNameLength(0),
 	ProcessorName()
 	{
@@ -96,8 +97,9 @@ namespace yocto
 				throw mpi::exception( err, "MPI_Comm_size(MPI_COMM_WORLD)");
 			}
 			
-			*(int *) & CommWorldLast = CommWorldSize - 1;
-			
+			(int  &) CommWorldLast = CommWorldSize - 1;
+			(bool &) IsParallel    = CommWorldSize > 1; 
+            
 			err = MPI_Comm_rank( MPI_COMM_WORLD, (int *) & CommWorldRank );
 			if( err != MPI_SUCCESS )
 			{
