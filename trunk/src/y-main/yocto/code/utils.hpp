@@ -18,6 +18,12 @@ namespace yocto
 		return b < a ? a : b;
 	}
 	
+    template <typename T>
+    inline int sign_of( T a )
+    {
+        return a < 0 ? -1 : (  0 < a ? 1 : 0 );
+    }
+    
 	template <typename T>
 	inline T clamp( T amin, T a, T amax ) 
 	{
