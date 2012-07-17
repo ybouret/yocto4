@@ -76,6 +76,13 @@ namespace yocto
              */
             virtual visit_handle get_variable( int domain, const string &name ) const;
             
+            //! provide curve
+            /**
+             user's curve data
+             */
+            virtual visit_handle get_curve( const string &name ) const;
+            
+            
             //! the step function
             virtual void step();  
             

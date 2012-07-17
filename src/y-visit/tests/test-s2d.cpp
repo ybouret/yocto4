@@ -127,7 +127,6 @@ namespace
                 initialize();
                 init_exchange();
                 wait_exchange();
-                
             }
         }
         

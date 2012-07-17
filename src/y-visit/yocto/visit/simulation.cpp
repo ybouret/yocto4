@@ -20,8 +20,8 @@ namespace yocto
     console(true),
     par_rank( MPI.CommWorldRank ),
     par_size( MPI.CommWorldSize ),
-    parallel(par_size>0),
-    master(par_rank==0)
+    parallel( MPI.IsParallel    ),
+    master(   MPI.IsMaster      )
     {
     }
     
@@ -91,5 +91,12 @@ namespace yocto
         MPI.Printf0(stderr, "get_variable(%d,'%s')\n", domain, name.c_str() );
         return VISIT_INVALID_HANDLE;
     }
+    
+    visit_handle VisIt:: Simulation:: get_curve( const string &name ) const
+    {
+        MPI.Printf0(stderr, "get_curve('%s')\n", name.c_str() );
+        return VISIT_INVALID_HANDLE;
+    }
+    
     
 }

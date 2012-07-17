@@ -214,7 +214,7 @@ namespace yocto
     {
         assert(cbdata);
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
-        const string id(name);
+        const string       id(name);
         return sim.get_variable(domain, id);
     }
     
@@ -236,6 +236,19 @@ namespace yocto
         static mpi &MPI = *mpi::location();
         MPI.Printf0(stderr,"[VisIt::Command] '%s' (%s) \n", cmd, args ? args : "NO ARGS" );
         VisIt::Perform( sim, cmd );
+    }
+    
+    //==========================================================================
+    //
+    // SimGetCurve callback
+    //
+    //==========================================================================
+    static inline
+    visit_handle SimGetCurve( const char *name, void *cbdata )
+    {
+        VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+        const string       id(name);
+        return sim.get_curve(id);
     }
     
     
@@ -346,6 +359,7 @@ namespace yocto
                         VisItSetGetMesh(SimGetMesh, cbdata);
                         VisItSetGetDomainList(SimGetDomainList,cbdata);
                         VisItSetGetVariable(SimGetVariable,cbdata);
+                        VisItSetGetCurve(SimGetCurve,cbdata);
                     }
                     else
                     {
