@@ -1,4 +1,4 @@
-/** \file yce-offset.h
+/** \file 
  \brief offsetof macros
  */
 
