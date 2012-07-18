@@ -153,7 +153,7 @@ namespace yocto
             
             /* Meta Data for Simulation */
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
-            VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,0);
+            VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,sim.runTime);
             
                        
             /* Create Generic Interface/Commands */
@@ -233,9 +233,9 @@ namespace yocto
         VisIt::Simulation &sim  = *(VisIt::Simulation *)cbdata;
         const string       todo = cmd;
         
-        static mpi &MPI = *mpi::location();
+        static const mpi &MPI = sim.MPI;
         MPI.Printf0(stderr,"[VisIt::Command] '%s' (%s) \n", cmd, args ? args : "NO ARGS" );
-        VisIt::Perform( sim, cmd );
+        VisIt::Perform(sim,todo);
     }
     
     //==========================================================================
@@ -260,12 +260,16 @@ namespace yocto
     void VisIt:: OneStep( Simulation &sim )
     {
         ++sim.cycle;
+        const double t0 = MPI_Wtime();
         sim.step();
+        sim.stepTime = MPI_Wtime() - t0;
         if( VisItIsConnected() )
         {
             VisItTimeStepChanged();
             VisItUpdatePlots();
         }
+        sim.loopTime = MPI_Wtime() - t0;
+        sim.post_step();
     }
     
     
