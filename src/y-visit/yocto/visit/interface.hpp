@@ -49,9 +49,12 @@ namespace yocto
             
             int        cycle;
             int        runMode;
-            bool       done;
+            double     runTime;   //!< should be cycle * dt
+            bool       done;      //!< end of simulation flag
             IOBuffer   iobuff;    //!< buffer for console input
             const mpi &MPI;       //!< MPI singleton reference
+            double     stepTime;  //!< last wall time for step
+            double     loopTime;  //!< stepTime + VisIt time
             const bool console;   //!< shall use the interactive console
             const int  par_rank;  //!< alias MPI.CommWorldRank 
             const int  par_size;  //!< alias MPI.CommWorldSize
@@ -83,7 +86,10 @@ namespace yocto
             virtual visit_handle get_curve( const string &name ) const;
             
             
-            //! the step function
+            //! the main step function
+            /**
+             called by Visit::OneStep
+             */
             virtual void step();  
             
             //! process the command to update the simulation
@@ -92,7 +98,8 @@ namespace yocto
             static const char  *GenericCommandReg[];
             static const size_t GenericCommandNum;
             
-            void invite() const;
+            //! if you want statistics after one step
+            virtual void post_step() const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);

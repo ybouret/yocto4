@@ -5,7 +5,8 @@ namespace yocto
 {
     
     const char * VisIt:: Simulation:: GenericCommandReg[] = { "halt", "run", "step" };
-    const size_t VisIt:: Simulation:: GenericCommandNum = sizeof(VisIt:: Simulation::GenericCommandReg)/sizeof(VisIt:: Simulation::GenericCommandReg[0]);
+    const size_t VisIt:: Simulation:: GenericCommandNum   = 
+    sizeof(VisIt:: Simulation::GenericCommandReg)/sizeof(VisIt:: Simulation::GenericCommandReg[0]);
     
     VisIt:: Simulation:: ~Simulation() throw()
     {
@@ -14,9 +15,12 @@ namespace yocto
     VisIt:: Simulation:: Simulation( const mpi &ref) :
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
+    runTime(0),
     done(false),
     iobuff( VisIt::IOBufferSize ),
     MPI( ref ),
+    stepTime(-1),
+    loopTime(-1),
     console(true),
     par_rank( MPI.CommWorldRank ),
     par_size( MPI.CommWorldSize ),
@@ -31,6 +35,14 @@ namespace yocto
         MPI.Printf0(stderr, "%s cycle= %6d\n", run_mode, cycle);
     }
     
+    
+    void VisIt::Simulation:: post_step() const
+    {
+        MPI.Printf0(stderr, "\tsteps/s= %10.3f | loops/s= %10.3f\n", 1.0 / stepTime, 1.0 / loopTime );
+    }
+    
+    
+#if 0
     void VisIt:: Simulation:: invite() const
     {
         if( console && runMode == VISIT_SIMMODE_STOPPED )
@@ -38,6 +50,7 @@ namespace yocto
             MPI.Printf0( stderr, "command> ");
         }
     }
+#endif
     
     void VisIt:: Simulation:: performAlways( const string &cmd )
     {
