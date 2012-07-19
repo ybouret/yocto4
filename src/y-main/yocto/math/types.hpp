@@ -89,6 +89,13 @@ namespace yocto
 		inline float  Tan( float  x ) throw()  { return tanf( x ); }
 		inline double Tan( double x ) throw()  { return tan(  x );  }
 		
+        inline float  Atan( float  x ) throw()  { return atanf( x ); }
+		inline double Atan( double x ) throw()  { return atan(  x );  }
+        
+        float  Atan2( float x, float y ) throw();
+        double Atan2( double x, double y ) throw();
+        
+        
 		inline float  Pow( float  x, float  y ) throw() { return powf(x,y); }
 		inline double Pow( double x, double y ) throw() { return pow(x,y);  }
 
