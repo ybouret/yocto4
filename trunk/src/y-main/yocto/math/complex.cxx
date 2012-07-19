@@ -107,6 +107,9 @@ namespace yocto
 		template<> real_t complex<real_t>:: mod2() const throw() { return re * re + im * im; }
 		template<> real_t complex<real_t>:: mod() const throw()  { return Sqrt( re * re + im * im ); }
 		
+        template<> real_t complex<real_t>:: arg() const throw()  { return Atan2(re,im); }
+
+        
 		//-- conj
 		template <>
 		complex<real_t> complex<real_t>:: conj() const throw()

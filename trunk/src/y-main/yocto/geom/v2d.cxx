@@ -95,10 +95,6 @@ namespace yocto {
 			return x*x + y*y;
 		}
 		
-		template <>
-		real_t v2d<real_t>:: angle() const throw() {
-			return 0;
-		}
 		
 		
 		template <>
@@ -119,6 +115,12 @@ namespace yocto {
 		real_t v2d<real_t>:: norm() const throw() {
 			return   math::Sqrt( real_t(x*x + y*y) );
 		}
+        
+        template <>
+		real_t v2d<real_t>:: angle() const throw() {
+			return math::Atan2(x,y);
+		}
+		
 #else
 		template <>
 		real_t v2d<real_t>:: norm() const throw() {
