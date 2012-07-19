@@ -87,7 +87,7 @@ namespace yocto {
 		
 		template <>
 		real_t v2d<real_t>::dot_( const v2d<real_t> &A, const v2d<real_t> &B ) throw() {
-			return A.x * B.x + A.y * B.y;
+			return (A.x * B.x) + (A.y * B.y);
 		}
 		
 		template <>
