@@ -1,7 +1,8 @@
 #include "yocto/core/list.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
-
+#include "yocto/core/merge-sort.hpp"
+#include "yocto/comparator.hpp"
 using namespace yocto;
 
 namespace  
@@ -10,12 +11,28 @@ namespace
 	{
 		node_type *next, *prev;
 		size_t     data;
+        void reset() throw() { data=0; }
+        static inline int compare( const node_type *lhs, const node_type *rhs, void *)
+        {
+            return __compare(lhs->data,rhs->data);
+        }
 	};
 	
 	static inline void display( node_type *node ) throw()
 	{
 		std::cerr << node->data << std::endl;
 	}
+    
+    static inline void display_list( const node_type *node, size_t n )
+    {
+        while(n-->0)
+        {
+            std::cerr << " " << node->data;
+            node=node->next;
+        }
+        std::cerr << std::endl;
+    }
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(list)
@@ -24,6 +41,7 @@ YOCTO_UNIT_TEST_IMPL(list)
 	node_type   *nodes = new node_type[num];
 	core::list_of<node_type> L;
 	
+    std::cerr << "-- inserting" << std::endl;
 	for( size_t i=0; i < num; ++i )
 	{
 		nodes[i].next = NULL;
@@ -46,7 +64,14 @@ YOCTO_UNIT_TEST_IMPL(list)
 		}
 	}
 	std::cerr << std::endl;
-	std::cerr << "--" << std::endl;
+	std::cerr << "-- raw list" << std::endl;
+    display_list(L.head,L.size);
+    std::cerr << "-- sorting" << std::endl;
+    core::merging<node_type>::sort(L,node_type::compare,NULL);
+    display_list(L.head,L.size);
+
+    
+    std::cerr << "-- removing" << std::endl;
 	{
 		size_t i=0;
 		while( L.size > 0 )
@@ -192,8 +217,46 @@ YOCTO_UNIT_TEST_IMPL(clist)
             std::cerr << "unlink = " << node->data << std::endl;
         }
         
-        //L.reset();
+        for( size_t i=0; i < num; ++i )
+        {
+            L.push_back(nodes+i);
+        }
+        
+        std::cerr << "-- raw list" << std::endl;
+        display_list(L.root,L.size);
+        std::cerr << "-- sorting" << std::endl;
+        core::merging<node_type>::sort(L,node_type::compare,NULL);
+        display_list(L.root,L.size);
+        
+        L.reset();
         delete [] nodes;
     }
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/core/cached-list.hpp"
+
+
+YOCTO_UNIT_TEST_IMPL(cached)
+{
+    typedef cache_of<node_type> node_cache;
+    node_cache cache(12);
+    cached_list<core::list_of,node_type>  L(cache);
+    cached_list<core::clist_of,node_type> C(cache);
+
+    
+    for( size_t i=0; i < 100; ++i )
+    {
+        L.append()->data = i;
+    }
+    L.empty();
+    
+    for( size_t i=0; i < 100; ++i )
+    {
+        C.append()->data = i;
+    }
+    C.empty();
+    std::cerr << "cache size=" << cache.size << std::endl;
+}
+YOCTO_UNIT_TEST_DONE()
+
