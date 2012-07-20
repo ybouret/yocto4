@@ -214,6 +214,7 @@ YOCTO_UNIT_TEST_IMPL(clist)
             node_type *node = L.fetch( alea_lt(L.size) );
             node_type *curr = L.unlink(node);
             assert(curr==node);
+	(void)curr;
             std::cerr << "unlink = " << node->data << std::endl;
         }
         

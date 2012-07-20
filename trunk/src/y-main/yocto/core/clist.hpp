@@ -203,7 +203,7 @@ namespace yocto
                         }
                         NODE *ans = pop_back();
                         assert(ans==node);
-                        return node; }
+                        return ans; }
                         
                     default: 
                         break;
@@ -214,7 +214,7 @@ namespace yocto
                     root = root->next;
                     NODE *ans = pop_back();
                     assert(ans==node);
-                    return node;
+                    return ans;
                 }
                 else 
                 {
