@@ -25,8 +25,12 @@ namespace yocto {
 		template <>
 		v3d<real_t>:: v3d( const v3d<real_t> &A, const v3d<real_t> &B ) throw() : x(B.x - A.x), y(B.y-A.y), z(B.z-A.z) {
 		}
-		
-		
+		template <>
+        void v3d<real_t>::ldz() throw()
+        {
+            x=y=z=0;
+        }
+
 		template <>
 		v3d<real_t> &v3d<real_t>::operator=( const v3d<real_t> &v ) throw() {
 			x = v.x;

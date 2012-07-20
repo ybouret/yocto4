@@ -52,7 +52,7 @@ namespace yocto {
 			T norm2() const throw();
 			T norm()  const throw();
 			void normalize() throw();
-			
+			void ldz() throw();
 			
 			friend
 			inline std::ostream & operator<<( std::ostream &v3d_os, const v3d &v )

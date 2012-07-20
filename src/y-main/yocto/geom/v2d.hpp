@@ -51,6 +51,7 @@ namespace yocto {
 			v2d &operator*=( const T ) throw();
 			v2d &operator/=( const T );
 			
+            void ldz() throw();
 			T norm2() const throw();
 			T norm()  const throw();
 			void normalize() throw();

@@ -159,6 +159,12 @@ namespace yocto {
 		
 #endif
 		
+        template <>
+        void v2d<real_t>:: ldz() throw()
+        {
+            x=y=0;
+        }
+        
 		template <>
 		void v2d<real_t>:: output( std::ostream &os ) const {
 			os << "[ " << x << ' ' << y << " ]'";
