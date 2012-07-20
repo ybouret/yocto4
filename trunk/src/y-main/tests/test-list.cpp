@@ -69,7 +69,7 @@ YOCTO_UNIT_TEST_IMPL(list)
     std::cerr << "-- sorting" << std::endl;
     core::merging<node_type>::sort(L,node_type::compare,NULL);
     display_list(L.head,L.size);
-
+    
     
     std::cerr << "-- removing" << std::endl;
 	{
@@ -214,7 +214,7 @@ YOCTO_UNIT_TEST_IMPL(clist)
             node_type *node = L.fetch( alea_lt(L.size) );
             node_type *curr = L.unlink(node);
             assert(curr==node);
-	(void)curr;
+            (void)curr;
             std::cerr << "unlink = " << node->data << std::endl;
         }
         
@@ -244,7 +244,7 @@ YOCTO_UNIT_TEST_IMPL(cached)
     node_cache cache(12);
     cached_list<core::list_of,node_type>  L(cache);
     cached_list<core::clist_of,node_type> C(cache);
-
+    
     
     for( size_t i=0; i < 100; ++i )
     {
