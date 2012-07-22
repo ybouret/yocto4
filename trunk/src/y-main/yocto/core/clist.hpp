@@ -9,6 +9,7 @@ namespace yocto
     namespace core
     {
         
+        //! circular list
         template <typename NODE>
         class clist_of
         {
@@ -18,8 +19,11 @@ namespace yocto
             explicit clist_of() throw() : size(0), root(0) {}
             virtual ~clist_of() throw() { assert(0==size); assert(0==root); }
             
-            void reset() throw() { size = 0; root = 0; }
+            //! list_of compatibility
+            inline void reset() throw() { size = 0; root = 0; }
             
+            
+            //! list_of compatibility
             inline void push_back( NODE *node ) throw()
             {
                 assert(node);
@@ -48,7 +52,7 @@ namespace yocto
                 ++size;
             }
             
-            
+            //! list_of compatibility
             inline void push_front( NODE *node ) throw()
             {
                 assert(node);
@@ -79,7 +83,7 @@ namespace yocto
                 
             }
             
-            
+            //! list_of compatibility
             inline NODE * pop_back() throw()
             {
                 assert(size>0);
@@ -123,7 +127,7 @@ namespace yocto
                 return prev;
             }
             
-            
+            //! list_of compatibility
             inline NODE *pop_front()
             {
                 assert(size>0);
@@ -132,6 +136,7 @@ namespace yocto
                 return pop_back();
             }
             
+            //! list_of compatibility
             inline bool owns( const NODE *node ) const throw()
             {
                 assert(!(root==NULL&&size>0));
@@ -144,6 +149,7 @@ namespace yocto
                 return false;
             }
             
+            //! specific code
             inline void insert_after( NODE *curr, NODE *node ) throw()
             {
                 assert(curr!=NULL);assert(this->owns(curr));
@@ -170,7 +176,7 @@ namespace yocto
                 ++size;
             }
             
-            //! fetch in 0..size-1
+            //! fetch in 0..size-1, list_of compatibility
             inline NODE *fetch( size_t index ) throw()
             {
                 assert(index<size);
@@ -181,6 +187,7 @@ namespace yocto
                 return node;
             }
             
+            //! list_of compatibility
             inline NODE *unlink( NODE *node ) throw()
             {
                 assert(node!=NULL);
