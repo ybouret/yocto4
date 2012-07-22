@@ -6,12 +6,19 @@
 namespace yocto 
 {
     
-    
+    //! cache of C++ objects
+    /**
+     NODE must have an empty constructor
+     and a nothrow reset method.
+     */
     template <typename NODE>
     class cache_of : public core::pool_of<NODE>
     {
     public:
+        //! create empty cache
         explicit cache_of() throw()  : core::pool_of<NODE>() {}
+        
+        //! create prefilled cache
         explicit cache_of( size_t n) : core::pool_of<NODE>() 
         {
             try { reserve(n);  }
@@ -19,8 +26,12 @@ namespace yocto
         }
         virtual ~cache_of() throw() { destroy(); }
         
+        //! destroy all cache
         inline void  destroy() throw() { while( this->size ) delete this->query(); }
+        
+        //! grow cache size
         inline void  reserve(size_t n) { while(n-- > 0) this->store( new NODE() ); }
+        
         //! a new/reset node
         /**
          warning: query() shouldn't be used directly
@@ -43,10 +54,12 @@ namespace yocto
         YOCTO_DISABLE_COPY_AND_ASSIGN(cache_of);
     };
     
+    //! a list with a public shared cache
     template <template <typename> class LIST_OF,typename NODE>
     class cached_list : public LIST_OF<NODE>
     {
     public:
+        //! use an external cache
         explicit cached_list( cache_of<NODE> &the_cache ) throw() :
         cache( the_cache )
         {
@@ -87,6 +100,7 @@ namespace yocto
             return node;
         }
         
+        //! remove an cache any previously appended node
         inline void remove( NODE *node ) throw()
         {
             assert( 0 != node );
