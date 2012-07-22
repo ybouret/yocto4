@@ -167,7 +167,7 @@ namespace yocto
         inline void SendAs( const T x, int dest,  int tag, MPI_Comm comm ) const
         {
             const T y = swap_be_as<T>(x);
-            Send(&y, sizeof(T), MPI_BYTE, dest, tag, comm);
+            this->Send(&y, sizeof(T), MPI_BYTE, dest, tag, comm);
         }
         
         //! recv ONE integral type
@@ -175,7 +175,7 @@ namespace yocto
         inline T RecvAs( int source,int tag, MPI_Comm comm, MPI_Status &status) const
         {
             T y(0);
-            Recv(&y, sizeof(T), MPI_BYTE, source, tag, comm, status);
+            this->Recv(&y, sizeof(T), MPI_BYTE, source, tag, comm, status);
             return swap_be_as<T>(y);
         }
         

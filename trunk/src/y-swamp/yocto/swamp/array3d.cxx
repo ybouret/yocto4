@@ -42,15 +42,44 @@ namespace yocto
         {
             assert( z >= lower.z );
             assert( z <= upper.z );
+            assert(slice!=0);
             return slice[z];
         }
+        
         
         template <>
         const array3D<ZTYPE>::slice_type & array3D<ZTYPE>:: operator[]( unit_t z ) const throw()
         {
             assert( z >= lower.z );
             assert( z <= upper.z );
+            assert(slice!=0);
             return slice[z];
+        }
+        
+        template <>
+        array3D<ZTYPE>::type & array3D<ZTYPE>::operator[]( const coord3D &c) throw()
+        {
+            assert( c.z >= lower.z );
+            assert( c.z <= upper.z );
+            assert( c.y >= lower.y );
+            assert( c.y <= upper.y );
+            assert( c.x >= lower.x );
+            assert( c.x <= upper.x );
+            assert(slice!=0);
+            return slice[c.z][c.y][c.x];
+        }
+        
+        template <>
+        array3D<ZTYPE>::const_type & array3D<ZTYPE>::operator[]( const coord3D &c) const throw()
+        {
+            assert( c.z >= lower.z );
+            assert( c.z <= upper.z );
+            assert( c.y >= lower.y );
+            assert( c.y <= upper.y );
+            assert( c.x >= lower.x );
+            assert( c.x <= upper.x );
+            assert(slice!=0);
+            return slice[c.z][c.y][c.x];
         }
         
         
@@ -91,8 +120,8 @@ namespace yocto
                 }
             }
         }
-
-              
+        
+        
         template <>
         void array3D<ZTYPE>:: foreach( const array_type  &other, const layout_type &sub, call_two proc, void *args)
         {
@@ -113,7 +142,7 @@ namespace yocto
                     }
                 }
             }
-  
+            
         }
         
         template <>
@@ -152,7 +181,7 @@ namespace yocto
             *info = arr;
             return arr;
         }
-
+        
         template <>
         void array3D<ZTYPE>:: dtor( void *handle ) throw()
         {
@@ -160,7 +189,7 @@ namespace yocto
             array_type *a = (array_type *)handle;
             delete a;
         }
-
+        
         
     }
     

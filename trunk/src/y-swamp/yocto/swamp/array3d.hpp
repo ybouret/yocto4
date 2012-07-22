@@ -33,7 +33,9 @@ namespace yocto
             
             slice_type       & operator[]( unit_t z ) throw();
             const slice_type & operator[]( unit_t z ) const throw();
-            
+            type             & operator[]( const coord3D &c) throw();
+            const_type       & operator[]( const coord3D &c) const throw();
+
             
             virtual void link( void *data ) throw();
             virtual void foreach( const layout_type &sub, callback proc, void *args );

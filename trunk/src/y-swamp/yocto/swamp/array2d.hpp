@@ -32,7 +32,8 @@ namespace yocto
             
             row_type       & operator[]( unit_t y ) throw();
             const row_type & operator[]( unit_t y ) const throw();
-            
+            type           & operator[]( const coord2D &c) throw();
+            const_type     & operator[]( const coord2D &c) const throw();
             
             virtual void link( void *data ) throw();
             virtual void foreach( const layout_type &sub, callback proc, void *args );
