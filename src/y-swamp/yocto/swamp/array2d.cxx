@@ -46,6 +46,29 @@ namespace yocto
         }
         
         template <>
+        array2D<ZTYPE>::type & array2D<ZTYPE>:: operator[]( const coord2D &c) throw()
+        {
+            assert( c.y >= lower.y );
+            assert( c.y <= upper.y );
+            assert( c.x >= lower.x );
+            assert( c.x <= upper.x );
+            assert( row != NULL );
+            return row[c.y][c.x];
+        }
+
+        template <>
+        array2D<ZTYPE>::const_type & array2D<ZTYPE>:: operator[]( const coord2D &c) const throw()
+        {
+            assert( c.y >= lower.y );
+            assert( c.y <= upper.y );
+            assert( c.x >= lower.x );
+            assert( c.x <= upper.x );
+            assert( row != NULL );
+            return row[c.y][c.x];
+        }
+
+        
+        template <>
         void array2D<ZTYPE>:: foreach( const layout_type &sub, callback proc, void *args )
         {
             assert( this->contains(sub) );
