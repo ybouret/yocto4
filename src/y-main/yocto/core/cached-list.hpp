@@ -101,6 +101,11 @@ namespace yocto
             return node;
         }
         
+        inline void append( size_t n )
+        {
+            while(n-- > 0) (void) append();
+        }
+        
         //! remove an cache any previously appended node
         inline void remove( NODE *node ) throw()
         {
