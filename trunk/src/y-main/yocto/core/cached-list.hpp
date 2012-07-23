@@ -6,6 +6,7 @@
 namespace yocto 
 {
     
+     
     //! cache of C++ objects
     /**
      NODE must have an empty constructor
