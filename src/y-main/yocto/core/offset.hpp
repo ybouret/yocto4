@@ -21,6 +21,6 @@
 #define YOCTO_DEC(addr,offset)       YOCTO_OFF_(void,addr,-,offset)
 #define YOCTO_DEC_CONST(addr,offset) YOCTO_OFF_(const void,addr,-,offset)
 
-#define YOCTO_HARD_RESET(CLASS,MEMBER,POINTER) memset( * (POINTER->MEMBER, 0, sizeof(CLASS) - YOCTO_OFFSET_OF(CLASS,MEMBER) )
+#define YOCTO_HARD_RESET(CLASS,MEMBER,POINTER) memset( &(POINTER->MEMBER), 0, sizeof(CLASS) - YOCTO_OFFSET_OF(CLASS,MEMBER) )
 
 #endif
