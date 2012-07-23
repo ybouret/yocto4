@@ -245,7 +245,6 @@ YOCTO_UNIT_TEST_IMPL(cached)
     cached_list<core::list_of,node_type>  L(cache);
     cached_list<core::clist_of,node_type> C(cache);
     
-    
     for( size_t i=0; i < 100; ++i )
     {
         L.append()->data = i;
@@ -258,6 +257,24 @@ YOCTO_UNIT_TEST_IMPL(cached)
     }
     C.empty();
     std::cerr << "cache size=" << cache.size << std::endl;
+}
+YOCTO_UNIT_TEST_DONE()
+
+
+#include "yocto/core/handle-list.hpp"
+
+
+YOCTO_UNIT_TEST_IMPL(hlist)
+{
+    int arr[32];
+    for( int i=0; i < sizeof(arr)/sizeof(arr[0]); ++i ) arr[i] = i;
+    handle_of<int>::cache_type cache;
+    handle_of<int>::list_type  L(cache);
+    for( int i=0; i < sizeof(arr)/sizeof(arr[0]); ++i ) 
+        L.attach( &arr[i] );
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
