@@ -181,7 +181,7 @@ namespace yocto
         async_ghosts_pair:: ~async_ghosts_pair() throw()
         {
         }
-
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -209,7 +209,7 @@ namespace yocto
                 length    = 0;
             }
         }
-
+        
         
         //! allocate memory once offsets are computed
         void async_ghosts:: allocate_for( linear_handles &handles )
@@ -248,6 +248,19 @@ namespace yocto
             }
         }
         
+        size_t async_ghosts:: store_inner1( const linear_base &A ) throw()
+        {
+            uint8_t *ptr = inner_buf;
+            for( size_t i=num_offsets; i>0; --i )
+            {
+                const size_t k = self.inner.offsets[i];
+                A.async_store(ptr, k);
+                assert( ptr <= inner_buf + length );
+            }
+            return num_offsets * A.item_size();
+        }
+        
+        
         //! query outer data from outer_buf
         void async_ghosts:: query_outer( const linear_handles &handles ) const throw()
         {
@@ -264,7 +277,21 @@ namespace yocto
             }
             
         }
+        
+        // idem for one field only
+        void async_ghosts:: query_outer1( linear_base &A ) const throw()
+        {
+            const uint8_t *ptr = outer_buf;
+            for( size_t i=num_offsets; i>0; --i )
+            {
+                const size_t k = self.outer.offsets[i];
+                A.async_query(ptr,k);
+                assert( ptr <= outer_buf + length );
+            }
+            
+        }
 
+        
         
     }
 }
