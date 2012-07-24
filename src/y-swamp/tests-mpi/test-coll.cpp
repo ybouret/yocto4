@@ -20,6 +20,8 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     const int size = MPI.CommWorldSize;
     fields_setup<layout2D> F;
     Y_SWAMP_DECL_VAR(F, "A", array2D<double> );
+    Y_SWAMP_DECL_AUX(F, "B", array2D<double> );
+    
     ghosts_setup<coord2D> G;
     if( size > 1 )
     {
@@ -39,7 +41,10 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     
     
     array2D<double> &A = D["A"].as< array2D<double> >();
-    A.set_all( L, rank+1 );
+    array2D<double> &B = D["B"].as< array2D<double> >();
+
+    A.set_all( L, rank+1    );
+    B.set_all( L, size-rank );
     auto_ptr< array2D<double> > pA0;
     if( 0 == rank )
     {
@@ -55,8 +60,15 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     _mpi::collect0(MPI, pA0.__get(), A, full_layout);
     
     if( 0 == rank )
-        pA0->ppm( "full.ppm", "full", full_layout, vproc, 0, 0, size );
+        pA0->ppm( "fullA.ppm", "fullA", full_layout, vproc, 0, 0, size );
+    MPI.Barrier(MPI_COMM_WORLD);
     
+    _mpi::synchronize1(B, MPI, D, requests);
+    _mpi::collect0(MPI, pA0.__get(), B, full_layout);
+
+    if( 0 == rank )
+        pA0->ppm( "fullB.ppm", "fullB", full_layout, vproc, 0, 0, size );
+
     
 }
 YOCTO_UNIT_TEST_DONE()
