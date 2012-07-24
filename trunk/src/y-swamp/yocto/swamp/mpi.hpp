@@ -16,11 +16,17 @@ namespace yocto
         struct _mpi
         {
             
+            //==================================================================
+            //
+            // data exchange protocols
+            //
+            //==================================================================
+            
             //! initialize the exchanges
             template <typename LAYOUT> inline static 
             void init_exchange( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
             {
-                static const int tag = 0xCALL;
+                static const int tag = 0xCA44;
                 assert( requests.count == D.num_requests() );
                 const linear_handles &handles = D.handles();
                 
@@ -86,6 +92,70 @@ namespace yocto
                     g.query_outer(handles);
                 }
             }
+            
+            template <typename LAYOUT> inline static
+            void synchronize1( linear_base &A, const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            {
+                static const int tag = 0xCA441;
+                
+                //==============================================================
+                // exchange local ghosts
+                //==============================================================
+                for( size_t i= D.local_ghosts_count(); i>0; --i )
+                {
+                    D.__local_ghosts(i).transfer1( A );
+                }
+                
+                //==============================================================
+                // start exchange of async ghost
+                //==============================================================
+                size_t       iRequest = 0;
+                for( size_t i = D.async_ghosts_count(); i>0; --i)
+                {
+                    async_ghosts &g = D.__async_ghosts(i);
+                    assert(g.peer>=0);
+                    assert(g.peer<MPI.CommWorldSize);
+                    assert(g.length>0);
+                    assert(g.inner_buf!=NULL);
+                    assert(g.outer_buf!=NULL);
+                    
+                    //----------------------------------------------------------
+                    //  Fill inner ghost with data
+                    //----------------------------------------------------------
+                    const size_t length1 = g.store_inner1( A );
+                    
+                    //----------------------------------------------------------
+                    //  Non blocking recv from peer
+                    //----------------------------------------------------------
+                    MPI.Irecv(g.outer_buf, length1, MPI_BYTE , g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                    assert(iRequest<requests.count);
+                    
+                    
+                    //----------------------------------------------------------
+                    //  Non blocking send to peer
+                    //----------------------------------------------------------
+                    MPI.Isend(g.inner_buf, length1, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                    assert( iRequest<=requests.count );
+                }
+                assert( requests.count == iRequest );
+                
+                
+                //==============================================================
+                // let us wait for the end of transfer
+                //==============================================================
+                MPI.Waitall(requests);
+
+                //==============================================================
+                // and tranfer back the ghosts into place
+                //==============================================================
+                for( size_t i = D.async_ghosts_count(); i>0; --i)
+                {
+                    async_ghosts &g = D.__async_ghosts(i);
+                    g.query_outer1(A);
+                }
+                
+            }
+            
             
             //! 1D collect a global array in rank 0
 			template <typename T>

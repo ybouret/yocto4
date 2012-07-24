@@ -129,7 +129,7 @@ namespace yocto
             //! store inner data into inner_buf
             /**
              must have enough memory...
-             \return the number_of stored bytes : A.item_size() * num_offset
+             \return the number_of stored bytes is A.item_size() * num_offset
              */
             size_t store_inner1( const linear_base &A ) throw();
             
