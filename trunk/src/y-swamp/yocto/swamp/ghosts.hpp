@@ -87,6 +87,9 @@ namespace yocto
             //! direct copy transfert
             void transfer( const linear_handles & handles ) const throw();
             
+            //! transfer only one of the handles
+            void transfer1( linear_base &A ) const throw();
+            
             //! shared pointer
             typedef shared_ptr<local_ghosts> ptr;
             

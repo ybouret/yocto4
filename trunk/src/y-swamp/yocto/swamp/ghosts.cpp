@@ -149,6 +149,23 @@ namespace yocto
             }
         }
         
+        void local_ghosts:: transfer1( linear_base &A ) const throw()
+        {
+            assert( num_offsets == lower.inside.offsets.size() );
+            assert( num_offsets == lower.mirror.offsets.size() );
+            assert( num_offsets == upper.inside.offsets.size() );
+            assert( num_offsets == upper.mirror.offsets.size() );  
+            for( size_t i=num_offsets; i>0; --i )
+            {
+                const size_t lower_mirror = lower.mirror.offsets[i];
+                const size_t lower_inside = lower.inside.offsets[i];
+                const size_t upper_mirror = upper.mirror.offsets[i];
+                const size_t upper_inside = upper.inside.offsets[i];
+                A.local_copy( lower_mirror, lower_inside);
+                A.local_copy( upper_mirror, upper_inside);
+            }
+        }
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
