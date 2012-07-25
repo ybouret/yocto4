@@ -160,15 +160,15 @@ namespace yocto
 		void Startall( Requests & ) const;
 		void Waitall( Requests & ) const;
 		
-        void InitSync() const;
-        void QuitSync() const;
+        void __InitSync() const;
+        void __QuitSync() const;
         
         //======================================================================
         // Send/Recv templated integral types
         //======================================================================
         //! send ONE integral type
         template <typename T>
-        inline void SendAs( const T x, int dest,  int tag, MPI_Comm comm ) const
+        inline void __Send( const T x, int dest,  int tag, MPI_Comm comm ) const
         {
             const T y = swap_be_as<T>(x);
             this->Send(&y, sizeof(T), MPI_BYTE, dest, tag, comm);
@@ -176,7 +176,7 @@ namespace yocto
         
         //! recv ONE integral type
         template <typename T>
-        inline T RecvAs( int source,int tag, MPI_Comm comm, MPI_Status &status) const
+        inline T __Recv( int source,int tag, MPI_Comm comm, MPI_Status &status) const
         {
             T y(0);
             this->Recv(&y, sizeof(T), MPI_BYTE, source, tag, comm, status);
@@ -185,12 +185,15 @@ namespace yocto
         
         //! bcast ONE integral type
         template <typename T>
-        inline void BcastAs( T &x, int root, MPI_Comm comm ) const
+        inline void __Bcast( T &x, int root, MPI_Comm comm ) const
         {
             T y = swap_be_as<T>(x);
             Bcast(&y, sizeof(T), MPI_BYTE, root, comm);
             x = swap_be_as<T>(y);
         }
+        
+        double Wtime() const;
+        void   __WaitFor( double nsec) const;
         
 	private:
 		friend class singleton<mpi>;                            //!< access mpi
