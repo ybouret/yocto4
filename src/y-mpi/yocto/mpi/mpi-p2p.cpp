@@ -22,7 +22,7 @@ throw mpi::exception( err, #SEND"()" );\
 	YOCTO_MPI_XSEND(Bsend)
 	YOCTO_MPI_XSEND(Ssend)
 	
-		
+    
 	
 	void       mpi::Recv( void       *buffer, size_t count, MPI_Datatype datatype, int source,int tag, MPI_Comm comm, MPI_Status &status) const
 	{
@@ -151,7 +151,18 @@ throw mpi::exception( err, "MPI_" #SEND "()" );\
 		
 	}
 	
-	
+	void  mpi:: Sendrecv(const void *sendbuf, size_t sendcount, MPI_Datatype sendtype, int dest, int sendtag,
+                         void       *recvbuf, size_t recvcount, MPI_Datatype recvtype, int from, int recvtag,
+                         MPI_Comm    comm,
+                         MPI_Status &status ) const
+    {
+        const int err = MPI_Sendrecv((void*)sendbuf, int(sendcount), sendtype, dest, sendtag, 
+                                     recvbuf,        int(recvcount), recvtype, from, recvtag, 
+                                     comm, &status);
+        if( err != MPI_SUCCESS )
+			throw mpi::exception( err, "Sendrecv()" );
+    }
+    
 	
 	
 }
