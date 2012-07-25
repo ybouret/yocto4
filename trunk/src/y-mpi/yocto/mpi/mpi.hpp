@@ -114,6 +114,10 @@ namespace yocto
 		void      Wait( MPI_Request &request, MPI_Status &status ) const;
 		void      Waitall( size_t count, MPI_Request requests[], MPI_Status status[] ) const;
 		
+        void      Sendrecv(const void *sendbuf, size_t sendcount, MPI_Datatype sendtype, int dest, int sendtag,
+                           void       *recvbuf, size_t recvcount, MPI_Datatype recvtype, int from, int recvtag,
+                           MPI_Comm    comm,
+                           MPI_Status &status ) const;
 		//======================================================================
 		// Collective Communication Routines
 		//======================================================================
