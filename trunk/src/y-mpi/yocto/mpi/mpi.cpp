@@ -174,4 +174,16 @@ namespace yocto
         return r;
     }
 
+    double mpi::Wtime() const
+    {
+        return MPI_Wtime();
+    }
+    
+    void  mpi:: __WaitFor( double nsec) const
+    {
+        const double stamp = Wtime();
+        while( Wtime() - stamp < nsec )
+            ;
+    }
+
 }

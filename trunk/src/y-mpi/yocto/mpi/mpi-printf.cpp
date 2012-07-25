@@ -69,7 +69,7 @@ namespace yocto
 	}
     
     
-    void mpi:: InitSync() const
+    void mpi:: __InitSync() const
     {
         static const int tag = 1001;
 		int              msg = tag;
@@ -93,7 +93,7 @@ namespace yocto
         }
     }
     
-	void mpi:: QuitSync() const
+	void mpi:: __QuitSync() const
     {
         static const int tag = 1001;
 		int              msg = tag;
