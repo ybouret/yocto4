@@ -10,7 +10,7 @@ using namespace yocto;
 using namespace swamp;
 
 
-double vproc( const double &x ) { return x; }
+static inline double vproc( const double &x ) { return x; }
 
 YOCTO_UNIT_TEST_IMPL(coll2D)
 {
