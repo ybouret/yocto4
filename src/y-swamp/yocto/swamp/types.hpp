@@ -16,32 +16,33 @@ namespace yocto
     namespace swamp
     {
         
-        //! signed integer for indices
-        typedef ptrdiff_t              unit_t;
+        typedef ptrdiff_t              unit_t; //!< signed integer for indices
         
-        //! coordinate referencing
+        
         template <typename COORD>
         inline unit_t & __coord( COORD &C, size_t dim ) throw()
         {
             assert( dim < sizeof(COORD)/sizeof(unit_t));
             unit_t *c = (unit_t *) &C;
             return  c[dim];
-        }
+        } //!< coordinate referencing
         
-        //! coordinate referencing, const
+        
         template <typename COORD>
         inline const unit_t & __coord( const COORD &C, size_t dim ) throw()
         {
             assert( dim < sizeof(COORD)/sizeof(unit_t));
             unit_t *c = (unit_t *) &C;
             return  c[dim];
-        }
+        }//!< coordinate referencing, const
         
         
-        //! base class for list of offsets
+        
         typedef sorted_vector<size_t>  sorted_offsets;
+        //!< base class for list of offsets
         
-        //! list of offset
+        /** \brief list of offset
+         */
         class offsets_list : public sorted_offsets
         {
         public:
