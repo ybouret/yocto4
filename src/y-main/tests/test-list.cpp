@@ -266,20 +266,20 @@ YOCTO_UNIT_TEST_DONE()
 
 struct h_node
 {
-    h_node *prev;
-    h_node *next;
-    int    *handle;
+    h_node   *prev;
+    h_node   *next;
+    unsigned *handle;
     void reset() throw() { handle=0; }
 };
 
 YOCTO_UNIT_TEST_IMPL(hlist)
 {
-    int arr[32];
-    for( int i=0; i < sizeof(arr)/sizeof(arr[0]); ++i ) arr[i] = i;
+    unsigned arr[32];
+    for( unsigned i=0; i < sizeof(arr)/sizeof(arr[0]); ++i ) arr[i] = i;
     cache_of<h_node> C;
     handle_list<h_node> L(C);
     
-    for( int i=0; i < sizeof(arr)/sizeof(arr[0]); ++i ) 
+    for( unsigned i=0; i < sizeof(arr)/sizeof(arr[0]); ++i ) 
         L.attach( &arr[i] );
     
     
