@@ -29,9 +29,9 @@ namespace yocto
                     for( size_t i=mid;i>0;--i)             R.push_front( source.pop_back() );
                     assert(0==source.size);
                     
-                    merging<NODE>::sort<core::list_of>(L,proc,args);
-                    merging<NODE>::sort<core::list_of>(R,proc,args);
-                    merging<NODE>::fusion<LIST_OF>(source,L,R,proc,args);
+                    merging<NODE>::template sort<core::list_of>(L,proc,args);
+                    merging<NODE>::template sort<core::list_of>(R,proc,args);
+                    merging<NODE>::template fusion<LIST_OF>(source,L,R,proc,args);
                 }
             }
             
@@ -70,3 +70,4 @@ namespace yocto
 }
 
 #endif
+
