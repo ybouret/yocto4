@@ -1,3 +1,8 @@
+/**
+ \file
+ \brief 2D Arrays
+ */
+
 #ifndef YOCTO_SWAMP_ARRAY2D_INCLUDED
 #define YOCTO_SWAMP_ARRAY2D_INCLUDED 1
 

@@ -1,3 +1,7 @@
+/**
+ \file
+ \brief 3D Arrays
+ */
 #ifndef YOCTO_SWAMP_ARRAY3D_INCLUDED
 #define YOCTO_SWAMP_ARRAY3D_INCLUDED 1
 
@@ -10,7 +14,6 @@ namespace yocto
 {
     namespace swamp
     {
-        
         
         //! three dimensional array
         template <typename T>

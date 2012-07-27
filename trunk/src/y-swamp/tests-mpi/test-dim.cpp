@@ -65,12 +65,12 @@ YOCTO_UNIT_TEST_IMPL(d1)
     
     
     //! start exchange
-    _mpi::init_exchange(MPI,D,requests);
+    _mpi::init_exchange_all(MPI,D,requests);
     MPI.Printf(stderr,"rank %d> launched requests\n", rank);
     //! do work on dataspace sync
     
     //! end exchange
-    _mpi::wait_exchange(MPI,D,requests);
+    _mpi::wait_exchange_all(MPI,D,requests);
     MPI.Printf(stderr,"rank %d> received requests\n", rank);
     {
         const string filename = vformat("end%d.%d.dat",rank,size);
@@ -135,12 +135,12 @@ YOCTO_UNIT_TEST_IMPL(d2)
     
     
     //! start exchange
-    _mpi::init_exchange(MPI,D,requests);
+    _mpi::init_exchange_all(MPI,D,requests);
     MPI.Printf(stderr,"rank %d> launched requests\n", rank);
     //! do work on dataspace sync
     
     //! end exchange
-    _mpi::wait_exchange(MPI,D,requests);
+    _mpi::wait_exchange_all(MPI,D,requests);
     MPI.Printf(stderr,"rank %d> received requests\n", rank);
 
     

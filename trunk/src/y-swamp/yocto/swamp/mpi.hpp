@@ -6,7 +6,7 @@
 #include "yocto/swamp/array3d.hpp"
 #include "yocto/mpi/mpi.hpp"
 
-namespace yocto 
+namespace yocto
 {
     
     namespace swamp
@@ -16,15 +16,13 @@ namespace yocto
         struct _mpi
         {
             
-            //==================================================================
-            //
-            // data exchange protocols
-            //
-            //==================================================================
-            
             //! initialize the exchanges
-            template <typename LAYOUT> inline static 
-            void init_exchange( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            /**
+             - exchange local ghosts
+             - load async ghosts and create I/O requests
+             */
+            template <typename LAYOUT> inline static
+            void init_exchange_all( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
             {
                 static const int tag = 0xCA44;
                 assert( requests.count == D.num_requests() );
@@ -71,8 +69,12 @@ namespace yocto
             }
             
             //! wait for all exchanges to be done
-            template <typename LAYOUT> inline static 
-            void wait_exchange( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests)
+            /**
+             - wait for I/O request
+             - fetch local ghosts
+             */
+            template <typename LAYOUT> inline static
+            void wait_exchange_all( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests)
             {
                 assert( requests.count == D.num_requests() );
                 const linear_handles &handles = D.handles();
@@ -93,8 +95,18 @@ namespace yocto
                 }
             }
             
+            //! wrapper
             template <typename LAYOUT> inline static
-            void synchronize1( linear_base &A, const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            void synchronize_all( const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            {
+                init_exchange_all<LAYOUT>(MPI, D, requests);
+                wait_exchange_all<LAYOUT>(MPI, D, requests);
+            }
+            
+            
+            //! for one array only
+            template <typename LAYOUT> inline static
+            void init_exchange_one( linear_base &A, const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
             {
                 static const int tag = 0xCA441;
                 
@@ -139,12 +151,18 @@ namespace yocto
                 }
                 assert( requests.count == iRequest );
                 
+            }
+            
+            
+            template <typename LAYOUT> inline static
+            void wait_exchange_one( linear_base &A, const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            {
                 
                 //==============================================================
                 // let us wait for the end of transfer
                 //==============================================================
                 MPI.Waitall(requests);
-
+                
                 //==============================================================
                 // and tranfer back the ghosts into place
                 //==============================================================
@@ -155,6 +173,15 @@ namespace yocto
                 }
                 
             }
+            
+            //! wrapper
+            template <typename LAYOUT> inline static
+            void synchronize_one( linear_base &A, const mpi &MPI, dataspace<LAYOUT> &D, mpi::Requests &requests )
+            {
+                init_exchange_one<LAYOUT>(A, MPI, D, requests);
+                wait_exchange_one<LAYOUT>(A, MPI, D, requests);
+            }
+
             
             
             //! 1D collect a global array in rank 0
@@ -180,7 +207,7 @@ namespace yocto
 						const layout1D sub   = full.split(r, MPI.CommWorldSize,0);
 						const size_t   bytes = sub.width * sizeof(T);
 						
-                        MPI.Recv( &A[sub.lower], bytes, MPI_BYTE, r, tag, MPI_COMM_WORLD, status);						
+                        MPI.Recv( &A[sub.lower], bytes, MPI_BYTE, r, tag, MPI_COMM_WORLD, status);
 					}
 				}
 				else
