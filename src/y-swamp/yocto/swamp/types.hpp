@@ -1,6 +1,6 @@
-// \file
 /**
- Simplified Workspaces and Meshes Processing
+ \file
+ \brief Simplified Workspaces And Meshes Processing
  */
 
 #ifndef YOCTO_SWAMP_TYPES_INCLUDED
@@ -10,7 +10,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/string.hpp"
 
-namespace yocto 
+namespace yocto
 {
     
     namespace swamp
@@ -18,7 +18,8 @@ namespace yocto
         
         //! signed integer for indices
         typedef ptrdiff_t              unit_t;
-       
+        
+        //! coordinate referencing
         template <typename COORD>
         inline unit_t & __coord( COORD &C, size_t dim ) throw()
         {
@@ -27,6 +28,7 @@ namespace yocto
             return  c[dim];
         }
         
+        //! coordinate referencing, const
         template <typename COORD>
         inline const unit_t & __coord( const COORD &C, size_t dim ) throw()
         {
@@ -38,7 +40,8 @@ namespace yocto
         
         //! base class for list of offsets
         typedef sorted_vector<size_t>  sorted_offsets;
-       
+        
+        //! list of offset
         class offsets_list : public sorted_offsets
         {
         public:
@@ -47,12 +50,15 @@ namespace yocto
             virtual ~offsets_list() throw();
             offsets_list( const offsets_list & );
             
+            //! permissive storage
             void store( size_t indx );
             
         private:
             YOCTO_DISABLE_ASSIGN(offsets_list);
         };
         
+        
+        //! list of variables for arrays data I/O
         class variables : public vector<string>
         {
         public:

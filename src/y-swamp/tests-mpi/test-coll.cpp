@@ -54,8 +54,8 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
     D.prepare_ghosts();
     mpi::Requests requests( D.num_requests() );
     
-    _mpi::init_exchange(MPI, D, requests);
-    _mpi::wait_exchange(MPI, D, requests);
+    _mpi::init_exchange_all(MPI, D, requests);
+    _mpi::wait_exchange_all(MPI, D, requests);
     
     _mpi::collect0(MPI, pA0.__get(), A, full_layout);
     
@@ -63,7 +63,7 @@ YOCTO_UNIT_TEST_IMPL(coll2D)
         pA0->ppm( "fullA.ppm", "fullA", full_layout, vproc, 0, 0, size );
     MPI.Barrier(MPI_COMM_WORLD);
     
-    _mpi::synchronize1(B, MPI, D, requests);
+    _mpi::synchronize_one(B, MPI, D, requests);
     _mpi::collect0(MPI, pA0.__get(), B, full_layout);
 
     if( 0 == rank )
@@ -122,8 +122,8 @@ YOCTO_UNIT_TEST_IMPL(coll3D)
     D.prepare_ghosts();
     mpi::Requests requests( D.num_requests() );
     
-    _mpi::init_exchange(MPI, D, requests);
-    _mpi::wait_exchange(MPI, D, requests);
+    _mpi::init_exchange_all(MPI, D, requests);
+    _mpi::wait_exchange_all(MPI, D, requests);
     
     _mpi::collect0(MPI, pA0, A, full_layout);
     

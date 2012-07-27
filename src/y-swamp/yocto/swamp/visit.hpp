@@ -1,6 +1,6 @@
-//! \file
 /**
- Wrappers to use VisIt libsim.
+ \file
+ \brief Wrappers to use VisIt libsim.
  */
 #ifndef YOCTO_SWAMP_VISIT_INCLUDED
 #define YOCTO_SWAMP_VISIT_INCLUDED 1

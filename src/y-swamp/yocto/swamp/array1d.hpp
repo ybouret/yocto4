@@ -1,10 +1,15 @@
+/**
+ \file
+ \brief 1D Arrays
+ */
+
 #ifndef YOCTO_SWAMP_ARRAY1D_INCLUDED
 #define YOCTO_SWAMP_ARRAY1D_INCLUDED 1
 
 #include "yocto/swamp/in1d.hpp"
 #include "yocto/swamp/linear.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace swamp
     {
@@ -23,7 +28,7 @@ namespace yocto
             typedef typename linear_type::const_cb const_cb;
             typedef typename linear_type::call_two call_two;
             
-            explicit array1D( const layout_type & L ) throw();            
+            explicit array1D( const layout_type & L ) throw();
             virtual ~array1D() throw();
             
             type &       operator[]( unit_t x ) throw();
@@ -46,7 +51,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
-            T *item; //!< offseted address 
+            T *item; //!< offseted address
         };
         
     }

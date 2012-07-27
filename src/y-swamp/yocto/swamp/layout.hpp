@@ -1,3 +1,8 @@
+/**
+ \file
+ \brief layout of logical indices
+ */
+
 #ifndef YOCTO_SWAMP_LAYOUT_INCLUDED
 #define YOCTO_SWAMP_LAYOUT_INCLUDED 1
 

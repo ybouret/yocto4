@@ -1,3 +1,8 @@
+/**
+ \file
+ \brief Virual arrays
+ */
+
 #ifndef YOCTO_SWAMP_ARRAYS_INCLUDED
 #define YOCTO_SWAMP_ARRAYS_INCLUDED 1
 

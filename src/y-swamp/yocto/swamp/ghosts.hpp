@@ -34,8 +34,11 @@ namespace yocto
             const position site;     //!< ghost position
             offsets_list   offsets;  //!< initial empty list
             
+            //! ctor: set ghost position
             explicit ghost( ghost::position p ) throw();
             const char *position_name() const throw();
+            
+            //! get peer position
             ghost::position mirror_position() const throw();
             
         private:
@@ -77,8 +80,8 @@ namespace yocto
         class local_ghosts : public ghosts_base
         {
         public:
-            local_ghosts_pair  lower; //!< lower.inner and its mirror
-            local_ghosts_pair  upper; //!< upper.lower and its mirror
+            local_ghosts_pair  lower; //!< lower.inside and its mirror
+            local_ghosts_pair  upper; //!< upper.inside and its mirror
             
             //! prepare ghosts pairs, no memory allocated
             explicit local_ghosts( size_t num_ghosts, size_t dim );            
