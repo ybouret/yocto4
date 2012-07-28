@@ -43,6 +43,26 @@ namespace yocto
 			throw mpi::exception( err, "MPI_Gather(root=%d)", root );
 	}
 	
+    void mpi:: Reduce(  const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) const
+    {
+        assert( !(NULL==sendbuf && count>0 ) );
+        assert( !(NULL==recvbuf && count>0 ) );
+        const int err = MPI_Reduce((void*)sendbuf, recvbuf, int(count), datatype, op, root, comm);
+        if( err != MPI_SUCCESS )
+			throw mpi::exception( err, "MPI_Reduce(root=%d)",root);
+    }
+    
+    void mpi:: Allreduce(     void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const
+    {
+        assert( !(NULL==sendbuf && count>0 ) );
+        assert( !(NULL==recvbuf && count>0 ) );
+        const int err = MPI_Allreduce((void*)sendbuf, recvbuf, int(count), datatype, op, comm);
+        if( err != MPI_SUCCESS )
+			throw mpi::exception( err, "MPI_Alleduce()");
+
+    }
+
+    
 	
 }
 
