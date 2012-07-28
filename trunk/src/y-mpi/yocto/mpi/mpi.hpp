@@ -42,7 +42,7 @@ namespace yocto
 	 MPI_Allgather			MPI_Allgatherv  	MPI_Allreduce
 	 MPI_Alltoall			MPI_Alltoallv		@MPI_Barrier
 	 @MPI_Bcast				@MPI_Gather			MPI_Gatherv
-	 MPI_Op_create			MPI_Op_free			MPI_Reduce
+	 MPI_Op_create			MPI_Op_free			@MPI_Reduce
 	 MPI_Reduce_scatter 	MPI_Scan			@MPI_Scatter
 	 MPI_Scatterv 	  	  
 	 */
@@ -125,7 +125,9 @@ namespace yocto
 		void Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
 		void Scatter( const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
 		void Gather(  const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
-        
+        void Reduce(  const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) const;
+        void Allreduce(     void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const;
+
 		//======================================================================
 		// Usefull helpers
 		//======================================================================
