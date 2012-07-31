@@ -21,5 +21,6 @@ ADD_TEST(Stiff    test-mk stiff)
 ADD_TEST(Stat     test-mk stat)
 ADD_TEST(Linear   test-mk linear)
 ADD_TEST(Smooth   test-mk smooth)
+ADD_TEST(Trigo    test-mk trigo)
 
 ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
