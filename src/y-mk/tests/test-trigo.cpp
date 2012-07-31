@@ -20,6 +20,7 @@ YOCTO_UNIT_TEST_IMPL(trigo)
         period += alea<double>();
     }
     
+    std::cerr << "on " << n << " points" << std::endl;
     const double tfac = numeric<double>::two_pi / period;
     vector<double> y(n,0);
     {
