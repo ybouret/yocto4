@@ -11,7 +11,7 @@ using namespace math;
 YOCTO_UNIT_TEST_IMPL(trigo)
 {
     // make sample
-    const size_t   n = 10 + alea_leq(10);
+    const size_t   n = 20 + alea_leq(10);
     vector<double> x(n,0);
     double period = 0;
     for( size_t i=1; i <=n; ++i )
@@ -28,7 +28,7 @@ YOCTO_UNIT_TEST_IMPL(trigo)
         for( size_t i=1; i<=n; ++i )
         {
             x[i] *= tfac;
-            y[i]  = ipower(Cos(x[i]), 3);
+            y[i]  = ipower(Cos(2*x[i]), 3);
             fp("%g %g\n",x[i],y[i]);
         }
     }
@@ -40,7 +40,7 @@ YOCTO_UNIT_TEST_IMPL(trigo)
     trig.compute(coef, solver);
     {
         ios::ocstream fp("trig1.dat",false);
-        const size_t m = 50 + alea_leq(50);
+        const size_t m = 400 + alea_leq(400);
         for( size_t i=0; i <= m; ++i )
         {
             const double theta = (i*numeric<double>::two_pi) / m;
