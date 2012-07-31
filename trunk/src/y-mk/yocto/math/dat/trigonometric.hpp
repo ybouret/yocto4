@@ -2,7 +2,7 @@
 #define YOCTO_MATH_TRIGONOMETRIC_INCLUDED 1
 
 #include "yocto/math/kernel/linsys.hpp"
-
+#include "yocto/geom/v2d.hpp"
 
 namespace yocto
 {
@@ -31,7 +31,8 @@ namespace yocto
              */
             void compute( array<T> &a, linsys<T> &solver ) const throw();
             
-            T operator()( T theta, const array<T> &a ) const throw();
+            T            operator()( T theta, const array<T> &a ) const throw();
+            geom::v2d<T> operator()( T theta, const array<T> &ax, const array<T> &ay ) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(trigonometric);

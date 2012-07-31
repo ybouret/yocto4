@@ -7,13 +7,13 @@ namespace yocto
     
     namespace math
     {
-
+        
         template <>
         trigonometric<real_t>:: ~trigonometric() throw()
         {
             
         }
-
+        
         
         static inline
         size_t __check_size( size_t n )
@@ -59,16 +59,16 @@ namespace yocto
             //------------------------------------------------------------------
             if( !solver.LU(M) )
                 throw exception("invalid trigonometric interpolation");
-
+            
         }
-
+        
         template <>
         void trigonometric<real_t>:: compute( array<real_t> &a, linsys<real_t> &solver ) const throw()
         {
             assert( a.size() == n );
             solver(M,a);
         }
-
+        
         template <>
         real_t trigonometric<real_t>:: operator()( real_t theta, const array<real_t> &a ) const throw()
         {
@@ -92,6 +92,37 @@ namespace yocto
                 v += a[j] * Cos( arg );
             }
             return v;
+        }
+        
+        template <>
+        geom::v2d<real_t> trigonometric<real_t>::operator()( real_t theta, const array<real_t> &ax, const array<real_t> &ay ) const throw()
+        {
+            assert( ax.size() == n );
+            assert( ay.size() == n );
+            size_t            j=1;
+            geom::v2d<real_t> v(ax[j],ay[j]);
+            ++j;
+            for( size_t k=1; k <= nn; ++k )
+            {
+                const real_t arg = k * theta;
+                const real_t ca  = Cos(arg);
+                const real_t sa  = Sin(arg);
+                v.x += ax[j] * ca;
+                v.y += ay[j] * ca;
+                ++j;
+                v.x += ax[j] * sa;
+                v.y += ay[j] * sa;
+                ++j;
+            }
+            if( is_even )
+            {
+                const real_t arg = n2 * theta;
+                const real_t ca  = Cos(arg);
+                v.x += ax[j] * ca;
+                v.y += ay[j] * ca;
+            }
+            return v;
+            
         }
         
         
