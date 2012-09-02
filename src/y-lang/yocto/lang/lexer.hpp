@@ -51,7 +51,10 @@ namespace yocto
             
             //! return cache.tail
             const lexeme *get( int pos ) const throw();
+            
+            //! public current line, to be modified by user.
             size_t            line;
+            
         private:
             typedef set<string,lexical::scanner::ptr> scannerDB;
             typedef lexical::scanner *                scan_ptr;
