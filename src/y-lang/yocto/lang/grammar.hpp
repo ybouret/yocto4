@@ -14,7 +14,7 @@ namespace yocto
         //! simple grammar
         /**
          the first declared rule will be the default rule,
-         wich can be change by set_root
+         which can be change by set_root
          */
         class grammar 
         {
