@@ -17,4 +17,4 @@ ADD_TEST(Levels  test-swamp levels)
 ADD_TEST(C2D     test-swamp C2D)
 ADD_TEST(C3D     test-swamp C3D)
 
-ADD_CUSTOM_TARGET(check-swamp COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-swamp)
+#ADD_CUSTOM_TARGET(check-swamp COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-swamp)

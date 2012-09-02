@@ -8,4 +8,4 @@ ENABLE_TESTING()
 ADD_TEST(vec3    test-lua++ "${HERE}/vec3.lua" )
 ADD_TEST(array   test-lua++ "${HERE}/array.lua")
 
-ADD_CUSTOM_TARGET(check-lua++ COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-lua++)
+#ADD_CUSTOM_TARGET(check-lua++ COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-lua++)

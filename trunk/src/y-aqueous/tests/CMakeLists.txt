@@ -13,4 +13,4 @@ ADD_TEST(Acetic      test-aqueous dosage ${CMAKE_CURRENT_SOURCE_DIR}/config.lua)
 ADD_TEST(Phosphoric  test-aqueous dosage ${CMAKE_CURRENT_SOURCE_DIR}/h3po4.lua)
 ADD_TEST(Lua         test-aqueous lua ${CMAKE_CURRENT_SOURCE_DIR}/config.lua)
 
-ADD_CUSTOM_TARGET(check-aqueous COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-aqueous)
+#ADD_CUSTOM_TARGET(check-aqueous COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-aqueous)

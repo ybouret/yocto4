@@ -11,4 +11,4 @@ ADD_TEST(Buffer   test-ocl buffer)
 ADD_TEST(Images   test-ocl images)
 ADD_TEST(Kernel   test-ocl kernel)
 
-ADD_CUSTOM_TARGET(check-ocl COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-ocl )
+#ADD_CUSTOM_TARGET(check-ocl COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-ocl )
