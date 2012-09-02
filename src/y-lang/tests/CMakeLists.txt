@@ -8,5 +8,4 @@ ENABLE_TESTING()
 ADD_TEST(RXPosix    test-lang posix)
 ADD_TEST(RXCompiler test-lang comp_rx '[:digit:]+[.]?' no )
 
-
-ADD_CUSTOM_TARGET(check-lang COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-lang)
+#ADD_CUSTOM_TARGET(check-lang COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-lang)

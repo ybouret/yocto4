@@ -9,4 +9,4 @@ ADD_TEST(HMAC    test-kr hmac)
 ADD_TEST(SCipher test-kr sc)
 ADD_TEST(BCipher test-kr bc)
 
-ADD_CUSTOM_TARGET(check-kr COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-kr )
+#ADD_CUSTOM_TARGET(check-kr COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-kr )

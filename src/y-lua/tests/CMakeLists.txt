@@ -10,4 +10,4 @@ ADD_TEST(Bisect  test-lua "${HERE}/bisect.lua")
 ADD_TEST(Sieve   test-lua "${HERE}/sieve.lua" )
 ADD_TEST(Sort    test-lua "${HERE}/sort.lua"  )
 
-ADD_CUSTOM_TARGET(check-lua COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-lua)
+#ADD_CUSTOM_TARGET(check-lua COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-lua)
