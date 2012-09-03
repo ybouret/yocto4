@@ -48,17 +48,19 @@ namespace yocto
 			string       value;
 			if( environment::get( value, name ) )
 			{
-				//std::cerr << "[layout parsing '" << value << "']" << std::endl;
 				//--------------------------------------------------------------
 				// #nproc
 				//--------------------------------------------------------------
 				const char *text  = value.c_str();
 				char       *field = NULL;
 				const long  nproc = strtol(text, &field, 10 );
+                
 				if( nproc <= 0 )
 					throw exception("Invalid number of CPU");
-				(size_t&)size = size_t(nproc);
-				//--------------------------------------------------------------
+				
+                (size_t&)size = size_t(nproc);
+				
+                //--------------------------------------------------------------
 				// offset, optional
 				//--------------------------------------------------------------
 				if( __next_field(field) )
