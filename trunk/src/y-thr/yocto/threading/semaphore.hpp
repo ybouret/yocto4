@@ -1,6 +1,4 @@
-/** \file semaphore.hpp
- \brief
- */
+//! \file
 
 #ifndef YOCTO_THREADING_SEMAPHORE_INCLUDED
 #define YOCTO_THREADING_SEMAPHORE_INCLUDED 1
@@ -12,7 +10,9 @@ namespace yocto {
 	
 	namespace threading
 	{
-		class semaphore  {
+        //! portable semaphore class
+		class semaphore
+        {
 		public:
 			explicit semaphore( const uint32_t initialPermits ) throw();
 			virtual ~semaphore() throw();
@@ -28,8 +28,6 @@ namespace yocto {
 			condition count_nonzero_;
 		};
 	}
-	
-	
 }
 
 #endif

@@ -1,7 +1,4 @@
-//! \file runnable.hpp
-/**
- \brief runnable class
- */
+//! \file
 
 #ifndef YOCTO_RUNNABLE_INCLUDED
 #define YOCTO_RUNNABLE_INCLUDED 1
