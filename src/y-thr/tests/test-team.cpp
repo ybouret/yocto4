@@ -51,7 +51,7 @@ namespace {
 			
 			{
 				YOCTO_LOCK(ctx.access);
-				sum += local_sum; 
+				sum += local_sum;
 			}
 		}
 		
@@ -80,9 +80,7 @@ YOCTO_UNIT_TEST_IMPL(team)
 		team local_simd;
 	}
 	
-	team simd;
-	//ios::icstream in( ios::cstdin );
-	//string        line;
+	team          simd;
 	Compute       comp; comp.iter_per_cycles = length;
 	team::task    proc( &comp, & Compute::Update );
 	wtime         chrono;
