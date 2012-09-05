@@ -178,7 +178,7 @@ namespace yocto
             //-- first pass: take care of specialized and discardable
             Tree->AST();
             
-            
+            //-- merge alternation
             __fusion(Tree);
             
             return Tree;

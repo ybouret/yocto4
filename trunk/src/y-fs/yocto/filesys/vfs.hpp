@@ -1,3 +1,5 @@
+//! \file
+
 #ifndef YOCTO_VFS_INCLUDED
 #define YOCTO_VFS_INCLUDED
 

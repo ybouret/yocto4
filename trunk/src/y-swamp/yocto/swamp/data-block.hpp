@@ -3,9 +3,9 @@
 
 #include "yocto/swamp/linear.hpp"
 
-namespace yocto 
+namespace yocto
 {
-	namespace swamp 
+	namespace swamp
 	{
 		//! memory for an array
 		class data_block : public object
@@ -13,13 +13,13 @@ namespace yocto
 		public:
 			explicit data_block( linear_base &linear_object );
 			virtual ~data_block() throw();
-
+            
 		private:
 			size_t size;
 			void  *base;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(data_block);
 		};
-
+        
 #if defined(_MSC_VER)
 		// this in ctor
 #pragma warning (push)
@@ -31,20 +31,20 @@ namespace yocto
 		public:
 			explicit standalone( const typename ARRAY::layout_type &L ) :
 			ARRAY( L ),
-				blk( *this ) {}
-
+            blk( *this ) {}
+            
 			virtual ~standalone() throw() {}
-
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(standalone);
 			data_block blk;
-
+            
 		};
 #if defined(_MSC_VER)
 #pragma warning (pop)
 #endif
 	}
-
+    
 }
 
 #endif

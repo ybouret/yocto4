@@ -23,7 +23,7 @@ namespace yocto
 			const size_t size; //!< #threads requested
 			const size_t root; //!< #CPU to start.
 			
-			//! parse the YOCTO_THREADING=#threads[,offset]"
+			//! parse the environment variable YOCTO_THREADING=#threads[,offset]
 			/**
 			 - if YOCTO_THREADING is undefined then size = hardware::nprocs(), root=0
 			 - if YOCTO_THREADING is defined, then the first field is #threads (mandatory)
