@@ -1,60 +1,40 @@
-/**
- \file
- \brief layout of logical indices
- */
+#ifndef YOCTO_SPADE_LAYOUT_INCLUDED
+#define YOCTO_SPADE_LAYOUT_INCLUDED 1
 
-#ifndef YOCTO_SWAMP_LAYOUT_INCLUDED
-#define YOCTO_SWAMP_LAYOUT_INCLUDED 1
+#include "yocto/spade/types.hpp"
+#include "yocto/object.hpp"
 
-
-#include "yocto/swamp/types.hpp"
-#include <iostream>
-
-namespace yocto 
+namespace yocto
 {
     
-    namespace swamp
+    namespace spade
     {
         
-        //! base layout, operations on coordinates
-        class layout_base : public object
+        class layout : public object
         {
         public:
-            virtual ~layout_base() throw();
+            //! default ctor
+            /**
+             \param num_dim > 0
+             */
+            explicit layout( size_t num_dim ) throw();
+            virtual ~layout() throw();
             
             const size_t dimensions;
             
         protected:
-            explicit layout_base(const size_t num_dims) throw();
-            
             //! order lower/upper, compute width and return #items
             size_t   setup( const void *lower_addr, const void *upper_addr, const void *pitch_addr, const void *width_addr) const throw();
             
             //! detect is coord is inside
             bool     is_inside( const void *coord_addr, const void *lower_addr, const void *upper_addr) const throw();
             
-            //! MPI style splitting for one dimension
-			/**
-			 \param lo final lower coordinate
-			 \param hi final upper coordinate
-			 \param Lo source lower coordinate
-			 \param Hi source upper coordinate
-			 \param rank MPI style rank, 0 <= rank < size
-			 \param size MPI style size
-			 */
-			static void split(unit_t      &lo, 
-							  unit_t      &hi, 
-							  const unit_t Lo, 
-							  const unit_t Hi, 
-							  const size_t rank, 
-							  const size_t size );
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(layout_base);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(layout);
         };
         
-        //! describe indices, no memory is allocated
         template <typename COORD>
-        class layout : public layout_base
+        class layout_of : public layout
         {
         public:
             typedef COORD                                         coord;         //!< POD coordinate
@@ -68,29 +48,29 @@ namespace yocto
 			const_coord   upper; //!< upper coordinate
 			const_coord   width; //!< coordinate width
             const_coord   pitch; //!< coordinate pitch: (1,nx,nx*ny)
-			const size_t  items; //!< number of linear items within the layout 
+			const size_t  items; //!< number of linear items within the layout
 			
 			
 			//! prepare layout
-			/** 
+			/**
 			 \param lo lower coordinates
 			 \param up upper coordinates
 			 The coordinates are ordered.
 			 */
-			inline explicit layout( param_coord lo, param_coord hi ) throw() :
-			layout_base( DIMENSIONS ),
+			inline explicit layout_of( param_coord lo, param_coord hi ) throw() :
+			layout( DIMENSIONS ),
 			lower( lo ),
 			upper( hi ),
 			width( ),
             pitch(),
-			items( layout_base::setup( &lower, &upper, &pitch, &width ) )
+			items( layout::setup( &lower, &upper, &pitch, &width ) )
 			{
 				
 			}
 			
 			//! copy layout
-			inline layout( const layout &other ) throw() :
-			layout_base( DIMENSIONS ),
+			inline layout_of( const layout_of &other ) throw() :
+			layout( DIMENSIONS ),
 			lower( other.lower ),
 			upper( other.upper ),
 			width( other.width ),
@@ -111,44 +91,30 @@ namespace yocto
 			inline virtual ~layout() throw() {}
             
             //! test that a coordinate is inside
-            inline bool has( param_coord c ) const throw() { return layout_base::is_inside( &c, &lower, &upper); }
+            inline bool has( param_coord c ) const throw() { return layout::is_inside( &c, &lower, &upper); }
             
             //! test that a sub layout is inside
-            inline bool contains( const layout &sub ) const throw() { return has(sub.lower) && has(sub.upper); }
+            inline bool contains( const layout_of &sub ) const throw() { return has(sub.lower) && has(sub.upper); }
             
-            //! load offsets of a sub layout in this
-            inline void load_offsets( const layout &sub, offsets_list &offsets ) const throw()
+            //! load offsets of a sub layout of *this
+            inline void load_offsets( const layout_of &sub, offsets_list &offsets ) const throw()
             {
                 assert( this->contains(sub) );
                 offsets.reserve( sub.items );
                 __ld(sub, offsets,int2type<DIMENSIONS>());
             }
             
-            friend inline std::ostream & operator<<( std::ostream &lay_os, const layout &the_layout )
+            friend inline std::ostream & operator<<( std::ostream &lay_os, const layout_of &the_layout )
             {
-                lay_os << "{ " << the_layout.lower << " -> " << the_layout.upper << " : #" << the_layout.width << "= " << the_layout.items << " }"; 
+                lay_os << "{ " << the_layout.lower << " -> " << the_layout.upper << " : #" << the_layout.width << "= " << the_layout.items << " }";
                 return lay_os;
             }
             
-            inline const layout & __layout() const throw() { return *this; }
+            inline const layout_of & __layout() const throw() { return *this; }
             
-            //! MPI style splitting along dimension dim
-			inline layout split( size_t rank, size_t size, size_t dim = DIMENSIONS-1 ) const
-			{
-                assert( dim < DIMENSIONS );
-				const unit_t Lo = __coord(lower,dim);
-				const unit_t Hi = __coord(upper,dim);
-				coord        s_lo(lower);
-				coord        s_hi(upper);
-				unit_t      &lo = __coord(s_lo,dim);
-				unit_t      &hi = __coord(s_hi,dim);
-				layout_base::split(lo,hi,Lo,Hi,rank,size);
-				return layout(s_lo,s_hi);
-			}
-
             
         private:
-            inline void __ld( const layout &sub, offsets_list &offsets, int2type<1> ) const throw()
+            inline void __ld( const layout_of &sub, offsets_list &offsets, int2type<1> ) const throw()
             {
                 const unit_t xmin = __coord(sub.lower,0);
                 const unit_t xmax = __coord(sub.upper,0);
@@ -159,7 +125,7 @@ namespace yocto
                 }
             }
             
-            inline void __ld( const layout &sub, offsets_list &offsets, int2type<2> ) const throw()
+            inline void __ld( const layout_of &sub, offsets_list &offsets, int2type<2> ) const throw()
             {
                 const unit_t ymin = __coord(sub.lower,1);
                 const unit_t ymax = __coord(sub.upper,1);
@@ -177,7 +143,7 @@ namespace yocto
                 
             }
             
-            inline void __ld( const layout &sub, offsets_list &offsets, int2type<3> ) const throw()
+            inline void __ld( const layout_of &sub, offsets_list &offsets, int2type<3> ) const throw()
             {
                 const unit_t zmin = __coord(sub.lower,2);
                 const unit_t zmax = __coord(sub.upper,2);
@@ -198,9 +164,8 @@ namespace yocto
                     }
                 }
             }
-            
-            
-            YOCTO_DISABLE_ASSIGN(layout);
+
+            YOCTO_DISABLE_ASSIGN(layout_of);
         };
         
         
