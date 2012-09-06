@@ -50,8 +50,25 @@ namespace yocto
                 }
             }
             
-            inline row        & operator[](unit_t y) throw()       { assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
-            inline const row  & operator[](unit_t y) const throw() { assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
+            inline row        & operator[](unit_t y) throw()
+            { assert(this->entry); assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
+            inline const row  & operator[](unit_t y) const throw()
+            { assert(this->entry); assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
+
+            inline static void *ctor( const layout_type &L, linear **handle )
+            {
+                assert(handle);
+                array_type  *arr = new array_type(L);
+                *handle   = arr;
+                return arr;
+            }
+            
+            inline static void dtor( void *p ) throw()
+            {
+                assert(p);
+                array_type *arr = static_cast<array_type *>(p);
+                delete arr;
+            }
 
             
         private:
