@@ -21,7 +21,7 @@ namespace yocto
             
             //! item size
 			virtual size_t item_size() const throw() = 0;
-
+            
             //! return the address @offset=source
             virtual const void *address_of( size_t source ) const throw() = 0;
             
@@ -33,7 +33,7 @@ namespace yocto
             
 			//! copy ptr intro entry[source]
 			virtual void async_query( const uint8_t * &ptr, size_t source ) throw()     = 0;
-                        
+            
         protected:
             explicit linear( size_t num_bytes ) throw(); //!< num_bytes > 0
             
@@ -52,7 +52,7 @@ namespace yocto
             
             //! default dtor
 			virtual ~linear_of() throw() {}
-                        
+            
             //! default ctor
 			explicit linear_of( const LAYOUT &L ) throw() :
             linear( L.items*sizeof(T) ),
@@ -63,7 +63,7 @@ namespace yocto
             
 			//! set every item to 0
 			inline void ldz() throw() { assert(entry); memset( entry, 0, bytes); }
-
+            
             //! set every item to value
             inline void ld( param_type value )
             {
