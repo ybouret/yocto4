@@ -26,11 +26,9 @@ namespace yocto
         spec( array_spec ),
         addr( array_addr ),
         info( array_info ),
-        dtor( array_dtor )
+        dtor( array_dtor ),
+        data( *info )
         {
-            assert(info);
-            assert(addr);
-            assert(dtor);
         }
         
         const string & varray:: key() const throw() { return name; }
@@ -40,6 +38,6 @@ namespace yocto
             if( requested != spec )
                 throw exception("spade.varray.spec=%s != %s", spec.name(), requested.name() );
         }
-
+        
     }
 }

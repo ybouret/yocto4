@@ -2,7 +2,7 @@
 #define YOCTO_SPADE_VARRAY_INCLUDED 1
 
 #include "yocto/type-spec.hpp"
-#include "yocto/spade/linear.hpp"
+#include "yocto/spade/data-block.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/string.hpp"
 
@@ -39,7 +39,7 @@ namespace yocto
             typedef intrusive_ptr<string,varray> ptr;
             const string & key() const throw();
             
-            const string    name;
+            const string    name; //!< array name
             const type_spec spec; //!< array typeid
             
             linear &       handle() throw();
@@ -64,9 +64,10 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(varray);
-            void   *        addr; //!< array[1|2|3]D address
-            linear *        info; //!< associated linear info
+            void   *        addr;          //!< array[1|2|3]D address
+            linear *        info;          //!< associated linear info
             void           (*dtor)(void*); //!< to destroy addr
+            const data_block data;
             void check_spec( const type_spec &requested ) const;
             
         };
