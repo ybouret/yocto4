@@ -1,11 +1,11 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/spade/types.hpp"
-#include "yocto/spade/v1d.hpp"
+#include "yocto/spade/in1d.hpp"
+#include "yocto/spade/in2d.hpp"
+#include "yocto/spade/in3d.hpp"
 
 using namespace yocto;
 using namespace spade;
 
-typedef geom::v1d<unit_t>   coord1D;
 
 YOCTO_UNIT_TEST_IMPL(coord)
 {
@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(coord)
     std::cerr << "x=" << x << std::endl;
     x = 5;
     
-    std::cerr << "x=" << C1.x << std::endl;
+    std::cerr << "x=" << C1 << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()

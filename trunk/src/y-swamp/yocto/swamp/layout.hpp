@@ -30,7 +30,7 @@ namespace yocto
             //! order lower/upper, compute width and return #items
             size_t   setup( const void *lower_addr, const void *upper_addr, const void *pitch_addr, const void *width_addr) const throw();
             
-            //! detect is coord is inside
+            //! detect if coord is inside
             bool     is_inside( const void *coord_addr, const void *lower_addr, const void *upper_addr) const throw();
             
             //! MPI style splitting for one dimension

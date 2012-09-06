@@ -29,6 +29,21 @@ namespace yocto
             //! detect is coord is inside
             bool     is_inside( const void *coord_addr, const void *lower_addr, const void *upper_addr) const throw();
             
+            //! MPI style splitting for one dimension
+			/**
+			 \param lo final lower coordinate
+			 \param hi final upper coordinate
+			 \param Lo source lower coordinate
+			 \param Hi source upper coordinate
+			 \param rank MPI style rank, 0 <= rank < size
+			 \param size MPI style size
+			 */
+            static void split(unit_t      &lo,
+                              unit_t      &hi,
+                              const unit_t Lo,
+                              const unit_t Hi,
+                              const size_t rank,
+                              const size_t size );
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(layout);
         };
@@ -88,7 +103,7 @@ namespace yocto
             }
             
 			//! destruct layout
-			inline virtual ~layout() throw() {}
+			inline virtual ~layout_of() throw() {}
             
             //! test that a coordinate is inside
             inline bool has( param_coord c ) const throw() { return layout::is_inside( &c, &lower, &upper); }
@@ -104,13 +119,28 @@ namespace yocto
                 __ld(sub, offsets,int2type<DIMENSIONS>());
             }
             
+            //! show it
             friend inline std::ostream & operator<<( std::ostream &lay_os, const layout_of &the_layout )
             {
                 lay_os << "{ " << the_layout.lower << " -> " << the_layout.upper << " : #" << the_layout.width << "= " << the_layout.items << " }";
                 return lay_os;
             }
             
-            inline const layout_of & __layout() const throw() { return *this; }
+            inline const layout_of & as_layout() const throw() { return *this; }
+            
+            //! MPI style splitting along dimension dim
+			inline layout split( size_t rank, size_t size, size_t dim = DIMENSIONS-1 ) const
+			{
+                assert( dim < DIMENSIONS );
+				const unit_t Lo = __coord(lower,dim);
+				const unit_t Hi = __coord(upper,dim);
+				coord        s_lo(lower);
+				coord        s_hi(upper);
+				unit_t      &lo = __coord(s_lo,dim);
+				unit_t      &hi = __coord(s_hi,dim);
+				layout::split(lo,hi,Lo,Hi,rank,size);
+				return layout_of<COORD>(s_lo,s_hi);
+			}
             
             
         private:
@@ -164,7 +194,7 @@ namespace yocto
                     }
                 }
             }
-
+            
             YOCTO_DISABLE_ASSIGN(layout_of);
         };
         
