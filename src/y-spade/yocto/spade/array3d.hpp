@@ -35,7 +35,7 @@ namespace yocto
                         new (slices+k) slice(slice_layout);
                         ++nslice;
                     }
-                    assert(this->width.z == size_t(nslice) );
+                    assert(size_t(this->width.z) == nslice );
                 }
                 catch(...)
                 {
