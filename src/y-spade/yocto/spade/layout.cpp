@@ -1,6 +1,9 @@
 #include "yocto/spade/layout.hpp"
 #include "yocto/code/swap.hpp"
 
+#include "yocto/exceptions.hpp"
+#include <cerrno>
+
 namespace yocto
 {
     
@@ -42,6 +45,46 @@ namespace yocto
             }
             return ans;
         }
+        
+        bool layout::is_inside( const void *coord_addr, const void *lower_addr, const void *upper_addr) const throw()
+        {
+            const unit_t *lower = (unit_t *)lower_addr;
+            const unit_t *upper = (unit_t *)upper_addr;
+            const unit_t *coord = (unit_t *)coord_addr;
+            for( size_t i=0; i < dimensions; ++i )
+            {
+                const unit_t coord_i = coord[i];
+                if( coord_i < lower[i] || coord_i > upper[i] )
+                    return false;
+            }
+            return true;
+        }
+        
+        void layout:: split(unit_t      &lo,
+                            unit_t      &hi,
+                            const unit_t Lo,
+                            const unit_t Hi,
+                            const size_t rank,
+                            const size_t size )
+		{
+			assert(Lo<=Hi);
+			assert(size>0);
+			assert(rank<size);
+			unit_t W = Hi - Lo + 1;
+			if( unit_t(size) > W )
+				throw libc::exception( EDOM, "layout_base::split(size=%u>#divisions=%u)", unsigned(size), unsigned(W));
+			unit_t todo = W/size; // first packet
+			lo = Lo;              // first offset
+			for( size_t i=1; i <= rank; ++i )
+			{
+				lo += todo;        // update offset
+				W  -= todo;        // decrease width
+				todo = W/(size-i); // next packet
+			}
+			hi = lo + (todo-1);
+			
+		}
+        
         
     }
     

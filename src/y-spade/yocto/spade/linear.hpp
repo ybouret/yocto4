@@ -1,0 +1,110 @@
+#ifndef YOCTO_SPADE_LINEAR_INCLUDED
+#define YOCTO_SPADE_LINEAR_INCLUDED 1
+
+
+#include "yocto/spade/types.hpp"
+
+namespace yocto
+{
+    
+    namespace spade
+    {
+        //! linear memory
+        class linear : public object
+        {
+        public:
+            const size_t bytes; //! #bytes once allocated
+            virtual ~linear() throw();
+            
+            //! link to data, dimension dependent
+			virtual void link( void *data ) throw() = 0;
+            
+            //! item size
+			virtual size_t item_size() const throw() = 0;
+
+            //! return the address @offset=source
+            virtual const void *address_of( size_t source ) const throw() = 0;
+            
+            //! copy object@offset=source in object@offset=target
+            virtual void local_copy( size_t target, size_t source ) throw() = 0;
+            
+            //! copy entry[source] into ptr
+			virtual void async_store( uint8_t * &ptr, size_t source ) const throw()     = 0;
+            
+			//! copy ptr intro entry[source]
+			virtual void async_query( const uint8_t * &ptr, size_t source ) throw()     = 0;
+                        
+        protected:
+            explicit linear( size_t num_bytes ) throw(); //!< num_bytes > 0
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(linear);
+        };
+        
+        
+        template <typename T,typename LAYOUT>
+        class linear_of : public linear, public LAYOUT
+        {
+        public:
+            YOCTO_ARGUMENTS_DECL_T;
+            typedef LAYOUT layout_type;
+			T             *entry; //!< must be linked to an array of LAYOUT::items
+            
+            //! default dtor
+			virtual ~linear_of() throw() {}
+                        
+            //! default ctor
+			explicit linear_of( const LAYOUT &L ) throw() :
+			LAYOUT( L ),
+            linear( this->items*sizeof(T) ),
+            entry( NULL )
+			{
+			}
+            
+			//! set every item to 0
+			inline void ldz() throw() { assert(entry); memset( entry, 0, bytes); }
+
+            //! set every item to value
+            inline void ld( param_type value )
+            {
+                assert(entry); for(size_t i=0;i<this->items;++i) entry[i] = value;
+            }
+            
+            //! virtual item_size()
+            virtual size_t item_size() const throw() { return sizeof(T); }
+            
+            //! virtual address_of
+            virtual const void *address_of( size_t source ) const throw() { assert(entry); assert(source<this->items); return &entry[source]; }
+            
+            //! virtual local_copy
+            virtual void local_copy( size_t target, size_t source ) throw()
+            {
+                assert(entry);assert(target<this->items);assert(source<this->items);
+                entry[target] = entry[source];
+            }
+            
+            //! virtual entry[source] into ptr
+			virtual void async_store( uint8_t * &ptr, size_t source ) const throw()
+            {
+                assert(ptr);assert(entry);assert(source<this->items);
+                const uint8_t *src = (const uint8_t *) &entry[source];
+                for(size_t i=sizeof(T);i>0;--i) *(ptr++) = *(src++);
+            }
+            
+            //! copy ptr intro entry[source]
+			virtual void async_query( const uint8_t * &ptr, size_t source ) throw()
+            {
+                assert(ptr);assert(entry);assert(source<this->items);
+                uint8_t *tgt = (uint8_t *) &entry[source];
+                for(size_t i=sizeof(T);i>0;--i) *(tgt++) = *(ptr++);
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(linear_of);
+        };
+        
+    }
+    
+}
+
+#endif

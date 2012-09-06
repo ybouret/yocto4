@@ -29,8 +29,7 @@ namespace yocto
         typedef sorted_vector<size_t>  sorted_offsets;
         
         
-        /** \brief list of offsets
-         */
+        //! sorted list of offsets
         class offsets_list : public sorted_offsets
         {
         public:
