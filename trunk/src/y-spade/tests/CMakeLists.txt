@@ -7,5 +7,5 @@ ENABLE_TESTING()
 ADD_TEST(Coord   test-spade coord)
 ADD_TEST(Layout  test-spade layout)
 ADD_TEST(Array1D test-spade array1D)
-
-#ADD_CUSTOM_TARGET(check-swamp COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-swamp)
+ADD_TEST(Array2D test-spade array2D)
+ADD_TEST(Array3D test-spade array3D)
