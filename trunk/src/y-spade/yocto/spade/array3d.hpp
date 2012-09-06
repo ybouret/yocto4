@@ -35,7 +35,7 @@ namespace yocto
                         new (slices+k) slice(slice_layout);
                         ++nslice;
                     }
-                    assert(this->width.z == nslice );
+                    assert(this->width.z == size_t(nslice) );
                 }
                 catch(...)
                 {
@@ -51,7 +51,33 @@ namespace yocto
             
             virtual void link( void *data ) throw()
             {
+                T *p = ( this->entry = static_cast<T*>(data) );
+                for( unit_t k=this->lower.z; k <= this->upper.z;++k, p += slice_layout.items )
+                {
+                    slices[k].link(p);
+                }
             }
+            
+            inline slice & operator[]( unit_t z ) throw()
+            { assert(this->entry); assert(z>=this->lower.z);assert(z<=this->upper.z); return slices[z]; }
+            inline const slice & operator[]( unit_t z ) const throw()
+            { assert(this->entry); assert(z>=this->lower.z);assert(z<=this->upper.z); return slices[z]; }
+            
+            inline static void *ctor( const layout_type &L, linear **handle )
+            {
+                assert(handle);
+                array_type  *arr = new array_type(L);
+                *handle   = arr;
+                return arr;
+            }
+            
+            inline static void dtor( void *p ) throw()
+            {
+                assert(p);
+                array_type *arr = static_cast<array_type *>(p);
+                delete arr;
+            }
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array3D);

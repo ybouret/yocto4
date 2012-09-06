@@ -33,6 +33,21 @@ namespace yocto
                 item        = this->entry - this->lower;
             }
             
+            inline static void *ctor( const layout_type &L, linear **handle )
+            {
+                assert(handle);
+                array_type  *arr = new array_type(L);
+                *handle   = arr;
+                return arr;
+            }
+            
+            inline static void dtor( void *p ) throw()
+            {
+                assert(p);
+                array_type *arr = static_cast<array_type *>(p);
+                delete arr;
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
             T *item; //!< offseted item
