@@ -23,13 +23,14 @@ namespace yocto
             
             virtual ~array1D() throw() {}
             
-            inline type       & operator[](size_t x) throw()       { assert(x>=this->lower);assert(x<=this->upper); return item[x]; }
-            inline const_type & operator[](size_t x) const throw() { assert(x>=this->lower);assert(x<=this->upper); return item[x]; }
+            inline type       & operator[](unit_t x) throw()       { assert(x>=this->lower);assert(x<=this->upper); return item[x]; }
+            inline const_type & operator[](unit_t x) const throw() { assert(x>=this->lower);assert(x<=this->upper); return item[x]; }
             
             virtual void link( void *data ) throw()
             {
                 assert(data);
-                item = static_cast<T*>(data) - this->lower;
+                this->entry = static_cast<T*>(data);
+                item        = this->entry - this->lower;
             }
             
         private:

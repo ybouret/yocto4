@@ -43,7 +43,7 @@ namespace yocto
         
         
         template <typename T,typename LAYOUT>
-        class linear_of : public linear, public LAYOUT
+        class linear_of :  public linear, public LAYOUT
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
@@ -55,7 +55,7 @@ namespace yocto
                         
             //! default ctor
 			explicit linear_of( const LAYOUT &L ) throw() :
-            linear( this->items*sizeof(T) ),
+            linear( L.items*sizeof(T) ),
             LAYOUT( L ),
             entry(0)
 			{
