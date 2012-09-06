@@ -3,6 +3,7 @@
 
 #include "yocto/type-spec.hpp"
 #include "yocto/string.hpp"
+#include "yocto/spade/linear.hpp"
 
 namespace yocto
 {

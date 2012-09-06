@@ -11,4 +11,7 @@ ADD_TEST(Array2D test-spade array2D)
 ADD_TEST(Array3D test-spade array3D)
 ADD_TEST(Arrays  test-spade arrays)
 ADD_TEST(Fields  test-spade fields)
+ADD_TEST(Data1D  test-spade data1D)
+ADD_TEST(Data2D  test-spade data2D)
+ADD_TEST(Data3D  test-spade data3D)
 
