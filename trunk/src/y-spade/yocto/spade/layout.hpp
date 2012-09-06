@@ -129,7 +129,7 @@ namespace yocto
             inline const layout_of & as_layout() const throw() { return *this; }
             
             //! MPI style splitting along dimension dim
-			inline layout split( size_t rank, size_t size, size_t dim = DIMENSIONS-1 ) const
+			inline layout_of split( size_t rank, size_t size, size_t dim = DIMENSIONS-1 ) const
 			{
                 assert( dim < DIMENSIONS );
 				const unit_t Lo = __coord(lower,dim);

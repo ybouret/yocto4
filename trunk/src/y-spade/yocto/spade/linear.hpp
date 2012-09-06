@@ -55,9 +55,9 @@ namespace yocto
                         
             //! default ctor
 			explicit linear_of( const LAYOUT &L ) throw() :
-			LAYOUT( L ),
             linear( this->items*sizeof(T) ),
-            entry( NULL )
+            LAYOUT( L ),
+            entry(0)
 			{
 			}
             
