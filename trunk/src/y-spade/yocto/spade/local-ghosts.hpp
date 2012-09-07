@@ -22,11 +22,13 @@ namespace yocto
             template <typename LAYOUT>
             inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
             {
+                //! create corresponding inner layout
                 {
                     const LAYOUT inside_sub = inside.inner_sublayout(L, num_ghosts);
                     inside.load_from(outline, inside_sub);
                 }
                 
+                //! create corresponding outer layout
                 {
                     const LAYOUT mirror_sub = mirror.outer_sublayout(L, num_ghosts);
                     mirror.load_from(outline,mirror_sub);
@@ -59,7 +61,6 @@ namespace yocto
                 assert(lower.inside.size() == upper.inside.size());
             }
             
-        protected:
             local_ghosts_pair lower;
             local_ghosts_pair upper;
             
