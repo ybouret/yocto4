@@ -2,7 +2,7 @@
 #define YOCTO_SPADE_LOCAL_GHOSTS_INCLUDED 1
 
 #include "yocto/spade/ghost.hpp"
-#include "yocto/spade/linear.hpp"
+#include "yocto/spade/linear-handles.hpp"
 
 namespace yocto
 {
@@ -43,14 +43,17 @@ namespace yocto
         
         
         //! lower and upper pair
-        class local_ghosts
+        class local_ghosts : public ghosts
         {
         public:
             explicit local_ghosts( size_t dim ) throw();
             virtual ~local_ghosts() throw();
             
             //! transfert one array
-            void transfert( linear &handle ) throw();
+            void transfer( linear &handle ) throw();
+            
+            //! transfert a set of handles
+            void transfer( linear_handles &handles ) throw();
             
             //! compute all offets
             template <typename LAYOUT>
@@ -59,6 +62,7 @@ namespace yocto
                 lower.setup<LAYOUT>( num_ghosts, outline, L );
                 upper.setup<LAYOUT>( num_ghosts, outline, L );
                 assert(lower.inside.size() == upper.inside.size());
+                (size_t&)num_offsets = lower.inside.size();
             }
             
             local_ghosts_pair lower;

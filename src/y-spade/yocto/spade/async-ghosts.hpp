@@ -2,14 +2,14 @@
 #define YOCTO_SPADE_ASYNC_GHOSTS_INCLUDED 1
 
 #include "yocto/spade/ghost.hpp"
-#include "yocto/spade/linear.hpp"
+#include "yocto/spade/linear-handles.hpp"
 
 namespace yocto
 {
     namespace spade
     {
         
-        class async_ghosts
+        class async_ghosts : public ghosts
         {
         public:
             //! set ghosts site
@@ -37,11 +37,37 @@ namespace yocto
                     const LAYOUT outer_sub = outer.outer_sublayout(L,num_ghosts);
                     outer.load_from(outline,outer_sub);
                 }
+                
+                assert( inner.size() == outer.size() );
+                (size_t&)num_offsets = inner.size();
             }
             
             uint8_t *ibuffer; //!< buffer to store inner ghost
             uint8_t *obuffer; //!< buffer to query outer ghost
             size_t   iobytes; //!< maximum buffers capacity
+            
+            void allocate_for( const linear_handles &handles );
+            
+            //! store inner handle content into ibuffer
+            /**
+             \return the number of stored bytes
+             */
+            size_t inner_store( const linear &handle ) throw();
+            
+            //! query outer handle content from obuffer
+            void outer_query( linear &handle ) throw();
+            
+            //! store inner handles content into ibuffer
+            /**
+             \return the number of stored bytes
+             */
+            size_t inner_store( const linear_handles &handles ) throw();
+           
+            //! query outer handle content from obuffer
+            void outer_query( linear_handles &handles ) throw();
+
+            
+            
             
         private:
             size_t iolen; //!< for memory allocation

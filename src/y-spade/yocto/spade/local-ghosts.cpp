@@ -5,7 +5,7 @@ namespace yocto
 {
     namespace spade
     {
-     
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -35,18 +35,46 @@ namespace yocto
         {
         }
         
-        void local_ghosts:: transfert( linear &handle ) throw()
+        void local_ghosts:: transfer( linear &handle ) throw()
         {
-            assert( lower.inside.size() == lower.mirror.size() );
-            assert( upper.inside.size() == lower.mirror.size() );
-            assert( lower.inside.size() == upper.inside.size() );
-            for( size_t i=lower.inside.size();i>0;--i)
+            assert( lower.inside.size() == num_offsets );
+            assert( lower.mirror.size() == num_offsets );
+            assert( upper.inside.size() == num_offsets );
+            assert( upper.mirror.size() == num_offsets );
+            for( size_t i=num_offsets;i>0;--i)
             {
                 handle.local_copy( lower.mirror[i], lower.inside[i]);
                 handle.local_copy( upper.mirror[i], upper.inside[i]);
             }
         }
+        
+        void local_ghosts:: transfer( linear_handles &handles ) throw()
+        {
+            assert( lower.inside.size() == num_offsets );
+            assert( lower.mirror.size() == num_offsets );
+            assert( upper.inside.size() == num_offsets );
+            assert( upper.mirror.size() == num_offsets );
 
+            
+            const size_t num_handles = handles.size();
+            for( size_t i=num_offsets;i>0;--i)
+            {
+                const size_t lower_mirror = lower.mirror[i];
+                const size_t lower_inside = lower.inside[i];
+                const size_t upper_mirror = upper.mirror[i];
+                const size_t upper_inside = upper.inside[i];
+                
+                for( size_t j=num_handles;j>0;--j)
+                {
+                    assert(handles[j]);
+                    linear &handle = *handles[j];
+                    handle.local_copy( lower_mirror, lower_inside);
+                    handle.local_copy( upper_mirror, upper_inside);
+                }
+            }
+        }
+        
+        
         
     }
     
