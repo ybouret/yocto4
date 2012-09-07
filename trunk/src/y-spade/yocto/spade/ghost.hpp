@@ -53,6 +53,7 @@ namespace yocto
                     case at_lower_y:
                     case at_lower_z:
                     {
+                        check(dim, __coord(L.width,dim), num_ghosts);
                         typename LAYOUT::coord lower = L.lower;
                         typename LAYOUT::coord upper = lower;
                         __coord(upper,dim) += num_ghosts-1;
@@ -111,7 +112,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
-            
+            static void check( size_t dim, unit_t w, size_t ng);
         };
         
         class ghosts : public object

@@ -18,6 +18,9 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
     std::cerr << "d1a.layout : " << d1a.as_layout() << std::endl;
     std::cerr << "d1a.outline: " << d1a.outline     << std::endl;
     
+    d1a.get_local(1).transfer( d1a.handles );
+    d1a.get_local(1).transfer( d1a["A1"].handle() );
+    
     ghosts_setup  G1b;
     G1b.set_async( ghost::at_lower_x, 2, 0);
     dataspace<layout1D> d1b( L1, F1, G1b);

@@ -14,6 +14,7 @@ namespace yocto
         {
         public:
             explicit linear_handles() throw();
+            explicit linear_handles(size_t);
             virtual ~linear_handles() throw();
             
             //! size of interleaved items

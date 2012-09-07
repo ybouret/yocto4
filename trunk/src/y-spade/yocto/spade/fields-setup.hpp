@@ -5,6 +5,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/memory/pooled.hpp"
 #include "yocto/spade/array-db.hpp"
+#include "yocto/spade/linear-handles.hpp"
 
 namespace yocto
 {
@@ -25,9 +26,10 @@ namespace yocto
             void append(const char                           *name,
                         const std::type_info                 &spec,
                         const typename field_type::array_ctor ctor,
-                        const typename field_type::array_dtor dtor)
+                        const typename field_type::array_dtor dtor,
+                        bool                                  async)
             {
-                const field_type f(name,spec,ctor,dtor);
+                const field_type f(name,spec,ctor,dtor,async);
                 for( size_t i=fields.size();i>0;--i)
                 {
                     if( f.name == fields[i].name )
@@ -42,8 +44,8 @@ namespace yocto
             //! release memory
             inline void   clear() throw() { fields.release(); }
             
-            //! create all fields with same layout into database
-            inline void create( const LAYOUT &L, array_db &db ) const
+            //! create all fields with same layout into database, register async handles
+            inline void create( const LAYOUT &L, array_db &db, linear_handles &handles) const
             {
                 for( size_t i=1; i <= fields.size(); ++i )
                 {
@@ -55,6 +57,10 @@ namespace yocto
                         varray::ptr vp( new varray(f.name, f.spec, addr, info, f.dtor) );
                         addr = 0;
                         db.insert(vp);
+                        if( f.async )
+                        {
+                            handles.push_back( info );
+                        }
                     }
                     catch(...)
                     {
@@ -69,7 +75,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(fields_setup);
         };
 
-#define Y_SPADE_FIELD(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), ARRAY::ctor, ARRAY::dtor); } while(false)
+#define Y_SPADE_FIELD(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), ARRAY::ctor, ARRAY::dtor, true); } while(false)
+#define Y_SPADE_LOCAL(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), ARRAY::ctor, ARRAY::dtor, false); } while(false)
         
     }
 }

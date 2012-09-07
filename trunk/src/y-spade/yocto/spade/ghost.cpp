@@ -1,5 +1,6 @@
 #include "yocto/spade/ghost.hpp"
 #include "yocto/error.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -86,6 +87,12 @@ namespace yocto
             return ghost::position(-1);
         }
      
+        void ghost::check( size_t dim, unit_t w, size_t ng)
+        {
+            if( w < ng )
+                throw exception("spade.ghost on %c: not enough width", char('x'+dim));
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // ghosts
