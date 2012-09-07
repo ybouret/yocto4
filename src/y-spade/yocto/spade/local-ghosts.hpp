@@ -3,6 +3,7 @@
 
 #include "yocto/spade/ghost.hpp"
 #include "yocto/spade/linear-handles.hpp"
+#include "yocto/shared-ptr.hpp"
 
 namespace yocto
 {
@@ -25,12 +26,14 @@ namespace yocto
                 //! create corresponding inner layout
                 {
                     const LAYOUT inside_sub = inside.inner_sublayout(L, num_ghosts);
+                    std::cerr << "\tinside_sub: " << inside_sub << std::endl;
                     inside.load_from(outline, inside_sub);
                 }
                 
                 //! create corresponding outer layout
                 {
                     const LAYOUT mirror_sub = mirror.outer_sublayout(L, num_ghosts);
+                    std::cerr << "\tmirror_sub: " << mirror_sub << std::endl;
                     mirror.load_from(outline,mirror_sub);
                 }
                 
@@ -46,6 +49,9 @@ namespace yocto
         class local_ghosts : public ghosts
         {
         public:
+            typedef shared_ptr<local_ghosts> ptr;
+
+            
             explicit local_ghosts( size_t dim ) throw();
             virtual ~local_ghosts() throw();
             
@@ -59,7 +65,10 @@ namespace yocto
             template <typename LAYOUT>
             inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
             {
+                std::cerr << "local lower:" << std::endl;
                 lower.setup<LAYOUT>( num_ghosts, outline, L );
+                
+                std::cerr << "local upper:" << std::endl;
                 upper.setup<LAYOUT>( num_ghosts, outline, L );
                 assert(lower.inside.size() == upper.inside.size());
                 (size_t&)num_offsets = lower.inside.size();

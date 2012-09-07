@@ -90,7 +90,7 @@ namespace yocto
                 {
                     assert(handles[k]);
                     handles[k]->async_store(p,j);
-                   assert(handles[k]);
+                    assert(handles[k]);
                 }
             }
             return n;
