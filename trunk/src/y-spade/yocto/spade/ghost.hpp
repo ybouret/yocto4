@@ -45,6 +45,7 @@ namespace yocto
             template <typename LAYOUT>
             inline LAYOUT inner_sublayout( const LAYOUT &L, size_t num_ghosts )
             {
+                assert(num_ghosts>0);
                 const size_t dim   = site>>1;
                 switch( site )
                 {
@@ -54,7 +55,7 @@ namespace yocto
                     {
                         typename LAYOUT::coord lower = L.lower;
                         typename LAYOUT::coord upper = lower;
-                        __coord(upper,dim) += num_ghosts;
+                        __coord(upper,dim) += num_ghosts-1;
                         return LAYOUT(lower,upper);
                     }
                     
@@ -64,7 +65,7 @@ namespace yocto
                     {
                         typename LAYOUT::coord upper = L.upper;
                         typename LAYOUT::coord lower = upper;
-                        __coord(upper,dim) -= num_ghosts;
+                        __coord(upper,dim) -= (num_ghosts-1);
                         return LAYOUT(lower,upper);
                     }
                 }
@@ -74,6 +75,7 @@ namespace yocto
             template <typename LAYOUT>
             inline LAYOUT outer_sublayout( const LAYOUT &L, size_t num_ghosts )
             {
+                assert(num_ghosts>0);
                 const size_t dim   = site>>1;
                 switch( site )
                 {

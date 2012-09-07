@@ -7,12 +7,13 @@ YOCTO_UNIT_TEST_IMPL(data1D)
 {
     const layout1D         L( RandCoord1D(), RandCoord1D() );
     fields_setup<layout1D> F(8);
-    
+    ghosts_setup           G;
+
     Y_SPADE_FIELD(F, "A", array1D<float> );
     Y_SPADE_FIELD(F, "B", array1D<int>   );
 
     
-    dataspace<layout1D> ds(L,F);
+    dataspace<layout1D> ds(L,F,G);
        
     F.clear();
     
@@ -33,12 +34,13 @@ YOCTO_UNIT_TEST_IMPL(data2D)
 {
     const layout2D         L( RandCoord2D(), RandCoord2D() );
     fields_setup<layout2D> F(8);
-    
+    ghosts_setup           G;
+
     Y_SPADE_FIELD(F, "A", array2D<float> );
     Y_SPADE_FIELD(F, "B", array2D<int>   );
     
     
-    dataspace<layout2D> ds(L,F);
+    dataspace<layout2D> ds(L,F,G);
     
     F.clear();
     
@@ -59,12 +61,13 @@ YOCTO_UNIT_TEST_IMPL(data3D)
 {
     const layout3D         L( RandCoord3D(), RandCoord3D() );
     fields_setup<layout3D> F(8);
-    
+    ghosts_setup           G;
+
     Y_SPADE_FIELD(F, "A", array3D<float> );
     Y_SPADE_FIELD(F, "B", array3D<int>   );
     
     
-    dataspace<layout3D> ds(L,F);
+    dataspace<layout3D> ds(L,F,G);
     
     F.clear();
     

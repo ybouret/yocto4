@@ -3,6 +3,7 @@
 
 #include "yocto/spade/ghost.hpp"
 #include "yocto/spade/linear-handles.hpp"
+#include "yocto/shared-ptr.hpp"
 
 namespace yocto
 {
@@ -12,6 +13,8 @@ namespace yocto
         class async_ghosts : public ghosts
         {
         public:
+            typedef shared_ptr<async_ghosts> ptr;
+            
             //! set ghosts site
             explicit async_ghosts( ghost::position pos ) throw();
             
@@ -26,16 +29,19 @@ namespace yocto
             template <typename LAYOUT>
             inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
             {
+                std::cerr << "async " << inner.position_name() << std::endl;
                 //! create corresponding inner layout
                 {
                     const LAYOUT inner_sub = inner.inner_sublayout(L, num_ghosts);
                     inner.load_from(outline, inner_sub);
+                    std::cerr << "\tinner_sub:" << inner_sub << std::endl;
                 }
                 
                 //! create corresponding outer layout
                 {
                     const LAYOUT outer_sub = outer.outer_sublayout(L,num_ghosts);
                     outer.load_from(outline,outer_sub);
+                    std::cerr << "\touter_sub:" << outer_sub << std::endl;
                 }
                 
                 assert( inner.size() == outer.size() );
