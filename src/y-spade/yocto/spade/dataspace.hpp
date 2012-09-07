@@ -19,16 +19,25 @@ namespace yocto
             typedef LAYOUT                layout_type;
             typedef fields_setup<LAYOUT>  fields_list;
             
-            virtual ~dataspace() throw() {}
             
-            const LAYOUT outline; //!< this layout + ghosts
+            const LAYOUT   outline;          //!< this layout + ghosts
+            linear_handles handles;          //!< from fields
+            const size_t   local_count;      //!< #local ghosts
+            const size_t   async_count;      //!< #async ghosts
+            const size_t   num_requests;     //!< #MPI request for data exchange
+            
+            virtual ~dataspace() throw() {}
             
             explicit dataspace(const LAYOUT       &L,
                                const fields_list  &F,
                                const ghosts_setup &G) :
             array_db( F.size() + LAYOUT::DIMENSIONS ),
             LAYOUT(L),
-            outline(L)
+            outline(L),
+            handles( F.size() ),
+            local_count(0),
+            async_count(0),
+            num_requests(0)
             {
                 //--------------------------------------------------------------
                 // recompute outline from ghosts
@@ -43,15 +52,35 @@ namespace yocto
                 //--------------------------------------------------------------
                 // create fields from outline
                 //--------------------------------------------------------------
-                F.create( outline, *this );
+                F.create( outline, *this, handles );
+                
+                //--------------------------------------------------------------
+                // and prepare ghosts memory
+                //--------------------------------------------------------------
+                for( size_t i=1;i<=async_count;++i)
+                {
+                    async_reg[i]->allocate_for( handles );
+                }
             }
-        
+            
+            inline local_ghosts & get_local( size_t index ) throw()
+            {
+                assert(index>0);assert(index<=local_count);
+                return *local_reg[index];
+            }
+            
+            inline async_ghosts & get_async(size_t index) throw()
+            {
+                assert(index>0);assert(index<=async_count);
+                return *async_reg[index];
+
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
-            vector<local_ghosts::ptr> local_ghosts_reg;
-            vector<async_ghosts::ptr> async_ghosts_reg;
-
+            vector<local_ghosts::ptr> local_reg;
+            vector<async_ghosts::ptr> async_reg;
+            
             //==================================================================
             // recompute outline from ghosts
             //==================================================================
@@ -61,8 +90,8 @@ namespace yocto
                 std::cerr << "recomputing outline" << std::endl;
                 typename LAYOUT::coord out_lower = outline.lower;
                 typename LAYOUT::coord out_upper = outline.upper;
-                size_t num_local = 0;
-                size_t num_async = 0;
+                size_t &num_local = (size_t&)local_count;
+                size_t &num_async = (size_t&)async_count;
                 
                 for( size_t dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
                 {
@@ -115,9 +144,13 @@ namespace yocto
                     //----------------------------------------------------------
                     //-- reserve memory
                     //----------------------------------------------------------
-                    local_ghosts_reg.reserve( num_local );
-                    async_ghosts_reg.reserve( num_async );
+                    local_reg.reserve( num_local );
+                    async_reg.reserve( num_async );
                     
+                    //----------------------------------------------------------
+                    //-- compute num_requests
+                    //----------------------------------------------------------
+                    (size_t&) num_requests = 2 * num_async;
                 }
                 
             }
@@ -141,10 +174,10 @@ namespace yocto
                             const local_ghosts::ptr lp( lg );
                             
                             lg->setup(g->count, outline, L);
-                            local_ghosts_reg.push_back(lp);
+                            local_reg.push_back(lp);
                         }
                     }
-
+                    
                     //----------------------------------------------------------
                     //-- create lower async ghost
                     //----------------------------------------------------------
@@ -157,10 +190,10 @@ namespace yocto
                             const async_ghosts::ptr ap(ag);
                             
                             ag->setup(g->count,outline,L);
-                            async_ghosts_reg.push_back(ap);
+                            async_reg.push_back(ap);
                         }
                     }
-
+                    
                     //----------------------------------------------------------
                     //-- create lower async ghost
                     //----------------------------------------------------------
@@ -173,13 +206,12 @@ namespace yocto
                             const async_ghosts::ptr ap(ag);
                             
                             ag->setup(g->count,outline,L);
-                            async_ghosts_reg.push_back(ap);
+                            async_reg.push_back(ap);
                         }
                     }
-
-                    
                 }
-                
+                assert( local_count == local_reg.size() );
+                assert( async_count == async_reg.size() );
             }
             
         };

@@ -21,15 +21,18 @@ namespace yocto
             const type_spec  spec;
             const array_ctor ctor;
             const array_dtor dtor;
-                     
+            const bool       async;
+            
             inline field_info(const char           *a_name,
                               const std::type_info &a_spec,
                               const array_ctor      a_ctor,
-                              const array_dtor      a_dtor) :
+                              const array_dtor      a_dtor,
+                              const bool            a_async) :
             name( a_name ),
             spec( a_spec ),
             ctor( a_ctor ),
-            dtor( a_dtor )
+            dtor( a_dtor ),
+            async(a_async)
             {
                 assert(ctor);assert(dtor);
             }
@@ -42,7 +45,8 @@ namespace yocto
             name(other.name),
             spec(other.spec),
             ctor(other.ctor),
-            dtor(other.dtor)
+            dtor(other.dtor),
+            async(other.async)
             {
             }
             

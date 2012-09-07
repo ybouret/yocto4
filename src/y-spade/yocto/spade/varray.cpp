@@ -39,5 +39,17 @@ namespace yocto
                 throw exception("spade.varray.spec=%s != %s", spec.name(), requested.name() );
         }
         
+        
+        linear & varray:: handle() throw()
+        {
+            assert(info);
+            return *info;
+        }
+        
+        const linear & varray:: handle() const throw()
+        {
+            assert(info);
+            return *info;
+        }
     }
 }

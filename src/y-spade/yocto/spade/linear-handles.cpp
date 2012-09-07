@@ -11,6 +11,11 @@ namespace yocto
         {
         }
         
+        linear_handles:: linear_handles(size_t n) :
+        vector<linear_ptr>(n,as_capacity)
+        {
+        }
+        
         linear_handles:: ~linear_handles() throw()
         {
         }
