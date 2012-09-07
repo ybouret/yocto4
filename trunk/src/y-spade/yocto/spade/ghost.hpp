@@ -112,7 +112,19 @@ namespace yocto
             
         };
         
-        
+        class ghosts : public object
+        {
+        public:
+            const size_t num_offsets; //!< to be set by setup
+            
+            virtual ~ghosts() throw();
+            
+        protected:
+            explicit ghosts() throw();
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts);
+        };
         
     }
 }

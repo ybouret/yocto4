@@ -85,6 +85,14 @@ namespace yocto
             critical_error(error_invalid_data, "invalid ghost::upper_position dimension index");
             return ghost::position(-1);
         }
+     
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // ghosts
+        //
+        ////////////////////////////////////////////////////////////////////////
+        ghosts:: ~ghosts() throw() {}
+        ghosts::  ghosts() throw() : num_offsets(0) {}
         
     }
     
