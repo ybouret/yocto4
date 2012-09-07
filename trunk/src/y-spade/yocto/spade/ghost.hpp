@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_GHOST_INCLUDED
 #define YOCTO_SPADE_GHOST_INCLUDED 1
 
-#include "yocto/spade/types.hpp"
+#include "yocto/spade/layout.hpp"
 
 namespace yocto
 {
@@ -9,7 +9,7 @@ namespace yocto
     {
         
         //! a ghost is a localized list of offsets...
-        class ghost
+        class ghost : public offsets_list
         {
         public:
             enum position
@@ -23,14 +23,13 @@ namespace yocto
             };
             
             const position site;    //!< ghost position
-            offsets_list   offsets; //!< initial empty list
             
             static const char     *get_position_name( ghost::position p ) throw();
             static ghost::position get_mirror_position( ghost::position p ) throw();
             static ghost::position get_lower_position( size_t dim );
             static ghost::position get_upper_position( size_t dim );
             
-            ~ghost() throw();
+            virtual ~ghost() throw();
             
                        
             //! ctor: set ghost position
@@ -42,11 +41,78 @@ namespace yocto
             //! get mirror position if needed
             ghost::position mirror_position() const throw();
 
+            //! build the corresponding inner sublayout for num_ghosts
+            template <typename LAYOUT>
+            inline LAYOUT inner_sublayout( const LAYOUT &L, size_t num_ghosts )
+            {
+                const size_t dim   = site>>1;
+                switch( site )
+                {
+                    case at_lower_x:
+                    case at_lower_y:
+                    case at_lower_z:
+                    {
+                        typename LAYOUT::coord lower = L.lower;
+                        typename LAYOUT::coord upper = lower;
+                        __coord(upper,dim) += num_ghosts;
+                        return LAYOUT(lower,upper);
+                    }
+                    
+                    case at_upper_x:
+                    case at_upper_y:
+                    case at_upper_z:
+                    {
+                        typename LAYOUT::coord upper = L.upper;
+                        typename LAYOUT::coord lower = upper;
+                        __coord(upper,dim) -= num_ghosts;
+                        return LAYOUT(lower,upper);
+                    }
+                }
+            }
+            
+            //! build the corrsponding outer sublayout for num_ghosts
+            template <typename LAYOUT>
+            inline LAYOUT outer_sublayout( const LAYOUT &L, size_t num_ghosts )
+            {
+                const size_t dim   = site>>1;
+                switch( site )
+                {
+                    case at_lower_x:
+                    case at_lower_y:
+                    case at_lower_z:
+                    {
+                        typename LAYOUT::coord lower = L.lower;
+                        typename LAYOUT::coord upper = lower;
+                        __coord(upper,dim) -= 1;
+                        __coord(lower,dim) -= num_ghosts;
+                        return LAYOUT(lower,upper);
+                    }
+                        
+                    case at_upper_x:
+                    case at_upper_y:
+                    case at_upper_z:
+                    {
+                        typename LAYOUT::coord upper = L.upper;
+                        typename LAYOUT::coord lower = upper;
+                        __coord(lower,dim) += 1;
+                        __coord(upper,dim) += num_ghosts;
+                        return LAYOUT(lower,upper);
+                    }
+                }
+            }
+
+            template <typename LAYOUT>
+            inline void load_from( const LAYOUT &outline, const LAYOUT &L )
+            {
+                outline.load_offsets(L,*this);
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
             
         };
+        
+        
         
     }
 }

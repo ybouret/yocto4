@@ -15,8 +15,8 @@ namespace yocto
         ghost:: ~ghost() throw() {}
         
         ghost:: ghost( ghost::position p ) throw() :
-        site( p ),
-        offsets()
+        offsets_list(),
+        site( p )
         {
         }
         
