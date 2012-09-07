@@ -1,5 +1,5 @@
-#ifndef YOCTO_DATASPACE_INCLUDED
-#define YOCTO_DATASPACE_INCLUDED 1
+#ifndef YOCTO_SPADE_DATASPACE_INCLUDED
+#define YOCTO_SPADE_DATASPACE_INCLUDED 1
 
 #include "yocto/spade/fields-setup.hpp"
 
@@ -8,6 +8,7 @@ namespace yocto
     namespace spade
     {
         
+        //! dataspace: original layout + ghosts
         template <typename LAYOUT>
         class dataspace : public array_db, public LAYOUT
         {

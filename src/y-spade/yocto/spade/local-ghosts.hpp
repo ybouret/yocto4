@@ -1,0 +1,73 @@
+#ifndef YOCTO_SPADE_LOCAL_GHOSTS_INCLUDED
+#define YOCTO_SPADE_LOCAL_GHOSTS_INCLUDED 1
+
+#include "yocto/spade/ghost.hpp"
+#include "yocto/spade/linear.hpp"
+
+namespace yocto
+{
+    namespace spade
+    {
+        
+        //! for PBC without parallelism
+        class local_ghosts_pair
+        {
+        public:
+            ghost inside; //!< inside, in layout
+            ghost mirror; //!< mirror, in outline
+            
+            local_ghosts_pair( ghost::position pos ) throw();
+            ~local_ghosts_pair() throw();
+            
+            template <typename LAYOUT>
+            inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
+            {
+                {
+                    const LAYOUT inside_sub = inside.inner_sublayout(L, num_ghosts);
+                    inside.load_from(outline, inside_sub);
+                }
+                
+                {
+                    const LAYOUT mirror_sub = mirror.outer_sublayout(L, num_ghosts);
+                    mirror.load_from(outline,mirror_sub);
+                }
+                
+                assert( inside.size() == mirror.size() );
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(local_ghosts_pair);
+        };
+        
+        
+        //! lower and upper pair
+        class local_ghosts
+        {
+        public:
+            explicit local_ghosts( size_t dim ) throw();
+            virtual ~local_ghosts() throw();
+            
+            //! transfert one array
+            void transfert( linear &handle ) throw();
+            
+            //! compute all offets
+            template <typename LAYOUT>
+            inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
+            {
+                lower.setup<LAYOUT>( num_ghosts, outline, L );
+                upper.setup<LAYOUT>( num_ghosts, outline, L );
+                assert(lower.inside.size() == upper.inside.size());
+            }
+            
+        protected:
+            local_ghosts_pair lower;
+            local_ghosts_pair upper;
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(local_ghosts);
+        };
+    }
+    
+}
+
+#endif
