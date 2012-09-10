@@ -5,6 +5,10 @@
 #include "yocto/spade/in2d.hpp"
 #include "yocto/spade/memory.hpp"
 
+#include "yocto/geom/color.hpp"
+#include "yocto/ios/ocstream.hpp"
+
+
 namespace yocto
 {
     namespace spade
@@ -19,7 +23,7 @@ namespace yocto
             typedef linear_of<T,layout2D>          linear_type;
             typedef layout2D                       layout_type;
             typedef array1D<T>                     row;
-
+            
             const layout1D   row_layout;
             
             explicit array2D( const layout_type &L ) throw() :
@@ -39,7 +43,7 @@ namespace yocto
                 rows += this->lower.y;
                 memory_release(rows, mrow);
             }
-
+            
             virtual void link( void *data ) throw()
             {
                 assert(data);
@@ -54,7 +58,7 @@ namespace yocto
             { assert(this->entry); assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
             inline const row  & operator[](unit_t y) const throw()
             { assert(this->entry); assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
-
+            
             inline static void *ctor( const layout_type &L, linear **handle )
             {
                 assert(handle);
@@ -69,13 +73,82 @@ namespace yocto
                 array_type *arr = static_cast<array_type *>(p);
                 delete arr;
             }
-
+            
+            //! save a raw ppm
+			void ppm(const string        &filename,
+					 const string        &comment,
+					 const layout2D      &area,
+					 double             (*vproc)( const T & ),
+					 const color::rgba32 *colors = NULL,
+					 double               vmin   = 0,
+					 double               vmax   = 1
+					 ) const
+            {
+                assert( vproc != NULL );
+                assert( this->has( area.lower ) );
+                assert( this->has( area.upper ) );
+                ios::ocstream fp( filename,false );
+                fp("P6\n");
+                
+                //-- comment
+                fp("#%s\n", &comment[0] );
+                
+                //-- size
+                fp("%u %u\n", unsigned(area.width.x), unsigned(area.width.y) );
+                
+                //-- #colors
+                fp("255\n");
+                
+                
+                //-- data
+                const bool default_ramp = (NULL == colors);
+                for( unit_t y = area.upper.y; y >= area.lower.y; --y )
+                {
+                    const row &r_y = (*this)[y];
+                    for( unit_t x = area.lower.x; x <= area.upper.x; ++x )
+                    {
+                        const double v = vproc( r_y[x] );
+                        if( default_ramp )
+                        {
+                            const color::rgba<double> c = color::rgba<double>::ramp( v, vmin, vmax );
+                            const uint8_t b[4] =  { uint8_t( 255 * c.r ), uint8_t( 255 * c.g ), uint8_t(255 * c.b ), 0 };
+                            fp.write( b[0] );
+                            fp.write( b[1] );
+                            fp.write( b[2] );
+                        }
+                        else
+                        {
+                            const color::rgba32 c = color::rgba32:: ramp( colors, v, vmin, vmax );
+                            fp.write( c.r );
+                            fp.write( c.g );
+                            fp.write( c.b );
+                        }
+                        
+                    }
+                }
+            }
+            
+            inline void ppm(const char          *filename,
+                            const char          *comment,
+                            const layout2D      &area,
+                            double             (*vproc)( const T & ),
+                            const color::rgba32 *colors = NULL,
+                            double               vmin   = 0,
+                            double               vmax   = 1
+                            ) const
+            {
+                const string fn(filename);
+                const string cm(comment);
+                this->ppm(fn,cm,area,vproc,colors,vmin,vmax);
+            }
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array2D);
             size_t    mrow;  //!< for allocation
             row      *rows;  //!< offseted rows
         };
+        
         
     }
 }
