@@ -52,7 +52,7 @@ namespace yocto
             typedef shared_ptr<local_ghosts> ptr;
 
             
-            explicit local_ghosts( size_t dim ) throw();
+            explicit local_ghosts( dimension_t dim ) throw();
             virtual ~local_ghosts() throw();
             
             //! transfert one array

@@ -59,6 +59,16 @@ namespace yocto
             inline const row  & operator[](unit_t y) const throw()
             { assert(this->entry); assert(y>=this->lower.y);assert(y<=this->upper.y); return rows[y]; }
             
+            inline type & operator[]( const coord2D &u ) throw()
+            {
+                return (*this)[u.y][u.x];
+            }
+            
+            inline const_type & operator[]( const coord2D &u ) const throw()
+            {
+                return (*this)[u.y][u.x];
+            }
+            
             inline static void *ctor( const layout_type &L, linear **handle )
             {
                 assert(handle);

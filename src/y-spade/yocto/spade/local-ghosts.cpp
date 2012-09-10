@@ -29,7 +29,7 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         local_ghosts:: ~local_ghosts() throw() {}
         
-        local_ghosts:: local_ghosts( size_t dim ) throw() :
+        local_ghosts:: local_ghosts( dimension_t dim ) throw() :
         lower( ghost::get_lower_position(dim) ),
         upper( ghost::get_upper_position(dim) )
         {

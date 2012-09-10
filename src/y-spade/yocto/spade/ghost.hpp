@@ -26,8 +26,8 @@ namespace yocto
             
             static const char     *get_position_name( ghost::position p ) throw();
             static ghost::position get_mirror_position( ghost::position p ) throw();
-            static ghost::position get_lower_position( size_t dim );
-            static ghost::position get_upper_position( size_t dim );
+            static ghost::position get_lower_position( dimension_t dim );
+            static ghost::position get_upper_position( dimension_t dim );
             
             virtual ~ghost() throw();
             
@@ -47,7 +47,7 @@ namespace yocto
             {
                 assert(num_ghosts>0);
                 const ptrdiff_t shift = num_ghosts - 1;
-                const size_t    dim   = site>>1;
+                const size_t    dim   = size_t(site)>>1;
                 switch( site )
                 {
                     case at_lower_x:
@@ -66,7 +66,7 @@ namespace yocto
                     case at_upper_z:
                     {
                         typename LAYOUT::coord upper = outline.upper;    // start from outline
-                        typename LAYOUT::coord lower = outline.lower;    // copy for lower
+                        typename LAYOUT::coord lower = outline.lower;    // start from outline
                         __coord(upper,dim) -= num_ghosts;                // translate to layout
                         __coord(lower,dim) = __coord(upper,dim) - shift; // adjust lower
                         return LAYOUT(lower,upper);

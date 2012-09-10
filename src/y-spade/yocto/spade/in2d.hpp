@@ -11,6 +11,9 @@ namespace yocto
     {
         typedef geom::v2d<ptrdiff_t>     coord2D;
         typedef layout_of<coord2D>       layout2D;
+        template <typename T> struct     vertex2D {
+            typedef geom::v2d<T> type;
+        };
     }
     
 }

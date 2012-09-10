@@ -24,4 +24,23 @@ inline coord3D RandCoord3D()
     return coord3D( RandCoord1D(), RandCoord1D(), RandCoord1D() );
 }
 
+template <typename T>
+T genv1()
+{
+    return 10 * ( alea<T>() - 0.5 );
+}
+
+template <typename T>
+geom::v2d<T> genv2()
+{
+    return geom::v2d<T>( genv1<T>(), genv1<T>() );
+}
+
+template <typename T>
+geom::v3d<T> genv3()
+{
+    return geom::v3d<T>( genv1<T>(), genv1<T>(), genv1<T>() );
+}
+
+
 #endif
