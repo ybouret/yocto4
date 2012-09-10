@@ -21,18 +21,18 @@ namespace yocto
             ~local_ghosts_pair() throw();
             
             template <typename LAYOUT>
-            inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
+            inline void setup( size_t num_ghosts, const LAYOUT &outline)
             {
                 //! create corresponding inner layout
                 {
-                    const LAYOUT inside_sub = inside.inner_sublayout(L, num_ghosts);
+                    const LAYOUT inside_sub = inside.inner_sublayout(outline, num_ghosts);
                     std::cerr << "\tinside_sub: " << inside_sub << std::endl;
                     inside.load_from(outline, inside_sub);
                 }
                 
                 //! create corresponding outer layout
                 {
-                    const LAYOUT mirror_sub = mirror.outer_sublayout(L, num_ghosts);
+                    const LAYOUT mirror_sub = mirror.outer_sublayout(outline, num_ghosts);
                     std::cerr << "\tmirror_sub: " << mirror_sub << std::endl;
                     mirror.load_from(outline,mirror_sub);
                 }
@@ -63,13 +63,13 @@ namespace yocto
             
             //! compute all offets
             template <typename LAYOUT>
-            inline void setup( size_t num_ghosts, const LAYOUT &outline, const LAYOUT &L)
+            inline void setup( size_t num_ghosts, const LAYOUT &outline)
             {
                 std::cerr << "local lower:" << std::endl;
-                lower.setup<LAYOUT>( num_ghosts, outline, L );
+                lower.setup<LAYOUT>( num_ghosts, outline);
                 
                 std::cerr << "local upper:" << std::endl;
-                upper.setup<LAYOUT>( num_ghosts, outline, L );
+                upper.setup<LAYOUT>( num_ghosts, outline);
                 assert(lower.inside.size() == upper.inside.size());
                 (size_t&)num_offsets = lower.inside.size();
             }
