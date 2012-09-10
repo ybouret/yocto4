@@ -115,6 +115,33 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
             A.ppm("a1.ppm","a",A,vprocf,NULL,vmin,vmax);
         }
         
+        ghosts_setup           G2b;
+        G2b.set_async( ghost::at_upper_y, 2, 0);
+        G2b.set_async( ghost::at_lower_y, 2, 0);
+        dataspace<layout2D> d2b( L2, F2, G2b);
+        std::cerr << "d2b.layout : " << d2b.as_layout() << std::endl;
+        std::cerr << "d2b.outline: " << d2b.outline     << std::endl;
+        {
+            array2D<float> &A = d2b["A2"].as< array2D<float> >();
+            for( unit_t y=A.lower.y; y <= A.upper.y; ++y )
+                for(unit_t x = A.lower.x; x <= A.upper.x; ++x )
+                    A[y][x] = y+x;
+            double vmin = A.get_min();
+            double vmax = A.get_max();
+            A.ppm("b0.ppm", "b0", A, vprocf,NULL,vmin,vmax);
+            const size_t num_io1 = d2b.get_async(1).inner_store( d2b.handles );
+            const size_t num_io2 = d2b.get_async(2).inner_store( d2b.handles );
+            std::cerr << "\tIOBYTES=" << num_io1 << "," << num_io2 << std::endl;
+            if( num_io1 != num_io2 )
+                throw exception("invalid 2D async");
+            memcpy( d2b.get_async(2).obuffer, d2b.get_async(1).ibuffer, num_io1);
+            memcpy( d2b.get_async(1).obuffer, d2b.get_async(2).obuffer, num_io2);
+            d2b.get_async(1).outer_query( d2b.handles );
+            d2b.get_async(2).outer_query( d2b.handles );
+            
+            A.ppm("b1.ppm", "b1", A, vprocf,NULL,vmin,vmax);
+        }
+        
     }
     
     
