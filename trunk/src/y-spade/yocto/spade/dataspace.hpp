@@ -37,7 +37,9 @@ namespace yocto
             handles( F.size() ),
             local_count(0),
             async_count(0),
-            num_requests(0)
+            num_requests(0),
+	    local_reg(),
+	    async_reg()
             {
                 //--------------------------------------------------------------
                 // recompute outline from ghosts
