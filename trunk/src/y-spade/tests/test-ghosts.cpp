@@ -2,6 +2,7 @@
 #include "./main.hpp"
 #include "yocto/spade/dataspace.hpp"
 #include "yocto/spade/array3d.hpp"
+#include <cstring>
 
 template <typename T>
 static inline void display_array( const array1D<T> &A )
@@ -35,25 +36,47 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         std::cerr << "d1a.outline: " << d1a.outline     << std::endl;
         
         
-        array1D<float> &A = d1a["A1"].as< array1D<float> >();
-        d1a.get_local(1).transfer( d1a.handles );
-        d1a.get_local(1).transfer( d1a["A1"].handle() );
-        
-        for(unit_t x = A.lower; x <= A.upper; ++x )
-            A[x] = x;
-        
-        std::cerr << "\t\tinitial: " << std::endl;
-        display_array(A);
-        d1a.get_local(1).transfer( d1a.handles );
-        std::cerr << "\t\tfinal  : " << std::endl;
-        display_array(A);
-        
+        {
+            array1D<float> &A = d1a["A1"].as< array1D<float> >();
+            d1a.get_local(1).transfer( d1a.handles );
+            d1a.get_local(1).transfer( d1a["A1"].handle() );
+            
+            for(unit_t x = A.lower; x <= A.upper; ++x )
+                A[x] = x;
+            
+            std::cerr << "\t\tlocal initial: " << std::endl;
+            display_array(A);
+            d1a.get_local(1).transfer( d1a.handles );
+            std::cerr << "\t\tlocal final  : " << std::endl;
+            display_array(A);
+        }
         
         ghosts_setup  G1b;
         G1b.set_async( ghost::at_lower_x, 2, 0);
         dataspace<layout1D> d1b( L1, F1, G1b);
         std::cerr << "d1b.layout : " << d1b.as_layout() << std::endl;
         std::cerr << "d1b.outline: " << d1b.outline     << std::endl;
+        
+        {
+            array1D<float> &A = d1b["A1"].as< array1D<float> >();
+            for(unit_t x = A.lower; x <= A.upper; ++x )
+                A[x] = x;
+            std::cerr << "\t\tasync initial: " << std::endl;
+            display_array(A);
+        
+            //! store data into ghost inner
+            const size_t num_io = d1b.get_async(1).inner_store( d1b.handles );
+            std::cerr << "\t#IOBYTES=" << num_io << std::endl;
+            
+            //! artificial copy
+            memcpy(d1b.get_async(1).obuffer,d1b.get_async(1).ibuffer,num_io);
+            
+            //! query data from the ghost outer
+            d1b.get_async(1).outer_query( d1b.handles );
+            
+            std::cerr << "\t\tasync final  : " << std::endl;
+            display_array(A);
+        }
     }
     
     std::cerr << std::endl;

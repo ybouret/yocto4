@@ -49,16 +49,15 @@ namespace yocto
         size_t async_ghosts:: inner_store( const linear &handle ) throw()
         {
             assert(num_offsets>0);
-            
-            const size_t n = handle.item_size() * num_offsets;
-            assert(n<=iobytes);
+            assert(handle.item_size() * num_offsets<=iobytes);
             uint8_t    *p=ibuffer;
             for( size_t i=num_offsets;i>0;--i)
             {
                 handle.async_store(p,inner[i]);
                 assert(p<=ibuffer+iobytes);
             }
-            return n;
+            assert( static_cast<size_t>(p-ibuffer) == handle.item_size() * num_offsets );
+            return static_cast<size_t>(p-ibuffer);
         }
         
         void async_ghosts:: outer_query( linear &handle ) throw()
@@ -69,7 +68,7 @@ namespace yocto
             for( size_t i=num_offsets;i>0;--i)
             {
                 handle.async_query(p,outer[i]);
-                assert(p<=ibuffer+iobytes);
+                assert(p<=obuffer+iobytes);
             }
             
         }
@@ -77,8 +76,7 @@ namespace yocto
         size_t async_ghosts:: inner_store( const linear_handles &handles ) throw()
         {
             assert(num_offsets>0);
-            const size_t n = handles.interleaved() * num_offsets;
-            assert(n<=iobytes);
+            assert(handles.interleaved() * num_offsets<=iobytes);
             
             const size_t num_handles = handles.size();
             uint8_t     *p           = ibuffer;
@@ -93,7 +91,8 @@ namespace yocto
                     assert(handles[k]);
                 }
             }
-            return n;
+            assert( static_cast<size_t>(p-ibuffer)== handles.interleaved() * num_offsets);
+            return static_cast<size_t>(p-ibuffer);
         }
         
         
@@ -105,7 +104,7 @@ namespace yocto
             const uint8_t *p           = obuffer;
             for( size_t i=num_offsets;i>0;--i)
             {
-                const size_t j = inner[i];
+                const size_t j = outer[i];
                 for( size_t k=num_handles;k>0;--k)
                 {
                     assert(handles[k]);
