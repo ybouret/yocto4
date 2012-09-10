@@ -3,6 +3,16 @@
 #include "yocto/spade/dataspace.hpp"
 #include "yocto/spade/array3d.hpp"
 
+template <typename T>
+static inline void display_array( const array1D<T> &A )
+{
+    for(unit_t x=A.lower;x<=A.upper;++x)
+    {
+        std::cerr << A[x] << " ";
+    }
+    std::cerr << std::endl;
+}
+
 YOCTO_UNIT_TEST_IMPL(ghosts)
 {
     
@@ -24,8 +34,20 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         std::cerr << "d1a.layout : " << d1a.as_layout() << std::endl;
         std::cerr << "d1a.outline: " << d1a.outline     << std::endl;
         
+        
+        array1D<float> &A = d1a["A1"].as< array1D<float> >();
         d1a.get_local(1).transfer( d1a.handles );
         d1a.get_local(1).transfer( d1a["A1"].handle() );
+        
+        for(unit_t x = A.lower; x <= A.upper; ++x )
+            A[x] = x;
+        
+        std::cerr << "\t\tinitial: " << std::endl;
+        display_array(A);
+        d1a.get_local(1).transfer( d1a.handles );
+        std::cerr << "\t\tfinal  : " << std::endl;
+        display_array(A);
+        
         
         ghosts_setup  G1b;
         G1b.set_async( ghost::at_lower_x, 2, 0);
@@ -34,9 +56,10 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         std::cerr << "d1b.outline: " << d1b.outline     << std::endl;
     }
     
+    std::cerr << std::endl;
     ////////////////////////////////////////////////////////////////////////////
     //
-    // 1D
+    // 2D
     //
     ////////////////////////////////////////////////////////////////////////////
     {
