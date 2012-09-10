@@ -99,6 +99,33 @@ namespace yocto
                 for(size_t i=sizeof(T);i>0;--i) *(tgt++) = *(ptr++);
             }
             
+            //! linear get min
+            inline T get_min() const
+            {
+                assert(entry);
+                T ans( entry[0] );
+                for( size_t i=1; i < this->items;++i)
+                {
+                    const T tmp( entry[i] );
+                    if( tmp < ans ) ans = tmp;
+                }
+                return ans;
+            }
+            
+            //! linear get max
+            inline T get_max() const
+            {
+                assert(entry);
+                T ans( entry[0] );
+                for( size_t i=1; i < this->items;++i)
+                {
+                    const T tmp( entry[i] );
+                    if( tmp > ans ) ans = tmp;
+                }
+                return ans;
+            }
+
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear_of);
         };

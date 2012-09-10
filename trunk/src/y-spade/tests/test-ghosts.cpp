@@ -14,6 +14,12 @@ static inline void display_array( const array1D<T> &A )
     std::cerr << std::endl;
 }
 
+static double vprocf( const float &x )
+{
+ 
+    return x;
+}
+
 YOCTO_UNIT_TEST_IMPL(ghosts)
 {
     
@@ -63,7 +69,7 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
                 A[x] = x;
             std::cerr << "\t\tasync initial: " << std::endl;
             display_array(A);
-        
+            
             //! store data into ghost inner
             const size_t num_io = d1b.get_async(1).inner_store( d1b.handles );
             std::cerr << "\t#IOBYTES=" << num_io << std::endl;
@@ -97,6 +103,18 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         dataspace<layout2D> d2a( L2, F2, G2a);
         std::cerr << "d2a.layout : " << d2a.as_layout() << std::endl;
         std::cerr << "d2a.outline: " << d2a.outline     << std::endl;
+        {
+            array2D<float> &A = d2a["A2"].as< array2D<float> >();
+            for( unit_t y=A.lower.y; y <= A.upper.y; ++y )
+                for(unit_t x = A.lower.x; x <= A.upper.x; ++x )
+                    A[y][x] = y+x;
+            double vmin = A.get_min();
+            double vmax = A.get_max();
+            A.ppm("a0.ppm", "a0", A, vprocf,NULL,vmin,vmax);
+            d2a.get_local(1).transfer( d2a.handles );
+            A.ppm("a1.ppm","a",A,vprocf,NULL,vmin,vmax);
+        }
+        
     }
     
     
