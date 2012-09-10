@@ -40,7 +40,7 @@ namespace yocto
                 const size_t buff_size = n << 1;
                 iolen   = buff_size;
                 ibuffer = memory_acquire<uint8_t>(iolen);
-                iobytes = buff_size;
+                iobytes = n;
                 obuffer = ibuffer + iobytes;
             }
         }
