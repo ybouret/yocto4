@@ -27,9 +27,10 @@ namespace yocto
         {
         }
         
-        void ghosts_setup:: set_local( size_t dim, char D, size_t num_ghosts )
+        void ghosts_setup:: set_local( dimension_t dim, size_t num_ghosts )
         {
-            assert(dim<3);
+            const char D = char('x'+dim);
+            assert(size_t(dim)<3);
             if( local[dim].active)
                 throw exception("ghost_setup.set_local_%c: already set",D);
             
@@ -42,6 +43,7 @@ namespace yocto
             
         }
         
+#if 0
         void ghosts_setup:: set_local_x( size_t num_ghosts )
         {
             set_local(0,'x',num_ghosts);
@@ -57,6 +59,7 @@ namespace yocto
         {
             set_local(2,'z',num_ghosts);
         }
+#endif
         
         void ghosts_setup:: set_async( ghost::position pos, size_t num_ghosts, int peer )
         {
