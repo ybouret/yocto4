@@ -14,4 +14,6 @@ ADD_TEST(Fields  test-spade fields)
 ADD_TEST(Data1D  test-spade data1D)
 ADD_TEST(Data2D  test-spade data2D)
 ADD_TEST(Data3D  test-spade data3D)
+ADD_TEST(Ghosts  test-spade data3D)
+ADD_TEST(Mesh    test-spade mesh)
 
