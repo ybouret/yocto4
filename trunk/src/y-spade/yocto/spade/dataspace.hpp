@@ -104,6 +104,7 @@ namespace yocto
                         const ghosts_info *g = G.get_local() + dim;
                         if( g->active && g->count>0 )
                         {
+                            ghost::check(dim, __coord(this->width,dim), g->count);
                             __coord(out_lower,dim) -= g->count;
                             __coord(out_upper,dim) += g->count;
                             ++num_local;
@@ -118,6 +119,7 @@ namespace yocto
                         const ghosts_info *g = G.get_async() + at_lower;
                         if( g->active && g->count>0)
                         {
+                            ghost::check(dim, __coord(this->width,dim), g->count);
                             __coord(out_lower,dim) -= g->count;
                             ++num_async;
                         }
@@ -131,6 +133,7 @@ namespace yocto
                         const ghosts_info *g = G.get_async() + at_upper;
                         if( g->active && g->count>0)
                         {
+                            ghost::check(dim, __coord(this->width,dim), g->count);
                             __coord(out_upper,dim) += g->count;
                             ++num_async;
                         }

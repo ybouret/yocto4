@@ -115,9 +115,10 @@ namespace yocto
                 outline.load_offsets(sub,*this);
             }
             
+            static void check( size_t dim, unit_t w, size_t ng);
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
-            static void check( size_t dim, unit_t w, size_t ng);
         };
         
         class ghosts : public object
