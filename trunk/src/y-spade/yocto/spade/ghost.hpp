@@ -31,7 +31,7 @@ namespace yocto
             
             virtual ~ghost() throw();
             
-                       
+            
             //! ctor: set ghost position
             explicit ghost( ghost::position p ) throw();
             
@@ -40,56 +40,24 @@ namespace yocto
             
             //! get mirror position if needed
             ghost::position mirror_position() const throw();
-
+            
             //! build the corresponding inner sublayout for num_ghosts
             template <typename LAYOUT>
-            inline LAYOUT inner_sublayout( const LAYOUT &L, size_t num_ghosts )
+            inline LAYOUT inner_sublayout( const LAYOUT &outline, size_t num_ghosts )
             {
                 assert(num_ghosts>0);
-                const size_t dim   = site>>1;
+                const ptrdiff_t shift = num_ghosts - 1;
+                const size_t    dim   = site>>1;
                 switch( site )
                 {
                     case at_lower_x:
                     case at_lower_y:
                     case at_lower_z:
                     {
-                        check(dim, __coord(L.width,dim), num_ghosts);
-                        typename LAYOUT::coord lower = L.lower;
-                        typename LAYOUT::coord upper = lower;
-                        __coord(upper,dim) += num_ghosts-1;
-                        return LAYOUT(lower,upper);
-                    }
-                    
-                    case at_upper_x:
-                    case at_upper_y:
-                    case at_upper_z:
-                    {
-                        typename LAYOUT::coord upper = L.upper;
-                        typename LAYOUT::coord lower = upper;
-                        __coord(upper,dim) -= (num_ghosts-1);
-                        return LAYOUT(lower,upper);
-                    }
-                }
-		// never get there
-		return L;
-            }
-            
-            //! build the corrsponding outer sublayout for num_ghosts
-            template <typename LAYOUT>
-            inline LAYOUT outer_sublayout( const LAYOUT &L, size_t num_ghosts )
-            {
-                assert(num_ghosts>0);
-                const size_t dim   = site>>1;
-                switch( site )
-                {
-                    case at_lower_x:
-                    case at_lower_y:
-                    case at_lower_z:
-                    {
-                        typename LAYOUT::coord lower = L.lower;
-                        typename LAYOUT::coord upper = lower;
-                        __coord(upper,dim) -= 1;
-                        __coord(lower,dim) -= num_ghosts;
+                        typename LAYOUT::coord lower = outline.lower;    // start from outline
+                        typename LAYOUT::coord upper = outline.upper;    // start from outline
+                        __coord(lower,dim) += num_ghosts;                // translate to layout
+                        __coord(upper,dim) = __coord(lower,dim) + shift; // adjust upper
                         return LAYOUT(lower,upper);
                     }
                         
@@ -97,21 +65,54 @@ namespace yocto
                     case at_upper_y:
                     case at_upper_z:
                     {
-                        typename LAYOUT::coord upper = L.upper;
-                        typename LAYOUT::coord lower = upper;
-                        __coord(lower,dim) += 1;
-                        __coord(upper,dim) += num_ghosts;
+                        typename LAYOUT::coord upper = outline.upper;    // start from outline
+                        typename LAYOUT::coord lower = outline.lower;    // copy for lower
+                        __coord(upper,dim) -= num_ghosts;                // translate to layout
+                        __coord(lower,dim) = __coord(upper,dim) - shift; // adjust lower
                         return LAYOUT(lower,upper);
                     }
                 }
-		// never get there
-		return L;
+                // never get there
+                return outline;
             }
-
+            
+            //! build the corrsponding outer sublayout for num_ghosts
             template <typename LAYOUT>
-            inline void load_from( const LAYOUT &outline, const LAYOUT &L )
+            inline LAYOUT outer_sublayout( const LAYOUT &outline, size_t num_ghosts )
             {
-                outline.load_offsets(L,*this);
+                assert(num_ghosts>0);
+                const size_t    dim   = site>>1;
+                const ptrdiff_t shift = num_ghosts - 1;
+                switch( site )
+                {
+                    case at_lower_x:
+                    case at_lower_y:
+                    case at_lower_z:
+                    {
+                        typename LAYOUT::coord lower = outline.lower;
+                        typename LAYOUT::coord upper = outline.upper;
+                        __coord(upper,dim) = __coord(lower,dim) + shift;
+                        return LAYOUT(lower,upper);
+                    }
+                        
+                    case at_upper_x:
+                    case at_upper_y:
+                    case at_upper_z:
+                    {
+                        typename LAYOUT::coord upper = outline.upper;
+                        typename LAYOUT::coord lower = outline.lower;
+                        __coord(lower,dim) = __coord(upper,dim) - shift;
+                        return LAYOUT(lower,upper);
+                    }
+                }
+                // never get there
+                return outline;
+            }
+            
+            template <typename LAYOUT>
+            inline void load_from( const LAYOUT &outline, const LAYOUT &sub )
+            {
+                outline.load_offsets(sub,*this);
             }
             
         private:

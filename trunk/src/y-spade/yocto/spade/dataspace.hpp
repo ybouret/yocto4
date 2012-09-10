@@ -38,8 +38,8 @@ namespace yocto
             local_count(0),
             async_count(0),
             num_requests(0),
-	    local_reg(),
-	    async_reg()
+            local_reg(),
+            async_reg()
             {
                 //--------------------------------------------------------------
                 // recompute outline from ghosts
@@ -75,7 +75,7 @@ namespace yocto
             {
                 assert(index>0);assert(index<=async_count);
                 return *async_reg[index];
-
+                
             }
             
         private:
@@ -158,11 +158,11 @@ namespace yocto
             }
             
             //==================================================================
-            // build the ghosts
+            // build the ghosts from the outline and the setup
             //==================================================================
             void build_ghosts(const ghosts_setup &G)
             {
-                const LAYOUT &L = this->as_layout();
+                //const LAYOUT &L = this->as_layout();
                 for( size_t dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
                 {
                     //----------------------------------------------------------
@@ -175,7 +175,7 @@ namespace yocto
                             local_ghosts           *lg = new local_ghosts(dim);
                             const local_ghosts::ptr lp( lg );
                             
-                            lg->setup(g->count, outline, L);
+                            lg->setup(g->count, outline);
                             local_reg.push_back(lp);
                         }
                     }
@@ -191,7 +191,7 @@ namespace yocto
                             async_ghosts           *ag = new async_ghosts( ghost::position(at_lower) );
                             const async_ghosts::ptr ap(ag);
                             
-                            ag->setup(g->count,outline,L);
+                            ag->setup(g->count,outline);
                             async_reg.push_back(ap);
                         }
                     }
@@ -207,7 +207,7 @@ namespace yocto
                             async_ghosts           *ag = new async_ghosts( ghost::position(at_upper) );
                             const async_ghosts::ptr ap(ag);
                             
-                            ag->setup(g->count,outline,L);
+                            ag->setup(g->count,outline);
                             async_reg.push_back(ap);
                         }
                     }
