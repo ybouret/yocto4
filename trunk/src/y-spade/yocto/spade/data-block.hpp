@@ -19,6 +19,24 @@ namespace yocto
             size_t size; //!< l.bytes
             void  *data; //!< >= size
         };
+        
+        template <typename ARRAY>
+        class standalone : public ARRAY
+        {
+        public:
+            explicit standalone( const typename ARRAY::layout_type &L ) :
+            ARRAY(L),
+            data(*this)
+            {
+            }
+            
+            virtual ~standalone();
+            
+        private:
+            const data_block data;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(standalone);
+        };
+        
     }
     
 }
