@@ -89,7 +89,7 @@ namespace yocto
      
         void ghost::check( size_t dim, unit_t w, size_t ng)
         {
-            if( w < ng )
+            if( size_t(w) < ng )
                 throw exception("spade.ghost on %c: not enough width", char('x'+dim));
         }
         

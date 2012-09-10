@@ -70,6 +70,8 @@ namespace yocto
                         return LAYOUT(lower,upper);
                     }
                 }
+		// never get there
+		return L;
             }
             
             //! build the corrsponding outer sublayout for num_ghosts
@@ -102,6 +104,8 @@ namespace yocto
                         return LAYOUT(lower,upper);
                     }
                 }
+		// never get there
+		return L;
             }
 
             template <typename LAYOUT>
