@@ -63,6 +63,17 @@ namespace yocto
             inline const slice & operator[]( unit_t z ) const throw()
             { assert(this->entry); assert(z>=this->lower.z);assert(z<=this->upper.z); return slices[z]; }
             
+            inline type & operator[]( const coord3D &u ) throw()
+            {
+                return (*this)[u.z][u.y][u.x];
+            }
+            
+            inline const_type & operator[]( const coord3D &u ) const throw()
+            {
+                return (*this)[u.z][u.y][u.x];
+            }
+
+            
             inline static void *ctor( const layout_type &L, linear **handle )
             {
                 assert(handle);

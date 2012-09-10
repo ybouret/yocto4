@@ -16,4 +16,9 @@ ADD_TEST(Data2D  test-spade data2D)
 ADD_TEST(Data3D  test-spade data3D)
 ADD_TEST(Ghosts  test-spade data3D)
 ADD_TEST(Mesh    test-spade mesh)
+ADD_TEST(Region  test-spade region)
+ADD_TEST(Work1D  test-spade work1D)
+ADD_TEST(Work1D  test-spade work2D)
+ADD_TEST(Work1D  test-spade work3D)
+
 

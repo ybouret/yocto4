@@ -9,7 +9,7 @@ namespace yocto
     namespace spade
     {
         //! rectilinear mesh
-        template <typename T, typename LAYOUT>
+        template <typename LAYOUT, typename T>
         class rmesh : public quadmesh
         {
         public:

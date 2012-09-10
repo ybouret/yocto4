@@ -11,6 +11,10 @@ namespace yocto
     {
         typedef geom::v3d<ptrdiff_t>     coord3D;
         typedef layout_of<coord3D>       layout3D;
+        template <typename T> struct     vertex3D {
+            typedef geom::v3d<T> type;
+        };
+
     }
     
 }

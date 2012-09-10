@@ -139,24 +139,25 @@ namespace yocto
                         }
                     }
                     
-                    //----------------------------------------------------------
-                    //-- recompute outline
-                    //----------------------------------------------------------
-                    new ((void*)&outline) LAYOUT(out_lower,out_upper);
-                    std::cerr << "layout: " << this->as_layout() << std::endl;
-                    std::cerr << "outline:" << outline           << std::endl;
-                    
-                    //----------------------------------------------------------
-                    //-- reserve memory
-                    //----------------------------------------------------------
-                    local_reg.reserve( num_local );
-                    async_reg.reserve( num_async );
-                    
-                    //----------------------------------------------------------
-                    //-- compute num_requests
-                    //----------------------------------------------------------
-                    (size_t&) num_requests = 2 * num_async;
                 }
+                //--------------------------------------------------------------
+                //-- recompute outline
+                //--------------------------------------------------------------
+                new ((void*)&outline) LAYOUT(out_lower,out_upper);
+                std::cerr << "layout: " << this->as_layout() << std::endl;
+                std::cerr << "outline:" << outline           << std::endl;
+                
+                //--------------------------------------------------------------
+                //-- reserve memory
+                //--------------------------------------------------------------
+                local_reg.reserve( num_local );
+                async_reg.reserve( num_async );
+                
+                //----------------------------------------------------------
+                //-- compute num_requests
+                //----------------------------------------------------------
+                (size_t&) num_requests = 2 * num_async;
+                
                 
             }
             
@@ -175,7 +176,7 @@ namespace yocto
                         const ghosts_info *g = G.get_local() + dim;
                         if( g->active && g->count>0 )
                         {
-                            local_ghosts           *lg = new local_ghosts(dim);
+                            local_ghosts           *lg = new local_ghosts( dimension_t(dim) );
                             const local_ghosts::ptr lp( lg );
                             
                             lg->setup(g->count, outline);

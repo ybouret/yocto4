@@ -43,24 +43,6 @@ namespace yocto
             
         }
         
-#if 0
-        void ghosts_setup:: set_local_x( size_t num_ghosts )
-        {
-            set_local(0,'x',num_ghosts);
-        }
-        
-        
-        void ghosts_setup:: set_local_y( size_t num_ghosts )
-        {
-            set_local(1,'y',num_ghosts);
-        }
-
-        void ghosts_setup:: set_local_z( size_t num_ghosts )
-        {
-            set_local(2,'z',num_ghosts);
-        }
-#endif
-        
         void ghosts_setup:: set_async( ghost::position pos, size_t num_ghosts, int peer )
         {
             const size_t dim = pos >> 1;
