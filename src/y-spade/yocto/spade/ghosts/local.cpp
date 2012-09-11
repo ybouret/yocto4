@@ -1,4 +1,4 @@
-#include "yocto/spade/local-ghosts.hpp"
+#include "yocto/spade/ghosts/local.hpp"
 
 
 namespace yocto

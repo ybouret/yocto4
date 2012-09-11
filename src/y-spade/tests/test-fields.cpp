@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/spade/fields-setup.hpp"
+#include "yocto/spade/fields/setup.hpp"
 
 #include "./main.hpp"
 #include "yocto/spade/array3d.hpp"

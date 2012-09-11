@@ -1,4 +1,4 @@
-#include "yocto/spade/ghost.hpp"
+#include "yocto/spade/ghosts/ghost.hpp"
 #include "yocto/error.hpp"
 #include "yocto/exception.hpp"
 
