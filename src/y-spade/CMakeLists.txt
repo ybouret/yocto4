@@ -18,9 +18,14 @@ SET( ghosts_srcs ${ghosts_decl} ${ghosts_impl}  )
 INSTALL( FILES ${ghosts_decl} DESTINATION include/yocto/spade/ghosts )
 SOURCE_GROUP( spade/ghosts FILES ${ghosts_srcs} )
 
+FILE( GLOB mpi_decl yocto/spade/mpi/*.hpp )
+SET( mpi_srcs ${mpi_decl} )
+INSTALL( FILES ${mpi_decl} DESTINATION include/yocto/spade/mpi )
+SOURCE_GROUP( spade/mpi FILES ${mpi_srcs} )
+
 INCLUDE_DIRECTORIES( . ../y-main )
 
-ADD_LIBRARY( y-spade STATIC ${srcs} ${fields_srcs} ${ghosts_srcs} )
+ADD_LIBRARY( y-spade STATIC ${srcs} ${fields_srcs} ${ghosts_srcs} ${mpi_srcs} )
 INSTALL( TARGETS y-spade ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
