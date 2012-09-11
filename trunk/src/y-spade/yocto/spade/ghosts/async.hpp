@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_ASYNC_GHOSTS_INCLUDED
 #define YOCTO_SPADE_ASYNC_GHOSTS_INCLUDED 1
 
-#include "yocto/spade/ghost.hpp"
+#include "yocto/spade/ghosts/ghost.hpp"
 #include "yocto/spade/linear-handles.hpp"
 #include "yocto/shared-ptr.hpp"
 

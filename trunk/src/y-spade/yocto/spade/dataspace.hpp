@@ -2,9 +2,9 @@
 #define YOCTO_SPADE_DATASPACE_INCLUDED 1
 
 #include "yocto/spade/fields/setup.hpp"
-#include "yocto/spade/ghosts-setup.hpp"
-#include "yocto/spade/local-ghosts.hpp"
-#include "yocto/spade/async-ghosts.hpp"
+#include "yocto/spade/ghosts/setup.hpp"
+#include "yocto/spade/ghosts/local.hpp"
+#include "yocto/spade/ghosts/async.hpp"
 
 namespace yocto
 {

@@ -1,4 +1,4 @@
-#include "yocto/spade/async-ghosts.hpp"
+#include "yocto/spade/ghosts/async.hpp"
 #include "yocto/spade/memory.hpp"
 
 namespace yocto

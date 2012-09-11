@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_GHOSTS_SETUP_INCLUDED
 #define YOCTO_SPADE_GHOSTS_SETUP_INCLUDED
 
-#include "yocto/spade/ghost.hpp"
+#include "yocto/spade/ghosts/ghost.hpp"
 
 namespace yocto
 {
