@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_FIELDS_SETUP_INCLUDED
 #define YOCTO_SPADE_FIELDS_SETUP_INCLUDED 1
 
-#include "yocto/spade/field-info.hpp"
+#include "yocto/spade/fields/info.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/memory/pooled.hpp"
 #include "yocto/spade/array-db.hpp"
