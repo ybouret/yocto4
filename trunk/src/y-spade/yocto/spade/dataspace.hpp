@@ -195,6 +195,7 @@ namespace yocto
                             async_ghosts           *ag = new async_ghosts( ghost::position(at_lower) );
                             const async_ghosts::ptr ap(ag);
                             
+                            ag->peer = g->peer;
                             ag->setup(g->count,outline);
                             async_reg.push_back(ap);
                         }
@@ -211,6 +212,7 @@ namespace yocto
                             async_ghosts           *ag = new async_ghosts( ghost::position(at_upper) );
                             const async_ghosts::ptr ap(ag);
                             
+                            ag->peer = g->peer;
                             ag->setup(g->count,outline);
                             async_reg.push_back(ap);
                         }

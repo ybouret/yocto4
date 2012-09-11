@@ -13,7 +13,7 @@ namespace yocto
             
             
             template <typename DATASPACE> static inline
-            void init( const mpi & MPI, DATASPACE &ds, mpi::Requests requests )
+            void init( const mpi & MPI, DATASPACE &ds, mpi::Requests &requests )
             {
                 static const int tag = 0xCA44;
                 assert( requests.count == ds.num_requests );
@@ -62,7 +62,7 @@ namespace yocto
             }
             
             template <typename DATASPACE> static inline
-            void wait( const mpi & MPI, DATASPACE &ds, mpi::Requests requests )
+            void wait( const mpi & MPI, DATASPACE &ds, mpi::Requests &requests )
             {
                 assert( requests.count == ds.num_requests );
                 //--------------------------------------------------------------
