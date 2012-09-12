@@ -1,6 +1,8 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/spade/mpi/workspace.hpp"
 #include "yocto/spade/rmesh.hpp"
+#include "yocto/spade/mpi/collect0.hpp"
+#include "yocto/auto-ptr.hpp"
 
 #include "../tests/main.hpp"
 
@@ -29,7 +31,7 @@ YOCTO_UNIT_TEST_IMPL(h1d)
     array1D<double> &X  = W["X"].as< array1D<double> >();
     array1D<double> &A  = W["A"].as< array1D<double> >();
     array1D<double> &LA = W["LA"].as< array1D<double> >();
-
+    
     const double     deltaX = LX/NX;
     const double     dX2    = deltaX * deltaX;
     const double     dt     = 0.1 * dX2;
@@ -51,11 +53,19 @@ YOCTO_UNIT_TEST_IMPL(h1d)
     
     //-- sync A
     W.sync(MPI);
+    auto_ptr< array1D<double> > pCom;
+    
+    //-- array to gather
+    if(0==rank)
+        pCom.reset( new standalone< array1D<double> >(full_layout) );
+    
+    mpi_collect0::get( MPI, pCom.__get(), A, full_layout );
+    
     
     //-- loop
     for(;;)
     {
-       
+        
         //-- compute laplacian
         for( unit_t i=A.lower+1;i<A.upper;++i)
         {
@@ -71,6 +81,8 @@ YOCTO_UNIT_TEST_IMPL(h1d)
         //-- sync A
         W.sync(MPI);
         
+        //-- collect
+        mpi_collect0::get( MPI, pCom.__get(), A, full_layout );
         break;
     }
     

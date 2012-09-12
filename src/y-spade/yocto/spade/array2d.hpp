@@ -84,6 +84,21 @@ namespace yocto
                 delete arr;
             }
             
+            inline void set( const array_type &other, const layout_type &sub ) throw()
+            {
+                assert(this->contains(sub));
+                assert(other.contains(sub));
+                array_type &self = *this;
+                for( unit_t j=sub.lower.y;j<=sub.upper.y;++j)
+                {
+                    row       &target = self[j];
+                    const row &source = other[j];
+                    for( unit_t i=sub.lower.x;i<=sub.upper.x;++i)
+                        target[i] = source[i];
+                }
+            }
+            
+            
             //! save a raw ppm
 			void ppm(const string        &filename,
 					 const string        &comment,

@@ -11,7 +11,6 @@ namespace yocto
         struct mpi_exchange
         {
             
-            
             template <typename DATASPACE> static inline
             void init( const mpi & MPI, DATASPACE &ds, mpi::Requests &requests )
             {
