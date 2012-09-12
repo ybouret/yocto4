@@ -5,9 +5,22 @@
 #include "yocto/auto-ptr.hpp"
 
 #include "../tests/main.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 #define LX (1.2)
 #define NX (100)
+
+static inline void save_curve( double dX, const array1D<double> &Y )
+{
+    static unsigned idx = 0;
+    ios::ocstream fp( vformat("h1d%08u.curve",idx), false);
+    fp("#curve\n",idx);
+    for( unit_t i=Y.lower;i<=Y.upper;++i)
+    {
+        fp("%g %g\n", i * dX, Y[i]);
+    }
+    ++idx;
+}
 
 YOCTO_UNIT_TEST_IMPL(h1d)
 {
@@ -34,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(h1d)
     
     const double     deltaX = LX/NX;
     const double     dX2    = deltaX * deltaX;
-    const double     dt     = 0.1 * dX2;
+    const double     dt     = 0.2 * dX2;
     
     for( unit_t i = X.lower; i <= X.upper;++i ) X[i] = (i*LX)/NX;
     MPI.Printf( stderr, "%d.%d: lower=%d, upper=%d\n", size, rank, int(A.lower), int(A.upper) );
@@ -60,9 +73,12 @@ YOCTO_UNIT_TEST_IMPL(h1d)
         pCom.reset( new standalone< array1D<double> >(full_layout) );
     
     mpi_collect0::get( MPI, pCom.__get(), A, full_layout );
+    if(0==rank)
+        save_curve(deltaX, *pCom);
     
     
     //-- loop
+    unsigned iter = 0;
     for(;;)
     {
         
@@ -83,7 +99,12 @@ YOCTO_UNIT_TEST_IMPL(h1d)
         
         //-- collect
         mpi_collect0::get( MPI, pCom.__get(), A, full_layout );
-        break;
+        if(0==rank)
+            save_curve(deltaX, *pCom);
+        ++iter;
+        MPI.Printf0(stderr,"#iter=%u\n",iter);
+        if(iter>500)
+            break;
     }
     
     
