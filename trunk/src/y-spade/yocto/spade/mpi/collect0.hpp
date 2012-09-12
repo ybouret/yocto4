@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_MPI_COLLECT0_INCLUDED
 #define YOCTO_SPADE_MPI_COLLECT0_INCLUDED 1
 
-#include "yocto/spade/array3D.hpp"
+#include "yocto/spade/array3d.hpp"
 
 namespace yocto
 {

@@ -14,7 +14,7 @@ static inline void save_curve( double dX, const array1D<double> &Y )
 {
     static unsigned idx = 0;
     ios::ocstream fp( vformat("h1d%08u.curve",idx), false);
-    fp("#curve\n",idx);
+    fp("#curve\n");
     for( unit_t i=Y.lower;i<=Y.upper;++i)
     {
         fp("%g %g\n", i * dX, Y[i]);
