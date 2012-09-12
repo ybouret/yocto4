@@ -30,7 +30,7 @@ namespace yocto
             {
             }
             
-            virtual ~standalone();
+            virtual ~standalone() throw() {}
             
         private:
             const data_block data;

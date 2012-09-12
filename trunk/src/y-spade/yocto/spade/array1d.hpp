@@ -48,6 +48,17 @@ namespace yocto
                 delete arr;
             }
             
+            inline void set( const array_type &other, const layout_type &sub ) throw()
+            {
+                assert(this->contains(sub));
+                assert(other.contains(sub));
+                array_type &self = *this;
+                for( unit_t i=sub.lower;i<=sub.upper;++i)
+                {
+                    self[i] = other[i];
+                }
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
             T *item; //!< offseted item

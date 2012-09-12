@@ -49,6 +49,7 @@ namespace yocto
             static void       *ctor( const layout_type &L, linear_base **info );
             static void        dtor(void*) throw();
             
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
             T *item; //!< offseted address
