@@ -27,11 +27,12 @@ namespace yocto
                     const axis_layout layout1(lower1,upper1);
                     const string      name( quadmesh::get_axis_name(dimension_t(dim)));
                     const type_spec   spec( typeid(axis_type) );
+                    const type_spec   held( typeid(T) );
                     linear           *info = 0;
                     void             *addr = axis_type::ctor( layout1, &info );
                     try
                     {
-                        const varray::ptr ap( new varray(name, spec, addr, info, axis_type::dtor));
+                        const varray::ptr ap( new varray(name, spec, held, addr, info, axis_type::dtor));
                         addr = 0;
                         adb.insert(ap);
                     }

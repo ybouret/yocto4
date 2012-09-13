@@ -19,17 +19,20 @@ namespace yocto
             
             const string     name;
             const type_spec  spec;
+            const type_spec  held;
             const array_ctor ctor;
             const array_dtor dtor;
             const bool       async;
             
             inline field_info(const char           *a_name,
                               const std::type_info &a_spec,
+                              const std::type_info &a_held,
                               const array_ctor      a_ctor,
                               const array_dtor      a_dtor,
                               const bool            a_async) :
             name( a_name ),
             spec( a_spec ),
+            held( a_held ),
             ctor( a_ctor ),
             dtor( a_dtor ),
             async(a_async)
@@ -44,6 +47,7 @@ namespace yocto
             inline field_info( const field_info &other ) :
             name(other.name),
             spec(other.spec),
+            held(other.held),
             ctor(other.ctor),
             dtor(other.dtor),
             async(other.async)

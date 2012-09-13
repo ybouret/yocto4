@@ -21,6 +21,7 @@ namespace yocto
             /**
              \param array_name array identifier
              \param array_spec array class type
+             \param array_held type held by array
              \param array_addr address of the array
              \param array_info memory requirements for the array
              \param array_dtor array destructor wrapper
@@ -28,6 +29,7 @@ namespace yocto
              */
             explicit varray(const string         &array_name,
                             const type_spec      &array_spec,
+                            const type_spec      &array_held,
                             void *                array_addr,
                             linear               *array_info,
                             void                (*array_dtor)(void *));
@@ -41,6 +43,7 @@ namespace yocto
             
             const string    name; //!< array name
             const type_spec spec; //!< array typeid
+            const type_spec held; //!< typeid of type in array
             
             linear &       handle() throw();
             const linear & handle() const throw();

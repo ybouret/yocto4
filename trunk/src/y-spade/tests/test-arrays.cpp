@@ -12,7 +12,7 @@ YOCTO_UNIT_TEST_IMPL(arrays)
         const layout1D L( RandCoord1D(), RandCoord1D());
         linear *info = 0;
         void   *addr = array1D<float>::ctor( L, &info );
-        varray::ptr p( new varray("a1", typeid(array1D<float>), addr, info, array1D<float>::dtor));
+        varray::ptr p( new varray("a1", typeid(array1D<float>), typeid(float), addr, info, array1D<float>::dtor));
         adb.insert(p);
     }
     
@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(arrays)
         const layout2D L( RandCoord2D(), RandCoord2D());
         linear *info = 0;
         void   *addr = array2D<double>::ctor( L, &info );
-        varray::ptr p( new varray("b2", typeid(array2D<double>), addr, info, array2D<double>::dtor));
+        varray::ptr p( new varray("b2", typeid(array2D<double>), typeid(double), addr, info, array2D<double>::dtor));
         adb.insert(p);
     }
     

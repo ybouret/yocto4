@@ -25,11 +25,12 @@ namespace yocto
             //! append a new need for field...
             void append(const char                           *name,
                         const std::type_info                 &spec,
+                        const std::type_info                 &held,
                         const typename field_type::array_ctor ctor,
                         const typename field_type::array_dtor dtor,
                         bool                                  async)
             {
-                const field_type f(name,spec,ctor,dtor,async);
+                const field_type f(name,spec,held,ctor,dtor,async);
                 for( size_t i=fields.size();i>0;--i)
                 {
                     if( f.name == fields[i].name )
@@ -54,7 +55,7 @@ namespace yocto
                     void   *addr = f.ctor(L,&info);
                     try
                     {
-                        varray::ptr vp( new varray(f.name, f.spec, addr, info, f.dtor) );
+                        varray::ptr vp( new varray(f.name, f.spec, f.held, addr, info, f.dtor) );
                         addr = 0;
                         db.insert(vp);
                         if( f.async )
@@ -75,8 +76,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(fields_setup);
         };
 
-#define Y_SPADE_FIELD(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), ARRAY::ctor, ARRAY::dtor, true); } while(false)
-#define Y_SPADE_LOCAL(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), ARRAY::ctor, ARRAY::dtor, false); } while(false)
+#define Y_SPADE_FIELD(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), typeid(ARRAY::type), ARRAY::ctor, ARRAY::dtor, true); } while(false)
+#define Y_SPADE_LOCAL(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), typeid(ARRAY::type), ARRAY::ctor, ARRAY::dtor, false); } while(false)
         
     }
 }

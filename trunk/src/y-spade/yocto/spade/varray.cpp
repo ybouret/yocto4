@@ -19,6 +19,7 @@ namespace yocto
         
         varray::varray(const string         &array_name,
                        const type_spec      &array_spec,
+                       const type_spec      &array_held,
                        void *                array_addr,
                        linear               *array_info,
                        void                (*array_dtor)(void *)) :
