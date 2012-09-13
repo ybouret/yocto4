@@ -14,6 +14,14 @@ namespace yocto
             assert(proc);
         }
         
+        vtk_record:: vtk_record( const vtk_record &other ) :
+        spec( other.spec ),
+        kind(other.kind),
+        proc(other.proc)
+        {
+        }
+        
+        
         const type_spec & vtk_record:: key() const throw()
         {
             return spec;

@@ -67,7 +67,7 @@ namespace yocto
             
             //! 2D collect a global array in rank 0
 			template <typename T> static inline
-			void get( const mpi &MPI, array2D<T> *pA, const array2D<T> &B, const layout2D &full, size_t dim = 1)
+			void get( const mpi &MPI, array2D<T> *pA, const array2D<T> &B, const layout2D &full)
 			{
 				static const int   tag = 0xC012;
                 const int rank =  MPI.CommWorldRank;
@@ -80,7 +80,7 @@ namespace yocto
 					//-- direct copy of B in A
                     //----------------------------------------------------------
 					{
-						const layout2D sub = full.split(0, MPI.CommWorldSize,dim );
+						const layout2D sub = full.split(0, MPI.CommWorldSize,on_y);
 						A.set( B, sub );
 					}
                     
@@ -90,7 +90,7 @@ namespace yocto
 					MPI_Status status;
 					for( int r=1; r < MPI.CommWorldSize; ++r )
 					{
-						const layout2D sub   = full.split(r,size,dim);
+						const layout2D sub   = full.split(r,size,on_y);
 						const size_t   bytes = sub.width.x * sizeof(T);
 						
 						for(unit_t y=sub.upper.y;y>=sub.lower.y;--y)
@@ -105,7 +105,7 @@ namespace yocto
                     //----------------------------------------------------------
 					//-- send sub data
                     //----------------------------------------------------------
-					const layout2D sub   = full.split(rank,size,dim);
+					const layout2D sub   = full.split(rank,size,on_y);
 					const size_t   bytes = sub.width.x * sizeof(T);
 					
 					for( unit_t y=sub.upper.y; y>=sub.lower.y;--y)
