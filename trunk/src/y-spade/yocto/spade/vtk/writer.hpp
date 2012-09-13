@@ -32,7 +32,7 @@ namespace yocto
             
             //! write a 2D rmesh
             template <typename T> inline
-            void write_mesh( ios::ostream &fp, const rmesh<T,layout2D> &mesh , const layout2D &sub )
+            void write_mesh( ios::ostream &fp, const rmesh<layout2D,T> &mesh , const layout2D &sub )
             {
                 const vtk_record &r = (*this)[ typeid(T) ];
                 const array1D<T> &X = mesh.X();
@@ -46,7 +46,7 @@ namespace yocto
             
             //! write a 3D rmesh
             template <typename T> inline
-            void write_mesh( ios::ostream &fp, const rmesh<T,layout3D> &mesh , const layout3D &sub )
+            void write_mesh( ios::ostream &fp, const rmesh<layout3D,T> &mesh , const layout3D &sub )
             {
                 const vtk_record &r = (*this)[ typeid(T) ];
                 const array1D<T> &X = mesh.X();

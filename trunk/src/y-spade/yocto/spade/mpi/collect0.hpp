@@ -65,7 +65,7 @@ namespace yocto
             }
             
             
-            //! 2D collect a global array in rank 0
+            //! 2D collect a global array in rank 0: SPLITTED ON Y
 			template <typename T> static inline
 			void get( const mpi &MPI, array2D<T> *pA, const array2D<T> &B, const layout2D &full)
 			{
@@ -77,7 +77,7 @@ namespace yocto
 					assert( NULL != pA );
 					array2D<T> &A = *pA;
                     //----------------------------------------------------------
-					//-- direct copy of B in A
+					//-- direct copy of B in A for rank 0
                     //----------------------------------------------------------
 					{
 						const layout2D sub = full.split(0, MPI.CommWorldSize,on_y);
@@ -118,11 +118,12 @@ namespace yocto
             
             //! 3D collect a global array in rank 0
 			template <typename T> static inline
-			void collect0( const mpi & MPI, array3D<T> *pA, const array3D<T> &B, const layout3D &full, size_t dim = 2 )
+			void collect0( const mpi & MPI, array3D<T> *pA, const array3D<T> &B, const layout3D &full )
 			{
 				static const int   tag = 0xC013;
                 const int rank =  MPI.CommWorldRank;
                 const int size =  MPI.CommWorldSize;
+                const dimension_t dim = on_z;
 				if( 0 == rank )
 				{
 					assert( NULL != pA );
