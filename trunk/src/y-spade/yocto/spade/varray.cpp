@@ -25,6 +25,7 @@ namespace yocto
                        void                (*array_dtor)(void *)) :
         name( array_name ),
         spec( array_spec ),
+	held( array_held ),
         addr( array_addr ),
         info( array_info ),
         dtor( array_dtor ),
