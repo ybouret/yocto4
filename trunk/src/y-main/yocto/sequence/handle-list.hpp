@@ -1,14 +1,14 @@
 #ifndef YOCTO_CORE_HANDLE_LIST_INCLUDED
 #define YOCTO_CORE_HANDLE_LIST_INCLUDED 1
 
-#include "yocto/core/cached-list.hpp"
+#include "yocto/sequence/cached-list.hpp"
 #include "yocto/core/list.hpp"
 
 namespace yocto 
 {
     
         
-    //! HANDLE_NODE must have a handle member and a reset() method
+    //! HANDLE_NODE must have a handle member
     template <typename HANDLE_NODE>
     class handle_list : public cached_list<core::list_of,HANDLE_NODE>
     {
