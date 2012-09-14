@@ -2,25 +2,25 @@
 #define CACHED_LIST_INCLUDED 1
 
 #include "yocto/core/pool.hpp"
+#include "yocto/object.hpp"
 
 namespace yocto 
 {
     
      
-    //! cache of C++ objects
+    //! cache of C++ destructed objects
     /**
      NODE must have an empty constructor
-     and a nothrow reset method.
      */
     template <typename NODE>
-    class cache_of : public core::pool_of<NODE>
+    class cache_of 
     {
     public:
         //! create empty cache
-        explicit cache_of() throw()  : core::pool_of<NODE>() {}
+        explicit cache_of() throw()  : pool()  {}
         
         //! create prefilled cache
-        explicit cache_of( size_t n) : core::pool_of<NODE>() 
+        explicit cache_of( size_t n) : pool()
         {
             try { reserve(n);  }
             catch(...) { destroy(); }
@@ -28,32 +28,43 @@ namespace yocto
         virtual ~cache_of() throw() { destroy(); }
         
         //! destroy all cache
-        inline void  destroy() throw() { while( this->size ) delete this->query(); }
+        inline void  destroy() throw() { while( pool.size ) object::release1<NODE>(pool.query()); }
         
         //! grow cache size
-        inline void  reserve(size_t n) { while(n-- > 0) this->store( new NODE() ); }
+        inline void  reserve(size_t n) { while(n-- > 0) pool.store(  new_node() ); }
         
-        //! a new/reset node
-        /**
-         warning: query() shouldn't be used directly
-         */
+        //! build a new alive node
         inline NODE *provide()
         {
-            if( this->size > 0 )
-            {
-                NODE *node = this->query();
-                node->reset();
-                return node;
-            }
-            else 
-            {
-                return new NODE();
-            }
+            NODE *node = pool.size > 0 ? pool.query() : new_node();
+            try { new (node) NODE(); }
+            catch(...) { pool.store(node); throw;  }
+            return node;
         }
         
+        //! duplicate another live node
+        inline NODE *dup( const NODE *other )
+        {
+            NODE *node = pool.size > 0 ? pool.query() : new_node();
+            try { new (node) NODE(*other); }
+            catch(...) { pool.store(node); throw;  }
+            return node;
+        }
+        
+        inline void garbage( NODE *node ) throw()
+        {
+            assert(node);
+            node->~NODE();
+            pool.store(node);
+        }
+        
+        inline size_t size() const throw() { return pool.size; }
+        
     private:
+        NODE *new_node() { return object::acquire1<NODE>(); }
         YOCTO_DISABLE_COPY_AND_ASSIGN(cache_of);
-    };
+        core::pool_of<NODE> pool;
+     };
     
     //! a list with a public shared cache
     template <template <typename> class LIST_OF,typename NODE>
@@ -66,14 +77,8 @@ namespace yocto
         {
         }
         
-        //! delete all its nodes
-        /**
-         use empty() before to preserve cache
-         */
-        virtual ~cached_list() throw()
-        {
-            while( this->size ) delete this->pop_back();
-        }
+        //! call empty()
+        virtual ~cached_list() throw() { empty(); }
         
         //! if NODE has a copy ctor
         cached_list( const cached_list &other ) :
@@ -82,17 +87,15 @@ namespace yocto
             try
             {
                 for( const NODE *node = other.head; node; node=node->next )
-                    this->push_back( new NODE(*node) );
+                    this->push_back( cache.dup(node) );
             }
             catch(...) { empty(); throw; }
         }
         
-        inline void empty() throw()
-        {
-            while( this->size ) cache.store( this->pop_back() );
-        }
+        //! garbage all nodes
+        inline void empty() throw()  { while( this->size ) cache.garbage( this->pop_back() );  }
         
-        //! query and push_back a node
+        //! provide and push_back a node
         inline NODE *append()
         {
             NODE *node = cache.provide();
@@ -111,7 +114,7 @@ namespace yocto
         {
             assert( 0 != node );
             assert( this->owns(node) );
-            cache.store( this->unlink(node) );
+            cache.garbage( this->unlink(node) );
         }
         
         cache_of<NODE> &cache;

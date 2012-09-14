@@ -79,7 +79,7 @@ namespace yocto
 					std::cerr << "List of Tests in " << argv[0] << std::endl;
 					for( size_t i=0; i < num_; ++i )
 					{
-						std::cerr << "--  " << reg_[i].name << std::endl;
+						std::cout << "--  " << reg_[i].name << std::endl;
 					}
 					return 1;
 				}

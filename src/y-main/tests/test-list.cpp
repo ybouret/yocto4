@@ -11,7 +11,7 @@ namespace
 	{
 		node_type *next, *prev;
 		size_t     data;
-        void reset() throw() { data=0; }
+        //void reset() throw() { data=0; }
         static inline int compare( const node_type *lhs, const node_type *rhs, void *)
         {
             return __compare(lhs->data,rhs->data);
@@ -235,7 +235,7 @@ YOCTO_UNIT_TEST_IMPL(clist)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/core/cached-list.hpp"
+#include "yocto/sequence/cached-list.hpp"
 
 
 YOCTO_UNIT_TEST_IMPL(cached)
@@ -256,12 +256,12 @@ YOCTO_UNIT_TEST_IMPL(cached)
         C.append()->data = i;
     }
     C.empty();
-    std::cerr << "cache size=" << cache.size << std::endl;
+    std::cerr << "cache size=" << cache.size() << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
 
 
-#include "yocto/core/handle-list.hpp"
+#include "yocto/sequence/handle-list.hpp"
 
 
 struct h_node
