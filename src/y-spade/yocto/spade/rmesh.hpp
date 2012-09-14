@@ -10,14 +10,15 @@ namespace yocto
     {
         //! rectilinear mesh
         template <typename LAYOUT, typename T>
-        class rmesh : public quadmesh
+        class rmesh : public quadmesh, public LAYOUT
         {
         public:
             typedef spade::array1D<T> axis_type;
             typedef layout1D          axis_layout;
             
             explicit rmesh( const LAYOUT &outline, array_db &adb_ref ) :
-            quadmesh( adb_ref )
+            quadmesh( adb_ref ),
+            LAYOUT( outline   )
             {
                 //-- create the axis with their name
                 for( size_t dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
