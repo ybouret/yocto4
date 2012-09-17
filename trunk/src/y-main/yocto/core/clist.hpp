@@ -1,7 +1,7 @@
 #ifndef YOCTO_CIRCULAR_LIST_INCUDED
 #define YOCTO_CIRCULAR_LIST_INCUDED 1
 
-#include "yocto/os.hpp"
+#include "yocto/code/swap.hpp"
 
 namespace yocto 
 {
@@ -22,6 +22,12 @@ namespace yocto
             //! list_of compatibility
             inline void reset() throw() { size = 0; root = 0; }
             
+            //! exchange content
+            void swap_with( clist_of &other ) throw()
+            {
+                cswap(size,other.size);
+                cswap(root,other.root);
+            }
             
             //! list_of compatibility
             inline void push_back( NODE *node ) throw()
