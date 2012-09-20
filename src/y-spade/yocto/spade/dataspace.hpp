@@ -89,7 +89,7 @@ namespace yocto
             void recompute_outline( const ghosts_setup &G )
             {
                 
-                std::cerr << "recomputing outline" << std::endl;
+                //std::cerr << "recomputing outline" << std::endl;
                 typename LAYOUT::coord out_lower = outline.lower;
                 typename LAYOUT::coord out_upper = outline.upper;
                 size_t &num_local = (size_t&)local_count;
@@ -144,8 +144,8 @@ namespace yocto
                 //-- recompute outline
                 //--------------------------------------------------------------
                 new ((void*)&outline) LAYOUT(out_lower,out_upper);
-                std::cerr << "layout: " << this->as_layout() << std::endl;
-                std::cerr << "outline:" << outline           << std::endl;
+                //std::cerr << "layout: " << this->as_layout() << std::endl;
+                //std::cerr << "outline:" << outline           << std::endl;
                 
                 //--------------------------------------------------------------
                 //-- reserve memory
@@ -166,7 +166,6 @@ namespace yocto
             //==================================================================
             void build_ghosts(const ghosts_setup &G)
             {
-                //const LAYOUT &L = this->as_layout();
                 for( size_t dim=0; dim < LAYOUT::DIMENSIONS; ++dim )
                 {
                     //----------------------------------------------------------
