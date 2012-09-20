@@ -45,6 +45,11 @@ namespace yocto
                 wait_exchange(MPI);
             }
             
+            inline void sync1(const mpi &MPI, linear &handle)
+            {
+                mpi_exchange::sync1(MPI,handle,self,requests);
+            }
+            
         private:
             dataspace<LAYOUT> &self;
             mpi::Requests      requests;
