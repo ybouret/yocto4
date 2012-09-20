@@ -138,6 +138,9 @@ namespace yocto
 		//! parallel printf, in order in MPI_COMM_WORLD
 		void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
 		
+        //! parallel printf, in order in MPI_COMM_WORLD, with size.rank
+		void PrintfI( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4);
+        
 		//! printf only on rank 0, with protecting barriers
 		void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
 		

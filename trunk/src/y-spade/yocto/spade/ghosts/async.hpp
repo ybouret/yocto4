@@ -29,19 +29,19 @@ namespace yocto
             template <typename LAYOUT>
             inline void setup( size_t num_ghosts, const LAYOUT &outline)
             {
-                std::cerr << "async " << inner.position_name() << std::endl;
+                //std::cerr << "async " << inner.position_name() << std::endl;
                 //! create corresponding inner layout
                 {
                     const LAYOUT inner_sub = inner.inner_sublayout(outline, num_ghosts);
                     inner.load_from(outline, inner_sub);
-                    std::cerr << "\tinner_sub:" << inner_sub << std::endl;
+                    //std::cerr << "\tinner_sub:" << inner_sub << std::endl;
                 }
                 
                 //! create corresponding outer layout
                 {
                     const LAYOUT outer_sub = outer.outer_sublayout(outline,num_ghosts);
                     outer.load_from(outline,outer_sub);
-                    std::cerr << "\touter_sub:" << outer_sub << std::endl;
+                    //std::cerr << "\touter_sub:" << outer_sub << std::endl;
                 }
                 
                 assert( inner.size() == outer.size() );
