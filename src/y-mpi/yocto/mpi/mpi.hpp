@@ -216,4 +216,6 @@ namespace yocto
 	
 }
 
+#define YOCTO_MPI const mpi & MPI = mpi::init(&argc,&argv)
+
 #endif
