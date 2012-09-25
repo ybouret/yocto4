@@ -20,11 +20,11 @@ namespace yocto
         class region
         {
         public:
+            YOCTO_ARGUMENTS_DECL_T;
             typedef typename VERTEX<T>::type                     vertex;
             typedef typename type_traits<vertex>::parameter_type param_vertex;
 
             static const size_t DIMENSIONS = sizeof(vertex)/sizeof(T);
-            YOCTO_ARGUMENTS_DECL_T;
             
             const vertex vmin;
             const vertex vmax;

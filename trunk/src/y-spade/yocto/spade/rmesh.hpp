@@ -3,6 +3,7 @@
 
 #include "yocto/spade/quadmesh.hpp"
 #include "yocto/spade/array1d.hpp"
+#include "yocto/spade/region.hpp"
 
 namespace yocto
 {
@@ -13,6 +14,7 @@ namespace yocto
         class rmesh : public quadmesh, public LAYOUT
         {
         public:
+            YOCTO_ARGUMENTS_DECL_T;
             typedef spade::array1D<T> axis_type;
             typedef layout1D          axis_layout;
             
@@ -65,6 +67,26 @@ namespace yocto
             inline const axis_type & Y() const throw() { return get_axis( on_y ); }
             inline const axis_type & Z() const throw() { return get_axis( on_z ); }
 
+            //! extrapolate full_region/full_layout to this layout
+            template <typename REGION>
+            void regular_map_to( const REGION &full_region, const LAYOUT &full_layout)
+            {
+                assert( REGION::DIMENSIONS == LAYOUT::DIMENSIONS );
+                for( size_t dim=0; dim < LAYOUT::DIMENSIONS; ++dim)
+                {
+                    axis_type   &A   = get_axis( dimension_t(dim) );
+                    const_type   v0  = __component<typename REGION::type>(full_region.vmin,   dim);
+                    const_type   dv  = __component<typename REGION::type>(full_region.length, dim);
+                    const unit_t org = __coord(full_layout.lower,dim);
+                    const unit_t den = __coord(full_layout.upper,dim) - org;
+                    for( unit_t i = A.lower; i <= A.upper; ++i )
+                    {
+                        A[i] = v0 + ( (i-org) * dv ) / den;
+                    }
+                }
+            }
+            
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rmesh);
