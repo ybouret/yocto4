@@ -93,7 +93,7 @@ namespace yocto
             {
 				const string filename(the_filename);
 				const string title(the_title);
-				this->save<U,LAYOUT>(filename,title,wksp,var,sub);
+				this->save<LAYOUT,U>(filename,title,wksp,var,sub);
 			}
 
             
