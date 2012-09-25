@@ -5,16 +5,12 @@
 #include "yocto/spade/data-block.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/string.hpp"
-#include "yocto/sequence/vector.hpp"
-#include "yocto/memory/pooled.hpp"
 
 namespace yocto
 {
     namespace spade
     {
-        
-        typedef vector<string,memory::pooled::allocator> variables;
-        
+                
         //! virual array
         /**
          generic array handling

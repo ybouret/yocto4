@@ -100,9 +100,8 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
 			fp("ASCII\n");
 		}
 
-        void vtk_writer:: prolog( ios::ostream &fp, const string &name, size_t num, const vtk_record &r) const
+        void vtk_writer:: prolog( ios::ostream &fp, const string &name, const vtk_record &r) const
 		{
-			fp("POINT_DATA %u\n", unsigned(num));
 			fp("%s %s float\n", r.kind.c_str(), name.c_str());
 			fp("LOOKUP_TABLE default\n");
 		}
@@ -153,7 +152,7 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
 			//------------------------------------------------------------------
 			// write the point data information
 			//------------------------------------------------------------------
-			prolog(fp, name, sub.items, r);
+			prolog(fp, name, r);
             
 			//------------------------------------------------------------------
 			// write all items of the sub layout
@@ -181,7 +180,7 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
 			//------------------------------------------------------------------
 			// write the point data information
 			//------------------------------------------------------------------
-			prolog(fp, name, sub.items, r);
+			prolog(fp, name, r);
             
 			//------------------------------------------------------------------
 			// write all items of the sub layout

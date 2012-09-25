@@ -59,8 +59,8 @@ namespace yocto
                 write_axis_sub(fp, &Z[sub.lower.z], sub.width.z, sizeof(T), r, 'Z' );
             }
             
-            //! write POINT_DATA
-            void prolog( ios::ostream &fp, const string &name, size_t num, const vtk_record &r) const;
+            //! write kind
+            void prolog( ios::ostream &fp, const string &name, const vtk_record &r) const;
             
             //! write one item
             void write1( ios::ostream &fp, const void *data, const vtk_record &r) const;
@@ -79,6 +79,7 @@ namespace yocto
                 ios::ocstream fp(filename,false);
                 header(fp, title);
                 write_mesh(fp,wksp.mesh,sub);
+                fp("POINT_DATA %u\n", unsigned(sub.items));
                 for( size_t q=1; q <= var.size(); ++q )
                 {
                     const string &name = var[q];
