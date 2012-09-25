@@ -2,12 +2,14 @@
 #include "yocto/visit/interface.hpp"
 #include "yocto/wtime.hpp"
 
-#include "yocto/swamp/visit.hpp"
-#include "yocto/swamp/mpi.hpp"
+#include "yocto/spade/visit.hpp"
+#include "yocto/spade/mpi/exchange.hpp"
+#include "yocto/spade/mpi/workspace.hpp"
 #include "yocto/code/rand.hpp"
-
+#include "yocto/spade/array2d.hpp"
+#include "yocto/spade/region2d.hpp"
 using namespace yocto;
-using namespace swamp;
+using namespace spade;
 
 typedef double               Real;
 typedef coord2D              Coord;
@@ -15,14 +17,14 @@ typedef array2D<Real>        Array;
 typedef layout2D             Layout;
 typedef region2D<Real>::type Region;
 typedef vertex2D<Real>::type Vertex;
-typedef workspace<Layout, Real,rmesh> Workspace;
-typedef fields_setup<Layout> FieldsSetup;
-typedef ghosts_setup<Coord>  GhostsSetup;
-typedef array1D<Real>        Array1D;
+typedef mpi_workspace<Layout,rmesh,Real> Workspace;
+typedef fields_setup<Layout>             FieldsSetup;
+typedef ghosts_setup                     GhostsSetup;
+typedef array1D<Real>                    Array1D;
 
 
 
-namespace 
+namespace
 {
     
     class MyFields : public FieldsSetup
@@ -30,10 +32,10 @@ namespace
     public:
         explicit MyFields() : FieldsSetup(8)
         {
-            Y_SWAMP_DECL_VAR( *this, "U",  Array);
-            Y_SWAMP_DECL_VAR( *this, "V",  Array);
-            Y_SWAMP_DECL_AUX( *this, "LU", Array);
-            Y_SWAMP_DECL_AUX( *this, "LV", Array);
+            Y_SPADE_FIELD( *this, "U",  Array);
+            Y_SPADE_FIELD( *this, "V",  Array);
+            Y_SPADE_LOCAL( *this, "LU", Array);
+            Y_SPADE_LOCAL( *this, "LV", Array);
         }
         
         virtual ~MyFields() throw()
@@ -46,11 +48,11 @@ namespace
     };
     
     
-    class MySim : 
+    class  MySim :
     public VisIt :: Simulation,
     public MyFields,
     public Workspace,
-    public _visit
+    public VisItIO
     {
     public:
         Array &U;
@@ -58,31 +60,27 @@ namespace
         Array &LU;
         Array &LV;
         
-        mpi::Requests requests;
         const Array1D &X;
         const Array1D &Y;
-        const Array1D &dX;
-        const Array1D &dY;
-        Real  alpha;
-        Real  beta;
+        Real           alpha;
+        Real           beta;
         
         explicit MySim(  const mpi &ref, const Layout &L, const GhostsSetup &G ) :
         VisIt::Simulation( ref ),
         MyFields(),
-        Workspace( L, G, *this ),
+        Workspace( L,*this,G ),
         U(  (*this)["U" ].as<Array>() ),
         V(  (*this)["V" ].as<Array>() ),
         LU( (*this)["LU"].as<Array>() ),
         LV( (*this)["LV"].as<Array>() ),
-        requests( num_requests() ),
         X(mesh.X()),
         Y(mesh.Y()),
-        dX( mesh.dX() ),
-        dY( mesh.dY() ),
+        // dX( mesh.dX() ),
+        //dY( mesh.dY() ),
         alpha( 1e-2 ),
         beta( 1e-3 )
         {
-            prepare_ghosts();
+
         }
         
         
@@ -110,12 +108,12 @@ namespace
         
         inline void init_exchange()
         {
-            _mpi::init_exchange_all(MPI, *this, requests);
+            Workspace::init_exchange(MPI);
         }
         
         inline void wait_exchange()
         {
-            _mpi::wait_exchange_all(MPI, *this, requests);
+           Workspace::wait_exchange(MPI);
         }
         
         
@@ -153,13 +151,13 @@ namespace
             
             //! append U on mesh2d
             {
-                visit_handle vmd = variable_meta_data<Real>("U", "mesh2d");                
+                visit_handle vmd = variable_meta_data<Real>("U", "mesh2d");
                 VisIt_SimulationMetaData_addVariable(md, vmd);
             }
             
             //! append V on mesh2d
             {
-                visit_handle vmd = variable_meta_data<Real>("V", "mesh2d");                
+                visit_handle vmd = variable_meta_data<Real>("V", "mesh2d");
                 VisIt_SimulationMetaData_addVariable(md, vmd);
             }
             
@@ -235,16 +233,18 @@ namespace
         
         void computeLaplacian( Array &Lap, const Array &f, unit_t i, unit_t j )
         {
-            const Real dx2 = dX[i]*dX[i];
-            const Real dy2 = dY[j]*dY[j];
+            const Real dx = X[i+1] - X[i];
+            const Real dy = Y[j+1] - Y[j];
+            const Real dx2 = dx*dx;
+            const Real dy2 = dy*dy;
             const Real fac = 0.5 * ( dx2 + dy2 );
-            Lap[j][i] = fac * ( (f[j][i-1] - 2*f[j][i] + f[j][i+1])/dx2+ (f[j-1][i] - 2*f[j][i] + f[j+1][i])/dy2); 
+            Lap[j][i] = fac * ( (f[j][i-1] - 2*f[j][i] + f[j][i+1])/dx2+ (f[j-1][i] - 2*f[j][i] + f[j+1][i])/dy2);
         }
         
         void computeLaplacians( unit_t i, unit_t j )
         {
             computeLaplacian(LU, U, i,j );
-            computeLaplacian(LV, V, i,j );            
+            computeLaplacian(LV, V, i,j );
         }
         
         virtual void step()
@@ -331,19 +331,17 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     // create the ghosts
     //--------------------------------------------------------------------------
     GhostsSetup  sim_ghosts;
-    if( MPI.CommWorldSize > 1 )
+    if( MPI.IsParallel )
     {
-        sim_ghosts.lower.count.y = 2;
-        sim_ghosts.lower.peer.y  = MPI.CommWorldPrev();
-        sim_ghosts.upper.count.y = 2;
-        sim_ghosts.upper.peer.y  = MPI.CommWorldNext();
+        sim_ghosts.set_async(ghost::at_lower_y, 2, MPI.CommWorldPrev());
+        sim_ghosts.set_async(ghost::at_upper_y, 2, MPI.CommWorldNext());
     }
-    else 
+    else
     {
-        sim_ghosts.local.count.y = 2;
+        sim_ghosts.set_local(on_y,2);
     }
     
-    sim_ghosts.local.count.x = 1; // PBC for x
+    sim_ghosts.set_local(on_x,1); //! PBC on X
     
     //--------------------------------------------------------------------------
     // create the sim layout
