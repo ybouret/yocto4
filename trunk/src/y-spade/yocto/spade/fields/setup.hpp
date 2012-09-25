@@ -6,6 +6,7 @@
 #include "yocto/memory/pooled.hpp"
 #include "yocto/spade/array-db.hpp"
 #include "yocto/spade/linear-handles.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
