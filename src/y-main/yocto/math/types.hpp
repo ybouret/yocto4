@@ -67,6 +67,12 @@ namespace yocto
 		inline float  Fabs( float x  ) throw() { return fabsf( x ); }
 		inline double Fabs( double x ) throw() { return fabs( x );  }
 		
+        template <typename T, typename U>
+        inline T Signed( T a, U b) throw()
+        {
+            return b >= 0 ? Fabs(a) : -Fabs(a);
+        }
+        
 		inline float  Square( float  x ) throw() { return x*x; }
 		inline double Square( double x ) throw() { return x*x; }
 		inline float  Square( const complex<float>  &x ) throw() { return x.re * x.re + x.im * x.im; }
