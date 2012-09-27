@@ -39,8 +39,8 @@ namespace yocto
             const ghosts_info *get_async() const throw();
             
         private:
-            ghosts_info local[3];
-            ghosts_info async[6];
+            ghosts_info local[3]; //! on_x,on_y,on_z
+            ghosts_info async[6]; //! at_lower_x,at_upper_x,at_lower_y,at_upper_y,at_lower_z,at_upper_z
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghosts_setup);            
         };

@@ -21,6 +21,7 @@ namespace yocto
         inner( pos ),
         outer( pos ),
         peer(-1),
+        content(0),
         ibuffer(0),
         obuffer(0),
         iobytes(0),
@@ -46,7 +47,7 @@ namespace yocto
         }
         
         
-        size_t async_ghosts:: inner_store( const linear &handle ) throw()
+        void async_ghosts:: inner_store( const linear &handle ) throw()
         {
             assert(num_offsets>0);
             assert(handle.item_size() * num_offsets<=iobytes);
@@ -57,7 +58,7 @@ namespace yocto
                 assert(p<=ibuffer+iobytes);
             }
             assert( static_cast<size_t>(p-ibuffer) == handle.item_size() * num_offsets );
-            return static_cast<size_t>(p-ibuffer);
+            content = static_cast<size_t>(p-ibuffer);
         }
         
         void async_ghosts:: outer_query( linear &handle ) throw()
@@ -70,10 +71,9 @@ namespace yocto
                 handle.async_query(p,outer[i]);
                 assert(p<=obuffer+iobytes);
             }
-            
         }
         
-        size_t async_ghosts:: inner_store( const linear_handles &handles ) throw()
+        void async_ghosts:: inner_store( const linear_handles &handles ) throw()
         {
             assert(num_offsets>0);
             assert(handles.interleaved() * num_offsets<=iobytes);
@@ -92,7 +92,7 @@ namespace yocto
                 }
             }
             assert( static_cast<size_t>(p-ibuffer)== handles.interleaved() * num_offsets);
-            return static_cast<size_t>(p-ibuffer);
+            content =  static_cast<size_t>(p-ibuffer);
         }
         
         
