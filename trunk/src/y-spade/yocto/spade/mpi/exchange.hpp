@@ -26,8 +26,9 @@ namespace yocto
                 //--------------------------------------------------------------
                 // load and create send requests
                 //--------------------------------------------------------------
-                size_t iRequest = 0;
-                for( size_t i=ds.async_count;i>0;--i)
+                size_t       iRequest = 0;
+                const size_t na       = ds.async_count;
+                for( size_t i=na;i>0;--i)
                 {
                     async_ghosts &g = ds.get_async(i);
                     assert(g.peer>=0);
@@ -39,21 +40,26 @@ namespace yocto
                     //----------------------------------------------------------
                     // create ibuffer
                     //----------------------------------------------------------
-                    const size_t ns = g.inner_store( ds.handles );
+                    g.inner_store( ds.handles );
                     
                     //----------------------------------------------------------
                     // create non blocking recv
                     //----------------------------------------------------------
-                    MPI.Irecv(g.obuffer, ns, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                    MPI.Irecv(g.obuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
                     assert(iRequest<=requests.count);
                     
+                }
+                
+                for( size_t i=1; i <= na; ++i )
+                {
+                    async_ghosts &g = ds.get_async(i);
                     //----------------------------------------------------------
                     // create non blocking send
                     //----------------------------------------------------------
-                    MPI.Isend(g.ibuffer, ns, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                    MPI.Isend(g.ibuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
                     assert(iRequest<=requests.count);
+                    
                 }
-                
                 //--------------------------------------------------------------
                 // process with MPI
                 //--------------------------------------------------------------
@@ -102,8 +108,9 @@ namespace yocto
                 //--------------------------------------------------------------
                 // load and create send requests
                 //--------------------------------------------------------------
-                size_t iRequest = 0;
-                for( size_t i=ds.async_count;i>0;--i)
+                size_t       iRequest = 0;
+                const size_t na       = ds.async_count;
+                for( size_t i=na;i>0;--i)
                 {
                     async_ghosts &g = ds.get_async(i);
                     assert(g.peer>=0);
@@ -115,18 +122,23 @@ namespace yocto
                     //----------------------------------------------------------
                     // create ibuffer
                     //----------------------------------------------------------
-                    const size_t ns = g.inner_store( handle );
+                    g.inner_store( handle );
                     
                     //----------------------------------------------------------
                     // create non blocking recv
                     //----------------------------------------------------------
-                    MPI.Irecv(g.obuffer, ns, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                    MPI.Irecv(g.obuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
                     assert(iRequest<=requests.count);
                     
+                }
+                
+                for( size_t i=1;i<=na;++i)
+                {
+                    async_ghosts &g = ds.get_async(i);
                     //----------------------------------------------------------
                     // create non blocking send
                     //----------------------------------------------------------
-                    MPI.Isend(g.ibuffer, ns, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                    MPI.Isend(g.ibuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
                     assert(iRequest<=requests.count);
                 }
                 
@@ -154,14 +166,14 @@ namespace yocto
                     g.outer_query(handle);
                 }
             }
-
+            
             template <typename DATASPACE> static inline
             void sync1( const mpi & MPI, linear &handle, DATASPACE &ds, mpi::Requests &requests )
             {
                 init1(MPI,handle,ds,requests);
                 wait1(MPI,handle,ds,requests);
             }
-
+            
             
             
         };

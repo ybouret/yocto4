@@ -23,9 +23,10 @@ namespace yocto
             //! release memory
             virtual ~async_ghosts() throw();
             
-            ghost inner; //!< in layout
-            ghost outer; //!< in outline
-            int   peer;  //!< default is -1
+            ghost  inner;   //!< in layout
+            ghost  outer;   //!< in outline
+            int    peer;    //!< default is -1
+            size_t content; //!< last content, in bytes
             
             //! create offsets
             template <typename LAYOUT>
@@ -58,18 +59,18 @@ namespace yocto
             
             //! store inner handle content into ibuffer
             /**
-             \return the number of stored bytes
+             update content, the number of stored bytes
              */
-            size_t inner_store( const linear &handle ) throw();
+            void inner_store( const linear &handle ) throw();
             
             //! query outer handle content from obuffer
             void outer_query( linear &handle ) throw();
             
             //! store inner handles content into ibuffer
             /**
-             \return the number of stored bytes
+             update content
              */
-            size_t inner_store( const linear_handles &handles ) throw();
+            void inner_store( const linear_handles &handles ) throw();
            
             //! query outer handle content from obuffer
             void outer_query( linear_handles &handles ) throw();

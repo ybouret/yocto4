@@ -16,7 +16,7 @@ static inline void display_array( const array1D<T> &A )
 
 static double vprocf( const float &x )
 {
- 
+    
     return x;
 }
 
@@ -71,11 +71,11 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
             display_array(A);
             
             //! store data into ghost inner
-            const size_t num_io = d1b.get_async(1).inner_store( d1b.handles );
-            std::cerr << "\t#IOBYTES=" << num_io << std::endl;
+            d1b.get_async(1).inner_store( d1b.handles );
+            std::cerr << "\t#IOBYTES=" <<  d1b.get_async(1).content << std::endl;
             
             //! artificial copy
-            memcpy(d1b.get_async(1).obuffer,d1b.get_async(1).ibuffer,num_io);
+            memcpy(d1b.get_async(1).obuffer,d1b.get_async(1).ibuffer, d1b.get_async(1).content);
             
             //! query data from the ghost outer
             d1b.get_async(1).outer_query( d1b.handles );
@@ -131,8 +131,10 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
             double vmin = A.get_min();
             double vmax = A.get_max();
             A.ppm("b0.ppm", "b0", A, vprocf,NULL,vmin,vmax);
-            const size_t num_io1 = d2b.get_async(1).inner_store( d2b.handles );
-            const size_t num_io2 = d2b.get_async(2).inner_store( d2b.handles );
+            d2b.get_async(1).inner_store( d2b.handles );
+            const size_t num_io1 = d2b.get_async(1).content;
+            d2b.get_async(2).inner_store( d2b.handles );
+            const size_t num_io2 = d2b.get_async(2).content;
             std::cerr << "\tIOBYTES=" << num_io1 << "," << num_io2 << std::endl;
             if( num_io1 != num_io2 )
                 throw exception("invalid 2D async");
