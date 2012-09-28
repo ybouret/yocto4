@@ -191,7 +191,7 @@ namespace yocto
                     }
                     if (its == 30)
                     {
-                        printf("no convergence in 30 svdcmp iterations");
+                        //printf("no convergence in 30 svdcmp iterations");
                     }
                     x=w[l]; /* Shift from bottom 2-by-2 minor. */
                     nm=k-1;
