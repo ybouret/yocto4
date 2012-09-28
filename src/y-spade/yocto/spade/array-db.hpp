@@ -3,6 +3,7 @@
 
 #include "yocto/spade/varray.hpp"
 #include "yocto/associative/set.hpp"
+#include "yocto/spade/linear-handles.hpp"
 
 namespace yocto
 {
@@ -23,6 +24,10 @@ namespace yocto
             const varray & operator[]( const string & ) const;
             const varray & operator[]( const char  *  ) const;
             
+            void query( linear_handles &handles, const string &id);
+            void query( linear_handles &handles, const char   *id);
+            void query( linear_handles &handles, const char **names, const size_t count);
+            void query( linear_handles &handles, const array<string> &names );
             
         private:
             set<string,varray::ptr> arrays;

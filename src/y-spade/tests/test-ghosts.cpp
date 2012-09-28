@@ -115,6 +115,12 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         handles.append( d2a["B2"].handle() );
         
         {
+            handles.free();
+            const char *names[] = { "A2", "B2" };
+            d2a.query(handles, names, 2);
+        }
+        
+        {
             array2D<float> &A = d2a["A2"].as< array2D<float> >();
             for( unit_t y=A.lower.y; y <= A.upper.y; ++y )
                 for(unit_t x = A.lower.x; x <= A.upper.x; ++x )

@@ -12,7 +12,10 @@ namespace yocto
         {
             
             template <typename DATASPACE> static inline
-            void init( const mpi & MPI, DATASPACE &ds, mpi::Requests &requests )
+            void init(const mpi      &MPI,
+                      linear_handles &handles,
+                      DATASPACE      &ds,
+                      mpi::Requests  &requests )
             {
                 static const int tag = 0xCA44;
                 assert( requests.count == ds.num_requests );
@@ -21,7 +24,7 @@ namespace yocto
                 // transfert local ghosts
                 //--------------------------------------------------------------
                 for( size_t i=ds.local_count;i>0;--i)
-                    ds.get_local(i).transfer( ds.handles );
+                    ds.get_local(i).transfer( handles );
                 
                 //--------------------------------------------------------------
                 // load data and create recv requests
@@ -40,7 +43,7 @@ namespace yocto
                     //----------------------------------------------------------
                     // create ibuffer
                     //----------------------------------------------------------
-                    g.inner_store( ds.handles );
+                    g.inner_store( handles );
                     
                     //----------------------------------------------------------
                     // create non blocking recv
@@ -61,8 +64,9 @@ namespace yocto
                     //----------------------------------------------------------
                     MPI.Isend(g.ibuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
                     assert(iRequest<=requests.count);
-                    
                 }
+                assert(iRequest==requests.count);
+                
                 //--------------------------------------------------------------
                 // process with MPI
                 //--------------------------------------------------------------
@@ -70,7 +74,10 @@ namespace yocto
             }
             
             template <typename DATASPACE> static inline
-            void wait( const mpi & MPI, DATASPACE &ds, mpi::Requests &requests )
+            void wait(const mpi      & MPI,
+                      linear_handles & handles,
+                      DATASPACE      & ds,
+                      mpi::Requests  & requests )
             {
                 assert( requests.count == ds.num_requests );
                 //--------------------------------------------------------------
@@ -84,15 +91,18 @@ namespace yocto
                 for( size_t i=ds.async_count;i>0;--i)
                 {
                     async_ghosts &g = ds.get_async(i);
-                    g.outer_query(ds.handles);
+                    g.outer_query(handles);
                 }
             }
             
             template <typename DATASPACE> static inline
-            void sync( const mpi & MPI, DATASPACE &ds, mpi::Requests requests )
+            void sync( const mpi     & MPI,
+                      linear_handles & handles,
+                      DATASPACE      & ds,
+                      mpi::Requests  & requests )
             {
-                init(MPI,ds,requests);
-                wait(MPI,ds,requests);
+                init(MPI,handles,ds,requests);
+                wait(MPI,handles,ds,requests);
             }
             
             template <typename DATASPACE> static inline
