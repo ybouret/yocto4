@@ -30,12 +30,12 @@ namespace
     class MyFields : public FieldsSetup
     {
     public:
-        explicit MyFields() : FieldsSetup(8)
+        explicit MyFields() : FieldsSetup(2*sizeof(Real))
         {
             Y_SPADE_FIELD( *this, "U",  Array);
             Y_SPADE_FIELD( *this, "V",  Array);
-            Y_SPADE_LOCAL( *this, "LU", Array);
-            Y_SPADE_LOCAL( *this, "LV", Array);
+            Y_SPADE_FIELD( *this, "LU", Array);
+            Y_SPADE_FIELD( *this, "LV", Array);
         }
         
         virtual ~MyFields() throw()
@@ -59,7 +59,7 @@ namespace
         Array &V;
         Array &LU;
         Array &LV;
-        
+        linear_handles handles;
         const Array1D &X;
         const Array1D &Y;
         Real           alpha;
@@ -73,6 +73,7 @@ namespace
         V(  (*this)["V" ].as<Array>() ),
         LU( (*this)["LU"].as<Array>() ),
         LV( (*this)["LV"].as<Array>() ),
+        handles(),
         X(mesh.X()),
         Y(mesh.Y()),
         // dX( mesh.dX() ),
@@ -80,7 +81,8 @@ namespace
         alpha( 1e-2 ),
         beta( 1e-3 )
         {
-
+            query(handles,"U");
+            query(handles,"V");
         }
         
         
@@ -108,12 +110,12 @@ namespace
         
         inline void init_exchange()
         {
-            Workspace::init_exchange(MPI);
+            Workspace::init_exchange(MPI,handles);
         }
         
         inline void wait_exchange()
         {
-           Workspace::wait_exchange(MPI);
+           Workspace::wait_exchange(MPI,handles);
         }
         
         
