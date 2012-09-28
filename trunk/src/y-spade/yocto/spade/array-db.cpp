@@ -51,6 +51,34 @@ namespace yocto
             return (*this)[id];
         }
 
+        void array_db:: query( linear_handles &handles, const string &id)
+        {
+            array_db &self = *this;
+            handles.append( self[id].handle() );
+        }
         
+        void array_db:: query( linear_handles &handles, const char *ID)
+        {
+            const string id(ID);
+            array_db &self = *this;
+            handles.append( self[id].handle() );
+        }
+        
+        void array_db:: query( linear_handles &handles, const char **names, const size_t count)
+        {
+            assert(!(names==0&&count>0));
+            for( size_t i=0; i < count; ++i)
+            {
+                query(handles,names[i]);
+            }
+        }
+        
+        void array_db:: query( linear_handles &handles, const array<string> &names )
+        {
+            for(size_t i=1; i <= names.size();++i)
+            {
+                query(handles,names[i]);
+            }
+        }
     }
 }

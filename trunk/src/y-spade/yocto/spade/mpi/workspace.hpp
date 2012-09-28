@@ -29,20 +29,19 @@ namespace yocto
             
             virtual ~mpi_workspace() throw() {}
             
-            inline void init_exchange(const mpi &MPI)
+            inline void init_exchange(const mpi &MPI, linear_handles &handles)
             {
-                mpi_exchange::init(MPI, self, requests);
+                mpi_exchange::init(MPI,handles,self,requests);
             }
             
-            inline void wait_exchange(const mpi &MPI)
+            inline void wait_exchange(const mpi &MPI, linear_handles &handles)
             {
-                mpi_exchange::wait(MPI,self,requests);
+                mpi_exchange::wait(MPI,handles,self,requests);
             }
             
-            inline void sync(const mpi &MPI)
+            inline void sync(const mpi &MPI, linear_handles &handles)
             {
-                init_exchange(MPI);
-                wait_exchange(MPI);
+                mpi_exchange::sync(MPI,handles,self,requests);
             }
             
             inline void sync1(const mpi &MPI, linear &handle)

@@ -40,9 +40,9 @@ YOCTO_UNIT_TEST_IMPL(h2d)
     const int   last = MPI.CommWorldLast;
     
     //-- register the fields
-    fields_setup<layout2D> F(2);
+    fields_setup<layout2D> F( 2*sizeof(double) );
     Y_SPADE_FIELD(F, "A",  Array2D );
-    Y_SPADE_LOCAL(F, "LA", Array2D );
+    Y_SPADE_FIELD(F, "LA", Array2D );
     
     
     
@@ -104,7 +104,13 @@ YOCTO_UNIT_TEST_IMPL(h2d)
     if(0==rank)
         var.push_back("A");
     
-    W.sync(MPI);
+    linear_handles handles;
+    W.query(handles, "A");
+    MPI.PrintfI(stderr, "#handles=%u\n", unsigned(handles.size()));
+    
+    
+    W.sync(MPI,handles);
+    
     mpi_collect0::get(MPI, pA, A,full_layout);
     if(0==rank)
     {
@@ -138,7 +144,7 @@ YOCTO_UNIT_TEST_IMPL(h2d)
             }
         }
         
-        W.sync(MPI);
+        W.sync(MPI,handles);
         if( 0 == (iter%10) )
         {
             mpi_collect0::get(MPI, pA, A,full_layout);
