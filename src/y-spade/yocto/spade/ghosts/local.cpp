@@ -1,6 +1,5 @@
 #include "yocto/spade/ghosts/local.hpp"
 
-
 namespace yocto
 {
     namespace spade
@@ -48,7 +47,7 @@ namespace yocto
             }
         }
         
-        void local_ghosts:: transfer( linear_handles &handles ) throw()
+        void local_ghosts:: transfer( array<linear_ptr> &handles ) throw()
         {
             assert( lower.inside.size() == num_offsets );
             assert( lower.mirror.size() == num_offsets );

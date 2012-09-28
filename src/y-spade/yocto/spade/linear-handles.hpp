@@ -20,6 +20,8 @@ namespace yocto
             //! size of interleaved items
             size_t interleaved() const throw();
             
+            void append( linear &handle );
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear_handles);
         };

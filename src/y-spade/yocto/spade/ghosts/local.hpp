@@ -59,7 +59,9 @@ namespace yocto
             void transfer( linear &handle ) throw();
             
             //! transfert a set of handles
-            void transfer( linear_handles &handles ) throw();
+            void transfer( array<linear_ptr> &handles ) throw();
+            
+            
             
             //! compute all offets
             template <typename LAYOUT>

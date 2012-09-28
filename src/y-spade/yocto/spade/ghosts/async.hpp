@@ -55,7 +55,7 @@ namespace yocto
             uint8_t *obuffer; //!< buffer to query outer ghost
             size_t   iobytes; //!< maximum buffers capacity
             
-            void allocate_for( const linear_handles &handles );
+            void allocate_for( const size_t max_interleaved_size );
             
             //! store inner handle content into ibuffer
             /**
@@ -75,11 +75,13 @@ namespace yocto
             //! query outer handle content from obuffer
             void outer_query( linear_handles &handles ) throw();
 
-            
+            bool can_handle( const linear &handle ) const throw();
+            bool can_handle( const linear_handles &handles) const throw();
             
             
         private:
-            size_t iolen; //!< for memory allocation
+            size_t iolen;                 //!< for memory allocation
+            size_t max_interleaved_bytes; //!< for I/O control
             YOCTO_DISABLE_COPY_AND_ASSIGN(async_ghosts);
             
         };
