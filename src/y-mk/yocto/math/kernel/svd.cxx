@@ -10,7 +10,7 @@ namespace yocto
     namespace math
     {
         static inline
-        real_t pythag(real_t a, real_t b)
+        real_t pythag(real_t a, real_t b) throw()
         {
             const real_t absa=Fabs(a);
             const real_t absb=Fabs(b);
@@ -34,13 +34,14 @@ namespace yocto
             assert(v.cols==a.cols);
             assert(v.rows==a.cols);
             assert(w.size()==a.cols);
-            int flag,its,j,jj,k,l,nm;
-            real_t c,f,h,s,x,y,z;
-            
             vector<real_t> rv1(n,0);
-            //rv1=dvector(1,n);
+            
+            size_t k;
+            real_t c,f,h,s,x,y,z;
+            size_t l = 0;
             real_t g=0,scale=0,anorm=0; /* Householder reduction to bidiagonal form */
-            for(size_t i=1;i<=n;i++) {
+            for(size_t i=1;i<=n;i++)
+            {
                 l=i+1;
                 rv1[i]=scale*g;
                 g=s=scale=0.0;
@@ -59,7 +60,7 @@ namespace yocto
                         g = -Signed(sqrt(s),f);
                         h=f*g-s;
                         a[i][i]=f-g;
-                        for (j=l;j<=n;j++)
+                        for(size_t j=l;j<=n;j++)
                         {
                             for (s=0.0,k=i;k<=m;k++)
                                 s += a[k][i]*a[k][j];
@@ -89,10 +90,10 @@ namespace yocto
                         a[i][l]=f-g;
                         for(k=l;k<=n;k++)
                             rv1[k]=a[i][k]/h;
-                        for(j=l;j<=m;j++) {
+                        for(size_t j=l;j<=m;j++) {
                             for (s=0.0,k=l;k<=n;k++)
                                 s += a[j][k]*a[i][k];
-                            for (k=l;k<=n;k++)
+                            for(k=l;k<=n;k++)
                                 a[j][k] += s*rv1[k];
                         }
                         for (k=l;k<=n;k++)
@@ -103,13 +104,13 @@ namespace yocto
             }
             for(size_t i=n;i>=1;i--)
             { /* Accumulation of right-hand transformations. */
-                if (i < n)
+                if (i<n)
                 {
                     if (g)
                     {
-                        for(j=l;j<=n;j++) /* real_t division to avoid possible underflow. */
+                        for(size_t j=l;j<=n;j++) /* real_t division to avoid possible underflow. */
                             v[j][i]=(a[i][j]/a[i][l])/g;
-                        for(j=l;j<=n;j++)
+                        for(size_t j=l;j<=n;j++)
                         {
                             for (s=0.0,k=l;k<=n;k++)
                                 s += a[i][k]*v[k][j];
@@ -117,7 +118,7 @@ namespace yocto
                                 v[k][j] += s*v[k][i];
                         }
                     }
-                    for (j=l;j<=n;j++)
+                    for(size_t j=l;j<=n;j++)
                         v[i][j]=v[j][i]=0.0;
                 }
                 v[i][i]=1.0;
@@ -128,30 +129,37 @@ namespace yocto
             { /* Accumulation of left-hand transformations. */
                 l=i+1;
                 g=w[i];
-                for(j=l;j<=n;j++)
+                for(size_t j=l;j<=n;j++)
                     a[i][j]=0.0;
                 if (g)
                 {
                     g=1.0/g;
-                    for (j=l;j<=n;j++)
+                    for(size_t j=l;j<=n;j++)
                     {
                         for (s=0.0,k=l;k<=m;k++) s += a[k][i]*a[k][j];
                         f=(s/a[i][i])*g;
                         for (k=i;k<=m;k++) a[k][j] += f*a[k][i];
                     }
-                    for(j=i;j<=m;j++) a[j][i] *= g;
+                    for(size_t j=i;j<=m;j++) a[j][i] *= g;
                 }
                 else
-                    for(j=i;j<=m;j++) a[j][i]=0.0;
+                    for(size_t j=i;j<=m;j++) a[j][i]=0.0;
                 ++a[i][i];
             }
             for (k=n;k>=1;k--)
-            { /* Diagonalization of the bidiagonal form. */
-                for (its=1;its<=30;its++)
+            {
+                /* Diagonalization of the bidiagonal form. */
+                unsigned its=0;
+                for(its=1;its<=30;its++)
                 {
-                    flag=1;
-                    for (l=k;l>=1;l--) { /* Test for splitting. */
-                        nm=l-1; /* Note that rv1[1] is always zero. */
+                    int   flag = 1;
+                    size_t nm  = 0;
+                    for (l=k;l>=1;l--)
+                    {
+                        /* Test for splitting. */
+                        nm=l-1;
+                        
+                        /* Note that rv1[1] is always zero. */
                         if ((real_t)(Fabs(rv1[l])+anorm) == anorm)
                         {
                             flag=0;
@@ -173,7 +181,7 @@ namespace yocto
                             h=1.0/h;
                             c=g*h;
                             s = -f*h;
-                            for (j=1;j<=m;j++) {
+                            for(size_t j=1;j<=m;j++) {
                                 y=a[j][nm];
                                 z=a[j][i];
                                 a[j][nm]=y*c+z*s;
@@ -185,7 +193,7 @@ namespace yocto
                     if (l == k) { /* Convergence. */
                         if (z < 0.0) { /* Singular value is made nonnegative. */
                             w[k] = -z;
-                            for (j=1;j<=n;j++) v[j][k] = -v[j][k];
+                            for(size_t j=1;j<=n;j++) v[j][k] = -v[j][k];
                         }
                         break;
                     }
@@ -202,7 +210,7 @@ namespace yocto
                     g=pythag(f,1.0);
                     f=((x-z)*(x+z)+h*((y/(f+Signed(g,f)))-h))/x;
                     c=s=1.0; /* Next QR transformation: */
-                    for(j=l;j<=nm;j++)
+                    for(size_t j=l;j<=nm;j++)
                     {
                         const size_t i=j+1;
                         g=rv1[i];
@@ -217,7 +225,7 @@ namespace yocto
                         g = g*c-x*s;
                         h=y*s;
                         y *= c;
-                        for(jj=1;jj<=n;jj++)
+                        for(size_t jj=1;jj<=n;jj++)
                         {
                             x=v[jj][j];
                             z=v[jj][i];
@@ -233,7 +241,7 @@ namespace yocto
                         }
                         f=c*g+s*y;
                         x=c*y-s*g;
-                        for(jj=1;jj<=m;jj++)
+                        for(size_t jj=1;jj<=m;jj++)
                         {
                             y=a[jj][j];
                             z=a[jj][i];
