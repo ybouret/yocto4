@@ -32,5 +32,9 @@ namespace yocto
             return ans;
         }
 
+        void linear_handles:: append( linear &handle )
+        {
+            push_back( &handle );
+        }
     }
 }

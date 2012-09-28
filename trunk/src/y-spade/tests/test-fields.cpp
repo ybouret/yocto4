@@ -8,7 +8,6 @@
 YOCTO_UNIT_TEST_IMPL(fields)
 {
     array_db       db;
-    linear_handles handles;
     
     {
         fields_setup<layout1D> F(8);
@@ -19,7 +18,7 @@ YOCTO_UNIT_TEST_IMPL(fields)
         std::cerr << "Got " << F.size() << " fields" << std::endl;
         
         const layout1D L( RandCoord1D(), RandCoord1D() );
-        F.create(L,db,handles);
+        F.create(L,db);
     }
     
     array1D<double> &A = db["A"].as< array1D<double> >();
@@ -31,7 +30,7 @@ YOCTO_UNIT_TEST_IMPL(fields)
         Y_SPADE_FIELD(F, "B3", array3D<size_t> );
         const layout3D L( RandCoord3D(), RandCoord3D() );
 
-        F.create(L,db,handles);
+        F.create(L,db);
     }
     
     array3D<size_t> &B3 = db["B3"].as< array3D<size_t> >();

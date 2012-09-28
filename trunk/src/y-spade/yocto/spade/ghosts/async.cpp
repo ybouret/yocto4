@@ -25,17 +25,18 @@ namespace yocto
         ibuffer(0),
         obuffer(0),
         iobytes(0),
-        iolen(0)
+        iolen(0),
+        max_interleaved_bytes(0)
         {
         }
         
-        void async_ghosts:: allocate_for( const linear_handles &handles )
+        void async_ghosts:: allocate_for( const size_t max_interleaved_size )
         {
             assert( 0 == ibuffer );
             assert( 0 == obuffer );
             assert( 0 == iobytes );
             assert( 0 == iolen   );
-            const size_t n = num_offsets * handles.interleaved();
+            const size_t n = num_offsets * max_interleaved_size;
             if( n > 0 )
             {
                 const size_t buff_size = n << 1;
@@ -43,14 +44,24 @@ namespace yocto
                 ibuffer = memory_acquire<uint8_t>(iolen);
                 iobytes = n;
                 obuffer = ibuffer + iobytes;
+                max_interleaved_bytes = max_interleaved_size;
             }
         }
         
+        bool async_ghosts:: can_handle( const linear &handle ) const throw()
+        {
+            return handle.item_size() * num_offsets <= iobytes;
+        }
         
+        bool async_ghosts:: can_handle( const linear_handles &handles ) const throw()
+        {
+            return handles.interleaved() * num_offsets<=iobytes;
+        }
+    
         void async_ghosts:: inner_store( const linear &handle ) throw()
         {
             assert(num_offsets>0);
-            assert(handle.item_size() * num_offsets<=iobytes);
+            assert(can_handle(handle));
             uint8_t    *p=ibuffer;
             for( size_t i=num_offsets;i>0;--i)
             {
@@ -64,7 +75,7 @@ namespace yocto
         void async_ghosts:: outer_query( linear &handle ) throw()
         {
             assert(num_offsets>0);
-            assert(handle.item_size() * num_offsets<=iobytes);
+            assert(can_handle(handle));
             const uint8_t *p = obuffer;
             for( size_t i=num_offsets;i>0;--i)
             {
@@ -76,7 +87,7 @@ namespace yocto
         void async_ghosts:: inner_store( const linear_handles &handles ) throw()
         {
             assert(num_offsets>0);
-            assert(handles.interleaved() * num_offsets<=iobytes);
+            assert(can_handle(handles));
             
             const size_t num_handles = handles.size();
             uint8_t     *p           = ibuffer;
@@ -99,7 +110,7 @@ namespace yocto
         void async_ghosts::  outer_query( linear_handles &handles ) throw()
         {
             assert(num_offsets>0);
-            assert(handles.interleaved() * num_offsets<=iobytes);
+            assert(can_handle(handles));
             const size_t   num_handles = handles.size();
             const uint8_t *p           = obuffer;
             for( size_t i=num_offsets;i>0;--i)

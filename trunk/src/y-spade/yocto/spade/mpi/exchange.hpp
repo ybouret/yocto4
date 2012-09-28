@@ -24,7 +24,7 @@ namespace yocto
                     ds.get_local(i).transfer( ds.handles );
                 
                 //--------------------------------------------------------------
-                // load and create send requests
+                // load data and create recv requests
                 //--------------------------------------------------------------
                 size_t       iRequest = 0;
                 const size_t na       = ds.async_count;
@@ -50,6 +50,9 @@ namespace yocto
                     
                 }
                 
+                //--------------------------------------------------------------
+                // create send requests in reverse order
+                //--------------------------------------------------------------
                 for( size_t i=1; i <= na; ++i )
                 {
                     async_ghosts &g = ds.get_async(i);
@@ -106,7 +109,7 @@ namespace yocto
                 
                 
                 //--------------------------------------------------------------
-                // load and create send requests
+                // load send data and create recv requests
                 //--------------------------------------------------------------
                 size_t       iRequest = 0;
                 const size_t na       = ds.async_count;
@@ -132,6 +135,9 @@ namespace yocto
                     
                 }
                 
+                //--------------------------------------------------------------
+                // create send requests in reverse order
+                //--------------------------------------------------------------
                 for( size_t i=1;i<=na;++i)
                 {
                     async_ghosts &g = ds.get_async(i);

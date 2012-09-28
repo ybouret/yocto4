@@ -21,7 +21,7 @@ namespace yocto
             
             
             const LAYOUT   outline;          //!< this layout + ghosts
-            linear_handles handles;          //!< from fields
+            //linear_handles handles;          //!< from fields
             const size_t   local_count;      //!< #local ghosts
             const size_t   async_count;      //!< #async ghosts
             const size_t   num_requests;     //!< #MPI request for data exchange
@@ -34,7 +34,7 @@ namespace yocto
             array_db( F.size() + LAYOUT::DIMENSIONS ),
             LAYOUT(L),
             outline(L),
-            handles( F.size() ),
+            //handles( F.size() ),
             local_count(0),
             async_count(0),
             num_requests(0),
@@ -54,14 +54,15 @@ namespace yocto
                 //--------------------------------------------------------------
                 // create fields from outline
                 //--------------------------------------------------------------
-                F.create( outline, *this, handles );
+                //F.create( outline, *this, handles );
+                F.create( outline, *this);
                 
                 //--------------------------------------------------------------
                 // and prepare ghosts memory
                 //--------------------------------------------------------------
                 for( size_t i=1;i<=async_count;++i)
                 {
-                    async_reg[i]->allocate_for( handles );
+                    async_reg[i]->allocate_for( F.max_interleaved_size );
                 }
             }
             
