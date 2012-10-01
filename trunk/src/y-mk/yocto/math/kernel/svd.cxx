@@ -9,6 +9,48 @@ namespace yocto
     
     namespace math
     {
+        /**
+         Solves A·X = B for a vector X, where A is specified
+         by the arrays u[1..m][1..n], w[1..n], v[1..n][1..n] as returned by svdcmp.
+         m and n are the dimensions of a,
+         and will be equal for square matrices.
+         b[1..m] is the input right-hand side.
+         x[1..n] is the output solution vector.
+         No input quantities are destroyed, so the routine may be called sequentially with different b’s.
+         */
+        template <>
+        void svd<real_t>::solve(const matrix<real_t> &u,
+                                const array<real_t>  &w,
+                                const matrix<real_t> &v,
+                                const array<real_t> &b,
+                                array<real_t>       &x)
+        {
+            const size_t m = u.rows;
+            const size_t n = u.cols;
+            assert( w.size() == n );
+            assert( v.rows == n);
+            assert( v.cols == n );
+            
+            vector<real_t> tmp(n,0);
+            for(size_t j=1;j<=n;j++) {
+                real_t s=0.0;
+                if( w[j] )
+                {
+                    for(size_t i=1;i<=m;i++) s += u[i][j]*b[i];
+                    s /= w[j];
+                }
+                tmp[j]=s;
+            }
+            for(size_t j=1;j<=n;j++)
+            {
+                real_t s=0.0;
+                for(size_t jj=1;jj<=n;jj++) s += v[j][jj]*tmp[jj];
+                x[j]=s;
+            }
+        }
+        
+        
+        
         static inline
         real_t pythag(real_t a, real_t b) throw()
         {
@@ -20,8 +62,10 @@ namespace yocto
                 return (absb <= 0.0 ? 0.0 : absb*Sqrt(1.0+Square(absa/absb)));
         }
         
+        static const size_t SVD_MAX_ITS = 1024;
         /******************************************************************************/
-        void svdcmp(matrix<real_t> &a, array<real_t> &w, matrix<real_t> &v)
+        template <>
+        bool svd<real_t>:: build(matrix<real_t> &a, array<real_t> &w, matrix<real_t> &v)
         /*******************************************************************************
          Given a matrix a[1..m][1..n], this routine computes its singular value
          decomposition, A = U.W.VT.  The matrix U replaces a on output.  The diagonal
@@ -150,7 +194,7 @@ namespace yocto
             {
                 /* Diagonalization of the bidiagonal form. */
                 unsigned its=0;
-                for(its=1;its<=30;its++)
+                for(its=1;its<=SVD_MAX_ITS;its++)
                 {
                     int   flag = 1;
                     size_t nm  = 0;
@@ -197,9 +241,10 @@ namespace yocto
                         }
                         break;
                     }
-                    if (its == 30)
+                    if (its >= SVD_MAX_ITS)
                     {
                         //printf("no convergence in 30 svdcmp iterations");
+                        return false;
                     }
                     x=w[l]; /* Shift from bottom 2-by-2 minor. */
                     nm=k-1;
@@ -253,6 +298,24 @@ namespace yocto
                     rv1[k]=f;
                     w[k]=x;
                 }
+            }
+            return true;
+        }
+        
+        template <>
+        void svd<real_t>:: truncate( array<real_t> &w, const real_t ftol )
+        {
+            const size_t n  = w.size();
+            real_t wmax = 0;
+            for( size_t i=n;i>0;--i)
+            {
+                const real_t tmp = Fabs( w[i] );
+                if( tmp > wmax ) wmax = tmp;
+            }
+            const real_t wmin = ftol * wmax;
+            for( size_t i=n;i>0;--i)
+            {
+                if( Fabs(w[i]) <= wmin ) w[i] = 0;
             }
         }
     }
