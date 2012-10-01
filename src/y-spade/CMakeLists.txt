@@ -29,9 +29,15 @@ SET( mpi_srcs ${mpi_decl} )
 INSTALL( FILES ${mpi_decl} DESTINATION include/yocto/spade/mpi )
 SOURCE_GROUP( spade/mpi FILES ${mpi_srcs} )
 
+FILE( GLOB contour_decl yocto/spade/contour/*.hpp )
+FILE( GLOB contour_impl yocto/spade/contour/*.cpp )
+SET( contour_srcs ${contour_decl} ${contour_impl}  )
+INSTALL( FILES ${contour_decl} DESTINATION include/yocto/spade/contour )
+SOURCE_GROUP( spade/contour FILES ${contour_srcs} )
+
 INCLUDE_DIRECTORIES( . ../y-main )
 
-ADD_LIBRARY( y-spade STATIC ${srcs} ${fields_srcs} ${ghosts_srcs} ${vtk_srcs} ${mpi_srcs} )
+ADD_LIBRARY( y-spade STATIC ${srcs} ${fields_srcs} ${ghosts_srcs} ${vtk_srcs} ${mpi_srcs} ${contour_srcs} )
 INSTALL( TARGETS y-spade ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
