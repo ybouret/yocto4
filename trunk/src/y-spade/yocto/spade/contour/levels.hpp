@@ -1,7 +1,8 @@
 #ifndef YOCTO_SPADE_CONTOUR_LEVELS_INCLUDED
 #define YOCTO_SPADE_CONTOUR_LEVELS_INCLUDED 1
 
-#include "yocto/ordered/sorted-vector.hpp"
+#include "yocto/associative/set.hpp"
+#include "yocto/intrusive-ptr.hpp"
 
 namespace yocto
 {
@@ -9,48 +10,75 @@ namespace yocto
     namespace spade
     {
         
-        
-        template <typename T>
-        class level
+               
+        template <typename KEY,typename T>
+        class level : public counted
         {
         public:
-            typedef int KEY;
             YOCTO_ASSOCIATIVE_KEY_T;
             
-            level(param_key id, param_type args);
-            level(const level &);
-            ~level() throw();
+            const_key  id;
+            type       value;
             
-            const_type value;
-            const_key  key;
+            inline explicit level(param_key k, param_type args) : id(k), value(args) {}
+            inline virtual ~level() throw() {}
             
-            template <typename U> friend
-            bool operator<( const level<U> &lhs_level, const level<U> &rhs_level ) throw();
+            inline const_key & key() const throw() { return id; }
+            
+            typedef intrusive_ptr<KEY, level<KEY,T> > ptr;
             
         private:
-            YOCTO_DISABLE_ASSIGN(level);
-            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(level);
         };
         
-        template <typename T>
-        class levels
+        template <typename KEY, typename T>
+        class levels : public set< KEY,typename level<KEY,T>::ptr>
         {
         public:
-            typedef level<T>                    level_t;
-            typedef sorted_vector< level_t >    db_type;
+            YOCTO_ASSOCIATIVE_KEY_T;
             
-            explicit levels() throw();
-            virtual ~levels() throw();
+            typedef level<KEY,T>          level_t;
+            typedef typename level_t::ptr level_ptr;
+            typedef set<KEY,level_t>      db_type;
             
-            const db_type & operator()(void) const throw();
+            explicit levels() throw() : db_type() {}
+            virtual ~levels() throw() {}
             
-            void append(  
+            inline type & operator[]( param_key id )
+            {
+                db_type   &self = *this;
+                level_ptr *ppL  = self.search(id);
+                if( ppL )
+                {
+                    return (**ppL).value;
+                }
+                else
+                {
+                    const_type val(0);
+                    level_ptr p( new level_t(id,val) );
+                    if(!self.insert(p))
+                    {
+                        throw exception("");
+                    }
+                    return p->value;
+                }
+            }
+            
+            inline const_type & operator[](param_key id) const
+            {
+                const db_type   &self = *this;
+                const level_ptr *ppL  = self.search(id);
+                if(!ppL)
+                    throw exception("");
+                return (**ppL).value;
+            }
             
         private:
-            db_type db;
             YOCTO_DISABLE_COPY_AND_ASSIGN(levels);
-            
         };
+        
+        
+        
         
     }
     
