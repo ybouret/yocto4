@@ -29,7 +29,8 @@ YOCTO_UNIT_TEST_INIT(32)
     YOCTO_UNIT_TEST_DECL(smooth);
     
     YOCTO_UNIT_TEST_DECL(trigo);
-    
+
+    YOCTO_UNIT_TEST_DECL(svd);
 }
 YOCTO_UNIT_TEST_EXEC()
 
