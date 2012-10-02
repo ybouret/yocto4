@@ -115,71 +115,79 @@ namespace yocto
                 // transfert local ghosts
                 //--------------------------------------------------------------
                 for( size_t i=ds.local_count;i>0;--i)
+                {
                     ds.get_local(i).transfer( handle );
-                
+                }
                 
                 //--------------------------------------------------------------
                 // load send data and create recv requests
                 //--------------------------------------------------------------
-                size_t       iRequest = 0;
-                const size_t na       = ds.async_count;
-                for( size_t i=na;i>0;--i)
+                const size_t na = ds.async_count;
+                if(na>0)
                 {
-                    async_ghosts &g = ds.get_async(i);
-                    assert(g.peer>=0);
-                    assert(g.peer<MPI.CommWorldSize);
-                    assert(g.ibuffer!=0);
-                    assert(g.obuffer!=0);
-                    assert(g.iobytes>0);
+                    size_t       iRequest = 0;
+                    for( size_t i=na;i>0;--i)
+                    {
+                        async_ghosts &g = ds.get_async(i);
+                        assert(g.peer>=0);
+                        assert(g.peer<MPI.CommWorldSize);
+                        assert(g.ibuffer!=0);
+                        assert(g.obuffer!=0);
+                        assert(g.iobytes>0);
+                        
+                        //----------------------------------------------------------
+                        // create ibuffer
+                        //----------------------------------------------------------
+                        g.inner_store( handle );
+                        
+                        //----------------------------------------------------------
+                        // create non blocking recv
+                        //----------------------------------------------------------
+                        MPI.Irecv(g.obuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                        assert(iRequest<=requests.count);
+                        
+                    }
                     
-                    //----------------------------------------------------------
-                    // create ibuffer
-                    //----------------------------------------------------------
-                    g.inner_store( handle );
+                    //--------------------------------------------------------------
+                    // create send requests in reverse order
+                    //--------------------------------------------------------------
+                    for( size_t i=1;i<=na;++i)
+                    {
+                        async_ghosts &g = ds.get_async(i);
+                        //----------------------------------------------------------
+                        // create non blocking send
+                        //----------------------------------------------------------
+                        MPI.Isend(g.ibuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
+                        assert(iRequest<=requests.count);
+                    }
                     
-                    //----------------------------------------------------------
-                    // create non blocking recv
-                    //----------------------------------------------------------
-                    MPI.Irecv(g.obuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
-                    assert(iRequest<=requests.count);
-                    
+                    //--------------------------------------------------------------
+                    // process with MPI
+                    //--------------------------------------------------------------
+                    MPI.Startall(requests);
                 }
-                
-                //--------------------------------------------------------------
-                // create send requests in reverse order
-                //--------------------------------------------------------------
-                for( size_t i=1;i<=na;++i)
-                {
-                    async_ghosts &g = ds.get_async(i);
-                    //----------------------------------------------------------
-                    // create non blocking send
-                    //----------------------------------------------------------
-                    MPI.Isend(g.ibuffer, g.content, MPI_BYTE, g.peer, tag, MPI_COMM_WORLD, requests[iRequest++]);
-                    assert(iRequest<=requests.count);
-                }
-                
-                //--------------------------------------------------------------
-                // process with MPI
-                //--------------------------------------------------------------
-                MPI.Startall(requests);
             }
             
             template <typename DATASPACE> static inline
             void wait1( const mpi & MPI, linear &handle, DATASPACE &ds, mpi::Requests &requests )
             {
                 assert( requests.count == ds.num_requests );
-                //--------------------------------------------------------------
-                // wait for MPI I/O
-                //--------------------------------------------------------------
-                MPI.Waitall(requests);
-                
-                //--------------------------------------------------------------
-                // dispatch ghosts data
-                //--------------------------------------------------------------
-                for( size_t i=ds.async_count;i>0;--i)
+                const size_t na = ds.async_count;
+                if(na>0)
                 {
-                    async_ghosts &g = ds.get_async(i);
-                    g.outer_query(handle);
+                    //--------------------------------------------------------------
+                    // wait for MPI I/O
+                    //--------------------------------------------------------------
+                    MPI.Waitall(requests);
+                    
+                    //--------------------------------------------------------------
+                    // dispatch ghosts data
+                    //--------------------------------------------------------------
+                    for( size_t i=na;i>0;--i)
+                    {
+                        async_ghosts &g = ds.get_async(i);
+                        g.outer_query(handle);
+                    }
                 }
             }
             
