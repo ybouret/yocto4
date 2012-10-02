@@ -76,10 +76,12 @@ namespace yocto
             //! virtual address_of
             virtual const void *address_of( size_t source ) const throw() { assert(entry); assert(source<this->items); return &entry[source]; }
             
-            //! virtual local_copy
+            //! virtual local_copy, assuming an assign operator exists
             virtual void local_copy( size_t target, size_t source ) throw()
             {
-                assert(entry);assert(target<this->items);assert(source<this->items);
+                assert(entry);
+                assert(target<this->items);
+                assert(source<this->items);
                 entry[target] = entry[source];
             }
             
