@@ -1,12 +1,12 @@
 #include "yocto/visit/interface.hpp"
 #include "yocto/exception.hpp"
 
-namespace yocto 
+namespace yocto
 {
     
     
     
-    VisIt:: TraceFile:: TraceFile( int rank, const string &filename  ) : 
+    VisIt:: TraceFile:: TraceFile( int rank, const string &filename  ) :
     rank_(rank)
     {
         if( 0 == rank_)
@@ -29,35 +29,33 @@ namespace yocto
     {
         VisItSetOptions( (char *) options.c_str() );
     }
-   
-#if 0
-    void VisIt:: SetupEnvironment()
-    {
-        if( !VisItSetupEnvironment() )
-            throw exception("VisItSetupEnvironment Failure!");
-    }
-#endif
     
-    namespace 
+    
+    namespace
     {
-        static int visit_broadcast_int_callback(int *value, int sender)
+        static inline
+        int visit_broadcast_int_callback(int *value,
+                                         int  sender)
         {
             return MPI_Bcast(value, 1, MPI_INT, sender, MPI_COMM_WORLD);
         }
-        static int visit_broadcast_string_callback(char *str, int len,
-                                                   int sender)
+        
+        static inline
+        int visit_broadcast_string_callback(char *str,
+                                            int   len,
+                                            int   sender)
         {
             return MPI_Bcast(str, len, MPI_CHAR, sender, MPI_COMM_WORLD);
         }
     }
     
-    void VisIt:: SetupParallel(const mpi    &MPI , 
+    void VisIt:: SetupParallel(const mpi    &MPI ,
                                const string &sim_name,
                                const string &sim_comment,
                                const string &sim_path,
                                const string *sim_ui)
     {
-        MPI.Printf( stderr, "[Visit] SetupParallel %d.%d\n", MPI.CommWorldRank, MPI.CommWorldSize);
+        MPI.Printf( stderr, "[Visit] SetupParallel %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
         //----------------------------------------------------------------------
         // startup VisIt
         //----------------------------------------------------------------------
@@ -67,13 +65,13 @@ namespace yocto
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
         //----------------------------------------------------------------------
-        VisItSetBroadcastIntFunction(visit_broadcast_int_callback); 
-        VisItSetBroadcastStringFunction(visit_broadcast_string_callback); 
+        VisItSetBroadcastIntFunction(visit_broadcast_int_callback);
+        VisItSetBroadcastStringFunction(visit_broadcast_string_callback);
         
         //----------------------------------------------------------------------
         // Tell libsim whether the simulation is parallel.
         //----------------------------------------------------------------------
-        VisItSetParallel(     MPI.CommWorldSize > 1 ); 
+        VisItSetParallel(     MPI.CommWorldSize > 1 );
         VisItSetParallelRank( MPI.CommWorldRank     );
         
         //----------------------------------------------------------------------
@@ -86,12 +84,10 @@ namespace yocto
         if( ui_file ) MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
         if( 0 == MPI.CommWorldRank )
         {
-            
-           
-            if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(), 
-                                                      sim_comment.c_str(), 
+            if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(),
+                                                      sim_comment.c_str(),
                                                       sim_path.c_str(),
-                                                      NULL, 
+                                                      NULL,
                                                       ui_file,
                                                       NULL
                                                       ) )
