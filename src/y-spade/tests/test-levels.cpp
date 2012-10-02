@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/spade/contour/levels.hpp"
+#include "yocto/spade/contour/iso2d.hpp"
 
 using namespace yocto;
 using namespace spade;

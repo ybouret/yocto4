@@ -9,6 +9,7 @@ namespace yocto
     namespace spade
     {
         
+        //! float or double levels
         template <typename T>
         class levels : public sorted_vector<T,comparator<T> >
         {
