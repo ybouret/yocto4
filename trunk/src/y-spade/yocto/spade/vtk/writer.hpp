@@ -32,7 +32,7 @@ namespace yocto
             
             //! write a 2D rmesh
             template <typename T> inline
-            void write_mesh( ios::ostream &fp, const rmesh<layout2D,T> &mesh , const layout2D &sub )
+            void write_mesh( ios::ostream &fp, const rmesh<layout2D,T> &mesh , const layout2D &sub ) const
             {
                 const vtk_record &r = (*this)[ typeid(T) ];
                 const array1D<T> &X = mesh.X();
@@ -46,7 +46,7 @@ namespace yocto
             
             //! write a 3D rmesh
             template <typename T> inline
-            void write_mesh( ios::ostream &fp, const rmesh<layout3D,T> &mesh , const layout3D &sub )
+            void write_mesh( ios::ostream &fp, const rmesh<layout3D,T> &mesh , const layout3D &sub ) const
             {
                 const vtk_record &r = (*this)[ typeid(T) ];
                 const array1D<T> &X = mesh.X();
@@ -74,11 +74,11 @@ namespace yocto
             
             //! unique vtk save routine
             template <typename LAYOUT,typename U>
-            void save( const string &filename, const string &title, const workspace<LAYOUT,rmesh,U> &wksp, const array<string> &var, const LAYOUT &sub )
+            void save( const string &filename, const string &title, const workspace<LAYOUT,rmesh,U> &wksp, const array<string> &var, const LAYOUT &sub ) const
             {
                 ios::ocstream fp(filename,false);
                 header(fp, title);
-                write_mesh(fp,wksp.mesh,sub);
+                write_mesh<U>(fp,wksp.mesh,sub);
                 fp("POINT_DATA %u\n", unsigned(sub.items));
                 for( size_t q=1; q <= var.size(); ++q )
                 {
@@ -90,7 +90,7 @@ namespace yocto
             
             //! unique vtk save routine, wrapper
             template <typename LAYOUT,typename U>
-            void save( const char *the_filename, const char *the_title, const workspace<LAYOUT,rmesh,U> &wksp, const array<string> &var, const LAYOUT &sub )
+            void save( const char *the_filename, const char *the_title, const workspace<LAYOUT,rmesh,U> &wksp, const array<string> &var, const LAYOUT &sub ) const
             {
 				const string filename(the_filename);
 				const string title(the_title);

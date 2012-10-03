@@ -7,7 +7,10 @@ namespace yocto
     namespace spade
     {
         vtk_writer:: ~vtk_writer() throw() {}
-     
+        
+        typedef geom::v2d<float>  v2d_flt;
+		typedef geom::v2d<double> v2d_dbl;
+        
         typedef geom::v3d<float>  v3d_flt;
 		typedef geom::v3d<double> v3d_dbl;
         
@@ -34,6 +37,29 @@ namespace yocto
 				const unit_t x = *(unit_t*)data;
 				fp( format.unit_fmt.c_str(), static_cast<long int>(x) );
 			}
+            
+            static inline void write_v2d_flt( ios::ostream &fp, const void *data, const vtk_format &format )
+			{
+				assert(data);
+				const v2d_flt &v = *(v2d_flt *)data;
+				fp( format.real_fmt.c_str(), double(v.x) );
+				fp.write(' ');
+				fp( format.real_fmt.c_str(), double(v.y) );
+                fp.write(' ');
+				fp( format.real_fmt.c_str(), 0.0 );
+			}
+            
+            static inline void write_v2d_dbl( ios::ostream &fp, const void *data, const vtk_format &format )
+			{
+				assert(data);
+				const v2d_dbl &v = *(v2d_dbl *)data;
+				fp( format.real_fmt.c_str(), (v.x) );
+				fp.write(' ');
+				fp( format.real_fmt.c_str(), (v.y) );
+                fp.write(' ');
+				fp( format.real_fmt.c_str(), 0.0 );
+			}
+            
             
 			static inline void write_v3d_flt( ios::ostream &fp, const void *data, const vtk_format &format )
 			{
@@ -73,6 +99,8 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
             Y_SPADE_SCALARS(float,write_float);
 			Y_SPADE_SCALARS(double,write_double);
 			Y_SPADE_SCALARS(unit_t,write_unit);
+            Y_SPADE_VECTORS(v2d_flt,write_v2d_flt);
+			Y_SPADE_VECTORS(v2d_dbl,write_v2d_dbl);
 			Y_SPADE_VECTORS(v3d_flt,write_v3d_flt);
 			Y_SPADE_VECTORS(v3d_dbl,write_v3d_dbl);
         }
@@ -99,11 +127,12 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
 			fp("%s\n", title.c_str());
 			fp("ASCII\n");
 		}
-
+        
         void vtk_writer:: prolog( ios::ostream &fp, const string &name, const vtk_record &r) const
 		{
 			fp("%s %s float\n", r.kind.c_str(), name.c_str());
-			fp("LOOKUP_TABLE default\n");
+            if( r.kind == "SCALARS" )
+                fp("LOOKUP_TABLE default\n");
 		}
         
 		void vtk_writer:: write1( ios::ostream &fp, const void *data, const vtk_record &r) const
@@ -113,7 +142,7 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
 			r.proc( fp, data, format );
 			fp.write('\n');
 		}
-
+        
         void  vtk_writer:: write_rmesh_sub( ios::ostream &fp, const layout2D &sub ) const
 		{
 			fp("DATASET RECTILINEAR_GRID\n");
@@ -199,7 +228,7 @@ do { const vtk_record r( typeid(TYPE), KIND, PROC); if( !records.insert(r) ) thr
 				}
 			}
 		}
-
+        
         
         
     }
