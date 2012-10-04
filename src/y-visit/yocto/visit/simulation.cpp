@@ -22,10 +22,12 @@ namespace yocto
     stepTime(-1),
     loopTime(-1),
     console(true),
-    par_rank( MPI.CommWorldRank ),
-    par_size( MPI.CommWorldSize ),
-    parallel( MPI.IsParallel    ),
-    master(   MPI.IsMaster      )
+    par_rank(  MPI.CommWorldRank ),
+    par_size(  MPI.CommWorldSize ),
+    par_last(  MPI.CommWorldLast ),
+    parallel(  MPI.IsParallel    ),
+    is_first(  MPI.IsFirst       ),
+    is_final(  MPI.IsFinal       )
     {
     }
     

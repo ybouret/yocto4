@@ -9,7 +9,7 @@ static void
 ui_run_clicked(void *cbdata)
 {
     VisIt::Simulation *sim = (VisIt::Simulation *)cbdata;
-    if(sim->master) fprintf(stderr,"ui_run_clicked\n");
+    if(sim->is_first) fprintf(stderr,"ui_run_clicked\n");
     sim->runMode = VISIT_SIMMODE_RUNNING;
     VisItTimeStepChanged();
 }
@@ -18,7 +18,7 @@ static void
 ui_halt_clicked(void *cbdata)
 {
     VisIt::Simulation *sim = (VisIt::Simulation *)cbdata;
-    if(sim->master) fprintf(stderr,"ui_halt_clicked\n");
+    if(sim->is_first) fprintf(stderr,"ui_halt_clicked\n");
     sim->runMode = VISIT_SIMMODE_STOPPED;
     VisItTimeStepChanged();
 }
@@ -27,7 +27,7 @@ static void
 ui_step_clicked(void *cbdata)
 {
     VisIt::Simulation *sim = (VisIt::Simulation *)cbdata;
-    if(sim->master) fprintf(stderr,"ui_step_clicked\n");
+    if(sim->is_first) fprintf(stderr,"ui_step_clicked\n");
     sim->runMode = VISIT_SIMMODE_STOPPED;
     VisIt::OneStep( *sim );
     VisItTimeStepChanged();
@@ -37,14 +37,14 @@ static void
 ui_levels_changed(int value, void *cbdata)
 {
     VisIt::Simulation *sim = (VisIt::Simulation *)cbdata;
-    if(sim->master) fprintf(stderr,"ui_levels_changed: %d\n", value);
+    if(sim->is_first) fprintf(stderr,"ui_levels_changed: %d\n", value);
 }
 
 static void
 ui_option_changed(int value, void *cbdata)
 {
     VisIt::Simulation *sim = (VisIt::Simulation *)cbdata;
-    if(sim->master) fprintf(stderr,"ui_option_changed: %d\n", value);
+    if(sim->is_first) fprintf(stderr,"ui_option_changed: %d\n", value);
 }
 
 
@@ -77,7 +77,7 @@ public:
         {
             
             MPI.Printf0(stderr, "update UI\n" );
-            if(master)
+            if(is_first)
             {
                 VisItUI_setValueI("LEVELS",      cycle % 100, 1);
                 VisItUI_setValueI("progressBar", cycle % 100, 1);

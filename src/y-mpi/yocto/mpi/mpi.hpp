@@ -72,11 +72,12 @@ namespace yocto
 		static mpi & init( int * argc, char ***argv );
 		void   Finalize() throw();
 		
-		
+       		
 		const int    CommWorldSize;    //!< size of MPI_COMM_WORLD
 		const int    CommWorldRank;    //!< rank in MPI_COMM_WORLD
 		const int    CommWorldLast;    //!< CommWorldSize-1;
-		const bool   IsMaster;         //!< 0 == CommWorldRank
+		const bool   IsFirst;          //!< 0 == CommWorldRank
+        const bool   IsFinal;          //!< CommWorldLast == CommWorldRank
         const bool   IsParallel;       //!< CommWorldSize > 1
 		const int    ProcessorNameLength;
 		const char   ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
