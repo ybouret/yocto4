@@ -179,7 +179,7 @@ namespace yocto
         return MPI_Wtime();
     }
     
-    void  mpi:: __WaitFor( double nsec) const
+    void  mpi:: WaitFor( double nsec) const
     {
         const double stamp = Wtime();
         while( Wtime() - stamp < nsec )
