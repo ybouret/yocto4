@@ -119,6 +119,7 @@ namespace yocto
 	}
     
     
+#if 0
     void mpi:: __InitSync() const
     {
         static const int tag = 1001;
@@ -156,6 +157,7 @@ namespace yocto
             Barrier(MPI_COMM_WORLD);
         }
     }
+#endif
     
 	
 }
