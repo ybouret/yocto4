@@ -92,7 +92,7 @@ namespace yocto
         char        *cmd = sim.iobuff();
         const size_t len = sim.iobuff.length();
         memset(cmd,len,0);
-        if( sim.master )
+        if( sim.is_first )
         {
             //------------------------------------------------------------------
             // capture the line
@@ -322,7 +322,7 @@ namespace yocto
             // Get input from VisIt or timeout so the simulation can run.
             //------------------------------------------------------------------
             const int blocking = ( sim.runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;            
-            if(sim.master)
+            if(sim.is_first)
             {
                 visitstate = VisItDetectInput(blocking, fd );
             }
