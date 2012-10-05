@@ -196,6 +196,15 @@ namespace yocto
             x = swap_be_as<T>(y);
         }
         
+        //! send ONE integral type
+        template <typename T>
+        inline void Isend( const T x, int dest,  int tag, MPI_Comm comm, MPI_Request &req) const
+        {
+            const T y = swap_be_as<T>(x);
+            this->Isend(&y, sizeof(T), MPI_BYTE, dest, tag, comm, req);
+        }
+        
+               
         double Wtime() const;
         void   WaitFor( double nsec) const;
         

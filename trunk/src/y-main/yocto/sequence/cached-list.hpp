@@ -117,6 +117,14 @@ namespace yocto
             cache.garbage( this->unlink(node) );
         }
         
+        //! garbage an unlinked node
+        inline void garbage( NODE *node ) throw()
+        {
+            assert( 0 != node );
+            assert( !this->owns(node) );
+            cache.garbage(node);
+        }
+        
         cache_of<NODE> &cache;
         
     private:
