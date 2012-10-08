@@ -69,6 +69,9 @@ namespace yocto
              */
             virtual void get_meta_data( visit_handle &md ) const;
             
+            void add_generic_command( const string &cmd, visit_handle &md ) const;
+            void add_generic_command( const char   *cmd, visit_handle &md ) const;
+            
             //! provide mesh
             /**
              user's mesh data

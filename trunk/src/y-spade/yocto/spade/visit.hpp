@@ -84,7 +84,7 @@ namespace yocto
                     VisIt_MeshMetaData_setNumDomains(h,num_domains);
                 }
                 else 
-                    throw exception("_visit::mesh_meta_data error");
+                    throw exception("VisIt I/O::mesh_meta_data error");
                 return h;
             }
             
@@ -109,7 +109,7 @@ namespace yocto
                 const type_spec spec( typeid(T) );
                 const param    *p = params.search( spec );
                 if( !p )
-                    throw exception("no _visit('%s')", spec.name());
+                    throw exception("no VisIt I/O for <'%s'>", spec.name());
                 
                 visit_handle vmd = VISIT_INVALID_HANDLE;
                 if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
@@ -120,7 +120,7 @@ namespace yocto
                     VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
                 }
                 else 
-                    throw exception("_visit::variable_data error");
+                    throw exception("VisIt I/O::variable_data error");
                 return vmd;
             }
             
