@@ -95,6 +95,26 @@ namespace yocto
         assert( VISIT_INVALID_HANDLE != md );
     }
     
+    void VisIt:: Simulation:: add_generic_command( const string &name, visit_handle &md ) const
+    {
+        visit_handle cmd = VISIT_INVALID_HANDLE;
+        if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
+        {
+            VisIt_CommandMetaData_setName(cmd, name.c_str());
+            VisIt_SimulationMetaData_addGenericCommand(md, cmd);
+        }
+        else
+            throw exception("VisIt.Simulation.add_generic_command('%s') FAILURE", name.c_str());
+    }
+    
+    void VisIt:: Simulation:: add_generic_command( const char *text, visit_handle &md ) const
+    {
+        const string name(text);
+        add_generic_command(name, md);
+    }
+    
+   
+    
     visit_handle VisIt:: Simulation::  get_mesh( int domain, const string &name ) const
     {
         MPI.Printf0(stderr, "get_mesh(%d,'%s')\n", domain, name.c_str() );
