@@ -56,8 +56,9 @@ namespace yocto {
 			T norm()  const throw();
 			void normalize() throw();
 
-			T angle() const throw();
-			
+			T angle() const throw(); //! in ]-\pi,\pi]
+			T positive_angle() const throw(); //! in [0;2pi]
+            
 			friend inline
 			std::ostream &operator<<( std::ostream &v2d_os, const v2d<T> &v )
 			{

@@ -3,7 +3,7 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_INIT(80)
+YOCTO_UNIT_TEST_INIT(128)
 {
 	
 	YOCTO_UNIT_TEST_DECL(platform);
@@ -78,7 +78,7 @@ YOCTO_UNIT_TEST_INIT(80)
     YOCTO_UNIT_TEST_DECL(clist);
     YOCTO_UNIT_TEST_DECL(cached);
     YOCTO_UNIT_TEST_DECL(hlist);
-
+    YOCTO_UNIT_TEST_DECL(geom);
 }
 YOCTO_UNIT_TEST_EXEC()
 
