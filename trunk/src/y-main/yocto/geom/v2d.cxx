@@ -121,6 +121,12 @@ namespace yocto {
 			return math::Atan2(x,y);
 		}
 		
+        template <>
+        real_t  v2d<real_t>::positive_angle() const throw()
+        {
+            const real_t a = math::Atan2(x,y);
+            return a < 0 ? a + math::numeric<real_t>::two_pi : a;
+        }
 #else
 		template <>
 		real_t v2d<real_t>:: norm() const throw() {
