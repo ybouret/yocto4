@@ -32,14 +32,18 @@ namespace yocto
 	
 	void mpi:: Startall( Requests &requests ) const
 	{
+        Y_MPI_STAMP;
 		if( requests.count )
 			Startall( requests.count, &requests[0] );
+        Y_MPI_CTIME;
 	}
 	
 	void mpi:: Waitall( Requests &requests ) const
 	{
+        Y_MPI_STAMP;
 		if( requests.count )
 			Waitall( requests.count, &requests[0], &requests(0) );
+        Y_MPI_CTIME;
 	}
 	
 	MPI_Request & mpi:: Requests:: operator[]( size_t indx ) throw()

@@ -74,6 +74,7 @@ namespace yocto
     IsFirst(true),
     IsFinal(true),
     IsParallel(false),
+    CommTime(0),
 	ProcessorNameLength(0),
 	ProcessorName()
 	{
@@ -176,12 +177,12 @@ namespace yocto
         return r;
     }
 
-    double mpi::Wtime() const
+    double mpi::Wtime() const throw()
     {
         return MPI_Wtime();
     }
     
-    void  mpi:: WaitFor( double nsec) const
+    void  mpi:: WaitFor( double nsec) const throw()
     {
         const double stamp = Wtime();
         while( Wtime() - stamp < nsec )
