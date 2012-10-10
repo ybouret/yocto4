@@ -135,6 +135,7 @@ namespace yocto {
 #endif
 		
 #if YOCTO_ZTYPE != 'i'
+        
 		template <>
 		void v2d<real_t>:: normalize() throw() {
 			const real_t fac =  math::Sqrt( real_t(1) / ( x*x + y*y ) );
