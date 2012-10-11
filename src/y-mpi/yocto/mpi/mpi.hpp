@@ -210,7 +210,7 @@ namespace yocto
         void   WaitFor( double nsec) const throw();
         
 	private:
-		friend class singleton<mpi>;                            //!< access mpi
+		friend class singleton<mpi>;                           //!< access mpi
 		static const threading::longevity life_time = 0;       //!< TODO: set to a better value
 		static const char                 name[];
 		explicit mpi();
