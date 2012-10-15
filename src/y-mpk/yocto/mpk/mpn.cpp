@@ -350,7 +350,9 @@ namespace yocto
                 
                 if( os.flags() & std::ios_base::hex )
 				{
-					// hexa
+                    //----------------------------------------------------------
+					// hexa decimal format
+                    //----------------------------------------------------------
 					assert(size_>0);
 					const uint8_t *p = byte_ + size_;
 					
@@ -371,6 +373,28 @@ namespace yocto
 						os << hexa_char[ ( B  ) & 0xf ];
 					}
 				}
+                else
+                {
+                    //----------------------------------------------------------
+					// decimal format
+                    //----------------------------------------------------------
+                    string ans;
+                    const natural Ten( uint8_t(10) );
+                    natural       Arg = *this;
+                    while( Arg >= Ten )
+                    {
+                        const natural Quot = Arg/Ten;
+                        const natural Rem  = Arg - Ten * Quot;
+                        assert(Rem<Ten);
+                        ans.append( char('0' + Rem.byte_[0]) );
+                        Arg = Quot;
+                    }
+                    ans.append(char('0' + Arg.byte_[0]));
+                    for( size_t i=ans.size();i>0;--i)
+                    {
+                        os << ans[i-1];
+                    }
+                }
 			}
 			
 			
