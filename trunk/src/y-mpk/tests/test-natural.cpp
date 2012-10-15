@@ -87,6 +87,7 @@ YOCTO_UNIT_TEST_IMPL(natural)
 	proc_disp<uint32_t>( gen );
 	proc_disp<uint64_t>( gen );
 	
+    
 	{
 		std::cerr << "-- Testing Addition" << std::endl;
 		for( size_t k=0; k< ITER; ++k )
