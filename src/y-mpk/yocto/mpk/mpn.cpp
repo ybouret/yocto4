@@ -168,7 +168,7 @@ namespace yocto
 			update();
 		}
 		
-		
+#if 0
 		natural:: natural( const uint8_t &x ) :
 		size_( 1 ),
 		maxi_( size_ ),
@@ -215,7 +215,24 @@ namespace yocto
 			byte_[ 7 ] =  uint8_t( (x>>56) & 0xff );
 			update();
 		}
-		
+#endif
+        
+        natural:: natural( const uint64_t x ) :
+		size_( 8 ),
+		maxi_( size_ ),
+		byte_( mem_acquire(maxi_) )
+		{
+			byte_[ 0 ] =  uint8_t( (x)     & 0xff );
+			byte_[ 1 ] =  uint8_t( (x>>8)  & 0xff );
+			byte_[ 2 ] =  uint8_t( (x>>16) & 0xff );
+			byte_[ 3 ] =  uint8_t( (x>>24) & 0xff );
+			byte_[ 4 ] =  uint8_t( (x>>32) & 0xff );
+			byte_[ 5 ] =  uint8_t( (x>>40) & 0xff );
+			byte_[ 6 ] =  uint8_t( (x>>48) & 0xff );
+			byte_[ 7 ] =  uint8_t( (x>>56) & 0xff );
+			update();
+		}
+        
 		natural:: natural( size_t n, const as_capacity_t & ) :
 		size_(n),
 		maxi_(n),
