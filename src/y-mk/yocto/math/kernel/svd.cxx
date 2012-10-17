@@ -54,12 +54,15 @@ namespace yocto
         static inline
         real_t pythag(real_t a, real_t b) throw()
         {
+            static const real_t One(1);
+            static const real_t Zero(0);
+            
             const real_t absa=Fabs(a);
             const real_t absb=Fabs(b);
             if (absa > absb)
-                return absa*Sqrt(1.0+Square(absb/absa));
+                return absa*Sqrt(One+Square(absb/absa));
             else
-                return (absb <= 0.0 ? 0.0 : absb*Sqrt(1.0+Square(absa/absb)));
+                return (absb <= Zero ? Zero : absb*Sqrt(One+Square(absa/absb)));
         }
         
         static const size_t SVD_MAX_ITS = 1024;
@@ -92,7 +95,7 @@ namespace yocto
                 if (i <= m)
                 {
                     for(k=i;k<=m;k++)
-                        scale += fabs(a[k][i]);
+                        scale += Fabs(a[k][i]);
                     if (scale)
                     {
                         for(k=i;k<=m;k++)
@@ -101,7 +104,7 @@ namespace yocto
                             s += a[k][i]*a[k][i];
                         }
                         f=a[i][i];
-                        g = -Signed(sqrt(s),f);
+                        g = -Signed(Sqrt(s),f);
                         h=f*g-s;
                         a[i][i]=f-g;
                         for(size_t j=l;j<=n;j++)
@@ -120,7 +123,7 @@ namespace yocto
                 if (i <= m && i != n)
                 {
                     for(k=l;k<=n;k++)
-                        scale += fabs(a[i][k]);
+                        scale += Fabs(a[i][k]);
                     if (scale)
                     {
                         for(k=l;k<=n;k++)
@@ -129,7 +132,7 @@ namespace yocto
                             s += a[i][k]*a[i][k];
                         }
                         f=a[i][l];
-                        g = -Signed(sqrt(s),f);
+                        g = -Signed(Sqrt(s),f);
                         h=f*g-s;
                         a[i][l]=f-g;
                         for(k=l;k<=n;k++)
