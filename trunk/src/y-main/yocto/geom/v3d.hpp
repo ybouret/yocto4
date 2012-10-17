@@ -1,8 +1,8 @@
 /** \file v3d.hpp
  */
 
-#ifndef _YOCTO_v3d_HPP_
-#define _YOCTO_v3d_HPP_ 1
+#ifndef YOCTO_V3D_INCLUDED
+#define YOCTO_V3D_INCLUDED 1
 
 #include "yocto/geom/v2d.hpp"
 

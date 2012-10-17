@@ -66,11 +66,14 @@ namespace yocto
 			//==================================================================
 			natural( const ro_buffer & ); //!< binary + update
 			natural( const void *buffer, const size_t buflen ); //!< binary + update
+#if 0
 			natural( const uint8_t   & ); //!< one   byte
 			natural( const uint16_t  & ); //!< two   bytes
 			natural( const uint32_t  & ); //!< four  bytes
 			natural( const uint64_t  & ); //!< eight bytes
-
+#endif
+            natural( const uint64_t ); //!< default cast
+            
 			//==================================================================
 			// fast conversion
 			//==================================================================

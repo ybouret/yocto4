@@ -1,8 +1,8 @@
 /** \file v2d.hpp
 */
 
-#ifndef _YOCTO_v2d_HPP_
-#define _YOCTO_v2d_HPP_ 1
+#ifndef YOCTO_V2D_INCLUDED
+#define YOCTO_V2D_INCLUDED 1
 
 #include "yocto/bitwise.hpp"
 #include "yocto/random/uniform.hpp"
