@@ -119,7 +119,7 @@ namespace
         }
         
         
-        virtual void perform( const string &cmd )
+        virtual void perform( const string &cmd, const array<string> & )
         {
             MPI.Printf( stderr, "sim %d.%d> %s\n", par_rank, par_size, cmd.c_str() );
             if( cmd == "raz" )

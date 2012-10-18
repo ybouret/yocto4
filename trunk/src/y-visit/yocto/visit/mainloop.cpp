@@ -5,7 +5,7 @@
 
 #include <cstdlib>
 
-namespace yocto 
+namespace yocto
 {
     
 #define VISIT_COMMAND_PROCESS 0
@@ -37,7 +37,7 @@ namespace yocto
     }
     
     
-    static inline 
+    static inline
     int ProcessVisItCommand( VisIt:: Simulation &sim )
     {
         int command = -1;
@@ -49,13 +49,13 @@ namespace yocto
                 command = VISIT_COMMAND_SUCCESS;
                 BroadcastSlaveCommand(&command);
                 return 1;
-            } 
-            else 
+            }
+            else
             {
                 command = VISIT_COMMAND_FAILURE;
                 BroadcastSlaveCommand(&command);
                 return 0;
-            } 
+            }
         }
         else
         {
@@ -72,9 +72,9 @@ namespace yocto
                     case VISIT_COMMAND_SUCCESS:
                         return 1;
                     case VISIT_COMMAND_FAILURE:
-                        return 0; 
+                        return 0;
                 }
-            } 
+            }
         }
         return 1;
     }
@@ -85,7 +85,7 @@ namespace yocto
     // Process Console.
     //
     //==========================================================================
-    static inline 
+    static inline
     void ProcessConsole( VisIt:: Simulation &sim )
     {
         const mpi &  MPI = sim.MPI;
@@ -115,7 +115,7 @@ namespace yocto
                     c = 0;
                     --num_in;
                 }
-                else 
+                else
                     break;
             }
         }
@@ -147,7 +147,7 @@ namespace yocto
         VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
         
         
-        if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY) 
+        if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY)
         {
             assert( VISIT_INVALID_HANDLE != md );
             
@@ -155,7 +155,7 @@ namespace yocto
             VisIt_SimulationMetaData_setMode(md,sim.runMode);
             VisIt_SimulationMetaData_setCycleTime(md, sim.cycle,sim.runTime);
             
-                       
+            
             /* Create Generic Interface/Commands */
             for(size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
             {
@@ -170,7 +170,7 @@ namespace yocto
             
             /* Specific Meta Data for the simulation */
             sim.get_meta_data(md);
-
+            
         }
         
         return md;
@@ -181,7 +181,7 @@ namespace yocto
     // SimGetDomainList callback
     //
     //==========================================================================
-    static 
+    static
     visit_handle SimGetDomainList(const char *name, void *cbdata)
     {
         assert(cbdata);
@@ -224,17 +224,21 @@ namespace yocto
     // Control Command Callback
     //
     //==========================================================================
-    static inline 
-    void ControlCommandCallback(const char *cmd, 
+    static inline
+    void ControlCommandCallback(const char *cmd,
                                 const char *args,
                                 void       *cbdata)
     {
         assert(cbdata!=NULL);
         VisIt::Simulation &sim  = *(VisIt::Simulation *)cbdata;
-        const string       todo = cmd;
-        
+        string       todo = cmd;
+        if(args)
+        {
+            todo += ' ';
+            todo += args;
+        }
         static const mpi &MPI = sim.MPI;
-        MPI.Printf0(stderr,"[VisIt::Command] '%s' (%s) \n", cmd, args ? args : "NO ARGS" );
+        MPI.Printf0(stderr,"[VisIt::Command] '%s'\n", todo.c_str());
         VisIt::Perform(sim,todo);
     }
     
@@ -278,9 +282,9 @@ namespace yocto
     //  process the command and forward to VisIt
     //
     //==========================================================================
-    void VisIt:: Perform( Simulation &sim, const string &cmd )
+    void VisIt:: Perform( Simulation &sim, const string &user_cmd )
     {
-        sim.performAlways(cmd);
+        sim.performAlways(user_cmd);
         if( VisItIsConnected() )
         {
             VisItTimeStepChanged();
@@ -316,12 +320,12 @@ namespace yocto
             MPI.Printf0(stderr, "[VisIt] Console is Active\n");
         }
         
-        do 
-        {            
+        do
+        {
             //------------------------------------------------------------------
             // Get input from VisIt or timeout so the simulation can run.
             //------------------------------------------------------------------
-            const int blocking = ( sim.runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;            
+            const int blocking = ( sim.runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;
             if(sim.is_first)
             {
                 visitstate = VisItDetectInput(blocking, fd );
@@ -377,20 +381,20 @@ namespace yocto
                     //----------------------------------------------------------
                     if(!ProcessVisItCommand(sim))
                     {
-                        /* Disconnect on an error or closed connection. */ 
+                        /* Disconnect on an error or closed connection. */
                         MPI.Printf0(stderr,"[VisIt] Disconnected\n");
                         VisItDisconnect();
                     }
                     break;
                     
-                case 3: 
+                case 3:
                     ProcessConsole(sim);
                     break;
                     
-                case -1: 
+                case -1:
                 case -2:
-                case -3: 
-                case -4: 
+                case -3:
+                case -4:
                 case -5:
                     throw exception("VisItDetectInput Error(%d): %s",visitstate,VisItGetLastError());
                     
@@ -399,7 +403,7 @@ namespace yocto
                     
             }
             
-        } 
+        }
         while ( !sim.done );
     }
 }
