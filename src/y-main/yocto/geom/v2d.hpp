@@ -78,6 +78,9 @@ namespace yocto {
 			T &       operator[]( size_t i ) throw(); //!< i=0..1
 			const T & operator[]( size_t i) const throw(); //!< i=0..1
 
+            static
+            T angle_of( const v2d &a, const v2d &b ) throw();
+            
 		};
 
 		template <class T>

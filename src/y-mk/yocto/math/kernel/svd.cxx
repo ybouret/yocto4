@@ -50,7 +50,7 @@ namespace yocto
         }
         
         
-        
+#if 0
         static inline
         real_t pythag(real_t a, real_t b) throw()
         {
@@ -64,6 +64,7 @@ namespace yocto
             else
                 return (absb <= Zero ? Zero : absb*Sqrt(One+Square(absa/absb)));
         }
+#endif
         
         static const size_t SVD_MAX_ITS = 1024;
         /******************************************************************************/
@@ -223,7 +224,7 @@ namespace yocto
                             rv1[i]=c*rv1[i];
                             if ((real_t)(Fabs(f)+anorm) == anorm) break;
                             g=w[i];
-                            h=pythag(f,g);
+                            h=Hypotenuse(f,g);
                             w[i]=h;
                             h=1.0/h;
                             c=g*h;
@@ -255,7 +256,7 @@ namespace yocto
                     g=rv1[nm];
                     h=rv1[k];
                     f=((y-z)*(y+z)+(g-h)*(g+h))/(2.0*h*y);
-                    g=pythag(f,1.0);
+                    g=Hypotenuse(f,real_t(1.0));
                     f=((x-z)*(x+z)+h*((y/(f+Signed(g,f)))-h))/x;
                     c=s=1.0; /* Next QR transformation: */
                     for(size_t j=l;j<=nm;j++)
@@ -265,7 +266,7 @@ namespace yocto
                         y=w[i];
                         h=s*g;
                         g=c*g;
-                        z=pythag(f,h);
+                        z=Hypotenuse(f,h);
                         rv1[j]=z;
                         c=f/z;
                         s=h/z;
@@ -280,7 +281,7 @@ namespace yocto
                             v[jj][j]=x*c+z*s;
                             v[jj][i]=z*c-x*s;
                         }
-                        z=pythag(f,h);
+                        z=Hypotenuse(f,h);
                         w[j]=z; /* Rotation can be arbitrary if z = 0. */
                         if (z) {
                             z=1.0/z;
