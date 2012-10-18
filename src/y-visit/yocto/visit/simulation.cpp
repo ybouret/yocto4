@@ -2,6 +2,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/string/tokenizer.hpp"
 
+#include <cstdlib>
+
 namespace yocto
 {
     
@@ -28,7 +30,8 @@ namespace yocto
     par_last(  MPI.CommWorldLast ),
     parallel(  MPI.IsParallel    ),
     is_first(  MPI.IsFirst       ),
-    is_final(  MPI.IsFinal       )
+    is_final(  MPI.IsFinal       ),
+	cmdArgs()
     {
     }
     
