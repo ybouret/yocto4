@@ -1,6 +1,7 @@
 #include "yocto/geom/v2d.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/math/ztype.hpp"
+#include "yocto/code/utils.hpp"
 #include <iostream>
 #include <cstdlib>
 
@@ -164,6 +165,14 @@ namespace yocto {
 			y =  radius * math::Sin( theta );
 		}
 		
+        template <>
+        real_t v2d<real_t>::angle_of( const v2d<real_t> &a, const v2d<real_t> &b ) throw()
+        {
+            const real_t C = clamp<real_t>(-1,(a*b)/(a.norm()*b.norm()),1);
+            const real_t S = a.x * b.y - a.y * b.x;
+            return math::Signed<real_t,real_t>( math::Acos(C), S );
+        }
+        
 #endif
 		
         template <>

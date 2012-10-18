@@ -88,9 +88,15 @@ namespace yocto
 
 		inline float  Cos( float  x ) throw()  { return cosf( x ); }
 		inline double Cos( double x ) throw()  { return cos(  x );  }
-
-		inline float  Sin( float  x ) throw()  { return sinf( x ); }
+        
+        inline float  Acos( float x) throw()   { return acosf(x); }
+        inline double Acos( double x ) throw() { return acos(x); }
+		
+        inline float  Sin( float  x ) throw()  { return sinf( x ); }
 		inline double Sin( double x ) throw()  { return sin(  x );  }
+        
+        inline float  Asin( float  x ) throw()  { return asinf( x ); }
+		inline double Asin( double x ) throw()  { return asin(  x );  }
 		
 		inline float  Tan( float  x ) throw()  { return tanf( x ); }
 		inline double Tan( double x ) throw()  { return tan(  x );  }
@@ -122,7 +128,26 @@ namespace yocto
 		inline float  Floor( float  x ) throw()  { return floorf( x ); }
 		inline double Floor( double x ) throw()  { return floor(  x );  }
 		
-		
+		inline float Hypotenuse( float a, float b) throw()
+        {
+            const float absa=Fabs(a);
+            const float absb=Fabs(b);
+            if (absa > absb)
+                return absa*Sqrt(1.0f+Square(absb/absa));
+            else
+                return (absb <= 0.0f ? 0.0f : absb*Sqrt(1.0f+Square(absa/absb)));
+        }
+        
+        inline double Hypotenuse( double a, double b) throw()
+        {
+            const double absa=Fabs(a);
+            const double absb=Fabs(b);
+            if (absa > absb)
+                return absa*Sqrt(1.0+Square(absb/absa));
+            else
+                return (absb <= 0.0 ? 0.0 : absb*Sqrt(1.0+Square(absa/absb)));
+        }
+
 				
 	}
 	
