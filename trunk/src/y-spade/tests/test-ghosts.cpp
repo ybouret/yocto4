@@ -51,7 +51,7 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
             d1a.get_local(1).transfer( d1a["A1"].handle() );
             
             for(unit_t x = A.lower; x <= A.upper; ++x )
-                A[x] = x;
+                A[x] = float(x);
             
             std::cerr << "\t\tlocal initial: " << std::endl;
             display_array(A);
@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         {
             array1D<float> &A = d1b["A1"].as< array1D<float> >();
             for(unit_t x = A.lower; x <= A.upper; ++x )
-                A[x] = x;
+                A[x] = float(x);
             std::cerr << "\t\tasync initial: " << std::endl;
             display_array(A);
             
@@ -124,7 +124,7 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
             array2D<float> &A = d2a["A2"].as< array2D<float> >();
             for( unit_t y=A.lower.y; y <= A.upper.y; ++y )
                 for(unit_t x = A.lower.x; x <= A.upper.x; ++x )
-                    A[y][x] = y+x;
+                    A[y][x] = float(y+x);
             double vmin = A.get_min();
             double vmax = A.get_max();
             A.ppm("a0.ppm", "a0", A, vprocf,NULL,vmin,vmax);
@@ -145,7 +145,7 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
             array2D<float> &A = d2b["A2"].as< array2D<float> >();
             for( unit_t y=A.lower.y; y <= A.upper.y; ++y )
                 for(unit_t x = A.lower.x; x <= A.upper.x; ++x )
-                    A[y][x] = y+x;
+                    A[y][x] = float(y+x);
             double vmin = A.get_min();
             double vmax = A.get_max();
             A.ppm("b0.ppm", "b0", A, vprocf,NULL,vmin,vmax);

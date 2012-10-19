@@ -20,6 +20,10 @@ namespace yocto
             void  *data; //!< >= size
         };
         
+#if defined(_MSC_VER)
+		// this in constructor
+#pragma warning ( disable : 4355 )
+#endif
         template <typename ARRAY>
         class standalone : public ARRAY
         {

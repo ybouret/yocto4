@@ -18,7 +18,7 @@ YOCTO_UNIT_TEST_IMPL(array1D)
         A1.ldz();
         for( unit_t i=A1.lower; i <= A1.upper; ++i )
         {
-            A1[i] = i;
+            A1[i] = float(i);
         }
         
         linear *h = 0;
