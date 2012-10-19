@@ -106,8 +106,9 @@ namespace yocto
     
     void VisIt:: Simulation:: performAlways( const string &user_cmd )
     {
-        const string         cmd = parse_user_command(user_cmd);
+        const string         cmd  = parse_user_command(user_cmd);
         const array<string> &args = cmdArgs;
+        //MPI.Printf0(stderr,"[VisIt::performAlways]: '%s'\n", cmd.c_str());
         
         if(  cmd == "run"  )
         {
@@ -129,6 +130,7 @@ namespace yocto
             {
                 const char  *arg = args[1].c_str();
                 n   = atol(arg);
+                if(n<=0) n=1;
             }
             while(n-->0)
             {
