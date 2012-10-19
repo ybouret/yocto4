@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/net/io/protocol.hpp"
 #include "yocto/net/ip-address.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 using namespace network;
