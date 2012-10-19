@@ -7,7 +7,10 @@ namespace yocto
 {
     namespace spade
     {
-        
+#if defined(_MSC_VER)
+		// this in constructor
+#pragma warning ( disable : 4355 )
+#endif
         template <
         typename LAYOUT,
         template <class,class> class MESH,

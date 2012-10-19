@@ -181,10 +181,10 @@ namespace yocto
                     a[i][j]=0.0;
                 if (g)
                 {
-                    g=1.0/g;
+                    g=real_t(1)/g;
                     for(size_t j=l;j<=n;j++)
                     {
-                        for (s=0.0,k=l;k<=m;k++) s += a[k][i]*a[k][j];
+                        for (s=0,k=l;k<=m;k++) s += a[k][i]*a[k][j];
                         f=(s/a[i][i])*g;
                         for (k=i;k<=m;k++) a[k][j] += f*a[k][i];
                     }
@@ -226,7 +226,7 @@ namespace yocto
                             g=w[i];
                             h=Hypotenuse(f,g);
                             w[i]=h;
-                            h=1.0/h;
+                            h=real_t(1)/h;
                             c=g*h;
                             s = -f*h;
                             for(size_t j=1;j<=m;j++) {
@@ -255,7 +255,7 @@ namespace yocto
                     y=w[nm];
                     g=rv1[nm];
                     h=rv1[k];
-                    f=((y-z)*(y+z)+(g-h)*(g+h))/(2.0*h*y);
+                    f=((y-z)*(y+z)+(g-h)*(g+h))/(real_t(2)*h*y);
                     g=Hypotenuse(f,real_t(1.0));
                     f=((x-z)*(x+z)+h*((y/(f+Signed(g,f)))-h))/x;
                     c=s=1.0; /* Next QR transformation: */
@@ -284,7 +284,7 @@ namespace yocto
                         z=Hypotenuse(f,h);
                         w[j]=z; /* Rotation can be arbitrary if z = 0. */
                         if (z) {
-                            z=1.0/z;
+                            z=real_t(1)/z;
                             c=f*z;
                             s=h*z;
                         }

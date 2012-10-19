@@ -27,7 +27,7 @@ inline coord3D RandCoord3D()
 template <typename T>
 T genv1()
 {
-    return 10 * ( alea<T>() - 0.5 );
+    return T(10) * ( alea<T>() - T(0.5) );
 }
 
 template <typename T>
