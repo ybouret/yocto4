@@ -21,7 +21,6 @@ namespace yocto
             
             
             const LAYOUT   outline;          //!< this layout + ghosts
-            //linear_handles handles;          //!< from fields
             const size_t   local_count;      //!< #local ghosts
             const size_t   async_count;      //!< #async ghosts
             const size_t   num_requests;     //!< #MPI request for data exchange
@@ -34,7 +33,6 @@ namespace yocto
             array_db( F.size() + LAYOUT::DIMENSIONS ),
             LAYOUT(L),
             outline(L),
-            //handles( F.size() ),
             local_count(0),
             async_count(0),
             num_requests(0),
@@ -54,7 +52,6 @@ namespace yocto
                 //--------------------------------------------------------------
                 // create fields from outline
                 //--------------------------------------------------------------
-                //F.create( outline, *this, handles );
                 F.create( outline, *this);
                 
                 //--------------------------------------------------------------
@@ -79,6 +76,8 @@ namespace yocto
                 
             }
             
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
             vector<local_ghosts::ptr> local_reg;
@@ -90,7 +89,6 @@ namespace yocto
             void recompute_outline( const ghosts_setup &G )
             {
                 
-                //std::cerr << "recomputing outline" << std::endl;
                 typename LAYOUT::coord out_lower = outline.lower;
                 typename LAYOUT::coord out_upper = outline.upper;
                 size_t &num_local = (size_t&)local_count;
@@ -145,8 +143,6 @@ namespace yocto
                 //-- recompute outline
                 //--------------------------------------------------------------
                 new ((void*)&outline) LAYOUT(out_lower,out_upper);
-                //std::cerr << "layout: " << this->as_layout() << std::endl;
-                //std::cerr << "outline:" << outline           << std::endl;
                 
                 //--------------------------------------------------------------
                 //-- reserve memory

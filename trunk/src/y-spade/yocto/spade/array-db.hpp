@@ -24,10 +24,31 @@ namespace yocto
             const varray & operator[]( const string & ) const;
             const varray & operator[]( const char  *  ) const;
             
+            //! append handle of id to handles
             void query( linear_handles &handles, const string &id);
+            
+            //! append handle of id to handles
             void query( linear_handles &handles, const char   *id);
+            
+            //! C-style append handles of names to handles
             void query( linear_handles &handles, const char **names, const size_t count);
+            
+            //! C++ style append handles of names to handles
             void query( linear_handles &handles, const array<string> &names );
+            
+            //! load content of handles[source] into array
+            template <typename T>
+            inline void load( array<T> &arr, const linear_handles &handles, const size_t source ) const
+            {
+                assert( handles.size() <= arr.size() );
+                for( size_t i=handles.size();i>0;--i)
+                {
+                    const linear_ptr p = handles[i]; assert(p!=NULL);
+                    assert( p->item_size() <= sizeof(T));
+                    memcpy( &arr[i], p->address_of(source), sizeof(T) );
+                }
+            }
+            
             
         private:
             set<string,varray::ptr> arrays;
