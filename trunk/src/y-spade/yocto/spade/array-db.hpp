@@ -49,6 +49,19 @@ namespace yocto
                 }
             }
             
+            //! load content of handles[source] into array
+            template <typename T>
+            inline void save( linear_handles &handles, const array<T> &arr, const size_t target ) const
+            {
+                assert( handles.size() <= arr.size() );
+                for( size_t i=handles.size();i>0;--i)
+                {
+                    linear_ptr p = handles[i]; assert(p!=NULL);
+                    assert( p->item_size() <= sizeof(T));
+                    memcpy( (void*)(p->address_of(target)), &arr[i], sizeof(T) );
+                }
+            }
+
             
         private:
             set<string,varray::ptr> arrays;
