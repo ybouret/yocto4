@@ -23,5 +23,17 @@ namespace yocto
             push_back(ID);
         }
         
+        variables & variables:: operator<<( const string &id )
+        {
+            append(id);
+            return *this;
+        }
+        
+        variables & variables:: operator<<( const char *id )
+        {
+            append(id);
+            return *this;
+        }
+        
     }
 }

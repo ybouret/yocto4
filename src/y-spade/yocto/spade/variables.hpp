@@ -22,6 +22,8 @@ namespace yocto
             void append( const string &id );
             void append( const char   *id );
             
+            variables & operator<<( const string &id );
+            variables & operator<<( const char   *id );
             
         private:
             YOCTO_DISABLE_ASSIGN(variables);
