@@ -92,6 +92,7 @@ namespace yocto
                             const U the_level = ls[k];
                             if ( the_level  < dmin || the_level > dmax)
                                 continue;
+                            
                             for (int m=4;m>=0;m--)
                             {
                                 if (m > 0)
