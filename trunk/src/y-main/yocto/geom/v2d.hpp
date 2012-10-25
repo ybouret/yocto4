@@ -1,5 +1,5 @@
 /** \file v2d.hpp
-*/
+ */
 
 #ifndef YOCTO_V2D_INCLUDED
 #define YOCTO_V2D_INCLUDED 1
@@ -9,14 +9,14 @@
 #include <iosfwd>
 
 namespace yocto {
-
+    
 	namespace geom {
-
+        
 		template <class T>
 		struct v2d {
 			T x;
 			T y;
-
+            
 			//----------------------------------------------------------------------
 			// constructors
 			//----------------------------------------------------------------------
@@ -24,27 +24,27 @@ namespace yocto {
 			v2d( const T X, const T Y ) throw(); //!< (X,Y)
 			v2d( const v2d & ) throw();
 			v2d( const v2d &A, const v2d &B) throw(); // A->B
-
+            
 			//----------------------------------------------------------------------
 			// assign
 			//----------------------------------------------------------------------
 			v2d &operator=( const v2d & ) throw();
-
+            
 			//----------------------------------------------------------------------
 			// +
 			//----------------------------------------------------------------------
 			v2d &operator+=( const v2d &) throw();
 			v2d operator+() const throw();
 			v2d operator+(const v2d & ) const throw();
-
+            
 			//----------------------------------------------------------------------
 			// -
 			//----------------------------------------------------------------------
 			v2d &operator-=( const v2d &) throw();
 			v2d operator-() const throw();
 			v2d operator-(const v2d & ) const throw();
-
-
+            
+            
 			//----------------------------------------------------------------------
 			// * (and see template friends)
 			//----------------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace yocto {
 			T norm2() const throw();
 			T norm()  const throw();
 			void normalize() throw();
-
+            
 			T angle() const throw(); //! in ]-\pi,\pi]
 			T positive_angle() const throw(); //! in [0;2pi]
             
@@ -65,30 +65,32 @@ namespace yocto {
 				v.output(v2d_os);
 				return v2d_os;
 			}
-
+            
 			void output( std::ostream &os ) const;
-
+            
 			v2d( Random::Uniform &ran) throw();
 			v2d( Random::Uniform &ran, const T radius ) throw();
-
+            
 			static v2d mul_( const T, const v2d & ) throw();
 			static T   dot_( const v2d &, const v2d & ) throw();
 			static v2d div_( const v2d &, const T );
-
+            
 			T &       operator[]( size_t i ) throw(); //!< i=0..1
 			const T & operator[]( size_t i) const throw(); //!< i=0..1
-
+            
             static
             T angle_of( const v2d &a, const v2d &b ) throw();
             
+            static
+            T det( const v2d &a, const v2d &b) throw();
 		};
-
+        
 		template <class T>
 		inline v2d<T>  operator*(const T a, const v2d<T> &v) throw()
 		{
 			return v2d<T>::mul_(a,v);
 		}
-
+        
 		template <class T>
 		inline T  operator*(const v2d<T> &lhs, const v2d<T> &rhs) throw()
 		{
@@ -101,9 +103,9 @@ namespace yocto {
 			return v2d<T>::div_( lhs, a );
 		}
 		
-
+        
 	}
-
+    
 }
 
 

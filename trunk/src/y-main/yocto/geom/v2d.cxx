@@ -176,6 +176,12 @@ namespace yocto {
 #endif
 		
         template <>
+        real_t v2d<real_t>::det( const v2d<real_t> &a, const v2d<real_t> &b ) throw()
+        {
+            return a.x * b.y - a.y * b.x;
+        }
+        
+        template <>
         void v2d<real_t>:: ldz() throw()
         {
             x=y=0;
