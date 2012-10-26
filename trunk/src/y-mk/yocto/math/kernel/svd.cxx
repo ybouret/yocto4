@@ -22,8 +22,8 @@ namespace yocto
         void svd<real_t>::solve(const matrix<real_t> &u,
                                 const array<real_t>  &w,
                                 const matrix<real_t> &v,
-                                const array<real_t> &b,
-                                array<real_t>       &x)
+                                const array<real_t>  &b,
+                                array<real_t>        &x)
         {
             const size_t m = u.rows;
             const size_t n = u.cols;
@@ -32,39 +32,23 @@ namespace yocto
             assert( v.cols == n );
             
             vector<real_t> tmp(n,0);
-            for(size_t j=1;j<=n;j++) {
+            for(size_t j=1;j<=n;++j) {
                 real_t s=0.0;
-                if( w[j] )
+                if( Fabs(w[j])>0 )
                 {
-                    for(size_t i=1;i<=m;i++) s += u[i][j]*b[i];
+                    for(size_t i=1;i<=m;++i) s += u[i][j]*b[i];
                     s /= w[j];
                 }
                 tmp[j]=s;
             }
-            for(size_t j=1;j<=n;j++)
+            for(size_t j=1;j<=n;++j)
             {
                 real_t s=0.0;
-                for(size_t jj=1;jj<=n;jj++) s += v[j][jj]*tmp[jj];
+                for(size_t jj=1;jj<=n;++jj) s += v[j][jj]*tmp[jj];
                 x[j]=s;
             }
         }
         
-        
-#if 0
-        static inline
-        real_t pythag(real_t a, real_t b) throw()
-        {
-            static const real_t One(1);
-            static const real_t Zero(0);
-            
-            const real_t absa=Fabs(a);
-            const real_t absb=Fabs(b);
-            if (absa > absb)
-                return absa*Sqrt(One+Square(absb/absa));
-            else
-                return (absb <= Zero ? Zero : absb*Sqrt(One+Square(absa/absb)));
-        }
-#endif
         
         static const size_t SVD_MAX_ITS = 1024;
         /******************************************************************************/

@@ -13,12 +13,12 @@ namespace yocto
         {
             //! singular value decomposition
             /**
-             Given a matrix a[1..m][1..n], this routine computes its singular value
+             Given a matrix A[1..m][1..n], this routine computes its singular value
              decomposition, A = U.W.VT.  The matrix U replaces a on output.  The diagonal
              matrix of singular values W is output as a vector w[1..n].  The matrix V (not
              the transpose VT) is output as v[1..n][1..n].
              */
-            static bool build(matrix<T> &a, array<T> &w, matrix<T> &v);
+            static bool build(matrix<T> &A, array<T> &W, matrix<T> &V);
             
             //! solve a system after a singular value decomposition
             /**
