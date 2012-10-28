@@ -1,5 +1,7 @@
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/ztype.hpp"
+#include "yocto/code/swap.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto {
 	
@@ -83,7 +85,108 @@ namespace yocto {
 			return false;
 		}
 		
-		
+#define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d)
+        
+		template <>
+        bool bracket<real_t>::expand( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
+        {
+            static const real_t GOLD = 1.618034;
+            static const real_t GLIM = 10;
+            static const real_t TINY = 1e-20;
+            
+            //------------------------------------------------------------------
+            // assume f.a and f.b are computed
+            //------------------------------------------------------------------
+            if (f.b > f.a)
+            {
+                cswap(x.a,x.b);
+                cswap(f.a,f.b);
+            }
+            
+            //------------------------------------------------------------------
+            // now, we go downhill: initialize third point
+            //-----------------------------------------------------------------
+            x.c = x.b + GOLD * (x.b - x.a);
+            f.c = func(x.c);
+            while( f.b > f.c )
+            {
+                assert(f.b<= f.a);
+                assert( (x.a<=x.b && x.b <= x.c) || ( x.a >= x.b && x.b >= x.c));
+                const real_t width = x.c - x.a;
+                
+                //-- interval is too small
+                if( Fabs(width) <= 0 )
+                    return false;
+                
+                //-- points are not well set
+                const real_t beta  = (x.b - x.c) / width;
+                if( beta <=0 || beta >=1 )
+                    return false;
+                
+                const real_t dc = f.c - f.a;
+                const real_t db = f.b - f.a;
+                const real_t q  = db - beta * dc;
+                
+                if(q>0)
+                {
+                    //----------------------------------------------------------
+                    // possible parabolic fit
+                    //----------------------------------------------------------
+                    const real_t p    = beta * beta * dc - db;
+                    const real_t lam  = -p/( 2*Signed(max_of(Fabs(q),TINY),q) );
+                    const real_t u    = x.a + lam * width;
+                    const real_t ulim = x.b + GLIM * (x.b - x.a);
+                    const real_t fu   = func(u);
+                    
+                    //----------------------------------------------------------
+                    // if u is between a and b
+                    //----------------------------------------------------------
+                    if( (u-x.a) * (x.b-u) >= 0 )
+                    {
+                     
+                        continue;
+                    }
+                    
+                    //----------------------------------------------------------
+                    // if u is between b and c
+                    //----------------------------------------------------------
+                    if( (u-x.b) * (x.c-u) >= 0)
+                    {
+                        
+                        continue;
+                    }
+                    
+                    //----------------------------------------------------------
+                    // if u is between c and ulim
+                    //----------------------------------------------------------
+                    if( (u-x.c) * (ulim -u ) >= 0)
+                    {
+                        
+                        continue;
+                    }
+                    
+                    //-- reject fit
+                }
+                
+                //--------------------------------------------------------------
+                // negative curvature or rejected fit: use default probe
+                //--------------------------------------------------------------
+
+                // a <-- b
+                x.a = x.b;
+                f.a = f.b;
+                // b <-- c
+                x.b = x.c;
+                f.b = f.c;
+                // c <-- forward
+                x.c = x.b + GOLD * (x.b - x.a);
+                f.c = func(x.c);
+
+            }
+            
+            return true;
+        }
+        
 		
 	} //math
 	
