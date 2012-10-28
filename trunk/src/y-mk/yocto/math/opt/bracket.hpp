@@ -17,9 +17,15 @@ namespace yocto {
 			//! bracketing a minimum to call minimize
 			/**
 			 search in x.a->x.c, assume that f.a and f.c are computed
+             \return true is a good point is found, false is minimum is on the side
 			 */
 			static bool inside( typename numeric<T>::function &func, triplet<T> &x, triplet<T> &f );
 			
+            //! bracketting a minimum to call minimize
+            /**
+             search from xa,xb, assuming that fa and fb are computed.
+             */
+            static bool expand( typename numeric<T>::function &func, triplet<T> &x, triplet<T> &f );
 		};
 		
 		
