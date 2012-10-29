@@ -17,9 +17,9 @@ namespace yocto
             {
             public:
                 inline cgw(numeric<real_t>::scalar_field &func,
-                             const array<real_t>           &pos,
-                             const array<real_t>           &vec
-                             ) :
+                           const array<real_t>           &pos,
+                           const array<real_t>           &vec
+                           ) :
                 _func( func ),
                 _pos( pos ),
                 _vec( vec ),
@@ -51,7 +51,7 @@ namespace yocto
         }
         
         template <>
-        bool cgrad<real_t>(numeric<real_t>::scalar_field &func,
+        void cgrad<real_t>(numeric<real_t>::scalar_field &func,
                            numeric<real_t>::vector_field &grad,
                            array<real_t>                 &p,
                            const real_t                   ftol
@@ -59,20 +59,24 @@ namespace yocto
         {
             const size_t nvar = p.size(); assert(nvar>0);
             
-            vector<real_t> g(nvar,0);
-            vector<real_t> h(nvar,0);
-            vector<real_t> xi(nvar,0);
-            cgw            wrapper( func, p, xi );
+            vector<real_t>            g(nvar,0);
+            vector<real_t>            h(nvar,0);
+            vector<real_t>            xi(nvar,0);
+            cgw                       wrapper( func, p, xi );
             numeric<real_t>::function F( &wrapper, & cgw::compute );
             //------------------------------------------------------------------
             // initialize
             //------------------------------------------------------------------
             real_t fp = func(p);
-            grad(p,xi);
+            grad(xi,p);
             for( size_t i=nvar;i>0;--i)
             {
                 g[i] = h[i] = -xi[i];
             }
+            
+            std::cerr << "pos=" << p  << std::endl;
+            std::cerr << "f  =" << fp << std::endl;
+            std::cerr << "xi =" << xi << std::endl;
             
             //------------------------------------------------------------------
             // conjugated gradient loop
@@ -106,13 +110,15 @@ namespace yocto
                 // test convegence on variables
                 //--------------------------------------------------------------
                 if( converged )
-                    return true;
+                    return;
                 
                 //--------------------------------------------------------------
                 // prepare next step
                 //--------------------------------------------------------------
                 fp = fp_new;
-                grad(p,xi);
+                grad(xi,p);
+                std::cerr << "pos=" << p  << std::endl;
+                std::cerr << "f  =" << fp << std::endl;
                 
                 //--------------------------------------------------------------
                 // conjugated gradient
@@ -124,17 +130,19 @@ namespace yocto
                     dgg += (xi[i]+g[i])*xi[i];
                 }
                 if( Fabs(gg) <= 0 )
-                    return true; // early return
+                    return; // early return
                 const real_t gam = dgg / gg;
                 for( size_t i=nvar;i>0;--i)
                 {
                     g[i] = -xi[i];
                     xi[i]=h[i]=g[i]+gam*h[i];
                 }
+                
             }
             
-            return true;
         }
-    }
-}
+        
+        
+    } // math
+} // yocto
 
