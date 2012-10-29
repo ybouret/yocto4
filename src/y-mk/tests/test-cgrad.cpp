@@ -135,14 +135,14 @@ YOCTO_UNIT_TEST_IMPL(cgrad2)
     
     vector<double> var(2,0);
     var[1] = 0.5;
-    var[2] = 0.3;
+    var[2] = -0.3;
     
     numeric<double>::scalar_field Func( &param, &Param::func );
     numeric<double>::vector_field Grad( &param, &Param::grad );
     std::cerr << "Func(" << var << ")=" << Func(var) << std::endl;
     //std::cerr << "Grad(" << var << ")=" << Grad(var) << std::endl;
     
-    { ios::ocstream fp("cgrad2.dat",true); }
+    { ios::ocstream fp("cgrad2.dat",false); }
     
     cgrad<double>::callback cb( &param, &Param::cb );
     cgrad<double>::optimize(Func,Grad,var,1e-5,&cb);
