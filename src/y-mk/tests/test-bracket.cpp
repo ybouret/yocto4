@@ -18,24 +18,19 @@ YOCTO_UNIT_TEST_IMPL(bracket)
         triplet<double> x = { 0, 0.1 };
         triplet<double> f = { F(x.a), F(x.b) };
         
-        if( bracket<double>::expand(F, x, f) )
-        {
-            minimize<double> opt = { 1e-5 };
-            opt(F,x,f);
-            std::cerr << "min: F(" << x.b << ")=" << f.b << std::endl;
-        }
+        bracket<double>::expand(F, x, f) ;
+        minimize<double>(F,x,f,1e-5);
+        std::cerr << "min: F(" << x.b << ")=" << f.b << std::endl;
     }
     
     {
         triplet<double> x = { 4, 5 };
         triplet<double> f = { F(x.a), F(x.b) };
         
-        if( bracket<double>::expand(F, x, f) )
-        {
-            minimize<double> opt = { 1e-5 };
-            opt(F,x,f);
-            std::cerr << "min: F(" << x.b << ")=" << f.b << std::endl;
-        }
+        bracket<double>::expand(F, x, f) ;
+        minimize<double>(F,x,f,1e-5);
+        std::cerr << "min: F(" << x.b << ")=" << f.b << std::endl;
+        
     }
 }
 YOCTO_UNIT_TEST_DONE()

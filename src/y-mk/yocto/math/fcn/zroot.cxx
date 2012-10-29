@@ -180,8 +180,7 @@ namespace yocto
 						return false; //-- spurious ?
 					}
 					//std::cerr << "minimizing with XX= " << XX << " and FF=" << FF << std::endl;
-					minimize<real_t> opt = { FTOL };
-					opt( lmin_, XX, FF );
+					minimize<real_t>( lmin_, XX, FF, FTOL );
 					//std::cerr << "                XX= " << XX << " and FF=" << FF << std::endl;
 					f1 = lmin_( XX.b );
 				}
