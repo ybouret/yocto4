@@ -23,5 +23,6 @@ ADD_TEST(Linear   test-mk linear)
 ADD_TEST(Smooth   test-mk smooth)
 ADD_TEST(Trigo    test-mk trigo)
 ADD_TEST(SVD      test-mk svd)
+ADD_TEST(Bracket  test-mk bracket)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
