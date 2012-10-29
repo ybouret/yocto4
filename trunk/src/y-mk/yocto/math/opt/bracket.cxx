@@ -18,15 +18,11 @@ namespace yocto {
 			// try to find x.b so that f.b <= f.a and f.b <= f.c
 			//
 			//==================================================================
-			//std::cout << "bracketing in [" << x.a << " ; " << x.c << "]" << std::endl;
 			
 			while( Fabs(x.c-x.a) > fmax * ( Fabs(x.a) + Fabs(x.c) ))
 			{
 				x.b = REAL(0.5)*(x.a + x.c);
 				f.b = func(x.b);
-				
-				//std::cout << "x=[ " << x.a << " " << x.b << " " << x.c << " ]" << std::endl;
-				//std::cout << "f=[ " << f.a << " " << f.b << " " << f.c << " ]" << std::endl;
 				
 				if( f.b > f.a )
 				{
@@ -57,8 +53,6 @@ namespace yocto {
 						assert( f.b <= f.c );
 						assert( f.b <= f.a );
 						assert( (x.a<=x.b&& x.b<=x.c) || ( x.a>=x.b && x.b>=x.c) );
-						//std::cout << "success!" << std::endl;
-						//exit(1);
 						return true;
 					}
 				}
@@ -85,13 +79,13 @@ namespace yocto {
 			return false;
 		}
 		
-#define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d)
+#define SHFT(a,b,c,d) do{ (a)=(b);(b)=(c);(c)=(d); } while(false)
         
 		template <>
         bool bracket<real_t>::expand( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
         {
             static const real_t GOLD = 1.618034;
-            static const real_t GLIM = 10;
+            static const real_t GLIM = 4;
             static const real_t TINY = 1e-20;
             
             //------------------------------------------------------------------
@@ -104,46 +98,59 @@ namespace yocto {
             }
             
             //------------------------------------------------------------------
-            // now, we go downhill: initialize third point
+            // now, we go downhill: initialize the third point
             //-----------------------------------------------------------------
             x.c = x.b + GOLD * (x.b - x.a);
             f.c = func(x.c);
+            std::cerr << "x=" << x << std::endl;
+            std::cerr << "f=" << f << std::endl;
+            
             while( f.b > f.c )
             {
+                std::cerr << "\tx=" << x << std::endl;
+                std::cerr << "\tf=" << f << std::endl;
                 assert(f.b<= f.a);
                 assert( (x.a<=x.b && x.b <= x.c) || ( x.a >= x.b && x.b >= x.c));
-                const real_t width = x.c - x.a;
+                const real_t delta = x.c - x.a;
                 
+                std::cerr << "\tdelta=" << delta << std::endl;
                 //-- interval is too small
-                if( Fabs(width) <= 0 )
+                if( Fabs(delta) <= 0 )
                     return false;
                 
                 //-- points are not well set
-                const real_t beta  = (x.b - x.c) / width;
+                const real_t beta  = (x.b - x.a) / delta;
+                std::cerr << "\tbeta=" << beta << std::endl;
                 if( beta <=0 || beta >=1 )
                     return false;
                 
                 const real_t dc = f.c - f.a;
                 const real_t db = f.b - f.a;
-                const real_t q  = db - beta * dc;
+                const real_t q  = beta * dc - db;
                 
+                std::cerr << "\tq=" << q << std::endl;
                 if(q>0)
                 {
                     //----------------------------------------------------------
                     // possible parabolic fit
                     //----------------------------------------------------------
-                    const real_t p    = beta * beta * dc - db;
-                    const real_t lam  = -p/( 2*Signed(max_of(Fabs(q),TINY),q) );
-                    const real_t u    = x.a + lam * width;
+                    const real_t p    = db - beta * beta * dc;                   assert(p<0);
+                    const real_t lam  = -p/( 2*Signed(max_of(Fabs(q),TINY),q) ); assert(lam>0);
+                    const real_t u    = x.a + lam * delta;
                     const real_t ulim = x.b + GLIM * (x.b - x.a);
-                    const real_t fu   = func(u);
+                    
+                    std::cerr << "\tlam =" << lam << std::endl;
+                    std::cerr << "\tu   =" << u << std::endl;
+                    std::cerr << "\tulim=" << ulim << std::endl;
                     
                     //----------------------------------------------------------
                     // if u is between a and b
                     //----------------------------------------------------------
                     if( (u-x.a) * (x.b-u) >= 0 )
                     {
-                     
+                        
+                        std::cerr << "\t\tbetween a and b" << std::endl;
+                        return false;
                         continue;
                     }
                     
@@ -152,38 +159,42 @@ namespace yocto {
                     //----------------------------------------------------------
                     if( (u-x.b) * (x.c-u) >= 0)
                     {
-                        
+                        std::cerr << "\t\tbetween b and c" << std::endl;
+                        return false;
                         continue;
                     }
                     
                     //----------------------------------------------------------
-                    // if u is between c and ulim
+                    // if u is between c and ulim: move to b,c,u
                     //----------------------------------------------------------
                     if( (u-x.c) * (ulim -u ) >= 0)
                     {
-                        
+                        const real_t fu   = func(u);
+                        SHFT(x.a,x.b,x.c,u);
+                        SHFT(f.a,f.b,f.c,fu);
+                        std::cerr << "\t\tbetween c and ulim" << std::endl;
                         continue;
                     }
                     
-                    //-- reject fit
+                    //----------------------------------------------------------
+                    //-- reject fit: accept ulim
+                    //----------------------------------------------------------
+                    std::cerr << "\t\taccept ulim" << std::endl;
+                    SHFT(x.a,x.b,x.c,ulim);
+                    SHFT(f.a,f.b,f.c,func(ulim));
+                    continue;
+                    
                 }
                 
                 //--------------------------------------------------------------
-                // negative curvature or rejected fit: use default probe
+                // negative curvature
                 //--------------------------------------------------------------
-
-                // a <-- b
-                x.a = x.b;
-                f.a = f.b;
-                // b <-- c
-                x.b = x.c;
-                f.b = f.c;
-                // c <-- forward
-                x.c = x.b + GOLD * (x.b - x.a);
-                f.c = func(x.c);
-
+                std::cerr << "\tdefault step" << std::endl;
+                SHFT(x.a, x.b, x.c, x.b + GOLD * (x.b - x.a) );
+                SHFT(f.a,f.b,f.c,func(x.c));
             }
-            
+            std::cerr << "x=" << x << std::endl;
+            std::cerr << "f=" << f << std::endl;
             return true;
         }
         
