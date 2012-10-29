@@ -102,6 +102,7 @@ namespace yocto {
             //-----------------------------------------------------------------
             x.c = x.b + GOLD * (x.b - x.a);
             f.c = func(x.c);
+            std::cerr << "<bracket init>" << std::endl;
             std::cerr << "x=" << x << std::endl;
             std::cerr << "f=" << f << std::endl;
             
@@ -110,92 +111,96 @@ namespace yocto {
                 std::cerr << "\tx=" << x << std::endl;
                 std::cerr << "\tf=" << f << std::endl;
                 assert(f.b<= f.a);
-                assert( (x.a<=x.b && x.b <= x.c) || ( x.a >= x.b && x.b >= x.c));
+                assert(x.is_ordered());
+                
                 const real_t delta = x.c - x.a;
-                
-                std::cerr << "\tdelta=" << delta << std::endl;
-                //-- interval is too small
                 if( Fabs(delta) <= 0 )
-                    return false;
-                
-                //-- points are not well set
-                const real_t beta  = (x.b - x.a) / delta;
-                std::cerr << "\tbeta=" << beta << std::endl;
-                if( beta <=0 || beta >=1 )
-                    return false;
-                
-                const real_t dc = f.c - f.a;
-                const real_t db = f.b - f.a;
-                const real_t q  = beta * dc - db;
-                
-                std::cerr << "\tq=" << q << std::endl;
-                if(q>0)
                 {
+                    std::cerr << "invalid interval" << std::endl;
+                    return false;
+                }
+                
+                // compute geometrical factors
+                const real_t alpha = (x.b - x.a) / delta; assert(alpha>=0);
+                const real_t beta  = (x.c - x.b) / delta; assert(beta>=0);
+                const real_t A     = f.a - f.b;           assert(A>=0);
+                const real_t B     = f.b - f.c;           assert(B>0);
+                
+                // compute curvature times determinant>0
+                const real_t q     = beta * A - alpha * B;
+                
+                std::cerr << "q=" << q << std::endl;
+                if( q > 0 )
+                {
+                    
                     //----------------------------------------------------------
-                    // possible parabolic fit
+                    // compute the probe and its limit
                     //----------------------------------------------------------
-                    const real_t p    = db - beta * beta * dc;                   assert(p<0);
-                    const real_t lam  = -p/( 2*Signed(max_of(Fabs(q),TINY),q) ); assert(lam>0);
-                    const real_t u    = x.a + lam * delta;
+                    const real_t p    = alpha*alpha*B + beta*beta*A; assert(p>=0);
+                    const real_t lam  = p / ( 2 * max_of(q,TINY) );  assert(lam>=0);
+                    const real_t u    = x.b + lam * delta;
                     const real_t ulim = x.b + GLIM * (x.b - x.a);
                     
-                    std::cerr << "\tlam =" << lam << std::endl;
-                    std::cerr << "\tu   =" << u << std::endl;
+                    std::cerr << "\tu   =" << u   << std::endl;
                     std::cerr << "\tulim=" << ulim << std::endl;
                     
-                    //----------------------------------------------------------
-                    // if u is between a and b
-                    //----------------------------------------------------------
-                    if( (u-x.a) * (x.b-u) >= 0 )
+                    if( (u-x.b)*(x.c-u) >= 0 )
                     {
-                        
-                        std::cerr << "\t\tbetween a and b" << std::endl;
-                        return false;
-                        continue;
-                    }
-                    
-                    //----------------------------------------------------------
-                    // if u is between b and c
-                    //----------------------------------------------------------
-                    if( (u-x.b) * (x.c-u) >= 0)
-                    {
+                        //----------------------------------------------------------
+                        // between b and c
+                        //----------------------------------------------------------
                         std::cerr << "\t\tbetween b and c" << std::endl;
+                        const real_t fu   = func(u);
+                        if( fu <= f.c )
+                        {
+                            x.a = x.b; x.b = u;
+                            f.a = f.b; f.b = fu;
+                            continue; // winner
+                        }
+                        
+                        if( fu >= f.b )
+                        {
+                            x.c = u;
+                            f.c = u;
+                            continue; // winner
+                        }
+                        
+                        goto PROBE; // no interest
                         return false;
-                        continue;
                     }
                     
-                    //----------------------------------------------------------
-                    // if u is between c and ulim: move to b,c,u
-                    //----------------------------------------------------------
-                    if( (u-x.c) * (ulim -u ) >= 0)
+                    if( (u-x.c) * (ulim -u ) >= 0 )
                     {
+                        //----------------------------------------------------------
+                        // between c and ulim
+                        //----------------------------------------------------------
+                        std::cerr << "\t\tbetween c and ulim" << std::endl;
                         const real_t fu   = func(u);
                         SHFT(x.a,x.b,x.c,u);
                         SHFT(f.a,f.b,f.c,fu);
-                        std::cerr << "\t\tbetween c and ulim" << std::endl;
                         continue;
                     }
                     
-                    //----------------------------------------------------------
-                    //-- reject fit: accept ulim
-                    //----------------------------------------------------------
-                    std::cerr << "\t\taccept ulim" << std::endl;
+                    std::cerr << "\t\tbeyond ulim" << std::endl;
                     SHFT(x.a,x.b,x.c,ulim);
                     SHFT(f.a,f.b,f.c,func(ulim));
-                    continue;
-                    
                 }
                 
                 //--------------------------------------------------------------
-                // negative curvature
+                // default magnification step
                 //--------------------------------------------------------------
+            PROBE:
                 std::cerr << "\tdefault step" << std::endl;
                 SHFT(x.a, x.b, x.c, x.b + GOLD * (x.b - x.a) );
                 SHFT(f.a,f.b,f.c,func(x.c));
             }
+            std::cerr << "<bracket quit>" << std::endl;
             std::cerr << "x=" << x << std::endl;
             std::cerr << "f=" << f << std::endl;
+            
+            
             return true;
+            
         }
         
 		
