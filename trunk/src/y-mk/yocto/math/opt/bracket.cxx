@@ -102,9 +102,9 @@ namespace yocto {
             //-----------------------------------------------------------------
             x.c = x.b + GOLD * (x.b - x.a);
             f.c = func(x.c);
-            std::cerr << "<bracket init>" << std::endl;
-            std::cerr << "x=" << x << std::endl;
-            std::cerr << "f=" << f << std::endl;
+            //std::cerr << "<bracket init>" << std::endl;
+            //std::cerr << "x=" << x << std::endl;
+            //std::cerr << "f=" << f << std::endl;
             
             while( f.b > f.c )
             {
@@ -194,9 +194,9 @@ namespace yocto {
                 SHFT(x.a, x.b, x.c, x.b + GOLD * (x.b - x.a) );
                 SHFT(f.a,f.b,f.c,func(x.c));
             }
-            std::cerr << "<bracket quit>" << std::endl;
-            std::cerr << "x=" << x << std::endl;
-            std::cerr << "f=" << f << std::endl;
+            //std::cerr << "<bracket quit>" << std::endl;
+            //std::cerr << "x=" << x << std::endl;
+            //std::cerr << "f=" << f << std::endl;
                     
         }
         

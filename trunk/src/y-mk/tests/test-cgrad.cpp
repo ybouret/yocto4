@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/opt/cgrad.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -49,6 +50,13 @@ struct pot2
         dFdX[1] = dx*dMorse(r)/xa;
         dFdX[2] = dy*dMorse(r)/ya;
     }
+    
+    bool cb( const array<double> &X  )
+    {
+        ios::ocstream fp("cgrad.dat",true);
+        fp("%g %g\n", X[1], X[2]);
+        return true;
+    }
 };
 
 YOCTO_UNIT_TEST_IMPL(cgrad)
@@ -59,7 +67,21 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     vector<double> X(2,0);
     X[1] = 0;
     X[2] = 0;
-    cgrad(Func, Grad, X, 1e-7);
+    { ios::ocstream fp("cgrad.dat",false); }
+    
+    cgrad<double>::callback cb( &P, &pot2::cb);
+    cgrad<double>::optimize(Func, Grad, X, 1e-7, &cb);
     std::cerr << "X=" << X << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+                
+
+YOCTO_UNIT_TEST_IMPL(cgrad2)
+{
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+

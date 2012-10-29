@@ -9,11 +9,17 @@ namespace yocto
     {
         
         template <typename T>
-        void cgrad(typename numeric<T>::scalar_field &func,
-                   typename numeric<T>::vector_field &grad,
-                   array<T>                          &p,
-                   const T                            ftol
-                   );
+        struct cgrad
+        {
+            typedef functor<bool,TL1(const array<T>)> callback;
+            
+            static bool optimize(typename numeric<T>::scalar_field &func,
+                                 typename numeric<T>::vector_field &grad,
+                                 array<T>                          &p,
+                                 const T                            ftol,
+                                 callback                          *cb = 0
+                                 );
+        };
         
     }
 }
