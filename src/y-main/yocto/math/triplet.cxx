@@ -32,6 +32,13 @@ namespace yocto {
 			os << "[ " << a << " " << b << " " << c << " ]'";
 		}
 
+        template <>
+        bool triplet<real_t>:: is_ordered() const throw()
+        {
+            return (a <= b && b <= c) || (a >= b && b >= c);
+        }
+
+        
 	}
 
 }

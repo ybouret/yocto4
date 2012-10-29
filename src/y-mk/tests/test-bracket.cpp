@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -13,12 +14,29 @@ inline double func( double x )
 YOCTO_UNIT_TEST_IMPL(bracket)
 {
     numeric<double>::function F = cfunctor(func);
-    triplet<double> x = { 0, 0.1 };
-    triplet<double> f = { F(x.a), F(x.b) };
+    {
+        triplet<double> x = { 0, 0.1 };
+        triplet<double> f = { F(x.a), F(x.b) };
+        
+        if( bracket<double>::expand(F, x, f) )
+        {
+            minimize<double> opt = { 1e-5 };
+            opt(F,x,f);
+            std::cerr << "min: F(" << x.b << ")=" << f.b << std::endl;
+        }
+    }
     
-    bracket<double>::expand(F, x, f);
-    
-    
+    {
+        triplet<double> x = { 4, 5 };
+        triplet<double> f = { F(x.a), F(x.b) };
+        
+        if( bracket<double>::expand(F, x, f) )
+        {
+            minimize<double> opt = { 1e-5 };
+            opt(F,x,f);
+            std::cerr << "min: F(" << x.b << ")=" << f.b << std::endl;
+        }
+    }
 }
 YOCTO_UNIT_TEST_DONE()
 

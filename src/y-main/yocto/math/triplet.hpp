@@ -26,6 +26,7 @@ namespace yocto {
 			
 			T       &operator[]( size_t index ) throw();
 			const T &operator[]( size_t index ) const throw();
+            bool is_ordered() const throw();
 		};
 
 	}

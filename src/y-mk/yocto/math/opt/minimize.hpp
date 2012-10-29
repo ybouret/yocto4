@@ -1,8 +1,8 @@
 /** \file minimize.hpp
 */
 
-#ifndef _YOCTO_MINIMIZE_HPP_
-#define _YOCTO_MINIMIZE_HPP_ 1
+#ifndef YOCTO_OPT_MINIMIZE_INCLUDED
+#define YOCTO_OPT_MINIMIZE_INCLUDED 1
 
 
 #include "yocto/math/triplet.hpp"
