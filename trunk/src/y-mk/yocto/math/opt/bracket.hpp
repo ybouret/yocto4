@@ -25,7 +25,7 @@ namespace yocto {
             /**
              search from xa,xb, assuming that fa and fb are computed.
              */
-            static bool expand( typename numeric<T>::function &func, triplet<T> &x, triplet<T> &f );
+            static void expand( typename numeric<T>::function &func, triplet<T> &x, triplet<T> &f );
 		};
 		
 		

@@ -14,9 +14,8 @@ namespace yocto {
 #define SHIFT3(a,b,c,d) (a)=(b);(b)=(c);(c)=(d)
 		
 		
-		
 		template <>
-		void minimize<real_t>:: operator()( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
+		void minimize<real_t>( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f, real_t ftol )
 		{
 			assert(f.b<=f.a);
 			assert(f.b<=f.c);

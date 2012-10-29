@@ -24,8 +24,7 @@ YOCTO_UNIT_TEST_IMPL(opt)
 	}
 	std::cerr << "x=" << x << std::endl;
 	std::cerr << "f=" << f << std::endl;
-	minimize<float> opt = { 1e-6f };
-	opt( func,x,f);
+	minimize<float>( func,x,f,1e-6f);
 	std::cerr << "min@" << x.b << " = " << f.b << std::endl;
 	
 }

@@ -82,7 +82,7 @@ namespace yocto {
 #define SHFT(a,b,c,d) do{ (a)=(b);(b)=(c);(c)=(d); } while(false)
         
 		template <>
-        bool bracket<real_t>::expand( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
+        void bracket<real_t>::expand( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
         {
             static const real_t GOLD = 1.618034;
             static const real_t GLIM = 4;
@@ -116,8 +116,9 @@ namespace yocto {
                 const real_t delta = x.c - x.a;
                 if( Fabs(delta) <= 0 )
                 {
-                    std::cerr << "invalid interval" << std::endl;
-                    return false;
+                    f.a = f.b = f.c;
+                    x.a = x.b = x.c;
+                    return;
                 }
                 
                 // compute geometrical factors
@@ -166,7 +167,6 @@ namespace yocto {
                         }
                         
                         goto PROBE; // no interest
-                        return false;
                     }
                     
                     if( (u-x.c) * (ulim -u ) >= 0 )
@@ -197,10 +197,7 @@ namespace yocto {
             std::cerr << "<bracket quit>" << std::endl;
             std::cerr << "x=" << x << std::endl;
             std::cerr << "f=" << f << std::endl;
-            
-            
-            return true;
-            
+                    
         }
         
 		
