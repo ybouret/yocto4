@@ -85,7 +85,7 @@ namespace yocto {
         void bracket<real_t>::expand( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f )
         {
             static const real_t GOLD = 1.618034;
-            static const real_t GLIM = 4;
+            static const real_t GLIM = 10;
             static const real_t TINY = 1e-20;
             
             //------------------------------------------------------------------
@@ -108,8 +108,8 @@ namespace yocto {
             
             while( f.b > f.c )
             {
-                std::cerr << "\tx=" << x << std::endl;
-                std::cerr << "\tf=" << f << std::endl;
+                //std::cerr << "\tx=" << x << std::endl;
+                //std::cerr << "\tf=" << f << std::endl;
                 assert(f.b<= f.a);
                 assert(x.is_ordered());
                 
@@ -130,7 +130,7 @@ namespace yocto {
                 // compute curvature times determinant>0
                 const real_t q     = beta * A - alpha * B;
                 
-                std::cerr << "q=" << q << std::endl;
+                //std::cerr << "q=" << q << std::endl;
                 if( q > 0 )
                 {
                     
@@ -142,15 +142,15 @@ namespace yocto {
                     const real_t u    = x.b + lam * delta;
                     const real_t ulim = x.b + GLIM * (x.b - x.a);
                     
-                    std::cerr << "\tu   =" << u   << std::endl;
-                    std::cerr << "\tulim=" << ulim << std::endl;
+                    //std::cerr << "\tu   =" << u   << std::endl;
+                    //std::cerr << "\tulim=" << ulim << std::endl;
                     
                     if( (u-x.b)*(x.c-u) >= 0 )
                     {
                         //----------------------------------------------------------
                         // between b and c
                         //----------------------------------------------------------
-                        std::cerr << "\t\tbetween b and c" << std::endl;
+                        //std::cerr << "\t\tbetween b and c" << std::endl;
                         const real_t fu   = func(u);
                         if( fu <= f.c )
                         {
@@ -174,14 +174,14 @@ namespace yocto {
                         //----------------------------------------------------------
                         // between c and ulim
                         //----------------------------------------------------------
-                        std::cerr << "\t\tbetween c and ulim" << std::endl;
+                        //std::cerr << "\t\tbetween c and ulim" << std::endl;
                         const real_t fu   = func(u);
                         SHFT(x.a,x.b,x.c,u);
                         SHFT(f.a,f.b,f.c,fu);
                         continue;
                     }
                     
-                    std::cerr << "\t\tbeyond ulim" << std::endl;
+                    //std::cerr << "\t\tbeyond ulim" << std::endl;
                     SHFT(x.a,x.b,x.c,ulim);
                     SHFT(f.a,f.b,f.c,func(ulim));
                 }
@@ -190,7 +190,7 @@ namespace yocto {
                 // default magnification step
                 //--------------------------------------------------------------
             PROBE:
-                std::cerr << "\tdefault step" << std::endl;
+                //std::cerr << "\tdefault step" << std::endl;
                 SHFT(x.a, x.b, x.c, x.b + GOLD * (x.b - x.a) );
                 SHFT(f.a,f.b,f.c,func(x.c));
             }

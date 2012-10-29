@@ -9,7 +9,7 @@ namespace yocto
     {
         
         template <typename T>
-        bool cgrad(typename numeric<T>::scalar_field &func,
+        void cgrad(typename numeric<T>::scalar_field &func,
                    typename numeric<T>::vector_field &grad,
                    array<T>                          &p,
                    const T                            ftol

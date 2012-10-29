@@ -11,7 +11,7 @@ namespace yocto {
 		
 		
 		
-#define SHIFT3(a,b,c,d) (a)=(b);(b)=(c);(c)=(d)
+#define SHIFT3(a,b,c,d) do { (a)=(b);(b)=(c);(c)=(d); } while(false)
 		
 		
 		template <>
@@ -62,7 +62,8 @@ namespace yocto {
 					SHIFT3(f3,f2,f1,func(x1));
 				}
 				std::cerr << "x=[ " << x0 << " " << x1 << " " << x2 << " " << x3 << " ]" << std::endl;
-				std::cerr << "del=" << Fabs( x3 - x0 ) << " | brk=" << xtol * ( Fabs(x1) + Fabs(x2) ) << std::endl;
+                std::cerr << "f=[ " << f0 << " " << f1 << " " << f2 << " " << f2 << " ]" << std::endl;
+				std::cerr << "del=" << Fabs( x3 - x0 ) << " | brk=" << xtol * ( Fabs(x1) + Fabs(x2) ) << "(xtol=" << xtol << ")" << std::endl;
 			}
 			
 			//std::cerr << "x=[ " << x0 << " " << x1 << " " << x2 << " " << x3 << " ]" << std::endl;
