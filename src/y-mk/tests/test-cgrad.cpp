@@ -35,7 +35,7 @@ struct pot2
         //std::cerr << "func(" << x << "," << y << ")" << std::endl;
         return Morse( r );
     }
-
+    
     
     void grad( array<double> &dFdX, const array<double> &X )
     {
@@ -75,12 +75,78 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/geom/v2d.hpp"
+typedef geom::v2d<double> vtx;
 
-                
+struct Param
+{
+    vtx    tau;
+    double len;
+    
+    double func( const array<double> &var )
+    {
+        assert( var.size() == 2);
+        const vtx a( var[1], var[2]);
+        const double an = a.norm();
+        const double as = a*tau;
+        const double F1 = 1 - as/an;
+        
+        const double dl = (an - len)/len;
+        const double F2 = 0.5*dl*dl;
+        const double ans = F1 + F2;
+        //std::cerr << "func(" << var << ")=" << ans << std::endl;
+        return ans;
+    }
+    
+    void grad( array<double> &g, const array<double> &var )
+    {
+        assert( var.size() == 2);
+        assert( var.size() == 2);
+        const vtx a( var[1], var[2]);
+        const double an = a.norm();
+        const double as = a*tau;
+        const double dl = (an - len)/len;
+        
+        g[1] = a.x * as / (an*an*an) - tau.x/an + a.x * dl / (an*len);
+        g[2] = a.y * as / (an*an*an) - tau.y/an + a.y * dl / (an*len);
+        
+        std::cerr << "grad(" << var << ")=" << g << std::endl;
+    }
+    
+    
+    bool cb( const array<double> &var )
+    {
+        std::cerr << "func(" << var << ")=" << func(var) << std::endl;
+        //fgetc(stdin);
+        ios::ocstream fp("cgrad2.dat",true);
+        fp("%g %g\n", var[1], var[2]);
+        return true;
+    }
+};
+
 
 YOCTO_UNIT_TEST_IMPL(cgrad2)
 {
+    Param param;
+    param.tau.x = 1;
+    param.tau.y = 1;
+    param.tau.normalize();
+    param.len   = 1.2;
     
+    vector<double> var(2,0);
+    var[1] = 0.5;
+    var[2] = 0.3;
+    
+    numeric<double>::scalar_field Func( &param, &Param::func );
+    numeric<double>::vector_field Grad( &param, &Param::grad );
+    std::cerr << "Func(" << var << ")=" << Func(var) << std::endl;
+    //std::cerr << "Grad(" << var << ")=" << Grad(var) << std::endl;
+    
+    { ios::ocstream fp("cgrad2.dat",true); }
+    
+    cgrad<double>::callback cb( &param, &Param::cb );
+    cgrad<double>::optimize(Func,Grad,var,1e-5,&cb);
+    std::cerr << "var=" << var << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
 
