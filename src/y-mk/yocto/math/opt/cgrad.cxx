@@ -51,11 +51,12 @@ namespace yocto
         }
         
         template <>
-        void cgrad<real_t>(numeric<real_t>::scalar_field &func,
-                           numeric<real_t>::vector_field &grad,
-                           array<real_t>                 &p,
-                           const real_t                   ftol
-                           )
+        bool cgrad<real_t>::optimize(numeric<real_t>::scalar_field          &func,
+                                     numeric<real_t>::vector_field          &grad,
+                                     array<real_t>                          &p,
+                                     const real_t                            ftol,
+                                     callback                               *cb
+                                     )
         {
             const size_t nvar = p.size(); assert(nvar>0);
             
@@ -74,9 +75,9 @@ namespace yocto
                 g[i] = h[i] = -xi[i];
             }
             
-            std::cerr << "pos=" << p  << std::endl;
-            std::cerr << "f  =" << fp << std::endl;
-            std::cerr << "xi =" << xi << std::endl;
+            //std::cerr << "pos=" << p  << std::endl;
+            //std::cerr << "f  =" << fp << std::endl;
+            //std::cerr << "xi =" << xi << std::endl;
             
             //------------------------------------------------------------------
             // conjugated gradient loop
@@ -105,20 +106,25 @@ namespace yocto
                         converged = false;
                 }
                 const real_t fp_new = f.b;
+                //--------------------------------------------------------------
+                // apply callback
+                //--------------------------------------------------------------
+                if( cb && !(*cb)(p) )
+                    return false;
                 
                 //--------------------------------------------------------------
                 // test convegence on variables
                 //--------------------------------------------------------------
                 if( converged )
-                    return;
+                    return true;
                 
                 //--------------------------------------------------------------
                 // prepare next step
                 //--------------------------------------------------------------
                 fp = fp_new;
                 grad(xi,p);
-                std::cerr << "pos=" << p  << std::endl;
-                std::cerr << "f  =" << fp << std::endl;
+                //std::cerr << "pos=" << p  << std::endl;
+                //std::cerr << "f  =" << fp << std::endl;
                 
                 //--------------------------------------------------------------
                 // conjugated gradient
@@ -129,8 +135,10 @@ namespace yocto
                     gg  += g[i] * g[i];
                     dgg += (xi[i]+g[i])*xi[i];
                 }
+                
                 if( Fabs(gg) <= 0 )
-                    return; // early return
+                    return true; // early return
+                
                 const real_t gam = dgg / gg;
                 for( size_t i=nvar;i>0;--i)
                 {
@@ -139,7 +147,6 @@ namespace yocto
                 }
                 
             }
-            
         }
         
         
