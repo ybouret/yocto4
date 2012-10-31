@@ -291,8 +291,9 @@ namespace yocto
         }
         
         template <>
-        void svd<real_t>:: truncate( array<real_t> &w, const real_t ftol )
+        bool svd<real_t>:: truncate( array<real_t> &w, const real_t ftol )
         {
+            bool truncated  = false;
             const size_t n  = w.size();
             real_t wmax = 0;
             for( size_t i=n;i>0;--i)
@@ -300,11 +301,16 @@ namespace yocto
                 const real_t tmp = Fabs( w[i] );
                 if( tmp > wmax ) wmax = tmp;
             }
-            const real_t wmin = ftol * wmax;
+            const real_t wmin = Fabs( ftol * wmax );
             for( size_t i=n;i>0;--i)
             {
-                if( Fabs(w[i]) <= wmin ) w[i] = 0;
+                if( Fabs(w[i]) <= wmin )
+                {
+                    w[i] = 0;
+                    truncated = true;
+                }
             }
+            return truncated;
         }
     }
 }

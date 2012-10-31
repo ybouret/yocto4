@@ -58,8 +58,8 @@ namespace yocto
 			static const T      tiny; //!< 10^{min_10_exp}
 			static const T      huge; //!< 10^{max_10_exp}
 			
-			typedef functor<T,TL1(T)> function;
-			typedef functor<T,TL1(const array<T>&)> scalar_field; 
+			typedef functor<T,TL1(T)>                            function;
+			typedef functor<T,TL1(const array<T>&)>              scalar_field; 
 			typedef functor<void,TL2(array<T>&,const array<T>&)> vector_field;
 		};
 		

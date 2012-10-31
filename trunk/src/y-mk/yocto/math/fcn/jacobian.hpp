@@ -16,6 +16,8 @@ namespace yocto
 		class jacobian
 		{
 		public:
+            typedef functor<void,TL2(matrix<T>&,const array<T>&)> type;
+            
 			explicit jacobian();
 			virtual ~jacobian() throw();
 			
@@ -24,7 +26,7 @@ namespace yocto
 			
 			size_t size() const throw();
 			
-			
+			//! with automatic memory allocation
 			void operator()( matrix<T> &jac, typename numeric<T>::vector_field &F, const array<T> &X, T h );
 			
 		private:
@@ -40,6 +42,31 @@ namespace yocto
 			matrix<T> d_;
 		};
 		
+        template <typename T>
+        class jacobian_of
+        {
+        public:
+            explicit jacobian_of( typename numeric<T>::vector_field &F ) :
+            call( this, & jacobian_of<T>::compute ),
+            step(1e-4),
+            func(F),
+            fjac()
+            {
+            }
+            
+            virtual ~jacobian_of() throw() {}
+            typename jacobian<T>::type call;
+            T                          step; //!< default is 1e-4
+            
+        private:
+            typename numeric<T>::vector_field &func;
+            jacobian<T>                        fjac;
+            inline void compute( matrix<T> &J, const array<T> &X)
+            {
+                fjac(J,func,X,step);
+            }
+        };
+        
 	}
 	
 }

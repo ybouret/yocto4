@@ -39,7 +39,7 @@ namespace yocto
           
             //! truncate singular value to ftol * max|w|
             static
-            void truncate( array<T> &w, const T ftol );
+            bool truncate( array<T> &w, const T ftol );
             
         };
         

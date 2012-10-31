@@ -23,6 +23,7 @@ static inline void show_values( const char *name )
 	SHOW(ftol);
 	SHOW(min_exp);
 	SHOW(max_exp);
+    SHOW(tiny);
 }
 
 
