@@ -22,8 +22,8 @@ namespace yocto {
 			assert( (x.a<=x.b && x.b<=x.c) || (x.a>=x.b && x.b>=x.c) );
 			
 			
-			static const real_t fmax = numeric<real_t>::sqrteps; //!< numeric constraint
-			static const real_t dmax = numeric<real_t>::minimum; //!< numeric constraint
+			static const real_t fmax = Sqrt(numeric<real_t>::ftol); //!< numeric constraint
+			static const real_t dmax = numeric<real_t>::tiny;       //!< numeric constraint
 			static const real_t R    = REAL(0.618034);
 			static const real_t C    = REAL(1.0)-R;
 			

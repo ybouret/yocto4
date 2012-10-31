@@ -55,7 +55,7 @@ namespace yocto
 		{
 			if( n > 0 )
 			{
-				try 
+				try
 				{
 					ylo_.make(n,0);
 					yhi_.make(n,0);
@@ -90,8 +90,13 @@ namespace yocto
 			static const real_t hmin = numeric<real_t>::tiny * Pow( real_t(hdiv_),real_t(kmax_) );
 			static const real_t dtol = Sqrt( numeric<real_t>:: ftol );
 			
-			const size_t nvar = X.size(); assert( nvar == this->size() );
-			
+			const size_t nvar = X.size();
+			if( nvar != this->size() )
+            {
+                this->release();
+                this->acquire(nvar);
+            }
+            assert( nvar == this->size() );
 			for( size_t j=1; j <= nvar; ++j)
 			{
 				real_t       h    = max_of<real_t>( Fabs(h0), hmin );
