@@ -16,6 +16,11 @@ namespace yocto
             typedef typename numeric<T>::vector_field           Function;
             typedef typename jacobian<T>::type                  Jacobian;
             
+            //! solve the function using hybrid Newton-Raphson/Conjugated Gradient
+            /**
+             The functions need to be scaled.
+             TODO: detect other spurious points...
+             */
             static bool solve( Function &func, Jacobian &jac, array<T> &X, T ftol );
             
                        

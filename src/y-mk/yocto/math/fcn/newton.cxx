@@ -104,12 +104,12 @@ namespace yocto
             
             const size_t n = X.size(); assert(n>0);
             
-            matrix<real_t> J0(n,n);
-            matrix<real_t> J(n,n);
-            vector<real_t> F(n,0);
+            matrix<real_t> J0(n,n); // initial jacobian
+            matrix<real_t> J(n,n);  // working copy of jacobian
+            vector<real_t> F(n,0);  // initial function values
             vector<real_t> h(n,0);  // common step
             vector<real_t> g(n,0);  // for Conjugated Gradient
-            vector<real_t> W(n,0);  // singular values
+            vector<real_t> W(n,0);  // for singular values
             matrix<real_t> V(n,n);  // for SVD
             vector<real_t> xi(n,0); // for Conjugated Gradient
             Energy                       nrj(func,X,h);
@@ -138,10 +138,10 @@ namespace yocto
                 //==============================================================
                 jac(J0,X);
                 J.assign(J0);
-                std::cerr << "Xi=" << X  << std::endl;
-                std::cerr << "Fi=" << F  << std::endl;
+                std::cerr << "X="  << X  << std::endl;
+                std::cerr << "F="  << F  << std::endl;
                 std::cerr << "J="  << J  << std::endl;
-                std::cerr << "g0=" << g0 << std::endl;
+                std::cerr << "E="  << g0 << std::endl;
                 
                 //==============================================================
                 //
@@ -150,9 +150,7 @@ namespace yocto
                 //==============================================================
                 if( ! svd<real_t>::build(J,W,V) )
                 {
-                    std::cerr << "SVD failure: very bad jacobian" << std::endl;
-                    
-                    
+                    std::cerr << "[newton] SVD failure: very bad jacobian" << std::endl;
                     return false;
                 }
                 
@@ -161,10 +159,10 @@ namespace yocto
                 {
                     //----------------------------------------------------------
                     //
-                    // switch to CJ
+                    // switch to Conjugated Gradient
                     //
                     //----------------------------------------------------------
-                    std::cerr << "(Almost) Singular Jacobian" << std::endl;
+                    std::cerr << "[newton] (Almost) Singular Jacobian" << std::endl;
                     
                     //----------------------------------------------------------
                     //
@@ -190,13 +188,15 @@ namespace yocto
                     // build conjugated direction
                     //
                     //----------------------------------------------------------
+                    bool may_return = true;
                     if( IS_NR == status )
                     {
                         //------------------------------------------------------
                         //-- start CJ
                         //------------------------------------------------------
-                        std::cerr << "start CJ" << std::endl;
-                        status = IS_CJ;
+                        std::cerr << "[newton] start CJ" << std::endl;
+                        status     = IS_CJ;
+                        may_return = false; // take at least one conjugated direction
                         for(size_t j=n;j>0;--j)
                         {
                             g[j] = -xi[j];
@@ -208,7 +208,7 @@ namespace yocto
                         //------------------------------------------------------
                         //-- update CJ
                         //------------------------------------------------------
-                        std::cerr << "update CJ" << std::endl;
+                        std::cerr << "[newton] update CJ" << std::endl;
                         real_t dgg = 0, gg = 0;
                         for( size_t j=n;j>0;--j)
                         {
@@ -217,7 +217,7 @@ namespace yocto
                         }
                         if( Fabs(gg) <= 0 )
                         {
-                            std::cerr << "null gradient" << std::endl;
+                            std::cerr << "[newton] null gradient" << std::endl;
                             return true;
                         }
                         const real_t gam = dgg/gg;
@@ -239,14 +239,14 @@ namespace yocto
                     // bracket energy minimum
                     //----------------------------------------------------------
                     bracket<real_t>::expand(E, x, f);
-                    std::cerr << "cj_brack_x=" << x << std::endl;
-                    std::cerr << "cj_brack_f=" << f << std::endl;
+                    //std::cerr << "cj_brack_x=" << x << std::endl;
+                    //std::cerr << "cj_brack_f=" << f << std::endl;
 
                     //----------------------------------------------------------
                     // minimize it
                     //----------------------------------------------------------
                     minimize(E, x, f, ftol);
-                    std::cerr << "cj@" << x.b << " => " << f.b << std::endl;
+                    std::cerr << "[newton] cj@" << x.b << " => " << f.b << std::endl;
                     
                     //----------------------------------------------------------
                     // update status
@@ -258,9 +258,10 @@ namespace yocto
                         X[i] = Xtmp[i];
                         F[i] = Ftmp[i];
                     }
-                    if( has_converged(X, h,ftol) )
+                    
+                    if( may_return && has_converged(X, h,ftol) )
                     {
-                        std::cerr << "Energy convergence" << std::endl;
+                        std::cerr << "[newton] energy convergence" << std::endl;
                         return true;
                     }
                     
@@ -310,10 +311,7 @@ namespace yocto
                             X[i] = Xtmp[i];
                             F[i] = Ftmp[i];
                         }
-                        std::cerr << "good step" << std::endl;
-                        std::cerr << "X=" << X   << std::endl;
-                        std::cerr << "F=" << F   << std::endl;
-                        std::cerr << "g=" << g1  << std::endl;
+                        std::cerr << "[newton] good step" << std::endl;
                         //------------------------------------------------------
                         //
                         // test convergenge
@@ -321,7 +319,7 @@ namespace yocto
                         //------------------------------------------------------
                         if( has_converged(X,h,ftol) )
                         {
-                            std::cerr << "Success after a good step" << std::endl;
+                            std::cerr << "[newton] success after a good step" << std::endl;
                             return true;
                         }
                         g0 = g1;
@@ -333,7 +331,7 @@ namespace yocto
                         // no: find a better decrease
                         //
                         //------------------------------------------------------
-                        std::cerr << "need to backtrack!" << std::endl;
+                        std::cerr << "[newton] backtrack" << std::endl;
                         
                         //------------------------------------------------------
                         //-- approximating g(lambda) = glim
@@ -347,11 +345,12 @@ namespace yocto
                             lam /= 2;
                             if( lam <= numeric<real_t>::tiny )
                             {
+                                std::cerr << "[newton]: spurious point" << std::endl;
                                 return false;
                             }
                         }
                         assert(g1<g0);
-                        std::cerr << "backtrack from lambda=" << lam << " => " << g1 << std::endl;
+                        std::cerr << "[newton] from lambda=" << lam << " => " << g1 << std::endl;
                         
                         //------------------------------------------------------
                         // limited bracketing
@@ -389,8 +388,8 @@ namespace yocto
                                 f.b = f.c;
                             }
                         }
-                        std::cerr << "bracket_x=" << x << std::endl;
-                        std::cerr << "bracket_f=" << f << std::endl;
+                        std::cerr << "[newton] bracket_x=" << x << std::endl;
+                        std::cerr << "[newton] bracket_f=" << f << std::endl;
                         
                         //------------------------------------------------------
                         // line minimization
@@ -399,10 +398,10 @@ namespace yocto
                             minimize(E, x, f, ftol);
                         
                         //------------------------------------------------------
-                        // update status
+                        // update status, no allowed convergence
                         //------------------------------------------------------
                         g0 = E(x.b);
-                        std::cerr << "backtrack g(" << x.b << ")=" << g0 << std::endl;
+                        std::cerr << "[newton] backtrack g(" << x.b << ")=" << g0 << std::endl;
                         for( size_t i=n;i>0;--i)
                         {
                             X[i] = Xtmp[i];

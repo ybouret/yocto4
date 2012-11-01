@@ -62,9 +62,12 @@ namespace
     class Param2
     {
     public:
-        vtx tau;
+        vtx    tau;
+        double len;
         
-        Param2()
+        Param2() :
+        tau(),
+        len(0)
         {
         }
         
@@ -77,23 +80,23 @@ namespace
         {
             const vtx a(X[1],X[2]);
             
-            F[1] = a.norm2() - 3;
+            F[1] = (a.norm()-len)/len;
             F[2] = 1 - (a*tau)/a.norm();
         }
         
         void jac( matrix<double> &J, const array<double> &X )
         {
             const vtx a(X[1],X[2]);
-
+            const double   an = a.norm();
             {
                 array<double> &j = J[1];
-                j[1] = 2*a.x; j[2] = 2*a.y;
+                j[1] = a.x/(len*an);
+                j[2] = a.y/(len*an);
             }
             
             {
                 array<double> &j  = J[2];
                 const double   as = a*tau;
-                const double   an = a.norm();
                 const double   an3 = an*an*an;
                 j[1] = a.x * as / an3 - tau.x/an;
                 j[2] = a.y * as / an3 - tau.y/an;
@@ -117,6 +120,7 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     p.tau.x = 1;
     p.tau.y = 1;
     p.tau.normalize();
+    p.len   = 3;
     
     X[1] = 0.1;
     X[2] = 0.0;
@@ -126,8 +130,8 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     std::cerr << "X=" << X << std::endl;
     
     vector<double> Y(2,0);
-    Y[1] = 0.1;
-    Y[2] = 0.0;
+    Y[1] = -4;
+    Y[2] = -3;
     Newton<double>::Jacobian Kn( &p, &Param2::jac);
     Newton<double>::solve(Fn, Kn, Y, 1e-7);
     std::cerr << std::endl;
