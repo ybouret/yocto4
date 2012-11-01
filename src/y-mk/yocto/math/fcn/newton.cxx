@@ -1,12 +1,16 @@
 #include "yocto/math/fcn/newton.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/sequence/vector.hpp"
-//#include "yocto/math/kernel/linsys.hpp"
+
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/code/utils.hpp"
 
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
+
+#if defined(CHECK_GRAD)
+#include "yocto/math/fcn/derivative.hpp"
+#endif
 
 namespace yocto
 {
@@ -51,6 +55,17 @@ namespace yocto
                     return energy_of(F);
                 }
                 
+#if defined(CHECK_GRAD)
+                inline real_t Eval( const array<real_t> &xx )
+                {
+                    for(size_t i=n;i>0;--i)
+                    {
+                        X[i] = xx[i];
+                    }
+                    fn(F,X);
+                    return energy_of(F);
+                }
+#endif
                 Newton<real_t>::Function &fn;
                 const size_t              n;
                 const array<real_t>      &position;
@@ -97,12 +112,16 @@ namespace yocto
             vector<real_t> W(n,0);  // singular values
             matrix<real_t> V(n,n);  // for SVD
             vector<real_t> xi(n,0); // for Conjugated Gradient
-            Energy                    nrj(func,X,h);
-            array<real_t>            &Xtmp = nrj.X;
-            array<real_t>            &Ftmp = nrj.F;
-            numeric<real_t>::function E( &nrj, & Energy::Compute );
-            int status = IS_NR; // default: newton raphson
+            Energy                       nrj(func,X,h);
+            array<real_t>                &Xtmp = nrj.X;
+            array<real_t>                &Ftmp = nrj.F;
+            numeric<real_t>::function     E( &nrj, & Energy::Compute );
             
+#if defined(CHECK_GRAD)
+            numeric<real_t>::scalar_field EE( &nrj, & Energy::Eval );
+            derivative<real_t> drvs;
+#endif
+            int status = IS_NR; // default: newton raphson
             
             //==================================================================
             // initialize F and its Energy
@@ -119,9 +138,10 @@ namespace yocto
                 //==============================================================
                 jac(J0,X);
                 J.assign(J0);
-                std::cerr << "Xi=" << X << std::endl;
-                std::cerr << "Fi=" << F << std::endl;
-                std::cerr << "J="  << J << std::endl;
+                std::cerr << "Xi=" << X  << std::endl;
+                std::cerr << "Fi=" << F  << std::endl;
+                std::cerr << "J="  << J  << std::endl;
+                std::cerr << "g0=" << g0 << std::endl;
                 
                 //==============================================================
                 //
@@ -132,7 +152,7 @@ namespace yocto
                 {
                     std::cerr << "SVD failure: very bad jacobian" << std::endl;
                     
-                                        
+                    
                     return false;
                 }
                 
@@ -145,7 +165,7 @@ namespace yocto
                     //
                     //----------------------------------------------------------
                     std::cerr << "(Almost) Singular Jacobian" << std::endl;
-                   
+                    
                     //----------------------------------------------------------
                     //
                     // build energy gradient
@@ -158,20 +178,95 @@ namespace yocto
                             sum += F[j] * J0[j][i];
                         xi[i] = sum;
                     }
+                    std::cerr << "grad=" << xi << std::endl;
                     
-                    if( IS_NR )
+#if defined(CHECK_GRAD)
+                    //drvs.gradient(xi,EE,X,1e-4);
+                    //std::cerr << "grad=" << xi << std::endl;
+#endif
+                    
+                    //----------------------------------------------------------
+                    //
+                    // build conjugated direction
+                    //
+                    //----------------------------------------------------------
+                    if( IS_NR == status )
                     {
-                        //-- initialize CJ
+                        //------------------------------------------------------
+                        //-- start CJ
+                        //------------------------------------------------------
                         std::cerr << "start CJ" << std::endl;
                         status = IS_CJ;
+                        for(size_t j=n;j>0;--j)
+                        {
+                            g[j] = -xi[j];
+                            xi[j]=h[j]=g[j];
+                        }
                     }
                     else
                     {
-                        //-- updated CJ
+                        //------------------------------------------------------
+                        //-- update CJ
+                        //------------------------------------------------------
                         std::cerr << "update CJ" << std::endl;
+                        real_t dgg = 0, gg = 0;
+                        for( size_t j=n;j>0;--j)
+                        {
+                            gg  += g[j] * g[j];
+                            dgg += (xi[j]+g[j])*xi[j];
+                        }
+                        if( Fabs(gg) <= 0 )
+                        {
+                            std::cerr << "null gradient" << std::endl;
+                            return true;
+                        }
+                        const real_t gam = dgg/gg;
+                        for( size_t j=n;j>0;--j)
+                        {
+                            g[j] = -xi[j];
+                            xi[j]=h[j]=g[j]+gam*h[j];
+                        }
                     }
+                    
+                    //----------------------------------------------------------
+                    // initialize bracketing
+                    // todo: x.b should be different of 1 ??
+                    //----------------------------------------------------------
+                    triplet<real_t> x = { 0,  1,      0 };
+                    triplet<real_t> f = { g0, E(x.b), 0 };
+                    
+                    //----------------------------------------------------------
+                    // bracket energy minimum
+                    //----------------------------------------------------------
+                    bracket<real_t>::expand(E, x, f);
+                    std::cerr << "cj_brack_x=" << x << std::endl;
+                    std::cerr << "cj_brack_f=" << f << std::endl;
 
-                    return false;
+                    //----------------------------------------------------------
+                    // minimize it
+                    //----------------------------------------------------------
+                    minimize(E, x, f, ftol);
+                    std::cerr << "cj@" << x.b << " => " << f.b << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // update status
+                    //----------------------------------------------------------
+                    g0 = E(x.b);
+                    for( size_t i=n; i>0; --i )
+                    {
+                        h[i] = Xtmp[i] - X[i];
+                        X[i] = Xtmp[i];
+                        F[i] = Ftmp[i];
+                    }
+                    if( has_converged(X, h,ftol) )
+                    {
+                        std::cerr << "Energy convergence" << std::endl;
+                        return true;
+                    }
+                    
+                    //----------------------------------------------------------
+                    // continue to next step
+                    //----------------------------------------------------------
                 }
                 else
                 {
@@ -256,7 +351,7 @@ namespace yocto
                             }
                         }
                         assert(g1<g0);
-                        std::cerr << "backtrack@" << lam << " => " << g1 << std::endl;
+                        std::cerr << "backtrack from lambda=" << lam << " => " << g1 << std::endl;
                         
                         //------------------------------------------------------
                         // limited bracketing
@@ -296,8 +391,16 @@ namespace yocto
                         }
                         std::cerr << "bracket_x=" << x << std::endl;
                         std::cerr << "bracket_f=" << f << std::endl;
+                        
+                        //------------------------------------------------------
+                        // line minimization
+                        //------------------------------------------------------
                         if( !stop )
                             minimize(E, x, f, ftol);
+                        
+                        //------------------------------------------------------
+                        // update status
+                        //------------------------------------------------------
                         g0 = E(x.b);
                         std::cerr << "backtrack g(" << x.b << ")=" << g0 << std::endl;
                         for( size_t i=n;i>0;--i)
