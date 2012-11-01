@@ -36,6 +36,7 @@ YOCTO_UNIT_TEST_INIT(32)
     YOCTO_UNIT_TEST_DECL(cgrad2);
 
     YOCTO_UNIT_TEST_DECL(newton);
+    YOCTO_UNIT_TEST_DECL(newton2);
 
     
 }
