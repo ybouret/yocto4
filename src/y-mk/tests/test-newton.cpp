@@ -22,13 +22,14 @@ namespace
         
         void compute( array<double> &F, const array<double> &X )
         {
-            assert(X.size()==2);
+            assert(X.size()==3);
             assert(F.size()==X.size());
             const double x = X[1];
             const double y = X[2];
-            
-            F[1] = 9 - (x*x+y*y);
+            const double z = X[3];
+            F[1] = 9 - (x*x+y*y+z*z);
             F[2] = y-x;
+            F[3] = 1 - sqrt((x-0.1)*(x-0.1)+y*y);
         }
         
     private:
@@ -43,10 +44,11 @@ YOCTO_UNIT_TEST_IMPL(newton)
     Newton<double>::Function Fn( &p, & Param::compute );
     jacobian_of<double>      jwrapper(Fn);
     Newton<double>::Jacobian &Jn = jwrapper.call;
-    vector<double>           X(2,0);
+    vector<double>           X(3,0);
     
-    X[1] = 0.5;
+    X[1] = 0.1;
     X[2] = 0.1;
+    X[3] = 0.1;
     Newton<double>::solve(Fn, Jn, X, 1e-5);
     
 }

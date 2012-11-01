@@ -1,8 +1,10 @@
 #include "yocto/math/fcn/newton.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/math/kernel/linsys.hpp"
+//#include "yocto/math/kernel/linsys.hpp"
+#include "yocto/math/kernel/svd.hpp"
 #include "yocto/code/utils.hpp"
+
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 
@@ -90,16 +92,16 @@ namespace yocto
             matrix<real_t> J0(n,n);
             matrix<real_t> J(n,n);
             vector<real_t> F(n,0);
-            vector<real_t> h(n,0); // common step
-            vector<real_t> g(n,0); // for Conjugated Gradient
-            linsys<real_t> solve(n);
-            vector<real_t> Xb(n,0);
-            
+            vector<real_t> h(n,0);  // common step
+            vector<real_t> g(n,0);  // for Conjugated Gradient
+            vector<real_t> W(n,0);  // singular values
+            matrix<real_t> V(n,n);  // for SVD
+            vector<real_t> xi(n,0); // for Conjugated Gradient
             Energy                    nrj(func,X,h);
             array<real_t>            &Xtmp = nrj.X;
             array<real_t>            &Ftmp = nrj.F;
             numeric<real_t>::function E( &nrj, & Energy::Compute );
-            //int status = IS_NR; // default: newton raphson
+            int status = IS_NR; // default: newton raphson
             
             
             //==================================================================
@@ -126,14 +128,49 @@ namespace yocto
                 // examine jacobian
                 //
                 //==============================================================
-                if( !solve.LU(J) )
+                if( ! svd<real_t>::build(J,W,V) )
+                {
+                    std::cerr << "SVD failure: very bad jacobian" << std::endl;
+                    
+                                        
+                    return false;
+                }
+                
+                std::cerr << "W=" << W << std::endl;
+                if( svd<real_t>::truncate(W, ftol) )
                 {
                     //----------------------------------------------------------
                     //
                     // switch to CJ
                     //
                     //----------------------------------------------------------
-                    std::cerr << "Singular Jacobian" << std::endl;
+                    std::cerr << "(Almost) Singular Jacobian" << std::endl;
+                   
+                    //----------------------------------------------------------
+                    //
+                    // build energy gradient
+                    //
+                    //----------------------------------------------------------
+                    for( size_t i=n;i>0;--i)
+                    {
+                        real_t sum = 0;
+                        for( size_t j=n;j>0;--j)
+                            sum += F[j] * J0[j][i];
+                        xi[i] = sum;
+                    }
+                    
+                    if( IS_NR )
+                    {
+                        //-- initialize CJ
+                        std::cerr << "start CJ" << std::endl;
+                        status = IS_CJ;
+                    }
+                    else
+                    {
+                        //-- updated CJ
+                        std::cerr << "update CJ" << std::endl;
+                    }
+
                     return false;
                 }
                 else
@@ -143,8 +180,10 @@ namespace yocto
                     // compute the full newton step
                     //
                     //----------------------------------------------------------
-                    for(size_t i=n;i>0;--i) h[i] = -F[i];
-                    solve(J,h);
+                    status = IS_NR;
+                    for(size_t i=n;i>0;--i)
+                        F[i] = -F[i];
+                    svd<real_t>::solve(J, W, V, F, h);
                     std::cerr << "h=" << h << std::endl;
                     
                     //----------------------------------------------------------
@@ -152,11 +191,12 @@ namespace yocto
                     // evaluate the new position/energy
                     //
                     //----------------------------------------------------------
-                    for(size_t i=n;i>0;--i) Xtmp[i] = X[i] + h[i];
+                    for(size_t i=n;i>0;--i)
+                        Xtmp[i] = X[i] + h[i];
                     func(Ftmp,Xtmp);
                     real_t g1 = energy_of(Ftmp);
                     std::cerr << "g0=" << g0 << "-> g1=" << g1 << std::endl;
-                   
+                    
                     //----------------------------------------------------------
                     //
                     // do we accept the full newton step ?
@@ -166,7 +206,9 @@ namespace yocto
                     if( g1 <= glim )
                     {
                         //------------------------------------------------------
+                        //
                         // yes: good enough decrease
+                        //
                         //------------------------------------------------------
                         for(size_t i=n;i>0;--i)
                         {
@@ -174,8 +216,14 @@ namespace yocto
                             F[i] = Ftmp[i];
                         }
                         std::cerr << "good step" << std::endl;
-                        std::cerr << "X=" << X << std::endl;
-                        std::cerr << "F=" << F << std::endl;
+                        std::cerr << "X=" << X   << std::endl;
+                        std::cerr << "F=" << F   << std::endl;
+                        std::cerr << "g=" << g1  << std::endl;
+                        //------------------------------------------------------
+                        //
+                        // test convergenge
+                        //
+                        //------------------------------------------------------
                         if( has_converged(X,h,ftol) )
                         {
                             std::cerr << "Success after a good step" << std::endl;
@@ -186,32 +234,72 @@ namespace yocto
                     else
                     {
                         //------------------------------------------------------
+                        //
                         // no: find a better decrease
+                        //
                         //------------------------------------------------------
                         std::cerr << "need to backtrack!" << std::endl;
-                        size_t iter=1;
-                        real_t lam =1;
-                        //-- decrease to fall under g0
-                        do
+                        
+                        //------------------------------------------------------
+                        //-- approximating g(lambda) = glim
+                        //------------------------------------------------------
+                        real_t lam = alpha;
+                        for(;;)
                         {
-                            lam = real_t(1)/(++iter);
+                            g1=E(lam);
+                            if( g1 < g0 )
+                                break;
+                            lam /= 2;
                             if( lam <= numeric<real_t>::tiny )
                             {
-                                std::cerr << "backtrack failure" << std::endl;
                                 return false;
                             }
-                            g1 = E(lam);
-                            if( g1 < g0 )
-                            {
-                                std::cerr << "backtrack@" << lam << " => " << g1 << std::endl;
-                                break;
-                            }
                         }
-                        while(g1>=g0);
                         assert(g1<g0);
                         std::cerr << "backtrack@" << lam << " => " << g1 << std::endl;
                         
-                        g0 = g1;
+                        //------------------------------------------------------
+                        // limited bracketing
+                        //------------------------------------------------------
+                        triplet<real_t>     x    = { 0, lam, 0 };
+                        triplet<real_t>     f    = { g0, g1, 0 };
+                        static const real_t GOLD = REAL(1.61803398874989);
+                        static const real_t xmax = 0.5;
+                        bool                stop = false;
+                        for(;;)
+                        {
+                            x.c = x.b + GOLD * (x.b-x.a);
+                            if( x.c >= xmax )
+                            {
+                                x.c  = xmax;
+                                stop = true;
+                            }
+                            f.c = E(x.c);
+                            if( f.c >= f.b )
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                assert( f.c < f.b );
+                                if( stop )
+                                {
+                                    x.b = x.c;
+                                    f.b = f.c;
+                                    break;
+                                }
+                                x.a = x.b;
+                                f.a = f.b;
+                                x.b = x.c;
+                                f.b = f.c;
+                            }
+                        }
+                        std::cerr << "bracket_x=" << x << std::endl;
+                        std::cerr << "bracket_f=" << f << std::endl;
+                        if( !stop )
+                            minimize(E, x, f, ftol);
+                        g0 = E(x.b);
+                        std::cerr << "backtrack g(" << x.b << ")=" << g0 << std::endl;
                         for( size_t i=n;i>0;--i)
                         {
                             X[i] = Xtmp[i];
