@@ -10,7 +10,7 @@ namespace yocto
 {
 	//! make index
 	template <typename T,typename FUNC>
-	inline void make_index( array<T> &ra, array<size_t> &idx, FUNC &compare ) throw()
+	inline void make_index( const array<T> &ra, array<size_t> &idx, FUNC &compare ) throw()
 	{
 		const size_t n = idx.size(); assert( ra.size() == idx.size() );
 		for( size_t i=1; i <= n; ++i ) idx[i] = i;
