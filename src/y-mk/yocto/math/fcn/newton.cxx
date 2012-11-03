@@ -75,6 +75,14 @@ namespace yocto
                 }
                 return true;
             }
+            
+            
+            static inline int compareW( const real_t a, const real_t b )
+            {
+                const real_t lhs = Fabs(a);
+                const real_t rhs = Fabs(b);
+                return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
+            }
         }
         
         
@@ -142,10 +150,10 @@ namespace yocto
                 // Check condition
                 //
                 //==============================================================
-                make_index(w, widx, __compare<real_t> );
+                make_index(w, widx, compareW );
                 const real_t icond = Fabs( w[ widx[1] ] / w[ widx[n] ] );
                 
-                std::cerr << "w=" << w << std::endl;
+                std::cerr << "w="       << w     << std::endl;
                 std::cerr << "icond = " << icond << std::endl;
                 
                 if( icond >= 1e-4 )
@@ -344,9 +352,14 @@ namespace yocto
                     // find the line minimum
                     //
                     //----------------------------------------------------------
+                    std::cerr << "[newton]: cj line minimization" << std::endl;
                     triplet<real_t> x = { 0,  1,      0 };
                     triplet<real_t> f = { G0, E(x.b), 0 };
+                    std::cerr << "cj_x=" << x << std::endl;
+                    std::cerr << "cj_f=" << f << std::endl;
                     bracket<real_t>::expand(E, x,f);
+                    std::cerr << "cj_x=" << x << std::endl;
+                    std::cerr << "cj_f=" << f << std::endl;
                     minimize<real_t>(E, x, f, ftol);
                     
                     //----------------------------------------------------------

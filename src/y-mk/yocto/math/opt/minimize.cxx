@@ -19,7 +19,7 @@ namespace yocto {
 		{
 			assert(f.b<=f.a);
 			assert(f.b<=f.c);
-			assert( (x.a<=x.b && x.b<=x.c) || (x.a>=x.b && x.b>=x.c) );
+			assert(x.is_ordered());
 			
 			
 			static const real_t fmax = Sqrt(numeric<real_t>::ftol); //!< numeric constraint
@@ -41,7 +41,8 @@ namespace yocto {
 				x2 = x.b + C * ( x.c- x.b );
 				f2 = func( x2 );
 			}
-			else {
+			else
+            {
 				x2 = x.b;
 				f2 = f.b;
 				x1 = x.b - C * (x.b - x.a );
