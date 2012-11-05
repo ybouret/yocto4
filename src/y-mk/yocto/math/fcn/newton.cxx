@@ -7,7 +7,7 @@
 
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
-#include "yocto/code/make-index.hpp"
+#include "yocto/code/hsort.hpp"
 
 namespace yocto
 {
@@ -76,13 +76,14 @@ namespace yocto
                 return true;
             }
             
-            
+#if 0
             static inline int compareW( const real_t a, const real_t b )
             {
                 const real_t lhs = Fabs(a);
                 const real_t rhs = Fabs(b);
                 return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
             }
+#endif
         }
         
         
@@ -103,8 +104,8 @@ namespace yocto
             vector<real_t>             h(n,0);    // common step
             vector<real_t>             g(n,0);    // for Conjugated Gradient
             vector<real_t>             w(n,0);    // for singular values
+            vector<real_t>             wa(n,0);   // absolute values
             matrix<real_t>             v(n,n);    // for SVD
-            vector<size_t>             widx(n,0); // for SVD
             vector<real_t>             xi(n,0);   // for Conjugated Gradient
             Energy                     nrj(func,X,h);
             array<real_t>             &XX = nrj.X;
@@ -150,13 +151,21 @@ namespace yocto
                 // Check condition
                 //
                 //==============================================================
-                make_index(w, widx, compareW );
-                const real_t icond = Fabs( w[ widx[1] ] / w[ widx[n] ] );
+                for(size_t j=n;j>0;--j) wa[j] = Fabs(w[j]);
+                hsort(wa);
+                const real_t wmax  = wa[ n ];
+                if( wmax <= 0 )
+                {
+                    std::cerr << "[newton]: null jacobian" << std::endl;
+                    return false;
+                }
+                const real_t wmin  = wa[ 1 ];
+                const real_t icond = Fabs( wmin / wmax );
                 
                 std::cerr << "w="       << w     << std::endl;
                 std::cerr << "icond = " << icond << std::endl;
                 
-                if( icond >= 1e-4 )
+                if( icond >= 1e-6 )
                 {
                     //==========================================================
                     //
@@ -173,6 +182,7 @@ namespace yocto
                     for( size_t j=n;j>0;--j)
                         g[j] = -F[j];
                     svd<real_t>::solve(J, w, v, g, h);
+                    std::cerr << "h=" << h << std::endl;
                     
                     
                     //----------------------------------------------------------
@@ -225,8 +235,11 @@ namespace yocto
                                 return false;
                             }
                         }
-                        std::cerr << "[newton]: backtrack from " << lam << ", G=" << G1 << std::endl;
+                        //std::cerr << "[newton]: backtrack from " << lam << ", G=" << G1 << std::endl;
                         
+                        triplet<real_t> x = { 0,  lam, 0 };
+                        triplet<real_t> f = { G0, G1,  0 };
+#if 0
                         //------------------------------------------------------
                         // cheap bracketing with simple golden extension
                         //------------------------------------------------------
@@ -234,8 +247,7 @@ namespace yocto
                         static const real_t xmax = 0.5;
                         bool                stop = false;
                         
-                        triplet<real_t> x = { 0,  lam, 0 };
-                        triplet<real_t> f = { G0, G1,  0 };
+                        
                         x.c = x.b + GOLD * ( x.b - x.a );
                         f.c = E(x.c);
                         while( f.b > f.c )
@@ -245,17 +257,20 @@ namespace yocto
                                 // don't go further
                                 x.b = x.c;
                                 f.b = f.c;
-                                stop = false;
+                                stop = true;
                                 break;
                             }
                             //-- move forward
                             x.a = x.b; x.b = x.c; x.c = x.b + GOLD * (x.b - x.a);
-                            f.a = f.b; f.b = f.c; f.c = E(f.c);
+                            f.a = f.b; f.b = f.c; f.c = E(x.c);
                         }
                         if( !stop )
                         {
                             minimize(E, x, f, ftol);
                         }
+#endif
+                        bracket<real_t>::expand( E, x, f );
+                        minimize<real_t>(E,x,f,ftol);
                         lam = x.b;
                         G1  = E(lam);
                         std::cerr << "[newton]: backtrack@" << lam << ", G=" << G1 << std::endl;

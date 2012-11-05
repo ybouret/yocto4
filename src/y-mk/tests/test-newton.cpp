@@ -50,6 +50,16 @@ YOCTO_UNIT_TEST_IMPL(newton)
     X[2] = 0.1;
     X[3] = 0.1;
     Newton<double>::solve(Fn, Jn, X, 1e-5);
+    
+    vector<double>           Y(3,0);
+    
+    Y[1] = 0.1;
+    Y[2] = 0.1;
+    Y[3] = 0.1;
+    Newton<double>::qsolve(Fn, Jn, Y, 1e-5);
+
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
