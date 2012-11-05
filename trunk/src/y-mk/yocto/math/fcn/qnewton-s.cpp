@@ -1,2 +1,2 @@
 #define YOCTO_ZTYPE 's'
-#include "newton.cxx"
+#include "qnewton.cxx"

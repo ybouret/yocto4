@@ -33,13 +33,73 @@ We notice that
 \end{equation}
 and that
 \begin{equation}
-	\myhess_G = \mytrn{\mymat{J}}\mymat{J} + \partial_{\vec{X}}\mymat{J} \otimes \vec{F}
+	\myhess_G = \mytrn{\mymat{J}}\mymat{J} + \partial_{\vec{X}}\mymat{J} \otimes \vec{F}.
 \end{equation}
 
-\section{Well conditioned Jacobian}
+
+\section{Well-conditioned Jacobian}
 In that case, we can compute the full Newton's step
 \begin{equation}
 	\vec{h}_k = - \mymat{J}^{-1} \vec{F}_k
 \end{equation}
+Let us now define
+\begin{equation}
+	g_k(\lambda) =  G \left(\vec{X}_k + \lambda \vec{h}_k\right)
+\end{equation}
+We have
+\begin{equation}
+	g_k(\lambda) \simeq G_k - \lambda \vec{F}_k^2 = G_k(1 - 2\lambda)
+\end{equation}
+meaning that the Newton's step is a descent direction for $G$.
+We accept they full Newton's step only if the decrease is enough compared to
+the descent rate of $G$.
+We take $0<\alpha<{1}$ and we accept the full Newton's step only if
+$$
+	g_k(1) \leq (1-\alpha) g_k(0).
+$$
+Otherwise, we must backtrack to an acceptable solution.
+
+\section{Ill-conditioned Jacobian}
+We can switch to a conjugated gradient algorithm on $G$ since we have the knowledge of $\mygrad G$.
+Nonetheless, we have a second order approximation of $G$
+\begin{equation}
+	G\left(\vec{X}_k+\vec{h}\right) \simeq G_k + \mytrn{\vec{F}_k} \mymat{J} \vec{h} +
+	\frac{1}{2} \mytrn{\vec{h}} \mytrn{\mymat{J}}\mymat{J} \vec{h}
+\end{equation}
+which is as best as we are close to a root.
+Since we assume that $\mymat{J}$ is ill-conditioned, we can use a singular value decomposition
+of
+\begin{equation}
+	\mymat{J} = \mymat{U} \mymat{W} \mytrn{\mymat{V}}
+\end{equation}
+where $\mymat{W}$ is a diagonal matrix, $\mytrn{\mymat{U}}\mymat{U}=\mytrn{\mymat{V}}\mymat{V}=\mymat{I}_n$.
+We obtain
+\begin{equation}
+	\mytrn{\mymat{J}}\mymat{J} = \mymat{V} \mymat{W}^2 \mytrn{\mymat{V}}.
+\end{equation}
+We transform $\mymat{W}$ into a non-singular matrix $\widetilde{\mymat{W}}$,
+so that the minimum of $G$ is around the step
+\begin{equation}
+	\vec{h}_k = - \mymat{V} \left( \widetilde{\mymat{W}}^{-2} \mymat{W}\right) \mytrn{\mymat{U}} \vec{F}_k.
+\end{equation}
+We recognize the Newton's step when $\mymat{W}$ is well-conditioned.
+The problem is to choose a good $\widetilde{\mymat{W}}$.
+Especially, we should have
+\begin{equation}
+\begin{array}{rcl}
+	\mygrad G_k \vec{h}_k & = &\mytrn{\vec{F}_k} \mymat{J} \vec{h_k} \\
+	& = & - \mytrn{\vec{F}_k} \mymat{U} \left( \widetilde{\mymat{W}}^{-2} \mymat{W}^2 \right)\mytrn{\mymat{U}} \vec{F}_k < 0\\
+\end{array}
+\end{equation}
+Since $\mygrad G_k$ is not zero, $\mytrn{\mymat{U}} \vec{F}_k$ is not zero.
+Since $\left( \widetilde{\mymat{W}}^{-2} \mymat{W}^2 \right)$ is positive-definite,
+\underline{$\vec{h}_k$ is a descent direction for $G$}.
+A simple way to regularize is
+\begin{equation}
+	\widetilde{W}_i^2 = W_i^2 + \beta^2 
+\end{equation}
+
+
+
 
 \end{document}
