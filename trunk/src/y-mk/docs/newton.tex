@@ -1,0 +1,45 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+
+\begin{document}
+
+\section{Setup}
+Let $\vec{F}\left(\vec{X}\right)$ be a system of $n$ equations with $n$ variables.
+Starting from $\vec{X}_k$, what is the step to take ?
+In any case, for a small step $\vec{h}$ we have
+\begin{equation}
+	\vec{F}\left(\vec{X}_k+\vec{h}\right) = \vec{F}_k + \mymat{J} \vec{h}
+\end{equation}
+We define the associated objective function
+\begin{equation}
+	G\left(\vec{X}\right) = \frac{1}{2} \vec{F}^2
+\end{equation}
+We notice that
+\begin{equation}
+	\mygrad G = \mytrn{\mymat{J}}\vec{F}
+\end{equation}
+and that
+\begin{equation}
+	\myhess_G = \mytrn{\mymat{J}}\mymat{J} + \partial_{\vec{X}}\mymat{J} \otimes \vec{F}
+\end{equation}
+
+\section{Well conditioned Jacobian}
+In that case, we can compute the full Newton's step
+\begin{equation}
+	\vec{h}_k = - \mymat{J}^{-1} \vec{F}_k
+\end{equation}
+
+\end{document}
