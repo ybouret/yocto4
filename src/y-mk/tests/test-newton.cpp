@@ -57,7 +57,7 @@ YOCTO_UNIT_TEST_IMPL(newton)
     Y[2] = 0.1;
     Y[3] = 0.1;
     Newton<double>::qsolve(Fn, Jn, Y, 1e-5);
-
+    
     
     
 }
@@ -147,6 +147,15 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     std::cerr << std::endl;
     std::cerr << "X=" << X << std::endl;
     std::cerr << "Y=" << Y << std::endl;
+    
+    vector<double> Z(2,0);
+    Z[1] = -4;
+    Z[2] = -3;
+    Newton<double>::qsolve(Fn, Kn, Z, 1e-7);
+    std::cerr << std::endl;
+    std::cerr << "X=" << X << std::endl;
+    std::cerr << "Y=" << Y << std::endl;
+    std::cerr << "Z=" << Z << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()

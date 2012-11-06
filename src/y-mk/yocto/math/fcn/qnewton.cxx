@@ -4,6 +4,7 @@
 #include "yocto/code/hsort.hpp"
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -145,6 +146,24 @@ namespace yocto
                 const real_t icnd = wmin / wmax;
                 std::cerr << "icnd=" << icnd << std::endl;
                 
+                //-- the condition is between 0 (bad) and 1 (homothetic matrix)
+                //-- somewere around numeric::ftol
+                real_t cfac = 0; // --> Newton's step
+                static const real_t c_hi = numeric<real_t>::sqrteps;
+                static const real_t c_lo = numeric<real_t>::epsilon;
+                if( icnd <= c_hi )
+                {
+                    if( icnd <= c_lo )
+                        cfac = 1;
+                    else
+                    {
+                        cfac = 1.0 - log(icnd/c_lo) / log(c_hi/c_lo);
+                    }
+                }
+                // else cfac = 0
+                cfac = clamp<real_t>(0,cfac,1);
+                std::cerr << "condition_factor=" << cfac << std::endl;
+                
                 //==============================================================
                 //
                 // find the regularization factor
@@ -165,12 +184,12 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- build the regularized inverse singular values
                 //--------------------------------------------------------------
-                const real_t beta2 = beta*beta;
-                const real_t fac   = beta2;
+                const real_t tmp   = beta * cfac;
+                const real_t beta2 = tmp*tmp;
                 for( size_t j=n;j>0;--j)
                 {
                     const real_t w = W[j];
-                    W[j] /= (w*w+fac);
+                    W[j] /= (w*w+beta2);
                 }
                 std::cerr << "iW=" << W << std::endl;
                 
@@ -233,6 +252,7 @@ namespace yocto
                         std::cerr << "[QuasiNewton]: Converged" << std::endl;
                         return true;
                     }
+                    G0 = G1;
                 }
                 else
                 {
@@ -267,8 +287,8 @@ namespace yocto
                     bracket<real_t>::expand(E,x,f);
                     minimize<real_t>(E, x, f, ftol);
                     lam = x.b;
-                    G1  = E(lam);
-                    std::cerr << "[QuasiNewton]: Backtrack G(" << lam << ")=" << G1 << std::endl;
+                    G0  = E(lam);
+                    std::cerr << "[QuasiNewton]: Backtrack G(" << lam << ")=" << G0 << std::endl;
                     for(size_t j=n;j>0;--j)
                     {
                         X[j] = EX[j];

@@ -8,6 +8,7 @@
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 #include "yocto/code/hsort.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -95,6 +96,7 @@ namespace yocto
         {
             static const real_t alpha      = real_t(1e-4);
             static const real_t rate       = (1-alpha);
+            static const real_t icond_min  = max_of<real_t>(numeric<real_t>::ftol,1e-6);
             
             const size_t n = X.size(); assert(n>0);
             
@@ -130,9 +132,9 @@ namespace yocto
                 //==============================================================
                 jac(J0,X);
                 J.assign(J0);
-                std::cerr << "X=" << X << std::endl;
-                std::cerr << "F=" << F << std::endl;
-                std::cerr << "J=" << J << std::endl;
+                //std::cerr << "X=" << X << std::endl;
+                //std::cerr << "F=" << F << std::endl;
+                //std::cerr << "J=" << J << std::endl;
                 std::cerr << "G=" << G0 << std::endl;
                 
                 //==============================================================
@@ -162,10 +164,10 @@ namespace yocto
                 const real_t wmin  = wa[ 1 ];
                 const real_t icond = Fabs( wmin / wmax );
                 
-                std::cerr << "w="       << w     << std::endl;
+                //std::cerr << "w="       << w     << std::endl;
                 std::cerr << "icond = " << icond << std::endl;
                 
-                if( icond >= 1e-6 )
+                if( icond >= icond_min )
                 {
                     //==========================================================
                     //
