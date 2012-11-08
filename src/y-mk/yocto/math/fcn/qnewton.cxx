@@ -70,7 +70,7 @@ namespace yocto
         template <>
         bool Newton<real_t>:: qsolve( Function &func, Jacobian &jac, array<real_t> &X, real_t ftol )
         {
-            const real_t alpha = 1e-4;
+            const real_t alpha = REAL(1e-4);
             
             const size_t              n = X.size(); assert(n>0);
             matrix<real_t>            J(n,n);
@@ -157,7 +157,7 @@ namespace yocto
                         cfac = 1;
                     else
                     {
-                        cfac = 1.0 - log(icnd/c_lo) / log(c_hi/c_lo);
+                        cfac = REAL(1.0) - Log(icnd/c_lo) / Log(c_hi/c_lo);
                     }
                 }
                 // else cfac = 0
