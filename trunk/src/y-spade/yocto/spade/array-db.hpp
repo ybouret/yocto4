@@ -1,3 +1,4 @@
+//!
 #ifndef YOCTO_SPADE_ARRAY_DB_INCLUDED
 #define YOCTO_SPADE_ARRAY_DB_INCLUDED 1
 
@@ -9,7 +10,11 @@ namespace yocto
 {
     namespace spade
     {
-        
+   
+        //! database or arrays
+        /**
+         used to store arrays and their memory.
+         */
         class array_db
         {
         public:

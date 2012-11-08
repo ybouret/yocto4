@@ -60,7 +60,7 @@ GET_FILENAME_COMPONENT(CC_NAME ${CMAKE_C_COMPILER} NAME )
 ########################################################################
 ## GNU
 ########################################################################
-IF( "${CC_NAME}" MATCHES "gcc.*" )
+IF( "${CC_NAME}" MATCHES "^gcc.*" )
   SET(YOCTO_GNU ON)
   MESSAGE( STATUS "Using GNU compilers" )
   
@@ -84,7 +84,7 @@ ENDIF()
 ########################################################################
 ## clang
 ########################################################################
-IF( "${CC_NAME}" MATCHES "clang.*" )
+IF( "${CC_NAME}" MATCHES "^clang.*" )
   SET(YOCTO_CLANG ON)
   MESSAGE( STATUS "Using CLANG compilers" )
   
@@ -102,7 +102,7 @@ ENDIF()
 ########################################################################
 ## Intel 
 ########################################################################
-IF( "${CC_NAME}" MATCHES "icc.*" )
+IF( "${CC_NAME}" MATCHES "^icc.*" )
   SET(YOCTO_INTEL ON)
   MESSAGE( STATUS "Using Intel compilers" )
   
@@ -118,7 +118,7 @@ ENDIF()
 ########################################################################
 ## PathScale
 ########################################################################
-IF( "${CC_NAME}" MATCHES "path.*" )
+IF( "${CC_NAME}" MATCHES "^path.*" )
   SET(YOCTO_PATHSCALE ON)
   MESSAGE( STATUS "Using PathScale compilers" )
   

@@ -119,7 +119,7 @@ ENDIF()
 ## where to install
 ########################################################################
 
-SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
+SET(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
 
 
 ########################################################################

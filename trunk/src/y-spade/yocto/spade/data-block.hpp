@@ -8,6 +8,7 @@ namespace yocto
     
     namespace spade
     {
+        //! memory for any array
         class data_block
         {
         public:
