@@ -11,7 +11,7 @@
 #include <cstdlib>
 #endif
 
-#if defined(__MACH__)
+#if defined(__MACH__) || defined(__FreeBSD__)
 #include <sys/select.h>
 #endif
 
