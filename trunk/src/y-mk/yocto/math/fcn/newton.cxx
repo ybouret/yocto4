@@ -96,7 +96,7 @@ namespace yocto
         {
             static const real_t alpha      = real_t(1e-4);
             static const real_t rate       = (1-alpha);
-            static const real_t icond_min  = max_of<real_t>(numeric<real_t>::ftol,1e-6);
+            static const real_t icond_min  = max_of<real_t>(numeric<real_t>::ftol,REAL(1e-6));
             
             const size_t n = X.size(); assert(n>0);
             
