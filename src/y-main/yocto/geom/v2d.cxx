@@ -139,7 +139,7 @@ namespace yocto {
         
 		template <>
 		void v2d<real_t>:: normalize() throw() {
-			const real_t fac =  math::Sqrt( real_t(1) / ( x*x + y*y ) );
+			const real_t fac =  REAL(1.0) / math::Hypotenuse(x,y);
 			x *= fac;
 			y *= fac;
 		}
