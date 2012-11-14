@@ -114,12 +114,50 @@ We perform a Gram-Schmidt orthonormalization of $\mymat{F}$ into
 	\end{array}
 	\right\rbrack.
 \end{equation}
+\subsection{Solving Bis}
+We build the initial matrix $\mymat{F}\in\mathcal{M}_{M,M}$
+\begin{equation}
+	\mymat{F} = 
+	\left\lbrack
+	\begin{array}{cc}
+	\mytrn{\mymat{P}} & \mymat{0} \\
+	\end{array}
+	\right\rbrack
+\end{equation}
+and we use a Singular Values Decomposition to obtain a fully
+orthonormal matrix
+\begin{equation}
+	\tilde{\mymat{F}} = 
+	\left\lbrack
+	\begin{array}{cc}
+	\tilde{\mytrn{\mymat{P}}} & \mytrn{\mymat{Q}} \\
+	\end{array}
+	\right\rbrack
+\end{equation}
 
 \subsubsection{Choice of the starting point}
 We choose a random $\vec{V}_0$ such as $\vecX_0 = \vecX^\star +  \mytrn{\mymat{Q}}\vec{V}_0$ has a strict majority of
 positive values.
 The amplitude of the random value
 should be around the greatest absolute value of $\vecX^\star$.
+
+\subsubsection{Choice of the starting point, bis}
+We can't directly find $\vec{V}_0$ such that
+\[
+	\vecX_0 = \vecX^\star + \mytrn{\mymat{Q}}\vec{V}_0
+\]	
+but the vector that minimizes the distance to $\vecX_0$ is $\vec{V}_0=\mymat{Q}\vecX_0$.
+In particular is we define
+\[
+	\vec{V}_0 = \lambda \mymat{Q}
+	\left\lbrack
+	\begin{array}{c}
+	1\\
+	\vdots\\
+	1\\
+	\end{array}
+	\right\rbrack
+\]
 
 \subsubsection{Newton Algorithm Mark-II}
 Starting from $\vec{V}_{n}$, we want to find $\delta\vec{V}_n$
