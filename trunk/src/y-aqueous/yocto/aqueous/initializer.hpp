@@ -57,6 +57,7 @@ namespace yocto
 			const library &lib;
 		};
 
+        //! chemsys initializer
 		class initializer
 		{
 		public:
@@ -68,6 +69,7 @@ namespace yocto
 
 			void electroneutrality();
 
+            //! create a valid concentration set in cs.C
 			void   operator()( chemsys &cs , double t);
 			size_t size() const throw();
 
@@ -76,6 +78,8 @@ namespace yocto
             constraint & operator[]( size_t index ) throw();
             const constraint & operator[]( size_t index ) const throw();
 
+            void run( chemsys &cs, double t );
+            
 		private:
 			vector< constraint::ptr > constraints;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);

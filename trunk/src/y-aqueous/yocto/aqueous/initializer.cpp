@@ -3,8 +3,9 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/math/kernel/svd.hpp"
 
-namespace yocto 
+namespace yocto
 {
 	namespace aqueous
 	{
@@ -69,7 +70,7 @@ namespace yocto
             value = new_v;
             (double &)fixedValue = v;
         }
-
+        
         
         
 		void constraint:: add( const string &id, double w )
@@ -100,7 +101,7 @@ namespace yocto
             const string ID(id);
             return weight_of(ID);
         }
-
+        
         
         
 		initializer:: ~initializer() throw()
@@ -195,7 +196,7 @@ namespace yocto
             
 			return num_pos > num_neg;
 		}
-
+        
         
         
         
@@ -265,7 +266,7 @@ namespace yocto
 				//==============================================================
 				//std::cerr << "# Decoding Linear Constraints" << std::endl;
 				for( size_t i=1; i <= Nc; ++i )
-				{               
+				{
 					const constraint &c = *(constraints[i]);
 					V[i] = c.value(t);
 					for( size_t j=1; j <= M; ++j )
@@ -305,7 +306,7 @@ namespace yocto
 				// complete P into F = invertible matrix
 				//--------------------------------------------------------------
 				cs.solver.ensure(M);
-				do 
+				do
 				{
 					for( size_t i=1; i <= Nc; ++i )
 						for( size_t j=1; j <= M; ++j )
@@ -389,7 +390,7 @@ namespace yocto
                 //std::cerr << "C =" << C << std::endl;
                 
                 
-				if( !converged ) 
+				if( !converged )
 					goto NEWTON_STEP;
                 
 				//==============================================================
@@ -406,7 +407,7 @@ namespace yocto
                 
 				{
 					double maxAbsC = 0;
-					for( size_t i=M; i >0; --i ) 
+					for( size_t i=M; i >0; --i )
 					{
 						const double tmp = C[i];
 						if( fabs(tmp) > fabs(maxAbsC) )
@@ -426,7 +427,7 @@ namespace yocto
                 
 				//==============================================================
 				//
-				// numeric corrections 
+				// numeric corrections
 				//
 				//==============================================================
                 //std::cerr << "# Linear Improvement" << std::endl;
@@ -454,14 +455,14 @@ namespace yocto
 					algebra<double>::sub(U,V);
                     
                     const double new_norm = get_max_of(dC);
-					if( new_norm >= old_norm ) 
+					if( new_norm >= old_norm )
                     {
                         break;
                     }
 					old_norm = new_norm;
-                  
+                    
                 }
-
+                
                 
                 //std::cerr << "#Improved:" << std::endl;
 				//std::cerr << "C=" << C << std::endl;
@@ -490,11 +491,11 @@ namespace yocto
                 {
                     const double dC_i = Fabs(dC[i]) + numeric<double>::tiny;
                     const double dC10 = Pow(10.0,ceil(Log10(dC_i)));
-                    dC[i] = dC10;                    
+                    dC[i] = dC10;
                 }
                 //std::cerr << "ErrdC=" << dC << std::endl;
                 
-				//--------------------------------------------------------------                
+				//--------------------------------------------------------------
 				//-- cutoff
                 //--------------------------------------------------------------
 				for( size_t j=M; j>0; --j )
@@ -512,7 +513,7 @@ namespace yocto
 				cs.normalize(t);
                 //std::cerr << "#Normalized" << std::endl;
                 //std::cerr << "C=" << C << std::endl;
-
+                
 			}
             
 		}
@@ -528,6 +529,131 @@ namespace yocto
 		}
         
 		size_t initializer:: size() const throw() { return constraints.size(); }
+        
+        
+        void initializer:: run( chemsys &cs, double t )
+        {
+            //==================================================================
+            //
+            // initialize constants and sanity check
+            //
+            //==================================================================
+			std::cerr << "# Initializing system" << std::endl;
+			array<double> &C  = cs.C;
+			const size_t   M  = C.size();
+			const size_t   N  = cs.size();
+			const size_t   Nc = constraints.size();
+			if( Nc+N != M )
+				throw exception("#constraints mismatch: Nc=%u + N=%u != M=%u", unsigned(Nc), unsigned(N), unsigned(M) );
+            
+			if( Nc > 0 )
+			{
+                linsys<double> &solve = cs.solver;
+                solve.ensure(Nc);
+                
+                //==============================================================
+                //
+				//-- decode constraints
+                //
+                //==============================================================
+                std::cerr << "# Decoding Linear Constraints" << std::endl;
+                matrix<double> P(Nc,M);
+				vector<double> Lambda(Nc,0.0);
+				for( size_t i=1; i <= Nc; ++i )
+				{
+					const constraint &c = *(constraints[i]);
+					Lambda[i] = c.value(t);
+					for( size_t j=1; j <= M; ++j )
+					{
+						const species &sp = *lib(j);
+						const double  *pW = c.coefficients.search( sp.name );
+						if( pW )
+							P[i][j] = *pW;
+					}
+				}
+				std::cerr << "P="      << P      << std::endl;
+				std::cerr << "Lambda=" << Lambda << std::endl;
+                
+                //==============================================================
+                //
+				//-- create Xstar = Pseudo-Inverse P times Lambda
+                //
+                //==============================================================
+                std::cerr << "#Create constant part" << std::endl;
+                vector<double> Xstar(M,0);
+                {
+                    
+                    matrix<double> P2(Nc,Nc);
+                    algebra<double>::mul_rtrn(P2, P, P);
+                    std::cerr << "P2=" << P2 << std::endl;
+                    if( !solve.LU(P2) )
+                    {
+                        throw exception("Singular Constraints/PseudoInverse");
+                    }
+                    vector<double> tmp(Nc,0);
+                    for(size_t i=Nc;i>0;--i) tmp[i] = Lambda[i];
+                    solve(P2,tmp);
+                    algebra<double>::mul_trn(Xstar, P, tmp);
+                    std::cerr << "Xstar=" << Xstar << std::endl;
+                }
+                
+                //==============================================================
+                //
+				//-- create the orthogonal matrix
+                //
+                //==============================================================
+                matrix<double> Q(N,M);
+                {
+                    matrix<double> F(M,M);
+                    //----------------------------------------------------------
+                    // Nc first rows are the P rows
+                    //----------------------------------------------------------
+                    for( size_t j=1; j <= Nc; ++j )
+                    {
+                        for( size_t i=1; i <= M; ++i )
+                        {
+                            F[i][j] = P[j][i];
+                        }
+                    }
+                    //std::cerr << "F=" << F << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // use SVD to orthonormalize F
+                    //----------------------------------------------------------
+                    matrix<double> svd_v(M,M);
+                    vector<double> svd_w(M,0);
+                    
+                    if( !svd<double>::build(F, svd_w, svd_v) )
+                        throw exception("Singular Constraints/SingularValues");
+                    //std::cerr << "Ft=" << F << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // extract Q rows as the M-Nc columns
+                    //----------------------------------------------------------
+                    for( size_t j=Nc+1; j<=M; ++j )
+                    {
+                        for(size_t i=1; i<=M; ++i)
+                        {
+                            Q[j-Nc][i] = F[i][j];
+                        }
+                    }
+                    std::cerr << "Q=" << Q << std::endl;
+                    
+                    matrix<double> Q2(M,M);
+                    algebra<double>::mul_ltrn(Q2, Q, Q);
+                    std::cerr << "Q2=" <<Q2 << std::endl;
+                }
+                
+                //==============================================================
+                //
+				//-- Find the orthogonal components
+                //
+                //==============================================================
+                vector<double> V(N,0);
+                
+            }
+            
+        }
         
         
 	}
