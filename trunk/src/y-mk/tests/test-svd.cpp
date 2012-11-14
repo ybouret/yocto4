@@ -43,3 +43,37 @@ YOCTO_UNIT_TEST_IMPL(svd)
 }
 YOCTO_UNIT_TEST_DONE()
 
+YOCTO_UNIT_TEST_IMPL(svdgs)
+{
+    
+    //-- orthogonalize colums ?
+    const size_t   n = 4;
+    matrix<double> M(n,n);
+    matrix<double> U(n,n);
+    matrix<double> V(n,n);
+    vector<double> W(n,0);
+    
+    M[1][1] = 1;
+    M[2][1] = 1;
+    
+    M[3][2] = 1;
+    M[4][2] = 1;
+    
+    std::cerr << "M=" << M << std::endl;
+    
+    U.assign(M);
+    if( ! svd<double>::build(U,W,V) )
+    {
+        std::cerr << "Unable to svd" << std::endl;
+    }
+    else
+    {
+        std::cerr << "U=" << U << std::endl;
+        std::cerr << "W=" << W << std::endl;
+    }
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+
