@@ -643,6 +643,7 @@ namespace yocto
                     algebra<double>::mul_ltrn(Q2, Q, Q);
                     std::cerr << "Q2=" <<Q2 << std::endl;
                 }
+                std::cerr << "nu=" << cs.nu << std::endl;
                 
                 //==============================================================
                 //
