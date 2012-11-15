@@ -301,6 +301,16 @@ assert( (S)->char_[(S)->size_] == 0 )
 			}
 		}
 
+        template <>
+        void string<YCHAR>:: trim( bool (*bad)(YCHAR) ) throw()
+        {
+            if(bad)
+            {
+                while(size_>0 && bad(char_[size_-1]))
+                    char_[--size_] = 0;
+            }
+        }
+        
 		template <>
 		void string<YCHAR>:: skip(size_t n) throw()
 		{
@@ -315,7 +325,24 @@ assert( (S)->char_[(S)->size_] == 0 )
 				clear();
 			}
 		}
-		
+        
+        template <>
+        void string<YCHAR>:: skip( bool (*bad)(YCHAR) ) throw()
+        {
+            if(bad)
+            {
+                size_t n=0;
+                while( n<size_ && bad(char_[n])) ++n;
+                skip(n);
+            }
+        }
+        template <>
+        void string<YCHAR>:: clean( bool (*bad)(YCHAR) ) throw()
+		{
+            trim(bad);
+            skip(bad);
+        }
+        
         template <>
 		void string<YCHAR>:: to_lower() throw()
         {

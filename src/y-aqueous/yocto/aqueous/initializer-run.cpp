@@ -193,7 +193,7 @@ namespace yocto
                     
                     //==========================================================
                     //
-                    // Prepare the Newton Algorithm
+                    // Prepare the Newton Algorithm,
                     //
                     //==========================================================
                     const double   amplitude = max_of(1e-7,get_max_of(Xstar));
@@ -203,7 +203,7 @@ namespace yocto
                     matrix<double> &Phi    = cs.Phi;
                     array<double>  &Gamma  = cs.Gamma;
                     bool            converged = false;
-                    const double    ftol   = 1e-7;
+                    const double    ftol      = 1e-7;
                     
                 NEWTON_INIT:
                     //----------------------------------------------------------
