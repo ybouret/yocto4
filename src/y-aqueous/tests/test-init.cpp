@@ -61,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(init)
         constraint &ac = ini.create(initAc);
         ac.add( "Ac-", 1);
         ac.add( "AcH", 1);
-        ac.set_value(0.001);
+        ac.set_value(0.000);
     }
     
     std::cerr << "Constraints: " << std::endl;

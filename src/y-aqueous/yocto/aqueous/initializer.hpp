@@ -42,9 +42,10 @@ namespace yocto
             //! reset value to a new fixedValue
             void set_value( double v );
             
-            double & weight_of( const string &id );
-            double & weight_of( const char   *id );
-            
+            double * weight_address_of( const string &id );
+            double * weight_address_of( const char   *id );
+            const double * weight_address_of( const string &id ) const;
+            const double * weight_address_of( const char   *id ) const;
             
 		private:
 			YOCTO_DISABLE_ASSIGN(constraint);

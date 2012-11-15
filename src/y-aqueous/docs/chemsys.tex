@@ -13,7 +13,7 @@
 \newcommand{\species}{\mychem{X}}
 \newcommand{\mymat}[1]{\boldsymbol{#1}}
 %\newcommand{\mytrn}[1]{{#1}^{\mathrm{t}}}
-\newcommand{\mytrn}[1]{{~^{\mathsf{t}}{#1}}}
+\newcommand{\mytrn}[1]{{\!\!~^{\mathsf{t}}{#1}}}
 \newcommand{\myvec}[1]{\overrightarrow{#1}}
 \newcommand{\vecX}{\myvec{\myconc{\mychem{X}}}}
 
@@ -143,22 +143,6 @@ The amplitude of the random value
 should be around the greatest absolute value of $\vecX^\star$.
 
 \subsubsection{Choice of the starting point, bis}
-We can't directly find $\vec{V}_0$ such that
-\[
-	\vecX_0 = \vecX^\star + \mytrn{\mymat{Q}}\vec{V}_0
-\]	
-but the vector that minimizes the distance to $\vecX_0$ is $\vec{V}_0=\mymat{Q}\vecX_0$.
-In particular is we define
-\[
-	\vec{V}_0 = \lambda \mymat{Q}
-	\left\lbrack
-	\begin{array}{c}
-	1\\
-	\vdots\\
-	1\\
-	\end{array}
-	\right\rbrack
-\]
 
 \subsubsection{Newton Algorithm Mark-II}
 Starting from $\vec{V}_{n}$, we want to find $\delta\vec{V}_n$
