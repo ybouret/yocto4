@@ -17,6 +17,8 @@ namespace yocto
         
         namespace
         {
+            typedef algebra<double> mkl;
+            
             static inline bool is_acceptable( const array<double> &C )
             {
                 size_t       num_pos = 0;
@@ -52,23 +54,22 @@ namespace yocto
                 chemsys       &cs;
                 const double   t;
                 array<double> &X;
-                const size_t   M;  // components
-                const size_t   N;  // reactions
+                const size_t   M;  // #components
+                const size_t   N;  // #reactions
                 const array<constraint::ptr> &constraints;
-                const size_t   Nc;      // constraints
+                const size_t   Nc;      // #constraints
                 vector<double> Xstar;
                 matrix<double> Q;
-                //Newton<double>::Function zF;
-                // Newton<double>::Jacobian zJ;
                 
                 
                 void buildX( const array<double> &v )
                 {
                     assert( v.size() == N );
-                    algebra<double>::mul_trn(X, Q, v);
-                    algebra<double>::add(X,Xstar);
+                    mkl::mul_trn(X, Q, v);
+                    mkl::add(X,Xstar);
                 }
                 
+#if 0
                 void newtF( array<double> &f, const array<double> &v)
                 {
                     assert( f.size() == N );
@@ -85,6 +86,7 @@ namespace yocto
                     cs.computeGammaAndPhi(t,false);
                     algebra<double>::mul_rtrn(J, cs.Phi, Q);
                 }
+#endif
                 
                 inline Init( chemsys &user_cs,
                             double    user_t,
@@ -111,7 +113,7 @@ namespace yocto
                     // constraints to algebraic relations
                     //
                     //==========================================================
-                    std::cerr << "# Decoding Linear Constraints" << std::endl;
+                    //std::cerr << "# Decoding Linear Constraints" << std::endl;
                     matrix<double> P(Nc,M);
                     vector<double> Lambda(Nc,0);
                     for( size_t i=1; i <= Nc; ++i )
@@ -132,22 +134,27 @@ namespace yocto
                     //==========================================================
                     //
                     // create Xstar = Pseudo-Inverse P times Lambda
+                    // and J = P' * inv(P*P')
                     //
                     //==========================================================
-                    std::cerr << "#Create constant part" << std::endl;
+                    //std::cerr << "#Create constant part" << std::endl;
+                    matrix<double> J(M,Nc);
                     {
                         matrix<double> P2(Nc,Nc);
-                        algebra<double>::mul_rtrn(P2, P, P);
-                        std::cerr << "P2=" << P2 << std::endl;
+                        mkl::mul_rtrn(P2, P, P);
                         if( !solve.LU(P2) )
                         {
                             throw exception("Singular Constraints/PseudoInverse");
                         }
                         vector<double> tmp(Nc,0);
-                        for(size_t i=Nc;i>0;--i) tmp[i] = Lambda[i];
+                        for(size_t i=Nc;i>0;--i)
+                            tmp[i] = Lambda[i];
                         solve(P2,tmp);
-                        algebra<double>::mul_trn(Xstar, P, tmp);
-                        std::cerr << "Xstar=" << Xstar << std::endl;
+                        mkl::mul_trn(Xstar, P, tmp);
+                        matrix<double> iP2(Nc,Nc);
+                        iP2.ld1();
+                        solve(P2,iP2);
+                        mkl::mul_ltrn(J, P, iP2);
                     }
                     
                     //==========================================================
@@ -187,7 +194,7 @@ namespace yocto
                                 Q[k][i] = F[i][j];
                             }
                         }
-                        std::cerr << "Q=" << Q << std::endl;
+                        //std::cerr << "Q=" << Q << std::endl;
                     }
                     
                     
@@ -196,14 +203,14 @@ namespace yocto
                     // Prepare the Newton Algorithm,
                     //
                     //==========================================================
-                    const double   amplitude = max_of(1e-7,get_max_of(Xstar));
+                    const double    amplitude = max_of(1e-7,get_max_of(Xstar));
                     vector<double>  V(N,0);
                     matrix<double> &W      = cs.W;
                     array<double>  &dV     = cs.xi;
                     matrix<double> &Phi    = cs.Phi;
                     array<double>  &Gamma  = cs.Gamma;
                     bool            converged = false;
-                    const double    ftol      = 1e-7;
+                    const double    ftol      = cs.ftol;
                     
                 NEWTON_INIT:
                     //----------------------------------------------------------
@@ -216,14 +223,14 @@ namespace yocto
                         buildX(V);
                     }
                     while( !is_acceptable(X) );
-                    std::cerr << "X0=" << X << std::endl;
+                    //std::cerr << "X0=" << X << std::endl;
                     
                 NEWTON_STEP:
                     //----------------------------------------------------------
                     // compute jacobian
                     //----------------------------------------------------------
                     cs.computeGammaAndPhi(t,false);
-                    algebra<double>::mul_rtrn(W, Phi, Q);
+                    mkl::mul_rtrn(W, Phi, Q);
                     if( ! solve.LU(W) )
                     {
                         std::cerr << "Singular Jacobian" << std::endl;
@@ -235,11 +242,8 @@ namespace yocto
                     //----------------------------------------------------------
                     for( size_t i=N;i>0;--i) dV[i] = -Gamma[i];
                     solve(W,dV);
-                    algebra<double>::add(V,dV);
+                    mkl::add(V,dV);
                     buildX(V);
-                    std::cerr << "dV=" << dV << std::endl;
-                    std::cerr << "V=" << V << std::endl;
-                    std::cerr << "X=" << X << std::endl;
                     converged = true;
                     for( size_t i=N;i>0;--i)
                     {
@@ -252,6 +256,80 @@ namespace yocto
                     if(!converged)
                         goto NEWTON_STEP;
                     
+                    //----------------------------------------------------------
+                    // check that we have an acceptable solution
+                    //----------------------------------------------------------
+                    if( !is_acceptable(X) )
+                        goto NEWTON_INIT;
+                    
+                    //==========================================================
+                    //
+                    // Linear Improvement
+                    //
+                    //==========================================================
+                    std::cerr << "X1=" << X << std::endl;
+                    vector<double> U(Nc,0.0);
+                    array<double> &dX = cs.dC;
+                    double old_norm = get_max_of(X);
+                    
+                    //----------------------------------------------------------
+                    // project as best as we can
+                    //----------------------------------------------------------
+                    while(true)
+                    {
+                        algebra<double>::mul(U,P,X);
+                        algebra<double>::sub(U,Lambda);
+                        algebra<double>::mul(dX, J, U);
+                        algebra<double>::sub(X,dX);
+                        const double new_norm = get_max_of(dX);
+                        if(new_norm>=old_norm)
+                            break;
+                        old_norm = new_norm;
+                    }
+                    
+                    
+                    std::cerr << "X2=" << X << std::endl;
+                    if(!is_acceptable(X))
+                        goto NEWTON_INIT;
+                    
+                    //==========================================================
+                    //
+                    // Error evaluation : dX = Q'*(Phi*Q')^-1*Gamma
+                    //
+                    //==========================================================
+                    
+                    //----------------------------------------------------------
+                    // compute the exact term
+                    //----------------------------------------------------------
+                    cs.computeGammaAndPhi(t, false);
+                    algebra<double>::mul_rtrn(W, Phi, Q);
+                    if( ! solve.LU(W) )
+                    {
+                        std::cerr << "Singular Jacobian/Error" << std::endl;
+                        goto NEWTON_INIT;
+                    }
+                    solve(W,Gamma);
+                    algebra<double>::mul_trn(dX, Q, Gamma);
+                    
+                    //----------------------------------------------------------
+                    // round up
+                    //----------------------------------------------------------
+                    for(size_t i=M;i>0;--i)
+                    {
+                        const double dX_i = Fabs(dX[i]) + numeric<double>::tiny;
+                        const double dX10 = pow(10.0,ceil(log10(dX_i)));
+                        dX[i] = dX10;
+                    }
+                    std::cerr << "Xerr=" << dX << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // cut-off
+                    //----------------------------------------------------------
+                    for(size_t i=M;i>0;--i)
+                    {
+                        if( X[i] <= dX[i] ) X[i] = 0;
+                    }
+                    std::cerr << "C=" << X << std::endl;
                 }
                 
                 
@@ -267,15 +345,16 @@ namespace yocto
             
         }
         
-        void initializer:: run( chemsys &cs, double t )
+        void initializer:: operator()( chemsys &cs, double t )
         {
             //==================================================================
             //
             // initialize constants and sanity check
             //
             //==================================================================
-			std::cerr << "# Initializing system" << std::endl;
-			array<double> &C  = cs.C;
+			//std::cerr << "# Initializing system" << std::endl;
+			
+            array<double> &C  = cs.C;
 			const size_t   M  = C.size();
 			const size_t   N  = cs.size();
 			const size_t   Nc = constraints.size();
@@ -284,7 +363,6 @@ namespace yocto
             
 			if( Nc > 0 )
 			{
-                
                 Init __init(cs,t,constraints);
             }
             

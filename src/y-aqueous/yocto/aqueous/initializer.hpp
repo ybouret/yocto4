@@ -42,8 +42,8 @@ namespace yocto
             //! reset value to a new fixedValue
             void set_value( double v );
             
-            double * weight_address_of( const string &id );
-            double * weight_address_of( const char   *id );
+            double       * weight_address_of( const string &id );
+            double       * weight_address_of( const char   *id );
             const double * weight_address_of( const string &id ) const;
             const double * weight_address_of( const char   *id ) const;
             
@@ -79,7 +79,7 @@ namespace yocto
             constraint & operator[]( size_t index ) throw();
             const constraint & operator[]( size_t index ) const throw();
 
-            void run( chemsys &cs, double t );
+            //void run( chemsys &cs, double t );
             
 		private:
 			vector< constraint::ptr > constraints;
