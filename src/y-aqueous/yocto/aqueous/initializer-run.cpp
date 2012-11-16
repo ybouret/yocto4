@@ -57,36 +57,47 @@ namespace yocto
                 const size_t   M;  // #components
                 const size_t   N;  // #reactions
                 const array<constraint::ptr> &constraints;
-                const size_t   Nc;      // #constraints
-                vector<double> Xstar;
-                matrix<double> Q;
+                const size_t   Nc;    // #constraints
+                vector<double> Xstar; // constant part
+                matrix<double> P;     // constraint matrix
+                vector<double> L;     // constraints values
+                matrix<double> Q;     // orthogonal to constraint
+                vector<double> U;     // helper for linear improvement
+                matrix<double> J;     // helper for linear improvement
+                array<double> &dX;    // cs.dC, for computations
                 
+                inline
+                void improveX()
+                {
+                    double old_norm = get_max_of(X);
+                    
+                    //----------------------------------------------------------
+                    // project as best as we can
+                    //----------------------------------------------------------
+                    while(true)
+                    {
+                        algebra<double>::mul(U,P,X);
+                        algebra<double>::sub(U,L);
+                        algebra<double>::mul(dX, J, U);
+                        algebra<double>::sub(X,dX);
+                        const double new_norm = get_max_of(dX);
+                        //std::cerr << "lindX=" << dX << std::endl;
+                        if(new_norm>=old_norm)
+                            break;
+                        old_norm = new_norm;
+                    }
+                    
+                }
                 
-                void buildX( const array<double> &v )
+                inline
+                void buildX( const array<double> &v ) throw()
                 {
                     assert( v.size() == N );
                     mkl::mul_trn(X, Q, v);
                     mkl::add(X,Xstar);
+                    improveX();
                 }
                 
-#if 0
-                void newtF( array<double> &f, const array<double> &v)
-                {
-                    assert( f.size() == N );
-                    assert( v.size() == N );
-                    buildX(v);
-                    cs.computeGammaAndPhi(t,false);
-                    algebra<double>::set(f,cs.Gamma);
-                }
-                
-                void newtJ( matrix<double> &J, const array<double> &v )
-                {
-                    assert( v.size() == N );
-                    buildX(v);
-                    cs.computeGammaAndPhi(t,false);
-                    algebra<double>::mul_rtrn(J, cs.Phi, Q);
-                }
-#endif
                 
                 inline Init( chemsys &user_cs,
                             double    user_t,
@@ -100,9 +111,12 @@ namespace yocto
                 constraints( user_constraints ),
                 Nc( constraints.size() ),
                 Xstar(M,0),
-                Q(N,M)
-                //,zF( this, & Init::newtF ),
-                //zJ( this, & Init::newtJ )
+                P(Nc,M),
+                L(Nc,0),
+                Q(N,M),
+                U(Nc,0),
+                J(M,Nc),
+                dX( cs.dC )
                 {
                     const library  &lib   = cs.lib;
                     linsys<double> &solve = cs.solver;
@@ -114,12 +128,10 @@ namespace yocto
                     //
                     //==========================================================
                     //std::cerr << "# Decoding Linear Constraints" << std::endl;
-                    matrix<double> P(Nc,M);
-                    vector<double> Lambda(Nc,0);
                     for( size_t i=1; i <= Nc; ++i )
                     {
                         const constraint &c = *(constraints[i]);
-                        Lambda[i] = c.value(t);
+                        L[i] = c.value(t);
                         for( size_t j=1; j <= M; ++j )
                         {
                             const species &sp = *lib(j);
@@ -138,7 +150,6 @@ namespace yocto
                     //
                     //==========================================================
                     //std::cerr << "#Create constant part" << std::endl;
-                    matrix<double> J(M,Nc);
                     {
                         matrix<double> P2(Nc,Nc);
                         mkl::mul_rtrn(P2, P, P);
@@ -148,7 +159,7 @@ namespace yocto
                         }
                         vector<double> tmp(Nc,0);
                         for(size_t i=Nc;i>0;--i)
-                            tmp[i] = Lambda[i];
+                            tmp[i] = L[i];
                         solve(P2,tmp);
                         mkl::mul_trn(Xstar, P, tmp);
                         matrix<double> iP2(Nc,Nc);
@@ -262,33 +273,8 @@ namespace yocto
                     if( !is_acceptable(X) )
                         goto NEWTON_INIT;
                     
-                    //==========================================================
-                    //
-                    // Linear Improvement
-                    //
-                    //==========================================================
-                    std::cerr << "X1=" << X << std::endl;
-                    vector<double> U(Nc,0.0);
-                    array<double> &dX = cs.dC;
-                    double old_norm = get_max_of(X);
+                    //std::cerr << "X1=" << X << std::endl;
                     
-                    //----------------------------------------------------------
-                    // project as best as we can
-                    //----------------------------------------------------------
-                    while(true)
-                    {
-                        algebra<double>::mul(U,P,X);
-                        algebra<double>::sub(U,Lambda);
-                        algebra<double>::mul(dX, J, U);
-                        algebra<double>::sub(X,dX);
-                        const double new_norm = get_max_of(dX);
-                        if(new_norm>=old_norm)
-                            break;
-                        old_norm = new_norm;
-                    }
-                    
-                    
-                    std::cerr << "X2=" << X << std::endl;
                     if(!is_acceptable(X))
                         goto NEWTON_INIT;
                     
@@ -320,7 +306,7 @@ namespace yocto
                         const double dX10 = pow(10.0,ceil(log10(dX_i)));
                         dX[i] = dX10;
                     }
-                    std::cerr << "Xerr=" << dX << std::endl;
+                    //std::cerr << "Xerr=" << dX << std::endl;
                     
                     //----------------------------------------------------------
                     // cut-off
@@ -351,9 +337,7 @@ namespace yocto
             //
             // initialize constants and sanity check
             //
-            //==================================================================
-			//std::cerr << "# Initializing system" << std::endl;
-			
+            //==================================================================			
             array<double> &C  = cs.C;
 			const size_t   M  = C.size();
 			const size_t   N  = cs.size();
