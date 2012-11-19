@@ -14,16 +14,14 @@ T F( T x )
 YOCTO_UNIT_TEST_IMPL(intg)
 {
 	{
-		integrate<float>         intg = { 1e-5f };
 		numeric<float>::function func( cfunctor( F<float>) );
-		const float              ans  = intg( 0, numeric<float>::two_pi, func )/numeric<float>::pi;
+		const float              ans  = integrate<float>( 0, numeric<float>::two_pi, func, 1e-5f )/numeric<float>::pi;
 		std::cerr << "float:  " << ans << std::endl;
 	}
 	
 	{
-		integrate<double>         intg = { 1e-5 };
 		numeric<double>::function func( cfunctor( F<double>) );
-		const double              ans  = intg( 0, numeric<double>::two_pi, func )/numeric<double>::pi;
+		const double              ans  = integrate<double>( 0, numeric<double>::two_pi, func, 1e-5 )/numeric<double>::pi;
 		std::cerr << "double: " << ans << std::endl;
 	}
 }

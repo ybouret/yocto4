@@ -89,9 +89,9 @@ ost = st
 		}
 		
 		template <>
-		real_t integrate<real_t>:: operator()( real_t a, real_t b, numeric<real_t>::function &F)
+		real_t integrate<real_t>( real_t a, real_t b, numeric<real_t>::function &F,real_t ftol)
 		{
-			return recursive_intg(a,b,F,this->ftol);
+			return recursive_intg(a,b,F,ftol);
 		}
 		
 	} // math

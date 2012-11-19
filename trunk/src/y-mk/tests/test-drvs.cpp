@@ -40,7 +40,6 @@ namespace {
 		std::cerr << "drvs/intg" << std::endl;
 		const T      xmax = numeric<T>::two_pi;
 		const size_t N = 128;
-		integrate<T> intg = { 2*numeric<T>::sqrteps };
 		dummy<T>     dum;
 		typename numeric<T>::function dF( &dum, & dummy<T>::compute );
 		const string out = string("drvs-") + typeid(T).name() + ".dat";
@@ -52,7 +51,7 @@ namespace {
 			const T x1 = (i*xmax)/N;			
 			const T x0 = ( (i-1) * xmax)/N; 
 			std::cerr << x0 << " -> " << x1 << std::endl;
-			const T y = intg( x0, x1, dF );
+			const T y = integrate<T>( x0, x1, dF, 2*numeric<T>::sqrteps );
 			z += y;
 			std::cerr << "\t" << z << " / " << F<T>(x1) << std::endl;
 			fp("%g %g\n", x1, z );

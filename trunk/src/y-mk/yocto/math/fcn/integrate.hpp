@@ -15,19 +15,11 @@ namespace yocto {
 
 
 		//! recursive Simpson's integration.
-		template <typename T>
-		struct integrate
-		{
-			T ftol; //!< fractional tolerance on integrated result.
-			T operator()( T a, T b, typename  numeric<T>::function &F );
-			
-		};
-
+        template <typename T>
+        T integrate( T a, T b, typename  numeric<T>::function &F, T ftol );
+        
 
 		#if 0
-
-
-
 		template <class T>
 		T integrate( const T xmin,
 		             const T xmax,
