@@ -83,6 +83,8 @@ struct Param
     vtx    tau;
     double len;
     
+    inline Param() : tau(), len(0) {}
+    
     double func( const array<double> &var )
     {
         assert( var.size() == 2);
@@ -134,7 +136,7 @@ YOCTO_UNIT_TEST_IMPL(cgrad2)
     param.len   = 1.2;
     
     vector<double> var(2,0);
-    var[1] = 0.5;
+    var[1] =  0.5;
     var[2] = -0.3;
     
     numeric<double>::scalar_field Func( &param, &Param::func );
