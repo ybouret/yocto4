@@ -32,19 +32,19 @@ namespace yocto
             assert( v.cols == n );
             
             vector<real_t> tmp(n,0);
-            for(size_t j=1;j<=n;++j) {
+            for(size_t j=n;j>0;--j) {
                 real_t s=0.0;
                 if( Fabs(w[j])>0 )
                 {
-                    for(size_t i=1;i<=m;++i) s += u[i][j]*b[i];
+                    for(size_t i=m;i>0;--i) s += u[i][j]*b[i];
                     s /= w[j];
                 }
                 tmp[j]=s;
             }
-            for(size_t j=1;j<=n;++j)
+            for(size_t j=n;j>0;--j)
             {
                 real_t s=0.0;
-                for(size_t jj=1;jj<=n;++jj) s += v[j][jj]*tmp[jj];
+                for(size_t jj=n;jj>0;--jj) s += v[j][jj]*tmp[jj];
                 x[j]=s;
             }
         }
