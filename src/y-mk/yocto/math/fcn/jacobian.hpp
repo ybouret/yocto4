@@ -42,6 +42,10 @@ namespace yocto
 			matrix<T> d_;
 		};
 		
+#if defined(_MSC_VER)
+#pragma warning (push)
+#pragma warning (disable:4355)
+#endif
         template <typename T>
         class jacobian_of
         {
@@ -66,7 +70,9 @@ namespace yocto
                 fjac(J,func,X,step);
             }
         };
-        
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
 	}
 	
 }
