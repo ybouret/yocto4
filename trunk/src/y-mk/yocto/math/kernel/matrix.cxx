@@ -299,6 +299,14 @@ namespace yocto
 			memcpy( ptr_, other.ptr_, len_ );
 		}
 		
+        template <>
+        void matrix<z_type>:: diag( const array<z_type> &w )
+        {
+            const size_t n = w.size();
+            make(n,n);
+            for(size_t i=n;i>0;--i) (*this)[i][i] = w[i];
+        }
+        
 #if 0
 		template <>
 		z_type  * matrix<z_type>::       get_row_item( size_t r ) throw()
