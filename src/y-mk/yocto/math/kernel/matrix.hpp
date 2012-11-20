@@ -56,7 +56,8 @@ namespace yocto
 				matrix( const matrix & );
 				matrix & operator=( const matrix & other );
 				void assign( const matrix &other ) throw(); //!< same sizes
-				
+				void diag( const array<T> &w);
+                
 				void swap_with( matrix &M ) throw();
 				void make( size_t r, size_t c );
 				void release() throw();
@@ -82,7 +83,6 @@ namespace yocto
 					return os;
 				}
 				
-				//void mul( array<T> &out, const array<T> &in ) const throw();
 				void ldz() throw();
 				void ld1() throw(); //!< pseudo-id if not square
 				void transpose();
