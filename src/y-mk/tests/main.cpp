@@ -29,16 +29,17 @@ YOCTO_UNIT_TEST_INIT(32)
     YOCTO_UNIT_TEST_DECL(smooth);
     
     YOCTO_UNIT_TEST_DECL(trigo);
-
+    
     YOCTO_UNIT_TEST_DECL(svd);
 	YOCTO_UNIT_TEST_DECL(bracket);
     YOCTO_UNIT_TEST_DECL(cgrad);
     YOCTO_UNIT_TEST_DECL(cgrad2);
-
+    
     YOCTO_UNIT_TEST_DECL(newton);
     YOCTO_UNIT_TEST_DECL(newton2);
     YOCTO_UNIT_TEST_DECL(svdgs);
-
+    
+	YOCTO_UNIT_TEST_DECL(lu);
     
 }
 YOCTO_UNIT_TEST_EXEC()
