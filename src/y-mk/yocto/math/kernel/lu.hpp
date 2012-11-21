@@ -10,11 +10,14 @@ namespace yocto
     namespace math
     {
         
+              
         template <typename T>
         struct lu
         {
+            
             typedef typename real_of<T>::type real_type;
-        
+            
+            
             static bool build(matrix<T>        &a,
                               array<size_t>    &indx,
                               array<real_type> &scal,
