@@ -2,7 +2,7 @@
 #define YOCTO_AQ_CHEMSYS_INCLUDED 1
 
 #include "yocto/aqueous/equilibrium.hpp"
-#include "yocto/math/kernel/linsys.hpp"
+#include "yocto/math/kernel/lu.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/fcn/derivative.hpp"
 
@@ -36,7 +36,8 @@ namespace yocto
             vector<double>     C;       //!< copy of solution content   [M]
             matrix<double>     Phi;     //!< dGamma/dC                  [NxM]
             matrix<double>     W;       //!< (Phi * nu')^(-1)           [NxM]
-            linsys<double>     solver;  //!< to solve system            [N]
+            vector<double>     scal;    //!< for LU                     [N]
+            vector<size_t>     indx;    //!< for LU                     [N]
             vector<double>     xi;      //!< local extent               [N]
             vector<double>     dC;      //!< local modification         [M]
             derivative<double> drvs;    //!< local derivative context
