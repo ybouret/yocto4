@@ -1,7 +1,7 @@
 #include "yocto/math/sig/data-smoother.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/math/kernel/linsys.hpp"
+#include "yocto/math/kernel/lu.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto {
@@ -20,6 +20,7 @@ namespace yocto {
 			return degree_;
 		}
         
+        typedef lu<real_t> LU;
         
 		template <>
 		smoother<real_t>:: smoother(
@@ -88,8 +89,12 @@ namespace yocto {
 			// LU decomposition
 			//
 			//------------------------------------------------------------------
-			linsys<real_t> lss( ncoeff_ );
-			if( !lss.LU( mu ) )
+			//linsys<real_t> lss( ncoeff_ );
+            vector<size_t> indx( ncoeff_,0);
+            vector<real_t> scal( ncoeff_,0);
+            vector<real_t> rhs( ncoeff_, 0);
+            
+			if( !LU::build( mu, indx, scal ) )
 				throw exception( "[smoother] singular moments, check kernel" );
             
 			//------------------------------------------------------------------
@@ -120,16 +125,16 @@ namespace yocto {
 				//-- extract column j of filter
 				for( size_t i=ncoeff_; i>0; --i )
 				{
-					lss[i] = filter_[i][j];
+					rhs[i] = filter_[i][j];
 				}
                 
 				//-- solve using internal solver memory
-				lss( mu );
+                LU::solve( mu, indx, rhs );
                 
 				//-- replace column j of filter
 				for( size_t i=ncoeff_; i>0; --i )
 				{
-					filter_[i][j] = lss[i];
+					filter_[i][j] = rhs[i];
 				}
                 
 			}

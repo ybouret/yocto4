@@ -23,9 +23,10 @@ namespace yocto
             err(   next_array() ),
             ysav(  next_array() ),
             dysav( next_array() ),
+            scal(  next_array() ),
             dfdy(),
             a(),
-            lss()
+            indx()
             {
             }
             
@@ -36,7 +37,7 @@ namespace yocto
                 stiff_step<real_t>::prepare(nv);
                 dfdy.make(nv,nv);
                 a.make(nv,nv);
-                lss.ensure(nv);
+                indx.make(nv,0);
             }
             
         }
