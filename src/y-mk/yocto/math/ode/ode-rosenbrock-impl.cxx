@@ -16,6 +16,8 @@ namespace yocto
             {
             }
             
+            typedef lu<real_t> LU;
+            
             template <> 
             void STIFF_STEP<real_t>:: operator()(array<real_t>       &y,
                                                  array<real_t>       &dydx,
@@ -70,14 +72,14 @@ namespace yocto
                         a[i][i] += __diag;
                     }
                     
-                    if( !lss.LU(a) )
+                    if( !LU::build(a,indx,scal) )
                     {
                         throw exception("singular jacobian");
                     }
                     
                     for( size_t i=1; i<=n ; ++i )
                         g1[i]=dysav[i]+h*C1X*dfdx[i];
-                    lss(a,g1);
+                    LU::solve(a,indx,g1);
                     for (size_t i=1;i<=n;i++)
                         y[i]=ysav[i]+A21*g1[i];
                     
@@ -85,7 +87,7 @@ namespace yocto
                     derivs(dydx,x,y);
                     for(size_t i=1; i<=n; ++i )
                         g2[i]=dydx[i]+h*C2X*dfdx[i]+C21*g1[i]/h;
-                    lss(a,g2);
+                    LU::solve(a,indx,g2);
                     for(size_t i=1; i<=n; ++i )
                         y[i]=ysav[i]+A31*g1[i]+A32*g2[i];
                     
@@ -93,11 +95,11 @@ namespace yocto
                     derivs(dydx,x,y);
                     for(size_t i=1; i<=n; ++i )
                         g3[i]=dydx[i]+h*C3X*dfdx[i]+(C31*g1[i]+C32*g2[i])/h;
-                    lss(a,g3);
+                    LU::solve(a,indx,g3);
                     
                     for(size_t i=1; i<=n; ++i )
                         g4[i]=dydx[i]+h*C4X*dfdx[i]+(C41*g1[i]+C42*g2[i]+C43*g3[i])/h;
-                    lss(a,g4);
+                    LU::solve(a,indx,g4);
                     
                     for( size_t i=1; i <= n; ++i )
                     {

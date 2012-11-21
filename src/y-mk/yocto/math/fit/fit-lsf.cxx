@@ -1,8 +1,9 @@
 #include "yocto/math/fit/lsf.hpp"
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/kernel/linsys.hpp"
+#include "yocto/math/kernel/lu.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -51,12 +52,13 @@ namespace yocto
 			used_(NULL),
 			nvar_( 0 ),
 			ndat_( 0 ),
-			harr_( 5 ),
+			harr_( 6 ),
 			dFda_( harr_.next_array() ),
 			beta_( harr_.next_array() ),
 			aorg_( harr_.next_array() ),
 			atry_( harr_.next_array() ),
 			step_( harr_.next_array() ),
+            scal_( harr_.next_array() ),
 			alpha_(),
 			curv_(),
 			xi_(0),
@@ -141,7 +143,8 @@ namespace yocto
 			}
 			
 			
-			
+			typedef lu<real_t> LU;
+            
 			template <>
 			void lsf<real_t>::operator()(sample<real_t>     &s,
 										 field              &f,
@@ -186,8 +189,8 @@ namespace yocto
 				alpha_.make(nvar_,nvar_);
 				curv_.make(nvar_,nvar_);
 				harr_.prepare(  nvar_  );
-				linsys<real_t> lss( nvar_ );
-				
+				vector<size_t> indx(nvar_,0);
+                
 				//--------------------------------------------------------------
 				// global init
 				//--------------------------------------------------------------
@@ -221,14 +224,14 @@ namespace yocto
 						const size_t df = ndat_ - nvar_;
 						if( df > 0 )
 						{
-							if( ! lss.LU( alpha_ ) )
+							if( ! LU::build( alpha_, indx, scal_ ) )
 							{
 								if(verbose) std::cerr << "[LeastSquareFit.Singular2]" << std::endl;
 								s.status = failure;
 								return;
 							}
 							curv_.ld1();
-							lss( alpha_, curv_ );
+                            LU::solve( alpha_, indx, curv_ );
 							const real_t residue = Dold/df;
 							for( size_t i=nvar_;i>0;--i)
 							{
@@ -265,7 +268,7 @@ namespace yocto
 						//------------------------------------------------------
 						// try to solve it
 						//------------------------------------------------------
-						if( ! lss.LU( curv_ ) )
+						if( ! LU::build( curv_, indx, scal_ ) )
 						{
 							lam *= LAMBDA_INC;
 							//std::cerr << "lam=" << lam << std::endl;
@@ -284,7 +287,7 @@ namespace yocto
 					// compute the step
 					//----------------------------------------------------------
 					for(size_t i=nvar_;i>0;--i) step_[i] = beta_[i];
-					lss( curv_, step_ );
+                    LU::solve( curv_, indx, step_ );
 					
 					//----------------------------------------------------------
 					// take the full step

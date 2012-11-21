@@ -50,6 +50,7 @@ namespace yocto
 				array_t           &aorg_;
 				array_t           &atry_;
 				array_t           &step_;
+                array_t           &scal_; //!< for LU
 				matrix<T>          alpha_;
 				matrix<T>          curv_;
 				T                  xi_;    //!< to compute gradient @x[i]
