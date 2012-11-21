@@ -12,9 +12,10 @@ namespace yocto
                                array<real_t> &scal,
                                bool          *dneg_p) throw()
         {
+            static const z_type z1(1);
             assert( a.cols   > 0   );
 			assert( a.is_square()  );
-			bool dneg = false;
+			bool  dneg     = false;
 			const size_t n = a.rows;
 			assert( indx.size() == a.rows );
             assert( scal.size() == a.rows );
@@ -64,10 +65,12 @@ namespace yocto
 				for( size_t i=j;i<=n;i++)
 				{
 					matrix<z_type>::row &a_i = a[i];
-					z_type sum=a_i[j];
+					
+                    z_type sum=a_i[j];
 					for(size_t k=1;k<j;++k)
 						sum -= a_i[k]*a[k][j];
 					a_i[j]=sum;
+                    
 					const real_t tmp = scal[i]*Fabs(sum);
 					if( tmp >= piv )
 					{
@@ -96,7 +99,7 @@ namespace yocto
 				
 				if (j != n)
 				{
-					const z_type fac = z_type(1)/(a[j][j]);
+					const z_type fac = z1/(a[j][j]);
 					for(size_t i=j+1;i<=n;++i)
 						a[i][j] *= fac;
 				}

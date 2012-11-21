@@ -4,10 +4,13 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace aqueous
     {
+        
+        typedef algebra<double> mkl;
+        typedef lu<double>      LU;
         
         chemsys:: ~chemsys() throw()
         {
@@ -25,7 +28,8 @@ namespace yocto
         C(),
         Phi(),
         W(),
-        solver(),
+        scal(),
+        indx(),
         xi(),
         dC(),
         drvs(),
@@ -40,7 +44,7 @@ namespace yocto
             
             if( ! insert( eq ) )
             {
-                throw exception("chemsys(multiple equilibrium [%s])", name.c_str()); 
+                throw exception("chemsys(multiple equilibrium [%s])", name.c_str());
             }
             
             return *eq;
@@ -60,7 +64,7 @@ namespace yocto
             
             if( ! insert( eq ) )
             {
-                throw exception("chemsys(multiple equilibrium [%s])", name.c_str()); 
+                throw exception("chemsys(multiple equilibrium [%s])", name.c_str());
             }
             
             return *eq;
@@ -73,7 +77,7 @@ namespace yocto
         }
         
         
-        void chemsys:: build() 
+        void chemsys:: build()
         {
             const size_t N = this->size();
             const size_t M = lib.size();
@@ -81,7 +85,9 @@ namespace yocto
             if( N > 0 && M > 0 )
             {
                 
-                //! memory allocation
+                //--------------------------------------------------------------
+                // memory allocation
+                //--------------------------------------------------------------
                 nu.make(N,M);
                 nuR.make(N,M);
                 nuP.make(N,M);
@@ -90,10 +96,14 @@ namespace yocto
                 dtGam.make(N,0.0);
                 Phi.make(N,M);
                 W.make(N,N);
-                solver.ensure(N);
+                scal.make(N,0.0);
+                indx.make(N,0);
                 xi.make(N,0.0);
                 dC.make(M,0.0);
-                //! compute topology
+                
+                //--------------------------------------------------------------
+                // compute topology
+                //--------------------------------------------------------------
                 equilibria::iterator p = begin();
                 for( size_t i=1; i <= N; ++i, ++p )
                 {
@@ -102,7 +112,6 @@ namespace yocto
                 }
             }
             C.make(M,0.0);
-            
         }
         
         
@@ -147,7 +156,7 @@ namespace yocto
                             if( j != k )
                             {
                                 const int Rik = Ri[k];
-                                if( Rik > 0 ) 
+                                if( Rik > 0 )
                                     PhiR *= ipower( C[k], Rik );
                             }
                         }
@@ -171,7 +180,7 @@ namespace yocto
                             if( j != k )
                             {
                                 const int Pik = Pi[k];
-                                if( Pik > 0 ) 
+                                if( Pik > 0 )
                                     PhiP *= ipower( C[k], Pik );
                             }
                         }
@@ -184,7 +193,7 @@ namespace yocto
                 
                 if( computeDerivative )
                     dtGam[i] = lhs * drvs( Fcn, t, t_scale );
-                else 
+                else
                     dtGam[i] = 0;
                 
             }
@@ -197,12 +206,12 @@ namespace yocto
             //------------------------------------------------------------------
             // compute W = Phi * trn(nu)
             //------------------------------------------------------------------
-            algebra<double>::mul_rtrn(W, Phi, nu);
+            mkl::mul_rtrn(W, Phi, nu);
             
             //------------------------------------------------------------------
             // prepare W
             //------------------------------------------------------------------
-            if( !solver.LU(W) )
+            if( !LU::build(W, indx, scal) )
                 throw exception("Singular composition!");
             
         }
@@ -224,7 +233,7 @@ namespace yocto
                 // compute extent
                 //==============================================================
                 for( size_t i=N;i>0;--i) xi[i] = -Gamma[i];
-                solver(W,xi);
+                LU::solve(W, indx, xi);
                 
                 //==============================================================
                 // compute dC
@@ -243,11 +252,11 @@ namespace yocto
                         converged = false;
                 }
                 
-                if( !converged ) 
+                if( !converged )
                     goto NEWTON_STEP;
             }
             
-            for( size_t j=M;j>0;--j) 
+            for( size_t j=M;j>0;--j)
                 C[j] = max_of<double>(0.0,C[j]);
             
         }
@@ -266,13 +275,13 @@ namespace yocto
                 //--------------------------------------------------------------
                 // dtGam += Phi * dC
                 //--------------------------------------------------------------
-                algebra<double>::muladd(dtGam, Phi,dC);
+                mkl::muladd(dtGam, Phi,dC);
                 
                 //--------------------------------------------------------------
                 // xi = inv(Phi*nu') * ( dtGam + Phi * dC ), in place
                 //--------------------------------------------------------------
-                solver(W,dtGam);
-                algebra<double>::mulsub_trn(dC, nu, dtGam);
+                LU::solve(W, indx, dtGam);
+                mkl::mulsub_trn(dC, nu, dtGam);
                 
             }
             
