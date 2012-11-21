@@ -19,6 +19,7 @@ YOCTO_UNIT_TEST_IMPL(round)
 	std::cerr << "sizeof(mutex)=" << sizeof(mutex) << std::endl;
 	std::cerr << "#u64         =" << YOCTO_U64_FOR_ITEM(mutex) << std::endl;
 	uint64_t dummy[ YOCTO_U64_FOR_ITEM(mutex) ];
+	(void)dummy;
 	std::cerr << "sizeof(dummy)=" << sizeof(dummy) << std::endl;
 
 }

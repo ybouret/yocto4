@@ -7,15 +7,21 @@ using namespace yocto;
 
 namespace  
 {
-	struct node_type
+	class node_type
 	{
+	public:
+		inline node_type() throw() : next(0), prev(0), data(0) {}
+		inline ~node_type() throw() {}
+
 		node_type *next, *prev;
 		size_t     data;
-        //void reset() throw() { data=0; }
+       
         static inline int compare( const node_type *lhs, const node_type *rhs, void *)
         {
             return __compare(lhs->data,rhs->data);
         }
+	private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
 	};
 	
 	static inline void display( node_type *node ) throw()
@@ -264,12 +270,17 @@ YOCTO_UNIT_TEST_DONE()
 #include "yocto/sequence/handle-list.hpp"
 
 
-struct h_node
+class h_node
 {
+public:
+	inline h_node() throw() : prev(0), next(0), handle(0) {}
+	inline ~h_node() throw() {}
+
     h_node   *prev;
     h_node   *next;
     unsigned *handle;
-    void reset() throw() { handle=0; }
+private:
+	YOCTO_DISABLE_COPY_AND_ASSIGN(h_node);
 };
 
 YOCTO_UNIT_TEST_IMPL(hlist)

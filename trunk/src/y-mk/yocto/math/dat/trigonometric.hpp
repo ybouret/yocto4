@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_TRIGONOMETRIC_INCLUDED
 #define YOCTO_MATH_TRIGONOMETRIC_INCLUDED 1
 
-#include "yocto/math/kernel/linsys.hpp"
+#include "yocto/math/kernel/lu.hpp"
 #include "yocto/geom/v2d.hpp"
 
 namespace yocto
@@ -20,7 +20,7 @@ namespace yocto
              \param theta in 0..2*pi exclusive
              \param solver to perform the LU on the matrix
              */
-            explicit trigonometric( const array<T> &theta, linsys<T> &solver );
+            explicit trigonometric( const array<T> &theta, lu<T> &solver );
             virtual ~trigonometric() throw();
             
             //! compute the trigonometric coefficicents
@@ -29,7 +29,7 @@ namespace yocto
              \param solver the untouched solver used in the constructor
              The values are replaced by the coefficients.
              */
-            void compute( array<T> &a, linsys<T> &solver ) const throw();
+            void compute( array<T> &a, lu<T> &solver ) const throw();
             
             T            operator()( T theta, const array<T> &a ) const throw();
             geom::v2d<T> operator()( T theta, const array<T> &ax, const array<T> &ay ) const throw();
