@@ -3,6 +3,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/code/ipower.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -34,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(trigo)
     }
     
     // prepare trigo interp
-    linsys<double>        solver;
+    lu<double>        solver;
     trigonometric<double> trig(x,solver);
     vector<double>        coef(y);
     trig.compute(coef, solver);
