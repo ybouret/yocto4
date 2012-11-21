@@ -7,25 +7,87 @@ namespace yocto
     {
         
         template <>
-        bool lu<z_type>::build(matrix<z_type> &a,
-                               array<size_t> &indx,
-                               array<real_t> &scal,
-                               bool          *dneg_p) throw()
+        lu<z_type>:: lu() throw() :
+        indx(),
+        scal(),
+        buffer_(0),
+        buflen_(0),
+        maxi_(0),
+        dneg(false)
+        {
+            
+        }
+        
+        
+        
+        template <>
+        void lu<z_type>:: release() throw()
+        {
+            memory::kind<memory::global>::release( buffer_, buflen_ );
+            maxi_ = 0;
+            indx.reset(0,0);
+            scal.reset(0,0);
+        }
+        
+        template <>
+        lu<z_type>:: ~lu() throw()
+        {
+            release();
+        }
+        
+        template <>
+        void lu<z_type>:: ensure( size_t n )
+        {
+            if(n>maxi_)
+            {
+                release();
+                const size_t indx_size = n * sizeof(indx_type);
+                const size_t scal_size = n * sizeof(real_type);
+                buflen_ = indx_size + scal_size;
+                buffer_ = memory::kind<memory::global>::acquire(buflen_);
+                maxi_   = n;
+            }
+        }
+        
+        template <>
+        lu<z_type>:: lu(size_t n) :
+        indx(),
+        scal(),
+        buffer_(0),
+        buflen_(0),
+        maxi_(0),
+        dneg(false)
+        {
+            ensure(n);
+        }
+        
+        template <>
+        void lu<z_type>:: link( size_t n ) throw()
+        {
+            assert(n>0);
+            assert(n<=maxi_);
+            size_t *p = static_cast<size_t*>(buffer_);
+            indx.reset(p,n);
+            p += n;
+            scal.reset( (real_type*)p,n);
+        }
+        
+        template <>
+        bool lu<z_type>::build(matrix<z_type> &a) throw()
         {
             static const z_type z1(1);
             assert( a.cols   > 0   );
 			assert( a.is_square()  );
-			bool  dneg     = false;
 			const size_t n = a.rows;
-			assert( indx.size() == a.rows );
-            assert( scal.size() == a.rows );
+            link(n);
+			assert( indx.size() == n );
+            assert( scal.size() == n );
             
 			//------------------------------------------------------------------
 			//
 			// initialize implicit pivots
 			//
 			//------------------------------------------------------------------
-			
 			for( size_t i=n;i>0;--i)
 			{
 				const matrix<z_type>::row & a_i = a[i];
@@ -112,21 +174,19 @@ namespace yocto
 				assert( indx[i] <= n );
 			}
 #endif
-            if( dneg_p ) *dneg_p = dneg;
             return true;
         }
         
         
         template <>
         void lu<z_type>:: solve(const matrix<z_type>     &a,
-                                const array<size_t>      &indx,
-                                array<z_type>            &b) throw()
+                                array<z_type>            &b) const throw()
         {
             assert( a.cols   > 0   );
 			assert( a.is_square()  );
 			assert( indx.size() == a.rows );
             assert( b.size() == a.rows );
-
+            
             const size_t n = a.rows;
             size_t       ii = 0;
             
@@ -156,13 +216,12 @@ namespace yocto
 					sum -= a[i][j]*b[j];
 				b[i]=sum/a[i][i];
 			}
-
+            
         }
         
         template <>
         void lu<z_type>:: solve(const matrix<z_type>     &M,
-                                const array<size_t>      &indx,
-                                matrix<z_type>           &Q) throw()
+                                matrix<z_type>           &Q) const throw()
         {
             assert( M.cols   > 0     );
 			assert( M.is_square()    );
@@ -198,7 +257,7 @@ namespace yocto
 					Q[i][k]=sum/M[i][i];
 				}
 			}
-
+            
         }
         
     }

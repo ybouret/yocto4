@@ -6,7 +6,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/fcn/derivative.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace aqueous
     {
@@ -17,13 +17,13 @@ namespace yocto
         public:
             explicit chemsys( const library &L, double frac_tol ) throw();
             virtual ~chemsys() throw();
-
+            
             equilibrium & create( const string &name, const equilibrium::constant &K );
             equilibrium & create( const string &name, double K );
             
             equilibrium & create( const char *name, const equilibrium::constant &K );
             equilibrium & create( const char *name, double K );
-
+            
             
             void build();
             const double       ftol;    //!< fractional tolerance
@@ -36,8 +36,7 @@ namespace yocto
             vector<double>     C;       //!< copy of solution content   [M]
             matrix<double>     Phi;     //!< dGamma/dC                  [NxM]
             matrix<double>     W;       //!< (Phi * nu')^(-1)           [NxM]
-            vector<double>     scal;    //!< for LU                     [N]
-            vector<size_t>     indx;    //!< for LU                     [N]
+            lu<double>         LU;      //!< solver                     [N]
             vector<double>     xi;      //!< local extent               [N]
             vector<double>     dC;      //!< local modification         [M]
             derivative<double> drvs;    //!< local derivative context
@@ -67,7 +66,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(chemsys);
-
+            
         public:
             const library &lib;
         };

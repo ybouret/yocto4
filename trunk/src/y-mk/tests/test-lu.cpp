@@ -30,10 +30,9 @@ static inline void test_lu()
 		}
 		
 		matrix<T> mLU = m;
-		vector<typename lu<T>::real_type> scal(n,0);
-        vector<size_t>                    indx(n,0);
+		lu<T> LU(n);
         
-		if( !lu<T>::build(mLU,indx,scal) )
+		if( !LU.build(mLU) )
 		{
 			std::cerr << "matrix " << n << "x" << n << " is not invertible!" << std::endl;
 			continue;
@@ -46,7 +45,7 @@ static inline void test_lu()
 		{
 			x[i] = b[i] = gen<T>::get();
 		}
-		lu<T>::solve( mLU, indx, x );
+		LU.solve( mLU,x );
 		algebra<T>::mul(R,m,x);
         
 		double res = 0;

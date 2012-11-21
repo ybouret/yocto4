@@ -4,7 +4,7 @@
 #include "yocto/math/fit/sample.hpp"
 #include "yocto/math/fcn/derivative.hpp"
 #include "yocto/sequence/lw-arrays.hpp"
-#include "yocto/math/kernel/matrix.hpp"
+#include "yocto/math/kernel/lu.hpp"
 
 namespace yocto
 {
@@ -50,14 +50,14 @@ namespace yocto
 				array_t           &aorg_;
 				array_t           &atry_;
 				array_t           &step_;
-                array_t           &scal_; //!< for LU
 				matrix<T>          alpha_;
 				matrix<T>          curv_;
 				T                  xi_;    //!< to compute gradient @x[i]
 				size_t             iA_;    //!< to compute gradient dF/da[iA]
 				derivative<T>      drvs_;  //!< to compute gradient
 				function_t         grad_;  //!< gradient function wrapper
-				
+				lu<T>              LU;
+                
 				T          grad_fn(T );
 				void       gradient(  T xi );
 				T          initialize();   //!< compute beta, alpha and sample.z, return intial D

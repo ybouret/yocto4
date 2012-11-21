@@ -52,19 +52,19 @@ namespace yocto
 			used_(NULL),
 			nvar_( 0 ),
 			ndat_( 0 ),
-			harr_( 6 ),
+			harr_( 5 ),
 			dFda_( harr_.next_array() ),
 			beta_( harr_.next_array() ),
 			aorg_( harr_.next_array() ),
 			atry_( harr_.next_array() ),
 			step_( harr_.next_array() ),
-            scal_( harr_.next_array() ),
 			alpha_(),
 			curv_(),
 			xi_(0),
 			iA_(0),
 			drvs_(),
-			grad_( this, & lsf<real_t>::grad_fn )
+			grad_( this, & lsf<real_t>::grad_fn ),
+            LU()
 			{
 			}
 			
@@ -143,7 +143,6 @@ namespace yocto
 			}
 			
 			
-			typedef lu<real_t> LU;
             
 			template <>
 			void lsf<real_t>::operator()(sample<real_t>     &s,
@@ -189,7 +188,7 @@ namespace yocto
 				alpha_.make(nvar_,nvar_);
 				curv_.make(nvar_,nvar_);
 				harr_.prepare(  nvar_  );
-				vector<size_t> indx(nvar_,0);
+                LU.ensure( nvar_ );
                 
 				//--------------------------------------------------------------
 				// global init
@@ -224,14 +223,14 @@ namespace yocto
 						const size_t df = ndat_ - nvar_;
 						if( df > 0 )
 						{
-							if( ! LU::build( alpha_, indx, scal_ ) )
+							if( ! LU.build( alpha_ ) )
 							{
 								if(verbose) std::cerr << "[LeastSquareFit.Singular2]" << std::endl;
 								s.status = failure;
 								return;
 							}
 							curv_.ld1();
-                            LU::solve( alpha_, indx, curv_ );
+                            LU.solve( alpha_, curv_ );
 							const real_t residue = Dold/df;
 							for( size_t i=nvar_;i>0;--i)
 							{
@@ -268,7 +267,7 @@ namespace yocto
 						//------------------------------------------------------
 						// try to solve it
 						//------------------------------------------------------
-						if( ! LU::build( curv_, indx, scal_ ) )
+						if( ! LU.build( curv_ ) )
 						{
 							lam *= LAMBDA_INC;
 							//std::cerr << "lam=" << lam << std::endl;
@@ -287,7 +286,7 @@ namespace yocto
 					// compute the step
 					//----------------------------------------------------------
 					for(size_t i=nvar_;i>0;--i) step_[i] = beta_[i];
-                    LU::solve( curv_, indx, step_ );
+                    LU.solve( curv_, step_ );
 					
 					//----------------------------------------------------------
 					// take the full step

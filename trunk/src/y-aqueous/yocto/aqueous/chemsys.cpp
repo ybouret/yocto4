@@ -28,8 +28,7 @@ namespace yocto
         C(),
         Phi(),
         W(),
-        scal(),
-        indx(),
+        LU(),
         xi(),
         dC(),
         drvs(),
@@ -96,8 +95,7 @@ namespace yocto
                 dtGam.make(N,0.0);
                 Phi.make(N,M);
                 W.make(N,N);
-                scal.make(N,0.0);
-                indx.make(N,0);
+                LU.ensure(N);
                 xi.make(N,0.0);
                 dC.make(M,0.0);
                 
@@ -211,7 +209,7 @@ namespace yocto
             //------------------------------------------------------------------
             // prepare W
             //------------------------------------------------------------------
-            if( !LU::build(W, indx, scal) )
+            if( !LU.build(W) )
                 throw exception("Singular composition!");
             
         }
@@ -233,7 +231,7 @@ namespace yocto
                 // compute extent
                 //==============================================================
                 for( size_t i=N;i>0;--i) xi[i] = -Gamma[i];
-                LU::solve(W, indx, xi);
+                LU.solve(W,xi);
                 
                 //==============================================================
                 // compute dC
@@ -280,7 +278,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 // xi = inv(Phi*nu') * ( dtGam + Phi * dC ), in place
                 //--------------------------------------------------------------
-                LU::solve(W, indx, dtGam);
+                LU.solve(W,dtGam);
                 mkl::mulsub_trn(dC, nu, dtGam);
                 
             }
