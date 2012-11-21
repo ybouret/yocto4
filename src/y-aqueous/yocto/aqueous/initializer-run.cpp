@@ -119,8 +119,7 @@ namespace yocto
                 dX( cs.dC )
                 {
                     const library  &lib   = cs.lib;
-                    vector<double>  scal(Nc,0);
-                    vector<size_t>  indx(Nc,0);
+                    lu<double> LU(Nc);
                     
                     //==========================================================
                     //
@@ -153,18 +152,18 @@ namespace yocto
                     {
                         matrix<double> P2(Nc,Nc);
                         mkl::mul_rtrn(P2, P, P);
-                        if( !lu<double>::build(P2,indx,scal) )
+                        if( !LU.build(P2) )
                         {
                             throw exception("Singular Constraints/PseudoInverse");
                         }
                         vector<double> tmp(Nc,0);
                         for(size_t i=Nc;i>0;--i)
                             tmp[i] = L[i];
-                        lu<double>::solve(P2,indx,tmp);
+                        LU.solve(P2,tmp);
                         mkl::mul_trn(Xstar, P, tmp);
                         matrix<double> iP2(Nc,Nc);
                         iP2.ld1();
-                        lu<double>::solve(P2,indx,iP2);
+                        LU.solve(P2,iP2);
                         mkl::mul_ltrn(J, P, iP2);
                     }
                     
@@ -222,8 +221,6 @@ namespace yocto
                     array<double>  &Gamma  = cs.Gamma;
                     bool            converged = false;
                     const double    ftol      = cs.ftol;
-                    indx.make(N,0);
-                    scal.make(N,0);
                     
                 NEWTON_INIT:
                     //----------------------------------------------------------
@@ -244,7 +241,7 @@ namespace yocto
                     //----------------------------------------------------------
                     cs.computeGammaAndPhi(t,false);
                     mkl::mul_rtrn(W, Phi, Q);
-                    if( !lu<double>::build(W, indx, scal) )
+                    if( !cs.LU.build(W) )
                     {
                         std::cerr << "Singular Jacobian" << std::endl;
                         goto NEWTON_INIT;
@@ -254,7 +251,7 @@ namespace yocto
                     // compute newton's step
                     //----------------------------------------------------------
                     for( size_t i=N;i>0;--i) dV[i] = -Gamma[i];
-                    lu<double>::solve(W,indx,dV);
+                    cs.LU.solve(W,dV);
                     mkl::add(V,dV);
                     buildX(V);
                     converged = true;
@@ -291,12 +288,12 @@ namespace yocto
                     //----------------------------------------------------------
                     cs.computeGammaAndPhi(t, false);
                     algebra<double>::mul_rtrn(W, Phi, Q);
-                    if( ! lu<double>::build(W,indx,scal) )
+                    if( ! cs.LU.build(W) )
                     {
                         std::cerr << "Singular Jacobian/Error" << std::endl;
                         goto NEWTON_INIT;
                     }
-                    lu<double>::solve(W,indx,Gamma);
+                    cs.LU.solve(W,Gamma);
                     algebra<double>::mul_trn(dX, Q, Gamma);
                     
                     //----------------------------------------------------------
@@ -339,7 +336,7 @@ namespace yocto
             //
             // initialize constants and sanity check
             //
-            //==================================================================			
+            //==================================================================
             array<double> &C  = cs.C;
 			const size_t   M  = C.size();
 			const size_t   N  = cs.size();

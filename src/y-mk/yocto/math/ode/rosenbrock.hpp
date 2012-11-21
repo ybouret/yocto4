@@ -3,7 +3,6 @@
 
 #include "yocto/math/ode/stiff-step.hpp"
 #include "yocto/math/kernel/lu.hpp"
-#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -23,10 +22,10 @@ namespace yocto
                 
             protected:
                 explicit rosenbrock();
-                lw_array<T>    &g1, &g2, &g3, &g4, &dfdx,&err,&ysav,&dysav,&scal;
+                lw_array<T>    &g1, &g2, &g3, &g4, &dfdx,&err,&ysav,&dysav;
                 matrix<T>      dfdy;
                 matrix<T>      a;
-                vector<size_t> indx;
+                lu<T>          LU;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rosenbrock);

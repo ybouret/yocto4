@@ -20,7 +20,6 @@ namespace yocto {
 			return degree_;
 		}
         
-        typedef lu<real_t> LU;
         
 		template <>
 		smoother<real_t>:: smoother(
@@ -90,11 +89,10 @@ namespace yocto {
 			//
 			//------------------------------------------------------------------
 			//linsys<real_t> lss( ncoeff_ );
-            vector<size_t> indx( ncoeff_,0);
-            vector<real_t> scal( ncoeff_,0);
+            lu<real_t> LU(ncoeff_);
             vector<real_t> rhs( ncoeff_, 0);
             
-			if( !LU::build( mu, indx, scal ) )
+			if( !LU.build(mu) )
 				throw exception( "[smoother] singular moments, check kernel" );
             
 			//------------------------------------------------------------------
@@ -129,7 +127,7 @@ namespace yocto {
 				}
                 
 				//-- solve using internal solver memory
-                LU::solve( mu, indx, rhs );
+                LU.solve( mu, rhs );
                 
 				//-- replace column j of filter
 				for( size_t i=ncoeff_; i>0; --i )

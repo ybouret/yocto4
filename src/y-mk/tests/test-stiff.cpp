@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/ode/stiff-drvrs.hpp"
 #include "yocto/math/ode/stiff-drvkr.hpp"
+#include "yocto/sequence/vector.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 
