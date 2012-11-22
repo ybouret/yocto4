@@ -233,7 +233,7 @@ namespace yocto
                 HHH(eee, aaa, bbb, ccc, ddd, X[ 4],  7);
                 HHH(ddd, eee, aaa, bbb, ccc, X[13],  5);
                 
-                /* parallel round 4 */   
+                /* parallel round 4 */
                 GGG(ccc, ddd, eee, aaa, bbb, X[ 8], 15);
                 GGG(bbb, ccc, ddd, eee, aaa, X[ 6],  5);
                 GGG(aaa, bbb, ccc, ddd, eee, X[ 4],  8);
@@ -279,12 +279,12 @@ namespace yocto
                 
                 return;
             }
-
+            
             static inline
-            void MDfinish(uint32_t      *MDbuf,
-                          const uint8_t *strptr,
-                          uint32_t       lswlen,
-                          uint32_t       mswlen)
+            void MDfinish(uint32_t            *MDbuf,
+                          const uint8_t       *strptr,
+                          const uint32_t       lswlen,
+                          const uint32_t       mswlen)
             {
                 unsigned int i;                                 /* counter       */
                 uint32_t     X[16];                             /* message words */
@@ -315,7 +315,7 @@ namespace yocto
                 
                 return;
             }
-
+            
         }
         
         rmd160 :: rmd160()  throw() :
@@ -348,6 +348,20 @@ namespace yocto
                 if( RMD.store( *p ) )
                     compress(MDbuf, RMD.block());
             }
+        }
+        
+        void rmd160::get(void *output, size_t outlen) throw()
+        {
+            MDfinish(MDbuf, RMD.flush(), RMD.lswlen(), RMD.mswlen() );
+            uint8_t hashcode[RMDsize/8];
+            for(size_t i=0; i<RMDsize/8; i+=4)
+            {
+                hashcode[i]   =  MDbuf[i>>2];         /* implicit cast to byte  */
+                hashcode[i+1] = (MDbuf[i>>2] >>  8);  /*  extracts the 8 least  */
+                hashcode[i+2] = (MDbuf[i>>2] >> 16);  /*  significant bits.     */
+                hashcode[i+3] = (MDbuf[i>>2] >> 24);
+            }
+            fill(output, outlen, hashcode, sizeof(hashcode));
         }
         
         
