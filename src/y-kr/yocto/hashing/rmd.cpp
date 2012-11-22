@@ -36,15 +36,15 @@ namespace yocto
             if(nb>=4)
             {
                 X[nx++] = B2X();
-                std::cerr.flush();
-                fprintf(stderr,"[rmd]: +%08x (length=%u)\n", X[nx-1], unsigned(length));
-                fflush(stderr);
+                //std::cerr.flush();
+                //fprintf(stderr,"[rmd]: +%08x (length=%u)\n", X[nx-1], unsigned(length));
+                //fflush(stderr);
                 nb = 0;
                 if( nx >= 16 )
                 {
-                    std::cerr.flush();
-                    fprintf(stderr,"[rmd]: <BLOCK>\n" );
-                    fflush(stderr);
+                    //std::cerr.flush();
+                    //fprintf(stderr,"[rmd]: <BLOCK>\n" );
+                    //fflush(stderr);
                     nx = 0;
                     return true;
                 }
@@ -68,6 +68,16 @@ namespace yocto
                 B[i] = 0;
             X[nx] = B2X();
             return (uint8_t *)X;
+        }
+        
+        uint32_t rmd:: lswlen() const throw()
+        {
+            return uint32_t(length&0xFFFFFFFFUL);
+        }
+        
+        uint32_t rmd:: mswlen() const throw()
+        {
+            return uint32_t( (length>>32) & 0xFFFFFFFFUL);
         }
         
     }

@@ -34,7 +34,10 @@ namespace yocto
             const uint8_t *flush() throw();
             
             const size_t   length;
-
+            
+            uint32_t lswlen() const throw();
+            uint32_t mswlen() const throw();
+            
         private:
             size_t   nx;
             size_t   nb;
