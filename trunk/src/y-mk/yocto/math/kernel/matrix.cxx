@@ -8,7 +8,7 @@
 #include "yocto/code/unroll.hpp"
 #include "yocto/code/swap.hpp"
 
-namespace yocto 
+namespace yocto
 {
 	namespace math
 	{
@@ -248,29 +248,7 @@ namespace yocto
 			YOCTO_LOOP(rows,cswap<z_type>( *p1, *p2 ); p1 += cols; p2 += cols );
 		}
 		
-		
-#if 0
-#define YOCTO_MATMUL(INDEX) ans += r_i[INDEX] * in[INDEX]
-		template <>
-		void matrix<z_type>::mul( array<z_type> &out, const array<z_type> &in ) const throw()
-		{
-			assert( out.size() == rows );
-			assert( in.size()  == cols );
-			assert( &out != &in );
-			
-			for( size_t i=rows; i>0; --i )
-			{
-				assert( cols > 0 );
-				z_type      ans = 0;
-				const row &r_i = row_[i];
-				//for( size_t j=cols; j>0; --j ) ans += r_i[j] * in[j];
-				YOCTO_LOOP_FUNC_(cols,YOCTO_MATMUL,1);
-				out[i] = ans;
-			}
-			
-		}
-#endif
-		
+        
 		template <>
 		void matrix<z_type>:: ldz() throw()
 		{

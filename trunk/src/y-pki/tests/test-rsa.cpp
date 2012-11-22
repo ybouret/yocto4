@@ -209,6 +209,7 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
                 std::cerr << "decoding: "; std::cerr.flush();
                 rsa_decoder dec( pub_k );
                 dec.append( crypted );
+                dec.flush();
                 while( dec.query(C) )
                 {
                     std::cerr << make_visible(C);
@@ -231,6 +232,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(auth)
 {
+    
     vector<rsa_key::pointer>  pub_keys,prv_keys;
     {
         ios::imstream fp( keys_db, sizeof(keys_db) );
@@ -257,7 +259,8 @@ YOCTO_UNIT_TEST_IMPL(auth)
             std::cerr << "+prv.key@" << prv.obits << std::endl;
         }
     }
-    
+    const size_t nk = pub_keys.size();
+    std::cerr << "Loaded " << nk << " keys" << std::endl;
     std::cerr << "Enter Keys...." << std::endl;
     ios::icstream fp( ios::cstdin );
     string   line;
@@ -278,15 +281,10 @@ YOCTO_UNIT_TEST_IMPL(auth)
         
         std::cerr << "encrypt..." << std::endl;
         const string msg = auth.encrypt( line, peer_pub_k);
-        b64.append( msg );
-        b64.flush();
-        const string m64 = b64.to_string();
+        const string m64 = b64.to_string(msg);
         std::cerr << m64 << std::endl;
         std::cerr << "signing..." << std::endl;
         string sgn = auth.signature( line, self_prv_k, alg );
-        //b64.reset();
-        //b64.append( sgn );
-        //b64.flush();
         const string s64 = b64.to_string( sgn );
         std::cerr << s64 << std::endl;
         std::cerr << "decrypt..." << std::endl;
