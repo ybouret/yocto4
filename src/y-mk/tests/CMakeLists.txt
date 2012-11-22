@@ -7,7 +7,7 @@ ENABLE_TESTING()
 
 ADD_TEST(ZType    test-mk z)
 ADD_TEST(Matrix   test-mk matrix)
-ADD_TEST(LinSys   test-mk linsys)
+ADD_TEST(LU       test-mk lu)
 ADD_TEST(Jacobi   test-mk jacobi)
 ADD_TEST(Intg     test-mk intg)
 ADD_TEST(Drvs     test-mk drvs)
