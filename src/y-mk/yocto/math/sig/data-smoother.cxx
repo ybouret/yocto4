@@ -89,8 +89,8 @@ namespace yocto {
 			//
 			//------------------------------------------------------------------
 			//linsys<real_t> lss( ncoeff_ );
-            lu<real_t> LU(ncoeff_);
-            vector<real_t> rhs( ncoeff_, 0);
+            lu<real_t>     LU(ncoeff_);
+            array<real_t> &rhs = LU.arr;
             
 			if( !LU.build(mu) )
 				throw exception( "[smoother] singular moments, check kernel" );

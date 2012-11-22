@@ -13,7 +13,8 @@ namespace yocto
         buffer_(0),
         buflen_(0),
         maxi_(0),
-        dneg(false)
+        dneg(false),
+        arr( scal )
         {
             
         }
@@ -56,7 +57,8 @@ namespace yocto
         buffer_(0),
         buflen_(0),
         maxi_(0),
-        dneg(false)
+        dneg(false),
+        arr( scal )
         {
             ensure(n);
         }
