@@ -26,7 +26,7 @@ namespace yocto
                 if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
                 {
                     const lexeme *lx = Lexer.peek();
-                    throw exception("%s: illegal extraneous token '%s'", name.c_str(), lx->label.c_str() );
+                    throw exception("%s: illegal extraneous token '%s' (line %u)", name.c_str(), lx->label.c_str(), unsigned(lx->line) );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
                 return ans.yield();

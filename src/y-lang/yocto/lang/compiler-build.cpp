@@ -14,7 +14,6 @@ namespace yocto
             static const char fn[] = "lang.compiler.build(ast)";
             __CHECK(ast!=NULL,"NULL ast");
             __CHECK(! ast->terminal,"invalid ast");
-            
             return NULL;
         }
 

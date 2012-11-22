@@ -55,7 +55,7 @@ namespace yocto
                 void  out( ios::ostream &fp, size_t &depth ) const;
                 void  output( ios::ostream &fp ) const;
               
-                //! remove discardable, drop specialized
+                //! remove discardable, drop specialized content
                 void  AST() throw();
                 
                 //! unlink from parent
