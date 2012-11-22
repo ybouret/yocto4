@@ -44,6 +44,7 @@ namespace yocto
             
 		public:
 			bool              dneg;
+            array<real_type> &arr;   //!< scal can be an extraneous array
 		};
         
 	}
