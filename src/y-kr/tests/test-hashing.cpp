@@ -8,6 +8,7 @@
 #include "yocto/hashing/digest.hpp"
 #include "yocto/hashing/sha256.hpp"
 #include "yocto/hashing/sha512.hpp"
+#include "yocto/hashing/rmd160.hpp"
 
 #include <iomanip>
 
@@ -24,7 +25,8 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 	hashing::sha256 h_sha256;
 	hashing::sha384 h_sha384;
 	hashing::sha512 h_sha512;
-	
+    hashing::rmd160 h_rmd160;
+    
 	{
 		const string wiki = "Wikipedia, l'encyclopedie libre et gratuite";
 		{
@@ -77,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 		
 	}
 	
-	hashing::function * h_reg[] = { &h_md2, &h_md4, &h_md5, &h_sha1, &h_sha224, &h_sha256, &h_sha384, &h_sha512};
+	hashing::function * h_reg[] = { &h_md2, &h_md4, &h_md5, &h_sha1, &h_sha224, &h_sha256, &h_sha384, &h_sha512, &h_rmd160 };
 	const size_t        h_num   = sizeof(h_reg)/sizeof(h_reg[0]);
 	
 	for( size_t i=0; i < h_num; ++i )
