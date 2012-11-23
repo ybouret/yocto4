@@ -197,7 +197,7 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
                 string crypted;
                 rsa_encoder enc( prv_k );
                 std::cerr << "encoding: "; std::cerr.flush();
-                enc.append( line );
+                enc << line;
                 enc.flush();
                 char C;
                 while( enc.query(C) )
@@ -208,7 +208,7 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
                 std::cerr << std::endl;
                 std::cerr << "decoding: "; std::cerr.flush();
                 rsa_decoder dec( pub_k );
-                dec.append( crypted );
+                dec << crypted;
                 dec.flush();
                 while( dec.query(C) )
                 {

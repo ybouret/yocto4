@@ -110,10 +110,10 @@ namespace yocto
         {
             assert(root!=NULL);
             fp("digraph %s {\n", graphName.c_str());
-            fp.append("rankdir=TB;\n");
-            fp.append("ordering=out;\n");
+            fp << "rankdir=TB;\n";
+            fp << "ordering=out;\n";
             root->viz(fp);
-            fp("}\n");
+            fp << "}\n";
         }
         
         void Huffman:: Tree:: display( ios::ostream &fp ) const

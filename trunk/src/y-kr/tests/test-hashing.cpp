@@ -9,6 +9,7 @@
 #include "yocto/hashing/sha256.hpp"
 #include "yocto/hashing/sha512.hpp"
 #include "yocto/hashing/rmd160.hpp"
+#include "yocto/wtime.hpp"
 
 #include <iomanip>
 
@@ -76,6 +77,12 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 			const digest i_md = digest::hex("73585d7c393cc548cfd6c4774a62f49c20bf16585a08a1e276f84fe3523538da12b61742f059ab56b05905eab6bab94b22b8b576ca7f5d8b612b2959083b84f3");
 			if( o_md != i_md ) throw exception("SHA-512 failure");
 		}
+        
+        {
+            const digest o_md = digest::checksum( h_rmd160, wiki);
+			const digest i_md = digest::hex("6ac643de598c9f47e584b10ef9e1ff9c22103d8a");
+            if( o_md != i_md ) throw exception("RMD-160 failure");
+        }
 		
 	}
 	
@@ -126,6 +133,13 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 				line.clear();
 			}
 		}
+        
+        //-- perf
+        wtime chrono;
+        for( size_t i=0; i < h_num; ++i )
+        {
+            
+        }
 	}
 	else
 	{

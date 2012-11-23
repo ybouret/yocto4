@@ -429,7 +429,7 @@ namespace yocto
 		void natural:: save( ios::ostream &out ) const
         {
             out.emit<uint32_t>( size_ );
-            out.append( *this );
+            out <<  *this;
         }
 
         natural natural:: load( ios::istream &fp )

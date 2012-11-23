@@ -29,11 +29,14 @@ namespace yocto
 			template <typename T>
 			inline void emit( T x ) { x = swap_be_as<T>(x); save(&x,sizeof(T)); } 
 			
-			void append( const char *buffer);
-			void append( const char *buffer, size_t buflen );
-			void append( const memory::ro_buffer &buffer   );
-			void append( char C );
 			
+			void append( const char *buffer, size_t buflen );
+
+            
+            ostream & operator<<( const char *buffer);
+            ostream & operator<<( const memory::ro_buffer &buffer );
+            ostream & operator<<( char C );
+            
 			virtual void operator()(const char *fmt,...) YOCTO_PRINTF_CHECK(2,3);
 			
 		protected:

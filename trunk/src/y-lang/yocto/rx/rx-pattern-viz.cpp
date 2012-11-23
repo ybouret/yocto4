@@ -22,14 +22,9 @@ namespace yocto
 		
 		void pattern:: graphviz(  ios::ostream &os, const string &graph_name ) const
 		{
-			
-			os.append("digraph ");
-			os.append( graph_name );
-            os.append(" {\n");
-            os.append("rankdir=TB;\nordering=out;\n");
+			os << "digraph " << graph_name << " {\n";
 			viz( os );
-			os.append("}\n");
-			
+			os << "}\n";
 		}
 		
 		
@@ -73,7 +68,7 @@ namespace yocto
 			{
 				char buffer[8];
 				snprintf( buffer, sizeof(buffer)-1, "0x%02x", C );
-				os.append( buffer );
+				os << buffer;
 			}
 			
 		}
@@ -84,37 +79,37 @@ namespace yocto
 			void    any1:: viz( ios::ostream &os ) const
 			{
 				tag(os); 
-				os.append(" [ label=\"any1\"];\n");
+				os << " [ label=\"any1\"];\n";
 			}
 			
 			void single:: viz( ios::ostream &os ) const
 			{
 				tag(os); 
-				os.append(" [ label=\"'");
+				os<< " [ label=\"'";
 				out(os,value );
-				os.append("'\"];\n");
+				os << "'\"];\n";
 			}
 			
 			void range:: viz( ios::ostream &os ) const
 			{
 				tag(os);
-				os.append("[ label=\"['");
+				os<<"[ label=\"['";
 				out(os,lower);
-				os.append("'-'");
+				os<<"'-'";
 				out(os,upper);
-				os.append("']\" ];\n");
+				os<<"']\" ];\n";
 				
 			}
 			
 			void within:: viz( ios::ostream &os ) const
 			{
 				tag(os);
-				os.append("[ label=\"<");
+				os<<"[ label=\"<";
 				for( symbols::const_iterator i = symbols_.begin(); i != symbols_.end(); ++i )
 				{
 					out(os, *i );
 				}
-				os.append(">\" ];\n");
+				os<<">\" ];\n";
 			}
 			
 			
@@ -136,7 +131,7 @@ namespace yocto
 			{
 				for( const pattern *p = op.head; p; p=p->next )
 				{
-					from.tag(os); os.append(" -> "); p->tag(os); os.append(";\n");
+					from.tag(os); os<<" -> "; p->tag(os); os<<";\n";
 				}
 			}
 			
@@ -144,8 +139,8 @@ namespace yocto
 			void AND:: viz( ios::ostream &os ) const
 			{
 				viz_op( os, operands );
-				tag(os); os.append( " [ label=\"AND\", shape=house ]");
-				os.append(";\n");
+				tag(os); os<< " [ label=\"AND\", shape=house ]";
+				os << ";\n";
 				viz_op_link( os, operands, *this );
 			}
 			
@@ -153,16 +148,16 @@ namespace yocto
 			void OR:: viz( ios::ostream &os ) const
 			{
 				viz_op( os, operands );
-				tag(os); os.append( " [ label=\"OR\", shape=house ]");
-				os.append(";\n");
+				tag(os); os<< " [ label=\"OR\", shape=house ]";
+				os<<";\n";
 				viz_op_link( os, operands, *this );
 			}
 			
 			void NONE:: viz( ios::ostream &os ) const
 			{
 				viz_op( os, operands );
-				tag(os); os.append( " [ label=\"NONE\", shape=house ]");
-				os.append(";\n");
+				tag(os); os<< " [ label=\"NONE\", shape=house ]";
+				os << ";\n";
 				viz_op_link( os, operands, *this );
 			}
 			

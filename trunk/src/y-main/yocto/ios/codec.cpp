@@ -26,9 +26,9 @@ namespace yocto
         
         string codec:: to_string( const memory::ro_buffer &data )
         {
+            ostream &self = *this;
             reset();
-            append( data );
-            flush();
+            ( self << data ).flush();
             return to_string();
         }
         

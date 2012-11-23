@@ -113,12 +113,11 @@ namespace yocto
 				{
 					ppat->viz(os);
 					tag(os);
-					os.append(" [ label=\">=");
+					os << " [ label=\">=";
 					char buffer[32];
 					snprintf(buffer, sizeof(buffer)-1, "%u", unsigned(num));
-					os.append(buffer);
-					os.append("\", shape=diamond];\n");
-					tag(os); os.append( " -> " ); ppat->tag(os); os.append( ";\n");
+					os<< buffer << "\", shape=diamond];\n";
+					tag(os); os << " -> "; ppat->tag(os); os << ";\n";
 				}
 				
 				virtual void     gather( first_chars &fch ) const 
@@ -174,12 +173,11 @@ namespace yocto
 				{
 					ppat->viz(os);
 					tag(os);
-					os.append(" [ label=\"[");
+					os << " [ label=\"[";
 					char buffer[32];
 					snprintf(buffer, sizeof(buffer)-1, "%u;%u", unsigned(nmin), unsigned(nmax) );
-					os.append(buffer);
-					os.append("]\", shape=diamond];\n");
-					tag(os); os.append( " -> " ); ppat->tag(os); os.append( ";\n");
+					os << buffer << "]\", shape=diamond];\n";
+					tag(os); os << " -> "; ppat->tag(os); os << ";\n";
 				}
 				
 				virtual void     gather( first_chars &fch ) const

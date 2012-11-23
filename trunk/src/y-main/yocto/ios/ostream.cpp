@@ -31,7 +31,7 @@ namespace yocto
 			if( saved < buflen )
 				throw libc::exception( EIO, "ostream::save(%u < %u)", unsigned(saved), unsigned(buflen) );
 		}
-
+        
 		void ostream:: append( const char *buffer, size_t buflen )
 		{
 			while( buflen > 0 )
@@ -43,6 +43,7 @@ namespace yocto
 			}
 		}
 		
+#if 0
 		void ostream:: append( const char *buffer )
 		{
 			append( buffer, length_of(buffer) );
@@ -57,7 +58,26 @@ namespace yocto
 		{
 			write(C);
 		}
-
+#endif
+        
+        ostream & ostream:: operator<<( const char *buffer)
+        {
+            append( buffer, length_of(buffer) );
+            return *this;
+        }
+        
+        ostream & ostream::operator<<( const memory::ro_buffer &buffer )
+        {
+            append( (const char *) buffer.ro(), buffer.length() );
+            return *this;
+        }
+        
+        ostream & ostream::operator<<( char C )
+        {
+            write(C);
+            return *this;
+        }
+        
 		void ostream:: operator()(const char *fmt,...)
 		{
 			assert(fmt);
@@ -78,7 +98,7 @@ namespace yocto
 				
 				if( success )
 				{
-					append( buffer );
+					append( buffer, length_of(buffer) );
 					return;
 				}
 				n <<= 1;

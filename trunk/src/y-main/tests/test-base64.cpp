@@ -58,7 +58,7 @@ YOCTO_UNIT_TEST_IMPL(base64)
     while( input.read_line(line) > 0 )
     {
         std::cerr << "-- encoding" << std::endl;
-        enc.append( line );
+        enc << line;
         enc.flush();
         char C;
         while( enc.query(C) )
