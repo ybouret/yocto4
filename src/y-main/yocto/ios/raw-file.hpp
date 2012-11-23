@@ -69,7 +69,7 @@ namespace yocto
 			inline void emit( T x ) { x = swap_be_as<T>(x); put_all(&x,sizeof(T)); } 
             
             void   save_buffer( const memory::ro_buffer &buff ); //!< 32 bits length
-            string load_string();
+            string load_string(); //!< 32 bits length
             
             //! for pipe behavior
             explicit raw_file( handle_t user_handle, size_t user_access ) throw();

@@ -10,6 +10,7 @@
 #include "yocto/hashing/sha512.hpp"
 #include "yocto/hashing/rmd160.hpp"
 #include "yocto/wtime.hpp"
+#include "yocto/ios/raw-file.hpp"
 
 #include <iomanip>
 
@@ -135,10 +136,30 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 		}
         
         //-- perf
-        wtime chrono;
+        wtime        chrono;
+        vector<char> data;
+        {
+            ios::raw_file inp( argv[1], ios::readable);
+            const size_t  len = inp.length();
+            data.make(len,0);
+            inp.get_all(data(), data.size());
+        }
+        std::cerr << "hashing " << data.size() << " bytes" << std::endl;
+        uint8_t hashcode[32];
+        const size_t niter = 16;
         for( size_t i=0; i < h_num; ++i )
         {
-            
+            hashing::function &h = *h_reg[i];
+            chrono.start();
+            for(size_t iter=1; iter<=niter;++iter)
+            {
+                h.set();
+                h.run( data(), data.size() );
+                h.get(hashcode, sizeof(hashcode) );
+            }
+            const double ell = chrono.query();
+            const double spd = niter * (data.size() /ell);
+            std::cerr << std::setw(16) << h.name() << ": " << (spd*1e-6) << " MB/s" << std::endl;
         }
 	}
 	else
