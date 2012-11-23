@@ -63,20 +63,20 @@ namespace yocto
                 case IsString:
                 {
                     const string s = j2s( asString() );
-                    fp.append(s);
+                    fp << s;
                 }
                     break;
                     
                 case IsTrue:
-                    fp.append("true");
+                    fp<<"true";
                     break;
                     
                 case IsFalse:
-                    fp.append("false");
+                    fp<<"false";
                     break;
                     
                 case IsNull:
-                    fp.append("null");
+                    fp<<"null";
                     break;
                     
                 case IsArray:
@@ -126,9 +126,9 @@ namespace yocto
                 const Pair &P = *i;
                 __indent(fp,start);
                 const string &key = keys[count];
-                fp.append(key);
+                fp << key;
                 __indent(fp,key_space - key.size());
-                fp.append(": ");
+                fp << ": ";
                 P.value.out(fp,child_start);
                 if( count < obj.length()  )
                 {

@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(iz)
         string line;
         while( fp.read_line( line ) >= 0)
         {
-			out.append( line ); out.append( '\n' );
+			out << line << '\n';
             line.clear();
         }
     }
@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(oz)
 	while( in.read_line( line ) >= 0 && line != ".quit" )
 	{
 		//std::cerr << "->" << line << std::endl;
-		fp.append( line ); fp.append( '\n' );
+		fp << line << '\n';
 		line.clear();
 	}
 

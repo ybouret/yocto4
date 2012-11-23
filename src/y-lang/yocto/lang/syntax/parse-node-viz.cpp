@@ -11,16 +11,14 @@ namespace yocto
             {
                 // declare the node
                 regex::show_tag(fp,this); 
-				fp.append(" [ label=\"'");
-				fp.append(label);
-				fp.append("'\"];\n");
                 
+                fp << " [ label=\"'" << label << "'\"];\n";
                 // link it to its parent
                 if( parent )
                 {
                     assert( ! parent->terminal );
                     const unsigned u = parent->children().index_of(this);
-                    regex::show_tag(fp, parent); fp.append(" -> "); regex::show_tag(fp,this); 
+                    regex::show_tag(fp, parent); fp<<" -> "; regex::show_tag(fp,this);
                     fp(" [label=\"%u\"];\n",u);
                 }
                 if( !terminal )
@@ -38,7 +36,7 @@ namespace yocto
                     if( lx->size )
                     {
                         regex::show_tag(fp, lx);
-                        fp.append(" [ label=\"'");
+                        fp<<" [ label=\"'";
                         const string s = lx->to_string();
                         for( size_t i=0; i < s.size(); ++i )
                         {
@@ -53,19 +51,19 @@ namespace yocto
                             };
                         }
                         
-                        fp.append("'\", shape=house];\n");
-                        regex::show_tag(fp,lx); fp.append(" -> "); regex::show_tag(fp,this); fp.append(" [arrowhead=box];\n");
+                        fp<<"'\", shape=house];\n";
+                        regex::show_tag(fp,lx); fp<<" -> "; regex::show_tag(fp,this); fp << " [arrowhead=box];\n";
                     }
                 }
             }
             
             void  parse_node:: graphviz( const string &id, ios::ostream &fp ) const
             {
-                fp.append("digraph "); fp.append(id); fp.append(" {\n");
-                fp.append("rankdir=TB;\n");
-                fp.append("ordering=out;\n");
+                fp << "digraph " << id << "{\n";
+                fp << "rankdir=TB;\n";
+                fp << "ordering=out;\n";
                 viz(fp);
-                fp.append("}\n");
+                fp << "}\n";
             }
             
             void  parse_node:: graphviz( const char   *id, ios::ostream &fp ) const

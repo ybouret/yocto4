@@ -1,8 +1,8 @@
 #include "yocto/lang/syntax/parse-node.hpp"
 
-namespace yocto 
+namespace yocto
 {
-    namespace lang 
+    namespace lang
     {
         
         namespace syntax
@@ -32,7 +32,7 @@ namespace yocto
                         {
                             delete node;
                         }
-                        else 
+                        else
                         {
                             node->AST();
                             tmp.push_back(node);
@@ -56,7 +56,7 @@ namespace yocto
                                 }
                                 // else merge...
                             case syntax:: is_merging_all:
-                                assert(node->terminal==0); 
+                                assert(node->terminal==0);
                             {
                                 child_list &sub = node->children();
                                 while( sub.size )
@@ -79,25 +79,20 @@ namespace yocto
             
             void  parse_node:: out( ios::ostream &fp, size_t &depth ) const
             {
-                for( size_t i=0; i < depth; ++i ) fp.write(' ');
-                fp.write('<');
-                fp.append(label);
-                fp.write('>');
+                for( size_t i=0; i < depth; ++i ) fp << ' ';
+                fp << '<' << label << '>';
                 if( terminal )
                 {
                     if( lex()->size )
                     {
-                        fp.write('\t');
-                        fp.write('\'');
                         const string s = lex()->to_string();
-                        fp.append(s);
-                        fp.write('\'');
+                        fp << "\t\'" << s << "\'";
                     }
-                    fp.write('\n');
+                    fp << '\n';
                 }
-                else 
+                else
                 {
-                    fp.write('\n');
+                    fp<< '\n';
                     ++depth;
                     const child_list &chl = children();
                     for( const parse_node *node = chl.head; node; node=node->next )

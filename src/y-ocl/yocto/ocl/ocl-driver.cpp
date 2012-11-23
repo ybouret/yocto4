@@ -113,8 +113,7 @@ namespace yocto
 		{
 			for( size_t i=0; i < BuildLogs.size; ++i )
 			{
-				os.append(BuildLogs[i]);
-				os.append( '\n' );
+                os << BuildLogs[i] << '\n';
 			}
 		}
 		
