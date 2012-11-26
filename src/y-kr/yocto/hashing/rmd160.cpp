@@ -290,7 +290,7 @@ namespace yocto
                 unsigned int i;                                 /* counter       */
                 uint32_t     X[16];                             /* message words */
                 
-                std::cerr << "[MDFinish] lswlen=" << lswlen << ", mswlen=" << mswlen << std::endl;
+                //std::cerr << "[MDFinish] lswlen=" << lswlen << ", mswlen=" << mswlen << std::endl;
                 
                 memset(X, 0, 16*sizeof(uint32_t));
                 
