@@ -33,6 +33,10 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(context);
 			};
 			
+            
+            static void split( size_t *counts, size_t num_counts, size_t huge ) throw();
+            
+            
 			//! what to do for each context
 			typedef  functor<void,TL1(context&)> task;
 			

@@ -30,7 +30,7 @@ namespace yocto
                  \param p  will be rule motif: taken care of in case of error
                  \param cb callback when motif is selected
                  \param control will be the special fctl flag
-                 the name cannot be EOF
+                 the id cannot be EOF
                  */
                 static rule * create( const string &id, regex::pattern *p, const action &cb, bool control);
                 static void   kill( rule *r ) throw();
