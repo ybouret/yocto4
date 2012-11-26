@@ -36,15 +36,17 @@ namespace yocto
 			//! what to do for each context
 			typedef  functor<void,TL1(context&)> task;
 			
-			//! build a team based on a layout
-			explicit team(const char *mutex_id = NULL);
+			//! build a team based on a parsed layout
+			explicit team(const char *mutex_id = 0);
 			
+            //! build a team with manual settings
+            explicit team( size_t num_threads, size_t thread_offset, const char *mutex_idx = 0);
+            
 			//! clean up
 			virtual ~team() throw();
 			
 			//! perform task todo on each context
 			void cycle( task &todo ) throw();
-			
 			
 			
 		private:
@@ -59,6 +61,8 @@ namespace yocto
 			void     *wksp_;    //!< workspace for threads/data
 			size_t    counter_;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(team);
+            void initialize();
+            
 			void terminate() throw();
 			
 			static void launcher(void*) throw();

@@ -33,7 +33,6 @@ namespace yocto
 			//------------------------------------------------------------------
 			std::cerr << "-- main thread: " << std::endl;
             thread::assign_cpu( thread::get_current_handle(), cpu_index(0,*this,cpu_setsize) );
-			//__assign( thread::get_current_handle(), cpu_index( 0, *this, cpu_setsize ) );
 			
 			//------------------------------------------------------------------
 			// assign team thread
@@ -43,7 +42,6 @@ namespace yocto
             {
                 thread::assign_cpu( m[i].thr.get_handle(), cpu_index(i,*this,cpu_setsize) );
             }
-            //__assign(  m[i].thr.get_handle(), cpu_index( i, *this, cpu_setsize ) );
 			
 			
 		}

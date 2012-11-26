@@ -76,6 +76,13 @@ namespace yocto
 			std::cerr << "[threading::layout=" << size << "," << root << "]" << std::endl;
 		}
 		
+        layout:: layout( size_t num_threads, size_t thread_offset ) :
+        size( num_threads   ),
+        root( thread_offset )
+        {
+            
+        }
+        
 		layout:: layout( const layout &other ) throw() :
 		size( other.size ),
 		root( other.root )
