@@ -22,7 +22,7 @@ namespace yocto
 		access( guard )
 		{}
 		
-		team::context:: ~context() throw() 
+		team::context:: ~context() throw()
 		{
 		}
 		
@@ -72,22 +72,10 @@ namespace yocto
 		{
 			terminate();
 		}
-		
-		
-		team:: team( const char *mutex_id) :
-		layout(),
-		_stop_( false    ),
-		guard_( mutex_id ),
-		start_(),
-		final_(),
-		ready_(0),
-		active_(),
-		task_(NULL),
-		wlen_( size * sizeof(member) ),
-		wksp_( memory::kind<memory::global>::acquire( wlen_ ) ),
-		counter_(0)
-		{
-			try
+        
+        void team:: initialize()
+        {
+            try
 			{
 				//--------------------------------------------------------------
                 // create the threads
@@ -118,7 +106,34 @@ namespace yocto
 				terminate();
 				throw;
 			}
-			
+            
+        }
+        
+        
+#define Y_TEAM_CTOR()           \
+_stop_( false    ),             \
+guard_( mutex_id ),             \
+start_(),                       \
+final_(),                       \
+ready_(0),                      \
+active_(),                      \
+task_(NULL),                    \
+wlen_( size * sizeof(member) ), \
+wksp_( memory::kind<memory::global>::acquire( wlen_ ) ), \
+counter_(0)
+        
+        team:: team( size_t num_threads, size_t thread_offset, const char *mutex_id ) :
+        layout(num_threads,thread_offset),
+        Y_TEAM_CTOR()
+        {
+            initialize();
+        }
+        
+		team:: team( const char *mutex_id) :
+		layout(),
+		Y_TEAM_CTOR()
+		{
+            initialize();
 		}
 		
 		void team:: launcher( void *args ) throw()

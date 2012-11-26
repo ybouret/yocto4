@@ -31,6 +31,8 @@ namespace yocto
 			 */
 			explicit layout(); 
 			
+            explicit layout( size_t num_threads, size_t thread_offset = 0);
+            
 			//! destructor.
 			virtual ~layout() throw();
 			
