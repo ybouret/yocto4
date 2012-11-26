@@ -9,6 +9,7 @@ namespace yocto
 {
 	namespace regex
 	{
+        //! compile an expression into an accepting pattern
 		pattern *compile( const string &expr, const pattern_dict *dict );
 		pattern *compile( const char   *expr, const pattern_dict *dict );
 	}

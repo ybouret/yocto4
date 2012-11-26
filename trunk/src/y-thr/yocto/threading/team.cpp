@@ -10,7 +10,17 @@ namespace yocto
 {
 	namespace threading
 	{
-		
+        void team:: split( size_t *counts, size_t num_counts, size_t huge ) throw()
+        {
+            assert( !(0==counts&&num_counts>0));
+            for( size_t rank = 0; rank < num_counts; ++rank )
+            {
+                const size_t todo = huge/(num_counts-rank);
+                counts[rank] = todo;
+                huge -= todo;
+            }
+        }
+        
 		//======================================================================
 		//
 		// team::context
