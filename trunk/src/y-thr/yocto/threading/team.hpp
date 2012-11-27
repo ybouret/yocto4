@@ -32,14 +32,13 @@ namespace yocto
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(context);
 			};
-			
-            
-            static void split( size_t *counts, size_t num_counts, size_t huge ) throw();
-            
             
 			//! what to do for each context
 			typedef  functor<void,TL1(context&)> task;
-			
+
+           
+            static void split( size_t &shift, size_t &count, size_t huge, size_t rank, size_t size) throw();
+						
 			//! build a team based on a parsed layout
 			explicit team(const char *mutex_id = 0);
 			
