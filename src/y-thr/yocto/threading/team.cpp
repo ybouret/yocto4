@@ -10,6 +10,23 @@ namespace yocto
 {
 	namespace threading
 	{
+        void team:: split( size_t &shift, size_t &count, size_t huge, size_t rank, size_t size) throw()
+        {
+            assert(size>0);
+            assert(rank<size);
+            size_t done = 0;
+            size_t todo = huge;
+            for(size_t i=0; i < rank; ++i )
+            {
+                todo = huge / (size-i);
+                huge -= todo;
+                done += todo;
+            }
+            shift = done;
+            count = todo;
+        }
+        
+#if 0
         void team:: split( size_t *counts, size_t num_counts, size_t huge ) throw()
         {
             assert( !(0==counts&&num_counts>0));
@@ -20,6 +37,21 @@ namespace yocto
                 huge -= todo;
             }
         }
+        
+        size_t divide( size_t huge, size_t rank, size_t size ) throw()
+        {
+            assert(size>0);
+            assert(rank<size);
+            for(size_t i=0;i<size;++i)
+            {
+                const size_t todo = huge/(size-i);
+                if( rank == i )
+                    return todo;
+                huge -= todo;
+            }
+            return 0;
+        }
+#endif
         
 		//======================================================================
 		//

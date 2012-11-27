@@ -282,7 +282,7 @@ namespace yocto
                     // Error evaluation : dX = Q'*(Phi*Q')^-1*Gamma
                     //
                     //==========================================================
-                    
+                    std::cerr << "X=" << X << std::endl;
                     //----------------------------------------------------------
                     // compute the exact term
                     //----------------------------------------------------------
@@ -312,9 +312,10 @@ namespace yocto
                     //----------------------------------------------------------
                     for(size_t i=M;i>0;--i)
                     {
-                        if( X[i] <= dX[i] ) X[i] = 0;
+                        if( Fabs(X[i]) <= dX[i] ) X[i] = 0;
+                        if( X[i] < 0 )
+                            throw exception("Invalid Constraints!");
                     }
-                    std::cerr << "C=" << X << std::endl;
                 }
                 
                 
