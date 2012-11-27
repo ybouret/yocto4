@@ -26,6 +26,7 @@ namespace yocto
                         lockable    &guard ) throw();				
 				~context() throw();
 				const size_t      rank;   //!< in 0..size-1
+                const size_t      indx;   //!< rank+1 in 1..size
 				const size_t      size;   //!< number of thread in the team
 				lockable         &access; //!< mutex
 				
@@ -36,7 +37,7 @@ namespace yocto
 			//! what to do for each context
 			typedef  functor<void,TL1(context&)> task;
 
-           
+            //! splitting prototype
             static void split( size_t &shift, size_t &count, size_t huge, size_t rank, size_t size) throw();
 						
 			//! build a team based on a parsed layout
