@@ -26,32 +26,6 @@ namespace yocto
             count = todo;
         }
         
-#if 0
-        void team:: split( size_t *counts, size_t num_counts, size_t huge ) throw()
-        {
-            assert( !(0==counts&&num_counts>0));
-            for( size_t rank = 0; rank < num_counts; ++rank )
-            {
-                const size_t todo = huge/(num_counts-rank);
-                counts[rank] = todo;
-                huge -= todo;
-            }
-        }
-        
-        size_t divide( size_t huge, size_t rank, size_t size ) throw()
-        {
-            assert(size>0);
-            assert(rank<size);
-            for(size_t i=0;i<size;++i)
-            {
-                const size_t todo = huge/(size-i);
-                if( rank == i )
-                    return todo;
-                huge -= todo;
-            }
-            return 0;
-        }
-#endif
         
 		//======================================================================
 		//
@@ -60,9 +34,13 @@ namespace yocto
 		//======================================================================
 		team::context:: context( const size_t thread_id, const size_t num_threads, lockable &guard ) throw() :
 		rank( thread_id   ),
+        indx( rank+1 ),
 		size( num_threads ),
 		access( guard )
-		{}
+		{
+            assert(size>0);
+            assert(rank<size);
+        }
 		
 		team::context:: ~context() throw()
 		{
