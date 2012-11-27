@@ -78,8 +78,6 @@ namespace yocto
             
             constraint & operator[]( size_t index ) throw();
             const constraint & operator[]( size_t index ) const throw();
-
-            //void run( chemsys &cs, double t );
             
 		private:
 			vector< constraint::ptr > constraints;

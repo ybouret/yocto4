@@ -19,8 +19,8 @@ namespace yocto
         class lexer 
         {
         public:
-            explicit lexer( const string &main_id );
-            explicit lexer( const char   *main_id );
+            explicit lexer( const string &main_id ); //!< build a lexer called main_id
+            explicit lexer( const char   *main_id ); //!< build a lexer called main_id
             virtual ~lexer() throw();
             
             lexical::scanner & first() throw();
