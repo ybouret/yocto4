@@ -55,7 +55,8 @@ namespace yocto
             explicit crew() :
             layout(),
             access( "crew::access" ),
-            start(),
+            enter(),
+            leave(),
             ready(0),
             built(0),
             proc(0),
@@ -81,14 +82,45 @@ namespace yocto
             
             void run( task &sub ) throw()
             {
+                //-- get a lock on a synchronized crew
+                for(;;)
+                {
+                    if( access.try_lock() )
+                    {
+                        if( ready >= size)
+                        {
+                            std::cerr << "[crew::run] threads are synchronized" << std::endl;
+                            break;
+                        }
+                        access.unlock();
+                    }
+                }
+                
+                //-- the access is locked
+                ready = 0;
+                activ = size;
+                
+                //-- prepare the enter condition
+                enter.broadcast();
+                
+                //-- prepare the task to perform
                 proc = &sub;
+                
+                //-- wait on leave while releasing access
+                leave.wait(access);
+                
+                std::cerr << "has run" << std::endl;
+                
+                //-- everybody is done
+                access.unlock();
             }
             
         private:
             mutex      access;
-            condition  start;
-            condition  synch;
+            condition  enter;
+            condition  leave;
             size_t     ready;
+            size_t     activ;
             size_t     built;
             task     *proc;
             bool      stop;
@@ -96,6 +128,7 @@ namespace yocto
             void     *wksp;
             size_t    nthr;
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
+            
             
             void initialize()
             {
@@ -123,27 +156,26 @@ namespace yocto
                         
                         built = ++nthr;
                     }
-                                        
+                    
                     //----------------------------------------------------------
                     //
                     // wait for first sync
                     //
                     //----------------------------------------------------------
-#if 1
                     for(;;)
                     {
                         if( access.try_lock() )
                         {
                             if( ready >= size)
                             {
-                                std::cerr << "threads are synchronized" << std::endl;
+                                std::cerr << "[crew] synchronized" << std::endl;
                                 access.unlock();
                                 break;
                             }
                             access.unlock();
                         }
                     }
-#endif
+
                     
                     //----------------------------------------------------------
                     //
@@ -159,18 +191,22 @@ namespace yocto
                 }
             }
             
+            
+            
 #define CREW_LOCK() scoped_lock guard(access)
 #define CERR_LOCK CREW_LOCK(); std::cerr
             
             void terminate() throw()
             {
-                std::cerr << "Terminate" << std::endl;
+                std::cerr << "[crew::terminate]" << std::endl;
                 stop = true;
                 
-                do
+                for(;;)
                 {
-                    start.broadcast();
-                } while( built>0);
+                    enter.broadcast();
+                    scoped_lock guard(access);
+                    if(built<=0) break;
+                }
                 
                 member *p = static_cast<member*>(wksp);
                 while(nthr>0)
@@ -212,7 +248,9 @@ namespace yocto
                 // tumble to the engine
                 //--------------------------------------------------------------
                 assert(args);
-                member     &m = *static_cast<member*>(args); assert(m.crew_p);
+                member     &m = *static_cast<member*>(args);
+                
+                assert(m.crew_p);
                 m.crew_p->engine(m.rank);
             }
             
@@ -226,34 +264,60 @@ namespace yocto
                 //--------------------------------------------------------------
                 context ctx(rank,size,access);
                 {
-                    CERR_LOCK << "enter thread " << size << "." << rank << std::endl;
+                    CERR_LOCK << "[crew::engine] start thread " << size << "." << rank << std::endl;
                 }
                 
                 
-                //--------------------------------------------------------------
-                //
-                // first synch
-                //
-                //--------------------------------------------------------------
-                access.lock();
-                ++ready;
-                std::cerr << "from "<< size << "." << rank << ": #ready=" << ready << std::endl;
-                start.wait(access);
-                --ready;
-               
-                { std::cerr << "running " << size << "." << rank << std::endl; }
                 
+                access.lock();
+            CYCLE:
+                //--------------------------------------------------------------
+                //
+                // CYCLE
+                //
+                //--------------------------------------------------------------
+                
+                //--------------------------------------------------------------
+                // LOCKED: update ready status
+                //--------------------------------------------------------------
+                ++ready;
+                //std::cerr << "[crew::engine] thread "<< size << "." << rank << ": #ready=" << ready << ", #activ=" << activ << std::endl;
+                
+                //--------------------------------------------------------------
+                // UNLOCK and WAIT
+                //--------------------------------------------------------------
+                enter.wait(access);
+                //{ std::cerr << "[crew] running " << size << "." << rank << std::endl; }
+                
+                //--------------------------------------------------------------
+                // LOCKED return: test for stop
+                //--------------------------------------------------------------
                 if( stop )
                 {
                     --built;
-                    std::cerr << "leave thread " << ctx.size << "." << ctx.rank << std::endl;
+                    std::cerr << "[crew] leave thread " << ctx.size << "." << ctx.rank << std::endl;
                     access.unlock();
                     return;
                 }
+                assert(0==ready); //-- set by run()
+                assert(activ>0);  //-- set by run()
                 access.unlock();
                 
+                
+                //--------------------------------------------------------------
+                // UNLOCKED: perform task associated to this local context
+                //--------------------------------------------------------------
                 assert(proc);
                 (*proc)(ctx);
+                
+                access.lock();
+                assert(activ>0);
+                if( --activ <= 0 )
+                {
+                    //std::cerr << "[crew::engine] all done" << std::endl;
+                    leave.signal();
+                }
+                goto CYCLE; // access is already locked at this point
             }
             
         };
@@ -277,6 +341,9 @@ public:
     
     void run( threading::crew::context &ctx )
     {
+        {scoped_lock guard( ctx.access );
+            std::cerr << "Sum::run " << ctx.rank << std::endl;
+        }
         
     }
     
@@ -293,6 +360,10 @@ YOCTO_UNIT_TEST_IMPL(crew)
     Sum s;
     threading::crew::task t( &s, & Sum::run );
     
+    std::cerr << "Cycle 1" << std::endl;
+    mt.run(t);
+    std::cerr << "Cycle 2" << std::endl;
+    mt.run(t);
     
 }
 YOCTO_UNIT_TEST_DONE()
