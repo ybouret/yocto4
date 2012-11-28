@@ -5,6 +5,7 @@
 
 #include "yocto/memory/global.hpp"
 #include "yocto/hw.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -14,6 +15,7 @@ namespace yocto
         class crew : public layout
         {
         public:
+            
             class context
             {
             public:
@@ -38,6 +40,8 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(context);
             };
             
+            typedef functor<void,TL1(context&)> task;
+            
             //! lacunar class for by-hand construction
             class member
             {
@@ -50,10 +54,11 @@ namespace yocto
             
             explicit crew() :
             layout(),
-            guard( "threading::crew" ),
-            ready(),
-            waiting(0),
-            engines(0),
+            access( "crew::access" ),
+            start(),
+            ready(0),
+            built(0),
+            proc(0),
             stop( false ),
             wlen( size * sizeof(member) ),
             wksp( memory::kind<memory::global>::acquire(wlen) ),
@@ -74,15 +79,22 @@ namespace yocto
                 return j;
             }
             
+            void run( task &sub ) throw()
+            {
+                proc = &sub;
+            }
+            
         private:
-            mutex     guard;
-            condition ready;
-            size_t    waiting;  //!< #waiting threads
-            size_t    engines;  //!< #engines
-            bool   stop;
-            size_t wlen;
-            void  *wksp;
-            size_t nthr;
+            mutex      access;
+            condition  start;
+            condition  synch;
+            size_t     ready;
+            size_t     built;
+            task     *proc;
+            bool      stop;
+            size_t    wlen;
+            void     *wksp;
+            size_t    nthr;
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
             
             void initialize()
@@ -109,8 +121,29 @@ namespace yocto
                         //------------------------------------------------------
                         new (&m.work) thread( crew::launch, &m);
                         
-                        engines = ++nthr;
+                        built = ++nthr;
                     }
+                                        
+                    //----------------------------------------------------------
+                    //
+                    // wait for first sync
+                    //
+                    //----------------------------------------------------------
+#if 1
+                    for(;;)
+                    {
+                        if( access.try_lock() )
+                        {
+                            if( ready >= size)
+                            {
+                                std::cerr << "threads are synchronized" << std::endl;
+                                access.unlock();
+                                break;
+                            }
+                            access.unlock();
+                        }
+                    }
+#endif
                     
                     //----------------------------------------------------------
                     //
@@ -118,8 +151,6 @@ namespace yocto
                     //
                     //----------------------------------------------------------
                     place();
-                    
-                    
                 }
                 catch(...)
                 {
@@ -128,6 +159,9 @@ namespace yocto
                 }
             }
             
+#define CREW_LOCK() scoped_lock guard(access)
+#define CERR_LOCK CREW_LOCK(); std::cerr
+            
             void terminate() throw()
             {
                 std::cerr << "Terminate" << std::endl;
@@ -135,9 +169,8 @@ namespace yocto
                 
                 do
                 {
-                    ready.broadcast();
-                }
-                while(engines>0);
+                    start.broadcast();
+                } while( built>0);
                 
                 member *p = static_cast<member*>(wksp);
                 while(nthr>0)
@@ -152,7 +185,7 @@ namespace yocto
             
             void  place(  )
             {
-                scoped_lock keep(guard);
+                CREW_LOCK();
                 assert( size > 0 );
                 const size_t  n  = hardware::nprocs();
                 member       *m  = static_cast<member *>(wksp);
@@ -187,36 +220,40 @@ namespace yocto
             void engine( size_t rank ) throw()
             {
                 //--------------------------------------------------------------
+                //
                 // Entering the engine
+                //
                 //--------------------------------------------------------------
-                context ctx(rank,size,guard);
+                context ctx(rank,size,access);
                 {
-                    scoped_lock keep( guard );
-                    std::cerr << "enter thread " << size << "." << rank << std::endl;
+                    CERR_LOCK << "enter thread " << size << "." << rank << std::endl;
                 }
                 
-                //--------------------------------------------------------------
-                //
-                // wait for job to do
-                //
-                //--------------------------------------------------------------
-                guard.lock();
-                ++waiting;
-                std::cerr << "#waiting=" << waiting << std::endl;
-                ready.wait(guard);
-                --waiting;
-                std::cerr << "running " << size << "." << rank << std::endl;
                 
+                //--------------------------------------------------------------
+                //
+                // first synch
+                //
+                //--------------------------------------------------------------
+                access.lock();
+                ++ready;
+                std::cerr << "from "<< size << "." << rank << ": #ready=" << ready << std::endl;
+                start.wait(access);
+                --ready;
+               
+                { std::cerr << "running " << size << "." << rank << std::endl; }
                 
                 if( stop )
                 {
-                    --engines;
-                    std::cerr << "leave thread " << ctx.size << "." << ctx.rank << ", #engines=" << engines << std::endl;
-                    guard.unlock();
+                    --built;
+                    std::cerr << "leave thread " << ctx.size << "." << ctx.rank << std::endl;
+                    access.unlock();
                     return;
                 }
-                guard.unlock();
+                access.unlock();
                 
+                assert(proc);
+                (*proc)(ctx);
             }
             
         };
@@ -227,9 +264,35 @@ namespace yocto
 
 using namespace yocto;
 
+#include "yocto/sequence/vector.hpp"
+
+class Sum
+{
+public:
+    const array<double> *pA, *pB;
+    array<double>   *pC;
+    
+    inline Sum() : pA(0), pB(0), pC(0) {}
+    inline ~Sum() throw() {}
+    
+    void run( threading::crew::context &ctx )
+    {
+        
+    }
+    
+    
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(Sum);
+};
+
+
 YOCTO_UNIT_TEST_IMPL(crew)
 {
-    threading::crew simd;
+    threading::crew mt;
     std::cerr << "Now in main program" << std::endl;
+    Sum s;
+    threading::crew::task t( &s, & Sum::run );
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
