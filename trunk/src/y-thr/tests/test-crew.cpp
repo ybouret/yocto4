@@ -299,8 +299,6 @@ namespace yocto
                     access.unlock();
                     return;
                 }
-                assert(0==ready); //-- set by run()
-                assert(activ>0);  //-- set by run()
                 access.unlock();
                 
                 
