@@ -50,31 +50,39 @@ namespace yocto
             
             explicit crew() :
             layout(),
-            guard( "crew" ),
+            guard( "threading::crew" ),
+            ready(),
+            waiting(0),
+            engines(0),
+            stop( false ),
             wlen( size * sizeof(member) ),
             wksp( memory::kind<memory::global>::acquire(wlen) ),
-            n_ok(0)
+            nthr(0)
             {
                 initialize();
             }
             
             virtual ~crew() throw()
             {
-                destroy();
+                terminate();
             }
             
             size_t cpu_index( size_t i, size_t n ) const throw()
             {
                 const size_t j =  ( root + i % size ) % n;
-                std::cerr << " |_ assign on CPU #" << j << "/" << n << std::endl;
+                std::cerr << "              |_ assign on CPU #" << j << "/" << n << std::endl;
                 return j;
             }
             
         private:
-            mutex  guard;
+            mutex     guard;
+            condition ready;
+            size_t    waiting;  //!< #waiting threads
+            size_t    engines;  //!< #engines
+            bool   stop;
             size_t wlen;
             void  *wksp;
-            size_t n_ok;
+            size_t nthr;
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
             
             void initialize()
@@ -82,66 +90,63 @@ namespace yocto
                 try
                 {
                     //----------------------------------------------------------
+                    //
                     // prepare the threads
+                    //
                     //----------------------------------------------------------
                     member *p = static_cast<member*>(wksp);
-                    while(n_ok<size)
+                    while(nthr<size)
                     {
-                        member &m = p[n_ok];
+                        member &m = p[nthr];
+                        //------------------------------------------------------
                         //-- set member info
+                        //------------------------------------------------------
                         m.crew_p = this;
-                        m.rank   = n_ok;
+                        m.rank   = nthr;
                         
+                        //------------------------------------------------------
                         //-- launch thread
+                        //------------------------------------------------------
                         new (&m.work) thread( crew::launch, &m);
                         
-                        n_ok++;
+                        engines = ++nthr;
                     }
+                    
                     //----------------------------------------------------------
+                    //
                     // place them
+                    //
                     //----------------------------------------------------------
                     place();
+                    
                     
                 }
                 catch(...)
                 {
-                    destroy();
+                    terminate();
                     throw;
                 }
             }
             
-            
-            void destroy() throw()
+            void terminate() throw()
             {
-                member *p = static_cast<member*>(wksp);
-                while(n_ok>0)
+                std::cerr << "Terminate" << std::endl;
+                stop = true;
+                
+                do
                 {
-                    --n_ok;
-                    member &m = p[n_ok];
+                    ready.broadcast();
+                }
+                while(engines>0);
+                
+                member *p = static_cast<member*>(wksp);
+                while(nthr>0)
+                {
+                    member &m = p[--nthr];
                     m.work.join();
                     m.work.~thread();
                 }
                 memory::kind<memory::global>::release(wksp, wlen);
-            }
-            
-            
-            static void launch(void *args) throw()
-            {
-                //--------------------------------------------------------------
-                // fetch data
-                //--------------------------------------------------------------
-                assert(args);
-                member &m = *static_cast<member*>(args); assert(m.crew_p);
-                crew   &c = *(m.crew_p);
-                
-                //--------------------------------------------------------------
-                // create context for task
-                //--------------------------------------------------------------
-                context ctx(m.rank,c.size,c.guard);
-                {
-                    scoped_lock keep( ctx.access );
-                    std::cerr << "In thread " << ctx.rank << "/" << ctx.size << std::endl;
-                }
             }
             
             
@@ -165,9 +170,55 @@ namespace yocto
                 {
                     thread::assign_cpu( m[i].work.get_handle(), cpu_index(i,n) );
                 }
+            }
+            
+            
+            static void launch(void *args) throw()
+            {
+                //--------------------------------------------------------------
+                // tumble to the engine
+                //--------------------------------------------------------------
+                assert(args);
+                member     &m = *static_cast<member*>(args); assert(m.crew_p);
+                m.crew_p->engine(m.rank);
+            }
+            
+            
+            void engine( size_t rank ) throw()
+            {
+                //--------------------------------------------------------------
+                // Entering the engine
+                //--------------------------------------------------------------
+                context ctx(rank,size,guard);
+                {
+                    scoped_lock keep( guard );
+                    std::cerr << "enter thread " << size << "." << rank << std::endl;
+                }
                 
+                //--------------------------------------------------------------
+                //
+                // wait for job to do
+                //
+                //--------------------------------------------------------------
+                guard.lock();
+                ++waiting;
+                std::cerr << "#waiting=" << waiting << std::endl;
+                ready.wait(guard);
+                --waiting;
+                std::cerr << "running " << size << "." << rank << std::endl;
+                
+                
+                if( stop )
+                {
+                    --engines;
+                    std::cerr << "leave thread " << ctx.size << "." << ctx.rank << ", #engines=" << engines << std::endl;
+                    guard.unlock();
+                    return;
+                }
+                guard.unlock();
                 
             }
+            
         };
         
     }
@@ -179,5 +230,6 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(crew)
 {
     threading::crew simd;
+    std::cerr << "Now in main program" << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
