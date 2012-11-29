@@ -31,22 +31,33 @@ namespace yocto
             };
         }
         
+#define Y_CREW_CTOR() \
+access( "crew::mutex" ),\
+enter(),\
+leave(),\
+ready(0),\
+activ(0),\
+built(0),\
+proc(0),\
+stop( false ),\
+wlen( size * sizeof(member) ),\
+wksp( memory::kind<memory::global>::acquire(wlen) ),\
+nthr(0)
+        
         crew:: crew() :
         layout(),
-        access( "crew::access" ),
-        enter(),
-        leave(),
-        ready(0),
-        activ(0),
-        built(0),
-        proc(0),
-        stop( false ),
-        wlen( size * sizeof(member) ),
-        wksp( memory::kind<memory::global>::acquire(wlen) ),
-        nthr(0)
+        Y_CREW_CTOR()
         {
             initialize();
         }
+        
+        crew:: crew(size_t num_threads,size_t off_threads) :
+        layout(num_threads,off_threads),
+        Y_CREW_CTOR()
+        {
+            initialize();
+        }
+        
         
         crew:: ~crew() throw()
         {
