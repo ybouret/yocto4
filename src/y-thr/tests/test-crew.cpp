@@ -72,9 +72,13 @@ public:
         
         const size_t i0 = w.start;
         const size_t i1 = w.final;
-        for( size_t i=i1; i >= i0; --i )
-            C[i] = A[i] + B[i];
-        
+        for( size_t iter=1; iter <= 10; ++iter)
+        {
+            for( size_t i=i1; i >= i0; --i )
+            {
+                C[i] = A[i] + B[i];
+            }
+        }
     }
     
     
