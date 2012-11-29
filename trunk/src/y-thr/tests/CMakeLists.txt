@@ -7,5 +7,6 @@ ENABLE_TESTING()
 ADD_TEST(Condition test-thr condition)
 ADD_TEST(Barrier   test-thr barrier)
 ADD_TEST(Team      test-thr team)
+ADD_TEST(Crew      test-thr crew)
 
 #ADD_CUSTOM_TARGET(check-thr COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-thr)
