@@ -43,7 +43,7 @@ namespace yocto
              \param length  computing length
              */
             template <class PTR_ARRAY,class U>
-            void dispatch( PTR_ARRAY &workers, U offset, size_t length ) const
+            void dispatch( PTR_ARRAY &workers, U offset, size_t length ) const throw()
             {
                 assert( workers.size() == size );
                 for( size_t rank=0;rank<size;++rank)
