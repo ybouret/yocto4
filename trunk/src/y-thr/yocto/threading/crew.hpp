@@ -32,6 +32,7 @@ namespace yocto
             typedef functor<void,TL1(context&)> task;
             
             explicit crew();
+            explicit crew(size_t num_threads,size_t off_threads);
             virtual ~crew() throw();
             void run( task &sub ) throw();
             
