@@ -35,6 +35,29 @@ namespace yocto
             virtual ~crew() throw();
             void run( task &sub ) throw();
             
+            //! automatically dispatch indices
+            /**
+             \param workers array of pointers to a class with some start/count/final members
+             \param offset  computing task offset
+             \param length  computing length
+             */
+            template <class PTR_ARRAY,class U>
+            void dispatch( PTR_ARRAY &workers, U offset, size_t length ) const
+            {
+                assert( workers.size() == size );
+                for( size_t rank=0;rank<size;++rank)
+                {
+                    const size_t i     = rank+1;
+                    const size_t count = length / ( size-rank );
+                    workers[i]->start  = offset;
+                    workers[i]->count  = count;
+                    offset += count;
+                    length -= count;
+                    workers[i]->final = offset-1;
+                }
+            }
+            
+            
         private:
             mutex      access; //!< shared mutex
             condition  enter;  //!< cycle synchro
@@ -49,8 +72,8 @@ namespace yocto
             size_t     nthr;   //!< for ctor/dtor
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
-            void initialize();
-            void terminate() throw();
+            void   initialize();
+            void   terminate() throw();
             size_t cpu_index( size_t i, size_t n ) const throw();
             void   place();
             void   engine( size_t rank ) throw();
