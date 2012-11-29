@@ -204,13 +204,11 @@ namespace yocto
             // LOCKED: update ready status
             //--------------------------------------------------------------
             ++ready;
-            //std::cerr << "[crew::engine] thread "<< size << "." << rank << ": #ready=" << ready << ", #activ=" << activ << std::endl;
             
             //--------------------------------------------------------------
             // UNLOCK and WAIT
             //--------------------------------------------------------------
             enter.wait(access);
-            //{ std::cerr << "[crew] running " << size << "." << rank << std::endl; }
             
             //--------------------------------------------------------------
             // LOCKED return: test for stop
@@ -218,7 +216,7 @@ namespace yocto
             if( stop )
             {
                 --built;
-                std::cerr << "[crew] leave thread " << ctx.size << "." << ctx.rank << std::endl;
+                std::cerr << "[crew::engine] shutdown thread " << ctx.size << "." << ctx.rank << std::endl;
                 access.unlock();
                 return;
             }
@@ -231,11 +229,14 @@ namespace yocto
             assert(proc);
             (*proc)(ctx);
             
+            
+            //--------------------------------------------------------------
+            // Get a lock to check that everyone is ok
+            //--------------------------------------------------------------
             access.lock();
             assert(activ>0);
             if( --activ <= 0 )
             {
-                //std::cerr << "[crew::engine] all done" << std::endl;
                 leave.signal();
             }
             goto CYCLE; // access is already locked at this point
@@ -251,7 +252,7 @@ namespace yocto
             {
                 if( access.try_lock() )
                 {
-                    if( ready >= size)
+                    if( ready >= size )
                     {
                         break;
                     }
