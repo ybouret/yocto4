@@ -1,4 +1,6 @@
 ADD_LIBRARY(module MODULE module.cpp module.hpp)
 ADD_EXECUTABLE(loader loader.cpp)
 TARGET_LINK_YOCTO(loader)
-
+IF(YOCTO_LINUX)
+TARGET_LINK_LIBRARIES(loader dl)
+ENDIF()
