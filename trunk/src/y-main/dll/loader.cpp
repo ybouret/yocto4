@@ -31,15 +31,15 @@ int main( int argc, char *argv[] )
         module m2( soname );
         
         std::cerr << "-- Loading plugin" << std::endl; std::cerr.flush();
-        plugin<ops> ops( m2, "load_ops" );
+        plugin<ops> plg( m2, "load_ops" );
         std::cerr << "-- Plugin is Loaded" << std::endl;
 		std::cerr.flush();
 		
-        assert(ops.api.add);
-        assert(ops.api.mul);
+        assert(plg->add);
+        assert(plg->mul);
         
-        std::cerr << "add: " << ops.api.add(2,3) << std::endl;
-        std::cerr << "mul: " << ops.api.mul(2,3) << std::endl;
+        std::cerr << "add: " << plg->add(2,3) << std::endl;
+        std::cerr << "mul: " << plg->mul(2,3) << std::endl;
 
         
         
