@@ -13,14 +13,21 @@ int main( int argc, char *argv[] )
         if( argc < 2 )
             throw exception("Usage: loader module.dll");
         const string soname = argv[1];
+        std::cerr << "-- Loading " << soname << std::endl;
         module  m( soname );
         std::cerr << "loaded <" << soname << ">" << std::endl;
-
+        
+        std::cerr << "-- Linking 'sum'" << std::endl;
         int (*sum)(int a, int b)  = 0;
         m.link( sum, "sum" );
         std::cerr << "sum@" << (void*)sum << std::endl;
+        std::cerr << "-- Executing function..." << std::endl;
         std::cerr << sum(1,2) << std::endl;
         
+        std::cerr << "-- Loading it a second time" << std::endl;
+        module m2( soname );
+        
+        std::cerr << "-- Done" << std::endl;
         return 0;
     }
     catch(const exception &e )
