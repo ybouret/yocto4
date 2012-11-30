@@ -5,6 +5,8 @@
 #include "yocto/rtld/export.hpp"
 #include "yocto/exception.hpp"
 
+#include <cstring>
+
 namespace yocto
 {
     
