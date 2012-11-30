@@ -24,6 +24,14 @@ namespace yocto
             fn = T( query(id) );
         }
         
+        template <typename T>
+        inline void link( T &fn , const char *id)
+        {
+            const string ID(id);
+            link<T>(fn,ID);
+        }
+
+        
 	private:
 		YOCTO_DISABLE_ASSIGN(module);
 		class  impl;
