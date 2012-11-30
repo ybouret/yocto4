@@ -22,14 +22,14 @@ __attribute__((destructor)) void OnQuit()
 #endif
 
 #if defined(YOCTO_WIN)
-#include <cstdio>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 extern "C" BOOL WINAPI DllMain(
                                HINSTANCE hinstDLL,  // handle to DLL module
                                DWORD fdwReason,     // reason for calling function
                                LPVOID lpReserved )  // reserved
 {
     std::cerr << "In DllMain" << std::endl;
-	puts("\t## C Code ##");
     // Perform actions based on the reason for calling.
     switch( fdwReason )
     {
@@ -61,7 +61,8 @@ extern "C" BOOL WINAPI DllMain(
 static int add( int a, int b ) throw() { return a+b; }
 static int mul( int a, int b ) throw() { return a*b; }
 
-YOCTO_EXPORT void YOCTO_API load_ops( ops *api )
+YOCTO_EXPORT 
+void YOCTO_API load_ops( ops *api )
 {
     assert(api!=0);
     api->add = add;

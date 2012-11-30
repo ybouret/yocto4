@@ -3,6 +3,7 @@
 
 #include "yocto/rtld/module.hpp"
 #include "yocto/rtld/export.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -16,9 +17,11 @@ namespace yocto
         dll(m)
         {
             clear();
-            void YOCTO_API (*ld)(void *) = 0; // loading function
-            dll.link(ld,ldname);              // fetch it in the dll
-            ld( (void*)&api );                // populate API
+            void (YOCTO_API *ld)(const C_API *) = 0; // loading function
+            dll.link(ld,ldname);                     // fetch it in the dll
+			if( !ld )                                // check
+			throw exception("plugin(no loader '%s')", ldname.c_str() ); 
+            ld( &api );                              // populate API
         }
         
         virtual ~plugin() throw() { clear(); }

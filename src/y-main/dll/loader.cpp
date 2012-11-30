@@ -21,6 +21,8 @@ int main( int argc, char *argv[] )
         std::cerr << "-- Linking 'sum'" << std::endl;
         int (*sum)(int a, int b)  = 0;
         m.link( sum, "sum" );
+		if( !sum )
+			throw exception("Can't find 'sum'");
         std::cerr << "sum@" << (void*)sum << std::endl;
         std::cerr << "-- Executing function..." << std::endl;
         std::cerr << sum(1,2) << std::endl;
@@ -28,9 +30,11 @@ int main( int argc, char *argv[] )
         std::cerr << "-- Loading it a second time" << std::endl;
         module m2( soname );
         
-        std::cerr << "-- Loading plugin" << std::endl;
+        std::cerr << "-- Loading plugin" << std::endl; std::cerr.flush();
         plugin<ops> ops( m2, "load_ops" );
-        
+        std::cerr << "-- Plugin is Loaded" << std::endl;
+		std::cerr.flush();
+		
         assert(ops.api.add);
         assert(ops.api.mul);
         
