@@ -18,6 +18,12 @@ namespace yocto
 		void *query( const string & ) throw();
 		void *query( const char   * );
 		
+        template <typename T>
+        inline void link( T &fn , const string &id)
+        {
+            fn = T( query(id) );
+        }
+        
 	private:
 		YOCTO_DISABLE_ASSIGN(module);
 		class  impl;
