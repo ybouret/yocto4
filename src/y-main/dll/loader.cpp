@@ -1,5 +1,6 @@
 #include "./module.hpp"
-#include "yocto/rtld/module.hpp"
+#include "yocto/rtld/plugin.hpp"
+
 #include "yocto/exception.hpp"
 #include <iostream>
 
@@ -26,6 +27,17 @@ int main( int argc, char *argv[] )
         
         std::cerr << "-- Loading it a second time" << std::endl;
         module m2( soname );
+        
+        std::cerr << "-- Loading plugin" << std::endl;
+        plugin<ops> ops( m2, "load_ops" );
+        
+        assert(ops.api.add);
+        assert(ops.api.mul);
+        
+        std::cerr << "add: " << ops.api.add(2,3) << std::endl;
+        std::cerr << "mul: " << ops.api.mul(2,3) << std::endl;
+
+        
         
         std::cerr << "-- Done" << std::endl;
         return 0;

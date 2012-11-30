@@ -5,4 +5,10 @@
 
 //int sum(int a, int b) throw();
 
+struct ops
+{
+    int (*add)(int,int);
+    int (*mul)(int,int);
+};
+
 #endif

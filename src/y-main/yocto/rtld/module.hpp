@@ -36,7 +36,6 @@ namespace yocto
 		YOCTO_DISABLE_ASSIGN(module);
 		class  impl;
 		impl  *impl_;
-		
 	};
 	
 }

@@ -22,8 +22,6 @@ __attribute__((destructor)) void OnQuit()
 #endif
 
 #if defined(YOCTO_WIN)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <cstdio>
 extern "C" BOOL WINAPI DllMain(
                                HINSTANCE hinstDLL,  // handle to DLL module
@@ -59,3 +57,14 @@ extern "C" BOOL WINAPI DllMain(
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
 #endif
+
+static int add( int a, int b ) throw() { return a+b; }
+static int mul( int a, int b ) throw() { return a*b; }
+
+YOCTO_EXPORT void YOCTO_API load_ops( ops *api )
+{
+    assert(api!=0);
+    api->add = add;
+    api->mul = mul;
+}
+
