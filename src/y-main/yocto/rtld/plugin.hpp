@@ -15,15 +15,18 @@ namespace yocto
     {
     public:
         explicit plugin( const module &m, const string &ldname) :
-        api(), 
+        api(),
         dll(m)
         {
-            clear();
-            void (YOCTO_API *ld)(const C_API *) = 0; // loading function
-            dll.link(ld,ldname);                     // fetch it in the dll
-			if( !ld )                                // check
-			throw exception("plugin(no loader '%s')", ldname.c_str() ); 
-            ld( &api );                              // populate API
+            initialize(ldname);
+        }
+        
+        explicit plugin( const module &m, const char *s) :
+        api(),
+        dll(m)
+        {
+            const string ldname = s;
+            initialize(ldname);
         }
         
         virtual ~plugin() throw() { clear(); }
@@ -34,7 +37,17 @@ namespace yocto
         module      dll; //!< to keep a reference
         YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);
         inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
+        inline void initialize( const string &ldname )
+        {
+            clear();
+            void (YOCTO_API *ld)(const C_API *) = 0; // loading function
+            dll.link(ld,ldname);                     // fetch it in the dll
+			if( !ld )                                // check
+                throw exception("plugin(no loader '%s')", ldname.c_str() );
+            ld( &api );                              // populate API
+        }
     };
+    
     
 }
 
