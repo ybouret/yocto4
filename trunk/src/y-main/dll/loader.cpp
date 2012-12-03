@@ -31,15 +31,17 @@ int main( int argc, char *argv[] )
         module m2( soname );
         
         std::cerr << "-- Loading plugin" << std::endl; std::cerr.flush();
-        interface<ops> plg( m2, "load_ops" );
+        interface<ops> I( m2, "load_ops" );
         std::cerr << "-- Plugin is Loaded" << std::endl;
 		std::cerr.flush();
 		
-        assert(plg->add);
-        assert(plg->mul);
+        assert(I->add);
+        assert(I->mul);
         
-        std::cerr << "add: " << plg->add(2,3) << std::endl;
-        std::cerr << "mul: " << plg->mul(2,3) << std::endl;
+        const interface<ops>::plugin p = I.handle;
+        
+        std::cerr << "add: " << p->add(2,3) << std::endl;
+        std::cerr << "mul: " << p->mul(2,3) << std::endl;
 
         
         

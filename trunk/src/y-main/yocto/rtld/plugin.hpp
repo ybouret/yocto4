@@ -47,7 +47,6 @@ namespace yocto
                 dll.link(ld,ldname);                     // fetch it in the dll
                 if( !ld )
                 {
-                    // check
                     throw exception("plugin<%s>(no loader '%s')", uid, ldname.c_str() );
                 }
                 ld( &api );                              // populate API
