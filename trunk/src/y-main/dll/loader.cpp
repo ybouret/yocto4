@@ -31,7 +31,7 @@ int main( int argc, char *argv[] )
         module m2( soname );
         
         std::cerr << "-- Loading plugin" << std::endl; std::cerr.flush();
-        plugin<ops> plg( m2, "load_ops" );
+        interface<ops> plg( m2, "load_ops" );
         std::cerr << "-- Plugin is Loaded" << std::endl;
 		std::cerr.flush();
 		
