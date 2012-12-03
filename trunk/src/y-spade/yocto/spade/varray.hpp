@@ -4,6 +4,7 @@
 #include "yocto/type-spec.hpp"
 #include "yocto/spade/data-block.hpp"
 #include "yocto/intrusive-ptr.hpp"
+#include "yocto/counted.hpp"
 #include "yocto/string.hpp"
 
 namespace yocto

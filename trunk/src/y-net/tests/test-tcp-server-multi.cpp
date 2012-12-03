@@ -7,6 +7,7 @@
 #include "yocto/net/socket-set.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"
+#include "yocto/counted.hpp"
 
 #include <cstdlib>
 

@@ -4,6 +4,7 @@
 #include "yocto/net/io/queue.hpp"
 #include "yocto/net/tcp-socket.hpp"
 #include "yocto/intrusive-ptr.hpp"
+#include "yocto/counted.hpp"
 
 namespace yocto
 {

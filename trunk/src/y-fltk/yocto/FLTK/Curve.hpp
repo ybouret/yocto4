@@ -4,6 +4,8 @@
 #include "yocto/string.hpp"
 #include "yocto/geom/v2d.hpp"
 #include "yocto/intrusive-ptr.hpp"
+#include "yocto/counted.hpp"
+
 #include "yocto/sequence/vector.hpp"
 #include "yocto/associative/set.hpp"
 

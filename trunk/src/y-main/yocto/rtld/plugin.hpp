@@ -26,15 +26,18 @@ namespace yocto
                 initialize(ldname);
             }
             
+            virtual ~content() throw() {}
+            
             const C_API api;
             const char *uid;
             
         private:
-            module dll;
-
+            YOCTO_DISABLE_COPY_AND_ASSIGN(content);
+            module       dll;
+            
             inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
-
-            inline void initialize( const string &ldname )
+            
+            inline void initialize(const string &ldname )
             {
                 uid = typeid(C_API).name();
                 clear();
@@ -51,13 +54,13 @@ namespace yocto
         };
         typedef shared_ptr<content> handle;
         const handle                h;
-
+        
         explicit plugin( const module &m, const string &ldname) :
         h( new content(m,ldname) ) {}
         
         virtual ~plugin() throw() {}
         
-        //! use -> transitivity
+        //! use "->" transitivity
         const C_API * operator->() const throw() { return &(h->api); }
         
     private:
