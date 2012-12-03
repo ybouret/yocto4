@@ -2,6 +2,7 @@
 #define YOCTO_AQ_SPECIES_INCLUDED 1
 
 #include "yocto/intrusive-ptr.hpp"
+#include "yocto/counted.hpp"
 #include "yocto/string.hpp"
 #include "yocto/associative/set.hpp"
 

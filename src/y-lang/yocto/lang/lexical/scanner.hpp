@@ -2,6 +2,7 @@
 #define YOCTO_LANG_SCANNER_INCLUDED 1
 
 #include "yocto/intrusive-ptr.hpp"
+#include "yocto/counted.hpp"
 #include "yocto/lang/lexeme.hpp"
 #include "yocto/lang/lexical/rule.hpp"
 #include "yocto/rx/pattern/dict.hpp"

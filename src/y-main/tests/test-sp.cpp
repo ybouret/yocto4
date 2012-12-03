@@ -23,6 +23,7 @@ YOCTO_UNIT_TEST_IMPL(shared_ptr)
 YOCTO_UNIT_TEST_DONE()
 
 #include "yocto/intrusive-ptr.hpp"
+#include "yocto/counted.hpp"
 
 namespace 
 {
