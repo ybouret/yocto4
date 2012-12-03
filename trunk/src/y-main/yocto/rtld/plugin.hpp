@@ -35,6 +35,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(content);
+            module       dll;
             
             explicit content( const module &m, const string &ldname ) :
             api(),
@@ -46,14 +47,9 @@ namespace yocto
                 void (YOCTO_API *ld)(const C_API *) = 0; // loading function
                 dll.link(ld,ldname);                     // fetch it in the dll
                 if( !ld )
-                {
                     throw exception("plugin<%s>(no loader '%s')", uid, ldname.c_str() );
-                }
-                ld( &api );                              // populate API
-                
+                ld( &api );                              // populate API                
             }
-            
-            module       dll;
             
             inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
         };
@@ -64,16 +60,10 @@ namespace yocto
         {
         public:
             inline plugin(const module &m, const string &ldname) :
-            ld( content::create(m,ldname) )
-            {
-                ld->withhold();
-            }
+            ld( content::create(m,ldname) ) { ld->withhold(); }
             
             inline plugin( const plugin &other ) throw() :
-            ld( other.ld )
-            {
-                ld->withhold();
-            }
+            ld( other.ld ) { ld->withhold(); }
             
             virtual ~plugin() throw()
             {
@@ -85,8 +75,8 @@ namespace yocto
                 }
             }
             
-            const C_API   * operator->() const throw() { return &(ld->api); }
-            const content & operator*()  const throw() { return *ld; }
+            inline const C_API   * operator->() const throw() { return &(ld->api); }
+            inline const content & operator*()  const throw() { return *ld; }
             
         private:
             YOCTO_DISABLE_ASSIGN(plugin);
