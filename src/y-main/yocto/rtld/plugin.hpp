@@ -4,40 +4,42 @@
 #include "yocto/rtld/module.hpp"
 #include "yocto/rtld/export.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/counted.hpp"
+
 #include <typeinfo>
 #include <cstring>
 
 namespace yocto
 {
     
+    //! interface to a C-API
     template <typename C_API>
-    class plugin
+    class interface
     {
     public:
-        class content : public object
+        //! holds information: API/DLL
+        class content : public object, public counted
         {
         public:
-            explicit content( const module &m, const string &ldname ) :
-            api(),
-            uid(0),
-            dll(m)
-            {
-                initialize(ldname);
-            }
             
-            virtual ~content() throw() {}
+            virtual ~content() throw() { clear(); }
             
             const C_API api;
             const char *uid;
             
+            static inline
+            content * create( const module &m, const string &ldname )
+            {
+                return new content(m,ldname);
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(content);
-            module       dll;
             
-            inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
-            
-            inline void initialize(const string &ldname )
+            explicit content( const module &m, const string &ldname ) :
+            api(),
+            uid(0),
+            dll(m)
             {
                 uid = typeid(C_API).name();
                 clear();
@@ -49,24 +51,66 @@ namespace yocto
                     throw exception("plugin<%s>(no loader '%s')", uid, ldname.c_str() );
                 }
                 ld( &api );                              // populate API
+                
             }
             
+            module       dll;
+            
+            inline void clear() throw() { memset( (void*)&api,0,sizeof(C_API)); }
         };
-        typedef shared_ptr<content> handle;
-        const handle                h;
         
-        explicit plugin( const module &m, const string &ldname) :
-        h( new content(m,ldname) ) {}
         
-        virtual ~plugin() throw() {}
+        //! dedicated reference counted smart pointer
+        class plugin
+        {
+        public:
+            inline plugin(const module &m, const string &ldname) :
+            ld( content::create(m,ldname) )
+            {
+                ld->withhold();
+            }
+            
+            inline plugin( const plugin &other ) throw() :
+            ld( other.ld )
+            {
+                ld->withhold();
+            }
+            
+            virtual ~plugin() throw()
+            {
+                assert(ld);
+                if( ld->liberate() )
+                {
+                    delete ld;
+                    ld = 0;
+                }
+            }
+            
+            const C_API   * operator->() const throw() { return &(ld->api); }
+            const content & operator*()  const throw() { return *ld; }
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(plugin);
+            content *ld;
+            
+        };
+        
+        const plugin handle;
+        
+        explicit interface( const module &m, const string &ldname) :
+        handle( m, ldname )
+        {
+        }
+        
+        virtual ~interface() throw() {}
         
         //! use "->" transitivity
-        const C_API * operator->() const throw() { return &(h->api); }
+        const C_API * operator->() const throw() { return &( (*handle).api ); }
         
     private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(interface);
+        
     };
-    
     
 }
 
