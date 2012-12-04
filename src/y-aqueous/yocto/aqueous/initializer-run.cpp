@@ -282,7 +282,7 @@ namespace yocto
                     // Error evaluation : dX = Q'*(Phi*Q')^-1*Gamma
                     //
                     //==========================================================
-                    std::cerr << "X=" << X << std::endl;
+                    std::cerr << "Xraw=" << X << std::endl;
                     //----------------------------------------------------------
                     // compute the exact term
                     //----------------------------------------------------------
@@ -305,7 +305,7 @@ namespace yocto
                         const double dX10 = pow(10.0,ceil(log10(dX_i)));
                         dX[i] = dX10;
                     }
-                    //std::cerr << "Xerr=" << dX << std::endl;
+                    std::cerr << "Xerr=" << dX << std::endl;
                     
                     //----------------------------------------------------------
                     // cut-off
@@ -316,6 +316,7 @@ namespace yocto
                         if( X[i] < 0 )
                             throw exception("Invalid Constraints!");
                     }
+                    std::cerr << "Xend=" << X << std::endl;
                 }
                 
                 
