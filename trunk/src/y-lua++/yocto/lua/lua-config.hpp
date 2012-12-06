@@ -18,7 +18,7 @@ namespace yocto
 			template <typename T>
 			static T Get( lua_State *L, const string &name );
 			
-			//! implemented for lua_Number and string
+			//! implemented for lua_Number, bool and string
 			template <typename T>
 			static void GetTable( lua_State *L, const string &name, sequence<T> &seq );
 			

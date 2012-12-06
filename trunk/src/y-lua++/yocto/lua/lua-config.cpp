@@ -23,6 +23,15 @@ namespace yocto
 				throw exception("'%s' is not a Number", &name[0] );
 			return lua_tonumber(L,-1);
 		}
+        
+        template <>
+		bool Config::Get<bool>( lua_State *L, const string &name )
+		{
+			GetGlobal_(L,name);
+			if( !lua_isboolean(L,-1) )
+				throw exception("'%s' is not a Boolean", &name[0] );
+			return lua_toboolean(L,-1) == 1;
+		}
 		
 		template <>
 		string Config::Get<string>( lua_State *L, const string &name )
