@@ -17,8 +17,8 @@ namespace yocto {
 			const real_t z  = Fabs(x);
 			const real_t t  = REAL(1.0)/(REAL(1.0)+REAL(0.5)*z);
 			const real_t ans= t*Exp(-z*z-REAL(1.26551223)+t*(REAL(1.00002368)+t*(REAL(0.37409196)+t*(REAL(0.09678418)+
-																									  t*(-REAL(0.18628806)+t*(REAL(0.27886807)+t*(-REAL(1.13520398)+t*(REAL(1.48851587)+
-																																									   t*(-REAL(0.82215223)+t*REAL(0.17087277))))))))));
+                                                                                                     t*(-REAL(0.18628806)+t*(REAL(0.27886807)+t*(-REAL(1.13520398)+t*(REAL(1.48851587)+
+                                                                                                                                                                      t*(-REAL(0.82215223)+t*REAL(0.17087277))))))))));
 			return x >= REAL(0.0) ? ans : REAL(2.0)-ans;
 		}
 		
@@ -26,15 +26,6 @@ namespace yocto {
 			return REAL(1.0)-qerfc( x );
 		}
 		
-#if 0
-		static
-		real_t zqerf( real_t x, void *args) throw()
-		{
-			assert( args );
-			const real_t p = *(real_t *)args;
-			return qerf(x)-p;
-		}
-#endif
 		
 		namespace
 		{
@@ -97,7 +88,7 @@ namespace yocto {
 		
 		
 		
-		real_t gamma_i( real_t a, real_t x ) 
+		real_t gamma_i( real_t a, real_t x )
 		{
 			static const real_t EPS = numeric<real_t>::epsilon;
 			//std::cerr << "gamma_i(" << a << "," << x << ")" << std::endl;
