@@ -5,7 +5,7 @@
 
 using namespace yocto;
 
-static inline int search_char( const char C, const char *tab )
+static int search_char( const char C, const char *tab )
 {
     for( int j=0; j < 64; ++j )
     {

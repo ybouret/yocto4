@@ -39,4 +39,8 @@ intel:
 
 codeblocks:
 	@bash ${CREATE} src codeblocks ${BUILD_TYPE}
+
+pathscale:
+	@bash ${CREATE} src pathscale ${BUILD_TYPE}
+
 	
