@@ -71,7 +71,7 @@ case $BUILD_TOOLS in
     ;;
     
   "pathscale" )
-      export CC=pacthcc; export CXX=pathCC;
+      export CC=pathcc; export CXX=pathCC;
       BUILD_SUBDIR=pathscale/$BUILD_TYPE;
       BUILD_GENERATOR="$WITH_MAKEFILES"
       cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
