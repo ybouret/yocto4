@@ -4,7 +4,7 @@
 #include <cstdio>
 
 using namespace yocto;
-#define REQUIRE( A )    {if (!(A)) printf( "Assertion failed at %s(%i)\n", _vfs::get_base_name(__FILE__), __LINE__ );}
+#define REQUIRE( A )    do{ if (!(A)) printf( "Assertion failed at %s(%i): %s \n", _vfs::get_base_name(__FILE__), __LINE__ , #A);} while(false)
 
 //------------------------------------------------------------------------
 
