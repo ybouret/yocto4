@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/in-stack.hpp"
 #include "yocto/string/vfs-utils.hpp"
+#include <cstdio>
 
 using namespace yocto;
 #define REQUIRE( A )    {if (!(A)) printf( "Assertion failed at %s(%i)\n", _vfs::get_base_name(__FILE__), __LINE__ );}
