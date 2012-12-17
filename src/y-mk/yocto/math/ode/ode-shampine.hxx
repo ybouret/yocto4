@@ -1,5 +1,5 @@
 #define STIFF_STEP shampine
-
+#define STIFF_NAME "Shampine"
 
 #define GAM (REAL(1.0)/REAL(2.0))
 #define A21 REAL(2.0)

@@ -44,12 +44,12 @@ namespace yocto
                 assert( n == dfdy.cols );
                 assert( n == a.rows );
                 assert( n == a.cols );
-                
+                //std::cerr << "** " << STIFF_NAME << ": y=" << y << ", x=" << x << ", htry=" << htry << ", yscal=" << yscal << std::endl;
                 //==============================================================
                 // Saving data
                 //==============================================================
                 real_t xsav = x;
-                for(size_t i=1;i<=n;i++) 
+                for(size_t i=n;i>0;--i)
                 { 
                     ysav[i]  =    y[i];
                     dysav[i] = dydx[i]; 
@@ -72,7 +72,7 @@ namespace yocto
                     
                     if( !LU.build(a) )
                     {
-                        throw exception("singular jacobian");
+                        throw exception("%s step: singular jacobian", STIFF_NAME);
                     }
                     
                     for( size_t i=1; i<=n ; ++i )
@@ -105,10 +105,12 @@ namespace yocto
                         err[i]= E1*g1[i]+E2*g2[i]+E3*g3[i]+E4*g4[i];
                     }
                     
+                    //-- update x
                     x=xsav+h;
                     if ( Fabs(x - xsav) <= 0 )
-                        throw exception("stepsize not significant in stiff");
+                        throw exception("%s: step size not significant", STIFF_NAME);
                     
+                    //-- error control
                     real_t errmax=0;
                     for(size_t i=1;i<=n;i++) 
                         errmax=max_of<real_t>(errmax,Fabs(err[i]/yscal[i]));
@@ -124,7 +126,6 @@ namespace yocto
                         hnext=SAFETY*h*Pow(errmax,PSHRNK);
                         h=(h >= REAL(0.0) ? max_of<real_t>(hnext,SHRNK*h) : min_of<real_t>(hnext,SHRNK*h));
                     }
-                    //if( jtry >= 10 ) exit(1);
                 }
                 
             }
