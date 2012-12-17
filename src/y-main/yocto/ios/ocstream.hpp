@@ -25,6 +25,8 @@ namespace yocto
 			
 			virtual void operator()(const char *fmt,...) YOCTO_PRINTF_CHECK(2,3);
 			
+            static void overwrite( const string &filename );
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(ocstream);
 		};

@@ -45,6 +45,12 @@ namespace yocto
 			if( ferror(handle) != 0 )
 				throw libc::exception( EIO, "ocstream('%s',...)", format );
 		}
+        
+        void ocstream:: overwrite( const string &filename )
+        {
+            ios::ocstream fp(filename,false);
+            fp.flush();
+        }
 		
 	}
 	
