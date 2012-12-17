@@ -72,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(stiff)
         
         ios::ocstream fp("stiff-rs.dat",false);
         fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
-        for( size_t i=0; i < 1000; ++i )
+        for( size_t i=0; i < 500; ++i )
         {
             Real x1 = i     * dx;
             Real x2 = (i+1) * dx;
@@ -92,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(stiff)
         
         ios::ocstream fp("stiff-kr.dat",false);
         fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
-        for( size_t i=0; i < 1000; ++i )
+        for( size_t i=0; i < 500; ++i )
         {
             Real x1 = i     * dx;
             Real x2 = (i+1) * dx;

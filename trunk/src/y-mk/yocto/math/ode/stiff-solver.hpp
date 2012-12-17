@@ -6,7 +6,7 @@
 
 namespace yocto
 {
-    namespace math 
+    namespace math
     {
         namespace ode
         {
@@ -29,11 +29,11 @@ namespace yocto
 								const T           x2,
 								T                &h1
 								);
-                          
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(stiff_solver);
             };
-         
+            
             template <
             typename T,
             template <class> class STEP
@@ -46,11 +46,11 @@ namespace yocto
                 explicit stiff_driver( T user_eps ) : stiff_solver<T>( user_eps ), step_() {}
                 virtual ~stiff_driver() throw() {}
                 
-                inline void start( size_t nv ) 
+                inline void start( size_t nv )
                 {
                     assert(nv>0);
-                    this->prepare( nv );
-                    step_.prepare( nv );
+                    this->prepare( nv ); //-- solver data
+                    step_.prepare( nv ); //-- step data
                 }
                 
                 void operator()(equation         &derivs,

@@ -25,10 +25,10 @@ namespace yocto
 			void stiff_solver<real_t>:: operator()(equation            &derivs,
                                                    jacobian            &jacobn,
                                                    stiff_step<real_t>  &forward,
-                                                   array<real_t>   &ystart,
-                                                   const real_t     x1,
-                                                   const real_t     x2,
-                                                   real_t          &h1
+                                                   array<real_t>       &ystart,
+                                                   const real_t         x1,
+                                                   const real_t         x2,
+                                                   real_t              &h1
                                                    )
 			{
 				const size_t   n    = ystart.size();
@@ -39,7 +39,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				assert( common_size()         == n );
 				assert( forward.common_size() == n );
-				
+                //std::cerr << "Stiff: y=" << ystart << ": x1=" << x1 << ", x2=" << x2 << ", h=" << h1 << std::endl;
 				
 				//--------------------------------------------------------------
 				// initialize
@@ -101,7 +101,6 @@ namespace yocto
 				for( size_t i=n; i >0; --i ) 
 					ystart[i] = y[i];
 				h1 = h;
-				
 			}
             
             
