@@ -63,9 +63,9 @@ namespace yocto
                 for( size_t jtry=1;; ++jtry )
                 {
                     const real_t __diag = REAL(1.0)/(GAM*h);
-                    for( size_t i=1;i<=n;++i)
+                    for( size_t i=n;i>0;--i)
                     {
-                        for( size_t j=1; j <= n; ++j )
+                        for( size_t j=n; j > 0; --j )
                             a[i][j] = -dfdy[i][j];
                         a[i][i] += __diag;
                     }
@@ -75,7 +75,7 @@ namespace yocto
                         throw exception("%s step: singular jacobian", STIFF_NAME);
                     }
                     
-                    for( size_t i=1; i<=n ; ++i )
+                    for( size_t i=n; i>0 ; --i )
                         g1[i]=dysav[i]+h*C1X*dfdx[i];
                     LU.solve(a,g1);
                     for (size_t i=1;i<=n;i++)
@@ -83,26 +83,26 @@ namespace yocto
                     
                     x=xsav+A2X*h;
                     derivs(dydx,x,y);
-                    for(size_t i=1; i<=n; ++i )
+                    for( size_t i=n; i>0 ; --i )
                         g2[i]=dydx[i]+h*C2X*dfdx[i]+C21*g1[i]/h;
                     LU.solve(a,g2);
-                    for(size_t i=1; i<=n; ++i )
+                    for( size_t i=n; i>0 ; --i )
                         y[i]=ysav[i]+A31*g1[i]+A32*g2[i];
                     
                     x=xsav+A3X*h;
                     derivs(dydx,x,y);
-                    for(size_t i=1; i<=n; ++i )
+                    for( size_t i=n; i>0 ; --i )
                         g3[i]=dydx[i]+h*C3X*dfdx[i]+(C31*g1[i]+C32*g2[i])/h;
                     LU.solve(a,g3);
                     
-                    for(size_t i=1; i<=n; ++i )
+                    for( size_t i=n; i>0 ; --i )
                         g4[i]=dydx[i]+h*C4X*dfdx[i]+(C41*g1[i]+C42*g2[i]+C43*g3[i])/h;
                     LU.solve(a,g4);
                     
-                    for( size_t i=1; i <= n; ++i )
+                    for( size_t i=n; i>0 ; --i )
                     {
-                        y[i]  = ysav[i]+B1*g1[i]+B2*g2[i]+B3*g3[i]+B4*g4[i];
-                        err[i]= E1*g1[i]+E2*g2[i]+E3*g3[i]+E4*g4[i];
+                        y[i]   = ysav[i]+B1*g1[i]+B2*g2[i]+B3*g3[i]+B4*g4[i];
+                        err[i] = E1*g1[i]+E2*g2[i]+E3*g3[i]+E4*g4[i];
                     }
                     
                     //-- update x
@@ -112,7 +112,7 @@ namespace yocto
                     
                     //-- error control
                     real_t errmax=0;
-                    for(size_t i=1;i<=n;i++) 
+                    for( size_t i=n; i>0 ; --i )
                         errmax=max_of<real_t>(errmax,Fabs(err[i]/yscal[i]));
                     errmax /= eps;
                     if (errmax <= REAL(1.0))

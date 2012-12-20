@@ -53,13 +53,14 @@ namespace yocto
 				const size_t cols;   //!< #cols...
 				const size_t size;   //!< rows * cols
 				
-				matrix( const matrix & );
-				matrix & operator=( const matrix & other );
-				void assign( const matrix &other ) throw(); //!< same sizes
-				void diag( const array<T> &w);
+				matrix( const matrix & ); //!< copy
+				matrix & operator=( const matrix & other ); //!< assign
+				void assign( const matrix &other ) throw(); //!< MUST have same sizes
+				void diag( const array<T> &w ); //!< make a diagonal matrix
+                
                 
 				void swap_with( matrix &M ) throw();
-				void make( size_t r, size_t c );
+				void make( size_t r, size_t c ); //!< set to zero
 				void release() throw();
 				
 				row &       operator[]( size_t r )       throw();
