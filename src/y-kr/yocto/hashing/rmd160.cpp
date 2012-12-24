@@ -321,6 +321,10 @@ namespace yocto
             
         }
         
+#if defined(_MSC_VER)
+		// init MDbuf
+#pragma warning ( disable : 4351 )
+#endif
         rmd160 :: rmd160()  throw() :
         function(__length,__window),
         RMD(),
