@@ -11,6 +11,10 @@ namespace yocto
         {
         }
         
+#if defined(_MSC_VER)
+		// init B
+#pragma warning ( disable : 4351 )
+#endif
         rmd:: rmd() throw() :
         length(0),
         nx(0),
