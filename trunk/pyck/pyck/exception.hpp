@@ -1,4 +1,4 @@
-#ifndef PYCK_EXECPTION_INCLUDED
+#ifndef PYCK_EXCEPTION_INCLUDED
 #define PYCK_EXCEPTION_INCLUDED 1
 
 #include "./os.hpp"

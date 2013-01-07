@@ -3,7 +3,8 @@
 #include "./mutex.hpp"
 #include "./exception.hpp"
 #include "./rand32.hpp"
-#include "./thread.hpp"
+#include "./team.hpp"
+#include "./c_array.hpp"
 
 #include <iostream>
 
@@ -20,6 +21,26 @@ void ThreadProc(void *args) throw()
     std::cerr << "From Thread" << std::endl;
     std::cerr.flush();
 }
+
+class Task : public Runnable
+{
+public:
+    const int id;
+    explicit Task( Mutex &m, int n) throw() : Runnable(m), id( n )  {}
+    virtual ~Task() throw() {}
+    
+private:
+    Task( const Task & );
+    Task &operator=( const Task ) throw();
+    
+    virtual void run() throw()
+    {
+        PYCK_LOCK(mutex);
+        std::cerr << "In Task #" << id << std::endl;
+        std::cerr.flush();
+    }
+    
+};
 
 #define __EXCP(CODE) do { try { CODE; } catch( const std::exception &e ) { std::cerr << e.what() << std::endl; } } while(false)
 
@@ -126,6 +147,38 @@ int main(int argc, char *argv[])
         Thread thr2( ThreadProc, &data);
         thr1.join();
         thr2.join();
+        std::cerr << std::endl;
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Testing Runnable
+        ////////////////////////////////////////////////////////////////////////
+        std::cerr << "-- Testing Runnable" << std::endl;
+        Task task1( mtx, 63 );
+        Task task2( mtx, 78 );
+        
+        task2.start();
+        task1.start();
+        
+        task1.join();
+        task2.join();
+        std::cerr << std::endl;
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Testing Team
+        ////////////////////////////////////////////////////////////////////////
+        std::cerr << "-- Testing Team" << std::endl;
+        const size_t nt = 4;
+        C_Array<int> arr(nt);
+        for( size_t i=0; i<nt;++i) arr[i] = r1.leq(100);
+        
+        Team<Task> team(nt);
+        for(size_t i=0;i<nt;++i)
+        {
+            team.enqueue(arr[i]);
+        }
+        
+        
+        
         
         return 0;
     }
