@@ -3,9 +3,12 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+
 #if defined(PYCK_WIN)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <cstdio>
+#define snprintf _snprintf
 #endif
 
 static inline void clear_buffer( char *buffer ) throw()
