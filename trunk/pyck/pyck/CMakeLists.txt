@@ -11,6 +11,7 @@ SET(pyck_srcs
 	wtime.hpp	wtime.cpp
 	sort.hpp	sort.cpp
 	rand32.hpp	rand32.cpp
+	thread.hpp	thread.cpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
