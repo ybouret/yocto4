@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "./error.hpp"
 #include <cstring>
 #include <cctype>
@@ -73,7 +74,7 @@ void Win32CriticalError( uint32_t err, const char *when ) throw()
 void SystemFormatError( int64_t err, char *buffer, size_t buflen) throw()
 {
 #if defined(PYCK_WIN)
-    Win32FormatError(err, buffer, buflen);
+    Win32FormatError(uint32_t(err), buffer, buflen);
 #endif
     
 #if defined(PYCK_BSD)
@@ -85,7 +86,7 @@ void SystemFormatError( int64_t err, char *buffer, size_t buflen) throw()
 void SystemCriticalError( int64_t err, const char *when ) throw()
 {
 #if defined(PYCK_WIN)
-    Win32CriticalError(err,when);
+    Win32CriticalError( uint32_t(err),when);
 #endif
     
 #if defined(PYCK_BSD)

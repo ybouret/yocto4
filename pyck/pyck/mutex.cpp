@@ -2,6 +2,8 @@
 #include "./error.hpp"
 #include <cstring>
 
+Mutex Mutex::Giant;
+
 void Mutex:: clear() throw()
 {
     memset( &mutex_,0,sizeof(mutex_));
