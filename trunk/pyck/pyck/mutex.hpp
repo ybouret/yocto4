@@ -24,7 +24,9 @@ public:
     
     virtual void lock()   throw();
     virtual void unlock() throw();
-    
+
+    static Mutex Giant;
+
 private:
     Mutex( const Mutex & );
     Mutex &operator=( const Mutex & );
@@ -39,5 +41,7 @@ private:
     void clear() throw();
     
 };
+
+#define PYCK_GIANT_LOCK() PYCK_LOCK( Mutex::Giant )
 
 #endif

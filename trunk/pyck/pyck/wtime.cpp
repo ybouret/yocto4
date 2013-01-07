@@ -1,5 +1,6 @@
 #include "./wtime.hpp"
 #include "./exception.hpp"
+#include "./mutex.hpp"
 
 #if defined(PYCK_BSD)
 #include <cerrno>
@@ -31,7 +32,7 @@ static void __wtime_fetch( int64_t &Q )
 {
     if( ! ::QueryPerformanceCounter( (LARGE_INTEGER *) &Q )  )
     {
-        throw Exception( " ::QueryPerformanceCounter", ::GetLastError(),  );
+        throw Exception( " ::QueryPerformanceCounter", ::GetLastError() );
     }
 }
 #endif
