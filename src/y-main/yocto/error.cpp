@@ -28,7 +28,7 @@ namespace yocto
 	
 	namespace
 	{
-		static inline void clear_buffer( char *buffer )
+		static inline void clear_buffer( char *buffer ) throw()
 		{
 			size_t len = strlen( buffer );
 			while( len-- > 0 && isspace( buffer[len] ) ) buffer[len] = 0;

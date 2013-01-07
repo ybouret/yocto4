@@ -20,6 +20,7 @@ namespace yocto
 		
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(wtime);
+        
 #if defined(YOCTO_BSD)
 		int64_t data[2];
 #endif
