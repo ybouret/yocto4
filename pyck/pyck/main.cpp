@@ -3,8 +3,23 @@
 #include "./mutex.hpp"
 #include "./exception.hpp"
 #include "./rand32.hpp"
+#include "./thread.hpp"
 
 #include <iostream>
+
+struct ThreadData
+{
+    Mutex *mutex;
+};
+
+void ThreadProc(void *args) throw()
+{
+    assert(args);
+    ThreadData &data = *(ThreadData *)args;
+    PYCK_LOCK( *data.mutex );
+    std::cerr << "From Thread" << std::endl;
+    std::cerr.flush();
+}
 
 #define __EXCP(CODE) do { try { CODE; } catch( const std::exception &e ) { std::cerr << e.what() << std::endl; } } while(false)
 
@@ -99,6 +114,18 @@ int main(int argc, char *argv[])
             const double spd = (N/ell) * 1e-6;
             std::cerr << "Speed=" << spd << " M/s, Ave" << i << "=" << ave << std::endl;
         }
+        std::cerr << std::endl;
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Testing Threads
+        ////////////////////////////////////////////////////////////////////////
+        std::cerr << "-- Testing Threads" << std::endl;
+        ThreadData data;
+        data.mutex = &mtx;
+        Thread thr1( ThreadProc, &data);
+        Thread thr2( ThreadProc, &data);
+        thr1.join();
+        thr2.join();
         
         return 0;
     }
