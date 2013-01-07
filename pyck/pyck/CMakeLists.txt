@@ -1,5 +1,9 @@
 SET(pyck_srcs
-	exception.hpp exception.cpp)
+	os.hpp		os.cpp
+	error.hpp	error.cpp
+	exception.hpp 	exception.cpp
+	lockable.hpp	lockable.cpp
+)
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
 
