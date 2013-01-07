@@ -4,6 +4,7 @@ SET(pyck_srcs
 	exception.hpp 	exception.cpp
 	lockable.hpp	lockable.cpp
 	mutex.hpp	mutex.cpp
+	wtime.hpp	wtime.cpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
