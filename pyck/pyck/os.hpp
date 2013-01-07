@@ -85,6 +85,7 @@ typedef __int64 int64_t;
 
 
 const char *GetPlatformName() throw();
+uint32_t    IntegerHash32( uint32_t ) throw();
 
 #if defined(__GNUC__)
 //! \warning for C++ methods, increase count by 1!
