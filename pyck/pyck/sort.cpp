@@ -1,5 +1,5 @@
 #include "./sort.hpp"
-
+#include <cstdlib>
 
 static inline int compare_doubles( const void *lhs, const void *rhs ) throw()
 {
