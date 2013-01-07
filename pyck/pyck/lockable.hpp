@@ -1,6 +1,7 @@
 #ifndef PYCK_LOCKABLE_INCLUDED
 #define PYCK_LOCKABLE_INCLUDED 1
 
+#include "./os.hpp"
 
 class Lockable
 {
@@ -27,6 +28,10 @@ private:
     ScopedLock(const ScopedLock &);
     ScopedLock &operator=( const ScopedLock & );
 };
+
+#define PYCK_LOCK__(ID) __PYCK_Lock ## ID
+#define PYCK_LOCK_(ID) PYCK_LOCK__(ID)
+#define PYCK_LOCK(LOCKABLE) volatile ScopedLock PYCK_LOCK_(__LINE__)(LOCKABLE)
 
 
 #endif
