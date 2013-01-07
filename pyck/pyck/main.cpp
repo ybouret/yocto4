@@ -169,14 +169,21 @@ int main(int argc, char *argv[])
         std::cerr << "-- Testing Team" << std::endl;
         const size_t nt = 4;
         C_Array<int> arr(nt);
-        for( size_t i=0; i<nt;++i) arr[i] = r1.leq(100);
+        Team<Task>   team(nt);
         
-        Team<Task> team(nt);
-        for(size_t i=0;i<nt;++i)
+        for( size_t j=0; j < 2; ++j )
         {
-            team.enqueue(arr[i]);
+            std::cerr << "Start" << std::endl;
+            for( size_t i=0; i<nt;++i)
+                arr[i] = r1.leq(100);
+            
+            for(size_t i=0;i<nt;++i)
+            {
+                team.enqueue(arr[i]);
+            }
+            team.finish();
+            std::cerr << "done" << std::endl << std::endl;
         }
-        
         
         
         
