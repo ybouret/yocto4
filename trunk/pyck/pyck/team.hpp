@@ -10,7 +10,8 @@ template <typename RUNNABLE>
 class Team
 {
 public:
-    Mutex mutex;
+    Mutex mutex; //!< sharable mutex
+    
     explicit Team(size_t n) :
     task( static_cast<RUNNABLE *>(operator new( __check(n) * sizeof(RUNNABLE) )) ),
     maxi( n ),
