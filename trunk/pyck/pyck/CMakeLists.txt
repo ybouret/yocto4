@@ -9,6 +9,8 @@ SET(pyck_srcs
 	lockable.hpp	lockable.cpp
 	mutex.hpp	mutex.cpp
 	wtime.hpp	wtime.cpp
+	sort.hpp	sort.cpp
+	rand32.hpp	rand32.cpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
