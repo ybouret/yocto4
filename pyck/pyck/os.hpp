@@ -83,6 +83,14 @@ typedef __int64 int64_t;
 #error "PYCK_HAS_STDINT failure"
 #endif
 
+//! integer to type mapping.
+template <int v>
+struct int2type {
+    enum
+    {
+        value = v //!< a different class for each v.
+    };
+};
 
 const char *GetPlatformName() throw();
 uint32_t    IntegerHash32( uint32_t ) throw();
