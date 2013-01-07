@@ -32,7 +32,7 @@ const char * Exception:: what() const throw() { return what_; }
 
 #include "./error.hpp"
 
-Exception:: Exception(const char *when, int64_t err ) throw()
+Exception:: Exception(int64_t err, const char *when ) throw()
 {
     assert(when!=0);
     memset(what_,0,Length);

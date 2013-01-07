@@ -10,7 +10,7 @@ public:
     static const size_t Length = 128;
     
     Exception(const char *fmt,...) throw() PYCK_PRINTF_CHECK(2,3);
-    Exception(const char *when, int64_t err ) throw();
+    Exception(int64_t err, const char *when) throw();
     Exception( const Exception & ) throw();
     virtual ~Exception() throw();
     
