@@ -13,7 +13,9 @@ Runnable:: ~Runnable() throw()
 {
 }
 
-
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
 Runnable:: Runnable( Mutex &m) throw() :
 mutex(m),
 thr(0),

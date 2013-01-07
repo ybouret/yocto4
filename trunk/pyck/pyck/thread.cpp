@@ -42,7 +42,7 @@ handle_()
 #if defined(PYCK_WIN)
     handle_ = ::CreateThread(0 ,
                              0 ,
-                             thread::launch,
+                             Thread::Launch,
                              this,
                              0,
                              & id32_ );
@@ -67,7 +67,7 @@ void Thread:: join() throw()
 #if defined(PYCK_WIN)
     if( ::WaitForSingleObject( handle_ , INFINITE ) != WAIT_OBJECT_0 )
     {
-        SystemCriticalError( ::GetLastError, "WaitForSingleObject" );
+        SystemCriticalError( ::GetLastError(), "WaitForSingleObject" );
     }
 #endif
 }
