@@ -9,3 +9,6 @@ SET(pyck_srcs
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
 
+ADD_EXECUTABLE(test-pyck main.cpp)
+TARGET_LINK_LIBRARIES(test-pyck pyck)
+
