@@ -12,6 +12,8 @@ SET(pyck_srcs
 	sort.hpp	sort.cpp
 	rand32.hpp	rand32.cpp
 	thread.hpp	thread.cpp
+	runnable.hpp	runnable.cpp	team.hpp
+	c_array.hpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )

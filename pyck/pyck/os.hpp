@@ -102,4 +102,46 @@ uint32_t    IntegerHash32( uint32_t ) throw();
 #	define PYCK_PRINTF_CHECK(i,j)
 #endif
 
+#define PYCK_ROUND_BYTE( ROUND_LN2 ) ( (size_t)( 1 << (ROUND_LN2) ) )
+#define PYCK_ROUND_MASK( ROUND_LN2 ) ( (size_t)(PYCK_ROUND_BYTE( ROUND_LN2 )-0x1) )
+#define PYCK_ROUND_NOT2( ROUND_LN2 ) ( (size_t)(~PYCK_ROUND_MASK( ROUND_LN2 ) )   )
+#define PYCK_ROUND(ROUND_LN2,N)      ( ( (size_t)(N) + PYCK_ROUND_MASK(ROUND_LN2) ) & PYCK_ROUND_NOT2( ROUND_LN2 ) )
+
+//! 1 byte  | 8 bits
+#define PYCK_ROUND1(N)    PYCK_ROUND(0,N)
+
+//! 2 bytes  | 16 bits
+#define PYCK_ROUND2(N)    PYCK_ROUND(1,N)
+
+//! 4 bytes  | 32 bits
+#define PYCK_ROUND4(N)    PYCK_ROUND(2,N)
+
+//! 8 bytes  | 64 bits
+#define PYCK_ROUND8(N)    PYCK_ROUND(3,N)
+
+//! 16 bytes | 128 bits
+#define PYCK_ROUND16(N)   PYCK_ROUND(4,N)
+
+//! 32 bytes | 256 bits
+#define PYCK_ROUND32(N)   PYCK_ROUND(5,N)
+
+//! 64 bytes | 512 bits
+#define PYCK_ROUND64(N)   PYCK_ROUND(6,N)
+
+//! 128 bytes | 1024 bits
+#define PYCK_ROUND128(N)  PYCK_ROUND(7,N)
+
+//! 256 bytes | 2048 bits
+#define PYCK_ROUND256(N)  PYCK_ROUND(8,N)
+
+#define PYCK_MEMALIGN(N)  PYCK_ROUND16(N)
+
+#define PYCK_U64_FOR_SIZE(N) ( PYCK_ROUND8(N) >> 3 )
+#define PYCK_U64_FOR_ITEM(T) PYCK_U64_FOR_SIZE(sizeof(T))
+
+#define PYCK_U32_FOR_SIZE(N) ( PYCK_ROUND4(N) >> 2 )
+#define PYCK_U32_FOR_ITEM(T) PYCK_U32_FOR_SIZE(sizeof(T))
+
+
+
 #endif
