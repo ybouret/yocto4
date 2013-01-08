@@ -26,3 +26,15 @@ TARGET_LINK_LIBRARIES(test-pyck pyck)
 IF( CMAKE_SYSTEM_NAME MATCHES "Linux" )
 	TARGET_LINK_LIBRARIES(test-pyck pthread)
 ENDIF()
+
+INCLUDE(../R.cmake)
+IF(R_FOUND)
+	GET_TARGET_PROPERTY(pyckLib pyck LOCATION )
+	MESSAGE( STATUS "pyckLib=${pyckLib}" )
+
+	ADD_CUSTOM_TARGET(pyck_R ALL
+        COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.cpp "${pyckLib}"
+        COMMENT "Building .Call wink module"
+        DEPENDS pyck 
+        SOURCES pyck_R.cpp)
+ENDIF()
