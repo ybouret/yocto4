@@ -1,5 +1,5 @@
 all:
-	@R CMD SHLIB -c --preclean -o pyck_R.so *.cpp
+	@R CMD SHLIB -c --preclean -o tests/pyck_R.so *.cpp
 
 clean:
-	@rm -f pyck_R.so
+	@rm -f tests/pyck_R.so

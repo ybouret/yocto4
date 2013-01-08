@@ -19,13 +19,7 @@ SET(pyck_srcs
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
-
-ADD_EXECUTABLE(test-pyck main.cpp)
-TARGET_LINK_LIBRARIES(test-pyck pyck)
-
-IF( CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD" )
-	TARGET_LINK_LIBRARIES(test-pyck pthread)
-ENDIF()
+ADD_SUBDIRECTORY(tests)
 
 INCLUDE(../R.cmake)
 IF(R_FOUND)
@@ -33,8 +27,8 @@ IF(R_FOUND)
 	MESSAGE( STATUS "pyckLib=${pyckLib}" )
 
 	ADD_CUSTOM_TARGET(pyck_R ALL
-        COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.cpp "${pyckLib}"
+        COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.cpp "${pyckLib}"
         COMMENT "Building .Call wink module"
         DEPENDS pyck 
-        SOURCES pyck_R.cpp)
+        SOURCES R++.hpp pyck_R.cpp)
 ENDIF()

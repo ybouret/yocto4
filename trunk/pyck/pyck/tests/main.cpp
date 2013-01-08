@@ -1,10 +1,10 @@
-#include "./wtime.hpp"
-#include "./error.hpp"
-#include "./mutex.hpp"
-#include "./exception.hpp"
-#include "./rand32.hpp"
-#include "./team.hpp"
-#include "./c_array.hpp"
+#include "../wtime.hpp"
+#include "../error.hpp"
+#include "../mutex.hpp"
+#include "../exception.hpp"
+#include "../rand32.hpp"
+#include "../team.hpp"
+#include "../c_array.hpp"
 
 #include <iostream>
 
