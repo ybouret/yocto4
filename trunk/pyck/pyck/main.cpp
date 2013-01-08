@@ -123,17 +123,21 @@ int main(int argc, char *argv[])
         {
             UniformGenerator &R = *r[i];
             R.seed( WallTime::Seed() );
-            double sum = 0;
+            double sum_x  = 0;
+            double sum_x2 = 0;
             chrono.start();
             const size_t N = 1000000;
             for( size_t j=0; j < N; ++j )
             {
-                sum += R.get<double>();
+                const double x = R.get<double>();
+                sum_x  += x;
+                sum_x2 += x*x;
             }
             const double ell = chrono.query();
-            const double ave = sum /= N;
+            const double ave = sum_x / N;
+            const double sig = (sum_x2 - 2*ave*sum_x + N * ave*ave )/(N-1);
             const double spd = (N/ell) * 1e-6;
-            std::cerr << "Speed=" << spd << " M/s, Ave" << i << "=" << ave << std::endl;
+            std::cerr << "Speed" << i << "=" << spd << " M/s, Ave=" << ave << ", Sig=" << sig << std::endl;
         }
         std::cerr << std::endl;
         
