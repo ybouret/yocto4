@@ -32,7 +32,7 @@ static void __wtime_fetch( int64_t &Q )
 {
     if( ! ::QueryPerformanceCounter( (LARGE_INTEGER *) &Q )  )
     {
-        throw Exception( " ::QueryPerformanceCounter", ::GetLastError() );
+        throw Exception( ::GetLastError(), "::QueryPerformanceCounter" );
     }
 }
 #endif
@@ -57,7 +57,7 @@ void WallTime:: start()
     PYCK_GIANT_LOCK();
     if( ! :: QueryPerformanceFrequency( &F ) )
     {
-        throw Exception( "::QueryPerformanceFrequency", ::GetLastError() );
+        throw Exception(::GetLastError(), "::QueryPerformanceFrequency");
     }
     freq = l_one / static_cast<long double>( F.QuadPart );
     __wtime_fetch( quad );
