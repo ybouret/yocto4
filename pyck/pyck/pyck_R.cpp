@@ -61,7 +61,13 @@ SEXP dumpMat( SEXP args ) throw()
         }
         
         CMatrix<double> M(m.rows,m.cols);
-        
+        for(size_t i=0; i < m.rows; ++i )
+        {
+            for(size_t j=0; j < m.cols; ++j )
+            {
+                M[i][j] = m[j][i];
+            }
+        }
         
         RMatrix<double> q( m.rows, m.cols );
         memcpy( &q[0][0], &m[0][0], sizeof(double) * q.items );
