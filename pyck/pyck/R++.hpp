@@ -88,8 +88,34 @@ public:
     
 };
 
+//! Core Matrix
+class CoreMatrix
+{
+public:
+    const size_t rows;
+    const size_t cols;
+    const size_t items;
+    
+    virtual ~CoreMatrix() throw()
+    {
+        (size_t&)rows  = 0;
+        (size_t&)cols  = 0;
+        (size_t&)items = 0;
+    }
+    
+protected:
+    explicit CoreMatrix() throw() :
+    rows(0), cols(0), items(0)
+    {}
+    
+private:
+    CoreMatrix(const CoreMatrix &);
+    CoreMatrix&operator=(const CoreMatrix&);
+};
+
+//! R matrix, columns major
 template <typename T>
-class RMatrix : public RObject
+class RMatrix : public RObject, public CoreMatrix
 {
 public:
     class Column
@@ -113,17 +139,11 @@ public:
         const size_t rows;
     };
     
-    const size_t rows;
-    const size_t cols;
-    const size_t items;
     
-    virtual ~RMatrix() throw() { operator delete(mcol); }
+    
+    virtual ~RMatrix() throw() { operator delete(mcol); mcol=0; }
     
     explicit RMatrix( SEXP args ) :
-    RObject(),
-    rows(0),
-    cols(0),
-    items(0),
     Rmat( coerceVector(args, RGetData<T>::Conv) ),
     data( RGetData<T>::Cast(Rmat) ),
     mcol(0)
@@ -132,10 +152,6 @@ public:
     }
     
     explicit RMatrix( size_t r, size_t c ) :
-    RObject(),
-    rows(0),
-    cols(0),
-    items(0),
     Rmat( allocMatrix( RGetData<T>::Conv, r, c) ),
     data( RGetData<T>::Cast(Rmat) ),
     mcol(0)
@@ -171,6 +187,81 @@ private:
             new (mcol+i) Column(p,rows);
         }
     }
+};
+
+//! C++ Matrix, rows major
+template <typename T>
+class CMatrix : public CoreMatrix
+{
+public:
+    class Row
+    {
+    public:
+        explicit Row( T *p, size_t c ) throw() :
+        data(p),
+        cols(c)
+        {
+        }
+        
+        T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
+        const T & operator[](size_t c) const throw() { assert(c<cols); return data[c]; }
+
+        
+    private:
+        Row(const Row &);
+        Row&operator=(const Row &);
+        ~Row();
+        T *data;
+    public:
+        const size_t cols;
+    };
+    
+    explicit CMatrix(size_t r, size_t c ) :
+    data(0),
+    mrow(0)
+    {
+        build(r,c);
+    }
+    
+    virtual ~CMatrix() throw()
+    {
+        operator delete(mrow);
+        delete []data;
+        mrow = 0;
+        data = 0;
+    }
+    
+private:
+    T   *data;
+    Row *mrow;
+    
+    CMatrix( const CMatrix & );
+    CMatrix&operator=(const CMatrix &);
+    
+    inline void build(size_t r,size_t c)
+    {
+        assert(r>0);
+        assert(c>0);
+        (size_t &)rows  = r;
+        (size_t &)cols  = c;
+        (size_t &)items = rows * cols;
+        data = new T[items];
+        try
+        {
+            mrow = static_cast<Row *>( operator new(rows*sizeof(Row)) );
+            T *p = data;
+            for(size_t i=0; i < rows; ++i, p += cols )
+            {
+                new (mrow+i) Row(p,cols);
+            }
+        }
+        catch(...)
+        {
+            delete []data;
+            throw;
+        }
+    }
+    
 };
 
 
