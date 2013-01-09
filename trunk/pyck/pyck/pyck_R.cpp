@@ -68,7 +68,13 @@ SEXP dumpMat( SEXP args ) throw()
                 M[i][j] = m[j][i];
             }
         }
+        Rprintf("M=\n");
+        M.print();
         
+        CMatrix<double> Q(args);
+        Rprintf("Q=\n");
+        Q.print();
+
         RMatrix<double> q( m.rows, m.cols );
         memcpy( &q[0][0], &m[0][0], sizeof(double) * q.items );
         

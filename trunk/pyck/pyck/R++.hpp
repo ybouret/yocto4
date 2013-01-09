@@ -32,7 +32,7 @@ public:
     virtual ~RObject() throw() { if(is_R)  { UNPROTECT(1); } }
     
     inline SEXP operator*() const throw() { return get_SEXP(); }
-
+    
     
 protected:
     explicit RObject() throw() : is_R(false) {}
@@ -56,7 +56,7 @@ public:
     
     inline T       & operator[](size_t indx) throw()       { assert(indx<size); return data[indx]; }
     inline const T & operator[](size_t indx) const throw() { assert(indx<size); return data[indx]; }
-   
+    
     explicit RVector( SEXP args ) :
     RObject(),
     Rvec( coerceVector(args, RGetData<T>::Conv) ),
@@ -75,7 +75,7 @@ public:
         set_R();
     }
     
-        
+    
 private:
     RVector(const RVector &);
     RVector&operator=(const RVector &);
@@ -165,7 +165,7 @@ public:
     const Column & operator[](size_t c) const throw() { assert(c<cols); return mcol[c]; }
     
 private:
-   
+    
     RMatrix(const RMatrix&);
     RMatrix&operator=(const RMatrix &);
     virtual SEXP get_SEXP() const throw() { return Rmat; }
@@ -207,7 +207,7 @@ public:
         
         T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
         const T & operator[](size_t c) const throw() { assert(c<cols); return data[c]; }
-
+        
         
     private:
         Row(const Row &);
@@ -218,11 +218,38 @@ public:
         const size_t cols;
     };
     
-    explicit CMatrix(size_t r, size_t c ) :
+    //! build a local matrix
+    explicit CMatrix(size_t r, size_t c) :
     data(0),
     mrow(0)
     {
         build(r,c);
+    }
+    
+    //! convert an R matrix to a C matrix
+    explicit CMatrix( SEXP args ) :
+    data(0),
+    mrow(0)
+    {
+        //-- find R parameters
+        SEXP Rmat = coerceVector(args, RGetData<T>::Conv);
+        SEXP Rdim = getAttrib(Rmat, R_DimSymbol);
+        const size_t r = INTEGER(Rdim)[0];
+        const size_t c = INTEGER(Rdim)[1];
+        const T     *p = RGetData<T>::Cast(Rmat);
+        
+        //-- prepare this matrix
+        build(r,c);
+        
+        //-- copy items
+        for(size_t i=0;i<rows;++i)
+        {
+            const size_t offset = i*cols;
+            for(size_t j=0;j<cols;++j)
+            {
+                data[offset+j] = p[i+rows*j];
+            }
+        }
     }
     
     virtual ~CMatrix() throw()
@@ -235,7 +262,17 @@ public:
     
     Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
     const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
-
+    
+    
+    inline void print() const
+    {
+        for(size_t i=0; i < rows; ++i )
+        {
+            for(size_t j=0;j<cols;++j)
+                Rprintf(" %g", (*this)[i][j]);
+            Rprintf("\n");
+        }
+    }
     
 private:
     T   *data;
