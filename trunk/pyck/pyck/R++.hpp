@@ -1,74 +1,177 @@
-#ifndef PYCK_R_INCLUDED
-#define PYCK_R_INCLUDED 1
-
-
-#include "./exception.hpp"
+#ifndef RXX_INCLUDED
+#define RXX_INCLUDED 1
 
 #include <R.h>
 #include <Rinternals.h>
+#include <new>
 
-
-
+//! template for R data type handling
 template <typename T> struct RGetData;
 
+//! for REAL
 template <>
 struct RGetData<double>
 {
-    static inline double * Cast( SEXP Rvec ) { return REAL(Rvec); }
+    static inline double * Cast( SEXP Rvec ) { assert(Rvec); return REAL(Rvec); }
     enum { Conv = REALSXP };
 };
 
+//! for INT
 template <>
 struct RGetData<int>
 {
-    static inline int * Cast( SEXP Rvec ) { return INTEGER(Rvec); }
+    static inline int * Cast( SEXP Rvec ) { assert(Rvec); return INTEGER(Rvec); }
     enum { Conv = INTSXP };
 };
 
+//! R Object
+class RObject
+{
+public:
+    const bool is_R; //!< handled by R, return value
+    virtual ~RObject() throw() { if(is_R)  { UNPROTECT(1); } }
+    
+    inline SEXP operator*() const throw() { return get_SEXP(); }
 
+    
+protected:
+    explicit RObject() throw() : is_R(false) {}
+    inline void set_R() throw() { (bool&)is_R = true; }
+    virtual SEXP get_SEXP() const throw() = 0;
+    
+    
+private:
+    RObject( const RObject &);
+    RObject&operator=(const RObject &);
+};
+
+//! R vector
 template <typename T>
-class RVector
+class RVector : public RObject
 {
 public:
     virtual ~RVector() throw()
     {
-        if(is_R)  { UNPROTECT(1); }
     }
     
     inline T       & operator[](size_t indx) throw()       { assert(indx<size); return data[indx]; }
     inline const T & operator[](size_t indx) const throw() { assert(indx<size); return data[indx]; }
    
     explicit RVector( SEXP args ) :
+    RObject(),
     Rvec( coerceVector(args, RGetData<T>::Conv) ),
     data( RGetData<T>::Cast(Rvec) ),
-    is_R( false ),
     size( length(Rvec) )
     {
     }
     
     explicit RVector( size_t n ) :
+    RObject(),
     Rvec( allocVector(RGetData<T>::Conv,n) ),
     data( RGetData<T>::Cast(Rvec) ),
-    is_R( true ),
     size( length(Rvec) )
     {
         PROTECT(Rvec);
+        set_R();
     }
     
-    inline SEXP operator*() const throw() { return Rvec; }
         
 private:
     RVector(const RVector &);
     RVector&operator=(const RVector &);
-    SEXP       Rvec;
-    T         *data;
-    const bool is_R;
+    SEXP         Rvec;
+    T           *data;
+    virtual SEXP get_SEXP() const throw() { return Rvec; }
     
 public:
     const size_t size;
     
 };
 
+template <typename T>
+class RMatrix : public RObject
+{
+public:
+    class Column
+    {
+    public:
+        inline Column( T *p, size_t r) throw() :
+        data(p),
+        rows(r)
+        {
+        }
+        
+        T  & operator[]( size_t r ) throw()          { assert(r<rows); return data[r]; }
+        const T & operator[](size_t r) const throw() { assert(r<rows); return data[r]; }
+        
+    private:
+        T *data;
+        Column( const Column & );
+        Column&operator=(const Column &);
+        ~Column() throw();
+    public:
+        const size_t rows;
+    };
+    
+    const size_t rows;
+    const size_t cols;
+    const size_t items;
+    
+    virtual ~RMatrix() throw() { operator delete(mcol); }
+    
+    explicit RMatrix( SEXP args ) :
+    RObject(),
+    rows(0),
+    cols(0),
+    items(0),
+    Rmat( coerceVector(args, RGetData<T>::Conv) ),
+    data( RGetData<T>::Cast(Rmat) ),
+    mcol(0)
+    {
+        get_dims();
+    }
+    
+    explicit RMatrix( size_t r, size_t c ) :
+    RObject(),
+    rows(0),
+    cols(0),
+    items(0),
+    Rmat( allocMatrix( RGetData<T>::Conv, r, c) ),
+    data( RGetData<T>::Cast(Rmat) ),
+    mcol(0)
+    {
+        PROTECT(Rmat);
+        set_R();
+        get_dims();
+    }
+    
+    Column &       operator[](size_t c) throw()       { assert(c<cols); return mcol[c]; }
+    const Column & operator[](size_t c) const throw() { assert(c<cols); return mcol[c]; }
+    
+private:
+   
+    RMatrix(const RMatrix&);
+    RMatrix&operator=(const RMatrix &);
+    virtual SEXP get_SEXP() const throw() { return Rmat; }
+    
+    SEXP    Rmat;
+    T      *data;
+    Column *mcol;
+    
+    inline void get_dims()
+    {
+        SEXP      Rdim  = getAttrib(Rmat, R_DimSymbol);
+        (size_t &)rows  = INTEGER(Rdim)[0];
+        (size_t &)cols  = INTEGER(Rdim)[1];
+        (size_t &)items = rows * cols;
+        mcol = static_cast<Column *>( operator new( cols * sizeof(Column) ));
+        T *p = data;
+        for( size_t i=0; i < cols; ++i, p += rows )
+        {
+            new (mcol+i) Column(p,rows);
+        }
+    }
+};
 
 
 #endif
