@@ -75,7 +75,6 @@ public:
         set_R();
     }
     
-    
 private:
     RVector(const RVector &);
     RVector&operator=(const RVector &);
