@@ -201,6 +201,8 @@ public:
         data(p),
         cols(c)
         {
+            assert(data!=0);
+            assert(cols>0);
         }
         
         T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
@@ -230,6 +232,10 @@ public:
         mrow = 0;
         data = 0;
     }
+    
+    Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
+    const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
+
     
 private:
     T   *data;
