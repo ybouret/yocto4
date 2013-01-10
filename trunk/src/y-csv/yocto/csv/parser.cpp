@@ -118,7 +118,6 @@ namespace yocto
                     Line &line = lines.back();
                     for( syntax::parse_node *item = node->children().head; item; item=item->next)
                     {
-                        string        tmp;
                         const lexeme *lx = item->lex();
                         if( item->label == "STRING" )
                         {

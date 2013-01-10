@@ -127,9 +127,9 @@ namespace
                     chrono.start();
                     gen.proc->shuffle(indx(), blk);
                     permTmx += chrono.query();
-                    v1.push_back( indx[i1] );
-                    v2.push_back( indx[i2] );
-                    v3.push_back( indx[i3] );
+                    v1.push_back( double(indx[i1]) );
+                    v2.push_back( double(indx[i2]) );
+                    v3.push_back( double(indx[i3]) );
                 }
                 double ave1,sig1,ave2,sig2,ave3,sig3;
                 ave_and_sig(ave1, sig1, v1); ave1 /= (blk-1); sig1 /= (blk-1);

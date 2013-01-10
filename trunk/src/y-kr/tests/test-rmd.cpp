@@ -87,7 +87,7 @@ YOCTO_UNIT_TEST_IMPL(rmd160)
         }
         const digest i_md = digest::hex("52783243c1697bdbe16d37f97f68f08325dc1528");
         const digest o_md = digest::get_from(RMD160);
-        
+       	std::cerr << "=>" << o_md << "/" << i_md << std::endl; 
     }
     
 }
