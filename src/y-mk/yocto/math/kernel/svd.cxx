@@ -81,7 +81,7 @@ namespace yocto
                 {
                     for(k=i;k<=m;k++)
                         scale += Fabs(a[k][i]);
-                    if (scale)
+                    if(scale>0)
                     {
                         for(k=i;k<=m;k++)
                         {
@@ -109,7 +109,7 @@ namespace yocto
                 {
                     for(k=l;k<=n;k++)
                         scale += Fabs(a[i][k]);
-                    if (scale)
+                    if (scale>0)
                     {
                         for(k=l;k<=n;k++)
                         {
@@ -138,7 +138,7 @@ namespace yocto
             { /* Accumulation of right-hand transformations. */
                 if (i<n)
                 {
-                    if (g)
+                    if(Fabs(g)>0)
                     {
                         for(size_t j=l;j<=n;j++) /* real_t division to avoid possible underflow. */
                             v[j][i]=(a[i][j]/a[i][l])/g;
@@ -163,7 +163,7 @@ namespace yocto
                 g=w[i];
                 for(size_t j=l;j<=n;j++)
                     a[i][j]=0.0;
-                if (g)
+                if(Fabs(g)>0)
                 {
                     g=real_t(1)/g;
                     for(size_t j=l;j<=n;j++)
@@ -267,7 +267,7 @@ namespace yocto
                         }
                         z=Hypotenuse(f,h);
                         w[j]=z; /* Rotation can be arbitrary if z = 0. */
-                        if (z) {
+                        if(z>0) {
                             z=real_t(1)/z;
                             c=f*z;
                             s=h*z;

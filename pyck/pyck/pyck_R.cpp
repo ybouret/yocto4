@@ -85,3 +85,4 @@ SEXP dumpMat( SEXP args ) throw()
         return R_NilValue;
     }
 }
+
