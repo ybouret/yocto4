@@ -61,13 +61,17 @@ YOCTO_UNIT_TEST_IMPL(place)
 	std::cerr << "Press Enter after check!" << std::endl;
 	fgetc(stdin);
 #endif
+	wtime chrono;
 	double res = 0;
+	chrono.start();
 	for(size_t i=1; ; ++i)
 	{
 		const double tmp = double(i);
 		res += 1.0/(tmp*tmp);
 		if( 0 == (i%(1024*1024)) )
 			std::cerr << sqrt(6*res) << std::endl;
+		if( chrono.query() >= 5.0 )
+	break;
 	}
 }
 YOCTO_UNIT_TEST_DONE()

@@ -363,10 +363,10 @@ namespace yocto
             uint8_t hashcode[RMDsize/8];
             for(size_t i=0; i<RMDsize/8; i+=4)
             {
-                hashcode[i]   =  MDbuf[i>>2];         /* implicit cast to byte  */
-                hashcode[i+1] = (MDbuf[i>>2] >>  8);  /*  extracts the 8 least  */
-                hashcode[i+2] = (MDbuf[i>>2] >> 16);  /*  significant bits.     */
-                hashcode[i+3] = (MDbuf[i>>2] >> 24);
+                hashcode[i]   = uint8_t(MDbuf[i>>2]);        /* implicit cast to byte  */
+                hashcode[i+1] = uint8_t(MDbuf[i>>2] >>  8);  /*  extracts the 8 least  */
+                hashcode[i+2] = uint8_t(MDbuf[i>>2] >> 16);  /*  significant bits.     */
+                hashcode[i+3] = uint8_t(MDbuf[i>>2] >> 24);
             }
             fill(output, outlen, hashcode, sizeof(hashcode));
         }
