@@ -179,7 +179,7 @@ private:
         (size_t &)rows  = INTEGER(Rdim)[0];
         (size_t &)cols  = INTEGER(Rdim)[1];
         (size_t &)items = rows * cols;
-        mcol = static_cast<Column *>( operator new( cols * sizeof(Column) ));
+        mcol = static_cast<Column *>( operator new( cols*sizeof(Column) ) );
         T *p = data;
         for( size_t i=0; i < cols; ++i, p += rows )
         {
