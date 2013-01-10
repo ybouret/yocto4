@@ -10,7 +10,7 @@ namespace yocto
     {
         
         template <typename T,typename VERTEX>
-        T & __component( VERTEX &v, size_t dim ) throw()
+        inline T & __component( VERTEX &v, size_t dim ) throw()
         {
             assert(dim<sizeof(VERTEX)/sizeof(T));
             return *(((T*)&v)+dim);

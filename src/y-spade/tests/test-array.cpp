@@ -80,7 +80,7 @@ YOCTO_UNIT_TEST_IMPL(array3D)
             {
                 for( unit_t i=A3.lower.x; i <= A3.upper.x; ++i )
                 {
-                    A3[k][j][i] = i*j*k;
+                    A3[k][j][i] = double(i*j*k);
                 }
             }
         }

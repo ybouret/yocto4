@@ -3,6 +3,10 @@
 
 #include "yocto/os.hpp"
 
+#if defined(__ICC)
+#pragma warning ( disable : 1418 )
+#endif
+
 #if defined(YOCTO_WIN)
 #define YOCTO_API    __cdecl
 #define YOCTO_EXPORT extern "C" __declspec(dllexport)
