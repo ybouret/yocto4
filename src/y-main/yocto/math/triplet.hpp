@@ -15,12 +15,12 @@ namespace yocto {
 		struct triplet {
 			T a,b,c;
 
-			void to_scilab( std::ostream &os ) const;
+			void to_scilab( std::ostream & ) const;
 
 			friend
-			inline std::ostream & operator<<( std::ostream &os, const triplet &x)
+			inline std::ostream & operator<<( std::ostream &os, const triplet &triplet_out)
 			{
-				x.to_scilab(os);
+				triplet_out.to_scilab(os);
 				return os;
 			}
 			
