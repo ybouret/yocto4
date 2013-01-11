@@ -77,7 +77,7 @@ namespace yocto
 				throw Exception( err, "clGetContextInfo(DEVICES)" );
 		}
 
-		void Context:: Notify( const char *errinfo, const memory::ro_buffer &errdata ) const throw()
+		void Context:: Notify( const char *errinfo, const memory::ro_buffer & ) const throw()
 		{
 			assert( errinfo != NULL );
 			std::cerr << "[Notify][" << errinfo << "]" << std::endl;

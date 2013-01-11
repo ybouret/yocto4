@@ -31,7 +31,7 @@ void perform()
 		}
 		iFFT( data(0), data.size() );
 		
-#if FFT_SAVE == 1
+#if defined(FFT_SAVE) && FFT_SAVE == 1
 		const string filename = string("fft") + string( char( 'A' + p ) ) + "-" + typeid(T).name() + ".dat";
 		ios::ocstream fp( filename );
 #endif
@@ -39,7 +39,7 @@ void perform()
 		T d = 0.0;
 		for( size_t i=1; i <= n; ++i )
 		{
-#if FFT_SAVE == 1
+#if defined(FFT_SAVE) && FFT_SAVE == 1
 			fp("%u %g %g %g\n", i, raw[i].re, spec[i], data[i].re );
 #endif
 			const T tmp = Fabs(raw[i] - data[i]);

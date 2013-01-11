@@ -109,8 +109,8 @@ namespace yocto
 		
 #define YOCTO_PSD_INITIALIZE(INDEX)       p[INDEX] = 0
 #define YOCTO_PSD_COMPUTE_WEIGHT(INDEX)   const real_t tmp = weight[INDEX] = w( INDEX * wfact ); sumw2 += tmp*tmp
-#define YOCTO_PSD_COPY_INDEPENDENT(INDEX) input[INDEX] = start[INDEX] * weight[INDEX]
-#define YOCTO_PSD_COPY_OVERLAPPING(INDEX) input[INDEX] = data[ (idx++) & mask ] * weight[INDEX]
+#define YOCTO_PSD_COPY_INDEPENDENT(INDEX) input[INDEX] = cplx_t(start[INDEX] * weight[INDEX])
+#define YOCTO_PSD_COPY_OVERLAPPING(INDEX) input[INDEX] = cplx_t(data[ (idx++) & mask ] * weight[INDEX])
 		
 #define YOCTO_PSD_ADD(INDEX) p[INDEX] += (input[INDEX].mod2())
 		

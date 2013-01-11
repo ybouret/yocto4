@@ -74,6 +74,10 @@ namespace yocto
 			template <typename T>
 			inline T pop( size_t nbits ) throw()
 			{
+#if defined(__ICC)
+#pragma warning(push)
+#pragma warning(disable:2259)
+#endif
 				assert(nbits<=sizeof(T)*8);
 				assert(nbits<=list_.size);
 				T            X(0);
@@ -88,6 +92,9 @@ namespace yocto
 					B <<= 1;
 				}
 				return X;
+#if defined(__ICC)
+#pragma warning(pop)
+#endif
 			}
 			
 			template <typename T>
