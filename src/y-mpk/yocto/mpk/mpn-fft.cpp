@@ -316,11 +316,11 @@ namespace yocto
                 const size_t top   = nP - 1;
 				
 #if YMPK_FFT_UNROLL == 1
-#   define YMPK_FFT_U(J)                       \
-/**/  carry += L[J].re/nN + 0.5;               \
-/**/  const real_t _q = size_t( carry/256.0 ); \
-/**/  const real_t _r = carry - 256.0 * _q;    \
-/**/  prod[J]        = uint8_t(_r);            \
+#   define YMPK_FFT_U(J)                               \
+/**/  carry += L[J].re/nN + 0.5;                       \
+/**/  const real_t _q = real_t(size_t( carry/256.0 )); \
+/**/  const real_t _r = carry - 256.0 * _q;            \
+/**/  prod[J]        = uint8_t(_r);                    \
 /**/  carry          = _q
 				
                 YOCTO_LOOP_FUNC_(top,YMPK_FFT_U,0);
@@ -394,11 +394,11 @@ namespace yocto
 				
 #if YMPK_FFT_UNROLL == 1
 #	undef  YMPK_FFT_U
-#   define YMPK_FFT_U(J)                     \
-/**/  carry += L[J].re/nN + 0.5;             \
-/**/  const real_t q = size_t( carry/256.0 );\
-/**/  const real_t r = carry - 256.0 * q;    \
-/**/  prod[J]        = uint8_t(r);           \
+#   define YMPK_FFT_U(J)                             \
+/**/  carry += L[J].re/nN + 0.5;                     \
+/**/  const real_t q = real_t(size_t( carry/256.0 ));\
+/**/  const real_t r = carry - 256.0 * q;            \
+/**/  prod[J]        = uint8_t(r);                   \
 /**/  carry          = q
 				
                 YOCTO_LOOP_FUNC_(top,YMPK_FFT_U,0);

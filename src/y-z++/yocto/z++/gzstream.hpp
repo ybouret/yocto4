@@ -30,6 +30,7 @@ namespace yocto {
 			
 		public:
 			explicit igzstream( const string &file_name);
+			explicit igzstream( const char   *file_name);
 			virtual ~igzstream() throw();
 			
 			virtual bool query( char &C );
@@ -43,6 +44,7 @@ namespace yocto {
 			
 		public:
 			explicit ogzstream( const string &file_name, size_t level, bool append = false );
+			explicit ogzstream( const char   *file_name, size_t level, bool append = false );
 			virtual ~ogzstream() throw();
 			
 			virtual void write( char C  );
