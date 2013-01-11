@@ -21,8 +21,13 @@ namespace yocto
             return *pS;
         }
         
+        species & library:: add( const char   *id,   int z )
+        {
+            const string name(id);
+            return add(name,z);
+        }
         
-        species       & library:: operator[]( const string &name )
+        species & library:: operator[]( const string &name )
         {
             species::ptr *ppS = search(name);
             if( !ppS ) throw exception("no library['%s']", name.c_str());
