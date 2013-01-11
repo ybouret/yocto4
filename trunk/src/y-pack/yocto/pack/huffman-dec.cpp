@@ -84,7 +84,7 @@ namespace yocto
                             assert(ch>=0);
                             assert(ch<int(ALPHABET_NUM));
                             C = char(ch);
-                            H.update(ch,Q);
+                            H.update(C,Q);
                             
                             /** todo : check */
                             
