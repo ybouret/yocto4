@@ -101,6 +101,12 @@ namespace yocto
         {
         }
         
+        explicit interface( const module &m, const char *ldname ) :
+        handle( m, ldname )
+        {
+            
+        }
+        
         virtual ~interface() throw() {}
         
         //! use "->" transitivity
