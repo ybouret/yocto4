@@ -44,14 +44,23 @@ namespace yocto
 
 			return h;
 		}
+		
+		static inline void * __input_gz( const char *file_name )
+		{
+			const string fn(file_name);
+			return __input_gz(fn);
+		}
 
 		igzstream:: igzstream( const string & file_name ) :
 		zlib::gzstream( __input_gz( file_name  ) )
 		{
-
-
 		}
 
+		igzstream:: igzstream( const char * file_name ) :
+                zlib::gzstream( __input_gz( file_name  ) )
+                {
+                }
+	
 		bool igzstream:: query( char &C )
 		{
 			const int res = gzgetc( (gzFile) GZ );
@@ -92,11 +101,23 @@ namespace yocto
 			return h;
 		}
 
+		static inline void * __output_gz( const char *file_name, size_t level, bool append )
+		{
+			const string fn(file_name);
+			return __output_gz(fn,level,append);
+		}
+	
 		ogzstream:: ogzstream( const string & file_name, size_t level , bool append ) :
 		zlib::gzstream( __output_gz( file_name, level, append ) )
 		{
 
 		}
+
+		ogzstream:: ogzstream( const char * file_name, size_t level , bool append ) :
+                zlib::gzstream( __output_gz( file_name, level, append ) )
+                {
+
+                }
 
 		void ogzstream:: write( char C )
 		{

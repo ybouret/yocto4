@@ -81,11 +81,18 @@ namespace yocto
 			inline T to() const throw()
 			{
 				T ans(0);
+#if defined(__ICC)
+#pragma warning(push)
+#pragma warning(disable:2259)
+#endif
 				for( size_t i=0; i <sizeof(T); ++i)
 				{
 					ans |= ( T(get_byte(i)) << ( i << 3 ) );
 				}
 				return ans;
+#if defined(__ICC)
+#pragma warning(pop)
+#endif
 			}
 
 			//==================================================================

@@ -35,7 +35,10 @@ namespace yocto
 				throw;
 			}
 		}
-		
+	
+#if defined(__ICC)
+#pragma warning ( disable : 2259 )
+#endif	
 		natural natural:: query( ios::bitio &in, size_t nbits ) 
 		{
 			assert(nbits<=in.size());
