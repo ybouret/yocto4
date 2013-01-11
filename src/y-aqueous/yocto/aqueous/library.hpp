@@ -17,7 +17,7 @@ namespace yocto
             
             
             species &add( const string &name, int z );
-            
+            species &add( const char   *id,   int z );
             
             template <typename T>
             inline void ld(const string &name, int z)
