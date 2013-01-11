@@ -33,6 +33,13 @@ namespace yocto
                 return new content(m,ldname);
             }
             
+            static inline
+            content * create( const module &m, const char *ldname )
+            {
+                const string tmp(ldname);
+                return new content(m,tmp);
+            }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(content);
             module       dll;
@@ -60,6 +67,9 @@ namespace yocto
         {
         public:
             inline plugin(const module &m, const string &ldname) :
+            ld( content::create(m,ldname) ) { ld->withhold(); }
+            
+            inline plugin(const module &m, const char *ldname) :
             ld( content::create(m,ldname) ) { ld->withhold(); }
             
             inline plugin( const plugin &other ) throw() :
