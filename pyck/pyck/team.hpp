@@ -13,6 +13,7 @@ public:
     Mutex mutex; //!< sharable mutex
     
     explicit Team(size_t n) :
+    mutex(),
     task( static_cast<RUNNABLE *>(operator new( __check(n) * sizeof(RUNNABLE) )) ),
     maxi( n ),
     size( 0 )
