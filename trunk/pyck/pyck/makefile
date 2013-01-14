@@ -3,3 +3,4 @@ all:
 
 clean:
 	@rm -f tests/pyck_R.so
+	@rm -f *.o

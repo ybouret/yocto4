@@ -42,7 +42,7 @@ static void __wtime_fetch( struct timeval *tv )
 {
     if( 0 != gettimeofday( tv, NULL) )
     {
-        throw Exception( "gettimeofday", errno  );
+        throw Exception( errno, "gettimeofday" );
     }
 }
 #endif
