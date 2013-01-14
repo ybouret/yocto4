@@ -21,14 +21,24 @@ SET(pyck_srcs
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
 ADD_SUBDIRECTORY(tests)
 
-INCLUDE(../R.cmake)
-IF(R_FOUND)
-	GET_TARGET_PROPERTY(pyckLib pyck LOCATION )
-	MESSAGE( STATUS "pyckLib=${pyckLib}" )
+FIND_FILE(R_CMAKE R.cmake PATHS .. NO_DEFAULT_PATH)
+MESSAGE(STATUS "R_CMAKE='${R_CMAKE}'")
 
-	ADD_CUSTOM_TARGET(pyck_R ALL
-        COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.cpp "${pyckLib}"
-        COMMENT "Building .Call module"
-        DEPENDS pyck 
-        SOURCES R++.hpp pyck_R.cpp)
+IF( "${R_CMAKE}" STREQUAL "R_CMAKE-NOTFOUND" )
+
+ELSE()
+
+	INCLUDE(${R_CMAKE})
+	IF(R_FOUND)
+		GET_TARGET_PROPERTY(pyckLib pyck LOCATION )
+		MESSAGE( STATUS "pyckLib=${pyckLib}" )
+
+		ADD_CUSTOM_TARGET(pyck_R ALL
+        	COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.cpp "${pyckLib}"
+        	COMMENT "Building .Call module"
+        	DEPENDS pyck 
+        	SOURCES R++.hpp pyck_R.cpp)
+	ENDIF()
+
 ENDIF()
+
