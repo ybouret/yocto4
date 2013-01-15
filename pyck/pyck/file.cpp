@@ -51,7 +51,7 @@ void cFile:: operator()(const char *fmt,...)
     va_start(ap,fmt);
     const int ans = vfprintf(fp, fmt, ap);
     va_end(ap);
-    if( ans != 0 )
+    if( ans < 0 )
     {
         char errbuf[128];
         LibcFormatError(errno, errbuf, sizeof(errbuf) );
