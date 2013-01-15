@@ -4,8 +4,8 @@
 
 void Runnable:: clear() throw()
 {
-    thr = 0;
-    memset( arr, 0 , sizeof(arr) );
+	thr = 0;
+	memset( arr, 0 , sizeof(arr) );
 }
 
 
@@ -18,29 +18,29 @@ Runnable:: ~Runnable() throw()
 #endif
 Runnable:: Runnable( Mutex &m) throw() :
 mutex(m),
-thr(0),
-arr()
+	thr(0),
+	arr()
 {
-    clear();
+	clear();
 }
 
 void Runnable:: Execute(void *args ) throw()
 {
-    assert(args);
-    Runnable *self = static_cast<Runnable *>(args);
-    self->run();
+	assert(args);
+	Runnable *self = static_cast<Runnable *>(args);
+	self->run();
 }
 
 void Runnable:: join() throw()
 {
-    assert(thr);
-    thr->join();
-    clear();
-    
+	assert(thr);
+	thr->join();
+	clear();
+
 }
 
 void Runnable:: start()
 {
-    assert(!thr);
-    thr = new( &arr[0] ) Thread( Runnable::Execute, this );
+	assert(!thr);
+	thr = new( &arr[0] ) Thread( Runnable::Execute, this );
 }
