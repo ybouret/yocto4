@@ -13,6 +13,7 @@ SET(pyck_srcs
 	rand32.hpp	rand32.cpp
 	thread.hpp	thread.cpp
 	runnable.hpp	runnable.cpp
+	file.hpp	file.cpp
 	team.hpp
 	c_array.hpp
 	pair.hpp
