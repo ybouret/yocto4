@@ -86,10 +86,10 @@ typedef __int64 int64_t;
 //! integer to type mapping.
 template <int v>
 struct int2type {
-    enum
-    {
-        value = v //!< a different class for each v.
-    };
+	enum
+	{
+		value = v //!< a different class for each v.
+	};
 };
 
 const char *GetPlatformName() throw();

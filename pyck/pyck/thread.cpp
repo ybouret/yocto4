@@ -5,10 +5,10 @@
 #if defined(PYCK_WIN)
 DWORD WINAPI Thread:: Launch( LPVOID args ) throw()
 {
-    Thread *thr= static_cast<Thread *>(args);
-    assert( thr );
-    thr->proc_( thr->data_ );
-    return 0;
+	Thread *thr= static_cast<Thread *>(args);
+	assert( thr );
+	thr->proc_( thr->data_ );
+	return 0;
 }
 
 #endif
@@ -16,10 +16,10 @@ DWORD WINAPI Thread:: Launch( LPVOID args ) throw()
 #if defined(PYCK_BSD)
 void * Thread:: Launch( void *args ) throw()
 {
-    Thread *thr= static_cast<Thread *>(args);
-    assert( thr );
-    thr->proc_( thr->data_ );
-    return NULL;
+	Thread *thr= static_cast<Thread *>(args);
+	assert( thr );
+	thr->proc_( thr->data_ );
+	return NULL;
 }
 #endif
 
@@ -27,29 +27,29 @@ void * Thread:: Launch( void *args ) throw()
 
 Thread:: Thread( Thread::Proc proc, void *data) :
 proc_( proc ),
-data_( data ),
+	data_( data ),
 #if defined(PYCK_WIN)
-id32_(0),
+	id32_(0),
 #endif
-handle_()
+	handle_()
 {
 #if	defined(PYCK_BSD)
-    const int res = pthread_create( &handle_, NULL, Thread:: Launch, this);
-    if( res != 0 )
-        throw Exception( res, "pthread_create" );
+	const int res = pthread_create( &handle_, NULL, Thread:: Launch, this);
+	if( res != 0 )
+		throw Exception( res, "pthread_create" );
 #endif
-    
+
 #if defined(PYCK_WIN)
-    handle_ = ::CreateThread(0 ,
-                             0 ,
-                             Thread::Launch,
-                             this,
-                             0,
-                             & id32_ );
-    if( NULL == handle_ )
-    {
-        throw Exception( ::GetLastError(), "::CreateThread" );
-    }
+	handle_ = ::CreateThread(0 ,
+		0 ,
+		Thread::Launch,
+		this,
+		0,
+		& id32_ );
+	if( NULL == handle_ )
+	{
+		throw Exception( ::GetLastError(), "::CreateThread" );
+	}
 #endif
 }
 
@@ -57,24 +57,24 @@ handle_()
 void Thread:: join() throw()
 {
 #if defined(PYCK_BSD)
-    const int res = pthread_join( handle_, 0 );
-    if( res != 0 )
-    {
-        SystemCriticalError( res, "pthread_join" );
-    }
+	const int res = pthread_join( handle_, 0 );
+	if( res != 0 )
+	{
+		SystemCriticalError( res, "pthread_join" );
+	}
 #endif
-    
+
 #if defined(PYCK_WIN)
-    if( ::WaitForSingleObject( handle_ , INFINITE ) != WAIT_OBJECT_0 )
-    {
-        SystemCriticalError( ::GetLastError(), "WaitForSingleObject" );
-    }
+	if( ::WaitForSingleObject( handle_ , INFINITE ) != WAIT_OBJECT_0 )
+	{
+		SystemCriticalError( ::GetLastError(), "WaitForSingleObject" );
+	}
 #endif
 }
 
 Thread:: ~Thread() throw()
 {
 #if defined(PYCK_WIN)
-    ::CloseHandle( handle_ );
+	::CloseHandle( handle_ );
 #endif
 }
