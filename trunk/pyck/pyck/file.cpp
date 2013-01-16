@@ -23,17 +23,17 @@ fp(0)
 	const char *ms = 0;
 	switch( mode )
 	{
-	case ReadOnly:
-		ms = "rb";
-		break;
-
-	case Overwrite:
-		ms = "wb";
-		break;
-
-	case Append:
-		ms = "ab";
-		break;
+        case ReadOnly:
+            ms = "rb";
+            break;
+            
+        case Overwrite:
+            ms = "wb";
+            break;
+            
+        case Append:
+            ms = "ab";
+            break;
 	}
 	fp = fopen( filename, ms );
 	if(!fp)
