@@ -6,6 +6,7 @@
 #include "../team.hpp"
 #include "../c_array.hpp"
 #include "../list.hpp"
+#include "../pool.hpp"
 
 #include <iostream>
 
