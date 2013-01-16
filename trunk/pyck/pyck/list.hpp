@@ -269,6 +269,8 @@ public:
     
     
 private:
+	ListOf(const ListOf&);
+	ListOf&operator=(const ListOf&);
     inline void push_first( NODE *node ) throw()
     {
         assert(NULL==head); assert(NULL==tail); assert(0==size);
