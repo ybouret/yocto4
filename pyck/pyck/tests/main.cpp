@@ -5,6 +5,7 @@
 #include "../rand32.hpp"
 #include "../team.hpp"
 #include "../c_array.hpp"
+#include "../list.hpp"
 
 #include <iostream>
 

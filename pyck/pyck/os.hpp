@@ -142,6 +142,13 @@ uint32_t    IntegerHash32( uint32_t ) throw();
 #define PYCK_U32_FOR_SIZE(N) ( PYCK_ROUND4(N) >> 2 )
 #define PYCK_U32_FOR_ITEM(T) PYCK_U32_FOR_SIZE(sizeof(T))
 
+template <typename T>
+inline void cswap( T &a, T &b ) throw()
+{
+    const T tmp(a);
+    a = b;
+    b = tmp;
+}
 
 
 #endif

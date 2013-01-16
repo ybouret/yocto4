@@ -17,6 +17,7 @@ SET(pyck_srcs
 	team.hpp
 	c_array.hpp
 	pair.hpp
+	list.hpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
