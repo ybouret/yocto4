@@ -19,6 +19,7 @@ SET(pyck_srcs
 	pair.hpp
 	list.hpp
 	pool.hpp
+	stats.hpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
