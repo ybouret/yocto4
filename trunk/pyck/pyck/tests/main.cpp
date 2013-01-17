@@ -7,6 +7,7 @@
 #include "../c_array.hpp"
 #include "../list.hpp"
 #include "../pool.hpp"
+#include "../stats.hpp"
 
 
 struct ThreadData
@@ -76,7 +77,11 @@ int main(int argc, char *argv[])
         C_Array<uint32_t> seeds(10);
         for( size_t i=0; i < seeds.size; ++i ) seeds[i] = WallTime::Seed();
         std::cerr << "seeds=" << seeds << std::endl;
-        
+        double ave=0,sig=0;
+        Stats::AverageAndStdErr(ave, sig, seeds);
+        std::cerr << "ave=" << ave << std::endl;
+        std::cerr << "sig=" << sig << std::endl;
+
         
         ////////////////////////////////////////////////////////////////////////
         // Errors
