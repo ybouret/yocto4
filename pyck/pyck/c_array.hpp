@@ -2,6 +2,7 @@
 #define PYCK_C_ARRAY_INCLUDED 1
 
 #include "./exception.hpp"
+#include <iostream>
 
 template <typename T>
 class C_Array
@@ -22,7 +23,15 @@ public:
 
 	inline T &       operator[](size_t indx) throw()       { assert(indx<size); return data[indx]; }
 	inline const T & operator[](size_t indx) const throw() { assert(indx<size); return data[indx]; }
-
+    
+    friend inline std::ostream & operator<<( std::ostream &os, const C_Array &arr)
+    {
+        os << "[";
+        for( size_t i=0; i < arr.size; ++i ) os << " " << arr[i];
+        os << "]'";
+        return os;
+    }
+    
 private:
 	C_Array( const C_Array & );
 	C_Array&operator=( const C_Array & );

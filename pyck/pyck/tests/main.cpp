@@ -8,7 +8,6 @@
 #include "../list.hpp"
 #include "../pool.hpp"
 
-#include <iostream>
 
 struct ThreadData
 {
@@ -68,6 +67,15 @@ int main(int argc, char *argv[])
         std::cerr << "Ellapsed: " << ell << " seconds" << std::endl;
         
         std::cerr << std::endl;
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        // C_Array
+        ////////////////////////////////////////////////////////////////////////
+        std::cerr << "-- Testing C_Array" << std::endl;
+        C_Array<uint32_t> seeds(10);
+        for( size_t i=0; i < seeds.size; ++i ) seeds[i] = WallTime::Seed();
+        std::cerr << "seeds=" << seeds << std::endl;
         
         
         ////////////////////////////////////////////////////////////////////////
