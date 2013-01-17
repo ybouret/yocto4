@@ -4,6 +4,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <new>
+#include <cassert>
 
 //! template for R data type handling
 template <typename T> struct RGetData;
