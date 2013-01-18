@@ -204,6 +204,23 @@ int main(int argc, char *argv[])
             std::cerr << "done" << std::endl << std::endl;
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        // Testing Team
+        ////////////////////////////////////////////////////////////////////////
+        std::cerr << "-- Testing Team::Split" << std::endl;
+        const size_t workload = 20;
+        for( size_t jsize=1; jsize <=8; ++jsize )
+        {
+            std::cerr << "\t#JOBS=" << jsize << std::endl;
+            for(size_t jrank=0; jrank<jsize; ++jrank )
+            {
+                size_t offset=0, length=0;
+                TeamBalance(workload,offset,length,jrank,jsize);
+                std::cerr << "\t\t" << jsize << "." << jrank << ": " << offset << "+" << length << std::endl;
+            }
+            std::cerr << std::endl;
+        }
+        
         
         
         return 0;
