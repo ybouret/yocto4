@@ -1,5 +1,5 @@
-#include "./os.hpp"
-#include "./R++.hpp"
+#include "../os.hpp"
+#include "../R++.hpp"
 
 extern "C"
 SEXP dumpVec( SEXP args ) throw()

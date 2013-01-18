@@ -20,6 +20,7 @@ SET(pyck_srcs
 	list.hpp
 	pool.hpp
 	stats.hpp
+	R++.hpp
 )
 
 ADD_LIBRARY( pyck STATIC ${pyck_srcs} )
@@ -38,7 +39,7 @@ ELSE()
 		MESSAGE( STATUS "pyckLib=${pyckLib}" )
 
 		ADD_CUSTOM_TARGET(pyck_R ALL
-        	COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/pyck_R.cpp "${pyckLib}"
+        	COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.cpp "${pyckLib}"
         	COMMENT "Building .Call module"
         	DEPENDS pyck 
         	SOURCES R++.hpp pyck_R.cpp)
