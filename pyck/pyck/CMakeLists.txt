@@ -42,7 +42,7 @@ ELSE()
         	COMMAND ${R_EXE} CMD SHLIB -c --preclean -o ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.so ${CMAKE_CURRENT_SOURCE_DIR}/tests/pyck_R.cpp "${pyckLib}"
         	COMMENT "Building .Call module"
         	DEPENDS pyck 
-        	SOURCES R++.hpp pyck_R.cpp)
+        	SOURCES R++.hpp tests/pyck_R.cpp)
 	ENDIF()
 
 ENDIF()
