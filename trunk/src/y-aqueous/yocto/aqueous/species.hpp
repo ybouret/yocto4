@@ -23,6 +23,8 @@ namespace yocto
                              const int    charge,
                              size_t       extra_bytes   = 0
                              );
+
+	    explicit species( const char *id, const int charge, size_t extra_bytes = 0 );
             
             virtual ~species() throw();
             
