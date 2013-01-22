@@ -9,7 +9,7 @@ SET(pyck_srcs
 	lockable.hpp	lockable.cpp
 	mutex.hpp	mutex.cpp
 	wtime.hpp	wtime.cpp
-	sort.hpp	sort.cpp
+	sort.hpp
 	rand32.hpp	rand32.cpp
 	thread.hpp	thread.cpp
 	runnable.hpp	runnable.cpp
