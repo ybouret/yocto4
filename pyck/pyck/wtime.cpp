@@ -84,7 +84,7 @@ double WallTime:: query() const
 	const long int sec_now  = now.tv_sec;
 	const long int usec_old = old->tv_usec;
 	const long int usec_now = now.tv_usec;
-	return static_cast<double>(sec_now-sec_old) + 1e-6 * static_cast<double>(usec_now-usec_old);
+	return double(sec_now-sec_old) + 1e-6 * double(usec_now-usec_old);
 #endif
 }
 

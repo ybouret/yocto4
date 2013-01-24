@@ -15,7 +15,7 @@ struct ThreadData
     Mutex *mutex;
 };
 
-void ThreadProc(void *args) throw()
+static void ThreadProc(void *args) throw()
 {
     assert(args);
     ThreadData &data = *(ThreadData *)args;
@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
         ////////////////////////////////////////////////////////////////////////
         std::cerr << "-- Testing WallTime" << std::endl;
         WallTime chrono;
+	{
         chrono.start();
         
         std::cerr << std::hex;
@@ -68,12 +69,13 @@ int main(int argc, char *argv[])
         std::cerr << "Ellapsed: " << ell << " seconds" << std::endl;
         
         std::cerr << std::endl;
-        
+        }
         
         ////////////////////////////////////////////////////////////////////////
         // C_Array
         ////////////////////////////////////////////////////////////////////////
         std::cerr << "-- Testing C_Array" << std::endl;
+{
         C_Array<uint32_t> seeds(10);
         for( size_t i=0; i < seeds.size; ++i ) seeds[i] = WallTime::Seed();
         std::cerr << "seeds=" << seeds << std::endl;
@@ -81,7 +83,7 @@ int main(int argc, char *argv[])
         Stats::AverageAndStdErr(ave, sig, seeds);
         std::cerr << "ave=" << ave << std::endl;
         std::cerr << "sig=" << sig << std::endl;
-
+}
         
         ////////////////////////////////////////////////////////////////////////
         // Errors
