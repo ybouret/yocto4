@@ -7,9 +7,9 @@
 
 #include <cmath>
 
-namespace yocto 
+namespace yocto
 {
-	namespace math 
+	namespace math
 	{
 		template <typename T>
 		struct real_of;
@@ -59,10 +59,15 @@ namespace yocto
 			static const T      huge; //!< 10^{max_10_exp}
 			
 			typedef functor<T,TL1(T)>                            function;
-			typedef functor<T,TL1(const array<T>&)>              scalar_field; 
+			typedef functor<T,TL1(const array<T>&)>              scalar_field;
 			typedef functor<void,TL2(array<T>&,const array<T>&)> vector_field;
+            
+            static const T zero;
+            static const T one;
+            static const T two;
 		};
 		
+        
 		
 		inline float  Fabs( float x  ) throw() { return fabsf( x ); }
 		inline double Fabs( double x ) throw() { return fabs( x );  }
@@ -85,7 +90,7 @@ namespace yocto
 		inline float  Fabs( const complex<float>  &x ) throw() { return Sqrt( x.re * x.re + x.im * x.im ); }
 		inline double Fabs( const complex<double> &x ) throw() { return Sqrt( x.re * x.re + x.im * x.im ); }
 		
-
+        
 		inline float  Cos( float  x ) throw()  { return cosf( x ); }
 		inline double Cos( double x ) throw()  { return cos(  x );  }
         
@@ -110,7 +115,7 @@ namespace yocto
         
 		inline float  Pow( float  x, float  y ) throw() { return powf(x,y); }
 		inline double Pow( double x, double y ) throw() { return pow(x,y);  }
-
+        
 		
 		
 		inline float  Exp( float  x ) throw()  { return expf( x ); }
@@ -147,8 +152,8 @@ namespace yocto
             else
                 return (absb <= 0.0 ? 0.0 : absb*Sqrt(1.0+Square(absa/absb)));
         }
-
-				
+        
+        
 	}
 	
 }
