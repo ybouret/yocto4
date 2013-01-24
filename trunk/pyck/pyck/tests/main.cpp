@@ -55,35 +55,35 @@ int main(int argc, char *argv[])
         ////////////////////////////////////////////////////////////////////////
         std::cerr << "-- Testing WallTime" << std::endl;
         WallTime chrono;
-	{
-        chrono.start();
-        
-        std::cerr << std::hex;
-        for( size_t i=0; i < 10; ++i )
         {
-            std::cerr << WallTime::Ticks() << " : " << WallTime::Seed() << std::endl;
-        }
-        std::cerr << std::dec;
-        
-        const double ell = chrono.query();
-        std::cerr << "Ellapsed: " << ell << " seconds" << std::endl;
-        
-        std::cerr << std::endl;
+            chrono.start();
+            
+            std::cerr << std::hex;
+            for( size_t i=0; i < 10; ++i )
+            {
+                std::cerr << WallTime::Ticks() << " : " << WallTime::Seed() << std::endl;
+            }
+            std::cerr << std::dec;
+            
+            const double ell = chrono.query();
+            std::cerr << "Ellapsed: " << ell << " seconds" << std::endl;
+            
+            std::cerr << std::endl;
         }
         
         ////////////////////////////////////////////////////////////////////////
         // C_Array
         ////////////////////////////////////////////////////////////////////////
         std::cerr << "-- Testing C_Array" << std::endl;
-{
-        C_Array<uint32_t> seeds(10);
-        for( size_t i=0; i < seeds.size; ++i ) seeds[i] = WallTime::Seed();
-        std::cerr << "seeds=" << seeds << std::endl;
-        double ave=0,sig=0;
-        Stats::AverageAndStdErr(ave, sig, seeds);
-        std::cerr << "ave=" << ave << std::endl;
-        std::cerr << "sig=" << sig << std::endl;
-}
+        {
+            C_Array<uint32_t> seeds(10);
+            for( size_t i=0; i < seeds.size; ++i ) seeds[i] = WallTime::Seed();
+            std::cerr << "seeds=" << seeds << std::endl;
+            double ave=0,sig=0;
+            Stats::AverageAndStdErr(ave, sig, seeds);
+            std::cerr << "ave=" << ave << std::endl;
+            std::cerr << "sig=" << sig << std::endl;
+        }
         
         ////////////////////////////////////////////////////////////////////////
         // Errors
