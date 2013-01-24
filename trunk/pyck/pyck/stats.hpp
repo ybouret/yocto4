@@ -8,7 +8,7 @@ struct Stats
 {
     //! Corrected Two Passes Algorithm
     template<typename T> static inline
-    void AverageAndStdErr( double &ave, double &sig, const T *data, size_t n ) throw()
+    void AverageAndStdDev( double &ave, double &sig, const T *data, size_t n ) throw()
     {
         assert(data);
         assert(n>1);
@@ -31,9 +31,9 @@ struct Stats
     }
     
     template<typename T> static inline
-    void AverageAndStdErr( double &ave, double &sig, const C_Array<T> &arr ) throw()
+    void AverageAndStdDev( double &ave, double &sig, const C_Array<T> &arr ) throw()
     {
-        AverageAndStdErr(ave,sig,&arr[0],arr.size);
+        AverageAndStdDev(ave,sig,&arr[0],arr.size);
     }
 };
 

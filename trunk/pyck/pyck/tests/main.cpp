@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
             for( size_t i=0; i < seeds.size; ++i ) seeds[i] = WallTime::Seed();
             std::cerr << "seeds=" << seeds << std::endl;
             double ave=0,sig=0;
-            Stats::AverageAndStdErr(ave, sig, seeds);
+            Stats::AverageAndStdDev(ave, sig, seeds);
             std::cerr << "ave=" << ave << std::endl;
             std::cerr << "sig=" << sig << std::endl;
         }
