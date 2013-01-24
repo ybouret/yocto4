@@ -15,12 +15,15 @@ static inline double test_copy( size_t N )
 	const size_t num_iter = 100;
 	wtime  chrono;
 	double t = 0;
-	vector<T> X(N,0);
-	vector<T> Y(N,0);
+	vector<T> X(N,numeric<T>::zero);
+	vector<T> Y(N,numeric<T>::zero);
 	for( size_t iter=0; iter < num_iter; ++iter )
 	{
-		for( size_t i=N;i>0; --i ) 
-			X[i] = alea<float>();
+		for( size_t i=N;i>1; --i ) 
+		{
+			const T tmp( alea<float>() );
+			X[i] = tmp;
+		}
 		chrono.start();
 		algebra<T>::set(Y,X);
 		t += chrono.query();

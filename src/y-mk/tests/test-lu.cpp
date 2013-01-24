@@ -37,9 +37,9 @@ static inline void test_lu()
 			std::cerr << "matrix " << n << "x" << n << " is not invertible!" << std::endl;
 			continue;
 		}
-		vector<T> b(n,0);
-		vector<T> x(n,0);
-        vector<T> R(n,0);
+		vector<T> b(n,numeric<T>::zero);
+		vector<T> x(n,numeric<T>::zero);
+        	vector<T> R(n,numeric<T>::zero);
         
 		for( size_t i=1; i <= n; ++i )
 		{
