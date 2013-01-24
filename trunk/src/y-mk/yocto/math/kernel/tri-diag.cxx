@@ -27,7 +27,7 @@ namespace yocto {
 		template <>
 		tridiag<z_type>:: tridiag( size_t n ) :
 				size_( n ),
-				wksp_( size_ * 4, 0),
+				wksp_( size_ * 4, numeric<z_type>::zero),
 				a_( wksp_(-1) ),
 				b_( a_ + size_ ),
 				c_( b_ + size_ ),
@@ -53,7 +53,7 @@ namespace yocto {
 		void tridiag<z_type>:: make( size_t n ) {
 			if( n > 0 ) {
 				size_t req = n * 4;
-				wksp_.make( req,0 );
+				wksp_.make( req, numeric<z_type>::zero );
 				size_ = n;
 				a_ = wksp_(-1);
 				b_ = a_ + size_;

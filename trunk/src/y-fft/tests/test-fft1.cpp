@@ -16,7 +16,7 @@ void perform()
 	for( size_t p=0; p <= 12; ++p )
 	{
 		const size_t   n  = (1<<p);
-		vector<cplx_t> data( n, 0 );
+		vector<cplx_t> data( n, numeric<cplx_t>::zero );
 		for( size_t i=1; i <= n; ++i )
 		{
 			data[i].re = T( (i-1) * (n-i) );
