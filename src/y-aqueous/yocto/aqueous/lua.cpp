@@ -13,6 +13,12 @@ namespace yocto
 		// load a library = table of species
 		//
 		/////////////////////////////////////////////////////////////////////////////
+        void _lua:: load( lua_State *L, library &lib, const char *libname, species_ctor *cb )
+        {
+            const string ln = libname;
+            _lua::load(L,lib,ln,cb);
+        }
+        
 		void _lua:: load( lua_State *L, library &lib, const string &libname, species_ctor *cb )
 		{
 			//==================================================================
@@ -89,6 +95,12 @@ namespace yocto
 		// load a chemsys = table of equilibria
 		//
 		/////////////////////////////////////////////////////////////////////////////
+        void _lua:: load(lua_State *L, yocto::aqueous::chemsys &cs, const char *csname)
+        {
+            const string csn = csname;
+            _lua::load(L,cs,csn);
+        }
+        
 		void _lua:: load(lua_State *L, yocto::aqueous::chemsys &cs, const string &csname)
 		{
 			//==================================================================
@@ -204,6 +216,12 @@ namespace yocto
 		// load an initializer = table of constraints
 		//
 		///////////////////////////////////////////////////////////////////////
+        void _lua:: load( lua_State *L, initializer &ini, const char *ininame )
+        {
+            const string inn = ininame;
+            _lua::load(L,ini,inn);
+        }
+        
 		void _lua:: load( lua_State *L, initializer &ini, const string &ininame )
 		{
 			assert(L!=NULL);
