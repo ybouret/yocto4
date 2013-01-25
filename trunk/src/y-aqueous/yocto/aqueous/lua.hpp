@@ -24,13 +24,17 @@ namespace yocto
             
             //! load a table of { "name", charge, EXTRA }
             static void load( lua_State *L, library     &lib, const string &libname, species_ctor *cb = NULL);
+            static void load( lua_State *L, library     &lib, const char   *libname, species_ctor *cb = NULL);
             
             //! load a table of chemical equilibria
             static void load( lua_State *L, chemsys     &cs,  const string &csname  );
+            static void load( lua_State *L, chemsys     &cs,  const char   *csname  );
+
             
             //! load a table of chemical initializer
             static void load( lua_State *L, initializer &ini, const string &ininame );
-            
+            static void load( lua_State *L, initializer &ini, const char   *ininame );
+
             //! effector
             class effector : public object, public counted
             {
