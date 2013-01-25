@@ -63,5 +63,6 @@ ADD_TEST(SortedVec   test-main sorted_vec)
 ADD_TEST(CircList    test-main clist)
 ADD_TEST(Cached      test-main cached)
 ADD_TEST(InStack     test-main in_stack)
+ADD_TEST(Labelled    test-main labelled)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
