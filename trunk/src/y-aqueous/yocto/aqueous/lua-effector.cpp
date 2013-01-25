@@ -171,7 +171,7 @@ namespace yocto
             // call the function
             //------------------------------------------------------------------
             const size_t nOut = output.size();
-            if( lua_pcall(L, 2+nIn, output.size(), 0) )
+            if( lua_pcall(L, 2+nIn, nOut, 0) )
                 throw exception("%s: %s", fn, lua_tostring(L, -1) );
             
             //------------------------------------------------------------------
