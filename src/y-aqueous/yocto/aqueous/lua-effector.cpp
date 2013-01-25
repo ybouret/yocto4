@@ -137,6 +137,13 @@ namespace yocto
             
         }
         
+        void _lua:: load( lua_State *L, effectors &edb, const char *effname )
+        {
+            const string id = effname;
+            _lua::load( L, edb, id);
+        }
+        
+        
         void _lua::effector:: call( lua_State *L, solution &dSdt, double t, double zeta, const solution &S ) const
         {
             //------------------------------------------------------------------

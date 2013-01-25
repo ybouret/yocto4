@@ -91,6 +91,12 @@ namespace yocto
 				throw exception("luaL_dofile( %s )", lua_tostring( L, -1 ) ); 
 			}
 		}
+        
+        void Config:: DoFile( lua_State *L, const char *fn )
+		{
+            const string filename = fn;
+            Config::DoFile(L,filename);
+        }
 		
 		void Config:: DoString( lua_State *L, const string &str  )
 		{

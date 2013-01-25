@@ -23,6 +23,8 @@ namespace yocto
 			static void GetTable( lua_State *L, const string &name, sequence<T> &seq );
 			
 			static void DoFile( lua_State *L, const string &filename );
+            static void DoFile( lua_State *L, const char   *filename );
+            
 			static void DoString( lua_State *L, const string &string );
 			
 		};
