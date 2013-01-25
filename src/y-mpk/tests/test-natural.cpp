@@ -139,7 +139,7 @@ YOCTO_UNIT_TEST_IMPL(natural)
 			std::cerr << std::hex << u << "-" << v << "=" << (u-v);
 			const mpn lhs = u;
 			const mpn rhs = v;
-			const mpn res = mpn::sub_(u,v);
+			const mpn res = mpn::sub_(lhs,rhs);
 			std::cerr << "  =>  " << lhs << "-" << rhs << "=" << res;
 			std::cerr << std::endl;
 			
