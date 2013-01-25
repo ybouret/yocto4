@@ -45,7 +45,7 @@ YOCTO_UNIT_TEST_IMPL(lua)
         solution ds(lib);
         ds.ldz();
         
-        _lua::effector::ptr *ppEff = edb.search("MCT");
+        _lua::effector::ptr *ppEff = edb.query("MCT");
         if( !ppEff )
             throw exception("Missing MCT");
         

@@ -156,7 +156,8 @@ namespace yocto
     
     void VisIt:: Simulation::  get_meta_data( visit_handle &md ) const
     {
-        assert( VISIT_INVALID_HANDLE != md );
+        if( VISIT_INVALID_HANDLE == md )
+		throw exception("VisIt.Simulatyion.get_meta_data(NULL)");
     }
     
     void VisIt:: Simulation:: add_generic_command( const string &name, visit_handle &md ) const
