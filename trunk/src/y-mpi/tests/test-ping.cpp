@@ -18,14 +18,12 @@ YOCTO_UNIT_TEST_IMPL(ping)
 	strncpy( obuff, "Hello", sizeof(obuff) );
 	
 	
-	mpi & MPI = mpi::init( &argc, &argv );
-	//std::cerr << "[MPI]: rank=" << MPI.CommWorldRank << " / " << MPI.CommWorldSize << " @" << MPI.ProcessorName << std::endl;
-	
+	mpi & MPI = mpi::init( &argc, &argv );	
 	const int atSelf  = MPI.CommWorldRank;
 	const int atRight = MPI.CommWorldNext();
 	const int atLeft  = MPI.CommWorldPrev();
 	MPI.Barrier( MPI_COMM_WORLD );
-	std::cerr << "[MPI #" << atSelf << "] Left=#" << atLeft << " Right=#" << atRight << std::endl;
+    MPI.Printf(stderr, "[MPI #%2d] Left=#%2d Right=%2d\n", atSelf, atLeft, atRight);
 	if( MPI.CommWorldSize > 1 )
 	{
 		//-- send left->right
@@ -38,7 +36,7 @@ YOCTO_UNIT_TEST_IMPL(ping)
 	
 	MPI.Barrier( MPI_COMM_WORLD );
 	
-	std::cerr << "[MPI]: rank=" << MPI.CommWorldRank << " done" << std::endl;
+    MPI.Printf(stderr, "[MPI #%2d]: done\n", atSelf);
 	MPI.Finalize();
 }
 YOCTO_UNIT_TEST_DONE()
