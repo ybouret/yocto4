@@ -3,6 +3,7 @@
 
 #include "yocto/aqueous/initializer.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/associative/labelled.hpp"
 
 extern "C"
 {
@@ -46,7 +47,7 @@ namespace yocto
                 
                 const string & key() const throw();
                 typedef intrusive_ptr<string,effector> ptr;
-                typedef set<string,effector::ptr>      db;
+                typedef labelled<set,effector::ptr>    db;
                 explicit effector( const string &id );
                 virtual ~effector() throw();
                 
