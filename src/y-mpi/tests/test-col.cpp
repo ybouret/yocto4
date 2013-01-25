@@ -50,13 +50,15 @@ YOCTO_UNIT_TEST_IMPL(scatter)
 	if( rank == 0 ) 
 	{
 		src.make( N * size, 1.0f );
-		for( size_t i=1; i <= src.size(); ++i ) src[i] = float(i);
+		for( size_t i=1; i <= src.size(); ++i )
+            src[i] = float(i);
 	}
-	vector<float> dst(N,0.0);
+	vector<float> dst(N,0.0f);
 	
 	float *sendbuff = rank == 0 ? &src[1] : NULL;
-	MPI.Scatter(sendbuff, N, MPI_FLOAT, &dst[1], N, MPI_FLOAT, 0, MPI_COMM_WORLD);
-	MPI.Printf( stderr, "Rank %d: dst[1]= %g\n", rank, dst[1] );
+    size_t sendsize = rank == 0 ? N       : 0;
+	MPI.Scatter(sendbuff, sendsize, MPI_FLOAT, &dst[1], N, MPI_FLOAT, 0, MPI_COMM_WORLD);
+	MPI.Printf( stderr, "Rank %d: dst[1]= %4g, dst[N]=%4g\n", rank, dst[1], dst[N] );
 	
 	MPI.Barrier(MPI_COMM_WORLD);
 	
