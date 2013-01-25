@@ -41,8 +41,8 @@ namespace yocto
             {
             public:
                 const string   name;    //!< will be the function name
-                vector<string> input;   //!< input arguments
-                vector<string> output;  //!< output arguments
+                vector<string> input;   //!< input  arguments names
+                vector<string> output;  //!< output arguments names
                 double         factor;  //!< scaling factor, default=1
                 
                 const string & key() const throw();
@@ -70,6 +70,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
             };
             
+            //! load a table of effectors
             static void load( lua_State *L, effectors &db, const string &effname );
             static void load( lua_State *L, effectors &db, const char   *effname );
             
