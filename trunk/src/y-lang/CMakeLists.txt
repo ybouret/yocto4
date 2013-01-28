@@ -27,7 +27,7 @@ SOURCE_GROUP( lang/lexical FILES ${lex_srcs} )
 FILE( GLOB snx_decl yocto/lang/syntax/*.hpp)
 FILE( GLOB snx_impl yocto/lang/syntax/*.cpp)
 SET( snx_srcs ${snx_decl} ${snx_impl} )
-INSTALL( FILES ${snx_decl} DESTINATION include/yocto/snx/lexical )
+INSTALL( FILES ${snx_decl} DESTINATION include/yocto/syntax/lexical )
 SOURCE_GROUP( lang/syntax FILES ${snx_srcs} )
 
 
