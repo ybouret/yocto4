@@ -65,9 +65,18 @@ ${lua_root}/lvm.c
 ${lua_root}/lzio.c
 )
 
-ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS=1)
+SET(public_decl
+${lua_root}/lua.h
+${lua_root}/luaconf.h
+${lua_root}/lauxlib.h
+${lua_root}/lua.hpp
+)
 
+ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS=1)
 ADD_LIBRARY(y-lua STATIC ${decl} ${impl})
+INSTALL( FILES   ${public_decl}  DESTINATION include/yocto/lua )
+INSTALL( TARGETS y-lua ARCHIVE DESTINATION lib )
+
 ADD_SUBDIRECTORY(tests)
 
 #ADD_EXECUTABLE(lua lua.c)
@@ -76,6 +85,6 @@ ADD_SUBDIRECTORY(tests)
 #IF(MSVC)
 
 #ELSE(MSVC)
-#	TARGET_LINK_LIBRARIES(lua m)
+	#TARGET_LINK_LIBRARIES(lua m)
 #ENDIF(MSVC)
 
