@@ -25,20 +25,20 @@ namespace yocto
         explicit labelled( size_t n, const as_capacity_t &opt ) : host_type(n,opt) {}
         
         //! map wrapper
-        bool store( const string &key, param_type &arg )
+        bool store( const string &key, param_type arg )
         {
             return this->insert(key,arg);
         }
         
         //! map  wrapper
-        bool store( const char *id, param_type &arg )
+        bool store( const char *id, param_type arg )
         {
             const string key = id;
             return this->insert(key,arg);
         }
         
         //! set wrapper
-        bool store( param_type &arg )
+        bool store( param_type arg )
         {
             return this->insert(arg);
         }
