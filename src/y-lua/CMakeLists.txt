@@ -68,6 +68,7 @@ ${lua_root}/lzio.c
 SET(public_decl
 ${lua_root}/lua.h
 ${lua_root}/luaconf.h
+${lua_root}/lualib.h
 ${lua_root}/lauxlib.h
 ${lua_root}/lua.hpp
 )
