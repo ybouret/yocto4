@@ -16,6 +16,7 @@ SET(pyck_srcs
 	file.hpp	file.cpp
 	team.hpp
 	c_array.hpp
+	c_matrix.hpp
 	pair.hpp
 	list.hpp
 	pool.hpp
