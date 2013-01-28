@@ -44,7 +44,7 @@ namespace yocto
                                           lua_State        *L)
         {
             assert( lua_istable(L,-1) );
-            const unsigned ns = lua_objlen(L, -1);
+            const unsigned ns = lua_rawlen(L, -1);
             for( unsigned i=1; i <= ns; ++i )
             {
                 lua_rawgeti(L,-1,i);
@@ -72,7 +72,7 @@ namespace yocto
             //==================================================================
             // count effectors
             //==================================================================
-            const unsigned neff = lua_objlen(L, -1);
+            const unsigned neff = lua_rawlen(L, -1);
             std::cerr << "*** Parsing " << neff << " effector(s)" << std::endl;
             for( unsigned i=1; i <= neff; ++i )
             {

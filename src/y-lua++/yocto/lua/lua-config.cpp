@@ -52,7 +52,7 @@ namespace yocto
 			GetGlobal_(L,name);
 			if( ! lua_istable(L,-1) )
 				throw exception("'%s' is not a table", &name[0] );
-			const size_t Ns = lua_objlen(L,-1);
+			const size_t Ns = lua_rawlen(L,-1);
 			
 			for( size_t i=1; i <= Ns; ++i )
 			{
@@ -70,7 +70,7 @@ namespace yocto
 			GetGlobal_(L,name);
 			if( ! lua_istable(L,-1) )
 				throw exception("'%s' is not a table", &name[0] );
-			const size_t Ns = lua_objlen(L,-1);
+			const size_t Ns = lua_rawlen(L,-1);
 			
 			for( size_t i=1; i <= Ns; ++i )
 			{

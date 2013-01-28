@@ -24,5 +24,4 @@ print('s1=',s1);
 base = { ex=i, ey=j, ez=k }
 print('base=',base);
 
-table.foreach(base,print);
-
+for k,v in pairs(base) do print(k,v) end

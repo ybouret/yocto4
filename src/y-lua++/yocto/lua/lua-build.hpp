@@ -26,8 +26,8 @@ namespace yocto {
 			static const Link::Member Getters[]; /**! expose variables to get */ \
 			static const Link::Member Setters[]; /**! expose variables to set */ \
 			\
-			static const luaL_reg     Functions[]; /**! static methods <=> package function */ \
-			static const luaL_reg     Events[];    /**! change semantic behavior */            \
+			static const luaL_Reg     Functions[]; /**! static methods <=> package function */ \
+			static const luaL_Reg     Events[];    /**! change semantic behavior */            \
 			\
 			typedef int (CLASS:: *Proc)( lua_State * );            /**!< lua callable method */ \
 			struct Method { const char *Name; CLASS::Proc Addr; }; /**!< method to link      */ \
@@ -76,7 +76,7 @@ namespace yocto {
 		// Static Methods = Functions
 		//----------------------------------------------------------------------
 		#define YOCTO_LUA_FUNCTIONS_OF(CLASS)  \
-			const luaL_reg                     \
+			const luaL_Reg                     \
 			CLASS ::Functions[] =
 
 		#define YOCTO_LUA_FUNCTION(CLASS,FUNCTION) \
@@ -90,7 +90,7 @@ namespace yocto {
 		// BuiltIn Events = Events
 		//----------------------------------------------------------------------
 		#define YOCTO_LUA_EVENTS_OF(CLASS) \
-			const luaL_reg                 \
+			const luaL_Reg                 \
 			CLASS::Events[] =
 
 		#define YOCTO_LUA_EVENT(CLASS,NAME) \
@@ -159,7 +159,9 @@ namespace yocto {
 		OBJECT *Check( lua_State *L, int index ) {
 			OBJECT **ppObj = (OBJECT **)luaL_checkudata(L,index,OBJECT::ClassName);
 			if( NULL == ppObj ) {
-				luaL_typerror( L, index, OBJECT::ClassName );
+                const char *req_type = OBJECT::ClassName;
+                const char *usr_type = luaL_typename(L, index);
+				luaL_error(L, "@index %d: invalide type '%s', expecting '%s'", index, usr_type, req_type);
 			}
 			return *ppObj;
 		}
