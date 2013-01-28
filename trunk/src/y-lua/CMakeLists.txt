@@ -67,7 +67,7 @@ ${lua_root}/lzio.c
 
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS=1)
 
-ADD_LIBRARY(y-lua52 STATIC ${decl} ${impl})
+ADD_LIBRARY(y-lua STATIC ${decl} ${impl})
 ADD_SUBDIRECTORY(tests)
 
 #ADD_EXECUTABLE(lua lua.c)

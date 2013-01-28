@@ -1,10 +1,10 @@
 
-SET(fx test-lua52)
+SET(fx test-lua)
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(${fx} main.cpp ${test_srcs})
-TARGET_LINK_YOCTO(${fx} lua52)
-SET( HERE "${CMAKE_SOURCE_DIR}/y-lua52/tests" )
+TARGET_LINK_YOCTO(${fx} lua)
+SET( HERE "${CMAKE_SOURCE_DIR}/y-lua/tests" )
 
 ENABLE_TESTING()
 ADD_TEST(Hello   ${fx} "${HERE}/hello.lua" )

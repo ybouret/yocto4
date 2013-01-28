@@ -53,15 +53,15 @@ namespace yocto {
 					// Package Functions
 					//
 					//--------------------------------------------------------------
-					static const luaL_reg _defaultFunctions[] =
+					static const luaL_Reg _defaultFunctions[] =
 					    {
 					        { "new", Lua::New<OBJECT> },
 					        { NULL, NULL }
 					    };
 
 					lua_newtable(L);
-					luaL_register(L, NULL, _defaultFunctions );
-					luaL_register(L, NULL, OBJECT::Functions );
+					luaL_setfuncs(L, _defaultFunctions,0 );
+					luaL_setfuncs(L,   OBJECT::Functions,0 );
 					lua_setglobal(L, OBJECT::PackageName     );
 
 
@@ -70,16 +70,16 @@ namespace yocto {
 					// Metatable = Events
 					//
 					//--------------------------------------------------------------
-					static const luaL_reg _defaultEvents[] =
+					static const luaL_Reg _defaultEvents[] =
 					    {
 					        { "__gc", Lua::Delete<OBJECT> },
 					        { NULL, NULL }
 					    };
 
-					luaL_newmetatable(L, OBJECT::ClassName );   //! metatable
-					luaL_register(L, NULL,  _defaultEvents );   //! default metamethods
-					luaL_register(L, NULL,  OBJECT::Events );   //! user's behavior
-					const int metatable = lua_gettop(L);        //! mark metatable.
+					luaL_newmetatable(L, OBJECT::ClassName );  //! metatable
+					luaL_setfuncs(L, _defaultEvents, 0 );      //! default metamethods
+					luaL_setfuncs(L, OBJECT::Events, 0 );      //! user's behavior
+					const int metatable = lua_gettop(L);       //! mark metatable.
 
 
 					lua_pushliteral(L, "__metatable");

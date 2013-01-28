@@ -33,7 +33,7 @@ namespace yocto
 			//==================================================================
 			// load the species
 			//==================================================================
-			const unsigned ns = lua_objlen(L, -1);
+			const unsigned ns = lua_rawlen(L, -1);
 			std::cerr << "*** Parsing " << ns << " species" << std::endl;
 			for( unsigned i=1; i <= ns; ++i )
 			{
@@ -45,7 +45,7 @@ namespace yocto
 					throw exception("species #%u: not a table", i);
                 
 				//-- get the number of fields
-				const unsigned nf = lua_objlen(L, -1);
+				const unsigned nf = lua_rawlen(L, -1);
 				if( nf != 2 && nf != 3 )
 					throw exception("species #%u: invalid #fields=%u, must be 2 or 3",i,nf);
                 
@@ -115,7 +115,7 @@ namespace yocto
 			//==================================================================
 			// load the equilibria
 			//==================================================================
-			const unsigned neq = lua_objlen(L, -1);
+			const unsigned neq = lua_rawlen(L, -1);
 			std::cerr << "*** Parsing " << neq << " equilibria" << std::endl;
 			for( unsigned i=1; i <= neq; ++i )
 			{
@@ -124,7 +124,7 @@ namespace yocto
 				if( !lua_istable(L, -1) )
 					throw exception( "equilibrium #%u: not a table", i);
                 
-				const size_t nf = lua_objlen(L, -1);
+				const size_t nf = lua_rawlen(L, -1);
 				if( nf < 3 )
 					throw exception("equilibrium #%u: not enough fields",i);
                 
@@ -175,7 +175,7 @@ namespace yocto
 					{
 						if( !lua_istable(L, -1) )
 							throw exception("[%s]: invalid actor #%u", ch, k );
-						if( lua_objlen(L, -1) != 2 )
+						if( lua_rawlen(L, -1) != 2 )
 							throw exception("[%s]: invalid actor #%u format", ch, k );
                         
                         
@@ -237,7 +237,7 @@ namespace yocto
 			//==================================================================
 			// parse all the constraints
 			//==================================================================
-			const unsigned nc = lua_objlen(L, -1);
+			const unsigned nc = lua_rawlen(L, -1);
 			std::cerr << "*** Parsing " << nc << " constraints" << std::endl;
 			for( unsigned i=1; i <= nc; ++i )
 			{
@@ -245,7 +245,7 @@ namespace yocto
 				if( !lua_istable(L, -1) )
 					throw exception("%s: invalid constraint #%u", ini_name, i);
                 
-				const size_t nf = lua_objlen(L, -1);
+				const size_t nf = lua_rawlen(L, -1);
 				if( nf < 2 )
 					throw exception("%s: not enough data for constraint #%u", ini_name, i);
                 
@@ -283,7 +283,7 @@ namespace yocto
 					{
 						if( !lua_istable(L, -1) )
 							throw exception("%s: constraint #%u has invalid field #%u", ini_name, i, k );
-						if( lua_objlen(L, -1) != 2 )
+						if( lua_rawlen(L, -1) != 2 )
 							throw exception("%s: constraint #%u has invalid field #%u format", ini_name, i, k );
                         
                         
