@@ -77,14 +77,7 @@ namespace yocto
                 return true;
             }
             
-#if 0
-            static inline int compareW( const real_t a, const real_t b )
-            {
-                const real_t lhs = Fabs(a);
-                const real_t rhs = Fabs(b);
-                return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
-            }
-#endif
+
         }
         
         
