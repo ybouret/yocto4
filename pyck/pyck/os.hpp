@@ -150,5 +150,14 @@ inline void cswap( T &a, T &b ) throw()
     b = tmp;
 }
 
+template <typename T>
+inline void cswap_const( const T &a, const T &b ) throw()
+{
+    const T tmp(a);
+    (T&)a = b;
+    (T&)b = tmp;
+}
+
+
 
 #endif

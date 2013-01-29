@@ -233,10 +233,16 @@ int main(int argc, char *argv[])
 		{
 			for(size_t j=0; j < M.cols; ++j )
 			{
-				M[i][j] = i + j; 
+				M[i][j] = i * M.cols + j;
 			}
 		}
 		std::cerr << "M=" << M << std::endl;
+        
+        C_Matrix<double> M2;
+        M2.swap_with(M);
+        std::cerr << "M2=" << M2 << std::endl;
+        M.ldz();
+        M2.ldz();
 		return 0;
 	}
 	catch( const std::exception &e )
