@@ -317,7 +317,7 @@ public:
     //! create a list for R
     RList(const char *names[], const size_t count) :
     size( count ),
-    L( L = allocVector(VECSXP,size) )
+    L( allocVector(VECSXP,size) )
     {
         PROTECT(L);
         
