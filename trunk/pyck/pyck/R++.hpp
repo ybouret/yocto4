@@ -308,4 +308,44 @@ private:
 };
 
 
+class RList : public RObject
+{
+public:
+    
+    //! create a list for R
+    RList(const char *names[], const size_t count) :
+    size( count ),
+    L( L = allocVector(VECSXP,size) )
+    {
+        PROTECT(L);
+        
+        //-- set list items name
+        SEXP list_names = 0;
+        PROTECT(list_names = allocVector(STRSXP,size));
+        for(size_t i = 0; i < size; i++)
+            SET_STRING_ELT(list_names,i,mkChar(names[i]));
+        setAttrib(L, R_NamesSymbol, list_names);
+        UNPROTECT(1); //-- list_name
+        
+        set_R();
+    }
+    
+    virtual ~RList() throw() {}
+    
+    inline void set(size_t indx, const RObject &elmt )
+    {
+        assert(indx<size);
+        SET_VECTOR_ELT(L, indx, *elmt);
+    }
+    
+    const size_t size;
+private:
+    SEXP         L;
+    
+    virtual SEXP get_SEXP() const throw() { return L; }
+
+    RList(const RList &);
+    RList&operator=(const RList &);
+};
+
 #endif

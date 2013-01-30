@@ -86,3 +86,25 @@ SEXP dumpMat( SEXP args ) throw()
     }
 }
 
+extern "C"
+SEXP getList() throw()
+{
+    try
+    {
+        const char  *names[] = { "A", "B" };
+        const size_t count   = sizeof(names)/sizeof(names[0]);
+        RList L(names,count);
+        RMatrix<double> q(2,3);
+        L.set(0,q);
+        memset( &q[0][0], 0, sizeof(double) * q.items );
+        RVector<int> v(1);
+        v[0] = 7;
+        L.set(1,v);
+        return *L;
+    }
+    catch(...)
+    {
+        return R_NilValue;
+    }
+}
+

@@ -8,3 +8,7 @@ mat1 <- matrix(seq1, 2)
 mat1
 .Call("dumpMat", mat1);
 
+L <- .Call("getList");
+print(L$A);
+print(L$B);
+
