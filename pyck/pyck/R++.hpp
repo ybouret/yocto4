@@ -5,6 +5,7 @@
 #include <Rinternals.h>
 #include <new>
 #include <cassert>
+#include "./exception.hpp"
 
 //! template for R data type handling
 template <typename T> struct RGetData;
@@ -308,6 +309,7 @@ private:
 };
 
 
+//! RList wrapper
 class RList : public RObject
 {
 public:
@@ -339,6 +341,7 @@ public:
     }
     
     const size_t size;
+    
 private:
     SEXP         L;
     
@@ -347,5 +350,14 @@ private:
     RList(const RList &);
     RList&operator=(const RList &);
 };
+
+//! argument conversion
+template <typename T>
+inline T R2Scalar( SEXP r )
+{
+    const RVector<T> value(r);
+    if( value.size < 1) throw Exception("R2Scalar: invalid argument");
+    return value[0];
+}
 
 #endif
