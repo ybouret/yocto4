@@ -8,19 +8,50 @@ template <typename T>
 class C_Array
 {
 public:
+    
+    explicit C_Array() throw() : data(0), size(0) {}
+    
 	explicit C_Array( size_t n ) :
 	data( static_cast<T*>(operator new( __check(n) * sizeof(T) )) ),
-		size(n)
+    size(n)
 	{
 	}
-
+    
 	virtual ~C_Array() throw()
 	{
-		operator delete(data);
-		data          = 0;
-		(size_t&)size = 0;
+        if(data)
+        {
+            assert(size);
+            operator delete(data);
+            data          = 0;
+            (size_t&)size = 0;
+        }
 	}
-
+    
+    inline void swap_with( C_Array &other ) throw()
+    {
+        cswap(data,other.data);
+        cswap_const(size,other.size);
+    }
+    
+    inline void make( size_t n )
+    {
+        if( n != size )
+        {
+            C_Array   tmp(n);
+            swap_with(tmp);
+        }
+    }
+    
+    inline void ensure( size_t n )
+    {
+        if( n > size )
+        {
+            C_Array   tmp(n);
+            swap_with(tmp);
+        }
+    }
+    
 	inline T &       operator[](size_t indx) throw()       { assert(indx<size); return data[indx]; }
 	inline const T & operator[](size_t indx) const throw() { assert(indx<size); return data[indx]; }
     
@@ -43,8 +74,8 @@ private:
 	}
 public:
 	const size_t size;
-
-
+    
+    
 };
 
 #endif
