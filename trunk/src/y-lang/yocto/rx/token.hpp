@@ -32,7 +32,7 @@ namespace yocto
 		
 		
 		
-		//! token is a list of t_char
+		//! token is a linked list of t_char
 		class token : public object, public core::list_of<t_char>
 		{
 		public:

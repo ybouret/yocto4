@@ -23,6 +23,7 @@ namespace yocto
 		class source;
 		void  show_tag( ios::ostream &, const void *p );
 		
+        //! base class to accept a source of t_char
 		class pattern : public token
 		{
 		public:
