@@ -14,6 +14,12 @@ namespace yocto
         {
         }
         
+        Curve:: Curve( const char *id ) :
+        name(id),
+        color(FL_WHITE)
+        {
+        }
+        
         const string & Curve:: key() const throw() { return name; }
         
         
@@ -41,7 +47,13 @@ namespace yocto
             }
         }
 
-        const Curve & Curves:: operator[]( const string &id ) const 
+        Curve & Curves:: operator[]( const char *name )
+        {
+            const string id = name;
+            return (*this)[id];
+        }
+        
+        const Curve & Curves:: operator[]( const string &id ) const
         {
             const Curve::Ptr *ppC = search(id);
             if( !ppC )
@@ -49,6 +61,12 @@ namespace yocto
                 throw exception("no Curves['%s']", id.c_str() );
             }
             return **ppC;
+        }
+        
+        const Curve & Curves:: operator[]( const char *name ) const
+        {
+            const string id = name;
+            return (*this)[id];
         }
         
         
