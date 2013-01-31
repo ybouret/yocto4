@@ -280,7 +280,7 @@ namespace yocto
         }
         
         // Draw tab's box
-        static void draw_tab_box(int x, int y, int w, int h, Fl_Color c, 
+        static void draw_tab_box(int x, int y, int w, int h, Fl_Color , 
                                  int onoff,		// is this tab 'on' or 'off'
                                  int curveleft, 	// is the left side of the tab curved, or a divider?
                                  int curveright) {	// is the right side of the tab curved, or a divider?
@@ -335,7 +335,7 @@ namespace yocto
         }
         
         // Draw a single tab with label
-        void Gel_Tabs::draw_tab(int i, int *p, int tw, int W, int H, int yedge, Fl_Widget* o, int what) {
+        void Gel_Tabs::draw_tab(int i, int *p, int /*tw*/, int W, int /*H*/, int yedge, Fl_Widget* o, int what) {
             int x1 = p[i];
             int sel = (what == SELECTED);
             

@@ -7,6 +7,6 @@ YOCTO_UNIT_TEST_IMPL(matte)
 {
     MakeWindowMatte()->show(argc,argv);
     
-    return Fl::run();
+    (void)Fl::run();
 }
 YOCTO_UNIT_TEST_DONE()
