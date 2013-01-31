@@ -98,7 +98,7 @@ namespace yocto
 			};
 			
 			
-			//!< any char within catalog
+			//! any char within symbols
 			class within : public one_char
 			{
 			public:
