@@ -24,6 +24,6 @@ YOCTO_UNIT_TEST_IMPL(canvas)
     
     win->show(argc,argv);
 
-    return Fl::run();
+    (void)Fl::run();
 }
 YOCTO_UNIT_TEST_DONE()
