@@ -18,13 +18,13 @@ namespace yocto {
 		
 		int array:: size( lua_State *L)
 		{
-			lua_pushnumber( L, array_.size() );
+			lua_pushnumber( L, lua_Number(array_.size()) );
 			return 1;
 		}
 		
 		int array:: capacity( lua_State *L )
 		{
-			lua_pushnumber( L, array_.capacity() );
+			lua_pushnumber( L, lua_Number(array_.capacity()) );
 			return 1;
 		}
 		

@@ -43,7 +43,7 @@ namespace yocto {
 		//======================================================================
 		#define YOCTO_LUA_IMPL(CLASS) \
 		const char CLASS:: ClassName[]   = #CLASS; \
-		const char CLASS:: PackageName[] = #CLASS "L";
+		const char CLASS:: PackageName[] = #CLASS "L"
 
 		#define YOCTO_LUA_METHODS_OF(CLASS)   \
 		const CLASS::Method CLASS::Methods[] =
