@@ -162,7 +162,7 @@ namespace yocto {
 		};
 
 		template <class OBJECT>
-		void Require( lua_State *L )
+		inline void Require( lua_State *L )
 		{
 			Lua::Bind<OBJECT>::Register(L);
 		}
