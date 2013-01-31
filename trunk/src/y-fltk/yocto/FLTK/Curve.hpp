@@ -23,6 +23,7 @@ namespace yocto
         {
         public:
             explicit Curve(const string &id);
+            explicit Curve(const char   *id);
             virtual ~Curve() throw();
             
             const string name;
@@ -45,6 +46,10 @@ namespace yocto
             
             Curve & operator[]( const string &id ); //!< existing or create
             const Curve & operator[]( const string &id ) const; //! must exist
+            
+            Curve & operator[]( const char * );
+            const Curve & operator[]( const char *) const;
+            
             
         private:
             YOCTO_DISABLE_COPY(Curves);
