@@ -47,7 +47,7 @@ namespace yocto
                 ~rule() throw();
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
             public:
-                const bool      fctl;    //!< control flag: rule is jump/call/back
+                const bool      fctl;    //!< control flag: true if rule is jump/call/back
             };
             
             class rules : public core::list_of<rule>
