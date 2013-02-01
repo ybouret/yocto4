@@ -55,6 +55,7 @@ public:
 	inline T &       operator[](size_t indx) throw()       { assert(indx<size); return data[indx]; }
 	inline const T & operator[](size_t indx) const throw() { assert(indx<size); return data[indx]; }
     
+    //! scilab/octave output
     friend inline std::ostream & operator<<( std::ostream &os, const C_Array &arr)
     {
         os << "[";
@@ -72,6 +73,7 @@ private:
 		if(n<=0) throw Exception("C_Array: invalid size");
 		return n;
 	}
+    
 public:
 	const size_t size;
     

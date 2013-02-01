@@ -87,6 +87,7 @@ public:
 	inline Row &       operator[](size_t r) throw()       { assert(r<rows); return row[r]; }
 	inline const Row & operator[](size_t r) const throw() { assert(r<rows); return row[r]; }
     
+    //! scilab/octave output
 	friend inline std::ostream & operator<<( std::ostream &os, const C_Matrix &M)
 	{
 		os << "[";

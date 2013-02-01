@@ -128,8 +128,8 @@ public:
         {
         }
         
-        T  & operator[]( size_t r ) throw()          { assert(r<rows); return data[r]; }
-        const T & operator[](size_t r) const throw() { assert(r<rows); return data[r]; }
+        inline T  & operator[]( size_t r ) throw()          { assert(r<rows); return data[r]; }
+        inline const T & operator[](size_t r) const throw() { assert(r<rows); return data[r]; }
         
     private:
         T *data;
@@ -162,8 +162,8 @@ public:
         get_dims();
     }
     
-    Column &       operator[](size_t c) throw()       { assert(c<cols); return mcol[c]; }
-    const Column & operator[](size_t c) const throw() { assert(c<cols); return mcol[c]; }
+    inline Column &       operator[](size_t c) throw()       { assert(c<cols); return mcol[c]; }
+    inline const Column & operator[](size_t c) const throw() { assert(c<cols); return mcol[c]; }
     
 private:
     
@@ -206,8 +206,8 @@ public:
             assert(cols>0);
         }
         
-        T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
-        const T & operator[](size_t c) const throw() { assert(c<cols); return data[c]; }
+        inline T &       operator[](size_t c) throw()       { assert(c<cols); return data[c]; }
+        inline const T & operator[](size_t c) const throw() { assert(c<cols); return data[c]; }
         
         
     private:
@@ -261,8 +261,8 @@ public:
         data = 0;
     }
     
-    Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
-    const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
+    inline Row &       operator[](size_t r) throw()       { assert(r<rows); return mrow[r]; }
+    inline const Row & operator[](size_t r) const throw() { assert(r<rows); return mrow[r]; }
     
     
     inline void print() const
