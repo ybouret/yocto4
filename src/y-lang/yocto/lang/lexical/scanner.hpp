@@ -69,7 +69,7 @@ namespace yocto
                 }
                 
                 //==============================================================
-                // jump within lexer's scanners
+                // jump within lexer's sub-scanners
                 //==============================================================
                 void jump( const string &id, regex::pattern *motif, const callback &cb );
                 void jump( const string &id, const string &expr, const callback &cb );
@@ -84,7 +84,7 @@ namespace yocto
                 }
                 
                 //==============================================================
-                // call one of the lexer's scanners
+                // call one of the lexer's sub-scanners
                 //==============================================================
                 void call( const string &id, regex::pattern *motif, const callback &cb );
                 void call( const string &id, const string   &expr,  const callback &cb );
