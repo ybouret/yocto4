@@ -9,7 +9,7 @@ namespace yocto
     
     namespace spade
     {
-        //! linear memory
+        //! linear memory interface
         class linear : public object
         {
         public:
@@ -74,9 +74,16 @@ namespace yocto
             virtual size_t item_size() const throw() { return sizeof(T); }
             
             //! virtual address_of
+            /**
+             \param source offset of the item to get
+             */
             virtual const void *address_of( size_t source ) const throw() { assert(entry); assert(source<this->items); return &entry[source]; }
             
             //! virtual local_copy, assuming an assign operator exists
+            /**
+             \param target offset of the target item
+             \param source offset of the source item
+             */
             virtual void local_copy( size_t target, size_t source ) throw()
             {
                 assert(entry);
