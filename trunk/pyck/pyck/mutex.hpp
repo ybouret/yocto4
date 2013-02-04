@@ -8,12 +8,12 @@
 #		define __USE_UNIX98
 #	endif
 #	include <pthread.h>
-#endif /* YOCTO_BSD */
+#endif /* BSD */
 
 #if defined(PYCK_WIN)
 #	define WIN32_LEAN_AND_MEAN
 #	include <windows.h>
-#endif /* YOCTO_WIN */
+#endif /* WIN */
 
 //! recursive mutex
 class Mutex : public Lockable

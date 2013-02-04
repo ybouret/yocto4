@@ -19,7 +19,7 @@ namespace yocto
 		{
 			assert( data != NULL );
 			assert( is_a_power_of_two(size) );
-			
+			assert( isign==1 || isign==-1);
 			--data;
 			
 			//==================================================================
@@ -31,7 +31,7 @@ namespace yocto
 				size_t j=1;
 				for (size_t i=1;i<n;i+=2) 
 				{ 
-					if (j > i) 
+					if(j>i) 
 					{ 
 						real_t *d_i = data+i;
 						real_t *d_j = data+j;
@@ -39,7 +39,7 @@ namespace yocto
 						cswap(d_j[1], d_i[1] );
 					}
 					size_t m = size; // m=  n / 2;
-					while (m >= 2 && j > m)
+					while( m>=2 && j>m )
 					{
 						j -= m;
 						m >>= 1;
@@ -86,13 +86,11 @@ namespace yocto
 				}
 			}
 			
-			
 			//==================================================================
 			// Normalizing
 			//==================================================================
 #define _YOCTO_FFT_SCALE(INDEX) data[INDEX] *= coef
 			YOCTO_LOOP_FUNC_(n,_YOCTO_FFT_SCALE,1);
-			
 		}
 		
 		

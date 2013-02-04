@@ -255,14 +255,12 @@ namespace yocto
 		
 		natural natural:: one()
 		{
-			static const uint8_t _one = 1;
-			return natural( _one );
+			return natural( 1 );
 		}
 		
 		natural natural:: two()
 		{
-			static const uint8_t _two = 2;
-			return natural( _two );
+			return natural( 2 );
 		}
 		
 		bool natural:: is_even() const throw() 
