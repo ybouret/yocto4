@@ -315,9 +315,11 @@ namespace yocto
                 uint8_t     *prod  = P.byte_;
                 const size_t top   = nP - 1;
 				
+                static const real_t half = 0.5;
+                
 #if YMPK_FFT_UNROLL == 1
 #   define YMPK_FFT_U(J)                               \
-/**/  carry += L[J].re/nN + 0.5;                       \
+/**/  carry += L[J].re/nN + half;                      \
 /**/  const real_t _q = real_t(size_t( carry/256.0 )); \
 /**/  const real_t _r = carry - 256.0 * _q;            \
 /**/  prod[J]        = uint8_t(_r);                    \
