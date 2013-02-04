@@ -1,0 +1,7 @@
+
+ADD_EXECUTABLE(bitrev bitrev.cpp)
+TARGET_LINK_YOCTO(bitrev)
+
+#INSTALL( TARGETS file2data RUNTIME DESTINATION bin )
+
+

@@ -55,18 +55,35 @@ int main( int argc, char *argv[] )
 		size_t count = 0;
 		char   c = 0;
 		
+#define SYMBOLS_PER_LINE 16
+        
+        char verbatim[SYMBOLS_PER_LINE+8];
+        memset( verbatim, 0, sizeof(verbatim));
+       
 		while( input->query(c) )
 		{
 			unsigned char C = c;
 			if( count > 0 ) 
 				output->write( ',' );
-			if( index >= 16 )
+            if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
+            {
+                verbatim[index] = c;
+            }
+            else
+            {
+                verbatim[index] = '.';
+            }
+			if( index >= SYMBOLS_PER_LINE )
 			{
 				output->write( '\n' );
+                
 				index = 0;
 			}
 			++index;
 			++count;
+            (*output)( " 0x%02x", unsigned(C) );
+            
+            /*
 			if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
 			{
 				(*output)( "  '%c'", C );
@@ -75,7 +92,7 @@ int main( int argc, char *argv[] )
 			{
 				(*output)( " 0x%02x", unsigned(C) );
 			}
-			
+			*/
 			
 		}
 		(*output)( " /* END */" );
