@@ -12,7 +12,7 @@ namespace yocto
 		template <> complex<real_t>:: complex( const real_t x, const real_t y ) throw() : re( x ), im( y ) {}
 		template <> complex<real_t>:: complex( const complex &z ) throw() : re( z.re ), im( z.im ) {}
 		template <> complex<real_t> & complex<real_t>:: operator=( const complex<real_t> & z ) throw() { re = z.re; im = z.im; return *this; }
-		template <> complex<real_t> & complex<real_t>:: operator=( const real_t          & x ) throw() { re = x;    im = 0;    return *this; }
+		template <> complex<real_t> & complex<real_t>:: operator=( const real_t            x ) throw() { re = x;    im = 0;    return *this; }
 		template <> complex<real_t>:: ~complex() throw() {}
 		
 		

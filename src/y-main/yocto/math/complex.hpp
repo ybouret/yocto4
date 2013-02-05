@@ -24,7 +24,7 @@ namespace yocto
 			complex( const complex &z ) throw();
 			
 			complex & operator=( const complex &z ) throw();
-			complex & operator=( const T       &x ) throw();
+			complex & operator=( const T        x ) throw();
 			
 			~complex() throw();
 			
