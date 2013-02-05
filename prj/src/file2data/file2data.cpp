@@ -8,11 +8,90 @@
 
 using namespace yocto;
 
+#define SYMBOLS_PER_LINE 16
+
+
+class Writer
+{
+public:
+    Writer( ios::ostream &output ) :
+    fp( output ),
+    count(0),
+    store()
+    {
+        
+    }
+    
+    ~Writer() throw(){}
+    
+    ios::ostream &fp;
+    size_t        count;
+    char          store[SYMBOLS_PER_LINE];
+    
+    void operator()(unsigned C)
+    {
+        assert(count<SYMBOLS_PER_LINE);
+        
+        //-- store char
+        if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
+        {
+            store[count] = C;
+        }
+        else
+        {
+            store[count] = '.';
+        }
+        //-- emit char
+        if(count>0)
+            fp.write(',');
+        fp( " 0x%02x", C );
+        ++count;
+        if( count >=  SYMBOLS_PER_LINE )
+        {
+            emit();
+            count = 0;
+        }
+    }
+    
+    void flush()
+    {
+        if(count>0)
+        {
+            for(size_t i=count;i<SYMBOLS_PER_LINE;++i)
+            {
+                fp("      ");
+            }
+        }
+        emit();
+    }
+    
+    
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(Writer);
+    inline void emit()
+    {
+        assert(count<=SYMBOLS_PER_LINE);
+        if(count > 0 )
+        {
+            fp(" /*|");
+            for( size_t i=0; i < count; ++i )
+            {
+                fp.write(store[i]);
+            }
+            for( size_t i=count;i<SYMBOLS_PER_LINE;++i)
+                fp.write(' ');
+            fp("|*/\n");
+        }
+    }
+    
+};
+
+
 int main( int argc, char *argv[] )
 {
 	try
 	{
-	
+        
 		
 		//-- default: save has binary
 		bool binary = true;
@@ -51,57 +130,19 @@ int main( int argc, char *argv[] )
 		}
 		auto_ptr< ios::ocstream > output( output_ );
 		
-		size_t index = 0;
-		size_t count = 0;
 		char   c = 0;
-		
-#define SYMBOLS_PER_LINE 16
+        Writer W( *output );
         
-        char verbatim[SYMBOLS_PER_LINE+8];
-        memset( verbatim, 0, sizeof(verbatim));
-       
 		while( input->query(c) )
 		{
-			unsigned char C = c;
-			if( count > 0 ) 
-				output->write( ',' );
-            if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
-            {
-                verbatim[index] = c;
-            }
-            else
-            {
-                verbatim[index] = '.';
-            }
-			if( index >= SYMBOLS_PER_LINE )
-			{
-				output->write( '\n' );
-                
-				index = 0;
-			}
-			++index;
-			++count;
-            (*output)( " 0x%02x", unsigned(C) );
-            
-            /*
-			if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
-			{
-				(*output)( "  '%c'", C );
-			}
-			else
-			{
-				(*output)( " 0x%02x", unsigned(C) );
-			}
-			*/
-			
+            const uint8_t C = c;
+			W(C);
 		}
-		(*output)( " /* END */" );
 		if( !binary )
 		{
-			if( count > 0 ) output->write(',');
-			output->write('0');
+			W(0);
 		}
-		output->write('\n');
+		W.flush();
 		
 		
 		return 0;
