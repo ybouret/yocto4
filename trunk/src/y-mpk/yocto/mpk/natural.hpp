@@ -10,7 +10,7 @@ namespace yocto
 {
 
 	namespace ios { class bitio; class ostream; class istream; }
-	
+
 	namespace mpk
 	{
 
@@ -18,10 +18,11 @@ namespace yocto
 		size_t   mem_round( size_t n );
 		uint8_t *mem_acquire( size_t &n );
 		void     mem_release( uint8_t * &, size_t &n ) throw();
-       
-        
+		size_t   mem_limit_size() throw();
+
+
 #		define YMPN_CMP_DECL(FUNC) \
-/*		*/ friend bool operator FUNC ( const natural &lhs, const natural &rhs ) throw()
+	/*		*/ friend bool operator FUNC ( const natural &lhs, const natural &rhs ) throw()
 
 		class natural : public memory::ro_buffer
 		{
@@ -38,9 +39,9 @@ namespace yocto
 			bool is_positive() const throw();
 			bool is_one() const throw();
 			bool is_two() const throw();
-			
+
 			size_t bits() const throw();
-			
+
 			//==================================================================
 			// I/O
 			//==================================================================
@@ -50,13 +51,13 @@ namespace yocto
 				mp.out(os);
 				return os;
 			}
-			
+
 			bool bit( size_t index ) const throw();
 			void store( ios::bitio &, size_t nbits ) const;
 			static natural query( ios::bitio &, size_t nbits );
-            void           save( ios::ostream &fp ) const;
-            static natural load( ios::istream &fp );
-            
+			void           save( ios::ostream &fp ) const;
+			static natural load( ios::istream &fp );
+
 			//==================================================================
 			// ro_buffer interface
 			//==================================================================
@@ -67,14 +68,8 @@ namespace yocto
 			//==================================================================
 			natural( const ro_buffer & ); //!< binary + update
 			natural( const void *buffer, const size_t buflen ); //!< binary + update
-#if 0
-			natural( const uint8_t   & ); //!< one   byte
-			natural( const uint16_t  & ); //!< two   bytes
-			natural( const uint32_t  & ); //!< four  bytes
-			natural( const uint64_t  & ); //!< eight bytes
-#endif
-            natural( const uint64_t ); //!< default cast
-            
+			natural( const uint64_t ); //!< default cast
+
 			//==================================================================
 			// fast conversion
 			//==================================================================
@@ -105,7 +100,7 @@ namespace yocto
 			natural & operator+=( const natural &rhs );
 			natural & operator++();
 			natural & inc( uint8_t x );
-			
+
 			//==================================================================
 			// subtraction
 			//==================================================================
@@ -124,7 +119,7 @@ namespace yocto
 			static natural sqr_( const natural &lhs);
 			friend natural operator*( const natural &lhs, const natural &rhs );
 			natural & operator *= ( const natural &rhs );
-			
+
 			//==================================================================
 			// bitwise
 			//==================================================================
@@ -132,14 +127,14 @@ namespace yocto
 			natural operator<<( size_t n) const;
 			natural & shl();         //!< shift left by one
 			natural & operator<<=( size_t n );
-			
+
 			static natural shr_( const natural &lhs, size_t n); //!< shift right
 			natural & shr() throw(); //!< shift right by one, special
 			natural operator>>( size_t n) const;
 			natural & operator>>=( size_t n );
-			
+
 			static natural exp2( size_t n ); //!< \return 1 << n 
-			
+
 			//==================================================================
 			//comparison
 			//==================================================================
@@ -168,7 +163,7 @@ namespace yocto
 			static natural  div_( const natural &num, const natural &den ); 
 			friend natural operator/( const natural &num, const natural &den );
 			natural & operator/=( const natural &den );
-			
+
 			//==================================================================
 			// mod
 			//==================================================================
@@ -176,36 +171,36 @@ namespace yocto
 			static natural  mod_( const natural &num, const natural &den ); 
 			friend natural  operator%(  const natural &num, const natural &den );
 			natural & operator %= ( const natural &den );
-			
+
 			//==================================================================
 			// modular arithmetic
 			//==================================================================
 			static natural  mod_inv( const natural &b, const natural &n );                     //!< modular inverse
 			static natural  mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
-			
+
 			//==================================================================
 			// arithmetic
 			//==================================================================
 			static natural gcd( const natural &lhs, const natural &rhs );           //!< greatest common divisor
 			static bool    are_coprime( const natural &lhs, const natural &rhs );   //!< gcd(lhs,rhs) == 1
-			
+
 			static natural one();
 			static natural two();
-			
+
 			bool    is_even()     const throw();
 			bool    is_odd()      const throw();
-			
+
 			bool    is_prime_()   const; //!< sieve based algorithm
 			natural next_prime_() const;
-			
-            //==================================================================
+
+			//==================================================================
 			// parsing
 			//==================================================================
-            static natural dec( const string & );
-            static natural dec( const char *txt );
-            static natural hex( const string & );
-            static natural hex( const char *txt );
-            
+			static natural dec( const string & );
+			static natural dec( const char *txt );
+			static natural hex( const string & );
+			static natural hex( const char *txt );
+
 		private:
 			size_t   size_;
 			size_t   maxi_;
@@ -222,12 +217,41 @@ namespace yocto
 			static  const uint8_t  _bit[8];
 			static  const uint8_t  _msk[8];
 		};
-        
-        template <typename T>
-        class;
-        
+
+		template <typename T>
+		class array_of
+		{
+		public:
+			explicit array_of( size_t n ) : 
+			size( n <= 0 ? 1 : n ),
+				buflen( size * sizeof(T) ),
+				buffer( mem_acquire( buflen ) ),
+				data( (T*) &buffer[0] )
+			{
+				//if(buflen>mem_limit_size()) std::cerr << "array_of(" << size << "*" << sizeof(T) << "): bytes=" << buflen << std::endl;
+			}
+
+			virtual ~array_of() throw() 
+			{
+				mem_release( buffer, buflen );
+				data = 0;
+				(size_t &)size = 0;
+			}
+
+			const size_t size;
+
+			inline T &       operator[](size_t i) throw()       { assert(i<size); return data[i]; }
+			inline const T & operator[](size_t i) const throw() { assert(i<size); return data[i]; }
+
+		private:
+			size_t       buflen;
+			uint8_t     *buffer;
+			T           *data;
+			YOCTO_DISABLE_COPY_AND_ASSIGN(array_of);
+		};
+
 	}
-	
+
 	typedef mpk::natural mpn;
 
 }

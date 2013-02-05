@@ -14,7 +14,7 @@ namespace yocto
 		class memmgr : public singleton<memmgr>
 		{
 		public:
-			static const size_t limit_size = 1024;
+			static const size_t limit_size = 8192;
 			static const size_t chunk_size = 8*limit_size;
 			
 			static inline void _round( size_t &n ) throw()
@@ -109,6 +109,12 @@ namespace yocto
 		{
 			static memmgr & mgr = * memmgr::location();
 			mgr.release(p,n);
+		}
+
+		size_t   mem_limit_size() throw()
+		{
+			static memmgr & mgr = memmgr::instance();
+			return mgr.limit_size;
 		}
 		
 	}

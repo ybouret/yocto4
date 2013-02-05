@@ -263,13 +263,10 @@ namespace yocto
                     nN <<= 1;
 				
 				//--------------------------------------------------------------
-                //- compute wokspace size and create it
+                //- compute wokspaces 
 				//--------------------------------------------------------------
-                const size_t   nW     = nN << 1; //-- L+R
-                size_t         buflen = nW * sizeof(cplx_t);
-                uint8_t       *buffer = mem_acquire(buflen);
-                cplx_t        *L      = (cplx_t *) &buffer[0];
-                cplx_t        *R      = L + nN;
+				array_of<cplx_t> L(nN);
+				array_of<cplx_t> R(nN);
                 const uint8_t *l      = lhs.byte_;
                 const uint8_t *r      = rhs.byte_;
 				
@@ -285,7 +282,7 @@ namespace yocto
 				//--------------------------------------------------------------
                 //-- forward
 				//--------------------------------------------------------------
-                _xfft( & L->re, & R->re, nN   );
+                _xfft( & L[0].re, & R[0].re, nN   );
 				
 				//--------------------------------------------------------------
                 //-- multiply in place, in L
@@ -296,7 +293,7 @@ namespace yocto
 				//--------------------------------------------------------------
                 //-- reverse
 				//--------------------------------------------------------------
-                _ifft( & L->re, nN );
+                _ifft( & L[0].re, nN );
 				
                 real_t       carry = 0;
                 uint8_t     *prod  = P.byte_;
@@ -323,8 +320,7 @@ namespace yocto
                 }
 #endif
                 prod[top] = uint8_t(carry);
-				
-                mem_release(buffer, buflen);                
+				        
                 P.update();
                 return P;
             }
@@ -351,9 +347,10 @@ namespace yocto
 				//--------------------------------------------------------------
                 //- compute wokspace size and create it
 				//--------------------------------------------------------------
-                size_t         buflen = nN * sizeof(cplx_t);
-                uint8_t       *buffer = mem_acquire(buflen);
-                cplx_t        *L      = (cplx_t *) &buffer[0];
+                //size_t         buflen = nN * sizeof(cplx_t);
+                //uint8_t       *buffer = mem_acquire(buflen);
+                //cplx_t        *L      = (cplx_t *) &buffer[0];
+				array_of<cplx_t> L( nN );
                 const uint8_t *l      = lhs.byte_;
 				
 				//--------------------------------------------------------------
@@ -366,7 +363,7 @@ namespace yocto
 				//--------------------------------------------------------------
                 //-- forward
 				//--------------------------------------------------------------
-                _fft( & L->re,  nN   );
+                _fft( & L[0].re,  nN   );
 				
 				//--------------------------------------------------------------
                 //-- multiply in place, in L
@@ -378,7 +375,7 @@ namespace yocto
 				//--------------------------------------------------------------
                 //-- reverse
 				//--------------------------------------------------------------
-                _ifft( & L->re, nN );
+                _ifft( & L[0].re, nN );
 				
                 real_t       carry = 0;
                 uint8_t     *prod  = P.byte_;
@@ -405,7 +402,7 @@ namespace yocto
 #endif
                 prod[top] = uint8_t(carry);
 				
-                mem_release(buffer, buflen);
+                //mem_release(buffer, buflen);
                 P.update();
                 return P;
             } else
