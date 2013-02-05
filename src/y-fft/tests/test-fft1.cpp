@@ -7,6 +7,7 @@
 using namespace yocto;
 using namespace math;
 
+
 template <typename T>
 static inline
 void perform()
@@ -24,7 +25,7 @@ void perform()
 		vector<cplx_t> raw( data );
 		
 		FFT( data(0), data.size() );
-		vector<T> spec( data.size(), 0 );
+		vector<T> spec( data.size(), numeric<T>::zero );
 		for( size_t i=1; i <= n; ++i )
 		{
 			spec[i] = Fabs( data[i] );

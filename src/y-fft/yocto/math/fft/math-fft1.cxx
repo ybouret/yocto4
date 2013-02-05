@@ -3,7 +3,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/code/unroll.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -33,10 +33,15 @@ namespace yocto
 				{ 
 					if(j>i) 
 					{ 
-						real_t *d_i = data+i;
+						
+#if 0
+                        real_t *d_i = data+i;
 						real_t *d_j = data+j;
-						cswap(d_j[0], d_i[0] ); 
+						cswap(d_j[0], d_i[0] );
 						cswap(d_j[1], d_i[1] );
+#else
+                        core::bswap<2*sizeof(real_t)>( data+i, data+j);
+#endif
 					}
 					size_t m = size; // m=  n / 2;
 					while( m>=2 && j>m )

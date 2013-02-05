@@ -100,6 +100,8 @@ namespace {
 	
 }
 
+#include <cstdio>
+
 YOCTO_UNIT_TEST_IMPL(xmul)
 {
 	Random::ISAAC_FAST::BitsGenerator gen( Random::ISAAC_INIT_RAND );
@@ -113,6 +115,9 @@ YOCTO_UNIT_TEST_IMPL(xmul)
 	for( size_t N=2; N <= NMAX; N <<= 1 )
 	{
 		test_mul(N,tmul,tfft,gen);
+        std::cerr.flush();
+        fprintf(stderr, "\tTimings: <mul>= %10.5f | <fft>= %10.5f\n\n", tmul, tfft);
+        fflush(stderr);
 		ios::ocstream fp("xmul.dat",true);
 		fp("%u %.6g %.6g\n", (unsigned)N, tmul, tfft );
 	}

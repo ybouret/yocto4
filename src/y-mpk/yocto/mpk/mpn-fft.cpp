@@ -7,6 +7,7 @@
 #include "yocto/code/unroll.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -36,24 +37,13 @@ namespace yocto
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
-                    if (j > i) 
+                    if (j > i)
 					{
-						{
-							real_t *d_i = data+i;
-							real_t *d_j = data+j;
-							cswap(d_j[0], d_i[0] );
-							cswap(d_j[1], d_i[1] );
-						}
-						
-						{
-							real_t *o_i = other+i;
-							real_t *o_j = other+j;
-							cswap(o_j[0], o_i[0] );
-							cswap(o_j[1], o_i[1] );
-						}
+                        core::bswap<2*sizeof(real_t)>( data+i,  data+j );
+                        core::bswap<2*sizeof(real_t)>( other+i, other+j);                        
                     }
                     size_t m = size; // m=  n / 2;
-                    while (m >= 2 && j > m) 
+                    while (m >= 2 && j > m)
 					{
                         j -= m;
                         m >>= 1;
@@ -117,7 +107,7 @@ namespace yocto
 			
         }
 		
-		static  
+		static
 		void _fft(real_t      *data,
 				  const size_t size
 				  ) throw()
@@ -134,11 +124,9 @@ namespace yocto
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
-                    if (j > i) {
-                        real_t *d_i = data+i;
-                        real_t *d_j = data+j;
-                        cswap(d_j[0], d_i[0] );
-                        cswap(d_j[1], d_i[1] );
+                    if (j > i)
+                    {
+                        core::bswap<2*sizeof(real_t)>( data+i, data+j);
                     }
                     size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m) {
@@ -205,11 +193,9 @@ namespace yocto
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
-                    if (j > i) {
-                        real_t *d_i = data+i;
-                        real_t *d_j = data+j;
-                        cswap(d_j[0], d_i[0] );
-                        cswap(d_j[1], d_i[1] );
+                    if (j > i)
+                    {
+                        core::bswap<2*sizeof(real_t)>( data+i, data+j);
                     }
                     size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m) {
@@ -265,7 +251,7 @@ namespace yocto
         {
             const size_t nL = lhs.size_;
             const size_t nR = rhs.size_;
-            if( nL >0 && nR > 0 ) 
+            if( nL >0 && nR > 0 )
 			{
                 const size_t nP = nL + nR;             //-- product size
                 natural       P( nP, as_capacity );    //-- product value
@@ -340,7 +326,8 @@ namespace yocto
                 memory::kind<memory::global>::release_as<cplx_t>( L, (size_t&)nW );
                 P.update();
                 return P;
-            } else
+            }
+            else
                 return natural();
         }
 		
@@ -348,7 +335,7 @@ namespace yocto
 		natural natural:: sqr_( const natural &lhs )
         {
             const size_t nL = lhs.size_;
-            if( nL > 0  ) 
+            if( nL > 0  )
 			{
                 const size_t nP = nL << 1;             //-- product size
                 natural       P( nP, as_capacity );    //-- product value
