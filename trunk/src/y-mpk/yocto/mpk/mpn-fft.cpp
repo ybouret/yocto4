@@ -245,8 +245,7 @@ namespace yocto
         }
 		
 		
-#define YMPK_FFT_UNROLL 1
-		
+#define YMPK_FFT_UNROLL 1        
         natural natural:: fft_( const natural &lhs, const natural &rhs )
         {
             const size_t nL = lhs.size_;
@@ -266,11 +265,13 @@ namespace yocto
 				//--------------------------------------------------------------
                 //- compute wokspace size and create it
 				//--------------------------------------------------------------
-                const size_t nW  = nN << 1; //-- L+R
-                cplx_t      *L   = memory::kind<memory::global>::acquire_as<cplx_t>( (size_t&)nW );
-                cplx_t      *R   = L + nN;
-                const uint8_t *l = lhs.byte_;
-                const uint8_t *r = rhs.byte_;
+                const size_t   nW     = nN << 1; //-- L+R
+                size_t         buflen = nW * sizeof(cplx_t);
+                uint8_t       *buffer = mem_acquire(buflen);
+                cplx_t        *L      = (cplx_t *) &buffer[0];
+                cplx_t        *R      = L + nN;
+                const uint8_t *l      = lhs.byte_;
+                const uint8_t *r      = rhs.byte_;
 				
 				//--------------------------------------------------------------
                 //-- fill workspaces
@@ -278,7 +279,7 @@ namespace yocto
 #define         YMPK_FFT_L(J) L[J].re = real_t( l[J] )
                 YOCTO_LOOP_FUNC_(nL,YMPK_FFT_L,0);
 				
-#define         YMPK_FFT_R(J) R[J].re = real_t( r[J] )
+#define         YMPK_FFT_R(J) R[J].re  = real_t( r[J] )
                 YOCTO_LOOP_FUNC_(nR,YMPK_FFT_R,0);
 				
 				//--------------------------------------------------------------
@@ -314,7 +315,7 @@ namespace yocto
                 YOCTO_LOOP_FUNC_(top,YMPK_FFT_U,0);
 #else
                 for( size_t i=0; i < top; ++i ) {
-                    carry         +=  L[i].re/nN + 0.5;
+                    carry         +=  L[i].re/nN + half;
                     const real_t q = size_t( carry / 256.0 );
                     const real_t r = carry - 256.0 * q;
                     prod[i]   = uint8_t(r);
@@ -323,7 +324,7 @@ namespace yocto
 #endif
                 prod[top] = uint8_t(carry);
 				
-                memory::kind<memory::global>::release_as<cplx_t>( L, (size_t&)nW );
+                mem_release(buffer, buflen);                
                 P.update();
                 return P;
             }
@@ -350,8 +351,10 @@ namespace yocto
 				//--------------------------------------------------------------
                 //- compute wokspace size and create it
 				//--------------------------------------------------------------
-                cplx_t        *L = memory::kind<memory::global>::acquire_as<cplx_t>( nN );
-                const uint8_t *l = lhs.byte_;
+                size_t         buflen = nN * sizeof(cplx_t);
+                uint8_t       *buffer = mem_acquire(buflen);
+                cplx_t        *L      = (cplx_t *) &buffer[0];
+                const uint8_t *l      = lhs.byte_;
 				
 				//--------------------------------------------------------------
                 //-- fill workspaces
@@ -402,7 +405,7 @@ namespace yocto
 #endif
                 prod[top] = uint8_t(carry);
 				
-                memory::kind<memory::global>::release_as<cplx_t>( L, nN );
+                mem_release(buffer, buflen);
                 P.update();
                 return P;
             } else

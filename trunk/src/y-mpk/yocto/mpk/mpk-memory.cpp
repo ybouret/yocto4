@@ -3,6 +3,7 @@
 
 #include "yocto/threading/singleton.hpp"
 
+#include <iostream>
 
 namespace yocto
 {
@@ -14,11 +15,10 @@ namespace yocto
 		{
 		public:
 			static const size_t limit_size = 1024;
-			static const size_t chunk_size = 8*1024;
+			static const size_t chunk_size = 8*limit_size;
 			
 			static inline void _round( size_t &n ) throw()
 			{
-				
 				if( n > 16 )
 				{
 					--n;
@@ -28,7 +28,6 @@ namespace yocto
 				}
 				else
 					n = 16;
-				
 			}
 			
 			inline uint8_t * acquire( size_t &n )
@@ -36,14 +35,18 @@ namespace yocto
 				YOCTO_LOCK(access);
 				_round(n);
 				if( n > limit_size )
+                {
+                    //std::cerr << "mpk: block_size=" << n << " > " << limit_size << std::endl;
 					return memory::kind<memory::global>::acquire_as<uint8_t>(n);
-				else {
-					try {
+                }
+				else
+                {
+					try
+                    {
 						return (uint8_t *)blocks_.acquire( n );
 					}
 					catch(...){ n=0; throw; }
 				}
-				
 			}
 			
 			inline void      release( uint8_t * &p, size_t &n ) throw()

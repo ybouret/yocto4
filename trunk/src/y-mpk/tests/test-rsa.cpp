@@ -15,7 +15,9 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(rsa0)
 {
 	Random::ISAAC_FAST::BitsGenerator gen( Random::ISAAC_INIT_RAND );
-	
+	wtime chrono;
+    
+    chrono.start();
 	mpn p = gen.rand<uint64_t>(34);
 	mpn q = gen.rand<uint64_t>(34);
 	std::cerr << "Generating p" << std::endl;
@@ -69,7 +71,8 @@ YOCTO_UNIT_TEST_IMPL(rsa0)
 		const mpn M  = M2 + ( ( (M1-M2) * cf ) % p ) * q;
 		std::cerr << "/crt=" << M << std::endl;
 	}
-	
+	const double ell = chrono.query();
+    std::cerr << "Ellapsed=" << ell << std::endl;
 	
 }
 YOCTO_UNIT_TEST_DONE()

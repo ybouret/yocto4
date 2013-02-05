@@ -18,7 +18,8 @@ namespace yocto
 		size_t   mem_round( size_t n );
 		uint8_t *mem_acquire( size_t &n );
 		void     mem_release( uint8_t * &, size_t &n ) throw();
-
+       
+        
 #		define YMPN_CMP_DECL(FUNC) \
 /*		*/ friend bool operator FUNC ( const natural &lhs, const natural &rhs ) throw()
 
