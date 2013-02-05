@@ -222,6 +222,10 @@ namespace yocto
 			static  const uint8_t  _bit[8];
 			static  const uint8_t  _msk[8];
 		};
+        
+        template <typename T>
+        class;
+        
 	}
 	
 	typedef mpk::natural mpn;
