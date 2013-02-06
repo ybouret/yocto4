@@ -15,7 +15,7 @@ namespace yocto
 		class rsa_codec : public ios::codec
 		{
 		public:
-			static const size_t prolog = 1; //!< #random bits before byte
+			static const size_t prolog = 1;              //!< #random bits before byte
             static const size_t dblock = 1 + prolog + 8; //!< #bits to encode one byte
 			virtual ~rsa_codec() throw();
 			
@@ -40,7 +40,6 @@ namespace yocto
             
             virtual void write( char C );
             virtual void flush();
-            
             virtual void reset() throw();
             
         private:

@@ -73,6 +73,7 @@ namespace yocto
         void rsa_encoder:: write( char C ) 
         {
             static Random::Bits & noise = Random::CryptoBits();
+            
             //------------------------------------------------------------------
             // this is a byte
             //------------------------------------------------------------------
@@ -96,6 +97,7 @@ namespace yocto
         void rsa_encoder:: flush()
         {
             static Random::Bits & noise = Random::CryptoBits();
+            
             //------------------------------------------------------------------
             // this is the end of one block
             //------------------------------------------------------------------
