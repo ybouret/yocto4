@@ -44,7 +44,7 @@ namespace yocto
 			
 			//! 0..X-1
 			template <typename T>
-			inline T within( T X ) throw()
+			inline T lt( T X ) throw()
 			{
 				static const T _t0(0);
 				return X  <= _t0 ? _t0 : ( full<T>() % X );
@@ -54,7 +54,7 @@ namespace yocto
 			template <typename T>
 			inline T fuzz() throw()
 			{
-				return this->rand<T>( 1 + this->within<size_t>( sizeof(T) * 8 ) );
+				return this->rand<T>( 1 + this->lt<size_t>( sizeof(T) * 8 ) );
 			}
 			
 			

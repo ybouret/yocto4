@@ -86,19 +86,18 @@ namespace yocto
 				q  = n0/b0;
 				r  = n0 - q * b0;
 			}
-            // normally an erro if b0 != 1
+            // normally an error if b0 != 1
 			return t;			
 		}
 		
 		natural natural:: mod_exp( const natural &B, const natural &E, const natural &N )
 		{
-			static const uint8_t _one = 1;
 			
 			if( N.is_zero() )
 				throw libc::exception( EDOM, "natural.exp %% 0");
 			
 			
-			natural result = _one;
+			natural result(1);
 			if( E.size_ > 0 )
 			{
 				assert( E.bits() > 0 );

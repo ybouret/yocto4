@@ -10,7 +10,7 @@ namespace yocto
 		
 		bool natural:: is_prime_() const
 		{
-			static const uint32_t p32 = YOCTO_PRIMES16_NEXT;
+			static const uint64_t p32 = YOCTO_PRIMES16_NEXT;
 			if( size_ <= 1 && byte_[0] <= 1 )
 			{
 				return false;

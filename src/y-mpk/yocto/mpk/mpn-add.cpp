@@ -8,7 +8,6 @@
 #include "yocto/code/swap.hpp"
 #include "yocto/code/cast.hpp"
 
-#include <iostream>
 
 namespace yocto
 {
@@ -37,8 +36,6 @@ namespace yocto
 		
 		natural natural:: add_( const natural &lhs, const natural &rhs )
 		{
-			
-			//std::cerr << "[[" << lhs << "+" << rhs << "]" << std::endl;
 			
 			//------------------------------------------------------------------
 			// Organize so that L is the largest one
@@ -95,7 +92,6 @@ namespace yocto
 			// finalize
 			//------------------------------------------------------------------
 			s[top_size] = uint8_t(carry);
-			
 			
 			
 			ans.update();

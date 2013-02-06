@@ -201,6 +201,7 @@ namespace yocto
 			static natural hex( const string & );
 			static natural hex( const char *txt );
             
+            
 		private:
 			size_t   size_;
 			size_t   maxi_;

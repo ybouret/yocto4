@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(mem)
 		for( size_t i=0; i < N; ++i )
 		{
 			blk_t &b = blk[i];
-			b.n      = 1+gen.within<size_t>( 1024 );
+			b.n      = 1+gen.lt<size_t>( 1024 );
 			b.p      = mpk::mem_acquire( b.n );
 		}
 		ell += chrono.query();
@@ -154,7 +154,7 @@ YOCTO_UNIT_TEST_IMPL(natural)
 		{
 			uint64_t      u   = gen.fuzz<uint64_t>();
 			const mpn    lhs = u;
-			const size_t n = 1 + gen.within<size_t>(10);
+			const size_t n = 1 + gen.lt<size_t>(10);
 			const mpn    res = mpn::shl_( lhs, n );
 			std::cerr << "0x" << lhs << " << " << std::dec << n << " = 0x" << res << std::endl;
 			if( res.bits() <= 64 )
@@ -175,7 +175,7 @@ YOCTO_UNIT_TEST_IMPL(natural)
 		{
 			uint64_t      u   = gen.full<uint64_t>();
 			const mpn     lhs = u;
-			const size_t  n   = gen.within<size_t>( 64 );
+			const size_t  n   = gen.lt<size_t>( 64 );
 			const mpn     res = mpn::shr_( lhs, n );
 			std::cerr << "0x" << lhs << " >> " << std::dec << n << " = 0x" << res << std::endl;
 			
@@ -358,7 +358,7 @@ static inline void genvec( vector<mpn> &arr, size_t NN )
 	for( size_t i=NN;i>0;--i)
 	{
 		uint8_t      buffer[SZMAX];
-		const size_t buflen = 1+gen.within<size_t>(SZMAX); assert( buflen <= SZMAX );
+		const size_t buflen = 1+gen.lt<size_t>(SZMAX); assert( buflen <= SZMAX );
 		for( size_t j=0; j < buflen; ++j ) buffer[j] = gen.full<uint8_t>();
 		const mpn    tmp( buffer, buflen );
 		//std::cerr << "mpn=" << tmp << std::endl;

@@ -1,9 +1,6 @@
 #include "yocto/mpk/natural.hpp"
 #include "yocto/memory/blocks.hpp"
-
 #include "yocto/threading/singleton.hpp"
-
-#include <iostream>
 
 namespace yocto
 {
@@ -36,7 +33,6 @@ namespace yocto
 				_round(n);
 				if( n > limit_size )
                 {
-                    //std::cerr << "mpk: block_size=" << n << " > " << limit_size << std::endl;
 					return memory::kind<memory::global>::acquire_as<uint8_t>(n);
                 }
 				else
