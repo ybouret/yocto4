@@ -40,7 +40,7 @@ namespace yocto
                     if (j > i)
 					{
                         core::bswap<2*sizeof(real_t)>( data+i,  data+j );
-                        core::bswap<2*sizeof(real_t)>( other+i, other+j);                        
+                        core::bswap<2*sizeof(real_t)>( other+i, other+j);
                     }
                     size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m)
@@ -120,7 +120,7 @@ namespace yocto
             //==================================================================
             // bit reversal algorithm
             //==================================================================
-            const size_t n    = size << 1;
+            const size_t n = size << 1;
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
@@ -152,8 +152,10 @@ namespace yocto
                     real_t wr          = 1.0;
                     real_t wi          = 0.0;
 					
-                    for (size_t m=1; m<mmax; m+=2) {
-                        for (size_t i=m; i<=n; i+=istep) {
+                    for (size_t m=1; m<mmax; m+=2)
+                    {
+                        for (size_t i=m; i<=n; i+=istep)
+                        {
                             real_t      *d_i   = data+i;
                             const size_t j     = i+mmax;
                             real_t      *d_j   = data+j;
@@ -189,7 +191,7 @@ namespace yocto
             //==================================================================
             // bit reversal algorithm
             //==================================================================
-            const size_t n    = size << 1;
+            const size_t n = size << 1;
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
@@ -245,7 +247,7 @@ namespace yocto
         }
 		
 		
-#define YMPK_FFT_UNROLL 1        
+#define YMPK_FFT_UNROLL 1
         natural natural:: fft_( const natural &lhs, const natural &rhs )
         {
             const size_t nL = lhs.size_;
@@ -263,7 +265,7 @@ namespace yocto
                     nN <<= 1;
 				
 				//--------------------------------------------------------------
-                //- compute wokspaces 
+                //- compute wokspaces
 				//--------------------------------------------------------------
 				array_of<cplx_t> L(nN);
 				array_of<cplx_t> R(nN);
@@ -320,7 +322,7 @@ namespace yocto
                 }
 #endif
                 prod[top] = uint8_t(carry);
-				        
+                
                 P.update();
                 return P;
             }
@@ -402,7 +404,6 @@ namespace yocto
 #endif
                 prod[top] = uint8_t(carry);
 				
-                //mem_release(buffer, buflen);
                 P.update();
                 return P;
             } else
