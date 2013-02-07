@@ -24,6 +24,14 @@ namespace yocto
             typedef functor<void,TL2(species&,lua_State*)> species_ctor;
             
             //! load a table of { "name", charge, EXTRA }
+            /**
+             \param L a lua state
+             \param lib the library to fill
+             \param the lua table name to load
+             \param cb  an optional ctor
+             if the callback is present, then the extra term is pushed onto the lua_State
+             then the callback is called for the current species.
+             */
             static void load( lua_State *L, library     &lib, const string &libname, species_ctor *cb = NULL);
             static void load( lua_State *L, library     &lib, const char   *libname, species_ctor *cb = NULL);
             

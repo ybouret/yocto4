@@ -1,7 +1,7 @@
 #include "yocto/aqueous/species.hpp"
 #include "yocto/memory/pooled.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace aqueous
     {
@@ -17,7 +17,7 @@ namespace yocto
         
         species:: species(const string &id,
                           const int    charge,
-                          size_t       extra_bytes  
+                          size_t       extra_bytes
                           ) :
         name(id),
         z(charge),
@@ -26,8 +26,8 @@ namespace yocto
         kill(NULL)
         {
         }
-
-	species:: species(const char  *id,
+        
+        species:: species(const char  *id,
                           const int    charge,
                           size_t       extra_bytes
                           ) :
@@ -42,7 +42,7 @@ namespace yocto
         const string & species:: key() const throw() { return name; }
         
         
-               
+        
     }
 }
 

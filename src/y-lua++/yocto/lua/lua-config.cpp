@@ -106,7 +106,16 @@ namespace yocto
 			{
 				throw exception("luaL_dostring( %s )", lua_tostring( L, -1 ) ); 
 			}
-			
+		}
+        
+        void Config:: DoString( lua_State *L, const char *str  )
+		{
+			assert( L );
+			lua_settop(L,0);
+			if( luaL_dostring( L, str ) )
+			{
+				throw exception("luaL_dostring( %s )", lua_tostring( L, -1 ) );
+			}
 		}
 	}
 	

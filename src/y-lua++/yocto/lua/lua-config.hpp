@@ -25,8 +25,8 @@ namespace yocto
 			static void DoFile( lua_State *L, const string &filename );
             static void DoFile( lua_State *L, const char   *filename );
             
-			static void DoString( lua_State *L, const string &string );
-			
+			static void DoString( lua_State *L, const string &code );
+			static void DoString( lua_State *L, const char   *code );
 		};
 		
 	}
