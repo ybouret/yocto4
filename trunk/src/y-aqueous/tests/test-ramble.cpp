@@ -2,13 +2,15 @@
 #include "yocto/aqueous/ramble.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-config.hpp"
+#include "yocto/spade/array1d.hpp"
 
 using namespace yocto;
 using namespace aqueous;
-
+using namespace spade;
 
 namespace
 {
+    typedef array1D<double>            Array;
     typedef ramble::of<double,int,int> ramble_type;
     
     typedef ramble_type::library Library;
