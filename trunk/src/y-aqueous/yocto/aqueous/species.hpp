@@ -6,7 +6,7 @@
 #include "yocto/string.hpp"
 #include "yocto/associative/set.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace aqueous
     {
@@ -23,8 +23,8 @@ namespace yocto
                              const int    charge,
                              size_t       extra_bytes   = 0
                              );
-
-	    explicit species( const char *id, const int charge, size_t extra_bytes = 0 );
+            
+            explicit species( const char *id, const int charge, size_t extra_bytes = 0 );
             
             virtual ~species() throw();
             
@@ -43,28 +43,28 @@ namespace yocto
             
             template <typename T>
             inline void make()
-            { 
+            {
                 assert(blen>=sizeof(T));
                 assert(addr!=0);
                 assert(kill==0);
-                new (addr) T(); 
+                new (addr) T();
                 kill = __kill<T>;
             }
             
             template <typename T, typename U>
             inline void make( typename type_traits<U>::parameter_type args)
             {
-                assert(blen>=sizeof(T)); 
-                assert(addr); 
-                new (addr) T(args); 
+                assert(blen>=sizeof(T));
+                assert(addr);
+                new (addr) T(args);
                 kill = __kill<T>;
             }
-                        
+            
             template <typename T>
             inline T &get() const throw() { assert(blen>=sizeof(T)); assert(addr!=0); return *(T*)addr; }
             
-           
-                        
+            
+            
         private:
             size_t blen;
             void  *addr;

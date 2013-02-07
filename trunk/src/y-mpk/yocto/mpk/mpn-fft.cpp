@@ -18,10 +18,11 @@ namespace yocto
         typedef double          real_t;
         typedef complex<real_t> cplx_t;
 		
-		static inline void _xfft(real_t      *data,
-								 real_t      *other,
-								 const size_t size
-								 ) throw()
+		static inline
+        void _xfft(real_t      *data,
+                   real_t      *other,
+                   const size_t size
+                   ) throw()
         {
             assert( data  != NULL );
 			assert( other != NULL );
@@ -107,7 +108,7 @@ namespace yocto
 			
         }
 		
-		static
+		static inline
 		void _fft(real_t      *data,
 				  const size_t size
 				  ) throw()
