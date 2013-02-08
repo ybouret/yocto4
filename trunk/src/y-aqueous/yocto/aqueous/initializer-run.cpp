@@ -3,7 +3,6 @@
 #include "yocto/math/kernel/algebra.hpp"
 
 #include "yocto/exception.hpp"
-//#include "yocto/math/fcn/newton.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/code/rand.hpp"
 
@@ -118,6 +117,7 @@ namespace yocto
                 J(M,Nc),
                 dX( cs.dC )
                 {
+                    static const char fn[] = "aqueous::init";
                     const library  &lib   = cs.lib;
                     lu<double> LU(Nc);
                     
@@ -154,7 +154,7 @@ namespace yocto
                         mkl::mul_rtrn(P2, P, P);
                         if( !LU.build(P2) )
                         {
-                            throw exception("Singular Constraints/PseudoInverse");
+                            throw exception("%s(singular constraints/PseudoInverse)", fn);
                         }
                         vector<double> tmp(Nc,0);
                         for(size_t i=Nc;i>0;--i)
@@ -192,7 +192,7 @@ namespace yocto
                         vector<double> svd_w(M,0);
                         
                         if( !svd<double>::build(F, svd_w, svd_v) )
-                            throw exception("Singular Constraints/SingularValues");
+                            throw exception("%s(singular constraints/SVD)", fn);
                         
                         //------------------------------------------------------
                         // extract Q rows as the M-Nc columns
@@ -215,10 +215,10 @@ namespace yocto
                     //==========================================================
                     const double    amplitude = max_of(1e-7,get_max_of(Xstar));
                     vector<double>  V(N,0);
-                    matrix<double> &W      = cs.W;
-                    array<double>  &dV     = cs.xi;
-                    matrix<double> &Phi    = cs.Phi;
-                    array<double>  &Gamma  = cs.Gamma;
+                    matrix<double> &W         = cs.W;
+                    array<double>  &dV        = cs.xi;
+                    matrix<double> &Phi       = cs.Phi;
+                    array<double>  &Gamma     = cs.Gamma;
                     bool            converged = false;
                     const double    ftol      = cs.ftol;
                     
@@ -243,7 +243,7 @@ namespace yocto
                     mkl::mul_rtrn(W, Phi, Q);
                     if( !cs.LU.build(W) )
                     {
-                        std::cerr << "Singular Jacobian" << std::endl;
+                        //std::cerr << "Singular Jacobian" << std::endl;
                         goto NEWTON_INIT;
                     }
                     
@@ -282,7 +282,7 @@ namespace yocto
                     // Error evaluation : dX = Q'*(Phi*Q')^-1*Gamma
                     //
                     //==========================================================
-                    std::cerr << "Xraw=" << X << std::endl;
+                    //std::cerr << "Craw=" << X << std::endl;
                     //----------------------------------------------------------
                     // compute the exact term
                     //----------------------------------------------------------
@@ -290,7 +290,7 @@ namespace yocto
                     algebra<double>::mul_rtrn(W, Phi, Q);
                     if( ! cs.LU.build(W) )
                     {
-                        std::cerr << "Singular Jacobian/Error" << std::endl;
+                        //std::cerr << "Singular Jacobian/Error" << std::endl;
                         goto NEWTON_INIT;
                     }
                     cs.LU.solve(W,Gamma);
@@ -305,7 +305,7 @@ namespace yocto
                         const double dX10 = pow(10.0,ceil(log10(dX_i)));
                         dX[i] = dX10;
                     }
-                    std::cerr << "Xerr=" << dX << std::endl;
+                    //std::cerr << "Cerr=" << dX << std::endl;
                     
                     //----------------------------------------------------------
                     // cut-off
@@ -316,7 +316,7 @@ namespace yocto
                         if( X[i] < 0 )
                             throw exception("Invalid Constraints!");
                     }
-                    std::cerr << "Xend=" << X << std::endl;
+                    //std::cerr << "C   =" << X << std::endl;
                 }
                 
                 
@@ -344,7 +344,7 @@ namespace yocto
 			const size_t   N  = cs.size();
 			const size_t   Nc = constraints.size();
 			if( Nc+N != M )
-				throw exception("#constraints mismatch: Nc=%u + N=%u != M=%u", unsigned(Nc), unsigned(N), unsigned(M) );
+				throw exception("#constraints mismatch: #constraints=%u + #equilibria=%u != #components=%u", unsigned(Nc), unsigned(N), unsigned(M) );
             
 			if( Nc > 0 )
 			{
