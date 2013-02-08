@@ -76,7 +76,7 @@ namespace yocto
 
             friend std::ostream & operator<<( std::ostream &, const initializer & );
             
-            constraint & operator[]( size_t index ) throw();
+            constraint       & operator[]( size_t index ) throw();
             const constraint & operator[]( size_t index ) const throw();
             
 		private:
