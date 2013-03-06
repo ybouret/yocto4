@@ -16,7 +16,7 @@ namespace yocto
 		//
 		//
 		////////////////////////////////////////////////////////////////////////
-#define __LDZ(VAR) ((natural &)VAR).ldz()
+#define __LDZ(VAR) ((natural &)VAR).ldZ()
 		
 		rsa_key:: ~rsa_key() throw()
 		{
@@ -107,6 +107,12 @@ namespace yocto
                     const natural _exponent1       = natural::load(fp);
                     const natural _exponent2       = natural::load(fp);
                     const natural _coefficient     = natural::load(fp);
+                    __LDZ(_privateExponent);
+                    __LDZ(_prime1);
+                    __LDZ(_prime2);
+                    __LDZ(_exponent1);
+                    __LDZ(_exponent2);
+                    __LDZ(_coefficient);
                     return rsa_public_key( _modulus, _publicExponent );
                 }
                     break;
@@ -203,7 +209,14 @@ namespace yocto
             const natural _exponent1       = natural::load(fp);
             const natural _exponent2       = natural::load(fp);
             const natural _coefficient     = natural::load(fp);
-            return rsa_private_key( _modulus, _publicExponent, _privateExponent, _prime1, _prime2, _exponent1, _exponent2, _coefficient);
+            const rsa_private_key prv( _modulus, _publicExponent, _privateExponent, _prime1, _prime2, _exponent1, _exponent2, _coefficient);
+            __LDZ(_privateExponent);
+            __LDZ(_prime1);
+            __LDZ(_prime2);
+            __LDZ(_exponent1);
+            __LDZ(_exponent2);
+            __LDZ(_coefficient);
+            return prv;
         }
         
         ////////////////////////////////////////////////////////////////////////

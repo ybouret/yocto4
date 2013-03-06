@@ -29,6 +29,7 @@ namespace yocto
 			virtual natural compute( const natural & ) const = 0;
 			
 			typedef shared_ptr<rsa_key> pointer;
+            
 		protected:
 			explicit rsa_key( const natural &rsa_modulus );
 			
