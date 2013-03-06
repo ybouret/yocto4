@@ -24,3 +24,26 @@ YOCTO_UNIT_TEST_IMPL(round)
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/math/round.hpp"
+#include "yocto/ios/icstream.hpp"
+#include "yocto/string/conv.hpp"
+
+YOCTO_UNIT_TEST_IMPL(log_round)
+{
+    string        line;
+    ios::icstream fp( ios::cstdin );
+    while( line.clear(), ( std::cerr << "> ").flush(), fp.read_line(line) >= 0 )
+    {
+        const double dt = strconv::to_double( line.c_str(), "dt" );
+        std::cerr << "dt=" << dt << std::endl;
+        if( dt > 0 )
+        {
+            std::cerr << "log_round=" << math::log_round(dt) << std::endl;
+        }
+        else
+            std::cerr << "invalid dt<=0" << std::endl;
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
