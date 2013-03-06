@@ -94,9 +94,16 @@ namespace yocto
 		{
 			YMPK_CHECK(this);
 			size_ = 0;
+            memset(byte_,0,maxi_);
 			YMPK_CHECK(this);
 		}
-		
+        
+		void natural:: ldZ() throw()
+		{
+			YMPK_CHECK(this);
+			size_ = 0;
+			YMPK_CHECK(this);
+		}
 		
 		bool natural:: is_zero() const throw()
 		{

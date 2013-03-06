@@ -33,7 +33,8 @@ namespace yocto
 			natural( const natural & );
 			natural & operator=( const natural & );
             
-			void ldz() throw();
+			void ldz() throw(); //!< set to 0, fast
+            void ldZ() throw(); //!< set to 0, slow
 			void xch( natural &other ) throw();
 			bool is_zero() const throw();
 			bool is_positive() const throw();
