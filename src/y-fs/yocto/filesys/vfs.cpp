@@ -63,5 +63,14 @@ namespace yocto
                 matching.pop_back();
             }
         }
+        
+        void vfs:: remove_files( const string &dirname, bool (*filter)( const entry &) )
+        {
+            assert(filter);
+            entry::callback cb( cfunctor(filter) );
+            remove_files( dirname, cb );
+        }
+
+        
 	}
 }

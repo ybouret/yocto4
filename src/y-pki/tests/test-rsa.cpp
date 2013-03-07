@@ -259,12 +259,14 @@ YOCTO_UNIT_TEST_IMPL(auth)
             std::cerr << "+prv.key@" << prv.obits << std::endl;
         }
     }
+    std::cerr << "Reserve memory" << std::endl;
+    rsa_auth auth(1024);
     const size_t nk = pub_keys.size();
     std::cerr << "Loaded " << nk << " keys" << std::endl;
     std::cerr << "Enter Keys...." << std::endl;
     ios::icstream fp( ios::cstdin );
     string   line;
-    rsa_auth auth;
+    
     
     const rsa_key  &self_prv_k = *prv_keys[2];
     const rsa_key  &self_pub_k = *pub_keys[2];

@@ -94,7 +94,8 @@ namespace yocto {
 			bool         is_reg( const string &path ) const throw();
 			bool         is_dir( const string &path ) const throw();
 			void         remove_files( const string &dirname, entry::callback &filter );
-			
+			void         remove_files( const string &dirname, bool (*filter)( const entry &) );
+            
 		protected:
 			explicit vfs() throw();
 			

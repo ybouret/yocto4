@@ -16,6 +16,7 @@ namespace yocto
         {
         public:
             explicit rsa_auth() throw();
+            explicit rsa_auth( size_t nbits ); //!< reserve nbits for plain/coded
             virtual ~rsa_auth() throw();
             static const size_t header = 32; //!< extraneous random bits
 
