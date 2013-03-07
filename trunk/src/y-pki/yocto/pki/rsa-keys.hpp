@@ -49,8 +49,8 @@ namespace yocto
 			rsa_public_key( const rsa_public_key &);
 			explicit rsa_public_key( const natural &rsa_modulus, const natural &rsa_publicExponent );
 		
-            void                  save_pub( ios::ostream &fp ) const;
-            static rsa_public_key load_pub( ios::istream &fp );
+            void                   save_pub( ios::ostream &fp ) const;
+            static rsa_public_key *load_pub( ios::istream &fp );
             
 		private:
 			YOCTO_DISABLE_ASSIGN(rsa_public_key);
@@ -73,8 +73,8 @@ namespace yocto
 			rsa_private_key( const rsa_private_key & );
 			
 			virtual natural compute( const natural &x ) const;
-			void                   save_prv( ios::ostream &fp ) const;
-            static rsa_private_key load_prv( ios::istream &fp );
+			void                    save_prv( ios::ostream &fp ) const;
+            static rsa_private_key *load_prv( ios::istream &fp );
             
             
             

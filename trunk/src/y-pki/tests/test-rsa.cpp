@@ -162,10 +162,10 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
         while( fp.query(C) )
         {
             fp.store(C);
-            const rsa_public_key pub = rsa_public_key:: load_pub(fp);
-            const rsa_key::pointer pk( new rsa_public_key( pub ) );
+            rsa_public_key        *pub = rsa_public_key:: load_pub(fp);
+            const rsa_key::pointer pk( pub );
             pub_keys.push_back( pk );
-            std::cerr << "+pub.key@" << pub.obits << " => " << pub.obits/8 << " bytes" << std::endl;
+            std::cerr << "+pub.key@" << pub->obits << " => " << pub->obits/8 << " bytes" << std::endl;
         }
     }
     
@@ -175,10 +175,10 @@ YOCTO_UNIT_TEST_IMPL(rsa2)
         while( fp.query(C) )
         {
             fp.store(C);
-            const rsa_private_key  prv = rsa_private_key:: load_prv(fp);
-            const rsa_key::pointer pk( new rsa_private_key( prv ) );
+            rsa_private_key       *prv = rsa_private_key:: load_prv(fp);
+            const rsa_key::pointer pk( prv );
             prv_keys.push_back( pk );
-            std::cerr << "+prv.key@" << prv.obits << std::endl;
+            std::cerr << "+prv.key@" << prv->obits << std::endl;
         }
     }
     
@@ -240,10 +240,10 @@ YOCTO_UNIT_TEST_IMPL(auth)
         while( fp.query(C) )
         {
             fp.store(C);
-            const rsa_public_key pub = rsa_public_key:: load_pub(fp);
-            const rsa_key::pointer pk( new rsa_public_key( pub ) );
+            rsa_public_key        *pub = rsa_public_key:: load_pub(fp);
+            const rsa_key::pointer pk( pub );
             pub_keys.push_back( pk );
-            std::cerr << "+pub.key@" << pub.obits << " => " << pub.obits/8 << " bytes" << std::endl;
+            std::cerr << "+pub.key@" << pub->obits << " => " << pub->obits/8 << " bytes" << std::endl;
         }
     }
     
@@ -253,10 +253,10 @@ YOCTO_UNIT_TEST_IMPL(auth)
         while( fp.query(C) )
         {
             fp.store(C);
-            const rsa_private_key  prv = rsa_private_key:: load_prv(fp);
-            const rsa_key::pointer pk( new rsa_private_key( prv ) );
+            rsa_private_key       *prv = rsa_private_key:: load_prv(fp);
+            const rsa_key::pointer pk( prv );
             prv_keys.push_back( pk );
-            std::cerr << "+prv.key@" << prv.obits << std::endl;
+            std::cerr << "+prv.key@" << prv->obits << std::endl;
         }
     }
     std::cerr << "Reserve memory" << std::endl;
