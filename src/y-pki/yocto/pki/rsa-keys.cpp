@@ -28,7 +28,7 @@ namespace yocto
 			natural n = m;
 			--n;
 			const size_t ans = n.bits();
-			if( ans <= 3 ) 
+			if( ans <= 3 )
 				throw libc::exception( EINVAL, "rsa_key(invalid modulus)" );
 			return ans;
 		}
@@ -57,7 +57,7 @@ namespace yocto
 		rsa_key( rsa_modulus ),
 		publicExponent( rsa_publicExponent )
 		{
-			if( ! publicExponent.is_positive() ) 
+			if( ! publicExponent.is_positive() )
 				throw libc::exception( EINVAL, "rsa_public_key(invalid publicExponent)");
 		}
 		
@@ -85,7 +85,7 @@ namespace yocto
             publicExponent.save( fp );
         }
         
-        rsa_public_key rsa_public_key::load_pub( ios::istream &fp )
+        rsa_public_key *rsa_public_key::load_pub( ios::istream &fp )
         {
             const uint32_t type_of_key = fp.read<uint32_t>();
             switch( type_of_key )
@@ -94,7 +94,7 @@ namespace yocto
                 {
                     const natural _modulus        = natural::load(fp);
                     const natural _publicExponent = natural::load(fp);
-                    return rsa_public_key( _modulus, _publicExponent );
+                    return new rsa_public_key( _modulus, _publicExponent );
                 }
                     
                 case PRV:
@@ -113,7 +113,7 @@ namespace yocto
                     __LDZ(_exponent1);
                     __LDZ(_exponent2);
                     __LDZ(_coefficient);
-                    return rsa_public_key( _modulus, _publicExponent );
+                    return new rsa_public_key( _modulus, _publicExponent );
                 }
                     break;
                 default: break;
@@ -148,7 +148,7 @@ namespace yocto
 			__CHECK_PRV( prime1>=prime2 );
 			__CHECK_PRV( exponent1   == privateExponent % (prime1 - One ) );
 			__CHECK_PRV( exponent2   == privateExponent % (prime2 - One ) );
-			__CHECK_PRV( coefficient == natural::mod_inv( prime2, prime1 ) ); 
+			__CHECK_PRV( coefficient == natural::mod_inv( prime2, prime1 ) );
 		}
 		
 		rsa_private_key:: ~rsa_private_key() throw()
@@ -194,7 +194,7 @@ namespace yocto
             coefficient.save(fp);
         }
         
-        rsa_private_key rsa_private_key::load_prv( ios::istream &fp )
+        rsa_private_key *rsa_private_key::load_prv( ios::istream &fp )
         {
             if( PRV != fp.read<uint32_t>() )
             {
@@ -209,14 +209,34 @@ namespace yocto
             const natural _exponent1       = natural::load(fp);
             const natural _exponent2       = natural::load(fp);
             const natural _coefficient     = natural::load(fp);
-            const rsa_private_key prv( _modulus, _publicExponent, _privateExponent, _prime1, _prime2, _exponent1, _exponent2, _coefficient);
-            __LDZ(_privateExponent);
-            __LDZ(_prime1);
-            __LDZ(_prime2);
-            __LDZ(_exponent1);
-            __LDZ(_exponent2);
-            __LDZ(_coefficient);
-            return prv;
+            try
+            {
+                rsa_private_key *prv = new rsa_private_key(_modulus,
+                                                           _publicExponent,
+                                                           _privateExponent,
+                                                           _prime1,
+                                                           _prime2,
+                                                           _exponent1,
+                                                           _exponent2,
+                                                           _coefficient);
+                __LDZ(_privateExponent);
+                __LDZ(_prime1);
+                __LDZ(_prime2);
+                __LDZ(_exponent1);
+                __LDZ(_exponent2);
+                __LDZ(_coefficient);
+                return prv;
+            }
+            catch(...)
+            {
+                __LDZ(_privateExponent);
+                __LDZ(_prime1);
+                __LDZ(_prime2);
+                __LDZ(_exponent1);
+                __LDZ(_exponent2);
+                __LDZ(_coefficient);
+                throw;
+            }
         }
         
         ////////////////////////////////////////////////////////////////////////
