@@ -7,6 +7,7 @@
 #include "yocto/exception.hpp"
 
 #include <iostream>
+#include <cstring>
 
 namespace yocto
 {
@@ -94,7 +95,6 @@ namespace yocto
 		{
 			YMPK_CHECK(this);
 			size_ = 0;
-            memset(byte_,0,maxi_);
 			YMPK_CHECK(this);
 		}
         
@@ -102,6 +102,7 @@ namespace yocto
 		{
 			YMPK_CHECK(this);
 			size_ = 0;
+			memset(byte_,0,maxi_);
 			YMPK_CHECK(this);
 		}
 		
