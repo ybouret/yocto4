@@ -16,7 +16,8 @@ namespace yocto
          and will be equal for square matrices.
          b[1..m] is the input right-hand side.
          x[1..n] is the output solution vector.
-         No input quantities are destroyed, so the routine may be called sequentially with different b’s.
+         No input quantities are destroyed,
+         so the routine may be called sequentially with different b’s.
          */
         template <>
         void svd<real_t>::solve(const matrix<real_t> &u,
@@ -51,15 +52,15 @@ namespace yocto
         
         
         static const size_t SVD_MAX_ITS = 1024;
-        /******************************************************************************/
+        /**********************************************************************/
         template <>
         bool svd<real_t>:: build(matrix<real_t> &a, array<real_t> &w, matrix<real_t> &v)
-        /*******************************************************************************
+        /***********************************************************************
          Given a matrix a[1..m][1..n], this routine computes its singular value
-         decomposition, A = U.W.VT.  The matrix U replaces a on output.  The diagonal
-         matrix of singular values W is output as a vector w[1..n].  The matrix V (not
-         the transpose VT) is output as v[1..n][1..n].
-         *******************************************************************************/
+         decomposition, A = U.W.VT.  The matrix U replaces a on output.
+         The diagonal matrix of singular values W is output as a vector w[1..n].
+         The matrix V (not the transpose VT) is output as v[1..n][1..n].
+         **********************************************************************/
         {
             const size_t m = a.rows;
             const size_t n = a.cols;
@@ -88,16 +89,16 @@ namespace yocto
                             a[k][i] /= scale;
                             s += a[k][i]*a[k][i];
                         }
-                        f=a[i][i];
+                        f = a[i][i];
                         g = -Signed(Sqrt(s),f);
-                        h=f*g-s;
+                        h = f*g-s;
                         a[i][i]=f-g;
                         for(size_t j=l;j<=n;j++)
                         {
-                            for (s=0.0,k=i;k<=m;k++)
+                            for(s=0.0,k=i;k<=m;k++)
                                 s += a[k][i]*a[k][j];
                             f=s/h;
-                            for (k=i;k<=m;k++)
+                            for(k=i;k<=m;k++)
                                 a[k][j] += f*a[k][i];
                         }
                         for (k=i;k<=m;k++) a[k][i] *= scale;
@@ -135,12 +136,13 @@ namespace yocto
                 anorm = max_of<real_t>(anorm,(Fabs(w[i])+Fabs(rv1[i])));
             }
             for(size_t i=n;i>=1;i--)
-            { /* Accumulation of right-hand transformations. */
+            {
+                /* Accumulation of right-hand transformations. */
                 if (i<n)
                 {
                     if(Fabs(g)>0)
                     {
-                        for(size_t j=l;j<=n;j++) /* real_t division to avoid possible underflow. */
+                        for(size_t j=l;j<=n;j++) /* double division to avoid possible underflow. */
                             v[j][i]=(a[i][j]/a[i][l])/g;
                         for(size_t j=l;j<=n;j++)
                         {
@@ -158,7 +160,8 @@ namespace yocto
                 l=i;
             }
             for(size_t i=min_of(m,n);i>=1;i--)
-            { /* Accumulation of left-hand transformations. */
+            {
+                /* Accumulation of left-hand transformations. */
                 l=i+1;
                 g=w[i];
                 for(size_t j=l;j<=n;j++)
@@ -201,8 +204,8 @@ namespace yocto
                     }
                     if (flag)
                     {
-                        c=0.0; /* Cancellation of rv1[l], if l > 1. */
-                        s=1.0;
+                        c=0; /* Cancellation of rv1[l], if l > 1. */
+                        s=1;
                         for(size_t i=l;i<=k;i++) {
                             f=s*rv1[i];
                             rv1[i]=c*rv1[i];
@@ -223,7 +226,7 @@ namespace yocto
                     }
                     z=w[k];
                     if (l == k) { /* Convergence. */
-                        if (z < 0.0) { /* Singular value is made nonnegative. */
+                        if(z<0) { /* Singular value is made nonnegative. */
                             w[k] = -z;
                             for(size_t j=1;j<=n;j++) v[j][k] = -v[j][k];
                         }
@@ -231,8 +234,7 @@ namespace yocto
                     }
                     if (its >= SVD_MAX_ITS)
                     {
-                        //printf("no convergence in 30 svdcmp iterations");
-                        return false;
+                        return false; // no convergence
                     }
                     x=w[l]; /* Shift from bottom 2-by-2 minor. */
                     nm=k-1;
@@ -255,7 +257,7 @@ namespace yocto
                         c=f/z;
                         s=h/z;
                         f=x*c+g*s;
-                        g = g*c-x*s;
+                        g=g*c-x*s;
                         h=y*s;
                         y *= c;
                         for(size_t jj=1;jj<=n;jj++)
