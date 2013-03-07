@@ -22,6 +22,14 @@ namespace yocto
         {
         }
         
+        rsa_auth:: rsa_auth( size_t nbits ) :
+        plain(),
+        coded()
+        {
+            plain.reserve(nbits);
+            coded.reserve(nbits);
+        }
+        
         string rsa_auth:: encrypt( const memory::ro_buffer &buff, const rsa_key &key )
         {
             return encrypt( buff.ro(), buff.length(), key);
