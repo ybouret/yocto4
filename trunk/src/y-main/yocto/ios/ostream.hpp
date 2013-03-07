@@ -26,6 +26,7 @@ namespace yocto
 			
 			void save( const void *buffer, size_t buflen ); //!< put all
 			
+            //! emit a BigEndian integral type
 			template <typename T>
 			inline void emit( T x ) { x = swap_be_as<T>(x); save(&x,sizeof(T)); } 
 			

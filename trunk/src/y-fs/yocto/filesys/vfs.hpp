@@ -81,7 +81,7 @@ namespace yocto {
 			//==================================================================
 			virtual entry::attribute query_attribute( const string &path, bool &is_link ) const throw() = 0;
 			virtual void     create_dir(  const string &dirname, const bool allow_already_exists ) = 0;
-			virtual void     remove_dir(  const string &dirname   ) = 0 ;
+			virtual void     remove_dir(  const string &dirname  ) = 0 ;
 			virtual void     remove_file( const string &filename ) = 0;
 			virtual scanner *new_scanner( const string &dirname ) const = 0;
 			
@@ -93,7 +93,7 @@ namespace yocto {
 			void         create_sub_dir( const string &dirname );
 			bool         is_reg( const string &path ) const throw();
 			bool         is_dir( const string &path ) const throw();
-			
+			void         remove_files( const string &dirname, entry::callback &filter );
 			
 		protected:
 			explicit vfs() throw();

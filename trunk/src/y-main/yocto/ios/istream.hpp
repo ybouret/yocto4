@@ -9,7 +9,7 @@
 namespace yocto
 {
 	
-	namespace ios 
+	namespace ios
 	{
 		class istream : public stream, public ichannel
 		{
@@ -25,7 +25,7 @@ namespace yocto
 			//! must get exactly buflen bytes
 			void load( void *buffer, size_t buflen );
 			
-			//! big endian reading
+			//! read a BigEndian integral type
 			template <typename T>
 			inline T read() { T x(0); load(&x, sizeof(T)); return swap_be_as<T>(x);}
 			

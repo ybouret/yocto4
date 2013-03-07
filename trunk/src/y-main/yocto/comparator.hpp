@@ -11,6 +11,13 @@ namespace yocto
 		return lhs < rhs ? -1 : ( rhs < lhs ? 1 : 0 );
 	}
 	
+    template <typename T>
+    inline int __compareC( const void *lhs, const void *rhs ) throw()
+    {
+        assert(lhs); assert(rhs);
+        return __compare<T>( *(T*)lhs, *(T*)rhs );
+    }
+    
 	template <typename T>
 	class comparator
 	{
