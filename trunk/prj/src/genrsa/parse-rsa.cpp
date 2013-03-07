@@ -5,6 +5,8 @@
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/pki/rsa-keys.hpp"
+#include "yocto/auto-ptr.hpp"
+#include "yocto/hashing/sha1.hpp"
 
 #include <iostream>
 
@@ -82,7 +84,7 @@ int  main( int argc, char *argv[] )
             if( !sep )
                 throw exception("Invalid [KEY] on line '%s'" , line.c_str() );
             const string key(org,sep-org);
-            std::cerr << "[KEY]=" << key << std::endl;
+            std::cerr << "[KEY]=" << std::hex << key << std::endl;
             string data( sep+1 );
             while( data.size() > 0 && character<char>::is_space( data[0] ) ) data.skip(1);
             
@@ -104,7 +106,7 @@ int  main( int argc, char *argv[] )
                 }
             }
             const natural value = get_value( data );
-            std::cerr << "value=" << value << std::endl;
+            std::cerr << "value= 0x" << value << std::endl;
             if( !db.insert( key, value) )
                 throw exception("multiple key '%s'", key.c_str() );
         }
@@ -123,8 +125,10 @@ int  main( int argc, char *argv[] )
         __FETCH(coefficient);
         
         const rsa_private_key prv( *modulus, *publicExponent, *privateExponent, *prime1, *prime2, *exponent1, *exponent2, *coefficient);
-        std::cerr << "got RSA private key: bits=" << prv.obits << std::endl;
-        const string filename = vformat( "rsa-key-%08x.bin", unsigned( prv.obits ) );
+        std::cerr << "got RSA private key: bits=" << std::dec << prv.obits << std::endl;
+        
+        hashing::sha1 h;
+        const string filename = vformat( "rsa-key-%08x-%08x.bin", unsigned(prv.obits), h.key<uint32_t>(prv.modulus) );
         {
             ios::ocstream fp( filename, false );
             prv.save_prv( fp );
@@ -132,8 +136,8 @@ int  main( int argc, char *argv[] )
         
         {
             ios::icstream fp( filename );
-            const rsa_private_key reload = rsa_private_key::load_prv( fp );
-            std::cerr << "Reload a key with maxbits=" << reload.obits << std::endl;
+            auto_ptr<rsa_key> reload( rsa_private_key::load_prv( fp ) );
+            std::cerr << "Reload a key with maxbits=" << reload->obits << std::endl;
         }
     }
     catch( const exception &e )

@@ -17,6 +17,7 @@ public:
     Writer( ios::ostream &output ) :
     fp( output ),
     count(0),
+    total(0),
     store()
     {
         
@@ -26,12 +27,12 @@ public:
     
     ios::ostream &fp;
     size_t        count;
+    size_t        total;
     char          store[SYMBOLS_PER_LINE];
     
     void operator()(unsigned C)
     {
         assert(count<SYMBOLS_PER_LINE);
-        
         //-- store char
         if( (C >= 32 && C < 127) && C != '\'' && C != '\\' )
         {
@@ -42,11 +43,15 @@ public:
             store[count] = '.';
         }
         //-- emit char
-        if(count>0)
+        if(total>0)
             fp.write(',');
+        else
+            fp.write(' ');
+        
         fp( " 0x%02x", C );
         ++count;
-        if( count >=  SYMBOLS_PER_LINE )
+        ++total;
+        if(  count >= SYMBOLS_PER_LINE )
         {
             emit();
             count = 0;

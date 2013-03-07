@@ -26,8 +26,7 @@ namespace yocto
 			const size_t  obits;   //!< (modulus-1).bits
 			const size_t  ibits;   //!< obits-1;
             
-			virtual natural compute( const natural & ) const = 0;
-			
+			virtual natural  compute( const natural & ) const = 0;            
 			typedef shared_ptr<rsa_key> pointer;
             
 		protected:
