@@ -7,7 +7,7 @@ namespace yocto
 {
     namespace pki
     {
-        class rsa_actor : public rsa_auth
+        class rsa_actor 
         {
         public:
             explicit rsa_actor() throw();
@@ -22,11 +22,14 @@ namespace yocto
             void load_self_key( const rsa_private_key &prv );
             void load_peer_key( const rsa_public_key  &pub );
             
+            const rsa_key & self_prv() const;
+            const rsa_key & self_pub() const;
+            const rsa_key & peer_key() const;
+            
         private:
-            rsa_private_key *self_prv;
-            rsa_public_key  *self_pub;
-            rsa_public_key  *peer_key;
-            rsa_auth         auth;
+            rsa_private_key *self_prv_;
+            rsa_public_key  *self_pub_;
+            rsa_public_key  *peer_key_;
             YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_actor);
         };
     }
