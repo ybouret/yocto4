@@ -12,6 +12,8 @@ namespace yocto
         
         struct Silo
         {
+            
+            //! DBfile wrapper
             class File
             {
             public:
@@ -39,8 +41,36 @@ namespace yocto
                                       title.c_str(),
                                       DB_HDF5);
                     if(!dbfile)
-                        throw exception("Can't Open Silo file '%s'", filename.c_str());
+                        throw exception("Can't Open DBfile '%s'", filename.c_str());
                 }
+            };
+            
+            //! DBoptlist wrapper
+            class OptList
+            {
+            public:
+                explicit OptList(size_t n) : optlist( DBMakeOptlist(n) )
+                {
+                    if(!optlist) throw exception("Can't create DBoptlist");
+                }
+                
+                virtual ~OptList() throw()
+                {
+                    DBFreeOptlist(optlist);
+                    optlist = 0;
+                }
+                
+                inline void AddOption( int kind, void *data)
+                {
+                    DBAddOption(optlist, kind, data);
+                }
+                
+                inline void AddTime(  double dtime) { AddOption( DBOPT_DTIME, &dtime); }
+                inline void AddCycle( int    cycle) { AddOption( DBOPT_CYCLE, &cycle); }
+                
+            private:
+                DBoptlist *optlist;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(OptList);
             };
         };
         
