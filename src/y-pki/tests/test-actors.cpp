@@ -7,9 +7,9 @@
 
 using namespace yocto;
 
-static const char two_keys_data[] =
+static const uint8_t two_keys_data[] =
 {
-#include "two-keys.inc"
+#include "two-keys.h"
 };
 
 YOCTO_UNIT_TEST_IMPL(actors)

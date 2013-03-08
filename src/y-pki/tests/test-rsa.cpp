@@ -142,9 +142,9 @@ YOCTO_UNIT_TEST_DONE()
 #pragma warning ( disable : 4309 )
 #endif
 
-static const char keys_db[] =
+static const uint8_t keys_db[] =
 {
-#include "rsa-keys.inc"
+#include "rsa-keys.h"
 };
 
 #include "yocto/ios/imstream.hpp"

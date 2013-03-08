@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp)
-ADD_EXECUTABLE(test-pki main.cpp ${test_srcs})
-TARGET_LINK_YOCTO( test-pki pki mpk)
+ADD_EXECUTABLE(test-pki main.cpp ${test_srcs} rsa-keys.h two-keys.h)
+TARGET_LINK_YOCTO(test-pki pki mpk)
 
 ENABLE_TESTING()
 ADD_TEST(RSA1   test-pki rsa1)
