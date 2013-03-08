@@ -1,6 +1,7 @@
 #include "yocto/mpk/natural.hpp"
 #include "yocto/memory/blocks.hpp"
 #include "yocto/threading/singleton.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -16,15 +17,7 @@ namespace yocto
 			
 			static inline void _round( size_t &n ) throw()
 			{
-				if( n > 16 )
-				{
-					--n;
-					for(unsigned int i=1; i < sizeof(size_t)*8; i <<= 1)
-						n = n | (n >> i);
-					++n;
-				}
-				else
-					n = 16;
+                n = (n<16) ? 16 : next_power_of_two(n);
 			}
 			
 			inline uint8_t * acquire( size_t &n )

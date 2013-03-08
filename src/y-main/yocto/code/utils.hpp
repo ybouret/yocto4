@@ -3,17 +3,17 @@
 
 #include "yocto/os.hpp"
 
-namespace yocto 
+namespace yocto
 {
 	
 	template <typename T>
-	inline T min_of( T a, T b ) 
+	inline T min_of( T a, T b )
 	{
 		return a < b ? a : b;
 	}
 	
 	template <typename T>
-	inline T max_of( T a, T b ) 
+	inline T max_of( T a, T b )
 	{
 		return b < a ? a : b;
 	}
@@ -26,7 +26,7 @@ namespace yocto
     
     
 	template <typename T>
-	inline T clamp( T amin, T a, T amax ) 
+	inline T clamp( T amin, T a, T amax )
 	{
 		return a < amin ? amin : ( amax < a ? amax : a );
 	}
@@ -47,18 +47,15 @@ namespace yocto
 	template <typename T>
 	inline T next_power_of_two( T v ) throw()
 	{
-		if( v <= 0 ) 
-			return 1;
-		else
-		{
-			--v;
-			for( size_t shift = 1; shift <= sizeof(T) << 2; shift <<= 1 )
-			{
-				v |= ( v >> shift );
-			}
-			return ++v;
-		}
+		assert(v>0);
+        --v;
+        for( size_t shift = 1; shift <= (sizeof(T)<<2); shift <<= 1 )
+            v |= ( v >> shift );
+        return ++v;
 	}
+    
+    
+    
 	
 	template <typename T>
 	inline T gcd_of( T x , T y )
