@@ -18,6 +18,7 @@ namespace yocto
         typedef double          real_t;
         typedef complex<real_t> cplx_t;
 		
+        //! simultaneous FFTs
 		static inline
         void _xfft(real_t      *data,
                    real_t      *other,
@@ -37,8 +38,9 @@ namespace yocto
             const size_t n    = size << 1;
             {
                 size_t j=1;
-                for (size_t i=1; i<n; i+=2) {
-                    if (j > i)
+                for(size_t i=1; i<n; i+=2)
+                {
+                    if(j>i)
 					{
                         core::bswap<2*sizeof(real_t)>( data+i,  data+j );
                         core::bswap<2*sizeof(real_t)>( other+i, other+j);
@@ -59,7 +61,8 @@ namespace yocto
             {
                 static const real_t sgn_two_pi = numeric<real_t>::two_pi;
                 size_t              mmax       = 2;
-                while (n > mmax) {
+                while (n > mmax)
+                {
                     const size_t istep = mmax << 1;
                     const real_t theta = sgn_two_pi/mmax;
                     real_t wtemp       = sin(0.5*theta);
@@ -257,14 +260,12 @@ namespace yocto
 			{
                 const size_t nP = nL + nR;             //-- product size
                 natural       P( nP, as_capacity );    //-- product value
-                size_t       nN = 1;
 				
 				//--------------------------------------------------------------
                 //-- compute common power of two
 				//--------------------------------------------------------------
-                while( nN < nP )
-                    nN <<= 1;
-				
+				const size_t nN = next_power_of_two(nP);
+                
 				//--------------------------------------------------------------
                 //- compute wokspaces
 				//--------------------------------------------------------------
@@ -298,7 +299,7 @@ namespace yocto
 				//--------------------------------------------------------------
                 _ifft( & L[0].re, nN );
 				
-                real_t       carry = 0;
+                real_t       carry = 0.0;
                 uint8_t     *prod  = P.byte_;
                 const size_t top   = nP - 1;
 				
@@ -339,21 +340,15 @@ namespace yocto
 			{
                 const size_t nP = nL << 1;             //-- product size
                 natural       P( nP, as_capacity );    //-- product value
-                size_t       nN = 1;
-				
 				//--------------------------------------------------------------
                 //-- compute power of two
 				//--------------------------------------------------------------
-                while( nN < nP )
-                    nN <<= 1;
-				
+                const size_t nN = next_power_of_two(nP);
+                
 				//--------------------------------------------------------------
                 //- compute wokspace size and create it
 				//--------------------------------------------------------------
-                //size_t         buflen = nN * sizeof(cplx_t);
-                //uint8_t       *buffer = mem_acquire(buflen);
-                //cplx_t        *L      = (cplx_t *) &buffer[0];
-				array_of<cplx_t> L( nN );
+                array_of<cplx_t> L( nN );
                 const uint8_t *l      = lhs.byte_;
 				
 				//--------------------------------------------------------------

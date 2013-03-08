@@ -55,7 +55,7 @@ namespace yocto
 		
 		natural  natural:: mod_inv( const natural &b, const natural &n )           
 		{
-			static const uint8_t _zero = 0, _one = 1;
+			static const uint64_t _zero = 0, _one = 1;
 			natural n0 = n;
 			natural b0 = b;
 			natural t0 = _zero;

@@ -5,7 +5,6 @@
 #include "yocto/exceptions.hpp"
 #include <cerrno>
 
-//#include <iostream>
 
 namespace yocto
 {
@@ -75,7 +74,6 @@ namespace yocto
 				// Bisection
 				//--------------------------------------------------------------
 				natural mid = add_( lo, hi ).shr();
-				//std::cerr << "-- 0x" << mid << std::endl;
 				const natural tmp = fft_( mid, den );
 				switch( comparison_of(tmp,num) )
 				{
