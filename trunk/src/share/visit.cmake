@@ -62,7 +62,15 @@ ELSE( "" STREQUAL "${VISIT}" )
 	####################################################################
 	MACRO(TARGET_LINK_VISIT_SILO tgt)
 		MESSAGE( STATUS "VisIt/Silo --> ${tgt}" )
+		
+		IF(YOCTO_MACOSX)
 		TARGET_LINK_LIBRARIES( ${tgt} siloh5)
+		ENDIF()
+		
+		IF(YOCTO_LINUX)
+		TARGET_LINK_LIBRARIES( ${tgt} siloh5 hdf5 )
+		ENDIF()
+		
 	ENDMACRO(TARGET_LINK_VISIT_SILO)
 	
 	####################################################################
