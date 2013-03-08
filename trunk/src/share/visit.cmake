@@ -25,6 +25,12 @@ ELSE( "" STREQUAL "${VISIT}" )
 	SET(LIBSIM_DIR ${VISIT}/libsim/V2)
 	INCLUDE_DIRECTORIES( ${LIBSIM_DIR}/include ${MPI_INCLUDE_PATH})
 	LINK_DIRECTORIES( ${LIBSIM_DIR}/lib )
+
+	####################################################################
+	# Tuning variables for silo
+	####################################################################
+	#INCLUDE_DIRECTORIES( ${VISIT}/include/silo/include )
+	#LINK_DIRECTORIES(    ${VISIT}/lib ${VISIT}/archives )
 	
 	####################################################################
 	# Macro to link what's necessary
