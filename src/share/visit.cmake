@@ -29,8 +29,8 @@ ELSE( "" STREQUAL "${VISIT}" )
 	####################################################################
 	# Tuning variables for silo
 	####################################################################
-	#INCLUDE_DIRECTORIES( ${VISIT}/include/silo/include )
-	#LINK_DIRECTORIES(    ${VISIT}/lib ${VISIT}/archives )
+	INCLUDE_DIRECTORIES( ${VISIT}/include/silo/include )
+	LINK_DIRECTORIES(    ${VISIT}/lib ${VISIT}/archives )
 	
 	####################################################################
 	# Macro to link what's necessary
@@ -58,8 +58,16 @@ ELSE( "" STREQUAL "${VISIT}" )
 	ENDMACRO(TARGET_LINK_VISIT)
 	
 	####################################################################
+	# Macro to link VisIt/Silo
+	####################################################################
+	MACRO(TARGET_LINK_VISIT_SILO tgt)
+		MESSAGE( STATUS "VisIt/Silo --> ${tgt}" )
+		TARGET_LINK_LIBRARIES( ${tgt} siloh5)
+	ENDMACRO(TARGET_LINK_VISIT_SILO)
+	
+	####################################################################
 	# Macro to move interfaces
-	# TODO: check depending on platforms
+	# TODO: check depending on platforms ?
 	####################################################################
 	SET(VISIT_UI_DIR "$ENV{HOME}/.visit/ui")
 	MACRO(VISIT_CUSTOM_UI tgt file )
