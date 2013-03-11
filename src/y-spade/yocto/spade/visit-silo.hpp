@@ -26,24 +26,24 @@ namespace yocto
                 
                 virtual ~OptList() throw()
                 {
+                    assert(optlist);
                     DBFreeOptlist(optlist);
                     optlist = 0;
                 }
                 
-                inline void AddOption( int kind, void *data)
+                inline void operator()( int kind, const void *data)
                 {
-                    DBAddOption(optlist,kind,data);
+                    assert(optlist);
+                    DBAddOption(optlist,kind,(void*)data);
                 }
                 
-                inline void AddTime(  double dtime) { AddOption( DBOPT_DTIME, &dtime); }
-                inline void AddCycle( int    cycle) { AddOption( DBOPT_CYCLE, &cycle); }
                 
             private:
                 DBoptlist *optlist;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(OptList);
                 friend class File;
             };
-
+            
             
             //! DBfile wrapper
             class File
@@ -57,6 +57,7 @@ namespace yocto
                 
                 virtual ~File() throw()
                 {
+                    assert(dbfile);
                     DBClose( dbfile );
                     dbfile = 0;
                 }
@@ -68,6 +69,13 @@ namespace yocto
                     char       *coordsname[3] = { 0,0,0 };
                     int         dims[3]       = { 0,0,0 };
                     float      *coords[3]     = { 0,0,0 };
+                    DBoptlist  *optlist       = 0;
+                    
+                    if(opt)
+                    {
+                        assert(opt->optlist);
+                        optlist = opt->optlist;
+                    }
                     
                     for( int i=0; i < ndims; ++i )
                     {
@@ -107,7 +115,7 @@ namespace yocto
                                   ndims,
                                   data_type,
                                   DB_COLLINEAR,
-                                  (opt != 0) ? opt->optlist : 0);
+                                  optlist);
                 }
                 
                 
@@ -123,11 +131,11 @@ namespace yocto
                                       title.c_str(),
                                       DB_HDF5);
                     if(!dbfile)
-                        throw exception("Can't Open DBfile '%s'", filename.c_str());
+                        throw exception("Can't create DBfile '%s'", filename.c_str());
                 }
             };
             
-                      
+            
             
         };
         
