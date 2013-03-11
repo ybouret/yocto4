@@ -15,8 +15,8 @@ YOCTO_UNIT_TEST_IMPL(silo)
     Silo::File    db( "demo.silo", "Just A Demo");
     Silo::OptList optlist(2);
     
-    optlist.AddTime(0);
-    optlist.AddCycle(0);
+    optlist.AddTime(1);
+    optlist.AddCycle(2);
     
     {
         array_db   adb;
@@ -27,7 +27,7 @@ YOCTO_UNIT_TEST_IMPL(silo)
         std::cerr << "mesh2d: " << L << std::endl;
         std::cerr << "X     : " << m2.X().as_layout() << std::endl;
         std::cerr << "Y     : " << m2.Y().as_layout() << std::endl;
-        db.PutRectilinearMesh("mesh",m2);
+        db.PutRectilinearMesh("mesh",m2,&optlist);
     }
     
     {
@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(silo)
         std::cerr << "mesh2d: " << L << std::endl;
         std::cerr << "X     : " << m2.X().as_layout() << std::endl;
         std::cerr << "Y     : " << m2.Y().as_layout() << std::endl;
-        db.PutRectilinearMesh("meshd",m2);
+        db.PutRectilinearMesh("meshd",m2,&optlist);
     }
     
     
