@@ -13,6 +13,38 @@ namespace yocto
         struct Silo
         {
             
+            class File;
+            
+            //! DBoptlist wrapper
+            class OptList
+            {
+            public:
+                explicit OptList(size_t n) : optlist( DBMakeOptlist(n) )
+                {
+                    if(!optlist) throw exception("Can't create DBoptlist");
+                }
+                
+                virtual ~OptList() throw()
+                {
+                    DBFreeOptlist(optlist);
+                    optlist = 0;
+                }
+                
+                inline void AddOption( int kind, void *data)
+                {
+                    DBAddOption(optlist,kind,data);
+                }
+                
+                inline void AddTime(  double dtime) { AddOption( DBOPT_DTIME, &dtime); }
+                inline void AddCycle( int    cycle) { AddOption( DBOPT_CYCLE, &cycle); }
+                
+            private:
+                DBoptlist *optlist;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(OptList);
+                friend class File;
+            };
+
+            
             //! DBfile wrapper
             class File
             {
@@ -30,12 +62,13 @@ namespace yocto
                 }
                 
                 template <typename RMESH>
-                void PutRectilinearMesh( const string &name, const RMESH &mesh )
+                void PutRectilinearMesh( const string &name, const RMESH &mesh, OptList *opt )
                 {
-                    const int   ndims = RMESH::DIMENSIONS; assert(ndims<=3); assert(ndims>0);
-                    char       *coordsname[3];
-                    int         dims[3];
-                    float      *coords[3];
+                    const int   ndims         = RMESH::DIMENSIONS; assert(ndims<=3); assert(ndims>0);
+                    char       *coordsname[3] = { 0,0,0 };
+                    int         dims[3]       = { 0,0,0 };
+                    float      *coords[3]     = { 0,0,0 };
+                    
                     for( int i=0; i < ndims; ++i )
                     {
                         const dimension_t dim = dimension_t(i);
@@ -45,6 +78,7 @@ namespace yocto
                         dims[i]   = axis.items;
                         coords[i] = (float *) axis.entry;
                     }
+                    
                     int data_type = -1;
                     {
                         static const type_spec spec_flt = typeid(float);
@@ -73,7 +107,7 @@ namespace yocto
                                   ndims,
                                   data_type,
                                   DB_COLLINEAR,
-                                  NULL);
+                                  opt != 0 ? opt->optlist : 0);
                 }
                 
                 
@@ -93,34 +127,7 @@ namespace yocto
                 }
             };
             
-            //! DBoptlist wrapper
-            class OptList
-            {
-            public:
-                explicit OptList(size_t n) : optlist( DBMakeOptlist(n) )
-                {
-                    if(!optlist) throw exception("Can't create DBoptlist");
-                }
-                
-                virtual ~OptList() throw()
-                {
-                    DBFreeOptlist(optlist);
-                    optlist = 0;
-                }
-                
-                inline void AddOption( int kind, void *data)
-                {
-                    DBAddOption(optlist, kind, data);
-                }
-                
-                inline void AddTime(  double dtime) { AddOption( DBOPT_DTIME, &dtime); }
-                inline void AddCycle( int    cycle) { AddOption( DBOPT_CYCLE, &cycle); }
-                
-            private:
-                DBoptlist *optlist;
-                YOCTO_DISABLE_COPY_AND_ASSIGN(OptList);
-            };
-            
+                      
             
         };
         
