@@ -25,6 +25,7 @@ typedef region3D<Real>::type             Region;
 class Parameters 
 {
 public:
+    static const size_t NumGhosts = 1;
     
     FieldsSetup fields;
     GhostsSetup ghosts;
@@ -37,15 +38,15 @@ public:
         Y_SPADE_FIELD( fields, "dU", Array);
         
         //-- declare the ghosts
-        ghosts.set_local(on_x, 2); // PBC on x
-        ghosts.set_local(on_y, 2); // PBC on y
+        ghosts.set_local(on_x, NumGhosts); // PBC on x
+        ghosts.set_local(on_y, NumGhosts); // PBC on y
         if( MPI.IsParallel )
         {
-            ghosts.set_async(ghost::at_lower_z, 2, MPI.CommWorldPrev());
-            ghosts.set_async(ghost::at_upper_z, 2, MPI.CommWorldNext());
+            ghosts.set_async(ghost::at_lower_z, NumGhosts, MPI.CommWorldPrev());
+            ghosts.set_async(ghost::at_upper_z, NumGhosts, MPI.CommWorldNext());
         }
         else
-            ghosts.set_local(on_z, 2);
+            ghosts.set_local(on_z, NumGhosts);
         
     }
     
@@ -94,6 +95,16 @@ public:
     void initialize()
     {
         U.ldz();
+        for( unit_t i=lower.x;i<=upper.x;++i)
+        {
+            for(unit_t j=lower.y;j<=upper.y;++j)
+            {
+                for(unit_t k=lower.z;k<=upper.z;++k)
+                {
+                    U[k][j][i] = alea<Real>();
+                }
+            }
+        }
         sync(MPI,handles);
     }
     
@@ -102,12 +113,18 @@ public:
     {
         assert( VISIT_INVALID_HANDLE != md );
         
-        MPI.Printf0(stderr, "\t\t+mesh\n");
         //! append the mesh
         {
             visit_handle mmd = mesh_meta_data(mesh, "mesh", par_size);
             VisIt_SimulationMetaData_addMesh(md, mmd);
         }
+        
+        //! append U on mesh
+        {
+            visit_handle vmd = variable_meta_data<Real>("U", "mesh");
+            VisIt_SimulationMetaData_addVariable(md, vmd);
+        }
+
     
     }
     
@@ -149,7 +166,26 @@ public:
         }
         return h;
     }
+    
+    virtual visit_handle get_variable( int domain, const string &name ) const
+    {
+        //MPI.Printf( stderr, "rank %d> SIM:get_variable '%s', domain=%d\n", par_rank, name.c_str(), domain);
+        visit_handle h = VISIT_INVALID_HANDLE;
+        
+        if( name == "U" )
+        {
+            const int nComponents=1;
+            const int nTuples    =U.items;
+            //MPI.Printf0( stderr, "Sending U: %dx%d\n", nComponents, nTuples);
+            assert(U.entry!=NULL);
+            if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
+            {
+                VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, U.entry);
+            }
+        }
 
+        return h;
+    }
     
 private:
     
@@ -159,6 +195,8 @@ int main( int argc, char *argv[] )
 {
     try
     {
+        
+        _rand.wseed();
         
         //----------------------------------------------------------------------
         //info for VisIt
