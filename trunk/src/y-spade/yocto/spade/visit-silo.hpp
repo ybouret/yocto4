@@ -31,6 +31,7 @@ namespace yocto
                     optlist = 0;
                 }
                 
+                // data must be persitent
                 inline void operator()( int kind, const void *data)
                 {
                     assert(optlist);
