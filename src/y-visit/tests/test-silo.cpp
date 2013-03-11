@@ -12,8 +12,8 @@ typedef vertex2D<double>::type V2d;
 
 YOCTO_UNIT_TEST_IMPL(silo)
 {
-    Silo::File    db( "demo.silo", "Just A Demo");
     Silo::OptList optlist(2);
+    Silo::File    db( "demo.silo", "Just A Demo");
     
     optlist.AddTime(1);
     optlist.AddCycle(2);
@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(silo)
         std::cerr << "mesh2d: " << L << std::endl;
         std::cerr << "X     : " << m2.X().as_layout() << std::endl;
         std::cerr << "Y     : " << m2.Y().as_layout() << std::endl;
-        db.PutRectilinearMesh("meshd",m2,&optlist);
+        db.PutRectilinearMesh("meshd",m2,NULL);
     }
     
     
