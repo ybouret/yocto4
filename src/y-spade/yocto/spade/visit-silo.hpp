@@ -107,7 +107,7 @@ namespace yocto
                                   ndims,
                                   data_type,
                                   DB_COLLINEAR,
-                                  opt != 0 ? opt->optlist : 0);
+                                  (opt != 0) ? opt->optlist : 0);
                 }
                 
                 
