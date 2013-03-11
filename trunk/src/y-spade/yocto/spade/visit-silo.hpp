@@ -29,6 +29,54 @@ namespace yocto
                     dbfile = 0;
                 }
                 
+                template <typename RMESH>
+                void PutRectilinearMesh( const string &name, const RMESH &mesh )
+                {
+                    const int   ndims = RMESH::DIMENSIONS; assert(ndims<=3); assert(ndims>0);
+                    char       *coordsname[3];
+                    int         dims[3];
+                    float      *coords[3];
+                    for( int i=0; i < ndims; ++i )
+                    {
+                        const dimension_t dim = dimension_t(i);
+                        const char *axis_name = RMESH::get_axis_name( dim );
+                        coordsname[i]         = (char *)axis_name;
+                        const typename RMESH::axis_type &axis = mesh.get_axis(dim);
+                        dims[i]   = axis.items;
+                        coords[i] = (float *) axis.entry;
+                    }
+                    int data_type = -1;
+                    {
+                        static const type_spec spec_flt = typeid(float);
+                        static const type_spec spec_dbl = typeid(double);
+                        static const type_spec spec_dat = typeid( typename RMESH::type );
+                        if( spec_dat == spec_flt )
+                        {
+                            data_type = DB_FLOAT;
+                            goto PUT_QUADMESH;
+                        }
+                        
+                        if( spec_dat == spec_dbl )
+                        {
+                            data_type = DB_DOUBLE;
+                            goto PUT_QUADMESH;
+                        }
+                        
+                        throw exception("Silo.File.PutRectilinearMesh(invalid type '%s')", spec_dat.name());
+                    }
+                PUT_QUADMESH:
+                    DBPutQuadmesh(dbfile,
+                                  name.c_str(),
+                                  coordsname,
+                                  coords,
+                                  dims,
+                                  ndims,
+                                  data_type,
+                                  DB_COLLINEAR,
+                                  NULL);
+                }
+                
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(File);
                 DBfile *dbfile;
@@ -72,6 +120,8 @@ namespace yocto
                 DBoptlist *optlist;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(OptList);
             };
+            
+            
         };
         
     }
