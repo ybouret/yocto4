@@ -4,6 +4,9 @@
 #include "yocto/spade/mpi/workspace.hpp"
 #include "yocto/spade/region3d.hpp"
 #include "yocto/visit/interface.hpp"
+#include "yocto/code/utils.hpp"
+#include "yocto/math/round.hpp"
+#include "yocto/code/pid.hpp"
 
 using namespace yocto;
 using namespace spade;
@@ -22,7 +25,7 @@ typedef region3D<Real>::type             Region;
 
 
 
-class Parameters 
+class Parameters
 {
 public:
     static const size_t NumGhosts = 1;
@@ -72,20 +75,32 @@ public:
     Array1D       &X;
     Array1D       &Y;
     Array1D       &Z;
+    double         dt;
+    const Vertex   delta;
+    const Vertex   delsq;
     linear_handles handles; //!< for MPI
-
-    explicit MySim(  const mpi &ref, const Layout &l) :
+    Real           Du;
+    
+    explicit MySim(const mpi    &ref,
+                   const Layout &l,
+                   const Vertex &d ) :
     VisIt::Simulation(ref),
     Parameters(MPI),
-    Workspace( l, fields, ghosts  ),
-    U(  (*this)["U"].as<Array>()  ),
-    dU( (*this)["dU"].as<Array>() ),
+    Workspace( l, fields, ghosts   ),
+    U(  (*this)["U" ].as<Array>()  ),
+    dU( (*this)["dU"].as<Array>()  ),
     X( mesh.X() ),
     Y( mesh.Y() ),
-    Z( mesh.Z() )
+    Z( mesh.Z() ),
+    dt(0),
+    delta(d),
+    delsq(delta.x*delta.x,delta.y*delta.y,delta.z*delta.z),
+    handles(),
+    Du( 5.0 )
     {
         MPI.PrintfI(stderr, "Ready\n");
         query( handles, "U" );
+        dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
     }
     
     virtual ~MySim() throw()
@@ -101,7 +116,7 @@ public:
             {
                 for(unit_t k=lower.z;k<=upper.z;++k)
                 {
-                    U[k][j][i] = alea<Real>();
+                    U[k][j][i] = 0.5*(1-2*alea<Real>());
                 }
             }
         }
@@ -112,6 +127,8 @@ public:
     virtual void get_meta_data( visit_handle &md ) const
     {
         assert( VISIT_INVALID_HANDLE != md );
+        //! append an UI command
+        add_generic_command("raz", md);
         
         //! append the mesh
         {
@@ -124,8 +141,8 @@ public:
             visit_handle vmd = variable_meta_data<Real>("U", "mesh");
             VisIt_SimulationMetaData_addVariable(md, vmd);
         }
-
-    
+        
+        
     }
     
     
@@ -183,12 +200,76 @@ public:
                 VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, U.entry);
             }
         }
-
+        
         return h;
     }
     
-private:
     
+    //! auxiliary commands
+    virtual void perform( const string &cmd, const array<string> & )
+    {
+        MPI.PrintfI( stderr, "cmd: %s\n", cmd.c_str() );
+        if( cmd == "raz" )
+        {
+            initialize();
+            cycle   = 0;
+            runTime = 0;
+        }
+    }
+    
+    //! Laplacian
+    inline void compute_laplacian()
+    {
+        for(unit_t k=lower.z;k<=upper.z;++k)
+        {
+            const unit_t km = k-1;
+            const unit_t kp = k+1;
+            for(unit_t j=lower.y;j<=upper.y;++j)
+            {
+                const unit_t jm=j-1;
+                const unit_t jp=j+1;
+                for( unit_t i=lower.x;i<=upper.x;++i)
+                {
+                    const unit_t im=i-1;
+                    const unit_t ip=i+1;
+                    const Real   mid = -2 * U[k][j][i];
+                    const Real   Lz  = (U[kp][j][i] + mid + U[km][j][i])/delsq.z;
+                    const Real   Ly  = (U[k][jp][i] + mid + U[k][jm][i])/delsq.y;
+                    const Real   Lx  = (U[k][j][ip] + mid + U[k][j][im])/delsq.x;
+                    dU[k][j][i] =  (Lx+Lz+Ly);
+                }
+            }
+        }
+        
+    }
+    
+    virtual void step()
+    {
+        VisIt::Simulation::step();
+        runTime = cycle * dt;
+        
+        compute_laplacian();
+        for(unit_t k=lower.z;k<=upper.z;++k)
+        {
+            for(unit_t j=lower.y;j<=upper.y;++j)
+            {
+                for( unit_t i=lower.x;i<=upper.x;++i)
+                {
+                    const Real u = U[k][j][i];
+                    U[k][j][i] += dt * ( (u - u*u*u) + Du * dU[k][j][i] );
+                    
+                    //const Real zeta = alea<Real>();
+                    //if( zeta > 0.7 ) U[k][j][i] += 0.1 * ( 0.5 - alea<Real>() );
+                    
+                }
+            }
+        }
+        sync(MPI,handles);
+    }
+    
+    
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
 };
 
 int main( int argc, char *argv[] )
@@ -196,7 +277,7 @@ int main( int argc, char *argv[] )
     try
     {
         
-        _rand.wseed();
+        _rand.wseed( get_process_h32() );
         
         //----------------------------------------------------------------------
         //info for VisIt
@@ -211,7 +292,7 @@ int main( int argc, char *argv[] )
         YOCTO_MPI;
         const int rank = MPI.CommWorldRank;
         const int size = MPI.CommWorldSize;
-       
+        
         
         //----------------------------------------------------------------------
         // parallel VisIt
@@ -219,52 +300,53 @@ int main( int argc, char *argv[] )
         const string       trace_name = "trace.dat";
         VisIt:: TraceFile  trace_file(rank,trace_name );
         VisIt:: SetupParallel( MPI, sim_name, sim_comment, sim_path, NULL);
-
+        
         
         //----------------------------------------------------------------------
         // Geometry/Workspace
         //----------------------------------------------------------------------
         const Coord cmin(1,1,1);
-        const Coord cmax(10,12,14);
+        const Coord cmax(30,40,50);
         const Layout full_layout( cmin, cmax );
         const Layout sim_layout = full_layout.split(rank, size);
-
+        const Region full_region( Vertex(0,0,0), Vertex(100,150,200) );
+        const Vertex delta(full_region.length.x / full_layout.width.x,
+                           full_region.length.y / full_layout.width.y,
+                           full_region.length.z / full_layout.width.z
+                           );
+        
         //----------------------------------------------------------------------
         // Create Simulation
         //----------------------------------------------------------------------
-        MySim sim(MPI,sim_layout);
-        
+        MySim sim(MPI,sim_layout,delta);
         //----------------------------------------------------------------------
         // create mesh
         //----------------------------------------------------------------------
-        const Region full_region( Vertex(-1,-1,-1), Vertex(1,1,1) );
-        const Real   dx = full_region.length.x / full_layout.width.x;
-        const Real   dy = full_region.length.y / full_layout.width.y;
-        const Real   dz = full_region.length.z / full_layout.width.z;
-
+        
+        
         for( unit_t i= sim.X.lower; i <= sim.X.upper; ++i )
         {
-            sim.X[i] = full_region.vmin.x + (i - full_layout.lower.x) * dx;
+            sim.X[i] = full_region.vmin.x + (i - full_layout.lower.x) * delta.x;
         }
         
         
         for( unit_t j=sim.Y.lower; j <= sim.Y.upper; ++j )
         {
-            sim.Y[j] = full_region.vmin.y + (j- full_layout.lower.y) * dy;
+            sim.Y[j] = full_region.vmin.y + (j- full_layout.lower.y) * delta.y;
         }
         
-
+        
         for( unit_t k=sim.Z.lower; k<= sim.Z.upper; ++k )
         {
-            sim.Z[k] = full_region.vmin.z + (k- full_layout.lower.z) * dz;
+            sim.Z[k] = full_region.vmin.z + (k- full_layout.lower.z) * delta.z;
         }
-       
-
+        
+        
         //----------------------------------------------------------------------
         //
         //----------------------------------------------------------------------
         sim.initialize();
-
+        
         VisIt::MainLoop(sim);
         
         return 0;

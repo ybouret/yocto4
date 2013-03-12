@@ -18,6 +18,12 @@ namespace yocto
 #endif
 		
 	}
+    
+    uint32_t get_process_h32()
+    {
+        const pid_type p = get_process_id();
+        return hash32(&p, sizeof(p));
+    }
 	
 }
 
