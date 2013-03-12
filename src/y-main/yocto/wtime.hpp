@@ -14,7 +14,7 @@ namespace yocto
 		void   start();
 		double query() const;
 		static uint64_t ticks();
-		static uint32_t seed();
+		static uint32_t seed(uint32_t ini=0);
 		
 		static void sleep( double s ) throw();
 		

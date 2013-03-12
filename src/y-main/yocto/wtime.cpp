@@ -123,7 +123,7 @@ namespace yocto
 	
 	extern uint32_t ihash32(uint32_t);
 	
-	uint32_t wtime:: seed() 
+	uint32_t wtime:: seed( uint32_t s )
 	{
 		union 
 		{
@@ -133,7 +133,8 @@ namespace yocto
 #if defined(__INTEL_COMPILER)
 #	pragma warning ( disable : 981 )
 #endif
-		uint32_t seed = ihash32( ini.dw[0] ) ^ ihash32( ini.dw[1] );
+        
+		uint32_t seed = s + (ihash32( ini.dw[0] ) ^ ihash32( ini.dw[1] ));
 		return seed;
 	}
 	

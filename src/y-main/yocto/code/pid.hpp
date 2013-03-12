@@ -23,7 +23,8 @@ namespace yocto
 	
 	
 	pid_type get_process_id();
-	
+	uint32_t get_process_h32();
+    
 	
 }
 #endif
