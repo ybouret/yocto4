@@ -24,7 +24,7 @@ namespace yocto
     MPI( ref ),
     stepTime(-1),
     loopTime(-1),
-    commTime(-1),
+    commTime(0),
     console(true),
     par_rank(  MPI.CommWorldRank ),
     par_size(  MPI.CommWorldSize ),
@@ -62,10 +62,10 @@ namespace yocto
     void VisIt::Simulation:: post_step() const
     {
         MPI.Printf0(stderr,
-                    "\tsteps/s= %10.3f | loops/s= %10.3f | CommTime = %10.4fms\n",
+                    "\tsteps/s= %8.2f | loops/s= %8.2f | CommTime = %6u usecs\n",
                     1.0 / stepTime,
                     1.0 / loopTime ,
-                    commTime * 1000.0);
+                    commTime);
     }
     
     
