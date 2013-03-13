@@ -6,6 +6,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/code/bswap.hpp"
+#include <typeinfo>
 
 using namespace yocto;
 using namespace math;
