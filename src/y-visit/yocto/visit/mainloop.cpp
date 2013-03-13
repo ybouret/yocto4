@@ -263,7 +263,6 @@ namespace yocto
     //==========================================================================
     void VisIt:: OneStep( Simulation &sim )
     {
-        //std::cerr << "\t\t OneStep" << std::endl;
         ++sim.cycle;
         const uint64_t mu0  = sim.MPI.CommTime;
         const double t0     = MPI_Wtime();
