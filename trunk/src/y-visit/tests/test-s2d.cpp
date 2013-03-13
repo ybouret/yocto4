@@ -187,7 +187,7 @@ namespace
                     VisIt_RectilinearMesh_setCoordsXY(h, hx, hy);
                     
                     int minRealIndex[3] = { 1,         2 ,        0 };
-                    int maxRealIndex[3] = { X.width-2, Y.width-3, 0 };
+                    int maxRealIndex[3] = { int(X.width)-2, int(Y.width)-3, 0 };
                     
                     if(  par_rank < par_size - 1)
                         maxRealIndex[1]++;

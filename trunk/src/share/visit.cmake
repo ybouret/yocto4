@@ -83,7 +83,7 @@ ELSE( "" STREQUAL "${VISIT}" )
 		ADD_CUSTOM_COMMAND( TARGET ${tgt}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} ARGS -E make_directory  "${VISIT_UI_DIR}"
-        COMMAND ${CMAKE_COMMAND} ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${VISIT_UI_DIR}/loop.ui"
+        COMMAND ${CMAKE_COMMAND} ARGS -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${VISIT_UI_DIR}/"
         COMMENT "Copy ${file} to ${VISIT_UI_DIR}"
         )
 	ENDMACRO(VISIT_CUSTOM_UI)
