@@ -9,7 +9,7 @@ namespace yocto
 	//======================================================================
 	void mpi:: Barrier(MPI_Comm comm) const
 	{
-        Y_MPI_STAMP;
+        Y_MPI_STAMP(Barrier);
 		const int err = MPI_Barrier( comm );
 		if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Barrier()" );
@@ -18,7 +18,7 @@ namespace yocto
 	
 	void mpi:: Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const
 	{
-        Y_MPI_STAMP;
+        Y_MPI_STAMP(Bcast);
 		const int err = MPI_Bcast( (void *)buffer, count, datatype, root, comm );
 		if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Bcast(root=%d)", root );
@@ -30,7 +30,7 @@ namespace yocto
 	{
 		assert( !(NULL==sendbuf && sendcnt > 0 ) );
 		assert( !(NULL==recvbuf && recvcnt > 0 ) );
-        Y_MPI_STAMP;
+        Y_MPI_STAMP(Scatter);
 		const int err = MPI_Scatter((void*)sendbuf,sendcnt,sendtype,recvbuf,recvcnt,recvtype,root,comm);
 		if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Scatter(root=%d)", root );
@@ -42,7 +42,7 @@ namespace yocto
 	{
 		assert( !(NULL==sendbuf && sendcnt > 0 ) );
 		assert( !(NULL==recvbuf && recvcnt > 0 ) );
-        Y_MPI_STAMP;
+        Y_MPI_STAMP(Gather);
 		const int err = MPI_Gather((void*)sendbuf,sendcnt,sendtype,recvbuf,recvcnt,recvtype,root,comm);
 		if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Gather(root=%d)", root );
@@ -53,7 +53,7 @@ namespace yocto
     {
         assert( !(NULL==sendbuf && count>0 ) );
         assert( !(NULL==recvbuf && count>0 ) );
-        Y_MPI_STAMP;
+        Y_MPI_STAMP(Reduce);
         const int err = MPI_Reduce((void*)sendbuf, recvbuf, int(count), datatype, op, root, comm);
         if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Reduce(root=%d)",root);
@@ -64,7 +64,7 @@ namespace yocto
     {
         assert( !(NULL==sendbuf && count>0 ) );
         assert( !(NULL==recvbuf && count>0 ) );
-        Y_MPI_STAMP;
+        Y_MPI_STAMP(Allreduce);
         const int err = MPI_Allreduce((void*)sendbuf, recvbuf, int(count), datatype, op, comm);
         if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Alleduce()");

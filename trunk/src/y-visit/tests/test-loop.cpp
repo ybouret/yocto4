@@ -92,9 +92,7 @@ private:
 
 YOCTO_UNIT_TEST_IMPL(loop)
 {
-    
-    //VisIt:: SetupEnvironment();
-    
+        
     const string sim_name    = "Simulation";
     const string sim_comment = "Simulation Comment";
     const string sim_path    = ".";
@@ -107,7 +105,6 @@ YOCTO_UNIT_TEST_IMPL(loop)
     MySim sim(MPI);
     
     //-- it looks like all widgets must be declared...
-    
     VisItUI_clicked("RUN",         ui_run_clicked,     &sim);
     VisItUI_clicked("HALT",        ui_halt_clicked,    &sim);
     VisItUI_clicked("STEP",        ui_step_clicked,    &sim);

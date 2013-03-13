@@ -250,9 +250,13 @@ public:
         
     }
     
+    virtual void step_prolog()
+    {
+        VisIt::Simulation::step_prolog();
+    }
+    
     virtual void step()
     {
-        VisIt::Simulation::step();
         runTime = cycle * dt;
         
         compute_laplacian();
@@ -269,11 +273,12 @@ public:
         }
         if(do_sync)
             sync(MPI,handles);
+        
+              
     }
     
-    virtual void post_step() const
+    virtual void step_epilog()
     {
-        //VisIt::Simulation::post_step();
         sum_steps += stepTime;
         sum_tcomm += double(commTime);
         num_steps += 1;

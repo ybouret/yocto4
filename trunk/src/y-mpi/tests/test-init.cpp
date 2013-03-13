@@ -10,7 +10,7 @@ YOCTO_UNIT_TEST_IMPL(init)
 	
     mpi &MPI = mpi::init( &argc, & argv );
 	
-    MPI.Printf(stderr, "%u.%u '%s' is ready\n", unsigned(MPI.CommWorldSize), unsigned(MPI.CommWorldRank),MPI.ProcessorName );
+    MPI.PrintfI(stderr, "'%s' is ready\n",MPI.ProcessorName );
 	
 	MPI.Finalize();
 	
