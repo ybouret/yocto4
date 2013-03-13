@@ -295,6 +295,7 @@ public:
                     ( 1e-4 * double(commTime) ) / stepTime,
                     ( 1e-4 * sum_tcomm) / sum_steps
                     );
+        
     }
     
     
