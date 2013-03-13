@@ -73,15 +73,15 @@ namespace yocto
 		void   Finalize() throw();
 		
        		
-		const int      CommWorldSize;    //!< size of MPI_COMM_WORLD
-		const int      CommWorldRank;    //!< rank in MPI_COMM_WORLD
-		const int      CommWorldLast;    //!< CommWorldSize-1;
-		const bool     IsFirst;          //!< 0 == CommWorldRank
-        const bool     IsFinal;          //!< CommWorldLast == CommWorldRank
-        const bool     IsParallel;       //!< CommWorldSize > 1
-        mutable double CommTime;         //!< cumulative communication time
-		const int      ProcessorNameLength;
-		const char     ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
+		const int        CommWorldSize;    //!< size of MPI_COMM_WORLD
+		const int        CommWorldRank;    //!< rank in MPI_COMM_WORLD
+		const int        CommWorldLast;    //!< CommWorldSize-1;
+		const bool       IsFirst;          //!< 0 == CommWorldRank
+        const bool       IsFinal;          //!< CommWorldLast == CommWorldRank
+        const bool       IsParallel;       //!< CommWorldSize > 1
+        mutable uint64_t CommTime;         //!< cumulative communication time in microseconds
+		const int        ProcessorNameLength;
+		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
 		
         int Comm_rank( MPI_Comm comm ) const;
         
@@ -227,5 +227,5 @@ namespace yocto
 
 #define YOCTO_MPI   const mpi & MPI = mpi::init(&argc,&argv)
 #define Y_MPI_STAMP const double stamp = MPI_Wtime()
-#define Y_MPI_CTIME CommTime += ( MPI_Wtime() - stamp )
+#define Y_MPI_CTIME CommTime += uint64_t( ( MPI_Wtime() - stamp ) * 1.0e6 )
 #endif
