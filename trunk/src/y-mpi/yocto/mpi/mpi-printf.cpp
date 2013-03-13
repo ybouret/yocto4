@@ -17,7 +17,7 @@ namespace yocto
 		
 		if( CommWorldSize > 1 )
 		{
-			//Barrier( MPI_COMM_WORLD );
+			Barrier( MPI_COMM_WORLD );
 			
 			if( CommWorldRank > 0 )
 			{
@@ -65,7 +65,7 @@ namespace yocto
 		
 		if( CommWorldSize > 1 )
 		{
-			//Barrier( MPI_COMM_WORLD );
+			Barrier( MPI_COMM_WORLD );
 			
 			if( CommWorldRank > 0 )
 			{
@@ -105,7 +105,7 @@ namespace yocto
 	
 	void mpi:: Printf0( FILE *fp, const char *fmt, ... ) const
 	{
-		//Barrier( MPI_COMM_WORLD );
+		Barrier( MPI_COMM_WORLD );
 		if( 0 == CommWorldRank )
 		{
 			va_list ap;
