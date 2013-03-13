@@ -56,6 +56,7 @@ namespace yocto
             const mpi &MPI;       //!< MPI singleton reference
             double     stepTime;  //!< last wall time for step
             double     loopTime;  //!< stepTime + VisIt time
+            double     commTime;  //!< from MPI
             const bool console;   //!< shall use the interactive console
             const int  par_rank;  //!< alias MPI.CommWorldRank 
             const int  par_size;  //!< alias MPI.CommWorldSize

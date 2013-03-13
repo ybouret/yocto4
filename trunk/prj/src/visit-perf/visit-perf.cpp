@@ -171,11 +171,10 @@ public:
                 VisIt_RectilinearMesh_setCoordsXYZ(h, hx, hy, hz);
                 
 #if 0
-                int minRealIndex[3] = { 1,         1 ,        2        };
-                int maxRealIndex[3] = { X.width-2, Y.width-2, Z.width-3};
+                int minRealIndex[3] = { 1,         1 ,        1       };
+                int maxRealIndex[3] = { X.width-1, Y.width-1, Z.width-1};
                 
-                if(  par_rank < par_size - 1)
-                    maxRealIndex[2]++;
+                //if(  par_rank < par_size - 1) maxRealIndex[2]++;
                 
                 VisIt_RectilinearMesh_setRealIndices(h, minRealIndex, maxRealIndex);
 #endif

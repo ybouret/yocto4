@@ -8,9 +8,11 @@ namespace yocto
 void mpi:: SEND( const void *buffer, size_t count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm ) const \
 {\
 assert( !( NULL == buffer && count > 0 ) );\
+Y_MPI_STAMP; \
 const int err = MPI_##SEND( (void *)buffer, int(count), datatype, dest, tag, comm );\
 if( err != MPI_SUCCESS )\
 throw mpi::exception( err, #SEND"(dest=%d)", dest );\
+Y_MPI_CTIME; \
 }
 	
 	

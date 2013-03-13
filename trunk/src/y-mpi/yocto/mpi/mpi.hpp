@@ -225,7 +225,7 @@ namespace yocto
 	
 }
 
-#define YOCTO_MPI const mpi & MPI = mpi::init(&argc,&argv)
+#define YOCTO_MPI   const mpi & MPI = mpi::init(&argc,&argv)
 #define Y_MPI_STAMP const double stamp = MPI_Wtime()
 #define Y_MPI_CTIME CommTime += ( MPI_Wtime() - stamp )
 #endif

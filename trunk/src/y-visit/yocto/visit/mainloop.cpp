@@ -263,8 +263,10 @@ namespace yocto
     //==========================================================================
     void VisIt:: OneStep( Simulation &sim )
     {
+        //std::cerr << "\t\t OneStep" << std::endl;
         ++sim.cycle;
-        const double t0 = MPI_Wtime();
+        sim.commTime     = sim.MPI.CommTime; //std::cerr << "\t\t\t entry commTime=" << sim.MPI.CommTime << std::endl;
+        const double t0  = MPI_Wtime();
         sim.step();
         sim.stepTime = MPI_Wtime() - t0;
         if( VisItIsConnected() )
@@ -272,7 +274,8 @@ namespace yocto
             VisItTimeStepChanged();
             VisItUpdatePlots();
         }
-        sim.loopTime = MPI_Wtime() - t0;
+        sim.loopTime  = MPI_Wtime() - t0;
+        sim.commTime  = sim.MPI.CommTime - sim.commTime;//std::cerr << "\t\t\t leave commTime=" << sim.MPI.CommTime << std::endl;
         sim.post_step();
     }
     
