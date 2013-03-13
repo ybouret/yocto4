@@ -406,7 +406,7 @@ int main( int argc, char *argv[] )
             }
         HAS_SYNC:;
         }
-        MPI.Printf0( stderr, "Synchronizing/MPI: %s\n" , sim.do_sync ? "TRUE" : "FALSE" );
+        MPI.PrintfI( stderr, "Synchronizing/MPI: %s\n" , sim.do_sync ? "TRUE" : "FALSE" );
         VisIt::MainLoop(sim);
         
         return 0;
