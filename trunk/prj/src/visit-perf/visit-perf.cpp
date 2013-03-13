@@ -328,7 +328,7 @@ int main( int argc, char *argv[] )
         // Geometry/Workspace
         //----------------------------------------------------------------------
         const Coord cmin(1,1,1);
-        const Coord cmax(30,40,50);
+        const Coord cmax(130,140,150);
         const Layout full_layout( cmin, cmax );
         const Layout sim_layout = full_layout.split(rank, size);
         const Region full_region( Vertex(0,0,0), Vertex(100,150,200) );
