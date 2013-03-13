@@ -83,6 +83,7 @@ public:
     mutable double sum_steps;
     mutable size_t num_steps;
     mutable double sum_tcomm;
+    bool           do_sync;
     
     explicit MySim(const mpi    &ref,
                    const Layout &l,
@@ -102,7 +103,8 @@ public:
     Du( 5.0 ),
     sum_steps(0),
     num_steps(0),
-    sum_tcomm(0)
+    sum_tcomm(0),
+    do_sync(true)
     {
         MPI.PrintfI(stderr, "Ready\n");
         query( handles, "U" );
@@ -265,7 +267,8 @@ public:
                 }
             }
         }
-        sync(MPI,handles);
+        if(do_sync)
+            sync(MPI,handles);
     }
     
     virtual void post_step() const
@@ -294,10 +297,18 @@ private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
 };
 
+#include "yocto/string/conv.hpp"
+#include "yocto/string/env.hpp"
+
 int main( int argc, char *argv[] )
 {
     try
     {
+        if( argc <= 3 )
+            throw exception("usage: simu Nx Ny Nz");
+        const size_t Nx = strconv::to_size( argv[1], "Nx");
+        const size_t Ny = strconv::to_size( argv[2], "Ny");
+        const size_t Nz = strconv::to_size( argv[3], "Nz");
         
         _rand.wseed( get_process_h32() );
         
@@ -328,7 +339,7 @@ int main( int argc, char *argv[] )
         // Geometry/Workspace
         //----------------------------------------------------------------------
         const Coord cmin(1,1,1);
-        const Coord cmax(130,140,150);
+        const Coord cmax(Nx,Ny,Nz);
         const Layout full_layout( cmin, cmax );
         const Layout sim_layout = full_layout.split(rank, size);
         const Region full_region( Vertex(0,0,0), Vertex(100,150,200) );
@@ -368,7 +379,28 @@ int main( int argc, char *argv[] )
         //
         //----------------------------------------------------------------------
         sim.initialize();
-        
+        sim.do_sync = true; //! default
+        {
+            string EnvSync;
+            if( environment::get(EnvSync, "SYNC") )
+            {
+                if( EnvSync == "true" )
+                {
+                    sim.do_sync = true;
+                    goto HAS_SYNC;
+                }
+                
+                if( EnvSync == "false" )
+                {
+                    sim.do_sync = false;
+                    goto HAS_SYNC;
+                }
+                
+                throw exception("Invalid Env 'SYNC=%s", EnvSync.c_str());
+            }
+        HAS_SYNC:;
+        }
+        MPI.Printf0( stderr, "Synchronizing/MPI: %s\n" , sim.do_sync ? "TRUE" : "FALSE" );
         VisIt::MainLoop(sim);
         
         return 0;
