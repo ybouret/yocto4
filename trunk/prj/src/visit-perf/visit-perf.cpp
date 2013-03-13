@@ -80,6 +80,9 @@ public:
     const Vertex   delsq;
     linear_handles handles; //!< for MPI
     Real           Du;
+    mutable double sum_steps;
+    mutable size_t num_steps;
+    mutable double sum_tcomm;
     
     explicit MySim(const mpi    &ref,
                    const Layout &l,
@@ -96,7 +99,10 @@ public:
     delta(d),
     delsq(delta.x*delta.x,delta.y*delta.y,delta.z*delta.z),
     handles(),
-    Du( 5.0 )
+    Du( 5.0 ),
+    sum_steps(0),
+    num_steps(0),
+    sum_tcomm(0)
     {
         MPI.PrintfI(stderr, "Ready\n");
         query( handles, "U" );
@@ -256,14 +262,31 @@ public:
                 {
                     const Real u = U[k][j][i];
                     U[k][j][i] += dt * ( (u - u*u*u) + Du * dU[k][j][i] );
-                    
-                    //const Real zeta = alea<Real>();
-                    //if( zeta > 0.7 ) U[k][j][i] += 0.1 * ( 0.5 - alea<Real>() );
-                    
                 }
             }
         }
         sync(MPI,handles);
+    }
+    
+    virtual void post_step() const
+    {
+        //VisIt::Simulation::post_step();
+        sum_steps += stepTime;
+        sum_tcomm += double(commTime);
+        num_steps += 1;
+        MPI.Printf0(stderr,
+                    "\tsteps/s = %8.2f < %8.2f >\n"
+                    "\tloops/s = %8.2f [ %8.5fx ]\n"
+                    "\tComm/us = %8u [ %8.3f%% ] < %8.3f%% >\n"
+                    ,
+                    1.0/stepTime,
+                    num_steps/sum_steps,
+                    1.0/loopTime,
+                    stepTime/loopTime,
+                    commTime,
+                    ( 1e-4 * double(commTime) ) / stepTime,
+                    ( 1e-4 * sum_tcomm) / sum_steps
+                    );
     }
     
     
