@@ -264,7 +264,12 @@ namespace yocto
     void VisIt:: OneStep( Simulation &sim )
     {
         ++sim.cycle;
-        const uint64_t mu0  = sim.MPI.CommTime;
+        
+        //-- display/precompute something
+        sim.step_prolog();
+        
+        //-- effective step
+        const uint64_t mu0  = sim.MPI.CommTime; 
         const double t0     = MPI_Wtime();
         sim.step();
         sim.stepTime = MPI_Wtime() - t0;
@@ -275,7 +280,9 @@ namespace yocto
         }
         sim.loopTime  = MPI_Wtime() - t0;
         sim.commTime  = unsigned(sim.MPI.CommTime - mu0);
-        sim.post_step();
+        
+        //-- display/postcompute something
+        sim.step_epilog();
     }
     
     

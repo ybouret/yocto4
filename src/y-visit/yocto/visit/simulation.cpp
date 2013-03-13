@@ -52,14 +52,20 @@ namespace yocto
         add_cmd_arg(a);
     }
     
-    void VisIt:: Simulation:: step()
+    
+    void VisIt:: Simulation:: step_prolog()
     {
         const char *run_mode = VisItIsConnected() ? "[VisIt ONLINE ]" : "[Visit OFFLINE]";
         MPI.Printf0(stderr, "%s cycle= %6d\n", run_mode, cycle);
     }
     
+    void VisIt:: Simulation:: step()
+    {
+        // do nothing
+    }
     
-    void VisIt::Simulation:: post_step() const
+    
+    void VisIt::Simulation:: step_epilog()
     {
         MPI.Printf0(stderr,
                     "\tsteps/s= %8.2f | loops/s= %8.2f | CommTime = %6u usecs\n",

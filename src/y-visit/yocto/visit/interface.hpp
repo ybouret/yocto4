@@ -96,6 +96,12 @@ namespace yocto
             virtual visit_handle get_curve( const string &name ) const;
             
             
+            //! if you want to display some info before step
+            /**
+             cycle is updated before the call.
+             */
+            virtual void step_prolog();
+            
             //! the main step function
             /**
              called by Visit::OneStep
@@ -109,7 +115,7 @@ namespace yocto
             static const size_t GenericCommandNum;
             
             //! if you want statistics after one step
-            virtual void post_step() const;
+            virtual void step_epilog();
             
             //! commands arguments
             void   no_cmd_args() throw();

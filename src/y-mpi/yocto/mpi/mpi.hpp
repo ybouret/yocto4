@@ -226,6 +226,14 @@ namespace yocto
 }
 
 #define YOCTO_MPI   const mpi & MPI = mpi::init(&argc,&argv)
-#define Y_MPI_STAMP const double stamp = MPI_Wtime()
+
+#define MPI_CTIME_DEBUG 0
+
+#if defined(MPI_CTIME_DEBUG) && MPI_CTIME_DEBUG == 1
+#include <iostream>
+#define Y_MPI_STAMP(FUNC) const double stamp = MPI_Wtime(); std::cerr << "[+" << #FUNC << "]" << std::endl
+#else
+#define Y_MPI_STAMP(FUNC) const double stamp = MPI_Wtime()
+#endif
 #define Y_MPI_CTIME CommTime += uint64_t( ( MPI_Wtime() - stamp ) * 1.0e6 )
 #endif
