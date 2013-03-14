@@ -9,9 +9,7 @@ namespace yocto
 {
     namespace spade
     {
-        
-        // TODO: solve ghosts addressing by ghosts setup ?
-        
+      
         class async_ghosts : public ghosts
         {
         public:

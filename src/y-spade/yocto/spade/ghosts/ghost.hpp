@@ -8,7 +8,7 @@ namespace yocto
     namespace spade
     {
         
-        //! a ghost is a localized list of offsets...
+        //! a ghost is a localized list of offsets
         class ghost : public offsets_list
         {
         public:

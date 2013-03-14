@@ -109,6 +109,13 @@ namespace yocto
         const string         cmd  = parse_user_command(user_cmd);
         const array<string> &args = cmdArgs;
         
+        MPI.Printf0(stderr, "command: <%s>", cmd.c_str());
+        for( size_t i=1; i <= args.size(); ++i )
+        {
+            MPI.Printf0(stderr, " '%s'", args[i].c_str());
+        }
+        MPI.Printf0(stderr, "\n");
+        
         if(  cmd == "run"  )
         {
             runMode = VISIT_SIMMODE_RUNNING;
@@ -150,7 +157,7 @@ namespace yocto
     
     void VisIt:: Simulation:: perform( const string &cmd, const array<string> &args )
     {
-        MPI.Printf(stderr,"rank %d> '%s', %u args\n", par_rank, cmd.c_str(), unsigned(args.size()));
+        //MPI.Printf(stderr,"rank %d> '%s', %u args\n", par_rank, cmd.c_str(), unsigned(args.size()));
     }
     
     void VisIt:: Simulation::  get_meta_data( visit_handle &md ) const

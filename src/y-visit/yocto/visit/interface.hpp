@@ -9,7 +9,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/sequence/vector.hpp"
 
-namespace yocto 
+namespace yocto
 {
     
     //! VisIt wrapper
@@ -21,6 +21,7 @@ namespace yocto
         class TraceFile
         {
         public:
+            //! only on master node
             TraceFile( int rank, const string &filename );
             virtual ~TraceFile() throw();
         private:
@@ -30,15 +31,25 @@ namespace yocto
         
         static void SetDirectory( const string &path );      //!< VisItSetDirectory
         static void SetOption(const string &options);        //!< VisItSetOptions
-        static void SetupParallel(const mpi &   MPI, 
+        
+        //! prepare simulation
+        /**
+         \param MPI         a MPI instance
+         \param sim_name    simulation name
+         \param sim_comment simulation comment
+         \param sim_path    simulation path
+         \param sim_ui      optional simulation UI file
+         */
+        static void SetupParallel(const mpi &   MPI,
                                   const string &sim_name,
                                   const string &sim_comment,
                                   const string &sim_path,
-                                  const string *sim_ui = NULL
-                                  ); //!< auxiliary functions
+                                  const string *sim_ui = 0
+                                  );
         
+        //! I/O memory buffer type
         typedef memory::buffer_of<char,memory::global> IOBuffer;
-        static const size_t                            IOBufferSize = 1024;
+        static const size_t                            IOBufferSize = 1024; //!< default length
         
         
         //! base class for a simulation
@@ -49,8 +60,8 @@ namespace yocto
             virtual ~Simulation() throw();
             
             const mpi &MPI;       //!< reference to the MPI singleton
-            int        cycle;
-            int        runMode;
+            int        cycle;     //!< number of cycles, upgraded by MainLoop
+            int        runMode;   //!< stopped or running
             double     runTime;   //!< should be cycle * dt
             bool       done;      //!< end of simulation flag
             IOBuffer   iobuff;    //!< buffer for console input
@@ -58,7 +69,7 @@ namespace yocto
             double     loopTime;  //!< stepTime + VisIt time
             unsigned   commTime;  //!< from MPI, in microseconds
             bool       console;   //!< shall use the interactive console
-            const int  par_rank;  //!< alias MPI.CommWorldRank 
+            const int  par_rank;  //!< alias MPI.CommWorldRank
             const int  par_size;  //!< alias MPI.CommWorldSize
             const int  par_last;  //!< alias MPI.CommWorldLast
             const bool parallel;  //!< par_size > 1
@@ -68,12 +79,13 @@ namespace yocto
             //! provide meta data information
             /**
              meta data for meshes, specific commands...
+             default does nothing.
              */
             virtual void get_meta_data( visit_handle &md ) const;
             
             //! add a generic command
             /**
-             VisIt wrapper
+             VisIt wrapper to add a generic command to the simulation control.
              */
             void add_generic_command( const string &cmd, visit_handle &md ) const;
             
@@ -109,7 +121,7 @@ namespace yocto
             /**
              called by Visit::OneStep
              */
-            virtual void step();  
+            virtual void step();
             
             //! process the command to update the simulation
             virtual void perform( const string &cmd, const array<string> &args);
@@ -138,10 +150,19 @@ namespace yocto
             vector<string> cmdArgs;
         };
         
+        //! handle visit I/O for simulation
         static void MainLoop(Simulation &sim );
+        
+        //! perform one step when possible
+        /**
+         sim.cycle++;
+         sim.step_prolog();
+         sim.step();
+         sim.step_epilog();
+         */
         static void OneStep( Simulation &sim );
         
-        //! 
+        //! call sim.performAlways() and propagate to VisIt.
         static void Perform( Simulation &sim, const string &user_cmd );
     };
     

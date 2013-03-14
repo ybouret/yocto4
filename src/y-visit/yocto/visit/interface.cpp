@@ -80,10 +80,13 @@ namespace yocto
         // Finish setting up the simulation
         //----------------------------------------------------------------------
         const char *ui_file = sim_ui ? sim_ui->c_str() : NULL;
-        MPI.Printf0( stderr, "[Visit] sim name    = '%s'\n", sim_name.c_str() );
+        MPI.Printf0( stderr, "[Visit] sim name    = '%s'\n", sim_name.c_str()    );
         MPI.Printf0( stderr, "[Visit] sim comment = '%s'\n", sim_comment.c_str() );
-        MPI.Printf0( stderr, "[Visit] sim path    = '%s'\n", sim_path.c_str() );
-        if( ui_file ) MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
+        MPI.Printf0( stderr, "[Visit] sim path    = '%s'\n", sim_path.c_str()    );
+        if( ui_file )
+            MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
+        
+        
         if( 0 == MPI.CommWorldRank )
         {
             if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(),
