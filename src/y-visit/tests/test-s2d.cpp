@@ -55,6 +55,7 @@ namespace
     public VisItIO
     {
     public:
+        const mpi &MPI;
         Array &U;
         Array &V;
         Array &LU;
@@ -69,6 +70,8 @@ namespace
         VisIt::Simulation( ref ),
         MyFields(),
         Workspace( L,*this,G ),
+        VisItIO(),
+        MPI(ref),
         U(  (*this)["U" ].as<Array>() ),
         V(  (*this)["V" ].as<Array>() ),
         LU( (*this)["LU"].as<Array>() ),
@@ -76,8 +79,6 @@ namespace
         handles(),
         X(mesh.X()),
         Y(mesh.Y()),
-        // dX( mesh.dX() ),
-        //dY( mesh.dY() ),
         alpha( 1e-2 ),
         beta( 1e-3 )
         {

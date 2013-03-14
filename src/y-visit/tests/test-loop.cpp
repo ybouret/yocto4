@@ -69,6 +69,7 @@ public:
     
     virtual void step()
     {
+        static const mpi & MPI = mpi::instance();
         // simulate work
         VisIt:: Simulation:: step();
         wtime::sleep( 0.2 );

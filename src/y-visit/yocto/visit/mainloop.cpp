@@ -88,7 +88,7 @@ namespace yocto
     static inline
     void ProcessConsole( VisIt:: Simulation &sim )
     {
-        const mpi &  MPI = sim.MPI;
+        const mpi &  MPI = mpi::instance();
         char        *cmd = sim.iobuff();
         const size_t len = sim.iobuff.length();
         memset(cmd,len,0);
@@ -237,7 +237,7 @@ namespace yocto
             todo += ' ';
             todo += args;
         }
-        static const mpi &MPI = sim.MPI;
+        static const mpi &MPI = mpi::instance();
         MPI.Printf0(stderr,"[VisIt::Command] '%s'\n", todo.c_str());
         VisIt::Perform(sim,todo);
     }
@@ -263,7 +263,8 @@ namespace yocto
     //==========================================================================
     void VisIt:: OneStep( Simulation &sim )
     {
-        const double t0     = MPI_Wtime();
+        static const mpi & MPI = sim.MPI;
+        const double t0        = MPI_Wtime();
         ++sim.cycle;
         
         //-- display/precompute something
@@ -271,11 +272,11 @@ namespace yocto
         
         //-- effective step
         {
-            const uint64_t mu0  = sim.MPI.CommTime;
+            const uint64_t mu0  = MPI.CommTime;
             const double   t1   = MPI_Wtime();
             sim.step();
             sim.stepTime = MPI_Wtime() - t1;
-            sim.commTime  = unsigned(sim.MPI.CommTime - mu0);
+            sim.commTime  = unsigned(MPI.CommTime - mu0);
         }
         if( VisItIsConnected() )
         {
@@ -340,7 +341,7 @@ namespace yocto
             const int blocking = ( sim.runMode == VISIT_SIMMODE_RUNNING) ? 0 : 1;
             if(sim.is_first)
             {
-                visitstate = VisItDetectInput(blocking, fd );
+                visitstate = VisItDetectInput(blocking,fd);
             }
             
             //------------------------------------------------------------------
