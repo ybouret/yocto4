@@ -89,17 +89,17 @@ namespace
         
         void initialize()
         {
-            MPI.Printf( stderr, "rank %d> Initializing U/V\n", par_rank);
+            MPI.PrintfI( stderr, "Initializing U/V\n");
             for( unit_t j=lower.y; j<=upper.y; ++j )
             {
                 const Real y = Y[j];
                 for( unit_t i=lower.x;i<=upper.x;++i)
                 {
-                    const Real x= X[i];
+                    const Real x  = X[i];
                     const Real r2 = x*x+y*y;
                     const Real r  = sqrt(r2);
                     
-                    U[j][i] = 1+0.5*cos(5*r) +  0.5*(0.5 - alea<Real>());
+                    U[j][i] = 1+0.5*cos(5*r) +  0.5*(0.5-alea<Real>());
                     V[j][i] = 1+(0.5 - alea<Real>());
                 }
             }
@@ -122,7 +122,7 @@ namespace
         
         virtual void perform( const string &cmd, const array<string> & )
         {
-            MPI.Printf( stderr, "sim %d.%d> %s\n", par_rank, par_size, cmd.c_str() );
+            //MPI.Printf( stderr, "sim %d.%d> %s\n", par_rank, par_size, cmd.c_str() );
             if( cmd == "raz" )
             {
                 initialize();

@@ -12,11 +12,12 @@
 
 #include "yocto/exception.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace spade
     {
         
+        //! Wrapper for common VisIt operations
         class VisItIO
         {
         public:
@@ -50,7 +51,7 @@ namespace yocto
             set<type_spec,param> params;
             
             
-            explicit VisItIO() : params(8,as_capacity) 
+            explicit VisItIO() : params(8,as_capacity)
             {
                 { const param p( typeid(float),             VISIT_VARTYPE_SCALAR, 1);  record(p); }
                 { const param p( typeid(double),            VISIT_VARTYPE_SCALAR, 1);  record(p); }
@@ -82,7 +83,7 @@ namespace yocto
                     VisIt_MeshMetaData_setSpatialDimension(h, LAYOUT::DIMENSIONS);
                     VisIt_MeshMetaData_setNumDomains(h,num_domains);
                 }
-                else 
+                else
                     throw exception("VisIt I/O::mesh_meta_data error");
                 return h;
             }
@@ -100,16 +101,18 @@ namespace yocto
             
             //! variable meta data
             /**
-             declare a variable attached to a mesh.
+             create a variable meta data to be attached to a mesh.
              */
             template <typename T>
             inline visit_handle variable_meta_data( const string &name, const string &mesh_id ) const
             {
+                //! query the variable type id
                 const type_spec spec( typeid(T) );
                 const param    *p = params.search( spec );
                 if( !p )
                     throw exception("no VisIt I/O for <'%s'>", spec.name());
                 
+                //! create the meta data
                 visit_handle vmd = VISIT_INVALID_HANDLE;
                 if(VisIt_VariableMetaData_alloc(&vmd) == VISIT_OKAY)
                 {
@@ -118,7 +121,7 @@ namespace yocto
                     VisIt_VariableMetaData_setType(vmd, p->vartype);
                     VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
                 }
-                else 
+                else
                     throw exception("VisIt I/O::variable_data error");
                 return vmd;
             }
