@@ -60,7 +60,9 @@ namespace yocto
         // startup VisIt
         //----------------------------------------------------------------------
         if( !VisItSetupEnvironment() )
-            throw exception("VisItSetupEnvironment(%s)", VisItGetLastError());
+        {
+            //throw exception("VisItSetupEnvironment(%s)", VisItGetLastError());
+        }
         
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
