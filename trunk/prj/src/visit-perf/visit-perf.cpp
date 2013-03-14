@@ -138,10 +138,16 @@ public:
         //! append an UI command
         add_generic_command("raz", md);
         
+        //! append an UI command
+        add_generic_command("quit", md);
+        
         //! append the mesh
         {
             visit_handle mmd = mesh_meta_data(mesh, "mesh", par_size);
             VisIt_SimulationMetaData_addMesh(md, mmd);
+            VisIt_MeshMetaData_setXLabel(mmd, "X");
+            VisIt_MeshMetaData_setYLabel(mmd, "Y");
+            VisIt_MeshMetaData_setZLabel(mmd, "Z");
         }
         
         //! append U on mesh
@@ -358,6 +364,8 @@ int main( int argc, char *argv[] )
         // Create Simulation
         //----------------------------------------------------------------------
         MySim sim(MPI,sim_layout,delta);
+        //sim.console = false;
+        
         //----------------------------------------------------------------------
         // create mesh
         //----------------------------------------------------------------------

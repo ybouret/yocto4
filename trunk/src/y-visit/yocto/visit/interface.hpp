@@ -48,16 +48,16 @@ namespace yocto
             explicit Simulation( const mpi & );
             virtual ~Simulation() throw();
             
+            const mpi &MPI;       //!< reference to the MPI singleton
             int        cycle;
             int        runMode;
             double     runTime;   //!< should be cycle * dt
             bool       done;      //!< end of simulation flag
             IOBuffer   iobuff;    //!< buffer for console input
-            const mpi &MPI;       //!< MPI singleton reference
             double     stepTime;  //!< last wall time for step
             double     loopTime;  //!< stepTime + VisIt time
             unsigned   commTime;  //!< from MPI, in microseconds
-            const bool console;   //!< shall use the interactive console
+            bool       console;   //!< shall use the interactive console
             const int  par_rank;  //!< alias MPI.CommWorldRank 
             const int  par_size;  //!< alias MPI.CommWorldSize
             const int  par_last;  //!< alias MPI.CommWorldLast
@@ -72,6 +72,9 @@ namespace yocto
             virtual void get_meta_data( visit_handle &md ) const;
             
             //! add a generic command
+            /**
+             VisIt wrapper
+             */
             void add_generic_command( const string &cmd, visit_handle &md ) const;
             
             //! add a generic command

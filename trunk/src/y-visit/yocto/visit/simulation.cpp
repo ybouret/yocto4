@@ -16,12 +16,12 @@ namespace yocto
     }
     
     VisIt:: Simulation:: Simulation( const mpi &ref) :
+    MPI(ref),
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
     runTime(0),
     done(false),
     iobuff( VisIt::IOBufferSize ),
-    MPI( ref ),
     stepTime(-1),
     loopTime(-1),
     commTime(0),
@@ -75,17 +75,6 @@ namespace yocto
     }
     
     
-#if 0
-    void VisIt:: Simulation:: invite() const
-    {
-        if( console && runMode == VISIT_SIMMODE_STOPPED )
-        {
-            MPI.Printf0( stderr, "command> ");
-        }
-    }
-#endif
-    
-    
     static inline
     bool is_cmd_sep( char c ) throw()
     {
@@ -119,7 +108,6 @@ namespace yocto
     {
         const string         cmd  = parse_user_command(user_cmd);
         const array<string> &args = cmdArgs;
-        //MPI.Printf0(stderr,"[VisIt::performAlways]: '%s'\n", cmd.c_str());
         
         if(  cmd == "run"  )
         {
@@ -168,7 +156,7 @@ namespace yocto
     void VisIt:: Simulation::  get_meta_data( visit_handle &md ) const
     {
         if( VISIT_INVALID_HANDLE == md )
-		throw exception("VisIt.Simulatyion.get_meta_data(NULL)");
+            throw exception("VisIt.Simulatyion.get_meta_data(NULL)");
     }
     
     void VisIt:: Simulation:: add_generic_command( const string &name, visit_handle &md ) const
