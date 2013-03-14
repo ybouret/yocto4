@@ -60,7 +60,7 @@ namespace yocto
         // startup VisIt
         //----------------------------------------------------------------------
         if( !VisItSetupEnvironment() )
-            throw exception("VisItSetupEnvironment Failure!");
+            throw exception("VisItSetupEnvironment(%s)", VisItGetLastError());
         
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
@@ -91,7 +91,7 @@ namespace yocto
                                                       ui_file,
                                                       NULL
                                                       ) )
-                throw exception("VisItInitialize Failure: %s", VisItGetLastError() );
+                throw exception("VisItInitialize(%s)", VisItGetLastError() );
         }
     }
 }
