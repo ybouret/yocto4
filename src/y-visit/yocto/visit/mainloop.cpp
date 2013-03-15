@@ -381,6 +381,10 @@ namespace yocto
                         VisItSetGetDomainList(SimGetDomainList,cbdata);
                         VisItSetGetVariable(SimGetVariable,cbdata);
                         VisItSetGetCurve(SimGetCurve,cbdata);
+                        
+                        //-- stop simulation on connect
+                        sim.runMode = VISIT_SIMMODE_STOPPED;
+                        VisItTimeStepChanged();
                     }
                     else
                     {

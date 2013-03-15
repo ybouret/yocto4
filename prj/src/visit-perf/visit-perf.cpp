@@ -1,5 +1,7 @@
 #include "yocto/spade/array3d.hpp"
 #include "yocto/spade/visit.hpp"
+#include "yocto/spade/ops/laplacian.hpp"
+
 #include "yocto/code/rand.hpp"
 #include "yocto/spade/mpi/workspace.hpp"
 #include "yocto/spade/region3d.hpp"
@@ -15,8 +17,8 @@ typedef coord3D  Coord;
 typedef layout3D Layout;
 typedef double   Real;
 
-typedef geom::v3d<Real> Vertex;
-typedef array3D<Real>   Array;
+typedef geom::v3d<Real>                  Vertex;
+typedef array3D<Real>                    Array;
 typedef mpi_workspace<Layout,rmesh,Real> Workspace;
 typedef fields_setup<Layout>             FieldsSetup;
 typedef ghosts_setup                     GhostsSetup;
@@ -49,7 +51,7 @@ public:
             ghosts.set_async(ghost::at_upper_z, NumGhosts, MPI.CommWorldNext());
         }
         else
-            ghosts.set_local(on_z, NumGhosts);
+            ghosts.set_local(on_z, NumGhosts); // PBC on z, anyway
         
     }
     
@@ -78,12 +80,15 @@ public:
     double         dt;
     const Vertex   delta;
     const Vertex   delsq;
+    const Vertex   inv_dsq;
     linear_handles handles; //!< for MPI
     Real           Du;
     mutable double sum_steps;
     mutable size_t num_steps;
     mutable double sum_tcomm;
     bool           do_sync;
+    int            num_iter;
+    size_t         counts;
     
     explicit MySim(const mpi    &ref,
                    const Layout &l,
@@ -99,16 +104,21 @@ public:
     dt(0),
     delta(d),
     delsq(delta.x*delta.x,delta.y*delta.y,delta.z*delta.z),
+    inv_dsq( 1.0/delsq.x, 1.0/delsq.y, 1.0/delsq.z),
     handles(),
     Du( 5.0 ),
     sum_steps(0),
     num_steps(0),
     sum_tcomm(0),
-    do_sync(true)
+    do_sync(true),
+    num_iter(1),
+    counts(0)
     {
-        MPI.PrintfI(stderr, "Ready\n");
         query( handles, "U" );
         dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
+        num_iter = int(ceil(1.0/dt));
+        MPI.PrintfI(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
+
     }
     
     virtual ~MySim() throw()
@@ -129,6 +139,7 @@ public:
             }
         }
         sync(MPI,handles);
+        counts=0;
     }
     
     
@@ -185,10 +196,27 @@ public:
                 VisIt_RectilinearMesh_setCoordsXYZ(h, hx, hy, hz);
                 
 #if 0
-                int minRealIndex[3] = { 1,         1 ,        1       };
-                int maxRealIndex[3] = { X.width-1, Y.width-1, Z.width-1};
+                int minRealIndex[3];
+                int maxRealIndex[3];
+                VisIt_RectilinearMesh_getRealIndices(h,minRealIndex,maxRealIndex);
+                MPI.PrintfI( stderr,
+                            "minRealIndex= { %d, %d, %d } maxRealIndex={ %d, %d, %d } widths={ %d, %d, %d}\n",
+                            minRealIndex[0],
+                            minRealIndex[1],
+                            minRealIndex[2],
+                            maxRealIndex[0],
+                            maxRealIndex[1],
+                            maxRealIndex[2],
+                            int(X.width),
+                            int(Y.width),
+                            int(Z.width)
+                            );
+#endif
                 
-                //if(  par_rank < par_size - 1) maxRealIndex[2]++;
+#if 1
+                int minRealIndex[3] = { 0,         0 ,        0        };
+                int maxRealIndex[3] = { X.width-1, Y.width-1, Z.width-1};
+                if( par_rank < par_last ) -- maxRealIndex[2];
                 
                 VisIt_RectilinearMesh_setRealIndices(h, minRealIndex, maxRealIndex);
 #endif
@@ -230,31 +258,6 @@ public:
         }
     }
     
-    //! Laplacian
-    inline void compute_laplacian()
-    {
-        for(unit_t k=lower.z;k<=upper.z;++k)
-        {
-            const unit_t km = k-1;
-            const unit_t kp = k+1;
-            for(unit_t j=lower.y;j<=upper.y;++j)
-            {
-                const unit_t jm=j-1;
-                const unit_t jp=j+1;
-                for( unit_t i=lower.x;i<=upper.x;++i)
-                {
-                    const unit_t im=i-1;
-                    const unit_t ip=i+1;
-                    const Real   mid = -2 * U[k][j][i];
-                    const Real   Lz  = (U[kp][j][i] + mid + U[km][j][i])/delsq.z;
-                    const Real   Ly  = (U[k][jp][i] + mid + U[k][jm][i])/delsq.y;
-                    const Real   Lx  = (U[k][j][ip] + mid + U[k][j][im])/delsq.x;
-                    dU[k][j][i] =  (Lx+Lz+Ly);
-                }
-            }
-        }
-        
-    }
     
     virtual void step_prolog()
     {
@@ -263,24 +266,27 @@ public:
     
     virtual void step()
     {
-        runTime = cycle * dt;
-        
-        compute_laplacian();
-        for(unit_t k=lower.z;k<=upper.z;++k)
+        for( int iter=0; iter<num_iter;++iter)
         {
-            for(unit_t j=lower.y;j<=upper.y;++j)
+            ++counts;
+            runTime = counts * dt;
+            
+            laplacian<Real>::compute( dU, U, as_layout(), inv_dsq);
+            
+            for(unit_t k=lower.z;k<=upper.z;++k)
             {
-                for( unit_t i=lower.x;i<=upper.x;++i)
+                for(unit_t j=lower.y;j<=upper.y;++j)
                 {
-                    const Real u = U[k][j][i];
-                    U[k][j][i] += dt * ( (u - u*u*u) + Du * dU[k][j][i] );
+                    for( unit_t i=lower.x;i<=upper.x;++i)
+                    {
+                        const Real u = U[k][j][i];
+                        U[k][j][i] += dt * ( (u - u*u*u) + Du * dU[k][j][i] );
+                    }
                 }
             }
+            if(do_sync)
+                sync(MPI,handles);
         }
-        if(do_sync)
-            sync(MPI,handles);
-        
-              
     }
     
     virtual void step_epilog()
