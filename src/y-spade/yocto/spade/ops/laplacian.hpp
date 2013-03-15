@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_OPS_LAPLACIAN_INCLUDED
 #define YOCTO_SPADE_OPS_LAPLACIAN_INCLUDED 1
 
-#include "yocto/spade/array3D.hpp"
+#include "yocto/spade/array3d.hpp"
 
 namespace yocto
 {
