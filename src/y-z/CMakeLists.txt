@@ -38,12 +38,7 @@ INSTALL( TARGETS y-z ARCHIVE DESTINATION lib )
 
 ADD_EXECUTABLE(test-z yocto/zlib/example.c)
 TARGET_LINK_LIBRARIES(test-z y-z)
-
-ENABLE_TESTING()
-ADD_TEST(zlib test-z)
-
-ADD_CUSTOM_TARGET(check-z COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-z )
-
-
-
+ADD_CUSTOM_COMMAND( TARGET test-z
+	COMMAND test-z
+	COMMENT "Testing zlib...")
 
