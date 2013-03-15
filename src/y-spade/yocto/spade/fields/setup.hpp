@@ -84,7 +84,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(fields_setup);
         };
         
-#define Y_SPADE_FIELD(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), typeid(ARRAY::type), ARRAY::ctor, ARRAY::dtor); } while(false)
+#define Y_SPADE_FIELD(F,NAME,ARRAY)   do { (F).append(NAME,typeid(ARRAY), typeid(ARRAY::type), ARRAY::ctor, ARRAY::dtor); } while(false)
+#define Y_SPADE_FIELD_T(F,NAME,ARRAY) do { (F).append(NAME,typeid(ARRAY), typeid(typename ARRAY::type), ARRAY::ctor, ARRAY::dtor); } while(false)
         
     }
 }
