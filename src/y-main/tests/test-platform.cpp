@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(platform)
 	
 	std::cerr << "-----------------------------------------------" << std::endl;
 	std::cerr << "next power of two:" << std::endl;
-	size_t v = 0;
+	size_t v = 1;
 	for( size_t i=0; i < 30; ++i )
 	{
 		for( size_t j=0; j<8; ++j, v += (j+i) )
