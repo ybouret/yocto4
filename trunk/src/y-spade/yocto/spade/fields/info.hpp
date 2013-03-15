@@ -33,9 +33,7 @@ namespace yocto
             held( a_held ),
             ctor( a_ctor ),
             dtor( a_dtor )
-            {
-                assert(ctor);assert(dtor);
-            }
+            { assert(ctor);assert(dtor);}
             
             
             
@@ -46,11 +44,8 @@ namespace yocto
             spec(other.spec),
             held(other.held),
             ctor(other.ctor),
-            dtor(other.dtor)
-            {
-            }
-            
-            
+            dtor(other.dtor) {}
+                        
             
         private:
             YOCTO_DISABLE_ASSIGN(field_info);
