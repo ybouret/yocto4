@@ -21,5 +21,7 @@ ADD_TEST(Work1D  test-spade work1D)
 ADD_TEST(Work2D  test-spade work2D)
 ADD_TEST(Work3D  test-spade work3D)
 ADD_TEST(IO      test-spade io)
+ADD_TEST(Ops     test-spade ops)
+
 
 
