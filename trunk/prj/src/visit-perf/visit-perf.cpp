@@ -116,7 +116,7 @@ public:
     {
         query( handles, "U" );
         dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
-        num_iter = int(ceil(1.0/dt));
+        num_iter = int(ceil(0.1/dt));
         MPI.PrintfI(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
 
     }
