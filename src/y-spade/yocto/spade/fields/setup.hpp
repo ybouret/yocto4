@@ -58,7 +58,7 @@ namespace yocto
             inline void   clear() throw() { fields.release(); }
             
             //! create all fields with same layout into database
-            inline void create( const LAYOUT &L, array_db &db) const
+            inline void create(const LAYOUT &L, array_db &db) const
             {
                 for( size_t i=1; i <= fields.size(); ++i )
                 {
