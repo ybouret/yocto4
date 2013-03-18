@@ -91,7 +91,9 @@ namespace yocto
         const mpi &  MPI = mpi::instance();
         char        *cmd = sim.iobuff();
         const size_t len = sim.iobuff.length();
+        size_t       num = 0;
         memset(cmd,len,0);
+        
         if( sim.is_first )
         {
             //------------------------------------------------------------------
@@ -106,14 +108,14 @@ namespace yocto
             //------------------------------------------------------------------
             // clean the line
             //------------------------------------------------------------------
-            size_t num_in = strlen(cmd);
-            while( num_in > 0 )
+            num = strlen(cmd);
+            while( num > 0 )
             {
-                char &c = cmd[num_in-1];
+                char &c = cmd[num-1];
                 if( c == '\n' || c == '\r' )
                 {
                     c = 0;
-                    --num_in;
+                    --num;
                 }
                 else
                     break;
@@ -123,12 +125,16 @@ namespace yocto
         //----------------------------------------------------------------------
         // broadcast the line
         //----------------------------------------------------------------------
-        MPI.Bcast(cmd, len, MPI_CHAR, 0, MPI_COMM_WORLD);
+        MPI.Bcast(num, 0, MPI_COMM_WORLD);
+        if(num>0)
+        {
+            MPI.Bcast(cmd, num, MPI_CHAR, 0, MPI_COMM_WORLD);
+        }
         
         //----------------------------------------------------------------------
-        // forward to the simulation
+        // forward to the simulation with a local string
         //----------------------------------------------------------------------
-        const string __cmd(cmd);
+        const string __cmd(cmd,num);
         MPI.Printf0(stderr, "[VisIt::Console] '%s'\n", __cmd.c_str());
         VisIt::Perform(sim,__cmd);
     }
@@ -230,14 +236,15 @@ namespace yocto
                                 void       *cbdata)
     {
         assert(cbdata!=NULL);
+        assert(cmd!=NULL);
         VisIt::Simulation &sim  = *(VisIt::Simulation *)cbdata;
-        string       todo = cmd;
-        if(args)
+        string             todo = cmd;
+        if(args!=NULL)
         {
             todo += ' ';
             todo += args;
         }
-        static const mpi &MPI = mpi::instance();
+        static const mpi &MPI = sim.MPI;
         MPI.Printf0(stderr,"[VisIt::Command] '%s'\n", todo.c_str());
         VisIt::Perform(sim,todo);
     }
@@ -275,7 +282,7 @@ namespace yocto
             const uint64_t mu0  = MPI.CommTime;
             const double   t1   = MPI_Wtime();
             sim.step();
-            sim.stepTime = MPI_Wtime() - t1;
+            sim.stepTime  = MPI_Wtime() - t1;
             sim.commTime  = unsigned(MPI.CommTime - mu0);
         }
         if( VisItIsConnected() )
@@ -382,7 +389,9 @@ namespace yocto
                         VisItSetGetVariable(SimGetVariable,cbdata);
                         VisItSetGetCurve(SimGetCurve,cbdata);
                         
-                        //-- stop simulation on connect
+                        //------------------------------------------------------
+                        // stop simulation on connect
+                        //------------------------------------------------------
                         sim.runMode = VISIT_SIMMODE_STOPPED;
                         VisItTimeStepChanged();
                     }
