@@ -81,7 +81,7 @@ namespace yocto
         const bool       IsParallel;       //!< CommWorldSize > 1
         mutable uint64_t CommTime;         //!< cumulative communication time in microseconds
 		const int        ProcessorNameLength;
-		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME];         //!< from MPI_Get_Processor_name(...)
+		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME]; //!< from MPI_Get_Processor_name(...)
 		
         int Comm_rank( MPI_Comm comm ) const;
         
@@ -204,8 +204,7 @@ namespace yocto
             const T y = swap_be_as<T>(x);
             this->Isend(&y, sizeof(T), MPI_BYTE, dest, tag, comm, req);
         }
-        
-               
+                
         double Wtime() const throw();
         void   WaitFor( double nsec) const throw();
         
