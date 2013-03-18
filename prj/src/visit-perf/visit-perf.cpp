@@ -213,7 +213,7 @@ public:
                             );
 #endif
                 
-#if 1
+#if 0
                 int minRealIndex[3] = { 0,         0 ,        0        };
                 int maxRealIndex[3] = { X.width-1, Y.width-1, Z.width-1};
                 if( par_rank < par_last ) -- maxRealIndex[2];
