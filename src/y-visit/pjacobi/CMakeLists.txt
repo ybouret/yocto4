@@ -10,7 +10,20 @@ ADD_EXECUTABLE(jacobi ${C_SRCS})
 IF( "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
 		TARGET_LINK_LIBRARIES(jacobi -w )
 ENDIF()
-	
+
+# sequential visit	
+IF(VISIT_FOUND)
+	ADD_EXECUTABLE(jacobi_visit ${C_SRCS} in_situ.c simulation_example.h)
+	TARGET_LINK_LIBRARIES(jacobi_visit simV2 simV2f m)
+	IF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+		TARGET_LINK_LIBRARIES(jacobi_visit dl)
+	ENDIF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+	IF( "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
+		TARGET_LINK_LIBRARIES(jacobi_visit -w )
+	ENDIF()
+	SET_PROPERTY(TARGET jacobi_visit APPEND PROPERTY COMPILE_FLAGS "-D_VISIT_")
+ENDIF(VISIT_FOUND)
+
 #parallel version
 FIND_PACKAGE(MPI)
 
@@ -25,16 +38,19 @@ IF(MPI_FOUND)
 		TARGET_LINK_LIBRARIES(pjacobi -w )
 	ENDIF()
 	
+	#parallel visit
 	IF(VISIT_FOUND)
 		ADD_EXECUTABLE(pjacobi_visit ${C_SRCS} in_situ.c simulation_example.h)
 		TARGET_LINK_LIBRARIES(pjacobi_visit ${MPI_C_LIBRARIES} simV2 simV2f m)
 		IF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-			TARGET_LINK_LIBRARIES(pjacobi dl)
+			TARGET_LINK_LIBRARIES(pjacobi_visit dl)
 		ENDIF( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 		IF( "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
 			TARGET_LINK_LIBRARIES(pjacobi_visit -w )
 		ENDIF()
 		SET_PROPERTY(TARGET pjacobi_visit APPEND PROPERTY COMPILE_FLAGS "-D_VISIT_ -DPARALLEL")
 	ENDIF(VISIT_FOUND)
-
+	
 ENDIF(MPI_FOUND)
+
+

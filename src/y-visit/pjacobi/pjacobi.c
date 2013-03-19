@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     par_rank=0; par_size = 1;
     //char *env = NULL;
 #ifdef PARALLEL
-    MPI_Init(&argc, &argv);                       /* starts MPI */
+    MPI_Init(&argc, &argv);                   /* starts MPI */
     MPI_Comm_rank(MPI_COMM_WORLD, &par_rank); /* get current process id */
     MPI_Comm_size(MPI_COMM_WORLD, &par_size); /* get # procs from env or */
     neighbors();
