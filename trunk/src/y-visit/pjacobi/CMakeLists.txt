@@ -7,6 +7,7 @@ solvers.h
 )
 
 ADD_EXECUTABLE(jacobi ${C_SRCS})
+TARGET_LINK_LIBRARIES(jacobi m)
 IF( "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
 		TARGET_LINK_LIBRARIES(jacobi -w )
 ENDIF()

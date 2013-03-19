@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 #endif
     
     runMode = SIM_STOPPED;
-    m = 20; // mesh size = (m+2)x(m+2) including the bc grid lines
+    m = 200; // mesh size = (m+2)x(m+2) including the bc grid lines
     // We make no attempt to check that the number of grid points divides evenly
     // with the number of MPI tasks.
     // rank 0 will display the bottom (southern) boundary wall
