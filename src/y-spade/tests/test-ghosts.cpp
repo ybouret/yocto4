@@ -41,6 +41,8 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         dataspace<layout1D> d1a( L1, F1, G1a);
         std::cerr << "d1a.layout : " << d1a.as_layout() << std::endl;
         std::cerr << "d1a.outline: " << d1a.outline     << std::endl;
+        std::cerr << "d1a.inboard: " << d1a.inboard     << std::endl;
+
         linear_handles handles;
         handles.append( d1a["A1"].handle() );
         handles.append( d1a["B1"].handle() );
@@ -65,6 +67,7 @@ YOCTO_UNIT_TEST_IMPL(ghosts)
         dataspace<layout1D> d1b( L1, F1, G1b);
         std::cerr << "d1b.layout : " << d1b.as_layout() << std::endl;
         std::cerr << "d1b.outline: " << d1b.outline     << std::endl;
+        std::cerr << "d1b.inboard: " << d1b.inboard     << std::endl;
         handles.free();
         handles.append( d1b["A1"].handle() );
         handles.append( d1b["B1"].handle() );

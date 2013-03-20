@@ -21,6 +21,7 @@ namespace yocto
             
             
             const LAYOUT   outline;          //!< this layout + ghosts
+            const LAYOUT   inboard;          //!< this layout - ghosts
             const size_t   local_count;      //!< #local ghosts
             const size_t   async_count;      //!< #async ghosts
             const size_t   num_requests;     //!< #MPI request for data exchange
@@ -33,6 +34,7 @@ namespace yocto
             array_db( F.size() + LAYOUT::DIMENSIONS ),
             LAYOUT(L),
             outline(L),
+            inboard(L),
             local_count(0),
             async_count(0),
             num_requests(0),
@@ -91,6 +93,8 @@ namespace yocto
                 
                 typename LAYOUT::coord out_lower = outline.lower;
                 typename LAYOUT::coord out_upper = outline.upper;
+                typename LAYOUT::coord inb_lower = outline.lower;
+                typename LAYOUT::coord inb_upper = outline.upper;
                 size_t &num_local = (size_t&)local_count;
                 size_t &num_async = (size_t&)async_count;
                 
@@ -120,6 +124,7 @@ namespace yocto
                         {
                             ghost::check(dim, __coord(this->width,dim), g->count);
                             __coord(out_lower,dim) -= g->count;
+                            __coord(inb_lower,dim) += g->count;
                             ++num_async;
                         }
                     }
@@ -134,16 +139,23 @@ namespace yocto
                         {
                             ghost::check(dim, __coord(this->width,dim), g->count);
                             __coord(out_upper,dim) += g->count;
+                            __coord(inb_upper,dim) -= g->count;
                             ++num_async;
                         }
                     }
                     
                 }
+                
                 //--------------------------------------------------------------
                 //-- recompute outline
                 //--------------------------------------------------------------
                 new ((void*)&outline) LAYOUT(out_lower,out_upper);
                 
+                //--------------------------------------------------------------
+                //-- recompute inboard
+                //--------------------------------------------------------------
+                new ((void*)&inboard) LAYOUT(inb_lower,inb_upper);
+
                 //--------------------------------------------------------------
                 //-- reserve memory
                 //--------------------------------------------------------------
