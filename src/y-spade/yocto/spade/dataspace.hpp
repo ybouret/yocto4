@@ -22,9 +22,9 @@ namespace yocto
             
             const LAYOUT   outline;          //!< this layout + ghosts
             const LAYOUT   inboard;          //!< this layout - ghosts
-            const size_t   local_count;      //!< #local ghosts
-            const size_t   async_count;      //!< #async ghosts
-            const size_t   num_requests;     //!< #MPI request for data exchange
+            const size_t   local_count;      //!< #local ghosts (used for PBC)
+            const size_t   async_count;      //!< #async ghosts (used with MPI)
+            const size_t   num_requests;     //!< #MPI requests for data exchange
             
             virtual ~dataspace() throw() {}
             
