@@ -10,3 +10,5 @@ TARGET_LINK_YOCTO( test-visit spade )
 
 VISIT_CUSTOM_UI( test-visit loop.ui )
 
+INSTALL( TARGETS test-visit RUNTIME DESTINATION bin )
+
