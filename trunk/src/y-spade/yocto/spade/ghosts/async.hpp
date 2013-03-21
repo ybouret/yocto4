@@ -34,7 +34,7 @@ namespace yocto
                 //! create corresponding inner layout
                 {
                     const LAYOUT inner_sub = inner.inner_sublayout(outline, num_ghosts);
-                    inner.load_from(outline, inner_sub);
+                    inner.load_from(outline,inner_sub);
                     //std::cerr << "\tinner_sub:" << inner_sub << std::endl;
                 }
                 
@@ -73,7 +73,10 @@ namespace yocto
             //! query outer handle content from obuffer
             void outer_query( linear_handles &handles ) throw();
 
+            //! check if has enough bytes for handle
             bool can_handle( const linear &handle ) const throw();
+            
+            //! check if has enogh bytes for handles
             bool can_handle( const linear_handles &handles) const throw();
             
             

@@ -21,6 +21,7 @@ namespace yocto
     void BroadcastSlaveCommand( int *command)
     {
         static mpi &MPI = *mpi::location();
+        assert(command!=NULL);
         MPI.Bcast(command, 1, MPI_INT, 0, MPI_COMM_WORLD);
     }
     
@@ -125,7 +126,7 @@ namespace yocto
         //----------------------------------------------------------------------
         // broadcast the line
         //----------------------------------------------------------------------
-        MPI.Bcast(num, 0, MPI_COMM_WORLD);
+        MPI.Bcast<size_t>(num, 0, MPI_COMM_WORLD);
         if(num>0)
         {
             MPI.Bcast(cmd, num, MPI_CHAR, 0, MPI_COMM_WORLD);
@@ -195,10 +196,10 @@ namespace yocto
         visit_handle h = VISIT_INVALID_HANDLE;
         if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
         {
-            visit_handle hdl;
+            visit_handle hdl = 0;
             int *iptr = NULL;
             
-            iptr = (int *)malloc(sizeof(int));
+            iptr  = (int *)malloc(sizeof(int));
             *iptr = sim.par_rank;
             
             if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
