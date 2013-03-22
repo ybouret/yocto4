@@ -329,7 +329,7 @@ YOCTO_UNIT_TEST_IMPL(s3d)
     const size_t Ny = strconv::to_size( argv[2], "Ny");
     const size_t Nz = strconv::to_size( argv[3], "Nz");
     
-    _rand.wseed( get_process_h32() );
+    _rand.wseed();
     
     //----------------------------------------------------------------------
     //info for VisIt

@@ -184,9 +184,9 @@ namespace yocto
         return core::rand32::to_float( next() );
     }
     
-    void urand32:: wseed( uint32_t s ) throw()
+    void urand32:: wseed() throw()
     {
-        seed( wtime::seed(s) );
+        seed( wtime::seed() );
     }
     
 }

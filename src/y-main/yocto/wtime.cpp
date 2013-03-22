@@ -17,6 +17,8 @@
 #include <cmath>
 #endif
 
+#include "yocto/code/pid.hpp"
+
 namespace yocto 
 {
 	
@@ -123,7 +125,7 @@ namespace yocto
 	
 	extern uint32_t ihash32(uint32_t);
 	
-	uint32_t wtime:: seed( uint32_t s )
+	uint32_t wtime:: seed()
 	{
 		union 
 		{
@@ -133,8 +135,9 @@ namespace yocto
 #if defined(__INTEL_COMPILER)
 #	pragma warning ( disable : 981 )
 #endif
+        const uint32_t data[4] = { ini.dw[0], ini.dw[1], ihash32( ini.dw[0] ) ^ ihash32( ini.dw[1] ), get_process_h32()  };
         
-		uint32_t seed = s + (ihash32( ini.dw[0] ) ^ ihash32( ini.dw[1] ));
+		uint32_t seed = hash32(data, sizeof(data) );
 		return seed;
 	}
 	

@@ -76,7 +76,7 @@ namespace yocto
         
         virtual uint32_t next() throw() = 0;
         virtual void     seed(uint32_t) throw() = 0;
-        void             wseed(uint32_t s=0) throw(); //!< seed( wtime::seed() )
+        void             wseed() throw(); //!< seed with wtime::seed + pid
         
         
         template <typename T> 
