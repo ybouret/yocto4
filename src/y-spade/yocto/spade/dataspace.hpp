@@ -93,12 +93,13 @@ namespace yocto
             void recompute_outline( const ghosts_setup &G )
             {
                 //--------------------------------------------------------------
-                // the outline is now set to the current layout
+                // the outline/inboard are now set to the current layout
                 //--------------------------------------------------------------
-                coord out_lower = outline.lower;
-                coord out_upper = outline.upper;
-                coord inb_lower = outline.lower;
-                coord inb_upper = outline.upper;
+                const LAYOUT &self = this->as_layout();
+                coord out_lower    = self.lower;
+                coord out_upper    = self.upper;
+                coord inb_lower    = self.lower;
+                coord inb_upper    = self.upper;
                 
                 size_t &num_local = (size_t&)local_count;
                 size_t &num_async = (size_t&)async_count;
@@ -128,10 +129,24 @@ namespace yocto
                         if( g->active && g->count>0)
                         {
                             ghost::check(dim, __coord(this->width,dim), g->count);
+                            //--------------------------------------------------
                             //-- modify layouts
+                            //--------------------------------------------------
                             __coord(out_lower,dim) -= g->count;
                             __coord(inb_lower,dim) += g->count;
+                            
+                            //--------------------------------------------------
                             //-- create the corresponding side layout
+                            //--------------------------------------------------
+                            coord side_lower = self.lower;
+                            coord side_upper = self.upper;
+                            __coord(side_upper,dim) = __coord(self.lower,dim) + unit_t(g->count-1);
+                            const LAYOUT side( side_lower, side_upper );
+                            ( (vector<LAYOUT> &) sides).push_back(side);
+                            
+                            //--------------------------------------------------
+                            //-- done for a lower ghost
+                            //--------------------------------------------------
                             ++num_async;
                         }
                     }
@@ -145,8 +160,25 @@ namespace yocto
                         if( g->active && g->count>0)
                         {
                             ghost::check(dim, __coord(this->width,dim), g->count);
+                            
+                            //--------------------------------------------------
+                            //-- modify layouts
+                            //--------------------------------------------------
                             __coord(out_upper,dim) += g->count;
                             __coord(inb_upper,dim) -= g->count;
+                            
+                            //--------------------------------------------------
+                            //-- create the corresponding side layout
+                            //--------------------------------------------------
+                            coord side_lower = self.lower;
+                            coord side_upper = self.upper;
+                            __coord(side_lower,dim) = __coord(self.upper,dim) - unit_t(g->count-1);
+                            const LAYOUT side( side_lower, side_upper );
+                            ( (vector<LAYOUT> &) sides).push_back(side);
+                            
+                            //--------------------------------------------------
+                            //-- done for an upper ghost
+                            //--------------------------------------------------
                             ++num_async;
                         }
                     }
