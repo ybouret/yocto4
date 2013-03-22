@@ -16,15 +16,16 @@ namespace yocto
         class dataspace : public array_db, public LAYOUT
         {
         public:
-            typedef LAYOUT                layout_type;
-            typedef fields_setup<LAYOUT>  fields_list;
+            typedef LAYOUT                 layout_type;
+            typedef fields_setup<LAYOUT>   fields_list;
+            typedef typename LAYOUT::coord coord;
             
-            
-            const LAYOUT   outline;          //!< this layout + ghosts
-            const LAYOUT   inboard;          //!< this layout - ghosts
-            const size_t   local_count;      //!< #local ghosts (used for PBC)
-            const size_t   async_count;      //!< #async ghosts (used with MPI)
-            const size_t   num_requests;     //!< #MPI requests for data exchange
+            const LAYOUT         outline;          //!< this layout + ghosts
+            const LAYOUT         inboard;          //!< this layout - ghosts
+            const vector<LAYOUT> sides;            //!< need up to date ghosts to be comptuted
+            const size_t         local_count;      //!< #local ghosts (used for PBC)
+            const size_t         async_count;      //!< #async ghosts (used with MPI)
+            const size_t         num_requests;     //!< #MPI requests for data exchange
             
             virtual ~dataspace() throw() {}
             
@@ -35,6 +36,7 @@ namespace yocto
             LAYOUT(L),
             outline(L),
             inboard(L),
+            sides(2*LAYOUT::DIMENSIONS,as_capacity),
             local_count(0),
             async_count(0),
             num_requests(0),
@@ -90,11 +92,14 @@ namespace yocto
             //==================================================================
             void recompute_outline( const ghosts_setup &G )
             {
+                //--------------------------------------------------------------
+                // the outline is now set to the current layout
+                //--------------------------------------------------------------
+                coord out_lower = outline.lower;
+                coord out_upper = outline.upper;
+                coord inb_lower = outline.lower;
+                coord inb_upper = outline.upper;
                 
-                typename LAYOUT::coord out_lower = outline.lower;
-                typename LAYOUT::coord out_upper = outline.upper;
-                typename LAYOUT::coord inb_lower = outline.lower;
-                typename LAYOUT::coord inb_upper = outline.upper;
                 size_t &num_local = (size_t&)local_count;
                 size_t &num_async = (size_t&)async_count;
                 
@@ -123,8 +128,10 @@ namespace yocto
                         if( g->active && g->count>0)
                         {
                             ghost::check(dim, __coord(this->width,dim), g->count);
+                            //-- modify layouts
                             __coord(out_lower,dim) -= g->count;
                             __coord(inb_lower,dim) += g->count;
+                            //-- create the corresponding side layout
                             ++num_async;
                         }
                     }
@@ -155,7 +162,7 @@ namespace yocto
                 //-- recompute inboard
                 //--------------------------------------------------------------
                 new ((void*)&inboard) LAYOUT(inb_lower,inb_upper);
-
+                
                 //--------------------------------------------------------------
                 //-- reserve memory
                 //--------------------------------------------------------------
