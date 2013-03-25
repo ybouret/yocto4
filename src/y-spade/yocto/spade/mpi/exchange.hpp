@@ -70,7 +70,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 // process with MPI
                 //--------------------------------------------------------------
-                MPI.Startall(requests);
+                //MPI.Startall(requests);
             }
             
             template <typename DATASPACE> static inline
