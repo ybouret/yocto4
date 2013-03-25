@@ -118,7 +118,7 @@ namespace
         do_sync(true),
         num_iter(1),
         counts(0),
-        exchanged_bytes( 2*get_async(1).inner.size() * U.item_size() ),
+        exchanged_bytes( async_count > 0 ? 2*get_async(1).inner.size() * U.item_size() : 0 ),
         bandwidth(0)
         {
             query( handles, "U" );
@@ -376,7 +376,7 @@ YOCTO_UNIT_TEST_IMPL(s3d)
     const Coord cmax(Nx,Ny,Nz);
     const Layout full_layout( cmin, cmax );
     const Layout sim_layout = full_layout.split(rank, size);
-    const Region full_region( Vertex(0,0,0), Vertex(100,150,200) );
+    const Region full_region( Vertex(0,0,0), Vertex(Nx,Ny,Nz) );
     const Vertex delta(full_region.length.x / full_layout.width.x,
                        full_region.length.y / full_layout.width.y,
                        full_region.length.z / full_layout.width.z
