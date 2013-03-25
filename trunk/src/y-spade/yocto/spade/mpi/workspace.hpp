@@ -16,7 +16,7 @@ namespace yocto
         typename U>
         class mpi_workspace : public workspace<LAYOUT,MESH,U>
         {
-        public:
+        public:            
             explicit mpi_workspace(const LAYOUT               &L,
                                    const fields_setup<LAYOUT> &F,
                                    const ghosts_setup         &G) :

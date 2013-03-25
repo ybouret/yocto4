@@ -86,7 +86,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(dataspace);
             vector<local_ghosts::ptr> local_reg;
             vector<async_ghosts::ptr> async_reg;
-            
+       
             //==================================================================
             // recompute outline from ghosts
             //==================================================================

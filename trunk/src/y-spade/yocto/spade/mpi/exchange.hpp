@@ -41,7 +41,7 @@ namespace yocto
                     assert(g.iobytes > 0);
                     
                     //----------------------------------------------------------
-                    // create ibuffer
+                    // create ibuffer and update g.content to exchanged #bytes
                     //----------------------------------------------------------
                     g.inner_store( handles );
                     

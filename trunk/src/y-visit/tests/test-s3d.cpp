@@ -92,6 +92,7 @@ namespace
         bool           do_sync;
         int            num_iter;
         size_t         counts;
+        const size_t   exchanged_bytes;
         
         explicit MySim(const mpi    &ref,
                        const Layout &l,
@@ -115,13 +116,14 @@ namespace
         sum_tcomm(0),
         do_sync(true),
         num_iter(1),
-        counts(0)
+        counts(0),
+        exchanged_bytes( get_async(1).inner.size() * U.item_size() )
         {
             query( handles, "U" );
             dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
             num_iter = int(ceil(0.1/dt));
             MPI.PrintfI(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
-            
+            MPI.PrintfI(stderr, "Exchanged Bytes: %u\n", unsigned( exchanged_bytes));
         }
         
         virtual ~MySim() throw()
@@ -286,7 +288,14 @@ namespace
                     }
                 }
                 if(do_sync)
-                    sync(MPI,handles);
+                {
+                    uint64_t tmx = 0;
+                    Y_MPI_TIME64(tmx,MPI,sync(MPI,handles));
+                    const double ts    = double(tmx)*1e-6;
+                    const double Gbits = double(exchanged_bytes) * (8.0 / double( 1 << 30) );
+                    const double bw    = Gbits/ts;
+                    MPI.Printf0(stderr, "\tBW: %g Gbits/s\n", bw);
+                }
             }
         }
         
