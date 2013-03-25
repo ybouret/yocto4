@@ -14,7 +14,7 @@ namespace yocto
             
             //! process
             /**
-             \param pA   on master: an array with 'full' layout, NULL otherwisr
+             \param pA   on master: an array with 'full' layout, NULL otherwise
              \param B    an array with a splitted layout.
              \param full the original full layout
              */
