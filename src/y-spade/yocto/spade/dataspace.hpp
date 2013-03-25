@@ -41,7 +41,9 @@ namespace yocto
             async_count(0),
             num_requests(0),
             local_reg(),
-            async_reg()
+            async_reg(),
+            io_start(0),
+            io_finish(0)
             {
                 //--------------------------------------------------------------
                 // recompute outline from ghosts
@@ -87,6 +89,11 @@ namespace yocto
             vector<local_ghosts::ptr> local_reg;
             vector<async_ghosts::ptr> async_reg;
        
+        public:
+            mutable double io_start;  //!< for benchmarking
+            mutable double io_finish; //!< for benchmarking
+            
+        private:
             //==================================================================
             // recompute outline from ghosts
             //==================================================================

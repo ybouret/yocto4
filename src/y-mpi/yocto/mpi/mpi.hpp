@@ -237,5 +237,6 @@ namespace yocto
 #define Y_MPI_CTIME CommTime += uint64_t( ( MPI_Wtime() - stamp ) * 1.0e6 )
 #endif
 
-#define Y_MPI_TIME64(TMX,MPI,CODE) do { const uint64_t mpi_enter = MPI.CommTime; { CODE; } TMX += (MPI.CommTime - mpi_enter); } while(false)
+#define Y_MPI_TIME64(TMX,MPI,CODE) \
+do { const uint64_t mpi_enter = MPI.CommTime; { CODE; } TMX += (MPI.CommTime - mpi_enter); } while(false)
 
