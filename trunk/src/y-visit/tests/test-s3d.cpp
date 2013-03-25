@@ -118,7 +118,7 @@ namespace
         do_sync(true),
         num_iter(1),
         counts(0),
-        exchanged_bytes( get_async(1).inner.size() * U.item_size() ),
+        exchanged_bytes( 2*get_async(1).inner.size() * U.item_size() ),
         bandwidth(0)
         {
             query( handles, "U" );
@@ -312,7 +312,7 @@ namespace
                         "\tsteps/s = %8.2f < %8.2f >\n"
                         "\tloops/s = %8.2f [ %8.5fx ]\n"
                         "\tComm/us = %8u [ %8.3f%% ] < %8.3f%% >\n"
-                        "\tGBits/s = %7.3f\n"
+                        "\tGBits/s = %8.4f\n"
                         ,
                         1.0/stepTime,
                         num_steps/sum_steps,
