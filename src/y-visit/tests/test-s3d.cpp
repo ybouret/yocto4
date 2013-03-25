@@ -118,7 +118,7 @@ namespace
         do_sync(true),
         num_iter(1),
         counts(0),
-        exchanged_bytes( async_count > 0 ? 2*get_async(1).inner.size() * U.item_size() : 0 ),
+        exchanged_bytes( async_count > 0 ? async_count*get_async(1).inner.size() * U.item_size() : 0 ),
         bandwidth(0)
         {
             query( handles, "U" );
@@ -290,7 +290,7 @@ namespace
                         }
                     }
                 }
-                if(do_sync)
+                if(do_sync&&parallel)
                 {
                     uint64_t tmx = 0;
                     Y_MPI_TIME64(tmx,MPI,sync(MPI,handles));
