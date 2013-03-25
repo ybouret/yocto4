@@ -93,6 +93,7 @@ namespace
         int            num_iter;
         size_t         counts;
         const size_t   exchanged_bytes;
+        double         bandwidth;
         
         explicit MySim(const mpi    &ref,
                        const Layout &l,
@@ -117,7 +118,8 @@ namespace
         do_sync(true),
         num_iter(1),
         counts(0),
-        exchanged_bytes( get_async(1).inner.size() * U.item_size() )
+        exchanged_bytes( get_async(1).inner.size() * U.item_size() ),
+        bandwidth(0)
         {
             query( handles, "U" );
             dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
@@ -269,6 +271,7 @@ namespace
         
         virtual void step()
         {
+            bandwidth = 0;
             for( int iter=0; iter<num_iter;++iter)
             {
                 ++counts;
@@ -294,9 +297,10 @@ namespace
                     const double ts    = double(tmx)*1e-6;
                     const double Gbits = double(exchanged_bytes) * (8.0 / double( 1 << 30) );
                     const double bw    = Gbits/ts;
-                    MPI.Printf0(stderr, "\tBW: %g Gbits/s\n", bw);
+                    bandwidth += bw;
                 }
             }
+            bandwidth /= num_iter;
         }
         
         virtual void step_epilog()
@@ -308,6 +312,7 @@ namespace
                         "\tsteps/s = %8.2f < %8.2f >\n"
                         "\tloops/s = %8.2f [ %8.5fx ]\n"
                         "\tComm/us = %8u [ %8.3f%% ] < %8.3f%% >\n"
+                        "\tGBits/s = %7.3f\n"
                         ,
                         1.0/stepTime,
                         num_steps/sum_steps,
@@ -315,7 +320,8 @@ namespace
                         stepTime/loopTime,
                         commTime,
                         ( 1e-4 * double(commTime) ) / stepTime,
-                        ( 1e-4 * sum_tcomm) / sum_steps
+                        ( 1e-4 * sum_tcomm) / sum_steps,
+                        bandwidth
                         );
             
         }
