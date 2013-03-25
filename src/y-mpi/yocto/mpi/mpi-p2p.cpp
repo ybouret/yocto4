@@ -39,10 +39,12 @@ Y_MPI_CTIME;                                        \
 	size_t mpi:: Get_count( const MPI_Status *status, MPI_Datatype datatype ) const
 	{
 		assert( NULL != status );
+        Y_MPI_STAMP(Get_count);
 		int       count = 0;
 		const int err   = MPI_Get_count( (MPI_Status *)status, datatype, &count );
 		if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Get_count()");
+        Y_MPI_CTIME;
 		assert( count >= 0 );
 		return count;
 	}
@@ -50,11 +52,13 @@ Y_MPI_CTIME;                                        \
 	size_t mpi:: Get_elements( const MPI_Status *status, MPI_Datatype datatype ) const
 	{
 		assert( NULL != status );
+        Y_MPI_STAMP(Get_elements);
 		int       count = 0;
 		const int err   = MPI_Get_elements( (MPI_Status *)status, datatype, &count );
 		if( err != MPI_SUCCESS )
 			throw mpi::exception( err, "MPI_Get_elements()");
 		assert( count >= 0 );
+        Y_MPI_CTIME;
 		return count;
 	}
 	
