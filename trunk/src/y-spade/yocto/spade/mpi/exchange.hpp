@@ -11,7 +11,8 @@ namespace yocto
         struct mpi_exchange
         {
             
-            template <typename DATASPACE> static inline
+            template <typename DATASPACE>
+            static inline
             void init(const mpi      &MPI,
                       linear_handles &handles,
                       DATASPACE      &ds,
@@ -104,17 +105,20 @@ namespace yocto
                 ds.io_finish = MPI.Wtime();
             }
             
-            template <typename DATASPACE> static inline
-            void sync( const mpi     & MPI,
-                      linear_handles & handles,
-                      DATASPACE      & ds,
-                      mpi::Requests  & requests )
+            template <typename DATASPACE>
+            static inline
+            double sync( const mpi     & MPI,
+                        linear_handles & handles,
+                        DATASPACE      & ds,
+                        mpi::Requests  & requests )
             {
                 init(MPI,handles,ds,requests);
                 wait(MPI,handles,ds,requests);
+                return ds.io_finish - ds.io_start;
             }
             
-            template <typename DATASPACE> static inline
+            template <typename DATASPACE>
+            static inline
             void init1( const mpi &MPI, linear &handle, DATASPACE &ds, mpi::Requests &requests )
             {
                 static const int tag = 0xCA441;
@@ -215,10 +219,11 @@ namespace yocto
             }
             
             template <typename DATASPACE> static inline
-            void sync1( const mpi & MPI, linear &handle, DATASPACE &ds, mpi::Requests &requests )
+            double sync1( const mpi & MPI, linear &handle, DATASPACE &ds, mpi::Requests &requests )
             {
                 init1(MPI,handle,ds,requests);
                 wait1(MPI,handle,ds,requests);
+                return ds.io_finish - ds.io_start;
             }
             
             

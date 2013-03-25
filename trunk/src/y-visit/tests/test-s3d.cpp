@@ -121,7 +121,8 @@ namespace
         exchanged_bytes( async_count > 0 ? async_count*get_async(1).inner.size() * U.item_size() : 0 ),
         bandwidth(0)
         {
-            query( handles, "U" );
+
+            query( handles, "U" ); //! data to exchange
             dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
             num_iter = int(ceil(0.1/dt));
             MPI.PrintfI(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
@@ -292,9 +293,8 @@ namespace
                 }
                 if(do_sync&&parallel)
                 {
-                    uint64_t tmx = 0;
-                    Y_MPI_TIME64(tmx,MPI,sync(MPI,handles));
-                    const double ts    = double(tmx)*1e-6;
+                    //uint64_t tmx = 0;
+                    const double ts    = mpi_workspace<Layout,rmesh,Real>::sync_fields(MPI,handles);
                     const double Gbits = double(exchanged_bytes) * (8.0 / double( 1 << 30) );
                     const double bw    = Gbits/ts;
                     bandwidth += bw;
