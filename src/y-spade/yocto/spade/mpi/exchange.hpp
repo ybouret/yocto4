@@ -21,7 +21,7 @@ namespace yocto
                 assert( requests.count == ds.num_requests );
                 
                 //--------------------------------------------------------------
-                // transfert local ghosts
+                // transfert local ghosts : PBC are ready after that
                 //--------------------------------------------------------------
                 for( size_t i=ds.local_count;i>0;--i)
                     ds.get_local(i).transfer( handles );
@@ -36,9 +36,9 @@ namespace yocto
                     async_ghosts &g = ds.get_async(i);
                     assert(g.peer>=0);
                     assert(g.peer<MPI.CommWorldSize);
-                    assert(g.ibuffer!=0);
-                    assert(g.obuffer!=0);
-                    assert(g.iobytes>0);
+                    assert(g.ibuffer!= 0);
+                    assert(g.obuffer!= 0);
+                    assert(g.iobytes > 0);
                     
                     //----------------------------------------------------------
                     // create ibuffer
@@ -131,9 +131,9 @@ namespace yocto
                         async_ghosts &g = ds.get_async(i);
                         assert(g.peer>=0);
                         assert(g.peer<MPI.CommWorldSize);
-                        assert(g.ibuffer!=0);
-                        assert(g.obuffer!=0);
-                        assert(g.iobytes>0);
+                        assert(g.ibuffer != 0);
+                        assert(g.obuffer != 0);
+                        assert(g.iobytes >  0);
                         
                         //----------------------------------------------------------
                         // create ibuffer
@@ -169,7 +169,10 @@ namespace yocto
             }
             
             template <typename DATASPACE> static inline
-            void wait1( const mpi & MPI, linear &handle, DATASPACE &ds, mpi::Requests &requests )
+            void wait1(const mpi     & MPI,
+                       linear        & handle,
+                       DATASPACE     & ds,
+                       mpi::Requests & requests )
             {
                 assert( requests.count == ds.num_requests );
                 const size_t na = ds.async_count;
