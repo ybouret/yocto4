@@ -11,7 +11,7 @@ namespace yocto
     
     namespace spade
     {
-        
+        //! build 2D contour vertices
         template <typename T,typename U>
         struct iso2d
         {
@@ -19,6 +19,16 @@ namespace yocto
             static  U dump( const T &v ) { return U(v); }
             typedef functor<void,TL4(const vertex &,const vertex &,const levels<U> &,size_t)> callback;
             
+            //! compute 2D iso segments
+            /**
+             \param ls    the level sets
+             \param d     the 2D data
+             \param x     the associated X mesh
+             \param y     the associated Y mesh
+             \param sub   the sublayout to be computed
+             \param cb    callback called for each vertices
+             \param dproc data conversion procedure
+             */
             static inline
             void compute(const levels<U>  &ls,
                          const array2D<T> &d,
@@ -35,8 +45,8 @@ namespace yocto
                 assert( sub.upper.x <= x.upper );
                 assert( sub.lower.y >= y.lower );
                 assert( sub.upper.y <= y.upper );
-                assert( ls.size() > 0 );
                 assert(dproc);
+                if( ls.size() <= 0 ) return;
                 
                 const unit_t jub=sub.upper.y;
                 const unit_t jlb=sub.lower.y;
@@ -71,9 +81,9 @@ namespace yocto
                 };
                 
                 
-                for (int j=(jub-1);j>=jlb;j--)
+                for(unit_t j=(jub-1);j>=jlb;j--)
                 {
-                    for (int i=ilb;i<=iub-1;i++)
+                    for(unit_t i=ilb;i<=iub-1;i++)
                     {
                         const U d_ji   = dproc(d[j][i]);
                         const int jp   = j+1;
