@@ -41,7 +41,7 @@ namespace
             assert(idx>0);
             assert(idx<=ls.size());
             vector<vertex> &v = vv[idx];
-            std::cerr << ls[idx] << ": " << a << "-> " << b << std::endl;
+            //std::cerr << ls[idx] << ": " << a << "-> " << b << std::endl;
             v.push_back(a);
             v.push_back(b);
         }
@@ -111,7 +111,7 @@ YOCTO_UNIT_TEST_IMPL(levels)
             const double dx = x - Vc.x;
             
             
-            A[j][i] = 1.0 / ( 1 + 5*dy*dy + 7*dx*dx);
+            A[j][i] = 1.0 / ( 1 + 5*dy*dy + 7*dx*dx + 0.8*sin( 8 * dx ) );
         }
     }
     
