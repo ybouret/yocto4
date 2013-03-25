@@ -31,6 +31,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 size_t       iRequest = 0;
                 const size_t na       = ds.async_count;
+                ds.io_start           = MPI.Wtime();
                 for( size_t i=na;i>0;--i)
                 {
                     async_ghosts &g = ds.get_async(i);
@@ -100,6 +101,7 @@ namespace yocto
                     async_ghosts &g = ds.get_async(i);
                     g.outer_query(handles);
                 }
+                ds.io_finish = MPI.Wtime();
             }
             
             template <typename DATASPACE> static inline
@@ -130,6 +132,7 @@ namespace yocto
                 // load send data and create recv requests
                 //--------------------------------------------------------------
                 const size_t na = ds.async_count;
+                ds.io_start     = MPI.Wtime();
                 if(na>0)
                 {
                     size_t       iRequest = 0;
@@ -208,6 +211,7 @@ namespace yocto
                         g.outer_query(handle);
                     }
                 }
+                ds.io_finish = MPI_Wtime();
             }
             
             template <typename DATASPACE> static inline
