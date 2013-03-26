@@ -13,9 +13,9 @@ namespace
 		mutex  *synchro;
 		double  sum;
 	};
-	
+
 	static 
-	void thread_proc( void *args )
+		void thread_proc( void *args )
 	{
 		thread_data       &d = *(thread_data *)args;
 		mutex             &m = *d.synchro;
@@ -34,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(thread)
 {
 	mutex synchro( "synchro" );
 	thread_data d = { &synchro, 0 };
-	
+
 	thread thr1( thread_proc, &d );
 	thread thr2( thread_proc, &d );
 	thread thr3( thread_proc, &d );
@@ -51,9 +51,9 @@ YOCTO_UNIT_TEST_DONE()
 #include <cmath>
 
 
-static void cpu_proc( size_t cpu_id, void * )
+	static void cpu_proc( size_t cpu_id, void * )
 {
-		std::cerr << "\tOn CPU #" << cpu_id << std::endl;
+	std::cerr << "\tOn CPU #" << cpu_id << std::endl;
 }
 
 YOCTO_UNIT_TEST_IMPL(place)
@@ -63,7 +63,7 @@ YOCTO_UNIT_TEST_IMPL(place)
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
 	std::cerr << "Before Placement: " << std::endl;
 	thread::for_each( thread::get_current_handle(), cpu_proc, 0 );
-    thread::assign_cpu( thread::get_current_handle(), cpu_id);
+	thread::assign_cpu( thread::get_current_handle(), cpu_id);
 	std::cerr << "After Placement:  " << std::endl;
 	thread::for_each( thread::get_current_handle(), cpu_proc, 0 );
 
@@ -75,12 +75,17 @@ YOCTO_UNIT_TEST_IMPL(place)
 	wtime chrono;
 	double res = 0;
 	chrono.start();
+	double t_last = -1;
 	for(size_t i=1; ; ++i)
 	{
 		const double tmp = double(i);
 		res += 1.0/(tmp*tmp);
-		if( 0 == (i%(1024*16)) )
+		const double t_now = chrono.query();
+		if( t_now - t_last >= 0.5 )
+		{
 			(std::cerr << sqrt(6*res) << std::endl).flush();
+			t_last = t_now;
+		}
 		if( chrono.query() >= 5.0 )
 			break;
 	}
