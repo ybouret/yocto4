@@ -305,7 +305,7 @@ namespace
                 double        total_time  = 0;
                 MPI.Reduce(&io_bytes, &total_bytes, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
                 MPI.Reduce(&io_time,  &total_time,  1, MPI_DOUBLE,        MPI_SUM, 0, MPI_COMM_WORLD);
-                bandwidth = ( GbitsFactor * total_bytes ) / ( num_iter * total_time );
+                bandwidth = par_size * ( GbitsFactor * total_bytes ) / ( num_iter * total_time );
             }
         }
         
