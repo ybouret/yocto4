@@ -298,6 +298,10 @@ namespace
                 }
             }
             
+        }
+        
+        virtual void step_epilog()
+        {
             if(do_sync&&parallel)
             {
                 static const double GbitsFactor = 8.0 / (1<<30);
@@ -307,10 +311,7 @@ namespace
                 MPI.Reduce(&io_time,  &total_time,  1, MPI_DOUBLE,        MPI_SUM, 0, MPI_COMM_WORLD);
                 bandwidth = par_size * ( GbitsFactor * total_bytes ) / ( num_iter * total_time );
             }
-        }
-        
-        virtual void step_epilog()
-        {
+            
             sum_steps += stepTime;
             sum_tcomm += double(commTime);
             num_steps += 1;
