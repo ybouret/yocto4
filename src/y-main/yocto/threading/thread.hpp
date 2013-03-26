@@ -8,9 +8,12 @@ namespace yocto
 	
 	namespace threading
 	{
+        
 		class thread 
 		{	
 		public:
+            static const size_t cpu_set_size;
+            
 #if defined(YOCTO_BSD)
 			typedef pthread_t handle_t;
 			typedef pthread_t id_t;
