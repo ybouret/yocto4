@@ -293,8 +293,7 @@ namespace
                 }
                 if(do_sync&&parallel)
                 {
-                    //uint64_t tmx = 0;
-                    const double ts    = mpi_workspace<Layout,rmesh,Real>::sync_fields(MPI,handles);
+                    const double ts    = mpi_workspace<Layout,rmesh,Real>::sync(MPI,handles);
                     const double Gbits = double(exchanged_bytes) * (8.0 / double( 1 << 30) );
                     const double bw    = Gbits/ts;
                     bandwidth += bw;
@@ -312,7 +311,7 @@ namespace
                         "\tsteps/s = %8.2f < %8.2f >\n"
                         "\tloops/s = %8.2f [ %8.5fx ]\n"
                         "\tComm/us = %8u [ %8.3f%% ] < %8.3f%% >\n"
-                        "\tGBits/s = %8.4f\n"
+                        "\tGBits/s>= %8.4f\n"
                         ,
                         1.0/stepTime,
                         num_steps/sum_steps,
