@@ -92,7 +92,8 @@ namespace
         bool           do_sync;
         int            num_iter;
         size_t         counts;
-        const size_t   exchanged_bytes;
+        unsigned long  io_bytes;
+        double         io_time;
         double         bandwidth;
         
         explicit MySim(const mpi    &ref,
@@ -118,15 +119,13 @@ namespace
         do_sync(true),
         num_iter(1),
         counts(0),
-        exchanged_bytes( async_count > 0 ? async_count*get_async(1).inner.size() * U.item_size() : 0 ),
         bandwidth(0)
         {
-
+            
             query( handles, "U" ); //! data to exchange
             dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
             num_iter = int(ceil(0.1/dt));
             MPI.PrintfI(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
-            MPI.PrintfI(stderr, "Exchanged Bytes: %u\n", unsigned( exchanged_bytes));
         }
         
         virtual ~MySim() throw()
@@ -272,6 +271,8 @@ namespace
         
         virtual void step()
         {
+            io_bytes  = 0;
+            io_time   = 0;
             bandwidth = 0;
             for( int iter=0; iter<num_iter;++iter)
             {
@@ -293,13 +294,19 @@ namespace
                 }
                 if(do_sync&&parallel)
                 {
-                    const double ts    = mpi_workspace<Layout,rmesh,Real>::sync(MPI,handles);
-                    const double Gbits = double(exchanged_bytes) * (8.0 / double( 1 << 30) );
-                    const double bw    = Gbits/ts;
-                    bandwidth += bw;
+                    sync_bw(MPI,handles,io_bytes,io_time);
                 }
             }
-            bandwidth /= num_iter;
+            
+            if(do_sync&&parallel)
+            {
+                static const double GbitsFactor = 8.0 / (1<<30);
+                unsigned long total_bytes = 0;
+                double        total_time  = 0;
+                MPI.Reduce(&io_bytes, &total_bytes, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+                MPI.Reduce(&io_time,  &total_time,  1, MPI_DOUBLE,        MPI_SUM, 0, MPI_COMM_WORLD);
+                bandwidth = ( GbitsFactor * total_bytes ) / ( num_iter * total_time );
+            }
         }
         
         virtual void step_epilog()

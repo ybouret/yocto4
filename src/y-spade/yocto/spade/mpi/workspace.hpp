@@ -17,7 +17,7 @@ namespace yocto
         typename U>
         class mpi_workspace : public workspace<LAYOUT,MESH,U>
         {
-        public:            
+        public:
             explicit mpi_workspace(const LAYOUT               &L,
                                    const fields_setup<LAYOUT> &F,
                                    const ghosts_setup         &G) :
@@ -40,14 +40,22 @@ namespace yocto
                 mpi_exchange::wait(MPI,handles,self,requests);
             }
             
-            inline double sync(const mpi &MPI, linear_handles &handles)
+            inline void sync(const mpi &MPI, linear_handles &handles)
             {
-                return mpi_exchange::sync(MPI,handles,self,requests);
+                mpi_exchange::sync(MPI,handles,self,requests);
             }
             
-            inline double sync1(const mpi &MPI, linear &handle)
+            inline void sync_bw(const mpi &MPI,
+                                linear_handles &handles,
+                                unsigned long &io_bytes,
+                                double        &io_time)
             {
-                return mpi_exchange::sync1(MPI,handle,self,requests);
+                mpi_exchange::sync_bw(MPI,handles,self,requests, io_bytes, io_time);
+            }
+            
+            inline void sync1(const mpi &MPI, linear &handle)
+            {
+                mpi_exchange::sync1(MPI,handle,self,requests);
             }
             
         private:
