@@ -52,7 +52,6 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(place)
 {
-    std::cerr << "thread::cpu_set_size=" << thread::cpu_set_size << std::endl;
 	size_t cpu_id = 0;
 	if( argc > 1 ) cpu_id = atoi(argv[1]);
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
@@ -70,7 +69,7 @@ YOCTO_UNIT_TEST_IMPL(place)
 		const double tmp = double(i);
 		res += 1.0/(tmp*tmp);
 		if( 0 == (i%(1024*1024)) )
-			std::cerr << sqrt(6*res) << std::endl;
+			(std::cerr << sqrt(6*res) << std::endl).flush();
 		if( chrono.query() >= 5.0 )
 	break;
 	}

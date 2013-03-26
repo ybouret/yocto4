@@ -11,9 +11,7 @@ namespace yocto
         
 		class thread 
 		{	
-		public:
-            static const size_t cpu_set_size;
-            
+		public:            
 #if defined(YOCTO_BSD)
 			typedef pthread_t handle_t;
 			typedef pthread_t id_t;
@@ -38,6 +36,9 @@ namespace yocto
             
             static void assign_cpu( thread::handle_t , size_t cpu_id );
             void on_cpu( size_t cpu_id );
+            
+            void for_each( void (*proc)(size_t cpu_id,void*), void *) const;
+            
             
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(thread);
