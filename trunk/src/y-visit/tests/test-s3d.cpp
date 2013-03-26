@@ -342,6 +342,15 @@ namespace
 
 #include "yocto/string/conv.hpp"
 #include "yocto/string/env.hpp"
+#include "yocto/threading/thread.hpp"
+
+static void display_cpu( size_t cpu_id, void *args)
+{
+    assert(args);
+    string &cpu_list = *(string *)args;
+    cpu_list += vformat(" %u", unsigned(cpu_id));
+    
+}
 
 YOCTO_UNIT_TEST_IMPL(s3d)
 {
@@ -394,6 +403,13 @@ YOCTO_UNIT_TEST_IMPL(s3d)
     //----------------------------------------------------------------------
     MySim sim(MPI,sim_layout,delta);
     //sim.console = false;
+    
+    {
+        string cpu_list = "\t#CPU: ";
+        threading::thread::for_each( threading::thread::get_current_handle(), display_cpu, &cpu_list );
+        
+        MPI.PrintfI(stderr, "%s\n", cpu_list.c_str());
+    }
     
     //----------------------------------------------------------------------
     // create mesh
