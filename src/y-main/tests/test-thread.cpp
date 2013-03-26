@@ -50,17 +50,28 @@ YOCTO_UNIT_TEST_DONE()
 #include <cstdlib>
 #include <cmath>
 
+
+static void cpu_proc( size_t cpu_id, void * )
+{
+		std::cerr << "\tOn CPU #" << cpu_id << std::endl;
+}
+
 YOCTO_UNIT_TEST_IMPL(place)
 {
 	size_t cpu_id = 0;
 	if( argc > 1 ) cpu_id = atoi(argv[1]);
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
+	std::cerr << "Before Placement: " << std::endl;
+	thread::for_each( thread::get_current_handle(), cpu_proc, 0 );
     thread::assign_cpu( thread::get_current_handle(), cpu_id);
+	std::cerr << "After Placement:  " << std::endl;
+	thread::for_each( thread::get_current_handle(), cpu_proc, 0 );
 
 #if 0
 	std::cerr << "Press Enter after check!" << std::endl;
 	fgetc(stdin);
 #endif
+	std::cerr << "Computing..." << std::endl;
 	wtime chrono;
 	double res = 0;
 	chrono.start();
@@ -68,10 +79,10 @@ YOCTO_UNIT_TEST_IMPL(place)
 	{
 		const double tmp = double(i);
 		res += 1.0/(tmp*tmp);
-		if( 0 == (i%(1024*1024)) )
+		if( 0 == (i%(1024*16)) )
 			(std::cerr << sqrt(6*res) << std::endl).flush();
 		if( chrono.query() >= 5.0 )
-	break;
+			break;
 	}
 }
 YOCTO_UNIT_TEST_DONE()

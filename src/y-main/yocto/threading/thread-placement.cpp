@@ -55,6 +55,23 @@ namespace yocto
 			if( err != 0 )
 				throw libc::exception( err, "pthread_setaffinity_np" );
 		}
+		
+		void thread:: for_each( thread::handle_t h, void (*proc)(size_t,void*), void *args)
+		{
+			assert(proc!=0);
+			YOCTO_CPU_SET  cpu_set;
+			CPU_ZERO( &cpu_set );
+			const int err = pthread_getaffinity_np( h, sizeof(YOCTO_CPU_SET), &cpu_set);
+			if( err != 0 )
+				throw libc::exception( err, "pthread_getaffinity_np" );
+			for( size_t cpu_id=0; cpu_id < CPU_SETSIZE; ++cpu_id )
+			{
+				if( CPU_ISSET(cpu_id, &cpu_set) )
+				{
+					proc(cpu_id,args);
+				}
+			}
+		}
 #endif
         
 #if defined(YOCTO_THREAD_AFFINITY)
@@ -67,6 +84,11 @@ namespace yocto
         {
             
         }
+        
+        void thread:: for_each( thread::handle_t, void (*proc)(size_t,void*), void *)
+        {
+			assert(proc);
+		}
 #endif
         
         void thread::on_cpu( size_t cpu_id )

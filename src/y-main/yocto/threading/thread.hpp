@@ -37,7 +37,7 @@ namespace yocto
             static void assign_cpu( thread::handle_t , size_t cpu_id );
             void on_cpu( size_t cpu_id );
             
-            void for_each( void (*proc)(size_t cpu_id,void*), void *) const;
+            static void for_each( thread::handle_t, void (*proc)(size_t cpu_id,void*), void *);
             
             
 		private:
