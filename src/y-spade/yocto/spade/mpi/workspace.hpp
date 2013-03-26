@@ -1,3 +1,4 @@
+#if 1
 #ifndef YOCTO_SPADE_MPI_WORKSPACE_INCLUDED
 #define YOCTO_SPADE_MPI_WORKSPACE_INCLUDED 1
 
@@ -39,14 +40,14 @@ namespace yocto
                 mpi_exchange::wait(MPI,handles,self,requests);
             }
             
-            inline void sync(const mpi &MPI, linear_handles &handles)
+            inline double sync(const mpi &MPI, linear_handles &handles)
             {
-                mpi_exchange::sync(MPI,handles,self,requests);
+                return mpi_exchange::sync(MPI,handles,self,requests);
             }
             
-            inline void sync1(const mpi &MPI, linear &handle)
+            inline double sync1(const mpi &MPI, linear &handle)
             {
-                mpi_exchange::sync1(MPI,handle,self,requests);
+                return mpi_exchange::sync1(MPI,handle,self,requests);
             }
             
         private:
@@ -60,4 +61,5 @@ namespace yocto
     
 }
 
+#endif
 #endif
