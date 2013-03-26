@@ -24,10 +24,10 @@
 
 namespace yocto 
 {
-    
-    namespace threading
-    {
-        //----------------------------------------------------------------------
+
+	namespace threading
+	{
+		//----------------------------------------------------------------------
 		// Win32 API wrapper
 		//----------------------------------------------------------------------
 #if defined(_WIN32)        
@@ -40,8 +40,42 @@ namespace yocto
 				throw win32::exception( err, "::SetThreadAffinityMask" );
 			}
 		}
+
+		void thread:: for_each( thread::handle_t h, void (*proc)(size_t,void*), void *args)
+		{
+			assert(proc!=0);
+			DWORD_PTR   cpu_set = 0;
+
+			//-- try to fetch it
+			for( size_t i=0; i < sizeof(DWORD_PTR) * 8; ++i )
+			{
+				const DWORD_PTR mask = DWORD_PTR(1) << i;
+				const DWORD_PTR old  = ::SetThreadAffinityMask(h,mask);
+				if( old != 0 )
+				{
+					//-- restore
+					if( ! ::SetThreadAffinityMask(h,old) )
+					{
+						const DWORD err = ::GetLastError();
+						throw win32::exception( err, "::SetThreadAffinityMask/Restore");
+					}
+					cpu_set = old;
+				}
+			}
+			if( !cpu_set )
+				throw win32::exception(ERROR_INVALID_PARAMETER,"Can't get Thread Affinity");
+
+			//-- parse it
+			for(size_t cpu_id = 0; cpu_id < sizeof(DWORD_PTR) * 8; ++cpu_id )
+			{
+				const DWORD_PTR mask = DWORD_PTR(1) << cpu_id;
+				if( 0 != (cpu_set&mask) )
+					proc(cpu_id,args);
+			}
+		}
+
 #endif
-		
+
 		//----------------------------------------------------------------------
 		// pthread wrapper
 		//----------------------------------------------------------------------
@@ -55,7 +89,7 @@ namespace yocto
 			if( err != 0 )
 				throw libc::exception( err, "pthread_setaffinity_np" );
 		}
-		
+
 		void thread:: for_each( thread::handle_t h, void (*proc)(size_t,void*), void *args)
 		{
 			assert(proc!=0);
@@ -73,29 +107,29 @@ namespace yocto
 			}
 		}
 #endif
-        
+
 #if defined(YOCTO_THREAD_AFFINITY)
-        void thread:: assign_cpu( thread::handle_t h, size_t cpu_id )
-        {
-            __assign(h,cpu_id);
-        }
+		void thread:: assign_cpu( thread::handle_t h, size_t cpu_id )
+		{
+			__assign(h,cpu_id);
+		}
 #else
-        void thread:: assign_cpu( thread::handle_t, size_t )
-        {
-            
-        }
-        
-        void thread:: for_each( thread::handle_t, void (*proc)(size_t,void*), void *)
-        {
+		void thread:: assign_cpu( thread::handle_t, size_t )
+		{
+
+		}
+
+		void thread:: for_each( thread::handle_t, void (*proc)(size_t,void*), void *)
+		{
 			assert(proc);
 		}
 #endif
-        
-        void thread::on_cpu( size_t cpu_id )
-        {
-            assign_cpu( handle_, cpu_id);
-        }
-        
-    }
-    
+
+		void thread::on_cpu( size_t cpu_id )
+		{
+			assign_cpu( handle_, cpu_id);
+		}
+
+	}
+
 }
