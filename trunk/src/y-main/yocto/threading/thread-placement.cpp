@@ -31,6 +31,8 @@ namespace yocto
 		// Win32 API wrapper
 		//----------------------------------------------------------------------
 #if defined(_WIN32)
+        const size_t thread::cpu_set_size = sizeof(DWORD_PTR);
+        
 		static inline void __assign( thread::handle_t h, const size_t j )
 		{
 			const DWORD_PTR mask = DWORD_PTR(1) << j;
@@ -46,6 +48,7 @@ namespace yocto
 		// pthread wrapper
 		//----------------------------------------------------------------------
 #if defined(YOCTO_CPU_SET_PTHREAD)
+        const size_t thread::cpu_set_size = CPU_SETSIZE;
 		static  void __assign( thread::handle_t h, const size_t j )
 		{
 			YOCTO_CPU_SET cpu_set;
@@ -63,6 +66,7 @@ namespace yocto
             __assign(h,cpu_id);
         }
 #else
+        const size_t thread:: cpu_set_size = 0;
         void thread:: assign_cpu( thread::handle_t, size_t )
         {
             
