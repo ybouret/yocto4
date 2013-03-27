@@ -10,7 +10,6 @@ YOCTO_UNIT_TEST_IMPL(sync)
 {
 	
 	
-	
 	mpi &MPI = mpi::init( &argc, & argv );
 	std::cerr.flush();
 	MPI.Printf( stderr, "From rank %d\n", MPI.CommWorldRank );

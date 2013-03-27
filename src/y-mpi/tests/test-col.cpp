@@ -68,7 +68,8 @@ YOCTO_UNIT_TEST_IMPL(scatter)
 	MPI.Scatter(sendbuff, sendsize, MPI_FLOAT, &dst[1], N, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	MPI.Printf( stderr, "Rank %d: dst[1]= %4g, dst[N]=%4g\n", rank, dst[1], dst[N] );
 	
-	MPI.Barrier(MPI_COMM_WORLD);
+    MPI.Barrier(MPI_COMM_WORLD);
+    MPI.WaitFor(0.2);
 	
 	
 }
