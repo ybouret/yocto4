@@ -1,4 +1,5 @@
 #include "yocto/mpi/mpi.hpp"
+#include "yocto/memory/buffers.hpp"
 
 namespace yocto
 {
@@ -184,6 +185,37 @@ Y_MPI_CTIME;\
         Y_MPI_CTIME;
     }
     
-	
+    
+    //==========================================================================
+    // send/recv strings helper
+    //==========================================================================
+	void mpi::Send(const string &s, int dest, int tag, MPI_Comm comm) const
+    {
+        //-- send the size
+        const size_t len = s.size();
+        Send<size_t>(len,dest,tag,comm);
+        
+        //-- send the content
+        if(len>0)
+        {
+            Send( s.ro(), len, MPI_BYTE, dest, tag, comm );
+        }
+    }
+    
+    string mpi::Recv(int source, int tag, MPI_Comm comm, MPI_Status &status) const
+    {
+        //-- recv the size
+        const size_t len = Recv<size_t>(source, tag, comm, status);
+        
+        //-- recv the content
+        if( len > 0 )
+        {
+            memory::buffer_of<char,memory::global> buf( len );
+            Recv(buf.rw(), len, MPI_BYTE, source, tag, comm, status);
+            return string(buf(),len);
+        }
+        else
+            return string();
+    }
 	
 }

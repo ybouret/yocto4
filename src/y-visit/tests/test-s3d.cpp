@@ -125,7 +125,7 @@ namespace
             query( handles, "U" ); //! data to exchange
             dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
             num_iter = int(ceil(0.1/dt));
-            MPI.PrintfI(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
+            MPI.Printf(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
         }
         
         virtual ~MySim() throw()
@@ -254,7 +254,7 @@ namespace
         //! auxiliary commands
         virtual void perform( const string &cmd, const array<string> & )
         {
-            MPI.PrintfI( stderr, "cmd: %s\n", cmd.c_str() );
+            MPI.Printf( stderr, "cmd: %s\n", cmd.c_str() );
             if( cmd == "raz" )
             {
                 initialize();
@@ -408,7 +408,7 @@ YOCTO_UNIT_TEST_IMPL(s3d)
         string cpu_list = "\t#CPU: ";
         threading::thread::for_each( threading::thread::get_current_handle(), display_cpu, &cpu_list );
         
-        MPI.PrintfI(stderr, "%s\n", cpu_list.c_str());
+        MPI.Printf(stderr, "%s\n", cpu_list.c_str());
     }
     
     //----------------------------------------------------------------------
@@ -455,11 +455,11 @@ YOCTO_UNIT_TEST_IMPL(s3d)
                 goto HAS_SYNC;
             }
             
-            throw exception("Invalid Env 'SYNC=%s", EnvSync.c_str());
+            throw exception("Invalid Env 'SYNC=%s'", EnvSync.c_str());
         }
     HAS_SYNC:;
     }
-    MPI.PrintfI( stderr, "Synchronizing/MPI: %s\n" , sim.do_sync ? "TRUE" : "FALSE" );
+    MPI.Printf( stderr, "Synchronizing/MPI: %s\n" , sim.do_sync ? "TRUE" : "FALSE" );
     VisIt::MainLoop(sim);
     
     return 0;

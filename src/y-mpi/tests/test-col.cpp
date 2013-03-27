@@ -11,7 +11,7 @@ YOCTO_UNIT_TEST_IMPL(bcast)
 	mpi &MPI = mpi::init( &argc, & argv );
 	const int rank = MPI.CommWorldRank;
 	//const int size = MPI.CommWorldSize;
-	MPI.PrintfI( stderr, "Bcast is ready\n" );
+	MPI.Printf( stderr, "Bcast is ready\n" );
 	
 	int msg = 0;
 	if( 0 == rank )
@@ -22,7 +22,7 @@ YOCTO_UNIT_TEST_IMPL(bcast)
     uint64_t mu0 = MPI.CommTime;
 	MPI.Bcast(&msg, 1, MPI_INT, 0, MPI_COMM_WORLD);
     uint64_t mu  = MPI.CommTime - mu0;
-	MPI.PrintfI( stderr, "msg=%d\n",msg );
+	MPI.Printf( stderr, "msg=%d\n",msg );
     MPI.Barrier(MPI_COMM_WORLD);
     MPI.WaitFor(0.2);
     MPI.Printf0(stderr, "\nin %g usec\n\n", double(mu));
@@ -35,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(bcast)
     mu0 = MPI.CommTime;
     MPI.Bcast<int>(msg, 0, MPI_COMM_WORLD);
     mu  = MPI.CommTime - mu0;
-	MPI.PrintfI( stderr, "msg=%d\n",msg );
+	MPI.Printf( stderr, "msg=%d\n",msg );
     MPI.Barrier(MPI_COMM_WORLD);
     MPI.WaitFor(0.2);
     MPI.Printf0(stderr, "\nin %g usec\n\n", double(mu));
