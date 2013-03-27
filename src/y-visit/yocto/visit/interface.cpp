@@ -90,12 +90,14 @@ namespace yocto
             MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
         
 #if 1
+        //----------------------------------------------------------------------
+        // startup VisIt, version 2
+        //----------------------------------------------------------------------
         char *env = 0;
         if( MPI.IsFirst )
         {
             env = VisItGetEnvironment();
-            if( !env )
-                throw exception("VisItGetEnvironment(FAILURE)");
+            //if( !env ) throw exception("VisItGetEnvironment(FAILURE)");
         }
         
         if( !VisItSetupEnvironment2(env) )
