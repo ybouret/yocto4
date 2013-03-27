@@ -137,13 +137,19 @@ namespace yocto
 		int  CommWorldNext() const throw(); //!< modulus the CommWorldSize
 		int  CommWorldPrev() const throw(); //!< modulus the CommWorldSize
 		
-		
+		//======================================================================
+		// stdio helpers
+		//======================================================================
+        
 		//! parallel printf, in order in MPI_COMM_WORLD
 		void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
         
-		//! printf only on rank 0, with protecting barriers
+		//! printf only on rank 0
 		void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
 		
+        //! close standard I/O on rank>0
+        void CloseStdIO() const;
+        
 		//! MPI_Request/MPI_Status helper
 		class Requests
 		{
@@ -169,6 +175,7 @@ namespace yocto
         //======================================================================
         // Send/Recv templated for integral types
         //======================================================================
+        
         //! send ONE integral type
         template <typename T>
         inline void Send( const T x, int dest,  int tag, MPI_Comm comm ) const
@@ -186,8 +193,7 @@ namespace yocto
             return swap_be_as<T>(y);
         }
         
-        void   Send( const string &s, int dest, int tag, MPI_Comm comm ) const;
-        string Recv( int source, int tag, MPI_Comm comm, MPI_Status &status ) const;
+       
         
         //! bcast ONE integral type
         template <typename T>
@@ -208,6 +214,12 @@ namespace yocto
                 
         double Wtime() const throw();
         void   WaitFor( double nsec) const throw();
+        
+        //======================================================================
+        // Send/Recv for strings
+        //======================================================================
+        void   Send( const string &s, int dest, int tag, MPI_Comm comm ) const;
+        string Recv( int source, int tag, MPI_Comm comm, MPI_Status &status ) const;
         
 	private:
 		friend class singleton<mpi>;                           //!< access mpi

@@ -8,11 +8,10 @@ YOCTO_UNIT_TEST_IMPL(init)
 {
 	
 	
-    mpi &MPI = mpi::init( &argc, & argv );
-	
+    YOCTO_MPI;
+    MPI.CloseStdIO();
     MPI.Printf(stderr, "'%s' is ready\n",MPI.ProcessorName);
 	
-	MPI.Finalize();
 	
 	
 }
