@@ -56,6 +56,8 @@ namespace yocto
                                const string *sim_ui)
     {
         MPI.Printf( stderr, "[Visit] SetupParallel %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
+        
+#if 0
         //----------------------------------------------------------------------
         // startup VisIt
         //----------------------------------------------------------------------
@@ -63,6 +65,7 @@ namespace yocto
         {
             //throw exception("VisItSetupEnvironment(%s)", VisItGetLastError());
         }
+#endif
         
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
@@ -86,8 +89,26 @@ namespace yocto
         if( ui_file )
             MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
         
+#if 1
+        char *env = 0;
+        if( MPI.IsFirst )
+        {
+            env = VisItGetEnvironment();
+            if( !env )
+                throw exception("VisItGetEnvironment(FAILURE)");
+        }
         
-        if( 0 == MPI.CommWorldRank )
+        if( !VisItSetupEnvironment2(env) )
+        {
+            if(env) free(env);
+            throw exception("VisItSetupEnvironment2(FAILURE)");
+        }
+        
+        if(env) free(env);
+        
+#endif
+        
+        if(  MPI.IsFirst )
         {
             if( ! VisItInitializeSocketAndDumpSimFile(sim_name.c_str(),
                                                       sim_comment.c_str(),
