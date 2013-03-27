@@ -10,7 +10,9 @@
 
 namespace yocto
 {
+
 	
+    
 	string vformat( const char *fmt,... )
 	{
 		assert(fmt);

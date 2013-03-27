@@ -37,6 +37,8 @@ YOCTO_UNIT_TEST_IMPL(ping)
 	MPI.Barrier( MPI_COMM_WORLD );
 	
     MPI.Printf(stderr, "[MPI #%2d]: done\n", atSelf);
+    MPI.Barrier(MPI_COMM_WORLD);
+    MPI.WaitFor(0.2);
 	MPI.Finalize();
 }
 YOCTO_UNIT_TEST_DONE()

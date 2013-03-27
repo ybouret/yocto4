@@ -29,8 +29,8 @@ YOCTO_UNIT_TEST_IMPL(string)
         }
     }
     
-	
-	MPI.Finalize();
+    MPI.Barrier(MPI_COMM_WORLD);
+    MPI.WaitFor(0.2);
 	
 	
 }
