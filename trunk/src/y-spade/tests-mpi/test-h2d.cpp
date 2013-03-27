@@ -106,7 +106,7 @@ YOCTO_UNIT_TEST_IMPL(h2d)
     
     linear_handles handles;
     W.query(handles, "A");
-    MPI.PrintfI(stderr, "#handles=%u\n", unsigned(handles.size()));
+    MPI.Printf(stderr, "#handles=%u\n", unsigned(handles.size()));
     
     
     W.sync(MPI,handles);

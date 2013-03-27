@@ -89,7 +89,7 @@ namespace
         
         void initialize()
         {
-            MPI.PrintfI( stderr, "Initializing U/V\n");
+            MPI.Printf( stderr, "Initializing U/V\n");
             for( unit_t j=lower.y; j<=upper.y; ++j )
             {
                 const Real y = Y[j];
