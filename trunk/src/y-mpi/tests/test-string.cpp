@@ -8,7 +8,8 @@ YOCTO_UNIT_TEST_IMPL(string)
 {
 	const int tag = 1010;
 	
-    mpi &MPI = mpi::init( &argc, & argv );
+    YOCTO_MPI;
+    MPI.CloseStdIO();
 	
     if( MPI.IsParallel )
     {
