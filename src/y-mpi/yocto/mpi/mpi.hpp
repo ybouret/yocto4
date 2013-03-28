@@ -5,7 +5,9 @@
 #include "yocto/threading/singleton.hpp"
 #include "yocto/code/printf-check.hpp"
 #include "yocto/code/endian.hpp"
+
 #include "yocto/string.hpp"
+
 
 #include <cstdio>
 
@@ -232,6 +234,7 @@ namespace yocto
 		YOCTO_DISABLE_COPY_AND_ASSIGN(mpi);
 		void clear_pname() throw();
 		void on_finalize() throw(); //!< clean up
+        
 	};
 	
 	

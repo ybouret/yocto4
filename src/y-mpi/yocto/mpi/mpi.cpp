@@ -76,7 +76,7 @@ namespace yocto
     IsParallel(false),
     CommTime(0),
 	ProcessorNameLength(0),
-	ProcessorName()
+	ProcessorName() //, typeDB(16,as_capacity)
 	{
 		if( NULL == mpi_argc_ || NULL == mpi_argv_ )
 		{
@@ -87,6 +87,10 @@ namespace yocto
 		
 		try
 		{
+            
+            //==================================================================
+            // MPI basic setup
+            //==================================================================
 			int err = MPI_Init( mpi_argc_, mpi_argv_ );
 			if( err != MPI_SUCCESS )
 			{
@@ -117,7 +121,19 @@ namespace yocto
 			{
 				clear_pname();
 			}
-			
+            
+			//==================================================================
+            // data type DB
+            //==================================================================
+#if 0
+#define Y_MPI_DB(TYPE,ID) (void)typeDB.insert( typeid(TYPE), ID)
+            
+            Y_MPI_DB(int,MPI_INT);
+            Y_MPI_DB(float,MPI_FLOAT);
+            Y_MPI_DB(double,MPI_DOUBLE);
+            Y_MPI_DB(unsigned,MPI_UNSIGNED);
+            Y_MPI_DB(unsigned long,MPI_UNSIGNED_LONG);
+#endif
 		}
 		catch(...)
 		{
