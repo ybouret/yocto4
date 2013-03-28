@@ -54,7 +54,7 @@ namespace yocto
                 access.unlock();
             }
         }
-        std::cerr << "got a lock: start...flag=" << flag << std::endl;
+        MPI.Printf(stderr, "Got a lock: start...flag=%d\n",flag);
 
         //----------------------------------------------------------------------
         //-- I got the lock: set process parameter
@@ -71,7 +71,7 @@ namespace yocto
     
     void mpi_comm_thread:: process() throw()
     {
-        { scoped_lock guard(access); std::cerr << "In Thread@rank=" << MPI.CommWorldRank << std::endl; }
+        { scoped_lock guard(access); MPI.Printf(stderr, "In Thread\n"); }
         assert(false == ready );
         assert(false == onair );
         
@@ -81,7 +81,7 @@ namespace yocto
     CYCLE:
         access.lock();
         ready = true;
-        std::cerr << "** Thread@rank=" << MPI.CommWorldRank << " is ready" << std::endl;
+        MPI.Printf(stderr,"** Thread is ready\n");
         
         //----------------------------------------------------------------------
         // wait ON A LOCKED MUTEX
@@ -92,7 +92,7 @@ namespace yocto
         // Here, I am LOCKED
         //----------------------------------------------------------------------
         assert(false==ready);
-        std::cerr << "** Will run rank=" << MPI.CommWorldRank << " with todo=" << todo << std::endl;
+        MPI.Printf(stderr, "** Will run todo=%d\n", todo);
         
         //----------------------------------------------------------------------
         // 
@@ -100,8 +100,9 @@ namespace yocto
         access.unlock();
         
         if(todo>0)
+        {
             goto CYCLE;
-        
+        }
         // return
         
     }
