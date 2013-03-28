@@ -1,6 +1,8 @@
 #include "yocto/visit/interface.hpp"
 #include "yocto/exception.hpp"
 
+#include <cstdio>
+
 namespace yocto
 {
     
@@ -102,8 +104,7 @@ namespace yocto
         
         if( !VisItSetupEnvironment2(env) )
         {
-            if(env) free(env);
-            throw exception("VisItSetupEnvironment2(FAILURE)");
+            //if(env) free(env); throw exception("VisItSetupEnvironment2(FAILURE)");
         }
         
         if(env) free(env);
