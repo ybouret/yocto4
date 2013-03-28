@@ -7,37 +7,40 @@ namespace yocto
     
     mpi_comm_thread:: ~mpi_comm_thread() throw()
     {
-        thr.join();
+       
     }
     
     mpi_comm_thread:: mpi_comm_thread( const mpi &ref ) :
     MPI(ref),
-    access(MPI.access),
+    access("MPI::Sync"),
     ready(false),
-    onair(false),
+    enter(),
     thr( mpi_comm_thread::launch, this)
     {
-        //scoped_lock guard(access);
         
+    }
+    
+    void mpi_comm_thread:: stop() throw()
+    {
+        _start(0);
+        thr.join();
     }
     
     
     void  mpi_comm_thread:: launch(void *args) throw()
     {
         assert(args);
-        static_cast<mpi_comm_thread *>(args)->process();
+        static_cast<mpi_comm_thread *>(args)->callback();
     }
     
-    bool mpi_comm_thread:: is_ready() const throw()
+        
+    void mpi_comm_thread:: start(mpi::Requests *req) throw()
     {
-        while( ! access.try_lock() )
-            ;
-        const bool ans = ready;
-        access.unlock();
-        return ans;
+        assert(req!=NULL);
+        _start(req);
     }
     
-    void mpi_comm_thread:: start(int flag)
+    void mpi_comm_thread:: _start(mpi::Requests *req) throw()
     {
         
         //----------------------------------------------------------------------
@@ -54,12 +57,12 @@ namespace yocto
                 access.unlock();
             }
         }
-        MPI.Printf(stderr, "Got a lock: start...flag=%d\n",flag);
+        MPI.Printf(stderr, "Got a lock: start requests@%p\n", req);
 
         //----------------------------------------------------------------------
         //-- I got the lock: set process parameter
         //----------------------------------------------------------------------
-        todo = flag;
+        requests = req;
         
         //-- prepare the process to run
         enter.signal();
@@ -69,11 +72,10 @@ namespace yocto
         access.unlock();
     }
     
-    void mpi_comm_thread:: process() throw()
+    void mpi_comm_thread:: callback() throw()
     {
         { scoped_lock guard(access); MPI.Printf(stderr, "In Thread\n"); }
         assert(false == ready );
-        assert(false == onair );
         
         //----------------------------------------------------------------------
         // lock the access
@@ -92,15 +94,16 @@ namespace yocto
         // Here, I am LOCKED
         //----------------------------------------------------------------------
         assert(false==ready);
-        MPI.Printf(stderr, "** Will run todo=%d\n", todo);
+        MPI.Printf(stderr, "** Will run requests@%p\n", requests);
         
         //----------------------------------------------------------------------
-        // 
+        // Ready to unlock
         //----------------------------------------------------------------------
         access.unlock();
         
-        if(todo>0)
+        if(requests)
         {
+            MPI.Waitall( *requests );
             goto CYCLE;
         }
         // return

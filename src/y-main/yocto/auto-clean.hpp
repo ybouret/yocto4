@@ -15,11 +15,11 @@ namespace yocto
 		host_( host ),
 		method_( method ) { assert(method_!=NULL); }
 		
-		inline ~auto_clean() throw() { (host_.*method)(); }
+		inline ~auto_clean() throw() { (host_.*method_)(); }
 		
 	private:
 		T        &host_;
-		void (T::*method_)(void) throw() 
+		void (T::*method_)(void) throw(); 
 		YOCTO_DISABLE_COPY_AND_ASSIGN(auto_clean);
 	};
 	
