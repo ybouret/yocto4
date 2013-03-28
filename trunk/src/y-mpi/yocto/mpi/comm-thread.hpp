@@ -4,6 +4,7 @@
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/threading/condition.hpp"
 #include "yocto/threading/thread.hpp"
+#include "yocto/auto-clean.hpp"
 
 namespace yocto
 {
@@ -14,21 +15,25 @@ namespace yocto
         explicit mpi_comm_thread( const mpi &ref );
         virtual ~mpi_comm_thread() throw();
         
-        bool     is_ready() const throw();
-        void     start(int flag);
         
+        //!
+        /**
+         \warning requests must be created BEFORE mpi_comm_thread
+         */
+        void     start( mpi::Requests *req ) throw(); //!< !NULL
+        void     stop() throw();
         
     private:
         const mpi                &MPI;
-        threading::mutex         &access; //!< MPI.access
+        threading::mutex          access; //!< MPI.access
         bool                      ready;  //!< internal ready flag
-        bool                      onair;  //!< internal I/O flag
-        threading::condition      enter;  //!< enter condition 
+        threading::condition      enter;  //!< enter condition
+        mpi::Requests            *requests;
         threading::thread         thr;
-        int                       todo;
         
         static void       launch(void*) throw();
-        void              process() throw();
+        void              callback() throw();
+        void _start( mpi::Requests *req) throw(); //!< NULL => stop
     };
     
     
