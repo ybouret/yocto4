@@ -15,7 +15,7 @@ namespace yocto
         virtual ~mpi_comm_thread() throw();
         
         bool     is_ready() const throw();
-        void     start();
+        void     start(int flag);
         
         
     private:
@@ -25,6 +25,7 @@ namespace yocto
         bool                      onair;  //!< internal I/O flag
         threading::condition      enter;  //!< enter condition 
         threading::thread         thr;
+        int                       todo;
         
         static void       launch(void*) throw();
         void              process() throw();

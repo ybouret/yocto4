@@ -13,7 +13,8 @@ YOCTO_UNIT_TEST_IMPL(comm)
 
     mpi_comm_thread comm(MPI);
     
-    comm.start();
+    comm.start(1);
+    comm.start(0);
     
     MPI.Barrier(MPI_COMM_WORLD);
 

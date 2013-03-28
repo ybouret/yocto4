@@ -37,7 +37,7 @@ namespace yocto
         return ans;
     }
     
-    void mpi_comm_thread:: start()
+    void mpi_comm_thread:: start(int flag)
     {
         
         //----------------------------------------------------------------------
@@ -54,18 +54,18 @@ namespace yocto
                 access.unlock();
             }
         }
-        std::cerr << "Start..." << std::endl;
+        std::cerr << "got a lock: start...flag=" << flag << std::endl;
 
         //----------------------------------------------------------------------
         //-- I got the lock: set process parameter
         //----------------------------------------------------------------------
-        
+        todo = flag;
         
         //-- prepare the process to run
         enter.signal();
         
         //-- release the mutex -> start the process
-        
+        ready = false;
         access.unlock();
     }
     
@@ -78,25 +78,32 @@ namespace yocto
         //----------------------------------------------------------------------
         // lock the access
         //----------------------------------------------------------------------
+    CYCLE:
         access.lock();
         ready = true;
         std::cerr << "** Thread@rank=" << MPI.CommWorldRank << " is ready" << std::endl;
         
         //----------------------------------------------------------------------
-        // wait/unlock
+        // wait ON A LOCKED MUTEX
         //----------------------------------------------------------------------
         enter.wait( access );
         
         //----------------------------------------------------------------------
-        // now I have the locked access
+        // Here, I am LOCKED
         //----------------------------------------------------------------------
-        ready = false;
-        
+        assert(false==ready);
+        std::cerr << "** Will run rank=" << MPI.CommWorldRank << " with todo=" << todo << std::endl;
         
         //----------------------------------------------------------------------
-        // DEBUG
+        // 
         //----------------------------------------------------------------------
         access.unlock();
+        
+        if(todo>0)
+            goto CYCLE;
+        
+        // return
+        
     }
     
 }
