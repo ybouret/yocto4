@@ -2,6 +2,7 @@
 #include "yocto/exception.hpp"
 
 #include <cstdio>
+#include <cstdlib>
 
 namespace yocto
 {
