@@ -1,4 +1,5 @@
 #include "yocto/mpi/async.hpp"
+#include <cstring>
 
 namespace yocto
 {
