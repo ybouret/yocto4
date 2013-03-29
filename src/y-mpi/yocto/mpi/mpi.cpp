@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cstdarg>
 
-namespace yocto 
+namespace yocto
 {
 	
 	
@@ -23,7 +23,7 @@ namespace yocto
 		
 	}
 	
-	mpi:: exception:: exception( const mpi::exception &e ) throw() : 
+	mpi:: exception:: exception( const mpi::exception &e ) throw() :
 	yocto::exception(e),
 	code( e.code ),
 	string_()
@@ -67,6 +67,22 @@ namespace yocto
 		(void) MPI_Finalize();
 	}
 	
+    const char *mpi:: ThreadLevelName() const throw()
+    {
+        switch( ThreadLevel )
+        {
+            case MPI_THREAD_SINGLE:        return "MPI_THREAD_SINGLE";
+            case MPI_THREAD_FUNNELED:      return "MPI_THREAD_FUNNELED";
+            case MPI_THREAD_SERIALIZED:    return "MPI_THREAD_SERIALIZED";
+            case MPI_THREAD_MULTIPLE:      return "MPI_THREAD_MULTIPLE";
+            default:
+                break;
+        }
+        return "UNKNOWN";
+        
+    }
+    
+    
 	mpi:: mpi() :
 	CommWorldSize(0),
 	CommWorldRank(0),
@@ -76,7 +92,8 @@ namespace yocto
     IsParallel(false),
     CommTime(0),
 	ProcessorNameLength(0),
-	ProcessorName() //, typeDB(16,as_capacity)
+	ProcessorName(),
+    ThreadLevel(0)
 	{
 		if( NULL == mpi_argc_ || NULL == mpi_argv_ )
 		{
@@ -91,7 +108,7 @@ namespace yocto
             //==================================================================
             // MPI basic setup
             //==================================================================
-			int err = MPI_Init( mpi_argc_, mpi_argv_ );
+			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , MPI_THREAD_MULTIPLE, (int*)&ThreadLevel);
 			if( err != MPI_SUCCESS )
 			{
 				throw mpi::exception( err, "MPI_Init()");
@@ -104,7 +121,7 @@ namespace yocto
 			}
 			
 			(int  &) CommWorldLast = CommWorldSize - 1;
-			(bool &) IsParallel    = CommWorldSize > 1; 
+			(bool &) IsParallel    = CommWorldSize > 1;
             
 			err = MPI_Comm_rank( MPI_COMM_WORLD, (int *) & CommWorldRank );
 			if( err != MPI_SUCCESS )
@@ -182,7 +199,7 @@ namespace yocto
 		return CommWorldRank > 0 ? CommWorldRank-1 : CommWorldLast;
 	}
 	
-	const char mpi::name[] = "MPI";	
+	const char mpi::name[] = "MPI";
     
     int mpi:: Comm_rank( MPI_Comm comm ) const
     {
@@ -192,7 +209,7 @@ namespace yocto
 			throw mpi::exception( err, "MPI_Comm_rank");
         return r;
     }
-
+    
     double mpi::Wtime() const throw()
     {
         return MPI_Wtime();
@@ -204,5 +221,5 @@ namespace yocto
         while( Wtime() - stamp < nsec )
             ;
     }
-
+    
 }
