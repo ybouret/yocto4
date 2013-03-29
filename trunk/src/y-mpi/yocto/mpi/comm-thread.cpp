@@ -7,7 +7,7 @@ namespace yocto
     
     mpi_comm_thread:: ~mpi_comm_thread() throw()
     {
-       
+        //stop();
     }
     
     mpi_comm_thread:: mpi_comm_thread( const mpi &ref ) :
@@ -15,7 +15,7 @@ namespace yocto
     access("MPI::Sync"),
     ready(false),
     enter(),
-    thr( mpi_comm_thread::launch, this)
+    thr( mpi_comm_thread::call, this)
     {
         
     }
@@ -27,10 +27,10 @@ namespace yocto
     }
     
     
-    void  mpi_comm_thread:: launch(void *args) throw()
+    void  mpi_comm_thread:: call(void *args) throw()
     {
         assert(args);
-        static_cast<mpi_comm_thread *>(args)->callback();
+        static_cast<mpi_comm_thread *>(args)->loop();
     }
     
         
@@ -72,7 +72,7 @@ namespace yocto
         access.unlock();
     }
     
-    void mpi_comm_thread:: callback() throw()
+    void mpi_comm_thread:: loop() throw()
     {
         { scoped_lock guard(access); MPI.Printf(stderr, "In Thread\n"); }
         assert(false == ready );

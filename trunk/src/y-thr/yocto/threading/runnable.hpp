@@ -5,6 +5,7 @@
 
 #include "yocto/threading/thread.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/type-traits.hpp"
 
 namespace yocto {
 	
@@ -16,7 +17,7 @@ namespace yocto {
         {
         public:
             virtual ~runnable() throw(); //!< join() MUST be called if start() was called
-            void    start();             //!< class the run() command in one new thread
+            void    start();             //!< call the run() command in one new thread
             void    join() throw();      //!< wait for run()  to complete
             
             
@@ -31,6 +32,29 @@ namespace yocto {
             static void execute( void * ) throw();
             void        cleanup() throw();
         };
+        
+        template <
+        typename HOST,
+        typename T
+        >
+        class method_run : public runnable
+        {
+        public:
+            
+            explicit method_run( const HOST &host ) throw() :
+            host_( host )
+            {
+            }
+            
+            virtual ~method_run() throw()
+            {
+            }
+            
+        private:
+            HOST & host_;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(method_run);
+        };
+        
 	}
 	
 }
