@@ -25,7 +25,6 @@ namespace yocto {
 		
 		runnable:: ~runnable() throw()
 		{
-			//wait();
 			assert( thread_ == NULL );
 		}
 		

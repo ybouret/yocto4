@@ -1,0 +1,144 @@
+#include "yocto/mpi/async.hpp"
+
+namespace yocto
+{
+    
+    void mpi_async:: clear() throw()
+    {
+        memset( wksp, 0, sizeof(wksp) );
+        thr = 0;
+    }
+    
+    mpi_async:: ~mpi_async() throw()
+    {
+        stop();
+    }
+    
+    
+    void mpi_async:: lock_on_ready() throw()
+    {
+        for(;;)
+        {
+            if( access.try_lock() )
+            {
+                if(ready)
+                    break;
+                access.unlock();
+            }
+        }
+    }
+    
+    void mpi_async:: load_requests(mpi::Requests *req) throw()
+    {
+        ready    = false;
+        requests = req;
+    }
+    
+    void mpi_async:: launch( mpi::Requests &req )
+    {
+        
+        lock_on_ready();     assert(thr);        
+        load_requests(&req);
+        resume_thread();
+        
+    }
+    
+    void mpi_async:: resume_thread() throw()
+    {
+        enter.signal();
+        access.unlock();
+    }
+    
+    
+    void mpi_async:: stop() throw()
+    {
+        
+        lock_on_ready();   assert(thr);
+        load_requests(0);
+        resume_thread();
+        
+        //----------------------------------------------------------------------
+        // final cleanup
+        //----------------------------------------------------------------------
+        thr->join();
+        destruct(thr);
+        clear();
+        
+    }
+    
+    void mpi_async:: finish() throw()
+    {
+        lock_on_ready();
+        access.unlock();
+    }
+    
+    mpi_async:: mpi_async( const mpi & ref ) :
+    MPI( ref ),
+    ready(false),
+    requests(0),
+    access( "MPI::Async" ),
+    enter(),
+    thr(0),
+    wksp()
+    {
+        clear();
+        thr = new( &wksp[0] ) threading::thread( mpi_async::call, this );
+    }
+    
+    void mpi_async:: call( void *args ) throw()
+    {
+        assert(args);
+        static_cast<mpi_async *>(args)->loop();
+    }
+    
+    void mpi_async:: loop() throw()
+    {
+        assert( ready == false   );
+        assert( 0     == requests);
+        
+        try
+        {
+            
+            //{ YOCTO_LOCK(access); MPI.Printf(stderr,"[Thread] Loop\n"); }
+            
+        CYCLE:
+            //----------------------------------------------------------------------
+            // acquire a lock
+            //----------------------------------------------------------------------
+            access.lock();
+            
+            //----------------------------------------------------------------------
+            // allow main thread to process
+            //----------------------------------------------------------------------
+            ready = true;
+            //MPI.Printf(stderr, "[Thread] Ready\n");
+            //----------------------------------------------------------------------
+            // Wait => unlock access
+            //----------------------------------------------------------------------
+            enter.wait(access);
+            
+            //----------------------------------------------------------------------
+            // return on a locked mutex
+            //----------------------------------------------------------------------
+            assert(false==ready);
+            //MPI.Printf( stderr, "[Thread] Run\n");
+            access.unlock();
+            
+            if( requests )
+            {
+                MPI.Waitall( *requests );
+                goto CYCLE;
+            }
+            //----------------------------------------------------------------------
+            // at this point: Final
+            //----------------------------------------------------------------------
+            //{ YOCTO_LOCK(access); MPI.Printf(stderr,"[Thread] Done\n"); }
+            
+        }
+        catch(...)
+        {
+            fprintf( stderr, "Something Went Wrong...\n");
+        }
+    }
+    
+}

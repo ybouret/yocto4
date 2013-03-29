@@ -21,7 +21,7 @@ namespace yocto
     
     void mpi:: Printf( FILE *fp, const char *fmt, ... ) const
 	{
-		
+		YOCTO_LOCK(access);
 		static const int tag = 1000;
 		
 		assert(fmt!=NULL);

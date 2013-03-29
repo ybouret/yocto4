@@ -31,8 +31,9 @@ namespace yocto
         mpi::Requests            *requests;
         threading::thread         thr;
         
-        static void       launch(void*) throw();
-        void              callback() throw();
+        static void       call(void*) throw();
+        void              loop() throw();
+        
         void _start( mpi::Requests *req) throw(); //!< NULL => stop
     };
     
