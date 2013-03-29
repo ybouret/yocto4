@@ -19,13 +19,13 @@ YOCTO_UNIT_TEST_IMPL(async)
     mpi::Requests   requests( 2 );
     mpi_async       comm(MPI);
     
-    const size_t block_size = 1024;
+    const size_t block_size = 16;
     memory::buffer_of<uint8_t, memory::global> send_next( block_size );
     memory::buffer_of<uint8_t, memory::global> recv_prev( block_size );
     
-    for( unsigned iter=1; iter <= 10; ++iter)
+    for( unsigned iter=1; iter <= 1024; ++iter)
     {
-        MPI.Printf(stderr, "** Iter= %u\n", iter);
+        //MPI.Printf(stderr, "** Iter= %u\n", iter);
         size_t ir = 0;
         MPI.Isend( send_next.ro(), block_size, MPI_BYTE, MPI.CommWorldNext(), 0, MPI_COMM_WORLD, requests[ir++]);
         MPI.Irecv( recv_prev.rw(), block_size, MPI_BYTE, MPI.CommWorldPrev(), 0, MPI_COMM_WORLD, requests[ir++]);
