@@ -2,7 +2,7 @@
 #define YOCTO_MPI_ASYNC_INCLUDED 1
 
 #include "yocto/mpi/mpi.hpp"
-#include "yocto/threading/condition.hpp"
+#include "yocto/threading/barrier.hpp"
 #include "yocto/threading/thread.hpp"
 #include "yocto/code/round.hpp"
 
@@ -25,6 +25,7 @@ namespace yocto
         mpi::Requests         *requests;
         threading::mutex       access;
         threading::condition   enter;
+        threading::barrier     leave;
         threading::thread     *thr;
         uint64_t               wksp[YOCTO_U64_FOR_ITEM(threading::thread)];
         

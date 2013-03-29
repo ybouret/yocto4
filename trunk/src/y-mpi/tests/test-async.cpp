@@ -7,7 +7,7 @@
 
 using namespace yocto;
 
-YOCTO_UNIT_TEST_IMPL(comm)
+YOCTO_UNIT_TEST_IMPL(async)
 {
 	
 	_rand.wseed();
@@ -32,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(comm)
         
         //MPI.Waitall(requests);
         comm.launch(requests);
-        MPI.Printf(stderr,"\twaiting...\n");
+        //MPI.Printf(stderr,"\twaiting...\n");
         comm.finish();
         
     }

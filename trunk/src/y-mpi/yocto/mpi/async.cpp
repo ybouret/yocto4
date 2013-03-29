@@ -68,16 +68,17 @@ namespace yocto
     
     void mpi_async:: finish() throw()
     {
-        lock_on_ready();
-        access.unlock();
+        leave.wait();
+        
     }
     
     mpi_async:: mpi_async( const mpi & ref ) :
     MPI( ref ),
     ready(false),
     requests(0),
-    access( "MPI::Async" ),
+    access( "MPI.Async" ),
     enter(),
+    leave(2,"MPI.Async.Barrier"),
     thr(0),
     wksp()
     {
@@ -99,7 +100,7 @@ namespace yocto
         try
         {
             
-            //{ YOCTO_LOCK(access); MPI.Printf(stderr,"[Thread] Loop\n"); }
+            { YOCTO_LOCK(access); MPI.Printf(stderr,"[Thread] Loop\n"); }
             
         CYCLE:
             //----------------------------------------------------------------------
@@ -127,12 +128,13 @@ namespace yocto
             if( requests )
             {
                 MPI.Waitall( *requests );
+                leave.wait();
                 goto CYCLE;
             }
             //----------------------------------------------------------------------
             // at this point: Final
             //----------------------------------------------------------------------
-            //{ YOCTO_LOCK(access); MPI.Printf(stderr,"[Thread] Done\n"); }
+            { YOCTO_LOCK(access); MPI.Printf(stderr,"[Thread] Done\n"); }
             
         }
         catch(...)
