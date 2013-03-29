@@ -85,7 +85,9 @@ namespace yocto
         mutable uint64_t CommTime;         //!< cumulative communication time in microseconds
 		const int        ProcessorNameLength;
 		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME]; //!< from MPI_Get_Processor_name(...)
-		
+		const int        ThreadLevel;
+        
+        const char *ThreadLevelName() const throw();
         int Comm_rank( MPI_Comm comm ) const;
         
         
