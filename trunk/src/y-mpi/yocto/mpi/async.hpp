@@ -28,7 +28,8 @@ namespace yocto
         threading::barrier     leave;
         threading::thread     *thr;
         uint64_t               wksp[YOCTO_U64_FOR_ITEM(threading::thread)];
-        
+        YOCTO_DISABLE_COPY_AND_ASSIGN(mpi_async);
+
         void clear() throw();
         
         static void call(void *) throw();
