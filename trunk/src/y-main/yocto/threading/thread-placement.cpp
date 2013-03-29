@@ -41,7 +41,7 @@ namespace yocto
 			}
 		}
 
-		void thread:: for_each( thread::handle_t h, void (*proc)(size_t,void*), void *args)
+		void thread:: foreach_cpu( thread::handle_t h, void (*proc)(size_t,void*), void *args)
 		{
 			assert(proc!=0);
 			DWORD_PTR   cpu_set = 0;
@@ -90,7 +90,7 @@ namespace yocto
 				throw libc::exception( err, "pthread_setaffinity_np" );
 		}
 
-		void thread:: for_each( thread::handle_t h, void (*proc)(size_t,void*), void *args)
+		void thread:: foreach_cpu( thread::handle_t h, void (*proc)(size_t,void*), void *args)
 		{
 			assert(proc!=0);
 			YOCTO_CPU_SET  cpu_set;
@@ -119,7 +119,7 @@ namespace yocto
 
 		}
 
-		void thread:: for_each( thread::handle_t, void (*proc)(size_t,void*), void *)
+		void thread:: foreach_cpu( thread::handle_t, void (*proc)(size_t,void*), void *)
 		{
 			assert(proc);
 		}

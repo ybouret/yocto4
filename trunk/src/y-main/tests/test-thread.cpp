@@ -62,10 +62,10 @@ YOCTO_UNIT_TEST_IMPL(place)
 	if( argc > 1 ) cpu_id = atoi(argv[1]);
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
 	std::cerr << "Before Placement: " << std::endl;
-	thread::for_each( thread::get_current_handle(), cpu_proc, 0 );
+	thread::foreach_cpu( thread::get_current_handle(), cpu_proc, 0 );
 	thread::assign_cpu( thread::get_current_handle(), cpu_id);
 	std::cerr << "After Placement:  " << std::endl;
-	thread::for_each( thread::get_current_handle(), cpu_proc, 0 );
+	thread::foreach_cpu( thread::get_current_handle(), cpu_proc, 0 );
 
 #if 0
 	std::cerr << "Press Enter after check!" << std::endl;
