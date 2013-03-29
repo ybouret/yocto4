@@ -406,7 +406,7 @@ YOCTO_UNIT_TEST_IMPL(s3d)
     
     {
         string cpu_list = "\t#CPU: ";
-        threading::thread::for_each( threading::thread::get_current_handle(), display_cpu, &cpu_list );
+        threading::thread::foreach_cpu( threading::thread::get_current_handle(), display_cpu, &cpu_list );
         
         MPI.Printf(stderr, "%s\n", cpu_list.c_str());
     }
