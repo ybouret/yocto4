@@ -72,6 +72,7 @@ namespace yocto
 			}
         }
         
+        //! find all positions matching one value
         template <typename T>
         inline void linear_find( T y, sequence<T> &x, const array<T> &X, const array<T> &Y, const size_t nmax = 0 )
         {
