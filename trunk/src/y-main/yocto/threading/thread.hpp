@@ -60,7 +60,6 @@ namespace yocto
            
 		};
      
-       
     }
     
     
@@ -77,7 +76,7 @@ namespace yocto
         template <typename FUNC>
         void launch( FUNC &fn )
         {
-            launch( thread_proxy::execute<FUNC>, &fn );
+            launch( thread_proxy::execute<FUNC>, (void *)&fn );
         }
         
     private:
@@ -88,7 +87,13 @@ namespace yocto
         void   execute( void *args ) throw()
         {
             assert(args);
-            FUNC &fn = *static_cast<FUNC *>(args);
+            union
+            {
+                void *args;
+                FUNC *func;
+            } alias = { args };
+            assert(alias.func);
+            FUNC &fn = * alias.func;
             fn();
         }
     };
