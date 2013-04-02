@@ -49,7 +49,7 @@ ost = st
 		
 		
 		static
-		real_t recursive_intg(  const real_t a, const real_t b, numeric<real_t>::function &F, const real_t ftol ) 
+		real_t recursive_intg(  const real_t a, const real_t b, numeric<real_t>::function &F, const real_t ftol )
 		{
 			
 			const real_t w = b-a;
@@ -93,6 +93,55 @@ ost = st
 		{
 			return recursive_intg(a,b,F,ftol);
 		}
+        
+        namespace
+        {
+            class intg2proxy
+            {
+            public:
+                inline intg2proxy(intg<real_t>::boundaries     &user_getYs,
+                                  numeric<real_t>::function2   &user_func2,
+                                  real_t                        user_ftol) :
+                getYs(user_getYs),
+                func2(user_func2),
+                ftol( user_ftol )
+                {
+                    
+                }
+                
+                intg<real_t>::boundaries    &getYs;
+                numeric<real_t>::function2  &func2;
+                const real_t                 ftol;
+                
+                inline real_t slice( real_t x )
+                {
+                    real_t ylo=0,yhi=0;
+                    getYs(x,ylo,yhi);
+                    numeric<real_t>::function F = bind_first(func2, x);
+                    return integrate(ylo, yhi, F, ftol);
+                }
+                
+                inline ~intg2proxy() throw() {}
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(intg2proxy);
+            };
+        }
+        
+        template <>
+		real_t integrate(real_t                        xmin,
+                         real_t                        xmax,
+                         intg<real_t>::boundaries     &getYs,
+                         numeric<real_t>::function2   &func2,
+                         real_t                        ftol
+                         )
+        {
+            intg2proxy                intg2( getYs, func2, ftol);
+            numeric<real_t>::function intg1( &intg2, & intg2proxy::slice);
+            
+            return integrate<real_t>(xmin, xmax, intg1, ftol);
+        }
+        
 		
 	} // math
 } //yocto

@@ -1,6 +1,6 @@
 /** \file  integrate.hpp
-	\brief Integration of Functions.
-*/
+ \brief Integration of Functions.
+ */
 
 #ifndef YOCTO_INTEGRATE_INCLUDED
 #define YOCTO_INTEGRATE_INCLUDED 1
@@ -10,36 +10,29 @@
 
 
 namespace yocto {
-
+    
 	namespace math {
-
-
+        
+        template <typename T>
+        struct intg
+        {
+            typedef functor<void,TL3(T,T&,T&)> boundaries;
+        };
+        
 		//! recursive Simpson's integration.
         template <typename T>
         T integrate( T a, T b, typename  numeric<T>::function &F, T ftol );
         
-
-		#if 0
-		template <class T>
-		T integrate( const T xmin,
-		             const T xmax,
-		             void                         (*proc_y)( T, T &ylo, T &yhi, void *),
-		             void                          *data_y,
-		             typename numerical<T>::proc2_t func_xy,
-		             void                          *args_xy,
-		             const T                        ftol);
-
-		template <class T>
-		T integrate( const T xmin,
-		             const T xmax,
-		             void                            (*proc_y)( T, T &ylo, T &yhi, void *),
-		             void                             *data_y,
-		             typename numerical<T>::CFunction2 func_xy,
-		             const T                           ftol);
-		#endif
-
-	}
-
+        template <class T>
+		T integrate(T                               xmin,
+                    T                               xmax,
+                    typename intg<T>::boundaries   &getYs,
+                    typename numeric<T>::function2 &func2,
+                    T                               ftol
+                    );
+        
+    }
+    
 }
 
 #endif

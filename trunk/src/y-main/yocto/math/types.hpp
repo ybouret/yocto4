@@ -59,9 +59,13 @@ namespace yocto
 			static const T      huge; //!< 10^{max_10_exp}
 			
 			typedef functor<T,TL1(T)>                            function;
+            typedef functor<T,TL2(T,T)>                          function2;
+
 			typedef functor<T,TL1(const array<T>&)>              scalar_field;
 			typedef functor<void,TL2(array<T>&,const array<T>&)> vector_field;
-            
+            typedef T                                           (*CFunction)(T);
+            typedef T                                           (*CFunction2)(T,T);
+
             static const T zero;
             static const T one;
             static const T two;

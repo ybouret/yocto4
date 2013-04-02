@@ -8,7 +8,6 @@ namespace yocto {
 
 	namespace math {
 
-
 		template <class T>
 		class spline : public object
 		{
@@ -43,8 +42,6 @@ namespace yocto {
 				const T      yhi_;
 				vector<T>    w_;
 		};
-
-		//YOCTO_DMC_MATH(class spline)
 
 	}
 
