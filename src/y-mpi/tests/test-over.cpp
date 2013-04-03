@@ -153,7 +153,7 @@ namespace {
             ++t_count;
         }
         t_end  = t_sum/t_count;
-        MPI.Printf0( stderr, "waited for %g/%g => %g\n", t_end,t_one, t_end/t_one);
+        MPI.Printf0( stderr, "waited for %.15g/%.15g => ratio= %.15g\n", t_end,t_one, t_end/t_one);
     }
     
 }
