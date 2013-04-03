@@ -130,7 +130,7 @@ namespace {
         const double nsec  = 0.2;
         t_sum = 0;
         size_t t_count = 0;
-        for( size_t i=0; i <4; ++i )
+        for( size_t i=0; i <16; ++i )
         {
             MPI_Request req[4];
             MPI_Status  sta[4];
@@ -153,7 +153,7 @@ namespace {
             ++t_count;
         }
         t_end  = t_sum/t_count;
-        MPI.Printf0( stderr, "waited for %.15g/%.15g => ratio= %.15g\n", t_end,t_one, t_end/t_one);
+        MPI.Printf0( stderr, "waited for %.6g/%.6g => ratio= %.6g\n", t_end,t_one, t_end/t_one);
     }
     
 }
