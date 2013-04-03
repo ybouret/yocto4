@@ -137,21 +137,10 @@ namespace yocto
 			if( err != MPI_SUCCESS )
 			{
 				clear_pname();
+                // TODO: throw an exception ?
 			}
             
-			//==================================================================
-            // data type DB
-            //==================================================================
-#if 0
-#define Y_MPI_DB(TYPE,ID) (void)typeDB.insert( typeid(TYPE), ID)
-            
-            Y_MPI_DB(int,MPI_INT);
-            Y_MPI_DB(float,MPI_FLOAT);
-            Y_MPI_DB(double,MPI_DOUBLE);
-            Y_MPI_DB(unsigned,MPI_UNSIGNED);
-            Y_MPI_DB(unsigned long,MPI_UNSIGNED_LONG);
-#endif
-		}
+        }
 		catch(...)
 		{
 			mpi_reset_();
