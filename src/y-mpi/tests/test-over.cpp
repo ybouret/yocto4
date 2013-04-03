@@ -3,6 +3,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/threading/thread.hpp"
 
 using namespace yocto;
 
@@ -16,6 +17,21 @@ namespace {
     {
         double bw;
         double tmx;
+    };
+    
+    struct mpi_async_t
+    {
+        const mpi     *MPI;
+        size_t         count;
+        MPI_Request  *requests;
+        MPI_Status   *status;
+        void operator()(void)
+        {
+            assert(requests);
+            assert(MPI);
+            MPI->Waitall(count, requests, status);
+            
+        }
     };
     
     static void perform_over(const mpi &MPI,
@@ -95,6 +111,7 @@ namespace {
             MPI.Irecv( recv_prev.rw(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, req[ir++]);
             
             
+            
             MPI.Waitall(ir, req, sta);
         }
         t_end = MPI.Wtime() - t_ini;
@@ -110,8 +127,10 @@ namespace {
         
         MPI.Printf0(stderr, "\t\t[[Testing Overlap]]\n");
         const double t_one = max_of( perf_sync.tmx, perf_async.tmx) / NUM_ITER;
-        const double nsec  = 1;
-        for( size_t i=0; i <1; ++i )
+        const double nsec  = 0.2;
+        t_sum = 0;
+        size_t t_count = 0;
+        for( size_t i=0; i <4; ++i )
         {
             MPI_Request req[4];
             MPI_Status  sta[4];
@@ -120,15 +139,21 @@ namespace {
             MPI.Irecv( recv_prev.rw(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, req[ir++]);
             MPI.Isend( send_next.ro(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, req[ir++]);
             MPI.Isend( send_prev.ro(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, req[ir++]);
-
-        
+            
+            mpi_async_t  Async = { &MPI, 4, req, sta };
+            thread_proxy thr;
+            thr.launch(Async);
+            
             MPI.WaitFor(nsec);
             
             t_ini = MPI.Wtime();
-            MPI.Waitall(ir, req, sta);
+            thr.finish();
             t_end = MPI.Wtime() - t_ini;
+            t_sum += t_end;
+            ++t_count;
         }
-        MPI.Printf0( stderr, "waited for %g/%g\n", t_end,t_one);
+        t_end  = t_sum/t_count;
+        MPI.Printf0( stderr, "waited for %g/%g => %g\n", t_end,t_one, t_end/t_one);
     }
     
 }
