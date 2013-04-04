@@ -3,7 +3,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/threading/thread.hpp"
+#include "yocto/threading/proxy.hpp"
 
 using namespace yocto;
 
@@ -120,7 +120,6 @@ namespace {
         perf_async.tmx = t_sum/size;
         perf_async.bw  = rank == 0 ? (GbitsFactor*b_sum)/(perf_async.tmx) : 0;
         MPI.Printf0(stderr, "<Gbits/s> = %.3f\n", perf_async.bw);
-        //MPI.Printf0(stderr, "t_async=%g / %g\n", perf_async.tmx, perf_sync.tmx);
         const double t_err       = rank == 0 ? 100.0 * (perf_async.bw-perf_sync.bw)/perf_sync.bw : 0;
         MPI.Printf0(stderr, "difference: %7.2f%%\n", t_err);
         
@@ -141,7 +140,7 @@ namespace {
             MPI.Isend( send_prev.ro(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, req[ir++]);
             
             mpi_async_t  Async = { &MPI, 4, req, sta };
-            thread_proxy thr;
+            threading::proxy thr;
             thr.launch(Async);
             
             MPI.WaitFor(nsec);

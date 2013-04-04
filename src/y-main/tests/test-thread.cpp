@@ -1,4 +1,4 @@
-#include "yocto/threading/thread.hpp"
+#include "yocto/threading/proxy.hpp"
 #include "yocto/wtime.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
@@ -113,14 +113,22 @@ namespace {
         {
             std::cerr << "run compute()" << std::endl;
         }
+        
     };
+    
+    void do_display( int a )
+    {
+        std::cerr << "display: " << a << std::endl;
+    }
+    
+    
 }
 
 #include "yocto/functor.hpp"
 
 YOCTO_UNIT_TEST_IMPL(thr_proxy)
 {
-    thread_proxy thr;
+    threading::proxy thr;
     thr.launch( do_something );
     thr.finish();
     
@@ -131,7 +139,10 @@ YOCTO_UNIT_TEST_IMPL(thr_proxy)
     functor<void,null_type> fn( &run , & run_something::compute );
     thr.launch(fn);
     thr.finish();
-        
+    
+    int a = 7;
+    thr.launch(do_display, a);
+    thr.finish();
 }
 YOCTO_UNIT_TEST_DONE()
 

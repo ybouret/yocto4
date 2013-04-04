@@ -2,16 +2,11 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/error.hpp"
 
-#include <cstring>
-#include <new>
-
 namespace yocto 
 {
 	namespace  threading 
 	{
-		
-		
-		
+				
 #if defined(YOCTO_WIN)
 		DWORD WINAPI thread::launch( LPVOID args ) throw()
 		{
@@ -140,39 +135,5 @@ namespace yocto
         
 	}
     
-    void thread_proxy:: clear() throw()
-    {
-        memset( block, 0, sizeof(block) );
-    }
-    
-    thread_proxy:: thread_proxy() throw() :
-    block()
-    {
-        clear();
-    }
-    
-    thread_proxy:: ~thread_proxy() throw()
-    {
-        clear();
-    }
-    
-    void thread_proxy:: launch( threading::thread::proc_t proc, void *data )
-    {
-        try
-        {
-            new ( &block[0] ) threading::thread(proc,data);
-        }
-        catch(...)
-        {
-            clear();
-            throw;
-        }
-    }
-    
-    void thread_proxy:: finish() throw()
-    {
-        static_cast<threading::thread *>( (void*)&block[0] )->join();
-        clear();
-    }
-
+   
 }
