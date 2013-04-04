@@ -19,20 +19,11 @@ namespace {
         double tmx;
     };
     
-    struct mpi_async_t
+    void mpi_wait_all( mpi::Requests &requests )
     {
-        const mpi     *MPI;
-        size_t         count;
-        MPI_Request  *requests;
-        MPI_Status   *status;
-        void operator()(void)
-        {
-            assert(requests);
-            assert(MPI);
-            MPI->Waitall(count, requests, status);
-            
-        }
-    };
+        static const mpi &MPI = *mpi::location();
+        MPI.Waitall(requests);
+    }
     
     static void perform_over(const mpi &MPI,
                              size_t     block_size,
@@ -129,19 +120,19 @@ namespace {
         const double nsec  = 0.2;
         t_sum = 0;
         size_t t_count = 0;
+        threading::proxy thr;
+
+        mpi::Requests requests(4);
+        
         for( size_t i=0; i <16; ++i )
         {
-            MPI_Request req[4];
-            MPI_Status  sta[4];
             size_t      ir = 0;
-            MPI.Irecv( recv_next.rw(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, req[ir++]);
-            MPI.Irecv( recv_prev.rw(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, req[ir++]);
-            MPI.Isend( send_next.ro(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, req[ir++]);
-            MPI.Isend( send_prev.ro(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, req[ir++]);
+            MPI.Irecv( recv_next.rw(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, requests[ir++]);
+            MPI.Irecv( recv_prev.rw(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, requests[ir++]);
+            MPI.Isend( send_next.ro(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, requests[ir++]);
+            MPI.Isend( send_prev.ro(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, requests[ir++]);
             
-            mpi_async_t  Async = { &MPI, 4, req, sta };
-            threading::proxy thr;
-            thr.launch(Async);
+            thr.launch(mpi_wait_all,requests);
             
             MPI.WaitFor(nsec);
             
