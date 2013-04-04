@@ -63,41 +63,7 @@ namespace yocto
     }
     
     
-    //! for cheap threading
-    class thread_proxy
-    {
-    public:
-        explicit thread_proxy() throw();
-        virtual ~thread_proxy() throw();
-        
-        void launch( threading::thread::proc_t proc, void *data );
-        void finish() throw();
-        
-        template <typename FUNC>
-        void launch( FUNC &fn )
-        {
-            launch( thread_proxy::execute<FUNC>, (void *)&fn );
-        }
-        
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(thread_proxy);
-        uint64_t block[ YOCTO_U64_FOR_ITEM(threading::thread) ];
-        void clear() throw();
-        template <typename FUNC> static inline
-        void   execute( void *args ) throw()
-        {
-            assert(args);
-            union
-            {
-                void *args;
-                FUNC *func;
-            } alias = { args };
-            assert(alias.func);
-            FUNC &fn = * alias.func;
-            fn();
-        }
-    };
-	
+   	
 }
 
 #endif
