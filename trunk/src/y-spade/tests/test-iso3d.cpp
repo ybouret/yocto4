@@ -16,17 +16,42 @@ namespace
     class lproc
     {
     public:
-        
+        vector< vector<triangle3D<double> > > vv;
+
         lproc()
         {
         }
         
         ~lproc() throw() {}
         
-        void process(  const triangle3D<double> &tr, const levels<double> &ls, size_t k)
+        void init( const levels<double> &ls )
         {
+            vv.free();
+            for( size_t i=1; i <= ls.size(); ++i )
+            {
+                const vector< triangle3D<double> > tmp;
+                vv.push_back(tmp);
+            }
             
         }
+        
+        void process(  const triangle3D<double> &tr, const levels<double> &ls, size_t k)
+        {
+            vector< triangle3D<double> > &v = vv[k];
+            v.push_back(tr);
+        }
+        
+        void save( const levels<double> &ls , vtk_writer &vtk) const
+        {
+            for( size_t i=1; i <= ls.size(); ++i )
+            {
+                const string  fn = vformat("l%g.vtk", ls[i] );
+                const vector< triangle3D<double> > &v = vv[i];
+                vtk.save(fn, "iso3d", v);
+            }
+            
+        }
+        
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(lproc);
@@ -98,7 +123,9 @@ YOCTO_UNIT_TEST_IMPL(iso3d)
     lproc           LP;
     ISO3D::callback cb( &LP, & lproc::process);
     
+    LP.init(ls);
     ISO3D::compute(A, X, Y, Z, W.as_layout(), ls, cb);
+    LP.save( ls, vtk );
     
 }
 YOCTO_UNIT_TEST_DONE()
