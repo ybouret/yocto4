@@ -130,8 +130,8 @@ namespace yocto
             assert( is_a_power_of_two(size) );
             assert( is_a_power_of_two(m)    );
 			
-			const bool overlap   = (PSD_Overlap   & options) != 0;
-            const size_t M = m << 1;
+			const bool   overlap   = (PSD_Overlap   & options) != 0;
+            const size_t M         = m << 1;
             if( M > size )
                 throw libc::exception(EDOM,"math::PowerSpectralDensity(2*m=%u>#data=%u)", unsigned(M), unsigned(size));
 			
@@ -195,7 +195,16 @@ namespace yocto
 			
             return M;
         }
-		
+        
+        template<>
+        size_t PSD<real_t>::Compute(Window              &w,
+                                    array<real_t>       &psd,
+                                    const array<real_t> &data,
+                                    const size_t         options)
+        {
+            
+            return PSD<real_t>::Compute(w, psd(), psd.size(), data(), data.size(), options);
+        }
 		
     }
 	

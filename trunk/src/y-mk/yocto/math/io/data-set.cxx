@@ -96,7 +96,7 @@ namespace yocto
 			{
 				for( colmap::iterator i = first_col; i != last_col; ++i )
 				{
-					std::cerr << "load colum " << i->key << std::endl;
+					std::cerr << "load column " << i->key << std::endl;
 				}
 			}
 			

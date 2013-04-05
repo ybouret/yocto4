@@ -4,7 +4,7 @@
 #include "yocto/math/complex.hpp"
 #include "yocto/math/types.hpp"
 
-namespace yocto 
+namespace yocto
 {
 	namespace math
 	{
@@ -64,22 +64,28 @@ namespace yocto
 			 If dt (in s ) is the real space data samping rate, then
 			 the p[j] is the spectral density at j / (M*dt) (in Hz).
 			 
-			 Accordingly, if you want to compute a spectrum 
+			 Accordingly, if you want to compute a spectrum
 			 with a resolution Freq_min and with frequency lower
 			 than Freq_max, you must extract a signal
 			 with delta_t <= 1/(2Freq_max) and
 			 m >= Freq_max/Freq_min.
 			 The total number of points must be >= 2*m, so that
-			 the data size must be = 2^N * (2*m) (N in [0..]) 
+			 the data size must be = 2^N * (2*m) (N in [0..])
 			 with the right sampling rate.
 			 */
 			static
 			size_t Compute(Window       &w,
 						   T            *p,
 						   const size_t  m,
-						   const T      *data, 
+						   const T      *data,
 						   const size_t  size,
 						   const size_t  options);
+            
+            static
+            size_t Compute(Window         &w,
+                           array<T>       &psd,
+                           const array<T> &data,
+                           const size_t    options);
 			
 		};
 		

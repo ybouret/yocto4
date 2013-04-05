@@ -1,6 +1,6 @@
 #include "yocto/FLTK/Canvas.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace FLTK
     {
@@ -11,14 +11,14 @@ namespace yocto
         
         Canvas:: Canvas( int X, int Y, int W, int H, const char *l ) :
         Fl_Box(X,Y,W,H,l),
-	xaxis(),
-	yaxis(),
-	y2axis(),
-	curves(),
-	curves2()
+        xaxis(),
+        yaxis(),
+        y2axis(),
+        curves(),
+        curves2()
         {
         }
-
+        
         
         void Canvas:: draw()
         {
@@ -33,7 +33,7 @@ namespace yocto
             __draw( *this, xaxis, yaxis,  curves);
             __draw( *this, xaxis, y2axis, curves2);
         }
-
+        
         
         void Canvas:: __draw( const Fl_Box &box, const Axis &Xaxis, const Axis &Yaxis, const Curves &C )
         {
@@ -75,7 +75,7 @@ namespace yocto
             }
             fl_pop_clip();
         }
-
+        
         
     }
 }
