@@ -12,6 +12,10 @@ namespace yocto
     namespace spade
     {
         //! build 2D contour vertices
+        /**
+         T is the type of data contained on the mesh
+         U is the type (float/double) of the axis AND levels
+         */
         template <typename T,typename U>
         struct iso2d
         {

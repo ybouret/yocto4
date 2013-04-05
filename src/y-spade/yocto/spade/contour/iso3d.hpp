@@ -1,20 +1,115 @@
+#ifndef YOCTO_SPADE_ISO3D_INCLUDED
+#define YOCTO_SPADE_ISO3D_INCLUDED 1
 
+
+#include "yocto/spade/triangle.hpp"
+#include "yocto/spade/array3d.hpp"
+#include "yocto/spade/contour/levels.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
-	
-	namespace swamp
-	{
-		
-		struct ZCORE
+    namespace spade
+    {
+        
+        template <typename T,typename U>
+        class iso3d
         {
-            typedef vertex3D<ZTYPE>::type XYZ;
-            typedef triangle3D<ZTYPE>     TRIANGLE;
+        public:
+            typedef typename vertex3D<U>::type vertex;
+            static  U dump( const T &v ) { return U(v); }
+            typedef functor<void,TL3(const triangle3D<U> &, const levels<U> &,size_t )> callback;
             
-#if defined(_MSC_VER)
-			//! default initialization of GRIDCELL:val
-#pragma warning ( disable : 4351 )
-#endif
+            static inline
+            void compute(const array3D<T>   &d,
+                         const array1D<U>   &x,
+                         const array1D<U>   &y,
+                         const array1D<U>   &z,
+                         const layout3D     &sub,
+                         const levels<U>    &levels,
+                         callback           &cb,
+                         U (*proc)(const T &) = dump )
+            {
+                typedef vertex        XYZ;
+                typedef triangle3D<U> TRIANGLE;
+                typedef U             ZTYPE;
+                assert( d.has(sub.lower) );
+                assert( d.has(sub.upper) );
+                
+                assert( sub.lower.x >= x.lower );
+                assert( sub.upper.x <= x.upper );
+                
+                assert( sub.lower.y >= y.lower );
+                assert( sub.upper.y <= y.upper );
+                
+                assert( sub.lower.z >= z.lower );
+                assert( sub.upper.z <= z.upper );
+                assert( levels.size() > 0 );
+                assert(proc!=0);
+                
+                TRIANGLE triangles[8];
+                GRIDCELL grid;
+                const size_t nl = levels.size();
+                
+                for( unit_t k = sub.lower.z; k < sub.upper.z; ++k )
+                {
+                    const unit_t k1 = k+1;
+                    grid.p[0].z = grid.p[1].z = grid.p[2].z = grid.p[3].z = z[k];
+                    grid.p[4].z = grid.p[5].z = grid.p[6].z = grid.p[7].z = z[k1];
+                    const array2D<T> &slice0 = d[k];
+                    const array2D<T> &slice1 = d[k1];
+                    
+                    for( unit_t j=sub.lower.y; j<sub.upper.y; ++j)
+                    {
+                        const unit_t j1 = j+1;
+                        grid.p[0].y = grid.p[3].y = grid.p[4].y = grid.p[7].y = y[j];
+                        grid.p[1].y = grid.p[2].y = grid.p[5].y = grid.p[6].y = y[j1];
+                        
+                        const array1D<T> &row00 = slice0[j ];
+                        const array1D<T> &row01 = slice0[j1];
+                        
+                        const array1D<T> &row10 = slice1[j ];
+                        const array1D<T> &row11 = slice1[j1];
+                        
+                        for( unit_t i=sub.lower.x; i <sub.upper.x; ++i )
+                        {
+                            const unit_t i1 = i+1;
+                            grid.p[0].x = grid.p[1].x = grid.p[4].x = grid.p[5].x = x[i];
+                            grid.p[2].x = grid.p[3].x = grid.p[6].x = grid.p[7].x = x[i1];
+                            
+                            grid.val[0] = proc(row00[i ]);
+                            grid.val[1] = proc(row01[i ]);
+                            grid.val[2] = proc(row01[i1]);
+                            grid.val[3] = proc(row00[i1]);
+                            
+                            grid.val[4] = proc(row10[i ]);
+                            grid.val[5] = proc(row11[i ]);
+                            grid.val[6] = proc(row11[i1]);
+                            grid.val[7] = proc(row10[i1]);
+                            
+                            for( size_t l=nl;l>0;--l)
+                            {
+                                const ZTYPE &L  = levels[l];
+                                const int    nt = Polygonise(grid, L, triangles);
+                                for( int  it=0; it<nt; ++it )
+                                {
+                                    cb( triangles[it], levels,l );
+                                }
+                            }
+                        }
+                        
+                    }
+                    
+                }
+                
+                
+            }
+            
+        private:
+            typedef vertex        XYZ;
+            typedef U             ZTYPE;
+            typedef triangle3D<U> TRIANGLE;
+            
             class GRIDCELL {
             public:
                 XYZ    p[8];
@@ -38,31 +133,25 @@ namespace yocto
             static inline
             XYZ VertexInterp(ZTYPE isolevel, const XYZ &p1, const XYZ &p2, ZTYPE valp1, ZTYPE valp2)
             {
-                //std::cerr << "interp " << isolevel << " : " << valp1 << "@" << p1 << " -> " << valp2 << "@" << p2 << std::endl;
                 if (math::Fabs(isolevel-valp1) < 0.00001)
                 {
-                    //std::cerr << " =>" << p1 << std::endl;
                     return(p1);
                 }
                 
                 if (math::Fabs(isolevel-valp2) < 0.00001)
                 {
-                    //std::cerr << " =>" << p2 << std::endl;
                     return(p2);
                 }
                 
                 if (math::Fabs(valp1-valp2) < 0.00001)
                 {
-                    //std::cerr << " =>" << p1 << std::endl;
                     return(p1);
                 }
                 
                 const ZTYPE mu = (isolevel - valp1) / (valp2 - valp1);
                 const XYZ ans( p1.x + mu * (p2.x - p1.x), p1.y + mu * (p2.y - p1.y),  p1.z + mu * (p2.z - p1.z) );
-                //std::cerr << " =>" << ans << std::endl;
                 return ans;
             }
-            
             
             /*
              Given a grid cell and an isolevel, calculate the triangular
@@ -448,92 +537,11 @@ namespace yocto
                 
                 return(ntriang);
             }
-            
+
         };
-		
-		template <>
-		void contour3D<ZTYPE>:: compute(const array3D<ZTYPE>   &d,
-                                        const array1D<ZTYPE>   &x,
-                                        const array1D<ZTYPE>   &y,
-                                        const array1D<ZTYPE>   &z,
-                                        const layout3D          &sub,
-                                        const level_set<ZTYPE> &levels,
-                                        callback                &proc)
-		{
-			
-			assert( d.has(sub.lower) );
-			assert( d.has(sub.upper) );
-			
-			assert( sub.lower.x >= x.lower );
-			assert( sub.upper.x <= x.upper );
-			
-			assert( sub.lower.y >= y.lower );
-			assert( sub.upper.y <= y.upper );
-			
-			assert( sub.lower.z >= z.lower );
-			assert( sub.upper.z <= z.upper );
-			assert( levels.size() > 0 );
-			
-            ZCORE::TRIANGLE triangles[8];
-            ZCORE::GRIDCELL grid;
-			const size_t nl = levels.size();
-			
-			for( unit_t k = sub.lower.z; k < sub.upper.z; ++k )
-			{
-				const unit_t k1 = k+1;
-				grid.p[0].z = grid.p[1].z = grid.p[2].z = grid.p[3].z = z[k];
-				grid.p[4].z = grid.p[5].z = grid.p[6].z = grid.p[7].z = z[k1];
-				const array2D<ZTYPE> &slice0 = d[k];
-				const array2D<ZTYPE> &slice1 = d[k1];
-				
-				for( unit_t j=sub.lower.y; j<sub.upper.y; ++j)
-				{
-					const unit_t j1 = j+1;
-					grid.p[0].y = grid.p[3].y = grid.p[4].y = grid.p[7].y = y[j];
-					grid.p[1].y = grid.p[2].y = grid.p[5].y = grid.p[6].y = y[j1];
-					
-					const array1D<ZTYPE> &row00 = slice0[j ];
-					const array1D<ZTYPE> &row01 = slice0[j1];
-					
-					const array1D<ZTYPE> &row10 = slice1[j ];
-					const array1D<ZTYPE> &row11 = slice1[j1];
-					
-					for( unit_t i=sub.lower.x; i <sub.upper.x; ++i )
-					{
-						const unit_t i1 = i+1;
-						grid.p[0].x = grid.p[1].x = grid.p[4].x = grid.p[5].x = x[i];
-						grid.p[2].x = grid.p[3].x = grid.p[6].x = grid.p[7].x = x[i1];
-						
-						grid.val[0] = row00[i ];
-						grid.val[1] = row01[i ];
-						grid.val[2] = row01[i1];
-						grid.val[3] = row00[i1];
-						
-						grid.val[4] = row10[i ];
-						grid.val[5] = row11[i ];
-						grid.val[6] = row11[i1];
-						grid.val[7] = row10[i1];
-						
-						for( size_t l=nl;l>0;--l)
-						{
-							const level<ZTYPE> &L = levels[l];
-							const int    nt = ZCORE::Polygonise(grid, L.value, triangles);
-							for( int  it=0; it<nt; ++it )
-							{
-								//std::cout << "send: " << triangles[it].p0 << "  " << triangles[it].p1 << " " << triangles[it].p2 << std::endl;
-								proc( triangles[it], L );
-							}
-						}
-					}
-					
-				}
-				
-			}
-			
-			
-		}
-		
-		
-		
-	}
+    }
 }
+
+
+#endif
+
