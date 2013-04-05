@@ -18,7 +18,7 @@ namespace
     public:
         vector< vector<vertex> > vv;
         
-        explicit lproc()
+        explicit lproc() : vv()
         {
             
         }
