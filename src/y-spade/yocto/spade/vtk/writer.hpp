@@ -7,6 +7,7 @@
 #include "yocto/spade/rmesh.hpp"
 #include "yocto/spade/array3d.hpp"
 #include "yocto/spade/workspace.hpp"
+#include "yocto/spade/triangle.hpp"
 
 namespace yocto
 {
@@ -96,6 +97,32 @@ namespace yocto
 				const string title(the_title);
 				this->save<LAYOUT,U>(filename,title,wksp,var,sub);
 			}
+
+            //! save triangle3D, as computed by iso3D
+            template <typename T>
+            inline void save( const string &filename, const string &title, const array< triangle3D<T> > &triangles ) const
+            {
+                const unsigned nt = triangles.size();
+                ios::ocstream fp( filename, false );
+                header(fp,title);
+                fp("DATASET POLYDATA\n");
+                fp("POINTS %u float\n", nt * 3 );
+                const vtk_record &r = (*this)[ typeid( typename vertex3D<T>::type ) ];
+                for(size_t i=1; i <= nt; ++i )
+                {
+                    const triangle3D<T> &t = triangles[i];
+                    for( size_t j=0; j <3; ++j )
+                    {
+                        write1(fp, &t[j], r);
+                    }
+                }
+                fp("POLYGONS %u %u\n", nt, 4 * nt );
+                unsigned count = 0;
+                for(size_t i=1; i <= nt; ++i, count += 3)
+                {
+                    fp("3 %u %u %u\n", count, count+1, count+2 );
+                }
+            }
 
             
         private:
