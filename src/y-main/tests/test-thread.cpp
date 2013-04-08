@@ -129,19 +129,19 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(thr_proxy)
 {
     threading::proxy thr;
-    thr.launch( do_something );
+    thr.trigger( do_something );
     thr.finish();
-    
+
     run_something run;
-    thr.launch(run);
+    thr.trigger(run);
     thr.finish();
     
     functor<void,null_type> fn( &run , & run_something::compute );
-    thr.launch(fn);
+    thr.trigger(fn);
     thr.finish();
     
     int a = 7;
-    thr.launch(do_display, a);
+    thr.trigger(do_display, a);
     thr.finish();
 }
 YOCTO_UNIT_TEST_DONE()
