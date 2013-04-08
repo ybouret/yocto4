@@ -10,6 +10,10 @@
 #include "yocto/geom/color.hpp"
 #include "yocto/ios/ocstream.hpp"
 
+#if defined(_MSC_VER)
+// this in constructor
+#pragma warning ( disable : 4355 )
+#endif
 
 namespace yocto
 {
