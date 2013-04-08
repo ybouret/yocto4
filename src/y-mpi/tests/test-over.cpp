@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "yocto/utest/run.hpp"
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/memory/buffers.hpp"
