@@ -132,7 +132,7 @@ namespace {
             MPI.Isend( send_next.ro(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, requests[ir++]);
             MPI.Isend( send_prev.ro(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, requests[ir++]);
             
-            thr.launch(mpi_wait_all,requests);
+            thr.trigger(mpi_wait_all,requests);
             
             MPI.WaitFor(nsec);
             
