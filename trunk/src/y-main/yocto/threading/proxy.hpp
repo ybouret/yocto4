@@ -18,14 +18,14 @@ namespace yocto
             void finish() throw();
             
             template <typename FUNC>
-            void launch( FUNC &fn )
+            void trigger( FUNC &fn )
             {
                 xdata[0] = (void *)&fn;
                 launch( proxy::execute<FUNC>, this );
             }
             
             template <typename FUNC, typename T>
-            void launch( FUNC &fn, T &x)
+            void trigger( FUNC &fn, T &x)
             {
                 xdata[0] = (void *)&fn;
                 xdata[1] = (void *)&x;
@@ -41,7 +41,7 @@ namespace yocto
             template <typename FUNC> static inline
             void   execute( void *args ) throw()
             {
-                assert(args);
+                assert(args!=0);
                 proxy &self = *(proxy *)args;
                 assert( self.xdata[0] );
                 union
