@@ -5,11 +5,11 @@
 #include "yocto/math/io/data-set.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/math/dat/spline.hpp"
 #include "yocto/string/conv.hpp"
 #include "yocto/math/fft/psd.hpp"
 #include "yocto/code/hsort.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/math/dat/spline.hpp"
 
 #include <iostream>
 
@@ -18,6 +18,14 @@ using namespace math;
 
 static const size_t default_size = 1024 * 1024;
 
+static const double Chi2( size_t i,
+                         const double f_star,
+                         const double d_star,
+                         const array<double> &t,
+                         const array<double> &f)
+{
+    return Fabs(f[i] - f_star) + Fabs( (f[i+1]-f[i]) - (t[i+1]-t[i]) * d_star);
+}
 
 int main( int argc, char *argv[] )
 {
@@ -62,7 +70,7 @@ int main( int argc, char *argv[] )
                     const double t   = SimDT * i;
                     for( size_t j=1; j <= nf; ++j )
                     {
-                        ans += amplitude[j] * cos( t * omega[j] + phase[j] );
+                        ans += amplitude[j] * cos( t * omega[j] + phase[j] ) + 0.5 * ( alea<double>() - 0.5);
                     }
                     fp("%g %g\n", t, ans);
                 }
@@ -119,63 +127,91 @@ int main( int argc, char *argv[] )
         ////////////////////////////////////////////////////////////////////////
         std::cerr << "\t-- resampling" << std::endl;
         
-        const size_t n    = next_power_of_two( t_raw.size() );
-        const double Tmax = t_raw[n_raw] - t_raw[1];
-        const double Tmin = Tmax / (n-1);
-        vector<double> t(n,0);
-        vector<double> f(n,0);
+        const size_t   n    = next_power_of_two( n_raw );
+        vector<double> t( n, 0 );
+        vector<double> f( n, 0 );
+        
+        for(size_t i=1; i<=n_raw; ++i)
         {
-            const spline<double>::boundary blo( true, 0 );
-            const spline<double>::boundary bhi( true, 0 );
-            spline<double> s_raw(t_raw,f_raw,blo,bhi);
-            for( size_t i=1; i <= n; ++i )
+            t[i] = t_raw[i];
+            f[i] = f_raw[i];
+        }
+        
+        {
+            //==================================================================
+            //-- phase 1: find the best fitting point
+            //==================================================================
+            const double f_star = f_raw[n_raw];
+            const double d_star = (f_raw[n_raw] - f_raw[n_raw-1])/(t_raw[n_raw]-t_raw[n_raw-1]);
+            size_t best_i=1;
+            double best_v=Chi2(best_i, f_star, d_star, t_raw, f_raw);
+            for(size_t j=2; j < n_raw; ++j)
             {
-                t[i] = (i-1) * Tmin + t_raw[1];
-                f[i] = s_raw( t[i] );
+                const double tmp = Chi2(j, f_star, d_star, t_raw, f_raw);
+                if( tmp < best_v)
+                {
+                    best_i = j;
+                    best_v = tmp;
+                }
+            }
+            std::cerr << "best@" <<  t_raw[best_i] << std::endl;
+            const size_t missing = n-n_raw;
+            const double t_best  = t_raw[best_i];
+            const double t_last  = t_raw[n_raw];
+            
+            for(size_t i=1; i <= missing; ++i )
+            {
+                const size_t tgt = n_raw  +i;
+                const size_t src = best_i +i;
+                const double del = t[src] - t_best; //!< little trick
+                t[tgt] = t_last + del;
+                f[tgt] = f[src];                    //!< same trick
+            }
+            {
+                ios::ocstream fp("resampled1.dat",false);
+                for(size_t i=1; i <= n; ++i) fp("%g %g\n", t[i], f[i]);
             }
         }
         
-        std::cerr << "\t-- #raw=" << n_raw << " => " << n << " samples" << std::endl;
+        const double dt = (t[n] - t[1]) / (n-1);
+        std::cerr << "-- dt=" << dt << std::endl;
         {
-            ios::ocstream fp("resampled.dat", false);
-            for(size_t i=1; i <= n; ++i ) fp("%g %g\n", t[i], f[i]);
+            //==================================================================
+            //-- phase 2: use splines for isosampling
+            //==================================================================
+            const spline<double>::boundary bnd(true,0);
+            spline<double> s(t,f,bnd,bnd);
+            const double t0 = t[1];
+            for(size_t i=1;i<=n;++i)
+            {
+                t[i] = t0 + (i-1) * dt;
+                f[i] = s(t[i]);
+            }
+            {
+                ios::ocstream fp("resampled2.dat",false);
+                for(size_t i=1; i <= n; ++i) fp("%g %g\n", t[i], f[i]);
+            }
         }
-        std::cerr << "\t-- Tmax    = " << Tmax << "s" << std::endl;
-        std::cerr << "\t-- Tmin    = " << Tmin << "s" << std::endl;
-        
-        const double FreqMaxRaw = 1.0 / Tmin;
-        const double FreqMinRaw = 1.0 / Tmax;
-        std::cerr << "\t-- FreqMaxRaw = " << FreqMaxRaw << " Hz" << std::endl;
-        std::cerr << "\t-- FreqMinRaw = " << FreqMinRaw << " Hz" << std::endl;
         
         ////////////////////////////////////////////////////////////////////////
         //
-        // Power Spectrum Density
+        // Evaluating PSD parameters
         //
         ////////////////////////////////////////////////////////////////////////
-        const size_t M_max      = n;
-        const size_t m_max      = M_max >> 1;
-        const double TmaxPSD    = m_max * Tmin;
-        const double FreqMinPSD = 1.0 / TmaxPSD; //-- 2*FreqMinRaw
-        std::cerr << "\t-- FreqMinPSD = " << FreqMinPSD << " Hz" << std::endl;
-        std::cerr << "\t-- m_max      = " << m_max << std::endl;
-        FreqMin = max_of( FreqMin, FreqMinPSD);
+        //const size_t m_max = (n/2);
         
-        size_t        m = min_of( m_max, next_power_of_two<size_t>( 1.0/ (Tmin*FreqMin)) / 2 );
-        const double df = 1.0 / ( Tmin * (m<<1) );
-        std::cerr << "m=" << m << std::endl;
-        std::cerr << "df=" << df << std::endl;
-        vector<double> psd(m,0);
+        const size_t m = n/2;
+        const double M = m << 1;
+        const double df = 1.0/(dt*M);
         vector<double> frq(m,0);
-        for( size_t i=1; i <= m; ++i )
-        {
-            frq[i] = (i-1) * df;
-        }
-        PSD<double>::Window w = cfunctor( PSD<double>::Welch );
-        PSD<double>::Compute( w, psd, f, PSD_Overlap);
+        vector<double> psd(m,0);
+        for(size_t i=1;i<=m;++i) frq[i] = (i-1) * df;
+        
+        PSD<double>::Window w = cfunctor(PSD<double>::Welch);
+        PSD<double>::Compute(w, psd, f, PSD_Overlap);
         {
             ios::ocstream fp("psd.dat",false);
-            for(size_t i=1; i <= m; ++i) fp("%g %g\n", frq[i], psd[i]);
+            for(size_t i=1; i <=m; ++i) fp("%g %g\n",frq[i],psd[i]);
         }
         return 0;
     }
