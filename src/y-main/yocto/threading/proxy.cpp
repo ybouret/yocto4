@@ -1,3 +1,7 @@
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
+
 #include "yocto/threading/proxy.hpp"
 
 #include <cstring>

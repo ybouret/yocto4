@@ -73,6 +73,9 @@ namespace yocto
         
     }
     
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
     mpi_async:: mpi_async( const mpi & ref ) :
     MPI( ref ),
     ready(false),

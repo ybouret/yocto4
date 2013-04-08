@@ -110,6 +110,9 @@ namespace yocto
             typedef U             ZTYPE;
             typedef triangle3D<U> TRIANGLE;
             
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
             class GRIDCELL {
             public:
                 XYZ    p[8];
