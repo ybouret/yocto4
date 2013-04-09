@@ -16,7 +16,12 @@ namespace yocto
 	namespace ios
 	{
 		
-		
+        FILE * cfile:: __get() throw()
+        {
+            assert(handle);
+            return handle;
+        }
+
 		
 		
 		cfile:: ~cfile() throw()
