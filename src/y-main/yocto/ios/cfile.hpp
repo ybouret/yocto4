@@ -28,9 +28,12 @@ namespace yocto
 			
 			void bufferize( memory::rw_buffer &buf );
 
+            FILE * __get() throw();
+            
 		protected:
 			FILE      *handle;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(cfile);
+            
 		public:
 			int *last_close;
 		};
