@@ -17,6 +17,7 @@ namespace yocto
             
             int      bzerror;
             virtual ~bz2stream() throw();
+            const char *get_error() const throw();
             
         protected:
             explicit bz2stream() throw(); //!< bzfile to NULL
@@ -41,6 +42,7 @@ namespace yocto
             ios::icstream fp;
             YOCTO_DISABLE_COPY_AND_ASSIGN(ibz2stream);
             int           cache;
+            bool          alive;
         public:
             int *last_close;
         };
