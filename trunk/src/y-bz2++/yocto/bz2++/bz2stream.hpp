@@ -31,12 +31,16 @@ namespace yocto
         {
         public:
             explicit ibz2stream( const string &filename );
+            explicit ibz2stream( const ios::local_file::cstdin_t &);
             virtual ~ibz2stream() throw();
+            
+            virtual bool query( char &C );
+			virtual void store( char  C );
             
         private:
             ios::icstream fp;
             YOCTO_DISABLE_COPY_AND_ASSIGN(ibz2stream);
-            
+            int           cache;
         public:
             int *last_close;
         };
