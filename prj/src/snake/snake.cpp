@@ -87,6 +87,38 @@ public:
         fp("%g %g\n", p->v.x, p->v.y);
     }
     
+    vertex get_G() const
+    {
+        vertex G;
+        const point *p = root;
+        for(size_t i=size;i>0;--i,p=p->next)
+        {
+            G += p->v;
+        }
+        return G/double(size);
+    }
+    
+    bool refine( point *p, array<point> &points)
+    {
+        assert(p);
+        assert( owns(p) );
+        const vertex &P = p->v;
+        point        *q = p->next;
+        const vertex &Q = q->v;
+        const vertex  G = get_G();
+        const vertex  PQ(P,Q);
+        const vertex  QG(Q,G);
+        
+        for( size_t i=1; i <= points.size(); ++i )
+        {
+            point &tmp = points[i];
+            const vertex PM(P,tmp.v);
+            
+        }
+        
+        return false;
+    }
+    
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(snake);
 };
