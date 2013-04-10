@@ -18,7 +18,7 @@ namespace
     public:
         vector< vector<triangle3D<double> > > vv;
 
-        lproc()
+        lproc() : vv()
         {
         }
         

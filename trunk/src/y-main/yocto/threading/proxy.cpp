@@ -3,6 +3,7 @@
 #endif
 
 #include "yocto/threading/proxy.hpp"
+#include "yocto/code/cast.hpp"
 
 #include <cstring>
 #include <new>
@@ -44,7 +45,8 @@ namespace yocto
         
         void proxy:: finish() throw()
         {
-            static_cast<threading::thread *>( (void*)&block[0] )->join();
+            _cast::from<threading::thread>( &block[0] )->join();
+            //static_cast<threading::thread *>( (void*)&block[0] )->join();
             clear();
         }
 
