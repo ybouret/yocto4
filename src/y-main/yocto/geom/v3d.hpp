@@ -86,12 +86,19 @@ namespace yocto {
 			return v3d<T>::dot_(a,b);
 		}
 		
+        template <class T>
+		inline v3d<T> operator/( const v3d<T> &lhs, const T a )
+		{
+			return v3d<T>::div_( lhs, a );
+		}
+        
 		template <class T>
 		inline v3d<T> operator^(const v3d<T> &a, const v3d<T> &b) throw()
 		{
 			return v3d<T>::cross_(a,b);
 		}
 		
+        
 	}
 	
 }
