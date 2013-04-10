@@ -17,7 +17,10 @@ namespace yocto
                 if( n <= 0 )
                     return;
                 
-                
+                if( n == 1)
+                {
+                    h.push_back(points[1]);
+                }
                 
                 //-- find leftmost point
                 size_t indx = 1;
@@ -34,10 +37,16 @@ namespace yocto
                 
                 h.push_back(curr);
                 const size_t start = indx;
-                double       theta = 0;
-                vertex       v( Sin(theta), Cos(theta) );
                 do
                 {
+                    for(size_t i=n;i>0;--i)
+                    {
+                        if(i==indx) continue;
+                        const vertex &p = points[i];
+                        const vertex v(curr,p);
+                        const real_t theta = Atan2(v.x,v.y);
+                        std::cerr << "theta=" << theta << std::endl;
+                    }
                     
                 }
                 while( indx != start );
