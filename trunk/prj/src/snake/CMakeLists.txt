@@ -1,0 +1,8 @@
+PROJECT(snake)
+
+ADD_EXECUTABLE(snake snake.cpp)
+TARGET_LINK_YOCTO(snake)
+
+#INSTALL( TARGETS file2data RUNTIME DESTINATION bin )
+
+
