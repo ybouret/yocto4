@@ -46,7 +46,6 @@ namespace yocto
         void proxy:: finish() throw()
         {
             _cast::from<threading::thread>( &block[0] )->join();
-            //static_cast<threading::thread *>( (void*)&block[0] )->join();
             clear();
         }
 
