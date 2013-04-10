@@ -28,14 +28,14 @@ SET(file3 ${CMAKE_CURRENT_SOURCE_DIR}/yocto/bz2/sample3.ref)
 ADD_CUSTOM_COMMAND(
 	TARGET  y_bzip2
 	POST_BUILD
-	COMMAND y_bzip2 ARGS -1 < ${file1} > sample1.bz2
-	COMMAND y_bzip2 ARGS -d < sample1.bz2 > sample1.tst
+	COMMAND y_bzip2 ARGS -v -1 < ${file1} > sample1.bz2
+	COMMAND y_bzip2 ARGS -v -d < sample1.bz2 > sample1.tst
 	COMMAND ${CMAKE_COMMAND} ARGS -E compare_files sample1.tst ${file1}
-	COMMAND y_bzip2 ARGS -2 < ${file2} > sample2.bz2
-	COMMAND y_bzip2 ARGS -d < sample2.bz2 > sample2.tst
+	COMMAND y_bzip2 ARGS -v -2 < ${file2} > sample2.bz2
+	COMMAND y_bzip2 ARGS -v -d < sample2.bz2 > sample2.tst
 	COMMAND ${CMAKE_COMMAND} ARGS -E compare_files sample2.tst ${file2}
-	COMMAND y_bzip2 ARGS -3  < ${file3} > sample3.bz2
-	COMMAND y_bzip2 ARGS -ds < sample3.bz2 > sample3.tst
+	COMMAND y_bzip2 ARGS -v -3  < ${file3} > sample3.bz2
+	COMMAND y_bzip2 ARGS -v -ds < sample3.bz2 > sample3.tst
 	COMMAND ${CMAKE_COMMAND} ARGS -E compare_files sample3.tst ${file3}
 	COMMENT "Testing y_bzip2" )
 	
