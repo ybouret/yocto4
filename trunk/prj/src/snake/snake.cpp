@@ -3,10 +3,12 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/math/kernel/lu.hpp"
 
 #include <iostream>
 
 using namespace yocto;
+using namespace math;
 
 typedef geom::v2d<double> vertex;
 
@@ -30,7 +32,11 @@ private:
 class snake : public core::clist_of<point>
 {
 public:
-    explicit snake()
+    matrix<double> mat;
+    vector<double> b;
+    lu<double>     LU;
+    
+    explicit snake() : mat(2,2), b(2,0.0), LU(2)
     {
     }
     
@@ -108,12 +114,26 @@ public:
         const vertex  G = get_G();
         const vertex  PQ(P,Q);
         const vertex  QG(Q,G);
+        mat[1][1] = PQ.x;
+        mat[1][2] = QG.x;
+        mat[2][1] = PQ.y;
+        mat[2][2] = QG.y;
+        if( !LU.build(mat) )
+        {
+            std::cerr << "Singular matrix" << std::endl;
+            return false;
+        }
         
         for( size_t i=1; i <= points.size(); ++i )
         {
             point &tmp = points[i];
             const vertex PM(P,tmp.v);
-            
+            b[1] = PM.x;
+            b[2] = PM.y;
+            LU.solve(mat, b);
+            const double lam = b[1];
+            const double lammu = b[2];
+            std::cerr << "lam=" << lam << ", lammu="  << lammu << std::endl;
         }
         
         return false;
@@ -141,6 +161,9 @@ int main(int argc, char *argv[] )
         
         s.initialize(points);
         s.save("bb.dat");
+        
+        s.refine(s.root, points);
+        
         return 0;
     }
     catch(...)
