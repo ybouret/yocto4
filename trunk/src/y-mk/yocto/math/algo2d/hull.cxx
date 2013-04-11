@@ -10,7 +10,7 @@ namespace yocto
         namespace algo2d
         {
             template <>
-            void hull<real_t>:: build( sequence<vertex> &h, const array<vertex> &points )
+            void hull<real_t>:: build( sequence<size_t> &h, const array<vertex> &points )
             {
                 h.free();
                 const size_t n  = points.size();
@@ -19,7 +19,7 @@ namespace yocto
                 
                 if( n == 1)
                 {
-                    h.push_back(points[1]);
+                    h.push_back(1);
                 }
                 
                 //-- find leftmost point
@@ -35,22 +35,21 @@ namespace yocto
                     }
                 }
                 
-                h.push_back(curr);
+                h.push_back(indx);
                 const size_t start = indx;
                 do
                 {
+                    //double theta_min = -1;
                     for(size_t i=n;i>0;--i)
                     {
                         if(i==indx) continue;
                         const vertex &p = points[i];
-                        const vertex v(curr,p);
-                        const real_t theta = Atan2(v.x,v.y);
-                        std::cerr << "theta=" << theta << std::endl;
+                        const vertex d(curr,p);
                     }
                     
                 }
                 while( indx != start );
-
+                
             }
         }
     }
