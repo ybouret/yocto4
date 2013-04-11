@@ -1,5 +1,4 @@
-#include "yocto/math/algo2d/itriangle.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/math/itriangle.hpp"
 #include "yocto/code/gsort.hpp"
 
 namespace yocto
