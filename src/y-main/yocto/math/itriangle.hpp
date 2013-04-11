@@ -2,6 +2,7 @@
 #define YOCTO_MATH_ITRIANGLE_INCLUDED 1
 
 #include "yocto/sequence/vector.hpp"
+#include "yocto/code/static-check.hpp"
 #include "yocto/core/list.hpp"
 
 namespace yocto
@@ -41,6 +42,20 @@ namespace yocto
             
             void insert_into( iEdge::Buffer &edges ) const;
             
+            template <typename T,size_t I>
+            inline T & get() throw()
+            {
+                YOCTO_STATIC_CHECK(I<2,invalid_index);
+                return *(T *)&wksp[I];
+            }
+            
+            template <typename T,size_t I>
+            inline const T & get() const throw()
+            {
+                YOCTO_STATIC_CHECK(I<2,invalid_index);
+                return *(const T *)&wksp[I];
+            }
+            
             class List : public core::list_of<iTriangle>
             {
             public:
@@ -52,9 +67,9 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(List);
             };
             
-            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(iTriangle);
+            uint64_t wksp[2];
         };
         
         
