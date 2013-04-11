@@ -83,13 +83,16 @@ namespace yocto
             { const iEdge edge(i2,i3,0); __insert_edge(edge,edges); }
             { const iEdge edge(i1,i3,0); __insert_edge(edge,edges); }
         }
+       
         
+#if 1
         iTriangle:: List:: List() throw() {}
         iTriangle:: List:: ~List() throw() { kill(); }
         void iTriangle:: List:: kill() throw()
         {
             while(size) delete pop_back();
         }
+#endif
         
         
     }

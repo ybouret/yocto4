@@ -16,9 +16,11 @@ namespace yocto
             template <typename T>
             struct delaunay
             {
+                
+                               
                 typedef geom::v2d<T> vertex;
                 static
-                void build( iTriangle::List &trlist, sequence<vertex> &vertices );
+                void build(iTriangle::List &trlist, const array<vertex> &vertices );
                 
             };
         }
