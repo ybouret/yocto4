@@ -45,14 +45,14 @@ namespace yocto
             template <typename T,size_t I>
             inline T & get() throw()
             {
-                YOCTO_STATIC_CHECK(I<2,invalid_index);
+                YOCTO_STATIC_CHECK(I<4,invalid_index);
                 return *(T *)&wksp[I];
             }
             
             template <typename T,size_t I>
             inline const T & get() const throw()
             {
-                YOCTO_STATIC_CHECK(I<2,invalid_index);
+                YOCTO_STATIC_CHECK(I<4,invalid_index);
                 return *(const T *)&wksp[I];
             }
             
@@ -69,7 +69,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(iTriangle);
-            uint64_t wksp[2];
+            uint64_t wksp[4];
         };
         
         
