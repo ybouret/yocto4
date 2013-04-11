@@ -17,7 +17,7 @@ namespace yocto
             struct hull
             {
                 typedef geom::v2d<T> vertex;
-                void build( sequence<vertex> &h, const array<vertex> &points);
+                void build( sequence<size_t> &h, const array<vertex> &points);
             };
             
         }
