@@ -1,5 +1,5 @@
-#ifndef YOCTO_MATH_ALGO2D_ITRIANGLE_INCLUDED
-#define YOCTO_MATH_ALGO2D_ITRIANGLE_INCLUDED 1
+#ifndef YOCTO_MATH_ITRIANGLE_INCLUDED
+#define YOCTO_MATH_ITRIANGLE_INCLUDED 1
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/core/list.hpp"

@@ -2,7 +2,7 @@
 #define YOCTO_MATH_ALGO2D_DELAUNAY_INCLUDED 1
 
 #include "yocto/geom/v2d.hpp"
-#include "yocto/sequence/array.hpp"
+#include "yocto/math/itriangle.hpp"
 
 namespace yocto
 {
@@ -13,6 +13,14 @@ namespace yocto
         namespace algo2d
         {
             
+            template <typename T>
+            struct delaunay
+            {
+                typedef geom::v2d<T> vertex;
+                static
+                void build( iTriangle::List &trlist, sequence<vertex> &vertices );
+                
+            };
         }
         
     }
