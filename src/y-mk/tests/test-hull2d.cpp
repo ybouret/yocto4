@@ -11,7 +11,7 @@ typedef geom::v2d<double> vtx;
 
 YOCTO_UNIT_TEST_IMPL(tr2d)
 {
-    const size_t n = 10;
+    const size_t n = 3;
     vector<vtx> vertices;
     for(size_t i=n;i>0;--i)
     {
@@ -29,6 +29,7 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
     
     algo2d::delaunay<double>::build(trlist, vertices);
     
+        
 }
 YOCTO_UNIT_TEST_DONE();
 
