@@ -8,6 +8,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/hsort.hpp"
 
+#include <cstdlib>
 
 namespace yocto
 {
