@@ -1,5 +1,5 @@
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/algo2d/hull.hpp"
+#include "yocto/math/alg/hull.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto

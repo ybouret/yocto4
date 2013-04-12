@@ -55,14 +55,14 @@ SET( stat_srcs ${stat_decl} ${stat_impl} )
 INSTALL( FILES ${stat_decl} DESTINATION include/yocto/math/stat )
 SOURCE_GROUP( math/stat FILES ${stat_srcs} )
 
-FILE( GLOB algo2d_decl yocto/math/algo2d/*.hpp)
-FILE( GLOB algo2d_impl yocto/math/algo2d/*.cpp)
-SET( algo2d_srcs ${algo2d_decl} ${algo2d_impl} )
-INSTALL( FILES ${algo2d_decl} DESTINATION include/yocto/math/algo2d )
-SOURCE_GROUP( math/algo2d FILES ${algo2d_srcs} )
+FILE( GLOB alg_decl yocto/math/alg/*.hpp)
+FILE( GLOB alg_impl yocto/math/alg/*.cpp)
+SET( alg_srcs ${alg_decl} ${alg_impl} )
+INSTALL( FILES ${alg_decl} DESTINATION include/yocto/math/alg )
+SOURCE_GROUP( math/alg FILES ${alg_srcs} )
 
 
-SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} ${stat_srcs} ${algo2d_srcs} )
+SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main )
 
