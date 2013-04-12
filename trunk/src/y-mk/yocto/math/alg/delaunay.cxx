@@ -111,17 +111,18 @@ namespace yocto
              These triangles are arranged in a consistent clockwise order.
              The triangle array 'v' should be malloced to 3 * nv
              The vertex array pxyz must be big enough to hold 3 more points
-             The vertex array must be sorted in increasing x values say
+             The vertex array must be sorted in increasing x values
              */
-            size_t Triangulate(size_t     nv,
-                               XYZ       *pxyz,
-                               ITRIANGLE *v)
+            static inline
+            size_t Triangulate(const size_t     nv,
+                               XYZ             *pxyz,
+                               ITRIANGLE       *v)
             {
                 
                 assert(nv>0);
                 static const size_t edges_init = 256;
                 static const size_t edges_step = 128;
-                bool inside;
+
                 real_t xp,yp,x1,y1,x2,y2,x3,y3,xc,yc,r;
                 real_t xmin,xmax,ymin,ymax,xmid,ymid;
                 real_t dx,dy,dmax;
@@ -187,7 +188,8 @@ namespace yocto
                 /*
                  Include each point one at a time into the existing mesh
                  */
-                for(size_t i=0;i<nv;i++) {
+                for(size_t i=0;i<nv;i++)
+                {
                     
                     xp = pxyz[i].x;
                     yp = pxyz[i].y;
@@ -209,7 +211,7 @@ namespace yocto
                         y2 = pxyz[v[j].p2].y;
                         x3 = pxyz[v[j].p3].x;
                         y3 = pxyz[v[j].p3].y;
-                        inside = CircumCircle(xp,yp,x1,y1,x2,y2,x3,y3,&xc,&yc,&r);
+                        const bool inside = CircumCircle(xp,yp,x1,y1,x2,y2,x3,y3,&xc,&yc,&r);
                         if (xc < xp && ((xp-xc)*(xp-xc)) > r)
                             complete[j] = true;
                         if (inside)
@@ -415,7 +417,7 @@ namespace yocto
             //------------------------------------------------------------------
             __make_delaunay(trlist, pxyz, indx);
         }
-
+        
         
         
     }
