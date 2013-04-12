@@ -45,7 +45,7 @@ namespace yocto
             void build( sequence<iTriangle> &trlist, const array<vtx2d> &);
             
             static
-            void build(const array<vtx3d> &);
+            void build( sequence<iTriangle> &trlist, const array<vtx3d> &);
             
         };
         
