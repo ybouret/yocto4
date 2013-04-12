@@ -4,10 +4,12 @@
 #include "yocto/math/types.hpp"
 #include "yocto/auto-arr.hpp"
 
-#include "yocto/ios/ocstream.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/hsort.hpp"
 #include "yocto/exception.hpp"
+
+//#include "yocto/ios/ocstream.hpp"
+
 
 #include <cstdlib>
 
@@ -173,6 +175,7 @@ namespace yocto
                 complete[0]  = false;
                 size_t ntri  = 1;
                 
+#if 0
                 {
                     ios::ocstream fp("supertri.dat",false);
                     fp("%g %g %g\n", pxyz[v[0].p1].x,pxyz[v[0].p1].y,pxyz[v[0].p1].z);
@@ -180,7 +183,7 @@ namespace yocto
                     fp("%g %g %g\n", pxyz[v[0].p3].x,pxyz[v[0].p3].y,pxyz[v[0].p3].z);
                     fp("%g %g %g\n", pxyz[v[0].p1].x,pxyz[v[0].p1].y,pxyz[v[0].p1].z);
                 }
-                
+#endif
                 /*
                  Include each point one at a time into the existing mesh
                  */
@@ -295,6 +298,7 @@ namespace yocto
                     }
                 }
                 
+#if 0
                 {
                     ios::ocstream fp("tri2d.dat",false);
                     for(size_t i=0;i<ntri;i++)
@@ -307,6 +311,7 @@ namespace yocto
                         fp("\n");
                     }
                 }
+#endif
                 
                 return ntri;
             }
@@ -329,24 +334,27 @@ namespace yocto
             const size_t nv = indx.size;
             assert(nv+3==pxyz.size);
             
-            //-- preparing data for Triangulate
+            //------------------------------------------------------------------
+            //-- preparing /allocating data for Triangulate
+            //------------------------------------------------------------------
             co_hsort(pxyz.base(),indx.base(),nv,XYZCompare);
             auto_arr<ITRIANGLE> vtri(3*nv);
             
-            
+            //------------------------------------------------------------------
             //-- call the algorithm
-            const size_t ntri = Triangulate(nv, pxyz.base(), vtri.base() );
-            std::cerr << "#ntri=" << ntri << std::endl;
+            //------------------------------------------------------------------
+            const size_t ntri = Triangulate( nv, pxyz.base(), vtri.base() );
             
+            //------------------------------------------------------------------
             //-- build user's triangles list
-            for(size_t i=0; i < ntri; ++i)
+            //------------------------------------------------------------------
+            for(size_t i=0; i<ntri; ++i)
             {
                 ITRIANGLE &src = vtri[i];
                 (void)src;
                 const iTriangle tgt( indx[src.p1], indx[src.p2], indx[src.p3] );
                 trlist.push_back(tgt);
             }
-            
             
         }
         
@@ -372,8 +380,42 @@ namespace yocto
                 p.y = v.y;
                 p.z = 0;
             }
+            
+            //------------------------------------------------------------------
+            // processing
+            //------------------------------------------------------------------
             __make_delaunay(trlist, pxyz, indx);
         }
+        
+        template <>
+        void delaunay<real_t>:: build( sequence<iTriangle> &trlist, const array<vtx3d> &vertices )
+        {
+            //------------------------------------------------------------------
+            // preparing data for triangulation
+            //------------------------------------------------------------------
+            trlist.free();
+            const size_t nv = vertices.size();
+            if(nv<3) return;
+            auto_arr<XYZ>       pxyz(nv+3);
+            auto_arr<size_t>    indx(nv);
+            
+            assert(pxyz.size==nv+3);
+            for( size_t i=1,j=0;i<=nv;++i,++j)
+            {
+                indx[j]        = i;
+                XYZ         &p = pxyz[j];
+                const vtx3d &v = vertices[i];
+                p.x = v.x;
+                p.y = v.y;
+                p.z = v.z;
+            }
+            
+            //------------------------------------------------------------------
+            // processing
+            //------------------------------------------------------------------
+            __make_delaunay(trlist, pxyz, indx);
+        }
+
         
         
     }
