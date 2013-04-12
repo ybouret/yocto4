@@ -106,8 +106,12 @@ namespace yocto
              The vertex array pxyz must be big enough to hold 3 more points
              The vertex array must be sorted in increasing x values say
              */
-            int Triangulate(int nv,XYZ *pxyz,ITRIANGLE *v,int *ntri)
+            int Triangulate(int nv,XYZ *pxyz,ITRIANGLE *v,int &ntri)
             {
+             
+                std::cerr << "Triangulate" << std::endl;
+                assert(nv>0);
+                
                 bool  *complete = NULL;
                 IEDGE *edges = NULL;
                 int nedge = 0;
@@ -173,7 +177,15 @@ namespace yocto
                 v[0].p2 = nv+1;
                 v[0].p3 = nv+2;
                 complete[0] = false;
-                *ntri = 1;
+                ntri = 1;
+                
+                {
+                    ios::ocstream fp("supertri.dat",false);
+                    fp("%g %g %g\n", pxyz[v[0].p1].x,pxyz[v[0].p1].y,pxyz[v[0].p1].z);
+                    fp("%g %g %g\n", pxyz[v[0].p2].x,pxyz[v[0].p2].y,pxyz[v[0].p2].z);
+                    fp("%g %g %g\n", pxyz[v[0].p3].x,pxyz[v[0].p3].y,pxyz[v[0].p3].z);
+                    fp("%g %g %g\n", pxyz[v[0].p1].x,pxyz[v[0].p1].y,pxyz[v[0].p1].z);
+                }
                 
                 /*
                  Include each point one at a time into the existing mesh
@@ -190,7 +202,7 @@ namespace yocto
                      three edges of that triangle are added to the edge buffer
                      and that triangle is removed.
                      */
-                    for (j=0;j<(*ntri);j++)
+                    for (j=0;j<ntri;j++)
                     {
                         if (complete[j])
                             continue;
@@ -222,10 +234,10 @@ namespace yocto
                             edges[nedge+2].p1 = v[j].p3;
                             edges[nedge+2].p2 = v[j].p1;
                             nedge += 3;
-                            v[j] = v[(*ntri)-1];
-                            complete[j] = complete[(*ntri)-1];
-                            (*ntri)--;
-                            j--;
+                            v[j] = v[ntri-1];
+                            complete[j] = complete[ntri-1];
+                            --ntri;
+                            --j;
                         }
                     }
                     
@@ -267,17 +279,17 @@ namespace yocto
                         if (edges[j].p1 < 0 || edges[j].p2 < 0)
                             continue;
                         
-                        if ((*ntri) >= trimax)
+                        if ((ntri) >= trimax)
                         {
                             status = 4;
                             goto skip;
                         }
                         
-                        v[*ntri].p1 = edges[j].p1;
-                        v[*ntri].p2 = edges[j].p2;
-                        v[*ntri].p3 = i;
-                        complete[*ntri] = false;
-                        (*ntri)++;
+                        v[ntri].p1 = edges[j].p1;
+                        v[ntri].p2 = edges[j].p2;
+                        v[ntri].p3 = i;
+                        complete[ntri] = false;
+                        (ntri)++;
                     }
                 }
                 
@@ -285,12 +297,12 @@ namespace yocto
                  Remove triangles with supertriangle vertices
                  These are triangles which have a vertex number greater than nv
                  */
-                for (i=0;i<(*ntri);i++)
+                for (i=0;i<(ntri);i++)
                 {
                     if (v[i].p1 >= nv || v[i].p2 >= nv || v[i].p3 >= nv)
                     {
-                        v[i] = v[(*ntri)-1];
-                        (*ntri)--;
+                        v[i] = v[(ntri)-1];
+                        (ntri)--;
                         i--;
                     }
                 }
@@ -319,9 +331,11 @@ namespace yocto
             // preparing data for triangulation
             //------------------------------------------------------------------
             const size_t n = vertices.size();
-            if(n<=3) return;
-            auto_arr<XYZ>    pxyz(n+3);
-            auto_arr<size_t> indx(n);
+            if(n<3) return;
+            auto_arr<XYZ>       pxyz(n+3);
+            auto_arr<size_t>    indx(n);
+            auto_arr<ITRIANGLE> vtri(3*n);
+            
             assert(pxyz.size>=n+3);
             for( size_t i=1,j=0;i<=n;++i,++j)
             {
@@ -333,6 +347,8 @@ namespace yocto
                 p.z = 0;
             }
             co_hsort(pxyz.base(),indx.base(),n,XYZCompare);
+            int ntri = 0;
+            Triangulate(n, pxyz.base(), vtri.base(), ntri);
         }
         
         
