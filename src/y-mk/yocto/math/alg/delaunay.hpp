@@ -10,9 +10,11 @@ namespace yocto
     namespace math
     {
         
+
+       
         struct iTriangle
         {
-            size_t p1, p2, p3;            
+            const size_t p1, p2, p3;
         };
         
         template <typename T>

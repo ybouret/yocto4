@@ -4,6 +4,7 @@
 
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -13,7 +14,10 @@ typedef geom::v2d<double> V2;
 YOCTO_UNIT_TEST_IMPL(tr2d)
 {
     
-    const int  n=3;
+    size_t  n=3;
+    if( argc > 1 )
+        n = strconv::to_size(argv[1],"n");
+    
     vector<V2> vec2(n,as_capacity);
     for(size_t i=1; i<=n; ++i )
     {
