@@ -1,7 +1,7 @@
 #ifndef YOCTO_HSORT_INCLUDED
 #define YOCTO_HSORT_INCLUDED 1
 
-#include "yocto/sequence/array.hpp"
+#include "yocto/sequence/lw-array.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/comparator.hpp"
 
@@ -131,6 +131,20 @@ namespace yocto
     template <typename T, typename U>
 	inline void co_hsort( array<T> &ra, array<U> &rb ) throw() { hsort( ra, rb, __compare<T> ); }
 	
+    template<typename T,typename FUNC>
+    inline void hsort( T *a, size_t n, FUNC &compare )
+    {
+        lw_array<T> A(a,n);
+        hsort<T,FUNC>(A,compare);
+    }
+    template<typename T,typename U,typename FUNC>
+    inline void co_hsort( T *a, U *b, size_t n, FUNC &compare )
+    {
+        lw_array<T> A(a,n);
+        lw_array<U> B(b,n);
+        hsort<T,U,FUNC>(A,B,compare);
+    }
+    
 }
 
 #endif

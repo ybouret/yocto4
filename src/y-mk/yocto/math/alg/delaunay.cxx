@@ -2,9 +2,12 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/auto-arr.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/code/hsort.hpp"
+
 
 namespace yocto
 {
@@ -21,7 +24,7 @@ namespace yocto
              The circumcircle centre is returned in (xc,yc) and the radius r
              NOTE: A point on the edge is inside the circumcircle
              */
-            static
+            static inline
             bool CircumCircle(real_t xp,real_t yp,
                               real_t x1,real_t y1,
                               real_t x2,real_t y2,
@@ -102,21 +105,6 @@ namespace yocto
              The triangle array 'v' should be malloced to 3 * nv
              The vertex array pxyz must be big enough to hold 3 more points
              The vertex array must be sorted in increasing x values say
-             
-             qsort(p,nv,sizeof(XYZ),XYZCompare);
-             :
-             int XYZCompare(void *v1,void *v2)
-             {
-             XYZ *p1,*p2;
-             p1 = v1;
-             p2 = v2;
-             if (p1->x < p2->x)
-             return(-1);
-             else if (p1->x > p2->x)
-             return(1);
-             else
-             return(0);
-             }
              */
             int Triangulate(int nv,XYZ *pxyz,ITRIANGLE *v,int *ntri)
             {
@@ -312,26 +300,39 @@ namespace yocto
                 free(complete);
                 return(status);
             }
-        
+            
         }
+        
+        static inline
+        int XYZCompare(const XYZ &p1, const XYZ &p2) throw()
+        {
+            const real_t x1 = p1.x;
+            const real_t x2 = p2.x;
+            return x1 < x2 ? -1 : ( x2 < x1 ? 1 : 0 );
+        }
+        
         
         template <>
         void delaunay<real_t>:: build( const array<vtx2d> &vertices )
         {
+            //------------------------------------------------------------------
+            // preparing data for triangulation
+            //------------------------------------------------------------------
             const size_t n = vertices.size();
             if(n<=3) return;
-            size_t m = n+3;
-            XYZ *pxyz = memory::kind<memory::global>::acquire_as<XYZ>(m);
-            try
+            auto_arr<XYZ>    pxyz(n+3);
+            auto_arr<size_t> indx(n);
+            assert(pxyz.size>=n+3);
+            for( size_t i=1,j=0;i<=n;++i,++j)
             {
-                memory::kind<memory::global>::release_as(pxyz,m);
+                indx[j]        = i;
+                XYZ         &p = pxyz[j];
+                const vtx2d &v = vertices[i];
+                p.x = v.x;
+                p.y = v.y;
+                p.z = 0;
             }
-            catch(...)
-            {
-                memory::kind<memory::global>::release_as(pxyz,m);
-                throw;
-            }
-            
+            co_hsort(pxyz.base(),indx.base(),n,XYZCompare);
         }
         
         
