@@ -44,7 +44,7 @@ namespace yocto
             if(n>0)
             {
                 auto_arr tmp( size+n );
-                mempcy( tmp.addr, addr, size * sizeof(T) );
+                memcpy( tmp.addr, addr, size * sizeof(T) );
                 swap_with(tmp);
             }
         }

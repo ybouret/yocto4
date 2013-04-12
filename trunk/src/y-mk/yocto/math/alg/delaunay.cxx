@@ -7,6 +7,7 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/hsort.hpp"
+#include "yocto/exception.hpp"
 
 #include <cstdlib>
 
@@ -96,7 +97,10 @@ namespace yocto
                 real_t x,y,z;
             };
             
-            typedef iTriangle ITRIANGLE;
+            struct ITRIANGLE
+            {
+                size_t p1, p2, p3;
+            };
             
             /*
              Triangulation subroutine
@@ -107,32 +111,25 @@ namespace yocto
              The vertex array pxyz must be big enough to hold 3 more points
              The vertex array must be sorted in increasing x values say
              */
-            int Triangulate(size_t nv,XYZ *pxyz,ITRIANGLE *v,int &ntri)
+            size_t Triangulate(size_t     nv,
+                               XYZ       *pxyz,
+                               ITRIANGLE *v)
             {
                 
-                std::cerr << "Triangulate" << std::endl;
                 assert(nv>0);
-                
-                IEDGE *edges = NULL;
-                int nedge = 0;
-                int emax = 200;
-                int status = 0;
-                
+                static const size_t edges_init = 256;
+                static const size_t edges_step = 128;
                 bool inside;
-                int i,j,k;
                 real_t xp,yp,x1,y1,x2,y2,x3,y3,xc,yc,r;
                 real_t xmin,xmax,ymin,ymax,xmid,ymid;
                 real_t dx,dy,dmax;
                 
                 /* Allocate memory for the completeness list, flag for each triangle */
-                const size_t   trimax = 4 * nv;
+                const size_t   trimax = 4 * nv; // or 3 ?
                 auto_arr<bool> complete(trimax);
                 
                 /* Allocate memory for the edge list */
-                if ((edges = (IEDGE *)malloc(emax*(long)sizeof(IEDGE))) == NULL) {
-                    status = 2;
-                    goto skip;
-                }
+                auto_arr<IEDGE> edges( edges_init );
                 
                 /*
                  Find the maximum and minimum vertex bounds.
@@ -142,7 +139,7 @@ namespace yocto
                 ymin = pxyz[0].y;
                 xmax = xmin;
                 ymax = ymin;
-                for (i=1;i<nv;i++) {
+                for(size_t i=1;i<nv;i++) {
                     if (pxyz[i].x < xmin) xmin = pxyz[i].x;
                     if (pxyz[i].x > xmax) xmax = pxyz[i].x;
                     if (pxyz[i].y < ymin) ymin = pxyz[i].y;
@@ -161,20 +158,20 @@ namespace yocto
                  vertex list. The supertriangle is the first triangle in
                  the triangle list.
                  */
-                pxyz[nv+0].x = xmid - 20 * dmax;
+                pxyz[nv+0].x = xmid - REAL(20.0) * dmax;
                 pxyz[nv+0].y = ymid - dmax;
-                pxyz[nv+0].z = 0.0;
+                pxyz[nv+0].z = REAL(0.0);
                 pxyz[nv+1].x = xmid;
-                pxyz[nv+1].y = ymid + 20 * dmax;
-                pxyz[nv+1].z = 0.0;
-                pxyz[nv+2].x = xmid + 20 * dmax;
+                pxyz[nv+1].y = ymid + REAL(20.0) * dmax;
+                pxyz[nv+1].z = REAL(0.0);
+                pxyz[nv+2].x = xmid + REAL(20.0) * dmax;
                 pxyz[nv+2].y = ymid - dmax;
-                pxyz[nv+2].z = 0.0;
-                v[0].p1 = nv;
-                v[0].p2 = nv+1;
-                v[0].p3 = nv+2;
-                complete[0] = false;
-                ntri = 1;
+                pxyz[nv+2].z = REAL(0.0);
+                v[0].p1      = int(nv);
+                v[0].p2      = int(nv+1);
+                v[0].p3      = int(nv+2);
+                complete[0]  = false;
+                size_t ntri  = 1;
                 
                 {
                     ios::ocstream fp("supertri.dat",false);
@@ -187,11 +184,11 @@ namespace yocto
                 /*
                  Include each point one at a time into the existing mesh
                  */
-                for (i=0;i<nv;i++) {
+                for(size_t i=0;i<nv;i++) {
                     
                     xp = pxyz[i].x;
                     yp = pxyz[i].y;
-                    nedge = 0;
+                    size_t nedge = 0;
                     
                     /*
                      Set up the edge buffer.
@@ -199,7 +196,7 @@ namespace yocto
                      three edges of that triangle are added to the edge buffer
                      and that triangle is removed.
                      */
-                    for (j=0;j<ntri;j++)
+                    for(size_t j=0;j<ntri;j++)
                     {
                         if (complete[j])
                             continue;
@@ -215,14 +212,9 @@ namespace yocto
                         if (inside)
                         {
                             /* Check that we haven't exceeded the edge list size */
-                            if (nedge+3 >= emax)
+                            if (nedge+3 >= edges.size)
                             {
-                                emax += 100;
-                                if ((edges = (IEDGE *)realloc(edges,emax*(long)sizeof(IEDGE))) == NULL)
-                                {
-                                    status = 3;
-                                    goto skip;
-                                }
+                                edges.reserve( edges_step );
                             }
                             edges[nedge+0].p1 = v[j].p1;
                             edges[nedge+0].p2 = v[j].p2;
@@ -243,9 +235,9 @@ namespace yocto
                      Note: if all triangles are specified anticlockwise then all
                      interior edges are opposite pointing in direction.
                      */
-                    for (j=0;j<nedge-1;j++)
+                    for(size_t j=0;j<nedge-1;j++)
                     {
-                        for (k=j+1;k<nedge;k++)
+                        for(size_t k=j+1;k<nedge;k++)
                         {
                             if ((edges[j].p1 == edges[k].p2) && (edges[j].p2 == edges[k].p1))
                             {
@@ -271,22 +263,21 @@ namespace yocto
                      Skipping over any tagged edges.
                      All edges are arranged in clockwise order.
                      */
-                    for (j=0;j<nedge;j++)
+                    for(size_t j=0;j<nedge;j++)
                     {
                         if (edges[j].p1 < 0 || edges[j].p2 < 0)
                             continue;
                         
-                        if ((ntri) >= trimax)
+                        if(ntri >= trimax)
                         {
-                            status = 4;
-                            goto skip;
+                            throw exception("Delaunay: #triangles exceeds theoretical max!");
                         }
                         
                         v[ntri].p1 = edges[j].p1;
                         v[ntri].p2 = edges[j].p2;
                         v[ntri].p3 = i;
                         complete[ntri] = false;
-                        (ntri)++;
+                        ++ntri;
                     }
                 }
                 
@@ -294,19 +285,30 @@ namespace yocto
                  Remove triangles with supertriangle vertices
                  These are triangles which have a vertex number greater than nv
                  */
-                for (i=0;i<(ntri);i++)
+                for(size_t i=0;i<ntri;i++)
                 {
                     if (v[i].p1 >= nv || v[i].p2 >= nv || v[i].p3 >= nv)
                     {
-                        v[i] = v[(ntri)-1];
-                        (ntri)--;
-                        i--;
+                        v[i] = v[ntri-1];
+                        --ntri;
+                        --i;
                     }
                 }
                 
-            skip:
-                free(edges);
-                return(status);
+                {
+                    ios::ocstream fp("tri2d.dat",false);
+                    for(size_t i=0;i<ntri;i++)
+                    {
+                        const ITRIANGLE &tr = v[i];
+                        fp("%g %g %g\n", pxyz[tr.p1].x, pxyz[tr.p1].y, pxyz[tr.p1].z);
+                        fp("%g %g %g\n", pxyz[tr.p2].x, pxyz[tr.p2].y, pxyz[tr.p2].z);
+                        fp("%g %g %g\n", pxyz[tr.p3].x, pxyz[tr.p3].y, pxyz[tr.p3].z);
+                        fp("%g %g %g\n", pxyz[tr.p1].x, pxyz[tr.p1].y, pxyz[tr.p1].z);
+                        fp("\n");
+                    }
+                }
+                
+                return ntri;
             }
             
         }
@@ -329,8 +331,8 @@ namespace yocto
             co_hsort(pxyz.base(),indx.base(),nv,XYZCompare);
             auto_arr<ITRIANGLE> vtri(3*nv);
             
-            int ntri = 0;
-            Triangulate(nv, pxyz.base(), vtri.base(), ntri);
+            const size_t ntri = Triangulate(nv, pxyz.base(), vtri.base() );
+            std::cerr << "#ntri=" << ntri << std::endl;
         }
         
         template <>
