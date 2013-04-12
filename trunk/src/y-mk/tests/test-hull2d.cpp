@@ -33,7 +33,20 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
         }
     }
     
-    delaunay<double>::build(vec2);
+    vector<iTriangle> tr;
+    delaunay<double>::build(tr,vec2);
+    
+    {
+        ios::ocstream fp("triangles.dat",false);
+        for(size_t i=1; i <= tr.size(); ++i)
+        {
+            fp("%g %g\n", vec2[ tr[i].p1 ].x, vec2[ tr[i].p1 ].y);
+            fp("%g %g\n", vec2[ tr[i].p2 ].x, vec2[ tr[i].p2 ].y);
+            fp("%g %g\n", vec2[ tr[i].p3 ].x, vec2[ tr[i].p3 ].y);
+            fp("%g %g\n", vec2[ tr[i].p1 ].x, vec2[ tr[i].p1 ].y);
+            fp("\n");
+        }
+    }
     
 }
 YOCTO_UNIT_TEST_DONE();

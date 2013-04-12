@@ -3,6 +3,7 @@
 
 #include "yocto/geom/v3d.hpp"
 #include "yocto/sequence/array.hpp"
+#include "yocto/container/sequence.hpp"
 
 namespace yocto
 {
@@ -12,9 +13,26 @@ namespace yocto
         
 
        
-        struct iTriangle
+        class iTriangle
         {
+        public:
             const size_t p1, p2, p3;
+            
+            inline iTriangle(size_t a, size_t b, size_t c) throw() :
+            p1(a), p2(b), p3(c)
+            {
+                assert(a!=b);
+                assert(b!=c);
+                assert(a!=c);
+            }
+            
+            inline ~iTriangle() throw() {}
+            
+            inline iTriangle( const iTriangle &t) throw() :
+            p1(t.p1),p2(t.p2),p3(t.p3) {}
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(iTriangle);
         };
         
         template <typename T>
@@ -24,7 +42,7 @@ namespace yocto
             typedef geom::v3d<T> vtx3d;
             
             static
-            void build(const array<vtx2d> &);
+            void build( sequence<iTriangle> &trlist, const array<vtx2d> &);
             
             static
             void build(const array<vtx3d> &);

@@ -323,24 +323,40 @@ namespace yocto
         
         
         static inline
-        void __make_delaunay( auto_arr<XYZ> &pxyz, auto_arr<size_t> &indx )
+        void __make_delaunay( sequence<iTriangle> &trlist, auto_arr<XYZ> &pxyz, auto_arr<size_t> &indx )
         {
+            assert(0 == trlist.size() );
             const size_t nv = indx.size;
             assert(nv+3==pxyz.size);
             
+            //-- preparing data for Triangulate
             co_hsort(pxyz.base(),indx.base(),nv,XYZCompare);
             auto_arr<ITRIANGLE> vtri(3*nv);
             
+            
+            //-- call the algorithm
             const size_t ntri = Triangulate(nv, pxyz.base(), vtri.base() );
             std::cerr << "#ntri=" << ntri << std::endl;
+            
+            //-- build user's triangles list
+            for(size_t i=0; i < ntri; ++i)
+            {
+                ITRIANGLE &src = vtri[i];
+                (void)src;
+                const iTriangle tgt( indx[src.p1], indx[src.p2], indx[src.p3] );
+                trlist.push_back(tgt);
+            }
+            
+            
         }
         
         template <>
-        void delaunay<real_t>:: build( const array<vtx2d> &vertices )
+        void delaunay<real_t>:: build( sequence<iTriangle> &trlist, const array<vtx2d> &vertices )
         {
             //------------------------------------------------------------------
             // preparing data for triangulation
             //------------------------------------------------------------------
+            trlist.free();
             const size_t nv = vertices.size();
             if(nv<3) return;
             auto_arr<XYZ>       pxyz(nv+3);
@@ -356,7 +372,7 @@ namespace yocto
                 p.y = v.y;
                 p.z = 0;
             }
-            __make_delaunay(pxyz, indx);
+            __make_delaunay(trlist, pxyz, indx);
         }
         
         
