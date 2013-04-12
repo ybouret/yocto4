@@ -33,21 +33,34 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
         }
     }
     
-    vector<iTriangle> tr;
-    delaunay<double>::build(tr,vec2);
+    vector<iTriangle> trlist;
+    delaunay<double>::build(trlist,vec2);
     
     {
         ios::ocstream fp("triangles.dat",false);
-        for(size_t i=1; i <= tr.size(); ++i)
+        for(size_t i=1; i <= trlist.size(); ++i)
         {
-            fp("%g %g\n", vec2[ tr[i].p1 ].x, vec2[ tr[i].p1 ].y);
-            fp("%g %g\n", vec2[ tr[i].p2 ].x, vec2[ tr[i].p2 ].y);
-            fp("%g %g\n", vec2[ tr[i].p3 ].x, vec2[ tr[i].p3 ].y);
-            fp("%g %g\n", vec2[ tr[i].p1 ].x, vec2[ tr[i].p1 ].y);
+            fp("%g %g\n", vec2[ trlist[i].p1 ].x, vec2[ trlist[i].p1 ].y);
+            fp("%g %g\n", vec2[ trlist[i].p2 ].x, vec2[ trlist[i].p2 ].y);
+            fp("%g %g\n", vec2[ trlist[i].p3 ].x, vec2[ trlist[i].p3 ].y);
+            fp("%g %g\n", vec2[ trlist[i].p1 ].x, vec2[ trlist[i].p1 ].y);
             fp("\n");
         }
     }
     
+    vector<size_t> h;
+    delaunay_hull(h, trlist);
+    std::cerr << "hull=" << h << std::endl;
+    {
+        ios::ocstream fp("hull.dat", false);
+        for(size_t i=1; i <= h.size(); ++i )
+        {
+            fp("%g %g\n", vec2[h[i]].x, vec2[h[i]].y);
+        }
+        if( h.size() )
+            fp("%g %g\n", vec2[h[1]].x, vec2[h[1]].y);
+
+    }
 }
 YOCTO_UNIT_TEST_DONE();
 

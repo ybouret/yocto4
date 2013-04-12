@@ -11,8 +11,6 @@ namespace yocto
     namespace math
     {
         
-
-       
         class iTriangle
         {
         public:
@@ -41,13 +39,21 @@ namespace yocto
             typedef geom::v2d<T> vtx2d;
             typedef geom::v3d<T> vtx3d;
             
+            //! return a list of clockwise triangles
             static
             void build( sequence<iTriangle> &trlist, const array<vtx2d> &);
             
+            //! return a list of clockwise triangles
             static
             void build( sequence<iTriangle> &trlist, const array<vtx3d> &);
             
+            
+            
         };
+        
+        //! return the list of indices composing the convex hull
+        void delaunay_hull(sequence<size_t>          &h,
+                           const array<iTriangle>    &trlist);
         
     }
     
