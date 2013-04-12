@@ -106,16 +106,15 @@ namespace yocto
              The vertex array pxyz must be big enough to hold 3 more points
              The vertex array must be sorted in increasing x values say
              */
-            int Triangulate(int nv,XYZ *pxyz,ITRIANGLE *v,int &ntri)
+            int Triangulate(size_t nv,XYZ *pxyz,ITRIANGLE *v,int &ntri)
             {
-             
+                
                 std::cerr << "Triangulate" << std::endl;
                 assert(nv>0);
                 
-                bool  *complete = NULL;
                 IEDGE *edges = NULL;
                 int nedge = 0;
-                int trimax,emax = 200;
+                int emax = 200;
                 int status = 0;
                 
                 bool inside;
@@ -125,11 +124,8 @@ namespace yocto
                 real_t dx,dy,dmax;
                 
                 /* Allocate memory for the completeness list, flag for each triangle */
-                trimax = 4 * nv;
-                if ((complete = (bool *)malloc(trimax*sizeof(bool))) == NULL) {
-                    status = 1;
-                    goto skip;
-                }
+                const size_t   trimax = 4 * nv;
+                auto_arr<bool> complete(trimax);
                 
                 /* Allocate memory for the edge list */
                 if ((edges = (IEDGE *)malloc(emax*(long)sizeof(IEDGE))) == NULL) {
@@ -309,7 +305,6 @@ namespace yocto
                 
             skip:
                 free(edges);
-                free(complete);
                 return(status);
             }
             
@@ -324,20 +319,32 @@ namespace yocto
         }
         
         
+        static inline
+        void __make_delaunay( auto_arr<XYZ> &pxyz, auto_arr<size_t> &indx )
+        {
+            const size_t nv = indx.size;
+            assert(nv+3==pxyz.size);
+            
+            co_hsort(pxyz.base(),indx.base(),nv,XYZCompare);
+            auto_arr<ITRIANGLE> vtri(3*nv);
+            
+            int ntri = 0;
+            Triangulate(nv, pxyz.base(), vtri.base(), ntri);
+        }
+        
         template <>
         void delaunay<real_t>:: build( const array<vtx2d> &vertices )
         {
             //------------------------------------------------------------------
             // preparing data for triangulation
             //------------------------------------------------------------------
-            const size_t n = vertices.size();
-            if(n<3) return;
-            auto_arr<XYZ>       pxyz(n+3);
-            auto_arr<size_t>    indx(n);
-            auto_arr<ITRIANGLE> vtri(3*n);
+            const size_t nv = vertices.size();
+            if(nv<3) return;
+            auto_arr<XYZ>       pxyz(nv+3);
+            auto_arr<size_t>    indx(nv);
             
-            assert(pxyz.size>=n+3);
-            for( size_t i=1,j=0;i<=n;++i,++j)
+            assert(pxyz.size==nv+3);
+            for( size_t i=1,j=0;i<=nv;++i,++j)
             {
                 indx[j]        = i;
                 XYZ         &p = pxyz[j];
@@ -346,9 +353,7 @@ namespace yocto
                 p.y = v.y;
                 p.z = 0;
             }
-            co_hsort(pxyz.base(),indx.base(),n,XYZCompare);
-            int ntri = 0;
-            Triangulate(n, pxyz.base(), vtri.base(), ntri);
+            __make_delaunay(pxyz, indx);
         }
         
         
