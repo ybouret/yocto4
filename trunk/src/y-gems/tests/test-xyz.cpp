@@ -21,7 +21,7 @@ YOCTO_UNIT_TEST_IMPL(xyz)
         
         if(true)
         {
-            IO::XYZ::Frames frames;
+            XYZ::Frames frames;
             frames.load( fp, nmax );
             std::cerr << "#frames=" << frames.size() << std::endl;
         }
