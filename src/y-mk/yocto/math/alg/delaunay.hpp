@@ -11,6 +11,7 @@ namespace yocto
     namespace math
     {
         
+        //! triangle by indidces
         class iTriangle
         {
         public:
@@ -44,6 +45,9 @@ namespace yocto
             void build( sequence<iTriangle> &trlist, const array<vtx2d> &);
             
             //! return a list of clockwise triangles
+            /**
+             the third dimension is untouched.
+             */
             static
             void build( sequence<iTriangle> &trlist, const array<vtx3d> &);
             
