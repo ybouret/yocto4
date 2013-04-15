@@ -29,5 +29,6 @@ ADD_TEST(CGrad    test-mk cgrad)
 ADD_TEST(CGrad2   test-mk cgrad2)
 ADD_TEST(Newton   test-mk newton)
 ADD_TEST(Newton2  test-mk newton2)
+ADD_TEST(Tri2D    test-mk tr2d 100)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
