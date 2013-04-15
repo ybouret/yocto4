@@ -79,7 +79,7 @@ namespace yocto
 		}
 		
 		template <>
-		void data_set<z_type>:: load( ios::istream &in, size_t skip, size_t nmax ) const
+		void data_set<z_type>:: load( ios::istream &in, callback *keep, size_t skip, size_t nmax ) const
 		{
 			const size_t     n = map_.size();
 			if( n <= 0 )
@@ -111,10 +111,24 @@ namespace yocto
 			}
 			
 			const bool limited = nmax > 0;
+            size_t     count   = 0;
 			while( in.read_line(line) >= 0 )
 			{
 				parse_line(line);
-				if( limited && (*first_col)->size() >= nmax )
+                if(keep)
+                {
+                    colmap::iterator        i = first_col;
+                    const sequence<real_t> &f = **i;
+                    if( ! (*keep)(f.back()) )
+                    {
+                        //-- suppress the point
+                        for( i=first_col; i != last_col; ++i)
+                        {
+                            (**i).pop_back();
+                        }
+                    }
+                }
+				if( limited && ++count >= nmax )
 					return;
 				line.clear();
 				++iline;
