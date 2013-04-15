@@ -8,7 +8,7 @@
 #include "yocto/code/hsort.hpp"
 #include "yocto/exception.hpp"
 
-//#include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 
 #include <cstdlib>
@@ -122,7 +122,7 @@ namespace yocto
                 assert(nv>0);
                 static const size_t edges_init = 256;
                 static const size_t edges_step = 128;
-
+                
                 real_t xp,yp,x1,y1,x2,y2,x3,y3,xc,yc,r;
                 real_t xmin,xmax,ymin,ymax,xmid,ymid;
                 real_t dx,dy,dmax;
@@ -420,6 +420,114 @@ namespace yocto
             __make_delaunay(trlist, pxyz, indx);
         }
         
+        template <>
+        real_t delaunay<real_t>::area( const array<size_t> &h, const array<vtx2d> &v)
+        {
+            real_t A = 0;
+            const size_t n=h.size();
+            if(n>2)
+            {
+                for(size_t i=n;i>0;--i)
+                {
+                    const vtx2d &p = v[h[i]];
+                    const vtx2d &q = v[h[i<n ? i+1:1]];
+                    A += p.x * q.y - p.y * q.x;
+                }
+                
+            }
+            return Fabs( REAL(0.5) * A);
+        }
+        
+        template <>
+        real_t delaunay<real_t>::area( const array<size_t> &h, const array<vtx3d> &v)
+        {
+            real_t A = 0;
+            const size_t n=h.size();
+            if(n>2)
+            {
+                for(size_t i=n;i>0;--i)
+                {
+                    const vtx3d &p = v[h[i]];
+                    const vtx3d &q = v[h[i<n ? i+1:1]];
+                    A += p.x * q.y - q.x * p.y;
+                }
+            }
+            return Fabs( REAL(0.5) * A);
+        }
+        
+        template <>
+        void delaunay<real_t>:: save_vtk(const string &filename,
+                                         const string &title,
+                                         const array<iTriangle> &tr,
+                                         const array<vtx2d> &vtx)
+        {
+            ios::ocstream fp(filename,false);
+            
+            //-- prolog
+            fp("# vtk DataFile Version 3.0\n");
+			fp("%s\n", title.c_str());
+			fp("ASCII\n");
+            
+            //-- triangle
+            const size_t nt = tr.size();
+            fp("DATASET POLYDATA\n");
+            fp("POINTS %u float\n", unsigned(nt) * 3 );
+            for(size_t i=1; i <= nt; ++i )
+            {
+                const iTriangle &t = tr[i];
+                const vtx2d &v1 = vtx[ t.p1 ];
+                const vtx2d &v2 = vtx[ t.p2 ];
+                const vtx2d &v3 = vtx[ t.p3 ];
+                fp("%g %g 0.0\n", v1.x, v1.y);
+                fp("%g %g 0.0\n", v2.x, v2.y);
+                fp("%g %g 0.0\n", v3.x, v3.y);
+            }
+            fp("POLYGONS %u %u\n", unsigned(nt), unsigned(4 * nt) );
+            unsigned count = 0;
+            for(size_t i=1; i <= nt; ++i, count += 3)
+            {
+                fp("3 %u %u %u\n", count, count+1, count+2 );
+            }
+
+        }
+        
+        template <>
+        void delaunay<real_t>:: save_vtk(const string &filename,
+                                         const string &title,
+                                         const array<iTriangle> &tr,
+                                         const array<vtx3d> &vtx)
+        {
+            ios::ocstream fp(filename,false);
+            
+            //-- prolog
+            fp("# vtk DataFile Version 3.0\n");
+			fp("%s\n", title.c_str());
+			fp("ASCII\n");
+            
+            //-- triangle
+            const size_t nt = tr.size();
+            fp("DATASET POLYDATA\n");
+            fp("POINTS %u float\n", unsigned(nt) * 3 );
+            for(size_t i=1; i <= nt; ++i )
+            {
+                const iTriangle &t = tr[i];
+                const vtx3d &v1 = vtx[ t.p1 ];
+                const vtx3d &v2 = vtx[ t.p2 ];
+                const vtx3d &v3 = vtx[ t.p3 ];
+                fp("%g %g %g\n", v1.x, v1.y, v1.z);
+                fp("%g %g %g\n", v2.x, v2.y, v2.z);
+                fp("%g %g %g\n", v3.x, v3.y, v3.z);
+            }
+            
+            fp("POLYGONS %u %u\n", unsigned(nt), unsigned(4 * nt) );
+            unsigned count = 0;
+            for(size_t i=1; i <= nt; ++i, count += 3)
+            {
+                fp("3 %u %u %u\n", count, count+1, count+2 );
+            }
+            
+        }
+
         
         
     }

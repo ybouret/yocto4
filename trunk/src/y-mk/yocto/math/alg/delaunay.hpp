@@ -4,6 +4,7 @@
 #include "yocto/math/v3d.hpp"
 #include "yocto/sequence/array.hpp"
 #include "yocto/container/sequence.hpp"
+#include "yocto/string.hpp"
 
 namespace yocto
 {
@@ -20,9 +21,9 @@ namespace yocto
             inline iTriangle(size_t a, size_t b, size_t c) throw() :
             p1(a), p2(b), p3(c)
             {
-                assert(a!=b);
-                assert(b!=c);
-                assert(a!=c);
+                assert(p1!=p2);
+                assert(p1!=p3);
+                assert(p2!=p3);
             }
             
             inline ~iTriangle() throw() {}
@@ -51,11 +52,32 @@ namespace yocto
             static
             void build( sequence<iTriangle> &trlist, const array<vtx3d> &);
             
+            static
+            T area( const array<size_t> &h, const array<vtx2d> &v);
+            
+            static
+            T area( const array<size_t> &h, const array<vtx3d> &v);
+            
+            static
+            void save_vtk(const string           &filename,
+                          const string           &title,
+                          const array<iTriangle> &tr,
+                          const array<vtx2d>     &vtx);
+            
+            static
+            void save_vtk(const string           &filename,
+                          const string           &title,
+                          const array<iTriangle> &tr,
+                          const array<vtx3d>     &vtx);
+            
         };
         
         //! return the list of indices composing the convex hull
         void delaunay_hull(sequence<size_t>          &h,
                            const array<iTriangle>    &trlist);
+        
+        
+        
         
     }
     
