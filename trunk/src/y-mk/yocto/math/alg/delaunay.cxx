@@ -221,6 +221,8 @@ namespace yocto
                             {
                                 edges.reserve( edges_step );
                             }
+                            
+                            /* register the edges */
                             edges[nedge+0].p1 = v[j].p1;
                             edges[nedge+0].p2 = v[j].p2;
                             edges[nedge+1].p1 = v[j].p2;

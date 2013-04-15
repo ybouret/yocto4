@@ -5,6 +5,7 @@
 #include "yocto/functor.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/shared-ptr.hpp"
+#include "yocto/math/v3d.hpp"
 
 namespace yocto
 {
@@ -21,8 +22,8 @@ namespace yocto
                 virtual ~Line() throw();
                 Line(const Line &);
                 
-                const string id;
-                const double x,y,z;
+                const string      id;
+                double            x,y,z;
                 
                 
             private:
