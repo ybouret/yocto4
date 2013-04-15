@@ -51,8 +51,6 @@ namespace yocto
             static
             void build( sequence<iTriangle> &trlist, const array<vtx3d> &);
             
-            
-            
         };
         
         //! return the list of indices composing the convex hull
