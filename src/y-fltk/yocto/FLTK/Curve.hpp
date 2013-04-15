@@ -2,7 +2,7 @@
 #define YOCTO_FLTK_CURVE_INCLUDED 1
 
 #include "yocto/string.hpp"
-#include "yocto/geom/v2d.hpp"
+#include "yocto/math/v2d.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/counted.hpp"
 
@@ -16,7 +16,7 @@ namespace yocto
     namespace FLTK 
     {
         
-        typedef geom::v2d<double> Point;
+        typedef math::v2d<double> Point;
         typedef vector<Point>     Points;
         
         class Curve : public Points, public counted

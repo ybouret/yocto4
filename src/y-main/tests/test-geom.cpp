@@ -1,10 +1,9 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/geom/v2d.hpp"
+#include "yocto/math/v2d.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
-using namespace geom;
 using namespace math;
 
 YOCTO_UNIT_TEST_IMPL(geom)

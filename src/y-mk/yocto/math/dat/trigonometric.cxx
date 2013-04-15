@@ -4,37 +4,37 @@
 
 namespace yocto
 {
-
+    
 	namespace math
 	{
-
+        
 		template <>
 		trigonometric<real_t>:: ~trigonometric() throw()
 		{
-
+            
 		}
-
-
+        
+        
 		static inline
-			size_t __check_size( size_t n )
+        size_t __check_size( size_t n )
 		{
 			if( n < 3 )
 				throw exception("trigonometric interpolation: size < 3");
 			return n;
 		}
-
-
+        
+        
 		template <>
 		trigonometric<real_t>:: trigonometric( const array<real_t> &theta, lu<real_t> &solver ) :
 		n( __check_size(theta.size()) ),
-			is_even( 0 == (n&1) ),
-			n2( n>>1 ),
-			nn( is_even ? n2-1:n2 ),
-			M()
+        is_even( 0 == (n&1) ),
+        n2( n>>1 ),
+        nn( is_even ? n2-1:n2 ),
+        M()
 		{
 			solver.ensure(n);
 			M.make(n,n);
-
+            
 			//------------------------------------------------------------------
 			// build the matrix to find coefficients
 			//------------------------------------------------------------------
@@ -53,22 +53,22 @@ namespace yocto
 				if(is_even)
 					M_i[j] = Cos( n2*t_i );
 			}
-
+            
 			//------------------------------------------------------------------
 			// see if the system is ok
 			//------------------------------------------------------------------
 			if( !solver.build(M) )
 				throw exception("invalid trigonometric interpolation");
-
+            
 		}
-
+        
 		template <>
 		void trigonometric<real_t>:: compute( array<real_t> &a, lu<real_t> &solver ) const throw()
 		{
 			assert( a.size() == n );
 			solver.solve(M,a);
 		}
-
+        
 		template <>
 		real_t trigonometric<real_t>:: operator()( real_t theta, const array<real_t> &a ) const throw()
 		{
@@ -93,14 +93,14 @@ namespace yocto
 			}
 			return v;
 		}
-
+        
 		template <>
-		geom::v2d<real_t> trigonometric<real_t>::operator()( real_t theta, const array<real_t> &ax, const array<real_t> &ay ) const throw()
+		v2d<real_t> trigonometric<real_t>::operator()( real_t theta, const array<real_t> &ax, const array<real_t> &ay ) const throw()
 		{
 			assert( ax.size() == n );
 			assert( ay.size() == n );
 			size_t            j=1;
-			geom::v2d<real_t> v(ax[j],ay[j]);
+			v2d<real_t> v(ax[j],ay[j]);
 			++j;
 			for( size_t k=1; k <= nn; ++k )
 			{
@@ -122,9 +122,9 @@ namespace yocto
 				v.y += ay[j] * ca;
 			}
 			return v;
-
+            
 		}
-
-
+        
+        
 	}
 }

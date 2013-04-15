@@ -8,7 +8,7 @@
 #include <VisItDataInterface_V2.h>
 #include "yocto/spade/rmesh.hpp"
 #include "yocto/associative/set.hpp"
-#include "yocto/geom/v3d.hpp"
+#include "yocto/math/v3d.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -55,10 +55,10 @@ namespace yocto
             {
                 { const param p( typeid(float),             VISIT_VARTYPE_SCALAR, 1);  record(p); }
                 { const param p( typeid(double),            VISIT_VARTYPE_SCALAR, 1);  record(p); }
-                { const param p( typeid(geom::v2d<float>),  VISIT_VARTYPE_VECTOR, 2);  record(p); }
-                { const param p( typeid(geom::v2d<double>), VISIT_VARTYPE_VECTOR, 2);  record(p); }
-                { const param p( typeid(geom::v3d<float>),  VISIT_VARTYPE_VECTOR, 3);  record(p); }
-                { const param p( typeid(geom::v3d<double>), VISIT_VARTYPE_VECTOR, 3);  record(p); }
+                { const param p( typeid(math::v2d<float>),  VISIT_VARTYPE_VECTOR, 2);  record(p); }
+                { const param p( typeid(math::v2d<double>), VISIT_VARTYPE_VECTOR, 2);  record(p); }
+                { const param p( typeid(math::v3d<float>),  VISIT_VARTYPE_VECTOR, 3);  record(p); }
+                { const param p( typeid(math::v3d<double>), VISIT_VARTYPE_VECTOR, 3);  record(p); }
                 
             }
             virtual ~VisItIO() throw() {}

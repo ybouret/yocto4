@@ -1,12 +1,12 @@
 #ifndef _YOCTO_M3D_HPP_
 #define _YOCTO_M3D_HPP_ 1
 
-#include "yocto/geom/v3d.hpp"
-#include "yocto/geom/m2d.hpp"
+#include "yocto/math/v3d.hpp"
+#include "yocto/math/m2d.hpp"
 
 namespace yocto {
 
-	namespace geom {
+	namespace math {
 
 		template <typename T>
 		struct m3d {

@@ -75,8 +75,8 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/geom/v2d.hpp"
-typedef geom::v2d<double> vtx;
+#include "yocto/math/v2d.hpp"
+typedef v2d<double> vtx;
 
 struct Param
 {

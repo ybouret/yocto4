@@ -1,5 +1,5 @@
 
-#include "yocto/geom/m3d.hpp"
+#include "yocto/math/m3d.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/swap.hpp"
 
@@ -8,9 +8,8 @@
 
 namespace yocto {
 
-	namespace geom {
+	namespace math {
 
-		using math::real_t;
 		
 		template<>
 		m3d<real_t>:: m3d(const real_t diag) throw() :

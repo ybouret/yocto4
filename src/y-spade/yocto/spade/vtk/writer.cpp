@@ -1,6 +1,6 @@
 #include "yocto/spade/vtk/writer.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/geom/v3d.hpp"
+#include "yocto/math/v3d.hpp"
 
 namespace yocto
 {
@@ -8,11 +8,11 @@ namespace yocto
     {
         vtk_writer:: ~vtk_writer() throw() {}
         
-        typedef geom::v2d<float>  v2d_flt;
-		typedef geom::v2d<double> v2d_dbl;
+        typedef math::v2d<float>  v2d_flt;
+		typedef math::v2d<double> v2d_dbl;
         
-        typedef geom::v3d<float>  v3d_flt;
-		typedef geom::v3d<double> v3d_dbl;
+        typedef math::v3d<float>  v3d_flt;
+		typedef math::v3d<double> v3d_dbl;
         
         
 		namespace

@@ -8,7 +8,7 @@
 using namespace yocto;
 using namespace spade;
 
-typedef geom::v3d<double> vertex;
+typedef math::v3d<double>    vertex;
 typedef iso3d<double,double> ISO3D;
 
 namespace

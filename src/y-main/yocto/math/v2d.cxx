@@ -1,4 +1,4 @@
-#include "yocto/geom/v2d.hpp"
+#include "yocto/math/v2d.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
@@ -7,10 +7,8 @@
 
 namespace yocto {
 	
-	namespace geom {
-		
-		using math::real_t;
-		
+	namespace math {
+        
 		template <>
 		v2d<real_t>:: v2d() throw() : x(0), y(0) {
 		}
