@@ -27,6 +27,15 @@ static const double Chi2( size_t i,
     return Fabs(f[i] - f_star) + Fabs( (f[i+1]-f[i]) - (t[i+1]-t[i]) * d_star);
 }
 
+struct time_selector
+{
+    double tmin,tmax;
+    bool   accept( double t ) const throw()
+    {
+        return t >= tmin && t <= tmax;
+    }
+};
+
 int main( int argc, char *argv[] )
 {
     const char *progname = _vfs::get_base_name(argv[0]);
@@ -87,11 +96,15 @@ int main( int argc, char *argv[] )
         //
         ////////////////////////////////////////////////////////////////////////
         
-        if( argc <= 3)
-            throw exception("usage: %s input_file #col FreqMin", progname);
-        const string input_file = argv[1];
-        const size_t col_index  = strconv::to_size(   argv[2], "#col" );
-        double       FreqMin    = strconv::to_double( argv[3], "FreqMin");
+        if( argc <= 4)
+            throw exception("usage: %s input_file #col tmin tmax", progname);
+        const string  input_file = argv[1];
+        const size_t  col_index = strconv::to_size( argv[2], "#col" );
+        time_selector ts = { 0, 0};
+        ts.tmin          = strconv::to_double( argv[3], "tmin");
+        ts.tmax          = strconv::to_double( argv[4], "tmax");
+        if( ts.tmax < ts.tmin )
+            throw exception("invalid time range !!!");
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -103,6 +116,7 @@ int main( int argc, char *argv[] )
         vector<double> f_raw( default_size, as_capacity );
         {
             data_set<double> ds;
+            data_set<double>::callback cb( &ts, & time_selector:: accept );
             ds.use(1,         t_raw);
             ds.use(col_index, f_raw);
             ios::icstream in( input_file );
