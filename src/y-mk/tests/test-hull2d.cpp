@@ -59,8 +59,11 @@ YOCTO_UNIT_TEST_IMPL(tr2d)
         }
         if( h.size() )
             fp("%g %g\n", vec2[h[1]].x, vec2[h[1]].y);
-
     }
+    std::cerr << "Area=" << delaunay<double>::area(h, vec2) << std::endl;
+    
+    delaunay<double>::save_vtk("triangles.vtk", "delaunay", trlist, vec2);
+    
 }
 YOCTO_UNIT_TEST_DONE();
 
