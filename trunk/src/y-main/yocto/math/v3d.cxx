@@ -1,4 +1,4 @@
-#include "yocto/geom/v3d.hpp"
+#include "yocto/math/v3d.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/math/ztype.hpp"
 #include <iostream>
@@ -6,9 +6,8 @@
 
 namespace yocto {
 	
-	namespace geom {
+	namespace math {
 		
-		using math::real_t;
 		
 		template <>
 		v3d<real_t>:: v3d() throw() : x(0), y(0), z(0) {

@@ -4,11 +4,11 @@
 #ifndef YOCTO_V3D_INCLUDED
 #define YOCTO_V3D_INCLUDED 1
 
-#include "yocto/geom/v2d.hpp"
+#include "yocto/math/v2d.hpp"
 
 namespace yocto {
 	
-	namespace geom {
+	namespace math {
 		
 		template <class T>
 		struct v3d {
@@ -103,8 +103,8 @@ namespace yocto {
 	
 }
 
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<float>)
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<double>)
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v3d<ptrdiff_t>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<float>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<double>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v3d<ptrdiff_t>)
 
 #endif

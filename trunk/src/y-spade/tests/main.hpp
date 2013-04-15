@@ -31,15 +31,15 @@ T genv1()
 }
 
 template <typename T>
-geom::v2d<T> genv2()
+math::v2d<T> genv2()
 {
-    return geom::v2d<T>( genv1<T>(), genv1<T>() );
+    return math::v2d<T>( genv1<T>(), genv1<T>() );
 }
 
 template <typename T>
-geom::v3d<T> genv3()
+math::v3d<T> genv3()
 {
-    return geom::v3d<T>( genv1<T>(), genv1<T>(), genv1<T>() );
+    return math::v3d<T>( genv1<T>(), genv1<T>(), genv1<T>() );
 }
 
 

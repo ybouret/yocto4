@@ -22,7 +22,7 @@ namespace yocto
             }
             
             static inline
-            void compute( array2D<T> &L, const array2D<T> &U, const layout2D &zone, const geom::v2d<T> &inv_dsq ) throw()
+            void compute( array2D<T> &L, const array2D<T> &U, const layout2D &zone, const math::v2d<T> &inv_dsq ) throw()
             {
                 
                 for( unit_t j=zone.lower.y,jm=j-1,jp=j+1;j<=zone.upper.y;++j,++jm,++jp )
@@ -43,7 +43,7 @@ namespace yocto
             }
             
             static inline
-            void compute( array3D<T> &L, const array3D<T> &U, const layout3D &zone, const geom::v3d<T> &inv_dsq ) throw()
+            void compute( array3D<T> &L, const array3D<T> &U, const layout3D &zone, const math::v3d<T> &inv_dsq ) throw()
             {
                 for( unit_t k=zone.lower.z,km=k-1,kp=k+1;k<=zone.upper.z;++k,++km,++kp )
                 {

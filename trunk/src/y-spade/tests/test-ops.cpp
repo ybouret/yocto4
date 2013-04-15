@@ -49,7 +49,7 @@ void test2D()
     
     wtime chrono;
     chrono.start();
-    const geom::v2d<T> inv_dsq(1,1);
+    const math::v2d<T> inv_dsq(1,1);
     const size_t ITER_MAX = 1 << 14;
     for(size_t i=0;i<ITER_MAX;++i)
     {
@@ -78,7 +78,7 @@ void test3D()
     
     wtime chrono;
     chrono.start();
-    const geom::v3d<T> inv_dsq(1,1,1);
+    const math::v3d<T> inv_dsq(1,1,1);
     const size_t ITER_MAX = 1 << 8;
     for(size_t i=0;i<ITER_MAX;++i)
     {

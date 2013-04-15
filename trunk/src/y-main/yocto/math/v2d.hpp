@@ -10,7 +10,7 @@
 
 namespace yocto {
     
-	namespace geom {
+	namespace math {
         
 		template <class T>
 		struct v2d {
@@ -110,9 +110,9 @@ namespace yocto {
 }
 
 
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<float>)
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<double>)
-YOCTO_SUPPORT_C_STYLE_OPS(geom::v2d<ptrdiff_t>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<float>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<double>)
+YOCTO_SUPPORT_C_STYLE_OPS(math::v2d<ptrdiff_t>)
 
 
 

@@ -19,7 +19,7 @@ typedef coord3D  Coord;
 typedef layout3D Layout;
 typedef double   Real;
 
-typedef geom::v3d<Real>                  Vertex;
+typedef math::v3d<Real>                  Vertex;
 typedef array3D<Real>                    Array;
 typedef mpi_workspace<Layout,rmesh,Real> Workspace;
 typedef fields_setup<Layout>             FieldsSetup;

@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_ALG_DELAUNAY_INCLUDED
 #define YOCTO_MATH_ALG_DELAUNAY_INCLUDED 1
 
-#include "yocto/geom/v3d.hpp"
+#include "yocto/math/v3d.hpp"
 #include "yocto/sequence/array.hpp"
 #include "yocto/container/sequence.hpp"
 
@@ -36,8 +36,8 @@ namespace yocto
         template <typename T>
         struct delaunay
         {
-            typedef geom::v2d<T> vtx2d;
-            typedef geom::v3d<T> vtx3d;
+            typedef v2d<T> vtx2d;
+            typedef v3d<T> vtx3d;
             
             //! return a list of clockwise triangles
             static
