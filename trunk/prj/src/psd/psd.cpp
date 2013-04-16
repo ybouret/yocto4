@@ -120,7 +120,7 @@ int main( int argc, char *argv[] )
             ds.use(1,         t_raw);
             ds.use(col_index, f_raw);
             ios::icstream in( input_file );
-            ds.load(in);
+            ds.load(in,&cb); //!< load with time selection
         }
         
         const size_t n_raw = t_raw.size();
@@ -214,8 +214,8 @@ int main( int argc, char *argv[] )
         ////////////////////////////////////////////////////////////////////////
         //const size_t m_max = (n/2);
         
-        const size_t m = n/2;
-        const double M = m << 1;
+        const size_t m  = n/2;
+        const double M  = m << 1;
         const double df = 1.0/(dt*M);
         vector<double> frq(m,0);
         vector<double> psd(m,0);
