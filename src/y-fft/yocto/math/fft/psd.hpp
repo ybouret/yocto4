@@ -19,45 +19,20 @@ namespace yocto
 		struct PSD
 		{
 			typedef typename numeric<T>::function Window;
-			static  T Square( T );   //!< Square Function, Test Only!
-			static  T Bartlett( T ); //!<  1-|(x-0.5)/0.5|
-			static  T Hann( T );     //!<  1- cos(2 \pi x )
-			static  T Welch( T );    //!<  1-((x-0.5)/0.5)^2
-			
-			//! truncated gaussian window
-			class     Gaussian
-			{
-			public:
-				const T sigma;
-				T operator()( T ) const;
-				Gaussian( T sig ) throw();
-				~Gaussian() throw();
-				Gaussian( const Gaussian & ) throw();
-				
-				YOCTO_DISABLE_ASSIGN(Gaussian);
-			};
-			
-			//! generic blackman window
-			class Blackman
-			{
-			public:
-				const T a0, a1, a2;
-				T operator()( T ) const;     //!< a0 - a1 * cos( 2 \pi x ) + a2 * cos( 4 \pi x )
-				Blackman( T alpha ) throw(); //!< default should be 0.16
-				~Blackman() throw();
-				Blackman( const Blackman & ) throw();
-				
-				YOCTO_DISABLE_ASSIGN(Blackman);
-			};
-			
+			static  T Square( T )   throw(); //!< Square Function, Test Only!
+            static  T Welch( T )    throw(); //!<  1-((x-0.5)/0.5)^2
+			static  T Bartlett( T ) throw(); //!<  1-|(x-0.5)/0.5|
+			static  T Hann( T )     throw(); //!<  1- cos(2 \pi x )
+            static  T Blackman(T)   throw(); //!<  (1-0.16)/2 - 0.5 * cos(2\pi x) + 0.16/2 cos(4\pi x)
+            static  T Nutall(T)     throw(); //!< 0.355768 - 0.487396 * cos(2*pi*x) + 0.144232 * cos(4*pi*x) - 0.012604 * cos(6*pi*x)
+            
 			//! Compute with windowing
 			/**
 			 \param w       a windowing function
 			 \param p       [0..m-1] power spectral density
 			 \param m       desired  length, using a M = 2*m sub-sampling
 			 \param data    [0..size-1] input signal
-			 \param size    a power of two
-			 \param overlap use overlapping of m points
+			 \param size    data size >= 2*m
 			 \warning M=2*m must be a less than size
 			 \return M
 			 
@@ -69,24 +44,16 @@ namespace yocto
 			 than Freq_max, you must extract a signal
 			 with delta_t <= 1/(2Freq_max) and
 			 m >= Freq_max/Freq_min.
-			 The total number of points must be >= 2*m, so that
-			 the data size must be = 2^N * (2*m) (N in [0..])
-			 with the right sampling rate.
+			 The total number of points must be >= 2*m
 			 */
-			static
-			size_t Compute(Window       &w,
-						   T            *p,
-						   const size_t  m,
-						   const T      *data,
-						   const size_t  size,
-						   const size_t  options);
-            
             static
-            size_t Compute(Window         &w,
-                           array<T>       &psd,
-                           const array<T> &data,
-                           const size_t    options);
-			
+            void Compute(Window      &w,
+                         T           *p,
+                         const size_t m,
+                         const T     *data,
+                         const size_t size);
+            
+            
 		};
 		
 	}

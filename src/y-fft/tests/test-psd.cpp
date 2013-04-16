@@ -16,6 +16,7 @@ template <typename T>
 void perform_psd( const size_t p, const size_t q )
 {
 
+
 	const size_t n  = 1 << p;
 	const size_t m = (1<<q);
 
@@ -33,6 +34,7 @@ void perform_psd( const size_t p, const size_t q )
 	const T rho   = 0.5  + 1.5  * alea<T>();
 	const T noise = 0.05 + 0.05 * alea<T>();
 
+    
 	for( size_t i=1; i < n; ++i )
 	{
 		const T t = times[i] = (i-1) * dt;
@@ -53,26 +55,15 @@ void perform_psd( const size_t p, const size_t q )
 	typename PSD<T>::Window  WelchWindow    = cfunctor( PSD<T>::Welch );
 	typename PSD<T>::Window  BartlettWindow = cfunctor( PSD<T>::Bartlett );
 	typename PSD<T>::Window  HannWindow     = cfunctor( PSD<T>::Hann );
-
-	typename PSD<T>::Gaussian G(0.7);
-	typename PSD<T>::Window   GaussWindow( G );
-	typename PSD<T>::Blackman B(0.22);
-	typename PSD<T>::Window   BlackmanWindow( B );
-
-	const size_t flags = 0; //normalize ? PSD_Normalize : 0;
-	
-#if 1
-	matrix<T> psd(ns,m);
-	PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n, flags );
-	PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
-	PSD<T>::Compute( BartlettWindow, &psd[++idx][1], m, data(0), n, flags );
-	PSD<T>::Compute( BartlettWindow, &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
-	PSD<T>::Compute( HannWindow,     &psd[++idx][1], m, data(0), n, flags );
-	PSD<T>::Compute( HannWindow,     &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
-	PSD<T>::Compute( GaussWindow,    &psd[++idx][1], m, data(0), n, flags );
-	PSD<T>::Compute( GaussWindow,    &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
-	PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n, flags );
-	PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n, flags | PSD_Overlap );
+    typename PSD<T>::Window  BlackmanWindow = cfunctor( PSD<T>::Blackman);
+    typename PSD<T>::Window  NutallWindow   = cfunctor( PSD<T>::Nutall);
+    
+    matrix<T> psd(ns,m);
+    PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n);
+    PSD<T>::Compute( BartlettWindow, &psd[++idx][1], m, data(0), n);
+    PSD<T>::Compute( HannWindow,     &psd[++idx][1], m, data(0), n);
+    PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n);
+    PSD<T>::Compute( NutallWindow,   &psd[++idx][1], m, data(0), n);
 
 	{
 		const char *filename = "psd.dat";
@@ -81,14 +72,14 @@ void perform_psd( const size_t p, const size_t q )
 		{
 			const T f = df * (i-1);
 			fp("%g", f);
-			for( size_t j=1; j <= ns; ++j )
+			for( size_t j=1; j <= idx; ++j )
 			{
 				fp(" %g", psd[j][i] );
 			}
 			fp("\n");
 		}
 	}
-#endif
+    
 
 }
 

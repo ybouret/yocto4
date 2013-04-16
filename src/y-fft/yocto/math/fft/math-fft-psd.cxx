@@ -19,25 +19,25 @@ namespace yocto
 		
         //======================================================================
         template <>
-        real_t PSD<real_t>:: Square( real_t X )
+        real_t PSD<real_t>:: Square( real_t X ) throw()
         {
             return X>=REAL(0.0) && X<=REAL(1.0) ? REAL(1.0) : REAL(0.0);
         }
 		
         template <>
-        real_t PSD<real_t>:: Bartlett( real_t X )
+        real_t PSD<real_t>:: Bartlett( real_t X ) throw()
         {
             return X>REAL(0.0) && X<REAL(1.0) ? REAL(1.0) - Fabs( (X-REAL(0.5) / REAL(0.5) ) ): REAL(0.0);
         }
 		
         template <>
-        real_t PSD<real_t>:: Hann( real_t X )
+        real_t PSD<real_t>:: Hann( real_t X ) throw()
         {
             return X>REAL(0.0) && X<REAL(1.0) ? REAL(0.5) * (REAL(1.0) - Cos( numeric<real_t>::two_pi * X)) : REAL(0.0) ;
         }
 		
         template <>
-        real_t PSD<real_t>:: Welch( real_t X )
+        real_t PSD<real_t>:: Welch( real_t X ) throw()
         {
             if(  X>0 && X<1 )
             {
@@ -51,62 +51,38 @@ namespace yocto
 			
         }
 		
+        
         //======================================================================
         template<>
-        PSD<real_t>:: Gaussian:: Gaussian( real_t sig ) throw() : sigma( sig ) {}
-		
-        template<>
-        PSD<real_t>:: Gaussian:: Gaussian( const Gaussian &G ) throw() : sigma( G.sigma ) {}
-		
-        template<>
-        PSD<real_t>:: Gaussian:: ~Gaussian() throw() {}
-		
-        template<>
-        real_t PSD<real_t>:: Gaussian:: operator()( real_t X ) const
-        {
-            if( X > 0 && X < 1 )
-            {
-                const real_t tmp = ((X-REAL(0.5) / REAL(0.5)))/sigma;
-                return       Exp( - REAL(0.5) * tmp * tmp );
-            }
-            else {
-                return 0;
-            }
-        }
-		
-        //======================================================================
-        template<>
-        PSD<real_t>:: Blackman:: Blackman( real_t  alpha  ) throw() :
-		a0( (REAL(1.0)-alpha)*REAL(0.5) ),
-		a1( REAL(0.5)),
-		a2( REAL(0.5) * alpha)
-        {}
-		
-        template<>
-        PSD<real_t>:: Blackman:: Blackman( const Blackman &B ) throw() :
-		a0( B.a0 ),
-		a1( B.a1 ),
-		a2( B.a2 )
-        {}
-		
-        template<>
-        PSD<real_t>:: Blackman:: ~Blackman() throw() {}
-		
-        template<>
-        real_t PSD<real_t>:: Blackman:: operator()( real_t X ) const
+        real_t PSD<real_t>:: Blackman( real_t X ) throw()
         {
             if( X > 0 && X < 1 )
             {
                 const real_t tmp  = numeric<real_t>::two_pi * X;
-                return a0 - a1 * Cos( tmp  ) + a2 * Cos( tmp + tmp );
+                return REAL(0.42) - REAL(0.50) * Cos( tmp  ) + REAL(0.08) * Cos( tmp + tmp );
             }
-            else {
+            else
+            {
                 return 0;
             }
         }
+        
+        template <>
+        real_t PSD<real_t>:: Nutall( real_t X ) throw()
+        {
+            if( X > 0 && X < 1 )
+            {
+                const real_t pi2 = numeric<real_t>:: two_pi * X;
+                const real_t pi4 = pi2+pi2;
+                const real_t pi6 = pi4+pi2;
+                return REAL(0.355768) - REAL(0.487396) * Cos(pi2) + REAL(0.144232) * Cos(pi4) - REAL(0.012604) * Cos(pi6);
+            }
+            else
+                return 0;
+        }
 		
 		
-		
+#if 0
 #define YOCTO_PSD_INITIALIZE(INDEX)       p[INDEX] = 0
 #define YOCTO_PSD_COMPUTE_WEIGHT(INDEX)   const real_t tmp = weight[INDEX] = w( INDEX * wfact ); sumw2 += tmp*tmp
 #define YOCTO_PSD_COPY_INDEPENDENT(INDEX) input[INDEX] = cplx_t(start[INDEX] * weight[INDEX])
@@ -205,7 +181,81 @@ namespace yocto
             
             return PSD<real_t>::Compute(w, psd(), psd.size(), data(), data.size(), options);
         }
-		
+#endif
+        
+        template <>
+        void PSD<real_t>:: Compute(Window        &w,
+                                   real_t        *p,
+                                   const size_t   m,
+                                   const real_t *data,
+                                   const size_t  size)
+        {
+            
+            assert(p!=NULL);
+            assert(m>0);
+            assert(is_a_power_of_two(m));
+            assert(!(data==NULL&&size>0));
+            
+            //==================================================================
+            // initialize data
+            //==================================================================
+            const size_t M = m << 1;
+            if( M > size )
+                throw exception("PSD: %u*2 > data size=%u", unsigned(m), unsigned(size));
+            
+            
+            vector<cplx_t> work(  M, numeric<cplx_t>::zero );
+            vector<real_t> work2( M, numeric<real_t>::zero );
+            cplx_t        *input  = work(0);
+            real_t        *weight = work2(0);
+            
+            //==================================================================
+            // initialize the weights
+            //==================================================================
+            real_t         sumw2  = 0;
+            {
+                const real_t wfac = REAL(1.0) / (M-1);
+                for( size_t i=0; i < M; ++i )
+                {
+                    const real_t tmp = weight[i] = w( i * wfac );
+                    sumw2 += tmp*tmp;
+                }
+            }
+            
+            //==================================================================
+            // initialize the spectrum
+            //==================================================================
+            for(size_t i=0;i<m;++i)
+                p[i] = 0;
+            
+            //==================================================================
+            // loop over segments
+            //==================================================================
+            size_t nsub = 0;
+            for( size_t start=0; start+M <= size; ++start)
+            {
+                //-- load the sample
+                for( size_t i=0; i<M; ++i )
+                {
+                    assert(start+i<size);
+                    cplx_t &f = input[i];
+                    f.re = data[ start+i ] * weight[i];
+                    f.im = 0;
+                }
+                FFT(input,M);
+                for(size_t i=0;i<m;++i)
+                    p[i] += input[i].mod2();
+                ++nsub;
+            }
+
+            //==================================================================
+            // normalize
+            //==================================================================
+            const real_t nfac = REAL(1.0)/(nsub*sumw2);
+            for(size_t i=0;i<m;++i)
+                p[i] *= nfac;
+        }
+        
     }
 	
 }
