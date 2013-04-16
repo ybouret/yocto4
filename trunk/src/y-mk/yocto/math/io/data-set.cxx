@@ -126,6 +126,15 @@ namespace yocto
                         {
                             (**i).pop_back();
                         }
+                        
+#if !defined(NDEBUG)
+                        const size_t chk = (**first_col).size();
+                        for( i=first_col; i != last_col; ++i)
+                        {
+                            assert( (**i).size() == chk );
+                        }
+#endif
+                        
                     }
                 }
 				if( limited && ++count >= nmax )
