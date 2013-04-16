@@ -217,7 +217,7 @@ namespace yocto
                 const real_t wfac = REAL(1.0) / (M-1);
                 for( size_t i=0; i < M; ++i )
                 {
-                    const real_t tmp = weight[i] = w( i * wfac );
+                    const real_t tmp = weight[i] = w( i * wfac ); // or (i+0.5)/M ?
                     sumw2 += tmp*tmp;
                 }
             }
@@ -234,12 +234,24 @@ namespace yocto
             size_t nsub = 0;
             for( size_t start=0; start+M <= size; ++start)
             {
+                //-- will remove the constant term
+                real_t a0 = 0;
+                if(true)
+                {
+                    for( size_t i=0; i<M; ++i )
+                    {
+                        assert(start+i<size);
+                        a0 += data[ start+i ];
+                    }
+                }
+                a0 /= real_t(M);
+                
                 //-- load the sample
                 for( size_t i=0; i<M; ++i )
                 {
                     assert(start+i<size);
                     cplx_t &f = input[i];
-                    f.re = data[ start+i ] * weight[i];
+                    f.re = (data[ start+i ]-a0) * weight[i];
                     f.im = 0;
                 }
                 FFT(input,M);
@@ -247,7 +259,7 @@ namespace yocto
                     p[i] += input[i].mod2();
                 ++nsub;
             }
-
+            
             //==================================================================
             // normalize
             //==================================================================
@@ -255,6 +267,13 @@ namespace yocto
             for(size_t i=0;i<m;++i)
                 p[i] *= nfac;
         }
+        
+        template <>
+        void PSD<real_t>:: Compute(Window &w, array<real_t> &psd, const array<real_t> &data)
+        {
+            PSD<real_t>::Compute( w, psd(0), psd.size(), data(0), data.size() );
+        }
+        
         
     }
 	

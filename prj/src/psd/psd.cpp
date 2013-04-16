@@ -18,6 +18,7 @@ using namespace math;
 
 static const size_t default_size = 1024 * 1024;
 
+#if 0
 static const double Chi2( size_t i,
                          const double f_star,
                          const double d_star,
@@ -26,6 +27,7 @@ static const double Chi2( size_t i,
 {
     return Fabs(f[i] - f_star) + Fabs( (f[i+1]-f[i]) - (t[i+1]-t[i]) * d_star);
 }
+#endif
 
 struct time_selector
 {
@@ -70,7 +72,7 @@ int main( int argc, char *argv[] )
                 amplitude[i] = 1.0 + 9.0 * alea<double>();
                 phase[i]     = alea<double>() * numeric<double>::two_pi;
             }
-            
+            const double offset = 5 * alea<double>();
             {
                 ios::ocstream fp("generated.dat", false);
                 for( size_t i=0; i < np; ++i )
@@ -79,8 +81,9 @@ int main( int argc, char *argv[] )
                     const double t   = SimDT * i;
                     for( size_t j=1; j <= nf; ++j )
                     {
-                        ans += amplitude[j] * cos( t * omega[j] + phase[j] ) + 0.5 * ( alea<double>() - 0.5);
+                        ans += amplitude[j] * cos( t * omega[j] + phase[j] );
                     }
+                    ans +=  0.5 * ( alea<double>() - 0.5) + offset;
                     fp("%g %g\n", t, ans);
                 }
                 
@@ -99,7 +102,7 @@ int main( int argc, char *argv[] )
         if( argc <= 4)
             throw exception("usage: %s input_file #col tmin tmax", progname);
         const string  input_file = argv[1];
-        const size_t  col_index = strconv::to_size( argv[2], "#col" );
+        const size_t  col_index  = strconv::to_size( argv[2], "#col" );
         time_selector ts = { 0, 0};
         ts.tmin          = strconv::to_double( argv[3], "tmin");
         ts.tmax          = strconv::to_double( argv[4], "tmax");
@@ -139,71 +142,34 @@ int main( int argc, char *argv[] )
         // Resample
         //
         ////////////////////////////////////////////////////////////////////////
-        std::cerr << "\t-- resampling" << std::endl;
+        std::cerr << "\t-- resampling " << n_raw << " data" << std::endl;
         
-        const size_t   n    = next_power_of_two( n_raw );
+        const size_t   n    = n_raw;
         vector<double> t( n, 0 );
         vector<double> f( n, 0 );
         
-        for(size_t i=1; i<=n_raw; ++i)
-        {
-            t[i] = t_raw[i];
-            f[i] = f_raw[i];
-        }
         
-        {
-            //==================================================================
-            //-- phase 1: find the best fitting point
-            //==================================================================
-            const double f_star = f_raw[n_raw];
-            const double d_star = (f_raw[n_raw] - f_raw[n_raw-1])/(t_raw[n_raw]-t_raw[n_raw-1]);
-            size_t best_i=1;
-            double best_v=Chi2(best_i, f_star, d_star, t_raw, f_raw);
-            for(size_t j=2; j < n_raw; ++j)
-            {
-                const double tmp = Chi2(j, f_star, d_star, t_raw, f_raw);
-                if( tmp < best_v)
-                {
-                    best_i = j;
-                    best_v = tmp;
-                }
-            }
-            std::cerr << "best@" <<  t_raw[best_i] << std::endl;
-            const size_t missing = n-n_raw;
-            const double t_best  = t_raw[best_i];
-            const double t_last  = t_raw[n_raw];
-            
-            for(size_t i=1; i <= missing; ++i )
-            {
-                const size_t tgt = n_raw  +i;
-                const size_t src = best_i +i;
-                const double del = t[src] - t_best; //!< little trick
-                t[tgt] = t_last + del;
-                f[tgt] = f[src];                    //!< same trick
-            }
-            {
-                ios::ocstream fp("resampled1.dat",false);
-                for(size_t i=1; i <= n; ++i) fp("%g %g\n", t[i], f[i]);
-            }
-        }
-        
-        const double dt = (t[n] - t[1]) / (n-1);
+        const double dt = (t_raw[n] - t_raw[1]) / (n-1);
         std::cerr << "-- dt=" << dt << std::endl;
         {
             //==================================================================
             //-- phase 2: use splines for isosampling
             //==================================================================
             const spline<double>::boundary bnd(true,0);
-            spline<double> s(t,f,bnd,bnd);
-            const double t0 = t[1];
+            spline<double> s(t_raw,f_raw,bnd,bnd);
+            const double t0 = t_raw[1];
             for(size_t i=1;i<=n;++i)
             {
                 t[i] = t0 + (i-1) * dt;
                 f[i] = s(t[i]);
             }
             {
-                ios::ocstream fp("resampled2.dat",false);
+                ios::ocstream fp("resampled.dat",false);
                 for(size_t i=1; i <= n; ++i) fp("%g %g\n", t[i], f[i]);
+            }
+            {
+                ios::ocstream fp("original.dat",false);
+                for(size_t i=1; i <= n; ++i) fp("%g %g\n", t_raw[i], f_raw[i]);
             }
         }
         
@@ -212,9 +178,9 @@ int main( int argc, char *argv[] )
         // Evaluating PSD parameters
         //
         ////////////////////////////////////////////////////////////////////////
-        //const size_t m_max = (n/2);
+        const size_t m_max = next_power_of_two(n)/4;
         
-        const size_t m  = n/2;
+        const size_t m  = m_max/2;
         const double M  = m << 1;
         const double df = 1.0/(dt*M);
         vector<double> frq(m,0);
@@ -222,7 +188,8 @@ int main( int argc, char *argv[] )
         for(size_t i=1;i<=m;++i) frq[i] = (i-1) * df;
         
         PSD<double>::Window w = cfunctor(PSD<double>::Welch);
-        PSD<double>::Compute(w, psd, f, PSD_Overlap);
+        PSD<double>::Compute(w, psd, f);
+        //psd[1] = 0;
         {
             ios::ocstream fp("psd.dat",false);
             for(size_t i=1; i <=m; ++i) fp("%g %g\n",frq[i],psd[i]);

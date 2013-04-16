@@ -8,11 +8,6 @@ namespace yocto
 {
 	namespace math
 	{
-		enum PSD_Option
-		{
-			PSD_Regular    = 0x00,
-			PSD_Overlap    = 0x01
-		};
 		
 		//! Power Spectral Density
 		template <typename T>
@@ -53,6 +48,8 @@ namespace yocto
                          const T     *data,
                          const size_t size);
             
+            static
+            void Compute(Window &w, array<T> &psd, const array<T> &data);
             
 		};
 		
