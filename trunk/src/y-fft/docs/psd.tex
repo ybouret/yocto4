@@ -61,4 +61,31 @@ we obtain
 	\right.
 \end{equation}
 
+\section{Rectifying a signal}
+Let us assume that we have $M$ points of data $f_1,\ldots,f_M$, iso-sampling $f(t)$ over the interval $[0;T]$.
+We also assume that the periodic part of $f$ is supported by a polynomial part.
+We build the function
+\begin{equation}
+	g(t) = f(t) - \sum_{k=1}^K a_k t^{(k-1)}
+\end{equation}
+and the coefficients are determined by the minimization of
+\begin{equation}
+\int_0^T g(t)^2\,dt.
+\end{equation}
+We must set
+\begin{equation}
+	\forall j,\; 0 = \int_0^T g(t)\dfrac{\partial g}{\partial a_j} dt
+\end{equation}
+or
+\begin{equation}
+	\int_0^T t^{(j-1)} f(t) dt = \sum_{k=1}^K a_k \int_{0}^T t^{(j+k-2)} \; dt 
+\end{equation}
+which reads
+\begin{equation}
+	\sum_{i=1}^M 
+	\left\lbrack 
+	\dfrac{i^j - (i-1)^{j}}{j}	\right\rbrack
+ f_i = \sum_{k=1}^K \dfrac{M^{j+k-1}}{j+k-1} a_k
+\end{equation}
+
 \end{document}
