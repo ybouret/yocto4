@@ -142,7 +142,7 @@ namespace yocto
             vector<real_t>  a;
             if(K>0)
             {
-                std::cerr << "K=" << K << std::endl;
+                //std::cerr << "K=" << K << std::endl;
                 sig.make(K,M);
                 a.make(K, numeric<real_t>::zero );
                 
@@ -158,7 +158,7 @@ namespace yocto
                         mu[j][k] = mu[k][j] = ipower<real_t>(M, p) / p;
                     }
                 }
-                std::cerr << "mu=" << mu << std::endl;
+                //std::cerr << "mu=" << mu << std::endl;
                 lu<real_t> LU(K);
                 if( !LU.build(mu) )
                     throw exception("PSD(Invalid Momemts");
@@ -174,38 +174,17 @@ namespace yocto
                         sig[j][i] = (ipower<real_t>(i,j)-ipower<real_t>(im,j))/j;
                     }
                 }
-                std::cerr << "sig0=" << sig << std::endl;
+                //std::cerr << "sig0=" << sig << std::endl;
                 LU.solve(mu, sig);
-                std::cerr << "sigm=" << sig << std::endl;
+                //std::cerr << "sigm=" << sig << std::endl;
             }
             
             //==================================================================
             // loop over segments
             //==================================================================
-            size_t       nsub = 0;
-            //const size_t M2 = M*M;
-            //const size_t M3 = M2*M;
-            
-            
-            
+            size_t      nsub =0;
             for( size_t start=0; start+M <= size; ++start)
             {
-#if 0
-                real_t a0=0,a1=0;
-                //--------------------------------------------------------------
-                // harmonizing data
-                //--------------------------------------------------------------
-                real_t sig1 = 0;
-                real_t sig2 = 0;
-                for(size_t i=0;i<M;++i)
-                {
-                    const real_t f_i = data[ start+i ];
-                    sig1 += f_i;
-                    sig2 += (REAL(0.5) + real_t(i)) * f_i;
-                }
-                a0 = (6*sig2)/M2 - (4*sig1)/M;
-                a1 = (6*sig1)/M2 - (12*sig2)/M3;
-#endif
                 
                 //--------------------------------------------------------------
                 //-- load the sample
@@ -221,7 +200,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 if(K>0)
                     algebra<real_t>::mul(a, sig, F);
-                std::cerr << "a=" << a <<  std::endl;
+                //std::cerr << "a=" << a <<  std::endl;
                 
                 //--------------------------------------------------------------
                 //-- load the sample

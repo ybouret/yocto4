@@ -99,13 +99,15 @@ int main( int argc, char *argv[] )
         //
         ////////////////////////////////////////////////////////////////////////
         
-        if( argc <= 4)
-            throw exception("usage: %s input_file #col tmin tmax", progname);
-        const string  input_file = argv[1];
-        const size_t  col_index  = strconv::to_size( argv[2], "#col" );
+        if( argc <= 5)
+            throw exception("usage: %s input_file #col K tmin tmax", progname);
+        int iarg = 1;
+        const string  input_file = argv[iarg++];
+        const size_t  col_index  = strconv::to_size( argv[iarg++], "#col" );
+        const size_t  K          = strconv::to_size( argv[iarg++], "K" );
         time_selector ts = { 0, 0};
-        ts.tmin          = strconv::to_double( argv[3], "tmin");
-        ts.tmax          = strconv::to_double( argv[4], "tmax");
+        ts.tmin          = strconv::to_double( argv[iarg++], "tmin");
+        ts.tmax          = strconv::to_double( argv[iarg++], "tmax");
         if( ts.tmax < ts.tmin )
             throw exception("invalid time range !!!");
         
@@ -188,7 +190,7 @@ int main( int argc, char *argv[] )
         for(size_t i=1;i<=m;++i) frq[i] = (i-1) * df;
         
         PSD<double>::Window w = cfunctor(PSD<double>::Welch);
-        PSD<double>::Compute(w, psd, f);
+        PSD<double>::Compute(w, psd, f, K);
         {
             ios::ocstream fp("psd.dat",false);
             for(size_t i=1; i <=m; ++i) fp("%g %g\n",frq[i],psd[i]);
