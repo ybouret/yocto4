@@ -232,28 +232,38 @@ namespace yocto
             // loop over segments
             //==================================================================
             size_t nsub = 0;
+            const size_t M2 = M*M;
+            const size_t M3 = M2*M;
             for( size_t start=0; start+M <= size; ++start)
             {
-                //-- will remove the constant term
-                real_t a0 = 0;
-                if(true)
+                real_t a0=0,a1=0;
+                //--------------------------------------------------------------
+                // harmonizing data
+                //--------------------------------------------------------------
+                real_t sig1 = 0;
+                real_t sig2 = 0;
+                for(size_t i=0;i<M;++i)
                 {
-                    for( size_t i=0; i<M; ++i )
-                    {
-                        assert(start+i<size);
-                        a0 += data[ start+i ];
-                    }
+                    const real_t f_i = data[ start+i ];
+                    sig1 += f_i;
+                    sig2 += (REAL(0.5) + real_t(i)) * f_i;
                 }
-                a0 /= real_t(M);
+                a0 = (6*sig2)/M2 - (4*sig1)/M;
+                a1 = (6*sig1)/M2 - (12*sig2)/M3;
                 
+                //--------------------------------------------------------------
                 //-- load the sample
+                //--------------------------------------------------------------
                 for( size_t i=0; i<M; ++i )
                 {
                     assert(start+i<size);
                     cplx_t &f = input[i];
-                    f.re = (data[ start+i ]-a0) * weight[i];
+                    f.re = (data[ start+i ] + (a1*i+a0) ) * weight[i];
                     f.im = 0;
                 }
+                
+                
+                //-- take the local FFT
                 FFT(input,M);
                 for(size_t i=0;i<m;++i)
                     p[i] += input[i].mod2();

@@ -180,7 +180,7 @@ int main( int argc, char *argv[] )
         ////////////////////////////////////////////////////////////////////////
         const size_t m_max = next_power_of_two(n)/4;
         
-        const size_t m  = m_max/2;
+        const size_t m  = m_max;
         const double M  = m << 1;
         const double df = 1.0/(dt*M);
         vector<double> frq(m,0);
@@ -189,7 +189,6 @@ int main( int argc, char *argv[] )
         
         PSD<double>::Window w = cfunctor(PSD<double>::Welch);
         PSD<double>::Compute(w, psd, f);
-        //psd[1] = 0;
         {
             ios::ocstream fp("psd.dat",false);
             for(size_t i=1; i <=m; ++i) fp("%g %g\n",frq[i],psd[i]);
