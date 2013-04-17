@@ -13,14 +13,14 @@ using namespace yocto;
 using namespace math;
 
 template <typename T>
-void perform_psd( const size_t p, const size_t q )
+void perform_psd( const size_t p, const size_t q, const size_t K)
 {
 
 
 	const size_t n  = 1 << p;
 	const size_t m = (1<<q);
-
-	std::cerr << "[PSD n=" << n << ", m= " << m << " ]" << std::endl;
+    
+	std::cerr << "[PSD n=" << n << ", m= " << m << " ]/moments=" << K << std::endl;
 
 	vector<T> times(n,0);
 	vector<T> data(n,0);
@@ -34,11 +34,11 @@ void perform_psd( const size_t p, const size_t q )
 	const T rho   = 0.5  + 1.5  * alea<T>();
 	const T noise = 0.05 + 0.05 * alea<T>();
 
-    
+    const T offset = 2*alea<T>();
 	for( size_t i=1; i < n; ++i )
 	{
 		const T t = times[i] = (i-1) * dt;
-		data[i] = Cos( numeric<T>::two_pi * f1 * t + phi1 ) + rho * Cos( numeric<T>::two_pi * f2 * t + phi2 ) + noise * alea<T>();
+		data[i] = Cos( numeric<T>::two_pi * f1 * t + phi1 ) + rho * Cos( numeric<T>::two_pi * f2 * t + phi2 ) + noise * alea<T>() + offset;
 	}
 
 	{
@@ -59,11 +59,11 @@ void perform_psd( const size_t p, const size_t q )
     typename PSD<T>::Window  NutallWindow   = cfunctor( PSD<T>::Nutall);
     
     matrix<T> psd(ns,m);
-    PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n);
-    PSD<T>::Compute( BartlettWindow, &psd[++idx][1], m, data(0), n);
-    PSD<T>::Compute( HannWindow,     &psd[++idx][1], m, data(0), n);
-    PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n);
-    PSD<T>::Compute( NutallWindow,   &psd[++idx][1], m, data(0), n);
+    PSD<T>::Compute( WelchWindow,    &psd[++idx][1], m, data(0), n,K);
+    PSD<T>::Compute( BartlettWindow, &psd[++idx][1], m, data(0), n,K);
+    PSD<T>::Compute( HannWindow,     &psd[++idx][1], m, data(0), n,K);
+    PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n,K);
+    PSD<T>::Compute( NutallWindow,   &psd[++idx][1], m, data(0), n,K);
 
 	{
 		const char *filename = "psd.dat";
@@ -86,10 +86,10 @@ void perform_psd( const size_t p, const size_t q )
 
 YOCTO_UNIT_TEST_IMPL(psd)
 {
-	if( argc < 3 )
-		throw exception("Need p and q");
+	if( argc < 4 )
+		throw exception("Need p,q and K");
 
-	perform_psd<double>( atol(argv[1]), atol(argv[2]));
+	perform_psd<double>( atol(argv[1]), atol(argv[2]), atol(argv[3]));
 
 
 }

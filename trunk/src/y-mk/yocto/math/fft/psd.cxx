@@ -9,6 +9,11 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/sequence/vector.hpp"
 
+#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/algebra.hpp"
+
+#include "yocto/code/ipower.hpp"
+
 #include <cerrno>
 
 namespace yocto
@@ -17,7 +22,6 @@ namespace yocto
     namespace math
     {
 		
-        //======================================================================
         template <>
         real_t PSD<real_t>:: Square( real_t X ) throw()
         {
@@ -52,7 +56,6 @@ namespace yocto
         }
 		
         
-        //======================================================================
         template<>
         real_t PSD<real_t>:: Blackman( real_t X ) throw()
         {
@@ -81,120 +84,21 @@ namespace yocto
                 return 0;
         }
 		
-		
-#if 0
-#define YOCTO_PSD_INITIALIZE(INDEX)       p[INDEX] = 0
-#define YOCTO_PSD_COMPUTE_WEIGHT(INDEX)   const real_t tmp = weight[INDEX] = w( INDEX * wfact ); sumw2 += tmp*tmp
-#define YOCTO_PSD_COPY_INDEPENDENT(INDEX) input[INDEX] = cplx_t(start[INDEX] * weight[INDEX])
-#define YOCTO_PSD_COPY_OVERLAPPING(INDEX) input[INDEX] = cplx_t(data[ (idx++) & mask ] * weight[INDEX])
-		
-#define YOCTO_PSD_ADD(INDEX) p[INDEX] += (input[INDEX].mod2())
-		
-#define YOCTO_PSD_NRM(INDEX) p[INDEX] *= pfact
-		
-        template<>
-        size_t PSD<real_t>::Compute(Window       &w,
-                                    real_t       *p,
-                                    const size_t  m,
-                                    const real_t *data,
-                                    const size_t  size,
-                                    const size_t  options)
-        {
-			const cplx_t cplx_zero(0);
-            assert( p    != NULL );
-            assert( data != NULL );
-            assert( is_a_power_of_two(size) );
-            assert( is_a_power_of_two(m)    );
-			
-			const bool   overlap   = (PSD_Overlap   & options) != 0;
-            const size_t M         = m << 1;
-            if( M > size )
-                throw libc::exception(EDOM,"math::PowerSpectralDensity(2*m=%u>#data=%u)", unsigned(M), unsigned(size));
-			
-            YOCTO_LOOP_FUNC_(m,YOCTO_PSD_INITIALIZE,0);
-            const size_t   shift = overlap ? m : M;
-            const size_t   nsubs = size/shift;
-            
-			vector<cplx_t> work( M, cplx_zero );
-            cplx_t        *input = work(0);
-			vector<real_t> work2(M,0);
-			real_t        *weight = work2(0);
-			real_t         sumw2  = 0;
-			{
-				const real_t   wfact = REAL(1.0)/(M-1);
-				YOCTO_LOOP_FUNC_(M,YOCTO_PSD_COMPUTE_WEIGHT,0);
-			}
-			
-			
-			
-			if( overlap )
-			{
-				const size_t mask = size - 1;
-				size_t       idx0 = 0;
-				for( size_t k=0; k < nsubs; ++k, idx0 += shift )
-				{
-					//-- initialize input :
-					//-- cyclic weighted copy
-					size_t idx = idx0;
-					YOCTO_LOOP_FUNC_(M,YOCTO_PSD_COPY_OVERLAPPING,0);
-					
-					//-- Fourier Transform
-					FFT( input, M );
-					
-					//-- gather the spectrum from [0..m-1]
-					YOCTO_LOOP_FUNC_(m,YOCTO_PSD_ADD,0);
-				}
-			}
-			else
-			{
-				const real_t  *start = data;
-				for(size_t k=0;
-					k < nsubs;
-					++k, start += shift )
-				{
-					//-- initialize input :
-					//-- copy start[0..M-1] into input, weighted
-					YOCTO_LOOP_FUNC_(M,YOCTO_PSD_COPY_INDEPENDENT,0);
-					
-					//-- Fourier Transform
-					FFT( input, M );
-					
-					//-- gather the spectrum from [0..m-1]
-					YOCTO_LOOP_FUNC_(m,YOCTO_PSD_ADD,0);
-				}
-				
-			}
-			
-			//! Partial Normalization
-			const real_t pfact = REAL(1.0) / (sumw2*nsubs);
-			YOCTO_LOOP_FUNC_(m,YOCTO_PSD_NRM,0);
-			
-            return M;
-        }
-        
-        template<>
-        size_t PSD<real_t>::Compute(Window              &w,
-                                    array<real_t>       &psd,
-                                    const array<real_t> &data,
-                                    const size_t         options)
-        {
-            
-            return PSD<real_t>::Compute(w, psd(), psd.size(), data(), data.size(), options);
-        }
-#endif
         
         template <>
         void PSD<real_t>:: Compute(Window        &w,
                                    real_t        *p,
                                    const size_t   m,
                                    const real_t *data,
-                                   const size_t  size)
+                                   const size_t  size,
+                                   const size_t  K)
         {
             
             assert(p!=NULL);
             assert(m>0);
             assert(is_a_power_of_two(m));
             assert(!(data==NULL&&size>0));
+            
             
             //==================================================================
             // initialize data
@@ -206,8 +110,11 @@ namespace yocto
             
             vector<cplx_t> work(  M, numeric<cplx_t>::zero );
             vector<real_t> work2( M, numeric<real_t>::zero );
+            vector<real_t> F(M, numeric<real_t>::zero );
+            
             cplx_t        *input  = work(0);
             real_t        *weight = work2(0);
+            real_t        *f      = F(0);
             
             //==================================================================
             // initialize the weights
@@ -229,13 +136,61 @@ namespace yocto
                 p[i] = 0;
             
             //==================================================================
+            // initialize the filtering
+            //==================================================================
+            matrix<real_t>  sig;
+            vector<real_t>  a;
+            if(K>0)
+            {
+                std::cerr << "K=" << K << std::endl;
+                sig.make(K,M);
+                a.make(K, numeric<real_t>::zero );
+                
+                //--------------------------------------------------------------
+                // Build the matrix of moments
+                //--------------------------------------------------------------
+                matrix<real_t> mu(K,K);
+                for( size_t j=1;j<=K;++j)
+                {
+                    for( size_t k=j;k<=K;++k)
+                    {
+                        const size_t p = j+k-1;
+                        mu[j][k] = mu[k][j] = ipower<real_t>(M, p) / p;
+                    }
+                }
+                std::cerr << "mu=" << mu << std::endl;
+                lu<real_t> LU(K);
+                if( !LU.build(mu) )
+                    throw exception("PSD(Invalid Momemts");
+                
+                //--------------------------------------------------------------
+                // Build sigma matrix, to get coefficients
+                //--------------------------------------------------------------
+                for(size_t i=1;i<=M;++i)
+                {
+                    const size_t im = i-1;
+                    for(size_t j=1;j<=K;++j)
+                    {
+                        sig[j][i] = (ipower<real_t>(i,j)-ipower<real_t>(im,j))/j;
+                    }
+                }
+                std::cerr << "sig0=" << sig << std::endl;
+                LU.solve(mu, sig);
+                std::cerr << "sigm=" << sig << std::endl;
+            }
+            
+            //==================================================================
             // loop over segments
             //==================================================================
-            size_t nsub = 0;
-            const size_t M2 = M*M;
-            const size_t M3 = M2*M;
+            size_t       nsub = 0;
+            //const size_t M2 = M*M;
+            //const size_t M3 = M2*M;
+            
+            
+            
             for( size_t start=0; start+M <= size; ++start)
             {
+#if 0
                 real_t a0=0,a1=0;
                 //--------------------------------------------------------------
                 // harmonizing data
@@ -250,16 +205,38 @@ namespace yocto
                 }
                 a0 = (6*sig2)/M2 - (4*sig1)/M;
                 a1 = (6*sig1)/M2 - (12*sig2)/M3;
+#endif
+                
+                //--------------------------------------------------------------
+                //-- load the sample
+                //--------------------------------------------------------------
+                for(size_t i=0;i<M;++i)
+                {
+                    assert(start+i<size);
+                    f[i] = data[start+i];
+                }
+                
+                //--------------------------------------------------------------
+                //-- compute the coefficients
+                //--------------------------------------------------------------
+                if(K>0)
+                    algebra<real_t>::mul(a, sig, F);
+                std::cerr << "a=" << a <<  std::endl;
                 
                 //--------------------------------------------------------------
                 //-- load the sample
                 //--------------------------------------------------------------
                 for( size_t i=0; i<M; ++i )
                 {
-                    assert(start+i<size);
-                    cplx_t &f = input[i];
-                    f.re = (data[ start+i ] + (a1*i+a0) ) * weight[i];
-                    f.im = 0;
+                    real_t sum = 0;
+                    for(size_t j=K;j>0;--j)
+                    {
+                        sum += a[j] * ipower<real_t>(i,j-1);
+                    }
+                    real_t f_i = f[i] - sum;
+                    cplx_t &g = input[i];
+                    g.re = f_i * weight[i];
+                    g.im = 0;
                 }
                 
                 //--------------------------------------------------------------
@@ -280,9 +257,9 @@ namespace yocto
         }
         
         template <>
-        void PSD<real_t>:: Compute(Window &w, array<real_t> &psd, const array<real_t> &data)
+        void PSD<real_t>:: Compute(Window &w, array<real_t> &psd, const array<real_t> &data, const size_t K)
         {
-            PSD<real_t>::Compute( w, psd(0), psd.size(), data(0), data.size() );
+            PSD<real_t>::Compute( w, psd(0), psd.size(), data(0), data.size(), K);
         }
         
         

@@ -1,6 +1,6 @@
 
 ADD_EXECUTABLE(y_psd psd.cpp)
-TARGET_LINK_YOCTO(y_psd mk fft)
+TARGET_LINK_YOCTO(y_psd mk)
 
 INSTALL( TARGETS y_psd RUNTIME DESTINATION bin )
 
