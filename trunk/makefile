@@ -11,6 +11,7 @@ clean:
 	@${MAKE} -s -C samples            clean
 	@${MAKE} -s -C src/y-aqueous/docs clean
 	@${MAKE} -s -C src/y-mk/docs      clean
+	@${MAKE} -s -C src/y-fft/docs     clean
 
 preclean:
 	@echo "-- removing out of sources builds" && cd forge && touch targets &&  ( ( cat targets | xargs rm -rf ) && rm -f targets )

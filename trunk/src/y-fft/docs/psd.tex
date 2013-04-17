@@ -1,0 +1,64 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+
+
+\begin{document}
+\title{Thoughts for Power Spectrum Estimation}
+\maketitle
+
+\section{Modifying signal}
+Let us assume that we have $f(t)$ on an interval $T$.
+We shall use the function
+\begin{equation}
+	g(t) = f(t) + a_1 t + a_0
+\end{equation}
+that corrects the drift of $f$.
+For this, we want to minimize
+\begin{equation}
+	J = \int_0^T g(t)^2 \, dt.
+\end{equation}
+We want to set
+\begin{equation}
+0 = \dfrac{\partial J}{\partial a_0} = \int_0^T g(t)\dfrac{\partial g}{\partial a_0} \, dt = \int_0^T g(t) dt
+\end{equation}
+meaning that we want $g$ to have a zero integral over $T$, which is 
+expected from an harmonic signal.
+We also want to set
+\begin{equation}
+0 = \dfrac{\partial J}{\partial a_1} = \int_0^T g(t)\dfrac{\partial g}{\partial a_1} \, dt = \int_0^T t g(t) dt
+\end{equation}
+which shall remove the constant drift part of $g$.
+With 
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	\sigma_1 & = & \sum_i f_i \\
+	\sigma_2 & = & \sum_i \left(i+\frac{1}{2}\right) f_i\\
+	\end{array}
+	\right.
+\end{equation}
+we obtain
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	a_0 & = & 6 \dfrac{\sigma_2}{M^2} - 4 \dfrac{\sigma_1}{M}\\
+	\\
+	a_1 & = & 6 \dfrac{\sigma_1}{M^2} - 12 \dfrac{\sigma_2}{M^3}\\
+	\end{array}
+	\right.
+\end{equation}
+
+\end{document}
