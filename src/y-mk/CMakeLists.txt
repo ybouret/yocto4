@@ -61,8 +61,13 @@ SET( alg_srcs ${alg_decl} ${alg_impl} )
 INSTALL( FILES ${alg_decl} DESTINATION include/yocto/math/alg )
 SOURCE_GROUP( math/alg FILES ${alg_srcs} )
 
+FILE( GLOB fft_decl yocto/math/fft/*.hpp)
+FILE( GLOB fft_impl yocto/math/fft/*.cpp)
+SET( fft_srcs ${fft_decl} ${fft_impl} )
+INSTALL( FILES ${fft_decl} DESTINATION include/yocto/math/fft )
+SOURCE_GROUP( math/fft FILES ${fft_srcs} )
 
-SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} )
+SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} ${fft_srcs})
 
 INCLUDE_DIRECTORIES( . ../y-main )
 
