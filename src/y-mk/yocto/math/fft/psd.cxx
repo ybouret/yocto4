@@ -207,12 +207,17 @@ namespace yocto
                 //--------------------------------------------------------------
                 for( size_t i=0; i<M; ++i )
                 {
+                    //-- compute the drift
                     real_t sum = 0;
                     for(size_t j=K;j>0;--j)
                     {
                         sum += a[j] * ipower<real_t>(i,j-1);
                     }
+                    
+                    //-- compute the effective signal
                     real_t f_i = f[i] - sum;
+                    
+                    //-- put it as a weighted complex
                     cplx_t &g = input[i];
                     g.re = f_i * weight[i];
                     g.im = 0;
