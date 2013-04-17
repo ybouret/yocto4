@@ -40,10 +40,7 @@ namespace yocto
 		void iFFT( complex<float>  *data, size_t size ) throw(); //!< Inverse Fourier Transform of data[0..size-1]
 		void FFT(  complex<double> *data, size_t size ) throw(); //!< Fourier Transform of data[0..size-1]
 		void iFFT( complex<double> *data, size_t size ) throw(); //!< Inverse Fourier Transform of data[0..size-1]
-		
-		
-		
-		
+			
 	}
 	
 }

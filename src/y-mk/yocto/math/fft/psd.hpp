@@ -46,10 +46,11 @@ namespace yocto
                          T           *p,
                          const size_t m,
                          const T     *data,
-                         const size_t size);
+                         const size_t size,
+                         const size_t K);
             
             static
-            void Compute(Window &w, array<T> &psd, const array<T> &data);
+            void Compute(Window &w, array<T> &psd, const array<T> &data, const size_t K);
             
 		};
 		
