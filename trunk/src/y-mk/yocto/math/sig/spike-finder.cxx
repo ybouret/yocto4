@@ -2,6 +2,7 @@
 #include "yocto/math/sig/spike-finder.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/code/utils.hpp"
 
 #include "yocto/sequence/vector.hpp"
 
@@ -22,13 +23,11 @@ namespace yocto
                 assert( x.size() == y.size() );
                 assert( x.size() == used.size() );
                 const size_t n = x.size();
-                std::cerr << "Looking for spike..." << std::endl;
                 for( size_t i=1; i <= n; ++i )
                 {
                     if( !used[i] )
                     {
                         //-- initialize
-                        std::cerr << "\tFirst unused@" << i  << std::endl;
                         spike.idx = i;
                         spike.pos = x[i];
                         spike.val = y[i];
@@ -46,12 +45,10 @@ namespace yocto
                                 }
                             }
                         }
-                        std::cerr << "Found@" << spike.idx << std::endl;
                         return true;
                     }
                 }
                 //-- no usable data
-                std::cerr << "No more available data..." << std::endl;
                 return false;
             }
             
@@ -64,8 +61,25 @@ namespace yocto
                 const size_t n = x.size();
                 assert(spike.idx>=1);
                 assert(spike.idx<=n);
-                if( spike.pos > 1 && spike.pos < n )
+                if( spike.idx > 1 && spike.idx < n )
                 {
+                    const real_t x0 = x[spike.idx-1];
+                    const real_t x1 = x[spike.idx]-x0;
+                    const real_t x2 = x[spike.idx+1]-x0;
+                    if( x2 > 0 || x2 < 0 )
+                    {
+                        const real_t alpha = x1/x2;
+                        const real_t f0    = y[spike.idx-1];
+                        const real_t beta  = y[spike.idx]   - f0;
+                        const real_t gam   = y[spike.idx+1] - f0; assert(gam<=beta);
+                        if(beta>0)
+                        {
+                            const real_t X = clamp<real_t>(0,REAL(0.5) * (beta - alpha*alpha*gam)/(beta-alpha*gam),1);
+                            //std::cerr << "X=" << X << std::endl;
+                            spike.pos = x0 + X * x2;
+                            
+                        }
+                    }
                     
                 }
                 // else do nothing => global max on the side !
@@ -121,7 +135,7 @@ namespace yocto
                     }
                     else
                     {
-                        std::cerr << "\tused --> " << j << std::endl;
+                        //std::cerr << "\tused --> " << j-1 << std::endl;
                         break;
                     }
                 }
@@ -133,7 +147,7 @@ namespace yocto
                     }
                     else
                     {
-                        std::cerr << "\tused <-- " << j << std::endl;
+                        //std::cerr << "\tused <-- " << j+1 << std::endl;
                         break;
                     }
                 }
