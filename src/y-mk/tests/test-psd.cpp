@@ -5,6 +5,7 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/math/sig/spike-finder.hpp"
 
 
 #include <cstdlib>
@@ -65,12 +66,15 @@ void perform_psd( const size_t p, const size_t q, const size_t K)
     PSD<T>::Compute( BlackmanWindow, &psd[++idx][1], m, data(0), n,K);
     PSD<T>::Compute( NutallWindow,   &psd[++idx][1], m, data(0), n,K);
 
+    vector<T> frq(m, numeric<T>::zero );
+    
 	{
 		const char *filename = "psd.dat";
 		ios::ocstream fp( filename, false );
 		for( size_t i=1; i < m; ++i )
 		{
 			const T f = df * (i-1);
+            frq[i] = f;
 			fp("%g", f);
 			for( size_t j=1; j <= idx; ++j )
 			{
@@ -80,7 +84,13 @@ void perform_psd( const size_t p, const size_t q, const size_t K)
 		}
 	}
     
-
+    vector< spike_info<T> > spikes;
+    const size_t spk = spike_finder<T>::detect( spikes, 5, frq, psd[1] );
+    std::cerr << "detected " << spk << " spikes" << std::endl;
+    for(size_t i=1; i <= spikes.size(); ++i)
+    {
+        std::cerr << "Spike #" << i << "@idx=" << spikes[i].idx << ": pos=" << spikes[i].pos << ", val=" << spikes[i].val << std::endl;
+    }
 }
 
 
