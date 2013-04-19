@@ -4,13 +4,14 @@ all:
 
 clean:
 	@echo "-- removing sdk" && rm -Rf sdk
-	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
-	@echo "-- removing .dat, .ppm, .vtk, .png, .bin, .curve  and .dot" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo
+	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo
 	@echo "-- cleaning auxiliary files"
 	@${MAKE} -s -C src/y-swamp/docs   clean
 	@${MAKE} -s -C samples            clean
 	@${MAKE} -s -C src/y-aqueous/docs clean
 	@${MAKE} -s -C src/y-mk/docs      clean
+	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
+
 
 preclean:
 	@echo "-- removing out of sources builds" && cd forge && touch targets &&  ( ( cat targets | xargs rm -rf ) && rm -f targets )
