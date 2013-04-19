@@ -95,5 +95,31 @@ namespace yocto
 #define real_t double
 #include "conv.cxx"
 	
+    
+    template <>
+    int strconv::to<int>( const string &txt, const char *ctx )
+    {
+        return strconv::to_int(txt,ctx);
+    }
+    
+    template <>
+    size_t strconv::to<size_t>( const string &txt, const char *ctx )
+    {
+        return strconv::to_size(txt,ctx);
+    }
+    
+    template <>
+    float strconv::to<float>( const string &txt, const char *ctx )
+    {
+        return strconv::to_real<float>(txt,ctx);
+    }
+    
+    template <>
+    double strconv::to<double>( const string &txt, const char *ctx )
+    {
+        return strconv::to_real<double>(txt,ctx);
+    }
+    
 }
+
 

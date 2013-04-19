@@ -19,7 +19,8 @@ namespace yocto
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(move_to_front);
-			struct node_t {
+			struct node_t
+            {
 				node_t *next;
 				node_t *prev;
 				uint8_t data;
@@ -35,4 +36,3 @@ namespace yocto
 
 
 #endif
-

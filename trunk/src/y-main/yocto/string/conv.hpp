@@ -43,7 +43,16 @@ namespace yocto
             return to_real<float>(txt,ctx);
         }
 
+        //! implemented for int,size,float,double
+        template <typename T>
+        static T to( const string &txt, const char *ctx = NULL );
         
+        template <typename T>
+        static inline T to( const char *txt, const char *ctx = NULL )
+        {
+            const string _txt(txt);
+            return to<T>( _txt, ctx );
+        }
         
 	};
 	
