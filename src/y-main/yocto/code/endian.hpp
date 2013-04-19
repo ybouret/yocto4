@@ -34,16 +34,16 @@
 
 #define YOCTO_NOPE16(X) ((uint16_t)(X))
 
-#define YOCTO_SWAP16(X)                        \
-(                                          \
+#define YOCTO_SWAP16(X)                \
+(                                      \
 ( (((uint16_t)(X)) & 0xff00 ) >> 8 ) | \
 ( (((uint16_t)(X)) & 0x00ff ) << 8 )   \
 )
 
 #define YOCTO_NOPE32(X) ((uint32_t)(X))
 
-#define YOCTO_SWAP32(X) \
-(                                          \
+#define YOCTO_SWAP32(X)                \
+(                                      \
 (((uint32_t)(X) & 0xff000000) >> 24) | \
 (((uint32_t)(X) & 0x00ff0000) >> 8)  | \
 (((uint32_t)(X) & 0x0000ff00) << 8)  | \
@@ -54,8 +54,8 @@
 
 #define YOCTO_MASK64(N) ( ( (uint64_t)(0xff) ) << (N) )
 
-#define YOCTO_SWAP64(X)                               \
-(                                                 \
+#define YOCTO_SWAP64(X)                       \
+(                                             \
 (((uint64_t)(X) & YOCTO_MASK64(56) ) >> 56) | \
 (((uint64_t)(X) & YOCTO_MASK64(48) ) >> 40) | \
 (((uint64_t)(X) & YOCTO_MASK64(40) ) >> 24) | \

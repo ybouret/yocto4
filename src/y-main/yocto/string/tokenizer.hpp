@@ -23,9 +23,14 @@ namespace yocto {
 				inline const T *token() const throw() { return token_; }
 				inline size_t   units() const throw() { return units_; }
 				inline size_t   count() const throw() { return count_; }
-				
+                
+				inline basic::string<T> to_string(void) const
+                { return basic::string<T>( token_, units_); }
+                
 				static void split( sequence< basic::string<T> > &seq, const basic::string<T> &input, bool (*is_separator)( T ) throw() );
 				
+                
+                
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(tokenizer);
 				const T *curr_;

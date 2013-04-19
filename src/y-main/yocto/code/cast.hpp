@@ -16,13 +16,14 @@ namespace yocto
 		
 		template <typename T>
 		static inline T    *from( void *addr ) throw() { return (T*)addr; }
-	
+        
 		template <typename T, typename U>
 		static inline T *trans( U *p ) throw() { return (T *)addr2addr(p); }
-	
+        
 	private:
 		static void * addr2addr( void * ) throw();
 	};
+    
 }
 
 #endif
