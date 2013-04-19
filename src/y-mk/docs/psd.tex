@@ -19,47 +19,6 @@
 \title{Thoughts for Power Spectrum Estimation}
 \maketitle
 
-\section{Modifying signal}
-Let us assume that we have $f(t)$ on an interval $T$.
-We shall use the function
-\begin{equation}
-	g(t) = f(t) + a_1 t + a_0
-\end{equation}
-that corrects the drift of $f$.
-For this, we want to minimize
-\begin{equation}
-	J = \int_0^T g(t)^2 \, dt.
-\end{equation}
-We want to set
-\begin{equation}
-0 = \dfrac{\partial J}{\partial a_0} = \int_0^T g(t)\dfrac{\partial g}{\partial a_0} \, dt = \int_0^T g(t) dt
-\end{equation}
-meaning that we want $g$ to have a zero integral over $T$, which is 
-expected from an harmonic signal.
-We also want to set
-\begin{equation}
-0 = \dfrac{\partial J}{\partial a_1} = \int_0^T g(t)\dfrac{\partial g}{\partial a_1} \, dt = \int_0^T t g(t) dt
-\end{equation}
-which shall remove the constant drift part of $g$.
-With 
-\begin{equation}
-	\left\lbrace
-	\begin{array}{rcl}
-	\sigma_1 & = & \sum_i f_i \\
-	\sigma_2 & = & \sum_i \left(i+\frac{1}{2}\right) f_i\\
-	\end{array}
-	\right.
-\end{equation}
-we obtain
-\begin{equation}
-	\left\lbrace
-	\begin{array}{rcl}
-	a_0 & = & 6 \dfrac{\sigma_2}{M^2} - 4 \dfrac{\sigma_1}{M}\\
-	\\
-	a_1 & = & 6 \dfrac{\sigma_1}{M^2} - 12 \dfrac{\sigma_2}{M^3}\\
-	\end{array}
-	\right.
-\end{equation}
 
 \section{Rectifying a signal}
 Let us assume that we have $M$ points of data $f_1,\ldots,f_M$, iso-sampling $f(t)$ over the interval $[0;T]$.
@@ -87,5 +46,71 @@ which reads
 	\dfrac{i^j - (i-1)^{j}}{j}	\right\rbrack
  f_i = \sum_{k=1}^K \dfrac{M^{j+k-1}}{j+k-1} a_k
 \end{equation}
+
+We have
+\begin{equation}
+\mymat{\mu} \vec{a} = \mymat{\sigma}\vec{f}
+\end{equation}
+with
+\begin{equation}
+	\mymat{\mu}_{j,k} = \dfrac{M^{j+k-1}}{j+k-1}
+\end{equation}
+and
+\begin{equation}
+	\mymat{\sigma}_{j,i} = \dfrac{i^j - (i-1)^{j}}{j}
+\end{equation}
+
+\section{Local Maximum Refinement}
+Let us assume that $i$ is the index of a local maximum $y_i$ at coordinate $x_i$.
+We define
+\begin{equation}
+	\alpha = \dfrac{x_{i}-x{i-1}}{x_{i+1}-x_{i-1}},
+\end{equation}
+\begin{equation}
+	\beta  = y_i - y_{i-1}
+\end{equation}
+and
+\begin{equation}
+	\gamma = y_{i+1} - y_{i-1}.
+\end{equation}
+We have the reduced parabola
+\begin{equation}
+	f(X) = \lambda X + \mu X^2
+\end{equation}
+satisfying
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	\beta  & = & \lambda \alpha + \mu \alpha^2\\
+	\gamma & = & \lambda+\mu\\
+	\end{array}
+	\right.
+\end{equation}
+with a maximum at
+\begin{equation}
+	X_m = -\dfrac{\lambda}{2\mu}.
+\end{equation}
+We obtain
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	\lambda \alpha(1-\alpha) & = & \beta - \alpha^2\gamma \\
+	\mu     \alpha(1-\alpha) & = & -(\beta - \alpha^2\gamma)  \\
+	\end{array}
+	\right.
+\end{equation}
+With $\beta>0$, $\gamma\leq\beta$ and $0<\alpha<1$, 
+\begin{equation}
+	X_m = \dfrac{1}{2} \dfrac{\beta - \alpha^2\gamma}{\beta - \alpha\gamma}
+\end{equation}
+and
+\begin{equation}
+	x_m = x_{i-1} + X_m \left(x_{i+1}-x_{i-1}\right).
+\end{equation}
+We also obtain
+\begin{equation}
+	y_m = y_{i-1} + \dfrac{1}{4\alpha\left(1-\alpha\right)} \dfrac{\left(\beta - \alpha^2\gamma\right)^2}{\beta-\alpha\gamma}.
+\end{equation}
+
 
 \end{document}

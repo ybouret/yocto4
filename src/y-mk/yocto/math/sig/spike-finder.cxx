@@ -74,10 +74,11 @@ namespace yocto
                         const real_t gam   = y[spike.idx+1] - f0; assert(gam<=beta);
                         if(beta>0)
                         {
-                            const real_t X = clamp<real_t>(0,REAL(0.5) * (beta - alpha*alpha*gam)/(beta-alpha*gam),1);
-                            //std::cerr << "X=" << X << std::endl;
-                            spike.pos = x0 + X * x2;
-                            
+                            const real_t num = beta - alpha*alpha*gam;
+                            const real_t den = beta-alpha*gam;
+                            const real_t Xm  = clamp<real_t>(0,REAL(0.5) * num/den,1);
+                            spike.pos = x0 + Xm * x2;
+                            spike.val = f0 + (num*num)/(den*REAL(4.0)*alpha*(REAL(1.0)-alpha));
                         }
                     }
                     

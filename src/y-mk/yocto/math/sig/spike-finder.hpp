@@ -3,6 +3,7 @@
 
 #include "yocto/sequence/array.hpp"
 #include "yocto/container/sequence.hpp"
+#include "yocto/comparator.hpp"
 
 namespace yocto
 {
@@ -26,12 +27,12 @@ namespace yocto
             
             inline ~spike_info() throw() {}
             
-            spike_info( const spike_info &s) throw() :
+            inline spike_info( const spike_info &s) throw() :
             idx(s.idx), pos(s.pos), val(s.val)
             {
             }
             
-            spike_info &operator=( const spike_info &s) throw()
+            inline spike_info &operator=( const spike_info &s) throw()
             {
                 idx = s.idx;
                 pos = s.pos;
@@ -39,6 +40,17 @@ namespace yocto
                 return *this;
             }
             
+            static inline
+            int compare_by_pos( const spike_info &lhs, const spike_info &rhs) throw()
+            {
+                return __compare(lhs.pos,rhs.pos);
+            }
+            
+            static inline
+            int compare_by_val( const spike_info &lhs, const spike_info &rhs) throw()
+            {
+                return __compare(lhs.val,rhs.val);
+            }
             
         };
         
