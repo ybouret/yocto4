@@ -1,5 +1,7 @@
 #include "yocto/mpk/natural.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/code/cast.hpp"
+
 #include <cerrno>
 
 
@@ -102,8 +104,7 @@ namespace yocto
 		natural natural:: dec_( uint8_t x ) const
 		{
 			uint64_t wksp[ YOCTO_U64_FOR_ITEM(natural) ];
-			void    *addr = & wksp[0];
-			natural &rhs = *(natural *) addr;
+			natural &rhs = *_cast::trans<natural,uint64_t>(wksp);
 			rhs.size_ = 1;
 			rhs.byte_ = &x;
 			return sub_( *this, rhs );

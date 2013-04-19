@@ -3,6 +3,7 @@
 
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/code/swap.hpp"
+#include "yocto/code/cast.hpp"
 #include "yocto/comparator.hpp"
 
 namespace yocto
@@ -17,8 +18,7 @@ namespace yocto
 		
 		//-- local memory
 		uint64_t     wksp[ YOCTO_U64_FOR_ITEM(T) ];
-		void        *addr = static_cast<void*>(wksp);
-		T           &rra  = *static_cast<T *>(addr);
+		T           &rra  = *_cast::trans<T,uint64_t>(wksp);
 		
 		// algorithm
 		size_t l =(n >> 1)+1;
@@ -69,12 +69,10 @@ namespace yocto
 		//-- local memory
         //----------------------------------------------------------------------
 		uint64_t     wksp[ YOCTO_U64_FOR_ITEM(T) ];
-		void        *addr = static_cast<void*>(wksp);
-		T           &rra  = *static_cast<T *>(addr);
+		T           &rra  = *_cast::trans<T,uint64_t>(wksp);
         
 		uint64_t     wksp2[ YOCTO_U64_FOR_ITEM(U) ];
-		void        *addr2 = static_cast<void*>(wksp2);
-		U           &rrb  = *static_cast<U *>(addr2);
+		U           &rrb  = *_cast::trans<U,uint64_t>(wksp2);
 		
         //----------------------------------------------------------------------
 		//-- algorithm
