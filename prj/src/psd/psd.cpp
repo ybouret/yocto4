@@ -10,6 +10,8 @@
 #include "yocto/code/hsort.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/dat/spline.hpp"
+#include "yocto/math/sig/spike-finder.hpp"
+#include "yocto/code/hsort.hpp"
 
 #include <iostream>
 
@@ -194,6 +196,23 @@ int main( int argc, char *argv[] )
         {
             ios::ocstream fp("psd.dat",false);
             for(size_t i=1; i <=m; ++i) fp("%g %g\n",frq[i],psd[i]);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Find main spikes
+        //
+        ////////////////////////////////////////////////////////////////////////
+        vector< spike_info<double> > spikes;
+        const size_t ns = spike_finder<double>::detect(spikes, 5, frq, psd);
+        hsort(spikes, spike_info<double>::compare_by_pos);
+        {
+            ios::ocstream fp("spikes.dat",false);
+            for(size_t i=1; i <= ns; ++i )
+            {
+                std::cerr << "Spike #" << i << "@idx=" << spikes[i].idx << ": pos=" << spikes[i].pos << ", val=" << spikes[i].val << std::endl;
+                fp("%g %g\n", spikes[i].pos, spikes[i].val);
+            }
         }
         return 0;
     }
