@@ -20,6 +20,19 @@ namespace yocto
         
         namespace
         {
+            
+            static inline
+            real_t DistSq(const real_t x1,
+                          const real_t y1,
+                          const real_t x2,
+                          const real_t y2
+                          ) throw()
+            {
+                const real_t dx = x2 - x1;
+                const real_t dy = y2 - y1;
+                return dx*dx + dy*dy;
+            }
+            
 #define EPSILON         REAL(0.000001)
             
             /*
@@ -29,63 +42,65 @@ namespace yocto
              NOTE: A point on the edge is inside the circumcircle
              */
             static inline
-            bool CircumCircle(real_t xp,real_t yp,
-                              real_t x1,real_t y1,
-                              real_t x2,real_t y2,
-                              real_t x3,real_t y3,
-                              real_t *xc,real_t *yc,
-                              real_t *rsqr) throw()
+            bool CircumCircle(const real_t xp,
+                              const real_t yp,
+                              const real_t x1,
+                              const real_t y1,
+                              const real_t x2,
+                              const real_t y2,
+                              const real_t x3,
+                              const real_t y3,
+                              real_t &xc,
+                              real_t &yc,
+                              real_t &rsqr) throw()
             {
-                real_t m1,m2,mx1,mx2,my1,my2;
-                real_t dx,dy,drsqr;
-                real_t fabsy1y2 = Fabs(y1-y2);
-                real_t fabsy2y3 = Fabs(y2-y3);
+                const real_t fabsy1y2 = Fabs(y1-y2);
+                const real_t fabsy2y3 = Fabs(y2-y3);
                 
                 /* Check for coincident points */
                 if (fabsy1y2 < EPSILON && fabsy2y3 < EPSILON)
                     return(false);
                 
-                if (fabsy1y2 < EPSILON) {
-                    m2 = - (x3-x2) / (y3-y2);
-                    mx2 = (x2 + x3) / REAL(2.0);
-                    my2 = (y2 + y3) / REAL(2.0);
-                    *xc = (x2 + x1) / REAL(2.0);
-                    *yc = m2 * (*xc - mx2) + my2;
-                } else if (fabsy2y3 < EPSILON) {
-                    m1 = - (x2-x1) / (y2-y1);
-                    mx1 = (x1 + x2) / REAL(2.0);
-                    my1 = (y1 + y2) / REAL(2.0);
-                    *xc = (x3 + x2) / REAL(2.0);
-                    *yc = m1 * (*xc - mx1) + my1;
-                } else {
-                    m1 = - (x2-x1) / (y2-y1);
-                    m2 = - (x3-x2) / (y3-y2);
-                    mx1 = (x1 + x2) / REAL(2.0);
-                    mx2 = (x2 + x3) / REAL(2.0);
-                    my1 = (y1 + y2) / REAL(2.0);
-                    my2 = (y2 + y3) / REAL(2.0);
-                    *xc = (m1 * mx1 - m2 * mx2 + my2 - my1) / (m1 - m2);
+                if (fabsy1y2 < EPSILON)
+                {
+                    const real_t m2 = - (x3-x2) / (y3-y2);
+                    const real_t mx2 = (x2 + x3) / REAL(2.0);
+                    const real_t my2 = (y2 + y3) / REAL(2.0);
+                    xc = (x2 + x1) / REAL(2.0);
+                    yc = m2 * (xc - mx2) + my2;
+                }
+                else if (fabsy2y3 < EPSILON)
+                {
+                    const real_t m1  = - (x2-x1) / (y2-y1);
+                    const real_t mx1 = (x1 + x2) / REAL(2.0);
+                    const real_t my1 = (y1 + y2) / REAL(2.0);
+                    xc  = (x3 + x2) / REAL(2.0);
+                    yc  = m1 * (xc - mx1) + my1;
+                }
+                else
+                {
+                    const real_t m1 = - (x2-x1) / (y2-y1);
+                    const real_t m2 = - (x3-x2) / (y3-y2);
+                    const real_t mx1 = (x1 + x2) / REAL(2.0);
+                    const real_t mx2 = (x2 + x3) / REAL(2.0);
+                    const real_t my1 = (y1 + y2) / REAL(2.0);
+                    const real_t my2 = (y2 + y3) / REAL(2.0);
+                    xc = (m1 * mx1 - m2 * mx2 + my2 - my1) / (m1 - m2);
                     if (fabsy1y2 > fabsy2y3)
                     {
-                        *yc = m1 * (*xc - mx1) + my1;
+                        yc = m1 * (xc - mx1) + my1;
                     } else
                     {
-                        *yc = m2 * (*xc - mx2) + my2;
+                        yc = m2 * (xc - mx2) + my2;
                     }
                 }
                 
-                dx = x2 - *xc;
-                dy = y2 - *yc;
-                *rsqr = dx*dx + dy*dy;
                 
-                dx = xp - *xc;
-                dy = yp - *yc;
-                drsqr = dx*dx + dy*dy;
+                rsqr               = DistSq(x2, y2, xc, yc);
+                const real_t drsqr = DistSq(xp, yp, xc, yc);
                 
-                // Original
-                //return((drsqr <= *rsqr) ? TRUE : FALSE);
-                // Proposed by Chuck Morris
-                return((drsqr - *rsqr) <= EPSILON ? true : false);
+                //return((drsqr <= rsqr) ? TRUE : FALSE);
+                return((drsqr - rsqr) <= EPSILON ? true : false);
             }
             
             
@@ -211,7 +226,8 @@ namespace yocto
                         y2 = pxyz[v[j].p2].y;
                         x3 = pxyz[v[j].p3].x;
                         y3 = pxyz[v[j].p3].y;
-                        const bool inside = CircumCircle(xp,yp,x1,y1,x2,y2,x3,y3,&xc,&yc,&r);
+                        xc=yc=r=0;
+                        const bool inside = CircumCircle(xp,yp,x1,y1,x2,y2,x3,y3,xc,yc,r);
                         if (xc < xp && ((xp-xc)*(xp-xc)) > r)
                             complete[j] = true;
                         if (inside)
@@ -488,7 +504,7 @@ namespace yocto
             {
                 fp("3 %u %u %u\n", count, count+1, count+2 );
             }
-
+            
         }
         
         template <>
@@ -527,7 +543,7 @@ namespace yocto
             }
             
         }
-
+        
         
         
     }
