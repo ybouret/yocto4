@@ -1,7 +1,8 @@
-#ifndef _YOCTO_TRIDIAG_HPP_
-#define _YOCTO_TRIDIAG_HPP_ 1
+#ifndef YOCTO_MATH_KERNEL_TRIDIAG_INCLUDED
+#define YOCTO_MATH_KERNEL_TRIDIAG_INCLUDED 1
 
 #include "yocto/sequence/vector.hpp"
+#include "yocto/math/kernel/matrix.hpp"
 
 namespace yocto {
 
@@ -19,17 +20,22 @@ namespace yocto {
 
 			void make( size_t n );
 
+            //! lower diagonal
 			T       &a( size_t n ) throw();
 			const T &a( size_t n ) const throw();
 
+            //! diagonal
 			T       &b( size_t n ) throw();
 			const T &b( size_t n ) const throw();
 
+            //! upper diagonal
 			T       &c( size_t n ) throw();
 			const T &c( size_t n ) const throw();
 
-			void     solve( array<T> &u, const array<T> &r );
-
+			void     solve( array<T>  &u, const array<T>  &r) const;
+            void     solve( matrix<T> &M, const matrix<T> &A) const;
+            
+            
 			T operator()( size_t i, size_t j) const throw();
 			void to_scilab( std::ostream &os ) const;
 
@@ -47,7 +53,7 @@ namespace yocto {
 			T          *a_;
 			T          *b_;
 			T          *c_;
-			T          *g_;
+			mutable T  *g_;
 		};
 	}
 
