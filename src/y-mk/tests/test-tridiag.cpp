@@ -3,6 +3,7 @@
 #include "yocto/code/rand.hpp"
 #include "../../y-main/tests/support.hpp"
 #include "yocto/math/types.hpp"
+#include <typeinfo>
 
 using namespace yocto;
 using namespace math;
