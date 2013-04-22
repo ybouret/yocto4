@@ -12,7 +12,40 @@ namespace yocto
 {
 	namespace math
 	{
+		template <>
+		matrix<z_type>::row &       matrix<z_type>::operator[]( size_t r )       throw()
+		{
+			assert( r >= 1 );
+			assert( r <= rows );
+			return row_[ r ];
+		}
 		
+		template <>
+		const matrix<z_type>::row &       matrix<z_type>::operator[]( size_t r ) const throw()
+		{
+			assert( r >= 1 );
+			assert( r <= rows );
+			return row_[ r ];
+		}
+		
+		template <>
+		z_type & matrix<z_type>::row:: operator[]( size_t c ) throw()
+		{
+			assert( item_     );
+			assert( c >=1     );
+			assert( c <= cols );
+			return item_[c];
+		}
+		
+		template <>
+		const z_type & matrix<z_type>::row:: operator[]( size_t c ) const throw()
+		{
+			assert( item_     );
+			assert( c >=1     );
+			assert( c <= cols );
+			return item_[c];
+		}
+
 		template <>
 		matrix<z_type>::row:: row( z_type *item, size_t c ) throw() :
 		cols( c     ),
@@ -128,6 +161,28 @@ namespace yocto
 			build();
 			memcpy( ptr_, M.ptr_, len_ );
 		}
+        
+        template <>
+		matrix<z_type>:: matrix( const matrix &M, const matrix_transpose_t &) :
+		rows( M.cols ),
+		cols( M.rows ),
+		size( M.size ),
+		row_( NULL   ),
+		ptr_( NULL   ),
+		len_( M.len_ ),
+		buffer_( NULL   ),
+		buflen_(0)
+		{
+			build();
+            matrix<z_type> &self = *this;
+            for( size_t i=1; i <= rows; ++i )
+            {
+                for( size_t j=1; j <= cols; ++j )
+                {
+                    self[i][j] = M[j][i];
+                }
+            }
+		}
 		
 		template <>
 		void matrix<z_type>:: swap_with( matrix &M ) throw()
@@ -140,9 +195,7 @@ namespace yocto
 			cswap_const( len_, M.len_ );
 			cswap( buffer_, M.buffer_ );
 			cswap( buflen_, M.buflen_ );
-			
-			//memswap( (void *) &rows, (void *) &M.rows, sizeof(matrix) - YOCTO_OFFSET_OF(matrix,rows) );
-		}
+        }
 		
 		template <>
 		void matrix<z_type>:: release() throw()
@@ -185,40 +238,7 @@ namespace yocto
 			}
 		}
 		
-		template <>
-		matrix<z_type>::row &       matrix<z_type>::operator[]( size_t r )       throw()
-		{
-			assert( r >= 1 );
-			assert( r <= rows );
-			return row_[ r ];
-		}
-		
-		template <>
-		const matrix<z_type>::row &       matrix<z_type>::operator[]( size_t r ) const throw()
-		{
-			assert( r >= 1 );
-			assert( r <= rows );
-			return row_[ r ];
-		}
-		
-		template <>
-		z_type & matrix<z_type>::row:: operator[]( size_t c ) throw()
-		{
-			assert( item_     );
-			assert( c >=1     );
-			assert( c <= cols );
-			return item_[c];
-		}
-		
-		template <>
-		const z_type & matrix<z_type>::row:: operator[]( size_t c ) const throw()
-		{
-			assert( item_     );
-			assert( c >=1     );
-			assert( c <= cols );
-			return item_[c];
-		}
-		
+				
 		template <>
 		void  matrix<z_type>:: swap_rows( size_t r1, size_t r2 ) throw()
 		{
@@ -285,27 +305,13 @@ namespace yocto
             for(size_t i=n;i>0;--i) (*this)[i][i] = w[i];
         }
         
-#if 0
-		template <>
-		z_type  * matrix<z_type>::       get_row_item( size_t r ) throw()
-		{
-			assert( r >= 1    );
-			assert( r <= rows );
-			return row_[r].item_;
-		}
-		
-		template <>
-		const z_type  * matrix<z_type>::       get_row_item( size_t r ) const  throw()
-		{
-			assert( r >= 1    );
-			assert( r <= rows );
-			return row_[r].item_;
-		}
-#endif
 		
 		template <>
 		void matrix<z_type>:: transpose()
 		{
+            matrix<z_type> M( *this, matrix_transpose);
+            swap_with(M);
+#if 0
 			if( rows  > 0 )
 			{
 				const matrix<z_type> &A = *this;
@@ -322,8 +328,10 @@ namespace yocto
 			else {
 				assert( 0 == cols );
 			}
-			
+#endif
 		}
+        
+        
 		
 	}
 }

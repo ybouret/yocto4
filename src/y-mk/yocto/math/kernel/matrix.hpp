@@ -9,6 +9,19 @@ namespace yocto
 	namespace math
 	{
 		
+    
+        enum matrix_ctor
+        {
+            matrix_ctor_normal,
+            matrix_ctor_transpose
+        };
+        
+        typedef int2type<matrix_ctor_normal>    matrix_normal_t;
+        typedef int2type<matrix_ctor_transpose> matrix_transpose_t;
+        
+        extern const matrix_normal_t    matrix_normal;
+        extern const matrix_transpose_t matrix_transpose;
+        
 		template <typename T>
 		class matrix : public object
 			{
@@ -54,6 +67,7 @@ namespace yocto
 				const size_t size;   //!< rows * cols
 				
 				matrix( const matrix & ); //!< copy
+                matrix( const matrix &, const matrix_transpose_t &);
 				matrix & operator=( const matrix & other ); //!< assign
 				void assign( const matrix &other ) throw(); //!< MUST have same sizes
 				void diag( const array<T> &w ); //!< make a diagonal matrix
