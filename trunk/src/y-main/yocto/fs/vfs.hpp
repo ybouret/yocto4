@@ -1,0 +1,109 @@
+//! \file
+
+#ifndef YOCTO_VFS_INCLUDED
+#define YOCTO_VFS_INCLUDED
+
+#include "yocto/string.hpp"
+#include "yocto/functor.hpp"
+
+namespace yocto {
+	
+	namespace filesys
+	{
+		class vfs : public object {
+		public:
+			virtual ~vfs() throw();
+			//==================================================================
+			//
+			// entry API
+			//
+			//==================================================================
+			class entry : public object
+			{
+			public:
+				typedef size_t attribute;          //!< attribute type
+				static const attribute no_ent = 0; //!< no entry
+				static const attribute is_reg = 1; //!< regular file
+				static const attribute is_dir = 2; //!< directory
+				static const attribute is_unk = 4; //!< unknown
+				
+				explicit entry( const string &vfs_path, const vfs &vfs_from );
+				virtual ~entry() throw();
+				entry( const entry &other );
+				
+				const string     path;
+				const char      *cstr;
+				const char      *base_name;
+				const char      *extension;
+				const bool       link;
+				const attribute  attr;
+				
+				typedef functor<bool,TL1(const entry &)> callback;
+				
+			private:
+				YOCTO_DISABLE_ASSIGN(entry);
+			};
+			
+			//======================================================================
+			//
+			// scanner API
+			//
+			//======================================================================
+			class scanner
+			: public object
+			{
+			public:
+				virtual ~scanner() throw();
+				virtual  const entry * next() = 0;
+				
+			protected:
+				explicit scanner( const string &dirname, const vfs &owner );
+				const vfs &vfs_;
+				string     dir_;
+				entry     *ent_;
+				
+				void make_entry( const char *entry_name );
+				void free_entry() throw();
+				
+			private:
+				uint64_t data_[ YOCTO_U64_FOR_ITEM(vfs::entry) ];
+				YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
+			};
+			
+			
+			void foreach_in( const string &dirname, entry::callback &on_entry ) const;
+			
+			
+			//==================================================================
+			//
+			// virtual interface
+			//
+			//==================================================================
+			virtual entry::attribute query_attribute( const string &path, bool &is_link ) const throw() = 0;
+			virtual void     create_dir(  const string &dirname, const bool allow_already_exists ) = 0;
+			virtual void     remove_dir(  const string &dirname  ) = 0 ;
+			virtual void     remove_file( const string &filename ) = 0;
+			virtual scanner *new_scanner( const string &dirname ) const = 0;
+			
+			//==================================================================
+			//
+			// non virtual interface
+			//
+			//==================================================================
+			void         create_sub_dir( const string &dirname );
+			bool         is_reg( const string &path ) const throw();
+			bool         is_dir( const string &path ) const throw();
+			void         remove_files( const string &dirname, entry::callback &filter );
+			void         remove_files( const string &dirname, bool (*filter)( const entry &) );
+            
+		protected:
+			explicit vfs() throw();
+			
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(vfs);
+		};
+	}
+	
+}
+
+#endif

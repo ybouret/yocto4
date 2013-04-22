@@ -66,5 +66,7 @@ ADD_TEST(InStack     test-main in_stack)
 ADD_TEST(Labelled    test-main labelled)
 ADD_TEST(BSwap       test-main bswap)
 ADD_TEST(ThrProxy    test-main thr_proxy)
+ADD_TEST(Scan        test-main scan)
+ADD_TEST(WD          test-main wd)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
