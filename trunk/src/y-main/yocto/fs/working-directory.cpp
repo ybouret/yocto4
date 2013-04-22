@@ -1,5 +1,4 @@
 #include "yocto/fs/working-directory.hpp"
-#include "yocto/string/vfs-utils.hpp"
 #include "yocto/memory/pooled.hpp"
 #include "yocto/memory/buffers.hpp"
 
@@ -53,7 +52,7 @@ namespace yocto
             else
             {
                 string ans(wd);
-                return string( _vfs::as_directory( ans ));
+                return string( vfs::as_directory( ans ));
             }
         }
 #endif
@@ -71,7 +70,7 @@ namespace yocto
         if( res > len )
             throw exception( "CurrentDirectory changed!");
         string ans( buffer() );
-        return string( _vfs::as_directory( ans ) );
+        return string( vfs::as_directory( ans ) );
 #endif
         
         

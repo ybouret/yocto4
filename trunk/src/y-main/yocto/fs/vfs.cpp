@@ -1,5 +1,4 @@
 #include "yocto/fs/vfs.hpp"
-#include "yocto/string/vfs-utils.hpp"
 #include "yocto/auto-ptr.hpp"
 #include "yocto/sequence/list.hpp"
 
@@ -15,7 +14,7 @@ namespace yocto
     void vfs:: create_sub_dir( const string &dirName )
     {
         string            org = dirName;
-        const std::size_t len = _vfs::as_directory( org ).size();
+        const std::size_t len = vfs::as_directory( org ).size();
         string            sub( len, as_capacity );
         std::size_t       idx = 0;
         while( idx < len )

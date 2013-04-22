@@ -1,7 +1,6 @@
 #include "yocto/ios/rc.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/string/vfs-utils.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/fs/local-fs.hpp"
 #include "yocto/auto-ptr.hpp"
@@ -28,7 +27,7 @@ void __rcpack( const string &resdir, const string &root, ios::resources::packer 
             std::cerr << "\t** subdir  " << ep->base_name << std::endl;
             string        sub_dir  = resdir + ep->base_name;
             string        sub_root = root    + ep->base_name;
-            __rcpack( _vfs::as_directory(sub_dir), _vfs::as_directory(sub_root), rc);
+            __rcpack( vfs::as_directory(sub_dir), vfs::as_directory(sub_root), rc);
         }
         else
         {
@@ -43,7 +42,7 @@ void __rcpack( const string &resdir, const string &root, ios::resources::packer 
 
 int main( int argc, char *argv[] )
 {
-    const char *progname = _vfs::get_base_name(argv[0]);
+    const char *progname = vfs::get_base_name(argv[0]);
     try
     {
         if( argc <= 2 )
@@ -57,7 +56,7 @@ int main( int argc, char *argv[] )
         {
             ios::resources::packer rc( exename, status);
             string root = "";
-            __rcpack( _vfs::as_directory(resdir), root, rc );
+            __rcpack( vfs::as_directory(resdir), root, rc );
         }
         
         
