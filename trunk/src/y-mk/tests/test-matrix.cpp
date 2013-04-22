@@ -40,6 +40,38 @@ static inline void test_matrix()
 		}
 		matrix<T> m2 = m;
 		m2 = m;
+        H.set();
+        H.run( &m2[1][1], m2.rows*m2.cols*sizeof(T));
+		const uint64_t k3 = H.key<uint64_t>();
+		if( k1 != k3 )
+		{
+			throw exception("data no match, after assign!");
+		}
+        
+        matrix<T> mt(m2,matrix_transpose);
+        H.set();
+        for(size_t j=1; j <= mt.cols; ++j)
+        {
+            for(size_t i=1;i<=mt.rows;++i)
+            {
+                H.run( &mt[i][j], sizeof(T));
+            }
+        }
+        const uint64_t k4 = H.key<uint64_t>();
+		if( k1 != k4 )
+		{
+			throw exception("data no match, after transpose!");
+		}
+        
+        mt.transpose();
+        H.set();
+        H.run( &mt[1][1], mt.rows*mt.cols*sizeof(T));
+        const uint64_t k5 = H.key<uint64_t>();
+		if( k1 != k5 )
+		{
+			throw exception("data no match, after 2 transpose!");
+		}
+
 	}
 	
 }

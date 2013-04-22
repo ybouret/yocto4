@@ -2,7 +2,6 @@
 #define _YOCTO_TRIDIAG_HPP_ 1
 
 #include "yocto/sequence/vector.hpp"
-#include <iosfwd>
 
 namespace yocto {
 
