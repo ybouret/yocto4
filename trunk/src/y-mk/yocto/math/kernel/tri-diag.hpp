@@ -35,6 +35,11 @@ namespace yocto {
 			void     solve( array<T>  &u, const array<T>  &r) const;
             void     solve( matrix<T> &M, const matrix<T> &A) const;
             
+            //! v = M*u
+            void apply( array<T> &v, const array<T> &u) const throw();
+            
+            void apply( matrix<T> &V, const matrix<T> &U) const throw();
+            
             
 			T operator()( size_t i, size_t j) const throw();
 			void to_scilab( std::ostream &os ) const;
