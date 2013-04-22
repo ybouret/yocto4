@@ -33,5 +33,6 @@ ADD_TEST(Tri2D    test-mk tr2d 100)
 ADD_TEST(LU2      test-mk lu2)
 ADD_TEST(FFT1     test-mk fft1)
 ADD_TEST(PSD      test-mk psd 12 8 0)
+ADD_TEST(TriDiag  test-mk tridiag)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
