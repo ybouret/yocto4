@@ -2,7 +2,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/imstream.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/string/vfs-utils.hpp"
+#include "yocto/fs/vfs.hpp"
 #include "yocto/mpk/natural.hpp"
 
 #include "yocto/exception.hpp"
@@ -28,7 +28,7 @@ bool load_string( ios::istream &fp, string &s )
 
 int main(int argc, char *argv[] )
 {
-    const char *progname = _vfs::get_base_name(argv[0]);
+    const char *progname = vfs::get_base_name(argv[0]);
     try
     {
         if( argc < 2 )

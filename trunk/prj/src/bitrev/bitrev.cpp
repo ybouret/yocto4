@@ -61,15 +61,10 @@ int main(int argc, char *argv[] )
     
     try
     {
-      
+        const size_t pmax = 14;
 
-        for( size_t p=0; p < 12; ++p )
+        for( size_t p=0; p <= pmax; ++p )
         {
-            perf<float>(p);
-            perf<double>(p);
-            std::cerr << std::endl;
-            
-#if 0
             const size_t size = 1 << p;
             std::cerr << "size=" << size << std::endl;
             size_t nops = 0;
@@ -91,9 +86,18 @@ int main(int argc, char *argv[] )
                     j += m;
                 }
             }
-            std::cerr << "\tnops = " << nops << " *2";
+            std::cerr << "\tnops = " << nops;;
             std::cerr << std::endl;
-#endif
+        }
+        
+        for( size_t p=0; p <= pmax; ++p )
+        {
+            const size_t size = 1 << p;
+            std::cerr << "size=" << size << std::endl;
+            perf<float>(p);
+            perf<double>(p);
+            std::cerr << std::endl;
+
         }
         
         return 0;
