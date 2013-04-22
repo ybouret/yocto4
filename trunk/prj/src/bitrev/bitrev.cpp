@@ -61,9 +61,16 @@ int main(int argc, char *argv[] )
     
     try
     {
-        const size_t pmax = 14;
-
-        for( size_t p=0; p <= pmax; ++p )
+        ios::ocstream decl("bitrev-tab.hpp",false);
+        ios::ocstream impl("bitrev-tab.cpp",false);
+        
+        decl << "#ifndef YOCTO_BITREV_TAB_INCLUDED\n";
+        decl << "#define YOCTO_BITREV_TAB_INCLUDED 1\n";
+        
+        impl << "#include \"./bitrev-tab.hpp\"\n";
+        
+        size_t sum_words  = 0;
+        for( size_t p=0; p <= 16; ++p )
         {
             const size_t size = 1 << p;
             std::cerr << "size=" << size << std::endl;
@@ -86,20 +93,25 @@ int main(int argc, char *argv[] )
                     j += m;
                 }
             }
-            std::cerr << "\tnops = " << nops;;
+            std::cerr << "\tnops = " << nops << " =>" <<  nops*2 <<   " words"<< std::endl;
+            sum_words += 2*nops;
             std::cerr << std::endl;
         }
+        decl << "#endif\n";
+        std::cerr << "#words=" << sum_words << std::endl;
         
-        for( size_t p=0; p <= pmax; ++p )
+        if(argc>1 && 0 == strcmp(argv[0], "perf") )
         {
-            const size_t size = 1 << p;
-            std::cerr << "size=" << size << std::endl;
-            perf<float>(p);
-            perf<double>(p);
-            std::cerr << std::endl;
-
+            for( size_t p=0; p <= 13; ++p )
+            {
+                const size_t size = 1 << p;
+                std::cerr << "size=" << size << std::endl;
+                perf<float>(p);
+                perf<double>(p);
+                std::cerr << std::endl;
+                
+            }
         }
-        
         return 0;
     }
     catch(...)
