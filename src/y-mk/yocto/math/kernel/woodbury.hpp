@@ -8,16 +8,15 @@ namespace yocto
     
     namespace math
     {
-        
+        //! helper to solve (A+(U.tV)) x = b
         template <typename T>
         struct woodbury
         {
             
-            
-            //! solve A+(U.tV)
             /**
+             compute woodbury matrix from a LU matrix A
              */
-            bool build( matrix<T>      &B,
+            bool build(matrix<T>       &B,
                        const lu<T>     &LU,
                        const matrix<T> &A,
                        const matrix<T> &U,
