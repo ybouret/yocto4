@@ -3,7 +3,6 @@
 #include "yocto/auto-ptr.hpp"
 
 using namespace yocto;
-using namespace filesys;
 
 YOCTO_UNIT_TEST_IMPL(scan)
 {
