@@ -4,7 +4,6 @@
 #include "yocto/auto-ptr.hpp"
 
 using namespace yocto;
-using namespace filesys;
 
 static void ls( const string &dirname )
 {

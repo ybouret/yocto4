@@ -7,8 +7,6 @@
 
 namespace yocto
 {
-	namespace filesys 
-	{
 		
 		class local_fs : public singleton<local_fs>, public vfs
 		{
@@ -28,7 +26,6 @@ namespace yocto
 			static const char name[];
 		};
 		
-		
-	}
+    
 }
 #endif

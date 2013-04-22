@@ -12,10 +12,10 @@ using namespace yocto;
 static inline
 void __rcpack( const string &resdir, const string &root, ios::resources::packer &rc )
 {
-    filesys::vfs & fs = filesys::local_fs::instance();
-    auto_ptr<filesys::vfs::scanner> scan( fs.new_scanner( resdir ) );
+    vfs & fs = local_fs::instance();
+    auto_ptr<vfs::scanner> scan( fs.new_scanner( resdir ) );
     
-    for( const filesys::vfs::entry *ep = scan->next(); ep; ep = scan->next() )
+    for( const vfs::entry *ep = scan->next(); ep; ep = scan->next() )
     {
         
         if( ep->attr == ep->is_dir )
@@ -30,7 +30,7 @@ void __rcpack( const string &resdir, const string &root, ios::resources::packer 
             string        sub_root = root    + ep->base_name;
             __rcpack( _vfs::as_directory(sub_dir), _vfs::as_directory(sub_root), rc);
         }
-        else 
+        else
         {
             const string  rcname = root + ep->base_name;
             std::cerr << "\t** packing " << rcname << std::endl;
