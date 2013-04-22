@@ -61,16 +61,21 @@ int main(int argc, char *argv[] )
     
     try
     {
+        const size_t pmax = 16;
+        const size_t smax = 1 << pmax;
         ios::ocstream decl("bitrev-tab.hpp",false);
         ios::ocstream impl("bitrev-tab.cpp",false);
         
         decl << "#ifndef YOCTO_BITREV_TAB_INCLUDED\n";
         decl << "#define YOCTO_BITREV_TAB_INCLUDED 1\n";
+        decl << "\n";
+        decl("#define YOCTO_BITREV_SIZE_MAX %u\n\n", unsigned(smax));
         
         impl << "#include \"./bitrev-tab.hpp\"\n";
         
+        
         size_t sum_words  = 0;
-        for( size_t p=0; p <= 16; ++p )
+        for( size_t p=0; p <= pmax; ++p )
         {
             const size_t size = 1 << p;
             std::cerr << "size=" << size << std::endl;
