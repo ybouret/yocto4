@@ -1,5 +1,4 @@
 #include "yocto/fs/vfs.hpp"
-#include "yocto/string/vfs-utils.hpp"
 
 #include <cstring>
 #include <new>
@@ -19,7 +18,7 @@ namespace yocto
     dir_( dirname ),
     ent_( NULL )
     {
-        _vfs::as_directory(dir_);
+        vfs::as_directory(dir_);
         //std::cout << "scanner [" << dir_ << "]" << std::endl;
     }
     
@@ -42,7 +41,7 @@ namespace yocto
         vfs::entry *tmp       = (vfs::entry *)(void *)data_;
         string      full_path = dir_ + entry_name;
         
-        _vfs::as_directory( full_path ).trim( 1 );
+        vfs::as_directory( full_path ).trim( 1 );
         new (tmp) vfs::entry( full_path, vfs_ );
         ent_ = tmp;
     }

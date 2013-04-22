@@ -1,6 +1,6 @@
 #include "yocto/ios/rc.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/string/vfs-utils.hpp"
+#include "yocto/fs/vfs.hpp"
 
 #include <iostream>
 
@@ -8,7 +8,7 @@ using namespace yocto;
 
 int main( int argc, char *argv[] )
 {
-    const char *progname = _vfs::get_base_name(argv[0]);
+    const char *progname = vfs::get_base_name(argv[0]);
     try
     {
         std::cerr << "**** Opening Attached Resources" << std::endl;

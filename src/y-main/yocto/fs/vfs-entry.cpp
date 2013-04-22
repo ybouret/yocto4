@@ -1,5 +1,4 @@
 #include "yocto/fs/vfs.hpp"
-#include "yocto/string/vfs-utils.hpp"
 
 namespace yocto {
 	
@@ -9,8 +8,8 @@ namespace yocto {
     //fs( vfs_from ),
     path( vfs_path ),
     cstr( path.c_str()  ),
-    base_name( _vfs::get_base_name( path ) ),
-    extension( _vfs::get_extension( path )  ),
+    base_name( vfs::get_base_name( path ) ),
+    extension( vfs::get_extension( path )  ),
     link( false ),
     attr( vfs_from.query_attribute( path,  *(bool *)&link ) )
     {
@@ -24,8 +23,8 @@ namespace yocto {
     //fs( other.fs ),
     path( other.path ),
     cstr( path.c_str() ),
-    base_name( _vfs::get_base_name( path ) ),
-    extension( _vfs::get_extension( path ) ),
+    base_name( vfs::get_base_name( path ) ),
+    extension( vfs::get_extension( path ) ),
     link( other.link ),
     attr( other.attr )
     {
