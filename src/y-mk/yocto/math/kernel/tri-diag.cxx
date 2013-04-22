@@ -140,20 +140,22 @@ namespace yocto {
 		}
 
 		template <>
-		void tridiag<z_type>:: solve( array<z_type> &u, const array<z_type> &r) {
+		void tridiag<z_type>:: solve( array<z_type> &u, const array<z_type> &r) const
+        {
 			assert(size_>0);
 			assert(u.size() == this->size());
 			assert(r.size() == this->size());
+			const size_t n = size_;
 
 			z_type piv = b_[1];
 			if( Fabs( piv ) <= REAL_MIN )
 				throw libc::exception( EDOM, "tridiag.solve(B(1)=0)" );
 
-			size_t n = size_;
 
 			u[1] = r[1] / piv;
 
-			for( size_t j=2, jm=1; j <= n; ++j,++jm ) {
+			for( size_t j=2, jm=1; j <= n; ++j,++jm )
+            {
 				assert(j-1==jm);
 				g_[j] = c_[jm] / piv;
 				piv   = b_[j] - a_[j] * g_[j];
@@ -162,12 +164,51 @@ namespace yocto {
 				u[j] = (r[j] - a_[j] * u[jm])/piv;
 			}
 
-			for( size_t j=n-1, jp=n;j>0;--j,--jp) {
+			for( size_t j=n-1, jp=n;j>0;--j,--jp)
+            {
 				assert(j+1==jp);
 				u[j] -= g_[jp] * u[jp];
 			}
 
 		}
+        
+        template <>
+        void tridiag<z_type>:: solve( matrix<z_type> &M, const matrix<z_type> &A) const
+        {
+            assert(size_>0);
+            const size_t n = size_;
+            assert(M.rows==n);
+            assert(A.rows==n);
+            assert(M.cols==A.cols);
+            
+            for( size_t c=M.cols;c>0;--c)
+            {
+                z_type piv = b_[1];
+                if( Fabs( piv ) <= REAL_MIN )
+                    throw libc::exception( EDOM, "tridiag.solve(B(1)=0)" );
+                
+                M[1][c] = A[1][c] / piv;
+                
+                for( size_t j=2, jm=1; j <= n; ++j,++jm )
+                {
+                    assert(j-1==jm);
+                    g_[j] = c_[jm] / piv;
+                    piv   = b_[j] - a_[j] * g_[j];
+                    if( Fabs( piv ) <= REAL_MIN )
+                        throw libc::exception( EDOM, "tridiag.solve(pivot=0)" );
+                    M[j][c] = (A[j][c] - a_[j] * M[jm][c])/piv;
+                }
+                
+                for( size_t j=n-1, jp=n;j>0;--j,--jp)
+                {
+                    assert(j+1==jp);
+                    M[j][c] -= g_[jp] * M[jp][c];
+                }
+
+            }
+            
+            
+        }
 
 
 		template <>
