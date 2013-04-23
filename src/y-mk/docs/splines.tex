@@ -1,0 +1,52 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+
+
+\begin{document}
+\title{Cubic Splines}
+\maketitle
+
+Let us assume that we have a signal based on 
+$$x_1<\ldots < x_i < \ldots<x_N$$
+with values 
+$$y_1,\ldots,y_i,\ldots,y_n.$$
+The linear interpolation between $x_j$ and $x_{j+1}$ writes
+$$
+	y = A y_{j} + B y_{j+1}
+$$
+with
+$$
+	A = \dfrac{x_{j+1}-x}{x_{j+1}-x_{j}},\;\;
+	B = (1-A) = \dfrac{x-x_{j}}{x_{j+1}-x_{j}}.
+$$
+Let us assume that we know the second derivatives
+$$
+	y_1'',\ldots,y_i'',\ldots,y_n''.
+$$
+The we have
+$$
+	y = A y_{j} + B y_{j+1} + C y_j'' + D y_{j+1}''
+$$
+with
+$$
+	C = \dfrac{1}{6}\left(A^3-A\right)\left(x_{j+1}-x_{j}\right)^2,\;\;D=\dfrac{1}{6}\left(B^3-B\right)\left(x_{j+1}-x_{j}\right)^2.
+$$
+The cubic continuous condition is met when the first derivative is continuous
+$$
+	y' = \dfrac{y_{j+1}-y_{j}}{x_{j+1}-x_{j}} - \dfrac{3A^2-1}{6}\left(x_{j+1}-x_{j}\right)y_j'' +
+	\dfrac{3B^2-1}{6}\left(x_{j+1}-x_{j}\right)y_{j+1}''
+$$
+\end{document}
