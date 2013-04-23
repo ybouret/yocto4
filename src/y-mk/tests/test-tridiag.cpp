@@ -90,15 +90,15 @@ namespace
                 r[i]   = gen<T>::get();
             }
             
+            //------------------------------------------------------------------
             //-- simple tridiag part
-            //M.output( std::cerr << "M=" ) << std::endl;
+            //------------------------------------------------------------------
+            
             if( !M.solve(u,r) )
             {
                 std::cerr << "Singular matrix" << std::endl;
                 continue;
             }
-            //std::cerr << "r=" << r << std::endl;
-            //std::cerr << "u=" << u << std::endl;
             M.apply(v,u);
             double sum = 0;
             for( size_t i=1; i <=n; ++i)

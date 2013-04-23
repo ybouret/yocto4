@@ -14,13 +14,14 @@ namespace yocto {
         
         
 #define Y_XTRIDIAG_CTOR() \
-arrays(6), \
-a( arrays.next_array() ), \
-b( arrays.next_array() ), \
-c( arrays.next_array() ), \
-g( arrays.next_array() ), \
-u( arrays.next_array() ), \
-z( arrays.next_array() )
+arrays(7), \
+a(  arrays.next_array() ), \
+b(  arrays.next_array() ), \
+c(  arrays.next_array() ), \
+g(  arrays.next_array() ), \
+u(  arrays.next_array() ), \
+z(  arrays.next_array() ), \
+bb( arrays.next_array() )
         
         template <>
         xtridiag<z_type>:: xtridiag() :
@@ -107,37 +108,55 @@ z( arrays.next_array() )
             return os;
         }
         
+        
+        namespace
+        {
+            static inline
+            bool __tridiag(const array<z_type>  &a,
+                           const array<z_type>  &b,
+                           const array<z_type>  &c,
+                           array<z_type>        &g,
+                           array<z_type>        &U,
+                           const array<z_type>  &R
+                           ) throw()
+            {
+                const size_t n = a.size();
+                assert(b.size()==n);
+                assert(c.size()==n);
+                assert(g.size()==n);
+                assert(U.size()==n);
+                assert(R.size()==n);
+                
+                z_type piv = b[1];
+                if( Fabs( piv ) <= REAL_MIN )
+                    return false;
+                
+                
+                U[1] = R[1] / piv;
+                
+                for( size_t j=2, jm=1; j <= n; ++j,++jm )
+                {
+                    g[j] = c[jm] / piv;
+                    piv  = b[j] - a[j] * g[j];
+                    if( Fabs( piv ) <= REAL_MIN )
+                        return false;
+                    U[j] = (R[j] - a[j] * U[jm])/piv;
+                }
+                
+                for( size_t j=n-1, jp=n;j>0;--j,--jp)
+                {
+                    assert(j+1==jp);
+                    U[j] -= g[jp] * U[jp];
+                }
+                
+                return true;
+            }
+        }
+        
         template <>
         bool xtridiag<z_type>:: solve(array<z_type>  &U, const array<z_type>  &R) const throw()
         {
-            const size_t n = size();
-            assert( n == U.size() );
-            assert( n == R.size() );
-            
-            z_type piv = b[1];
-			if( Fabs( piv ) <= REAL_MIN )
-				return false;
-            
-            
-			U[1] = R[1] / piv;
-            
-			for( size_t j=2, jm=1; j <= n; ++j,++jm )
-            {
-				g[j] = c[jm] / piv;
-				piv  = b[j] - a[j] * g[j];
-				if( Fabs( piv ) <= REAL_MIN )
-					return false;
-				U[j] = (R[j] - a[j] * U[jm])/piv;
-			}
-            
-			for( size_t j=n-1, jp=n;j>0;--j,--jp)
-            {
-				assert(j+1==jp);
-				U[j] -= g[jp] * U[jp];
-			}
-            
-            
-            return true;
+            return __tridiag(a, b, c, g, U, R);
         }
         
         template <>
