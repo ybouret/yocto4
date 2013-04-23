@@ -1,3 +1,3 @@
 #define YOCTO_ZTYPE 's'
-#include "tri-diag.cxx"
+#include "tridiag.cxx"
 

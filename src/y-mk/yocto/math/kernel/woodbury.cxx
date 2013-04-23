@@ -8,25 +8,63 @@ namespace yocto
     namespace math
     {
         
-        static inline
-        void __finalize( matrix<z_type> &B )
-        {
-            assert(B.is_square());
-            const size_t n = B.rows;
-            for(size_t i=n;i>0;--i)
+        namespace  {
+            static inline
+            void __finalize( matrix<z_type> &B )
             {
-                for(size_t j=n;j>i;--j)
+                assert(B.is_square());
+                const size_t n = B.rows;
+                for(size_t i=n;i>0;--i)
                 {
-                    B[i][j] = -B[i][j];
+                    for(size_t j=n;j>i;--j)
+                    {
+                        B[i][j] = -B[i][j];
+                    }
+                    B[i][i] = numeric<z_type>::one - B[i][i];
+                    for(size_t j=i-1;j>0;--j)
+                    {
+                        B[i][j] = -B[i][j];
+                    }
                 }
-                B[i][i] = numeric<z_type>::one - B[i][i];
-                for(size_t j=i-1;j>0;--j)
-                {
-                    B[i][j] = -B[i][j];
-                }
+                
             }
             
+            static inline
+            bool __compute_B( matrix<z_type> &B, const matrix<z_type> &Z, matrix<z_type> &tV )
+            {
+                assert(Z.cols == tV.rows);
+                assert(Z.rows == B.rows );
+                const size_t p = Z.cols;
+                
+                //--------------------------------------------------------------
+                // compute H = (Id + Z*tV)^(-1)
+                //--------------------------------------------------------------
+                matrix<z_type> H(p,p);
+                algebra<z_type>::mul(H, Z, tV);
+                for(size_t i=p;i>0;--i)
+                    H[i][i] += numeric<z_type>::one;
+                lu<z_type>     L(p);
+                if( !L.build(H) )
+                {
+                    // singular system
+                    return false;
+                }
+                
+                //--------------------------------------------------------------
+                // compute Z*H*tV
+                //--------------------------------------------------------------
+                L.solve(H,tV);
+                algebra<z_type>::mul(B, Z, tV);
+                
+                //--------------------------------------------------------------
+                // B = Id - B
+                //--------------------------------------------------------------
+                __finalize(B);
+                return true;
+            }
         }
+        
+        
         
         template <>
         bool woodbury<z_type>:: build(matrix<z_type>       &B,
@@ -43,30 +81,49 @@ namespace yocto
             assert(U.cols>0);
             
             const size_t n = A.rows;
-            const size_t p = U.cols;
+            
+            B.make(n,n);
+            matrix<z_type> Z(U);
+            matrix<z_type> tV(V,matrix_transpose);
+            
+            //-- solve auxiliary problems
+            LU.solve(A,Z);
+            
+            //-- compute the B matrix
+            return __compute_B(B, Z, tV);
+            
+        }
+        
+        template <>
+        bool woodbury<z_type>:: build(matrix<z_type>        &B,
+                                      const tridiag<z_type> &A,
+                                      const matrix<z_type>  &U,
+                                      const matrix<z_type>  &V)
+        {
+            assert(A.size()>0);
+            assert(U.rows == A.size() );
+            assert(V.rows == A.size() );
+            assert(U.cols == V.cols );
+            assert(U.cols>0);
+            
+            const size_t n = A.size();
+            B.make(n,n);
             
             matrix<z_type> Z(U);
-            matrix<z_type> H(p,p);
-            lu<z_type>     L(p);
+            matrix<z_type> tV(V,matrix_transpose);
             
-            LU.solve(A,Z);
-            algebra<z_type>::mul_ltrn(H, V, Z);
-            for(size_t i=p;i>0;--i) H[i][i] += numeric<z_type>::one;
-            if( !L.build(H) )
+            
+            //-- solve the auxiliary problems
             {
-                // singular H matrix !!!
-                return false;
+                matrix<z_type> tV0( tV );
+                A.solve(tV, tV0);
             }
             
-            matrix<z_type> tV(V,matrix_transpose);
-            L.solve(H, tV);
-            B.make(n,n);
-            algebra<z_type>::mul(B, Z, tV);
-            __finalize(B);
-            return true;
+            //-- compute the B matrix
+            return __compute_B(B, Z, tV);
+
         }
         
     }
-    
     
 }

@@ -1,4 +1,4 @@
-#include "yocto/math/kernel/tri-diag.hpp"
+#include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/exceptions.hpp"
