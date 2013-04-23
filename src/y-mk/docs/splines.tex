@@ -1,4 +1,4 @@
-\documentclass[aps,twocolumn]{revtex4}
+\documentclass[aps]{revtex4}
 \usepackage{graphicx}
 \usepackage{amssymb,amsfonts,amsmath,amsthm}
 \usepackage{chemarr}
@@ -19,6 +19,7 @@
 \title{Cubic Splines}
 \maketitle
 
+\section{Definition}
 Let us assume that we have a signal based on 
 $$x_1<\ldots < x_i < \ldots<x_N$$
 with values 
@@ -47,6 +48,60 @@ $$
 The cubic continuous condition is met when the first derivative is continuous
 $$
 	y' = \dfrac{y_{j+1}-y_{j}}{x_{j+1}-x_{j}} - \dfrac{3A^2-1}{6}\left(x_{j+1}-x_{j}\right)y_j'' +
-	\dfrac{3B^2-1}{6}\left(x_{j+1}-x_{j}\right)y_{j+1}''
+	\dfrac{3B^2-1}{6}\left(x_{j+1}-x_{j}\right)y_{j+1}''.
 $$
+Taking the right and left expression for $1<j<n$ yields
+$$
+	\dfrac{x_{j}-x_{j-1}}{6} y''_{j-1} + \dfrac{x_{j+1}-x_{j-1}}{3} y''_j + \dfrac{x_{j+1}-x_{j}}{6} y''_{j+1} = 
+	\dfrac{y_{j+1}-y_{j}}{x_{j+1}-x_{j}} - \dfrac{y_j-y_{j-1}}{x_j-x_{j-1}}
+$$
+\section{Natural Spline}
+This forces $y_1''=0$ and $y_2''=0$ so that
+$$
+	\begin{bmatrix}
+		1 & 0 & \cdots & \cdots & 0 \\
+		\cdots & \cdots & \cdots & \cdots & \cdots \\
+		\cdots & \dfrac{x_{j}-x_{j-1}}{6} & \dfrac{x_{j+1}-x_{j-1}}{3} & \dfrac{x_{j+1}-x_{j}}{6} & \cdots\\
+		\cdots & \cdots & \cdots & \cdots & \cdots \\
+		0 & \cdots & \cdots & 0 & 1 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	y''_1\\
+	\cdots\\
+	y''_j\\
+	\cdots\\
+	y''_n\\
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	0\\
+	\cdots\\
+	\dfrac{y_{j+1}-y_{j}}{x_{j+1}-x_{j}} - \dfrac{y_j-y_{j-1}}{x_j-x_{j-1}}\\
+	\cdots\\
+	0
+	\end{bmatrix}
+$$
+
+\section{Oriented Spline}
+\subsection{Left orientation}
+If $y'_1$ is set, then the first element of the matrix becomes
+$$
+	\dfrac{x_2-x_1}{3}
+$$
+and the first element of the right hand vector becomes
+$$
+	\dfrac{y_2-y_1}{x_2-x1} - y'_1.
+$$
+\subsection{Right orientation}
+If $y'_n$ is set then the last element of the matrix becomes
+$$
+	\dfrac{x_n-x_{n-1}}{3}
+$$
+and the last element of the right hand vector becomes
+$$
+	y'_n - \dfrac{y_n-y_{n-1}}{x_n-x_{n-1}}
+$$
+\subsection{Periodic}
+We assume that $y_n=y_1$
+
 \end{document}
