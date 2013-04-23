@@ -7,6 +7,8 @@
 #include "yocto/math/types.hpp"
 #include "yocto/code/bswap.hpp"
 #include <typeinfo>
+#include "yocto/string/conv.hpp"
+#include "yocto/exception.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -61,7 +63,10 @@ int main(int argc, char *argv[] )
     
     try
     {
-        const size_t pmax = 16;
+        if( argc <= 1 )
+            throw exception("Need pmax");
+        
+        const size_t pmax = strconv::to<size_t>(argv[1],"pmax");
         const size_t smax = 1 << pmax;
         ios::ocstream decl("bitrev-tab.hpp",false);
         ios::ocstream impl("bitrev-tab.cpp",false);
@@ -74,9 +79,10 @@ int main(int argc, char *argv[] )
         impl << "#include \"./bitrev-tab.hpp\"\n";
         
         
-        size_t sum_words  = 0;
+        vector<size_t> indx;
         for( size_t p=0; p <= pmax; ++p )
         {
+            indx.free();
             const size_t size = 1 << p;
             std::cerr << "size=" << size << std::endl;
             size_t nops = 0;
@@ -88,6 +94,8 @@ int main(int argc, char *argv[] )
 					{
                         ++nops;
                         //std::cerr << '(' << i << ',' << j << ')' << ' ';
+                        indx.push_back(i);
+                        indx.push_back(j);
                     }
                     size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m)
@@ -98,12 +106,30 @@ int main(int argc, char *argv[] )
                     j += m;
                 }
             }
-            std::cerr << "\tnops = " << nops << " =>" <<  nops*2 <<   " words"<< std::endl;
-            sum_words += 2*nops;
+            assert( 2*nops == indx.size());
+            const size_t nw = nops * 2;
+            std::cerr << "\tnops = " << nops << " =>" <<  nw <<   " words"<< std::endl;
             std::cerr << std::endl;
+            if(nw>0)
+            {
+                decl( "extern const size_t n%u;\n", unsigned(size) );
+                impl( "const size_t n%u = %u;\n", unsigned(size), unsigned(nops));
+                impl( "const size_t indx%u[%u] = {\n", unsigned(size), unsigned(nw));
+                decl( "extern const size_t indx%u[%u];\n",unsigned(size), unsigned(nw) );
+                
+                for( size_t i=1; i <= nw; ++i )
+                {
+                    impl(" %4u", unsigned(indx[i]) );
+                    if( i < indx.size() )
+                        impl(",");
+                    if( 0 == (i%16) ) impl("\n");
+                }
+                if( 0 != ( indx.size() % 16 ) ) impl << "\n";
+                impl( "};\n");
+            }
+            
         }
         decl << "#endif\n";
-        std::cerr << "#words=" << sum_words << std::endl;
         
         if(argc>1 && 0 == strcmp(argv[0], "perf") )
         {
@@ -118,6 +144,11 @@ int main(int argc, char *argv[] )
             }
         }
         return 0;
+    }
+    catch( const exception &e )
+    {
+        std::cerr << e.what() << std::endl;
+        std::cerr << e.when() << std::endl;
     }
     catch(...)
     {
