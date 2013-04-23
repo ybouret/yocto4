@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/kernel/tri-diag.hpp"
+#include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/code/rand.hpp"
 #include "../../y-main/tests/support.hpp"
 #include "yocto/math/types.hpp"

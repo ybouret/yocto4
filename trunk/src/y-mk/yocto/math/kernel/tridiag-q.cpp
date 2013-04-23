@@ -1,2 +1,2 @@
 #define YOCTO_ZTYPE 'q'
-#include "tri-diag.cxx"
+#include "tridiag.cxx"
