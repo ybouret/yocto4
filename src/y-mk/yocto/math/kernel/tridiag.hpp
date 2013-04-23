@@ -26,6 +26,14 @@ namespace yocto {
             
             T operator()( size_t i, size_t j,bool cyclic=false) const throw();
 
+			bool solve( array<T>  &U, const array<T>  &R) const throw();
+            bool solve( array<T>  &R) const throw();
+            bool solve( matrix<T> &M ) const throw();
+            
+            void apply( array<T>  &v, const array<T>  &u, bool cyclic=false) const throw();
+            void apply( matrix<T> &A, const matrix<T> &B, bool cyclic=false) const throw();
+            
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(xtridiag);
@@ -37,6 +45,11 @@ namespace yocto {
             array_type &c;
             
             size_t size() const throw();
+            
+        private:
+            array_type &g;
+            array_type &u;
+            array_type &z;
             
         };
         

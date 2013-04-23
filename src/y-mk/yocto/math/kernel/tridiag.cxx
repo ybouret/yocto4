@@ -14,10 +14,13 @@ namespace yocto {
         
         
 #define Y_XTRIDIAG_CTOR() \
-arrays(3), \
+arrays(6), \
 a( arrays.next_array() ), \
 b( arrays.next_array() ), \
-c( arrays.next_array() )
+c( arrays.next_array() ), \
+g( arrays.next_array() ), \
+u( arrays.next_array() ), \
+z( arrays.next_array() )
         
         template <>
         xtridiag<z_type>:: xtridiag() :
@@ -104,7 +107,109 @@ c( arrays.next_array() )
             return os;
         }
         
-       
+        template <>
+        bool xtridiag<z_type>:: solve(array<z_type>  &U, const array<z_type>  &R) const throw()
+        {
+            const size_t n = size();
+            assert( n == U.size() );
+            assert( n == R.size() );
+            
+            z_type piv = b[1];
+			if( Fabs( piv ) <= REAL_MIN )
+				return false;
+            
+            
+			U[1] = R[1] / piv;
+            
+			for( size_t j=2, jm=1; j <= n; ++j,++jm )
+            {
+				g[j] = c[jm] / piv;
+				piv  = b[j] - a[j] * g[j];
+				if( Fabs( piv ) <= REAL_MIN )
+					return false;
+				U[j] = (R[j] - a[j] * U[jm])/piv;
+			}
+            
+			for( size_t j=n-1, jp=n;j>0;--j,--jp)
+            {
+				assert(j+1==jp);
+				U[j] -= g[jp] * U[jp];
+			}
+            
+            
+            return true;
+        }
+        
+        template <>
+        bool xtridiag<z_type>:: solve( array<z_type> &R ) const throw()
+        {
+            if( solve(u,R) )
+            {
+                for(size_t i=R.size();i>0;--i)
+                {
+                    R[i] = u[i];
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        template <>
+        bool xtridiag<z_type>:: solve( matrix<z_type> &M ) const throw()
+        {
+            const size_t n = size();
+            assert( M.rows == n );
+            for(size_t c=M.cols;c>0;--c)
+            {
+                for(size_t i=n;i>0;--i)
+                    z[i] = M[i][c];
+                if( ! solve(u,z) )
+                    return false;
+                for(size_t i=n;i>0;--i)
+                    M[i][c] = u[i];
+            }
+            return true;
+        }
+        
+        
+        template <>
+        void xtridiag<z_type>:: apply( array<z_type> &V, const array<z_type> &U, bool cyclic) const throw()
+        {
+            const size_t n = size();
+            assert(V.size()==n);
+            assert(U.size()==n);
+            for( size_t i=n;i>0;--i)
+            {
+                z_type sum = numeric<z_type>::zero;
+                for(size_t j=n;j>0;--j)
+                {
+                    sum += (*this)(i,j,cyclic) * U[j];
+                }
+                V[i] = sum;
+            }
+        }
+        
+        template <>
+        void xtridiag<z_type>:: apply( matrix<z_type> &A, const matrix<z_type> &B, bool cyclic) const throw()
+        {
+            const size_t n = size();
+            assert(A.rows==n);
+            assert(B.rows==n);
+            assert(A.cols==B.cols);
+            for(size_t j=A.cols;j>0;--j)
+            {
+                for(size_t i=n;i>0;--i)
+                {
+                    z_type sum = numeric<z_type>::zero;
+                    for(size_t k=n;k>0;--k)
+                        sum += (*this)(i,k,cyclic) * B[k][j];
+                    A[i][j] = sum;
+                }
+            }
+        }
         
         ////////////////////////////////////////////////////////////////////////
         
