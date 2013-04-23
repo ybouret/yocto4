@@ -74,19 +74,65 @@ namespace
     static void test_xtri()
     {
         std::cerr << "Testing with <" << typeid(T).name() << ">" << std::endl;
-        for(size_t iter=1; iter <= 1; ++iter )
+        for(size_t iter=1; iter <= 10; ++iter )
         {
-            const size_t n = 1 + alea_leq(10);
+            const size_t n = 1 + alea_leq(128);
             xtridiag<T>  M(n);
+            vector<T>    r(n,numeric<T>::zero);
+            vector<T>    u(n,numeric<T>::zero);
+            vector<T>    v(n,numeric<T>::zero);
+
             for(size_t i=1; i <= n; ++i)
             {
                 M.a[i] = gen<T>::get();
                 M.b[i] = gen<T>::get();
                 M.c[i] = gen<T>::get();
+                r[i]   = gen<T>::get();
             }
-            M.output( std::cerr << "M=" ) << std::endl;
-            M.output( std::cerr << "Mc=",true ) << std::endl;
-
+            
+            //-- simple tridiag part
+            //M.output( std::cerr << "M=" ) << std::endl;
+            if( !M.solve(u,r) )
+            {
+                std::cerr << "Singular matrix" << std::endl;
+                continue;
+            }
+            //std::cerr << "r=" << r << std::endl;
+            //std::cerr << "u=" << u << std::endl;
+            M.apply(v,u);
+            double sum = 0;
+            for( size_t i=1; i <=n; ++i)
+            {
+                sum += Fabs(r[i] - v[i]);
+            }
+            sum /= n;
+            std::cerr << "DIFF" << n << "\t\t= " << sum << std::endl;
+            
+            matrix<T> A(n,n);
+            matrix<T> B(n,n);
+            A.ld1();
+            if(!M.solve(A))
+            {
+                std::cerr << "Singular Matrix" << std::endl;
+                continue;
+            }
+            
+            M.apply(B,A);
+            for(size_t i=1; i<=n;++i)
+            {
+                B[i][i] -= numeric<T>::one;
+            }
+            sum = 0;
+            for(size_t i=1; i <=n; ++i )
+            {
+                for(size_t j=1;j<=n;++j)
+                {
+                    sum += Fabs(B[i][j]);
+                }
+            }
+            sum /= (n*n);
+            std::cerr << "MDIF" << n << "\t\t= " << sum << std::endl;
+            
         }
         
     }
@@ -96,6 +142,9 @@ namespace
 YOCTO_UNIT_TEST_IMPL(tridiag)
 {
     test_xtri<float>();
+    test_xtri<double>();
+    test_xtri< complex<float> >();
+    test_xtri< complex<double> >();
     return 0;
     
     test_tri<float>();
