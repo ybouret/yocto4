@@ -50,7 +50,7 @@ namespace yocto {
             array_type &g;
             array_type &u;
             array_type &z;
-            
+            array_type &bb;
         };
         
 		template <class T>
