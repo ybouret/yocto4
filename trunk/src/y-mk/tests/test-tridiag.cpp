@@ -67,14 +67,41 @@ namespace
         }
     }
     
+    
+    
+    
+    template <typename T>
+    static void test_xtri()
+    {
+        std::cerr << "Testing with <" << typeid(T).name() << ">" << std::endl;
+        for(size_t iter=1; iter <= 1; ++iter )
+        {
+            const size_t n = 1 + alea_leq(10);
+            xtridiag<T>  M(n);
+            for(size_t i=1; i <= n; ++i)
+            {
+                M.a[i] = gen<T>::get();
+                M.b[i] = gen<T>::get();
+                M.c[i] = gen<T>::get();
+            }
+            M.output( std::cerr << "M=" ) << std::endl;
+            M.output( std::cerr << "Mc=",true ) << std::endl;
+
+        }
+        
+    }
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(tridiag)
 {
+    test_xtri<float>();
+    return 0;
+    
     test_tri<float>();
-    test_tri<double>();    
+    test_tri<double>();
     test_tri< complex<float> >();
     test_tri< complex<double> >();
-
+    
 }
 YOCTO_UNIT_TEST_DONE()

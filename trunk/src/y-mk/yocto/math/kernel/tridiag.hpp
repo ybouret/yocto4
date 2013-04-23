@@ -2,12 +2,44 @@
 #define YOCTO_MATH_KERNEL_TRIDIAG_INCLUDED 1
 
 #include "yocto/sequence/vector.hpp"
+#include "yocto/sequence/lw-arrays.hpp"
 #include "yocto/math/kernel/matrix.hpp"
 
 namespace yocto {
 
 	namespace math {
 
+        
+        template <class T>
+        class xtridiag
+        {
+        public:
+            typedef lw_array<T> array_type;
+            
+            explicit xtridiag();
+            explicit xtridiag(size_t);
+            virtual ~xtridiag() throw();
+            
+            void make(size_t n);
+            
+            std::ostream & output( std::ostream &os,bool cyclic=false) const;
+            
+            T operator()( size_t i, size_t j,bool cyclic=false) const throw();
+
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(xtridiag);
+            lw_arrays<T,memory::global> arrays;
+            
+        public:
+            array_type &a;
+            array_type &b;
+            array_type &c;
+            
+            size_t size() const throw();
+            
+        };
+        
 		template <class T>
 		class tridiag : public object {
 		public:

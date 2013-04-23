@@ -12,6 +12,102 @@ namespace yocto {
     
 	namespace math {
         
+        
+#define Y_XTRIDIAG_CTOR() \
+arrays(3), \
+a( arrays.next_array() ), \
+b( arrays.next_array() ), \
+c( arrays.next_array() )
+        
+        template <>
+        xtridiag<z_type>:: xtridiag() :
+        Y_XTRIDIAG_CTOR()
+        {
+        }
+        
+        template <>
+        xtridiag<z_type>:: ~xtridiag() throw()
+        {
+        }
+        
+        
+        template <>
+        size_t  xtridiag<z_type>:: size() const throw()
+        {
+            return arrays.common_size();
+        }
+        
+        template<>
+        void  xtridiag<z_type>:: make( size_t n )
+        {
+            arrays.prepare(n);
+        }
+        
+        
+        template <>
+        xtridiag<z_type>:: xtridiag( size_t n ) :
+        Y_XTRIDIAG_CTOR()
+        {
+            make(n);
+        }
+        
+        
+        template <>
+        z_type xtridiag<z_type>::  operator()( size_t i, size_t j,bool cyclic) const throw()
+        {
+            const size_t n = size();
+            assert(i>0);
+            assert(i<=n);
+            assert(j>0);
+            assert(j<=n);
+            const ptrdiff_t k = ptrdiff_t(i) - ptrdiff_t(j);
+            if(k==0)
+            {
+                return b[i];
+            }
+            
+            if(k==1)
+            {
+                return a[i];
+            }
+            
+            if(k==-1)
+            {
+                return c[i];
+            }
+            
+            if(cyclic)
+            {
+                if(i==1&&j==n) return c[n];
+                if(i==n&&j==1) return a[1];
+            }
+            
+            return 0;
+        }
+        
+        
+        template <>
+        std::ostream &  xtridiag<z_type>:: output(std::ostream &os,bool cyclic) const
+        {
+            const size_t n = size();
+            os << "[";
+			for( size_t i=1; i <= n; ++i )
+            {
+				for( size_t j=1; j <= n; ++j )
+                {
+					os << " " << (*this)(i,j,cyclic);
+				}
+				if( i < n )
+					os << " ;";
+			}
+			os << "];";
+            return os;
+        }
+        
+       
+        
+        ////////////////////////////////////////////////////////////////////////
+        
 		template <>
 		tridiag<z_type>:: tridiag() throw() :
         size_(0),
@@ -138,6 +234,9 @@ namespace yocto {
 			}
             
 		}
+        
+        
+        
         
 		template <>
 		void tridiag<z_type>:: solve( array<z_type> &u, const array<z_type> &r) const
