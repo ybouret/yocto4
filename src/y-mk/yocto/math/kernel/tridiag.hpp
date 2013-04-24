@@ -33,7 +33,8 @@ namespace yocto {
             void apply( array<T>  &v, const array<T>  &u, bool cyclic=false) const throw();
             void apply( matrix<T> &A, const matrix<T> &B, bool cyclic=false) const throw();
             
-            
+            bool solve_cyclic( array<T> &x, const array<T> &r ) const throw();
+            bool solve_cyclic( array<T> &x ) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(xtridiag);
@@ -51,6 +52,7 @@ namespace yocto {
             array_type &u;
             array_type &z;
             array_type &bb;
+            array_type &xx;
         };
         
 		template <class T>
