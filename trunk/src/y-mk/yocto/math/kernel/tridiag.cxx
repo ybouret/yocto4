@@ -14,14 +14,15 @@ namespace yocto {
         
         
 #define Y_XTRIDIAG_CTOR() \
-arrays(7), \
+arrays(8), \
 a(  arrays.next_array() ), \
 b(  arrays.next_array() ), \
 c(  arrays.next_array() ), \
 g(  arrays.next_array() ), \
 u(  arrays.next_array() ), \
 z(  arrays.next_array() ), \
-bb( arrays.next_array() )
+bb( arrays.next_array() ), \
+xx( arrays.next_array() )
         
         template <>
         xtridiag<z_type>:: xtridiag() :
@@ -151,11 +152,69 @@ bb( arrays.next_array() )
                 
                 return true;
             }
+            
+            static inline
+            bool __cyclic(const array<z_type>  &a,
+                          const array<z_type>  &b,
+                          const array<z_type>  &c,
+                          array<z_type>        &g,
+                          array<z_type>        &u,
+                          array<z_type>        &z,
+                          array<z_type>        &bb,
+                          const array<z_type>  &r,
+                          array<z_type>        &x
+                          ) throw()
+            {
+                const size_t n      =  a.size(); assert(n>=2);
+                const z_type alpha  =  a[1];
+                const z_type beta   =  c[n];
+                const z_type gamma  = -b[1];
+                
+                //==============================================================
+                // solve A.x = r
+                //==============================================================
+                bb[1]=b[1]-gamma;
+                bb[n]=b[n]-(alpha*beta)/gamma;
+                for(size_t i=2;i<n;i++)
+                    bb[i]=b[i];
+                if( ! __tridiag(a,bb,c,g,x,r) )
+                    return false;
+                
+                //==============================================================
+                // compute the vector u
+                //==============================================================
+                u[1]=gamma;
+                u[n]=alpha;
+                for(size_t i=2;i<n;i++)
+                    u[i]=numeric<z_type>::zero;
+                
+                //==============================================================
+                // solve A.z = u
+                //==============================================================
+                if(! __tridiag(a,bb,c,g,z,u) )
+                    return false;
+                
+                //==============================================================
+                // compute the factor
+                //==============================================================
+                const z_type fact=
+                (x[1]+beta*x[n]/gamma)/
+                (numeric<z_type>::one+z[1]+beta*z[n]/gamma);
+                for(size_t i=n;i>0;--i)
+                    x[i] -= fact*z[i];
+                return true;
+            }
         }
         
+        
+        //======================================================================
+        // solve regular system
+        //======================================================================
         template <>
         bool xtridiag<z_type>:: solve(array<z_type>  &U, const array<z_type>  &R) const throw()
         {
+            
+            assert(size()>0);
             return __tridiag(a, b, c, g, U, R);
         }
         
@@ -193,6 +252,23 @@ bb( arrays.next_array() )
             return true;
         }
         
+        //======================================================================
+        // solve cyclic sysetm
+        //======================================================================
+        template <>
+        bool xtridiag<z_type>:: solve_cyclic(array<z_type>  &x, const array<z_type>  &r) const throw()
+        {
+            assert(size()>=2);
+            return __cyclic(a, b, c, g, u, z, bb, r, x);
+        }
+        
+        template <>
+        bool xtridiag<z_type>:: solve_cyclic(array<z_type>  &x) const throw()
+        {
+            assert(x.size()==xx.size());
+            for(size_t i=x.size();i>0;--i) xx[i] = x[i];
+            return solve_cyclic(x, xx);
+        }
         
         template <>
         void xtridiag<z_type>:: apply( array<z_type> &V, const array<z_type> &U, bool cyclic) const throw()

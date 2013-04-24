@@ -34,6 +34,7 @@ namespace
                 r[i] = gen<T>::get();
             }
             
+            //-- simple tridiag
             M.solve(u,r);
             M.apply(v,u);
             double sum = 0;
@@ -64,6 +65,9 @@ namespace
             }
             sum /= (n*n);
             std::cerr << "MDIF" << n << "\t\t= " << sum << std::endl;
+            
+           
+            
         }
     }
     
@@ -133,6 +137,18 @@ namespace
             sum /= (n*n);
             std::cerr << "MDIF" << n << "\t\t= " << sum << std::endl;
             
+            //------------------------------------------------------------------
+            //-- use cyclic algo
+            //------------------------------------------------------------------
+            M.solve_cyclic(u,r);
+            M.apply(v,u,true);
+            sum = 0;
+            for( size_t i=1; i <=n; ++i)
+            {
+                sum += Fabs(r[i] - v[i]);
+            }
+            sum /= n;
+            std::cerr << "CDIF" << n << "\t\t= " << sum << std::endl;
         }
         
     }
