@@ -23,7 +23,7 @@ namespace yocto {
             // virtual interface
             //==================================================================
             virtual T operator()(size_t i, size_t j) const throw()  = 0;
-            virtual bool solve( array_type &x, const array_type &r) const throw() = 0;
+            virtual bool solve( array<T> &x, const array<T> &r) const throw() = 0;
 
             //==================================================================
             // non virtual interface
@@ -37,7 +37,7 @@ namespace yocto {
                 return os;
             }
             
-            void apply( array_type &v, const array_type &u) const throw();
+            void apply( array<T> &v, const array<T> &u) const throw();
             void apply( matrix<T>  &v, const matrix<T>  &u) const throw();
             bool solve( array_type &r) const throw();
             
@@ -69,7 +69,7 @@ namespace yocto {
             virtual ~tridiag() throw();
             
             virtual T operator()(size_t i, size_t j) const throw();
-            virtual bool solve( array_type &x, const array_type &r) const throw();
+            virtual bool solve( array<T> &x, const array<T> &r) const throw();
             
             
         private:
@@ -88,13 +88,18 @@ namespace yocto {
             virtual ~ctridiag() throw();
             
             virtual T operator()(size_t i, size_t j) const throw();
-            virtual bool solve( array_type &x, const array_type &r) const throw();
+            virtual bool solve( array<T> &x, const array<T> &r) const throw();
             
             
         private:
+            array_type &u;
+            array_type &z;
+            array_type &bb;
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(ctridiag);
         };
 
+#if 0
         template <class T>
         class xtridiag
         {
@@ -139,6 +144,7 @@ namespace yocto {
             array_type &bb;
             array_type &xx;
         };
+#endif
         
     }
     

@@ -29,7 +29,7 @@ namespace yocto
                               const matrix<T> &V);
             
             static bool build(matrix<T>        &B,
-                              const xtridiag<T>&A,
+                              const tridiag<T> &A,
                               const matrix<T>  &U,
                               const matrix<T>  &V);
             
