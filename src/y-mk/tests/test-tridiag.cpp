@@ -18,26 +18,29 @@ namespace
     static void test_xtri()
     {
         std::cerr << "Testing with <" << typeid(T).name() << ">" << std::endl;
-        for(size_t iter=1; iter <= 10; ++iter )
+        for(size_t iter=1; iter <= 20; ++iter )
         {
             const size_t n = 1 + alea_leq(128);
-            xtridiag<T>  M(n);
+            tridiag<T>   M(n);
+            ctridiag<T>  cM(n);
             vector<T>    r(n,numeric<T>::zero);
             vector<T>    u(n,numeric<T>::zero);
             vector<T>    v(n,numeric<T>::zero);
-
+            
             for(size_t i=1; i <= n; ++i)
             {
-                M.a[i] = gen<T>::get();
-                M.b[i] = gen<T>::get();
-                M.c[i] = gen<T>::get();
+                cM.a[i] = M.a[i] = gen<T>::get();
+                cM.b[i] = M.b[i] = gen<T>::get();
+                cM.c[i] = M.c[i] = gen<T>::get();
                 r[i]   = gen<T>::get();
             }
             
-            //------------------------------------------------------------------
-            //-- simple tridiag part
-            //------------------------------------------------------------------
+            matrix<T> A(n,n);
+            matrix<T> B(n,n);
             
+            //------------------------------------------------------------------
+            //-- simple tridiag
+            //------------------------------------------------------------------
             if( !M.solve(u,r) )
             {
                 std::cerr << "Singular matrix" << std::endl;
@@ -50,10 +53,30 @@ namespace
                 sum += Fabs(r[i] - v[i]);
             }
             sum /= n;
-            std::cerr << "DIFF" << n << "\t\t= " << sum << std::endl;
+            std::cerr << "TDIFF" << n << "  = " << sum << std::endl;
             
-            matrix<T> A(n,n);
-            matrix<T> B(n,n);
+            //------------------------------------------------------------------
+            //-- cyclic
+            //------------------------------------------------------------------
+            if(n>=2)
+            {
+                if( !cM.solve(u,r) )
+                {
+                    std::cerr << "Singular cyclic matrix" << std::endl;
+                    continue;
+                }
+                cM.apply(v,u);
+                sum = 0;
+                for( size_t i=1; i<=n; ++i)
+                {
+                    sum += Fabs(r[i] - v[i]);
+                }
+                sum /= n;
+                std::cerr << "CDIFF" << n << "  = " << sum << std::endl;
+            }
+            
+#if 0
+           
             A.ld1();
             if(!M.solve(A))
             {
@@ -89,6 +112,7 @@ namespace
             }
             sum /= n;
             std::cerr << "CDIF" << n << "\t\t= " << sum << std::endl;
+#endif
         }
         
     }
