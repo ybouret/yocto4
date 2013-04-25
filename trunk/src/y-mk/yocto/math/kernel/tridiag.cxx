@@ -21,12 +21,13 @@ namespace yocto {
         
         template <> tridiag_base<z_type>:: ~tridiag_base() throw() {}
         template <> tridiag_base<z_type>:: tridiag_base( size_t nxtra ) :
-        arrays( 5 + nxtra ),
+        arrays( 6 + nxtra ),
         a(  arrays.next_array() ),
         b(  arrays.next_array() ),
         c(  arrays.next_array() ),
         g(  arrays.next_array() ),
-        xx( arrays.next_array() )
+        xx( arrays.next_array() ),
+        rr( arrays.next_array() )
         {
             
         }
@@ -98,8 +99,24 @@ namespace yocto {
         {
             assert(size()==r.size());
             for(size_t i=size();i>0;--i) xx[i] = r[i];
-            return solve(xx,r);
+            return __solve(xx,r);
         }
+        
+        template <>
+        bool tridiag_base<z_type>::solve( matrix<z_type> &x) const throw()
+        {
+            assert( size() == x.rows );
+            assert(x.cols>0);
+            const size_t n = size();
+            for(size_t j=x.cols;j>0;--j)
+            {
+                for(size_t i=n;i>0;--i) rr[i]  = x[i][j];
+                if( ! __solve(xx,rr) )     return false;
+                for(size_t i=n;i>0;--i) x[i][j] = xx[i];
+            }
+            return true;
+        }
+
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -154,54 +171,6 @@ namespace yocto {
                 
                 return true;
             }
-            
-            static inline
-            bool __tridiag(const array<z_type>   &a,
-                           const array<z_type>   &b,
-                           const array<z_type>   &c,
-                           array<z_type>         &g,
-                           matrix<z_type>        &u,
-                           const matrix<z_type>  &r
-                           ) throw()
-            {
-                const size_t n = a.size();
-                assert(b.size()==n);
-                assert(c.size()==n);
-                assert(g.size()==n);
-                assert(u.rows==n);
-                assert(r.rows==n);
-                assert(u.cols==r.cols);
-                
-                assert(n>=2);
-                
-                for( size_t k=u.cols;k>0;--k)
-                {
-                    z_type piv = b[1];
-                    if( Fabs( piv ) <= REAL_MIN )
-                        return false;
-                    
-                    
-                    u[1][k] = r[1][k] / piv;
-                    
-                    for( size_t j=2, jm=1; j <= n; ++j,++jm )
-                    {
-                        g[j] = c[jm] / piv;
-                        piv  = b[j] - a[j] * g[j];
-                        if( Fabs( piv ) <= REAL_MIN )
-                            return false;
-                        u[j][k] = (r[j][k] - a[j] * u[jm][k])/piv;
-                    }
-                    
-                    for( size_t j=n-1, jp=n;j>0;--j,--jp)
-                    {
-                        assert(j+1==jp);
-                        u[j][k] -= g[jp] * u[jp][k];
-                    }
-                }
-                
-                return true;
-            }
-            
             
             
             ////////////////////////////////////////////////////////////////////
@@ -302,21 +271,13 @@ namespace yocto {
         }
         
         template <>
-        bool tridiag<z_type>:: solve( array<z_type> &x, const array<z_type> &r) const throw()
+        bool tridiag<z_type>:: __solve( array<z_type> &x, const array<z_type> &r) const throw()
         {
             assert( size() == x.size() );
             assert( size() == r.size() );
             return __tridiag(a, b, c, g, x, r);
         }
         
-        template <>
-        bool tridiag<z_type>::solve( matrix<z_type> &x, const matrix<z_type> &r) const throw()
-        {
-            assert( size() == x.rows );
-            assert( size() == r.rows );
-            assert( r.cols == x.cols );
-            return __tridiag(a, b, c, g, x, r);
-        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -331,11 +292,10 @@ namespace yocto {
         
         template <>
         ctridiag<z_type> :: ctridiag( size_t n ) :
-        tridiag_base<z_type>(4),
+        tridiag_base<z_type>(3),
         u(  arrays.next_array() ),
         z(  arrays.next_array() ),
-        bb( arrays.next_array() ),
-        rr( arrays.next_array() )
+        bb( arrays.next_array() )
         {
             make(n);
         }
@@ -365,30 +325,14 @@ namespace yocto {
         }
         
         template <>
-        bool ctridiag<z_type>:: solve( array<z_type> &x, const array<z_type> &r) const throw()
+        bool ctridiag<z_type>:: __solve( array<z_type> &x, const array<z_type> &r) const throw()
         {
             assert( size() == x.size() );
             assert( size() == r.size() );
             return __cyclic(a, b, c, g, u, z, bb, x, r);
         }
         
-        template <>
-        bool ctridiag<z_type>::solve( matrix<z_type> &x, const matrix<z_type> &r) const throw()
-        {
-            assert( size() == x.rows );
-            assert( size() == r.rows );
-            assert( r.cols == x.cols );
-            const size_t n = size();
-            for(size_t j=r.cols;j>0;--j)
-            {
-                for(size_t i=n;i>0;--i) rr[i] = r[i][j];
-                if( ! __cyclic(a, b, c, g, u, z, bb, xx, rr) )
-                    return false;
-                for(size_t i=n;i>0;--i) x[i][j] = xx[i];
-            }
-           return true;
-        }
-        
+              
         
 	}
     
