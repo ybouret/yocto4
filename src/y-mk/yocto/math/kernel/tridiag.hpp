@@ -23,8 +23,9 @@ namespace yocto {
             // virtual interface
             //==================================================================
             virtual T operator()(size_t i, size_t j) const throw()  = 0;
-            virtual bool solve( array<T> &x, const array<T> &r) const throw() = 0;
-
+            virtual bool solve( array<T>  &x, const array<T>  &r) const throw() = 0;
+            virtual bool solve( matrix<T> &x, const matrix<T> &r) const throw() = 0;
+            
             //==================================================================
             // non virtual interface
             //==================================================================
@@ -37,9 +38,9 @@ namespace yocto {
                 return os;
             }
             
-            void apply( array<T> &v, const array<T> &u) const throw();
-            void apply( matrix<T>  &v, const matrix<T>  &u) const throw();
-            bool solve( array<T> &r) const throw();
+            void apply( array<T>  &v, const array<T>   &u) const throw();
+            void apply( matrix<T> &v, const matrix<T>  &u) const throw();
+            bool solve( array<T>  &r) const throw();
             
         protected:
             lw_arrays<T,memory::global> arrays;
@@ -69,8 +70,8 @@ namespace yocto {
             virtual ~tridiag() throw();
             
             virtual T operator()(size_t i, size_t j) const throw();
-            virtual bool solve( array<T> &x, const array<T> &r) const throw();
-            
+            virtual bool solve( array<T>  &x, const array<T>  &r) const throw();
+            virtual bool solve( matrix<T> &x, const matrix<T> &r) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tridiag);
@@ -88,13 +89,15 @@ namespace yocto {
             virtual ~ctridiag() throw();
             
             virtual T operator()(size_t i, size_t j) const throw();
-            virtual bool solve( array<T> &x, const array<T> &r) const throw();
-            
+            virtual bool solve( array<T>  &x, const array<T>  &r) const throw();
+            virtual bool solve( matrix<T> &x, const matrix<T> &r) const throw();
+
             
         private:
             array_type &u;
             array_type &z;
             array_type &bb;
+            array_type &rr;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(ctridiag);
         };
