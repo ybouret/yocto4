@@ -360,4 +360,9 @@ inline T R2Scalar( SEXP r )
     return value[0];
 }
 
+//! string conversion
+inline const char *R2String( SEXP r )
+{
+    return CHAR(STRING_ELT(r,0));
+}
 #endif
