@@ -41,7 +41,7 @@ namespace
             //------------------------------------------------------------------
             //-- simple tridiag
             //------------------------------------------------------------------
-            if( !M.solve(u,r) )
+            if( !M.__solve(u,r) )
             {
                 std::cerr << "Singular matrix" << std::endl;
                 continue;
@@ -55,35 +55,12 @@ namespace
             sum /= n;
             std::cerr << "TDIFF" << n << "  = " << sum << std::endl;
             
-            //------------------------------------------------------------------
-            //-- cyclic
-            //------------------------------------------------------------------
-            if(n>=2)
-            {
-                if( !cM.solve(u,r) )
-                {
-                    std::cerr << "Singular cyclic matrix" << std::endl;
-                    continue;
-                }
-                cM.apply(v,u);
-                sum = 0;
-                for( size_t i=1; i<=n; ++i)
-                {
-                    sum += Fabs(r[i] - v[i]);
-                }
-                sum /= n;
-                std::cerr << "CDIFF" << n << "  = " << sum << std::endl;
-            }
-            
-#if 0
-           
             A.ld1();
             if(!M.solve(A))
             {
                 std::cerr << "Singular Matrix" << std::endl;
                 continue;
             }
-            
             M.apply(B,A);
             for(size_t i=1; i<=n;++i)
             {
@@ -98,21 +75,50 @@ namespace
                 }
             }
             sum /= (n*n);
-            std::cerr << "MDIF" << n << "\t\t= " << sum << std::endl;
+            std::cerr << "TMDIF" << n << "  = " << sum << std::endl;
             
             //------------------------------------------------------------------
-            //-- use cyclic algo
+            //-- cyclic
             //------------------------------------------------------------------
-            M.solve_cyclic(u,r);
-            M.apply(v,u,true);
-            sum = 0;
-            for( size_t i=1; i <=n; ++i)
+            if(n>=2)
             {
-                sum += Fabs(r[i] - v[i]);
+                if( !cM.__solve(u,r) )
+                {
+                    std::cerr << "Singular cyclic matrix" << std::endl;
+                    continue;
+                }
+                cM.apply(v,u);
+                sum = 0;
+                for( size_t i=1; i<=n; ++i)
+                {
+                    sum += Fabs(r[i] - v[i]);
+                }
+                sum /= n;
+                std::cerr << "CDIFF" << n << "  = " << sum << std::endl;
+                
+                A.ld1();
+                if(!cM.solve(A))
+                {
+                    std::cerr << "Singular Matrix" << std::endl;
+                    continue;
+                }
+                cM.apply(B,A);
+                for(size_t i=1; i<=n;++i)
+                {
+                    B[i][i] -= numeric<T>::one;
+                }
+                sum = 0;
+                for(size_t i=1; i <=n; ++i )
+                {
+                    for(size_t j=1;j<=n;++j)
+                    {
+                        sum += Fabs(B[i][j]);
+                    }
+                }
+                sum /= (n*n);
+                std::cerr << "CMDIF" << n << "  = " << sum << std::endl;
             }
-            sum /= n;
-            std::cerr << "CDIF" << n << "\t\t= " << sum << std::endl;
-#endif
+            
         }
         
     }
