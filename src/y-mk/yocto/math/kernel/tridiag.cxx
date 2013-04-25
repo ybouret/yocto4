@@ -13,6 +13,353 @@ namespace yocto {
 	namespace math {
         
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // tridiag base
+        //
+        ////////////////////////////////////////////////////////////////////////
+        
+        template <> tridiag_base<z_type>:: ~tridiag_base() throw() {}
+        template <> tridiag_base<z_type>:: tridiag_base( size_t nxtra ) :
+        arrays( 5 + nxtra ),
+        a(  arrays.next_array() ),
+        b(  arrays.next_array() ),
+        c(  arrays.next_array() ),
+        g(  arrays.next_array() ),
+        xx( arrays.next_array() )
+        {
+            
+        }
+        
+        template <>
+        void tridiag_base<z_type>:: make(size_t n)
+        {
+            arrays.prepare(n);
+        }
+        
+        template <>
+        size_t tridiag_base<z_type>:: size() const throw()
+        {
+            return arrays.common_size();
+        }
+        
+        template <>
+        void tridiag_base<z_type> :: output( std::ostream &os ) const
+        {
+            const tridiag_base<z_type> &self = *this;
+            const size_t n = size();
+            os << "[";
+			for( size_t i=1; i <= n; ++i )
+            {
+				for( size_t j=1; j <= n; ++j )
+                {
+					os << " " << self(i,j);
+				}
+				if( i < n )
+					os << " ;";
+			}
+			os << "];";
+        }
+        
+        template <>
+        void tridiag_base<z_type> :: apply( array_type &v, const array_type &u) const throw()
+        {
+            assert(v.size()==size());
+            assert(u.size()==size());
+            const size_t n = size();
+            const tridiag_base<z_type> &self = *this;
+            for(size_t i=n;i>0;--i)
+            {
+                z_type sum = numeric<z_type>::zero;
+                for(size_t j=n;j>0;--i)
+                    sum += self(i,j) * u[i];
+                v[i] = sum;
+            }
+            
+        }
+        
+        template <>
+        void tridiag_base<z_type>:: apply( matrix<z_type>  &v, const matrix<z_type>  &u) const throw()
+        {
+            assert(size()==v.rows);
+            assert(size()==u.rows);
+            assert(u.cols==v.cols);
+            const size_t n = size();
+            for(size_t k=u.cols;k>0;--k)
+            {
+                for(size_t i=n;i>0;--i) g[i] = u[i][k];
+                apply(xx,g);
+                for(size_t i=n;i>0;--i) v[i][k] = xx[i];
+            }
+        }
+        
+        template <>
+        bool tridiag_base<z_type>:: solve( array_type &r) const throw()
+        {
+            assert(size()==r.size());
+            for(size_t i=size();i>0;--i) xx[i] = r[i];
+            return solve(xx,r);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // algorithms
+        //
+        ////////////////////////////////////////////////////////////////////////
+        namespace
+        {
+            
+            ////////////////////////////////////////////////////////////////////
+            //
+            // simple tridiag algorithm
+            //
+            ////////////////////////////////////////////////////////////////////
+            static inline
+            bool __tridiag(const array<z_type>  &a,
+                           const array<z_type>  &b,
+                           const array<z_type>  &c,
+                           array<z_type>        &g,
+                           array<z_type>        &u,
+                           const array<z_type>  &r
+                           ) throw()
+            {
+                const size_t n = a.size();
+                assert(b.size()==n);
+                assert(c.size()==n);
+                assert(g.size()==n);
+                assert(u.size()==n);
+                assert(r.size()==n);
+                
+                z_type piv = b[1];
+                if( Fabs( piv ) <= REAL_MIN )
+                    return false;
+                
+                
+                u[1] = r[1] / piv;
+                
+                for( size_t j=2, jm=1; j <= n; ++j,++jm )
+                {
+                    g[j] = c[jm] / piv;
+                    piv  = b[j] - a[j] * g[j];
+                    if( Fabs( piv ) <= REAL_MIN )
+                        return false;
+                    u[j] = (r[j] - a[j] * u[jm])/piv;
+                }
+                
+                for( size_t j=n-1, jp=n;j>0;--j,--jp)
+                {
+                    assert(j+1==jp);
+                    u[j] -= g[jp] * u[jp];
+                }
+                
+                return true;
+            }
+            
+            static inline
+            bool __tridiag(const array<z_type>   &a,
+                           const array<z_type>   &b,
+                           const array<z_type>   &c,
+                           array<z_type>         &g,
+                           matrix<z_type>        &u,
+                           const matrix<z_type>  &r
+                           ) throw()
+            {
+                const size_t n = a.size();
+                assert(b.size()==n);
+                assert(c.size()==n);
+                assert(g.size()==n);
+                assert(u.rows==n);
+                assert(r.rows==n);
+                assert(u.cols==r.cols);
+                
+                for( size_t k=u.cols;k>0;--k)
+                {
+                    z_type piv = b[1];
+                    if( Fabs( piv ) <= REAL_MIN )
+                        return false;
+                    
+                    
+                    u[1][k] = r[1][k] / piv;
+                    
+                    for( size_t j=2, jm=1; j <= n; ++j,++jm )
+                    {
+                        g[j] = c[jm] / piv;
+                        piv  = b[j] - a[j] * g[j];
+                        if( Fabs( piv ) <= REAL_MIN )
+                            return false;
+                        u[j][k] = (r[j][k] - a[j] * u[jm][k])/piv;
+                    }
+                    
+                    for( size_t j=n-1, jp=n;j>0;--j,--jp)
+                    {
+                        assert(j+1==jp);
+                        u[j][k] -= g[jp] * u[jp][k];
+                    }
+                }
+                
+                return true;
+            }
+            
+            
+            
+            ////////////////////////////////////////////////////////////////////
+            //
+            // simple cyclic algorithm
+            //
+            ////////////////////////////////////////////////////////////////////
+            static inline
+            bool __cyclic(const array<z_type>  &a,
+                          const array<z_type>  &b,
+                          const array<z_type>  &c,
+                          array<z_type>        &g,
+                          array<z_type>        &u,
+                          array<z_type>        &z,
+                          array<z_type>        &bb,
+                          const array<z_type>  &r,
+                          array<z_type>        &x
+                          ) throw()
+            {
+                const size_t n      =  a.size(); assert(n>=2);
+                const z_type alpha  =  a[1];
+                const z_type beta   =  c[n];
+                const z_type gamma  = -b[1];
+                
+                //==============================================================
+                // solve A.x = r
+                //==============================================================
+                bb[1]=b[1]-gamma;
+                bb[n]=b[n]-(alpha*beta)/gamma;
+                for(size_t i=2;i<n;i++)
+                    bb[i]=b[i];
+                if( ! __tridiag(a,bb,c,g,x,r) )
+                    return false;
+                
+                //==============================================================
+                // compute the vector u
+                //==============================================================
+                u[1]=gamma;
+                u[n]=alpha;
+                for(size_t i=2;i<n;i++)
+                    u[i]=numeric<z_type>::zero;
+                
+                //==============================================================
+                // solve A.z = u
+                //==============================================================
+                if(! __tridiag(a,bb,c,g,z,u) )
+                    return false;
+                
+                //==============================================================
+                // compute the factor
+                //==============================================================
+                const z_type fact=
+                (x[1]+beta*x[n]/gamma)/
+                (numeric<z_type>::one+z[1]+beta*z[n]/gamma);
+                for(size_t i=n;i>0;--i)
+                    x[i] -= fact*z[i];
+                return true;
+            }
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // simple tridiagonal matrix
+        //
+        ////////////////////////////////////////////////////////////////////////
+        
+        template <>
+        tridiag<z_type> :: ~tridiag() throw()
+        {
+            
+        }
+        
+        template <>
+        tridiag<z_type> :: tridiag( size_t n ) :
+        tridiag_base<z_type>(0)
+        {
+            make(n);
+        }
+        
+        template <>
+        z_type tridiag<z_type>:: operator()(size_t i, size_t j) const throw()
+        {
+            assert(i>0);assert(i<=size());
+            assert(j>0);assert(j<=size());
+            
+            const ptrdiff_t k = ptrdiff_t(i) - ptrdiff_t(j);
+            switch( k )
+            {
+                case -1: return c[i];
+                case  0: return b[i];
+                case  1: return a[i];
+                    
+                default:
+                    break;
+            }
+            return 0;
+            
+        }
+        
+        template <>
+        bool tridiag<z_type>:: solve( array_type &x, const array_type &r) const throw()
+        {
+            assert( size() == x.size() );
+            assert( size() == r.size() );
+            return __tridiag(a, b, c, g, x, r);
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // cyclic tridiagonal matrix
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        ctridiag<z_type> :: ~ctridiag() throw()
+        {
+            
+        }
+        
+        template <>
+        ctridiag<z_type> :: ctridiag( size_t n ) :
+        tridiag_base<z_type>(0)
+        {
+            make(n);
+        }
+        
+        template <>
+        z_type ctridiag<z_type>:: operator()(size_t i, size_t j) const throw()
+        {
+            assert(i>0);assert(i<=size());
+            assert(j>0);assert(j<=size());
+            const size_t n = size();
+            
+            if(i==1&&j==n) return c[n];
+            if(i==n&&j==1) return a[1];
+            
+            const ptrdiff_t k = ptrdiff_t(i) - ptrdiff_t(j);
+            switch( k )
+            {
+                case -1: return c[i];
+                case  0: return b[i];
+                case  1: return a[i];
+                    
+                default:
+                    break;
+            }
+            return 0;
+            
+        }
+        
+        template <>
+        bool ctridiag<z_type>:: solve( array_type &x, const array_type &r) const throw()
+        {
+            assert( size() == x.size() );
+            assert( size() == r.size() );
+            return __tridiag(a, b, c, g, x, r);
+        }
+        
+        
+        
 #define Y_XTRIDIAG_CTOR() \
 arrays(8), \
 a(  arrays.next_array() ), \
@@ -110,101 +457,6 @@ xx( arrays.next_array() )
         }
         
         
-        namespace
-        {
-            static inline
-            bool __tridiag(const array<z_type>  &a,
-                           const array<z_type>  &b,
-                           const array<z_type>  &c,
-                           array<z_type>        &g,
-                           array<z_type>        &U,
-                           const array<z_type>  &R
-                           ) throw()
-            {
-                const size_t n = a.size();
-                assert(b.size()==n);
-                assert(c.size()==n);
-                assert(g.size()==n);
-                assert(U.size()==n);
-                assert(R.size()==n);
-                
-                z_type piv = b[1];
-                if( Fabs( piv ) <= REAL_MIN )
-                    return false;
-                
-                
-                U[1] = R[1] / piv;
-                
-                for( size_t j=2, jm=1; j <= n; ++j,++jm )
-                {
-                    g[j] = c[jm] / piv;
-                    piv  = b[j] - a[j] * g[j];
-                    if( Fabs( piv ) <= REAL_MIN )
-                        return false;
-                    U[j] = (R[j] - a[j] * U[jm])/piv;
-                }
-                
-                for( size_t j=n-1, jp=n;j>0;--j,--jp)
-                {
-                    assert(j+1==jp);
-                    U[j] -= g[jp] * U[jp];
-                }
-                
-                return true;
-            }
-            
-            static inline
-            bool __cyclic(const array<z_type>  &a,
-                          const array<z_type>  &b,
-                          const array<z_type>  &c,
-                          array<z_type>        &g,
-                          array<z_type>        &u,
-                          array<z_type>        &z,
-                          array<z_type>        &bb,
-                          const array<z_type>  &r,
-                          array<z_type>        &x
-                          ) throw()
-            {
-                const size_t n      =  a.size(); assert(n>=2);
-                const z_type alpha  =  a[1];
-                const z_type beta   =  c[n];
-                const z_type gamma  = -b[1];
-                
-                //==============================================================
-                // solve A.x = r
-                //==============================================================
-                bb[1]=b[1]-gamma;
-                bb[n]=b[n]-(alpha*beta)/gamma;
-                for(size_t i=2;i<n;i++)
-                    bb[i]=b[i];
-                if( ! __tridiag(a,bb,c,g,x,r) )
-                    return false;
-                
-                //==============================================================
-                // compute the vector u
-                //==============================================================
-                u[1]=gamma;
-                u[n]=alpha;
-                for(size_t i=2;i<n;i++)
-                    u[i]=numeric<z_type>::zero;
-                
-                //==============================================================
-                // solve A.z = u
-                //==============================================================
-                if(! __tridiag(a,bb,c,g,z,u) )
-                    return false;
-                
-                //==============================================================
-                // compute the factor
-                //==============================================================
-                const z_type fact=
-                (x[1]+beta*x[n]/gamma)/
-                (numeric<z_type>::one+z[1]+beta*z[n]/gamma);
-                for(size_t i=n;i>0;--i)
-                    x[i] -= fact*z[i];
-                return true;
-            }
-        }
         
         
         //======================================================================
@@ -306,257 +558,6 @@ xx( arrays.next_array() )
             }
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        
-		template <>
-		tridiag<z_type>:: tridiag() throw() :
-        size_(0),
-        wksp_( ),
-        a_( 0 ),
-        b_( 0 ),
-        c_( 0 ),
-        g_( 0 )
-		{
-            
-		}
-        
-		template <>
-		tridiag<z_type>:: tridiag( size_t n ) :
-        size_( n ),
-        wksp_( size_ * 4, numeric<z_type>::zero),
-        a_( wksp_(-1) ),
-        b_( a_ + size_ ),
-        c_( b_ + size_ ),
-        g_( c_ + size_ )
-		{
-            
-		}
-        
-		template <>
-		tridiag<z_type>:: ~tridiag() throw() {
-            
-		}
-        
-		template <>
-		size_t tridiag<z_type>:: size() const throw() {
-			return size_;
-		}
-        
-        
-        
-        
-		template <>
-		void tridiag<z_type>:: make( size_t n ) {
-			if( n > 0 ) {
-				size_t req = n * 4;
-				wksp_.make( req, numeric<z_type>::zero );
-				size_ = n;
-				a_ = wksp_(-1);
-				b_ = a_ + size_;
-				c_ = b_ + size_;
-				g_ = c_ + size_;
-			} else {
-				wksp_.release();
-				size_ = 0;
-				a_ = b_ = c_ = g_ = 0;
-			}
-		}
-        
-		template <>
-		z_type &tridiag<z_type>:: a( size_t n ) throw() {
-			assert(n>=1);
-			assert(n<=this->size());
-			assert(a_!=NULL);
-			return a_[n];
-		}
-        
-		template <>
-		const z_type &tridiag<z_type>:: a( size_t n ) const throw() {
-			assert(n>=1);
-			assert(n<=this->size());
-			assert(a_!=NULL);
-			return a_[n];
-		}
-        
-		template <>
-		z_type &tridiag<z_type>:: b( size_t n ) throw() {
-			assert(n>=1);
-			assert(n<=this->size());
-			assert(b_!=NULL);
-			return b_[n];
-		}
-        
-		template <>
-		const z_type &tridiag<z_type>:: b( size_t n ) const throw() {
-			assert(n>=1);
-			assert(n<=this->size());
-			assert(b_!=NULL);
-			return b_[n];
-		}
-        
-		template <>
-		z_type &tridiag<z_type>:: c( size_t n ) throw() {
-			assert(n>=1);
-			assert(n<=this->size());
-			assert(c_!=NULL);
-			return c_[n];
-		}
-        
-		template <>
-		const z_type &tridiag<z_type>:: c( size_t n ) const throw() {
-			assert(n>=1);
-			assert(n<=this->size());
-			assert(c_!=NULL);
-			return c_[n];
-		}
-        
-		template <>
-		z_type tridiag<z_type>:: operator()( size_t i, size_t j) const throw()
-		{
-            
-			assert(i>=1);
-			assert(i<=this->size());
-			assert(j>=1);
-			assert(j<=this->size());
-            
-			switch( int(i) - int(j) ) {
-				case 0:
-					return b_[i];
-                    
-				case 1:
-					return a_[i];
-                    
-				case -1:
-					return c_[i];
-                    
-				default:
-					return 0;
-			}
-            
-		}
-        
-        
-        
-        
-		template <>
-		void tridiag<z_type>:: solve( array<z_type> &u, const array<z_type> &r) const
-        {
-			assert(size_>0);
-			assert(u.size() == this->size());
-			assert(r.size() == this->size());
-			const size_t n = size_;
-            
-			z_type piv = b_[1];
-			if( Fabs( piv ) <= REAL_MIN )
-				throw libc::exception( EDOM, "tridiag.solve(B(1)=0)" );
-            
-            
-			u[1] = r[1] / piv;
-            
-			for( size_t j=2, jm=1; j <= n; ++j,++jm )
-            {
-				assert(j-1==jm);
-				g_[j] = c_[jm] / piv;
-				piv   = b_[j] - a_[j] * g_[j];
-				if( Fabs( piv ) <= REAL_MIN )
-					throw libc::exception( EDOM, "tridiag.solve(pivot=0)" );
-				u[j] = (r[j] - a_[j] * u[jm])/piv;
-			}
-            
-			for( size_t j=n-1, jp=n;j>0;--j,--jp)
-            {
-				assert(j+1==jp);
-				u[j] -= g_[jp] * u[jp];
-			}
-            
-		}
-        
-        template <>
-        void tridiag<z_type>:: solve( matrix<z_type> &M, const matrix<z_type> &A) const
-        {
-            assert(size_>0);
-            const size_t n = size_;
-            assert(M.rows==n);
-            assert(A.rows==n);
-            assert(M.cols==A.cols);
-            
-            for( size_t c=M.cols;c>0;--c)
-            {
-                z_type piv = b_[1];
-                if( Fabs( piv ) <= REAL_MIN )
-                    throw libc::exception( EDOM, "tridiag.solve(B(1)=0)" );
-                
-                M[1][c] = A[1][c] / piv;
-                
-                for( size_t j=2, jm=1; j <= n; ++j,++jm )
-                {
-                    assert(j-1==jm);
-                    g_[j] = c_[jm] / piv;
-                    piv   = b_[j] - a_[j] * g_[j];
-                    if( Fabs( piv ) <= REAL_MIN )
-                        throw libc::exception( EDOM, "tridiag.solve(pivot=0)" );
-                    M[j][c] = (A[j][c] - a_[j] * M[jm][c])/piv;
-                }
-                
-                for( size_t j=n-1, jp=n;j>0;--j,--jp)
-                {
-                    assert(j+1==jp);
-                    M[j][c] -= g_[jp] * M[jp][c];
-                }
-                
-            }
-            
-            
-        }
-        
-        
-		template <>
-		void tridiag<z_type>:: to_scilab( std::ostream &os ) const {
-            
-			os << "[";
-			for( size_t i=1; i <= size_; ++i ) {
-				for( size_t j=1; j <= size_; ++j ) {
-					os << " " << (*this)(i,j);
-				}
-				if( i < size_ )
-					os << " ;";
-			}
-			os << "];";
-            
-		}
-        
-        template <>
-        void tridiag<z_type>:: apply( array<z_type> &v, const array<z_type> &u) const throw()
-        {
-            const size_t n = size_;
-            assert(v.size() == n);
-            assert(u.size() == n);
-            for(size_t i=n; i>0; --i)
-            {
-                v[i]  = b_[i] * u[i];
-                if(i<n) v[i] += c_[i] * u[i+1];
-                if(i>1) v[i] += a_[i] * u[i-1];
-            }
-            
-        }
-        
-        template <>
-        void tridiag<z_type>::  apply(matrix<z_type> &V, const matrix<z_type> &U) const throw()
-        {
-            const size_t n = size_;
-            assert(V.rows == n);
-            assert(U.rows == n);
-            assert(V.cols == U.cols );
-            for( size_t j=V.cols;j>0;--j)
-            {
-                for(size_t i=n; i>0; --i)
-                {
-                    V[i][j]  = b_[i] * U[i][j];
-                    if(i<n) V[i][j] += c_[i] * U[i+1][j];
-                    if(i>1) V[i][j] += a_[i] * U[i-1][j];
-                }
-            }
-        }
         
         
 	}
