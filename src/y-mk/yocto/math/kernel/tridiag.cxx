@@ -99,7 +99,7 @@ namespace yocto {
         {
             assert(size()==r.size());
             for(size_t i=size();i>0;--i) xx[i] = r[i];
-            return __solve(xx,r);
+            return __solve(r,xx);
         }
         
         template <>

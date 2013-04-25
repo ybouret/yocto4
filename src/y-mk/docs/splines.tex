@@ -84,9 +84,9 @@ $$
 
 \section{Oriented Spline}
 \subsection{Left orientation}
-If $y'_1$ is set, then the first element of the matrix becomes
+If $y'_1$ is set, then the first two elements of the matrix becomes
 $$
-	\dfrac{x_2-x_1}{3}
+	\dfrac{x_2-x_1}{3} \;\text{ and }\; \dfrac{x_2-x_1}{6}
 $$
 and the first element of the right hand vector becomes
 $$
@@ -95,7 +95,7 @@ $$
 \subsection{Right orientation}
 If $y'_n$ is set then the last element of the matrix becomes
 $$
-	\dfrac{x_n-x_{n-1}}{3}
+	\dfrac{x_n-x_{n-1}}{6}\;\text{ and }\;\dfrac{x_n-x_{n-1}}{3}
 $$
 and the last element of the right hand vector becomes
 $$
