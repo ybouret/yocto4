@@ -96,7 +96,7 @@ namespace yocto
         
         template <>
         bool woodbury<z_type>:: build(matrix<z_type>        &B,
-                                      const tridiag<z_type> &A,
+                                      const xtridiag<z_type> &A,
                                       const matrix<z_type>  &U,
                                       const matrix<z_type>  &V)
         {
@@ -116,7 +116,7 @@ namespace yocto
             //-- solve the auxiliary problems
             {
                 matrix<z_type> tV0( tV );
-                A.solve(tV, tV0);
+                //A.solve(tV, tV0);
             }
             
             //-- compute the B matrix
