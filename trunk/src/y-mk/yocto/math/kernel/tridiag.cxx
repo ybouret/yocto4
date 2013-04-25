@@ -94,7 +94,7 @@ namespace yocto {
         }
         
         template <>
-        bool tridiag_base<z_type>:: solve( array_type &r) const throw()
+        bool tridiag_base<z_type>:: solve( array<z_type> &r) const throw()
         {
             assert(size()==r.size());
             for(size_t i=size();i>0;--i) xx[i] = r[i];

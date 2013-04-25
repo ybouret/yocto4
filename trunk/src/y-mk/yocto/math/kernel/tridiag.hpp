@@ -39,7 +39,7 @@ namespace yocto {
             
             void apply( array<T> &v, const array<T> &u) const throw();
             void apply( matrix<T>  &v, const matrix<T>  &u) const throw();
-            bool solve( array_type &r) const throw();
+            bool solve( array<T> &r) const throw();
             
         protected:
             lw_arrays<T,memory::global> arrays;
