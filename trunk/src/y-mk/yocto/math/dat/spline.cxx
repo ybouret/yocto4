@@ -94,7 +94,7 @@ namespace yocto {
                     break;
                     
                 case spline_cyclic:
-                    y2[n] = - ( y2[1] = dy1/dx1 - dyn/dxn);
+                    y2[n]  = - ( y2[1] = dy1/dx1 - dyn/dxn);
                     M.b[1] = M.b[n] = (dx1+dxn) / REAL(3.0);
                     M.c[n] = dxn / REAL(6.0);
                     M.a[1] = dx1 / REAL(6.0);
