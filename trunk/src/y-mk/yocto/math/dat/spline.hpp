@@ -7,43 +7,6 @@
 namespace yocto {
 
 	namespace math {
-
-#if 0
-		template <class T>
-		class spline : public object
-		{
-			public:
-				class boundary {
-					public:
-						explicit boundary( bool natural, const T slope = 0) throw();
-						virtual ~boundary() throw();
-						boundary( const boundary & ) throw();
-
-						const bool is_natural;
-						const T    derivative;
-
-					private:
-						boundary&operator=( boundary & );
-				};
-
-				spline( const array<T> &x, const array<T> &y, const boundary &lo, const boundary &hi );
-				virtual ~spline() throw();
-
-				T operator()( T x ) const throw();
-
-			private:
-				YOCTO_DISABLE_COPY_AND_ASSIGN(spline);
-				T           *x_;
-				T           *y_;
-				T           *y2_;
-				const size_t n_;
-				const T      xlo_;
-				const T      xhi_;
-				const T      ylo_;
-				const T      yhi_;
-				vector<T>    w_;
-		};
-#endif
         
         enum spline_type
         {
@@ -89,6 +52,7 @@ namespace yocto {
                 {
                 }
                 
+                //! regular spline with given boundaries parameters
                 inline boundaries( bool lo_natural, T lo_slope, bool up_natural, T up_slope) throw() :
                 type( spline_regular ),
                 lower(lo_natural,lo_slope),
@@ -96,7 +60,7 @@ namespace yocto {
                 {
                 }
                 
-                //!
+                //! quick spline setup
                 /**
                  \param t spline_cyclic => cyclic spline / spline_regular => doubly natural spline
                  */
@@ -130,7 +94,8 @@ namespace yocto {
             const T      xlo;
             const T      xup;
             const T      width;
-    
+            //! compute once x/y are set
+            void compute(const boundaries &);
         };
         
 	}
