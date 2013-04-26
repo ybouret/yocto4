@@ -38,6 +38,7 @@ YOCTO_UNIT_TEST_IMPL(spline)
         }
     }
     
+#if 0
     const spline<double>::boundaries bnd1( spline_regular );
     spline<double> S1(X,Y,bnd1);
     
@@ -58,6 +59,7 @@ YOCTO_UNIT_TEST_IMPL(spline)
             fp("%g %g %g %g\n", x, S1(x), S2(x), S3(x));
         }
     }
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()

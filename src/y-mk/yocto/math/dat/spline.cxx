@@ -9,6 +9,7 @@ namespace yocto {
     
 	namespace math {
         
+#if 0
         template <>
         spline<real_t>:: ~spline() throw()
         {
@@ -170,7 +171,8 @@ namespace yocto {
             return (a * y[klo]) + (b * y[khi]) + ( (a*a*a-a) * y2[klo] + (b*b*b-b) * y2[khi] ) * (h*h) / REAL(6.0);
         }
         
-        
+#endif
+
 	}
     
 }
