@@ -77,12 +77,12 @@ ADD_DEFINITIONS( ${FLTK-DEFINES} )
 #-----------------------------------------------------------------------
 # extract FLTK link directory
 #-----------------------------------------------------------------------
-EXEC_PROGRAM( bash ARGS ${FLTK-CONFIG} --ldflags OUTPUT_VARIABLE FLTK-LDFLAGS)
+#EXEC_PROGRAM( bash ARGS ${FLTK-CONFIG} --ldflags OUTPUT_VARIABLE FLTK-LDFLAGS)
 #MESSAGE( STATUS "  @FLTK-LDFLAGS='${FLTK-LDFLAGS}'")
-STRING( REGEX MATCHALL "[-][L]([^ ;])+" FLTK-LINK-DIR ${FLTK-LDFLAGS} )
-STRING( REPLACE  "-L" "" FLTK-LINK-DIR "${FLTK-LINK-DIR}")
+#STRING( REGEX MATCHALL "[-][L]([^ ;])+" FLTK-LINK-DIR ${FLTK-LDFLAGS} )
+#STRING( REPLACE  "-L" "" FLTK-LINK-DIR "${FLTK-LINK-DIR}")
 #MESSAGE( STATUS "  @FLTK-LINK-DIR='${FLTK-LINK-DIR}'" )
-LINK_DIRECTORIES( ${FLTK-LINK-DIR} )
+#LINK_DIRECTORIES( ${FLTK-LINK-DIR} )
 
 ########################################################################
 ## Linking
@@ -101,15 +101,16 @@ MACRO(TARGET_LINK_FLTK THE_TARGET)
 	#get all args
 	MESSAGE( STATUS "@FLTK --> ${THE_TARGET} | 'fltk-config ${_fltk_ldflags}'" )
 	EXEC_PROGRAM( bash ARGS ${FLTK-CONFIG} ${_fltk_ldflags} OUTPUT_VARIABLE FLTK-LDFLAGS)
-	#MESSAGE( STATUS "FLTK-LDFLAGS='${FLTK-LDFLAGS}'")
+	MESSAGE( STATUS "FLTK-LDFLAGS='${FLTK-LDFLAGS}'")
 
 	#extract libraries, link directories is already set
-	STRING( REGEX MATCHALL "([-][l]([^ ;])+)|(-framework ([^ ;])+)" FLTK-LIBS ${FLTK-LDFLAGS})
-	STRING( REPLACE  "-l" "" FLTK-LIBS "${FLTK-LIBS}")
+	#STRING( REGEX MATCHALL "([-][l]([^ ;])+)|(-framework ([^ ;])+)" FLTK-LIBS ${FLTK-LDFLAGS})
+	#STRING( REPLACE  "-l" "" FLTK-LIBS "${FLTK-LIBS}")
 	#MESSAGE( STATUS "${THE_TARGET} needs '${FLTK-LIBS}'")
 	
 	#and declare libraries to be linked !
-	TARGET_LINK_LIBRARIES(${THE_TARGET} ${FLTK-LIBS})
+	#TARGET_LINK_LIBRARIES(${THE_TARGET} ${FLTK-LIBS})
+	TARGET_LINK_LIBRARIES(${THE_TARGET} ${FLTK-LDFLAGS})
 ENDMACRO(TARGET_LINK_FLTK)
 
 ########################################################################
