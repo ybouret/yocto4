@@ -2,12 +2,22 @@
 #define YOCTO_MATH_DAT_SPLINE_INCLUDED 1
 
 #include "yocto/sequence/lw-arrays.hpp"
-//#include "yocto/math/types.hpp"
 
 namespace yocto {
 
 	namespace math {
         
+        enum spline_type
+        {
+            spline_natural,       //!< both sides are natural
+            spline_periodic,      //!< both sides are periodic
+            spline_tangent_left,  //!< left tangent, natural at right
+            spline_tangent_right, //!< right tangent, natural at left
+            spline_tangent_both   //!< both tangents are set
+        };
+        
+        
+#if 0
         enum spline_type
         {
             spline_regular,
@@ -97,6 +107,7 @@ namespace yocto {
             //! compute once x/y are set
             void compute(const boundaries &);
         };
+#endif
         
 	}
 
