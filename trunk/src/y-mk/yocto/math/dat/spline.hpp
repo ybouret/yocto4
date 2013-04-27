@@ -35,8 +35,8 @@ namespace yocto {
                          const array<T> &x,
                          const array<T> *y_tab,
                          array<T>       *y2_tab,
-                         const array<T> *ls_tab,
-                         const array<T> *rs_tab,
+                         const T        *ls_tab,
+                         const T        *rs_tab,
                          const size_t    ns);
             
             
