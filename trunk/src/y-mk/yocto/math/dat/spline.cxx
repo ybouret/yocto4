@@ -101,6 +101,21 @@ namespace yocto {
                     }
                     break;
                     
+                case spline_tangent_left:
+                    assert(ls_tab!=NULL);
+                    assert(ls_tab->size()==ns);;
+                    M.b[1] = dx1/REAL(3.0);
+                    M.c[1] = dx1/REAL(6.0);
+                    for(size_t j=0;j<ns;)
+                    {
+                        const array<real_t> &y   = y_tab[j];
+                        array<real_t>       &y2 = y2_tab[j];
+                        const real_t dy1 = y[2] - y[1];
+                        ++j;
+                        y2[1] =  dy1/dx1 - (*ls_tab)[j];
+                    }
+                    break;
+                    
                 default:
                     throw exception("unhandled spline type...");
                     break;

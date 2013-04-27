@@ -50,8 +50,9 @@ namespace yocto {
                       const array<T> *y2_tab,
                       const T        *width);
             
+            
+            
         };
-        
         
         
 	}
