@@ -14,8 +14,8 @@ namespace yocto {
                                       const array<real_t> &x,
                                       const array<real_t> *y_tab,
                                       array<real_t>       *y2_tab,
-                                      const array<real_t> *ls_tab,
-                                      const array<real_t> *rs_tab,
+                                      const real_t        *ls_tab,
+                                      const real_t        *rs_tab,
                                       const size_t         ns)
         {
             assert(ns>0);
@@ -96,29 +96,55 @@ namespace yocto {
                         array<real_t>       &y2 = y2_tab[j];
                         const real_t yh  = REAL(0.5) * (y[1]+y[n]);
                         const real_t dy1 = y[2] - yh;
-                        const real_t dyn = yh   - y[n-1];
+                        const real_t dyn = yh   - y[nm];
                         y2[n]  = - ( y2[1] = dy1/dx1 - dyn/dxn);
                     }
                     break;
                     
                 case spline_tangent_left:
                     assert(ls_tab!=NULL);
-                    assert(ls_tab->size()==ns);;
                     M.b[1] = dx1/REAL(3.0);
                     M.c[1] = dx1/REAL(6.0);
-                    for(size_t j=0;j<ns;)
+                    for(size_t j=0;j<ns;++j)
                     {
                         const array<real_t> &y   = y_tab[j];
                         array<real_t>       &y2 = y2_tab[j];
                         const real_t dy1 = y[2] - y[1];
-                        ++j;
-                        y2[1] =  dy1/dx1 - (*ls_tab)[j];
+                        y2[1] =  dy1/dx1 - ls_tab[j];
                     }
                     break;
                     
-                default:
-                    throw exception("unhandled spline type...");
+                case spline_tangent_right:
+                    assert(rs_tab!=NULL);
+                    M.b[n] = dxn / REAL(3.0);
+                    M.a[n] = dxn / REAL(6.0);
+                    for(size_t j=0;j<ns;++j)
+                    {
+                        const array<real_t> &y  = y_tab[j];
+                        array<real_t>       &y2 = y2_tab[j];
+                        const real_t dyn = y[n] - y[nm];
+                        y2[n]  = rs_tab[j] - dyn/dxn;
+                    }
                     break;
+                    
+                case spline_tangent_both:
+                    assert(ls_tab!=NULL);
+                    assert(rs_tab!=NULL);
+                    M.b[1] = dx1/REAL(3.0);
+                    M.c[1] = dx1/REAL(6.0);
+                    M.b[n] = dxn / REAL(3.0);
+                    M.a[n] = dxn / REAL(6.0);
+                    for(size_t j=0;j<ns;++j)
+                    {
+                        const array<real_t> &y   = y_tab[j];
+                        array<real_t>       &y2 = y2_tab[j];
+                        const real_t dy1 = y[2] - y[1];
+                        const real_t dyn = y[n] - y[nm];
+                        y2[1] =  dy1/dx1 - ls_tab[j];
+                        y2[n] = rs_tab[j] - dyn/dxn;
+                    }
+                    break;
+                    
                     
             }
             
