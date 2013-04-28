@@ -110,8 +110,10 @@ namespace yocto {
                         const array<real_t> &y   = y_tab[j];
                         array<real_t>       &y2 = y2_tab[j];
                         const real_t dy1 = y[2] - y[1];
-                        y2[1] =  dy1/dx1 - ls_tab[j];
+                        y2[1] = dy1/dx1 - ls_tab[j];
+                        y2[n] = 0;
                     }
+                    M.b[n] = 1;
                     break;
                     
                 case spline_tangent_right:
@@ -124,7 +126,9 @@ namespace yocto {
                         array<real_t>       &y2 = y2_tab[j];
                         const real_t dyn = y[n] - y[nm];
                         y2[n]  = rs_tab[j] - dyn/dxn;
+                        y2[1]  = 0;
                     }
+                    M.b[1] = 1;
                     break;
                     
                 case spline_tangent_both:
