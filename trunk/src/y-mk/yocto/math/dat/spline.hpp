@@ -62,6 +62,14 @@ namespace yocto {
                       const array<T> **ppy2,
                       const T        *width);
             
+            //! compute the approximate derivatives array
+            static
+            void derivs(array<T>       **ppy1,
+                        const array<T>  &x,
+                        const array<T> **ppy,
+                        const array<T> **ppy2,
+                        const size_t     ns
+                        );
             
             //! 1D helper
             static inline
@@ -91,6 +99,19 @@ namespace yocto {
                 const array<T> *ppy2[1] = { &y2 };
                 spline<T>::eval( &ans, 1, X, x, ppy, ppy2, width);
                 return ans;
+            }
+            
+            //! 1D helper
+            static inline
+            void derivs(array<T>       &y1,
+                        const array<T> &x,
+                        const array<T> &y,
+                        const array<T> &y2)
+            {
+                array<T>       *ppy1[1] = { &y1 };
+                const array<T> *ppy[1]  = { &y  };
+                const array<T> *ppy2[1] = { &y2 };
+                spline<T>:: derivs(ppy1, x, ppy, ppy2, 1);
             }
             
             //! 2D helper

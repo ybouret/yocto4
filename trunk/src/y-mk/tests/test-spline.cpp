@@ -82,6 +82,27 @@ YOCTO_UNIT_TEST_IMPL(spline)
     }
     
     {
+        ios::ocstream fp("derivs.dat",false);
+        matrix<double> Y1(5,nc);
+        for(size_t i=1; i <= 5; ++i)
+        {
+            spline<double>::derivs(Y1[i], X, Y, Y2[i]);
+        }
+        
+        std::cerr << "Y1=" << Y1 << std::endl;
+        for(size_t i=1; i <= nc; ++i )
+        {
+            fp("%g", X[i]);
+            for(size_t j=1; j<=5;++j)
+            {
+                fp(" %g", Y1[j][i]);
+            }
+            fp("\n");
+        }
+        
+    }
+    
+    {
         ios::ocstream fp("splines_bis.dat",false);
         for( size_t i=0; i<=np;++i)
         {
