@@ -206,7 +206,7 @@ namespace yocto {
                     P[1][i] = v.x;
                     P[2][i] = v.y;
                 }
-                width = type == spline_periodic ? &length : 0;
+                width = (type == spline_periodic) ? &length : 0;
                 spline<T>::compute(type,t,P,Q,LT,RT);
             }
             
