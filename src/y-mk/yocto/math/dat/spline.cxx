@@ -96,7 +96,7 @@ namespace yocto {
                     {
                         const array<real_t> &y   = *ppy[j];
                         array<real_t>       &y2 = *ppy2[j];
-                        const real_t yh  = REAL(0.5) * (y[1]+y[n]);
+                        const real_t yh  = REAL(0.5) * (y[1]+y[n]); //! regularize...
                         const real_t dy1 = y[2] - yh;
                         const real_t dyn = yh   - y[nm];
                         y2[n]  = - ( y2[1] = dy1/dx1 - dyn/dxn);
@@ -237,6 +237,56 @@ namespace yocto {
             }
         }
         
+        template<>
+        void spline<real_t>:: derivs(array<real_t>       **ppy1,
+                                     const array<real_t>  &x,
+                                     const array<real_t> **ppy,
+                                     const array<real_t> **ppy2,
+                                     const size_t          ns )
+        {
+            assert(ppy1);
+            assert(ppy);
+            assert(ppy2);
+            assert(ns>0);
+            const size_t n = x.size();
+            //------------------------------------------------------------------
+            // core derivatives
+            //------------------------------------------------------------------
+            for(size_t i=1;i<n;++i)
+            {
+                const size_t ip = i+1;
+                const real_t dx = x[ip]-x[i];
+                for( size_t j=0;j<ns;++j)
+                {
+                    assert(ppy[j]);
+                    assert(ppy1[j]);
+                    assert(ppy2[j]);
+                    const array<real_t> &y  =  *ppy[j];
+                    const array<real_t> &y2 = *ppy2[j];
+                    array<real_t>       &y1 = *ppy1[j];
+                    const real_t dy = y[ip]-y[i];
+                    y1[i] = dy/dx - dx * (y2[i]/REAL(3.0)+y2[ip]/REAL(6.0));
+                }
+            }
+            
+            //------------------------------------------------------------------
+            // last derivatives
+            //------------------------------------------------------------------
+            const size_t nm = n-1;
+            {
+                const real_t dx = x[n] - x[nm];
+                for(size_t j=0;j<ns;++j)
+                {
+                    const array<real_t> &y  =  *ppy[j];
+                    const array<real_t> &y2 = *ppy2[j];
+                    array<real_t>       &y1 = *ppy1[j];
+                    const real_t dy = y[n] - y[nm];
+                    y1[n] = dy/dx + dx * (y2[nm]/REAL(3.0)-y2[n]/REAL(6.0));
+                }
+            }
+
+        }
+        
         template <>
         spline<real_t>::  spline() throw() {}
         
@@ -320,7 +370,7 @@ namespace yocto {
         {
             return spline<real_t>::eval(u, t, P, Q, width);
         }
-
+        
         
 	}
     

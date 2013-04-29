@@ -88,8 +88,14 @@ namespace yocto {
             explicit ctridiag(size_t n=0);
             virtual ~ctridiag() throw();
             
+            //! cyclic access
+            /**
+             M[1][n] = c[n]
+             M[n][1] = a[1]
+             */
             virtual T operator()(size_t i, size_t j) const throw();
             virtual bool __solve( array<T>  &x, const array<T>  &r) const throw();
+            
             
             
         private:
