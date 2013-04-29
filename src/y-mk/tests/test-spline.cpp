@@ -100,3 +100,13 @@ YOCTO_UNIT_TEST_IMPL(spline)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/string/conv.hpp"
+
+YOCTO_UNIT_TEST_IMPL(spline2d)
+{
+    size_t n = 4;
+    if(argc>1) n = strconv::to<size_t>(argv[1],"n");
+    
+}
+YOCTO_UNIT_TEST_DONE()

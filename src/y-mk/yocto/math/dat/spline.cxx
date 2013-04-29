@@ -240,6 +240,11 @@ namespace yocto {
         spline<real_t>:: ~spline() throw() {}
         
         ////////////////////////////////////////////////////////////////////////
+        //
+        // Spline 1D
+        //
+        ////////////////////////////////////////////////////////////////////////
+        
         template <>
         spline1D<real_t>:: ~spline1D() throw() {}
         
@@ -277,6 +282,34 @@ namespace yocto {
             return spline<real_t>::eval(X, x, y, y2, width);
         }
         
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Spline 2D
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        spline2D<real_t>:: ~spline2D() throw() {}
+        
+        
+        static inline
+        const array<real_t> & __check_t( const array<real_t> &t )
+        {
+            if( t.size() < 2 ) throw exception("spline2D(not enough data)");
+            return t;
+        }
+        
+        template <>
+        spline2D<real_t>:: spline2D( const array<real_t> &user_t) :
+        t( __check_t(user_t) ),
+        n( t.size() ),
+        P( 2, n ),
+        Q( 2, n ),
+        length(t[t.size()]-t[1]),
+        width( 0 )
+        {
+            
+        }
         
 	}
     

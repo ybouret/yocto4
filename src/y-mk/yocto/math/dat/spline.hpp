@@ -113,7 +113,7 @@ namespace yocto {
                 assert(P.cols>=2);
                 const array<T> *y[2]  = { &P[1], &P[2] };
                 const array<T> *y2[2] = { &Q[1], &Q[2] };
-                compute(type, t, y, y2, 0, 0, 2);
+                compute(type, t, y, y2, &LT.x, &RT.x, 2);
             }
             
             
@@ -127,7 +127,7 @@ namespace yocto {
         
         //! make a spline with own y2
         template <typename T>
-        class spline1D
+        class spline1D : public spline<T>
         {
         public:
             explicit spline1D(spline_type     t,
@@ -141,11 +141,56 @@ namespace yocto {
             T operator()( const T X ) const throw();
             
         private:
-            const array<T> &x;
-            const array<T> &y;
+            const array<T> &x; //!< user's ref
+            const array<T> &y; //!< user's ref
             vector<T>       y2;
             const T         w;
             const T        *width;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(spline1D);
+        };
+        
+        template <typename T>
+        class spline2D : public spline<T>
+        {
+        public:
+            virtual ~spline2D() throw();
+            
+            //! prepare the computation
+            explicit spline2D(const array<T> &user_t);
+            
+            //! compute from a sequence of vertices
+            /**
+             \param type the spline type
+             \param p    an iterator with enough points
+             \param LT   left tangent vector if necessary
+             \param RT   right tangent vector if necessary
+             */
+            template <typename ITERATOR>
+            inline
+            void load(spline_type      type,
+                      ITERATOR         p,
+                      const v2d<T>     LT = v2d<T>::zero,
+                      const v2d<T>     RT = v2d<T>::zero )
+            {
+                for( size_t i=1;i<=n;++i,++p)
+                {
+                    const v2d<T> &v = *p;
+                    P[1][i] = v.x;
+                    P[2][i] = v.y;
+                }
+                width = type == spline_periodic ? &length : 0;
+                spline<T>::compute(type,t,P,Q,LT,RT);
+            }
+            
+        private:
+            const array<T>   &t;
+            const size_t      n; //!< t.size()
+            matrix<T>         P; //!< 2 x n
+            matrix<T>         Q; //!< 2 x n
+            const  T          length;
+            const  T         *width;
+            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(spline2D);
         };
         
 	}
