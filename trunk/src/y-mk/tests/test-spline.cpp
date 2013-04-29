@@ -171,5 +171,32 @@ YOCTO_UNIT_TEST_IMPL(spline2d)
         }
     }
     
+    //--------------------------------------------------------------------------
+    // close path -> poly
+    //--------------------------------------------------------------------------
+    t.push_back( t[nc] + (points[nc]-points[1]).norm() );
+    points.push_back( points[1] );
+    {
+        ios::ocstream fp("poly.dat",false);
+        for(size_t i=1; i <= t.size(); ++i )
+        {
+            fp("%g %g %g\n", t[i], points[i].x, points[i].y);
+        }
+    }
+    
+    
+    spline2D<double> S2(t);
+    S2.load(spline_periodic,points.begin());
+    {
+        ios::ocstream fp("spoly.dat",false);
+        const double L = t.back();
+        for( size_t i=0; i<=np;++i)
+        {
+            const double u = (i*L)/np;
+            const vtx    v = S2(u);
+            fp("%g %g %g\n", u, v.x, v.y);
+        }
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
