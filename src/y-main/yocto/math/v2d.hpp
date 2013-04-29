@@ -84,6 +84,7 @@ namespace yocto {
             static
             T det( const v2d &a, const v2d &b) throw();
            
+            static const v2d<T> zero;
 		};
         
 		template <class T>

@@ -3,6 +3,7 @@
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/v2d.hpp"
+#include "yocto/math/kernel/matrix.hpp"
 
 namespace yocto {
     
@@ -63,30 +64,58 @@ namespace yocto {
             
             
             //! 1D helper
-            static
-            inline void compute(spline_type     type,
-                                const array<T> &x,
-                                const array<T> &y,
-                                array<T>       &y2,
-                                const T         left_slope  = 0,
-                                const T         right_slope = 0
-                                )
+            static inline
+            void compute(spline_type     type,
+                         const array<T> &x,
+                         const array<T> &y,
+                         array<T>       &y2,
+                         const T         left_slope  = 0,
+                         const T         right_slope = 0
+                         )
             {
                 spline<T>::compute( type, x, &y, &y2, &left_slope, &right_slope, 1);
             }
             
             //! 1D helper
-            static
-            inline T eval(T               X,
-                          const array<T> &x,
-                          const array<T> &y,
-                          const array<T> &y2,
-                          const T        *width)
+            static inline
+            T eval(T               X,
+                   const array<T> &x,
+                   const array<T> &y,
+                   const array<T> &y2,
+                   const T        *width)
             {
                 T ans = 0;
                 spline<T>::eval( &ans, 1, X, x, &y, &y2, width);
                 return ans;
             }
+            
+            //! 2D helper
+            /**
+             \param type spline type
+             \param t    curve parameter
+             \param P    matrix: first row=x, second row=y
+             \param Q    second derivative matrix
+             \param LT   left tangent
+             \param RT   right tangent
+             */
+            static inline
+            void compute(spline_type      type,
+                         const array<T>  &t,
+                         const matrix<T> &P,
+                         matrix<T>       &Q,
+                         const v2d<T>     LT = v2d<T>::zero,
+                         const v2d<T>     RT = v2d<T>::zero
+                         )
+            {
+                assert(P.rows==2);
+                assert(Q.rows==2);
+                assert(P.cols==Q.cols);
+                assert(P.cols>=2);
+                const array<T> *y[2]  = { &P[1], &P[2] };
+                const array<T> *y2[2] = { &Q[1], &Q[2] };
+                compute(type, t, y, y2, 0, 0, 2);
+            }
+            
             
         protected:
             explicit spline() throw();

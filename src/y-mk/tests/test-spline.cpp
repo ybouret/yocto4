@@ -57,11 +57,11 @@ YOCTO_UNIT_TEST_IMPL(spline)
     spline<double>::compute(spline_tangent_both,  X, Y, Y2[5],0,0);
 
     
-    spline1D<double> S1(spline_natural,X,Y);
-    spline1D<double> S2(spline_periodic,X,Y);
-    spline1D<double> S3(spline_tangent_left,X,Y,0,0);
+    spline1D<double> S1(spline_natural,      X,Y);
+    spline1D<double> S2(spline_periodic,     X,Y);
+    spline1D<double> S3(spline_tangent_left, X,Y,0,0);
     spline1D<double> S4(spline_tangent_right,X,Y,0,0);
-    spline1D<double> S5(spline_tangent_both,X,Y,0,0);
+    spline1D<double> S5(spline_tangent_both, X,Y,0,0);
 
     
     const size_t np = 200;
