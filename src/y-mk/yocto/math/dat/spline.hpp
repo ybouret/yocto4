@@ -114,7 +114,7 @@ namespace yocto {
                 assert(P.rows==2);
                 assert(Q.rows==2);
                 assert(P.cols==Q.cols);
-                assert(P.cols>=2);
+                assert(P.cols==t.size());
                 const array<T> *y[2]  = { &P[1], &P[2] };
                 array<T>      *y2[2]  = { &Q[1], &Q[2] };
                 spline<T>::compute(type,
@@ -126,6 +126,24 @@ namespace yocto {
                                    2);
             }
             
+            //! 2D helper
+            static inline
+            v2d<T> eval(T u,
+                        const array<T>  &t,
+                        const matrix<T> &P,
+                        const matrix<T> &Q,
+                        const T         *width) throw()
+            {
+                assert(P.rows==2);
+                assert(Q.rows==2);
+                assert(P.cols==Q.cols);
+                assert(P.cols==t.size());
+                const array<T>  *y[2] = { &P[1], &P[2] };
+                const array<T> *y2[2] = { &Q[1], &Q[2] };
+                v2d<T> v;
+                spline<T>::eval(&v.x, 2, u, t, y, y2, width);
+                return v;
+            }
             
         protected:
             explicit spline() throw();
@@ -191,6 +209,9 @@ namespace yocto {
                 width = type == spline_periodic ? &length : 0;
                 spline<T>::compute(type,t,P,Q,LT,RT);
             }
+            
+            v2d<T> operator()(T X) const throw();
+            
             
         private:
             const array<T>   &t;

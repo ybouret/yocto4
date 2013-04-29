@@ -159,7 +159,17 @@ YOCTO_UNIT_TEST_IMPL(spline2d)
     
     spline2D<double> S1(t);
     S1.load(spline_natural, points.begin() );
-    
+    const size_t np = 200;
+    {
+        ios::ocstream fp("spath.dat",false);
+        const double L = t[nc];
+        for( size_t i=0; i<=np;++i)
+        {
+            const double u = (i*L)/np;
+            const vtx    v = S1(u);
+            fp("%g %g %g\n", u, v.x, v.y);
+        }
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()
