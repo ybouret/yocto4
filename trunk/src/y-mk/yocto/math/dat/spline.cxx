@@ -26,21 +26,6 @@ namespace yocto {
             //==================================================================
             // create the system matrix
             //==================================================================
-#if 0
-            auto_ptr< tridiag_base<real_t> > pM;
-            
-            switch( type )
-            {
-                case spline_periodic:
-                    pM.reset( new ctridiag<real_t>(n) );
-                    break;
-                    
-                default:
-                    pM.reset( new tridiag<real_t>(n) );
-                    break;
-            }
-            tridiag_base<real_t> &M = *pM;
-#endif
             tridiag<real_t> M(n);
             
             //==================================================================
@@ -133,8 +118,6 @@ namespace yocto {
                         y2[1]  = 0;
                     }
                     M.b[1] = 1;
-                    std::cerr << "Mr=" << M << std::endl;
-                    std::cerr << "Rr=" << *ppy2[0] << std::endl;
                     break;
                     
                 case spline_tangent_both:

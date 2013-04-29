@@ -42,6 +42,15 @@ namespace yocto {
             bool solve( array<T>  &r) const throw();
             bool solve( matrix<T> &x) const throw();
             
+            //! fill a size() x size() matrix
+            void set( matrix<T> &M ) const throw();
+            
+            //! add to a size() x size() matrix
+            void add( matrix<T> &M ) const throw();
+            
+            //! sub to a size() x size() matrix
+            void sub( matrix<T> &M ) const throw();
+            
         protected:
             lw_arrays<T,memory::global> arrays;
             explicit tridiag_base( size_t nxtra );
@@ -74,6 +83,8 @@ namespace yocto {
             virtual bool __solve( array<T>  &x, const array<T>  &r) const throw();
             
             bool sherman_morrison( array<T> &x, const array<T> &U, const array<T> &V, const array<T> &r) const throw();
+            bool woodbury( array<T> &x, const matrix<T> &U, const matrix<T> &V, const array<T> &r ) const;
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tridiag);
