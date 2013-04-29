@@ -12,15 +12,15 @@ namespace yocto {
         template <>
         void spline<real_t>:: compute(spline_type          type,
                                       const array<real_t> &x,
-                                      const array<real_t> *y_tab,
-                                      array<real_t>       *y2_tab,
+                                      const array<real_t> **ppy,
+                                      array<real_t>       **ppy2,
                                       const real_t        *ls_tab,
                                       const real_t        *rs_tab,
                                       const size_t         ns)
         {
             assert(ns>0);
-            assert(y_tab);
-            assert(y2_tab);
+            assert(ppy);
+            assert(ppy2);
             const size_t n = x.size(); assert(n>1);
             
             //==================================================================
@@ -60,8 +60,10 @@ namespace yocto {
                 M.c[i] = dxp/REAL(6.0);
                 for(size_t j=0;j<ns;++j)
                 {
-                    const array<real_t> &y   = y_tab[j]; assert( n == y.size()  );
-                    array<real_t>       &y2 = y2_tab[j]; assert( n == y2.size() );
+                    assert(ppy[j]);
+                    assert(ppy2[j]);
+                    const array<real_t> &y  = *ppy[j]; assert( n == y.size()  );
+                    array<real_t>       &y2 = *ppy2[j]; assert( n == y2.size() );
                     const real_t yi = y[i];
                     y2[i]  = (y[ip]-yi)/dxp - (yi-y[im])/dxm;
                 }
@@ -81,7 +83,7 @@ namespace yocto {
                     M.b[n] = 1;
                     for(size_t j=0;j<ns;++j)
                     {
-                        array<real_t> &y2 = y2_tab[j];
+                        array<real_t> &y2 = *ppy2[j];
                         y2[1] = y2[n] = 0;
                     }
                     break;
@@ -92,8 +94,8 @@ namespace yocto {
                     M.a[1] = dx1 / REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
-                        const array<real_t> &y   = y_tab[j];
-                        array<real_t>       &y2 = y2_tab[j];
+                        const array<real_t> &y   = *ppy[j];
+                        array<real_t>       &y2 = *ppy2[j];
                         const real_t yh  = REAL(0.5) * (y[1]+y[n]);
                         const real_t dy1 = y[2] - yh;
                         const real_t dyn = yh   - y[nm];
@@ -107,8 +109,8 @@ namespace yocto {
                     M.c[1] = dx1/REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
-                        const array<real_t> &y   = y_tab[j];
-                        array<real_t>       &y2 = y2_tab[j];
+                        const array<real_t> &y   = *ppy[j];
+                        array<real_t>       &y2 = *ppy2[j];
                         const real_t dy1 = y[2] - y[1];
                         y2[1] = dy1/dx1 - ls_tab[j];
                         y2[n] = 0;
@@ -122,8 +124,8 @@ namespace yocto {
                     M.a[n] = dxn / REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
-                        const array<real_t> &y  = y_tab[j];
-                        array<real_t>       &y2 = y2_tab[j];
+                        const array<real_t> &y  = *ppy[j];
+                        array<real_t>       &y2 = *ppy2[j];
                         const real_t dyn = y[n] - y[nm];
                         y2[n]  = rs_tab[j] - dyn/dxn;
                         y2[1]  = 0;
@@ -140,8 +142,8 @@ namespace yocto {
                     M.a[n] = dxn / REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
-                        const array<real_t> &y   = y_tab[j];
-                        array<real_t>       &y2 = y2_tab[j];
+                        const array<real_t> &y   = *ppy[j];
+                        array<real_t>       &y2 = *ppy2[j];
                         const real_t dy1 = y[2] - y[1];
                         const real_t dyn = y[n] - y[nm];
                         y2[1] =  dy1/dx1 - ls_tab[j];
@@ -157,7 +159,7 @@ namespace yocto {
             //==================================================================
             for(size_t j=0;j<ns;++j)
             {
-                array<real_t> &y2 = y2_tab[j];
+                array<real_t> &y2 = *ppy2[j];
                 if( !M.solve(y2) )
                     throw exception("spline::compute(SINGULAR)");
             }
@@ -170,14 +172,14 @@ namespace yocto {
                                    const size_t         ns,
                                    real_t               X,
                                    const array<real_t> &x,
-                                   const array<real_t> *y_tab,
-                                   const array<real_t> *y2_tab,
+                                   const array<real_t> **ppy,
+                                   const array<real_t> **ppy2,
                                    const real_t        *width)
         {
             assert(ns>0);
             assert(Y);
-            assert(y_tab);
-            assert(y2_tab);
+            assert(ppy);
+            assert(ppy2);
             const size_t n   = x.size();
             const real_t xlo = x[1];
             const real_t xup = x[n]; assert(xlo<xup);
@@ -195,12 +197,12 @@ namespace yocto {
             {
                 if( X <= xlo )
                 {
-                    for(size_t j=0;j<ns;++j) { Y[j] = y_tab[j][1]; }
+                    for(size_t j=0;j<ns;++j) { assert(ppy[j]); Y[j] = (*ppy[j])[1]; }
                     return;
                 }
                 if( X >= xup )
                 {
-                    for(size_t j=0;j<ns;++j) { Y[j] = y_tab[j][n]; }
+                    for(size_t j=0;j<ns;++j) { assert(ppy[j]); Y[j] = (*ppy[j])[n]; }
                     return;
                 }
             }
@@ -227,8 +229,10 @@ namespace yocto {
             //return (a * y[klo]) + (b * y[khi]) + ( (a*a*a-a) * y2[klo] + (b*b*b-b) * y2[khi] ) * (h*h) / REAL(6.0);
             for(size_t j=0;j<ns;++j)
             {
-                const array<real_t> &y  =  y_tab[j];
-                const array<real_t> &y2 = y2_tab[j];
+                assert(ppy[j]);
+                assert(ppy2[j]);
+                const array<real_t> &y  =  *ppy[j];
+                const array<real_t> &y2 = *ppy2[j];
                 Y[j] =  (a * y[klo]) + (b * y[khi]) + ( C*y2[klo]+D*y2[khi] ) * H;
             }
         }

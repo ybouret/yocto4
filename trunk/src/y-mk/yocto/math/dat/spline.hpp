@@ -37,8 +37,8 @@ namespace yocto {
             static
             void compute(spline_type     type,
                          const array<T> &x,
-                         const array<T> *y_tab,
-                         array<T>       *y2_tab,
+                         const array<T> **ppy,
+                         array<T>       **ppy2,
                          const T        *ls_tab,
                          const T        *rs_tab,
                          const size_t    ns);
@@ -57,23 +57,25 @@ namespace yocto {
             void eval(T              *Y,
                       const size_t    ns,
                       T               X,
-                      const array<T> &x,
-                      const array<T> *y_tab,
-                      const array<T> *y2_tab,
+                      const array<T>  &x,
+                      const array<T> **ppy,
+                      const array<T> **ppy2,
                       const T        *width);
             
             
             //! 1D helper
             static inline
             void compute(spline_type     type,
-                         const array<T> &x,
-                         const array<T> &y,
-                         array<T>       &y2,
+                         const array<T>  &x,
+                         const array<T>  &y,
+                         array<T>        &y2,
                          const T         left_slope  = 0,
                          const T         right_slope = 0
                          )
             {
-                spline<T>::compute( type, x, &y, &y2, &left_slope, &right_slope, 1);
+                const array<T> *ppy[1]  = { &y };
+                array<T>       *ppy2[1] = { &y2 };
+                spline<T>::compute( type, x, ppy, ppy2, &left_slope, &right_slope, 1);
             }
             
             //! 1D helper
@@ -85,7 +87,9 @@ namespace yocto {
                    const T        *width)
             {
                 T ans = 0;
-                spline<T>::eval( &ans, 1, X, x, &y, &y2, width);
+                const array<T> *ppy[1]  = { &y };
+                const array<T> *ppy2[1] = { &y2 };
+                spline<T>::eval( &ans, 1, X, x, ppy, ppy2, width);
                 return ans;
             }
             
@@ -112,8 +116,14 @@ namespace yocto {
                 assert(P.cols==Q.cols);
                 assert(P.cols>=2);
                 const array<T> *y[2]  = { &P[1], &P[2] };
-                const array<T> *y2[2] = { &Q[1], &Q[2] };
-                compute(type, t, y, y2, &LT.x, &RT.x, 2);
+                array<T>      *y2[2]  = { &Q[1], &Q[2] };
+                spline<T>::compute(type,
+                                   t,
+                                   y,
+                                   y2,
+                                   &LT.x,
+                                   &RT.x,
+                                   2);
             }
             
             
