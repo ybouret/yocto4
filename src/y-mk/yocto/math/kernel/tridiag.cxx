@@ -1,10 +1,11 @@
 #include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/exceptions.hpp"
+#include "yocto/math/kernel/algebra.hpp"
 
-#include <cmath>
-#include <cerrno>
+//#include <cmath>
+//#include <cerrno>
+//#include "yocto/exceptions.hpp"
 
 #include <iostream>
 
@@ -278,6 +279,27 @@ namespace yocto {
             return __tridiag(a, b, c, g, x, r);
         }
         
+        template <>
+        bool tridiag<z_type>:: sherman_morrison(array<z_type>       &x,
+                                                const array<z_type> &U,
+                                                const array<z_type> &V,
+                                                const array<z_type> &R) const throw()
+        {
+            array<z_type> &Y = xx;
+            array<z_type> &Z = rr;
+            if( !__tridiag(a, b, c, g, Z, U) ) return false;
+            if( !__tridiag(a, b, c, g, Y, R) ) return false;
+            const z_type num = algebra<z_type>::dot(V,Y);
+            const z_type den = numeric<z_type>::one +  algebra<z_type>::dot(V,Z);
+            if( Fabs(den) <= REAL_MIN)
+                return false;
+            const z_type fac = num / den;
+            for(size_t i=x.size();i>0;--i)
+            {
+                x[i] = Y[i] - fac * Z[i];
+            }
+            return true;
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
