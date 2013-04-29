@@ -90,8 +90,8 @@ namespace yocto {
                     
                 case spline_periodic:
                     M.b[1] = M.b[n] = (dx1+dxn) / REAL(3.0);
-                    M.c[n] = dxn / REAL(6.0);
-                    M.a[1] = dx1 / REAL(6.0);
+                    M.c[n] = M.a[n] = dxn / REAL(6.0);
+                    M.a[1] = M.c[1] = dx1 / REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
                         const array<real_t> &y   = *ppy[j];
@@ -99,8 +99,10 @@ namespace yocto {
                         const real_t yh  = REAL(0.5) * (y[1]+y[n]); //! regularize...
                         const real_t dy1 = y[2] - yh;
                         const real_t dyn = yh   - y[nm];
-                        y2[n]  = - ( y2[1] = dy1/dx1 - dyn/dxn);
+                        y2[n]  = - ( y2[1] = (dy1/dx1 - dyn/dxn) );
                     }
+                    std::cerr << "Mp=" << M << std::endl;
+                    std::cerr << "Rp0=" <<  *ppy2[0] << std::endl;
                     break;
                     
                 case spline_tangent_left:
@@ -109,7 +111,7 @@ namespace yocto {
                     M.c[1] = dx1/REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
-                        const array<real_t> &y   = *ppy[j];
+                        const array<real_t> &y  = *ppy[j];
                         array<real_t>       &y2 = *ppy2[j];
                         const real_t dy1 = y[2] - y[1];
                         y2[1] = dy1/dx1 - ls_tab[j];
@@ -126,7 +128,7 @@ namespace yocto {
                     {
                         const array<real_t> &y  = *ppy[j];
                         array<real_t>       &y2 = *ppy2[j];
-                        const real_t dyn = y[n] - y[nm];
+                        const real_t        dyn = y[n] - y[nm];
                         y2[n]  = rs_tab[j] - dyn/dxn;
                         y2[1]  = 0;
                     }
@@ -146,7 +148,7 @@ namespace yocto {
                         array<real_t>       &y2 = *ppy2[j];
                         const real_t dy1 = y[2] - y[1];
                         const real_t dyn = y[n] - y[nm];
-                        y2[1] =  dy1/dx1 - ls_tab[j];
+                        y2[1] = dy1/dx1  - ls_tab[j];
                         y2[n] = rs_tab[j] - dyn/dxn;
                     }
                     break;
