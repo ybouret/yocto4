@@ -103,10 +103,63 @@ YOCTO_UNIT_TEST_DONE()
 
 #include "yocto/string/conv.hpp"
 
+typedef v2d<double> vtx;
+#include "yocto/sequence/list.hpp"
+
 YOCTO_UNIT_TEST_IMPL(spline2d)
 {
-    size_t n = 4;
-    if(argc>1) n = strconv::to<size_t>(argv[1],"n");
+    size_t nc = 4;
+    if(argc>1) nc = strconv::to<size_t>(argv[1],"nc");
+    if(nc<2) throw exception("not enough points");
+    
+    vector<double> t(nc,0);
+    vector<vtx>    points(nc+1,as_capacity);
+    vector<double> theta(nc,0);
+    
+    //--------------------------------------------------------------------------
+    // construct angles
+    //--------------------------------------------------------------------------
+    for(size_t i=2;i<=nc;++i)
+    {
+        theta[i] = theta[i-1] + (0.01+alea<double>());
+    }
+    
+    {
+        const double fac = (numeric<double>::two_pi * ( 0.9 + 0.1*alea<double>())) / theta[nc];
+        for(size_t i=2;i<=nc;++i)
+        {
+            theta[i] *= fac;
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // construct points
+    //--------------------------------------------------------------------------
+    const double Rx = 2 * (1+alea<double>());
+    const double Ry = (1+alea<double>());
+    for( size_t i=1; i <=nc; ++i )
+    {
+        vtx v( Rx * Cos(theta[i]), Ry*Sin(theta[i]));
+        points.push_back(v);
+    }
+    
+    for(size_t i=2; i <= nc; ++i )
+    {
+        t[i] = t[i-1] + (points[i] - points[i-1]).norm();
+    }
+    
+    
+    {
+        ios::ocstream fp("path.dat",false);
+        for(size_t i=1; i <= nc; ++i )
+        {
+            fp("%g %g %g\n", t[i], points[i].x, points[i].y);
+        }
+    }
+    
+    spline2D<double> S1(t);
+    S1.load(spline_natural, points.begin() );
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

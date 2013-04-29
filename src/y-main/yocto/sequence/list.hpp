@@ -36,7 +36,7 @@ namespace yocto
 		
 		virtual const char *name() const throw() { return hidden::list_name; }
 		virtual void   free() throw() { while(list_.size>0) keep( list_.pop_back() ); }
-		virtual void   release() throw() { this->kill(); }
+		virtual void   release() throw() { kill(); }
 		virtual size_t size()     const throw()     { return list_.size; }
 		virtual size_t capacity() const throw()     { return pool_.size + list_.size; }		
 		virtual void   push_back( param_type obj )  { list_.push_back( make(obj) ); }
@@ -47,7 +47,8 @@ namespace yocto
 		virtual void   reserve( size_t n ) 
 		{
 			size_t m = 0;
-			try {
+			try
+            {
 				while( n-- > 0 )
 				{
 					pool_.store( node_type::acquire() );
@@ -85,7 +86,8 @@ namespace yocto
 		
 		inline list( size_t n, const as_capacity_t & ) : list_(), pool_()
 		{
-			try {
+			try
+            {
 				while( pool_.size < n ) pool_.store( node_type::acquire() );
 			}
 			catch (...) {
@@ -93,6 +95,20 @@ namespace yocto
 				throw;
 			}
 		}
+        
+        inline list( size_t n, param_type obj) : list_(), pool_()
+        {
+            try
+            {
+                for(size_t i=n;i>0;--i)
+                    list_.push_back( make(obj) );
+            }
+            catch(...)
+            {
+                kill();
+                throw;
+            }
+        }
 		
 		
 		inline list & operator=( const list & other ) 
