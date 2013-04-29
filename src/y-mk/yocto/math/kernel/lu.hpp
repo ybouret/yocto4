@@ -32,7 +32,7 @@ namespace yocto
             
 			void release() throw();
 			void ensure( size_t n );
-            
+                        
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(lu);
 			c_array<indx_type> indx;

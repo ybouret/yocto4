@@ -3,6 +3,9 @@
 #include "yocto/math/types.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 
+#include "yocto/math/kernel/lu.hpp"
+#include "yocto/sequence/vector.hpp"
+
 //#include <cmath>
 //#include <cerrno>
 //#include "yocto/exceptions.hpp"
@@ -117,6 +120,51 @@ namespace yocto {
             }
             return true;
         }
+
+        template<>
+        void  tridiag_base<z_type>:: set( matrix<z_type> &M ) const throw()
+        {
+            assert( size() == M.rows );
+            assert( size() == M.cols );
+            const size_t n = size();
+            const tridiag_base<z_type> &self = *this;
+            for(size_t i=n;i>0;--i)
+            {
+                for(size_t j=n;j>0;--j)
+                    M[i][j] = self(i,j);
+            }
+        }
+        
+        template<>
+        void  tridiag_base<z_type>:: add( matrix<z_type> &M ) const throw()
+        {
+            assert( size() == M.rows );
+            assert( size() == M.cols );
+            const size_t n = size();
+            const tridiag_base<z_type> &self = *this;
+            for(size_t i=n;i>0;--i)
+            {
+                for(size_t j=n;j>0;--j)
+                    M[i][j] += self(i,j);
+            }
+        }
+        
+        
+        template<>
+        void  tridiag_base<z_type>:: sub( matrix<z_type> &M ) const throw()
+        {
+            assert( size() == M.rows );
+            assert( size() == M.cols );
+            const size_t n = size();
+            const tridiag_base<z_type> &self = *this;
+            for(size_t i=n;i>0;--i)
+            {
+                for(size_t j=n;j>0;--j)
+                    M[i][j] -= self(i,j);
+            }
+        }
+
+
 
         
         ////////////////////////////////////////////////////////////////////////
@@ -300,6 +348,47 @@ namespace yocto {
             }
             return true;
         }
+        
+        template <>
+        bool tridiag<z_type>:: woodbury( array<z_type>       &x,
+                                        const matrix<z_type> &U,
+                                        const matrix<z_type> &V,
+                                        const array<z_type>  &r ) const
+        {
+            assert(x.size()==size());
+            assert(U.rows==size());
+            assert(V.rows==size());
+            assert(U.cols==V.cols);
+            
+            const size_t p = U.cols;
+            
+            //-- solve auxiliary problems
+            matrix<z_type> Z(U);
+            if( ! solve(Z) )
+                return false;
+            
+            //-- compute the H matrix
+            matrix<z_type> H(p,p);
+            algebra<z_type>::mul_ltrn(H, V, Z);
+            for(size_t i=p;i>0;--i) H[i][i] += numeric<z_type>::one;
+            
+            lu<z_type> LU(p);
+            if( !LU.build(H) )
+                return false;
+            
+            //-- solve the auxiliary problem A.y = r
+            array<z_type>  &y = xx;
+            if( ! __solve(y,r) )
+                return false;
+            
+            //-- apply the woodbury formula
+            vector<z_type> tVy(p,numeric<z_type>::zero);
+            algebra<z_type>::mul_trn(tVy, V, y);
+            LU.solve(H, tVy);
+            algebra<z_type>::mulsub(y, Z, tVy);
+            return true;
+        }
+
         
         ////////////////////////////////////////////////////////////////////////
         //
