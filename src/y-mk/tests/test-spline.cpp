@@ -57,12 +57,7 @@ YOCTO_UNIT_TEST_IMPL(spline)
     spline<double>::compute(spline_tangent_both,  X, Y, Y2[5],0,0);
 
     
-    spline1D<double> S1(spline_natural,      X,Y);
-    spline1D<double> S2(spline_periodic,     X,Y);
-    spline1D<double> S3(spline_tangent_left, X,Y,0,0);
-    spline1D<double> S4(spline_tangent_right,X,Y,0,0);
-    spline1D<double> S5(spline_tangent_both, X,Y,0,0);
-
+   
     
     const size_t np = 200;
     
@@ -99,9 +94,29 @@ YOCTO_UNIT_TEST_IMPL(spline)
             }
             fp("\n");
         }
-        
     }
     
+    {
+        ios::ocstream fp("derivs2.dat",false);
+        for(size_t i=1; i <= nc; ++i )
+        {
+            fp("%g", X[i]);
+            for(size_t j=1; j<=5;++j)
+            {
+                fp(" %g", Y2[j][i]);
+            }
+            fp("\n");
+        }
+    }
+
+    return 0;
+    
+    spline1D<double> S1(spline_natural,      X,Y);
+    spline1D<double> S2(spline_periodic,     X,Y);
+    spline1D<double> S3(spline_tangent_left, X,Y,0,0);
+    spline1D<double> S4(spline_tangent_right,X,Y,0,0);
+    spline1D<double> S5(spline_tangent_both, X,Y,0,0);
+
     {
         ios::ocstream fp("splines_bis.dat",false);
         for( size_t i=0; i<=np;++i)
