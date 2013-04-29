@@ -1,7 +1,8 @@
 #ifndef YOCTO_MATH_DAT_SPLINE_INCLUDED
 #define YOCTO_MATH_DAT_SPLINE_INCLUDED 1
 
-#include "yocto/sequence/lw-arrays.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/math/v2d.hpp"
 
 namespace yocto {
     
@@ -17,8 +18,10 @@ namespace yocto {
         };
         
         template <typename T>
-        struct spline
+        class spline
         {
+        public:
+            virtual ~spline() throw();
             
             //! compute splines' y2
             /**
@@ -40,7 +43,7 @@ namespace yocto {
                          const size_t    ns);
             
             
-            //! simulatneous splines evaluation
+            //! simultaneous splines evaluation
             /**
              \param Y array of values to be computed
              \param ns number of values
@@ -77,7 +80,7 @@ namespace yocto {
             inline T eval(T               X,
                           const array<T> &x,
                           const array<T> &y,
-                          array<T>       &y2,
+                          const array<T> &y2,
                           const T        *width)
             {
                 T ans = 0;
@@ -85,8 +88,36 @@ namespace yocto {
                 return ans;
             }
             
+        protected:
+            explicit spline() throw();
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(spline);
         };
         
+        
+        //! make a spline with own y2
+        template <typename T>
+        class spline1D
+        {
+        public:
+            explicit spline1D(spline_type     t,
+                              const array<T> &X,
+                              const array<T> &Y,
+                              const T        ls=0,
+                              const T        rs=0);
+            
+            virtual ~spline1D() throw() {}
+            
+            T operator()( const T X ) const throw();
+            
+        private:
+            const array<T> &x;
+            const array<T> &y;
+            vector<T>       y2;
+            const T         w;
+            const T        *width;
+        };
         
 	}
     
