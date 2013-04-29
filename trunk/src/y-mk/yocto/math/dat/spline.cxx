@@ -26,6 +26,7 @@ namespace yocto {
             //==================================================================
             // create the system matrix
             //==================================================================
+#if 0
             auto_ptr< tridiag_base<real_t> > pM;
             
             switch( type )
@@ -38,12 +39,13 @@ namespace yocto {
                     pM.reset( new tridiag<real_t>(n) );
                     break;
             }
+            tridiag_base<real_t> &M = *pM;
+#endif
+            tridiag<real_t> M(n);
             
             //==================================================================
             // fill the core matrix
             //==================================================================
-            tridiag_base<real_t> &M = *pM;
-            
             for(size_t i=2;i<n;++i)
             {
                 const size_t im  = i-1;
@@ -94,7 +96,7 @@ namespace yocto {
                     M.a[1] = M.c[1] = dx1 / REAL(6.0);
                     for(size_t j=0;j<ns;++j)
                     {
-                        const array<real_t> &y   = *ppy[j];
+                        const array<real_t> &y  =  *ppy[j];
                         array<real_t>       &y2 = *ppy2[j];
                         const real_t yh  = REAL(0.5) * (y[1]+y[n]); //! regularize...
                         const real_t dy1 = y[2] - yh;

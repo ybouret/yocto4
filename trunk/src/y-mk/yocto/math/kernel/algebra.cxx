@@ -285,6 +285,15 @@ namespace yocto
 				}
 			}
 		}
+        
+        template <>
+        z_type algebra<z_type>:: dot(const array<z_type> &u, const array<z_type> &v) throw()
+        {
+            z_type ans = numeric<z_type>::zero;
+            assert(u.size()==v.size());
+            for(size_t i=u.size();i>0;--i) ans += u[i] * v[i];
+            return ans;
+        }
 		
 	}
     

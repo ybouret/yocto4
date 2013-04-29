@@ -73,6 +73,8 @@ namespace yocto {
             virtual T operator()(size_t i, size_t j) const throw();
             virtual bool __solve( array<T>  &x, const array<T>  &r) const throw();
             
+            bool sherman_morrison( array<T> &x, const array<T> &U, const array<T> &V, const array<T> &r) const throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tridiag);
         };

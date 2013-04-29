@@ -40,6 +40,9 @@ namespace yocto
                 for( size_t i=v.size();i>0;--i) ans += Square( v[i] );
                 return ans;
             }
+            
+            static T dot( const array<T> &u, const array<T> &v ) throw();
+            
 		};
         
         
