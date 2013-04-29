@@ -9,6 +9,7 @@ namespace yocto {
 	
 	namespace math {
         
+        
 		template <>
 		v2d<real_t>:: v2d() throw() : x(0), y(0) {
 		}
@@ -21,6 +22,8 @@ namespace yocto {
 		v2d<real_t>:: v2d( const v2d<real_t> &v ) throw() : x(v.x), y(v.y) {
 		}
 		
+        template<> const v2d<real_t> v2d<real_t>::zero(0,0);
+
 		template <>
 		v2d<real_t>:: v2d( const v2d<real_t> &A, const v2d<real_t> &B ) throw() : x(B.x - A.x), y(B.y-A.y) {
 		}
