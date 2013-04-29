@@ -55,9 +55,9 @@ YOCTO_UNIT_TEST_IMPL(spline)
     
     std::cerr << "spline tangent both..." << std::endl;
     spline<double>::compute(spline_tangent_both,  X, Y, Y2[5],0,0);
-
     
-   
+    
+    
     
     const size_t np = 200;
     
@@ -108,7 +108,7 @@ YOCTO_UNIT_TEST_IMPL(spline)
             fp("\n");
         }
     }
-
+    
     return 0;
     
     spline1D<double> S1(spline_natural,      X,Y);
@@ -116,7 +116,7 @@ YOCTO_UNIT_TEST_IMPL(spline)
     spline1D<double> S3(spline_tangent_left, X,Y,0,0);
     spline1D<double> S4(spline_tangent_right,X,Y,0,0);
     spline1D<double> S5(spline_tangent_both, X,Y,0,0);
-
+    
     {
         ios::ocstream fp("splines_bis.dat",false);
         for( size_t i=0; i<=np;++i)

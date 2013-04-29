@@ -101,8 +101,8 @@ namespace yocto {
                         const real_t dyn = yh   - y[nm];
                         y2[n]  = - ( y2[1] = (dy1/dx1 - dyn/dxn) );
                     }
-                    std::cerr << "Mp=" << M << std::endl;
-                    std::cerr << "Rp0=" <<  *ppy2[0] << std::endl;
+                    //std::cerr << "Mp=" << M << std::endl;
+                    //std::cerr << "Rp0=" <<  *ppy2[0] << std::endl;
                     break;
                     
                 case spline_tangent_left:
@@ -133,6 +133,8 @@ namespace yocto {
                         y2[1]  = 0;
                     }
                     M.b[1] = 1;
+                    std::cerr << "Mr=" << M << std::endl;
+                    std::cerr << "Rr=" << *ppy2[0] << std::endl;
                     break;
                     
                 case spline_tangent_both:
@@ -283,7 +285,7 @@ namespace yocto {
                     const array<real_t> &y2 = *ppy2[j];
                     array<real_t>       &y1 = *ppy1[j];
                     const real_t dy = y[n] - y[nm];
-                    y1[n] = dy/dx + dx * (y2[nm]/REAL(3.0)-y2[n]/REAL(6.0));
+                    y1[n] = dy/dx + dx * (y2[nm]/REAL(6.0)+y2[n]/REAL(3.0));
                 }
             }
 
