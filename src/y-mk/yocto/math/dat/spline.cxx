@@ -23,6 +23,8 @@ namespace yocto {
             assert(ppy2);
             const size_t n = x.size(); assert(n>1);
             
+            if( type != spline_periodic)
+            {
             //==================================================================
             // create the system matrix
             //==================================================================
@@ -76,6 +78,7 @@ namespace yocto {
                     break;
                     
                 case spline_periodic:
+                    throw exception("unhandled !");
                     M.b[1] = M.b[n] = (dx1+dxn) / REAL(3.0);
                     M.c[n] = M.a[n] = dxn / REAL(6.0);
                     M.a[1] = M.c[1] = dx1 / REAL(6.0);
@@ -151,6 +154,61 @@ namespace yocto {
                     throw exception("spline::compute(SINGULAR)");
             }
             
+            }
+            else
+            {
+                // periodic case
+                const size_t     nm = n-1;
+                ctridiag<real_t> M(nm);
+                
+                //-- fill the core
+                for(size_t i=2;i<nm;++i)
+                {
+                    const size_t im  = i-1;
+                    const size_t ip  = i+1;
+                    const real_t xm  = x[im];
+                    const real_t xi  = x[i];
+                    const real_t xp  = x[ip];
+                    
+                    const real_t dxp = xp - xi; assert(dxp>0);
+                    const real_t dxm = xi - xm; assert(dxm>0);
+                    
+                    M.a[i] = dxm/REAL(6.0);
+                    M.b[i] = (xp - xm)/REAL(3.0);
+                    M.c[i] = dxp/REAL(6.0);
+                    for(size_t j=0;j<ns;++j)
+                    {
+                        assert(ppy[j]);
+                        assert(ppy2[j]);
+                        const array<real_t> &y  = *ppy[j];  assert( n == y.size()  );
+                        array<real_t>       &y2 = *ppy2[j]; assert( n == y2.size() );
+                        const real_t yi = y[i];
+                        y2[i]  = (y[ip]-yi)/dxp - (yi-y[im])/dxm;
+                    }
+                }
+                
+                //-- fill the sides
+                const real_t dx1 = x[2] - x[1];
+                const real_t dxn = x[n] - x[nm];
+                M.b[1] = M.b[n-1];
+                //A[1][1]  = A[n][n] = (dx1+dxn)/3;
+                //A[1][2]  = dx1/6;
+                //A[n][nm] = dxn/6;
+                
+                //A[1][nm] = dxn/6;
+                //A[n][2]  = dx1/6;
+                std::cerr << "M=" << M << std::endl;
+                for(size_t j=0;j<ns;++j)
+                {
+                    const array<real_t> &y  =  *ppy[j];
+                    array<real_t>       &y2 = *ppy2[j];
+                    const real_t yh  = REAL(0.5) * (y[1]+y[n]); //! regularize...
+                    const real_t dy1 = y[2] - yh;
+                    const real_t dyn = yh   - y[nm];
+                    y2[n]  = - ( y2[1] = (dy1/dx1 - dyn/dxn) );
+                }
+                std::cerr << "R=" << *ppy2[0] << std::endl;
+            }
             
         }
         

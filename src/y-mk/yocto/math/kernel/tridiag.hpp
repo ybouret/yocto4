@@ -64,7 +64,7 @@ namespace yocto {
             array_type &g;
             array_type &xx;
             array_type &rr;
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tridiag_base);
         };
@@ -118,6 +118,8 @@ namespace yocto {
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(ctridiag);
         };
+        
+        
         
     }
     
