@@ -16,7 +16,6 @@ namespace yocto {
     
     
     vfs::entry:: entry( const string &vfs_path, const vfs &vfs_from ) :
-    //fs( vfs_from ),
     path( vfs_path ),
     cstr( path.c_str()  ),
     base_name( vfs::get_base_name( path ) ),
@@ -31,7 +30,6 @@ namespace yocto {
     
     
     vfs:: entry:: entry( const entry &other ) :
-    //fs( other.fs ),
     path( other.path ),
     cstr( path.c_str() ),
     base_name( vfs::get_base_name( path ) ),
