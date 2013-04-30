@@ -103,30 +103,31 @@ $$
 $$
 \subsection{Periodic}
 We assume that $y_n=y_1$, then
-$$
-	\begin{bmatrix}
-		\dfrac{\left(x_2-x_1\right)+\left(x_n-x_{n-1}\right)}{3} & \dfrac{x_2-x_1}{6} & \cdots &  \dfrac{x_n-x_{n-1}}{6} & 0 \\
-		\cdots & \cdots & \cdots & \cdots & \cdots \\
-		\cdots & \dfrac{x_{j}-x_{j-1}}{6} & \dfrac{x_{j+1}-x_{j-1}}{3} & \dfrac{x_{j+1}-x_{j}}{6} & \cdots\\
-		\cdots & \cdots & \cdots & \cdots & \cdots \\
-		 0 & \dfrac{x_2-x_1}{6} &  & \cdots & \dfrac{x_n-x_{n-1}}{6} & \dfrac{\left(x_2-x_1\right)+\left(x_n-x_{n-1}\right)}{3} \\
-	\end{bmatrix}
-	\begin{bmatrix}
-	y''_1\\
-	\cdots\\
-	y''_j\\
-	\cdots\\
-	y''_n\\
-	\end{bmatrix}
-	=
-	\begin{bmatrix}
-	\dfrac{y_2-y_1}{x_2-x_1}-\dfrac{y_n-y_{n-1}}{x_n-x_{n-1}}\\
-	\cdots\\
-	\dfrac{y_{j+1}-y_{j}}{x_{j+1}-x_{j}} - \dfrac{y_j-y_{j-1}}{x_j-x_{j-1}}\\
-	\cdots\\
-	\dfrac{y_n-y_{n-1}}{x_n-x_{n-1}}-\dfrac{y_2-y_1}{x_2-x_1}\\
-	\end{bmatrix}
-$$
+we must solve a periodic system on $n-1$ points then set $y''_n=y''_1$.
+%$$
+%	\begin{bmatrix}
+%		\dfrac{\left(x_2-x_1\right)+\left(x_n-x_{n-1}\right)}{3} & \dfrac{x_2-x_1}{6} & \cdots &  \dfrac{x_n-x_{n-1}}{6} & 0 \\
+%		\cdots & \cdots & \cdots & \cdots & \cdots \\
+%		\cdots & \dfrac{x_{j}-x_{j-1}}{6} & \dfrac{x_{j+1}-x_{j-1}}{3} & \dfrac{x_{j+1}-x_{j}}{6} & \cdots\\
+%		\cdots & \cdots & \cdots & \cdots & \cdots \\
+%		 0 & \dfrac{x_2-x_1}{6} &  & \cdots & \dfrac{x_n-x_{n-1}}{6} & \dfrac{\left(x_2-x_1\right)+\left(x_n-x_{n-1}\right)}{3} \\
+%	\end{bmatrix}
+%	\begin{bmatrix}
+%	y''_1\\
+%	\cdots\\
+%	y''_j\\
+%	\cdots\\
+%	y''_n\\
+%	\end{bmatrix}
+%	=
+%	\begin{bmatrix}
+%	\dfrac{y_2-y_1}{x_2-x_1}-\dfrac{y_n-y_{n-1}}{x_n-x_{n-1}}\\
+%	\cdots\\
+%	\dfrac{y_{j+1}-y_{j}}{x_{j+1}-x_{j}} - \dfrac{y_j-y_{j-1}}{x_j-x_{j-1}}\\
+%	\cdots\\
+%	\dfrac{y_n-y_{n-1}}{x_n-x_{n-1}}-\dfrac{y_2-y_1}{x_2-x_1}\\
+%	\end{bmatrix}
+%$$
 
 
 \end{document}

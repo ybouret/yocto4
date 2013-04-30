@@ -3,7 +3,7 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_INIT(32)
+YOCTO_UNIT_TEST_INIT(64)
 {
 	YOCTO_UNIT_TEST_DECL(z);
 	YOCTO_UNIT_TEST_DECL(matrix);
