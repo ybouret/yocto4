@@ -2,6 +2,17 @@
 
 namespace yocto {
 	
+    bool vfs::entry:: is_regular()   const throw()
+    {
+        return is_reg == attr;
+    }
+   
+    bool vfs::entry:: is_directory()   const throw()
+    {
+        return is_dir == attr;
+    }
+    
+
     
     
     vfs::entry:: entry( const string &vfs_path, const vfs &vfs_from ) :

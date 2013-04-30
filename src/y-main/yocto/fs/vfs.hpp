@@ -39,6 +39,9 @@ namespace yocto {
             
             typedef functor<bool,TL1(const entry &)> callback;
             
+            bool is_regular()   const throw();
+            bool is_directory() const throw();
+            
         private:
             YOCTO_DISABLE_ASSIGN(entry);
         };
