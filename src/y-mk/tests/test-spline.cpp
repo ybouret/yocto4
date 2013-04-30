@@ -84,7 +84,6 @@ YOCTO_UNIT_TEST_IMPL(spline)
             spline<double>::derivs(Y1[i], X, Y, Y2[i]);
         }
         
-        std::cerr << "Y1=" << Y1 << std::endl;
         for(size_t i=1; i <= nc; ++i )
         {
             fp("%g", X[i]);
@@ -109,7 +108,6 @@ YOCTO_UNIT_TEST_IMPL(spline)
         }
     }
     
-    return 0;
     
     spline1D<double> S1(spline_natural,      X,Y);
     spline1D<double> S2(spline_periodic,     X,Y);
@@ -146,7 +144,7 @@ YOCTO_UNIT_TEST_IMPL(spline2d)
 {
     size_t nc = 4;
     if(argc>1) nc = strconv::to<size_t>(argv[1],"nc");
-    if(nc<2) throw exception("not enough points");
+    if(nc<3) throw exception("not enough points");
     
     vector<double> t(nc,0);
     vector<vtx>    points(nc+1,as_capacity);

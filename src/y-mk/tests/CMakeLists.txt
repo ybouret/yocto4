@@ -35,6 +35,7 @@ ADD_TEST(FFT1     test-mk fft1)
 ADD_TEST(PSD      test-mk psd 12 8 0)
 ADD_TEST(TriDiag  test-mk tridiag)
 ADD_TEST(Spline   test-mk spline)
+ADD_TEST(Spline2D test-mk spline2d)
 
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
