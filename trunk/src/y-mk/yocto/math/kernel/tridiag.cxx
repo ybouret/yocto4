@@ -6,10 +6,6 @@
 #include "yocto/math/kernel/lu.hpp"
 #include "yocto/sequence/vector.hpp"
 
-//#include <cmath>
-//#include <cerrno>
-//#include "yocto/exceptions.hpp"
-
 #include <iostream>
 
 namespace yocto {
@@ -69,8 +65,8 @@ namespace yocto {
         template <>
         void tridiag_base<z_type> :: apply( array<z_type> &v, const array<z_type> &u) const throw()
         {
-            assert(v.size()==size());
-            assert(u.size()==size());
+            assert(v.size()>=size());
+            assert(u.size()>=size());
             const size_t n = size();
             const tridiag_base<z_type> &self = *this;
             for(size_t i=n;i>0;--i)
@@ -86,8 +82,8 @@ namespace yocto {
         template <>
         void tridiag_base<z_type>:: apply( matrix<z_type>  &v, const matrix<z_type>  &u) const throw()
         {
-            assert(size()==v.rows);
-            assert(size()==u.rows);
+            assert(size()>=v.rows);
+            assert(size()>=u.rows);
             assert(u.cols==v.cols);
             const size_t n = size();
             for(size_t k=u.cols;k>0;--k)
@@ -101,7 +97,7 @@ namespace yocto {
         template <>
         bool tridiag_base<z_type>:: solve( array<z_type> &r) const throw()
         {
-            assert(size()==r.size());
+            assert(size()<=r.size());
             for(size_t i=size();i>0;--i) xx[i] = r[i];
             return __solve(r,xx);
         }
@@ -109,7 +105,7 @@ namespace yocto {
         template <>
         bool tridiag_base<z_type>::solve( matrix<z_type> &x) const throw()
         {
-            assert( size() == x.rows );
+            assert( size() <= x.rows );
             assert(x.cols>0);
             const size_t n = size();
             for(size_t j=x.cols;j>0;--j)
@@ -193,8 +189,8 @@ namespace yocto {
                 assert(b.size()==n);
                 assert(c.size()==n);
                 assert(g.size()==n);
-                assert(u.size()==n);
-                assert(r.size()==n);
+                assert(u.size()>=n);
+                assert(r.size()>=n);
                 
                 z_type piv = b[1];
                 if( Fabs( piv ) <= REAL_MIN )
@@ -322,8 +318,8 @@ namespace yocto {
         template <>
         bool tridiag<z_type>:: __solve( array<z_type> &x, const array<z_type> &r) const throw()
         {
-            assert( size() == x.size() );
-            assert( size() == r.size() );
+            assert( size() <= x.size() );
+            assert( size() <= r.size() );
             return __tridiag(a, b, c, g, x, r);
         }
         
@@ -355,7 +351,8 @@ namespace yocto {
                                         const matrix<z_type> &V,
                                         const array<z_type>  &r ) const
         {
-            assert(x.size()==size());
+            assert(x.size()>=size());
+            assert(r.size()>=size());
             assert(U.rows==size());
             assert(V.rows==size());
             assert(U.cols==V.cols);
@@ -438,8 +435,8 @@ namespace yocto {
         template <>
         bool ctridiag<z_type>:: __solve( array<z_type> &x, const array<z_type> &r) const throw()
         {
-            assert( size() == x.size() );
-            assert( size() == r.size() );
+            assert( size() <= x.size() );
+            assert( size() <= r.size() );
             return __cyclic(a, b, c, g, u, z, bb, x, r);
         }
         
