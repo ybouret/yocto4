@@ -1,0 +1,55 @@
+\documentclass[aps]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+
+
+\begin{document}
+\title{Shapes Fitting}
+
+\section{Settings}
+
+We have a set of $N$ points $\vec{A}_i = (x_i,y_i)$ in the plane.
+
+\section{Fitting to a Circle}
+This is the method of Kasa and Coope.\\
+The algebraic equation of the circle is
+\begin{equation}
+	x^2+y^2 = ax+by+c
+\end{equation}
+with $z = x^2+y^2$, we have the multilinear regression problem
+\begin{equation}
+	z = ax+by+c
+\end{equation}
+with provides
+\begin{equation}
+	\begin{bmatrix}
+	\sum x_i^2 & \sum x_iy_i & \sum x_i\\
+	\sum x_iy_i & \sum y_i^2 & \sum y_i\\
+	\sum x_i    & \sum y_i & N \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	a\\
+	b\\
+	c\\
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	\sum z_i x_i\\
+	\sum z_i y_i\\
+	\sum z_i\\
+	\end{bmatrix}
+\end{equation}
+
+\end{document}
