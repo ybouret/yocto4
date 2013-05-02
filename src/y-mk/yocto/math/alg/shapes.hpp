@@ -2,8 +2,8 @@
 #define YOCTO_MATH_ALG_SHAPES_INCLUDED 1
 
 #include "yocto/math/v2d.hpp"
-#include "yocto/math/kernel/lu.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/math/kernel/matrix.hpp"
 
 namespace yocto
 {
@@ -43,8 +43,9 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_circle);
             matrix<T> S;
             vector<T> Q;
-            lu<T>     LU;
-            
+            vector<T> W;
+            matrix<T> V;
+            vector<T> A;
         };
         
         
