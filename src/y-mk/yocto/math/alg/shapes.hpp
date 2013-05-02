@@ -43,33 +43,33 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_circle);
             matrix<T> S;
             vector<T> Q;
-            vector<T> W;
-            matrix<T> V;
-            vector<T> A;
+            vector<T> W; // for SVD build
+            matrix<T> V; // for SVD build
+            vector<T> A; // for SVD solve
         };
         
         
-#if 0
         template <typename T>
-        class ellipse
+        class fit_ellipse : public fit_shape<T>
         {
         public:
-            explicit ellipse();
-            virtual ~ellipse() throw();
+            explicit fit_ellipse();
+            virtual ~fit_ellipse() throw();
             
             void reset() throw();
             
             void append( T x, T y ) throw();
             
-            inline const matrix<T> &__S() const throw() { return S; }
-            inline const matrix<T> &__C() const throw() { return C; }
+            
+            bool solve();
             
         private:
-            matrix<T> S;
+            matrix<T> Sqq;
+            matrix<T> Sqz;
+            matrix<T> Szz;
             matrix<T> C;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(ellipse);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(fit_ellipse);
         };
-#endif
         
     }
 }
