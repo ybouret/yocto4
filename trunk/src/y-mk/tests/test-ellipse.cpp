@@ -4,6 +4,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -16,6 +17,8 @@ YOCTO_UNIT_TEST_IMPL(ellipse)
         n = strconv::to<size_t>(argv[1],"n");
     
     ellipse<double> ell;
+    vector<double>  vx;
+    vector<double>  vy;
     
     const double a = 4 + 2*alea<double>();
     const double b = 1.5 + alea<double>();
@@ -35,9 +38,13 @@ YOCTO_UNIT_TEST_IMPL(ellipse)
             const double y     = 0.1 + X*SinPhi + Y*CosPhi;
             fp("%g %g\n", x, y);
             ell.append(x,y);
+            vx.push_back(x);
+            vy.push_back(y);
         }
     }
+    std::cerr << "x=" << vx << std::endl;
+    std::cerr << "y=" << vy << std::endl;
     std::cerr << "S=" << ell.__S() << std::endl;
-    
+    std::cerr << "C=" << ell.__C() << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
