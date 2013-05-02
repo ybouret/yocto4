@@ -10,9 +10,11 @@ namespace yocto
         
         template <>
         ellipse<real_t>:: ellipse() :
-        S(6,6)
+        S(6,6),
+        C(6,6)
         {
-            
+            C[1][3] = C[3][1] = 2;
+            C[2][2] = -1;
         }
         
         template <>
