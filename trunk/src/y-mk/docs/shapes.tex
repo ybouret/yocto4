@@ -9,7 +9,8 @@
 
 %% concentration notations
 \newcommand{\mymat}[1]{\boldsymbol{#1}}
-\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+%\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\mytrn}[1]{~^{\mathsf{t}}\!{#1}}
 \newcommand{\myvec}[1]{\overrightarrow{#1}}
 \newcommand{\mygrad}{\vec{\nabla}}
 \newcommand{\myhess}{\mathcal{H}}
@@ -34,6 +35,7 @@ with $z = x^2+y^2$, we have the multilinear regression problem
 \end{equation}
 with provides
 \begin{equation}
+	\label{eq:circ}
 	\begin{bmatrix}
 	\sum x_i^2 & \sum x_iy_i & \sum x_i\\
 	\sum x_iy_i & \sum y_i^2 & \sum y_i\\
@@ -51,5 +53,116 @@ with provides
 	\sum z_i\\
 	\end{bmatrix}
 \end{equation}
+Solving \eqref{eq:circ} yields
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	x_c & = & \sfrac{a}{2}\\
+	y_c & = & \sfrac{b}{2}\\
+	r^2 & = & {c}+x_c^2+y_c^2\\
+	\end{array}
+	\right.
+\end{equation}
+
+\section{Fitting to an Ellipse}
+An algebraic equation is
+\begin{equation}
+\label{eq:ell_alg}
+	a\,x^2+b\,xy+c\,y^2 + d\,x+e\,y+f = 0
+\end{equation}
+which requires some constraints on $a,b,c$ to be unique.
+Let us define 
+\begin{equation}
+	\vec{A} = 
+	\begin{pmatrix}
+	a\\
+	b\\
+	c\\
+	\end{pmatrix},\;
+	\vec{B} = 
+	\begin{pmatrix}
+	d\\
+	e\\
+	f\\
+	\end{pmatrix},\;
+	\vec{Q} =
+	\begin{pmatrix}
+	x^2\\
+	xy\\
+	y^2\\
+	\end{pmatrix},\;
+	\vec{Z} =
+	\begin{pmatrix}
+	x\\
+	y\\
+	1\\
+	\end{pmatrix}.
+\end{equation}
+The equation \eqref{eq:ell_alg} becomes
+\begin{equation}
+	\vec{A}.\vec{Q} + \vec{B}.\vec{Z} = 0
+\end{equation}
+We want to minimize
+\begin{align}
+	F^2\left(\vec{A},\vec{B}\right) & = \sum_{i=1}^N \left(\vec{A}.\vec{Q}_i + \vec{B}.\vec{Z}_i\right)^2\\
+	& =  \sum_{i=1}^N \left\lbrack
+	\left(\vec{A}.\vec{Q}_i\right)^2 + 2 \left(\vec{A}.\vec{Q}_i\right)\left(\vec{B}.\vec{Z}_i\right) + \left(\vec{B}.\vec{Z}_i\right)^2
+	\right\rbrack\\
+	& = \vec{A}.\left(\sum_i \vec{Q}_i\otimes\vec{Q}_i\right).\vec{A} +
+	 2 \vec{A}.\left(\sum_i \vec{Q}_i\otimes\vec{Z}_i\right).\vec{B} + \vec{B}.\left(\sum_i \vec{Z}_i\otimes\vec{Z}_i\right)\vec{B}.\\
+\end{align}
+We define the $3\times3$ matrices
+\begin{equation}
+	\mymat{S}_{qq} =  \vec{Q}_i\otimes\vec{Q}_i,\;\;\mymat{S}_{qz}=\vec{Q}_i\otimes\vec{Z}_i,\;\;\mymat{S}_{zz}=\vec{Z}_i\otimes\vec{Z}_i.
+\end{equation}
+Let us minimize $F^2$ under the quadratic constraint
+\begin{equation}
+	\label{eq:C}
+	\vec{A}\mymat{C}\vec{A} = 1
+\end{equation}
+by setting
+\begin{equation}
+	L\left(\vec{A},\vec{B}\right) = F^2\left(\vec{A},\vec{B}\right) - \lambda \left( \vec{A}.\mymat{C}.\vec{A} - 1\right).
+\end{equation}
+We obtain the set of equations
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	\mymat{S}_{qq}\vec{A} + \mymat{S}_{qz}\vec{B} & = & \lambda \mymat{C} \vec{A} \\
+	\mytrn{\mymat{S}}_{qz}\vec{A} + \mymat{S}_{zz}\vec{B} & = & \vec{0}\\
+	\end{array}
+	\right.
+\end{equation}
+The solution are
+\begin{equation}
+	\vec{B} = -\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\vec{A}
+\end{equation}
+and
+\begin{equation}
+	\left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\right) \vec{A} = \lambda \mymat{C}\vec{A}.
+\end{equation}
+If we assume that $\mymat{C}$ is invertible then we define
+\begin{equation}
+	\mymat{M} = \mymat{C}^{-1} \left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\right)
+\end{equation}
+
+Consequently
+\begin{equation}
+	\lambda \in \mathsf{Spec}\left( M \right)
+\end{equation}
+and the acceptable eigenvectors $\vec{U}$ must verify
+\begin{equation}
+	\vec{U}\mymat{C}\vec{U}>0.
+\end{equation}
+If $\vec{U}$ is an acceptable eigenvector, then a solution $\vec{A}$ is 
+\begin{equation}
+	\vec{A} = \dfrac{1}{\sqrt{\vec{U}\mymat{C}\vec{U}}} \vec{U}
+\end{equation}
+
+If $\vec{A}$ is a solution then
+\begin{equation}
+	\vec{F}^2 = \vec{A} \left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\right) \vec{A} = \lambda
+\end{equation}
+so that $\vec{A}$ is computed from the acceptable eigenvector with the smallest eigenvalue...
 
 \end{document}

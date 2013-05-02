@@ -60,14 +60,26 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
         std::cerr << "Singular Distribution" << std::endl;
     
     
-#if 0
-    ellipse<double> ell;
-    vector<double>  vx;
-    vector<double>  vy;
+
     
-    const double a = 4 + 2*alea<double>();
-    const double b = 1.5 + alea<double>();
-    const double phi =  alea<double>() * numeric<double>::two_pi;
+}
+YOCTO_UNIT_TEST_DONE()
+
+
+YOCTO_UNIT_TEST_IMPL(fit_ellipse)
+{
+    size_t n = 10;
+    if(argc>1)
+        n = strconv::to<size_t>(argv[1],"n");
+
+    fit_ellipse<double> ell;
+    
+    const double Xc = 10 + (alea<double>() - 0.5) * 20;
+    const double Yc = 10 + (alea<double>() - 0.5) * 20;
+
+    const double Ra     = 4 + 2*alea<double>();
+    const double Rb     = 1.5 + alea<double>();
+    const double phi    =  alea<double>() * numeric<double>::two_pi;
     const double CosPhi = Cos(phi);
     const double SinPhi = Sin(phi);
     
@@ -77,21 +89,19 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
         for( size_t i=1; i <= n; ++i )
         {
             const double theta = alea<double>() * numeric<double>::two_pi;
-            const double X     = a * Cos(theta);
-            const double Y     = b * Sin(theta);
-            const double x     = 0.2 + X*CosPhi - Y*SinPhi;
-            const double y     = 0.1 + X*SinPhi + Y*CosPhi;
+            const double X     = Ra * Cos(theta);
+            const double Y     = Rb * Sin(theta);
+            const double x     = Xc + X*CosPhi - Y*SinPhi;
+            const double y     = Yc + X*SinPhi + Y*CosPhi;
             fp("%g %g\n", x, y);
             ell.append(x,y);
-            vx.push_back(x);
-            vy.push_back(y);
         }
     }
-    std::cerr << "x=" << vx << std::endl;
-    std::cerr << "y=" << vy << std::endl;
-    std::cerr << "S=" << ell.__S() << std::endl;
-    std::cerr << "C=" << ell.__C() << std::endl;
-#endif
+    //std::cerr << "S=" << ell.__S() << std::endl;
+    //std::cerr << "C=" << ell.__C() << std::endl;
+    ell.solve();
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+

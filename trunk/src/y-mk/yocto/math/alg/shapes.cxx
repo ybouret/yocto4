@@ -3,6 +3,7 @@
 #include "yocto/math/types.hpp"
 
 #include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/kernel/algebra.hpp"
 
 namespace yocto
 {
@@ -100,38 +101,64 @@ namespace yocto
             return ans;
         }
         
-#if 0
         template <>
-        ellipse<real_t>:: ~ellipse() throw() {}
+        fit_ellipse<real_t>:: ~fit_ellipse() throw() {}
         
         template <>
-        ellipse<real_t>:: ellipse() :
-        S(6,6),
-        C(6,6)
+        fit_ellipse<real_t>:: fit_ellipse() :
+        Sqq(3,3),
+        Sqz(3,3),
+        Szz(3,3),
+        C(3,3)
         {
-            C[1][3] = C[3][1] = 2;
+            C.ld1();
+            C.ldz();
             C[2][2] = -1;
+            C[1][3] = 2;
+            C[3][1] = 2;
         }
         
         template <>
-        void ellipse<real_t>:: reset() throw()
+        void fit_ellipse<real_t>:: reset() throw()
         {
-            S.ldz();
+            Sqq.ldz();
+            Sqz.ldz();
+            Szz.ldz();
         }
         
         template <>
-        void ellipse<real_t>::append( real_t x, real_t y) throw()
+        void fit_ellipse<real_t>::append( real_t x, real_t y) throw()
         {
-            const real_t  z[6] = { x*x, x*y, y*y, x, y , 1};
+            const real_t  q[3] = { x*x, x*y, y*y };
+            const real_t  z[3] = {   x,   y,   1 };
             const real_t *Z=z-1;
+            const real_t *Q=q-1;
             
-            for(size_t i=1; i <=6; ++i )
+            for(size_t i=1; i <=3; ++i )
             {
-                for(size_t j=1; j<= 6; ++j)
-                    S[i][j] += Z[i] * Z[j];
+                for(size_t j=1; j<= 3; ++j)
+                {
+                    Sqq[i][j] += Q[i] * Q[j];
+                    Sqz[i][j] += Q[i] * Z[j];
+                    Szz[i][j] += Z[i] * Z[j];
+                }
             }
         }
-#endif
+        
+        template <>
+        bool fit_ellipse<real_t>:: solve()
+        {
+            std::cerr << "Sqq=" << Sqq << std::endl;
+            std::cerr << "Sqz=" << Sqz << std::endl;
+            std::cerr << "Szz=" << Szz << std::endl;
+            std::cerr << "beta=-inv(Szz)*(Sqz')" << std::endl;
+            std::cerr << "S=Sqq+Sqz*beta" << std::endl;
+            std::cerr << "C=" << C << std::endl;
+            std::cerr << "M=inv(C)*S" << std::endl;
+            std::cerr << "[gevec,geval]=eig(M)" << std::endl;
+            std::cerr << "function [val] = F(A,B) val=A'*" << Sqq << "*A + 2 * A'*" << Sqz << "*B + B'*" << Szz << "*B; endfunction" << std::endl;
+            return true;
+        }
         
     }
     
