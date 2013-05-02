@@ -28,7 +28,9 @@ namespace yocto
         fit_circle<real_t>:: fit_circle() :
         S(3,3),
         Q(3,numeric<real_t>::zero),
-        LU(3)
+        W(3,numeric<real_t>::zero),
+        V(3,3),
+        A(3,numeric<real_t>::zero)
         {
             
         }
@@ -49,7 +51,7 @@ namespace yocto
             const real_t z  = x2+y2;
             S[1][1] += x2;
             S[2][2] += y2;
-           
+            
             S[1][2] += xy;
             S[2][1]  = S[1][2];
             
@@ -72,21 +74,26 @@ namespace yocto
         {
             bool ans = false;
             R = C.x = C.y  = 0;
-            if( LU.build(S) )
+            if( svd<real_t>::build(S, W, V) )
             {
-                ans = true;
-                //==============================================================
-                // solve
-                //==============================================================
-                LU.solve(S,Q);
-                std::cerr << "A=" << Q << std::endl;
-                //==============================================================
-                // deduce parameters
-                //==============================================================
-                C.x = Q[1]/2;
-                C.y = Q[2]/2;
-                const real_t R2 = Q[3] + C.norm2();
-                R = R2 > 0 ? Sqrt(R2) : 0;
+                if(!svd<real_t>:: truncate(W, numeric<real_t>::ftol ) )
+                {
+                    ans = true;
+                    //==============================================================
+                    // solve
+                    //==============================================================
+                    //std::cerr << "W=" << W << std::endl;
+                    svd<real_t>::solve(S, W, V, Q, A);
+                    //std::cerr << "A=" << A << std::endl;
+                    
+                    //==============================================================
+                    // deduce parameters
+                    //==============================================================
+                    C.x = A[1]/2;
+                    C.y = A[2]/2;
+                    const real_t R2 = A[3] + C.norm2();
+                    R = R2 > 0 ? Sqrt(R2) : 0;
+                }
             }
             
             reset();
