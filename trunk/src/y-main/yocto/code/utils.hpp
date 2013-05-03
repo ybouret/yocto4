@@ -23,8 +23,7 @@ namespace yocto
     {
         return a < 0 ? -1 : (  0 < a ? 1 : 0 );
     }
-    
-    
+       
 	template <typename T>
 	inline T clamp( T amin, T a, T amax )
 	{
