@@ -18,7 +18,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         template <>
-        void diag<real_t>:: balance( matrix<real_t> &a ) throw()
+        void diag<real_t>:: HessenbergBalance( matrix<real_t> &a ) throw()
         {
             static const real_t RADIX = REAL(2.0);
             
@@ -74,7 +74,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         template <>
-        void diag<real_t>:: Hessenberg( matrix<real_t> &a ) throw()
+        void diag<real_t>:: HessenbergReduce( matrix<real_t> &a ) throw()
         {
             assert( a.is_square() );
             const size_t n = a.rows;
@@ -126,12 +126,11 @@ namespace yocto
             }
         }
         
-#define __CHECK_ROW(I) assert((I)>=1); assert((I)<=n)
         
         template <>
-        void diag<real_t>:: eigenvalues(matrix<real_t> &a,
-                                        array<real_t>  &wr,
-                                        array<real_t>  &wi)
+        void diag<real_t>:: HessenbergQR(matrix<real_t> &a,
+                                         array<real_t>  &wr,
+                                         array<real_t>  &wi)
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
