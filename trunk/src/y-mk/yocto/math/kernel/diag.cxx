@@ -4,7 +4,7 @@
 #include "yocto/code/swap.hpp"
 #include "yocto/code/utils.hpp"
 
-#include "yocto/exception.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -129,10 +129,15 @@ namespace yocto
         }
         
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Hessenberg QR for eigenvalues
+        //
+        ////////////////////////////////////////////////////////////////////////
         template <>
         bool diag<real_t>:: HessenbergQR(matrix<real_t> &a,
                                          array<real_t>  &wr,
-                                         array<real_t>  &wi) throw()
+                                         array<real_t>  &wi) 
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
@@ -141,6 +146,7 @@ namespace yocto
             
             ptrdiff_t nn,m,l,k,j,i,mmin;
             real_t    z,y,x,w,v,u,t,s,r,q,p,anorm;
+            //vector<int> flag(n,0);
             
             anorm=0;
             for (i=1;i<=n;i++)
@@ -156,7 +162,7 @@ namespace yocto
                     for (l=nn;l>=2;l--)
                     {
                         s=Fabs(a[l-1][l-1])+Fabs(a[l][l]);
-                        if (s <= 0.0)
+                        if (s <= 0)
                             s=anorm;
                         if ((real_t)(Fabs(a[l][l-1]) + s) == s)
                             break;
@@ -186,7 +192,8 @@ namespace yocto
                                     wr[nn]=x-w/z;
                                 wi[nn-1]=wi[nn]=0;
                             }
-                            else {
+                            else
+                            {
                                 wr[nn-1]=wr[nn]=x+p;
                                 wi[nn-1]= -(wi[nn]=z);
                             }
@@ -270,7 +277,7 @@ namespace yocto
                                             a[k+2][j] -= p*z;
                                         }
                                         a[k+1][j] -= p*y;
-                                        a[k][j] -= p*x;
+                                        a[k][j]   -= p*x;
                                     }
                                     mmin = nn<k+3 ? nn : k+3;
                                     for (i=l;i<=mmin;i++)
@@ -289,6 +296,7 @@ namespace yocto
                     }
                 } while (l < nn-1);
             }
+            //std::cerr << "flag=" << flag << std::endl;
             return true;
         }
         
