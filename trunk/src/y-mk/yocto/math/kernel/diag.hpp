@@ -9,6 +9,19 @@ namespace yocto
     namespace math
     {
         
+#if 0
+        template <typename T>
+        class eigenvalue
+        {
+        public:
+            T    re;
+            T    im;
+            bool is_real;
+            
+            
+        };
+#endif
+        
         template <typename T>
         struct diag
         {
@@ -36,7 +49,7 @@ namespace yocto
             bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi ) throw();
             
             static inline
-            bool eigenvalues( matrix<T> &a, array<T> &wr, array<T> &wi ) throw()
+            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi ) throw()
             {
                 HessenbergBalance(a);
                 HessenbergReduce(a);

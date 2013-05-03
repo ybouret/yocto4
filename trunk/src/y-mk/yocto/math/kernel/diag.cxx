@@ -24,7 +24,6 @@ namespace yocto
             
             assert( a.is_square() );
             const size_t n = a.rows;
-            real_t s,r,g,f,c;
             
             const real_t sqrdx=RADIX*RADIX;
             size_t last=0;
@@ -33,18 +32,18 @@ namespace yocto
                 last=1;
                 for(size_t i=1;i<=n;i++)
                 {
-                    r=c=0.0;
+                    real_t r=0,c=0;
                     for (size_t j=1;j<=n;j++)
                         if (j != i)
                         {
                             c += Fabs(a[j][i]);
                             r += Fabs(a[i][j]);
                         }
-                    if (c && r)
+                    if(c>0 && r>0)
                     {
-                        g=r/RADIX;
-                        f=1.0;
-                        s=c+r;
+                        real_t g=r/RADIX;
+                        real_t f=REAL(1.0);
+                        real_t s=c+r;
                         while (c<g)
                         {
                             f *= RADIX;
@@ -56,10 +55,10 @@ namespace yocto
                             f /= RADIX;
                             c /= sqrdx;
                         }
-                        if( (c+r)/f < 0.95*s)
+                        if( (c+r)/f < REAL(0.95)*s)
                         {
                             last=0;
-                            g=1.0/f;
+                            g=REAL(1.0)/f;
                             for(size_t j=1;j<=n;j++) a[i][j] *= g;
                             for(size_t j=1;j<=n;j++) a[j][i] *= f;
                         }
@@ -118,7 +117,10 @@ namespace yocto
                     }
                 }
             }
-            // clean up to th exat Hessenberg form
+            
+            //==================================================================
+            // clean up to the exact Hessenberg form
+            //==================================================================
             for(size_t j=n;j>0;--j)
             {
                 for(size_t i=j+2;i<=n;++i)
@@ -146,10 +148,11 @@ namespace yocto
                     anorm += Fabs(a[i][j]);
             nn=n;
             t=0;
-            while (nn >= 1)
+            while(nn>=1)
             {
                 unsigned its=0;
-                do {
+                do
+                {
                     for (l=nn;l>=2;l--)
                     {
                         s=Fabs(a[l-1][l-1])+Fabs(a[l][l]);
@@ -162,7 +165,8 @@ namespace yocto
                     if (l == nn)
                     {
                         wr[nn]=x+t;
-                        wi[nn--]=0.0;
+                        wi[nn]=0;
+                        --nn;
                     }
                     else
                     {
