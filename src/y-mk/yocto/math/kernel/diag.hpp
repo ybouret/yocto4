@@ -9,18 +9,6 @@ namespace yocto
     namespace math
     {
         
-#if 0
-        template <typename T>
-        class eigenvalue
-        {
-        public:
-            T    re;
-            T    im;
-            bool is_real;
-            
-            
-        };
-#endif
         
         template <typename T>
         struct diag
@@ -46,10 +34,10 @@ namespace yocto
              \param a a real matrix reduced to its Hessenberg form: destructed !
              */
             static
-            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi ) throw();
+            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi );
             
             static inline
-            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi ) throw()
+            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi )
             {
                 HessenbergBalance(a);
                 HessenbergReduce(a);
