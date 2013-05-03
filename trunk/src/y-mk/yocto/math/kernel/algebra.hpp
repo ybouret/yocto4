@@ -42,6 +42,7 @@ namespace yocto
             }
             
             static T dot( const array<T> &u, const array<T> &v ) throw();
+            static void normalize( array<T> &v );
             
 		};
         

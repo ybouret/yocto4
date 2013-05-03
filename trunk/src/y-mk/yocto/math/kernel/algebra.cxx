@@ -295,6 +295,20 @@ namespace yocto
             return ans;
         }
 		
+        template <>
+        void algebra<z_type>::  normalize( array<z_type> &v )
+        {
+            real_t       sum2 = 0;
+            const size_t n    = v.size();
+            for( size_t i=n;i>0;--i) sum2 += Square( v[i] );
+            if(sum2>0)
+            {
+                const real_t fac = REAL(1.0)/Sqrt(sum2);
+                for(size_t i=n;i>0;--i) v[i] *= fac;
+                return;
+            }
+            
+        }
 	}
     
 }
