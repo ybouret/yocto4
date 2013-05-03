@@ -3,19 +3,22 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 
+#include <typeinfo>
+
 using namespace yocto;
 using namespace math;
 
 
-
-YOCTO_UNIT_TEST_IMPL(diag)
+template <typename T>
+static inline
+void test_diag()
 {
-    
+    std::cerr << "Testing for <" << typeid(T).name() << ">" << std::endl;
     
     for(size_t iter=1; iter <= 10; ++iter )
     {
         const size_t   n = 1 + alea_lt(10);
-        matrix<double> a(n,n);
+        matrix<T> a(n,n);
         
         for(size_t i=1; i<=n; ++i )
         {
@@ -25,15 +28,23 @@ YOCTO_UNIT_TEST_IMPL(diag)
             }
         }
         std::cerr << "a=" << a << std::endl;
-        diag<double>::balance(a);
+        diag<T>::HessenbergBalance(a);
         std::cerr << "b=" << a << std::endl;
-        diag<double>::Hessenberg(a);
+        diag<T>::HessenbergReduce(a);
         std::cerr << "c=" << a << std::endl;
-        vector<double> wr(n,0);
-        vector<double> wi(n,0);
-        diag<double>::eigenvalues(a, wr,wi);
+        vector<T> wr(n,0);
+        vector<T> wi(n,0);
+        diag<T>::HessenbergQR(a, wr,wi);
         std::cerr << "wr=" << wr << std::endl;
         std::cerr << "wi=" << wi << std::endl;
     }
+    
+}
+
+YOCTO_UNIT_TEST_IMPL(diag)
+{
+    test_diag<double>();
+    test_diag<float>();
+
 }
 YOCTO_UNIT_TEST_DONE()

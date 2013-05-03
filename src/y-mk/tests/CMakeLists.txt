@@ -36,6 +36,7 @@ ADD_TEST(PSD      test-mk psd 12 8 0)
 ADD_TEST(TriDiag  test-mk tridiag)
 ADD_TEST(Spline   test-mk spline)
 ADD_TEST(Spline2D test-mk spline2d)
+ADD_TEST(Diag     test-mk diag)
 ADD_TEST(FitCirc  test-mk fit_circle 10)
 ADD_TEST(FitEll   test-mk fit_ellipse 10)
 
