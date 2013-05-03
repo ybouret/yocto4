@@ -27,7 +27,7 @@ namespace yocto
             
             //! find the eigen values
             /**
-             \param a a real matrix reduced to its Hessenberg form.
+             \param a a real matrix reduced to its Hessenberg form: destructed !
              */
             static void eigenvalues( matrix<T> &a, array<T> &wr, array<T> &wi );
             

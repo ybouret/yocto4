@@ -11,10 +11,12 @@ using namespace math;
 YOCTO_UNIT_TEST_IMPL(diag)
 {
     
-    matrix<double> a(4,4);
-    const size_t   n = a.rows;
+    
     for(size_t iter=1; iter <= 10; ++iter )
     {
+        const size_t   n = 1 + alea_lt(10);
+        matrix<double> a(n,n);
+        
         for(size_t i=1; i<=n; ++i )
         {
             for(size_t j=1; j<=n;++j)
