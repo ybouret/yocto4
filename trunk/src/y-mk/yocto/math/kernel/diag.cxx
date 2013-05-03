@@ -128,9 +128,9 @@ namespace yocto
         
         
         template <>
-        void diag<real_t>:: HessenbergQR(matrix<real_t> &a,
+        bool diag<real_t>:: HessenbergQR(matrix<real_t> &a,
                                          array<real_t>  &wr,
-                                         array<real_t>  &wi)
+                                         array<real_t>  &wi) throw()
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
@@ -191,7 +191,7 @@ namespace yocto
                         else
                         {
                             if (its == 30)
-                                throw exception("Too many iterations in hqr");
+                                return false;
                             if (0 == (its%10) )
                             {
                                 t += x;
@@ -285,6 +285,7 @@ namespace yocto
                     }
                 } while (l < nn-1);
             }
+            return true;
         }
         
     }
