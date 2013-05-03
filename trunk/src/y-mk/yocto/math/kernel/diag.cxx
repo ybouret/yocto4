@@ -156,8 +156,10 @@ namespace yocto
                 its=0;
                 do
                 {
+                    
                     for (l=nn;l>=2;l--)
                     {
+                        std::cerr << "\tl=" << l << std::endl;
                         __CHECK_ROW(l-1);
                         __CHECK_ROW(l);
                         s=Fabs(a[l-1][l-1])+Fabs(a[l][l]);
@@ -169,11 +171,14 @@ namespace yocto
                             break;
                         }
                     }
+                    std::cerr << "\t->l=" << l << "/nn=" << nn << std::endl;
+                    __CHECK_ROW(nn);
                     x=a[nn][nn];
                     if (l == nn)
                     {
                         wr[nn]=x+t;
-                        wi[nn--]=0.0;
+                        wi[nn]=0.0;
+                        --nn;
                     }
                     else
                     {
@@ -200,7 +205,9 @@ namespace yocto
                                 wi[nn-1]= -(wi[nn]=z);
                             }
                             nn -= 2;
-                        } else {
+                        }
+                        else
+                        {
                             if (its == 30) throw exception("Too many iterations in hqr");
                             if (its == 10 || its == 20)
                             {
