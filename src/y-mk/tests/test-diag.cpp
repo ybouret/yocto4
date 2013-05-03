@@ -30,7 +30,7 @@ void test_diag()
         std::cerr << "a=" << a << std::endl;
         vector<T> wr(n,0);
         vector<T> wi(n,0);
-        if( diag<T>::eigenvalues(a, wr,wi) )
+        if( diag<T>::eig(a, wr,wi) )
         {
             std::cerr << "wr=" << wr << std::endl;
             std::cerr << "wi=" << wi << std::endl;
