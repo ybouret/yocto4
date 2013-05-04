@@ -9,6 +9,11 @@ namespace yocto
     namespace math
     {
         
+        struct eigen
+        {
+            static const int is_real = 0;
+            static const int is_cplx = 1;
+        };
         
         template <typename T>
         struct diag
@@ -34,14 +39,14 @@ namespace yocto
              \param a a real matrix reduced to its Hessenberg form: destructed !
              */
             static
-            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi );
+            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag );
             
             static inline
-            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi )
+            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag )
             {
                 HessenbergBalance(a);
                 HessenbergReduce(a);
-                return HessenbergQR(a, wr, wi);
+                return HessenbergQR(a, wr, wi, flag);
             }
         };
     }

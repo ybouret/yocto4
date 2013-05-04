@@ -137,16 +137,17 @@ namespace yocto
         template <>
         bool diag<real_t>:: HessenbergQR(matrix<real_t> &a,
                                          array<real_t>  &wr,
-                                         array<real_t>  &wi) 
+                                         array<real_t>  &wi,
+                                         array<int>     &flag)
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
-            assert( wr.size() >= n );
-            assert( wi.size() >= n );
+            assert( wr.size()   >= n );
+            assert( wi.size()   >= n );
+            assert( flag.size() >= n );
             
             ptrdiff_t nn,m,l,k,j,i,mmin;
             real_t    z,y,x,w,v,u,t,s,r,q,p,anorm;
-            //vector<int> flag(n,0);
             
             anorm=0;
             for (i=1;i<=n;i++)
@@ -172,6 +173,7 @@ namespace yocto
                     {
                         wr[nn]=x+t;
                         wi[nn]=0;
+                        flag[nn] = eigen::is_real;
                         --nn;
                     }
                     else
@@ -191,11 +193,13 @@ namespace yocto
                                 if( Fabs(z)>0 )
                                     wr[nn]=x-w/z;
                                 wi[nn-1]=wi[nn]=0;
+                                flag[nn-1] = flag[nn] = eigen::is_real;
                             }
                             else
                             {
                                 wr[nn-1]=wr[nn]=x+p;
                                 wi[nn-1]= -(wi[nn]=z);
+                                flag[nn-1] = flag[nn] = eigen::is_cplx;
                             }
                             nn -= 2;
                         }

@@ -28,12 +28,16 @@ void test_diag()
             }
         }
         std::cerr << "a=" << a << std::endl;
-        vector<T> wr(n,0);
-        vector<T> wi(n,0);
-        if( diag<T>::eig(a, wr,wi) )
+        vector<T>   wr(n,0);
+        vector<T>   wi(n,0);
+        vector<int> flag(n,-1);
+        
+        if( diag<T>::eig(a, wr,wi,flag) )
         {
+            std::cerr << "flag=" << flag << std::endl;
             std::cerr << "wr=" << wr << std::endl;
             std::cerr << "wi=" << wi << std::endl;
+            std::cerr << std::endl;
         }
         else
             std::cerr << "Couldn't diag!" << std::endl;
