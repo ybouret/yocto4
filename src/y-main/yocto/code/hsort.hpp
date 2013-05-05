@@ -123,18 +123,23 @@ namespace yocto
 		}
 	}
 	
+    //! default sorting
 	template <typename T>
 	inline void hsort( array<T> &ra ) throw() { hsort( ra, __compare<T> ); }
 	
+    //! default co-sorting
     template <typename T, typename U>
 	inline void co_hsort( array<T> &ra, array<U> &rb ) throw() { hsort( ra, rb, __compare<T> ); }
 	
+    //! C-style sorting
     template<typename T,typename FUNC>
     inline void hsort( T *a, size_t n, FUNC &compare )
     {
         lw_array<T> A(a,n);
         hsort<T,FUNC>(A,compare);
     }
+    
+    //! C-style co-sorting
     template<typename T,typename U,typename FUNC>
     inline void co_hsort( T *a, U *b, size_t n, FUNC &compare )
     {

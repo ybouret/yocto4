@@ -225,5 +225,34 @@ namespace yocto {
 			source.z = target_z;
 		}
 
+        template<>
+        real_t & m3d<real_t>:: operator()( size_t i, size_t j ) throw()
+        {
+            assert(i>=1);
+            assert(i<=3);
+            assert(j>=1);
+            assert(j<=3);
+            real_t *a = &ex.x;
+            --i;
+            --j;
+            return a[i*3+j];
+        }
+        
+        template<>
+        const real_t & m3d<real_t>:: operator()( size_t i, size_t j ) const throw()
+        {
+            assert(i>=1);
+            assert(i<=3);
+            assert(j>=1);
+            assert(j<=3);
+            const real_t *a = &ex.x;
+            --i;
+            --j;
+            return a[i*3+j];
+        }
+
+
+              
+        
 	}
 }
