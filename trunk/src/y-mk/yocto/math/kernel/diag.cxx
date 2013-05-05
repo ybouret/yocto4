@@ -138,7 +138,7 @@ namespace yocto
         bool diag<real_t>:: HessenbergQR(matrix<real_t> &a,
                                          array<real_t>  &wr,
                                          array<real_t>  &wi,
-                                         array<int>     &flag)
+                                         array<int>     &flag) throw()
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
@@ -148,6 +148,7 @@ namespace yocto
             
             ptrdiff_t nn,m,l,k,j,i,mmin;
             real_t    z,y,x,w,v,u,t,s,r,q,p,anorm;
+            
             
             anorm=0;
             for (i=1;i<=n;i++)
@@ -171,9 +172,11 @@ namespace yocto
                     x=a[nn][nn];
                     if (l == nn)
                     {
+                        
                         wr[nn]=x+t;
                         wi[nn]=0;
                         flag[nn] = eigen::is_real;
+                        
                         --nn;
                     }
                     else
@@ -189,11 +192,14 @@ namespace yocto
                             if (q >= 0)
                             {
                                 z=p+Signed(z,p);
+                                
+                                
                                 wr[nn-1]=wr[nn]=x+z;
                                 if( Fabs(z)>0 )
                                     wr[nn]=x-w/z;
                                 wi[nn-1]=wi[nn]=0;
-                                flag[nn-1] = flag[nn] = eigen::is_real;
+                                flag[nn-1]=flag[nn]=eigen::is_real;
+                                
                             }
                             else
                             {

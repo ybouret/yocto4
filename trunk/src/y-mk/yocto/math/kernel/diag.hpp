@@ -37,12 +37,15 @@ namespace yocto
             //! find the eigen values
             /**
              \param a a real matrix reduced to its Hessenberg form: destructed !
+             \param wr an array that will be filled with the real parts
+             \param wi an array that will be filled with the imagnary parts
+             \param flag an array to know wether the value is real or cplx
              */
             static
-            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag );
+            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag) throw();
             
             static inline
-            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag )
+            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag) throw()
             {
                 HessenbergBalance(a);
                 HessenbergReduce(a);
