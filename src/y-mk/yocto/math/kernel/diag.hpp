@@ -42,14 +42,14 @@ namespace yocto
              \param flag an array to know wether the value is real or cplx
              */
             static
-            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag) throw();
+            bool HessenbergQR( matrix<T> &a, array<T> &wr, array<T> &wi, size_t &nr) throw();
             
             static inline
-            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi, array<int> &flag) throw()
+            bool eig( matrix<T> &a, array<T> &wr, array<T> &wi, size_t &nr) throw()
             {
                 HessenbergBalance(a);
                 HessenbergReduce(a);
-                return HessenbergQR(a, wr, wi, flag);
+                return HessenbergQR(a, wr, wi, nr);
             }
         };
     }

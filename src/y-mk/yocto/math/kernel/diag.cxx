@@ -3,8 +3,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/code/swap.hpp"
 #include "yocto/code/utils.hpp"
-
-#include "yocto/sequence/vector.hpp"
+#include "yocto/code/hsort.hpp"
 
 namespace yocto
 {
@@ -138,18 +137,20 @@ namespace yocto
         bool diag<real_t>:: HessenbergQR(matrix<real_t> &a,
                                          array<real_t>  &wr,
                                          array<real_t>  &wi,
-                                         array<int>     &flag) throw()
+                                         size_t         &nr) throw()
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
             assert( wr.size()   >= n );
             assert( wi.size()   >= n );
-            assert( flag.size() >= n );
+            //assert( flag.size() >= n );
             
             ptrdiff_t nn,m,l,k,j,i,mmin;
             real_t    z,y,x,w,v,u,t,s,r,q,p,anorm;
             
-            
+            size_t   ir = 1; //! where to put real eigenvalues
+            size_t   ic = n; //! where to put cplx eigenvalues
+            nr = 0;
             anorm=0;
             for (i=1;i<=n;i++)
                 for (j=max_of<size_t>(i-1,1);j<=n;j++)
@@ -173,10 +174,13 @@ namespace yocto
                     if (l == nn)
                     {
                         
-                        wr[nn]=x+t;
-                        wi[nn]=0;
-                        flag[nn] = eigen::is_real;
-                        
+                        //wr[nn]=x+t;
+                        //wi[nn]=0;
+                        //flag[nn] = eigen::is_real;
+                        wr[ir]=x+t;
+                        wi[ir]=0;
+                        ++ir;
+                        ++nr;
                         --nn;
                     }
                     else
@@ -193,19 +197,31 @@ namespace yocto
                             {
                                 z=p+Signed(z,p);
                                 
+                                /*
+                                 wr[nn-1]=wr[nn]=x+z;
+                                 if( Fabs(z)>0 )
+                                 wr[nn]=x-w/z;
+                                 wi[nn-1]=wi[nn]=0;
+                                 flag[nn-1]=flag[nn]=eigen::is_real;
+                                 */
                                 
-                                wr[nn-1]=wr[nn]=x+z;
+                                wr[ir+1]=wr[ir]=x+z;
                                 if( Fabs(z)>0 )
-                                    wr[nn]=x-w/z;
-                                wi[nn-1]=wi[nn]=0;
-                                flag[nn-1]=flag[nn]=eigen::is_real;
-                                
+                                    wr[ir]=x-w/z;
+                                wi[ir+1]=wi[ir]=0;
+                                ir += 2;
+                                nr += 2;
                             }
                             else
                             {
-                                wr[nn-1]=wr[nn]=x+p;
-                                wi[nn-1]= -(wi[nn]=z);
-                                flag[nn-1] = flag[nn] = eigen::is_cplx;
+                                /*
+                                 wr[nn-1]=wr[nn]=x+p;
+                                 wi[nn-1]= -(wi[nn]=z);
+                                 flag[nn-1] = flag[nn] = eigen::is_cplx;
+                                 */
+                                wr[ic-1]=wr[ic]=x+p;
+                                wi[ic-1]= -(wi[ic]=z);
+                                ic -= 2;
                             }
                             nn -= 2;
                         }
@@ -306,7 +322,10 @@ namespace yocto
                     }
                 } while (l < nn-1);
             }
-            //std::cerr << "flag=" << flag << std::endl;
+            if(nr>0)
+            {
+                hsort(&wr[1], nr, __compare<real_t>);
+            }
             return true;
         }
         
