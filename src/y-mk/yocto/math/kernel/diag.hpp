@@ -55,9 +55,9 @@ namespace yocto
             
             //! find the eigenvectors from initial eigenvalues
             /**
-             \param transpose eigenvectors
+             \param transpose eigenvectors: #rows <= number of REAL eigenvalues
              \param a initial matrix
-             \param wr initial eigenvalues, shall be SORTED
+             \param wr initial eigenvalues, 1..ev.rows are REAL. Shall be SORTED
              */
             static
             void eigv( matrix<T> &ev, const matrix<T> &a, array<T> &wr );
