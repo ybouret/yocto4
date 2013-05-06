@@ -54,20 +54,44 @@ YOCTO_UNIT_TEST_IMPL(diag)
 }
 YOCTO_UNIT_TEST_DONE()
 
+template <typename T>
+static inline
+void __perform_eigv( const matrix<T> &A )
+{
+    std::cerr << "A=" << A << std::endl;
+    const size_t n = A.rows; assert(A.is_square());
+    vector<T> wr(n,0);
+    vector<T> wi(n,0);
+    size_t    nr = 0;
+    {
+        matrix<T> AA(A);
+        if( !diag<T>::eig(AA,wr,wi,nr) )
+        {
+            std::cerr << "Can't get eigenvalues" << std::endl;
+            return;
+        }
+    }
+    
+    if(nr>0)
+    {
+        vector<T> lam(nr,0);
+        for(size_t i=1; i <= nr; ++i) lam[i] = wr[i];
+        std::cerr << "lam=" << lam << std::endl;        
+        matrix<T> ev(nr,n);
+        diag<T>::eigv(ev,A,lam);
+        std::cerr << "ev=" << ev << "'" << std::endl;
+    }
+    
+}
+
 YOCTO_UNIT_TEST_IMPL(eigv)
 {
     matrix<double> A(3,3);
     A.ld1();
-    A[1][1] = 1.1;
-    A[2][1] = 0.01;
-    vector<double> wr(3,0);
-    wr[1] = A[1][1] + alea<double>();
-    
-    std::cerr << "A=" << A << std::endl;
-    
-    matrix<double> ev(1,3);
-    diag<double>::eigv(ev, A, wr);
-    
+    A[1][1] = 1 + alea<double>();
+    A[2][1] = 0.5-alea<double>();
+    A[3][1] = 0.5-alea<double>();
+    __perform_eigv(A);
     
 }
 YOCTO_UNIT_TEST_DONE()

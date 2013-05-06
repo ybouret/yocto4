@@ -422,7 +422,6 @@ namespace yocto {
             vector<size_t> J(n,0);
             
             vector<real_t> y(n,numeric<real_t>::zero);
-            vector<real_t> r(n,numeric<real_t>::zero);
             vector<real_t> z(n,numeric<real_t>::zero);
             
             if( nv > 0 )
@@ -430,16 +429,16 @@ namespace yocto {
                 hsort(&wr[1], nv, __compare<real_t>);
             }
             
+            ev.ldz();
+            
             for(size_t iv=1; iv <=n; )
             {
-                std::cerr << "//     iv=" << iv << std::endl;
                 //==============================================================
                 //
-                // First loop: check null space in SVD
+                // Check null space in SVD
                 //
                 //==============================================================
                 size_t nz = 0;
-                size_t j0 = 0;
                 while(true)
                 {
                     //----------------------------------------------------------
@@ -457,46 +456,47 @@ namespace yocto {
                     U.assign(B);
                     if( !svd<real_t>::build(U, W, V) )
                     {
-                        throw exception("diag::eigv(Bad Matrix");
+                        throw exception("diag::eigv(Bad Matrix,level-1)");
                     }
                     nz = svd<real_t>::truncate(W, ftol);
                     make_index(W, J, __compare_fabs);
-                    j0 = J[1];
+                    
                     if(nz>0)
                         break;
-                    assert(j0>0);
-                    assert(j0<=n);
                     
                     //----------------------------------------------------------
                     // inverse power using the smallest singular value
                     //----------------------------------------------------------
+                    const size_t j0 = J[1]; assert(j0>0); assert(j0<=n);
                     for(size_t i=n;i>0;--i)
                         y[i] = V[i][j0];
                     svd<real_t>::solve(U, W, V, y, z);
-                    std::cerr << "tau=" << wr[iv] << std::endl;
-                    std::cerr << "y=" << y << std::endl;
-                    std::cerr << "z=" << z << std::endl;
                     
                     //----------------------------------------------------------
                     // improve tau
                     //----------------------------------------------------------
-                    wr[iv] += 1.0 / mkl::dot(y,z);
-                    std::cerr << "tau_next=" << wr[iv] << std::endl;
+                    const real_t dtau = 1.0 / mkl::dot(y,z);
+                    wr[iv] += dtau;
                 }
                 
                 //==============================================================
-                //
                 // Second loop: improve nullspace
-                //
+                // at this point y is loaded
                 //==============================================================
                 assert(nz>0);
-                assert(j0>0);
-                assert(j0<=n);
-                
-                
-                
-                break;
-                
+                const real_t tau = wr[iv];
+                for(size_t k=1;k<=nz;++k)
+                {
+                    if(iv>ev.rows)
+                        return;
+                    wr[iv] = tau;
+                    array<real_t> &vec = ev[iv];
+                    const size_t j = J[k]; assert(j>0); assert(j<=n);
+                    assert(Fabs(W[j])<=0);
+                    for(size_t i=n;i>0;--i)
+                        vec[i] = V[i][j];
+                    ++iv;
+                }
             }
         }
         
