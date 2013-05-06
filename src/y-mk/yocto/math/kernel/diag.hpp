@@ -52,6 +52,17 @@ namespace yocto
                 HessenbergReduce(a);
                 return HessenbergQR(a, wr, wi, nr);
             }
+            
+            //! find the eigenvectors from initial eigenvalues
+            /**
+             \param transpose eigenvectors
+             \param a initial matrix
+             \param wr initial eigenvalues, shall be SORTED
+             */
+            static
+            void eigv( matrix<T> &ev, const matrix<T> &a, array<T> &wr );
+            
+            
         };
     }
     

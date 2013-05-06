@@ -15,7 +15,7 @@ void test_diag()
 {
     std::cerr << std::endl << "Testing for <" << typeid(T).name() << ">" << std::endl;
     
-    for(size_t iter=1; iter <= 8; ++iter )
+    for(size_t iter=1; iter <= 1; ++iter )
     {
         const size_t   n = 1 + alea_lt(10);
         matrix<T> a(n,n);
@@ -32,13 +32,21 @@ void test_diag()
         vector<T>   wi(n,0);
         size_t nr = 0;
         
-        if( diag<T>::eig(a, wr,wi,nr) )
+        matrix<T> aa(a);
+        if( diag<T>::eig(aa, wr,wi,nr) )
         {
             //std::cerr << "flag=" << flag << std::endl;
             std::cerr << "nr=" << nr << std::endl;
             std::cerr << "wr=" << wr << std::endl;
             std::cerr << "wi=" << wi << std::endl;
             std::cerr << std::endl;
+            
+            if(nr>0)
+            {
+                matrix<T> ev(nr,n);
+                diag<T>::eigv(ev,a,wr);
+            }
+            
         }
         else
             std::cerr << "Couldn't diag!" << std::endl;
