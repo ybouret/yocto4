@@ -160,8 +160,8 @@ namespace yocto
         {
             assert( a.is_square() );
             const ptrdiff_t n = a.rows;
-            assert( wr.size()   >= n );
-            assert( wi.size()   >= n );
+            assert( wr.size()   >= a.rows );
+            assert( wi.size()   >= a.rows );
             //assert( flag.size() >= n );
             
             ptrdiff_t nn,m,l,k,j,i,mmin;
@@ -475,7 +475,7 @@ namespace yocto {
                     //----------------------------------------------------------
                     // improve tau
                     //----------------------------------------------------------
-                    const real_t dtau = 1.0 / mkl::dot(y,z);
+                    const real_t dtau = REAL(1.0) / mkl::dot(y,z);
                     wr[iv] += dtau;
                 }
                 

@@ -1,3 +1,3 @@
-#define YOCTO_ZTYPE 'd'
+#define YOCTO_ZTYPE 's'
 #include "spike-finder.cxx"
 
