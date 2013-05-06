@@ -1,9 +1,7 @@
 #include "yocto/math/kernel/diag.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/code/swap.hpp"
-#include "yocto/code/utils.hpp"
-#include "yocto/code/hsort.hpp"
+
 
 namespace yocto
 {
@@ -65,6 +63,15 @@ namespace yocto
                 }
             }
         }
+    }
+}
+
+
+#include "yocto/code/swap.hpp"
+
+namespace yocto {
+    
+    namespace math {
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -127,6 +134,18 @@ namespace yocto
             }
         }
         
+    }
+}
+
+
+#include "yocto/code/utils.hpp"
+#include "yocto/code/hsort.hpp"
+
+namespace yocto
+{
+    
+    namespace math
+    {
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -328,6 +347,84 @@ namespace yocto
             }
             return true;
         }
+        
+    }
+    
+}
+
+
+#include "yocto/sequence/vector.hpp"
+#include "yocto/code/rand.hpp"
+#include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/exception.hpp"
+
+namespace yocto {
+    
+    namespace math
+    {
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        //
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        void diag<real_t>:: eigv(matrix<real_t>       &ev,
+                                 const matrix<real_t> &a,
+                                 array<real_t>        &wr )
+        {
+            assert(a.is_square());
+            assert( wr.size() >= ev.rows );
+            
+            const size_t n  = a.rows;
+            const size_t nv = ev.rows;
+            assert(ev.cols>=n);
+            
+            matrix<real_t> U(n,n);
+            matrix<real_t> V(n,n);
+            vector<real_t> b(n,numeric<real_t>::zero);
+            vector<real_t> W(n,numeric<real_t>::zero);
+            
+            if( nv > 0 )
+            {
+                hsort(&wr[1], nv, __compare<real_t>);
+            }
+            
+            for( size_t iv=1; iv <= nv; ++iv )
+            {
+                real_t        &tau = wr[iv];
+                array<real_t> &y   = ev[iv];
+                for(size_t i=n;i>0;--i)
+                {
+                    b[i] = REAL(0.5) - alea<real_t>();
+                }
+                
+                {
+                    //==========================================================
+                    // build the current matrix
+                    //==========================================================
+                    U.assign(a);
+                    for(size_t i=n;i>0;--i)
+                    {
+                        U[i][i] -= tau;
+                    }
+                    std::cerr << "tau=" << tau << std::endl;
+                    std::cerr << "A=" << U << std::endl;
+                    if( !svd<real_t>::build(U, W, V) )
+                    {
+                        throw exception("diag::eigv(Bad Matrix)");
+                    }
+                    
+                    std::cerr << "W=" << W << std::endl;
+                }
+                break;
+            }
+            
+        }
+        
+        
         
     }
 }
