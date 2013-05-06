@@ -365,7 +365,7 @@ namespace yocto {
     namespace math
     {
         
-      
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -377,6 +377,29 @@ namespace yocto {
         static inline int __compare_fabs( const real_t lhs, const real_t rhs) throw()
         {
             return __compare<real_t>( Fabs(lhs), Fabs(rhs) );
+        }
+        
+        
+        static inline
+        real_t __refine(const matrix<real_t>  &A,
+                        const matrix<real_t>  &B,
+                        array<real_t>         &y,
+                        array<real_t>         &z,
+                        array<real_t>         &r
+                        )
+        {
+            mkl::mul(r, B, y);
+            mkl::mul(z, A, y);
+            real_t zy  = 0;
+            real_t ry  = 0;
+            real_t den = 0;
+            for(size_t i=y.size();i>0;--i)
+            {
+                zy += z[i] * y[i];
+                ry += r[i] * y[i];
+                den += y[i] * y[i];
+            }
+            return (zy+ry)/den;
         }
         
         template <>
@@ -409,64 +432,72 @@ namespace yocto {
             
             for(size_t iv=1; iv <=n; )
             {
+                std::cerr << "//     iv=" << iv << std::endl;
                 //==============================================================
-                // B = A - wr[iv]*Id
+                //
+                // First loop: check null space in SVD
+                //
                 //==============================================================
-                B.assign(A);
-                for(size_t i=n;i>0;--i)
+                size_t nz = 0;
+                size_t j0 = 0;
+                while(true)
                 {
-                    B[i][i] -= wr[iv];
+                    //----------------------------------------------------------
+                    // B = A - wr[iv]*Id
+                    //----------------------------------------------------------
+                    B.assign(A);
+                    for(size_t i=n;i>0;--i)
+                    {
+                        B[i][i] -= wr[iv];
+                    }
+                    
+                    //----------------------------------------------------------
+                    // B = U * W * V'
+                    //----------------------------------------------------------
+                    U.assign(B);
+                    if( !svd<real_t>::build(U, W, V) )
+                    {
+                        throw exception("diag::eigv(Bad Matrix");
+                    }
+                    nz = svd<real_t>::truncate(W, ftol);
+                    make_index(W, J, __compare_fabs);
+                    j0 = J[1];
+                    if(nz>0)
+                        break;
+                    assert(j0>0);
+                    assert(j0<=n);
+                    
+                    //----------------------------------------------------------
+                    // inverse power using the smallest singular value
+                    //----------------------------------------------------------
+                    for(size_t i=n;i>0;--i)
+                        y[i] = V[i][j0];
+                    svd<real_t>::solve(U, W, V, y, z);
+                    std::cerr << "tau=" << wr[iv] << std::endl;
+                    std::cerr << "y=" << y << std::endl;
+                    std::cerr << "z=" << z << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // improve tau
+                    //----------------------------------------------------------
+                    wr[iv] += 1.0 / mkl::dot(y,z);
+                    std::cerr << "tau_next=" << wr[iv] << std::endl;
                 }
                 
                 //==============================================================
-                // B = U * W * V'
+                //
+                // Second loop: improve nullspace
+                //
                 //==============================================================
-                U.assign(B);
-                if( !svd<real_t>::build(U, W, V) )
-                {
-                    throw exception("diag::eigv(Bad Matrix");
-                }
+                assert(nz>0);
+                assert(j0>0);
+                assert(j0<=n);
                 
-                //==============================================================
-                // check likely kernel
-                //==============================================================
-                const size_t nz = svd<real_t>::truncate(W, ftol);
-                make_index(W,J,__compare_fabs);
-                std::cerr << "W=" << W << std::endl;
-                std::cerr << "J=" << J << std::endl;
-                std::cerr << "nz=" << nz << std::endl;
-                switch( nz )
-                {
-                    case 0: {
-                        //======================================================
-                        // invalid eigenvalue => need to upgrade
-                        //======================================================
-                        const size_t j0 = J[1];
-                        for(size_t i=n;i>0;--i) y[i] = V[i][j0];
-                        mkl::mul(r,B,y);
-                        mkl::mul(z,A,y);
-                        std::cerr << "Need to upgrade from j0=" << j0 << std::endl;
-                        
-                        
-                    }break;
-                        
-                        
-                    case 1:
-                        
-                        break;
-                        
-                    default:
-                        
-                        break;
-                        
-                }
                 
                 
                 break;
+                
             }
-            
-            
-            
         }
         
         
