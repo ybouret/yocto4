@@ -59,8 +59,11 @@ YOCTO_UNIT_TEST_IMPL(eigv)
     matrix<double> A(3,3);
     A.ld1();
     A[1][1] = 1.1;
+    A[2][1] = 0.01;
     vector<double> wr(3,0);
-    wr[1] = 1.11;
+    wr[1] = A[1][1] + alea<double>();
+    
+    std::cerr << "A=" << A << std::endl;
     
     matrix<double> ev(1,3);
     diag<double>::eigv(ev, A, wr);
