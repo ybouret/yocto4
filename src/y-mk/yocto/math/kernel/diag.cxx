@@ -358,12 +358,18 @@ namespace yocto
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/code/make-index.hpp"
 
 namespace yocto {
     
     namespace math
     {
         
+        
+        static inline int __compare_fabs( const real_t lhs, const real_t rhs) throw()
+        {
+            return __compare<real_t>( Fabs(lhs), Fabs(rhs) );
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -375,6 +381,7 @@ namespace yocto {
                                  const matrix<real_t> &a,
                                  array<real_t>        &wr )
         {
+            static const real_t ftol = numeric<real_t>::ftol;
             assert(a.is_square());
             assert( wr.size() >= ev.rows );
             
@@ -386,6 +393,8 @@ namespace yocto {
             matrix<real_t> V(n,n);
             vector<real_t> b(n,numeric<real_t>::zero);
             vector<real_t> W(n,numeric<real_t>::zero);
+            vector<size_t> J(n,0);
+            
             
             if( nv > 0 )
             {
@@ -401,7 +410,12 @@ namespace yocto {
                     b[i] = REAL(0.5) - alea<real_t>();
                 }
                 
+                algebra<real_t>::normalize(b);
+                std::cerr << "b=" << b << std::endl;
+                
+                for(size_t iter=1; iter <=5; ++iter)
                 {
+                    
                     //==========================================================
                     // build the current matrix
                     //==========================================================
@@ -411,13 +425,25 @@ namespace yocto {
                         U[i][i] -= tau;
                     }
                     std::cerr << "tau=" << tau << std::endl;
-                    std::cerr << "A=" << U << std::endl;
+                    //std::cerr << "A=" << U << std::endl;
                     if( !svd<real_t>::build(U, W, V) )
                     {
                         throw exception("diag::eigv(Bad Matrix)");
                     }
                     
+                    //std::cerr << "W=" << W << std::endl;
+                    const size_t nz =svd<real_t>::truncate(W, ftol);
+                    make_index(W, J, __compare_fabs);
                     std::cerr << "W=" << W << std::endl;
+                    std::cerr << "nz=" << nz << std::endl;
+                    std::cerr << "J="  << J << std::endl;
+                    
+                    svd<real_t>::solve(U, W, V, b, y);
+                    algebra<real_t>::normalize(y);
+                    std::cerr << "y=" << y << std::endl;
+
+                    algebra<real_t>::set(b,y);
+                    std::cerr << "b=" << b << std::endl;
                 }
                 break;
             }
