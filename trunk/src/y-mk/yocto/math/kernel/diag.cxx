@@ -365,88 +365,107 @@ namespace yocto {
     namespace math
     {
         
+      
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        //
+        //
+        ////////////////////////////////////////////////////////////////////////
+        typedef algebra<real_t> mkl;
         
         static inline int __compare_fabs( const real_t lhs, const real_t rhs) throw()
         {
             return __compare<real_t>( Fabs(lhs), Fabs(rhs) );
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        //
-        //
-        //
-        ////////////////////////////////////////////////////////////////////////
         template <>
         void diag<real_t>:: eigv(matrix<real_t>       &ev,
-                                 const matrix<real_t> &a,
+                                 const matrix<real_t> &A,
                                  array<real_t>        &wr )
         {
             static const real_t ftol = numeric<real_t>::ftol;
-            assert(a.is_square());
+            assert(A.is_square());
             assert( wr.size() >= ev.rows );
             
-            const size_t n  = a.rows;
+            const size_t n  = A.rows;
             const size_t nv = ev.rows;
-            assert(ev.cols>=n);
+            assert(ev.cols==n);
             
+            matrix<real_t> B(n,n);
             matrix<real_t> U(n,n);
             matrix<real_t> V(n,n);
-            vector<real_t> b(n,numeric<real_t>::zero);
             vector<real_t> W(n,numeric<real_t>::zero);
             vector<size_t> J(n,0);
             
+            vector<real_t> y(n,numeric<real_t>::zero);
+            vector<real_t> r(n,numeric<real_t>::zero);
+            vector<real_t> z(n,numeric<real_t>::zero);
             
             if( nv > 0 )
             {
                 hsort(&wr[1], nv, __compare<real_t>);
             }
             
-            for( size_t iv=1; iv <= nv; ++iv )
+            for(size_t iv=1; iv <=n; )
             {
-                real_t        &tau = wr[iv];
-                array<real_t> &y   = ev[iv];
+                //==============================================================
+                // B = A - wr[iv]*Id
+                //==============================================================
+                B.assign(A);
                 for(size_t i=n;i>0;--i)
                 {
-                    b[i] = REAL(0.5) - alea<real_t>();
+                    B[i][i] -= wr[iv];
                 }
                 
-                algebra<real_t>::normalize(b);
-                std::cerr << "b=" << b << std::endl;
-                
-                for(size_t iter=1; iter <=5; ++iter)
+                //==============================================================
+                // B = U * W * V'
+                //==============================================================
+                U.assign(B);
+                if( !svd<real_t>::build(U, W, V) )
                 {
-                    
-                    //==========================================================
-                    // build the current matrix
-                    //==========================================================
-                    U.assign(a);
-                    for(size_t i=n;i>0;--i)
-                    {
-                        U[i][i] -= tau;
-                    }
-                    std::cerr << "tau=" << tau << std::endl;
-                    //std::cerr << "A=" << U << std::endl;
-                    if( !svd<real_t>::build(U, W, V) )
-                    {
-                        throw exception("diag::eigv(Bad Matrix)");
-                    }
-                    
-                    //std::cerr << "W=" << W << std::endl;
-                    const size_t nz =svd<real_t>::truncate(W, ftol);
-                    make_index(W, J, __compare_fabs);
-                    std::cerr << "W=" << W << std::endl;
-                    std::cerr << "nz=" << nz << std::endl;
-                    std::cerr << "J="  << J << std::endl;
-                    
-                    svd<real_t>::solve(U, W, V, b, y);
-                    algebra<real_t>::normalize(y);
-                    std::cerr << "y=" << y << std::endl;
-
-                    algebra<real_t>::set(b,y);
-                    std::cerr << "b=" << b << std::endl;
+                    throw exception("diag::eigv(Bad Matrix");
                 }
+                
+                //==============================================================
+                // check likely kernel
+                //==============================================================
+                const size_t nz = svd<real_t>::truncate(W, ftol);
+                make_index(W,J,__compare_fabs);
+                std::cerr << "W=" << W << std::endl;
+                std::cerr << "J=" << J << std::endl;
+                std::cerr << "nz=" << nz << std::endl;
+                switch( nz )
+                {
+                    case 0: {
+                        //======================================================
+                        // invalid eigenvalue => need to upgrade
+                        //======================================================
+                        const size_t j0 = J[1];
+                        for(size_t i=n;i>0;--i) y[i] = V[i][j0];
+                        mkl::mul(r,B,y);
+                        mkl::mul(z,A,y);
+                        std::cerr << "Need to upgrade from j0=" << j0 << std::endl;
+                        
+                        
+                    }break;
+                        
+                        
+                    case 1:
+                        
+                        break;
+                        
+                    default:
+                        
+                        break;
+                        
+                }
+                
+                
                 break;
             }
+            
+            
             
         }
         

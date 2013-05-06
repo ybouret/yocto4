@@ -35,18 +35,10 @@ void test_diag()
         matrix<T> aa(a);
         if( diag<T>::eig(aa, wr,wi,nr) )
         {
-            //std::cerr << "flag=" << flag << std::endl;
             std::cerr << "nr=" << nr << std::endl;
             std::cerr << "wr=" << wr << std::endl;
             std::cerr << "wi=" << wi << std::endl;
             std::cerr << std::endl;
-            
-            if(nr>0)
-            {
-                matrix<T> ev(nr,n);
-                diag<T>::eigv(ev,a,wr);
-            }
-            
         }
         else
             std::cerr << "Couldn't diag!" << std::endl;
@@ -61,3 +53,20 @@ YOCTO_UNIT_TEST_IMPL(diag)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(eigv)
+{
+    matrix<double> A(3,3);
+    A.ld1();
+    A[1][1] = 1.1;
+    vector<double> wr(3,0);
+    wr[1] = 1.11;
+    
+    matrix<double> ev(1,3);
+    diag<double>::eigv(ev, A, wr);
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+

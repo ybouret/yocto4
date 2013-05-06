@@ -54,6 +54,7 @@ YOCTO_UNIT_TEST_INIT(64)
     YOCTO_UNIT_TEST_DECL(fit_circle);
     YOCTO_UNIT_TEST_DECL(fit_ellipse);
 
+    YOCTO_UNIT_TEST_DECL(eigv);
 }
 YOCTO_UNIT_TEST_EXEC()
 
