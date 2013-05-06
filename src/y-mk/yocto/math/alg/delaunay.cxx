@@ -166,8 +166,8 @@ namespace yocto
                 dx = xmax - xmin;
                 dy = ymax - ymin;
                 dmax = (dx > dy) ? dx : dy;
-                xmid = (xmax + xmin) / 2.0;
-                ymid = (ymax + ymin) / 2.0;
+                xmid = (xmax + xmin) / REAL(2.0);
+                ymid = (ymax + ymin) / REAL(2.0);
                 
                 /*
                  Set up the supertriangle

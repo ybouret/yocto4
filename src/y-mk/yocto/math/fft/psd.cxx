@@ -155,7 +155,7 @@ namespace yocto
                     for( size_t k=j;k<=K;++k)
                     {
                         const size_t p = j+k-1;
-                        mu[j][k] = mu[k][j] = ipower<real_t>(M, p) / p;
+                        mu[j][k] = mu[k][j] = ipower<real_t>(real_t(M), p) / real_t(p);
                     }
                 }
                 //std::cerr << "mu=" << mu << std::endl;
@@ -171,7 +171,7 @@ namespace yocto
                     const size_t im = i-1;
                     for(size_t j=1;j<=K;++j)
                     {
-                        sig[j][i] = (ipower<real_t>(i,j)-ipower<real_t>(im,j))/j;
+                        sig[j][i] = (ipower<real_t>(real_t(i),j)-ipower<real_t>(real_t(im),j))/real_t(j);
                     }
                 }
                 //std::cerr << "sig0=" << sig << std::endl;
@@ -211,7 +211,7 @@ namespace yocto
                     real_t sum = 0;
                     for(size_t j=K;j>0;--j)
                     {
-                        sum += a[j] * ipower<real_t>(i,j-1);
+                        sum += a[j] * ipower<real_t>(real_t(i),j-1);
                     }
                     
                     //-- compute the effective signal

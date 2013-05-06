@@ -185,7 +185,7 @@ namespace yocto {
                               const T        ls=0,
                               const T        rs=0);
             
-            virtual ~spline1D() throw() {}
+            virtual ~spline1D() throw();
             
             T operator()( const T X ) const throw();
             
