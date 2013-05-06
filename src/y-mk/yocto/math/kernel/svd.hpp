@@ -39,10 +39,10 @@ namespace yocto
           
             //! truncate singular value to ftol * max|w|
             /**
-             \return true if a value was truncated
+             \return the number of truncated values.
              */
             static
-            bool truncate( array<T> &w, const T ftol );
+            size_t truncate( array<T> &w, const T ftol );
             
         };
         
