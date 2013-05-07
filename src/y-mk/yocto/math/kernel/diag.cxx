@@ -18,11 +18,11 @@ namespace yocto
         void diag<real_t>:: HessenbergBalance( matrix<real_t> &a ) throw()
         {
             static const real_t RADIX = REAL(2.0);
+            static const real_t sqrdx = RADIX*RADIX;
             
             assert( a.is_square() );
             const size_t n = a.rows;
             
-            const real_t sqrdx=RADIX*RADIX;
             size_t last=0;
             while(0==last)
             {
@@ -36,7 +36,7 @@ namespace yocto
                             c += Fabs(a[j][i]);
                             r += Fabs(a[i][j]);
                         }
-                    if(c>0 && r>0)
+                    if( (c>0) && (r>0) )
                     {
                         real_t g=r/RADIX;
                         real_t f=REAL(1.0);
@@ -84,7 +84,7 @@ namespace yocto {
             assert( a.is_square() );
             const size_t n = a.rows;
             
-            for(size_t m=2;m<n;m++)
+            for(size_t m=2;m<n;++m)
             {
                 real_t x=0;
                 size_t i=m;
@@ -106,7 +106,7 @@ namespace yocto {
                 
                 if(Fabs(x)>0)
                 {
-                    for(size_t i=m+1;i<=n;i++)
+                    for(i=m+1;i<=n;i++)
                     {
                         real_t y = a[i][m-1];
                         if( Fabs(y)>0 )
@@ -124,6 +124,7 @@ namespace yocto {
                 }
             }
             
+            //std::cerr << "RTMP=" << a << std::endl;
             //==================================================================
             // clean up to the exact Hessenberg form
             //==================================================================
@@ -198,6 +199,7 @@ namespace yocto
                         //flag[nn] = eigen::is_real;
                         wr[ir]=x+t;
                         wi[ir]=0;
+                        std::cerr << "EIG: real single: " << wr[ir] << std::endl;
                         ++ir;
                         ++nr;
                         --nn;
@@ -227,6 +229,7 @@ namespace yocto
                                 wr[ir+1]=wr[ir]=x+z;
                                 if( Fabs(z)>0 )
                                     wr[ir]=x-w/z;
+                                std::cerr << "EIG: real pair: " << wr[ir] << ", " << wr[ir+1] << ", x=" << x << ", w=" << w << ", z=" << z << ", p=" << p << ", sq=" << Sqrt(Fabs(q)) << std::endl;
                                 wi[ir+1]=wi[ir]=0;
                                 ir += 2;
                                 nr += 2;
@@ -298,7 +301,7 @@ namespace yocto
                                         r /= x;
                                     }
                                 }
-                                if((s=Signed(Sqrt(p*p+q*q+r*r),p)) != 0.0)
+                                if( Fabs(s=Signed(Sqrt(p*p+q*q+r*r),p)) > 0 )
                                 {
                                     if (k == m)
                                     {

@@ -115,6 +115,12 @@ We define the $3\times3$ matrices
 \begin{equation}
 	\mymat{S}_{qq} =  \vec{Q}_i\otimes\vec{Q}_i,\;\;\mymat{S}_{qz}=\vec{Q}_i\otimes\vec{Z}_i,\;\;\mymat{S}_{zz}=\vec{Z}_i\otimes\vec{Z}_i.
 \end{equation}
+so that
+\begin{align}
+	F^2\left(\vec{A},\vec{B}\right)  & = \vec{A}\mymat{S}_{qq}\vec{A} + 2\vec{A}\mymat{S}_{qz}\vec{B} + \vec{B}\mymat{S}_{zz}\vec{B}\\
+	 & = \vec{A}\mymat{S}_{qq}\vec{A} + 2\vec{B}\mytrn{\mymat{S}_{qz}}\vec{A} + \vec{B}\mymat{S}_{zz}\vec{B}
+\end{align}
+
 Let us minimize $F^2$ under the quadratic constraint
 \begin{equation}
 	\label{eq:C}
@@ -135,15 +141,15 @@ We obtain the set of equations
 \end{equation}
 The solution are
 \begin{equation}
-	\vec{B} = -\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\vec{A}
+	\vec{B} = -\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\vec{A} = -\mymat{\beta}\vec{A}
 \end{equation}
 and
 \begin{equation}
-	\left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\right) \vec{A} = \lambda \mymat{C}\vec{A}.
+	\left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{\beta}\right) \vec{A} = \lambda \mymat{C}\vec{A}.
 \end{equation}
 If we assume that $\mymat{C}$ is invertible then we define
 \begin{equation}
-	\mymat{M} = \mymat{C}^{-1} \left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\right)
+	\mymat{M} = \mymat{C}^{-1} \left(\mymat{S}_{qq} - \mymat{S}_{qz}\beta\right)
 \end{equation}
 
 Consequently

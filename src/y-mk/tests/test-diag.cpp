@@ -2,11 +2,39 @@
 #include "yocto/math/kernel/diag.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/string/conv.hpp"
 
 #include <typeinfo>
 
 using namespace yocto;
 using namespace math;
+
+
+YOCTO_UNIT_TEST_IMPL(balance)
+{
+    if( argc > 1 )
+    {
+        const size_t n = strconv::to<size_t>(argv[1],"n");
+        matrix<double> A(n,n);
+        for(size_t i=1; i<=n; ++i )
+        {
+            for(size_t j=1; j<=n;++j)
+            {
+                A[i][j] = (0.5-alea<double>());// + (i==j?a.rows:0);
+            }
+        }
+        std::cerr << "A=" << A << std::endl;
+        matrix<double> B = A;
+        diag<double>::HessenbergBalance(B);
+        std::cerr << "B=" << B << std::endl;
+        matrix<double> C = B;
+        diag<double>::HessenbergReduce(C);
+        std::cerr << "C=" << C << std::endl;
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
 
 
 template <typename T>

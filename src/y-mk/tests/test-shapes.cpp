@@ -72,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     if(argc>1)
         n = strconv::to<size_t>(argv[1],"n");
 
-    fit_ellipse<double> ell;
+    fit_conic<double> ell;
     
     const double Xc = 10 + (alea<double>() - 0.5) * 20;
     const double Yc = 10 + (alea<double>() - 0.5) * 20;
