@@ -178,8 +178,18 @@ namespace yocto {
             // m = r+1
             for(size_t m=2; m<n; ++m )
             {
+                const size_t r = m-1;
                 real_t piv = 0;
-                size_t idx = m;
+                size_t s   = m;
+                for( size_t j=m+1;j<=n;++j)
+                {
+                    const real_t tmp = a[j][r];
+                    if(Fabs(tmp)>Fabs(piv))
+                    {
+                        piv = tmp;
+                        s   = j;
+                    }
+                }
                 
                 
             }
