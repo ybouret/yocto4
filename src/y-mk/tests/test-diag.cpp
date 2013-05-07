@@ -13,9 +13,9 @@ template <typename T>
 static inline
 void test_diag()
 {
-    std::cerr << std::endl << "Testing for <" << typeid(T).name() << ">" << std::endl;
+    std::cerr << std::endl << "DIAG for <" << typeid(T).name() << ">" << std::endl;
     
-    for(size_t iter=1; iter <= 1; ++iter )
+    for(size_t iter=1; iter <= 16; ++iter )
     {
         const size_t   n = 1 + alea_lt(10);
         matrix<T> a(n,n);
@@ -72,17 +72,39 @@ void __perform_eigv( const matrix<T> &A )
         }
     }
     
+    std::cerr << "nr=" << nr << std::endl;
     if(nr>0)
     {
         vector<T> lam(nr,0);
         for(size_t i=1; i <= nr; ++i) lam[i] = wr[i];
-        std::cerr << "lam=" << lam << std::endl;        
+        std::cerr << "lam=" << lam << std::endl;
         matrix<T> ev(nr,n);
         diag<T>::eigv(ev,A,lam);
         std::cerr << "ev=" << ev << "'" << std::endl;
     }
-    
 }
+
+template <typename T>
+static inline
+void __test_eigv()
+{
+    std::cerr << std::endl << "EIGV for <" << typeid(T).name() << ">" << std::endl;
+    for(size_t iter=1; iter <= 3; ++iter )
+    {
+        const size_t   n = 1 + alea_lt(10);
+        matrix<T> A(n,n);
+        
+        for(size_t i=1; i<=n; ++i )
+        {
+            for(size_t j=1; j<=n;++j)
+            {
+                A[i][j] = (0.5-alea<double>());// + (i==j?a.rows:0);
+            }
+        }
+        __perform_eigv(A);
+    }
+}
+
 
 YOCTO_UNIT_TEST_IMPL(eigv)
 {
@@ -92,6 +114,8 @@ YOCTO_UNIT_TEST_IMPL(eigv)
     A[2][1] = 0.5-alea<double>();
     A[3][1] = 0.5-alea<double>();
     __perform_eigv(A);
+    
+    __test_eigv<float>();
     
 }
 YOCTO_UNIT_TEST_DONE()
