@@ -36,6 +36,9 @@ namespace yocto
             void HessenbergReduce( matrix<T> &a ) throw();
             
     
+            static
+            void HessenbergForm( matrix<T> &a ) throw();
+            
             
             //! find the eigen values
             /**

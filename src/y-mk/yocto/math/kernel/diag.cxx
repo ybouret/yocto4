@@ -164,6 +164,28 @@ namespace yocto {
             }
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Hessenberg reduction
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        void diag<real_t>:: HessenbergForm( matrix<real_t> &a ) throw()
+        {
+            assert(a.is_square());
+            const size_t n = a.rows;
+            
+            // m = r+1
+            for(size_t m=2; m<n; ++m )
+            {
+                real_t piv = 0;
+                size_t idx = m;
+                
+                
+            }
+            
+        }
+        
     }
 }
 
