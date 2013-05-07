@@ -50,11 +50,11 @@ namespace yocto
         
         
         template <typename T>
-        class fit_ellipse : public fit_shape<T>
+        class fit_conic : public fit_shape<T>
         {
         public:
-            explicit fit_ellipse();
-            virtual ~fit_ellipse() throw();
+            explicit fit_conic();
+            virtual ~fit_conic() throw();
             
             void reset() throw();
             
@@ -68,7 +68,7 @@ namespace yocto
             matrix<T> Sqz;
             matrix<T> Szz;
             matrix<T> C;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(fit_ellipse);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(fit_conic);
         };
         
     }
