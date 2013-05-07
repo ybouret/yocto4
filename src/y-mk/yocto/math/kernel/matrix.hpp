@@ -82,7 +82,8 @@ namespace yocto
 				
 				void swap_rows( size_t r1, size_t r2 ) throw();
 				void swap_cols( size_t c1, size_t c2 ) throw();
-				
+				void swap_both( size_t u, size_t v ) throw();
+                
 				
 				bool is_square() const throw();
 				

@@ -30,6 +30,7 @@ YOCTO_UNIT_TEST_IMPL(balance)
         matrix<double> C = B;
         diag<double>::HessenbergReduce(C);
         std::cerr << "C=" << C << std::endl;
+        
     }
     
 }
