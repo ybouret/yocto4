@@ -63,6 +63,33 @@ namespace yocto
                 }
             }
         }
+        
+#if 0
+        template <>
+        void diag<real_t>:: HessenbergReOrder( matrix<real_t> &a ) throw()
+        {
+            //std::cerr << "// Hessenberg ReOrder" << std::endl;
+            assert( a.is_square() );
+            const size_t n = a.rows;
+            for(size_t i=1; i <= n; ++i )
+            {
+                real_t piv = Fabs(a[i][i]);
+                size_t m   = i;
+                for(size_t j=i+1; j<=n;++j)
+                {
+                    const real_t tmp = Fabs(a[j][j]);
+                    if(tmp>piv)
+                    {
+                        piv=tmp;
+                        m  = j;
+                    }
+                }
+                if(i!=m)
+                    a.swap_both(i,m);
+            }
+        }
+#endif
+        
     }
 }
 
@@ -83,7 +110,7 @@ namespace yocto {
         {
             assert( a.is_square() );
             const size_t n = a.rows;
-            
+            //std::cerr << "Hessenberg Reduction" << std::endl;
             for(size_t m=2;m<n;++m)
             {
                 real_t x=0;
@@ -91,17 +118,20 @@ namespace yocto {
                 
                 for(size_t j=m;j<=n;j++)
                 {
-                    if (Fabs(a[j][m-1]) > Fabs(x))
+                    const real_t piv = a[j][m-1];
+                    if (Fabs(piv) > Fabs(x))
                     {
-                        x=a[j][m-1];
+                        x=piv;
                         i=j;
                     }
                 }
                 
+                //std::cerr << "\tPIVOT #" << m << " : " << i << " / " << x << std::endl;
                 if (i != m)
                 {
+                    //std::cerr << "\tSWAP(" << i << "," << m << ")" << std::endl;
                     for (size_t j=m-1;j<=n;j++) cswap(a[i][j],a[m][j]);
-                    for (size_t j=1;j<=n;j++)   cswap(a[j][i],a[j][m]);
+                    for (size_t j=1;j<=n;j++) cswap(a[j][i],a[j][m]);
                 }
                 
                 if(Fabs(x)>0)
@@ -123,8 +153,7 @@ namespace yocto {
                     }
                 }
             }
-            
-            //std::cerr << "RTMP=" << a << std::endl;
+                        
             //==================================================================
             // clean up to the exact Hessenberg form
             //==================================================================

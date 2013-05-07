@@ -176,13 +176,28 @@ namespace yocto
             std::cerr << "Sqz = " << Sqz << std::endl;
             std::cerr << "Szz = " << Szz << std::endl;
             lu<real_t> LU(3);
+            
+            //------------------------------------------------------------------
+            // Szz <- inv(Szz)
+            //------------------------------------------------------------------
             if( !LU.build(Szz) )
                 return false;
             
+            //------------------------------------------------------------------
+            // beta <- transpose(Sqz)
+            //------------------------------------------------------------------
             matrix<real_t> beta(Sqz,matrix_transpose);
             std::cerr << "Sqzp= " << beta << std::endl;
+            
+            //------------------------------------------------------------------
+            // beta <- inv(Szz)*transpose(Sqz)
+            //------------------------------------------------------------------
             LU.solve(Szz, beta);
             std::cerr << "beta=" << beta << std::endl;
+            
+            //------------------------------------------------------------------
+            // M <- Sqq - Sqz * beta
+            //------------------------------------------------------------------
             matrix<real_t> M(3,3);
             mkl::mul(M, Sqz, beta);
             for(size_t i=3;i>0;--i)
@@ -193,66 +208,35 @@ namespace yocto
                 }
             }
             
+            //------------------------------------------------------------------
+            // I <- inv(C)
+            //------------------------------------------------------------------
             matrix<real_t> I(C);
             std::cerr << "C=" << I << std::endl;
             if( !LU.build(I) )
                 return false;
+            
+            //------------------------------------------------------------------
+            // M <- inv(C) * M
+            //------------------------------------------------------------------
             LU.solve(I,M);
             
+            vector<real_t> wr(3,0);
+            vector<real_t> wi(3,0);
+            size_t         nr=0;
             std::cerr << "M0=" << M << std::endl;
-            
-            //==================================================================
-            // compute the eigenvalues
-            //==================================================================
-            vector<real_t> wr(3, numeric<real_t>::zero );
-            vector<real_t> wi(3, numeric<real_t>::zero );
-            size_t         nr = 0;
             {
-                matrix<real_t> MM(M);
+                matrix<real_t> MM = M;
                 diag<real_t>::HessenbergBalance(MM);
                 std::cerr << "MB=" << MM << std::endl;
+                
                 diag<real_t>::HessenbergReduce(MM);
                 std::cerr << "MR=" << MM << std::endl;
-                
-                if( !diag<real_t>::HessenbergQR(MM, wr, wi, nr) )
-                    return false;
+            
+                if( !diag<real_t>::HessenbergQR(MM, wr, wi, nr) ) return false;
+                std::cerr << "nr=" << nr << std::endl;
+                std::cerr << "wr=" << wr << std::endl;
             }
-            std::cerr << "nr=" << nr << std::endl;
-            if( nr <=0 )
-                return false; // shouldn't happen
-            std::cerr << "wr=" << wr << std::endl;
-            std::cerr << "wi=" << wi << std::endl;
-            
-            //==================================================================
-            // compute the real possible eigenvectors
-            //==================================================================
-            matrix<real_t> ev(nr,3);
-            diag<real_t>::eigv(ev, M, wr);
-            std::cerr << "wr=" << wr << std::endl;
-            std::cerr << "ev=" << ev << "'" << std::endl;
-            
-            //==================================================================
-            // compute the acceptable eig
-            //==================================================================
-            size_t ok[3]  = { 0, 0, 0 };
-            real_t vn[3]  = { 0, 0, 0 };
-            size_t na = 0;
-            vector<real_t> y(3, numeric<real_t>::zero );
-            for(size_t i=1; i <= 3; ++i )
-            {
-                const array<real_t> &v = ev[i];
-                mkl::mul(y,C,v);
-                const real_t tmp = mkl::dot(v,y);
-                if(tmp>0)
-                {
-                    ok[na] = i;
-                    vn[na] = Sqrt(tmp);
-                    std::cerr << "Accept : " << v << " / " << vn[na] << std::endl;
-                    ++na;
-                    
-                }
-            }
-            
             return true;
         }
         

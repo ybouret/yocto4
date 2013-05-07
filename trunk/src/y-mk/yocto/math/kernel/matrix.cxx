@@ -311,26 +311,16 @@ namespace yocto
 		{
             matrix<z_type> M( *this, matrix_transpose);
             swap_with(M);
-#if 0
-			if( rows  > 0 )
-			{
-				const matrix<z_type> &A = *this;
-				matrix<z_type>        M( cols, rows );
-				for( size_t i=1; i <= rows; ++i )
-				{
-					for( size_t j=1; j <= cols; ++j )
-					{
-						M[j][i] = A[i][j];
-					}
-				}
-				swap_with( M );
-			}
-			else {
-				assert( 0 == cols );
-			}
-#endif
 		}
         
+        template <>
+        void matrix<z_type>:: swap_both( size_t u, size_t v ) throw()
+        {
+            assert(is_square());
+            swap_cols(u,v);
+            swap_rows(u,v);
+        }
+
         
 		
 	}

@@ -26,6 +26,8 @@ namespace yocto
             static
             void HessenbergBalance( matrix<T> &a ) throw();
             
+            //static void HessenbergReOrder( matrix<T> &a ) throw();
+            
             //! reduction to a real Hessenberg form
             /**
              matrix should be balanced.
@@ -33,6 +35,7 @@ namespace yocto
             static
             void HessenbergReduce( matrix<T> &a ) throw();
             
+    
             
             //! find the eigen values
             /**
