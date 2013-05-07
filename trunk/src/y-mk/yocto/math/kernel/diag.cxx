@@ -415,11 +415,11 @@ namespace yocto {
             const size_t nv = ev.rows;
             assert(ev.cols==n);
             
-            matrix<real_t> B(n,n);
-            matrix<real_t> U(n,n);
-            matrix<real_t> V(n,n);
-            vector<real_t> W(n,numeric<real_t>::zero);
-            vector<size_t> J(n,0);
+            matrix<real_t> B(n,n); //! A - tau * Id
+            matrix<real_t> U(n,n); //! for SVD
+            matrix<real_t> V(n,n); //! for SVD
+            vector<real_t> W(n,numeric<real_t>::zero); //! for SVD
+            vector<size_t> J(n,0); //! for indexing |W|
             
             vector<real_t> y(n,numeric<real_t>::zero);
             vector<real_t> z(n,numeric<real_t>::zero);
@@ -431,7 +431,7 @@ namespace yocto {
             
             ev.ldz();
             
-            for(size_t iv=1; iv <=n; )
+            for(size_t iv=1; iv <= nv; )
             {
                 //==============================================================
                 //
@@ -480,15 +480,13 @@ namespace yocto {
                 }
                 
                 //==============================================================
-                // Second loop: improve nullspace
-                // at this point y is loaded
+                // Compute nullspace
                 //==============================================================
                 assert(nz>0);
                 const real_t tau = wr[iv];
                 for(size_t k=1;k<=nz;++k)
                 {
-                    if(iv>ev.rows)
-                        return;
+                    if(iv>nv) break;
                     wr[iv] = tau;
                     array<real_t> &vec = ev[iv];
                     const size_t j = J[k]; assert(j>0); assert(j<=n);
