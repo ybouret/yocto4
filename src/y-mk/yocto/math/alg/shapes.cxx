@@ -224,7 +224,7 @@ namespace yocto
             // I <- inv(C)
             //------------------------------------------------------------------
             matrix<real_t> I(C);
-            std::cerr << "C=" << I << std::endl;
+            //std::cerr << "C=" << I << std::endl;
             if( !LU.build(I) )
             {
                 throw exception("%s(invalid constraint)", fn);
@@ -239,7 +239,6 @@ namespace yocto
             //------------------------------------------------------------------
             // find eigenvalues
             //------------------------------------------------------------------
-            std::cerr << "M=" << M << std::endl;
             vector<real_t> wr(3,0);
             vector<real_t> wi(3,0);
             size_t         nr=0;
@@ -277,7 +276,7 @@ namespace yocto
                 {
                     ia[na] = i;
                     wa[na] = tmp;
-                    std::cerr << "#acceptable_" << ia[na] << ": " << v << "; #w=" << wa[na] << std::endl;
+                    //std::cerr << "#acceptable_" << ia[na] << ": " << v << "; #w=" << wa[na] << std::endl;
                     ++na;
                 }
             }
@@ -296,7 +295,7 @@ namespace yocto
                 const real_t fac = REAL(1.0)/Sqrt(wa[0]);
                 for(size_t i=3;i>0;--i) A[i] *= fac;
             }
-            std::cerr << "A=" << A << std::endl;
+            //std::cerr << "A=" << A << std::endl;
             
             //------------------------------------------------------------------
             // compute the second part
@@ -304,7 +303,7 @@ namespace yocto
             array<real_t> &B = wi;
             mkl::mul(B,beta,A);
             for(size_t i=3;i>0;--i) B[i] = -B[i];
-            std::cerr << "B=" << B << std::endl;
+            //std::cerr << "B=" << B << std::endl;
             
             param[1] = A[1];
             param[2] = A[2];
@@ -335,28 +334,78 @@ namespace yocto
         {
             assert(param.size()>=6);
             matrix<real_t> S(2,2);
+            const real_t &a = param[1];
+            const real_t &b = param[2];
+            const real_t &c = param[3];
+            const real_t &d = param[4];
+            const real_t &e = param[5];
+            const real_t &f = param[6];
             
         BUILD_S:
-            S[1][1] = param[1];
-            S[2][2] = param[3];
-            S[1][2] = S[2][1] = param[2]/2;
+            S[1][1] = a;
+            S[2][2] = c;
+            S[1][2] = S[2][1] = b/2;
             std::cerr << "S=" << S << std::endl;
             matrix<real_t> Q(2,2);
             vector<real_t> lam(2,numeric<real_t>::zero);
-            {
-                jacobi<real_t> Jacobi;
-                if( !Jacobi(S,lam,Q) )
-                    throw exception("fit_conic::reduce(invalid parameters)");
-            }
+            if( !jacobi<real_t>::build(S,lam,Q) )
+                throw exception("fit_conic::reduce(invalid parameters)");
             if( lam[1] <0 && lam[2] < 0)
             {
                 // change sign
                 for(size_t i=1; i <=6; ++i ) param[i] = -param[i];
                 goto BUILD_S;
             }
-            jacobi<real_t>::eigsrt(lam, Q);
-            std::cerr << "lam=" << lam << std::endl;
-            std::cerr << "Q="   << Q   << std::endl;
+            
+            if( lam[1]>0 && lam[2]>0)
+            {
+                //==============================================================
+                // ellipse
+                //==============================================================
+
+                //--------------------------------------------------------------
+                // greater axis => X
+                // lam[1] <= lam[2]
+                //--------------------------------------------------------------
+                if(lam[1]>lam[2])
+                {
+                    cswap(lam[1],lam[2]);
+                    Q.swap_cols(1, 2);
+                }
+                std::cerr << "#found ellipse" << std::endl;
+                std::cerr << "lam=" << lam << std::endl;
+                std::cerr << "Q="   << Q   << std::endl;
+                const real_t lamX = lam[1];
+                const real_t lamY = lam[2];
+                
+                //--------------------------------------------------------------
+                // ( D )                  ( d )
+                // (   ) = transpose(Q) * (   )
+                // ( E )                  ( e )
+                //--------------------------------------------------------------
+                const real_t D   = (Q[1][1] * d + Q[2][1] * e);
+                const real_t E   = (Q[1][2] * d + Q[2][2] * e);
+                
+                const real_t Dp  = D/lamX;
+                const real_t Ep  = E/lamY;
+                
+                const real_t xc  = -REAL(0.5) * (Q[1][1] * Dp + Q[1][2] * Ep);
+                const real_t yc  = -REAL(0.5) * (Q[2][1] * Dp + Q[2][2] * Ep);
+                std::cerr << "xc=" << xc << std::endl;
+                std::cerr << "yc=" << yc << std::endl;
+                const real_t rhs = REAL(0.25) * ( D*Dp + E*Ep) - f;
+                std::cerr << "rhs=" <<rhs << std::endl;
+                const real_t R2  = rhs > 0 ? rhs : 0;
+                
+                const real_t Rx  = Sqrt(R2/lamX);
+                const real_t Ry =  Sqrt(R2/lamY);
+                
+                std::cerr << "Rx=" << Rx << std::endl;
+                std::cerr << "Ry=" << Ry << std::endl;
+                return;
+            }
+         
+            throw exception("can't reduce conic!");
         }
         
         

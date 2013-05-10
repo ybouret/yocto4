@@ -4,26 +4,7 @@
 namespace yocto {
 	
 	namespace math {
-		
-		template <>
-		jacobi<real_t>::jacobi() throw() :
-		wksp_(),
-		nrot_(0)
-		{
-		}
-		
-		template <>
-		jacobi<real_t>::jacobi( size_t n ) :
-		wksp_( n*2, 0 ),
-		nrot_(0)
-		{
-		}
-		
-		template <>
-		jacobi<real_t>:: ~jacobi() throw()
-		{
-		}
-		
+	        
 #define _YOCTO_JACOBI(a,i,j,k,l) g=a[i][j];h=a[k][l];a[i][j]=g-s*(h+g*tau); a[k][l]=h+s*(g-h*tau)
 		
 		static inline bool almost_equal( const real_t X, const real_t Y ) throw() {
@@ -32,40 +13,51 @@ namespace yocto {
 		}
 		
 		template <>
-		bool jacobi<real_t>:: operator()( matrix<real_t> &a, array<real_t> &d, matrix<real_t> &v ) {
+		bool jacobi<real_t>:: build( matrix<real_t> &a, array<real_t> &d, matrix<real_t> &v )
+        {
 			assert(a.rows>0);
 			assert(a.cols == a.rows);
 			assert(d.size() == a.rows);
 			
-			const size_t n = a.rows;
-			wksp_.make( n * 2, 0 );
-			real_t *b = wksp_(-1);
-			real_t *z = b+n;
+			const size_t   n = a.rows;
+            size_t         nrot_ = 0;
+            vector<real_t> b(n,numeric<real_t>::zero);
+            vector<real_t> z(n,numeric<real_t>::zero);
+          			
 			
-			
-			//-- initialize vectors
-			for(size_t ip=1;ip<=n; ++ip) {
+            //==================================================================
+			// initialize eigenvectors
+            //==================================================================
+			for(size_t ip=1;ip<=n; ++ip)
+            {
 				for(size_t iq=1;iq<=n;++iq)
 					v[ip][iq]=REAL(0.0);
 				v[ip][ip]=REAL(1.0);
 			}
 			
-			//-- initialize workspace
-			for(size_t ip=1;ip<=n; ++ip) {
+            //==================================================================
+			// initialize workspace
+            //==================================================================
+			for(size_t ip=1;ip<=n; ++ip)
+            {
 				b[ip]=d[ip]=a[ip][ip];
 				z[ip]=REAL(0.0);
 			}
 			
 			nrot_ = 0;
 			
-			//-- looping over sweeps
-			for(size_t iter=1;iter<=64;++iter) {
+            //==================================================================
+			// looping over sweeps
+            //==================================================================
+			for(size_t iter=1;iter<=64;++iter)
+            {
 				real_t sm = 0;
 				for(size_t ip=1;ip<n;++ip) {
 					for(size_t iq=ip+1;iq<=n; ++iq)
 						sm += Fabs(a[ip][iq]);
 				}
-				if (sm <= REAL_MIN ) {
+				if (sm <= REAL_MIN )
+                {
 					return true; // OK
 				}
 				

@@ -65,6 +65,7 @@ Solving \eqref{eq:circ} yields
 \end{equation}
 
 \section{Fitting to an Ellipse}
+\subsection{Algebraic definition}
 An algebraic equation is
 \begin{equation}
 \label{eq:ell_alg}
@@ -169,6 +170,162 @@ If $\vec{A}$ is a solution then
 \begin{equation}
 	\vec{F}^2 = \vec{A} \left(\mymat{S}_{qq} - \mymat{S}_{qz}\mymat{S}_{zz}^{-1} \mytrn{\mymat{S}}_{qz}\right) \vec{A} = \lambda
 \end{equation}
-so that $\vec{A}$ is computed from the acceptable eigenvector with the smallest eigenvalue...
+so that $\vec{A}$ is computed from the acceptable eigenvector with the smallest eigenvalue
 
+\subsection{Ellipe reduced equation}
+The quadratic  form is
+\begin{equation}
+\begin{bmatrix}
+x & y\\
+\end{bmatrix}
+\begin{bmatrix}
+ a & \dfrac{b}{2} \\
+ \dfrac{b}{2} & c\\
+\end{bmatrix}
+	\begin{bmatrix}
+	x\\
+	y\\
+	\end{bmatrix}
+	+
+	\begin{bmatrix}
+	x & y\\
+	\end{bmatrix}
+	\begin{bmatrix}
+	d\\
+	e\\
+	\end{bmatrix}
+	+f = 0
+\end{equation}
+At the center of the ellipse, the gradient of the quadratic form vanishes to that
+\begin{equation}
+	\begin{bmatrix}
+ a & \dfrac{b}{2} \\
+ \dfrac{b}{2} & c\\
+\end{bmatrix}
+\begin{bmatrix}
+	x_c\\
+	y_c\\
+\end{bmatrix}
+= -\dfrac{1}{2} 
+\begin{bmatrix}
+	d\\
+	e\\
+	\end{bmatrix}.
+\end{equation}
+Using $x=x'+x_c$ and $y=y'+y_c$
+one finds
+\begin{equation}
+	\begin{bmatrix}
+x' & y'\\
+\end{bmatrix}
+\begin{bmatrix}
+ a & \dfrac{b}{2} \\
+ \dfrac{b}{2} & c\\
+\end{bmatrix}
+	\begin{bmatrix}
+	x'\\
+	y'\\
+	\end{bmatrix} 
+	+
+		\begin{bmatrix}
+x_c & y_c\\
+\end{bmatrix}
+\begin{bmatrix}
+ a & \dfrac{b}{2} \\
+ \dfrac{b}{2} & c\\
+\end{bmatrix}
+	\begin{bmatrix}
+	x_c\\
+	y_c\\
+	\end{bmatrix} 
++
+	\begin{bmatrix}
+x_c & y_c\\
+\end{bmatrix}	
+\begin{bmatrix}
+	d\\
+	e\\
+	\end{bmatrix}
++
+	 f = 0
+\end{equation}
+and
+\begin{equation}
+\begin{bmatrix}
+x' & y'\\
+\end{bmatrix}
+\begin{bmatrix}
+ a & \dfrac{b}{2} \\
+ \dfrac{b}{2} & c\\
+\end{bmatrix}
+	\begin{bmatrix}
+	x'\\
+	y'\\
+	\end{bmatrix} = \dfrac{1}{4} 
+	\begin{bmatrix}
+	d & e\\
+	\end{bmatrix}
+	\begin{bmatrix}
+		a & \dfrac{b}{2} \\
+ 		\dfrac{b}{2} & c\\	\end{bmatrix}^{-1}
+	 \begin{bmatrix}
+	d\\
+	e\\
+	\end{bmatrix}- f.
+\end{equation}
+Since we have an ellipse, there exists $\lambda_X>0$, $\lambda_Y>0$ and an orthogonal matrix $\mymat{Q}$ such that
+\begin{equation}
+\begin{bmatrix}
+ a & \dfrac{b}{2} \\
+ \dfrac{b}{2} & c\\
+\end{bmatrix}
+= \mymat{Q}
+\begin{bmatrix}
+	\lambda_X & 0 \\
+	0  & \lambda_Y \\
+\end{bmatrix}
+\mytrn{\mymat{Q}}.
+\end{equation}
+With 
+\begin{equation}
+	\begin{bmatrix}
+	x'\\
+	y'\\
+	\end{bmatrix}
+	=
+	\mytrn{\mymat{Q}}
+	\begin{bmatrix}
+	X\\
+	Y\\
+	\end{bmatrix}
+\end{equation}
+and
+\begin{equation}
+	\begin{bmatrix}
+	D \\
+	E \\
+	\end{bmatrix}
+	=
+	\mytrn{\mymat{Q}}
+	\begin{bmatrix}
+	d\\
+	e\\
+	\end{bmatrix}
+\end{equation}
+we obtain
+\begin{equation}
+	\begin{bmatrix}
+	x_c\\
+	y_c\\
+	\end{bmatrix}
+	= -\dfrac{1}{2}\mymat{Q}
+	\begin{bmatrix}
+	D / \lambda_X\\
+	E / \lambda_Y\\
+	\end{bmatrix}
+\end{equation}
+and
+\begin{equation}
+	\lambda_X X^2 + \lambda_Y Y^2 = \dfrac{1}{4}\left(\dfrac{D^2}{\lambda_X} + \dfrac{E^2}{\lambda_Y}\right) - f
+\end{equation}
 \end{document}

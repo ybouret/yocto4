@@ -90,16 +90,23 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         }
     }
     vector<double> param(6,0);
-    std::cerr << "#Generic:" << std::endl;
-    ell.solve(conic_generic,param);
-    std::cerr << "param=" << param << std::endl;
-    ell.reduce(param);
-    std::cerr << std::endl;
-    
+
+    std::cerr << "Ra=" << Ra << std::endl;
+    std::cerr << "Rb=" << Rb << std::endl;
+    std::cerr << "Xc=" << Xc << std::endl;
+    std::cerr << "Yc=" << Yc << std::endl;
     std::cerr << "#Ellipse:" << std::endl;
     ell.solve(conic_ellipse,param);
     std::cerr << "param=" << param << std::endl;
     ell.reduce(param);
+    
+    std::cerr << std::endl;
+    std::cerr << "#Generic:" << std::endl;
+    ell.solve(conic_generic,param);
+    std::cerr << "param=" << param << std::endl;
+    ell.reduce(param);
+    
+   
     
 }
 YOCTO_UNIT_TEST_DONE()
