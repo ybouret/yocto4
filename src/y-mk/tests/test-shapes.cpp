@@ -39,8 +39,6 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
         }
     }
     
-    std::cerr << "S=" << circ.__S() << std::endl;
-    std::cerr << "Q=" << circ.__Q() << std::endl;
     
     v2d<double> C;
     double      radius=0;
@@ -61,6 +59,7 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(fit_ellipse)
 {
     size_t n = 10;
+    double noise = 0.1;
     if(argc>1)
         n = strconv::to<size_t>(argv[1],"n");
     
@@ -83,14 +82,16 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             const double theta = alea<double>() * numeric<double>::two_pi;
             const double X     = Ra * Cos(theta);
             const double Y     = Rb * Sin(theta);
-            const double x     = Xc + X*CosPhi - Y*SinPhi;
-            const double y     = Yc + X*SinPhi + Y*CosPhi;
+            const double x     = Xc + X*CosPhi - Y*SinPhi + (0.5 - alea<double>()) * noise;
+            const double y     = Yc + X*SinPhi + Y*CosPhi + (0.5 - alea<double>()) * noise;;
             fp("%g %g\n", x, y);
             ell.append(x,y);
         }
     }
     vector<double> param(6,0);
-
+    v2d<double>    radius,center;
+    m2d<double>    rot;
+    
     std::cerr << "Ra=" << Ra << std::endl;
     std::cerr << "Rb=" << Rb << std::endl;
     std::cerr << "Xc=" << Xc << std::endl;
@@ -100,14 +101,48 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     std::cerr << "#Ellipse:" << std::endl;
     ell.solve(conic_ellipse,param);
     std::cerr << "param=" << param << std::endl;
-    ell.reduce(param);
+    ell.reduce(center,radius,rot,param);
+    std::cerr << "ellipse:" << std::endl;
+    std::cerr << "center=" << center << std::endl;
+    std::cerr << "radius=" << radius << std::endl;
+    std::cerr << "rot=" << rot << std::endl;
+    {
+        ios::ocstream fp("ell_fit.dat",false);
+        for(double theta=0; theta <= 6.3; theta += 0.1)
+        {
+            const double c = Cos(theta);
+            const double s = Sin(theta);
+            const double Rx = radius.x * c;
+            const double Ry = radius.y * s;
+            const double x  = center.x + Rx * rot.ex.x + Ry * rot.ey.x;
+            const double y  = center.y + Rx * rot.ex.y + Ry * rot.ey.y;
+            fp("%g %g\n", x, y);
+        }
+    }
     
     std::cerr << std::endl;
     std::cerr << "#Generic:" << std::endl;
     ell.solve(conic_generic,param);
     std::cerr << "param=" << param << std::endl;
-    ell.reduce(param);
-    
+    ell.reduce(center,radius,rot,param);
+    std::cerr << "ellipse:" << std::endl;
+    std::cerr << "center=" << center << std::endl;
+    std::cerr << "radius=" << radius << std::endl;
+    std::cerr << "rot=" << rot << std::endl;
+    {
+        ios::ocstream fp("gen_fit.dat",false);
+        for(double theta=0; theta <= 6.3; theta += 0.1)
+        {
+            const double c = Cos(theta);
+            const double s = Sin(theta);
+            const double Rx = radius.x * c;
+            const double Ry = radius.y * s;
+            const double x  = center.x + Rx * rot.ex.x + Ry * rot.ey.x;
+            const double y  = center.y + Rx * rot.ex.y + Ry * rot.ey.y;
+            fp("%g %g\n", x, y);
+        }
+
+    }
    
     
 }

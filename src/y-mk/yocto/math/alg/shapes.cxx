@@ -330,7 +330,10 @@ namespace yocto
         
         
         template <>
-        void fit_conic<real_t>:: reduce( array<real_t> &param )
+        void fit_conic<real_t>:: reduce(v2d<real_t>   &center,
+                                        v2d<real_t>   &radius,
+                                        m2d<real_t>   &rotation,
+                                        array<real_t> &param )
         {
             assert(param.size()>=6);
             matrix<real_t> S(2,2);
@@ -345,7 +348,7 @@ namespace yocto
             S[1][1] = a;
             S[2][2] = c;
             S[1][2] = S[2][1] = b/2;
-            std::cerr << "S=" << S << std::endl;
+            //std::cerr << "S=" << S << std::endl;
             matrix<real_t> Q(2,2);
             vector<real_t> lam(2,numeric<real_t>::zero);
             if( !jacobi<real_t>::build(S,lam,Q) )
@@ -372,11 +375,16 @@ namespace yocto
                     cswap(lam[1],lam[2]);
                     Q.swap_cols(1, 2);
                 }
-                std::cerr << "#found ellipse" << std::endl;
-                std::cerr << "lam=" << lam << std::endl;
-                std::cerr << "Q="   << Q   << std::endl;
+                //std::cerr << "#found ellipse" << std::endl;
+                //std::cerr << "lam=" << lam << std::endl;
+                //std::cerr << "Q="   << Q   << std::endl;
                 const real_t lamX = lam[1];
                 const real_t lamY = lam[2];
+                rotation.ex.x = Q[1][1];
+                rotation.ex.y = Q[2][1];
+                
+                rotation.ey.x = Q[1][2];
+                rotation.ey.y = Q[2][2];
                 
                 //--------------------------------------------------------------
                 // ( D )                  ( d )
@@ -389,19 +397,19 @@ namespace yocto
                 const real_t Dp  = D/lamX;
                 const real_t Ep  = E/lamY;
                 
-                const real_t xc  = -REAL(0.5) * (Q[1][1] * Dp + Q[1][2] * Ep);
-                const real_t yc  = -REAL(0.5) * (Q[2][1] * Dp + Q[2][2] * Ep);
-                std::cerr << "xc=" << xc << std::endl;
-                std::cerr << "yc=" << yc << std::endl;
+                center.x = -REAL(0.5) * (Q[1][1] * Dp + Q[1][2] * Ep);
+                center.y  = -REAL(0.5) * (Q[2][1] * Dp + Q[2][2] * Ep);
+                //std::cerr << "center=" << center << std::endl;
                 const real_t rhs = REAL(0.25) * ( D*Dp + E*Ep) - f;
-                std::cerr << "rhs=" <<rhs << std::endl;
+                //std::cerr << "rhs=" <<rhs << std::endl;
                 const real_t R2  = rhs > 0 ? rhs : 0;
                 
-                const real_t Rx  = Sqrt(R2/lamX);
-                const real_t Ry =  Sqrt(R2/lamY);
+                radius.x  = Sqrt(R2/lamX);
+                radius.y =  Sqrt(R2/lamY);
                 
-                std::cerr << "Rx=" << Rx << std::endl;
-                std::cerr << "Ry=" << Ry << std::endl;
+                //std::cerr << "radius="<< radius << std::endl;
+                //std::cerr << "rot.ex=" << rotation.ex << std::endl;
+                //std::cerr << "rot.ey=" << rotation.ey << std::endl;
                 return;
             }
          
