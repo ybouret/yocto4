@@ -15,28 +15,28 @@ namespace yocto {
 	namespace math {
 		
 		template <class T>
-		class jacobi : public object {
-		public:
-			explicit jacobi() throw();
-			explicit jacobi( size_t n );
-			virtual ~jacobi() throw();
+		struct jacobi {
+            
+            //! Jacobi reduction
+            /**
+             \param a is a symetric matrix
+             \param d are the eigenvalues
+             \param v are the eigenvectors
+             \param Diag = Vt A V
+             */
+            static
+			bool build( matrix<T> &a, array<T> &d, matrix<T> &v );
 			
-			//-- a is a symetric matrix
-			//-- d are the eigenvalues
-			//-- v are the eigenvectors
-			//-- Diag = Vt A V
-			bool operator()( matrix<T> &a, array<T> &d, matrix<T> &v );
-			
-			//! sort eigenvalues by descending order
-			//! sort columns of v accordingly
+			//! sort eigenvalues and according columns of v by DESCENDING order
+            /**
+             \param d a vector or eigenvalues
+             \param v a matrix of eigenvectors
+             */
 			static
 			void eigsrt( array<T> &d, matrix<T> &v ) throw();
 			
-		private:
-			vector<T>  wksp_;
-			size_t     nrot_;
 		};
-				
+        
 	}
 }
 

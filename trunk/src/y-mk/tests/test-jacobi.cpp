@@ -19,15 +19,14 @@ static inline void test_jacobi()
 			}
 		}
 		matrix<T> a = m;
-		jacobi<T> Jacobi(n);
 		matrix<T> v(n,n);
 		vector<T> d(n,0);
-		if( !Jacobi(a,d,v) )
+		if( !jacobi<T>::build(a,d,v) )
 		{
 			std::cerr << "Couldn't perform jacobi!" << std::endl;
 			continue;
 		}
-		Jacobi.eigsrt(d,v);
+		jacobi<T>::eigsrt(d,v);
 		matrix<T> tv = v;
 		tv.transpose();
 		//std::cerr << "m=" << m << std::endl;
