@@ -52,7 +52,7 @@ void test_diag()
         {
             for(size_t j=1; j<=n;++j)
             {
-                a[i][j] = (0.5-alea<double>());// + (i==j?a.rows:0);
+                a[i][j] = (T(0.5)-alea<T>());// + (i==j?a.rows:0);
             }
         }
         std::cerr << "a=" << a << std::endl;
@@ -126,7 +126,7 @@ void __test_eigv()
         {
             for(size_t j=1; j<=n;++j)
             {
-                A[i][j] = (0.5-alea<double>());// + (i==j?a.rows:0);
+                A[i][j] = (T(0.5)-alea<T>());// + (i==j?a.rows:0);
             }
         }
         __perform_eigv(A);
