@@ -65,7 +65,6 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
         n = strconv::to<size_t>(argv[1],"n");
     
     fit_conic<double> ell;
-    fit_conic<double> gen;
 
     const double Xc = 10 + (alea<double>() - 0.5) * 20;
     const double Yc = 10 + (alea<double>() - 0.5) * 20;
@@ -88,16 +87,17 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             const double y     = Yc + X*SinPhi + Y*CosPhi;
             fp("%g %g\n", x, y);
             ell.append(x,y);
-            gen.append(x,y);
         }
     }
-    fit_conic<double>::parameters param;
+    vector<double> param(6,0);
     std::cerr << "#Generic:" << std::endl;
-    gen.solve(conic_generic,param);
+    ell.solve(conic_generic,param);
+    std::cerr << "param=" << param << std::endl;
     std::cerr << std::endl;
     
     std::cerr << "#Ellipse:" << std::endl;
     ell.solve(conic_ellipse,param);
+    std::cerr << "param=" << param << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()

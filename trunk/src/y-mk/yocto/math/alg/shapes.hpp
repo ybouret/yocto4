@@ -16,6 +16,9 @@ namespace yocto
         public:
             virtual ~fit_shape() throw();
             
+            virtual void reset() throw() = 0;
+            virtual void append( T x, T y ) throw() = 0;
+            
         protected:
             explicit fit_shape() throw();
             
@@ -37,16 +40,13 @@ namespace yocto
             inline const matrix<T> & __S() const throw() { return S; }
             inline const array<T>  & __Q() const throw() { return Q; }
             
-            //! reset upon success, throw otherwise
-            void solve( T &R, v2d<T> &C );
+            //! throw upon failure
+            void solve( T &R, v2d<T> &C ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_circle);
-            matrix<T> S;
-            vector<T> Q;
-            vector<T> W; // for SVD build
-            matrix<T> V; // for SVD build
-            vector<T> A; // for SVD solve
+            matrix<T>         S;
+            vector<T>         Q;
         };
         
         enum conic_type
@@ -59,10 +59,6 @@ namespace yocto
         class fit_conic : public fit_shape<T>
         {
         public:
-            struct parameters
-            {
-                T a,b,c,d,e,f;
-            };
             explicit fit_conic();
             virtual ~fit_conic() throw();
             
@@ -71,7 +67,7 @@ namespace yocto
             void append( T x, T y ) throw();
             
             
-            void solve(conic_type t,parameters &param);
+            void solve(conic_type t,array<T> &param) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_conic);
@@ -79,8 +75,6 @@ namespace yocto
             matrix<T> Sqz;
             matrix<T> Szz;
             
-        protected:
-            matrix<T> C;
         };
         
         
