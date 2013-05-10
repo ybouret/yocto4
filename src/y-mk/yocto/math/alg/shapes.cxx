@@ -35,10 +35,7 @@ namespace yocto
         template <>
         fit_circle<real_t>:: fit_circle() :
         S(3,3),
-        Q(3,numeric<real_t>::zero),
-        W(3,numeric<real_t>::zero),
-        V(3,3),
-        A(3,numeric<real_t>::zero)
+        Q(3,numeric<real_t>::zero)
         {
             
         }
@@ -78,12 +75,15 @@ namespace yocto
         }
         
         template <>
-        void fit_circle<real_t>:: solve( real_t &R, v2d<real_t> &C )
+        void fit_circle<real_t>:: solve( real_t &R, v2d<real_t> &C ) const
         {
             static const char fn[] = "fit_circle";
             
             R = C.x = C.y  = 0;
-            if( !svd<real_t>::build(S, W, V) )
+            matrix<real_t> U(S);
+            matrix<real_t> V(3,3);
+            vector<real_t> W(3,numeric<real_t>::zero);
+            if( !svd<real_t>::build(U, W, V) )
             {
                 throw exception("%s(no SVD: bad points)", fn);
             }
@@ -97,7 +97,8 @@ namespace yocto
             //==================================================================
             // solve
             //==================================================================
-            svd<real_t>::solve(S, W, V, Q, A);
+            vector<real_t> A(3,numeric<real_t>::zero);
+            svd<real_t>::solve(U, W, V, Q, A);
             
             //==================================================================
             // deduce parameters
@@ -106,9 +107,6 @@ namespace yocto
             C.y = A[2]/2;
             const real_t R2 = A[3] + C.norm2();
             R = R2 > 0 ? Sqrt(R2) : 0;
-            
-            reset();
-            
         }
         
         template <>
@@ -118,21 +116,8 @@ namespace yocto
         fit_conic<real_t>:: fit_conic() :
         Sqq(3,3),
         Sqz(3,3),
-        Szz(3,3),
-        C(3,3)
+        Szz(3,3)
         {
-            C.ldz();
-            
-            C.ld1();
-            //C[2][2] = 0.5;
-            
-            if(true)
-            {
-                C.ldz();
-                C[2][2] = -1;
-                C[1][3] = 2;
-                C[3][1] = 2;
-            }
         }
         
         template <>
@@ -163,12 +148,13 @@ namespace yocto
         }
         
         template <>
-        void fit_conic<real_t>:: solve(conic_type t, parameters &param)
+        void fit_conic<real_t>:: solve(conic_type t, array<real_t> &param) const
         {
             static const char fn[] = "fit_conic";
             
-            memset(&param,0,sizeof(param));
-            C.ldz();
+            assert(param.size()>=6);
+            for(size_t i=6;i>0;--i) param[i] = 0;
+            matrix<real_t> C(3,3);
             switch(t)
             {
                 case conic_generic:
@@ -310,12 +296,14 @@ namespace yocto
             for(size_t i=3;i>0;--i) B[i] = -B[i];
             std::cerr << "B=" << B << std::endl;
             
-            //------------------------------------------------------------------
-            // reduce the quadratic form
-            //------------------------------------------------------------------
+            param[1] = A[1];
+            param[2] = A[2];
+            param[3] = A[3];
             
+            param[4] = B[1];
+            param[5] = B[2];
+            param[6] = B[3];
             
-            reset();
         }
         
     }
