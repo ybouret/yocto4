@@ -91,12 +91,13 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             gen.append(x,y);
         }
     }
+    fit_conic<double>::parameters param;
     std::cerr << "#Generic:" << std::endl;
-    gen.solve(conic_generic);
+    gen.solve(conic_generic,param);
     std::cerr << std::endl;
     
     std::cerr << "#Ellipse:" << std::endl;
-    ell.solve(conic_ellipse);
+    ell.solve(conic_ellipse,param);
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -8,6 +8,7 @@
 #include "yocto/math/kernel/diag.hpp"
 
 #include "yocto/exception.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -162,10 +163,11 @@ namespace yocto
         }
         
         template <>
-        void fit_conic<real_t>:: solve(conic_type t)
+        void fit_conic<real_t>:: solve(conic_type t, parameters &param)
         {
             static const char fn[] = "fit_conic";
             
+            memset(&param,0,sizeof(param));
             C.ldz();
             switch(t)
             {
