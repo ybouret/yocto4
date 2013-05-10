@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     
     const double Ra     = 4 + 2*alea<double>();
     const double Rb     = 1.5 + alea<double>();
-    const double phi    =  alea<double>() * numeric<double>::two_pi;
+    const double phi    = alea<double>() * numeric<double>::two_pi;
     const double CosPhi = Cos(phi);
     const double SinPhi = Sin(phi);
     
@@ -95,6 +95,8 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     std::cerr << "Rb=" << Rb << std::endl;
     std::cerr << "Xc=" << Xc << std::endl;
     std::cerr << "Yc=" << Yc << std::endl;
+    std::cerr << "Cos(Phi)=" << CosPhi << std::endl;
+    std::cerr << "Sin(Phi)=" << SinPhi << std::endl;
     std::cerr << "#Ellipse:" << std::endl;
     ell.solve(conic_ellipse,param);
     std::cerr << "param=" << param << std::endl;
