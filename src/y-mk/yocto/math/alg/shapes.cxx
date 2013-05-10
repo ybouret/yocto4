@@ -331,22 +331,32 @@ namespace yocto
         
         
         template <>
-        void fit_conic<real_t>:: reduce( const array<real_t> &param )
+        void fit_conic<real_t>:: reduce( array<real_t> &param )
         {
             assert(param.size()>=6);
             matrix<real_t> S(2,2);
+            
+        BUILD_S:
             S[1][1] = param[1];
             S[2][2] = param[3];
             S[1][2] = S[2][1] = param[2]/2;
             std::cerr << "S=" << S << std::endl;
-            matrix<real_t> V(2,2);
+            matrix<real_t> Q(2,2);
             vector<real_t> lam(2,numeric<real_t>::zero);
             {
                 jacobi<real_t> Jacobi;
-                if( !Jacobi(S,lam,V) )
+                if( !Jacobi(S,lam,Q) )
                     throw exception("fit_conic::reduce(invalid parameters)");
             }
+            if( lam[1] <0 && lam[2] < 0)
+            {
+                // change sign
+                for(size_t i=1; i <=6; ++i ) param[i] = -param[i];
+                goto BUILD_S;
+            }
+            jacobi<real_t>::eigsrt(lam, Q);
             std::cerr << "lam=" << lam << std::endl;
+            std::cerr << "Q="   << Q   << std::endl;
         }
         
         
