@@ -59,6 +59,10 @@ namespace yocto
         class fit_conic : public fit_shape<T>
         {
         public:
+            struct parameters
+            {
+                T a,b,c,d,e,f;
+            };
             explicit fit_conic();
             virtual ~fit_conic() throw();
             
@@ -67,7 +71,7 @@ namespace yocto
             void append( T x, T y ) throw();
             
             
-            void solve(conic_type t);
+            void solve(conic_type t,parameters &param);
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_conic);
@@ -78,6 +82,8 @@ namespace yocto
         protected:
             matrix<T> C;
         };
+        
+        
         
     }
 }
