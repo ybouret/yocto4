@@ -43,6 +43,8 @@ namespace yocto
             //! throw upon failure
             void solve( T &R, v2d<T> &C ) const;
             
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_circle);
             matrix<T>         S;
@@ -69,6 +71,8 @@ namespace yocto
             
             void solve(conic_type t,array<T> &param) const;
             
+            static void reduce( const array<T> &param );
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(fit_conic);
             matrix<T> Sqq;

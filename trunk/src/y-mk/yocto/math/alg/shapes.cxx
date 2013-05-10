@@ -3,19 +3,14 @@
 #include "yocto/math/types.hpp"
 
 #include "yocto/math/kernel/svd.hpp"
-#include "yocto/math/kernel/algebra.hpp"
-#include "yocto/math/kernel/lu.hpp"
-#include "yocto/math/kernel/diag.hpp"
 
 #include "yocto/exception.hpp"
-#include <cstring>
 
 namespace yocto
 {
     namespace math
     {
         
-        typedef algebra<real_t> mkl;
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -109,6 +104,21 @@ namespace yocto
             R = R2 > 0 ? Sqrt(R2) : 0;
         }
         
+    }
+    
+}
+
+#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/diag.hpp"
+
+
+namespace yocto
+{
+    namespace math
+    {
+        typedef algebra<real_t> mkl;
+        
         template <>
         fit_conic<real_t>:: ~fit_conic() throw() {}
         
@@ -158,9 +168,9 @@ namespace yocto
             switch(t)
             {
                 case conic_generic:
-                    C[1][1] = 1;
+                    C[1][1] =   1;
                     C[2][2] = 0.5;
-                    C[3][3] = 1;
+                    C[3][3] =   1;
                     break;
                     
                 case conic_ellipse:
@@ -308,4 +318,30 @@ namespace yocto
         
     }
     
+}
+
+
+#include "yocto/math/kernel/jacobi.hpp"
+
+namespace yocto
+{
+    
+    namespace math
+    {
+        
+        
+        template <>
+        void fit_conic<real_t>:: reduce( const array<real_t> &param )
+        {
+            assert(param.size()>=6);
+            matrix<real_t> S(2,2);
+            S[1][1] = param[1];
+            S[2][2] = param[3];
+            S[1][2] = S[2][1] = param[2]/2;
+            std::cerr << "S=" << S << std::endl;
+            
+        }
+        
+        
+    }
 }
