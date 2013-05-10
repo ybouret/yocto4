@@ -44,23 +44,15 @@ YOCTO_UNIT_TEST_IMPL(fit_circle)
     
     v2d<double> C;
     double      radius=0;
-    
-    if( circ.solve(radius,C) )
+    circ.solve(radius,C);
+    std::cerr << "C=" << C << std::endl;
+    std::cerr << "radius=" << radius << std::endl;
+    ios::ocstream fp("fit_circ.dat",false);
+    for( double theta=0; theta < numeric<double>::two_pi; theta += 0.01 )
     {
-        std::cerr << "C=" << C << std::endl;
-        std::cerr << "radius=" << radius << std::endl;
-        ios::ocstream fp("fit_circ.dat",false);
-        for( double theta=0; theta < numeric<double>::two_pi; theta += 0.01 )
-        {
-            fp("%g %g\n", C.x + radius*cos(theta), C.y + radius*sin(theta) );
-        }
-        fp("%g %g\n", C.x+radius,C.y);
+        fp("%g %g\n", C.x + radius*cos(theta), C.y + radius*sin(theta) );
     }
-    else
-        std::cerr << "Singular Distribution" << std::endl;
-    
-    
-
+    fp("%g %g\n", C.x+radius,C.y);
     
 }
 YOCTO_UNIT_TEST_DONE()
@@ -71,12 +63,13 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     size_t n = 10;
     if(argc>1)
         n = strconv::to<size_t>(argv[1],"n");
-
-    fit_conic<double> ell;
     
+    fit_conic<double> ell;
+    fit_conic<double> gen;
+
     const double Xc = 10 + (alea<double>() - 0.5) * 20;
     const double Yc = 10 + (alea<double>() - 0.5) * 20;
-
+    
     const double Ra     = 4 + 2*alea<double>();
     const double Rb     = 1.5 + alea<double>();
     const double phi    =  alea<double>() * numeric<double>::two_pi;
@@ -95,11 +88,15 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
             const double y     = Yc + X*SinPhi + Y*CosPhi;
             fp("%g %g\n", x, y);
             ell.append(x,y);
+            gen.append(x,y);
         }
     }
-    //std::cerr << "S=" << ell.__S() << std::endl;
-    //std::cerr << "C=" << ell.__C() << std::endl;
-    ell.solve();
+    std::cerr << "#Generic:" << std::endl;
+    gen.solve(conic_generic);
+    std::cerr << std::endl;
+    
+    std::cerr << "#Ellipse:" << std::endl;
+    ell.solve(conic_ellipse);
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -100,69 +100,6 @@ namespace yocto {
     
     namespace math {
         
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // Hessenberg reduction
-        //
-        ////////////////////////////////////////////////////////////////////////
-        template <>
-        void diag<real_t>:: HessenbergReduce( matrix<real_t> &a ) throw()
-        {
-            assert( a.is_square() );
-            const size_t n = a.rows;
-            //std::cerr << "Hessenberg Reduction" << std::endl;
-            for(size_t m=2;m<n;++m)
-            {
-                real_t x=0;
-                size_t i=m;
-                
-                for(size_t j=m;j<=n;j++)
-                {
-                    const real_t piv = a[j][m-1];
-                    if (Fabs(piv) > Fabs(x))
-                    {
-                        x=piv;
-                        i=j;
-                    }
-                }
-                
-                //std::cerr << "\tPIVOT #" << m << " : " << i << " / " << x << std::endl;
-                if (i != m)
-                {
-                    //std::cerr << "\tSWAP(" << i << "," << m << ")" << std::endl;
-                    for (size_t j=m-1;j<=n;j++) cswap(a[i][j],a[m][j]);
-                    for (size_t j=1;j<=n;j++) cswap(a[j][i],a[j][m]);
-                }
-                
-                if(Fabs(x)>0)
-                {
-                    for(i=m+1;i<=n;i++)
-                    {
-                        real_t y = a[i][m-1];
-                        if( Fabs(y)>0 )
-                        {
-                            y /= x;
-                            a[i][m-1]=y;
-                            
-                            for (size_t j=m;j<=n;j++)
-                                a[i][j] -= y*a[m][j];
-                            
-                            for (size_t j=1;j<=n;j++)
-                                a[j][m] += y*a[j][i];
-                        }
-                    }
-                }
-            }
-                        
-            //==================================================================
-            // clean up to the exact Hessenberg form
-            //==================================================================
-            for(size_t j=n;j>0;--j)
-            {
-                for(size_t i=j+2;i<=n;++i)
-                    a[i][j] = 0;
-            }
-        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -170,7 +107,7 @@ namespace yocto {
         //
         ////////////////////////////////////////////////////////////////////////
         template <>
-        void diag<real_t>:: HessenbergForm( matrix<real_t> &a ) throw()
+        void diag<real_t>:: HessenbergReduce( matrix<real_t> &a ) throw()
         {
             assert(a.is_square());
             const size_t n = a.rows;
@@ -180,12 +117,14 @@ namespace yocto {
             //------------------------------------------------------------------
             for(size_t m=2; m<n; ++m )
             {
-                const size_t r = m-1;
-                real_t piv = 0;
-                size_t s   = m;
+                const size_t r   = m-1;
+                real_t       piv = 0;
+                size_t       s   = m;
                 for( size_t j=m+1;j<=n;++j)
                 {
-                    //-- find the pivot
+                    //----------------------------------------------------------
+                    // find the pivot
+                    //----------------------------------------------------------
                     const real_t tmp = a[j][r];
                     if(Fabs(tmp)>Fabs(piv))
                     {
@@ -195,7 +134,7 @@ namespace yocto {
                 }
                 if( s != m )
                 {
-                    std::cerr << "\t#SWAP(" << s << "," << m << ")" <<  "/pivot=" << piv << std::endl;
+                    //std::cerr << "\t#SWAP(" << s << "," << m << ")" <<  "/pivot=" << piv << std::endl;
                     assert(Fabs(piv)>0);
                     //----------------------------------------------------------
                     // First similarity transform: exchange colums/rows
@@ -205,13 +144,31 @@ namespace yocto {
                     //----------------------------------------------------------
                     // Second similarity transform
                     //----------------------------------------------------------
-                    //const real_t den = a[m][m-1]; std::cerr << "\tden=" << den << std::endl;
+                    assert( Fabs(piv-a[m][m-1]) <= 0 );
                     for(size_t i=m+1;i<=n;++i)
                     {
+                        const real_t factor = a[i][r] / piv;
                         
+                        //------------------------------------------------------
+                        // subtract factor times row r + 1 from row i
+                        //------------------------------------------------------
+                        for(size_t j=1;j<=n;++j) a[i][j] -= factor * a[m][j];
+                        
+                        //------------------------------------------------------
+                        // add factor times column i to column r + 1
+                        //------------------------------------------------------
+                        for(size_t j=1;j<=n;j++) a[j][m] += factor * a[j][i];
                     }
                 }
-                
+            }
+            
+            //==================================================================
+            // clean up to the exact Hessenberg form
+            //==================================================================
+            for(size_t j=n;j>0;--j)
+            {
+                for(size_t i=j+2;i<=n;++i)
+                    a[i][j] = 0;
             }
             
         }
@@ -274,13 +231,9 @@ namespace yocto
                     x=a[nn][nn];
                     if (l == nn)
                     {
-                        
-                        //wr[nn]=x+t;
-                        //wi[nn]=0;
-                        //flag[nn] = eigen::is_real;
                         wr[ir]=x+t;
                         wi[ir]=0;
-                        std::cerr << "EIG: real single: " << wr[ir] << std::endl;
+                        //std::cerr << "#EIG: real single: " << wr[ir] << std::endl;
                         ++ir;
                         ++nr;
                         --nn;
@@ -298,30 +251,16 @@ namespace yocto
                             if (q >= 0)
                             {
                                 z=p+Signed(z,p);
-                                
-                                /*
-                                 wr[nn-1]=wr[nn]=x+z;
-                                 if( Fabs(z)>0 )
-                                 wr[nn]=x-w/z;
-                                 wi[nn-1]=wi[nn]=0;
-                                 flag[nn-1]=flag[nn]=eigen::is_real;
-                                 */
-                                
                                 wr[ir+1]=wr[ir]=x+z;
                                 if( Fabs(z)>0 )
                                     wr[ir]=x-w/z;
-                                std::cerr << "EIG: real pair: " << wr[ir] << ", " << wr[ir+1] << ", x=" << x << ", w=" << w << ", z=" << z << ", p=" << p << ", sq=" << Sqrt(Fabs(q)) << std::endl;
+                                //std::cerr << "#EIG: real pair: " << wr[ir] << ", " << wr[ir+1] << ", x=" << x << ", w=" << w << ", z=" << z << ", p=" << p << ", sq=" << Sqrt(Fabs(q)) << std::endl;
                                 wi[ir+1]=wi[ir]=0;
                                 ir += 2;
                                 nr += 2;
                             }
                             else
                             {
-                                /*
-                                 wr[nn-1]=wr[nn]=x+p;
-                                 wi[nn-1]= -(wi[nn]=z);
-                                 flag[nn-1] = flag[nn] = eigen::is_cplx;
-                                 */
                                 wr[ic-1]=wr[ic]=x+p;
                                 wi[ic-1]= -(wi[ic]=z);
                                 ic -= 2;
