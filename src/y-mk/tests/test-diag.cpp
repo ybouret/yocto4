@@ -28,7 +28,7 @@ YOCTO_UNIT_TEST_IMPL(balance)
         diag<double>::HessenbergBalance(B);
         std::cerr << "B=" << B << std::endl;
         matrix<double> C = B;
-        diag<double>::HessenbergReduce(C);
+        diag<double>::HessenbergForm(C);
         std::cerr << "C=" << C << std::endl;
         
     }
