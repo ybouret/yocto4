@@ -9,12 +9,6 @@ namespace yocto
     namespace math
     {
         
-        struct eigen
-        {
-            static const int is_real = 0;
-            static const int is_cplx = 1;
-        };
-        
         template <typename T>
         struct diag
         {
@@ -34,10 +28,6 @@ namespace yocto
              */
             static
             void HessenbergReduce( matrix<T> &a ) throw();
-            
-    
-            static
-            void HessenbergForm( matrix<T> &a ) throw();
             
             
             //! find the eigen values
