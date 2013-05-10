@@ -175,7 +175,9 @@ namespace yocto {
             assert(a.is_square());
             const size_t n = a.rows;
             
+            //------------------------------------------------------------------
             // m = r+1
+            //------------------------------------------------------------------
             for(size_t m=2; m<n; ++m )
             {
                 const size_t r = m-1;
@@ -183,6 +185,7 @@ namespace yocto {
                 size_t s   = m;
                 for( size_t j=m+1;j<=n;++j)
                 {
+                    //-- find the pivot
                     const real_t tmp = a[j][r];
                     if(Fabs(tmp)>Fabs(piv))
                     {
@@ -190,7 +193,24 @@ namespace yocto {
                         s   = j;
                     }
                 }
-                
+                if( s != m )
+                {
+                    std::cerr << "\t#SWAP(" << s << "," << m << ")" <<  "/pivot=" << piv << std::endl;
+                    assert(Fabs(piv)>0);
+                    //----------------------------------------------------------
+                    // First similarity transform: exchange colums/rows
+                    //----------------------------------------------------------
+                    a.swap_both(s,m);
+                    
+                    //----------------------------------------------------------
+                    // Second similarity transform
+                    //----------------------------------------------------------
+                    //const real_t den = a[m][m-1]; std::cerr << "\tden=" << den << std::endl;
+                    for(size_t i=m+1;i<=n;++i)
+                    {
+                        
+                    }
+                }
                 
             }
             
