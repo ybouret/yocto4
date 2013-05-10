@@ -339,7 +339,14 @@ namespace yocto
             S[2][2] = param[3];
             S[1][2] = S[2][1] = param[2]/2;
             std::cerr << "S=" << S << std::endl;
-            
+            matrix<real_t> V(2,2);
+            vector<real_t> lam(2,numeric<real_t>::zero);
+            {
+                jacobi<real_t> Jacobi;
+                if( !Jacobi(S,lam,V) )
+                    throw exception("fit_conic::reduce(invalid parameters)");
+            }
+            std::cerr << "lam=" << lam << std::endl;
         }
         
         

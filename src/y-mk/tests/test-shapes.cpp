@@ -93,11 +93,13 @@ YOCTO_UNIT_TEST_IMPL(fit_ellipse)
     std::cerr << "#Generic:" << std::endl;
     ell.solve(conic_generic,param);
     std::cerr << "param=" << param << std::endl;
+    ell.reduce(param);
     std::cerr << std::endl;
     
     std::cerr << "#Ellipse:" << std::endl;
     ell.solve(conic_ellipse,param);
     std::cerr << "param=" << param << std::endl;
+    ell.reduce(param);
     
 }
 YOCTO_UNIT_TEST_DONE()
