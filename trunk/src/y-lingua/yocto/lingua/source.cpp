@@ -129,3 +129,18 @@ namespace yocto
     }
     
 }
+
+
+#include "yocto/ios/icstream.hpp"
+
+namespace yocto
+{
+    namespace lingua
+    {
+        void source:: attach_stdin()
+        {
+            const input fp( new ios::icstream(ios::cstdin) );
+            attach(fp);
+        }
+    }
+}

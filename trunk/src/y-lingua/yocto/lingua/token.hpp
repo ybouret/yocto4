@@ -28,7 +28,7 @@ namespace yocto
         
         
         //! a dynamic list of t_char
-        class token : public core::list_of<t_char>
+        class token : public object, public core::list_of<t_char>
         {
         public:
             token() throw();    //!< empty token

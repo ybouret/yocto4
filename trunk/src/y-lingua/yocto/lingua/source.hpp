@@ -34,6 +34,8 @@ namespace yocto
             
             bool    is_active(); //!< if there are some available t_char
             
+            void attach_stdin();
+            
         private:
             token                  cache; //!< I/O cache
             input                 *ppInp; //!< on block
