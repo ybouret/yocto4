@@ -18,6 +18,9 @@ namespace yocto
             detach();
         }
         
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
         source:: source() :
         cache(),
         ppInp(0),

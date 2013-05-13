@@ -20,6 +20,8 @@ YOCTO_UNIT_TEST_IMPL(joker)
         motifs.push_back(p);
         p->append( single::create('a') );
         p->append( optional::create( single::create('b') ) );
+		p->append( zero_or_more( single::create('c') ) );
+		p->append( one_or_more( single::create('d') ) );
     }
     shared_test_motifs( motifs );
 
