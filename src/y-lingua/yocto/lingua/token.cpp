@@ -35,7 +35,7 @@ namespace yocto
         
         t_cache:: ~t_cache() throw()
         {
-            delete_with( t_char::release );
+            kill();
         }
         
         void t_cache:: reserve( size_t n )
@@ -57,6 +57,12 @@ namespace yocto
             else
                 return t_char::acquire(C);
         }
+        
+        void    t_cache:: kill() throw()
+        {
+             delete_with( t_char::release );
+        }
+
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -96,6 +102,19 @@ namespace yocto
             }
         }
         
+        token & token:: operator=( const token &other )
+        {
+            token tmp(cache);
+            for(const t_char *ch = other.head; ch; ch=ch->next)
+            {
+                tmp.push_back( cache.create(ch->data) );
+            }
+            swap_with(tmp);
+            return *this;
+        }
+
+        
+        
         string token:: to_string( size_t skip,size_t trim) const
         {
             const size_t ndel = skip+trim;
@@ -129,6 +148,54 @@ namespace yocto
             }
             return os;
         }
+        
+        token:: token(t_cache &p, const string &s ):
+        cache(p)
+        {
+            try
+            {
+                const size_t n = s.size();
+                for(size_t i=0;i<n;++i)
+                    push_back( cache.create(s[i]) );
+            }
+            catch(...)
+            {
+                clear();
+                throw;
+            }
+        }
+        
+        token:: token(t_cache &p, const char *s ):
+        cache(p)
+        {
+            try
+            {
+                const size_t n = length_of(s);
+                for(size_t i=0;i<n;++i)
+                    push_back( cache.create(s[i]) );
+            }
+            catch(...)
+            {
+                clear();
+                throw;
+            }
+        }
+
+        
+        token & token:: operator=( const string &s )
+        {
+            token tmp(cache,s);
+            swap_with(tmp);
+            return *this;
+        }
+
+        token & token:: operator=( const char *s )
+        {
+            token tmp(cache,s);
+            swap_with(tmp);
+            return *this;
+        }
+
         
     }
     
