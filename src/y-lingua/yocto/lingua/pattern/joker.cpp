@@ -22,5 +22,10 @@ namespace yocto
         {
         }
         
+        void joker:: write( ios::ostream &fp ) const
+        {
+            motif->save(fp);
+        }
+        
     }
 }

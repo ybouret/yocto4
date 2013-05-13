@@ -1,47 +1,51 @@
 #include "yocto/lingua/pattern/joker.hpp"
 #include "yocto/auto-ptr.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
     namespace lingua
     {
         
-        at_least:: ~at_least() throw() {}
+        counting:: ~counting() throw() {}
         
-        at_least:: at_least( pattern *p, size_t n) throw() :
+        counting:: counting( pattern *p, size_t a, size_t b) throw() :
         joker(p),
-        count(n)
+        nmin(min_of(a,b)),
+        nmax(max_of(a,b))
         {
             
         }
         
-        at_least:: at_least( const at_least &other ) :
+        counting:: counting( const counting &other ) :
         joker(other),
-        count(other.count)
+        nmin(other.nmin),
+        nmax(other.nmax)
         {
         }
         
-        at_least * at_least:: create( pattern *p, size_t n)
+        counting * counting:: create( pattern *p, size_t a, size_t b)
         {
             auto_ptr<pattern> q(p);
-            at_least *ans = new at_least(p,n);
+            counting *ans = new counting(p,a,b);
             (void) q.yield();
             return ans;
         }
         
-        void at_least:: save(ios::ostream &fp) const
+        void counting:: save(ios::ostream &fp) const
         {
             fp.emit(tag);
-            fp.emit<uint32_t>(count);
+            fp.emit<uint32_t>(nmin);
+            fp.emit<uint32_t>(nmax);
             motif->save(fp);
         }
         
-        pattern * at_least:: clone() const
+        pattern * counting:: clone() const
         {
-            return new at_least( *this );
+            return new counting( *this );
         }
         
-        bool at_least:: accept( source &src )
+        bool counting:: accept( source &src )
         {
             assert(0==size);
             assert(0==motif->size);
@@ -54,7 +58,7 @@ namespace yocto
                 ++n;
             }
             
-            if( n >= count )
+            if( n >= nmin && n <=nmax )
             {
                 return true;
             }
@@ -65,17 +69,7 @@ namespace yocto
             }
         }
         
-        pattern * zero_or_more( pattern *p )
-        {
-            return at_least::create(p, 0);
-        }
         
-        pattern * one_or_more( pattern *p )
-        {
-            return at_least::create(p, 1);
-        }
-        
-
         
         
     }

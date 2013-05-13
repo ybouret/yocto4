@@ -9,6 +9,7 @@ namespace yocto
     namespace lingua
     {
      
+        //! smart pointer
         class joker : public pattern
         {
         public:
@@ -25,10 +26,12 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(joker);
         };
         
+        
+        //! '?'
         class optional : public joker
         {
         public:
-            static const uint32_t tag = YOCTO_FOURCC('J','K','?',' ');
+            static const uint32_t tag = YOCTO_FOURCC('J','K',' ','?');
             virtual ~optional() throw();
             
             virtual pattern *clone() const;
@@ -43,6 +46,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(optional);
         };
         
+        //! '*/+'
         class at_least : public joker
         {
         public:
@@ -62,6 +66,31 @@ namespace yocto
             explicit at_least( pattern *p, size_t n) throw();
             at_least( const at_least & );
             YOCTO_DISABLE_ASSIGN(at_least);
+        };
+        
+        pattern * zero_or_more( pattern *p );
+        pattern * one_or_more( pattern * p);
+        
+        class counting : public joker
+        {
+        public:
+            static const uint32_t tag = YOCTO_FOURCC('J', 'K', '{', '}');
+
+            virtual ~counting() throw();
+            
+            virtual pattern *clone() const;
+            virtual void     save( ios::ostream &fp ) const;
+            virtual bool     accept( source &src );
+            
+            const size_t nmin;
+            const size_t nmax;
+            
+            static counting *create( pattern *p, size_t a, size_t b );
+            
+        private:
+            explicit counting( pattern *p, size_t a, size_t b) throw();
+            counting( const counting &other );
+            YOCTO_DISABLE_ASSIGN(counting);
         };
         
         
