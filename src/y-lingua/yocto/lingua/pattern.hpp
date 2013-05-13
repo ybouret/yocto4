@@ -34,7 +34,9 @@ namespace yocto
              */
             virtual bool accept( source &src ) = 0;
             
+            virtual void save( ios::ostream &fp ) const = 0;
             
+            string  make_name() const;
             
         protected:
             explicit pattern() throw();

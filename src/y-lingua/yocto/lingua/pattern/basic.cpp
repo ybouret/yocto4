@@ -50,6 +50,12 @@ namespace yocto
         
         any1 *any1::create() { return new any1(); }
 
+        void any1:: save( ios::ostream &fp ) const
+        {
+            fp.emit(tag);
+        }
+
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // single
@@ -63,6 +69,13 @@ namespace yocto
         bool single:: is_valid(char c) const throw() { return value == c; }
 
         pattern * single:: clone() const { return new single(value); }
+        
+        
+        void single:: save( ios::ostream &fp ) const
+        {
+            fp.emit(tag);
+            fp.write(value);
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -88,6 +101,13 @@ namespace yocto
         {
             const int C = c;
             return C >= lower && C <= upper;
+        }
+        
+        void range:: save( ios::ostream &fp ) const
+        {
+            fp.emit(tag);
+            fp.emit<int32_t>(lower);
+            fp.emit<int32_t>(upper);
         }
         
         ////////////////////////////////////////////////////////////////////////
@@ -120,6 +140,15 @@ namespace yocto
                 throw exception("lingua::choice(NO CHARS)");
         }
         
+        void choice:: write( ios::ostream &fp ) const
+        {
+            fp.emit<uint32_t>( chars.size() );
+            for(size_t i=1;i<=chars.size();++i)
+            {
+                fp.write( chars[i] );
+            }
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // within
@@ -138,6 +167,11 @@ namespace yocto
             return new within();
         }
         
+        void within:: save( ios::ostream &fp ) const
+        {
+            fp.emit(tag);
+            write(fp);
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -157,7 +191,11 @@ namespace yocto
             return new none();
         }
 
-        
+        void none:: save( ios::ostream &fp ) const
+        {
+            fp.emit(tag);
+            write(fp);
+        }
         
         
     }

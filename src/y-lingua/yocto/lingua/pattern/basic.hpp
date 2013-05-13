@@ -33,7 +33,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('A', 'N', 'Y', '1');
             virtual ~any1() throw();
             virtual pattern *clone() const;
-            
+            virtual void     save( ios::ostream &fp ) const;
+
             static any1 *create();
             
         protected:
@@ -51,7 +52,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('S', 'N', 'G', 'L');
             virtual ~single() throw();
             virtual pattern *clone() const;
-            
+            virtual void     save( ios::ostream &fp ) const;
+
             static single * create( char );
             const char      value;
             
@@ -69,7 +71,8 @@ namespace yocto
             
             virtual ~range() throw();
             virtual pattern *clone() const;
-            
+            virtual void     save( ios::ostream &fp ) const;
+
             static range *create(int,int);
             const int lower;
             const int upper;
@@ -94,7 +97,8 @@ namespace yocto
         protected:
             explicit choice();
             choice(const choice &); //!< can't copy an empty choice
-            
+            void write( ios::ostream &fp ) const;
+
         private:
             virtual bool is_valid(char) const throw();
             sorted_vector<uint8_t> chars;
@@ -106,6 +110,7 @@ namespace yocto
         {
         public:
             static const uint32_t tag = YOCTO_FOURCC('W', '/', 'I', 'N');
+            virtual void     save( ios::ostream &fp ) const;
             virtual ~within() throw();
             
             virtual pattern *clone() const;
@@ -125,6 +130,8 @@ namespace yocto
             virtual ~none() throw();
             
             virtual pattern *clone() const;
+            virtual void     save( ios::ostream &fp ) const;
+
             static  none    *create();
             
         private:
