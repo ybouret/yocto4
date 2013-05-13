@@ -2,6 +2,7 @@
 #include "yocto/lingua/pattern/basic.hpp"
 #include "yocto/ios/imstream.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -30,6 +31,13 @@ YOCTO_UNIT_TEST_IMPL(basic)
     p_list motifs_cpy(motifs);
     motifs_cpy.kill();
     
+    vector<string> id;
+    for( const pattern *p = motifs.head;p;p=p->next)
+    {
+        const string tmp = p->make_name();
+        id.push_back(tmp);
+    }
+    
     source src;
     std::cerr << "Enter words:" << std::endl;
     ios::icstream fp( ios::cstdin );
@@ -43,17 +51,20 @@ YOCTO_UNIT_TEST_IMPL(basic)
         }
         while( src.is_active() )
         {
+            size_t idx = 0;
             for( pattern *p = motifs.head;p;p=p->next)
             {
+                ++idx;
+                const string &name = id[idx];
                 if(p->accept(src) )
                 {
-                    std::cerr << "accept <" << *p << ">" << std::endl;
+                    std::cerr << "accept <" << *p << ">  / [" << name << "]" << std::endl;
                     src.unget( *p );
                     p->reset();
                 }
                 else
                 {
-                    std::cerr << "reject" << std::endl;
+                    std::cerr << "reject / [" << name << "]" << std::endl;
                 }
             }
             assert(src.cache_size()>0);
