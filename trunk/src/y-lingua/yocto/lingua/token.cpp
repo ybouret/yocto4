@@ -26,57 +26,19 @@ namespace yocto
             object::release1<t_char>(ch);
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // t_cache
-        //
-        ////////////////////////////////////////////////////////////////////////
-        t_cache:: t_cache() throw() {}
-        
-        t_cache:: ~t_cache() throw()
-        {
-            kill();
-        }
-        
-        void t_cache:: reserve( size_t n )
-        {
-            while(n-- > 0)
-            {
-                store( t_char::acquire() );
-            }
-        }
-        
-        t_char  * t_cache:: create(char C)
-        {
-            if(size>0)
-            {
-                t_char *ch  = query();
-                ch->data = C;
-                return ch;
-            }
-            else
-                return t_char::acquire(C);
-        }
-        
-        void    t_cache:: kill() throw()
-        {
-             delete_with( t_char::release );
-        }
-
-        
+                
         ////////////////////////////////////////////////////////////////////////
         //
         // token
         //
         ////////////////////////////////////////////////////////////////////////
-        token:: token( t_cache &p ) throw() :
-        cache(p)
+        token:: token() throw()
         {
         }
         
         void token:: clear() throw()
         {
-            while(size) cache.store( pop_back() );
+            while(size) t_char::release( pop_back() );
         }
         
         
@@ -85,14 +47,13 @@ namespace yocto
             clear();
         }
         
-        token:: token( const token &other ) :
-        cache( other.cache )
+        token:: token( const token &other ) 
         {
             try
             {
                 for( const t_char *ch = other.head;ch;ch=ch->next)
                 {
-                    push_back( cache.create(ch->data) );
+                    push_back( t_char::acquire(ch->data) );
                 }
             }
             catch(...)
@@ -102,40 +63,20 @@ namespace yocto
             }
         }
         
-        token:: token( const token &other, t_cache &p ) :
-        cache( p )
-        {
-            try
-            {
-                for( const t_char *ch = other.head;ch;ch=ch->next)
-                {
-                    push_back( cache.create(ch->data) );
-                }
-            }
-            catch(...)
-            {
-                clear();
-                throw;
-            }
-        }
-
+      
         
         token & token:: operator=( const token &other )
         {
-            token tmp(cache);
-            for(const t_char *ch = other.head; ch; ch=ch->next)
-            {
-                tmp.push_back( cache.create(ch->data) );
-            }
+            token tmp(other);
             swap_with(tmp);
             return *this;
         }
 
         
         
-        string token:: to_string( size_t skip,size_t trim) const
+        string token:: to_string( size_t nskip,size_t ntrim) const
         {
-            const size_t ndel = skip+trim;
+            const size_t ndel = nskip+ntrim;
             if(ndel>=size)
                 return string();
             else
@@ -143,7 +84,7 @@ namespace yocto
                 size_t n = size - ndel; assert(n>0);
                 string ans(n,as_capacity);
                 const t_char *ch = head;
-                while(skip-->0)
+                while(nskip-->0)
                 {
                     assert(ch!=NULL);
                     ch = ch->next;
@@ -167,14 +108,13 @@ namespace yocto
             return os;
         }
         
-        token:: token(t_cache &p, const string &s ):
-        cache(p)
+        token:: token(const string &s)
         {
             try
             {
                 const size_t n = s.size();
                 for(size_t i=0;i<n;++i)
-                    push_back( cache.create(s[i]) );
+                    push_back( t_char::acquire(s[i]) );
             }
             catch(...)
             {
@@ -183,14 +123,13 @@ namespace yocto
             }
         }
         
-        token:: token(t_cache &p, const char *s ):
-        cache(p)
+        token:: token(const char *s)
         {
             try
             {
                 const size_t n = length_of(s);
                 for(size_t i=0;i<n;++i)
-                    push_back( cache.create(s[i]) );
+                    push_back( t_char::acquire(s[i]) );
             }
             catch(...)
             {
@@ -202,18 +141,29 @@ namespace yocto
         
         token & token:: operator=( const string &s )
         {
-            token tmp(cache,s);
+            token tmp(s);
             swap_with(tmp);
             return *this;
         }
 
         token & token:: operator=( const char *s )
         {
-            token tmp(cache,s);
+            token tmp(s);
             swap_with(tmp);
             return *this;
         }
+        
+        void token:: skip() throw()
+        {
+            assert(size>0);
+            t_char::release( pop_front() );
+        }
 
+        void token:: trim() throw()
+        {
+            assert(size>0);
+            t_char::release( pop_back() );
+        }
         
     }
     

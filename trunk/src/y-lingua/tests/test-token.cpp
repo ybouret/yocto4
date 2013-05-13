@@ -6,10 +6,7 @@ using namespace lingua;
 
 YOCTO_UNIT_TEST_IMPL(token)
 {
-    t_cache p;
-    p.reserve(2);
-    
-    token t(p);
+    token t;
     
     t = "token";
     std::cerr << "token=<" << t << ">" << std::endl;
@@ -35,6 +32,6 @@ YOCTO_UNIT_TEST_IMPL(token)
     std::cerr << t.to_string(1,1) << std::endl;
     std::cerr << t.to_string(2,2) << std::endl;
     std::cerr << t.to_string(3,3) << std::endl;
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
