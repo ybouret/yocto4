@@ -7,11 +7,10 @@ using namespace lingua;
 
 YOCTO_UNIT_TEST_IMPL(source)
 {
-    t_cache p;
-    source  src(p);
+    source  src;
     
-    token t(p);
-    token r(p);
+    token t;
+    token r;
     
     t = ", world!";
     src.unget(t);
@@ -21,8 +20,8 @@ YOCTO_UNIT_TEST_IMPL(source)
     
     const char data[] =" and hello again";
     {
-        const istream_ptr fp( new ios::imstream(data,sizeof(data)));
-        src.push("data", fp);
+        const input fp( new ios::imstream(data,sizeof(data)));
+        src.attach(fp);
     }
     
     t_char *ch = 0;
@@ -35,6 +34,5 @@ YOCTO_UNIT_TEST_IMPL(source)
     r.clear();
     t.clear();
     
-    std::cerr << "cache size=" << p.size << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

@@ -2,7 +2,6 @@
 #define YOCTO_LINGUA_TOKEN_INCLUDED 1
 
 #include "yocto/core/list.hpp"
-#include "yocto/core/pool.hpp"
 #include "yocto/string.hpp"
 
 namespace yocto
@@ -27,33 +26,17 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(t_char);
         };
         
-        //! a cache of t_char
-        class t_cache : public core::pool_of<t_char>
-        {
-        public:
-            explicit t_cache() throw();
-            virtual ~t_cache() throw();
-            void reserve(size_t n);
-            
-            t_char *create(char C=0);
-            void    kill() throw();
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(t_cache);
-        };
-        
         
         //! a dynamic list of t_char
         class token : public core::list_of<t_char>
         {
         public:
-            explicit token(t_cache &p) throw();
-            virtual ~token() throw();
-            token(const token &other);
-            token(const token &other, t_cache &p);
+            explicit token() throw();    //!< empty token
+            virtual ~token() throw();              //!< back into cache
+            token(const token &other);             //!< copy with same cache
             
-            explicit token(t_cache &p, const string &s);
-            explicit token(t_cache &p, const char   *s);
+            explicit token(const string &s);
+            explicit token( const char   *s);
             
             token & operator=( const token  &);
             token & operator=( const string &);
@@ -61,12 +44,13 @@ namespace yocto
             
             void clear() throw();
             
-            string to_string( size_t skip=0,size_t trim=0 ) const;
+            string to_string( size_t nskip=0,size_t ntrim=0 ) const;
             
             friend std::ostream & operator<<( std::ostream &, const token &);
             
-        private:
-            t_cache &cache;
+            void skip() throw(); //!< if size > 0
+            void trim() throw(); //!< if size > 0
+            
         };
         
     }

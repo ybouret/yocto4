@@ -1,4 +1,5 @@
 #include "yocto/lingua/source.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -9,54 +10,55 @@ namespace yocto
         
         ////////////////////////////////////////////////////////////////////////
         //
-        // input
-        //
-        ////////////////////////////////////////////////////////////////////////
-        input:: ~input() throw()
-        {
-        }
-        
-        input:: input( const string &id, const istream_ptr &fp ) :
-        name(id),
-        iptr(fp)
-        {
-        }
-        
-        input:: input( const input &other ) :
-        name( other.name ),
-        iptr( other.iptr )
-        {
-        }
-        
-        bool input:: query( char &C )
-        {
-            return iptr->query(C);
-        }
-        
-        
-        
-        ////////////////////////////////////////////////////////////////////////
-        //
         // source
         //
         ////////////////////////////////////////////////////////////////////////
         source:: ~source() throw()
         {
+            detach();
         }
         
-        source:: source( t_cache &p ) :
-        tpool(p),
-        cache(tpool),
-        instk(2,as_capacity)
+        source:: source() :
+        cache(),
+        ppInp(0),
+        block()
         {
+            init();
         }
         
+        void source:: init() throw()
+        {
+            memset(block,0,sizeof(block));
+            ppInp = 0;
+        }
+
+        void source:: detach() throw()
+        {
+            if(ppInp)
+            {
+                ppInp->~input();
+                init();
+            }
+        }
+
+        void source:: attach(const input &fp) throw()
+        {
+            detach();
+            ppInp = new (block) input(fp);
+        }
+
         
         void source:: unget(t_char *ch) throw()
         {
             assert(ch!=NULL);
             cache.push_front(ch);
         }
+        
+        size_t  source:: cache_size() const throw()
+        {
+            return cache.size;
+        }
+
         
         void source:: unget(token &token) throw()
         {
@@ -66,7 +68,7 @@ namespace yocto
         
         void source:: uncpy(const token &t)
         {
-            token tmp(t,tpool);
+            token tmp(t);
             cache.merge_front(tmp);
         }
         
@@ -79,42 +81,37 @@ namespace yocto
             else
             {
                 //--------------------------------------------------------------
-                // no cache: try inputs
+                // no cache: try input
                 //--------------------------------------------------------------
-                t_char *ch = tpool.create(0);
+                t_char *ch = t_char::acquire();
                 try
                 {
-                    while(instk.size()>0)
-                    {
-                        input  &curr = instk.peek();
-                        if(curr.query(ch->data))
-                            return ch;
-                        //-- done with this input
-                        std::cerr << "-<" << curr.name << ">" << std::endl;
-                        instk.pop();
-                    }
+                    if(ppInp && (**ppInp).query(ch->data) )
+                        return ch;
                 }
                 catch(...)
                 {
-                    tpool.store(ch);
+                    t_char::release(ch);
                     throw;
                 }
                 
                 //--------------------------------------------------------------
                 // no cache, no input
                 //--------------------------------------------------------------
-                tpool.store(ch);
+                t_char::release(ch);
                 return 0;
                 
             }
         }
         
-        void  source:: push(const string &id, const istream_ptr &fp)
+        
+        void source:: skip(size_t n) throw()
         {
-            const input inp(id,fp);
-            instk.push(inp);
+            assert(n<=cache.size);
+            while(n-->0) t_char::release(cache.pop_front());
         }
         
+
         
         
     }
