@@ -14,6 +14,12 @@ namespace yocto
         {
         }
         
+        void optional:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            write(fp);
+        }
+        
         pattern *optional:: clone() const { return new optional( *this ); }
         
         optional *optional:: create(pattern *p)
