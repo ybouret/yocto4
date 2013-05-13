@@ -127,12 +127,14 @@ namespace yocto
             (void)chars.insert(C);
         }
         
-        bool choice:: is_valid(char c) const throw()
+        void choice:: append(int lo,int hi)
         {
-            const uint8_t C(c);
-            return chars.search(C);
+            if(hi<lo) cswap(lo,hi);
+            for(int i=lo;i<=hi;++i)
+                (void)chars.insert( uint8_t(i) );
         }
         
+               
         choice:: choice( const choice &other ) :
         chars( other.chars )
         {
@@ -173,6 +175,13 @@ namespace yocto
             write(fp);
         }
         
+        bool within:: is_valid(char c) const throw()
+        {
+            const uint8_t C(c);
+            return chars.search(C);
+        }
+
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // none
@@ -197,6 +206,10 @@ namespace yocto
             write(fp);
         }
         
-        
+        bool none:: is_valid(char c) const throw()
+        {
+            const uint8_t C(c);
+            return !chars.search(C);
+        }
     }
 }
