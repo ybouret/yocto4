@@ -102,6 +102,24 @@ namespace yocto
             }
         }
         
+        token:: token( const token &other, t_cache &p ) :
+        cache( p )
+        {
+            try
+            {
+                for( const t_char *ch = other.head;ch;ch=ch->next)
+                {
+                    push_back( cache.create(ch->data) );
+                }
+            }
+            catch(...)
+            {
+                clear();
+                throw;
+            }
+        }
+
+        
         token & token:: operator=( const token &other )
         {
             token tmp(cache);

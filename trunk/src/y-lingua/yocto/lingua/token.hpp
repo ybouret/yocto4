@@ -50,7 +50,7 @@ namespace yocto
             explicit token(t_cache &p) throw();
             virtual ~token() throw();
             token(const token &other);
-            
+            token(const token &other, t_cache &p);
             
             explicit token(t_cache &p, const string &s);
             explicit token(t_cache &p, const char   *s);
