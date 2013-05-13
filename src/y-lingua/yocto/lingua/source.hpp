@@ -14,23 +14,25 @@ namespace yocto
         
         typedef shared_ptr<ios::istream> input;
         
-        //! convert a sequence of ios::istream into a source of t_char
+        //! convert an input into a source of t_char
         class source
         {
         public:
             explicit source();
             virtual ~source() throw();
             
-            t_char *get();
-            void    unget(t_char *) throw();
-            void    unget(token &t) throw();
-            void    uncpy(const token &);
-            void    skip(size_t n) throw(); //!< n <= cache.size
+            t_char *get(); //!< try to get a new t_char
+            void    unget(t_char *) throw(); //!< push back into cache
+            void    unget(token &t) throw(); //!< push back into cache
+            void    uncpy(const token &);    //!< push a copy into cache
+            void    skip(size_t n) throw();  //!< n <= cache.size
             
-            void    attach( const input &) throw();
-            void    detach() throw();
+            void    attach( const input &) throw(); //!< detach/set as input
+            void    detach() throw();               //!< remove input/cache
             
             size_t  cache_size() const throw();
+            
+            bool    is_active(); //!< if there are some available t_char
             
         private:
             token                  cache; //!< I/O cache

@@ -31,16 +31,16 @@ namespace yocto
         class token : public core::list_of<t_char>
         {
         public:
-            explicit token() throw();    //!< empty token
-            virtual ~token() throw();              //!< back into cache
-            token(const token &other);             //!< copy with same cache
+            token() throw();    //!< empty token
+            virtual ~token() throw();    //!< destructr
+            token(const token &other);   //!< full copy
             
-            explicit token(const string &s);
-            explicit token( const char   *s);
+            token(const string &s);
+            token( const char   *s);
             
             token & operator=( const token  &);
             token & operator=( const string &);
-            token & operator=( const char *);
+            token & operator=( const char   *);
             
             void clear() throw();
             

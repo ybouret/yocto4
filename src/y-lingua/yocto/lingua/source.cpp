@@ -30,6 +30,7 @@ namespace yocto
         {
             memset(block,0,sizeof(block));
             ppInp = 0;
+            cache.clear();
         }
 
         void source:: detach() throw()
@@ -111,6 +112,17 @@ namespace yocto
             while(n-->0) t_char::release(cache.pop_front());
         }
         
+        bool source:: is_active()
+        {
+            t_char *ch = get();
+            if( ch )
+            {
+                cache.push_front(ch);
+                return true;
+            }
+            else
+                return false;
+        }
 
         
         
