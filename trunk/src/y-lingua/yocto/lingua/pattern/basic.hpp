@@ -93,15 +93,16 @@ namespace yocto
             virtual ~choice() throw();
             
             void append(char c);
+            void append(int lo,int hi);
             
         protected:
             explicit choice();
             choice(const choice &); //!< can't copy an empty choice
             void write( ios::ostream &fp ) const;
 
-        private:
-            virtual bool is_valid(char) const throw();
             sorted_vector<uint8_t> chars;
+            
+        private:
             YOCTO_DISABLE_ASSIGN(choice);
         };
         
@@ -110,13 +111,15 @@ namespace yocto
         {
         public:
             static const uint32_t tag = YOCTO_FOURCC('W', '/', 'I', 'N');
-            virtual void     save( ios::ostream &fp ) const;
             virtual ~within() throw();
             
             virtual pattern *clone() const;
+            virtual void     save( ios::ostream &fp ) const;
+
             static  within *create();
             
         private:
+            virtual bool is_valid(char) const throw();
             explicit within();
             within( const within &);
             YOCTO_DISABLE_ASSIGN(within);
@@ -135,11 +138,11 @@ namespace yocto
             static  none    *create();
             
         private:
+            virtual bool is_valid(char) const throw();
             explicit none();
             none( const none &);
             YOCTO_DISABLE_ASSIGN(none);
         };
-        
         
     }
 }
