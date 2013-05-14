@@ -44,10 +44,18 @@ namespace yocto
 			{
 				auto_ptr<logical> p(0);
 
+				//=============================================================
+				//
+				// do we have a caret ?
+				//
+				//==============================================================
 				assert( LBRACK == curr[0] );
+
+				//-- skip LBRACK
 				if(++curr>last)
 					throw exception("%s(Unfinished Group)", fn);
 
+				//-- test
 				if( '^' == curr[0] )
 				{
 					p.reset( NOT::create() );
@@ -57,7 +65,16 @@ namespace yocto
 				{
 					p.reset( OR::create() );
 				}
+
+				
 				assert(p.is_valid());
+				//=============================================================
+				//
+				// do we have a '-' ?
+				//
+				//==============================================================
+				
+
 				while(curr<last)
 				{
 					char C = curr[0];
