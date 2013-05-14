@@ -21,6 +21,14 @@ namespace yocto
             fp.emit(tag);
             write(fp);
         }
+
+        void AND:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [ label=\"&&\"];\n";
+            __viz(this,fp);
+        }
+
+        
         
         pattern * AND::clone() const { return new AND( *this ); }
         

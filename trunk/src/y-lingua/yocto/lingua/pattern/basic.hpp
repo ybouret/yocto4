@@ -34,9 +34,10 @@ namespace yocto
             virtual ~any1() throw();
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
-
+            virtual void     viz( ios::ostream &fp) const;
             static any1 *create();
             
+        
         protected:
             explicit any1() throw();
             
@@ -53,6 +54,7 @@ namespace yocto
             virtual ~single() throw();
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
 
             static single * create( char ); //! single->data = &value
             const char      value;
@@ -72,6 +74,7 @@ namespace yocto
             virtual ~range() throw();
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
 
             static range *create(int,int); //!< range->data = &lower
             const int lower;
@@ -99,7 +102,7 @@ namespace yocto
             explicit choice(uint32_t t) throw();
             choice(const choice &); //!< can't copy an empty choice
             void write( ios::ostream &fp ) const;
-
+            void __viz( ios::ostream &fp ) const;
             sorted_vector<uint8_t> chars;
             
         private:
@@ -115,6 +118,7 @@ namespace yocto
             
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
 
             static  within *create();
             
@@ -134,6 +138,7 @@ namespace yocto
             
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
 
             static  none    *create();
             

@@ -1,5 +1,7 @@
 #include "yocto/lingua/pattern.hpp"
 #include "yocto/ios/osstream.hpp"
+#include "yocto/ios/ocstream.hpp"
+
 #include "yocto/chars.hpp"
 
 namespace yocto
@@ -60,6 +62,26 @@ namespace yocto
         {
             
         }
+        
+        
+        void pattern:: outviz( char c, ios::ostream &fp)
+        {
+            if(c<32 || c >= 127 || c == '"' || c == '\\' )
+            {
+                fp("0x%02x", unsigned(c) );
+            }
+            else
+                fp("%c",c);
+        }
+        
+        void pattern:: graphviz( const string &filename ) const
+        {
+            ios::ocstream fp(filename,false);
+            fp << "digraph G{\n";
+            viz(fp);
+            fp << "}\n";
+        }
+
         
     }
     

@@ -3,6 +3,8 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/memory/buffers.hpp"
 #include "yocto/chars.hpp"
+#include "yocto/type-ints.hpp"
+#include "yocto/code/utils.hpp"
 
 #include <cerrno>
 #include <cstdarg>
@@ -42,23 +44,26 @@ namespace yocto
 				buflen -= done;
 			}
 		}
+        
+        void ostream:: viz( const void *p )
+        {
+            union
+            {
+                const void                       *a;
+                unsigned_int<sizeof(void*)>::type u;
+            }
+            alias = { p };
+            write('A');
+            for(int i=0;i<sizeof(void*);++i)
+            {
+                const uint8_t b = alias.u & 0xff;
+                write( hexa_char[ (b>>4) & 15 ] );
+                write( hexa_char[  b     & 15 ] );
+                alias.u >>= 8;
+            }
+        }
+        
 		
-#if 0
-		void ostream:: append( const char *buffer )
-		{
-			append( buffer, length_of(buffer) );
-		}
-		
-		void ostream:: append( const memory::ro_buffer &buffer )
-		{
-			append( (const char *) buffer.ro(), buffer.length() );
-		}
-		
-		void ostream:: append( char C )
-		{
-			write(C);
-		}
-#endif
         
         ostream & ostream:: operator<<( const char *buffer)
         {

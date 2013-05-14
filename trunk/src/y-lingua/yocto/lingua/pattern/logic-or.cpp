@@ -46,6 +46,12 @@ namespace yocto
             optimize_all();
         }
         
+        void OR:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [ label=\"||\"];\n";
+            __viz(this,fp);
+        }
+        
     }
     
 }

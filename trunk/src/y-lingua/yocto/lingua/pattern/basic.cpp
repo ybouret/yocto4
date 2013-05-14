@@ -55,7 +55,11 @@ namespace yocto
             fp.emit(tag);
         }
 
-        
+        void any1:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=ANY1];\n";
+        }
+
         ////////////////////////////////////////////////////////////////////////
         //
         // single
@@ -80,6 +84,13 @@ namespace yocto
         {
             fp.emit(tag);
             fp.write(value);
+        }
+        
+        void single:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=\"'";
+            outviz(value, fp);
+            fp << "'\"];\n";
         }
         
         ////////////////////////////////////////////////////////////////////////
@@ -119,6 +130,15 @@ namespace yocto
             fp.emit(tag);
             fp.emit<int32_t>(lower);
             fp.emit<int32_t>(upper);
+        }
+        
+        void range:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=\"['";
+            outviz(lower, fp);
+            fp << "'-'";
+            outviz(upper,fp);
+            fp << "']\"];\n";
         }
         
         ////////////////////////////////////////////////////////////////////////
@@ -171,6 +191,16 @@ namespace yocto
             }
         }
         
+        void choice:: __viz( ios::ostream &fp ) const
+        {
+            
+            for(size_t i=1; i <= chars.size(); ++i)
+            {
+                outviz(chars[i], fp);
+            }
+            
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // within
@@ -204,6 +234,13 @@ namespace yocto
             return chars.search(C);
         }
 
+        void within:: viz(ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp << " [ label=\"[";
+            __viz(fp);
+            fp << "]\"];\n";
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -234,6 +271,14 @@ namespace yocto
         {
             const uint8_t C(c);
             return !chars.search(C);
+        }
+        
+        void none:: viz(ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp << " [ label=\"[^";
+            __viz(fp);
+            fp << "]\"];\n";
         }
     }
 }

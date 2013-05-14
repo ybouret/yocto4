@@ -36,5 +36,12 @@ namespace yocto
         {
             motif->optimize();
         }
+        
+        
+        void joker:: __viz( const void *parent, ios::ostream &fp ) const
+        {
+            motif->viz(fp);
+            fp.viz(parent); fp << " -> "; fp.viz(motif); fp << ";\n";
+        }
     }
 }
