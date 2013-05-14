@@ -2,7 +2,9 @@
 #include "yocto/lingua/pattern/basic.hpp"
 #include "yocto/ios/imstream.hpp"
 #include "yocto/ios/icstream.hpp"
+#include "yocto/ios/ocstream.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/auto-ptr.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -10,13 +12,30 @@ using namespace lingua;
 
 void shared_test_motifs( p_list &motifs )
 {
+    // make name
     vector<string> id;
     for( const pattern *p = motifs.head;p;p=p->next)
     {
-        const string tmp = p->make_name();
+        const string tmp = p->hr_name();
         id.push_back(tmp);
+        std::cerr << "Got:[" << tmp << "]" << std::endl;
+        
+        std::cerr << "\tsave..." << std::endl;
+        {
+            ios::ocstream fp("pattern.bin",false);
+            p->save(fp);
+        }
+        
+        std::cerr << "\tload..." << std::endl;
+        {
+            ios::icstream     fp("pattern.bin");
+            auto_ptr<pattern> q( pattern::load(fp) );
+            if( *q != *p )
+                throw exception("invalid I/O");
+        }
     }
     
+       
     source src;
     std::cerr << "Enter words:" << std::endl;
     ios::icstream fp( ios::cstdin );

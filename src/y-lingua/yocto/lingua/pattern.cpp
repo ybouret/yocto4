@@ -23,7 +23,7 @@ namespace yocto
             clear();
         }
         
-        string  pattern:: make_name() const
+        string  pattern:: hr_name() const
         {
             string ans;
             ios::osstream fp(ans);
@@ -32,7 +32,30 @@ namespace yocto
                 ans[i] = make_visible(ans[i]);
             return ans;
         }
+        
+        string pattern:: content() const
+        {
+            string ans;
+            ios::osstream fp(ans);
+            save(fp);
+            return ans;
+        }
 
+        
+        bool operator==( const pattern &lhs, const pattern &rhs )
+        {
+            const string L = lhs.content();
+            const string R = rhs.content();
+            return L == R;
+        }
+        
+        bool operator!=( const pattern &lhs, const pattern &rhs )
+        {
+            const string L = lhs.content();
+            const string R = rhs.content();
+            return L != R;
+        }
+        
     }
     
 }

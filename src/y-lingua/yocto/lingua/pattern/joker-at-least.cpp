@@ -33,7 +33,7 @@ namespace yocto
         {
             fp.emit(tag);
             fp.emit<uint32_t>(count);
-            motif->save(fp);
+            write(fp);
         }
         
         pattern * at_least:: clone() const

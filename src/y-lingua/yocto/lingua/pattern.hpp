@@ -3,6 +3,8 @@
 
 #include "yocto/lingua/source.hpp"
 #include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
+
 #include "yocto/core/meta-list.hpp"
 
 namespace yocto
@@ -39,7 +41,18 @@ namespace yocto
             //! save a binary representation
             virtual void save( ios::ostream &fp ) const = 0;
             
-            string  make_name() const;
+            //! human readable name
+            string  hr_name() const;
+            
+            //! binary content
+            string content() const;
+            
+            //! based on binary representations
+            friend bool operator==( const pattern &lhs, const pattern &rhs );
+            friend bool operator!=( const pattern &lhs, const pattern &rhs );
+            
+            static pattern *optimize( pattern *p );
+            static pattern *load( ios::istream &fp);
             
         protected:
             explicit pattern(uint32_t t) throw();
