@@ -24,8 +24,9 @@ namespace yocto
             static pattern *AMONG(const string &s);
             static pattern *AMONG(const char   *s);
 
-            void append( pattern *p ) throw();
-            
+            void     append( pattern *p ) throw();
+            pattern *remove() throw();
+
         protected:
             explicit logical(uint32_t t) throw();
             logical( const logical & );

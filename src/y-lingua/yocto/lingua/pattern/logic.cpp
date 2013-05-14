@@ -54,6 +54,12 @@ namespace yocto
             operands.push_back(p);
         }
         
+		 pattern *logical::remove() throw()
+		 {
+			 assert(operands.size>0);
+			 return operands.pop_back();
+		 }
+
         void logical:: optimize_all() throw()
         {
             for( pattern *p = operands.head;p;p=p->next)
