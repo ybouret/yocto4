@@ -3,11 +3,13 @@
 #include "yocto/lingua/pattern/basic.hpp"
 #include "yocto/lingua/pattern/logic.hpp"
 #include "yocto/lingua/pattern/joker.hpp"
+#include "yocto/lingua/pattern/posix.hpp"
 
 #include "yocto/auto-ptr.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/string/tokenizer.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/code/utils.hpp"
 
 #define YRX_VERBOSE 1
 
@@ -33,6 +35,30 @@ namespace yocto
 		{
 
 			static const char fn[] = "lingua::compile";
+			///////////////////////////////////////////////////////////////////
+			//
+			// hexa
+			//
+			///////////////////////////////////////////////////////////////////
+			static inline
+				uint8_t compile_hexa(const char * &curr, const char * last)
+			{
+				assert('x' == curr[0]);
+				if(++curr>=last) 
+					throw exception("%s(Missing First Hexa Char)");
+				if( !isxdigit(curr[0]) )
+					throw exception("%s(Invalid First Hexa Byte)");
+
+				int ans = hex2dec(curr[0]) << 4;
+
+				if(++curr>=last) 
+					throw exception("%s(Missing Second Hexa Char)");
+				if( !isxdigit(curr[0]) )
+					throw exception("%s(Invalid Second Hexa Byte)");
+				ans |= hex2dec(curr[0]);
+
+				return uint8_t(ans);
+			}
 
 			///////////////////////////////////////////////////////////////////
 			//
@@ -43,45 +69,83 @@ namespace yocto
 				pattern *compile_group(const char * &curr, const char * last)
 			{
 				auto_ptr<logical> p(0);
+				YRX(std::cerr << "[GRP] Start New Group" << std::endl);
+
+				assert( LBRACK == curr[0] );
 
 				//=============================================================
 				//
 				// do we have a caret ?
 				//
 				//==============================================================
-				assert( LBRACK == curr[0] );
+
 
 				//-- skip LBRACK
-				if(++curr>last)
+				if(++curr>=last)
 					throw exception("%s(Unfinished Group)", fn);
 
-				//-- test
+				//-- test caret
 				if( '^' == curr[0] )
 				{
 					p.reset( NOT::create() );
-					++curr;
+					++curr; // skip it
+					if(curr>=last)
+						throw exception("%s(Unfinihsed group after ^)", fn );
+					YRX(std::cerr << "[GRP] <<NOT>>" <<std::endl);
 				}
 				else
 				{
 					p.reset( OR::create() );
 				}
 
-				
+
 				assert(p.is_valid());
 				//=============================================================
 				//
 				// do we have a '-' ?
 				//
 				//==============================================================
-				
+				assert(curr<last);
+				if( '-' == curr[0] )
+				{
+					p->append( single::create('-') );
+					++curr;
+				}
 
+				//=============================================================
+				//
+				// do we have a '-' ?
+				//
+				//==============================================================
 				while(curr<last)
 				{
 					char C = curr[0];
 
-					
+					switch(C)
+					{
+					case RBRACK:
+						YRX( std::cerr << "[GRP] End" << std::endl );
+						goto FINISHED;
+
+						//-----------------------------------------------------
+						//
+						// generic char
+						//
+						//-----------------------------------------------------
+					default:
+						YRX(std::cerr << "[GRP] Append single '" << C << "'" << std::endl);
+						p->append( single::create(C) );
+						++curr;
+						break;
+					}
 				}
 				throw exception("%s(Unfinished Group)", fn);
+
+FINISHED:
+				if(p->operands.size<=0)
+					throw exception("%s(Empty Group)", fn );
+				p->optimize();
+				return pattern::simplify(p.yield());
 			}
 
 			///////////////////////////////////////////////////////////////////
@@ -126,13 +190,13 @@ namespace yocto
 						//--------------------------------------------------
 					case '(':
 						++depth;
-						YRX(std::cerr << "[XP] Start SubExpression/Depth=" << depth << std::endl);
+						YRX(std::cerr << "[RXP] Start SubExpression/Depth=" << depth << std::endl);
 						++curr;
 						p->append( compile_xp(curr,last,dict,depth) );
 						break;
 
 					case ')':
-						YRX(std::cerr << "[XP] Finish SubExpression/Depth=" << depth << std::endl);
+						YRX(std::cerr << "[RXP] Finish SubExpression/Depth=" << depth << std::endl);
 						if(depth<=0) throw exception("%s(Unexpected Right Paren)",fn);
 						--depth;
 						++curr;
@@ -144,7 +208,7 @@ namespace yocto
 						//
 						//--------------------------------------------------
 					case '|': {
-						YRX(std::cerr << "[XP] Alternation/Depth=" << depth << std::endl);
+						YRX(std::cerr << "[RXP] Alternation/Depth=" << depth << std::endl);
 						++curr;
 						auto_ptr<pattern>  lhs( p.yield() );
 						auto_ptr<pattern>  rhs( compile_xp(curr, last, dict, depth));
@@ -160,34 +224,34 @@ namespace yocto
 							  //
 							  //--------------------------------------------------
 					case '?':
-						YRX(std::cerr << "[XP] joker '?'" << std::endl);
+						YRX(std::cerr << "[RXP] joker '?'" << std::endl);
 						if(p->operands.size<=0)
 							throw exception("%s(No Left Expression for '?')",fn);
 						else
 						{
-							p->append( optional::create(p->operands.pop_back() ));
+							p->append( optional::create(p->remove() ));
 						}
 						++curr;
 						break;
 
 					case '+':
-						YRX(std::cerr << "[XP] joker '+'" << std::endl);
+						YRX(std::cerr << "[RXP] joker '+'" << std::endl);
 						if(p->operands.size<=0)
 							throw exception("%s(No Left Expression for '+')",fn);
 						else
 						{
-							p->append( one_or_more(p->operands.pop_back() ));
+							p->append( one_or_more(p->remove() ));
 						}
 						++curr;
 						break;
 
 					case '*':
-						YRX(std::cerr << "[XP] joker '*'" << std::endl);
+						YRX(std::cerr << "[RXP] joker '*'" << std::endl);
 						if(p->operands.size<=0)
 							throw exception("%s(No Left Expression for '*')",fn);
 						else
 						{
-							p->append( zero_or_more(p->operands.pop_back() ));
+							p->append( zero_or_more(p->remove() ));
 						}
 						++curr;
 						break;
@@ -213,7 +277,7 @@ namespace yocto
 							const string content( scan_braces(curr, last) );
 							assert(RBRACE==curr[0]);
 							++curr;
-							YRX(std::cerr << "[XP] [BRACES] {" << content << "}" << std::endl);
+							YRX(std::cerr << "[RXP] [BRACES] {" << content << "}" << std::endl);
 							if(content.size()<=0)
 								throw exception("%s(Empty Braces)",fn);
 							if(isdigit(content[0]))
@@ -247,18 +311,18 @@ namespace yocto
 										const string bstr(orgB,endB-orgB);
 										const size_t b = strconv::to<size_t>(bstr,"Second Brace Number");
 										YRX(std::cerr << "\t=> between " <<a << " and " << b << " times" << std::endl);
-										p->append( counting::create( p->operands.pop_back(), a, b));
+										p->append( counting::create( p->remove(), a, b));
 									}
 									else
 									{
 										YRX(std::cerr<<"\t=> at least " << a << " times" <<std::endl);
-										p->append( at_least::create( p->operands.pop_back(), a));
+										p->append( at_least::create( p->remove(), a));
 									}
 								}
 								else
 								{
 									YRX(std::cerr << "\t=> exactly " << a << " times" << std::endl);
-									p->append( counting::create( p->operands.pop_back(), a, a));
+									p->append( counting::create( p->remove(), a, a));
 								}
 							}
 							else
@@ -275,6 +339,60 @@ namespace yocto
 
 						//--------------------------------------------------
 						//
+						// escaped char
+						//
+						//--------------------------------------------------
+					case '\\':
+						if(++curr>=last)
+							throw exception("%s(Unfinished Escaped Sequence)", fn);
+						C = curr[0];
+						YRX( std::cerr << "[RXP] Escaped Sequence <" << C << ">" << std::endl);
+						switch(C)
+						{
+						case 'x':
+							C = char(compile_hexa(curr,last));
+							break;
+
+							//-------------------------------------------------
+							// simple escaped
+							//-------------------------------------------------
+						case '\\':
+						case '[':
+						case ']':
+						case '.':
+						case '{':
+						case '}':
+						case '+':
+						case '*':
+						case '?':
+							break;
+
+							//-------------------------------------------------
+							// control escaped
+							//-------------------------------------------------
+						case 'n': C='\n'; break;
+						case 'r': C='\r'; break;
+						case 't': C='\t'; break;
+
+						default:
+							throw exception("%s(Unknown Escaped Sequence '%c')", fn, C);
+						}
+						++curr;
+						p->append( single::create(C) );
+						break;
+
+						//--------------------------------------------------
+						//
+						// specific chars
+						//
+						//--------------------------------------------------
+					case '.':
+						p->append( posix::dot() );
+						++curr;
+						break;
+
+						//--------------------------------------------------
+						//
 						// single chars
 						//
 						//--------------------------------------------------
@@ -282,7 +400,7 @@ namespace yocto
 						//--------------------------------------------------
 						// a new single char
 						//--------------------------------------------------
-						YRX(std::cerr << "[XP] append single '" << C << "'" << std::endl);
+						YRX(std::cerr << "[RXP] append single '" << C << "'" << std::endl);
 						p->append( single::create(C) );
 						++curr;
 					}
