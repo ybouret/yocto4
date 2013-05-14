@@ -30,6 +30,7 @@ namespace yocto
             explicit logical(uint32_t t) throw();
             logical( const logical & );
             void write( ios::ostream &fp ) const;
+            void __viz( const void *parent, ios::ostream &fp ) const;
             
             //! apply optimize to all operands
             void optimize_all() throw();
@@ -46,6 +47,7 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC(' ','&', '&', ' ' );
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
             virtual bool     accept( source &src );
             
             virtual ~AND() throw();
@@ -67,6 +69,7 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC(' ','|', '|', ' ' );
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
             virtual bool     accept( source &src );
             
             virtual ~OR() throw();
@@ -89,6 +92,7 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC(' ','!', '=', ' ' );
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
             virtual bool     accept( source &src );
             
             virtual ~NOT() throw();

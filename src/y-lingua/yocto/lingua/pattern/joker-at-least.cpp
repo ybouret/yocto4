@@ -75,6 +75,12 @@ namespace yocto
             return at_least::create(p, 1);
         }
         
+        void at_least:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp(" [label=\">=%u\"];\n", unsigned(count));
+            __viz(this, fp);
+        }
 
         
         

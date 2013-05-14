@@ -21,6 +21,7 @@ namespace yocto
             pattern *motif;
             joker( const joker &);
             void write( ios::ostream &fp ) const;
+            void __viz( const void *parent, ios::ostream &fp ) const;
             
         private:
             
@@ -37,6 +38,8 @@ namespace yocto
             
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
+
             virtual bool     accept( source &src );
             
             static optional *create(pattern *p);
@@ -57,6 +60,7 @@ namespace yocto
             
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
             virtual bool     accept( source &src );
             
             static at_least *create(pattern *p,size_t n);
@@ -81,6 +85,7 @@ namespace yocto
             
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
+            virtual void     viz( ios::ostream &fp) const;
             virtual bool     accept( source &src );
             
             const size_t nmin;

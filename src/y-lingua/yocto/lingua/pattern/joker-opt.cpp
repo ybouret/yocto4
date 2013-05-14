@@ -45,6 +45,12 @@ namespace yocto
                 return true;
         }
         
+        void optional:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=\"?\"];\n";
+            __viz(this, fp);
+        }
+        
     }
 
 }

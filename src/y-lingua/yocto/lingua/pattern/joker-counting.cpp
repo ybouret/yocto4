@@ -70,6 +70,14 @@ namespace yocto
         }
         
         
+        void counting:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp(" [label=\"{%u,%u}\"];\n", unsigned(nmin), unsigned(nmax));
+            __viz(this, fp);
+        }
+
+        
         
         
     }

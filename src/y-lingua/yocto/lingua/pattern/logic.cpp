@@ -62,6 +62,17 @@ namespace yocto
             }
         }
         
+        void logical:: __viz(const void *parent, ios::ostream &fp) const
+        {
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                p->viz(fp);
+            }
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                fp.viz(parent); fp << " -> ";  fp.viz(p); fp << ";\n";
+            }
+        }
     }
 }
 
@@ -97,13 +108,13 @@ namespace yocto
                 p->operands.push_back( single::create( s[i] ) );
             return p.yield();
         }
-
+        
         pattern *logical:: AMONG(const char *s)
         {
             const string tmp(s);
             return AMONG(tmp);
         }
-
+        
     }
     
     

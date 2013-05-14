@@ -12,6 +12,7 @@ namespace yocto
     namespace lingua
     {
         
+        
         //! a cloneable pattern
         class pattern : public token
         {
@@ -41,11 +42,16 @@ namespace yocto
             //! save a binary representation
             virtual void save( ios::ostream &fp ) const = 0;
             
+            virtual void viz( ios::ostream &fp ) const  = 0;
+            static  void outviz( char c, ios::ostream &fp);
+            void graphviz( const string &filename ) const;
+            
             //! human readable name
             string  hr_name() const;
             
             //! binary content
             string content() const;
+            
             
             //! based on binary representations
             friend bool operator==( const pattern &lhs, const pattern &rhs );
@@ -53,6 +59,7 @@ namespace yocto
             
             //! loading from a binary representation
             static pattern *load( ios::istream &fp);
+            
             
             //! optimization: default is do nothing
             virtual void optimize() throw();
