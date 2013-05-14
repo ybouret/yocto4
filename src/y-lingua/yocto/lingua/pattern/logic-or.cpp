@@ -44,6 +44,30 @@ namespace yocto
         void OR::optimize() throw()
         {
             optimize_all();
+            
+            //------------------------------------------------------------------
+            //-- fusion of OR
+            //------------------------------------------------------------------
+            p_list tmp;
+            while( operands.size )
+            {
+                pattern *p = operands.pop_front();
+                if( p->type == OR::tag )
+                {
+                    assert(p->data);
+                    tmp.merge_back( *static_cast<p_list *>(p->data) );
+                    delete p;
+                }
+                else
+                    tmp.push_back(p);
+            }
+            
+            //------------------------------------------------------------------
+            //-- ok
+            //------------------------------------------------------------------
+            
+            operands.swap_with(tmp);
+
         }
         
         void OR:: viz( ios::ostream &fp) const

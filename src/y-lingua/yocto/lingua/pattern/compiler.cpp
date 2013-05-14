@@ -1,8 +1,13 @@
 #include "yocto/lingua/pattern/compiler.hpp"
+
 #include "yocto/lingua/pattern/basic.hpp"
 #include "yocto/lingua/pattern/logic.hpp"
+#include "yocto/lingua/pattern/joker.hpp"
+
 #include "yocto/auto-ptr.hpp"
 #include "yocto/exception.hpp"
+
+#include <cstdlib>
 
 #define YRX_VERBOSE 1
 
@@ -19,7 +24,7 @@ namespace yocto
         
         namespace
         {
-            
+            static inline
             pattern *compile_xp(const char   * &curr,
                                 const char   * last,
                                 const p_dict *dict,
@@ -33,7 +38,11 @@ namespace yocto
                     char C = *curr;
                     switch(C)
                     {
-                            
+                            //--------------------------------------------------
+                            //
+                            // SubExpressions
+                            //
+                            //--------------------------------------------------
                         case '(':
                             ++depth;
                             YRX(std::cerr << "[XP] Start SubExpression/Depth=" << depth << std::endl);
@@ -48,6 +57,65 @@ namespace yocto
                             ++curr;
                             goto FINISHED;
                             
+                            //--------------------------------------------------
+                            //
+                            // Alternation
+                            //
+                            //--------------------------------------------------
+                        case '|': {
+                            YRX(std::cerr << "[XP] Alternation/Depth=" << depth << std::endl);
+                            ++curr;
+                            auto_ptr<pattern>  lhs( p.yield() );
+                            auto_ptr<pattern>  rhs( compile_xp(curr, last, dict, depth));
+                            p.reset( OR::create() );
+                            p->append(lhs.yield());
+                            p->append(rhs.yield());
+                        }
+                            goto FINISHED;
+                            
+                            //--------------------------------------------------
+                            //
+                            // Jokers
+                            //
+                            //--------------------------------------------------
+                        case '?':
+                            YRX(std::cerr << "[XP] joker '?'" << std::endl);
+                            if(p->operands.size<=0)
+                                throw exception("%s(No Left Expression for '?')",fn);
+                            else
+                            {
+                                p->append( optional::create(p->operands.pop_back() ));
+                            }
+                            ++curr;
+                            break;
+                            
+                        case '+':
+                            YRX(std::cerr << "[XP] joker '+'" << std::endl);
+                            if(p->operands.size<=0)
+                                throw exception("%s(No Left Expression for '+')",fn);
+                            else
+                            {
+                                p->append( one_or_more(p->operands.pop_back() ));
+                            }
+                            ++curr;
+                            break;
+                            
+                        case '*':
+                            YRX(std::cerr << "[XP] joker '*'" << std::endl);
+                            if(p->operands.size<=0)
+                                throw exception("%s(No Left Expression for '*')",fn);
+                            else
+                            {
+                                p->append( zero_or_more(p->operands.pop_back() ));
+                            }
+                            ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // single chars
+                            //
+                            //--------------------------------------------------
                         default:
                             //--------------------------------------------------
                             // a new single char
@@ -62,13 +130,12 @@ namespace yocto
                     throw exception("%s(Unfinished SubExpression)",fn);
                 
             FINISHED:
+                assert( p.is_valid() );
                 if(p->operands.size<=0)
                     throw exception("%s(Empty SubExpression)",fn);
                 
                 p->optimize();
-                
-                return p.yield();
-                //return pattern::simplify(p.yield());
+                return pattern::simplify(p.yield());
             }
             
             
@@ -87,6 +154,7 @@ namespace yocto
             size_t      depth = 0;
             const char *curr  = expr.c_str();
             const char *last  = curr + expr.size();
+            
             return compile_xp(curr,
                               last,
                               dict,
