@@ -88,15 +88,15 @@ namespace yocto
         class choice : public one_char
         {
         public:
-            static const size_t default_capacity = 16;
             
             virtual ~choice() throw();
             
             void append(char c);
             void append(int lo,int hi);
+            void reserve(size_t n);
             
         protected:
-            explicit choice(uint32_t t);
+            explicit choice(uint32_t t) throw();
             choice(const choice &); //!< can't copy an empty choice
             void write( ios::ostream &fp ) const;
 
