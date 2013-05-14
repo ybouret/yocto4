@@ -59,14 +59,18 @@ namespace yocto
             
             //! based on binary representations
             friend bool operator==( const pattern &lhs, const pattern &rhs );
+            
+            //! base on binary representation
             friend bool operator!=( const pattern &lhs, const pattern &rhs );
             
             //! loading from a binary representation
             static pattern *load( ios::istream &fp);
             
-            
             //! optimization: default is do nothing
             virtual void optimize() throw();
+            
+            //! optimize
+            static pattern *simplify( pattern *p ) throw();
             
         protected:
             explicit pattern(uint32_t t) throw();
