@@ -9,7 +9,7 @@ namespace yocto
         // OR
         //
         ////////////////////////////////////////////////////////////////////////
-        OR::  OR() throw() : logical(type) {}
+        OR::  OR() throw() : logical(OR::tag) {}
         OR:: ~OR() throw() {}
         
         OR:: OR( const OR &other ) : logical(other) {}

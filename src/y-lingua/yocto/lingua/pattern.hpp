@@ -69,8 +69,7 @@ namespace yocto
             //! optimization: default is do nothing
             virtual void optimize() throw();
             
-            //! optimize
-            static pattern *simplify( pattern *p ) throw();
+            static pattern *simplify( pattern *pattern ) throw();
             
         protected:
             explicit pattern(uint32_t t) throw();
