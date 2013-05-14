@@ -1,10 +1,12 @@
 #include "yocto/lingua/pattern/logic.hpp"
+#include "yocto/lingua/pattern/joker.hpp"
 
 
 namespace yocto
 {
     namespace lingua
     {
+#if 0
         pattern *pattern:: optimize( pattern *p )
         {
             assert(p);
@@ -26,6 +28,13 @@ namespace yocto
                     ops.swap_with(tmp);
                 } break;
                     
+                case optional::tag:
+                case at_least::tag:
+                case counting::tag:
+                    assert(p->data);
+                    static_cast<pattern *>(p->data)->optimize;
+                    break;
+                    
                 default:
                     break;
             }
@@ -45,5 +54,7 @@ namespace yocto
             
             return p;
         }
+#endif
+        
     }
 }

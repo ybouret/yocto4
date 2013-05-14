@@ -14,6 +14,7 @@ namespace yocto
         {
         public:
             virtual ~joker() throw();
+            virtual void optimize() throw();
             
         protected:
             explicit joker( uint32_t t, pattern *p ) throw();
