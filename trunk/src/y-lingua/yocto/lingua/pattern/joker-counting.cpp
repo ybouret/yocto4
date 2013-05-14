@@ -37,7 +37,7 @@ namespace yocto
             fp.emit(tag);
             fp.emit<uint32_t>(nmin);
             fp.emit<uint32_t>(nmax);
-            motif->save(fp);
+            write(fp);
         }
         
         pattern * counting:: clone() const
