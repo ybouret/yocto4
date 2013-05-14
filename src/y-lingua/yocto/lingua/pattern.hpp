@@ -1,3 +1,7 @@
+/** \file
+ \brief regex based pattern interface.
+ */
+
 #ifndef YOCTO_LINGUA_PATTERN_INCLUDED
 #define YOCTO_LINGUA_PATTERN_INCLUDED 1
 
@@ -71,6 +75,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
         };
         
+        //! list of patterns
         typedef core::meta_list<pattern> p_list;
     }
 }
