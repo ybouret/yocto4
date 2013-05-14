@@ -7,7 +7,7 @@ namespace yocto
     {
         optional:: ~optional() throw() {}
         
-        optional:: optional( pattern *p ) throw() : joker(p) {}
+        optional:: optional( pattern *p ) throw() : joker(tag,p) {}
         
         optional:: optional( const optional &other) :
         joker(other)

@@ -9,7 +9,7 @@ namespace yocto
         // NOT
         //
         ////////////////////////////////////////////////////////////////////////
-        NOT::  NOT() throw() {}
+        NOT::  NOT() throw() : logical(tag) {}
         NOT:: ~NOT() throw() {}
         
         NOT:: NOT( const NOT &other ) : logical(other) {}

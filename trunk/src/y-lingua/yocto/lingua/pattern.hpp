@@ -14,8 +14,10 @@ namespace yocto
         class pattern : public token
         {
         public:
-            pattern *prev;
-            pattern *next;
+            const uint32_t type; //!< for identifier
+            pattern       *prev; //!< for list
+            pattern       *next; //!< for list
+            void          *data; //!< access to special data
             
             virtual ~pattern() throw();
             
@@ -34,12 +36,13 @@ namespace yocto
              */
             virtual bool accept( source &src ) = 0;
             
+            //! save a binary representation
             virtual void save( ios::ostream &fp ) const = 0;
             
             string  make_name() const;
             
         protected:
-            explicit pattern() throw();
+            explicit pattern(uint32_t t) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);

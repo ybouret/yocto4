@@ -15,11 +15,19 @@ namespace yocto
         
         logical:: ~logical() throw() {}
         
-        logical:: logical() throw() : operands() {}
+        logical:: logical(uint32_t t) throw() :
+        pattern(t),
+        operands()
+        {
+            data = &operands;
+        }
         
-        logical:: logical( const logical &other ) : operands(other.operands)
+        logical:: logical( const logical &other ) :
+        pattern(other.type),
+        operands(other.operands)
         {
             if(operands.size<=0) throw exception("lingua::logical(NO OPERANDS)");
+            data = &operands;
         }
         
         void logical:: reset() throw()

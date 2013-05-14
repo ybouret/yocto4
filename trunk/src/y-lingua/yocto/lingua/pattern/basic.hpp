@@ -19,7 +19,7 @@ namespace yocto
             virtual bool accept( source &src );
             
         protected:
-            explicit one_char() throw();
+            explicit one_char(uint32_t t) throw();
             
         private:
             virtual bool is_valid(char) const throw() = 0;
@@ -54,7 +54,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
 
-            static single * create( char );
+            static single * create( char ); //! single->data = &value
             const char      value;
             
         private:
@@ -73,7 +73,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     save( ios::ostream &fp ) const;
 
-            static range *create(int,int);
+            static range *create(int,int); //!< range->data = &lower
             const int lower;
             const int upper;
             
@@ -96,7 +96,7 @@ namespace yocto
             void append(int lo,int hi);
             
         protected:
-            explicit choice();
+            explicit choice(uint32_t t);
             choice(const choice &); //!< can't copy an empty choice
             void write( ios::ostream &fp ) const;
 

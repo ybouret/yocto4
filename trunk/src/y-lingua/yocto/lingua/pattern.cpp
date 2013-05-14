@@ -11,9 +11,11 @@ namespace yocto
         pattern:: ~pattern() throw() {}
         
         
-        pattern:: pattern() throw()  :
+        pattern:: pattern(uint32_t t) throw()  :
+        type(t),
         prev(0),
-        next(0)
+        next(0),
+        data(0)
         {}
         
         void pattern:: reset() throw()

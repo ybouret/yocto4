@@ -12,7 +12,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         
-        one_char:: one_char() throw() {}
+        one_char:: one_char(uint32_t t) throw() : pattern(t) {}
         
         one_char:: ~one_char() throw() {}
         
@@ -40,7 +40,7 @@ namespace yocto
         // any1
         //
         ////////////////////////////////////////////////////////////////////////
-        any1:: any1() throw() {}
+        any1:: any1() throw() : one_char(tag) {}
         
         any1:: ~any1() throw() {}
         
@@ -61,7 +61,12 @@ namespace yocto
         // single
         //
         ////////////////////////////////////////////////////////////////////////
-        single:: single(char c) throw() : value(c) {}
+        single:: single(char c) throw() :
+        one_char(tag),  value(c)
+        {
+            data = (void*)&value;
+        }
+        
         single:: ~single() throw() {}
         
         single * single::create( char c) { return new single(c); }
@@ -83,16 +88,22 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         range::~range() throw() {}
-        range:: range(int a, int b) throw() : lower( min_of(a,b) ), upper( max_of(a,b) )
+        range:: range(int a, int b) throw() :
+        one_char(tag),
+        lower( min_of(a,b) ),
+        upper( max_of(a,b) )
         {
+            data = (void *)&lower;
         }
         
         range * range:: create(int a, int b) { return new range(a,b); }
         
         range:: range( const range &other ) throw() :
+        one_char(tag),
         lower( other.lower ),
         upper( other.upper )
         {
+            data = (void *)&lower;
         }
         
         pattern * range:: clone() const { return new range(*this); }
@@ -116,9 +127,11 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         choice:: ~choice() throw() {}
-        choice::  choice() :
+        choice::  choice(uint32_t t) :
+        one_char(t),
         chars( default_capacity, as_capacity)
         {
+            data = &chars;
         }
         
         void choice:: append(char c)
@@ -136,10 +149,12 @@ namespace yocto
         
                
         choice:: choice( const choice &other ) :
+        one_char( other.type ),
         chars( other.chars )
         {
             if( chars.size() <= 0 )
                 throw exception("lingua::choice(NO CHARS)");
+            data = &chars;
         }
         
         void choice:: write( ios::ostream &fp ) const
@@ -158,7 +173,10 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         within:: ~within() throw() {}
         
-        within:: within() : choice() {}
+        within:: within() : choice(tag)
+        {
+            
+        }
         
         within:: within( const within &other ) : choice(other) {}
         
@@ -189,7 +207,8 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         none:: ~none() throw() {}
         
-        none:: none() : choice() {}
+        none:: none() : choice(tag)
+        {}
         
         none:: none( const none &other ) : choice(other) {}
         
