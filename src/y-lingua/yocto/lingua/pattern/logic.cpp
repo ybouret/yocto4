@@ -54,6 +54,13 @@ namespace yocto
             operands.push_back(p);
         }
         
+        void logical:: optimize_all() throw()
+        {
+            for( pattern *p = operands.head;p;p=p->next)
+            {
+                p->optimize();
+            }
+        }
         
     }
 }

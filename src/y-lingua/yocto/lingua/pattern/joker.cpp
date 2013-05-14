@@ -31,5 +31,10 @@ namespace yocto
             motif->save(fp);
         }
         
+        
+        void joker:: optimize() throw()
+        {
+            motif->optimize();
+        }
     }
 }

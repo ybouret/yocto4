@@ -31,6 +31,9 @@ namespace yocto
             logical( const logical & );
             void write( ios::ostream &fp ) const;
             
+            //! apply optimize to all operands
+            void optimize_all() throw();
+            
         private:
             YOCTO_DISABLE_ASSIGN(logical);
         };
@@ -48,6 +51,8 @@ namespace yocto
             virtual ~AND() throw();
             
             static AND *create();
+            
+            virtual void optimize() throw();
             
         private:
             explicit AND() throw();
@@ -68,6 +73,8 @@ namespace yocto
             
             static OR *create();
             
+            virtual void optimize() throw();
+
         private:
             explicit OR() throw();
             OR( const OR & );
@@ -87,7 +94,8 @@ namespace yocto
             virtual ~NOT() throw();
             
             static NOT *create();
-            
+            virtual void optimize() throw();
+
         private:
             explicit NOT() throw();
             NOT( const NOT & );

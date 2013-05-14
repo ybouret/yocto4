@@ -49,6 +49,11 @@ namespace yocto
             else
                 return false;
         }
+        
+        void NOT:: optimize() throw()
+        {
+            optimize_all();
+        }
 
     }
     

@@ -56,6 +56,11 @@ namespace yocto
             return L != R;
         }
         
+        void pattern:: optimize() throw()
+        {
+            
+        }
+        
     }
     
 }

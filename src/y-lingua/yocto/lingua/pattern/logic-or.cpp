@@ -41,6 +41,11 @@ namespace yocto
             return false;
         }
 
+        void OR::optimize() throw()
+        {
+            optimize_all();
+        }
+        
     }
     
 }
