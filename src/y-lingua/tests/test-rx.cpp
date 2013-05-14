@@ -10,6 +10,8 @@
 using namespace yocto;
 using namespace lingua;
 
+//void shared_test_motifs( p_list &motifs );
+
 YOCTO_UNIT_TEST_IMPL(rx)
 {
     if(argc>1)
@@ -17,7 +19,7 @@ YOCTO_UNIT_TEST_IMPL(rx)
         p_dict dict;
         dict.insert("DIGIT", posix::digit() );
         const string      rxp = argv[1];
-        auto_ptr<pattern> q( compile(rxp,0) );
+        auto_ptr<pattern> q( compile(rxp,&dict) );
         
         {
             ios::ocstream fp("expr.bin",false);
@@ -26,6 +28,10 @@ YOCTO_UNIT_TEST_IMPL(rx)
         
         q->graphviz( "expr.dot" );
         system("dot -Tpng -oexpr.png expr.dot");
+        
+        //p_list motifs;
+        //motifs.push_back( q.yield() );
+        //shared_test_motifs(motifs);
     }
 }
 YOCTO_UNIT_TEST_DONE()
