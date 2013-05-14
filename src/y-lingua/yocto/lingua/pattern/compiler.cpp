@@ -6,8 +6,8 @@
 
 #include "yocto/auto-ptr.hpp"
 #include "yocto/exception.hpp"
-
-#include <cstdlib>
+#include "yocto/string/tokenizer.hpp"
+#include "yocto/string/conv.hpp"
 
 #define YRX_VERBOSE 1
 
@@ -21,6 +21,7 @@
 #define LBRACE '{'
 #define RBRACE '}'
 
+
 namespace yocto
 {
     namespace lingua
@@ -29,7 +30,19 @@ namespace yocto
         namespace
         {
             static const char fn[] = "lingua::compile";
-
+            
+            static inline
+            bool sep_coma( char C) throw()
+            {
+                return ',' == C;
+            }
+            
+            static inline
+            bool sep_null( char C ) throw()
+            {
+                return 0 == C;
+            }
+            
             static inline
             string scan_braces(const char   * &curr,
                                const char   * last)
@@ -138,23 +151,63 @@ namespace yocto
                             // braces
                             //
                             //--------------------------------------------------
-                        case LBRACE: {
+                        case LBRACE:
+                        {
                             const string content( scan_braces(curr, last) );
                             assert(RBRACE==curr[0]);
                             ++curr;
                             YRX(std::cerr << "[XP] [BRACES] {" << content << "}" << std::endl);
                             if(content.size()<=0)
                                 throw exception("%s(Empty Braces)",fn);
-                            if(content[0] >= '0' && content[0] <= '9')
+                            if(isdigit(content[0]))
                             {
                                 //----------------------------------------------
                                 // assume counting joker
                                 //----------------------------------------------
+                                if( p->operands.size <= 0 )
+                                    throw exception("%s(No SubExpression before Braces)",fn);
+                                const char *orgA = &content[0];
+                                const char *endA = orgA;
+                                const char *endB = orgA + content.size();
+                                bool        comma = false;
+                                while(endA<endB)
+                                {
+                                    if(*endA==',')
+                                    {
+                                        comma = true;
+                                        break;
+                                    }
+                                    ++endA;
+                                }
+                                const string astr(orgA,endA-orgA);
+                                const size_t a = strconv::to<size_t>(astr,"First Brace Number");
+                                YRX( std::cerr << "\ta=" << astr << std::endl);
+                                if(comma)
+                                {
+                                    const char *orgB = endA+1;
+                                    if(orgB<endB)
+                                    {
+                                        const string bstr(orgB,endB-orgB);
+                                        const size_t b = strconv::to<size_t>(bstr,"Second Brace Number");
+                                        YRX(std::cerr << "\t=> between " <<a << " and " << b << " times" << std::endl);
+                                        p->append( counting::create( p->operands.pop_back(), a, b));
+                                    }
+                                    else
+                                    {
+                                        YRX(std::cerr<<"\t=> at least " << a << " times" <<std::endl);
+                                        p->append( at_least::create( p->operands.pop_back(), a));
+                                    }
+                                }
+                                else
+                                {
+                                    YRX(std::cerr << "\t=> exactly " << a << " times" << std::endl);
+                                    p->append( counting::create( p->operands.pop_back(), a, a));
+                                }
                             }
                             else
                             {
                                 //----------------------------------------------
-                                // assume named pattern from dictionary
+                                // assume named joker from dictionary
                                 //----------------------------------------------
                                 if(!dict)
                                     throw exception("%s(no dict for {%s})", fn, content.c_str());

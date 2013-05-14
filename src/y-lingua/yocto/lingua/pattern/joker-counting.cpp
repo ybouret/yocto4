@@ -1,6 +1,7 @@
 #include "yocto/lingua/pattern/joker.hpp"
 #include "yocto/auto-ptr.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -27,6 +28,8 @@ namespace yocto
         counting * counting:: create( pattern *p, size_t a, size_t b)
         {
             auto_ptr<pattern> q(p);
+            if(max_of(a, b)<=0)
+                throw exception("lingua::counting(invalid nmax=0)");
             counting *ans = new counting(p,a,b);
             (void) q.yield();
             return ans;
