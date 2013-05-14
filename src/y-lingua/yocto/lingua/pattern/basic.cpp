@@ -127,11 +127,16 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         choice:: ~choice() throw() {}
-        choice::  choice(uint32_t t) :
+        choice::  choice(uint32_t t) throw() :
         one_char(t),
-        chars( default_capacity, as_capacity)
+        chars()
         {
             data = &chars;
+        }
+        
+        void choice:: reserve(size_t n)
+        {
+            chars.reserve(n);
         }
         
         void choice:: append(char c)
