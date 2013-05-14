@@ -16,7 +16,7 @@ namespace yocto
             virtual ~joker() throw();
             
         protected:
-            explicit joker( pattern *p ) throw();
+            explicit joker( uint32_t t, pattern *p ) throw();
             pattern *motif;
             joker( const joker &);
             void write( ios::ostream &fp ) const;

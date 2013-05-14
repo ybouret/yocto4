@@ -9,7 +9,7 @@ namespace yocto
         at_least:: ~at_least() throw() {}
         
         at_least:: at_least( pattern *p, size_t n) throw() :
-        joker(p),
+        joker(tag,p),
         count(n)
         {
             

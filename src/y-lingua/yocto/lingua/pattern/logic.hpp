@@ -27,7 +27,7 @@ namespace yocto
             void append( pattern *p ) throw();
             
         protected:
-            explicit logical() throw();
+            explicit logical(uint32_t t) throw();
             logical( const logical & );
             void write( ios::ostream &fp ) const;
             

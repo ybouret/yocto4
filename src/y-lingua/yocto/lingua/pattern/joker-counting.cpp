@@ -10,7 +10,7 @@ namespace yocto
         counting:: ~counting() throw() {}
         
         counting:: counting( pattern *p, size_t a, size_t b) throw() :
-        joker(p),
+        joker(tag,p),
         nmin(min_of(a,b)),
         nmax(max_of(a,b))
         {

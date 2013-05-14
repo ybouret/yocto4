@@ -9,7 +9,7 @@ namespace yocto
         // AND
         //
         ////////////////////////////////////////////////////////////////////////
-        AND::  AND() throw() {}
+        AND::  AND() throw() : logical(type) {}
         AND:: ~AND() throw() {}
         
         AND:: AND( const AND &other ) : logical(other) {}
