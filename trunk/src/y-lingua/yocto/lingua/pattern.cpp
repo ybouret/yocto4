@@ -60,7 +60,7 @@ namespace yocto
         
         void pattern:: optimize() throw()
         {
-            
+            // default is do nothing
         }
         
         

@@ -12,6 +12,7 @@ namespace yocto
     {
         
         
+        //! shared input
         typedef shared_ptr<ios::istream> input;
         
         //! convert an input into a source of t_char
