@@ -17,6 +17,10 @@
 #define YRX(CODE)
 #endif
 
+
+#define LBRACE '{'
+#define RBRACE '}'
+
 namespace yocto
 {
     namespace lingua
@@ -24,13 +28,31 @@ namespace yocto
         
         namespace
         {
+            static const char fn[] = "lingua::compile";
+
+            static inline
+            string scan_braces(const char   * &curr,
+                               const char   * last)
+            {
+                assert( LBRACE == curr[0] );
+                const char *org = ++curr;
+                while(curr<last)
+                {
+                    if(RBRACE==curr[0])
+                    {
+                        return string(org,curr-org);
+                    }
+                    ++curr;
+                }
+                throw exception("%s(Unfinished Braces)",fn);
+            }
+            
             static inline
             pattern *compile_xp(const char   * &curr,
                                 const char   * last,
                                 const p_dict *dict,
                                 size_t       &depth )
             {
-                static const char fn[] = "lingua::compile";
                 
                 auto_ptr<logical> p( AND::create() );
                 while(curr<last)
@@ -109,6 +131,36 @@ namespace yocto
                                 p->append( zero_or_more(p->operands.pop_back() ));
                             }
                             ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // braces
+                            //
+                            //--------------------------------------------------
+                        case LBRACE: {
+                            const string content( scan_braces(curr, last) );
+                            assert(RBRACE==curr[0]);
+                            ++curr;
+                            YRX(std::cerr << "[XP] [BRACES] {" << content << "}" << std::endl);
+                            if(content.size()<=0)
+                                throw exception("%s(Empty Braces)",fn);
+                            if(content[0] >= '0' && content[0] <= '9')
+                            {
+                                //----------------------------------------------
+                                // assume counting joker
+                                //----------------------------------------------
+                            }
+                            else
+                            {
+                                //----------------------------------------------
+                                // assume named pattern from dictionary
+                                //----------------------------------------------
+                                if(!dict)
+                                    throw exception("%s(no dict for {%s})", fn, content.c_str());
+                                p->append( dict->create(content) );
+                            }
+                        }
                             break;
                             
                             //--------------------------------------------------
