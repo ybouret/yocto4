@@ -31,19 +31,47 @@ namespace yocto
 
 		namespace
 		{
-	
+
 			static const char fn[] = "lingua::compile";
 
-
+			///////////////////////////////////////////////////////////////////
+			//
+			// group
+			//
+			///////////////////////////////////////////////////////////////////
 			static inline
-			pattern *compile_braces(const char * &curr, const char * last)
+				pattern *compile_group(const char * &curr, const char * last)
 			{
-				
+				auto_ptr<logical> p(0);
+
 				assert( LBRACK == curr[0] );
-				
-				return 0;
+				if(++curr>last)
+					throw exception("%s(Unfinished Group)", fn);
+
+				if( '^' == curr[0] )
+				{
+					p.reset( NOT::create() );
+					++curr;
+				}
+				else
+				{
+					p.reset( OR::create() );
+				}
+				assert(p.is_valid());
+				while(curr<last)
+				{
+					char C = curr[0];
+
+					
+				}
+				throw exception("%s(Unfinished Group)", fn);
 			}
 
+			///////////////////////////////////////////////////////////////////
+			//
+			// braces
+			//
+			///////////////////////////////////////////////////////////////////
 			static inline
 				string scan_braces(const char   * &curr,
 				const char   * last)
@@ -153,8 +181,9 @@ namespace yocto
 						//
 						//--------------------------------------------------
 					case LBRACK:
-						p->append(0);
-
+						p->append(compile_group(curr,last));
+						assert(RBRACK==curr[0]);
+						++curr;
 						break;
 
 						//--------------------------------------------------
