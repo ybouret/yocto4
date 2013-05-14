@@ -9,8 +9,8 @@ namespace yocto
     namespace lingua
     {
         
-        pattern *compile( const string &expr, p_dict *dict = 0);
-        pattern *compile( const char   *expr, p_dict *dict = 0);
+        pattern *compile( const string &expr, const p_dict *dict = 0);
+        pattern *compile( const char   *expr, const p_dict *dict = 0);
         
     }
 }

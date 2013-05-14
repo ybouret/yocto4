@@ -1,5 +1,7 @@
 #include "yocto/lingua/pattern/logic.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
     namespace lingua
@@ -9,7 +11,7 @@ namespace yocto
         // AND
         //
         ////////////////////////////////////////////////////////////////////////
-        AND::  AND() throw() : logical(type) {}
+        AND::  AND() throw() : logical(AND::tag) {}
         AND:: ~AND() throw() {}
         
         AND:: AND( const AND &other ) : logical(other) {}
@@ -56,7 +58,7 @@ namespace yocto
             //-- recursive opt
             //------------------------------------------------------------------
             optimize_all();
-            
+
             //------------------------------------------------------------------
             //-- fusion of and
             //------------------------------------------------------------------

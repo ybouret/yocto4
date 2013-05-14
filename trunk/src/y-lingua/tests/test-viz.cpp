@@ -1,7 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lingua/pattern/posix.hpp"
 
-#include "yocto/sequence/vector.hpp"
 
 #include "yocto/auto-ptr.hpp"
 

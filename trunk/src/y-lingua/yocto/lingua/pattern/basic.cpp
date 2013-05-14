@@ -40,7 +40,7 @@ namespace yocto
         // any1
         //
         ////////////////////////////////////////////////////////////////////////
-        any1:: any1() throw() : one_char(tag) {}
+        any1:: any1() throw() : one_char(any1::tag) {}
         
         any1:: ~any1() throw() {}
         
@@ -66,7 +66,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         single:: single(char c) throw() :
-        one_char(tag),  value(c)
+        one_char(single::tag),  value(c)
         {
             data = (void*)&value;
         }
@@ -100,7 +100,7 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         range::~range() throw() {}
         range:: range(int a, int b) throw() :
-        one_char(tag),
+        one_char(range::tag),
         lower( min_of(a,b) ),
         upper( max_of(a,b) )
         {
@@ -110,7 +110,7 @@ namespace yocto
         range * range:: create(int a, int b) { return new range(a,b); }
         
         range:: range( const range &other ) throw() :
-        one_char(tag),
+        one_char(range::tag),
         lower( other.lower ),
         upper( other.upper )
         {
@@ -147,6 +147,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         choice:: ~choice() throw() {}
+        
         choice::  choice(uint32_t t) throw() :
         one_char(t),
         chars()
@@ -208,7 +209,7 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         within:: ~within() throw() {}
         
-        within:: within() : choice(tag)
+        within:: within() : choice(within::tag)
         {
             
         }
@@ -249,7 +250,7 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         none:: ~none() throw() {}
         
-        none:: none() : choice(tag)
+        none:: none() : choice(none::tag)
         {}
         
         none:: none( const none &other ) : choice(other) {}
