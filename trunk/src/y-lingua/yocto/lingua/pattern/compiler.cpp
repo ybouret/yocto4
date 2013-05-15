@@ -30,60 +30,124 @@ namespace yocto
 {
 	namespace lingua
 	{
-
+        
 		namespace
 		{
-
+            
 			static const char fn[] = "lingua::compile";
-			///////////////////////////////////////////////////////////////////
+            
+            ////////////////////////////////////////////////////////////////////
+            //
+			//
+			// compile posix
+			//
+            //
+			////////////////////////////////////////////////////////////////////
+            static inline
+            pattern * compile_posix( const char * &curr, const char * last)
+            {
+                YRX(std::cerr << "[GRP] posix" << std::endl);
+                
+                //==============================================================
+                // extract the name
+                //==============================================================
+                assert( ':' == curr[0] );
+                if( ++curr >= last )
+                    throw exception("%s(Unfinished Posix)",fn);
+                const char *org = curr;
+                while(curr<last)
+                {
+                    if( ':' == curr[0] )
+                    {
+                        ++curr;
+                        if( curr[0]  != RBRACK )
+                            throw exception("%s(Invalid Posix after'%s'",fn,org-2);
+                        
+                        assert(curr>org);
+                        const string id(org,(curr-org)-1);
+                        YRX(std::cerr << "[GRP] id=<" << id << ">" << std::endl);
+#define YRX_POSIX(ID) if( id == #ID ) return posix::ID()
+                        
+                        YRX_POSIX(upper);
+                        YRX_POSIX(lower);
+                        YRX_POSIX(digit);
+                        YRX_POSIX(alpha);
+                        YRX_POSIX(alnum);
+                        YRX_POSIX(xdigit);
+                        YRX_POSIX(blank);
+                        YRX_POSIX(space);
+                        YRX_POSIX(punct);
+                        
+                        YRX_POSIX(word);
+                        YRX_POSIX(endl);
+                        YRX_POSIX(cstring);
+                        
+                        throw exception("%s(Unhandled Posix '%s')", fn, id.c_str());
+                        
+                        //======================================================
+                        // return whatever
+                        //======================================================
+                    }
+                    ++curr;
+                }
+                throw exception("%s(Unfinished Posix after '%s')",fn,org-2);
+            }
+            
+            
+			////////////////////////////////////////////////////////////////////
+            //
 			//
 			// hexa
 			//
-			///////////////////////////////////////////////////////////////////
+            //
+			////////////////////////////////////////////////////////////////////
 			static inline
-				uint8_t compile_hexa(const char * &curr, const char * last)
+            uint8_t compile_hexa(const char * &curr, const char * last)
 			{
 				assert('x' == curr[0]);
-				if(++curr>=last) 
-					throw exception("%s(Missing First Hexa Char)");
+				if(++curr>=last)
+					throw exception("%s(Missing First Hexa Char)",fn);
 				if( !isxdigit(curr[0]) )
-					throw exception("%s(Invalid First Hexa Byte)");
-
+					throw exception("%s(Invalid First Hexa Byte)",fn);
+                
 				int ans = hex2dec(curr[0]) << 4;
-
-				if(++curr>=last) 
-					throw exception("%s(Missing Second Hexa Char)");
+                
+				if(++curr>=last)
+					throw exception("%s(Missing Second Hexa Char)",fn);
 				if( !isxdigit(curr[0]) )
-					throw exception("%s(Invalid Second Hexa Byte)");
+					throw exception("%s(Invalid Second Hexa Byte)",fn);
 				ans |= hex2dec(curr[0]);
-
+                
 				return uint8_t(ans);
 			}
-
-			///////////////////////////////////////////////////////////////////
+            
+            
+			////////////////////////////////////////////////////////////////////
 			//
+            //
 			// group
 			//
-			///////////////////////////////////////////////////////////////////
+            //
+			////////////////////////////////////////////////////////////////////
 			static inline
-				pattern *compile_group(const char * &curr, const char * last)
+            pattern *compile_group(const char * &curr, const char * last)
 			{
 				auto_ptr<logical> p(0);
 				YRX(std::cerr << "[GRP] Start New Group" << std::endl);
-
+                
 				assert( LBRACK == curr[0] );
-
-				//=============================================================
+                
+				//==============================================================
 				//
 				// do we have a caret ?
 				//
 				//==============================================================
-
-
+                
+                
 				//-- skip LBRACK
 				if(++curr>=last)
 					throw exception("%s(Unfinished Group)", fn);
-
+                
 				//-- test caret
 				if( '^' == curr[0] )
 				{
@@ -95,12 +159,15 @@ namespace yocto
 				}
 				else
 				{
+                    if( ':' == curr[0] )
+                        return compile_posix(curr,last);
+                    
 					p.reset( OR::create() );
 				}
-
-
+                
+                
 				assert(p.is_valid());
-				//=============================================================
+				//==============================================================
 				//
 				// do we have a '-' ?
 				//
@@ -111,51 +178,55 @@ namespace yocto
 					p->append( single::create('-') );
 					++curr;
 				}
-
+                                
 				//=============================================================
 				//
-				// do we have a '-' ?
+				// process the rest
 				//
 				//==============================================================
 				while(curr<last)
 				{
 					char C = curr[0];
-
+                    
 					switch(C)
 					{
-					case RBRACK:
-						YRX( std::cerr << "[GRP] End" << std::endl );
-						goto FINISHED;
-
-						//-----------------------------------------------------
-						//
-						// generic char
-						//
-						//-----------------------------------------------------
-					default:
-						YRX(std::cerr << "[GRP] Append single '" << C << "'" << std::endl);
-						p->append( single::create(C) );
-						++curr;
-						break;
+                        case RBRACK:
+                            YRX( std::cerr << "[GRP] End" << std::endl );
+                            goto FINISHED;
+                            
+                            //-----------------------------------------------------
+                            //
+                            // generic char
+                            //
+                            //-----------------------------------------------------
+                        default:
+                            YRX(std::cerr << "[GRP] Append single '" << C << "'" << std::endl);
+                            p->append( single::create(C) );
+                            ++curr;
+                            break;
 					}
 				}
 				throw exception("%s(Unfinished Group)", fn);
-
-FINISHED:
+                
+            FINISHED:
 				if(p->operands.size<=0)
 					throw exception("%s(Empty Group)", fn );
-				p->optimize();
-				return pattern::simplify(p.yield());
+                
+                p->optimize();
+                return pattern::collapse(p.yield());
 			}
-
+            
+            
 			///////////////////////////////////////////////////////////////////
 			//
+            //
 			// braces
 			//
+            //
 			///////////////////////////////////////////////////////////////////
 			static inline
-				string scan_braces(const char   * &curr,
-				const char   * last)
+            string scan_braces(const char   * &curr,
+                               const char   * last)
 			{
 				assert( LBRACE == curr[0] );
 				const char *org = ++curr;
@@ -169,110 +240,110 @@ FINISHED:
 				}
 				throw exception("%s(Unfinished Braces)",fn);
 			}
-
+            
 			static inline
-				pattern *compile_xp(const char   * &curr,
-				const char   * last,
-				const p_dict *dict,
-				size_t       &depth )
+            pattern *compile_xp(const char   * &curr,
+                                const char   * last,
+                                const p_dict *dict,
+                                size_t       &depth )
 			{
-
+                
 				auto_ptr<logical> p( AND::create() );
 				while(curr<last)
 				{
 					char C = *curr;
 					switch(C)
 					{
-						//--------------------------------------------------
-						//
-						// SubExpressions
-						//
-						//--------------------------------------------------
-					case '(':
-						++depth;
-						YRX(std::cerr << "[RXP] Start SubExpression/Depth=" << depth << std::endl);
-						++curr;
-						p->append( compile_xp(curr,last,dict,depth) );
-						break;
-
-					case ')':
-						YRX(std::cerr << "[RXP] Finish SubExpression/Depth=" << depth << std::endl);
-						if(depth<=0) throw exception("%s(Unexpected Right Paren)",fn);
-						--depth;
-						++curr;
-						goto FINISHED;
-
-						//--------------------------------------------------
-						//
-						// Alternation
-						//
-						//--------------------------------------------------
-					case '|': {
-						YRX(std::cerr << "[RXP] Alternation/Depth=" << depth << std::endl);
-						++curr;
-						auto_ptr<pattern>  lhs( p.yield() );
-						auto_ptr<pattern>  rhs( compile_xp(curr, last, dict, depth));
-						p.reset( OR::create() );
-						p->append(lhs.yield());
-						p->append(rhs.yield());
-							  }
-							  goto FINISHED;
-
-							  //--------------------------------------------------
-							  //
-							  // Jokers
-							  //
-							  //--------------------------------------------------
-					case '?':
-						YRX(std::cerr << "[RXP] joker '?'" << std::endl);
-						if(p->operands.size<=0)
-							throw exception("%s(No Left Expression for '?')",fn);
-						else
-						{
-							p->append( optional::create(p->remove() ));
-						}
-						++curr;
-						break;
-
-					case '+':
-						YRX(std::cerr << "[RXP] joker '+'" << std::endl);
-						if(p->operands.size<=0)
-							throw exception("%s(No Left Expression for '+')",fn);
-						else
-						{
-							p->append( one_or_more(p->remove() ));
-						}
-						++curr;
-						break;
-
-					case '*':
-						YRX(std::cerr << "[RXP] joker '*'" << std::endl);
-						if(p->operands.size<=0)
-							throw exception("%s(No Left Expression for '*')",fn);
-						else
-						{
-							p->append( zero_or_more(p->remove() ));
-						}
-						++curr;
-						break;
-
-						//--------------------------------------------------
-						//
-						// bracket
-						//
-						//--------------------------------------------------
-					case LBRACK:
-						p->append(compile_group(curr,last));
-						assert(RBRACK==curr[0]);
-						++curr;
-						break;
-
-						//--------------------------------------------------
-						//
-						// braces
-						//
-						//--------------------------------------------------
-					case LBRACE:
+                            //--------------------------------------------------
+                            //
+                            // SubExpressions
+                            //
+                            //--------------------------------------------------
+                        case '(':
+                            ++depth;
+                            YRX(std::cerr << "[RXP] Start SubExpression/Depth=" << depth << std::endl);
+                            ++curr;
+                            p->append( compile_xp(curr,last,dict,depth) );
+                            break;
+                            
+                        case ')':
+                            YRX(std::cerr << "[RXP] Finish SubExpression/Depth=" << depth << std::endl);
+                            if(depth<=0) throw exception("%s(Unexpected Right Paren)",fn);
+                            --depth;
+                            ++curr;
+                            goto FINISHED;
+                            
+                            //--------------------------------------------------
+                            //
+                            // Alternation
+                            //
+                            //--------------------------------------------------
+                        case '|': {
+                            YRX(std::cerr << "[RXP] Alternation/Depth=" << depth << std::endl);
+                            ++curr;
+                            auto_ptr<pattern>  lhs( p.yield() );
+                            auto_ptr<pattern>  rhs( compile_xp(curr, last, dict, depth));
+                            p.reset( OR::create() );
+                            p->append(lhs.yield());
+                            p->append(rhs.yield());
+                        }
+                            goto FINISHED;
+                            
+                            //--------------------------------------------------
+                            //
+                            // Jokers
+                            //
+                            //--------------------------------------------------
+                        case '?':
+                            YRX(std::cerr << "[RXP] joker '?'" << std::endl);
+                            if(p->operands.size<=0)
+                                throw exception("%s(No Left Expression for '?')",fn);
+                            else
+                            {
+                                p->append( optional::create(p->remove() ));
+                            }
+                            ++curr;
+                            break;
+                            
+                        case '+':
+                            YRX(std::cerr << "[RXP] joker '+'" << std::endl);
+                            if(p->operands.size<=0)
+                                throw exception("%s(No Left Expression for '+')",fn);
+                            else
+                            {
+                                p->append( one_or_more(p->remove() ));
+                            }
+                            ++curr;
+                            break;
+                            
+                        case '*':
+                            YRX(std::cerr << "[RXP] joker '*'" << std::endl);
+                            if(p->operands.size<=0)
+                                throw exception("%s(No Left Expression for '*')",fn);
+                            else
+                            {
+                                p->append( zero_or_more(p->remove() ));
+                            }
+                            ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // bracket
+                            //
+                            //--------------------------------------------------
+                        case LBRACK:
+                            p->append(compile_group(curr,last));
+                            assert(RBRACK==curr[0]);
+                            ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // braces
+                            //
+                            //--------------------------------------------------
+                        case LBRACE:
 						{
 							const string content( scan_braces(curr, last) );
 							assert(RBRACE==curr[0]);
@@ -335,93 +406,94 @@ FINISHED:
 								p->append( dict->create(content) );
 							}
 						}
-						break;
-
-						//--------------------------------------------------
-						//
-						// escaped char
-						//
-						//--------------------------------------------------
-					case '\\':
-						if(++curr>=last)
-							throw exception("%s(Unfinished Escaped Sequence)", fn);
-						C = curr[0];
-						YRX( std::cerr << "[RXP] Escaped Sequence <" << C << ">" << std::endl);
-						switch(C)
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // escaped char
+                            //
+                            //--------------------------------------------------
+                        case '\\':
+                            if(++curr>=last)
+                                throw exception("%s(Unfinished Escaped Sequence)", fn);
+                            C = curr[0];
+                            YRX( std::cerr << "[RXP] Escaped Sequence <" << C << ">" << std::endl);
+                            switch(C)
 						{
-						case 'x':
-							C = char(compile_hexa(curr,last));
-							break;
-
-							//-------------------------------------------------
-							// simple escaped
-							//-------------------------------------------------
-						case '\\':
-						case '[':
-						case ']':
-						case '.':
-						case '{':
-						case '}':
-						case '+':
-						case '*':
-						case '?':
-							break;
-
-							//-------------------------------------------------
-							// control escaped
-							//-------------------------------------------------
-						case 'n': C='\n'; break;
-						case 'r': C='\r'; break;
-						case 't': C='\t'; break;
-
-						default:
-							throw exception("%s(Unknown Escaped Sequence '%c')", fn, C);
+                            case 'x':
+                                C = char(compile_hexa(curr,last));
+                                break;
+                                
+                                //-------------------------------------------------
+                                // simple escaped
+                                //-------------------------------------------------
+                            case '\\':
+                            case '[':
+                            case ']':
+                            case '.':
+                            case '{':
+                            case '}':
+                            case '+':
+                            case '*':
+                            case '?':
+                                break;
+                                
+                                //-------------------------------------------------
+                                // control escaped
+                                //-------------------------------------------------
+                            case 'n': C='\n'; break;
+                            case 'r': C='\r'; break;
+                            case 't': C='\t'; break;
+                                
+                            default:
+                                throw exception("%s(Unknown Escaped Sequence '%c')", fn, C);
 						}
-						++curr;
-						p->append( single::create(C) );
-						break;
-
-						//--------------------------------------------------
-						//
-						// specific chars
-						//
-						//--------------------------------------------------
-					case '.':
-						p->append( posix::dot() );
-						++curr;
-						break;
-
-						//--------------------------------------------------
-						//
-						// single chars
-						//
-						//--------------------------------------------------
-					default:
-						//--------------------------------------------------
-						// a new single char
-						//--------------------------------------------------
-						YRX(std::cerr << "[RXP] append single '" << C << "'" << std::endl);
-						p->append( single::create(C) );
-						++curr;
+                            ++curr;
+                            p->append( single::create(C) );
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // specific chars
+                            //
+                            //--------------------------------------------------
+                        case '.':
+                            p->append( posix::dot() );
+                            ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // single chars
+                            //
+                            //--------------------------------------------------
+                        default:
+                            //--------------------------------------------------
+                            // a new single char
+                            //--------------------------------------------------
+                            YRX(std::cerr << "[RXP] append single '" << C << "'" << std::endl);
+                            p->append( single::create(C) );
+                            ++curr;
 					}
 				}
-
+                
 				if(depth>0)
 					throw exception("%s(Unfinished SubExpression)",fn);
-
-FINISHED:
+                
+            FINISHED:
 				assert( p.is_valid() );
 				if(p->operands.size<=0)
 					throw exception("%s(Empty SubExpression)",fn);
-
+                
+                
 				p->optimize();
-				return pattern::simplify(p.yield());
-			}
-
-
+                return pattern::collapse(p.yield());
+            }
+            
+            
 		}
-
-
+        
+        
 		////////////////////////////////////////////////////////////////////////
 		//
 		//
@@ -434,18 +506,18 @@ FINISHED:
 			size_t      depth = 0;
 			const char *curr  = expr.c_str();
 			const char *last  = curr + expr.size();
-
+            
 			return compile_xp(curr,
-				last,
-				dict,
-				depth);
+                              last,
+                              dict,
+                              depth);
 		}
-
+        
 		pattern *compile( const char *expr, const p_dict *dict )
 		{
 			const string xp(expr);
 			return compile(xp,dict);
 		}
-
+        
 	}
 }

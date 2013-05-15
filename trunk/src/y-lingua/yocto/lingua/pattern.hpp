@@ -69,7 +69,13 @@ namespace yocto
             //! optimization: default is do nothing
             virtual void optimize() throw();
             
-            static pattern *simplify( pattern *pattern ) throw();
+            
+            //! convert a single operand AND/OR
+            static pattern *collapse( pattern *p ) throw();
+            
+            
+            //! non thread safe !!!
+            const char *fourcc() const throw();
             
         protected:
             explicit pattern(uint32_t t) throw();
