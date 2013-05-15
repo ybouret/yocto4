@@ -103,7 +103,15 @@ namespace yocto
             first_chars tmp;
             for(const pattern *p = operands.head;p;p=p->next)
             {
+                tmp.free();
+                tmp.accept_empty = true;
                 p->firsts(tmp);
+                fch.include(tmp);
+                if( !tmp.accept_empty )
+                {
+                    fch.accept_empty = false;
+                    return;
+                }
             }
         }
         
