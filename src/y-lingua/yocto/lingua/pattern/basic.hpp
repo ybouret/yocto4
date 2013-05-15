@@ -3,7 +3,6 @@
 
 #include "yocto/lingua/pattern.hpp"
 #include "yocto/code/fourcc.hpp"
-#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -96,14 +95,13 @@ namespace yocto
             
             void append(char c);
             void append(int lo,int hi);
-            void reserve(size_t n);
+            byte_store chars;
             
         protected:
             explicit choice(uint32_t t) throw();
             choice(const choice &); //!< can't copy an empty choice
             void write( ios::ostream &fp ) const;
             void __viz( ios::ostream &fp ) const;
-            sorted_vector<uint8_t> chars;
             
         private:
             YOCTO_DISABLE_ASSIGN(choice);

@@ -155,10 +155,7 @@ namespace yocto
             data = &chars;
         }
         
-        void choice:: reserve(size_t n)
-        {
-            chars.reserve(n);
-        }
+      
         
         void choice:: append(char c)
         {
@@ -175,8 +172,8 @@ namespace yocto
         
                
         choice:: choice( const choice &other ) :
-        one_char( other.type ),
-        chars( other.chars )
+        one_char( other.type  ),
+        chars(    other.chars )
         {
             if( chars.size() <= 0 )
                 throw exception("lingua::choice(NO CHARS)");

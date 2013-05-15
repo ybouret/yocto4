@@ -10,6 +10,7 @@
 #include "yocto/ios/istream.hpp"
 
 #include "yocto/core/meta-list.hpp"
+#include "yocto/lingua/first-chars.hpp"
 
 namespace yocto
 {
@@ -46,9 +47,17 @@ namespace yocto
             //! save a binary representation
             virtual void save( ios::ostream &fp ) const = 0;
             
+            //! save a GraphViz representation
             virtual void viz( ios::ostream &fp ) const  = 0;
+            
+            //! save char as a GraphViz printable char
             static  void outviz( char c, ios::ostream &fp);
+            
+            //! save a directed graph of the pattern
             void graphviz( const string &filename ) const;
+            
+            //! save a directed graph of the pattern
+            void graphviz( const char   *fn ) const;
             
             //! human readable name
             string  hr_name() const;
@@ -73,8 +82,7 @@ namespace yocto
             //! convert a single operand AND/OR
             static pattern *collapse( pattern *p ) throw();
             
-            
-            //! non thread safe !!!
+            //! non thread safe, debug only
             const char *fourcc() const throw();
             
         protected:
