@@ -21,6 +21,9 @@ namespace yocto
             
             first_chars( const first_chars & );
             
+            void include( const first_chars & other );
+            void exclude( const first_chars &other) throw();
+            
         private:
             YOCTO_DISABLE_ASSIGN(first_chars);
         };

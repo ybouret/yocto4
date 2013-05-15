@@ -24,6 +24,18 @@ namespace yocto
             
         }
         
+        void first_chars:: include( const first_chars & other )
+        {
+            for(size_t i=1;i<=other.size();++i)
+                (void)insert( other[i] );
+        }
+
+        void first_chars:: exclude( const first_chars & other ) throw()
+        {
+            for(size_t i=1;i<=other.size();++i)
+                (void)remove( other[i] );
+        }
+        
         
     }
 }
