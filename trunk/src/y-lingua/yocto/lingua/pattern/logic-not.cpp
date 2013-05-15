@@ -64,7 +64,20 @@ namespace yocto
         void NOT:: firsts( first_chars &fch ) const
         {
             fch.free();
-            fch.accept_empty = true;
+            fch.accept_empty = false;
+			
+			fch.reserve(256);
+			for(size_t i=0;i<256;++i) (void) fch.insert( uint8_t(i) );
+
+			first_chars tmp;
+		
+			for( const pattern *p = operands.head;p;p=p->next)
+			{
+				tmp.free();
+				p->firsts(tmp);
+				fch.exclude(tmp);
+			}
+
         }
         
     }
