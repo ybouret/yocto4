@@ -24,6 +24,8 @@ namespace yocto
             void include( const first_chars & other );
             void exclude( const first_chars &other) throw();
             
+            friend std::ostream & operator<<( std::ostream &, const first_chars &);
+            
         private:
             YOCTO_DISABLE_ASSIGN(first_chars);
         };

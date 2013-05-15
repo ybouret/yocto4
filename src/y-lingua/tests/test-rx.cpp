@@ -31,6 +31,10 @@ YOCTO_UNIT_TEST_IMPL(rx)
         q->graphviz( "expr.dot" );
         system("dot -Tpng -oexpr.png expr.dot");
         
+        first_chars fch;
+        q->firsts(fch);
+        std::cerr << fch << std::endl;
+        
         string line;
         ios::icstream fp( ios::cstdin );
         source        src;
