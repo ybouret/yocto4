@@ -80,7 +80,12 @@ namespace yocto
             __viz(this, fp);
         }
 
-        
+        void counting:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            motif->firsts(fch);
+            fch.accept_empty = nmin <= 0;
+        }
         
         
     }

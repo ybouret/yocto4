@@ -51,6 +51,14 @@ namespace yocto
             __viz(this, fp);
         }
         
+        void optional:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            motif->firsts(fch);
+            fch.accept_empty = true;
+        }
+        
+        
     }
 
 }
