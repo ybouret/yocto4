@@ -7,7 +7,7 @@ namespace yocto
     namespace lingua
     {
         
-        p_dict:: p_dict() throw() {}
+        p_dict:: p_dict() throw() : patterns(), db() {}
         
         p_dict:: ~p_dict() throw() {}
         
