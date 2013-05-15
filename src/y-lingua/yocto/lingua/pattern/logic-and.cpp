@@ -94,6 +94,19 @@ namespace yocto
             //------------------------------------------------------------------
             operands.swap_with(tmp);
         }
+        
+        void AND:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = true;
+            
+            first_chars tmp;
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                p->firsts(tmp);
+            }
+        }
+        
     }
     
 }
