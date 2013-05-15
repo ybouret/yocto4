@@ -102,7 +102,7 @@ namespace yocto
             //
 			////////////////////////////////////////////////////////////////////
 			static inline
-            uint8_t compile_hexa(const char * &curr, const char * last)
+            uint8_t parse_hexa(const char * &curr, const char * last)
 			{
 				assert('x' == curr[0]);
 				if(++curr>=last)
@@ -115,12 +115,73 @@ namespace yocto
 				if(++curr>=last)
 					throw exception("%s(Missing Second Hexa Char)",fn);
 				if( !isxdigit(curr[0]) )
-					throw exception("%s(Invalid Second Hexa Byte)",fn);
+					throw exception("%s(Invalid Second Hexa Char)",fn);
 				ans |= hex2dec(curr[0]);
                 
 				return uint8_t(ans);
 			}
             
+            static inline
+            pattern *group_esc(const char * &curr, const char * last)
+            {
+                assert( '\\' == curr[0] );
+                if(++curr>=last)
+                    throw exception("%s(Unfinished Group Escaped Sequence)",fn);
+                
+                char C = curr[0];
+                YRX(std::cerr << "[GRP] Escaped <" << C << ">" << std::endl);
+                switch(C)
+                {
+                    case 'x':
+                        C = char(parse_hexa(curr, last));
+                        break;
+                        
+                        //------------------------------------------------------
+                        //litteral
+                        //------------------------------------------------------
+                    case '\\':
+                    case ':':
+                    case '[':
+                    case ']':
+                    case '^':
+                    case '-':
+                        break;
+                        
+                        //-------------------------------------------------
+                        // control escaped
+                        //-------------------------------------------------
+                    case 'n': C='\n'; break;
+                    case 'r': C='\r'; break;
+                    case 't': C='\t'; break;
+                        
+                    default:
+                        throw exception("%s(Unknown Group Escaped Sequence '%c')",fn,C);
+                }
+                return single::create(C);
+            }
+            
+            static inline
+            pattern *next_single( const char * &curr, const char *last )
+            {
+                assert( '-' == curr[0] );
+                if(++curr>=last)
+                    throw exception("%s(Unfinished Range)",fn);
+                
+                const char C = curr[0];
+                switch(C)
+                {
+                    case '\\':
+                        return group_esc(curr, last);
+                        
+                    case '[':
+                    case ']':
+                        throw exception("%s(Invalid Range Char '%c')", fn, C);
+                        
+                    default:
+                        break;
+                }
+                return single::create(C);
+            }
             
 			////////////////////////////////////////////////////////////////////
 			//
@@ -178,7 +239,7 @@ namespace yocto
 					p->append( single::create('-') );
 					++curr;
 				}
-                                
+                
 				//=============================================================
 				//
 				// process the rest
@@ -194,11 +255,60 @@ namespace yocto
                             YRX( std::cerr << "[GRP] End" << std::endl );
                             goto FINISHED;
                             
-                            //-----------------------------------------------------
+                            //--------------------------------------------------
+                            //
+                            // recursive for multiple grouping
+                            //
+                            //--------------------------------------------------
+                        case LBRACK:
+                            p->append( compile_group(curr, last) );
+                            assert(RBRACK==curr[0]);
+                            ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // Escaped Sequence
+                            //
+                            //--------------------------------------------------
+                        case '\\':
+                            p->append( group_esc(curr, last) );
+                            ++curr;
+                            break;
+                            
+                            //--------------------------------------------------
+                            //
+                            // Range
+                            //
+                            //--------------------------------------------------
+                        case '-':
+                            YRX(std::cerr << "[GRP] Build range" << std::endl);
+                        {
+                            if(p->operands.size<=0)
+                                throw exception("%s(Range: No Left Symbol)",fn);
+                            if(p->operands.tail->type != single::tag)
+                                throw exception("%s(Range: Bad Left Type)",fn);
+                            
+                            pattern *q = p->remove();
+                            assert(q->data);
+                            const int lower = *static_cast<char *>(q->data);
+                            delete q;
+                            
+                            q = next_single(curr, last);
+                            assert(q->data);
+                            const int upper = *static_cast<char *>(q->data);
+                            delete q;
+                            YRX(std::cerr << "[GRP] New range " << char(lower) << ", " << char(upper) << std::endl);
+                            p->append( range::create(lower,upper) );
+                            ++curr;
+                        }
+                            break;
+                            
+                            //--------------------------------------------------
                             //
                             // generic char
                             //
-                            //-----------------------------------------------------
+                            //--------------------------------------------------
                         default:
                             YRX(std::cerr << "[GRP] Append single '" << C << "'" << std::endl);
                             p->append( single::create(C) );
@@ -421,7 +531,7 @@ namespace yocto
                             switch(C)
 						{
                             case 'x':
-                                C = char(compile_hexa(curr,last));
+                                C = char(parse_hexa(curr,last));
                                 break;
                                 
                                 //-------------------------------------------------
