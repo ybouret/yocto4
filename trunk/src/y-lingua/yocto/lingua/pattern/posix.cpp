@@ -116,7 +116,7 @@ namespace yocto
 			within *p = within::create();
 			try
 			{
-				p->reserve( 32 );
+				p->chars.reserve( 32 );
 				p->append(  33,  47 );
 				p->append(  58,  64 );
 				p->append(  91,  96 );

@@ -14,7 +14,7 @@ namespace yocto
         {
             auto_ptr<pattern> q(p);
             const size_t n = fp.read<uint32_t>();
-            p->reserve(n);
+            p->chars.reserve(n);
             for(size_t i=1; i <=n; ++i)
             {
                 p->append( fp.read<char>() );

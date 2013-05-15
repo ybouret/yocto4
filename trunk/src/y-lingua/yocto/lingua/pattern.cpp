@@ -83,6 +83,12 @@ namespace yocto
             viz(fp);
             fp << "}\n";
         }
+        
+        void pattern:: graphviz( const char   *fn ) const
+        {
+            const string filename(fn);
+            graphviz(filename);
+        }
 
         const char *pattern:: fourcc() const throw()
         {
