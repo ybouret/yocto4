@@ -79,6 +79,13 @@ namespace yocto
             __viz(this,fp);
         }
         
+        void OR:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = true;
+        }
+        
+        
     }
     
 }

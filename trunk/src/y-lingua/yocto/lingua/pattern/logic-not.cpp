@@ -61,6 +61,12 @@ namespace yocto
             __viz(this,fp);
         }
         
+        void NOT:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = true;
+        }
+        
     }
     
 }
