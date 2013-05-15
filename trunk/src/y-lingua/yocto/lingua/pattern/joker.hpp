@@ -35,10 +35,7 @@ namespace yocto
         public:
             static const uint32_t tag = YOCTO_FOURCC('J','K',' ','?');
             virtual ~optional() throw();
-            
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
 
             virtual bool     accept( source &src );
             
@@ -57,10 +54,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('J', 'K', '>', '=');
             
             virtual ~at_least() throw();
+            Y_LINGUA_PATTERN_API();
             
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
             virtual bool     accept( source &src );
             
             static at_least *create(pattern *p,size_t n);
@@ -82,10 +77,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('J', 'K', '{', '}');
 
             virtual ~counting() throw();
-            
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
+
             virtual bool     accept( source &src );
             
             const size_t nmin;

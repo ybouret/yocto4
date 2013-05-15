@@ -60,6 +60,14 @@ namespace yocto
             fp.viz(this); fp << " [label=ANY1];\n";
         }
 
+        
+        void any1:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = false;
+            for(size_t i=0; i<256; ++i ) (void)fch.insert(uint8_t(i));
+            
+        }
         ////////////////////////////////////////////////////////////////////////
         //
         // single
@@ -91,6 +99,13 @@ namespace yocto
             fp.viz(this); fp << " [label=\"'";
             outviz(value, fp);
             fp << "'\"];\n";
+        }
+        
+        void single:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = false;
+            (void)fch.insert(uint8_t(value));
         }
         
         ////////////////////////////////////////////////////////////////////////
@@ -139,6 +154,13 @@ namespace yocto
             fp << "'-'";
             outviz(upper,fp);
             fp << "']\"];\n";
+        }
+        
+        void range:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = false;
+            for(int i=lower;i<=upper;++i) (void)fch.insert(uint8_t(i));
         }
         
         ////////////////////////////////////////////////////////////////////////
@@ -240,6 +262,14 @@ namespace yocto
             fp << "]\"];\n";
         }
         
+        void within:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            const size_t n = chars.size();
+            fch.accept_empty = n <= 0;
+            for(size_t i=1; i<=n; ++i ) (void)fch.insert( chars[i] );
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // none
@@ -278,5 +308,14 @@ namespace yocto
             __viz(fp);
             fp << "]\"];\n";
         }
+        
+        void none:: firsts( first_chars &fch ) const
+        {
+            fch.free();
+            fch.accept_empty = false;
+            for(size_t i=0;i<256;++i)            (void)fch.insert(uint8_t(i));
+            for(size_t i=1;i<=chars.size();++i)  (void)fch.remove( chars[i] );
+        }
+        
     }
 }
