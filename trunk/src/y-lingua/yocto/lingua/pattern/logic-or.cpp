@@ -83,6 +83,22 @@ namespace yocto
         {
             fch.free();
             fch.accept_empty = true;
+			bool set_accept_empty = true;
+
+			first_chars tmp;
+			for( const pattern *p = operands.head;p;p=p->next)
+			{
+				tmp.free();
+				tmp.accept_empty = true;
+				p->firsts(tmp);
+				fch.include(tmp);
+				if( set_accept_empty )
+				{
+					fch.accept_empty = tmp.accept_empty;
+					set_accept_empty = false;
+				}
+			}
+
         }
         
         
