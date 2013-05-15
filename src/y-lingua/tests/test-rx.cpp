@@ -2,6 +2,8 @@
 #include "yocto/lingua/pattern/compiler.hpp"
 #include "yocto/lingua/pattern/posix.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/icstream.hpp"
+#include "yocto/ios/imstream.hpp"
 
 #include "yocto/auto-ptr.hpp"
 
@@ -29,9 +31,26 @@ YOCTO_UNIT_TEST_IMPL(rx)
         q->graphviz( "expr.dot" );
         system("dot -Tpng -oexpr.png expr.dot");
         
-        //p_list motifs;
-        //motifs.push_back( q.yield() );
-        //shared_test_motifs(motifs);
+        string line;
+        ios::icstream fp( ios::cstdin );
+        source        src;
+        while( line.clear(), (std::cerr << "> ").flush(), fp.read_line(line) > 0 )
+        {
+            std::cerr << "matching '" << line << "'" << std::endl;
+            
+            q->reset();
+            {
+                const input inp( new ios::imstream(line) );
+                src.attach(inp);
+            }
+            if(q->accept(src))
+            {
+                std::cerr << "accept '" << *q << "'" << std::endl;
+            }
+            else
+                std::cerr << "reject" << std::endl;
+        }
+        
     }
 }
 YOCTO_UNIT_TEST_DONE()
