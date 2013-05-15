@@ -59,6 +59,10 @@ namespace yocto
             //! save a directed graph of the pattern
             void graphviz( const char   *fn ) const;
             
+            
+            //! fill first_chars
+            virtual void firsts( first_chars &fch ) const = 0;
+            
             //! human readable name
             string  hr_name() const;
             
@@ -91,6 +95,13 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
         };
+        
+#define Y_LINGUA_PATTERN_API()                 \
+virtual pattern *clone() const;                \
+virtual void     save( ios::ostream & ) const; \
+virtual void     viz( ios::ostream &) const;   \
+virtual void     firsts( first_chars &) const
+        
         
         //! list of patterns
         typedef core::meta_list<pattern> p_list;

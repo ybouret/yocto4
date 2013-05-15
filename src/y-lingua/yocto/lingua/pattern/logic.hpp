@@ -35,10 +35,7 @@ namespace yocto
             
             //! apply optimize to all operands
             void optimize_all() throw();
-            
-            //! helper for AND/OR
-            void fusion_single( pattern *p ) throw();
-            
+                     
         private:
             YOCTO_DISABLE_ASSIGN(logical);
         };
@@ -49,12 +46,11 @@ namespace yocto
         {
         public:
             static const uint32_t tag = YOCTO_FOURCC(' ','&', '&', ' ' );
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            virtual ~AND() throw();
+            Y_LINGUA_PATTERN_API();
+
             virtual bool     accept( source &src );
             
-            virtual ~AND() throw();
             
             static AND *create();
             
@@ -71,12 +67,10 @@ namespace yocto
         {
         public:
             static const uint32_t tag = YOCTO_FOURCC(' ','|', '|', ' ' );
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
-            virtual bool     accept( source &src );
-            
             virtual ~OR() throw();
+            Y_LINGUA_PATTERN_API();
+            
+            virtual bool     accept( source &src );
             
             static OR *create();
             
@@ -94,9 +88,8 @@ namespace yocto
         {
         public:
             static const uint32_t tag = YOCTO_FOURCC(' ','!', '=', ' ' );
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
+
             virtual bool     accept( source &src );
             
             virtual ~NOT() throw();

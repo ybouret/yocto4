@@ -31,12 +31,11 @@ namespace yocto
         public:
             static const uint32_t tag = YOCTO_FOURCC('A', 'N', 'Y', '1');
             virtual ~any1() throw();
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
+            
             static any1 *create();
             
-        
+            
         protected:
             explicit any1() throw();
             
@@ -51,9 +50,7 @@ namespace yocto
         public:
             static const uint32_t tag = YOCTO_FOURCC('S', 'N', 'G', 'L');
             virtual ~single() throw();
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
 
             static single * create( char ); //! single->data = &value
             const char      value;
@@ -71,9 +68,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('R', 'N', 'G', 'E');
             
             virtual ~range() throw();
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
+
 
             static range *create(int,int); //!< range->data = &lower
             const int lower;
@@ -114,9 +110,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('W', '/', 'I', 'N');
             virtual ~within() throw();
             
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
+
 
             static  within *create();
             
@@ -134,9 +129,8 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('N', 'O', 'N', 'E');
             virtual ~none() throw();
             
-            virtual pattern *clone() const;
-            virtual void     save( ios::ostream &fp ) const;
-            virtual void     viz( ios::ostream &fp) const;
+            Y_LINGUA_PATTERN_API();
+
 
             static  none    *create();
             
