@@ -121,6 +121,13 @@ namespace yocto
 				return uint8_t(ans);
 			}
             
+            ////////////////////////////////////////////////////////////////////
+            //
+			//
+			// escaped sequence in group
+			//
+            //
+			////////////////////////////////////////////////////////////////////
             static inline
             pattern *group_esc(const char * &curr, const char * last)
             {
@@ -160,6 +167,13 @@ namespace yocto
                 return single::create(C);
             }
             
+            ////////////////////////////////////////////////////////////////////
+            //
+			//
+			// next single in group
+			//
+            //
+			////////////////////////////////////////////////////////////////////
             static inline
             pattern *next_single( const char * &curr, const char *last )
             {
