@@ -54,7 +54,7 @@ namespace yocto
             }
             alias = { p };
             write('A');
-            for(int i=0;i<sizeof(void*);++i)
+            for(unsigned i=0;i<sizeof(void*);++i)
             {
                 const uint8_t b = alias.u & 0xff;
                 write( hexa_char[ (b>>4) & 15 ] );
