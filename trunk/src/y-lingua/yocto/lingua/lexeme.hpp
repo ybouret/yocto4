@@ -9,6 +9,7 @@ namespace yocto
 {
 	namespace lingua
 	{
+		//! a token with a name and a line
 		class lexeme : public token
 		{
 		public:
