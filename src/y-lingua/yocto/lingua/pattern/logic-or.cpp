@@ -12,7 +12,7 @@ namespace yocto
         OR::  OR() throw() : logical(OR::tag) {}
         OR:: ~OR() throw() {}
         
-        OR:: OR( const OR &other ) : logical(other) {}
+        OR:: OR( const OR &other ) : logical(other) { assert(OR::tag==type); }
         
         OR * OR::create() { return new OR(); }
         
@@ -40,34 +40,37 @@ namespace yocto
             }
             return false;
         }
-
+        
         void OR::optimize() throw()
         {
             optimize_all();
-            
             //------------------------------------------------------------------
             //-- fusion of OR
             //------------------------------------------------------------------
+            assert(OR::tag==type);
             p_list tmp;
             while( operands.size )
             {
-                pattern *p = operands.pop_front();
-                if( p->type == OR::tag )
+                pattern *p = pattern::collapse( operands.pop_front() );
+                switch(p->type)
                 {
-                    assert(p->data);
-                    tmp.merge_back( *static_cast<p_list *>(p->data) );
-                    delete p;
+                    case OR::tag:
+                        assert(p->data);
+                        tmp.merge_back( *static_cast<p_list *>(p->data) );
+                        delete p;
+                        break;
+                        
+                    default:
+                        tmp.push_back(p);
+                        break;
                 }
-                else
-                    tmp.push_back(p);
+                
             }
             
             //------------------------------------------------------------------
             //-- ok
             //------------------------------------------------------------------
-            
             operands.swap_with(tmp);
-
         }
         
         void OR:: viz( ios::ostream &fp) const

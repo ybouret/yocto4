@@ -36,6 +36,9 @@ namespace yocto
             //! apply optimize to all operands
             void optimize_all() throw();
             
+            //! helper for AND/OR
+            void fusion_single( pattern *p ) throw();
+            
         private:
             YOCTO_DISABLE_ASSIGN(logical);
         };

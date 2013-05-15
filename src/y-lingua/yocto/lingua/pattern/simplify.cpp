@@ -7,27 +7,24 @@ namespace yocto
     {
         
         
-        pattern * pattern:: simplify(pattern *p) throw()
+        pattern * pattern:: collapse(pattern *p) throw()
         {
             assert(p);
             switch(p->type)
             {
                 case AND:: tag:
-                case OR::  tag: {
+                case OR::  tag:
+                {
                     assert(p->data);
                     p_list &ops = *static_cast<p_list *>( p->data );
-                    p_list  tmp;
-                    while( ops.size )
+                    if(ops.size==1)
                     {
-                        tmp.push_back( pattern::simplify( ops.pop_front()) );
-                    }
-                    if( 1 == tmp.size )
-                    {
+                        pattern *q = ops.pop_back();
                         delete p;
-                        return tmp.pop_back();
+                        p=q;
                     }
-                    ops.swap_with(tmp);
-                } break;
+                }
+                    break;
                     
                 default:
                     break;

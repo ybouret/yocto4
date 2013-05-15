@@ -1,7 +1,5 @@
 #include "yocto/lingua/pattern/logic.hpp"
 
-#include <iostream>
-
 namespace yocto
 {
     namespace lingua
@@ -11,10 +9,20 @@ namespace yocto
         // AND
         //
         ////////////////////////////////////////////////////////////////////////
-        AND::  AND() throw() : logical(AND::tag) {}
-        AND:: ~AND() throw() {}
+        AND::  AND() throw() :
+        logical(AND::tag)
+        {
+            assert(AND::tag==type);
+        }
         
-        AND:: AND( const AND &other ) : logical(other) {}
+        AND:: ~AND() throw()
+        {}
+        
+        AND:: AND( const AND &other ) :
+        logical(other)
+        {
+            assert(AND::tag==type);
+        }
         
         AND * AND::create() { return new AND(); }
         
@@ -23,13 +31,13 @@ namespace yocto
             fp.emit(tag);
             write(fp);
         }
-
+        
         void AND:: viz( ios::ostream &fp) const
         {
             fp.viz(this); fp << " [ label=\"&&\"];\n";
             __viz(this,fp);
         }
-
+        
         
         
         pattern * AND::clone() const { return new AND( *this ); }
@@ -58,28 +66,32 @@ namespace yocto
             //-- recursive opt
             //------------------------------------------------------------------
             optimize_all();
-
+            
             //------------------------------------------------------------------
             //-- fusion of and
             //------------------------------------------------------------------
             p_list tmp;
             while( operands.size )
             {
-                pattern *p = operands.pop_front();
-                if( p->type == AND::tag )
+                pattern *p = pattern::collapse(operands.pop_front());
+                switch(p->type)
                 {
-                    assert(p->data);
-                    tmp.merge_back( *static_cast<p_list *>(p->data) );
-                    delete p;
+                    case AND::tag:
+                        assert(p->data);
+                        tmp.merge_back( *static_cast<p_list *>(p->data) );
+                        delete p;
+                        break;
+                        
+                    default:
+                        tmp.push_back(p);
+                        break;
                 }
-                else
-                    tmp.push_back(p);
+                
             }
-
+            
             //------------------------------------------------------------------
             //-- ok
             //------------------------------------------------------------------
-
             operands.swap_with(tmp);
         }
     }
