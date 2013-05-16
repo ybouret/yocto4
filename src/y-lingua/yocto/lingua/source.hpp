@@ -34,7 +34,7 @@ namespace yocto
             size_t  cache_size() const throw();
             
             bool    is_active(); //!< if there are some available t_char
-            
+            char    peek() const throw(); //!< cache head if cache_size()>0
             void attach_stdin();
             
         private:

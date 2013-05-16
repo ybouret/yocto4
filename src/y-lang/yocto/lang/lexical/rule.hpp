@@ -4,7 +4,7 @@
 #include "yocto/rx/pattern.hpp"
 #include "yocto/functor.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace lang
     {
@@ -15,7 +15,7 @@ namespace yocto
             typedef functor<bool,TL1(const regex::token)> action;
             
             //! generic rule
-            class rule
+            class rule : public object
             {
             public:
                 const string    label;   //!< terminal label
@@ -39,7 +39,7 @@ namespace yocto
                 /**
                  when motif is selected, call this->proc( *motif );
                  */
-                bool produce(); 
+                bool produce();
                 
             private:
                 action proc;

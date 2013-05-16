@@ -127,7 +127,11 @@ namespace yocto
                 return false;
         }
 
-        
+        char source:: peek() const throw()
+        {
+            assert( cache_size() > 0 );
+            return cache.head->data;
+        }
         
     }
     
