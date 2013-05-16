@@ -13,10 +13,10 @@ namespace yocto
 		class lexeme : public token
 		{
 		public:
-			lexeme       *prev;  //!< for list
-			lexeme       *next;  //!< for list
-			const string &name;  //!< name of the rule that created the lexeme
-			const size_t  line;  //!< line number
+			lexeme       *prev;   //!< for list
+			lexeme       *next;   //!< for list
+			const string &label;  //!< label of the rule that created the lexeme
+			const size_t  line;   //!< creation line number
 
 			explicit lexeme( const string &id, size_t il ) throw();
 			virtual ~lexeme() throw();
