@@ -143,9 +143,9 @@ namespace yocto
                 auto_ptr<p_dict> pdict;
             };
             
-#define Y_LEX_FORWARD(ID,EXPR) make(ID,EXPR,this,forward())
-#define Y_LEX_DISCARD(ID,EXPR) make(ID,EXPR,this,discard())
-#define Y_LEX_PROCESS(ID,EXPR,CLASS,METHOD) make(ID,EXPR,this, &CLASS::METHOD)
+#define Y_LEX_FORWARD(PTR,ID,EXPR) (PTR)->make(ID,EXPR,this,forward())
+#define Y_LEX_DISCARD(PTR,ID,EXPR) (PTR)->make(ID,EXPR,this,discard())
+#define Y_LEX_PROCESS(PTR,ID,EXPR,CLASS,METHOD) (PTR)->make(ID,EXPR, &(*(PTR)), &CLASS::METHOD)
             
         }
     }
