@@ -1,4 +1,5 @@
 #include "yocto/lingua/lexical/scanner.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -30,7 +31,15 @@ pdict(0)
             }            
             
            
-            
+            bool scanner:: has( const string &id ) const throw()
+            {
+                for( const rule *r = rules.head;r;r=r->next)
+                {
+                    if( id == r->label)
+                        return true;
+                }
+                return false;
+            }
             
             p_dict & scanner:: dict()
             {
@@ -73,6 +82,11 @@ pdict(0)
                                 const action &cb)
             {
                 assert(motif);
+                if( has(label) )
+                {
+                    delete motif;
+                    throw exception("<%s>.make(mutliple '%s;)", name.c_str(), label.c_str());
+                }
                 rules.push_back( rule::create(label, motif, cb, false));
             }
             

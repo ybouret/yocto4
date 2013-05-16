@@ -32,7 +32,7 @@ namespace yocto
                 const string & key() const throw();
                 
                 typedef intrusive_ptr<string,scanner> ptr;
-                
+                bool has( const string &id ) const throw();
                 
                 //==============================================================
                 //
@@ -145,6 +145,7 @@ namespace yocto
             
 #define Y_LEX_FORWARD(ID,EXPR) make(ID,EXPR,this,forward())
 #define Y_LEX_DISCARD(ID,EXPR) make(ID,EXPR,this,discard())
+#define Y_LEX_PROCESS(ID,EXPR,CLASS,METHOD) make(ID,EXPR,this, &CLASS::METHOD)
             
         }
     }
