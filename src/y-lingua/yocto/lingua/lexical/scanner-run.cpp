@@ -34,6 +34,7 @@ namespace yocto
                         {
                             best = r;
                             blen = r->motif->size;
+                            break;
                         }
                     }
                     
@@ -73,6 +74,7 @@ namespace yocto
                                 // too late
                                 //----------------------------------------------
                                 src.unget( *(r->motif) );
+                                assert(0==r->motif->size);
                             }
                         }
                     }

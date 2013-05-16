@@ -61,6 +61,8 @@ namespace yocto
             else
             {
                 src.unget( *this );
+                assert(0==size);
+                assert(0==motif->size);
                 return false;
             }
         }
