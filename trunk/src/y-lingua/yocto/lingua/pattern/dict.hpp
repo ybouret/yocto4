@@ -18,6 +18,9 @@ namespace yocto
             void insert( const string &id, pattern *p);
             void insert( const char   *id, pattern *p);
             
+            void insert( const string &id, const string &expr);
+            void insert( const char   *id, const char   *expr);
+            
             bool has( const string &id ) const throw();
             bool has( const char   *id ) const;
             

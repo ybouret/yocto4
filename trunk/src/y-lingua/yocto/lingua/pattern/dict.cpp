@@ -65,3 +65,27 @@ namespace yocto
         }
     }
 }
+
+
+#include "yocto/lingua/pattern/compiler.hpp"
+
+namespace yocto
+{
+    namespace lingua
+    {
+        void p_dict::insert( const string &id, const string &expr)
+        {
+            pattern *p = compile(expr,this);
+            insert(id,p);
+        }
+        
+        void p_dict:: insert( const char   *id, const char   *expr)
+        {
+            const string I(id);
+            const string E(expr);
+            insert(I,E);
+        }
+
+        
+    }
+}
