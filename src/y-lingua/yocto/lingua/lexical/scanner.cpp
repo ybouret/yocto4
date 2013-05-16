@@ -56,7 +56,6 @@ pdict(0)
             
             void scanner:: reset() throw()
             {
-                line = 1;
                 for( rule *r = rules.head; r; r=r->next )
                 {
                     r->motif->reset();

@@ -12,12 +12,12 @@ namespace
         explicit Scanner( size_t &lr) :
         lexical::scanner( "Scanner", lr)
         {
-            dict().insert( "DIGIT", "[:digit:]");
-            Y_LEX_FORWARD(this,"ID",     "[:word:]+");
-            Y_LEX_FORWARD(this,"INT",    "[-+]?{DIGIT}+");
-            Y_LEX_FORWARD(this,"FLT",    "[-+]?{DIGIT}+[.]{DIGIT}*");
-            Y_LEX_DISCARD(this,"BLANKS", "[:blank:]+");
-            Y_LEX_PROCESS(this,"ENDL", "[:endl:]", Scanner, OnEndl);
+            dict().insert( "DIGIT",       "[:digit:]");
+            Y_LEX_FORWARD(*this,"ID",     "[:word:]+");
+            Y_LEX_FORWARD(*this,"INT",    "[-+]?{DIGIT}+");
+            Y_LEX_FORWARD(*this,"FLT",    "[-+]?{DIGIT}+[.]{DIGIT}*");
+            Y_LEX_DISCARD(*this,"BLANKS", "[:blank:]+");
+            Y_LEX_PROCESS(*this,"ENDL",   "[:endl:]", Scanner, OnEndl);
             no_dict();
         }
         
