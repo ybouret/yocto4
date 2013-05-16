@@ -17,7 +17,7 @@ namespace
             Y_LEX_FORWARD("INT",    "[-+]?{DIGIT}+");
             Y_LEX_FORWARD("FLT",    "[-+]?{DIGIT}+[.]{DIGIT}*");
             Y_LEX_DISCARD("BLANKS", "[:blank:]+");
-            make( "ENDL",   "[:endl:]",   this, &Scanner::OnEndl);
+            Y_LEX_PROCESS("ENDL", "[:endl:]", Scanner, OnEndl);
             no_dict();
         }
         
