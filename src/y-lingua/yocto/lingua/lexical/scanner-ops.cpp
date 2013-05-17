@@ -44,7 +44,7 @@ namespace yocto
                     
                     inline bool operator()( const token &trigger )
                     {
-                        handle( int2type<Kind>() );
+                        handle();
                         onJump(trigger);
                         return false; // no lexeme production
                     }
@@ -63,18 +63,16 @@ namespace yocto
                     
                     
                 private:
-                    inline void  handle( int2type<OpsJump> )
-                    {
-                        parent.jump(scanID);
-                    }
-                    
-                    inline void handle( int2type<OpsCall> )
-                    {
-                        parent.call(scanID);
-                    }
-                    
+                    void handle();
                     YOCTO_DISABLE_ASSIGN(Change);
                 };
+                
+                template <>
+                void Change<OpsJump> :: handle() { parent.jump(scanID); }
+                
+                template <>
+                void Change<OpsCall>:: handle() { parent.call(scanID); }
+                
             }
             
             

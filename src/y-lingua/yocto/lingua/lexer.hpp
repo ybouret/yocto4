@@ -29,10 +29,13 @@ namespace yocto
             //! create a new scanner
             lexical::scanner & declare(const char *id);
             
+            //! get the sub-scanner
             const lexical::scanner & sub(const string &id) const;
+            
+            //! get the sub-scanner
             const lexical::scanner & sub(const char   *id) const;
 
-            //! line=1, reset all, clear history
+            //! line=1, reset all, clear history and cache
             void reset() throw();
             
             void jump( const string &id); //!< change current scanner
@@ -51,7 +54,7 @@ namespace yocto
             
             //! back into cache
             /**
-             a sub scanner can cache a lexeme !
+             a sub scanner can cache a lexeme to mimic a complex expression
              */
             void    unget( lexeme *lx ) throw();
             
