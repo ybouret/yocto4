@@ -30,11 +30,19 @@ namespace yocto
         {
         }
         
+#define Y_LINGUA_GRAMMAR_CTOR() \
+name(id), \
+rules(), \
+items(), \
+__eof("EOF")
+        
         grammar:: grammar( const string &id ) :
-        name(id),
-        rules(),
-        items(),
-        __eof("EOF")
+        Y_LINGUA_GRAMMAR_CTOR()
+        {
+        }
+        
+        grammar:: grammar( const char *id ) :
+        Y_LINGUA_GRAMMAR_CTOR()
         {
         }
         
@@ -120,7 +128,7 @@ namespace yocto
                     throw exception("%u: {%s} illegal extraneous '%s'", unsigned(lx->line) , name.c_str(), lx->label.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
-                return ans.yield();                
+                return ans.yield();
             }
             
             throw exception("not matching");
