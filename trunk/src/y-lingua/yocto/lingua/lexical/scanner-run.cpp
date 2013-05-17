@@ -106,7 +106,7 @@ namespace yocto
                         // test consistency
                         //------------------------------------------------------
                         if(fctl)
-                            throw exception("%u: <%s> control rule '%s' shall not produce a lexeme",
+                            throw exception("%u: <%s> control rule '%s' should not produce a lexeme",
                                             unsigned(line),
                                             name.c_str(),
                                             best->label.c_str());
@@ -121,11 +121,17 @@ namespace yocto
                     }
                     else
                     {
+                        
                         //------------------------------------------------------
                         // silently remove it...
                         //------------------------------------------------------
                         best->motif->reset();
-                        // and continue...
+                        if( fctl )
+                            return 0; // do something with this control pattern
+                        
+                        //------------------------------------------------------
+                        // regular pattern was discarde -> continue
+                        //------------------------------------------------------
                     }
                 }
                 
