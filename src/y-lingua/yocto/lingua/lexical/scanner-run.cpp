@@ -11,7 +11,7 @@ namespace yocto
         {
             
             
-            lexeme * scanner:: next_lexeme( source &src, bool &fctl)
+            lexeme * scanner:: get( source &src, bool &fctl)
             {
                 if( rules.size <= 0 )
                     throw exception("<%s>(no rules", name.c_str());

@@ -1,4 +1,5 @@
 #include "yocto/lingua/lexical/rules.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -40,9 +41,10 @@ namespace yocto
                                  )
             {
                 assert(p!=NULL);
-                assert( "EOF" != id );
+                
                 try
                 {
+                    if( id == "EOF" ) throw exception("rule::create(invalid label=EOF)");
                     return new rule(id,p,cb,control);
                 }
                 catch(...)

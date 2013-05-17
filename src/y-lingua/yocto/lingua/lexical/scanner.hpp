@@ -165,7 +165,7 @@ namespace yocto
                  - if NULL: fctl = false => EOF
                  fctl = true  => jump/call/back, change of active scanner for lexer
                  */
-                lexeme *next_lexeme( source &src , bool &fctl );
+                lexeme *get( source &src , bool &fctl );
                 
                 void link_to( lexer & ) throw();
                 
@@ -177,9 +177,8 @@ namespace yocto
                 unsigned         opsID;
             };
             
-#define Y_LEX_FORWARD(REF,ID,EXPR) (REF).make(ID,EXPR,this,forward())
-#define Y_LEX_DISCARD(REF,ID,EXPR) (REF).make(ID,EXPR,this,discard())
-#define Y_LEX_PROCESS(REF,ID,EXPR,CLASS,METHOD) (REF).make(ID,EXPR, &(REF), &CLASS::METHOD)
+#define Y_LEX_FORWARD(REF,ID,EXPR) (REF).make(ID,EXPR, &(REF), (REF).forward())
+#define Y_LEX_DISCARD(REF,ID,EXPR) (REF).make(ID,EXPR, &(REF), (REF).discard())
             
         }
     }
