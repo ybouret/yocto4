@@ -8,13 +8,19 @@ namespace yocto
         lexer:: ~lexer() throw() {}
         
 #define Y_LEX_CTOR() \
-name(id), \
-line(0), \
-scan(0), \
-scanners(), \
+name(id),           \
+line(1),           \
+scan(0),          \
+cache(),         \
+scanners(),     \
 init(0)
         
         lexer:: lexer( const string &id ) :
+        Y_LEX_CTOR()
+        {
+        }
+        
+        lexer:: lexer( const char *id ) :
         Y_LEX_CTOR()
         {
         }
@@ -39,6 +45,7 @@ init(0)
             if( !scanners.insert(p) )
                 throw exception("lexer::get(unexpected failure in insert '%s')", id.c_str() );
             if(!init) init = s;
+            if(!scan) scan = s;
             s->link_to(*this);
             return *s;
         }
@@ -51,16 +58,29 @@ init(0)
                 (*i)->reset();
             }
             history.free();
+            cache.kill();
             scan = init;
         }
         
+        const lexical::scanner & lexer:: current() const
+        {
+            if( !scan ) throw exception("lexer[%s]: no current scanner", name.c_str());
+            return *scan;
+        }
+        
+        const lexical::scanner & lexer:: first() const
+        {
+            if( !init ) throw exception("lexer[%s]: no first scanner", name.c_str());
+            return *init;
+        }
+
         
         void lexer:: jump( const string &id )
         {
             assert(scan);
             scanner_ptr target = fetch(id);
             if( !target )
-                throw exception("lexer::jump(no '%s')", id.c_str());
+                throw exception("lexer[%s].jump(no '%s')", name.c_str(), id.c_str());
             scan = target;
         }
         
@@ -70,7 +90,7 @@ init(0)
             assert(scan);
             scanner_ptr target = fetch(id);
             if( !target )
-                throw exception("lexer::call(no '%s')", id.c_str());
+                throw exception("lexer[%s].call(no '%s')", name.c_str(), id.c_str());
             history.push_back(scan);
             scan = target;
         }
@@ -79,9 +99,68 @@ init(0)
         {
             assert(scan);
             if( history.size() <= 0 )
-                throw exception("lexer::back(invalid from '%s'", scan->name.c_str());
+                throw exception("lexer[%s].back(invalid from '%s')", name.c_str(), scan->name.c_str());
             scan = history.back();
             history.pop_back();
+        }
+        
+        void lexer:: unget( lexeme *lx ) throw()
+        {
+            assert(lx);
+            cache.push_front(lx);
+        }
+        
+        lexeme * lexer:: get( source &src )
+        {
+            if( cache.size > 0 ) return cache.pop_front();
+            
+            while(true)
+            {
+                if( !scan )
+                    throw exception("%u: lexer[%s] no scanner", unsigned(line), name.c_str());
+                
+                bool    fctl = false;
+                lexeme *lx  = scan->get(src, fctl);
+                if( lx )
+                {
+                    //----------------------------------------------------------
+                    //
+                    // a lexeme is directly returned
+                    //
+                    //----------------------------------------------------------
+                    if(fctl)
+                    {
+                        const string label( lx->label );
+                        delete lx;
+                        throw exception("%u: lexer[%s]: invalid lexeme '%s'", unsigned(line), name.c_str(), label.c_str());
+                    }
+                    return lx;
+                }
+                else
+                {
+                    //----------------------------------------------------------
+                    //
+                    // no lexeme was detected
+                    //
+                    //----------------------------------------------------------
+                    if( fctl )
+                    {
+                        //------------------------------------------------------
+                        // that was a control pattern => continue
+                        //------------------------------------------------------
+                        continue;
+                    }
+                    else
+                    {
+                        //------------------------------------------------------
+                        // end of source !
+                        //------------------------------------------------------
+                        assert( ! src.is_active() );
+                        return 0;
+                    }
+                }
+            }
+            
         }
         
         

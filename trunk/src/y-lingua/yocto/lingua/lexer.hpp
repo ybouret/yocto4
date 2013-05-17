@@ -10,11 +10,13 @@ namespace yocto
     namespace lingua
     {
      
+        //! a source of lexemes
         class lexer : public object
         {
         public:
             
             explicit lexer(const string &id);
+            explicit lexer(const char   *id);
             virtual ~lexer() throw();
             
             const string name;
@@ -32,7 +34,20 @@ namespace yocto
             void call( const string &id); //!< change current scanner, keeping track
             void back();                  //!< returns from call
             
+            //! get the current scanner
+            const lexical::scanner & current() const;
             
+            //! get the first scanner
+            const lexical::scanner & first() const;
+            
+            
+            //! get next lexeme: NULL => EOF
+            lexeme *get( source &src );
+            
+            //! back into cache
+            void    unget( lexeme *lx ) throw();
+            
+        
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             typedef lexical::scanner *                scanner_ptr;
@@ -40,6 +55,7 @@ namespace yocto
             typedef list<scanner_ptr>                 history_t;
             
             lexical::scanner       *scan;       //!< current
+            lexemes                 cache;      //!< cache
             scannerDB               scanners;   //!< database
             lexical::scanner       *init;       //!< main
             history_t               history;    //!< for call/back handling

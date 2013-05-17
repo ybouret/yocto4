@@ -17,7 +17,7 @@ namespace
             Y_LEX_FORWARD(*this,"INT",    "[-+]?{DIGIT}+");
             Y_LEX_FORWARD(*this,"FLT",    "[-+]?{DIGIT}+[.]{DIGIT}*");
             Y_LEX_DISCARD(*this,"BLANKS", "[:blank:]+");
-            Y_LEX_PROCESS(*this,"ENDL",   "[:endl:]", Scanner, OnEndl);
+            make("ENDL", "[:endl:]", this, & Scanner::OnEndl);
             no_dict();
         }
         
@@ -48,7 +48,7 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     bool    fctl=false;
     while(true)
     {
-        lexeme *lx = scan.next_lexeme(src, fctl);
+        lexeme *lx = scan.get(src, fctl);
         if(lx)
         {
             lxms.push_back(lx);

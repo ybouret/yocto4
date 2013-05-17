@@ -32,7 +32,8 @@ opsID(0)
                 
             }            
             
-           
+            const string & scanner:: key() const throw() { return name; }
+            
             bool scanner:: has( const string &id ) const throw()
             {
                 for( const rule *r = rules.head;r;r=r->next)
