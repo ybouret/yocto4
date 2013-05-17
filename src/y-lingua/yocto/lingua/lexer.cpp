@@ -5,6 +5,13 @@ namespace yocto
 {
     namespace lingua
     {
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // setup
+        //
+        ////////////////////////////////////////////////////////////////////////
+
         lexer:: ~lexer() throw() {}
         
 #define Y_LEX_CTOR() \
@@ -27,12 +34,19 @@ history()
         }
         
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // scanners API
+        //
+        ////////////////////////////////////////////////////////////////////////
         lexical::scanner *lexer:: fetch( const string &id ) const throw()
         {
             const lexical::scanner::ptr *ppScanner = scanners.search(id);
             if( !ppScanner ) return 0;
             return (lexical::scanner *) &(**ppScanner);
         }
+        
+        
         
         lexical::scanner & lexer::declare( const string &id )
         {
@@ -95,7 +109,11 @@ history()
             return *init;
         }
         
-        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // run-time scanners
+        //
+        ////////////////////////////////////////////////////////////////////////
         void lexer:: jump( const string &id )
         {
             assert(scan);
@@ -125,6 +143,28 @@ history()
             history.pop_back();
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // lexeme I/O
+        //
+        ////////////////////////////////////////////////////////////////////////
+        bool lexer:: is_active( source &src )
+        {
+            if( cache.size > 0 )
+                return true;
+            else
+            {
+                lexeme *lx = get(src);
+                if(lx)
+                {
+                    cache.push_front(lx);
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+        
         void lexer:: unget( lexeme *lx ) throw()
         {
             assert(lx);
@@ -138,6 +178,7 @@ history()
             {
                 if( !scan )
                     throw exception("%u: lexer[%s] no scanner", unsigned(line), name.c_str());
+               
                 std::cerr << "[" << name << "]<" << scan->name << ">" << std::endl;
                 
                 if( cache.size > 0 )

@@ -54,9 +54,14 @@ namespace yocto
             
             //! back into cache
             /**
-             a sub scanner can cache a lexeme to mimic a complex expression
+             a sub scanner can cache a lexeme to mimic 
+             a complex expression (aka real string).
              */
             void    unget( lexeme *lx ) throw();
+            
+            
+            //! test if possible supplementary lexemes from source
+            bool is_active( source &src );
             
         
         private:
