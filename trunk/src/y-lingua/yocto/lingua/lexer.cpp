@@ -165,6 +165,12 @@ history()
             }
         }
         
+        const lexeme *lexer::peek() const throw()
+        {
+            assert(cache.size>0);
+            return cache.head;
+        }
+        
         void lexer:: unget( lexeme *lx ) throw()
         {
             assert(lx);
