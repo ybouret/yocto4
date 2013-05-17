@@ -16,7 +16,9 @@ namespace yocto
 name(id),                   \
 line(line_ref),             \
 rules(),                    \
-pdict(0)
+mylex(0),                   \
+pdict(0),                   \
+opsID(0)
             
             scanner:: scanner( const string &id, size_t &line_ref) :
             Y_SCANNER_CTOR()

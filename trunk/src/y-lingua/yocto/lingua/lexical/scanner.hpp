@@ -15,8 +15,12 @@ namespace yocto
     namespace lingua
     {
         
+        class lexer;
+        
         namespace lexical
         {
+            
+            typedef  functor<void,TL1(const token &)> callback;
             
             class scanner : public object, public counted
             {
@@ -52,24 +56,24 @@ namespace yocto
                 //! increase line and return false (discard newline)
                 bool __no_endl( const token & ) throw();
                 
-                typedef bool (scanner::*callback)(const token &);
+                typedef bool (scanner::*method)(const token &);
                 
-                inline callback forward() const throw()
+                inline method forward() const throw()
                 {
                     return &scanner:: __forward;
                 }
                 
-                inline callback discard() const throw()
+                inline method discard() const throw()
                 {
                     return &scanner:: __discard;
                 }
                 
-                inline callback newline() const throw()
+                inline method newline() const throw()
                 {
                     return &scanner:: __newline;
                 }
                 
-                inline callback no_endl() const throw()
+                inline method no_endl() const throw()
                 {
                     return &scanner:: __no_endl;
                 }
@@ -78,7 +82,7 @@ namespace yocto
                 
                 //==============================================================
                 //
-                // make action upon pattern
+                // lexeme creation
                 //
                 //==============================================================
                 void make(const string &label,
@@ -98,7 +102,7 @@ namespace yocto
                     make(label,motif,cb);
                 }
                 
-
+                
                 template <typename OBJECT_POINTER,typename OBJECT_METHOD>
                 void make(const char    *label,
                           const char    *expr,
@@ -109,7 +113,34 @@ namespace yocto
                     const string E(expr);
                     make<OBJECT_POINTER,OBJECT_METHOD>(L,E,host,meth);
                 }
-
+                
+                //==============================================================
+                //
+                // jump to my lexer's sub-scanner
+                //
+                //==============================================================
+                void jump(const string   &id,
+                          pattern        *motif,
+                          const callback &onJump );
+                
+                //==============================================================
+                //
+                // call my lexer's sub-scanner
+                //
+                //==============================================================
+                void call(const string   &id,
+                          pattern        *motif,
+                          const callback &onCall );
+                
+                
+                //==============================================================
+                //
+                // back from a previous call
+                //
+                //==============================================================
+                void back( pattern *motif, const callback &onBack );
+                
+                
                 //==============================================================
                 //
                 // dictionary
@@ -136,11 +167,14 @@ namespace yocto
                  */
                 lexeme *next_lexeme( source &src , bool &fctl );
                 
+                void link_to( lexer & ) throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list           rules;
+                lexer           *mylex;
                 auto_ptr<p_dict> pdict;
+                unsigned         opsID;
             };
             
 #define Y_LEX_FORWARD(REF,ID,EXPR) (REF).make(ID,EXPR,this,forward())
