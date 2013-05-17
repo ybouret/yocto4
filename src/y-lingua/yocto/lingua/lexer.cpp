@@ -13,7 +13,8 @@ line(1),           \
 scan(0),          \
 cache(),         \
 scanners(),     \
-init(0)
+init(0),       \
+history()
         
         lexer:: lexer( const string &id ) :
         Y_LEX_CTOR()
