@@ -11,6 +11,7 @@ namespace yocto
         
         typedef sorted_vector<uint8_t> byte_store;
         
+        //! list of the first possible accepted chars
         class first_chars : public byte_store
         {
         public:

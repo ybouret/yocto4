@@ -124,6 +124,9 @@ YOCTO_UNIT_TEST_IMPL(lexer)
         std::cerr << "[" << lx->label << "]=" << *lx << std::endl;
     }
     
+    if( Lxx.is_active(src) )
+        throw exception("Source should be inactive!");
+    
     
     
 
