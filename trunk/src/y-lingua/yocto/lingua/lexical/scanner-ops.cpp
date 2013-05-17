@@ -178,6 +178,20 @@ namespace yocto
             }
 
             
+            void scanner:: emit( lexer &L, token &content)
+            {
+                lexeme *lx = new lexeme(name,line);
+                L.unget(lx);
+                lx->swap_with(content);
+            }
+            
+            void scanner:: emit( lexer &L, const string &s )
+            {
+                token content(s);
+                emit(L,content);
+            }
+            
+            
         }
         
     }

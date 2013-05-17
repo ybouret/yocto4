@@ -123,6 +123,30 @@ namespace yocto
                           pattern        *motif,
                           const callback &onJump );
                 
+                template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+                inline void jump(const string  &label,
+                                 const string  &expr,
+                                 OBJECT_POINTER host,
+                                 OBJECT_METHOD  meth)
+                {
+                    assert(host);
+                    assert(meth);
+                    const callback onJump(host,meth);
+                    pattern       *motif = compile(expr,pdict.__get());
+                    jump(label,motif,onJump);
+                }
+                
+                template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+                inline void jump(const char *label,
+                                 const char  *expr,
+                                 OBJECT_POINTER host,
+                                 OBJECT_METHOD  meth)
+                {
+                    const string L(label);
+                    const string E(expr);
+                    jump<OBJECT_POINTER,OBJECT_METHOD>(L,E,host,meth);
+                }
+                
                 //==============================================================
                 //
                 // call my lexer's sub-scanner
@@ -132,6 +156,30 @@ namespace yocto
                           pattern        *motif,
                           const callback &onCall );
                 
+                template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+                inline void call(const string  &label,
+                                 const string  &expr,
+                                 OBJECT_POINTER host,
+                                 OBJECT_METHOD  meth)
+                {
+                    assert(host);
+                    assert(meth);
+                    const callback onCall(host,meth);
+                    pattern       *motif = compile(expr,pdict.__get());
+                    call(label,motif,onCall);
+                }
+                
+                template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+                inline void call(const char *label,
+                                 const char  *expr,
+                                 OBJECT_POINTER host,
+                                 OBJECT_METHOD  meth)
+                {
+                    const string L(label);
+                    const string E(expr);
+                    call<OBJECT_POINTER,OBJECT_METHOD>(L,E,host,meth);
+                }
+                
                 
                 //==============================================================
                 //
@@ -139,6 +187,27 @@ namespace yocto
                 //
                 //==============================================================
                 void back( pattern *motif, const callback &onBack );
+                
+                template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+                inline void back(const string  &expr,
+                                 OBJECT_POINTER host,
+                                 OBJECT_METHOD  meth)
+                {
+                    assert(host);
+                    assert(meth);
+                    const callback onBack(host,meth);
+                    pattern       *motif = compile(expr,pdict.__get());
+                    back(motif,onBack);
+                }
+                
+                template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+                inline void back(const char    *expr,
+                                 OBJECT_POINTER host,
+                                 OBJECT_METHOD  meth)
+                {
+                    const string E(expr);
+                    back<OBJECT_POINTER,OBJECT_METHOD>(E,host,meth);
+                }
                 
                 
                 //==============================================================
@@ -168,6 +237,13 @@ namespace yocto
                 lexeme *get( source &src , bool &fctl );
                 
                 void link_to( lexer & ) throw();
+                
+                //! simulate a lexeme recognition
+                void emit( lexer &, const string & );
+                
+                //! simulate a lexeme recognition
+                void emit( lexer &, token &);
+                
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
