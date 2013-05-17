@@ -63,16 +63,12 @@ namespace yocto
             }
         }
         
-      
-        
         token & token:: operator=( const token &other )
         {
             token tmp(other);
             swap_with(tmp);
             return *this;
         }
-
-        
         
         string token:: to_string( size_t nskip,size_t ntrim) const
         {

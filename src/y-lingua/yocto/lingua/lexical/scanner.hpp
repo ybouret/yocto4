@@ -239,10 +239,10 @@ namespace yocto
                 void link_to( lexer & ) throw();
                 
                 //! simulate a lexeme recognition
-                void emit( lexer &, const string & );
+                void emit( lexer &, const string & ) const;
                 
                 //! simulate a lexeme recognition
-                void emit( lexer &, token &);
+                void emit( lexer &, token &) const;
                 
                 
             private:

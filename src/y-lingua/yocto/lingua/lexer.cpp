@@ -27,11 +27,11 @@ history()
         }
         
         
-        lexical::scanner *lexer:: fetch( const string &id ) throw()
+        lexical::scanner *lexer:: fetch( const string &id ) const throw()
         {
-            lexical::scanner::ptr *ppScanner = scanners.search(id);
+            const lexical::scanner::ptr *ppScanner = scanners.search(id);
             if( !ppScanner ) return 0;
-            return &(**ppScanner);
+            return (lexical::scanner *) &(**ppScanner);
         }
         
         lexical::scanner & lexer::declare( const string &id )
@@ -50,6 +50,26 @@ history()
             s->link_to(*this);
             return *s;
         }
+        
+        lexical::scanner & lexer::declare( const char *id )
+        {
+            const string ID(id);
+            return declare(ID);
+        }
+        
+        const lexical::scanner & lexer:: sub( const string &id ) const
+        {
+            lexical::scanner *s = fetch(id);
+            if( !s ) throw exception("lexer.get(no '%s)", id.c_str());
+            return *s;
+        }
+        
+        const lexical::scanner & lexer:: sub( const char *id ) const
+        {
+            const string ID(id);
+            return sub(ID);
+        }
+        
         
         void lexer:: reset() throw()
         {
