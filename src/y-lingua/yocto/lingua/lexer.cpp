@@ -73,7 +73,7 @@ init(0)
             if( !init ) throw exception("lexer[%s]: no first scanner", name.c_str());
             return *init;
         }
-
+        
         
         void lexer:: jump( const string &id )
         {
@@ -81,7 +81,6 @@ init(0)
             scanner_ptr target = fetch(id);
             if( !target )
                 throw exception("lexer[%s].jump(no '%s')", name.c_str(), id.c_str());
-            std::cerr << "[" << name << "]: JUMP from <" << scan->name << "> to <" << target->name << ">" << std::endl;
             scan = target;
         }
         
@@ -119,25 +118,15 @@ init(0)
                 if( !scan )
                     throw exception("%u: lexer[%s] no scanner", unsigned(line), name.c_str());
                 std::cerr << "[" << name << "]<" << scan->name << ">" << std::endl;
-
+                
                 if( cache.size > 0 )
                     return cache.pop_front();
-
+                
                 bool    fctl = false;
                 lexeme *lx  = scan->get(src, fctl);
                 if( lx )
                 {
-                    //----------------------------------------------------------
-                    //
-                    // a lexeme is directly returned
-                    //
-                    //----------------------------------------------------------
-                    if(fctl)
-                    {
-                        const string label( lx->label );
-                        delete lx;
-                        throw exception("%u: lexer[%s]: invalid lexeme '%s'", unsigned(line), name.c_str(), label.c_str());
-                    }
+                    assert(false==fctl);
                     return lx;
                 }
                 else
@@ -152,8 +141,6 @@ init(0)
                         //------------------------------------------------------
                         // that was a control pattern => continue
                         //------------------------------------------------------
-                        assert(scan);
-                        std::cerr << "scan is now " << scan->name << std::endl;
                         continue;
                     }
                     else
