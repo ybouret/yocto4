@@ -63,7 +63,11 @@ namespace yocto
             //! test if possible supplementary lexemes from source
             bool is_active( source &src );
             
-        
+            //! cache.size > 0
+            const lexeme *peek() const throw();
+            
+          
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             typedef lexical::scanner *                scanner_ptr;

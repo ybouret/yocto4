@@ -41,14 +41,14 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 			};
             
-            class rules : public core::list_of<rule>
+            class r_list : public core::list_of<rule>
             {
             public:
-                explicit rules() throw();
-                virtual ~rules() throw();
+                explicit r_list() throw();
+                virtual ~r_list() throw();
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(rules);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(r_list);
             };
             
             

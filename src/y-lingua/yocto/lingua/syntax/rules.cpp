@@ -42,9 +42,9 @@ namespace yocto
 			}
             
             
-            rules:: rules() throw() {}
+            r_list:: r_list() throw() {}
             static inline void __delete_rule( rule *r ) throw() { assert(r); delete r; }
-            rules:: ~rules() throw() { delete_with( __delete_rule ); }
+            r_list:: ~r_list() throw() { delete_with( __delete_rule ); }
 
             
         }
