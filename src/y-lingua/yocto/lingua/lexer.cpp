@@ -81,6 +81,7 @@ init(0)
             scanner_ptr target = fetch(id);
             if( !target )
                 throw exception("lexer[%s].jump(no '%s')", name.c_str(), id.c_str());
+            std::cerr << "[" << name << "]: JUMP from <" << scan->name << "> to <" << target->name << ">" << std::endl;
             scan = target;
         }
         
@@ -112,13 +113,16 @@ init(0)
         
         lexeme * lexer:: get( source &src )
         {
-            if( cache.size > 0 ) return cache.pop_front();
             
             while(true)
             {
                 if( !scan )
                     throw exception("%u: lexer[%s] no scanner", unsigned(line), name.c_str());
-                
+                std::cerr << "[" << name << "]<" << scan->name << ">" << std::endl;
+
+                if( cache.size > 0 )
+                    return cache.pop_front();
+
                 bool    fctl = false;
                 lexeme *lx  = scan->get(src, fctl);
                 if( lx )
@@ -148,6 +152,8 @@ init(0)
                         //------------------------------------------------------
                         // that was a control pattern => continue
                         //------------------------------------------------------
+                        assert(scan);
+                        std::cerr << "scan is now " << scan->name << std::endl;
                         continue;
                     }
                     else

@@ -45,6 +45,9 @@ namespace yocto
             lexeme *get( source &src );
             
             //! back into cache
+            /**
+             a sub scanner can cache a lexeme !
+             */
             void    unget( lexeme *lx ) throw();
             
         
