@@ -9,12 +9,15 @@ namespace
     class Lexer : public lexer
     {
     public:
-        explicit Lexer() : lexer( "MyLexer" )
+        string str;
+        
+        explicit Lexer() : lexer( "MyLexer" ), str()
         {
             lexical::scanner &Main = declare( "Main" );
             
             Y_LEX_FORWARD(Main, "ID",     "[:word:]+" );
             Y_LEX_FORWARD(Main, "INT",    "[:digit:]+");
+            Main.call("STRING", "\\x22", this, & Lexer::EnterString);
             Y_LEX_FORWARD(Main, "PUNCT",  "[:punct:]" );
             Y_LEX_DISCARD(Main, "BLANKS", "[:blank:]+");
             Main.make("ENDL", "[:endl:]", this, & Lexer::OnNewline);
@@ -29,6 +32,11 @@ namespace
             Y_LEX_DISCARD(Com2, "1DOT", ".");
             Com2.make("ENDL", "[:endl:]", this, & Lexer::OnNewline);
             Com2.back("\\*\\*/", this, & Lexer::LeaveCom2);
+            
+            lexical::scanner &Str = declare("STRING");
+            Str.back("\\x22", this, & Lexer::LeaveString);
+            Str.make("1REG", ".", this, & Lexer::StringRegular);
+            
             
         }
         
@@ -72,6 +80,26 @@ namespace
         void LeaveCom2( const token & )
         {
             std::cerr << "</C Comment>" << std::endl;
+        }
+        
+        void EnterString( const token & )
+        {
+            std::cerr << "<STRING>" << std::endl;
+            str.clear();
+        }
+        
+        bool StringRegular( const token &t )
+        {
+            assert(t.size==1);
+            str.append(t.head->data);
+            return false;
+        }
+        
+        void LeaveString( const token & )
+        {
+            std::cerr << "</STRING='" << str << "'>" << std::endl;
+            // => Mimicking a string in the calling scanner
+            sub("STRING").emit(*this, str);
         }
         
     private:

@@ -26,7 +26,12 @@ namespace yocto
             //! create a new scanner
             lexical::scanner & declare( const string &id );
             
+            //! create a new scanner
+            lexical::scanner & declare(const char *id);
             
+            const lexical::scanner & sub(const string &id) const;
+            const lexical::scanner & sub(const char   *id) const;
+
             //! line=1, reset all, clear history
             void reset() throw();
             
@@ -63,7 +68,7 @@ namespace yocto
             lexical::scanner       *init;       //!< main
             history_t               history;    //!< for call/back handling
             
-            lexical::scanner *fetch( const string &id ) throw();
+            lexical::scanner *fetch( const string &id ) const throw();
         };
         
     }
