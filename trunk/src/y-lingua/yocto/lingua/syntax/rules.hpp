@@ -12,6 +12,8 @@ namespace yocto
         {
             
 #define Y_SYNTAX_MATCH_ARGS lexer &Lexer, source &Source, xnode * &Tree
+#define Y_SYNTAX_RULE_API() \
+virtual bool  match( Y_SYNTAX_MATCH_ARGS )
             
             class rule : public object
 			{
