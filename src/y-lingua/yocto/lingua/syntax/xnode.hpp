@@ -33,6 +33,9 @@ namespace yocto
                 //! take care of lexeme in case of error
                 static xnode * create( const string &label_ref, lexeme *lx, node_property p );
               
+                void viz( ios::ostream &fp) const;
+                void graphviz( const string &fn) const;
+                void graphviz( const char   *fn) const;
                 
             protected:
                 explicit xnode( const string &label_ref, lexeme *lx, node_property p ) throw();
