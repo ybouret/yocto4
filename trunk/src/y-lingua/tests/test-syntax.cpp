@@ -45,6 +45,9 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     
     auto_ptr<syntax::xnode> tree( G.parse(Lexer,Source) );
     
+    tree->graphviz("tree.dot");
+    system("dot -Tpng -otree.png tree.dot");
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
