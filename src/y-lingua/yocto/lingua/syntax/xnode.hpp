@@ -28,14 +28,23 @@ namespace yocto
                 xnode        *next;   //!< for tree/child_list
                 xnode        *parent; //!< for tree
                 
-                 ~xnode() throw();
+                 virtual ~xnode() throw();
+                
+                
                 
                 //! take care of lexeme in case of error
                 static xnode * create( const string &label_ref, lexeme *lx, node_property p );
               
+                //! GraphViz output
                 void viz( ios::ostream &fp) const;
-                void graphviz( const string &fn) const;
-                void graphviz( const char   *fn) const;
+                void graphviz( const string &fn) const; //!< make a GraphViz file
+                void graphviz( const char   *fn) const; //!< make a GraphViz file
+                
+                //! restore parsed node into lexer and delete it.
+                static void restore( lexer &Lexer, xnode *node ) throw();
+                
+                //! unlink from parent
+                xnode *unlink() throw();
                 
             protected:
                 explicit xnode( const string &label_ref, lexeme *lx, node_property p ) throw();

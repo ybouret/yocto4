@@ -56,6 +56,35 @@ namespace yocto
                 
             }
             
+            xnode * xnode::unlink() throw()
+            {
+                assert(parent);
+                assert(! parent->terminal );
+                assert(  parent->children.owns(this) );
+                xnode *self = parent->children.unlink(this);
+                assert(this==self);
+                self->parent = 0;
+                return this;
+            }
+
+            
+            
+            void xnode:: restore( lexer &Lexer, xnode *node ) throw()
+            {
+                assert(node);
+                if(node->terminal)
+                {
+                    Lexer.unget(node->lex);
+                    node->lex = 0;
+                    delete node;
+                }
+                else
+                {
+                    child_list &ch = node->children;
+                    while( ch.size ) xnode::restore(Lexer, ch.pop_back() );
+                }
+            }
+            
         }
     }
     

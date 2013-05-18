@@ -36,7 +36,6 @@ namespace yocto
                     const lexeme *lx = lex;
                     if( lx->size )
                     {
-                        //regex::show_tag(fp, lx);
                         fp.viz(lx);
                         fp<<" [ label=\"'";
                         const string s = lx->to_string();
@@ -55,7 +54,6 @@ namespace yocto
                         
                         fp<<"'\", shape=house];\n";
                         fp.viz(lx); fp<<" -> "; fp.viz(this); fp << " [arrowhead=box];\n";
-                        //regex::show_tag(fp,lx); fp<<" -> "; regex::show_tag(fp,this); fp << " [arrowhead=box];\n";
                     }
                 }
             }
