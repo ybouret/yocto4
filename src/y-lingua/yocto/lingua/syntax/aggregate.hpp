@@ -9,13 +9,15 @@ namespace yocto
     {
         namespace syntax
         {
+            
+            //! match a sequence of consecutive rules
             class aggregate : public composite
             {
             public:
                 virtual ~aggregate() throw();
                 Y_SYNTAX_RULE_API();
                 
-                explicit aggregate( const string &id);
+                explicit aggregate(const string &id);
                 
             private:
                 YOCTO_DISABLE_COPY(aggregate);
