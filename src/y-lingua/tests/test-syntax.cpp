@@ -41,8 +41,12 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     Source.attach_stdin();
     
     grammar G("MyGrammar");
-    G.term("ID");
+    syntax::terminal  &ID   = G.term("ID");
+    syntax::aggregate &PAIR = G.agg("PAIR");
+    PAIR.add(ID);
+    PAIR.add(ID);
     
+    G.set_root(PAIR);
     auto_ptr<syntax::xnode> tree( G.parse(Lexer,Source) );
     
     tree->graphviz("tree.dot");

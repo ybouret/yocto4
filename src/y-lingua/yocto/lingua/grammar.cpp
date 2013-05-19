@@ -83,6 +83,12 @@ __eof("EOF")
             const string ID(rule_id); set_root(ID);
         }
         
+        void grammar:: set_root( const syntax::rule &r )
+        {
+            assert( rules.owns( &r) );
+            rules.move_to_front( (syntax::rule *) &r );
+        }
+
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar terminal
@@ -101,10 +107,22 @@ __eof("EOF")
             return term(ID,ppty);
         }
         
-        void grammar:: set_root( const syntax::rule &r )
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // grammar aggregate
+        //
+        ////////////////////////////////////////////////////////////////////////
+        syntax::aggregate & grammar:: agg( const string &id, syntax::node_property ppty)
         {
-            assert( rules.owns( &r) );
-            rules.move_to_front( (syntax::rule *) &r );
+            syntax::aggregate *r = new syntax::aggregate(id,ppty);
+            add(r);
+            return *r;
+        }
+        
+        syntax::aggregate & grammar:: agg( const char *id, syntax::node_property ppty)
+        {
+            const string ID(id);
+            return agg(ID,ppty);
         }
         
         ////////////////////////////////////////////////////////////////////////

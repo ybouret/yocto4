@@ -2,6 +2,8 @@
 #define YOCTO_LINGUA_GRAMMAR_INCLUDED 1
 
 #include "yocto/lingua/syntax/terminal.hpp"
+#include "yocto/lingua/syntax/aggregate.hpp"
+
 #include "yocto/associative/set.hpp"
 
 namespace yocto
@@ -26,6 +28,11 @@ namespace yocto
             //! new terminal
             syntax::terminal &term( const char   *id, syntax::node_property = syntax::is_regular);
 
+            //! new aggregate
+            syntax::aggregate &agg( const string &id, syntax::node_property = syntax::is_regular);
+            
+            //! new aggregate
+            syntax::aggregate &agg( const char   *id, syntax::node_property = syntax::is_regular);
             
             //! changing root
             void set_root( const string &rule_id );
