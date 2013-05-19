@@ -18,13 +18,13 @@ namespace yocto
                 if( parent )
                 {
                     assert( ! parent->terminal );
-                    const unsigned u = parent->children.index_of(this);
+                    const unsigned u = parent->children().index_of(this);
                     fp.viz(parent); fp<<" -> "; fp.viz(this);
                     fp(" [label=\"%u\"];\n",u);
                 }
                 if( !terminal )
                 {
-                    const child_list &ch = children;
+                    const child_list &ch = children();
                     for( const xnode *node = ch.head; node; node=node->next )
                     {
                         node->viz(fp);
@@ -33,7 +33,7 @@ namespace yocto
                 }
                 else
                 {
-                    const lexeme *lx = lex;
+                    const lexeme *lx = lex();
                     if( lx->size )
                     {
                         fp.viz(lx);

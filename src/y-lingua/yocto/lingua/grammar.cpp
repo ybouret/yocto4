@@ -118,14 +118,19 @@ __eof("EOF")
             if( rules.size <= 0)
                 throw exception("{%s}.parse(no rules)", name.c_str());
             
-            syntax::xnode *Tree = 0;
-            if( rules.head->match(Lexer, Source, Tree) )
+            syntax::xnode *root = rules.head->match(Lexer, Source);
+            if(root)
             {
-                auto_ptr<syntax::xnode> ans( Tree );
+                auto_ptr<syntax::xnode> ans(root);
                 if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
                 {
                     const lexeme *lx = Lexer.peek();
-                    throw exception("%u: {%s} illegal extraneous '%s'", unsigned(lx->line) , name.c_str(), lx->label.c_str() );
+                    const string  s  = lx->to_string();
+                    throw exception("%u: {%s} illegal extraneous '%s'='%s'",
+                                    unsigned(lx->line) ,
+                                    name.c_str(),
+                                    lx->label.c_str(),
+                                    s.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
                 return ans.yield();

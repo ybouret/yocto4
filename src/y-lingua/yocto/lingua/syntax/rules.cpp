@@ -36,7 +36,7 @@ namespace yocto
 				else
 				{
 					assert(! Tree->terminal );
-					Tree->children.push_back( Node );
+					Tree->children().push_back( Node );
                     Node->parent = Tree;
 				}
 			}
