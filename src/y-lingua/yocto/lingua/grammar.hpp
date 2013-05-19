@@ -3,6 +3,7 @@
 
 #include "yocto/lingua/syntax/terminal.hpp"
 #include "yocto/lingua/syntax/aggregate.hpp"
+#include "yocto/lingua/syntax/alternative.hpp"
 
 #include "yocto/associative/set.hpp"
 
@@ -33,6 +34,12 @@ namespace yocto
             
             //! new aggregate
             syntax::aggregate &agg( const char   *id, syntax::node_property = syntax::is_regular);
+            
+            //! new alternative
+            syntax::alternative &alt( const string &id );
+            
+            //! new alternative
+            syntax::alternative &alt( const char   *id );
             
             //! changing root
             void set_root( const string &rule_id );

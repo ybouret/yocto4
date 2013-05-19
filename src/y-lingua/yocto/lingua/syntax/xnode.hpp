@@ -13,7 +13,11 @@ namespace yocto
         {
             enum node_property
             {
-                is_regular
+                is_regular     = 0,
+                is_discardable = 1, //!< no semantic meaning
+                is_specialized = 2, //!< univocal meaning, erase content
+                is_merging_all = 4, //!< merge with parent's children
+                is_merging_one = 8  //!< merge with parent's children if only one child
             };
             
             //! parse node

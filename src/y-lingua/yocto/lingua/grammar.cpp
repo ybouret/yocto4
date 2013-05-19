@@ -127,6 +127,24 @@ __eof("EOF")
         
         ////////////////////////////////////////////////////////////////////////
         //
+        // grammar alternative
+        //
+        ////////////////////////////////////////////////////////////////////////
+        syntax::alternative & grammar:: alt( const string &id )
+        {
+            syntax::alternative *r = new syntax::alternative(id);
+            add(r);
+            return *r;
+        }
+        
+        syntax::alternative & grammar:: alt( const char *id )
+        {
+            const string ID(id);
+            return alt(ID);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
         // grammar parsing
         //
         ////////////////////////////////////////////////////////////////////////
