@@ -18,7 +18,6 @@ namespace yocto
                 Y_SYNTAX_RULE_API();
                 
                 explicit alternative(const string &id);
-                const node_property behavior;
                 
             private:
                 YOCTO_DISABLE_COPY(alternative);
