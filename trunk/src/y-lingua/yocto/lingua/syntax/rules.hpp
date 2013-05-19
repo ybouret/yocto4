@@ -11,9 +11,9 @@ namespace yocto
         namespace syntax
         {
             
-#define Y_SYNTAX_MATCH_ARGS lexer &Lexer, source &Source, xnode * &Tree
+#define Y_SYNTAX_MATCH_ARGS lexer &Lexer, source &Source
 #define Y_SYNTAX_RULE_API() \
-virtual bool  match( Y_SYNTAX_MATCH_ARGS )
+virtual xnode *match( Y_SYNTAX_MATCH_ARGS )
             
             class rule : public object
 			{
@@ -23,7 +23,7 @@ virtual bool  match( Y_SYNTAX_MATCH_ARGS )
 				rule        *prev;
 				virtual ~rule() throw();
                 
-				virtual bool  match( Y_SYNTAX_MATCH_ARGS ) = 0;
+				virtual xnode *match( Y_SYNTAX_MATCH_ARGS ) = 0;
                 
                 typedef rule *ptr;
                 

@@ -46,6 +46,12 @@ namespace yocto
                 //! unlink from parent
                 xnode *unlink() throw();
                 
+                //! access
+                child_list       & children() throw();
+                lexeme          *& lex() throw();
+                const child_list & children() const throw();
+                lexeme * const   & lex() const throw();
+                
             protected:
                 explicit xnode( const string &label_ref, lexeme *lx, node_property p ) throw();
                 
@@ -55,8 +61,6 @@ namespace yocto
                 uint64_t wksp[YOCTO_U64_FOR_ITEM(child_list)];
                 
             public:
-                lexeme    *&lex;
-                child_list &children;
                 
                 const bool          terminal; //!< true if terminal => one lexeme
                 const node_property property; //!< semantic property

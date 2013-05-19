@@ -14,9 +14,9 @@ namespace
         {
             lexical::scanner & Main = declare("Main");
             
-            Y_LEX_FORWARD(Main, "ID", "[:word:]+");
+            Y_LEX_FORWARD(Main, "ID",    "[:word:]+");
             Y_LEX_DISCARD(Main, "BLANK", "[:blank:]");
-            Y_LEX_DISCARD(Main,"endl", "[:endl:]");
+            Y_LEX_DISCARD(Main, "endl",  "[:endl:]");
             
         }
         

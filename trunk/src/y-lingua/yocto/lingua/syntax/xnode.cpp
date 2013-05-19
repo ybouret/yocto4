@@ -13,33 +13,51 @@ namespace yocto
             {
                 if(terminal)
                 {
-                    assert(lex!=NULL);
-                    delete lex;
+                    delete lex();
                 }
                 else
                 {
-                    while( children.size ) delete children.pop_back();
+                    while( children().size ) delete children().pop_back();
                 }
                 memset(wksp,0,sizeof(wksp));
             }
             
+            xnode::child_list & xnode:: children() throw()
+            {
+                assert(!terminal);
+                return * _cast::trans<child_list,uint64_t>(wksp);
+            }
+            
+            const xnode::child_list & xnode:: children() const throw()
+            {
+                assert(!terminal);
+                return * _cast::trans<child_list,uint64_t>((uint64_t*)wksp);
+            }
          
+            lexeme *& xnode:: lex() throw()
+            {
+                assert(terminal);
+                return * _cast::trans<lexeme*,uint64_t>(wksp);
+            }
+            
+            lexeme * const & xnode:: lex() const throw()
+            {
+                assert(terminal);
+                return * _cast::trans<lexeme*,uint64_t>((uint64_t *)wksp);
+            }
+              
             xnode:: xnode( const string &label_ref, lexeme *lx, node_property p ) throw():
             label(label_ref),
             prev(0),
             next(0),
             parent(0),
             wksp(),
-            lex(      * _cast::trans<lexeme*   ,uint64_t>(wksp) ),
-            children( * _cast::trans<child_list,uint64_t>(wksp) ),
             terminal(lx!=0),
             property(p)
             {
                 memset(wksp,0,sizeof(wksp));
-                assert(lex==0);
-                assert(children.size==0);
-                
-                lex = lx;
+                if(lx)
+                    lex() = lx;
             }
             
             xnode * xnode:: create( const string &label_ref, lexeme *lx, node_property p )
@@ -60,8 +78,8 @@ namespace yocto
             {
                 assert(parent);
                 assert(! parent->terminal );
-                assert(  parent->children.owns(this) );
-                xnode *self = parent->children.unlink(this);
+                assert(  parent->children().owns(this) );
+                xnode *self = parent->children().unlink(this);
                 assert(this==self);
                 self->parent = 0;
                 return this;
@@ -74,15 +92,15 @@ namespace yocto
                 assert(node);
                 if(node->terminal)
                 {
-                    Lexer.unget(node->lex);
-                    node->lex = 0;
-                    delete node;
+                    Lexer.unget(node->lex());
+                    node->lex() = 0;
                 }
                 else
                 {
-                    child_list &ch = node->children;
+                    child_list &ch = node->children();
                     while( ch.size ) xnode::restore(Lexer, ch.pop_back() );
                 }
+                delete node;
             }
             
         }

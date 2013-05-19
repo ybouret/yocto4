@@ -20,7 +20,7 @@ namespace yocto
                                   const string   &eof_ref);
 				virtual ~terminal() throw();
                 
-				virtual bool  match( Y_SYNTAX_MATCH_ARGS );
+				Y_SYNTAX_RULE_API();
                 
                 const node_property semantic;
                 
