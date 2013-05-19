@@ -10,8 +10,9 @@ namespace yocto
             
             aggregate:: ~aggregate() throw() {}
             
-            aggregate:: aggregate( const string &id ) :
-            composite(id)
+            aggregate:: aggregate( const string &id , node_property ppty) :
+            composite(id),
+            behavior(ppty)
             {
             }
             
@@ -24,7 +25,8 @@ namespace yocto
                 const size_t n = items.size();
                 if(n<=0)
                     throw exception("syntax.aggregate.%s is empty", label.c_str());
-                auto_ptr<xnode>    node( xnode::create(label, 0, is_regular) );
+                xnode          *parent = xnode::create(label, 0, behavior);
+                auto_ptr<xnode> node( parent );
                 
                 //==============================================================
                 // gather each rule
@@ -39,6 +41,7 @@ namespace yocto
                         return NULL;
                     }
                     node->children().push_back(sub);
+                    sub->parent = parent;
                 }
                 
                 std::cerr << "+AGG '" << label << "'" << std::endl;

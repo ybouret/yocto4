@@ -10,11 +10,16 @@ namespace yocto
         {
             void xnode:: viz(ios::ostream &fp) const
             {
+                //--------------------------------------------------------------
                 // declare the node
+                //--------------------------------------------------------------
                 fp.viz(this);
                 
                 fp << " [ label=\"'" << label << "'\"];\n";
+                
+                //--------------------------------------------------------------
                 // link it to its parent
+                //--------------------------------------------------------------
                 if( parent )
                 {
                     assert( ! parent->terminal );
@@ -22,6 +27,7 @@ namespace yocto
                     fp.viz(parent); fp<<" -> "; fp.viz(this);
                     fp(" [label=\"%u\"];\n",u);
                 }
+                
                 if( !terminal )
                 {
                     const child_list &ch = children();

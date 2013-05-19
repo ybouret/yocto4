@@ -16,6 +16,7 @@ namespace yocto
             public:
                 virtual ~composite() throw();
                 
+                void add( rule &r );
                 
             protected:
                 explicit composite(const string &id );

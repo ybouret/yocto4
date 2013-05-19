@@ -17,7 +17,7 @@ namespace yocto
             prev(0)
 			{}
             
-			
+#if 0
             void rule:: check( const xnode *Tree)
             {
                 if( Tree && Tree->terminal )
@@ -40,7 +40,7 @@ namespace yocto
                     Node->parent = Tree;
 				}
 			}
-            
+#endif
             
             r_list:: r_list() throw() {}
             static inline void __delete_rule( rule *r ) throw() { assert(r); delete r; }

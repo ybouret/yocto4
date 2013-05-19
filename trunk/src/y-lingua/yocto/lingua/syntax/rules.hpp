@@ -30,15 +30,6 @@ virtual xnode *match( Y_SYNTAX_MATCH_ARGS )
 			protected:
 				explicit rule( const string &id );
                 
-				//! grow tree
-                /**
-                 if Tree != NULL, Tree must be NOT terminal
-                 */
-				void grow( xnode * & Tree, xnode * &Node ) throw();
-                
-                //! check the parent tree is valid
-                void check( const xnode *Tree);
-                
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
 			};

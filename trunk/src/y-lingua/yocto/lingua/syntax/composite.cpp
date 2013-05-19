@@ -18,6 +18,11 @@ namespace yocto
             }
             
             
+            void composite:: add( rule &r )
+            {
+                items.push_back( &r );
+            }
+            
 
         }
 

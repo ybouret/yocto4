@@ -17,8 +17,9 @@ namespace yocto
                 virtual ~aggregate() throw();
                 Y_SYNTAX_RULE_API();
                 
-                explicit aggregate(const string &id);
-                
+                explicit aggregate(const string &id, node_property ppty);
+                const node_property behavior;
+
             private:
                 YOCTO_DISABLE_COPY(aggregate);
             };
