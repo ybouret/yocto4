@@ -172,6 +172,25 @@ __eof("EOF")
         
         ////////////////////////////////////////////////////////////////////////
         //
+        // grammar repeating
+        //
+        ////////////////////////////////////////////////////////////////////////
+        syntax::repeating & grammar:: rep( const string &id, syntax::rule &p, size_t at_least)
+        {
+            check_ownership(p);
+            syntax::repeating *r = new syntax::repeating(id,p,at_least);
+            add(r);
+            return *r;
+        }
+
+        syntax::repeating & grammar:: rep( const char *id, syntax::rule &p, size_t at_least)
+        {
+            const string ID(id);
+            return rep(ID,p,at_least);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
         // grammar parsing
         //
         ////////////////////////////////////////////////////////////////////////

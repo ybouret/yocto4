@@ -37,6 +37,22 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(optional);
             };
+            
+            
+            //! match a sequence of repeating rule
+            class repeating : public joker
+            {
+            public:
+                Y_SYNTAX_RULE_API();
+                
+                virtual ~repeating() throw();
+                explicit repeating( const string &id, rule &r, size_t n);
+                
+                const size_t at_least;
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(repeating);
+            };
         }
         
     }
