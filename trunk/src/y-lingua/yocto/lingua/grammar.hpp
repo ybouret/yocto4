@@ -41,13 +41,17 @@ namespace yocto
             //! new alternative
             syntax::alternative &alt( const char   *id );
             
-            //! changing root
-            void set_root( const string &rule_id );
-            void set_root( const char   *rule_id );
-            void set_root( const syntax::rule &r );
+           
+            void set_root( const string &rule_id );  //!< changing root
+            void set_root( const char   *rule_id );  //!< changing root
+            void set_root( const syntax::rule &r );  //!< changing root
             
             //! convert root to tree
-            syntax::xnode *parse(lexer &Lexer, source &Source);
+            bool accept(lexer &Lexer, source &Source, syntax::xnode * &Tree);
+            
+            syntax::rule & operator[]( const string &id );
+            syntax::rule & operator[]( const char   *id );
+            
             
         private:
             void add( syntax::rule *r);

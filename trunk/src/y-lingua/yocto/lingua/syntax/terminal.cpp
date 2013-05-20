@@ -26,10 +26,10 @@ namespace yocto
 #endif
             }
             
-            xnode  *terminal:: match( Y_SYNTAX_MATCH_ARGS )
+            Y_SYNTAX_MATCH_TYPE terminal:: match( Y_SYNTAX_MATCH_ARGS )
             {
+                check(Tree);
                 std::cerr << "?TERM <" << label << ">" << std::endl;
-                //check(Tree);
                 
                 lexeme *lx = Lexer.get( Source );
                 if( !lx )
@@ -50,13 +50,15 @@ namespace yocto
                 if( lx->label == this->label )
                 {
                     std::cerr << "+TERM <" << label << ">" << std::endl;
-                    return xnode::create(this->label,lx,semantic);
+                    xnode *term =  xnode::create(this->label,lx,semantic);
+                    grow(Tree,term);
+                    return true;
                 }
                 else
                 {
                     std::cerr << "-TERM <" << label << ">" << std::endl;
                     Lexer.unget(lx);
-                    return 0;
+                    return false;
                 }
             }
             

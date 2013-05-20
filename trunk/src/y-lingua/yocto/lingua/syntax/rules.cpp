@@ -17,12 +17,13 @@ namespace yocto
             prev(0)
 			{}
             
-#if 0
-            void rule:: check( const xnode *Tree)
+            void rule:: check( const xnode *tree )
             {
-                if( Tree && Tree->terminal )
-                    throw exception("invalid terminal tree <%s> for rule <%s>", Tree->label.c_str(), label.c_str() );
+                if( tree && tree->terminal )
+                    throw exception("invalid terminal tree <%s> for rule <%s>", tree->label.c_str(), label.c_str() );
             }
+
+            
             
 			void rule:: grow( xnode * & Tree, xnode * &Node ) throw()
 			{
@@ -40,7 +41,6 @@ namespace yocto
                     Node->parent = Tree;
 				}
 			}
-#endif
             
             r_list:: r_list() throw() {}
             static inline void __delete_rule( rule *r ) throw() { assert(r); delete r; }

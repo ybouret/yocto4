@@ -16,8 +16,9 @@ namespace yocto
             {
             }
             
-            xnode *aggregate:: match(Y_SYNTAX_MATCH_ARGS)
+            Y_SYNTAX_MATCH_TYPE aggregate:: match(Y_SYNTAX_MATCH_ARGS)
             {
+                check(Tree);
                 std::cerr << "?AGG '" << label << "'" << std::endl;
                 //==============================================================
                 // sanity check
@@ -25,31 +26,46 @@ namespace yocto
                 const size_t n = items.size();
                 if(n<=0)
                     throw exception("syntax.aggregate.%s is empty", label.c_str());
-                xnode          *parent = xnode::create(label, 0, behavior);
-                auto_ptr<xnode> node( parent );
+                
                 
                 //==============================================================
-                // gather each rule
+                // Create the SubTree
                 //==============================================================
-                for( size_t i=1; i <=n; ++i )
+                xnode          *aggTree = xnode::create(label, 0, behavior);
+                try
                 {
-                    xnode *sub = items[i]->match(Lexer, Source);
-                    if( !sub )
+                    //==========================================================
+                    // gather each rule
+                    //==========================================================
+                    for( size_t i=1; i <=n; ++i )
                     {
-                        xnode::restore(Lexer, node.yield() );
-                        std::cerr << "-AGG '" << label << "'" << std::endl;
-                        return NULL;
+                        if( !items[i]->match(Lexer, Source, aggTree) )
+                        {
+                            //--------------------------------------------------
+                            // no throw, delete aggTree
+                            //--------------------------------------------------
+                            xnode::restore(Lexer, aggTree);
+                            std::cerr << "-AGG '" << label << "'" << std::endl;
+                            return false;
+                        }                        
                     }
-                    node->children().push_back(sub);
-                    sub->parent = parent;
+                    
+                    //==========================================================
+                    // grow the tree
+                    //==========================================================
+                    std::cerr << "+AGG '" << label << "'" << std::endl;
+                    grow(Tree,aggTree);
+                    return true;
                 }
-                
-                std::cerr << "+AGG '" << label << "'" << std::endl;
-                return node.yield();
+                catch(...)
+                {
+                    delete aggTree;
+                    throw;
+                }
             }
-
+            
         }
-
+        
     }
-
+    
 }
