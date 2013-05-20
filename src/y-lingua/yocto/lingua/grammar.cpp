@@ -145,6 +145,33 @@ __eof("EOF")
         
         ////////////////////////////////////////////////////////////////////////
         //
+        // grammar optional
+        //
+        ////////////////////////////////////////////////////////////////////////
+        void grammar:: check_ownership( const syntax::rule &p ) const
+        {
+            if( !rules.owns(&p) )
+            {
+                throw exception("{%s}: not owning rule '%s'", name.c_str(), p.label.c_str());
+            }
+        }
+
+        syntax::optional &grammar:: opt( const string &id, syntax::rule &p)
+        {
+            check_ownership(p);
+            syntax::optional *r = new syntax::optional(id,p);
+            add(r);
+            return *r;
+        }
+
+        syntax::optional &grammar:: opt(  const char *id, syntax::rule &p )
+        {
+            const string ID(id);
+            return opt(ID,p);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
         // grammar parsing
         //
         ////////////////////////////////////////////////////////////////////////
@@ -157,7 +184,6 @@ __eof("EOF")
             
             if( rules.head->match(Lexer, Source, Tree) )
             {
-                auto_ptr<syntax::xnode> root(Tree);
                 if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
                 {
                     const lexeme *lx = Lexer.peek();
@@ -169,7 +195,7 @@ __eof("EOF")
                                     s.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
-                return root.yield();
+                return true;
             }
             
             throw exception("not matching");

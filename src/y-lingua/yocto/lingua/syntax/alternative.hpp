@@ -18,7 +18,8 @@ namespace yocto
                 Y_SYNTAX_RULE_API();
                 
                 explicit alternative(const string &id);
-                
+                inline alternative & operator|=( rule &r ) { add(r); return *this; }
+
             private:
                 YOCTO_DISABLE_COPY(alternative);
             };

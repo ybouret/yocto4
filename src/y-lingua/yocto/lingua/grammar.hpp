@@ -4,6 +4,7 @@
 #include "yocto/lingua/syntax/terminal.hpp"
 #include "yocto/lingua/syntax/aggregate.hpp"
 #include "yocto/lingua/syntax/alternative.hpp"
+#include "yocto/lingua/syntax/joker.hpp"
 
 #include "yocto/associative/set.hpp"
 
@@ -41,7 +42,12 @@ namespace yocto
             //! new alternative
             syntax::alternative &alt( const char   *id );
             
-           
+            //! new optional
+            syntax::optional &opt( const string &id, syntax::rule &r);
+            
+            //! new optional
+            syntax::optional &opt( const char *  id, syntax::rule &r);
+
             void set_root( const string &rule_id );  //!< changing root
             void set_root( const char   *rule_id );  //!< changing root
             void set_root( const syntax::rule &r );  //!< changing root
@@ -69,6 +75,8 @@ namespace yocto
             private:
                 YOCTO_DISABLE_ASSIGN(item);
             };
+            
+            void check_ownership( const syntax::rule &r ) const;
             
             syntax::r_list rules; //!< first is root, can be changed with set_root
             item::db       items; //!< for rule fast naming
