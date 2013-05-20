@@ -32,36 +32,33 @@ namespace yocto
                 // Create the SubTree
                 //==============================================================
                 xnode          *aggTree = xnode::create(label, 0, behavior);
-                try
+                auto_ptr<xnode> p(aggTree);
+                
+                
+                //==============================================================
+                // gather each rule
+                //==============================================================
+                for( size_t i=1; i <=n; ++i )
                 {
-                    //==========================================================
-                    // gather each rule
-                    //==========================================================
-                    for( size_t i=1; i <=n; ++i )
+                    if( !items[i]->match(Lexer, Source, aggTree) )
                     {
-                        if( !items[i]->match(Lexer, Source, aggTree) )
-                        {
-                            //--------------------------------------------------
-                            // no throw, delete aggTree
-                            //--------------------------------------------------
-                            xnode::restore(Lexer, aggTree);
-                            std::cerr << "-AGG '" << label << "'" << std::endl;
-                            return false;
-                        }                        
+                        //--------------------------------------------------
+                        // no throw, delete aggTree
+                        //--------------------------------------------------
+                        p.forget();
+                        xnode::restore(Lexer, aggTree);
+                        std::cerr << "-AGG '" << label << "'" << std::endl;
+                        return false;
                     }
-                    
-                    //==========================================================
-                    // grow the tree
-                    //==========================================================
-                    std::cerr << "+AGG '" << label << "'" << std::endl;
-                    grow(Tree,aggTree);
-                    return true;
                 }
-                catch(...)
-                {
-                    delete aggTree;
-                    throw;
-                }
+                
+                //==============================================================
+                // grow the tree
+                //==============================================================
+                std::cerr << "+AGG '" << label << "'" << std::endl;
+                p.forget();
+                grow(Tree,aggTree);
+                return true;
             }
             
         }

@@ -32,7 +32,9 @@ namespace yocto
 			return *this;
 		}
 		
-		inline T * yield() throw() 
+        inline void forget() throw() { pointee_ = 0; }
+        
+		inline T *  yield() throw()
 		{
 			T    *p  = pointee_;
 			pointee_ = 0;

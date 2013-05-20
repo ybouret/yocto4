@@ -60,8 +60,9 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     DECL += ( G.opt("MODIF?", MODIF ) );
     DECL += STOP;
     
+    syntax::repeating &STAT = G.rep( "STAT", DECL, 0);
     
-    G.set_root(DECL);
+    G.set_root(STAT);
     syntax::xnode *Tree = 0;
     if( G.accept(Lexer,Source,Tree) )
     {
