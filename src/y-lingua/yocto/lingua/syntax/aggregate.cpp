@@ -32,7 +32,7 @@ namespace yocto
                 // Create the SubTree
                 //==============================================================
                 xnode          *aggTree = xnode::create(label, 0, behavior);
-                auto_ptr<xnode> p(aggTree);
+                auto_ptr<xnode> protection(aggTree);
                 
                 
                 //==============================================================
@@ -45,7 +45,7 @@ namespace yocto
                         //--------------------------------------------------
                         // no throw, delete aggTree
                         //--------------------------------------------------
-                        p.forget();
+                        protection.forget();
                         xnode::restore(Lexer, aggTree);
                         std::cerr << "-AGG '" << label << "'" << std::endl;
                         return false;
@@ -56,7 +56,7 @@ namespace yocto
                 // grow the tree
                 //==============================================================
                 std::cerr << "+AGG '" << label << "'" << std::endl;
-                p.forget();
+                protection.forget();
                 grow(Tree,aggTree);
                 return true;
             }
