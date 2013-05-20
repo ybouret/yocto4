@@ -17,10 +17,10 @@ namespace
             
             Y_LEX_FORWARD(Main, "ALPHA", "[:alpha:]+");
             Y_LEX_FORWARD(Main, "DIGIT", "[:digit:]+");
+            Y_LEX_FORWARD(Main, "MODIF", "[@$]");
             Y_LEX_FORWARD(Main, "STOP",  ";" );
             Y_LEX_DISCARD(Main, "BLANK", "[:blank:]");
             Y_LEX_DISCARD(Main, "endl",  "[:endl:]");
-            
         }
         
         virtual ~MyLexer() throw()
@@ -53,10 +53,13 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     syntax::alternative  &ALT1  = G.alt("ALT1");
     ALT1.add(ALPHA);
     ALT1.add(DIGIT);
-    syntax::aggregate    &DECL = G.agg("DECL");
-    DECL.add(ALT1);
-    syntax::terminal     &STOP = G.term("STOP");
-    DECL.add(STOP);
+    syntax::aggregate    &DECL  = G.agg("DECL");
+    syntax::terminal     &STOP  = G.term("STOP");
+    syntax::terminal     &MODIF = G.term("MODIF");
+    DECL += ALT1;
+    DECL += ( G.opt("MODIF?", MODIF ) );
+    DECL += STOP;
+    
     
     G.set_root(DECL);
     syntax::xnode *Tree = 0;
