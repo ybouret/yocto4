@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lingua/grammar.hpp"
+#include "yocto/fs/local-fs.hpp"
 
 using namespace yocto;
 using namespace lingua;
@@ -14,7 +15,9 @@ namespace
         {
             lexical::scanner & Main = declare("Main");
             
-            Y_LEX_FORWARD(Main, "ID",    "[:word:]+");
+            Y_LEX_FORWARD(Main, "ALPHA", "[:alpha:]+");
+            Y_LEX_FORWARD(Main, "DIGIT", "[:digit:]+");
+            Y_LEX_FORWARD(Main, "STOP",  ";" );
             Y_LEX_DISCARD(Main, "BLANK", "[:blank:]");
             Y_LEX_DISCARD(Main, "endl",  "[:endl:]");
             
@@ -35,22 +38,39 @@ namespace
 YOCTO_UNIT_TEST_IMPL(syntax)
 {
     std::cerr << "sizeof(xnode)=" << sizeof(syntax::xnode) << std::endl;
+    vfs &fs = local_fs::instance();
+    if(fs.is_reg("tree.dot" )) fs.remove_file("tree.dot");
+    if(fs.is_reg("tree.png"))  fs.remove_file("tree.png");
+    
     MyLexer Lexer;
     source  Source;
     
     Source.attach_stdin();
     
     grammar G("MyGrammar");
-    syntax::terminal  &ID   = G.term("ID");
-    syntax::aggregate &PAIR = G.agg("PAIR");
-    PAIR.add(ID);
-    PAIR.add(ID);
+    syntax::terminal     &ALPHA = G.term("ALPHA");
+    syntax::terminal     &DIGIT = G.term("DIGIT");
+    syntax::alternative  &ALT1  = G.alt("ALT1");
+    ALT1.add(ALPHA);
+    ALT1.add(DIGIT);
+    syntax::aggregate    &DECL = G.agg("DECL");
+    DECL.add(ALT1);
+    syntax::terminal     &STOP = G.term("STOP");
+    DECL.add(STOP);
     
-    G.set_root(PAIR);
-    auto_ptr<syntax::xnode> tree( G.parse(Lexer,Source) );
-    
-    tree->graphviz("tree.dot");
-    system("dot -Tpng -otree.png tree.dot");
+    G.set_root(DECL);
+    syntax::xnode *Tree = 0;
+    if( G.accept(Lexer,Source,Tree) )
+    {
+        if(Tree)
+        {
+            auto_ptr<syntax::xnode> tree(Tree);
+            tree->graphviz("tree.dot");
+            system("dot -Tpng -otree.png tree.dot");
+        }
+        else
+            std::cerr << "Accepted Empty Tree" << std::endl;
+    }
     
     
 }

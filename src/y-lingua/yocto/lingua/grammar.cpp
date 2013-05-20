@@ -88,7 +88,7 @@ __eof("EOF")
             assert( rules.owns( &r) );
             rules.move_to_front( (syntax::rule *) &r );
         }
-
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar terminal
@@ -149,15 +149,15 @@ __eof("EOF")
         //
         ////////////////////////////////////////////////////////////////////////
         
-        syntax::xnode * grammar:: parse(lexer &Lexer, source &Source)
+        bool grammar:: accept(lexer &Lexer, source &Source, syntax::xnode * &Tree)
         {
+            assert(0==Tree);
             if( rules.size <= 0)
                 throw exception("{%s}.parse(no rules)", name.c_str());
             
-            syntax::xnode *root = rules.head->match(Lexer, Source);
-            if(root)
+            if( rules.head->match(Lexer, Source, Tree) )
             {
-                auto_ptr<syntax::xnode> ans(root);
+                auto_ptr<syntax::xnode> root(Tree);
                 if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
                 {
                     const lexeme *lx = Lexer.peek();
@@ -169,13 +169,30 @@ __eof("EOF")
                                     s.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
-                return ans.yield();
+                return root.yield();
             }
             
             throw exception("not matching");
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        //
+        //
+        ////////////////////////////////////////////////////////////////////////
+        syntax::rule & grammar:: operator[]( const string &id )
+        {
+            item *it = items.search(id);
+            if(!it)
+                throw exception("{%s} no rule '%s'", name.c_str(), id.c_str());
+            return *(it->handle);
+        }
         
+        syntax::rule & grammar:: operator[]( const char *id )
+        {
+            const string ID(id);
+            return (*this)[ID];
+        }
         
     }
     

@@ -18,8 +18,9 @@ namespace yocto
                 
             }
             
-            xnode * alternative:: match(Y_SYNTAX_MATCH_ARGS)
+            Y_SYNTAX_MATCH_TYPE alternative:: match(Y_SYNTAX_MATCH_ARGS)
             {
+                check(Tree);
                 std::cerr << "?ALT '" << label << "'" << std::endl;
                 //==============================================================
                 // sanity check
@@ -33,16 +34,20 @@ namespace yocto
                 //==============================================================
                 for( size_t i=1; i <=n; ++i )
                 {
-                    xnode *node = items[i]->match(Lexer, Source);
-                    if( node )
+                    xnode *altTree=0;
+                    if( items[i]->match(Lexer, Source, altTree) )
                     {
                         std::cerr << "+ALT '" << label << "'"  << std::endl;
-                        return node;
+                        if(altTree)
+                        {
+                            grow(Tree, altTree);
+                        }
+                        return true;
                     }
                 }
                 
-                std::cerr << "-AGG '" << label << "'" << std::endl;
-                return 0;
+                std::cerr << "-ALT'" << label << "'" << std::endl;
+                return false;
                 
             }
             

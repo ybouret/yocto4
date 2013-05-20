@@ -10,10 +10,11 @@ namespace yocto
         
         namespace syntax
         {
-            
-#define Y_SYNTAX_MATCH_ARGS lexer &Lexer, source &Source
+     
+#define Y_SYNTAX_MATCH_TYPE bool
+#define Y_SYNTAX_MATCH_ARGS lexer &Lexer, source &Source, xnode * &Tree
 #define Y_SYNTAX_RULE_API() \
-virtual xnode *match( Y_SYNTAX_MATCH_ARGS )
+virtual Y_SYNTAX_MATCH_TYPE match( Y_SYNTAX_MATCH_ARGS )
             
             class rule : public object
 			{
@@ -23,12 +24,15 @@ virtual xnode *match( Y_SYNTAX_MATCH_ARGS )
 				rule        *prev;
 				virtual ~rule() throw();
                 
-				virtual xnode *match( Y_SYNTAX_MATCH_ARGS ) = 0;
+				virtual Y_SYNTAX_MATCH_TYPE match( Y_SYNTAX_MATCH_ARGS ) = 0;
                 
                 typedef rule *ptr;
                 
 			protected:
 				explicit rule( const string &id );
+                
+                void check( const xnode *tree );
+                void grow(xnode * & Tree, xnode * &Node) throw();
                 
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
