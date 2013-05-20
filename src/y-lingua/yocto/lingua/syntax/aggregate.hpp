@@ -20,6 +20,8 @@ namespace yocto
                 explicit aggregate(const string &id, node_property ppty);
                 const node_property behavior;
 
+                inline aggregate & operator+=( rule &r ) { add(r); return *this; }
+
             private:
                 YOCTO_DISABLE_COPY(aggregate);
             };

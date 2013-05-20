@@ -182,6 +182,8 @@ __eof("EOF")
             if( rules.size <= 0)
                 throw exception("{%s}.parse(no rules)", name.c_str());
             
+            auto_ptr<syntax::xnode> root(Tree);
+            
             if( rules.head->match(Lexer, Source, Tree) )
             {
                 if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
@@ -195,6 +197,7 @@ __eof("EOF")
                                     s.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
+                (void) root.yield();
                 return true;
             }
             
