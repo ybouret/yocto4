@@ -31,6 +31,20 @@ namespace yocto
             return  terminal(ID, EX);
         }
 
+        void parser:: reset() throw()
+        {
+            lexer::reset();
+            tree.release();;
+        }
+    
+        bool parser:: operator()( source &src )
+        {
+            tree.release();
+            syntax::xnode * root = 0;
+            const bool      ans  = accept(*this, src, root);
+            tree.reset(root);
+            return ans;
+        }
         
     }
 
