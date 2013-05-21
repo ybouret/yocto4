@@ -64,6 +64,10 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(parser)
 {
+    vfs &fs = local_fs::instance();
+    if(fs.is_reg("tree.dot" )) fs.remove_file("tree.dot");
+    if(fs.is_reg("tree.png"))  fs.remove_file("tree.png");
+
     MyParser Parser;
     source   Source;
     Source.attach_stdin();
