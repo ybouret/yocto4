@@ -255,6 +255,8 @@ namespace yocto
             
 #define Y_LEX_FORWARD(REF,ID,EXPR) (REF).make(ID,EXPR, &(REF), (REF).forward())
 #define Y_LEX_DISCARD(REF,ID,EXPR) (REF).make(ID,EXPR, &(REF), (REF).discard())
+#define Y_LEX_NO_ENDL(REF)         (REF).make("end","[:endl:]", &(REF), (REF).no_endl())
+            
             
         }
     }

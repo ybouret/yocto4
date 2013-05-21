@@ -39,26 +39,30 @@ namespace yocto
                     Lexer.unget(lx);
                     return 0;
                 }
-                
-                if( lx->label == eof )
-                {
-                    Lexer.unget(lx);
-                    return 0;
-                }
-                
-                //std::cerr << "<==== <" << lx->label << ">" << std::endl;
-                if( lx->label == this->label )
-                {
-                    std::cerr << "+TERM <" << label << ">" << std::endl;
-                    xnode *term =  xnode::create(this->label,lx,semantic);
-                    grow(Tree,term);
-                    return true;
-                }
                 else
                 {
-                    std::cerr << "-TERM <" << label << ">" << std::endl;
-                    Lexer.unget(lx);
-                    return false;
+                    
+                    if( lx->label == eof )
+                    {
+                        Lexer.unget(lx);
+                        return 0;
+                    }
+                    
+                    //std::cerr << "<==== <" << lx->label << ">" << std::endl;
+                    if( lx->label == this->label )
+                    {
+                        std::cerr << "+TERM <" << label << ">" << std::endl;
+                        xnode *term =  xnode::create(this->label,lx,semantic);
+                        grow(Tree,term);
+                        return true;
+                    }
+                    else
+                    {
+                        std::cerr << "-TERM <" << label << ">" << std::endl;
+                        Lexer.unget(lx);
+                        return false;
+                    }
+                    
                 }
             }
             

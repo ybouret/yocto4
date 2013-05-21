@@ -19,11 +19,17 @@ namespace
             syntax::terminal & RBRACK = terminal("LBRACK", "\\]");
             syntax::terminal & ID     = terminal("ID", "[:alpha:][:word:]*");
             syntax::terminal & INT    = terminal("INT", "[:digit:]+");
+            
+            Y_LEX_DISCARD(scanner, "BLANK", "[:blank:]");
+            Y_LEX_NO_ENDL(scanner);
+            
             syntax::alternative & ITEM =  alt("ITEM");
             ITEM |= ID;
             ITEM |= INT;
             
             set_root( opt(ITEM) );
+            set_root( ID );
+            
         }
 
         virtual ~MyParser() throw()
