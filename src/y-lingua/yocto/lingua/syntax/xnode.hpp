@@ -5,7 +5,7 @@
 
 namespace yocto
 {
- 
+    
     namespace lingua
     {
         
@@ -32,13 +32,13 @@ namespace yocto
                 xnode        *next;   //!< for tree/child_list
                 xnode        *parent; //!< for tree
                 
-                 virtual ~xnode() throw();
+                virtual ~xnode() throw();
                 
                 
                 
                 //! take care of lexeme in case of error
                 static xnode * create( const string &label_ref, lexeme *lx, node_property p );
-              
+                
                 //! GraphViz output
                 void viz( ios::ostream &fp) const;
                 void graphviz( const string &fn) const; //!< make a GraphViz file

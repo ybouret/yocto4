@@ -156,34 +156,31 @@ __eof("EOF")
             }
         }
 
-        syntax::optional &grammar:: opt( const string &id, syntax::rule &p)
+        syntax::optional &grammar:: opt( syntax::rule &p)
         {
             check_ownership(p);
+            const string id = "opt@" + p.label;
             syntax::optional *r = new syntax::optional(id,p);
             add(r);
             return *r;
         }
 
-        syntax::optional &grammar:: opt(  const char *id, syntax::rule &p )
-        {
-            const string ID(id);
-            return opt(ID,p);
-        }
+
         
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar repeating
         //
         ////////////////////////////////////////////////////////////////////////
-        syntax::repeating & grammar:: rep( const string &id, syntax::rule &p, size_t at_least)
+        syntax::repeating & grammar:: rep(  const string &id, syntax::rule &p, size_t at_least)
         {
             check_ownership(p);
             syntax::repeating *r = new syntax::repeating(id,p,at_least);
             add(r);
             return *r;
         }
-
-        syntax::repeating & grammar:: rep( const char *id, syntax::rule &p, size_t at_least)
+        
+        syntax::repeating & grammar:: rep(  const char *id, syntax::rule &p, size_t at_least)
         {
             const string ID(id);
             return rep(ID,p,at_least);
