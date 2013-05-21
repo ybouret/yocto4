@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lingua/grammar.hpp"
 #include "yocto/fs/local-fs.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 using namespace lingua;
