@@ -39,8 +39,13 @@ namespace yocto
                     //==========================================================
                     // clean up non terminal node
                     //==========================================================
-                    xnode::child_list  target;
+                    
+                                       
+                    //----------------------------------------------------------
+                    // recursive cleanup
+                    //----------------------------------------------------------
                     xnode::child_list &source = node->children();
+                    xnode::child_list  target;
                     while( source.size )
                     {
                         xnode *sub = xnode::abstract( source.pop_front() );
@@ -48,6 +53,21 @@ namespace yocto
                             target.push_back(sub);
                     }
                     source.swap_with(target);
+                    
+                    //----------------------------------------------------------
+                    // do we have some content ?
+                    //----------------------------------------------------------
+                    if(0==source.size)
+                    {
+                        delete node;
+                        return 0;
+                    }
+                    
+                    //----------------------------------------------------------
+                    //
+                    //----------------------------------------------------------
+
+                    
                     return node;
                 }
             }
