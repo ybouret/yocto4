@@ -9,6 +9,7 @@ namespace yocto
     namespace lingua
     {
         
+        //! compile a grammar into an AST
         class compiler : public parser
         {
         public:
@@ -17,6 +18,9 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
+            void do_nothing(const token &) throw();
+            void do_newline(const token &) throw();
+            
         };
         
     }
