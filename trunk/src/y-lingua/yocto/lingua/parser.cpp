@@ -18,17 +18,17 @@ namespace yocto
             
         }
         
-        syntax::terminal & parser:: terminal( const string &id, const string &expr)
+        syntax::terminal & parser:: terminal( const string &id, const string &expr, syntax::node_property ppty)
         {
             Y_LEX_FORWARD(scanner, id, expr);
-            return term(id);
+            return term(id,ppty);
         }
 
-        syntax::terminal & parser:: terminal( const char *id, const char *expr)
+        syntax::terminal & parser:: terminal( const char *id, const char *expr, syntax::node_property ppty)
         {
             const string ID(id);
             const string EX(expr);
-            return  terminal(ID, EX);
+            return  terminal(ID, EX, ppty);
         }
 
         void parser:: reset() throw()
@@ -42,7 +42,7 @@ namespace yocto
             tree.release();
             syntax::xnode * root = 0;
             const bool      ans  = accept(*this, src, root);
-            tree.reset(root);
+            tree.reset( syntax::xnode::abstract(root) );
             return ans;
         }
         
