@@ -50,11 +50,13 @@ namespace yocto
                 //! unlink from parent
                 xnode *unlink() throw();
                 
-                //! access
-                child_list       & children() throw();
-                lexeme          *& lex() throw();
-                const child_list & children() const throw();
-                lexeme * const   & lex() const throw();
+                child_list       & children() throw();       //!< if !terminal
+                lexeme          *& lex() throw();            //!< if terminal
+                const child_list & children() const throw(); //!< if !terminal
+                lexeme * const   & lex() const throw();      //!< if terminal
+                
+                //! convert to an abstract node
+                static xnode *abstract(xnode *node);
                 
             protected:
                 explicit xnode( const string &label_ref, lexeme *lx, node_property p ) throw();
