@@ -17,13 +17,13 @@ namespace yocto
             //==================================================================
             // lexer
             //==================================================================
-            syntax::terminal & RULE_ID = terminal("RULE_ID", "[[:alpha:]][:word:]+");
+            syntax::terminal & RULE_ID = terminal("RULE_ID", "[[:alpha:]][:word:]*");
             syntax::terminal & COLUMN  = jettison("COLUMN", ":");
             syntax::terminal & STOP    = jettison("STOP",";");
             syntax::terminal & EXPR    = terminal("EXPR", "[:cstring:]" );
-            syntax::terminal & LPAREN  = terminal("LPAREN", "\\(");
-            syntax::terminal & RPAREN  = terminal("RPAREN", "\\)");
-            syntax::terminal & ALT     = terminal("ALT", "\\|");
+            syntax::terminal & LPAREN  = jettison("LPAREN", "\\(");
+            syntax::terminal & RPAREN  = jettison("RPAREN", "\\)");
+            syntax::terminal & PIPE    = jettison("PIPE", "\\|");
             
             // Call C++ comment
             scanner.call(CppComment, "//",     this, &compiler::do_nothing);
@@ -32,7 +32,7 @@ namespace yocto
             scanner.call(C_Comment, "/\\*\\*", this, &compiler::do_nothing);
             
             Y_LEX_DISCARD(scanner, "BLANK", "[:blank:]");
-            Y_LEX_NO_ENDL(scanner);            
+            Y_LEX_NO_ENDL(scanner);
             
             //==================================================================
             // C++ Comment
@@ -67,16 +67,29 @@ namespace yocto
             //------------------------------------------------------------------
             {
                 
-                //syntax::aggregate   &GROUP = agg("GROUP");
-                syntax::alternative &ATOM  = alt("ATOM");
-                ATOM |= RULE_ID;
-                ATOM |= EXPR;
+                syntax::aggregate   &GROUP = agg("GROUP");
+                syntax::alternative &CORE  = alt("CORE");
+                CORE |= RULE_ID;
+                CORE |= EXPR;
+                CORE |= GROUP;
+               
+                syntax::aggregate &ATOM = agg("ATOM", syntax::is_merging_one);
+                ATOM += CORE;
+                ATOM += opt(terminal("ATTR", "[+*?]") );
+               
+                syntax::aggregate &ATOMS = agg("ATOMS", syntax::is_merging_one);
+                ATOMS += ATOM;
+                syntax::aggregate &OPT_ATOM = agg("ALT");
+                OPT_ATOM += PIPE;
+                OPT_ATOM += ATOM;
+                ATOMS += rep("OPT_ATOMS",OPT_ATOM,0);
                 
-                syntax::aggregate &BODY   = agg("BODY");
-                BODY += ATOM;
-                BODY += opt( terminal("ATTR", "[+*?]") );
+                GROUP += LPAREN;
+                GROUP += ATOMS;
+                GROUP += RPAREN;
                 
-                RULE += rep("RULE_CONTENT", BODY, 1);
+                RULE += rep("CONTENT", ATOMS, 1);
+                //RULE += rep("RULE_CONTENT", BODY, 1);
             }
             //------------------------------------------------------------------
             // end rule
