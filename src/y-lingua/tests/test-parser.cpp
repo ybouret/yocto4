@@ -15,10 +15,12 @@ namespace
     public:
         explicit MyParser() : parser( "Lists", "main")
         {
-            syntax::terminal & LBRACK = terminal("LPAREN", "\\[");
-            syntax::terminal & RBRACK = terminal("LBRACK", "\\]");
+            syntax::terminal & LBRACK = terminal("LPAREN", "\\[", syntax::is_discardable);
+            syntax::terminal & RBRACK = terminal("LBRACK", "\\]", syntax::is_discardable);
             syntax::terminal & ID     = terminal("ID", "[:alpha:][:word:]*");
             syntax::terminal & INT    = terminal("INT", "[:digit:]+");
+            syntax::terminal & COMMA  = terminal("COMMA", ",", syntax::is_discardable);
+            syntax::terminal & STOP   = terminal("STOP",  ";", syntax::is_discardable);
             
             Y_LEX_DISCARD(scanner, "BLANK", "[:blank:]");
             Y_LEX_NO_ENDL(scanner);
@@ -27,8 +29,27 @@ namespace
             ITEM |= ID;
             ITEM |= INT;
             
-            set_root( opt(ITEM) );
-            set_root( ID );
+            syntax::aggregate & LIST = agg("LIST");
+            LIST += LBRACK;
+            LIST += ITEM;
+            
+            ITEM |= LIST;
+            
+            syntax::aggregate & OPT_ITEM = agg("OPT_ITEM");
+            OPT_ITEM += COMMA;
+            OPT_ITEM += ITEM;
+            
+            syntax::repeating & EXTRA_ITEMS = rep("EXTRA_ITEMS", OPT_ITEM,0);
+            LIST += EXTRA_ITEMS;
+            LIST += RBRACK;
+
+            
+            syntax::aggregate & DECL = agg("DECL");
+            DECL += LIST;
+            DECL += STOP;
+            
+            syntax::repeating & STAT = rep("STAT", DECL, 0);
+            set_root( STAT );
             
         }
 
