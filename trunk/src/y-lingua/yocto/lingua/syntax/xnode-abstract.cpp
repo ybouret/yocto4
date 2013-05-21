@@ -8,7 +8,7 @@ namespace yocto
     {
         namespace syntax
         {
-
+            
             xnode * xnode:: abstract(xnode *node)
             {
                 if(!node) return 0;
@@ -40,7 +40,7 @@ namespace yocto
                     // clean up non terminal node
                     //==========================================================
                     
-                                       
+                    
                     //----------------------------------------------------------
                     // recursive cleanup
                     //----------------------------------------------------------
@@ -50,7 +50,34 @@ namespace yocto
                     {
                         xnode *sub = xnode::abstract( source.pop_front() );
                         if(sub)
-                            target.push_back(sub);
+                        {
+                            switch( sub->property )
+                            {
+                                case is_merging_one:
+                                    assert(!sub->terminal);
+                                    if( 1 == sub->children().size )
+                                    {
+                                        target.merge_back(sub->children());
+                                        delete sub;
+                                    }
+                                    else
+                                    {
+                                        target.push_back(sub);
+                                    }
+                                    break;
+                                    
+                                case is_merging_all:
+                                    assert(!sub->terminal);
+                                    target.merge_back( sub->children() );
+                                    delete sub;
+                                    break;
+                                    
+                                default:
+                                    target.push_back(sub);
+                                    break;
+                                    
+                            }
+                        }
                     }
                     source.swap_with(target);
                     
@@ -66,13 +93,13 @@ namespace yocto
                     //----------------------------------------------------------
                     //
                     //----------------------------------------------------------
-
+                    
                     
                     return node;
                 }
             }
         }
-
+        
     }
-
+    
 }
