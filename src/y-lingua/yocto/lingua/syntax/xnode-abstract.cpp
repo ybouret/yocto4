@@ -8,28 +8,46 @@ namespace yocto
     {
         namespace syntax
         {
+#define Y_XNODE_SHOW 1
             
-            xnode * xnode:: abstract(xnode *node)
+#if defined(Y_XNODE_SHOW) && (Y_XNODE_SHOW==1)
+#define Y_XNODE_AST(CODE) do { CODE; } while(false)
+            static inline
+            void __indent( int depth )
+            {
+                if(depth)
+                {
+                    for(int i= (depth) * 2; i>0; --i) std::cerr << ' ';
+                }
+            }
+#else
+#define Y_XNODE_AST(CODE)
+#endif
+            
+            
+            xnode * xnode:: abstract(xnode *node, int &depth) throw()
             {
                 if(!node) return 0;
-                
                 if(node->terminal)
                 {
                     //==========================================================
-                    // clean up terminal node
+                    // AST terminal node
                     //==========================================================
                     switch(node->property)
                     {
-                        case is_specialized:
+                        case is_specialized:   
+                            Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: Clear    " << node->label << "='" << *(node->lex()) << "'" << std::endl);
                             node->lex()->clear();
                             break;
                             
                         case is_discardable:
+                            Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: Jettison " << node->label << "='" << *(node->lex()) << "'" << std::endl);
                             delete node;
                             return 0;
                             
-                        case is_regular:
                         default:
+                            assert(is_regular==node->property);
+                            Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: Keep     " << node->label << "='" << *(node->lex()) << "'" << std::endl);
                             break;
                     }
                     return node;
@@ -37,10 +55,9 @@ namespace yocto
                 else
                 {
                     //==========================================================
-                    // clean up non terminal node
+                    // AST non terminal node
                     //==========================================================
-                    
-                    
+                    Y_XNODE_AST(__indent(depth)); std::cerr << "[XNODE]: " << node->label << " / #children=" << node->children().size << std::endl;
                     //----------------------------------------------------------
                     // recursive cleanup
                     //----------------------------------------------------------
@@ -48,27 +65,33 @@ namespace yocto
                     xnode::child_list  target;
                     while( source.size )
                     {
-                        xnode *sub = xnode::abstract( source.pop_front() );
+                        ++depth;
+                        xnode *sub = xnode::abstract( source.pop_front(),depth );
+                        --depth;
                         if(sub)
                         {
                             switch( sub->property )
                             {
                                 case is_merging_one:
                                     assert(!sub->terminal);
-                                    if( 1 == sub->children().size )
-                                    {
-                                        target.merge_back(sub->children());
-                                        delete sub;
-                                    }
-                                    else
+                                    assert(sub->children().size>0); // impossible here;
+                                    if( sub->children().size > 1 )
                                     {
                                         target.push_back(sub);
+                                        break;
                                     }
-                                    break;
+                                    assert(1==sub->children().size);
                                     
                                 case is_merging_all:
+                                    Y_XNODE_AST(__indent(depth+1)); std::cerr << sub->label << " ==> " << node->label << std::endl;
                                     assert(!sub->terminal);
-                                    target.merge_back( sub->children() );
+                                    assert(sub->children().size>0);
+                                    while( sub->children().size )
+                                    {
+                                        xnode *ch = sub->children().pop_front();
+                                        ch->parent = node;
+                                        target.push_back(ch);
+                                    }
                                     delete sub;
                                     break;
                                     
@@ -89,10 +112,6 @@ namespace yocto
                         delete node;
                         return 0;
                     }
-                    
-                    //----------------------------------------------------------
-                    //
-                    //----------------------------------------------------------
                     
                     
                     return node;

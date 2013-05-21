@@ -25,7 +25,7 @@ namespace
             Y_LEX_DISCARD(scanner, "BLANK", "[:blank:]");
             Y_LEX_NO_ENDL(scanner);
             
-            syntax::alternative & ITEM =  alt("ITEM");
+            syntax::alternative & ITEM =  alt();
             ITEM |= ID;
             ITEM |= INT;
             
@@ -35,7 +35,7 @@ namespace
             
             ITEM |= LIST;
             
-            syntax::aggregate & OPT_ITEM = agg("OPT_ITEM");
+            syntax::aggregate & OPT_ITEM = agg("OPT_ITEM", syntax::is_merging_all);
             OPT_ITEM += COMMA;
             OPT_ITEM += ITEM;
             
@@ -44,7 +44,7 @@ namespace
             LIST += RBRACK;
 
             
-            syntax::aggregate & DECL = agg("DECL");
+            syntax::aggregate & DECL = agg("DECL", syntax::is_merging_one);
             DECL += LIST;
             DECL += STOP;
             

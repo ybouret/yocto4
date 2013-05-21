@@ -67,7 +67,8 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     syntax::xnode *Tree = 0;
     if( G.accept(Lexer,Source,Tree) )
     {
-        Tree = syntax::xnode::abstract(Tree);
+        int depth = 0;
+        Tree = syntax::xnode::abstract(Tree,depth);
         if(Tree)
         {
             auto_ptr<syntax::xnode> tree(Tree);

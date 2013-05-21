@@ -42,11 +42,19 @@ namespace yocto
             //! new alternative
             syntax::alternative &alt( const char   *id );
             
+            //! automatic naming since it shall not appear.
+            syntax::alternative &alt();
+            
             //! new optional, automatic naming
             syntax::optional &opt(syntax::rule &r);
           
             //! new repeating
+            /**
+             with syntax::is_merging_all property
+             */
             syntax::repeating &rep( const string &id, syntax::rule &r, size_t at_least);
+            
+            //! new repeating
             syntax::repeating &rep( const char   *id, syntax::rule &r, size_t at_least);
 
             void set_root( const string &rule_id );  //!< changing root
@@ -82,6 +90,7 @@ namespace yocto
             syntax::r_list rules; //!< first is root, can be changed with set_root
             item::db       items; //!< for rule fast naming
             const string   __eof; //!< "EOF"
+            int            opidx; //!< for automatic naming
             YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
         };
     }

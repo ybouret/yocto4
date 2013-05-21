@@ -1,4 +1,5 @@
 #include "yocto/lingua/parser.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -18,13 +19,22 @@ namespace yocto
             
         }
         
-        syntax::terminal & parser:: terminal( const string &id, const string &expr, syntax::node_property ppty)
+        syntax::terminal & parser:: terminal( const string &id, const string &expr, syntax::node_property ppty )
         {
+            
+            switch(ppty)
+            {
+                case syntax::is_merging_all:
+                case syntax::is_merging_one:
+                    throw exception("invalid syntax property for terminal '%s'", id.c_str());
+                default:
+                    break;
+            }
             Y_LEX_FORWARD(scanner, id, expr);
             return term(id,ppty);
         }
 
-        syntax::terminal & parser:: terminal( const char *id, const char *expr, syntax::node_property ppty)
+        syntax::terminal & parser:: terminal( const char *id, const char *expr, syntax::node_property ppty )
         {
             const string ID(id);
             const string EX(expr);
@@ -42,7 +52,9 @@ namespace yocto
             tree.release();
             syntax::xnode * root = 0;
             const bool      ans  = accept(*this, src, root);
-            tree.reset( syntax::xnode::abstract(root) );
+            int depth = 0;
+            std::cerr << "{" << grammar::name << "}: Abstracting" << std::endl;
+            tree.reset( syntax::xnode::abstract(root,depth) );
             return ans;
         }
         
