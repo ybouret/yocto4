@@ -185,44 +185,10 @@ __eof("EOF")
             const string ID(id);
             return rep(ID,p,at_least);
         }
-        
+      
         ////////////////////////////////////////////////////////////////////////
         //
-        // grammar parsing
-        //
-        ////////////////////////////////////////////////////////////////////////
-        
-        bool grammar:: accept(lexer &Lexer, source &Source, syntax::xnode * &Tree)
-        {
-            assert(0==Tree);
-            if( rules.size <= 0)
-                throw exception("{%s}.parse(no rules)", name.c_str());
-            
-            auto_ptr<syntax::xnode> root(Tree);
-            
-            if( rules.head->match(Lexer, Source, Tree) )
-            {
-                if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
-                {
-                    const lexeme *lx = Lexer.peek();
-                    const string  s  = lx->to_string();
-                    throw exception("%u: {%s} illegal extraneous '%s'='%s'",
-                                    unsigned(lx->line) ,
-                                    name.c_str(),
-                                    lx->label.c_str(),
-                                    s.c_str() );
-                }
-                std::cerr << "[[ SUCCESS ]]" << std::endl;
-                (void) root.yield();
-                return true;
-            }
-            
-            throw exception("not matching");
-        }
-        
-        ////////////////////////////////////////////////////////////////////////
-        //
-        //
+        // access to named rules
         //
         ////////////////////////////////////////////////////////////////////////
         syntax::rule & grammar:: operator[]( const string &id )
@@ -238,7 +204,49 @@ __eof("EOF")
             const string ID(id);
             return (*this)[ID];
         }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // grammar parsing
+        //
+        ////////////////////////////////////////////////////////////////////////
         
+        bool grammar:: accept(lexer &Lexer, source &Source, syntax::xnode * &Tree)
+        {
+            assert(0==Tree);
+            if( rules.size <= 0)
+                throw exception("{%s}.parse(no rules)", name.c_str());
+            
+            
+            //==================================================================
+            // try to accept root node
+            //==================================================================
+            if( rules.head->match(Lexer, Source, Tree) )
+            {
+                auto_ptr<syntax::xnode> root(Tree);
+                if( Lexer.is_active(Source) && Lexer.peek()->label != __eof )
+                {
+                    const lexeme *lx = Lexer.peek();
+                    const string  s  = lx->to_string();
+                    throw exception("%u: {%s} illegal extraneous '%s'='%s'",
+                                    unsigned(lx->line) ,
+                                    name.c_str(),
+                                    lx->label.c_str(),
+                                    s.c_str() );
+                }
+                std::cerr << "[[ SUCCESS ]]" << std::endl;
+                root.forget();
+                return true;
+            }
+            //==================================================================
+            // something went wrong
+            //==================================================================
+            
+            
+            throw exception("not matching");
+        }
+        
+              
     }
     
 }

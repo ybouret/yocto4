@@ -21,7 +21,7 @@ namespace
             Y_LEX_FORWARD(Main, "MODIF", "[@$]");
             Y_LEX_FORWARD(Main, "STOP",  ";" );
             Y_LEX_DISCARD(Main, "BLANK", "[:blank:]");
-            Y_LEX_DISCARD(Main, "endl",  "[:endl:]");
+            Y_LEX_NO_ENDL(Main);
         }
         
         virtual ~MyLexer() throw()
