@@ -36,7 +36,7 @@ namespace yocto
             const lexical::scanner & sub(const char   *id) const;
 
             //! line=1, reset all, clear history and cache
-            void reset() throw();
+            virtual void reset() throw();
             
             void jump( const string &id); //!< change current scanner
             void call( const string &id); //!< change current scanner, keeping track

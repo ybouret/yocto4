@@ -16,14 +16,17 @@ namespace yocto
 		
 		virtual ~auto_ptr() throw() { __kill(); }
 		
-		void reset( T *p ) throw()
+		inline void reset( T *p ) throw()
 		{
-			assert( p != pointee_ );
+			assert( p==0 || p != pointee_ );
 			__kill();
 			pointee_ = (mutable_type *)p;
 		}
+        
+        inline void release() throw() { reset(0); }
+        
 		
-		auto_ptr & operator=( T *p ) throw()
+		inline auto_ptr & operator=( T *p ) throw()
 		{
 			if( p != pointee_ )
 			{

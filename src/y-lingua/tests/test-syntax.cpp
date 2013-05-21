@@ -55,7 +55,7 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     ALT1.add(ALPHA);
     ALT1.add(DIGIT);
     syntax::aggregate    &DECL  = G.agg("DECL");
-    syntax::terminal     &STOP  = G.term("STOP");
+    syntax::terminal     &STOP  = G.term("STOP", syntax::is_specialized);
     syntax::terminal     &MODIF = G.term("MODIF");
     DECL += ALT1;
     DECL += ( G.opt( MODIF ) );
@@ -67,6 +67,7 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     syntax::xnode *Tree = 0;
     if( G.accept(Lexer,Source,Tree) )
     {
+        Tree = syntax::xnode::abstract(Tree);
         if(Tree)
         {
             auto_ptr<syntax::xnode> tree(Tree);
