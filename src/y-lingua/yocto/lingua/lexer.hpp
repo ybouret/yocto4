@@ -9,7 +9,7 @@ namespace yocto
 {
     namespace lingua
     {
-     
+        
         //! a source of lexemes
         class lexer : public object
         {
@@ -34,9 +34,9 @@ namespace yocto
             
             //! get the sub-scanner
             const lexical::scanner & sub(const char   *id) const;
-
+            
             //! line=1, reset all, clear history and cache
-            virtual void reset() throw();
+            void reset() throw();
             
             void jump( const string &id); //!< change current scanner
             void call( const string &id); //!< change current scanner, keeping track
@@ -54,7 +54,7 @@ namespace yocto
             
             //! back into cache
             /**
-             a sub scanner can cache a lexeme to mimic 
+             a sub scanner can cache a lexeme to mimic
              a complex expression (aka real string).
              */
             void    unget( lexeme *lx ) throw();
@@ -66,7 +66,7 @@ namespace yocto
             //! cache.size > 0
             const lexeme *peek() const throw();
             
-          
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);

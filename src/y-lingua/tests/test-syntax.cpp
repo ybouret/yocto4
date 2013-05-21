@@ -64,20 +64,17 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     syntax::repeating &STAT = G.rep( "STAT", DECL, 0);
     
     G.set_root(STAT);
-    syntax::xnode *Tree = 0;
-    if( G.accept(Lexer,Source,Tree) )
+    int depth = 0;
+    syntax::xnode *Tree = syntax::xnode::abstract( G.accept(Lexer,Source), depth );
+    if( Tree )
     {
-        int depth = 0;
-        Tree = syntax::xnode::abstract(Tree,depth);
-        if(Tree)
-        {
-            auto_ptr<syntax::xnode> tree(Tree);
-            tree->graphviz("tree.dot");
-            system("dot -Tpng -otree.png tree.dot");
-        }
-        else
-            std::cerr << "Accepted Empty Tree" << std::endl;
+        auto_ptr<syntax::xnode> tree(Tree);
+        tree->graphviz("tree.dot");
+        system("dot -Tpng -otree.png tree.dot");
     }
+    else
+        std::cerr << "Accepted Empty Tree" << std::endl;
+    
     
     
 }

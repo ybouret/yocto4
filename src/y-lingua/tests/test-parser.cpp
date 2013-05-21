@@ -15,12 +15,17 @@ namespace
     public:
         explicit MyParser() : parser( "Lists", "main")
         {
-            syntax::terminal & LBRACK = terminal("LPAREN", "\\[", syntax::is_discardable);
-            syntax::terminal & RBRACK = terminal("LBRACK", "\\]", syntax::is_discardable);
+            syntax::terminal & LBRACK = jettison("LPAREN", "\\[");
+            syntax::terminal & RBRACK = jettison("LBRACK", "\\]");
             syntax::terminal & ID     = terminal("ID", "[:alpha:][:word:]*");
             syntax::terminal & INT    = terminal("INT", "[:digit:]+");
-            syntax::terminal & COMMA  = terminal("COMMA", ",", syntax::is_discardable);
-            syntax::terminal & STOP   = terminal("STOP",  ";", syntax::is_discardable);
+            syntax::terminal & COMMA  = jettison("COMMA", ",");
+            syntax::terminal & STOP   = jettison("STOP",  ";");
+            
+            lexical::scanner & COM1   = declare("COM1");
+            scanner.call("COM1", "//", this, & MyParser:: EnterCom1);
+            Y_LEX_DISCARD(COM1, "DOT", ".");
+            COM1.back("[:endl:]", this, & MyParser:: LeaveCom1 );
             
             Y_LEX_DISCARD(scanner, "BLANK", "[:blank:]");
             Y_LEX_NO_ENDL(scanner);
@@ -42,7 +47,7 @@ namespace
             syntax::repeating & EXTRA_ITEMS = rep("EXTRA_ITEMS", OPT_ITEM,0);
             LIST += EXTRA_ITEMS;
             LIST += RBRACK;
-
+            
             
             syntax::aggregate & DECL = agg("DECL", syntax::is_merging_one);
             DECL += LIST;
@@ -52,9 +57,20 @@ namespace
             set_root( STAT );
             
         }
-
+        
         virtual ~MyParser() throw()
         {
+        }
+        
+        inline void EnterCom1( const token &)
+        {
+            std::cerr << "<Comment>" << std::endl;
+        }
+        
+        inline void LeaveCom1( const token &)
+        {
+            std::cerr << "</Comment>" << std::endl;
+            ++line;
         }
         
     private:
@@ -67,21 +83,20 @@ YOCTO_UNIT_TEST_IMPL(parser)
     vfs &fs = local_fs::instance();
     if(fs.is_reg("tree.dot" )) fs.remove_file("tree.dot");
     if(fs.is_reg("tree.png"))  fs.remove_file("tree.png");
-
+    
     MyParser Parser;
     source   Source;
     Source.attach_stdin();
+    auto_ptr<syntax::xnode> tree( Parser(Source) );
     
-    if( Parser(Source) )
+    if( tree.is_valid() )
     {
-        if( Parser.tree.is_valid() )
-        {
-            Parser.tree->graphviz("tree.dot");
-            system("dot -Tpng -otree.png tree.dot");
-        }
-        else
-            std::cerr << "Empty Parse Tree" << std::endl;
+        tree->graphviz("tree.dot");
+        system("dot -Tpng -otree.png tree.dot");
     }
+    else
+        std::cerr << "Empty Parse Tree" << std::endl;
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

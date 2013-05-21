@@ -62,7 +62,10 @@ namespace yocto
             void set_root( const syntax::rule &r );  //!< changing root
             
             //! convert root to tree
-            bool accept(lexer &Lexer, source &Source, syntax::xnode * &Tree);
+            /**
+             throw upon error
+             */
+            syntax::xnode *accept(lexer &Lexer, source &Source );
             
             syntax::rule & operator[]( const string &id );
             syntax::rule & operator[]( const char   *id );
