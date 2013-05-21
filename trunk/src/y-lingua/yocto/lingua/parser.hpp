@@ -20,11 +20,12 @@ namespace yocto
             //! lexer reset and tree.reset()
             virtual void reset() throw();
 
-            //! create a lexer rule and a grammar terminal
+            //! create a lexer rule and a REGULAR grammar terminal
             syntax::terminal & terminal( const string &id, const string &expr, syntax::node_property ppty = syntax::is_regular);
-            
-            //! create a lexer rule and a grammar terminal
+        
+            //! create a lexer rule and a REGULAR grammar terminal
             syntax::terminal & terminal( const char *id, const char *expr, syntax::node_property ppty = syntax::is_regular);
+        
             
             bool operator()( source &src );
             

@@ -34,7 +34,8 @@ namespace yocto
 name(id), \
 rules(), \
 items(), \
-__eof("EOF")
+__eof("EOF"), \
+opidx(0)
         
         grammar:: grammar( const string &id ) :
         Y_LINGUA_GRAMMAR_CTOR()
@@ -142,6 +143,13 @@ __eof("EOF")
             const string ID(id);
             return alt(ID);
         }
+        
+        syntax::alternative & grammar:: alt()
+        {
+            const string id = vformat("alt#%d", ++opidx);
+            return alt(id);
+        }
+
         
         ////////////////////////////////////////////////////////////////////////
         //
