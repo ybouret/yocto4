@@ -57,7 +57,7 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     syntax::terminal     &STOP  = G.term("STOP");
     syntax::terminal     &MODIF = G.term("MODIF");
     DECL += ALT1;
-    DECL += ( G.opt("MODIF?", MODIF ) );
+    DECL += ( G.opt( MODIF ) );
     DECL += STOP;
     
     syntax::repeating &STAT = G.rep( "STAT", DECL, 0);

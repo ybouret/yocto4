@@ -42,17 +42,12 @@ namespace yocto
             //! new alternative
             syntax::alternative &alt( const char   *id );
             
-            //! new optional
-            syntax::optional &opt( const string &id, syntax::rule &r);
-            
-            //! new optional
-            syntax::optional &opt( const char *  id, syntax::rule &r);
-
+            //! new optional, automatic naming
+            syntax::optional &opt(syntax::rule &r);
+          
             //! new repeating
             syntax::repeating &rep( const string &id, syntax::rule &r, size_t at_least);
-
-            //! new repeating
-            syntax::repeating &rep( const char *id, syntax::rule &r, size_t at_least);
+            syntax::repeating &rep( const char   *id, syntax::rule &r, size_t at_least);
 
             void set_root( const string &rule_id );  //!< changing root
             void set_root( const char   *rule_id );  //!< changing root
