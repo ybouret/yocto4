@@ -560,6 +560,10 @@ namespace yocto
                             case '+':
                             case '*':
                             case '?':
+                            case '(':
+                            case ')':
+                            case '|':
+                            case '"':
                                 break;
                                 
                                 //-------------------------------------------------
