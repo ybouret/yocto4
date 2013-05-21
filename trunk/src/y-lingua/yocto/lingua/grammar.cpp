@@ -149,7 +149,7 @@ opidx(0)
             const string id = vformat("alt#%d", ++opidx);
             return alt(id);
         }
-
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -163,7 +163,7 @@ opidx(0)
                 throw exception("{%s}: not owning rule '%s'", name.c_str(), p.label.c_str());
             }
         }
-
+        
         syntax::optional &grammar:: opt( syntax::rule &p)
         {
             check_ownership(p);
@@ -172,8 +172,8 @@ opidx(0)
             add(r);
             return *r;
         }
-
-
+        
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -193,7 +193,7 @@ opidx(0)
             const string ID(id);
             return rep(ID,p,at_least);
         }
-      
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // access to named rules
@@ -212,7 +212,7 @@ opidx(0)
             const string ID(id);
             return (*this)[ID];
         }
-
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // grammar parsing
@@ -221,7 +221,7 @@ opidx(0)
         
         syntax::xnode *grammar:: accept(lexer &Lexer, source &Source)
         {
-
+            
             if( rules.size <= 0)
                 throw exception("{%s}.parse(no rules)", name.c_str());
             
@@ -249,11 +249,23 @@ opidx(0)
             // something went wrong
             //==================================================================
             assert(0==Tree);
-            
+            std::cerr << std::endl << "---- NOT MATCHING" << std::endl;
+            if(Lexer.is_active(Source))
+            {
+                std::cerr << "Lexemes: " << std::endl;
+                for( const lexeme *lx = Lexer.peek(); lx; lx=lx->next)
+                {
+                    std::cerr << "\t'" << lx->label << "'=" << *lx << std::endl;
+                }
+            }
+            else
+            {
+                std::cerr << "No Lexeme" << std::endl;
+            }
             throw exception("not matching");
         }
         
-              
+        
     }
     
 }

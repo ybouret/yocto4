@@ -67,29 +67,29 @@ namespace yocto
             //------------------------------------------------------------------
             {
                 
-                syntax::aggregate   &GROUP = agg("GROUP");
-                syntax::alternative &CORE  = alt("CORE");
+                syntax::aggregate   & GROUP = agg( "GROUP", syntax::is_merging_one );
+                syntax::alternative & CORE  = alt("CORE");
                 CORE |= RULE_ID;
                 CORE |= EXPR;
                 CORE |= GROUP;
-               
-                syntax::aggregate &ATOM = agg("ATOM", syntax::is_merging_one);
+                
+                syntax::aggregate &ATOM = agg("ATOM",syntax::is_merging_one);
                 ATOM += CORE;
-                ATOM += opt(terminal("ATTR", "[+*?]") );
-               
-                syntax::aggregate &ATOMS = agg("ATOMS", syntax::is_merging_one);
-                ATOMS += ATOM;
-                syntax::aggregate &OPT_ATOM = agg("ALT");
-                OPT_ATOM += PIPE;
-                OPT_ATOM += ATOM;
-                ATOMS += rep("OPT_ATOMS",OPT_ATOM,0);
+                ATOM += opt( terminal("ATTR", "[+?*]"));
+                syntax::repeating &ATOMS = rep("ATOMS",ATOM,1);
+                syntax::aggregate &CONTENT = agg("CONTENT", syntax::is_merging_all);
+                CONTENT += ATOMS;
+                syntax::aggregate &ALT     = agg("ALT");
+                ALT += PIPE;
+                ALT += CONTENT;
+                CONTENT += rep("EXTRA_CONTENT",ALT,0);
                 
                 GROUP += LPAREN;
-                GROUP += ATOMS;
+                GROUP += CONTENT;
                 GROUP += RPAREN;
                 
-                RULE += rep("CONTENT", ATOMS, 1);
-                //RULE += rep("RULE_CONTENT", BODY, 1);
+                RULE += rep("BODY",CONTENT,1);
+                
             }
             //------------------------------------------------------------------
             // end rule
