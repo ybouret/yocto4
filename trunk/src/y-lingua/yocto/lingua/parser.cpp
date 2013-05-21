@@ -5,7 +5,7 @@ namespace yocto
 {
     namespace lingua
     {
-
+        
         parser:: ~parser() throw()
         {
             
@@ -33,32 +33,47 @@ namespace yocto
             Y_LEX_FORWARD(scanner, id, expr);
             return term(id,ppty);
         }
-
+        
         syntax::terminal & parser:: terminal( const char *id, const char *expr, syntax::node_property ppty )
         {
             const string ID(id);
             const string EX(expr);
             return  terminal(ID, EX, ppty);
         }
-
-        void parser:: reset() throw()
+        
+        syntax::terminal & parser:: univocal( const string &id, const string &expr )
         {
-            lexer::reset();
-            tree.release();;
+            return  terminal( id, expr, syntax::is_specialized);
         }
-    
-        bool parser:: operator()( source &src )
+        
+        syntax::terminal & parser:: univocal( const char *id, const char *expr )
         {
-            tree.release();
-            syntax::xnode * root = 0;
-            const bool      ans  = accept(*this, src, root);
+            const string ID(id);
+            const string EX(expr);
+            return univocal(ID, EX);
+        }
+        
+        syntax::terminal & parser:: jettison( const string &id, const string &expr)
+        {
+            return terminal(id, expr, syntax::is_discardable);
+        }
+        
+        syntax::terminal & parser:: jettison( const char *id, const char *expr )
+        {
+            const string ID(id);
+            const string EX(expr);
+            return jettison(ID, EX);
+        }
+        
+        
+        
+        syntax::xnode *parser:: operator()( source &src )
+        {
             int depth = 0;
-            std::cerr << "{" << grammar::name << "}: Abstracting" << std::endl;
-            tree.reset( syntax::xnode::abstract(root,depth) );
-            return ans;
+            return  syntax::xnode::abstract( accept(*this,src),depth);
         }
         
     }
-
+    
 }
 

@@ -219,13 +219,13 @@ opidx(0)
         //
         ////////////////////////////////////////////////////////////////////////
         
-        bool grammar:: accept(lexer &Lexer, source &Source, syntax::xnode * &Tree)
+        syntax::xnode *grammar:: accept(lexer &Lexer, source &Source)
         {
-            assert(0==Tree);
+
             if( rules.size <= 0)
                 throw exception("{%s}.parse(no rules)", name.c_str());
             
-            
+            syntax::xnode *Tree = 0;
             //==================================================================
             // try to accept root node
             //==================================================================
@@ -243,13 +243,12 @@ opidx(0)
                                     s.c_str() );
                 }
                 std::cerr << "[[ SUCCESS ]]" << std::endl;
-                root.forget();
-                return true;
+                return root.yield(); // may be null => empty
             }
             //==================================================================
             // something went wrong
             //==================================================================
-            
+            assert(0==Tree);
             
             throw exception("not matching");
         }

@@ -15,19 +15,26 @@ namespace yocto
             virtual ~parser() throw();
             
             lexical::scanner         &scanner; //!< first, used to compile regex
-            auto_ptr<syntax::xnode>   tree;    //!< last parsed node
             
-            //! lexer reset and tree.reset()
-            virtual void reset() throw();
-
             //! create a lexer rule and a REGULAR grammar terminal
             syntax::terminal & terminal( const string &id, const string &expr, syntax::node_property ppty = syntax::is_regular);
         
             //! create a lexer rule and a REGULAR grammar terminal
             syntax::terminal & terminal( const char *id, const char *expr, syntax::node_property ppty = syntax::is_regular);
         
+            //! crate a lexer rule and a SPECIALIZED grammar terminal
+            syntax::terminal & univocal( const string &id, const string &expr );
             
-            bool operator()( source &src );
+            //! crate a lexer rule and a SPECIALIZED grammar terminal(drop content)
+            syntax::terminal & univocal( const char   *id, const char   *expr );
+            
+            //! create a lexer rule and a DISCARDABLE grammar terminal (no semantic role)
+            syntax::terminal & jettison( const string &id, const string &expr);
+            
+            //! create a lexer rule and a DISCARDABLE grammar terminal (no semantic role)
+            syntax::terminal & jettison( const char *id, const char *expr );
+            
+            syntax::xnode *operator()( source &src );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);
