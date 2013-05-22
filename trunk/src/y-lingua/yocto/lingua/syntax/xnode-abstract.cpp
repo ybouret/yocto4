@@ -8,7 +8,7 @@ namespace yocto
     {
         namespace syntax
         {
-#define Y_XNODE_SHOW 1
+#define Y_XNODE_SHOW 0
             
 #if defined(Y_XNODE_SHOW) && (Y_XNODE_SHOW==1)
 #define Y_XNODE_AST(CODE) do { CODE; } while(false)
@@ -57,7 +57,7 @@ namespace yocto
                     //==========================================================
                     // AST non terminal node
                     //==========================================================
-                    Y_XNODE_AST(__indent(depth)); std::cerr << "[XNODE]: " << node->label << " / #children=" << node->children().size << std::endl;
+                    Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: " << node->label << " / #children=" << node->children().size << std::endl);
                     //----------------------------------------------------------
                     // recursive cleanup
                     //----------------------------------------------------------
@@ -83,7 +83,7 @@ namespace yocto
                                     assert(1==sub->children().size);
                                     
                                 case is_merging_all:
-                                    Y_XNODE_AST(__indent(depth+1)); std::cerr << sub->label << " ==> " << node->label << std::endl;
+                                    Y_XNODE_AST(__indent(depth+1); std::cerr << sub->label << " ==> " << node->label << std::endl);
                                     assert(!sub->terminal);
                                     assert(sub->children().size>0);
                                     while( sub->children().size )

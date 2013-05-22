@@ -185,7 +185,7 @@ history()
                 if( !scan )
                     throw exception("%u: lexer[%s] no scanner", unsigned(line), name.c_str());
                
-                std::cerr << "[" << name << "]<" << scan->name << ">" << std::endl;
+                //std::cerr << "[" << name << "]<" << scan->name << ">" << std::endl;
                 
                 if( cache.size > 0 )
                     return cache.pop_front();

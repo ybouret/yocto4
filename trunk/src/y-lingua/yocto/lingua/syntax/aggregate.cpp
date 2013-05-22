@@ -19,7 +19,7 @@ namespace yocto
             Y_SYNTAX_MATCH_TYPE aggregate:: match(Y_SYNTAX_MATCH_ARGS)
             {
                 check(Tree);
-                std::cerr << "?AGG '" << label << "'" << std::endl;
+                //std::cerr << "?AGG '" << label << "'" << std::endl;
                 //==============================================================
                 // sanity check
                 //==============================================================
@@ -47,7 +47,7 @@ namespace yocto
                         //--------------------------------------------------
                         protection.forget();
                         xnode::restore(Lexer, aggTree);
-                        std::cerr << "-AGG '" << label << "'" << std::endl;
+                        //std::cerr << "-AGG '" << label << "'" << std::endl;
                         return false;
                     }
                 }
@@ -55,7 +55,7 @@ namespace yocto
                 //==============================================================
                 // grow the tree
                 //==============================================================
-                std::cerr << "+AGG '" << label << "'" << std::endl;
+                //std::cerr << "+AGG '" << label << "'" << std::endl;
                 protection.forget();
                 grow(Tree,aggTree);
                 return true;
