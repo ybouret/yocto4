@@ -34,7 +34,7 @@ namespace yocto
             //! create a lexer rule and a DISCARDABLE grammar terminal (no semantic role)
             syntax::terminal & jettison( const char *id, const char *expr );
             
-            syntax::xnode *operator()( source &src );
+            virtual syntax::xnode *run( source &src );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);

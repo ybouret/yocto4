@@ -17,7 +17,7 @@ YOCTO_UNIT_TEST_IMPL(cc)
     source   src;
     src.attach_stdin();
     
-    auto_ptr<syntax::xnode> root( compiler::ast(cc(src)) );
+    auto_ptr<syntax::xnode> root( cc.run(src) );
     root->graphviz("tree.dot");
     system("dot -Tpng -otree.png tree.dot");
     
