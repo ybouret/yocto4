@@ -38,7 +38,7 @@ namespace yocto
             {
                 check(Tree);
                 assert(handle);
-                std::cerr << "?OPT@" << label << ": " << handle->label << std::endl;
+                //std::cerr << "?OPT@" << label << ": " << handle->label << std::endl;
                 xnode *subTree = 0;
                 if( handle->match(Lexer, Source, subTree) && subTree != 0)
                 {
@@ -65,7 +65,7 @@ namespace yocto
             {
                 check(Tree);
                 assert(handle);
-                std::cerr << "?REP@" << label << ">=" << at_least << ": " << handle->label << std::endl;
+                //std::cerr << "?REP@" << label << ">=" << at_least << ": " << handle->label << std::endl;
         
                 xnode *           rep = xnode::create(label, 0, syntax::is_merging_all );
                 auto_ptr<xnode> p(rep);
@@ -79,14 +79,14 @@ namespace yocto
                 
                 if(count>=at_least)
                 {
-                    std::cerr << "+REP@" << label << " #" << count << " " << handle->label << std::endl;
+                    //std::cerr << "+REP@" << label << " #" << count << " " << handle->label << std::endl;
                     p.forget();
                     grow(Tree,rep);
                     return true;
                 }
                 else
                 {
-                    std::cerr << "-REP@" << label << " #" << count << " " << handle->label << std::endl;
+                    //std::cerr << "-REP@" << label << " #" << count << " " << handle->label << std::endl;
                     xnode::restore(Lexer, p.yield());
                     return false;
                 }

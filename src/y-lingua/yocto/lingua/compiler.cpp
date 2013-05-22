@@ -106,6 +106,120 @@ namespace yocto
         void compiler:: do_nothing(const token &) throw() {}
         void compiler:: do_newline(const token &) throw() { ++line; }
         
+        namespace
+        {
+            ////////////////////////////////////////////////////////////////////
+            // bottom up coupling
+            ////////////////////////////////////////////////////////////////////
+            static inline
+            syntax::xnode * __merge_groups( syntax::xnode *node ) throw()
+            {
+                assert(node!=0);
+                if( ! node->terminal )
+                {
+                    syntax::xnode::child_list  target;
+                    syntax::xnode::child_list &source = node->children();
+                    const bool is_group = ("GROUP" == node->label);
+                    while( source.size )
+                    {
+                        syntax::xnode *sub = __merge_groups( source.pop_front() );
+                        if( is_group && ("GROUP" == sub->label) )
+                        {
+                            syntax::xnode::child_list &ch = sub->children();
+                            while( ch.size )
+                            {
+                                syntax::xnode *n  = ch.pop_front();
+                                target.push_back(n);
+                                n->parent = node;
+                            }
+                            delete sub;
+                        }
+                        else
+                            target.push_back(sub);
+                    }
+                    target.swap_with(source);
+                }
+                return node;
+            }
+            
+            ////////////////////////////////////////////////////////////////////
+            // GROUP  consecutive coupling
+            ////////////////////////////////////////////////////////////////////
+            static inline
+            syntax::xnode * __couple_groups( syntax::xnode *node ) throw()
+            {
+                assert(node);
+                if( !node->terminal )
+                {
+                    syntax::xnode::child_list  target;
+                    syntax::xnode::child_list &source = node->children();
+                    while( source.size )
+                    {
+                        syntax::xnode *sub = __couple_groups( source.pop_front() );
+                        syntax::xnode *prv = target.tail;
+                        if( "GROUP" == sub->label && prv != 0 && "GROUP" == prv->label )
+                        {
+                            syntax::xnode::child_list &ch = sub->children();
+                            while( ch.size )
+                            {
+                                syntax::xnode *n  = ch.pop_front();
+                                prv->children().push_back(n);
+                                n->parent = prv;
+                            }
+                            delete sub;
+                        }
+                        else
+                            target.push_back(sub);
+                    }
+                    source.swap_with(target);
+                }
+                return node;
+            }
+            
+            ////////////////////////////////////////////////////////////////////
+            // ALT bottom-up coupling
+            ////////////////////////////////////////////////////////////////////
+            static inline
+            syntax::xnode * __alt_merge( syntax::xnode *node ) throw()
+            {
+                if( !node->terminal )
+                {
+                    syntax::xnode::child_list  target;
+                    syntax::xnode::child_list &source = node->children();
+                    const bool is_alt = ( "ALT" == node->label );
+                    while( source.size )
+                    {
+                        syntax::xnode *sub = __alt_merge( source.pop_front() );
+                        if( is_alt && "ALT" == sub->label)
+                        {
+                            syntax::xnode::child_list &ch = sub->children();
+                            while(ch.size)
+                            {
+                                syntax::xnode *n = ch.pop_front();
+                                target.push_back(n);
+                                n->parent = node;
+                            }
+                            delete sub;
+                        }
+                        else
+                            target.push_back(sub);
+                    }
+                    
+                    target.swap_with(source);
+                    
+                }
+                return node;
+            }
+            
+            
+        }
+        
+        syntax::xnode * compiler:: ast( syntax::xnode *node )
+        {
+            assert(node);
+            return __couple_groups(node);
+        }
+        
     }
     
 }

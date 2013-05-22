@@ -16,6 +16,9 @@ namespace yocto
             explicit compiler();
             virtual ~compiler() throw();
             
+            static
+            syntax::xnode *ast( syntax::xnode *node);
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
             void do_nothing(const token &) throw();
