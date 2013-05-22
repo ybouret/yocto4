@@ -68,7 +68,7 @@ namespace yocto
             // rule content
             //------------------------------------------------------------------
             {
-                
+#if 0
                 syntax::aggregate   & GROUP = agg( "GROUP", syntax::is_merging_one );
                 syntax::alternative & CORE  = alt("CORE");
                 CORE |= RULE_ID;
@@ -94,13 +94,13 @@ namespace yocto
                 GROUP += RPAREN;
                 
                 RULE += rep("BODY",CONTENT,1);
+#endif
                 
             }
             //------------------------------------------------------------------
             // end rule
             //------------------------------------------------------------------
             RULE += STOP;
-            
             
             
             set_root( rep("RULES",RULE,1) );
@@ -111,143 +111,168 @@ namespace yocto
         void compiler:: do_nothing(const token &) throw() {}
         void compiler:: do_newline(const token &) throw() { ++line; }
         
-        namespace
+        
+        //======================================================================
+        // contract consecutive groups on the same level
+        //======================================================================
+        static inline
+        syntax::xnode * __contract_groups( syntax::xnode *node ) throw()
         {
-            ////////////////////////////////////////////////////////////////////
-            // bottom up coupling
-            ////////////////////////////////////////////////////////////////////
-            static inline
-            syntax::xnode * __merge_groups( syntax::xnode *node ) throw()
+            assert(node);
+            if(!node->terminal)
             {
-                assert(node!=0);
-                if( ! node->terminal )
+                syntax::xnode::child_list &source = node->children();
+                syntax::xnode::child_list  target;
+                while(source.size)
                 {
-                    syntax::xnode::child_list  target;
-                    syntax::xnode::child_list &source = node->children();
-                    const bool is_group = ("GROUP" == node->label);
-                    while( source.size )
+                    syntax::xnode *sub = __contract_groups( source.pop_front() );
+                    syntax::xnode *prv = target.tail;
+                    if( "GROUP" == sub->label && prv && "GROUP" == prv->label )
                     {
-                        syntax::xnode *sub = __merge_groups( source.pop_front() );
-                        if( is_group && ("GROUP" == sub->label) )
+                        syntax::xnode::child_list &ch = sub->children();
+                        while(ch.size)
                         {
-                            syntax::xnode::child_list &ch = sub->children();
-                            while( ch.size )
-                            {
-                                syntax::xnode *n  = ch.pop_front();
-                                target.push_back(n);
-                                n->parent = node;
-                            }
-                            delete sub;
+                            syntax::xnode *n = ch.pop_front();
+                            prv->children().push_back(n);
+                            n->parent = prv;
                         }
-                        else
-                            target.push_back(sub);
+                        delete sub;
                     }
-                    target.swap_with(source);
+                    else
+                        target.push_back(sub);
                 }
-                return node;
+                source.swap_with(target);
+            }
+            return node;
+        }
+        
+        //======================================================================
+        // fusion group within a group
+        //======================================================================
+        static inline
+        syntax::xnode * __assemble_groups( syntax::xnode *node ) throw()
+        {
+            assert(node);
+            
+            if( !node->terminal )
+            {
+                syntax::xnode::child_list &source = node->children();
+                syntax::xnode::child_list  target;
+                const bool is_group = "GROUP" == node->label;
+                while(source.size)
+                {
+                    syntax::xnode *sub = __assemble_groups( source.pop_front() );
+                    if( is_group && "GROUP" == sub->label )
+                    {
+                        syntax::xnode::child_list &ch = sub->children();
+                        while(ch.size)
+                        {
+                            syntax::xnode *n = ch.pop_front();
+                            target.push_back(n);
+                            n->parent = node;
+                        }
+                        delete sub;
+                    }
+                    else
+                        target.push_back(sub);
+                }
+                target.swap_with(source);
             }
             
-            ////////////////////////////////////////////////////////////////////
-            // GROUP  consecutive coupling
-            ////////////////////////////////////////////////////////////////////
-            static inline
-            syntax::xnode * __couple_groups( syntax::xnode *node ) throw()
+            return node;
+        }
+        
+        //======================================================================
+        // ALT rewriting
+        //======================================================================
+        static inline void __xnode_kill( syntax::xnode *node ) throw()
+        {
+            delete node;
+        }
+        
+        
+        static inline void __enhance( syntax::xnode *alt, const string &group_label )
+        {
+            assert(alt->label == "ALT" );
+            syntax::xnode::child_list &source = alt->children();
+            syntax::xnode::child_list  target;
+            
+            while(source.size&&source.head->label != "ALT")
             {
-                assert(node);
-                if( !node->terminal )
-                {
-                    syntax::xnode::child_list  target;
-                    syntax::xnode::child_list &source = node->children();
-                    while( source.size )
-                    {
-                        syntax::xnode *sub = __couple_groups( source.pop_front() );
-                        syntax::xnode *prv = target.tail;
-                        if( "GROUP" == sub->label && prv != 0 && "GROUP" == prv->label )
-                        {
-                            syntax::xnode::child_list &ch = sub->children();
-                            while( ch.size )
-                            {
-                                syntax::xnode *n  = ch.pop_front();
-                                prv->children().push_back(n);
-                                n->parent = prv;
-                            }
-                            delete sub;
-                        }
-                        else
-                            target.push_back(sub);
-                    }
-                    source.swap_with(target);
-                }
-                return node;
+                target.push_back( source.pop_front() );
             }
             
-            ////////////////////////////////////////////////////////////////////
-            // ALT bottom-up coupling
-            ////////////////////////////////////////////////////////////////////
-            static inline
-            syntax::xnode * __alt_merge( syntax::xnode *node ) throw()
+            if( target.size > 1 && source.size > 0)
             {
-                if( !node->terminal )
+                try
                 {
-                    syntax::xnode::child_list  target;
-                    syntax::xnode::child_list &source = node->children();
-                    const bool is_alt = ( "ALT" == node->label );
-                    while( source.size )
+                    syntax::xnode * g = syntax::xnode::create(group_label, 0, syntax::is_merging_one);
+                    source.push_front(g);
+                    g->parent = alt;
+                    while(target.size)
                     {
-                        syntax::xnode *sub = __alt_merge( source.pop_front() );
-                        if( is_alt && "ALT" == sub->label)
-                        {
-                            syntax::xnode::child_list &ch = sub->children();
-                            while(ch.size)
-                            {
-                                syntax::xnode *n = ch.pop_front();
-                                target.push_back(n);
-                                n->parent = node;
-                            }
-                            delete sub;
-                        }
-                        else
-                            target.push_back(sub);
+                        g->children().push_back( target.pop_front() );
+                        g->children().tail->parent = g;
                     }
-                    
-                    target.swap_with(source);
-                    
                 }
-                return node;
+                catch(...)
+                {
+                    target.delete_with( __xnode_kill );
+                    throw;
+                }
             }
-            
-            static inline
-            syntax::xnode * __rewrite( syntax::xnode *node ) throw()
+            else
             {
-                if( !node->terminal )
-                {
-                    syntax::xnode::child_list &source = node->children();
-                    syntax::xnode::child_list  target;
-                    while(source.size)
-                    {
-                        target.push_back( __rewrite(source.pop_front() ) );
-                    }
-                    if( target.tail->label == "ALT")
-                    {
-                        syntax::xnode *alt = target.pop_back();
-                        assert(target.size>0);
-                        syntax::xnode *sub = target.pop_back();
-                        sub->parent = alt;
-                        alt->children().push_front(sub);
-                        target.push_back(alt);
-                    }
-                    target.swap_with(source);
-                }
-                return node;
+                // doesn't need to group
+                while( target.size )
+                    source.push_front( target.pop_back() );
             }
             
         }
         
-        syntax::xnode * compiler:: ast( syntax::xnode *node )
+        static inline
+        syntax:: xnode * __rewrite( syntax::xnode *node, const string &group_label )
         {
             assert(node);
-            return __alt_merge(__rewrite(__merge_groups(__couple_groups(node))));
+            if( !node->terminal )
+            {
+                syntax::xnode::child_list &source = node->children();
+                syntax::xnode::child_list  target;
+                try {
+                    
+                    while(source.size)
+                    {
+                        target.push_back( __rewrite( source.pop_front(), group_label) );
+                    }
+                    
+                    if( target.tail && "ALT" == target.tail->label )
+                    {
+                        __enhance(target.tail,group_label);
+                    }
+                    
+                    target.swap_with(source);
+                }
+                catch(...)
+                {
+                    target.delete_with( __xnode_kill );
+                    delete node;
+                    throw;
+                }
+            }
+            
+            return node;
         }
+        
+        syntax::xnode * compiler::run( source &src )
+        {
+            //const string &group_label = (*this)["GROUP"].label;
+            
+            syntax::xnode *node = parser::run(src);
+            return node;
+        }
+        
+        
+        
         
     }
     

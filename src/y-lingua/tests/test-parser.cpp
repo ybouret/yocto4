@@ -87,7 +87,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
     MyParser Parser;
     source   Source;
     Source.attach_stdin();
-    auto_ptr<syntax::xnode> tree( Parser(Source) );
+    auto_ptr<syntax::xnode> tree( Parser.run(Source) );
     
     if( tree.is_valid() )
     {

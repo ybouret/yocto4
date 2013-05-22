@@ -67,11 +67,12 @@ namespace yocto
         
         
         
-        syntax::xnode *parser:: operator()( source &src )
+        syntax::xnode *parser:: run( source &src )
         {
             int depth = 0;
             return  syntax::xnode::abstract( accept(*this,src),depth);
         }
+        
         
     }
     

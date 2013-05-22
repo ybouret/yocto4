@@ -110,7 +110,7 @@ YOCTO_UNIT_TEST_IMPL(json)
     source src;
     src.attach_stdin();
     
-    auto_ptr<syntax::xnode> root( json(src) );
+    auto_ptr<syntax::xnode> root( json.run(src) );
     assert( root.is_valid() );
     root->graphviz("tree.dot");
     system("dot -Tpng -otree.png tree.dot");
