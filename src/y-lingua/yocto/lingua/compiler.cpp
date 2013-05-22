@@ -21,9 +21,11 @@ namespace yocto
             syntax::terminal & COLUMN  = jettison("COLUMN", ":");
             syntax::terminal & STOP    = jettison("STOP",";");
             syntax::terminal & EXPR    = terminal("EXPR", "[:cstring:]" );
+            syntax::terminal & CHAR    = terminal("CHAR","'.'");
             syntax::terminal & LPAREN  = jettison("LPAREN", "\\(");
             syntax::terminal & RPAREN  = jettison("RPAREN", "\\)");
             syntax::terminal & PIPE    = jettison("PIPE", "\\|");
+            syntax::terminal & CODE    = terminal("CODE","@[:word:]+");
             
             // Call C++ comment
             scanner.call(CppComment, "//",     this, &compiler::do_nothing);
@@ -71,11 +73,14 @@ namespace yocto
                 syntax::alternative & CORE  = alt("CORE");
                 CORE |= RULE_ID;
                 CORE |= EXPR;
+                CORE |= CHAR;
                 CORE |= GROUP;
                 
                 syntax::aggregate &ATOM = agg("ATOM",syntax::is_merging_one);
                 ATOM += CORE;
                 ATOM += opt( terminal("ATTR", "[+?*]"));
+                ATOM += opt( CODE );
+                
                 syntax::repeating &ATOMS = rep("ATOMS",ATOM,1);
                 syntax::aggregate &CONTENT = agg("CONTENT", syntax::is_merging_all);
                 CONTENT += ATOMS;
@@ -211,13 +216,37 @@ namespace yocto
                 return node;
             }
             
+            static inline
+            syntax::xnode * __rewrite( syntax::xnode *node ) throw()
+            {
+                if( !node->terminal )
+                {
+                    syntax::xnode::child_list &source = node->children();
+                    syntax::xnode::child_list  target;
+                    while(source.size)
+                    {
+                        target.push_back( __rewrite(source.pop_front() ) );
+                    }
+                    if( target.tail->label == "ALT")
+                    {
+                        syntax::xnode *alt = target.pop_back();
+                        assert(target.size>0);
+                        syntax::xnode *sub = target.pop_back();
+                        sub->parent = alt;
+                        alt->children().push_front(sub);
+                        target.push_back(alt);
+                    }
+                    target.swap_with(source);
+                }
+                return node;
+            }
             
         }
         
         syntax::xnode * compiler:: ast( syntax::xnode *node )
         {
             assert(node);
-            return __couple_groups(node);
+            return __alt_merge(__rewrite(__merge_groups(__couple_groups(node))));
         }
         
     }
