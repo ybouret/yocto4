@@ -85,7 +85,7 @@ namespace yocto
                 ATOMS += SEQUENCE;
                 syntax::aggregate &ALT     = agg("ALT");
                 ALT += PIPE;
-                ALT += SEQUENCE;
+                ALT += ATOMS;
                 ATOMS += rep("EXTRA_CONTENT",ALT,0);
                 
                 GROUP += LPAREN;
@@ -93,7 +93,7 @@ namespace yocto
                 GROUP += RPAREN;
                 
                 RULE += rep("BODY",ATOMS,1);
-                                               
+                
             }
             //------------------------------------------------------------------
             // end rule
@@ -180,94 +180,13 @@ namespace yocto
             return node;
         }
         
-        //======================================================================
-        // ALT rewriting
-        //======================================================================
-        static inline void __xnode_kill( syntax::xnode *node ) throw()
-        {
-            delete node;
-        }
-        
-        
-        static inline void __enhance( syntax::xnode *alt, const string &group_label )
-        {
-            assert(alt->label == "ALT" );
-            syntax::xnode::child_list &source = alt->children();
-            syntax::xnode::child_list  target;
-            
-            while(source.size&&source.head->label != "ALT")
-            {
-                target.push_back( source.pop_front() );
-            }
-            
-            if( target.size > 1 && source.size > 0)
-            {
-                try
-                {
-                    syntax::xnode * g = syntax::xnode::create(group_label, 0, syntax::is_merging_one);
-                    source.push_front(g);
-                    g->parent = alt;
-                    while(target.size)
-                    {
-                        g->children().push_back( target.pop_front() );
-                        g->children().tail->parent = g;
-                    }
-                }
-                catch(...)
-                {
-                    target.delete_with( __xnode_kill );
-                    throw;
-                }
-            }
-            else
-            {
-                // doesn't need to group
-                while( target.size )
-                    source.push_front( target.pop_back() );
-            }
-            
-        }
-        
-        static inline
-        syntax:: xnode * __rewrite( syntax::xnode *node, const string &group_label )
-        {
-            assert(node);
-            if( !node->terminal )
-            {
-                syntax::xnode::child_list &source = node->children();
-                syntax::xnode::child_list  target;
-                try {
-                    
-                    while(source.size)
-                    {
-                        target.push_back( __rewrite( source.pop_front(), group_label) );
-                    }
-                    
-                    if( target.tail && "ALT" == target.tail->label )
-                    {
-                        __enhance(target.tail,group_label);
-                    }
-                    
-                    target.swap_with(source);
-                }
-                catch(...)
-                {
-                    target.delete_with( __xnode_kill );
-                    delete node;
-                    throw;
-                }
-            }
-            
-            return node;
-        }
         
         syntax::xnode * compiler::run( source &src )
         {
-            //const string &group_label = (*this)["GROUP"].label;
             
             syntax::xnode *node = parser::run(src);
-            return node;
-            //return rewrite(node);
+            //return node;
+            return rewrite(node);
         }
         
         

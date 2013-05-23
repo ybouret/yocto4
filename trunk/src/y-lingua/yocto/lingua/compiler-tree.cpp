@@ -17,51 +17,48 @@ namespace yocto
             }
         }
         
-        syntax::xnode *compiler::rewrite( syntax::xnode *node )
+        syntax::xnode *compiler::rewrite( syntax::xnode *root )
         {
-            assert(node);
-            grammar      &G = *this;
-            const string &atoms_label = G["ATOMS"].label;
-            
-            if( ! node->terminal )
+            assert(root);
+            if( ! root->terminal )
             {
+                syntax::xnode::child_list &children = root->children();
+                assert(children.size>0);
                 syntax::xnode::child_list  target;
-                syntax::xnode::child_list &source = node->children();
                 
-                //! recursive call
-                while(source.size)
-                {
-                    target.push_back( rewrite(source.pop_front()) );
-                }
+                //--------------------------------------------------------------
+                //-- recursive call
+                //--------------------------------------------------------------
+                while(children.size) target.push_back( rewrite(children.pop_front()) );
+                target.swap_with(children);
                 
-                assert(target.size>0);
-                if( "ALT" == target.tail->label )
+                //--------------------------------------------------------------
+                //-- analysis
+                //--------------------------------------------------------------
+                assert(children.size>0);
+                while(children.size)
                 {
-                    std::cerr << "Effective Rewrite with #target=" << target.size << std::endl;
-                    //----------------------------------------------------------
-                    // rewriting
-                    //----------------------------------------------------------
-                    assert(0==source.size);
-                    source.push_front( target.pop_back() );
-                    syntax::xnode *alt = source.tail;
-                    assert(target.size>0);
-                    if( target.size > 1 )
+                    syntax::xnode *node = children.pop_front();
+                    if( node->label == "ATOMS" )
                     {
-                        syntax::xnode *atoms = syntax::xnode::create( atoms_label, 0, syntax::is_merging_one);
-                        atoms->parent = alt;
-                        alt->children().push_front(atoms);
-                        __claim(atoms, target);
+                        syntax::xnode::child_list &ch = node->children();
+                        if( ch.tail->label == "ALT" )
+                        {
+                            syntax::xnode *alt = ch.pop_back();
+                            alt->children().push_front(node);
+                            node->parent = alt;
+                            alt->parent = root;
+                            target.push_back(alt);
+                            continue;
+                        }
                     }
-                    else
-                    {
-                        __claim(alt,target);
-                    }
+                    
+                    target.push_back(node);
                 }
-                else
-                    source.swap_with(target);
+                target.swap_with(children);
+                
             }
-            
-            return node;
+            return root;
         }
         
     }

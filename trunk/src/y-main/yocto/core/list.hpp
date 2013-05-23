@@ -194,7 +194,8 @@ namespace yocto
 				}
 				
 			}
-			
+            
+           			
 			//! fetch in 0..size-1
 			inline NODE *fetch( size_t index ) throw()
 			{
@@ -220,6 +221,7 @@ namespace yocto
 				push_front( unlink(node) );
 			}
 			
+            //! replace and return mine
             inline NODE* replace( NODE *mine, NODE *yours ) throw()
             {
                 assert( owns(mine) );
