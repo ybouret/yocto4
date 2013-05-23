@@ -9,6 +9,13 @@ namespace yocto
         namespace syntax
         {
          
+            
+            xnode::child_list::  child_list() throw() {}
+            xnode::child_list:: ~child_list() throw()
+            {
+                while(size) delete pop_back();
+            }
+            
             xnode:: ~xnode() throw()
             {
                 if(terminal)

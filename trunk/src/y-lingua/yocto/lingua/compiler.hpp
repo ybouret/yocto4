@@ -22,7 +22,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
             void do_nothing(const token &) throw();
             void do_newline(const token &) throw();
-            
+            syntax::xnode * rewrite( syntax::xnode *);
         };
         
     }
