@@ -63,9 +63,11 @@ namespace yocto
             //! test if possible supplementary lexemes from source
             bool is_active( source &src );
             
-            //! cache.size > 0
+            //! assume cache.size > 0
             const lexeme *peek() const throw();
             
+            //! assume cache.size > 0
+            const lexeme *last() const throw();
             
             
         private:
