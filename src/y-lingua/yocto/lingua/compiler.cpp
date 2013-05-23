@@ -68,7 +68,6 @@ namespace yocto
             // rule content
             //------------------------------------------------------------------
             {
-#if 0
                 syntax::aggregate   & GROUP = agg( "GROUP", syntax::is_merging_one );
                 syntax::alternative & CORE  = alt("CORE");
                 CORE |= RULE_ID;
@@ -81,21 +80,20 @@ namespace yocto
                 ATOM += opt( terminal("ATTR", "[+?*]"));
                 ATOM += opt( CODE );
                 
-                syntax::repeating &ATOMS = rep("ATOMS",ATOM,1);
-                syntax::aggregate &CONTENT = agg("CONTENT", syntax::is_merging_all);
-                CONTENT += ATOMS;
+                syntax::repeating &SEQUENCE = rep("SEQUENCE",ATOM,1);
+                syntax::aggregate &ATOMS    = agg("ATOMS", syntax::is_merging_one);
+                ATOMS += SEQUENCE;
                 syntax::aggregate &ALT     = agg("ALT");
                 ALT += PIPE;
-                ALT += CONTENT;
-                CONTENT += rep("EXTRA_CONTENT",ALT,0);
+                ALT += SEQUENCE;
+                ATOMS += rep("EXTRA_CONTENT",ALT,0);
                 
                 GROUP += LPAREN;
-                GROUP += CONTENT;
+                GROUP += ATOMS;
                 GROUP += RPAREN;
                 
-                RULE += rep("BODY",CONTENT,1);
-#endif
-                
+                RULE += rep("BODY",ATOMS,1);
+                                               
             }
             //------------------------------------------------------------------
             // end rule
@@ -269,6 +267,7 @@ namespace yocto
             
             syntax::xnode *node = parser::run(src);
             return node;
+            //return rewrite(node);
         }
         
         

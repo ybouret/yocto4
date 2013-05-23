@@ -25,7 +25,14 @@ namespace yocto
             {
             public:
                 
-                typedef core::list_of<xnode> child_list;
+                class child_list : public core::list_of<xnode>
+                {
+                public:
+                    explicit child_list() throw();
+                    virtual ~child_list() throw();
+                private:
+                    YOCTO_DISABLE_COPY_AND_ASSIGN(child_list);
+                };
                 
                 const string &label;  //!< referring to the creating syntax rule
                 xnode        *prev;   //!< for tree/child_list
