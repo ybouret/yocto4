@@ -17,7 +17,7 @@ namespace yocto
             //==================================================================
             // lexer
             //==================================================================
-            syntax::terminal & RULE_ID = terminal("RULE_ID", "[[:alpha:]][:word:]*");
+            syntax::terminal & RULE_ID = terminal("ID", "[[:alpha:]][:word:]*");
             syntax::terminal & COLUMN  = jettison("COLUMN", ":");
             syntax::terminal & STOP    = jettison("STOP",";");
             syntax::terminal & EXPR    = terminal("EXPR", "[:cstring:]" );
@@ -25,7 +25,7 @@ namespace yocto
             syntax::terminal & LPAREN  = jettison("LPAREN", "\\(");
             syntax::terminal & RPAREN  = jettison("RPAREN", "\\)");
             syntax::terminal & PIPE    = jettison("PIPE", "\\|");
-            syntax::terminal & CODE    = terminal("CODE","@[:word:]+");
+            syntax::terminal & CODE    = terminal("CODE","\\[-?$?\\]");
             
             // Call C++ comment
             scanner.call(CppComment, "//",     this, &compiler::do_nothing);
@@ -62,6 +62,7 @@ namespace yocto
             syntax::aggregate &RULE = agg("RULE");
             RULE += RULE_ID;
             RULE += COLUMN;
+            RULE += opt(CODE);
             
             
             //------------------------------------------------------------------
@@ -78,7 +79,6 @@ namespace yocto
                 syntax::aggregate &ATOM = agg("ATOM",syntax::is_merging_one);
                 ATOM += CORE;
                 ATOM += opt( terminal("ATTR", "[+?*]"));
-                ATOM += opt( CODE );
                 
                 syntax::repeating &SEQUENCE = rep("SEQUENCE",ATOM,1);
                 syntax::aggregate &ATOMS    = agg("ATOMS", syntax::is_merging_one);
@@ -109,13 +109,38 @@ namespace yocto
         void compiler:: do_newline(const token &) throw() { ++line; }
         
         
-                
+        
+        static inline
+        syntax::xnode *__cleanup( syntax::xnode *node ) throw()
+        {
+            assert(node);
+            if( ! node->terminal )
+            {
+                syntax::xnode::child_list &source = node->children();
+                syntax::xnode::child_list  target;
+                while(source.size)
+                {
+                    target.push_back( __cleanup( source.pop_front() ) );
+                }
+                target.swap_with(source);
+            }
+            else
+            {
+                if( node->label == "CHAR" || node->label == "EXPR")
+                {
+                    assert(node->lex()->size>=2);
+                    node->lex()->skip();
+                    node->lex()->trim();
+                }
+            }
+            return node;
+        }
         
         syntax::xnode * compiler::run( source &src )
         {
             
             syntax::xnode *node = parser::run(src);
-            return simplify(assemble("ATOMS",assemble("ALT",rewrite(contract_atoms(node)))));
+            return __cleanup(simplify(assemble("ATOMS",assemble("ALT",rewrite(contract_atoms(node))))));
         }
         
         
