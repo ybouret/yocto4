@@ -11,7 +11,7 @@
 #include "yocto/string/conv.hpp"
 #include "yocto/code/utils.hpp"
 
-#define YRX_VERBOSE 1
+#define YRX_VERBOSE 0
 
 #if defined(YRX_VERBOSE) && (YRX_VERBOSE == 1 )
 #define YRX(CODE) do { CODE; } while(false)
