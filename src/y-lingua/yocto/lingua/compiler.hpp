@@ -22,7 +22,11 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
             void do_nothing(const token &) throw();
             void do_newline(const token &) throw();
-            syntax::xnode * rewrite( syntax::xnode *);
+            static syntax::xnode * rewrite( syntax::xnode *) throw();
+            static syntax::xnode * contract_atoms( syntax::xnode *node ) throw();
+            static syntax::xnode * assemble( const char *label, syntax::xnode *node ) throw();
+            static syntax::xnode * simplify( syntax::xnode *node ) throw();
+            
         };
         
     }

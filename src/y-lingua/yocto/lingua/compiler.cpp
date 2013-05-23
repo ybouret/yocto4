@@ -110,83 +110,13 @@ namespace yocto
         void compiler:: do_newline(const token &) throw() { ++line; }
         
         
-        //======================================================================
-        // contract consecutive groups on the same level
-        //======================================================================
-        static inline
-        syntax::xnode * __contract_groups( syntax::xnode *node ) throw()
-        {
-            assert(node);
-            if(!node->terminal)
-            {
-                syntax::xnode::child_list &source = node->children();
-                syntax::xnode::child_list  target;
-                while(source.size)
-                {
-                    syntax::xnode *sub = __contract_groups( source.pop_front() );
-                    syntax::xnode *prv = target.tail;
-                    if( "GROUP" == sub->label && prv && "GROUP" == prv->label )
-                    {
-                        syntax::xnode::child_list &ch = sub->children();
-                        while(ch.size)
-                        {
-                            syntax::xnode *n = ch.pop_front();
-                            prv->children().push_back(n);
-                            n->parent = prv;
-                        }
-                        delete sub;
-                    }
-                    else
-                        target.push_back(sub);
-                }
-                source.swap_with(target);
-            }
-            return node;
-        }
-        
-        //======================================================================
-        // fusion group within a group
-        //======================================================================
-        static inline
-        syntax::xnode * __assemble_groups( syntax::xnode *node ) throw()
-        {
-            assert(node);
-            
-            if( !node->terminal )
-            {
-                syntax::xnode::child_list &source = node->children();
-                syntax::xnode::child_list  target;
-                const bool is_group = "GROUP" == node->label;
-                while(source.size)
-                {
-                    syntax::xnode *sub = __assemble_groups( source.pop_front() );
-                    if( is_group && "GROUP" == sub->label )
-                    {
-                        syntax::xnode::child_list &ch = sub->children();
-                        while(ch.size)
-                        {
-                            syntax::xnode *n = ch.pop_front();
-                            target.push_back(n);
-                            n->parent = node;
-                        }
-                        delete sub;
-                    }
-                    else
-                        target.push_back(sub);
-                }
-                target.swap_with(source);
-            }
-            
-            return node;
-        }
-        
+                
         
         syntax::xnode * compiler::run( source &src )
         {
             
             syntax::xnode *node = parser::run(src);
-            //return node;
-            return rewrite(node);
+            return simplify(assemble("ATOMS",assemble("ALT",rewrite(contract_atoms(node)))));
         }
         
         
