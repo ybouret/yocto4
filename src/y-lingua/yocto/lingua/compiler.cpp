@@ -93,7 +93,6 @@ namespace yocto
                 GROUP += RPAREN;
                 
                 RULE += rep("BODY",ATOMS,1);
-                
             }
             //------------------------------------------------------------------
             // end rule

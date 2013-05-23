@@ -257,12 +257,32 @@ opidx(0)
                 {
                     std::cerr << "\t'" << lx->label << "'=" << *lx << std::endl;
                 }
+                
+                const lexeme *lx_last = Lexer.last(); assert(lx_last);
+                const lexeme *lx_prev = lx_last->prev;
+                if(lx_prev)
+                {
+                    throw exception("%u: {%s} invalid '%s' after '%s'",
+                                    unsigned(lx_last->line),
+                                    name.c_str(),
+                                    lx_last->label.c_str(),
+                                    lx_prev->label.c_str());
+                }
+                else
+                {
+                    throw exception("%u: {%s} invalid '%s'",
+                                    unsigned(lx_last->line),
+                                    name.c_str(),
+                                    lx_last->label.c_str());
+                }
             }
             else
             {
-                std::cerr << "No Lexeme" << std::endl;
+                throw exception("%u: {%s} no lexeme", unsigned(Lexer.line), name.c_str() );
             }
-            throw exception("not matching");
+            
+            
+            
         }
         
         

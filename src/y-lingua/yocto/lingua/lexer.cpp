@@ -171,6 +171,12 @@ history()
             return cache.head;
         }
         
+        const lexeme *lexer:: last() const throw()
+        {
+            assert(cache.size>0);
+            return cache.tail;;
+        }
+        
         void lexer:: unget( lexeme *lx ) throw()
         {
             assert(lx);
