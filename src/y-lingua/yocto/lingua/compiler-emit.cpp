@@ -91,7 +91,7 @@ namespace yocto
                     
                     if( "CHAR" == node->label )
                     {
-                       Insert(db, GTerm::CreateFromChar(node,dict));
+                        Insert(db, GTerm::CreateFromChar(node,dict));
                         return;
                     }
                     
@@ -102,7 +102,7 @@ namespace yocto
                             Collect(db, sub,dict);
                         }
                     }
-
+                    
                 }
                 
             private:
@@ -110,28 +110,54 @@ namespace yocto
             };
             
             
-            class GRule : public object, public counted
+            class GRuleID : public object, public counted
             {
             public:
                 const string name;
                 
-                inline GRule( const string &id ) :
+                inline GRuleID( const string &id ) :
                 name(id)
                 {
                 }
                 
-                virtual ~GRule() throw()
+                virtual ~GRuleID() throw()
                 {
                 }
                 
                 inline const string &key() const throw() { return name; }
                 
-                typedef intrusive_ptr<string,GRule> Ptr;
-                typedef set<string,Ptr>             DB;
+                typedef intrusive_ptr<string,GRuleID> Ptr;
+                typedef set<string,Ptr>              DB;
                 
+                static inline
+                void Collect( DB &db, const syntax::xnode *node )
+                {
+                    assert(node);
+                    if( node->label == "ID")
+                    {
+                        const string id = node->lex()->to_string();
+                        if( ! db.search(id) )
+                        {
+                            const GRuleID::Ptr p( new GRuleID(id) );
+                            if( ! db.insert(p) )
+                                throw exception("GRuleID::DB(unexpected failure)");
+                            std::cerr << "+GRuleID [" << id << "]" << std::endl;
+                        }
+                        return;
+                    }
+                    
+                    if( !node->terminal )
+                    {
+                        for( const syntax::xnode *sub = node->children().head;sub;sub=sub->next)
+                        {
+                            Collect(db, sub);
+                        }
+                        
+                    }
+                }
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(GRule);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(GRuleID);
             };
             
             
@@ -142,8 +168,24 @@ namespace yocto
         {
             assert(G != 0);
             p_dict    dict;
+            
+            //==================================================================
+            //
+            // Collect all terminal => pattern
+            //
+            //==================================================================
             GTerm::DB TermDB;
             GTerm::Collect(TermDB, G, &dict);
+            
+            //==================================================================
+            //
+            // Collect all IDs
+            //
+            //==================================================================
+            GRuleID::DB RuleID;
+            GRuleID::Collect(RuleID, G);
+            
+            
         }
         
     }
