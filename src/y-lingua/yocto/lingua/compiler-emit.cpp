@@ -5,6 +5,7 @@
 #include "yocto/associative/set.hpp"
 
 #include "yocto/exception.hpp"
+#include "yocto/lingua/pattern/compiler.hpp"
 
 namespace yocto
 {
@@ -19,17 +20,22 @@ namespace yocto
             class GTerm : public object, public counted
             {
             public:
-                const string expr;
-                string       attr;
-                string       code;
+                const string      name;
+                auto_ptr<pattern> motif;
+                string            attr;
+                string            code;
                 
-                explicit GTerm(const string &_expr
+                explicit GTerm(const string &_name,
+                               const string &expr,
+                               const p_dict *dict 
                                ) :
-                expr(_expr),
+                name(_name),
+                motif(0),
                 attr(),
                 code()
                 {
-                    std::cerr << "+GTerm <" << expr << ">" << std::endl;
+                    std::cerr << "+GTerm <" << name << ">" << std::endl;
+                    motif.reset( compile(expr,dict) );
                 }
                 
                 virtual ~GTerm() throw()
@@ -37,7 +43,8 @@ namespace yocto
                 }
                 
                 
-                static GTerm * CreateFromAtom( const syntax::xnode *node)
+#if 0
+                static GTerm * CreateFromAtom( const syntax::xnode *node, const p_dict *dict)
                 {
                     assert(node);
                     assert("ATOM" == node->label);
@@ -47,7 +54,7 @@ namespace yocto
                     const syntax::xnode *sub = ch.head;
                     assert(sub);
                     
-                    GTerm *p = CreateFromCore(sub);
+                    GTerm *p = CreateFromCore(sub,dict);
                     sub = sub->next;
                     if(sub)
                     {
@@ -63,34 +70,36 @@ namespace yocto
                     }
                     return p;
                 }
+#endif
                 
-                static GTerm * CreateFromExpr(const syntax::xnode *node)
+                static GTerm * CreateFromExpr(const syntax::xnode *node, const p_dict *dict)
                 {
                     assert(node);
                     assert( "EXPR" == node->label);
                     
-                    const string expr = node->lex()->to_string();
-                    return new GTerm(expr);
+                    const string name = node->lex()->to_string();
+                    const string expr = name;
+                    return new GTerm(name,expr,dict);
                 }
                 
-                static GTerm *CreateFromChar(const syntax::xnode *node)
+                static GTerm *CreateFromChar(const syntax::xnode *node,const p_dict *dict)
                 {
                     assert(node);
                     assert( "CHAR" == node->label);
                     assert(node->lex()->size == 1);
-                    const uint8_t b( node->lex()->head->data );
-                    const string expr = vformat("\\x%02x", b);
-                    return new GTerm(expr);
+                    const string name = node->lex()->to_string();
+                    const string expr = vformat("\\x%02x", uint8_t(name[0]));
+                    return new GTerm(name,expr,dict);
                     
                 }
                 
-                static GTerm *CreateFromCore(const syntax::xnode *node)
+                static GTerm *CreateFromCore(const syntax::xnode *node, const p_dict *dict)
                 {
                     if( node->label == "EXPR" )
-                        return CreateFromExpr(node);
+                        return CreateFromExpr(node,dict);
                     
                     if( node->label == "CHAR")
-                        return CreateFromChar(node);
+                        return CreateFromChar(node,dict);
                     
                     throw exception("Invalid Terminal Core '%s'", node->label.c_str());
                 }
@@ -100,7 +109,7 @@ namespace yocto
                 typedef intrusive_ptr<string,GTerm> Ptr;
                 typedef set<string,Ptr>             DB;
                 
-                const string & key() const throw() { return expr; }
+                const string & key() const throw() { return name; }
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(GTerm);
@@ -119,18 +128,18 @@ namespace yocto
             }
             //! In-Order terminal collection
             static inline
-            void __collect_term( GTerm::DB &db, const syntax::xnode *node )
+            void __collect_term( GTerm::DB &db, const syntax::xnode *node, const p_dict *dict )
             {
                 assert(node!=0);
                 if( "EXPR" == node->label )
                 {
-                    __insert_term(db, GTerm::CreateFromExpr(node));
+                    __insert_term(db, GTerm::CreateFromExpr(node,dict));
                     return;
                 }
                 
                 if( "CHAR" == node->label )
                 {
-                    __insert_term(db, GTerm::CreateFromChar(node));
+                    __insert_term(db, GTerm::CreateFromChar(node,dict));
                     return;
                 }
                 
@@ -138,7 +147,7 @@ namespace yocto
                 {
                     for( const syntax::xnode *sub = node->children().head;sub;sub=sub->next)
                     {
-                        __collect_term(db, sub);
+                        __collect_term(db, sub,dict);
                     }
                 }
                 
@@ -149,8 +158,9 @@ namespace yocto
         void compiler::emit( const syntax::xnode *G )
         {
             assert(G != 0);
+            p_dict    dict;
             GTerm::DB TermDB;
-            __collect_term(TermDB, G);
+            __collect_term(TermDB, G, &dict);
         }
         
     }
