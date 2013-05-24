@@ -25,7 +25,7 @@ namespace yocto
             syntax::terminal & LPAREN  = jettison("LPAREN", "\\(");
             syntax::terminal & RPAREN  = jettison("RPAREN", "\\)");
             syntax::terminal & PIPE    = jettison("PIPE", "\\|");
-            syntax::terminal & CODE    = terminal("CODE","\\[-?$?\\]");
+            syntax::terminal & CODE    = terminal("CODE","\\[[:word:]*\\]");
             
             // Call C++ comment
             scanner.call(CppComment, "//",     this, &compiler::do_nothing);
@@ -62,7 +62,6 @@ namespace yocto
             syntax::aggregate &RULE = agg("RULE");
             RULE += RULE_ID;
             RULE += COLUMN;
-            RULE += opt(CODE);
             
             
             //------------------------------------------------------------------
@@ -79,6 +78,7 @@ namespace yocto
                 syntax::aggregate &ATOM = agg("ATOM",syntax::is_merging_one);
                 ATOM += CORE;
                 ATOM += opt( terminal("ATTR", "[+?*]"));
+                ATOM += opt( CODE );
                 
                 syntax::repeating &SEQUENCE = rep("SEQUENCE",ATOM,1);
                 syntax::aggregate &ATOMS    = agg("ATOMS", syntax::is_merging_one);
@@ -107,7 +107,6 @@ namespace yocto
         
         void compiler:: do_nothing(const token &) throw() {}
         void compiler:: do_newline(const token &) throw() { ++line; }
-        
         
         
         static inline
