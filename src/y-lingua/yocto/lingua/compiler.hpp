@@ -18,6 +18,8 @@ namespace yocto
             
             virtual syntax::xnode *run( source &src );
             
+            void emit( const syntax::xnode *G );
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(compiler);
             void do_nothing(const token &) throw();
