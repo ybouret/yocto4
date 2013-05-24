@@ -22,56 +22,21 @@ namespace yocto
             public:
                 const string      name;
                 auto_ptr<pattern> motif;
-                string            attr;
-                string            code;
                 
                 explicit GTerm(const string &_name,
                                const string &expr,
                                const p_dict *dict 
                                ) :
                 name(_name),
-                motif(0),
-                attr(),
-                code()
+                motif(compile(expr,dict))
                 {
                     std::cerr << "+GTerm <" << name << ">" << std::endl;
-                    motif.reset( compile(expr,dict) );
                 }
                 
                 virtual ~GTerm() throw()
                 {
                 }
-                
-                
-#if 0
-                static GTerm * CreateFromAtom( const syntax::xnode *node, const p_dict *dict)
-                {
-                    assert(node);
-                    assert("ATOM" == node->label);
-                    const syntax::xnode::child_list &ch = node->children();
-                    assert(ch.size>0);
-                    
-                    const syntax::xnode *sub = ch.head;
-                    assert(sub);
-                    
-                    GTerm *p = CreateFromCore(sub,dict);
-                    sub = sub->next;
-                    if(sub)
-                    {
-                        assert( "ATTR" == sub->label);
-                        p->attr = sub->lex()->to_string();
-                    }
-                    
-                    sub = sub->next;
-                    if(sub)
-                    {
-                        assert( "CODE" == sub->label );
-                        p->code = sub->lex()->to_string();
-                    }
-                    return p;
-                }
-#endif
-                
+                                
                 static GTerm * CreateFromExpr(const syntax::xnode *node, const p_dict *dict)
                 {
                     assert(node);
@@ -93,17 +58,6 @@ namespace yocto
                     
                 }
                 
-                static GTerm *CreateFromCore(const syntax::xnode *node, const p_dict *dict)
-                {
-                    if( node->label == "EXPR" )
-                        return CreateFromExpr(node,dict);
-                    
-                    if( node->label == "CHAR")
-                        return CreateFromChar(node,dict);
-                    
-                    throw exception("Invalid Terminal Core '%s'", node->label.c_str());
-                }
-                
                 
                 
                 typedef intrusive_ptr<string,GTerm> Ptr;
@@ -122,10 +76,12 @@ namespace yocto
                 const GTerm::Ptr p(t);
                 if( ! db.insert(p) )
                 {
-                    //! multiple expression: is it the same ?
+                    throw exception("multiple terminal '%s'", p->name.c_str());
                 }
                 
             }
+            
+            
             //! In-Order terminal collection
             static inline
             void __collect_term( GTerm::DB &db, const syntax::xnode *node, const p_dict *dict )
