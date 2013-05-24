@@ -17,16 +17,22 @@ namespace yocto
         namespace
         {
             
+            ////////////////////////////////////////////////////////////////////
+            //
+            //  Grammar Terminal / Database
+            //
+            ////////////////////////////////////////////////////////////////////
             class GTerm : public object, public counted
             {
             public:
                 const string      name;
                 auto_ptr<pattern> motif;
                 
-                explicit GTerm(const string &_name,
-                               const string &expr,
-                               const p_dict *dict 
-                               ) :
+                //! create from name and expression
+                inline GTerm(const string &_name,
+                             const string &expr,
+                             const p_dict *dict
+                             ) :
                 name(_name),
                 motif(compile(expr,dict))
                 {
@@ -36,8 +42,8 @@ namespace yocto
                 virtual ~GTerm() throw()
                 {
                 }
-                                
-                static GTerm * CreateFromExpr(const syntax::xnode *node, const p_dict *dict)
+                
+                static inline GTerm * CreateFromExpr(const syntax::xnode *node, const p_dict *dict)
                 {
                     assert(node);
                     assert( "EXPR" == node->label);
@@ -47,7 +53,7 @@ namespace yocto
                     return new GTerm(name,expr,dict);
                 }
                 
-                static GTerm *CreateFromChar(const syntax::xnode *node,const p_dict *dict)
+                static inline GTerm *CreateFromChar(const syntax::xnode *node,const p_dict *dict)
                 {
                     assert(node);
                     assert( "CHAR" == node->label);
@@ -59,55 +65,76 @@ namespace yocto
                 }
                 
                 
-                
                 typedef intrusive_ptr<string,GTerm> Ptr;
                 typedef set<string,Ptr>             DB;
                 
-                const string & key() const throw() { return name; }
+                inline const string & key() const throw() { return name; }
+                
+                static inline void Insert( DB &db, GTerm *t )
+                {
+                    const GTerm::Ptr p(t);
+                    if( ! db.insert(p) )
+                    {
+                        throw exception("multiple terminal '%s'", p->name.c_str());
+                    }
+                    
+                }
+                
+                static inline void Collect( DB &db, const syntax::xnode *node, const p_dict *dict )
+                {
+                    assert(node!=0);
+                    if( "EXPR" == node->label )
+                    {
+                        Insert(db, GTerm::CreateFromExpr(node,dict));
+                        return;
+                    }
+                    
+                    if( "CHAR" == node->label )
+                    {
+                       Insert(db, GTerm::CreateFromChar(node,dict));
+                        return;
+                    }
+                    
+                    if( ! node->terminal )
+                    {
+                        for( const syntax::xnode *sub = node->children().head;sub;sub=sub->next)
+                        {
+                            Collect(db, sub,dict);
+                        }
+                    }
+
+                }
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(GTerm);
             };
             
             
-            static inline
-            void __insert_term( GTerm::DB &db, GTerm *t )
+            class GRule : public object, public counted
             {
-                const GTerm::Ptr p(t);
-                if( ! db.insert(p) )
+            public:
+                const string name;
+                
+                inline GRule( const string &id ) :
+                name(id)
                 {
-                    throw exception("multiple terminal '%s'", p->name.c_str());
                 }
                 
-            }
+                virtual ~GRule() throw()
+                {
+                }
+                
+                inline const string &key() const throw() { return name; }
+                
+                typedef intrusive_ptr<string,GRule> Ptr;
+                typedef set<string,Ptr>             DB;
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(GRule);
+            };
             
             
-            //! In-Order terminal collection
-            static inline
-            void __collect_term( GTerm::DB &db, const syntax::xnode *node, const p_dict *dict )
-            {
-                assert(node!=0);
-                if( "EXPR" == node->label )
-                {
-                    __insert_term(db, GTerm::CreateFromExpr(node,dict));
-                    return;
-                }
-                
-                if( "CHAR" == node->label )
-                {
-                    __insert_term(db, GTerm::CreateFromChar(node,dict));
-                    return;
-                }
-                
-                if( ! node->terminal )
-                {
-                    for( const syntax::xnode *sub = node->children().head;sub;sub=sub->next)
-                    {
-                        __collect_term(db, sub,dict);
-                    }
-                }
-                
-            }
         }
         
         
@@ -116,7 +143,7 @@ namespace yocto
             assert(G != 0);
             p_dict    dict;
             GTerm::DB TermDB;
-            __collect_term(TermDB, G, &dict);
+            GTerm::Collect(TermDB, G, &dict);
         }
         
     }
