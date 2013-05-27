@@ -118,6 +118,20 @@ namespace yocto
 			
 			inline void reset() throw() { head = tail = NULL; size=0; }
 					
+            inline void auto_delete() throw()
+            {
+                NODE *node = tail;
+				while( node )
+				{
+					NODE *prev = node->prev;
+					node->next = NULL;
+					node->prev = NULL;
+					delete node;
+					node = prev;
+				}
+				reset();
+            }
+            
 			inline void delete_with( void (*proc)( NODE * ) ) throw()
 			{
 				assert(proc);

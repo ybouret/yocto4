@@ -241,6 +241,11 @@ namespace yocto
                 }
             }
             
+            inline void auto_delete() throw()
+            {
+                while(size) delete pop_back();
+            }
+            
         private:
             inline void __push_back( NODE *node ) throw()
             {

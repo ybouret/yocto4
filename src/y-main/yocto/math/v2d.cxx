@@ -115,7 +115,7 @@ namespace yocto {
 #if YOCTO_ZTYPE != 'i'
 		template <>
 		real_t v2d<real_t>:: norm() const throw() {
-			return   math::Sqrt( real_t(x*x + y*y) );
+			return   math::Hypotenuse(x, y);
 		}
         
         template <>
