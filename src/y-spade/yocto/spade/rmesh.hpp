@@ -86,6 +86,18 @@ namespace yocto
                 }
             }
             
+            inline bool is_valid() const throw()
+            {
+                for( size_t dim=0; dim < LAYOUT::DIMENSIONS; ++dim)
+                {
+                    const axis_type &A = get_axis( dimension_t(dim) );
+                    for(unit_t i=A.lower;i<A.upper;++i)
+                    {
+                        if( A[i] >= A[i+1]) return false;
+                    }
+                }
+                return true;
+            }
             
             
         private:
