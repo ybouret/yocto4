@@ -166,6 +166,25 @@ namespace yocto {
                 return v;
             }
             
+            //! 2D helper
+            static inline
+            void derivs(matrix<T>       &D,
+                        const array<T>  &t,
+                        const matrix<T> &P,
+                        const matrix<T> &Q )
+            {
+                assert(P.rows==2);
+                assert(Q.rows==2);
+                assert(D.rows==2);
+                assert(P.cols==Q.cols);
+                assert(D.cols==Q.cols);
+                assert(P.cols==t.size());
+                array<T>       *y1[2] = { &D[1], &D[2] };
+                const array<T>  *y[2] = { &P[1], &P[2] };
+                const array<T> *y2[2] = { &Q[1], &Q[2] };
+                spline<T>:: derivs(y1, t, y, y2, 2);
+            }
+        
         protected:
             explicit spline() throw();
             
