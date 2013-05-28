@@ -53,7 +53,7 @@ namespace yocto
                 return * _cast::trans<lexeme*,uint64_t>((uint64_t *)wksp);
             }
               
-#if defined(_MSV_VER)
+#if defined(_MSC_VER)
 #pragma warning ( disable : 4351 )
 #endif
             xnode:: xnode( const string &label_ref, lexeme *lx, node_property p ) throw():
