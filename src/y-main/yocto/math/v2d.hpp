@@ -83,7 +83,9 @@ namespace yocto {
             
             static
             T det( const v2d &a, const v2d &b) throw();
-           
+            
+            v2d rotated_by( T angle ) const throw();
+            
             static const v2d<T> zero;
 		};
         
