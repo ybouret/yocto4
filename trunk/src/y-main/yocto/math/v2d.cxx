@@ -174,6 +174,15 @@ namespace yocto {
             return math::Signed<real_t,real_t>( math::Acos(C), S );
         }
         
+        template <>
+        v2d<real_t> v2d<real_t>:: rotated_by( real_t angle ) const throw()
+        {
+            const real_t c = Cos(angle);
+            const real_t s = Sin(angle);
+            return v2d<real_t>( c * x - s * y, s*x + c *y);
+        }
+
+        
 #endif
 		
         template <>
