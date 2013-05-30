@@ -142,6 +142,16 @@ namespace yocto
 				return layout_of<COORD>(s_lo,s_hi);
 			}
             
+            inline bool is_same_layout_than( const layout_of &other ) const throw()
+            {
+                const unit_t *u = & __coord(lower, 0);
+                const unit_t *v = & __coord(other.lower, 0);
+                for(size_t i=0;i< DIMENSIONS*2; ++i)
+                {
+                    if( u[i] != v[i] ) return false;
+                }
+                return true;
+            }
             
         private:
             inline void __ld( const layout_of &sub, offsets_list &offsets, int2type<1> ) const throw()
