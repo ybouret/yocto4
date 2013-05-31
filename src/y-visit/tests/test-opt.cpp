@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 
+#if 0
 #include "silo.h"
 #include <cstdio>
 
@@ -107,6 +108,13 @@ YOCTO_UNIT_TEST_IMPL(opt)
     /* Close the Silo file. */
     DBClose(dbfile);
     return 0;
+}
+YOCTO_UNIT_TEST_DONE()
+#endif
+
+YOCTO_UNIT_TEST_IMPL(opt)
+{
+    std::cerr << "SILO is disabled so far" << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
 
