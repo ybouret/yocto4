@@ -12,6 +12,7 @@ typedef vertex2D<double>::type V2d;
 
 YOCTO_UNIT_TEST_IMPL(silo)
 {
+#if 0
     Silo::File    db( "demo.silo", "Just A Demo");
     
    
@@ -46,7 +47,8 @@ YOCTO_UNIT_TEST_IMPL(silo)
         std::cerr << "Y     : " << m2.Y().as_layout() << std::endl;
         db.PutRectilinearMesh("meshd",m2,NULL);
     }
-    
+#endif
+    std::cerr << "Disabled!" << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
