@@ -86,6 +86,7 @@ namespace yocto
 		const int        ProcessorNameLength;
 		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME]; //!< from MPI_Get_Processor_name(...)
 		const int        ThreadLevel;
+        const string     CommWorldID;
         
         const char *ThreadLevelName() const throw();
         int Comm_rank( MPI_Comm comm ) const;

@@ -93,7 +93,8 @@ namespace yocto
     CommTime(0),
 	ProcessorNameLength(0),
 	ProcessorName(),
-    ThreadLevel(0)
+    ThreadLevel(0),
+    CommWorldID()
 	{
 		if( NULL == mpi_argc_ || NULL == mpi_argv_ )
 		{
@@ -140,6 +141,7 @@ namespace yocto
                 // TODO: throw an exception ?
 			}
             
+            (string &)CommWorldID = vformat("%d.%d", CommWorldSize, CommWorldRank);
         }
 		catch(...)
 		{
