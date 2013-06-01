@@ -63,7 +63,7 @@ namespace yocto
                 lexeme * const   & lex() const throw();      //!< if terminal
                 
                 //! convert to an abstract node
-                static xnode *abstract(xnode *node,int &depth) throw();
+                static xnode *AST(xnode *node,int &depth) throw();
                 
             protected:
                 explicit xnode( const string &label_ref, lexeme *lx, node_property p ) throw();

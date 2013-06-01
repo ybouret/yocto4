@@ -25,7 +25,7 @@ namespace yocto
 #endif
             
             
-            xnode * xnode:: abstract(xnode *node, int &depth) throw()
+            xnode * xnode:: AST(xnode *node, int &depth) throw()
             {
                 if(!node) return 0;
                 if(node->terminal)
@@ -66,7 +66,7 @@ namespace yocto
                     while( source.size )
                     {
                         ++depth;
-                        xnode *sub = xnode::abstract( source.pop_front(),depth );
+                        xnode *sub = xnode::AST( source.pop_front(),depth );
                         --depth;
                         if(sub)
                         {

@@ -70,7 +70,7 @@ namespace yocto
         syntax::xnode *parser:: run( source &src )
         {
             int depth = 0;
-            return  syntax::xnode::abstract( accept(*this,src),depth);
+            return  syntax::xnode::AST( accept(*this,src),depth);
         }
         
         
