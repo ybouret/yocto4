@@ -3,7 +3,7 @@
 
 #include "yocto/code/swap.hpp"
 
-namespace yocto 
+namespace yocto
 {
     
     namespace core
@@ -51,7 +51,7 @@ namespace yocto
                         node->next = root;
                         break;
                         
-                    default: 
+                    default:
                         __push_back(node);
                         break;
                 }
@@ -80,7 +80,7 @@ namespace yocto
                         node->next = root;
                         break;
                         
-                    default: 
+                    default:
                         __push_back(node);
                         root = root->prev;
                         break;
@@ -115,7 +115,7 @@ namespace yocto
                         prev->next = prev->prev = NULL;
                         size = 1;
                         return prev;
-                    } 
+                    }
                         
                     default:
                         break;
@@ -160,6 +160,7 @@ namespace yocto
             {
                 assert(curr!=NULL);assert(this->owns(curr));
                 assert(node!=NULL);assert(!this->owns(node));
+                assert(NULL==node->next); assert(NULL==node->prev);
                 assert(size!=0);
                 if( size == 1 )
                 {
@@ -168,18 +169,21 @@ namespace yocto
                     root->prev = node;
                     node->prev = root;
                     node->next = root;
+                    
                 }
                 else
                 {
                     assert(size>=2);
                     assert(curr->next != NULL );
-                    NODE *next = curr->next;
+                    NODE *_nxt = curr->next;
                     curr->next = node;
                     node->prev = curr;
-                    next->prev = node;
-                    node->next = next;
+                    node->next = _nxt;
+                    _nxt->prev = node;
                 }
                 ++size;
+                assert(this->owns(curr));
+                assert(this->owns(node));
             }
             
             //! fetch in 0..size-1, list_of compatibility
@@ -218,7 +222,7 @@ namespace yocto
                         assert(ans==node);
                         return ans; }
                         
-                    default: 
+                    default:
                         break;
                 }
                 assert(size>2);
@@ -229,7 +233,7 @@ namespace yocto
                     assert(ans==node);
                     return ans;
                 }
-                else 
+                else
                 {
                     NODE *prev = node->prev;
                     NODE *next = node->next;
