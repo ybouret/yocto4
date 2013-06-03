@@ -165,6 +165,28 @@ namespace yocto
         }
         
         
+        static inline
+        const syntax::xnode *__get_rules( const syntax::xnode *node )
+        {
+            assert(node);
+            if(node->terminal)
+                return 0;
+            else
+            {
+                if("RULES" == node->label)
+                {
+                    return node;
+                }
+                
+                for(const syntax::xnode *sub = node->children().head; sub; sub=sub->next )
+                {
+                    const syntax::xnode *ans = __get_rules(sub);
+                    if(ans) return ans;
+                }
+                return 0;
+            }
+        }
+        
         void compiler::emit( const syntax::xnode *G )
         {
             assert(G != 0);
@@ -175,6 +197,7 @@ namespace yocto
             //==================================================================
             p_dict    dict;
             
+            std::cerr << "======== Gathering Terminals" << std::endl;
             //==================================================================
             //
             // Collect all terminal => pattern
@@ -188,10 +211,41 @@ namespace yocto
             // Collect all IDs
             //
             //==================================================================
+            std::cerr << "======== Gathering Rules ID" << std::endl;
             GRuleID::DB RuleID;
             GRuleID::Collect(RuleID, G);
             
             
+            //==================================================================
+            //
+            // find the RULES
+            //
+            //==================================================================
+            std::cerr << "======== Finding RULES" << std::endl;
+            const syntax::xnode *R = __get_rules(G);
+            if(!R)
+                throw exception("Missing Rules!");
+            assert(!R->terminal);
+            
+            //==================================================================
+            //
+            // check that every rule has a definition
+            //
+            //==================================================================
+            const syntax::xnode::child_list &Rules = R->children();
+            std::cerr << "======== Checking " << Rules.size << " rules" << std::endl;
+            for( const syntax::xnode *sub = Rules.head;sub;sub=sub->next)
+            {
+                assert(!sub->terminal);
+                const syntax::xnode::child_list &content = sub->children();
+                assert(content.size>0);
+                assert("ID" == content.head->label);
+                assert(content.head->terminal);
+                const string id = content.head->lex()->to_string();
+                std::cerr << "New Rule: <" << id << ">" << std::endl;
+                if( !RuleID.search(id) )
+                    throw exception("Missing Grammar Rule for <%s>", id.c_str());
+            }
         }
         
     }
