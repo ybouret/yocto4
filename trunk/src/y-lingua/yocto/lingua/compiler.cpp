@@ -98,17 +98,32 @@ namespace yocto
             // end rule
             //------------------------------------------------------------------
             RULE += STOP;
-            syntax::aggregate &RULES = agg("RULES");
-            RULES += rep("RULES_DECL", RULE, 1);
+            
+            
+            //------------------------------------------------------------------
+            // create the grammar
+            //------------------------------------------------------------------
             
             syntax::aggregate &GRAMMAR = agg("GRAMMAR");
             
-            syntax::aggregate &PARSER_DECL = agg("PARSER_DECL", syntax::is_merging_all);
-            PARSER_DECL += terminal("PARSER", "@[:word:]+");
-            PARSER_DECL += STOP;
+            //------------------------------------------------------------------
+            // with a parser declaration
+            //------------------------------------------------------------------
+            {
+                syntax::aggregate &PARSER_DECL = agg("PARSER_DECL", syntax::is_merging_all);
+                PARSER_DECL += terminal("PARSER", "@[:word:]+");
+                PARSER_DECL += STOP;
+                GRAMMAR += PARSER_DECL;
+            }
             
-            GRAMMAR += PARSER_DECL;
-            GRAMMAR += RULES;
+            //------------------------------------------------------------------
+            // make a dedicated node for RULES
+            //------------------------------------------------------------------
+            {
+                syntax::aggregate &RULES = agg("RULES");
+                RULES += rep("RULES_DECL", RULE, 1);
+                GRAMMAR += RULES;
+            }
             
             set_root( GRAMMAR );
             
