@@ -98,9 +98,19 @@ namespace yocto
             // end rule
             //------------------------------------------------------------------
             RULE += STOP;
+            syntax::aggregate &RULES = agg("RULES");
+            RULES += rep("RULES_DECL", RULE, 1);
             
+            syntax::aggregate &GRAMMAR = agg("GRAMMAR");
             
-            set_root( rep("RULES",RULE,1) );
+            syntax::aggregate &PARSER_DECL = agg("PARSER_DECL", syntax::is_merging_all);
+            PARSER_DECL += terminal("PARSER", "@[:word:]+");
+            PARSER_DECL += STOP;
+            
+            GRAMMAR += PARSER_DECL;
+            GRAMMAR += RULES;
+            
+            set_root( GRAMMAR );
             
             
         }

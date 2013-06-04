@@ -110,6 +110,11 @@ namespace yocto
             };
             
             
+            ////////////////////////////////////////////////////////////////////
+            //
+            // Gammar RuleID database
+            //
+            ////////////////////////////////////////////////////////////////////
             class GRuleID : public object, public counted
             {
             public:
@@ -127,7 +132,7 @@ namespace yocto
                 inline const string &key() const throw() { return name; }
                 
                 typedef intrusive_ptr<string,GRuleID> Ptr;
-                typedef set<string,Ptr>              DB;
+                typedef set<string,Ptr>               DB;
                 
                 static inline
                 void Collect( DB &db, const syntax::xnode *node )
@@ -246,6 +251,16 @@ namespace yocto
                 if( !RuleID.search(id) )
                     throw exception("Missing Grammar Rule for <%s>", id.c_str());
             }
+            
+            
+            //==================================================================
+            //
+            // OK, let us start building the grammar
+            //
+            //==================================================================
+            
+            
+            
         }
         
     }
