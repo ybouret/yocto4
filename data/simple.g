@@ -1,4 +1,6 @@
-grammar : (INT|ID)+;
+@simple;
+
+CODE : (INT|ID)+;
 
 ID : "[:word:]"+;
 INT : "[:digit:]"+;
