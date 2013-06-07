@@ -60,7 +60,7 @@ namespace yocto
         Y_MPI_CTIME;
     }
     
-    void mpi:: Allreduce(     void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const
+    void mpi:: Allreduce(const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const
     {
         assert( !(NULL==sendbuf && count>0 ) );
         assert( !(NULL==recvbuf && count>0 ) );

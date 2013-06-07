@@ -66,12 +66,19 @@ namespace yocto
             //! mesh meta data
             /**
              declare a rectilinear mesh for VisIt
+             \param mesh the rectilinear mesh
+             \param name the name as seen by VisIt
+             \param num_domains should be par_size for standard simuliation
+             \param labels labels for axes, should have #DIMENSIONS
              */
             template <typename T,typename LAYOUT>
             inline
             visit_handle mesh_meta_data(const rmesh<LAYOUT,T> & mesh,
                                         const string &          name,
-                                        int                     num_domains ) const
+                                        int                     num_domains,
+                                        char                  **labels = 0,
+                                        char                  **units  = 0
+                                        ) const
             {
                 assert(num_domains>0);
                 visit_handle h = VISIT_INVALID_HANDLE;
@@ -81,6 +88,26 @@ namespace yocto
                     VisIt_MeshMetaData_setMeshType( h, VISIT_MESHTYPE_RECTILINEAR );
                     VisIt_MeshMetaData_setTopologicalDimension( h, LAYOUT::DIMENSIONS);
                     VisIt_MeshMetaData_setSpatialDimension(h, LAYOUT::DIMENSIONS);
+                    
+                    if(labels)
+                    {
+                        VisIt_MeshMetaData_setXLabel(h, labels[0]);
+                        if( LAYOUT::DIMENSIONS > 1 )
+                            VisIt_MeshMetaData_setYLabel(h, labels[1]);
+                        if( LAYOUT::DIMENSIONS > 2 )
+                            VisIt_MeshMetaData_setZLabel(h, labels[2]);
+                    }
+                    
+                    if(units)
+                    {
+                        VisIt_MeshMetaData_setXUnits(h, units[0]);
+                        if( LAYOUT::DIMENSIONS > 1 )
+                            VisIt_MeshMetaData_setYUnits(h, units[1]);
+                        if( LAYOUT::DIMENSIONS > 2 )
+                            VisIt_MeshMetaData_setZUnits(h, units[2]);
+                        
+                    }
+                    
                     VisIt_MeshMetaData_setNumDomains(h,num_domains);
                 }
                 else
@@ -93,10 +120,12 @@ namespace yocto
             inline
             visit_handle mesh_meta_data(const rmesh<LAYOUT,T> & mesh,
                                         const char            * id,
-                                        int                     num_domains ) const
+                                        int                     num_domains,
+                                        char                  **labels = 0,
+                                        char                  **units  = 0) const
             {
                 const string name(id);
-                return mesh_meta_data<T,LAYOUT>( mesh, name, num_domains );
+                return mesh_meta_data<T,LAYOUT>( mesh, name, num_domains,labels,units );
             }
             
             //! variable meta data
@@ -104,7 +133,10 @@ namespace yocto
              create a variable meta data to be attached to a mesh.
              */
             template <typename T>
-            inline visit_handle variable_meta_data( const string &name, const string &mesh_id ) const
+            inline visit_handle variable_meta_data(const string &name,
+                                                   const string &mesh_id,
+                                                   const char   *units = 0
+                                                   ) const
             {
                 //! query the variable type id
                 const type_spec spec( typeid(T) );
@@ -120,6 +152,8 @@ namespace yocto
                     VisIt_VariableMetaData_setMeshName(vmd, mesh_id.c_str());
                     VisIt_VariableMetaData_setType(vmd, p->vartype);
                     VisIt_VariableMetaData_setCentering(vmd, VISIT_VARCENTERING_NODE);
+                    if(units)
+                        VisIt_VariableMetaData_setUnits(vmd, units );
                 }
                 else
                     throw exception("VisIt I/O::variable_data error");
@@ -128,10 +162,12 @@ namespace yocto
             
             //! variable meta data wrapper
             template <typename T>
-            inline visit_handle variable_meta_data( const char *nid, const char *mid ) const
+            inline visit_handle variable_meta_data(const char *nid,
+                                                   const char *mid,
+                                                   const char *units = 0) const
             {
                 const string name(nid), mesh_id(mid);
-                return variable_meta_data<T>(name,mesh_id);
+                return variable_meta_data<T>(name,mesh_id,units);
             }
             
         private:
