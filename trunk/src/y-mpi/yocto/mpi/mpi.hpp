@@ -47,7 +47,7 @@ namespace yocto
 	 @MPI_Bcast				@MPI_Gather			MPI_Gatherv
 	 MPI_Op_create			MPI_Op_free			@MPI_Reduce
 	 MPI_Reduce_scatter 	MPI_Scan			@MPI_Scatter
-	 MPI_Scatterv 	  	  
+	 MPI_Scatterv
 	 */
 	
 	//! MPI functions wrappers
@@ -75,7 +75,7 @@ namespace yocto
 		static mpi & init( int * argc, char ***argv );
 		void   Finalize() throw();
 		
-       		
+        
 		const int        CommWorldSize;    //!< size of MPI_COMM_WORLD
 		const int        CommWorldRank;    //!< rank in MPI_COMM_WORLD
 		const int        CommWorldLast;    //!< CommWorldSize-1;
@@ -126,37 +126,37 @@ namespace yocto
                            void       *recvbuf, size_t recvcount, MPI_Datatype recvtype, int from, int recvtag,
                            MPI_Comm    comm,
                            MPI_Status &status ) const;
-		//======================================================================
-		// Collective Communication Routines
-		//======================================================================
-		void Barrier(MPI_Comm comm) const;
-		void Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
-		void Scatter( const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
-		void Gather(  const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const; 
-        void Reduce(  const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) const;
-        void Allreduce(     void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const;
-
-		//======================================================================
-		// Usefull helpers
-		//======================================================================
-		int  CommWorldNext() const throw(); //!< modulus the CommWorldSize
-		int  CommWorldPrev() const throw(); //!< modulus the CommWorldSize
-		
-		//======================================================================
-		// stdio helpers
-		//======================================================================
+        //======================================================================
+        // Collective Communication Routines
+        //======================================================================
+        void Barrier(MPI_Comm comm) const;
+        void Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
+        void Scatter(   const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const;
+        void Gather(    const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const;
+        void Reduce(    const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) const;
+        void Allreduce( const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const;
         
-		//! parallel printf, in order in MPI_COMM_WORLD
-		void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
-        
-		//! printf only on rank 0
-		void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4); 
+        //======================================================================
+        // Usefull helpers
+        //======================================================================
+        int  CommWorldNext() const throw(); //!< modulus the CommWorldSize
+        int  CommWorldPrev() const throw(); //!< modulus the CommWorldSize
 		
+        //======================================================================
+        // stdio helpers
+        //======================================================================
+        
+        //! parallel printf, in order in MPI_COMM_WORLD
+        void Printf( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4);
+        
+        //! printf only on rank 0
+        void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4);
+        
         //! close standard I/O on rank>0
         void CloseStdIO() const;
         
-		//! MPI_Request/MPI_Status helper
-		class Requests
+        //! MPI_Request/MPI_Status helper
+        class Requests
 		{
 		public:
 			explicit Requests( size_t num );
@@ -198,7 +198,7 @@ namespace yocto
             return swap_be_as<T>(y);
         }
         
-       
+        
         
         //! bcast ONE integral type
         template <typename T>
@@ -216,7 +216,7 @@ namespace yocto
             const T y = swap_be_as<T>(x);
             this->Isend(&y, sizeof(T), MPI_BYTE, dest, tag, comm, req);
         }
-                
+        
         double Wtime() const throw();
         void   WaitFor( double nsec) const throw();
         
