@@ -1,6 +1,7 @@
 #ifndef YOCTO_SPADE_VISIT_SILO_INCLUDED
 #define YOCTO_SPADE_VISIT_SILO_INCLUDED 1
 
+#if 0
 #include "silo.h"
 #include "yocto/spade/quadmesh.hpp"
 #include "yocto/exception.hpp"
@@ -142,6 +143,7 @@ namespace yocto
         
     }
 }
+#endif
 
 #endif
 
