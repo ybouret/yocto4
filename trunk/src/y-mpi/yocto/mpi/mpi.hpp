@@ -7,7 +7,8 @@
 #include "yocto/code/endian.hpp"
 
 #include "yocto/string.hpp"
-
+#include "yocto/type-spec.hpp"
+#include "yocto/sequence/vector.hpp"
 
 #include <cstdio>
 
@@ -42,7 +43,7 @@ namespace yocto
 	
 	
 	/* collective:
-	 MPI_Allgather			MPI_Allgatherv  	MPI_Allreduce
+	 MPI_Allgather			MPI_Allgatherv  	@MPI_Allreduce
 	 MPI_Alltoall			MPI_Alltoallv		@MPI_Barrier
 	 @MPI_Bcast				@MPI_Gather			MPI_Gatherv
 	 MPI_Op_create			MPI_Op_free			@MPI_Reduce
@@ -221,10 +222,44 @@ namespace yocto
         void   WaitFor( double nsec) const throw();
         
         //======================================================================
+        //
         // Send/Recv for strings
+        //
         //======================================================================
         void   Send( const string &s, int dest, int tag, MPI_Comm comm ) const;
         string Recv( int source, int tag, MPI_Comm comm, MPI_Status &status ) const;
+        
+        //======================================================================
+        //
+        // data type
+        //
+        //======================================================================
+        class db_item
+        {
+        public:
+            const type_spec    spec;
+            const MPI_Datatype id;
+            
+            db_item( const std::type_info &info, const MPI_Datatype ID) throw();
+            ~db_item() throw();
+            db_item(const db_item &other) throw();
+            
+            static int compare( const db_item &lhs, const db_item &rhs ) throw();
+            
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(db_item);
+        };
+        
+        MPI_Datatype get_type( const std::type_info &info ) const;
+        MPI_Datatype get_type( const type_spec      &spec ) const;
+        template <typename T>
+        inline MPI_Datatype get_type() const
+        {
+            return get_type( typeid(T) );
+        }
+        
+        const vector<db_item> db;
         
 	private:
 		friend class singleton<mpi>;                           //!< access mpi
@@ -237,6 +272,7 @@ namespace yocto
 		YOCTO_DISABLE_COPY_AND_ASSIGN(mpi);
 		void clear_pname() throw();
 		void on_finalize() throw(); //!< clean up
+        
         
 	};
 	

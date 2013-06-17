@@ -1,4 +1,5 @@
 #include "yocto/mpi/mpi.hpp"
+#include "yocto/code/hsort.hpp"
 
 #include <cstring>
 #include <cstdarg>
@@ -6,7 +7,9 @@
 namespace yocto
 {
 	
-	
+       
+    
+    
 #if defined(_MSC_VER)
 	// init of string_
 #pragma warning ( disable : 4351 )
@@ -94,7 +97,8 @@ namespace yocto
 	ProcessorNameLength(0),
 	ProcessorName(),
     ThreadLevel(0),
-    CommWorldID()
+    CommWorldID(),
+    db(16,as_capacity)
 	{
 		if( NULL == mpi_argc_ || NULL == mpi_argv_ )
 		{
@@ -133,6 +137,9 @@ namespace yocto
 			(bool &)IsFirst = (CommWorldRank == 0);
 			(bool &)IsFinal = (CommWorldRank == CommWorldLast);
             
+            //==================================================================
+            // MPI advanced setup
+            //==================================================================
 			clear_pname();
 			err = MPI_Get_processor_name( (char *) ProcessorName, (int *) & ProcessorNameLength );
 			if( err != MPI_SUCCESS )
@@ -141,63 +148,79 @@ namespace yocto
                 // TODO: throw an exception ?
 			}
             
+#define Y_MPI_DB ((vector<db_item> &)db)
+#define Y_MPI_REGISTER(T,ID) do {   \
+const db_item item( typeid(T), ID); \
+Y_MPI_DB.push_back(item);           \
+} while(false)
+            
+            
+            Y_MPI_REGISTER(int,           MPI_INT);
+            Y_MPI_REGISTER(long,          MPI_LONG);
+            Y_MPI_REGISTER(unsigned,      MPI_UNSIGNED);
+            Y_MPI_REGISTER(unsigned long, MPI_UNSIGNED_LONG);
+            Y_MPI_REGISTER(float,         MPI_FLOAT);
+            Y_MPI_REGISTER(double,        MPI_DOUBLE);
+            
+            hsort(Y_MPI_DB, db_item::compare);
+            
             (string &)CommWorldID = vformat("%d.%d", CommWorldSize, CommWorldRank);
         }
-		catch(...)
-		{
-			mpi_reset_();
-			on_finalize();
-			throw;
-		}
-	}
-	
-	mpi & mpi:: init( int * argc, char ***argv )
-	{
-		YOCTO_LOCK(access);
-		if( NULL == argc || NULL == argv )
-		{
-			throw yocto::exception("yocto::mpi::Init( INVALID ARGS )");
-		}
-		
-		mpi_argc_ = argc;
-		mpi_argv_ = argv;
-		mpi & ans = mpi::instance();
-		mpi_reset_();
-		return ans;
-	}
-	
-	
-	void mpi:: Finalize() throw()
-	{
-		destroy();
-	}
-	
-	mpi:: ~mpi() throw()
-	{
-		on_finalize();
-	}
-	
-	
-	int mpi:: CommWorldNext() const throw()
-	{
-		assert( CommWorldSize > 0 );
-		return CommWorldRank >= CommWorldLast ? 0 : CommWorldRank+1;
-	}
-	
-	int mpi:: CommWorldPrev() const throw()
-	{
-		assert( CommWorldSize > 0 );
-		return CommWorldRank > 0 ? CommWorldRank-1 : CommWorldLast;
-	}
-	
-	const char mpi::name[] = "MPI";
+        catch(...)
+        {
+            mpi_reset_();
+            on_finalize();
+            throw;
+        }
+    }
+    
+    mpi & mpi:: init( int * argc, char ***argv )
+    {
+        YOCTO_LOCK(access);
+        if( NULL == argc || NULL == argv )
+        {
+            throw yocto::exception("yocto::mpi::Init( INVALID ARGS )");
+        }
+        
+        mpi_argc_ = argc;
+        mpi_argv_ = argv;
+        mpi & ans = mpi::instance();
+        mpi_reset_();
+        return ans;
+    }
+    
+    
+    void mpi:: Finalize() throw()
+    {
+        destroy();
+    }
+    
+    mpi:: ~mpi() throw()
+    {
+        on_finalize();
+    }
+    
+    
+    int mpi:: CommWorldNext() const throw()
+    {
+        assert( CommWorldSize > 0 );
+        return CommWorldRank >= CommWorldLast ? 0 : CommWorldRank+1;
+    }
+    
+    int mpi:: CommWorldPrev() const throw()
+    {
+        assert( CommWorldSize > 0 );
+        return CommWorldRank > 0 ? CommWorldRank-1 : CommWorldLast;
+    }
+    
+    const char mpi::name[] = "MPI";
     
     int mpi:: Comm_rank( MPI_Comm comm ) const
     {
         int       r   = -1;
         const int err = MPI_Comm_rank(comm, &r);
         if( err != MPI_SUCCESS )
-			throw mpi::exception( err, "MPI_Comm_rank");
+            throw mpi::exception( err, "MPI_Comm_rank");
         return r;
     }
     
