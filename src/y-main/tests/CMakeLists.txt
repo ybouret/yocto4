@@ -68,5 +68,6 @@ ADD_TEST(BSwap       test-main bswap)
 ADD_TEST(ThrProxy    test-main thr_proxy)
 ADD_TEST(Scan        test-main scan)
 ADD_TEST(WD          test-main wd)
+ADD_TEST(Unique      test-main unique)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
