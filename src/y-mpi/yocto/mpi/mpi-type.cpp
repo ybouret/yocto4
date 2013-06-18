@@ -104,6 +104,7 @@ __append_data_type(Y_MPI_DB,item);    \
         //----------------------------------------------------------------------
         // integers
         //----------------------------------------------------------------------
+#if 0
         Y_MPI_REGISTER(uint8_t, MPI_UINT8_T);
         Y_MPI_REGISTER(int8_t,  MPI_INT8_T);
         
@@ -115,11 +116,13 @@ __append_data_type(Y_MPI_DB,item);    \
         
         Y_MPI_REGISTER(uint64_t, MPI_UINT64_T);
         Y_MPI_REGISTER(int64_t,  MPI_INT64_T);
-        
+#endif
+    
         //----------------------------------------------------------------------
         // standard integers, likely to be aliases
         //----------------------------------------------------------------------
         Y_MPI_REGISTER(char,  MPI_CHAR);
+	Y_MPI_REGISTER(uint8_t, MPI_BYTE);
         Y_MPI_REGISTER(short, MPI_SHORT);
         Y_MPI_REGISTER(unsigned short, MPI_UNSIGNED_SHORT);
         
@@ -131,9 +134,6 @@ __append_data_type(Y_MPI_DB,item);    \
         
         Y_MPI_REGISTER(long long,          MPI_LONG_LONG);
         Y_MPI_REGISTER(unsigned long long, MPI_UNSIGNED_LONG_LONG);
-        
-        
-        Y_MPI_REGISTER(char,    MPI_CHAR);
         
         
         
