@@ -18,7 +18,7 @@ namespace yocto
 	
 	template <
 	typename KEY,
-	typename T, 
+	typename T,
 	typename KEY_HASHER = key_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
 	class map : public associative<KEY,T>
@@ -32,7 +32,7 @@ namespace yocto
 		public:
 			node_type   *next;
 			node_type   *prev;
-			const size_t hkey; 
+			const size_t hkey;
 			const_key    key;
 			type         data;
 			inline ~node_type() throw() {}
@@ -49,7 +49,7 @@ namespace yocto
 		explicit map( size_t n, const as_capacity_t & ) : hash_(), hmem_(), ktab_(n,hmem_) {}
 		virtual ~map() throw() { _kill(); }
 		
-		inline map( const map &other ) : hash_(), hmem_(), ktab_() 
+		inline map( const map &other ) : hash_(), hmem_(), ktab_()
 		{
 			map tmp( other.size(), as_capacity );
 			other._copy_into( tmp );
@@ -86,20 +86,9 @@ namespace yocto
 			{
 				return false;
 			}
-			else 
+			else
 			{
-				if( size() < capacity() )
-				{
-					assert(slot!=NULL);
-					_insert2( ktab_, hkey, key, args, slot );
-				}
-				else
-				{
-					map  other( container::next_capacity( capacity() ), as_capacity);
-					_copy_into(other);
-					_insert( other.ktab_,  hkey, key, args );
-					mswap( other.ktab_, ktab_ );
-				}
+                __insert(key, args, hkey, slot);
 				return true;
 			}
 		}
@@ -116,10 +105,20 @@ namespace yocto
 				ktab_.remove_front_of(slot, destruct<node_type> );
 				return true;
 			}
-			else 
+			else
 				return false;
 		}
 		
+        virtual void lazy_insert( param_key key, param_type args )
+        {
+            const size_t     hkey = hash_(key);
+			kslot_t         *slot = NULL;
+			const node_type *node = ktab_.search( hkey, slot, _match, &key );
+            if(!node)
+                __insert(key, args, hkey, slot);
+        }
+        
+        
 		//======================================================================
 		// iterators
 		//======================================================================
@@ -183,6 +182,24 @@ namespace yocto
 		static inline bool _match( const node_type *node, const void *params ) throw()
 		{ return node->key == *(const_key*)params; }
 		
+        inline void __insert(param_key     key,
+                             param_type    args,
+                             const size_t  hkey,
+                             kslot_t      *slot)
+        {
+            if( size() < capacity() )
+            {
+                assert(slot!=NULL);
+                _insert2( ktab_, hkey, key, args, slot );
+            }
+            else
+            {
+                map  other( container::next_capacity( capacity() ), as_capacity);
+                _copy_into(other);
+                _insert( other.ktab_,  hkey, key, args );
+                mswap( other.ktab_, ktab_ );
+            }
+        }
 	};
 	
 }
