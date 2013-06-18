@@ -67,6 +67,7 @@ namespace yocto
                 { const param p( typeid(math::v3d<double>), VISIT_VARTYPE_VECTOR, 3, set_data_d);  record(p); }
                 
             }
+            
             virtual ~VisItIO() throw() {}
             
             //! mesh meta data
