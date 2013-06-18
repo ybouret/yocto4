@@ -2,6 +2,7 @@
 #define YOCTO_CODE_UNIQUE_INCLUDED 1
 
 #include "yocto/code/hsort.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -27,6 +28,8 @@ namespace yocto
             size_t next = 1;
             while(next<n_ok)
             {
+                assert(compare(a[curr],a[next]) <= 0);
+                
                 if( compare(a[curr],a[next]) == 0 )
                 {
                     T *target = &a[next];
