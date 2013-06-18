@@ -35,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(ops)
     YOCTO_MPI;
     MPI.CloseStdIO();
  
-    MPI.Printf0(stderr, "Checking DataBase\n");
+    MPI.Printf0(stderr, "Checking DataBase, #items=%u\n", unsigned( MPI.db.size() ) );
     const array<mpi::data_type> &db = MPI.db;
     for( size_t i=1; i <= db.size(); ++i )
     {
