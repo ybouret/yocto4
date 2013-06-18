@@ -206,28 +206,15 @@ namespace
             //MPI.Printf( stderr, "rank %d> SIM:get_variable '%s', domain=%d\n", par_rank, name.c_str(), domain);
             visit_handle h = VISIT_INVALID_HANDLE;
             
-            if( name == "U" )
-            {
-                const int nComponents=1;
-                const int nTuples    =U.items;
-                //MPI.Printf0( stderr, "Sending U: %dx%d\n", nComponents, nTuples);
-                assert(U.entry!=NULL);
-                if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
-                {
-                    VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, U.entry);
-                }
-            }
             
             if( name == "V" )
             {
-                const int nComponents=1;
-                const int nTuples    =V.items;
-                //MPI.Printf0( stderr, "Sending V: %dx%d\n", nComponents, nTuples);
-                assert(V.entry!=NULL);
-                if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
-                {
-                    VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, V.entry);
-                }
+                return variable_data(V);
+            }
+            
+            if(name == "U")
+            {
+                return variable_data(U);
             }
             
             return h;

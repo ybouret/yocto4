@@ -115,12 +115,12 @@ __append_data_type(Y_MPI_DB,item);    \
         Y_MPI_REGISTER(uint64_t, MPI_UINT64_T);
         Y_MPI_REGISTER(int64_t,  MPI_INT64_T);
 #endif
-    
+        
         //----------------------------------------------------------------------
         // standard integers, likely to be aliases
         //----------------------------------------------------------------------
         Y_MPI_REGISTER(char,  MPI_CHAR);
-	Y_MPI_REGISTER(uint8_t, MPI_BYTE);
+        Y_MPI_REGISTER(uint8_t, MPI_BYTE);
         Y_MPI_REGISTER(short, MPI_SHORT);
         Y_MPI_REGISTER(unsigned short, MPI_UNSIGNED_SHORT);
         
