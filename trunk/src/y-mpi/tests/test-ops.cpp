@@ -36,12 +36,12 @@ YOCTO_UNIT_TEST_IMPL(ops)
     MPI.CloseStdIO();
  
     MPI.Printf0(stderr, "Checking DataBase\n");
-    const array<mpi::db_item> &db = MPI.db;
+    const array<mpi::data_type> &db = MPI.db;
     for( size_t i=1; i <= db.size(); ++i )
     {
-        const mpi::db_item &item = db[i];
-        MPI.Printf(stderr, "%-10s => 0x%08x\n", item.spec.name(), unsigned(item.id) );
-        const MPI_Datatype res = MPI.get_type(item.spec);
+        const mpi::data_type &item = db[i];
+        MPI.Printf(stderr, "%-10s => 0x%08x\n", item.name(), unsigned(item.id) );
+        const MPI_Datatype res = MPI.get_type(item);
         MPI.Printf(stderr,"found 0x%08x\n", unsigned(res));
     }
     MPI.Printf0(stderr,"\n");
@@ -54,8 +54,10 @@ YOCTO_UNIT_TEST_IMPL(ops)
     __SHOW(size_t);
     __SHOW(long);
     __SHOW(unsigned long);
+    __SHOW(ptrdiff_t);
     MPI.Printf0(stderr,"\n");
 
+    
     MPI.Printf0(stderr, "Checking Ops\n");
     
     __check_ops<int>(MPI,      "int      : %d\n");
