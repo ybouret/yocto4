@@ -19,9 +19,10 @@ namespace yocto
                           );
         
         //! templated operation on one type
-        template <typename T,MPI_Op   OP> static inline
+        template <typename T> static inline
         T apply(const mpi &MPI,
                 const T    input,
+		MPI_Op     op,
                 MPI_Comm   comm)
         {
             T output(0);
@@ -29,7 +30,7 @@ namespace yocto
                            &output,
                            &input,
                            MPI.get_type<T>(),
-                           OP,
+                           op,
                            comm);
             return output;
         }
@@ -38,28 +39,28 @@ namespace yocto
         template <typename T> static inline
         T sum(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
-            return apply<T,MPI_SUM>(MPI,x,comm);
+            return apply<T>(MPI,x,MPI_SUM,comm);
         }
         
         //! specialized prod
         template <typename T> static inline
         T prod(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
-            return apply<T,MPI_PROD>(MPI,x,comm);
+            return apply<T>(MPI,x,MPI_PROD,comm);
         }
         
         //! specialized min
         template <typename T> static inline
         T min(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
-            return apply<T,MPI_MIN>(MPI,x,comm);
+            return apply<T>(MPI,x,MPI_MIN,comm);
         }
         
         //! specialized min
         template <typename T> static inline
         T max(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
-            return apply<T,MPI_MAX>(MPI,x,comm);
+            return apply<T>(MPI,x,MPI_MAX,comm);
         }
         
         
