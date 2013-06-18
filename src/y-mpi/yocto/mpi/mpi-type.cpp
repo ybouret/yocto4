@@ -22,7 +22,7 @@ namespace yocto
         return lhs.compare_to( rhs );
     }
     
-    MPI_Datatype mpi:: get_type(  const type_spec &spec) const
+    MPI_Datatype mpi:: get_type(const type_spec &spec) const
     {
         size_t jhi = db.size();
         if(jhi>0 )
@@ -79,8 +79,6 @@ namespace yocto
     
     void mpi:: gendb()
     {
-        if(CommWorldRank==0)
-            std::cerr << "Generating MPI types database (sizeof(mpi::data_type)=" << sizeof(data_type) << ")" << std::endl;
         
 #if 0
 #define Y_MPI_DB_INFO(T) std::cerr << "MPI Register " << #T << std::endl

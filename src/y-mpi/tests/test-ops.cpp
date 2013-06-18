@@ -3,7 +3,7 @@
 
 using namespace yocto;
 
-#define __SHOW(TYPE) MPI.Printf(stderr, "%-16s : 0x%016lx\n", #TYPE, ptrdiff_t(MPI.get_type<TYPE>()) )
+#define __SHOW(TYPE) MPI.Printf(stderr, "%-16s : 0x%lx\n", #TYPE, ptrdiff_t(MPI.get_type<TYPE>()) )
 
 
 template <typename T>
@@ -40,9 +40,9 @@ YOCTO_UNIT_TEST_IMPL(ops)
     for( size_t i=1; i <= db.size(); ++i )
     {
         const mpi::data_type &item = db[i];
-        MPI.Printf(stderr, "%-10s => 0x%016lx\n", item.name(), ptrdiff_t(item.id) );
+        MPI.Printf(stderr, "%-10s => 0x%lx\n", item.name(), ptrdiff_t(item.id) );
         const MPI_Datatype res = MPI.get_type(item);
-        MPI.Printf(stderr,"found 0x%016lx\n", ptrdiff_t(res));
+        MPI.Printf(stderr,"found 0x%lx\n", ptrdiff_t(res));
     }
     MPI.Printf0(stderr,"\n");
     
