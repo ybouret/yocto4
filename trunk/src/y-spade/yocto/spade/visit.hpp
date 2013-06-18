@@ -21,25 +21,30 @@ namespace yocto
         class VisItIO
         {
         public:
+            typedef void (*set_data_proc)( visit_handle &, int, int, const void *);
             class param
             {
             public:
                 const type_spec         spec;       //!< the type spec
                 const int               vartype;    //!< VISIT_VARTYPE_(SCALAR|VECTOR)
                 const int               components; //!< nComponents
+                set_data_proc           set_data;   //!< for variable_data function
                 inline const type_spec &key() const throw() { return spec; }
                 
-                inline param( const std::type_info &id, int vt, int nc) :
+                inline param( const std::type_info &id, int vt, int nc, set_data_proc sd) :
                 spec(id),
                 vartype(vt),
-                components(nc)
+                components(nc),
+                set_data(sd)
                 {
+                    assert(set_data!=0);
                 }
                 
                 inline param( const param &other ) :
-                spec( other.spec ),
-                vartype( other.vartype ),
-                components( other.components )
+                spec(       other.spec       ),
+                vartype(    other.vartype    ),
+                components( other.components ),
+                set_data(   other.set_data   )
                 {
                 }
                 
@@ -53,12 +58,13 @@ namespace yocto
             
             explicit VisItIO() : params(8,as_capacity)
             {
-                { const param p( typeid(float),             VISIT_VARTYPE_SCALAR, 1);  record(p); }
-                { const param p( typeid(double),            VISIT_VARTYPE_SCALAR, 1);  record(p); }
-                { const param p( typeid(math::v2d<float>),  VISIT_VARTYPE_VECTOR, 2);  record(p); }
-                { const param p( typeid(math::v2d<double>), VISIT_VARTYPE_VECTOR, 2);  record(p); }
-                { const param p( typeid(math::v3d<float>),  VISIT_VARTYPE_VECTOR, 3);  record(p); }
-                { const param p( typeid(math::v3d<double>), VISIT_VARTYPE_VECTOR, 3);  record(p); }
+                { const param p( typeid(float),             VISIT_VARTYPE_SCALAR, 1, set_data_f);  record(p); }
+                { const param p( typeid(double),            VISIT_VARTYPE_SCALAR, 1, set_data_d);  record(p); }
+                { const param p( typeid(int),               VISIT_VARTYPE_SCALAR, 1, set_data_i);  record(p); }
+                { const param p( typeid(math::v2d<float>),  VISIT_VARTYPE_VECTOR, 2, set_data_f);  record(p); }
+                { const param p( typeid(math::v2d<double>), VISIT_VARTYPE_VECTOR, 2, set_data_d);  record(p); }
+                { const param p( typeid(math::v3d<float>),  VISIT_VARTYPE_VECTOR, 3, set_data_f);  record(p); }
+                { const param p( typeid(math::v3d<double>), VISIT_VARTYPE_VECTOR, 3, set_data_d);  record(p); }
                 
             }
             virtual ~VisItIO() throw() {}
@@ -156,7 +162,7 @@ namespace yocto
                         VisIt_VariableMetaData_setUnits(vmd, units );
                 }
                 else
-                    throw exception("VisIt I/O::variable_data error");
+                    throw exception("VisIt I/O::variable_meta_data error");
                 return vmd;
             }
             
@@ -170,10 +176,62 @@ namespace yocto
                 return variable_meta_data<T>(name,mesh_id,units);
             }
             
+            template <typename ARRAY>
+            inline visit_handle variable_data( const ARRAY &A ) const
+            {
+                assert(A.items>0);
+                assert(A.entry!=NULL);
+                
+                //--------------------------------------------------------------
+                // Look Up Params
+                //--------------------------------------------------------------
+                const type_spec spec( typeid( typename ARRAY::type ) );
+                const param    *p = params.search(spec);
+                if(!p)
+                    throw exception("no VisIt I/O for <'%s'>", spec.name());
+                visit_handle h = VISIT_INVALID_HANDLE;
+                
+                //--------------------------------------------------------------
+                // Allocate handle
+                //--------------------------------------------------------------
+                if(VisIt_VariableData_alloc(&h) != VISIT_OKAY)
+                    throw exception("VisIt I/O::variable_data error");
+                
+                //--------------------------------------------------------------
+                // prepare data
+                //--------------------------------------------------------------
+                const int nComponents= int(p->components);
+                const int nTuples    = int(A.items);
+                p->set_data(h,nComponents,nTuples,A.entry);
+                return h;
+            }
+            
         private:
             inline void record( const param &p ) { (void) params.insert(p); }
             YOCTO_DISABLE_COPY_AND_ASSIGN(VisItIO);
+            static void set_data_d(visit_handle &h,
+                                   const int     nComponents,
+                                   const int     nTuples,
+                                   const void   *addr)
+            {
+                VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, (double*)addr);
+            }
             
+            static void set_data_f(visit_handle &h,
+                                   const int     nComponents,
+                                   const int     nTuples,
+                                   const void   *addr)
+            {
+                VisIt_VariableData_setDataF(h, VISIT_OWNER_SIM, nComponents, nTuples, (float*)addr);
+            }
+            
+            static void set_data_i(visit_handle &h,
+                                   const int     nComponents,
+                                   const int     nTuples,
+                                   const void   *addr)
+            {
+                VisIt_VariableData_setDataI(h, VISIT_OWNER_SIM, nComponents, nTuples, (int*)addr);
+            }
         };
         
     }

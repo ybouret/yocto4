@@ -238,13 +238,7 @@ namespace
             
             if( name == "U" )
             {
-                const int nComponents=1;
-                const int nTuples    =U.items;
-                assert(U.entry!=NULL);
-                if(VisIt_VariableData_alloc(&h) == VISIT_OKAY)
-                {
-                    VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, nComponents, nTuples, U.entry);
-                }
+                return variable_data(U);
             }
             
             return h;
