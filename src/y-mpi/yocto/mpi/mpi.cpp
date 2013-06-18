@@ -1,5 +1,4 @@
 #include "yocto/mpi/mpi.hpp"
-#include "yocto/code/hsort.hpp"
 
 #include <cstring>
 #include <cstdarg>
@@ -98,7 +97,7 @@ namespace yocto
 	ProcessorName(),
     ThreadLevel(0),
     CommWorldID(),
-    db(16,as_capacity)
+    db(32,as_capacity)
 	{
 		if( NULL == mpi_argc_ || NULL == mpi_argv_ )
 		{
@@ -148,21 +147,7 @@ namespace yocto
                 // TODO: throw an exception ?
 			}
             
-#define Y_MPI_DB ((vector<db_item> &)db)
-#define Y_MPI_REGISTER(T,ID) do {   \
-const db_item item( typeid(T), ID); \
-Y_MPI_DB.push_back(item);           \
-} while(false)
-            
-            
-            Y_MPI_REGISTER(int,           MPI_INT);
-            Y_MPI_REGISTER(long,          MPI_LONG);
-            Y_MPI_REGISTER(unsigned,      MPI_UNSIGNED);
-            Y_MPI_REGISTER(unsigned long, MPI_UNSIGNED_LONG);
-            Y_MPI_REGISTER(float,         MPI_FLOAT);
-            Y_MPI_REGISTER(double,        MPI_DOUBLE);
-            
-            hsort(Y_MPI_DB, db_item::compare);
+            gendb();
             
             (string &)CommWorldID = vformat("%d.%d", CommWorldSize, CommWorldRank);
         }

@@ -234,21 +234,19 @@ namespace yocto
         // data type
         //
         //======================================================================
-        class db_item
+        class data_type : public type_spec
         {
         public:
-            const type_spec    spec;
             const MPI_Datatype id;
             
-            db_item( const std::type_info &info, const MPI_Datatype ID) throw();
-            ~db_item() throw();
-            db_item(const db_item &other) throw();
+            data_type( const std::type_info &info, const MPI_Datatype ID) throw();
+            ~data_type() throw();
+            data_type(const data_type &other) throw();
             
-            static int compare( const db_item &lhs, const db_item &rhs ) throw();
-            
+            static int compare( const data_type &lhs, const data_type &rhs ) throw();
             
         private:
-            YOCTO_DISABLE_ASSIGN(db_item);
+            YOCTO_DISABLE_ASSIGN(data_type);
         };
         
         MPI_Datatype get_type( const std::type_info &info ) const;
@@ -259,7 +257,8 @@ namespace yocto
             return get_type( typeid(T) );
         }
         
-        const vector<db_item> db;
+        typedef vector<data_type> db_type;
+        const db_type db;
         
 	private:
 		friend class singleton<mpi>;                           //!< access mpi
@@ -272,7 +271,7 @@ namespace yocto
 		YOCTO_DISABLE_COPY_AND_ASSIGN(mpi);
 		void clear_pname() throw();
 		void on_finalize() throw(); //!< clean up
-        
+        void gendb();
         
 	};
 	
