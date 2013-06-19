@@ -86,7 +86,27 @@ namespace yocto {
             
             v2d rotated_by( T angle ) const throw();
             
+            static T dist2( const v2d &, const v2d &) throw();
+            static T dist(const v2d &, const v2d & ) throw();
+            
             static const v2d<T> zero;
+            
+            static inline
+            int lexicographical_compare( const v2d &lhs, const v2d &rhs ) throw()
+            {
+                if( lhs.x < rhs. x)
+                    return -1;
+                else
+                {
+                    if(rhs.x<lhs.x)
+                        return 1;
+                    else
+                    {
+                        // lhs.x == rhs.x
+                        return lhs.y < rhs.y ? -1 : ( rhs.y < lhs.y ? 1 : 0 );
+                    }
+                }
+            }
 		};
         
 		template <class T>
