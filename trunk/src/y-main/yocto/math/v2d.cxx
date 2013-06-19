@@ -129,6 +129,23 @@ namespace yocto {
             const real_t a = math::Atan2(x,y);
             return a < 0 ? a + math::numeric<real_t>::two_pi : a;
         }
+        
+        template <>
+        real_t v2d<real_t>:: dist2(const v2d<real_t> &lhs, const v2d<real_t> &rhs ) throw()
+        {
+            const real_t dx = rhs.x - lhs.x;
+            const real_t dy = rhs.y - lhs.y;
+            return dx*dx + dy*dy;
+        }
+        
+        template <>
+        real_t v2d<real_t>:: dist(const v2d<real_t> &lhs, const v2d<real_t> &rhs ) throw()
+        {
+            const real_t dx = rhs.x - lhs.x;
+            const real_t dy = rhs.y - lhs.y;
+            return Hypotenuse(dx, dy);
+        }
+        
 #else
 		template <>
 		real_t v2d<real_t>:: norm() const throw() {

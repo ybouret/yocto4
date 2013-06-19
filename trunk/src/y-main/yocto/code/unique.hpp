@@ -67,8 +67,8 @@ namespace yocto
         const size_t n = a.size();
         if( n > 1 )
         {
-            size_t k = unique<typename ARRAY::type>( &a[1], n, compare);
-            while(k-->0)
+            size_t to_drop = unique<typename ARRAY::type>( &a[1], n, compare);
+            while(to_drop-->0)
                 a.pop_back();
         }
         
