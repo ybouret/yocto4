@@ -73,6 +73,7 @@ namespace yocto
 			char string_[MPI_MAX_ERROR_STRING];
 		};
 		
+        //! MPI_Init wrapper
 		static mpi & init( int * argc, char ***argv );
 		void   Finalize() throw();
 		
@@ -86,8 +87,8 @@ namespace yocto
         mutable uint64_t CommTime;         //!< cumulative communication time in microseconds
 		const int        ProcessorNameLength;
 		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME]; //!< from MPI_Get_Processor_name(...)
-		const int        ThreadLevel;
-        const string     CommWorldID;
+		const int        ThreadLevel;      //!< Information
+        const string     CommWorldID;      //!< size.rank
         
         const char *ThreadLevelName() const throw();
         int Comm_rank( MPI_Comm comm ) const;
@@ -127,6 +128,7 @@ namespace yocto
                            void       *recvbuf, size_t recvcount, MPI_Datatype recvtype, int from, int recvtag,
                            MPI_Comm    comm,
                            MPI_Status &status ) const;
+        
         //======================================================================
         // Collective Communication Routines
         //======================================================================
@@ -231,7 +233,7 @@ namespace yocto
         
         //======================================================================
         //
-        // data type
+        // data type for database
         //
         //======================================================================
         class data_type : public type_spec
