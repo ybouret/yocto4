@@ -10,14 +10,17 @@ namespace yocto
     
     //! rearrange an array or ORDERED values
     /**
-     \return the number of doublons
+     \return the number of unique items
      */
     template <typename T,typename FUNC>
     inline size_t __unique( T *a, const size_t n, FUNC &compare) throw()
     {
         assert(!(a==0&&n>0));
-        size_t ans = 0;
-        if(n>1)
+        if(n<=1)
+        {
+            return n;
+        }
+        else
         {
             //-- local memory
             uint64_t     wksp[ YOCTO_U64_FOR_ITEM(T) ];
@@ -33,10 +36,9 @@ namespace yocto
                 if( compare(a[curr],a[next]) == 0 )
                 {
                     T *target = &a[next];
-                    memmove(ra,target,sizeof(T));
-                    memmove(target,target+1,(n_ok-next)*sizeof(T));
-                    memmove(&a[--n_ok],ra,sizeof(T));
-                    ++ans;
+                    memmove((void*)ra,        (void*)target,     sizeof(T));
+                    memmove((void*)target,    (void*)(target+1), (n_ok-next)*sizeof(T));
+                    memmove((void*)&a[--n_ok],(void*)ra,         sizeof(T));
                 }
                 else
                 {
@@ -44,15 +46,14 @@ namespace yocto
                     ++curr;
                 }
             }
-            
+            return n_ok;
         }
-        return ans;
     }
     
     
     //! rearrange an array of values
     /**
-     \return the number of doublons
+     \return the number of unique items
      */
     template <typename T,typename FUNC>
     inline size_t unique( T *a, const size_t n, FUNC &compare) throw()
@@ -61,14 +62,15 @@ namespace yocto
         return __unique<T>(a, n, compare);
     }
     
+    //! sort and cleanup the array
     template <typename ARRAY,typename FUNC>
     inline void unique( ARRAY &a, FUNC &compare) throw()
     {
         const size_t n = a.size();
         if( n > 1 )
         {
-            size_t to_drop = unique<typename ARRAY::type>( &a[1], n, compare);
-            while(to_drop-->0)
+            const size_t n_ok = unique<typename ARRAY::type>( &a[1], n, compare);
+            while( a.size() > n_ok )
                 a.pop_back();
         }
         
