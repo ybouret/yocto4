@@ -22,9 +22,12 @@ namespace yocto
         }
         else
         {
+            assert(n>=2);
             //-- local memory
             uint64_t     wksp[ YOCTO_U64_FOR_ITEM(T) ];
             T           *ra   = _cast::trans<T,uint64_t>(wksp);
+            
+            //-- initialize algorithm
             size_t       n_ok = n;
             
             size_t curr = 0;
@@ -63,6 +66,9 @@ namespace yocto
     }
     
     //! sort and cleanup the array
+    /**
+     assume the array is not a list...
+     */
     template <typename ARRAY,typename FUNC>
     inline void unique( ARRAY &a, FUNC &compare) throw()
     {
@@ -73,7 +79,6 @@ namespace yocto
             while( a.size() > n_ok )
                 a.pop_back();
         }
-        
     }
     
     
