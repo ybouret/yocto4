@@ -37,28 +37,28 @@ namespace yocto
         
         //! specialized sum
         template <typename T> static inline
-        T sum(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
+        T sum_of(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
             return apply<T>(MPI,x,MPI_SUM,comm);
         }
         
         //! specialized prod
         template <typename T> static inline
-        T prod(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
+        T prod_of(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
             return apply<T>(MPI,x,MPI_PROD,comm);
         }
         
         //! specialized min
         template <typename T> static inline
-        T min(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
+        T min_of(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
             return apply<T>(MPI,x,MPI_MIN,comm);
         }
         
         //! specialized min
         template <typename T> static inline
-        T max(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
+        T max_of(const mpi &MPI, T x, MPI_Comm comm = MPI_COMM_WORLD)
         {
             return apply<T>(MPI,x,MPI_MAX,comm);
         }
