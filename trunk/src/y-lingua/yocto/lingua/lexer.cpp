@@ -188,16 +188,17 @@ history()
             
             while(true)
             {
+                //--------------------------------------------------------------
+                // check the scanner
+                //--------------------------------------------------------------
                 if( !scan )
                     throw exception("%u: lexer[%s] no scanner", unsigned(line), name.c_str());
-               
-                //std::cerr << "[" << name << "]<" << scan->name << ">" << std::endl;
                 
                 if( cache.size > 0 )
                     return cache.pop_front();
                 
                 bool    fctl = false;
-                lexeme *lx  = scan->get(src, fctl);
+                lexeme *lx   = scan->get(src, fctl);
                 if( lx )
                 {
                     assert(false==fctl);
