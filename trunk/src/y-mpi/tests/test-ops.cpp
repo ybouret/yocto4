@@ -9,21 +9,22 @@ using namespace yocto;
 template <typename T>
 void __check_ops(const mpi &MPI, const char *fmt)
 {
-    const T x( MPI.CommWorldRank+1 );
+	const int v = MPI.CommWorldRank+1;
+    const T   x = T(v);
     MPI.Printf(stderr, fmt, x);
-    const T s = mpi_ops::sum(MPI,x);
+    const T s = mpi_ops::sum_of(MPI,x);
     MPI.Printf0(stderr,"sum:\n");
     MPI.Printf(stderr,fmt,s);
     
-    const T p = mpi_ops::prod(MPI, x);
+    const T p = mpi_ops::prod_of(MPI, x);
     MPI.Printf0(stderr,"prod:\n");
     MPI.Printf(stderr,fmt,p);
     
-    const T xmin =  mpi_ops::min(MPI, x);
+    const T xmin =  mpi_ops::min_of(MPI, x);
     MPI.Printf0(stderr,"min:\n");
     MPI.Printf(stderr,fmt,xmin);
     
-    const T xmax =  mpi_ops::max(MPI, x);
+    const T xmax =  mpi_ops::max_of(MPI, x);
     MPI.Printf0(stderr,"max:\n");
     MPI.Printf(stderr,fmt,xmax);
 }
