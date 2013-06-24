@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/mpi/ops.hpp"
+#include "yocto/mpi/mpi.hpp"
 
 using namespace yocto;
 
@@ -12,19 +12,19 @@ void __check_ops(const mpi &MPI, const char *fmt)
 	const int v = MPI.CommWorldRank+1;
     const T   x = T(v);
     MPI.Printf(stderr, fmt, x);
-    const T s = mpi_ops::sum_of(MPI,x);
+    const T s = MPI.Sum(x,MPI_COMM_WORLD);
     MPI.Printf0(stderr,"sum:\n");
     MPI.Printf(stderr,fmt,s);
     
-    const T p = mpi_ops::prod_of(MPI, x);
+    const T p = MPI.Prod(x,MPI_COMM_WORLD);
     MPI.Printf0(stderr,"prod:\n");
     MPI.Printf(stderr,fmt,p);
     
-    const T xmin =  mpi_ops::min_of(MPI, x);
+    const T xmin =  MPI.Min(x, MPI_COMM_WORLD);
     MPI.Printf0(stderr,"min:\n");
     MPI.Printf(stderr,fmt,xmin);
     
-    const T xmax =  mpi_ops::max_of(MPI, x);
+    const T xmax =  MPI.Max(x, MPI_COMM_WORLD);
     MPI.Printf0(stderr,"max:\n");
     MPI.Printf(stderr,fmt,xmax);
 }
