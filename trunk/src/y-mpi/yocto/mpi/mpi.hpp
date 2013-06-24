@@ -310,28 +310,28 @@ namespace yocto
         template <typename T>
         inline T Sum(const T &input, MPI_Comm comm) const
         {
-            return Allreduce1(input, MPI_SUM, comm);
+            return Allreduce1<T>(input, MPI_SUM, comm);
         }
         
         //! Product Of operands
         template <typename T>
         inline T Prod(const T &input, MPI_Comm comm) const
         {
-            return Allreduce1(input, MPI_PROD, comm);
+            return Allreduce1<T>(input, MPI_PROD, comm);
         }
         
         //! Min Of operands
         template <typename T>
         inline T Min(const T &input, MPI_Comm comm) const
         {
-            return Allreduce1(input, MPI_MIN, comm);
+            return Allreduce1<T>(input, MPI_MIN, comm);
         }
         
         //! Min Of operands
         template <typename T>
         inline T Max(const T &input, MPI_Comm comm) const
         {
-            return Allreduce1(input, MPI_MAX, comm);
+            return Allreduce1<T>(input, MPI_MAX, comm);
         }
         
         

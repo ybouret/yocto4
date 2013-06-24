@@ -11,6 +11,7 @@ void __check_ops(const mpi &MPI, const char *fmt)
 {
 	const int v = MPI.CommWorldRank+1;
     const T   x = T(v);
+	MPI.Printf0(stderr,"Checking ops with\n");
     MPI.Printf(stderr, fmt, x);
     const T s = MPI.Sum(x,MPI_COMM_WORLD);
     MPI.Printf0(stderr,"sum:\n");
@@ -27,6 +28,8 @@ void __check_ops(const mpi &MPI, const char *fmt)
     const T xmax =  MPI.Max(x, MPI_COMM_WORLD);
     MPI.Printf0(stderr,"max:\n");
     MPI.Printf(stderr,fmt,xmax);
+
+	MPI.Printf0(stderr,"\n");
 }
 
 
@@ -60,11 +63,10 @@ YOCTO_UNIT_TEST_IMPL(ops)
 
     
     MPI.Printf0(stderr, "Checking Ops\n");
-    
     __check_ops<int>(MPI,      "int      : %d\n");
     __check_ops<float>(MPI,    "float    : %f\n");
     __check_ops<double>(MPI,   "double   : %lf\n");
     __check_ops<unsigned>(MPI, "unsigned : %u\n");
-
+	
 }
 YOCTO_UNIT_TEST_DONE()
