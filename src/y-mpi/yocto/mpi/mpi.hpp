@@ -95,7 +95,9 @@ namespace yocto
         
         
 		//======================================================================
+        //
 		// Point-to-point Communication Routines
+        //
 		//======================================================================
 		void       Send(  const void *buffer, size_t count, MPI_Datatype datatype, int dest,  int tag, MPI_Comm comm ) const;
 		void       Rsend( const void *buffer, size_t count, MPI_Datatype datatype, int dest,  int tag, MPI_Comm comm ) const;
@@ -130,7 +132,9 @@ namespace yocto
                            MPI_Status &status ) const;
         
         //======================================================================
+        //
         // Collective Communication Routines
+        //
         //======================================================================
         void Barrier(MPI_Comm comm) const;
         void Bcast( void *buffer, size_t count, MPI_Datatype datatype, int root, MPI_Comm comm ) const;
@@ -140,13 +144,17 @@ namespace yocto
         void Allreduce( const void *sendbuf, void *recvbuf, size_t count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) const;
         
         //======================================================================
+        //
         // Usefull helpers
+        //
         //======================================================================
         int  CommWorldNext() const throw(); //!< modulus the CommWorldSize
         int  CommWorldPrev() const throw(); //!< modulus the CommWorldSize
 		
         //======================================================================
+        //
         // stdio helpers
+        //
         //======================================================================
         
         //! parallel printf, in order in MPI_COMM_WORLD
@@ -157,6 +165,13 @@ namespace yocto
         
         //! close standard I/O on rank>0
         void CloseStdIO() const;
+        
+        
+        //======================================================================
+        //
+        // Requests helpers
+        //
+        //======================================================================
         
         //! MPI_Request/MPI_Status helper
         class Requests
@@ -181,7 +196,9 @@ namespace yocto
 		
         
         //======================================================================
+        //
         // Send/Recv templated for integral types
+        //
         //======================================================================
         
         //! send ONE integral type
@@ -261,6 +278,63 @@ namespace yocto
         
         typedef vector<data_type> db_type;
         const db_type db;
+        
+        //======================================================================
+        //
+        // Allreduce wrappers
+        //
+        //======================================================================
+       
+        //! Allreduce on one type
+        void Allreduce1(void        *output,
+                        const void  *input,
+                        MPI_Datatype datatype,
+                        MPI_Op       op,
+                        MPI_Comm     comm
+                        ) const;
+        
+        //! integral type allreduce1
+        template <typename T>
+        inline T Allreduce1(const T &input, MPI_Op op, MPI_Comm comm ) const
+        {
+            T output(0);
+            Allreduce1(&output,
+                       &input,
+                       get_type<T>(),
+                       op,
+                       comm);
+            return output;
+        }
+        
+        //! Sum Of operands
+        template <typename T>
+        inline T Sum(const T &input, MPI_Comm comm) const
+        {
+            return Allreduce1(input, MPI_SUM, comm);
+        }
+        
+        //! Product Of operands
+        template <typename T>
+        inline T Prod(const T &input, MPI_Comm comm) const
+        {
+            return Allreduce1(input, MPI_PROD, comm);
+        }
+        
+        //! Min Of operands
+        template <typename T>
+        inline T Min(const T &input, MPI_Comm comm) const
+        {
+            return Allreduce1(input, MPI_MIN, comm);
+        }
+        
+        //! Min Of operands
+        template <typename T>
+        inline T Max(const T &input, MPI_Comm comm) const
+        {
+            return Allreduce1(input, MPI_MAX, comm);
+        }
+        
+        
         
 	private:
 		friend class singleton<mpi>;                           //!< access mpi

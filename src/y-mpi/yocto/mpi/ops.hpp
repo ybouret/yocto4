@@ -22,7 +22,7 @@ namespace yocto
         template <typename T> static inline
         T apply(const mpi &MPI,
                 const T    input,
-		MPI_Op     op,
+                MPI_Op     op,
                 MPI_Comm   comm)
         {
             T output(0);
