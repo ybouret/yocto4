@@ -6,7 +6,11 @@
 
 namespace yocto
 {
-    template <typename T,typename FUNC> inline
+    
+    template <
+    typename T,
+    typename FUNC>
+    inline
     size_t remove_if( T *a, size_t n, FUNC &is_bad )
     {
         assert(!(a==0&&n>0));
@@ -29,6 +33,8 @@ namespace yocto
         }
         return n_ok;
     }
+    
+    
     
     template <typename ARRAY,typename FUNC> inline
     void remove_if( ARRAY &a, FUNC &is_bad)
