@@ -25,19 +25,15 @@ YOCTO_UNIT_TEST_IMPL(async)
     
     for( unsigned iter=1; iter <= 1024; ++iter)
     {
-        //MPI.Printf(stderr, "** Iter= %u\n", iter);
         size_t ir = 0;
         MPI.Irecv( recv_prev.rw(), block_size, MPI_BYTE, MPI.CommWorldPrev(), 0, MPI_COMM_WORLD, requests[ir++]);
         MPI.Isend( send_next.ro(), block_size, MPI_BYTE, MPI.CommWorldNext(), 0, MPI_COMM_WORLD, requests[ir++]);
         
-        //MPI.Waitall(requests);
         comm.launch(requests);
-        //MPI.Printf(stderr,"\twaiting...\n");
         comm.finish();
         
     }
     
-    //MPI.Barrier(MPI_COMM_WORLD);
     
 }
 YOCTO_UNIT_TEST_DONE()
