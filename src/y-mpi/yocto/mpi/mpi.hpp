@@ -247,6 +247,7 @@ namespace yocto
         //======================================================================
         void   Send( const string &s, int dest, int tag, MPI_Comm comm ) const;
         string Recv( int source, int tag, MPI_Comm comm, MPI_Status &status ) const;
+        void   Bcast( string &s, int root, MPI_Comm comm) const;
         
         //======================================================================
         //

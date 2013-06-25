@@ -9,8 +9,10 @@ YOCTO_UNIT_TEST_IMPL(bcast)
 {
 	
 	mpi &MPI = mpi::init( &argc, & argv );
+    
+    MPI.CloseStdIO();
+    
 	const int rank = MPI.CommWorldRank;
-	//const int size = MPI.CommWorldSize;
 	MPI.Printf( stderr, "Bcast is ready\n" );
 	
 	int msg = 0;
@@ -18,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(bcast)
 	{
 		msg = 7;
 	}
-	MPI.Printf0( stderr, "Broadcasting %d\n", msg );
+	MPI.Printf0( stderr, "Broadcasting int %d\n", msg );
     uint64_t mu0 = MPI.CommTime;
 	MPI.Bcast(&msg, 1, MPI_INT, 0, MPI_COMM_WORLD);
     uint64_t mu  = MPI.CommTime - mu0;
@@ -31,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(bcast)
     msg = 0;
     if( 0 == rank )
         msg = 10101;
-    MPI.Printf0( stderr, "Broadcasting %d\n", msg );
+    MPI.Printf0( stderr, "Broadcasting integral %d\n", msg );
     mu0 = MPI.CommTime;
     MPI.Bcast<int>(msg, 0, MPI_COMM_WORLD);
     mu  = MPI.CommTime - mu0;
@@ -41,6 +43,17 @@ YOCTO_UNIT_TEST_IMPL(bcast)
     MPI.Printf0(stderr, "\nin %g usec\n\n", double(mu));
     MPI.Barrier(MPI_COMM_WORLD);
     
+    
+    string s;
+    if(MPI.IsFirst)
+        s = vformat("initial string %d.%d", MPI.CommWorldSize, rank);
+    else
+        s = "empty";
+    MPI.Printf0( stderr, "Broadcasting '%s'\n", s.c_str() );
+
+    MPI.Bcast(s,0,MPI_COMM_WORLD);
+    MPI.Printf(stderr,"s='%s'\n", s.c_str());
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
@@ -49,6 +62,8 @@ YOCTO_UNIT_TEST_IMPL(scatter)
 {
 	
 	mpi &MPI = mpi::init( &argc, & argv );
+    MPI.CloseStdIO();
+    
 	const int rank = MPI.CommWorldRank;
 	const int size = MPI.CommWorldSize;
 	MPI.Printf( stderr, "Scatter: Rank %d/%d is ready\n", rank, size );

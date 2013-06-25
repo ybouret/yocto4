@@ -1,6 +1,10 @@
 #include "yocto/mpi/mpi.hpp"
+#include "yocto/memory/buffers.hpp"
+#include "yocto/memory/pooled.hpp"
 
-namespace yocto 
+#include <cstring>
+
+namespace yocto
 {
 	
 	
@@ -36,7 +40,7 @@ namespace yocto
 			throw mpi::exception( err, "MPI_Scatter(root=%d)", root );
         Y_MPI_CTIME;
 	}
-
+    
 	
 	void mpi:: Gather( const void *sendbuf, size_t sendcnt, MPI_Datatype sendtype, void *recvbuf, size_t recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm ) const
 	{
@@ -70,7 +74,36 @@ namespace yocto
 			throw mpi::exception( err, "MPI_Alleduce()");
         Y_MPI_CTIME;
     }
-
+    
+    void mpi::Bcast( string &s, int root, MPI_Comm comm) const
+    {
+        //----------------------------------------------------------------------
+        // Broadcasting size: only root counts !!
+        //----------------------------------------------------------------------
+        size_t sz = s.size();
+        Bcast<size_t>(sz,root,comm);
+        
+        //----------------------------------------------------------------------
+        // Prepare data
+        //----------------------------------------------------------------------
+        memory::buffer_of<char,memory::pooled> buf( sz );
+        
+        
+        const bool is_root = (root == Comm_rank(comm));
+        if(is_root)
+            memcpy(buf.rw(),s.ro(),sz);
+        Bcast(buf.rw(), sz, MPI_BYTE, root, comm);
+        
+        //----------------------------------------------------------------------
+        // Rebuild strings
+        //----------------------------------------------------------------------
+        if(!is_root)
+        {
+            const string tmp( buf(0), sz);
+            s = tmp;
+        }
+    }
+    
     
 	
 }
