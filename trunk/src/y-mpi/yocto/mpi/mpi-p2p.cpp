@@ -1,5 +1,6 @@
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/memory/buffers.hpp"
+#include "yocto/memory/pooled.hpp"
 
 namespace yocto
 {
@@ -210,7 +211,7 @@ Y_MPI_CTIME;\
         //-- recv the content
         if( len > 0 )
         {
-            memory::buffer_of<char,memory::global> buf( len );
+            memory::buffer_of<char,memory::pooled> buf( len );
             Recv(buf.rw(), len, MPI_BYTE, source, tag, comm, status);
             return string(buf(),len);
         }
@@ -218,4 +219,5 @@ Y_MPI_CTIME;\
             return string();
     }
 	
+       
 }

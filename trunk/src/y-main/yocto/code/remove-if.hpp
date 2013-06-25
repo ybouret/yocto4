@@ -7,6 +7,7 @@
 namespace yocto
 {
     
+    //! use a functionoid to remove if is bad
     template <
     typename T,
     typename FUNC>
