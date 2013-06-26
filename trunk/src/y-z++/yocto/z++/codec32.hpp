@@ -14,6 +14,16 @@ namespace yocto
             explicit codec32() throw();
             virtual ~codec32() throw();
             
+            Y_CODEC32_DECL();
+            
+            
+            static int32_t Encode(void           *destbuf,
+                                  uint32_t       &destlen,
+                                  const void     *srcbuf,
+                                  const uint32_t  srclen,
+                                  const int       level) throw();
+            
+            static uint32_t EncodeSpace(uint32_t src) throw();
             
             
         private:
