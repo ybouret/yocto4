@@ -16,7 +16,7 @@ namespace yocto
             
             Y_CODEC32_DECL();
             
-            
+            //! need a memory lock before call
             static int32_t Encode(void           *destbuf,
                                   uint32_t       &destlen,
                                   const void     *srcbuf,
