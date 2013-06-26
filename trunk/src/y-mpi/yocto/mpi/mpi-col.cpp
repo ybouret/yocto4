@@ -1,6 +1,7 @@
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/memory/buffers.hpp"
 #include "yocto/memory/pooled.hpp"
+#include "yocto/auto-ptr.hpp"
 
 #include <cstring>
 
@@ -75,6 +76,11 @@ namespace yocto
         Y_MPI_CTIME;
     }
     
+    namespace
+    {
+        typedef memory::buffer_of<char,memory::pooled> buffer_type;
+    }
+    
     void mpi::Bcast( string &s, int root, MPI_Comm comm) const
     {
         //----------------------------------------------------------------------
@@ -86,24 +92,34 @@ namespace yocto
         //----------------------------------------------------------------------
         // Prepare data
         //----------------------------------------------------------------------
+        auto_ptr<buffer_type> buff;
+        char                 *addr = 0;
+        
         memory::buffer_of<char,memory::pooled> buf( sz );
         
         
         const bool is_root = (root == Comm_rank(comm));
         if(is_root)
-            memcpy(buf.rw(),s.ro(),sz);
-
+        {
+            addr = &s[0];
+        }
+        else
+        {
+            buff.reset( new buffer_type(sz) );
+            addr = (*buff)(0);
+        }
+        
         //----------------------------------------------------------------------
         // Broadcast effectively
         //----------------------------------------------------------------------
-        Bcast(buf.rw(), sz, MPI_BYTE, root, comm);
+        Bcast(addr, sz, MPI_BYTE, root, comm);
         
         //----------------------------------------------------------------------
         // Rebuild strings
         //----------------------------------------------------------------------
         if(!is_root)
         {
-            const string tmp( buf(0), sz);
+            const string tmp( addr, sz);
             s = tmp;
         }
     }
