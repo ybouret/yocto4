@@ -1,6 +1,7 @@
 #include "yocto/z++/codec32.hpp"
-#include "yocto/threading/mutex.hpp"
 #include "yocto/zlib/zlib.h"
+
+#include <iostream>
 
 namespace yocto
 {
@@ -20,15 +21,16 @@ namespace yocto
             
             Y_CODEC32_CHECK();
             
-            Bytef       *dest    = (Bytef *)destbuf;
-            uLong        destLen = destLen;
-            const Bytef *source = (const Bytef *)srcbuf;
+            Bytef       *target    = (Bytef *)destbuf;
+            uLong        targetLen = destlen;
+            const Bytef *source    = (const Bytef *)srcbuf;
             const uLong  sourceLen = srclen;
-            YOCTO_GIANT_LOCK();
-            const int    ans = compress2(dest, &destLen, source, sourceLen, int(level));
+           
+            const int    ans = compress2(target, &targetLen, source, sourceLen, int(level));
             if(ans!=Z_OK)
                 return 1;
             
+            destlen = targetLen;
             return 0;
         }
         
