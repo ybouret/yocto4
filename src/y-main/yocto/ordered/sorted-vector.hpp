@@ -6,6 +6,7 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/core/locate.hpp"
 #include "yocto/code/swap.hpp"
+#include "yocto/code/cast.hpp"
 #include "yocto/bitwise.hpp"
 
 #include <iostream>
@@ -102,7 +103,7 @@ namespace yocto
 			else
 			{
 				uint64_t      stk[ YOCTO_U64_FOR_ITEM(T) ];
-				mutable_type *tmp = (mutable_type *)stk;
+				mutable_type *tmp = _cast::trans<mutable_type,uint64_t>(stk);
 				new (tmp) T(args);
 				if( size_ >= maxi_ )
 				{ 
