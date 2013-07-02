@@ -85,7 +85,7 @@ namespace yocto
 				}
 				else
 				{
-					_rand.seed( uint32_t(time(NULL)) );
+					alea_init();
 					const char *name = argv[1];
 					const proc_type *proc = search( name );
 					if( !proc )
