@@ -116,5 +116,9 @@ int main(int argc, char *argv[] )
 		if(ptr) free(ptr);
 		std::cerr  << "-- end of father" << std::endl;
 	}
+    else
+    {
+        std::cerr << "-- end of child" << std::endl;
+    }
 	return 0;
 }
