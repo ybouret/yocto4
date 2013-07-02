@@ -159,8 +159,7 @@ int main( int argc, char *argv[] )
             //==================================================================
             //-- phase 2: use splines for isosampling
             //==================================================================
-            const spline<double>::boundary bnd(true,0);
-            spline<double> s(t_raw,f_raw,bnd,bnd);
+            spline1D<double> s(spline_natural,t_raw,f_raw);
             const double t0 = t_raw[1];
             for(size_t i=1;i<=n;++i)
             {
