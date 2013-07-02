@@ -48,37 +48,48 @@ else
   WITH_MAKEFILES="MSYS Makefiles"
 fi
 
+########################################################################
+## Check Ninja
+########################################################################
+BUILD_SPEC=""
+if [ "$NINJA" = "yes" ];
+then
+	BUILD_SPEC="-ninja";
+	cmake -E cmake_echo_color --blue "-- Using Ninja!!!"
+	WITH_MAKEFILES="Ninja";
+fi
+
 case $BUILD_TOOLS in
   "gnu" )
     export CC=gcc$VERSION; export CXX=g++$VERSION;
-    BUILD_SUBDIR=gnu$VERSION/$BUILD_TYPE;
+    BUILD_SUBDIR=gnu$VERSION/$BUILD_TYPE$BUILD_SPEC;
     BUILD_GENERATOR="$WITH_MAKEFILES"
     cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
   "clang" )
     export CC=clang$VERSION; export CXX=clang++$VERSION;
-    BUILD_SUBDIR=clang$VERSION/$BUILD_TYPE;
+    BUILD_SUBDIR=clang$VERSION/$BUILD_TYPE$BUILD_SPEC;
     BUILD_GENERATOR="$WITH_MAKEFILES"
     cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
   "intel" )
       export CC=icc; export CXX=icpc;
-      BUILD_SUBDIR=intel/$BUILD_TYPE;
+      BUILD_SUBDIR=intel/$BUILD_TYPE$BUILD_SPEC;
       BUILD_GENERATOR="$WITH_MAKEFILES"
       cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
   "pathscale" )
       export CC=pathcc; export CXX=pathCC;
-      BUILD_SUBDIR=pathscale/$BUILD_TYPE;
+      BUILD_SUBDIR=pathscale/$BUILD_TYPE$BUILD_SPEC;
       BUILD_GENERATOR="$WITH_MAKEFILES"
       cmake -E cmake_echo_color --blue "-- CC=$CC | CXX=$CXX";
     ;;
     
   "codeblocks") 
-    BUILD_SUBDIR=cb/$BUILD_TYPE;
+    BUILD_SUBDIR=cb/$BUILD_TYPE$BUILD_SPEC;
     BUILD_GENERATOR="CodeBlocks - $WITH_MAKEFILES";
     ;;
     
@@ -103,8 +114,12 @@ esac
 
 BUILD_SYSTEM=`uname -s`
 case $BUILD_SYSTEM in
-  "FreeBSD" | "Linux" | "SunOS" ) BUILD_TARGET=$BUILD_SYSTEM-`uname -m`;;
-  *) BUILD_TARGET=$BUILD_SYSTEM;;
+  "FreeBSD" | "Linux" | "SunOS" )
+		BUILD_TARGET=$BUILD_SYSTEM-`uname -m`
+		;;
+  *) 
+		BUILD_TARGET=$BUILD_SYSTEM
+		;;
 esac
 
 cmake -E cmake_echo_color --blue "-- BUILD_SOURCE = <$BUILD_SOURCE>"

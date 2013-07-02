@@ -28,7 +28,6 @@ vs9:
 vs10:
 	@bash ${CREATE} src vs10 ${BUILD_TYPE}
 
-
 gnu:
 	@bash ${CREATE} src gnu ${BUILD_TYPE}
 
