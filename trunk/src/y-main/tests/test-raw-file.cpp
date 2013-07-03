@@ -36,6 +36,8 @@ YOCTO_UNIT_TEST_IMPL(raw_file)
 	
 	{
 		ios::irchannel in( "foo.raw", 0 );
+        scoped_lock guard( in.handle() );
+        
 		do {
 			in.get( buffer, sizeof(buffer), done );
 			std::cerr.write( buffer, done );

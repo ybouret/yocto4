@@ -11,31 +11,26 @@ namespace yocto
 		}
 		
 		orchannel:: orchannel( const string &filename, offset_t at, error_type *status ) :
-		file_( filename, readable )
+        raw_channel( writable, filename, at, status )
 		{
-			file_.status = status;
-			file_.seek( at, from_set );
 		}
         
         orchannel:: orchannel( const char *filename, offset_t at, error_type *status ) :
-		file_( filename, readable )
+        raw_channel( writable, filename, at, status )
 		{
-			file_.status = status;
-			file_.seek( at, from_set );
-		}
+        }
 		
 		void orchannel:: put( const void *data, size_t size, size_t &done )
 		{
-			file_.put( data, size, done );
+			h.put( data, size, done );
 		}
 		
         
         orchannel:: orchannel( raw_file::handle_t handle, error_type *status) :
-        file_( handle, writable )
+        raw_channel( writable, handle, status )
         {
-            file_.status = status;
         }
-
+        
         
     }
 }
