@@ -70,5 +70,6 @@ ADD_TEST(Scan        test-main scan)
 ADD_TEST(WD          test-main wd)
 ADD_TEST(Unique      test-main unique)
 ADD_TEST(RemoveIf    test-main remove_if)
+ADD_TEST(RawFile     test-main raw_file)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
