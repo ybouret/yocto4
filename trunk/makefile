@@ -4,7 +4,7 @@ all:
 
 clean:
 	@echo "-- removing sdk" && rm -Rf sdk
-	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo
+	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo *.raw
 	@echo "-- cleaning auxiliary files"
 	@${MAKE} -s -C src/y-swamp/docs   clean
 	@${MAKE} -s -C samples            clean
