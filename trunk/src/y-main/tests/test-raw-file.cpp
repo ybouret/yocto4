@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ios/raw-file.hpp"
 #include "yocto/ios/irchannel.hpp"
+#include "yocto/ios/orchannel.hpp"
 
 using namespace yocto;
 
@@ -43,6 +44,11 @@ YOCTO_UNIT_TEST_IMPL(raw_file)
 			std::cerr.write( buffer, done );
 		} while( done > 0 );
 	}
+    
+    {
+        ios::orchannel fp("bar.raw");
+        fp.put(msg.ro(), msg.length(), done);
+    }
 	
 	
 }
