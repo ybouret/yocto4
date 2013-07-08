@@ -30,16 +30,18 @@ namespace yocto
             
             void    attach( const input &) throw(); //!< detach/set as input
             void    detach() throw();               //!< remove input/cache
+            bool    is_attached() const throw();
             
             size_t  cache_size() const throw();
             
-            bool    is_active(); //!< if there are some available t_char
+            bool    is_active();          //!< if there are some available t_char
             char    peek() const throw(); //!< cache head if cache_size()>0
-            void attach_stdin();
+            
+            void    attach_stdin();
             
         private:
             token                  cache; //!< I/O cache
-            input                 *ppInp; //!< on block
+            input                 *ppInp; //!< points on block
             uint64_t               block[ YOCTO_U64_FOR_ITEM(input) ];
             
             void init() throw();

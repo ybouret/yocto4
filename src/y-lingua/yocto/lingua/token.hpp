@@ -31,12 +31,12 @@ namespace yocto
         class token : public object, public core::list_of<t_char>
         {
         public:
-            token() throw();    //!< empty token
+            token() throw();             //!< empty token
             virtual ~token() throw();    //!< destructr
             token(const token &other);   //!< full copy
             
-            token(const string &s);
-            token( const char   *s);
+            token(const string &s);      //!< from a string
+            token(const char   *s);      //!< from a C-string
             
             token & operator=( const token  &);
             token & operator=( const string &);

@@ -132,6 +132,12 @@ namespace yocto
             assert( cache_size() > 0 );
             return cache.head->data;
         }
+     
+        bool    source:: is_attached() const throw()
+        {
+            return ppInp != 0;
+        }
+
         
     }
     
