@@ -19,6 +19,8 @@ namespace yocto
             
             //! create an empty grammar
             explicit grammar( const string &id );
+            
+            //! create an empty grammar
             explicit grammar( const char   *id );
             
             //! default ctor
