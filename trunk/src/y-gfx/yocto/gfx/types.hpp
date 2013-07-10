@@ -52,6 +52,8 @@ namespace yocto
         {
             //! find how many bits (0..8) and what shift, throw on error
             static void   fmt( const uint32_t mask, const uint8_t &bits, const uint8_t &shift, const uint8_t &loss, const char *which);
+            
+            //! return a 32 bits '0' or '1' string
             static string binary(const uint32_t c);
         };
         
