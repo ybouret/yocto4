@@ -18,11 +18,12 @@ namespace yocto
             explicit first_chars() throw();
             virtual ~first_chars() throw();
             
-            bool accept_empty; //!< default true
+            bool accept_empty; //!< default: true
             
+            //! copy contructor
             first_chars( const first_chars & );
             
-            void include( const first_chars & other );
+            void include( const first_chars &other);
             void exclude( const first_chars &other) throw();
             
             friend std::ostream & operator<<( std::ostream &, const first_chars &);

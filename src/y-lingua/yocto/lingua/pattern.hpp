@@ -69,7 +69,6 @@ namespace yocto
             //! binary content
             string content() const;
             
-            
             //! based on binary representations
             friend bool operator==( const pattern &lhs, const pattern &rhs );
             

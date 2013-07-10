@@ -35,7 +35,7 @@ namespace yocto
             set_pixel_proc set_pixel_;
             
         public:
-            const quad32_t  mask;
+            const quad32_t  mask;            //!< color mask for each channel
             const quad8_t   bits;            //!< #bits for each channel
             const quad8_t   shift;           //!< #left shifts for each channel
             const quad8_t   loss;            //!< #lost bits for each channel
