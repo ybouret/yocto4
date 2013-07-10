@@ -8,6 +8,7 @@ namespace yocto
 {
     namespace gfx
     {
+        typedef ptrdiff_t unit_t;
         
         template <typename T>
         class quad

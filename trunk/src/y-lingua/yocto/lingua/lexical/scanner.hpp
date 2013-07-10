@@ -77,9 +77,7 @@ namespace yocto
                 {
                     return &scanner:: __no_endl;
                 }
-                
-                
-                
+                                
                 //==============================================================
                 //
                 // lexeme creation
@@ -230,9 +228,11 @@ namespace yocto
                 //! try to get next lexeme
                 /**
                  throw an exception if no match.
-                 \return - if not NULL, a lexeme, and fctl = false
-                 - if NULL: fctl = false => EOF
-                 fctl = true  => jump/call/back, change of active scanner for lexer
+                 \return 
+                 - if not NULL, a lexeme, and fctl = false
+                 - if NULL: 
+                 -- fctl = false => EOF
+                 -- fctl = true  => jump/call/back, change of active scanner for lexer
                  */
                 lexeme *get( source &src , bool &fctl );
                 
