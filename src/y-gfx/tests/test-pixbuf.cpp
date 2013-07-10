@@ -29,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(pixbuf)
     __show_px(px2);
     __show_px(px3);
     __show_px(px4);
-
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
