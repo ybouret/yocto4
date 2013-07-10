@@ -45,8 +45,8 @@ namespace yocto
             }
         };
         
-        typedef quad<uint32_t> quad32;
-        typedef quad<uint8_t>  quad8;
+        typedef quad<uint32_t> quad32_t;
+        typedef quad<uint8_t>  quad8_t;
         
         struct color_bits
         {
