@@ -39,8 +39,8 @@ namespace yocto
             const quad8_t   bits;            //!< #bits for each channel
             const quad8_t   shift;           //!< #left shifts for each channel
             const quad8_t   loss;            //!< #lost bits for each channel
-            const uint8_t   bytes_per_pixel; //!< compatibility is checked
-            const uint8_t   bits_per_pixel;  //!< from mask/bits
+            const size_t    bytes_per_pixel; //!< compatibility is checked
+            const size_t    bits_per_pixel;  //!< from mask/bits
             
             uint32_t get_pixel( const void *addr ) const throw();
             void     set_pixel( uint32_t, void *addr) const throw();
