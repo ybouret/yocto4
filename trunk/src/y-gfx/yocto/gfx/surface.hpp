@@ -35,7 +35,6 @@ namespace yocto
             virtual ~surface() throw();
             
             
-            
             row &       operator[](size_t j) throw();
             const row & operator[](size_t j) const throw();
 
@@ -43,6 +42,8 @@ namespace yocto
             const pixel_buffer pixels;
             const size_t       w;
             const size_t       h;
+            
+            void save_ppm( const string &filename ) const;
             
         private:
             size_t nrow;
