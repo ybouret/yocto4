@@ -13,73 +13,73 @@ Function {MakeWindow()} {open return_type void
   } {
     Fl_Input input_pKw {
       label {pKw=}
-      xywh {42 10 80 24} type Float labelfont 13 labelsize 12 labelcolor 88 textfont 13 textsize 12
+      xywh {42 10 80 24} type Float labelfont 4 labelsize 12 labelcolor 88 textfont 4 textsize 12
     }
     Fl_Input input_pKa {
       label {pKa=}
-      xywh {42 36 80 24} type Float labelfont 13 labelsize 12 labelcolor 88 textfont 13 textsize 12
+      xywh {42 36 80 24} type Float labelfont 4 labelsize 12 labelcolor 88 textfont 4 textsize 12
     }
     Fl_Box {} {
       label {Water Dissociation}
-      xywh {124 10 180 24} labelfont 13 labelsize 12 labelcolor 88
+      xywh {124 10 180 24} labelfont 4 labelsize 12 labelcolor 88
     }
     Fl_Box {} {
       label Fluoresceine
-      xywh {124 36 180 24} labelfont 13 labelsize 12 labelcolor 88
+      xywh {124 36 180 24} labelfont 4 labelsize 12 labelcolor 88
     }
     Fl_Input input_C0 {
       label {C0=}
-      xywh {42 59 80 24} type Float labelfont 13 labelsize 12 labelcolor 4 textfont 13 textsize 12
+      xywh {42 59 80 24} type Float labelfont 4 labelsize 12 labelcolor 4 textfont 4 textsize 12
     }
     Fl_Box {} {
       label {Total [Fluoresceine]}
-      xywh {124 59 180 24} labelfont 13 labelsize 12 labelcolor 4
+      xywh {124 59 180 24} labelfont 4 labelsize 12 labelcolor 4
     }
     Fl_Input input_V0 {
       label {V0=}
-      xywh {42 84 80 24} type Float labelfont 13 labelsize 12 labelcolor 4 textfont 13 textsize 12
+      xywh {42 84 80 24} type Float labelfont 4 labelsize 12 labelcolor 4 textfont 4 textsize 12
     }
     Fl_Box {} {
       label {Total Volume}
-      xywh {124 84 180 24} labelfont 13 labelsize 12 labelcolor 4
+      xywh {124 84 180 24} labelfont 4 labelsize 12 labelcolor 4
     }
     Fl_Button {} {
       label {Evalutate pH limits}
       callback {evaluate_limits();}
-      xywh {10 140 300 20} box ROUND_UP_BOX labelfont 14 labelsize 12
+      xywh {10 140 300 20} box ROUND_UP_BOX labelfont 5 labelsize 12
     }
     Fl_Output output_min {
       label {-V0@->}
-      xywh {50 167 50 24} labelfont 13 labelsize 12 textfont 13 textsize 12
+      xywh {50 167 50 24} labelfont 4 labelsize 12 textfont 4 textsize 12
     }
     Fl_Input input_Cb {
       label {Cb=}
-      xywh {42 111 80 24} type Float labelfont 13 labelsize 12 labelcolor 58 textfont 13 textsize 12
+      xywh {42 111 80 24} type Float labelfont 4 labelsize 12 labelcolor 58 textfont 4 textsize 12
     }
     Fl_Box {} {
       label {[Base]}
-      xywh {124 111 180 24} labelfont 13 labelsize 12
+      xywh {124 111 180 24} labelfont 4 labelsize 12
     }
     Fl_Output output_ini {
       label {0 @->}
-      xywh {141 167 50 24} labelfont 13 labelsize 12 textfont 13 textsize 12
+      xywh {141 167 50 24} labelfont 4 labelsize 12 textfont 4 textsize 12
     }
     Fl_Output output_max {
       label {V0 @->}
-      xywh {232 167 50 24} labelfont 13 labelsize 12 textfont 13 textsize 12
+      xywh {232 167 50 24} labelfont 4 labelsize 12 textfont 4 textsize 12
     }
     Fl_Input input_pH {
       label {pH=}
-      xywh {35 204 50 24} type Float labelfont 13 labelsize 12 labelcolor 144 textfont 13 textsize 12
+      xywh {35 204 50 24} type Float labelfont 4 labelsize 12 labelcolor 144 textfont 4 textsize 12
     }
     Fl_Button {} {
       label {Compute !}
       callback {compute_volume();}
-      xywh {90 204 94 24} box ROUND_UP_BOX labelfont 13 labelsize 12 labelcolor 144
+      xywh {90 204 94 24} box ROUND_UP_BOX labelfont 5 labelsize 12 labelcolor 144
     }
     Fl_Output output_Vb {
       label {Vb=}
-      xywh {214 204 88 24} labelfont 13 labelsize 12 labelcolor 58 textfont 13 textsize 12
+      xywh {214 204 88 24} labelfont 4 labelsize 12 labelcolor 58 textfont 4 textsize 12
     }
   }
 } 
