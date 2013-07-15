@@ -1,5 +1,6 @@
 #include "ui.h"
 #include "yocto/math/fcn/zfind.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace math;
 
@@ -67,7 +68,7 @@ namespace
                 std::cerr << eq << std::endl;
             }
 #endif
-
+            
             
             
             (double &)pH_max = compute_pH(V0);
@@ -77,10 +78,10 @@ namespace
         
         double compute_pH( const double Vb )
         {
-         
+            
             if( Fabs(Vb) > V0)
                 throw exception("|Vb|=%g exceeds V0=%g", Fabs(Vb), V0);
-                       
+            
             
             //==================================================================
             // Create the initializer
@@ -104,7 +105,7 @@ namespace
             //------------------------------------------------------------------
             // Base/Acid ?
             //------------------------------------------------------------------
-
+            
             if(Vb<0)
             {
                 const double ConcCl = (-Vb) * Cb / V0;
@@ -173,19 +174,77 @@ namespace
             
             pH_usr = pH;
             numeric<double>::function zpH( this, & Fluoresceine::zero_pH);
-            zfind<double>             solve(0);
+            zfind<double>             solve(1e-3);
             
             return solve(zpH,-V0,V0);
         }
         
         
-        
+        static Fluoresceine *load()
+        {
+            const double C_user = strconv::to<double>( input_C0->value(), "C0");
+            const double V_user = strconv::to<double>( input_V0->value(), "V0");
+            const double C_base = strconv::to<double>( input_Cb->value(), "Cb");
+            
+            return new Fluoresceine(C_user,V_user,C_base);
+            
+        }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Fluoresceine);
     };
 }
 
+#include "yocto/auto-ptr.hpp"
+
+static inline
+void set_limits( const Fluoresceine &fluo )
+{
+    {
+        const string smin = vformat("%.2f", fluo.pH_min);
+        output_min->value( smin.c_str() );
+    }
+    
+    {
+        const string sini = vformat("%.2f", fluo.pH_ini);
+        output_ini->value( sini.c_str() );
+    }
+    
+    {
+        const string smax = vformat("%.2f", fluo.pH_max);
+        output_max->value( smax.c_str() );
+    }
+}
+
+void evaluate_limits()
+{
+    auto_ptr<Fluoresceine> fluo( Fluoresceine::load() );
+    set_limits( *fluo );
+}
+
+void compute_volume()
+{
+    try
+    {
+        auto_ptr<Fluoresceine> fluo( Fluoresceine::load() );
+        set_limits( *fluo );
+        output_Vb->value("N/A");
+        
+        const double pH = strconv::to<double>( input_pH->value(), "pH" );
+        const double Vb = fluo->compute_volume( pH );
+        const string s  = vformat("%.3f", Vb);
+        output_Vb->value( s.c_str() );
+    }
+    catch( const exception &e )
+    {
+        fl_message_title("Exception");
+        fl_alert("compute_volumes: %s\n%s",e.what(),e.when());
+    }
+    catch(...)
+    {
+        throw; // fatal
+    }
+}
 
 int main(int argc, char *argv[] )
 {
@@ -193,15 +252,22 @@ int main(int argc, char *argv[] )
     try
     {
         MakeWindow();
-        MainWindow->show();
+        input_pKw->value("14");
+        input_pKa->value("6.4");
         
-        Fluoresceine fl(1e-2,0.1,1e-2);
-        std::cerr << "===> pH_min=" << fl.pH_min << std::endl;
-        std::cerr << "===> pH_max=" << fl.pH_max << std::endl;
-        std::cerr << "===> pH_ini=" << fl.pH_ini << std::endl;
-
-        const double V9 = fl.compute_volume(9.0);
-        std::cerr << "V9=" << V9 << std::endl;
+        input_C0->value("0.01");
+        input_V0->value("100");
+        input_Cb->value("0.01");
+        
+        input_pH->value("7.00");
+        output_Vb->value("N/A");
+        
+        output_min->value("N/A");
+        output_ini->value("N/A");
+        output_max->value("N/A");
+        
+        
+        MainWindow->show();
         
         return Fl::run();
     }

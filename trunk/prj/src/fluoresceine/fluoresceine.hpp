@@ -10,4 +10,8 @@
 using namespace yocto;
 using namespace aqueous;
 
+
+void evaluate_limits();
+void compute_volume();
+
 #endif
