@@ -56,7 +56,7 @@ namespace yocto
             C.release();
             W.release();
             Phi.release();
-            dGam.release();
+            dtGam.release();
             Gamma.release();
             nu.release();
             nuP.release();
@@ -100,7 +100,7 @@ namespace yocto
                     nuP.make(N,M);
                     nu.make(N,M);
                     Gamma.make(N,0);
-                    dGam.make(N,0);
+                    dtGam.make(N,0);
                     Phi.make(N,M);
                     W.make(N,N);
                     C.make(M,0);
@@ -189,10 +189,10 @@ namespace yocto
                     
                 }
                 Gamma[i] = Ki * lhs - rhs;
-                dGam[i]  = 0;
+                dtGam[i]  = 0;
                 if(compute_derivatives)
                 {
-                    dGam[i] = dervs( Eq.K, t, time_scale );
+                    dtGam[i] = dervs( Eq.K, t, time_scale ) * lhs;
                 }
             }
             std::cerr << "Gamma=" << Gamma << std::endl;
@@ -223,6 +223,19 @@ namespace yocto
                         goto NEWTON_STEP;
                 }
                 std::cerr << "C=" << C << std::endl;
+            }
+        }
+        
+        
+        void equilibria:: legalize_dC( double t )
+        {
+            const size_t N = nu.rows;
+            if(N>0)
+            {
+                compute_Gamma_and_W(t,true);
+                mkl::muladd(dtGam, Phi, dC);
+                LU.solve(W,dtGam);
+                mkl::mulsub_trn(dC, nu, dtGam);
             }
         }
         

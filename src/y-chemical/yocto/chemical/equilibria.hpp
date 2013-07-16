@@ -29,7 +29,7 @@ namespace yocto
             imatrix_t nuP;   //!< products,  NxM
             matrix_t  nu;    //!< algebraic, NxM
             vector_t  Gamma; //!< unrolled equilibria, N
-            vector_t  dGam;  //!< time derivative of Gamma
+            vector_t  dtGam; //!< time derivative of Gamma
             matrix_t  Phi;   //!< Gamma Jacobian, NxM
             matrix_t  W;     //!< (Phi*nu')^(-1), NxN
             vector_t  C;     //!< local concentrations
