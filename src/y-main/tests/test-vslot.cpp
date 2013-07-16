@@ -6,6 +6,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(vslot)
 {
+    std::cerr << "sizeof(vslot)=" << sizeof(vslot) << std::endl;
     vslot v1;
     
     v1.allocate(2);

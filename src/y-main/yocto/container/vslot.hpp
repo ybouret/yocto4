@@ -10,9 +10,9 @@ namespace yocto
     class vslot
     {
     public:
-        explicit vslot() throw();
-        explicit vslot(size_t n);
-        virtual ~vslot() throw();
+        vslot() throw();
+        vslot(size_t n);
+        ~vslot() throw();
         
         void allocate(size_t n);   //!< memory only
         void deallocate() throw(); //!< once object is destructed
@@ -42,7 +42,7 @@ namespace yocto
             prepare_for(sizeof(T)); //!< get memory
             new (data) T(args);     //!< try to construct, may throw
             activate<T>();          //!< activate the object
-
+            
         }
         
         //! query type comparison
