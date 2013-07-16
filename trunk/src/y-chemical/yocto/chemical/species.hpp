@@ -9,6 +9,8 @@
 #include "yocto/counted.hpp"
 #include "yocto/associative/set.hpp"
 
+#include "yocto/math/types.hpp"
+
 namespace yocto
 {
     namespace chemical
