@@ -25,6 +25,7 @@ namespace yocto
             const string name;
             const int    z;
             vslot        data;
+            size_t       indx;
             
             explicit species( const string &id, int charge);
             explicit species( const char   *id, int charge);

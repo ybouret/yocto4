@@ -9,6 +9,11 @@ namespace yocto
     namespace chemical
     {
         ////////////////////////////////////////////////////////////////////////
+        const string & equilibrium:: key() const throw()
+        {
+            return name;
+        }
+        
         equilibrium:: equilibrium( const string &id ) :
         name(id),
         data()
@@ -48,6 +53,27 @@ namespace yocto
             return actors.size();
         }
         
+        void equilibrium:: fill(array<ptrdiff_t> &nuR,
+                                array<ptrdiff_t> &nuP) const throw()
+        {
+            assert(nuR.size()==nuP.size());
+            
+            for( size_t i=actors.size();i>0;--i)
+            {
+                const actor   &a    =  actors[i];
+                const species &spec = *a.spec;
+                const int      coef =  a.coef;
+                assert(spec.indx>=1);
+                assert(spec.indx<=nuR.size());
+                const size_t    j   = spec.indx;
+                if(coef>=0)
+                    nuP[j] += coef;
+                else
+                    nuR[j] -= coef;
+            }
+        }
+        
+        
         std::ostream & operator<<( std::ostream &os, const equilibrium &eq)
         {
             const array<equilibrium::actor> &actors = eq.actors;
@@ -64,7 +90,7 @@ namespace yocto
             for(size_t i=1; i <= nr; ++i )
             {
                 if(i>1) os << " + ";
-                os << "(" << -actors[i].coef << ")*" << actors[i].spec->name;
+                os << "(" << -actors[i].coef << ")*{" << actors[i].spec->name << "}";
             }
             
             os << " <=> ";
@@ -72,7 +98,7 @@ namespace yocto
             for(size_t i=ns;i<=actors.size();++i)
             {
                 if(i>ns) os << " + ";
-                os << "(" << actors[i].coef << ")*" << actors[i].spec->name;
+                os << "(" << actors[i].coef << ")*{" << actors[i].spec->name << "}";
             }
             
             os << " | " << eq.K(0, standard_pressure, standard_temperature);

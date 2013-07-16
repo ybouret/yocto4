@@ -24,6 +24,9 @@ namespace yocto
             const species::ptr & operator[]( const string &id ) const;
             const species::ptr &operator[]( const char    *id ) const;
 
+            void suppress( const string &name ) throw();
+            
+            void update_indices() throw(); // in case a species is removed
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(collection);

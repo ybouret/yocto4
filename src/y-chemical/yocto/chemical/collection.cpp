@@ -22,6 +22,7 @@ namespace yocto
             species::ptr p( new species(name,z) );
             if( !insert(p) )
                 throw exception("chemical.collection.add(mutliple '%s')", name.c_str());
+            p->indx = this->size();
             return *p;
         }
 
@@ -54,8 +55,21 @@ namespace yocto
             return (*this)[ID];
         }
         
+        void collection:: suppress(const string &name) throw()
+        {
+            if( remove(name) )
+                update_indices();
+        }
         
-        
+        void collection:: update_indices() throw()
+        {
+            size_t i = 1;
+            for( iterator sp = begin(); sp != end(); ++sp, ++i )
+            {
+                (**sp).indx = i;
+            }
+        }
+
 
         
         

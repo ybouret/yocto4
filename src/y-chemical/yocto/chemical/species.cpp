@@ -16,14 +16,16 @@ namespace yocto
         species:: species(const string &id, int charge ) :
         name(id),
         z(charge),
-        data()
+        data(),
+        indx(0)
         {
         }
         
         species:: species(const char *id, int charge ) :
         name(id),
         z(charge),
-        data()
+        data(),
+        indx(0)
         {
         }
 
