@@ -20,12 +20,13 @@ namespace yocto
         void free() throw();    //!< desctruct object, keep memory
         void release() throw(); //!< free and deallocate
         
-        bool is_allocated() const throw();
-        bool is_active() const throw();
+        bool is_allocated() const throw(); //!< has some memory ?
+        bool is_active() const throw();    //!< has some object ?
         
-        const std::type_info *info() const throw();
+        const std::type_info *info() const throw(); //!< remind me of the type
         
         
+        //! zero argument contructor, automatic memory management
         template <typename T>
         inline void make()
         {
@@ -34,6 +35,7 @@ namespace yocto
             activate<T>();          //!< activate the object
         }
         
+        //! one argument constructor, automatic memory management
         template <typename T>
         inline void make( typename type_traits<T>::parameter_type args )
         {
@@ -43,12 +45,14 @@ namespace yocto
 
         }
         
+        //! query type comparison
         template <typename T>
         bool same_type_than() const throw()
         {
             return type != 0 && typeid(T) == *type;
         }
         
+        //! transtyping with DEBUG control
         template <typename T>
         inline T &as() throw()
         {
@@ -57,6 +61,7 @@ namespace yocto
             return *(T*)data;
         }
         
+        //! transtyping with DEBUG control
         template <typename T>
         inline const T &as() const throw()
         {
