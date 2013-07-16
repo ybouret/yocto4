@@ -48,8 +48,12 @@ namespace yocto
             //! number of actors
             size_t count() const throw();
             
+            //! output
             friend std::ostream & operator<<( std::ostream &, const equilibrium & );
             
+            //! fill a matrix row
+            void fill(array<ptrdiff_t> &nuR,
+                      array<ptrdiff_t> &nuP) const throw();
             
         protected:
             vector<actor> actors; //!< 

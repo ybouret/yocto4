@@ -1,11 +1,11 @@
-#include "yocto/chemical/equilibrium.hpp"
+#include "yocto/chemical/equilibria.hpp"
 #include "yocto/utest/run.hpp"
 
 
 using namespace yocto;
 #include <cmath>
 
-YOCTO_UNIT_TEST_IMPL(equilibrium)
+YOCTO_UNIT_TEST_IMPL(equilibria)
 {
     chemical::collection lib;
     lib.reserve(16);
@@ -25,28 +25,37 @@ YOCTO_UNIT_TEST_IMPL(equilibrium)
         std::cerr << sp << " +#bytes=" << sp.data.bytes() << std::endl;
     }
     
+    chemical::equilibria chemsys;
+    
     {
-        chemical::equilibrium::ptr eq( new chemical::constant_equilibrium("water",1e-14) );
         
-        eq->add( lib["H+"], 1);
-        eq->add( lib["HO-"], 1);
+        chemical::equilibrium &eq = chemsys.add("water", 1e-14);
+        eq.add( lib["H+"], 1);
+        eq.add( lib["HO-"], 1);
         
-        
-        
-        std::cerr << *eq << std::endl;
     }
     
     {
-        chemical::equilibrium::ptr eq( new chemical::constant_equilibrium("acid",pow(10.0,-4.8)) );
+        chemical::equilibrium &eq = chemsys.add("acid",pow(10.0,-4.8));
         
-        eq->add( lib["H+"], 1);
-        eq->add( lib["A-"], 1);
-        eq->add( lib["AH"], -1);
+        eq.add( lib["H+"], 1);
+        eq.add( lib["A-"], 1);
+        eq.add( lib["AH"], -1);
         
         
-        std::cerr << *eq << std::endl;
     }
     
+    std::cerr << "Equilibria: " << std::endl;
+    std::cerr << chemsys << std::endl;
+    
+    chemsys.build_from(lib);
+    
+    for(size_t i=1; i <= chemsys.C.size(); ++i )
+    {
+        chemsys.C[i] = 1e-5;
+    }
+    
+    chemsys.compute_Gamma_and_W(0, false);
     
 }
 YOCTO_UNIT_TEST_DONE()
