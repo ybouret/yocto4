@@ -14,8 +14,7 @@ namespace yocto
         {
         public:
             const string name;
-            
-            
+            vslot        data;   //!< for derived classes            
             
             virtual ~equilibrium() throw();
             
@@ -29,7 +28,7 @@ namespace yocto
             typedef intrusive_ptr<string,equilibrium> ptr;
             typedef set<string,equilibrium::ptr>      db;
             
-            
+            //! species+coefficient
             class actor
             {
             public:
@@ -43,15 +42,17 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(actor);
             };
             
+            //! add a species
             void   add( const species::ptr &spec, const int coef );
+            
+            //! number of actors
             size_t count() const throw();
             
             friend std::ostream & operator<<( std::ostream &, const equilibrium & );
             
             
         protected:
-            vslot         data;
-            vector<actor> actors;
+            vector<actor> actors; //!< 
             
             explicit equilibrium( const string &id );
             explicit equilibrium( const char   *id );
