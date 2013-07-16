@@ -16,18 +16,25 @@ namespace yocto
         
         equilibrium:: equilibrium( const string &id ) :
         name(id),
-        data()
+        data(),
+        K( this, & equilibrium::computeK)
         {
             
         }
         
         equilibrium:: equilibrium(const char *id ) :
         name(id),
-        data()
+        data(),
+        K( this, & equilibrium::computeK)
         {
             
         }
         
+        
+        double equilibrium:: computeK( double t ) const throw()
+        {
+            return getK(t);
+        }
         
         equilibrium:: ~equilibrium() throw() {}
         
@@ -101,7 +108,7 @@ namespace yocto
                 os << "(" << actors[i].coef << ")*{" << actors[i].spec->name << "}";
             }
             
-            os << " | " << eq.K(0, standard_pressure, standard_temperature);
+            os << " | " << eq.K(0);
             return os;
         }
         
@@ -143,7 +150,7 @@ namespace yocto
         {
         }
         
-        double constant_equilibrium::K(double t, double, double) const throw()
+        double constant_equilibrium::getK(double t) const throw()
         {
             return data.as<double>();
         }
