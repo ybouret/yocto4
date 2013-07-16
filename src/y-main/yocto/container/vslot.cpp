@@ -108,4 +108,7 @@ namespace yocto
         return type;
     }
     
+    size_t vslot:: bytes() const throw() { return size; }
+    
+    
 }
