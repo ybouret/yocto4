@@ -23,6 +23,7 @@ namespace yocto
         bool is_allocated() const throw(); //!< has some memory ?
         bool is_active() const throw();    //!< has some object ?
         
+        size_t bytes() const throw();
         const std::type_info *info() const throw(); //!< remind me of the type
         
         
