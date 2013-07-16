@@ -22,11 +22,11 @@ namespace yocto
     
     bool vslot:: is_active() const throw()
     {
-        if( type )
+        if(type!=0)
         {
             assert(is_allocated());
             assert(kill!=0);
-            return 0;
+            return true;
         }
         else
         {
@@ -46,8 +46,8 @@ namespace yocto
             data = object:: operator new(n);
             size = n;
         }
-        
     }
+
     
     void vslot:: deallocate() throw()
     {
@@ -69,12 +69,25 @@ namespace yocto
             kill = 0;
             type = 0;
         }
+        assert(0==kill);
+        assert(0==type);
     }
     
     void vslot:: release() throw()
     {
         free();
         deallocate();
+    }
+    
+    void vslot:: prepare_for(size_t n)
+    {
+        free();
+        if(n>size)
+        {
+            deallocate();
+            allocate(n);
+        }
+        
     }
     
     vslot:: ~vslot() throw()
@@ -90,5 +103,9 @@ namespace yocto
     {
     }
     
+    const std::type_info * vslot:: info() const throw()
+    {
+        return type;
+    }
     
 }

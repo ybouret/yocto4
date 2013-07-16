@@ -23,11 +23,66 @@ namespace yocto
         bool is_allocated() const throw();
         bool is_active() const throw();
         
+        const std::type_info *info() const throw();
+        
+        
+        template <typename T>
+        inline void make()
+        {
+            prepare_for(sizeof(T)); //!< get memory
+            new (data) T();         //!< try to construct, may throw
+            activate<T>();          //!< activate the object
+        }
+        
+        template <typename T>
+        inline void make( typename type_traits<T>::parameter_type args )
+        {
+            prepare_for(sizeof(T)); //!< get memory
+            new (data) T(args);     //!< try to construct, may throw
+            activate<T>();          //!< activate the object
+
+        }
+        
+        template <typename T>
+        bool same_type_than() const throw()
+        {
+            return type != 0 && typeid(T) == *type;
+        }
+        
+        template <typename T>
+        inline T &as() throw()
+        {
+            assert(is_active());
+            assert(same_type_than<T>());
+            return *(T*)data;
+        }
+        
+        template <typename T>
+        inline const T &as() const throw()
+        {
+            assert(is_active());
+            assert(same_type_than<T>());
+            return *(T*)data;
+        }
+        
+        
     private:
-        size_t          size;
-        void           *data;
-        std::type_info *type;
-        void          (*kill)(void*);
+        size_t                size;
+        void                 *data;
+        const std::type_info *type;
+        void                (*kill)(void*);
+        void prepare_for(size_t n);
+        
+        template <typename T>
+        static inline
+        void __kill( void *addr ) throw() { assert(addr); static_cast<T*>(addr)->~T(); }
+        
+        template <typename T>
+        inline void activate() throw()
+        {
+            kill =  __kill<T>;
+            type = &typeid(T);
+        }
         YOCTO_DISABLE_COPY_AND_ASSIGN(vslot);
     };
     
