@@ -52,10 +52,10 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     
     for(size_t i=1; i <= chemsys.C.size(); ++i )
     {
-        chemsys.C[i] = 1e-5;
+        chemsys.C[i] = i*1e-5;
     }
     
-    chemsys.compute_Gamma_and_W(0, false);
+    chemsys.normalize_C(0);
     
 }
 YOCTO_UNIT_TEST_DONE()

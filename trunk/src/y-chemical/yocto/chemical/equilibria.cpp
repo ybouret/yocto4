@@ -6,6 +6,7 @@
 
 namespace yocto
 {
+    using namespace math;
     
     namespace chemical
     {
@@ -13,17 +14,21 @@ namespace yocto
         
         equilibria:: ~equilibria() throw() {}
         
+        //======================================================================
+        // initialize
+        //======================================================================
         equilibria:: equilibria() :
         equilibrium::db(),
         pressure(standard_pressure),
         temperature(standard_temperature),
-        nuR(),
-        nuP()
+        ftol( numeric<double>::ftol ),
+        time_scale(1e-4)
         {
-            
         }
         
-        
+        //======================================================================
+        // append a constant equilibrium
+        //======================================================================
         equilibrium & equilibria:: add( const string &name, const double K)
         {
             equilibrium::ptr p( new constant_equilibrium(name,K) );
@@ -33,14 +38,21 @@ namespace yocto
             return *p;
         }
         
+        
         equilibrium & equilibria:: add( const char   *name, const double K)
         {
             const string NAME(name);
             return add(NAME,K);
         }
         
+        //======================================================================
+        // release all memory
+        //======================================================================
         void equilibria:: reset() throw()
         {
+            LU.release();
+            dC.release();
+            xi.release();
             C.release();
             W.release();
             Phi.release();
@@ -51,6 +63,9 @@ namespace yocto
             nuR.release();
         }
         
+        //======================================================================
+        // I/O
+        //======================================================================
         std::ostream & operator<<( std::ostream &os, const equilibria &eqs)
         {
             static const size_t nch = 64;
@@ -64,6 +79,9 @@ namespace yocto
             return os;
         }
         
+        //======================================================================
+        // acquire all required memory
+        //======================================================================
         void equilibria:: build_from( collection &lib )
         {
             reset();
@@ -86,6 +104,9 @@ namespace yocto
                     Phi.make(N,M);
                     W.make(N,N);
                     C.make(M,0);
+                    xi.make(N,0);
+                    dC.make(M,0);
+                    LU.ensure(N);
                     
                     //----------------------------------------------------------
                     // compute topological parts
@@ -95,12 +116,10 @@ namespace yocto
                     {
                         (**eq).fill(nuR[i], nuP[i]);
                     }
-                    std::cerr << "nuR=" << nuR << std::endl;
-                    std::cerr << "nuP=" << nuP << std::endl;
                     
-                    for(i=1;i<=N;++i)
+                    for(i=N;i>0;--i)
                     {
-                        for(size_t j=1; j<=M;++j)
+                        for(size_t j=M;j>0;--j)
                         {
                             nu[i][j] = nuP[i][j] - nuR[i][j];
                         }
@@ -116,13 +135,18 @@ namespace yocto
             }
         }
         
+        
+        
         void equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
         {
             const size_t N = nu.rows;
             const size_t M = nu.cols;
             iterator     eq = begin();
+            Phi.ldz();
             for(size_t i=1;i<=N;++i,++eq)
             {
+                equilibrium &Eq = **eq;
+                const double Ki =  Eq.K(t);
                 double lhs = 1;
                 double rhs = 1;
                 for(size_t j=M;j>0;--j)
@@ -132,7 +156,16 @@ namespace yocto
                         if(r>0)
                         {
                             lhs *= ipower(C[j],r);
-                            
+                            double tmp = Ki * r * ipower(C[j],r-1);
+                            for(size_t k=M;k>j;--k)
+                            {
+                                tmp *= ipower(C[k],nuR[i][k]);
+                            }
+                            for(size_t k=j-1;k>0;--k)
+                            {
+                                tmp *= ipower(C[k],nuR[i][k]);
+                            }
+                            Phi[i][j] = tmp;
                         }
                     }
                     
@@ -141,18 +174,56 @@ namespace yocto
                         if(p>0)
                         {
                             rhs *= ipower(C[j],p);
+                            double tmp = p * ipower(C[j],p-1);
+                            for(size_t k=M;k>j;--k)
+                            {
+                                tmp *= ipower(C[k],nuP[i][k]);
+                            }
+                            for(size_t k=j-1;k>0;--k)
+                            {
+                                tmp *= ipower(C[k],nuP[i][k]);
+                            }
+                            Phi[i][j] -= tmp;
                         }
                     }
                     
                 }
-                Gamma[i] = (*eq)->K(t, pressure, temperature) * lhs - rhs;
+                Gamma[i] = Ki * lhs - rhs;
                 dGam[i]  = 0;
                 if(compute_derivatives)
                 {
-                    dGam[i] = 0;
+                    dGam[i] = dervs( Eq.K, t, time_scale );
                 }
             }
             std::cerr << "Gamma=" << Gamma << std::endl;
+            std::cerr << "Phi="   << Phi << std::endl;
+            
+            mkl::mul_rtrn(W, Phi, nu);
+            std::cerr << "W=" << W << std::endl;
+            if( !LU.build(W) )
+                throw exception("equilibria: invalid composition");
+            
+        }
+        
+        void equilibria:: normalize_C( double t )
+        {
+            const size_t N = nu.rows;
+            if(N>0)
+            {
+                const size_t M = nu.cols;
+            NEWTON_STEP:
+                compute_Gamma_and_W(t,false);
+                mkl::set(xi,Gamma);
+                LU.solve(W, xi);
+                mkl::mul_trn(dC, nu, xi);
+                mkl::sub(C, dC);
+                for(size_t i=M;i>0;--i)
+                {
+                    if( Fabs(dC[i]) > Fabs( ftol * C[i] ) )
+                        goto NEWTON_STEP;
+                }
+                std::cerr << "C=" << C << std::endl;
+            }
         }
         
         

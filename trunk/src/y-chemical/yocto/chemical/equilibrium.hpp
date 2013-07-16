@@ -19,7 +19,7 @@ namespace yocto
             virtual ~equilibrium() throw();
             
             //! get a constant
-            virtual double K( double t, double P, double T ) const throw() = 0;
+            virtual double getK( double t ) const throw() = 0;
             
             //! the name
             const string &key() const throw();
@@ -56,13 +56,17 @@ namespace yocto
                       array<ptrdiff_t> &nuP) const throw();
             
         protected:
-            vector<actor> actors; //!< 
+            vector<actor> actors; //!< sorted vector of actors
             
             explicit equilibrium( const string &id );
             explicit equilibrium( const char   *id );
+            double   computeK(double) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
+            
+        public:
+            mutable math::numeric<double>::function K;
         };
         
         
@@ -73,7 +77,7 @@ namespace yocto
             explicit constant_equilibrium( const char   *id, const double Keq );
             virtual ~constant_equilibrium() throw();
             
-            virtual double K( double t, double P, double T ) const throw();
+            virtual double getK( double t ) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(constant_equilibrium);
