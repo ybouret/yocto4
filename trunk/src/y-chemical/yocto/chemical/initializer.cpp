@@ -53,5 +53,24 @@ namespace yocto
             return (*this)[name];
         }
         
+        
+        initializer:: ~initializer() throw()
+        {
+        }
+        
+        initializer:: initializer() throw() : constraints()
+        {
+        }
+        
+        
+        constraint & initializer:: create( const double value )
+        {
+            constraint::ptr p( new constraint(value) );
+            push_back(p);
+            return *p;
+        }
+        
+        
+        
     }
 }
