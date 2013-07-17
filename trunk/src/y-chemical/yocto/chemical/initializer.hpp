@@ -1,6 +1,49 @@
 #ifndef YOCTO_CHEMICAL_INITIALIZER_INCLUDED
 #define YOCTO_CHEMICAL_INITIALIZER_INCLUDED 1
 
+#include "yocto/chemical/equilibria.hpp"
+#include "yocto/shared-ptr.hpp"
+
+namespace yocto
+{
+    namespace chemical
+    {
+        typedef map<string,double> constraint_weights;
+        
+        class constraint : public constraint_weights
+        {
+        public:
+            double   value;
+            explicit constraint( const double v );
+            virtual ~constraint() throw();
+            
+            typedef shared_ptr<constraint> ptr;
+            
+            double & operator[]( const string & ); //!< created on the fly
+            double & operator[]( const char   * );
+            
+            const double & operator[](const string &) const;
+            const double & operator[](const char   *) const;
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
+        };
+        
+        class initializer : public vector<constraint::ptr>
+        {
+        public:
+            explicit initializer() throw();
+            virtual ~initializer() throw();
+            
+            constraint & create( const double value );
+            
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
+        };
+        
+        
+    }
+}
 
 #endif
-
