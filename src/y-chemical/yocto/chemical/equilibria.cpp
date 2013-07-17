@@ -3,6 +3,7 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include <iostream>
 #include "yocto/code/ipower.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -210,7 +211,13 @@ namespace yocto
             const size_t N = nu.rows;
             if(N>0)
             {
+                
                 const size_t M = nu.cols;
+                for(size_t i=M;i>0;--i)
+                {
+                    C[i] = max_of<double>(0,C[i]);
+                }
+                
             NEWTON_STEP:
                 compute_Gamma_and_W(t,false);
                 mkl::set(xi,Gamma);

@@ -16,6 +16,10 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     lib.add("AH",0);
     lib.add("A-",-1);
     
+    lib.add("NH4+");
+    lib.add("NH3");
+    
+    
     proton.data.allocate(100);
     hydroxy.data.make<double>(3.0);
     
@@ -42,8 +46,9 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
         eq.add( lib["A-"], 1);
         eq.add( lib["AH"], -1);
         
-        
     }
+    
+    chemsys.add_acid(lib, "amoniac", "NH4+", "NH3", pow(10,-9.2) );
     
     std::cerr << "Equilibria: " << std::endl;
     std::cerr << chemsys << std::endl;
