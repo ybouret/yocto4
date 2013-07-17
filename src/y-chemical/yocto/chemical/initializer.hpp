@@ -25,6 +25,8 @@ namespace yocto
             const double & operator[](const string &) const;
             const double & operator[](const char   *) const;
             
+            friend std::ostream & operator<<(std::ostream &, const constraint &);
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
         };
@@ -39,7 +41,10 @@ namespace yocto
             
             constraint & create( const double value );
             
+            void electroneutrality( const collection &lib );
             
+            friend std::ostream & operator<<(std::ostream &, const initializer &);
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
         };
