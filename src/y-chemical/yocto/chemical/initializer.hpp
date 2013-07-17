@@ -17,7 +17,7 @@ namespace yocto
             explicit constraint( const double v );
             virtual ~constraint() throw();
             
-            typedef shared_ptr<constraint> ptr;
+            typedef shared_ptr<constraint>   ptr;
             
             double & operator[]( const string & ); //!< created on the fly
             double & operator[]( const char   * );
@@ -29,7 +29,9 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
         };
         
-        class initializer : public vector<constraint::ptr>
+        typedef vector<constraint::ptr> constraints;
+
+        class initializer : public constraints
         {
         public:
             explicit initializer() throw();
