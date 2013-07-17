@@ -20,10 +20,11 @@ namespace yocto
         public:
             virtual ~equilibria() throw();
             explicit equilibria();
+            
             double pressure;
             double temperature;
             double ftol;       //!< for Newton Convergence
-            double time_scale; //!< for time derivatives
+            double time_scale; //!< for time derivatives, default is 1e-4
             
             imatrix_t nuR;   //!< reactives, NxM
             imatrix_t nuP;   //!< products,  NxM

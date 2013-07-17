@@ -39,12 +39,18 @@ namespace yocto
             explicit initializer() throw();
             virtual ~initializer() throw();
             
+            //! append a new constraint, to be filled
             constraint & create( const double value );
             
+            //! set the electroneutrality
             void electroneutrality( const collection &lib );
             
+            void operator()( equilibria &cs, collection &lib );
+            
             friend std::ostream & operator<<(std::ostream &, const initializer &);
-
+            
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
         };

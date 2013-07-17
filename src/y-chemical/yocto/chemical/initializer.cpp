@@ -102,7 +102,7 @@ namespace yocto
             for(size_t i=0;i<ns;++i) os << ':'; os << std::endl;
             for(size_t i=1; i <= I.size(); ++i)
             {
-                os << ": " << *I[i] << std::endl;
+                os << ":: " << *I[i] << std::endl;
             }
             for(size_t i=0;i<ns;++i) os << ':'; os << std::endl;
             return os;
