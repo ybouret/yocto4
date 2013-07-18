@@ -136,9 +136,7 @@ namespace yocto
             }
         }
         
-        
-        
-        void equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
+        void equilibria:: compute_Gamma_and_Phi( double t, bool compute_derivatives)
         {
             const size_t N = nu.rows;
             const size_t M = nu.cols;
@@ -199,6 +197,12 @@ namespace yocto
             std::cerr << "Gamma=" << Gamma << std::endl;
             std::cerr << "Phi="   << Phi << std::endl;
             
+        }
+        
+        
+        void equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
+        {
+            compute_Gamma_and_Phi(t, compute_derivatives);
             mkl::mul_rtrn(W, Phi, nu);
             std::cerr << "W=" << W << std::endl;
             if( !LU.build(W) )

@@ -47,8 +47,12 @@ namespace yocto
             //! wrapper
             equilibrium &add( const char   *name, const double K);
 
-            void add_water( const collection &lib, const double Kw = 1e-14 );
+            void add_water( const collection &lib, const double Kw);
             void add_acid( const collection &lib, const char *name, const char *acid, const char *base, const double Ka );
+            
+            
+            //! compute Ganna and Phi
+            void compute_Gamma_and_Phi( double t, bool compute_derivatives);
             
             
             //! compute Gamma and W=(Phi*nu')^(-1). dGamma/dt if needed
