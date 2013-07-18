@@ -194,7 +194,7 @@ namespace yocto
             mkl::set(dX,X);
             mkl::add(X, Y);
             __PROJ(X);
-            std::cerr << "X1p=" << X << std::endl;
+            std::cerr << "X1=" << X << std::endl;
             mkl::sub(dX,X);
             
             //------------------------------------------------------------------
