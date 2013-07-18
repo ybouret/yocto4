@@ -45,7 +45,7 @@ namespace yocto
             //! set the electroneutrality
             void electroneutrality( const collection &lib );
             
-            void operator()( equilibria &cs, collection &lib );
+            void operator()( equilibria &cs, collection &lib, const double t );
             
             friend std::ostream & operator<<(std::ostream &, const initializer &);
             

@@ -22,6 +22,13 @@ namespace yocto
 			for( size_t i=v.size();i>0;--i) v[i] = u[i];
 		}
 		
+        template <>
+		void algebra<z_type>:: neg( array<z_type> &v, const array<z_type> &u ) throw()
+        {
+            assert( v.size() == u.size() );
+			for( size_t i=v.size();i>0;--i) v[i] = -u[i];
+        }
+        
 		template <>
 		void algebra<z_type>:: add( array<z_type> &v, const array<z_type> &u ) throw()
 		{
