@@ -4,6 +4,7 @@
 
 #include "yocto/chemical/collection.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/code/rand32.hpp"
 
 namespace yocto
 {
@@ -54,19 +55,32 @@ namespace yocto
             //! fill a matrix row
             void fill(array<ptrdiff_t> &nuR,
                       array<ptrdiff_t> &nuP) const throw();
+
+            //! compute the scaled concentration C
+            void scale(double t) const throw();
+
+            //! append scaled concentration
+            /**
+             the scaling must be done before
+             */
+            void append( array<double> &C, urand32 &ran ) const throw();
             
         protected:
-            vector<actor> actors; //!< sorted vector of actors
             
             explicit equilibrium( const string &id );
             explicit equilibrium( const char   *id );
             double   computeK(double) const throw();
             
         private:
+            vector<actor> actors; //!< sorted vector of actors
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
             
         public:
+            const   int    Nu; //!< sum of algebraic coefficients (Delta_r nu)
+            mutable double C0; //!< used to compute typical C scaling if Nu!=0
             mutable math::numeric<double>::function K;
+            
+            
         };
         
         

@@ -38,6 +38,15 @@ namespace yocto
         {
         }
         
+        void equilibria:: scale_all( double t ) const throw()
+        {
+            for( const_iterator eq=begin();eq!=end();++eq)
+            {
+                (**eq).scale(t);
+            }
+        }
+
+        
         //======================================================================
         // append a constant equilibrium
         //======================================================================

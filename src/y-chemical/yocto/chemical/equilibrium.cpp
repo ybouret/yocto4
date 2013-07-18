@@ -17,6 +17,8 @@ namespace yocto
         equilibrium:: equilibrium( const string &id ) :
         name(id),
         data(),
+        Nu(0),
+        C0(0),
         K( this, & equilibrium::computeK)
         {
             
@@ -25,6 +27,8 @@ namespace yocto
         equilibrium:: equilibrium(const char *id ) :
         name(id),
         data(),
+        Nu(0),
+        C0(0),
         K( this, & equilibrium::computeK)
         {
             
@@ -52,6 +56,7 @@ namespace yocto
                 const actor a(spec,coef);
                 actors.push_back(a);
                 hsort(actors,__compare_actors);
+                ((int&) Nu) += coef;
             }
         }
         
@@ -108,9 +113,33 @@ namespace yocto
                 os << "(" << actors[i].coef << ")*{" << actors[i].spec->name << "}";
             }
             
-            os << " | " << eq.K(0);
+            os << " | K= " << eq.K(0);
+            os << " / Nu= " << eq.Nu;
             return os;
         }
+        
+        void equilibrium:: scale(double t) const throw()
+        {
+            C0 = 1;
+            const double K0 = K(t);
+            if(Nu!=0 && K0>0)
+            {
+                C0=pow(K0,1.0/Nu);
+            }
+        }
+        
+        void equilibrium:: append( array<double> &C, urand32 &ran ) const throw()
+        {
+            for( size_t i=actors.size();i>0;--i)
+            {
+                const species &sp = * actors[i].spec;
+                assert(sp.indx>0);
+                assert(sp.indx<=C.size());
+                C[sp.indx] += C0 * ran.get<double>();
+            }
+            
+        }
+        
         
         ////////////////////////////////////////////////////////////////////////
         equilibrium:: actor:: actor( const species::ptr &sp, const int stochio ) throw() :

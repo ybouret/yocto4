@@ -59,8 +59,11 @@ namespace yocto
         {
         }
         
-        initializer:: initializer() throw() : constraints()
+        initializer:: initializer() throw() :
+        constraints(),
+        ran()
         {
+            ran.wseed();
         }
         
         
