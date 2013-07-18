@@ -40,11 +40,16 @@ namespace yocto
             double & operator[]( const char * );
             const double &operator[]( const char *) const;
             
+            void load( const array<double> &C ) throw();
+            void save( array<double> &C) const throw();
+
             double pH() const;
+            
+            friend std::ostream & operator<<( std::ostream &, const solution &);
             
         private:
             component::db composition;
-            
+            const size_t  name_max;
         };
         
     }
