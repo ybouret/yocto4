@@ -12,6 +12,8 @@ namespace yocto
         typedef algebra<double> mkl;
         
         
+        
+        
         static inline
         void __project(vector_t       &X,
                        const matrix_t &P,
@@ -133,14 +135,13 @@ namespace yocto
             // Initialize the algorithm
             //
             //==================================================================
-            vector_t &Y = cs.dC;
-            vector_t &X = cs.C;
+            vector_t  &X = cs.C;
+            vector_t  &Y = cs.dC;
+            matrix_t  &W = cs.W;
+            lu_t      &LU = cs.LU;
             vector_t  Mu(Nc,0);
-            matrix_t &W   = cs.W;
-            matrix_t &Phi = cs.Phi;
-            vector_t &Gam = cs.Gamma;
-            vector_t &xi  = cs.xi;
             vector_t  dX(M,0);
+            vector_t &Gamma = cs.Gamma;
             const double ftol = cs.ftol;
             
             
@@ -163,87 +164,54 @@ namespace yocto
             }
             std::cerr << "X0=" << X << std::endl;
             __PROJ(X);
-            
-            //==================================================================
-            // correction
-            //==================================================================
-            for(size_t i=X.size();i>0;--i) if(X[i]<=0) X[i] = 0;
-
             std::cerr << "X0p=" << X << std::endl;
             
         NEWTON_STEP:
-            //------------------------------------------------------------------
-            //
-            // compute the modified Jacobian
-            //
-            //------------------------------------------------------------------
-            cs.compute_Gamma_and_Phi(t,false);
-            mkl::mul_rtrn(W,Phi,Q);
-            
-            if( !cs.LU.build(W) )
             {
-                std::cerr << "singular composition" << std::endl;
-                return;
-            }
-            
-            //------------------------------------------------------------------
-            //
-            // compute the chemical extent
-            //
-            //------------------------------------------------------------------
-            mkl::neg(xi,Gam);
-            cs.LU.solve(W,xi);
-            
-            //------------------------------------------------------------------
-            //
-            // compute Y=the increase in X
-            //
-            //------------------------------------------------------------------
-            mkl::mul_trn(Y, Q, xi);
-            std::cerr << "step=" << Y << std::endl;
-            return;
-            
-            //------------------------------------------------------------------
-            //
-            // compute the CORRECTED new X and the final differences
-            //
-            //------------------------------------------------------------------
-            mkl::set(dX,X);
-            mkl::add(X, Y);
-            __PROJ(X);
-            std::cerr << "X1=" << X << std::endl;
-            mkl::sub(dX,X);
-            std::cerr << "dX=" << dX << std::endl;
-            //------------------------------------------------------------------
-            //
-            // check convergence
-            //
-            //------------------------------------------------------------------
-            for(size_t i=M;i>0;--i)
-            {
-                if( Fabs(dX[i] ) > Fabs( ftol * X[i] ))
+                //------------------------------------------------------------------
+                //
+                // compute the modified jacobian
+                //
+                //------------------------------------------------------------------
+                cs.compute_Gamma_and_Phi(t, false);
+                const double E0 = 0.5 * mkl::norm2(Gamma);
+                mkl::mul_rtrn(W, cs.Phi, Q);
+                
+                if(!LU.build(W))
                 {
-                    goto NEWTON_STEP;
+                    std::cerr << "singular composition" << std::endl;
+                    return;
+                }
+                
+                //------------------------------------------------------------------
+                //
+                // compute the DECREASE Y
+                //
+                //------------------------------------------------------------------
+                LU.solve(W,Gamma);
+                mkl::mul_trn(Y, Q,Gamma);
+                
+                //------------------------------------------------------------------
+                //
+                // evaluate the new coordinates and the effective step dX
+                //
+                //------------------------------------------------------------------
+                mkl::set(dX,X);
+                mkl::sub(X,Y);
+                __PROJ(X);
+                mkl::sub(dX,X);
+                std::cerr << "X="  << X  << std::endl;
+                std::cerr << "dX=" << dX << std::endl;
+                
+                for(size_t i=M;i>0;--i)
+                {
+                    if( Fabs(dX[i]) > Fabs( ftol * X[i] ) )
+                        goto NEWTON_STEP;
                 }
             }
             
-            //------------------------------------------------------------------
-            //
-            // success: check error
-            //
-            //------------------------------------------------------------------
-            std::cerr << "ftol=" << ftol << std::endl;
-            cs.compute_Gamma_and_Phi(t,false);
-            mkl::mul_rtrn(W,Phi,Q);
-            if( !cs.LU.build(W) )
-            {
-                std::cerr << "singular FINAL composition" << std::endl;
-                return;
-            }
-            cs.LU.solve(W, Gam);
-            mkl::mul_trn(dX, Q, Gam);
-            std::cerr << "Xerr=" << dX << std::endl;
         }
+        
         
     }
 }
