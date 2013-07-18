@@ -29,7 +29,7 @@ namespace yocto
             mkl::mulsub(Mu, P, X);
             L2.solve(P2, Mu);
             mkl::mul_trn(Y, P, Mu);
-            std::cerr << "Y=" << Y << std::endl;
+            //std::cerr << "Y=" << Y << std::endl;
             mkl::add(X, Y);
             double Ymin = mkl::norm2(Y);
             
@@ -42,11 +42,11 @@ namespace yocto
                 mkl::mulsub(Mu, P, X);
                 L2.solve(P2, Mu);
                 mkl::mul_trn(Y, P, Mu);
-                std::cerr << "Y=" << Y << std::endl;
+                //std::cerr << "Y=" << Y << std::endl;
                 mkl::add(X, Y);
                 const double Ytmp = mkl::norm2(Y);
                 if(Ytmp>=Ymin)
-                    return;
+                    break;
                 Ymin = Ytmp;
             }
         }
@@ -67,6 +67,9 @@ namespace yocto
             const size_t Nc = size();
             if( N+Nc != M )
                 throw exception("initialier: #species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
+            
+            cs.scale_all(t);
+            
             
             //==================================================================
             //
@@ -140,6 +143,7 @@ namespace yocto
             vector_t  dX(M,0);
             const double ftol = cs.ftol;
             
+            
             //==================================================================
             //
             // Algorithm
@@ -153,8 +157,18 @@ namespace yocto
             //------------------------------------------------------------------
             for(size_t i=1;i<=M;++i)
                 X[i] = 0;
+            for( equilibria::iterator eq= cs.begin(); eq != cs.end(); ++eq )
+            {
+                (**eq).append(X,ran);
+            }
             std::cerr << "X0=" << X << std::endl;
             __PROJ(X);
+            
+            //==================================================================
+            // correction
+            //==================================================================
+            for(size_t i=X.size();i>0;--i) if(X[i]<=0) X[i] = 0;
+
             std::cerr << "X0p=" << X << std::endl;
             
         NEWTON_STEP:
@@ -165,6 +179,7 @@ namespace yocto
             //------------------------------------------------------------------
             cs.compute_Gamma_and_Phi(t,false);
             mkl::mul_rtrn(W,Phi,Q);
+            
             if( !cs.LU.build(W) )
             {
                 std::cerr << "singular composition" << std::endl;
@@ -185,6 +200,8 @@ namespace yocto
             //
             //------------------------------------------------------------------
             mkl::mul_trn(Y, Q, xi);
+            std::cerr << "step=" << Y << std::endl;
+            return;
             
             //------------------------------------------------------------------
             //
@@ -196,7 +213,7 @@ namespace yocto
             __PROJ(X);
             std::cerr << "X1=" << X << std::endl;
             mkl::sub(dX,X);
-            
+            std::cerr << "dX=" << dX << std::endl;
             //------------------------------------------------------------------
             //
             // check convergence
@@ -225,7 +242,7 @@ namespace yocto
             }
             cs.LU.solve(W, Gam);
             mkl::mul_trn(dX, Q, Gam);
-            std::cerr << "dX=" << dX << std::endl;
+            std::cerr << "Xerr=" << dX << std::endl;
         }
         
     }

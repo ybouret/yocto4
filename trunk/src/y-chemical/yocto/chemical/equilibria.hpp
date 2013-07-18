@@ -64,6 +64,9 @@ namespace yocto
             //! Reduce dC to a legal step
             void legalize_dC( double t );
             
+            //! scale all equilibrium
+            void scale_all( double t ) const throw();
+            
             friend std::ostream & operator<<( std::ostream &, const equilibria &);
             
         private:
