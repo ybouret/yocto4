@@ -23,7 +23,18 @@ namespace yocto
         pressure(standard_pressure),
         temperature(standard_temperature),
         ftol( numeric<double>::ftol ),
-        time_scale(1e-4)
+        time_scale(1e-4),
+        nuR(),
+        nuP(),
+        nu(),
+        Gamma(),
+        dtGam(),
+        Phi(),
+        W(),
+        C(),
+        xi(),
+        dC(),
+        LU()
         {
         }
         
