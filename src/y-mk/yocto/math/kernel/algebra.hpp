@@ -41,8 +41,21 @@ namespace yocto
                 return ans;
             }
             
+            template <typename U>
+            static inline T norm1( const array<U> &v ) throw()
+            {
+                T ans(0.0);
+                for(size_t i=v.size();i>0;--i)
+                {
+                    const T tmp = Fabs(v[i]);
+                    if(tmp>ans) ans=tmp;
+                }
+                return ans;
+            }
+            
             static T dot( const array<T> &u, const array<T> &v ) throw();
             static void normalize( array<T> &v );
+            
             
 		};
         

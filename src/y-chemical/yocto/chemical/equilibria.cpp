@@ -214,8 +214,8 @@ namespace yocto
                     dtGam[i] = dervs( Eq.K, t, time_scale ) * lhs;
                 }
             }
-            std::cerr << "Gamma=" << Gamma << std::endl;
-            std::cerr << "Phi="   << Phi << std::endl;
+            //std::cerr << "Gamma=" << Gamma << std::endl;
+            //std::cerr << "Phi="   << Phi << std::endl;
             
         }
         
@@ -224,7 +224,6 @@ namespace yocto
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
             mkl::mul_rtrn(W, Phi, nu);
-            std::cerr << "W=" << W << std::endl;
             if( !LU.build(W) )
                 throw exception("equilibria: invalid composition");
             
@@ -253,7 +252,6 @@ namespace yocto
                     if( Fabs(dC[i]) > Fabs( ftol * C[i] ) )
                         goto NEWTON_STEP;
                 }
-                std::cerr << "C=" << C << std::endl;
             }
         }
         
