@@ -30,6 +30,7 @@ namespace yocto
         {
         public:
             explicit solution( const collection &lib );
+            solution( const solution &other);
             virtual ~solution() throw();
             
             const size_t components;
@@ -61,6 +62,7 @@ namespace yocto
         private:
             component::db composition;
             const size_t  name_max;
+            YOCTO_DISABLE_ASSIGN(solution);
         };
         
     }

@@ -96,6 +96,12 @@ namespace yocto
             }
         }
         
+        void _lua:: load( lua_State *L, initializer &ini, const char *name )
+        {
+            const string NAME(name);
+            return _lua::load(L,ini,NAME);
+        }
+        
     }
     
 }

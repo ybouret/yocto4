@@ -32,3 +32,15 @@ ini =
     { 0, {1,"Cl-"} },
     { 0, {1,"NH4+"}, { 1, "NH3" } }
 };
+
+
+-- effector
+effectors = { 
+    { "MCT", { "H+", "Ac-" }, { "H+", "AcH", "Ac-"} }
+    };
+
+function MCT(t,zeta,h,am)
+    print( "MCT@t=" .. t .. ", zeta=" .. zeta );
+    print( "h=" .. h .. ", am=" .. am );
+    return 1,2,3;
+end

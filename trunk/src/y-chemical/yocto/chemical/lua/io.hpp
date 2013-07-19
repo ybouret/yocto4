@@ -2,6 +2,7 @@
 #define YOCTO_CHEMICAL_LUA_IO_INCLUDED 1
 
 #include "yocto/chemical/initializer.hpp"
+#include "yocto/chemical/effector.hpp"
 
 extern "C"
 {
@@ -28,8 +29,12 @@ namespace yocto
             static void load( lua_State *L, const collection &lib, equilibria &cs, const string &name );
             static void load( lua_State *L, const collection &lib, equilibria &cs, const char   *name );
 
-            static void load( lua_State *L, initializer &ini, const string &name );
             
+            static void load( lua_State *L, initializer &ini, const string &name );
+            static void load( lua_State *L, initializer &ini, const char   *name );
+            
+            class effector;
+            static void load( lua_State *L, effectors &eff, const string &name);
             
         };
         

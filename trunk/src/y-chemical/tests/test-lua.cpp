@@ -41,5 +41,13 @@ YOCTO_UNIT_TEST_IMPL(lua)
     s.load(cs.C);
     std::cerr << s << std::endl;
     
+    chemical::effectors eff;
+    chemical::_lua::load(L, eff, "effectors");
+    
+    chemical::solution ds(s);
+    
+    eff.collect(ds, 0, 0, s);
+    std::cerr << "ds=" << ds << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()

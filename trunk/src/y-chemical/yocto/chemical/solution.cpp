@@ -46,6 +46,15 @@ namespace yocto
             }
         }
         
+        solution:: solution( const solution &other ) :
+        components(  other.components  ),
+        composition( other.composition ),
+        name_max(    other.name_max    )
+        {
+            
+        }
+        
+        
         solution:: ~solution() throw()
         {
         }
