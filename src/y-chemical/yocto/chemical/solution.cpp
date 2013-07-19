@@ -125,6 +125,29 @@ namespace yocto
             return os;
         }
         
+        component::db::iterator solution::begin() throw() { return composition.begin(); }
+        component::db::iterator solution::end()   throw() { return composition.end();   }
+        component::db::const_iterator solution::begin() const throw() { return composition.begin(); }
+        component::db::const_iterator solution::end()   const throw() { return composition.end();   }
+        
+
+        void solution:: ldz() throw()
+        {
+            for( iterator i=begin(); i != end(); ++i )
+                (*i).conc = 0;
+        }
+        
+        double solution:: sum_zC() const throw()
+        {
+            double ans = 0;
+            for( const_iterator i = begin(); i != end(); ++i)
+            {
+                const component &p = *i;
+                ans += p.conc * p.spec->z;
+            }
+            return ans;
+        }
+        
     }
     
 }

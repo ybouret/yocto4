@@ -42,10 +42,21 @@ namespace yocto
             
             void load( const array<double> &C ) throw();
             void save( array<double> &C) const throw();
-
+            
             double pH() const;
             
             friend std::ostream & operator<<( std::ostream &, const solution &);
+            
+            typedef component::db::iterator       iterator;
+            typedef component::db::const_iterator const_iterator;
+            
+            iterator begin() throw();
+            iterator end()   throw();
+            const_iterator begin() const throw();
+            const_iterator end()   const throw();
+            
+            void   ldz() throw();
+            double sum_zC() const throw(); //!< charge excess, in concentration units
             
         private:
             component::db composition;
