@@ -58,6 +58,8 @@ inline const species::ptr &method() const { return (*this)[name]; }
             species &add(const char   *name);
             
             
+            friend std::ostream & operator<<( std::ostream &, const collection &);
+            
             void dump_ztable( std::ostream &os ) const;
             
         private:

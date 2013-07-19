@@ -142,6 +142,18 @@ if( !ztable.insert(id,z) ) throw exception(fmt, name); \
             }
         }
         
+        std::ostream & operator<<( std::ostream &os, const collection &lib)
+        {
+            os << "{" << std::endl;
+            for( collection::const_iterator i = lib.begin(); i != lib.end(); ++i )
+            {
+                const species &sp = **i;
+                os << "\t\"" << sp.name << "\" : " << sp.z << std::endl;
+            }
+            os << "}";
+            return os;
+        }
+        
     }
     
 }
