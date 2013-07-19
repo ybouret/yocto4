@@ -68,7 +68,7 @@ YOCTO_UNIT_TEST_IMPL(init2)
     
     chemical::equilibria cs;
     cs.add_water(lib,1e-14);
-    cs.add_acid(lib, "eq1", "CO2", "HCO3-", 4.16e-7);
+    cs.add_acid(lib, "eq1", "CO2",   "HCO3-", 4.16e-7);
     cs.add_acid(lib, "eq2", "HCO3-", "CO3--", 4.69e-11);
     
     std::cerr << cs << std::endl;
