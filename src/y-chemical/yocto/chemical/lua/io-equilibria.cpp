@@ -1,7 +1,6 @@
 #include "yocto/chemical/lua/io.hpp"
 #include "yocto/lua/lua.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/auto-ptr.hpp"
 
 namespace yocto
 {
@@ -47,7 +46,11 @@ namespace yocto
         
         
         static inline
-        void __parse_one_eq( lua_State *L, equilibria &cs, const char *table_name, const unsigned table_indx)
+        void __parse_one_eq(lua_State *L,
+                            const collection &lib,
+                            equilibria &cs,
+                            const char *table_name,
+                            const unsigned table_indx)
         {
             if(!lua_istable(L, -1))
             {
@@ -118,18 +121,43 @@ namespace yocto
             const char *eq_name = name.c_str();
             for( size_t i=3;i<=n;++i)
             {
+                //--------------------------------------------------------------
+                //-- push actor
+                //--------------------------------------------------------------
                 lua_rawgeti(L, -1, i);
                 const unsigned ia = i-2;
                 if(!lua_istable(L, -1))
                     throw exception("%s[%s] actor #%u is not a LUA_TABLE", table_name, eq_name, ia );
                 if( lua_rawlen(L, -1) != 2 )
                     throw exception("%s[%s] actor #%u is not valid", table_name,eq_name,ia);
+                
+                //-- push factor
+                lua_rawgeti(L,-1,1);
+                if(!lua_isnumber(L, -1))
+                    throw exception("%s[%s]  invalid stochiometric #%u", table_name, eq_name, ia);
+                const int coef = int(lua_tonumber(L,-1));
+                //-- pop factor
+                lua_pop(L,1);
+                
+                //-- push name
+                lua_rawgeti(L, -1, 2);
+                if(!lua_isstring(L,-1))
+                    throw exception("%s[%s] invalid name #%u", table_name, eq_name, ia);
+                const string actor_name = lua_tostring(L, -1);
+                //-- pop name
+                lua_pop(L,1);
+                
+                (**ppEq).add( lib[actor_name], coef);
+                
+                //--------------------------------------------------------------
+                //-- pop actor
+                //--------------------------------------------------------------
                 lua_pop(L, 1);
             }
             
         }
         
-        void _lua:: load(lua_State *L,  equilibria &cs, const string &name)
+        void _lua:: load(lua_State *L, const collection &lib, equilibria &cs, const string &name)
         {
             assert(L);
             lua_settop(L, 0);
@@ -141,7 +169,6 @@ namespace yocto
             }
             
             const size_t n = lua_rawlen(L, -1);
-            std::cerr << "Parsing " << n << " equilibrium(a)" << std::endl;
             
             for(size_t i=1;i<=n;++i)
             {
@@ -150,7 +177,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 lua_rawgeti(L, -1, i);
                 
-                __parse_one_eq(L, cs, table_name, i);
+                __parse_one_eq(L, lib, cs, table_name, i);
                 
                 //--------------------------------------------------------------
                 // pop the equilibrium
@@ -159,6 +186,13 @@ namespace yocto
             }
             
             
+        }
+        
+        
+        void _lua:: load( lua_State *L, const collection &lib, equilibria &cs, const char   *name )
+        {
+            const string NAME(name);
+            _lua::load(L,lib,cs,NAME);
         }
     }
     
