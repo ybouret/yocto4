@@ -119,8 +119,11 @@ namespace yocto
             for( size_t i=3;i<=n;++i)
             {
                 lua_rawgeti(L, -1, i);
+                const unsigned ia = i-2;
                 if(!lua_istable(L, -1))
-                    throw exception("%s[%s] actor #%u is not a LUA_TABLE", table_name, eq_name, unsigned(i-2) );
+                    throw exception("%s[%s] actor #%u is not a LUA_TABLE", table_name, eq_name, ia );
+                if( lua_rawlen(L, -1) != 2 )
+                    throw exception("%s[%s] actor #%u is not valid", table_name,eq_name,ia);
                 lua_pop(L, 1);
             }
             
