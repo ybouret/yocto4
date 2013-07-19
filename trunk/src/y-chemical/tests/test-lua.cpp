@@ -22,5 +22,10 @@ YOCTO_UNIT_TEST_IMPL(lua)
     
     std::cerr << "lib=" << lib << std::endl;
     
+    chemical::equilibria cs;
+    
+    chemical:: _lua::load(L,cs,"eqs");
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

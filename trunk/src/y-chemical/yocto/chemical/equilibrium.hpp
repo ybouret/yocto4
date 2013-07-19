@@ -20,7 +20,7 @@ namespace yocto
             virtual ~equilibrium() throw();
             
             //! get a constant
-            virtual double getK( double t ) const throw() = 0;
+            virtual double getK( double t ) const = 0;
             
             //! the name
             const string &key() const throw();
