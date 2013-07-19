@@ -2,7 +2,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/math/kernel/algebra.hpp"
-#include "yocto/math/opt/bracket.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -143,24 +143,21 @@ namespace yocto
                     V.make(N,0);
                     dV.make(N,0);
                     
+                    //==========================================================
+                    //
+                    // Initialize the algorithm
+                    //
+                    //==========================================================
                     
-                    //==========================================================
-                    //
-                    // Initialize the algorithm: X0 + tQ.V
-                    //
-                    //==========================================================
+                    
+                    //----------------------------------------------------------
+                    // compute X0 such that X = X0 + Q'*V
+                    //----------------------------------------------------------
                     mkl::set(Mu,Lam);
                     L2.solve(P2, Mu);
                     mkl::mul_trn(X0,P,Mu);
                     project(X0);
                     std::cerr << "X0=" << X0 << std::endl;
-                    
-                    double amplitude = 0;
-                    for(size_t i=M;i>0;--i)
-                    {
-                        const double xm = Fabs(X0[i]);
-                        if(xm>amplitude) amplitude = xm;
-                    }
                     
                     //==========================================================
                     //
@@ -169,21 +166,22 @@ namespace yocto
                     //==========================================================
                     bool converged = false;
                     
+                INIT_STEP:
                     //----------------------------------------------------------
                     // initialize step
                     //----------------------------------------------------------
-                    for(size_t i=N;i>0;--i)
+                    mkl::set(X1,0);
+                    for( equilibria::iterator eq = cs.begin(); eq != cs.end(); ++eq )
                     {
-                        V[i] = amplitude * (0.5 - ran.get<double>());
+                        (**eq).append(X1, ran);
                     }
-                    std::cerr << "V=" << V << std::endl;
+                    mkl::mul(V, Q, X1);
                     
                 NEWTON_STEP:
                     //----------------------------------------------------------
                     // build composition: X1 = X0 + Q'*V;
                     //----------------------------------------------------------
                     build_composition();
-                    //std::cerr << "X1=" << X1 << std::endl;
                     
                     
                     //----------------------------------------------------------
@@ -194,13 +192,11 @@ namespace yocto
                     mkl::mul_rtrn(cs.W, cs.Phi, Q);
                     if( ! cs.LU.build(cs.W) )
                     {
-                        std::cerr << "singular newton step" << std::endl;
-                        return;
+                        //std::cerr << "singular newton step" << std::endl;
+                        goto INIT_STEP;
                     }
                     mkl::neg(dV,cs.Gamma);
                     cs.LU.solve(cs.W,dV);
-                    std::cerr << "V="  << V  << std::endl;
-                    std::cerr << "dV=" << dV << std::endl;
                     
                     converged = true;
                     for(size_t i=N;i>0;--i)
@@ -211,9 +207,47 @@ namespace yocto
                     }
                     if(!converged) goto NEWTON_STEP;
                     
+                    //----------------------------------------------------------
+                    // compute error
+                    //----------------------------------------------------------
                     build_composition();
                     mkl::set(cs.C,X1);
+                    //std::cerr << "X1=" << X1 << std::endl;
+                    cs.compute_Gamma_and_Phi(t,false);
+                    mkl::mul_rtrn(cs.W, cs.Phi, Q);
+                    if( ! cs.LU.build(cs.W) )
+                    {
+                        //std::cerr << "singular final composition" << std::endl;
+                        goto INIT_STEP;
+                    }
+                    cs.LU.solve(cs.W,cs.Gamma);
+                    mkl::mul_trn(Y, Q, cs.Gamma);
+                    for(size_t i=M;i>0;--i)
+                    {
+                        double err = Fabs(Y[i]);
+                        if(err>0) err = pow(10.0,ceil(Log10(err)));
+                        Y[i] = err;
+                    }
+                    //std::cerr << "dX=" << Y  << std::endl;
+
+                    //----------------------------------------------------------
+                    // update X1
+                    //----------------------------------------------------------
+                    for(size_t i=M;i>0;--i)
+                    {
+                        if( Fabs(X1[i]) <= Y[i] )
+                            X1[i] = 0;
+                    }
+                    std::cerr << "X2=" << X1 << std::endl;
                     
+                    for(size_t i=M;i>0;--i)
+                    {
+                        if(X1[i]<0)
+                            goto INIT_STEP;
+                    }
+                    
+                    mkl::set(cs.C, X1);
+                    cs.normalize_C(t);
                 }
                 
                 

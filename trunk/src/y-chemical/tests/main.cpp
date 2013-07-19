@@ -10,6 +10,8 @@ YOCTO_UNIT_TEST_INIT(8)
     YOCTO_UNIT_TEST_DECL(equilibrium);
     YOCTO_UNIT_TEST_DECL(equilibria);
     YOCTO_UNIT_TEST_DECL(init);
+    YOCTO_UNIT_TEST_DECL(init2);
+    
 }
 YOCTO_UNIT_TEST_EXEC()
 
