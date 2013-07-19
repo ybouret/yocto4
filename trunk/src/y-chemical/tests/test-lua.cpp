@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
+#include "yocto/chemical/solution.hpp"
 
 using namespace yocto;
 
@@ -20,12 +21,25 @@ YOCTO_UNIT_TEST_IMPL(lua)
     chemical::collection lib;
     chemical:: _lua:: load(L, lib, "species");
     
-    std::cerr << "lib=" << lib << std::endl;
+    std::cerr <<  lib << std::endl;
     
     chemical::equilibria cs;
+    chemical:: _lua::load(L, lib, cs,"eqs");
     
-    chemical:: _lua::load(L,cs,"eqs");
+    std::cerr  << cs << std::endl;
     
+    chemical::initializer ini;
+    chemical:: _lua::load(L,ini,"ini");
+    ini.electroneutrality(lib);
+
+    std::cerr << ini << std::endl;
+    
+    ini(cs,lib,0);
+    
+    chemical::solution s(lib);
+    
+    s.load(cs.C);
+    std::cerr << s << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()

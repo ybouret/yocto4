@@ -16,7 +16,6 @@ namespace yocto
         {
             assert( lua_istable(L, -1));
             const size_t n  = lua_rawlen(L,-1);
-            std::cerr << table_name << "[" << table_indx << "] has " << n << " fields" << std::endl;
             
             //------------------------------------------------------------------
             // get the name
@@ -59,7 +58,6 @@ namespace yocto
                 throw exception("chemical collection '%s' is not a LUA_TABLE", table_name);
             
             const size_t n = lua_rawlen(L,-1);
-            std::cerr << "Parsing " << n << " species" << std::endl;
             
             for(size_t i=1;i<=n;++i)
             {

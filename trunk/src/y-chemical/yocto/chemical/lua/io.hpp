@@ -25,7 +25,10 @@ namespace yocto
 
          
             class equilibrium;
-            static void load( lua_State *L, equilibria &cs, const string &name );
+            static void load( lua_State *L, const collection &lib, equilibria &cs, const string &name );
+            static void load( lua_State *L, const collection &lib, equilibria &cs, const char   *name );
+
+            static void load( lua_State *L, initializer &ini, const string &name );
             
             
         };
