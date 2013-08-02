@@ -8,15 +8,16 @@ namespace yocto
     
     namespace chemical
     {
+        //! for a solution
         class component
         {
         public:
             component( const species::ptr &sp ) throw();
             ~component() throw();
-            const species::ptr spec;
-            double             conc;
+            const species::ptr spec; //!< from a collection
+            double             conc; //!< the real concentration
             
-            const string &key() const throw();
+            const string &key() const throw(); //!< spec->name
             
             component(const component &other ) throw();
             
@@ -26,6 +27,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(component);
         };
         
+        //! built from a solution
         class solution
         {
         public:
@@ -41,8 +43,14 @@ namespace yocto
             double & operator[]( const char * );
             const double &operator[]( const char *) const;
             
+            double       & operator[]( size_t i ) throw();
+            const double & operator[]( size_t i ) const throw();
+
             void load( const array<double> &C ) throw();
             void save( array<double> &C) const throw();
+            
+            void mul( double a ) throw();
+            
             
             double pH() const;
             

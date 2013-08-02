@@ -11,23 +11,24 @@ namespace yocto
     namespace chemical
     {
         
+        //! an equilibrium
         class equilibrium : public object, public counted
         {
         public:
-            const string name;
+            const string name;   //!< unique identifier ("water", "acid",...)
             vslot        data;   //!< for derived classes            
             
             virtual ~equilibrium() throw();
             
-            //! get a constant
+            //! get a constant at a given time
             virtual double getK( double t ) const = 0;
             
             //! the name
             const string &key() const throw();
             
             
-            typedef intrusive_ptr<string,equilibrium> ptr;
-            typedef set<string,equilibrium::ptr>      db;
+            typedef intrusive_ptr<string,equilibrium> ptr; //!< smart pointer
+            typedef set<string,equilibrium::ptr>      db;  //!< database
             
             //! species+coefficient
             class actor
@@ -43,7 +44,7 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(actor);
             };
             
-            //! add a species
+            //! add a species with its stochiometric coefficient
             void   add( const species::ptr &spec, const int coef );
             
             //! number of actors

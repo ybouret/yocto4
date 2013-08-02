@@ -19,23 +19,24 @@ namespace yocto
         extern const double standard_pressure;
         extern const double standard_temperature;
         
+        //! a species
         class species : public object, public counted
         {
         public:
-            const string name;
-            const int    z;
-            vslot        data;
-            size_t       indx;
+            const string name; //!< unique name
+            const int    z;    //!< algebraic charge
+            vslot        data; //!< whatever, see vslot
+            size_t       indx; //!< index in collection
             
             explicit species( const string &id, int charge);
             explicit species( const char   *id, int charge);
             virtual ~species() throw();
             
-            const string &key() const throw();
+            const string &key() const throw(); //!< the name
             
             
-            typedef intrusive_ptr<string,species> ptr;
-            typedef set<string,ptr>               db;
+            typedef intrusive_ptr<string,species> ptr; //!< smart pointer
+            typedef set<string,ptr>               db;  //!< database of smart pointers
             
             friend std::ostream & operator<<( std::ostream &, const species &);
             
