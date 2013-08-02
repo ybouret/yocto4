@@ -14,6 +14,7 @@ namespace yocto
 inline species::ptr       &method()       { return (*this)[name]; } \
 inline const species::ptr &method() const { return (*this)[name]; } 
         
+        //! database of species
         class collection : public species::db
         {
         public:
@@ -24,21 +25,21 @@ inline const species::ptr &method() const { return (*this)[name]; }
             explicit collection(size_t);
             virtual ~collection() throw();
             
-            species &add( const string &name, int z);
-            species &add( const char   *name, int z);
+            species &add( const string &name, int z); //!< a new species, with its algebraic charge
+            species &add( const char   *name, int z); //!< a new species, with its algebraic charge
             
-            bool    has( const string &name) const throw();
-            bool    has( const char   *name) const;
+            bool    has( const string &name) const throw(); //!< check for species
+            bool    has( const char   *name) const;         //!< check for species
             
-            species::ptr &operator[]( const string &id );
-            species::ptr &operator[]( const char   *id );
+            species::ptr &operator[]( const string &id );   //!< get an existing species
+            species::ptr &operator[]( const char   *id );   //!< get an existing species
             
-            const species::ptr & operator[]( const string &id ) const;
-            const species::ptr & operator[]( const char   *id ) const;
+            const species::ptr & operator[]( const string &id ) const; //!< get an existing species, const
+            const species::ptr & operator[]( const char   *id ) const; //!< get an existing species, const
 
-            void suppress( const string &name ) throw();
+            void suppress( const string &name ) throw(); //!< suppress an existing species
             
-            void update_indices() throw(); // in case a species is removed
+            void update_indices() throw(); //!< shall be called by equilibria
             
             //------------------------------------------------------------------
             // species must be declared before use !
@@ -54,8 +55,8 @@ inline const species::ptr &method() const { return (*this)[name]; }
             YOCTO_CHEMICAL_NAMED_SPECIES(amonium,     "NH4+")
             YOCTO_CHEMICAL_NAMED_SPECIES(amoniac,     "NH3")
             
-            species &add(const string &name); //! one of the predefined species in ztable
-            species &add(const char   *name);
+            species &add(const string &name); //!< one of the predefined species in ztable
+            species &add(const char   *name); //!< one of the predefined species in ztable
             
             
             friend std::ostream & operator<<( std::ostream &, const collection &);

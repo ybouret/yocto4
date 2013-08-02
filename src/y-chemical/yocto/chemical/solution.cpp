@@ -104,6 +104,16 @@ namespace yocto
         }
         
         
+        void solution:: mul(double a) throw()
+        {
+            for( component::db::iterator i=composition.begin(); i != composition.end(); ++i )
+            {
+                component &comp = *i;
+                comp.conc *= a;
+            }
+        }
+        
+        
         void solution:: save( array<double> &C ) const throw()
         {
             assert(C.size()>=composition.size());
@@ -155,6 +165,24 @@ namespace yocto
                 ans += p.conc * p.spec->z;
             }
             return ans;
+        }
+        
+        double & solution:: operator[]( size_t i ) throw()
+        {
+            assert(i>0);
+            assert(i<=components);
+            iterator j = begin();
+            for(size_t k=1;k<i;++k) ++j;
+            return (*j).conc;
+        }
+        
+        const double & solution:: operator[]( size_t i ) const throw()
+        {
+            assert(i>0);
+            assert(i<=components);
+            const_iterator j = begin();
+            for(size_t k=1;k<i;++k) ++j;
+            return (*j).conc;
         }
         
     }

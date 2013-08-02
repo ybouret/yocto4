@@ -15,6 +15,7 @@ namespace yocto
         typedef vector<double>          vector_t;
         typedef math::lu<double>        lu_t;
         
+        //! a database of equilibrium
         class equilibria : public equilibrium::db
         {
         public:
@@ -38,7 +39,11 @@ namespace yocto
             vector_t  dC;    //!< corrections
             lu_t      LU;    //!< for local matrix inversion
             
+            
+            //! release all memory
             void reset() throw();
+            
+            //! allocate from a collection
             void build_from( collection &lib );
             
             //! make a "true" constant equilibrium
@@ -51,7 +56,7 @@ namespace yocto
             void add_acid( const collection &lib, const char *name, const char *acid, const char *base, const double Ka );
             
             
-            //! compute Ganna and Phi
+            //! compute Ganna and Phi, dGamma/dt if needed
             void compute_Gamma_and_Phi( double t, bool compute_derivatives);
             
             

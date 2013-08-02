@@ -8,6 +8,7 @@ namespace yocto
 {
     namespace chemical
     {
+        //! base type for constraint weights
         typedef map<string,double> constraint_weights;
         
         class constraint : public constraint_weights
@@ -20,10 +21,11 @@ namespace yocto
             typedef shared_ptr<constraint>   ptr;
             
             double & operator[]( const string & ); //!< created on the fly
-            double & operator[]( const char   * );
+            double & operator[]( const char   * ); //!< created on the fly
             
-            const double & operator[](const string &) const;
-            const double & operator[](const char   *) const;
+            
+            const double & operator[](const string &) const; //!< get an existing weight
+            const double & operator[](const char   *) const; //!< get an existion weight
             
             friend std::ostream & operator<<(std::ostream &, const constraint &);
             
@@ -31,8 +33,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
         };
         
+        //! base class for a collection of constraints
         typedef vector<constraint::ptr> constraints;
 
+        //! a set of constraints to init equilibria
         class initializer : public constraints
         {
         public:
@@ -46,6 +50,7 @@ namespace yocto
             //! set the electroneutrality
             void electroneutrality( const collection &lib );
             
+            //! initialize at time t
             void operator()( equilibria &cs, collection &lib, const double t );
             
             friend std::ostream & operator<<(std::ostream &, const initializer &);
