@@ -36,8 +36,11 @@ ini =
 
 -- effector
 effectors = { 
-    { "MCT", { "H+", "Ac-" }, { "H+", "AcH", "Ac-"} }
-    };
+    { "MCT",                  -- function name
+      { "H+", "Ac-" },        -- input components
+      { "H+", "AcH", "Ac-"}   -- output components
+    }
+};
 
 function MCT(t,zeta,h,am)
     print( "MCT@t=" .. t .. ", zeta=" .. zeta );
