@@ -8,14 +8,15 @@ namespace yocto
     namespace chemical
     {
         
+        //! compute a global rate
         class effector : public object, public counted
         {
         public:
-            const string name;
+            const string name;   //!< unique identifier
             double       factor; //!< scaling factor, default is 1
             
             virtual ~effector() throw();
-            const string &key() const throw();
+            const string &key() const throw(); //!< the name
             
             typedef intrusive_ptr<string,effector> ptr;
             
@@ -31,14 +32,17 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(effector);
         };
         
+        //! base class for effectors database
         typedef set<string,effector::ptr> effectors_db;
         
+        //! database of effectos
         class effectors : public effectors_db
         {
         public:
             explicit effectors();
             virtual ~effectors() throw();
             
+            //! sum of all the rates times the effector's factor
             void collect(solution &dSdt, double t, double zeta, const solution &S ) const;
             
         private:

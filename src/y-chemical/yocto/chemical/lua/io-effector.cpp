@@ -164,5 +164,12 @@ namespace yocto
             }
         }
         
+        void _lua::load( lua_State *L, effectors &eff, const char *name)
+        {
+            const string ID(name);
+            _lua::load(L,eff,ID);
+        }
+
+        
     }
 }
