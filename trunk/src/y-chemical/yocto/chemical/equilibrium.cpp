@@ -17,6 +17,7 @@ namespace yocto
         equilibrium:: equilibrium( const string &id ) :
         name(id),
         data(),
+	actors(),
         Nu(0),
         C0(0),
         K( this, & equilibrium::computeK)
@@ -27,6 +28,7 @@ namespace yocto
         equilibrium:: equilibrium(const char *id ) :
         name(id),
         data(),
+	actors(),
         Nu(0),
         C0(0),
         K( this, & equilibrium::computeK)
