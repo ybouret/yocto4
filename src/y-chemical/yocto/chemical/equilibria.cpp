@@ -34,7 +34,8 @@ namespace yocto
         C(),
         xi(),
         dC(),
-        LU()
+        LU(),
+	dervs()
         {
         }
         

@@ -204,7 +204,7 @@ namespace yocto
             //assert( flag.size() >= n );
             
             ptrdiff_t nn,m,l,k,j,i,mmin;
-            real_t    z,y,x,w,v,u,t,s,r,q,p,anorm;
+            real_t    z,y,x,w,v,u,t,s,r=0,q=0,p=0,anorm;
             
             size_t   ir = 1; //! where to put real eigenvalues
             size_t   ic = n; //! where to put cplx eigenvalues
