@@ -14,10 +14,14 @@ namespace yocto
             return name;
         }
         
+#if defined(_MSC_VER)
+		// using this in ctor
+#pragma warning ( disable : 4355 ) 
+#endif
         equilibrium:: equilibrium( const string &id ) :
         name(id),
         data(),
-	actors(),
+		actors(),
         Nu(0),
         C0(0),
         K( this, & equilibrium::computeK)

@@ -36,7 +36,7 @@ namespace yocto
             lua_rawgeti(L, -1, 2);
             if(!lua_isnumber(L, -1))
                 throw exception("%s[%u][1] is not a numer", table_name, unsigned(table_indx));
-            const int z = lua_tonumber(L, -1);
+            const int z = int(lua_tonumber(L, -1));
             lua_pop(L, 1);
             species &sp = lib.add(name, z);
             
