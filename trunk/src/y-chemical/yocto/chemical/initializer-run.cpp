@@ -182,7 +182,7 @@ namespace yocto
                     // build composition: X1 = X0 + Q'*V;
                     //----------------------------------------------------------
                     build_composition();
-                    
+                    std::cerr << "X1=" << X1 << std::endl;
                     
                     //----------------------------------------------------------
                     // compute newton step
@@ -192,12 +192,14 @@ namespace yocto
                     mkl::mul_rtrn(cs.W, cs.Phi, Q);
                     if( ! cs.LU.build(cs.W) )
                     {
-                        //std::cerr << "singular newton step" << std::endl;
+                        std::cerr << "singular newton step" << std::endl;
                         goto INIT_STEP;
                     }
                     mkl::neg(dV,cs.Gamma);
                     cs.LU.solve(cs.W,dV);
                     
+                    std::cerr << "V=" << V << std::endl;
+                    std::cerr << "dV=" << dV << std::endl;
                     converged = true;
                     for(size_t i=N;i>0;--i)
                     {
@@ -217,7 +219,7 @@ namespace yocto
                     mkl::mul_rtrn(cs.W, cs.Phi, Q);
                     if( ! cs.LU.build(cs.W) )
                     {
-                        //std::cerr << "singular final composition" << std::endl;
+                        std::cerr << "singular final composition" << std::endl;
                         goto INIT_STEP;
                     }
                     cs.LU.solve(cs.W,cs.Gamma);
@@ -229,7 +231,7 @@ namespace yocto
                         Y[i] = err;
                     }
                     //std::cerr << "dX=" << Y  << std::endl;
-
+                    
                     //----------------------------------------------------------
                     // update X1
                     //----------------------------------------------------------

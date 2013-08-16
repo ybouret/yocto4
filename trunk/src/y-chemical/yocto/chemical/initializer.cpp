@@ -77,11 +77,19 @@ namespace yocto
         void initializer:: electroneutrality( const collection &lib )
         {
             constraint &Q = create(0);
+            size_t num_charged = 0;
             for( collection::const_iterator i=lib.begin(); i!=lib.end();++i)
             {
                 const species &sp = **i;
-                Q[sp.name] = sp.z;
+                const int z = sp.z;
+                if(z!=0)
+                {
+                    Q[sp.name] = sp.z;
+                    ++num_charged;
+                }
             }
+            if(num_charged<=0)
+                throw exception("No charged species for electroneutrality!");
         }
         
         
