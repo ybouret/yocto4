@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES(../../y-spade)
 
 FILE(GLOB test_srcs test-*.cpp)
-ADD_EXECUTABLE(test-chemical main.cpp ${test_srcs} example.lua)
+ADD_EXECUTABLE(test-chemical main.cpp ${test_srcs} example.lua acetic.lua)
 TARGET_LINK_YOCTO( test-chemical chemical mk lua++ lua)
 
 ENABLE_TESTING()
@@ -13,5 +13,6 @@ ADD_TEST(Init        test-chemical init)
 ADD_TEST(Init0       test-chemical init 0)
 ADD_TEST(Init2       test-chemical init2 )
 ADD_TEST(Init2.0     test-chemical init2 0)
-
+ADD_TEST(Lua         test-chemical lua ${CMAKE_CURRENT_SOURCE_DIR}/example.lua)
+ADD_TEST(Acetic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/acetic.lua)
 

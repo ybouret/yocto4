@@ -63,6 +63,8 @@ inline const species::ptr &method() const { return (*this)[name]; }
             
             void dump_ztable( std::ostream &os ) const;
             
+            size_t max_name_length() const throw(); //!< max name length
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(collection);
             void build_ztable();

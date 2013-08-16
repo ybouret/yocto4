@@ -1,4 +1,5 @@
 #include "yocto/chemical/collection.hpp"
+#include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 
 #include <iostream>
@@ -30,7 +31,6 @@ if( !ztable.insert(id,z) ) throw exception(fmt, name); \
             Y_CHEM_ZTABLE("CO3--",  -2);
             Y_CHEM_ZTABLE("NH3",     0);
             Y_CHEM_ZTABLE("NH4+",    1);
-            
         }
         
         collection:: collection() :
@@ -142,13 +142,25 @@ if( !ztable.insert(id,z) ) throw exception(fmt, name); \
             }
         }
         
+        size_t collection:: max_name_length() const throw()
+        {
+            size_t res = 0;
+            for( collection::const_iterator i = begin(); i != end(); ++i )
+                res = max_of(res, (**i).name.size());
+            return res;
+        }
+
+        
         std::ostream & operator<<( std::ostream &os, const collection &lib)
         {
+            const size_t maxlen = lib.max_name_length();
             os << "{" << std::endl;
             for( collection::const_iterator i = lib.begin(); i != lib.end(); ++i )
             {
                 const species &sp = **i;
-                os << "\t\"" << sp.name << "\" : " << sp.z << std::endl;
+                os << "\t\"" << sp.name;
+                for(size_t i=maxlen-sp.name.size();i>0;--i) os << ' ';
+                os << "\" : " << sp.z << std::endl;
             }
             os << "}";
             return os;
