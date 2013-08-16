@@ -34,21 +34,21 @@ namespace yocto
 		
 		
 		vector( const vector &other ) : hmem_(), size_(0), maxi_(other.size_), 
-		item_( static_cast<memory::allocator&>(hmem_).acquire_as<mutable_type>( maxi_ )-1 )
+        item_( hmem_.template acquire_as<mutable_type>( maxi_ )-1 )
 		{
 			assert(maxi_>=other.size_);
 			_duplicate(other);
 		}
 		
 		vector( const vector &other, size_t extra ) : hmem_(), size_(0), maxi_(other.size_+extra),
-		item_( static_cast<memory::allocator&>(hmem_).acquire_as<mutable_type>( maxi_ )-1 )
+        item_( hmem_.template acquire_as<mutable_type>( maxi_ )-1 )
 		{
 			assert(maxi_>=other.size_+extra);
 			_duplicate(other);
 		}
 		
 		explicit vector( size_t n, const as_capacity_t & ) : hmem_(), size_(0), maxi_(n),
-		item_( static_cast<memory::allocator&>(hmem_).acquire_as<mutable_type>( maxi_ )-1)
+        item_( hmem_.template acquire_as<mutable_type>( maxi_ )-1 )
 		{
 			assert( maxi_>=n);
 		}
@@ -93,15 +93,15 @@ namespace yocto
 				swap_with(tmp);
 			}
 		}
-		virtual void pop_back() throw() { assert(size_>0); destruct( &item_[size_--] ); }
+		virtual void pop_back() throw()           { assert(size_>0); destruct( &item_[size_--] ); }
 		virtual void push_front( param_type obj ) { _push_front(obj,int2type<bitwise_ops>()); }
-		virtual void pop_front() { assert(size_>0); _pop_front( int2type<bitwise_ops>() ); }
+		virtual void pop_front()                  { assert(size_>0); _pop_front( int2type<bitwise_ops>() ); }
 		
 		//======================================================================
 		// specific interface
 		//======================================================================
 		explicit vector( size_t n, param_type obj ) : hmem_(), size_(0), maxi_(n),
-		item_( static_cast<memory::allocator&>(hmem_).acquire_as<mutable_type>( maxi_ )-1)
+        item_( hmem_.template acquire_as<mutable_type>( maxi_ )-1 )
 		{
 			assert( maxi_>=n );
 			try
