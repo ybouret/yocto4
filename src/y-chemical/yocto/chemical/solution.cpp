@@ -113,6 +113,24 @@ namespace yocto
             }
         }
         
+        void solution:: neg() throw()
+        {
+            for( component::db::iterator i=composition.begin(); i != composition.end(); ++i )
+            {
+                component &comp = *i;
+                comp.conc = - comp.conc;
+            }
+        }
+        
+        void solution:: add( const solution &other )
+        {
+            solution &self = *this;
+            for( const_iterator i = other.begin(); i != other.end(); ++i )
+            {
+                const component &comp = *i;
+                self[ comp.spec->name ] += comp.conc;
+            }
+        }
         
         void solution:: save( array<double> &C ) const throw()
         {
@@ -183,6 +201,24 @@ namespace yocto
             const_iterator j = begin();
             for(size_t k=1;k<i;++k) ++j;
             return (*j).conc;
+        }
+        
+        
+        void solution:: write_header( ios::ostream &os ) const
+        {
+            for( const_iterator i = begin(); i != end(); ++i)
+            {
+                os.write(' ');
+                os << (*i).spec->name;
+            }
+        }
+        
+        void solution:: write_values( ios::ostream &os ) const
+        {
+            for( const_iterator i = begin(); i != end(); ++i)
+            {
+                os(" %.15g", (*i).conc);
+            }
         }
         
     }
