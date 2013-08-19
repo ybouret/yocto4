@@ -2,6 +2,7 @@
 #define YOCTO_CHEMICAL_SOLUTION_INCLUDED 1
 
 #include "yocto/chemical/collection.hpp"
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -27,7 +28,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(component);
         };
         
-        //! built from a solution
+        //! built from a collection
         class solution
         {
         public:
@@ -35,37 +36,42 @@ namespace yocto
             solution( const solution &other);
             virtual ~solution() throw();
             
+            //! number of components..
             const size_t components;
             
-            double & operator[]( const string & );
-            const double & operator[]( const string &) const;
+            double & operator[]( const string & );             //!< get by bame
+            const double & operator[]( const string &) const;  //!< get by name
             
-            double & operator[]( const char * );
-            const double &operator[]( const char *) const;
+            double & operator[]( const char * );               //!< get by name
+            const double &operator[]( const char *) const;     //!< get by name
             
-            double       & operator[]( size_t i ) throw();
-            const double & operator[]( size_t i ) const throw();
+            double       & operator[]( size_t i ) throw();      //!< get by index
+            const double & operator[]( size_t i ) const throw();//!< get by index
 
-            void load( const array<double> &C ) throw();
-            void save( array<double> &C) const throw();
+            void load( const array<double> &C ) throw();        //!< first components into slots
+            void save( array<double> &C) const throw();         //!< first components into slots
             
-            void mul( double a ) throw();
+            void mul( double a ) throw();      //!< multiply all
+            void neg() throw();                //!< * -1
+            void add( const solution &other ); //!< must be compatible
             
-            
-            double pH() const;
+            double pH() const; //!< get pH if any
             
             friend std::ostream & operator<<( std::ostream &, const solution &);
             
             typedef component::db::iterator       iterator;
             typedef component::db::const_iterator const_iterator;
             
-            iterator begin() throw();
-            iterator end()   throw();
+            iterator       begin() throw();
+            iterator       end()   throw();
             const_iterator begin() const throw();
             const_iterator end()   const throw();
             
-            void   ldz() throw();
+            void   ldz() throw(); //!< everyone to zero
             double sum_zC() const throw(); //!< charge excess, in concentration units
+            
+            void write_header( ios::ostream & ) const;
+            void write_values( ios::ostream & ) const;
             
         private:
             component::db composition;

@@ -3,6 +3,8 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/chemical/solution.hpp"
+#include "yocto/ios/ocstream.hpp"
+#include "yocto/fs/vfs.hpp"
 
 using namespace yocto;
 
@@ -49,12 +51,73 @@ YOCTO_UNIT_TEST_IMPL(dosage)
     //--------------------------------------------------------------------------
     // find the initial composition
     //--------------------------------------------------------------------------
-    cs.ftol = 1e-7;
+    //cs.ftol = 1e-7;
     ini(cs,lib,0.0);
     
-    chemical::solution S(lib);
-    S.load(cs.C);
-    std::cerr << "pH=" << S.pH() << std::endl;
+    chemical::solution S0(lib);
+    S0.load(cs.C);
+    std::cerr << "S0=" << S0 << std::endl;
+    std::cerr << "pH=" << S0.pH() << std::endl;
+    const double V0 = Lua::Config::Get<lua_Number>(L,"V0");
+    std::cerr << "starting with V0=" << V0 << std::endl;
+    
+    //--------------------------------------------------------------------------
+    // find the titration
+    //--------------------------------------------------------------------------
+    vector<string> added;
+    Lua::Config::GetTable<string>(L, "S1", added);
+    const double   C1 = Lua::Config::Get<lua_Number>(L,"C1");
+    chemical::solution S1(lib);
+    for( size_t i=1; i<=added.size(); ++i)
+    {
+        S1[ added[i] ] = C1;
+    }
+    std::cerr << "dosage with " << S1 << std::endl;
+    const double V1 = Lua::Config::Get<lua_Number>(L,"V1");
+    std::cerr << "Adding up to V1=" << V1 << std::endl;
+    
+    //--------------------------------------------------------------------------
+    // Here we go
+    //--------------------------------------------------------------------------
+    size_t       N    = 100;
+    const double dV   = V1/N;
+    double       Vtot = V0;
+    chemical::solution dn(S1);
+    dn.mul(dV);
+    
+    string fn = vfs::get_base_name(argv[1]);
+    vfs::change_extension(fn, "dat");
+    std::cerr << "saving into " << fn << std::endl;
+    
+    {
+        ios::ocstream fp(fn,false);
+        fp << "#V pH";
+        S0.write_header(fp);
+        fp << "\n";
+        
+        fp << "0";
+        fp(" %.3e", S0.pH());
+        S0.write_values(fp);
+        fp << "\n";
+    }
+    
+    for(size_t i=1; i<= N; ++i )
+    {
+        S0.mul(Vtot);        // S0 => matter quantities
+        S0.add(dn);          // add solution
+        Vtot += dV;          // increase volume
+        S0.mul(1.0/Vtot);    // dissolution
+        S0.save(cs.C);       // prepare equilibria
+        cs.normalize_C(0.0); // normalize
+        S0.load(cs.C);
+        
+        ios::ocstream fp(fn,true);
+        fp("%.3g", i*dV);
+        fp(" %.3e", S0.pH());
+        S0.write_values(fp);
+        fp << "\n";
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
