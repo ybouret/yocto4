@@ -36,6 +36,7 @@ namespace yocto
                 vector_t     Mu;
                 vector_t     V;
                 vector_t     dV;
+                vector_t     V0;
                 
                 Initializer(equilibria        &user_cs,
                             collection        &lib,
@@ -58,26 +59,30 @@ namespace yocto
                 Y(),
                 Mu(),
                 V(),
-                dV()
+                dV(),
+                V0()
                 {
                     //==========================================================
                     // check rank
                     //==========================================================
                     if( N+Nc != M )
-                        throw exception("initialier: #species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
+                        throw exception("initialier: #species=%u != (#equilibria=%u+#constraints=%u)",
+                                        unsigned(M),
+                                        unsigned(N),
+                                        unsigned(Nc) );
                     
                     //==========================================================
-                    // initialize
+                    // initialize the equilibria
                     //==========================================================
                     cs.build_from(lib);
                     
                     //==========================================================
-                    // initialize
+                    // initialize the concentrations
                     //==========================================================
                     cs.scale_all(t);
                     
                     //==========================================================
-                    // build agebraic constraints
+                    // build agebraic constraints: matrix P and rhs Lambda
                     //==========================================================
                     P.make(Nc,M);
                     Lam.make(Nc,M);
@@ -88,7 +93,7 @@ namespace yocto
                         for( constraint_weights::const_iterator weight=Q.begin(); weight != Q.end(); ++weight )
                         {
                             const species::ptr &sp = lib[weight->key];
-                            P[i][sp->indx] = *weight;
+                            P[i][sp->indx]         = *weight;
                         }
                     }
                     std::cerr << "P=" << P << std::endl;
@@ -96,11 +101,15 @@ namespace yocto
                     
                     //==========================================================
                     //
-                    // build the orthogonal matrix by SVD
+                    // build the orthogonal matrix Q by SVD
                     //
                     //==========================================================
                     Q.make(N,M);
                     {
+                        //------------------------------------------------------
+                        // make a MxM zero matrix, then fill its first colums
+                        // with P rows...
+                        //------------------------------------------------------
                         matrix_t F(M,M);
                         for(size_t i=1;i<=Nc;++i)
                         {
@@ -108,10 +117,17 @@ namespace yocto
                                 F[j][i] = P[i][j];
                         }
                         
+                        //------------------------------------------------------
+                        // use SVD
+                        //------------------------------------------------------
                         matrix_t __V(M,M);
                         vector_t __W(M,0);
                         if( !math::svd<double>::build(F, __W, __V) )
                             throw exception("singular initializer for SVD");
+                        
+                        //------------------------------------------------------
+                        // Fetch the orthogonal space into Q
+                        //------------------------------------------------------
                         for(size_t i=1;i<=N;++i)
                         {
                             for(size_t j=1;j<=M;++j)
@@ -142,6 +158,7 @@ namespace yocto
                     Mu.make(Nc,0);
                     V.make(N,0);
                     dV.make(N,0);
+                    V0.make(N,0);
                     
                     //==========================================================
                     //
@@ -157,7 +174,7 @@ namespace yocto
                     L2.solve(P2, Mu);
                     mkl::mul_trn(X0,P,Mu);
                     project(X0);
-                    std::cerr << "X0=" << X0 << std::endl;
+                    //std::cerr << "X0=" << X0 << std::endl;
                     
                     //==========================================================
                     //
@@ -168,13 +185,18 @@ namespace yocto
                     
                 INIT_STEP:
                     //----------------------------------------------------------
-                    // initialize step
+                    // initialize step in X1:
+                    // add a random fraction of the scaled composition
                     //----------------------------------------------------------
                     mkl::set(X1,0);
                     for( equilibria::iterator eq = cs.begin(); eq != cs.end(); ++eq )
                     {
                         (**eq).append(X1, ran);
                     }
+                    
+                    //----------------------------------------------------------
+                    // "Legalize" the concentration: compute the initial V value
+                    //----------------------------------------------------------
                     mkl::mul(V, Q, X1);
                     
                 NEWTON_STEP:
@@ -182,10 +204,10 @@ namespace yocto
                     // build composition: X1 = X0 + Q'*V;
                     //----------------------------------------------------------
                     build_composition();
-                    std::cerr << "X1=" << X1 << std::endl;
+                    //std::cerr << "X1=" << X1 << std::endl;
                     
                     //----------------------------------------------------------
-                    // compute newton step
+                    // compute numeric newton step
                     //----------------------------------------------------------
                     mkl::set(cs.C,X1);
                     cs.compute_Gamma_and_Phi(t,false);
@@ -198,12 +220,25 @@ namespace yocto
                     mkl::neg(dV,cs.Gamma);
                     cs.LU.solve(cs.W,dV);
                     
-                    std::cerr << "V=" << V << std::endl;
-                    std::cerr << "dV=" << dV << std::endl;
+                    //----------------------------------------------------------
+                    // ok: dV is the Newton step
+                    // now, we must take care of numeric noise on all
+                    // the matrices we computed.
+                    //----------------------------------------------------------
+                    //std::cerr << "V="  << V << std::endl;
+                    //std::cerr << "dV=" << dV << std::endl;
+                    
+                    mkl::set(V0,V);         // save V into V0
+                    mkl::add(V,dV);         // use Newton's step
+                    build_composition();    // deduce new composition, in X1
+                    mkl::mul(V, Q, X1);     // compute the corrected V, in dV
+                    mkl::set(dV,V);         // compute the "real" dV
+                    mkl::sub(dV,V0);        // using all the numerical incertainty
+                    //std::cerr << "V1="  << V  << std::endl;
+                    //std::cerr << "dV1=" << dV << std::endl;
                     converged = true;
                     for(size_t i=N;i>0;--i)
                     {
-                        V[i] += dV[i];
                         if( Fabs(dV[i]) > Fabs( cs.ftol * V[i] ) )
                             converged = false;
                     }
@@ -240,7 +275,7 @@ namespace yocto
                         if( Fabs(X1[i]) <= Y[i] )
                             X1[i] = 0;
                     }
-                    std::cerr << "X2=" << X1 << std::endl;
+                    //std::cerr << "X2=" << X1 << std::endl;
                     
                     for(size_t i=M;i>0;--i)
                     {
@@ -248,11 +283,17 @@ namespace yocto
                             goto INIT_STEP;
                     }
                     
+                    //----------------------------------------------------------
+                    // make a final normalization
+                    //----------------------------------------------------------
                     mkl::set(cs.C, X1);
                     cs.normalize_C(t);
                 }
                 
                 
+                //--------------------------------------------------------------
+                // X1 = X0 + Q'*V, then X1 is projected
+                //--------------------------------------------------------------
                 void build_composition()
                 {
                     mkl::mul_trn(X1, Q, V);
