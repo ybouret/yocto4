@@ -37,6 +37,9 @@ namespace yocto
             pixel_t map_rgba(const rgb_t &c) const throw();
             pixel_t map_rgba(const rgb_t &c, uint8_t a) const throw();
             
+            rgb_t   get_rgb( pixel_t c) const throw();
+            rgb_t   get_rgba(pixel_t c) const throw();
+            
         private:
             YOCTO_DISABLE_ASSIGN(color_format);
         };

@@ -15,8 +15,12 @@ std::cerr << #NAME << "=" << gfx::conv::to_binary(fmt.mask.NAME) \
 
 #define _MAP(NAME) do { \
 const gfx::rgb_t NAME = gfx::get_named_rgb(#NAME); \
+std::cerr << "(" << int(NAME.r) << "," << int(NAME.g) << "," << int(NAME.b) << ") "; \
 const gfx::pixel_t c  = fmt.map_rgb(NAME); \
-std::cerr << #NAME << " = " << gfx::conv::to_binary(c) << " / " << gfx::conv::to_binary(c & (~fmt.opaque) ) << std::endl;\
+std::cerr << #NAME << " = " << gfx::conv::to_binary(c) << " / " << gfx::conv::to_binary(c & (~fmt.opaque) ); \
+const gfx::rgb_t tmp = fmt.get_rgb(c); \
+std::cerr << "(" << int(tmp.r) << "," << int(tmp.g) << "," << int(tmp.b) << ") "; \
+std::cerr << std::endl; \
 } while(false)
 
 static inline void display( const gfx::color_format &fmt )
