@@ -1,5 +1,6 @@
 #include "yocto/gfx/rgb.hpp"
 #include <cstdlib>
+#include <cstring>
 #include "yocto/exception.hpp"
 
 namespace yocto
