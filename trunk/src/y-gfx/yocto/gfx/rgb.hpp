@@ -34,13 +34,12 @@ namespace yocto
                 return *this;
             }
             
-            
             inline ~rgb() throw() {}
             
         };
         
-        typedef rgb<uint8_t>  rgba_t;
-        typedef rgb<uint32_t> rgba_mask_t;
+        typedef rgb<uint8_t>  rgb_t;
+        typedef rgb<uint32_t> rgb_mask_t;
         
     }
 }
