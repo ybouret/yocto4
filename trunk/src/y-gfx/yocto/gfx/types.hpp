@@ -9,7 +9,7 @@ namespace yocto
     
     namespace gfx
     {
-        typedef uint32_t color_t;
+        typedef uint32_t pixel_t;
         
         template <typename T>
         struct alpha_max;

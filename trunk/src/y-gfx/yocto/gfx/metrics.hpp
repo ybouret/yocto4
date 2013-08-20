@@ -15,9 +15,11 @@ namespace yocto
             virtual ~metrics() throw();
             metrics( const metrics &) throw();
             
-            const size_t bytes_per_pixel;
+            const size_t  bytes_per_pixel;
+            pixel_t     (*get_pixel)(const void *);
+            void        (*put_pixel)(void *,pixel_t);
             
-            static void fmt(const uint32_t mask,
+            static void fmt(const uint32_t  mask,
                             uint8_t       &bits,
                             uint8_t       &shift,
                             uint8_t       &loss,
