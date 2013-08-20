@@ -11,7 +11,13 @@ INCLUDE_DIRECTORIES( . ../y-main)
 ADD_EXECUTABLE(named-rgb named-rgb.cpp)
 TARGET_LINK_YOCTO(named-rgb)
 
-ADD_LIBRARY( y-gfx STATIC ${srcs} )
+ADD_CUSTOM_COMMAND(
+	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/named.inc
+	COMMAND named-rgb ${CMAKE_CURRENT_SOURCE_DIR}/named.txt ${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/named.inc
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/named.txt named-rgb.cpp
+)
+
+ADD_LIBRARY( y-gfx STATIC ${srcs} ${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/named.inc)
 INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)

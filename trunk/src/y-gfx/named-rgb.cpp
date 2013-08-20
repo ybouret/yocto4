@@ -58,7 +58,7 @@ int main(int argc, char *argv[] )
         const string input_name = argv[1];
         const string output_name = argv[2];
         
-        std::cerr << input_name << " ==> " << output_name << std::endl;
+        std::cerr << "-- " << input_name << " ==> " << output_name << std::endl;
         
         ios::icstream inp(input_name);
         ios::ocstream fp(output_name,false);
@@ -69,10 +69,8 @@ int main(int argc, char *argv[] )
         size_t         name_max = 0;
         while( line.clear(), inp.read_line(line) > 0 )
         {
-            std::cerr << line << std::endl;
             seq.free();
             tokenizer::split(seq, line,is_sep);
-            std::cerr << seq << std::endl;
             if(seq.size()>=4)
             {
                 const string   name = seq[1];
@@ -85,11 +83,11 @@ int main(int argc, char *argv[] )
             }
         }
         hsort(colors, named::compare);
-        std::cerr << "Parsed " << colors.size() << " colors" << std::endl;
+        std::cerr << "-- parsed " << colors.size() << " colors" << std::endl;
         for(size_t i=1; i <= colors.size(); ++i )
         {
             const named &c = colors[i];
-            std::cerr << c.name << std::endl;
+            //std::cerr << c.name << std::endl;
             fp << "\t{";
             fp << "\"" << c.name << "\",";
             for(size_t j=c.name.size();j<=name_max;++j) fp << ' ';
