@@ -30,7 +30,9 @@ namespace yocto
         
         struct conv
         {
-            static string to_binary(const uint8_t &b);
+            static string to_binary(const uint8_t  &b);
+            static string to_binary(const uint32_t &b);
+            
             static inline uint8_t f2b( float f ) throw()
             {
                 return uint8_t( floorf(f*255.0f + 0.5f) );

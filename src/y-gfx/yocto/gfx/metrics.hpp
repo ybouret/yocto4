@@ -17,6 +17,11 @@ namespace yocto
             
             const size_t bytes_per_pixel;
             
+            static void fmt(const uint32_t mask,
+                            uint8_t       &bits,
+                            uint8_t       &shift,
+                            uint8_t       &loss,
+                            const char    *field);
             
         private:
             YOCTO_DISABLE_ASSIGN(metrics);
