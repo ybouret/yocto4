@@ -17,6 +17,12 @@ namespace yocto
             inline rgb() throw() :
             r(0),g(0),b(0),a( alpha_max<T>::value ) {}
             
+            inline rgb( T R, T G, T B, T A ) throw() :
+            r(R), g(G), b(B), a(A) {}
+            
+            inline rgb( T R, T G, T B ) throw() :
+            r(R), g(G), b(B), a( alpha_max<T>::value ) {}
+            
             inline rgb( const rgb &other ) throw() :
             r(other.r),
             g(other.g),
