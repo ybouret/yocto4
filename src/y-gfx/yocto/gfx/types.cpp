@@ -45,7 +45,7 @@ namespace yocto
         
         string color_bits::binary(const uint32_t c)
         {
-            string ans(8,as_capacity);
+            string ans(32,as_capacity);
             for(int shift=31;shift>=0;--shift)
             {
                 if( 0 != ( (0x1<<shift) & c) )
