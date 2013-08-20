@@ -31,18 +31,18 @@ namespace yocto
         template <typename T>
         inline void make()
         {
-            prepare_for(sizeof(T)); //!< get memory
-            new (data) T();         //!< try to construct, may throw
-            activate<T>();          //!< activate the object
+            prepare_for(sizeof(T)); // get memory
+            new (data) T();         // try to construct, may throw
+            activate<T>();          // activate the object
         }
         
         //! one argument constructor, automatic memory management
         template <typename T>
         inline void make( typename type_traits<T>::parameter_type args )
         {
-            prepare_for(sizeof(T)); //!< get memory
-            new (data) T(args);     //!< try to construct, may throw
-            activate<T>();          //!< activate the object
+            prepare_for(sizeof(T)); // get memory
+            new (data) T(args);     // try to construct, may throw
+            activate<T>();          //  activate the object
             
         }
         
