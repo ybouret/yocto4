@@ -10,7 +10,9 @@ namespace yocto
         
         
         metrics:: metrics( const metrics &other ) throw() :
-        bytes_per_pixel( other.bytes_per_pixel )
+        bytes_per_pixel( other.bytes_per_pixel ),
+	get_pixel(other.get_pixel),
+        put_pixel(other.put_pixel)
         {
         }
         
