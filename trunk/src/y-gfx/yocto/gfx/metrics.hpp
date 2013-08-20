@@ -28,6 +28,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_ASSIGN(metrics);
         };
+        
+        
     }
 }
 
