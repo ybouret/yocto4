@@ -17,17 +17,18 @@ namespace yocto
             const rgb_t      shift;
             const rgb_t      loss;
             const size_t     bits_per_pixel;
-
+            
             explicit color_format(size_t  BytesPerPixel,
-                                  color_t Rmask,
-                                  color_t Gmask,
-                                  color_t Bmask,
-                                  color_t Amask
+                                  pixel_t Rmask,
+                                  pixel_t Gmask,
+                                  pixel_t Bmask,
+                                  pixel_t Amask
                                   );
             
             virtual ~color_format() throw();
             color_format( const color_format &) throw();
             
+            pixel_t map_rgb(uint8_t r, uint8_t g, uint8_t b) const throw();
             
             
         private:

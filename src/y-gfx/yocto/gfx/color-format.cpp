@@ -21,10 +21,10 @@ namespace yocto
         
         
         color_format:: color_format(size_t  BytesPerPixel,
-                                    color_t Rmask,
-                                    color_t Gmask,
-                                    color_t Bmask,
-                                    color_t Amask) :
+                                    pixel_t Rmask,
+                                    pixel_t Gmask,
+                                    pixel_t Bmask,
+                                    pixel_t Amask) :
         metrics(BytesPerPixel),
         mask( Rmask, Gmask, Bmask, Amask),
         bits(0,0,0,0),
@@ -62,9 +62,21 @@ namespace yocto
                 if(bmax>bpp) bpp = bmax;
             }
             
+            //-- chek bits/bytes
             if( bits_per_pixel > 8 * bytes_per_pixel)
                 throw exception("gfx::color_format(too many bits per pixel)");
         }
+        
+        pixel_t color_format:: map_rgb(uint8_t r, uint8_t g, uint8_t b) const throw()
+        {
+            return
+            ( (pixel_t(r)    >> loss.r) << shift.r ) |
+            ( (pixel_t(g)    >> loss.g) << shift.g ) |
+            ( (pixel_t(b)    >> loss.b) << shift.b ) |
+            ( (pixel_t(0xff) >> loss.a) << shift.a );
+
+        }
+
         
     }
 }
