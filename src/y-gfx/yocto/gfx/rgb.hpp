@@ -8,7 +8,7 @@ namespace yocto
 {
     namespace gfx
     {
-        
+        //! generic rbg(a)
         template <typename T>
         class rgb
         {
@@ -48,9 +48,9 @@ namespace yocto
         typedef rgb<uint8_t>  rgb_t;
         typedef rgb<uint32_t> rgb_mask_t;
         
-        rgb_t get_named_rgb( const string &id);
-        rgb_t get_named_rgb( const char   *id);
-        void  get_named_rgb( sequence<string> &names);
+        rgb_t get_named_rgb(const string &id);
+        rgb_t get_named_rgb(const char   *id);
+        void  get_named_rgb(sequence<string> &names);
     }
 }
 
