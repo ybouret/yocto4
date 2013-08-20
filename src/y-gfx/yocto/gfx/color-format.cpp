@@ -74,8 +74,17 @@ namespace yocto
             ( (pixel_t(g)    >> loss.g) << shift.g ) |
             ( (pixel_t(b)    >> loss.b) << shift.b ) |
             ( (pixel_t(0xff) >> loss.a) << shift.a );
-
         }
+        
+        pixel_t color_format:: map_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) const throw()
+        {
+            return
+            ( (pixel_t(r)    >> loss.r) << shift.r ) |
+            ( (pixel_t(g)    >> loss.g) << shift.g ) |
+            ( (pixel_t(b)    >> loss.b) << shift.b ) |
+            ( (pixel_t(a)    >> loss.a) << shift.a );
+        }
+
 
         
     }
