@@ -102,5 +102,23 @@ namespace yocto
         }
         
         
+#define YGFX_GET(f) ( (c&mask.f) >> shift.f ) << loss.f
+        
+        rgb_t color_format:: get_rgb( pixel_t c ) const throw()
+        {
+            return rgb_t(uint8_t(YGFX_GET(r)),
+                         uint8_t(YGFX_GET(g)),
+                         uint8_t(YGFX_GET(b)) );
+        }
+        
+        rgb_t color_format:: get_rgba( pixel_t c ) const throw()
+        {
+            return rgb_t(uint8_t(YGFX_GET(r)),
+                         uint8_t(YGFX_GET(g)),
+                         uint8_t(YGFX_GET(b)),
+                         uint8_t(YGFX_GET(a))
+                         );
+        }
+        
     }
 }
