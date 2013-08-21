@@ -120,5 +120,21 @@ namespace yocto
                          );
         }
         
+        
+        color_format color_format:: ARGB32()
+        {
+            return color_format(4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+        }
+        
+        color_format color_format:: ARGB16()
+        {
+            return color_format(2,0x0f00,0x00f0,0x000f,0xf000);
+        }
+
+        color_format color_format::RGB24()
+        {
+            return color_format(3,0x00ff0000,0x0000ff00,0x000000ff,0x00000000);
+        }
+        
     }
 }
