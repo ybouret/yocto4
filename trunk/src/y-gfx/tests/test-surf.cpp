@@ -7,10 +7,11 @@ using namespace yocto;
 static inline
 void display( const gfx::surface &S )
 {
-    std::cerr << "width =" << S.w << std::endl;
-    std::cerr << "height=" << S.h << std::endl;
-    std::cerr << "stride=" << S.pixels->stride << std::endl;
-
+    std::cerr << "BPP    =" << S.format.bytes_per_pixel << std::endl;
+    std::cerr << "width  =" << S.w << std::endl;
+    std::cerr << "height =" << S.h << std::endl;
+    std::cerr << "stride =" << S.pixels->stride << std::endl;
+    std::cerr << std::endl;
 }
 
 YOCTO_UNIT_TEST_IMPL(surf)

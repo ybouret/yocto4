@@ -14,11 +14,11 @@ namespace yocto
 
         pixbuf:: ~pixbuf() throw()
         {
-            assert(entry);
+            assert(entry_);
             if(allocated)
             {
-                assert(bytes);
-                memory::kind<memory::global>::release(entry, bytes);
+                assert(bytes_);
+                memory::kind<memory::global>::release(entry_, bytes_);
             }
         }
         
@@ -70,8 +70,8 @@ namespace yocto
         bytes_per_line( w * bytes_per_pixel ),
         stride( bytes_per_line     ),
         move(0),
-        bytes(  bytes_per_line * h ),
-        entry(  memory::kind<memory::global>::acquire(bytes) ),
+        bytes_(  bytes_per_line * h ),
+        entry_(  memory::kind<memory::global>::acquire(bytes_) ),
         allocated(true)
         {
             switch(bytes_per_pixel)
@@ -95,6 +95,22 @@ namespace yocto
             }
         }
 
+        
+        size_t      pixbuf:: bytes() const throw()
+        {
+            return bytes_;
+        }
+        
+        void       * pixbuf:: entry( unit_t x, unit_t y ) throw()
+        {
+            assert(entry_);
+            assert(move);
+            return move(static_cast<uint8_t*>(entry_) + (y*stride),x);
+        }
+        
+
+        
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // pixbuf::pointer
@@ -135,6 +151,6 @@ namespace yocto
             assert(host);
             return host;
         }
-        
+               
     }
 }

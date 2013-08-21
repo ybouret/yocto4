@@ -9,6 +9,7 @@ namespace yocto
     namespace gfx
     {
         
+        
         class pixbuf : public metrics, public counted
         {
         public:
@@ -40,9 +41,12 @@ namespace yocto
                 pixbuf *host;
             };
             
-        protected:
-            size_t bytes;
-            void  *entry;
+            size_t      bytes() const throw();
+            void       *entry( unit_t x, unit_t y ) throw();
+            
+        private:
+            size_t bytes_;
+            void  *entry_;
             
         public:
             const bool allocated;
