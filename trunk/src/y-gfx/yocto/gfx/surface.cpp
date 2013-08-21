@@ -91,7 +91,7 @@ namespace yocto
         }
 
         
-        pixel_t surface:: get_pixel( unit_t x, unit_t y ) const throw()
+        pixel_t surface:: get_pixel( size_t x, size_t y ) const throw()
         {
             assert(x<w);
             assert(y<h);
@@ -106,7 +106,7 @@ namespace yocto
             format.put_pixel(addr,C);
         }
         
-        void surface:: put_pixel(unit_t x, unit_t y, pixel_t C) throw()
+        void surface:: put_pixel(size_t x, size_t y, pixel_t C) throw()
         {
             assert(x<w);
             assert(y<h);
