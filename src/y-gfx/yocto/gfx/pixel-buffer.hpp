@@ -16,6 +16,7 @@ namespace yocto
             const size_t h;              //!< height
             const size_t bytes_per_line; //!< w * bytes_per_pixel
             const size_t stride;         //!< may be larger than bytes_per_line
+            void *     (*move)(void *,unit_t); //!< address shifting
             
             //! allocate some pixels
             explicit pixbuf( size_t BytesPerPixel, size_t Width, size_t Height);

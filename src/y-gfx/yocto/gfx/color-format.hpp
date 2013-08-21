@@ -40,6 +40,11 @@ namespace yocto
             rgb_t   get_rgb( pixel_t c) const throw();
             rgb_t   get_rgba(pixel_t c) const throw();
             
+            
+            static color_format ARGB32();
+            static color_format ARGB16();
+            static color_format RGB24();
+            
         private:
             YOCTO_DISABLE_ASSIGN(color_format);
         };

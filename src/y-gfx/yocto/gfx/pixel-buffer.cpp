@@ -38,6 +38,30 @@ namespace yocto
             return h;
         }
         
+        static inline
+        void * __move1(void *addr, unit_t n)
+        {
+            return static_cast<uint8_t*>(addr)+n;
+        }
+        
+        static inline
+        void * __move2(void *addr, unit_t n)
+        {
+            return static_cast<uint16_t*>(addr)+n;
+        }
+        
+        static inline
+        void * __move3(void *addr, unit_t n)
+        {
+            return static_cast<uint8_t*>(addr)+(n*3);
+        }
+        
+        static inline
+        void * __move4(void *addr, unit_t n)
+        {
+            return static_cast<uint32_t*>(addr)+n;
+        }
+        
         pixbuf:: pixbuf( size_t BytesPerPixel, size_t Width, size_t Height) :
         metrics(BytesPerPixel),
         counted(),
@@ -45,11 +69,30 @@ namespace yocto
         h( __check_height( Height) ),
         bytes_per_line( w * bytes_per_pixel ),
         stride( bytes_per_line     ),
+        move(0),
         bytes(  bytes_per_line * h ),
         entry(  memory::kind<memory::global>::acquire(bytes) ),
         allocated(true)
         {
-            
+            switch(bytes_per_pixel)
+            {
+                case 1:
+                    move = __move1;
+                    break;
+                    
+                case 2:
+                    move = __move2;
+                    break;
+                    
+                case 3:
+                    move = __move3;
+                    break;
+                    
+                case 4:
+                    move = __move4;
+                    break;
+                    
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
