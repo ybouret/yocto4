@@ -19,7 +19,25 @@ namespace yocto
             
             //! allocate some pixels
             explicit pixbuf( size_t BytesPerPixel, size_t Width, size_t Height);
+            
+            //! clean up
             virtual ~pixbuf() throw();
+            
+            class pointer
+            {
+            public:
+                //! p must be valid
+                pointer( pixbuf *p ) throw();
+                ~pointer() throw();
+                pointer(const pointer &other ) throw();
+                
+                pixbuf *operator->() throw();
+                const pixbuf * operator->() const throw();
+                
+            private:
+                YOCTO_DISABLE_ASSIGN(pointer);
+                pixbuf *host;
+            };
             
         protected:
             size_t bytes;
@@ -32,7 +50,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(pixbuf);
         };
         
+        typedef pixbuf::pointer pixel_buffer;
+
     }
+    
 }
 
 #endif

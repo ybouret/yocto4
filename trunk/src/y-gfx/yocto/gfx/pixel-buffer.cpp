@@ -6,6 +6,12 @@ namespace yocto
 {
     namespace gfx
     {
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // pixbuf
+        //
+        ////////////////////////////////////////////////////////////////////////
+
         pixbuf:: ~pixbuf() throw()
         {
             assert(entry);
@@ -46,7 +52,46 @@ namespace yocto
             
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // pixbuf::pointer
+        //
+        ////////////////////////////////////////////////////////////////////////
+        pixbuf::pointer:: pointer( pixbuf *p ) throw():
+        host(p)
+        {
+            assert(host);
+            host->withhold();
+        }
         
+        pixbuf:: pointer:: ~pointer() throw()
+        {
+            assert(host);
+            if( host->liberate() )
+            {
+                delete host;
+                host = 0;
+            }
+        }
+        
+        pixbuf:: pointer:: pointer( const pointer &other ) throw() :
+        host( other.host )
+        {
+            assert(host);
+            host->withhold();
+        }
+        
+        pixbuf *  pixbuf:: pointer::operator->() throw()
+        {
+            assert(host);
+            return host;
+        }
+
+        const pixbuf *  pixbuf:: pointer::operator->() const throw()
+        {
+            assert(host);
+            return host;
+        }
         
     }
 }
