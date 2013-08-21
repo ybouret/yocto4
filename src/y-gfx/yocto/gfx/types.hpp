@@ -9,7 +9,8 @@ namespace yocto
     
     namespace gfx
     {
-        typedef uint32_t pixel_t;
+        typedef uint32_t  pixel_t;
+        typedef ptrdiff_t unit_t;
         
         template <typename T>
         struct alpha_max;
