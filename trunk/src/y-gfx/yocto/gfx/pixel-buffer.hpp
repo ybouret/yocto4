@@ -13,11 +13,13 @@ namespace yocto
         class pixbuf : public metrics, public counted
         {
         public:
-            const size_t w;              //!< width
-            const size_t h;              //!< height
-            const size_t bytes_per_line; //!< w * bytes_per_pixel
-            const size_t stride;         //!< may be larger than bytes_per_line
-            void *     (*move)(void *,unit_t); //!< address shifting
+            typedef void * (*peek_proc)(void*,unit_t);
+            
+            const size_t    w;              //!< width
+            const size_t    h;              //!< height
+            const size_t    bytes_per_line; //!< w * bytes_per_pixel
+            const size_t    stride;         //!< may be larger than bytes_per_line
+            const peek_proc peek;           //!< peek and address on a line
             
             //! allocate some pixels
             explicit pixbuf( size_t BytesPerPixel, size_t Width, size_t Height);

@@ -1,6 +1,5 @@
 #include "yocto/gfx/pixel-buffer.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/memory/global.hpp"
 
 namespace yocto
 {
@@ -69,7 +68,7 @@ namespace yocto
         h( __check_height( Height) ),
         bytes_per_line( w * bytes_per_pixel ),
         stride( bytes_per_line     ),
-        move(0),
+        peek(0),
         bytes_(  bytes_per_line * h ),
         entry_(  memory::kind<memory::global>::acquire(bytes_) ),
         allocated(true)
@@ -77,19 +76,19 @@ namespace yocto
             switch(bytes_per_pixel)
             {
                 case 1:
-                    move = __move1;
+                    (peek_proc &)peek = __move1;
                     break;
                     
                 case 2:
-                    move = __move2;
+                    (peek_proc &)peek = __move2;
                     break;
                     
                 case 3:
-                    move = __move3;
+                    (peek_proc &)peek = __move3;
                     break;
                     
                 case 4:
-                    move = __move4;
+                    (peek_proc &)peek = __move4;
                     break;
                     
             }
@@ -104,8 +103,8 @@ namespace yocto
         void       * pixbuf:: entry( unit_t x, unit_t y ) throw()
         {
             assert(entry_);
-            assert(move);
-            return move(static_cast<uint8_t*>(entry_) + (y*stride),x);
+            assert(peek);
+            return peek(static_cast<uint8_t*>(entry_) + (y*stride),x);
         }
         
 

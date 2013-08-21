@@ -5,13 +5,24 @@ using namespace yocto;
 
 
 static inline
-void display( const gfx::surface &S )
+void display( gfx::surface &S )
 {
-    std::cerr << "BPP    =" << S.format.bytes_per_pixel << std::endl;
-    std::cerr << "width  =" << S.w << std::endl;
-    std::cerr << "height =" << S.h << std::endl;
-    std::cerr << "stride =" << S.pixels->stride << std::endl;
+    std::cerr << "BPP    = " << S.format.bytes_per_pixel << std::endl;
+    std::cerr << "bpp    = " << S.format.bits_per_pixel  << std::endl;
+    std::cerr << "width  = " << S.w << std::endl;
+    std::cerr << "height = " << S.h << std::endl;
+    std::cerr << "stride = " << S.pixels->stride << std::endl;
     std::cerr << std::endl;
+    
+    for(size_t j=0;j<S.h;++j)
+    {
+        for(size_t i=0;i<S.w;++i)
+        {
+            gfx::pixel_t C = S.__get( S[j][i] );
+            C = ~C;
+            S.put_pixel(i, j, C);
+        }
+    }
 }
 
 YOCTO_UNIT_TEST_IMPL(surf)
