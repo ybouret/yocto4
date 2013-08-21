@@ -41,10 +41,10 @@ namespace yocto
             
             
             pixel_t __get( const void * ) const throw();
-            pixel_t get_pixel( unit_t x, unit_t y ) const throw();
+            pixel_t get_pixel( size_t x, size_t y ) const throw();
             
             void  __put( void *, pixel_t ) throw();
-            void    put_pixel( unit_t x, unit_t y, pixel_t C) throw();
+            void    put_pixel( size_t x, size_t y, pixel_t C) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(surface);
