@@ -147,6 +147,11 @@ namespace yocto
 		{
 			while( pool_.size > n ) node_type::release( pool_.query() );
 		}
+        
+        virtual void reverse() throw()
+        {
+            list_.reverse();
+        }
 		
 	protected:
 		core::list_of<node_type> list_;

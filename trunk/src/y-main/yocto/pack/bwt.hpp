@@ -1,13 +1,13 @@
-#ifndef YOCTO_CODE_BWT_INCLUDED
-#define YOCTO_CODE_BWT_INCLUDED 1
+#ifndef YOCTO_PACK_BWT_INCLUDED
+#define YOCTO_PACK_BWT_INCLUDED 1
 
-#include "yocto/code/mtf.hpp"
+#include "yocto/pack/mtf.hpp"
 
 
 namespace yocto
 {
 	
-	namespace core
+	namespace pack
 	{
 		
 		struct bwt

@@ -1,4 +1,4 @@
-#include "yocto/code/bwt.hpp"
+#include "yocto/pack/bwt.hpp"
 #include "yocto/sequence/c-array.hpp"
 #include "yocto/code/hsort.hpp"
 
@@ -7,7 +7,7 @@
 namespace yocto
 {
 	
-	namespace core
+	namespace pack
 	{
 		namespace 
 		{

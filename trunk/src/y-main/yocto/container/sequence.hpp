@@ -20,12 +20,14 @@ namespace yocto
 		virtual void push_front( param_type ) = 0;
 		virtual void pop_front() = 0;
 		
-		inline type       & front() throw() { return *(type *) &get_front(); }
-		inline const_type & front() const throw() { return get_front(); }
+		inline type       & front() throw()       { return *(type *) &get_front(); }
+		inline const_type & front() const throw() { return            get_front(); }
 		
-		inline type       & back() throw() { return *(type *) &get_back(); }
-		inline const_type & back() const throw() { return get_back(); }
+		inline type       & back() throw()       { return *(type *) &get_back(); }
+		inline const_type & back() const throw() { return            get_back(); }
 		
+        virtual void reverse() throw() = 0;
+        
 	protected:
 		inline explicit sequence() throw() {}
 		
