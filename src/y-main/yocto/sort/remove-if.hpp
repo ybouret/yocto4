@@ -8,11 +8,15 @@ namespace yocto
 {
     
     //! use a functionoid to remove if is bad
+    /**
+     reject the bad values at the end of the array
+     \return the number of good values
+     */
     template <
     typename T,
     typename FUNC>
     inline
-    size_t remove_if( T *a, size_t n, FUNC &is_bad )
+    size_t remove_if( T *a, size_t n, FUNC &is_bad ) throw()
     {
         assert(!(a==0&&n>0));
         size_t   n_ok = n;
@@ -38,7 +42,7 @@ namespace yocto
     
     
     template <typename ARRAY,typename FUNC> inline
-    void remove_if( ARRAY &a, FUNC &is_bad)
+    void remove_if( ARRAY &a, FUNC &is_bad) throw()
     {
         size_t n = a.size();
         if(n>0)

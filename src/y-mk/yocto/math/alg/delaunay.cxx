@@ -5,7 +5,7 @@
 #include "yocto/auto-arr.hpp"
 
 #include "yocto/sequence/vector.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 #include "yocto/exception.hpp"
 
 #include "yocto/ios/ocstream.hpp"

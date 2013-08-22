@@ -1,5 +1,5 @@
 #include "yocto/chemical/equilibrium.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 
 #include <iostream>
 

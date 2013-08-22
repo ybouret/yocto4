@@ -1,7 +1,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/core/merge-sort.hpp"
+#include "yocto/sort/merge.hpp"
 #include "yocto/comparator.hpp"
 using namespace yocto;
 

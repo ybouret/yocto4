@@ -3,7 +3,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/code/gsort.hpp"
+#include "yocto/sort/gnome.hpp"
 
 #include <cstdlib>
 

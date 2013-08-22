@@ -10,6 +10,12 @@ SET( code_srcs ${code_decl} ${code_impl})
 INSTALL( FILES ${code_decl} DESTINATION include/yocto/code )
 SOURCE_GROUP( code FILES ${code_srcs} )
 
+FILE( GLOB sort_decl yocto/sort/*.hpp)
+FILE( GLOB sort_impl yocto/sort/*.cpp)
+SET( sort_srcs ${sort_decl} ${sort_impl} )
+INSTALL( FILES ${sort_decl} DESTINATION include/yocto/sort )
+SOURCE_GROUP( sort FILES ${sort_srcs} )
+
 FILE( GLOB threading_decl yocto/threading/*.hpp)
 FILE( GLOB threading_impl yocto/threading/*.cpp)
 SET( threading_srcs ${threading_decl} ${threading_impl} )
@@ -127,8 +133,8 @@ SET( pack_srcs ${pack_decl} ${pack_impl} )
 INSTALL( FILES ${pack_decl} DESTINATION include/yocto/pack )
 SOURCE_GROUP( pack FILES ${pack_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl} ${fs_decl} ${pack_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs} ${fs_srcs} ${pack_srcs})
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl} ${fs_decl} ${pack_decl} ${sort_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs} ${fs_srcs} ${pack_srcs} ${sort_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

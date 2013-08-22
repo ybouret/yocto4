@@ -1,5 +1,5 @@
-#ifndef YOCTO_HSORT_INCLUDED
-#define YOCTO_HSORT_INCLUDED 1
+#ifndef YOCTO_SORT_HEAP_INCLUDED
+#define YOCTO_SORT_HEAP_INCLUDED 1
 
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/code/swap.hpp"

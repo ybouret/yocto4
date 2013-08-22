@@ -5,7 +5,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/fs/vfs.hpp"
 #include "yocto/string/conv.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 
 using namespace yocto;
 

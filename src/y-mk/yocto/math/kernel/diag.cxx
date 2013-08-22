@@ -178,7 +178,7 @@ namespace yocto {
 
 
 #include "yocto/code/utils.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 
 namespace yocto
 {
@@ -381,7 +381,7 @@ namespace yocto
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/code/make-index.hpp"
+#include "yocto/sort/index.hpp"
 
 namespace yocto {
     

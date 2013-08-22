@@ -1,7 +1,7 @@
 #include "yocto/math/fcn/newton.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/kernel/svd.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 #include "yocto/code/utils.hpp"

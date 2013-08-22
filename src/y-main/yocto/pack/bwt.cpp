@@ -1,6 +1,6 @@
 #include "yocto/pack/bwt.hpp"
 #include "yocto/sequence/c-array.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 
 #include <cstring>
 

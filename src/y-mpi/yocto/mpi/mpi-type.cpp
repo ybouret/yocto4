@@ -1,5 +1,5 @@
 #include "yocto/mpi/mpi.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 
 namespace yocto
 {

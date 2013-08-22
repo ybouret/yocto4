@@ -1,5 +1,5 @@
-#ifndef YOCTO_CODE_MAKE_INDEX_INCLUDED
-#define YOCTO_CODE_MAKE_INDEX_INCLUDED 1
+#ifndef YOCTO_SORT_INDEX_INCLUDED
+#define YOCTO_SORT_INDEX_INCLUDED 1
 
 #include "yocto/sequence/array.hpp"
 #include "yocto/code/swap.hpp"

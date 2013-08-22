@@ -1,7 +1,7 @@
 #include "yocto/ocl/command-queue.hpp"
 #include "yocto/ocl/exception.hpp"
 #include "yocto/ocl/driver.hpp"
-#include "yocto/code/make-index.hpp"
+#include "yocto/sort/index.hpp"
 
 namespace yocto
 {

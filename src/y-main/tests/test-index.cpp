@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/code/make-index.hpp"
+#include "yocto/sort/index.hpp"
 #include "yocto/sequence/vector.hpp"
 
 #include "support.hpp"

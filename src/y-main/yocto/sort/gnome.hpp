@@ -1,6 +1,6 @@
 
-#ifndef YOCTO_CODE_GSORT_INCLUDED
-#define YOCTO_CODE_GSORT_INCLUDED 1
+#ifndef YOCTO_SORT_GNOME_INCLUDED
+#define YOCTO_SORT_GNOME_INCLUDED 1
 
 #include "yocto/code/swap.hpp"
 

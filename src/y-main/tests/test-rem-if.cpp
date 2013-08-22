@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/code/remove-if.hpp"
+#include "yocto/sort/remove-if.hpp"
 #include "yocto/sequence/vector.hpp"
 
 
