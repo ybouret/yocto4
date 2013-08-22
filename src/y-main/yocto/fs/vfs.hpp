@@ -41,6 +41,8 @@ namespace yocto {
             
             bool is_regular()   const throw();
             bool is_directory() const throw();
+            bool has_extension( const string &ext ) const throw();
+            bool has_extension( const char   *ext ) const throw();
             
         private:
             YOCTO_DISABLE_ASSIGN(entry);
@@ -82,10 +84,10 @@ namespace yocto {
         //
         //==================================================================
         virtual entry::attribute query_attribute( const string &path, bool &is_link ) const throw() = 0;
-        virtual void     create_dir(  const string &dirname, const bool allow_already_exists ) = 0;
-        virtual void     remove_dir(  const string &dirname  ) = 0 ;
-        virtual void     remove_file( const string &filename ) = 0;
-        virtual scanner *new_scanner( const string &dirname ) const = 0;
+        virtual void             create_dir(  const string &dirname, const bool allow_already_exists ) = 0;
+        virtual void             remove_dir(  const string &dirname  ) = 0 ;
+        virtual void             remove_file( const string &filename ) = 0;
+        virtual scanner *        new_scanner( const string &dirname ) const = 0;
         
         //==================================================================
         //

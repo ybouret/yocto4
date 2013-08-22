@@ -40,6 +40,23 @@ namespace yocto {
         
     }
     
+    bool vfs::entry:: has_extension( const string &ext ) const throw()
+    {
+        return (extension!=0) && (strcmp( ext.c_str(), extension ) == 0);
+    }
+    
+    bool vfs::entry:: has_extension( const char *ext ) const throw()
+    {
+        if( 0 == ext )
+        {
+            return (0 == extension);
+        }
+        else
+        {
+            return (extension!=0) && (strcmp(ext,extension) == 0);
+        }
+    }
+
     
     void vfs:: foreach_in( const string &dirname,  vfs::entry::callback &on_entry ) const
     {
