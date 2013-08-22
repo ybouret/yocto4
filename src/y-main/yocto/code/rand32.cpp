@@ -54,7 +54,7 @@ namespace yocto
         
         
         
-        void test_rand32(void)
+        void rand32::test(void)
         {
             rand32 r;
             r.settable(12345,65435,34221,12345,9983651,95746118);
