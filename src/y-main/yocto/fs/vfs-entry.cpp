@@ -1,4 +1,5 @@
 #include "yocto/fs/vfs.hpp"
+#include <cstring>
 
 namespace yocto {
 	
