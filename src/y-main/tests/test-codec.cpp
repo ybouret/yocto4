@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/code/bwt.hpp"
-#include "yocto/code/mtf.hpp"
+#include "yocto/pack/bwt.hpp"
+#include "yocto/pack/mtf.hpp"
 
 #include "yocto/string.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -33,8 +33,8 @@ static inline void display( const string &str )
 YOCTO_UNIT_TEST_IMPL(codec)
 {
     
-	core::move_to_front mtf_encoder;
-	core::move_to_front mtf_decoder;
+	pack::move_to_front mtf_encoder;
+	pack::move_to_front mtf_decoder;
 	
 	string         line;
 	vector<size_t> indices;
@@ -45,7 +45,7 @@ YOCTO_UNIT_TEST_IMPL(codec)
 		const size_t size = line.size();
 		string       ostr = line;
 		indices.make( size, 0 );
-		const size_t pidx = core::bwt::encode( ostr.rw(), line.ro(), size, size ? &indices[1] : NULL);
+		const size_t pidx = pack::bwt::encode( ostr.rw(), line.ro(), size, size ? &indices[1] : NULL);
 		std::cerr << "src: "; display( line );
 		std::cerr << "dst: "; display( ostr );
 		
@@ -67,7 +67,7 @@ YOCTO_UNIT_TEST_IMPL(codec)
 		
 		
 		string       fstr = ostr;
-		core::bwt::decode( fstr.rw(), ostr.ro(), size, size ? &indices[1] : NULL, pidx );
+		pack::bwt::decode( fstr.rw(), ostr.ro(), size, size ? &indices[1] : NULL, pidx );
 		std::cerr << "org: "; display( fstr );
 		line.clear();
 	}

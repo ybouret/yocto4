@@ -56,7 +56,7 @@ namespace yocto
 			os << "]'";
 			return os;
 		}
-		
+        
 	protected:
 		inline array() throw() {}
 		

@@ -291,7 +291,7 @@ return * data._##TYPE; }
         {
             if( length() > 0 )
             {
-                yocto::reverse<Value>( &values[1], values.size() );
+                mreverse<Value>( &values[1], values.size() );
             }
         }
         

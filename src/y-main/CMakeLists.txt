@@ -121,8 +121,14 @@ SET( fs_srcs ${fs_decl} ${fs_impl} )
 INSTALL( FILES ${fs_decl} DESTINATION include/yocto/fs )
 SOURCE_GROUP( fs FILES ${fs_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl} ${fs_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs} ${fs_srcs})
+FILE( GLOB pack_decl yocto/pack/*.hpp)
+FILE( GLOB pack_impl yocto/pack/*.cpp)
+SET( pack_srcs ${pack_decl} ${pack_impl} )
+INSTALL( FILES ${pack_decl} DESTINATION include/yocto/pack )
+SOURCE_GROUP( pack FILES ${pack_srcs} )
+
+SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl} ${fs_decl} ${pack_decl})
+SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs} ${fs_srcs} ${pack_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

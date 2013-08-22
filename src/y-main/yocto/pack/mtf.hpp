@@ -1,12 +1,12 @@
-#ifndef YOCTO_CODE_MTF_INCLUDED
-#define YOCTO_CODE_MTF_INCLUDED 1
+#ifndef YOCTO_PACK_MTF_INCLUDED
+#define YOCTO_PACK_MTF_INCLUDED 1
 
 #include "yocto/core/list.hpp"
 
 namespace yocto
 {
 	
-	namespace core
+	namespace pack
 	{
 		class move_to_front 
 		{

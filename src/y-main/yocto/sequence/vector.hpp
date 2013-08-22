@@ -142,6 +142,10 @@ namespace yocto
             while( size_ > n ) pop_back();
         }
 		
+        virtual void reverse() throw()
+        {
+            mreverse<mutable_type>(item_+1, size_);
+        }
 		
 	private:
 		ALLOCATOR     hmem_;

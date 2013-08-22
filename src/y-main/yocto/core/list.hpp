@@ -281,6 +281,13 @@ namespace yocto
             }
             
             
+            inline void reverse() throw()
+            {
+                list_of tmp;
+                while( size ) tmp.push_back( pop_front() );
+                swap_with(tmp);
+            }
+            
 					
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(list_of);

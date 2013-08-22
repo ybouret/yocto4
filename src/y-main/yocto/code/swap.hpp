@@ -48,7 +48,7 @@ namespace yocto
 	}
 	
 	template <typename T>
-	inline void reverse( T *base, size_t size ) throw()
+	inline void mreverse( T *base, size_t size ) throw()
 	{
 		if( size > 1 )
 		{

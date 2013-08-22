@@ -4,8 +4,8 @@
 #include "yocto/ios/ocstream.hpp"
 
 #include "yocto/ios/raw-file.hpp"
-#include "yocto/code/bwt.hpp"
-#include "yocto/code/mtf.hpp"
+#include "yocto/pack/bwt.hpp"
+#include "yocto/pack/mtf.hpp"
 
 #include <cstdlib>
 
@@ -48,7 +48,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
     char                coded[ block_size ];
     size_t              indices[ block_size ];
     size_t              count      = 0;
-    core::move_to_front mtf;
+    pack::move_to_front mtf;
     Huffman::Codec      huff;
     ios::bitio          bio;
     
@@ -56,7 +56,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
     ios::ocstream output( ios::cstdout );
     
     
-    core::move_to_front *pMtf = &mtf;
+    pack::move_to_front *pMtf = &mtf;
     char C = 0;
     size_t nIn = 0;
     size_t nOut = 0;
@@ -66,7 +66,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
         block[ count++ ] = C;
         if( count >= block_size )
         {
-            const size_t pidx = core::bwt::encode(coded, block, count, indices, pMtf);
+            const size_t pidx = pack::bwt::encode(coded, block, count, indices, pMtf);
             nOut += emit( output, bio, huff, count, pidx, coded );
             count = 0;
         }
@@ -74,7 +74,7 @@ YOCTO_UNIT_TEST_IMPL(comp)
     
     if( count > 0 )
     {
-        const size_t pidx = core::bwt::encode(coded, block, count, indices, pMtf);
+        const size_t pidx = pack::bwt::encode(coded, block, count, indices, pMtf);
         nOut += emit( output, bio, huff, count, pidx, coded );
     }
     

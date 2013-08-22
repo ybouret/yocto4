@@ -1,10 +1,10 @@
-#include "yocto/code/mtf.hpp"
+#include "yocto/pack/mtf.hpp"
 
 #include <cstring>
 
 namespace yocto {
 
-	namespace core {
+	namespace pack {
 
 		move_to_front:: ~move_to_front() throw()
 		{
