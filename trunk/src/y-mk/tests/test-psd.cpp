@@ -6,7 +6,7 @@
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/sig/spike-finder.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 
 #include <cstdlib>
 

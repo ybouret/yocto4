@@ -2,7 +2,7 @@
 #include "yocto/math/fit/lsf.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/code/ipower.hpp"

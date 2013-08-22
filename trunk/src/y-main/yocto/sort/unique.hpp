@@ -1,7 +1,7 @@
 #ifndef YOCTO_CODE_UNIQUE_INCLUDED
 #define YOCTO_CODE_UNIQUE_INCLUDED 1
 
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 #include <cstring>
 
 namespace yocto

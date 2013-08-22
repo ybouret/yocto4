@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/code/unique.hpp"
+#include "yocto/sort/unique.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/comparator.hpp"
 #include "yocto/code/rand.hpp"

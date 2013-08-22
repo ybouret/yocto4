@@ -1,11 +1,10 @@
-#ifndef YOCTO_MERGE_SORT_INCLUDED
-#define YOCTO_MERGE_SORT_INCLUDED 1
+#ifndef YOCTO_SORT_MERGE_INCLUDED
+#define YOCTO_SORT_MERGE_INCLUDED 1
 
 #include "yocto/core/list.hpp"
 
 namespace yocto 
 {
-    
     
     namespace core 
     {
