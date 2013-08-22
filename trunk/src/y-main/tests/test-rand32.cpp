@@ -179,7 +179,7 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(rand32)
 {
-    core::test_rand32();
+    core::rand32::test();
     
     rand32_mwc   __mwc;
     rand32_shr3  __shr3;

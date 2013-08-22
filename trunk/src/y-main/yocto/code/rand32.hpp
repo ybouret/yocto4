@@ -56,14 +56,12 @@ namespace yocto
                 return (0.5f+float(u))/4294967296.0f;
             }
             
-            
+            static void test();
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rand32);
         };
         
         
-        
-        void test_rand32();
         
         
     }
@@ -171,6 +169,19 @@ namespace yocto
     typedef grand32<&core::rand32::kiss>   rand32_kiss;
     typedef grand32<&core::rand32::lfib4>  rand32_lfib4;
     typedef grand32<&core::rand32::swb>    rand32_swb;
+    
+    template <typename T,typename GRAND32 = rand32_kiss>
+    class uniform_generator : public GRAND32
+    {
+    public:
+        explicit uniform_generator() throw() :
+        GRAND32() { this->wseed(); }
+        virtual ~uniform_generator() throw() {}
+        inline T operator()(void) throw() { return this->template get<T>(); }
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(uniform_generator);
+    };
+    
 }
 
 #endif
