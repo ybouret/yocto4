@@ -1,3 +1,4 @@
+#include "yocto/math/ztype.hpp"
 #include "yocto/gems/io/xyz.hpp"
 #include "yocto/string/conv.hpp"
 #include "yocto/string/tokenizer.hpp"
@@ -9,11 +10,13 @@ namespace yocto
     
     namespace gems
     {
+        using namespace math;
         
         ////////////////////////////////////////////////////////////////////
         //
         ////////////////////////////////////////////////////////////////////
-        XYZ:: Line:: Line( const string &ID, double X, double Y, double Z) :
+        template <>
+        XYZ<real_t>:: Line:: Line( const string &ID, double X, double Y, double Z) :
         id( ID ),
         x( X ),
         y( Y ),
@@ -21,12 +24,14 @@ namespace yocto
         {
         }
         
-        XYZ:: Line:: ~Line() throw()
+        template <>
+        XYZ<real_t>:: Line:: ~Line() throw()
         {
             
         }
         
-        XYZ:: Line:: Line( const Line &other ) :
+        template <>
+        XYZ<real_t>:: Line:: Line( const Line &other ) :
         id( other.id ),
         x( other.x ),
         y( other.y ),
@@ -38,9 +43,10 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////
         // Frame
         ////////////////////////////////////////////////////////////////////
-        bool XYZ:: Frame:: HasHeader(ios::istream &fp,
-                                     size_t       &num_atoms,
-                                     string       &comment)
+        template <>
+        bool XYZ<real_t>:: Frame:: HasHeader(ios::istream &fp,
+                                             size_t       &num_atoms,
+                                             string       &comment)
         {
             
             string &in = comment;
@@ -64,9 +70,10 @@ namespace yocto
         }
         
         
-        void XYZ:: Frame:: ReadAtoms(ios::istream &fp,
-                                     size_t n,
-                                     Callback &cb)
+        template <>
+        void XYZ<real_t>:: Frame:: ReadAtoms(ios::istream &fp,
+                                             size_t n,
+                                             Callback &cb)
         {
             static const char *atom_id[] = { "x", "y", "z", "" };
             assert(n>0);
@@ -84,8 +91,8 @@ namespace yocto
                 if( !tkn.get_next( character<char>::is_space ) )
                     throw exception("XYZ(missing ID of atom %u", unsigned(i));
                 
-                const string id( tkn.token(), tkn.units() );
-                double       coord[4] = { 0, 0, 0, 0};
+                const string id( tkn.to_string() );
+                real_t       coord[4] = { 0, 0, 0, 0};
                 
                 for( size_t j=0;j<3;++j)
                 {
@@ -93,25 +100,31 @@ namespace yocto
                     if( !tkn.get_next( character<char>::is_space ) )
                         throw exception("XYZ(missing coord <%s> of atom %u='%s'", tag, unsigned(i), id.c_str());
                     const string val( tkn.token(), tkn.units() );
-                    coord[j] = strconv::to_double( val.c_str(), tag);
+                    coord[j] = strconv::to<real_t>( val.c_str(), tag);
                 }
                 const Line L(id,coord[0],coord[1],coord[2]);
                 cb(L);
             }
         }
         
-        
-        XYZ:: Frame:: Frame(size_t n) :
+        template <>
+        XYZ<real_t>:: Frame:: Frame(size_t n) :
         FrameBase(n,as_capacity),
         comment()
         {
         }
         
-        XYZ:: Frame:: ~Frame() throw() {}
+        template <>
+        XYZ<real_t>:: Frame:: ~Frame() throw() {}
         
+        template <>
+        void XYZ<real_t>:: Frame:: AppendAtom(const XYZ<real_t>::Line &line)
+        {
+            push_back(line);
+        }
         
-        
-        XYZ::Frame * XYZ:: Frame:: Load( ios::istream &fp )
+        template <>
+        XYZ<real_t>::Frame * XYZ<real_t>:: Frame:: Load( ios::istream &fp )
         {
             size_t num_atoms = 0;
             string comment;
@@ -127,21 +140,20 @@ namespace yocto
                 return 0;
         }
         
-        
-        void XYZ:: Frame:: AppendAtom(const XYZ::Line &line)
-        {
-            push_back(line);
-        }
+       
         
         
         ////////////////////////////////////////////////////////////////////
         // Frames
         ////////////////////////////////////////////////////////////////////
-        XYZ:: Frames:: Frames() throw() {}
+        template <>
+        XYZ<real_t>:: Frames:: Frames() throw() {}
         
-        XYZ:: Frames:: ~Frames() throw() {}
+        template <>
+        XYZ<real_t>:: Frames:: ~Frames() throw() {}
         
-        void XYZ:: Frames:: load ( ios::istream &fp, size_t nmax)
+        template <>
+        void XYZ<real_t>:: Frames:: load ( ios::istream &fp, size_t nmax)
         {
             size_t nld = 0;
             for(;;)

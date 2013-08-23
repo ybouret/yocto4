@@ -21,6 +21,15 @@ namespace yocto
             inline v4d( const v4d &other ) throw() :
             x(other.x),y(other.y),z(other.z),w(other.w) {}
             
+            inline v4d & operator=( const v4d &other ) throw()
+            {
+                x = other.x;
+                y = other.y;
+                z = other.z;
+                w = other.w;
+                return *this;
+            }
+            
         };
     }
 }
