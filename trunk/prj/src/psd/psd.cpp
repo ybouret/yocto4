@@ -7,11 +7,10 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/string/conv.hpp"
 #include "yocto/math/fft/psd.hpp"
-#include "yocto/code/hsort.hpp"
+#include "yocto/sort/heap.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/dat/spline.hpp"
 #include "yocto/math/sig/spike-finder.hpp"
-#include "yocto/code/hsort.hpp"
 
 #include <iostream>
 
