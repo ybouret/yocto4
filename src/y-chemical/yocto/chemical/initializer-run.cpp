@@ -181,8 +181,8 @@ namespace yocto
                     // Algorithm
                     //
                     //==========================================================
-                    bool converged = false;
-                    
+                    bool   converged = false;
+                    double dV_norm   = 0;
                 INIT_STEP:
                     //----------------------------------------------------------
                     // initialize step in X1:
@@ -198,6 +198,7 @@ namespace yocto
                     // "Legalize" the concentration: compute the initial V value
                     //----------------------------------------------------------
                     mkl::mul(V, Q, X1);
+                    dV_norm = -1;
                     
                 NEWTON_STEP:
                     //----------------------------------------------------------
@@ -234,8 +235,12 @@ namespace yocto
                     mkl::mul(V, Q, X1);     // compute the corrected V, in dV
                     mkl::set(dV,V);         // compute the "real" dV
                     mkl::sub(dV,V0);        // using all the numerical incertainty
-                    //std::cerr << "V1="  << V  << std::endl;
-                    //std::cerr << "dV1=" << dV << std::endl;
+                    if( dV_norm < 0 )
+                    {
+                        dV_norm = mkl::norm1(dV);
+                    }
+                    std::cerr << "V1="  << V  << std::endl;
+                    std::cerr << "dV1=" << dV << std::endl;
                     converged = true;
                     for(size_t i=N;i>0;--i)
                     {
