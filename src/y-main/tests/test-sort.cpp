@@ -78,7 +78,7 @@ static inline void test_netsort()
         ra.free();
         for(size_t j=0;j<2;++j) { const T tmp( gen<T>::get() ); ra.push_back(tmp); }
         std::cerr << ra << " => ";
-        netsort2(ra[1], ra[2]);
+        netsort<T>::level2(ra[1], ra[2]);
         std::cerr << ra;
         std::cerr << std::endl;
         check_sorted(ra, "netsort2");
@@ -90,7 +90,7 @@ static inline void test_netsort()
         ra.free();
         for(size_t j=0;j<3;++j) { const T tmp( gen<T>::get() ); ra.push_back(tmp); }
         std::cerr << ra << " => ";
-        netsort3(ra[1], ra[2], ra[3]);
+        netsort<T>::level3(ra[1], ra[2], ra[3]);
         std::cerr << ra;
         std::cerr << std::endl;
         check_sorted(ra, "netsort3");
@@ -102,7 +102,7 @@ static inline void test_netsort()
         ra.free();
         for(size_t j=0;j<4;++j) { const T tmp( gen<T>::get() ); ra.push_back(tmp); }
         std::cerr << ra << " => ";
-        netsort4(ra[1], ra[2], ra[3], ra[4]);
+        netsort<T>::level4(ra[1], ra[2], ra[3], ra[4]);
         std::cerr << ra;
         std::cerr << std::endl;
         check_sorted(ra, "netsort4");
@@ -114,7 +114,7 @@ static inline void test_netsort()
         ra.free();
         for(size_t j=0;j<6;++j) { const T tmp( gen<T>::get() ); ra.push_back(tmp); }
         std::cerr << ra << " => ";
-        netsort6(ra[1], ra[2], ra[3], ra[4], ra[5], ra[6]);
+        netsort<T>::level6(ra[1], ra[2], ra[3], ra[4], ra[5], ra[6]);
         std::cerr << ra;
         std::cerr << std::endl;
         check_sorted(ra, "netsort6");
