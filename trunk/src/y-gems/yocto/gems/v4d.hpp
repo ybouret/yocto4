@@ -45,7 +45,9 @@ namespace yocto
             inline void muladd3(const T a, const v4d &other) throw()
             { x += a*other.x; y += a*other.y; z += a*other.z; }
             
-            inline T squared_norm3(void) const throw() {}
+            inline T squared_norm3(void) const throw()
+            { return (x*x) + (y*y) + (z*z); }
+            
         };
     }
 }
