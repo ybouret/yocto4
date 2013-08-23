@@ -13,8 +13,11 @@ namespace yocto
     namespace gems
     {
         
+        //! Handling XYZ files
+        template <typename T>
         struct XYZ
         {
+            //! a parsed line: atom x y z
             class Line
             {
             public:
@@ -23,8 +26,7 @@ namespace yocto
                 Line(const Line &);
                 
                 const string      id;
-                double            x,y,z;
-                
+                T                 x,y,z;
                 
             private:
                 YOCTO_DISABLE_ASSIGN(Line);
@@ -54,7 +56,7 @@ namespace yocto
                 void AppendAtom( const Line & );
             };
             
-            class Frames : public vector<Frame::Ptr>
+            class Frames : public vector<typename Frame::Ptr>
             {
             public:
                 explicit Frames() throw();

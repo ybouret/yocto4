@@ -12,7 +12,6 @@ YOCTO_UNIT_TEST_IMPL(xyz)
     if( argc > 1)
     {
         const string  fn = argv[1];
-        ios::icstream fp(fn);
         
         
         size_t nmax = 10;
@@ -21,7 +20,8 @@ YOCTO_UNIT_TEST_IMPL(xyz)
         
         if(true)
         {
-            XYZ::Frames frames;
+            XYZ<double>::Frames frames;
+            ios::icstream fp(fn);
             frames.load( fp, nmax );
             std::cerr << "#frames=" << frames.size() << std::endl;
         }
