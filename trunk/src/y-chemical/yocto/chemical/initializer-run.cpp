@@ -181,7 +181,6 @@ namespace yocto
                     // Algorithm
                     //
                     //==========================================================
-                    bool   converged = false;
                     double old_norm  = -1;
                     
                 INIT_STEP:
