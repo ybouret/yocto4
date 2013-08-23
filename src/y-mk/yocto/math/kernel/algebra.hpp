@@ -36,13 +36,21 @@ namespace yocto
             template <typename U>
             static inline T norm2( const array<U> &v ) throw()
             {
-                T ans(0.0);
+                T ans(0);
                 for( size_t i=v.size();i>0;--i) ans += Square( v[i] );
-                return ans;
+                return Sqrt(ans);
             }
             
             template <typename U>
             static inline T norm1( const array<U> &v ) throw()
+            {
+                T ans(0);
+                for( size_t i=v.size();i>0;--i) ans += Fabs( v[i] );
+                return ans;
+            }
+            
+            template <typename U>
+            static inline T norm_infty( const array<U> &v ) throw()
             {
                 T ans(0.0);
                 for(size_t i=v.size();i>0;--i)

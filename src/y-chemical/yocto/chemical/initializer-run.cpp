@@ -182,7 +182,8 @@ namespace yocto
                     //
                     //==========================================================
                     bool   converged = false;
-                    double dV_norm   = 0;
+                    double old_norm  = -1;
+                    
                 INIT_STEP:
                     //----------------------------------------------------------
                     // initialize step in X1:
@@ -198,56 +199,58 @@ namespace yocto
                     // "Legalize" the concentration: compute the initial V value
                     //----------------------------------------------------------
                     mkl::mul(V, Q, X1);
-                    dV_norm = -1;
                     
-                NEWTON_STEP:
                     //----------------------------------------------------------
-                    // build composition: X1 = X0 + Q'*V;
+                    // And deduce the first composition: X1 = X0 + Q' * V
                     //----------------------------------------------------------
                     build_composition();
-                    //std::cerr << "X1=" << X1 << std::endl;
                     
                     //----------------------------------------------------------
-                    // compute numeric newton step
+                    // Compute the first dV norm
+                    // the composition is updated
                     //----------------------------------------------------------
-                    mkl::set(cs.C,X1);
-                    cs.compute_Gamma_and_Phi(t,false);
-                    mkl::mul_rtrn(cs.W, cs.Phi, Q);
-                    if( ! cs.LU.build(cs.W) )
-                    {
-                        std::cerr << "singular newton step" << std::endl;
+                    if(!update_composition())
                         goto INIT_STEP;
-                    }
-                    mkl::neg(dV,cs.Gamma);
-                    cs.LU.solve(cs.W,dV);
+                    
+                    old_norm = mkl::norm2(dV);
                     
                     //----------------------------------------------------------
-                    // ok: dV is the Newton step
-                    // now, we must take care of numeric noise on all
-                    // the matrices we computed.
+                    // wait for the norm to decrease
                     //----------------------------------------------------------
-                    //std::cerr << "V="  << V << std::endl;
-                    //std::cerr << "dV=" << dV << std::endl;
+                    while(true)
+                    {
+                        if(!update_composition()) goto INIT_STEP;
+                        const double new_norm = mkl::norm2(dV);
+                        std::cerr << old_norm << " => " << new_norm << std::endl;
+                        if(new_norm<=old_norm)
+                        {
+                            old_norm = new_norm;
+                            break;
+                        }
+                    }
                     
-                    mkl::set(V0,V);         // save V into V0
-                    mkl::add(V,dV);         // use Newton's step
-                    build_composition();    // deduce new composition, in X1
-                    mkl::mul(V, Q, X1);     // compute the corrected V, in dV
-                    mkl::set(dV,V);         // compute the "real" dV
-                    mkl::sub(dV,V0);        // using all the numerical incertainty
-                    if( dV_norm < 0 )
+                    std::cerr << "Found decreasing dV" << std::endl;
+                    
+                    
+                    //----------------------------------------------------------
+                    // forward until increasing norm
+                    //----------------------------------------------------------
+                    while(true)
                     {
-                        dV_norm = mkl::norm1(dV);
+                        if(!update_composition()) goto INIT_STEP;
+                        const double new_norm = mkl::norm2(dV);
+                        std::cerr << old_norm << " => " << new_norm << std::endl;
+                        if(new_norm>=old_norm)
+                        {
+                            break;
+                        }
+                        old_norm = new_norm;
                     }
-                    std::cerr << "V1="  << V  << std::endl;
-                    std::cerr << "dV1=" << dV << std::endl;
-                    converged = true;
-                    for(size_t i=N;i>0;--i)
-                    {
-                        if( Fabs(dV[i]) > Fabs( cs.ftol * V[i] ) )
-                            converged = false;
-                    }
-                    if(!converged) goto NEWTON_STEP;
+                    
+                    //----------------------------------------------------------
+                    // numerical limit is reached
+                    //----------------------------------------------------------
+                    //std::cerr << std::endl << "V=" << V << std::endl;
                     
                     //----------------------------------------------------------
                     // compute error
@@ -270,6 +273,7 @@ namespace yocto
                         if(err>0) err = pow(10.0,ceil(Log10(err)));
                         Y[i] = err;
                     }
+                    //std::cerr << "X1=" << X1 << std::endl;
                     //std::cerr << "dX=" << Y  << std::endl;
                     
                     //----------------------------------------------------------
@@ -280,7 +284,6 @@ namespace yocto
                         if( Fabs(X1[i]) <= Y[i] )
                             X1[i] = 0;
                     }
-                    //std::cerr << "X2=" << X1 << std::endl;
                     
                     for(size_t i=M;i>0;--i)
                     {
@@ -299,13 +302,50 @@ namespace yocto
                 //--------------------------------------------------------------
                 // X1 = X0 + Q'*V, then X1 is projected
                 //--------------------------------------------------------------
-                void build_composition()
+                inline void build_composition() throw()
                 {
                     mkl::mul_trn(X1, Q, V);
                     mkl::add(X1, X0);
                     project(X1);
                 }
                 
+                //--------------------------------------------------------------
+                // build the Newton's step from X1
+                // and the effective dV
+                //--------------------------------------------------------------
+                inline bool update_composition() throw()
+                {
+                    //----------------------------------------------------------
+                    // compute numeric newton step
+                    //----------------------------------------------------------
+                    mkl::set(cs.C,X1);
+                    cs.compute_Gamma_and_Phi(t,false);
+                    mkl::mul_rtrn(cs.W, cs.Phi, Q);
+                    if( ! cs.LU.build(cs.W) )
+                    {
+                        std::cerr << "singular newton step" << std::endl;
+                        return false;
+                    }
+                    mkl::neg(dV,cs.Gamma);
+                    cs.LU.solve(cs.W,dV);
+                    
+                    //----------------------------------------------------------
+                    // ok: dV is the estimated Newton step.
+                    // Now, we must take care of numeric noise on all
+                    // the matrices we computed.
+                    //----------------------------------------------------------
+                    mkl::set(V0,V);         // save V into V0
+                    mkl::add(V,dV);         // use Newton's step
+                    build_composition();    // deduce new composition, in X1
+                    mkl::mul(V, Q, X1);     // compute the corrected V, in dV
+                    mkl::set(dV,V);         // compute the "real" dV
+                    mkl::sub(dV,V0);        // using all the numerical incertainty
+                    
+                    //std::cerr << "V="  <<  V << std::endl;
+                    //std::cerr << "dV=" << dV << std::endl;
+                    
+                    return true;
+                }
                 
                 void project( vector_t &X ) throw()
                 {
