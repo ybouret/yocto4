@@ -6,7 +6,7 @@
 
 namespace yocto
 {
- 
+    
     namespace gems
     {
         template <typename T>
@@ -30,6 +30,22 @@ namespace yocto
                 return *this;
             }
             
+            inline void ldz() throw()
+            { x=y=z=0; }
+            
+            inline void set3(const v4d &other) throw()
+            { x=other.x;y=other.y;z=other.z;}
+            
+            inline void add3(const v4d &other) throw()
+            { x+=other.x;y+=other.y;z+=other.z; }
+            
+            inline void sub3(const v4d &other) throw()
+            { x-=other.x;y-=other.y;z-=other.z; }
+            
+            inline void muladd3(const T a, const v4d &other) throw()
+            { x += a*other.x; y += a*other.y; z += a*other.z; }
+            
+            inline T squared_norm3(void) const throw() {}
         };
     }
 }
