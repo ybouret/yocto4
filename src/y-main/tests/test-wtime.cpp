@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 using namespace yocto;
 

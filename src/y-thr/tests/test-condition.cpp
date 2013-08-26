@@ -2,7 +2,7 @@
 #include "yocto/threading/thread.hpp"
 #include "yocto/threading/condition.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 using namespace yocto;
 

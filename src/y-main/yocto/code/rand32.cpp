@@ -1,5 +1,5 @@
 #include "yocto/code/rand32.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 #include <cstdio>
 

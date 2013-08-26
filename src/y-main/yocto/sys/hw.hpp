@@ -1,5 +1,5 @@
-#ifndef YOCTO_HW_INCLUDED
-#define YOCTO_HW_INCLUDED 1
+#ifndef YOCTO_SYS_HW_INCLUDED
+#define YOCTO_SYS_HW_INCLUDED 1
 
 #include "yocto/os.hpp"
 

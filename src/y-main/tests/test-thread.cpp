@@ -1,5 +1,5 @@
 #include "yocto/threading/proxy.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
 

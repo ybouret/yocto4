@@ -8,7 +8,7 @@
 #include "yocto/visit/interface.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/math/round.hpp"
-#include "yocto/code/pid.hpp"
+#include "yocto/sys/pid.hpp"
 
 #include "yocto/utest/run.hpp"
 

@@ -6,10 +6,10 @@
 
 #include "yocto/hashing/sha1.hpp"
 
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/random/isaac.hpp"
 
-#include "yocto/code/pid.hpp"
+#include "yocto/sys/pid.hpp"
 
 #include <cstring>
 

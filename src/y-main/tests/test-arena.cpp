@@ -4,7 +4,7 @@
 #include "yocto/memory/chunk.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/memory/global.hpp"
 
 #include <cstdlib>
