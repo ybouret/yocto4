@@ -1,7 +1,7 @@
 #ifndef YOCTO_ETA_INCLUDED
 #define YOCTO_ETA_INCLUDED 1
 
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 namespace yocto
 {

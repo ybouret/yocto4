@@ -1,4 +1,4 @@
-#include "yocto/hw.hpp"
+#include "yocto/sys/hw.hpp"
 
 #if defined(YOCTO_APPLE) 
 #include <sys/param.h>

@@ -4,7 +4,7 @@
 #include "yocto/code/endian.hpp"
 #include "yocto/code/rand.hpp"
 
-#include "yocto/hw.hpp"
+#include "yocto/sys/hw.hpp"
 
 using namespace yocto;
 

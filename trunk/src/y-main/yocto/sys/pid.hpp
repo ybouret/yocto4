@@ -2,8 +2,8 @@
  \brief access the process identifier
  */
 
-#ifndef YOCTO_CODE_PID_INCLUDED
-#define YOCTO_CODE_PID_INCLUDED 1
+#ifndef YOCTO_SYS_PID_INCLUDED
+#define YOCTO_SYS_PID_INCLUDED 1
 
 #include "yocto/os.hpp"
 

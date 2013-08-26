@@ -3,7 +3,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/complex.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include <cstdio>
 
 using namespace yocto;

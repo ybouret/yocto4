@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand32.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include <cmath>

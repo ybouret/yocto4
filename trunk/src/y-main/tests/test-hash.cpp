@@ -14,7 +14,7 @@
 #include "yocto/ios/icstream.hpp"
 
 #include "yocto/memory/global.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 #include <iomanip>
 #include <cstdlib>

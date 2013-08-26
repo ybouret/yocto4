@@ -9,7 +9,7 @@
 #include "yocto/hashing/sha256.hpp"
 #include "yocto/hashing/sha512.hpp"
 #include "yocto/hashing/rmd160.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/ios/raw-file.hpp"
 
 #include <iomanip>

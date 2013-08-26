@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/object.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/code/rand.hpp"
 
 using namespace yocto;

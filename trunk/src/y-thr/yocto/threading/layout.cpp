@@ -2,7 +2,7 @@
 
 #include "yocto/string/env.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/hw.hpp"
+#include "yocto/sys/hw.hpp"
 
 #include <iostream>
 #include <cstdlib>

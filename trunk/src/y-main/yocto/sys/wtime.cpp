@@ -2,7 +2,7 @@
 #define _POSIX_C_SOURCE 199309 
 #endif
 
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/code/utils.hpp"
 
@@ -17,7 +17,7 @@
 #include <cmath>
 #endif
 
-#include "yocto/code/pid.hpp"
+#include "yocto/sys/pid.hpp"
 
 namespace yocto 
 {

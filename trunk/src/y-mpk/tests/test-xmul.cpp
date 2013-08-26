@@ -2,7 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/mpk/natural.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/random/isaac.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"

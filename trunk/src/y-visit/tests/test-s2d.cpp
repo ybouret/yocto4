@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/visit/interface.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 #include "yocto/spade/visit.hpp"
 #include "yocto/spade/mpi/exchange.hpp"
@@ -11,12 +11,12 @@
 using namespace yocto;
 using namespace spade;
 
-typedef double               Real;
-typedef coord2D              Coord;
-typedef array2D<Real>        Array;
-typedef layout2D             Layout;
-typedef region2D<Real>::type Region;
-typedef vertex2D<Real>::type Vertex;
+typedef double                           Real;
+typedef coord2D                          Coord;
+typedef array2D<Real>                    Array;
+typedef layout2D                         Layout;
+typedef region2D<Real>::type             Region;
+typedef vertex2D<Real>::type             Vertex;
 typedef mpi_workspace<Layout,rmesh,Real> Workspace;
 typedef fields_setup<Layout>             FieldsSetup;
 typedef ghosts_setup                     GhostsSetup;

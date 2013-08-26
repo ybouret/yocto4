@@ -1,6 +1,6 @@
 #include "yocto/threading/crew.hpp"
 #include "yocto/threading/thread.hpp"
-#include "yocto/hw.hpp"
+#include "yocto/sys/hw.hpp"
 #include <iostream>
 
 namespace yocto
