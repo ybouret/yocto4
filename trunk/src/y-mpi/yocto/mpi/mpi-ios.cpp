@@ -46,7 +46,6 @@ namespace yocto
             
             inline void write(char C)
             {
-                MPI.Printf(stderr, "checking %d /write\n", MPI.CommWorldRank);
                 match_io();
                 if(fp)
                 {
@@ -67,7 +66,6 @@ namespace yocto
             
             inline void flush()
             {
-                MPI.Printf(stderr, "checking %d /flush\n", MPI.CommWorldRank);
                 match_io();
                 if(fp) { fp->flush(); }
             }
@@ -97,7 +95,6 @@ namespace yocto
             {
                 
                 done = 0;
-                MPI.Printf(stderr, "checking %d /put\n", MPI.CommWorldRank);
                 match_io();
                 if(fp)
                 {
@@ -105,16 +102,12 @@ namespace yocto
                     
                     //-- append root
                     fp->append((const char *)data,size);
-                    std::cerr << "Root append #" << size << std::endl;
                     
                     //-- append others
                     MPI_Status status;
                     for(int r=1;r<MPI.CommWorldSize;++r)
                     {
-                        size_t in_size = 0;
-                        std::cerr << "Root receiving from @" <<r << std::endl;
-                        MPI.Recv<size_t>(in_size, tag, MPI_COMM_WORLD, status);
-                        std::cerr << "Root will receive #" << in_size << " from @" <<r<< std::endl;
+                        const size_t in_size = MPI.Recv<size_t>(r, tag, MPI_COMM_WORLD, status);
                         if(in_size>0)
                         {
                             memory::buffer_of<char,memory::global> in_buff(in_size);
@@ -129,13 +122,9 @@ namespace yocto
                 else
                 {
                     assert(MPI.CommWorldRank>0);
-                    std::cerr << "@" << MPI.CommWorldRank << " will send #" << size << std::endl;
                     MPI.Send<size_t>(size, 0, tag, MPI_COMM_WORLD);
                     if(size>0)
-                    {
-                        std::cerr << "@" << MPI.CommWorldRank << " sending #" << size << std::endl;
                         MPI.Send(data, size, MPI_BYTE, 0, tag, MPI_COMM_WORLD);
-                    }
                     
                     //-- all done
                     done = size;
@@ -166,7 +155,6 @@ namespace yocto
     
     mpi::ostream:: ~ostream() throw()
     {
-        std::cerr << "~ostream" << std::endl;
         assert(impl);
         delete static_cast<mpi_ostream*>(impl);
         impl = 0 ;
