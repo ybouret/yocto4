@@ -95,27 +95,6 @@ with
 
 \subsection{Solving}
 \subsubsection{Choice of $\mymat{Q}$}
-We build an invertible trial matrix
-\begin{equation}
-	\mymat{F} = 
-	\left\lbrack
-	\begin{array}{c}
-		\mymat{P}\\
-		\mymat{Q}_0=\text{rand}(N,M)\\
-	\end{array}
-	\right\rbrack.
-\end{equation}
-We perform a Gram-Schmidt orthonormalization of $\mymat{F}$ into
-\begin{equation}
-	\tilde{\mymat{F}} = 
-	\left\lbrack
-	\begin{array}{c}
-		\tilde{\mymat{P}}\\
-		\mymat{Q}=\tilde{\mymat{Q}}_0\\
-	\end{array}
-	\right\rbrack.
-\end{equation}
-\subsection{Solving Bis}
 We build the initial matrix $\mymat{F}\in\mathcal{M}_{M,M}$
 \begin{equation}
 	\mymat{F} = 

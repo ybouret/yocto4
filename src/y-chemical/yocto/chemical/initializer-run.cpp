@@ -30,13 +30,14 @@ namespace yocto
                 matrix_t     Q;
                 matrix_t     P2;
                 lu_t         L2;
+                vector_t     Xstar;
                 vector_t     X0;
                 vector_t     X1;
-                vector_t     Y;
+                vector_t     dX;
                 vector_t     Mu;
                 vector_t     V;
                 vector_t     dV;
-                vector_t     V0;
+                vector_t     Y;
                 
                 Initializer(equilibria        &user_cs,
                             collection        &lib,
@@ -54,13 +55,14 @@ namespace yocto
                 Q(),
                 P2(),
                 L2(),
+                Xstar(),
                 X0(),
                 X1(),
-                Y(),
+                dX(),
                 Mu(),
                 V(),
                 dV(),
-                V0()
+                Y()
                 {
                     //==========================================================
                     // check rank
@@ -152,13 +154,15 @@ namespace yocto
                     // Final Memory Allocation
                     //
                     //==========================================================
-                    X0.make(M,0);
-                    X1.make(M,0);
-                    Y.make(M,0);
-                    Mu.make(Nc,0);
-                    V.make(N,0);
-                    dV.make(N,0);
-                    V0.make(N,0);
+                    Xstar. make(M,  0);
+                    X0.    make(M,  0);
+                    X1.    make(M,  0);
+                    dX.    make(M,  0);
+                    Mu.    make(Nc, 0);
+                    V.     make(N,  0);
+                    dV.    make(N,  0);
+                    Y.     make(M,  0);
+                    
                     
                     //==========================================================
                     //
@@ -168,95 +172,108 @@ namespace yocto
                     
                     
                     //----------------------------------------------------------
-                    // compute X0 such that X = X0 + Q'*V
+                    // compute Xstar such that X = Xstar + Q'*V
                     //----------------------------------------------------------
                     mkl::set(Mu,Lam);
                     L2.solve(P2, Mu);
-                    mkl::mul_trn(X0,P,Mu);
-                    project(X0);
+                    mkl::mul_trn(Xstar,P,Mu);
+                    project(Xstar);
+                    
+                    std::cerr << "Xstar=" << Xstar << std::endl;
+                    
+                    double old_norm = -1;
+                    
+                INIT_STEP:
+                    //==========================================================
+                    //
+                    // Step initialization
+                    //
+                    //==========================================================
+                    
+                    //----------------------------------------------------------
+                    // build a guess composition from equilibria
+                    //----------------------------------------------------------
+                    mkl::set(X0, 0);
+                    for( equilibria::iterator i=cs.begin();i!=cs.end();++i)
+                    {
+                        const equilibrium &eq = **i;
+                        eq.append(X0,ran);
+                    }
+                    
+                    //std::cerr << "Xguess=" << X0 << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // deduce initial V
+                    //----------------------------------------------------------
+                    mkl::mul(V, Q, X0);
+                    //std::cerr << "V=" << V << std::endl;
+                    
+                    //----------------------------------------------------------
+                    // recompute initial X0
+                    //----------------------------------------------------------
+                    build_composition(X0);
                     //std::cerr << "X0=" << X0 << std::endl;
                     
                     //==========================================================
                     //
-                    // Algorithm
+                    // first norm init
                     //
                     //==========================================================
-                    double old_norm  = -1;
+                    if( !build_next_composition() ) goto INIT_STEP;
+                    old_norm = mkl::norm2(dX);
                     
-                INIT_STEP:
-                    //----------------------------------------------------------
-                    // initialize step in X1:
-                    // add a random fraction of the scaled composition
-                    //----------------------------------------------------------
-                    mkl::set(X1,0);
-                    for( equilibria::iterator eq = cs.begin(); eq != cs.end(); ++eq )
-                    {
-                        (**eq).append(X1, ran);
-                    }
-                    
-                    //----------------------------------------------------------
-                    // "Legalize" the concentration: compute the initial V value
-                    //----------------------------------------------------------
-                    mkl::mul(V, Q, X1);
-                    
-                    //----------------------------------------------------------
-                    // And deduce the first composition: X1 = X0 + Q' * V
-                    //----------------------------------------------------------
-                    build_composition();
-                    
-                    //----------------------------------------------------------
-                    // Compute the first dV norm
-                    // the composition is updated
-                    //----------------------------------------------------------
-                    if(!update_composition())
-                        goto INIT_STEP;
-                    
-                    old_norm = mkl::norm2(dV);
-                    
-                    //----------------------------------------------------------
-                    // wait for the norm to decrease
-                    //----------------------------------------------------------
+                    //==========================================================
+                    //
+                    // forward while increasing norm
+                    //
+                    //==========================================================
                     while(true)
                     {
-                        if(!update_composition()) goto INIT_STEP;
-                        const double new_norm = mkl::norm2(dV);
-                        std::cerr << old_norm << " => " << new_norm << std::endl;
+                        mkl::set(X0,X1);
+                        if( !build_next_composition() ) goto INIT_STEP;
+                        const double new_norm = mkl::norm2(dX);
+                        //std::cerr << old_norm << " => " << new_norm << std::endl;
                         if(new_norm<=old_norm)
                         {
+                            mkl::set(X0,X1);
                             old_norm = new_norm;
-                            break;
-                        }
-                    }
-                    
-                    std::cerr << "Found decreasing dV" << std::endl;
-                    
-                    
-                    //----------------------------------------------------------
-                    // forward until increasing norm
-                    //----------------------------------------------------------
-                    while(true)
-                    {
-                        if(!update_composition()) goto INIT_STEP;
-                        const double new_norm = mkl::norm2(dV);
-                        std::cerr << old_norm << " => " << new_norm << std::endl;
-                        if(new_norm>=old_norm)
-                        {
                             break;
                         }
                         old_norm = new_norm;
                     }
+                    // std::cerr << "dX=" << dX << std::endl;
+                    //std::cerr << "X0=" << X0 << std::endl;
                     
-                    //----------------------------------------------------------
-                    // numerical limit is reached
-                    //----------------------------------------------------------
-                    //std::cerr << std::endl << "V=" << V << std::endl;
                     
-                    //----------------------------------------------------------
-                    // compute error
-                    //----------------------------------------------------------
-                    build_composition();
-                    mkl::set(cs.C,X1);
-                    //std::cerr << "X1=" << X1 << std::endl;
+                    
+                    //==========================================================
+                    //
+                    // forward while decreasing norm
+                    // starting from X1=X0
+                    //
+                    //==========================================================
+                    while(true)
+                    {
+                        if( !build_next_composition() ) goto INIT_STEP;
+                        const double new_norm = mkl::norm2(dX);
+                        //std::cerr << old_norm << " => " << new_norm << std::endl;
+                        if(new_norm>=old_norm)
+                        {
+                            break; // X0 is the best guest
+                        }
+                        mkl::set(X0,X1);
+                        old_norm = new_norm;
+                    }
+                    //std::cerr << "dX=" << dX << std::endl;
+                    //std::cerr << "X0=" << X0 << std::endl;
+                    
+                    
+                    //==========================================================
+                    //
+                    // Error evaluation
+                    //
+                    //==========================================================
+                    mkl::set(cs.C,X0);
                     cs.compute_Gamma_and_Phi(t,false);
                     mkl::mul_rtrn(cs.W, cs.Phi, Q);
                     if( ! cs.LU.build(cs.W) )
@@ -265,60 +282,66 @@ namespace yocto
                         goto INIT_STEP;
                     }
                     cs.LU.solve(cs.W,cs.Gamma);
-                    mkl::mul_trn(Y, Q, cs.Gamma);
+                    mkl::mul_trn(dX, Q, cs.Gamma);
+                    
                     for(size_t i=M;i>0;--i)
                     {
-                        double err = Fabs(Y[i]);
+                        double err = Fabs(dX[i]);
                         if(err>0) err = pow(10.0,ceil(Log10(err)));
-                        Y[i] = err;
+                        dX[i] = err;
                     }
-                    //std::cerr << "X1=" << X1 << std::endl;
-                    //std::cerr << "dX=" << Y  << std::endl;
+                    //std::cerr << "dX=" << dX << std::endl;
                     
-                    //----------------------------------------------------------
-                    // update X1
-                    //----------------------------------------------------------
+                    
+                    //==========================================================
+                    //
+                    // Truncation/Accept
+                    //
+                    //==========================================================
                     for(size_t i=M;i>0;--i)
                     {
-                        if( Fabs(X1[i]) <= Y[i] )
-                            X1[i] = 0;
+                        if( Fabs(X0[i]) <= dX[i] )
+                            X0[i] = 0;
                     }
                     
                     for(size_t i=M;i>0;--i)
                     {
-                        if(X1[i]<0)
+                        if(X0[i]<0)
                             goto INIT_STEP;
                     }
                     
-                    //----------------------------------------------------------
-                    // make a final normalization
-                    //----------------------------------------------------------
-                    mkl::set(cs.C, X1);
+                    
+                    //==========================================================
+                    //
+                    // Final answer
+                    //
+                    //==========================================================
+                    mkl::set(cs.C, X0);
                     cs.normalize_C(t);
+                    
                 }
                 
                 
                 //--------------------------------------------------------------
-                // X1 = X0 + Q'*V, then X1 is projected
+                // X = Xstar + Q'*V, then X1 is projected
                 //--------------------------------------------------------------
-                inline void build_composition() throw()
+                inline void build_composition(vector_t &X) throw()
                 {
-                    mkl::mul_trn(X1, Q, V);
-                    mkl::add(X1, X0);
-                    project(X1);
+                    mkl::mul_trn(X, Q, V);
+                    mkl::add(X, Xstar);
+                    project(X);
                 }
                 
                 //--------------------------------------------------------------
-                // build the Newton's step from X1
-                // and the effective dV
+                // compute X1 and dX from X0
                 //--------------------------------------------------------------
-                inline bool update_composition() throw()
+                inline bool build_next_composition() throw()
                 {
                     //----------------------------------------------------------
-                    // compute numeric newton step
+                    // compute Newton's step dV from X0
                     //----------------------------------------------------------
-                    mkl::set(cs.C,X1);
-                    cs.compute_Gamma_and_Phi(t,false);
+                    mkl::set(cs.C,X0);
+                    cs.compute_Gamma_and_Phi(t, false);
                     mkl::mul_rtrn(cs.W, cs.Phi, Q);
                     if( ! cs.LU.build(cs.W) )
                     {
@@ -329,24 +352,64 @@ namespace yocto
                     cs.LU.solve(cs.W,dV);
                     
                     //----------------------------------------------------------
-                    // ok: dV is the estimated Newton step.
-                    // Now, we must take care of numeric noise on all
-                    // the matrices we computed.
+                    // update V
                     //----------------------------------------------------------
-                    mkl::set(V0,V);         // save V into V0
-                    mkl::add(V,dV);         // use Newton's step
-                    build_composition();    // deduce new composition, in X1
-                    mkl::mul(V, Q, X1);     // compute the corrected V, in dV
-                    mkl::set(dV,V);         // compute the "real" dV
-                    mkl::sub(dV,V0);        // using all the numerical incertainty
+                    mkl::add(V, dV);
                     
-                    //std::cerr << "V="  <<  V << std::endl;
-                    //std::cerr << "dV=" << dV << std::endl;
+                    //----------------------------------------------------------
+                    // compute the next composition
+                    //----------------------------------------------------------
+                    build_composition(X1);
+                    
+                    //----------------------------------------------------------
+                    // compute the difference in composition
+                    //----------------------------------------------------------
+                    mkl::vec(dX,X0,X1);
                     
                     return true;
                 }
                 
-                void project( vector_t &X ) throw()
+                /*
+                 //--------------------------------------------------------------
+                 // build the Newton's step from X1
+                 // and the effective dV
+                 //--------------------------------------------------------------
+                 inline bool update_composition() throw()
+                 {
+                 //----------------------------------------------------------
+                 // compute numeric newton step
+                 //----------------------------------------------------------
+                 mkl::set(cs.C,X1);
+                 cs.compute_Gamma_and_Phi(t,false);
+                 mkl::mul_rtrn(cs.W, cs.Phi, Q);
+                 if( ! cs.LU.build(cs.W) )
+                 {
+                 std::cerr << "singular newton step" << std::endl;
+                 return false;
+                 }
+                 mkl::neg(dV,cs.Gamma);
+                 cs.LU.solve(cs.W,dV);
+                 
+                 //----------------------------------------------------------
+                 // ok: dV is the estimated Newton step.
+                 // Now, we must take care of numeric noise on all
+                 // the matrices we computed.
+                 //----------------------------------------------------------
+                 mkl::set(V0,V);         // save V into V0
+                 mkl::add(V,dV);         // use Newton's step
+                 build_composition();    // deduce new composition, in X1
+                 mkl::mul(V, Q, X1);     // compute the corrected V, in dV
+                 mkl::set(dV,V);         // compute the "real" dV
+                 mkl::sub(dV,V0);        // using all the numerical incertainty
+                 
+                 //std::cerr << "V="  <<  V << std::endl;
+                 //std::cerr << "dV=" << dV << std::endl;
+                 
+                 return true;
+                 }
+                 */
+                
+                inline void project( vector_t &X ) throw()
                 {
                     //==================================================================
                     // initialize first projection
