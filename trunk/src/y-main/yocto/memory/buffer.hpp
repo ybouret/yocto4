@@ -40,6 +40,38 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(rw_buffer);
 		};
+        
+        template <size_t N>
+        class fixed_length_buffer : public rw_buffer
+        {
+        public:
+            inline fixed_length_buffer() throw() :
+            addr()
+            {
+                clear();
+            }
+            
+            virtual ~fixed_length_buffer() throw() { clear(); }
+            
+            virtual size_t length() const throw() { return N; }
+            
+            inline friend bool operator==( const fixed_length_buffer &lhs, const fixed_length_buffer &rhs ) throw()
+            {
+                for(size_t i=0;i<N;++i) if( lhs.addr[i] != rhs.addr[i] ) return false;
+                return true;
+            }
+            
+            inline friend bool operator!=( const fixed_length_buffer &lhs, const fixed_length_buffer &rhs ) throw()
+            {
+                for(size_t i=0;i<N;++i) if( lhs.addr[i] != rhs.addr[i] ) return true;
+                return false;
+            }
+            
+        private:
+            uint8_t addr[N];
+            virtual const void *get_address() const throw() { return addr; }
+            inline void clear() throw() { for(size_t i=0;i<N;++i) addr[i] = 0; }
+        };
 	}
 	
 }
