@@ -79,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
     //--------------------------------------------------------------------------
     // Here we go
     //--------------------------------------------------------------------------
-    size_t       N    = 100;
+    size_t       N    = 1000;
     const double dV   = V1/N;
     double       Vtot = V0;
     chemical::solution dn(S1);
@@ -96,7 +96,7 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         fp << "\n";
         
         fp << "0";
-        fp(" %.3e", S0.pH());
+        fp(" %.5e", S0.pH());
         S0.write_values(fp);
         fp << "\n";
     }
@@ -112,8 +112,8 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         S0.load(cs.C);
         
         ios::ocstream fp(fn,true);
-        fp("%.3g", i*dV);
-        fp(" %.3e", S0.pH());
+        fp("%.5e", i*dV);
+        fp(" %.5e", S0.pH());
         S0.write_values(fp);
         fp << "\n";
     }
