@@ -200,19 +200,16 @@ namespace yocto
                         eq.append(X0,ran);
                     }
                     
-                    //std::cerr << "Xguess=" << X0 << std::endl;
                     
                     //----------------------------------------------------------
                     // deduce initial V
                     //----------------------------------------------------------
                     mkl::mul(V, Q, X0);
-                    //std::cerr << "V=" << V << std::endl;
                     
                     //----------------------------------------------------------
                     // recompute initial X0
                     //----------------------------------------------------------
                     build_composition(X0);
-                    //std::cerr << "X0=" << X0 << std::endl;
                     
                     //==========================================================
                     //
@@ -232,18 +229,15 @@ namespace yocto
                         mkl::set(X0,X1);
                         if( !build_next_composition() ) goto INIT_STEP;
                         const double new_norm = mkl::norm2(dX);
-                        //std::cerr << old_norm << " => " << new_norm << std::endl;
                         if(new_norm<=old_norm)
                         {
+                            // accept an leave
                             mkl::set(X0,X1);
                             old_norm = new_norm;
                             break;
                         }
                         old_norm = new_norm;
                     }
-                    // std::cerr << "dX=" << dX << std::endl;
-                    //std::cerr << "X0=" << X0 << std::endl;
-                    
                     
                     
                     //==========================================================
@@ -256,7 +250,6 @@ namespace yocto
                     {
                         if( !build_next_composition() ) goto INIT_STEP;
                         const double new_norm = mkl::norm2(dX);
-                        //std::cerr << old_norm << " => " << new_norm << std::endl;
                         if(new_norm>=old_norm)
                         {
                             break; // X0 is the best guest
@@ -286,11 +279,10 @@ namespace yocto
                     
                     for(size_t i=M;i>0;--i)
                     {
-                        double err = Fabs(dX[i]);
-                        if(err>0) err = pow(10.0,ceil(Log10(err)));
+                        double    err = Fabs(dX[i]);
+                        if(err>0) err = Pow(10.0,Ceil(Log10(err)));
                         dX[i] = err;
                     }
-                    //std::cerr << "dX=" << dX << std::endl;
                     
                     
                     //==========================================================
@@ -318,7 +310,6 @@ namespace yocto
                     //==========================================================
                     mkl::set(cs.C, X0);
                     cs.normalize_C(t);
-                    
                 }
                 
                 
