@@ -21,7 +21,7 @@ namespace yocto
             class Line
             {
             public:
-                explicit Line( const string &ID, double X, double Y, double z );
+                explicit Line( const string &ID, T X, T Y, T Z );
                 virtual ~Line() throw();
                 Line(const Line &);
                 
