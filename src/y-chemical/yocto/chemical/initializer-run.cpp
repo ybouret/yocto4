@@ -360,51 +360,12 @@ namespace yocto
                     return true;
                 }
                 
-                /*
-                 //--------------------------------------------------------------
-                 // build the Newton's step from X1
-                 // and the effective dV
-                 //--------------------------------------------------------------
-                 inline bool update_composition() throw()
-                 {
-                 //----------------------------------------------------------
-                 // compute numeric newton step
-                 //----------------------------------------------------------
-                 mkl::set(cs.C,X1);
-                 cs.compute_Gamma_and_Phi(t,false);
-                 mkl::mul_rtrn(cs.W, cs.Phi, Q);
-                 if( ! cs.LU.build(cs.W) )
-                 {
-                 std::cerr << "singular newton step" << std::endl;
-                 return false;
-                 }
-                 mkl::neg(dV,cs.Gamma);
-                 cs.LU.solve(cs.W,dV);
-                 
-                 //----------------------------------------------------------
-                 // ok: dV is the estimated Newton step.
-                 // Now, we must take care of numeric noise on all
-                 // the matrices we computed.
-                 //----------------------------------------------------------
-                 mkl::set(V0,V);         // save V into V0
-                 mkl::add(V,dV);         // use Newton's step
-                 build_composition();    // deduce new composition, in X1
-                 mkl::mul(V, Q, X1);     // compute the corrected V, in dV
-                 mkl::set(dV,V);         // compute the "real" dV
-                 mkl::sub(dV,V0);        // using all the numerical incertainty
-                 
-                 //std::cerr << "V="  <<  V << std::endl;
-                 //std::cerr << "dV=" << dV << std::endl;
-                 
-                 return true;
-                 }
-                 */
                 
                 inline void project( vector_t &X ) throw()
                 {
-                    //==================================================================
+                    //==========================================================
                     // initialize first projection
-                    //==================================================================
+                    //==========================================================
                     mkl::set(Mu, Lam);
                     mkl::mulsub(Mu, P, X);
                     L2.solve(P2, Mu);
@@ -412,9 +373,9 @@ namespace yocto
                     mkl::add(X, Y);
                     double Ymin = mkl::norm1(Y);
                     
-                    //==================================================================
+                    //==========================================================
                     // go on while norm decreases
-                    //==================================================================
+                    //==========================================================
                     while(true)
                     {
                         mkl::set(Mu, Lam);
@@ -447,9 +408,7 @@ namespace yocto
         
         void initializer:: operator()( equilibria &cs, collection &lib, const double t )
         {
-            
-            Initializer ini(cs,lib,*this,t,ran);
-            
+            Initializer ini(cs,lib,*this,t,ran);            
         }
         
         
