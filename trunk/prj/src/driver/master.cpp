@@ -1,6 +1,6 @@
 //#include "yocto/ios/pstream.hpp"
 #include "yocto/exceptions.hpp"
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 #include "yocto/string.hpp"
 
 #include <cstdio>

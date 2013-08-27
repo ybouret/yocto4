@@ -10,7 +10,7 @@
 #include "yocto/string.hpp"
 #include "yocto/ios/icstream.hpp"
 
-#include "yocto/wtime.hpp"
+#include "yocto/sys/wtime.hpp"
 
 using namespace yocto;
 
