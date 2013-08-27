@@ -9,6 +9,7 @@ clean:
 	@${MAKE} -s -C samples            clean
 	@${MAKE} -s -C src/y-aqueous/docs clean
 	@${MAKE} -s -C src/y-mk/docs      clean
+	@${MAKE} -s -C src/y-chemical/docs clean
 	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
 
 

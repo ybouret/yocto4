@@ -1,4 +1,4 @@
 all:
 
 clean:
-	rm -f *.toc *.aux *.log *.synctex.gz chemsys.ps chemsys.pdf
+	rm -f *.toc *.aux *.log *.synctex.gz chemical-solution.ps chemical-solution.pdf
