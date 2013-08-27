@@ -353,6 +353,8 @@ namespace yocto
             
             virtual void write( char C ); //!< dangerous: interleaved result !
 			virtual void flush();         //!< flush...
+            
+            //! always return when done==size, so that only 1 call to append
 			virtual void put(const void *data, size_t size, size_t &done);
             
             ios::ostream & operator*(); //!< if rank==0, otherwise throw !
