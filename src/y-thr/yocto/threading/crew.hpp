@@ -10,17 +10,19 @@ namespace yocto
     
     namespace threading
     {
+        //! make a crew of threads
         class crew : public layout
         {
         public:
             
+            //! context of current thread
             class context
             {
             public:
-                const size_t rank;
-                const size_t indx;
-                const size_t size;
-                lockable    &access;
+                const size_t rank;   //!< 0..size-1
+                const size_t indx;   //!< rank+1, for information
+                const size_t size;   //!< size of the crew
+                lockable    &access; //!< common mutex for synchronization
                 
                 context( size_t r, size_t s, lockable &lock_ref) throw();
                 ~context() throw();
@@ -29,17 +31,25 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(context);
             };
             
+            //! task to be run per context
             typedef functor<void,TL1(context&)> task;
             
+            //! make a crew with hardware #procs, 1:1 placement
             explicit crew();
+            
+            //! make a crew with #num_threads, starting at CPU #off_threads
             explicit crew(size_t num_threads,size_t off_threads);
+            
+            //! clean up
             virtual ~crew() throw();
+            
+            //! call the same task for every context/thread
             void run( task &sub ) throw();
             
             //! automatically dispatch indices
             /**
              \param workers array of pointers to a class with some start/count/final members
-             \param offset  computing task offset
+             \param offset  computing task offset (integral type)
              \param length  computing length
              */
             template <class PTR_ARRAY,class U>

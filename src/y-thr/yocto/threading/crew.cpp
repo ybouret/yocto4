@@ -31,15 +31,15 @@ namespace yocto
             };
         }
         
-#define Y_CREW_CTOR() \
+#define Y_CREW_CTOR()   \
 access( "crew::mutex" ),\
-enter(),\
-leave(),\
-ready(0),\
-activ(0),\
-built(0),\
-proc(0),\
-stop( false ),\
+enter(),                \
+leave(),                \
+ready(0),               \
+activ(0),               \
+built(0),               \
+proc(0),                \
+stop( false ),          \
 wlen( size * sizeof(member) ),\
 wksp( memory::kind<memory::global>::acquire(wlen) ),\
 nthr(0)
