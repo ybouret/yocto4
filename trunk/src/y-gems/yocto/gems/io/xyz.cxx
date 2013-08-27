@@ -16,7 +16,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////
         template <>
-        XYZ<real_t>:: Line:: Line( const string &ID, double X, double Y, double Z) :
+        XYZ<real_t>:: Line:: Line( const string &ID, real_t X, real_t Y, real_t Z) :
         id( ID ),
         x( X ),
         y( Y ),

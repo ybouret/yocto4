@@ -200,25 +200,28 @@ namespace yocto
                         eq.append(X0,ran);
                     }
                     
-                    
+					std::cerr << "Xguess=" << X0 << std::endl;
                     //----------------------------------------------------------
                     // deduce initial V
                     //----------------------------------------------------------
                     mkl::mul(V, Q, X0);
-                    
+					std::cerr << "V=" << V << std::endl;
+
                     //----------------------------------------------------------
                     // recompute initial X0
                     //----------------------------------------------------------
                     build_composition(X0);
-                    
+					std::cerr << "X0=" << X0 << std::endl;
+
                     //==========================================================
                     //
                     // first norm init
                     //
                     //==========================================================
-                    if( !build_next_composition() ) goto INIT_STEP;
+                    if( !build_next_composition() ) 
+						goto INIT_STEP;
                     old_norm = mkl::norm2(dX);
-                    
+					std::cerr << "Init=" << old_norm << std::endl;
                     //==========================================================
                     //
                     // forward while increasing norm
@@ -228,7 +231,8 @@ namespace yocto
                     {
                         mkl::set(X0,X1);
                         if( !build_next_composition() ) goto INIT_STEP;
-                        const double new_norm = mkl::norm2(dX);
+						const double new_norm = mkl::norm2(dX);
+						std::cerr << old_norm << " ==> " << new_norm << std::endl;
                         if(new_norm<=old_norm)
                         {
                             // accept an leave
@@ -250,6 +254,7 @@ namespace yocto
                     {
                         if( !build_next_composition() ) goto INIT_STEP;
                         const double new_norm = mkl::norm2(dX);
+						std::cerr << old_norm << " => " << new_norm << std::endl;
                         if(new_norm>=old_norm)
                         {
                             break; // X0 is the best guest
@@ -371,8 +376,8 @@ namespace yocto
                     L2.solve(P2, Mu);
                     mkl::mul_trn(Y, P, Mu);
                     mkl::add(X, Y);
-                    double Ymin = mkl::norm1(Y);
-                    
+                    double Ymin = mkl::norm_infty(Y);
+
                     //==========================================================
                     // go on while norm decreases
                     //==========================================================
@@ -383,7 +388,7 @@ namespace yocto
                         L2.solve(P2, Mu);
                         mkl::mul_trn(Y, P, Mu);
                         mkl::add(X, Y);
-                        const double Ytmp = mkl::norm1(Y);
+                        const double Ytmp = mkl::norm_infty(Y);
                         if(Ytmp>=Ymin)
                             break;
                         Ymin = Ytmp;
