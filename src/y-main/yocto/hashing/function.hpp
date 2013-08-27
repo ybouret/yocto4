@@ -10,27 +10,29 @@ namespace yocto
 	namespace memory
 	{
 		class ro_buffer;
+        class rw_buffer;
 	}
 	
 	namespace hashing
 	{
 		
+        //! base class for hashing function
 		class function : public object
 		{
 		public:
 			virtual ~function() throw();
 			
-			const size_t length;
-			const size_t window;
+			const size_t length; //!< output generation
+			const size_t window; //!< internal window size
 			
 			virtual const char *name()   const throw() = 0;
-			virtual void set() throw() = 0;
-			virtual void run( const void *buffer, size_t buflen ) throw() = 0;
-			virtual void get( void *output, size_t outlen ) throw() = 0;
+			virtual void        set() throw() = 0; //!< initialize
+			virtual void        run( const void *buffer, size_t buflen ) throw() = 0; //!< process bytes
+			virtual void        get( void *output, size_t outlen ) throw() = 0;       //!< finalize/fill array
 		
-			void operator()( const void *buffer, size_t buflen ) throw();
-			void operator()( const memory::ro_buffer &buf ) throw();
-			void operator()( const char *buf ) throw();
+			void operator()( const void *buffer, size_t buflen ) throw(); //!< this->run(buffer,buflen);
+			void operator()( const memory::ro_buffer &buf )      throw(); //!< this->run(buf.ro(),buf.length());
+			void operator()( const char *buf )                   throw(); //!< this->run(buf,strlen(buf));
 			
 			static void fill( void *output, size_t outlen, const void *input, size_t inlen ) throw();
 			
@@ -43,6 +45,10 @@ namespace yocto
 			template <typename T>
 			inline T key( const memory::ro_buffer &buf ) throw() { set(); (*this)(buf); return key<T>(); }
 			
+            //!this->get( output.rw(), output.length() )
+            void out( memory::rw_buffer &output ) throw();
+            
+            
 		protected:
 			explicit function( size_t L, size_t W) throw();
 			

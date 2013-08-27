@@ -42,7 +42,6 @@ namespace yocto
 		void function:: operator()( const void *buffer, size_t buflen ) throw()
 		{
 			run( buffer, buflen );
-			
 		}
 		
 		void function:: operator()( const memory::ro_buffer &buf ) throw()
@@ -56,6 +55,10 @@ namespace yocto
 		}
 
 
+        void function:: out( memory::rw_buffer &output ) throw()
+        {
+            get( output.rw(), output.length() );
+        }
 
 	}
 

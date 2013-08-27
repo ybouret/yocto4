@@ -6,9 +6,11 @@
 #include "yocto/code/printf-check.hpp"
 #include "yocto/code/endian.hpp"
 
+#include "yocto/ios/ostream.hpp"
 #include "yocto/string.hpp"
 #include "yocto/type-spec.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/hashing/sha1.hpp"
 
 #include <cstdio>
 
@@ -55,7 +57,8 @@ namespace yocto
 	class mpi : public singleton<mpi>
 	{
 	public:
-		
+		typedef hashing::sha1 hashing_function;
+        
 		//! dedicated error handling
 		class exception : public yocto::exception
 		{
@@ -88,7 +91,7 @@ namespace yocto
 		const int        ProcessorNameLength;
 		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME]; //!< from MPI_Get_Processor_name(...)
 		const int        ThreadLevel;      //!< Information
-        const string     CommWorldID;      //!< size.rank
+        const string     CommWorldID;      //!< size.rank, formatted as %d
         
         const char *ThreadLevelName() const throw();
         int Comm_rank( MPI_Comm comm ) const;
@@ -278,7 +281,8 @@ namespace yocto
         }
         
         typedef vector<data_type> db_type;
-        const db_type db;
+        const db_type             db;
+        mutable hashing_function  hasher;
         
         //======================================================================
         //
@@ -335,6 +339,28 @@ namespace yocto
             return Allreduce1<T>(input, MPI_MAX, comm);
         }
         
+        class ostream : public ios::ostream
+        {
+        public:
+            explicit ostream(const mpi  &,
+                             const string  &filename,
+                             bool           append );
+            explicit ostream(const mpi  &,
+                             const char *filename,
+                             bool        append);
+            
+            virtual ~ostream() throw();
+            
+            virtual void write( char C ); //!< dangerous: interleaved result !
+			virtual void flush();         //!< flush...
+			virtual void put(const void *data, size_t size, size_t &done);
+            
+            ios::ostream & operator*(); //!< if rank==0, otherwise throw !
+            
+        private:
+            void *impl;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(ostream);
+        };
         
         
 	private:
