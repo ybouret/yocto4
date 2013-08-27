@@ -41,12 +41,12 @@ YOCTO_UNIT_TEST_IMPL(rand)
         uniform_generator<double,rand32_kiss> ran;
         static const  size_t num = 10;
         double               tab[num];
-        for(int i=0; i < num; ++i)
+        for(size_t i=0; i < num; ++i)
         {
             tab[i] = ran();
         }
         show(tab,num);
-        for(int i=0; i < num; ++i)
+        for(size_t i=0; i < num; ++i)
         {
             tab[i] = ran.lt(num);
         }
