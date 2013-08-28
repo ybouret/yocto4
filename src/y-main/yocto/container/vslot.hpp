@@ -10,9 +10,9 @@ namespace yocto
     class vslot
     {
     public:
-        vslot() throw();
-        vslot(size_t n);
-        ~vslot() throw();
+        explicit vslot() throw();
+        explicit vslot(size_t n);
+        virtual ~vslot() throw();
         
         void allocate(size_t n);   //!< memory only
         void deallocate() throw(); //!< once object is destructed
@@ -32,7 +32,7 @@ namespace yocto
         inline void make()
         {
             prepare_for(sizeof(T)); // get memory
-            new (data) T();         // try to construct, may throw
+            new (data_) T();         // try to construct, may throw
             activate<T>();          // activate the object
         }
         
@@ -41,7 +41,7 @@ namespace yocto
         inline void make( typename type_traits<T>::parameter_type args )
         {
             prepare_for(sizeof(T)); // get memory
-            new (data) T(args);     // try to construct, may throw
+            new (data_) T(args);     // try to construct, may throw
             activate<T>();          // activate the object
         }
         
@@ -49,7 +49,7 @@ namespace yocto
         inline void build(typename type_traits<U>::parameter_type args)
         {
             prepare_for(sizeof(T)); // get memory
-            new (data) T(args);     // try to construct, may throw
+            new (data_) T(args);     // try to construct, may throw
             activate<T>();          // activate the object
         }
         
@@ -57,7 +57,7 @@ namespace yocto
         template <typename T>
         bool same_type_than() const throw()
         {
-            return type != 0 && typeid(T) == *type;
+            return type_ != 0 && typeid(T) == *type_;
         }
         
         //! transtyping with DEBUG control
@@ -66,7 +66,7 @@ namespace yocto
         {
             assert(is_active());
             assert(same_type_than<T>());
-            return *(T*)data;
+            return *(T*)data_;
         }
         
         //! transtyping with DEBUG control
@@ -75,15 +75,15 @@ namespace yocto
         {
             assert(is_active());
             assert(same_type_than<T>());
-            return *(T*)data;
+            return *(T*)data_;
         }
         
         
     private:
-        size_t                size;
-        void                 *data;
-        const std::type_info *type;
-        void                (*kill)(void*);
+        size_t                size_;
+        void                 *data_;
+        const std::type_info *type_;
+        void                (*kill_)(void*);
         void prepare_for(size_t n);
         
         template <typename T>
@@ -93,8 +93,8 @@ namespace yocto
         template <typename T>
         inline void activate() throw()
         {
-            kill =  __kill<T>;
-            type = &typeid(T);
+            kill_ =  __kill<T>;
+            type_ = &typeid(T);
         }
         YOCTO_DISABLE_COPY_AND_ASSIGN(vslot);
     };

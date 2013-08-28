@@ -17,23 +17,16 @@ namespace yocto
         public:
             
             //! context of current thread
-            class context
+            class context : public vslot
             {
             public:
                 const size_t rank;   //!< 0..size-1
                 const size_t indx;   //!< rank+1, for information
                 const size_t size;   //!< size of the crew
                 lockable    &access; //!< common mutex for synchronization
-                vslot        data;   //!< any user data
                 
-                context( size_t r, size_t s, lockable &lock_ref) throw();
-                ~context() throw();
-                
-                template <typename T>
-                T &as() throw() { return data.as<T>(); }
-                
-                template <typename T>
-                const T &as() const throw() { return data.as<T>(); }
+                explicit context( size_t r, size_t s, lockable &lock_ref) throw();
+                virtual ~context() throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(context);
@@ -80,7 +73,7 @@ namespace yocto
                 {
                     context       &ctx = self[rank];
                     const WINDOW   win(ctx,length,offset);
-                    ctx.data.make<WINDOW>(win);
+                    ctx.make<WINDOW>(win);
                 }
             }
             
