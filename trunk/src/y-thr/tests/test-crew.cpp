@@ -130,3 +130,22 @@ YOCTO_UNIT_TEST_IMPL(crew)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/string/conv.hpp"
+
+YOCTO_UNIT_TEST_IMPL(cwin)
+{
+    size_t length = 1000;
+    if(argc>1)
+        length = strconv::to<size_t>(argv[1],"length");
+    
+    threading::crew team;
+    for(size_t i=0;i<team.size;++i)
+    {
+        threading::crew::context       &ctx = team[i];
+        const threading::crew::window   win(ctx,length,0);
+        std::cerr << "win #" << i << " : " << win.start << " => " << win.final << ", #=" << win.count << std::endl;
+        ctx.data.make<threading::crew::window>(win);
+    }
+}
+YOCTO_UNIT_TEST_DONE()

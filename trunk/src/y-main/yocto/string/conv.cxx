@@ -5,7 +5,7 @@ real_t strconv:: to_real<real_t>( const string &txt, const char *ctx )
 	static const char fmt[] = "strconv::to_real(invalid char '%c') for <%s>";
 	if( !ctx )        ctx   = "";
 	static const char fmt2[] = "strconv::to_real(end of input after %s) for <%s>";
-	assert( txt.size() > 0 );
+    if( txt.size() <= 0 ) throw libc::exception( EINVAL, "strconv::to_real(empty string)");
 	
 	const size_t n = txt.size();
 	size_t       i = 0;

@@ -36,14 +36,21 @@ namespace yocto
             activate<T>();          // activate the object
         }
         
-        //! one argument constructor, automatic memory management
+        //! one argument copy constructor, automatic memory management
         template <typename T>
         inline void make( typename type_traits<T>::parameter_type args )
         {
             prepare_for(sizeof(T)); // get memory
             new (data) T(args);     // try to construct, may throw
-            activate<T>();          //  activate the object
-            
+            activate<T>();          // activate the object
+        }
+        
+        template <typename T,typename U>
+        inline void build(typename type_traits<U>::parameter_type args)
+        {
+            prepare_for(sizeof(T)); // get memory
+            new (data) T(args);     // try to construct, may throw
+            activate<T>();          // activate the object
         }
         
         //! query type comparison

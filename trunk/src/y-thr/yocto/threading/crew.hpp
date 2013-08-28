@@ -3,6 +3,7 @@
 
 #include "yocto/threading/condition.hpp"
 #include "yocto/threading/layout.hpp"
+#include "yocto/container/vslot.hpp"
 #include "yocto/functor.hpp"
 
 namespace yocto
@@ -23,12 +24,26 @@ namespace yocto
                 const size_t indx;   //!< rank+1, for information
                 const size_t size;   //!< size of the crew
                 lockable    &access; //!< common mutex for synchronization
+                vslot        data;   //!< any user data
                 
                 context( size_t r, size_t s, lockable &lock_ref) throw();
                 ~context() throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(context);
+            };
+            
+            class window
+            {
+            public:
+                explicit window(const context &, size_t length, size_t offset ) throw();
+                virtual ~window() throw();
+                window(const window &w) throw();
+                const size_t start;
+                const size_t count;
+                const size_t final;
+            private:
+                YOCTO_DISABLE_ASSIGN(window);
             };
             
             //! task to be run per context
@@ -45,6 +60,10 @@ namespace yocto
             
             //! call the same task for every context/thread
             void run( task &sub ) throw();
+            
+            context &       operator[](size_t rank) throw();
+            const context & operator[](size_t rank) const throw();
+            
             
             //! automatically dispatch indices
             /**
