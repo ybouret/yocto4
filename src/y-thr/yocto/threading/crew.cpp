@@ -11,6 +11,11 @@ namespace yocto
     namespace threading
     {
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // crew::context
+        //
+        ////////////////////////////////////////////////////////////////////////
         crew::context:: ~context() throw() {}
         crew::context::  context( size_t r, size_t s, lockable &lock_ref) throw() :
         rank(r),
@@ -20,6 +25,49 @@ namespace yocto
         {
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // crew::window
+        //
+        ////////////////////////////////////////////////////////////////////////
+        crew::window:: ~window() throw() {}
+        
+        crew::window:: window( const context &ctx, size_t length, size_t offset ) throw() :
+        start(0),
+        count(0),
+        final(0)
+        {
+            // initialize
+            const size_t size = ctx.size;
+            size_t       todo = length/size;
+            
+            //forward
+            for(size_t r=1;r<=ctx.rank;++r)
+            {
+                length -= todo;
+                offset += todo;
+                todo    = length/(size-r);
+            }
+            
+            (size_t &)start = offset;
+            (size_t &)count = todo;
+            (size_t &)final = (start+count)-1;
+            
+        }
+        
+        crew::window:: window( const window &w ) throw() :
+        start(w.start),
+        count(w.count),
+        final(w.final)
+        {
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // crew::member
+        //
+        ////////////////////////////////////////////////////////////////////////
         namespace
         {
             //! lacunar class for by-hand construction
@@ -84,7 +132,7 @@ nthr(0)
             {
                 destruct(--ctx);
             }
-
+            
         }
         
         
@@ -324,6 +372,19 @@ nthr(0)
             //-- everybody is done
             //------------------------------------------------------------------
             access.unlock();
+        }
+        
+        
+        crew::context & crew:: operator[](size_t rank) throw()
+        {
+            assert(rank<size);
+            return _cast::from<context>(wksp,woff)[rank];
+        }
+        
+        const crew::context & crew:: operator[](size_t rank) const throw()
+        {
+            assert(rank<size);
+            return _cast::from<context>((void*)wksp,woff)[rank];
         }
         
         

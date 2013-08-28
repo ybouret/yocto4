@@ -14,7 +14,7 @@ namespace yocto
 	{
 		static const char fmt[] = "strconv::to_size(invalid char '%c') for <%s>";
 		if( !ctx )        ctx   = "";
-		assert( txt.size() > 0 );
+		if( txt.size() <= 0 ) throw libc::exception( EINVAL, "strconv::to_size(empty string)");
 		size_t ans = 0;
 		for( size_t i=0; i < txt.size(); ++i )
 		{
@@ -45,7 +45,7 @@ namespace yocto
 	{
 		static const char fmt[] = "strconv::to_int(invalid char '%c') for <%s>";
 		if( !ctx )        ctx   = "";
-		assert( txt.size() > 0 );
+		if( txt.size() <= 0 ) throw libc::exception( EINVAL, "strconv::to_int(empty string)");
 		const size_t n   =  txt.size();
 		size_t       i   = 0;
 		bool         neg = false;
