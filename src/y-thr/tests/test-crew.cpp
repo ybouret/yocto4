@@ -11,52 +11,18 @@ class Sum
 {
 public:
     
-    class Worker
-    {
-    public:
-        explicit Worker() : start(0), count(0), final(0)
-        {
-        }
-        ~Worker() throw() {}
-        
-        typedef shared_ptr<Worker> Ptr;
-        
-        size_t start, count, final;
-        
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(Worker);
-    };
-    
-    vector<Worker::Ptr> workers;
     const array<double> *pA, *pB;
-    array<double>   *pC;
+    array<double>       *pC;
     
-    inline Sum( const threading::crew &tc) :  workers(tc.size,as_capacity), pA(0), pB(0), pC(0)
+    inline Sum() :
+    pA(0), pB(0), pC(0)
     {
-        for(size_t i=1; i <= tc.size;++i)
-        {
-            const Worker::Ptr p( new Worker() );
-            workers.push_back(p);
-        }
     }
     
     inline ~Sum() throw()
     {
     }
     
-    void dispatch( const threading::crew &mt, const size_t N )
-    {
-        mt.dispatch<vector<Worker::Ptr>,size_t>(workers, 1, N);
-    }
-    
-    void display() const
-    {
-        for( size_t i=1; i <= workers.size();++i)
-        {
-            const Worker        &w = *workers[i];
-            std::cerr << "worker #" << i << ": " << w.start << " -> " << w.final << ": #=" << w.count << std::endl;
-        }
-    }
     
     void run( threading::crew::context &ctx )
     {
@@ -65,7 +31,8 @@ public:
         assert(pA);
         assert(pB);
         assert(pC);
-        const Worker        &w = *workers[ ctx.indx ];
+        
+        const threading::crew::window &w = ctx.data.as<threading::crew::window>();
         const array<double> &A = *pA;
         const array<double> &B = *pB;
         array<double>       &C = *pC;
@@ -98,10 +65,15 @@ YOCTO_UNIT_TEST_IMPL(crew)
     }
     
     threading::crew mt;
+    mt.dispatch<threading::crew::window>(N, 1);
+    for(size_t i=0;i<mt.size;++i)
+    {
+        const threading::crew::window &w = mt[i].as<threading::crew::window>();
+        std::cerr << "\t-- thread #" << mt.size << "." << i << " : " << w.start << " -> " << w.final << " #=" << w.count << std::endl;
+    }
+    
     std::cerr << "Now in main program" << std::endl;
-    Sum s(mt);
-    s.dispatch(mt, N);
-    s.display();
+    Sum s;
     
     threading::crew::task t( &s, & Sum::run );
     
@@ -147,5 +119,9 @@ YOCTO_UNIT_TEST_IMPL(cwin)
         std::cerr << "win #" << i << " : " << win.start << " => " << win.final << ", #=" << win.count << std::endl;
         ctx.data.make<threading::crew::window>(win);
     }
+    
+    team.dispatch<threading::crew::window>(length,1);
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

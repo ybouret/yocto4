@@ -21,7 +21,8 @@ namespace yocto
         rank(r),
         indx(rank+1),
         size(s),
-        access(lock_ref)
+        access(lock_ref),
+        data()
         {
         }
         
