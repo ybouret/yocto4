@@ -32,7 +32,7 @@ public:
         assert(pB);
         assert(pC);
         
-        const threading::crew::window &w = ctx.data.as<threading::crew::window>();
+        const threading::crew::window &w = ctx.as<threading::crew::window>();
         const array<double> &A = *pA;
         const array<double> &B = *pB;
         array<double>       &C = *pC;
@@ -117,7 +117,7 @@ YOCTO_UNIT_TEST_IMPL(cwin)
         threading::crew::context       &ctx = team[i];
         const threading::crew::window   win(ctx,length,0);
         std::cerr << "win #" << i << " : " << win.start << " => " << win.final << ", #=" << win.count << std::endl;
-        ctx.data.make<threading::crew::window>(win);
+        ctx.make<threading::crew::window>(win);
     }
     
     team.dispatch<threading::crew::window>(length,1);

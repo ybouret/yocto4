@@ -8,56 +8,56 @@ namespace yocto
     
     bool vslot:: is_allocated() const throw()
     {
-        if( size > 0 )
+        if( size_ > 0 )
         {
-            assert(data!=0);
+            assert(data_!=0);
             return true;
         }
         else
         {
-            assert(0==data);
+            assert(0==data_);
             return false;
         }
     }
     
     bool vslot:: is_active() const throw()
     {
-        if(type!=0)
+        if(type_!=0)
         {
             assert(is_allocated());
-            assert(kill!=0);
+            assert(kill_!=0);
             return true;
         }
         else
         {
-            assert(0==kill);
+            assert(0==kill_);
             return false;
         }
     }
     
     void vslot:: allocate( size_t n )
     {
-        assert(0==size);
-        assert(0==data);
-        assert(0==kill);
-        assert(0==type);
+        assert(0==size_);
+        assert(0==data_);
+        assert(0==kill_);
+        assert(0==type_);
         if(n>0)
         {
-            data = object:: operator new(n);
-            size = n;
+            data_ = object:: operator new(n);
+            size_ = n;
         }
     }
 
     
     void vslot:: deallocate() throw()
     {
-        assert(0==type);
-        assert(0==kill);
+        assert(0==type_);
+        assert(0==kill_);
         if(is_allocated())
         {
-            object:: operator delete(data,size);
-            data = 0;
-            size = 0;
+            object:: operator delete(data_,size_);
+            data_ = 0;
+            size_ = 0;
         }
     }
     
@@ -65,12 +65,12 @@ namespace yocto
     {
         if(is_active())
         {
-            kill(data);
-            kill = 0;
-            type = 0;
+            kill_(data_);
+            kill_ = 0;
+            type_ = 0;
         }
-        assert(0==kill);
-        assert(0==type);
+        assert(0==kill_);
+        assert(0==type_);
     }
     
     void vslot:: release() throw()
@@ -82,7 +82,7 @@ namespace yocto
     void vslot:: prepare_for(size_t n)
     {
         free();
-        if(n>size)
+        if(n>size_)
         {
             deallocate();
             allocate(n);
@@ -96,19 +96,19 @@ namespace yocto
     }
     
     vslot:: vslot() throw() :
-    size(0),
-    data(0),
-    type(0),
-    kill(0)
+    size_(0),
+    data_(0),
+    type_(0),
+    kill_(0)
     {
     }
     
     const std::type_info * vslot:: info() const throw()
     {
-        return type;
+        return type_;
     }
     
-    size_t vslot:: bytes() const throw() { return size; }
+    size_t vslot:: bytes() const throw() { return size_; }
     
     
 }
