@@ -1,6 +1,8 @@
 #include "yocto/threading/crew.hpp"
 #include "yocto/threading/thread.hpp"
 #include "yocto/sys/hw.hpp"
+#include "yocto/code/round.hpp"
+#include "yocto/code/cast.hpp"
 #include <iostream>
 
 namespace yocto
@@ -40,8 +42,9 @@ activ(0),               \
 built(0),               \
 proc(0),                \
 stop( false ),          \
-wlen( size * sizeof(member) ),\
-wksp( memory::kind<memory::global>::acquire(wlen) ),\
+woff( memory::align(size*sizeof(member) )         ), \
+wlen( memory::align(size*sizeof(context)) + woff  ), \
+wksp( memory::kind<memory::global>::acquire(wlen) ), \
 nthr(0)
         
         crew:: crew() :
@@ -64,8 +67,30 @@ nthr(0)
             terminate();
         }
         
+        void crew:: create_contexts() throw()
+        {
+            context *ctx = _cast::from<context>(wksp,woff);
+            for(size_t i=0;i<size;++i)
+            {
+                new ( &ctx[i] ) context(i,size,access);
+            }
+            
+        }
+        
+        void crew:: delete_contexts() throw()
+        {
+            context *ctx = _cast::from<context>(wksp,woff)+size;
+            for(size_t i=size;i>0;--i)
+            {
+                destruct(--ctx);
+            }
+
+        }
+        
+        
         void crew:: initialize()
         {
+            create_contexts();
             try
             {
                 //----------------------------------------------------------
@@ -145,6 +170,7 @@ nthr(0)
             }
             
             std::cerr << "[crew::cleanup]" << std::endl;
+            delete_contexts();
             member *p = static_cast<member*>(wksp);
             while(nthr>0)
             {
@@ -198,8 +224,10 @@ nthr(0)
             // Entering the engine
             //
             //--------------------------------------------------------------
-            context ctx(rank,size,access);
-            { scoped_lock guard(access); std::cerr << "[crew::engine] start thread " << size << "." << rank << std::endl; }
+            assert(rank<size);
+            context &ctx = _cast::from<context>(wksp,woff)[rank];
+            
+            { scoped_lock guard(access); std::cerr << "[crew::engine] start thread " << ctx.size << "." << ctx.rank << std::endl; }
             
             
             

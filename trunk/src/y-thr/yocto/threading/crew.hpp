@@ -70,17 +70,18 @@ namespace yocto
             
             
         private:
-            mutex      access; //!< shared mutex
-            condition  enter;  //!< cycle synchro
-            condition  leave;  //!< main thread wait on it
-            size_t     ready;  //!< availability
-            size_t     activ;  //!< detect end of work
-            size_t     built;  //!< for terminate
-            task      *proc;   //!< job to do
-            bool       stop;   //!< to shutdown threads
-            size_t     wlen;   //!< memory length
-            void      *wksp;   //!< memory workspace
-            size_t     nthr;   //!< for ctor/dtor
+            mutex        access; //!< shared mutex
+            condition    enter;  //!< cycle synchro
+            condition    leave;  //!< main thread wait on it
+            size_t       ready;  //!< availability
+            size_t       activ;  //!< detect end of work
+            size_t       built;  //!< for terminate
+            task        *proc;   //!< job to do
+            bool         stop;   //!< to shutdown threads
+            const size_t woff;   //!< offset for contexts
+            size_t       wlen;   //!< memory length for internal data + contexts
+            void        *wksp;   //!< memory workspace
+            size_t       nthr;   //!< for ctor/dtor
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(crew);
             void   initialize();
@@ -90,6 +91,9 @@ namespace yocto
             void   engine( size_t rank ) throw();
             
             static void launch(void *args) throw();
+            
+            void create_contexts() throw();
+            void delete_contexts() throw();
         };
         
     }
