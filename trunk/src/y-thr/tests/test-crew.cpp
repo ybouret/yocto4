@@ -8,51 +8,55 @@
 
 using namespace yocto;
 
-class Sum
-{
-public:
+namespace {
     
-    const array<double> *pA, *pB;
-    array<double>       *pC;
-    
-    inline Sum() :
-    pA(0), pB(0), pC(0)
+    class Sum
     {
-    }
-    
-    inline ~Sum() throw()
-    {
-    }
-    
-    
-    void run( threading::context &ctx )
-    {
-        //{ scoped_lock guard( ctx.access ); std::cerr << "Sum::run " << ctx.rank << std::endl; }
+    public:
         
-        assert(pA);
-        assert(pB);
-        assert(pC);
+        const array<double> *pA, *pB;
+        array<double>       *pC;
         
-        const threading::window &w = ctx.as<threading::window>();
-        const array<double> &A = *pA;
-        const array<double> &B = *pB;
-        array<double>       &C = *pC;
-        
-        const size_t i0 = w.start;
-        const size_t i1 = w.final;
-        for( size_t iter=1; iter <= 10; ++iter)
+        inline Sum() :
+        pA(0), pB(0), pC(0)
         {
-            for( size_t i=i1; i >= i0; --i )
+        }
+        
+        inline ~Sum() throw()
+        {
+        }
+        
+        
+        void run( threading::context &ctx )
+        {
+            //{ scoped_lock guard( ctx.access ); std::cerr << "Sum::run " << ctx.rank << std::endl; }
+            
+            assert(pA);
+            assert(pB);
+            assert(pC);
+            
+            const threading::window &w = ctx.as<threading::window>();
+            const array<double> &A = *pA;
+            const array<double> &B = *pB;
+            array<double>       &C = *pC;
+            
+            const size_t i0 = w.start;
+            const size_t i1 = w.final;
+            for( size_t iter=1; iter <= 10; ++iter)
             {
-                C[i] = A[i] + B[i];
+                for( size_t i=i1; i >= i0; --i )
+                {
+                    C[i] = A[i] + B[i];
+                }
             }
         }
-    }
+        
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(Sum);
+    };
     
-    
-private:
-    YOCTO_DISABLE_COPY_AND_ASSIGN(Sum);
-};
+}
 
 #include "yocto/code/rand.hpp"
 
@@ -126,3 +130,57 @@ YOCTO_UNIT_TEST_IMPL(cwin)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+namespace {
+    class Lazy
+    {
+    public:
+        explicit Lazy() throw() {}
+        virtual ~Lazy() throw() {}
+        
+        
+        void run( threading::context &ctx ) throw()
+        {
+            const double dt = ctx.as<double>();
+            wtime::sleep(dt);
+        }
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(Lazy);
+    };
+}
+
+YOCTO_UNIT_TEST_IMPL(lazy)
+{
+    double sleep_total = 1.0;
+    
+    threading::crew team;
+    const double dt = sleep_total / team.size;
+    
+    for(size_t i=0;i<team.size;++i)
+    {
+        team[i].make<double>(dt);
+    }
+    
+    Lazy lazy;
+    threading::crew::task tsk( &lazy, & Lazy::run );
+    
+    const size_t CYCLES = 10;
+    wtime chrono;
+    double ell = 0;
+    for(size_t i=1; i <= CYCLES; ++i)
+    {
+        std::cerr << "Cycle " << i << std::endl;
+        std::cerr.flush();
+        chrono.start();
+        team.run(tsk);
+        ell += chrono.query();
+    }
+    std::cerr << "Average time=" << ell/CYCLES << std::endl;
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+
+
