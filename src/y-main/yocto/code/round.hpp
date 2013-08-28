@@ -41,4 +41,12 @@
 #define YOCTO_U32_FOR_SIZE(N) ( YOCTO_ROUND4(N) >> 2 )
 #define YOCTO_U32_FOR_ITEM(T) YOCTO_U32_FOR_SIZE(sizeof(T))
 
+namespace yocto
+{
+    namespace memory
+    {
+        inline size_t align( size_t n ) throw() { return YOCTO_MEMALIGN(n); }
+    }
+}
+
 #endif
