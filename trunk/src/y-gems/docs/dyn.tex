@@ -1,6 +1,6 @@
 \documentclass[aps,twocolumn]{revtex4}
 \usepackage{graphicx}
-\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{amssymb,amsfonts,amsmath}
 \usepackage{chemarr}
 \usepackage{bm}
 \usepackage{pslatex}
@@ -88,5 +88,21 @@ where
 	\dot{\mymat{J}} = \partial_{\vec{q}} \dot{\vec{C}}
 \end{equation}
 is the Jacobian of $\dot{\vec{C}}$ with respect to $\vec{q}$.
+
+We end up with
+\begin{equation}
+	\mymat{J}\mymat{W}\vec{Y} = 
+	-\mymat{J}\mymat{W}\vec{F} - \dot{\mymat{J}}\dot{\vec{q}}
+\end{equation}
+
+\subsection{Not Working Constraints}
+Since the virtual forces are not working, they must be orthogonal to the legal velocities: the Eq. \eqref{eq:J}
+shows that they are a linear combination of the rows of $\mymat{J}$.
+There exists a $M$ dimensional vector $\vec{\lambda}$ 
+of Lagrange multipliers
+such that
+\begin{equation}
+	\vec{Y} = \mytrn{\mymat{J}}\vec{\lambda}
+\end{equation}
 
 \end{document}
