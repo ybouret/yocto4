@@ -1,0 +1,92 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+%\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+%\newcommand{\mytrn}[1]{{#1}^{\mathrm{t}}}
+\newcommand{\mytrn}[1]{{\!\!~^{\mathsf{t}}{#1}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\half}{\sfrac{1}{2}}
+
+\begin{document}
+\title{Dynamics}
+
+\section{Notations}
+Let us have a system with $N$ particles, so that we have a $3N$-dimensional
+vector $\vec{q}$ of positions and a vector $\dot{\vec{q}}$ of velocities.
+We assume that we can compute the force field $\vec{F}$ such that
+\begin{equation}
+	\ddot{\vec{q}} = \mymat{W} \vec{F}
+\end{equation}
+we $\mymat{W}$ is the tensorized mass inverse matrix.
+
+\section{Newtonian Dynamics}
+
+\subsection{Problem}
+At step $n$, we know $\vec{q}_n$, $\dot{\vec{q}}_n$ and $\ddot{\vec{q}}_n = \mymat{W} \vec{F}_n$.
+How do we compute $\vec{q}_{n+1}$ after a time step $\tau$ ?
+
+\subsection{Velocity Verlet}
+This is a two step mechanism.
+\begin{enumerate}
+	\item
+	Compute $\ddot{\vec{q}}_n = \mymat{W} \vec{F}_n$ then 
+	upgrade the positions and the velocities with
+	\begin{align}
+	\dot{\vec{q}}_{n+\half} & = \dot{\vec{q}}_{n} + \dfrac{1}{2} \tau \ddot{\vec{q}}_n \\
+	\vec{q}_{n+1}           & = \vec{q}_{n}       + \tau \dot{\vec{q}}_{n} + \dfrac{1}{2}{\tau^2} \ddot{\vec{q}}_n
+\end{align}
+
+	\item 
+	Evaluate $\ddot{\vec{q}}_{n+\half} = \mymat{W} \vec{F}_{n+\half}$  using $\dot{\vec{q}}_{n+\half}$ and $\vec{q}_{n+1}$ 
+	then complete
+	\begin{equation}
+		\dot{\vec{q}}_{n+1} = \dot{\vec{q}}_{n+\half} + \dfrac{1}{2} \tau \ddot{\vec{q}}_{n+\half}
+	\end{equation}
+
+\end{enumerate}
+
+For conservative system, the Velocity Verlet algorithm is precise to the order 2, and there is
+no need to re-compute the forces after the velocity completion step.
+
+\section{Holomorphic Constraints}
+\subsection{Legal positions}
+
+Let us assume that we have a set of $M$ holomorphic constraints, namely we want
+\begin{equation}
+	\label{eq:C}
+	\vec{C}\left(\vec{q}\right) = \vec{0}.
+\end{equation}
+
+\subsection{Legal velocities}
+Accordingly, the time derivatives of Eq. \eqref{eq:C} are all zero.
+Especially
+\begin{equation}
+	\label{eq:J}
+	\mymat{J}\dot{\vec{q}} = \vec{0}
+\end{equation}
+where $\mymat{J}$ is the $M\times 3N$ Jacobian of $\vec{C}$ with respect to $\vec{q}$.
+The Eq. \eqref{eq:J} already defines a set of \textbf{legal} velocities.
+
+\subsection{Legal dynamics}
+We assume that the set of constraints produces a set of internal forces $\vec{Y}$ so that
+\begin{equation}
+	\ddot{\vec{q}} = \mymat{W} \left( \vec{F} + \vec{Y} \right).
+\end{equation}
+The derivative of Eq. \eqref{eq:J} yields
+\begin{equation}
+	\vec{0} = \dot{\mymat{J}}\dot{\vec{q}} + \mymat{J}\ddot{\vec{q}}
+\end{equation}
+where
+\begin{equation}
+	\dot{\mymat{J}} = \partial_{\vec{q}} \dot{\vec{C}}
+\end{equation}
+is the Jacobian of $\dot{\vec{C}}$ with respect to $\vec{q}$.
+
+\end{document}
