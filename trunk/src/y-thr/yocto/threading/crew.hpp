@@ -29,10 +29,17 @@ namespace yocto
                 context( size_t r, size_t s, lockable &lock_ref) throw();
                 ~context() throw();
                 
+                template <typename T>
+                T &as() throw() { return data.as<T>(); }
+                
+                template <typename T>
+                const T &as() const throw() { return data.as<T>(); }
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(context);
             };
             
+            //! can be used as a base class for data segmenting
             class window
             {
             public:
@@ -64,26 +71,16 @@ namespace yocto
             context &       operator[](size_t rank) throw();
             const context & operator[](size_t rank) const throw();
             
-            
-            //! automatically dispatch indices
-            /**
-             \param workers array of pointers to a class with some start/count/final members
-             \param offset  computing task offset (integral type)
-             \param length  computing length
-             */
-            template <class PTR_ARRAY,class U>
-            void dispatch( PTR_ARRAY &workers, U offset, size_t length ) const throw()
+            //! make windows in contexts data
+            template <typename WINDOW>
+            inline void dispatch( size_t length, size_t offset )
             {
-                assert( workers.size() == size );
+                crew &self = *this;
                 for( size_t rank=0;rank<size;++rank)
                 {
-                    const size_t i     = rank+1;
-                    const size_t count = length / ( size-rank );
-                    workers[i]->start  = offset;
-                    workers[i]->count  = count;
-                    offset += count;
-                    length -= count;
-                    workers[i]->final = offset-1;
+                    context       &ctx = self[rank];
+                    const WINDOW   win(ctx,length,offset);
+                    ctx.data.make<WINDOW>(win);
                 }
             }
             
