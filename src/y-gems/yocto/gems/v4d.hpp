@@ -21,6 +21,9 @@ namespace yocto
             inline v4d( const v4d &other ) throw() :
             x(other.x),y(other.y),z(other.z),w(other.w) {}
             
+            inline v4d( const v4d &a, const v4d &b ) throw() :
+            x(b.x-a.x), y(b.y-a.x), z(b.z-a.z), w(0) {}
+            
             inline v4d & operator=( const v4d &other ) throw()
             {
                 x = other.x;
@@ -30,7 +33,7 @@ namespace yocto
                 return *this;
             }
             
-            inline void ldz() throw()
+            inline void ldz3() throw()
             { x=y=z=0; }
             
             inline void set3(const v4d &other) throw()
