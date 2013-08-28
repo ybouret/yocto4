@@ -3,7 +3,7 @@
 
 #include "yocto/threading/condition.hpp"
 #include "yocto/threading/layout.hpp"
-#include "yocto/container/vslot.hpp"
+#include "yocto/threading/context.hpp"
 #include "yocto/functor.hpp"
 
 namespace yocto
@@ -16,35 +16,7 @@ namespace yocto
         {
         public:
             
-            //! context of current thread
-            class context : public vslot
-            {
-            public:
-                const size_t rank;   //!< 0..size-1
-                const size_t indx;   //!< rank+1, for information
-                const size_t size;   //!< size of the crew
-                lockable    &access; //!< common mutex for synchronization
-                
-                explicit context( size_t r, size_t s, lockable &lock_ref) throw();
-                virtual ~context() throw();
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(context);
-            };
             
-            //! can be used as a base class for data segmenting
-            class window
-            {
-            public:
-                explicit window(const context &, size_t length, size_t offset ) throw();
-                virtual ~window() throw();
-                window(const window &w) throw();
-                const size_t start;
-                const size_t count;
-                const size_t final;
-            private:
-                YOCTO_DISABLE_ASSIGN(window);
-            };
             
             //! task to be run per context
             typedef functor<void,TL1(context&)> task;

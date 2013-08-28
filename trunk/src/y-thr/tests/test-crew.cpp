@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/threading/crew.hpp"
+#include "yocto/threading/window.hpp"
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/sys/wtime.hpp"
@@ -24,7 +25,7 @@ public:
     }
     
     
-    void run( threading::crew::context &ctx )
+    void run( threading::context &ctx )
     {
         //{ scoped_lock guard( ctx.access ); std::cerr << "Sum::run " << ctx.rank << std::endl; }
         
@@ -32,7 +33,7 @@ public:
         assert(pB);
         assert(pC);
         
-        const threading::crew::window &w = ctx.as<threading::crew::window>();
+        const threading::window &w = ctx.as<threading::window>();
         const array<double> &A = *pA;
         const array<double> &B = *pB;
         array<double>       &C = *pC;
@@ -65,10 +66,10 @@ YOCTO_UNIT_TEST_IMPL(crew)
     }
     
     threading::crew mt;
-    mt.dispatch<threading::crew::window>(N, 1);
+    mt.dispatch<threading::window>(N, 1);
     for(size_t i=0;i<mt.size;++i)
     {
-        const threading::crew::window &w = mt[i].as<threading::crew::window>();
+        const threading::window &w = mt[i].as<threading::window>();
         std::cerr << "\t-- thread #" << mt.size << "." << i << " : " << w.start << " -> " << w.final << " #=" << w.count << std::endl;
     }
     
@@ -114,13 +115,13 @@ YOCTO_UNIT_TEST_IMPL(cwin)
     threading::crew team;
     for(size_t i=0;i<team.size;++i)
     {
-        threading::crew::context       &ctx = team[i];
-        const threading::crew::window   win(ctx,length,0);
+        threading::context       &ctx = team[i];
+        const threading::window   win(ctx,length,0);
         std::cerr << "win #" << i << " : " << win.start << " => " << win.final << ", #=" << win.count << std::endl;
-        ctx.make<threading::crew::window>(win);
+        ctx.make<threading::window>(win);
     }
     
-    team.dispatch<threading::crew::window>(length,1);
+    team.dispatch<threading::window>(length,1);
     
     
 }
