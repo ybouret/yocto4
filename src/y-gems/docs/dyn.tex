@@ -33,7 +33,7 @@ At step $n$, we know $\vec{q}_n$, $\dot{\vec{q}}_n$ and $\ddot{\vec{q}}_n = \mym
 How do we compute $\vec{q}_{n+1}$ after a time step $\tau$ ?
 
 \subsection{Velocity Verlet}
-This is a two step mechanism.
+This is a two steps mechanism.
 \begin{enumerate}
 	\item
 	Compute $\ddot{\vec{q}}_n = \mymat{W} \vec{F}_n$ then 
@@ -52,7 +52,7 @@ This is a two step mechanism.
 
 \end{enumerate}
 
-For conservative system, the Velocity Verlet algorithm is precise to the order 2, and there is
+For conservative systems, the Velocity Verlet algorithm is precise to the order 2, and there is
 no need to re-compute the forces after the velocity completion step.
 
 \section{Holomorphic Constraints}
@@ -91,6 +91,7 @@ is the Jacobian of $\dot{\vec{C}}$ with respect to $\vec{q}$.
 
 We end up with
 \begin{equation}
+\label{eq:JW}
 	\mymat{J}\mymat{W}\vec{Y} = 
 	-\mymat{J}\mymat{W}\vec{F} - \dot{\mymat{J}}\dot{\vec{q}}
 \end{equation}
@@ -102,7 +103,12 @@ There exists a $M$ dimensional vector $\vec{\lambda}$
 of Lagrange multipliers
 such that
 \begin{equation}
-	\vec{Y} = \mytrn{\mymat{J}}\vec{\lambda}
+	\vec{Y} = \mytrn{\mymat{J}}\vec{\lambda}.
+\end{equation}
+
+Using Eq. \eqref{eq:JW}, one finds
+\begin{equation}
+	\mymat{J}\mymat{W} \mytrn{\mymat{J}}\vec{\lambda} = -\left(\mymat{J}\mymat{W}\vec{F} + \dot{\mymat{J}}\dot{\vec{q}}\right)
 \end{equation}
 
 \end{document}
