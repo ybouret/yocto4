@@ -56,7 +56,8 @@ For conservative systems, the Velocity Verlet algorithm is precise to the order 
 no need to re-compute the forces after the velocity completion step.
 
 \section{Holomorphic Constraints}
-\subsection{Legal positions}
+\subsection{Continuous description}
+\subsubsection{Legal positions}
 
 Let us assume that we have a set of $M$ holomorphic constraints, namely we want
 \begin{equation}
@@ -64,7 +65,7 @@ Let us assume that we have a set of $M$ holomorphic constraints, namely we want
 	\vec{C}\left(\vec{q}\right) = \vec{0}.
 \end{equation}
 
-\subsection{Legal velocities}
+\subsubsection{Legal velocities}
 Accordingly, the time derivatives of Eq. \eqref{eq:C} are all zero.
 Especially
 \begin{equation}
@@ -74,7 +75,7 @@ Especially
 where $\mymat{J}$ is the $M\times 3N$ Jacobian of $\vec{C}$ with respect to $\vec{q}$.
 The Eq. \eqref{eq:J} already defines a set of \textbf{legal} velocities.
 
-\subsection{Legal dynamics}
+\subsubsection{Legal dynamics}
 We assume that the set of constraints produces a set of internal forces $\vec{Y}$ so that
 \begin{equation}
 	\ddot{\vec{q}} = \mymat{W} \left( \vec{F} + \vec{Y} \right).
@@ -96,7 +97,7 @@ We end up with
 	-\mymat{J}\mymat{W}\vec{F} - \dot{\mymat{J}}\dot{\vec{q}}
 \end{equation}
 
-\subsection{Not Working Constraints}
+\subsubsection{Not Working Constraints}
 Since the virtual forces are not working, they must be orthogonal to the legal velocities: the Eq. \eqref{eq:J}
 shows that they are a linear combination of the rows of $\mymat{J}$.
 There exists a $M$ dimensional vector $\vec{\lambda}$ 
@@ -110,5 +111,40 @@ Using Eq. \eqref{eq:JW}, one finds
 \begin{equation}
 	\mymat{J}\mymat{W} \mytrn{\mymat{J}}\vec{\lambda} = -\left(\mymat{J}\mymat{W}\vec{F} + \dot{\mymat{J}}\dot{\vec{q}}\right)
 \end{equation}
+
+\subsection{Discrete description}
+
+We modify the Velocity Verlet algorithm.
+We start from
+$$
+	\vec{C}(\vec{q}_n)=\vec{0}  
+$$
+and
+$$
+ \mymat{J} \dot{\vec{q}}_n = \vec{0}
+$$
+and we evaluate the extern forces $\vec{F}_n$.
+
+\begin{enumerate}
+\item 
+	Compute 
+	$$
+		\vec{q}_{n+1} = \vec{q}_{n} + \tau \dot{\vec{q}}_n + \dfrac{1}{2} \tau^2 \mymat{W}\left( \vec{F}_n + \vec{Y}_n\right)
+	$$
+	with 
+	$$
+		\vec{Y}_n = \mytrn{\mymat{J}}\vec{\lambda}_n
+	$$
+	such that
+	$$
+		\vec{C}(\vec{q}_{n+1}) = \vec{0}.
+	$$
+	Then compute
+	$$
+		\dot{\vec{q}}_{n+\half}  = \dot{\vec{q}}_{n} + \dfrac{1}{2} \tau  \mymat{W}\left( \vec{F}_n + \vec{Y}_n\right)
+	$$
+\item Evalutate $\vec{F}_{n+\half}$ using $\vec{q}_{n+1}$ and $\dot{\vec{q}}_{n+\half}$.
+\end{enumerate}
+
 
 \end{document}
