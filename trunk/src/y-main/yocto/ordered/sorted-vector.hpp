@@ -33,7 +33,6 @@ namespace yocto
 		explicit sorted_vector() throw() :
 		hmem_(), size_(0), maxi_(0), addr_(NULL), item_(addr_-1), comp_()
 		{
-			//YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 		}
 		
 		explicit sorted_vector( size_t n, const as_capacity_t & ) :
@@ -42,7 +41,6 @@ namespace yocto
 		item_(addr_-1),
 		comp_()
 		{
-			//YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 		}
 		
 		sorted_vector( const sorted_vector &other ) :
@@ -53,7 +51,6 @@ namespace yocto
 		item_(addr_-1),
 		comp_()
 		{
-			//YOCTO_STATIC_CHECK(support_bitwise_ops<mutable_type>::value,invalid_type);
 			other.duplicate_into( *this );
 		}
 		
