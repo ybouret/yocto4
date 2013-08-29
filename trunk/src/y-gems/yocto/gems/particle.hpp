@@ -18,7 +18,8 @@ namespace yocto
             v3d<T> r; T w;
             v3d<T> v; T m;
             v3d<T> a;
-            uint_t id;
+            uint_t id;     //!< for specific forces
+            uint_t type;   //!< for generic forces
             
              particle() throw();
             ~particle() throw();
