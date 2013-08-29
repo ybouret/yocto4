@@ -2,27 +2,28 @@
 #define YOCTO_GEMS_PARTICLE_INCLUDED 1
 
 #include "yocto/gems/types.hpp"
+#include "yocto/container/vslot.hpp"
 #include "yocto/math/v3d.hpp"
 
 namespace yocto
 {
     namespace gems
     {
-     
+        
         using namespace math;
         
         template <typename T>
-        class particle
+        class particle : public vslot
         {
         public:
             v3d<T> r; T w;
             v3d<T> v; T m;
             v3d<T> a;
-            uint_t id;     //!< for specific forces
-            uint_t type;   //!< for generic forces
+            const uint_t id;     //!< for specific forces
+            const uint_t type;   //!< for generic forces
             
-             particle() throw();
-            ~particle() throw();
+            explicit particle() throw();
+            virtual ~particle() throw();
             
         };
     }

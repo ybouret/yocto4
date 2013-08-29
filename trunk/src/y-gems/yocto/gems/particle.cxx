@@ -16,7 +16,8 @@ namespace yocto
         r(), w( numeric<real_t>::one ),
         v(), m( numeric<real_t>::one ),
         a(),
-        id(0)
+        id(0),
+        type(0)
         {
         }
         
