@@ -1,11 +1,13 @@
-#ifndef YOCTO_GEMS_INVENTORY_INCLUDED
-#define YOCTO_GEMS_INVENTORY_INCLUDED 1
+#ifndef YOCTO_GEMS_FACTORY_INCLUDED
+#define YOCTO_GEMS_FACTORY_INCLUDED 1
 
 #include "yocto/gems/types.hpp"
 #include "yocto/container/vslot.hpp"
 #include "yocto/string.hpp"
 
 #include "yocto/associative/set.hpp"
+#include "yocto/associative/map.hpp"
+
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/counted.hpp"
 
@@ -22,6 +24,7 @@ namespace yocto
             const string name;
             const uint_t type;
             const T      mass;
+            const T      inv_mass;
             
             explicit record(const string &particle_name,
                             const uint_t  particle_type,
@@ -38,17 +41,27 @@ namespace yocto
         };
         
         template <typename T>
-        class inventory
+        class factory
         {
         public:
-            explicit inventory();
-            virtual ~inventory() throw();
+            explicit factory();
+            virtual ~factory() throw();
             
             record<T> & declare( const string &name, const uint_t type, const T mass);
             
+            record<T> & operator[](const string &name);
+            record<T> & operator[](const char   *name);
+            
+            const record<T> & operator[](const string &name) const;
+            const record<T> & operator[](const char   *name) const;
+
+            
         private:
-            typename record<T>::db db;
-            YOCTO_DISABLE_COPY_AND_ASSIGN(inventory);
+            typedef  map<uint_t,string,key_hasher<uint_t,hashing::sfh>,allocator> type_mapper;
+            typename record<T>::db records;
+            type_mapper            typeIDs;
+            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(factory);
         };
         
         
