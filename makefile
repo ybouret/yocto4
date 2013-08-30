@@ -6,10 +6,11 @@ clean:
 	@echo "-- removing sdk" && rm -Rf sdk
 	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo *.raw
 	@echo "-- cleaning auxiliary files"
-	@${MAKE} -s -C samples            clean
-	@${MAKE} -s -C src/y-aqueous/docs clean
-	@${MAKE} -s -C src/y-mk/docs      clean
+	@${MAKE} -s -C samples             clean
+	@${MAKE} -s -C src/y-aqueous/docs  clean
+	@${MAKE} -s -C src/y-mk/docs       clean
 	@${MAKE} -s -C src/y-chemical/docs clean
+	@${MAKE} -s -C src/y-gems/docs     clean
 	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
 
 
