@@ -88,7 +88,7 @@ where
 \begin{equation}
 	\dot{\mymat{J}} = \partial_{\vec{q}} \dot{\vec{C}}
 \end{equation}
-is the Jacobian of $\dot{\vec{C}}$ with respect to $\vec{q}$.
+is the Jacobian of $\dot{\vec{C}}$ with respect to $\vec{q}$: $\dot{\mymat{J}}$ depends on both $\vec{q}$ and $\vec{v}$.
 
 We end up with
 \begin{equation}
@@ -128,18 +128,32 @@ $$
  \mymat{J}_n \vec{v}_n = \vec{0}
 $$
 and we evaluated the extern forces $\vec{F}_n$.
-We also computed  $\mymat{J}_n$, $\dot{\mymat{J}}_n$ and $\vec{G}_n$.
+We also computed  $\mymat{J}_n$, $\dot{\mymat{J}}_n$ and 
+\begin{equation}
+	\vec{G}_n = - \mytrn{\mymat{J}}_n \left(\mymat{J}_n\mymat{W} \mytrn{\mymat{J}}_n\right)^{-1}\left(\mymat{J}_n\mymat{W}\vec{F} + \dot{\mymat{J}}_n\vec{v}_n\right)
+\end{equation}
+
 \begin{enumerate}
 \item	
 The legal positions are computed by solving
 	\begin{equation}
 		\vec{C}\left(\vec{q}_n + \tau \vec{v}_n + \dfrac{1}{2}\tau^2\underbrace{\mymat{W}(\vec{F}_n+\vec{G}_n+\mytrn{\mymat{J}}_n \vec{\lambda}_c)}_{\vec{a}_n}\right) = \vec{0}
 	\end{equation}
-We now have $\vec{q}_{n+1}$ and we can compute $\mymat{J}_{n+1}$.
+We now have $\vec{q}_{n+1}$ and we can compute $\mymat{J}_{n+1}$ and $\dot{\mymat{J}}_{n+\half}$.
 The half step velocities are
 \begin{equation}
 	\vec{v}_{n+\half} = 
-	\left(\mymat{I}_{3N} - \mymat{W}\mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\mymat{J}_{n+1} \right) \left( \vec{v}_{n} + \dfrac{1}{2} \tau \vec{a}_n \right)
+	\left(\mymat{I}_{3N} - \mymat{W}\mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\mymat{J}_{n+1} \right) \left( \vec{v}_{n} + \frac{1}{2} \tau \vec{a}_n \right)
+\end{equation}
+
+\item We can now evaluate $\vec{F}_{n+\half}$  using $\vec{v}_{n+\half}$ and $\vec{q}_{n+1}$.
+We also have
+\begin{equation}
+\vec{G}_{n+\half} = - \mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\left(\mymat{J}_{n+1}\mymat{W}\vec{F}_{n+\half} + \dot{\mymat{J}}_{n+\half}\vec{v}_{n+\half}\right)
+\end{equation}
+so that we complete
+\begin{equation}
+	\vec{v}_{n+1} = \left(\mymat{I}_{3N} - \mymat{W}\mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\mymat{J}_{n+1} \right) \left( \vec{v}_{n+\half} + \frac{1}{2}\tau \mymat{W} \left(\vec{F}_{n+\half}+\vec{G}_{n+\half}\right)\right)
 \end{equation}
 
 \end{enumerate}
