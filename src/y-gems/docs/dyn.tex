@@ -1,4 +1,4 @@
-\documentclass[aps,twocolumn]{revtex4}
+\documentclass[aps,onecolumn]{revtex4}
 \usepackage{graphicx}
 \usepackage{amssymb,amsfonts,amsmath}
 \usepackage{chemarr}
@@ -104,7 +104,7 @@ There exists a $M$ dimensional vector $\vec{\lambda}$
 of Lagrange multipliers
 such that
 \begin{equation}
-	\vec{Y} = \mytrn{\mymat{J}}\vec{\lambda}.
+	\vec{G} = \mytrn{\mymat{J}}\vec{\lambda}.
 \end{equation}
 
 Using Eq. \eqref{eq:JW}, one finds
@@ -127,7 +127,23 @@ and
 $$
  \mymat{J}_n \vec{v}_n = \vec{0}
 $$
-and we evaluate the extern forces $\vec{F}_n$.
+and we evaluated the extern forces $\vec{F}_n$.
+We also computed  $\mymat{J}_n$, $\dot{\mymat{J}}_n$ and $\vec{G}_n$.
+\begin{enumerate}
+\item	
+The legal positions are computed by solving
+	\begin{equation}
+		\vec{C}\left(\vec{q}_n + \tau \vec{v}_n + \dfrac{1}{2}\tau^2\underbrace{\mymat{W}(\vec{F}_n+\vec{G}_n+\mytrn{\mymat{J}}_n \vec{\lambda}_c)}_{\vec{a}_n}\right) = \vec{0}
+	\end{equation}
+We now have $\vec{q}_{n+1}$ and we can compute $\mymat{J}_{n+1}$.
+The half step velocities are
+\begin{equation}
+	\vec{v}_{n+\half} = 
+	\left(\mymat{I}_{3N} - \mymat{W}\mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\mymat{J}_{n+1} \right) \left( \vec{v}_{n} + \dfrac{1}{2} \tau \vec{a}_n \right)
+\end{equation}
+
+\end{enumerate}
+
 
 
 
