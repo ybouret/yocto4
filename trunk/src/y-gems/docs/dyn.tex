@@ -1,4 +1,4 @@
-\documentclass[aps,onecolumn]{revtex4}
+\documentclass[aps,twocolumn]{revtex4}
 \usepackage{graphicx}
 \usepackage{amssymb,amsfonts,amsmath}
 \usepackage{chemarr}
@@ -13,152 +13,114 @@
 \newcommand{\mytrn}[1]{{\!\!~^{\mathsf{t}}{#1}}}
 \newcommand{\myvec}[1]{\overrightarrow{#1}}
 \newcommand{\half}{\sfrac{1}{2}}
+\newcommand{\q}{\vec{q}}
+\newcommand{\dq}{\dot{\q}}
+\newcommand{\ddq}{\ddot{\q}}
+\newcommand{\C}{\vec{C}}
+\newcommand{\J}{\mymat{J}}
+\newcommand{\dJ}{\dot{\J}}
+\newcommand{\tJ}{\mytrn{\J}}
+\newcommand{\G}{\vec{G}}
+\newcommand{\W}{\mymat{W}}
 
 \begin{document}
 \title{Dynamics}
 
 \section{Notations}
 Let us have a system with $N$ particles, so that we have a $3N$-dimensional
-vector $\vec{q}$ of positions and a vector $\vec{v}$ of velocities.
+vector $\q$ of positions and a vector $\dq$ of velocities.
 We assume that we can compute the force field $\vec{F}$ such that
 \begin{equation}
-	\vec{a} = \mymat{W} \vec{F}
+	\label{eq:newton}
+	\ddq = \mymat{W} \vec{F}
 \end{equation}
 where $\mymat{W}$ is the tensorized mass inverse matrix.
 
 \section{Newtonian Dynamics}
 
 \subsection{Problem}
-At step $n$, we know $\vec{q}_n$, $\vec{v}_n$ and $\vec{a}_n = \mymat{W} \vec{F}_n$.
-How do we compute $\vec{q}_{n+1}$ after a time step $\tau$ ?
+At step $n$, we know $\q_n$, $\dq_n$ and $\ddq_n = \mymat{W} \vec{F}_n$.
+How do we compute $\q_{n+1}$ and $\dq_{n+1}$after a time step $\tau$ ?
 
-\subsection{Velocity Verlet}
-This is a two steps mechanism.
+\subsection{Velocity Verlet Derivation for Holonomic Forces}
+We update $\q_n$ by Taylor expansion during $\tau$ with
+\begin{equation}
+	\label{eq:forward}
+	\q_{n+1} = \q_n + \tau \dq_n + \frac{1}{2}\tau^2 \ddq_n.
+\end{equation}
+Since we can evaluate $\vec{F}_{n+1}$ and $\ddq_{n+1}=\mymat{W}\vec{F}_{n+1}$, the backward Taylor expansion
+gives
+\begin{equation}
+	\label{eq:backward}
+	\q_n = \q_{n+1} - \tau \dq_{n+1} + \frac{1}{2}\tau^2 \ddq_{n+1}.
+\end{equation}
+The sum of Eq. \eqref{eq:forward} and Eq. \eqref{eq:backward} gives 
+\begin{equation}
+	\label{eq:vv}
+	\dq_{n+1} = \dq_{n} + \dfrac{1}{2}\mymat{W}\left\lbrack\vec{F}_n + \vec{F}_{n+1}\right\rbrack
+\end{equation}
+
+\subsection{Velocity Verlet for Generic Forces}
+We use the following sequence.
+Given $\q_n$ and $\dq_n$, we compute $\vec{F}_n=\vec{F}(\q_n,\dq_n)$.
+Then for each time step we perform the following sequence.
 \begin{enumerate}
-	\item
-	Compute $\vec{a}_n = \mymat{W} \vec{F}_n$ then 
-	upgrade the positions and the velocities with
-	\begin{align}
-	\vec{v}_{n+\half} & = \vec{v}_{n} + \dfrac{1}{2} \tau \vec{a}_n \\
-	\vec{q}_{n+1}           & = \vec{q}_{n}       + \tau \vec{v}_{n} + \dfrac{1}{2}{\tau^2} \vec{a}_n
-	\end{align}
-
-	\item 
-	Evaluate $\vec{a}_{n+\half} = \mymat{W} \vec{F}_{n+\half}$  using $\vec{v}_{n+\half}$ and $\vec{q}_{n+1}$ 
-	then complete
-	\begin{equation}
-		\vec{v}_{n+1} = \vec{v}_{n+\half} + \dfrac{1}{2} \tau \vec{a}_{n+\half}
+	\item Evaluate \begin{equation} 
+	\dq_{n+\half} = \dq_n + \frac{1}{2}\tau \mymat{W}\vec{F}_n
 	\end{equation}
-
+	Advance
+	\item \begin{equation}
+	\q_{n+1}  = \q_n + \tau \dq_{n+\half}.
+	\end{equation} 
+	The potential energy is already available.
+	\item Evaluate $\vec{F}_{n+\half}=\vec{F}(\q_{n+1},\dq_{n+\half})$
+	\item Update
+	\begin{equation}
+		\dq_{n+1} = \dq_{n+\half} + \frac{1}{2} \tau \W \vec{F}_{n+\half}.
+	\end{equation}
+	The kinetic energy if available.
+	\item Update
+	\begin{equation}
+		\vec{F}_{n+1}=\vec{F}(\q_{n+1},\dq_{n+1})
+	\end{equation}
 \end{enumerate}
 
-For conservative systems, the Velocity Verlet algorithm is precise to the order 2, and there is
-no need to re-compute the forces after the velocity completion step.
-
-\section{Holomorphic Constraints}
-\subsection{Continuous description}
-\subsubsection{Legal positions}
-
-Let us assume that we have a set of $M$ holomorphic constraints, namely we want
+\section{Holonomic Constraints}
+\subsection{Definitions and Notations}
+We assume that we have a set of $M$ constraints forming the $M$ dimensional vector
 \begin{equation}
-	\label{eq:C}
-	\vec{C}\left(\vec{q}\right) = \vec{0}.
+	\C(\q) = \vec{0}.
 \end{equation}
-
-\subsubsection{Legal velocities}
-Accordingly, the time derivatives of Eq. \eqref{eq:C} are all zero.
-Especially
+The successive time derivatives must be zero as well, which produces the legal velocities
 \begin{equation}
-	\label{eq:J}
-	\mymat{J}\vec{v} = \vec{0}
+	\J\dq = \vec{0}
 \end{equation}
-where $\mymat{J}$ is the $M\times 3N$ Jacobian of $\vec{C}$ with respect to $\vec{q}$.
-The Eq. \eqref{eq:J} already defines a set of \textbf{legal} velocities.
-
-\subsubsection{Legal dynamics}
-We assume that the set of constraints produces a set of internal forces $\vec{G}$ so that
+where $\J$ is the Jacobian of $\C$ with respect to $\q$ and is a $M\times3N$ matrix.
+We get the legal accelerations
 \begin{equation}
-	\vec{a} = \mymat{W} \left( \vec{F} + \vec{G} \right).
+	\dJ\dq + \J\ddq = \vec{0}
 \end{equation}
-The derivative of Eq. \eqref{eq:J} yields
+\subsection{Virtual Forces}
+Since the constraints are internal to the system, they doesn't work but they produce some internal
+forces $\G$. So
 \begin{equation}
-	\vec{0} = \dot{\mymat{J}}\vec{v} + \mymat{J}\vec{a}
+\forall \dq, \; \G\cdot\dq = 0.
 \end{equation}
-where
+Accordingly, $\G$ is a combination of the rows of $J$
 \begin{equation}
-	\dot{\mymat{J}} = \partial_{\vec{q}} \dot{\vec{C}}
+	\G = \tJ \vec{\lambda}.
 \end{equation}
-is the Jacobian of $\dot{\vec{C}}$ with respect to $\vec{q}$: $\dot{\mymat{J}}$ depends on both $\vec{q}$ and $\vec{v}$.
-
-We end up with
+Let us write
 \begin{equation}
-\label{eq:JW}
-	\mymat{J}\mymat{W}\vec{G} = 
-	-\mymat{J}\mymat{W}\vec{F} - \dot{\mymat{J}}\vec{v}
+	\ddq = \W \left( \vec{F} + \G \right)
 \end{equation}
-
-\subsubsection{Not Working Constraints}
-Since the virtual forces are not working, they must be orthogonal to the legal velocities: the Eq. \eqref{eq:J}
-shows that they are a linear combination of the rows of $\mymat{J}$.
-There exists a $M$ dimensional vector $\vec{\lambda}$ 
-of Lagrange multipliers
-such that
+we obtain
 \begin{equation}
-	\vec{G} = \mytrn{\mymat{J}}\vec{\lambda}.
+	\J \W \tJ \vec{\lambda} = -\left\lbrack \J\W\vec{F} + \dJ \dq \right\rbrack
 \end{equation}
-
-Using Eq. \eqref{eq:JW}, one finds
-\begin{equation}
-	\mymat{J}\mymat{W} \mytrn{\mymat{J}}\vec{\lambda} = -\left(\mymat{J}\mymat{W}\vec{F} + \dot{\mymat{J}}\vec{v}\right)
-\end{equation}
-and finally
-\begin{equation}
-	\vec{G} = - \mytrn{\mymat{J}}\left(\mymat{J}\mymat{W} \mytrn{\mymat{J}}\right)^{-1}\left(\mymat{J}\mymat{W}\vec{F} + \dot{\mymat{J}}\vec{v}\right)
-\end{equation}
-
-\subsection{Discrete description}
-
-We modify the Velocity Verlet algorithm.
-We start from
-$$
-	\vec{C}(\vec{q}_n)=\vec{0}  
-$$
 and
-$$
- \mymat{J}_n \vec{v}_n = \vec{0}
-$$
-and we evaluated the extern forces $\vec{F}_n$.
-We also computed  $\mymat{J}_n$, $\dot{\mymat{J}}_n$ and 
 \begin{equation}
-	\vec{G}_n = - \mytrn{\mymat{J}}_n \left(\mymat{J}_n\mymat{W} \mytrn{\mymat{J}}_n\right)^{-1}\left(\mymat{J}_n\mymat{W}\vec{F} + \dot{\mymat{J}}_n\vec{v}_n\right)
+	\G = - \tJ \left(\J \W \tJ \right)^{-1}\left\lbrack \J\W\vec{F} + \dJ \dq \right\rbrack.
 \end{equation}
-
-\begin{enumerate}
-\item	
-The legal positions are computed by solving
-	\begin{equation}
-		\vec{C}\left(\vec{q}_n + \tau \vec{v}_n + \dfrac{1}{2}\tau^2\underbrace{\mymat{W}(\vec{F}_n+\vec{G}_n+\mytrn{\mymat{J}}_n \vec{\lambda}_c)}_{\vec{a}_n}\right) = \vec{0}
-	\end{equation}
-We now have $\vec{q}_{n+1}$ and we can compute $\mymat{J}_{n+1}$ and $\dot{\mymat{J}}_{n+\half}$.
-The half step velocities are
-\begin{equation}
-	\vec{v}_{n+\half} = 
-	\left(\mymat{I}_{3N} - \mymat{W}\mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\mymat{J}_{n+1} \right) \left( \vec{v}_{n} + \frac{1}{2} \tau \vec{a}_n \right)
-\end{equation}
-
-\item We can now evaluate $\vec{F}_{n+\half}$  using $\vec{v}_{n+\half}$ and $\vec{q}_{n+1}$.
-We also have
-\begin{equation}
-\vec{G}_{n+\half} = - \mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\left(\mymat{J}_{n+1}\mymat{W}\vec{F}_{n+\half} + \dot{\mymat{J}}_{n+\half}\vec{v}_{n+\half}\right)
-\end{equation}
-so that we complete
-\begin{equation}
-	\vec{v}_{n+1} = \left(\mymat{I}_{3N} - \mymat{W}\mytrn{\mymat{J}}_{n+1} \left(\mymat{J}_{n+1}\mymat{W} \mytrn{\mymat{J}}_{n+1}\right)^{-1}\mymat{J}_{n+1} \right) \left( \vec{v}_{n+\half} + \frac{1}{2}\tau \mymat{W} \left(\vec{F}_{n+\half}+\vec{G}_{n+\half}\right)\right)
-\end{equation}
-
-\end{enumerate}
-
-
-
 
 \end{document}
