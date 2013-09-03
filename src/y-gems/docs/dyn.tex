@@ -137,8 +137,20 @@ the $\A$ is definite positive, and the Cholesky algorithm can be used to solve t
 \section{Discrete Newtonian Dynamics}
 
 \subsection{Legalizing the phase space}
-Let us assume that $\q$ and $\dq$ are almost satisfying respectively Eq. \eqref{eq:C} and Eq. \eqref{eq:J}.
-
-
+Let us assume that $\q_k$ and $\dq_{k}$ are almost satisfying respectively Eq. \eqref{eq:C} and Eq. \eqref{eq:J}.
+To change the positions, one can move the particles only along $\W\tJ_k \vec{\lambda}_k$ to respect the weighted constraints physics.
+We obtain
+\begin{equation}
+	\label{eq:legal_q}
+	\q_{k+1} = \q_k - \W \tJ_k \left(\J_k \W \tJ_k \right)^{-1} \C(\q_k)
+\end{equation}
+and we can compute $\J_{k+1}$.
+We the update $\dq_k$ to
+\begin{equation}
+	\label{eq:legal_dq}
+	\dq_{k+1} = \dq_k - \W\tJ_{k+1} \left(\J_k \W \tJ_k \right)^{-1} \J_{k+1} \dq_k.
+\end{equation}
+We repeat this until the desired tolerance on $\q_{k+1}$ is achieved.
+At the end of the loop, a valid input phase space $\q_{n}$, $\dq_{n}$ and $\J_n$ is available.
 
 \end{document}
