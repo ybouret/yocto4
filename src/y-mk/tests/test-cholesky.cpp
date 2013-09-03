@@ -30,7 +30,7 @@ void perform()
 			//std::cerr << "M=" << M <<  std::endl;
 		}
 		vector<T> d(n,0);
-		if(cholesky<T>::apply( M, d ))
+		if(cholesky<T>::build( M, d ))
 		{
 			//std::cerr << "d=" << d << std::endl;
 			vector<T> b(n,0);
