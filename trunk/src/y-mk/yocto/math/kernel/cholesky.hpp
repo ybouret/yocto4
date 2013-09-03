@@ -1,5 +1,5 @@
-#ifndef YOCTO_CHOLESKY_INCLUDED
-#define YOCTO_CHOLESKY_INCLUDED 1
+#ifndef YOCTO_MATH_CHOLESKY_INCLUDED
+#define YOCTO_MATH_CHOLESKY_INCLUDED 1
 
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/array.hpp"
@@ -18,7 +18,7 @@ namespace yocto
 			 the result is stored in the lower triangle,
 			 but the diagonal into diag.
 			 */
-			static bool apply( matrix<T> &a, array<T> &diag ) throw();
+			static bool build( matrix<T> &a, array<T> &diag ) throw();
 			
 			//! after cholesky::apply(a,diag), b[1..n] and x[1..n], may be the same
 			static void solve( const matrix<T> &a, const array<T> &diag, const array<T> &b, array<T> &x ) throw(); 

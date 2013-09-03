@@ -9,7 +9,7 @@ namespace yocto
 	{
 	
 		template <>
-		bool cholesky<real_t>:: apply( matrix<real_t> &a, array<real_t> &diag ) throw()
+		bool cholesky<real_t>:: build( matrix<real_t> &a, array<real_t> &diag ) throw()
 		{
 			assert( a.rows == diag.size() );
 			assert( a.is_square() );
@@ -24,7 +24,7 @@ namespace yocto
 					
 					if( i == j )
 					{
-						if( sum <= 0.0 )
+						if( sum <= numeric<real_t>::zero )
 							return false;
 						diag[i] = Sqrt( sum );
 					}
