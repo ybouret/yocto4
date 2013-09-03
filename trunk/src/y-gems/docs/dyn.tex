@@ -22,6 +22,7 @@
 \newcommand{\tJ}{\mytrn{\J}}
 \newcommand{\G}{\vec{G}}
 \newcommand{\W}{\mymat{W}}
+\newcommand{\A}{\mymat{A}}
 
 \begin{document}
 \title{Dynamics}
@@ -88,10 +89,12 @@ Then for each time step we perform the following sequence.
 \subsection{Definitions and Notations}
 We assume that we have a set of $M$ constraints forming the $M$ dimensional vector
 \begin{equation}
+\label{eq:C}
 	\C(\q) = \vec{0}.
 \end{equation}
 The successive time derivatives must be zero as well, which produces the legal velocities
 \begin{equation}
+	\label{eq:J}
 	\J\dq = \vec{0}
 \end{equation}
 where $\J$ is the Jacobian of $\C$ with respect to $\q$ and is a $M\times3N$ matrix.
@@ -122,7 +125,20 @@ and
 	\G = - \tJ \left(\J \W \tJ \right)^{-1}\left\lbrack \J\W\vec{F} + \dJ \dq \right\rbrack.
 \end{equation}
 
-\subsection{Numerical Drift Correction}
+\subsection{Algebraic Considerations}
+The matrix
+\begin{equation}
+	\A  = \J \W \tJ 
+\end{equation}
+is the Gram matrix of $\J\W^{1/2}$.
+Provided that the rows of $\J$ are independent, namely $\text{rank}(\J)=M$, and likely that the $M$ constraints are independent, 
+the $\A$ is definite positive, and the Cholesky algorithm can be used to solve the linear problem.
+
+\section{Discrete Newtonian Dynamics}
+
+\subsection{Legalizing the phase space}
+Let us assume that $\q$ and $\dq$ are almost satisfying respectively Eq. \eqref{eq:C} and Eq. \eqref{eq:J}.
+
 
 
 \end{document}
