@@ -16,11 +16,13 @@ namespace yocto
 			const size_t n = a.rows;
 			for( size_t i=1; i <= n; ++i )
 			{
+                matrix<real_t>::row &a_i = a[i];
 				for( size_t j=i; j <=n; ++j )
 				{
-					real_t sum = a[i][j];
+                    matrix<real_t>::row &a_j = a[j];
+					real_t sum = a_i[j];
 					for( size_t k=i-1;k>0;--k) 
-						sum -= a[i][k] * a[j][k];
+						sum -= a_i[k] * a_j[k];
 					
 					if( i == j )
 					{
@@ -30,7 +32,7 @@ namespace yocto
 					}
 					else
 					{
-						a[j][i] = sum / diag[i];
+						a_j[i] = sum / diag[i];
 					}
 				}
 			}
@@ -62,6 +64,28 @@ namespace yocto
 				x[i] = sum / diag[i];
 			}
 		}
+        
+        template <>
+        void cholesky<real_t>:: Gram( matrix<real_t> &a, const matrix<real_t> &J)
+        {
+            const size_t n = a.rows;
+            assert(a.is_square());
+            assert(J.rows == a.rows);
+            const size_t m = J.cols;
+            for(size_t i=n;i>0;--i)
+            {
+                for(size_t j=i;i>0;--j)
+                {
+                    real_t sum = 0;
+                    for(size_t k=m;k>0;--k)
+                    {
+                        sum += J[i][k] * J[j][k];
+                    }
+                    a[i][j] = a[j][i] = sum;
+                }
+            }
+        }
+
 			
 	}
 	

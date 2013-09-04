@@ -21,7 +21,10 @@ namespace yocto
 			static bool build( matrix<T> &a, array<T> &diag ) throw();
 			
 			//! after cholesky::apply(a,diag), b[1..n] and x[1..n], may be the same
-			static void solve( const matrix<T> &a, const array<T> &diag, const array<T> &b, array<T> &x ) throw(); 
+			static void solve( const matrix<T> &a, const array<T> &diag, const array<T> &b, array<T> &x ) throw();
+            
+            //! a = J.J', symmetric
+            static void Gram( matrix<T> &a, const matrix<T> &J );
 		};
 		
 		
