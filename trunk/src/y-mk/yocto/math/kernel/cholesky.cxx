@@ -24,7 +24,7 @@ namespace yocto
 					
 					if( i == j )
 					{
-						if( sum <= numeric<real_t>::zero )
+						if( sum <= 0 )
 							return false;
 						diag[i] = Sqrt( sum );
 					}

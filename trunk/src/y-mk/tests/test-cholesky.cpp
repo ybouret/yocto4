@@ -39,14 +39,10 @@ void perform()
             const matrix<T> A = M;
             if(cholesky<T>::build( M, d ))
             {
-                //std::cerr << "d=" << d << std::endl;
-                
                 for( size_t i=1; i <= n; ++i ) b[i] = T(0.5) - alea<T>();
-                //std::cerr << "b=" << b << std::endl;
                 cholesky<T>::solve( M,d,b,x);
-                //std::cerr << "x=" << x << std::endl;
-                algebra<T>::mul(r,A,x);
-                algebra<T>::sub(r,b);
+                algebra<T>::mul(r,A,x); // compute estimated solution
+                algebra<T>::sub(r,b);   // compute residue
                 std::cerr << "norm" << n << "=" << algebra<T>::norm2(r) << std::endl;
             }
             else {
