@@ -23,6 +23,8 @@
 \newcommand{\G}{\vec{G}}
 \newcommand{\W}{\mymat{W}}
 \newcommand{\A}{\mymat{A}}
+\newcommand{\JW}{\hat{\mymat{J}}}
+\newcommand{\tJW}{\mytrn{\JW}}
 
 \begin{document}
 \title{Dynamics}
@@ -128,11 +130,11 @@ and
 \subsection{Algebraic Considerations}
 The matrix
 \begin{equation}
-	\A  = \J \W \tJ 
+	 \J \W \tJ 
 \end{equation}
 is the Gram matrix of $\J\W^{1/2}$.
 Provided that the rows of $\J$ are independent, namely $\text{rank}(\J)=M$, and likely that the $M$ constraints are independent, 
-the $\A$ is definite positive, and the Cholesky algorithm can be used to solve the linear problem.
+then this is a definite positive, and the Cholesky algorithm can be used to solve the linear problem.
 
 \section{Discrete Newtonian Dynamics}
 
@@ -177,6 +179,19 @@ Starting from a valid $\q_n$, we compute $\J_n$, and we must also have a valid $
 	$$
 	\item Legalize $\dq_{n+1}^{p}$ to $\dq_{n+1}$ as shown in Eq. \eqref{eq:legal_dq}
 \end{enumerate}
+
+\section{Practical Implementation}
+
+\subsection{Notations}
+Every time a matrix $\J_n$ is compute then $\JW_n=\J_n\W$ is computed, as well as a representation of $\A_n = \left(\JW_n\tJ_n\right)^{-1}$.
+An upgrade of positions is
+$$
+	\q_{k+1} = \q_{k} - \tJW_{k} \A_{k} \C\left(\q_{k}\right).
+$$
+A legalization of the velocities is
+$$
+	\dq_{k+1} = \dq_{k} - \tJW_{k+1} \A_{k+1} \J_{k+1} \dq_{k}
+$$
 
 
 \end{document}
