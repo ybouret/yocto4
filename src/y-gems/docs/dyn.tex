@@ -139,18 +139,44 @@ the $\A$ is definite positive, and the Cholesky algorithm can be used to solve t
 \subsection{Legalizing the phase space}
 Let us assume that $\q_k$ and $\dq_{k}$ are almost satisfying respectively Eq. \eqref{eq:C} and Eq. \eqref{eq:J}.
 To change the positions, one can move the particles only along $\W\tJ_k \vec{\lambda}_k$ to respect the weighted constraints physics.
-We obtain
+We obtain some \textbf{upgraded positions}
 \begin{equation}
 	\label{eq:legal_q}
 	\q_{k+1} = \q_k - \W \tJ_k \left(\J_k \W \tJ_k \right)^{-1} \C(\q_k)
 \end{equation}
 and we can compute $\J_{k+1}$.
-We the update $\dq_k$ to
+We the update $\dq_k$ to some \textbf{legal velocities}
 \begin{equation}
 	\label{eq:legal_dq}
 	\dq_{k+1} = \dq_k - \W\tJ_{k+1} \left(\J_k \W \tJ_k \right)^{-1} \J_{k+1} \dq_k.
 \end{equation}
 We repeat this until the desired tolerance on $\q_{k+1}$ is achieved.
 At the end of the loop, a valid input phase space $\q_{n}$, $\dq_{n}$ and $\J_n$ is available.
+
+\subsection{Constrained Velocity Verlet}
+
+Starting from a valid $\q_n$, we compute $\J_n$, and we must also have a valid $\dq_n$ such that $\J_n\dq_n=\vec{0}$.
+
+\begin{enumerate}
+	\item Evaluate $\vec{F}_n = \vec{F}(\q_n,\dq_n)$ and $\dJ_n$.
+	\item Evaluate $\G_n = -\tJ_n \left(\J_n \W \tJ_n \right)^{-1}\left\lbrack \J_n\W\vec{F}_n + \dJ_n \dq_n \right\rbrack$
+	\item Evaluate the predicted phase space
+	\begin{align*}
+	\dq_{n+\half}^p & = \dq_n + \frac{1}{2} \tau \W \left(\vec{F}_n + \G_n \right) \\
+	\q_{n+\half}^p  & = \q_{n} + \tau \dq_{n+\half}^p
+	\end{align*}
+	\item Legalize $\left(\q_{n+\half}^p,\dq_{n+\half}^p\right)$ to $\left(\q_{n+1},\dq_{n+\half}\right)$. Now $\J_{n+1}$ is available.
+	\item Evaluate $\vec{F}_{n+\half}=\vec{F}\left(\q_{n+1},\dq_{n+\half}\right)$, $\dJ_{n+\half}$, 
+	and 
+	$$
+	\G_{n+\half}=-\tJ_{n+1} \left(\J_{n+1} \W \tJ_{n+1} \right)^{-1}\left\lbrack \J_{n+1}\W\vec{F}_{n+\half} + \dJ_{n+\half} \dq_{n+\half} \right\rbrack
+	$$
+	\item Update
+	$$
+		\dq_{n+1}^{p} = \dq_{n+\half} + \frac{1}{2} \tau \W\left(\vec{F}_{n+\half} + \vec{G}_{n+\half}\right)
+	$$
+	\item Legalize $\dq_{n+1}^{p}$ to $\dq_{n+1}$ as shown in Eq. \eqref{eq:legal_dq}
+\end{enumerate}
+
 
 \end{document}
