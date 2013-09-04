@@ -183,15 +183,82 @@ Starting from a valid $\q_n$, we compute $\J_n$, and we must also have a valid $
 \section{Practical Implementation}
 
 \subsection{Notations}
-Every time a matrix $\J_n$ is compute then $\JW_n=\J_n\W$ is computed, as well as a representation of $\A_n = \left(\JW_n\tJ_n\right)^{-1}$.
+Every time a matrix $\J_n$ is computed then  a representation of $\A_n = \left(\J_n \W\tJ_n\right)^{-1}$.\\
+
 An upgrade of positions is
 $$
-	\q_{k+1} = \q_{k} - \tJW_{k} \A_{k} \C\left(\q_{k}\right).
+	\q_{k+1} = \q_{k} - \W \tJ_k  \A_{k} \C\left(\q_{k}\right).
 $$
+
 A legalization of the velocities is
 $$
-	\dq_{k+1} = \dq_{k} - \tJW_{k+1} \A_{k+1} \J_{k+1} \dq_{k}
+	\dq_{k+1} = \dq_{k} - \W \tJ_{k+1}  \A_{k+1} \J_{k+1} \dq_{k}
 $$
+
+Since $\W$ is a diagonal matrix, some dedicated multiplications shall take place.
+
+\subsection{Algorithm Implementation}
+
+\subsubsection{Initialization}
+We assume that we start from a valid phase space $\left(\q_n,\dq_n\right)$.
+We compute $\J_n$, $\A_n$ and collect $\vec{F}_n = \vec{F}\left(\q_n,\dq_n\right)$
+The initial kinetic energy, potential energy and Virial are computed.
+
+\subsubsection{Predicted Half Step}
+\label{pred0}
+Compute $\dJ_n$.
+Then deduce $$\vec{F}^c_n=\vec{F}_n - \tJ_n\A_n\left(\J_n\W\vec{F}_n + \dJ_n\dq_n\right)$$
+
+Use the predicted Velocity Verlet update with
+$$
+	\dq^p_{n+\half} = \dq_{n} + \frac{1}{2} \tau \W \vec{F}^c_{n}
+$$
+then
+$$
+	\q^p_{n+\half} = \q_{n} + \tau \dq^p_{n+\half}
+$$
+
+\subsubsection{Legalized Half-Step}
+After at least one round, we have the matrix $\J_{n+1}$ and $\A_{n+1}$, and the
+valid phase space $\left(\q_{n+1},\dq_{n+\half}\right)$.
+
+\subsubsection{Midpoint Forces Evaluation}
+Evaluate $\dJ_{n+\half}$ then collect
+$$
+	\vec{F}_{n+\half} = \vec{F}\left(\q_{n+1},\dq_{n+\half}\right)
+$$
+and compute
+$$
+	\vec{F}^c_{n+\half}=\vec{F}_{n+\half} - \tJ_{n+1}\A_{n+1}\left(\J_{n+1}\W\vec{F}_{n+\half} + \dJ_{n+\half}\dq_{n+\half}\right)
+$$
+
+\subsubsection{Predicted Full Step}
+Update
+$$
+	\dq^p_{n+1} = \dq^p_{n+\half} + \frac{1}{2} \tau \vec{F}^c_{n+\half}
+$$
+
+\subsubsection{Legalized Full Step}
+\label{final}
+This is a one step correction with
+$$
+	\dq_{n+1} = \dq_{n+1}^p - \W\tJ_{n+1} \A_{n+1} \J_{k+1} \dq_{n+1}^p.
+$$
+The compute
+$$
+	\vec{F}_{n+1} = \vec{F}\left(\q_{n+1},\dq_{n+1}\right)
+$$
+
+To go further, iterate to step \ref{pred0}.
+
+\subsection{Comments}
+
+\subsubsection{Constraints Clustering}
+Obviously, the constraints are most of the time grouped into clusters contribute
+independently to their involved particles. This shall greatly reduce the dimensionality of the matrices.
+
+\subsubsection{Holonomic Forces}
+When the forces don't depend on the velocities, then the forces evaluation in step \ref{final} is unnecessary.
 
 
 \end{document}
