@@ -86,6 +86,38 @@ namespace yocto
             }
         }
 
+        template <>
+		bool cholesky<real_t>:: inv_build( matrix<real_t> &a, array<real_t> &inv_diag ) throw()
+		{
+			assert( a.rows == inv_diag.size() );
+			assert( a.is_square() );
+			const size_t n = a.rows;
+			for( size_t i=1; i <= n; ++i )
+			{
+                matrix<real_t>::row &a_i = a[i];
+				for( size_t j=i; j <=n; ++j )
+				{
+                    matrix<real_t>::row &a_j = a[j];
+					real_t sum = a_i[j];
+					for( size_t k=i-1;k>0;--k)
+						sum -= a_i[k] * a_j[k];
+					
+					if( i == j )
+					{
+						if( sum <= 0 )
+							return false;
+						inv_diag[i] = REAL(1.0) / Sqrt( sum );
+					}
+					else
+					{
+						a_j[i] = sum * inv_diag[i];
+					}
+				}
+			}
+			return true;
+		}
+
+        
 			
 	}
 	

@@ -25,6 +25,14 @@ namespace yocto
             
             //! a = J.J', symmetric
             static void Gram( matrix<T> &a, const matrix<T> &J );
+            
+            //! a.is_square() and diag.size() == a.rows
+			/**
+			 only the upper part of a is required, and
+			 the result is stored in the lower triangle,
+			 but the diagonal into diag.
+			 */
+			static bool inv_build( matrix<T> &a, array<T> &inv_diag ) throw();
 		};
 		
 		
