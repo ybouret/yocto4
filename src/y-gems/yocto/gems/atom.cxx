@@ -1,5 +1,5 @@
 #include "yocto/math/ztype.hpp"
-#include "yocto/gems/atom.hpp"
+#include "yocto/gems/residue.hpp"
 
 namespace yocto
 {
@@ -11,8 +11,8 @@ namespace yocto
         }
         
         template <>
-        atom<real_t>:: atom( word_t u, word_t t) throw() :
-        identifier(u,t), r(),v(),a(),m(0),w(0)
+        atom<real_t>:: atom( const parent_type &res, word_t u, word_t t) throw() :
+        identifier(u,t), r(),v(),a(),m(0),w(0), parent(res)
         {
         }
         
