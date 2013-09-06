@@ -20,7 +20,7 @@ namespace yocto
 			 */
 			static bool build( matrix<T> &a, array<T> &diag ) throw();
 			
-			//! after cholesky::apply(a,diag), b[1..n] and x[1..n], may be the same
+			//! after cholesky::build(a,diag), b[1..n] and x[1..n], may be the same
 			static void solve( const matrix<T> &a, const array<T> &diag, const array<T> &b, array<T> &x ) throw();
             
             //! a = J.J', symmetric
@@ -30,9 +30,12 @@ namespace yocto
 			/**
 			 only the upper part of a is required, and
 			 the result is stored in the lower triangle,
-			 but the diagonal into diag.
+			 but the inverse diagonal into invdiag.
 			 */
 			static bool inv_build( matrix<T> &a, array<T> &inv_diag ) throw();
+            
+            //! after cholesky::inv_build(a,inv_diag), b[1..n] and x[1..n], may be the same
+			static void inv_solve( const matrix<T> &a, const array<T> &inv_diag, const array<T> &b, array<T> &x ) throw();
 		};
 		
 		

@@ -150,7 +150,7 @@ and we can compute $\J_{k+1}$.
 We the update $\dq_k$ to some \textbf{legal velocities}
 \begin{equation}
 	\label{eq:legal_dq}
-	\dq_{k+1} = \dq_k - \W\tJ_{k+1} \left(\J_k \W \tJ_k \right)^{-1} \J_{k+1} \dq_k.
+	\dq_{k+1} = \dq_k - \W\tJ_{k+1} \left(\J_{k+1} \W \tJ_{k+1} \right)^{-1} \J_{k+1} \dq_k.
 \end{equation}
 We repeat this until the desired tolerance on $\q_{k+1}$ is achieved.
 At the end of the loop, a valid input phase space $\q_{n}$, $\dq_{n}$ and $\J_n$ is available.
@@ -183,7 +183,8 @@ Starting from a valid $\q_n$, we compute $\J_n$, and we must also have a valid $
 \section{Practical Implementation}
 
 \subsection{Notations}
-Every time a matrix $\J_n$ is computed then  a representation of $\A_n = \left(\J_n \W\tJ_n\right)^{-1}$.\\
+Every time a matrix $\J_n$ is computed then  a representation of $\A_n = \left(\J_n \W\tJ_n\right)^{-1}$
+must be computed as well.\\
 
 An upgrade of positions is
 $$
