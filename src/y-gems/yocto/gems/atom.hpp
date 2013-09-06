@@ -1,10 +1,9 @@
 #ifndef YOCTO_GEMS_ATOM_INCLUDED
 #define YOCTO_GEMS_ATOM_INCLUDED 1
 
-#include "yocto/gems/types.hpp"
+#include "yocto/gems/identifier.hpp"
 #include "yocto/math/v3d.hpp"
 #include "yocto/intrusive-ptr.hpp"
-#include "yocto/counted.hpp"
 
 namespace yocto
 {
@@ -13,13 +12,11 @@ namespace yocto
         using namespace math;
         
         template <typename T>
-        class atom : public object, public counted
+        class atom : public identifier
         {
         public:
             typedef intrusive_ptr<word_t,atom> ptr;
             
-            const word_t uuid;
-            const word_t type;
             v3d<T>       r;
             v3d<T>       v;
             v3d<T>       a;
@@ -30,7 +27,6 @@ namespace yocto
             virtual ~atom() throw();
             void     set_mass(T mass) throw();
             
-            const word_t & key() const throw();
             
         private:
             atom& operator=(const atom &);

@@ -12,7 +12,7 @@ namespace yocto
         
         template <>
         atom<real_t>:: atom( word_t u, word_t t) throw() :
-        uuid(u), type(t), r(),v(),a(),m(0),w(0)
+        identifier(u,t), r(),v(),a(),m(0),w(0)
         {
         }
         
@@ -24,12 +24,7 @@ namespace yocto
             (real_t &)w = 1/( (real_t &)m = mass );
         }
         
-        template <>
-        const word_t & atom<real_t>:: key() const throw()
-        {
-            return uuid;
-        }
-
+        
         
     }
     
