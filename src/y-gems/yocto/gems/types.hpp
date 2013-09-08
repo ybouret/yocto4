@@ -9,7 +9,6 @@ namespace yocto
     namespace gems
     {
         
-        typedef uint32_t                  uint_t;
         typedef uint32_t                  word_t;
         typedef memory::global::allocator allocator;
         
