@@ -13,6 +13,7 @@ namespace yocto
         {
         public:
             typedef intrusive_ptr<word_t,residue> ptr;
+            typedef vector<ptr,allocator>         group;
 
             explicit residue( word_t u, word_t t) throw();
             virtual ~residue() throw();
