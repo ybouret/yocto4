@@ -1,9 +1,7 @@
 #ifndef YOCTO_GEMS_FRAME_INCLUDED
 #define YOCTO_GEMS_FRAME_INCLUDED 1
 
-#include "yocto/gems/residue.hpp"
-#include "yocto/gems/type-table.hpp"
-#include "yocto/associative/set.hpp"
+#include "yocto/gems/library.hpp"
 
 namespace yocto
 {
@@ -15,20 +13,16 @@ namespace yocto
         public:
             typedef typename residue<T>::ptr res_p;
             typedef typename atom<T>::ptr    atm_p;
-            typedef set<word_t, res_p, key_hasher<word_t,hashing::sfh>,allocator> res_set;
-            typedef set<word_t, atm_p, key_hasher<word_t,hashing::sfh>,allocator> atm_set;
+            typedef set<word_t, res_p, key_hasher<word_t,hashing::sfh>,allocator> residue_set;
+            typedef set<word_t, atm_p, key_hasher<word_t,hashing::sfh>,allocator> atom_set;
             
             virtual ~frame() throw();
             explicit frame() throw();
             
-            type_table reslib;
-            type_table atmlib;
-            
             
             
         private:
-            
-            
+            residue_set residues_;
             YOCTO_DISABLE_COPY_AND_ASSIGN(frame);
         };
         
