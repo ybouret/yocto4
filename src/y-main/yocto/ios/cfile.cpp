@@ -85,6 +85,12 @@ namespace yocto
 				throw libc::exception( errno, "setvbuf(@%p+%u)", buf.rw(), unsigned(buf.length()) );
 			}	
 		}
+        
+        ptrdiff_t cfile:: tell() const throw()
+        {
+            assert(handle);
+            return ftell(handle);
+        }
 		
 	}
 	
