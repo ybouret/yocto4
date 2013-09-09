@@ -12,6 +12,24 @@ namespace yocto
             
         }
         
+        template <>
+        residue<real_t>:: residue( word_t u, word_t t) throw() :
+        identifier(u,t)
+        {
+        }
+        
+        
+        template <>
+        residue<real_t>:: properties:: ~properties() throw() {}
+        
+        template <>
+        residue<real_t>:: properties:: properties(word_t        t,
+                                                  const string &n) :
+        gems::properties(t,n)
+        {
+        }
+        
+        
     }
     
 }
