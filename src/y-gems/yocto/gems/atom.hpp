@@ -1,9 +1,9 @@
 #ifndef YOCTO_GEMS_ATOM_INCLUDED
 #define YOCTO_GEMS_ATOM_INCLUDED 1
 
-#include "yocto/gems/identifier.hpp"
 #include "yocto/math/v3d.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/gems/identifier.hpp"
+#include "yocto/gems/properties.hpp"
 #include "yocto/sequence/vector.hpp"
 
 namespace yocto
@@ -35,12 +35,25 @@ namespace yocto
             virtual ~atom() throw();
             void     set_mass(T mass) throw();
             
+            class properties : public gems::properties
+            {
+            public:
+                typedef intrusive_ptr<word_t,properties> ptr;
+                const T mass;
+                explicit properties(word_t t, const string &n, T m );
+                virtual ~properties() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
+            };
             
         private:
             atom& operator=(const atom &);
             atom(const atom &other) throw();
             
         };
+        
+        
         
     }
     
