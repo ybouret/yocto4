@@ -30,6 +30,8 @@ namespace yocto
 
             FILE * __get() throw();
             
+            ptrdiff_t tell() const throw();
+            
 		protected:
 			FILE      *handle;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(cfile);
