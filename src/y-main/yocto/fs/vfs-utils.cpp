@@ -189,6 +189,17 @@ namespace yocto
         
     }
     
+    void vfs::remove_extension(string &path) throw() {
+        const string  &src = path;
+        const char    *pos = get_extension( src );
+        if( pos )
+        {
+            path.trim( length_of(pos)+1 );
+        } 
+        
+    }
+    
+    
     string  vfs::to_directory( const string &path )
     {
         string temp(path);
