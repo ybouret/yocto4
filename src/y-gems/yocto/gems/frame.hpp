@@ -19,8 +19,8 @@ namespace yocto
             virtual ~frame() throw();
             explicit frame();
             
-            residue<T> & create( word_t type );
-            
+            residue<T> & add_residue( word_t type );
+            atom<T>    & add_atom(word_t type);
             
             
             array<atom_ptr>       &atoms() throw();

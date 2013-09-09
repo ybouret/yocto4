@@ -24,7 +24,7 @@ namespace yocto
         
         
         template <>
-        residue<real_t> & frame<real_t>:: create( word_t type )
+        residue<real_t> & frame<real_t>:: add_residue( word_t type )
         {
             //-- check exists
             if( lib.residues.search(type) == 0 )
