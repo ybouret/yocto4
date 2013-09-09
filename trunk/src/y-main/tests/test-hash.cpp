@@ -194,3 +194,22 @@ YOCTO_UNIT_TEST_IMPL(hcol)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/associative/key-hasher.hpp"
+
+YOCTO_UNIT_TEST_IMPL(key_hasher)
+{
+    key_hasher<string,hashing::sha1> Hash;
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/associative/sub-hasher.hpp"
+
+YOCTO_UNIT_TEST_IMPL(sub_hasher)
+{
+    sub_hasher<int, double, hashing::sha1> Hash;
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+
