@@ -81,7 +81,7 @@ namespace yocto
                 __insert_edge(edges, tr.p2, tr.p3);
                 __insert_edge(edges, tr.p3, tr.p1);
             }
-            std::cerr << "found " << edges.size << " edges on hull for " << trlist.size() << " triangles" << std::endl;
+            //std::cerr << "found " << edges.size << " edges on hull for " << trlist.size() << " triangles" << std::endl;
             h.reserve( edges.size + 1);
             //==================================================================
             // make the hull indices
