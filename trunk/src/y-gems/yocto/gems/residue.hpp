@@ -12,8 +12,7 @@ namespace yocto
         class residue : public identifier, public atom<T>::group
         {
         public:
-            typedef intrusive_ptr<word_t,residue> ptr;
-            typedef vector<ptr,allocator>         group;
+            typedef intrusive_ptr<word_t,residue> pointer;
 
             explicit residue( word_t u, word_t t) throw();
             virtual ~residue() throw();
@@ -22,7 +21,7 @@ namespace yocto
             class properties : public gems::properties
             {
             public:
-                typedef intrusive_ptr<word_t,properties> ptr;
+                typedef intrusive_ptr<word_t,properties> pointer;
                 explicit properties(word_t t, const string &n);
                 virtual ~properties() throw();
                 
