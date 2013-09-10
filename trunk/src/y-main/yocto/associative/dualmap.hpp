@@ -205,7 +205,7 @@ namespace yocto
         //======================================================================
         // find a concrete key node using the key/hkey
         //======================================================================
-        KNode *find_by_key( param_key key, const size_t hkey ) const throw()
+        inline KNode *find_by_key( param_key key, const size_t hkey ) const throw()
         {
             if(slots>0)
             {
@@ -226,7 +226,7 @@ namespace yocto
         //======================================================================
         // find a concrete key node using the subkey/hsub
         //======================================================================
-        KNode *find_by_sub( param_subkey sub, const size_t hsub ) const throw()
+        inline KNode *find_by_sub( param_subkey sub, const size_t hsub ) const throw()
         {
             if(slots>0)
             {
