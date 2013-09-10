@@ -1,7 +1,7 @@
 #ifndef YOCTO_MEMORY_RECORDS_INCLUDED
 #define YOCTO_MEMORY_RECORDS_INCLUDED 1
 
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 
 namespace yocto
 {

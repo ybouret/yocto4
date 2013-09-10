@@ -3,7 +3,6 @@
 
 #include "yocto/fs/vfs.hpp"
 #include "yocto/threading/singleton.hpp"
-#include "yocto/type-ints.hpp"
 
 namespace yocto
 {

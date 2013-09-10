@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_FIELD_INFO_INCLUDED
 #define YOCTO_SPADE_FIELD_INFO_INCLUDED 1
 
-#include "yocto/type-spec.hpp"
+#include "yocto/type/spec.hpp"
 #include "yocto/string.hpp"
 #include "yocto/spade/linear.hpp"
 

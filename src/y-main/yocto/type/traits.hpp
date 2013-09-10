@@ -6,7 +6,7 @@
 #define YOCTO_TYPE_TRAITS_INCLUDED 1
 
 
-#include "yocto/type-list.hpp"
+#include "yocto/type/list.hpp"
 
 namespace yocto
 {
@@ -220,46 +220,6 @@ namespace yocto
 		const_reference_type>::result
 		>::result parameter_type;
 		
-		
-		/** \brief container like arguments
-		 * streams, containers,..., can't contain references,
-		 * so these are the aliases used for in/out parameters passing
-		 */
-#define	YOCTO_ARGUMENTS_DECL_T                                              \
-typedef T                                        type;                      \
-typedef typename type_traits<T>::mutable_type    mutable_type;              \
-typedef const mutable_type                       const_type;                \
-typedef typename                                                            \
-yocto::select<                                                              \
-type_traits<mutable_type>::is_primitive, /* no references in containers */  \
-const_type  , /* pass primitive mutable types by const value            */  \
-const_type &  /* pass non primitive mutable types by const reference    */  \
->::result param_type
-		
-#define	YOCTO_ARGUMENTS_DECL_KEY                                           \
-typedef KEY                                      key_type;                 \
-typedef typename type_traits<KEY>::mutable_type  mutable_key;              \
-typedef const mutable_key                        const_key;                \
-typedef typename                                                           \
-yocto::select<                                                             \
-type_traits<mutable_key>::is_primitive, /* no references in containers */  \
-const_key  , /* pass primitive mutable types by const value            */  \
-const_key &  /* pass non primitive mutable types by const reference    */  \
->::result param_key
-		
-#define YOCTO_ASSOCIATIVE_KEY_T YOCTO_ARGUMENTS_DECL_T; YOCTO_ARGUMENTS_DECL_KEY
-		
-#define	YOCTO_ARGUMENTS_DECL_SUBKEY                                              \
-typedef SUBKEY                                      subkey_type;                 \
-typedef typename type_traits<SUBKEY>::mutable_type  mutable_subkey;              \
-typedef const mutable_subkey                        const_subkey;                \
-typedef typename                                                                 \
-yocto::select<                                                                   \
-type_traits<mutable_subkey>::is_primitive, /* no references in containers */     \
-const_subkey  , /* pass primitive mutable types by const value            */     \
-const_subkey &  /* pass non primitive mutable types by const reference    */     \
->::result param_subkey
-
 		
 	};
 	

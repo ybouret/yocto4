@@ -1,4 +1,4 @@
-#include "yocto/type-spec.hpp"
+#include "yocto/type/spec.hpp"
 #include <cstring>
 
 namespace yocto {

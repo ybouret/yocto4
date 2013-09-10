@@ -4,6 +4,12 @@ FILE( GLOB top_impl yocto/*.cpp)
 SET( top_srcs ${top_decl} ${top_impl} )
 INSTALL( FILES ${top_decl} DESTINATION include/yocto )
 
+FILE( GLOB type_decl yocto/type/*.hpp)
+FILE( GLOB type_impl yocto/type/*.cpp)
+SET( type_srcs ${type_decl} ${type_impl} )
+INSTALL( FILES ${type_decl} DESTINATION include/yocto/type )
+SOURCE_GROUP( type FILES ${type_srcs} )
+
 FILE( GLOB sys_decl yocto/sys/*.hpp)
 FILE( GLOB sys_impl yocto/sys/*.cpp)
 SET( sys_srcs ${sys_decl} ${sys_impl} )
@@ -139,8 +145,8 @@ SET( pack_srcs ${pack_decl} ${pack_impl} )
 INSTALL( FILES ${pack_decl} DESTINATION include/yocto/pack )
 SOURCE_GROUP( pack FILES ${pack_srcs} )
 
-SET( decl ${top_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl} ${fs_decl} ${pack_decl} ${sort_decl} ${sys_decl})
-SET( srcs ${top_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs} ${fs_srcs} ${pack_srcs} ${sort_srcs} ${sys_srcs})
+SET( decl ${top_decl} ${type_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${geom_decl} ${ramp_decl} ${fs_decl} ${pack_decl} ${sort_decl} ${sys_decl})
+SET( srcs ${top_srcs} ${type_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${geom_srcs} ${ramp_srcs} ${fs_srcs} ${pack_srcs} ${sort_srcs} ${sys_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

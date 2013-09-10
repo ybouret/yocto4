@@ -4,7 +4,7 @@
 #include "yocto/memory/pooled.hpp"
 
 #include "yocto/utest/run.hpp"
-#include "yocto/type-spec.hpp"
+#include "yocto/type/spec.hpp"
 
 #include "support.hpp"
 

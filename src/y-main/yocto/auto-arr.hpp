@@ -2,7 +2,7 @@
 #define YOCTO_AUTO_ARR_INCLUDED 1
 
 #include "yocto/memory/allocator.hpp"
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 #include "yocto/code/swap.hpp"
 
 #include <cstring>

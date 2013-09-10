@@ -1,7 +1,6 @@
 #ifndef YOCTO_XARRAY_INCLUDED 
 #define YOCTO_XARRAY_INCLUDED 1
 
-#include "yocto/type-traits.hpp"
 #include "yocto/memory/slab.hpp"
 #include "yocto/memory/embed.hpp"
 #include "yocto/code/swap.hpp"

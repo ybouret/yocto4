@@ -1,7 +1,7 @@
 #ifndef YOCTO_SPADE_VARRAY_INCLUDED
 #define YOCTO_SPADE_VARRAY_INCLUDED 1
 
-#include "yocto/type-spec.hpp"
+#include "yocto/type/spec.hpp"
 #include "yocto/spade/data-block.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/counted.hpp"

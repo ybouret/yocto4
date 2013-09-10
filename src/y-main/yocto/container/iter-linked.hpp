@@ -2,7 +2,7 @@
 #define YOCTO_CONTAINER_LINKED_ITER_INCLUDED 1
 
 #include "yocto/container/iterator.hpp"
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 #include "yocto/code/unroll.hpp"
 
 namespace yocto

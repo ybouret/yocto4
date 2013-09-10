@@ -1,7 +1,7 @@
 #ifndef YOCTO_MPK_NATURAL_INCLUDED
 #define YOCTO_MPK_NATURAL_INCLUDED 1
 
-#include "yocto/type-ints.hpp"
+#include "yocto/type/ints.hpp"
 #include "yocto/string.hpp"
 
 #include <iosfwd>

@@ -2,7 +2,7 @@
 #define YOCTO_SHARED_PTR_INCLUDED 1
 
 
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 
 namespace yocto
 {

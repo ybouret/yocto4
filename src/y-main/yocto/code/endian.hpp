@@ -1,7 +1,7 @@
 #ifndef YOCTO_CODE_ENDIAN_INCLUDED
 #define YOCTO_CODE_ENDIAN_INCLUDED 1
 
-#include "yocto/type-ints.hpp"
+#include "yocto/type/ints.hpp"
 
 #if defined(YOCTO_BYTE_ORDER)
 #	error "YOCTO_BYTE_ORDER should NOT be defined"

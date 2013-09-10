@@ -5,7 +5,7 @@
 #ifndef YOCTO_BITWISE_INCLUDED
 #define YOCTO_BITWISE_INCLUDED 1
 
-#include "yocto/type-traits.hpp"
+#include "yocto/type/traits.hpp"
 
 
 namespace yocto {

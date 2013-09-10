@@ -5,7 +5,7 @@
 #ifndef YOCTO_BINARY_INCLUDED
 #define YOCTO_BINARY_INCLUDED 1
 
-#include "yocto/type-ints.hpp"
+#include "yocto/type/ints.hpp"
 
 
 namespace yocto

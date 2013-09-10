@@ -2,7 +2,6 @@
 #define YOCTO_DATA_EXTENDER_INCLUDED 1
 
 #include "yocto/sequence/array.hpp"
-#include "yocto/type-ints.hpp"
 
 namespace yocto
 {

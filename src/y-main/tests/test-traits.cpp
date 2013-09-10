@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/type-traits.hpp"
+#include "yocto/type/traits.hpp"
 
 using namespace yocto;
 

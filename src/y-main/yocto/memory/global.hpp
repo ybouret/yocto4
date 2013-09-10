@@ -3,7 +3,7 @@
 
 #include "yocto/threading/singleton.hpp"
 #include "yocto/memory/allocator.hpp"
-#include "yocto/type-ints.hpp"
+#include "yocto/type/ints.hpp"
 
 namespace yocto
 {

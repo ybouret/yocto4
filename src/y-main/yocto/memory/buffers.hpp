@@ -3,7 +3,7 @@
 
 #include "yocto/memory/buffer.hpp"
 #include "yocto/memory/allocator.hpp"
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 #include <cstring>
 
 namespace yocto

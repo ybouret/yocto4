@@ -1,7 +1,7 @@
 #ifndef YOCTO_PROPERTY_INCLUDED
 #define YOCTO_PROPERTY_INCLUDED 1
 
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
