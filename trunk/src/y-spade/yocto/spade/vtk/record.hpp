@@ -3,7 +3,7 @@
 
 #include "yocto/spade/vtk/format.hpp"
 #include "yocto/ios/ostream.hpp"
-#include "yocto/type-spec.hpp"
+#include "yocto/type/spec.hpp"
 
 namespace yocto
 {

@@ -1,7 +1,7 @@
 #ifndef YOCTO_VSLOT_INCLUDED
 #define YOCTO_VSLOT_INCLUDED 1
 
-#include "yocto/type-traits.hpp"
+#include "yocto/type/traits.hpp"
 #include <typeinfo>
 
 namespace yocto

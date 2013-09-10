@@ -3,7 +3,7 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/memory/buffers.hpp"
 #include "yocto/chars.hpp"
-#include "yocto/type-ints.hpp"
+#include "yocto/type/ints.hpp"
 #include "yocto/code/utils.hpp"
 
 #include <cerrno>

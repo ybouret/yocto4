@@ -4,6 +4,7 @@
 #include "yocto/string.hpp"
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/memory/global.hpp"
+#include "yocto/type/key.hpp"
 
 namespace yocto
 {

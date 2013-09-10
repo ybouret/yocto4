@@ -4,7 +4,7 @@
 #include "yocto/comparator.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/container/container.hpp"
-#include "yocto/type-traits.hpp"
+#include "yocto/type/args.hpp"
 #include "yocto/code/swap.hpp"
 #include <cstring>
 

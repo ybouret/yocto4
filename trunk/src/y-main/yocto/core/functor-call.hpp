@@ -3,7 +3,7 @@
 
 
 #include "yocto/object.hpp"
-#include "yocto/type-traits.hpp"
+#include "yocto/type/traits.hpp"
 
 namespace yocto
 {

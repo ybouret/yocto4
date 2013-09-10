@@ -2,7 +2,6 @@
 #define _YOCTO_TEAC_HPP_ 1
 
 #include "yocto/crypto/bc/block-cipher.hpp"
-#include "yocto/type-traits.hpp"
 #include "yocto/crypto/bc/tea.hpp"
 #include <cstring>
 

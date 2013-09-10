@@ -2,7 +2,7 @@
 #define YOCTO_INTRUSIVE_PTR_INCLUDED 1
 
 
-#include "yocto/type-traits.hpp"
+#include "yocto/type/key.hpp"
 
 namespace yocto
 {

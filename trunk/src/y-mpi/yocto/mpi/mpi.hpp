@@ -8,7 +8,7 @@
 
 #include "yocto/ios/ostream.hpp"
 #include "yocto/string.hpp"
-#include "yocto/type-spec.hpp"
+#include "yocto/type/spec.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/hashing/sha1.hpp"
 
