@@ -30,7 +30,7 @@ namespace yocto
 		}
 		
 		
-
+        
 		size_t slab:: bytes_for( size_t block_size, size_t num_blocks )
 		{
 			return round_bs(block_size) * num_blocks;
@@ -47,14 +47,42 @@ namespace yocto
 			assert( blockSize == round_bs(blockSize) );
 			assert( blockSize % sizeof(size_t) == 0 );
 			
-			//-- format the slab
-			uint8_t *q = data;
-			for( size_t i=0; i < numBlocks; q += blockSize ) 
+			link();
+		}
+		
+        
+        void slab:: reset() throw()
+        {
+            firstAvailable = 0;
+            stillAvailable = numBlocks;
+            link();
+        }
+        
+        void slab:: format(void        *entry,
+                           const size_t block_size,
+                           const size_t num_blocks ) throw()
+        {
+            data = static_cast<uint8_t*>(entry);
+            (size_t &)numBlocks = num_blocks;
+            (size_t &)blockSize = block_size;
+            assert( blockSize == round_bs(blockSize) );
+			assert( blockSize % sizeof(size_t) == 0 );
+            reset();
+        }
+        
+        
+        void slab:: link() throw()
+        {
+            assert(0==firstAvailable);
+            assert(numBlocks==stillAvailable);
+            
+            uint8_t     *q = data;
+			for( size_t i=0; i < numBlocks; q += blockSize )
 			{
 				*(size_t *)q = ++i;
 			}
-		}
-		
+        }
+        
 		
 		void *slab:: acquire() throw()
 		{
@@ -65,7 +93,7 @@ namespace yocto
 			firstAvailable = *(size_t *)p;
 			--stillAvailable;
 			
-			memset( p, 0, blockSize );			
+			memset( p, 0, blockSize );
 			return p;
 			
 		}
