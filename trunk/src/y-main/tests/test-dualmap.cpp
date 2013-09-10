@@ -13,5 +13,7 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
     (void) dm.get_key_of(s);
     (void) dm.get_sub_of(10);
     
+    dm.insert(10, s, 1.0f);
+    
 }
 YOCTO_UNIT_TEST_DONE()
