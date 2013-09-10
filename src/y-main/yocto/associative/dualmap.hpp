@@ -21,7 +21,7 @@ namespace yocto
     typename SUBKEY,
     typename T,
     typename HFUNC     = hashing::sfh,
-    typename ALLOCATOR =  memory::global::allocator >
+    typename ALLOCATOR = memory::global::allocator >
     class dualmap
     {
     public:
@@ -39,10 +39,16 @@ namespace yocto
             const size_t hkey;
             const_subkey sub;
             const size_t hsub;
+            T            data;
             
+            inline KNode(param_key    k,
+                         size_t       hk,
+                         param_subkey s,
+                         size_t       hs,
+                         param_type   args) :
+            next(0), prev(0), key(k), hkey(hk), sub(s), hsub(hs), data(args)
+            {}
             
-            inline KNode( param_key k, size_t hk, param_subkey s, size_t hs ) :
-            next(0), prev(0), key(k), hkey(hk), sub(s), hsub(hs) {}
             inline ~KNode() throw() {}
             
         private:
@@ -94,10 +100,55 @@ namespace yocto
         
         virtual const char *name() const throw() { return hidden::dualmap_name; }
         
-        inline void insert(param_key    key,
+        inline bool insert(param_key    key,
                            param_subkey sub,
                            param_type   args)
         {
+            //==================================================================
+            // dual check
+            //==================================================================
+            const size_t hkey = keyHasher(key);
+            if(find_by_key(key,hkey))
+                return false;
+            
+            const size_t hsub = subHasher(sub);
+            if(find_by_sub(sub, hsub))
+                return false;
+            
+            
+            //==================================================================
+            // memory check
+            //==================================================================
+            
+            //==================================================================
+            // create the key nodes
+            //==================================================================
+            assert(kpool.available()>=1);
+            assert(hpool.available()>=2);
+            assert(slots>0);
+            
+            //------------------------------------------------------------------
+            // knode
+            //------------------------------------------------------------------
+            KNode *knode = kpool.query();
+            try {
+                new (knode) KNode(key,hkey,sub,hsub,args);
+            }
+            catch(...){ kpool.store(knode); throw; }
+            
+            //------------------------------------------------------------------
+            // key/sub node
+            //------------------------------------------------------------------
+            HNode *key_node = new ( hpool.query() ) HNode(knode);
+            HNode *sub_node = new ( hpool.query() ) HNode(knode);
+            
+            //==================================================================
+            // put all the nodes in place
+            //==================================================================
+            klist.push_back(knode);
+            keyTable[ hkey % slots ].push_front( key_node );
+            subTable[ hsub % slots ].push_front( sub_node );
+            return true;
             
         }
         
@@ -116,25 +167,44 @@ namespace yocto
         }
         
     private:
-        size_t itmax; //!< max items in table
-        size_t slots; //!< slots for htable metrics
-        size_t count; //!< currently in tables
+        //----------------------------------------------------------------------
+        // metrics
+        //----------------------------------------------------------------------
+        size_t                        itmax; //!< max items in table
+        size_t                        slots; //!< slots for htable metrics
+        size_t                        count; //!< currently in tables
         
-        KList klist; //!< list of KNodes
-        KPool kpool; //!< pool of KNodes
+        //----------------------------------------------------------------------
+        // concrete dual keys node
+        //----------------------------------------------------------------------
+        KList                          klist; //!< list of KNodes
+        KPool                          kpool; //!< pool of KNodes: capacity = count
         
-        HSlot *keyTable; //!< indexed by key, #slots
-        HSlot *subTable; //!< indexed by subkey, #slots
-        HPool  hpool;    //!< 2 * max_items
+        //----------------------------------------------------------------------
+        // pointer to dual keys node
+        //----------------------------------------------------------------------
+        HSlot                          *keyTable; //!< indexed by key, #slots
+        HSlot                          *subTable; //!< indexed by subkey, #slots
+        HPool                           hpool; //!< 2 * max_items
         
+        //----------------------------------------------------------------------
+        // hashing functions
+        //----------------------------------------------------------------------
         mutable key_hasher<KEY,HFUNC>    keyHasher;
         mutable key_hasher<SUBKEY,HFUNC> subHasher;
-        size_t                   wlen; //!< total #bytes allocated
-        void                    *wksp; //!< memory
-        ALLOCATOR                hmem; //!< the allocator
+        
+        //----------------------------------------------------------------------
+        // memory provider
+        //----------------------------------------------------------------------
+        size_t                           wlen; //!< total #bytes allocated
+        void                            *wksp; //!< memory
+        ALLOCATOR                        hmem; //!< the allocator
         
         YOCTO_DISABLE_COPY_AND_ASSIGN(dualmap);
         
+        //======================================================================
+        // find a concrete key node using the key/hkey
+        //======================================================================
         KNode *find_by_key( param_key key, const size_t hkey ) const throw()
         {
             if(slots>0)
@@ -153,6 +223,9 @@ namespace yocto
             return 0;
         }
         
+        //======================================================================
+        // find a concrete key node using the subkey/hsub
+        //======================================================================
         KNode *find_by_sub( param_subkey sub, const size_t hsub ) const throw()
         {
             if(slots>0)
