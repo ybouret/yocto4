@@ -21,6 +21,14 @@ namespace yocto
 			~slab() throw();
 			slab( void *entry, const size_t block_size, const size_t num_blocks ) throw();
 			
+            void reset() throw(); //!< forced reset
+            
+            //! forced reformatting
+            void format(void         *entry,
+                        const size_t block_size,
+                        const size_t num_blocks ) throw();
+            
+            
 			void *acquire() throw();
 			void  release(void *) throw();
 			
@@ -32,6 +40,7 @@ namespace yocto
 			const size_t  numBlocks; //!< inital num_blocks
 			
 		private:
+            void link() throw();
 			YOCTO_DISABLE_COPY_AND_ASSIGN(slab);
 		};
 		
@@ -51,6 +60,9 @@ namespace yocto
 			inline size_t available() const throw() { return slab_.stillAvailable; }
 			inline size_t involved()  const throw() { return capacity() - available(); }
 			
+            inline void reset() throw() { slab_.reset(); }
+            inline void format(void *entry, const size_t num_blocks) throw() { slab_.format(entry,sizeof(T),num_blocks); }
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(slab_of);
 			slab slab_;
