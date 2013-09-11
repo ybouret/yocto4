@@ -34,7 +34,7 @@ namespace yocto
 			explicit condition() throw();
 			virtual ~condition() throw();
 			
-			//! wait on a locked mutex, returns on  the locked mutex
+			//! wait on a locked mutex, returns on  the LOCKED mutex
 			void     wait( mutex & ) throw();
 			
 			//! allow one blocked thread to wake up
@@ -44,10 +44,10 @@ namespace yocto
 			void     broadcast() throw();
 			
 		private:
-			
 			YOCTO_DISABLE_COPY_AND_ASSIGN(condition);
+            
 #if defined(YOCTO_BSD)
-			pthread_cond_t cond;
+			pthread_cond_t cond; //!< using native condition
 #endif
 
 #if defined(YOCTO_WIN)
@@ -55,7 +55,7 @@ namespace yocto
 			int              cv_waiting;   /*!< waiting count                */
 			int              cv_signals;   /*!< signals count                */
 			win32::semaphore cv_wait_sem;  /*!< Win32 semaphore when waiting */
-			win32::semaphore cv_done_sem;  /*!< Win32 semaphore whan done    */
+			win32::semaphore cv_done_sem;  /*!< Win32 semaphore when done    */
 #endif
 
 		};
