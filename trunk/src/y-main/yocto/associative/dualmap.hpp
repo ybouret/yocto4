@@ -9,6 +9,7 @@
 #include "yocto/memory/slab.hpp"
 #include "yocto/code/htable.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/container/container.hpp"
 
 namespace yocto
 {
@@ -23,7 +24,7 @@ namespace yocto
     typename T,
     typename HFUNC     = hashing::sfh,
     typename ALLOCATOR = memory::global::allocator >
-    class dualmap
+    class dualmap : public container
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
@@ -69,7 +70,7 @@ namespace yocto
             inline HNode(KNode *kn ) throw() : next(0), prev(0), knode(kn)
             { assert(knode); }
             
-            inline ~HNode() throw() {}            
+            inline ~HNode() throw() {}
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(HNode);
@@ -131,7 +132,7 @@ namespace yocto
                 wlen = hpool_offset + hpool_length;
                 wksp = hmem.acquire(wlen);
                 uint8_t *addr = static_cast<uint8_t *>(wksp);
-               
+                
                 //==============================================================
                 // format memory
                 //==============================================================
@@ -141,15 +142,16 @@ namespace yocto
                 hpool.format( &addr[hpool_offset], hpool_nummax);
             }
         }
-
+        
         
         virtual ~dualmap() throw() { __release(); }
         
-        virtual const char *name() const throw()     { return hidden::dualmap_name; }
-        virtual size_t      size() const throw()     { return klist.size; }
-        virtual size_t      capacity() const throw() { return itmax; }
-        virtual void        free() throw()           { __free(); }
-        virtual void        release() throw()        { __release(); }
+        virtual const char *name() const throw()      { return hidden::dualmap_name; }
+        virtual size_t      size() const throw()      { return klist.size; }
+        virtual size_t      capacity() const throw()  { return itmax; }
+        virtual void        free() throw()            { __free(); }
+        virtual void        release() throw()         { __release(); }
+        virtual void        reserve(size_t n) throw() { if(n>0) __reserve(n); }
         
         inline bool insert(param_key    key,
                            param_subkey sub,
@@ -170,37 +172,25 @@ namespace yocto
             //==================================================================
             // memory check
             //==================================================================
+            if( klist.size >= itmax )
+                __reserve( next_increase(itmax) );
             
             //==================================================================
-            // create the key nodes
+            // node insertion
             //==================================================================
-            assert(kpool.available()>=1);
-            assert(hpool.available()>=2);
-            assert(slots>0);
-            
-            //------------------------------------------------------------------
-            // knode
-            //------------------------------------------------------------------
-            KNode *knode = kpool.query();
-            try {
-                new (knode) KNode(key,hkey,sub,hsub,args);
-            }
-            catch(...){ kpool.store(knode); throw; }
-            
-            //------------------------------------------------------------------
-            // key/sub node
-            //------------------------------------------------------------------
-            HNode *key_node = new ( hpool.query() ) HNode(knode);
-            HNode *sub_node = new ( hpool.query() ) HNode(knode);
-            
-            //==================================================================
-            // put all the nodes in place
-            //==================================================================
-            klist.push_back(knode);
-            keyTable[ hkey % slots ].push_front( key_node );
-            subTable[ hsub % slots ].push_front( sub_node );
+            __insert(key, hkey, sub, hsub, args);
             return true;
             
+        }
+        
+        inline bool has_key( param_key key ) const throw()
+        {
+            return 0 != find_by_key(key, keyHasher(key) );
+        }
+        
+        inline bool has_sub( param_subkey sub ) const throw()
+        {
+            return 0 != find_by_sub(sub, subHasher(sub) );
         }
         
         inline const_subkey * get_sub_of( param_key key ) const throw()
@@ -307,6 +297,49 @@ namespace yocto
             return 0;
         }
         
+        //======================================================================
+        // node expansion
+        //======================================================================
+        inline void __insert(param_key    key,
+                             size_t       hkey,
+                             param_subkey sub,
+                             size_t       hsub,
+                             param_type   args)
+        {
+            //==================================================================
+            // create the key nodes
+            //==================================================================
+            assert(kpool.available()>=1);
+            assert(hpool.available()>=2);
+            assert(slots>0);
+            
+            //------------------------------------------------------------------
+            // knode, may throw upon creating
+            //------------------------------------------------------------------
+            KNode *knode = kpool.query();
+            try {
+                new (knode) KNode(key,hkey,sub,hsub,args);
+            }
+            catch(...){ kpool.store(knode); throw; }
+            
+            //------------------------------------------------------------------
+            // key/sub node, no throw
+            //------------------------------------------------------------------
+            HNode *key_node = new ( hpool.query() ) HNode(knode);
+            HNode *sub_node = new ( hpool.query() ) HNode(knode);
+            
+            //==================================================================
+            // put all the nodes in place
+            //==================================================================
+            klist.push_back(knode);
+            keyTable[ hkey % slots ].push_front( key_node );
+            subTable[ hsub % slots ].push_front( sub_node );
+            
+        }
+        
+        //======================================================================
+        // subroutines to free all data
+        //======================================================================
         inline void __free_hslot( HSlot &s ) throw()
         {
             while(s.size>0)
@@ -332,6 +365,9 @@ namespace yocto
             }
         }
         
+        //======================================================================
+        // release all resources
+        //======================================================================
         inline void __release() throw()
         {
             __free();
@@ -343,6 +379,31 @@ namespace yocto
             itmax    = 0;
             hmem.release(wksp,wlen);
         }
+        
+        //======================================================================
+        // memory expansion
+        //======================================================================
+        inline void __reserve(size_t n)
+        {
+            assert(n>0);
+            dualmap dm( itmax + n, as_capacity);
+            __duplicate_into(dm);
+            swap_with(dm);
+        }
+        
+        inline void __duplicate_into( dualmap &dm ) const
+        {
+            assert( 0 == dm.size() );
+            for( const KNode *node = klist.head; node; node=node->next)
+            {
+                dm.__insert(node->key,
+                            node->hkey,
+                            node->sub,
+                            node->hsub,
+                            node->data);
+            }
+        }
+        
         
         
     };
