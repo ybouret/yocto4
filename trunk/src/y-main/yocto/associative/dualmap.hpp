@@ -19,6 +19,7 @@ namespace yocto
         extern const char dualmap_name[];
     }
     
+    //! a map indexed by two keys
     template <
     typename KEY,
     typename SUBKEY,
@@ -490,6 +491,9 @@ namespace yocto
             //------------------------------------------------------------------
             knode = klist.unlink(knode);
         
+            //------------------------------------------------------------------
+            // remove hnodes
+            //------------------------------------------------------------------
             __remove_from_hslot( keyTable[knode->hkey%slots], knode );
             __remove_from_hslot( subTable[knode->hsub%slots], knode );
 
