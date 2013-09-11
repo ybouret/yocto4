@@ -3,6 +3,7 @@
 
 
 #include "yocto/code/ilog2.hpp"
+#include "yocto/code/swap.hpp"
 
 namespace yocto
 {
@@ -63,6 +64,10 @@ namespace yocto
             inline void reset() throw() { slab_.reset(); }
             inline void format(void *entry, const size_t num_blocks) throw() { slab_.format(entry,sizeof(T),num_blocks); }
             
+            inline void swap_with( slab_of &other ) throw()
+            {
+                mswap( slab_, other.slab_ );
+            }
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(slab_of);
 			slab slab_;
