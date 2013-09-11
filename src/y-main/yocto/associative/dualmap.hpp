@@ -10,6 +10,7 @@
 #include "yocto/code/htable.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/container/container.hpp"
+#include "yocto/container/iter-linked.hpp"
 
 namespace yocto
 {
@@ -219,6 +220,18 @@ namespace yocto
             cswap(wlen,other.wlen);
             cswap(wksp,other.wksp);
         }
+        
+        //======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::linked<type,KNode,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator( klist.head ); }
+		inline iterator end()   throw() { return iterator( NULL );       }
+		
+		typedef iterating::linked<const_type,const KNode,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return const_iterator( klist.head  ); }
+		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
+
         
     private:
         //----------------------------------------------------------------------
