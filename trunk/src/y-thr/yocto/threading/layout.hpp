@@ -39,6 +39,10 @@ namespace yocto
 			//! copy size and root.
 			layout( const layout &other ) throw();
 			
+            //! where to assign thread #i
+            size_t cpu_index_of( size_t iThread ) const throw();
+            
+            
 		private:
 			YOCTO_DISABLE_ASSIGN(layout);
 		};
