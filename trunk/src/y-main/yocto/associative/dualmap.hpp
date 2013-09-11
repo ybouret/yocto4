@@ -208,6 +208,28 @@ namespace yocto
             return 0;
         }
         
+        
+        inline type * search( param_key key) throw()
+        {
+            KNode *knode = find_by_key(key, keyHasher(key) );
+            if(knode) return & knode->data;
+            return 0;
+        }
+        
+        inline const_type * search( param_key key) const throw()
+        {
+            KNode *knode = find_by_key(key, keyHasher(key) );
+            if(knode) return & knode->data;
+            return 0;
+        }
+        
+        inline const_type * sub_search( param_subkey sub) const throw()
+        {
+            KNode *knode = find_by_sub(sub, subHasher(sub) );
+            if(knode) return & knode->data;
+            return 0;
+        }
+        
         inline void swap_with( dualmap &other ) throw()
         {
             cswap(itmax, other.itmax);
