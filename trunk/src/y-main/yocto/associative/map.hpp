@@ -5,7 +5,6 @@
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/associative/ktable.hpp"
-
 #include "yocto/container/iter-linked.hpp"
 
 namespace yocto

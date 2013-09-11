@@ -43,5 +43,22 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
         dm.release();
     }
     
+    for(size_t i=10 + alea_leq(10); i>0;--i)
+    {
+        const int    k = gen<int>::get();
+        const string s = gen<string>::get();
+        const float  f = gen<float>::get();
+        
+        if( dm.insert(k,s,f) )
+        {
+            std::cerr << "inserted (" << k << "," << s << ")=" << f << std::endl;
+        }
+    }
+    std::cerr << std::endl;
+    for( dualmap<int, string, float>::iterator i = dm.begin(); i != dm.end(); ++i)
+    {
+        std::cerr << "@(" << i->key << "," << i->sub << ") : " << *i << std::endl;
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
