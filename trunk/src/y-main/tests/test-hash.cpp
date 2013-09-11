@@ -203,13 +203,3 @@ YOCTO_UNIT_TEST_IMPL(key_hasher)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/associative/sub-hasher.hpp"
-
-YOCTO_UNIT_TEST_IMPL(sub_hasher)
-{
-    sub_hasher<int, double, hashing::sha1> Hash;
-    
-}
-YOCTO_UNIT_TEST_DONE()
-
-
