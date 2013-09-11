@@ -31,8 +31,7 @@ namespace yocto
 		void semaphore:: wait() throw()
 		{
 			assert( sem_ != NULL );
-			const DWORD res = WaitForSingleObject( 
-												  sem_,            /* handle to semaphore */
+			const DWORD res = WaitForSingleObject(sem_,           /* handle to semaphore  */
 												  INFINITE);      /* let's wait          */
 			if( res != WAIT_OBJECT_0 )
 				win32::critical_error( ::GetLastError(), "WaitForSingleObject( SEMAPHORE )");
@@ -58,7 +57,7 @@ namespace yocto
 		{
 			const int res = pthread_cond_init( & cond, NULL );
 			if( res != 0 )
-				libc::critical_error( res, "pthread_cond_init" );			
+				libc::critical_error( res, "pthread_cond_init" );
 		}
 		
 		condition:: ~condition() throw()

@@ -278,6 +278,11 @@ namespace yocto
 		inline const_iterator begin() const throw() { return const_iterator( klist.head  ); }
 		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
         
+        //======================================================================
+		// auxiliary data
+		//======================================================================
+        inline size_t allocated_bytes() const throw() { return wlen;  }
+        inline size_t num_slots() const throw()       { return slots; }
         
     private:
         //----------------------------------------------------------------------
