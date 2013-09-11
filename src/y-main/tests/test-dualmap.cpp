@@ -13,7 +13,10 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
     (void) dm.get_key_of(s);
     (void) dm.get_sub_of(10);
     
-    dm.insert(10, s, 1.0f);
+    dualmap<int, string, float> dm2(10,as_capacity);
     
+    dm2.insert(10, s, 1.0f);
+    //dm.insert(11, s, 2.0f);
+
 }
 YOCTO_UNIT_TEST_DONE()
