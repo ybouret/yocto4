@@ -8,6 +8,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/memory/slab.hpp"
 #include "yocto/code/htable.hpp"
+#include "yocto/code/round.hpp"
 
 namespace yocto
 {
@@ -82,7 +83,6 @@ namespace yocto
         explicit dualmap() throw() :
         itmax(0),
         slots(0),
-        count(0),
         klist(),
         kpool(0,0),
         keyTable(0),
@@ -94,11 +94,64 @@ namespace yocto
         wksp(),
         hmem()
         {
+            
+            
         }
         
-        virtual ~dualmap() throw() {}
+        explicit dualmap(size_t n, const as_capacity_t &):
+        itmax(n),
+        slots(htable::compute_slots_for(itmax)),
+        klist(),
+        kpool(0,0),
+        keyTable(0),
+        subTable(0),
+        hpool(0,0),
+        keyHasher(),
+        subHasher(),
+        wlen(),
+        wksp(),
+        hmem()
+        {
+            if(slots>0)
+            {
+                assert(itmax>0);
+                //==============================================================
+                // compute metrics
+                //==============================================================
+                const size_t kpool_length = KPool::bytes_for(itmax);
+                const size_t k_tab_offset = memory::align(kpool_length);
+                const size_t k_tab_length = itmax * sizeof(HSlot);
+                const size_t s_tab_offset = memory::align(k_tab_offset+k_tab_length);
+                const size_t s_tab_length = itmax * sizeof(HSlot);
+                const size_t hpool_offset = memory::align(s_tab_offset+s_tab_length);
+                const size_t hpool_nummax = 2*itmax;
+                const size_t hpool_length = HPool::bytes_for(hpool_nummax);
+                
+                //==============================================================
+                // acquire memory
+                //==============================================================
+                wlen = hpool_offset + hpool_length;
+                wksp = hmem.acquire(wlen);
+                uint8_t *addr = static_cast<uint8_t *>(wksp);
+               
+                //==============================================================
+                // format memory
+                //==============================================================
+                kpool.format( &addr[0], itmax );
+                keyTable = (HSlot *) &addr[k_tab_offset];
+                subTable = (HSlot *) &addr[s_tab_offset];
+                hpool.format( &addr[hpool_offset], hpool_nummax);
+            }
+        }
+
         
-        virtual const char *name() const throw() { return hidden::dualmap_name; }
+        virtual ~dualmap() throw() { __release(); }
+        
+        virtual const char *name() const throw()     { return hidden::dualmap_name; }
+        virtual size_t      size() const throw()     { return klist.size; }
+        virtual size_t      capacity() const throw() { return itmax; }
+        virtual void        free() throw()           { __free(); }
+        virtual void        release() throw()        { __release(); }
         
         inline bool insert(param_key    key,
                            param_subkey sub,
@@ -172,7 +225,6 @@ namespace yocto
         //----------------------------------------------------------------------
         size_t                        itmax; //!< max items in table
         size_t                        slots; //!< slots for htable metrics
-        size_t                        count; //!< currently in tables
         
         //----------------------------------------------------------------------
         // concrete dual keys node
@@ -242,6 +294,43 @@ namespace yocto
                 }
             }
             return 0;
+        }
+        
+        inline void __free_hslot( HSlot &s ) throw()
+        {
+            while(s.size>0)
+            {
+                HNode *node = s.pop_back();
+                destruct(node);
+                hpool.store(node);
+            }
+        }
+        
+        inline void __free() throw()
+        {
+            for(size_t i=0; i < slots; ++i )
+            {
+                __free_hslot( keyTable[i] );
+                __free_hslot( subTable[i] );
+            }
+            while(klist.size>0)
+            {
+                KNode *node = klist.pop_back();
+                destruct(node);
+                kpool.store(node);
+            }
+        }
+        
+        inline void __release() throw()
+        {
+            __free();
+            hpool.format(0,0);
+            kpool.format(0,0);
+            keyTable = 0;
+            subTable = 0;
+            slots    = 0;
+            itmax    = 0;
+            hmem.release(wksp,wlen);
         }
         
         
