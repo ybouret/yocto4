@@ -230,6 +230,29 @@ namespace yocto
             return 0;
         }
         
+        inline bool remove( param_key key ) throw()
+        {
+            KNode *knode =  find_by_key(key, keyHasher(key) );
+            if(knode)
+            {
+                __remove(knode);
+                return true;
+            }
+            return false;
+        }
+        
+        inline bool sub_remove( param_subkey sub) throw()
+        {
+            KNode *knode =  find_by_sub(sub, subHasher(sub) );
+            if(knode)
+            {
+                __remove(knode);
+                return true;
+            }
+            return false;
+        }
+        
+        
         inline void swap_with( dualmap &other ) throw()
         {
             cswap(itmax, other.itmax);
@@ -253,7 +276,7 @@ namespace yocto
 		typedef iterating::linked<const_type,const KNode,iterating::forward> const_iterator;
 		inline const_iterator begin() const throw() { return const_iterator( klist.head  ); }
 		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
-
+        
         
     private:
         //----------------------------------------------------------------------
@@ -439,7 +462,44 @@ namespace yocto
             }
         }
         
+        //======================================================================
+        // removal
+        //======================================================================
+        inline void __remove_from_hslot(HSlot       &hslot,
+                                        const KNode *knode ) throw()
+        {
+            for( HNode *node = hslot.head; node; node=node->next)
+            {
+                if(node->knode==knode)
+                {
+                    node = hslot.unlink(node);
+                    destruct(node);
+                    hpool.store(node);
+                    return;
+                }
+            }
+            assert( die("never get here") );
+        }
         
+        inline void __remove( KNode *knode ) throw()
+        {
+            assert(knode);
+            assert(klist.owns(knode));
+            //------------------------------------------------------------------
+            // unlink from list
+            //------------------------------------------------------------------
+            knode = klist.unlink(knode);
+        
+            __remove_from_hslot( keyTable[knode->hkey%slots], knode );
+            __remove_from_hslot( subTable[knode->hsub%slots], knode );
+
+            //------------------------------------------------------------------
+            // destruct and cache
+            //------------------------------------------------------------------
+            destruct(knode);
+            kpool.store(knode);
+            
+        }
         
     };
     

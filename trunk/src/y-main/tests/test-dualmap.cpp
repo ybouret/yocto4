@@ -44,7 +44,7 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
         dm.release();
     }
     
-    for(size_t i=10 + alea_leq(10); i>0;--i)
+    for(size_t i=20 + alea_leq(20); i>0;--i)
     {
         const int    k = gen<int>::get();
         const string s = gen<string>::get();
@@ -71,7 +71,25 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
     {
         if( !dm.search(keys[i])) throw exception("can't find by key");
         if( !dm.sub_search(subs[i])) throw exception("can't find by subkey");
+        std::cerr << "#";
     }
+    
+    std::cerr << std::endl;
+    std::cerr << "removing..." << std::endl;
+    for(size_t i=1;i<=keys.size();++i)
+    {
+        if( 0 == (i%2) )
+        {
+            if( !dm.remove(keys[i])) throw exception("can't remove by key");
+        }
+        else
+        {
+            if( !dm.sub_remove(subs[i])) throw exception("can't remove by subkey");
+        }
+        std::cerr << "#";
+    }
+    std::cerr << std::endl;
+
     
 }
 YOCTO_UNIT_TEST_DONE()
