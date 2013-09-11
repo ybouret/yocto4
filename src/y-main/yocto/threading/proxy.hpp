@@ -16,6 +16,7 @@ namespace yocto
             
             void launch( threading::thread::proc_t proc, void *data );
             void finish() throw();
+            void on_cpu(size_t id);
             
             template <typename FUNC>
             void trigger( FUNC &fn )

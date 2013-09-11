@@ -48,6 +48,11 @@ namespace yocto
             _cast::from<threading::thread>( &block[0] )->join();
             clear();
         }
+        
+        void proxy::on_cpu(size_t id)
+        {
+            _cast::from<threading::thread>( &block[0] )->on_cpu(id);
+        }
 
     }
 }

@@ -9,7 +9,7 @@
 
 namespace yocto
 {
-
+    
 	namespace threading
 	{
 		//======================================================================
@@ -29,7 +29,7 @@ namespace yocto
 						++field;
 						return true;
 					}
-					else 
+					else
 					{
 						throw exception("Invalid char '%c' in value", field[0]);
 					}
@@ -93,6 +93,13 @@ namespace yocto
 		{
 		}
 		
+        size_t layout:: cpu_index_of( size_t iThread) const throw()
+        {
+            assert(size>0);
+            const size_t j = root + ( iThread % size );
+            std::cerr << "              |_ assign on CPU #" << j << "/" << size << std::endl;
+            return j;
+        }
 		
 	}
 	
