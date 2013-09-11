@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/string.hpp"
 #include "support.hpp"
+#include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
 
@@ -55,9 +56,21 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
         }
     }
     std::cerr << std::endl;
+    vector<int> keys;
+    vector<string> subs;
     for( dualmap<int, string, float>::iterator i = dm.begin(); i != dm.end(); ++i)
     {
         std::cerr << "@(" << i->key << "," << i->sub << ") : " << *i << std::endl;
+        keys.push_back(i->key);
+        subs.push_back(i->sub);
+    }
+    
+    std::cerr << std::endl;
+    std::cerr << "searching..." << std::endl;
+    for(size_t i=1;i<=keys.size();++i)
+    {
+        if( !dm.search(keys[i])) throw exception("can't find by key");
+        if( !dm.sub_search(subs[i])) throw exception("can't find by subkey");
     }
     
 }
