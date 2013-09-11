@@ -69,9 +69,7 @@ namespace yocto
             inline HNode(KNode *kn ) throw() : next(0), prev(0), knode(kn)
             { assert(knode); }
             
-            inline ~HNode() throw() {}
-            
-            
+            inline ~HNode() throw() {}            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(HNode);
@@ -217,6 +215,19 @@ namespace yocto
             const KNode *knode = find_by_sub(sub, subHasher(sub) );
             if(knode) return & knode->key;
             return 0;
+        }
+        
+        inline void swap_with( dualmap &other ) throw()
+        {
+            cswap(itmax, other.itmax);
+            cswap(slots, other.slots);
+            mswap(klist, other.klist);
+            kpool.swap_with(other.kpool);
+            cswap(keyTable,other.keyTable);
+            cswap(subTable,other.subTable);
+            hpool.swap_with(other.hpool);
+            cswap(wlen,other.wlen);
+            cswap(wksp,other.wksp);
         }
         
     private:
