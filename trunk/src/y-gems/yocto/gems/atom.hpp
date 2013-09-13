@@ -5,6 +5,8 @@
 #include "yocto/gems/identifier.hpp"
 #include "yocto/gems/properties.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/intrusive-ptr.hpp"
+#include "yocto/nosy-ptr.hpp"
 
 namespace yocto
 {
@@ -15,22 +17,43 @@ namespace yocto
         
         using namespace math;
         
+        //! a shared atom
         template <typename T>
         class atom : public identifier
         {
         public:
+            typedef intrusive_ptr<word_t,atom> pointer;
+            typedef vector<pointer,allocator>  group;
+            
             typedef residue<T>                         residue_type;
+            typedef intrusive_ptr<word_t,residue_type> residue_ptr;
             
             v3d<T>            r;
             v3d<T>            v;
             v3d<T>            a;
             const T           m; //!< mass
             const T           w; //!< 1/mass
+            const residue_ptr parent;
             
-            explicit atom( word_t u, word_t t) throw();
+            explicit atom( const residue_ptr &from, word_t u, word_t t) throw();
             virtual ~atom() throw();
             void     set_mass(T mass) throw();
             
+            //! atom properties for library
+            class properties : public gems::properties
+            {
+            public:
+                const T mass;
+                
+                typedef nosy_ptr<word_t,string,properties>  pointer;
+                typedef gems::properties::table<properties> table;
+                
+                explicit properties( word_t t, const string &n, T m );
+                virtual ~properties() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
+            };
             
         private:
             atom& operator=(const atom &);

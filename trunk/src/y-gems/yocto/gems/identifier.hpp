@@ -10,7 +10,7 @@ namespace yocto
     namespace gems
     {
         
-        class identifier : public object, public counted
+        class identifier : public virtual object, public counted
         {
         public:
             const word_t uuid;
