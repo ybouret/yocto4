@@ -1,15 +1,19 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/associative/dual-set.hpp"
 #include "yocto/string.hpp"
+#include "support.hpp"
+
+#include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
 
 class Dummy
 {
 public:
-    explicit Dummy( int a, const string &b ) :
+    explicit Dummy( int a, const string &b , float x) :
     first(a),
-    second(b)
+    second(b),
+    value(x)
     {
     }
     
@@ -19,6 +23,7 @@ public:
     
     const int    first;
     const string second;
+    float        value;
     
     Dummy( const Dummy &d ) :
     first( d.first ),
@@ -41,11 +46,51 @@ YOCTO_UNIT_TEST_IMPL(dualset)
     
     ds_t ds1;
     
-    ds1.reserve(1);
-    
+    for(size_t i= 100 + alea_leq(100); i>0;--i)
     {
-        const Dummy tmp(1,"toto");
-        ds1.insert(tmp);
+        const int    a = gen<int>::get();
+        const string b = gen<string>::get();
+        const float  x = gen<float>::get();
+        const Dummy  d(a,b,x);
+        if( !ds1.insert(d) )
+            std::cerr << "multiple dual " << a << "," <<b << std::endl;
     }
+    
+    std::cerr << "size     = " << ds1.size()      << std::endl;
+    std::cerr << "capacity = " << ds1.capacity()  << std::endl;
+    std::cerr << "slots    = " << ds1.num_slots() << std::endl;
+    std::cerr << "bytes    = " << ds1.allocated_bytes() << std::endl;
+    
+    
+    vector<int>    keys;
+    vector<string> subs;
+    
+    for( ds_t::iterator i=ds1.begin(); i != ds1.end(); ++i )
+    {
+        keys.push_back( i->key() );
+        subs.push_back( i->subkey() );
+    }
+    
+    for(size_t i=1; i <= keys.size(); ++i )
+    {
+        if(!ds1.search(keys[i])) throw exception("missing key");
+        if(!ds1.sub_search(subs[i])) throw exception("missing subkey");
+    }
+    
+    for(size_t i=1; i <= keys.size(); ++i )
+    {
+        if( (i%2) )
+        {
+            if( !ds1.remove(keys[i])) throw exception("missing remove key");
+        }
+        else
+        {
+            if( !ds1.sub_remove(subs[i])) throw exception("missing remove subkey");
+
+        }
+    }
+    
+    
+
 }
 YOCTO_UNIT_TEST_DONE()
