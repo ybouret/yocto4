@@ -1,5 +1,5 @@
-#ifndef YOCTO_ASSOCIATIVE_DUAL_MAP_INCLUDED
-#define YOCTO_ASSOCIATIVE_DUAL_MAP_INCLUDED 1
+#ifndef YOCTO_ASSOCIATIVE_DUAL_SET_INCLUDED
+#define YOCTO_ASSOCIATIVE_DUAL_SET_INCLUDED 1
 
 #include "yocto/type/sub-key.hpp"
 #include "yocto/memory/global.hpp"
@@ -16,7 +16,7 @@ namespace yocto
 {
     namespace hidden
     {
-        extern const char dual_map_name[];
+        extern const char dual_set_name[];
     }
     
     //! a map indexed by two keys
@@ -26,7 +26,7 @@ namespace yocto
     typename T,
     typename HFUNC     = hashing::sfh,
     typename ALLOCATOR = memory::global::allocator >
-    class dual_map : public container
+    class dual_set : public container
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
@@ -39,18 +39,18 @@ namespace yocto
         public:
             KNode       *next;
             KNode       *prev;
-            const_key    key;
             const size_t hkey;
-            const_subkey sub;
             const size_t hsub;
             T            data;
             
-            inline KNode(param_key    k,
-                         size_t       hk,
-                         param_subkey s,
+            inline KNode(size_t       hk,
                          size_t       hs,
                          param_type   args) :
-            next(0), prev(0), key(k), hkey(hk), sub(s), hsub(hs), data(args)
+            next(0),
+            prev(0),
+            hkey(hk),
+            hsub(hs),
+            data(args)
             {}
             
             inline ~KNode() throw() {}
@@ -81,7 +81,7 @@ namespace yocto
         typedef core::list_of<HNode>   HSlot;
         typedef memory::slab_of<HNode> HPool;
         
-        explicit dual_map() throw() :
+        explicit dual_set() throw() :
         itmax(0),
         slots(0),
         klist(),
@@ -99,7 +99,7 @@ namespace yocto
             
         }
         
-        explicit dual_map(size_t n, const as_capacity_t &):
+        explicit dual_set(size_t n, const as_capacity_t &):
         itmax(n),
         slots(htable::compute_slots_for(itmax)),
         klist(),
@@ -146,26 +146,26 @@ namespace yocto
         }
         
         
-        virtual ~dual_map() throw() { __release(); }
+        virtual ~dual_set() throw() { __release(); }
         
-        virtual const char *name() const throw()      { return hidden::dual_map_name; }
+        virtual const char *name() const throw()      { return hidden::dual_set_name; }
         virtual size_t      size() const throw()      { return klist.size; }
         virtual size_t      capacity() const throw()  { return itmax; }
         virtual void        free() throw()            { __free(); }
         virtual void        release() throw()         { __release(); }
         virtual void        reserve(size_t n) throw() { if(n>0) __reserve(n); }
         
-        inline bool insert(param_key    key,
-                           param_subkey sub,
-                           param_type   args)
+        inline bool insert(param_type   args)
         {
             //==================================================================
             // dual check
             //==================================================================
+            const_key &key = args.key();
             const size_t hkey = keyHasher(key);
             if(find_by_key(key,hkey))
                 return false;
             
+            const_subkey &sub = args.subkey();
             const size_t hsub = subHasher(sub);
             if(find_by_sub(sub, hsub))
                 return false;
@@ -180,7 +180,7 @@ namespace yocto
             //==================================================================
             // node insertion
             //==================================================================
-            __insert(key, hkey, sub, hsub, args);
+            __insert(hkey,hsub,args);
             return true;
             
         }
@@ -254,8 +254,7 @@ namespace yocto
         }
         
         
-        
-        inline void swap_with( dual_map &other ) throw()
+        inline void swap_with( dual_set &other ) throw()
         {
             cswap(itmax, other.itmax);
             cswap(slots, other.slots);
@@ -318,7 +317,7 @@ namespace yocto
         void                            *wksp; //!< memory
         ALLOCATOR                        hmem; //!< the allocator
         
-        YOCTO_DISABLE_COPY_AND_ASSIGN(dual_map);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(dual_set);
         
         //======================================================================
         // find a concrete key node using the key/hkey
@@ -330,7 +329,7 @@ namespace yocto
                 HSlot *hslot = (HSlot *)&keyTable[ hkey % slots ];
                 for( HNode *h = hslot->head;h;h=h->next)
                 {
-                    if(h->knode->key==key)
+                    if(h->knode->data.key()==key)
                     {
                         assert(h->knode->hkey==hkey);
                         hslot->move_to_front(h);
@@ -351,7 +350,7 @@ namespace yocto
                 HSlot *hslot = (HSlot *)&subTable[ hsub % slots ];
                 for( HNode *h = hslot->head;h;h=h->next)
                 {
-                    if(h->knode->sub==sub)
+                    if(h->knode->data.subkey()==sub)
                     {
                         assert(h->knode->hsub==hsub);
                         hslot->move_to_front(h);
@@ -365,9 +364,7 @@ namespace yocto
         //======================================================================
         // node expansion
         //======================================================================
-        inline void __insert(param_key    key,
-                             size_t       hkey,
-                             param_subkey sub,
+        inline void __insert(size_t       hkey,
                              size_t       hsub,
                              param_type   args)
         {
@@ -383,7 +380,7 @@ namespace yocto
             //------------------------------------------------------------------
             KNode *knode = kpool.query();
             try {
-                new (knode) KNode(key,hkey,sub,hsub,args);
+                new (knode) KNode(hkey,hsub,args);
             }
             catch(...){ kpool.store(knode); throw; }
             
@@ -451,19 +448,17 @@ namespace yocto
         inline void __reserve(size_t n)
         {
             assert(n>0);
-            dual_map dm( itmax + n, as_capacity);
+            dual_set dm( itmax + n, as_capacity);
             __duplicate_into(dm);
             swap_with(dm);
         }
         
-        inline void __duplicate_into( dual_map &dm ) const
+        inline void __duplicate_into( dual_set &dm ) const
         {
             assert( 0 == dm.size() );
             for( const KNode *node = klist.head; node; node=node->next)
             {
-                dm.__insert(node->key,
-                            node->hkey,
-                            node->sub,
+                dm.__insert(node->hkey,
                             node->hsub,
                             node->data);
             }

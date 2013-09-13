@@ -73,5 +73,6 @@ ADD_TEST(RemoveIf    test-main remove_if)
 ADD_TEST(RawFile     test-main raw_file)
 ADD_TEST(VSlot       test-main vslot)
 ADD_TEST(DualMap     test-main dualmap)
+ADD_TEST(DualSet     test-main dualset)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
