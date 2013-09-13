@@ -12,13 +12,11 @@ namespace yocto
         {
         }
        
-#if 0
         template <>
         atom<real_t>:: atom( const residue_ptr &res, word_t u, word_t t) throw() :
         identifier(u,t), r(),v(),a(),m(0),w(0), parent(res)
         {
         }
-#endif
         
         
         template <>
@@ -27,7 +25,6 @@ namespace yocto
             (real_t &)w = 1/( (real_t &)m = mass );
         }
         
-#if 0
         template <>
         atom<real_t>::properties:: ~properties() throw() {}
         
@@ -41,7 +38,6 @@ namespace yocto
             if(mass<=0)
                 throw libc::exception( ERANGE, "negative mass for '%s'", name.c_str() );
         }
-#endif
         
     }
     

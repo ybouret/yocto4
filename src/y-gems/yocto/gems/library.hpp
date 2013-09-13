@@ -2,7 +2,6 @@
 #define YOCTO_GEMS_LIBRARY_INCLUDED 1
 
 #include "yocto/gems/residue.hpp"
-#include "yocto/associative/set.hpp"
 
 namespace yocto
 {
@@ -16,22 +15,12 @@ namespace yocto
             explicit library();
             virtual ~library() throw();
             
-#if 0
-            //typedef typename atom<T>::properties    atom_properties;
-            //typedef typename residue<T>::properties residue_properties;
+            typename atom<T>::properties::table    atoms;
+            typename residue<T>::properties::table residues;
             
-            //typedef set<word_t,typename atom_properties::pointer,key_hasher<word_t,hashing::sfh>,allocator>    atmlib;
-            //typedef set<word_t,typename residue_properties::pointer,key_hasher<word_t,hashing::sfh>,allocator> reslib;
+            typename residue<T>::properties & declare_residue( word_t type, const string &name );
+            typename atom<T>::properties    & declare_atom( word_t type, const string &name, T mass);
 
-            //atmlib atoms;
-            //reslib residues;
-            
-            residue_properties & declare_residue( word_t type, const string &name );
-            residue_properties & declare_residue( word_t type, const char   *name );
-
-            atom_properties & declare_atom(word_t type, const string &name, T mass );
-            atom_properties & declare_atom(word_t type, const char   *name, T mass );
-#endif
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
