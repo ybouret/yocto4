@@ -5,6 +5,8 @@
 
 #include "yocto/sequence/vector.hpp"
 
+#include "yocto/nosy-ptr.hpp"
+
 using namespace yocto;
 
 class Dummy
@@ -34,6 +36,7 @@ public:
     const int    & key() const throw() { return first; }
     const string & subkey() const throw() { return second; }
     
+    typedef nosy_ptr<int,string,Dummy> Ptr;
     
 private:
     YOCTO_DISABLE_ASSIGN(Dummy);
@@ -43,6 +46,7 @@ private:
 YOCTO_UNIT_TEST_IMPL(dualset)
 {
     typedef dual_set<int, string, Dummy> ds_t;
+    
     
     ds_t ds1;
     
