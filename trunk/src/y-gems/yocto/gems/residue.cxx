@@ -18,7 +18,7 @@ namespace yocto
         {
         }
         
-        
+#if 0
         template <>
         residue<real_t>:: properties:: ~properties() throw() {}
         
@@ -28,7 +28,7 @@ namespace yocto
         gems::properties(t,n)
         {
         }
-        
+#endif
         
     }
     

@@ -33,7 +33,7 @@ namespace yocto
         YOCTO_ARGUMENTS_DECL_KEY;
         YOCTO_ARGUMENTS_DECL_SUBKEY;
         
-        //! holds real keys
+        //! holds real keys and data
         class KNode
         {
         public:
@@ -251,6 +251,26 @@ namespace yocto
                 return true;
             }
             return false;
+        }
+        
+        inline KNode *node_with_key( param_key key ) throw()
+        {
+            return find_by_key(key, keyHasher(key) );
+        }
+        
+        inline const KNode *node_with_key( param_key key ) const throw()
+        {
+            return find_by_key(key, keyHasher(key) );
+        }
+        
+        inline KNode *node_with_subkey( param_subkey sub ) throw()
+        {
+            return find_by_sub(sub, subHasher(sub) );
+        }
+        
+        inline const KNode *node_with_subkey( param_subkey sub ) const throw()
+        {
+            return find_by_sub(sub, subHasher(sub) );
         }
         
         
