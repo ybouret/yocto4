@@ -14,6 +14,8 @@ YOCTO_UNIT_TEST_IMPL(lib)
     lib.declare_residue(0, "simu");
     lib.declare_atom(0, "H", 1);
     
+    std::cerr << "type of simu = " <<   lib.residues.type_of("simu") << std::endl;
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

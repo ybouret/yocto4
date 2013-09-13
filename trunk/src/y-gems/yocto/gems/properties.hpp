@@ -25,6 +25,9 @@ namespace yocto
             const word_t & key() const throw();
             const string & subkey() const throw();
             
+            static void check_pointer(const void *addr, const string &id);
+            static void check_pointer(const void *addr, word_t        id);
+
             template <typename T>
             class table : public dual_set<word_t, string, typename T::pointer,hashing::sfh,allocator>
             {
@@ -33,7 +36,19 @@ namespace yocto
                 explicit table() throw() : base_type() {}
                 virtual ~table() throw() {}
                 
+                inline word_t type_of( const string &n ) const
+                {
+                    const typename T::pointer *p = this->sub_search(n);
+                    properties::check_pointer(p,n);
+                    return (*p)->type;
+                }
                 
+                inline const string & name_of( word_t t) const
+                {
+                    const typename T::pointer *p = this->search(t);
+                    properties::check_pointer(p,t);
+                    return (*p)->name;
+                }
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(table);

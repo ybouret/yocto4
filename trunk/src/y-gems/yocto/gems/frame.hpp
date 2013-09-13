@@ -15,8 +15,8 @@ namespace yocto
             explicit frame();
         
         private:
-            
             YOCTO_DISABLE_COPY_AND_ASSIGN(frame);
+            
         public:
             library<T> lib;
         };
