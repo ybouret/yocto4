@@ -55,6 +55,9 @@ namespace yocto
             
             inline ~KNode() throw() {}
             
+            inline const_key    & key()    const throw() { return data.key(); }
+            inline const_subkey & subkey() const throw() { return data.subkey(); }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(KNode);
         };
