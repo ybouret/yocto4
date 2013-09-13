@@ -16,7 +16,7 @@ namespace yocto
 {
     namespace hidden
     {
-        extern const char dualmap_name[];
+        extern const char dual_map_name[];
     }
     
     //! a map indexed by two keys
@@ -26,7 +26,7 @@ namespace yocto
     typename T,
     typename HFUNC     = hashing::sfh,
     typename ALLOCATOR = memory::global::allocator >
-    class dualmap : public container
+    class dual_map : public container
     {
     public:
         YOCTO_ARGUMENTS_DECL_T;
@@ -81,7 +81,7 @@ namespace yocto
         typedef core::list_of<HNode>   HSlot;
         typedef memory::slab_of<HNode> HPool;
         
-        explicit dualmap() throw() :
+        explicit dual_map() throw() :
         itmax(0),
         slots(0),
         klist(),
@@ -99,7 +99,7 @@ namespace yocto
             
         }
         
-        explicit dualmap(size_t n, const as_capacity_t &):
+        explicit dual_map(size_t n, const as_capacity_t &):
         itmax(n),
         slots(htable::compute_slots_for(itmax)),
         klist(),
@@ -146,9 +146,9 @@ namespace yocto
         }
         
         
-        virtual ~dualmap() throw() { __release(); }
+        virtual ~dual_map() throw() { __release(); }
         
-        virtual const char *name() const throw()      { return hidden::dualmap_name; }
+        virtual const char *name() const throw()      { return hidden::dual_map_name; }
         virtual size_t      size() const throw()      { return klist.size; }
         virtual size_t      capacity() const throw()  { return itmax; }
         virtual void        free() throw()            { __free(); }
@@ -254,7 +254,7 @@ namespace yocto
         }
         
         
-        inline void swap_with( dualmap &other ) throw()
+        inline void swap_with( dual_map &other ) throw()
         {
             cswap(itmax, other.itmax);
             cswap(slots, other.slots);
@@ -317,7 +317,7 @@ namespace yocto
         void                            *wksp; //!< memory
         ALLOCATOR                        hmem; //!< the allocator
         
-        YOCTO_DISABLE_COPY_AND_ASSIGN(dualmap);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(dual_map);
         
         //======================================================================
         // find a concrete key node using the key/hkey
@@ -450,12 +450,12 @@ namespace yocto
         inline void __reserve(size_t n)
         {
             assert(n>0);
-            dualmap dm( itmax + n, as_capacity);
+            dual_map dm( itmax + n, as_capacity);
             __duplicate_into(dm);
             swap_with(dm);
         }
         
-        inline void __duplicate_into( dualmap &dm ) const
+        inline void __duplicate_into( dual_map &dm ) const
         {
             assert( 0 == dm.size() );
             for( const KNode *node = klist.head; node; node=node->next)
@@ -495,13 +495,13 @@ namespace yocto
             // unlink from list
             //------------------------------------------------------------------
             knode = klist.unlink(knode);
-        
+            
             //------------------------------------------------------------------
             // remove hnodes
             //------------------------------------------------------------------
             __remove_from_hslot( keyTable[knode->hkey%slots], knode );
             __remove_from_hslot( subTable[knode->hsub%slots], knode );
-
+            
             //------------------------------------------------------------------
             // destruct and cache
             //------------------------------------------------------------------
