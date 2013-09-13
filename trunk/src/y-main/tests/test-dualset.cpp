@@ -30,7 +30,8 @@ public:
     
     Dummy( const Dummy &d ) :
     first( d.first ),
-    second( d.second )
+    second( d.second ),
+    value(d.value)
     {
     }
     
