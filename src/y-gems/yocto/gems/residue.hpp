@@ -9,10 +9,9 @@ namespace yocto
     {
         
         template <typename T>
-        class residue : public identifier, public atom<T>::group
+        class residue : public identifier
         {
         public:
-            typedef intrusive_ptr<word_t,residue> pointer;
 
             explicit residue( word_t u, word_t t) throw();
             virtual ~residue() throw();
@@ -21,8 +20,7 @@ namespace yocto
             class properties : public gems::properties
             {
             public:
-                typedef intrusive_ptr<word_t,properties> pointer;
-                explicit properties(word_t t, const string &n);
+                explicit properties();
                 virtual ~properties() throw();
                 
             private:

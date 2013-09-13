@@ -9,7 +9,6 @@ YOCTO_UNIT_TEST_IMPL(lib)
     std::cerr << "sizeof(library<float>)  = " << sizeof( library<float>  ) << std::endl;
     std::cerr << "sizeof(library<double>) = " << sizeof( library<double> ) << std::endl;
 
-    library<float> lib;
-    lib.declare_atom(0, "H", 1);
+    //library<float> lib;
 }
 YOCTO_UNIT_TEST_DONE()
