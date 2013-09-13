@@ -98,3 +98,11 @@ YOCTO_UNIT_TEST_IMPL(dualset)
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(dualset2)
+{
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
