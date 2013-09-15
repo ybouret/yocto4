@@ -113,37 +113,32 @@ namespace yocto
         wksp(),
         hmem()
         {
-            if(slots>0)
-            {
-                assert(itmax>0);
-                //==============================================================
-                // compute metrics
-                //==============================================================
-                const size_t kpool_length = KPool::bytes_for(itmax);
-                const size_t k_tab_offset = memory::align(kpool_length);
-                const size_t k_tab_length = itmax * sizeof(HSlot);
-                const size_t s_tab_offset = memory::align(k_tab_offset+k_tab_length);
-                const size_t s_tab_length = itmax * sizeof(HSlot);
-                const size_t hpool_offset = memory::align(s_tab_offset+s_tab_length);
-                const size_t hpool_nummax = 2*itmax;
-                const size_t hpool_length = HPool::bytes_for(hpool_nummax);
-                
-                //==============================================================
-                // acquire memory
-                //==============================================================
-                wlen = hpool_offset + hpool_length;
-                wksp = hmem.acquire(wlen);
-                uint8_t *addr = static_cast<uint8_t *>(wksp);
-                
-                //==============================================================
-                // format memory
-                //==============================================================
-                kpool.format( &addr[0], itmax );
-                keyTable = (HSlot *) &addr[k_tab_offset];
-                subTable = (HSlot *) &addr[s_tab_offset];
-                hpool.format( &addr[hpool_offset], hpool_nummax);
-            }
+            __init();
         }
+        
+        explicit dual_map(const dual_map &other):
+        itmax(other.size()),
+        slots(htable::compute_slots_for(itmax)),
+        klist(),
+        kpool(0,0),
+        keyTable(0),
+        subTable(0),
+        hpool(0,0),
+        keyHasher(),
+        subHasher(),
+        wlen(),
+        wksp(),
+        hmem()
+        {
+            __init();
+            try
+            {
+                other.__duplicate_into( *this );
+            }
+            catch(...){ __release(); }
+        }
+        
+
         
         
         virtual ~dual_map() throw() { __release(); }
@@ -318,7 +313,7 @@ namespace yocto
         void                            *wksp; //!< memory
         ALLOCATOR                        hmem; //!< the allocator
         
-        YOCTO_DISABLE_COPY_AND_ASSIGN(dual_map);
+        YOCTO_DISABLE_ASSIGN(dual_map);
         
         //======================================================================
         // find a concrete key node using the key/hkey
@@ -509,6 +504,40 @@ namespace yocto
             destruct(knode);
             kpool.store(knode);
             
+        }
+        
+        inline void __init()
+        {
+            if(slots>0)
+            {
+                assert(itmax>0);
+                //==============================================================
+                // compute metrics
+                //==============================================================
+                const size_t kpool_length = KPool::bytes_for(itmax);
+                const size_t k_tab_offset = memory::align(kpool_length);
+                const size_t k_tab_length = itmax * sizeof(HSlot);
+                const size_t s_tab_offset = memory::align(k_tab_offset+k_tab_length);
+                const size_t s_tab_length = itmax * sizeof(HSlot);
+                const size_t hpool_offset = memory::align(s_tab_offset+s_tab_length);
+                const size_t hpool_nummax = 2*itmax;
+                const size_t hpool_length = HPool::bytes_for(hpool_nummax);
+                
+                //==============================================================
+                // acquire memory
+                //==============================================================
+                wlen = hpool_offset + hpool_length;
+                wksp = hmem.acquire(wlen);
+                uint8_t *addr = static_cast<uint8_t *>(wksp);
+                
+                //==============================================================
+                // format memory
+                //==============================================================
+                kpool.format( &addr[0], itmax );
+                keyTable = (HSlot *) &addr[k_tab_offset];
+                subTable = (HSlot *) &addr[s_tab_offset];
+                hpool.format( &addr[hpool_offset], hpool_nummax);
+            }
         }
         
     };

@@ -83,6 +83,14 @@ YOCTO_UNIT_TEST_IMPL(dualset)
         if(!ds1.sub_search(subs[i])) throw exception("missing subkey");
     }
     
+    std::cerr << std::endl << "COPY" << std::endl;
+    ds_t ds2( ds1 );
+    std::cerr << "size     = " << ds2.size()      << std::endl;
+    std::cerr << "capacity = " << ds2.capacity()  << std::endl;
+    std::cerr << "slots    = " << ds2.num_slots() << std::endl;
+    std::cerr << "bytes    = " << ds2.allocated_bytes() << std::endl;
+
+    
     for(size_t i=1; i <= keys.size(); ++i )
     {
         if( (i%2) )
@@ -133,9 +141,17 @@ YOCTO_UNIT_TEST_IMPL(dualset2)
     
     for(size_t i=1; i <= keys.size(); ++i )
     {
-        if(!ds1.search(keys[i])) throw exception("missing key");
+        if(!ds1.search(keys[i]))     throw exception("missing key");
         if(!ds1.sub_search(subs[i])) throw exception("missing subkey");
     }
+    
+    std::cerr << std::endl << "COPY" << std::endl;
+    ds_t ds2( ds1 );
+    std::cerr << "size     = " << ds2.size()      << std::endl;
+    std::cerr << "capacity = " << ds2.capacity()  << std::endl;
+    std::cerr << "slots    = " << ds2.num_slots() << std::endl;
+    std::cerr << "bytes    = " << ds2.allocated_bytes() << std::endl;
+
     
     for(size_t i=1; i <= keys.size(); ++i )
     {
