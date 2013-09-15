@@ -17,3 +17,4 @@ const_key &  /* pass non primitive mutable types by const reference    */  \
 #define YOCTO_ASSOCIATIVE_KEY_T YOCTO_ARGUMENTS_DECL_T; YOCTO_ARGUMENTS_DECL_KEY
 
 #endif
+
