@@ -50,6 +50,34 @@ namespace yocto
                     return (*p)->name;
                 }
                 
+                inline T & operator[](word_t t)
+                {
+                    typename T::pointer *p = this->search(t);
+                    properties::check_pointer(p,t);
+                    return **p;
+                }
+                
+                inline const T & operator[](word_t t) const
+                {
+                    const typename T::pointer *p = this->search(t);
+                    properties::check_pointer(p,t);
+                    return **p;
+                }
+                
+                inline T & operator[](const string &n)
+                {
+                    typename T::pointer *p = this->sub_search(n);
+                    properties::check_pointer(p,n);
+                    return **p;
+                }
+                
+                inline const T & operator[](const string &n) const
+                {
+                    const typename T::pointer *p = this->sub_search(n);
+                    properties::check_pointer(p,n);
+                    return **p;
+                }
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(table);
             };

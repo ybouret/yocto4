@@ -16,6 +16,9 @@ YOCTO_UNIT_TEST_IMPL(lib)
     
     std::cerr << "type of simu = " <<   lib.residues.type_of("simu") << std::endl;
     
+    atom<float>::properties &p = lib.atoms[0];
+    std::cerr << "name=" << p.name << std::endl;
     
+    std::cerr << "type=" << lib.atoms["H"].type << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
