@@ -8,7 +8,8 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(dualmap)
 {
-    dual_map<int, string, float> dm;
+    typedef  dual_map<int, string, float> dm_t;
+    dm_t dm;
     
     const string s = "toto";
     
@@ -73,6 +74,9 @@ YOCTO_UNIT_TEST_IMPL(dualmap)
         if( !dm.sub_search(subs[i])) throw exception("can't find by subkey");
         std::cerr << "#";
     }
+    
+    std::cerr << std::endl << "COPY" << std::endl;
+    dm_t dm3(dm2);
     
     std::cerr << std::endl;
     std::cerr << "removing..." << std::endl;
