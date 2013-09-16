@@ -14,7 +14,6 @@ using namespace yocto;
 template <typename KEY,typename T,typename KEY_HASHER, typename ALLOCATOR>
 static inline void test_map()
 {
-#if 1
 	typedef  map<KEY,T,KEY_HASHER,ALLOCATOR> map_t;
 	std::cerr << "map<" << typeid(KEY).name() << "," << typeid(T).name() << ">" << std::endl;
 	std::cerr << "sizeof(map)=" << sizeof(map_t) << std::endl;
@@ -25,7 +24,7 @@ static inline void test_map()
 		std::cerr << "---- generating" << std::endl;
 		map_t M;
 		vector<KEY> keys;
-		for( size_t i=0; i < 2048; ++i )
+		for( size_t i=0; i < 4096; ++i )
 		{
 			KEY key  = gen< typename map_t::mutable_key  >::get();
 			T   data = gen< typename map_t::mutable_type >::get();
@@ -64,7 +63,6 @@ static inline void test_map()
 		
 		
 	}
-#endif
 }
 
 YOCTO_UNIT_TEST_IMPL(map)
