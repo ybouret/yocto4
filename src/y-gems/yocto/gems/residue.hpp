@@ -11,7 +11,7 @@ namespace yocto
         
         //! a residue identifies a group of atoms
         template <typename T>
-        class residue : public identifier, public atom<T>::group
+        class residue : public identifier, public atom<T>::sorted_group
         {
         public:
             typedef  intrusive_ptr<word_t,residue> pointer;
