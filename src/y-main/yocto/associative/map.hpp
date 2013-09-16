@@ -98,6 +98,7 @@ namespace yocto
             __init();
         }
         
+        //! copy ctor
         explicit map( const map &other ) :
         itmax(other.size()),
         slots(htable::compute_slots_for(itmax)),
@@ -116,6 +117,7 @@ namespace yocto
         }
 
         
+        //! no-throw swap
         inline void swap_with( map &other ) throw()
         {
             cswap(itmax, other.itmax);
@@ -140,7 +142,9 @@ namespace yocto
         {
             if(n>0)
             {
-                
+                map tmp( itmax +n, as_capacity );
+                __duplicate_into(tmp);
+                swap_with(tmp);
             }
         }
         
@@ -149,8 +153,9 @@ namespace yocto
             //------------------------------------------------------------------
             // check key
             //------------------------------------------------------------------
+            HSlot       *slot = 0;
             const size_t hkey = hash(key);
-            if( (slots>0) && (0!=__find(key, hkey)) ) return false;
+            if( (slots>0) && (0!=__find(key, hkey, slot)) ) return false;
             
             //------------------------------------------------------------------
             // check memory/insert
@@ -175,14 +180,16 @@ namespace yocto
             const size_t hkey = hash(key);
             if(slots>0)
             {
-                HNode *node = __find(key,hkey);
+                HSlot *slot = 0;
+                HNode *node = __find(key,hkey,slot);
                 if(node)
                 {
-                    assert(hslot[hkey%slots].head==node);
+                    assert(slot);
+                    assert(slot->head==node);
                     KNode *knode = node->knode;
                     destruct( klist.unlink(knode) );
                     kpool.store(knode);
-                    hpool.store( hslot[hkey%slots].pop_front() );
+                    hpool.store( slot->pop_front() );
                     return true;
                 }
             }
@@ -208,6 +215,19 @@ namespace yocto
 		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator(klist.head); }
 		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator(0);          }
 
+        //======================================================================
+        // signature
+        //======================================================================
+        size_t signature() const throw()
+        {
+            hashing::sha1 H;
+            H.set();
+            for(const KNode *knode=klist.head;knode;knode=knode->next)
+            {
+                H.run_type(knode->hkey);
+            }
+            return H.key<size_t>();
+        }
         
     private:
         //----------------------------------------------------------------------
@@ -283,17 +303,18 @@ namespace yocto
         //======================================================================
         // look up, virtual for associative interface
         //======================================================================
-        HNode * __find( param_key key, const size_t hkey ) const throw()
+        HNode * __find( param_key key, const size_t hkey, HSlot * &slot ) const throw()
         {
             assert(slots);
             assert(hslot);
-            HSlot &slot = hslot[ hkey % slots ];
-            for(HNode *node=slot.head;node;node=node->next)
+            assert(0==slot);
+            slot = &hslot[ hkey % slots ];
+            for(HNode *node=slot->head;node;node=node->next)
             {
                 assert(node->knode);
                 if(key == node->knode->key)
                 {
-                    slot.move_to_front(node);
+                    slot->move_to_front(node);
                     return node;
                 }
             }
@@ -304,7 +325,8 @@ namespace yocto
         {
             if(slots)
             {
-                HNode *node = __find(key,hash(key));
+                HSlot *slot = 0;
+                HNode *node = __find(key,hash(key),slot);
                 if(node) return & node->knode->data;
             }
             return 0;
@@ -374,195 +396,7 @@ namespace yocto
         }
     };
     
-    
-#if 0
-	template <
-	typename KEY,
-	typename T,
-	typename KEY_HASHER = key_hasher<KEY>,
-	typename ALLOCATOR  = memory::global::allocator >
-	class map : public associative<KEY,T>
-	{
-	public:
-		YOCTO_ASSOCIATIVE_KEY_T;
-		
-		//! data key/obj node
-		class node_type
-		{
-		public:
-			node_type   *next;
-			node_type   *prev;
-			const size_t hkey;
-			const_key    key;
-			type         data;
-			inline ~node_type() throw() {}
-			inline  node_type( size_t h, param_key k,  param_type args ) : next(NULL), prev(NULL), hkey(h), key(k), data(args) {}
-			
-		private:
-			YOCTO_DISABLE_COPY_AND_ASSIGN(node_type);
-		};
-		
-		
-		
-		
-		explicit map() throw(): hash_(), hmem_(),ktab_() {}
-		explicit map( size_t n, const as_capacity_t & ) : hash_(), hmem_(), ktab_(n,hmem_) {}
-		virtual ~map() throw() { _kill(); }
-		
-		inline map( const map &other ) : hash_(), hmem_(), ktab_()
-		{
-			map tmp( other.size(), as_capacity );
-			other._copy_into( tmp );
-			mswap( tmp.ktab_, ktab_ );
-		}
-		
-		//======================================================================
-		// container interface
-		//======================================================================
-		virtual const char *name() const throw()     { return hidden::map_name; }
-		virtual size_t      size() const throw()     { return ktab_.nlist.size; }
-		virtual size_t      capacity() const throw() { return ktab_.nodes;      }
-		virtual void        free() throw()    { _free(); }
-		virtual void        release() throw() { _kill(); }
-		virtual void        reserve( size_t n )
-		{
-			if( n > 0 )
-			{
-				map other( this->capacity() + n, as_capacity );
-				_copy_into( other );
-				mswap( ktab_, other.ktab_ );
-			}
-		}
-		
-		//======================================================================
-		// associative interface
-		//======================================================================
-		virtual bool insert( param_key key, param_type args )
-		{
-			const size_t     hkey = hash_(key);
-			kslot_t         *slot = NULL;
-			const node_type *node = ktab_.search( hkey, slot, _match, &key );
-			if( node )
-			{
-				return false;
-			}
-			else
-			{
-                __insert(key, args, hkey, slot);
-				return true;
-			}
-		}
-		
-		virtual bool remove( param_key key ) throw()
-		{
-			const size_t     hkey = hash_(key);
-			kslot_t         *slot = NULL;
-			const node_type *node = ktab_.search( hkey, slot, _match, &key );
-			if( node )
-			{
-				assert( slot != NULL); assert( slot->head );
-				assert( node == slot->head ->addr); assert( node->key == key );
-				ktab_.remove_front_of(slot, destruct<node_type> );
-				return true;
-			}
-			else
-				return false;
-		}
-		
-        virtual void lazy_insert( param_key key, param_type args )
-        {
-            const size_t     hkey = hash_(key);
-			kslot_t         *slot = NULL;
-			const node_type *node = ktab_.search( hkey, slot, _match, &key );
-            if(!node)
-                __insert(key, args, hkey, slot);
-        }
-        
-        
-		//======================================================================
-		// iterators
-		//======================================================================
-		typedef iterating::linked<type,node_type,iterating::forward> iterator;
-		inline iterator begin() throw() { return iterator( ktab_.nlist.head ); }
-		inline iterator end()   throw() { return iterator( NULL );       }
-		
-		typedef iterating::linked<const_type,const node_type,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return const_iterator( ktab_.nlist.head  ); }
-		inline const_iterator end()   const throw() { return const_iterator( NULL );       }
-		
-	private:
-		YOCTO_DISABLE_ASSIGN(map);
-		
-		typedef core::ktable<node_type>    ktable_t;
-		typedef typename ktable_t::kslot_t kslot_t;
-		typedef typename ktable_t::knode_t knode_t;
-		mutable KEY_HASHER hash_;
-		ALLOCATOR          hmem_;
-		mutable ktable_t   ktab_;
-		
-		virtual const_type *lookup( param_key key ) const throw()
-		{
-			const size_t     hkey = hash_(key);
-			kslot_t         *slot = NULL;
-			const node_type *node = ktab_.search( hkey, slot, _match, &key );
-			return node ?  & node->data : NULL;
-		}
-		
-		inline void _free() throw() { ktab_.free_with( destruct<node_type> ); }
-		inline void _kill() throw() { _free();  ktab_.release_all(hmem_);     }
-		inline void _copy_into( map &other ) const
-		{
-			assert( other.capacity() >= this->size() );
-			assert( other.size() == 0 );
-			for( const node_type *src = ktab_.nlist.head; src; src = src->next )
-			{
-				//-- dup/insert
-				_insert( other.ktab_, src->hkey, src->key, src->data );
-			}
-			assert( other.size() == this->size() );
-			assert( other.ktab_.signature() == this->ktab_.signature() );
-		}
-		
-		static inline node_type *_create( ktable_t &tab, size_t hkey, param_key key, param_type args )
-		{
-			//-- atomic node creationg
-			node_type       *tgt = tab.cache.query();
-			try{ new (tgt) node_type(hkey,key,args); }
-			catch(...) { tab.cache.store(tgt); throw; }
-			return tgt;
-		}
-		
-		static inline void _insert( ktable_t &tab, size_t hkey, param_key key, param_type args )
-		{ tab.insert( _create(tab,hkey,key,args) ); }
-		
-		static inline void _insert2( ktable_t &tab, size_t hkey, param_key key, param_type args, kslot_t *slot ) throw()
-		{ tab.insert2(_create(tab,hkey,key,args),slot); }
-		
-		
-		static inline bool _match( const node_type *node, const void *params ) throw()
-		{ return node->key == *(const_key*)params; }
-		
-        inline void __insert(param_key     key,
-                             param_type    args,
-                             const size_t  hkey,
-                             kslot_t      *slot)
-        {
-            if( size() < capacity() )
-            {
-                assert(slot!=NULL);
-                _insert2( ktab_, hkey, key, args, slot );
-            }
-            else
-            {
-                map  other( container::next_capacity( capacity() ), as_capacity);
-                _copy_into(other);
-                _insert( other.ktab_,  hkey, key, args );
-                mswap( other.ktab_, ktab_ );
-            }
-        }
-	};
-#endif
-    
+
 }
 
 #endif

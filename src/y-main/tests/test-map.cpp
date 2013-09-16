@@ -20,6 +20,7 @@ static inline void test_map()
 	{ map_t M; }
 	{ map_t M(1,as_capacity); }
 	
+    for(size_t iter=0;iter<4;++iter)
 	{
 		std::cerr << "---- generating" << std::endl;
 		map_t M;
@@ -42,7 +43,10 @@ static inline void test_map()
 		}
 		std::cerr << "---- size=" << M.size() << "/" << M.capacity() << std::endl;
 		std::cerr << "---- copy" << std::endl;
+        const size_t sig1 = M.signature();
 		map_t M2(M);
+        const size_t sig2 = M2.signature();
+        std::cerr << "signatures: " << sig1 << "/" << sig2 << std::endl;
 		std::cerr << "---- removing " << keys.size() << " keys" << std::endl;
 		for( size_t i=1; i <= keys.size(); ++i )
 		{
@@ -59,9 +63,6 @@ static inline void test_map()
 				std::cerr << "Unable to remove '" << i->hkey << "' !" << std::endl;
 			}
 		}
-		
-		
-		
 	}
 }
 
