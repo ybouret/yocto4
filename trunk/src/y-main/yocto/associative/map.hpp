@@ -4,7 +4,9 @@
 #include "yocto/container/associative.hpp"
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/associative/ktable.hpp"
+#include "yocto/code/htable.hpp"
+#include "yocto/memory/slab.hpp"
+#include "yocto/core/list.hpp"
 #include "yocto/container/iter-linked.hpp"
 
 namespace yocto
@@ -14,7 +16,152 @@ namespace yocto
 	{
 		extern const char map_name[];
 	}
-	
+    
+    template <
+    typename KEY,
+    typename T,
+    typename KEY_HASHER = key_hasher<KEY>,
+	typename ALLOCATOR  = memory::global::allocator >
+	class map
+	{
+    public:
+        YOCTO_ASSOCIATIVE_KEY_T;
+        
+        //! key/hkey/data
+        class KNode
+        {
+        public:
+            KNode       *prev;
+            KNode       *next;
+            const_key    key;
+            const size_t hkey;
+            type         data;
+            
+            inline KNode( param_key k, size_t h, param_type args) :
+            prev(0), next(0), key(k), hkey(h), data(args) {}
+            inline ~KNode() throw() {}
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(KNode);
+        };
+        
+        typedef core::list_of<KNode>   KList;
+        typedef memory::slab_of<KNode> KPool;
+        
+        
+        //! handle node on knode
+        class HNode
+        {
+        public:
+            HNode *prev;
+            HNode *next;
+            KNode *knode;
+            inline  HNode(KNode *kn) throw() : prev(0), next(0), knode(kn) { assert(knode); }
+            inline ~HNode() throw() {}
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(HNode);
+        };
+        
+        typedef core::list_of<HNode>    HSlot;
+        typedef memory::slab_of<HNode>  HPool;
+        
+        explicit map() throw() :
+        itmax(0),
+        slots(0),
+        klist(),
+        kpool(0,0),
+        hslot(0),
+        hpool(0,0),
+        wlen(0),
+        wksp(0),
+        hash(),
+        hmem()
+        {
+        }
+        
+        
+        virtual ~map() throw() { __release(); }
+        
+        
+        virtual const char *name() const throw()     { return hidden::map_name; }
+        virtual void        free() throw()           { __free(); }
+        virtual void        release()  throw()       { __release(); }
+        virtual size_t      size()     const throw() { return klist.size; }
+        virtual size_t      capacity() const throw() { return itmax; }
+        
+    private:
+        //----------------------------------------------------------------------
+        // metrics
+        //----------------------------------------------------------------------
+        size_t                        itmax; //!< max items in table
+        size_t                        slots; //!< slots for htable metrics
+        
+        //----------------------------------------------------------------------
+        // holding key/data
+        //----------------------------------------------------------------------
+        KList                         klist;
+        KPool                         kpool;
+        
+        //----------------------------------------------------------------------
+        // holding slots
+        //----------------------------------------------------------------------
+        HSlot                        *hslot; // 0..slots
+        HPool                         hpool;
+      
+        //----------------------------------------------------------------------
+        // memory
+        //----------------------------------------------------------------------
+        size_t                        wlen;
+        void                         *wksp;
+        
+        mutable KEY_HASHER            hash;
+        ALLOCATOR                     hmem;
+
+        YOCTO_DISABLE_COPY_AND_ASSIGN(map);
+        
+        //======================================================================
+		// free
+		//======================================================================
+        inline void __free_slot(HSlot &slot) throw()
+        {
+            while(slot.size>0)
+            {
+                HNode *node = slot.pop_back();
+                destruct(node);
+                hpool.store(node);
+            }
+        }
+        
+        inline void __free() throw()
+        {
+            for(size_t i=0;i<slots;++i) __free_slot( hslot[i] );
+            while(klist.size)
+            {
+                KNode *knode = klist.pop_back();
+                destruct(knode);
+                kpool.store(knode);
+            }
+        }
+        
+        //======================================================================
+		// release
+		//======================================================================
+        void __release() throw()
+        {
+            __free();
+            hmem.release(wksp,wlen);
+            slots = 0;
+            itmax = 0;
+            hslot = 0;
+            kpool.format(0,0);
+            hpool.format(0,0);
+        }
+        
+    };
+    
+    
+#if 0
 	template <
 	typename KEY,
 	typename T,
@@ -200,7 +347,8 @@ namespace yocto
             }
         }
 	};
-	
+#endif
+    
 }
 
 #endif

@@ -14,6 +14,7 @@ using namespace yocto;
 template <typename KEY,typename T,typename KEY_HASHER, typename ALLOCATOR>
 static inline void test_map()
 {
+#if 0
 	typedef  map<KEY,T,KEY_HASHER,ALLOCATOR> map_t;
 	std::cerr << "map<" << typeid(KEY).name() << "," << typeid(T).name() << ">" << std::endl;
 	std::cerr << "sizeof(map)=" << sizeof(map_t) << std::endl;
@@ -63,10 +64,16 @@ static inline void test_map()
 		
 		
 	}
+#endif
 }
 
 YOCTO_UNIT_TEST_IMPL(map)
 {
+    map<int,string> M;
+    
+    M.free();
+    M.release();
+    
 	test_map<int,int,key_hasher<int>,memory::global::allocator>();
 	test_map<const int,string,key_hasher<int,hashing::sfh>,memory::global::allocator>();
 	test_map<const string,const string,key_hasher<string,hashing::sha1>,memory::pooled::allocator>();
