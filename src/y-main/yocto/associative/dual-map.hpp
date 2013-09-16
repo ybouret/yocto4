@@ -138,7 +138,7 @@ namespace yocto
             catch(...){ __release(); }
         }
         
-
+        
         
         
         virtual ~dual_map() throw() { __release(); }
@@ -167,15 +167,17 @@ namespace yocto
             
             
             //==================================================================
-            // memory check 
+            // memory check/insertion
             //==================================================================
             if( klist.size >= itmax )
-                __reserve( next_increase(itmax) );
-            
-            //==================================================================
-            // node insertion
-            //==================================================================
-            __insert(key, hkey, sub, hsub, args);
+            {
+                dual_map tmp( next_capacity(itmax), as_capacity );
+                __duplicate_into(tmp);
+                tmp.__insert(key,hkey,sub,hsub,args);
+                swap_with(tmp);
+            }
+            else
+                __insert(key, hkey, sub, hsub, args);
             return true;
             
         }
