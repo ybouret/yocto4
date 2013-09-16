@@ -17,6 +17,7 @@ namespace yocto
         atomList(),
         atomSet(),
         residueSet(),
+	lib(),
         rid(0),
         aid(0)
         {
