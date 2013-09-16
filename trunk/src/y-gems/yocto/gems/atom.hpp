@@ -23,31 +23,33 @@ namespace yocto
         {
         public:
             typedef intrusive_ptr<word_t,atom> pointer;
-            class pointer_comparator
+            typedef atom                      *ptr;
+            
+            class ptr_comparator
             {
             public:
-                inline  pointer_comparator() throw() {}
-                inline ~pointer_comparator() throw() {}
-                inline  int operator()( const pointer &lhs, const pointer &rhs) throw()
+                inline  ptr_comparator() throw() {}
+                inline ~ptr_comparator() throw() {}
+                inline  int operator()( const ptr &lhs, const ptr &rhs) const throw()
                 {
                     return __compare<word_t>(lhs->uuid,rhs->uuid);
                 }
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(pointer_comparator);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(ptr_comparator);
             };
 
-            typedef sorted_vector<pointer,pointer_comparator,allocator> group;
-            typedef residue<T>                                          residue_type;
-            typedef intrusive_ptr<word_t,residue_type>                  residue_ptr;
+            typedef sorted_vector<ptr,ptr_comparator,allocator>  group;
+            typedef residue<T>                                   residue_type;
+            typedef intrusive_ptr<word_t,residue_type>           residue_pointer;
             
-            v3d<T>            r;
-            v3d<T>            v;
-            v3d<T>            a;
-            const T           m; //!< mass
-            const T           w; //!< 1/mass
-            const residue_ptr parent;
+            v3d<T>                r;
+            v3d<T>                v;
+            v3d<T>                a;
+            const T               m; //!< mass
+            const T               w; //!< 1/mass
+            const residue_pointer parent;
             
-            explicit atom( const residue_ptr &from, word_t u, word_t t) throw();
+            explicit atom( const residue_pointer &from, word_t u, word_t t) throw();
             virtual ~atom() throw();
             void     set_mass(T mass) throw();
             

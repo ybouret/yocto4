@@ -13,7 +13,7 @@ namespace yocto
         }
        
         template <>
-        atom<real_t>:: atom( const residue_ptr &res, word_t u, word_t t) throw() :
+        atom<real_t>:: atom( const residue_pointer &res, word_t u, word_t t) throw() :
         identifier(u,t), r(),v(),a(),m(0),w(0), parent(res)
         {
             //std::cerr << "atom type=" << type << " #parent count=" << parent->refcount() << std::endl;
@@ -39,6 +39,10 @@ namespace yocto
             if(mass<=0)
                 throw libc::exception( ERANGE, "negative mass for '%s'", name.c_str() );
         }
+        
+        template <>
+        const char atom<real_t>::properties::table::Label[] = "atom";
+        
         
     }
     

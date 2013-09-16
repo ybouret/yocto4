@@ -205,7 +205,7 @@ namespace yocto
         inline const_key * get_key_of( param_subkey sub ) const throw()
         {
             const KNode *knode = find_by_sub(sub, subHasher(sub) );
-            if(knode) return & knode->key;
+            if(knode) return & knode->key();
             return 0;
         }
         

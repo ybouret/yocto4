@@ -9,12 +9,6 @@ namespace yocto
         template <>
         frame<real_t>:: ~frame() throw()
         {
-            // avoid circular reference
-            for(residue_set::reverse_iterator i=residueSet.rbegin(); i != residueSet.rend(); ++i )
-            {
-                residue<real_t> &r = **i;
-                r.release();
-            }
         }
         
         
@@ -34,7 +28,7 @@ namespace yocto
         // adding a new residue, empty
         //======================================================================
         template <>
-        word_t frame<real_t>:: add_residue(word_t type)
+        word_t frame<real_t>:: add_residue(const word_t type)
         {
             const residue_properties_pointer *rpp = lib.residues.search(type);
             if(!rpp)
@@ -47,6 +41,14 @@ namespace yocto
             ++rid;
             return p->uuid;
         }
+        
+        
+        template <>
+        word_t frame<real_t>:: add_residue(const string &name )
+        {
+            return add_residue( lib.residues.type_of(name) );
+        }
+        
         
         //======================================================================
         // adding a new atom
@@ -75,13 +77,14 @@ namespace yocto
             //------------------------------------------------------------------
             //-- phase 0: create the atom
             //------------------------------------------------------------------
-            atom_pointer p( new atom<real_t>(parent,aid,type) );
+            atom_ptr       p = new atom<real_t>(parent,aid,type);
+            atom_pointer   q(p);
             p->set_mass( (*app)->mass );
             
             //------------------------------------------------------------------
             //-- phase 1: insert into atomSet
             //------------------------------------------------------------------
-            if(!atomSet.insert(p))
+            if(!atomSet.insert(q))
                 throw exception("unexpected atom '%s' insertion in FRAME failure", name);
             
             
@@ -119,7 +122,12 @@ namespace yocto
             return p->uuid;
         }
         
-        
+        template <>
+        word_t frame<real_t>:: add_atom_to( word_t residue_uuid, const string &name)
+        {
+            return add_atom_to(residue_uuid, lib.atoms.type_of(name) );
+        }
+
         
         
     }
