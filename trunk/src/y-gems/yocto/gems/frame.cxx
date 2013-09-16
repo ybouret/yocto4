@@ -44,22 +44,40 @@ namespace yocto
         template <>
         word_t frame<real_t>:: add_atom_to( word_t residue_uuid, word_t type)
         {
-            //-- checke atom type
+            //------------------------------------------------------------------
+            //-- check atom type
+            //------------------------------------------------------------------
             const atom_properties_pointer *app = lib.atoms.search(type);
             if(!app)
                 throw exception("no atom type in library");
             const char *name = (*app)->name.c_str();
             
-            const residue_pointer *parent_addr = residueSet.search( residue_uuid );
+            residue_pointer *parent_addr = residueSet.search( residue_uuid );
             if(!parent_addr)
                 throw exception("no parent residue for atom '%s'", name);
             
-            //-- phase 1: insert into atomSet
-            atom_pointer p( new atom<real_t>(*parent_addr,aid,type) );
-            if(!atomSet.insert(p))
-                throw exception("unexpected atom '%s' insertion failure", name);
+            residue_pointer &parent = *parent_addr;
             
+            //------------------------------------------------------------------
+            //-- phase 1: insert into atomSet
+            //------------------------------------------------------------------
+            atom_pointer p( new atom<real_t>(parent,aid,type) );
+            if(!atomSet.insert(p))
+                throw exception("unexpected atom '%s' insertion in FRAME failure", name);
+            
+            //------------------------------------------------------------------
             //-- phase 2: add to residue
+            //------------------------------------------------------------------
+            try
+            {
+                if( !parent->insert(p) )
+                    throw exception("unexpected atom '%s' insertion in RESIDUE failure",name);
+            }
+            catch(...)
+            {
+                (void) atomSet.remove(aid);
+                throw;
+            }
             
             ++aid;
             return p->uuid;

@@ -5,6 +5,7 @@
 #include "yocto/gems/identifier.hpp"
 #include "yocto/gems/properties.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/nosy-ptr.hpp"
 
@@ -23,10 +24,23 @@ namespace yocto
         {
         public:
             typedef intrusive_ptr<word_t,atom> pointer;
-            typedef vector<pointer,allocator>  group;
-            
-            typedef residue<T>                         residue_type;
-            typedef intrusive_ptr<word_t,residue_type> residue_ptr;
+            class pointer_comparator
+            {
+            public:
+                inline  pointer_comparator() throw() {}
+                inline ~pointer_comparator() throw() {}
+                inline  int operator()( const pointer &lhs, const pointer &rhs) throw()
+                {
+                    return __compare<word_t>(lhs->uuid,rhs->uuid);
+                }
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(pointer_comparator);
+            };
+
+            typedef vector<pointer,allocator>                           group;
+            typedef sorted_vector<pointer,pointer_comparator,allocator> sorted_group;
+            typedef residue<T>                                          residue_type;
+            typedef intrusive_ptr<word_t,residue_type>                  residue_ptr;
             
             v3d<T>            r;
             v3d<T>            v;
@@ -55,6 +69,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
             };
             
+                       
         private:
             atom& operator=(const atom &);
             atom(const atom &other) throw();
