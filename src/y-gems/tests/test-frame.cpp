@@ -6,8 +6,10 @@ using namespace gems;
 
 YOCTO_UNIT_TEST_IMPL(frame)
 {
-    //frame<float> F;
+    frame<float> F;
     
+    F.lib.declare_residue(0, "simu");
+    F.add_residue(0);
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -16,9 +16,22 @@ namespace yocto
             explicit frame();
             
             
+            //! new residue
+            /**
+             \return the residue uuid
+             */
+            word_t add_residue( word_t type );
+            
+            //! new atom
+            /**
+             \return the atom uuid
+             */
+            word_t add_atom_to( word_t residue_uuid, word_t type);
             
         private:
             typedef key_hasher<word_t,hashing::sfh>                    word_hasher;
+            typedef typename residue<T>::properties::pointer           residue_properties_pointer;
+            typedef typename atom<T>::properties::pointer              atom_properties_pointer;
             typedef typename atom<T>::pointer                          atom_pointer;
             typedef typename residue<T>::pointer                       residue_pointer;
             typedef  set<word_t,atom_pointer,word_hasher,allocator>    atom_set;
@@ -31,6 +44,10 @@ namespace yocto
             
         public:
             library<T> lib;
+            
+        private:
+            word_t rid;
+            word_t aid;
         };
         
     }
