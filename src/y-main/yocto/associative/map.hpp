@@ -5,8 +5,8 @@
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/htable.hpp"
-#include "yocto/memory/slab.hpp"
 #include "yocto/core/list.hpp"
+#include "yocto/memory/slab.hpp"
 #include "yocto/container/iter-linked.hpp"
 
 namespace yocto
@@ -289,7 +289,7 @@ namespace yocto
         //======================================================================
 		// release
 		//======================================================================
-        void __release() throw()
+        inline void __release() throw()
         {
             __free();
             hmem.release(wksp,wlen);
@@ -303,7 +303,7 @@ namespace yocto
         //======================================================================
         // look up, virtual for associative interface
         //======================================================================
-        HNode * __find( param_key key, const size_t hkey, HSlot * &slot ) const throw()
+        inline HNode * __find( param_key key, const size_t hkey, HSlot * &slot ) const throw()
         {
             assert(slots);
             assert(hslot);
