@@ -9,8 +9,6 @@
 #include "yocto/core/list.hpp"
 #include "yocto/container/iter-linked.hpp"
 
-#include <iostream>
-
 namespace yocto
 {
 	
@@ -158,7 +156,6 @@ namespace yocto
             if( klist.size >= itmax )
             {
                 map tmp( container::next_capacity(itmax), as_capacity );
-                std::cerr << "itmax: " << itmax << " => " << tmp.itmax << std::endl;
                 __duplicate_into(tmp);
                 tmp.__insert(key,hkey,args);
                 swap_with(tmp);
@@ -319,7 +316,6 @@ namespace yocto
         {
             if(slots>0)
             {
-                std::cerr << "__init for " << itmax << std::endl;
                 const size_t kpool_offset = 0;
                 const size_t kpool_length = KPool::bytes_for(itmax);
                 const size_t hslot_offset = memory::align(kpool_offset + kpool_length);
@@ -334,8 +330,6 @@ namespace yocto
                 kpool.format( &p[kpool_offset], itmax);
                 hslot      = (HSlot *) &p[hslot_offset];
                 hpool.format( &p[hpool_offset], itmax);
-                std::cerr << "kpool.available=" << kpool.available() << std::endl;
-                std::cerr << "hpool.available=" << hpool.available() << std::endl;
             }
         }
         
@@ -344,7 +338,6 @@ namespace yocto
         //======================================================================
         inline void __insert( param_key key, const size_t hkey, param_type args )
         {
-            std::cerr << "__insert into itmax=" << itmax << std::endl;
             assert(klist.size<itmax);
             assert(kpool.available()>0);
             assert(hpool.available()==kpool.available());
@@ -361,6 +354,7 @@ namespace yocto
             }
             HNode *node = new ( hpool.query() ) HNode(knode);
             hslot[ hkey % slots ].push_front(node);
+            klist.push_back(knode);
         }
         
         //======================================================================
@@ -368,13 +362,11 @@ namespace yocto
         //======================================================================
         inline void __duplicate_into( map &other ) const
         {
-            std::cerr << "duplicating " << this->size() << "/" << klist.size << " items into " << other.capacity() << std::endl;
             assert(other.size()==0);
             assert(other.capacity()>=this->size());
             
             for( const KNode *knode = klist.head; knode; knode=knode->next)
             {
-                std::cerr << " dup " << knode->key << std::endl;
                 other.__insert( knode->key, knode->hkey, knode->data);
             }
         }
