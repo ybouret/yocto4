@@ -45,5 +45,7 @@ YOCTO_UNIT_TEST_IMPL(frame)
         F.add_atom_to(ir, ia);
     }
     
+    
+    std::cerr << "na=" << na << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
