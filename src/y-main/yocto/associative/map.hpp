@@ -197,6 +197,32 @@ namespace yocto
         }
         
         //======================================================================
+        // fast access
+        //======================================================================
+        inline type       &front()       throw() { assert(klist.head); return klist.head->data; }
+        inline const_type &front() const throw() { assert(klist.head); return klist.head->data; }
+        inline type       &back()        throw() { assert(klist.head); return klist.tail->data; }
+        inline const_type &back()  const throw() { assert(klist.head); return klist.tail->data; }
+        
+        //======================================================================
+        // slow access
+        //======================================================================
+        inline type & operator()(size_t indx) throw()
+        {
+            assert(indx>0);
+            assert(indx<=this->size());
+            return klist.fetch(--indx)->data;
+        }
+        
+        inline const_type & operator()(size_t indx) const throw()
+        {
+            assert(indx>0);
+            assert(indx<=this->size());
+            return ((KList &)klist).fetch(--indx)->data;
+        }
+
+        
+        //======================================================================
 		// iterators
 		//======================================================================
 		typedef iterating::linked<type,KNode,iterating::forward> iterator;
