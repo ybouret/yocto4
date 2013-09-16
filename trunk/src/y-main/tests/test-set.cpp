@@ -12,7 +12,7 @@
 using namespace yocto;
 
 
-namespace 
+namespace
 {
 	template <typename KEY>
 	class dummy
@@ -22,7 +22,7 @@ namespace
 		
 		KEY id;
 		
-		dummy( param_key k ) : id(k) 
+		dummy( param_key k ) : id(k)
 		{
 		}
 		
@@ -43,36 +43,41 @@ namespace
 		typedef set<KEY,dummy<KEY>,KEY_HASHER,ALLOCATOR> set_t;
 		typedef typename set_t::mutable_key              key_t;
 		
-		vector<KEY> keys;
-		set_t       S;
-		std::cerr << "set<" << typeid(KEY).name() << ",dummy>" << std::endl;
-		std::cerr << "-- insert" << std::endl;
-		for( size_t i=0; i < 2048; ++i )
-		{
-			KEY        k = gen<key_t>::get();
-			dummy<KEY> d( k );
-			if( S.insert( d ) )
-			{
-				if( alea<float>() > 0.6f ) keys.push_back( k );
-			}
-			else {
-				std::cerr << "Multiple Key '" << k << "'" << std::endl;
-			}			
-		}
-		std::cerr << "-- size=" << S.size() << "/" << S.capacity() << std::endl;
-		set_t S2(S);
-		
-		std::cerr << "---- removing " << keys.size() << " keys" << std::endl;
-		for( size_t i=1; i <= keys.size(); ++i )
-		{
-			if( !S2.remove( keys[i] ) ) std::cerr << "can't remove " << keys[i] << std::endl;
-		}
-		
-		for( typename set_t::iterator i = S2.begin(); i != S2.end(); ++i )
-		{
-			const KEY &k = i->data.key();
-			if( ! S.remove( k ) ) std::cerr << "can't remove " << k << std::endl;
-		}
+        for(size_t iter=0;iter<4;++iter)
+        {
+            vector<KEY> keys;
+            set_t       S;
+            std::cerr << "set<" << typeid(KEY).name() << ",dummy>" << std::endl;
+            std::cerr << "-- insert" << std::endl;
+            for( size_t i=0; i < 4096; ++i )
+            {
+                KEY        k = gen<key_t>::get();
+                dummy<KEY> d( k );
+                if( S.insert( d ) )
+                {
+                    if( alea<float>() > 0.6f ) keys.push_back( k );
+                }
+                else {
+                    std::cerr << "Multiple Key '" << k << "'" << std::endl;
+                }
+            }
+            std::cerr << "-- size=" << S.size() << "/" << S.capacity() << std::endl;
+            const size_t sig1 = S.signature();
+            set_t S2(S);
+            const size_t sig2 = S.signature();
+            std::cerr << "signatures: " << sig1 << "/" << sig2 << std::endl;
+            std::cerr << "---- removing " << keys.size() << " keys" << std::endl;
+            for( size_t i=1; i <= keys.size(); ++i )
+            {
+                if( !S2.remove( keys[i] ) ) std::cerr << "can't remove " << keys[i] << std::endl;
+            }
+            
+            for( typename set_t::iterator i = S2.begin(); i != S2.end(); ++i )
+            {
+                const KEY &k = i->data.key();
+                if( ! S.remove( k ) ) std::cerr << "can't remove " << k << std::endl;
+            }
+        }
 		
 	}
 	
