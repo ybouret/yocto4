@@ -15,7 +15,7 @@ namespace yocto
 		extern const char set_name[];
 	}
 	
-	
+#if 1
 	template <
 	typename KEY,
 	typename T, 
@@ -218,7 +218,8 @@ namespace yocto
 		
 		
 	};
-	
+#endif
+    
 }
 
 #endif
