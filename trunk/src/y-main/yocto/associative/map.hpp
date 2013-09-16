@@ -22,7 +22,7 @@ namespace yocto
     typename T,
     typename KEY_HASHER = key_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
-	class map : public container
+	class map : public associative<KEY,T>
 	{
     public:
         YOCTO_ASSOCIATIVE_KEY_T;
@@ -67,6 +67,7 @@ namespace yocto
         typedef core::list_of<HNode>    HSlot;
         typedef memory::slab_of<HNode>  HPool;
         
+        //! default ctor
         explicit map() throw() :
         itmax(0),
         slots(0),
@@ -81,6 +82,7 @@ namespace yocto
         {
         }
         
+        //! prepare for capacity
         explicit map( size_t n, const as_capacity_t & ) :
         itmax(n),
         slots( htable::compute_slots_for(itmax) ),

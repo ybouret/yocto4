@@ -143,7 +143,7 @@ namespace yocto
             catch(...){ __release(); }
         }
         
-
+        
         
         virtual ~dual_set() throw() { __release(); }
         
@@ -174,12 +174,13 @@ namespace yocto
             // memory check
             //==================================================================
             if( klist.size >= itmax )
-                __reserve( next_increase(itmax) );
-            
-            //==================================================================
-            // node insertion
-            //==================================================================
-            __insert(hkey,hsub,args);
+            {
+                dual_set tmp( next_capacity(itmax), as_capacity);
+                tmp.__insert(hkey,hsub,args);
+                swap_with(tmp);
+            }
+            else
+                __insert(hkey,hsub,args);
             return true;
             
         }
@@ -544,7 +545,7 @@ namespace yocto
                 subTable = (HSlot *) &addr[s_tab_offset];
                 hpool.format( &addr[hpool_offset], hpool_nummax);
             }
-
+            
         }
     };
     
