@@ -14,6 +14,9 @@ namespace yocto
         
         template <>
         frame<real_t>:: frame() :
+        atomList(),
+        atomSet(),
+        residueSet(),
         rid(0),
         aid(0)
         {
@@ -59,14 +62,32 @@ namespace yocto
             residue_pointer &parent = *parent_addr;
             
             //------------------------------------------------------------------
-            //-- phase 1: insert into atomSet
+            //-- phase 0: create the atom
             //------------------------------------------------------------------
             atom_pointer p( new atom<real_t>(parent,aid,type) );
+            p->set_mass( (*app)->mass );
+            
+            //------------------------------------------------------------------
+            //-- phase 1: insert into atomSet
+            //------------------------------------------------------------------
             if(!atomSet.insert(p))
                 throw exception("unexpected atom '%s' insertion in FRAME failure", name);
             
             //------------------------------------------------------------------
-            //-- phase 2: add to residue
+            //-- phase 1: insert into atomList
+            //------------------------------------------------------------------
+            try {
+                if( !atomList.insert(p) )
+                    throw exception("unexpected atom '%s' insertion in LIST failure", name);
+            }
+            catch(...)
+            {
+                (void) atomSet.remove(aid);
+                throw;
+            }
+            
+            //------------------------------------------------------------------
+            //-- phase 3: add to residue
             //------------------------------------------------------------------
             try
             {
@@ -75,6 +96,7 @@ namespace yocto
             }
             catch(...)
             {
+                (void) atomList.remove(p);
                 (void) atomSet.remove(aid);
                 throw;
             }
@@ -82,7 +104,7 @@ namespace yocto
             ++aid;
             return p->uuid;
         }
-
+        
         
         
         

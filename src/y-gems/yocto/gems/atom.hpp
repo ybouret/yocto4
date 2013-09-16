@@ -4,7 +4,6 @@
 #include "yocto/math/v3d.hpp"
 #include "yocto/gems/identifier.hpp"
 #include "yocto/gems/properties.hpp"
-#include "yocto/sequence/vector.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
 #include "yocto/intrusive-ptr.hpp"
 #include "yocto/nosy-ptr.hpp"
@@ -37,8 +36,7 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(pointer_comparator);
             };
 
-            typedef vector<pointer,allocator>                           group;
-            typedef sorted_vector<pointer,pointer_comparator,allocator> sorted_group;
+            typedef sorted_vector<pointer,pointer_comparator,allocator> group;
             typedef residue<T>                                          residue_type;
             typedef intrusive_ptr<word_t,residue_type>                  residue_ptr;
             
