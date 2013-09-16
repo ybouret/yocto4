@@ -4,6 +4,7 @@
 #define YOCTO_KEY_HASHER_INCLUDED 1
 
 #include "yocto/hashing/sfh.hpp"
+#include "yocto/hashing/sha1.hpp"
 #include "yocto/type/args.hpp"
 #include "yocto/code/class-conversion.hpp"
 

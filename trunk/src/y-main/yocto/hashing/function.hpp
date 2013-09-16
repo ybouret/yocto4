@@ -34,6 +34,9 @@ namespace yocto
 			void operator()( const memory::ro_buffer &buf )      throw(); //!< this->run(buf.ro(),buf.length());
 			void operator()( const char *buf )                   throw(); //!< this->run(buf,strlen(buf));
 			
+            template <typename T>
+            void run_type( const T &x ) throw() { run(&x,sizeof(T)); }
+            
 			static void fill( void *output, size_t outlen, const void *input, size_t inlen ) throw();
 			
 			template <typename T>
