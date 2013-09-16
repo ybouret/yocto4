@@ -40,7 +40,7 @@ namespace yocto
             atom_list      atomList;
             atom_set       atomSet;
             residue_set    residueSet;
-            
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(frame);
             
         public:

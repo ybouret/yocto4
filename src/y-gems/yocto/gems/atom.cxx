@@ -16,6 +16,7 @@ namespace yocto
         atom<real_t>:: atom( const residue_ptr &res, word_t u, word_t t) throw() :
         identifier(u,t), r(),v(),a(),m(0),w(0), parent(res)
         {
+            //std::cerr << "atom type=" << type << " #parent count=" << parent->refcount() << std::endl;
         }
         
         

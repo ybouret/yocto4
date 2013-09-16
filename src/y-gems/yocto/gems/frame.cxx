@@ -9,6 +9,12 @@ namespace yocto
         template <>
         frame<real_t>:: ~frame() throw()
         {
+            // avoid circular reference
+            for(residue_set::reverse_iterator i=residueSet.rbegin(); i != residueSet.rend(); ++i )
+            {
+                residue<real_t> &r = **i;
+                r.release();
+            }
         }
         
         
@@ -17,7 +23,7 @@ namespace yocto
         atomList(),
         atomSet(),
         residueSet(),
-	lib(),
+        lib(),
         rid(0),
         aid(0)
         {
@@ -56,6 +62,10 @@ namespace yocto
                 throw exception("no atom type in library");
             const char *name = (*app)->name.c_str();
             
+            
+            //------------------------------------------------------------------
+            //-- check that parent exists
+            //------------------------------------------------------------------
             residue_pointer *parent_addr = residueSet.search( residue_uuid );
             if(!parent_addr)
                 throw exception("no parent residue for atom '%s'", name);
@@ -74,6 +84,7 @@ namespace yocto
             if(!atomSet.insert(p))
                 throw exception("unexpected atom '%s' insertion in FRAME failure", name);
             
+            
             //------------------------------------------------------------------
             //-- phase 1: insert into atomList
             //------------------------------------------------------------------
@@ -86,6 +97,8 @@ namespace yocto
                 (void) atomSet.remove(aid);
                 throw;
             }
+            //++aid;
+            //return p->uuid;
             
             //------------------------------------------------------------------
             //-- phase 3: add to residue
