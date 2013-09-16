@@ -25,9 +25,9 @@ namespace yocto
             const word_t & key() const throw();
             const string & subkey() const throw();
             
-            static void check_pointer(const void *addr, const string &id);
-            static void check_pointer(const void *addr, word_t        id);
-
+            static void check_pointer(const void *addr, const string &id, const char *label);
+            static void check_pointer(const void *addr, word_t        id, const char *label);
+            
             template <typename T>
             class table : public dual_set<word_t, string, typename T::pointer,hashing::sfh,allocator>
             {
@@ -35,57 +35,58 @@ namespace yocto
                 typedef dual_set<word_t, string,typename T::pointer,hashing::sfh,allocator> base_type;
                 explicit table() throw() : base_type() {}
                 virtual ~table() throw() {}
+                static const char Label[];
                 
                 inline word_t type_of( const string &n ) const
                 {
                     const typename T::pointer *p = this->sub_search(n);
-                    properties::check_pointer(p,n);
+                    properties::check_pointer(p,n,Label);
                     return (*p)->type;
                 }
                 
                 inline const string & name_of( word_t t) const
                 {
                     const typename T::pointer *p = this->search(t);
-                    properties::check_pointer(p,t);
+                    properties::check_pointer(p,t,Label);
                     return (*p)->name;
                 }
                 
                 inline T & operator[](word_t t)
                 {
                     typename T::pointer *p = this->search(t);
-                    properties::check_pointer(p,t);
+                    properties::check_pointer(p,t,Label);
                     return **p;
                 }
                 
                 inline const T & operator[](word_t t) const
                 {
                     const typename T::pointer *p = this->search(t);
-                    properties::check_pointer(p,t);
+                    properties::check_pointer(p,t,Label);
                     return **p;
                 }
                 
                 inline T & operator[](const string &n)
                 {
                     typename T::pointer *p = this->sub_search(n);
-                    properties::check_pointer(p,n);
+                    properties::check_pointer(p,n,Label);
                     return **p;
                 }
                 
                 inline const T & operator[](const string &n) const
                 {
                     const typename T::pointer *p = this->sub_search(n);
-                    properties::check_pointer(p,n);
+                    properties::check_pointer(p,n,Label);
                     return **p;
                 }
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(table);
             };
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(properties);
         };
-     
+        
         
         
         

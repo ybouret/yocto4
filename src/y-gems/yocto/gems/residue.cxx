@@ -28,6 +28,9 @@ namespace yocto
         {
         }
         
+        template <>
+        const char residue<real_t>::properties::table::Label[] = "residue";
+        
     }
     
 }

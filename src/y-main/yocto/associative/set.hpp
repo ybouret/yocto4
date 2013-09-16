@@ -18,7 +18,7 @@ namespace yocto
 		extern const char set_name[];
 	}
 	
-    //! set of object with a key() method
+    //! set of object with a key() method, MUST BE A REFERENCE !
     template <
     typename KEY,
     typename T,
