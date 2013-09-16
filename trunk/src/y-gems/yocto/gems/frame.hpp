@@ -12,9 +12,17 @@ namespace yocto
         class frame 
         {
         public:
+            typedef key_hasher<word_t,hashing::sfh>                    word_hasher;
+            typedef typename residue<T>::properties::pointer           residue_properties_pointer;
+            typedef typename atom<T>::properties::pointer              atom_properties_pointer;
+            typedef typename atom<T>::pointer                          atom_pointer;
+            typedef typename residue<T>::pointer                       residue_pointer;
+            typedef  set<word_t,atom_pointer,word_hasher,allocator>    atom_set;
+            typedef  set<word_t,residue_pointer,word_hasher,allocator> residue_set;
+            typedef  typename atom<T>::group                           atom_list;
+            
             virtual ~frame() throw();
             explicit frame();
-            
             
             //! new residue
             /**
@@ -29,16 +37,9 @@ namespace yocto
             word_t add_atom_to( word_t residue_uuid, word_t type);
             
         private:
-            typedef key_hasher<word_t,hashing::sfh>                    word_hasher;
-            typedef typename residue<T>::properties::pointer           residue_properties_pointer;
-            typedef typename atom<T>::properties::pointer              atom_properties_pointer;
-            typedef typename atom<T>::pointer                          atom_pointer;
-            typedef typename residue<T>::pointer                       residue_pointer;
-            typedef  set<word_t,atom_pointer,word_hasher,allocator>    atom_set;
-            typedef  set<word_t,residue_pointer,word_hasher,allocator> residue_set;
-            
-            atom_set    atomSet;
-            residue_set residueSet;
+            atom_list      atomList;
+            atom_set       atomSet;
+            residue_set    residueSet;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(frame);
             
