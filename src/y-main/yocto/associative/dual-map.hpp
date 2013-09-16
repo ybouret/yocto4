@@ -167,7 +167,7 @@ namespace yocto
             
             
             //==================================================================
-            // memory check
+            // memory check 
             //==================================================================
             if( klist.size >= itmax )
                 __reserve( next_increase(itmax) );

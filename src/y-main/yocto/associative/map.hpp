@@ -9,6 +9,8 @@
 #include "yocto/core/list.hpp"
 #include "yocto/container/iter-linked.hpp"
 
+#include <iostream>
+
 namespace yocto
 {
 	
@@ -22,7 +24,7 @@ namespace yocto
     typename T,
     typename KEY_HASHER = key_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
-	class map
+	class map : public container
 	{
     public:
         YOCTO_ASSOCIATIVE_KEY_T;
@@ -56,7 +58,8 @@ namespace yocto
             HNode *prev;
             HNode *next;
             KNode *knode;
-            inline  HNode(KNode *kn) throw() : prev(0), next(0), knode(kn) { assert(knode); }
+            inline  HNode(KNode *kn) throw() :
+            prev(0), next(0), knode(kn) { assert(knode); }
             inline ~HNode() throw() {}
             
         private:
@@ -80,6 +83,50 @@ namespace yocto
         {
         }
         
+        explicit map( size_t n, const as_capacity_t & ) :
+        itmax(n),
+        slots( htable::compute_slots_for(itmax) ),
+        klist(),
+        kpool(0,0),
+        hslot(0),
+        hpool(0,0),
+        wlen(0),
+        wksp(0),
+        hash(),
+        hmem()
+        {
+            __init();
+        }
+        
+        explicit map( const map &other ) :
+        itmax(other.size()),
+        slots(htable::compute_slots_for(itmax)),
+        klist(),
+        kpool(0,0),
+        hslot(0),
+        hpool(0,0),
+        wlen(0),
+        wksp(0),
+        hash(),
+        hmem()
+        {
+            __init();
+            try { other.__duplicate_into( *this ); }
+            catch(...) {__release(); throw;        }
+        }
+
+        
+        inline void swap_with( map &other ) throw()
+        {
+            cswap(itmax, other.itmax);
+            cswap(slots, other.slots);
+            klist.swap_with(other.klist);
+            kpool.swap_with(other.kpool);
+            cswap(hslot,other.hslot);
+            hpool.swap_with(other.hpool);
+            cswap(wlen,other.wlen);
+            cswap(wksp,other.wksp);
+        }
         
         virtual ~map() throw() { __release(); }
         
@@ -89,6 +136,79 @@ namespace yocto
         virtual void        release()  throw()       { __release(); }
         virtual size_t      size()     const throw() { return klist.size; }
         virtual size_t      capacity() const throw() { return itmax; }
+        virtual void        reserve(size_t n)
+        {
+            if(n>0)
+            {
+                
+            }
+        }
+        
+        virtual bool insert( param_key key, param_type args )
+        {
+            //------------------------------------------------------------------
+            // check key
+            //------------------------------------------------------------------
+            const size_t hkey = hash(key);
+            if( (slots>0) && (0!=__find(key, hkey)) ) return false;
+            
+            //------------------------------------------------------------------
+            // check memory/insert
+            //------------------------------------------------------------------
+            if( klist.size >= itmax )
+            {
+                map tmp( container::next_capacity(itmax), as_capacity );
+                std::cerr << "itmax: " << itmax << " => " << tmp.itmax << std::endl;
+                __duplicate_into(tmp);
+                tmp.__insert(key,hkey,args);
+                swap_with(tmp);
+            }
+            else
+            {
+                __insert(key,hkey,args);
+            }
+            return true;
+        }
+        
+        
+        virtual bool remove( param_key key ) throw()
+        {
+            const size_t hkey = hash(key);
+            if(slots>0)
+            {
+                HNode *node = __find(key,hkey);
+                if(node)
+                {
+                    assert(hslot[hkey%slots].head==node);
+                    KNode *knode = node->knode;
+                    destruct( klist.unlink(knode) );
+                    kpool.store(knode);
+                    hpool.store( hslot[hkey%slots].pop_front() );
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        //======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::linked<type,KNode,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator(klist.head); }
+		inline iterator end()   throw() { return iterator(0);          }
+        
+        typedef iterating::linked<type,KNode,iterating::reverse> reverse_iterator;
+		inline reverse_iterator rbegin() throw() { return reverse_iterator(klist.tail); }
+		inline reverse_iterator rend()   throw() { return reverse_iterator(0);          }
+		
+		typedef iterating::linked<const_type,const KNode,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return const_iterator(klist.head); }
+		inline const_iterator end()   const throw() { return const_iterator(0);          }
+     
+        typedef iterating::linked<const_type,const KNode,iterating::reverse> const_reverse_iterator;
+		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator(klist.head); }
+		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator(0);          }
+
         
     private:
         //----------------------------------------------------------------------
@@ -106,19 +226,22 @@ namespace yocto
         //----------------------------------------------------------------------
         // holding slots
         //----------------------------------------------------------------------
-        HSlot                        *hslot; // 0..slots
+        mutable HSlot                *hslot; // 0..slots
         HPool                         hpool;
-      
+        
         //----------------------------------------------------------------------
         // memory
         //----------------------------------------------------------------------
         size_t                        wlen;
         void                         *wksp;
         
+        //----------------------------------------------------------------------
+        // components
+        //----------------------------------------------------------------------
         mutable KEY_HASHER            hash;
         ALLOCATOR                     hmem;
-
-        YOCTO_DISABLE_COPY_AND_ASSIGN(map);
+        
+        YOCTO_DISABLE_ASSIGN(map);
         
         //======================================================================
 		// free
@@ -158,6 +281,103 @@ namespace yocto
             hpool.format(0,0);
         }
         
+        //======================================================================
+        // look up, virtual for associative interface
+        //======================================================================
+        HNode * __find( param_key key, const size_t hkey ) const throw()
+        {
+            assert(slots);
+            assert(hslot);
+            HSlot &slot = hslot[ hkey % slots ];
+            for(HNode *node=slot.head;node;node=node->next)
+            {
+                assert(node->knode);
+                if(key == node->knode->key)
+                {
+                    slot.move_to_front(node);
+                    return node;
+                }
+            }
+            return 0;
+        }
+        
+        virtual const_type *lookup( param_key key ) const throw()
+        {
+            if(slots)
+            {
+                HNode *node = __find(key,hash(key));
+                if(node) return & node->knode->data;
+            }
+            return 0;
+        }
+        
+        
+        //======================================================================
+        // memory init
+        //======================================================================
+        inline void __init()
+        {
+            if(slots>0)
+            {
+                std::cerr << "__init for " << itmax << std::endl;
+                const size_t kpool_offset = 0;
+                const size_t kpool_length = KPool::bytes_for(itmax);
+                const size_t hslot_offset = memory::align(kpool_offset + kpool_length);
+                const size_t hslot_length = sizeof(HSlot) * slots;
+                const size_t hpool_offset = memory::align(hslot_offset + hslot_length);
+                const size_t hpool_length = HPool::bytes_for(itmax);
+                
+                wlen = hpool_offset + hpool_length;
+                wksp = hmem.acquire(wlen);
+                
+                uint8_t *p = static_cast<uint8_t *>(wksp);
+                kpool.format( &p[kpool_offset], itmax);
+                hslot      = (HSlot *) &p[hslot_offset];
+                hpool.format( &p[hpool_offset], itmax);
+                std::cerr << "kpool.available=" << kpool.available() << std::endl;
+                std::cerr << "hpool.available=" << hpool.available() << std::endl;
+            }
+        }
+        
+        //======================================================================
+        // insertion
+        //======================================================================
+        inline void __insert( param_key key, const size_t hkey, param_type args )
+        {
+            std::cerr << "__insert into itmax=" << itmax << std::endl;
+            assert(klist.size<itmax);
+            assert(kpool.available()>0);
+            assert(hpool.available()==kpool.available());
+            assert(slots);
+            assert(hslot);
+            
+            KNode *knode = kpool.query();
+            try {
+                new (knode) KNode(key,hkey,args);
+            }
+            catch(...)
+            {
+                kpool.store(knode); throw;
+            }
+            HNode *node = new ( hpool.query() ) HNode(knode);
+            hslot[ hkey % slots ].push_front(node);
+        }
+        
+        //======================================================================
+        // duplication
+        //======================================================================
+        inline void __duplicate_into( map &other ) const
+        {
+            std::cerr << "duplicating " << this->size() << "/" << klist.size << " items into " << other.capacity() << std::endl;
+            assert(other.size()==0);
+            assert(other.capacity()>=this->size());
+            
+            for( const KNode *knode = klist.head; knode; knode=knode->next)
+            {
+                std::cerr << " dup " << knode->key << std::endl;
+                other.__insert( knode->key, knode->hkey, knode->data);
+            }
+        }
     };
     
     
