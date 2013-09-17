@@ -43,7 +43,7 @@ namespace
 		typedef set<KEY,dummy<KEY>,KEY_HASHER,ALLOCATOR> set_t;
 		typedef typename set_t::mutable_key              key_t;
 		
-        for(size_t iter=0;iter<4;++iter)
+        for(size_t iter=0;iter<1;++iter)
         {
             vector<KEY> keys;
             set_t       S;

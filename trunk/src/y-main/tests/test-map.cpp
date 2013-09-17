@@ -20,7 +20,7 @@ static inline void test_map()
 	{ map_t M; }
 	{ map_t M(1,as_capacity); }
 	
-    for(size_t iter=0;iter<4;++iter)
+    for(size_t iter=0;iter<1;++iter)
 	{
 		std::cerr << "---- generating" << std::endl;
 		map_t M;
