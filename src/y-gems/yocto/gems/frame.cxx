@@ -72,19 +72,18 @@ namespace yocto
             if(!parent_addr)
                 throw exception("no parent residue for atom '%s'", name);
             
-            residue_pointer &parent = *parent_addr;
+            residue<real_t> &parent = **parent_addr;
             
             //------------------------------------------------------------------
             //-- phase 0: create the atom
             //------------------------------------------------------------------
-            atom_ptr       p = new atom<real_t>(parent,aid,type);
-            atom_pointer   q(p);
+            atom_pointer p( new atom<real_t>(parent,aid,type) );
             p->set_mass( (*app)->mass );
             
             //------------------------------------------------------------------
             //-- phase 1: insert into atomSet
             //------------------------------------------------------------------
-            if(!atomSet.insert(q))
+            if(!atomSet.insert(p))
                 throw exception("unexpected atom '%s' insertion in FRAME failure", name);
             
             
@@ -108,7 +107,7 @@ namespace yocto
             //------------------------------------------------------------------
             try
             {
-                if( !parent->insert(p) )
+                if( !parent.insert(p) )
                     throw exception("unexpected atom '%s' insertion in RESIDUE failure",name);
             }
             catch(...)
@@ -127,7 +126,7 @@ namespace yocto
         {
             return add_atom_to(residue_uuid, lib.atoms.type_of(name) );
         }
-
+        
         
         
     }
