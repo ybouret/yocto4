@@ -92,3 +92,68 @@ YOCTO_UNIT_TEST_IMPL(rmd160)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+#include "yocto/hashing/rmd128.hpp"
+
+YOCTO_UNIT_TEST_IMPL(rmd128)
+{
+    hashing::rmd128 RMD128;
+    
+    {
+        const string vec;
+        const digest i_md = digest::hex("cdf26213a150dc3ecb610f18f6b38b46");
+        const digest o_md = digest::checksum(RMD128,vec);
+        std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+
+    {
+        const string vec = "a";
+        const digest i_md = digest::hex("86be7afa339d0fc7cfc785e72f578d33");
+        const digest o_md = digest::checksum(RMD128,vec);
+        std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+    
+    {
+        const string vec = "abc";
+        const digest i_md = digest::hex("c14a12199c66e4ba84636b0f69144c77");
+        const digest o_md = digest::checksum(RMD128,vec);
+        std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+    
+    {
+        const string vec = "message digest";
+        const digest i_md = digest::hex("9e327b3d6e523062afc1132d7df9d1b8");
+        const digest o_md = digest::checksum(RMD128,vec);
+        std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+    
+    {
+        const string vec = "abcdefghijklmnopqrstuvwxyz";
+        const digest i_md = digest::hex("fd2aa607f71dc8f510714922b371834e");
+        const digest o_md = digest::checksum(RMD128,vec);
+        std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+    
+    {
+        const string vec = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+        const digest i_md = digest::hex("a1aa0689d0fafa2ddc22e88b49133a06");
+        const digest o_md = digest::checksum(RMD128,vec);
+        std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+    
+    {
+        RMD128.set();
+        const char a = 'a';
+        for( size_t i=0; i < 1000000;++i)
+        {
+            RMD128.run( &a, 1);
+        }
+        const digest i_md = digest::hex("4a7f5723f954eba1216c9d8f6320431f");
+        const digest o_md = digest::get_from(RMD128);
+       	std::cerr << "=>" << o_md << "/" << i_md << std::endl;
+    }
+
+    
+}
+YOCTO_UNIT_TEST_DONE()

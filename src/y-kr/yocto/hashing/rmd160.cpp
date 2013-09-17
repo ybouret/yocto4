@@ -292,7 +292,7 @@ namespace yocto
                 
                 //std::cerr << "[MDFinish] lswlen=" << lswlen << ", mswlen=" << mswlen << std::endl;
                 
-                memset(X, 0, 16*sizeof(uint32_t));
+                memset(X, 0, sizeof(X));
                 
                 /* put bytes from strptr into X */
                 for (i=0; i<(lswlen&63); i++)
