@@ -1,5 +1,5 @@
 #include "yocto/math/ztype.hpp"
-#include "yocto/gems/residue.hpp"
+#include "yocto/gems/atom.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
 
@@ -13,8 +13,8 @@ namespace yocto
         }
        
         template <>
-        atom<real_t>:: atom( const residue_pointer &res, word_t u, word_t t) throw() :
-        identifier(u,t), r(),v(),a(),m(0),w(0), parent(res)
+        atom<real_t>:: atom( const residue<real_t> &from, word_t u, word_t t) throw() :
+        identifier(u,t), r(),v(),a(),m(0),w(0), parent(from)
         {
             //std::cerr << "atom type=" << type << " #parent count=" << parent->refcount() << std::endl;
         }

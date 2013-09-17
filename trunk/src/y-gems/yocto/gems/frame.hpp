@@ -16,7 +16,6 @@ namespace yocto
             typedef typename residue<T>::properties::pointer           residue_properties_pointer;
             typedef typename atom<T>::properties::pointer              atom_properties_pointer;
             typedef typename atom<T>::pointer                          atom_pointer;
-            typedef typename atom<T>::ptr                              atom_ptr;
             typedef typename residue<T>::pointer                       residue_pointer;
             typedef  set<word_t,atom_pointer,word_hasher,allocator>    atom_set;
             typedef  set<word_t,residue_pointer,word_hasher,allocator> residue_set;
