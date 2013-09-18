@@ -5,7 +5,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/pki/rsa-keys.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/hashing/sha1.hpp"
 
 #include <iostream>

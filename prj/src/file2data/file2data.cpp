@@ -1,7 +1,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 #include <iostream>
 #include <cstring>

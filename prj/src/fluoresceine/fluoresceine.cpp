@@ -195,7 +195,7 @@ namespace
     };
 }
 
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 static inline
 void set_limits( const Fluoresceine &fluo )
