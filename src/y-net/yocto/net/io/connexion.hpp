@@ -3,7 +3,7 @@
 
 #include "yocto/net/io/queue.hpp"
 #include "yocto/net/tcp-socket.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 
 namespace yocto
@@ -41,7 +41,7 @@ namespace yocto
 			const socket_address & key() const throw();
 		};
 		
-		typedef intrusive_ptr<socket_address,io_link> connexion;
+		typedef intr_ptr<socket_address,io_link> connexion;
 		
         
         //! base class for user connexion

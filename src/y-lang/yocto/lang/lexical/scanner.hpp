@@ -1,7 +1,7 @@
 #ifndef YOCTO_LANG_SCANNER_INCLUDED
 #define YOCTO_LANG_SCANNER_INCLUDED 1
 
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/lang/lexeme.hpp"
 #include "yocto/lang/lexical/rule.hpp"
@@ -129,7 +129,7 @@ namespace yocto
                 const string & key() const throw();
                 
                 //! counted smart pointer
-                typedef  intrusive_ptr<string,scanner> ptr;
+                typedef  intr_ptr<string,scanner> ptr;
                 
                 //! set parent
                 void link_to( lexer &parent ) throw();

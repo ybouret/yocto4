@@ -5,7 +5,7 @@
 #include "yocto/gems/identifier.hpp"
 #include "yocto/gems/properties.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/nosy-ptr.hpp"
 
 namespace yocto
@@ -22,7 +22,7 @@ namespace yocto
         class atom : public identifier
         {
         public:
-            typedef intrusive_ptr<word_t,atom> pointer;
+            typedef intr_ptr<word_t,atom> pointer;
             
             class pointer_comparator
             {

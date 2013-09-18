@@ -17,7 +17,7 @@ private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(my_link);
 };
 
-typedef intrusive_ptr<socket_address,my_link> my_conn;
+typedef intr_ptr<socket_address,my_link> my_conn;
 
 
 class my_proto : public server_protocol

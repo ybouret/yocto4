@@ -5,7 +5,7 @@
 #include "yocto/lingua/lexical/rules.hpp"
 #include "yocto/lingua/pattern/compiler.hpp"
 
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/auto-ptr.hpp"
 
@@ -35,7 +35,7 @@ namespace yocto
                 
                 const string & key() const throw();
                 
-                typedef intrusive_ptr<string,scanner> ptr;
+                typedef intr_ptr<string,scanner> ptr;
                 bool has( const string &id ) const throw();
                 
                 //==============================================================

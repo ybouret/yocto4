@@ -1,7 +1,7 @@
 #ifndef YOCTO_AQ_SPECIES_INCLUDED
 #define YOCTO_AQ_SPECIES_INCLUDED 1
 
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/string.hpp"
 #include "yocto/associative/set.hpp"
@@ -32,9 +32,9 @@ namespace yocto
             const int    z;    //!< algebraic charge
             
             
-            typedef intrusive_ptr<string,species> ptr;
-            typedef set<string,ptr>               db;
-            typedef db::const_iterator            iterator;
+            typedef intr_ptr<string,species> ptr;
+            typedef set<string,ptr>          db;
+            typedef db::const_iterator       iterator;
             
             const string & key() const throw();
             

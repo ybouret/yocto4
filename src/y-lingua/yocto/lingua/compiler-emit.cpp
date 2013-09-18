@@ -1,7 +1,7 @@
 #include "yocto/lingua/compiler.hpp"
 
 #include "yocto/counted.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/associative/set.hpp"
 
 #include "yocto/exception.hpp"
@@ -65,8 +65,8 @@ namespace yocto
                 }
                 
                 
-                typedef intrusive_ptr<string,GTerm> Ptr;
-                typedef set<string,Ptr>             DB;
+                typedef intr_ptr<string,GTerm> Ptr;
+                typedef set<string,Ptr>        DB;
                 
                 inline const string & key() const throw() { return name; }
                 
@@ -131,8 +131,8 @@ namespace yocto
                 
                 inline const string &key() const throw() { return name; }
                 
-                typedef intrusive_ptr<string,GRuleID> Ptr;
-                typedef set<string,Ptr>               DB;
+                typedef intr_ptr<string,GRuleID> Ptr;
+                typedef set<string,Ptr>          DB;
                 
                 static inline
                 void Collect( DB &db, const syntax::xnode *node )

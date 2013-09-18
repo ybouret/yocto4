@@ -54,7 +54,7 @@ namespace yocto
                 double         factor;  //!< scaling factor, default=1
                 
                 const string & key() const throw();
-                typedef intrusive_ptr<string,effector> ptr;
+                typedef intr_ptr<string,effector>      ptr;
                 typedef labelled<set,effector::ptr>    db;
                 explicit effector( const string &id );
                 virtual ~effector() throw();

@@ -15,18 +15,18 @@ namespace yocto
 	 - size_t refcount() const throw()
 	 */
 	template <typename KEY,typename T>
-	class intrusive_ptr
+	class intr_ptr
 	{
 	public:
 		YOCTO_ASSOCIATIVE_KEY_T;
 		
-		inline intrusive_ptr( T *p ) : pointee_( (mutable_type*)p )
+		inline intr_ptr( T *p ) : pointee_( (mutable_type*)p )
 		{
 			assert( pointee_ );
 			pointee_->withhold();
 		}
 		
-		inline ~intrusive_ptr() throw()
+		inline ~intr_ptr() throw()
 		{
 			assert(pointee_);
 			if( pointee_->liberate() )
@@ -35,7 +35,7 @@ namespace yocto
 			}
 		}
 		
-		inline intrusive_ptr( const intrusive_ptr &other ) throw() :
+		inline intr_ptr( const intr_ptr &other ) throw() :
 		pointee_( other.pointee_ )
 		{
 			pointee_->withhold();
@@ -73,7 +73,7 @@ namespace yocto
 		
 	private:
 		mutable_type *pointee_;
-		YOCTO_DISABLE_ASSIGN(intrusive_ptr);
+		YOCTO_DISABLE_ASSIGN(intr_ptr);
 	};
 	
 	

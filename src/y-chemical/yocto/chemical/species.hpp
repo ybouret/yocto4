@@ -5,7 +5,7 @@
 #include "yocto/container/vslot.hpp"
 #include "yocto/string.hpp"
 
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/associative/set.hpp"
 
@@ -35,8 +35,8 @@ namespace yocto
             const string &key() const throw(); //!< the name
             
             
-            typedef intrusive_ptr<string,species> ptr; //!< smart pointer
-            typedef set<string,ptr>               db;  //!< database of smart pointers
+            typedef intr_ptr<string,species> ptr; //!< smart pointer
+            typedef set<string,ptr>          db;  //!< database of smart pointers
             
             friend std::ostream & operator<<( std::ostream &, const species &);
             

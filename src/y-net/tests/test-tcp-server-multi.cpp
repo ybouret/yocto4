@@ -3,7 +3,7 @@
 #include "yocto/net/tcp-socket.hpp"
 #include "yocto/ios/iflux.hpp"
 #include "yocto/memory/buffers.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/net/socket-set.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"
@@ -29,7 +29,7 @@ namespace  {
 		
 		virtual ~Client() throw() {}
 		
-		typedef intrusive_ptr<ClientID,Client> Ptr; 
+		typedef intr_ptr<ClientID,Client> Ptr; 
 		
 		const ClientID & key() const throw() { return self(); }
 		
