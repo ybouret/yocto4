@@ -55,9 +55,10 @@ namespace yocto
         public core::list_of<GNode>
         {
         public:
-            typedef intr_ptr<KEY,Group> pointer;
-            const_key            key;
-            GPool                pool;
+            typedef intr_ptr<KEY,Group>                   Pointer;
+            typedef set<KEY,Pointer,KEY_HASHER,ALLOCATOR> DataBase;
+            const_key key;
+            GPool     pool;
             
             explicit Group( param_key k ) :
             key(k)
@@ -71,12 +72,18 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(Group);
         };
         
+        inline bool insert( param_key key, param_type args )
+        {
+            
+            return false;
+        }
+        
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_map);
-        
-        DList dlist;
-        DPool dpool;
-        GPool gpool;
+        DList                    dlist;
+        DPool                    dpool;
+        GPool                    gpool;
+        typename Group::DataBase groups;
         
     };
 }
