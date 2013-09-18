@@ -5,7 +5,7 @@
 #include "yocto/type/key.hpp"
 #include "yocto/associative/key-hasher.hpp"
 #include "yocto/core/list.hpp"
-#include "yocto/memory/slab.hpp"
+#include "yocto/core/pool.hpp"
 
 namespace yocto
 {
@@ -36,27 +36,52 @@ namespace yocto
         };
         
         typedef core::list_of<DNode> DList;
+        typedef core::pool_of<DNode> DPool;
         
         class GNode
         {
         public:
-            GNode       *prev;
-            GNode       *next;
-            DNode       *dnode;
-            const size_t hkey;
-            const_key    key;
-            
+            GNode *prev;
+            GNode *next;
+            DNode *dnode;
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(GNode);
         };
         
-        typedef core::list_of<GNode> Group;
+        class Group : public object, public core::list_of<GNode>
+        {
+        public:
+            const_key    key;
+            const size_t hkey;
+            Group       *prev;
+            Group       *next;
+            
+            explicit Group( param_key k, const size_t h) :
+            key(k),
+            hkey(h),
+            prev(0),
+            next(0)
+            {
+            }
+            virtual ~Group() throw()
+            {
+            }
+
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Group);
+        };
         
+        typedef core::list_of<Group> GSlot;
+        typedef core::pool_of<Group> GPool;
         
         
     private:
-        size_t itmax;
-        size_t slots; //!< the adapted prime #slots
+        YOCTO_DISABLE_COPY_AND_ASSIGN(multi_map);
+        
+        DList dlist;
+        DPool dpool;
+        
+        
         
     };
 }
