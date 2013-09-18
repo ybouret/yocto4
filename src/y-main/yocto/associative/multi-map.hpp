@@ -55,7 +55,7 @@ namespace yocto
         };
         typedef core::pool_of<GNode> GPool;
         
-        class Group :
+        class  Group :
         public object,
         public counted,
         public core::list_of<GNode>
@@ -82,6 +82,7 @@ namespace yocto
         
         typedef typename Group::Pointer  GroupPointer;
         typedef typename Group::DataBase GroupDB;
+        
         
         inline void insert( param_key key, param_type args )
         {
