@@ -18,7 +18,7 @@ namespace yocto
             virtual ~effector() throw();
             const string &key() const throw(); //!< the name
             
-            typedef intrusive_ptr<string,effector> ptr;
+            typedef intr_ptr<string,effector> ptr;
             
             //! compute the rate
             virtual void call(solution &dSdt, double t, double zeta, const solution &S ) const = 0;

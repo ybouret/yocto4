@@ -14,7 +14,7 @@ namespace yocto
         class residue : public identifier, public atom<T>::group
         {
         public:
-            typedef  intrusive_ptr<word_t,residue> pointer;
+            typedef  intr_ptr<word_t,residue> pointer;
 
             explicit residue( word_t u, word_t t ) throw();
             virtual ~residue() throw();

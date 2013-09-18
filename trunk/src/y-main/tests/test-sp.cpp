@@ -22,7 +22,7 @@ YOCTO_UNIT_TEST_IMPL(shared_ptr)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 
 namespace 
@@ -44,7 +44,7 @@ namespace
 			std::cerr << "-[dummy " << value << "]" << std::endl;
 		}
 	
-		typedef intrusive_ptr<uint32_t,dummy> ptr;
+		typedef intr_ptr<uint32_t,dummy> ptr;
 		
 	
 		

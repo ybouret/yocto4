@@ -43,8 +43,8 @@ namespace yocto
             const string     name;
             mutable constant K;
             
-            typedef intrusive_ptr<string,equilibrium> ptr;
-            typedef set<string,ptr>                   db;
+            typedef intr_ptr<string,equilibrium> ptr;
+            typedef set<string,ptr>              db;
             
             void add( const string &id, int nu );
             void add( const char   *id, int nu );

@@ -1,11 +1,11 @@
 #ifndef YOCTO_ASSOC_MULTI_MAP_INCLUDED
 #define YOCTO_ASSOC_MULTI_MAP_INCLUDED
 
-#include "yocto/container/container.hpp"
-#include "yocto/type/key.hpp"
-#include "yocto/associative/key-hasher.hpp"
+#include "yocto/associative/set.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
+#include "yocto/intr-ptr.hpp"
+#include "yocto/counted.hpp"
 
 namespace yocto
 {
@@ -47,41 +47,36 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(GNode);
         };
+        typedef core::pool_of<GNode> GPool;
         
-        class Group : public object, public core::list_of<GNode>
+        class Group :
+        public object,
+        public counted,
+        public core::list_of<GNode>
         {
         public:
-            const_key    key;
-            const size_t hkey;
-            Group       *prev;
-            Group       *next;
+            typedef intr_ptr<KEY,Group> pointer;
+            const_key            key;
+            GPool                pool;
             
-            explicit Group( param_key k, const size_t h) :
-            key(k),
-            hkey(h),
-            prev(0),
-            next(0)
+            explicit Group( param_key k ) :
+            key(k)
             {
             }
             virtual ~Group() throw()
             {
             }
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Group);
         };
-        
-        typedef core::list_of<Group> GSlot;
-        typedef core::pool_of<Group> GPool;
-        
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_map);
         
         DList dlist;
         DPool dpool;
-        
-        
+        GPool gpool;
         
     };
 }

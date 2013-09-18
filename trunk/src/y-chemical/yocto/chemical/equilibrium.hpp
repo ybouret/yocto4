@@ -27,8 +27,8 @@ namespace yocto
             const string &key() const throw();
             
             
-            typedef intrusive_ptr<string,equilibrium> ptr; //!< smart pointer
-            typedef set<string,equilibrium::ptr>      db;  //!< database
+            typedef intr_ptr<string,equilibrium> ptr; //!< smart pointer
+            typedef set<string,equilibrium::ptr> db;  //!< database
             
             //! species+coefficient
             class actor

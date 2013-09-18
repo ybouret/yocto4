@@ -3,7 +3,7 @@
 
 #include "yocto/type/spec.hpp"
 #include "yocto/spade/data-block.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/string.hpp"
 
@@ -40,7 +40,7 @@ namespace yocto
             virtual ~varray() throw();
             
             
-            typedef intrusive_ptr<string,varray> ptr;
+            typedef intr_ptr<string,varray> ptr;
             const string & key() const throw();
             
             const string    name; //!< array name

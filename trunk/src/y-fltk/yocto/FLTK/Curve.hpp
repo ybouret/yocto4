@@ -3,7 +3,7 @@
 
 #include "yocto/string.hpp"
 #include "yocto/math/v2d.hpp"
-#include "yocto/intrusive-ptr.hpp"
+#include "yocto/intr-ptr.hpp"
 #include "yocto/counted.hpp"
 
 #include "yocto/sequence/vector.hpp"
@@ -30,7 +30,7 @@ namespace yocto
             Fl_Color     color;
             
             const string &key() const throw();
-            typedef intrusive_ptr<string,Curve> Ptr;
+            typedef intr_ptr<string,Curve>      Ptr;
             typedef set<string,Curve::Ptr>      DB;
             
         private:
