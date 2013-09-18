@@ -35,21 +35,28 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(DNode);
         };
         
+        typedef core::list_of<DNode> DList;
+        
         class GNode
         {
         public:
-            GNode *prev;
-            GNode *next;
-            DNode *dnode;
+            GNode       *prev;
+            GNode       *next;
+            DNode       *dnode;
+            const size_t hkey;
+            const_key    key;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(GNode);
         };
         
+        typedef core::list_of<GNode> Group;
         
         
         
     private:
+        size_t itmax;
+        size_t slots; //!< the adapted prime #slots
         
     };
 }

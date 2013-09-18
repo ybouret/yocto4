@@ -11,8 +11,9 @@ namespace yocto
         static const size_t load_factor = 4;
         static const size_t min_slots   = 3;
         
+        //! return the adapted prime size
         static size_t compute_slots_for( size_t &items );
-        
+                
     };
     
 }
