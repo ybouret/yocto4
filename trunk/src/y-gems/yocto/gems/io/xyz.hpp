@@ -4,7 +4,7 @@
 #include "yocto/ios/istream.hpp"
 #include "yocto/functor.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/math/v3d.hpp"
 
 namespace yocto

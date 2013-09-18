@@ -74,5 +74,6 @@ ADD_TEST(VSlot       test-main vslot)
 ADD_TEST(DualMap     test-main dualmap)
 ADD_TEST(DualSet     test-main dualset)
 ADD_TEST(DualSet2    test-main dualset2)
+ADD_TEST(MultiMap    test-main multi_map)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)

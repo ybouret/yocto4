@@ -5,9 +5,9 @@
 #include "yocto/lingua/lexical/rules.hpp"
 #include "yocto/lingua/pattern/compiler.hpp"
 
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {

@@ -5,7 +5,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/imstream.hpp"
 
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 #include <cstdlib>
 

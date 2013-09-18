@@ -3,7 +3,7 @@
 
 #include "yocto/string.hpp"
 #include "yocto/math/v2d.hpp"
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 
 #include "yocto/sequence/vector.hpp"

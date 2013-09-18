@@ -1,5 +1,5 @@
 #include "yocto/fs/vfs.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/sequence/list.hpp"
 
 #include <iostream>

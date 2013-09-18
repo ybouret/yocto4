@@ -3,7 +3,7 @@
 
 #include "yocto/spade/ghosts/ghost.hpp"
 #include "yocto/spade/linear-handles.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 
 namespace yocto
 {

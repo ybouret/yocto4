@@ -2,7 +2,7 @@
 #include "yocto/spade/mpi/workspace.hpp"
 #include "yocto/spade/rmesh.hpp"
 #include "yocto/spade/mpi/collect0.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/spade/vtk/writer.hpp"
 
 #include "../tests/main.hpp"

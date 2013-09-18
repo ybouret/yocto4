@@ -1,7 +1,7 @@
 #include "yocto/json/parser.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/lang/parser.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/string/conv.hpp"
 
 //#define Y_JSON_OUTPUT

@@ -3,7 +3,7 @@
 
 #include "yocto/net/io/queue.hpp"
 #include "yocto/net/tcp-socket.hpp"
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 
 namespace yocto

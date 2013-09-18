@@ -10,7 +10,7 @@
 
 #include "yocto/memory/buffers.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/container/sequence.hpp"
 
 namespace yocto 

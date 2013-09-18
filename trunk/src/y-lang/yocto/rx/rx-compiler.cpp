@@ -6,7 +6,7 @@
 #include "yocto/rx/pattern/joker.hpp"
 #include "yocto/rx/pattern/posix.hpp"
 
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/code/utils.hpp"
 
 #include "yocto/string/tokenizer.hpp"

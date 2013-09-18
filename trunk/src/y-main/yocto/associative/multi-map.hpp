@@ -4,7 +4,7 @@
 #include "yocto/associative/set.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 
 namespace yocto

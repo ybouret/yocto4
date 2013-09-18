@@ -1,7 +1,7 @@
 #ifndef YOCTO_LANG_SCANNER_INCLUDED
 #define YOCTO_LANG_SCANNER_INCLUDED 1
 
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/lang/lexeme.hpp"
 #include "yocto/lang/lexical/rule.hpp"

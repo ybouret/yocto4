@@ -4,7 +4,7 @@
 #include "yocto/lingua/pattern/logic.hpp"
 #include "yocto/lingua/pattern/joker.hpp"
 
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {

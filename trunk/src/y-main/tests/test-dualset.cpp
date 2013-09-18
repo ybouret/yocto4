@@ -5,7 +5,7 @@
 
 #include "yocto/sequence/vector.hpp"
 
-#include "yocto/nosy-ptr.hpp"
+#include "yocto/ptr/nosy.hpp"
 #include "yocto/counted.hpp"
 
 using namespace yocto;

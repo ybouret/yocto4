@@ -1,7 +1,7 @@
 #ifndef YOCTO_AQ_SPECIES_INCLUDED
 #define YOCTO_AQ_SPECIES_INCLUDED 1
 
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/string.hpp"
 #include "yocto/associative/set.hpp"

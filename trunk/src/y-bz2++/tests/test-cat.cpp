@@ -1,6 +1,6 @@
 #include "yocto/bz2++/bz2stream.hpp"
 #include "yocto/utest/run.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 
 using namespace yocto;

@@ -2,7 +2,7 @@
 #define YOCTO_OCL_CODES_INCLUDED 1
 
 #include "yocto/ocl/types.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/sequence/vector.hpp"
 
 

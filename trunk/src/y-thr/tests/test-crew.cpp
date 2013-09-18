@@ -4,7 +4,7 @@
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/sys/wtime.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 
 using namespace yocto;
 

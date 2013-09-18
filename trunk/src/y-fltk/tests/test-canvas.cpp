@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "canvas.h"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/math/types.hpp"
 
 using namespace yocto;

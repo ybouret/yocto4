@@ -2,7 +2,7 @@
 #define YOCTO_CHEMICAL_INITIALIZER_INCLUDED 1
 
 #include "yocto/chemical/equilibria.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 
 namespace yocto
 {
