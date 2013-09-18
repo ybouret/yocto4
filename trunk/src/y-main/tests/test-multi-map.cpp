@@ -33,10 +33,10 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
     }
     
     multi_map<string,string> thesaurus;
-    for( size_t g=3+alea_leq(10); g>0; --g )
+    for( size_t g=3+alea_leq(100); g>0; --g )
     {
         const string key = gen<string>::get();
-        for(size_t i=1+alea_leq(10);i>0;--i)
+        for(size_t i=1+alea_leq(200);i>0;--i)
         {
             const string str = gen<string>::get();
             thesaurus.insert(key,str);
