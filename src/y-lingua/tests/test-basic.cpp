@@ -4,7 +4,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 using namespace yocto;
 using namespace lingua;

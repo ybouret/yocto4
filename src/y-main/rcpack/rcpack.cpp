@@ -3,7 +3,7 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/fs/local-fs.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include <iostream>
 
 using namespace yocto;

@@ -3,7 +3,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/ios/iflux.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 
 #include <iostream>

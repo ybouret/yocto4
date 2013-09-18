@@ -5,7 +5,7 @@
 #include "yocto/container/vslot.hpp"
 #include "yocto/string.hpp"
 
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/associative/set.hpp"
 

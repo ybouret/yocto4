@@ -1,6 +1,6 @@
 #include "yocto/lang/syntax/joker.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto 
 {

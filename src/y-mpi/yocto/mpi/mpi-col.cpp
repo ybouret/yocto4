@@ -1,7 +1,7 @@
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/memory/buffers.hpp"
 #include "yocto/memory/pooled.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 #include <cstring>
 

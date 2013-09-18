@@ -5,7 +5,7 @@
 #include "yocto/lingua/pattern/joker.hpp"
 #include "yocto/lingua/pattern/posix.hpp"
 
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/string/tokenizer.hpp"
 #include "yocto/string/conv.hpp"

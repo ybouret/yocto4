@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/fs/local-fs.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 using namespace yocto;
 

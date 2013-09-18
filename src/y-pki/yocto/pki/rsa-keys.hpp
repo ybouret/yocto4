@@ -3,7 +3,7 @@
 
 
 #include "yocto/mpk/natural.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/code/fourcc.hpp"
 
 namespace yocto

@@ -1,4 +1,4 @@
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/object.hpp"
 
 namespace yocto

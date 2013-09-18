@@ -4,7 +4,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/threading/runnable.hpp"
 #include <iostream>
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/sequence/vector.hpp"
 #include <cstdlib>
 

@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/string.hpp"
 
 using namespace yocto;
@@ -22,7 +22,7 @@ YOCTO_UNIT_TEST_IMPL(shared_ptr)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 
 namespace 

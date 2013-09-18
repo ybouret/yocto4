@@ -1,6 +1,6 @@
 #include "yocto/csv/parser.hpp"
 #include "yocto/lang/parser.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 //#define Y_CSV_OUTPUT
 #if defined(Y_CSV_OUTPUT)

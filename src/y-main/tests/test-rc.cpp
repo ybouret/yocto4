@@ -23,7 +23,7 @@ YOCTO_UNIT_TEST_IMPL(rcpack)
 YOCTO_UNIT_TEST_DONE()
 
 
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 YOCTO_UNIT_TEST_IMPL(rcload)
 {

@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lang/compiler.hpp"
 #include "yocto/ios/icstream.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
 

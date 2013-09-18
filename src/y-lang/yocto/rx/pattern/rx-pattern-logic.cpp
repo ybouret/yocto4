@@ -219,7 +219,7 @@ namespace yocto
 }
 
 #include "yocto/rx/pattern/basic.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {

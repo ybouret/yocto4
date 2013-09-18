@@ -3,7 +3,7 @@
 
 #include "yocto/lingua/token.hpp"
 #include "yocto/ios/istream.hpp"
-#include "yocto/shared-ptr.hpp"
+#include "yocto/ptr/shared.hpp"
 #include "yocto/code/round.hpp"
 
 namespace yocto

@@ -3,7 +3,7 @@
 #include "yocto/net/tcp-socket.hpp"
 #include "yocto/ios/iflux.hpp"
 #include "yocto/memory/buffers.hpp"
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/net/socket-set.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"

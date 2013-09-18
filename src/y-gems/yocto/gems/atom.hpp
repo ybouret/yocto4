@@ -5,8 +5,8 @@
 #include "yocto/gems/identifier.hpp"
 #include "yocto/gems/properties.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
-#include "yocto/intr-ptr.hpp"
-#include "yocto/nosy-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
+#include "yocto/ptr/nosy.hpp"
 
 namespace yocto
 {

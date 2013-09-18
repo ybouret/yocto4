@@ -3,7 +3,7 @@
 
 #include "yocto/type/spec.hpp"
 #include "yocto/spade/data-block.hpp"
-#include "yocto/intr-ptr.hpp"
+#include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/string.hpp"
 

@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lingua/pattern/dict.hpp"
 #include "yocto/lingua/pattern/posix.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 
 using namespace yocto;
 using namespace lingua;

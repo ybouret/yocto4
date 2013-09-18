@@ -2,7 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/auto-ptr.hpp"
+#include "yocto/ptr/auto.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto {
