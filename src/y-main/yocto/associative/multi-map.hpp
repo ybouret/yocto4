@@ -30,7 +30,8 @@ namespace yocto
             DNode  *prev;
             DNode  *next;
             type    data;
-            inline  DNode( param_type args ) : prev(0), next(0), data(args) {}
+            inline  DNode( param_type args ) :
+            prev(0), next(0), data(args) {}
             inline ~DNode() throw() {}
             
         private:
