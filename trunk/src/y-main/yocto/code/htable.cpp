@@ -42,5 +42,24 @@ namespace yocto
         return slots;
     }
     
+    
+    size_t htable:: compute_slots_for(size_t &items, size_t &sub_prime)
+    {
+        sub_prime = 0;
+        if(items<=0) return 0;
+        
+        //----------------------------------------------------------------------
+        // compute the slots
+        //----------------------------------------------------------------------
+        const size_t slots = max_of<size_t>(items,3) * load_factor;
+        const size_t count = slots/load_factor;
+        if(count<items) throw libc::exception( ERANGE, "htable: #count overflow");
+        
+        sub_prime = prev_prime(slots-1);
+        items     = count;
+        return slots;
+    }
+
+    
 }
 
