@@ -161,18 +161,14 @@ namespace yocto
             //------------------------------------------------------------------
             // check memory/insert
             //------------------------------------------------------------------
-            if( klist.size >= itmax )
-            {
-                set tmp( container::next_capacity(itmax), as_capacity );
-                __duplicate_into(tmp);
-                tmp.__insert(hkey,args);
-                swap_with(tmp);
-            }
-            else
-            {
-                __insert(hkey,args);
-            }
+            __check_and_insert(hkey, args);
             return true;
+        }
+        
+        inline void insert__(param_type args)
+        {
+            assert(0==search( args.key() ));
+            __check_and_insert( hash(args.key()), args);
         }
         
         
@@ -245,7 +241,7 @@ namespace yocto
         inline const_type &front() const throw() { assert(klist.head); return klist.head->data; }
         inline type       &back()        throw() { assert(klist.head); return klist.tail->data; }
         inline const_type &back()  const throw() { assert(klist.head); return klist.tail->data; }
-
+        
         //======================================================================
         // slow access
         //======================================================================
@@ -412,6 +408,21 @@ namespace yocto
         //======================================================================
         // insertion
         //======================================================================
+        inline void __check_and_insert(const size_t hkey, param_type args )
+        {
+            if( klist.size >= itmax )
+            {
+                set tmp( container::next_capacity(itmax), as_capacity );
+                __duplicate_into(tmp);
+                tmp.__insert(hkey,args);
+                swap_with(tmp);
+            }
+            else
+            {
+                __insert(hkey,args);
+            }
+        }
+        
         inline void __insert( const size_t hkey, param_type args )
         {
             assert(klist.size<itmax);
