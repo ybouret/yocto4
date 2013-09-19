@@ -46,6 +46,6 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
         }
     }
     std::cerr << "size=" << thesaurus.size() << std::endl;
-    
+    std::cerr << "keys=" << thesaurus.keys() << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

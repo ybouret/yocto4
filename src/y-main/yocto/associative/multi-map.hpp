@@ -115,10 +115,9 @@ namespace yocto
                 G->push_front(gnode);    // put group node in place
                 dlist.push_back(dnode);  // put data  node in place
             }
-            catch(...) { __destroy(dnode); throw; }
-            
-            
+            catch(...) { __destroy(dnode); throw; }            
         }
+        
         
         explicit multi_map() throw() :
         dlist(),
@@ -133,7 +132,8 @@ namespace yocto
         virtual void free() throw()    { __free();    }
         virtual void release() throw() { __release(); }
         
-        size_t size() const throw() { return dlist.size; }
+        inline size_t size() const throw() { return dlist.size;    }
+        inline size_t keys() const throw() { return groups.size(); }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_map);
