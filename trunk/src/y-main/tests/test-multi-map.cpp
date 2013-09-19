@@ -11,7 +11,9 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(multi_map)
 {
+    std::cerr << "Testing Double Hashing Method" << std::endl;
     vector<size_t> indx;
+    indx.reserve(100);
     for(size_t n=4;n<=100;++n)
     {
         const size_t q = prev_prime(n-1);
@@ -32,6 +34,7 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
         }
     }
     
+    std::cerr << "Testing Thesaurus" << std::endl;
     multi_map<string,string> thesaurus;
     for( size_t g=3+alea_leq(100); g>0; --g )
     {
@@ -42,5 +45,7 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
             thesaurus.insert(key,str);
         }
     }
+    std::cerr << "size=" << thesaurus.size() << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()

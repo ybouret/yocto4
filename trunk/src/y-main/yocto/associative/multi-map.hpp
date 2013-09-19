@@ -30,8 +30,7 @@ namespace yocto
             DNode  *prev;
             DNode  *next;
             type    data;
-            inline  DNode( param_type args ) :
-            prev(0), next(0), data(args) {}
+            inline  DNode(param_type args) : prev(0), next(0), data(args) {}
             inline ~DNode() throw() {}
             
         private:
@@ -66,14 +65,8 @@ namespace yocto
             typedef set<KEY,Pointer,KEY_HASHER,ALLOCATOR> DataBase;
             const_key gkey;
             
-            explicit Group( param_key k ) :
-            gkey(k)
-            {
-            }
-            
-            virtual ~Group() throw()
-            {
-            }
+            explicit Group(param_key k) : gkey(k) {}
+            virtual ~Group() throw() {}
             
             inline const_key &key() const throw() { return gkey; }
             
@@ -103,12 +96,14 @@ namespace yocto
                 G = (*ppG).__get();
             }
             assert(G!=0);
+            assert(groups.search(key)!=0);
+            assert( (*groups.search(key)).__get() == G );
             
             //------------------------------------------------------------------
             // Create a Data Node
             //------------------------------------------------------------------
             DNode *dnode = dpool.size ? dpool.query() : object::acquire1<DNode>();
-            try{ new (dnode) DNode(args); }catch(...){ dpool.store(dnode); }
+            try{ new (dnode) DNode(args); }catch(...){ dpool.store(dnode); throw; }
             
             //------------------------------------------------------------------
             // Create a Group Node
@@ -117,14 +112,12 @@ namespace yocto
             {
                 GNode *gnode = gpool.size ? gpool.query() : object::acquire1<GNode>();
                 gnode->dnode = dnode;
-                G->push_front(gnode);
+                G->push_front(gnode);    // put group node in place
+                dlist.push_back(dnode);  // put data  node in place
             }
-            catch(...)
-            {
-                __destroy(dnode);
-            }
+            catch(...) { __destroy(dnode); throw; }
             
-            dlist.push_back(dnode);
+            
         }
         
         explicit multi_map() throw() :
@@ -139,6 +132,9 @@ namespace yocto
         
         virtual void free() throw()    { __free();    }
         virtual void release() throw() { __release(); }
+        
+        size_t size() const throw() { return dlist.size; }
+        
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_map);
         DList                    dlist;
@@ -150,7 +146,7 @@ namespace yocto
         // data node destruct
         //----------------------------------------------------------------------
         inline void __destroy( DNode *dnode ) throw()
-        { assert(dnode); destruct(dnode); dpool.store(dnode); }
+        { assert(dnode); dnode->~DNode(); dpool.store(dnode); }
         
         //----------------------------------------------------------------------
         // free
