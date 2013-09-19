@@ -18,7 +18,7 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
     {
         const size_t q = prev_prime(n-1);
         indx.free();
-        size_t       hkey   =  alea_leq(0xFFFFFFFF);
+        size_t       hkey   = alea_leq(0xFFFFFFFE);
         
         for(size_t i=0;i<n;++i)
         {
@@ -33,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(multi_map)
             if(indx[i]!=i) throw exception("invalid index for n=%u", unsigned(n));
         }
     }
-    
+	
     std::cerr << "Testing Thesaurus" << std::endl;
     multi_map<string,string> thesaurus;
     for( size_t g=3+alea_leq(100); g>0; --g )
