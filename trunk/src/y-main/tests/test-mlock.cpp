@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/memory/locked.hpp"
 #include <cstdlib>
+#include "yocto/core/list.hpp"
 
 using namespace yocto;
 
@@ -20,6 +21,5 @@ YOCTO_UNIT_TEST_IMPL(mlock)
 		p[i] = rand();
 	}
 	vmem.release(addr, n);
-    
 }
 YOCTO_UNIT_TEST_DONE()
