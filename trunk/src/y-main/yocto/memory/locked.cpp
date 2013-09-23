@@ -86,6 +86,26 @@ namespace yocto
                 return addr;
 #endif
                 
+#if defined(YOCTO_WIN)
+				//-- phase 1: get VirtualMemory
+				void *addr = ::VirtualAlloc( 0, m, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+				if(!addr) 
+				{
+					n=0;
+					throw win32::exception( ::GetLastError(), "VirtualAlloc" );
+				}
+				
+				//-- phase 2: lock Virtual Memory
+				if( ! ::VirtualLock(addr,m) )
+				{
+					const DWORD err = ::GetLastError();
+					n = 0;
+					::VirtualFree(addr,0,MEM_RELEASE);
+					throw win32::exception( err, "VirtualLock" );
+				}
+				n=m;
+				return addr;
+#endif
             }
             else
                 return 0;
@@ -101,6 +121,10 @@ namespace yocto
                 free(p);
 #endif
                 
+#if defined(YOCTO_WIN)
+				(void)::VirtualUnlock(p,n);
+				::VirtualFree(p,0,MEM_RELEASE);
+#endif
                 p = 0;
                 n = 0;
             }
