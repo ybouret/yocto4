@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/memory/locked.hpp"
 #include <cstdlib>
-#include "yocto/core/list.hpp"
+#include "yocto/memory/page.hpp"
 
 using namespace yocto;
 
@@ -21,5 +21,12 @@ YOCTO_UNIT_TEST_IMPL(mlock)
 		p[i] = rand();
 	}
 	vmem.release(addr, n);
+    
+    std::cerr << "sizeof(memory::page)=" << sizeof(memory::page) << std::endl;
+    
+    memory::page *P = new memory::page(0);
+    
+    delete P;
+    
 }
 YOCTO_UNIT_TEST_DONE()
