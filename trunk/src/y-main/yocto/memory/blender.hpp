@@ -8,6 +8,7 @@ namespace yocto
 	namespace memory
 	{
 		
+        //! in place memory blending
 		class blender : public object
 		{
 		public:

@@ -26,10 +26,10 @@ using namespace crypto;
 
 
 static
-void process_all(memory::blender   &p,
-				 memory::blender   &q,
-				 const memory::ro_buffer          &instr,
-				 const string &line )
+void process_all(memory::blender            &p,
+				 memory::blender            &q,
+				 const memory::ro_buffer    &instr,
+				 const string              &line )
 {
 	string enc = line;
 	
@@ -57,7 +57,10 @@ void process_all(memory::blender   &p,
 }
 
 static
-void process_pair( block_cipher &e, block_cipher &d, const string &line, const memory::ro_buffer &IV )
+void process_pair(block_cipher &e,
+                  block_cipher &d,
+                  const string &line,
+                  const memory::ro_buffer &IV )
 {
 	{
 		block_cipher_ecb::encrypter e_ecb( e, IV );
