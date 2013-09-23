@@ -8,6 +8,7 @@
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <cstring>
 #endif
 
 #include "yocto/exceptions.hpp"
@@ -30,6 +31,15 @@ namespace yocto
             if(ans<=0)
                 throw libc::exception( errno, "get system PAGE_SIZE");
             return ans;
+#endif
+
+#if defined(YOCTO_WIN)
+			SYSTEM_INFO sSysInfo;         // useful information about the system
+			memset(&sSysInfo,0,sizeof(SYSTEM_INFO));
+			GetSystemInfo(&sSysInfo);     // no error get info
+			const DWORD ans = sSysInfo.dwPageSize;
+			if(ans<=0) throw win32::exception( ERROR_INVALID_DATA, "SYSTEM_INFO.dwPageSize");
+			return ans;
 #endif
         }
         
