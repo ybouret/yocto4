@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <cerrno>
 #include <sys/mman.h>
+#include <cstdlib>
 #endif
 
 #if defined(YOCTO_WIN)
