@@ -3,6 +3,7 @@
 #if defined(YOCTO_BSD)
 #include <unistd.h>
 #include <cerrno>
+#include <sys/mman.h>
 #endif
 
 #if defined(YOCTO_WIN)
@@ -32,7 +33,7 @@ namespace yocto
                 throw libc::exception( errno, "get system PAGE_SIZE");
             return ans;
 #endif
-
+            
 #if defined(YOCTO_WIN)
 			SYSTEM_INFO sSysInfo;         // useful information about the system
 			memset(&sSysInfo,0,sizeof(SYSTEM_INFO));
@@ -48,6 +49,62 @@ namespace yocto
         }
         
         const char locked::name[] = "locked memory";
+        
+        
+        void * locked:: acquire( size_t &n )
+        {
+            YOCTO_LOCK(access);
+            if(n>0)
+            {
+                //--------------------------------------------------------------
+                // rounding #num pages
+                //--------------------------------------------------------------
+                size_t num_pages = n/page_size;
+                if( 0 != (n%page_size) ) ++num_pages;
+                const size_t m   = num_pages * page_size;
+                if(m<n) throw exception("locked::acquire overflow");
+                
+#if defined(YOCTO_BSD)
+                void *addr = calloc(1, m);
+                //-- phase 1: get memory
+                if(!addr)
+                {
+                    n = 0;
+                    throw libc::exception( errno, "locked::acquire(%u)", unsigned(m));
+                }
+                
+                //-- phase 2: lock memory
+                if( mlock(addr, m) != 0 )
+                {
+                    free(addr);
+                    n = 0;
+                    throw libc::exception( errno, "mlock");
+                }
+                
+                n = m;
+                return addr;
+#endif
+                
+            }
+            else
+                return 0;
+        }
+        
+        void locked:: release(void *&p, size_t &n) throw()
+        {
+            if(n>0)
+            {
+                assert(p!=0);
+#if defined(YOCTO_BSD)
+                munlock(p, n);
+                free(p);
+#endif
+                
+                p = 0;
+                n = 0;
+            }
+        }
+        
         
         
     }
