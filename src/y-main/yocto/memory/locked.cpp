@@ -14,6 +14,7 @@
 #endif
 
 #include "yocto/exceptions.hpp"
+#include "yocto/object.hpp"
 
 namespace yocto
 {
@@ -89,7 +90,7 @@ namespace yocto
 #if defined(YOCTO_WIN)
 				//-- phase 1: get VirtualMemory
 				void *addr = ::VirtualAlloc( 0, m, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-				if(!addr) 
+				if(!addr)
 				{
 					n=0;
 					throw win32::exception( ::GetLastError(), "VirtualAlloc" );
@@ -113,6 +114,7 @@ namespace yocto
         
         void locked:: release(void *&p, size_t &n) throw()
         {
+            YOCTO_LOCK(access);
             if(n>0)
             {
                 assert(p!=0);
@@ -129,8 +131,6 @@ namespace yocto
                 n = 0;
             }
         }
-        
-        
         
     }
 }
