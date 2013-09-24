@@ -17,6 +17,8 @@ namespace yocto
             virtual void *acquire( size_t &n );
 			virtual void  release( void * &p, size_t &n ) throw();
             
+            void *try_acquire( size_t &n, bool &safe);
+            
         private:
             explicit locked();
             virtual ~locked() throw();
