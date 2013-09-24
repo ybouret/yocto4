@@ -22,7 +22,9 @@ namespace yocto
         page:: page( size_t nbytes ) :
         nblk( 2 + __rpbs(nbytes)/block_size ),
         head( locked::instance().acquire_as<block_t>(nblk) ),
-        tail( &head[nblk]-1 )
+        tail( &head[nblk]-1 ),
+	next(0),
+	prev(0)
         {
             assert(nblk>2);
             
