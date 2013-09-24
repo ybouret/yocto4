@@ -64,25 +64,29 @@ namespace yocto
         }
         
         
-        void block_cipher_factory:: declare( const string &name, creator proc)
+        void block_cipher_factory:: declare( const string &id, creator proc)
         {
-            if( !db.insert(name,proc) )
-                throw exception("block_cipher_library(multiple '%s')", name.c_str());
+            if( !db.insert(id,proc) )
+                throw exception("block_cipher_library(multiple '%s')", id.c_str());
         }
         
-        void block_cipher_factory:: declare( const char *name, creator proc)
+        void block_cipher_factory:: declare( const char *id, creator proc)
         {
-            const string id(name);
-            declare(id,proc);
+            const string ID(id);
+            declare(ID,proc);
         }
         
+        const char block_cipher_factory::name[] = "bc_factory";
         
-        block_cipher_factory:: block_cipher_factory()
+        block_cipher_factory:: block_cipher_factory() :
+        db()
         {
             
 #define Y_BCF(ID) declare(#ID,ID)
+            
             Y_BCF(encrypt_ecb);
             Y_BCF(decrypt_ecb);
+            
             Y_BCF(encrypt_cbc);
             Y_BCF(decrypt_cbc);
 
@@ -104,5 +108,14 @@ namespace yocto
             return db.end();
         }
         
+        
+        operating_block_cipher * block_cipher_factory:: create( const string &id, block_cipher &e, block_cipher &d, const memory::ro_buffer &iv) const
+        {
+            const creator *hook = db.search(id);
+            if(!hook)
+                throw exception("%s.create( no '%s')", name, id.c_str());
+            creator proc = *hook; assert(proc);
+            return proc(e,d,iv);
+        }
     }
 }
