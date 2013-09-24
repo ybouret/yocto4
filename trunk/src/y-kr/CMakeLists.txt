@@ -19,8 +19,15 @@ INSTALL( FILES ${sc_decl} DESTINATION include/yocto/crypto/sc )
 SOURCE_GROUP( crypto/sc FILES ${sc_srcs} )
 
 
-SET( decl ${hashing_decl} ${bc_decl} ${sc_decl} )
-SET( srcs ${hashing_srcs} ${bc_srcs} ${sc_srcs} )
+FILE( GLOB ios_decl yocto/crypto/ios/*.hpp)
+FILE( GLOB ios_impl yocto/crypto/ios/*.cpp)
+SET( ios_srcs ${ios_decl} ${ios_impl} )
+INSTALL( FILES ${ios_decl} DESTINATION include/yocto/crypto/ios )
+SOURCE_GROUP( crypto/ios FILES ${ios_srcs} )
+
+
+SET( decl ${hashing_decl} ${bc_decl} ${sc_decl} ${ios_decl})
+SET( srcs ${hashing_srcs} ${bc_srcs} ${sc_srcs} ${ios_srcs})
 
 INCLUDE_DIRECTORIES( . ../y-main )
 
