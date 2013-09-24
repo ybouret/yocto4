@@ -18,7 +18,6 @@ namespace yocto
 	
 	digest digest::checksum( hashing::function &h, const ro_buffer &b )
 	{
-		digest ans( h.length, 0 );
 		h.set();
 		h(b);
 		return digest::get_from(h);
