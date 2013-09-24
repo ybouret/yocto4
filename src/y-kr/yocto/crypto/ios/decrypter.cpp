@@ -1,4 +1,5 @@
 #include "yocto/crypto/ios/decrypter.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -15,7 +16,18 @@ namespace yocto
         
         bool ios_decrypter:: process(ios::ostream &target, ios::istream &source, callback *cb)
         {
-            
+            size_t count = 0;
+            size_t done  = 0;
+            for(;;)
+            {
+                source.get(ibuf, block_size, done);
+                if(done<=0)
+                {
+                    break;
+                }
+                count += done;
+            }
+            std::cerr << "processed #" << count << std::endl;
             return true;
         }
     }

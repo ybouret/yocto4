@@ -9,7 +9,7 @@ namespace yocto
     {
         ios_cipher:: ~ios_cipher() throw()
         {
-            memory::kind<memory::global>::release(buffer, buflen);
+            memory::kind<memory::global>::release(obuf, bmem);
         }
         
         ios_cipher:: ios_cipher(ios_bits                 bits,
@@ -19,9 +19,12 @@ namespace yocto
         H(),
         S(user_key),
         block_size(0),
+        obuf(0),
+        ibuf(0),
         block_encrypter(),
         block_decrypter(),
-        instr( digest::checksum(S,user_key) )
+        instr( digest::checksum(S,user_key) ),
+        bmem(0)
         {
             //==================================================================
             // get the factory
@@ -73,8 +76,9 @@ namespace yocto
             std::cerr << "using " << id << std::endl;
             operating.reset( F.create(id, *block_encrypter, *block_decrypter, instr) );
             
-            buflen = block_size;
-            buffer = memory::kind<memory::global>::acquire(buflen);
+            bmem   = block_size*2;
+            obuf   = memory::kind<memory::global>::acquire(bmem);
+            ibuf   = static_cast<uint8_t*>(obuf) + block_size;
             
         }
         

@@ -49,13 +49,14 @@ namespace yocto
             ios_hmac                         S;
         public:
             const size_t                     block_size;
-        private:
-            void                            *buffer;
+        protected:
+            void                            *obuf;
+            void                            *ibuf;
             auto_ptr<block_cipher>           block_encrypter;
             auto_ptr<block_cipher>           block_decrypter;
             auto_ptr<operating_block_cipher> operating;
             const digest                     instr;
-            size_t                           buflen;
+            size_t                           bmem;
             
             
             
