@@ -19,6 +19,25 @@ namespace yocto
             
             void *try_acquire( size_t &n, bool &safe);
             
+            template <typename T>
+			inline T *try_acquire_as( size_t &n, bool &safe)
+			{
+				size_t bytes = n * sizeof(T);
+				try
+				{
+					T     *ptr  = static_cast<T*>( try_acquire(bytes,safe) );
+					assert( bytes >= n * sizeof(T) );
+					n = bytes / sizeof(T);
+					return ptr;
+				}
+				catch(...)
+				{
+					assert( bytes == 0 );
+					n = 0;
+					throw;
+				}
+			}
+            
         private:
             explicit locked();
             virtual ~locked() throw();
