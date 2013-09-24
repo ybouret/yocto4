@@ -4,7 +4,6 @@
 #include "yocto/code/utils.hpp"
 #include <cstring>
 
-#include <iostream>
 
 namespace yocto
 {
@@ -25,8 +24,6 @@ namespace yocto
         {
             return 0 == head->from && head->next == tail;
         }
-
-        
         
         page:: page( size_t nbytes ) :
         safe(false),
@@ -78,13 +75,9 @@ namespace yocto
                     const size_t usr_nblocks = usr_aligned/block_size;
                     const size_t blk_aligned = blk->size;
                     const size_t blk_nblocks = blk_aligned/block_size;
-                    //std::cerr << "usr_aligned=" << usr_aligned << "/#blk=" << usr_nblocks  << std::endl;
-                    //std::cerr << "blk_aligned=" << blk_aligned << "/#blk=" << blk_nblocks  << std::endl;
                     const size_t split_limit = usr_nblocks+1;
                     if( blk_nblocks>split_limit)
                     {
-                        //std::cerr  << "should split !" << std::endl;
-                        
                         block_t *next = blk->next; assert(next!=0);
                         block_t *dest = blk+split_limit;
                         blk->next  = dest;
@@ -96,10 +89,7 @@ namespace yocto
                         blk->size  = usr_aligned;
                         dest->size = block_size*(blk_nblocks-split_limit);
                         assert( (static_cast<ptrdiff_t>(dest->next-dest)-1) * block_size == dest->size );
-                        //std::cerr << "blk size=" << blk->size  << std::endl;
-                        //std::cerr << "new size=" << dest->size <<  std::endl;
                     }
-                    //else std::cerr << "should keep !" << std::endl;
                     
                     blk->from = this;
                     n         = blk->size;
@@ -125,17 +115,17 @@ namespace yocto
             blk->from = 0;
             if(blk->next->from == 0 )
             {
-                //std::cerr << "\t\t##MERGE NEXT" << std::endl;
                 __merge_next_of(blk);
             }
+            
             if(blk->prev&&0==blk->prev->from)
             {
-                //std::cerr << "\t\t##MERGE PREV" << std::endl;
                 __merge_next_of(blk->prev);
             }
+            
             return P;
         }
-
+        
         void page:: __merge_next_of( block_t *blk ) throw()
         {
             assert(blk);
