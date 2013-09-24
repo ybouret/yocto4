@@ -112,6 +112,65 @@ namespace yocto
                 return 0;
         }
         
+        
+        void * locked:: try_acquire(size_t &n, bool &safe)
+        {
+            YOCTO_LOCK(access);
+            safe = false;
+            if(n>0)
+            {
+                //--------------------------------------------------------------
+                // rounding #num pages
+                //--------------------------------------------------------------
+                size_t num_pages = n/page_size;
+                if( 0 != (n%page_size) ) ++num_pages;
+                const size_t m   = num_pages * page_size;
+                if(m<n) throw exception("locked::try_acquire overflow");
+                
+#if defined(YOCTO_BSD)
+                void *addr = calloc(1, m);
+                //-- phase 1: get memory
+                if(!addr)
+                {
+                    n = 0;
+                    throw libc::exception( errno, "locked::try_acquire(%u)", unsigned(m));
+                }
+                
+                //-- phase 2: lock memory
+                safe = true;
+                if( mlock(addr, m) != 0 )
+                {
+                    safe = false;
+                }
+                
+                n = m;
+                return addr;
+#endif
+                
+#if defined(YOCTO_WIN)
+				//-- phase 1: get VirtualMemory
+				void *addr = ::VirtualAlloc( 0, m, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+				if(!addr)
+				{
+					n=0;
+					throw win32::exception( ::GetLastError(), "VirtualAlloc" );
+				}
+				
+				//-- phase 2: lock Virtual Memory
+                safe = true;
+				if( ! ::VirtualLock(addr,m) )
+				{
+                    safe = false;
+				}
+				n=m;
+				return addr;
+#endif
+            }
+            else
+                return 0;
+
+        }
+        
         void locked:: release(void *&p, size_t &n) throw()
         {
             YOCTO_LOCK(access);
