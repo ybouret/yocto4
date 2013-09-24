@@ -58,6 +58,7 @@ namespace yocto
         
         page:: ~page() throw()
         {
+            assert(is_empty());
             locked::location()->release_as<block_t>(head, nblk);
         }
         
