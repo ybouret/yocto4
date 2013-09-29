@@ -150,3 +150,107 @@ YOCTO_UNIT_TEST_IMPL(ode)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/code/rand.hpp"
+
+namespace
+{
+    class Michaelis
+    {
+    public:
+        double k1,k2,k3;
+        
+        inline Michaelis() :
+        k1(0),
+        k2(0),
+        k3(0)
+        {
+            k1 = 1   * (1+alea<double>());
+            k2 = 0.1 * (1+alea<double>());
+            k3 = 0.2 * (1+alea<double>());
+        }
+        
+        void rate( array<double> &dydx, double , const array<double> &y )
+        {
+            const double & S  = y[1];
+            const double & E  = y[2];
+            const double & ES = y[3];
+            //const double & P  = y[4];
+            
+            const double v1 = k1 * S * E;
+            const double v2 = k2 * ES;
+            const double v3 = k3 * ES;
+        
+            double & dSdt  = dydx[1];
+            double & dEdt  = dydx[2];
+            double & dESdt = dydx[3];
+            double & dPdt  = dydx[4];
+            
+        
+            dSdt  = v2 - v1;
+            dEdt  = v2 - v1;
+            dESdt = v1 - v2 - v3;
+            dPdt  = v3;
+            
+        }
+        
+        inline ~Michaelis()
+        {
+        }
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(Michaelis);
+    };
+    
+}
+
+static const char FileName[] = "mm.dat";
+
+static inline void  Output( double t, const array<double> &C)
+{
+    ios::ocstream fp(FileName,true);
+    fp("%g",t);
+    for(size_t i=1; i <= C.size(); ++i)
+    {
+        fp(" %g", C[i]);
+    }
+    fp("\n");
+}
+
+
+YOCTO_UNIT_TEST_IMPL(michaelis)
+{
+   
+    ode::drvck<double>::type odeint(1e-4);
+    Michaelis                enzyme;
+    ode::field<double>::type diffeq( &enzyme, & Michaelis::rate );
+
+    const size_t   nvar = 4;
+    vector<double> y(nvar,0);
+    odeint.start(nvar);
+    
+    double &S  = y[1];
+    double &E  = y[2];
+    double &ES = y[3];
+    double &P  = y[4];
+    
+    S  = 1;
+    E  = 0.1 * 0.5*(1+alea<double>());
+    ES = 0;
+    P  = 0;
+    
+    double       t = 0;
+    const double dt = 1e-2;
+    double       h  = t/10;
+    ios::ocstream::overwrite(FileName);
+    Output(t, y);
+    for(size_t i=1;;++i)
+    {
+        odeint( diffeq, y, t, t+dt, h );
+        t=i*dt;
+        Output(t, y);
+        if(t>20) break;
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
