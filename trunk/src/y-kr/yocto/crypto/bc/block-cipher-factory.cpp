@@ -3,6 +3,10 @@
 
 #include "yocto/crypto/bc/block-cipher-ecb.hpp"
 #include "yocto/crypto/bc/block-cipher-cbc.hpp"
+#include "yocto/crypto/bc/block-cipher-ctr.hpp"
+#include "yocto/crypto/bc/block-cipher-cfb.hpp"
+#include "yocto/crypto/bc/block-cipher-ofb.hpp"
+#include "yocto/crypto/bc/block-cipher-pcbc.hpp"
 
 namespace yocto
 {
@@ -14,7 +18,7 @@ namespace yocto
         }
         
         
-             
+        
         //======================================================================
         // ECB
         //======================================================================
@@ -63,6 +67,104 @@ namespace yocto
             
         }
         
+        //======================================================================
+        // CTR
+        //======================================================================
+        namespace
+        {
+            static inline
+            operating_block_cipher *encrypt_ctr(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_ctr::encrypter(e,iv);
+            }
+            
+            static inline
+            operating_block_cipher *decrypt_ctr(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_ctr::decrypter(e,iv);
+            }
+            
+            
+        }
+        
+        //======================================================================
+        // CFB
+        //======================================================================
+        namespace
+        {
+            static inline
+            operating_block_cipher *encrypt_cfb(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_cfb::encrypter(e,iv);
+            }
+            
+            static inline
+            operating_block_cipher *decrypt_cfb(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_cfb::decrypter(e,iv);
+            }
+            
+            
+        }
+        
+        //======================================================================
+        // OFB
+        //======================================================================
+        namespace
+        {
+            static inline
+            operating_block_cipher *encrypt_ofb(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_ofb::encrypter(e,iv);
+            }
+            
+            static inline
+            operating_block_cipher *decrypt_ofb(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_ofb::decrypter(e,iv);
+            }
+            
+            
+        }
+
+        //======================================================================
+        // PCBC
+        //======================================================================
+        namespace
+        {
+            static inline
+            operating_block_cipher *encrypt_pcbc(block_cipher &e,
+                                                block_cipher &,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_pcbc::encrypter(e,iv);
+            }
+            
+            static inline
+            operating_block_cipher *decrypt_pcbc(block_cipher &e,
+                                                block_cipher &d,
+                                                const memory::ro_buffer &iv )
+            {
+                return new block_cipher_pcbc::decrypter(d,e,iv);
+            }
+            
+            
+        }
+
+        
+        
         
         void block_cipher_factory:: declare( const string &id, creator proc)
         {
@@ -89,7 +191,19 @@ namespace yocto
             
             Y_BCF(encrypt_cbc);
             Y_BCF(decrypt_cbc);
-
+            
+            Y_BCF(encrypt_ctr);
+            Y_BCF(decrypt_ctr);
+            
+            Y_BCF(encrypt_cfb);
+            Y_BCF(decrypt_cfb);
+            
+            Y_BCF(encrypt_ofb);
+            Y_BCF(decrypt_ofb);
+            
+            Y_BCF(encrypt_pcbc);
+            Y_BCF(decrypt_pcbc);
+            
         }
         
         
