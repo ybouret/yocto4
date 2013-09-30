@@ -157,16 +157,18 @@ namespace
     class Michaelis
     {
     public:
-        double k1,k2,k3;
+        double k1,k2,k3,k4;
         
         inline Michaelis() :
         k1(0),
         k2(0),
-        k3(0)
+        k3(0),
+        k4(0)
         {
             k1 = 1   * (1+alea<double>());
             k2 = 0.1 * (1+alea<double>());
             k3 = 0.2 * (1+alea<double>());
+            k4 = 0.08;
         }
         
         void rate( array<double> &dydx, double , const array<double> &y )
@@ -174,22 +176,23 @@ namespace
             const double & S  = y[1];
             const double & E  = y[2];
             const double & ES = y[3];
-            //const double & P  = y[4];
+            const double & P  = y[4];
             
             const double v1 = k1 * S * E;
             const double v2 = k2 * ES;
             const double v3 = k3 * ES;
-        
+            const double v4 = k4 * P * E;
+            
             double & dSdt  = dydx[1];
             double & dEdt  = dydx[2];
             double & dESdt = dydx[3];
             double & dPdt  = dydx[4];
             
         
-            dSdt  = v2 - v1;
-            dEdt  = v2 - v1;
-            dESdt = v1 - v2 - v3;
-            dPdt  = v3;
+            dSdt  = (v2-v1);
+            dEdt  = (v2+v3) - (v1+v4);
+            dESdt = (v1+v4) - (v2+v3);
+            dPdt  = v3-v4;
             
         }
         
@@ -234,7 +237,7 @@ YOCTO_UNIT_TEST_IMPL(michaelis)
     double &P  = y[4];
     
     S  = 1;
-    E  = 0.1 * 0.5*(1+alea<double>());
+    E  = 0.1 + 0.5*(1+alea<double>());
     ES = 0;
     P  = 0;
     
@@ -248,7 +251,7 @@ YOCTO_UNIT_TEST_IMPL(michaelis)
         odeint( diffeq, y, t, t+dt, h );
         t=i*dt;
         Output(t, y);
-        if(t>20) break;
+        if(t>30) break;
     }
     
 }
