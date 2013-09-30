@@ -76,7 +76,7 @@ namespace yocto
             YOCTO_LOOP( len, target.write( *(C++) ) );
         }
 		
-        void zpipe:: def( ios::ostream &target, ios::istream &source, size_t level )
+        void zpipe:: def( ios::ostream &target, ios::istream &source, size_t level, memory::blender &blend)
         {
             z_stream     strm;
             _zpipe_init( strm );
@@ -99,7 +99,9 @@ namespace yocto
                         strm.next_out  = (Bytef*)out;
                         (void)deflate(&strm, flush);      /* no bad return value */
                         //assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-                        _save( target, CHUNK - strm.avail_out );
+                        const size_t length = CHUNK - strm.avail_out;
+                        blend.scramble(out,length);
+                        _save( target, length );
                     } while (strm.avail_out == 0);
                     assert(strm.avail_in == 0);     /* all input will be used */
 					
@@ -117,7 +119,7 @@ namespace yocto
         }
 		
 		
-        void zpipe:: inf( ios::ostream &target, ios::istream &source)
+        void zpipe:: inf( ios::ostream &target, ios::istream &source, memory::blender &blend)
         {
             z_stream     strm;
             _zpipe_init( strm );
@@ -130,6 +132,7 @@ namespace yocto
                 /* decompress until deflate stream ends or end of file */
                 do {
                     strm.avail_in = _read( source );
+                    blend.scramble(in,strm.avail_in);
                     if (strm.avail_in == 0)
                         break;
                     strm.next_in = (Bytef *)in;
@@ -147,7 +150,8 @@ namespace yocto
 							default:
 								throw exception( "inflate(%s)", zError( ret ) );
                         }
-                        _save( target, CHUNK - strm.avail_out );
+                        const size_t length = CHUNK-strm.avail_out;
+                        _save( target, length );
                     } while (strm.avail_out == 0);
 					
                     /* done when inflate() says it's done */

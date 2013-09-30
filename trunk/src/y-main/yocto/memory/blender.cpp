@@ -14,8 +14,16 @@ namespace yocto
 		{
 			scramble( buffer.rw(), buffer.length() );
 		}
-		
-	}
+	
+        
+        no_blender:: ~no_blender() throw() {}
+		no_blender::  no_blender() throw() {}
+
+        void no_blender:: schedule(const memory::ro_buffer &) throw() {}
+        void no_blender:: scramble(void *, size_t) throw() {}
+        
+        
+    }
 	
 	
 }

@@ -56,8 +56,8 @@ YOCTO_UNIT_TEST_IMPL(def)
 	ios::ocstream target( ios::cstdout );
 
 	zlib::zpipe zp( chunk );
-
-	zp.def( target, source, level );
+    memory::no_blender blend;
+	zp.def( target, source, level, blend );
 
 
 
@@ -72,8 +72,9 @@ YOCTO_UNIT_TEST_IMPL(inf)
 	ios::ocstream target( ios::cstdout );
 
 	zlib::zpipe zp( chunk );
+    memory::no_blender blend;
 
-	zp.inf( target, source );
+	zp.inf( target, source, blend);
 
 
 
