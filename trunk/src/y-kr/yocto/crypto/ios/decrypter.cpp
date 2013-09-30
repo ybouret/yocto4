@@ -1,5 +1,5 @@
 #include "yocto/crypto/ios/decrypter.hpp"
-#include <iostream>
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -16,18 +16,56 @@ namespace yocto
         
         bool ios_decrypter:: process(ios::ostream &target, ios::istream &source, callback *cb)
         {
-            size_t count = 0;
-            size_t done  = 0;
+            
+            init();  // prepare cipher
+            S.set(); // prepare hmac
+            
+            //==================================================================
+            // main processing
+            //==================================================================
             for(;;)
             {
-                source.get(ibuf, block_size, done);
-                if(done<=0)
+                assert(count<block_size);
+                char &C = *(char *)&ibuf[count];
+                if(source.query(C))
                 {
-                    break;
+                    if(++count>=block_size)
+                    {
+                        //-- decrypt
+                        operating->crypt(obuf, ibuf);
+                        
+                        //-- update signature
+                        S.run(obuf,block_size);
+                        
+                        //-- emit
+                        emit(target);
+                        assert(0==count);
+                    }
                 }
-                count += done;
+                else
+                    break; // EOF
             }
-            std::cerr << "processed #" << count << std::endl;
+            
+            //==================================================================
+            // flushing
+            //==================================================================
+            if(count>0)
+            {
+                operating->crypt_flush(obuf, ibuf, count);
+                S.run(obuf,block_size);
+                emit(target);
+            }
+            
+            //==================================================================
+            // signature check
+            //==================================================================
+            if(false)
+            {
+                const code_t tag  = source.read<code_t>();
+                const code_t code = S.key<code_t>();
+                if(tag!=code)
+                    throw exception("corrupted data signature");
+            }
             return true;
         }
     }

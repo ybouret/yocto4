@@ -31,6 +31,7 @@ namespace yocto
         {
         public:
             typedef functor<bool,TL1(size_t)> callback;
+            typedef uint64_t                  code_t;
             
             virtual ~ios_cipher() throw();
             
@@ -40,25 +41,31 @@ namespace yocto
                                 const memory::ro_buffer &user_key );
             
             
-            //! reschedule operating block cipher
-            void         restart() throw();
             virtual bool process( ios::ostream &target, ios::istream &source, callback *cb) = 0;
             
         protected:
             ios_hash                         H;
             ios_hmac                         S;
+            
         public:
             const size_t                     block_size;
+            
         protected:
-            void                            *obuf;
-            void                            *ibuf;
+            size_t                           count;
+            size_t                           total;
+            uint8_t                         *obuf;
+            uint8_t                         *ibuf;
             auto_ptr<block_cipher>           block_encrypter;
             auto_ptr<block_cipher>           block_decrypter;
             auto_ptr<operating_block_cipher> operating;
             const digest                     instr;
             size_t                           bmem;
+                        
+            //! emit an encoded block of count bytes, set count to 0, update total
+            void emit( ios::ostream &target);
             
-            
+            //! reschedule cipher, count=0, total=0
+            void init() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ios_cipher);
