@@ -7,10 +7,33 @@
 using namespace yocto;
 
 static inline
-void __encrypt( ios::ostream &target, ios::istream &source, crypto::ios_cipher &enc)
+void __encipher( ios::ostream &target, ios::istream &source, crypto::ios_cipher &enc)
 {
-    enc.restart();
     enc.process(target,source,0);
+}
+
+static inline
+void __check( crypto::ios_cipher &enc, crypto::ios_cipher &dec )
+{
+    string       src = "QWERTYUIOPASDFGHJKLZXCVBNM";
+    src += src;
+    string       tgt;
+    
+    {
+        ios::imstream source(src);
+        ios::osstream target(tgt);
+        __encipher(target, source, enc);
+        tgt.output_visible(std::cerr) << std::endl;
+    }
+    
+    string chk;
+    {
+        ios::imstream source(tgt);
+        ios::osstream target(chk);
+        __encipher(target,source,dec);
+        chk.output_visible(std::cerr) << std::endl;
+    }
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(ios)
@@ -22,17 +45,10 @@ YOCTO_UNIT_TEST_IMPL(ios)
     crypto::ios_encrypter e2( crypto::ios128, "cbc", key);
     crypto::ios_decrypter d2( crypto::ios128, "cbc", key);
     
-    string       src = "QWERTYUIOPASDFGHJKLZXCVBNM";
-    src += src;
-    string       tgt;
+    __check(e1, d1);
     
-    {
-        ios::imstream source(src);
-        tgt.clear();
-        ios::osstream target(tgt);
-        __encrypt(target, source, e1);
-        tgt.output_visible(std::cerr) << std::endl;
-    }
+    __check(e2,d2);
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
