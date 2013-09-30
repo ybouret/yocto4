@@ -46,9 +46,8 @@ namespace yocto
         protected:
             ios_hash                         H;
             ios_hmac                         S;
-            
         public:
-            const size_t                     block_size;
+            const size_t                     block_size; //!< AES: 16
             
         protected:
             size_t                           count;
