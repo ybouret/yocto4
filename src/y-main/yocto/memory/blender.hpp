@@ -23,6 +23,19 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(blender);
 		};
+        
+        //! prototype
+        class no_blender : public blender
+        {
+        public:
+            explicit no_blender() throw();
+            virtual ~no_blender() throw();
+            virtual void schedule( const memory::ro_buffer &) throw();
+            virtual void scramble( void *, size_t ) throw();
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(no_blender);
+        };
 		
 	}
 	

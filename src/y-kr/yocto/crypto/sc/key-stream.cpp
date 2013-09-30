@@ -10,9 +10,9 @@ namespace yocto
 		key_stream:: ~key_stream() throw() {}
 		key_stream::  key_stream() throw() {}
 		
-	#if defined(__ICC)
-	#pragma warning ( disable : 2259 )
-	#endif	
+#if defined(__ICC)
+#pragma warning ( disable : 2259 )
+#endif
 #define YKS_CIPHER1(INDEX) q[INDEX] ^= call()
 		
 		void key_stream:: scramble( void *buffer, size_t buflen ) throw()

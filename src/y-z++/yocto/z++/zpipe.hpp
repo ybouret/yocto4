@@ -5,6 +5,7 @@
 #include "yocto/ios/ostream.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/memory/buffers.hpp"
+#include "yocto/memory/blender.hpp"
 
 namespace yocto
 {
@@ -18,8 +19,8 @@ namespace yocto
 			explicit zpipe( size_t chunk_size );
 			virtual ~zpipe() throw();
 
-			void def( ios::ostream &target, ios::istream &source, size_t level );
-			void inf( ios::ostream &target, ios::istream &source);
+			void def( ios::ostream &target, ios::istream &source, size_t level, memory::blender &blend );
+			void inf( ios::ostream &target, ios::istream &source, memory::blender &blend);
 
 			
 
