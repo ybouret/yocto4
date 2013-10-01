@@ -6,6 +6,7 @@
 #include "yocto/ios/ocstream.hpp"
 
 #include <typeinfo>
+#include <cmath>
 
 
 using namespace yocto;
@@ -158,17 +159,43 @@ namespace
     {
     public:
         double k1,k2,k3,k4;
+        double beta;
         
         inline Michaelis() :
         k1(0),
         k2(0),
         k3(0),
-        k4(0)
+        k4(0),
+        beta(0)
         {
             k1 = 1   * (1+alea<double>());
             k2 = 0.1 * (1+alea<double>());
             k3 = 0.2 * (1+alea<double>());
             k4 = 0.08;
+            
+            beta = k4*k2/(k1*k3);
+        }
+        
+        void show_steady( const array<double> &y ) const
+        {
+            const double & S  = y[1];
+            const double & E  = y[2];
+            const double & ES = y[3];
+            const double & P  = y[4];
+            const double E0 = E + ES;
+            const double S0 = S + ES + P;
+            
+            const double a  = k1*(1+beta);
+            const double b  = k2+beta*(k2+k2*(E0-S0));
+            const double c  = -beta*k2*S0;
+            
+            const double delta = b*b - 4.0 * (a*c);
+            const double Seq   = (sqrt(delta) - b)/(a+a);
+            std::cerr << "[S]eq=" << Seq << std::endl;
+            
+            const double ESeq  = E0 * (k1*Seq)/(k2+k1*Seq);
+            std::cerr << "[ES]eq=" << ESeq << std::endl;
+            
         }
         
         void rate( array<double> &dydx, double , const array<double> &y )
@@ -240,6 +267,9 @@ YOCTO_UNIT_TEST_IMPL(michaelis)
     E  = 0.1 + 0.5*(1+alea<double>());
     ES = 0;
     P  = 0;
+    
+    std::cerr << "Steady State:" << std::endl;
+    enzyme.show_steady(y);
     
     double       t = 0;
     const double dt = 1e-2;
