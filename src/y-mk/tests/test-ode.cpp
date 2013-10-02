@@ -173,7 +173,7 @@ namespace
             k3 = 0.2 * (1+alea<double>());
             k4 = 0.08;
             
-            beta = k4*k2/(k1*k3);
+            beta = (k4*k2)/(k1*k3);
         }
         
         void show_steady( const array<double> &y ) const
