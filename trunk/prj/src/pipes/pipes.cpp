@@ -87,7 +87,7 @@ int main(int argc, char *argv[] )
 				input.get_all(ptr, len);
 			}
 			
-			if( len != write( fd[I_WRITE], ptr, len) )
+			if( int(len) != write( fd[I_WRITE], ptr, len) )
 			{
 				throw libc::exception( errno, "write error");
 			}

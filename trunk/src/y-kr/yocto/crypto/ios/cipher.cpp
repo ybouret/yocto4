@@ -26,6 +26,7 @@ namespace yocto
         ibuf(0),
         block_encrypter(),
         block_decrypter(),
+	operating(),
         instr( digest::checksum(S,user_key) ),
         bmem(0)
         {
