@@ -30,7 +30,7 @@ namespace yocto
                          callback           &cb,
                          U (*proc)(const T &) = dump )
             {
-                typedef vertex        XYZ;
+                //typedef vertex        XYZ;
                 typedef triangle3D<U> TRIANGLE;
                 typedef U             ZTYPE;
                 assert( d.has(sub.lower) );
