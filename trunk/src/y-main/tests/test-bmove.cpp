@@ -3,12 +3,19 @@
 #include "yocto/math/complex.hpp"
 #include "yocto/sys/wtime.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/hashing/sha1.hpp"
+
+#include <cstring>
 
 using namespace yocto;
 using namespace math;
 
 #define ITER_MAX (1024*1024)
 #define Y_BMOVE_TMX(N)  do {                         \
+memset(arr,0,sizeof(arr));                           \
+core::bmove<N>(arr,brr);                             \
+if( H.key<uint64_t>(arr,N)!=H.key<uint64_t>(brr,N) ) \
+throw exception("invalid bmove<%u>",N);              \
 const double ini = chrono.query();                   \
 for(int i=0;i<ITER_MAX;++i) core::bmove<N>(arr,brr); \
 tmx[N-1] = 1e-6 * (ITER_MAX/(chrono.query() - ini)); \
@@ -23,6 +30,9 @@ YOCTO_UNIT_TEST_IMPL(bmove)
     uint8_t arr[64] = { 0 };
     uint8_t brr[64] = { 0 };
     double  tmx[64] = { 0 };
+    
+    for(unsigned i=0;i<64;++i) brr[i] = uint8_t(i);
+    hashing::sha1 H;
     
     wtime chrono;
     chrono.start();
