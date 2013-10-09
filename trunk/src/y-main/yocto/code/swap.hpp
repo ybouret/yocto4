@@ -3,14 +3,13 @@
 
 #include "yocto/os.hpp"
 
-namespace yocto 
+namespace yocto
 {
+    
 	template <typename T>
 	inline void cswap( T &a, T &b ) throw()
 	{
-		const T tmp(a);
-		a = b;
-		b = tmp;
+		const T tmp(a); a = b; b = tmp;
 	}
 	
 	template <typename T>
