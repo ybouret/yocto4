@@ -38,6 +38,18 @@ typedef unsigned_int<N>::type word_t;\
         Y_BMOVE_IMPL(4)
         Y_BMOVE_IMPL(8)
         
+        template <> inline void bmove<12>(void *a, const void *b) throw()
+        {
+            uint64_t       *tgt = (uint64_t *)a;
+            const uint64_t *src = (const uint64_t *)b;
+            tgt[0] = src[0];
+            
+            uint32_t       *t32 = (uint32_t *)&tgt[1];
+            const uint32_t *s32 = (const uint32_t *)&src[1];
+            
+            t32[0] = s32[0];
+        }
+        
         template <> inline void bmove<16>(void *a, const void *b) throw()
         {
             uint64_t       *tgt = (uint64_t *)a;
