@@ -46,6 +46,14 @@ typedef unsigned_int<N>::type word_t;\
             tgt[1] = src[1];
         }
 
+        template <> inline void bmove<24>(void *a, const void *b) throw()
+        {
+            uint64_t       *tgt = (uint64_t *)a;
+            const uint64_t *src = (const uint64_t *)b;
+            tgt[0] = src[0];
+            tgt[1] = src[1];
+            tgt[2] = src[2];
+        }
         
     }
     
