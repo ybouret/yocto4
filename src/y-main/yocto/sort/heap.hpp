@@ -2,7 +2,7 @@
 #define YOCTO_SORT_HEAP_INCLUDED 1
 
 #include "yocto/sequence/lw-array.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bmove.hpp"
 #include "yocto/code/cast.hpp"
 #include "yocto/comparator.hpp"
 
@@ -31,15 +31,15 @@ namespace yocto
 		{
 			if (l>1) 
 			{
-				mmove(rra,ra[--l]);
+				bmove(rra,ra[--l]);
 			}
 			else
 			{
-				mmove( rra,    ra[ir] );
-				mmove( ra[ir], ra[1]  );
+				bmove( rra,    ra[ir] );
+				bmove( ra[ir], ra[1]  );
 				if (--ir == 1) 
 				{
-					mmove(ra[1],rra);
+					bmove(ra[1],rra);
 					break;
 				}
 			}
@@ -51,14 +51,14 @@ namespace yocto
 					j++;
 				if ( compare(rra,ra[j]) < 0) 
 				{ 
-					mmove( ra[i], ra[j] );
+					bmove( ra[i], ra[j] );
 					i=j;
 					j <<= 1;
 				} 
 				else 
 					j=ir+1; 
 			}
-			mmove( ra[i], rra );
+			bmove( ra[i], rra );
 		}
 	}
 	
@@ -88,21 +88,21 @@ namespace yocto
 			if (l>1) 
 			{
 				--l;
-				mmove(rra,ra[l]);
-				mmove(rrb,rb[l]);
+				bmove(rra,ra[l]);
+				bmove(rrb,rb[l]);
 			}
 			else
 			{
-				mmove( rra,    ra[ir] );
-				mmove( ra[ir], ra[1]  );
+				bmove( rra,    ra[ir] );
+				bmove( ra[ir], ra[1]  );
 				
-				mmove( rrb,    rb[ir] );
-				mmove( rb[ir], rb[1]  );
+				bmove( rrb,    rb[ir] );
+				bmove( rb[ir], rb[1]  );
 				
 				if (--ir == 1) 
 				{
-					mmove(ra[1],rra);
-					mmove(rb[1],rrb);
+					bmove(ra[1],rra);
+					bmove(rb[1],rrb);
 					break;
 				}
 			}
@@ -114,16 +114,16 @@ namespace yocto
 					j++;
 				if( compare(rra,ra[j]) < 0) 
 				{ 
-					mmove( ra[i], ra[j] );
-					mmove( rb[i], rb[j] );
+					bmove( ra[i], ra[j] );
+					bmove( rb[i], rb[j] );
 					i=j;
 					j <<= 1;
 				} 
 				else 
 					j=ir+1; 
 			}
-			mmove( ra[i], rra );
-			mmove( rb[i], rrb );
+			bmove( ra[i], rra );
+			bmove( rb[i], rrb );
 		}
 	}
 	

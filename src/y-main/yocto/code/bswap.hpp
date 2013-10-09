@@ -2,19 +2,29 @@
 #define YOCTO_BSWAP_INCLUDED 1
 
 #include "yocto/os.hpp"
-
+#include "yocto/code/unroll.hpp"
 
 namespace yocto
 {
     namespace core
     {
+#define Y_BSWAP_FUNC(TYPE,I) const TYPE tmp(L[I]); L[I] = R[I]; R[I] = tmp
+#define Y_BSWAP8(I)          Y_BSWAP_FUNC(uint8_t,I)
+        
+        template <size_t N>
+        inline void bswap( void *lhs, void *rhs ) throw()
+        {
+            uint8_t *L = (uint8_t *)lhs;
+            uint8_t *R = (uint8_t *)rhs;
+            YOCTO_LOOP_FUNC_(N, Y_BSWAP8, 0);
+        }
+        
 #define YOCTO_BSWAP_IMPL(TYPE) \
 const TYPE tmp = *(TYPE *)lhs; \
 *(TYPE *)lhs   = *(TYPE *)rhs; \
 *(TYPE *)rhs   = tmp
         
-        template <size_t N>
-        inline void bswap( void *lhs, void *rhs ) throw();
+        
         
         
         template <>
@@ -41,26 +51,99 @@ const TYPE tmp = *(TYPE *)lhs; \
             YOCTO_BSWAP_IMPL(uint64_t);
         }
         
+#define Y_BSWAP64(I) Y_BSWAP_FUNC(uint64_t,I)
+        
         template <>
         inline void bswap<16>(void *lhs, void *rhs) throw()
         {
             uint64_t *L = (uint64_t *)lhs;
             uint64_t *R = (uint64_t *)rhs;
-            {
-                const uint64_t tmp = L[0];
-                L[0] = R[0];
-                R[0] = tmp;
-            }
-            
-            {
-                const uint64_t tmp = L[1];
-                L[1] = R[1];
-                R[1] = tmp;
-            }
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
         }
         
+        template <>
+        inline void bswap<24>(void *lhs, void *rhs) throw()
+        {
+            uint64_t *L = (uint64_t *)lhs;
+            uint64_t *R = (uint64_t *)rhs;
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
+            { Y_BSWAP64(2); }
+        }
+        
+        
+        template <>
+        inline void bswap<32>(void *lhs, void *rhs) throw()
+        {
+            uint64_t *L = (uint64_t *)lhs;
+            uint64_t *R = (uint64_t *)rhs;
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
+            { Y_BSWAP64(2); }
+            { Y_BSWAP64(3); }
+        }
+        
+        template <>
+        inline void bswap<40>(void *lhs, void *rhs) throw()
+        {
+            uint64_t *L = (uint64_t *)lhs;
+            uint64_t *R = (uint64_t *)rhs;
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
+            { Y_BSWAP64(2); }
+            { Y_BSWAP64(3); }
+            { Y_BSWAP64(4); }
+        }
+        
+        template <>
+        inline void bswap<48>(void *lhs, void *rhs) throw()
+        {
+            uint64_t *L = (uint64_t *)lhs;
+            uint64_t *R = (uint64_t *)rhs;
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
+            { Y_BSWAP64(2); }
+            { Y_BSWAP64(3); }
+            { Y_BSWAP64(4); }
+            { Y_BSWAP64(5); }
+        }
+        
+        template <>
+        inline void bswap<56>(void *lhs, void *rhs) throw()
+        {
+            uint64_t *L = (uint64_t *)lhs;
+            uint64_t *R = (uint64_t *)rhs;
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
+            { Y_BSWAP64(2); }
+            { Y_BSWAP64(3); }
+            { Y_BSWAP64(4); }
+            { Y_BSWAP64(5); }
+            { Y_BSWAP64(6); }
+        }
+        
+        template <>
+        inline void bswap<64>(void *lhs, void *rhs) throw()
+        {
+            uint64_t *L = (uint64_t *)lhs;
+            uint64_t *R = (uint64_t *)rhs;
+            { Y_BSWAP64(0); }
+            { Y_BSWAP64(1); }
+            { Y_BSWAP64(2); }
+            { Y_BSWAP64(3); }
+            { Y_BSWAP64(4); }
+            { Y_BSWAP64(5); }
+            { Y_BSWAP64(6); }
+            { Y_BSWAP64(7); }
+        }
+
+        
+        
+        
+        
     }
- 
+    
     template <typename T>
     inline void bswap(T &a, T &b) throw()
     {
