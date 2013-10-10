@@ -6,19 +6,9 @@
 namespace yocto
 {
     
-	template <typename T>
-	inline void cswap( T &a, T &b ) throw()
-	{
-		const T tmp(a); a = b; b = tmp;
-	}
-	
-	template <typename T>
-	inline void cswap_const( const T &a, const T &b ) throw()
-	{
-		cswap<T>( (T&)a, (T&)b );
-	}
 	
 	
+#if 0
 	template <typename T>
 	inline void mswap( T &a, T &b ) throw()
 	{
@@ -36,30 +26,12 @@ namespace yocto
 		for( size_t i=sizeof(T);i>0;--i,++p,++q)
 			*p = *q;
 	}
+    
 	
-	inline void memswap( void *target, void *source, size_t length ) throw()
-	{
-		assert( !(NULL==target && length > 0 ) );
-		assert( !(NULL==source && length > 0 ) );
-		uint8_t *p = (uint8_t *)target;
-		uint8_t *q = (uint8_t *)source;
-		for( size_t i=length;i>0;--i,++p,++q) cswap( *p, *q );
-	}
+#endif
+    
 	
-	template <typename T>
-	inline void mreverse( T *base, size_t size ) throw()
-	{
-		if( size > 1 )
-		{
-			const size_t n = size/2;
-			const size_t m = size-1;
-			for( size_t i=0; i < n; ++i )
-			{
-				mswap( base[i], base[m-i]);
-			}
-		}
-		
-	}
+    
 }
 
 
