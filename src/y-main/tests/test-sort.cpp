@@ -160,3 +160,90 @@ YOCTO_UNIT_TEST_IMPL(qsort)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/sys/wtime.hpp"
+
+#if defined(NDEBUG)
+#define ITER_MAX 2048
+#else
+#define ITER_MAX 1024
+#endif
+
+enum SortWith
+{
+    HeapSort,
+    QuickSort,
+    LibcSort
+};
+
+template <typename T>
+inline int c_compare( const void *lhs, const void *rhs ) throw()
+{
+    return __compare( *(const T*)lhs, *(const T*)rhs);
+}
+
+template <typename T>
+inline double test_perf( size_t n, SortWith proc )
+{
+    wtime chrono;
+    chrono.start();
+    
+    vector<T> arr(n,as_capacity);
+    for(size_t i=0;i<n;++i) { const T tmp( gen<T>::get() ); arr.push_back(tmp); }
+    double average = 0;
+    for(size_t i=0;i<ITER_MAX;++i)
+    {
+        c_shuffle( &arr[1], n);
+        const double stamp = chrono.query();
+        switch(proc)
+        {
+            case HeapSort:
+                hsort(arr);
+                break;
+                
+            case QuickSort:
+                qsort(arr);
+                break;
+                
+            case LibcSort:
+                qsort(&arr[1],n,sizeof(T),c_compare<T>);
+                break;
+        }
+        average += chrono.query() - stamp;
+        check_sorted(arr,"sorting perf");
+    }
+    return average/ITER_MAX;
+}
+
+#include "yocto/ios/ocstream.hpp"
+
+template <typename T>
+inline void compare_perf(size_t nmax, const char *filename )
+{
+    std::cerr << std::endl << filename << std::endl;
+    ios::ocstream::overwrite(filename);
+    for(size_t n=4;n<=nmax;n += 4)
+    {
+        (std::cerr << ".").flush();
+        const double htmx = test_perf<T>(n,HeapSort);
+        const double qtmx = test_perf<T>(n,QuickSort);
+        const double ctmx = test_perf<T>(n,LibcSort);
+        ios::ocstream fp(filename,true);
+        fp("%g %g %g %g\n", double(n), htmx, qtmx, ctmx);
+    }
+    std::cerr << std::endl;
+    
+}
+
+
+YOCTO_UNIT_TEST_IMPL(sort_perf)
+{
+    const size_t nmax = 256;
+    compare_perf<int>(nmax,"perf_int.dat");
+    compare_perf<float>(nmax,"perf_flt.dat");
+    compare_perf<double>(nmax,"perf_dbl.dat");
+    compare_perf<string>(nmax,"perf_str.dat");
+
+}
+YOCTO_UNIT_TEST_DONE()
+
+

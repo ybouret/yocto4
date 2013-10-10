@@ -9,19 +9,18 @@
 
 namespace yocto
 {
-#define Y_QSORT_MAX_LEVELS 64
+#define YOCTO_QSORT_MAX_LEVELS 64
     template <typename T,typename FUNC>
     inline void qsort( array<T> &arr, FUNC &compare) throw()
     {
         //----------------------------------------------------------------------
 		// local memory
         //----------------------------------------------------------------------
-		uint64_t     wksp[ YOCTO_U64_FOR_ITEM(T) ];
-		T           &piv  = *_cast::trans<T,uint64_t>(wksp);
-
-        size_t  beg[Y_QSORT_MAX_LEVELS];
-        size_t  end[Y_QSORT_MAX_LEVELS];
-        
+        size_t       beg[YOCTO_QSORT_MAX_LEVELS];
+        size_t       end[YOCTO_QSORT_MAX_LEVELS];
+		uint64_t     tmp[YOCTO_U64_FOR_ITEM(T) ];
+		T           &piv  = *_cast::trans<T,uint64_t>(tmp);
+                
         //----------------------------------------------------------------------
 		// initialize stacks
         //----------------------------------------------------------------------
@@ -32,7 +31,7 @@ namespace yocto
         //----------------------------------------------------------------------
 		// quick sort
         //----------------------------------------------------------------------
-        while (i>=0)
+        while(i>=0)
         {
             size_t L=beg[i];
             size_t R=end[i]-1;
@@ -54,7 +53,7 @@ namespace yocto
                 const int im = i;
                 i=ip;
                 
-                if (end[i]-beg[i]>end[im]-beg[im])
+                if(end[i]-beg[i]>end[im]-beg[im])
                 {
                     cswap(beg[i],beg[im]);
                     cswap(end[i],end[im]);
@@ -66,6 +65,11 @@ namespace yocto
             }
         }
     }
+    
+    //! default sorting
+	template <typename T>
+	inline void qsort( array<T> &ra ) throw() { qsort( ra, __compare<T> ); }
+
 }
 
 #endif
