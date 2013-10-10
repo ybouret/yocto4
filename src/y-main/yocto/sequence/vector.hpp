@@ -17,7 +17,7 @@ namespace yocto
 	namespace hidden { extern const char vector_name[]; }
 	
 	template <typename T, typename ALLOCATOR = memory::global::allocator >
-	class vector  : public sequence<T>, public array<T>
+	class vector  : public virtual sequence<T>, public virtual array<T>
 	{
 	public:
 		YOCTO_ARGUMENTS_DECL_T;

@@ -16,7 +16,14 @@ namespace yocto
 			uint8_t  encode( uint8_t ) throw();
 			uint8_t  decode( uint8_t ) throw();
 			void     reset(void)   throw();
-			
+            
+            //! possible output=input
+			void     encode(void *output,const void *input, size_t length) throw();
+            
+            //! possible output=input
+            void     decode(void *output,const void *input, size_t length) throw();
+
+            
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(move_to_front);
 			struct node_t

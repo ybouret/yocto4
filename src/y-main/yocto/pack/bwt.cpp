@@ -1,6 +1,7 @@
 #include "yocto/pack/bwt.hpp"
 #include "yocto/sequence/c-array.hpp"
 #include "yocto/sort/heap.hpp"
+#include "yocto/sort/quick.hpp"
 
 #include <cstring>
 
@@ -9,9 +10,9 @@ namespace yocto
 	
 	namespace pack
 	{
-		namespace 
+		namespace
 		{
-			struct rotlexdat 
+			struct rotlexdat
 			{
 				const uint8_t *buf;
 				size_t         len;
@@ -36,7 +37,7 @@ namespace yocto
 			};
 		}
 		
-		size_t bwt::encode( void *output, const void *input, const size_t size, size_t *indices, move_to_front *mtf ) throw()
+		size_t bwt::encode( void *output, const void *input, const size_t size, size_t *indices) throw()
 		{
 			const uint8_t    *buf_in  = (const uint8_t *)input;
 			uint8_t          *buf_out = (uint8_t *)output;
@@ -46,7 +47,7 @@ namespace yocto
 			
 			c_array<size_t>  arr( indices, size );
 			rotlexdat        cmp = { buf_in, size };
-			hsort( arr, cmp );
+			qSort( arr, cmp );
 			
 			size_t pidx=0;
 			for( size_t i=0; i < size; ++i )
@@ -56,23 +57,17 @@ namespace yocto
 				if( 0 == idx )
 					pidx=i;
 			}
-            if( mtf )
-            {
-                for( size_t i=0; i < size; ++i )
-                {
-                    buf_out[i] = mtf->encode( buf_out[i] );
-                }
-            }
-			return pidx;
+            return pidx;
 		}
 		
-		void   bwt:: decode( void *output, const void *input, const size_t size, size_t *indices, size_t primary_index, move_to_front *mtf ) throw()
+		void   bwt:: decode( void *output, const void *input, const size_t size, size_t *indices, size_t primary_index) throw()
 		{
 			size_t buckets[256];
 			const uint8_t *buf_in  = (const uint8_t *)input;
 			uint8_t       *buf_out = (uint8_t *)output;
 			memset( buckets, 0, sizeof(buckets) );
 			
+            
 			for( size_t i=0; i < size; ++i )
 			{
 				const size_t bi = buf_in[i];
@@ -89,7 +84,7 @@ namespace yocto
 				sum += __t;
 			}
 			
-			size_t j = primary_index;
+			size_t      j = primary_index;
 			uint8_t    *c = buf_out + size;
 			for( size_t i=size;i>0;--i) {
 				const uint8_t bj = buf_in[j];
@@ -97,14 +92,7 @@ namespace yocto
 				j = buckets[bj] + indices[j];
 			}
             
-            if( mtf )
-            {
-                for( size_t i=0; i < size; ++i )
-                {
-                    buf_out[i] = mtf->decode( buf_out[i] );
-                }
-            }
-			
+            
 		}
 		
 	}
