@@ -94,7 +94,7 @@ namespace yocto
 }
 
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto {
     

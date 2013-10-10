@@ -5,7 +5,7 @@
 #	include "yocto/code/unroll.hpp"
 #endif
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/code/cast.hpp"
 
 

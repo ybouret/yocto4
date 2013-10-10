@@ -1,7 +1,7 @@
 #ifndef YOCTO_SORT_NETWORK_INCLUDED
 #define YOCTO_SORT_NETWORK_INCLUDED 1
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {

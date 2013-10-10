@@ -2,7 +2,7 @@
 #ifndef YOCTO_SORT_GNOME_INCLUDED
 #define YOCTO_SORT_GNOME_INCLUDED 1
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -23,7 +23,7 @@ namespace yocto
 			
 			if(rhs<lhs)
 			{
-				mswap(lhs,rhs);
+				bswap(lhs,rhs);
 				if( 0 == --i ) 
 					++i;
 			}

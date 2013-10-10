@@ -2,7 +2,7 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exceptions.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/exceptions.hpp"
 
 #include "yocto/memory/chunk.hpp"
@@ -192,7 +192,7 @@ namespace yocto
 				while( --prev >= chunk_ && prev->data >= pAcquiring_->data )
 				{
 					assert( prev->data > pAcquiring_->data );
-					mswap<chunk>( *prev, *pAcquiring_ );
+					bswap<chunk>( *prev, *pAcquiring_ );
 					pAcquiring_ = prev;
 				}
 				

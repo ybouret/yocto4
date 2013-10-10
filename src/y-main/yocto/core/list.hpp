@@ -1,7 +1,7 @@
 #ifndef YOCTO_CORE_LIST_INCLUDED
 #define YOCTO_CORE_LIST_INCLUDED 1
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {

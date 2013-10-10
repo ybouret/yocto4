@@ -3,7 +3,7 @@
 
 
 #include "yocto/code/ilog2.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -66,7 +66,7 @@ namespace yocto
             
             inline void swap_with( slab_of &other ) throw()
             {
-                mswap( slab_, other.slab_ );
+                bswap( slab_, other.slab_ );
             }
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(slab_of);

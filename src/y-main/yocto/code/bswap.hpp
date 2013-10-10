@@ -137,11 +137,7 @@ const TYPE tmp = *(TYPE *)lhs; \
             { Y_BSWAP64(6); }
             { Y_BSWAP64(7); }
         }
-
-        
-        
-        
-        
+ 
     }
     
     template <typename T>
@@ -177,7 +173,6 @@ const TYPE tmp = *(TYPE *)lhs; \
 		}
 	}
     
-#if 0
     inline void memswap( void *target, void *source, size_t length ) throw()
 	{
 		assert( !(NULL==target && length > 0 ) );
@@ -186,7 +181,6 @@ const TYPE tmp = *(TYPE *)lhs; \
 		uint8_t *q = (uint8_t *)source;
 		for( size_t i=length;i>0;--i,++p,++q) cswap( *p, *q );
 	}
-#endif
     
 }
 

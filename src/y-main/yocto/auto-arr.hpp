@@ -3,7 +3,7 @@
 
 #include "yocto/memory/allocator.hpp"
 #include "yocto/type/args.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include <cstring>
 

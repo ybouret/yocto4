@@ -1,7 +1,7 @@
 
 #include "yocto/math/m3d.hpp"
 #include "yocto/math/ztype.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include <iostream>
 #include <cstring>

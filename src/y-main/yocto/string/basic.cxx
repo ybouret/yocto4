@@ -1,6 +1,6 @@
 #include "yocto/string/basic.hpp"
 #include "yocto/memory/pooled.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include <cstring>
 #include <iostream>

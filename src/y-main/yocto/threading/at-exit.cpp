@@ -2,7 +2,7 @@
 #include "yocto/threading/mutex.hpp"
 #include "yocto/error.hpp"
 #include <cerrno>
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include <cstdlib>
 
 namespace yocto
@@ -70,7 +70,7 @@ namespace yocto
 			cb_t *prev = curr;
 			while( --prev >= cb_reg && prev->life_time > curr->life_time )
 			{
-				mswap<cb_t>( *prev, *curr );
+				bswap<cb_t>( *prev, *curr );
 				--curr;
 			}
 			

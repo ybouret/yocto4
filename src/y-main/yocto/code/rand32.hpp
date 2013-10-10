@@ -1,7 +1,7 @@
 #ifndef YOCTO_RAND32_INCLUDED
 #define YOCTO_RAND32_INCLUDED 1
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto 
 {
@@ -111,10 +111,7 @@ namespace yocto
                 for( size_t i=n-1;i>0;--i)
                 {
                     const size_t j   = leq(i);
-					mswap( a[i], a[j] );
-                    //const T tmp(a[i]);
-                    //a[i] = a[j];
-                    //a[j] = tmp;
+					bswap( a[i], a[j] );
                 }
             }
         }

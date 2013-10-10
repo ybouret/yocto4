@@ -2,7 +2,7 @@
 #include "yocto/rx/pattern/joker.hpp"
 #include "yocto/rx/source.hpp"
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/ios/ostream.hpp"
 
 #include <cstdio>

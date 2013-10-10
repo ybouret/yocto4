@@ -4,7 +4,7 @@
 #include "yocto/memory/chunk.hpp"
 
 #include "yocto/code/utils.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/exceptions.hpp"
 
 #include <cerrno>
@@ -140,7 +140,7 @@ namespace yocto
 				while( --prev >= arena_ && prev->block_size >= cache_->block_size )
 				{
 					assert( prev->block_size > cache_->block_size );
-					mswap<arena>( *prev, *cache_ );
+					bswap<arena>( *prev, *cache_ );
 					--cache_;
 				}
 				

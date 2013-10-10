@@ -31,7 +31,7 @@ namespace yocto
 							tmp.push_back( p );
 					}
 				}
-				mswap(tmp,operands);
+				bswap(tmp,operands);
 			}
 			
 			

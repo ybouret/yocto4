@@ -1,7 +1,7 @@
 #include "yocto/hashing/digest.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/code/unroll.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include <cstring>
 

@@ -1,6 +1,6 @@
 #include "yocto/memory/arena.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include "yocto/memory/chunk.hpp"
 

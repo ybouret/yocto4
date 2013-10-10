@@ -48,7 +48,7 @@ namespace yocto
 		{
 			dictionary D( other.size() , as_capacity );
 			other._copy_into(D);
-			mswap( xarr_, D.xarr_ );
+			bswap( xarr_, D.xarr_ );
 		}
 		
 		inline dictionary & operator=( const dictionary & other ) 
@@ -57,7 +57,7 @@ namespace yocto
 			{
 				dictionary D( other.size() , as_capacity );
 				_copy_into(D);
-				mswap( xarr_, D.xarr_ );
+				bswap( xarr_, D.xarr_ );
 			}
 			return *this;
 		}
@@ -76,7 +76,7 @@ namespace yocto
 			{
 				dictionary D( this->capacity() + n , as_capacity );
 				_copy_into(D);
-				mswap( xarr_, D.xarr_ );
+				bswap( xarr_, D.xarr_ );
 			}
 		}
 		
@@ -117,7 +117,7 @@ namespace yocto
 					dictionary D( container::next_capacity( this->capacity() ), as_capacity );
 					_copy_into(D); assert( D.xarr_.slots.available() > 0 );
 					D._insert(key,data,indx);
-					mswap( xarr_, D.xarr_ );
+					bswap( xarr_, D.xarr_ );
 				}
 				return true;
 			}
