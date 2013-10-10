@@ -8,6 +8,9 @@
 using namespace yocto;
 using namespace math;
 
+#include <cstdlib>
+#include <cstring>
+
 #define ITER_MAX (1024*1024)
 #define Y_BSWAP_TMX(N)  do {                         \
 memset(arr,rand(),sizeof(arr));                      \

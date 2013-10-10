@@ -146,7 +146,7 @@ static inline void test_qsort()
 		ra.push_back( tmp );
 	}
 	std::cerr << "raw=" << ra << std::endl;
-	qsort( ra, __compare<T> );
+	qSort( ra, __compare<T> );
 	std::cerr << "srt=" << ra << std::endl;
     check_sorted(ra, "sorting");
 }
@@ -168,6 +168,8 @@ YOCTO_UNIT_TEST_DONE()
 #define ITER_MAX 1024
 #endif
 
+#include <cstdlib>
+
 enum SortWith
 {
     HeapSort,
@@ -176,7 +178,7 @@ enum SortWith
 };
 
 template <typename T>
-inline int c_compare( const void *lhs, const void *rhs ) throw()
+inline int compare_args( const void *lhs, const void *rhs ) throw()
 {
     return __compare( *(const T*)lhs, *(const T*)rhs);
 }
@@ -201,11 +203,11 @@ inline double test_perf( size_t n, SortWith proc )
                 break;
                 
             case QuickSort:
-                qsort(arr);
+                qSort(arr);
                 break;
                 
             case LibcSort:
-                qsort(&arr[1],n,sizeof(T),c_compare<T>);
+                qsort(&arr[1],n,sizeof(T),compare_args<T>);
                 break;
         }
         average += chrono.query() - stamp;
