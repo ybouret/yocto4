@@ -132,3 +132,31 @@ YOCTO_UNIT_TEST_IMPL(sort)
     test_netsort<float>();
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/sort/quick.hpp"
+template <typename T>
+static inline void test_qsort()
+{
+	std::cerr << "-- sorting" << std::endl;
+	const size_t n = 1 + alea_leq( 20 );
+	vector<T>    ra(n,as_capacity);
+	for( size_t i=0; i < n; ++i )
+	{
+		T tmp( gen<T>::get() );
+		ra.push_back( tmp );
+	}
+	std::cerr << "raw=" << ra << std::endl;
+	qsort( ra, __compare<T> );
+	std::cerr << "srt=" << ra << std::endl;
+    check_sorted(ra, "sorting");
+}
+
+YOCTO_UNIT_TEST_IMPL(qsort)
+{
+    test_qsort<int>();
+    test_qsort<float>();
+    test_qsort<double>();
+    test_qsort<string>();
+}
+YOCTO_UNIT_TEST_DONE()
+

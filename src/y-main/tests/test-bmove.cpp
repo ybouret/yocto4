@@ -12,7 +12,7 @@ using namespace math;
 
 #define ITER_MAX (1024*1024)
 #define Y_BMOVE_TMX(N)  do {                         \
-memset(arr,0,sizeof(arr));                           \
+memset(arr,rand(),sizeof(arr));                      \
 core::bmove<N>(arr,brr);                             \
 if( H.key<uint64_t>(arr,N)!=H.key<uint64_t>(brr,N) ) \
 throw exception("invalid bmove<%u>",N);              \
