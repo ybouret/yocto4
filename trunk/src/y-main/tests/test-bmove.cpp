@@ -6,6 +6,8 @@
 #include "yocto/hashing/sha1.hpp"
 
 #include <cstring>
+#include <cstdlib>
+
 
 using namespace yocto;
 using namespace math;
