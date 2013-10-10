@@ -73,10 +73,14 @@ void Krypton:: Cipher(const string &filename )
 static bool MayOverwrite( const string &filename )
 {
     const vfs::entry ep(filename,local_fs::instance());
-    if(ep.is_unk)
+    if(ep.is_unk==ep.attr)
         return true;
     
-    return true;
+    fl_message_title("Confirmation Requested");
+    if( 0 == fl_choice("Overwrite '%s'", "Overwrite", "Cancel", 0, ep.base_name) )
+        return true;
+    
+    return false;
 }
 
 void Krypton::Encode(const string &filename, const string &usr)
@@ -86,6 +90,7 @@ void Krypton::Encode(const string &filename, const string &usr)
     // check output
     //--------------------------------------------------------------------------
     const string outname = filename + "." + KRYPTON_EXTENSION;
+    std::cerr << "Encode to " << outname << std::endl;
     if( !MayOverwrite(outname) )
         return;
     
@@ -139,7 +144,7 @@ void Krypton::Encode(const string &filename, const string &usr)
     //--------------------------------------------------------------------------
     // save
     //--------------------------------------------------------------------------
-    ios::ocstream fp("toto.ykr",false);
+    ios::ocstream fp(outname,false);
     
     //--------------------------------------------------------------------------
     // signature
