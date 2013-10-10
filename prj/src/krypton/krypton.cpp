@@ -70,8 +70,25 @@ void Krypton:: Cipher(const string &filename )
     
 }
 
+static bool MayOverwrite( const string &filename )
+{
+    const vfs::entry ep(filename,local_fs::instance());
+    if(ep.is_unk)
+        return true;
+    
+    return true;
+}
+
 void Krypton::Encode(const string &filename, const string &usr)
 {
+    
+    //--------------------------------------------------------------------------
+    // check output
+    //--------------------------------------------------------------------------
+    const string outname = filename + "." + KRYPTON_EXTENSION;
+    if( !MayOverwrite(outname) )
+        return;
+    
     //--------------------------------------------------------------------------
     // prepare crypto stuff
     //--------------------------------------------------------------------------
@@ -154,7 +171,7 @@ void Krypton::Decode(const string &filename, const string &usr )
     const digest Key = digest::checksum(hash, usr);
     std::cerr << "Key=" << Key << std::endl;
     HMAC  auth(Key);
-   
+    
     ios::icstream fp(filename);
     
     //--------------------------------------------------------------------------
@@ -257,7 +274,7 @@ int main(int argc, char *argv[])
                 fl_message_title("Unhandled Cipher Error");
                 fl_alert("Something Went Wrong !");
             }
-        
+            
         }
         fl_message_title("Confirmation Requested");
         if( 0 != fl_choice("Really Quit", "Quit", "Continue", 0) )
