@@ -10,7 +10,7 @@ using namespace math;
 
 #define ITER_MAX (1024*1024)
 #define Y_BSWAP_TMX(N)  do {                         \
-memset(arr,0,sizeof(arr));                           \
+memset(arr,rand(),sizeof(arr));                      \
 const uint64_t akey = H.key<uint64_t>(arr,N) ;       \
 const uint64_t bkey = H.key<uint64_t>(brr,N) ;       \
 core::bswap<N>(arr,brr);                             \
