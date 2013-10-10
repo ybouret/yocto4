@@ -4,7 +4,7 @@
 #include "yocto/container/sequence.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/container/iter-linked.hpp"
 
 namespace yocto

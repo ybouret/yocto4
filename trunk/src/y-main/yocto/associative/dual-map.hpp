@@ -263,7 +263,7 @@ namespace yocto
         {
             cswap(itmax, other.itmax);
             cswap(slots, other.slots);
-            mswap(klist, other.klist);
+            bswap(klist, other.klist);
             kpool.swap_with(other.kpool);
             cswap(keyTable,other.keyTable);
             cswap(subTable,other.subTable);

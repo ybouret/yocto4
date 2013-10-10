@@ -1,8 +1,8 @@
 #include "yocto/json/json.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/exceptions.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace JSON
     {
@@ -26,9 +26,9 @@ namespace yocto
             switch( type )
             {
                     
-                    YJSON_KILL(String);     
-                    YJSON_KILL(Array);  
-                    YJSON_KILL(Object); 
+                    YJSON_KILL(String);
+                    YJSON_KILL(Array);
+                    YJSON_KILL(Object);
                     
                 default:
                     break;
@@ -42,6 +42,7 @@ namespace yocto
         {
             cswap<ValueType>( (ValueType&)type, (ValueType&)other.type );
             memswap(&data,&other.data,sizeof(data));
+            //core::bswap<sizeof(data)>(data,other.data);
         }
         
         void Value:: nullify() throw()
@@ -52,14 +53,14 @@ namespace yocto
         
         Value:: Value( const String &s ) :
         type( IsString ),
-	data()
+        data()
         {
             data._String = new String(s);
         }
         
         Value:: Value( const char *s ) :
         type( IsString ),
-	data()
+        data()
         {
             data._String = new String(s);
         }
@@ -72,7 +73,7 @@ namespace yocto
         }
         
         
-        Value:: Value( const ValueType of ) : 
+        Value:: Value( const ValueType of ) :
         type(of),
         data()
         {
@@ -90,7 +91,7 @@ namespace yocto
         
         Value:: Value( const Value &other ) :
         type( other.type ),
-	data()
+        data()
         {
             switch( type )
             {
@@ -297,7 +298,7 @@ return * data._##TYPE; }
         
         ////////////////////////////////////////////////////////////////////////
         //
-        // Pair 
+        // Pair
         //
         ////////////////////////////////////////////////////////////////////////
         Pair:: Pair( const string &id ) : name(id), value() {}
@@ -310,7 +311,7 @@ return * data._##TYPE; }
         
         ////////////////////////////////////////////////////////////////////////
         //
-        // Object 
+        // Object
         //
         ////////////////////////////////////////////////////////////////////////
         Object::  Object() throw() : pairs() {}
@@ -387,7 +388,7 @@ return * data._##TYPE; }
         {
             Value tmp( of ); swap_with(tmp);
         }
-
+        
         
     }
     

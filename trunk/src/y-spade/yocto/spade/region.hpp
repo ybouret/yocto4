@@ -2,7 +2,7 @@
 #define YOCTO_SPADE_REGION_INCLUDED 1
 
 #include "yocto/spade/types.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {

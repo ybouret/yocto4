@@ -37,7 +37,7 @@ namespace yocto
 		{
 			catalog C( other.size() , as_capacity );
 			other._copy_into(C);
-			mswap( xarr_, C.xarr_ );
+			bswap( xarr_, C.xarr_ );
 		}
 		
 		inline catalog & operator=( const catalog & other ) 
@@ -46,7 +46,7 @@ namespace yocto
 			{
 				catalog C( other.size() , as_capacity );
 				_copy_into(C);
-				mswap( xarr_, C.xarr_ );
+				bswap( xarr_, C.xarr_ );
 			}
 			return *this;
 		}
@@ -66,7 +66,7 @@ namespace yocto
 			{
 				catalog C( this->capacity() + n , as_capacity );
 				_copy_into(C);
-				mswap( xarr_, C.xarr_ );
+				bswap( xarr_, C.xarr_ );
 			}
 		}
 		
@@ -104,7 +104,7 @@ namespace yocto
 					catalog C( container::next_capacity( this->capacity() ), as_capacity );
 					_copy_into(C); assert( C.xarr_.slots.available() > 0 );
 					C._insert(args,indx);
-					mswap( xarr_, C.xarr_ );
+					bswap( xarr_, C.xarr_ );
 				}
 				return true;
 			}

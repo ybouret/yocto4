@@ -1,7 +1,7 @@
 #ifndef YOCTO_CIRCULAR_LIST_INCUDED
 #define YOCTO_CIRCULAR_LIST_INCUDED 1
 
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {

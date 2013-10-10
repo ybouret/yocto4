@@ -5,7 +5,7 @@
 #include "yocto/comparator.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/core/locate.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/code/cast.hpp"
 #include "yocto/bitwise.hpp"
 

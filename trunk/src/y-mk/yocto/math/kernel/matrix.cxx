@@ -6,7 +6,7 @@
 #include <cstring>
 #include "yocto/core/offset.hpp"
 #include "yocto/code/unroll.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {

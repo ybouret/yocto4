@@ -2,7 +2,6 @@
 #define YOCTO_SORT_INDEX_INCLUDED 1
 
 #include "yocto/sequence/array.hpp"
-#include "yocto/code/swap.hpp"
 #include "yocto/comparator.hpp"
 #include "yocto/sequence/c-array.hpp"
 

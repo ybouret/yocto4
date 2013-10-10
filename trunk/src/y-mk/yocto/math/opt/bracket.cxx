@@ -1,6 +1,6 @@
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/ztype.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto {

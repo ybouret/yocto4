@@ -1,5 +1,5 @@
 #include "yocto/spade/layout.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include "yocto/exceptions.hpp"
 #include <cerrno>

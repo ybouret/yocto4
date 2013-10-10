@@ -3,7 +3,7 @@
 
 #include "yocto/memory/slab.hpp"
 #include "yocto/memory/embed.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -36,7 +36,7 @@ namespace yocto
 					buflen_ = memory::embed::prepare( reg, num );
 					buffer_ = alloc.acquire( buflen_ ); 
 					memory::embed::dispatch( reg, num, buffer_ );
-					slab_t tmp_slots( entry, n ); mswap( tmp_slots, slots );
+					slab_t tmp_slots( entry, n ); yocto::bswap( tmp_slots, slots );
 				}
 			}
 			
@@ -45,7 +45,7 @@ namespace yocto
 				assert( slots.involved() == 0 );
 				alloc.release(buffer_,buflen_);
 				table = NULL;
-				slab_t tmp_slots( NULL, 0 ); mswap( tmp_slots, slots );
+				slab_t tmp_slots( NULL, 0 ); yocto::bswap( tmp_slots, slots );
 			}
 			
 			inline size_t bytes() const throw() { return buflen_; }

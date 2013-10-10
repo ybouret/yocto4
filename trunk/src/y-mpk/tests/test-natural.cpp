@@ -4,7 +4,7 @@
 #include "yocto/sys/wtime.hpp"
 #include "yocto/random/isaac.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 
 using namespace yocto;
 

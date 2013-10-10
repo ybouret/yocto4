@@ -5,7 +5,7 @@
 #include "yocto/container/sequence.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/bitwise.hpp"
-#include "yocto/code/swap.hpp"
+#include "yocto/code/bswap.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/code/cast.hpp"
 #include "yocto/sequence/array.hpp"
@@ -196,8 +196,8 @@ namespace yocto
 			assert(n>0);
 			vector tmp( n+maxi_, as_capacity );
 			memcpy( (void*)& tmp.item_[1], (void*) &item_[1], size_ * sizeof(T) );
-			mswap( maxi_, tmp.maxi_ );
-			mswap( item_, tmp.item_ );
+			bswap( maxi_, tmp.maxi_ );
+			bswap( item_, tmp.item_ );
 		}
 		
 		void _reserve( size_t n, int2type<false> ) {
