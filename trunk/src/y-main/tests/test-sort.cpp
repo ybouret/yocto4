@@ -59,7 +59,6 @@ static inline void test_cosort()
 	std::cerr << "srta=" << ra << std::endl;
 	std::cerr << "srtb=" << rb << std::endl;
     check_sorted(ra, "co-sorting");
-
 }
 
 #include "yocto/sort/network.hpp"
@@ -151,12 +150,41 @@ static inline void test_qsort()
     check_sorted(ra, "sorting");
 }
 
+template <typename T,typename U>
+static inline void test_coqsort()
+{
+	std::cerr << "-- co-quicksorting" << std::endl;
+	const size_t n = 1 + alea_leq( 20 );
+	vector<T>    ra(n,as_capacity);
+	vector<U>    rb(n,as_capacity);
+	for( size_t i=0; i < n; ++i )
+	{
+		{
+			T tmp( gen<T>::get() );
+			ra.push_back( tmp );
+		}
+		{
+			U tmp( gen<U>::get() );
+			rb.push_back( tmp );
+		}
+	}
+	std::cerr << "rawa=" << ra << std::endl;
+	std::cerr << "rawb=" << rb << std::endl;
+	co_qsort( ra, rb, __compare<T> );
+	std::cerr << "srta=" << ra << std::endl;
+	std::cerr << "srtb=" << rb << std::endl;
+    check_sorted(ra, "co-sorting");
+}
+
+
 YOCTO_UNIT_TEST_IMPL(qsort)
 {
     test_qsort<int>();
     test_qsort<float>();
     test_qsort<double>();
     test_qsort<string>();
+    test_coqsort<string,int>();
+    test_coqsort<int,string>();
 }
 YOCTO_UNIT_TEST_DONE()
 
