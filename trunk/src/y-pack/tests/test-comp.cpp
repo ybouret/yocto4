@@ -56,7 +56,6 @@ YOCTO_UNIT_TEST_IMPL(comp)
     ios::ocstream output( ios::cstdout );
     
     
-    pack::move_to_front *pMtf = &mtf;
     char C = 0;
     size_t nIn = 0;
     size_t nOut = 0;
@@ -66,7 +65,8 @@ YOCTO_UNIT_TEST_IMPL(comp)
         block[ count++ ] = C;
         if( count >= block_size )
         {
-            const size_t pidx = pack::bwt::encode(coded, block, count, indices, pMtf);
+            const size_t pidx = pack::bwt::encode(coded, block, count, indices);
+            mtf.encode(coded,coded,count);
             nOut += emit( output, bio, huff, count, pidx, coded );
             count = 0;
         }
@@ -74,7 +74,8 @@ YOCTO_UNIT_TEST_IMPL(comp)
     
     if( count > 0 )
     {
-        const size_t pidx = pack::bwt::encode(coded, block, count, indices, pMtf);
+        const size_t pidx = pack::bwt::encode(coded, block, count, indices);
+        mtf.encode(coded,coded,count);
         nOut += emit( output, bio, huff, count, pidx, coded );
     }
     

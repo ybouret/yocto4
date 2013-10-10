@@ -3,7 +3,7 @@
 
 #include "yocto/container/sequence.hpp"
 #include "yocto/container/iter-linear.hpp"
-
+#include "yocto/memory/buffer.hpp"
 #include <iostream>
 
 namespace yocto
@@ -15,7 +15,7 @@ namespace yocto
 	}
 	
 	template <typename T>
-	class array : public virtual container
+	class array : public virtual container, public virtual memory::rw_buffer
 	{
 	public:
 		YOCTO_ARGUMENTS_DECL_T;
@@ -57,6 +57,8 @@ namespace yocto
 			return os;
 		}
         
+        virtual size_t length() const throw() { return this->size() * sizeof(T); }
+        
 	protected:
 		inline array() throw() {}
 		
@@ -64,6 +66,7 @@ namespace yocto
 		virtual const_type *get_item() const throw() = 0; //!< for a 1..size access
 		inline  type       *item(size_t index) throw()        { return (type *)get_item() + index; }
 		inline  const_type *item(size_t index) const throw()  { return get_item()+index; }
+        virtual const void *get_address() const throw() { return item(1); }
 	};
 	
 }

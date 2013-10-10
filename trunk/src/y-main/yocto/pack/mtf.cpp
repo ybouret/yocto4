@@ -70,6 +70,30 @@ namespace yocto {
 			return node->data;
 		}
 
+        void move_to_front:: encode(void *output,const void *input, size_t length) throw()
+        {
+            assert(!(0==output&&length>0));
+            assert(!(0==input &&length>0));
+            uint8_t       *tgt = (uint8_t *)output;
+            const uint8_t *src = (const uint8_t *)input;
+            for(size_t i=0;i<length;++i)
+            {
+                *(tgt++) = encode( *(src++) );
+            }
+        }
+        
+        void move_to_front:: decode(void *output,const void *input, size_t length) throw()
+        {
+            assert(!(0==output&&length>0));
+            assert(!(0==input &&length>0));
+            uint8_t       *tgt = (uint8_t *)output;
+            const uint8_t *src = (const uint8_t *)input;
+            for(size_t i=0;i<length;++i)
+            {
+                *(tgt++) = decode( *(src++) );
+            }
+        }
+
 
 
 	}
