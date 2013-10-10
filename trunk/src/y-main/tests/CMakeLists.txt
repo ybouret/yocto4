@@ -78,5 +78,6 @@ ADD_TEST(MultiMap    test-main multi_map)
 ADD_TEST(MLock       test-main mlock)
 ADD_TEST(Pages       test-main pages)
 ADD_TEST(BMove       test-main bmove)
+ADD_TEST(QSort       test-main qsort)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
