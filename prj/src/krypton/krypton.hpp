@@ -14,7 +14,7 @@ struct Krypton
     typedef hashing::hmac<Hash> HMAC;
     static void Cipher( const string &filename );
     static bool ChooseFile( string &filename );
-    static void Encode( const string &filename, const string &usr );
+    static void Encode( const string &filename, const string &outname, const string &usr );
     static void Decode( const string &filename, const string &usr );
     static bool Passwd( string &usr, const char *mode );
 };

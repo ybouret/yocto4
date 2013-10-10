@@ -42,6 +42,26 @@ bool Krypton:: Passwd(string &usr, const char *mode)
     }
 }
 
+static bool MayOverwrite( const string &filename )
+{
+    const vfs::entry ep(filename,local_fs::instance());
+    if(ep.is_directory())
+        throw exception("'%s' is a directory", ep.base_name);
+    
+    if( ep.is_regular() )
+    {
+        fl_message_title("Confirmation Requested");
+        if( 0 == fl_choice("Overwrite '%s'", "Overwrite", "Cancel", 0, ep.base_name) )
+            return true;
+        else
+            return false;
+    }
+    
+    // default
+    return true;
+}
+
+
 #define KRYPTON_EXTENSION "ykr"
 
 void Krypton:: Cipher(const string &filename )
@@ -63,36 +83,31 @@ void Krypton:: Cipher(const string &filename )
     else
     {
         std::cerr << "Encoding" << std::endl;
-        if(!Krypton::Passwd(usr, "enter key to encode file:") )
+        const string outname = filename + "." + KRYPTON_EXTENSION;
+        if(!MayOverwrite(outname))
+        {
+            fl_message_title("Encoding Canceled");
+            fl_message("No Allowed Overwrite");
             return;
-        Krypton::Encode(filename,usr);
+        }
+        
+        if(!Krypton::Passwd(usr, "enter key to encode file:") )
+        {
+            fl_message_title("Encoding Canceled");
+            fl_message("No Provided Password");
+            return;
+        }
+        
+        Krypton::Encode(filename,outname,usr);
+        fl_message_title("Done");
+        fl_message("Successful Encoding!");
     }
     
 }
 
-static bool MayOverwrite( const string &filename )
-{
-    const vfs::entry ep(filename,local_fs::instance());
-    if(ep.is_unk==ep.attr)
-        return true;
-    
-    fl_message_title("Confirmation Requested");
-    if( 0 == fl_choice("Overwrite '%s'", "Overwrite", "Cancel", 0, ep.base_name) )
-        return true;
-    
-    return false;
-}
 
-void Krypton::Encode(const string &filename, const string &usr)
+void Krypton::Encode(const string &filename, const string &outname, const string &usr)
 {
-    
-    //--------------------------------------------------------------------------
-    // check output
-    //--------------------------------------------------------------------------
-    const string outname = filename + "." + KRYPTON_EXTENSION;
-    std::cerr << "Encode to " << outname << std::endl;
-    if( !MayOverwrite(outname) )
-        return;
     
     //--------------------------------------------------------------------------
     // prepare crypto stuff
