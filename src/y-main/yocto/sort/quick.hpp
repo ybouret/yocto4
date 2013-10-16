@@ -11,7 +11,7 @@ namespace yocto
 {
 #define YOCTO_QSORT_MAX_LEVELS 64
     template <typename T,typename FUNC>
-    inline void qSort( array<T> &arr, FUNC &compare) throw()
+    inline void quicksort(array<T> &arr, FUNC &compare) throw()
     {
         //----------------------------------------------------------------------
 		// local memory
@@ -74,9 +74,9 @@ namespace yocto
     
     //! default sorting
 	template <typename T>
-	inline void qSort( array<T> &ra ) throw()
+	inline void quicksort( array<T> &ra ) throw()
 	{
-		qSort(ra,__compare<T>);
+		quicksort(ra,__compare<T>);
 	}
     
     //! co quicksorting

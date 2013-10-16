@@ -76,9 +76,29 @@ void Krypton:: Cipher(const string &filename )
     if( ep.has_extension(KRYPTON_EXTENSION) )
     {
         std::cerr << "Decoding" << std::endl;
-        if(!Krypton::Passwd(usr, "enter key to decode file:") )
+       
+        string outname = filename;
+        vfs::remove_extension(outname);
+        std::cerr << "Should Write in " << outname << std::endl;
+        
+        if(!MayOverwrite(outname))
+        {
+            fl_message_title("Decoding Canceled");
+            fl_message("No Allowed Overwrite");
             return;
-        Krypton::Decode(filename, usr);
+        }
+        
+        if(!Krypton::Passwd(usr, "enter key to decode file:") )
+        {
+            fl_message_title("Decoding Canceled");
+            fl_message("No Provided Password");
+            return;
+        }
+        
+        
+        Krypton::Decode(filename, outname, usr);
+        fl_message_title("Done");
+        fl_message("Successful Decoding!");
     }
     else
     {
@@ -182,7 +202,7 @@ void Krypton::Encode(const string &filename, const string &outname, const string
     fp << Z;
 }
 
-void Krypton::Decode(const string &filename, const string &usr )
+void Krypton::Decode(const string &filename, const string &outname, const string &usr )
 {
     //--------------------------------------------------------------------------
     // prepare crypto stuff
@@ -266,7 +286,10 @@ void Krypton::Decode(const string &filename, const string &usr )
     if(Sgn != OriginalSgn)
         throw exception("Corrupted Data!");
     
-    ios::ocstream out("p.dat",false);
+    //--------------------------------------------------------------------------
+    // Write the plain stream
+    //--------------------------------------------------------------------------
+    ios::ocstream out(outname,false);
     out << P;
 }
 
