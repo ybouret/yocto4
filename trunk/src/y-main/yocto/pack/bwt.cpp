@@ -47,7 +47,7 @@ namespace yocto
 			
 			c_array<size_t>  arr( indices, size );
 			rotlexdat        cmp = { buf_in, size };
-			qSort( arr, cmp );
+			quicksort( arr, cmp );
 			
 			size_t pidx=0;
 			for( size_t i=0; i < size; ++i )

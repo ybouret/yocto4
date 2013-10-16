@@ -145,7 +145,7 @@ static inline void test_qsort()
 		ra.push_back( tmp );
 	}
 	std::cerr << "raw=" << ra << std::endl;
-	qSort( ra, __compare<T> );
+	quicksort( ra, __compare<T> );
 	std::cerr << "srt=" << ra << std::endl;
     check_sorted(ra, "sorting");
 }
@@ -231,7 +231,7 @@ inline double test_perf( size_t n, SortWith proc )
                 break;
                 
             case QuickSort:
-                qSort(arr);
+                quicksort(arr);
                 break;
                 
             case LibcSort:
