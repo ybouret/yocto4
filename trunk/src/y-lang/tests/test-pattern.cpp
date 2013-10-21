@@ -48,7 +48,8 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 		patterns.push_back( j1 );
 	}
 	
-	
+
+	int res=0;	
 	{
 		std::cerr << "-- saving patterns..." << std::endl;
 		size_t i=0;
@@ -60,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 			snprintf( buffer, sizeof(buffer)-1, "dot -Tpng g%02x.dot -o g%02x.png", unsigned(i), unsigned(i));
 			std::cerr << "" << buffer << "" << std::endl;
 			const string cmd = buffer;
-			system( cmd.c_str() );
+			res=system( cmd.c_str() );
 			++i;
 		}
 		std::cerr << "-- done" << std::endl;
@@ -93,6 +94,6 @@ YOCTO_UNIT_TEST_IMPL(pattern)
 		src.skip( len );
 	}
 	
-	
+	(void)res;	
 }
 YOCTO_UNIT_TEST_DONE()

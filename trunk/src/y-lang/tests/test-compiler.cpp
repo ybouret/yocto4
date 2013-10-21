@@ -18,9 +18,10 @@ YOCTO_UNIT_TEST_IMPL(comp_rx)
 {
 	if( argc > 1 )
 	{
+		int res=0;
 		regex::pattern_dict dict;
 		dict.record( "DIGIT", regex::posix::digit() );
-        dict.record( "DIGITS", "[1-9]{DIGIT}*" );
+	        dict.record( "DIGITS", "[1-9]{DIGIT}*" );
 		const string expr = argv[1];
 		std::cerr << "-- compiling '" << expr << "'" << std::endl;
 		auto_ptr<regex::pattern> p( regex::compile( expr, &dict ) );
@@ -31,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(comp_rx)
 			p->graphviz( fp, "G" );
 		}
 		
-		system("dot -Tpng expr.dot -o expr.png");
+		res = system("dot -Tpng expr.dot -o expr.png");
 		{
 			regex::first_chars fch;
 			p->gather(fch);
@@ -100,7 +101,7 @@ YOCTO_UNIT_TEST_IMPL(comp_rx)
 			}
 			
 		}
-		
+		(void)res;	
 	}
 	
 }

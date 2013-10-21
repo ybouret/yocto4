@@ -92,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(parser)
     if( tree.is_valid() )
     {
         tree->graphviz("tree.dot");
-        system("dot -Tpng -otree.png tree.dot");
+        int res=system("dot -Tpng -otree.png tree.dot");(void)res;
     }
     else
         std::cerr << "Empty Parse Tree" << std::endl;

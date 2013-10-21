@@ -19,7 +19,7 @@ YOCTO_UNIT_TEST_IMPL(cc)
     
     auto_ptr<syntax::xnode> root( cc.run(src) );
     root->graphviz("tree.dot");
-    system("dot -Tpng -otree.png tree.dot");
+    int res=system("dot -Tpng -otree.png tree.dot");(void)res;
     cc.emit( root.__get() );
     
 }

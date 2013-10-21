@@ -20,7 +20,7 @@ static void __save_viz( const char *name, pattern *p)
     p->graphviz(fn);
     
     const string cmd = vformat("dot -Tpng -o%s.png %s.dot", name,name);
-    system( cmd.c_str() );
+    int res=system( cmd.c_str() );(void)res;
     
 }
 

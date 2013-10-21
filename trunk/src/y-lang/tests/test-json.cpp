@@ -12,7 +12,7 @@ using namespace lang;
 
 YOCTO_UNIT_TEST_IMPL(json)
 {
-    
+    int res=0;
     lexer   L("JSON Lexer");
     grammar G("JSON Gramar");
     
@@ -105,7 +105,7 @@ YOCTO_UNIT_TEST_IMPL(json)
             ios::ocstream out( "g.dot", false );
             Tree->graphviz("G", out);
         }
-        system( "dot -Tpng g.dot -o g.png" );
+        res = system( "dot -Tpng g.dot -o g.png" );
         std::cerr << "Compressing Tree" << std::endl;
         Tree->AST();
         std::cerr << "Saving Final Parse Tree" << std::endl;
@@ -113,13 +113,13 @@ YOCTO_UNIT_TEST_IMPL(json)
             ios::ocstream out( "q.dot", false );
             Tree->graphviz("Q", out);
         }
-        system( "dot -Tpng q.dot -o q.png" );
+        res = system( "dot -Tpng q.dot -o q.png" );
         {
             ios::ocstream out( "ast.dat", false );
             Tree->output(out);
         }
     }
     
-    
+	(void)res;    
 }
 YOCTO_UNIT_TEST_DONE()
