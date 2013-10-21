@@ -21,8 +21,8 @@ void test_catalog()
 	
 	for( size_t i=0; i < 4096; ++i )
 	{
-		T tmp = gen<mutable_type>::get();
-		if( C.insert( tmp ) )
+		type tmp = gen<mutable_type>::get();
+		if( C.insert( (param_type)tmp ) )
 		{
 			if( alea<float>() > 0.6f ) 
 			{
