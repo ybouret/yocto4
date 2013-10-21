@@ -39,7 +39,7 @@ namespace  {
 
 YOCTO_UNIT_TEST_IMPL(labelled)
 {
-#if 0
+#if 1
     labelled<map,int> M;
     M.store( "hello", 1 );
     M.query( "hello" );
