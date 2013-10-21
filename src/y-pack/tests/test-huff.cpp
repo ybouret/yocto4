@@ -45,7 +45,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
         ios::ocstream fp("huff.dot",false);
         huff.tree().graphviz("G", fp);
     }
-    system( "dot -Tpng huff.dot -o huff.png" );
+    int res=system( "dot -Tpng huff.dot -o huff.png" );(void)res;
     {
         ios::ocstream fp( ios::cstderr );
         fp("Core Tree: \n");

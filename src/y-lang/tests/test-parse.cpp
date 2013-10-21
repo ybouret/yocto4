@@ -50,7 +50,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
     }
     
     
-    
+    int res=0;
     ios::icstream fp( ios::cstdin );
     regex::source Source( fp );
     auto_ptr<syntax::parse_node> Tree( G.accept(Lexer, Source) );
@@ -62,7 +62,7 @@ YOCTO_UNIT_TEST_IMPL(parse)
             ios::ocstream out( "g.dot", false );
             Tree->graphviz("G", out);
         }
-        system( "dot -Tpng g.dot -o g.png" );
+        res = system( "dot -Tpng g.dot -o g.png" );
         std::cerr << "Compressing Tree" << std::endl;
         Tree->AST();
         std::cerr << "Saving Final Parse Tree" << std::endl;
@@ -70,12 +70,12 @@ YOCTO_UNIT_TEST_IMPL(parse)
             ios::ocstream out( "q.dot", false );
             Tree->graphviz("Q", out);
         }
-        system( "dot -Tpng q.dot -o q.png" );
+        res = system( "dot -Tpng q.dot -o q.png" );
         {
             ios::ocstream out( "ast.dat", false );
             Tree->output(out);
         }
     }
-    
+   (void)res; 
 }
 YOCTO_UNIT_TEST_DONE()

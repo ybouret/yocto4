@@ -70,7 +70,7 @@ YOCTO_UNIT_TEST_IMPL(syntax)
     {
         auto_ptr<syntax::xnode> tree(Tree);
         tree->graphviz("tree.dot");
-        system("dot -Tpng -otree.png tree.dot");
+        int res=system("dot -Tpng -otree.png tree.dot");(void)res;
     }
     else
         std::cerr << "Accepted Empty Tree" << std::endl;

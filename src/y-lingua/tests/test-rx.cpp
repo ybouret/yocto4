@@ -29,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(rx)
         }
         
         q->graphviz( "expr.dot" );
-        system("dot -Tpng -oexpr.png expr.dot");
+        int res=system("dot -Tpng -oexpr.png expr.dot");(void)res;
         
         first_chars fch;
         q->firsts(fch);

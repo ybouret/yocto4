@@ -13,7 +13,7 @@ static inline void test_posix( const string &name, const regex::pattern &p )
 {
 	const string fdot = name + ".dot";
 	const string fpng = name + ".png";
-	
+	int res=0;	
 	{
 		ios::ocstream fp( fdot, false );
 		p.graphviz( fp, "G" );
@@ -21,8 +21,8 @@ static inline void test_posix( const string &name, const regex::pattern &p )
 	
 	const string cmd = "dot -Tpng " + fdot + " -o " + fpng;
 	std::cerr << cmd << std::endl;
-	system( cmd.c_str() );
-	
+	res = system( cmd.c_str() );
+	(void)res;
 }
 
 #define _TEST(NAME) \
