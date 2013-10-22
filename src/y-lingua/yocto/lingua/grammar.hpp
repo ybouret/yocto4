@@ -12,7 +12,7 @@ namespace yocto
 {
     namespace lingua
     {
-        class grammar
+        class grammar : public virtual object
         {
         public:
             const string name;

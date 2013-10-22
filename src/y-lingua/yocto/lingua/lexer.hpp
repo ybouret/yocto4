@@ -11,7 +11,7 @@ namespace yocto
     {
         
         //! a source of lexemes
-        class lexer : public object
+        class lexer : public virtual object
         {
         public:
             
