@@ -53,11 +53,15 @@ namespace yocto
             lexeme *get( source &src );
             
             //! back into cache
+            void    unget( lexeme *lx ) throw();
+            
+            
+            //! put in cache an artificial lexeme with label from.name
             /**
              a sub scanner can cache a lexeme to mimic
              a complex expression (aka real string).
              */
-            void    unget( lexeme *lx ) throw();
+            void  unget( const lexical::scanner &from, const string &data );
             
             
             //! test if possible supplementary lexemes from source

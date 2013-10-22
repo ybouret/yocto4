@@ -1,10 +1,10 @@
 #include "yocto/json/parser.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/lang/parser.hpp"
+#include "yocto/lingua/parser.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/string/conv.hpp"
 
-//#define Y_JSON_OUTPUT
+#define Y_JSON_OUTPUT 1
 #if defined(Y_JSON_OUTPUT)
 #include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
@@ -12,7 +12,7 @@
 
 namespace yocto 
 {
-    using namespace lang;
+    using namespace lingua;
     
     namespace JSON
     {
@@ -40,7 +40,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 
                 //-- main rule
-                syntax::alternate & INSTANCE = alt("INSTANCE");
+                syntax::alternative & INSTANCE = alt("INSTANCE");
                 
                 //--------------------------------------------------------------
                 // terminals
@@ -61,42 +61,52 @@ namespace yocto
                 //--------------------------------------------------------------
                 // other main rules
                 //--------------------------------------------------------------
-                scan.call("JSON::String",  "\"", this, &Impl::OnEnterString);
-                scan.make( "BLANKS", "[ \t]+",   & scan.discard );
-                scan.make( "ENDL",   "[:endl:]", & scan.no_endl );
+                scanner.call("JSON::String",  "\"", this, &Impl::OnEnterString);
+                Y_LEX_DISCARD(scanner,"BLANKS","[ \t]+");
+                Y_LEX_NO_ENDL(scanner);
                 
                 //--------------------------------------------------------------
                 // JSON:: String
                 //--------------------------------------------------------------
                 jstr.back("\"", this, &Impl::OnLeaveString);
                 jstr.make( "ESC",   "\\x5c.", this, &Impl::OnEscape);
-                jstr.make( "1CHAR", ".",     this, &Impl::OnChar);
+                jstr.make( "1CHAR", ".",      this, &Impl::OnChar);
                 
                 
                 
                 //--------------------------------------------------------------
                 // initialize value
                 //--------------------------------------------------------------
-                syntax::alternate &VALUE = alt("VALUE");
-                VALUE << NUMBER << STRING << Null << True << False;
+                syntax::alternative &VALUE = alt("VALUE");
+                VALUE |= NUMBER;
+                VALUE |= STRING;
+                VALUE |= Null;
+                VALUE |= True;
+                VALUE |= False;
                 
                 //--------------------------------------------------------------
                 // ARRAY
                 //--------------------------------------------------------------
-                syntax::alternate &ARRAYS = alt( "ARRAYS" );
+                syntax::alternative &ARRAYS = alt( "ARRAYS" );
                 
                 {
                     {
                         syntax::aggregate &EMPTY_ARRAY = agg( "EMPTY_ARRAY" );
-                        EMPTY_ARRAY << LBRACK << RBRACK;
+                        EMPTY_ARRAY += LBRACK;
+                        EMPTY_ARRAY += RBRACK;
                         ARRAYS |= EMPTY_ARRAY;
                     }
                     {
                         syntax::aggregate &ARRAY       = agg( "ARRAY" );
                         syntax::aggregate &TAIL_VALUE  = agg( "TAIL_VALUE", syntax::is_merging_all );
-                        TAIL_VALUE << COMMA << VALUE;
+                        TAIL_VALUE += COMMA;
+                        TAIL_VALUE += VALUE;
                         
-                        ARRAY << LBRACK << VALUE << rep( "ZERO_OR_MORE_TAIL_VALUE", TAIL_VALUE, 0 ) << RBRACK;
+                        ARRAY += LBRACK;
+                        ARRAY += VALUE;
+                        ARRAY += rep( "ZERO_OR_MORE_TAIL_VALUE", TAIL_VALUE, 0 );
+                        ARRAY += RBRACK;
+                        
                         ARRAYS |= ARRAY;
                     }
                 }
@@ -106,20 +116,29 @@ namespace yocto
                 //--------------------------------------------------------------
                 // OBJECT
                 //--------------------------------------------------------------
-                syntax::alternate &OBJECTS = alt("OBJECTS");
+                syntax::alternative &OBJECTS = alt("OBJECTS");
                 {
                     {
                         syntax::aggregate &EMPTY_OBJECT = agg( "EMPTY_OBJECT" );
-                        EMPTY_OBJECT << LBRACE << RBRACE;
+                        EMPTY_OBJECT += LBRACE;
+                        EMPTY_OBJECT += RBRACE;
                         OBJECTS |= EMPTY_OBJECT;
                     }
+                    
                     {
                         syntax::aggregate &PAIR = agg("PAIR");
-                        PAIR << STRING << COLUMN << VALUE;
+                        PAIR += STRING;
+                        PAIR += COLUMN;
+                        PAIR += VALUE;
                         syntax::aggregate &TAIL_PAIR = agg("TAIL_PAIR", syntax::is_merging_all);
-                        TAIL_PAIR << COMMA << PAIR;
+                        TAIL_PAIR += COMMA;
+                        TAIL_PAIR += PAIR;
                         syntax::aggregate &OBJECT = agg("OBJECT");
-                        OBJECT << LBRACE << PAIR << rep("ZERO_OR_MORE_TAIL_PAIR", TAIL_PAIR, 0 ) << RBRACE;
+                        OBJECT += LBRACE;
+                        OBJECT += PAIR;
+                        OBJECT += rep("ZERO_OR_MORE_TAIL_PAIR", TAIL_PAIR, 0 );
+                        OBJECT += RBRACE;
+                        
                         OBJECTS |= OBJECT;
                     }
                     
@@ -136,25 +155,25 @@ namespace yocto
                 
             }
             
-            void OnEnterString( const regex::token & )
+            void OnEnterString( const token & )
             {
                 _str.clear();
             }
             
-            void OnLeaveString( const regex::token & )
+            void OnLeaveString( const token & )
             {
                 unget( jstr, _str);
             }
             
-            bool OnChar( const regex::token &t )
+            bool OnChar( const token &t )
             {
-                for( regex::t_char *ch = t.head; ch; ch=ch->next )
+                for( t_char *ch = t.head; ch; ch=ch->next )
                     _str.append( ch->data );
                 
                 return false; // not a lexeme !
             }
             
-            bool OnEscape( const regex::token &t )
+            bool OnEscape( const token &t )
             {
                 assert(t.size==2);
                 char C = t.tail->data;
@@ -181,33 +200,31 @@ namespace yocto
             //==================================================================
             // main call
             //==================================================================
-            void call( Value &value, ios::istream &fp )
+            void call( Value &value, lingua::input &in )
             {
                 value.nullify(); //! make a null value 
                 reset();         //! lexer reset
                 
-                regex::source                S(fp);
-                auto_ptr<syntax::parse_node> Tree( accept(*this,S) );
-                
-                Tree->AST();
+                source src;
+                src.attach(in);
+                auto_ptr<syntax::xnode> tree( run(src) );
                 
 #if defined (Y_JSON_OUTPUT)
                 std::cerr << "Saving tree..." << std::endl;
                 {
-                    ios::ocstream os("json.dot",false);
-                    Tree->graphviz("G", os);
+                    tree->graphviz("json.dot");
                 }
                 system( "dot -Tpng json.dot -o json.png" );
 #endif
                 
-                walk( value, Tree.__get() );
+                walk( value, tree.__get() );
             }
             
             
             //==================================================================
             // walk the tree
             //==================================================================
-            void walk( Value &value, const syntax::parse_node *node )
+            void walk( Value &value, const syntax::xnode *node )
             {
                 assert(node!=NULL);
                 assert(value.type == IsNull);
@@ -245,7 +262,7 @@ namespace yocto
                     value.make( IsString );
                     string &str = value.asString();
                     const lexeme *lx = node->lex();
-                    for( regex::t_char *t = lx->head; t; t=t->next )
+                    for( t_char *t = lx->head; t; t=t->next )
                     {
                         const char C = t->data;
                         str.append(C);
@@ -280,22 +297,22 @@ namespace yocto
                 throw exception("JSON::walk(Invalid Node <%s>)", label.c_str() );
             }
             
-            void walk_array( Array &arr, const syntax::parse_node::child_list &children )
+            void walk_array( Array &arr, const syntax::xnode::child_list &children )
             {
-                for( const syntax::parse_node *node = children.head; node; node=node->next )
+                for( const syntax::xnode *node = children.head; node; node=node->next )
                 {
                     { const Value nil; arr.push(nil); }
                     walk( arr[ arr.length()-1 ], node);
                 }
             }
             
-            void walk_object( Object &obj, const syntax::parse_node::child_list &children )
+            void walk_object( Object &obj, const syntax::xnode::child_list &children )
             {
-                for( const syntax::parse_node *node = children.head; node; node=node->next )
+                for( const syntax::xnode *node = children.head; node; node=node->next )
                 {
                     assert( node->label == "PAIR" );
                     assert( ! node->terminal );
-                    const syntax::parse_node::child_list &pair = node->children();
+                    const syntax::xnode::child_list &pair = node->children();
                     assert( pair.size == 2);
                     assert(pair.head->label == "JSON::String" );
                     assert(pair.head->terminal);
@@ -328,7 +345,7 @@ namespace yocto
         {
         }
         
-        Value & Parser:: operator()( ios::istream &in )
+        Value & Parser:: operator()( lingua::input &in )
         {
             impl->call(value,in);
             return value;
