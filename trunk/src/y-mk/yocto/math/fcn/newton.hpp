@@ -22,8 +22,6 @@ namespace yocto
              TODO: detect other spurious points...
              */
             static bool solve( Function &func, Jacobian &jac, array<T> &X, T ftol );
-            static bool qsolve( Function &func, Jacobian &jac, array<T> &X, T ftol );
-
             
         };
         

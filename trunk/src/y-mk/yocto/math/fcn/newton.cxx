@@ -7,7 +7,7 @@
 
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
-#include "yocto/sort/heap.hpp"
+#include "yocto/sort/quick.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto
@@ -64,7 +64,9 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Energy);
             };
             
-            static inline bool has_converged( const array<real_t> &X, const array<real_t> &h, const real_t ftol) throw()
+            static inline bool has_converged(const array<real_t> &X,
+                                             const array<real_t> &h,
+                                             const real_t         ftol) throw()
             {
                 assert( h.size() == X.size() );
                 for( size_t i=h.size();i>0;--i)
@@ -106,7 +108,7 @@ namespace yocto
             array<real_t>             &XX = nrj.X;
             array<real_t>             &FF = nrj.F;
             numeric<real_t>::function  E( &nrj, & Energy::Compute );
-            int status = IS_NR; // default: newton raphson
+            int status = IS_NR; // default: Newton Raphson
             
             //==================================================================
             //
@@ -147,7 +149,7 @@ namespace yocto
                 //
                 //==============================================================
                 for(size_t j=n;j>0;--j) wa[j] = Fabs(w[j]);
-                hsort(wa);
+                quicksort(wa);
                 const real_t wmax  = wa[ n ];
                 if( wmax <= 0 )
                 {
@@ -234,36 +236,6 @@ namespace yocto
                         
                         triplet<real_t> x = { 0,  lam, 0 };
                         triplet<real_t> f = { G0, G1,  0 };
-#if 0
-                        //------------------------------------------------------
-                        // cheap bracketing with simple golden extension
-                        //------------------------------------------------------
-                        static const real_t GOLD = REAL(1.61803398874989);
-                        static const real_t xmax = 0.5;
-                        bool                stop = false;
-                        
-                        
-                        x.c = x.b + GOLD * ( x.b - x.a );
-                        f.c = E(x.c);
-                        while( f.b > f.c )
-                        {
-                            if( x.c >= xmax )
-                            {
-                                // don't go further
-                                x.b = x.c;
-                                f.b = f.c;
-                                stop = true;
-                                break;
-                            }
-                            //-- move forward
-                            x.a = x.b; x.b = x.c; x.c = x.b + GOLD * (x.b - x.a);
-                            f.a = f.b; f.b = f.c; f.c = E(x.c);
-                        }
-                        if( !stop )
-                        {
-                            minimize(E, x, f, ftol);
-                        }
-#endif
                         bracket<real_t>::expand( E, x, f );
                         minimize<real_t>(E,x,f,ftol);
                         lam = x.b;
