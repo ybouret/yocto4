@@ -45,17 +45,17 @@ namespace yocto
                 //--------------------------------------------------------------
                 // terminals
                 //--------------------------------------------------------------
-                syntax::terminal &LBRACK = terminal( "LBRACK", '[', syntax::is_discardable );
-                syntax::terminal &RBRACK = terminal( "RBRACK", ']', syntax::is_discardable );
-                syntax::terminal &LBRACE = terminal( "LBRACE", '{', syntax::is_discardable );
-                syntax::terminal &RBRACE = terminal( "RBRACE", '}', syntax::is_discardable );
-                syntax::terminal &COMMA  = terminal( "COMMA",  ',', syntax::is_discardable );
+                syntax::terminal &LBRACK = jettison( "LBRACK", '[');
+                syntax::terminal &RBRACK = jettison( "RBRACK", ']');
+                syntax::terminal &LBRACE = jettison( "LBRACE", '{' );
+                syntax::terminal &RBRACE = jettison( "RBRACE", '}' );
+                syntax::terminal &COMMA  = jettison( "COMMA",  ',' );
                 syntax::terminal &NUMBER = terminal( "NUMBER", "-?[1-9][0-9]*([.][0-9]+)?([e|E][-+]?[0-9]+)?" );
-                syntax::terminal &Null   = terminal( "null",  "null",  syntax::is_specialized );
-                syntax::terminal &True   = terminal( "true",  "true",  syntax::is_specialized );
-                syntax::terminal &False  = terminal( "false", "false", syntax::is_specialized );
+                syntax::terminal &Null   = univocal( "null",  "null");
+                syntax::terminal &True   = univocal( "true",  "true");
+                syntax::terminal &False  = univocal( "false", "false");
                 syntax::terminal &STRING = term( "JSON::String" );
-                syntax::terminal &COLUMN = terminal( "COLUMN", ':', syntax::is_discardable );
+                syntax::terminal &COLUMN = jettison( "COLUMN", ':');
                 
                 
                 //--------------------------------------------------------------
@@ -162,7 +162,7 @@ namespace yocto
             
             void OnLeaveString( const token & )
             {
-                unget( jstr, _str);
+                emit( jstr, _str);
             }
             
             bool OnChar( const token &t )
@@ -207,16 +207,18 @@ namespace yocto
                 
                 source src;
                 src.attach(in);
-                auto_ptr<syntax::xnode> tree( run(src) );
+                syntax::xnode *root = accept(*this, src);
                 
 #if defined (Y_JSON_OUTPUT)
                 std::cerr << "Saving tree..." << std::endl;
                 {
-                    tree->graphviz("json.dot");
+                    root->graphviz("json.dot");
                 }
                 system( "dot -Tpng json.dot -o json.png" );
 #endif
-                
+                int depth = 0;
+                auto_ptr<syntax::xnode> tree( syntax::xnode::AST(root, depth) );
+
                 walk( value, tree.__get() );
             }
             

@@ -184,7 +184,7 @@ history()
         }
         
         
-        void lexer:: unget(const lexical::scanner &from, const string &data)
+        void lexer:: emit(const lexical::scanner &from, const string &data)
         {
             //------------------------------------------------------------------
             //-- create an empty lexeme
