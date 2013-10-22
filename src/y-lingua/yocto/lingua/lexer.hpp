@@ -61,7 +61,7 @@ namespace yocto
              a sub scanner can cache a lexeme to mimic
              a complex expression (aka real string).
              */
-            void  unget( const lexical::scanner &from, const string &data );
+            void  emit( const lexical::scanner &from, const string &data );
             
             
             //! test if possible supplementary lexemes from source
