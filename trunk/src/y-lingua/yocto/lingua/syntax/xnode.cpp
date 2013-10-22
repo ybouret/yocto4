@@ -8,7 +8,7 @@ namespace yocto
     {
         namespace syntax
         {
-         
+            
             
             xnode::child_list::  child_list() throw() {}
             xnode::child_list:: ~child_list() throw()
@@ -40,7 +40,7 @@ namespace yocto
                 assert(!terminal);
                 return * _cast::trans<child_list,uint64_t>((uint64_t*)wksp);
             }
-         
+            
             lexeme *& xnode:: lex() throw()
             {
                 assert(terminal);
@@ -52,11 +52,13 @@ namespace yocto
                 assert(terminal);
                 return * _cast::trans<lexeme*,uint64_t>((uint64_t *)wksp);
             }
-              
+            
 #if defined(_MSC_VER)
 #pragma warning ( disable : 4351 )
 #endif
-            xnode:: xnode( const string &label_ref, lexeme *lx, node_property p ) throw():
+            xnode:: xnode(const string &label_ref,
+                          lexeme       *lx,
+                          node_property p ) throw():
             label(label_ref),
             prev(0),
             next(0),
@@ -94,7 +96,7 @@ namespace yocto
                 self->parent = 0;
                 return this;
             }
-
+            
             
             
             void xnode:: restore( lexer &Lexer, xnode *node ) throw()

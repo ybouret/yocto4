@@ -113,7 +113,8 @@ opidx(0)
         // grammar aggregate
         //
         ////////////////////////////////////////////////////////////////////////
-        syntax::aggregate & grammar:: agg( const string &id, syntax::node_property ppty)
+        syntax::aggregate & grammar:: agg(const string         &id,
+                                          syntax::node_property ppty)
         {
             syntax::aggregate *r = new syntax::aggregate(id,ppty);
             add(r);

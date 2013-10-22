@@ -27,7 +27,9 @@ namespace yocto
             
             xnode * xnode:: AST(xnode *node, int &depth) throw()
             {
-                if(!node) return 0;
+                if(!node)
+                    return 0;
+                
                 if(node->terminal)
                 {
                     //==========================================================
@@ -35,7 +37,7 @@ namespace yocto
                     //==========================================================
                     switch(node->property)
                     {
-                        case is_specialized:   
+                        case is_specialized:
                             Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: Clear    " << node->label << "='" << *(node->lex()) << "'" << std::endl);
                             node->lex()->clear();
                             break;
@@ -57,7 +59,7 @@ namespace yocto
                     //==========================================================
                     // AST non terminal node
                     //==========================================================
-                    Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: " << node->label << " / #children=" << node->children().size << std::endl);
+                    Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: " << node->label << " / #children=" << node->children().size << " @input" << std::endl);
                     //----------------------------------------------------------
                     // recursive cleanup
                     //----------------------------------------------------------
@@ -85,7 +87,7 @@ namespace yocto
                                 case is_merging_all:
                                     Y_XNODE_AST(__indent(depth+1); std::cerr << sub->label << " ==> " << node->label << std::endl);
                                     assert(!sub->terminal);
-                                    assert(sub->children().size>0);
+                                    //assert(sub->children().size>0);
                                     while( sub->children().size )
                                     {
                                         xnode *ch = sub->children().pop_front();
@@ -103,17 +105,7 @@ namespace yocto
                         }
                     }
                     source.swap_with(target);
-                    
-                    //----------------------------------------------------------
-                    // do we have some content ?
-                    //----------------------------------------------------------
-                    if(0==source.size)
-                    {
-                        delete node;
-                        return 0;
-                    }
-                    
-                    
+                    Y_XNODE_AST(__indent(depth); std::cerr << "[XNODE]: " << node->label << " / #children=" << node->children().size << " @output" << std::endl);
                     return node;
                 }
             }
