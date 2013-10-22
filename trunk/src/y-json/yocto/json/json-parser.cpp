@@ -154,17 +154,10 @@ namespace yocto
                 
             }
             
-            void OnEnterString( const token & )
-            {
-                _str.clear();
-            }
+            inline void OnEnterString( const token & ){ _str.clear();        }
+            inline void OnLeaveString( const token & ){ emit( jstr, _str);   }
             
-            void OnLeaveString( const token & )
-            {
-                emit( jstr, _str);
-            }
-            
-            bool OnChar( const token &t )
+            inline bool OnChar( const token &t )
             {
                 for( t_char *ch = t.head; ch; ch=ch->next )
                     _str.append( ch->data );
@@ -172,7 +165,7 @@ namespace yocto
                 return false; // not a lexeme !
             }
             
-            bool OnEscape( const token &t )
+            inline bool OnEscape( const token &t )
             {
                 assert(t.size==2);
                 char C = t.tail->data;
