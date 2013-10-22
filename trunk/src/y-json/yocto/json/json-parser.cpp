@@ -18,7 +18,7 @@ namespace yocto
     {
         
         
-        class Parser :: Impl : public object, public parser
+        class Parser :: Impl : public parser
         {
         public:
             source             src;
@@ -27,6 +27,7 @@ namespace yocto
             
             Impl() :
             parser( "JSON::Lexer" , "JSON::Parser" ),
+            src(),
             jstr( declare("JSON::String") ),
             _str()
             {
