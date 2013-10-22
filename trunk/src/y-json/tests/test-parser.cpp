@@ -9,18 +9,11 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(parser)
 {
     JSON::Parser           json;
-    auto_ptr<ios::istream> input;
-    if(argc>1)
-    {
-        input.reset( new ios::icstream( argv[1] ) );
-    }
-    else
-    {
-        input.reset( new ios::icstream(ios::cstdin) );
-    }
+    lingua::input          input( argc > 1 ? new ios::icstream( argv[1] ) : new ios::icstream(ios::cstdin));
     
-    JSON::Value  &j = json( *input );
-    std::cerr << "Got " << j.type_name() << std::endl;
+    
+    JSON::Value  &j = json( input );
+    std::cerr << "Got "    << j.type_name() << std::endl;
     std::cerr << "length=" << j.length() << std::endl;
     ios::ocstream fp( ios::cstderr );
     j.output(fp);

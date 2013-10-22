@@ -1,5 +1,6 @@
 #include "yocto/lingua/parser.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/lingua/pattern/basic.hpp"
 
 namespace yocto
 {
@@ -19,9 +20,9 @@ namespace yocto
             
         }
         
-        syntax::terminal & parser:: terminal( const string &id, const string &expr, syntax::node_property ppty )
+        static inline
+        void __check_terminal_ppty( const string &id, syntax::node_property ppty )
         {
-            
             switch(ppty)
             {
                 case syntax::is_merging_all:
@@ -30,6 +31,12 @@ namespace yocto
                 default:
                     break;
             }
+            
+        }
+        
+        syntax::terminal & parser:: terminal( const string &id, const string &expr, syntax::node_property ppty )
+        {
+            __check_terminal_ppty(id, ppty);
             Y_LEX_FORWARD(scanner, id, expr);
             return term(id,ppty);
         }
@@ -40,6 +47,21 @@ namespace yocto
             const string EX(expr);
             return  terminal(ID, EX, ppty);
         }
+        
+        syntax::terminal & parser:: terminal(const string &id, const char C, syntax::node_property ppty)
+        {
+            __check_terminal_ppty(id, ppty);
+            const lexical::action fwd( &scanner, & lexical::scanner::__forward );
+            scanner.make(id, single::create(C), fwd);
+            return term(id,ppty);
+        }
+        
+        syntax::terminal & parser:: terminal(const char *id, const char C, syntax::node_property ppty)
+        {
+            const string ID(id);
+            return terminal(ID, C, ppty);
+        }
+        
         
         syntax::terminal & parser:: univocal( const string &id, const string &expr )
         {
