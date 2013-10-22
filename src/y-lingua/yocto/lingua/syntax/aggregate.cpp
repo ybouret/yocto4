@@ -10,7 +10,8 @@ namespace yocto
             
             aggregate:: ~aggregate() throw() {}
             
-            aggregate:: aggregate( const string &id , node_property ppty) :
+            aggregate:: aggregate(const string &id ,
+                                  node_property ppty) :
             composite(id),
             behavior(ppty)
             {

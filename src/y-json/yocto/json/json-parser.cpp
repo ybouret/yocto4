@@ -4,7 +4,7 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/string/conv.hpp"
 
-#define Y_JSON_OUTPUT 1
+#define Y_JSON_OUTPUT 0
 #if defined(Y_JSON_OUTPUT)
 #include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
@@ -21,8 +21,6 @@ namespace yocto
         class Parser :: Impl : public object, public parser
         {
         public:
-            
-            
             lexical::scanner  &jstr;
             string             _str;
             
@@ -207,17 +205,15 @@ namespace yocto
                 
                 source src;
                 src.attach(in);
-                syntax::xnode *root = accept(*this, src);
-                
+                auto_ptr<syntax::xnode> tree( run(src) );
+
 #if defined (Y_JSON_OUTPUT)
                 std::cerr << "Saving tree..." << std::endl;
                 {
-                    root->graphviz("json.dot");
+                    tree->graphviz("json.dot");
                 }
                 system( "dot -Tpng json.dot -o json.png" );
 #endif
-                int depth = 0;
-                auto_ptr<syntax::xnode> tree( syntax::xnode::AST(root, depth) );
 
                 walk( value, tree.__get() );
             }
