@@ -10,7 +10,7 @@
 #include <cstdlib>
 #endif
 
-namespace yocto 
+namespace yocto
 {
     using namespace lingua;
     
@@ -21,10 +21,11 @@ namespace yocto
         class Parser :: Impl : public object, public parser
         {
         public:
+            source             src;
             lexical::scanner  &jstr;
             string             _str;
             
-            Impl() : 
+            Impl() :
             parser( "JSON::Lexer" , "JSON::Parser" ),
             jstr( declare("JSON::String") ),
             _str()
@@ -200,22 +201,30 @@ namespace yocto
             //==================================================================
             void call( Value &value, lingua::input &in )
             {
-                value.nullify(); //! make a null value 
+                value.nullify(); //! make a null value
                 reset();         //! lexer reset
+                src.attach(in);  //! source reset
                 
-                source src;
-                src.attach(in);
-                auto_ptr<syntax::xnode> tree( run(src) );
-
-#if defined (Y_JSON_OUTPUT)
-                std::cerr << "Saving tree..." << std::endl;
+                try
                 {
-                    tree->graphviz("json.dot");
-                }
-                system( "dot -Tpng json.dot -o json.png" );
+                    auto_ptr<syntax::xnode> tree( run(src) );
+                    
+#if defined (Y_JSON_OUTPUT)
+                    std::cerr << "Saving tree..." << std::endl;
+                    {
+                        tree->graphviz("json.dot");
+                    }
+                    system( "dot -Tpng json.dot -o json.png" );
 #endif
-
-                walk( value, tree.__get() );
+                    
+                    src.detach();
+                    walk( value, tree.__get() );
+                }
+                catch(...)
+                {
+                    src.detach();
+                    throw;
+                }
             }
             
             
@@ -241,7 +250,7 @@ namespace yocto
                     return;
                 }
                 
-                if( label == "ARRAY") 
+                if( label == "ARRAY")
                 {
                     value.make( IsArray );
                     walk_array( value.asArray(), node->children() );
@@ -331,7 +340,7 @@ namespace yocto
         };
         
         
-        Parser:: ~Parser() throw() 
+        Parser:: ~Parser() throw()
         {
             delete impl;
         }
