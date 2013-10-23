@@ -20,6 +20,14 @@ namespace
             
         }
         
+        bool callback( const array<double> &F, const array<double> &X)
+        {
+            std::cerr << "-- X=" << X << std::endl;
+            std::cerr << "-- F=" << F << std::endl;
+            std::cerr << std::endl;
+            return true;
+        }
+        
         void compute( array<double> &F, const array<double> &X )
         {
             assert(X.size()==3);
@@ -47,11 +55,12 @@ YOCTO_UNIT_TEST_IMPL(newton)
     jacobian_of<double>      jwrapper(Fn);
     Newton<double>::Jacobian &Jn = jwrapper.call;
     vector<double>           X(3,0);
+    Newton<double>::Callback  Cb( &p, & Param::callback );
     
     X[1] = 0.1+0.1*alea<double>();
     X[2] = 0.1+0.1*alea<double>();
     X[3] = 0.1+0.1*alea<double>();
-    if(Newton<double>::solve(Fn, Jn, X, 1e-5))
+    if(Newton<double>::solve(Fn, Jn, X, 1e-5, &Cb))
     {
         std::cerr << "X=" << X << std::endl;
     }
@@ -80,6 +89,15 @@ namespace
         {
             
         }
+        
+        bool callback( const array<double> &F, const array<double> &X)
+        {
+            std::cerr << "-- X=" << X << std::endl;
+            std::cerr << "-- F=" << F << std::endl;
+            std::cerr << std::endl;
+            return true;
+        }
+
         
         void get( array<double> &F, const array<double> &X )
         {
@@ -121,7 +139,8 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     jacobian_of<double>      jwrapper(Fn);
     Newton<double>::Jacobian &Jn = jwrapper.call;
     vector<double>           X(2,0);
-    
+    Newton<double>::Callback  Cb( &p, & Param2::callback );
+
     p.tau.x = 1;
     p.tau.y = 1;
     p.tau.normalize();
@@ -130,7 +149,7 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     X[1] = 0.1;
     X[2] = 0.0;
     
-    Newton<double>::solve(Fn, Jn, X, 1e-7);
+    Newton<double>::solve(Fn, Jn, X, 1e-7,&Cb);
     std::cerr << std::endl;
     std::cerr << "X=" << X << std::endl;
     
@@ -138,7 +157,7 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     Y[1] = -4;
     Y[2] = -3;
     Newton<double>::Jacobian Kn( &p, &Param2::jac);
-    Newton<double>::solve(Fn, Kn, Y, 1e-7);
+    Newton<double>::solve(Fn, Kn, Y, 1e-7, &Cb);
     std::cerr << std::endl;
     std::cerr << "X=" << X << std::endl;
     std::cerr << "Y=" << Y << std::endl;
