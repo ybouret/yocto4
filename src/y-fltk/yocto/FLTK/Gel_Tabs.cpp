@@ -358,7 +358,7 @@ namespace yocto
         }
         
         // CTOR
-        Gel_Tabs::Gel_Tabs(int X,int Y,int W, int H, const char *l) : Fl_Group(X,Y,W,H,l) {
+        Gel_Tabs::Gel_Tabs(int X,int Y,int W, int H, const char *l) : Fl_Group(X,Y,W,H,l), value_(0), push_(0) {
             box(FL_THIN_UP_BOX);
             push_ = 0;
         }
