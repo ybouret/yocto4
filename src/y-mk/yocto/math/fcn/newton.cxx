@@ -95,11 +95,14 @@ namespace yocto
 #define IS_NR 0
 #define IS_CJ 1
         
+#define Y_NEWTON_CB() do { if( (0!=cb) && ! (*cb)(F,X) ) return false; } while(false)
+        
         template <>
         bool Newton<real_t>:: solve(Function      &func,
                                     Jacobian      &jac,
                                     array<real_t> &X,
-                                    real_t         ftol )
+                                    real_t         ftol,
+                                    Callback      *cb)
         {
             static const real_t alpha      = real_t(1e-4);
             static const real_t rate       = (1-alpha);
@@ -128,6 +131,7 @@ namespace yocto
             //
             //==================================================================
             func(F,X);
+            Y_NEWTON_CB();
             real_t G0 = energy_of(F);
             
             for(;;)
@@ -214,6 +218,7 @@ namespace yocto
                             X[j] = XX[j];
                             F[j] = FF[j];
                         }
+                        Y_NEWTON_CB();
                         G0 = G1;
                         if( has_converged(X, h, ftol) )
                         {
@@ -370,7 +375,8 @@ namespace yocto
                         X[j] = XX[j];
                         F[j] = FF[j];
                     }
-                    
+                    Y_NEWTON_CB();
+
                     Y_NEWTON_OUT(std::cerr << "[newton] \tCJ@ G = " << G0 << " (opt=" << x.b << ")" << std::endl);
                     Y_NEWTON_OUT(std::cerr << "[newton] \t    h = " << h << std::endl);
                     if( may_return && has_converged(X, h, ftol) )
