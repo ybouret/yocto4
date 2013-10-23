@@ -3,6 +3,7 @@
 #include "yocto/sequence/vector.hpp"
 
 #include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
 
 #include "yocto/math/opt/bracket.hpp"
@@ -10,12 +11,391 @@
 #include "yocto/sort/quick.hpp"
 #include "yocto/code/utils.hpp"
 
+#include "yocto/ios/ocstream.hpp"
+
+namespace yocto
+{
+    namespace math
+    {
+        
+        
+        namespace
+        {
+#define Y_NEWTON_CB() do { if( (0!=cb) && ! (*cb)(F,X) ) return false; } while(false)
+            
+            static inline real_t energy_of( const array<real_t> &U ) throw()
+            {
+                real_t ans = 0;
+                for(size_t i=U.size();i>0;--i)
+                {
+                    const real_t u = U[i];
+                    ans += u*u;
+                }
+                return ans/2;
+            }
+            
+            class newton
+            {
+            public:
+                typedef algebra<real_t>   mkl;
+                Newton<real_t>::Function &func;
+                Newton<real_t>::Jacobian &fjac;
+                array<real_t>            &X;    //!< user's X
+                const size_t              n;    //!< #variables
+                vector<real_t>            F;    //!< function values
+                vector<real_t>            h;    //!< Newton's step
+                vector<real_t>            g;    //!< auxiliary
+                vector<real_t>            xi;   //!< for CJ
+                vector<real_t>            XX;   //!< trial position
+                vector<real_t>            FF;   //!< trial function
+                vector<real_t>            W;    //!< for SVD
+                vector<real_t>            A;    //!< |W|
+                matrix<real_t>            J0;   //!< original Jacobian
+                matrix<real_t>            J;    //!< working copy of J0 for SVD
+                matrix<real_t>            V;    //!< for SVD
+                numeric<real_t>::function H;
+                const real_t              ftol;  //!< fractional tolerance
+                const real_t              alpha; //!< control parameter
+                Newton<real_t>::Callback *cb;
+                
+                enum status_type
+                {
+                    using_nr,
+                    using_cj
+                };
+                
+                inline ~newton() throw() {}
+                
+                //==============================================================
+                //
+                // create resources
+                //
+                //==============================================================
+                inline  newton(Newton<real_t>::Function &func_ref,
+                               Newton<real_t>::Jacobian &fjac_ref,
+                               array<real_t>            &X_ref,
+                               const real_t              frc_tol,
+                               Newton<real_t>::Callback *cb_addr) :
+                func( func_ref ),
+                fjac( fjac_ref ),
+                X( X_ref    ),
+                n( X.size() ),
+                F(n,0),
+                h(n,0),
+                g(n,0),
+                xi(n,0),
+                XX(n,0),
+                FF(n,0),
+                W(n,0),
+                A(n,0),
+                J0(n,n),
+                J(n,n),
+                V(n,n),
+                H( this, & newton::getH ),
+                ftol( Fabs(frc_tol) ),
+                alpha( REAL(1.0e-4) ),
+                cb(cb_addr)
+                {
+                }
+                
+                //==============================================================
+                //
+                // compute jacobian condition
+                //
+                //==============================================================
+                inline bool compute_icond_and_xi( real_t &icond )
+                {
+                    //-- compute the Jacobian @X
+                    fjac(J0,X);
+                    J.assign(J0);
+                    
+                    //-- svd
+                    if( !svd<real_t>::build(J, W, V) )
+                    {
+                        std::cerr << "[Newton] Invalid Jacobian" << std::endl;
+                        return false;
+                    }
+                    
+                    //-- condition
+                    for(size_t i=n;i>0;--i) A[i] = Fabs(W[i]);
+                    quicksort(A);
+                    const real_t amax = A[n];
+                    if(amax<=0)
+                    {
+                        std::cerr << "[Newton] Singular Jacobian" << std::endl;
+                        return false;
+                    }
+                    const real_t amin = A[1];
+                    icond = amin/amax;
+                    
+                    std::cerr << "[Newton] icond=" << icond << std::endl;
+                    
+                    //-- Gradient in xi
+                    for( size_t j=n;j>0;--j)
+                    {
+                        real_t sum = 0;
+                        for( size_t i=n;i>0;--i)
+                            sum += F[i] * J0[i][j];
+                        xi[j] = sum;
+                    }
+                    
+                    return true;
+                }
+                
+                inline bool has_converged()
+                {
+                    bool cvg = true;
+                    for(size_t i=n;i>0;--i)
+                    {
+                        const real_t dx = Fabs(XX[i]-X[i]);
+                        const real_t sx = Fabs(XX[i]) + Fabs(X[i]);
+                        if( dx > ftol * sx )
+                            cvg = false;
+                        X[i] = XX[i];
+                        F[i] = FF[i];
+                    }
+                    
+                    return cvg;
+                }
+                //==============================================================
+                //
+                // the algorithm
+                //
+                //==============================================================
+                bool solve()
+                {
+                    
+                    //----------------------------------------------------------
+                    //
+                    // initialize
+                    //
+                    //----------------------------------------------------------
+                    func(F,X);
+                    real_t      icond  = -1;
+                    status_type status = using_nr;
+                    real_t      H0     = energy_of(F);
+                    
+                    
+                    Y_NEWTON_CB();
+                    
+                    
+                    //----------------------------------------------------------
+                    //
+                    // loop
+                    //
+                    //----------------------------------------------------------
+                    for(;;)
+                    {
+                        std::cerr << std::endl;
+                        std::cerr << "[Newton] H0=" << H0 << std::endl;
+                        std::cerr << "          X=" << X << std::endl;
+                        std::cerr << "          F=" << F << std::endl;
+                        
+                        //------------------------------------------------------
+                        // compute Jacobian, its inverse condition
+                        // and the Energy gradient in xi
+                        //------------------------------------------------------
+                        if(! compute_icond_and_xi(icond) )
+                            return false;
+                        
+                        if( icond >= 1e-1 )
+                        {
+                            //__________________________________________________
+                            //
+                            // Using Newton's Step
+                            //__________________________________________________
+                            
+                            status = using_nr;
+                            //--------------------------------------------------
+                            // compute the full Newton's step in h
+                            //--------------------------------------------------
+                            mkl::neg(g,F);
+                            svd<real_t>::solve(J, W, V, g, h);
+                            
+                            //--------------------------------------------------
+                            // try it...will initialize XX and FF
+                            //--------------------------------------------------
+                            const real_t rate = mkl::dot(xi, h);
+                            const real_t Hr   = H0+alpha*rate;
+                            const real_t H1   = H(1);
+                            std::cerr << "[Newton] rate=" << rate << std::endl;
+                            std::cerr << "[Newton] H1=" << H1  << " / Hr=" << Hr << std::endl;
+                            
+                            if(H1<Hr)
+                            {
+                                //----------------------------------------------
+                                // We descend fast enough
+                                //----------------------------------------------
+                                std::cerr << "[Newton] Accepting" << std::endl;
+                                H0=H1;
+                                
+                                Y_NEWTON_CB();
+                                
+                                if(has_converged())
+                                {
+                                    std::cerr << "[Newton] Convergence" << std::endl;
+                                    return true;
+                                }
+
+                            }
+                            else
+                            {
+                                //----------------------------------------------
+                                // Bad descent: find a backtracking point
+                                //----------------------------------------------
+                                std::cerr << "[Newton] Backtracking" << std::endl;
+                                real_t lam = alpha;
+                                real_t Hbk = H(lam);
+                                while(Hbk>=H0)
+                                {
+                                    lam /= 2;
+                                    if( lam <= numeric<real_t>::tiny )
+                                    {
+                                        std::cerr << "[Newton] Spurious Point" << std::endl;
+                                        return false;
+                                    }
+                                    Hbk = H(lam);
+                                }
+                                std::cerr << "H(" << lam << ")=" << Hbk << std::endl;
+                                
+                                //----------------------------------------------
+                                // expand and minimize
+                                //----------------------------------------------
+                                triplet<real_t> xx = {0, lam,lam};
+                                triplet<real_t> ff = {H0,Hbk,Hbk};
+                                bracket<real_t>::expand(H, xx, ff);
+                                minimize<real_t>(H, xx, ff, 0);
+                                
+                                lam = xx.b;
+                                H0  = H(lam);
+                                std::cerr << "H(" << lam <<  ")=" << H0 << std::endl;
+                                for(size_t i=n;i>0;--i)
+                                {
+                                    X[i] = XX[i];
+                                    F[i] = FF[i];
+                                }
+                                Y_NEWTON_CB();
+                            }
+                        }
+                        else
+                        {
+                            //__________________________________________________
+                            //
+                            // Using Conjugated Gradient
+                            //__________________________________________________
+                            
+                            //--------------------------------------------------
+                            // Algorithm for CJ
+                            //--------------------------------------------------
+                            bool may_return = true;
+                            if( using_nr == status )
+                            {
+                                std::cerr << "[Newton] Initialize CJ" << std::endl;
+                                status     = using_cj;
+                                may_return = false;
+                                for(size_t j=n;j>0;--j)
+                                {
+                                    g[j] = -xi[j];
+                                    xi[j]=h[j]=g[j];
+                                }
+                            }
+                            else
+                            {
+                                std::cerr << "[Newton] update CJ" << std::endl;
+                                real_t dgg=0, gg=0;
+                                for( size_t j=n;j>0;--j)
+                                {
+                                    gg  += g[j] * g[j];
+                                    dgg += (xi[j]+g[j])*xi[j];
+                                }
+                                if( gg <= 0 )
+                                {
+                                    std::cerr << "[Newton] Local Extremum" << std::endl;
+                                    return true;
+                                }
+                                const real_t gam=dgg/gg;
+                                for(size_t j=n;j>0;--j)
+                                {
+                                    g[j]  = -xi[j];
+                                    xi[j] = h[j]=g[j]+gam*h[j];
+                                }
+                            }
+                            
+                            //--------------------------------------------------
+                            // Line Search along h = conjugated direction
+                            //--------------------------------------------------
+                            std::cerr << "[Newton] Line Minimization" << std::endl;
+                            const real_t rate = mkl::dot(h,xi);
+                            real_t       beta = alpha*H0/(rate);
+                            std::cerr << "rate = "  << rate << std::endl;
+                            std::cerr << "beta = "  << beta << std::endl;
+                            triplet<real_t> x = { 0,  beta,   0 };
+                            triplet<real_t> f = { H0, H(x.b), 0 };
+                            bracket<real_t>::expand(H, x,f);
+                            minimize<real_t>(H, x, f, 0);
+                            beta = x.b;
+                            std::cerr << "beta = " << beta << std::endl;
+                            H0 = H(beta);
+                            std::cerr << "X="  << X   << std::endl;
+                            std::cerr << "XX=" << XX  << std::endl;
+                            std::cerr << "h="  << h   << std::endl;
+                            
+                            if( has_converged() && may_return)
+                            {
+                                std::cerr << "[Newton] SubConvergence" << std::endl;
+                                return true;
+                            }
+                        }
+                        
+                    }
+                    
+                }
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(newton);
+                
+                //! evaluate H using X and Newton's step
+                inline real_t getH( real_t lam )
+                {
+                    for(size_t i=n;i>0;--i) XX[i] = X[i] + lam * h[i];
+                    func(FF,XX);
+                    return energy_of(FF);
+                }
+                
+                
+            };
+            
+            
+        }
+        
+        template <>
+        bool Newton<real_t>:: solve(Function      &func,
+                                    Jacobian      &fjac,
+                                    array<real_t> &X,
+                                    real_t         ftol,
+                                    Callback      *cb)
+        {
+            const size_t n = X.size(); assert(n>0);
+            
+            //==================================================================
+            // acquire resources
+            //==================================================================
+            newton       newt(func,fjac,X,ftol,cb);
+            
+            return newt.solve();
+            
+        }
+        
+    }
+}
+
+#if 0
 //#define YOCTO_NEWTON_SHOW 1
 
 #if defined(YOCTO_NEWTON_SHOW)
 #define Y_NEWTON_OUT(EXPR) do { EXPR; } while(false)
 #else
-#define Y_NEWTON_OUT(EXPR) 
+#define Y_NEWTON_OUT(EXPR)
 #endif
 
 namespace yocto
@@ -88,14 +468,13 @@ namespace yocto
                 return true;
             }
             
-
+            
         }
         
         
 #define IS_NR 0
 #define IS_CJ 1
         
-#define Y_NEWTON_CB() do { if( (0!=cb) && ! (*cb)(F,X) ) return false; } while(false)
         
         template <>
         bool Newton<real_t>:: solve(Function      &func,
@@ -376,7 +755,7 @@ namespace yocto
                         F[j] = FF[j];
                     }
                     Y_NEWTON_CB();
-
+                    
                     Y_NEWTON_OUT(std::cerr << "[newton] \tCJ@ G = " << G0 << " (opt=" << x.b << ")" << std::endl);
                     Y_NEWTON_OUT(std::cerr << "[newton] \t    h = " << h << std::endl);
                     if( may_return && has_converged(X, h, ftol) )
@@ -398,3 +777,4 @@ namespace yocto
         }
     }
 }
+#endif

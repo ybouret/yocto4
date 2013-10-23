@@ -139,7 +139,7 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     jacobian_of<double>      jwrapper(Fn);
     Newton<double>::Jacobian &Jn = jwrapper.call;
     vector<double>           X(2,0);
-    Newton<double>::Callback  Cb( &p, & Param2::callback );
+    Newton<double>::Callback Cb( &p, & Param2::callback );
 
     p.tau.x = 1;
     p.tau.y = 1;
@@ -152,6 +152,7 @@ YOCTO_UNIT_TEST_IMPL(newton2)
     Newton<double>::solve(Fn, Jn, X, 1e-7,&Cb);
     std::cerr << std::endl;
     std::cerr << "X=" << X << std::endl;
+    
     
     vector<double> Y(2,0);
     Y[1] = -4;
