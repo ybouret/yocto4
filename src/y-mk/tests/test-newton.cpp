@@ -38,6 +38,8 @@ namespace
     
 }
 
+#include "yocto/code/rand.hpp"
+
 YOCTO_UNIT_TEST_IMPL(newton)
 {
     Param p;
@@ -46,10 +48,13 @@ YOCTO_UNIT_TEST_IMPL(newton)
     Newton<double>::Jacobian &Jn = jwrapper.call;
     vector<double>           X(3,0);
     
-    X[1] = 0.1;
-    X[2] = 0.1;
-    X[3] = 0.1;
-    Newton<double>::solve(Fn, Jn, X, 1e-5);
+    X[1] = 0.1+0.1*alea<double>();
+    X[2] = 0.1+0.1*alea<double>();
+    X[3] = 0.1+0.1*alea<double>();
+    if(Newton<double>::solve(Fn, Jn, X, 1e-5))
+    {
+        std::cerr << "X=" << X << std::endl;
+    }
 }
 YOCTO_UNIT_TEST_DONE()
 
