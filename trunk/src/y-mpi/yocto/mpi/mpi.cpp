@@ -97,7 +97,8 @@ namespace yocto
 	ProcessorName(),
     ThreadLevel(0),
     CommWorldID(),
-    db(32,as_capacity)
+    db(32,as_capacity),
+	hasher()
 	{
 		if( NULL == mpi_argc_ || NULL == mpi_argv_ )
 		{
