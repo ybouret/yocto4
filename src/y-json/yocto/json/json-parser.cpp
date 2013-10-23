@@ -225,7 +225,8 @@ namespace yocto
             //==================================================================
             // walk the tree
             //==================================================================
-            void walk( Value &value, const syntax::xnode *node )
+            inline void walk(Value               &value,
+                             const syntax::xnode *node )
             {
                 assert(node!=NULL);
                 assert(value.type == IsNull);
@@ -298,7 +299,8 @@ namespace yocto
                 throw exception("JSON::walk(Invalid Node <%s>)", label.c_str() );
             }
             
-            void walk_array( Array &arr, const syntax::xnode::child_list &children )
+            inline void walk_array(Array                           &arr,
+                                   const syntax::xnode::child_list &children )
             {
                 for( const syntax::xnode *node = children.head; node; node=node->next )
                 {
@@ -307,7 +309,8 @@ namespace yocto
                 }
             }
             
-            void walk_object( Object &obj, const syntax::xnode::child_list &children )
+            inline void walk_object(Object                          &obj,
+                                    const syntax::xnode::child_list &children )
             {
                 for( const syntax::xnode *node = children.head; node; node=node->next )
                 {
