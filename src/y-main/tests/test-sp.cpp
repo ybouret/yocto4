@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/ptr/shared.hpp"
 #include "yocto/string.hpp"
+#include "yocto/ptr/arc.hpp"
 
 using namespace yocto;
 
