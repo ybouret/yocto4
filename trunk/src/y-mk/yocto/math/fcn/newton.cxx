@@ -50,8 +50,7 @@ namespace yocto
                 vector<real_t>            FF;   //!< trial function
                 vector<real_t>            W;    //!< for SVD
                 vector<real_t>            A;    //!< |W|
-                matrix<real_t>            J0;   //!< original Jacobian
-                matrix<real_t>            J;    //!< working copy of J0 for SVD
+                matrix<real_t>            J;    //!< Jacobian, used in SVD
                 matrix<real_t>            V;    //!< for SVD
                 numeric<real_t>::function H;
                 const real_t              ftol;  //!< fractional tolerance
@@ -88,12 +87,11 @@ namespace yocto
                 FF(n,0),
                 W(n,0),
                 A(n,0),
-                J0(n,n),
                 J(n,n),
                 V(n,n),
                 H( this, & newton::getH ),
                 ftol( Fabs(frc_tol) ),
-                alpha( REAL(1.0e-4) ),
+                alpha( REAL(1.0e-3) ),
                 cb(cb_addr)
                 {
                 }
@@ -106,8 +104,16 @@ namespace yocto
                 inline bool compute_icond_and_xi( real_t &icond )
                 {
                     //-- compute the Jacobian @X
-                    fjac(J0,X);
-                    J.assign(J0);
+                    fjac(J,X);
+                    
+                    //-- Gradient in xi
+                    for( size_t j=n;j>0;--j)
+                    {
+                        real_t sum = 0;
+                        for( size_t i=n;i>0;--i)
+                            sum += F[i] * J[i][j];
+                        xi[j] = sum;
+                    }
                     
                     //-- svd
                     if( !svd<real_t>::build(J, W, V) )
@@ -130,14 +136,7 @@ namespace yocto
                     
                     std::cerr << "[Newton] icond=" << icond << std::endl;
                     
-                    //-- Gradient in xi
-                    for( size_t j=n;j>0;--j)
-                    {
-                        real_t sum = 0;
-                        for( size_t i=n;i>0;--i)
-                            sum += F[i] * J0[i][j];
-                        xi[j] = sum;
-                    }
+                   
                     
                     return true;
                 }
@@ -215,13 +214,14 @@ namespace yocto
                             //--------------------------------------------------
                             // try it...will initialize XX and FF
                             //--------------------------------------------------
-                            const real_t rate = mkl::dot(xi, h);
-                            const real_t Hr   = H0+alpha*rate;
-                            const real_t H1   = H(1);
-                            std::cerr << "[Newton] rate=" << rate << std::endl;
-                            std::cerr << "[Newton] H1=" << H1  << " / Hr=" << Hr << std::endl;
+                            const real_t rho   = -mkl::dot(xi,h);
+                            const real_t slope = alpha*rho;
+                            const real_t Hr    = H0-slope;
+                            const real_t H1    = H(1);
+                            std::cerr << "[Newton] rho = " << rho << std::endl;
+                            std::cerr << "[Newton] H1  = " << H1  << " / Hr=" << Hr << std::endl;
                             
-                            if(H1<Hr)
+                            if(H1<=Hr)
                             {
                                 //----------------------------------------------
                                 // We descend fast enough
@@ -244,9 +244,9 @@ namespace yocto
                                 // Bad descent: find a backtracking point
                                 //----------------------------------------------
                                 std::cerr << "[Newton] Backtracking" << std::endl;
-                                real_t lam = alpha;
+                                real_t lam = REAL(0.5);
                                 real_t Hbk = H(lam);
-                                while(Hbk>=H0)
+                                while(Hbk>H0-lam*slope)
                                 {
                                     lam /= 2;
                                     if( lam <= numeric<real_t>::tiny )
@@ -258,16 +258,7 @@ namespace yocto
                                 }
                                 std::cerr << "H(" << lam << ")=" << Hbk << std::endl;
                                 
-                                //----------------------------------------------
-                                // expand and minimize
-                                //----------------------------------------------
-                                triplet<real_t> xx = {0, lam,lam};
-                                triplet<real_t> ff = {H0,Hbk,Hbk};
-                                bracket<real_t>::expand(H, xx, ff);
-                                minimize<real_t>(H, xx, ff, 0);
-                                
-                                lam = xx.b;
-                                H0  = H(lam);
+                                H0  = Hbk;
                                 std::cerr << "H(" << lam <<  ")=" << H0 << std::endl;
                                 for(size_t i=n;i>0;--i)
                                 {
