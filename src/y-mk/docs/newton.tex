@@ -71,10 +71,10 @@ Otherwise, we must backtrack to an acceptable solution, that can't be tested for
 the parabolic case).
 
 \section{Ill-conditioned Jacobian}
-We can switch to a conjugated gradient algorithm on $G$ since we have the knowledge of $\mygrad G$.
-Nonetheless, we have a second order approximation of $G$
+We can switch to a conjugated gradient algorithm on $G$ since we have the knowledge of $\mygrad f$.
+Nonetheless, we have a second order approximation of $f$
 \begin{equation}
-	G\left(\vec{X}_k+\vec{h}\right) \simeq G_k + \mytrn{\vec{F}_k} \mymat{J} \vec{h} +
+	f\left(\vec{X}+\vec{h}\right) \simeq f(\vec{X}) + \mytrn{\vec{F}} \mymat{J} \vec{h} +
 	\frac{1}{2} \mytrn{\vec{h}} \mytrn{\mymat{J}}\mymat{J} \vec{h}
 \end{equation}
 which is as best as we are close to a root.
