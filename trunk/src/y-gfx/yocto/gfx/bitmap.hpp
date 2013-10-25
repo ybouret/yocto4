@@ -64,6 +64,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
             bitmap           *shared;    //!< in case of shared bitmap
             
+        protected:
             //__________________________________________________________________
             //
             // constructors
