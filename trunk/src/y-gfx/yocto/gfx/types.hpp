@@ -2,6 +2,7 @@
 #define YOCTO_GFX_TYPES_INCLUDED 1
 
 #include "yocto/string.hpp"
+#include "yocto/math/v2d.hpp"
 #include <cmath>
 
 namespace yocto
