@@ -49,7 +49,8 @@ namespace yocto
             
             static bitmap * create(size_t Depth, size_t W, size_t H);
             static bitmap * link( const bitmap::pointer &bmp, const region *rect);
-                       
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
             bitmap           *shared;    //!< in case of shared bitmap
