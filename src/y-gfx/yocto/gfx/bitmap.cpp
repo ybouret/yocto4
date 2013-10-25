@@ -164,7 +164,49 @@ namespace yocto
             
         }
         
+        void * bitmap:: get_line(unit_t y) throw()
+        {
+            assert(y>=0);
+            assert(size_t(y)<h);
+            assert(entry);
+            return static_cast<uint8_t *>(entry)+(y*stride);
+        }
+     
+        const void * bitmap:: get_line(unit_t y) const throw()
+        {
+            assert(y>=0);
+            assert(size_t(y)<h);
+            assert(entry);
+            return static_cast<uint8_t *>(entry)+(y*stride);
+        }
         
+        void * bitmap:: hmove(void *addr,      unit_t x) throw()
+        {
+            assert(addr);
+            assert(peek);
+            return peek(addr,x);
+        }
+
+        const void *bitmap:: hmove(const void *addr, unit_t x) const throw()
+        {
+            assert(addr);
+            assert(peek);
+            return peek((void*)addr,x);
+        }
+        
+        void * bitmap:: get(unit_t x, unit_t y) throw()
+        {
+            assert(x>=0);
+            assert(x<w);
+            return hmove( get_line(y), x );
+        }
+        
+        const void * bitmap:: get(unit_t x, unit_t y) const throw()
+        {
+            assert(x>=0);
+            assert(x<w);
+            return hmove( get_line(y), x );
+        }
         
         
     }
