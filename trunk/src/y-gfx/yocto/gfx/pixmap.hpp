@@ -58,6 +58,13 @@ namespace yocto
                 create_rows();
             }
             
+            explicit pixmap( const bitmap::pointer &bmp, const region &rect ) :
+            bitmap( validate(bmp),rect),
+            nrow(0),
+            rows()
+            {
+                create_rows();
+            }
             
         private:
             size_t nrow;
@@ -76,6 +83,11 @@ namespace yocto
             inline void delete_rows() throw()
             {
                 memory::kind<memory::global>::release_as<row>(rows,nrow);
+            }
+            
+            inline const bitmap::pointer & validate( const bitmap::pointer &bmp )
+            {
+                return bmp;
             }
         };
     }
