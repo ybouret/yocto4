@@ -8,7 +8,8 @@ namespace yocto
     namespace gfx
     {
         
-              
+        void pixmap_check_same( size_t depth, size_t sz );
+        
         template <typename T>
         class pixmap : public bitmap
         {
@@ -87,6 +88,7 @@ namespace yocto
             
             inline const bitmap::pointer & validate( const bitmap::pointer &bmp )
             {
+                pixmap_check_same(bmp->depth, sizeof(T));
                 return bmp;
             }
         };
