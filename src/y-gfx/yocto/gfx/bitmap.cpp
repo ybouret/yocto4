@@ -3,6 +3,7 @@
 #include "yocto/memory/global.hpp"
 
 #include <cstring>
+#include <iostream>
 
 namespace yocto
 {
@@ -99,8 +100,9 @@ namespace yocto
         allocated(0),
         shared(0)
         {
-            if(rect.x<=0||rect.xlast>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
-            if(rect.y<=0||rect.ylast>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
+            //std::cerr << "rect@(" << rect.x << "," << rect.y << ")+[" << rect.w << "," << rect.h << "]" << std::endl;
+            if(rect.x<0||rect.xend>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
+            if(rect.y<0||rect.yend>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
             
             shared = (bitmap *)( bmp.__get() );
             shared->withhold();

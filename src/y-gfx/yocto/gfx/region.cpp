@@ -12,8 +12,8 @@ namespace yocto
         y(Y),
         w(W),
         h(H),
-        xlast(x+w),
-        ylast(y+h)
+        xend(x+w),
+        yend(y+h)
         {
         }
         
@@ -22,8 +22,8 @@ namespace yocto
         y(other.y),
         w(other.w),
         h(other.h),
-        xlast(other.xlast),
-        ylast(other.ylast)
+        xend(other.xend),
+        yend(other.yend)
         {
             
         }

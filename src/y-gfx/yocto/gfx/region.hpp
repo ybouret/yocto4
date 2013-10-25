@@ -10,9 +10,12 @@ namespace yocto
         class region
         {
         public:
-            const unit_t x,y;
-            const size_t w,h;
-            const unit_t xlast,ylast;
+            const unit_t x; //!< x-offset
+            const unit_t y; //!< y-offset
+            const size_t w; //!< width
+            const size_t h; //!< height
+            const unit_t xend; //!< first invalid x-offset
+            const unit_t yend; //!< first invalid y-offset
             
             region(unit_t X,unit_t Y,const size_t W,const size_t H) throw();
             ~region() throw();
