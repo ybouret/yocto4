@@ -23,7 +23,7 @@ namespace yocto
             
             typedef arc_ptr<bitmap> pointer;
             typedef void * (*peek_proc)(void *,unit_t);
-            
+                      
             //! default destructor
             virtual ~bitmap() throw();
             
@@ -38,6 +38,7 @@ namespace yocto
             const size_t      pitch;     //!< w * depth
             const size_t      stride;    //!< >= scanline
             void             *entry;     //!< address of (0,0)
+            
             const peek_proc   peek;      //!< for address translation
             const size_t      allocated; //!< if has memory
             
@@ -49,6 +50,14 @@ namespace yocto
             
             static bitmap * create(size_t Depth, size_t W, size_t H);
             static bitmap * link( const bitmap::pointer &bmp, const region *rect);
+            
+            void *       get_line(unit_t y) throw();
+            const void * get_line(unit_t y) const throw();
+            void *       hmove(void *,      unit_t x) throw();
+            const void  *hmove(const void *,unit_t x) const throw();
+            
+            void *      get(unit_t x, unit_t y) throw();
+            const void *get(unit_t x, unit_t y) const throw();
             
             
         private:
@@ -64,7 +73,7 @@ namespace yocto
             
             //! make a shared bitmap
             explicit bitmap(const bitmap::pointer &bmp, const region &rect );
-
+            
         };
         
     }
