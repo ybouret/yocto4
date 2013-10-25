@@ -151,8 +151,8 @@ namespace yocto
         allocated(0),
         shared(0)
         {
-            if(rect.x<0||rect.xend>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
-            if(rect.y<0||rect.yend>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
+            if(rect.x<0||size_t(rect.xend)>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
+            if(rect.y<0||size_t(rect.yend)>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
             
             shared = (bitmap *)( bmp.__get() );
             shared->withhold();
@@ -197,14 +197,14 @@ namespace yocto
         void * bitmap:: get(unit_t x, unit_t y) throw()
         {
             assert(x>=0);
-            assert(x<w);
+            assert(size_t(x)<w);
             return hmove( get_line(y), x );
         }
         
         const void * bitmap:: get(unit_t x, unit_t y) const throw()
         {
             assert(x>=0);
-            assert(x<w);
+            assert(size_t(x)<w);
             return hmove( get_line(y), x );
         }
         
