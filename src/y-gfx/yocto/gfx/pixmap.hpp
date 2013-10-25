@@ -8,27 +8,75 @@ namespace yocto
     namespace gfx
     {
         
-        class pixmap_base
-        {
-        public:
-            virtual ~pixmap_base() throw();
-            
-            static void check_same( size_t Depth, size_t SizeOf );
-            
-        protected:
-            explicit pixmap_base();
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(pixmap_base);
-        };
-        
+              
         template <typename T>
-        class pixmap
+        class pixmap : public bitmap
         {
         public:
+            YOCTO_ARGUMENTS_DECL_T;
+            
+            class row
+            {
+            public:
+                inline explicit row(void *P,size_t W) throw() :
+                w(W),
+                addr((mutable_type *)P)
+                {
+                    assert(w>0);
+                    assert(0!=addr);
+                }
+                
+                const size_t w;
+                
+                inline type & operator[](unit_t x) throw()
+                {
+                    assert(x>=0);
+                    assert(size_t(x)<w);
+                    return addr[x];
+                }
+                
+                inline const_type & operator[](unit_t x) const throw()
+                {
+                    assert(x>=0);
+                    assert(size_t(x)<w);
+                    return addr[x];
+                }
+                
+            private:
+                mutable_type *addr;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(row);
+                ~row() throw();
+            };
+            
+            virtual ~pixmap() throw() { delete_rows(); }
+            
+            explicit pixmap(size_t W, size_t H ) :
+            bitmap(sizeof(T),W,H),
+            nrow(0),
+            rows(0)
+            {
+                create_rows();
+            }
+            
             
         private:
+            size_t nrow;
+            row   *rows;
             YOCTO_DISABLE_COPY_AND_ASSIGN(pixmap);
+            
+            inline void create_rows()
+            {
+                nrow = h;
+                rows = memory::kind<memory::global>::acquire_as<row>(nrow);
+                uint8_t *p = static_cast<uint8_t*>(entry);
+                for(size_t i=0;i<h;++i,p+=this->stride)
+                    new (&rows[i]) row(p,w);
+            }
+            
+            inline void delete_rows() throw()
+            {
+                memory::kind<memory::global>::release_as<row>(rows,nrow);
+            }
         };
     }
 }

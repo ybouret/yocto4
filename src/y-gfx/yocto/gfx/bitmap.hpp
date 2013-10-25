@@ -11,7 +11,7 @@ namespace yocto
     namespace gfx
     {
         
-        class bitmap : public object, public counted
+        class bitmap : public virtual object, public counted
         {
         public:
             enum memory_type
