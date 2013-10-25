@@ -8,6 +8,24 @@ namespace yocto
 {
     namespace gfx
     {
+        
+        bitmap * bitmap:: create(size_t Depth, size_t W, size_t H)
+        {
+            return new bitmap(Depth,W,H);
+        }
+        
+        bitmap * bitmap::link( const bitmap::pointer &bmp, const region *rect)
+        {
+            if(rect)
+                return new bitmap(bmp,*rect);
+            else
+            {
+                const region full(0,0,bmp->w,bmp->h);
+                return new bitmap(bmp,full);
+            }
+        }
+        
+        
         bitmap:: ~bitmap() throw()
         {
             assert(entry);
@@ -70,31 +88,31 @@ namespace yocto
             }
         }
         
-        bitmap:: bitmap( const bitmap::pointer &bmp, unit_t x, unit_t y, size_t w, size_t h ) :
+        bitmap:: bitmap( const bitmap::pointer &bmp, const region &rect ) :
         type( is_shared ),
         depth(bmp->depth),
-        w( __check_bitmap(w, "Shared Width") ),
-        h( __check_bitmap(h, "Shared Height")),
+        w( __check_bitmap(rect.w, "Shared Width") ),
+        h( __check_bitmap(rect.h, "Shared Height")),
         pitch( w * depth ),
         stride( bmp->stride ),
         entry(0),
         allocated(0),
         shared(0)
         {
-            if(x<=0||x+w>=bmp->w) throw exception("Invalid Shared Bitmap x-offset");
-            if(y<=0||y+h>=bmp->h) throw exception("Invalid Shared Bitmap y-offset");
+            if(rect.x<=0||rect.xlast>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
+            if(rect.y<=0||rect.ylast>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
             
             shared = (bitmap *)( bmp.__get() );
             shared->withhold();
             
             uint8_t *p = static_cast<uint8_t*>(shared->entry);
-            p += y * stride;
-            p += x * depth;
+            p += rect.y * stride;
+            p += rect.x * depth;
             entry = p;
             
         }
         
-
+        
         
         
     }

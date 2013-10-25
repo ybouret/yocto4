@@ -1,7 +1,7 @@
 #ifndef YOCTO_GFX_BITMAP_INCLUDED
 #define YOCTO_GFX_BITMAP_INCLUDED 1
 
-#include "yocto/gfx/types.hpp"
+#include "yocto/gfx/region.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/ptr/arc.hpp"
 
@@ -45,6 +45,13 @@ namespace yocto
             //__________________________________________________________________
             void ldz() throw(); //!< zero all bits
             
+            static bitmap * create(size_t Depth, size_t W, size_t H);
+            static bitmap * link( const bitmap::pointer &bmp, const region *rect);
+                       
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
+            bitmap           *shared;    //!< in case of shared bitmap
+            
             //__________________________________________________________________
             //
             // constructors
@@ -53,12 +60,8 @@ namespace yocto
             explicit bitmap(size_t Depth, size_t W, size_t H);
             
             //! make a shared bitmap
-            explicit bitmap(const bitmap::pointer &bmp, unit_t x, unit_t y, size_t w, size_t h);
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
-            bitmap           *shared;    //!< in case of shared bitmap
-            
+            explicit bitmap(const bitmap::pointer &bmp, const region &rect );
+
         };
         
     }
