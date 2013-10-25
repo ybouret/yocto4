@@ -65,6 +65,55 @@ namespace yocto
             return Value;
         }
         
+        static inline
+        void * __move1(void *addr, unit_t n) throw()
+        {
+            return static_cast<uint8_t *>(addr)+n;
+        }
+        static inline
+        void * __move2(void *addr, unit_t n) throw()
+        {
+            return static_cast<uint16_t *>(addr)+n;
+        }
+        static inline
+        void * __move3(void *addr, unit_t n) throw()
+        {
+            return static_cast<uint8_t *>(addr)+(3*n);
+        }
+        static inline
+        void * __move4(void *addr, unit_t n) throw()
+        {
+            return static_cast<uint32_t *>(addr)+n;
+        }
+        
+        static inline
+        void * __move8(void *addr, unit_t n) throw()
+        {
+            return static_cast<uint64_t *>(addr)+n;
+        }
+        
+        static inline
+        void * __move16(void *addr, unit_t n) throw()
+        {
+            return static_cast<uint64_t *>(addr)+(n+n);
+        }
+        
+        
+        
+        static bitmap::peek_proc __assign_peek(size_t depth)
+        {
+            switch(depth)
+            {
+                case  1: return __move1;
+                case  2: return __move2;
+                case  3: return __move3;
+                case  4: return __move4;
+                case  8: return __move8;
+                case 16: return __move16;
+            }
+            throw exception("Unsupported depth=%u", unsigned(depth) );
+        }
+        
         bitmap:: bitmap( size_t Depth, size_t W, size_t H ) :
         type( in_memory ),
         depth( __check_bitmap(Depth,"Depth" ) ),
@@ -73,6 +122,7 @@ namespace yocto
         pitch( w*depth ),
         stride( pitch ),
         entry(0),
+        peek( __assign_peek(depth) ),
         allocated( stride * h ),
         shared(0)
         {
@@ -97,10 +147,10 @@ namespace yocto
         pitch( w * depth ),
         stride( bmp->stride ),
         entry(0),
+        peek(bmp->peek),
         allocated(0),
         shared(0)
         {
-            //std::cerr << "rect@(" << rect.x << "," << rect.y << ")+[" << rect.w << "," << rect.h << "]" << std::endl;
             if(rect.x<0||rect.xend>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
             if(rect.y<0||rect.yend>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
             
