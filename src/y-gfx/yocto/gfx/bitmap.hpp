@@ -22,6 +22,7 @@ namespace yocto
             };
             
             typedef arc_ptr<bitmap> pointer;
+            typedef void * (*peek_proc)(void *,unit_t);
             
             //! default destructor
             virtual ~bitmap() throw();
@@ -37,6 +38,7 @@ namespace yocto
             const size_t      pitch;     //!< w * depth
             const size_t      stride;    //!< >= scanline
             void             *entry;     //!< address of (0,0)
+            const peek_proc   peek;      //!< for address translation
             const size_t      allocated; //!< if has memory
             
             //__________________________________________________________________
