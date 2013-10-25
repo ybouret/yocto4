@@ -142,8 +142,8 @@ namespace yocto
         bitmap:: bitmap( const bitmap::pointer &bmp, const region &rect ) :
         type( is_shared ),
         depth(bmp->depth),
-        w( __check_bitmap(rect.w, "Shared Width") ),
-        h( __check_bitmap(rect.h, "Shared Height")),
+        w( __check_bitmap(rect.w, "Shared Width")  ),
+        h( __check_bitmap(rect.h, "Shared Height") ),
         pitch( w * depth ),
         stride( bmp->stride ),
         entry(0),
