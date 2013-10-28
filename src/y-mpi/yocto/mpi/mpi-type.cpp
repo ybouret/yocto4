@@ -32,7 +32,7 @@ namespace yocto
             {
                 const size_t     mid  = (jlo+jhi)>>1;
                 const data_type &item = db[mid];
-                const int      cmp  = spec.compare_to(item);
+                const int        cmp  = spec.compare_to(item);
                 if(cmp == 0 )
                 {
                     return item.id;
