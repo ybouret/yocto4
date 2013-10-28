@@ -13,13 +13,13 @@ YOCTO_UNIT_TEST_IMPL(ios)
             *fp << "Header\n";
         }
         fp.write( 'A' + MPI.CommWorldRank);
-        //if(MPI.IsFirst) *fp << "\n";
-        //const string str = vformat("On Node %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
-        ////size_t done = 0;
-        //fp.put(str.ro(), str.size(), done);
-        //fp("Hello from %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
-        
         if(MPI.IsFirst) *fp << "\n";
+        const string str = vformat("On Node %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
+        size_t done = 0;
+        fp.put(str.ro(), str.size(), done);
+        fp("Hello from %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
+        
+        if(MPI.IsFirst) *fp << "Epilog\n";
         //MPI.Barrier(MPI_COMM_WORLD);
         //MPI.Printf(stderr,"Done\n");
     }

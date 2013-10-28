@@ -357,6 +357,7 @@ namespace yocto
             
             virtual void write(char C); // shouldn't be use directly...
             virtual void flush();
+            virtual void put( const void *buff, size_t size, size_t &done);
             
             ios::ostream & operator*(); //!< for rank==0, to write headers etc...
             
