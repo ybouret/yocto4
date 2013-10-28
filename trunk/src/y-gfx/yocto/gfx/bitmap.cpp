@@ -10,7 +10,7 @@ namespace yocto
     namespace gfx
     {
         
-        bitmap * bitmap:: create(size_t Depth, size_t W, size_t H)
+        bitmap * bitmap:: create(size_t Depth, unit_t W, unit_t H)
         {
             return new bitmap(Depth,W,H);
         }
@@ -58,7 +58,7 @@ namespace yocto
         
         
         static inline
-        size_t __check_bitmap( size_t Value, const char *Name )
+        unit_t __check_bitmap( unit_t Value, const char *Name )
         {
             if(Value<=0)
                 throw exception("Negative Bitmap %s",Name);
@@ -114,7 +114,7 @@ namespace yocto
             throw exception("Unsupported depth=%u", unsigned(depth) );
         }
         
-        bitmap:: bitmap( size_t Depth, size_t W, size_t H ) :
+        bitmap:: bitmap( size_t Depth, unit_t W, unit_t H ) :
         type( in_memory ),
         depth( __check_bitmap(Depth,"Depth" ) ),
         w(     __check_bitmap(W,    "Width" ) ),
@@ -151,8 +151,8 @@ namespace yocto
         allocated(0),
         shared(0)
         {
-            if(rect.x<0||size_t(rect.xend)>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
-            if(rect.y<0||size_t(rect.yend)>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
+            if(rect.x<0||rect.xend>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
+            if(rect.y<0||rect.yend>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
             
             shared = (bitmap *)( bmp.__get() );
             shared->withhold();
