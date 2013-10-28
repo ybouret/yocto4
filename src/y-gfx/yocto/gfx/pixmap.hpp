@@ -77,7 +77,7 @@ namespace yocto
                 nrow = h;
                 rows = memory::kind<memory::global>::acquire_as<row>(nrow);
                 uint8_t *p = static_cast<uint8_t*>(entry);
-                for(size_t i=0;i<h;++i,p+=this->stride)
+                for(unit_t i=0;i<h;++i,p+=this->stride)
                     new (&rows[i]) row(p,w);
             }
             
