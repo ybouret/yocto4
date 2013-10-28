@@ -37,7 +37,9 @@ namespace yocto
     
     void mpi::ostream:: write(char C)
     {
-        char iobuff[sizeof(io_key_t)+1];
+        static const char iosize = sizeof(io_key_t)+1;
+        char iobuff[sizeof(io_key_t)*2];
+        
         if(fp)
         {
             assert(MPI.IsFirst);
@@ -46,7 +48,7 @@ namespace yocto
             MPI_Status status;
             for(int r=1;r<MPI.CommWorldSize;++r)
             {
-                MPI.Recv(iobuff, sizeof(iobuff), MPI_BYTE, r, tag, MPI_COMM_WORLD, status);
+                MPI.Recv(iobuff,iosize, MPI_BYTE, r, tag, MPI_COMM_WORLD, status);
                 const io_key_t k = swap_be_as<io_key_t>( *(io_key_t *)iobuff );
                 if(k!=key)
                     throw yocto::exception("MPI I/O: invalid key during write char");
@@ -58,7 +60,7 @@ namespace yocto
             assert(!MPI.IsFirst);
             *(io_key_t *)iobuff = swap_be_as<io_key_t>(key);
             iobuff[sizeof(io_key_t)]=C;
-            MPI.Send(iobuff, sizeof(iobuff), MPI_BYTE, 0, tag, MPI_COMM_WORLD);
+            MPI.Send(iobuff, iosize, MPI_BYTE, 0, tag, MPI_COMM_WORLD);
         }
     }
     
