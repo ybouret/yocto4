@@ -10,7 +10,10 @@ namespace yocto
     
     namespace gfx
     {
-        
+        //! generic bitmap
+        /**
+         Supported depths are 1,2,3,4,8,16
+         */
         class bitmap : public virtual object, public counted
         {
         public:
