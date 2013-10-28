@@ -27,19 +27,19 @@ namespace yocto
                     assert(0!=addr);
                 }
                 
-                const size_t w;
+                const unit_t w;
                 
                 inline type & operator[](unit_t x) throw()
                 {
                     assert(x>=0);
-                    assert(size_t(x)<w);
+                    assert(x<w);
                     return addr[x];
                 }
                 
                 inline const_type & operator[](unit_t x) const throw()
                 {
                     assert(x>=0);
-                    assert(size_t(x)<w);
+                    assert(x<w);
                     return addr[x];
                 }
                 
