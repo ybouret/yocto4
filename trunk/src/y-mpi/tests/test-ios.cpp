@@ -5,6 +5,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(ios)
 {
+#if 0
     YOCTO_MPI;
     {
         mpi::ostream fp( MPI, "foo.dat", false );
@@ -22,5 +23,7 @@ YOCTO_UNIT_TEST_IMPL(ios)
         MPI.Barrier(MPI_COMM_WORLD);
         MPI.Printf(stderr,"Done\n");
     }
+#endif
+    
 }
 YOCTO_UNIT_TEST_DONE()

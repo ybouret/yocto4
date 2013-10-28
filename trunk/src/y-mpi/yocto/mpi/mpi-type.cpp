@@ -89,7 +89,7 @@ namespace yocto
 #define Y_MPI_DB ((db_type&)db)
 #define Y_MPI_REGISTER(T,ID) do {     \
 const data_type item( typeid(T), ID); \
-Y_MPI_DB_INFO(T); \
+Y_MPI_DB_INFO(T);                     \
 __append_data_type(Y_MPI_DB,item);    \
 } while(false)
         
@@ -99,22 +99,6 @@ __append_data_type(Y_MPI_DB,item);    \
         Y_MPI_REGISTER(float,         MPI_FLOAT);
         Y_MPI_REGISTER(double,        MPI_DOUBLE);
         
-        //----------------------------------------------------------------------
-        // integers
-        //----------------------------------------------------------------------
-#if 0
-        Y_MPI_REGISTER(uint8_t, MPI_UINT8_T);
-        Y_MPI_REGISTER(int8_t,  MPI_INT8_T);
-        
-        Y_MPI_REGISTER(uint16_t, MPI_UINT16_T);
-        Y_MPI_REGISTER(int16_t,  MPI_INT16_T);
-        
-        Y_MPI_REGISTER(uint32_t, MPI_UINT32_T);
-        Y_MPI_REGISTER(int32_t,  MPI_INT32_T);
-        
-        Y_MPI_REGISTER(uint64_t, MPI_UINT64_T);
-        Y_MPI_REGISTER(int64_t,  MPI_INT64_T);
-#endif
         
         //----------------------------------------------------------------------
         // standard integers, likely to be aliases

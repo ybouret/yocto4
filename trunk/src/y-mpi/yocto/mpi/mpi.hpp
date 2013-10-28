@@ -339,31 +339,21 @@ namespace yocto
             return Allreduce1<T>(input, MPI_MAX, comm);
         }
         
+        
+        //======================================================================
+        //
+        // I/O
+        //
+        //======================================================================
         class ostream : public ios::ostream
         {
         public:
-            explicit ostream(const mpi  &,
-                             const string  &filename,
-                             bool           append );
-            explicit ostream(const mpi  &,
-                             const char *filename,
-                             bool        append);
-            
+            explicit ostream( const mpi &, const string &filename, bool append );
             virtual ~ostream() throw();
             
-            virtual void write( char C ); //!< dangerous: interleaved result !
-			virtual void flush();         //!< flush...
-            
-            //! always return when done==size, so that only 1 call to append
-			virtual void put(const void *data, size_t size, size_t &done);
-            
-            ios::ostream & operator*(); //!< if rank==0, otherwise throw !
-            
         private:
-            void *impl;
             YOCTO_DISABLE_COPY_AND_ASSIGN(ostream);
         };
-        
         
 	private:
 		friend class singleton<mpi>;                           //!< access mpi
