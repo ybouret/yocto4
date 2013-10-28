@@ -12,12 +12,12 @@ namespace yocto
         public:
             const unit_t x; //!< x-offset
             const unit_t y; //!< y-offset
-            const size_t w; //!< width
-            const size_t h; //!< height
+            const unit_t w; //!< width
+            const unit_t h; //!< height
             const unit_t xend; //!< first invalid x-offset
             const unit_t yend; //!< first invalid y-offset
             
-            region(unit_t X,unit_t Y,const size_t W,const size_t H) throw();
+            region(unit_t X,unit_t Y,const unit_t W,const unit_t H) throw();
             ~region() throw();
             region(const region &other) throw();
             

@@ -33,10 +33,10 @@ namespace yocto
             //__________________________________________________________________
             const memory_type type;      //!< memory
             const size_t      depth;     //!< bytes per pixel
-            const size_t      w;         //!< width
-            const size_t      h;         //!< height
-            const size_t      pitch;     //!< w * depth
-            const size_t      stride;    //!< >= scanline
+            const unit_t      w;         //!< width
+            const unit_t      h;         //!< height
+            const unit_t      pitch;     //!< w * depth
+            const unit_t      stride;    //!< >= scanline
             void             *entry;     //!< address of (0,0)
             
             const peek_proc   peek;      //!< for address translation
@@ -48,7 +48,7 @@ namespace yocto
             //__________________________________________________________________
             void ldz() throw(); //!< zero all bits
             
-            static bitmap * create(size_t Depth, size_t W, size_t H);
+            static bitmap * create(size_t Depth, unit_t W, unit_t H);
             static bitmap * link( const bitmap::pointer &bmp, const region *rect);
             
             void *       get_line(unit_t y) throw();
@@ -58,6 +58,7 @@ namespace yocto
             
             void *      get(unit_t x, unit_t y) throw();
             const void *get(unit_t x, unit_t y) const throw();
+            
             
             
         private:
@@ -70,7 +71,7 @@ namespace yocto
             // constructors
             //__________________________________________________________________
             //! make an in_memory bitmap
-            explicit bitmap(size_t Depth, size_t W, size_t H);
+            explicit bitmap(size_t Depth, unit_t W, unit_t H);
             
             //! make a shared bitmap
             explicit bitmap(const bitmap::pointer &bmp, const region &rect );

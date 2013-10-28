@@ -7,11 +7,11 @@ namespace yocto
         
         region:: ~region() throw() {}
         
-        region:: region( unit_t X, unit_t Y, size_t W, size_t H ) throw():
+        region:: region( unit_t X, unit_t Y, unit_t W, unit_t H ) throw():
         x(X),
         y(Y),
-        w(W),
-        h(H),
+        w(W<0?-W:W),
+        h(H<0?-H:H),
         xend(x+w),
         yend(y+h)
         {
