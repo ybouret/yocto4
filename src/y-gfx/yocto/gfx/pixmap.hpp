@@ -19,9 +19,8 @@ namespace yocto
             class row
             {
             public:
-                inline explicit row(void *P,size_t W) throw() :
-                w(W),
-                addr((mutable_type *)P)
+                inline row(void *P, unit_t W) throw():
+                w(W), addr((mutable_type *)P)
                 {
                     assert(w>0);
                     assert(0!=addr);
@@ -51,7 +50,7 @@ namespace yocto
             
             virtual ~pixmap() throw() { delete_rows(); }
             
-            explicit pixmap(size_t W, size_t H ) :
+            explicit pixmap(unit_t W, unit_t H ) :
             bitmap(sizeof(T),W,H),
             nrow(0),
             rows(0)
