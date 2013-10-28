@@ -345,14 +345,24 @@ namespace yocto
         // I/O
         //
         //======================================================================
+        typedef uint32_t io_key_t;
         class ostream : public ios::ostream
         {
         public:
+            static const int tag = 6;
             explicit ostream( const mpi &, const string &filename, bool append );
             virtual ~ostream() throw();
+            const mpi     &MPI;
+            const io_key_t key;
+            
+            virtual void write(char C); // shouldn't be use directly...
+            virtual void flush();
+            
+            ios::ostream & operator*(); //!< for rank==0, to write headers etc...
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ostream);
+            ios::ostream *fp;
         };
         
 	private:
