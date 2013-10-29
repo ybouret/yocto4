@@ -5,9 +5,10 @@ TARGET_LINK_YOCTO(test-gfx gfx)
 
 ENABLE_TESTING()
 
-ADD_TEST(Bitmap test-gfx bitmap)
-ADD_TEST(Pixmap test-gfx pixmap)
-ADD_TEST(RGB    test-gfx rgb)
-
+ADD_TEST(Bitmap  test-gfx bitmap)
+ADD_TEST(Pixmap  test-gfx pixmap)
+ADD_TEST(RGB     test-gfx rgb)
+ADD_TEST(Format  test-gfx format)
+ADD_TEST(Metrics test-gfx metrics)
 
 
