@@ -62,7 +62,7 @@ namespace yocto
         
         typedef rgb<uint8_t>  rgb_t;
         typedef rgb<uint32_t> rgb_mask_t;
-        
+        unsigned rgb_distance_sq( const rgb_t &lhs, const rgb_t &rhs ) throw();
     }
 }
 
