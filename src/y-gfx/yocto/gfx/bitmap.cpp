@@ -15,7 +15,7 @@ namespace yocto
             return new bitmap(Depth,W,H);
         }
         
-        bitmap * bitmap::link( const bitmap::pointer &bmp, const region *rect)
+        bitmap * bitmap::create_shared( const bitmap::pointer &bmp, const region *rect)
         {
             if(rect)
                 return new bitmap(bmp,*rect);
@@ -26,6 +26,25 @@ namespace yocto
             }
         }
         
+        
+        bitmap * bitmap:: duplicate( const bitmap::pointer &bmp, const region *rect)
+        {
+            const region full(0,0,bmp->w,bmp->h);
+            const region *area = rect ?  rect : &full;
+            bitmap *dst = new bitmap(bmp->depth,area->w,area->h);
+            
+            uint8_t       *tgt = (uint8_t *)(dst->entry);
+            const uint8_t *src = (uint8_t *)(bmp->get(area->x, area->y));
+            const size_t   len = dst->pitch;
+            for(unit_t j=area->h;j>0;--j)
+            {
+                memcpy(tgt,src,len);
+                tgt += dst->stride;
+                src += bmp->stride;
+            }
+            return dst;
+        }
+
         
         bitmap:: ~bitmap() throw()
         {

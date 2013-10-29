@@ -52,7 +52,8 @@ namespace yocto
             void ldz() throw(); //!< zero all bits
             
             static bitmap * create(size_t Depth, unit_t W, unit_t H);
-            static bitmap * link( const bitmap::pointer &bmp, const region *rect);
+            static bitmap * create_shared( const bitmap::pointer &bmp, const region *rect);
+            static bitmap * duplicate( const bitmap::pointer &bmp, const region *rect);
             
             void *       get_line(unit_t y) throw();
             const void * get_line(unit_t y) const throw();
@@ -67,6 +68,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
             bitmap           *shared;    //!< in case of shared bitmap
+            
             
         protected:
             //__________________________________________________________________
