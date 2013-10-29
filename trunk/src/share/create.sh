@@ -129,7 +129,7 @@ cmake -E cmake_echo_color --blue "-- BUILD_SYSTEM = <$BUILD_SYSTEM>"
 cmake -E cmake_echo_color --blue "-- BUILD_TARGET = <$BUILD_TARGET>"
 
 BUILD_ROOT=./forge/$BUILD_TARGET/$BUILD_SUBDIR
-cmake -E cmake_echo_color "-- creating $BUILD_ROOT";
+cmake -E cmake_echo_color --red --bold "-- creating $BUILD_ROOT";
 cmake -E make_directory $BUILD_ROOT || xerror "Cant' create $BUILD_ROOT";
 case $BUILD_TOOLS in
   "xcode" | "vs9"  | "vs10") 
@@ -145,7 +145,7 @@ esac
 ########################################################################
 ## register the BUILD_TARGET
 ########################################################################
-cmake -E cmake_echo_color --green --bold "-- registering $BUILD_TARGET"
+cmake -E cmake_echo_color --red --bold "-- registering $BUILD_TARGET"
 cmake -E touch ./forge/targets || xerror "-- can't create targets file"
 (grep $BUILD_TARGET ./forge/targets > /dev/null ) || (echo $BUILD_TARGET >> ./forge/targets)
 
