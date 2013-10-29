@@ -15,6 +15,7 @@ namespace yocto
         {
         public:
             YOCTO_ARGUMENTS_DECL_T;
+            typedef arc_ptr<pixmap> pointer;
             
             class row
             {
@@ -50,7 +51,25 @@ namespace yocto
             
             virtual ~pixmap() throw() { delete_rows(); }
             
-            explicit pixmap(unit_t W, unit_t H ) :
+            
+            static inline pixmap *create(unit_t W, unit_t H)
+            {
+                return new pixmap(W,H);
+            }
+            
+            static inline pixmap *attach( bitmap::pointer &bmp, const region *rect )
+            {
+                if(rect)
+                    return new pixmap(bmp,*rect);
+                else
+                {
+                    const region full(0,0,bmp->w,bmp->h);
+                    return new pixmap(bmp,full);
+                }
+            }
+                       
+        protected:
+            inline pixmap(unit_t W, unit_t H ) :
             bitmap(sizeof(T),W,H),
             nrow(0),
             rows(0)
@@ -58,13 +77,14 @@ namespace yocto
                 create_rows();
             }
             
-            explicit pixmap( bitmap::pointer &bmp, const region &rect ) :
+            inline pixmap( bitmap::pointer &bmp, const region &rect ) :
             bitmap( validate(bmp),rect),
             nrow(0),
             rows()
             {
                 create_rows();
             }
+
             
         private:
             size_t nrow;

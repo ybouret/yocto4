@@ -57,7 +57,6 @@ ENDIF()
 ########################################################################
 GET_FILENAME_COMPONENT(CC_NAME ${CMAKE_C_COMPILER} NAME )
 
-
 ########################################################################
 ## GNU
 ########################################################################
@@ -199,7 +198,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	ENDIF()
   
   IF( YOCTO_CLANG )
-		TARGET_LINK_LIBRARIES( ${tgt} stdc++ )
+		TARGET_LINK_LIBRARIES( ${tgt} stdc++ -flto )
   ENDIF()
   
 ENDMACRO()
