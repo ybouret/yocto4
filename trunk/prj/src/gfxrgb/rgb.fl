@@ -1,0 +1,22 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+header_name {.h} 
+code_name {.cxx}
+decl {void OnClick();} {public global
+} 
+
+Function {MakeWindow()} {open
+} {
+  Fl_Window {} {
+    label {GFX Named RGB Colors} open
+    xywh {164 141 300 200} type Double resizable visible
+  } {
+    Fl_Browser browser {
+      callback {OnClick();}
+      xywh {10 68 280 122} type Hold textfont 4 resizable
+    }
+    Fl_Box box {selected
+      xywh {10 10 280 48} box FLAT_BOX color 1
+    }
+  }
+} 

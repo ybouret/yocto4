@@ -2,7 +2,6 @@
 #define YOCTO_GFX_RGB_INCLUDED 1
 
 #include "yocto/gfx/types.hpp"
-#include "yocto/container/sequence.hpp"
 
 namespace yocto
 {
@@ -23,7 +22,7 @@ namespace yocto
         {
             enum { value = 1 };
         };
-
+        
         //! generic rbg(a)
         template <typename T>
         class rgb
@@ -47,6 +46,7 @@ namespace yocto
             a(other.a)
             {
             }
+            
             inline rgb & operator=( const rgb &other ) throw()
             {
                 r = other.r;
@@ -63,9 +63,6 @@ namespace yocto
         typedef rgb<uint8_t>  rgb_t;
         typedef rgb<uint32_t> rgb_mask_t;
         
-        rgb_t get_named_rgb(const string &id);
-        rgb_t get_named_rgb(const char   *id);
-        void  get_named_rgb(sequence<string> &names);
     }
 }
 

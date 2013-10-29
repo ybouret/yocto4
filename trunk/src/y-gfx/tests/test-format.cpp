@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/gfx/format.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/gfx/named-rgb.hpp"
 
 using namespace yocto;
 
