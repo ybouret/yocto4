@@ -15,7 +15,7 @@ namespace yocto
             return new bitmap(Depth,W,H);
         }
         
-        bitmap * bitmap::create_shared( const bitmap::pointer &bmp, const region *rect)
+        bitmap * bitmap::attach( bitmap::pointer &bmp, const region *rect)
         {
             if(rect)
                 return new bitmap(bmp,*rect);
@@ -27,7 +27,7 @@ namespace yocto
         }
         
         
-        bitmap * bitmap:: duplicate( const bitmap::pointer &bmp, const region *rect)
+        bitmap * bitmap:: carbon( bitmap::pointer &bmp, const region *rect)
         {
             const region full(0,0,bmp->w,bmp->h);
             const region *area = rect ?  rect : &full;
@@ -158,7 +158,7 @@ namespace yocto
             }
         }
         
-        bitmap:: bitmap( const bitmap::pointer &bmp, const region &rect ) :
+        bitmap:: bitmap( bitmap::pointer &bmp, const region &rect ) :
         type( is_shared ),
         depth(bmp->depth),
         w( __check_bitmap(rect.w, "Shared Width")  ),

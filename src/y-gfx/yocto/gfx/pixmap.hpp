@@ -58,7 +58,7 @@ namespace yocto
                 create_rows();
             }
             
-            explicit pixmap( const bitmap::pointer &bmp, const region &rect ) :
+            explicit pixmap( bitmap::pointer &bmp, const region &rect ) :
             bitmap( validate(bmp),rect),
             nrow(0),
             rows()
@@ -85,7 +85,7 @@ namespace yocto
                 memory::kind<memory::global>::release_as<row>(rows,nrow);
             }
             
-            inline const bitmap::pointer & validate( const bitmap::pointer &bmp )
+            inline bitmap::pointer & validate( bitmap::pointer &bmp )
             {
                 pixmap_check_same(bmp->depth, sizeof(T));
                 return bmp;
