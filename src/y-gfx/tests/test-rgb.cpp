@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/gfx/rgb.hpp"
+#include "yocto/gfx/named-rgb.hpp"
 #include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
