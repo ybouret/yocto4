@@ -7,7 +7,7 @@ namespace yocto
 {
     namespace gfx
     {
-        //! common color_format/pixel_buffer info
+        //! used to compact/expand pixels
         class metrics
         {
         public:
