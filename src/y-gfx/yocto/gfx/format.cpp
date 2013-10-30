@@ -65,7 +65,7 @@ namespace yocto
             }
             
             //-- chek bits/bytes
-            if( bpp > 8 * depth)
+            if( bpp > 8 * bytes)
                 throw exception("gfx::format(too many bits per pixel)");
             
             //-- compute opaque
