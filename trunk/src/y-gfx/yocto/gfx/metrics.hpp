@@ -8,14 +8,14 @@ namespace yocto
     namespace gfx
     {
         //! used to compact/expand pixels
-        class metrics
+        class metrics : public virtual object
         {
         public:
-            explicit metrics( size_t Depth );
+            explicit metrics( size_t Bytes );
             virtual ~metrics() throw();
             metrics( const metrics &) throw();
             
-            const size_t  depth;
+            const size_t  bytes;
             
             pixel_t     (*get_pixel)(const void *);
             void        (*put_pixel)(void *,pixel_t);

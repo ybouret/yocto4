@@ -10,7 +10,7 @@ namespace yocto
         
         
         metrics:: metrics( const metrics &other ) throw() :
-        depth(     other.depth     ),
+        bytes(     other.bytes     ),
         get_pixel( other.get_pixel ),
         put_pixel( other.put_pixel )
         {
@@ -81,13 +81,13 @@ namespace yocto
         }
         
         
-        metrics:: metrics(size_t Depth) :
-        depth( Depth ),
+        metrics:: metrics(size_t Bytes) :
+        bytes( Bytes ),
         get_pixel(0),
         put_pixel(0)
         {
             
-            switch(depth)
+            switch(bytes)
             {
                 case 1:
                     get_pixel = __get1;
@@ -110,7 +110,7 @@ namespace yocto
                     break;
                     
                 default:
-                    throw exception("gfx::metrics(invalid depth=%u)",unsigned(depth));
+                    throw exception("gfx::metrics(invalid bytes=%u)",unsigned(bytes));
             }
         }
         

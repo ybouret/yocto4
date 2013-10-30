@@ -26,7 +26,7 @@ std::cerr << std::endl; \
 
 static inline void display( const gfx::format &fmt )
 {
-    std::cerr << "depth=" << fmt.depth << std::endl;
+    std::cerr << "bytes=" << fmt.bytes << std::endl;
     _SHOW(r);
     _SHOW(g);
     _SHOW(b);
