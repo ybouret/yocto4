@@ -5,12 +5,33 @@ namespace yocto
     namespace gfx
     {
         
-        surface:: row:: row( void *addr, unit_t W) throw() :
+        surface:: row:: row( void *data, unit_t W, peek_proc proc) throw() :
         w(W),
-        p(addr)
+        addr(data),
+        peek(proc)
         {
             
         }
+        
+        void * surface::row:: operator[](unit_t x) throw()
+        {
+            assert(x>=0);
+            assert(x<w);
+            assert(addr);
+            assert(peek);
+            return peek(addr,x);
+        }
+        
+        const void * surface::row:: operator[](unit_t x) const throw()
+        {
+            assert(x>=0);
+            assert(x<w);
+            assert(addr);
+            assert(peek);
+            return peek(addr,x);
+        }
+
+
         
         
         surface * surface:: create(const format fmt, unit_t W, unit_t H)
@@ -44,9 +65,25 @@ namespace yocto
             rows = memory::kind<memory::global>::acquire_as<row>(nrow);
             uint8_t *p = static_cast<uint8_t *>(entry);
             for(unit_t i=0;i<h;++i,p+=stride)
-                new (rows+i) row(p,w);
+                new (rows+i) row(p,w,peek);
         }
         
+        
+        surface::row & surface::operator[]( unit_t y ) throw()
+        {
+            assert(y>=0);
+            assert(y<h);
+            return rows[y];
+        }
+        
+        const surface::row & surface::operator[]( unit_t y ) const throw()
+        {
+            assert(y>=0);
+            assert(y<h);
+            return rows[y];
+        }
+
+
         
     }
     
