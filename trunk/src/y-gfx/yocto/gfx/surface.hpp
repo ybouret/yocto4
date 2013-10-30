@@ -16,17 +16,26 @@ namespace yocto
             class row
             {
             public:
-                row(void *addr, unit_t W) throw();
+                row(void *data, unit_t W, peek_proc proc) throw();
                 const unit_t w;
                 
+                void *       operator[](unit_t x) throw();
+                const void * operator[](unit_t x) const throw();
+
+                
             private:
-                void *p; // row entry address
+                void     *addr;    // row entry address
+                peek_proc peek;
+                
                 YOCTO_DISABLE_COPY_AND_ASSIGN(row);
                 ~row() throw();
             };
             
             static surface *create( const format fmt, unit_t W, unit_t H);
             virtual ~surface() throw();
+            
+            row &       operator[]( unit_t y ) throw();
+            const row & operator[]( unit_t y ) const throw();
             
         private:
             explicit surface( const format &fmt, unit_t W, unit_t H);
