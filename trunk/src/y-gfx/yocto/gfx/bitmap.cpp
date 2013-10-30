@@ -26,22 +26,26 @@ namespace yocto
             }
         }
         
-        
-        bitmap * bitmap:: carbon( bitmap &bmp, const region *rect)
+        void bitmap:: copy_data_from( const bitmap &bmp, const region &area) throw()
+        {
+            const bitmap  &slf = *this;
+            uint8_t       *tgt = (uint8_t *)(slf.entry);
+            const uint8_t *src = (uint8_t *)(bmp.get(area.x, area.y));
+            for(unit_t j=area.h;j>0;--j)
+            {
+                memcpy(tgt,src,slf.pitch);
+                tgt += slf.stride;
+                src += bmp.stride;
+            }
+
+        }
+
+        bitmap * bitmap:: carbon( const bitmap &bmp, const region *rect)
         {
             const region full(0,0,bmp.w,bmp.h);
             const region *area = rect ?  rect : &full;
             bitmap *dst = new bitmap(bmp.depth,area->w,area->h);
-            
-            uint8_t       *tgt = (uint8_t *)(dst->entry);
-            const uint8_t *src = (uint8_t *)(bmp.get(area->x, area->y));
-            const size_t   len = dst->pitch;
-            for(unit_t j=area->h;j>0;--j)
-            {
-                memcpy(tgt,src,len);
-                tgt += dst->stride;
-                src += bmp.stride;
-            }
+            dst->copy_data_from(bmp, *area);
             return dst;
         }
 

@@ -67,7 +67,17 @@ namespace yocto
                     return new pixmap(bmp,full);
                 }
             }
-                       
+            
+            static inline pixmap *carbon( const bitmap &bmp, const region *rect )
+            {
+                pixmap_check_same(bmp.depth, sizeof(T));
+                const region  full(0,0,bmp.w,bmp.h);
+                const region &area = rect ? *rect : full;
+                pixmap       *pxm  = new pixmap(area.w,area.h);
+                pxm->copy_data_from(bmp,area);
+                return pxm;
+            }
+            
         protected:
             inline pixmap(unit_t W, unit_t H ) :
             bitmap(sizeof(T),W,H),
