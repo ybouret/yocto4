@@ -57,13 +57,13 @@ namespace yocto
                 return new pixmap(W,H);
             }
             
-            static inline pixmap *attach( bitmap::pointer &bmp, const region *rect )
+            static inline pixmap *attach( bitmap &bmp, const region *rect )
             {
                 if(rect)
                     return new pixmap(bmp,*rect);
                 else
                 {
-                    const region full(0,0,bmp->w,bmp->h);
+                    const region full(0,0,bmp.w,bmp.h);
                     return new pixmap(bmp,full);
                 }
             }
@@ -77,7 +77,7 @@ namespace yocto
                 create_rows();
             }
             
-            inline pixmap( bitmap::pointer &bmp, const region &rect ) :
+            inline pixmap( bitmap &bmp, const region &rect ) :
             bitmap( validate(bmp),rect),
             nrow(0),
             rows()
@@ -105,9 +105,9 @@ namespace yocto
                 memory::kind<memory::global>::release_as<row>(rows,nrow);
             }
             
-            inline bitmap::pointer & validate( bitmap::pointer &bmp )
+            inline bitmap  & validate( bitmap &bmp )
             {
-                pixmap_check_same(bmp->depth, sizeof(T));
+                pixmap_check_same(bmp.depth, sizeof(T));
                 return bmp;
             }
         };

@@ -52,8 +52,8 @@ namespace yocto
             void ldz() throw(); //!< zero all bits
             
             static bitmap * create(size_t Depth, unit_t W, unit_t H);
-            static bitmap * attach( bitmap::pointer &bmp, const region *rect);
-            static bitmap * carbon( bitmap::pointer &bmp, const region *rect);
+            static bitmap * attach( bitmap &bmp, const region *rect); //!< will withold the bitmap
+            static bitmap * carbon( bitmap &bmp, const region *rect); 
             
             void *       get_line(unit_t y) throw();
             const void * get_line(unit_t y) const throw();
@@ -79,7 +79,7 @@ namespace yocto
             explicit bitmap(size_t Depth, unit_t W, unit_t H);
             
             //! make a shared bitmap
-            explicit bitmap( bitmap::pointer &bmp, const region &rect );
+            explicit bitmap( bitmap &bmp, const region &rect );
             
         };
         

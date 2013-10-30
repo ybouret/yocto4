@@ -24,8 +24,8 @@ YOCTO_UNIT_TEST_IMPL(pixmap)
     
     const gfx::region rect(gfx::region(10,10,100,50)  );
     
-    gfx::pixmap<uint32_t>::pointer pix2 = pixmap32::attach( bmp, &rect);
-    gfx::pixmap<float>::pointer    pix3 = gfx::pixmap<float>::attach( bmp, &rect);
+    gfx::pixmap<uint32_t>::pointer pix2 = pixmap32::attach( *bmp, &rect);
+    gfx::pixmap<float>::pointer    pix3 = gfx::pixmap<float>::attach( *bmp, &rect);
     gfx::pixmap<RGB4>::pointer     pix4 = gfx::pixmap<RGB4>::create(256,128);
     gfx::pixmap<YUV4>::pointer     pix5 = gfx::pixmap<YUV4>::create(256,128);
 

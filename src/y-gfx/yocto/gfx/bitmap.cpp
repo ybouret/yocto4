@@ -15,32 +15,32 @@ namespace yocto
             return new bitmap(Depth,W,H);
         }
         
-        bitmap * bitmap::attach( bitmap::pointer &bmp, const region *rect)
+        bitmap * bitmap::attach( bitmap  &bmp, const region *rect)
         {
             if(rect)
                 return new bitmap(bmp,*rect);
             else
             {
-                const region full(0,0,bmp->w,bmp->h);
+                const region full(0,0,bmp.w,bmp.h);
                 return new bitmap(bmp,full);
             }
         }
         
         
-        bitmap * bitmap:: carbon( bitmap::pointer &bmp, const region *rect)
+        bitmap * bitmap:: carbon( bitmap &bmp, const region *rect)
         {
-            const region full(0,0,bmp->w,bmp->h);
+            const region full(0,0,bmp.w,bmp.h);
             const region *area = rect ?  rect : &full;
-            bitmap *dst = new bitmap(bmp->depth,area->w,area->h);
+            bitmap *dst = new bitmap(bmp.depth,area->w,area->h);
             
             uint8_t       *tgt = (uint8_t *)(dst->entry);
-            const uint8_t *src = (uint8_t *)(bmp->get(area->x, area->y));
+            const uint8_t *src = (uint8_t *)(bmp.get(area->x, area->y));
             const size_t   len = dst->pitch;
             for(unit_t j=area->h;j>0;--j)
             {
                 memcpy(tgt,src,len);
                 tgt += dst->stride;
-                src += bmp->stride;
+                src += bmp.stride;
             }
             return dst;
         }
@@ -158,22 +158,22 @@ namespace yocto
             }
         }
         
-        bitmap:: bitmap( bitmap::pointer &bmp, const region &rect ) :
+        bitmap:: bitmap( bitmap &bmp, const region &rect ) :
         type( is_shared ),
-        depth(bmp->depth),
+        depth(bmp.depth),
         w( __check_bitmap(rect.w, "Shared Width")  ),
         h( __check_bitmap(rect.h, "Shared Height") ),
         pitch( w * depth ),
-        stride( bmp->stride ),
+        stride( bmp.stride ),
         entry(0),
-        peek(bmp->peek),
+        peek(bmp.peek),
         allocated(0),
         shared(0)
         {
-            if(rect.x<0||rect.xend>bmp->w) throw exception("Invalid Shared Bitmap x-offset");
-            if(rect.y<0||rect.yend>bmp->h) throw exception("Invalid Shared Bitmap y-offset");
+            if(rect.x<0||rect.xend>bmp.w) throw exception("Invalid Shared Bitmap x-offset");
+            if(rect.y<0||rect.yend>bmp.h) throw exception("Invalid Shared Bitmap y-offset");
             
-            shared = (bitmap *)( bmp.__get() );
+            shared = &bmp;
             shared->withhold();
             
             uint8_t *p = static_cast<uint8_t*>(shared->entry);
