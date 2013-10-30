@@ -21,10 +21,10 @@ namespace yocto
             void        (*put_pixel)(void *,pixel_t);
             
             static void fmt(const uint32_t  mask,
-                            uint8_t       &bits,
-                            uint8_t       &shift,
-                            uint8_t       &loss,
-                            const char    *field);
+                            uint8_t        &bits,
+                            uint8_t        &shift,
+                            uint8_t        &loss,
+                            const char     *field);
             
         private:
             YOCTO_DISABLE_ASSIGN(metrics);
