@@ -4,6 +4,7 @@
 #include "yocto/gfx/region.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/ptr/arc.hpp"
+#include "yocto/hashing/sha1.hpp"
 
 namespace yocto
 {
@@ -53,7 +54,7 @@ namespace yocto
             
             static bitmap * create(size_t Depth, unit_t W, unit_t H);
             static bitmap * attach( bitmap &bmp, const region *rect); //!< will withold the bitmap
-            static bitmap * carbon( bitmap &bmp, const region *rect); 
+            static bitmap * carbon( const bitmap &bmp, const region *rect);
             
             void *       get_line(unit_t y) throw();
             const void * get_line(unit_t y) const throw();
@@ -80,6 +81,8 @@ namespace yocto
             
             //! make a shared bitmap
             explicit bitmap( bitmap &bmp, const region &rect );
+            
+            void copy_data_from( const bitmap &bmp, const region &rect) throw();
             
         };
         
