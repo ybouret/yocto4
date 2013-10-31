@@ -61,8 +61,13 @@ YOCTO_UNIT_TEST_IMPL(image)
     fill_surface(*s);
     
   
-    gfx::image::save("image.tga", *s, gfx::image::TGA, gfx::surface::to_rgba, &*s);
-    gfx::image::save("image_a.tga", *s, gfx::image::TGA_A, gfx::surface::to_rgba, &*s);
+    gfx::image::save("image.tga",    *s, gfx::image::TGA,    gfx::surface::to_rgba, &*s);
+    gfx::image::save("image_a.tga",  *s, gfx::image::TGA_A,  gfx::surface::to_rgba, &*s);
+    gfx::image::save("image.ppm",    *s, gfx::image::PPM,    gfx::surface::to_rgba, &*s);
+    gfx::image::save("image.tiff",   *s, gfx::image::TIFF,   gfx::surface::to_rgba, &*s);
+    gfx::image::save("image.eps",    *s, gfx::image::EPS,    gfx::surface::to_rgba, &*s);
+    gfx::image::save("image_bw.eps", *s, gfx::image::EPS_BW, gfx::surface::to_rgba, &*s);
+    gfx::image::save("image.bmp",    *s, gfx::image::BMP,    gfx::surface::to_rgba, &*s);
 
     
 }
