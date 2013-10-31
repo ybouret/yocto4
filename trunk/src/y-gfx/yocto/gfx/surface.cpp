@@ -83,12 +83,10 @@ namespace yocto
             return rows[y];
         }
 
-        rgb_t surface:: to_rgba(const void *addr, const void *args) throw()
+        rgb_t surface:: to_rgba(const void *addr) const throw()
         {
-            assert(args);
             assert(addr);
-            const surface *surf = (const surface *)args;
-            return surf->get_rgba( surf->get_pixel(addr) );
+            return get_rgba(get_pixel(addr) );
         }
 
         

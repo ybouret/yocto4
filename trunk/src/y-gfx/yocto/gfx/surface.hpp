@@ -37,7 +37,7 @@ namespace yocto
             row &       operator[]( unit_t y ) throw();
             const row & operator[]( unit_t y ) const throw();
             
-            static rgb_t to_rgba(const void *addr, const void *args) throw();
+            rgb_t to_rgba(const void *addr) const throw();
             
         private:
             explicit surface( const format &fmt, unit_t W, unit_t H);
@@ -47,6 +47,7 @@ namespace yocto
             
             void create_rows();
             void delete_rows() throw();
+            
             
         };
     }
