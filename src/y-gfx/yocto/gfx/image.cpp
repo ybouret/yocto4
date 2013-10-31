@@ -22,6 +22,7 @@ namespace yocto
         static inline
         void BM_WriteHexString(ios::ostream &fptr,const char *s)
         {
+            assert(s!=0);
             const unsigned n = strlen(s);
             char hex[4] = {0,0,0,0};
             
@@ -29,7 +30,6 @@ namespace yocto
             {
                 hex[0] = s[i];
                 hex[1] = s[i+1];
-                hex[2] = '\0';
                 unsigned c = 0;
                 sscanf(hex,"%X",&c);
                 __putc(c,fptr);
@@ -38,9 +38,9 @@ namespace yocto
         
         static inline uint8_t __greyscale( const rgb_t &C ) throw()
         {
-            const float r = C.r/255.0f;
-            const float g = C.g/255.0f;
-            const float b = C.b/255.0f;
+            const float r = conv::unit_float[C.r];
+            const float g = conv::unit_float[C.g];
+            const float b = conv::unit_float[C.b];
             const float Y = 0.2126*r + 0.7152*g + 0.0722*b;
             return conv::to_byte(Y);
         }

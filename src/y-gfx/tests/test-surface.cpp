@@ -54,6 +54,10 @@ namespace  {
                 const uint8_t g = gfx::conv::to_byte( w00 * g00 + w11 * g11 + w01 * g01 + w10 * g10 );
                 const uint8_t b = gfx::conv::to_byte( w00 * b00 + w11 * b11 + w01 * b01 + w10 * b10 );
                 s.put_pixel( s[y][x], s.map_rgba(r, g, b, alpha) );
+                if(x==0&&y==0)
+                {
+                    std::cerr << "Top Left=" << int(r) << " " << int(g) << " " << int(b) << std::endl;
+                }
             }
         }
     }
@@ -94,7 +98,9 @@ YOCTO_UNIT_TEST_IMPL(image)
     gfx::image::save("image.eps",    *s, gfx::image::EPS,    proc);
     gfx::image::save("image_bw.eps", *s, gfx::image::EPS_BW, proc);
     gfx::image::save("image.bmp",    *s, gfx::image::BMP,    proc);
+    gfx::image::save("image.rgb",    *s, gfx::image::RGB,    proc);
+    gfx::image::save("image.raw",    *s, gfx::image::RAW,    proc);
+    gfx::image::save("image_bw.raw", *s, gfx::image::RAW_BW, proc);
 
-    
 }
 YOCTO_UNIT_TEST_DONE()
