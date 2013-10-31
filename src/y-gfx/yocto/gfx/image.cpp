@@ -11,11 +11,10 @@ namespace yocto
         void image::save(const string &filename,
                          const bitmap &bmp,
                          int           fmt,
-                         addr2rgba     proc,
-                         const void   *args)
+                         addr2rgba     &proc)
         {
             ios::ocstream fp(filename,false);
-            save(fp, bmp, fmt, proc, args);
+            save(fp, bmp, fmt, proc);
         }
         
         
@@ -57,6 +56,97 @@ namespace yocto
         }
         
         
+        static inline bool Same_BitmapPixel(const rgb_t &lhs, const rgb_t &rhs ) throw()
+        {
+            if(lhs.r!=rhs.r) return false;
+            if(lhs.g!=rhs.g) return false;
+            if(lhs.b!=rhs.b) return false;
+            if(lhs.a!=rhs.a) return false;
+            return true;
+        }
+        
+        /*
+         Write a compressed TGA row
+         Depth is either 3 or 4
+         */
+        void WriteTGACompressedRow(ios::ostream &fptr,
+                                   const bitmap &bmp,
+                                   const unit_t  y,
+                                   const int     depth,
+                                   addr2rgba    &proc)
+        {
+            const unit_t width = bmp.w;
+            int   i;
+            int   counter      = 1;
+            int   pixelstart   = 0;
+            int   packettype   = 0;
+            int   readytowrite = 0;
+            rgb_t currentpixel(0,0,0,0);
+            rgb_t nextpixel(0,0,0,0);
+            
+            currentpixel = proc(bmp.get(0,y));
+            for (;;) {
+                if (pixelstart+counter >= width)  // Added April to fix strange bug
+                    readytowrite = 1;
+                else
+                    nextpixel = proc(bmp.get(pixelstart+counter,y));
+                
+                if (!readytowrite) {
+                    if (Same_BitmapPixel(currentpixel,nextpixel)) {
+                        if (packettype == 0) {
+                            counter++;
+                            if (counter >= 128 || (pixelstart + counter) >= width)
+                                readytowrite = 1;
+                        } else {
+                            counter--;
+                            readytowrite = 1;
+                        }
+                    } else {
+                        if (packettype == 1 || counter <= 1) {
+                            packettype = 1;
+                            currentpixel = nextpixel;
+                            counter++;
+                            if (counter >= 128 || (pixelstart + counter) >= width)
+                                readytowrite = 1;
+                        } else {
+                            readytowrite = 1;
+                        }
+                    }
+                }
+                
+                if (readytowrite) {
+                    if (pixelstart + counter > width)
+                        counter = width - pixelstart;
+                    if (packettype == 0) {
+                        __putc(((counter-1) | 0x80),fptr);
+                        __putc(currentpixel.b,fptr);
+                        __putc(currentpixel.g,fptr);
+                        __putc(currentpixel.r,fptr);
+                        if (depth == 4)
+                            __putc(currentpixel.a,fptr);
+                        currentpixel = nextpixel;
+                    } else {
+                        __putc(counter-1,fptr);
+                        for (i=0;i<counter;i++) {
+                            const rgb_t tmp = proc( bmp.get(pixelstart+i,y) );
+                            __putc(tmp.b,fptr);
+                            __putc(tmp.g,fptr);
+                            __putc(tmp.r,fptr);
+                            if (depth == 4)
+                                __putc(tmp.a,fptr);
+                        }
+                    }
+                    if ((pixelstart = pixelstart + counter) >= width)
+                        break; /* From for (;;) */
+                    readytowrite = 0;
+                    packettype = 0;
+                    counter = 1;
+                }
+            }
+        }
+
+        
+        
         /*
          Write a bitmap to a file
          The format is as follows
@@ -79,11 +169,8 @@ namespace yocto
         void image:: save(ios::ostream &fptr,
                           const bitmap &bmp,
                           int           fmt,
-                          addr2rgba     proc,
-                          const void   *args)
+                          addr2rgba     &proc)
         {
-            assert(args);
-            assert(proc);
             const int nx  = bmp.w;
             const int ny  = bmp.h;
             const int FMT = abs(fmt);
@@ -127,7 +214,7 @@ namespace yocto
                         __putc(0x00,fptr);
                     }
                     break;
-                case 2:
+                case PPM:
                     fptr("P6\n%d %d\n255\n",nx,ny);
                     break;
                 case 3:
@@ -231,19 +318,19 @@ namespace yocto
             //__________________________________________________________________
             unit_t linelength = 0;
             for(unit_t j=0;j<ny;j++) {
-                unit_t rowindex = fmt > 0 ? j  : (ny-1-j);
+                const unit_t rowindex = fmt > 0 ? j  : (ny-1-j);
                 switch(FMT)
                 {
                     case 12:
-                        //WriteTGACompressedRow(fptr,&(bm[rowindex]),nx,3);
+                        WriteTGACompressedRow(fptr,bmp,rowindex,3,proc);
                         break;
                     case 13:
-                        //WriteTGACompressedRow(fptr,&(bm[rowindex]),nx,4);
+                        WriteTGACompressedRow(fptr,bmp,rowindex,4,proc);
                         break;
                 }
                 for(unit_t i=0;i<nx;i++)
                 {
-                    const rgb_t C = proc( bmp.get(i,rowindex),args );
+                    const rgb_t C = proc( bmp.get(i,rowindex) );
                     switch (FMT) {
                         case 1:
                         case TGA_A:
@@ -254,7 +341,7 @@ namespace yocto
                             if(FMT == 11)
                                 __putc(C.a,fptr);
                             break;
-                        case 2:
+                        case PPM:
                         case 3:
                         case 5:
                         case 8:
@@ -297,7 +384,7 @@ namespace yocto
                 case TGA_A:
                 case 12:
                 case 13:
-                case 2:
+                case PPM:
                 case 3:
                 case 4:
                     break;

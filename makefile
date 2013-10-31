@@ -4,7 +4,7 @@ all:
 
 clean:
 	@echo "-- removing sdk" && rm -Rf sdk
-	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo *.raw
+	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo *.raw image*.*
 	@echo "-- cleaning auxiliary files"
 	@${MAKE} -s -C samples             clean
 	@${MAKE} -s -C src/y-aqueous/docs  clean

@@ -35,18 +35,15 @@ namespace yocto
              */
             
             
-            typedef rgb_t (*addr2rgba)(const void *addr, const void *args);
             static void save(ios::ostream &fp,
                              const bitmap &bmp,
                              int           fmt,
-                             addr2rgba     proc,
-                             const void   *args);
+                             addr2rgba     &proc);
             
             static void save(const string &filename,
                              const bitmap &bmp,
                              int           fmt,
-                             addr2rgba     proc,
-                             const void   *args);
+                             addr2rgba     &proc);
         };
         
     }
