@@ -1,6 +1,5 @@
 #include "yocto/gfx/image.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include <cstdlib>
 
 #define __putc(C,F) F.write(C)
 
@@ -11,11 +10,12 @@ namespace yocto
         
         void image::save(const string &filename,
                          const bitmap &bmp,
-                         int           fmt,
-                         addr2rgba     &proc)
+                         const format_t fmt,
+                         addr2rgba     &proc,
+                         bool           flip )
         {
             ios::ocstream fp(filename,false);
-            save(fp, bmp, fmt, proc);
+            save(fp, bmp, fmt, proc, flip);
         }
         
         
@@ -145,7 +145,7 @@ namespace yocto
                 }
             }
         }
-
+        
         
         
         /*
@@ -163,18 +163,17 @@ namespace yocto
          7 == EPS black and white
          8 == raw
          9 == BMP
-         A negative format indicates a vertical flip
          */
         
         
-        void image:: save(ios::ostream &fptr,
-                          const bitmap &bmp,
-                          int           fmt,
-                          addr2rgba     &proc)
+        void image:: save(ios::ostream  &fptr,
+                          const bitmap  &bmp,
+                          const format_t fmt,
+                          addr2rgba     &proc,
+                          bool           flip)
         {
             const int nx  = bmp.w;
             const int ny  = bmp.h;
-            const int FMT = abs(fmt);
             int offset=0;
             int size=0;
             
@@ -183,14 +182,14 @@ namespace yocto
             // Write the header
             //__________________________________________________________________
             
-            switch(FMT) {
+            switch(fmt) {
                 case TGA:
                 case TGA_A:
-                case 12:
-                case 13:
+                case TGA_Z:
+                case TGA_ZA:
                     __putc(0,fptr);  /* Length of ID */
                     __putc(0,fptr);  /* No colour map */
-                    if (FMT == 12 || FMT == 13)
+                    if (fmt == TGA_Z || fmt == TGA_ZA)
                         __putc(10,fptr); /* compressed RGB */
                     else
                         __putc(2,fptr); /* uncompressed RGB  */
@@ -207,8 +206,8 @@ namespace yocto
                     __putc((nx & 0xff00) / 256,fptr);
                     __putc((ny & 0x00ff),fptr); /* Y width */
                     __putc((ny & 0xff00) / 256,fptr);
-                    if (FMT == 11 || FMT == 13) {
-                        __putc(32,fptr);                      /* 32 bit bitmap     */
+                    if (fmt == TGA_A || fmt == TGA_ZA) {
+                        __putc(32,fptr);                        /* 32 bit bitmap     */
                         __putc(0x08,fptr);
                     } else {
                         __putc(24,fptr);                 		/* 24 bit bitmap 		*/
@@ -218,7 +217,7 @@ namespace yocto
                 case PPM:
                     fptr("P6\n%d %d\n255\n",nx,ny);
                     break;
-                case 3:
+                case RGB:
                     __putc(0x01,fptr);
                     __putc(0xda,fptr);
                     __putc(0x00,fptr);
@@ -240,14 +239,14 @@ namespace yocto
                     __putc(0x00,fptr);
                     __putc(0x00,fptr);
                     break;
-                case 4:
+                case RAW_BW:
                     break;
-                case 5:
+                case TIFF:
                     BM_WriteHexString(fptr,"4d4d002a");	/* Little endian & TIFF identifier */
                     offset = nx * ny * 3 + 8;
                     BM_WriteLongInt(fptr,offset);
                     break;
-                case 6:
+                case EPS:
                     fptr("%%!PS-Adobe-3.0 EPSF-3.0\n");
                     fptr("%%%%Creator: Created from bitmaplib by Paul Bourke\n");
                     fptr("%%%%BoundingBox: %d %d %d %d\n",0,0,nx,ny);
@@ -259,7 +258,7 @@ namespace yocto
                     fptr("{currentfile 3 %d mul string readhexstring pop} bind\n",nx);
                     fptr("false 3 colorimage\n");
                     break;
-                case 7:
+                case EPS_BW:
                     fptr("%%!PS-Adobe-3.0 EPSF-3.0\n");
                     fptr("%%%%Creator: Created from bitmaplib by Paul Bourke\n");
                     fptr("%%%%BoundingBox: %d %d %d %d\n",0,0,nx,ny);
@@ -271,9 +270,9 @@ namespace yocto
                     fptr("{currentfile %d string readhexstring pop} bind\n",nx);
                     fptr("false 1 colorimage\n");
                     break;
-                case 8:
+                case RAW:
                     break;
-                case 9:
+                case BMP:
                     /* Header 10 bytes */
                     __putc('B',fptr);
                     __putc('M',fptr);
@@ -317,43 +316,68 @@ namespace yocto
             //
             // Write the binary data
             //__________________________________________________________________
+            const unit_t top  = ny-1;
             unit_t linelength = 0;
             for(unit_t j=0;j<ny;j++) {
-                const unit_t rowindex = fmt > 0 ? j  : (ny-1-j);
-                switch(FMT)
+                //--------------------------------------------------------------
+                //-- set default value
+                //--------------------------------------------------------------
+                unit_t rowindex = j;
+                
+                //--------------------------------------------------------------
+                //-- adjust depending on format
+                //--------------------------------------------------------------
+                switch(fmt)
                 {
-                    case 12:
-                        WriteTGACompressedRow(fptr,bmp,rowindex,3,proc);
-                        break;
-                    case 13:
-                        WriteTGACompressedRow(fptr,bmp,rowindex,4,proc);
+                    default:
                         break;
                 }
+                
+                //--------------------------------------------------------------
+                //-- use flip
+                //--------------------------------------------------------------
+                if(flip)
+                {
+                    rowindex = top-rowindex;
+                }
+
+                switch(fmt)
+                {
+                    case TGA_Z:
+                        WriteTGACompressedRow(fptr,bmp,rowindex,3,proc);
+                        break;
+                    case TGA_ZA:
+                        WriteTGACompressedRow(fptr,bmp,rowindex,4,proc);
+                        break;
+                    default:
+                        break;
+                }
+                
                 for(unit_t i=0;i<nx;i++)
                 {
                     const rgb_t C = proc( bmp.get(i,rowindex) );
-                    switch (FMT) {
-                        case 1:
+                    switch (fmt) {
+                        case TGA:
                         case TGA_A:
-                        case 9:
+                        case BMP:
                             __putc(C.b,fptr);
                             __putc(C.g,fptr);
                             __putc(C.r,fptr);
-                            if(FMT == 11)
+                            if(fmt == TGA_A)
                                 __putc(C.a,fptr);
                             break;
                         case PPM:
-                        case 3:
-                        case 5:
-                        case 8:
+                        case RGB:
+                        case TIFF:
+                        case RAW:
                             __putc(C.r,fptr);
                             __putc(C.g,fptr);
                             __putc(C.b,fptr);
                             break;
-                        case 4:
+                        case RAW_BW:
                             __putc(__greyscale(C),fptr);
                             break;
-                        case 6:
+                        case EPS:
                             fptr("%02x%02x%02x",C.r,C.g,C.b);
                             linelength += 6;
                             if (linelength >= 72 || linelength >= nx)
@@ -362,13 +386,17 @@ namespace yocto
                                 linelength = 0;
                             }
                             break;
-                        case 7:
+                        case EPS_BW:
                             fptr("%02x",__greyscale(C));
                             linelength += 2;
                             if (linelength >= 72 || linelength >= nx) {
                                 fptr("\n");
                                 linelength = 0;
                             }
+                            break;
+                            
+                        default:
+                            assert(fmt==TGA_Z||fmt==TGA_ZA);
                             break;
                     }
                 }
@@ -379,17 +407,16 @@ namespace yocto
             //
             // Write the footer
             //__________________________________________________________________
-            
-            switch(FMT) {
+            switch(fmt) {
                 case TGA:
                 case TGA_A:
-                case 12:
-                case 13:
+                case TGA_Z:
+                case TGA_ZA:
                 case PPM:
-                case 3:
-                case 4:
+                case RGB:
+                case RAW_BW:
                     break;
-                case 5:
+                case TIFF:
                     __putc(0x00,fptr); /* The number of directory entries (14) */
                     __putc(0x0e,fptr);
                     
@@ -473,12 +500,12 @@ namespace yocto
                     BM_WriteHexString(fptr,"000100010001");
                     
                     break;
-                case 6:
-                case 7:
+                case EPS:
+                case EPS_BW:
                     fptr("\n%%%%EOF\n");
                     break;
-                case 8:
-                case 9:
+                case RAW:
+                case BMP:
                     break;
             }
             
