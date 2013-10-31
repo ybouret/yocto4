@@ -22,14 +22,15 @@ namespace yocto
         static inline
         void BM_WriteHexString(ios::ostream &fptr,const char *s)
         {
-            unsigned int i;
-            int c;
-            char hex[3];
+            const unsigned n = strlen(s);
+            char hex[4] = {0,0,0,0};
             
-            for (i=0;i<strlen(s);i+=2) {
+            for(unsigned i=0;i<n;i+=2)
+            {
                 hex[0] = s[i];
                 hex[1] = s[i+1];
                 hex[2] = '\0';
+                unsigned c = 0;
                 sscanf(hex,"%X",&c);
                 __putc(c,fptr);
             }
@@ -37,22 +38,21 @@ namespace yocto
         
         static inline uint8_t __greyscale( const rgb_t &C ) throw()
         {
-            const int r = C.r;
-            const int g = C.g;
-            const int b = C.b;
-            return (r+g+b)/(255*255*255);
+            const float r = C.r/255.0f;
+            const float g = C.g/255.0f;
+            const float b = C.b/255.0f;
+            const float Y = 0.2126*r + 0.7152*g + 0.0722*b;
+            return conv::to_byte(Y);
         }
         
-        void BM_WriteLongInt(ios::ostream &fptr,char *s,long n)
+        void BM_WriteLongInt(ios::ostream &fptr, long n)
         {
-            int i;
-            
+            char s[4];
             s[0] = (n & 0xff000000) / 16777216;
             s[1] = (n & 0x00ff0000) / 65536;
             s[2] = (n & 0x0000ff00) / 256;
             s[3] = (n & 0x000000ff);
-            
-            for (i=0;i<4;i++)
+            for(int i=0;i<4;i++)
                 __putc(s[i],fptr);
         }
         
@@ -89,7 +89,6 @@ namespace yocto
             const int FMT = abs(fmt);
             int offset=0;
             int size=0;
-            char  buffer[1024];
             
             //__________________________________________________________________
             //
@@ -97,8 +96,8 @@ namespace yocto
             //__________________________________________________________________
             
             switch(FMT) {
-                case 1:
-                case 11:
+                case TGA:
+                case TGA_A:
                 case 12:
                 case 13:
                     __putc(0,fptr);  /* Length of ID */
@@ -158,7 +157,7 @@ namespace yocto
                 case 5:
                     BM_WriteHexString(fptr,"4d4d002a");	/* Little endian & TIFF identifier */
                     offset = nx * ny * 3 + 8;
-                    BM_WriteLongInt(fptr,buffer,offset);
+                    BM_WriteLongInt(fptr,offset);
                     break;
                 case 6:
                     fptr("%%!PS-Adobe-3.0 EPSF-3.0\n");
@@ -230,7 +229,7 @@ namespace yocto
             //
             // Write the binary data
             //__________________________________________________________________
-            int linelength = 0;
+            unit_t linelength = 0;
             for(unit_t j=0;j<ny;j++) {
                 unit_t rowindex = fmt > 0 ? j  : (ny-1-j);
                 switch(FMT)
@@ -247,12 +246,12 @@ namespace yocto
                     const rgb_t C = proc( bmp.get(i,rowindex),args );
                     switch (FMT) {
                         case 1:
-                        case 11:
+                        case TGA_A:
                         case 9:
                             __putc(C.b,fptr);
                             __putc(C.g,fptr);
                             __putc(C.r,fptr);
-                            if (FMT == 11)
+                            if(FMT == 11)
                                 __putc(C.a,fptr);
                             break;
                         case 2:
@@ -293,9 +292,9 @@ namespace yocto
             // Write the footer
             //__________________________________________________________________
             
-            switch (FMT) {
-                case 1:
-                case 11:
+            switch(FMT) {
+                case TGA:
+                case TGA_A:
                 case 12:
                 case 13:
                 case 2:
@@ -323,7 +322,7 @@ namespace yocto
                     /* bits per sample tag, short int */
                     BM_WriteHexString(fptr,"0102000300000003");
                     offset = nx * ny * 3 + 182;
-                    BM_WriteLongInt(fptr,buffer,offset);
+                    BM_WriteLongInt(fptr,offset);
                     
                     /* Compression flag, short int */
                     BM_WriteHexString(fptr,"010300030000000100010000");
@@ -350,17 +349,17 @@ namespace yocto
                     /* Strip byte count flag, long int */
                     BM_WriteHexString(fptr,"0117000400000001");
                     offset = nx * ny * 3;
-                    BM_WriteLongInt(fptr,buffer,offset);
+                    BM_WriteLongInt(fptr,offset);
                     
                     /* Minimum sample value flag, short int */
                     BM_WriteHexString(fptr,"0118000300000003");
                     offset = nx * ny * 3 + 188;
-                    BM_WriteLongInt(fptr,buffer,offset);
+                    BM_WriteLongInt(fptr,offset);
                     
                     /* Maximum sample value tag, short int */
                     BM_WriteHexString(fptr,"0119000300000003");
                     offset = nx * ny * 3 + 194;
-                    BM_WriteLongInt(fptr,buffer,offset);
+                    BM_WriteLongInt(fptr,offset);
                     
                     /* Planar configuration tag, short int */
                     BM_WriteHexString(fptr,"011c00030000000100010000");
@@ -368,7 +367,7 @@ namespace yocto
                     /* Sample format tag, short int */
                     BM_WriteHexString(fptr,"0153000300000003");
                     offset = nx * ny * 3 + 200;
-                    BM_WriteLongInt(fptr,buffer,offset);
+                    BM_WriteLongInt(fptr,offset);
                     
                     /* End of the directory entry */
                     BM_WriteHexString(fptr,"00000000");
