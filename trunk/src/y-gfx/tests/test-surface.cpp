@@ -16,7 +16,9 @@ namespace  {
         {
             gfx::get_named_rgb("blue"),
             gfx::get_named_rgb("red"),
-            gfx::get_named_rgb("green")
+            gfx::get_named_rgb("green"),
+            gfx::get_named_rgb("yellow"),
+            gfx::get_named_rgb("pink")
         };
         
         const size_t num = sizeof(col)/sizeof(col[0]);
@@ -26,8 +28,9 @@ namespace  {
         {
             for( gfx::unit_t x=0;x<s.w;++x)
             {
+                const uint8_t alpha = gfx::conv::to_byte( float(x*y)/(s.h*s.w));
                 const gfx::rgb_t &c = col[(k++)%num];
-                s.put_pixel( s[y][x], s.map_rgb(c.r, c.g, c.b) );
+                s.put_pixel( s[y][x], s.map_rgba(c.r, c.g, c.b, alpha) );
             }
         }
     }
@@ -39,12 +42,28 @@ YOCTO_UNIT_TEST_IMPL(surface)
     std::cerr << "sizeof(gfx::surface)=" << sizeof(gfx::surface) << std::endl;
     gfx::surface::pointer s1 = gfx::surface::create( gfx::format::RGB24(), 100, 50);
     fill_surface(*s1);
-
+    
     gfx::surface::pointer s2 = gfx::surface::create( gfx::format::ARGB32(), 100, 50);
     fill_surface(*s2);
     
     gfx::surface::pointer s3 = gfx::surface::create( gfx::format::ARGB16(), 100, 50);
     fill_surface(*s3);
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/gfx/image.hpp"
+#include "yocto/ios/ocstream.hpp"
+
+YOCTO_UNIT_TEST_IMPL(image)
+{
+    gfx::surface::pointer s = gfx::surface::create( gfx::format::ARGB32(), 256, 128);
+    fill_surface(*s);
+    
+  
+    gfx::image::save("image.tga", *s, gfx::image::TGA, gfx::surface::to_rgba, &*s);
+    gfx::image::save("image_a.tga", *s, gfx::image::TGA_A, gfx::surface::to_rgba, &*s);
+
     
 }
 YOCTO_UNIT_TEST_DONE()
