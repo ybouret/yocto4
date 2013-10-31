@@ -1,5 +1,6 @@
 #include "yocto/gfx/image.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include <cstdlib>
 
 #define __putc(C,F) F.write(C)
 
