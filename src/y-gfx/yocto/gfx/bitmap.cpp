@@ -1,6 +1,7 @@
 #include "yocto/gfx/bitmap.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/memory/global.hpp"
+#include "yocto/core/offset.hpp"
 
 #include <cstring>
 #include <iostream>
@@ -42,7 +43,7 @@ namespace yocto
 
         bitmap * bitmap:: carbon( const bitmap &bmp, const region *rect)
         {
-            const region full(0,0,bmp.w,bmp.h);
+            const region  full(0,0,bmp.w,bmp.h);
             const region *area = rect ?  rect : &full;
             bitmap *dst = new bitmap(bmp.depth,area->w,area->h);
             dst->copy_data_from(bmp, *area);
@@ -76,7 +77,7 @@ namespace yocto
                     }
                     break;
             }
-            memset( (void*)&w, 0, 1);
+            YOCTO_SELF_RESET(bitmap,type);
         }
         
         

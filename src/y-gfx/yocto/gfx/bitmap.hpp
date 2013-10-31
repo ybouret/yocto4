@@ -52,9 +52,9 @@ namespace yocto
             //__________________________________________________________________
             void ldz() throw(); //!< zero all bits
             
-            static bitmap * create(size_t Depth, unit_t W, unit_t H);
-            static bitmap * attach( bitmap &bmp, const region *rect); //!< will withold the bitmap
-            static bitmap * carbon( const bitmap &bmp, const region *rect);
+            static bitmap * create(size_t        Depth, unit_t W, unit_t H);
+            static bitmap * attach(bitmap       &bmp, const region *rect); //!< will withold the bitmap
+            static bitmap * carbon(const bitmap &bmp, const region *rect); //!< will withold the bitmap
             
             void *       get_line(unit_t y) throw();
             const void * get_line(unit_t y) const throw();
