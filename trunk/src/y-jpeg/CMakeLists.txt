@@ -73,7 +73,7 @@ ADD_CUSTOM_COMMAND(
 	POST_BUILD
 	COMMAND cjpeg -dct int -outfile ${CMAKE_CURRENT_BINARY_DIR}/testout.jpg  ${JROOT}/testimg.ppm
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testout.jpg ${JROOT}/testimg.jpg
-	COMMAND ./cjpeg -dct int -progressive -opt -outfile ${CMAKE_CURRENT_BINARY_DIR}/testoutp.jpg ${JROOT}/testimg.ppm
+	COMMAND cjpeg -dct int -progressive -opt -outfile ${CMAKE_CURRENT_BINARY_DIR}/testoutp.jpg ${JROOT}/testimg.ppm
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testoutp.jpg ${JROOT}/testimgp.jpg
 	COMMENT "Testing cjpeg"
 	)

@@ -10,5 +10,6 @@ ADD_TEST(Pixmap  test-gfx pixmap)
 ADD_TEST(RGB     test-gfx rgb)
 ADD_TEST(Format  test-gfx format)
 ADD_TEST(Metrics test-gfx metrics)
+ADD_TEST(Surface test-gfx surface)
 
 
