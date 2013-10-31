@@ -2,6 +2,7 @@
 #define YOCTO_GFX_RGB_INCLUDED 1
 
 #include "yocto/gfx/types.hpp"
+//#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -63,6 +64,10 @@ namespace yocto
         typedef rgb<uint8_t>  rgb_t;
         typedef rgb<uint32_t> rgb_mask_t;
         unsigned rgb_distance_sq( const rgb_t &lhs, const rgb_t &rhs ) throw();
+        
+        //typedef functor<rgb_t,TL1(void*)> addr2rgba;
+
+        
     }
 }
 
