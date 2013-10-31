@@ -23,6 +23,7 @@ namespace yocto
                 return uint8_t( floorf(f*255.0f + 0.5f) );
             }
             
+            static const float unit_float[256];
         };
         
         
