@@ -1,4 +1,5 @@
 #include "yocto/gfx/image.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 #define __putc(C,F) F.write(C)
 
@@ -6,6 +7,18 @@ namespace yocto
 {
     namespace gfx
     {
+        
+        void image::save(const string &filename,
+                         const bitmap &bmp,
+                         int           fmt,
+                         addr2rgba     proc,
+                         const void   *args)
+        {
+            ios::ocstream fp(filename,false);
+            save(fp, bmp, fmt, proc, args);
+        }
+        
+        
         static inline
         void BM_WriteHexString(ios::ostream &fptr,const char *s)
         {
@@ -20,6 +33,14 @@ namespace yocto
                 sscanf(hex,"%X",&c);
                 __putc(c,fptr);
             }
+        }
+        
+        static inline uint8_t __greyscale( const rgb_t &C ) throw()
+        {
+            const int r = C.r;
+            const int g = C.g;
+            const int b = C.b;
+            return (r+g+b)/(255*255*255);
         }
         
         void BM_WriteLongInt(ios::ostream &fptr,char *s,long n)
@@ -204,11 +225,74 @@ namespace yocto
                     break;
             }
             
+            
+            //__________________________________________________________________
+            //
+            // Write the binary data
+            //__________________________________________________________________
+            int linelength = 0;
+            for(unit_t j=0;j<ny;j++) {
+                unit_t rowindex = fmt > 0 ? j  : (ny-1-j);
+                switch(FMT)
+                {
+                    case 12:
+                        //WriteTGACompressedRow(fptr,&(bm[rowindex]),nx,3);
+                        break;
+                    case 13:
+                        //WriteTGACompressedRow(fptr,&(bm[rowindex]),nx,4);
+                        break;
+                }
+                for(unit_t i=0;i<nx;i++)
+                {
+                    const rgb_t C = proc( bmp.get(i,rowindex),args );
+                    switch (FMT) {
+                        case 1:
+                        case 11:
+                        case 9:
+                            __putc(C.b,fptr);
+                            __putc(C.g,fptr);
+                            __putc(C.r,fptr);
+                            if (FMT == 11)
+                                __putc(C.a,fptr);
+                            break;
+                        case 2:
+                        case 3:
+                        case 5:
+                        case 8:
+                            __putc(C.r,fptr);
+                            __putc(C.g,fptr);
+                            __putc(C.b,fptr);
+                            break;
+                        case 4:
+                            __putc(__greyscale(C),fptr);
+                            break;
+                        case 6:
+                            fptr("%02x%02x%02x",C.r,C.g,C.b);
+                            linelength += 6;
+                            if (linelength >= 72 || linelength >= nx)
+                            {
+                                fptr("\n");
+                                linelength = 0;
+                            }
+                            break;
+                        case 7:
+                            fptr("%02x",__greyscale(C));
+                            linelength += 2;
+                            if (linelength >= 72 || linelength >= nx) {
+                                fptr("\n");
+                                linelength = 0;
+                            }
+                            break;
+                    }
+                }
+            }
+            
+            
             //__________________________________________________________________
             //
             // Write the footer
             //__________________________________________________________________
-
+            
             switch (FMT) {
                 case 1:
                 case 11:
@@ -310,7 +394,7 @@ namespace yocto
                 case 9:
                     break;
             }
-
+            
             
         }
         
