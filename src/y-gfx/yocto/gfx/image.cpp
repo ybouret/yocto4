@@ -70,7 +70,11 @@ namespace yocto
             int size=0;
             char  buffer[1024];
             
-            /* Write the header */
+            //__________________________________________________________________
+            //
+            // Write the header
+            //__________________________________________________________________
+            
             switch(FMT) {
                 case 1:
                 case 11:
@@ -199,6 +203,114 @@ namespace yocto
                     __putc(0,fptr); __putc(0,fptr); __putc(0,fptr); __putc(0,fptr);
                     break;
             }
+            
+            //__________________________________________________________________
+            //
+            // Write the footer
+            //__________________________________________________________________
+
+            switch (FMT) {
+                case 1:
+                case 11:
+                case 12:
+                case 13:
+                case 2:
+                case 3:
+                case 4:
+                    break;
+                case 5:
+                    __putc(0x00,fptr); /* The number of directory entries (14) */
+                    __putc(0x0e,fptr);
+                    
+                    /* Width tag, short int */
+                    BM_WriteHexString(fptr,"0100000300000001");
+                    __putc((nx & 0xff00) / 256,fptr);		/* Image width */
+                    __putc((nx & 0x00ff),fptr);
+                    __putc(0x00,fptr);
+                    __putc(0x00,fptr);
+                    
+                    /* Height tag, short int */
+                    BM_WriteHexString(fptr,"0101000300000001");
+                    __putc((ny & 0xff00) / 256,fptr);    /* Image height */
+                    __putc((ny & 0x00ff),fptr);
+                    __putc(0x00,fptr);
+                    __putc(0x00,fptr);
+                    
+                    /* bits per sample tag, short int */
+                    BM_WriteHexString(fptr,"0102000300000003");
+                    offset = nx * ny * 3 + 182;
+                    BM_WriteLongInt(fptr,buffer,offset);
+                    
+                    /* Compression flag, short int */
+                    BM_WriteHexString(fptr,"010300030000000100010000");
+                    
+                    /* Photometric interpolation tag, short int */
+                    BM_WriteHexString(fptr,"010600030000000100020000");
+                    
+                    /* Strip offset tag, long int */
+                    BM_WriteHexString(fptr,"011100040000000100000008");
+                    
+                    /* Orientation flag, short int */
+                    BM_WriteHexString(fptr,"011200030000000100010000");
+                    
+                    /* Sample per pixel tag, short int */
+                    BM_WriteHexString(fptr,"011500030000000100030000");
+                    
+                    /* Rows per strip tag, short int */
+                    BM_WriteHexString(fptr,"0116000300000001");
+                    __putc((ny & 0xff00) / 256,fptr);
+                    __putc((ny & 0x00ff),fptr);
+                    __putc(0x00,fptr);
+                    __putc(0x00,fptr);
+                    
+                    /* Strip byte count flag, long int */
+                    BM_WriteHexString(fptr,"0117000400000001");
+                    offset = nx * ny * 3;
+                    BM_WriteLongInt(fptr,buffer,offset);
+                    
+                    /* Minimum sample value flag, short int */
+                    BM_WriteHexString(fptr,"0118000300000003");
+                    offset = nx * ny * 3 + 188;
+                    BM_WriteLongInt(fptr,buffer,offset);
+                    
+                    /* Maximum sample value tag, short int */
+                    BM_WriteHexString(fptr,"0119000300000003");
+                    offset = nx * ny * 3 + 194;
+                    BM_WriteLongInt(fptr,buffer,offset);
+                    
+                    /* Planar configuration tag, short int */
+                    BM_WriteHexString(fptr,"011c00030000000100010000");
+                    
+                    /* Sample format tag, short int */
+                    BM_WriteHexString(fptr,"0153000300000003");
+                    offset = nx * ny * 3 + 200;
+                    BM_WriteLongInt(fptr,buffer,offset);
+                    
+                    /* End of the directory entry */
+                    BM_WriteHexString(fptr,"00000000");
+                    
+                    /* Bits for each colour channel */
+                    BM_WriteHexString(fptr,"000800080008");
+                    
+                    /* Minimum value for each component */
+                    BM_WriteHexString(fptr,"000000000000");
+                    
+                    /* Maximum value per channel */
+                    BM_WriteHexString(fptr,"00ff00ff00ff");
+                    
+                    /* Samples per pixel for each channel */
+                    BM_WriteHexString(fptr,"000100010001");
+                    
+                    break;
+                case 6:
+                case 7:
+                    fptr("\n%%%%EOF\n");
+                    break;
+                case 8:
+                case 9:
+                    break;
+            }
+
             
         }
         
