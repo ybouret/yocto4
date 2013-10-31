@@ -69,6 +69,7 @@ YOCTO_BUILD(aqueous)
 YOCTO_BUILD(chemical)
 YOCTO_BUILD(visit)
 YOCTO_BUILD(fltk)
+YOCTO_BUILD(jpeg)
 MESSAGE( STATUS "---------------- </modules> ----------------" )
 MESSAGE( STATUS "" )
 
