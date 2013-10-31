@@ -4,7 +4,6 @@
 #include "yocto/gfx/region.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/ptr/arc.hpp"
-#include "yocto/hashing/sha1.hpp"
 
 namespace yocto
 {
@@ -63,7 +62,6 @@ namespace yocto
             
             void *      get(unit_t x, unit_t y) throw();
             const void *get(unit_t x, unit_t y) const throw();
-            
             
             
         private:
