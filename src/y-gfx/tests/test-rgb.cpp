@@ -16,5 +16,6 @@ YOCTO_UNIT_TEST_IMPL(rgb)
         std::cerr << std::endl;
     }
     std::cerr << "#names=" << names.size() << std::endl;
+    //names.release();
 }
 YOCTO_UNIT_TEST_DONE()
