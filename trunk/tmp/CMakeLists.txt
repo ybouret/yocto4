@@ -2,7 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(libs)
 
 FIND_PACKAGE(JPEG REQUIRED)
+FIND_PACKAGE(PNG  REQUIRED)
 INCLUDE_DIRECTORIES(${JPEG_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIR})
 
 ADD_LIBRARY(demo STATIC 
 bitmaplib.c
@@ -32,5 +34,6 @@ seriallib.h
 simplex.h
 wrllib.c
 wrllib.h
+libpng-short-example.c
 )
 
