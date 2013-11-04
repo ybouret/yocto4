@@ -34,13 +34,13 @@ namespace yocto
 
         
         
-        surface * surface:: create(const format fmt, unit_t W, unit_t H)
+        surface * surface:: create(const pixel_format fmt, unit_t W, unit_t H)
         {
             return new surface(fmt,W,H);
         }
         
-        surface:: surface( const format &fmt, unit_t W, unit_t H ) :
-        format(fmt),
+        surface:: surface( const pixel_format &fmt, unit_t W, unit_t H ) :
+        pixel_format(fmt),
         bitmap(fmt.bytes,W,H),
         rows(0),
         nrow(0)

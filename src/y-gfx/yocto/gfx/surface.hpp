@@ -2,13 +2,13 @@
 #define YOCTO_GFX_SURFACE_INCLUDED 1
 
 #include "yocto/gfx/bitmap.hpp"
-#include "yocto/gfx/format.hpp"
+#include "yocto/gfx/pixel-format.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
-        class surface : public format, public bitmap
+        class surface : public pixel_format, public bitmap
         {
         public:
             typedef arc_ptr<surface> pointer;
@@ -31,7 +31,7 @@ namespace yocto
                 ~row() throw();
             };
             
-            static surface *create( const format fmt, unit_t W, unit_t H);
+            static surface *create( const pixel_format fmt, unit_t W, unit_t H);
             virtual ~surface() throw();
             
             row &       operator[]( unit_t y ) throw();
@@ -40,7 +40,7 @@ namespace yocto
             rgb_t to_rgba(const void *addr) const throw();
             
         private:
-            explicit surface( const format &fmt, unit_t W, unit_t H);
+            explicit surface( const pixel_format &fmt, unit_t W, unit_t H);
             row   *rows;
             size_t nrow;
             YOCTO_DISABLE_COPY_AND_ASSIGN(surface);

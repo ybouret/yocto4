@@ -1,13 +1,13 @@
-#include "yocto/gfx/format.hpp"
+#include "yocto/gfx/pixel-format.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
-        format:: ~format() throw() {}
+        pixel_format:: ~pixel_format() throw() {}
         
-        format:: format( const format &other ) throw() :
+        pixel_format:: pixel_format( const pixel_format &other ) throw() :
         metrics(other),
         mask(other.mask),
         bits(other.bits),
@@ -21,11 +21,11 @@ namespace yocto
         
         
         
-        format:: format(size_t  Depth,
-                        pixel_t Rmask,
-                        pixel_t Gmask,
-                        pixel_t Bmask,
-                        pixel_t Amask) :
+        pixel_format:: pixel_format(size_t  Depth,
+                                    pixel_t Rmask,
+                                    pixel_t Gmask,
+                                    pixel_t Bmask,
+                                    pixel_t Amask) :
         metrics(Depth),
         mask( Rmask, Gmask, Bmask, Amask),
         bits(0,0,0,0),
@@ -43,7 +43,7 @@ namespace yocto
                 for(size_t j=i+1;j<4;++j)
                 {
                     if( mask_p[i] & mask_p[j] )
-                        throw exception("gfx::format(overlapping mask '%s' and '%s'", name[i], name[j]);
+                        throw exception("gfx::pixel_format(overlapping mask '%s' and '%s'", name[i], name[j]);
                 }
             }
             
@@ -72,7 +72,7 @@ namespace yocto
             (pixel_t &) opaque = ( (pixel_t(0xff) >> loss.a) << shift.a );
         }
         
-        pixel_t format:: map_rgb(uint8_t r, uint8_t g, uint8_t b) const throw()
+        pixel_t pixel_format:: map_rgb(uint8_t r, uint8_t g, uint8_t b) const throw()
         {
             return
             ( (pixel_t(r)    >> loss.r) << shift.r ) |
@@ -81,13 +81,13 @@ namespace yocto
             opaque;
         }
         
-        pixel_t format:: map_rgb(const rgb_t &c) const throw()
+        pixel_t pixel_format:: map_rgb(const rgb_t &c) const throw()
         {
             return map_rgb(c.r,c.g,c.b);
         }
         
         
-        pixel_t format:: map_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) const throw()
+        pixel_t pixel_format:: map_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) const throw()
         {
             return
             ( (pixel_t(r)    >> loss.r) << shift.r ) |
@@ -96,7 +96,7 @@ namespace yocto
             ( (pixel_t(a)    >> loss.a) << shift.a );
         }
         
-        pixel_t format:: map_rgba(const rgb_t &c, uint8_t a) const throw()
+        pixel_t pixel_format:: map_rgba(const rgb_t &c, uint8_t a) const throw()
         {
             return map_rgba(c.r,c.g,c.b,a);
         }
@@ -104,14 +104,14 @@ namespace yocto
         
 #define YGFX_GET(f) ( (c&mask.f) >> shift.f ) << loss.f
         
-        rgb_t format:: get_rgb( pixel_t c ) const throw()
+        rgb_t pixel_format:: get_rgb( pixel_t c ) const throw()
         {
             return rgb_t(uint8_t(YGFX_GET(r)),
                          uint8_t(YGFX_GET(g)),
                          uint8_t(YGFX_GET(b)) );
         }
         
-        rgb_t format:: get_rgba( pixel_t c ) const throw()
+        rgb_t pixel_format:: get_rgba( pixel_t c ) const throw()
         {
             return rgb_t(uint8_t(YGFX_GET(r)),
                          uint8_t(YGFX_GET(g)),
@@ -121,19 +121,19 @@ namespace yocto
         }
         
         
-        format format:: ARGB32()
+        pixel_format pixel_format:: ARGB32()
         {
-            return format(4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+            return pixel_format(4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
         }
         
-        format format:: ARGB16()
+        pixel_format pixel_format:: ARGB16()
         {
-            return format(2,0x0f00,0x00f0,0x000f,0xf000);
+            return pixel_format(2,0x0f00,0x00f0,0x000f,0xf000);
         }
         
-        format format::RGB24()
+        pixel_format pixel_format::RGB24()
         {
-            return format(3,0x00ff0000,0x0000ff00,0x000000ff,0x00000000);
+            return pixel_format(3,0x00ff0000,0x0000ff00,0x000000ff,0x00000000);
         }
         
     }

@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/gfx/format.hpp"
+#include "yocto/gfx/pixel-format.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/gfx/named-rgb.hpp"
 
@@ -24,7 +24,7 @@ std::cerr << "(" << int(tmp.r) << "," << int(tmp.g) << "," << int(tmp.b) << ") "
 std::cerr << std::endl; \
 } while(false)
 
-static inline void display( const gfx::format &fmt )
+static inline void display( const gfx::pixel_format &fmt )
 {
     std::cerr << "bytes=" << fmt.bytes << std::endl;
     _SHOW(r);
@@ -42,7 +42,7 @@ static inline void display( const gfx::format &fmt )
 
 
 
-YOCTO_UNIT_TEST_IMPL(format)
+YOCTO_UNIT_TEST_IMPL(pixfmt)
 {
         
     std::cerr << "checking colors" << std::endl;
@@ -56,11 +56,11 @@ YOCTO_UNIT_TEST_IMPL(format)
     }
     
     
-    gfx::format fmt1(4,0xff000000,0x00ff0000,0x0000ff00,0x000000ff);
+    gfx::pixel_format fmt1(4,0xff000000,0x00ff0000,0x0000ff00,0x000000ff);
     display(fmt1);
         
     
-    gfx::format fmt2(4,0x000f,0x00f0,0x0f00,0xf000);
+    gfx::pixel_format fmt2(4,0x000f,0x00f0,0x0f00,0xf000);
     display(fmt2);
     
     
