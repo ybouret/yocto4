@@ -67,13 +67,13 @@ namespace  {
 YOCTO_UNIT_TEST_IMPL(surface)
 {
     std::cerr << "sizeof(gfx::surface)=" << sizeof(gfx::surface) << std::endl;
-    gfx::surface::pointer s1 = gfx::surface::create( gfx::format::RGB24(), 100, 50);
+    gfx::surface::pointer s1 = gfx::surface::create( gfx::pixel_format::RGB24(), 100, 50);
     fill_surface(*s1);
     
-    gfx::surface::pointer s2 = gfx::surface::create( gfx::format::ARGB32(), 100, 50);
+    gfx::surface::pointer s2 = gfx::surface::create( gfx::pixel_format::ARGB32(), 100, 50);
     fill_surface(*s2);
     
-    gfx::surface::pointer s3 = gfx::surface::create( gfx::format::ARGB16(), 100, 50);
+    gfx::surface::pointer s3 = gfx::surface::create( gfx::pixel_format::ARGB16(), 100, 50);
     fill_surface(*s3);
     
 }
@@ -82,7 +82,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(save)
 {
-    gfx::surface::pointer s = gfx::surface::create( gfx::format::ARGB32(), 256, 128);
+    gfx::surface::pointer s = gfx::surface::create( gfx::pixel_format::ARGB32(), 256, 128);
     fill_surface(*s);
     
     gfx::addr2rgba proc( &*s, & gfx::surface::to_rgba);

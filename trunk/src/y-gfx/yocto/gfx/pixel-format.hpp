@@ -1,5 +1,5 @@
-#ifndef YOCTO_FORMAT_INCLUDED
-#define YOCTO_FORMAT_INCLUDED 1
+#ifndef YOCTO_PIXEL_FORMAT_INCLUDED
+#define YOCTO_PIXEL_FORMAT_INCLUDED 1
 
 #include "yocto/gfx/metrics.hpp"
 #include "yocto/gfx/rgb.hpp"
@@ -9,7 +9,7 @@ namespace yocto
 {
     namespace gfx
     {
-        class format : public metrics
+        class pixel_format : public metrics
         {
         public:
             const rgb_mask_t mask;
@@ -19,15 +19,15 @@ namespace yocto
             const pixel_t    opaque;
             const size_t     bpp;     //!< used bits of depth
             
-            explicit format(size_t  Depth,
+            explicit pixel_format(size_t  Depth,
                             pixel_t Rmask,
                             pixel_t Gmask,
                             pixel_t Bmask,
                             pixel_t Amask
                             );
             
-            virtual ~format() throw();
-            format( const format &) throw();
+            virtual ~pixel_format() throw();
+            pixel_format( const pixel_format &) throw();
             
             pixel_t map_rgb(uint8_t r, uint8_t g, uint8_t b) const throw();
             pixel_t map_rgb(const rgb_t &c) const throw();
@@ -41,12 +41,12 @@ namespace yocto
             rgb_t   get_rgba(pixel_t c) const throw();
             
             
-            static format ARGB32();
-            static format ARGB16();
-            static format RGB24();
+            static pixel_format ARGB32();
+            static pixel_format ARGB16();
+            static pixel_format RGB24();
             
         private:
-            YOCTO_DISABLE_ASSIGN(format);
+            YOCTO_DISABLE_ASSIGN(pixel_format);
         };
     }
 }
