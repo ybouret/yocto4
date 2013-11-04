@@ -198,7 +198,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	ENDIF()
   
   IF( YOCTO_CLANG )
-		TARGET_LINK_LIBRARIES( ${tgt} stdc++ -flto )
+		TARGET_LINK_LIBRARIES( ${tgt} stdc++ ) #-flto 
   ENDIF()
   
 ENDMACRO()
