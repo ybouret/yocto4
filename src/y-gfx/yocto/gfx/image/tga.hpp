@@ -14,8 +14,11 @@ namespace yocto
             explicit TGA();
             virtual ~TGA() throw();
             
-            YOCTO_GFX_IMAGE_FORMAT_API();
-            
+            virtual void save(const string &filename, 
+								 const bitmap &bmp,
+								 addr2rgba    &proc,
+								 void         *options) const;
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(TGA);
         };

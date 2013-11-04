@@ -7,108 +7,38 @@
 
 namespace yocto
 {
-	class module::impl  : public object
-	{
-	public:
-		static inline void *load_library( const char *soname )
-		{
-			YOCTO_GIANT_LOCK();
-			assert(soname);
-#if defined(YOCTO_BSD)
-			void *h = dlopen( soname, RTLD_NOW );
-			if( !h )
-				throw imported::exception( "dlopen", "%s", dlerror() );
-			return h;
-#endif
-			
-#if defined(YOCTO_WIN)
-			void *h = ::LoadLibrary( soname );
-			if( !h )
-				throw win32:: exception( ::GetLastError(), "::LoadLibrary(%s)", soname );
-			return h;
-#endif
-		}
-		
-		explicit impl( const string &soname ) :
-		handle( load_library( soname.c_str() ) ),
-		count(1)
-		{
-			
-		}
-		
-		explicit impl( const char *soname ) :
-		handle( load_library( soname ) ),
-		count(1)
-		{
-			
-		}
-		
-		
-		
-		virtual ~impl() throw() 
-		{
-			YOCTO_GIANT_LOCK();
-			assert( 0    == count  );
-			assert( NULL != handle );
-			
-#if defined(YOCTO_BSD)
-			dlclose( handle );
-#endif
-			
-#if defined(YOCTO_WIN)
-			::FreeLibrary( (HINSTANCE)handle );
-#endif
-			handle = NULL;
-		}
-		
-		void   *handle;
-		size_t  count;
-		
-	private:
-		YOCTO_DISABLE_COPY_AND_ASSIGN(impl);
-	};
 	
-	module:: module( const string &soname ) : impl_( new impl(soname) )
+	module:: module( dylib *user_dll ) throw() : 
+	dll(user_dll)
 	{
+		assert(0!=dll);
+		dylib_incr(dll);
 	}
 	
-	module:: module( const char   *soname ) : impl_( new impl(soname) )
+	module:: module( const module &other ) throw() : dll( other.dll )
 	{
-		
-	}
-	
-	module:: module( const module &other ) throw() : impl_( other.impl_ )
-	{
-		++( impl_->count );
+		dylib_incr(dll);
 	}
 	
 	module:: ~module() throw()
 	{
-		assert( impl_ );
-		assert( impl_->count > 0 );
-		if( --(impl_->count) <= 0 )
-		{
-			delete impl_;
-		}
-		impl_ = NULL;
+		assert(dll);
+		if(dylib_decr(dll)<=0)
+			dylib_free(dll);
+		dll = 0;
 	}
 	
 	
-	void * module:: query( const string &symbol ) throw()
+	void * module:: query( const string &symbol ) const throw()
 	{
-#if defined(YOCTO_BSD)
-		return dlsym( (impl_->handle), symbol.c_str() );
-#endif
-		
-#if defined(YOCTO_WIN)
-		return (void*) ::GetProcAddress( (HMODULE)(impl_->handle), symbol.c_str() );
-#endif
+		assert(dll);
+		return dylib_addr(dll,symbol.c_str());
 	}
 	
-	void * module:: query( const char *symbol )
+	void * module:: query( const char *symbol ) const throw()
 	{
-		const string s = symbol;
-		return query( s );
+		assert(dll);
+		return dylib_addr(dll,symbol);
 	}
 	
 	

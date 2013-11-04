@@ -44,7 +44,7 @@ namespace  {
             for( gfx::unit_t x=0;x<s.w;++x)
             {
                 const float wx = float(x)/s.w;
-                const float mx = 1.0-wx;
+                const float mx = 1.0f-wx;
                 const float w00 = mx*my;
                 const float w11 = wx*wy;
                 const float w01 = mx*wy;

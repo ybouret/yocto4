@@ -15,9 +15,10 @@ namespace yocto
         
         void TGA:: save(const string  &filename,
                         const bitmap  &bmp,
-                        addr2rgba     &proc) const
+                        addr2rgba     &proc,
+						void          *) const
         {
-            
+         
         }
         
     }

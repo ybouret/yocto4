@@ -15,7 +15,8 @@ int main( int argc, char *argv[] )
             throw exception("Usage: loader module.dll");
         const string soname = argv[1];
         std::cerr << "-- Loading " << soname << std::endl;
-        module  m( soname );
+		dylib *dll = dylib_load( soname.c_str() );
+        const module  m( dll );
         std::cerr << "loaded <" << soname << ">" << std::endl;
         
         std::cerr << "-- Linking 'sum'" << std::endl;
@@ -28,7 +29,7 @@ int main( int argc, char *argv[] )
         std::cerr << sum(1,2) << std::endl;
         
         std::cerr << "-- Loading it a second time" << std::endl;
-        module m2( soname );
+        const module m2( dll );
         
         std::cerr << "-- Loading plugin" << std::endl; std::cerr.flush();
         interface<ops> I( m2, "load_ops" );

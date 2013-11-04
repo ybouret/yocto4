@@ -7,7 +7,8 @@ YOCTO_UNIT_TEST_IMPL(module)
 {
 	if( argc > 1 )
 	{
-		module M( argv[1] );
+		dylib *dll = dylib_load( argv[1] );
+		const module M( dll );
 		for( int i=2; i < argc; ++i )
 		{
 			std::cerr << argv[i] << ": ";
