@@ -5,7 +5,9 @@
 
 namespace yocto
 {
-	
+    
+    
+    
 	class module : public object
 	{
 	public:

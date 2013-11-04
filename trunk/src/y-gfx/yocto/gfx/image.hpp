@@ -16,8 +16,8 @@ namespace yocto
 virtual void save(      \
 const string &filename, \
 const bitmap &bmp,      \
-addr2rgba    &proc,     \
-void         *options) const EXTRA  \
+addr2rgba    &proc      \
+) const EXTRA
 
         //! image formats handling
         class image : public singleton<image>
