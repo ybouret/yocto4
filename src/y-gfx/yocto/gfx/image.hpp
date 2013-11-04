@@ -12,6 +12,13 @@ namespace yocto
     namespace gfx
     {
         
+#define YOCTO_GFX_IMAGE_FORMAT_API(EXTRA) \
+virtual void save(      \
+const string &filename, \
+const bitmap &bmp,      \
+addr2rgba    &proc,     \
+void         *options) const EXTRA  \
+
         //! image formats handling
         class image : public singleton<image>
         {
@@ -23,6 +30,8 @@ namespace yocto
                 
                 virtual ~format() throw();
                 const string &key() const throw();
+                
+                YOCTO_GFX_IMAGE_FORMAT_API(=0);
                 
             protected:
                 explicit format( const char *id );
@@ -38,16 +47,19 @@ namespace yocto
              */
             void operator()( format *fmt );
             
+            bool has( const string &id) const throw();
+            bool has( const char   *id) const;
+            
+            const image::format & operator[](const string &id) const;
             
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(image);
-           
+            
             //__________________________________________________________________
             //
             // singleton API
             //__________________________________________________________________
-
             virtual ~image() throw();
             explicit image();
             friend class singleton<image>;

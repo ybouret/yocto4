@@ -48,6 +48,28 @@ namespace yocto
             return formats.end();
         }
         
+        const image::format & image:: operator[](const string &id) const
+        {
+            const fmt_ptr *ppFmt = formats.search(id);
+            if( !ppFmt )
+                throw exception("unregistered image format '%s'", id.c_str());
+            
+            return **ppFmt;
+        }
+        
+        bool image:: has( const string &id) const throw()
+        {
+            return 0 != formats.search(id);
+        }
+
+        bool image:: has( const char *tgt ) const
+        {
+            const string id(tgt);
+            return 0 != formats.search(id);
+        }
+
+        
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // image format

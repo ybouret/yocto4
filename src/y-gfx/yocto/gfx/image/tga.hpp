@@ -14,6 +14,8 @@ namespace yocto
             explicit TGA();
             virtual ~TGA() throw();
             
+            YOCTO_GFX_IMAGE_FORMAT_API();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(TGA);
         };
