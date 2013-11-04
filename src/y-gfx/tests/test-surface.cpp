@@ -24,7 +24,7 @@ namespace  {
         const float r00 = col[0].r/255.0f;
         const float g00 = col[0].g/255.0f;
         const float b00 = col[0].b/255.0f;
-      
+        
         const float r01 = col[1].r/255.0f;
         const float g01 = col[1].g/255.0f;
         const float b01 = col[1].b/255.0f;
@@ -32,7 +32,7 @@ namespace  {
         const float r11 = col[2].r/255.0f;
         const float g11 = col[2].g/255.0f;
         const float b11 = col[2].b/255.0f;
-       
+        
         const float r10 = col[3].r/255.0f;
         const float g10 = col[3].g/255.0f;
         const float b10 = col[3].b/255.0f;
@@ -79,28 +79,26 @@ YOCTO_UNIT_TEST_IMPL(surface)
 }
 YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/gfx/image.hpp"
-#include "yocto/ios/ocstream.hpp"
 
-YOCTO_UNIT_TEST_IMPL(image)
+YOCTO_UNIT_TEST_IMPL(save)
 {
     gfx::surface::pointer s = gfx::surface::create( gfx::format::ARGB32(), 256, 128);
     fill_surface(*s);
     
     gfx::addr2rgba proc( &*s, & gfx::surface::to_rgba);
-  
-    gfx::image::save("image.tga",    *s, gfx::image::TGA,    proc);
-    gfx::image::save("image_a.tga",  *s, gfx::image::TGA_A,  proc);
-    gfx::image::save("image_z.tga",  *s, gfx::image::TGA_Z,  proc);
-    gfx::image::save("image_za.tga", *s, gfx::image::TGA_ZA, proc);
-    gfx::image::save("image.ppm",    *s, gfx::image::PPM,    proc);
-    gfx::image::save("image.tiff",   *s, gfx::image::TIFF,   proc);
-    gfx::image::save("image.eps",    *s, gfx::image::EPS,    proc);
-    gfx::image::save("image_bw.eps", *s, gfx::image::EPS_BW, proc);
-    gfx::image::save("image.bmp",    *s, gfx::image::BMP,    proc);
-    gfx::image::save("image.rgb",    *s, gfx::image::RGB,    proc);
-    gfx::image::save("image.raw",    *s, gfx::image::RAW,    proc);
-    gfx::image::save("image_bw.raw", *s, gfx::image::RAW_BW, proc);
-
+    
+    s->save("image.tga",    s->TGA,    proc);
+    s->save("image_a.tga",  s->TGA_A,  proc);
+    s->save("image_z.tga", s->TGA_Z,  proc);
+    s->save("image_za.tga", s->TGA_ZA, proc);
+    s->save("image.ppm",    s->PPM,    proc);
+    s->save("image.tiff",   s->TIFF,   proc);
+    s->save("image.eps",    s->EPS,    proc);
+    s->save("image_bw.eps", s->EPS_BW, proc);
+    s->save("image.bmp",    s->BMP,    proc);
+    s->save("image.rgb",    s->RGB,    proc);
+    s->save("image.raw",    s->RAW,    proc);
+    s->save("image_bw.raw", s->RAW_BW, proc);
+    
 }
 YOCTO_UNIT_TEST_DONE()

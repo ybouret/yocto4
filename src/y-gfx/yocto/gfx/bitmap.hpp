@@ -2,8 +2,12 @@
 #define YOCTO_GFX_BITMAP_INCLUDED 1
 
 #include "yocto/gfx/region.hpp"
+#include "yocto/gfx/rgb.hpp"
+
 #include "yocto/counted.hpp"
 #include "yocto/ptr/arc.hpp"
+
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -26,7 +30,7 @@ namespace yocto
             
             typedef arc_ptr<bitmap> pointer;
             typedef void * (*peek_proc)(void *,unit_t);
-                      
+            
             //! default destructor
             virtual ~bitmap() throw();
             
@@ -63,6 +67,41 @@ namespace yocto
             void *      get(unit_t x, unit_t y) throw();
             const void *get(unit_t x, unit_t y) const throw();
             
+            
+            //__________________________________________________________________
+            //
+            // I/O
+            //__________________________________________________________________
+            enum iofmt
+            {
+                TGA    ,   //!< Targa
+                TGA_A  ,  //!< Targa with Alpha
+                TGA_Z  ,  //!< Compressed Targa
+                TGA_ZA ,  //!< Compressed Targa with Alpha
+                PPM    ,   //!< PPM
+                RGB    ,   //!< RGB
+                RAW_BW ,   //!< Raw Greyscale
+                TIFF   ,   //!< Tiff
+                EPS    ,   //!< EPS/colour
+                EPS_BW ,   //!< EPS/black and white
+                RAW    ,   //!< Raw
+                BMP        //!< BMP
+            };
+            
+            void save(ios::ostream  &fp,
+                      const iofmt    fmt,
+                      addr2rgba     &proc,
+                      bool           flip=false) const;
+            
+            void save(const string &filename,
+                      const iofmt   fmt,
+                      addr2rgba    &proc,
+                      bool          flip=false) const;
+            
+            void save(const char   *filename,
+                      const iofmt   fmt,
+                      addr2rgba    &proc,
+                      bool          flip=false) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);
