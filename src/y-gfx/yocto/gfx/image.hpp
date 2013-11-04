@@ -12,6 +12,7 @@ namespace yocto
     namespace gfx
     {
         
+        //! image formats handling
         class image : public singleton<image>
         {
         public:
