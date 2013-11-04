@@ -1,10 +1,17 @@
 #include "yocto/gfx/image.hpp"
-
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // image
+        //
+        ////////////////////////////////////////////////////////////////////////
+
         const char image::name[] = "gfx::image";
         
         image:: image()
@@ -15,6 +22,34 @@ namespace yocto
         {
             
         }
+        
+        
+        void image:: operator()( format *fmt )
+        {
+            const fmt_ptr p(fmt);
+            
+            if( !formats.insert(p) )
+                throw exception("multiple image format '%s'", p->name.c_str());
+            
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // image format
+        //
+        ////////////////////////////////////////////////////////////////////////
+        image::format::format( const string &id ) :
+        name(id)
+        {
+        }
+        
+        image:: format:: ~format() throw()
+        {
+        }
+        
+        const string & image::format::key() const throw() { return name; }
+        
     }
 }
 
