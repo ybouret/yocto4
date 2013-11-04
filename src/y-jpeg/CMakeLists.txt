@@ -7,6 +7,7 @@ SET(JROOT  ${CMAKE_CURRENT_SOURCE_DIR}/yocto/jpeg)
 MESSAGE( STATUS "@${JROOT}" )
 SET(JCONFIG ${JROOT}/jconfig.h)
 
+IF(FALSE)
 ADD_CUSTOM_COMMAND(
    OUTPUT   ${JCONFIG}
    COMMAND  sh configure --disable-shared --without-x --quiet
@@ -14,6 +15,7 @@ ADD_CUSTOM_COMMAND(
    COMMENT "Generating Platform Adapated <jconfig.h>"
    WORKING_DIRECTORY ${JROOT}
    )
+ENDIF()
 
 SET(LIBSOURCES 
 	jcapimin.c jcapistd.c jctrans.c jcparam.c jdatadst.c jcinit.c jcmaster.c jcmarker.c jcmainct.c jcprepct.c jccoefct.c jccolor.c jcsample.c jchuff.c jcphuff.c jcdctmgr.c jfdctfst.c jfdctflt.c jfdctint.c jdapimin.c jdapistd.c jdtrans.c jdatasrc.c jdmaster.c jdinput.c jdmarker.c jdhuff.c jdphuff.c jdmainct.c jdcoefct.c jdpostct.c jddctmgr.c jidctfst.c jidctflt.c jidctint.c jidctred.c jdsample.c jdcolor.c jquant1.c jquant2.c jdmerge.c jcomapi.c jutils.c jerror.c jmemmgr.c jmemnobs.c)
