@@ -2,4 +2,3 @@
 
 #define BMP_SUPPORTED
 #define PPM_SUPPORTED
-
