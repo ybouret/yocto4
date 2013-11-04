@@ -25,7 +25,7 @@ namespace yocto
                 const string &key() const throw();
                 
             protected:
-                explicit format( const string &id);
+                explicit format( const char *id );
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(format);
@@ -37,6 +37,8 @@ namespace yocto
              \param format a raw pointer, taken care of in case of error
              */
             void operator()( format *fmt );
+            
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(image);
@@ -56,10 +58,17 @@ namespace yocto
             //
             // format mgmt
             //__________________________________________________________________
-
+            
             typedef intr_ptr<string,format> fmt_ptr;
             typedef set<string,fmt_ptr>     fmt_db;
             fmt_db formats;
+            
+        public:
+            typedef fmt_db::const_iterator iterator;
+            
+            size_t   size()  const throw();
+            iterator begin() const throw();
+            iterator end()   const throw();
         };
         
     }
