@@ -7,15 +7,7 @@ SET(JROOT  ${CMAKE_CURRENT_SOURCE_DIR}/yocto/jpeg)
 MESSAGE( STATUS "@${JROOT}" )
 SET(JCONFIG ${JROOT}/jconfig.h)
 
-IF(FALSE)
-ADD_CUSTOM_COMMAND(
-   OUTPUT   ${JCONFIG}
-   COMMAND  sh configure --disable-shared --without-x --quiet
-   DEPENDS   
-   COMMENT "Generating Platform Adapated <jconfig.h>"
-   WORKING_DIRECTORY ${JROOT}
-   )
-ENDIF()
+ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
 
 SET(LIBSOURCES 
 	jcapimin.c jcapistd.c jctrans.c jcparam.c jdatadst.c jcinit.c jcmaster.c jcmarker.c jcmainct.c jcprepct.c jccoefct.c jccolor.c jcsample.c jchuff.c jcphuff.c jcdctmgr.c jfdctfst.c jfdctflt.c jfdctint.c jdapimin.c jdapistd.c jdtrans.c jdatasrc.c jdmaster.c jdinput.c jdmarker.c jdhuff.c jdphuff.c jdmainct.c jdcoefct.c jdpostct.c jddctmgr.c jidctfst.c jidctflt.c jidctint.c jidctred.c jdsample.c jdcolor.c jquant1.c jquant2.c jdmerge.c jcomapi.c jutils.c jerror.c jmemmgr.c jmemnobs.c)
@@ -26,6 +18,8 @@ FOREACH(f ${LIBSOURCES})
 ENDFOREACH()
 
 ADD_LIBRARY(y-jpeg STATIC ${JCONFIG} ${SOURCES})
+
+IF(NOT MSVC)
 
 ADD_EXECUTABLE(cjpeg 
 	${JROOT}/cjpeg.c 
@@ -86,6 +80,7 @@ ADD_CUSTOM_COMMAND(
 	COMMAND jpegtran -outfile ${CMAKE_CURRENT_BINARY_DIR}/testoutt.jpg ${JROOT}/testprog.jpg
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testoutt.jpg ${JROOT}/testorig.jpg
 	COMMENT "Testing jpegtran" )
+ENDIF(NOT MSVC)
 
 INSTALL( FILES 
 	${JROOT}/jconfig.h
