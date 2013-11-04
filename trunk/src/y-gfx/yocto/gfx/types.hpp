@@ -24,6 +24,7 @@ namespace yocto
             }
             
             static const float unit_float[256];
+            static uint8_t greyscale( const uint8_t r, const uint8_t g, const uint8_t b) throw();
         };
         
         
