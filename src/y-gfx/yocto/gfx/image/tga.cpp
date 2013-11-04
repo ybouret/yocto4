@@ -1,4 +1,5 @@
 #include "yocto/gfx/image/tga.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {
@@ -16,9 +17,14 @@ namespace yocto
         void TGA:: save(const string  &filename,
                         const bitmap  &bmp,
                         addr2rgba     &proc,
-						void          *) const
+						const char     *options) const
         {
-         
+            bitmap::iofmt fmt = bitmap::TGA;
+            if(options)
+            {
+                
+            }
+            bmp.save(filename, fmt, proc);
         }
         
     }

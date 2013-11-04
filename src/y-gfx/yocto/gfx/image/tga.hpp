@@ -17,7 +17,7 @@ namespace yocto
             virtual void save(const string &filename, 
 								 const bitmap &bmp,
 								 addr2rgba    &proc,
-								 void         *options) const;
+								 const char   *options) const;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(TGA);

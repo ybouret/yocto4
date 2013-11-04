@@ -75,9 +75,9 @@ namespace yocto
             enum iofmt
             {
                 TGA    ,   //!< Targa
-                TGA_A  ,  //!< Targa with Alpha
-                TGA_Z  ,  //!< Compressed Targa
-                TGA_ZA ,  //!< Compressed Targa with Alpha
+                TGA_A  ,   //!< Targa with Alpha
+                TGA_Z  ,   //!< Compressed Targa
+                TGA_ZA ,   //!< Compressed Targa with Alpha
                 PPM    ,   //!< PPM
                 RGB    ,   //!< RGB
                 RAW_BW ,   //!< Raw Greyscale

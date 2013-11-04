@@ -27,7 +27,7 @@ namespace yocto
                virtual void save(const string &filename, 
 								 const bitmap &bmp,
 								 addr2rgba    &proc,
-								 void         *options) const = 0;
+								 const char   *options) const = 0;
                 
             protected:
                 explicit format( const char *id );

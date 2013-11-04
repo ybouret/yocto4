@@ -14,7 +14,7 @@ SET( img_srcs ${img_decl} ${img_impl} )
 INSTALL( FILES ${img_decl} DESTINATION include/yocto/gfx/image )
 SOURCE_GROUP( gfx/image FILES ${img_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main)
+INCLUDE_DIRECTORIES( . ../y-main ../y-jpeg)
 
 ADD_EXECUTABLE(named-rgb EXCLUDE_FROM_ALL named-rgb.cpp)
 TARGET_LINK_YOCTO(named-rgb)
