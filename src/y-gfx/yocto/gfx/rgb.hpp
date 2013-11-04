@@ -59,6 +59,11 @@ namespace yocto
             
             inline ~rgb() throw() {}
             
+            friend inline bool operator==(const rgb &lhs, const rgb &rhs ) throw()
+            {
+                return (lhs.r == rhs.r) && (lhs.g == rhs.g) && (lhs.b == rhs.b) && (lhs.a == rhs.a);
+            }
+            
         };
         
         typedef rgb<uint8_t>  rgb_t;

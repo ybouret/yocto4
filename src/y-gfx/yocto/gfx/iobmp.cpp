@@ -1,4 +1,5 @@
 #include "yocto/gfx/bitmap.hpp"
+#include "yocto/code/utils.hpp"
 
 #define __putc(C,F) F.write(C)
 
@@ -14,25 +15,33 @@ namespace yocto
         {
             assert(s!=0);
             const unsigned n = length_of(s);
-            char hex[4] = {0,0,0,0};
-            
+            /*
+             char hex[4] = {0,0,0,0};
+             for(unsigned i=0;i<n;i+=2)
+             {
+             hex[0] = s[i];
+             hex[1] = s[i+1];
+             unsigned c = 0;
+             sscanf(hex,"%X",&c);
+             __putc(c,fptr);
+             }
+             */
             for(unsigned i=0;i<n;i+=2)
             {
-                hex[0] = s[i];
-                hex[1] = s[i+1];
-                unsigned c = 0;
-                sscanf(hex,"%X",&c);
+                const int hi = hex2dec( s[i]  );
+                const int lo = hex2dec( s[i+1]);
+                const uint8_t c = uint8_t( (hi<<4) | lo );
                 __putc(c,fptr);
             }
         }
         
         static inline uint8_t __greyscale( const rgb_t &C ) throw()
         {
-            
             return conv::greyscale(C.r, C.g, C.b);
         }
         
-        void BM_WriteLongInt(ios::ostream &fptr, long n)
+        static inline
+        void BM_WriteLongInt(ios::ostream &fptr, const long n)
         {
             char s[4];
             s[0] = (n & 0xff000000) / 16777216;
