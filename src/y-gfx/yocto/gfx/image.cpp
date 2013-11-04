@@ -33,13 +33,27 @@ namespace yocto
             
         }
         
+        size_t image:: size()  const throw()
+        {
+            return formats.size();
+        }
+        
+        image::iterator image::begin() const throw()
+        {
+            return formats.begin();
+        }
+        
+        image::iterator image::end() const throw()
+        {
+            return formats.end();
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
         // image format
         //
         ////////////////////////////////////////////////////////////////////////
-        image::format::format( const string &id ) :
+        image::format::format( const char *id ) :
         name(id)
         {
         }
