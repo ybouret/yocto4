@@ -1,7 +1,7 @@
 #include "yocto/gfx/bitmap.hpp"
 #include "yocto/code/utils.hpp"
 
-#define __putc(C,F) F.write(C)
+#define __putc(C,F) F.write(char(C))
 
 namespace yocto
 {
@@ -44,10 +44,10 @@ namespace yocto
         void BM_WriteLongInt(ios::ostream &fptr, const long n)
         {
             char s[4];
-            s[0] = (n & 0xff000000) / 16777216;
-            s[1] = (n & 0x00ff0000) / 65536;
-            s[2] = (n & 0x0000ff00) / 256;
-            s[3] = (n & 0x000000ff);
+            s[0] = char( (n & 0xff000000) / 16777216 );
+            s[1] = char( (n & 0x00ff0000) / 65536    );
+            s[2] = char( (n & 0x0000ff00) / 256      );
+            s[3] = char( (n & 0x000000ff)            );
             for(int i=0;i<4;i++)
                 __putc(s[i],fptr);
         }
@@ -304,12 +304,13 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- adjust depending on format
                 //--------------------------------------------------------------
+#if 0
                 switch(fmt)
                 {
                     default:
                         break;
                 }
-                
+#endif           
                 //--------------------------------------------------------------
                 //-- use flip
                 //--------------------------------------------------------------

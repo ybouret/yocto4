@@ -64,6 +64,10 @@ namespace yocto
                 
                 inline ~newton() throw() {}
                 
+#if defined(_MSC_VER)
+				// this in ctor
+#pragma warning ( disable : 4355 )
+#endif
                 //==============================================================
                 //
                 // create resources

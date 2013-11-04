@@ -12,13 +12,6 @@ namespace yocto
     namespace gfx
     {
         
-#define YOCTO_GFX_IMAGE_FORMAT_API(EXTRA) \
-virtual void save(      \
-const string &filename, \
-const bitmap &bmp,      \
-addr2rgba    &proc      \
-) const EXTRA
-
         //! image formats handling
         class image : public singleton<image>
         {
@@ -31,7 +24,10 @@ addr2rgba    &proc      \
                 virtual ~format() throw();
                 const string &key() const throw();
                 
-                YOCTO_GFX_IMAGE_FORMAT_API(=0);
+               virtual void save(const string &filename, 
+								 const bitmap &bmp,
+								 addr2rgba    &proc,
+								 void         *options) const = 0;
                 
             protected:
                 explicit format( const char *id );
