@@ -16,7 +16,7 @@ SOURCE_GROUP( gfx/image FILES ${img_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main)
 
-ADD_EXECUTABLE(named-rgb named-rgb.cpp)
+ADD_EXECUTABLE(named-rgb EXCLUDE_FROM_ALL named-rgb.cpp)
 TARGET_LINK_YOCTO(named-rgb)
 
 
