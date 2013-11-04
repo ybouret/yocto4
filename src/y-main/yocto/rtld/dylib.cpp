@@ -25,7 +25,7 @@ namespace yocto
 	{
 		dylib *dll = dylib::acquire();
 		YOCTO_GIANT_LOCK();
-		#if defined(YOCTO_BSD)
+#if defined(YOCTO_BSD)
 		dll->h = dlopen(soname,RTLD_NOW);
 		if(0==dll->h)
 		{
@@ -33,9 +33,9 @@ namespace yocto
 			throw imported::exception( "dlopen", "%s", dlerror() );
 		}
 		return dll;
-		#endif
+#endif
 		
-		#if defined(YOCTO_WIN)
+#if defined(YOCTO_WIN)
 		dll->h = ::LoadLibrary(soname);
 		if(0==dll->h)
 		{
@@ -43,7 +43,7 @@ namespace yocto
 			throw win32::exception( ::GetLastError(), "::LoadLibrary");
 		}
 		return dll;
-		#endif
+#endif
 	}
 	
     dylib *dylib_load( const char *soname, char *errbuf, size_t errlen)
@@ -86,7 +86,7 @@ namespace yocto
         return dll;
     }
     
-	#define Y_DLL_CHECK() assert(0!=dll); assert(0!=dll->h)
+#define Y_DLL_CHECK() assert(0!=dll); assert(0!=dll->h)
     void dylib_incr(dylib *dll) throw()
 	{
 		Y_DLL_CHECK();
@@ -109,7 +109,7 @@ namespace yocto
 #if defined(YOCTO_BSD)
 		dlclose(dll->h);
 #endif
-            
+        
 #if defined(YOCTO_WIN)
 		:: FreeLibrary((HINSTANCE)(dll->h));
 #endif
@@ -122,13 +122,13 @@ namespace yocto
 		Y_DLL_CHECK();
 		if(symbol)
 		{
-			#if defined(YOCTO_BSD)
+#if defined(YOCTO_BSD)
 			return dlsym( (void*)(dll->h), symbol );
-			#endif
+#endif
 			
-			#if defined(YOCTO_WIN)
+#if defined(YOCTO_WIN)
 			return (void*) ::GetProcAddress( (HMODULE)(dll->h), symbol );
-			#endif
+#endif
 		}
 		return 0;
 	}
