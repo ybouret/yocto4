@@ -8,7 +8,11 @@
 
 namespace yocto
 {
-	
+	namespace hidden
+    {
+        void singleton_out( const char *name, const char *mesg, const int life_time) throw();
+    }
+    
 	//! singleton of T
 	/**
 	 T must define:
@@ -20,7 +24,8 @@ namespace yocto
 	{
 	public:
 		static threading::mutex access;
-		
+		static bool             verbose;
+        
 		static T & instance()
 		{
 			static volatile bool     register_ = true;
@@ -39,6 +44,7 @@ namespace yocto
 					//----------------------------------------------------------
 					if( register_ ) 
 					{
+                        if(verbose) hidden::singleton_out( T::name, "registering", T::life_time);
 						clear_( (void *)location_ );
 						threading::at_exit::perform( release_, T::life_time);
 						register_ = false;
@@ -51,6 +57,7 @@ namespace yocto
 					instance_ = static_cast<volatile T *>( instance_addr );
 					try
 					{
+                        if(verbose) hidden::singleton_out( T::name, "creating", T::life_time);
 						new ( instance_addr ) T();
 					}
 					catch(...)
@@ -110,6 +117,7 @@ namespace yocto
 		{
 			if (instance_ != NULL)
 			{
+                if(verbose) hidden::singleton_out( T::name, "destroying", T::life_time);
 				instance_->~T();
 				clear_( (void *)instance_ );
 				instance_ = NULL;
@@ -123,6 +131,9 @@ namespace yocto
 	template <typename T>
 	threading::mutex singleton<T>::access( T::name );
 	
+    template <typename T>
+    bool singleton<T>::verbose = false;
+    
 	
 }
 

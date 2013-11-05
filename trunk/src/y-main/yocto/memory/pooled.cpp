@@ -6,7 +6,7 @@ namespace yocto
 	
 	namespace memory
 	{
-		const char pooled::name[] = "pooled";
+		const char pooled::name[] = "memory::pooled";
 		
 		pooled:: ~pooled() throw() {}
 		
