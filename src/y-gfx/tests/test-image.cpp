@@ -88,9 +88,13 @@ YOCTO_UNIT_TEST_IMPL(image)
     
     gfx::addr2rgba proc( &*s, & gfx::surface::to_rgba);
 
+	std::cerr << "Saving TGA" << std::endl;
     img["tga"].save( "image2.tga", *s, proc, 0);
+
+	std::cerr << "Saving JPG" << std::endl;
     img["jpg"].save( "image2.jpg", *s, proc, 0);
 
+	std::cerr << "Done Saving..." << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
