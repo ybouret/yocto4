@@ -1,11 +1,10 @@
-#include "yocto/gfx/image/jpg.hpp"
-#include "yocto/ios/ocstream.hpp"
-#include "yocto/auto-arr.hpp"
-
 extern "C"
 {
 #include "yocto/jpeg/jpeglib.h"
 }
+#include "yocto/gfx/image/jpg.hpp"
+#include "yocto/ios/ocstream.hpp"
+#include "yocto/auto-arr.hpp"
 
 #include <cstring>
 
