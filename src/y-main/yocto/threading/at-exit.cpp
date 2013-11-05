@@ -1,9 +1,12 @@
 #include "yocto/threading/at-exit.hpp"
 #include "yocto/threading/mutex.hpp"
 #include "yocto/error.hpp"
-#include <cerrno>
 #include "yocto/code/bswap.hpp"
+
 #include <cstdlib>
+#include <cerrno>
+
+//#include <iostream>
 
 namespace yocto
 {
@@ -11,7 +14,7 @@ namespace yocto
 	namespace threading
 	{
 		
-		namespace 
+		namespace
 		{
 			struct cb_t
 			{
@@ -38,14 +41,18 @@ namespace yocto
 					
 				}
 				cb_num = 0;
-			}			
+			}
 		}
 		
-		void at_exit::perform( at_exit::callback procedure, threading::longevity life_time) throw()
+		void at_exit::perform(at_exit::callback    procedure,
+                              threading::longevity life_time) throw()
 		{
 			static bool registered = false;
 			
-			//-- once registering
+            //__________________________________________________________________
+			//
+            // once registering
+            //__________________________________________________________________
 			YOCTO_GIANT_LOCK();
 			if( !registered )
 			{
@@ -56,17 +63,27 @@ namespace yocto
 			}
 			
 			assert( procedure );
-			
-			//-- check room left
+            //std::cerr << "*** at_exit@" << (void *)procedure << " $" << life_time << std::endl;
+            
+            //__________________________________________________________________
+            //
+			// check room left
+            //__________________________________________________________________
 			if( cb_num >= YOCTO_AT_EXIT_STACK_SIZE )
 				libc::critical_error( ERANGE, "YOCTO_AT_EXIT_STACK_SIZE overflow");
 			
-			//-- store at end of stack
+            //__________________________________________________________________
+            //
+			// store at end of stack
+            //__________________________________________________________________
 			cb_t *curr      = &cb_reg[cb_num++];
 			curr->procedure = procedure;
 			curr->life_time = life_time;
 			
-			//-- re-order
+            //__________________________________________________________________
+            //
+			// re-order
+            //__________________________________________________________________
 			cb_t *prev = curr;
 			while( --prev >= cb_reg && prev->life_time > curr->life_time )
 			{

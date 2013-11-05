@@ -68,9 +68,15 @@ namespace  {
     
 }
 
+#include "yocto/memory/pooled.hpp"
 
 YOCTO_UNIT_TEST_IMPL(image)
 {
+    gfx::image::verbose       = true;
+    object::provider::verbose = true;
+    memory::global::verbose   = true;
+    memory::pooled::verbose   = true;
+    
     gfx::image &img = gfx::image::instance();
     std::cerr << "testing " << img.get_name() << std::endl;
     
