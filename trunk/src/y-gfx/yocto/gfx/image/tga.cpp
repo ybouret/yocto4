@@ -5,7 +5,7 @@ namespace yocto
 {
     namespace gfx
     {
-        TGA:: TGA() : image::format("tga")
+        TGA:: TGA() : format("tga")
         {
             
         }

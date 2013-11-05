@@ -1,14 +1,14 @@
 #ifndef YOCTO_GFX_IMAGE_JPG_INCLUDED
 #define YOCTO_GFX_IMAGE_JPG_INCLUDED 1
 
-#include "yocto/gfx/image.hpp"
+#include "yocto/gfx/format.hpp"
 
 namespace yocto
 {
     namespace gfx
     {
         
-        class JPG : public image::format
+        class JPG : public format
         {
         public:
             explicit JPG();
