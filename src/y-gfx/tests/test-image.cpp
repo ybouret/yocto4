@@ -57,7 +57,7 @@ namespace  {
                 const uint8_t r = gfx::conv::to_byte( w00 * r00 + w11 * r11 + w01 * r01 + w10 * r10 );
                 const uint8_t g = gfx::conv::to_byte( w00 * g00 + w11 * g11 + w01 * g01 + w10 * g10 );
                 const uint8_t b = gfx::conv::to_byte( w00 * b00 + w11 * b11 + w01 * b01 + w10 * b10 );
-                s.put_pixel( s[y][x], s.map_rgba(r, g, b, alpha) );
+                //s.put_pixel( s[y][x], s.map_rgba(r, g, b, alpha) );
                 if(x==0&&y==0)
                 {
                     std::cerr << "Top Left=" << int(r) << " " << int(g) << " " << int(b) << std::endl;
@@ -77,28 +77,31 @@ YOCTO_UNIT_TEST_IMPL(image)
     memory::global::verbose   = true;
     memory::pooled::verbose   = true;
     
-    gfx::image &img = gfx::image::instance();
-    std::cerr << "testing " << img.get_name() << std::endl;
+    //gfx::image &img = gfx::image::instance();
+    //std::cerr << "testing " << img.get_name() << std::endl;
     
-    img( new gfx::TGA() );
-    img( new gfx::JPG() );
+    //img( new gfx::TGA() );
+    //img( new gfx::JPG() );
     
     std::cerr << "supported formats:" << std::endl;
-    for( gfx::image::iterator i=img.begin();i!=img.end();++i)
-    {
-        std::cerr << (*i)->name << std::endl;
-    }
+    //for( gfx::image::iterator i=img.begin();i!=img.end();++i)
+    //{
+    //    std::cerr << (*i)->name << std::endl;
+    //}
     
+	std::cerr << "Filling surface" << std::endl;
     gfx::surface::pointer s = gfx::surface::create( gfx::pixel_format::ARGB32(), 256, 128);
     fill_surface2(*s);
-    
+	std::cerr << "Surface is Filled" << std::endl;
+    return 0;
+
     gfx::addr2rgba proc( &*s, & gfx::surface::to_rgba);
 
 	std::cerr << "Saving TGA" << std::endl;
-    img["tga"].save( "image2.tga", *s, proc, 0);
+    //img["tga"].save( "image2.tga", *s, proc, 0);
 
 	std::cerr << "Saving JPG" << std::endl;
-    img["jpg"].save( "image2.jpg", *s, proc, 0);
+    //img["jpg"].save( "image2.jpg", *s, proc, 0);
 
 	std::cerr << "Done Saving..." << std::endl;
     
