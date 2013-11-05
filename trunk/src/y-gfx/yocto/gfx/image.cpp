@@ -14,7 +14,7 @@ namespace yocto
 
         const char image::name[] = "gfx::image";
         
-        image:: image()
+		image:: image() : formats(8,as_capacity)
         {
         }
         
