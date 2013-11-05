@@ -12,7 +12,7 @@ namespace yocto
 {
     namespace gfx
     {
-        JPG:: JPG() : format("jpg")
+        JPG:: JPG() : image::format("jpg")
         {
             
         }
@@ -33,7 +33,6 @@ namespace yocto
             ios::ocstream fp(filename,false);
             
             JSAMPROW row_pointer[1];
-            // int row_stride;
             
             // memory, auto released
             auto_arr<char> jimg( 3*size_t(width) );
@@ -70,11 +69,12 @@ namespace yocto
                 
                 row_pointer[0] = jimage;
                 int j = cinfo.image_height - 1;
-                while (cinfo.next_scanline < cinfo.image_height) {
+                while (cinfo.next_scanline < cinfo.image_height)
+                {
                     for (int i=0;i<width;i++)
                     {
-                        const rgb_t C = proc( bmp.get(i, j) );
-                        const int i3 = 3*i;
+                        const rgb_t C  = proc( bmp.get(i, j) );
+                        const int   i3 = 3*i;
                         jimage[i3  ] = C.r;
                         jimage[i3+1] = C.g;
                         jimage[i3+2] = C.b;
