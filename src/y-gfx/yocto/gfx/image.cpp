@@ -48,7 +48,7 @@ namespace yocto
             return formats.end();
         }
         
-        const image::format & image:: operator[](const string &id) const
+        const format & image:: operator[](const string &id) const
         {
             const fmt_ptr *ppFmt = formats.search(id);
             if( !ppFmt )
@@ -69,23 +69,7 @@ namespace yocto
         }
 
         
-        
-        ////////////////////////////////////////////////////////////////////////
-        //
-        // image format
-        //
-        ////////////////////////////////////////////////////////////////////////
-        image::format::format( const char *id ) :
-        name(id)
-        {
-        }
-        
-        image:: format:: ~format() throw()
-        {
-        }
-        
-        const string & image::format::key() const throw() { return name; }
-        
+              
     }
 }
 
