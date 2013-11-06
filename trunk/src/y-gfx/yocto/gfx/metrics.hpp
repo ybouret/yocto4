@@ -8,7 +8,7 @@ namespace yocto
     namespace gfx
     {
         //! used to compact/expand pixels
-        class metrics : public virtual object
+        class metrics 
         {
         public:
             explicit metrics( size_t Bytes );

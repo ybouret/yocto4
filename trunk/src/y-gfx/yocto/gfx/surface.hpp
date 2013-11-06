@@ -25,7 +25,7 @@ namespace yocto
                 
             private:
                 void     *addr;    // row entry address
-                peek_proc peek;
+                peek_proc peek;    // translation
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(row);
                 ~row() throw();
