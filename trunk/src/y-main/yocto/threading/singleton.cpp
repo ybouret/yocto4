@@ -4,6 +4,8 @@
 
 namespace yocto
 {
+	bool singleton_verbose = false;
+
     namespace hidden
     {
         void singleton_out( const char *name, const char *mesg, const int life_time ) throw()

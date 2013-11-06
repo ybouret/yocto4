@@ -12,7 +12,8 @@ namespace yocto
     {
         void singleton_out( const char *name, const char *mesg, const int life_time) throw();
     }
-    
+    extern bool singleton_verbose;
+
 	//! singleton of T
 	/**
 	 T must define:
@@ -44,6 +45,7 @@ namespace yocto
 					//----------------------------------------------------------
 					if( register_ ) 
 					{
+						verbose = singleton_verbose;
                         if(verbose) hidden::singleton_out( T::name, "registering", T::life_time);
 						clear_( (void *)location_ );
 						threading::at_exit::perform( release_, T::life_time);
