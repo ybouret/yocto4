@@ -5,7 +5,8 @@ extern "C" {
 #include "yocto/gfx/image/jpg.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/auto-arr.hpp"
-
+#include "yocto/code/utils.hpp"
+#include "yocto/string/conv.hpp"
 #include <cstring>
 
 namespace yocto
@@ -24,12 +25,18 @@ namespace yocto
         void JPG:: save(const string  &filename,
                         const bitmap  &bmp,
                         addr2rgba     &proc,
-						const char     *options) const
+						const char    *options) const
         {
             const int width   = bmp.w;
             const int height  = bmp.h;
             int quality       = 75;
+            if(options)
+            {
+                const string opt = options;
+                quality = clamp<int>(0,strconv::to<int>(opt,"jpeg quality"),100);
+            }
             
+            // open the file
             ios::ocstream fp(filename,false);
             
             JSAMPROW row_pointer[1];
