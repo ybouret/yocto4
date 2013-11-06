@@ -1,5 +1,6 @@
 #include "yocto/gfx/surface.hpp"
 
+
 namespace yocto
 {
     namespace gfx
@@ -10,7 +11,9 @@ namespace yocto
         addr(data),
         peek(proc)
         {
-            
+            assert(addr!=0);
+			assert(w>0);
+			assert(peek!=0);
         }
         
         void * surface::row:: operator[](unit_t x) throw()
@@ -61,16 +64,20 @@ namespace yocto
         
         void surface:: create_rows()
         {
+			assert(entry!=0);
+			assert(h>0);
+			assert(w>0);
             nrow = h; assert(nrow>0);
             rows = memory::kind<memory::global>::acquire_as<row>(nrow);
             uint8_t *p = static_cast<uint8_t *>(entry);
             for(unit_t i=0;i<h;++i,p+=stride)
-                new (rows+i) row(p,w,peek);
+                new ( &rows[i] ) row(p,w,peek);
         }
         
         
         surface::row & surface::operator[]( unit_t y ) throw()
         {
+			assert(rows);
             assert(y>=0);
             assert(y<h);
             return rows[y];
@@ -78,6 +85,7 @@ namespace yocto
         
         const surface::row & surface::operator[]( unit_t y ) const throw()
         {
+			assert(rows);
             assert(y>=0);
             assert(y<h);
             return rows[y];
@@ -85,6 +93,7 @@ namespace yocto
 
         rgb_t surface:: to_rgba(const void *addr) const throw()
         {
+			assert(get_pixel);
             assert(addr);
             return get_rgba(get_pixel(addr) );
         }

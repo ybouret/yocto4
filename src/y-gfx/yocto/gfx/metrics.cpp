@@ -14,6 +14,8 @@ namespace yocto
         get_pixel( other.get_pixel ),
         put_pixel( other.put_pixel )
         {
+			assert(get_pixel);
+			assert(put_pixel);
         }
         
         //======================================================================

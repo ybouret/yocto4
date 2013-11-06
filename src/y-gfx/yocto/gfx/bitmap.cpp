@@ -155,6 +155,7 @@ namespace yocto
         
         void bitmap:: ldz() throw()
         {
+			assert(entry!=0);
             uint8_t *p = (uint8_t*)entry;
             for(size_t i=h;i>0;--i)
             {
