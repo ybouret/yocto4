@@ -53,7 +53,7 @@ namespace  {
                 const uint8_t r = gfx::conv::to_byte( w00 * r00 + w11 * r11 + w01 * r01 + w10 * r10 );
                 const uint8_t g = gfx::conv::to_byte( w00 * g00 + w11 * g11 + w01 * g01 + w10 * g10 );
                 const uint8_t b = gfx::conv::to_byte( w00 * b00 + w11 * b11 + w01 * b01 + w10 * b10 );
-                s.put_pixel( s[y][x], s.map_rgba(r, g, b, alpha) );
+                //s.put_pixel( s[y][x], s.map_rgba(r, g, b, alpha) );
                 if(x==0&&y==0)
                 {
                     std::cerr << "Top Left=" << int(r) << " " << int(g) << " " << int(b) << std::endl;
@@ -66,15 +66,16 @@ namespace  {
 
 YOCTO_UNIT_TEST_IMPL(surface)
 {
+	singleton_verbose = true;
     std::cerr << "sizeof(gfx::surface)=" << sizeof(gfx::surface) << std::endl;
     gfx::surface::pointer s1 = gfx::surface::create( gfx::pixel_format::RGB24(), 100, 50);
-    fill_surface(*s1);
+    //fill_surface(*s1);
     
     gfx::surface::pointer s2 = gfx::surface::create( gfx::pixel_format::ARGB32(), 100, 50);
-    fill_surface(*s2);
+    //fill_surface(*s2);
     
     gfx::surface::pointer s3 = gfx::surface::create( gfx::pixel_format::ARGB16(), 100, 50);
-    fill_surface(*s3);
+    //fill_surface(*s3);
     
 }
 YOCTO_UNIT_TEST_DONE()
