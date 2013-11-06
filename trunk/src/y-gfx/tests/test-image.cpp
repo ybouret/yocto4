@@ -57,7 +57,8 @@ namespace  {
                 const uint8_t r = gfx::conv::to_byte( w00 * r00 + w11 * r11 + w01 * r01 + w10 * r10 );
                 const uint8_t g = gfx::conv::to_byte( w00 * g00 + w11 * g11 + w01 * g01 + w10 * g10 );
                 const uint8_t b = gfx::conv::to_byte( w00 * b00 + w11 * b11 + w01 * b01 + w10 * b10 );
-                //s.put_pixel( s[y][x], s.map_rgba(r, g, b, alpha) );
+                const uint32_t c = s.map_rgba(r, g, b, alpha);
+                s.put_pixel( s[y][x], c );
                 if(x==0&&y==0)
                 {
                     std::cerr << "Top Left=" << int(r) << " " << int(g) << " " << int(b) << std::endl;
@@ -72,10 +73,13 @@ namespace  {
 
 YOCTO_UNIT_TEST_IMPL(image)
 {
-    gfx::image::verbose       = true;
-    object::provider::verbose = true;
-    memory::global::verbose   = true;
-    memory::pooled::verbose   = true;
+    if(false)
+    {
+        gfx::image::verbose       = true;
+        object::provider::verbose = true;
+        memory::global::verbose   = true;
+        memory::pooled::verbose   = true;
+    }
     
     //gfx::image &img = gfx::image::instance();
     //std::cerr << "testing " << img.get_name() << std::endl;
@@ -94,15 +98,15 @@ YOCTO_UNIT_TEST_IMPL(image)
     fill_surface2(*s);
 	std::cerr << "Surface is Filled" << std::endl;
     return 0;
-
+    
     gfx::addr2rgba proc( &*s, & gfx::surface::to_rgba);
-
+    
 	std::cerr << "Saving TGA" << std::endl;
     //img["tga"].save( "image2.tga", *s, proc, 0);
-
+    
 	std::cerr << "Saving JPG" << std::endl;
     //img["jpg"].save( "image2.jpg", *s, proc, 0);
-
+    
 	std::cerr << "Done Saving..." << std::endl;
     
 }
