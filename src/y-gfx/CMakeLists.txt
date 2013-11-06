@@ -23,7 +23,7 @@ TARGET_LINK_YOCTO(named-rgb)
 ADD_CUSTOM_COMMAND(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/named-rgb.inc
         COMMAND named-rgb ${CMAKE_CURRENT_SOURCE_DIR}/named-rgb.txt ${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/named-rgb.inc
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/named-rgb.txt named-rgb.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/named-rgb.txt ${CMAKE_CURRENT_SOURCE_DIR}/named-rgb.cpp
 )
 
 
