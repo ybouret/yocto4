@@ -1,7 +1,8 @@
 #include "yocto/gfx/bitmap.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/exceptions.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/core/offset.hpp"
+#include "yocto/code/bswap.hpp"
 
 #include <cstring>
 #include <iostream>
@@ -134,8 +135,26 @@ namespace yocto
                 case  4: return __move4;
                 case  8: return __move8;
                 case 16: return __move16;
+                default: break;
             }
-            throw exception("Unsupported depth=%u", unsigned(depth) );
+            throw imported::exception("bitmap::peek","unsupported depth=%u", unsigned(depth) );
+        }
+        
+        static bitmap::swap_proc __assign_swap(size_t depth)
+        {
+            switch(depth)
+            {
+                case  1: return core::bswap<1>;
+                case  2: return core::bswap<2>;
+                case  3: return core::bswap<3>;
+                case  4: return core::bswap<4>;
+                case  8: return core::bswap<8>;
+                case 16: return core::bswap<16>;
+                default:
+                    break;
+            }
+            throw imported::exception("bitmap::swap","unsupported depth=%u", unsigned(depth) );
+
         }
         
         bitmap:: bitmap( size_t Depth, unit_t W, unit_t H ) :
@@ -147,6 +166,7 @@ namespace yocto
         stride( pitch ),
         entry(0),
         peek( __assign_peek(depth) ),
+        swap( __assign_swap(depth) ),
         allocated( stride * h ),
         shared(0)
         {
@@ -173,6 +193,7 @@ namespace yocto
         stride( bmp.stride ),
         entry(0),
         peek(bmp.peek),
+        swap(bmp.swap),
         allocated(0),
         shared(0)
         {
@@ -233,6 +254,45 @@ namespace yocto
             return hmove( get_line(y), x );
         }
         
+        void bitmap:: flip_vert() throw()
+        {
+            unit_t n  = h/2;
+            unit_t lo = 0;
+            unit_t hi = h;
+            const unit_t m = w;
+            const size_t d = depth;
+            while(n-->0)
+            {
+                --hi;
+                uint8_t *a = static_cast<uint8_t *>(get_line(lo));
+                uint8_t *b = static_cast<uint8_t *>(get_line(hi));
+                for(unit_t j=m;j>0;--j)
+                {
+                    swap(a,b);
+                    a += d;
+                    b += d;
+                }
+                ++lo;
+            }
+            
+        }
+        
+        void bitmap:: flip_horz() throw()
+        {
+            const unit_t n = w/2;
+            const size_t d = depth;
+            for(unit_t y=0;y<h;++y)
+            {
+                uint8_t *p = static_cast<uint8_t*>(get_line(y));
+                uint8_t *q = p+pitch;
+                for(unit_t i=n;i>0;--i)
+                {
+                    q -= d;
+                    swap(p,q);
+                    p += d;
+                }
+            }
+        }
         
         
     }
