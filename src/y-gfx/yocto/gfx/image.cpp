@@ -11,7 +11,7 @@ namespace yocto
         // image
         //
         ////////////////////////////////////////////////////////////////////////
-
+        
         const char image::name[] = "gfx::image";
         
 		image:: image() : formats(8,as_capacity)
@@ -26,7 +26,7 @@ namespace yocto
         
         void image:: operator()( format *fmt )
         {
-            const fmt_ptr p(fmt);
+            const format::pointer p(fmt);
             
             if( !formats.insert(p) )
                 throw exception("multiple image format '%s'", p->name.c_str());
@@ -50,7 +50,7 @@ namespace yocto
         
         const image::format & image:: operator[](const string &id) const
         {
-            const fmt_ptr *ppFmt = formats.search(id);
+            const format::pointer *ppFmt = formats.search(id);
             if( !ppFmt )
                 throw exception("unregistered image format '%s'", id.c_str());
             
@@ -61,14 +61,18 @@ namespace yocto
         {
             return 0 != formats.search(id);
         }
-
+        
         bool image:: has( const char *tgt ) const
         {
             const string id(tgt);
             return 0 != formats.search(id);
         }
-
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // image::format
+        //
+        ////////////////////////////////////////////////////////////////////////
         image::format::format( const char *id ) :
         name(id)
         {
@@ -79,6 +83,14 @@ namespace yocto
         }
         
         const string & image:: format::key() const throw() { return name; }
+        
+        void image::format::save(const string  &filename,
+                                 const surface &surf,
+                                 const char    *options) const
+        {
+            addr2rgba proc( &surf, & surface::to_rgba);
+            save(filename,surf,proc,options);
+        }
         
     }
 }

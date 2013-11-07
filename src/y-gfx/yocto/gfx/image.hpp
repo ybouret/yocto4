@@ -1,9 +1,11 @@
 #ifndef YOCTO_GFX_IMAGE_INCLUDED
 #define YOCTO_GFX_IMAGE_INCLUDED 1
 
-#include "yocto/gfx/bitmap.hpp"
-#include "yocto/gfx/rgb.hpp"
+#include "yocto/gfx/pixmap.hpp"
+#include "yocto/gfx/surface.hpp"
+
 #include "yocto/threading/singleton.hpp"
+
 #include "yocto/ptr/intr.hpp"
 #include "yocto/associative/set.hpp"
 
@@ -11,6 +13,8 @@ namespace yocto
 {
     namespace gfx
     {
+     
+        typedef pixmap<rgb_t> bitmap32;
         
         //! image formats handling
         class image : public singleton<image>
@@ -19,6 +23,9 @@ namespace yocto
             class format : public object, public counted
             {
             public:
+                typedef intr_ptr<string,format>     pointer;
+                typedef set<string,format::pointer> database;
+
                 const string name;
                 
                 virtual ~format() throw();
@@ -28,6 +35,10 @@ namespace yocto
                                   const bitmap &bmp,
                                   addr2rgba    &proc,
                                   const char   *options) const = 0;
+            
+                void save(const string  &filename,
+                          const surface &surf,
+                          const char    *options) const;
                 
             protected:
                 explicit format( const char *id );
@@ -66,13 +77,10 @@ namespace yocto
             //
             // format mgmt
             //__________________________________________________________________
-            
-            typedef intr_ptr<string,format> fmt_ptr;
-            typedef set<string,fmt_ptr>     fmt_db;
-            fmt_db formats;
+            format::database formats;
             
         public:
-            typedef fmt_db::const_iterator iterator;
+            typedef format::database::const_iterator iterator;
             
             size_t   size()  const throw();
             iterator begin() const throw();
