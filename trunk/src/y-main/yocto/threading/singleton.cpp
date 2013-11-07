@@ -4,11 +4,13 @@
 
 namespace yocto
 {
-	bool singleton_verbose = false;
+	bool singleton_verbosity = false;
 
     namespace hidden
     {
-        void singleton_out( const char *name, const char *mesg, const int life_time ) throw()
+        void singleton_out(const char *name,
+                           const char *mesg,
+                           const int   life_time ) throw()
         {
             assert(name);
             assert(mesg);
