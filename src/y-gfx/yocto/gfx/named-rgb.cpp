@@ -70,5 +70,20 @@ namespace yocto
             return ans;
         }
 
+        rgb_t:: rgb_t( const string &id ) : r(0),g(0),b(0),a(0xff)
+        {
+            const rgb_t tmp = get_named_rgb(id);
+            r=tmp.r;
+            g=tmp.g;
+            b=tmp.b;
+        }
+        
+        rgb_t:: rgb_t( const char *id ) : r(0),g(0),b(0),a(0xff)
+        {
+            const rgb_t tmp = get_named_rgb(id);
+            r=tmp.r;
+            g=tmp.g;
+            b=tmp.b;
+        }
     }
 }

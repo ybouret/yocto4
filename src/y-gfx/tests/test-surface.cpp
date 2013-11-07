@@ -17,7 +17,7 @@ namespace  {
             gfx::get_named_rgb("blue"),
             gfx::get_named_rgb("red"),
             gfx::get_named_rgb("green"),
-            gfx::get_named_rgb("yellow")
+            gfx::get_named_rgb("black")
         };
         
         
@@ -49,7 +49,7 @@ namespace  {
                 const float w11 = wx*wy;
                 const float w01 = mx*wy;
                 const float w10 = wx*my;
-                const uint8_t alpha = gfx::conv::to_byte( float(x*y)/(s.h*s.w));
+                const uint8_t alpha = gfx::conv::to_byte( 0.5f + 0.5f*float(x*y)/(s.h*s.w));
                 const uint8_t r = gfx::conv::to_byte( w00 * r00 + w11 * r11 + w01 * r01 + w10 * r10 );
                 const uint8_t g = gfx::conv::to_byte( w00 * g00 + w11 * g11 + w01 * g01 + w10 * g10 );
                 const uint8_t b = gfx::conv::to_byte( w00 * b00 + w11 * b11 + w01 * b01 + w10 * b10 );
@@ -66,7 +66,7 @@ namespace  {
 
 YOCTO_UNIT_TEST_IMPL(surface)
 {
-	singleton_verbose = true;
+	singleton_verbosity = true;
     std::cerr << "sizeof(gfx::surface)=" << sizeof(gfx::surface) << std::endl;
     gfx::surface::pointer s1 = gfx::surface::create( gfx::pixel_format::RGB24(), 100, 50);
 
@@ -91,7 +91,7 @@ YOCTO_UNIT_TEST_IMPL(save)
     
     s->save("image.tga",    s->TGA,    proc);
     s->save("image_a.tga",  s->TGA_A,  proc);
-    s->save("image_z.tga", s->TGA_Z,  proc);
+    s->save("image_z.tga",  s->TGA_Z,  proc);
     s->save("image_za.tga", s->TGA_ZA, proc);
     s->save("image.ppm",    s->PPM,    proc);
     s->save("image.tiff",   s->TIFF,   proc);
