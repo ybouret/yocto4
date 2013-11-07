@@ -51,12 +51,12 @@ namespace yocto {
 				value.clear();
 				const DWORD res = ::GetEnvironmentVariable( &name[0], NULL, 0);
 				const DWORD err = ::GetLastError();
-				if( err == ERROR_ENVVAR_NOT_FOUND ) 
+				if( err == ERROR_ENVVAR_NOT_FOUND )
 				{
 					//std::cerr << "Not Defined" << std::endl;
 					return false;
 				}
-				else 
+				else
 				{
 					//std::cerr << "[res1] = " << unsigned(res) << std::endl;
 					const size_t           len    = res-1;
@@ -65,7 +65,7 @@ namespace yocto {
 					char                  *buf    = blk();
 					const DWORD           res2    = ::GetEnvironmentVariable( &name[0], buf, res);
 					//std::cerr << "[res2] = " << unsigned(res2) << std::endl;
-					if(  res2 != len ) 
+					if(  res2 != len )
 					{
 						throw win32::exception( ::GetLastError(), "::GetEnvironmentVariable");
 					}
@@ -122,18 +122,16 @@ namespace yocto {
 	}
 	
 	
-	void environment::set( const string &name, const string &value) 
+	void environment::set( const string &name, const string &value)
 	{
 		envmgr::instance().store( name, value );
 	}
 	
 	
-#if 1
 	static void _parse_env( const char *str, const size_t len, void (*proc)( const string &, const string &, void *), void *args )
 	{
 		assert(str!=NULL);
 		assert(len>0);
-		//printf("parsing [%s]\n", str );
 		size_t idx    = 1;
 		bool   has_eq = false;
 		while( idx < len ) {
@@ -150,10 +148,7 @@ namespace yocto {
 		++idx;
 		string value( str+idx, len-idx );
 		proc( name, value, args );
-		//table.must_insert( name, value );
-		//printf("name=[%s]\n",  name.of_const<char>()  );
-		//printf("    |_[%s]\n", value.of_const<char>() );
-	}
+    }
 	
 	
 	void environment:: get( void (*proc)( const string &, const string &, void *), void *args )
@@ -202,9 +197,50 @@ namespace yocto {
 		}
 		
 #endif
-		
-		
 	}
-#endif
 	
+    
+}
+
+#include "yocto/string/conv.hpp"
+
+namespace yocto
+{
+    template <>
+    bool environment:: check<bool>( bool &value, const string &name)
+    {
+        string s;
+        if( get(s, name) )
+        {
+            
+            if(s=="false"||s=="FALSE"||s=="0")
+            {
+                value = false;
+                return true;
+            }
+            
+            if(s=="true"||s=="TRUE"||s=="1")
+            {
+                value = true;
+            }
+            
+            throw imported::exception("environment::check<bool>","invalid value '%s'", s.c_str());
+        }
+        else
+            return false;
+    }
+    
+    template <>
+    bool environment:: check<int>( int &value, const string &name)
+    {
+        string s;
+        if( get(s,name) )
+        {
+            value = strconv::to<int>(value,"environment::check<int>");
+            return true;
+        }
+        else
+            return true;
+    }
+    
 }

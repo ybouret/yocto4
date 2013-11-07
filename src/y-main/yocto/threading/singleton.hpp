@@ -12,7 +12,12 @@ namespace yocto
     {
         void singleton_out( const char *name, const char *mesg, const int life_time) throw();
     }
-    extern bool singleton_verbose;
+    
+    //! global flag for singleton creation
+    /**
+     Used at the first call of instance(). Default if 'false'.
+     */
+    extern bool singleton_verbosity;
 
 	//! singleton of T
 	/**
@@ -45,7 +50,7 @@ namespace yocto
 					//----------------------------------------------------------
 					if( register_ ) 
 					{
-						verbose = singleton_verbose;
+						verbose = singleton_verbosity;
                         if(verbose) hidden::singleton_out( T::name, "registering", T::life_time);
 						clear_( (void *)location_ );
 						threading::at_exit::perform( release_, T::life_time);
@@ -59,7 +64,6 @@ namespace yocto
 					instance_ = static_cast<volatile T *>( instance_addr );
 					try
 					{
-                        if(verbose) hidden::singleton_out( T::name, "creating", T::life_time);
 						new ( instance_addr ) T();
 					}
 					catch(...)
