@@ -99,6 +99,13 @@ YOCTO_UNIT_TEST_IMPL(image)
 	std::cerr << "Saving JPG" << std::endl;
     img["jpg"].save( "image2.jpg", *s, proc, 0);
     
+    s->flip_vert();
+    img["jpg"].save( "image2v.jpg", *s, proc, 0);
+
+    s->flip_horz();
+    img["jpg"].save( "image2h.jpg", *s, proc, 0);
+
+    
 	std::cerr << "Done Saving..." << std::endl;
     
 }

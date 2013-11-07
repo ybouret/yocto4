@@ -30,6 +30,7 @@ namespace yocto
             
             typedef arc_ptr<bitmap> pointer;
             typedef void * (*peek_proc)(void *,unit_t);
+            typedef void   (*swap_proc)(void *,void *);
             
             //! default destructor
             virtual ~bitmap() throw();
@@ -47,6 +48,7 @@ namespace yocto
             void             *entry;     //!< address of (0,0)
             
             const peek_proc   peek;      //!< for address translation
+            const swap_proc   swap;
             const size_t      allocated; //!< if has memory
             
             //__________________________________________________________________
@@ -67,6 +69,8 @@ namespace yocto
             void *      get(unit_t x, unit_t y) throw();
             const void *get(unit_t x, unit_t y) const throw();
             
+            void flip_vert() throw();
+            void flip_horz() throw();
             
             //__________________________________________________________________
             //
