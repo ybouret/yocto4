@@ -17,5 +17,6 @@ YOCTO_UNIT_TEST_IMPL(rgb)
     }
     std::cerr << "#names=" << names.size() << std::endl;
     //names.release();
+    gfx::rgb_t red = "red";
 }
 YOCTO_UNIT_TEST_DONE()
