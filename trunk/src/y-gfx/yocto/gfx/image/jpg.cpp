@@ -3,11 +3,16 @@ extern "C" {
 }
 
 #include "yocto/gfx/image/jpg.hpp"
+
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/icstream.hpp"
+
 #include "yocto/auto-arr.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/string/conv.hpp"
 #include <cstring>
+#include "yocto/ptr/auto.hpp"
+#include "yocto/exceptions.hpp"
 
 namespace yocto
 {
@@ -97,7 +102,82 @@ namespace yocto
             }
             catch(...)
             {
+                jpeg_finish_compress(&cinfo);
                 jpeg_destroy_compress(&cinfo);
+                throw;
+            }
+        }
+        
+        
+        surface * JPG:: load(const string      &filename,
+                             const pixel_format fmt) const
+        {
+            
+            ios::icstream fp(filename);
+            FILE *fptr = fp.__get();
+            struct jpeg_decompress_struct cinfo;
+            memset(&cinfo,0,sizeof(cinfo));
+            
+            struct jpeg_error_mgr jerr;
+            memset(&jerr,0,sizeof(jerr));
+            
+            // Error handler
+            cinfo.err = jpeg_std_error(&jerr);
+            
+            // Create decompressor
+            jpeg_create_decompress(&cinfo);
+            jpeg_stdio_src(&cinfo, fptr);
+            
+            try
+            {
+                
+                // Read header
+                jpeg_read_header(&cinfo, 1);
+                jpeg_start_decompress(&cinfo);
+                
+                const unit_t width  = cinfo.output_width;
+                const unit_t height = cinfo.output_height;
+                
+                // Can only handle RGB JPEG images at this stage
+                if (cinfo.output_components != 3)
+                    throw imported::exception("jpeg::load", "unsupported #components");
+                
+                // create surfaces
+                auto_ptr<surface> surf( surface::create(fmt, width, height) );
+                
+                // acquire local memory
+                const unit_t input_pitch = cinfo.output_width * cinfo.output_components;
+                auto_arr<JSAMPLE> samples( input_pitch );
+                JSAMPLE *buffer = samples.base();
+                
+                
+                int j = cinfo.output_height-1;
+                while (cinfo.output_scanline < cinfo.output_height)
+                {
+                    surface::row &row_j = (*surf)[j];
+                    (void)jpeg_read_scanlines(&cinfo,&buffer,1);
+                    for (int i=0;i<cinfo.output_width;i++)
+                    {
+                        const int i3 = 3*i;
+                        const rgb_t   c( buffer[i3], buffer[i3+1], buffer[i3+2], 0xff);
+                        const pixel_t p = surf->map_rgb(c);;
+                        void *addr = row_j[i];
+                        surf->put_pixel(addr,p);
+                    }
+                    j--;
+                }
+                
+                
+                // Done
+                jpeg_finish_decompress(&cinfo);
+                jpeg_destroy_decompress(&cinfo);
+                
+                return surf.yield();
+            }
+            catch(...)
+            {
+                jpeg_finish_decompress(&cinfo);
+                jpeg_destroy_decompress(&cinfo);
                 throw;
             }
         }

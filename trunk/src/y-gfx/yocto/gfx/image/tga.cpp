@@ -27,5 +27,12 @@ namespace yocto
             bmp.save(filename, fmt, proc);
         }
         
+        
+        surface * TGA::load(const string      &filename,
+                            const pixel_format fmt) const
+        {
+            return 0;
+        }
+        
     }
 }

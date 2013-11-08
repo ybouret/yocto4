@@ -30,7 +30,11 @@ namespace yocto
                 
                 virtual ~format() throw();
                 const string &key() const throw();
-                
+            
+                //______________________________________________________________
+                //
+                // Saving
+                //______________________________________________________________
                 virtual void save(const string &filename,
                                   const bitmap &bmp,
                                   addr2rgba    &proc,
@@ -39,6 +43,13 @@ namespace yocto
                 void save(const string  &filename,
                           const surface &surf,
                           const char    *options) const;
+                
+                //______________________________________________________________
+                //
+                // Loading
+                //______________________________________________________________
+                virtual surface *load(const string      &filename,
+                                      const pixel_format fmt) const =0;
                 
             protected:
                 explicit format( const char *id );

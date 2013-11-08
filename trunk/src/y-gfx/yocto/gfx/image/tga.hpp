@@ -18,7 +18,9 @@ namespace yocto
 								 const bitmap &bmp,
 								 addr2rgba    &proc,
 								 const char   *options) const;
-
+            
+            virtual surface *load(const string      &filename,
+                                  const pixel_format fmt) const;
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(TGA);
         };
