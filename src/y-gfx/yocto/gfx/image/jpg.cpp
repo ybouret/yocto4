@@ -156,7 +156,7 @@ namespace yocto
                 {
                     surface::row &row_j = (*surf)[j];
                     (void)jpeg_read_scanlines(&cinfo,&buffer,1);
-                    for (int i=0;i<cinfo.output_width;i++)
+                    for(unsigned int i=0;i<cinfo.output_width;i++)
                     {
                         const int i3 = 3*i;
                         const rgb_t   c( buffer[i3], buffer[i3+1], buffer[i3+2], 0xff);
