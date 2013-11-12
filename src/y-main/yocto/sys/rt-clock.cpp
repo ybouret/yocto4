@@ -5,7 +5,6 @@
 #if defined(YOCTO_APPLE)
 #include <mach/mach.h>
 #include <mach/mach_time.h>
-#include <iostream>
 #endif
 
 #if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD)
@@ -14,6 +13,7 @@
 #include "yocto/threading/mutex.hpp"
 #endif
 
+
 namespace yocto
 {
 
@@ -21,7 +21,6 @@ namespace yocto
   
     void rt_clock::calibrate()
     {
-        std::cerr << "sizeof(...)=" << sizeof(mach_timebase_info_data_t) << std::endl;
         mach_timebase_info_data_t timebase;
         const kern_return_t err = mach_timebase_info(&timebase);
         if(err != KERN_SUCCESS)
@@ -29,7 +28,6 @@ namespace yocto
             throw imported::exception("mach_timebase_info","%s",mach_error_string(err));
         }
         double conversion_factor = double(timebase.numer) / timebase.denom;
-        std::cerr << "conversion_factor=" << conversion_factor << std::endl;
         *(double *)data = 1e-9 * conversion_factor;
     }
     
