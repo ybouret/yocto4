@@ -27,9 +27,9 @@ namespace yocto
 	}
 
 	wtime:: wtime( ) :
-	last(0)
+	last( ticks() )
 	{
-		last = ticks();
+		
 	}
 
 
