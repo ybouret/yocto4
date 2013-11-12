@@ -8,6 +8,12 @@
 #include <iostream>
 #endif
 
+#if defined(YOCTO_LINUX)
+#include <sys/time.h>
+#include <errno.h>
+#include "yocto/threading/mutex.hpp"
+#endif
+
 namespace yocto
 {
 
@@ -40,6 +46,34 @@ namespace yocto
 
 #endif
     
+#if defined(YOCTO_LINUX)
+	void rt_clock:: calibrate()
+	{
+		YOCTO_GIANT_LOCK();
+		struct timespec tp  = { 0, 0 };
+		const int       err = clock_getres( CLOCK_REALTIME, &tp );
+		if(err!=0)
+			throw libc::exception( errno, "clock_gettime" );
+		
+	}
+	
+	uint64_t rt_clock:: ticks()
+	{
+		static const uint64_t giga = YOCTO_U64(0x3B9ACA00);
+		YOCTO_GIANT_LOCK();
+		struct timespec tp  = { 0, 0 };
+		const int       err = clock_gettime( CLOCK_REALTIME, &tp );
+		if(err!=0)
+			throw libc::exception( errno, "clock_gettime" );
+		return uint64_t(tp.tv_sec) + giga * uint64_t(tp.tv_nsec); 
+	}
+	
+	double rt_clock:: operator()( uint64_t num_ticks ) const
+	{
+		return 1e-9 * double(num_ticks);
+	}
+#endif
+
     rt_clock:: rt_clock() : data()
     {
         for(unsigned i=0;i<sizeof(data)/sizeof(data[0]);++i) data[i] = 0;

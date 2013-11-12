@@ -173,7 +173,7 @@ MACRO(TARGET_LINK_YOCTO tgt)
 	## Platform Specific Flags
 	####################################################################
 	IF( YOCTO_LINUX )
-		TARGET_LINK_LIBRARIES( ${tgt} pthread )
+		TARGET_LINK_LIBRARIES( ${tgt} pthread rt)
 	ENDIF()
 	
 	IF( YOCTO_FREEBSD )
