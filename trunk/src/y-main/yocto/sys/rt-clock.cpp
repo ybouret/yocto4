@@ -117,6 +117,10 @@ namespace yocto
 	}
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4351 )
+#endif
+
     rt_clock:: rt_clock() : data()
     {
         for(unsigned i=0;i<sizeof(data)/sizeof(data[0]);++i) data[i] = 0;

@@ -29,7 +29,10 @@ YOCTO_UNIT_TEST_IMPL(clock)
     rt_clock chrono;
     
     const uint64_t ini = chrono.ticks();
-    const uint16_t tmx = ini - chrono.ticks();
+	const uint64_t fin = chrono.ticks();
+    const uint64_t tmx = fin-ini;
+	std::cerr << "ini=" << ini << std::endl;
+	std::cerr << "fin=" << fin << std::endl;
     std::cerr << "tmx=" << tmx << std::endl;
     std::cerr << "ell=" << chrono(tmx) << std::endl;
 }
