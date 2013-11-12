@@ -10,6 +10,10 @@ namespace yocto
     namespace core
     {
         
+        //______________________________________________________________________
+        //
+        // Default Slower Algorithm
+        //______________________________________________________________________
 #define Y_BMOVE_FUNC(I) tgt[I] = src[I]
         template <size_t N>
         inline void bmove( void *a, const void *b ) throw()
@@ -19,14 +23,10 @@ namespace yocto
             YOCTO_LOOP_FUNC_(N, Y_BMOVE_FUNC, 0);
         }
         
-        template <size_t N64>
-        inline void bmov64( void *a, const void *b ) throw()
-        {
-            uint64_t       *tgt = (uint64_t *)a;
-            const uint64_t *src = (const uint64_t *)b;
-            YOCTO_LOOP_FUNC_(N64, Y_BMOVE_FUNC, 0);
-        }
-        
+        //______________________________________________________________________
+        //
+        // For Native Types
+        //______________________________________________________________________
 #define Y_BMOVE_IMPL(N) \
 template <> inline void bmove<N>(void *a, const void *b) throw() \
 { \
@@ -37,6 +37,12 @@ typedef unsigned_int<N>::type word_t;\
         Y_BMOVE_IMPL(2)
         Y_BMOVE_IMPL(4)
         Y_BMOVE_IMPL(8)
+        
+        
+        //______________________________________________________________________
+        //
+        // For Extended Types
+        //______________________________________________________________________
         
         template <> inline void bmove<12>(void *a, const void *b) throw()
         {
@@ -56,7 +62,7 @@ typedef unsigned_int<N>::type word_t;\
             tgt[0] = src[0];
             tgt[1] = src[1];
         }
-
+        
         template <> inline void bmove<20>(void *a, const void *b) throw()
         {
             uint64_t       *tgt = (uint64_t *)a;
@@ -85,7 +91,7 @@ typedef unsigned_int<N>::type word_t;\
             tgt[0] = src[0];
             tgt[1] = src[1];
             tgt[2] = src[2];
-
+            
             uint32_t       *t32 = (uint32_t *)&tgt[3];
             const uint32_t *s32 = (const uint32_t *)&src[3];
             t32[0] = s32[0];
@@ -114,7 +120,7 @@ typedef unsigned_int<N>::type word_t;\
             const uint32_t *s32 = (const uint32_t *)&src[4];
             t32[0] = s32[0];
         }
-
+        
         
         template <> inline void bmove<40>(void *a, const void *b) throw()
         {
