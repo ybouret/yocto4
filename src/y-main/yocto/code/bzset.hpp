@@ -29,6 +29,41 @@ namespace yocto
             p[2] = 0;
         }
         
+        template <>
+        inline void __bzfill<4>(void *addr) throw()
+        {
+            *(uint32_t *)addr = 0;
+        }
+        
+        template <>
+        inline void __bzfill<5>(void *addr) throw()
+        {
+            uint32_t *p = (uint32_t *)addr;
+            *(p++) = 0;
+            *(uint8_t*)p = 0;
+        }
+        
+        
+        template <>
+        inline void __bzfill<6>(void *addr) throw()
+        {
+            uint32_t *p = (uint32_t *)addr;
+            *(p++) = 0;
+            *(uint16_t*)p = 0;
+        }
+        
+        template <>
+        inline void __bzfill<7>(void *addr) throw()
+        {
+            uint32_t *p = (uint32_t *)addr;
+            *(p++) = 0;
+            uint8_t *q = (uint8_t *)p;
+            q[0] = 0;
+            q[1] = 0;
+            q[2] = 0;
+        }
+
+        
         template <size_t N>
         inline void bzset( void *addr ) throw()
         {
