@@ -67,7 +67,7 @@ namespace yocto
         template <size_t N>
         inline void bzset( void *addr ) throw()
         {
-            typedef uint32_t     bzset_word;
+            typedef uint64_t     bzset_word;
             bzset_word *p = (bzset_word *)addr;
             for(size_t i=N/sizeof(bzset_word);i>0;--i)
                 *(p++) = 0;
