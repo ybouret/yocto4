@@ -1,6 +1,7 @@
 #include "yocto/sys/rt-clock.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/code/cast.hpp"
+#include "yocto/threading/mutex.hpp"
 
 #if defined(YOCTO_APPLE)
 #include <mach/mach.h>
@@ -8,11 +9,18 @@
 #endif
 
 #if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD)
-#include <sys/time.h>
-#include <errno.h>
-#include "yocto/threading/mutex.hpp"
+#define YOCTO_USE_CLOCK_GETTIME 1
 #endif
 
+#if defined(YOCTO_USE_CLOCK_GETTIME)
+#include <sys/time.h>
+#include <errno.h>
+#endif
+
+
+#if defined(YOCTO_WIN)
+#include "yocto/exceptions.hpp"
+#endif
 
 namespace yocto
 {
@@ -21,6 +29,7 @@ namespace yocto
   
     void rt_clock::calibrate()
     {
+		YOCTO_GIANT_LOCK();
         mach_timebase_info_data_t timebase;
         const kern_return_t err = mach_timebase_info(&timebase);
         if(err != KERN_SUCCESS)
@@ -33,6 +42,7 @@ namespace yocto
     
     uint64_t rt_clock:: ticks()
     {
+		YOCTO_GIANT_LOCK();
         return mach_absolute_time();
     }
     
@@ -44,7 +54,7 @@ namespace yocto
 
 #endif
     
-#if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD)
+#if defined(YOCTO_CLOCK_GETTIME)
 	static const uint64_t __giga64 = YOCTO_U64(0x3B9ACA00);
 
 	void rt_clock:: calibrate()
@@ -71,6 +81,39 @@ namespace yocto
 	double rt_clock:: operator()( uint64_t num_ticks ) const
 	{
 		return 1e-9 * double(num_ticks);
+	}
+#endif
+
+
+#if defined(YOCTO_WIN)
+	void rt_clock:: calibrate()
+	{
+		static const long double l_one = 1;
+		YOCTO_GIANT_LOCK();
+		LARGE_INTEGER F;
+		if( ! :: QueryPerformanceFrequency( &F ) )
+		{
+			throw win32::exception( ::GetLastError(), "::QueryPerformanceFrequency" );
+		}
+		const double freq = l_one / static_cast<long double>( F.QuadPart );
+		*(double *)data = freq;
+	}
+	
+	uint64_t rt_clock:: ticks() 
+	{
+		YOCTO_GIANT_LOCK();
+		int64_t Q = 0;
+		if( ! ::QueryPerformanceCounter( (LARGE_INTEGER *)&Q)  )
+		{
+			throw win32::exception( ::GetLastError(), " ::QueryPerformanceCounter" );
+		}
+		return uint64_t(Q);
+	}
+
+	double rt_clock:: operator()( uint64_t num_clicks ) const 
+	{
+		const double freq = *(const double *)data;
+		return freq * double(num_clicks);
 	}
 #endif
 
