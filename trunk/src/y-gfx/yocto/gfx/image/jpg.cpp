@@ -9,8 +9,8 @@ extern "C" {
 
 #include "yocto/auto-arr.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/code/bzset.hpp"
 #include "yocto/string/conv.hpp"
-#include <cstring>
 #include "yocto/ptr/auto.hpp"
 #include "yocto/exceptions.hpp"
 
@@ -52,11 +52,11 @@ namespace yocto
             
             // Compression Info
             struct jpeg_compress_struct cinfo;
-            memset(&cinfo,0,sizeof(cinfo));
+            bzset(cinfo);
             
             // Error handler
             struct jpeg_error_mgr jerr;
-            memset(&jerr,0,sizeof(jerr));
+            bzset(jerr);;
             cinfo.err = jpeg_std_error(&jerr);
             
             // Initialize JPEG compression object.
@@ -116,10 +116,10 @@ namespace yocto
             ios::icstream fp(filename);
             FILE *fptr = fp.__get();
             struct jpeg_decompress_struct cinfo;
-            memset(&cinfo,0,sizeof(cinfo));
+            bzset(cinfo);
             
             struct jpeg_error_mgr jerr;
-            memset(&jerr,0,sizeof(jerr));
+            bzset(jerr);
             
             // Error handler
             cinfo.err = jpeg_std_error(&jerr);
