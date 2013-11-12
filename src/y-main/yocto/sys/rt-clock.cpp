@@ -8,7 +8,7 @@
 #include <iostream>
 #endif
 
-#if defined(YOCTO_LINUX)
+#if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD)
 #include <sys/time.h>
 #include <errno.h>
 #include "yocto/threading/mutex.hpp"
@@ -46,26 +46,28 @@ namespace yocto
 
 #endif
     
-#if defined(YOCTO_LINUX)
+#if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD)
+	static const uint64_t __giga64 = YOCTO_U64(0x3B9ACA00);
+
 	void rt_clock:: calibrate()
 	{
 		YOCTO_GIANT_LOCK();
 		struct timespec tp  = { 0, 0 };
 		const int       err = clock_getres( CLOCK_REALTIME, &tp );
 		if(err!=0)
-			throw libc::exception( errno, "clock_gettime" );
-		
+			throw libc::exception( errno, "clock_getres" );
+		const uint64_t res = uint64_t(tp.tv_sec) + __giga64 * uint64_t(tp.tv_nsec);
+		*(uint64_t*)data = res;
 	}
 	
 	uint64_t rt_clock:: ticks()
 	{
-		static const uint64_t giga = YOCTO_U64(0x3B9ACA00);
 		YOCTO_GIANT_LOCK();
 		struct timespec tp  = { 0, 0 };
 		const int       err = clock_gettime( CLOCK_REALTIME, &tp );
 		if(err!=0)
 			throw libc::exception( errno, "clock_gettime" );
-		return uint64_t(tp.tv_sec) + giga * uint64_t(tp.tv_nsec); 
+		return uint64_t(tp.tv_sec) + __giga64 * uint64_t(tp.tv_nsec); 
 	}
 	
 	double rt_clock:: operator()( uint64_t num_ticks ) const
