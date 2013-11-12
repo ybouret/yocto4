@@ -21,3 +21,16 @@ YOCTO_UNIT_TEST_IMPL(wtime)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/sys/rt-clock.hpp"
+
+YOCTO_UNIT_TEST_IMPL(clock)
+{
+    rt_clock chrono;
+    
+    const uint64_t ini = chrono.ticks();
+    const uint16_t tmx = ini - chrono.ticks();
+    std::cerr << "tmx=" << tmx << std::endl;
+    std::cerr << "ell=" << chrono(tmx) << std::endl;
+}
+YOCTO_UNIT_TEST_DONE()
