@@ -16,6 +16,7 @@
 #if defined(YOCTO_USE_CLOCK_GETTIME)
 #include <sys/time.h>
 #include <errno.h>
+#include <iostream>
 #endif
 
 
@@ -55,7 +56,8 @@ namespace yocto
 
 #endif
 
-#if defined(YOCTO_CLOCK_GETTIME)
+#if defined(YOCTO_USE_CLOCK_GETTIME)
+
 	static const uint64_t __giga64 = YOCTO_U64(0x3B9ACA00);
 
 	void rt_clock:: calibrate()
@@ -65,7 +67,7 @@ namespace yocto
 		const int       err = clock_getres( CLOCK_REALTIME, &tp );
 		if(err!=0)
 			throw libc::exception( errno, "clock_getres" );
-		const uint64_t res = uint64_t(tp.tv_sec) + __giga64 * uint64_t(tp.tv_nsec);
+		const uint64_t res = __giga64*uint64_t(tp.tv_sec) + uint64_t(tp.tv_nsec); 
 		*(uint64_t*)data = res;
 	}
 
@@ -76,7 +78,8 @@ namespace yocto
 		const int       err = clock_gettime( CLOCK_REALTIME, &tp );
 		if(err!=0)
 			throw libc::exception( errno, "clock_gettime" );
-		return uint64_t(tp.tv_sec) + __giga64 * uint64_t(tp.tv_nsec); 
+		
+		return __giga64*uint64_t(tp.tv_sec) + uint64_t(tp.tv_nsec); 
 	}
 
 	double rt_clock:: operator()( uint64_t num_ticks ) const

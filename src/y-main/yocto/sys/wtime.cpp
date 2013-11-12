@@ -2,9 +2,16 @@
 #define _POSIX_C_SOURCE 199309 
 #endif
 
+
 #include "yocto/sys/wtime.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/sys/pid.hpp"
+
+#if defined(YOCTO_BSD)
+#include <cmath>
+#include <time.h>
+#endif
+
 
 #if defined(YOCTO_WIN)
 #define WIN32_LEAN_AND_MEAN
