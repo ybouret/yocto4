@@ -15,10 +15,15 @@ for(size_t i=iter;i>0;--i) { core::bzset<N>(arr); }  \
 const double tmx = chrono.query() - ini;             \
 const double spd = (iter/tmx);                       \
 ios::ocstream fp("ldz.dat",true);                    \
-fp("%u %.5g\n", unsigned(N), 1e-6*spd);              \
-std::cerr << '.';                                    \
-std::cerr.flush();                                   \
 for(unsigned i=0;i<N;++i) if(0!=arr[i]) throw exception("invalid bzset<%u>@%u\n", unsigned(N), i);\
+for(size_t i=0;i<sizeof(arr)/sizeof(arr[0]);++i) arr[i] = uint8_t(i+1); \
+const double ini2 = chrono.query();                   \
+for(size_t i=iter;i>0;--i) { memset(arr,0,N); }       \
+const double tmx2 = chrono.query() - ini2;            \
+const double spd2 = (iter/tmx2);                      \
+fp("%u %.5g %.5g\n", unsigned(N), 1e-6*spd, 1e-6*spd2); \
+std::cerr << '.';                                       \
+std::cerr.flush();                                      \
 } while(false)
 
 YOCTO_UNIT_TEST_IMPL(bzset)

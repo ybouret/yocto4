@@ -88,16 +88,17 @@ namespace yocto
 		__wtime_fetch(now);
 		return static_cast<double>( freq * static_cast<long double>(now-quad) );
 #endif
+        
 #if defined(__ICC)
 #pragma warning ( disable : 2259 ) 
 #endif	
 #if defined(YOCTO_BSD)
-		const struct timeval *old = (const struct timeval *)(void*)data;
-		struct timeval now;
+		const struct timeval &old = *(const struct timeval *)(void*)data;
+		struct timeval now = { 0, 0 };
 		__wtime_fetch( &now );
-		const long int sec_old  = old->tv_sec;
+		const long int sec_old  = old.tv_sec;
 		const long int sec_now  = now.tv_sec;
-		const long int usec_old = old->tv_usec;
+		const long int usec_old = old.tv_usec;
 		const long int usec_now = now.tv_usec;
 		return static_cast<double>(sec_now-sec_old) + 1e-6 * static_cast<double>(usec_now-usec_old);
 #endif
