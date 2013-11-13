@@ -65,7 +65,7 @@ namespace yocto
             valid_( true )
             {
                 
-                const string args = dir_ + '*';
+                const string args = folder + '*';
                 YOCTO_GIANT_LOCK();
                 hFind_ = ::FindFirstFile( &args[0], &hData_ );
                 
@@ -84,7 +84,7 @@ namespace yocto
                 if(valid_ )
                 {
                     //std::cerr << "[WIN32] has next entry '" << hData_.cFileName << "'" << std::endl;
-                    make_entry( hData_.cFileName );
+                    const vfs::entry *ep = make_entry( hData_.cFileName );
                     YOCTO_GIANT_LOCK();
                     if( ! ::FindNextFile( hFind_, &hData_ ) )
                     {
@@ -96,13 +96,12 @@ namespace yocto
                             throw win32::exception( err, "::FindNextFile(%s)",local_dir());
                         }
                     }
-                    return ent_;
+                    return ep;
                 }
                 else
                 {
                     //std::cerr << "[WIN32] NO  next entry." << std::endl;
-                    free_entry();
-                    return NULL;
+                    return 0;
                 }
             }
 #endif
