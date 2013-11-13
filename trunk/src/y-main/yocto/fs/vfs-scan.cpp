@@ -19,16 +19,15 @@ namespace yocto
     ent_( NULL )
     {
         vfs::as_directory(dir_);
-        //std::cout << "scanner [" << dir_ << "]" << std::endl;
     }
     
     void vfs:: scanner:: free_entry() throw()
     {
-        if( ent_ )
+        if( 0 != ent_ )
         {
-            destruct( ent_ );
+            destruct<vfs::entry>( ent_ );
             memset( data_, 0, sizeof(data_) );
-            ent_ = NULL;
+            ent_ = 0;
         }
     }
     

@@ -83,6 +83,7 @@ namespace yocto
 			return 0;
 		}
 #endif
+        assert(dll->h);
         return dll;
     }
     
@@ -105,7 +106,8 @@ namespace yocto
     {
 		Y_DLL_CHECK();
 		assert(0==dll->n);
-		
+		assert(dll->h);
+        
 #if defined(YOCTO_BSD)
 		dlclose(dll->h);
 #endif
