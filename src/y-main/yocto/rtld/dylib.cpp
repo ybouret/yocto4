@@ -9,6 +9,8 @@
 
 #include <cstring>
 
+#include <iostream>
+
 namespace yocto
 {
     
@@ -18,40 +20,46 @@ namespace yocto
         size_t n; //!< #ref
 		static inline dylib *acquire() { return object::acquire1<dylib>(); }
 		static inline void   release(dylib *dll) throw() { assert(dll); memset(dll,0,sizeof(dylib)); object::release1<dylib>(dll); }
+        
+#if defined(YOCTO_BSD)
+        static inline int flag2args( dylib_flag flag )
+        {
+            switch( flag )
+            {
+                case dylib_full:
+                    return RTLD_NOW;
+                    
+                case dylib_lazy:
+                    return RTLD_LAZY;
+            }
+            throw exception("invalid dlopen flag");
+        }
+#endif
+        
+#if defined(YOCTO_WIN)
+        static inline void *handle_of( const char *soname, dylib_flag flag )
+        {
+            switch(flag)
+            {
+                case dylib_full: return ::LoadLibrary(soname);
+                case dylib_lazy: return ::LoadLibraryEx(soname,0,DONT_RESOLVE_DLL_REFERENCES);
+                default:
+                    throw exception("invalid LoadLibrary flag");
+            }
+
+        }
+#endif
+        
     };
 	
 	
-#if defined(YOCTO_BSD)
-    static inline int __get_dlopen_arg( dylib_flag flag )
-    {
-        switch( flag )
-        {
-            case dylib_full: return RTLD_NOW;
-            case dylib_lazy: return RTLD_LAZY;
-        }
-        throw exception("invalid dlopen flag");
-    }
-#endif
-    
-#if defined(YOCTO_WIN)
-    static inline void * __get_handle( const char *soname, dylib_flag flag )
-    {
-        switch(flag)
-        {
-            case dylib_full: return ::LoadLibrary(soname);
-            case dylib_lazy: return ::LoadLibraryEx(soname,0,DONT_RESOLVE_DLL_REFERENCES);
-            default:
-                throw exception("invalid LoadLibrary flag");
-        }
-    }
-#endif
     
 	dylib *dylib_load( const char *soname , dylib_flag flag)
 	{
 		dylib *dll = dylib::acquire();
 		YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
-        dll->h = dlopen(soname, __get_dlopen_arg(flag) );
+        dll->h = dlopen(soname, dylib::flag2args(flag) );
 		if(0==dll->h)
 		{
 			dylib::release(dll);
@@ -61,11 +69,12 @@ namespace yocto
 #endif
 		
 #if defined(YOCTO_WIN)
-        dll->h = __get_handle(soname,flag);
+        dll->h = dylib::handle_of(soname,flag);
         if(0==dll->h)
 		{
+            const DWORD err = ::GetLastError();
 			dylib::release(dll);
-			throw win32::exception( ::GetLastError(), "::LoadLibrary");
+			throw win32::exception( err, "::LoadLibrary");
 		}
 		return dll;
 #endif
@@ -81,7 +90,7 @@ namespace yocto
         YOCTO_GIANT_LOCK();
         
 #if defined(YOCTO_BSD)
-        dll->h = dlopen(soname, __get_dlopen_arg(flag) );
+        dll->h = dlopen(soname, dylib::flag2args(flag) );
         if(0==dll->h)
         {
             if(errbuf)
@@ -97,7 +106,7 @@ namespace yocto
 #endif
         
 #if defined(YOCTO_WIN)
-        dll->h = __get_handle(soname,flag);
+        dll->h = dylib::handle_of(soname,flag);
 		if(0==dll->h)
 		{
 			if(errbuf)
