@@ -14,7 +14,8 @@ namespace yocto
     
     vfs:: scanner:: scanner( const string &dirname, const vfs &owner ) :
     fs( owner   ),
-    folder( dirname )
+    folder( dirname ),
+    data()
     {
         vfs::as_directory((string&)folder);
     }
