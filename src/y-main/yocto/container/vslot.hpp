@@ -32,7 +32,7 @@ namespace yocto
         inline void make()
         {
             prepare_for(sizeof(T)); // get memory
-            new (data_) T();         // try to construct, may throw
+            new (data_) T();        // try to construct, may throw
             activate<T>();          // activate the object
         }
         
@@ -49,8 +49,17 @@ namespace yocto
         inline void build(typename type_traits<U>::parameter_type args)
         {
             prepare_for(sizeof(T)); // get memory
-            new (data_) T(args);     // try to construct, may throw
+            new (data_) T(args);    // try to construct, may throw
             activate<T>();          // activate the object
+        }
+        
+        template <typename T,typename U, typename V>
+        inline void build(typename type_traits<U>::parameter_type u,
+                          typename type_traits<V>::parameter_type v )
+        {
+            prepare_for(sizeof(T));
+            new (data_) T(u,v);
+            activate<T>();
         }
         
         //! query type comparison
