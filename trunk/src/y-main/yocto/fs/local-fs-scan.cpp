@@ -25,7 +25,7 @@ namespace yocto
             
             const char *local_dir() const throw()
             {
-                return &dir_[0];
+                return folder.c_str();
             }
             
 #if defined(YOCTO_BSD)
@@ -52,8 +52,7 @@ namespace yocto
                     throw libc::exception( errno, "readdir(%s)", local_dir() );
                 }
                 else {
-                    make_entry( ep->d_name );
-                    return ent_;
+                    return make_entry( ep->d_name );
                 }
             }
 #endif
@@ -98,8 +97,8 @@ namespace yocto
                         }
                     }
                     return ent_;
-                } 
-                else 
+                }
+                else
                 {
                     //std::cerr << "[WIN32] NO  next entry." << std::endl;
                     free_entry();

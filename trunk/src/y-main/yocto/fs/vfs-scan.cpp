@@ -9,41 +9,28 @@ namespace yocto
     
     vfs:: scanner:: ~scanner() throw()
     {
-        free_entry();
     }
     
     
     vfs:: scanner:: scanner( const string &dirname, const vfs &owner ) :
-    vfs_( owner   ),
-    dir_( dirname ),
-    ent_( NULL )
+    fs( owner   ),
+    folder( dirname )
     {
-        vfs::as_directory(dir_);
-    }
-    
-    void vfs:: scanner:: free_entry() throw()
-    {
-        if( 0 != ent_ )
-        {
-            destruct<vfs::entry>( ent_ );
-            memset( data_, 0, sizeof(data_) );
-            ent_ = 0;
-        }
+        vfs::as_directory((string&)folder);
     }
     
     
-    void vfs:: scanner:: make_entry(const char *entry_name)
+    
+    const vfs::entry * vfs:: scanner:: make_entry(const char *entry_name)
     {
         assert( length_of(entry_name)>0 );
-        free_entry();
         
-        vfs::entry *tmp       = (vfs::entry *)(void *)data_;
-        string      full_path = dir_ + entry_name;
-        
+        string      full_path = folder + entry_name;
         vfs::as_directory( full_path ).trim( 1 );
-        new (tmp) vfs::entry( full_path, vfs_ );
-        ent_ = tmp;
+        data.build<vfs::entry,string,vfs>(full_path,fs);
+        
+        return & data.as<vfs::entry>();
     }
-    
+   
 	
 }

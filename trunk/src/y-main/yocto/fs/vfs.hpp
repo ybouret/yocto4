@@ -5,6 +5,7 @@
 
 #include "yocto/string.hpp"
 #include "yocto/functor.hpp"
+#include "yocto/container/vslot.hpp"
 
 namespace yocto {
 	
@@ -60,17 +61,17 @@ namespace yocto {
             virtual ~scanner() throw();
             virtual  const entry * next() = 0;
             
+            const vfs    &fs;     //!< owner fs
+            const string  folder; //!< directory
+            
         protected:
             explicit scanner( const string &dirname, const vfs &owner );
-            const vfs &vfs_;
-            string     dir_;
-            entry     *ent_;
+
+            const entry * make_entry( const char *entry_name );
             
-            void make_entry( const char *entry_name );
-            void free_entry() throw();
             
         private:
-            uint64_t data_[ YOCTO_U64_FOR_ITEM(vfs::entry) ];
+            vslot    data;
             YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
         };
         
