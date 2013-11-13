@@ -15,7 +15,7 @@ int main( int argc, char *argv[] )
             throw exception("Usage: loader module.dll");
         const string soname = argv[1];
         std::cerr << "-- Loading " << soname << std::endl;
-		dylib *dll = dylib_load( soname.c_str() );
+		dylib *dll = dylib_load( soname.c_str(), dylib_full );
         const module  m( dll );
         std::cerr << "loaded <" << soname << ">" << std::endl;
         

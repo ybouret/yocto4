@@ -21,12 +21,37 @@ namespace yocto
     };
 	
 	
-	dylib *dylib_load( const char *soname )
+#if defined(YOCTO_BSD)
+    static inline int __get_dlopen_arg( dylib_flag flag )
+    {
+        switch( flag )
+        {
+            case dylib_full: return RTLD_NOW;
+            case dylib_lazy: return RTLD_LAZY;
+        }
+        throw exception("invalid dlopen flag");
+    }
+#endif
+    
+#if defined(YOCTO_WIN)
+    static inline void * __get_handle( const char *soname, dylib_flag flag )
+    {
+        switch(flag)
+        {
+            case dylib_full: return ::LoadLibrary(soname);
+            case dylib_lazy: return ::LoadLibraryEx(soname,0,DONT_RESOLVE_DLL_REFERENCES);
+            default:
+                throw exception("invalid LoadLibrary flag");
+        }
+    }
+#endif
+    
+	dylib *dylib_load( const char *soname , dylib_flag flag)
 	{
 		dylib *dll = dylib::acquire();
 		YOCTO_GIANT_LOCK();
 #if defined(YOCTO_BSD)
-		dll->h = dlopen(soname,RTLD_NOW);
+        dll->h = dlopen(soname, __get_dlopen_arg(flag) );
 		if(0==dll->h)
 		{
 			dylib::release(dll);
@@ -36,8 +61,8 @@ namespace yocto
 #endif
 		
 #if defined(YOCTO_WIN)
-		dll->h = ::LoadLibrary(soname);
-		if(0==dll->h)
+        dll->h = __get_handle(soname,flag);
+        if(0==dll->h)
 		{
 			dylib::release(dll);
 			throw win32::exception( ::GetLastError(), "::LoadLibrary");
@@ -46,7 +71,7 @@ namespace yocto
 #endif
 	}
 	
-    dylib *dylib_load( const char *soname, char *errbuf, size_t errlen)
+    dylib *dylib_load( const char *soname, dylib_flag flag, char *errbuf, size_t errlen)
     {
         
         assert(!(0==errbuf&&errlen>0));
@@ -56,7 +81,7 @@ namespace yocto
         YOCTO_GIANT_LOCK();
         
 #if defined(YOCTO_BSD)
-        dll->h = dlopen(soname, RTLD_NOW);
+        dll->h = dlopen(soname, __get_dlopen_arg(flag) );
         if(0==dll->h)
         {
             if(errbuf)
@@ -72,7 +97,7 @@ namespace yocto
 #endif
         
 #if defined(YOCTO_WIN)
-		dll->h = ::LoadLibrary(soname);
+        dll->h = __get_handle(soname,flag);
 		if(0==dll->h)
 		{
 			if(errbuf)

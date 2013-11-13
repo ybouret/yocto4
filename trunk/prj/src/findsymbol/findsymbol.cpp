@@ -20,7 +20,7 @@ static inline void process_folder( const string &folder_name )
         if(ep->is_regular() && ! ep->link )
         {
             std::cerr << "Trying " << ep->path << std::endl;
-            dylib *dll = dylib_load( ep->path.c_str(), buffer, sizeof(buffer) );
+            dylib *dll = dylib_load( ep->path.c_str(), dylib_lazy, buffer, sizeof(buffer) );
             if( dll )
             {
                 std::cerr << ep->path << " is a dll" << std::endl;
