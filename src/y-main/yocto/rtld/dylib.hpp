@@ -7,12 +7,17 @@ namespace yocto
 {
     
     struct  dylib;
+    enum dylib_flag
+    {
+        dylib_full,
+        dylib_lazy
+    };
     
     //! only memory exception is raised, may return NULL
-    dylib      *dylib_load( const char *soname, char *errbuf, size_t errlen);
+    dylib      *dylib_load( const char *soname, dylib_flag flag, char *errbuf, size_t errlen);
     
 	//! exception in case of error
-	dylib      *dylib_load(const char *soname);
+	dylib      *dylib_load(const char *soname, dylib_flag flag);
     
     //! increase reference count
     void        dylib_incr(dylib *dll) throw();
