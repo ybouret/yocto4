@@ -9,7 +9,8 @@
 
 #if defined(YOCTO_BSD)
 #include <cmath>
-#include <time.h>
+#include <ctime>
+#include <cerrno>
 #endif
 
 
