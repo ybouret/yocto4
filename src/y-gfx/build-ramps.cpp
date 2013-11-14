@@ -119,10 +119,12 @@ int main( int argc, char *argv[] )
             parse(input,colors);
         }
         
+#if 0
         for(size_t i=0;i<256;++i)
         {
             std::cerr << int(colors[i].r) << " " << int(colors[i].g) << " " << int(colors[i].b) << std::endl;
         }
+#endif
         
         // write header/source
         ios::ocstream hdr(header_filename,false);
