@@ -77,6 +77,25 @@ void parse( ios::istream &fp, RGB colors[256])
     }
 }
 
+static inline void make_guard( string &guard )
+{
+    for(size_t i=0;i<guard.length();++i)
+    {
+        char c = guard[i];
+        
+        switch(c)
+        {
+            case '.':
+                c = '_';
+                break;
+            default:
+                c= toupper(c);
+        }
+        
+        guard[i] = c;
+    }
+}
+
 int main( int argc, char *argv[] )
 {
     const char *prog = vfs::get_base_name(argv[0]);
@@ -85,22 +104,56 @@ int main( int argc, char *argv[] )
         if( argc != 3 )
             throw exception("usage: %s input.dat base_name", prog);
         
-        const string input_filename = argv[1];
+        const string input_filename  = argv[1];
         const string output_basename = argv[2];
         const string header_filename = output_basename + ".hpp";
         const string source_filename = output_basename + ".cpp";
+        string       guard           = "YOCTO_GFX_RAMP";
+        guard += vfs::get_base_name(input_filename);
+        make_guard(guard);
         
         RGB colors[256];
+        // load colors
         {
-            // open the input file
             ios::icstream input( input_filename );
             parse(input,colors);
         }
+        
         for(size_t i=0;i<256;++i)
         {
             std::cerr << int(colors[i].r) << " " << int(colors[i].g) << " " << int(colors[i].b) << std::endl;
         }
         
+        // write header/source
+        ios::ocstream hdr(header_filename,false);
+        ios::ocstream src(source_filename,false);
+        
+        hdr << "#ifndef " << guard << "\n";
+        hdr << "#define " << guard << " 1\n";
+        hdr << "#include \"yocto/gfx/rgb.hpp\"\n\n";
+        hdr << "namespace yocto { namespace gfx {\n\n";
+        
+        string rc_name = vfs::get_base_name(input_filename);
+        vfs::remove_extension(rc_name);
+        rc_name = "ramp" + rc_name;
+        hdr << "\t\textern const rgb_t " << rc_name << "[256];";
+        hdr << "\n}}\n";
+        hdr << "#endif\n";
+        
+        
+        src << "#include \"./" << vfs::get_base_name(header_filename) << "\"\n\n";
+        src << "namespace yocto { namespace gfx {\n\n";
+        src << "\t\t const rgb_t " << rc_name << "[256]=\n{\n";
+        for(size_t i=0;i<256;++i)
+        {
+            const RGB &c = colors[i];
+            src("\trgb_t(%3u,%3u,%3u)",unsigned(c.r),unsigned(c.g),unsigned(c.b));
+            if(i<255) src << ",";
+            src << "\n";
+        }
+        src << "};\n";
+        src << "\n}}\n";
+
         return 0;
     }
     catch( const exception &e )
