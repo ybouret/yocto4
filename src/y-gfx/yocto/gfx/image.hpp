@@ -13,7 +13,7 @@ namespace yocto
 {
     namespace gfx
     {
-     
+        
         typedef pixmap<rgb_t> bitmap32;
         
         //! image formats handling
@@ -25,12 +25,12 @@ namespace yocto
             public:
                 typedef intr_ptr<string,format>     pointer;
                 typedef set<string,format::pointer> database;
-
+                
                 const string name;
                 
                 virtual ~format() throw();
                 const string &key() const throw();
-            
+                
                 //______________________________________________________________
                 //
                 // Saving
@@ -39,10 +39,10 @@ namespace yocto
                                   const bitmap &bmp,
                                   addr2rgba    &proc,
                                   const char   *options) const = 0;
-            
-                void save(const string  &filename,
-                          const surface &surf,
-                          const char    *options) const;
+                
+                void save_surface(const string  &filename,
+                                  const surface &surf,
+                                  const char    *options) const;
                 
                 //______________________________________________________________
                 //
@@ -57,7 +57,7 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(format);
             };
- 
+            
             
             //! register a new format
             /**

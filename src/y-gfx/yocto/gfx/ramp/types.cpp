@@ -33,5 +33,11 @@ namespace yocto
             return rgb_t( gfx::conv::to_byte(c.r), gfx::conv::to_byte(c.g), gfx::conv::to_byte(c.b) );
         }
         
+        rgb_t ramp:: get(float v, const rgb_t *colors) throw()
+        {
+            assert(colors);
+            return colors[ gfx::conv::to_byte(clamp<float>(0,v,1)) ];
+        }
+        
     }
 }

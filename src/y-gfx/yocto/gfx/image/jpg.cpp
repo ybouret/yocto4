@@ -81,11 +81,12 @@ namespace yocto
                 
                 row_pointer[0] = jimage;
                 int j = cinfo.image_height - 1;
+                const gfx::unit_t top = bmp.h-1;
                 while (cinfo.next_scanline < cinfo.image_height)
                 {
                     for (int i=0;i<width;i++)
                     {
-                        const rgb_t C  = proc( bmp.get(i, j) );
+                        const rgb_t C  = proc( bmp.get(i, top-j) );
                         const int   i3 = 3*i;
                         jimage[i3  ] = C.r;
                         jimage[i3+1] = C.g;
