@@ -84,9 +84,9 @@ namespace yocto
         
         const string & image:: format::key() const throw() { return name; }
         
-        void image::format::save(const string  &filename,
-                                 const surface &surf,
-                                 const char    *options) const
+        void image::format::save_surface(const string  &filename,
+                                         const surface &surf,
+                                         const char    *options) const
         {
             addr2rgba proc( &surf, & surface::to_rgba);
             save(filename,surf,proc,options);
