@@ -6,6 +6,7 @@
 #include "yocto/core/pool.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/container/iter-linked.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -153,6 +154,18 @@ namespace yocto
             list_.reverse();
         }
 		
+        
+        inline friend std::ostream & operator<<( std::ostream &os, const list &a )
+		{
+			os << "[ ";
+            for( const node_type *node = a.list_.head; node; node=node->next)
+            {
+                os << node->data << ' ';
+            }
+			os << "]'";
+			return os;
+		}
+        
 	protected:
 		core::list_of<node_type> list_;
 		core::pool_of<node_type> pool_;

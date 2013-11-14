@@ -16,6 +16,11 @@ SOURCE_GROUP( gfx/image FILES ${img_srcs} )
 
 INCLUDE_DIRECTORIES( . ../y-main ../y-jpeg)
 
+########################################################################
+##
+## Generating the named rgb colors
+##
+########################################################################
 ADD_EXECUTABLE(named-rgb EXCLUDE_FROM_ALL named-rgb.cpp)
 TARGET_LINK_YOCTO(named-rgb)
 
@@ -26,10 +31,30 @@ ADD_CUSTOM_COMMAND(
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/named-rgb.txt ${CMAKE_CURRENT_SOURCE_DIR}/named-rgb.cpp
 )
 
+########################################################################
+##
+## Generating the color ramps
+##
+########################################################################
+ADD_EXECUTABLE(build-ramps EXCLUDE_FROM_ALL build-ramps.cpp)
+TARGET_LINK_YOCTO(build-ramps)
+
+FILE( GLOB ramps ramps/*.dat )
+MESSAGE( STATUS "ramps are ${ramps}" )
+
+########################################################################
+##
+## Generating the library 
+##
+########################################################################
+SET( ramp_srcs ${ramp_decl} ${ramp_impl} )
+INSTALL( FILES ${ramp_decl} DESTINATION include/yocto/gfx/ramp )
+SOURCE_GROUP( gfx/ramp FILES ${ramp_srcs} )
 
 ADD_LIBRARY( y-gfx STATIC 	${srcs}
 				${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/named-rgb.inc
 				${img_srcs}
+				${ramp_srcs}
 )
 INSTALL( TARGETS y-gfx ARCHIVE DESTINATION lib )
 
