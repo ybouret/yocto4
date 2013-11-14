@@ -10,7 +10,7 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/visit )
 SOURCE_GROUP( visit FILES ${srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main ../y-mpi)
+INCLUDE_DIRECTORIES( . ../y-main ../y-mpi ../y-gfx)
 
 ADD_LIBRARY( y-visit STATIC ${srcs} )
 INSTALL( TARGETS y-visit ARCHIVE DESTINATION lib )
