@@ -7,7 +7,7 @@
 #include "yocto/spade/in2d.hpp"
 #include "yocto/spade/memory.hpp"
 
-#include "yocto/geom/color.hpp"
+#include "yocto/gfx/ramp/types.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 #if defined(_MSC_VER)
@@ -110,7 +110,7 @@ namespace yocto
 					 const string        &comment,
 					 const layout2D      &area,
 					 double             (*vproc)( const T & ),
-					 const color::rgba32 *colors = NULL,
+					 const gfx::rgb_t    *colors = NULL,
 					 double               vmin   = 0,
 					 double               vmax   = 1
 					 ) const
@@ -132,28 +132,16 @@ namespace yocto
                 
                 
                 //-- data
-                const bool default_ramp = (NULL == colors);
                 for( unit_t y = area.upper.y; y >= area.lower.y; --y )
                 {
                     const row &r_y = (*this)[y];
                     for( unit_t x = area.lower.x; x <= area.upper.x; ++x )
                     {
                         const double v = vproc( r_y[x] );
-                        if( default_ramp )
-                        {
-                            const color::rgba<double> c = color::rgba<double>::ramp( v, vmin, vmax );
-                            const uint8_t b[4] =  { uint8_t( 255 * c.r ), uint8_t( 255 * c.g ), uint8_t(255 * c.b ), 0 };
-                            fp.write( b[0] );
-                            fp.write( b[1] );
-                            fp.write( b[2] );
-                        }
-                        else
-                        {
-                            const color::rgba32 c = color::rgba32:: ramp( colors, v, vmin, vmax );
-                            fp.write( c.r );
-                            fp.write( c.g );
-                            fp.write( c.b );
-                        }
+                        const gfx::rgb_t c = gfx::ramp::to_rgb(v,colors,vmin,vmax);
+                        fp.write( c.r );
+                        fp.write( c.g );
+                        fp.write( c.b );
                         
                     }
                 }
@@ -163,7 +151,7 @@ namespace yocto
                             const char          *comment,
                             const layout2D      &area,
                             double             (*vproc)( const T & ),
-                            const color::rgba32 *colors = NULL,
+                            const gfx::rgb_t    *colors = NULL,
                             double               vmin   = 0,
                             double               vmax   = 1
                             ) const

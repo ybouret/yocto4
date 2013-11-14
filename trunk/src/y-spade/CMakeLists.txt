@@ -41,7 +41,7 @@ SET( ops_srcs ${ops_decl} ${ops_impl})
 INSTALL( FILES ${ops_decl} DESTINATION include/yocto/spade/ops ) 
 SOURCE_GROUP( spade/ops FILES ${ops_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../y-main ../y-gfx)
 
 ADD_LIBRARY( y-spade STATIC ${srcs} ${fields_srcs} ${ghosts_srcs} ${vtk_srcs} ${mpi_srcs} ${contour_srcs} ${ops_srcs})
 INSTALL( TARGETS y-spade ARCHIVE DESTINATION lib )

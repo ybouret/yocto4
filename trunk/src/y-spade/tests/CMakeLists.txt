@@ -1,7 +1,7 @@
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-spade main.cpp ${test_srcs} main.hpp)
-TARGET_LINK_YOCTO( test-spade spade )
+TARGET_LINK_YOCTO( test-spade spade gfx)
 
 ENABLE_TESTING()
 ADD_TEST(Coord   test-spade coord)
