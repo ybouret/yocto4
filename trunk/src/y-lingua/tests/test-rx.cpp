@@ -12,7 +12,6 @@
 using namespace yocto;
 using namespace lingua;
 
-//void shared_test_motifs( p_list &motifs );
 
 YOCTO_UNIT_TEST_IMPL(rx)
 {
