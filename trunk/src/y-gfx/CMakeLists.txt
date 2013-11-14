@@ -40,13 +40,32 @@ ADD_EXECUTABLE(build-ramps EXCLUDE_FROM_ALL build-ramps.cpp)
 TARGET_LINK_YOCTO(build-ramps)
 
 FILE( GLOB ramps ramps/*.dat )
-MESSAGE( STATUS "ramps are ${ramps}" )
+SET(builtin_ramp_decl)
+SET(builtin_ramp_srcs)
+
+FOREACH(f ${ramps})
+	MESSAGE( STATUS "${f}" )
+	GET_FILENAME_COMPONENT(r ${f} NAME_WE )
+	SET(r_com "${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/ramp/r${r}")
+	SET(r_hdr "${r_com}.hpp")
+	SET(r_src "${r_com}.cpp")
+	ADD_CUSTOM_COMMAND(
+		OUTPUT ${r_hdr} ${r_src}
+		COMMAND build-ramps ${f} ${r_com}
+		DEPENDS ${f} ${CMAKE_CURRENT_SOURCE_DIR}/build-ramps.cpp
+		)
+	LIST( APPEND builtin_ramp_decl ${r_hdr} )
+	LIST( APPEND builtin_ramp_srcs ${r_src} )
+ENDFOREACH()
+
 
 ########################################################################
 ##
 ## Generating the library 
 ##
 ########################################################################
+SET( ramp_decl yocto/gfx/ramp/types.hpp ${builtin_ramp_decl})
+SET( ramp_impl yocto/gfx/ramp/types.cpp ${builtin_ramp_srcs})
 SET( ramp_srcs ${ramp_decl} ${ramp_impl} )
 INSTALL( FILES ${ramp_decl} DESTINATION include/yocto/gfx/ramp )
 SOURCE_GROUP( gfx/ramp FILES ${ramp_srcs} )
