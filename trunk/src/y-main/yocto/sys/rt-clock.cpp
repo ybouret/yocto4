@@ -9,7 +9,7 @@
 #include <mach/mach_time.h>
 #endif
 
-#if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD)
+#if defined(YOCTO_LINUX) || defined(YOCTO_FREEBSD) || defined(YOCTO_SUNOS)
 #define YOCTO_USE_CLOCK_GETTIME 1
 #endif
 
