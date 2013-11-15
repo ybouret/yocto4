@@ -19,7 +19,7 @@ namespace yocto
         class source
         {
         public:
-            explicit source();
+            explicit source() throw();
             virtual ~source() throw();
             
             t_char *get(); //!< try to get a new t_char

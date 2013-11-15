@@ -21,7 +21,7 @@ namespace yocto
 #if defined(_MSC_VER)
 #pragma warning ( disable : 4351 )
 #endif
-        source:: source() :
+        source:: source() throw() :
         cache(),
         ppInp(0),
         block()
