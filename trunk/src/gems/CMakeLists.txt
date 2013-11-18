@@ -14,7 +14,7 @@ SOURCE_GROUP( gems/io FILES ${io_srcs} )
 
 SET( gems_srcs ${srcs} ${io_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY(y-gems STATIC ${gems_srcs} )
 

@@ -14,7 +14,7 @@ SET(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/../sdk)
 ########################################################################
 # mandatory project
 ########################################################################
-ADD_SUBDIRECTORY(y-main)
+ADD_SUBDIRECTORY(main)
 
 ########################################################################
 # Read projects to exclude

@@ -69,7 +69,7 @@ SOURCE_GROUP( math/fft FILES ${fft_srcs} )
 
 SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} ${fft_srcs})
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-mk STATIC ${srcs} )
 INSTALL( TARGETS y-mk ARCHIVE DESTINATION lib )

@@ -6,7 +6,7 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/pack )
 SOURCE_GROUP( pack FILES ${srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-pack STATIC ${srcs} )
 INSTALL( TARGETS y-pack ARCHIVE DESTINATION lib )

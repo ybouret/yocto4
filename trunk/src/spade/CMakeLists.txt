@@ -41,7 +41,7 @@ SET( ops_srcs ${ops_decl} ${ops_impl})
 INSTALL( FILES ${ops_decl} DESTINATION include/yocto/spade/ops ) 
 SOURCE_GROUP( spade/ops FILES ${ops_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main ../y-gfx)
+INCLUDE_DIRECTORIES( . ../main ../gfx)
 
 ADD_LIBRARY( y-spade STATIC ${srcs} ${fields_srcs} ${ghosts_srcs} ${vtk_srcs} ${mpi_srcs} ${contour_srcs} ${ops_srcs})
 INSTALL( TARGETS y-spade ARCHIVE DESTINATION lib )
@@ -52,7 +52,7 @@ ADD_SUBDIRECTORY(tests)
 FIND_PACKAGE(MPI)
 
 IF(MPI_FOUND)
-	INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH} ../y-mpi)
+	INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH} ../mpi)
 	ADD_SUBDIRECTORY(tests-mpi)
 ENDIF(MPI_FOUND)
 
@@ -61,7 +61,7 @@ IF(FALSE)
 INCLUDE(../share/opencl.cmake)
 
 IF(OPENCL_FOUND)
-	INCLUDE_DIRECTORIES(../y-ocl)
+	INCLUDE_DIRECTORIES(../ocl)
 	ADD_SUBDIRECTORY(tests-ocl)
 ENDIF(OPENCL_FOUND)
 

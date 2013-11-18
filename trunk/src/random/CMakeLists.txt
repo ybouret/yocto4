@@ -6,7 +6,7 @@ SET( random_srcs ${random_decl} ${random_impl} )
 INSTALL( FILES ${random_decl} DESTINATION include/yocto/random )
 SOURCE_GROUP( random FILES ${random_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 
 ADD_LIBRARY( y-random STATIC ${random_srcs}  )

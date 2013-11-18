@@ -28,7 +28,7 @@ SOURCE_GROUP( net/io FILES ${io_srcs} )
 SET( decl ${net_decl} ${sys_decl} ${ip_decl} ${io_decl} )
 SET( srcs ${net_srcs} ${sys_srcs} ${ip_srcs} ${io_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY(y-net STATIC ${srcs} )
 

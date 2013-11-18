@@ -29,7 +29,7 @@ SOURCE_GROUP( crypto/ios FILES ${ios_srcs} )
 SET( decl ${hashing_decl} ${bc_decl} ${sc_decl} ${ios_decl})
 SET( srcs ${hashing_srcs} ${bc_srcs} ${sc_srcs} ${ios_srcs})
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY(y-kr STATIC ${srcs} )
 

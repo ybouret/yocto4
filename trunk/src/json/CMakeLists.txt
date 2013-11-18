@@ -6,7 +6,7 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/json )
 SOURCE_GROUP( json FILES ${srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main ../y-lingua)
+INCLUDE_DIRECTORIES( . ../main ../lingua)
 
 ADD_LIBRARY( y-json STATIC ${srcs} )
 INSTALL( TARGETS y-json ARCHIVE DESTINATION lib )

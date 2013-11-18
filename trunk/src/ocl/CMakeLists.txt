@@ -15,7 +15,7 @@ SOURCE_GROUP( ocl FILES ${ocl_srcs} )
 SET( decl ${ocl_decl}  )
 SET( srcs ${ocl_srcs}  )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY(y-ocl STATIC ${srcs} )
 
