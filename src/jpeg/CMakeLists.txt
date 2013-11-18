@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(jpeg)
+PROJECT(jpeg C)
 MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <jpeg> ----------------" )
 
