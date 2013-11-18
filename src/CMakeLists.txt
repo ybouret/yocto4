@@ -32,9 +32,9 @@ ENDFOREACH()
 
 MACRO(YOCTO_BUILD dir)
   IF( no_${dir} )
-    MESSAGE( STATUS "NOT BUILDING y-${dir}" )
+    MESSAGE( STATUS "NOT BUILDING ${dir}" )
   ELSE()
-    ADD_SUBDIRECTORY(y-${dir})
+    ADD_SUBDIRECTORY(${dir})
   ENDIF()
 ENDMACRO(YOCTO_BUILD)
 
@@ -69,8 +69,8 @@ YOCTO_BUILD(aqueous)
 YOCTO_BUILD(chemical)
 YOCTO_BUILD(visit)
 YOCTO_BUILD(fltk)
-#YOCTO_BUILD(jpeg)
-ADD_SUBDIRECTORY(jpeg)
+YOCTO_BUILD(jpeg)
+
 MESSAGE( STATUS "---------------- </modules> ----------------" )
 MESSAGE( STATUS "" )
 
