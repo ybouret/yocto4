@@ -7,10 +7,10 @@ clean:
 	@echo "-- removing temporary files" && rm -f *.dat *.ppm *.vtk *.png *.dot *.bin *.curve *.silo *.raw image*.*
 	@echo "-- cleaning auxiliary files"
 	@${MAKE} -s -C samples             clean
-	@${MAKE} -s -C src/y-aqueous/docs  clean
-	@${MAKE} -s -C src/y-mk/docs       clean
-	@${MAKE} -s -C src/y-chemical/docs clean
-	@${MAKE} -s -C src/y-gems/docs     clean
+	@${MAKE} -s -C src/aqueous/docs  clean
+	@${MAKE} -s -C src/mk/docs       clean
+	@${MAKE} -s -C src/chemical/docs clean
+	@${MAKE} -s -C src/gems/docs     clean
 	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
 
 

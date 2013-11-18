@@ -14,7 +14,7 @@ SOURCE_GROUP( mpk FILES ${mpk_srcs} )
 
 SET( srcs ${mpk_srcs} ${rsa_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-mpk STATIC ${srcs} )
 INSTALL( TARGETS y-mpk ARCHIVE DESTINATION lib )

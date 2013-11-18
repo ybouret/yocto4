@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/kernel/matrix.hpp"
-#include "../../y-main/tests/support.hpp"
+#include "../../main/tests/support.hpp"
 #include "yocto/hashing/sha1.hpp"
 
 #include <typeinfo>

@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/kernel/lu.hpp"
-#include "../../y-main/tests/support.hpp"
+#include "../../main/tests/support.hpp"
 #include <typeinfo>
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/kernel/algebra.hpp"

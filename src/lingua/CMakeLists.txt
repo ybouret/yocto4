@@ -24,7 +24,7 @@ SET( syn_srcs ${syn_decl} ${syn_impl} )
 INSTALL( FILES ${syn_decl} DESTINATION include/yocto/lingua/syntax )
 SOURCE_GROUP( lingua/syntax FILES ${syn_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main )
+INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-lingua STATIC ${srcs} ${pat_srcs} ${lex_srcs} ${syn_srcs})
 INSTALL( TARGETS y-lingua ARCHIVE DESTINATION lib )

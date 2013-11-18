@@ -6,7 +6,7 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/aqueous )
 SOURCE_GROUP( aqueous FILES ${srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main ../y-mk ../y-lua ../y-lua++ )
+INCLUDE_DIRECTORIES( . ../main ../mk ../lua ../lua++ )
 
 ADD_LIBRARY( y-aqueous STATIC ${srcs} )
 INSTALL( TARGETS y-aqueous ARCHIVE DESTINATION lib )

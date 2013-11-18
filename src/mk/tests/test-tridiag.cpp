@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/code/rand.hpp"
-#include "../../y-main/tests/support.hpp"
+#include "../../main/tests/support.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/sequence/vector.hpp"
 #include <typeinfo>

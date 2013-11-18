@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/crypto/sc/arc4.hpp"
-#include "../../y-main/tests/support.hpp"
+#include "../../main/tests/support.hpp"
 #include "yocto/random/uuid.hpp"
 #include "yocto/crypto/sc/isaac-ks.hpp"
 

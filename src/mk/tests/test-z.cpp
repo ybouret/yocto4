@@ -3,7 +3,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 #include <typeinfo>
-#include "../../y-main/tests/support.hpp"
+#include "../../main/tests/support.hpp"
 
 #define SHOW(VAR) std::cerr << "numeric<" << name << ">::" #VAR " = " << numeric<T>::VAR << std::endl
 

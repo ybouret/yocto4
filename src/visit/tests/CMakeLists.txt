@@ -1,5 +1,5 @@
 
-INCLUDE_DIRECTORIES(../../y-spade)
+INCLUDE_DIRECTORIES(../../spade)
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-visit main.cpp ${test_srcs})
