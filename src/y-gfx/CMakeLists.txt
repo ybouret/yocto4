@@ -14,7 +14,7 @@ SET( img_srcs ${img_decl} ${img_impl} )
 INSTALL( FILES ${img_decl} DESTINATION include/yocto/gfx/image )
 SOURCE_GROUP( gfx/image FILES ${img_srcs} )
 
-INCLUDE_DIRECTORIES( . ../y-main ../y-jpeg)
+INCLUDE_DIRECTORIES( . ../y-main ../jpeg)
 
 ########################################################################
 ##
