@@ -4,6 +4,7 @@
 #include "yocto/code/bzset.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ptr/auto.hpp"
 #include <cerrno>
 
 namespace yocto
@@ -121,6 +122,7 @@ namespace yocto
             header.height = hi*256 + lo;
             header.bitsperpixel    = __fgetc("bitsperpixel");
             header.imagedescriptor = __fgetc("imagedescriptor");
+            
             /*
              Can only handle image type 1, 2, 3 and 10
              1 - index colour uncompressed
@@ -186,8 +188,12 @@ namespace yocto
                 }
             }
             
+            const unit_t W = header.width;
+            const unit_t H = header.height;
+            auto_ptr<surface> surf( surface::create(fmt, W, H ) );
             
-            return 0;
+            
+            return surf.yield();
         }
         
     }
