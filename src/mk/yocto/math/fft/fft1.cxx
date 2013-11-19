@@ -32,16 +32,8 @@ namespace yocto
 				for (size_t i=1;i<n;i+=2) 
 				{ 
 					if(j>i) 
-					{ 
-						
-#if 0
-                        real_t *d_i = data+i;
-						real_t *d_j = data+j;
-						cswap(d_j[0], d_i[0] );
-						cswap(d_j[1], d_i[1] );
-#else
+					{ 						
                         core::bswap<2*sizeof(real_t)>( data+i, data+j);
-#endif
 					}
 					size_t m = size; // m=  n / 2;
 					while( m>=2 && j>m )

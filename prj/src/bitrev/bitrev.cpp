@@ -14,48 +14,46 @@ using namespace yocto;
 using namespace math;
 
 
-#define ITER_MAX 8192
+#define ITER_MAX (16*1024)
 
 template <typename T>
 static inline
-void perf( size_t p )
+double perf( size_t p )
 {
     wtime chrono;
     chrono.start();
     const size_t size = 1 << p;
     const size_t n    = size << 1;
-    double       ell  = 0;
     vector<T> arr(n, numeric<T>::zero );
+    uint64_t t64 = 0;
     for( size_t iter=0; iter < ITER_MAX; ++iter)
     {
-        const double stamp = chrono.query();
+        const uint64_t stamp = wtime::ticks();
         size_t j=1;
         for (size_t i=1; i<n; i+=2)
         {
             if (j > i)
             {
-#if 0
-                cswap(arr[i],arr[j]);
-                cswap(arr[i+1],arr[j+1]);
-                
-#else
                 core::bswap<2*sizeof(T)>( &arr[i], &arr[j] );
-#endif
             }
             size_t m = size; // m=  n / 2;
             while (m >= 2 && j > m)
             {
-                j -= m;
+                j -=  m;
                 m >>= 1;
             }
             j += m;
         }
-        ell += (chrono.query() - stamp);
+        t64 += wtime::ticks() - stamp;
     }
+    
+    const double ell = chrono(t64);
     const double fac = double(ITER_MAX) * double(size) * 1e-6;
+    const double speed = fac/ell;
     std::cerr.flush();
-    fprintf( stderr, "type=%-8s | speed%-5u = %10.5f M/s\n", typeid(T).name(), unsigned(size), fac/ell);
+    fprintf( stderr, "type=%-8s | speed%-5u = %10.5f M/s\n", typeid(T).name(), unsigned(size), speed);
     fflush(stderr);
+    return speed;
 }
 
 int main(int argc, char *argv[] )
@@ -67,6 +65,20 @@ int main(int argc, char *argv[] )
             throw exception("Need pmax");
         
         const size_t pmax = strconv::to<size_t>(argv[1],"pmax");
+        {
+            ios::ocstream fp("bitrev.dat",false);
+            for( size_t p=0; p <= pmax; ++p )
+            {
+                const size_t size = 1 << p;
+                std::cerr << "size=" << size << std::endl;
+                const double speed4 = perf<float>(p);
+                const double speed8 = perf<double>(p);
+                fp("%u %g %g\n", unsigned(size),speed4,speed8);
+                std::cerr << std::endl;
+            }
+        }
+        
+#if 0
         const size_t smax = 1 << pmax;
         ios::ocstream decl("bitrev-tab.hpp",false);
         ios::ocstream impl("bitrev-tab.cpp",false);
@@ -130,19 +142,9 @@ int main(int argc, char *argv[] )
             
         }
         decl << "#endif\n";
+#endif
         
-        if(argc>1 && 0 == strcmp(argv[0], "perf") )
-        {
-            for( size_t p=0; p <= 13; ++p )
-            {
-                const size_t size = 1 << p;
-                std::cerr << "size=" << size << std::endl;
-                perf<float>(p);
-                perf<double>(p);
-                std::cerr << std::endl;
-                
-            }
-        }
+        
         return 0;
     }
     catch( const exception &e )
