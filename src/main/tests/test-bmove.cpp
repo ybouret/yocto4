@@ -1,9 +1,10 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/bmove.hpp"
 #include "yocto/math/complex.hpp"
-#include "yocto/sys/wtime.hpp"
+#include "yocto/sys/timings.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/hashing/sha1.hpp"
+#include "yocto/string/conv.hpp"
 
 #include <cstring>
 #include <cstdlib>
@@ -12,6 +13,7 @@
 using namespace yocto;
 using namespace math;
 
+#if 0
 #define ITER_MAX (1024*1024)
 #define Y_BMOVE_TMX(N)  do {                         \
 memset(arr,rand(),sizeof(arr));                      \
@@ -24,6 +26,18 @@ tmx[N-1] = 1e-6 * (ITER_MAX/(chrono.query() - ini)); \
 std::cerr << "#" << N << " => " << tmx[N-1] << " Mmov/s" << std::endl;\
 ios::ocstream fp("mov.dat",true); fp("%g %g\n", double(N), tmx[N-1] ); \
 } while(false)
+#endif
+
+#define Y_BMOVE_TMX(N)  do {                            \
+memset(arr,rand(),sizeof(arr));                         \
+core::bmove<N>(arr,brr);                                \
+if( H.key<uint64_t>(arr,N)!=H.key<uint64_t>(brr,N) )    \
+throw exception("invalid bmove<%u>",N);                 \
+YOCTO_TIMINGS(chrono,duration,core::bmove<N>(arr,brr)); \
+ios::ocstream fp("mov.dat",true);                       \
+fp("%g %g\n", double(N), 1e-6 * chrono.speed );         \
+std::cerr << "."; std::cerr.flush();                    \
+} while(false)
 
 YOCTO_UNIT_TEST_IMPL(bmove)
 {
@@ -31,13 +45,13 @@ YOCTO_UNIT_TEST_IMPL(bmove)
     
     uint8_t arr[64] = { 0 };
     uint8_t brr[64] = { 0 };
-    double  tmx[64] = { 0 };
+    
+    double duration = 0.1;
     
     for(unsigned i=0;i<64;++i) brr[i] = uint8_t(i);
     hashing::sha1 H;
+    timings chrono;
     
-    wtime chrono;
-    chrono.start();
     
     ios::ocstream::overwrite("mov.dat");
     /*         */    Y_BMOVE_TMX(1);  Y_BMOVE_TMX(2);  Y_BMOVE_TMX(3);  Y_BMOVE_TMX(4);  Y_BMOVE_TMX(5);  Y_BMOVE_TMX(6);  Y_BMOVE_TMX(7);  Y_BMOVE_TMX(8);  Y_BMOVE_TMX(9);
@@ -48,7 +62,7 @@ YOCTO_UNIT_TEST_IMPL(bmove)
     Y_BMOVE_TMX(50); Y_BMOVE_TMX(51); Y_BMOVE_TMX(52); Y_BMOVE_TMX(53); Y_BMOVE_TMX(54); Y_BMOVE_TMX(55); Y_BMOVE_TMX(56); Y_BMOVE_TMX(57); Y_BMOVE_TMX(58); Y_BMOVE_TMX(59);
     Y_BMOVE_TMX(60); Y_BMOVE_TMX(61); Y_BMOVE_TMX(62); Y_BMOVE_TMX(63); Y_BMOVE_TMX(64);
     
-    
+    std::cerr << std::endl;
     {
         char a=0;
         char b='a';
