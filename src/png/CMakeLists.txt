@@ -7,9 +7,10 @@ INCLUDE_DIRECTORIES(../z/yocto/zlib)
 
 
 SET(PNGROOT yocto/png)
+
 #PNGLIBCONF
 SET(PNGLIBCONF ${CMAKE_CURRENT_SOURCE_DIR}/${PNGROOT}/pnglibconf.h)
-
+MESSAGE( STATUS "using ${PNGLIBCONF}" )
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/share/pnglibconf.h.prebuilt
                ${PNGLIBCONF})
 
