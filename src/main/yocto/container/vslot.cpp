@@ -43,8 +43,9 @@ namespace yocto
         assert(0==type_);
         if(n>0)
         {
-            data_ = object:: operator new(n);
-            size_ = n;
+            const size_t na = YOCTO_MEMALIGN(n);
+            data_ = object:: operator new(na);
+            size_ = na;
         }
     }
 
@@ -101,6 +102,15 @@ namespace yocto
     type_(0),
     kill_(0)
     {
+    }
+    
+    vslot:: vslot(size_t n):
+    size_(0),
+    data_(0),
+    type_(0),
+    kill_(0)
+    {
+        allocate(n);
     }
     
     const std::type_info * vslot:: info() const throw()
