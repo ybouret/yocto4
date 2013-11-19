@@ -2,8 +2,9 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/code/bzset.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/exceptions.hpp"
 #include "yocto/sequence/vector.hpp"
+#include <cerrno>
 
 namespace yocto
 {
@@ -91,13 +92,14 @@ namespace yocto
         surface * TGA::load(const string      &filename,
                             const pixel_format fmt) const
         {
+            YOCTO_GIANT_LOCK();
             ios::icstream fptr(filename);
             FILE *fp = fptr.__get();
             TGAHEADER header;
             bzset(header);
             int lo=0,hi=0;
             unsigned char p[8]= {0};
-
+            
             /* Read the header */
             header.idlength      = __fgetc("idlength");
             header.colourmaptype = __fgetc("coulourmaptype");
@@ -173,7 +175,16 @@ namespace yocto
                 }
             }
             
-            
+            /* Go to the start of the image data */
+            {
+                int skipover = 18;
+                skipover += header.idlength;
+                skipover += header.colourmaptype * header.colourmaplength * header.colourmapdepth / 8;
+                if( 0!= fseek(fp,skipover,SEEK_SET) )
+                {
+                    throw libc::exception( EIO, "TGA skip data");
+                }
+            }
             
             
             return 0;
