@@ -44,7 +44,7 @@ SET(builtin_ramp_decl)
 SET(builtin_ramp_srcs)
 
 FOREACH(f ${ramps})
-	MESSAGE( STATUS "${f}" )
+	#MESSAGE( STATUS "${f}" )
 	GET_FILENAME_COMPONENT(r ${f} NAME_WE )
 	SET(r_com "${CMAKE_CURRENT_SOURCE_DIR}/yocto/gfx/ramp/r${r}")
 	SET(r_hdr "${r_com}.hpp")
