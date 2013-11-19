@@ -11,8 +11,11 @@ clean:
 	@${MAKE} -s -C src/mk/docs       clean
 	@${MAKE} -s -C src/chemical/docs clean
 	@${MAKE} -s -C src/gems/docs     clean
-	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
+ifdef WINDIR
 
+else
+	@echo "-- removing MacOSX Finder info" && find . -name '.DS_Store' | xargs rm -f
+endif
 
 preclean:
 	@echo "-- removing out of sources builds" && cd forge && touch targets &&  ( ( cat targets | xargs rm -rf ) && rm -f targets )
