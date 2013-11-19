@@ -94,7 +94,6 @@ namespace yocto
 				assert( cache_ );
 				assert( cache_->block_size == block_size );
 				return cache_->acquire_block();
-				
 			}
 			else
 			{

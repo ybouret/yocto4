@@ -230,7 +230,6 @@ namespace yocto
             buffer( mem_acquire( buflen ) ),
             data(  (T*) &buffer[0] )
 			{
-				//if(buflen>mem_limit_size()) std::cerr << "array_of(" << size << "*" << sizeof(T) << "): bytes=" << buflen << std::endl;
 			}
             
 			virtual ~array_of() throw()
