@@ -47,7 +47,7 @@ SET(impl
 SET(srcs ${decl} ${impl})
 
 if(MSVC)
-  #add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+  add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)
 
 ADD_LIBRARY(y-png STATIC ${srcs})
