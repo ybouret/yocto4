@@ -7,6 +7,7 @@
 namespace yocto
 {
     
+    //! local dynamic memory, using the object allocator
     class vslot
     {
     public:
@@ -23,7 +24,7 @@ namespace yocto
         bool is_allocated() const throw(); //!< has some memory ?
         bool is_active() const throw();    //!< has some object ?
         
-        size_t bytes() const throw();
+        size_t bytes() const throw();               //!< current allocated bytes
         const std::type_info *info() const throw(); //!< remind me of the type
         
         
@@ -40,11 +41,12 @@ namespace yocto
         template <typename T>
         inline void make( typename type_traits<T>::parameter_type args )
         {
-            prepare_for(sizeof(T)); // get memory
+            prepare_for(sizeof(T));  // get memory
             new (data_) T(args);     // try to construct, may throw
-            activate<T>();          // activate the object
+            activate<T>();           // activate the object
         }
         
+        //! one argument constructor
         template <typename T,typename U>
         inline void build(typename type_traits<U>::parameter_type args)
         {
@@ -53,6 +55,7 @@ namespace yocto
             activate<T>();          // activate the object
         }
         
+        //! two arguments constructor
         template <typename T,typename U, typename V>
         inline void build(typename type_traits<U>::parameter_type u,
                           typename type_traits<V>::parameter_type v )

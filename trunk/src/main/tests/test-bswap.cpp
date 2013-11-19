@@ -1,9 +1,10 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/math/complex.hpp"
-#include "yocto/sys/wtime.hpp"
+#include "yocto/sys/timings.hpp"
 #include "yocto/hashing/sha1.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -11,21 +12,19 @@ using namespace math;
 #include <cstdlib>
 #include <cstring>
 
-#define ITER_MAX (1024*1024)
-#define Y_BSWAP_TMX(N)  do {                         \
-memset(arr,rand(),sizeof(arr));                      \
-const uint64_t akey = H.key<uint64_t>(arr,N) ;       \
-const uint64_t bkey = H.key<uint64_t>(brr,N) ;       \
-core::bswap<N>(arr,brr);                             \
-if( H.key<uint64_t>(arr,N)!=bkey )                   \
-throw exception("invalid bswap<%u> level 1",N);      \
-if( H.key<uint64_t>(brr,N)!=akey)                    \
-throw exception("invalid bswap<%u> level 2",N);      \
-const double ini = chrono.query();                   \
-for(int i=0;i<ITER_MAX;++i) core::bswap<N>(arr,brr); \
-tmx[N-1] = 1e-6 * (ITER_MAX/(chrono.query() - ini)); \
-std::cerr << "#" << N << " => " << tmx[N-1] << " Mswp/s" << std::endl;\
-ios::ocstream fp("swp.dat",true); fp("%g %g\n", double(N), tmx[N-1] ); \
+#define Y_BSWAP_TMX(N)  do {                            \
+memset(arr,rand(),sizeof(arr));                         \
+const uint64_t akey = H.key<uint64_t>(arr,N) ;          \
+const uint64_t bkey = H.key<uint64_t>(brr,N) ;          \
+core::bswap<N>(arr,brr);                                \
+if( H.key<uint64_t>(arr,N)!=bkey )                      \
+throw exception("invalid bswap<%u> level 1",N);         \
+if( H.key<uint64_t>(brr,N)!=akey)                       \
+throw exception("invalid bswap<%u> level 2",N);         \
+YOCTO_TIMINGS(chrono,duration,core::bswap<N>(arr,brr)); \
+ios::ocstream fp("swp.dat",true);                       \
+fp("%g %g\n", double(N), chrono.speed * 1e-6 );         \
+std::cerr << "."; std::cerr.flush();                    \
 } while(false)
 
 
@@ -33,13 +32,15 @@ YOCTO_UNIT_TEST_IMPL(bswap)
 {
     uint8_t arr[64] = { 0 };
     uint8_t brr[64] = { 0 };
-    double  tmx[64] = { 0 };
     
     for(unsigned i=0;i<64;++i) brr[i] = uint8_t(i);
     hashing::sha1 H;
     
-    wtime chrono;
-    chrono.start();
+    timings chrono;
+    
+    double duration = 0.1;
+    if( argc > 1 )
+        duration = strconv::to<double>(argv[1],"duration");
     
     ios::ocstream::overwrite("swp.dat");
     
@@ -52,6 +53,8 @@ YOCTO_UNIT_TEST_IMPL(bswap)
     Y_BSWAP_TMX(50); Y_BSWAP_TMX(51); Y_BSWAP_TMX(52); Y_BSWAP_TMX(53); Y_BSWAP_TMX(54); Y_BSWAP_TMX(55); Y_BSWAP_TMX(56); Y_BSWAP_TMX(57); Y_BSWAP_TMX(58); Y_BSWAP_TMX(59);
     Y_BSWAP_TMX(60); Y_BSWAP_TMX(61); Y_BSWAP_TMX(62); Y_BSWAP_TMX(63); Y_BSWAP_TMX(64);
 
+    std::cerr << std::endl;
+    
     {
         char a = 'A';
         char b = 'B';
