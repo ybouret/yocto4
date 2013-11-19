@@ -65,6 +65,7 @@ int main(int argc, char *argv[] )
             throw exception("Need pmax");
         
         const size_t pmax = strconv::to<size_t>(argv[1],"pmax");
+        if(argc>2&&strcmp(argv[2],"perf")==0)
         {
             ios::ocstream fp("bitrev.dat",false);
             for( size_t p=0; p <= pmax; ++p )
@@ -78,25 +79,14 @@ int main(int argc, char *argv[] )
             }
         }
         
-#if 0
-        const size_t smax = 1 << pmax;
-        ios::ocstream decl("bitrev-tab.hpp",false);
-        ios::ocstream impl("bitrev-tab.cpp",false);
         
-        decl << "#ifndef YOCTO_BITREV_TAB_INCLUDED\n";
-        decl << "#define YOCTO_BITREV_TAB_INCLUDED 1\n";
-        decl << "\n";
-        decl("#define YOCTO_BITREV_SIZE_MAX %u\n\n", unsigned(smax));
-        
-        impl << "#include \"./bitrev-tab.hpp\"\n";
-        
-        
-        vector<size_t> indx;
+        vector<size_t> indx(1024*1024,as_capacity);
         for( size_t p=0; p <= pmax; ++p )
         {
             indx.free();
+            size_t       imax=0;
             const size_t size = 1 << p;
-            std::cerr << "size=" << size << std::endl;
+            std::cerr << "size=" << size << " | p=" << p << std::endl;
             size_t nops = 0;
             const size_t n    = size << 1;
             {
@@ -108,6 +98,8 @@ int main(int argc, char *argv[] )
                         //std::cerr << '(' << i << ',' << j << ')' << ' ';
                         indx.push_back(i);
                         indx.push_back(j);
+                        if(i>imax) imax=i;
+                        if(j>imax) imax=j;
                     }
                     size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m)
@@ -121,28 +113,13 @@ int main(int argc, char *argv[] )
             assert( 2*nops == indx.size());
             const size_t nw = nops * 2;
             std::cerr << "\tnops = " << nops << " =>" <<  nw <<   " words"<< std::endl;
+            const size_t nb = nw * sizeof(uint32_t);
+            std::cerr << "\timax = " << imax << std::endl;
+            std::cerr << "\tnb   = " << nb << " / " << double(nb)/(1024.0) << " kBytes" << std::endl;
+            //std::cerr << indx << std::endl;
             std::cerr << std::endl;
-            if(nw>0)
-            {
-                decl( "extern const size_t n%u;\n", unsigned(size) );
-                impl( "const size_t n%u = %u;\n", unsigned(size), unsigned(nops));
-                impl( "const size_t indx%u[%u] = {\n", unsigned(size), unsigned(nw));
-                decl( "extern const size_t indx%u[%u];\n",unsigned(size), unsigned(nw) );
-                
-                for( size_t i=1; i <= nw; ++i )
-                {
-                    impl(" %4u", unsigned(indx[i]) );
-                    if( i < indx.size() )
-                        impl(",");
-                    if( 0 == (i%16) ) impl("\n");
-                }
-                if( 0 != ( indx.size() % 16 ) ) impl << "\n";
-                impl( "};\n");
-            }
-            
         }
-        decl << "#endif\n";
-#endif
+        
         
         
         return 0;
