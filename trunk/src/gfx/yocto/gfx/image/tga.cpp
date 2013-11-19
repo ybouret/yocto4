@@ -2,6 +2,8 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/code/bzset.hpp"
+#include "yocto/exception.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -45,6 +47,44 @@ namespace yocto
                 int8_t    bitsperpixel;
                 int8_t    imagedescriptor;
             };
+            
+            static inline
+            void TGA_MergeBytes(rgb_t *pixel,const uint8_t *p,const int bytes)
+            {
+                assert(pixel);
+                assert(p);
+                switch(bytes)
+                {
+                    case 4:
+                        pixel->r = p[2];
+                        pixel->g = p[1];
+                        pixel->b = p[0];
+                        pixel->a = p[3];
+                        return;
+                        
+                    case 3:
+                        pixel->r = p[2];
+                        pixel->g = p[1];
+                        pixel->b = p[0];
+                        pixel->a = 255;
+                        return;
+                        
+                    case 2:
+                        pixel->r = (p[1] & 0x7c) << 1;
+                        pixel->g = ((p[1] & 0x03) << 6) | ((p[0] & 0xe0) >> 2);
+                        pixel->b = (p[0] & 0x1f) << 3;
+                        pixel->a = (p[1] & 0x80);
+                        return;
+                        
+                    case 1:
+                        pixel->r = p[0];
+                        pixel->g = p[0];
+                        pixel->b = p[0];
+                        pixel->a = 255;
+                        return;
+                }
+            }
+            
         }
         
 #define __fgetc(FIELD) fptr.read1(FIELD)
@@ -56,7 +96,8 @@ namespace yocto
             TGAHEADER header;
             bzset(header);
             int lo=0,hi=0;
-            
+            unsigned char p[8]= {0};
+
             /* Read the header */
             header.idlength      = __fgetc("idlength");
             header.colourmaptype = __fgetc("coulourmaptype");
@@ -78,7 +119,62 @@ namespace yocto
             header.height = hi*256 + lo;
             header.bitsperpixel    = __fgetc("bitsperpixel");
             header.imagedescriptor = __fgetc("imagedescriptor");
-
+            /*
+             Can only handle image type 1, 2, 3 and 10
+             1 - index colour uncompressed
+             2 - rgb uncompressed
+             10 - rgb rle comrpessed
+             3 - grey scale uncompressed
+             9 - rle index colour (unsupported)
+             11 - rle black and white
+             */
+            if (header.datatypecode != 1 &&
+                header.datatypecode != 2 &&
+                header.datatypecode != 3 &&
+                header.datatypecode != 11 &&
+                header.datatypecode != 10) {
+                throw exception("unsupported TGA datatypecode");
+            }
+            
+            
+            
+            /* Can only handle pixel depths of 8, 16, 24, and 32 */
+            if (header.bitsperpixel != 8  &&
+                header.bitsperpixel != 16 &&
+                header.bitsperpixel != 24 &&
+                header.bitsperpixel != 32)
+            {
+                throw exception("unsupported TGA bitsperpixel");
+            }
+            
+            /*
+             Can only handle colour map types of 0 and 1
+             Ignore the colour map case (1) for RGB images!
+             */
+            if (header.colourmaptype != 0 && header.colourmaptype != 1)
+            {
+                throw exception("unsupported TGA colourmaptype");
+            }
+            
+            
+            vector<rgb_t> ctable;
+            /* Read the colour index table */
+            if (header.datatypecode == 1)
+            {
+                ctable.reserve(header.colourmaplength);
+                const size_t bytes2read = header.colourmapdepth / 8;
+                rgb_t c;
+                for(int i=0;i<header.colourmaplength;i++)
+                {
+                    if( fread(p,1,bytes2read,fp) != bytes2read)
+                        throw exception("cannot read colour table");
+                    TGA_MergeBytes(&c,p,bytes2read);
+                    ctable.push_back(c);
+                }
+            }
+            
+            
+            
             
             return 0;
         }
