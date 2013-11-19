@@ -18,7 +18,8 @@ namespace yocto
 			
 			virtual bool query( char &C ) = 0;
 			virtual void store( char  C ) = 0;
-			
+			char         read1(const char *field=0);
+            
 			//! get at most buflen bytes
 			virtual void get( void *data, size_t size, size_t &done );
 			

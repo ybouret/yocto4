@@ -12,6 +12,15 @@ namespace yocto
 		istream:: ~istream() throw() {}
 		istream:: istream() throw()  {}
 		
+        char istream:: read1(const char *field)
+        {
+            const char *msg = field ? field : "input byte";
+            char C = 0;
+            if( !query(C) )
+                throw libc::exception( EIO, "istream::read1(%s)", msg);
+            return C;
+        }
+        
 		void istream:: get( void *data, size_t size, size_t &done )
 		{
 			assert( !(data==NULL&&size>0) );
