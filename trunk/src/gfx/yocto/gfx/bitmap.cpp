@@ -254,6 +254,16 @@ namespace yocto
             return hmove( get_line(y), x );
         }
         
+        void * bitmap:: address_of( unit_t n ) throw()
+        {
+            return peek(entry,n);
+        }
+       
+        const void * bitmap:: address_of( unit_t n ) const throw()
+        {
+            return peek(entry,n);
+        }
+        
         void bitmap:: flip_vert() throw()
         {
             unit_t n  = h/2;

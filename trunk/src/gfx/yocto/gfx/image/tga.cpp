@@ -201,56 +201,81 @@ namespace yocto
             
             const unit_t W = header.width;
             const unit_t H = header.height;
+            const unit_t N = W*H;
             auto_ptr<surface> surf( surface::create(fmt, W, H ) );
             
             bytes2read = header.bitsperpixel / 8;
-            for(unit_t y=0;y<H;++y)
+            unit_t n = 0;
+#define PXL() do \
+{ \
+if(n>=N) throw exception("too many read bytes!");\
+surf->put_pixel( surf->address_of(n), surf->map_rgba(c) );\
+++n; \
+} while(false)
+            
+            
+            while(n<N)
             {
-                for(unit_t x=0;x<W;++x)
+                rgb_t c;
+                //__________________________________________________________
+                //
+                // read the color
+                //__________________________________________________________
+                switch(header.datatypecode)
                 {
-                    rgb_t c;
-                    //__________________________________________________________
-                    //
-                    // read the color
-                    //__________________________________________________________
-                    switch(header.datatypecode)
+                    case 1:  /* Indexed uncompressed */
                     {
-                        case 1:  /* Indexed uncompressed */
+                        const size_t q = max_of<uint8_t>(header.colourmaplength-1, __fgetb("index"));
+                        c = ctable[q+1];
+                        PXL();
+                    } break;
+                        
+                        
+                    case 2:  /* RGB Uncompressed */
+                    case 3:  /* Grey Uncompressed */
+                    {
+                        if ( int(fread(p,1,bytes2read,fp)) != int(bytes2read))
+                            throw libc::exception( EIO, "TGA read RGB");
+                        TGA_MergeBytes(&c,p,bytes2read);
+                        PXL();
+                    } break;
+                        
+                        
+                        
+                    case 11: /* Compressed black and white */
+                    case 10: /* RGB Compressed */
+                    {
+                        if (int(fread(p,1,bytes2read+1,fp)) != int(bytes2read+1) )
+                            throw libc::exception( EIO, "TGA read Compressed RGB");
+                        const size_t j = p[0] & 0x7f;
+                        TGA_MergeBytes(&c,&(p[1]),bytes2read);
+                        PXL();
+                        if(p[0] & 0x80)
                         {
-                            const size_t n = max_of<uint8_t>(header.colourmaplength-1, __fgetb("index"));
-                            c = ctable[n+1];
-                        } break;
-                            
-                            
-                        case 2:  /* RGB Uncompressed */
+                            /* RLE chunk */
+                            for(size_t i=0;i<j;i++)
+                            {
+                                //TGA_MergeBytes(&c,&(p[1]),bytes2read);
+                                PXL();
+                            }
+                        }
+                        else
                         {
-                            if ( int(fread(p,1,bytes2read,fp)) != int(bytes2read))
-                                throw;
-                             TGA_MergeBytes(&c,p,bytes2read);
-                        } break;
-                            
-                        case 3:  /* Grey Uncompressed */
-                        {
-                        } break;
-                            
-                        case 10: /* RGB Compressed */
-                        {
-                        } break;
-                            
-                        case 11:   /* Compressed black and white */
-                        {
-                        } break;
-                            
-                        default:;
-                    }
-                    
-                    //__________________________________________________________
-                    //
-                    // put it into surface
-                    //__________________________________________________________
-                    const uint32_t px = surf->map_rgba(c);
-                    surf->put_pixel( (*surf)[y][x], px );
+                            /* Normal chunk */
+                            for (size_t i=0;i<j;i++)
+                            {
+                                if( int(fread(p,1,bytes2read,fp)) != int(bytes2read) )
+                                    throw libc::exception( EIO, "TGA read Compressed RGB");
+                                TGA_MergeBytes(&c,p,bytes2read);
+                                PXL();
+                            }
+                        }
+                    } break;
+                        
+                        
+                    default:n++;
                 }
+                
             }
             
             /* Flip the image ? */
@@ -258,101 +283,6 @@ namespace yocto
             {
                 //Flip_Bitmap(image,header.width,header.height,0);
             }
-            
-            /* Read the image */
-            bytes2read = header.bitsperpixel / 8;
-#if 0
-            while (n < header.width * header.height) {
-                if (header.datatypecode == 1) {
-#ifdef TGA_READ_USE_FREAD
-                    index = buffer[buffptr++];
-#else
-                    if ((index = fgetc(fptr)) == EOF)
-                        return(4);
-#endif
-                    if (index < 0)
-                        index = 0;
-                    if (index >= header.colourmaplength)
-                        index = header.colourmaplength-1;
-                    image[n] = ctable[index];
-                    n++;
-                } else if (header.datatypecode == 2) {              /* RGB Uncompressed */
-#ifdef TGA_READ_USE_FREAD
-                    for (k=0;k<bytes2read;k++)
-                        p[k] = buffer[buffptr++];
-#else
-                    if ((int)fread(p,1,bytes2read,fptr) != bytes2read)
-                        return(4);
-#endif
-                    TGA_MergeBytes(&(image[n]),p,bytes2read);
-                    n++;
-                } else if (header.datatypecode == 3) {              /* Grey Uncompressed */
-#ifdef TGA_READ_USE_FREAD
-                    for (k=0;k<bytes2read;k++)
-                        p[k] = buffer[buffptr++];
-#else
-                    if ((int)fread(p,1,bytes2read,fptr) != bytes2read)
-                        return(4);
-#endif
-                    TGA_MergeBytes(&(image[n]),p,bytes2read);
-                    n++;
-                } else if (header.datatypecode == 10) {             /* RGB Compressed */
-#ifdef TGA_READ_USE_FREAD
-                    for (k=0;k<bytes2read+1;k++)
-                        p[k] = buffer[buffptr++];
-#else
-                    if ((int)fread(p,1,bytes2read+1,fptr) != bytes2read+1)
-                        return(4);
-#endif
-                    j = p[0] & 0x7f;
-                    TGA_MergeBytes(&(image[n]),&(p[1]),bytes2read);
-                    n++;
-                    if (p[0] & 0x80) {         /* RLE chunk */
-                        for (i=0;i<j;i++) {
-                            TGA_MergeBytes(&(image[n]),&(p[1]),bytes2read);
-                            n++;
-                        }
-                    } else {                   /* Normal chunk */
-                        for (i=0;i<j;i++) {
-                            if ((int)fread(p,1,bytes2read,fptr) != bytes2read)
-                                return(6);
-                            TGA_MergeBytes(&(image[n]),p,bytes2read);
-                            n++;
-                        }
-                    }
-                } else if (header.datatypecode == 11) {             /* Compressed black and white */
-#ifdef TGA_READ_USE_FREAD
-                    for (k=0;k<bytes2read+1;k++)
-                        p[k] = buffer[buffptr++];
-#else
-                    if ((int)fread(p,1,bytes2read+1,fptr) != bytes2read+1)
-                        return(4);
-#endif
-                    j = p[0] & 0x7f;
-                    TGA_MergeBytes(&(image[n]),&(p[1]),bytes2read);
-                    n++;
-                    if (p[0] & 0x80) {         /* RLE chunk */
-                        for (i=0;i<j;i++) {
-                            TGA_MergeBytes(&(image[n]),&(p[1]),bytes2read);
-                            n++;
-                        }
-                    } else {                   /* Normal chunk */
-                        for (i=0;i<j;i++) {
-                            if ((int)fread(p,1,bytes2read,fptr) != bytes2read)
-                                return(6);
-                            TGA_MergeBytes(&(image[n]),p,bytes2read);
-                            n++;
-                        }
-                    }
-                }
-            }
-            
-            /* Flip the image ? */
-            if ((header.imagedescriptor & 0x20) == 32)
-                Flip_Bitmap(image,header.width,header.height,0);
-            
-#endif
-            
             return surf.yield();
         }
         
