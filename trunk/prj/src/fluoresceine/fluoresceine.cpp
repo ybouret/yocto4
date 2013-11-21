@@ -1,13 +1,14 @@
 #include "ui.h"
 #include "yocto/math/fcn/zfind.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/chemical/solution.hpp"
 
 using namespace math;
 
 namespace
 {
     
-    class Fluoresceine : public library
+    class Fluoresceine : public collection
     {
     public:
         
@@ -18,7 +19,7 @@ namespace
         const double pH_max;
         const double pH_ini;
         double       pH_usr;
-        chemsys      cs;
+        equilibria   cs;
         
         explicit Fluoresceine( const double C_user, const double V_user, const double C_base ) :
         C0(C_user),
@@ -28,7 +29,7 @@ namespace
         pH_max(0),
         pH_ini(0),
         pH_usr(7),
-        cs(*this,1e-7)
+        cs()
         {
             //==================================================================
             //-- create library
@@ -40,34 +41,27 @@ namespace
             add("Na+",  1);
             add("Cl-", -1);
             
+            collection &lib = *this;
             
             //==================================================================
             // Create the chemical system
             //==================================================================
             {
                 const double pKw   = 14;
-                equilibrium &water = cs.create("water", Pow(10.0, -pKw) );
-                water.add("H+",1);
-                water.add("HO-",1);
+                equilibrium &water = cs.add("water", Pow(10.0, -pKw) );
+                water.add( lib["H+"], 1);
+                water.add( lib["HO-"],1);
             }
             
             {
                 const double pKa  = 6.4;
-                equilibrium &fluo = cs.create("fluoresceine", Pow(10.0,-pKa));
-                fluo.add("FlH",-1);
-                fluo.add("H+",1);
-                fluo.add("Fl-",1);
+                equilibrium &fluo = cs.add("fluoresceine", Pow(10.0,-pKa));
+                fluo.add( lib["FlH"],-1);
+                fluo.add( lib["H+"],  1);
+                fluo.add( lib["Fl-"], 1);
             }
             
-            cs.build();
-            
-#if 0
-            for( chemsys::iterator i=cs.begin(); i != cs.end(); ++i)
-            {
-                const equilibrium &eq = **i;
-                std::cerr << eq << std::endl;
-            }
-#endif
+            cs.build_from(lib);
             
             
             
@@ -82,24 +76,25 @@ namespace
             if( Fabs(Vb) > V0)
                 throw exception("|Vb|=%g exceeds V0=%g", Fabs(Vb), V0);
             
+            // TODO: reload pKa
             
             //==================================================================
             // Create the initializer
             //==================================================================
-            initializer ini( *this );
+            initializer ini;
             
             //------------------------------------------------------------------
             //-- electroneutrality
             //------------------------------------------------------------------
-            ini.electroneutrality();
+            ini.electroneutrality(*this);
             
             //------------------------------------------------------------------
             //-- mass conservation
             //------------------------------------------------------------------
             {
                 constraint &fluo = ini.create(C0);
-                fluo.add("Fl-", 1);
-                fluo.add("FlH",1);
+                fluo["Fl-"] = 1;
+                fluo["FlH"] = 1;
             }
             
             //------------------------------------------------------------------
@@ -109,20 +104,14 @@ namespace
             if(Vb<0)
             {
                 const double ConcCl = (-Vb) * Cb / V0;
-                constraint &Cl = ini.create(ConcCl);
-                Cl.add("Cl-", 1);
-                
-                constraint &Na = ini.create(0);
-                Na.add("Na+", 1);
+                ini.create(ConcCl)["Cl-"] = 1;                
+                ini.create(0)["Na+"] = 1;
             }
             else
             {
                 const double ConcNa = Vb * Cb / V0;
-                constraint &Na = ini.create(ConcNa);
-                Na.add("Na+", 1);
-                
-                constraint &Cl = ini.create(0);
-                Cl.add("Cl-", 1);
+                ini.create(ConcNa)["Na+"] = 1;
+                ini.create(0)["Cl-"] = 1;
             }
             
             
@@ -135,12 +124,12 @@ namespace
             //------------------------------------------------------------------
             //-- initialize cs.C at time=0
             //------------------------------------------------------------------
-            ini(cs,0);
+            ini(cs,*this,0.0);
             
             //------------------------------------------------------------------
             //-- fetch
             //------------------------------------------------------------------
-            s.get(cs.C);
+            s.load(cs.C);
             
             //std::cerr << s << std::endl;
             //std::cerr << "pH=" << s.pH() << std::endl;

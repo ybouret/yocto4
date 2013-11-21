@@ -79,7 +79,7 @@ namespace yocto
                     cs.build_from(lib);
                     
                     //==========================================================
-                    // initialize the concentrations
+                    // scale the concentrations
                     //==========================================================
                     cs.scale_all(t);
                     
@@ -218,7 +218,8 @@ namespace yocto
                     // first norm init
                     //
                     //==========================================================
-                    if( !build_next_composition() ) 
+#if 0
+                    if( !build_next_composition() )
 						goto INIT_STEP;
                     old_norm = mkl::norm2(dX);
 					std::cerr << "Init=" << old_norm << std::endl;
@@ -237,6 +238,7 @@ namespace yocto
                         {
                             // accept an leave
                             mkl::set(X0,X1);
+                            std::cerr << "Accept X0=" << X0 << std::endl;
                             old_norm = new_norm;
                             break;
                         }
@@ -262,8 +264,15 @@ namespace yocto
                         mkl::set(X0,X1);
                         old_norm = new_norm;
                     }
-                    //std::cerr << "dX=" << dX << std::endl;
-                    //std::cerr << "X0=" << X0 << std::endl;
+#endif
+                    for(size_t ITER=1;ITER<=100;++ITER)
+                    {
+                        if( !build_next_composition() ) goto INIT_STEP;
+                         mkl::set(X0,X1);
+                    }
+                    std::cerr << "End of Newton..." << std::endl;
+                    std::cerr << "dX=" << dX << std::endl;
+                    std::cerr << "X0=" << X0 << std::endl;
                     
                     
                     //==========================================================
@@ -289,6 +298,8 @@ namespace yocto
                         dX[i] = err;
                     }
                     
+                    std::cerr << "X0=" <<X0 << std::endl;
+                    std::cerr << "dX=" << dX << std::endl;
                     
                     //==========================================================
                     //
