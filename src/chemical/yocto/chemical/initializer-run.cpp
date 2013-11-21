@@ -4,6 +4,8 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
 
+#include "yocto/ios/ocstream.hpp"
+
 namespace yocto
 {
     namespace chemical
@@ -181,7 +183,6 @@ namespace yocto
                     
                     std::cerr << "Xstar=" << Xstar << std::endl;
                     
-                    double old_norm = -1;
                     
                 INIT_STEP:
                     //==========================================================
@@ -206,13 +207,13 @@ namespace yocto
                     //----------------------------------------------------------
                     mkl::mul(V, Q, X0);
 					std::cerr << "V=" << V << std::endl;
-
+                    
                     //----------------------------------------------------------
                     // recompute initial X0
                     //----------------------------------------------------------
                     build_composition(X0);
 					std::cerr << "X0=" << X0 << std::endl;
-
+                    
                     //==========================================================
                     //
                     // first norm init
@@ -265,10 +266,24 @@ namespace yocto
                         old_norm = new_norm;
                     }
 #endif
-                    for(size_t ITER=1;ITER<=100;++ITER)
+                    
+                    double old_norm = -1;
+                    
                     {
-                        if( !build_next_composition() ) goto INIT_STEP;
-                         mkl::set(X0,X1);
+                        ios::ocstream fp("dx.dat",false);
+                        for(size_t ITER=1;ITER<=30;++ITER)
+                        {
+                            if( !build_next_composition() ) goto INIT_STEP;
+                            mkl::set(X0,X1);
+                            std::cerr << "dX=" << dX << std::endl;
+                            std::cerr << "X0=" << X0  << std::endl;
+                            std::cerr << "=>" << mkl::norm2(dX) << std::endl;
+                            const double new_norm = sqrt(mkl::norm2(dX));
+                            if(old_norm>0)
+                                fp("%u %g %g\n", unsigned(ITER), new_norm, old_norm );
+                            old_norm = new_norm;
+                            if(new_norm<=0) break;
+                        }
                     }
                     std::cerr << "End of Newton..." << std::endl;
                     std::cerr << "dX=" << dX << std::endl;
@@ -297,9 +312,6 @@ namespace yocto
                         if(err>0) err = Pow(10.0,Ceil(Log10(err)));
                         dX[i] = err;
                     }
-                    
-                    std::cerr << "X0=" <<X0 << std::endl;
-                    std::cerr << "dX=" << dX << std::endl;
                     
                     //==========================================================
                     //
@@ -373,6 +385,10 @@ namespace yocto
                     //----------------------------------------------------------
                     mkl::vec(dX,X0,X1);
                     
+                    //----------------------------------------------------------
+                    // compute the effective V
+                    //----------------------------------------------------------
+                    mkl::mul(V, Q, X1);
                     return true;
                 }
                 
@@ -388,7 +404,7 @@ namespace yocto
                     mkl::mul_trn(Y, P, Mu);
                     mkl::add(X, Y);
                     double Ymin = mkl::norm_infty(Y);
-
+                    
                     //==========================================================
                     // go on while norm decreases
                     //==========================================================
@@ -424,7 +440,7 @@ namespace yocto
         
         void initializer:: operator()( equilibria &cs, collection &lib, const double t )
         {
-            Initializer ini(cs,lib,*this,t,ran);            
+            Initializer ini(cs,lib,*this,t,ran);
         }
         
         
