@@ -69,6 +69,9 @@ namespace yocto
             void *      get(unit_t x, unit_t y) throw();
             const void *get(unit_t x, unit_t y) const throw();
             
+            void       *address_of( unit_t n ) throw();
+            const void *address_of( unit_t n ) const throw();
+
             void flip_vert() throw();
             void flip_horz() throw();
             

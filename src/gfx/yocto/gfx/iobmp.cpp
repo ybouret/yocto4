@@ -15,17 +15,6 @@ namespace yocto
         {
             assert(s!=0);
             const unsigned n = length_of(s);
-            /*
-             char hex[4] = {0,0,0,0};
-             for(unsigned i=0;i<n;i+=2)
-             {
-             hex[0] = s[i];
-             hex[1] = s[i+1];
-             unsigned c = 0;
-             sscanf(hex,"%X",&c);
-             __putc(c,fptr);
-             }
-             */
             for(unsigned i=0;i<n;i+=2)
             {
                 const int hi = hex2dec( s[i]  );
@@ -83,7 +72,7 @@ namespace yocto
             
             currentpixel = proc(bmp.get(0,y));
             for (;;) {
-                if (pixelstart+counter >= width)  // Added April to fix strange bug
+                if (pixelstart+counter >= width)
                     readytowrite = 1;
                 else
                     nextpixel = proc(bmp.get(pixelstart+counter,y));
@@ -185,7 +174,8 @@ namespace yocto
                     __putc((ny & 0xff00) / 256,fptr);
                     if (fmt == TGA_A || fmt == TGA_ZA) {
                         __putc(32,fptr);                        /* 32 bit bitmap     */
-                        __putc(0x08,fptr);
+                        //__putc(0x08,fptr);
+                        __putc(0x00,fptr);
                     } else {
                         __putc(24,fptr);                 		/* 24 bit bitmap 		*/
                         __putc(0x00,fptr);
@@ -310,7 +300,7 @@ namespace yocto
                     default:
                         break;
                 }
-#endif           
+#endif
                 //--------------------------------------------------------------
                 //-- use flip
                 //--------------------------------------------------------------
@@ -394,6 +384,7 @@ namespace yocto
                 case RGB:
                 case RAW_BW:
                     break;
+                    
                 case TIFF:
                     __putc(0x00,fptr); /* The number of directory entries (14) */
                     __putc(0x0e,fptr);
