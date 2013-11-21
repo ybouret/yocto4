@@ -96,6 +96,11 @@ namespace yocto
             ( (pixel_t(a)    >> loss.a) << shift.a );
         }
         
+        pixel_t pixel_format:: map_rgba(const rgb_t &c ) const throw()
+        {
+            return map_rgba(c.r, c.g, c.b, c.a);
+        }
+        
         pixel_t pixel_format:: map_rgba(const rgb_t &c, uint8_t a) const throw()
         {
             return map_rgba(c.r,c.g,c.b,a);

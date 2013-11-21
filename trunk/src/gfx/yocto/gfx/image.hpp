@@ -51,6 +51,12 @@ namespace yocto
                 virtual surface *load(const string      &filename,
                                       const pixel_format fmt) const =0;
                 
+                //______________________________________________________________
+                //
+                // some info
+                //______________________________________________________________
+                virtual bool lossless() const throw() = 0;
+                
             protected:
                 explicit format( const char *id );
                 

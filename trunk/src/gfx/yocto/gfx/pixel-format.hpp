@@ -20,11 +20,11 @@ namespace yocto
             const size_t     bpp;     //!< used bits of depth
             
             explicit pixel_format(size_t  Depth,
-                            pixel_t Rmask,
-                            pixel_t Gmask,
-                            pixel_t Bmask,
-                            pixel_t Amask
-                            );
+                                  pixel_t Rmask,
+                                  pixel_t Gmask,
+                                  pixel_t Bmask,
+                                  pixel_t Amask
+                                  );
             
             virtual ~pixel_format() throw();
             pixel_format( const pixel_format &) throw();
