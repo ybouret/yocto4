@@ -235,9 +235,12 @@ void compute_volume()
     }
 }
 
+#include "yocto/code/rand.hpp"
+
 int main(int argc, char *argv[] )
 {
     const char *progname = vfs::get_base_name(argv[0]);
+    _rand.wseed();
     try
     {
         MakeWindow();
