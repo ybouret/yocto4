@@ -12,13 +12,22 @@ namespace yocto
 		istream:: ~istream() throw() {}
 		istream:: istream() throw()  {}
 		
-        char istream:: read1(const char *field)
+        char istream:: read_char(const char *field)
         {
             const char *msg = field ? field : "input byte";
             char C = 0;
             if( !query(C) )
-                throw libc::exception( EIO, "istream::read1(%s)", msg);
+                throw libc::exception( EIO, "istream::read_char(%s)", msg);
             return C;
+        }
+        
+        uint8_t istream:: read_byte(const char *field)
+        {
+            const char *msg = field ? field : "input byte";
+            char C = 0;
+            if( !query(C) )
+                throw libc::exception( EIO, "istream::read_byte(%s)", msg);
+            return uint8_t(C);
         }
         
 		void istream:: get( void *data, size_t size, size_t &done )

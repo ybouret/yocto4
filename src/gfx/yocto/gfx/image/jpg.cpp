@@ -27,6 +27,11 @@ namespace yocto
         {
         }
         
+        bool JPG:: lossless() const throw()
+        {
+            return false;
+        }
+        
         void JPG:: save(const string  &filename,
                         const bitmap  &bmp,
                         addr2rgba     &proc,

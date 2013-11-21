@@ -21,6 +21,9 @@ namespace yocto
             
             virtual surface *load(const string      &filename,
                                   const pixel_format fmt) const;
+            
+            virtual bool lossless() const throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(TGA);
         };
