@@ -36,6 +36,8 @@ YOCTO_UNIT_TEST_IMPL(smooth)
         y[i] = sin(x[i]) + sin(3*x[i]);
         z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
     }
+    z[1] = y[1];
+    z[n] = y[n];
     
     {
         ios::ocstream fp("rdata.dat", false);
@@ -45,8 +47,6 @@ YOCTO_UNIT_TEST_IMPL(smooth)
         }
     }
     
-    z[1] = y[1];
-    z[n] = y[n];
     
     extender<double> Ex(z,extension_cyclic,extension_cyclic);
     smoother<double> Sm_u(nf,nf,smoother<double>::uniform,d);
@@ -63,8 +63,50 @@ YOCTO_UNIT_TEST_IMPL(smooth)
             fp("%g %g %g\n", x[i], s_u[i], s_g[i]);
         }
     }
-
+    
     
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/math/sig/extend.hpp"
+
+YOCTO_UNIT_TEST_IMPL(extend)
+{
+    const size_t    n=200;
+    vector<double>  x(n,0.0);
+    vector<double>  y(n,0.0);
+    vector<double>  z(n,0.0);
+    
+    for( size_t i=1; i <= n; ++i )
+    {
+        x[i] = numeric<double>::two_pi * (i-1) / double(n);
+        y[i] = sin(x[i]) + sin(3*x[i]);
+        z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
+    }
+    z[1] = y[1];
+    z[n] = y[n];
+    
+    {
+        ios::ocstream fp("xdata.dat", false);
+        for( size_t i=1; i<=n; ++i )
+        {
+            fp("%g %g %g\n", x[i], y[i], z[i]);
+        }
+    }
+    
+    extend<double> xtd1(extend_constant,extend_constant);
+    extend<double> xtd2(extend_cyclic,extend_cyclic);
+    
+    {
+        ios::ocstream fp("xtend.dat",false);
+        for( double xx = x[1]-1; xx <= x[n]+1; xx += 0.01 )
+        {
+            fp("%g %g %g\n", xx, xtd1(xx,x,z), xtd2(xx,x,z));
+        }
+    }
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+

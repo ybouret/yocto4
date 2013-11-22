@@ -13,10 +13,10 @@ namespace yocto
 		
 		enum extension_type
 		{
-		    extension_constant,
-		    extension_cyclic,
-		    extension_reflect,
-		    extension_symmetric
+		    extension_constant, //!< to the border value
+		    extension_cyclic,   //!< for cyclic data
+		    extension_reflect,  //!< assume odd/border
+		    extension_symmetric //!< assume even/border
 		};
 		
 		
