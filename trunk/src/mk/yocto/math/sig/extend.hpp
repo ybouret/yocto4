@@ -29,6 +29,14 @@ namespace yocto
             
             v2d<T> at( ptrdiff_t i, const array<T> &X, const array<T> &Y ) const;
             
+            void operator()(array<T>       &Z,
+                            const array<T> &X,
+                            const array<T> &Y,
+                            const T         dt_prev,
+                            const T         dt_next,
+                            const size_t    degree
+                            ) const;
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(extend);

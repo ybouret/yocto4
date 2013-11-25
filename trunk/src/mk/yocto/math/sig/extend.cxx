@@ -1,12 +1,27 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/sig/extend.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/math/types.hpp"
+#include "yocto/code/utils.hpp"
+#include "yocto/math/kernel/lu.hpp"
+#include "yocto/code/ipower.hpp"
+
 #include <cerrno>
+
+#include "yocto/ios/ocstream.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
     namespace math
     {
+        
+        
+        static inline int compare_v(const v2d<real_t> &lhs, const v2d<real_t> &rhs ) throw()
+        {
+            return __compare(lhs.x, rhs.x);
+        }
         
         template <> extend<real_t>:: ~extend() throw() {}
         
@@ -158,7 +173,7 @@ namespace yocto
                             
                         case extend_odd:
                             return Y[N] - (get_y(N+N-i,Y,N)-Y[N]);
-                        
+                            
                         case extend_even:
                             return get_y(N+N-i,Y,N);
                             
@@ -189,6 +204,119 @@ namespace yocto
             ans.y = get_y(i, Y, N );
             
             return ans;
+        }
+        
+        template <>
+        void extend<real_t>:: operator()(array<real_t>       &Z,
+                                         const array<real_t> &X,
+                                         const array<real_t> &Y,
+                                         real_t               dt_prev,
+                                         real_t               dt_next,
+                                         const size_t         degree
+                                         ) const
+        {
+            assert(X.size()==Y.size());
+            assert(Z.size()==Y.size());
+            if(X.size()<=0)
+                return;
+            
+            
+            const ptrdiff_t N = ptrdiff_t(X.size());
+            if(N<=0)
+                throw libc::exception( ERANGE, "integer overflow in extend()");
+            
+            const size_t ncoef = degree+1;
+            const real_t L     = X[N] - X[1];
+            dt_prev = Fabs(dt_prev);
+            dt_next = Fabs(dt_next);
+            vector< v2d<real_t> > v;
+            for(ptrdiff_t i=1;i<=N;++i)
+            {
+                v.free();
+                const real_t xi = X[i];
+                v2d<real_t> tmp(0,Y[i]);
+                v.push_back(tmp);
+                
+                for(ptrdiff_t j=i-1;;--j)
+                {
+                    const real_t xj = get_x(j, X, N, L);
+                    const real_t dx = xj-xi;
+                    if( Fabs(dx) > dt_prev )
+                        break;
+                    tmp.x = dx;
+                    tmp.y = get_y(j, Y, N);
+                    v.push_back(tmp);
+                }
+                
+                for(ptrdiff_t j=i+1;;++j)
+                {
+                    const real_t xj = get_x(j, X, N, L);
+                    const real_t dx = xj-xi;
+                    if( Fabs(dx) > dt_next )
+                        break;
+                    tmp.x = dx;
+                    tmp.y = get_y(j, Y, N);
+                    v.push_back(tmp);
+                }
+                const size_t W = v.size();
+                
+                //______________________________________________________________
+                //
+                // number of coefficients
+                //______________________________________________________________
+                const size_t m = min_of<size_t>(ncoef,W);
+                
+                matrix<real_t>  mu(m,m);
+                vector<real_t>  a(m,0.0);
+                
+                //______________________________________________________________
+                //
+                // rhs
+                //______________________________________________________________
+                for(size_t r=1;r<=m;++r)
+                {
+                    const size_t p = r-1;
+                    real_t       s = 0;
+                    for(size_t j=1;j<=W;++j)
+                    {
+                        const v2d<real_t> &q = v[j];
+                        s += q.y * ipower(q.x,p);
+                    }
+                    a[r] = s;
+                }
+                
+                //______________________________________________________________
+                //
+                // momenta
+                //______________________________________________________________
+                for(size_t r=1;r<=m;++r)
+                {
+                    for(size_t c=r;c<=m;++c)
+                    {
+                        const size_t p=(c+r-2);
+                        real_t       s=0;
+                        for(size_t j=1;j<=W;++j)
+                        {
+                            s += ipower(v[j].x,p);
+                        }
+                        mu[r][c] = mu[c][r] = s;
+                    }
+                }
+                
+                
+                
+                //______________________________________________________________
+                //
+                // solve
+                //______________________________________________________________
+                lu<real_t> LU(m);
+                if( !LU.build(mu) )
+                    throw exception("invalid data @X[%u]=%g", unsigned(i), double(X[i]));
+                LU.solve(mu,a);
+                Z[i] = a[1];
+            }
+            
+            
         }
         
         
