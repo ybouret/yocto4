@@ -73,7 +73,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(extend)
 {
-    const size_t    n=20;
+    const size_t    n=150;
     vector<double>  x(n,0.0);
     vector<double>  y(n,0.0);
     vector<double>  z(n,0.0);
@@ -107,15 +107,6 @@ YOCTO_UNIT_TEST_IMPL(extend)
     extend<double> xtd3(extend_odd,extend_odd);
     extend<double> xtd4(extend_even,extend_even);
 
-#if 0
-    {
-        ios::ocstream fp("xtend.dat",false);
-        for( double xx = x[1]-1; xx <= x[n]+1; xx += 0.01 )
-        {
-            fp("%g %g %g\n", xx, xtd1(xx,x,z), xtd2(xx,x,z));
-        }
-    }
-#endif
     
     {
         ios::ocstream fp("xivtx.dat",false);
@@ -137,6 +128,33 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
+    vector<double> z1(n,0.0);
+    xtd1(z1,x,z,0.2,0.2,2);
+    {
+        ios::ocstream fp("xz1.dat", false);
+        for(size_t i=1; i<=n; ++i )
+        {
+            fp("%g %g\n", x[i], z1[i]);
+        }
+    }
+    
+    xtd2(z1,x,z,0.2,0.2,2);
+    {
+        ios::ocstream fp("xz2.dat", false);
+        for(size_t i=1; i<=n; ++i )
+        {
+            fp("%g %g\n", x[i], z1[i]);
+        }
+    }
+    
+    xtd3(z1,x,z,0.2,0.2,2);
+    {
+        ios::ocstream fp("xz3.dat", false);
+        for(size_t i=1; i<=n; ++i )
+        {
+            fp("%g %g\n", x[i], z1[i]);
+        }
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()
