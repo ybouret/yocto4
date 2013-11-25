@@ -42,7 +42,7 @@ namespace yocto
         public:
             explicit initializer() throw();
             virtual ~initializer() throw();
-            rand32_kiss ran;
+            rand32_kiss ran; //!< initialized during construction
             
             //! append a new constraint, to be filled
             constraint & create( const double value );

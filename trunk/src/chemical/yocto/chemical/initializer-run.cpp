@@ -202,6 +202,11 @@ namespace yocto
                     }
                     
 					std::cerr << "Xguess=" << X0 << std::endl;
+                    mkl::set(cs.C, X0);
+                    cs.normalize_C(t);
+                    std::cerr << "Xchem=" << cs.C << std::endl;
+                    mkl::set(X0,cs.C);
+                    
                     //----------------------------------------------------------
                     // deduce initial V
                     //----------------------------------------------------------
@@ -219,53 +224,6 @@ namespace yocto
                     // first norm init
                     //
                     //==========================================================
-#if 0
-                    if( !build_next_composition() )
-						goto INIT_STEP;
-                    old_norm = mkl::norm2(dX);
-					std::cerr << "Init=" << old_norm << std::endl;
-                    //==========================================================
-                    //
-                    // forward while increasing norm
-                    //
-                    //==========================================================
-                    while(true)
-                    {
-                        mkl::set(X0,X1);
-                        if( !build_next_composition() ) goto INIT_STEP;
-						const double new_norm = mkl::norm2(dX);
-						std::cerr << old_norm << " ==> " << new_norm << std::endl;
-                        if(new_norm<=old_norm)
-                        {
-                            // accept an leave
-                            mkl::set(X0,X1);
-                            std::cerr << "Accept X0=" << X0 << std::endl;
-                            old_norm = new_norm;
-                            break;
-                        }
-                        old_norm = new_norm;
-                    }
-                    
-                    
-                    //==========================================================
-                    //
-                    // forward while decreasing norm
-                    // starting from X1=X0
-                    //
-                    //==========================================================
-                    while(true)
-                    {
-                        if( !build_next_composition() ) goto INIT_STEP;
-                        const double new_norm = mkl::norm2(dX);
-						std::cerr << old_norm << " => " << new_norm << std::endl;
-                        if(new_norm>=old_norm)
-                        {
-                            break; // X0 is the best guest
-                        }
-                        mkl::set(X0,X1);
-                        old_norm = new_norm;
-                    }
-#endif
                     
                     double old_norm = -1;
                     
@@ -275,9 +233,9 @@ namespace yocto
                         {
                             if( !build_next_composition() ) goto INIT_STEP;
                             mkl::set(X0,X1);
-                            std::cerr << "dX=" << dX << std::endl;
-                            std::cerr << "X0=" << X0  << std::endl;
-                            std::cerr << "=>" << mkl::norm2(dX) << std::endl;
+                            //std::cerr << "dX=" << dX << std::endl;
+                            //std::cerr << "X0=" << X0  << std::endl;
+                            std::cerr << "=>" << sqrt(mkl::norm2(dX)) <<  std::endl;
                             const double new_norm = sqrt(mkl::norm2(dX));
                             if(old_norm>0)
                                 fp("%u %g %g\n", unsigned(ITER), new_norm, old_norm );
