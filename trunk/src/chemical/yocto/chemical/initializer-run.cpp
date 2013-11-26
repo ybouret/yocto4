@@ -100,6 +100,7 @@ namespace yocto
                     //==========================================================
                     P.make(Nc,M);
                     Lam.make(Nc,M);
+                                       
                     for(size_t i=1; i <= Nc; ++i )
                     {
                         const constraint &Q = * cr[i];
@@ -112,7 +113,23 @@ namespace yocto
                     }
                     std::cerr << "P=" << P << std::endl;
                     std::cerr << "Lam=" << Lam << std::endl;
-                    
+                    {
+                        matrix_t __U(P);
+                        std::cerr << "U0=" << __U << std::endl;
+                        matrix_t __V(M,M);
+                        vector_t __W(M,0);
+                        if(!svd<double>::build(__U, __W, __V)  )
+                        {
+                            std::cerr << "Can't SVD P!" << std::endl;
+                        }
+                        else
+                        {
+                            std::cerr << "U=" << __U << std::endl;
+                            std::cerr << "W=" << __W << std::endl;
+                            std::cerr << "V=" << __V << std::endl;
+                        }
+                    }
+
                     //==========================================================
                     //
                     // build the orthogonal matrix Q by SVD
@@ -130,7 +147,7 @@ namespace yocto
                             for(size_t j=1;j<=M;++j)
                                 F[j][i] = P[i][j];
                         }
-                        
+                        std::cerr << "F0=" << F << std::endl;
                         //------------------------------------------------------
                         // use SVD
                         //------------------------------------------------------
@@ -147,6 +164,12 @@ namespace yocto
                             for(size_t j=1;j<=M;++j)
                                 Q[i][j] = F[j][i+Nc];
                         }
+                        for(size_t i=1;i<=Nc;++i)
+                        {
+                            for(size_t j=1;j<=M;++j)
+                                F[j][i] = P[i][j];
+                        }
+                        std::cerr << "F1=" << F << std::endl;
                     }
                     std::cerr << "Q=" << Q << std::endl;
                     
@@ -191,7 +214,8 @@ namespace yocto
                     
                     std::cerr << "Xstar=" << Xstar << std::endl;
                     
-                    
+                    exit(-1);
+
                 INIT_STEP:
                     //==========================================================
                     //
@@ -211,7 +235,7 @@ namespace yocto
                     
 					//std::cerr << "Xguess=" << C << std::endl;
                     cs.normalize_C(t);
-                    //std::cerr << "Xchem=" << C << std::endl;
+                    std::cerr << "Xchem=" << C << std::endl;
                     
                     //----------------------------------------------------------
                     // deduce initial V
@@ -230,17 +254,18 @@ namespace yocto
                     // Looping
                     //
                     //==========================================================
-                   
+                    
                     //__________________________________________________________
                     //
                     // initialize
                     //__________________________________________________________
-                    //ios::ocstream fp("dx.dat",false);
                     size_t ITER=1;
                     if( !build_next_composition()) goto INIT_STEP;
                     double old_rms = getRMS();
-                    //fp("%u %g\n", unsigned(ITER), old_rms);
-                    
+                    {
+                        ios::ocstream fp("dx.dat",false);
+                        fp("%u %g\n", unsigned(ITER), old_rms);
+                    }
                     //__________________________________________________________
                     //
                     // forward
@@ -249,9 +274,14 @@ namespace yocto
                     const size_t ITER_MIN = ITER_MIN_PER_COMPONENT * M;
                     for(;;++ITER)
                     {
-                        if( !build_next_composition()) goto INIT_STEP;
+                        if( !build_next_composition())
+                            goto INIT_STEP;
+                        
                         const double new_rms = getRMS();
-                        //fp("%u %g\n", unsigned(ITER), new_rms);
+                        {
+                            ios::ocstream fp("dx.dat",true);
+                            fp("%u %g\n", unsigned(ITER), new_rms);
+                        }
                         if(ITER>=ITER_MIN)
                         {
                             if(new_rms>=old_rms) break;
@@ -261,9 +291,9 @@ namespace yocto
                     }
                     
                     
-                    //std::cerr << "End of Newton..." << std::endl;
-                    //std::cerr << "dC=" << dC << std::endl;
-                    //std::cerr << " C=" << C  << std::endl;
+                    std::cerr << "End of Newton..." << std::endl;
+                    std::cerr << "dC=" << dC << std::endl;
+                    std::cerr << " C=" << C  << std::endl;
                     
                     
                     //==========================================================
@@ -287,7 +317,7 @@ namespace yocto
                         if(err>0) err = Pow(10.0,Ceil(Log10(err)));
                         dC[i] = err;
                     }
-                    
+                    std::cerr << "err=" << dC << std::endl;
                     //==========================================================
                     //
                     // Truncation/Accept
@@ -302,7 +332,10 @@ namespace yocto
                     for(size_t i=M;i>0;--i)
                     {
                         if(C[i]<0)
+                        {
+                            std::cerr << "Invalid Final Composition" << std::endl;
                             goto INIT_STEP;
+                        }
                     }
                     
                     
@@ -349,7 +382,7 @@ namespace yocto
                     mkl::add(V, dV);
                     
                     //----------------------------------------------------------
-                    // compute the next composition
+                    // compute the next composition from V
                     //----------------------------------------------------------
                     build_composition(C1);
                     
@@ -399,7 +432,7 @@ namespace yocto
                 
                 inline double getRMS(void) const throw() { return sqrt( mkl::norm2(dC)/M ); }
                 
-                               
+                
                 ~Initializer() throw()
                 {
                     
