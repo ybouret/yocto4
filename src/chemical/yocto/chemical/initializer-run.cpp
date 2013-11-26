@@ -23,6 +23,11 @@ namespace yocto
             public:
                 equilibria  &cs;
                 initializer &cr;
+                urand32     &ran;
+                lu_t        &L;
+                matrix_t    &W;
+                matrix_t    &Phi;
+                vector_t    &Gamma;
                 const size_t N;
                 const size_t M;
                 const size_t Nc;
@@ -33,9 +38,9 @@ namespace yocto
                 matrix_t     P2;
                 lu_t         L2;
                 vector_t     Xstar;
-                vector_t     X0;
-                vector_t     X1;
-                vector_t     dX;
+                vector_t     &C;
+                vector_t      C1;
+                vector_t     &dC;
                 vector_t     Mu;
                 vector_t     V;
                 vector_t     dV;
@@ -45,9 +50,14 @@ namespace yocto
                             collection        &lib,
                             initializer       &user_cr,
                             const double       user_t,
-                            urand32           &ran) :
+                            urand32           &user_ran) :
                 cs(user_cs),
                 cr(user_cr),
+                ran(user_ran),
+                L(cs.LU),
+                W(cs.W),
+                Phi(cs.Phi),
+                Gamma(cs.Gamma),
                 N(cs.size()),
                 M(lib.size()),
                 Nc(cr.size()),
@@ -58,9 +68,9 @@ namespace yocto
                 P2(),
                 L2(),
                 Xstar(),
-                X0(),
-                X1(),
-                dX(),
+                C(cs.C),
+                C1(),
+                dC(cs.dC),
                 Mu(),
                 V(),
                 dV(),
@@ -157,9 +167,7 @@ namespace yocto
                     //
                     //==========================================================
                     Xstar. make(M,  0);
-                    X0.    make(M,  0);
-                    X1.    make(M,  0);
-                    dX.    make(M,  0);
+                    C1.    make(M,  0);
                     Mu.    make(Nc, 0);
                     V.     make(N,  0);
                     dV.    make(N,  0);
@@ -194,58 +202,64 @@ namespace yocto
                     //----------------------------------------------------------
                     // build a guess composition from equilibria
                     //----------------------------------------------------------
-                    mkl::set(X0, 0);
+                    mkl::set(C, 0);
                     for( equilibria::iterator i=cs.begin();i!=cs.end();++i)
                     {
                         const equilibrium &eq = **i;
-                        eq.append(X0,ran);
+                        eq.append(C,ran);
                     }
                     
-					std::cerr << "Xguess=" << X0 << std::endl;
-                    mkl::set(cs.C, X0);
+					std::cerr << "Xguess=" << C << std::endl;
                     cs.normalize_C(t);
-                    std::cerr << "Xchem=" << cs.C << std::endl;
-                    mkl::set(X0,cs.C);
+                    std::cerr << "Xchem=" << C << std::endl;
                     
                     //----------------------------------------------------------
                     // deduce initial V
                     //----------------------------------------------------------
-                    mkl::mul(V, Q, X0);
+                    mkl::mul(V, Q, C);
 					std::cerr << "V=" << V << std::endl;
                     
                     //----------------------------------------------------------
                     // recompute initial X0
                     //----------------------------------------------------------
-                    build_composition(X0);
-					std::cerr << "X0=" << X0 << std::endl;
+                    build_composition(C);
+					std::cerr << "X0=" << C << std::endl;
                     
                     //==========================================================
                     //
-                    // first norm init
+                    // Looping
                     //
                     //==========================================================
+                   
+                    //__________________________________________________________
+                    //
+                    // initialize
+                    //__________________________________________________________
+                    ios::ocstream fp("dx.dat",false);
+                    size_t ITER=1;
+                    if( !build_next_composition()) goto INIT_STEP;
+                    double old_rms = getRMS();
+                    fp("%u %g\n", unsigned(ITER), old_rms);
                     
-                    double old_norm = -1;
-                    
+                    const size_t ITER_MIN_PER_COMPONENT = 8;
+                    const size_t ITER_MIN = ITER_MIN_PER_COMPONENT * M;
+                    for(;;++ITER)
                     {
-                        ios::ocstream fp("dx.dat",false);
-                        for(size_t ITER=1;ITER<=30;++ITER)
+                        if( !build_next_composition()) goto INIT_STEP;
+                        const double new_rms = getRMS();
+                        fp("%u %g\n", unsigned(ITER), new_rms);
+                        if(ITER>=ITER_MIN)
                         {
-                            if( !build_next_composition() ) goto INIT_STEP;
-                            mkl::set(X0,X1);
-                            //std::cerr << "dX=" << dX << std::endl;
-                            //std::cerr << "X0=" << X0  << std::endl;
-                            std::cerr << "=>" << sqrt(mkl::norm2(dX)) <<  std::endl;
-                            const double new_norm = sqrt(mkl::norm2(dX));
-                            if(old_norm>0)
-                                fp("%u %g %g\n", unsigned(ITER), new_norm, old_norm );
-                            old_norm = new_norm;
-                            if(new_norm<=0) break;
+                            if(new_rms>=old_rms) break;
                         }
+                        
+                        old_rms = new_rms;
                     }
+                    
+                    
                     std::cerr << "End of Newton..." << std::endl;
-                    std::cerr << "dX=" << dX << std::endl;
-                    std::cerr << "X0=" << X0 << std::endl;
+                    std::cerr << "dC=" << dC << std::endl;
+                    std::cerr << " C=" << C  << std::endl;
                     
                     
                     //==========================================================
@@ -253,22 +267,21 @@ namespace yocto
                     // Error evaluation
                     //
                     //==========================================================
-                    mkl::set(cs.C,X0);
                     cs.compute_Gamma_and_Phi(t,false);
-                    mkl::mul_rtrn(cs.W, cs.Phi, Q);
-                    if( ! cs.LU.build(cs.W) )
+                    mkl::mul_rtrn(W, Phi, Q);
+                    if( !L.build(W) )
                     {
                         std::cerr << "singular final composition" << std::endl;
                         goto INIT_STEP;
                     }
-                    cs.LU.solve(cs.W,cs.Gamma);
-                    mkl::mul_trn(dX, Q, cs.Gamma);
+                    L.solve(W,Gamma);
+                    mkl::mul_trn(dC, Q, Gamma);
                     
                     for(size_t i=M;i>0;--i)
                     {
-                        double    err = Fabs(dX[i]);
+                        double    err = Fabs(dC[i]);
                         if(err>0) err = Pow(10.0,Ceil(Log10(err)));
-                        dX[i] = err;
+                        dC[i] = err;
                     }
                     
                     //==========================================================
@@ -278,13 +291,13 @@ namespace yocto
                     //==========================================================
                     for(size_t i=M;i>0;--i)
                     {
-                        if( Fabs(X0[i]) <= dX[i] )
-                            X0[i] = 0;
+                        if( Fabs(C[i]) <= dC[i] )
+                            C[i] = 0;
                     }
                     
                     for(size_t i=M;i>0;--i)
                     {
-                        if(X0[i]<0)
+                        if(C[i]<0)
                             goto INIT_STEP;
                     }
                     
@@ -294,7 +307,6 @@ namespace yocto
                     // Final answer
                     //
                     //==========================================================
-                    mkl::set(cs.C, X0);
                     cs.normalize_C(t);
                 }
                 
@@ -315,18 +327,17 @@ namespace yocto
                 inline bool build_next_composition() throw()
                 {
                     //----------------------------------------------------------
-                    // compute Newton's step dV from X0
+                    // compute Newton's step dV from C
                     //----------------------------------------------------------
-                    mkl::set(cs.C,X0);
                     cs.compute_Gamma_and_Phi(t, false);
-                    mkl::mul_rtrn(cs.W, cs.Phi, Q);
-                    if( ! cs.LU.build(cs.W) )
+                    mkl::mul_rtrn(W, Phi, Q);
+                    if( ! L.build(W) )
                     {
                         std::cerr << "singular newton step" << std::endl;
                         return false;
                     }
-                    mkl::neg(dV,cs.Gamma);
-                    cs.LU.solve(cs.W,dV);
+                    mkl::neg(dV,Gamma);
+                    L.solve(W,dV);
                     
                     //----------------------------------------------------------
                     // update V
@@ -336,17 +347,18 @@ namespace yocto
                     //----------------------------------------------------------
                     // compute the next composition
                     //----------------------------------------------------------
-                    build_composition(X1);
+                    build_composition(C1);
                     
                     //----------------------------------------------------------
                     // compute the difference in composition
                     //----------------------------------------------------------
-                    mkl::vec(dX,X0,X1);
+                    mkl::vec(dC,C,C1);
+                    mkl::set(C,C1);
                     
                     //----------------------------------------------------------
                     // compute the effective V
                     //----------------------------------------------------------
-                    mkl::mul(V, Q, X1);
+                    mkl::mul(V, Q, C);
                     return true;
                 }
                 
@@ -381,7 +393,9 @@ namespace yocto
                     
                 }
                 
+                inline double getRMS(void) const throw() { return sqrt( mkl::norm2(dC)/M ); }
                 
+                               
                 ~Initializer() throw()
                 {
                     

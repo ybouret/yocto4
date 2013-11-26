@@ -39,11 +39,7 @@ YOCTO_UNIT_TEST_IMPL(init)
     }
     
     std::cerr << ini << std::endl;
-    
-    ini.find(cs, lib,0.0);
-    
-    return 0;
-    
+        
     ini(cs,lib,0.0);
     chemical::solution S(lib);
     S.load(cs.C);
@@ -51,6 +47,9 @@ YOCTO_UNIT_TEST_IMPL(init)
     std::cerr << "C=" << cs.C << std::endl;
     std::cerr << "S=" << S << std::endl;
     std::cerr << "pH=" << S.pH() << std::endl;
+    
+  
+
 }
 YOCTO_UNIT_TEST_DONE()
 

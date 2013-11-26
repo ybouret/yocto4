@@ -227,7 +227,7 @@ namespace yocto
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
             mkl::mul_rtrn(W, Phi, nu);
-            std::cerr << "Gamma=" << Gamma << std::endl;
+            //std::cerr << "Gamma=" << Gamma << std::endl;
             if( !LU.build(W) )
                 throw exception("equilibria: invalid composition");
             
@@ -235,8 +235,7 @@ namespace yocto
         
         void equilibria:: normalize_C( double t )
         {
-            std::cerr << "-- normalizing C @t=" <<t << std::endl;
-            std::cerr << "C=" << C << std::endl;
+            std::cerr << "// normalizing @t=" <<t << " C=" << C << std::endl;
             const size_t N = nu.rows;
             if(N>0)
             {
@@ -259,6 +258,7 @@ namespace yocto
                         goto NEWTON_STEP;
                 }
             }
+            std::cerr << "C=" << C << std::endl;
         }
         
         
