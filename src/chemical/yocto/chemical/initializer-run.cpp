@@ -209,21 +209,21 @@ namespace yocto
                         eq.append(C,ran);
                     }
                     
-					std::cerr << "Xguess=" << C << std::endl;
+					//std::cerr << "Xguess=" << C << std::endl;
                     cs.normalize_C(t);
-                    std::cerr << "Xchem=" << C << std::endl;
+                    //std::cerr << "Xchem=" << C << std::endl;
                     
                     //----------------------------------------------------------
                     // deduce initial V
                     //----------------------------------------------------------
                     mkl::mul(V, Q, C);
-					std::cerr << "V=" << V << std::endl;
+					//std::cerr << "V=" << V << std::endl;
                     
                     //----------------------------------------------------------
                     // recompute initial X0
                     //----------------------------------------------------------
                     build_composition(C);
-					std::cerr << "X0=" << C << std::endl;
+					//std::cerr << "X0=" << C << std::endl;
                     
                     //==========================================================
                     //
@@ -235,19 +235,23 @@ namespace yocto
                     //
                     // initialize
                     //__________________________________________________________
-                    ios::ocstream fp("dx.dat",false);
+                    //ios::ocstream fp("dx.dat",false);
                     size_t ITER=1;
                     if( !build_next_composition()) goto INIT_STEP;
                     double old_rms = getRMS();
-                    fp("%u %g\n", unsigned(ITER), old_rms);
+                    //fp("%u %g\n", unsigned(ITER), old_rms);
                     
+                    //__________________________________________________________
+                    //
+                    // forward
+                    //__________________________________________________________
                     const size_t ITER_MIN_PER_COMPONENT = 8;
                     const size_t ITER_MIN = ITER_MIN_PER_COMPONENT * M;
                     for(;;++ITER)
                     {
                         if( !build_next_composition()) goto INIT_STEP;
                         const double new_rms = getRMS();
-                        fp("%u %g\n", unsigned(ITER), new_rms);
+                        //fp("%u %g\n", unsigned(ITER), new_rms);
                         if(ITER>=ITER_MIN)
                         {
                             if(new_rms>=old_rms) break;
@@ -257,9 +261,9 @@ namespace yocto
                     }
                     
                     
-                    std::cerr << "End of Newton..." << std::endl;
-                    std::cerr << "dC=" << dC << std::endl;
-                    std::cerr << " C=" << C  << std::endl;
+                    //std::cerr << "End of Newton..." << std::endl;
+                    //std::cerr << "dC=" << dC << std::endl;
+                    //std::cerr << " C=" << C  << std::endl;
                     
                     
                     //==========================================================
