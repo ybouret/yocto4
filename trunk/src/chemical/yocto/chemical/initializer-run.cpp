@@ -5,6 +5,7 @@
 #include "yocto/code/utils.hpp"
 
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/sort/index.hpp"
 
 namespace yocto
 {
@@ -17,6 +18,11 @@ namespace yocto
         
         
         namespace  {
+            
+            static inline int compare_fabs( double a, double b ) throw()
+            {
+                return __compare<double>(fabs(a),fabs(b));
+            }
             
             class Initializer
             {
@@ -127,6 +133,18 @@ namespace yocto
                             std::cerr << "U=" << __U << std::endl;
                             std::cerr << "W=" << __W << std::endl;
                             std::cerr << "V=" << __V << std::endl;
+                            vector<size_t> idx(M,0);
+                            make_index(__W, idx, compare_fabs);
+                            std::cerr << "idx=" << idx << std::endl;
+                            for(size_t i=1; i <= N; ++i)
+                            {
+                                __W[ idx[i] ] = 0;
+                            }
+                            std::cerr << "W1=" << __W << std::endl;
+                            vector_t Xpart(M,0);
+                            svd<double>::solve(__U, __W, __V, Lam, Xpart);
+                            std::cerr << "Xpart=" << Xpart << std::endl;
+                            matrix_t __Q(N,M);
                         }
                     }
 
