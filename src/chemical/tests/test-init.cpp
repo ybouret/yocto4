@@ -19,6 +19,7 @@ YOCTO_UNIT_TEST_IMPL(init)
     lib.add("AH",0);
     lib.add("A-",-1);
     
+    
     chemical::equilibria cs;
     
     cs.add_water(lib,1e-14);
@@ -38,6 +39,10 @@ YOCTO_UNIT_TEST_IMPL(init)
     }
     
     std::cerr << ini << std::endl;
+    
+    ini.find(cs, lib,0.0);
+    
+    return 0;
     
     ini(cs,lib,0.0);
     chemical::solution S(lib);

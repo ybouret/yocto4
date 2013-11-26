@@ -55,10 +55,12 @@ namespace yocto
             
             friend std::ostream & operator<<(std::ostream &, const initializer &);
             
+            void find( equilibria &cs, collection &lib, const double t );
             
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(initializer);
+            
         };
         
         
