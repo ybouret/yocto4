@@ -235,7 +235,7 @@ namespace yocto
         
         void equilibria:: normalize_C( double t )
         {
-            std::cerr << "// normalizing @t=" <<t << " C=" << C << std::endl;
+            //std::cerr << "// normalizing @t=" <<t << " C=" << C << std::endl;
             const size_t N = nu.rows;
             if(N>0)
             {
@@ -258,7 +258,7 @@ namespace yocto
                         goto NEWTON_STEP;
                 }
             }
-            std::cerr << "C=" << C << std::endl;
+            //std::cerr << "C=" << C << std::endl;
         }
         
         

@@ -80,6 +80,11 @@ namespace yocto
         template <typename T> 
         T get() throw(); //!< valid for uin32_t, float, double
         
+        //! generate a pair of gaussian number
+        void gaussian(double &u, double &v ) throw();
+        
+        void hypersphere(const double radius, double arr[], const size_t num) throw();
+        
         template <typename T>
         inline T full() throw()
         {
