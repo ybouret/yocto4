@@ -31,6 +31,14 @@ namespace yocto
         upper(up)
         {}
         
+        template <> extend<real_t>:: extend( extend_mode both ) throw() :
+        lower( both ),
+        upper( both )
+        {
+        }
+        
+        
+        
 #if 0
         template <>
         real_t extend<real_t>:: operator()(real_t               x,

@@ -22,6 +22,8 @@ namespace yocto
         {
         public:
             explicit extend( extend_mode lo, extend_mode up) throw();
+            explicit extend( extend_mode both ) throw();
+            
             virtual ~extend() throw();
             
             extend_mode lower;
