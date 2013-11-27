@@ -88,6 +88,7 @@ YOCTO_UNIT_TEST_IMPL(init2)
         mass["CO3--"] = 1;
     }
 
+    std::cerr << ini << std::endl;
     
     ini(cs,lib,0.0);
     chemical::solution S(lib);

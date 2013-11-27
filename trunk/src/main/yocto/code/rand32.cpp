@@ -1,5 +1,6 @@
 #include "yocto/code/rand32.hpp"
 #include "yocto/sys/wtime.hpp"
+#include "yocto/math/types.hpp"
 
 #include <cstdio>
 
@@ -189,6 +190,42 @@ namespace yocto
         seed( wtime::seed() );
     }
     
+    void urand32:: gaussian(double &u, double &v) throw()
+    {
+        static const double two_pi = math::numeric<double>::two_pi;
+        double         x1    = 0;
+        while( x1<=0 ) x1  = get<double>();
+        const double x2    = get<double>();
+        const double l     = math::Log( x1 );
+        const double theta = two_pi * x2;
+        const double rho   = math::Sqrt( -(l+l) );
+        
+        u = rho * sin( theta );
+        v = rho * cos( theta );
+    }
+
+    void urand32:: hypersphere(const double radius, double arr[], const size_t num) throw()
+    {
+        assert(num>0);
+        assert(arr!=0);
+        double fac = 0;
+        for(size_t i=0;;)
+        {
+            double u=0,v=0;
+            gaussian(u, v);
+            arr[i++] = u; fac += u*u;
+            if(i>=num) break;
+            arr[i++] = v; fac += v*v;
+            if(i>=num) break;
+        }
+        fac = radius/math::Sqrt(fac);
+        for(size_t i=0;i<num;++i)
+        {
+            arr[i] *= fac;
+        }
+    }
+    
+
 }
 /*-----------------------------------------------------
  Write your own calling program and try one or more of
