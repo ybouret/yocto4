@@ -78,6 +78,19 @@ YOCTO_UNIT_TEST_IMPL(extend)
     vector<double>  y(n,0.0);
     vector<double>  z(n,0.0);
     
+    double dt = 0.2;
+    size_t degree = 2;
+    
+    if(argc>1)
+    {
+        dt = strconv::to<double>(argv[1],"dt");
+    }
+    
+    if(argc>2)
+    {
+        degree = strconv::to<size_t>(argv[2],"degree");
+    }
+    
     for( size_t i=2; i <= n; ++i )
     {
         x[i] = x[i-1] + 0.5 + alea<double>();
@@ -129,16 +142,22 @@ YOCTO_UNIT_TEST_IMPL(extend)
     }
     
     vector<double> z1(n,0.0);
-    xtd1(z1,x,z,0.2,0.2,2);
+    vector<double> w1(n,0.0);
+    
+    xtd1.eval(z1, x,z, dt, 2);
+    xtd1.diff(w1, x,z, dt, 2);
+
     {
         ios::ocstream fp("xz1.dat", false);
         for(size_t i=1; i<=n; ++i )
         {
-            fp("%g %g\n", x[i], z1[i]);
+            fp("%g %g %g\n", x[i], z1[i], w1[i]);
         }
     }
     
-    xtd2(z1,x,z,0.2,0.2,2);
+    return 0;
+    
+    xtd2(extend_eval,z1,x,z,0.2,0.2,2);
     {
         ios::ocstream fp("xz2.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -147,7 +166,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
-    xtd3(z1,x,z,0.2,0.2,2);
+    xtd3(extend_eval,z1,x,z,0.2,0.2,2);
     {
         ios::ocstream fp("xz3.dat", false);
         for(size_t i=1; i<=n; ++i )
