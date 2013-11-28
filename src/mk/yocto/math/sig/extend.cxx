@@ -215,7 +215,8 @@ namespace yocto
         }
         
         template <>
-        void extend<real_t>:: operator()(array<real_t>       &Z,
+        void extend<real_t>:: operator()(extend_value         kind,
+                                         array<real_t>       &Z,
                                          const array<real_t> &X,
                                          const array<real_t> &Y,
                                          real_t               dt_prev,
@@ -225,9 +226,32 @@ namespace yocto
         {
             assert(X.size()==Y.size());
             assert(Z.size()==Y.size());
-            if(X.size()<=0)
-                return;
             
+            //-- sort out sizes
+            switch( X.size() )
+            {
+                case 0:
+                    return;
+                    
+                case 1:
+                    switch(kind)
+                {
+                    case extend_eval: Z[1] = Y[1]; break;
+                    case extend_diff: Z[1] = 0;    break;
+                }
+                    return;
+                    
+                default:
+                    break;
+            }
+            
+            size_t nmin = 0;
+            
+            switch(kind)
+            {
+                case extend_eval: nmin=0; break;
+                case extend_diff: nmin=1; break;
+            }
             
             const ptrdiff_t N = ptrdiff_t(X.size());
             if(N<=0)
@@ -245,28 +269,33 @@ namespace yocto
                 v2d<real_t> tmp(0,Y[i]);
                 v.push_back(tmp);
                 
+                size_t nl = 0;
                 for(ptrdiff_t j=i-1;;--j)
                 {
                     const real_t xj = get_x(j, X, N, L);
                     const real_t dx = xj-xi;
-                    if( Fabs(dx) > dt_prev )
+                    if( nl>=nmin && Fabs(dx) > dt_prev )
                         break;
+                    
                     tmp.x = dx;
                     tmp.y = get_y(j, Y, N);
                     v.push_back(tmp);
+                    ++nl;
                 }
                 
+                size_t nr = 0;
                 for(ptrdiff_t j=i+1;;++j)
                 {
                     const real_t xj = get_x(j, X, N, L);
                     const real_t dx = xj-xi;
-                    if( Fabs(dx) > dt_next )
+                    if( nr>=nmin && Fabs(dx) > dt_next )
                         break;
                     tmp.x = dx;
                     tmp.y = get_y(j, Y, N);
                     v.push_back(tmp);
+                    ++nr;
                 }
-                const size_t W = v.size();
+                const size_t W = v.size(); assert(W>=1+2*nmin);
                 
                 //______________________________________________________________
                 //
@@ -315,13 +344,17 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // solve
+                // solve for coefficients
                 //______________________________________________________________
                 lu<real_t> LU(m);
                 if( !LU.build(mu) )
                     throw exception("invalid data @X[%u]=%g", unsigned(i), double(X[i]));
                 LU.solve(mu,a);
-                Z[i] = a[1];
+                switch(kind)
+                {
+                    case extend_eval:                      Z[i] = a[1]; break;
+                    case extend_diff: assert(a.size()>=2); Z[i] = a[2]; break;
+                }
             }
             
             
