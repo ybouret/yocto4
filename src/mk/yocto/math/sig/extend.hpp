@@ -17,12 +17,7 @@ namespace yocto
             extend_even        //!< assume even/boundary
         };
         
-        enum extend_value
-        {
-            extend_eval, //!< get filtered value
-            extend_diff  //!< get fileterd derivative
-        };
-        
+              
         template <typename T>
         class extend
         {
@@ -38,36 +33,15 @@ namespace yocto
             v2d<T> at( ptrdiff_t i, const array<T> &X, const array<T> &Y ) const;
             
             
-            void operator()(extend_value    kind,
-                            array<T>       &Z,
+            void operator()(array<T>       &Z,
                             const array<T> &X,
                             const array<T> &Y,
                             const T         dt_prev,
                             const T         dt_next,
-                            const size_t    degree
+                            const size_t    degree,
+                            array<T>       *dZdX = 0
                             ) const;
-            
-            inline void eval(array<T>       &Z,
-                             const array<T> &X,
-                             const array<T> &Y,
-                             const T         dt,
-                             const size_t    degree
-                             ) const
-            {
-                const T half = dt/2;
-                (*this)(extend_eval,Z,X,Y,half,half,degree);
-            }
-            
-            inline void diff(array<T>       &Z,
-                             const array<T> &X,
-                             const array<T> &Y,
-                             const T         dt,
-                             const size_t    degree
-                             ) const
-            {
-                const T half = dt/2;
-                (*this)(extend_diff,Z,X,Y,half,half,degree);
-            }
+
             
             
         private:

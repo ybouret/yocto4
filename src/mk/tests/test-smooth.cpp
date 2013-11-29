@@ -144,8 +144,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     vector<double> z1(n,0.0);
     vector<double> w1(n,0.0);
     
-    xtd1.eval(z1, x,z, dt, 2);
-    xtd1.diff(w1, x,z, dt, 2);
+    xtd1(z1, x,z, dt/2, dt/2, degree, &w1);
 
     {
         ios::ocstream fp("xz1.dat", false);
@@ -154,10 +153,8 @@ YOCTO_UNIT_TEST_IMPL(extend)
             fp("%g %g %g\n", x[i], z1[i], w1[i]);
         }
     }
-    
-    return 0;
-    
-    xtd2(extend_eval,z1,x,z,0.2,0.2,2);
+        
+    xtd2(z1, x,z, dt/2, dt/2, degree, &w1);
     {
         ios::ocstream fp("xz2.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -166,7 +163,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
-    xtd3(extend_eval,z1,x,z,0.2,0.2,2);
+    xtd3(z1, x,z, dt/2, dt/2, degree, &w1);
     {
         ios::ocstream fp("xz3.dat", false);
         for(size_t i=1; i<=n; ++i )
