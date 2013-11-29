@@ -26,19 +26,19 @@ namespace yocto
             double temperature;
             double ftol;       //!< for Newton Convergence
             double time_scale; //!< for time derivatives, default is 1e-4
-            
-            imatrix_t nuR;   //!< reactives, NxM
-            imatrix_t nuP;   //!< products,  NxM
-            matrix_t  nu;    //!< algebraic, NxM
-            vector_t  Gamma; //!< unrolled equilibria, N
-            vector_t  dtGam; //!< time derivative of Gamma
-            matrix_t  Phi;   //!< Gamma Jacobian, NxM
-            matrix_t  W;     //!< (Phi*nu')^(-1), NxN
-            vector_t  C;     //!< local concentrations
-            vector_t  xi;    //!< local extent
-            vector_t  dC;    //!< corrections
-            lu_t      LU;    //!< for local matrix inversion
-            
+            const double tiny;
+
+            imatrix_t    nuR;   //!< reactives, NxM
+            imatrix_t    nuP;   //!< products,  NxM
+            matrix_t     nu;    //!< algebraic, NxM
+            vector_t     Gamma; //!< unrolled equilibria, N
+            vector_t     dtGam; //!< time derivative of Gamma
+            matrix_t     Phi;   //!< Gamma Jacobian, NxM
+            matrix_t     W;     //!< (Phi*nu')^(-1), NxN
+            vector_t     C;     //!< local concentrations
+            vector_t     xi;    //!< local extent
+            vector_t     dC;    //!< corrections
+            lu_t         LU;    //!< for local matrix inversion
             
             //! release all memory
             void reset() throw();

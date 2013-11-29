@@ -13,8 +13,8 @@ namespace yocto
     {
         typedef math::algebra<double> mkl;
         
-        equilibria:: ~equilibria() throw() {}
         
+        equilibria:: ~equilibria() throw() {}
         
         
         //======================================================================
@@ -26,6 +26,7 @@ namespace yocto
         temperature(standard_temperature),
         ftol( numeric<double>::ftol ),
         time_scale(1e-4),
+        tiny( numeric<double>::tiny ),
         nuR(),
         nuP(),
         nu(),
@@ -56,6 +57,7 @@ namespace yocto
         equilibrium & equilibria:: add( const string &name, const double K)
         {
             equilibrium::ptr p( new constant_equilibrium(name,K) );
+            
             if( !insert(p) )
                 throw exception("chemical.equilibria.insert(multiple '%s')", name.c_str());
             
@@ -217,8 +219,11 @@ namespace yocto
                     dtGam[i] = dervs( Eq.K, t, time_scale ) * lhs;
                 }
             }
-            //std::cerr << "Gamma=" << Gamma << std::endl;
-            //std::cerr << "Phi="   << Phi << std::endl;
+            
+            for(size_t i=N;i>0;--i)
+            {
+                if(Fabs(Gamma[i])<=tiny) Gamma[i] = 0;
+            }
             
         }
         
@@ -227,7 +232,6 @@ namespace yocto
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
             mkl::mul_rtrn(W, Phi, nu);
-            //std::cerr << "Gamma=" << Gamma << std::endl;
             if( !LU.build(W) )
                 throw exception("equilibria: invalid composition");
             
@@ -235,10 +239,10 @@ namespace yocto
         
         void equilibria:: normalize_C( double t )
         {
-            //std::cerr << "// normalizing @t=" <<t << " C=" << C << std::endl;
             const size_t N = nu.rows;
             if(N>0)
             {
+                
                 
                 const size_t M = nu.cols;
                 for(size_t i=M;i>0;--i)
@@ -252,13 +256,26 @@ namespace yocto
                 LU.solve(W, xi);
                 mkl::mul_trn(dC, nu, xi);
                 mkl::sub(C, dC);
+                std::cerr.flush();
+                //std::cerr << "// Newton tiny=" << tiny << "/" << numeric<double>::tiny << std::endl;
+                //std::cerr << "C=" << C << std::endl;
+                //std::cerr << "//iter=" << iter << std::endl;
+                //std::cerr << "Gamma=" << Gamma << std::endl;
+                //std::cerr << "dC=" << dC << std::endl;
+                
+                bool converged = true;
                 for(size_t i=M;i>0;--i)
                 {
-                    if( Fabs(dC[i]) > Fabs( ftol * C[i] ) )
-                        goto NEWTON_STEP;
+                    if( Fabs(C[i]) <= tiny ) C[i] = 0;
+                    double err = Fabs(dC[i]);
+                    if( err <= tiny ) err = 0;
+                    if( err > Fabs( ftol * C[i] ) )
+                    {
+                        converged = false;
+                    }
                 }
+                if(!converged) goto NEWTON_STEP;
             }
-            //std::cerr << "C=" << C << std::endl;
         }
         
         
