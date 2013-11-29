@@ -117,8 +117,8 @@ namespace yocto
                             P[i][sp->indx]         = *weight;
                         }
                     }
-                    std::cerr << "P=" << P << std::endl;
-                    std::cerr << "Lam=" << Lam << std::endl;
+                    //std::cerr << "P=" << P << std::endl;
+                    //std::cerr << "Lam=" << Lam << std::endl;
                     
                     //==========================================================
                     //
