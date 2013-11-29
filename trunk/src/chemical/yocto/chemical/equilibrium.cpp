@@ -16,13 +16,15 @@ namespace yocto
         
 #if defined(_MSC_VER)
 		// using this in ctor
-#pragma warning ( disable : 4355 ) 
+#pragma warning ( disable : 4355 )
 #endif
         equilibrium:: equilibrium( const string &id ) :
         name(id),
         data(),
 		actors(),
         Nu(0),
+        NuR(0),
+        NuP(0),
         C0(0),
         K( this, & equilibrium::computeK)
         {
@@ -32,8 +34,10 @@ namespace yocto
         equilibrium:: equilibrium(const char *id ) :
         name(id),
         data(),
-	actors(),
+        actors(),
         Nu(0),
+        NuR(0),
+        NuP(0),
         C0(0),
         K( this, & equilibrium::computeK)
         {
@@ -63,6 +67,10 @@ namespace yocto
                 actors.push_back(a);
                 hsort(actors,__compare_actors);
                 ((int&) Nu) += coef;
+                if(coef>0)
+                    ((unsigned&)NuR) += unsigned(coef);
+                else
+                    ((unsigned&)NuP) += unsigned(-coef);
             }
         }
         
@@ -120,7 +128,7 @@ namespace yocto
             }
             
             os << " | K= " << eq.K(0);
-            os << " / Nu= " << eq.Nu;
+            os << " / Nu= " << eq.Nu << ", NuP= " << eq.NuP << ", NuR= " << eq.NuR;
             return os;
         }
         

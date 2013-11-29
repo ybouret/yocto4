@@ -2,10 +2,12 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/math/kernel/algebra.hpp"
+//#include "yocto/math/types.hpp"
+
 #include "yocto/code/utils.hpp"
 
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/sort/index.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -145,6 +147,7 @@ namespace yocto
                         if( !math::svd<double>::build(F, __W, __V) )
                             throw exception("singular initializer for SVD");
                         
+                        
                         //------------------------------------------------------
                         // Fetch the orthogonal space into Q
                         //------------------------------------------------------
@@ -271,6 +274,7 @@ namespace yocto
                         std::cerr << "singular final composition" << std::endl;
                         goto INIT_STEP;
                     }
+                    
                     L.solve(W,Gamma);
                     mkl::mul_trn(dC, Q, Gamma);
                     
