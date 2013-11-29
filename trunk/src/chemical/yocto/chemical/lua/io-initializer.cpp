@@ -30,7 +30,7 @@ namespace yocto
             lua_pop(L, 1);       // pop the constraint value--------------------
             
             
-            constraint &c = ini.create(value);
+            constraint &c = ini.equals(value);
             
             
             //------------------------------------------------------------------
