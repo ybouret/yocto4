@@ -45,7 +45,7 @@ namespace yocto
             rand32_kiss ran; //!< initialized during construction
             
             //! append a new constraint, to be filled
-            constraint & create( const double value );
+            constraint & equals( const double value );
             
             //! set the electroneutrality
             void electroneutrality( const collection &lib );

@@ -67,7 +67,7 @@ namespace yocto
         }
         
         
-        constraint & initializer:: create( const double value )
+        constraint & initializer:: equals( const double value )
         {
             constraint::ptr p( new constraint(value) );
             push_back(p);
@@ -76,7 +76,7 @@ namespace yocto
         
         void initializer:: electroneutrality( const collection &lib )
         {
-            constraint &Q = create(0);
+            constraint &Q = equals(0);
             size_t num_charged = 0;
             for( collection::const_iterator i=lib.begin(); i!=lib.end();++i)
             {

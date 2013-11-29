@@ -33,7 +33,7 @@ YOCTO_UNIT_TEST_IMPL(init)
     
     ini.electroneutrality(lib);
     {
-        chemical::constraint &mass = ini.create(C0);
+        chemical::constraint &mass = ini.equals(C0);
         mass["AH"] = 1;
         mass["A-"] = 1;
     }
@@ -82,7 +82,7 @@ YOCTO_UNIT_TEST_IMPL(init2)
     
     ini.electroneutrality(lib);
     {
-        chemical::constraint &mass = ini.create(C0);
+        chemical::constraint &mass = ini.equals(C0);
         mass["CO2"]   = 1;
         mass["HCO3-"] = 1;
         mass["CO3--"] = 1;
