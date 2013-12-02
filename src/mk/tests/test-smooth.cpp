@@ -181,7 +181,6 @@ YOCTO_UNIT_TEST_IMPL(extend)
         {
             fp("%g %g\n", pdx[i], rms[i]);
         }
-        
     }
     
 }
