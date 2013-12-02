@@ -18,7 +18,7 @@ namespace yocto
     {
         
         
-          
+        
         template <> extend<real_t>:: ~extend() throw() {}
         
         template <> extend<real_t>:: extend(extend_mode lo,
@@ -156,14 +156,14 @@ namespace yocto
         }
         
         template <>
-        void extend<real_t>:: operator()(array<real_t>       &Z,
-                                         const array<real_t> &X,
-                                         const array<real_t> &Y,
-                                         real_t               dt_prev,
-                                         real_t               dt_next,
-                                         const size_t         degree,
-                                         array<real_t>       *dZdX
-                                         ) const
+        real_t extend<real_t>:: operator()(array<real_t>       &Z,
+                                           const array<real_t> &X,
+                                           const array<real_t> &Y,
+                                           real_t               dt_prev,
+                                           real_t               dt_next,
+                                           const size_t         degree,
+                                           array<real_t>       *dZdX
+                                           ) const
         {
             assert(X.size()==Y.size());
             assert(Z.size()==Y.size());
@@ -179,12 +179,12 @@ namespace yocto
             switch( X.size() )
             {
                 case 0:
-                    return;
+                    return 0;
                     
                 case 1:
                     Z[1] = Y[1];
                     if(drvs) (*dZdX)[1] = 0;
-                    return;
+                    return 0;
                     
                     
                 default:
@@ -196,7 +196,7 @@ namespace yocto
             const ptrdiff_t N = ptrdiff_t(X.size());
             if(N<=0)
                 throw libc::exception( ERANGE, "integer overflow in extend()");
-            
+            real_t       rms   = 0;
             const size_t ncoef = degree+1;
             const real_t L     = X[N] - X[1];
             dt_prev = Fabs(dt_prev);
@@ -292,15 +292,47 @@ namespace yocto
                     throw exception("invalid data @X[%u]=%g", unsigned(i), double(X[i]));
                 LU.solve(mu,a);
                 Z[i] = a[1];
+                const real_t dz = Z[i] - Y[i];
+                rms += dz*dz;
                 if(drvs)
                 {
                     (*dZdX)[i] = a[2];
                 }
             }
-            
-            
+            return Sqrt( rms/N );
         }
         
+        template <>
+        void extend<real_t>:: build_rms(sequence<real_t>    &dx,
+                                        sequence<real_t>    &rms,
+                                        const array<real_t> &X,
+                                        const array<real_t> &Y,
+                                        const size_t         degree) const
+        {
+            const extend<real_t> &self = *this;
+            dx.free();
+            rms.free();
+            const size_t N     = X.size();
+            if(N<2)
+            {
+                dx.push_back(0);
+                rms.push_back(0);
+            }
+            else
+            {
+                vector<real_t> Z(N,0);
+                const real_t   width = X[N] - X[1];
+                const real_t   xstep = width/(N-1);
+                const size_t   M     = N/2;
+                for(size_t i=0; i <= M; ++i)
+                {
+                    const real_t dx_value  = i * xstep;
+                    const real_t rms_value = self(Z,X,Y,dx_value,degree,0);
+                    dx.push_back(dx_value);
+                    rms.push_back(rms_value);
+                }
+            }
+        }
         
         
     }

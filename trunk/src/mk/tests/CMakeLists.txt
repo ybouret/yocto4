@@ -40,6 +40,7 @@ ADD_TEST(Diag     test-mk diag)
 ADD_TEST(FitCirc  test-mk fit_circle 10)
 ADD_TEST(FitEll   test-mk fit_ellipse 10)
 ADD_TEST(Michaelis test-mk michaelis)
+ADD_TEST(Extend    test-mk extend)
 
 
 

@@ -17,7 +17,7 @@ namespace yocto
             extend_even        //!< assume even/boundary
         };
         
-              
+        
         template <typename T>
         class extend
         {
@@ -33,15 +33,35 @@ namespace yocto
             v2d<T> at( ptrdiff_t i, const array<T> &X, const array<T> &Y ) const;
             
             
-            void operator()(array<T>       &Z,
-                            const array<T> &X,
-                            const array<T> &Y,
-                            const T         dt_prev,
-                            const T         dt_next,
-                            const size_t    degree,
-                            array<T>       *dZdX = 0
-                            ) const;
-
+            T operator()(array<T>       &Z,
+                         const array<T> &X,
+                         const array<T> &Y,
+                         const T         dt_prev,
+                         const T         dt_next,
+                         const size_t    degree,
+                         array<T>       *dZdX
+                         ) const;
+            
+            
+            inline T operator()(array<T>       &Z,
+                                const array<T> &X,
+                                const array<T> &Y,
+                                const T         dt,
+                                const size_t    degree,
+                                array<T>       *dZdX
+                                ) const
+            {
+                const extend  &self = *this;
+                const T  half = dt/2;
+                return self(Z,X,Y,half,half,degree,dZdX);
+            }
+            
+            
+            void build_rms(sequence<T>    &dx,
+                           sequence<T>    &rms,
+                           const array<T> &X,
+                           const array<T> &Y,
+                           const size_t   degree) const;
             
             
         private:
