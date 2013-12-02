@@ -172,6 +172,18 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
+    vector<double> pdx;
+    vector<double> rms;
+    xtd3.build_rms(pdx, rms, x,z, degree);
+    {
+        ios::ocstream fp("xrms.dat",false);
+        for(size_t i=1; i <= pdx.size(); ++i )
+        {
+            fp("%g %g\n", pdx[i], rms[i]);
+        }
+        
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
