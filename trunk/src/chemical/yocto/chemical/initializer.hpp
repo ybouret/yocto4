@@ -48,6 +48,9 @@ namespace yocto
             constraint & equals( const double value );
             
             //! set the electroneutrality
+            /**
+             Won't create a constraint if no species is charged.
+             */
             void electroneutrality( const collection &lib );
             
             //! initialize at time t

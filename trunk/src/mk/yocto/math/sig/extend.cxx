@@ -312,7 +312,7 @@ namespace yocto
             const extend<real_t> &self = *this;
             dx.free();
             rms.free();
-            const size_t N     = X.size();
+            const size_t N = X.size();
             if(N<2)
             {
                 dx.push_back(0);

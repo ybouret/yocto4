@@ -27,6 +27,8 @@ namespace yocto
         ftol( numeric<double>::ftol ),
         time_scale(1e-4),
         tiny( numeric<double>::tiny ),
+        C(),
+        dC(),
         nuR(),
         nuP(),
         nu(),
@@ -34,9 +36,7 @@ namespace yocto
         dtGam(),
         Phi(),
         W(),
-        C(),
         xi(),
-        dC(),
         LU(),
         dervs()
         {
@@ -77,9 +77,7 @@ namespace yocto
         void equilibria:: reset() throw()
         {
             LU.release();
-            dC.release();
             xi.release();
-            C.release();
             W.release();
             Phi.release();
             dtGam.release();
@@ -87,6 +85,8 @@ namespace yocto
             nu.release();
             nuP.release();
             nuR.release();
+            dC.release();
+            C.release();
         }
         
         //======================================================================
@@ -115,9 +115,12 @@ namespace yocto
             try
             {
                 const size_t N = this->size();
+                const size_t M = lib.size();
+                C.make(M,0);
+                dC.make(M,0);
+                
                 if(N>0)
                 {
-                    const size_t M = lib.size();
                     
                     //----------------------------------------------------------
                     // allocate memory
@@ -129,9 +132,7 @@ namespace yocto
                     dtGam.make(N,0);
                     Phi.make(N,M);
                     W.make(N,N);
-                    C.make(M,0);
                     xi.make(N,0);
-                    dC.make(M,0);
                     LU.ensure(N);
                     
                     //----------------------------------------------------------

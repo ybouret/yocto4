@@ -84,6 +84,8 @@ namespace yocto
                 dV(),
                 Y()
                 {
+                    assert(M>0);
+                    
                     //==========================================================
                     // check rank
                     //==========================================================
@@ -92,6 +94,7 @@ namespace yocto
                                         unsigned(M),
                                         unsigned(N),
                                         unsigned(Nc) );
+                    
                     
                     //==========================================================
                     // initialize the equilibria
@@ -119,8 +122,32 @@ namespace yocto
                             P[i][sp->indx]         = *weight;
                         }
                     }
-                    //std::cerr << "P=" << P << std::endl;
-                    //std::cerr << "Lam=" << Lam << std::endl;
+                    std::cerr << "P=" << P << std::endl;
+                    std::cerr << "Lam=" << Lam << std::endl;
+                    
+                    //==========================================================
+                    //
+                    // special case: no equilibria: constraints sets all !
+                    //
+                    //==========================================================
+                    if(N<=0)
+                    {
+                        L2.ensure(Nc);
+                        assert(P.is_square());
+                        if( !L2.build(P) )
+                            throw exception("invalid constraints set");
+                        std::cerr << "C=" << C << std::endl;
+                        mkl::set(C,Lam);
+                        L2.solve(P,C);
+                        for(size_t i=M;i>0;--i)
+                        {
+                            if(C[i]<=0) C[i] = 0;
+                        }
+                       
+                        
+                        return;
+                    }
+                    
                     
                     //==========================================================
                     //
