@@ -1,0 +1,42 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+\newcommand{\myd}{\mathrm{d}}
+
+\begin{document}
+
+\section{Continuous function approximation}
+Let $g(x)$ be a function that we want to approximate by $f\left(x,\vec{a}\right)$ on an interval $I$,
+and $\vec{a}\in \mathbb{R}^N$.
+
+We define
+\begin{equation}
+	D^2\left(\vec{a}\right) =
+	 \dfrac{1}{2} \int_I \left\lbrack g(x) - f\left(x,\vec{a}\right) \right\rbrack^2 \; \myd x.
+\end{equation}
+We obtain a set of $N$ equations
+\begin{equation}
+	 \dfrac{\partial D^2}{ \partial a_i } = - \int_I \left\lbrack g(x) - f\left(x,\vec{a}\right) \right\rbrack \dfrac{\partial f}{\partial a_i} \; \myd x.
+\end{equation}
+We want to solve, for all $i$
+\begin{equation}
+	G_i\left(\vec{a}\right) =\int_I \left\lbrack g(x) - f\left(x,\vec{a}\right) \right\rbrack \dfrac{\partial f}{\partial a_i} \; \myd x.
+\end{equation}
+Starting from $\vec{G}_n\left(\vec{a}\right)$, we approximate the opposite Jacobian of $\vec{G}$ with
+\begin{equation}
+	\mymat{J} = \int_I \left(\dfrac{\partial f}{\partial a_i}\right)\left(\dfrac{\partial f}{\partial a_j}\right)\; \myd x.
+\end{equation}
+
+\end{document}
