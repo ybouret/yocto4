@@ -16,6 +16,9 @@ namespace yocto {
 		float  iqerf( float  p ) throw();//!< X|qerf(X)=p, -1<p<1
 		double iqerf( double p ) throw();
        
+        float  iqerfc( float  p ) throw(); //!< X|qerfc(X)=p, 0<p<2
+        double iqerfc( double p ) throw(); 
+        
 		float  gamma_log( float  X ) throw();
 		double gamma_log( double X ) throw();
 
