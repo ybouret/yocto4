@@ -68,4 +68,30 @@ namespace yocto
         remove_files( dirname, cb );
     }
     
+    namespace
+    {
+        class rm_wrapper
+        {
+        public:
+            const string &ext;
+            rm_wrapper( const string &user_ext ) throw() : ext(user_ext) {}
+            inline ~rm_wrapper() throw() {}
+            
+            inline bool has_ext( const vfs::entry &ep ) throw()
+            {
+                return  ep.has_extension(ext);
+            }
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(rm_wrapper);
+        };
+    }
+    
+    void vfs:: remove_files_with_extensions( const string &dirname, const string &extension)
+    {
+        rm_wrapper w(extension);
+        entry::callback cb( &w, & rm_wrapper::has_ext );
+        remove_files(dirname,cb);
+    }
+
+    
 }
