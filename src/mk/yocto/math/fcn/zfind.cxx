@@ -6,10 +6,10 @@
 //#include <iostream>
 
 namespace yocto {
-
-
+    
+    
 	namespace math {
-
+        
         
         template <>
         zfind<real_t>:: ~zfind() throw()
@@ -28,24 +28,25 @@ namespace yocto {
 		void zfind<real_t>::run( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f) const {
 			assert(f.a*f.c<=0.0);
 			assert(this->xerr>=0.0);
-
-			//----------------------------------------------------------------------
+            
+			//------------------------------------------------------------------
 			//
 			// prepare
 			//
-			//----------------------------------------------------------------------
+			//------------------------------------------------------------------
 			if( x.a >= x.c )
 			{
 				cswap( x.a, x.c );
 				cswap( f.a, f.c );
 			}
 			assert( x.c >= x.a );
-
-			//----------------------------------------------------------------------
+            
+			//------------------------------------------------------------------
 			//
 			// Loop
 			//
-			//----------------------------------------------------------------------
+			//------------------------------------------------------------------
+            real_t old_dx = Fabs(x.c-x.a);
 			do {
 				assert(f.a * f.c <= 0 );
 				//--------------------------------------------------------------
@@ -55,10 +56,10 @@ namespace yocto {
 				//--------------------------------------------------------------
 				const real_t w     = x.c - x.a;
 				const real_t h     = REAL(0.5) * w;
-
+                
 				x.b = x.a + h;
 				f.b = func( x.b );
-
+                
 				//--------------------------------------------------------------
 				//
 				// Ensuring Stability
@@ -68,7 +69,7 @@ namespace yocto {
 				//std::cout << "[zfind: X=" << x << "]" << std::endl;
 				//std::cout << "[zfind: F=" << f << "]" << std::endl;
 				//std::cout << "[zfind: D=" << D << "]" << std::endl;
-
+                
 				real_t rho = 0;
 				if( f.b <= -D )
 				{
@@ -89,7 +90,7 @@ namespace yocto {
 				// ENTER: Ridders' step: There are 8 sub-cases
 				//
 				//--------------------------------------------------------------
-
+                
 				if( f.a <= f.c )
 				{
 					assert(f.a<=0);
@@ -207,33 +208,40 @@ namespace yocto {
 					//
 					//----------------------------------------------------------
 				}
-
+                
 				//--------------------------------------------------------------
 				//
 				// LEAVE: Ridders' step
 				//
 				//--------------------------------------------------------------
-
+                
 				assert(x.c>=x.a);
+                const real_t new_dx = Fabs(x.c-x.a);
+                if(new_dx>=old_dx)
+                {
+                    //std::cerr << "new_dx=" << new_dx << "  " << std::endl;
+                    break; // numerical roundinf
+                }
+                old_dx = new_dx;
 			}
 			while( (x.c - x.a) > xerr );
-
-
+            
+            
 			// arrange to get the best result
 			if( Fabs(f.a) < Fabs(f.b) ) {
 				f.b = f.a;
 				x.b = x.a;
 			}
-
+            
 			if( Fabs(f.c) < Fabs(f.b) ) {
 				f.b = f.c;
 				x.b = x.c;
 			}
-
+            
 		}
-
-
-
+        
+        
+        
 		template <>
 		real_t zfind<real_t>::get(  numeric<real_t>::function &func, real_t xlo, real_t xhi) const
 		{
@@ -244,8 +252,8 @@ namespace yocto {
 			zfind<real_t>::run( func, x,f );
 			return x.b;
 		}
-
-
+        
+        
 	} // math
 }
 

@@ -377,13 +377,14 @@ namespace yocto {
         y(Y),
         y2( __check_spline(X,Y), numeric<real_t>::zero ),
         w(X[X.size()]-X[1]),
-        width( t==spline_periodic ? &w : 0)
+        width( t==spline_periodic ? &w : 0),
+        type(t)
         {
             spline<real_t>::compute( t, x, y, y2, ls, rs );
         }
         
         template <>
-        real_t spline1D<real_t>:: operator()(const real_t X) const throw()
+        real_t spline1D<real_t>:: get(const real_t X) const throw()
         {
             assert( x.size() == y.size() );
             assert( x.size() == y2.size() );
@@ -391,6 +392,15 @@ namespace yocto {
             return spline<real_t>::eval(X, x, y, y2, width);
         }
         
+        template <>
+        void spline1D<real_t>:: recompute(const real_t ls, const real_t rs)
+        {
+            assert( x.size() == y.size() );
+            assert( x.size() == y2.size() );
+            assert( x.size() >= 2 );
+            spline<real_t>::compute( type, x, y, y2, ls, rs );
+        }
+
         
         ////////////////////////////////////////////////////////////////////////
         //
