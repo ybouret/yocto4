@@ -32,10 +32,16 @@ namespace yocto {
 			struct zqerf_type
 			{
 				real_t p;
-				inline real_t compute( real_t x ) const throw()
+				inline real_t compute_diff_erf( real_t x ) const throw()
 				{
 					return qerf(x)-p;
 				}
+                
+                inline real_t compute_diff_erfc( real_t x ) const throw()
+                {
+                    return qerfc(x) - p;
+                }
+                
 			};
 		}
 		
@@ -43,7 +49,7 @@ namespace yocto {
 			assert(p>-1);
 			assert(p<1);
 			const zqerf_type          zqerf_args = { p };
-			numeric<real_t>::function zqerf( &zqerf_args, & zqerf_type::compute );
+			numeric<real_t>::function zqerf( &zqerf_args, & zqerf_type::compute_diff_erf );
 			real_t x_lo = -1;
 			while( zqerf(x_lo) >= 0) x_lo += x_lo;
 			real_t x_hi = 1;
@@ -51,6 +57,26 @@ namespace yocto {
 			
 			const zfind<real_t>        solve( max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) );
 			return solve( zqerf, x_lo, x_hi );
+		}
+        
+        real_t iqerfc( real_t p ) throw() {
+			assert(p>0);
+			assert(p<2);
+			const zqerf_type          zqerfc_args = { p };
+			numeric<real_t>::function zqerfc( &zqerfc_args, & zqerf_type::compute_diff_erfc );
+			real_t x_lo = -1;
+			while( zqerfc(x_lo) <= 0)
+            {
+                x_lo += x_lo;
+            }
+            
+			real_t x_hi = 1;
+			while( zqerfc(x_hi) >= 0)
+            {
+                x_hi += x_hi;
+			}
+			const zfind<real_t>        solve( max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) );
+			return solve( zqerfc, x_lo, x_hi );
 		}
 		
 		real_t gamma_log( real_t xx ) throw() {

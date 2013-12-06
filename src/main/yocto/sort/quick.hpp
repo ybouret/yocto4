@@ -163,7 +163,7 @@ namespace yocto
 
     //! co quicksorting
     template <typename T, typename U>
-    inline void co_qsort( array<T> &arr, array<T> &brr )
+    inline void co_qsort( array<T> &arr, array<U> &brr ) throw()
     {
         co_qsort(arr,brr,__compare<T>);
     }
