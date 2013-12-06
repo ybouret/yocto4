@@ -219,7 +219,6 @@ namespace yocto {
                 const real_t new_dx = Fabs(x.c-x.a);
                 if(new_dx>=old_dx)
                 {
-                    //std::cerr << "new_dx=" << new_dx << "  " << std::endl;
                     break; // numerical roundinf
                 }
                 old_dx = new_dx;
@@ -245,8 +244,6 @@ namespace yocto {
 		template <>
 		real_t zfind<real_t>::get(  numeric<real_t>::function &func, real_t xlo, real_t xhi) const
 		{
-			//std::cout << "func@" << (void *)func << std::endl;
-			//std::cout << "args@" << args         << std::endl;
 			triplet<real_t> x = { xlo,       REAL(0.0), xhi       };
 			triplet<real_t> f = { func(xlo), REAL(0.0), func(xhi) };
 			zfind<real_t>::run( func, x,f );
