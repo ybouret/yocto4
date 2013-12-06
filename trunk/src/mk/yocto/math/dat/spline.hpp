@@ -205,15 +205,18 @@ namespace yocto {
                               const T        rs=0);
             
             virtual ~spline1D() throw();
+            T get(const T X) const throw();
             
-            T operator()( const T X ) const throw();
+            inline T operator()( const T X ) const throw() { return get(X); }
+            void recompute(const T ls=0,const T rs=0);
             
         private:
-            const array<T> &x; //!< user's ref
-            const array<T> &y; //!< user's ref
-            vector<T>       y2;
-            const T         w;
-            const T        *width;
+            const array<T>   &x;  //!< user's ref
+            const array<T>   &y;  //!< user's ref
+            vector<T>         y2; //!< own y2
+            const T           w;     //!< width
+            const T          *width; //!< &w if is_periodic
+            const spline_type type;
             YOCTO_DISABLE_COPY_AND_ASSIGN(spline1D);
         };
         
