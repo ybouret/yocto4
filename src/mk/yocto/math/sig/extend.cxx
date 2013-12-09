@@ -133,6 +133,7 @@ namespace yocto
                     return Y[i];
                 }
             }
+		return 0;
         }
         
         
