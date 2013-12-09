@@ -7,7 +7,7 @@ extern "C" {
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/icstream.hpp"
 
-#include "yocto/auto-arr.hpp"
+#include "yocto/ptr/auto-arr.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/code/bzset.hpp"
 #include "yocto/string/conv.hpp"

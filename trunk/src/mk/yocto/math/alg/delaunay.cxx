@@ -2,7 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/auto-arr.hpp"
+#include "yocto/ptr/auto-arr.hpp"
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/sort/heap.hpp"
