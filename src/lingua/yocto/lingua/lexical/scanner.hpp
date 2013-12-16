@@ -38,6 +38,8 @@ namespace yocto
                 const string & key() const throw();
                 
                 typedef intr_ptr<string,scanner> ptr;
+                
+                //! search for a rule label
                 bool has( const string &id ) const throw();
                 
                 //==============================================================
