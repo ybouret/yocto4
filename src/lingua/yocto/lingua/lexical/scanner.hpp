@@ -22,9 +22,11 @@ namespace yocto
             
             typedef  functor<void,TL1(const token &)> callback;
             
+            //! tunable lexical scanner
             class scanner : public object, public counted
             {
             public:
+                //! ctor: scanner ID + a ref to a line count
                 explicit scanner( const string &id, size_t &line_ref);
                 explicit scanner( const char   *id, size_t &line_ref);
                 
