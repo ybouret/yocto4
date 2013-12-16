@@ -19,6 +19,9 @@ namespace yocto
         
         
         //! a cloneable pattern
+        /**
+         The token part should NOT be duplicated upon cloning
+         */
         class pattern : public token
         {
         public:
@@ -30,6 +33,9 @@ namespace yocto
             virtual ~pattern() throw();
             
             //! default this->clear()
+            /**
+             may be more complicated for compound patterns
+             */
             virtual void reset() throw();
             
             //! clone interface
@@ -37,10 +43,11 @@ namespace yocto
             
             //! true if accept the source
             /**
-             \param src the source to be tested
+             \param src the source to be tested.
              the pattern must be empty before call.
              if the source doesn't match, then
-             it must be restored, and the pattern left empty
+             it must be restored (see source.unget),
+             and the pattern left empty.
              */
             virtual bool accept( source &src ) = 0;
             

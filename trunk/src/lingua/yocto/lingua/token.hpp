@@ -10,6 +10,9 @@ namespace yocto
     {
         
         //! a single dynamic char
+        /**
+         use built-in small object allocator for memory
+         */
         class t_char
         {
         public:
