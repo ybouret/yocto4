@@ -60,6 +60,7 @@ namespace yocto
            
 		};
      
+        void assign_current_thread_on( size_t cpu_id );
     }
     
     
