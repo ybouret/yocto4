@@ -1,5 +1,5 @@
 all:
 
 clean:
-	rm -f *.toc *.aux *.log *.synctex.gz newton.ps newton.pdf psd.ps psd.pdf splines.ps splines.pdf shapes.pdf shapes.ps lsf.psd lsf.ps
+	rm -f *.toc *.aux *.log *.synctex.gz newton.ps newton.pdf psd.ps psd.pdf splines.ps splines.pdf shapes.pdf shapes.ps lsf.pdf lsf.ps
 
