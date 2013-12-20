@@ -9,10 +9,16 @@ namespace yocto
     namespace lingua
     {
         
+        //______________________________________________________________________
+        //
         //! base type for first_chars
+        //______________________________________________________________________
         typedef sorted_vector<uint8_t> byte_store;
         
+        //______________________________________________________________________
+        //
         //! list of the first possible accepted chars
+        //______________________________________________________________________
         class first_chars : public byte_store
         {
         public:
