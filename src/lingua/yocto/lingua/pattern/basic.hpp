@@ -9,7 +9,10 @@ namespace yocto
     namespace lingua
     {
         
+        //______________________________________________________________________
+        //
         //! accept one char by a virtual is_valid method
+        //______________________________________________________________________
         class one_char : public pattern
         {
         public:
@@ -25,7 +28,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(one_char);
         };
         
+        //______________________________________________________________________
+        //
         //! accept any char
+        //______________________________________________________________________
         class any1 : public one_char
         {
         public:
@@ -44,7 +50,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(pattern);
         };
         
+        //______________________________________________________________________
+        //
         //! accept a single char
+        //______________________________________________________________________
         class single : public one_char
         {
         public:
@@ -61,7 +70,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(single);
         };
         
+        //______________________________________________________________________
+        //
         //! accept a range of char
+        //______________________________________________________________________
         class range : public one_char
         {
         public:
@@ -82,7 +94,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(range);
         };
         
+        //______________________________________________________________________
+        //
         //! accept some chars
+        //______________________________________________________________________
         class choice : public one_char
         {
         public:
@@ -103,7 +118,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(choice);
         };
         
+        //______________________________________________________________________
+        //
         //! accept whithin some chars
+        //______________________________________________________________________
         class within : public choice
         {
         public:
@@ -122,7 +140,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(within);
         };
         
+        //______________________________________________________________________
+        //
         //! reject some chars
+        //______________________________________________________________________
         class none : public choice
         {
         public:

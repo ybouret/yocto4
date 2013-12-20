@@ -9,6 +9,10 @@ namespace yocto
     namespace lingua
     {
         
+        //______________________________________________________________________
+        //
+        //! a list of operands
+        //______________________________________________________________________
         class logical : public pattern
         {
         public:
@@ -40,8 +44,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(logical);
         };
         
-        
+        //______________________________________________________________________
+        //
         //! logical AND: must accept all operands
+        //______________________________________________________________________
         class AND : public logical
         {
         public:
@@ -62,7 +68,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(AND);
         };
         
+        //______________________________________________________________________
+        //
         //! logical OR: must accept one operand, lazy from left to right
+        //______________________________________________________________________
         class OR : public logical
         {
         public:
@@ -82,8 +91,10 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(OR);
         };
         
-        
+        //______________________________________________________________________
+        //
         //! logical NOT: must reject every operand
+        //______________________________________________________________________
         class NOT : public logical
         {
         public:

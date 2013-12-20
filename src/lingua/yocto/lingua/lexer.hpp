@@ -10,7 +10,10 @@ namespace yocto
     namespace lingua
     {
         
+        //______________________________________________________________________
+        //
         //! a source of lexemes
+        //______________________________________________________________________
         class lexer : public virtual object
         {
         public:

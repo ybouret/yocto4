@@ -19,10 +19,16 @@ namespace yocto
         
         namespace lexical
         {
-            
+            //__________________________________________________________________
+            //
+            //! control callback
+            //__________________________________________________________________
             typedef  functor<void,TL1(const token &)> callback;
             
+            //__________________________________________________________________
+            //
             //! tunable lexical scanner
+            //__________________________________________________________________
             class scanner : public object, public counted
             {
             public:
@@ -44,10 +50,13 @@ namespace yocto
                 
                 //==============================================================
                 //
-                // some helper callbacks
+                // some helpers for lexical action
                 //
                 //==============================================================
                 
+                //! method pointer prototype
+                typedef bool (scanner::*method)(const token &);
+
                 //! return true
                 bool __forward( const token & ) throw();
                 
@@ -60,7 +69,6 @@ namespace yocto
                 //! increase line and return false (discard newline)
                 bool __no_endl( const token & ) throw();
                 
-                typedef bool (scanner::*method)(const token &);
                 
                 inline method forward() const throw()
                 {

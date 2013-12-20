@@ -10,14 +10,20 @@ namespace yocto
     {
         namespace lexical
         {
+            //__________________________________________________________________
+            //
             //! what to do with a token
             /**
-             if returns true => will produce a lexeme
+             if returns true  => will produce a lexeme
              if returns false => lexeme will be discarded
              */
+            //__________________________________________________________________
             typedef functor<bool,TL1(const token&)> action;
             
+            //__________________________________________________________________
+            //
             //! generic rule
+            //__________________________________________________________________
             class rule : public object
             {
             public:
@@ -55,6 +61,10 @@ namespace yocto
                 const bool fctl;    //!<  true if role is jump/call/back
             };
          
+            //__________________________________________________________________
+            //
+            //! list of rules
+            //__________________________________________________________________
             class r_list : public core::list_of<rule>
             {
             public:
