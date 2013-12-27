@@ -45,6 +45,9 @@ namespace yocto
             };
             
             //! add a species with its stochiometric coefficient
+            /**
+             the species pointer should come from a library.
+             */
             void   add( const species::ptr &spec, const int coef );
             
             //! number of actors
@@ -68,6 +71,10 @@ namespace yocto
             
             
             //! check current validity
+            /**
+             - at least one species
+             - charge conservation
+             */
             bool is_valid() const throw();
             
         protected:

@@ -42,6 +42,7 @@ effectors = {
     }
 };
 
+-- one function for effector
 function MCT(t,zeta,h,am)
     print( "MCT@t=" .. t .. ", zeta=" .. zeta );
     print( "h=" .. h .. ", am=" .. am );

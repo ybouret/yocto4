@@ -11,6 +11,7 @@ namespace yocto
         //! base type for constraint weights
         typedef map<string,double> constraint_weights;
         
+        
         class constraint : public constraint_weights
         {
         public:
