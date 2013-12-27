@@ -58,8 +58,9 @@ YOCTO_UNIT_TEST_IMPL(equilibrium)
     
     {
         chemical::equilibrium::ptr eq( new chemical::constant_equilibrium("ugly",pow(10.0,-4.8)) );
-        eq->add( lib["AH"],1);
-        
+        eq->add( lib["AH"],-1);
+        eq->add( lib["A-"],1);
+
         std::cerr << *eq << std::endl;
         check_eq(*eq);
     }
