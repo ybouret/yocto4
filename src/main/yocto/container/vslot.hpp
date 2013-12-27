@@ -70,7 +70,8 @@ namespace yocto
         template <typename T>
         bool same_type_than() const throw()
         {
-            return type_ != 0 && typeid(T) == *type_;
+            typedef typename type_traits<T>::mutable_type TT;
+            return type_ != 0 && typeid(TT) == *type_;
         }
         
         //! transtyping with DEBUG control
@@ -91,6 +92,7 @@ namespace yocto
             return *(T*)data_;
         }
         
+        //! type name of "" if no type
         const char *name() const throw();
         
         
@@ -102,6 +104,10 @@ namespace yocto
         void                (*copy_)(void*,const void *); //!< copy wrapper
         void prepare_for(size_t n);
         
+        //______________________________________________________________________
+        //
+        // destructor wrapper
+        //______________________________________________________________________
         template <typename T>
         static inline
         void __kill( void *addr ) throw()
@@ -110,6 +116,10 @@ namespace yocto
             static_cast<T*>(addr)->~T();
         }
         
+        //______________________________________________________________________
+        //
+        // copy constructor wrapper
+        //______________________________________________________________________
         template <typename T>
         static inline
         void __copy( void *dest, const void *addr )
@@ -125,7 +135,7 @@ namespace yocto
             typedef typename type_traits<T>::mutable_type TT;
             kill_ =  __kill<TT>;
             copy_ =  __copy<TT>;
-            type_ = &typeid(T);
+            type_ = &typeid(TT);
         }
         YOCTO_DISABLE_ASSIGN(vslot);
     };
