@@ -67,6 +67,9 @@ namespace yocto
             void normalize_C( double t );
             
             //! Reduce dC to a legal step
+            /**
+             The corresponding concentrations MUST be in C before this call !
+             */
             void legalize_dC( double t );
             
             //! scale all equilibrium
