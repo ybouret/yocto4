@@ -141,7 +141,10 @@ namespace yocto
                     size_t i=1;
                     for( iterator eq=begin();eq!=end();++eq,++i)
                     {
-                        (**eq).fill(nuR[i], nuP[i]);
+                        const equilibrium &Eq = **eq;
+                        if(!Eq.is_valid())
+                            throw exception("invalid equilibrium <%s>", Eq.name.c_str());
+                        Eq.fill(nuR[i], nuP[i]);
                     }
                     
                     for(i=N;i>0;--i)
@@ -151,6 +154,7 @@ namespace yocto
                             nu[i][j] = nuP[i][j] - nuR[i][j];
                         }
                     }
+                    
                     std::cerr << "nu=" << nu << std::endl;
                     
                 }
