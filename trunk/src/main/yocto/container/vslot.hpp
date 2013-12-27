@@ -14,6 +14,7 @@ namespace yocto
         explicit vslot() throw();
         explicit vslot(size_t n);
         virtual ~vslot() throw();
+        vslot( const vslot &other);
         
         void allocate(size_t n);   //!< memory only
         void deallocate() throw(); //!< once object is destructed
@@ -90,25 +91,43 @@ namespace yocto
             return *(T*)data_;
         }
         
+        const char *name() const throw();
+        
         
     private:
-        size_t                size_;
-        void                 *data_;
-        const std::type_info *type_;
-        void                (*kill_)(void*);
+        size_t                size_;                      //!< allocated bytes for data
+        void                 *data_;                      //!< allocated memory area
+        const std::type_info *type_;                      //!< for type id
+        void                (*kill_)(void*);              //!< destructor wrapper
+        void                (*copy_)(void*,const void *); //!< copy wrapper
         void prepare_for(size_t n);
         
         template <typename T>
         static inline
-        void __kill( void *addr ) throw() { assert(addr); static_cast<T*>(addr)->~T(); }
+        void __kill( void *addr ) throw()
+        {
+            assert(addr);
+            static_cast<T*>(addr)->~T();
+        }
+        
+        template <typename T>
+        static inline
+        void __copy( void *dest, const void *addr )
+        {
+            assert(dest);
+            assert(addr);
+            new (dest) T( *(T*)addr );
+        }
         
         template <typename T>
         inline void activate() throw()
         {
-            kill_ =  __kill<T>;
+            typedef typename type_traits<T>::mutable_type TT;
+            kill_ =  __kill<TT>;
+            copy_ =  __copy<TT>;
             type_ = &typeid(T);
         }
-        YOCTO_DISABLE_COPY_AND_ASSIGN(vslot);
+        YOCTO_DISABLE_ASSIGN(vslot);
     };
     
 }
