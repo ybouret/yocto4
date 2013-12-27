@@ -5,6 +5,14 @@
 using namespace yocto;
 #include <cmath>
 
+void check_eq( const chemical::equilibrium &eq)
+{
+    if( eq.is_valid() )
+        std::cerr << "\t" << eq.name << " is valid." << std::endl;
+    else
+        std::cerr << "\t " << eq.name << " is NOT VALID!" << std::endl;
+}
+
 YOCTO_UNIT_TEST_IMPL(equilibrium)
 {
     chemical::collection lib;
@@ -32,8 +40,8 @@ YOCTO_UNIT_TEST_IMPL(equilibrium)
         eq->add( lib["HO-"], 1);
         
         
-        
         std::cerr << *eq << std::endl;
+        check_eq(*eq);
     }
     
     {
@@ -45,9 +53,16 @@ YOCTO_UNIT_TEST_IMPL(equilibrium)
         
         
         std::cerr << *eq << std::endl;
+        check_eq(*eq);
     }
     
-    
+    {
+        chemical::equilibrium::ptr eq( new chemical::constant_equilibrium("ugly",pow(10.0,-4.8)) );
+        eq->add( lib["AH"],1);
+        
+        std::cerr << *eq << std::endl;
+        check_eq(*eq);
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()

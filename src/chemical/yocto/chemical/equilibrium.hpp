@@ -66,8 +66,11 @@ namespace yocto
              */
             void append( array<double> &C, urand32 &ran ) const throw();
             
-        protected:
             
+            //! check current validity
+            bool is_valid() const throw();
+            
+        protected:
             explicit equilibrium( const string &id );
             explicit equilibrium( const char   *id );
             double   computeK(double) const throw();
@@ -80,9 +83,8 @@ namespace yocto
             const   int      Nu;  //!< sum of algebraic coefficients (Delta_r nu)
             const   unsigned NuR; //!< sum of algebraic reactives coefficients
             const   unsigned NuP; //!< sum of algebraic products  coefficients
-            mutable double C0;    //!< used to compute typical C scaling if Nu!=0
+            mutable double   C0;  //!< used to compute typical C scaling if Nu!=0
             mutable math::numeric<double>::function K;
-            
             
         };
         

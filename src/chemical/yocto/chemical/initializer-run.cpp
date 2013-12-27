@@ -2,7 +2,6 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/math/kernel/algebra.hpp"
-//#include "yocto/math/types.hpp"
 
 #include "yocto/code/utils.hpp"
 

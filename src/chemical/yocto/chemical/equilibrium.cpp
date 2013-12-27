@@ -154,6 +154,28 @@ namespace yocto
             
         }
         
+        bool equilibrium:: is_valid() const throw()
+        {
+            // does it mean something
+            if( actors.size() <= 0 )
+                return false;
+            
+            // charge conservation
+            int DeltaNuZ = 0;
+            for( size_t i=actors.size();i>0;--i)
+            {
+                const actor &a = actors[i];
+                const int    nu = a.coef;
+                const int    z  = a.spec->z;
+                DeltaNuZ += z*nu;
+            }
+            
+            if(DeltaNuZ != 0 )
+                return false;
+            
+            return true;
+        }
+
         
         ////////////////////////////////////////////////////////////////////////
         equilibrium:: actor:: actor( const species::ptr &sp, const int stochio ) throw() :
