@@ -21,6 +21,7 @@ namespace yocto
                 {
                 public:
                     typedef typename field<T>::explicit_type equation;
+                    typedef typename field<T>::callback_type callback;
                     
                     virtual ~step() throw();
                     
@@ -40,7 +41,8 @@ namespace yocto
                                              const T          x,
                                              const T          h,
                                              const array<T>  &y,
-                                             const array<T>  &dydx
+                                             const array<T>  &dydx,
+                                             callback        *cb
                                              ) = 0;
                     
                     

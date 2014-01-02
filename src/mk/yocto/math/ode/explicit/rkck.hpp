@@ -19,6 +19,8 @@ namespace yocto
             {
             public:
                 typedef typename field<T>::explicit_type equation;
+                typedef typename field<T>::callback_type callback;
+                
                 explicit RKCK();
                 virtual ~RKCK() throw();
                 
@@ -28,7 +30,9 @@ namespace yocto
                                         const T          x,
                                         const T          h,
                                         const array<T>  &y,
-                                        const array<T>  &dydx );
+                                        const array<T>  &dydx,
+                                        callback        *cb
+                                        );
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(RKCK);
