@@ -4,20 +4,19 @@
 
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/memory/buffers.hpp"
-#include "yocto/memory/records.hpp"
 
 namespace yocto
 {
 	
 	template <typename T,
 	typename MEMORY_KIND>
-	class lw_arrays 
+	class lw_arrays
 	{
 	public:
 		typedef          lw_array<T>                     array_type;
 		typedef typename type_traits<T>::mutable_type    mutable_type;
 		
-		explicit lw_arrays( size_t num_arrays ) : 
+		explicit lw_arrays( size_t num_arrays ) :
 		arrays_(num_arrays),
 		size_(0),
 		wksp_(NULL),
@@ -34,7 +33,7 @@ namespace yocto
 			update();
 		}
 		
-		void prepare( const size_t new_size )
+		inline void prepare( const size_t new_size )
 		{
 			if( new_size != size_ )
 			{
@@ -54,14 +53,14 @@ namespace yocto
 		
 		inline array_type & operator[]( size_t index ) throw()
 		{
-			assert( index > 0 ); 
+			assert( index > 0 );
 			assert( index <= num_arrays() );
 			return arrays_[index-1];
 		}
 		
 		inline const array_type & operator[]( size_t index ) const throw()
 		{
-			assert( index > 0 ); 
+			assert( index > 0 );
 			assert( index <= num_arrays() );
 			return arrays_[index-1];
 		}
@@ -81,7 +80,7 @@ namespace yocto
 		size_t            indx_;   //!< dispatch index
 		YOCTO_DISABLE_COPY_AND_ASSIGN(lw_arrays);
 		
-		inline void update() throw() 
+		inline void update() throw()
 		{
 			mutable_type *p = wksp_;
 			for( size_t i=0; i < arrays_.size; ++i, p += size_)

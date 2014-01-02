@@ -81,7 +81,7 @@ namespace yocto
 					for (size_t i=n; i>0; --i) 
 						errmax= max_of<real_t>(errmax,Fabs(yerr[i]/yscal[i]));
 					errmax /= eps;
-					if (errmax <= 1.0) 
+					if (errmax <= REAL(1.0) )
 						break; // ==> success
 					
 					//----------------------------------------------------------

@@ -21,6 +21,10 @@ namespace yocto
 				//! derivs( dydx[], x, y[] )
 				typedef functor<void,TL3(array<T>&,T,const array<T>&)> type;
                 
+                typedef functor<void,TL3(array<T>&,T,const array<T>&)>                 explicit_type; //!< derivs( dydx[], x, y[] );
+                typedef functor<void,TL4(array<T> &, matrix<T> &, T, const array<T>&)> implicit_type; //!< jacobn( dfdx[], dfdy[][], x, y[] );
+                
+                
                 //! jacobn( dfdx[], dfdy[][], x, y[] );
 				typedef functor<void,TL4(array<T> &, matrix<T> &, T, const array<T>&)> diff;
 			};
