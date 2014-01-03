@@ -19,7 +19,7 @@ namespace yocto
 			
 			template <>
 			RKCK<real_t>:: RKCK() :
-            Explicit::step<real_t>(6),
+            explicit_step<real_t>(6),
 			ytmp( next_array() ),
 			ak2(  next_array()   ),
 			ak3(  next_array()   ),

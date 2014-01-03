@@ -15,7 +15,7 @@ namespace yocto
             
             //! Runge-Kutta Cash-Karp 4/5 step
             template <typename T>
-            class RKCK : public Explicit::step<T>
+            class RKCK : public explicit_step<T>
             {
             public:
                 typedef typename field<T>::explicit_type equation;
