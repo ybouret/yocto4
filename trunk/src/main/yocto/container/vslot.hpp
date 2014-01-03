@@ -14,7 +14,6 @@ namespace yocto
         explicit vslot() throw();
         explicit vslot(size_t n);
         virtual ~vslot() throw();
-        vslot( const vslot &other);
         
         void allocate(size_t n);   //!< memory only
         void deallocate() throw(); //!< once object is destructed
@@ -66,6 +65,7 @@ namespace yocto
             activate<T>();
         }
         
+        
         //! query type comparison
         template <typename T>
         bool same_type_than() const throw()
@@ -101,7 +101,7 @@ namespace yocto
         void                 *data_;                      //!< allocated memory area
         const std::type_info *type_;                      //!< for type id
         void                (*kill_)(void*);              //!< destructor wrapper
-        void                (*copy_)(void*,const void *); //!< copy wrapper
+        //void                (*copy_)(void*,const void *); //!< copy wrapper
         void prepare_for(size_t n);
         
         //______________________________________________________________________
@@ -115,29 +115,30 @@ namespace yocto
             assert(addr);
             static_cast<T*>(addr)->~T();
         }
-        
-        //______________________________________________________________________
-        //
-        // copy constructor wrapper
-        //______________________________________________________________________
-        template <typename T>
-        static inline
-        void __copy( void *dest, const void *addr )
-        {
-            assert(dest);
-            assert(addr);
-            new (dest) T( *(T*)addr );
-        }
+        /*
+         //______________________________________________________________________
+         //
+         // copy constructor wrapper
+         //______________________________________________________________________
+         template <typename T>
+         static inline
+         void __copy( void *dest, const void *addr )
+         {
+         assert(dest);
+         assert(addr);
+         new (dest) T( *(T*)addr );
+         }
+         */
         
         template <typename T>
         inline void activate() throw()
         {
             typedef typename type_traits<T>::mutable_type TT;
             kill_ =  __kill<TT>;
-            copy_ =  __copy<TT>;
+            //copy_ =  __copy<TT>;
             type_ = &typeid(TT);
         }
-        YOCTO_DISABLE_ASSIGN(vslot);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(vslot);
     };
     
 }
