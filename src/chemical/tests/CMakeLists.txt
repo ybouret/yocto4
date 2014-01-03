@@ -16,5 +16,4 @@ ADD_TEST(Init2.0     test-chemical init2 0)
 ADD_TEST(Lua         test-chemical lua ${CMAKE_CURRENT_SOURCE_DIR}/example.lua)
 ADD_TEST(Acetic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/acetic.lua)
 ADD_TEST(Oxalic      test-chemical dosage ${CMAKE_CURRENT_SOURCE_DIR}/oxalic.lua)
-ADD_TEST(DiffEq      test-chemical diff
-${CMAKE_CURRENT_SOURCE_DIR}/diff.lua)
+ADD_TEST(DiffEq      test-chemical diff   ${CMAKE_CURRENT_SOURCE_DIR}/diff.lua)

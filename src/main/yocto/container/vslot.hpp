@@ -131,7 +131,7 @@ namespace yocto
          */
         
         template <typename T>
-        inline void activate() throw()
+        void activate() throw()
         {
             typedef typename type_traits<T>::mutable_type TT;
             kill_ =  __kill<TT>;
