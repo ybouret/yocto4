@@ -9,6 +9,10 @@ namespace yocto
     {
         namespace ode
         {
+            //! adaptive controler
+            /**
+             needs to be prepared before integration
+             */
             template <typename T>
             class explicit_controler : public lw_arrays<T,ode::memory_type>
             {

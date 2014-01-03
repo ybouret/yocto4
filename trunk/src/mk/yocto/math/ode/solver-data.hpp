@@ -14,7 +14,7 @@ namespace yocto
         {
          
             template <typename T>
-            class solver_data : public lw_arrays<T,memory_type>
+            class solver_data : public lw_arrays<T,ode::memory_type>
             {
             public:
                 virtual ~solver_data() throw();
