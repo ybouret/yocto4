@@ -1,4 +1,5 @@
 #include "yocto/chemical/effector.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -61,6 +62,29 @@ namespace yocto
             return os;
         }
 
+        
+        effector       & effectors:: operator[]( const string &id )
+        {
+            effector::ptr *ppEff  = search(id);
+            if(!ppEff)
+            {
+                throw exception("no effector '%s'", id.c_str());
+            }
+            return **ppEff;
+        }
+
+        const effector       & effectors:: operator[]( const string &id ) const
+        {
+            const effector::ptr *ppEff  = search(id);
+            if(!ppEff)
+            {
+                throw exception("no const effector '%s'", id.c_str());
+            }
+            return **ppEff;
+        }
+        
+        
+        
     }
 
 }
