@@ -1,7 +1,7 @@
 #ifndef YOCTO_ODE_ROSENBROCK_INCLUDED
 #define YOCTO_ODE_ROSENBROCK_INCLUDED 1
 
-#include "yocto/math/ode/stiff-step.hpp"
+#include "yocto/math/ode/implicit/step.hpp"
 #include "yocto/math/kernel/lu.hpp"
 
 namespace yocto
@@ -13,7 +13,7 @@ namespace yocto
         {
             
             template <typename T>
-            class rosenbrock : public stiff_step<T>
+            class rosenbrock : public implicit_step<T>
             {
             public:
                 virtual ~rosenbrock() throw();

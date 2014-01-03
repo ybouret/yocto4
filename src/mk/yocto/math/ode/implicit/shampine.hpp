@@ -1,7 +1,8 @@
 #ifndef YOCTO_ODE_SHAMPINE_INCLUDED
 #define YOCTO_ODE_SHAMPINE_INCLUDED 1
 
-#include "yocto/math/ode/rosenbrock.hpp"
+#include "yocto/math/ode/implicit/rosenbrock.hpp"
+
 namespace yocto
 {
     namespace math
@@ -17,8 +18,8 @@ namespace yocto
                 virtual ~shampine() throw();
                 explicit shampine();
                 
-                typedef typename stiff_step<T>::equation equation;
-                typedef typename stiff_step<T>::jacobian jacobian;
+                typedef typename implicit_step<T>::equation equation;
+                typedef typename implicit_step<T>::jacobian jacobian;
                 
                 virtual void operator()(array<T>       &y,
                                         array<T>       &dydx,
