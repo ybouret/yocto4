@@ -13,8 +13,8 @@ namespace yocto
 			class RK45 : public explicit_controler<T>
             {
             public:
-                typedef typename field<T>::explicit_type equation;
-                typedef typename field<T>::callback_type callback;
+                typedef typename Field<T>::Equation equation;
+                typedef typename Field<T>::Callback callback;
                 
                 explicit RK45();
                 virtual ~RK45() throw();
@@ -45,7 +45,7 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(RK45);
-                lw_array<T> &yerr,&ytmp;
+                typename Field<T>::LW_Array &yerr,&ytmp;
             };
             
             

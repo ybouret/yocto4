@@ -14,11 +14,11 @@ namespace yocto
              needs to be prepared before integration
              */
             template <typename T>
-            class explicit_controler : public lw_arrays<T,ode::memory_type>
+            class explicit_controler : public Field<T>::LW_Arrays
             {
             public:
-                typedef typename field<T>::explicit_type equation;
-                typedef typename field<T>::callback_type callback;
+                typedef typename Field<T>::Equation equation;
+                typedef typename Field<T>::Callback callback;
                 
                 virtual ~explicit_controler() throw();
                 

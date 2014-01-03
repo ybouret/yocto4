@@ -2,8 +2,8 @@
 #define YOCTO_ODE_SOLVER_DATA_INCLUDED 1
 
 
-#include "yocto/sequence/lw-arrays.hpp"
 #include "yocto/math/ode/types.hpp"
+
 
 namespace yocto
 {
@@ -14,7 +14,7 @@ namespace yocto
         {
          
             template <typename T>
-            class solver_data : public lw_arrays<T,ode::memory_type>
+            class solver_data : public Field<T>::LW_Arrays
             {
             public:
                 virtual ~solver_data() throw();
@@ -25,7 +25,7 @@ namespace yocto
                 
             protected:
                 explicit solver_data( T user_eps );
-                lw_array<T> &y, &dydx, &yscal;
+                typename Field<T>::LW_Array &y, &dydx, &yscal;
 
                 
             private:

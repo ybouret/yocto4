@@ -49,7 +49,7 @@ namespace yocto
 		}
 		
 		inline array_type & next_array() throw() { assert(indx_<num_arrays() ); return arrays_[indx_++]; }
-		inline void         restart() throw() { indx_ = 0; }
+		inline void         restart()    throw() { indx_ = 0; }
 		
 		inline array_type & operator[]( size_t index ) throw()
 		{

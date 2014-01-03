@@ -2,7 +2,6 @@
 #define YOCTO_MATH_ODE_EXPLICIT_STEP_INCLUDED 1
 
 #include "yocto/math/ode/types.hpp"
-#include "yocto/sequence/lw-arrays.hpp"
 
 namespace yocto
 {
@@ -15,11 +14,11 @@ namespace yocto
             
             //! memory and method for one step
             template <typename T>
-            class explicit_step : public lw_arrays<T,ode::memory_type>
+            class explicit_step : public Field<T>::LW_Arrays
             {
             public:
-                typedef typename field<T>::explicit_type equation;
-                typedef typename field<T>::callback_type callback;
+                typedef typename Field<T>::Equation equation;
+                typedef typename Field<T>::Callback callback;
                 
                 virtual ~explicit_step() throw();
                 
