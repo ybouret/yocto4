@@ -28,9 +28,9 @@ namespace
         vector<double>        yy;
         ODE                   eq;
         
-        explicit ChemDiff(chemical::collection &lib,
-                          chemical::equilibria &user_cs,
-                          chemical::effectors  &user_eff,
+        explicit ChemDiff(chemical::collection  &lib,
+                          chemical::equilibria  &user_cs,
+                          chemical::effectors   &user_eff,
                           chemical::initializer &ini
                           ) : ODE_Solver(1e-5),
         cs(user_cs),
