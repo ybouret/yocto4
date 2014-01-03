@@ -10,14 +10,42 @@ namespace yocto
         namespace ode
         {
             template <typename T>
-			class rk45 : public lw_arrays<T,ode::memory_type>
+			class RK45 : public lw_arrays<T,ode::memory_type>
             {
             public:
-                explicit rk45();
-                virtual ~rk45() throw();
+                typedef typename field<T>::explicit_type equation;
+                typedef typename field<T>::callback_type callback;
+                
+                explicit RK45();
+                virtual ~RK45() throw();
+                
+                //! try to forward
+                /**
+                 \param forward an explicit step (RKCK,RKDP)
+                 \param y       input/output values
+                 \param drvs    the differential equation
+                 \param x       input/output coordinate
+                 \param h_try   trial step
+                 \param h_did   final step
+                 \param h_next  predicted net step
+                 \param yscal   scaling values
+                 \param eps     fractional tolerance for h
+                 */
+                void operator()(explicit_step<T> &forward,
+                                array<T>         &y,
+                                const array<T>   &dydx,
+                                equation         &drvs,
+                                T                &x,
+                                const T           h_try,
+                                T                &h_did,
+                                T                &h_next,
+                                const array<T>   &yscal,
+                                const T           eps,
+                                callback         *cb);
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(rk45);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(RK45);
+                lw_array<T> &yerr,&ytmp;
             };
             
             
