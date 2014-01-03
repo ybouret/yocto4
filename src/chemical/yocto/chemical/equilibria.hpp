@@ -66,6 +66,12 @@ namespace yocto
             //! Newton algorithm to find equilibria
             void normalize_C( double t );
             
+            //! Copy first C.size() variables from y, y.size() >= C.size()
+            void load_C( const array<double> &y ) throw();
+            
+            //! Copy first C.size() variables into y, y.size() >= C.size()
+            void save_C( array<double> &y ) const throw();
+            
             //! Reduce dC to a legal step
             /**
              The corresponding concentrations MUST be in C before this call !
