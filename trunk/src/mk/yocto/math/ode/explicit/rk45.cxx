@@ -13,7 +13,7 @@ namespace yocto
             template <> RK45<real_t>:: ~RK45() throw() {}
             
             template <> RK45<real_t>:: RK45() :
-            lw_arrays<real_t,ode::memory_type>(2),
+            explicit_controler<real_t>(2),
             yerr( next_array() ),
             ytmp( next_array() )
             {

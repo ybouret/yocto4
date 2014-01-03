@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_ODE_EXPLICIT_RK45_INCLUDED
 #define YOCTO_MATH_ODE_EXPLICIT_RK45_INCLUDED 1
 
-#include "yocto/math/ode/explicit/step.hpp"
+#include "yocto/math/ode/explicit/controler.hpp"
 
 namespace yocto
 {
@@ -10,7 +10,7 @@ namespace yocto
         namespace ode
         {
             template <typename T>
-			class RK45 : public lw_arrays<T,ode::memory_type>
+			class RK45 : public explicit_controler<T>
             {
             public:
                 typedef typename field<T>::explicit_type equation;
