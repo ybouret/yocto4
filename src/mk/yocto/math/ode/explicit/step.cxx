@@ -10,24 +10,20 @@ namespace yocto
         namespace ode
         {
             
-            namespace Explicit
+            
+            template <> explicit_step<real_t>:: ~explicit_step() throw() {}
+            
+            template <>
+            explicit_step<real_t> :: explicit_step( size_t num_arrays ) :
+            lw_arrays<real_t,ode::memory_type>(num_arrays)
             {
-                
-                template <> step<real_t>:: ~step() throw() {}
-
-                template <>
-                step<real_t> :: step( size_t num_arrays ) :
-                lw_arrays<real_t,ode::memory_type>(num_arrays)
-                {
-                }
-                
-                
-                
             }
-
+            
+            
+            
         }
-
+        
     }
-
+    
 }
 
