@@ -15,6 +15,8 @@ namespace
 {
     typedef ode::driverCK<double>::type  ODE_Solver;
     typedef ode::Field<double>::Equation ODE;
+    typedef ode::Field<double>::Callback ODE_CB;
+
     typedef algebra<double> mkl;
     
     class ChemDiff : public ODE_Solver
@@ -27,19 +29,23 @@ namespace
         const size_t          nv;
         vector<double>        yy;
         ODE                   eq;
+        ODE_CB                cb;
+        size_t                calls;
         
         explicit ChemDiff(chemical::collection  &lib,
                           chemical::equilibria  &user_cs,
                           chemical::effectors   &user_eff,
                           chemical::initializer &ini
-                          ) : ODE_Solver(1e-5),
+                          ) : ODE_Solver(1e-7),
         cs(user_cs),
         eff(user_eff),
         S(lib),
         dSdt(lib),
         nv(lib.size()),
         yy(nv,0),
-        eq( this, &ChemDiff::Compute )
+        eq( this, &ChemDiff::Compute ),
+        cb( this, &ChemDiff::Normalize ),
+        calls(0)
         {
             if(nv<=0) throw exception("No Species");
             ini(cs,lib,0.0);
@@ -55,11 +61,21 @@ namespace
         {
             S.load(y);
             eff.collect(dSdt, t, 0.0, S);
-            for(size_t i=nv;i>0;--i) cs.C[i] = y[i];
+            cs.load_C(y);
             dSdt.save(cs.dC);
             cs.legalize_dC(t);
+            
             for(size_t i=nv;i>0;--i)
                 dydt[i] = cs.dC[i];
+            
+            ++calls;
+        }
+        
+        void Normalize( array<double> &y, double t )
+        {
+            cs.load_C(y);
+            cs.normalize_C(t);
+            cs.save_C(y);
         }
         
         // start from S => compute new S
@@ -68,9 +84,19 @@ namespace
             ODE_Solver &odeint = *this;
             S.save(yy);
             odeint(eq,yy,t,t1,dt1,NULL);
-            S.load(yy);
+            cs.load_C(y);
+            cs.normalize_C(t1);
+            S.load(cs.C);
         }
         
+        void update_cb( double t, double t1, double &dt1 )
+        {
+            ODE_Solver &odeint = *this;
+            S.save(yy);
+            odeint(eq,yy,t,t1,dt1,&cb);
+            S.load(yy);
+        }
+
         
         
         
@@ -123,26 +149,32 @@ YOCTO_UNIT_TEST_IMPL(diff)
     
     std::cerr << "-- Initializing ChemDiff" << std::endl;
     
-    ChemDiff chemdiff(lib,cs,eff,ini);
-    ODE      Eq( &chemdiff, &ChemDiff::Compute);
-    
+    ChemDiff cd1(lib,cs,eff,ini);
+    ChemDiff cd2(lib,cs,eff,ini);
+
     
     
     const double dt   = 0.01;
     double       dt1  = dt/10;
+    double       dt2  = dt1;
     double       t    = 0;
     
     ios::ocstream fp("diff.dat",false);
-    fp("%g %g\n", t, chemdiff.S.pH());
+    fp("%g %g\n", t, cd1.S.pH());
     for(size_t i=0;;++i)
     {
         const double t1 = t + dt;
-        chemdiff.update(t,t1,dt1);
+        cd1.update(t,t1,dt1);
+        cd2.update_cb(t,t1,dt2);
         t = t1;
-        std::cerr << "pH=" << chemdiff.S.pH() << std::endl;
-        fp("%g %g\n", t, chemdiff.S.pH());
-        if( t > 5 ) break;
+        std::cerr << "pH=" << cd1.S.pH() << std::endl;
+        fp("%g %g %g\n", t, cd1.S.pH(), cd2.S.pH() );
+        if( t > 2 ) break;
     }
+    
+    std::cerr << "cd1 #calls=" << cd1.calls << std::endl;
+    std::cerr << "cd2 #calls=" << cd2.calls << std::endl;
+
     
     
     

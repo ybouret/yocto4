@@ -296,6 +296,19 @@ namespace yocto
             }
         }
         
+        void equilibria:: load_C( const array<double> &y ) throw()
+        {
+            assert(C.size()<=y.size());
+            for(size_t i=C.size();i>0;--i) C[i] = y[i];
+        }
+
+        void equilibria:: save_C( array<double> &y ) const throw()
+        {
+            assert(C.size()<=y.size());
+            for(size_t i=C.size();i>0;--i) y[i] = C[i];
+        }
+
+        
         
     }
     
