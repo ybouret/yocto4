@@ -53,8 +53,8 @@ YOCTO_UNIT_TEST_IMPL(stiff)
 {
     problem eq;
        
-    ode::field<Real>::type derivs( &eq, & problem::derivs );
-    ode::field<Real>::diff jacobn( &eq, & problem::jacobn );
+    ode::Field<Real>::Equation derivs( &eq, & problem::derivs );
+    ode::Field<Real>::Jacobian jacobn( &eq, & problem::jacobn );
     
    
     vector<Real> y(3,0.0);

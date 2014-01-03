@@ -74,8 +74,8 @@ namespace
         SOLVER  odeint(eps);
         
         problem<T>                      pb;
-        typedef typename ode::field<T>::explicit_type equation;
-        typedef typename ode::field<T>::callback_type callback;
+        typedef typename ode::Field<T>::Equation equation;
+        typedef typename ode::Field<T>::Callback callback;
         const char *id = typeid(T).name();
         
         std::cerr << "--------------------" << std::endl;

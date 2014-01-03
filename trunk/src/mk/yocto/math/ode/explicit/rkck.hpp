@@ -18,8 +18,8 @@ namespace yocto
             class RKCK : public explicit_step<T>
             {
             public:
-                typedef typename field<T>::explicit_type equation;
-                typedef typename field<T>::callback_type callback;
+                typedef typename Field<T>::Equation equation;
+                typedef typename Field<T>::Callback callback;
                 
                 explicit RKCK();
                 virtual ~RKCK() throw();

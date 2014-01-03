@@ -12,14 +12,14 @@ namespace yocto
         {
             //! explicit solver
             /**
-             needs to bee prepared before integration.
+             needs to be prepared before integration.
              */
             template <typename T>
 			class explicit_solver : public solver_data<T>
 			{
 			public:
-				typedef typename field<T>::explicit_type equation;
-                typedef typename field<T>::callback_type callback;
+				typedef typename Field<T>::Equation equation;
+                typedef typename Field<T>::Callback callback;
                 
 				explicit explicit_solver( T user_eps );
 				virtual ~explicit_solver() throw();
@@ -60,8 +60,8 @@ namespace yocto
 			> class explicit_driver : public explicit_solver<T>
 			{
 			public:
-				typedef typename field<T>::explicit_type equation;
-                typedef typename field<T>::callback_type callback;
+				typedef typename Field<T>::Equation equation;
+                typedef typename Field<T>::Callback callback;
 
 				explicit explicit_driver( T user_eps ) : explicit_solver<T>( user_eps ), ctrl_(), step_() {}
 				virtual ~explicit_driver() throw() {}

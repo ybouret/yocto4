@@ -13,7 +13,7 @@ namespace yocto
             
             template <>
             explicit_controler<real_t>:: explicit_controler( size_t num_arrays ) :
-            lw_arrays<real_t,ode::memory_type>(num_arrays)
+            Field<real_t>::LW_Arrays(num_arrays)
             {
             }
             

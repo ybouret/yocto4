@@ -113,7 +113,7 @@ YOCTO_UNIT_TEST_IMPL(michaelis)
    
     ode::driverCK<double>::type       odeint(1e-4);
     Michaelis                         enzyme;
-    ode::field<double>::explicit_type diffeq( &enzyme, & Michaelis::rate );
+    ode::Field<double>::Equation      diffeq( &enzyme, & Michaelis::rate );
 
     const size_t   nvar = 4;
     vector<double> y(nvar,0);
