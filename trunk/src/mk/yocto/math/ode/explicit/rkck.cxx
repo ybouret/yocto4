@@ -1,7 +1,5 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/ode/explicit/rkck.hpp"
-
-#include "yocto/math/ode/rkck.hpp"
 #include "yocto/math/ztype.hpp"
 
 namespace yocto
