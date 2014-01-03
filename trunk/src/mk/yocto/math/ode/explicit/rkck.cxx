@@ -59,7 +59,7 @@ namespace yocto
 				for (size_t i=n;i>0;--i)
 					ytmp[i]=y[i]+b21*h*dydx[i];
 				
-                double xx = RKCK_CHK(a2);
+                double RKCK_CHK(a2);
                 drvs(ak2,xx,ytmp);
                 
 				for (size_t i=n;i>0;--i)

@@ -3,6 +3,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exceptions.hpp"
+#include <cerrno>
 
 namespace yocto
 {

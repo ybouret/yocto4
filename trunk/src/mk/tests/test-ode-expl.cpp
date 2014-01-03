@@ -3,6 +3,7 @@
 #include "yocto/math/ode/explicit/driver-dp.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include <typeinfo>
 
 using namespace yocto;
 using namespace math;
