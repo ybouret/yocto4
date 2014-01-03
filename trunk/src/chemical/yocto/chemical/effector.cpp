@@ -47,6 +47,19 @@ namespace yocto
                 }
             }
         }
+        
+        std::ostream & operator<<( std::ostream &os, const effectors &db)
+        {
+            os << "________________" << std::endl;
+            os << std::endl;
+            for( effectors::const_iterator i=db.begin(); i != db.end(); ++i )
+            {
+                const effector &eff = **i;
+                os << "effector '" << eff.name << "'" << std::endl;
+            }
+            os << "________________";
+            return os;
+        }
 
     }
 
