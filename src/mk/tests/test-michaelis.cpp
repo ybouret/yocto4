@@ -1,6 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/ode/drvck.hpp"
-#include "yocto/math/ode/drvdp.hpp"
+#include "yocto/math/ode/explicit/driver-ck.hpp"
 
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -112,9 +111,9 @@ static inline void  Output( double t, const array<double> &C)
 YOCTO_UNIT_TEST_IMPL(michaelis)
 {
    
-    ode::drvck<double>::type odeint(1e-4);
-    Michaelis                enzyme;
-    ode::field<double>::type diffeq( &enzyme, & Michaelis::rate );
+    ode::driverCK<double>::type       odeint(1e-4);
+    Michaelis                         enzyme;
+    ode::field<double>::explicit_type diffeq( &enzyme, & Michaelis::rate );
 
     const size_t   nvar = 4;
     vector<double> y(nvar,0);
@@ -133,14 +132,14 @@ YOCTO_UNIT_TEST_IMPL(michaelis)
     std::cerr << "Steady State:" << std::endl;
     enzyme.show_steady(y);
     
-    double       t = 0;
+    double       t  = 0;
     const double dt = 1e-2;
     double       h  = t/10;
     ios::ocstream::overwrite(FileName);
     Output(t, y);
     for(size_t i=1;;++i)
     {
-        odeint( diffeq, y, t, t+dt, h );
+        odeint( diffeq, y, t, t+dt, h, NULL);
         t=i*dt;
         Output(t, y);
         if(t>30) break;
