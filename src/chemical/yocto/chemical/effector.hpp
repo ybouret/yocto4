@@ -45,6 +45,8 @@ namespace yocto
             //! sum of all the rates times the effector's factor
             void collect(solution &dSdt, double t, double zeta, const solution &S ) const;
             
+            friend std::ostream & operator<<( std::ostream &, const effectors &);
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
         };

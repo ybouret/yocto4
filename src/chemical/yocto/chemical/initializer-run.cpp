@@ -117,6 +117,8 @@ namespace yocto
                         Lam[i] = Q.value;
                         for( constraint_weights::const_iterator weight=Q.begin(); weight != Q.end(); ++weight )
                         {
+                            if( !lib.has(weight->key) )
+                                throw exception("constraint: unregistered species '%s'", weight->key.c_str());
                             const species::ptr &sp = lib[weight->key];
                             P[i][sp->indx]         = *weight;
                         }
