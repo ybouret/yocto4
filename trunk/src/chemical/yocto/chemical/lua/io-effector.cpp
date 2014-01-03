@@ -65,7 +65,7 @@ namespace yocto
                 {
                     if( !lua_isnumber(L, -1) )
                         throw exception("%s: invalid result #%u", fn, unsigned(i));
-                    dSdt[ output[i] ] += factor * lua_tonumber(L, -1);
+                    dSdt[ output[i] ] +=  lua_tonumber(L, -1);
                     lua_pop(L,1);
                 }
 

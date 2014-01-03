@@ -35,7 +35,7 @@ effectors =
 -- one function for effector
 function NaOH(t,zeta)
 
-print( "NaOH@t=" .. t .. ", zeta=" .. zeta );
-return 1,2;
+-- print( "NaOH@t=" .. t .. ", zeta=" .. zeta );
+return 1,1;
 
 end
