@@ -1,0 +1,45 @@
+#ifndef YOCTO_MATH_ODE_EXPLICIT_RKDP_INCLUDED
+#define YOCTO_MATH_ODE_EXPLICIT_RKDP_INCLUDED 1
+
+
+#include "yocto/math/ode/explicit/step.hpp"
+
+namespace yocto
+{
+	namespace math
+	{
+		
+		namespace ode
+		{
+			
+			//! Runge-Kutta Dormand-Price 4/5 step
+			template <typename T>
+			class RKDP : public explicit_step<T>
+			{
+			public:
+				typedef typename field<T>::explicit_type equation;
+                typedef typename field<T>::callback_type callback;
+
+				explicit RKDP();
+				virtual ~RKDP() throw();
+				
+                virtual void operator()(array<T>        &yout,
+                                        array<T>        &yerr,
+                                        equation        &drvs,
+                                        const T          x,
+                                        const T          h,
+                                        const array<T>  &y,
+                                        const array<T>  &dydx,
+                                        callback        *cb
+                                        );
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(RKDP);
+				lw_array<T> &ytmp, &ak2, &ak3, &ak4, &ak5, &ak6, &ak7;
+			};
+		}
+		
+	}
+	
+}
+
+#endif
