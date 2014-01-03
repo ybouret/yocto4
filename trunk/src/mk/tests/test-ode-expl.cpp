@@ -48,6 +48,17 @@ namespace
             ++count;
         }
         
+        void dLV( array<T> &dydx, T , const array<T> &y )
+		{
+			const T a = 3, b = 2, c = 3, d = 2;
+			const T X = y[1];
+			const T Y = y[2];
+			dydx[1] =  a*X - b * X * Y;
+			dydx[2] = -c*Y + d * X * Y;
+			++count;
+		}
+
+        
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(problem);
@@ -135,6 +146,36 @@ namespace
             
             
         }
+        
+        std::cerr << "LV" << std::endl;
+        {
+            equation EqLV( &pb, & problem<T>::dLV );
+            y.make(2,0);
+            pb.count = 0;
+            h1 = L/n;
+          
+            y[1] = 1;
+            y[2] = 2;
+            
+            odeint.start(2);
+            {
+                const string  fn =  vformat("%s-lv-%s.dat", rk, id );
+                ios::ocstream fp(fn,false);
+                fp("%g %g %g\n", double(0), double(y[1]), double(y[2]));
+                
+                for(size_t i=0;i<n;++i)
+                {
+                    const T x0 = (i*L)/n;
+                    const T x1 = ((i+1)*L)/n;
+                    odeint(EqLV,y,x0,x1,h1,NULL);
+                    fp("%g %g %g\n", double(x1), double(y[1]), double(y[2]));
+                }
+                std::cerr << "count=" << pb.count << std::endl;
+            }
+            
+            
+        }
+
         
     }
 }

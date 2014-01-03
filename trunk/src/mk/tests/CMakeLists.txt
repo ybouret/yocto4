@@ -13,7 +13,6 @@ ADD_TEST(Intg     test-mk intg)
 ADD_TEST(Drvs     test-mk drvs)
 ADD_TEST(Zero     test-mk zero)
 ADD_TEST(Optim    test-mk opt)
-ADD_TEST(ODE      test-mk ode)
 ADD_TEST(LSF      test-mk lsf)
 ADD_TEST(LSF2     test-mk lsf2)
 ADD_TEST(Cholesky test-mk cholesky)
@@ -41,7 +40,7 @@ ADD_TEST(FitCirc  test-mk fit_circle 10)
 ADD_TEST(FitEll   test-mk fit_ellipse 10)
 ADD_TEST(Michaelis test-mk michaelis)
 ADD_TEST(Extend    test-mk extend)
-
+ADD_TEST(ode_expl  test-mk ode_expl)
 
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
