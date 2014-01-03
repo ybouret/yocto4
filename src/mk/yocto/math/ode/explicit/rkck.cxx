@@ -52,8 +52,10 @@ namespace yocto
                 
 				const size_t n = y.size();
 				
+                //______________________________________________________________
+                //
                 //assuming y is valid w.r.t the callback
-                
+                //______________________________________________________________
 #define RKCK_CHK(A) xx=x+A*h; if (cb) (*cb)(ytmp,xx)
                 
 				for (size_t i=n;i>0;--i)
