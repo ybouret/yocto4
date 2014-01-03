@@ -1,35 +1,35 @@
-#include "yocto/math/ode/stiff-solver.hpp"
+#include "yocto/math/ode/implicit/solver.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/exceptions.hpp"
 
 namespace yocto
 {
-    namespace math 
+    namespace math
     {
         namespace ode
         {
             
             template <>
-            stiff_solver<real_t>:: ~stiff_solver() throw()
+            implicit_solver<real_t>:: ~implicit_solver() throw()
             {
             }
             
             template <>
-            stiff_solver<real_t>:: stiff_solver( real_t user_eps ) : 
+            implicit_solver<real_t>:: implicit_solver( real_t user_eps ) :
             solver_data<real_t>( user_eps )
             {
             }
             
-            template <>   
-			void stiff_solver<real_t>:: operator()(equation            &derivs,
-                                                   jacobian            &jacobn,
-                                                   stiff_step<real_t>  &forward,
-                                                   array<real_t>       &ystart,
-                                                   const real_t         x1,
-                                                   const real_t         x2,
-                                                   real_t              &h1
-                                                   )
+            template <>
+			void implicit_solver<real_t>:: operator()(equation               &derivs,
+                                                      jacobian               &jacobn,
+                                                      implicit_step<real_t>  &forward,
+                                                      array<real_t>          &ystart,
+                                                      const real_t            x1,
+                                                      const real_t            x2,
+                                                      real_t                 &h1
+                                                      )
 			{
 				const size_t   n    = ystart.size();
 				const real_t  _TINY = Fabs( TINY );
@@ -49,7 +49,7 @@ namespace yocto
 				for( size_t i=n;i>0;--i) y[i] = ystart[i];
 				
 				//--------------------------------------------------------------
-				// Main Loop 
+				// Main Loop
 				//--------------------------------------------------------------
 				for(;;)
 				{
@@ -76,7 +76,7 @@ namespace yocto
 					{
 						// had to reduce
 					}
-#endif              
+#endif
 					
 					//----------------------------------------------------------
 					// check if done
@@ -98,7 +98,7 @@ namespace yocto
 				//--------------------------------------------------------------
 				// success
 				//--------------------------------------------------------------
-				for( size_t i=n; i >0; --i ) 
+				for( size_t i=n; i >0; --i )
 					ystart[i] = y[i];
 				h1 = h;
 			}

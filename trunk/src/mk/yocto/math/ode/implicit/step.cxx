@@ -1,5 +1,5 @@
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/ode/stiff-step.hpp"
+#include "yocto/math/ode/implicit/step.hpp"
 
 
 namespace yocto
@@ -9,9 +9,10 @@ namespace yocto
         
         namespace ode
         {
-            template <> stiff_step<real_t>:: ~stiff_step() throw() {}
-            template <> stiff_step<real_t>:: stiff_step(const size_t num) :
-            lw_arrays<real_t, memory_type>(num)
+            template <> implicit_step<real_t>:: ~implicit_step() throw() {}
+            
+            template <> implicit_step<real_t>:: implicit_step(const size_t num) :
+            Field<real_t>::LW_Arrays(num)
             {}
         }
         

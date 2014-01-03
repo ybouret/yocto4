@@ -1,4 +1,4 @@
 #define YOCTO_ZTYPE 'd'
-#include "yocto/math/ode/shampine.hpp"
-#include "ode-shampine.hxx"
-#include "ode-rosenbrock-impl.cxx"
+#include "yocto/math/ode/implicit/shampine.hpp"
+#include "shampine.hxx"
+#include "rosenbrock-impl.cxx"

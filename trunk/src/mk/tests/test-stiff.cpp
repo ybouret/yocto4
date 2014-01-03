@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/ode/stiff-drvrs.hpp"
-#include "yocto/math/ode/stiff-drvkr.hpp"
+#include "yocto/math/ode/implicit/driver-rs.hpp"
+#include "yocto/math/ode/implicit/driver-kr.hpp"
 #include "yocto/sequence/vector.hpp"
 
 #include "yocto/ios/ocstream.hpp"
@@ -63,7 +63,7 @@ YOCTO_UNIT_TEST_IMPL(stiff)
     Real dx = 0.01;
     
     {
-        ode::stiff_drvrs<Real>::type drv(1e-4);
+        ode::driverRS<Real>::type drv(1e-4);
         drv.start(3);
         Real h  = 2.9e-4;
         y[1] = 1;
@@ -72,7 +72,7 @@ YOCTO_UNIT_TEST_IMPL(stiff)
         
         ios::ocstream fp("stiff-rs.dat",false);
         fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
-        for( size_t i=0; i < 500; ++i )
+        for( size_t i=0; i < 1000; ++i )
         {
             Real x1 = i     * dx;
             Real x2 = (i+1) * dx;
@@ -83,7 +83,7 @@ YOCTO_UNIT_TEST_IMPL(stiff)
     
     
     {
-        ode::stiff_drvkr<Real>::type drv(1e-4);
+        ode::driverKR<Real>::type drv(1e-4);
         drv.start(3);
         Real h  = 2.9e-4;
         y[1] = 1;
@@ -92,7 +92,7 @@ YOCTO_UNIT_TEST_IMPL(stiff)
         
         ios::ocstream fp("stiff-kr.dat",false);
         fp("%g %g %g %g\n", 0.0, y[1], y[2], y[3] );
-        for( size_t i=0; i < 500; ++i )
+        for( size_t i=0; i < 1000; ++i )
         {
             Real x1 = i     * dx;
             Real x2 = (i+1) * dx;

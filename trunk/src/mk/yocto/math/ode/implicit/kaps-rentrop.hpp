@@ -1,7 +1,7 @@
 #ifndef YOCTO_ODE_KAPS_RENTROP_INCLUDED
 #define YOCTO_ODE_KAPS_RENTROP_INCLUDED 1
 
-#include "yocto/math/ode/rosenbrock.hpp"
+#include "yocto/math/ode/implicit/rosenbrock.hpp"
 
 namespace yocto
 {
@@ -18,8 +18,8 @@ namespace yocto
                 virtual ~kaps_rentrop() throw();
                 explicit kaps_rentrop();
                 
-                typedef typename stiff_step<T>::equation equation;
-                typedef typename stiff_step<T>::jacobian jacobian;
+                typedef typename implicit_step<T>::equation equation;
+                typedef typename implicit_step<T>::jacobian jacobian;
                 
                 virtual void operator()(array<T>       &y,
                                         array<T>       &dydx,

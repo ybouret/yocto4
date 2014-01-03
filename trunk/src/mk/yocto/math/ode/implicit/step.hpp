@@ -1,9 +1,7 @@
-#ifndef YOCTO_ODE_STIFF_STEP_INCLUDED
-#define YOCTO_ODE_STIFF_STEP_INCLUDED 1
+#ifndef YOCTO_ODE_IMPLICIT_STEP_INCLUDED
+#define YOCTO_ODE_IMPLICIT_STEP_INCLUDED 1
 
 #include "yocto/math/ode/types.hpp"
-#include "yocto/sequence/lw-arrays.hpp"
-#include "yocto/math/kernel/matrix.hpp"
 
 namespace yocto
 {
@@ -14,13 +12,13 @@ namespace yocto
         {
             
             template <typename T>
-            class stiff_step : public lw_arrays<T,memory_type>
+            class implicit_step : public Field<T>::LW_Arrays
             {
             public:
                 typedef typename Field<T>::Equation  equation;
                 typedef typename Field<T>::Jacobian  jacobian;
                 
-                virtual ~stiff_step() throw();
+                virtual ~implicit_step() throw();
                 
                 virtual void operator()(array<T>       &y,
                                         array<T>       &dydx,
@@ -34,10 +32,10 @@ namespace yocto
                                         jacobian       &jacobn
                                         ) = 0;
             protected:
-                explicit stiff_step( const size_t num );
+                explicit implicit_step( const size_t num );
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(stiff_step);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(implicit_step);
             };
             
         }
