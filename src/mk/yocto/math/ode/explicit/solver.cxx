@@ -9,6 +9,17 @@ namespace yocto
     {
         namespace ode
         {
+            
+            template <>
+            explicit_solver<real_t>:: ~explicit_solver() throw() {}
+            
+            template <>
+            explicit_solver<real_t>:: explicit_solver( real_t user_eps ) :
+            solver_data<real_t>(user_eps)
+            {
+                
+            }
+            
             template <>
 			void explicit_solver<real_t>::
             operator()(equation                   &drvs,

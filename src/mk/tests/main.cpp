@@ -60,6 +60,9 @@ YOCTO_UNIT_TEST_INIT(64)
     
     YOCTO_UNIT_TEST_DECL(michaelis);
     
+    YOCTO_UNIT_TEST_DECL(ode_expl);
+
+    
 }
 YOCTO_UNIT_TEST_EXEC()
 
