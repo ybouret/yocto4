@@ -44,7 +44,7 @@ namespace yocto
                                         T                &h_next,
                                         const array<T>   &yscal,
                                         const T           eps,
-                                        callback         *cb);
+                                        callback         *cb) = 0;
             protected:
                 explicit explicit_controler(size_t num_arrays);
                 
