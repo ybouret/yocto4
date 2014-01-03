@@ -48,6 +48,12 @@ SET( ode_explicit_srcs ${ode_explicit_decl} ${ode_explicit_impl} )
 INSTALL( FILES ${ode_explicit_decl} DESTINATION include/yocto/math/ode/explicit )
 SOURCE_GROUP( math/ode/explicit FILES ${ode_explicit_srcs} )
 
+FILE( GLOB ode_implicit_decl yocto/math/ode/implicit/*.hpp)
+FILE( GLOB ode_implicit_impl yocto/math/ode/implicit/*.cpp)
+SET( ode_implicit_srcs ${ode_implicit_decl} ${ode_implicit_impl} )
+INSTALL( FILES ${ode_implicit_decl} DESTINATION include/yocto/math/ode/implicit )
+SOURCE_GROUP( math/ode/implicit FILES ${ode_implicit_srcs} )
+
 FILE( GLOB fit_decl yocto/math/fit/*.hpp)
 FILE( GLOB fit_impl yocto/math/fit/*.cpp)
 SET( fit_srcs ${fit_decl} ${fit_impl} )
@@ -72,7 +78,7 @@ SET( fft_srcs ${fft_decl} ${fft_impl} )
 INSTALL( FILES ${fft_decl} DESTINATION include/yocto/math/fft )
 SOURCE_GROUP( math/fft FILES ${fft_srcs} )
 
-SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${ode_explicit_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} ${fft_srcs})
+SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${ode_explicit_srcs} ${ode_implicit_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} ${fft_srcs})
 
 INCLUDE_DIRECTORIES( . ../main )
 
