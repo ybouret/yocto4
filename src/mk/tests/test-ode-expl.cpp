@@ -54,12 +54,13 @@ namespace
     };
     
     
-    template <typename T>
-    static inline void solve()
+    template <typename T,
+    typename SOLVER
+    >
+    static inline void solve( const char *rk )
     {
         const T eps = 1e-7;
-        typename ode::driverCK<T>::type odeCK(eps);
-        typename ode::driverDP<T>::type odeDP(eps);
+        SOLVER  odeint(eps);
         
         problem<T>                      pb;
         typedef typename ode::field<T>::explicit_type equation;
@@ -67,7 +68,7 @@ namespace
         const char *id = typeid(T).name();
         
         std::cerr << "--------------------" << std::endl;
-        std::cerr << "solving <" << id << ">" << std::endl;
+        std::cerr << "solving <" << id << ">/" << rk << std::endl;
         std::cerr << "--------------------" << std::endl;
         
         vector<T> y;
@@ -85,11 +86,9 @@ namespace
             y.make(1,0);
             y[1]     = 1;
             pb.count = 0;
-            odeCK.start(1);
-            odeDP.start(1);
-            std::cerr << "\tCK" << std::endl;
+            odeint.start(1);
             {
-                const string  fn =  vformat("ck-exp-%s.dat",  id );
+                const string  fn =  vformat("%s-exp-%s.dat",  rk, id );
                 ios::ocstream fp(fn,false);
                 fp("%g %g\n", double(0), double(y[1]));
                 
@@ -97,32 +96,13 @@ namespace
                 {
                     const T x0 = (i*L)/n;
                     const T x1 = ((i+1)*L)/n;
-                    odeCK(EqExp,y,x0,x1,h1,&OnExp);
+                    odeint(EqExp,y,x0,x1,h1,&OnExp);
                     fp("%g %g\n", double(x1), double(y[1]));
                 }
                 
                 std::cerr << "count=" << pb.count << std::endl;
             }
             
-            y[1]     = 1;
-            pb.count = 0;
-            h1 = L/n;
-            std::cerr << "\tDP" << std::endl;
-            {
-                const string  fn =  vformat("dp-exp-%s.dat",  id );
-                ios::ocstream fp(fn,false);
-                fp("%g %g\n", double(0), double(y[1]));
-                
-                for(size_t i=0;i<n;++i)
-                {
-                    const T x0 = (i*L)/n;
-                    const T x1 = ((i+1)*L)/n;
-                    odeDP(EqExp,y,x0,x1,h1,&OnExp);
-                    fp("%g %g\n", double(x1), double(y[1]));
-                }
-                
-                std::cerr << "count=" << pb.count << std::endl;
-            }
             
             
         }
@@ -137,11 +117,9 @@ namespace
             pb.count = 0;
             h1 = L/n;
             
-            odeCK.start(2);
-            odeDP.start(2);
-            std::cerr << "\tCK" << std::endl;
+            odeint.start(2);
             {
-                const string  fn =  vformat("ck-cos-%s.dat", id );
+                const string  fn =  vformat("%s-cos-%s.dat", rk, id );
                 ios::ocstream fp(fn,false);
                 fp("%g %g %g\n", double(0), double(y[1]), double(y[2]));
                 
@@ -149,32 +127,12 @@ namespace
                 {
                     const T x0 = (i*L)/n;
                     const T x1 = ((i+1)*L)/n;
-                    odeCK(EqCos,y,x0,x1,h1,NULL);
+                    odeint(EqCos,y,x0,x1,h1,NULL);
                     fp("%g %g %g\n", double(x1), double(y[1]), double(y[2]));
                 }
                 std::cerr << "count=" << pb.count << std::endl;
             }
             
-            y[1] = 1;
-            y[2] = 0;
-            pb.count = 0;
-            h1 = L/n;
-            
-            std::cerr << "\tDP" << std::endl;
-            {
-                const string  fn =  vformat("dp-cos-%s.dat", id );
-                ios::ocstream fp(fn,false);
-                fp("%g %g %g\n", double(0), double(y[1]), double(y[2]));
-                
-                for(size_t i=0;i<n;++i)
-                {
-                    const T x0 = (i*L)/n;
-                    const T x1 = ((i+1)*L)/n;
-                    odeDP(EqCos,y,x0,x1,h1,NULL);
-                    fp("%g %g %g\n", double(x1), double(y[1]), double(y[2]));
-                }
-                std::cerr << "count=" << pb.count << std::endl;
-            }
             
         }
         
@@ -186,9 +144,10 @@ namespace
 YOCTO_UNIT_TEST_IMPL(ode_expl)
 {
     
-    solve<double>();
-    solve<float>();
-    
+    solve<double,ode::driverCK<double>::type>( "ck" );
+    solve<double,ode::driverDP<double>::type>( "dp" );
+    solve<float,ode::driverCK<float>::type>( "ck" );
+    solve<float,ode::driverDP<float>::type>( "dp" );
     
 }
 YOCTO_UNIT_TEST_DONE()
