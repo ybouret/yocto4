@@ -7,6 +7,9 @@ using namespace yocto;
 #define __SHOW() std::cerr << "name= <" << v1.name() << ">" << std::endl
 #define __COPY() do { const vslot v2(v1); std::cerr << "copy= <" << v2.name() << ">" << std::endl; } while(false)
 
+#undef __COPY
+#define __COPY() do {} while(false)
+
 YOCTO_UNIT_TEST_IMPL(vslot)
 {
     std::cerr << "sizeof(vslot)=" << sizeof(vslot) << std::endl;

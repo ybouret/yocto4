@@ -26,13 +26,13 @@ namespace yocto
         {
             assert(is_allocated());
             assert(kill_!=0);
-            assert(copy_!=0);
+            //assert(copy_!=0);
             return true;
         }
         else
         {
             assert(0==kill_);
-            assert(0==copy_);
+            //assert(0==copy_);
             return false;
         }
     }
@@ -42,7 +42,7 @@ namespace yocto
         assert(0==size_);
         assert(0==data_);
         assert(0==kill_);
-        assert(0==copy_);
+        //assert(0==copy_);
         assert(0==type_);
         if(n>0)
         {
@@ -57,7 +57,7 @@ namespace yocto
     {
         assert(0==type_);
         assert(0==kill_);
-        assert(0==copy_);
+        //assert(0==copy_);
         if(is_allocated())
         {
             object:: operator delete(data_,size_);
@@ -72,12 +72,12 @@ namespace yocto
         {
             kill_(data_);
             kill_ = 0;
-            copy_ = 0;
+            //copy_ = 0;
             type_ = 0;
         }
         assert(0==kill_);
         assert(0==type_);
-        assert(0==copy_);
+        //assert(0==copy_);
     }
     
     void vslot:: release() throw()
@@ -106,8 +106,7 @@ namespace yocto
 size_(0), \
 data_(0), \
 type_(0), \
-kill_(0), \
-copy_(0)
+kill_(0)
     
     vslot:: vslot() throw() :
     VSLOT_CTOR()
@@ -132,6 +131,7 @@ copy_(0)
         return type_ ?  type_->name() : "";
     }
     
+#if 0
     vslot:: vslot( const vslot &other) :
     VSLOT_CTOR()
     {
@@ -157,5 +157,6 @@ copy_(0)
             copy_ = other.copy_;
         }
     }
+#endif
     
 }
