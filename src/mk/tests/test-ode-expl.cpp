@@ -71,7 +71,7 @@ namespace
     >
     static inline void solve( const char *rk )
     {
-        const T eps = 1e-7;
+        const T eps = T(1e-7);
         SOLVER  odeint(eps);
         
         problem<T>                      pb;
