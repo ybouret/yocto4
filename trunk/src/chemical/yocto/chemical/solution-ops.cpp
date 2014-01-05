@@ -24,7 +24,7 @@ namespace yocto
             vector<const_iterator> it(ns,as_capacity);
             
             //-- initialize and check weights
-            for(size_t i=ns;i>0;--i)
+            for(size_t i=1;i<=ns;++i)
             {
                 assert(has_same_components_than(solutions[i]));
                 it.push_back( solutions[i].begin() );
@@ -37,14 +37,14 @@ namespace yocto
                 throw exception("solution::mix(invalid sum of weights)");
 
             //-- fill  cs.C
-            for(size_t j = components;j>0;--j)
+            for(size_t j=1;j<=components;++j)
             {
                 
-                for(size_t i=ns;i>0;--i)
+                for(size_t i=1;i<=ns;++i)
                 {
                     const_iterator  &iter = it[i];
                     const component &comp = *iter;
-                    wC[i] += weights[i] * comp.concentration;
+                    wC[i] = weights[i] * comp.concentration;
                     ++iter;
                 }
                 quicksort(wC);

@@ -2,6 +2,7 @@
 #include "yocto/chemical/initializer.hpp"
 #include "yocto/chemical/solution.hpp"
 #include "yocto/string/conv.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 
@@ -57,7 +58,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
             all_acid["Ac-"] = 1;
         }
         ini_base.define("Cl-", 0.0);
-        ini_base.define("H+", pow(10,-8));
+        ini_base.define("H+", pow(10,-9));
         ini_base(cs,lib,0);
         Sb.load(cs.C);
         std::cerr << "Sb="    << Sb << std::endl;
@@ -71,8 +72,20 @@ YOCTO_UNIT_TEST_IMPL(mix)
     chemical::solution S(lib);
     
     vector<double> W(2,0.5);
-    S.mix(cs,solutions,W,0.0);
-    std::cerr << "S=" << S << std::endl;
-    std::cerr << "S.pH=" << S.pH() << std::endl;
+   
+    ios::ocstream fp("mix.dat",false);
+    const size_t N=100;
+    for(size_t i=0;i<=N;++i)
+    {
+        const double alpha = double(i)/N;
+        W[1] = (1.0-alpha);
+        W[2] = alpha;
+        S.mix(cs,solutions,W,0.0);
+        fp("%g %g\n",alpha,S.pH());
+    }
+    
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
