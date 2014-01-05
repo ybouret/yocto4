@@ -44,7 +44,7 @@ namespace yocto
                 {
                     const component &p = (*j);
                     component       &q = (*k);
-                    q.conc += eff.factor * p.conc;
+                    q.concentration += eff.factor * p.concentration;
                 }
             }
         }

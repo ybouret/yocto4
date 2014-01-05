@@ -13,7 +13,7 @@ namespace yocto
         
         component:: component( const species::ptr &sp ) throw() :
         spec(sp),
-        conc(0)
+        concentration(0)
         {
         }
         
@@ -24,7 +24,7 @@ namespace yocto
         
         component:: component( const component &other ) throw() :
         spec(other.spec),
-        conc(other.conc)
+        concentration(other.concentration)
         {
             
         }
@@ -54,6 +54,26 @@ namespace yocto
             
         }
         
+        bool solution:: has_same_components_than(const solution &other ) const throw()
+        {
+            if(other.components != components)
+            {
+                return false;
+            }
+            
+            const_iterator i=composition.begin();
+            const_iterator j=other.composition.begin();
+            
+            for(size_t n = components;n>0;--n,++i,++j)
+            {
+                const component &mine = *i;
+                const component &its  = *j;
+                if( mine.spec->name != its.spec->name )
+                    return false;
+            }
+            return true;
+            
+        }
         
         solution:: ~solution() throw()
         {
@@ -64,7 +84,7 @@ namespace yocto
             component *p = composition.search(name);
             if(!p)
                 throw exception("solution[no '%s']", name.c_str());
-            return p->conc;
+            return p->concentration;
         }
         
         const double & solution:: operator[]( const string &name ) const
@@ -72,7 +92,7 @@ namespace yocto
             const component *p = composition.search(name);
             if(!p)
                 throw exception("solution[no '%s'] const", name.c_str());
-            return p->conc;
+            return p->concentration;
         }
         
         double & solution:: operator[]( const char *id )
@@ -99,7 +119,7 @@ namespace yocto
             for( component::db::iterator i=composition.begin(); i != composition.end(); ++i )
             {
                 component &comp = *i;
-                comp.conc = C[++j];
+                comp.concentration = C[++j];
             }
         }
         
@@ -109,7 +129,7 @@ namespace yocto
             for( component::db::iterator i=composition.begin(); i != composition.end(); ++i )
             {
                 component &comp = *i;
-                comp.conc *= a;
+                comp.concentration *= a;
             }
         }
         
@@ -118,7 +138,7 @@ namespace yocto
             for( component::db::iterator i=composition.begin(); i != composition.end(); ++i )
             {
                 component &comp = *i;
-                comp.conc = - comp.conc;
+                comp.concentration = - comp.concentration;
             }
         }
         
@@ -128,7 +148,7 @@ namespace yocto
             for( const_iterator i = other.begin(); i != other.end(); ++i )
             {
                 const component &comp = *i;
-                self[ comp.spec->name ] += comp.conc;
+                self[ comp.spec->name ] += comp.concentration;
             }
         }
         
@@ -139,7 +159,7 @@ namespace yocto
             for( component::db::const_iterator i=composition.begin(); i != composition.end(); ++i )
             {
                 const component &comp = *i;
-                C[++j] = comp.conc;
+                C[++j] = comp.concentration;
             }
         }
         
@@ -154,7 +174,7 @@ namespace yocto
                 os << "\t[" << name << "]";
                 assert(name.size()<=s.name_max);
                 for(size_t i=s.name_max-comp.spec->name.size();i>0;--i) os << ' ';
-                os << " : " << comp.conc;
+                os << " : " << comp.concentration;
                 if(++j<s.components) os << ",";
                 os << std::endl;
             }
@@ -167,11 +187,11 @@ namespace yocto
         component::db::const_iterator solution::begin() const throw() { return composition.begin(); }
         component::db::const_iterator solution::end()   const throw() { return composition.end();   }
         
-
+        
         void solution:: ldz() throw()
         {
             for( iterator i=begin(); i != end(); ++i )
-                (*i).conc = 0;
+                (*i).concentration = 0;
         }
         
         double solution:: sum_zC() const throw()
@@ -180,7 +200,7 @@ namespace yocto
             for( const_iterator i = begin(); i != end(); ++i)
             {
                 const component &p = *i;
-                ans += p.conc * p.spec->z;
+                ans += p.concentration * p.spec->z;
             }
             return ans;
         }
@@ -191,7 +211,7 @@ namespace yocto
             assert(i<=components);
             iterator j = begin();
             for(size_t k=1;k<i;++k) ++j;
-            return (*j).conc;
+            return (*j).concentration;
         }
         
         const double & solution:: operator[]( size_t i ) const throw()
@@ -200,7 +220,7 @@ namespace yocto
             assert(i<=components);
             const_iterator j = begin();
             for(size_t k=1;k<i;++k) ++j;
-            return (*j).conc;
+            return (*j).concentration;
         }
         
         
@@ -217,7 +237,7 @@ namespace yocto
         {
             for( const_iterator i = begin(); i != end(); ++i)
             {
-                os(" %.15g", (*i).conc);
+                os(" %.15g", (*i).concentration);
             }
         }
         

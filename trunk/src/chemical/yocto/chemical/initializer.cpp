@@ -74,6 +74,14 @@ namespace yocto
             return *p;
         }
         
+        void initializer:: define(const string &id, const double value)
+        {
+            constraint::ptr p( new constraint(value) );
+            (*p)[id] = 1.0;
+            push_back(p);
+        }
+        
+        
         void initializer:: electroneutrality( const collection &lib )
         {
             size_t num_charged = 0;
