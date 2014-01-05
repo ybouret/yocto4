@@ -10,12 +10,13 @@ using namespace yocto;
 
 namespace
 {
-    class memory_node : public object, public cslot
+    class memory_node : public object
     {
     public:
         memory_node *next, *prev;
+        cslot        data;
         
-        explicit memory_node() : cslot( alea_leq(100) ), next(0), prev(0)
+        explicit memory_node() : next(0), prev(0), data( alea_leq(100) )
         {
         }
         
