@@ -24,6 +24,9 @@ namespace yocto
              \param lib  collection to grow
              \param name the name of the lua table
              \param cb   a constructor for extra data
+             
+             when cb is not NULL, the extra data are pushed onto the state and
+             cb is called: a nil value is pushed if no extra data are present.
              */
             static void load( lua_State *L, collection &lib, const string &name, species_ctor *cb =0 );
             

@@ -21,7 +21,7 @@ YOCTO_UNIT_TEST_IMPL(collection)
     for( chemical::collection::iterator i = lib.begin(); i != lib.end(); ++i )
     {
         const chemical::species &sp = **i;
-        std::cerr << sp << " +#bytes=" << sp.data.bytes() << std::endl;
+        std::cerr << sp << " +#bytes=" << sp.data.size() << std::endl;
     }
     
     std::cerr << "ztable: " << std::endl;

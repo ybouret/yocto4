@@ -30,7 +30,7 @@ YOCTO_UNIT_TEST_IMPL(equilibrium)
     for( chemical::collection::iterator i = lib.begin(); i != lib.end(); ++i )
     {
         const chemical::species &sp = **i;
-        std::cerr << sp << " +#bytes=" << sp.data.bytes() << std::endl;
+        std::cerr << sp << " +#bytes=" << sp.data.size() << std::endl;
     }
     
     {
