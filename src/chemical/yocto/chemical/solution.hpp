@@ -57,7 +57,6 @@ namespace yocto
             void save( array<double> &C) const throw();         //!< first components into slots
             
             void mul( double a ) throw();      //!< multiply all
-            void neg() throw();                //!< * -1
             void add( const solution &other ); //!< must be compatible (not necessarily same components)
             
             double pH() const; //!< get pH if any
@@ -83,6 +82,7 @@ namespace yocto
             component::db composition;
             const size_t  name_max;
             YOCTO_DISABLE_ASSIGN(solution);
+            
         };
         
     }
