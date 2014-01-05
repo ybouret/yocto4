@@ -58,7 +58,6 @@ kill_(0)
     
     void basic_slot:: prepare_for(size_t n) { free(); slot_.prepare(n); }
     
-    
     void basic_slot:: basic_swap_with( basic_slot &other ) throw()
     {
         slot_.swap_with(other.slot_);
