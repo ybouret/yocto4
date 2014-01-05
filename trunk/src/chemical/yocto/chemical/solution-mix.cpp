@@ -23,23 +23,28 @@ namespace yocto
             vector<double>         wC(ns,0);
             vector<const_iterator> it(ns,as_capacity);
             
+            //------------------------------------------------------------------
             //-- initialize and check weights
+            //------------------------------------------------------------------
             for(size_t i=1;i<=ns;++i)
             {
                 assert(has_same_components_than(solutions[i]));
                 it.push_back( solutions[i].begin() );
                 const double w = weights[i];
                 if(w<0)
-                    throw exception("solution::mix(invalid weights[%u]=%g", unsigned(i), w);
+                    throw exception("solution::mix(invalid weights[%u]=%g)", unsigned(i), w);
                 ws += w;
             }
             if(ws<=0)
                 throw exception("solution::mix(invalid sum of weights)");
 
+            //------------------------------------------------------------------
             //-- fill  cs.C
+            // for each component
+            //------------------------------------------------------------------
             for(size_t j=1;j<=components;++j)
             {
-                
+                //-- for each solution
                 for(size_t i=1;i<=ns;++i)
                 {
                     const_iterator  &iter = it[i];
