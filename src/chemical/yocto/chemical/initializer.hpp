@@ -48,6 +48,9 @@ namespace yocto
             //! append a new constraint, to be filled
             constraint & equals( const double value );
             
+            //! helper: create a simple constraint
+            void define( const string &id, const double value);
+            
             //! set the electroneutrality
             /**
              Won't create a constraint if no species is charged.

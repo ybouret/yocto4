@@ -16,7 +16,7 @@ namespace yocto
             component( const species::ptr &sp ) throw();
             ~component() throw();
             const species::ptr spec; //!< from a collection
-            double             conc; //!< the real concentration
+            double             concentration; //!< the real concentration
             
             const string &key() const throw(); //!< spec->name
             
@@ -28,6 +28,8 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(component);
         };
         
+        class equilibria;
+        
         //! built from a collection
         class solution
         {
@@ -38,6 +40,9 @@ namespace yocto
             
             //! number of components..
             const size_t components;
+            
+            //! for debug: same components, same order
+            bool has_same_components_than( const solution &other ) const throw();
             
             double & operator[]( const string & );             //!< get by bame
             const double & operator[]( const string &) const;  //!< get by name
@@ -53,7 +58,7 @@ namespace yocto
             
             void mul( double a ) throw();      //!< multiply all
             void neg() throw();                //!< * -1
-            void add( const solution &other ); //!< must be compatible
+            void add( const solution &other ); //!< must be compatible (not necessarily same components)
             
             double pH() const; //!< get pH if any
             
@@ -72,6 +77,7 @@ namespace yocto
             
             void write_header( ios::ostream & ) const;
             void write_values( ios::ostream & ) const;
+            void mix( equilibria &cs, const array<solution> &solutions, const array<double> &weights, double t);
             
         private:
             component::db composition;

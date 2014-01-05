@@ -48,8 +48,10 @@ YOCTO_UNIT_TEST_IMPL(init)
     std::cerr << "S=" << S << std::endl;
     std::cerr << "pH=" << S.pH() << std::endl;
     
-  
-
+    chemical::solution S2(S);
+    std::cerr << "S2=" << S2 << std::endl;
+    assert( S2.has_same_components_than(S));
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
