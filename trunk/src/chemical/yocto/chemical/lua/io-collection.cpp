@@ -40,11 +40,20 @@ namespace yocto
             lua_pop(L, 1);
             species &sp = lib.add(name, z);
             
-            if( n>2 && ctor )
+            if(ctor)
             {
-                lua_rawgeti(L, -1, 3);
-                (*ctor)(L,sp);
-                lua_pop(L,1);
+                if(n>2)
+                {
+                    lua_rawgeti(L, -1, 3);
+                    (*ctor)(L,sp);
+                    lua_pop(L,1);
+                }
+                else
+                {
+                    lua_pushnil(L);
+                    (*ctor)(L,sp);
+                    lua_pop(L,1);
+                }
             }
         }
         

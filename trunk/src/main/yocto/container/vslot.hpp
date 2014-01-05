@@ -7,33 +7,130 @@
 namespace yocto
 {
     
+    //! C-data slot: managing memory
+    class cslot
+    {
+    public:
+        cslot() throw();
+        ~cslot() throw();
+        cslot(size_t n);
+        void swap_with( cslot &other ) throw();
+        
+        void        *data;
+        const size_t size;
+        
+        void prepare(size_t n);
+        void release() throw();
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(cslot);
+    };
+    
+    //! base class for vslot/xslot
+    class basic_slot 
+    {
+    public:
+        explicit basic_slot() throw();
+        virtual ~basic_slot() throw();
+        explicit basic_slot(size_t);
+        
+        
+        size_t                size() const throw(); //!< allocated bytes
+        const std::type_info *info() const throw(); //!< remind me of the type
+        const char  *         name() const throw(); //!< from info() or ""
+        
+        
+        //! virtual interface
+        virtual bool is_active() const throw() = 0;
+        virtual void free()      throw() = 0;
+        
+        //! Non virtual interface
+        void release() throw();
+        
+        //! status helper
+        bool is_allocated() const throw();
+        
+        //! setup helper
+        void prepare_for(size_t n);
+        
+        //! allocate an INACTIVE slot
+        void allocate(size_t n);
+        
+        //! deallocate an INACTIVE slot
+        void deallocate() throw();
+        
+        
+        //! query type comparison
+        template <typename T>
+        inline bool same_type_than() const throw()
+        {
+            typedef typename type_traits<T>::mutable_type TT;
+            return info_ != 0 && typeid(TT) == *info_;
+        }
+        
+        //! transtyping with DEBUG control
+        template <typename T>
+        inline T &as() throw()
+        {
+            assert(is_active());
+            assert(same_type_than<T>());
+            return *(T*)(slot_.data);
+        }
+        
+        //! transtyping with DEBUG control
+        template <typename T>
+        inline const T &as() const throw()
+        {
+            assert(is_active());
+            assert(same_type_than<T>());
+            return *(T*)(slot_.data);
+        }
+
+        
+        
+    protected:
+        cslot                 slot_;
+        const std::type_info *info_;           //!< for type id
+        void                (*kill_)(void*);   //!< destructor wrapper
+        
+        template <typename T>
+        inline void basic_activate() throw()
+        {
+            info_ = &typeid(T);
+            kill_ = __kill<T>;
+        }
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(basic_slot);
+        template <typename T>
+        static inline
+        void __kill( void *addr ) throw()
+        {
+            assert(addr);
+            static_cast<T*>(addr)->~T();
+        }
+
+    };
+    
+    
     //! local dynamic memory, using the object allocator
-    class vslot
+    class vslot : public basic_slot
     {
     public:
         explicit vslot() throw();
         explicit vslot(size_t n);
         virtual ~vslot() throw();
         
-        void allocate(size_t n);   //!< memory only
-        void deallocate() throw(); //!< once object is destructed
         
-        void free() throw();    //!< desctruct object, keep memory
-        void release() throw(); //!< free and deallocate
-        
-        bool is_allocated() const throw(); //!< has some memory ?
-        bool is_active() const throw();    //!< has some object ?
-        
-        size_t bytes() const throw();               //!< current allocated bytes
-        const std::type_info *info() const throw(); //!< remind me of the type
-        
+        virtual bool is_active() const throw();
+        virtual void free() throw();
         
         //! zero argument contructor, automatic memory management
         template <typename T>
         inline void make()
         {
             prepare_for(sizeof(T)); // get memory
-            new (data_) T();        // try to construct, may throw
+            new (slot_.data) T();   // try to construct, may throw
             activate<T>();          // activate the object
         }
         
@@ -42,7 +139,7 @@ namespace yocto
         inline void make( typename type_traits<T>::parameter_type args )
         {
             prepare_for(sizeof(T));  // get memory
-            new (data_) T(args);     // try to construct, may throw
+            new (slot_.data) T(args);     // try to construct, may throw
             activate<T>();           // activate the object
         }
         
@@ -51,7 +148,7 @@ namespace yocto
         inline void build(typename type_traits<U>::parameter_type args)
         {
             prepare_for(sizeof(T)); // get memory
-            new (data_) T(args);    // try to construct, may throw
+            new (slot_.data) T(args);    // try to construct, may throw
             activate<T>();          // activate the object
         }
         
@@ -61,60 +158,15 @@ namespace yocto
                           typename type_traits<V>::parameter_type v )
         {
             prepare_for(sizeof(T));
-            new (data_) T(u,v);
+            new (slot_.data) T(u,v);
             activate<T>();
         }
         
         
-        //! query type comparison
-        template <typename T>
-        bool same_type_than() const throw()
-        {
-            typedef typename type_traits<T>::mutable_type TT;
-            return type_ != 0 && typeid(TT) == *type_;
-        }
-        
-        //! transtyping with DEBUG control
-        template <typename T>
-        inline T &as() throw()
-        {
-            assert(is_active());
-            assert(same_type_than<T>());
-            return *(T*)data_;
-        }
-        
-        //! transtyping with DEBUG control
-        template <typename T>
-        inline const T &as() const throw()
-        {
-            assert(is_active());
-            assert(same_type_than<T>());
-            return *(T*)data_;
-        }
-        
-        //! type name of "" if no type
-        const char *name() const throw();
-        
         
     private:
-        size_t                size_;                      //!< allocated bytes for data
-        void                 *data_;                      //!< allocated memory area
-        const std::type_info *type_;                      //!< for type id
-        void                (*kill_)(void*);              //!< destructor wrapper
-        //void                (*copy_)(void*,const void *); //!< copy wrapper
-        void prepare_for(size_t n);
+        void __free() throw();
         
-        //______________________________________________________________________
-        //
-        // destructor wrapper
-        //______________________________________________________________________
-        template <typename T>
-        static inline
-        void __kill( void *addr ) throw()
-        {
-            assert(addr);
-            static_cast<T*>(addr)->~T();
-        }
         /*
          //______________________________________________________________________
          //
@@ -129,15 +181,14 @@ namespace yocto
          new (dest) T( *(T*)addr );
          }
          */
-        
+
         template <typename T>
         void activate() throw()
         {
             typedef typename type_traits<T>::mutable_type TT;
-            kill_ =  __kill<TT>;
-            //copy_ =  __copy<TT>;
-            type_ = &typeid(TT);
+            basic_activate<TT>();
         }
+        
         YOCTO_DISABLE_COPY_AND_ASSIGN(vslot);
     };
     
