@@ -124,6 +124,30 @@ namespace yocto
             }
         }
         
+        void boot::loader:: fill( matrix_t &P, array<double> &Lam) const throw()
+        {
+            const size_t Nc = size();
+            assert(P.rows==Nc);
+            assert(Lam.size()==Nc);
+            for(size_t i=1;i<=Nc;++i)
+            {
+                const constraint &cstr = *(*this)[i];
+                array<double>    &P_i  = P[i];
+                Lam[i] = cstr.value;
+                for( constraint::const_iterator j=cstr.begin(); j!=cstr.end();++j)
+                {
+                    const constituent &cc = **j;
+                    const size_t k = cc.spec->indx;
+                    const double w = cc.weight;
+                    assert(k>=1);
+                    assert(k<=P.cols);
+                    P_i[k] = w;
+                }
+            }
+            
+        }
+
+        
     }
     
 }

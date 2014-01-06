@@ -2,6 +2,7 @@
 #include "yocto/chemical/boot.hpp"
 
 using namespace yocto;
+using namespace math;
 
 
 YOCTO_UNIT_TEST_IMPL(boot)
@@ -33,5 +34,16 @@ YOCTO_UNIT_TEST_IMPL(boot)
     ini.electroneutrality(lib);
     
     std::cerr << ini << std::endl;
+    
+    const size_t Nc = ini.size();
+    const size_t M  = lib.size();
+    matrix<double> P(Nc,M);
+    vector<double> Lam(Nc,0);
+    
+    lib.update_indices();
+    
+    ini.fill(P,Lam);
+    std::cerr << "P=" << P << std::endl;
+    std::cerr << "Lam=" << Lam << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

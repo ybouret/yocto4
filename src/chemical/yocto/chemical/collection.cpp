@@ -118,6 +118,17 @@ if( !ztable.insert(id,z) ) throw exception(fmt, name); \
             }
         }
         
+        bool collection:: has_valid_indices() const throw()
+        {
+            size_t i = 1;
+            for( const_iterator sp = begin(); sp != end(); ++sp, ++i )
+            {
+                if( (**sp).indx != i )
+                    return false;
+            }
+            return true;
+        }
+        
         species & collection:: add(const string &name)
         {
             const int *z = ztable.search(name);

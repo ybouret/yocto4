@@ -74,6 +74,14 @@ namespace yocto
                 //! electroneutrality: disabled is no charged species
                 void electroneutrality( const collection &lib );
                 
+                //! compute matrix and constraint vector
+                /**
+                 \param P a matrix MxNc (M is the lib.size)
+                 \param Lam a vector Nc
+                 \warning the collection must have updated indices !
+                 */
+                void fill( matrix_t &P, array<double> &Lam) const throw();
+                
                 
                 friend std::ostream & operator<<( std::ostream &, const loader &);
             private:
