@@ -1,5 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/chemical/lua/io.hpp"
+#include "yocto/lua/lua-state.hpp"
+#include "yocto/lua/lua-config.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -50,7 +52,25 @@ YOCTO_UNIT_TEST_IMPL(boot)
     std::cerr << "sizeof(boot:constraint)="  << sizeof(chemical::boot::constraint) << std::endl;
     std::cerr << "sizeof(boot:loader)="       << sizeof(chemical::boot::loader) << std::endl;
     
+    std::cerr << "testing simple" << std::endl;
     simple_boot();
+    std::cerr << std::endl;
+    
+    if( argc > 1)
+    {
+        Lua::State VM;
+        lua_State *L = VM();
+        Lua::Config::DoFile(L,argv[1]);
+        
+        chemical::collection lib;
+        chemical::_lua::load(L, lib, "species");
+        std::cerr << lib << std::endl;
+        
+        chemical::boot::loader ini;
+        chemical::_lua::load(L, ini, "ini", lib);
+        std::cerr << ini << std::endl;
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
