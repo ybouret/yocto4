@@ -72,11 +72,11 @@ YOCTO_UNIT_TEST_IMPL(mix)
     
     chemical::solution S(lib);
     
-    vector<double> W(2,0.5);
+    vector<double> W(2,0.0);
    
     ios::ocstream fp("mix.dat",false);
-    const size_t N=100;
-    const double Va = 20;
+    const size_t N  = 100;
+    const double Va =  20;
     const double dV = Va/(N/2);
     for(size_t i=0;i<=N;++i)
     {
