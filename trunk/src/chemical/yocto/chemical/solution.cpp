@@ -30,7 +30,7 @@ namespace yocto
         }
         
         solution:: solution( const collection &lib ) :
-        components( lib.size() ),
+        components(  lib.size() ),
         composition( components, as_capacity),
         name_max(0)
         {

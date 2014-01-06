@@ -39,7 +39,8 @@ inline const species::ptr &method() const { return (*this)[name]; }
 
             void suppress( const string &name ) throw(); //!< suppress an existing species
             
-            void update_indices() throw(); //!< shall be called by equilibria
+            void update_indices() throw(); //!< shall be called by equilibria/boot
+            bool has_valid_indices() const throw(); //!< check indices are ok
             
             //------------------------------------------------------------------
             // species must be declared before use !
