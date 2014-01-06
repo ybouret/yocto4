@@ -12,6 +12,26 @@ YOCTO_UNIT_TEST_IMPL(boot)
 
     chemical::boot::loader ini;
     
+    chemical::collection lib;
+    lib.add("H+");
+    lib.add("HO-");
+    lib.add("AcH",0);
+    lib.add("Ac-",-1);
+    lib.add("Na+",1);
     
+    std::cerr << lib << std::endl;
+    
+    {
+        chemical::boot::constraint &ph = ini.add( 1e-6 );
+        ph.weight( lib["H+"], 1);
+    }
+
+    {
+        ini.define( lib["Na+"], 0);
+    }
+    
+    ini.electroneutrality(lib);
+    
+    std::cerr << ini << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

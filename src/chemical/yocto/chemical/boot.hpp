@@ -46,7 +46,12 @@ namespace yocto
                 
                 double value;
                 
+                constraint &weight( const species::ptr &sp, const double w);
+                
+                
                 typedef shared_ptr<constraint> ptr;
+                
+                friend std::ostream & operator<<( std::ostream &, const constraint &);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
@@ -63,6 +68,14 @@ namespace yocto
                 
                 constraint & add(double value);
                 
+                //! helper: set species concentration
+                void define( const species::ptr &sp, const double conc);
+                
+                //! electroneutrality: disabled is no charged species
+                void electroneutrality( const collection &lib );
+                
+                
+                friend std::ostream & operator<<( std::ostream &, const loader &);
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(loader);
             };
