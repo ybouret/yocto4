@@ -63,6 +63,8 @@ namespace yocto
             class loader : public constraints
             {
             public:
+                rand32_kiss ran;
+
                 explicit loader() throw();
                 virtual ~loader() throw();
                 
@@ -70,6 +72,14 @@ namespace yocto
                 
                 //! helper: set species concentration
                 void define( const species::ptr &sp, const double conc);
+                
+                //! helper: set sum of 2 species concentration
+                void conserve( const species::ptr &A, const species::ptr &B, const double conc);
+                
+                //! helper: set sum of 3 species concentration
+                void conserve( const species::ptr &A, const species::ptr &B, const species::ptr &C, const double conc);
+
+                
                 
                 //! electroneutrality: disabled is no charged species
                 void electroneutrality( const collection &lib );
@@ -82,8 +92,12 @@ namespace yocto
                  */
                 void fill( matrix_t &P, array<double> &Lam) const throw();
                 
+                //! initialize
+                void operator()( equilibria &cs, collection &lib, double t);
                 
+                //! output
                 friend std::ostream & operator<<( std::ostream &, const loader &);
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(loader);
             };

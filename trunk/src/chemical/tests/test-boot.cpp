@@ -2,6 +2,7 @@
 #include "yocto/chemical/lua/io.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-config.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -12,6 +13,8 @@ namespace {
         chemical::boot::loader ini;
         
         chemical::collection lib;
+        chemical::equilibria cs;
+        
         lib.add("H+");
         lib.add("HO-");
         lib.add("AcH",0);
@@ -43,6 +46,26 @@ namespace {
         ini.fill(P,Lam);
         std::cerr << "P=" << P << std::endl;
         std::cerr << "Lam=" << Lam << std::endl;
+        
+        std::cerr << "going to solve" << std::endl;
+        
+        ini.release();
+        
+        cs.add_water(lib, 1e-14);
+        cs.add_acid(lib, "Ac", "AcH", "Ac-", pow(10,-4.78));
+        
+        std::cerr << cs << std::endl;
+        
+        ini.electroneutrality(lib);
+        ini.define( lib["Na+"], 0);
+        const double C0 = 1e-5;
+        ini.conserve( lib["AcH"], lib["Ac-"], C0);
+        
+        std::cerr << ini << std::endl;
+        
+        ini(cs,lib,0.0);
+        
+        
     }
 }
 
@@ -56,6 +79,8 @@ YOCTO_UNIT_TEST_IMPL(boot)
     simple_boot();
     std::cerr << std::endl;
     
+    
+#if 0
     if( argc > 1)
     {
         Lua::State VM;
@@ -70,7 +95,84 @@ YOCTO_UNIT_TEST_IMPL(boot)
         chemical::_lua::load(L, ini, "ini", lib);
         std::cerr << ini << std::endl;
     }
+#endif
     
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(boot1)
+{
+    double C0 = 1e-4;
+    if( argc > 1 )
+    {
+        C0 = strconv::to_double(argv[1],"C0");
+    }
+    
+    chemical::collection lib;
+    lib.add("H+");
+    lib.add("HO-");
+    lib.add("Na+");
+    lib.add("Cl-");
+    lib.add("AcH",0);
+    lib.add("Ac-",-1);
+    
+    chemical::equilibria cs;
+    cs.add_water(lib, 1e-14);
+    cs.add_acid(lib, "Ac", "AcH", "Ac-", pow(10,-4.78) );
+    
+    chemical::boot::loader ini;
+    ini.electroneutrality(lib);
+    ini.conserve( lib["AcH"], lib["Ac-"], C0);
+    ini.define( lib["Cl-"], 0.001 );
+    ini.define( lib["Na+"], 0.001 );
+    
+    ini(cs,lib,0);
+    
+    chemical::solution S(lib);
+    S.load( cs.C );
+    std::cerr << "S=" << S << std::endl;
+    std::cerr << "pH=" << S.pH() << std::endl;
+    
+    
+    }
+    YOCTO_UNIT_TEST_DONE()
+    
+    YOCTO_UNIT_TEST_IMPL(boot2)
+    {
+        double C0 = 1e-4;
+        if( argc > 1 )
+        {
+            C0 = strconv::to_double(argv[1],"C0");
+        }
+        
+        chemical::collection lib;
+        lib.add("H+");
+        lib.add("HO-");
+        lib.add("CO2");
+        lib.add("HCO3-");
+        lib.add("CO3--");
+        
+        
+        chemical::equilibria cs;
+        cs.add_water(lib,1e-14);
+        cs.add_acid(lib, "eq1", "CO2",   "HCO3-", 4.16e-7);
+        cs.add_acid(lib, "eq2", "HCO3-", "CO3--", 4.69e-11);
+        
+        std::cerr << cs << std::endl;
+        
+        chemical::boot::loader ini;
+        ini.electroneutrality(lib);
+        ini.conserve( lib["CO2"], lib["HCO3-"], lib["CO3--"],C0);
+        
+        ini(cs,lib,0);
+        
+        chemical::solution S(lib);
+        S.load( cs.C );
+        std::cerr << "S=" << S << std::endl;
+        std::cerr << "pH=" << S.pH() << std::endl;
+        
+        
+    }
+    YOCTO_UNIT_TEST_DONE()
+    

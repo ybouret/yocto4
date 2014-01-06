@@ -75,7 +75,11 @@ namespace yocto
         //
         //
         ////////////////////////////////////////////////////////////////////////
-        boot:: loader:: loader() throw() : constraints() {}
+        boot:: loader:: loader() throw() : constraints(), ran()
+        {
+            ran.wseed();
+        }
+        
         boot:: loader:: ~loader() throw() {}
         
         
@@ -101,6 +105,16 @@ namespace yocto
         void boot::loader:: define( const species::ptr &sp, const double conc)
         {
             (void) add(conc).weight(sp, 1);
+        }
+        
+        void boot::loader:: conserve( const species::ptr &A, const species::ptr &B, const double conc)
+        {
+            (void) add(conc).weight(A,1).weight(B,1);
+        }
+
+        void boot::loader:: conserve( const species::ptr &A, const species::ptr &B,  const species::ptr &C, const double conc)
+        {
+            (void) add(conc).weight(A,1).weight(B,1).weight(C,1);
         }
         
         void boot::loader:: electroneutrality(const collection &lib)

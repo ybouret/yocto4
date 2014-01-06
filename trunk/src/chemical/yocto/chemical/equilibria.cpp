@@ -50,6 +50,22 @@ namespace yocto
             }
         }
         
+        //! build a random concentration after scaling
+        void equilibria:: trial( urand32 &ran, double t)
+        {
+            for(size_t i=C.size();i>0;--i) C[i] = 0;
+            
+            for( iterator eq=begin();eq!=end();++eq)
+            {
+                (**eq).append(C,ran);
+            }
+            
+            normalize_C(t);
+            for(size_t i=C.size();i>0;--i) C[i] = max_of<double>(C[i],0);
+
+            
+        }
+        
         
         //======================================================================
         // append a constant equilibrium
@@ -284,30 +300,32 @@ namespace yocto
         }
         
         
-        void equilibria:: legalize_dC( double t )
+        void equilibria:: legalize_dC( double t, bool computeDerivatives )
         {
             const size_t N = nu.rows;
             if(N>0)
             {
-                compute_Gamma_and_W(t,true);
+                compute_Gamma_and_W(t,computeDerivatives);
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
                 mkl::mulsub_trn(dC, nu, dtGam);
             }
         }
         
+        
+        
         void equilibria:: load_C( const array<double> &y ) throw()
         {
             assert(C.size()<=y.size());
             for(size_t i=C.size();i>0;--i) C[i] = y[i];
         }
-
+        
         void equilibria:: save_C( array<double> &y ) const throw()
         {
             assert(C.size()<=y.size());
             for(size_t i=C.size();i>0;--i) y[i] = C[i];
         }
-
+        
         
         
     }
