@@ -2,6 +2,7 @@
 #define YOCTO_CHEMICAL_LUA_IO_INCLUDED 1
 
 #include "yocto/chemical/initializer.hpp"
+#include "yocto/chemical/boot.hpp"
 #include "yocto/chemical/effector.hpp"
 
 extern "C"
@@ -18,6 +19,12 @@ namespace yocto
         
         struct _lua
         {
+            
+            //__________________________________________________________________
+            //
+            // collection API
+            //__________________________________________________________________
+
             //! append species to a collection
             /**
              \param L a  valid lua_State
@@ -32,6 +39,11 @@ namespace yocto
             
             //! wrapper
             static void load( lua_State *L, collection &lib, const char   *name, species_ctor *cb =0 );
+
+            //__________________________________________________________________
+            //
+            // equilibria API
+            //__________________________________________________________________
 
             //! forward lua equilibrium
             class equilibrium;
@@ -48,6 +60,11 @@ namespace yocto
             //! wrapper
             static void load( lua_State *L, const collection &lib, equilibria &cs, const char   *name );
 
+            //__________________________________________________________________
+            //
+            // initializer API
+            //__________________________________________________________________
+
             //! append constraints to an initializer
             /**
              \param L a valid lua_State
@@ -58,7 +75,30 @@ namespace yocto
             
             //! wrapper
             static void load( lua_State *L, initializer &ini, const char   *name );
+
             
+            //__________________________________________________________________
+            //
+            // boot API
+            //__________________________________________________________________
+            
+            //! append constraints to a boot::loader
+            /**
+             \param L a valid lua_State
+             \param ini a boot loader
+             \param name the name of the lua table
+             \param lib the collection to search for species
+             */
+            static void load( lua_State *L, boot::loader &ini, const string &name, const collection &lib);
+            
+            //! wrapper
+            static void load( lua_State *L, boot::loader &ini, const char *name, const collection &lib);
+
+            //__________________________________________________________________
+            //
+            // effector API
+            //__________________________________________________________________
+
             //! forward lua effector
             class effector;
             
