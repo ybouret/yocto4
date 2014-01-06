@@ -102,20 +102,6 @@ namespace yocto
             }
         }
         
-        
-                
-        /*
-         void solution:: neg() throw()
-         {
-         for( component::db::iterator i=composition.begin(); i != composition.end(); ++i )
-         {
-         component &comp = *i;
-         comp.concentration = - comp.concentration;
-         }
-         }
-         */
-        
-        
               
         void solution:: save( array<double> &C ) const throw()
         {
@@ -151,7 +137,6 @@ namespace yocto
         component::db::iterator solution::end()   throw() { return composition.end();   }
         component::db::const_iterator solution::begin() const throw() { return composition.begin(); }
         component::db::const_iterator solution::end()   const throw() { return composition.end();   }
-        
         
         void solution:: ldz() throw()
         {
