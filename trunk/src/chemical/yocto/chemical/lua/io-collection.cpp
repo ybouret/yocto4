@@ -89,6 +89,7 @@ namespace yocto
                 lua_pop(L,1);
             }
             
+            lib.update_indices();
             
         }
         

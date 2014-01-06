@@ -34,6 +34,8 @@ namespace yocto
              
              when cb is not NULL, the extra data are pushed onto the state and
              cb is called: a nil value is pushed if no extra data are present.
+             
+             Indices are updated.
              */
             static void load( lua_State *L, collection &lib, const string &name, species_ctor *cb =0 );
             
