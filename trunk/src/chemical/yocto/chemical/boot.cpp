@@ -1,4 +1,5 @@
 #include "yocto/chemical/boot.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -44,6 +45,30 @@ namespace yocto
         
         boot:: constraint:: ~constraint() throw() {}
         
+        boot::constraint & boot:: constraint:: weight(const species::ptr &sp, const double w)
+        {
+            const constituent::ptr p( new constituent(sp,w) );
+            if(!insert(p))
+                throw exception("constraint: multiple constituent '%s'", sp->name.c_str());
+            return *this;
+        }
+        
+        std::ostream & operator<<( std::ostream &os, const boot::constraint &cstr)
+        {
+            os << cstr.value << " =";
+            for( boot::constraint::const_iterator i=cstr.begin(); i != cstr.end(); ++i)
+            {
+                const boot::constituent &it = **i;
+                const double             w  = it.weight;
+                if(w>0)
+                    os << " + " << w;
+                else
+                    os << " - " << -w;
+                
+                os << "*[" << it.spec->name << "]";
+            }
+            return os;
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -61,6 +86,43 @@ namespace yocto
             return *back();
         }
         
+        std::ostream & operator<<( std::ostream &os, const boot::loader &ld)
+        {
+            static const size_t nn = 32;
+            os << '/'; for(size_t i=nn;i>0;--i) os << '-'; os << std::endl;
+            for(size_t i=1; i <= ld.size();++i)
+            {
+                os << "| " << *ld[i] << std::endl;
+            }
+            os << '\\'; for(size_t i=nn;i>0;--i) os << '-';
+            return os;
+        }
+        
+        void boot::loader:: define( const species::ptr &sp, const double conc)
+        {
+            (void) add(conc).weight(sp, 1);
+        }
+        
+        void boot::loader:: electroneutrality(const collection &lib)
+        {
+            size_t num_charged = 0;
+            for( collection::const_iterator i=lib.begin(); i!=lib.end();++i)
+            {
+                if( (**i).z != 0 )
+                    ++num_charged;
+            }
+            if(num_charged<=0)
+                return;
+            
+            constraint &Q = add(0);
+            for( collection::const_iterator i=lib.begin(); i!=lib.end();++i)
+            {
+                const species::ptr &sp = *i;
+                const int           z  = sp->z;
+                if(z!=0)
+                    Q.weight(sp, sp->z);
+            }
+        }
         
     }
     
