@@ -66,7 +66,7 @@ namespace yocto
                 if(!pp)
                     throw exception("%s[%u]: component %u: unknown species '%s'", table_name, table_indx, j, name.c_str());
                 
-                c.weight( *pp, w);
+                (void)c.weight( *pp, w);
                 
                 lua_pop(L,1);         // pop the component---------------------
             }
