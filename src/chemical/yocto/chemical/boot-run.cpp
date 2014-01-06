@@ -98,7 +98,7 @@ namespace yocto
                     std::cerr << std::endl;
                     
                     
-                    vector_t dC(M,0);
+                    vector_t dX(M,0);
                     
                     size_t count = 0;
                     ios::ocstream fp("err.dat",false);
@@ -116,16 +116,16 @@ namespace yocto
                         std::cerr << "full=" << cs.dC << std::endl;
                         
                         //------------------------------------------------------
-                        // save starting point
-                        //------------------------------------------------------
-                        mkl::set(dC,cs.C);
-                        
-                        //------------------------------------------------------
                         // find max allowable step
                         //------------------------------------------------------
                         const double shrink = step_max();
                         std::cerr << "shrink=" << shrink << std::endl;
                         
+                        //------------------------------------------------------
+                        // save starting point
+                        //------------------------------------------------------
+                        mkl::set(dX,cs.C);
+
                         //------------------------------------------------------
                         // move to new position
                         //------------------------------------------------------
@@ -135,21 +135,34 @@ namespace yocto
                         // normalize the position
                         //------------------------------------------------------
                         cs.normalize_C(t); // WARNING: cs.dC is destructed !
+                        std::cerr << "X=" << dX   << std::endl;
                         std::cerr << "C=" << cs.C << std::endl;
+                        
                         
                         //------------------------------------------------------
                         // compute effective motion
                         //------------------------------------------------------
-                        mkl::sub(dC,cs.C);
-                        mkl::mul(dC,1.0/(FTOL+shrink));
-                        std::cerr << "dC=" << dC << std::endl;
+                        mkl::sub(dX,cs.C);
+                        mkl::mul(dX,1.0/(FTOL+shrink));
+                        std::cerr << "dC=" << dX << std::endl;
                         
                         //------------------------------------------------------
                         // check convergence
                         //------------------------------------------------------
-                        
-                        if(count>10) break;
+                        bool converged = true;
+                        for( size_t i=M;i>0;--i)
+                        {
+                            if( fabs(dX[i]) > FTOL * fabs(cs.C[i]) )
+                            {
+                                converged = false;
+                                break;
+                            }
+                        }
+                        if(converged) break;
                     }
+                    
+                    cs.compute_Gamma_and_W(t, false);
+                    std::cerr << "Gamma=" << cs.Gamma << std::endl;
                     
                     
                 }

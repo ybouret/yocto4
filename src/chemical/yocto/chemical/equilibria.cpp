@@ -255,7 +255,6 @@ namespace yocto
             mkl::mul_rtrn(W, Phi, nu);
             if( !LU.build(W) )
                 throw exception("equilibria: invalid composition");
-            
         }
         
         void equilibria:: normalize_C( double t )
@@ -277,7 +276,7 @@ namespace yocto
                 LU.solve(W, xi);
                 mkl::mul_trn(dC, nu, xi);
                 mkl::sub(C, dC);
-                std::cerr.flush();
+                //std::cerr.flush();
                 //std::cerr << "// Newton tiny=" << tiny << "/" << numeric<double>::tiny << std::endl;
                 //std::cerr << "C=" << C << std::endl;
                 //std::cerr << "//iter=" << iter << std::endl;
@@ -309,6 +308,10 @@ namespace yocto
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
                 mkl::mulsub_trn(dC, nu, dtGam);
+                for(size_t i=dC.size();i>0;--i)
+                {
+                    if( fabs(dC[i]) <= tiny ) dC[i] = 0;
+                }
             }
         }
         
