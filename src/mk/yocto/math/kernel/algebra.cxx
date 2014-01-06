@@ -3,69 +3,93 @@
 #include "yocto/math/types.hpp"
 #include "yocto/exceptions.hpp"
 
-namespace yocto 
+namespace yocto
 {
 	
-	namespace math 
+	namespace math
 	{
         
 		template <>
 		void algebra<z_type>:: set( array<z_type> &v, z_type a ) throw()
 		{
-			for( size_t i=v.size();i>0;--i) v[i] = a;
-		}
+			for( size_t i=v.size();i>0;--i)
+            {
+                v[i] = a;
+            }
+        }
 		
+        template <>
+		void algebra<z_type>:: mul( array<z_type> &v, z_type a ) throw()
+		{
+			for( size_t i=v.size();i>0;--i)
+            {
+                v[i] *= a;
+            }
+        }
+        
 		template <>
 		void algebra<z_type>:: set( array<z_type> &v, const array<z_type> &u ) throw()
 		{
 			assert( v.size() == u.size() );
-			for( size_t i=v.size();i>0;--i) v[i] = u[i];
-		}
+			for( size_t i=v.size();i>0;--i)
+            {
+                v[i] = u[i];
+            }
+            
+        }
 		
         template <>
 		void algebra<z_type>:: neg( array<z_type> &v, const array<z_type> &u ) throw()
         {
             assert( v.size() == u.size() );
-			for( size_t i=v.size();i>0;--i) v[i] = -u[i];
+			for( size_t i=v.size();i>0;--i) { v[i] = -u[i]; }
         }
         
 		template <>
 		void algebra<z_type>:: add( array<z_type> &v, const array<z_type> &u ) throw()
 		{
 			assert( v.size() == u.size() );
-			for( size_t i=v.size();i>0;--i) v[i] += u[i];
-		}
+			for( size_t i=v.size();i>0;--i) { v[i] += u[i]; }
+        }
 		
+        template <>
+		void algebra<z_type>:: subp( array<z_type> &v, const array<z_type> &u ) throw()
+		{
+			assert( v.size() == u.size() );
+			for( size_t i=v.size();i>0;--i)
+            { v[i] = u[i] - v[i];}
+        }
+        
         template <>
 		void algebra<z_type>:: sub( array<z_type> &v, const array<z_type> &u ) throw()
 		{
 			assert( v.size() == u.size() );
-			for( size_t i=v.size();i>0;--i) v[i] -= u[i];
-		}
+			for( size_t i=v.size();i>0;--i) { v[i] -= u[i]; }
+        }
         
         template <>
 		void algebra<z_type>:: vec( array<z_type> &v, const array<z_type> &a, const array<z_type> &b ) throw()
 		{
 			assert( v.size() == a.size() );
             assert( v.size() == b.size() );
-			for( size_t i=v.size();i>0;--i) v[i] = b[i] - a[i];
-		}
+			for( size_t i=v.size();i>0;--i) { v[i] = b[i] - a[i]; }
+        }
         
 		template <>
 		void algebra<z_type>:: muladd( array<z_type> &v, z_type a, const array<z_type> &u ) throw()
 		{
 			assert( v.size() == u.size() );
-			for( size_t i=v.size();i>0;--i) v[i] += a * u[i];
-		}
+			for( size_t i=v.size();i>0;--i) { v[i] += a * u[i]; }
+        }
         
-      
+        
 		
 		template <>
 		void algebra<z_type>:: mulset( array<z_type> &v, z_type a, const array<z_type> &u ) throw()
 		{
 			assert( v.size() == u.size() );
-			for( size_t i=v.size();i>0;--i) v[i] = a * u[i];
-		}
+			for( size_t i=v.size();i>0;--i) { v[i] = a * u[i]; }
+        }
 		
 		
 		
@@ -200,8 +224,8 @@ namespace yocto
 					z_type sum(0);
 					for( size_t k=n; k>0; --k )
 						sum += lhs_i[k] * rhs[k][j];
-					M_i[j] = sum;
-				}
+                        M_i[j] = sum;
+                        }
 			}
 		}
 		
@@ -222,8 +246,8 @@ namespace yocto
 					z_type sum(0);
 					for( size_t k=n; k>0; --k )
 						sum += lhs[k][i] * rhs[k][j];
-					M_i[j] = sum;
-				}
+                        M_i[j] = sum;
+                        }
 			}
 		}
 		
@@ -247,8 +271,8 @@ namespace yocto
                     const matrix<z_type>::row &rhs_j = rhs[j];
 					for( size_t k=n; k>0; --k )
 						sum += lhs_i[k] * rhs_j[k];
-					M_i[j] = sum;
-				}
+                        M_i[j] = sum;
+                        }
 			}
 		}
 		
@@ -307,7 +331,7 @@ namespace yocto
             z_type ans = numeric<z_type>::zero;
             assert(u.size()==v.size());
             for(size_t i=u.size();i>0;--i) ans += u[i] * v[i];
-            return ans;
+                return ans;
         }
 		
         template <>

@@ -75,11 +75,17 @@ namespace yocto
             //! Reduce dC to a legal step
             /**
              The corresponding concentrations MUST be in C before this call !
+             Use computeDerivatives=0 when computing initial compositions.
              */
-            void legalize_dC( double t );
+            void legalize_dC( double t, bool computeDerivatives=true );
+            
+            
             
             //! scale all equilibrium
             void scale_all( double t ) const throw();
+            
+            //! build a random valid concentration after scaling
+            void trial( urand32 &ran, double t );
             
             friend std::ostream & operator<<( std::ostream &, const equilibria &);
             
