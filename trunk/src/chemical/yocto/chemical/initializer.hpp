@@ -11,18 +11,22 @@ namespace yocto
         //! base type for constraint weights
         typedef map<string,double> constraint_weights;
         
-        
+        //! a constraint
+        /**
+         a constraint is a value plus a linear combination
+         of the concentrations.
+         */
         class constraint : public constraint_weights
         {
         public:
-            double   value;
+            const double   value;
             explicit constraint( const double v );
             virtual ~constraint() throw();
             
             typedef shared_ptr<constraint>   ptr;
             
-            double & operator[]( const string & ); //!< created on the fly
-            double & operator[]( const char   * ); //!< created on the fly
+            double & operator[]( const string & ); //!< weight created on the fly
+            double & operator[]( const char   * ); //!< weight created on the fly
             
             
             const double & operator[](const string &) const; //!< get an existing weight
@@ -45,11 +49,14 @@ namespace yocto
             virtual ~initializer() throw();
             rand32_kiss ran; //!< initialized during construction
             
-            //! append a new constraint, to be filled
+            //! append a new constraint, weights to be filled
             constraint & equals( const double value );
             
-            //! helper: create a simple constraint
+            //! helper: create a simple constraint of a species to a value
             void define( const string &id, const double value);
+            
+            //! wrapper
+            void define( const char *id, const double value );
             
             //! set the electroneutrality
             /**

@@ -81,6 +81,12 @@ namespace yocto
             push_back(p);
         }
         
+        void initializer:: define( const char *id, const double value )
+        {
+            const string ID(id);
+            define(ID,value);
+        }
+
         
         void initializer:: electroneutrality( const collection &lib )
         {
