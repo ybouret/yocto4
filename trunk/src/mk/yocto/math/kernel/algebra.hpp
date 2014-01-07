@@ -16,8 +16,8 @@ namespace yocto
             static void mul(    array<T> &v, T a ) throw();                     //!< v *= a
 			static void set(    array<T> &v, const array<T> &u ) throw();       //!< v = u
 			static void add(    array<T> &v, const array<T> &u ) throw();       //!< v += u
-            static void sub(    array<T> &v, const array<T> &u ) throw();       //!< v -= u
-            static void subp(   array<T> &v, const array<T> &u ) throw();       //!< v -= u; v = -v
+            static void sub(    array<T> &v, const array<T> &u ) throw();       //!< v  = v-u
+            static void subp(   array<T> &v, const array<T> &u ) throw();       //!< v  = u-v
             static void vec(    array<T> &v, const array<T> &a, const array<T> &b) throw(); //!< v = b-a
 			static void muladd( array<T> &v, T a, const array<T> &u ) throw();  //!< v += a * u
 			static void mulset( array<T> &v, T a, const array<T> &u ) throw();  //!< v  = a * u
@@ -66,7 +66,7 @@ namespace yocto
             
             static T dot( const array<T> &u, const array<T> &v ) throw();
             static void normalize( array<T> &v );
-            
+            static T sum( const array<T> &u ) throw();
             
 		};
         
