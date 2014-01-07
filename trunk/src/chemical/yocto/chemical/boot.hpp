@@ -33,8 +33,8 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(constituent);
             };
             
-            typedef key_hasher<string>        hasher_type;
-            typedef memory::pooled::allocator allocator_type;
+            typedef key_hasher<string>                                      hasher_type;
+            typedef memory::pooled::allocator                               allocator_type;
             typedef set<string,constituent::ptr,hasher_type,allocator_type> constituents;
             
             //! a constraint: constituents + values

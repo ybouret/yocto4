@@ -14,7 +14,7 @@ template <typename T>
 static inline void show_values( const char *name )
 {
 	SHOW(epsilon);
-	SHOW(sqrteps);
+	SHOW(sqrt_epsilon);
 	SHOW(minimum);
 	SHOW(maximum);
 	SHOW(pi);
@@ -24,6 +24,7 @@ static inline void show_values( const char *name )
 	SHOW(min_exp);
 	SHOW(max_exp);
     SHOW(tiny);
+    SHOW(sqrt_tiny);
 }
 
 

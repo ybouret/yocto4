@@ -14,15 +14,15 @@ using namespace yocto;
 using namespace math;
 
 
-#define Y_BMOVE_TMX(N)  do {                            \
-memset(arr,rand(),sizeof(arr));                         \
-core::bmove<N>(arr,brr);                                \
-if( H.key<uint64_t>(arr,N)!=H.key<uint64_t>(brr,N) )    \
-throw exception("invalid bmove<%u>",N);                 \
-YOCTO_TIMINGS(chrono,duration,core::bmove<N>(arr,brr)); \
-ios::ocstream fp("mov.dat",true);                       \
-fp("%g %g\n", double(N), 1e-6 * chrono.speed );         \
-std::cerr << "."; std::cerr.flush();                    \
+#define Y_BMOVE_TMX(N)  do {                               \
+memset(arr,rand(),sizeof(arr));                            \
+core::bmove<N>(arr,brr);                                   \
+if( H.key<uint64_t>(arr,N)!=H.key<uint64_t>(brr,N) )       \
+throw exception("invalid bmove<%u>",N);                    \
+YOCTO_TIMINGS(chrono,duration,core::bmove<N>(arr,brr));    \
+ios::ocstream fp("mov.dat",true);                          \
+fp("%g %g\n", double(N), 1e-6 * chrono.speed );            \
+std::cerr << "."; std::cerr.flush();                       \
 } while(false)
 
 YOCTO_UNIT_TEST_IMPL(bmove)
