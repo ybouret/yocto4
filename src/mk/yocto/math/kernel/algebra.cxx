@@ -348,6 +348,15 @@ namespace yocto
             }
             
         }
+        
+        template <>
+        z_type algebra<z_type>:: sum( const array<z_type> &u ) throw()
+        {
+            z_type ans(0);
+            for(size_t i=u.size();i>0;--i) ans += u[i];
+            return ans;
+        }
+
 	}
     
 }

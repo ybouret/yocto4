@@ -54,7 +54,7 @@ namespace yocto
             
             //! wrapper
             equilibrium &add( const char   *name, const double K);
-
+            
             //! default water wrapper
             void add_water( const collection &lib, const double Kw);
             
@@ -69,7 +69,10 @@ namespace yocto
             //! compute Gamma and W=(Phi*nu')^(-1). dGamma/dt if needed
             void compute_Gamma_and_W( double t, bool compute_derivatives);
             
-            //! Newton algorithm to find equilibria
+            //! compute nu'*(Phi*nu')^(-1)*Phi for a NORMALIZED C
+            void compute_Chi(matrix_t &Chi, double t);
+            
+            //! cleanup and Newton algorithm to find equilibria
             void normalize_C( double t );
             
             //! Copy first C.size() variables from y, y.size() >= C.size()

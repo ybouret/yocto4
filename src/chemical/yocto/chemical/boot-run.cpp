@@ -94,81 +94,69 @@ namespace yocto
                     //
                     // algorithm
                     //__________________________________________________________
+                    vector_t dX(M,0);
+
                     // build a random valid concentration set
                     cs.trial(ini.ran, t);
                     std::cerr << "C=" << cs.C << std::endl;
                     std::cerr << std::endl;
                     
                     
-                    vector_t dX(M,0);
+                VIRTUAL_STEP:
+                    //----------------------------------------------------------
+                    // from a normalized C, compute the external source
+                    //----------------------------------------------------------
+                    build_dC();
+                    //std::cerr << "sigma=" << cs.dC << std::endl;
                     
-                    size_t count = 0;
-                    ios::ocstream fp("err.dat",false);
+                    //----------------------------------------------------------
+                    // legalize the source
+                    //----------------------------------------------------------
+                    cs.legalize_dC(t,false);
+                    //std::cerr << "dC   =" << cs.dC << std::endl;
                     
-                    for(;;++count)
+                    //----------------------------------------------------------
+                    // save old position
+                    //----------------------------------------------------------
+                    mkl::set(dX,cs.C);
+                    
+                    //----------------------------------------------------------
+                    // update/clear
+                    //----------------------------------------------------------
+                    mkl::add(cs.C, cs.dC);
+                    cs.cleanup_C();
+                    //std::cerr << "C=" << cs.C << std::endl;
+                    if( mkl::sum(cs.C) <= 0 )
                     {
-                        //------------------------------------------------------
-                        // make a virtual source term
-                        //------------------------------------------------------
-                        build_dC();
-                        
-                        //------------------------------------------------------
-                        // reduce by chemistry
-                        //------------------------------------------------------
-                        cs.legalize_dC(t,false);
-                        std::cerr << "full=" << cs.dC << std::endl;
-                        
-                        //------------------------------------------------------
-                        // find max allowable step
-                        //------------------------------------------------------
-                        const double shrink = step_max();
-                        std::cerr << "shrink=" << shrink << std::endl;
-                        
-                        //------------------------------------------------------
-                        // save starting point
-                        //------------------------------------------------------
-                        mkl::set(dX,cs.C);
-                        
-                        //------------------------------------------------------
-                        // move to new position
-                        //------------------------------------------------------
-                        mkl::muladd(cs.C, shrink, cs.dC);
-                        
-                        //------------------------------------------------------
-                        // normalize the position
-                        //------------------------------------------------------
-                        cs.normalize_C(t); // WARNING: cs.dC is destructed !
-                        std::cerr << "X=" << dX   << std::endl;
-                        std::cerr << "C=" << cs.C << std::endl;
-                        
-                        //------------------------------------------------------
-                        // compute effective motion
-                        //------------------------------------------------------
-                        mkl::sub(dX,cs.C);
-                        mkl::mul(dX,1.0/(FTOL+shrink));
-                        std::cerr << "dC=" << dX << std::endl;
-                        const double err = mkl::norm_infty(dX);
-                        std::cerr << "err=" << err << std::endl;
-                        
-                        //------------------------------------------------------
-                        // check convergence
-                        //------------------------------------------------------
-                        bool converged = true;
-                        for( size_t i=M;i>0;--i)
-                        {
-                            if( fabs(dX[i]) > FTOL * fabs(cs.C[i]) )
-                            {
-                                converged = false;
-                                break;
-                            }
-                        }
-                        if(converged) break;
+                        std::cerr << "Invalid Composition after step!" << std::endl;
+                        exit(1);
                     }
                     
-                    cs.compute_Gamma_and_W(t, false);
-                    std::cerr << "Gamma=" << cs.Gamma << std::endl;
+                    //----------------------------------------------------------
+                    // normalize
+                    //----------------------------------------------------------
+                    cs.normalize_C(t);
+                    std::cerr<< "C=" << cs.C << std::endl;
                     
-                    
+                    //----------------------------------------------------------
+                    //compute effective step
+                    //----------------------------------------------------------
+                    mkl::sub(dX, cs.C);
+                    std::cerr << "dX=" << dX << std::endl;
+                    for(size_t i=M;i>0;--i)
+                    {
+                        double err = fabs(dX[i]);
+                        if(err<=cs.tiny) err=0;
+                        if( err > FTOL * fabs(cs.C[i]))
+                            goto VIRTUAL_STEP;
+                    }
+
+                    //----------------------------------------------------------
+                    // done
+                    //----------------------------------------------------------
+                    std::cerr << "Done" << std::endl;
+                    std::cerr << "C=" << cs.C << std::endl;
+
                 }
                 
                 //! dC = P'*(P*P')^(-1)(Lam - PC)
@@ -181,9 +169,9 @@ namespace yocto
                 }
                 
                 //! find max acceptable step
-                inline double step_max() const throw()
+                inline double step_max(bool &full) const throw()
                 {
-                    bool decreased = false;
+                    assert(true==full);
                     double shrink = 1;
                     for(size_t i=M;i>0;--i)
                     {
@@ -195,34 +183,34 @@ namespace yocto
                             if(D>C)
                             {
                                 shrink  = min_of<double>(shrink,C/D);
-                                decreased = true;
+                                full = false;
                             }
                         }
                     }
-                    if(decreased)
+                    if(!full)
                     {
                         std::cerr << "\t[DECREASED]" << std::endl;
-                    }
-                    else
-                    {
-                        std::cerr << "\t[FULL STEP]" << std::endl;
-                    }
-                    
-                    return shrink;
-                }
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(boot_solver);
-            };
-            
-        }
-        
-        
-        void boot::loader::operator()(equilibria &cs, collection &lib, double t)
-        {
-            boot_solver solve(cs,t,*this,lib);
-        }
-        
-        
-    }
-}
+                        }
+                        else
+                        {
+                            std::cerr << "\t[FULL STEP]" << std::endl;
+                        }
+                        
+                        return shrink;
+                        }
+                        
+                    private:
+                        YOCTO_DISABLE_COPY_AND_ASSIGN(boot_solver);
+                        };
+                        
+                        }
+                        
+                        
+                        void boot::loader::operator()(equilibria &cs, collection &lib, double t)
+                        {
+                            boot_solver solve(cs,t,*this,lib);
+                        }
+                        
+                        
+                        }
+                        }

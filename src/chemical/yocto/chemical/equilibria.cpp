@@ -56,9 +56,11 @@ namespace yocto
             for(size_t i=C.size();i>0;--i)
             {
                 if(C[i]<=tiny) C[i] = 0;
+                
+                assert(C[i]>=0);
             }
         }
-
+        
         
         //! build a random concentration after scaling
         void equilibria:: trial( urand32 &ran, double t)
@@ -267,11 +269,11 @@ namespace yocto
         void equilibria:: normalize_C( double t )
         {
             const size_t N = nu.rows;
+            cleanup_C();
             if(N>0)
             {
                 
                 const size_t M = nu.cols;
-                cleanup_C();
                 
             NEWTON_STEP:
                 compute_Gamma_and_W(t,false);
@@ -325,6 +327,20 @@ namespace yocto
             for(size_t i=C.size();i>0;--i) y[i] = C[i];
         }
         
+        
+        void equilibria:: compute_Chi(matrix_t &Chi, double t)
+        {
+            const size_t M = C.size();
+            Chi.make(M,M);
+            const size_t N = nu.rows;
+            if(N>0)
+            {
+                compute_Gamma_and_W(t,false);
+                matrix_t tmpPhi(Phi);
+                LU.solve(W, tmpPhi);
+                mkl::mul_ltrn(Chi, nu, tmpPhi);
+            }
+        }
         
         
     }
