@@ -28,8 +28,8 @@ YOCTO_UNIT_TEST_IMPL(lua)
     
     std::cerr  << cs << std::endl;
     
-    chemical::initializer ini;
-    chemical:: _lua::load(L,ini,"ini");
+    chemical::boot::loader ini;
+    chemical:: _lua::load(L,ini,"ini",lib);
     ini.electroneutrality(lib);
 
     std::cerr << ini << std::endl;

@@ -42,9 +42,9 @@ YOCTO_UNIT_TEST_IMPL(dosage)
     //--------------------------------------------------------------------------
     // prepare the initializer
     //--------------------------------------------------------------------------
-    chemical::initializer ini;
+    chemical::boot::loader ini;
     ini.electroneutrality(lib);
-    chemical:: _lua::load(L,ini,"ini");
+    chemical:: _lua::load(L,ini,"ini",lib);
     
     std::cerr << ini << std::endl;
     

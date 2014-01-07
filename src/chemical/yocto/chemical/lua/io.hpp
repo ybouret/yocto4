@@ -1,7 +1,6 @@
 #ifndef YOCTO_CHEMICAL_LUA_IO_INCLUDED
 #define YOCTO_CHEMICAL_LUA_IO_INCLUDED 1
 
-#include "yocto/chemical/initializer.hpp"
 #include "yocto/chemical/boot.hpp"
 #include "yocto/chemical/effector.hpp"
 
@@ -61,22 +60,6 @@ namespace yocto
             
             //! wrapper
             static void load( lua_State *L, const collection &lib, equilibria &cs, const char   *name );
-
-            //__________________________________________________________________
-            //
-            // initializer API
-            //__________________________________________________________________
-
-            //! append constraints to an initializer
-            /**
-             \param L a valid lua_State
-             \param ini an initializer
-             \param name the name of the lua table
-             */
-            static void load( lua_State *L, initializer &ini, const string &name );
-            
-            //! wrapper
-            static void load( lua_State *L, initializer &ini, const char   *name );
 
             
             //__________________________________________________________________

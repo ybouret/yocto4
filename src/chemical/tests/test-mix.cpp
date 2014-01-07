@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/chemical/initializer.hpp"
+#include "yocto/chemical/boot.hpp"
 #include "yocto/chemical/solution.hpp"
 #include "yocto/string/conv.hpp"
 #include "yocto/ios/ocstream.hpp"
@@ -31,15 +31,11 @@ YOCTO_UNIT_TEST_IMPL(mix)
     chemical::solution Sa(lib);
     
     {
-        chemical::initializer ini_acid;
+        chemical::boot::loader ini_acid;
         ini_acid.electroneutrality(lib);
-        ini_acid.define("Cl-", 0.0);
-        ini_acid.define("Na+", 0.0);
-        {
-            chemical::constraint &all_acid = ini_acid.equals(Ca);
-            all_acid["AcH"] = 1;
-            all_acid["Ac-"] = 1;
-        }
+        ini_acid.define( lib["Cl-"], 0.0);
+        ini_acid.define( lib["Na+"], 0.0);
+        ini_acid.conserve( lib["AcH"], lib["Ac-"], Ca);
         
         ini_acid(cs,lib,0);
         std::cerr << "C=" << cs.C << std::endl;
@@ -51,15 +47,11 @@ YOCTO_UNIT_TEST_IMPL(mix)
     chemical::solution Sb(lib);
     
     {
-        chemical::initializer ini_base;
+        chemical::boot::loader ini_base;
         ini_base.electroneutrality(lib);
-        {
-            chemical::constraint &all_acid = ini_base.equals(0.0);
-            all_acid["AcH"] = 1;
-            all_acid["Ac-"] = 1;
-        }
-        ini_base.define("Cl-", 0.0);
-        ini_base.define("Na+", Ca);
+        ini_base.conserve( lib["AcH"], lib["Ac-"], 0);
+        ini_base.define( lib["Cl-"], 0.0);
+        ini_base.define( lib["Na+"], Ca);
         ini_base(cs,lib,0);
         Sb.load(cs.C);
         std::cerr << "Sb="    << Sb << std::endl;
@@ -73,7 +65,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
     chemical::solution S(lib);
     
     vector<double> W(2,0.0);
-   
+    
     ios::ocstream fp("mix.dat",false);
     const size_t N  = 100;
     const double Va =  20;
