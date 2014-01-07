@@ -43,21 +43,22 @@ namespace yocto
 		template <typename T>
 		struct numeric
 		{
-			static const T epsilon;
-			static const T sqrteps;
-			static const T minimum;
-			static const T maximum;
-			static const T pi;
-			static const T two_pi;
+			static const T      epsilon;
+			static const T      sqrt_epsilon;
+			static const T      minimum;
+			static const T      maximum;
+			static const T      pi;
+			static const T      two_pi;
 			static const size_t dig;
 			static const T      ftol;
 			static const T      min_exp;
 			static const T      max_exp;
 			static const T      min_10_exp;
 			static const T      max_10_exp;
-			static const T      tiny; //!< 10^{min_10_exp}
-			static const T      huge; //!< 10^{max_10_exp}
-			
+			static const T      tiny;      //!< 10^{min_10_exp}
+			static const T      huge;      //!< 10^{max_10_exp}
+			static const T      sqrt_tiny;
+            
 			typedef functor<T,TL1(T)>                            function;
             typedef functor<T,TL2(T,T)>                          function2;
 

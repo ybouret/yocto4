@@ -42,9 +42,12 @@ namespace yocto
 			template <typename T>
 			inline T key() throw() { T k(0); get( &k, sizeof(k) ); return k; }
 			
+            
+            //! reset/run/key
 			template <typename T>
 			inline T key( const void *buffer, size_t buflen ) throw() { set(); run(buffer,buflen); return key<T>(); }
 			
+            //! reset/run/key
 			template <typename T>
 			inline T key( const memory::ro_buffer &buf ) throw() { set(); (*this)(buf); return key<T>(); }
 			

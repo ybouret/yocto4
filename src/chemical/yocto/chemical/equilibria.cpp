@@ -26,7 +26,8 @@ namespace yocto
         temperature(standard_temperature),
         ftol( numeric<double>::ftol ),
         time_scale(1e-4),
-        tiny( numeric<double>::tiny ),
+        tiny(  numeric<double>::tiny ),
+        sqrt_tiny( numeric<double>::sqrt_tiny ),
         C(),
         dC(),
         nuR(),
@@ -50,6 +51,15 @@ namespace yocto
             }
         }
         
+        void equilibria:: cleanup_C() throw()
+        {
+            for(size_t i=C.size();i>0;--i)
+            {
+                if(C[i]<=tiny) C[i] = 0;
+            }
+        }
+
+        
         //! build a random concentration after scaling
         void equilibria:: trial( urand32 &ran, double t)
         {
@@ -59,10 +69,7 @@ namespace yocto
             {
                 (**eq).append(C,ran);
             }
-            
             normalize_C(t);
-            for(size_t i=C.size();i>0;--i) C[i] = max_of<double>(C[i],0);
-
             
         }
         
@@ -171,7 +178,7 @@ namespace yocto
                         }
                     }
                     
-                    std::cerr << "nu=" << nu << std::endl;
+                    //std::cerr << "nu=" << nu << std::endl;
                     
                 }
             }
@@ -263,12 +270,8 @@ namespace yocto
             if(N>0)
             {
                 
-                
                 const size_t M = nu.cols;
-                for(size_t i=M;i>0;--i)
-                {
-                    C[i] = max_of<double>(0,C[i]);
-                }
+                cleanup_C();
                 
             NEWTON_STEP:
                 compute_Gamma_and_W(t,false);
@@ -276,12 +279,7 @@ namespace yocto
                 LU.solve(W, xi);
                 mkl::mul_trn(dC, nu, xi);
                 mkl::sub(C, dC);
-                //std::cerr.flush();
-                //std::cerr << "// Newton tiny=" << tiny << "/" << numeric<double>::tiny << std::endl;
-                //std::cerr << "C=" << C << std::endl;
-                //std::cerr << "//iter=" << iter << std::endl;
-                //std::cerr << "Gamma=" << Gamma << std::endl;
-                //std::cerr << "dC=" << dC << std::endl;
+                
                 
                 bool converged = true;
                 for(size_t i=M;i>0;--i)
@@ -310,12 +308,10 @@ namespace yocto
                 mkl::mulsub_trn(dC, nu, dtGam);
                 for(size_t i=dC.size();i>0;--i)
                 {
-                    if( fabs(dC[i]) <= tiny ) dC[i] = 0;
+                    if( fabs(dC[i]) <= sqrt_tiny ) dC[i] = 0;
                 }
             }
         }
-        
-        
         
         void equilibria:: load_C( const array<double> &y ) throw()
         {

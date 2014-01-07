@@ -4,6 +4,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/ios/ocstream.hpp"
 
+
 namespace yocto
 {
     namespace chemical
@@ -44,6 +45,7 @@ namespace yocto
                 P2(),
                 LU()
                 {
+                    
                     static const double FTOL = math::numeric<double>::ftol;
                     if( Nc+N != M )
                         throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
@@ -102,6 +104,7 @@ namespace yocto
                     
                     size_t count = 0;
                     ios::ocstream fp("err.dat",false);
+                    
                     for(;;++count)
                     {
                         //------------------------------------------------------
@@ -125,7 +128,7 @@ namespace yocto
                         // save starting point
                         //------------------------------------------------------
                         mkl::set(dX,cs.C);
-
+                        
                         //------------------------------------------------------
                         // move to new position
                         //------------------------------------------------------
@@ -138,13 +141,14 @@ namespace yocto
                         std::cerr << "X=" << dX   << std::endl;
                         std::cerr << "C=" << cs.C << std::endl;
                         
-                        
                         //------------------------------------------------------
                         // compute effective motion
                         //------------------------------------------------------
                         mkl::sub(dX,cs.C);
                         mkl::mul(dX,1.0/(FTOL+shrink));
                         std::cerr << "dC=" << dX << std::endl;
+                        const double err = mkl::norm_infty(dX);
+                        std::cerr << "err=" << err << std::endl;
                         
                         //------------------------------------------------------
                         // check convergence
@@ -179,6 +183,7 @@ namespace yocto
                 //! find max acceptable step
                 inline double step_max() const throw()
                 {
+                    bool decreased = false;
                     double shrink = 1;
                     for(size_t i=M;i>0;--i)
                     {
@@ -190,9 +195,19 @@ namespace yocto
                             if(D>C)
                             {
                                 shrink  = min_of<double>(shrink,C/D);
+                                decreased = true;
                             }
                         }
                     }
+                    if(decreased)
+                    {
+                        std::cerr << "\t[DECREASED]" << std::endl;
+                    }
+                    else
+                    {
+                        std::cerr << "\t[FULL STEP]" << std::endl;
+                    }
+                    
                     return shrink;
                 }
                 

@@ -26,7 +26,10 @@ namespace yocto
             double temperature;
             double ftol;       //!< for Newton Convergence
             double time_scale; //!< for time derivatives, default is 1e-4
-            const double tiny;
+            
+            const double tiny;      //!< numeric cutoff: numeric<double>::tiny
+            const double sqrt_tiny; //!< numeric RMS cutoff: numeric<double>::sqrt_tiny
+            
             
             vector_t     C;     //!< local concentrations
             vector_t     dC;    //!< corrections
@@ -52,11 +55,14 @@ namespace yocto
             //! wrapper
             equilibrium &add( const char   *name, const double K);
 
+            //! default water wrapper
             void add_water( const collection &lib, const double Kw);
+            
+            //! default acid wrapper
             void add_acid( const collection &lib, const char *name, const char *acid, const char *base, const double Ka );
             
             
-            //! compute Ganna and Phi, dGamma/dt if needed
+            //! compute Gamma and Phi, dGamma/dt if needed
             void compute_Gamma_and_Phi( double t, bool compute_derivatives);
             
             
@@ -75,10 +81,9 @@ namespace yocto
             //! Reduce dC to a legal step
             /**
              The corresponding concentrations MUST be in C before this call !
-             Use computeDerivatives=0 when computing initial compositions.
+             Use computeDerivatives=false when computing initial compositions.
              */
             void legalize_dC( double t, bool computeDerivatives=true );
-            
             
             
             //! scale all equilibrium
@@ -88,6 +93,9 @@ namespace yocto
             void trial( urand32 &ran, double t );
             
             friend std::ostream & operator<<( std::ostream &, const equilibria &);
+            
+            //! test for positive/cutoff C
+            void cleanup_C() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
