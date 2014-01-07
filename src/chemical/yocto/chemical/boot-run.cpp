@@ -82,7 +82,7 @@ namespace yocto
                     std::cerr << "P=" << P << std::endl;
                     std::cerr << "Lam=" << Lam << std::endl;
                     mkl::mul_rtrn(P2, P, P);
-                    std::cerr << "P2=" << P2 << std::endl;
+                    //std::cerr << "P2=" << P2 << std::endl;
                     if( !LU.build(P2) )
                         throw exception("singular chemical constraints");
                     
@@ -94,15 +94,19 @@ namespace yocto
                     //
                     // algorithm
                     //__________________________________________________________
+                    static const size_t MAX_STEP_PER_SPECIES = 4;
+                    const size_t steps_before_rms = max_of<size_t>(2,MAX_STEP_PER_SPECIES * M);
+                    
                     vector_t dX(M,0);
-
+                    
+                INITIALIZE:
                     // build a random valid concentration set
                     cs.trial(ini.ran, t);
-                    std::cerr << "C=" << cs.C << std::endl;
-                    std::cerr << std::endl;
-                    
+                    size_t count   =  0;
+                    double old_rms = -1;
                     
                 VIRTUAL_STEP:
+                    ++count;
                     //----------------------------------------------------------
                     // from a normalized C, compute the external source
                     //----------------------------------------------------------
@@ -113,7 +117,7 @@ namespace yocto
                     // legalize the source
                     //----------------------------------------------------------
                     cs.legalize_dC(t,false);
-                    //std::cerr << "dC   =" << cs.dC << std::endl;
+                    //std::cerr << "dC=" << cs.dC << std::endl;
                     
                     //----------------------------------------------------------
                     // save old position
@@ -125,24 +129,39 @@ namespace yocto
                     //----------------------------------------------------------
                     mkl::add(cs.C, cs.dC);
                     cs.cleanup_C();
-                    //std::cerr << "C=" << cs.C << std::endl;
                     if( mkl::sum(cs.C) <= 0 )
                     {
                         std::cerr << "Invalid Composition after step!" << std::endl;
-                        exit(1);
+                        goto INITIALIZE;
                     }
                     
                     //----------------------------------------------------------
                     // normalize
                     //----------------------------------------------------------
                     cs.normalize_C(t);
-                    std::cerr<< "C=" << cs.C << std::endl;
+                    //std::cerr<< "C=" << cs.C << std::endl;
                     
                     //----------------------------------------------------------
                     //compute effective step
                     //----------------------------------------------------------
                     mkl::sub(dX, cs.C);
-                    std::cerr << "dX=" << dX << std::endl;
+                    //std::cerr << "dX=" << dX << std::endl;
+                    
+                    //----------------------------------------------------------
+                    //check cycling
+                    //----------------------------------------------------------
+                    const double rms = __RMS(dX);
+                    if(count>steps_before_rms)
+                    {
+                        assert(old_rms>=0);
+                        if(rms>=old_rms)
+                            goto FINALIZE;
+                    }
+                    old_rms = rms;
+                    
+                    //----------------------------------------------------------
+                    //check convergence
+                    //----------------------------------------------------------
                     for(size_t i=M;i>0;--i)
                     {
                         double err = fabs(dX[i]);
@@ -150,12 +169,38 @@ namespace yocto
                         if( err > FTOL * fabs(cs.C[i]))
                             goto VIRTUAL_STEP;
                     }
-
-                    //----------------------------------------------------------
+                   
+                FINALIZE:
+                    //__________________________________________________________
+                    //
                     // done
-                    //----------------------------------------------------------
-                    std::cerr << "Done" << std::endl;
-                    std::cerr << "C=" << cs.C << std::endl;
+                    //__________________________________________________________
+                    //std::cerr << "Done" << std::endl;
+                    //std::cerr << "Cn=" << cs.C << std::endl;
+                    
+                    //__________________________________________________________
+                    //
+                    // Check Errors for rounding
+                    //__________________________________________________________
+                    build_dC();
+                    vector_t &Y = cs.dC;
+                    //std::cerr << "Y1=" << Y << std::endl;
+                    for(size_t i=M;i>0;--i)
+                    {
+                        double err = fabs(Y[i]);
+                        if(err>0)
+                        {
+                            err = pow(10,ceil(log10(err)));
+                        }
+                        Y[i] = err;
+                    }
+                    //std::cerr << "Y2=" << Y << std::endl;
+                    for(size_t i=M;i>0;--i)
+                    {
+                        if( cs.C[i] <= Y[i] ) cs.C[i] = 0;
+                    }
+                    cs.normalize_C(t);
+                    //std::cerr << "C=" << cs.C << std::endl;
 
                 }
                 
@@ -168,49 +213,30 @@ namespace yocto
                     mkl::mul_trn(cs.dC,P,Mu); // dC = P'*(P*P')^(-1)(Lam - PC)
                 }
                 
-                //! find max acceptable step
-                inline double step_max(bool &full) const throw()
+                static inline double __RMS(const array<double> &v) throw()
                 {
-                    assert(true==full);
-                    double shrink = 1;
-                    for(size_t i=M;i>0;--i)
+                    double rms = 0;
+                    const size_t n = v.size();
+                    for(size_t i=n;i>0;--i)
                     {
-                        const double dC = cs.dC[i];
-                        if( dC < 0 )
-                        {
-                            const double D  = -dC;     assert(D>0);
-                            const double C  = cs.C[i];
-                            if(D>C)
-                            {
-                                shrink  = min_of<double>(shrink,C/D);
-                                full = false;
-                            }
-                        }
+                        const double tmp = v[i];
+                        rms += tmp * tmp;
                     }
-                    if(!full)
-                    {
-                        std::cerr << "\t[DECREASED]" << std::endl;
-                        }
-                        else
-                        {
-                            std::cerr << "\t[FULL STEP]" << std::endl;
-                        }
-                        
-                        return shrink;
-                        }
-                        
-                    private:
-                        YOCTO_DISABLE_COPY_AND_ASSIGN(boot_solver);
-                        };
-                        
-                        }
-                        
-                        
-                        void boot::loader::operator()(equilibria &cs, collection &lib, double t)
-                        {
-                            boot_solver solve(cs,t,*this,lib);
-                        }
-                        
-                        
-                        }
-                        }
+                    return sqrt(rms/n);
+                }
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(boot_solver);
+            };
+            
+        }
+        
+        
+        void boot::loader::operator()(equilibria &cs, collection &lib, double t)
+        {
+            boot_solver solve(cs,t,*this,lib);
+        }
+        
+        
+    }
+}

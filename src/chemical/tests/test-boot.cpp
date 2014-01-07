@@ -80,7 +80,6 @@ YOCTO_UNIT_TEST_IMPL(boot)
     std::cerr << std::endl;
     
     
-#if 0
     if( argc > 1)
     {
         Lua::State VM;
@@ -91,11 +90,20 @@ YOCTO_UNIT_TEST_IMPL(boot)
         chemical::_lua::load(L, lib, "species");
         std::cerr << lib << std::endl;
         
+        chemical::equilibria cs;
+        chemical::_lua::load(L, lib, cs, "eqs");
+        
         chemical::boot::loader ini;
+        ini.electroneutrality(lib);
         chemical::_lua::load(L, ini, "ini", lib);
         std::cerr << ini << std::endl;
+        
+        ini(cs,lib,0.0);
+        chemical::solution S(lib);
+        S.load(cs.C);
+        std::cerr << S << std::endl;
+        
     }
-#endif
     
     
 }

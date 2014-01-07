@@ -92,7 +92,7 @@ namespace yocto
         
         std::ostream & operator<<( std::ostream &os, const boot::loader &ld)
         {
-            static const size_t nn = 64;
+            static const size_t nn = 63;
             os << '/'; for(size_t i=nn;i>0;--i) os << '-'; os << std::endl;
             for(size_t i=1; i <= ld.size();++i)
             {
