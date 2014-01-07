@@ -32,10 +32,10 @@ namespace
         ODE_CB                cb;
         size_t                calls;
         
-        explicit ChemDiff(chemical::collection  &lib,
-                          chemical::equilibria  &user_cs,
-                          chemical::effectors   &user_eff,
-                          chemical::initializer &ini
+        explicit ChemDiff(chemical::collection   &lib,
+                          chemical::equilibria   &user_cs,
+                          chemical::effectors    &user_eff,
+                          chemical::boot::loader &ini
                           ) : ODE_Solver(1e-7),
         cs(user_cs),
         eff(user_eff),
@@ -129,8 +129,8 @@ YOCTO_UNIT_TEST_IMPL(diff)
     
     std::cerr  << cs << std::endl;
     
-    chemical::initializer ini;
-    chemical:: _lua::load(L,ini,"ini");
+    chemical::boot::loader ini;
+    chemical:: _lua::load(L,ini,"ini",lib);
     ini.electroneutrality(lib);
     
     std::cerr << ini << std::endl;
