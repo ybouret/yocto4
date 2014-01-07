@@ -55,12 +55,33 @@ namespace yocto
                     // initializing stuff
                     //__________________________________________________________
                     cs.build_from(lib);
+                    
+                    //__________________________________________________________
+                    //
+                    // no species
+                    //__________________________________________________________
                     if(M<=0)
                         return;
                     
+                    //__________________________________________________________
+                    //
+                    // no equilbrium
+                    //__________________________________________________________
                     if(N<=0)
                     {
-                        
+                        assert(Nc==M);
+                        //------------------------------------------------------
+                        // the P matrix squared
+                        //------------------------------------------------------
+                        P.make(M,M);
+                        LU.ensure(M);
+                        ini.fill(P, cs.C);
+                        std::cerr << "P=" << P << std::endl;
+                        std::cerr << "Lam=" << cs.C << std::endl;
+                        if( !LU.build(P) )
+                            throw exception("invalid chemical constraints");
+                        LU.solve(P,cs.C);
+                        cs.cleanup_C();
                         return;
                     }
                     
