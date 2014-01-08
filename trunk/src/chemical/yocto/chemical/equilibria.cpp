@@ -150,15 +150,15 @@ namespace yocto
                     //----------------------------------------------------------
                     // allocate memory
                     //----------------------------------------------------------
-                    nuR.make(N,M);
-                    nuP.make(N,M);
-                    nu.make(N,M);
-                    Gamma.make(N,0);
-                    dtGam.make(N,0);
-                    Phi.make(N,M);
-                    W.make(N,N);
-                    xi.make(N,0);
-                    LU.ensure(N);
+                    nuR.   make(N,M);
+                    nuP.   make(N,M);
+                    nu.    make(N,M);
+                    Gamma. make(N,0);
+                    dtGam. make(N,0);
+                    Phi.   make(N,M);
+                    W.     make(N,N);
+                    xi.    make(N,0);
+                    LU.    ensure(N);
                     
                     //----------------------------------------------------------
                     // compute topological parts
@@ -243,7 +243,7 @@ namespace yocto
                     
                 }
                 Gamma[i] = Ki * lhs - rhs;
-                dtGam[i]  = 0;
+                dtGam[i] = 0;
                 if(compute_derivatives)
                 {
                     dtGam[i] = dervs( Eq.K, t, time_scale ) * lhs;
