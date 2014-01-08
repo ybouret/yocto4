@@ -103,11 +103,13 @@ namespace yocto
                     std::cerr << "P=" << P << std::endl;
                     std::cerr << "Lam=" << Lam << std::endl;
                     mkl::mul_rtrn(P2, P, P);
-                    //std::cerr << "P2=" << P2 << std::endl;
                     if( !LU.build(P2) )
                         throw exception("singular chemical constraints");
                     
+                    //__________________________________________________________
+                    //
                     // scale all reactions
+                    //__________________________________________________________
                     cs.scale_all(t);
                     
                     
@@ -118,10 +120,16 @@ namespace yocto
                     static const size_t MAX_STEP_PER_SPECIES = 4;
                     const size_t steps_before_rms = max_of<size_t>(2,MAX_STEP_PER_SPECIES * M);
                     
+                    static const size_t MAX_FAILURES = 10;
+                    size_t num_failures = 0;
+                    
                     vector_t dX(M,0);
                     
                 INITIALIZE:
                     // build a random valid concentration set
+                    if(num_failures>MAX_FAILURES)
+                        throw exception("too many failures in chemical boot: check constraints");
+                    
                     cs.trial(ini.ran, t);
                     size_t count   =  0;
                     double old_rms = -1;
@@ -153,6 +161,7 @@ namespace yocto
                     if( mkl::sum(cs.C) <= 0 )
                     {
                         std::cerr << "Invalid Composition after step!" << std::endl;
+                        ++num_failures;
                         goto INITIALIZE;
                     }
                     
