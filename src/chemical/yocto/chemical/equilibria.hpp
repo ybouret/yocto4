@@ -67,12 +67,18 @@ namespace yocto
             
             
             //! compute Gamma and W=(Phi*nu')^(-1). dGamma/dt if needed
-            void compute_Gamma_and_W( double t, bool compute_derivatives);
+            void compute_Gamma_and_W( double t, bool compute_derivatives, const matrix_t &Nu);
             
             //! compute nu'*(Phi*nu')^(-1)*Phi for a NORMALIZED C
             void compute_Chi(matrix_t &Chi, double t);
             
+            //! use Newton's algorithm with a Nu matrix
+            void normalize_with( const matrix_t &Nu, double t );
+            
             //! cleanup and Newton algorithm to find equilibria
+            /**
+             use the total nu matrix.
+             */
             void normalize_C( double t );
             
             //! Copy first C.size() variables from y, y.size() >= C.size()
@@ -81,11 +87,17 @@ namespace yocto
             //! Copy first C.size() variables into y, y.size() >= C.size()
             void save_C( array<double> &y ) const throw();
             
-            //! Reduce dC to a legal step
+            //! reduce dC to a legal step
             /**
              The corresponding concentrations MUST be in C before this call !
              Use computeDerivatives=false when computing initial compositions.
              */
+            void legalize_with( const matrix_t &Nu, double t, bool computeDerivatives);
+            
+            //! Reduce dC to a legal step
+            /**
+             use the total nu matrix, with derivatives by default.
+            */
             void legalize_dC( double t, bool computeDerivatives=true );
             
             
@@ -103,6 +115,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
             math::derivative<double> dervs;
+            
+            
         };
         
         

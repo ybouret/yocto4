@@ -32,8 +32,10 @@ namespace yocto
                 vector<bool> fixed;
                 vector_t     X;
                 matrix_t     Q;
-                matrix_t     Sig;
-                matrix_t     nu;
+                vector_t     Sig;
+                matrix_t     Nu;
+                matrix_t     Q2;
+                vector_t     Mu;
                 
                 boot_solver(equilibria       &usr_cs,
                             const double      usr_t,
@@ -53,19 +55,21 @@ namespace yocto
                 X(),
                 Q(),
                 Sig(),
-                nu()
+                Nu(),
+                Q2(),
+                Mu()
                 {
                     if( Nc+N != M )
                         throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
                     //__________________________________________________________
                     //
-                    // initializing stuff
+                    // initializing equilibria resources
                     //__________________________________________________________
                     cs.build_from(lib);
                     
                     //__________________________________________________________
                     //
-                    // no species
+                    // no species...
                     //__________________________________________________________
                     if(M<=0)
                         return;
@@ -78,7 +82,7 @@ namespace yocto
                     {
                         assert(Nc==M);
                         //------------------------------------------------------
-                        // the P matrix squared
+                        // the P matrix is square
                         //------------------------------------------------------
                         P.make(M,M);
                         LU.ensure(M);
@@ -111,43 +115,54 @@ namespace yocto
                     //
                     // reducing system
                     //__________________________________________________________
-                    std::cerr << "Reducing System" << std::endl;
+                    std::cerr << "Reducing System D.O.F." << std::endl;
                     fixed.make(M,0);
                     X    .make(M,0);
-                    matrix_t Q;
-                    vector_t Sig;
                     (size_t&)dof = ini.dispatch(Q, Sig, fixed, X);
                     if(dof<=0)
                         throw exception("#DOF should be positive in chemical::boot");
-                    std::cerr << "#dof=" << dof << std::endl;
-                    std::cerr << "Q="   << Q   << std::endl;
-                    std::cerr << "Sig=" << Sig << std::endl;
-                    std::cerr << "fixed=" << fixed << std::endl;
-                    std::cerr << "X="     << X  << std::endl;
                     
-                    nu = cs.nu;
-                    std::cerr << "nu0=" << nu << std::endl;
+                    std::cerr << "#dof="  << dof   << std::endl;
+                    std::cerr << "Q="     << Q     << std::endl;
+                    std::cerr << "Sig="   << Sig   << std::endl;
+                    std::cerr << "fixed=" << fixed << std::endl;
+                    std::cerr << "X="     << X     << std::endl;
+                    
                     
                     //__________________________________________________________
                     //
-                    // compute the restricted nu matrix
+                    // compute the restricted nu matrix:
+                    // erase the fixed components coefficients
                     //__________________________________________________________
-                    assert(nu.rows==N);
+                    Nu = cs.nu;
+                    assert(Nu.rows==N);
+                    assert(Nu.cols==M);
                     for(size_t i=1;i<=N;++i)
                     {
                         for(size_t j=1;j<=M;++j)
                         {
-                            if(fixed[j]) nu[i][j] = 0;
+                            if(fixed[j]) Nu[i][j] = 0;
                         }
                     }
-                    std::cerr << "nu=" << nu << std::endl;
+                    std::cerr << "nu=" << cs.nu << std::endl;
+                    std::cerr << "Nu=" << Nu << std::endl;
                     
+                    Q2.make(dof,dof);
+                    mkl::mul_rtrn(Q2, Q, Q);
+                    if( !LU.build(Q2) )
+                        throw exception("unexpected singular reduced constraints");
+                    Mu.make(dof,0);
+                    
+                    //__________________________________________________________
+                    //
+                    // scale concentrations
+                    //__________________________________________________________
+                    cs.scale_all(t);
                     
                     //__________________________________________________________
                     //
                     // compute a starting point
                     //__________________________________________________________
-                    cs.scale_all(t);
                     cs.trial(ini.ran,t);
                     for(size_t i=1;i<=M;++i)
                     {
@@ -157,9 +172,21 @@ namespace yocto
                         }
                     }
                     std::cerr << "C=" << cs.C << std::endl;
+                    cs.normalize_with(Nu,t);
+                    std::cerr << "C=" << cs.C << std::endl;
+                    
                     
                 }
                 
+                
+                //! sigma = Q' * (Q*Q')^(-1)(Sig-Q*C)
+                void build_sigma( const array<double> &C)
+                {
+                    mkl::mul(Mu, Q, C);
+                    mkl::subp(Mu,Sig);
+                    LU.solve(Q2, Mu);
+                    mkl::mul_trn(cs.dC, Q, Mu);
+                }
                 
                 
 #if 0
