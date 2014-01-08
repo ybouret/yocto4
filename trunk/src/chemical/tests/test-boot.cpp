@@ -135,6 +135,10 @@ YOCTO_UNIT_TEST_IMPL(boot1)
     ini.define( lib["Cl-"], 0.001 );
     ini.define( lib["Na+"], 0.001 );
     
+    std::cerr << lib << std::endl;
+    std::cerr << cs  << std::endl;
+    std::cerr << ini << std::endl;
+    
     ini(cs,lib,0);
     
     chemical::solution S(lib);
@@ -180,6 +184,46 @@ YOCTO_UNIT_TEST_IMPL(boot1)
         std::cerr << "S=" << S << std::endl;
         std::cerr << "pH=" << S.pH() << std::endl;
         
+        
+        
+    }
+    YOCTO_UNIT_TEST_DONE()
+    
+    
+    YOCTO_UNIT_TEST_IMPL(bootH)
+    {
+        double C0 = 1e-4;
+        if( argc > 1 )
+        {
+            C0 = strconv::to_double(argv[1],"C0");
+        }
+        
+        chemical::collection lib;
+        
+        lib.add("H+");
+        lib.add("HO-");
+        lib.add("Na+");
+        lib.add("Cl-");
+        lib.add("AcH", 0);
+        lib.add("Ac-",-1);
+        
+        
+        chemical::equilibria cs;
+        cs.add_water(lib, 1e-14);
+        cs.add_acid(lib, "Ac", "AcH", "Ac-", pow(10,-4.78) );
+        
+        chemical::boot::loader ini;
+        ini.electroneutrality(lib);
+        ini.conserve( lib["AcH"], lib["Ac-"], C0);
+        ini.define( lib["Cl-"], 5e-4 );
+        ini.define( lib["H+"],  pow(10,-7.0) );
+        
+        std::cerr << lib << std::endl;
+        std::cerr << cs  << std::endl;
+        std::cerr << ini << std::endl;
+        
+        ini(cs,lib,0);
+
         
     }
     YOCTO_UNIT_TEST_DONE()

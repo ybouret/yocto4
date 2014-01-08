@@ -84,13 +84,21 @@ namespace yocto
                 //! electroneutrality: disabled is no charged species
                 void electroneutrality( const collection &lib );
                 
-                //! compute matrix and constraint vector
+                //! compute full matrix and constraint vector
                 /**
                  \param P a matrix MxNc (M is the lib.size)
                  \param Lam a vector Nc
                  \warning the collection must have updated indices !
                  */
                 void fill( matrix_t &P, array<double> &Lam) const throw();
+                
+                
+                //! create a reduced matrix of constraints
+                /**
+                 \return the remaining degreess of freedom
+                 */
+                size_t dispatch( matrix_t &Q, vector_t &Sig, array<bool> &fixed, array<double> &C ) const;
+                
                 
                 //! initialize
                 void operator()( equilibria &cs, collection &lib, double t);

@@ -26,10 +26,143 @@ namespace yocto
                 const size_t Nc; //!< ini.size
                 matrix_t     P;
                 vector_t     Lam;
-                vector_t     Mu;  //!< to store PX
                 matrix_t     P2; //!< P*P' then LU
                 lu_t         LU;
+                const size_t dof;
+                vector<bool> fixed;
+                vector_t     X;
+                matrix_t     Q;
+                matrix_t     Sig;
+                matrix_t     nu;
                 
+                boot_solver(equilibria       &usr_cs,
+                            const double      usr_t,
+                            boot::loader     &ini,
+                            collection       &lib ) :
+                cs(usr_cs),
+                t(usr_t),
+                M( lib.size() ),
+                N( cs.size()  ),
+                Nc( ini.size() ),
+                P(),
+                Lam(),
+                P2(),
+                LU(),
+                dof(0),
+                fixed(),
+                X(),
+                Q(),
+                Sig(),
+                nu()
+                {
+                    if( Nc+N != M )
+                        throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
+                    //__________________________________________________________
+                    //
+                    // initializing stuff
+                    //__________________________________________________________
+                    cs.build_from(lib);
+                    
+                    //__________________________________________________________
+                    //
+                    // no species
+                    //__________________________________________________________
+                    if(M<=0)
+                        return;
+                    
+                    //__________________________________________________________
+                    //
+                    // no equilibrium
+                    //__________________________________________________________
+                    if(N<=0)
+                    {
+                        assert(Nc==M);
+                        //------------------------------------------------------
+                        // the P matrix squared
+                        //------------------------------------------------------
+                        P.make(M,M);
+                        LU.ensure(M);
+                        ini.fill(P, cs.C);
+                        std::cerr << "P=" << P << std::endl;
+                        std::cerr << "Lam=" << cs.C << std::endl;
+                        if( !LU.build(P) )
+                            throw exception("invalid chemical constraints");
+                        LU.solve(P,cs.C);
+                        cs.cleanup_C();
+                        return;
+                    }
+
+                    //__________________________________________________________
+                    //
+                    // checking rank
+                    //__________________________________________________________
+                    P   .make(Nc,M);
+                    Lam .make(Nc,0.0);
+                    P2  .make(Nc,Nc);
+                    LU  .ensure(Nc);
+                    ini.fill(P, Lam);
+                    std::cerr << "P="   << P   << std::endl;
+                    std::cerr << "Lam=" << Lam << std::endl;
+                    mkl::mul_rtrn(P2, P, P);
+                    if( !LU.build(P2) )
+                        throw exception("singular chemical constraints");
+                    
+                    //__________________________________________________________
+                    //
+                    // reducing system
+                    //__________________________________________________________
+                    std::cerr << "Reducing System" << std::endl;
+                    fixed.make(M,0);
+                    X    .make(M,0);
+                    matrix_t Q;
+                    vector_t Sig;
+                    (size_t&)dof = ini.dispatch(Q, Sig, fixed, X);
+                    if(dof<=0)
+                        throw exception("#DOF should be positive in chemical::boot");
+                    std::cerr << "#dof=" << dof << std::endl;
+                    std::cerr << "Q="   << Q   << std::endl;
+                    std::cerr << "Sig=" << Sig << std::endl;
+                    std::cerr << "fixed=" << fixed << std::endl;
+                    std::cerr << "X="     << X  << std::endl;
+                    
+                    nu = cs.nu;
+                    std::cerr << "nu0=" << nu << std::endl;
+                    
+                    //__________________________________________________________
+                    //
+                    // compute the restricted nu matrix
+                    //__________________________________________________________
+                    assert(nu.rows==N);
+                    for(size_t i=1;i<=N;++i)
+                    {
+                        for(size_t j=1;j<=M;++j)
+                        {
+                            if(fixed[j]) nu[i][j] = 0;
+                        }
+                    }
+                    std::cerr << "nu=" << nu << std::endl;
+                    
+                    
+                    //__________________________________________________________
+                    //
+                    // compute a starting point
+                    //__________________________________________________________
+                    cs.scale_all(t);
+                    cs.trial(ini.ran,t);
+                    for(size_t i=1;i<=M;++i)
+                    {
+                        if(fixed[i])
+                        {
+                            cs.C[i] = X[i];
+                        }
+                    }
+                    std::cerr << "C=" << cs.C << std::endl;
+                    
+                }
+                
+                
+                
+#if 0
                 boot_solver(equilibria       &usr_cs,
                             const double      usr_t,
                             boot::loader     &ini,
@@ -140,13 +273,14 @@ namespace yocto
                     // from a normalized C, compute the external source
                     //----------------------------------------------------------
                     build_dC();
-                    //std::cerr << "sigma=" << cs.dC << std::endl;
+                    std::cerr << std::endl;
+                    std::cerr << "sigma=" << cs.dC << std::endl;
                     
                     //----------------------------------------------------------
                     // legalize the source
                     //----------------------------------------------------------
                     cs.legalize_dC(t,false);
-                    //std::cerr << "dC=" << cs.dC << std::endl;
+                    std::cerr << "dC=" << cs.dC << std::endl;
                     
                     //----------------------------------------------------------
                     // save old position
@@ -169,13 +303,13 @@ namespace yocto
                     // normalize
                     //----------------------------------------------------------
                     cs.normalize_C(t);
-                    //std::cerr<< "C=" << cs.C << std::endl;
+                    std::cerr<< "C=" << cs.C << std::endl;
                     
                     //----------------------------------------------------------
                     //compute effective step
                     //----------------------------------------------------------
                     mkl::sub(dX, cs.C);
-                    //std::cerr << "dX=" << dX << std::endl;
+                    std::cerr << "dX=" << dX << std::endl;
                     
                     //----------------------------------------------------------
                     //check cycling
@@ -199,14 +333,14 @@ namespace yocto
                         if( err > FTOL * fabs(cs.C[i]))
                             goto VIRTUAL_STEP;
                     }
-                   
+                    
                 FINALIZE:
                     //__________________________________________________________
                     //
                     // done
                     //__________________________________________________________
-                    //std::cerr << "Done" << std::endl;
-                    //std::cerr << "Cn=" << cs.C << std::endl;
+                    std::cerr << "Done" << std::endl;
+                    std::cerr << "Cn=" << cs.C << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -231,7 +365,7 @@ namespace yocto
                     }
                     cs.normalize_C(t);
                     //std::cerr << "C=" << cs.C << std::endl;
-
+                    
                 }
                 
                 //! dC = P'*(P*P')^(-1)(Lam - PC)
@@ -254,6 +388,7 @@ namespace yocto
                     }
                     return sqrt(rms/n);
                 }
+#endif
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(boot_solver);
