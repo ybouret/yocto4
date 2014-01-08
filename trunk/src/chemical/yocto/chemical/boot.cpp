@@ -61,9 +61,9 @@ namespace yocto
                 const boot::constituent &it = **i;
                 const double             w  = it.weight;
                 if(w>0)
-                    os << " + " << w;
+                    os << " +" << w;
                 else
-                    os << " - " << -w;
+                    os << " -" << -w;
                 
                 os << "*[" << it.spec->name << "]";
             }
