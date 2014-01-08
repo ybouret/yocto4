@@ -161,6 +161,92 @@ namespace yocto
             
         }
 
+        size_t boot::loader:: dispatch( matrix_t &Q, vector_t &Sig, array<bool> &fixed, array<double> &C ) const
+        {
+            
+            static const char fn[] = "chemical dispatch: ";
+            assert(C.size()>0);
+            assert(fixed.size()==C.size());
+            assert(0==Q.rows);
+            assert(0==Q.cols);
+            assert(0==Sig.size());
+            
+            const size_t Nc = size();
+            const size_t M  = C.size();
+            size_t       dof = 0;
+            
+            //__________________________________________________________________
+            //
+            // first pass: computing DOFs and fixing C
+            //__________________________________________________________________
+            for(size_t i=1;i<=Nc;++i)
+            {
+                const constraint &cstr  = *(*this)[i];   //! the constraint
+                const size_t      count = cstr.size();  //! #constituent
+                if(count<=0)
+                    throw exception("unexpected empty constraint");
+                if(count == 1)
+                {
+                    const double       v  = cstr.value;    //! the value
+                    const constituent &cc = *cstr.front(); //! the constituent
+                    const size_t       k  = cc.spec->indx; //! its index
+                    const double       w  = cc.weight;     //! its weight
+                    const char        *id = cc.spec->name.c_str();
+                    assert(k>=1);
+                    assert(k<=M);
+                    
+                    if( fixed[k]  ) throw exception("%sconstituent '%s' is already fixed",fn,id);
+                    if(fabs(w)<=0)  throw exception("%sinvalid weight for constituent '%s'",fn,id);
+                    C[k]     = v/w;
+                    fixed[k] = true;
+                }
+                else
+                {
+                    ++dof;
+                }
+            }
+            
+            //__________________________________________________________________
+            //
+            // second pass
+            //__________________________________________________________________
+            if(dof>0)
+            {
+                Q   .make(dof,M);
+                Sig .make(dof,0.0);
+                
+                for(size_t i=1,l=1;i<=Nc;++i)
+                {
+                    const constraint &cstr  = *(*this)[i];   //! the constraint
+                    const size_t      count = cstr.size();  //! #constituent
+                    assert(count>0);
+                    if(count>1)
+                    {
+                        //-- a new dof
+                        array<double> &Q_l = Q[l];
+                        Sig[l] = cstr.value;
+                        ++l;
+                        
+                        //-- fill it
+                        for( constraint::const_iterator j=cstr.begin(); j!=cstr.end();++j)
+                        {
+                            const constituent &cc = **j;
+                            const size_t k = cc.spec->indx;
+                            const double w = cc.weight;
+                            assert(k>=1);
+                            assert(k<=M);
+                            Q_l[k] = w;
+                        }
+
+                    }
+                }
+            }
+            
+            
+            
+            return dof;
+            
+        }
         
     }
     
