@@ -226,7 +226,7 @@ namespace yocto
                 
                 for(size_t i=1,l=1;i<=Nc;++i)
                 {
-                    const constraint &cstr  = *(*this)[i];   //! the constraint
+                    const constraint &cstr  = *(*this)[i];  //! the constraint
                     const size_t      count = cstr.size();  //! #constituent
                     assert(count>0);
                     if(count>1)
