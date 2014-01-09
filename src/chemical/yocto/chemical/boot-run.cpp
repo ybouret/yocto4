@@ -4,6 +4,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/sort/quick.hpp"
+#include "yocto/math/kernel/svd.hpp"
 
 namespace yocto
 {
@@ -25,9 +26,10 @@ namespace yocto
         }
         
         
+        
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
-            static const double FTOL = math::numeric<double>::ftol;
+            //static const double FTOL = math::numeric<double>::ftol;
             
             //__________________________________________________________________
             //
@@ -141,107 +143,74 @@ namespace yocto
             matrix_t  P2(dof,dof);
             mkl::mul_rtrn(P2, P, P);
             if( !LU.build(P2 ))
-                throw exception("singular chemical constraints");
+                throw exception("singular chemical constraints/rank");
             
-            vector_t Mu(dof,0.0);       // temporary to compute linear constraints
-            vector_t dX(M,0.0);         // to detect concentration updates
-            vector_t sigma(M,0.0);      // the virtual source term
-            
-            ios::ocstream fp("err.dat",false);
-            
-            static const size_t MIN_ITER_PER_SPECIES = 2;
-            const  size_t       min_iter = min_of<size_t>(2,M * MIN_ITER_PER_SPECIES);
-            
-            double oldRMS = -1;
-            for(size_t iter=1;;++iter)
+            const size_t ny = M-fix;
+            matrix_t Psi(M,ny);
             {
-                std::cerr << std::endl << "iter=" << iter << std::endl;
-                std::cerr << "C0=" << cs.C << std::endl;
-                //--------------------------------------------------------------
-                // virtual source term
-                //--------------------------------------------------------------
-                mkl::mul(Mu, P, cs.C);
-                mkl::subp(Mu, Lam);
-                LU.solve(P2, Mu);
-                mkl::mul_trn(cs.dC, P, Mu);
-                std::cerr << "sigma=" << cs.dC << std::endl;
-                std::cerr << "fixed=" << cs.fixed << std::endl;
-                for(size_t i=M;i>0;--i)
+                vector<size_t> indices(ny,as_capacity);
+                for(size_t j=1;j<=M;++j)
                 {
-                    if(cs.fixed[i]) cs.dC[i] = 0;
+                    if( !cs.fixed[j] ) indices.push_back(j);
                 }
-                mkl::set(sigma,cs.dC); // save it
-                //--------------------------------------------------------------
-                // legalize the source term
-                //--------------------------------------------------------------
-                cs.legalize_dC(t, false);
-                std::cerr << "dC2=" << cs.dC << std::endl;
-                
-                //--------------------------------------------------------------
-                // save C
-                //--------------------------------------------------------------
-                mkl::set(dX,cs.C);
-                
-                //--------------------------------------------------------------
-                // update C
-                //--------------------------------------------------------------
-                mkl::add(cs.C, cs.dC);
-                cs.normalize_C(t);
-                
-                std::cerr << "C1=" << cs.C << std::endl;
-                
-                //--------------------------------------------------------------
-                // compute effective displacement
-                //--------------------------------------------------------------
-                mkl::subp(dX,cs.C);
-                std::cerr << "dX=" << dX << std::endl;
-                const double RMS = mkl::rms(dX);
-                if(RMS>0)
+                std::cerr << "indices=" << indices << std::endl;
+                assert(ny==indices.size());
+                for(size_t j=1;j<=ny;++j)
                 {
-                    fp("%g %g\n", double(iter), log10(RMS));
+                    Psi[ indices[j] ][j] = 1;
                 }
-                
-                //--------------------------------------------------------------
-                // test convergence on dX
-                //--------------------------------------------------------------
-                if(iter>min_iter)
-                {
-                    assert(oldRMS>=0);
-                    if(RMS>=oldRMS)
-                        break;
-                }
-                oldRMS = RMS;
             }
+            std::cerr << "Psi=" << Psi << std::endl;
             
             //__________________________________________________________________
             //
-            // Test residual
+            // compute Xstar
             //__________________________________________________________________
-            std::cerr << "Converged for dX" << std::endl;
-            std::cerr << "sigma=" << sigma << std::endl;
-            std::cerr << "dX   =" << dX << std::endl;
-            
-            //------------------------------------------------------------------
-            // normalize the P/Lambda system
-            //------------------------------------------------------------------
-            for(size_t i=dof;i>0;--i)
+            vector_t Xstar(M,0.0);
             {
-                const double fac = mkl::norm_L2(P[i]);
-                for(size_t j=M;j>0;--j)
-                {
-                    P[i][j] /= fac;
-                }
-                Lam[i] /= fac;
+                vector_t U(dof,0.0);
+                mkl::set(U,Lam);
+                LU.solve(P2, U);
+                mkl::mul_trn(Xstar, P, U);
             }
+            std::cerr << "Xstar=" << Xstar << std::endl;
             
-            //------------------------------------------------------------------
-            // compute the RMS on the constraints
-            //------------------------------------------------------------------
-            mkl::mul(Mu, P, cs.C);
-            mkl::sub(Mu, Lam);
-            const double rms = mkl::rms(Mu);
             
-            std::cerr << "rms=" << rms << std::endl;
+            //__________________________________________________________________
+            //
+            // compute Q, an orthogonal complementary of P
+            // with nv = M-dof
+            //__________________________________________________________________
+            const size_t nv = M-dof;
+            matrix_t Q(nv,M);
+            {
+                matrix_t F(M,M);
+                for(size_t i=1;i<=dof;++i)
+                {
+                    for(size_t j=1;j<=M;++j)
+                    {
+                        F[j][i] = P[i][j];
+                    }
+                }
+                //std::cerr << "F=" << F << std::endl;
+                vector_t __W(M,0);
+                matrix_t __V(M,M);
+                if( ! math::svd<double>::build(F, __W, __V) )
+                    throw exception("singular chemical constraint/SVD");
+                //std::cerr << "F=" << F << std::endl;
+                for(size_t i=1;i<=nv;++i)
+                {
+                    for(size_t j=1;j<=M;++j)
+                    {
+                        Q[i][j] = F[j][i+dof];
+                    }
+                }
+            }
+            std::cerr << "Q=" << Q << std::endl;
+            std::cerr << "Z=P*Psi" << std::endl;
+            std::cerr << "Y0=Z'*inv(Z*Z') * (Lam - P*X0)" << std::endl;
+            
+            
             
         }
         
