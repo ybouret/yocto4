@@ -37,7 +37,7 @@ namespace yocto
 			static void gram_schmidt( matrix<T> &U, const matrix<T> &V, bool normalize);
             
             template <typename U>
-            static inline T norm2( const array<U> &v ) throw()
+            static inline T norm_L2( const array<U> &v ) throw()
             {
                 T ans(0);
                 for( size_t i=v.size();i>0;--i) ans += Square( v[i] );
@@ -45,7 +45,17 @@ namespace yocto
             }
             
             template <typename U>
-            static inline T norm1( const array<U> &v ) throw()
+            static inline T rms( const array<U> &v ) throw()
+            {
+                assert(v.size()>0);
+                const size_t n = v.size();
+                T ans(0);
+                for( size_t i=n;i>0;--i) ans += Square( v[i] );
+                return Sqrt(ans/n);
+            }
+            
+            template <typename U>
+            static inline T norm_L1( const array<U> &v ) throw()
             {
                 T ans(0);
                 for( size_t i=v.size();i>0;--i) ans += Fabs( v[i] );
@@ -53,7 +63,7 @@ namespace yocto
             }
             
             template <typename U>
-            static inline T norm_infty( const array<U> &v ) throw()
+            static inline T norm_Linf( const array<U> &v ) throw()
             {
                 T ans(0.0);
                 for(size_t i=v.size();i>0;--i)

@@ -144,7 +144,7 @@ namespace yocto
             //__________________________________________________________________
             if(dof<=0)
             {
-                cs.normalize_C(t);
+                cs.normalize_C(t); // just to check
                 std::cerr << "C=" << cs.C << std::endl;
                 return;
             }
@@ -154,20 +154,28 @@ namespace yocto
             //
             // Most generic case
             //__________________________________________________________________
-            std::cerr << "P=" << P << std::endl;
+            std::cerr << "P="   << P   << std::endl;
             std::cerr << "Lam=" << Lam << std::endl;
             
-            matrix_t P2(dof,dof);
+            matrix_t  P2(dof,dof);
             mkl::mul_rtrn(P2, P, P);
             if( !LU.build(P2 ))
                 throw exception("singular chemical constraints");
             
-            vector_t Mu(dof,0.0);
-            vector_t dX(M,0.0);
-            vector_t sigma(M,0.0);
+            vector_t Mu(dof,0.0);       // temporary to compute linear constraints
+            vector_t dX(M,0.0);         // to detect concentration updates
+            vector_t sigma(M,0.0);      // the virtual source term
+            
+            ios::ocstream fp("err.dat",false);
+            
+            static const size_t MIN_ITER_PER_SPECIES = 2;
+            const  size_t       min_iter = min_of<size_t>(2,M * MIN_ITER_PER_SPECIES);
+            
+            double oldRMS = -1;
             for(size_t iter=1;;++iter)
             {
-                std::cerr << std::endl << " iter=" << iter << std::endl;
+                std::cerr << std::endl << "iter=" << iter << std::endl;
+                std::cerr << "C0=" << cs.C << std::endl;
                 //--------------------------------------------------------------
                 // virtual source term
                 //--------------------------------------------------------------
@@ -180,11 +188,19 @@ namespace yocto
                 {
                     if(fixed[i]) cs.dC[i] = 0; // should be true
                 }
-                mkl::set(sigma,cs.dC);
+                mkl::set(sigma,cs.dC); // save it
                 //--------------------------------------------------------------
                 // legalize the source term
                 //--------------------------------------------------------------
                 cs.legalize_with(Nu, t, false);
+                matrix_t Chi(M,M);
+                cs.compute_Chi(Chi,t);
+                std::cerr << "Phi=" << cs.Phi << std::endl;
+                std::cerr << "Chi=" << Chi    << std::endl;
+                for(size_t i=M;i>0;--i)
+                {
+                    if(fixed[i]) cs.dC[i] = 0; // should be true
+                }
                 std::cerr << "dC2=" << cs.dC << std::endl;
                 
                 //--------------------------------------------------------------
@@ -198,46 +214,61 @@ namespace yocto
                 mkl::add(cs.C, cs.dC);
                 cs.normalize_with(Nu,t);
                 
-                std::cerr << "C=" << cs.C << std::endl;
+                std::cerr << "C1=" << cs.C << std::endl;
                 
                 //--------------------------------------------------------------
                 // compute effective displacement
                 //--------------------------------------------------------------
                 mkl::subp(dX,cs.C);
                 std::cerr << "dX=" << dX << std::endl;
+                const double RMS = mkl::rms(dX);
+                if(RMS>0)
+                {
+                    fp("%g %g\n", double(iter), log10(RMS));
+                }
                 
                 //--------------------------------------------------------------
                 // test convergence on dX
                 //--------------------------------------------------------------
-                bool converged = true;
-                for(size_t i=M;i>0;--i)
+                if(iter>min_iter)
                 {
-                    double err = fabs(dX[i]);
-                    if(err<=cs.tiny) err = 0;
-                    if( err > FTOL * fabs(cs.C[i]))
-                    {
-                        converged = false;
+                    assert(oldRMS>=0);
+                    if(RMS>=oldRMS)
                         break;
-                    }
                 }
-                if(converged)
-                    break;
+                oldRMS = RMS;
             }
+            
+            //__________________________________________________________________
+            //
+            // Test residual
+            //__________________________________________________________________
             std::cerr << "Converged for dX" << std::endl;
             std::cerr << "sigma=" << sigma << std::endl;
             std::cerr << "dX   =" << dX << std::endl;
-            mkl::sub(dX,sigma);
-            std::cerr << "dY   ="  << dX << std::endl;
-            for(size_t i=M;i>0;--i)
+            
+            //------------------------------------------------------------------
+            // normalize the P/Lambda system
+            //------------------------------------------------------------------
+            for(size_t i=dof;i>0;--i)
             {
-                dX[i] = dX[i] * dX[i];
+                const double fac = mkl::norm_L2(P[i]);
+                for(size_t j=M;j>0;--j)
+                {
+                    P[i][j] /= fac;
+                }
+                Lam[i] /= fac;
             }
-            quicksort(dX);
-            double rms = 0;
-            for(size_t i=1;i<=M;++i) rms += dX[i];
-            rms = sqrt(rms/M);
+            
+            //------------------------------------------------------------------
+            // compute the RMS on the constraints
+            //------------------------------------------------------------------
+            mkl::mul(Mu, P, cs.C);
+            mkl::sub(Mu, Lam);
+            const double rms = mkl::rms(Mu);
+            
             std::cerr << "rms=" << rms << std::endl;
-
+            
         }
         
         

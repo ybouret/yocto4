@@ -313,6 +313,7 @@ namespace yocto
             if(N>0)
             {
                 compute_Gamma_and_W(t,computeDerivatives,Nu);
+                std::cerr << "dtGam=" << dtGam << std::endl;
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
                 mkl::mulsub_trn(dC, Nu, dtGam);
