@@ -33,6 +33,8 @@ namespace yocto
         nuR(),
         nuP(),
         nu(),
+        Nu(),
+        fixed(),
         Gamma(),
         dtGam(),
         Phi(),
@@ -64,12 +66,22 @@ namespace yocto
         //! build a random concentration after scaling
         void equilibria:: trial( urand32 &ran, double t)
         {
-            for(size_t i=C.size();i>0;--i) C[i] = 0;
+            
+            for(size_t i=dC.size();i>0;--i)
+            {
+                dC[i] = 0;
+            }
             
             for( iterator eq=begin();eq!=end();++eq)
             {
-                (**eq).append(C,ran);
+                (**eq).append(dC,ran);
             }
+            
+            for(size_t i=dC.size();i>0;--i)
+            {
+                if( !fixed[i] ) C[i] = dC[i];
+            }
+            
             normalize_C(t);
             
         }
@@ -106,6 +118,8 @@ namespace yocto
             Phi.release();
             dtGam.release();
             Gamma.release();
+            fixed.release();
+            Nu.release();
             nu.release();
             nuP.release();
             nuR.release();
@@ -152,6 +166,8 @@ namespace yocto
                     nuR.   make(N,M);
                     nuP.   make(N,M);
                     nu.    make(N,M);
+                    Nu.    make(N,M);
+                    fixed. make(M,false);
                     Gamma. make(N,0);
                     dtGam. make(N,0);
                     Phi.   make(N,M);
@@ -178,8 +194,7 @@ namespace yocto
                             nu[i][j] = nuP[i][j] - nuR[i][j];
                         }
                     }
-                    
-                    //std::cerr << "nu=" << nu << std::endl;
+                    Nu.assign(nu);
                     
                 }
             }
@@ -254,38 +269,71 @@ namespace yocto
                 if(Fabs(Gamma[i])<=tiny) Gamma[i] = 0;
             }
             
+            for(size_t j=M;j>0;--j)
+            {
+                if(fixed[j])
+                {
+                    for(size_t i=N;i>0;--i)
+                    {
+                        Phi[i][j] = 0;
+                    }
+                }
+            }
+            
+            
         }
         
         
-        void equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives, const matrix_t &Nu)
+        void equilibria:: update_topology() throw()
+        {
+            Nu.assign(nu);
+            for(size_t j=fixed.size();j>0;--j)
+            {
+                if(fixed[j])
+                {
+                    for(size_t i=Nu.rows;i>0;--i) Nu[i][j] = 0;
+                }
+            }
+        }
+        
+        
+        //! activate all
+        void equilibria:: restore_topology() throw()
+        {
+            for(size_t j=fixed.size();j>0;--j)
+            {
+                fixed[j] = false;
+            }
+            Nu.assign(nu);
+        }
+
+        
+        void equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
-            mkl::mul_rtrn(W, Phi, Nu);
+            mkl::mul_rtrn(W, Phi,Nu);
             if( !LU.build(W) )
                 throw exception("equilibria: invalid composition");
         }
         
+        
+      
+        
         void equilibria:: normalize_C( double t )
         {
-            normalize_with(nu,t);
-        }
-        
-        void equilibria:: normalize_with( const matrix_t &Nu, double t )
-        {
-            assert(nu.rows==Nu.rows);
-            assert(nu.cols==Nu.cols);
-            const size_t N = Nu.rows;
+            
+            const size_t N = nu.rows;
             cleanup_C();
             
             if(N>0)
             {
-                const size_t M = Nu.cols;
+                const size_t M = nu.cols;
                 
             NEWTON_STEP:
-                compute_Gamma_and_W(t,false,Nu);
+                compute_Gamma_and_W(t,false);
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
-                mkl::mul_trn(dC, Nu, xi);
+                mkl::mul_trn(dC,Nu,xi);
                 mkl::sub(C, dC);
                 
                 
@@ -305,30 +353,25 @@ namespace yocto
         }
         
         
-        void equilibria:: legalize_with( const matrix_t &Nu, double t, bool computeDerivatives)
+        void equilibria:: legalize_dC( double t, bool computeDerivatives)
         {
-            assert(nu.rows==Nu.rows);
-            assert(nu.cols==Nu.cols);
-            const size_t N = Nu.rows;
+            
+            const size_t N = nu.rows;
             if(N>0)
             {
-                compute_Gamma_and_W(t,computeDerivatives,Nu);
-                std::cerr << "dtGam=" << dtGam << std::endl;
+                compute_Gamma_and_W(t,computeDerivatives);
+                std::cerr << "Phi=" << Phi << std::endl;
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
                 mkl::mulsub_trn(dC, Nu, dtGam);
                 for(size_t i=dC.size();i>0;--i)
                 {
-                    if( fabs(dC[i]) <= sqrt_tiny ) dC[i] = 0;
+                    if( fixed[i] || fabs(dC[i]) <= sqrt_tiny ) dC[i] = 0;
                 }
             }
             
         }
         
-        void equilibria:: legalize_dC( double t, bool computeDerivatives )
-        {
-            legalize_with(nu, t, computeDerivatives);
-        }
         
         void equilibria:: load_C( const array<double> &y ) throw()
         {
@@ -350,7 +393,7 @@ namespace yocto
             const size_t N = nu.rows;
             if(N>0)
             {
-                compute_Gamma_and_W(t,false,nu);
+                compute_Gamma_and_W(t,false);
                 matrix_t tmpPhi(Phi);
                 LU.solve(W, tmpPhi);
                 mkl::mul_ltrn(Chi, nu, tmpPhi);

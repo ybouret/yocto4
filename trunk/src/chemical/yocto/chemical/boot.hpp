@@ -97,8 +97,8 @@ namespace yocto
                 /**
                  \param  P an empty matrix
                  \param  Lam an empty vector
-                 \param  fixed an array of false boolean
-                 \param  X0    an array of zero values
+                 \param  fixed an array of boolean
+                 \param  X0    an array of values, to be set
                  \return the remaining degrees of freedom
                  when #DOF>0, P is set to (#DOF,M), Lam to #DOF.
                  */
