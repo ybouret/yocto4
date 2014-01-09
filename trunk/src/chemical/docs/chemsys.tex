@@ -16,7 +16,8 @@
 \newcommand{\mytrn}[1]{{\!\!~^{\mathsf{t}}{#1}}}
 \newcommand{\myvec}[1]{\overrightarrow{#1}}
 \newcommand{\vecX}{\myvec{\myconc{\mychem{X}}}}
-
+\newcommand{\dof}{\mathtt{d}}
+\newcommand{\fixed}{\mathtt{f}}
 \begin{document}
 \title{Chemical Solution}
 
@@ -82,69 +83,56 @@ should be set to zero.
 \subsection{Remaining Degrees of Freedom}
 We need $M-N$ supplementary relations to initialize the system. Hopefully, this constraint should be linear
 since they shall express the matter conservation, the charge conservation or a fixed concentration.
-Let us assume that $\mymat{P}\in\mathcal{M}_{M-N,M}$ is the corresponding "projection" matrix such that
-\begin{equation}
-	\label{eq:proj}
-	\mymat{P} \vecX = \vec{\Lambda} \in \mathbb{R}^{M-N}.
-\end{equation}
+We have
+$$
+	N_c  = M-N.
+$$
+Among those $N_c$ constraints, we isolate the $\fixed$ "single" component condition that fix $\fixed$ concentrations.
+We have $\dof$ remaining degrees of freedom with
+$$
+	\fixed + \dof = N_c.
+$$
+Let $\vecX_0$ be the vector of fixed concentrations corresponding to the $\fixed$ single constraints, and with
+a zero value elsewhere.
 
-\subsection{Finding a matching solution: the virtual source method}
-\subsubsection{Starting point}
-Let us start from a valid composition: a \textbf{random scaled composition} is computed then the Newton's algorithm is
-applied to find $\vecX_0$ such that :
-$$\vec{\Gamma}(\vecX_0)=\vec{0}.$$
-
-\subsubsection{Virtual source term}
-%We know that there exist two vectors $\vec{U}\in\mathbb{R}^{M-N}$ and $\vec{V}\in \mathbb{R}^{N}$ of Lagrange multipliers, and
-%a matrix  $\mymat{Q}\in\mathcal{M}_{N,M}$ such that $\mymat{Q}\in\mymat{P}^\perp$
+%There exist an \textbf{orthogonal} matrix $\mymat{\Psi}\in\mathcal{M}_{M,M-\fixed}$ and a set of Lagrange multipliers
+%$\vec{Y}\in\mathbb{R}^{M-\fixed}$ 
+%such that
 %\begin{equation}
-%	\vecX = \mytrn{\mymat{P}} \vec{U} + \mytrn{\mymat{Q}}\vec{V}.
+%	\vecX = \vecX_0 + \mymat{\Psi}\vec{Y}.
 %\end{equation}
-Starting from $\vecX_n$, we want to compute $\vec{\sigma}_n$  such that
-$$
-	\mymat{P}(\vecX_n+\vec{\sigma}_n) = \vec{\Lambda}
-$$
-or
-$$
-	\mymat{P} \vec{\sigma}_n = \vec{\Lambda} - \mymat{P} \vecX_n.
-$$
-This can be achieved if $\vec{\sigma}_n$ is in the image of $\mymat{P}$, so that there exist a vector $\vec{U}_n\in\mathbb{R}^{M-N}$ 
-such that
-$$
-	\vec{\sigma}_n = \mytrn{\mymat{P}} \vec{U}_n
-$$
-We recognise an invertible Gram matrix so that finally
+%Each column of $\Psi$ is zero but for one element (with value 1) corresponding to a NOT fixed concentration.
+%With an ordering of those element, $\mymat{\Psi}$ is unique.
+
+\subsection{Biased Chemical Evolution}
+Since $\fixed$ concentrations are fixed, we define the stoichiometric matrix $\hat{\mymat{\nu}}$
+where the coefficients of all the fixed species are set to zero, and equal to those of $\mymat{\nu}$ otherwise.
+
+\subsection{Acceptable Solutions mark-II}
+We are left with a matrix $\mymat{P}\in\mathcal{M}_{\dof,M}$ and a vector $\vec{\Lambda}\in\mathbb{R}^{\dof}$ such
+that the acceptable set of concentration must match
 \begin{equation}
-		\vec{\sigma}_n = \underbrace{\mytrn{\mymat{P}} \left(\mymat{P} \mytrn{\mymat{P}}\right)^{-1}}_{\text{Moore-Penrose Pseudo Inverse}}
-		 \left( \vec{\Lambda} - \mymat{P}\vecX_n \right)
+	\mymat{P}\vecX = \vec{\Lambda}
 \end{equation}
 
-\subsubsection{Chemical Damping}
-The source term must be damped by the equilibria, so that we have
-\begin{equation}
-	\vec{\rho}_n = \left[\mymat{I} - \mytrn{\mymat{\nu}}\left(\mymat{\Phi}_n\mytrn{\mymat{\nu}}\right)^{-1}\mymat{\Phi}_n\right] \vec{\sigma_n}
-\end{equation}
-and we build
-\begin{equation}
-	\vec{Y}_n = \vecX_n + \vec{\rho}_n \text{ and } \forall i, Y_i \geq 0
-\end{equation}
-and $\vecX_{n+1}$ is the Newton's algorithm solution starting from $\vec{Y}_n$.
+\subsection{Solving}
+\subsubsection{No Reactions}
+In that case, $\mymat{P}$ is a square matrix which must be invertible.
+We get
+$$
+	\vecX = \mymat{P}^{-1}\vec{\Lambda}
+$$
+and we must check that the concentrations are OK.
+
+\subsubsection{No extra degrees of freedom}
+In that case, we start from a random set of concentration, but for the fixed values, and
+we apply the Newton's algorithm with $\hat{\mymat{\nu}}$.
+
+\subsubsection{blah blah}
+
+
 \end{document}
 
-
-
-\subsubsection{Linear Improvement}
-Due to numerical roundoff, $\vecX_n$ maybe not numerically legal.
-We iterate the projection
-\begin{equation}
-	\left\lbrace
-	\begin{array}{rcl}
-	\delta \vecX_n & = & - \mytrn{\mymat{P}} \left(\mymat{P} \mytrn{\mymat{P}}\right)^{-1} \left( \mymat{P}\vecX_n - \vec{\Lambda} \right)\\
-	\vecX_{n+1}    & = & \vecX_n + \delta\vecX_n
-	\end{array}
-	\right.
-\end{equation}
-until the numerical limit is reached.
 
 \subsubsection{Final Error Estimation}
 Let $\vecX_n$ the set of current values. The the error is about

@@ -56,7 +56,6 @@ namespace yocto
             for(size_t i=C.size();i>0;--i)
             {
                 if(C[i]<=tiny) C[i] = 0;
-                
                 assert(C[i]>=0);
             }
         }
@@ -277,6 +276,7 @@ namespace yocto
             assert(nu.cols==Nu.cols);
             const size_t N = Nu.rows;
             cleanup_C();
+            
             if(N>0)
             {
                 const size_t M = Nu.cols;

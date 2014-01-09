@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES(../../spade)
 
 FILE(GLOB test_srcs test-*.cpp)
-ADD_EXECUTABLE(test-chemical main.cpp ${test_srcs} example.lua acetic.lua oxalic.lua diff.lua)
+ADD_EXECUTABLE(test-chemical main.cpp ${test_srcs} example.lua acetic.lua oxalic.lua diff.lua boot.lua boot-no-dof.lua)
 TARGET_LINK_YOCTO( test-chemical chemical mk lua++ lua)
 
 ENABLE_TESTING()
