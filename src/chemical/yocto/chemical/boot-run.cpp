@@ -32,6 +32,8 @@ namespace yocto
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
+            static const double FTOL = math::numeric<double>::ftol;
+            
             //__________________________________________________________________
             //
             // Initializing
@@ -162,7 +164,8 @@ namespace yocto
             
             vector_t Mu(dof,0.0);
             vector_t dX(M,0.0);
-            for(size_t iter=1;iter<=3;++iter)
+            vector_t sigma(M,0.0);
+            for(size_t iter=1;;++iter)
             {
                 std::cerr << std::endl << " iter=" << iter << std::endl;
                 //--------------------------------------------------------------
@@ -175,9 +178,14 @@ namespace yocto
                 std::cerr << "sigma=" << cs.dC << std::endl;
                 for(size_t i=M;i>0;--i)
                 {
-                    if(fixed[i]) cs.dC[i] = 0;
+                    if(fixed[i]) cs.dC[i] = 0; // should be true
                 }
-                std::cerr << "dC=" << cs.dC << std::endl;
+                mkl::set(sigma,cs.dC);
+                //--------------------------------------------------------------
+                // legalize the source term
+                //--------------------------------------------------------------
+                cs.legalize_with(Nu, t, false);
+                std::cerr << "dC2=" << cs.dC << std::endl;
                 
                 //--------------------------------------------------------------
                 // save C
@@ -192,7 +200,31 @@ namespace yocto
                 
                 std::cerr << "C=" << cs.C << std::endl;
                 
+                //--------------------------------------------------------------
+                // compute effective displacement
+                //--------------------------------------------------------------
+                mkl::sub(dX,cs.C);
+                std::cerr << "dX=" << dX << std::endl;
+                
+                //--------------------------------------------------------------
+                // test convergence on dX
+                //--------------------------------------------------------------
+                bool converged = true;
+                for(size_t i=M;i>0;--i)
+                {
+                    double err = fabs(dX[i]);
+                    if(err<=cs.tiny) err = 0;
+                    if( err > FTOL * fabs(cs.C[i]))
+                    {
+                        converged = false;
+                        break;
+                    }
+                    dX[i] = err;
+                }
+                if(converged)
+                    break;
             }
+            std::cerr << "Converged for dX" << std::endl;
             
             
         }

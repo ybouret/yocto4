@@ -159,7 +159,10 @@ YOCTO_UNIT_TEST_IMPL(boot1)
         std::cerr << ini << std::endl;
         
         ini(cs,lib,0);
-
+        chemical::solution S(lib);
+        S.load( cs.C );
+        std::cerr << "S=" << S << std::endl;
+        std::cerr << "pH=" << S.pH() << std::endl;
         
     }
     YOCTO_UNIT_TEST_DONE()
