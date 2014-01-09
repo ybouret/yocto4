@@ -7,67 +7,6 @@
 using namespace yocto;
 using namespace math;
 
-namespace {
-    static inline void simple_boot()
-    {
-        chemical::boot::loader ini;
-        
-        chemical::collection lib;
-        chemical::equilibria cs;
-        
-        lib.add("H+");
-        lib.add("HO-");
-        lib.add("AcH",0);
-        lib.add("Ac-",-1);
-        lib.add("Na+",1);
-        
-        std::cerr << lib << std::endl;
-        
-        {
-            chemical::boot::constraint &ph = ini.add( 1e-6 );
-            ph.weight( lib["H+"], 1);
-        }
-        
-        {
-            ini.define( lib["Na+"], 0);
-        }
-        
-        ini.electroneutrality(lib);
-        
-        std::cerr << ini << std::endl;
-        
-        const size_t Nc = ini.size();
-        const size_t M  = lib.size();
-        matrix<double> P(Nc,M);
-        vector<double> Lam(Nc,0);
-        
-        lib.update_indices();
-        
-        ini.fill(P,Lam);
-        std::cerr << "P=" << P << std::endl;
-        std::cerr << "Lam=" << Lam << std::endl;
-        
-        std::cerr << "going to solve" << std::endl;
-        
-        ini.release();
-        
-        cs.add_water(lib, 1e-14);
-        cs.add_acid(lib, "Ac", "AcH", "Ac-", pow(10,-4.78));
-        
-        std::cerr << cs << std::endl;
-        
-        ini.electroneutrality(lib);
-        ini.define( lib["Na+"], 0);
-        const double C0 = 1e-5;
-        ini.conserve( lib["AcH"], lib["Ac-"], C0);
-        
-        std::cerr << ini << std::endl;
-        
-        ini(cs,lib,0.0);
-        
-        
-    }
-}
 
 YOCTO_UNIT_TEST_IMPL(boot)
 {
@@ -75,9 +14,6 @@ YOCTO_UNIT_TEST_IMPL(boot)
     std::cerr << "sizeof(boot:constraint)="  << sizeof(chemical::boot::constraint) << std::endl;
     std::cerr << "sizeof(boot:loader)="       << sizeof(chemical::boot::loader) << std::endl;
     
-    std::cerr << "testing simple" << std::endl;
-    simple_boot();
-    std::cerr << std::endl;
     
     
     if( argc > 1)
@@ -92,6 +28,7 @@ YOCTO_UNIT_TEST_IMPL(boot)
         
         chemical::equilibria cs;
         chemical::_lua::load(L, lib, cs, "eqs");
+        std::cerr << cs << std::endl;
         
         chemical::boot::loader ini;
         ini.electroneutrality(lib);
@@ -102,7 +39,6 @@ YOCTO_UNIT_TEST_IMPL(boot)
         chemical::solution S(lib);
         S.load(cs.C);
         std::cerr << S << std::endl;
-        
     }
     
     

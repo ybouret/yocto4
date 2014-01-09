@@ -10,423 +10,191 @@ namespace yocto
     namespace chemical
     {
         
-        namespace {
-            
-            typedef math::algebra<double> mkl;
-            
-            class boot_solver
+        
+        typedef math::algebra<double> mkl;
+        
+        
+        static inline void generate_starting(equilibria          &cs,
+                                             const array<bool>   &fixed,
+                                             const array<double> &X0,
+                                             urand32             &ran,
+                                             const double        &t)
+        {
+            assert(cs.C.size()==fixed.size());
+            assert(X0.size()==fixed.size());
+            cs.trial(ran,t);
+            for(size_t i=X0.size();i>0;--i)
             {
-            public:
-                ~boot_solver() throw() {}
-                
-                equilibria  &cs;
-                const double t;
-                const size_t M;  //!< lib.size
-                const size_t N;  //!< cs.size
-                const size_t Nc; //!< ini.size
-                matrix_t     P;
-                vector_t     Lam;
-                matrix_t     P2; //!< P*P' then LU
-                lu_t         LU;
-                const size_t dof;
-                vector<bool> fixed;
-                vector_t     X;
-                matrix_t     Q;
-                vector_t     Sig;
-                matrix_t     Nu;
-                matrix_t     Q2;
-                vector_t     Mu;
-                
-                boot_solver(equilibria       &usr_cs,
-                            const double      usr_t,
-                            boot::loader     &ini,
-                            collection       &lib ) :
-                cs(usr_cs),
-                t(usr_t),
-                M( lib.size() ),
-                N( cs.size()  ),
-                Nc( ini.size() ),
-                P(),
-                Lam(),
-                P2(),
-                LU(),
-                dof(0),
-                fixed(),
-                X(),
-                Q(),
-                Sig(),
-                Nu(),
-                Q2(),
-                Mu()
-                {
-                    if( Nc+N != M )
-                        throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
-                    //__________________________________________________________
-                    //
-                    // initializing equilibria resources
-                    //__________________________________________________________
-                    cs.build_from(lib);
-                    
-                    //__________________________________________________________
-                    //
-                    // no species...
-                    //__________________________________________________________
-                    if(M<=0)
-                        return;
-                    
-                    //__________________________________________________________
-                    //
-                    // no equilibrium
-                    //__________________________________________________________
-                    if(N<=0)
-                    {
-                        assert(Nc==M);
-                        //------------------------------------------------------
-                        // the P matrix is square
-                        //------------------------------------------------------
-                        P.make(M,M);
-                        LU.ensure(M);
-                        ini.fill(P, cs.C);
-                        std::cerr << "P=" << P << std::endl;
-                        std::cerr << "Lam=" << cs.C << std::endl;
-                        if( !LU.build(P) )
-                            throw exception("invalid chemical constraints");
-                        LU.solve(P,cs.C);
-                        cs.cleanup_C();
-                        return;
-                    }
-
-                    //__________________________________________________________
-                    //
-                    // checking rank
-                    //__________________________________________________________
-                    P   .make(Nc,M);
-                    Lam .make(Nc,0.0);
-                    P2  .make(Nc,Nc);
-                    LU  .ensure(Nc);
-                    ini.fill(P, Lam);
-                    std::cerr << "P="   << P   << std::endl;
-                    std::cerr << "Lam=" << Lam << std::endl;
-                    mkl::mul_rtrn(P2, P, P);
-                    if( !LU.build(P2) )
-                        throw exception("singular chemical constraints");
-                    
-                    //__________________________________________________________
-                    //
-                    // reducing system
-                    //__________________________________________________________
-                    std::cerr << "Reducing System D.O.F." << std::endl;
-                    fixed.make(M,0);
-                    X    .make(M,0);
-                    (size_t&)dof = ini.dispatch(Q, Sig, fixed, X);
-                    if(dof<=0)
-                        throw exception("#DOF should be positive in chemical::boot");
-                    
-                    std::cerr << "#dof="  << dof   << std::endl;
-                    std::cerr << "Q="     << Q     << std::endl;
-                    std::cerr << "Sig="   << Sig   << std::endl;
-                    std::cerr << "fixed=" << fixed << std::endl;
-                    std::cerr << "X="     << X     << std::endl;
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    // compute the restricted nu matrix:
-                    // erase the fixed components coefficients
-                    //__________________________________________________________
-                    Nu = cs.nu;
-                    assert(Nu.rows==N);
-                    assert(Nu.cols==M);
-                    for(size_t i=1;i<=N;++i)
-                    {
-                        for(size_t j=1;j<=M;++j)
-                        {
-                            if(fixed[j]) Nu[i][j] = 0;
-                        }
-                    }
-                    std::cerr << "nu=" << cs.nu << std::endl;
-                    std::cerr << "Nu=" << Nu << std::endl;
-                    
-                    Q2.make(dof,dof);
-                    mkl::mul_rtrn(Q2, Q, Q);
-                    if( !LU.build(Q2) )
-                        throw exception("unexpected singular reduced constraints");
-                    Mu.make(dof,0);
-                    
-                    //__________________________________________________________
-                    //
-                    // scale concentrations
-                    //__________________________________________________________
-                    cs.scale_all(t);
-                    
-                    //__________________________________________________________
-                    //
-                    // compute a starting point
-                    //__________________________________________________________
-                    cs.trial(ini.ran,t);
-                    for(size_t i=1;i<=M;++i)
-                    {
-                        if(fixed[i])
-                        {
-                            cs.C[i] = X[i];
-                        }
-                    }
-                    std::cerr << "C=" << cs.C << std::endl;
-                    cs.normalize_with(Nu,t);
-                    std::cerr << "C=" << cs.C << std::endl;
-                    
-                    
-                }
-                
-                
-                //! sigma = Q' * (Q*Q')^(-1)(Sig-Q*C)
-                void build_sigma( const array<double> &C)
-                {
-                    mkl::mul(Mu, Q, C);
-                    mkl::subp(Mu,Sig);
-                    LU.solve(Q2, Mu);
-                    mkl::mul_trn(cs.dC, Q, Mu);
-                }
-                
-                
-#if 0
-                boot_solver(equilibria       &usr_cs,
-                            const double      usr_t,
-                            boot::loader     &ini,
-                            collection       &lib ) :
-                cs(usr_cs),
-                t(usr_t),
-                M( lib.size() ),
-                N( cs.size()  ),
-                Nc( ini.size() ),
-                P(),
-                Lam(),
-                Mu(),
-                P2(),
-                LU()
-                {
-                    
-                    static const double FTOL = math::numeric<double>::ftol;
-                    if( Nc+N != M )
-                        throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
-                    
-                    //__________________________________________________________
-                    //
-                    // initializing stuff
-                    //__________________________________________________________
-                    cs.build_from(lib);
-                    
-                    //__________________________________________________________
-                    //
-                    // no species
-                    //__________________________________________________________
-                    if(M<=0)
-                        return;
-                    
-                    //__________________________________________________________
-                    //
-                    // no equilbrium
-                    //__________________________________________________________
-                    if(N<=0)
-                    {
-                        assert(Nc==M);
-                        //------------------------------------------------------
-                        // the P matrix squared
-                        //------------------------------------------------------
-                        P.make(M,M);
-                        LU.ensure(M);
-                        ini.fill(P, cs.C);
-                        std::cerr << "P=" << P << std::endl;
-                        std::cerr << "Lam=" << cs.C << std::endl;
-                        if( !LU.build(P) )
-                            throw exception("invalid chemical constraints");
-                        LU.solve(P,cs.C);
-                        cs.cleanup_C();
-                        return;
-                    }
-                    
-                    //__________________________________________________________
-                    //
-                    // memory
-                    //__________________________________________________________
-                    P.     make(Nc,M);
-                    Lam.   make(Nc,0);
-                    Mu.    make(Nc,0);
-                    P2.    make(Nc,Nc);
-                    LU.    ensure(Nc);     //! to inverse P2
-                    
-                    //__________________________________________________________
-                    //
-                    // constant part
-                    //__________________________________________________________
-                    ini.fill(P, Lam);
-                    std::cerr << "P=" << P << std::endl;
-                    std::cerr << "Lam=" << Lam << std::endl;
-                    mkl::mul_rtrn(P2, P, P);
-                    if( !LU.build(P2) )
-                        throw exception("singular chemical constraints");
-                    
-                    //__________________________________________________________
-                    //
-                    // scale all reactions
-                    //__________________________________________________________
-                    cs.scale_all(t);
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    // algorithm
-                    //__________________________________________________________
-                    static const size_t MAX_STEP_PER_SPECIES = 4;
-                    const size_t steps_before_rms = max_of<size_t>(2,MAX_STEP_PER_SPECIES * M);
-                    
-                    static const size_t MAX_FAILURES = 10;
-                    size_t num_failures = 0;
-                    
-                    vector_t dX(M,0);
-                    
-                INITIALIZE:
-                    // build a random valid concentration set
-                    if(num_failures>MAX_FAILURES)
-                        throw exception("too many failures in chemical boot: check constraints");
-                    
-                    cs.trial(ini.ran, t);
-                    size_t count   =  0;
-                    double old_rms = -1;
-                    
-                VIRTUAL_STEP:
-                    ++count;
-                    //----------------------------------------------------------
-                    // from a normalized C, compute the external source
-                    //----------------------------------------------------------
-                    build_dC();
-                    std::cerr << std::endl;
-                    std::cerr << "sigma=" << cs.dC << std::endl;
-                    
-                    //----------------------------------------------------------
-                    // legalize the source
-                    //----------------------------------------------------------
-                    cs.legalize_dC(t,false);
-                    std::cerr << "dC=" << cs.dC << std::endl;
-                    
-                    //----------------------------------------------------------
-                    // save old position
-                    //----------------------------------------------------------
-                    mkl::set(dX,cs.C);
-                    
-                    //----------------------------------------------------------
-                    // update/clear
-                    //----------------------------------------------------------
-                    mkl::add(cs.C, cs.dC);
-                    cs.cleanup_C();
-                    if( mkl::sum(cs.C) <= 0 )
-                    {
-                        std::cerr << "Invalid Composition after step!" << std::endl;
-                        ++num_failures;
-                        goto INITIALIZE;
-                    }
-                    
-                    //----------------------------------------------------------
-                    // normalize
-                    //----------------------------------------------------------
-                    cs.normalize_C(t);
-                    std::cerr<< "C=" << cs.C << std::endl;
-                    
-                    //----------------------------------------------------------
-                    //compute effective step
-                    //----------------------------------------------------------
-                    mkl::sub(dX, cs.C);
-                    std::cerr << "dX=" << dX << std::endl;
-                    
-                    //----------------------------------------------------------
-                    //check cycling
-                    //----------------------------------------------------------
-                    const double rms = __RMS(dX);
-                    if(count>steps_before_rms)
-                    {
-                        assert(old_rms>=0);
-                        if(rms>=old_rms)
-                            goto FINALIZE;
-                    }
-                    old_rms = rms;
-                    
-                    //----------------------------------------------------------
-                    //check convergence
-                    //----------------------------------------------------------
-                    for(size_t i=M;i>0;--i)
-                    {
-                        double err = fabs(dX[i]);
-                        if(err<=cs.tiny) err=0;
-                        if( err > FTOL * fabs(cs.C[i]))
-                            goto VIRTUAL_STEP;
-                    }
-                    
-                FINALIZE:
-                    //__________________________________________________________
-                    //
-                    // done
-                    //__________________________________________________________
-                    std::cerr << "Done" << std::endl;
-                    std::cerr << "Cn=" << cs.C << std::endl;
-                    
-                    //__________________________________________________________
-                    //
-                    // Check Errors for rounding
-                    //__________________________________________________________
-                    build_dC();
-                    vector_t &Y = cs.dC;
-                    //std::cerr << "Y1=" << Y << std::endl;
-                    for(size_t i=M;i>0;--i)
-                    {
-                        double err = fabs(Y[i]);
-                        if(err>0)
-                        {
-                            err = pow(10,ceil(log10(err)));
-                        }
-                        Y[i] = err;
-                    }
-                    //std::cerr << "Y2=" << Y << std::endl;
-                    for(size_t i=M;i>0;--i)
-                    {
-                        if( cs.C[i] <= Y[i] ) cs.C[i] = 0;
-                    }
-                    cs.normalize_C(t);
-                    //std::cerr << "C=" << cs.C << std::endl;
-                    
-                }
-                
-                //! dC = P'*(P*P')^(-1)(Lam - PC)
-                inline void build_dC() throw()
-                {
-                    mkl::mul(Mu,P,cs.C);      // Mu = PC
-                    mkl::subp(Mu,Lam);        // Mu = Lam - PC
-                    LU.solve(P2,Mu);          // Mu = (P*P')^(-1)(Lam - PC)
-                    mkl::mul_trn(cs.dC,P,Mu); // dC = P'*(P*P')^(-1)(Lam - PC)
-                }
-                
-                static inline double __RMS(const array<double> &v) throw()
-                {
-                    double rms = 0;
-                    const size_t n = v.size();
-                    for(size_t i=n;i>0;--i)
-                    {
-                        const double tmp = v[i];
-                        rms += tmp * tmp;
-                    }
-                    return sqrt(rms/n);
-                }
-#endif
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(boot_solver);
-            };
-            
+                if(fixed[i]) cs.C[i] = X0[i];
+            }
         }
         
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
-            boot_solver solve(cs,t,*this,lib);
+            //__________________________________________________________________
+            //
+            // Initializing
+            //__________________________________________________________________
+            const size_t M  = lib.size();
+            const size_t N  = cs.size();
+            const size_t Nc = this->size();
+            if( Nc+N != M )
+                throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
+            
+            //__________________________________________________________________
+            //
+            // Acquiring resources
+            //__________________________________________________________________
+            cs.build_from(lib);
+            
+            //__________________________________________________________________
+            //
+            // no species...
+            //__________________________________________________________________
+            if(M<=0)
+                return;
+            
+            //__________________________________________________________________
+            //
+            // some species
+            //__________________________________________________________________
+            cs.scale_all(t);
+            matrix_t P;
+            lu_t     LU;
+            
+            //__________________________________________________________________
+            //
+            // no equilibrium
+            //__________________________________________________________________
+            if(N<=0)
+            {
+                assert(Nc==M);
+                //------------------------------------------------------
+                // the P matrix is square
+                //------------------------------------------------------
+                P.make(M,M);
+                LU.ensure(M);
+                fill(P, cs.C);
+                std::cerr << "P="   << P << std::endl;
+                std::cerr << "Lam=" << cs.C << std::endl;
+                if( !LU.build(P) )
+                    throw exception("invalid chemical constraints");
+                LU.solve(P,cs.C);
+                cs.cleanup_C();
+                return;
+            }
+            
+            //__________________________________________________________________
+            //
+            // some equilibria: compute #DOF and #FIX
+            //__________________________________________________________________
+            LU.ensure(M);
+            vector_t     Lam;
+            vector<bool> fixed(M,false);
+            vector_t     X0(M,0.0);
+            
+            const size_t dof   = dispatch(P, Lam, fixed, X0);
+            const size_t fix   = Nc-dof;
+            std::cerr << "#DOF="  << dof << std::endl;
+            std::cerr << "#FIX="  << fix << std::endl;
+            std::cerr << "fixed=" << fixed << std::endl;
+            std::cerr << "X0   =" << X0    << std::endl;
+            
+            
+            //__________________________________________________________________
+            //
+            // Biased stoichiometry
+            //__________________________________________________________________
+            matrix_t Nu = cs.nu;
+            assert(Nu.rows==N);
+            assert(Nu.cols==M);
+            for(size_t i=1;i<=N;++i)
+            {
+                for(size_t j=1;j<=M;++j)
+                {
+                    if(fixed[j]) Nu[i][j] = 0;
+                }
+            }
+            std::cerr << "nu=" << cs.nu << std::endl;
+            std::cerr << "Nu=" << Nu << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // Create a starting point
+            //__________________________________________________________________
+            
+            //------------------------------------------------------------------
+            // create a random valid concentration
+            //------------------------------------------------------------------
+            generate_starting(cs, fixed, X0, ran, t);
+            std::cerr << "C0=" << cs.C << std::endl;
+            
+            //------------------------------------------------------------------
+            // biased equilibrium
+            //------------------------------------------------------------------
+            cs.normalize_with(Nu,t);
+            std::cerr << "C1="  << cs.C << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // No DOF: just a biased chemistry
+            //__________________________________________________________________
+            if(dof<=0)
+            {
+                cs.normalize_C(t);
+                std::cerr << "C=" << cs.C << std::endl;
+                return;
+            }
+            
+            
+            //__________________________________________________________________
+            //
+            // Most generic case
+            //__________________________________________________________________
+            std::cerr << "P=" << P << std::endl;
+            std::cerr << "Lam=" << Lam << std::endl;
+            
+            matrix_t P2(dof,dof);
+            mkl::mul_rtrn(P2, P, P);
+            if( !LU.build(P2 ))
+                throw exception("singular chemical constraints");
+            
+            vector_t Mu(dof,0.0);
+            vector_t dX(M,0.0);
+            for(size_t iter=1;iter<=3;++iter)
+            {
+                std::cerr << std::endl << " iter=" << iter << std::endl;
+                //--------------------------------------------------------------
+                // virtual source term
+                //--------------------------------------------------------------
+                mkl::mul(Mu, P, cs.C);
+                mkl::subp(Mu, Lam);
+                LU.solve(P2, Mu);
+                mkl::mul_trn(cs.dC, P, Mu);
+                std::cerr << "sigma=" << cs.dC << std::endl;
+                for(size_t i=M;i>0;--i)
+                {
+                    if(fixed[i]) cs.dC[i] = 0;
+                }
+                std::cerr << "dC=" << cs.dC << std::endl;
+                
+                //--------------------------------------------------------------
+                // save C
+                //--------------------------------------------------------------
+                mkl::set(dX,cs.C);
+                
+                //--------------------------------------------------------------
+                // update C
+                //--------------------------------------------------------------
+                mkl::add(cs.C, cs.dC);
+                cs.normalize_with(Nu,t);
+                
+                std::cerr << "C=" << cs.C << std::endl;
+                
+            }
+            
+            
         }
         
         

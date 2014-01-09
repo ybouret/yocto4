@@ -95,9 +95,14 @@ namespace yocto
                 
                 //! create a reduced matrix of constraints
                 /**
-                 \return the remaining degreess of freedom
+                 \param  P an empty matrix
+                 \param  Lam an empty vector
+                 \param  fixed an array of false boolean
+                 \param  X0    an array of zero values
+                 \return the remaining degrees of freedom
+                 when #DOF>0, P is set to (#DOF,M), Lam to #DOF.
                  */
-                size_t dispatch( matrix_t &Q, vector_t &Sig, array<bool> &fixed, array<double> &C ) const;
+                size_t dispatch( matrix_t &P, vector_t &Lam, array<bool> &fixed, array<double> &X0 ) const;
                 
                 
                 //! initialize
