@@ -3,7 +3,7 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/ios/ocstream.hpp"
-
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -203,7 +203,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 // compute effective displacement
                 //--------------------------------------------------------------
-                mkl::sub(dX,cs.C);
+                mkl::subp(dX,cs.C);
                 std::cerr << "dX=" << dX << std::endl;
                 
                 //--------------------------------------------------------------
@@ -219,14 +219,25 @@ namespace yocto
                         converged = false;
                         break;
                     }
-                    dX[i] = err;
                 }
                 if(converged)
                     break;
             }
             std::cerr << "Converged for dX" << std::endl;
-            
-            
+            std::cerr << "sigma=" << sigma << std::endl;
+            std::cerr << "dX   =" << dX << std::endl;
+            mkl::sub(dX,sigma);
+            std::cerr << "dY   ="  << dX << std::endl;
+            for(size_t i=M;i>0;--i)
+            {
+                dX[i] = dX[i] * dX[i];
+            }
+            quicksort(dX);
+            double rms = 0;
+            for(size_t i=1;i<=M;++i) rms += dX[i];
+            rms = sqrt(rms/M);
+            std::cerr << "rms=" << rms << std::endl;
+
         }
         
         
