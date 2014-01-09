@@ -43,7 +43,7 @@ void perform()
                 cholesky<T>::solve( M,d,b,x);
                 algebra<T>::mul(r,A,x); // compute estimated solution
                 algebra<T>::sub(r,b);   // compute residue
-                std::cerr << "norm" << n << "=" << algebra<T>::norm2(r) << std::endl;
+                std::cerr << "norm" << n << "=" << algebra<T>::norm_L2(r) << std::endl;
             }
             else {
                 std::cerr << "// FAILURE" << std::endl;

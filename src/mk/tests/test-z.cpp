@@ -13,6 +13,7 @@ using namespace math;
 template <typename T>
 static inline void show_values( const char *name )
 {
+    std::cerr << "-- " << name << " -- " << std::endl;
 	SHOW(epsilon);
 	SHOW(sqrt_epsilon);
 	SHOW(minimum);
@@ -25,6 +26,7 @@ static inline void show_values( const char *name )
 	SHOW(max_exp);
     SHOW(tiny);
     SHOW(sqrt_tiny);
+    std::cerr <<std::endl;
 }
 
 
@@ -57,7 +59,7 @@ YOCTO_UNIT_TEST_IMPL(z)
 	test_ops<double>();
 	test_ops< complex<float> >();
 	test_ops< complex<double> >();
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
