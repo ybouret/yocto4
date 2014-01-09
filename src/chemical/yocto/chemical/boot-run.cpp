@@ -15,18 +15,13 @@ namespace yocto
         
         
         static inline void generate_starting(equilibria          &cs,
-                                             const array<bool>   &fixed,
                                              const array<double> &X0,
                                              urand32             &ran,
                                              const double        &t)
         {
-            assert(cs.C.size()==fixed.size());
-            assert(X0.size()==fixed.size());
+            assert(X0.size()==cs.C.size());
+            mkl::set(cs.C,X0);
             cs.trial(ran,t);
-            for(size_t i=X0.size();i>0;--i)
-            {
-                if(fixed[i]) cs.C[i] = X0[i];
-            }
         }
         
         
@@ -93,33 +88,22 @@ namespace yocto
             //__________________________________________________________________
             LU.ensure(M);
             vector_t     Lam;
-            vector<bool> fixed(M,false);
             vector_t     X0(M,0.0);
             
-            const size_t dof   = dispatch(P, Lam, fixed, X0);
+            const size_t dof   = dispatch(P, Lam, cs.fixed, X0);
             const size_t fix   = Nc-dof;
             std::cerr << "#DOF="  << dof << std::endl;
             std::cerr << "#FIX="  << fix << std::endl;
-            std::cerr << "fixed=" << fixed << std::endl;
+            std::cerr << "fixed=" << cs.fixed << std::endl;
             std::cerr << "X0   =" << X0    << std::endl;
-            
+            cs.update_topology();
             
             //__________________________________________________________________
             //
             // Biased stoichiometry
             //__________________________________________________________________
-            matrix_t Nu = cs.nu;
-            assert(Nu.rows==N);
-            assert(Nu.cols==M);
-            for(size_t i=1;i<=N;++i)
-            {
-                for(size_t j=1;j<=M;++j)
-                {
-                    if(fixed[j]) Nu[i][j] = 0;
-                }
-            }
             std::cerr << "nu=" << cs.nu << std::endl;
-            std::cerr << "Nu=" << Nu << std::endl;
+            std::cerr << "Nu=" << cs.Nu << std::endl;
             
             //__________________________________________________________________
             //
@@ -129,14 +113,10 @@ namespace yocto
             //------------------------------------------------------------------
             // create a random valid concentration
             //------------------------------------------------------------------
-            generate_starting(cs, fixed, X0, ran, t);
+            generate_starting(cs,X0, ran, t);
             std::cerr << "C0=" << cs.C << std::endl;
             
-            //------------------------------------------------------------------
-            // biased equilibrium
-            //------------------------------------------------------------------
-            cs.normalize_with(Nu,t);
-            std::cerr << "C1="  << cs.C << std::endl;
+            
             
             //__________________________________________________________________
             //
@@ -144,6 +124,7 @@ namespace yocto
             //__________________________________________________________________
             if(dof<=0)
             {
+                cs.restore_topology();
                 cs.normalize_C(t); // just to check
                 std::cerr << "C=" << cs.C << std::endl;
                 return;
@@ -152,7 +133,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Most generic case
+            // Most generic case: keep the altered topology
             //__________________________________________________________________
             std::cerr << "P="   << P   << std::endl;
             std::cerr << "Lam=" << Lam << std::endl;
@@ -184,23 +165,16 @@ namespace yocto
                 LU.solve(P2, Mu);
                 mkl::mul_trn(cs.dC, P, Mu);
                 std::cerr << "sigma=" << cs.dC << std::endl;
+                std::cerr << "fixed=" << cs.fixed << std::endl;
                 for(size_t i=M;i>0;--i)
                 {
-                    if(fixed[i]) cs.dC[i] = 0; // should be true
+                    if(cs.fixed[i]) cs.dC[i] = 0;
                 }
                 mkl::set(sigma,cs.dC); // save it
                 //--------------------------------------------------------------
                 // legalize the source term
                 //--------------------------------------------------------------
-                cs.legalize_with(Nu, t, false);
-                matrix_t Chi(M,M);
-                cs.compute_Chi(Chi,t);
-                std::cerr << "Phi=" << cs.Phi << std::endl;
-                std::cerr << "Chi=" << Chi    << std::endl;
-                for(size_t i=M;i>0;--i)
-                {
-                    if(fixed[i]) cs.dC[i] = 0; // should be true
-                }
+                cs.legalize_dC(t, false);
                 std::cerr << "dC2=" << cs.dC << std::endl;
                 
                 //--------------------------------------------------------------
@@ -212,7 +186,7 @@ namespace yocto
                 // update C
                 //--------------------------------------------------------------
                 mkl::add(cs.C, cs.dC);
-                cs.normalize_with(Nu,t);
+                cs.normalize_C(t);
                 
                 std::cerr << "C1=" << cs.C << std::endl;
                 

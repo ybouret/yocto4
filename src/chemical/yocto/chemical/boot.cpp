@@ -205,8 +205,8 @@ namespace yocto
                     
                     if(k<1||k>M)    throw exception("%sinvalid '%s' index",fn,id);
                     if( fixed[k]  ) throw exception("%sconstituent '%s' is already fixed",fn,id);
-                    if(fabs(w)<=0)  throw exception("%sinvalid weight for constituent '%s'",fn,id);
                     X0[k]    = v/w;
+                    if(X0[k]<0.0) throw exception("%sinvalid weight for constituent '%s'",fn,id);
                     fixed[k] = true;
                 }
                 else
