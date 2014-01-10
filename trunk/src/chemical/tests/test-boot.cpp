@@ -39,6 +39,9 @@ YOCTO_UNIT_TEST_IMPL(boot)
         chemical::solution S(lib);
         S.load(cs.C);
         std::cerr << S << std::endl;
+        if( lib.has("H+") )
+            std::cerr << "pH=" << S.pH() << std::endl;
+        
     }
     
     
