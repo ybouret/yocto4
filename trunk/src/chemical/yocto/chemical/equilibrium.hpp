@@ -88,8 +88,8 @@ namespace yocto
             
         public:
             const   int      Nu;  //!< sum of algebraic coefficients (Delta_r nu)
-            const   unsigned NuR; //!< sum of algebraic reactives coefficients
-            const   unsigned NuP; //!< sum of algebraic products  coefficients
+            const   unsigned NuR; //!< sum of algebraic reactives coefficients (Delta_r nu_r)
+            const   unsigned NuP; //!< sum of algebraic products  coefficients (Delta_r nu_p)
             mutable double   C0;  //!< used to compute typical C scaling if Nu!=0
             mutable math::numeric<double>::function K;
             

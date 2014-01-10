@@ -120,7 +120,7 @@ $$
 $$
 and we must check that the concentrations are OK.
 
-\subsubsection{No extra degrees of freedom}
+\subsubsection{No extra degrees of freedom: Newton's algorithm mark-II}
 In that case, we start from a random set of concentrations, but for the fixed values, and
 we apply the Newton's algorithm with $\hat{\mymat{\nu}}$.
 
@@ -176,6 +176,16 @@ In that case, we extract an orthonormal base $\mymat{Z}$ of  $(\mytrn{\mymat{B}}
 so that there exists a vector of $N$ Lagrange multipliers $\vec{U}$ where
 $$
 	\vecX = \vecX^\star + \mymat{Z}\vec{U}.
+$$
+
+\subsubsection{Newton's Algorithm Mark-III}
+We want to solve
+$$
+	\vec{\Gamma}(\vecX^\star + \mymat{Z}\vec{U}) = \vec{0}.
+$$
+Starting from $\vec{U}_n$ we compute $\delta \vec{U}_n$ such that
+$$
+	\vec{\Gamma}(\vecX^\star + \mymat{Z}\vec{U}_n) + \hat{\mymat{\Phi}} \mymat{Z} \delta \vec{U}_n = \vec{0}
 $$
 \end{document}
 

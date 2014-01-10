@@ -106,6 +106,9 @@ namespace yocto
                 
                 
                 //! initialize
+                /**
+                 \warning the equilibria topology must be restored !!!!
+                 */
                 void operator()( equilibria &cs, collection &lib, double t);
                 
                 //! output
