@@ -180,6 +180,27 @@ namespace yocto
             std::cerr << "A=" << A << std::endl;
             std::cerr << "B=" << B << std::endl;
             
+            vector_t Mu(dof,0.0);
+            vector_t Xstar(M,0.0);
+            {
+                matrix_t Psi(dof,na);
+                mkl::mul_rtrn(Psi, P, A);
+                std::cerr << "Psi=" << Psi << std::endl;
+                matrix_t Psi2(dof,dof);
+                mkl::mul_rtrn(Psi2, Psi, Psi);
+                if(!LU.build(Psi2))
+                    throw exception("incompatible chemical constraints");
+                mkl::mul(Mu,P,X0);
+                mkl::subp(Mu,Lam);
+                LU.solve(Psi2, Mu);
+                vector_t Y0(na,0.0);
+                mkl::mul_trn(Y0, Psi, Mu);
+                std::cerr << "Y0=" << Y0 << std::endl;
+                mkl::mul_trn(Xstar, A, Y0);
+                std::cerr << "X1=" << Xstar << std::endl;
+            }
+            mkl::add(Xstar,X0);
+            std::cerr << "Xstar=" << Xstar << std::endl;
             
             //__________________________________________________________________
             //
@@ -238,6 +259,8 @@ namespace yocto
                 
             }
             std::cerr << "Z=" << Z << std::endl;
+            
+            
             
             
         }
