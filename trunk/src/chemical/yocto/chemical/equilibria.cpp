@@ -379,12 +379,14 @@ namespace yocto
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,Nu,xi);
                 mkl::sub(C, dC);
-                
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                std::cerr << "dC   =" << dC    << std::endl;
                 
                 bool converged = true;
                 for(size_t i=M;i>0;--i)
                 {
-                    if( Fabs(C[i]) <= tiny ) C[i] = 0;
+                    if( C[i] <= tiny )
+                        C[i] = 0;
                     double err = Fabs(dC[i]);
                     if( err <= tiny ) err = 0;
                     if( err > Fabs( ftol * C[i] ) )
@@ -392,7 +394,9 @@ namespace yocto
                         converged = false;
                     }
                 }
-                if(!converged) goto NEWTON_STEP;
+                std::cerr << "C=" << C << std::endl;
+                if(!converged)
+                    goto NEWTON_STEP;
             }
         }
         
@@ -404,13 +408,13 @@ namespace yocto
             if(N>0)
             {
                 compute_Gamma_and_W(t,computeDerivatives);
-                std::cerr << "Phi=" << Phi << std::endl;
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
                 mkl::mulsub_trn(dC, Nu, dtGam);
                 for(size_t i=dC.size();i>0;--i)
                 {
-                    if( fixed[i] || fabs(dC[i]) <= sqrt_tiny ) dC[i] = 0;
+                    if( fixed[i] || (fabs(dC[i]) <= sqrt_tiny) )
+                        dC[i] = 0;
                 }
             }
             
