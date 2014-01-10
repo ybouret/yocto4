@@ -15,16 +15,16 @@ namespace yocto
         struct boot
         {
             
-            //! a constituent: species + weight
+            //! a constituent: species + INTEGER weight
             class constituent : public object, public counted
             {
             public:
-                explicit constituent( const species::ptr &sp, const double w ) throw();
+                explicit constituent( const species::ptr &sp, const int w ) throw();
                 virtual ~constituent() throw();
                 constituent( const constituent &) throw();
                 
                 const species::ptr spec;
-                const double       weight;
+                const int          weight;
                 const string &     key() const throw();
                 
                 typedef intr_ptr<string,constituent> ptr;
