@@ -114,6 +114,9 @@ namespace yocto
             //! test for positive/cutoff C
             void cleanup_C() throw();
             
+            //! rescaled Gamma root mean square using C
+            double rms(const double t) throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
             math::derivative<double> dervs;
