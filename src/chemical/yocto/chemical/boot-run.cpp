@@ -139,14 +139,17 @@ namespace yocto
             std::cerr << "P="   << P   << std::endl;
             std::cerr << "Lam=" << Lam << std::endl;
             
-            matrix_t  P2(dof,dof);
-            mkl::mul_rtrn(P2, P, P);
-            if( !LU.build(P2 ))
-                throw exception("singular chemical constraints/rank");
+            {
+                matrix_t  P2(dof,dof);
+                mkl::mul_rtrn(P2, P, P);
+                if( !LU.build(P2 ))
+                    throw exception("singular chemical constraints/rank");
+            }
             
             const size_t na = M-fix;
             matrix_t A(na,M);
             matrix_t B;
+            if(fix>0) B.make(fix,M);
             {
                 vector<size_t> indices(na,as_capacity);
                 for(size_t j=1;j<=M;++j)
@@ -168,7 +171,6 @@ namespace yocto
                         if( cs.fixed[j] ) indices.push_back(j);
                     }
                     assert(fix==indices.size());
-                    B.make(fix,M);
                     for(size_t i=1;i<=fix;++i)
                     {
                         B[i][indices[i]] = 1;
@@ -181,57 +183,12 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // compute Xstar
-            //__________________________________________________________________
-            vector_t Xstar(M,0.0);
-            {
-                vector_t U(dof,0.0);
-                mkl::set(U,Lam);
-                LU.solve(P2, U);
-                mkl::mul_trn(Xstar, P, U);
-            }
-            std::cerr << "Xstar=" << Xstar << std::endl;
-            
-            
-            //__________________________________________________________________
-            //
-            // compute Q, an orthogonal complementary of P
-            // with nv = M-dof
-            //__________________________________________________________________
-            const size_t nq = M-dof;
-            matrix_t Q(nq,M);
-            {
-                matrix_t F(M,M);
-                for(size_t i=1;i<=dof;++i)
-                {
-                    for(size_t j=1;j<=M;++j)
-                    {
-                        F[j][i] = P[i][j];
-                    }
-                }
-                //std::cerr << "F=" << F << std::endl;
-                vector_t __W(M,0);
-                matrix_t __V(M,M);
-                if( ! math::svd<double>::build(F, __W, __V) )
-                    throw exception("singular chemical constraint/SVD");
-                //std::cerr << "F=" << F << std::endl;
-                for(size_t i=1;i<=nq;++i)
-                {
-                    for(size_t j=1;j<=M;++j)
-                    {
-                        Q[i][j] = F[j][i+dof];
-                    }
-                }
-            }
-            std::cerr << "Q=" << Q << std::endl;
-            
-            //__________________________________________________________________
-            //
             // Compute the generator of the variables space
             //__________________________________________________________________
+            matrix_t Z(M,N);
             {
-                const size_t nv = P.rows + B.rows;
-                matrix_t F(M,nv);
+                //-- create B+P subspace
+                matrix_t F(M,Nc);
                 for(size_t j=1;j<=B.rows;++j)
                 {
                     for(size_t i=1;i<=M;++i)
@@ -247,8 +204,40 @@ namespace yocto
                         F[i][j+B.rows] = P[j][i];
                     }
                 }
-                std::cerr << "F=" << F << std::endl;
+                
+                //-- check rank
+                {
+                    matrix_t F2(Nc,Nc);
+                    mkl::mul_ltrn(F2, F, F);
+                    if(!LU.build(F2))
+                        throw exception("singular chemical constraint/orthogonal space");
+                }
+                
+                //-- make an orthonormal space from F
+                matrix_t G(M,M);
+                for(size_t j=1;j<=Nc;++j)
+                {
+                    for(size_t i=1;i<=M;++i)
+                    {
+                        G[i][j] = F[i][j];
+                    }
+                }
+                
+                vector_t __W(M,0);
+                matrix_t __V(M,M);
+                if( ! math::svd<double>::build(G, __W, __V) )
+                    throw exception("singular chemical constraint/SVD");
+
+                for(size_t j=1;j<=N;++j)
+                {
+                    for(size_t i=1;i<=M;++i)
+                    {
+                        Z[i][j] =  G[i][j+Nc];
+                    }
+                }
+                
             }
+            std::cerr << "Z=" << Z << std::endl;
             
             
         }
