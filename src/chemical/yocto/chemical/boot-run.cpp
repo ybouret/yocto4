@@ -146,6 +146,7 @@ namespace yocto
             
             const size_t na = M-fix;
             matrix_t A(na,M);
+            matrix_t B;
             {
                 vector<size_t> indices(na,as_capacity);
                 for(size_t j=1;j<=M;++j)
@@ -158,8 +159,25 @@ namespace yocto
                 {
                     A[i][ indices[i] ] = 1;
                 }
+                
+                if(fix>0)
+                {
+                    indices.free();
+                    for(size_t j=1;j<=M;++j)
+                    {
+                        if( cs.fixed[j] ) indices.push_back(j);
+                    }
+                    assert(fix==indices.size());
+                    B.make(fix,M);
+                    for(size_t i=1;i<=fix;++i)
+                    {
+                        B[i][indices[i]] = 1;
+                    }
+                }
             }
             std::cerr << "A=" << A << std::endl;
+            std::cerr << "B=" << B << std::endl;
+            
             
             //__________________________________________________________________
             //
@@ -207,7 +225,30 @@ namespace yocto
             }
             std::cerr << "Q=" << Q << std::endl;
             
-            
+            //__________________________________________________________________
+            //
+            // Compute the generator of the variables space
+            //__________________________________________________________________
+            {
+                const size_t nv = P.rows + B.rows;
+                matrix_t F(M,nv);
+                for(size_t j=1;j<=B.rows;++j)
+                {
+                    for(size_t i=1;i<=M;++i)
+                    {
+                        F[i][j] = B[j][i];
+                    }
+                }
+                
+                for(size_t j=1;j<=P.rows;++j)
+                {
+                    for(size_t i=1;i<=M;++i)
+                    {
+                        F[i][j+B.rows] = P[j][i];
+                    }
+                }
+                std::cerr << "F=" << F << std::endl;
+            }
             
             
         }
