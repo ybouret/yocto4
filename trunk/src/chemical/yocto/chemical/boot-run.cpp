@@ -126,7 +126,6 @@ namespace yocto
             //__________________________________________________________________
             if(dof<=0)
             {
-                cs.restore_topology();
                 cs.normalize_C(t); // just to check
                 std::cerr << "C=" << cs.C << std::endl;
                 return;
@@ -145,22 +144,22 @@ namespace yocto
             if( !LU.build(P2 ))
                 throw exception("singular chemical constraints/rank");
             
-            const size_t ny = M-fix;
-            matrix_t Psi(M,ny);
+            const size_t na = M-fix;
+            matrix_t A(na,M);
             {
-                vector<size_t> indices(ny,as_capacity);
+                vector<size_t> indices(na,as_capacity);
                 for(size_t j=1;j<=M;++j)
                 {
                     if( !cs.fixed[j] ) indices.push_back(j);
                 }
                 std::cerr << "indices=" << indices << std::endl;
-                assert(ny==indices.size());
-                for(size_t j=1;j<=ny;++j)
+                assert(na==indices.size());
+                for(size_t i=1;i<=na;++i)
                 {
-                    Psi[ indices[j] ][j] = 1;
+                    A[i][ indices[i] ] = 1;
                 }
             }
-            std::cerr << "Psi=" << Psi << std::endl;
+            std::cerr << "A=" << A << std::endl;
             
             //__________________________________________________________________
             //
@@ -181,8 +180,8 @@ namespace yocto
             // compute Q, an orthogonal complementary of P
             // with nv = M-dof
             //__________________________________________________________________
-            const size_t nv = M-dof;
-            matrix_t Q(nv,M);
+            const size_t nq = M-dof;
+            matrix_t Q(nq,M);
             {
                 matrix_t F(M,M);
                 for(size_t i=1;i<=dof;++i)
@@ -198,7 +197,7 @@ namespace yocto
                 if( ! math::svd<double>::build(F, __W, __V) )
                     throw exception("singular chemical constraint/SVD");
                 //std::cerr << "F=" << F << std::endl;
-                for(size_t i=1;i<=nv;++i)
+                for(size_t i=1;i<=nq;++i)
                 {
                     for(size_t j=1;j<=M;++j)
                     {
@@ -207,8 +206,7 @@ namespace yocto
                 }
             }
             std::cerr << "Q=" << Q << std::endl;
-            std::cerr << "Z=P*Psi" << std::endl;
-            std::cerr << "Y0=Z'*inv(Z*Z') * (Lam - P*X0)" << std::endl;
+            
             
             
             
