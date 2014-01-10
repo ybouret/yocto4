@@ -205,10 +205,54 @@ namespace yocto
             }
         }
         
-        void equilibria:: compute_Gamma_and_Phi( double t, bool compute_derivatives)
+        
+        double equilibria:: rms(const double t)  throw()
         {
             const size_t N = nu.rows;
-            const size_t M = nu.cols;
+            if(N<=0)
+                return 0;
+            const size_t    M  = nu.cols;
+            iterator        eq = begin();
+            double ans = 0;
+            for(size_t i=1;i<=N;++i,++eq)
+            {
+                equilibrium &Eq = **eq;
+                const double Ki =  Eq.K(t);
+                double lhs = 1;
+                double rhs = 1;
+                for(size_t j=M;j>0;--j)
+                {
+                    {
+                        const size_t r = nuR[i][j];
+                        if(r>0)
+                        {
+                            lhs *= ipower(C[j],r);
+                        }
+                    }
+                    
+                    {
+                        const size_t p = nuP[i][j];
+                        if(p>0)
+                        {
+                            rhs *= ipower(C[j],p);
+                        }
+                    }
+                    
+                }
+                double G = fabs(Ki * lhs - rhs);
+                const size_t DeltaNuP = Eq.NuP;
+                if(DeltaNuP>0)
+                    G = pow(G,1.0/DeltaNuP);
+                ans += G*G;
+            }
+            
+            return sqrt(ans/N);
+        }
+        
+        void equilibria:: compute_Gamma_and_Phi( double t, bool compute_derivatives)
+        {
+            const size_t N  = nu.rows;
+            const size_t M  = nu.cols;
             iterator     eq = begin();
             Phi.ldz();
             for(size_t i=1;i<=N;++i,++eq)
