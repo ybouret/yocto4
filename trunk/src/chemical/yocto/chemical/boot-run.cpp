@@ -324,44 +324,42 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
 } while(false)
             
             
-        INITIALIZE:
+        // INITIALIZE:
             generate_starting(cs, X0, ran, t);
-            std::cerr << "C0=" << C << std::endl;
+            //std::cerr << "C0=" << C << std::endl;
             
             count  =  0;
             oldRMS = -1;
         PROJECTION:
             std::cerr << std::endl;
-            std::cerr << "C=" << C << std::endl;
+            //std::cerr << "C=" << C << std::endl;
             
             //-- compute projected U
             mkl::mul_trn(U,Z,C);
-            std::cerr << "U=" << U << std::endl;
+            //std::cerr << "U=" << U << std::endl;
             
             //-- compute projected concentration
             COMPUTE_C(dC);
-            std::cerr << "Cp=" << dC << std::endl;
+            //std::cerr << "Cp=" << dC << std::endl;
             
             //-- compute virtual source term
             mkl::sub(dC,C);
-            std::cerr << "dC0=" << dC << std::endl;
+            //std::cerr << "dC0=" << dC << std::endl;
             
             //-- legalize trial move
             cs.legalize_dC(t);
-            std::cerr << "dC1=" << dC << std::endl;
+            //std::cerr << "dC1=" << dC << std::endl;
             
             //-- save C
             mkl::set(X,C);
             
             //-- move C towards projection
             mkl::add(C,dC);
-            std::cerr  << "Cn=" << cs.C << std::endl;
+            //std::cerr  << "Cn=" << cs.C << std::endl;
             
             //-- normalize it
-            cs.cleanup_C();
-            std::cerr << "Cz=" << cs.C << std::endl;
             cs.normalize_C(t);
-            std::cerr << "C1=" << cs.C << std::endl;
+            std::cerr << "C=" << C << std::endl;
             
             //-- compute effective difference
             mkl::sub(X,C);
