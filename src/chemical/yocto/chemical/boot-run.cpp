@@ -3,8 +3,10 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/sort/quick.hpp"
+//#include "yocto/sort/quick.hpp"
 #include "yocto/math/kernel/svd.hpp"
+#include "yocto/auto-clean.hpp"
+
 
 namespace yocto
 {
@@ -13,7 +15,8 @@ namespace yocto
         
         
         typedef math::algebra<double> mkl;
-        
+        typedef math::svd<double>     SVD;
+
         
         static inline void generate_starting(equilibria          &cs,
                                              const array<double> &X0,
@@ -29,7 +32,7 @@ namespace yocto
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
-            //static const double FTOL = math::numeric<double>::ftol;
+            auto_clean<equilibria> onReturn( cs, & equilibria::restore_topology );
             
             //__________________________________________________________________
             //
@@ -52,16 +55,19 @@ namespace yocto
             // no species...
             //__________________________________________________________________
             if(M<=0)
+            {
                 return;
+            }
+            
             
             //__________________________________________________________________
             //
-            // some species
+            // some species: M>0
             //__________________________________________________________________
             cs.scale_all(t);
+            lu_t     LU(M);
             matrix_t P;
-            lu_t     LU;
-            
+
             //__________________________________________________________________
             //
             // no equilibrium
@@ -73,7 +79,6 @@ namespace yocto
                 // the P matrix is square
                 //------------------------------------------------------
                 P.make(M,M);
-                LU.ensure(M);
                 fill(P, cs.C);
                 std::cerr << "P="   << P << std::endl;
                 std::cerr << "Lam=" << cs.C << std::endl;
@@ -88,7 +93,6 @@ namespace yocto
             //
             // some equilibria: compute #DOF and #FIX
             //__________________________________________________________________
-            LU.ensure(M);
             vector_t     Lam;
             vector_t     X0(M,0.0);
             
@@ -246,7 +250,7 @@ namespace yocto
                 
                 vector_t __W(M,0);
                 matrix_t __V(M,M);
-                if( ! math::svd<double>::build(G, __W, __V) )
+                if( ! SVD::build(G, __W, __V) )
                     throw exception("singular chemical constraint/SVD");
 
                 for(size_t j=1;j<=N;++j)
@@ -259,8 +263,80 @@ namespace yocto
                 
             }
             std::cerr << "Z=" << Z << std::endl;
+           
+            //__________________________________________________________________
+            //
+            // Newton's Algorithm
+            //__________________________________________________________________
+            std::cerr << std::endl;
             
             
+            vector_t U(N,0.0);
+            vector_t &dU    = cs.xi;
+            vector_t &Gamma = cs.Gamma;
+            vector_t &C     = cs.C;
+            matrix_t &W     = cs.W;
+            vector_t X(M,0.0);
+            
+            mkl::mul_trn(U,Z,C);
+            
+            
+            //------------------------------------------------------------------
+            // initialize concentrations
+            //------------------------------------------------------------------
+#define compute_C() do {  mkl::set(C,Xstar); mkl::muladd(C, Z, U); mkl::mul_trn(U,Z,C); } while(false)
+           
+            compute_C();
+            
+            ios::ocstream fp("rms.dat", false);
+            
+            for(size_t count=0;;++count)
+            {
+                std::cerr << "U=" << U << std::endl;
+                std::cerr << "C=" << C << std::endl;
+                //--------------------------------------------------------------
+                // compute Gamma & Phi (biased)
+                //--------------------------------------------------------------
+                cs.compute_Gamma_and_Phi(t,false);
+                std::cerr << "Gamma=" << Gamma    << std::endl;
+                std::cerr << "Phi  =" << cs.Phi   << std::endl;
+                
+                //--------------------------------------------------------------
+                // compute the Newton's matrix
+                //--------------------------------------------------------------
+                mkl::mul(W,cs.Phi,Z);
+                std::cerr << "W=" << cs.W << std::endl;
+                if(!LU.build(W))
+                {
+                    std::cerr << "Invalid composition";
+                    return;
+                }
+                
+                //--------------------------------------------------------------
+                // compute step
+                //--------------------------------------------------------------
+                mkl::neg(dU,Gamma);
+                LU.solve(W,dU);
+                std::cerr << "dU=" << dU << std::endl;
+                
+                //--------------------------------------------------------------
+                // save conc
+                //--------------------------------------------------------------
+                mkl::set(X,C);
+                
+                //--------------------------------------------------------------
+                // upgrade
+                //--------------------------------------------------------------
+                mkl::add(U,dU);
+                compute_C();
+                std::cerr << "newU=" << U << std::endl;
+                std::cerr << "newC=" << C << std::endl;
+                mkl::sub(X,C);
+                std::cerr << "dC="   << X << std::endl;
+                const double rms = mkl::rms(X);
+                fp("%g %g\n", double(count), rms);
+                if(count>30) break;
+            }
             
             
         }

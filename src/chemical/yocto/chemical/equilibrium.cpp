@@ -68,9 +68,9 @@ namespace yocto
                 hsort(actors,__compare_actors);
                 ((int&) Nu) += coef;
                 if(coef>0)
-                    ((unsigned&)NuR) += unsigned(coef);
+                    ((unsigned&)NuP) += unsigned(coef);
                 else
-                    ((unsigned&)NuP) += unsigned(-coef);
+                    ((unsigned&)NuR) += unsigned(-coef);
             }
         }
         
