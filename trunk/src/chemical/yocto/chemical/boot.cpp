@@ -241,7 +241,7 @@ namespace yocto
                         {
                             const constituent &cc = **j;
                             const size_t k = cc.spec->indx;
-                            const double w = cc.weight;
+                            const int    w = cc.weight;
                             assert(k>=1);
                             assert(k<=M);
                             P_l[k] = w;
