@@ -12,11 +12,11 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         boot:: constituent:: constituent(const species::ptr &sp,
-                                         const double        w ) throw() :
+                                         const int           w ) throw() :
         spec(sp),
         weight(w)
         {
-            assert(fabs(w)>0);
+            assert(w!=0);
         }
         
         boot:: constituent:: constituent( const constituent &other ) throw() :
@@ -152,7 +152,7 @@ namespace yocto
                 {
                     const constituent &cc = **j;
                     const size_t k = cc.spec->indx;
-                    const double w = cc.weight;
+                    const int    w = cc.weight;
                     assert(k>=1);
                     assert(k<=P.cols);
                     P_i[k] = w;
@@ -198,7 +198,7 @@ namespace yocto
                     const double       v  = cstr.value;    //! the value
                     const constituent &cc = *cstr.front(); //! the only constituent
                     const size_t       k  = cc.spec->indx; //! its index
-                    const double       w  = cc.weight;     //! its weight
+                    const int          w  = cc.weight;     //! its weight
                     const char        *id = cc.spec->name.c_str();
                     assert(k>=1);
                     assert(k<=M);
