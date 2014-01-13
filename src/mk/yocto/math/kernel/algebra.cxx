@@ -82,6 +82,13 @@ namespace yocto
 			for( size_t i=v.size();i>0;--i) { v[i] += a * u[i]; }
         }
         
+        template <>
+		void algebra<z_type>:: mulsub( array<z_type> &v, z_type a, const array<z_type> &u ) throw()
+		{
+			assert( v.size() == u.size() );
+			for( size_t i=v.size();i>0;--i) { v[i] -= a * u[i]; }
+        }
+        
         
 		
 		template <>

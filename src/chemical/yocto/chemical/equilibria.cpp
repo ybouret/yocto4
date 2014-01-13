@@ -41,6 +41,7 @@ namespace yocto
         W(),
         xi(),
         LU(),
+        CC(),
         dervs()
         {
         }
@@ -112,6 +113,7 @@ namespace yocto
         //======================================================================
         void equilibria:: reset() throw()
         {
+            CC.release();
             LU.release();
             xi.release();
             W.release();
@@ -174,6 +176,7 @@ namespace yocto
                     W.     make(N,N);
                     xi.    make(N,0);
                     LU.    ensure(N);
+                    CC.    make(M,0.0);
                     
                     //----------------------------------------------------------
                     // compute topological parts
@@ -205,15 +208,16 @@ namespace yocto
             }
         }
         
-        
-        double equilibria:: rms(const double t)  throw()
+        //======================================================================
+        // normalized RMS for Gamma
+        //======================================================================
+        void equilibria:: compute_Gamma(const double t)  throw()
         {
             const size_t N = nu.rows;
             if(N<=0)
-                return 0;
+                return;
             const size_t    M  = nu.cols;
             iterator        eq = begin();
-            double ans = 0;
             for(size_t i=1;i<=N;++i,++eq)
             {
                 equilibrium &Eq = **eq;
@@ -239,16 +243,47 @@ namespace yocto
                     }
                     
                 }
-                double G = fabs(Ki * lhs - rhs);
+                Gamma[i] = Ki*lhs -rhs;
+                if(Fabs(Gamma[i])<=tiny) Gamma[i] = 0;
+            }
+            
+        }
+        
+        //======================================================================
+        // normalized RMS for Gamma
+        //======================================================================
+        double equilibria:: Gamma2RMS() const throw()
+        {
+            assert(Gamma.size()>0);
+            const size_t   N   = Gamma.size();
+            double         ans = 0;
+            const_iterator eq  = begin();
+            for(size_t i=1;i<=N;++i,++eq)
+            {
+                const equilibrium &Eq = **eq;
+                double             G  = fabs(Gamma[i]);
                 const size_t DeltaNuP = Eq.NuP;
                 if(DeltaNuP>0)
                     G = pow(G,1.0/DeltaNuP);
                 ans += G*G;
             }
-            
             return sqrt(ans/N);
         }
         
+        //======================================================================
+        // compute Gamma return scaled rms
+        //======================================================================
+        double equilibria:: compute_rms(double t) throw()
+        {
+            compute_Gamma(t);
+            return Gamma2RMS();
+        }
+        
+        
+        
+        //======================================================================
+        // compute Gamma and Phi=dGamma/dC
+        //======================================================================
         void equilibria:: compute_Gamma_and_Phi( double t, bool compute_derivatives)
         {
             const size_t N  = nu.rows;
@@ -306,12 +341,9 @@ namespace yocto
                 {
                     dtGam[i] = dervs( Eq.K, t, time_scale ) * lhs;
                 }
-            }
-            
-            for(size_t i=N;i>0;--i)
-            {
                 if(Fabs(Gamma[i])<=tiny) Gamma[i] = 0;
             }
+            
             
             for(size_t j=M;j>0;--j)
             {
@@ -350,54 +382,91 @@ namespace yocto
             }
             Nu.assign(nu);
         }
-
         
-        void equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
+        
+        bool equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
             mkl::mul_rtrn(W, Phi,Nu);
-            if( !LU.build(W) )
-                throw exception("equilibria: invalid composition");
+            return LU.build(W);
         }
         
         
-      
-        
-        void equilibria:: normalize_C( double t )
+        bool equilibria:: normalize_C( double t )
         {
             
             const size_t N = nu.rows;
-            cleanup_C();
+            const size_t M = nu.cols;
+            
+#if !defined(NDEBUG)
+            for(size_t i=M;i>0;--i) { assert(C[i]>=0); }
+#endif
             
             if(N>0)
             {
-                const size_t M = nu.cols;
+                
                 
             NEWTON_STEP:
-                compute_Gamma_and_W(t,false);
+                //______________________________________________________________
+                //
+                // compute the Newton's step -dC
+                //______________________________________________________________
+                if(!compute_Gamma_and_W(t,false))
+                    return false;
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,Nu,xi);
-                mkl::sub(C, dC);
-                std::cerr << "Gamma=" << Gamma << std::endl;
-                std::cerr << "dC   =" << dC    << std::endl;
                 
-                bool converged = true;
+                //______________________________________________________________
+                //
+                // careful subtraction
+                //______________________________________________________________
+                mkl::set(CC,C);
+                double shrink = 1;
                 for(size_t i=M;i>0;--i)
                 {
-                    if( C[i] <= tiny )
-                        C[i] = 0;
-                    double err = Fabs(dC[i]);
-                    if( err <= tiny ) err = 0;
-                    if( err > Fabs( ftol * C[i] ) )
+                    double &dd = dC[i];
+                    double &cc = C[i];
+                    if(dd>cc)
                     {
-                        converged = false;
+                        shrink = min_of(shrink,cc/dd);
+                        cc = 0;
+                        dd = 0;
                     }
                 }
-                std::cerr << "C=" << C << std::endl;
-                if(!converged)
-                    goto NEWTON_STEP;
+                
+                mkl::mulsub(C, shrink, dC);
+                
+                //______________________________________________________________
+                //
+                // Effective increase
+                //______________________________________________________________
+                mkl::sub(CC,C);
+                
+                std::cerr << "Gamma  =" << Gamma << std::endl;
+                std::cerr << "dC     =" << CC    << std::endl;
+                std::cerr << "shrink =" << shrink << std::endl;
+                std::cerr << "C      =" << C      << std::endl;
+                
+                //______________________________________________________________
+                //
+                // convergence
+                //______________________________________________________________
+                for(size_t i=M;i>0;--i)
+                {
+                    double err = fabs(CC[i]);
+                    if(err<=tiny) err = 0;
+                    if(err> ftol * fabs(C[i]))
+                        goto NEWTON_STEP;
+                }
+               
+                //______________________________________________________________
+                //
+                // check error
+                //______________________________________________________________
+                
             }
+            return true;
         }
         
         
@@ -419,6 +488,8 @@ namespace yocto
             }
             
         }
+        
+        
         
         
         void equilibria:: load_C( const array<double> &y ) throw()

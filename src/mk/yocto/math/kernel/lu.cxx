@@ -51,6 +51,14 @@ namespace yocto
         }
         
         template <>
+        size_t lu<z_type>:: capacity() const throw()
+        {
+            return maxi_;
+        }
+
+        
+        
+        template <>
         lu<z_type>:: lu(size_t n) :
         indx(),
         scal(),
