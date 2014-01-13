@@ -37,7 +37,7 @@ namespace yocto
             imatrix_t    nuR;   //!< reactives, NxM
             imatrix_t    nuP;   //!< products,  NxM
             matrix_t     nu;    //!< algebraic, NxM
-            matrix_t     Nu;    //!< effective Nu for extend, NxM
+            matrix_t     Nu;    //!< effective Nu
             bvector_t    fixed; //!< initially all false
             vector_t     Gamma; //!< unrolled equilibria, N
             vector_t     dtGam; //!< time derivative of Gamma
@@ -45,12 +45,19 @@ namespace yocto
             matrix_t     W;     //!< (Phi*nu')^(-1), NxN
             vector_t     xi;    //!< local extent
             lu_t         LU;    //!< for local matrix inversion
+            vector_t     CC;    //!< auxiliary
             
             //! release all memory
             void reset() throw();
             
+            
             //! allocate from a collection
             void build_from( collection &lib );
+            
+            
+            //! test for positive/cutoff C
+            void cleanup_C() throw();
+            
             
             //! make a "true" constant equilibrium
             equilibrium &add( const string &name, const double K);
@@ -58,26 +65,38 @@ namespace yocto
             //! wrapper
             equilibrium &add( const char   *name, const double K);
             
+            
             //! default water wrapper
             void add_water( const collection &lib, const double Kw);
+            
             
             //! default acid wrapper
             void add_acid( const collection &lib, const char *name, const char *acid, const char *base, const double Ka );
             
             
-            //! compute Gamma and Phi, dGamma/dt if needed
+            //! compute Gamma and Phi=dGamma/dC, dGamma/dt if needed
+            /**
+             Uses the exact topology for Gamma and Phi,
+             the set to zero the fixed derivatives.
+             */
             void compute_Gamma_and_Phi( double t, bool compute_derivatives);
             
             
             //! compute Gamma and W=(Phi*nu')^(-1). dGamma/dt if needed
-            void compute_Gamma_and_W( double t, bool compute_derivatives);
+            /**
+             \return false in case of singular composition
+             */
+            bool compute_Gamma_and_W( double t, bool compute_derivatives);
             
             
             //! compute nu'*(Phi*nu')^(-1)*Phi, valid for a NORMALIZED C
             void compute_Chi(matrix_t &Chi, double t);
             
-            //! cleanup and Newton algorithm to find equilibria
-            void normalize_C( double t);
+            
+            //! Newton algorithm to find equilibria
+            bool normalize_C( double t);
+            
+            
             
             //! Copy first C.size() variables from y, y.size() >= C.size()
             void load_C( const array<double> &y ) throw();
@@ -99,6 +118,9 @@ namespace yocto
             void legalize_dC( double t, bool computeDerivatives=true );
             
             //! scale all equilibrium
+            /**
+             for each equilibirum, call scale(t)
+             */
             void scale_all( double t ) const throw();
             
             //! build a random valid concentration after scaling
@@ -111,11 +133,12 @@ namespace yocto
             
             friend std::ostream & operator<<( std::ostream &, const equilibria &);
             
-            //! test for positive/cutoff C
-            void cleanup_C() throw();
+           
             
-            //! rescaled Gamma root mean square using C
-            double rms(const double t) throw();
+            //! compute Gamma Only
+            void   compute_Gamma(const double t) throw();
+            double Gamma2RMS() const throw();
+            double compute_rms(double t) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

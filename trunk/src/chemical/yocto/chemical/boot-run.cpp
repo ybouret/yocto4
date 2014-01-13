@@ -29,10 +29,31 @@ namespace yocto
         }
         
         
+        static inline bool has_maximal_rank( const matrix_t &A, lu_t &LU )
+        {
+            const size_t nr = A.rows;
+            const size_t nc = A.cols;
+            assert( LU.capacity() >= max_of(A.rows, A.cols));
+            
+            if(nr>nc)
+            {
+                matrix_t A2(nc,nc);
+                mkl::mul_ltrn(A2, A, A);
+                return LU.build(A2);
+            }
+            else
+            {
+                matrix_t A2(nr,nr);
+                mkl::mul_rtrn(A2, A, A);
+                return LU.build(A2);
+            }
+            
+        }
+        
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
-            static const double FTOL = math::numeric<double>::ftol;
+            //static const double FTOL = math::numeric<double>::ftol;
             
             auto_clean<equilibria> onReturn( cs, & equilibria::restore_topology );
             
@@ -111,8 +132,8 @@ namespace yocto
             
             const size_t dof   = dispatch(P, Lam, cs.fixed, X0);
             const size_t fix   = Nc-dof;
-            std::cerr << "#DOF  ="  << dof << std::endl;
-            std::cerr << "#FIX  ="  << fix << std::endl;
+            std::cerr << "#DOF  =" << dof << std::endl;
+            std::cerr << "#FIX  =" << fix << std::endl;
             std::cerr << "fixed =" << cs.fixed << std::endl;
             std::cerr << "X0    =" << X0    << std::endl;
             cs.update_topology();
@@ -136,6 +157,8 @@ namespace yocto
             {
                 generate_starting(cs,X0, ran, t);
                 std::cerr << "C0=" << cs.C << std::endl;
+                cs.cleanup_C();
+                cs.normalize_C(t);
                 cs.restore_topology();
                 cs.normalize_C(t); // just to check
                 std::cerr << "C=" << cs.C << std::endl;
@@ -268,11 +291,10 @@ namespace yocto
                     //--------------------------------------------------------------
                     //-- check rank
                     //--------------------------------------------------------------
+                    std::cerr << "F=" << F << std::endl;
+                    if( !has_maximal_rank(F,LU))
                     {
-                        matrix_t F2(Nc,Nc);
-                        mkl::mul_ltrn(F2, F, F);
-                        if(!LU.build(F2))
-                            throw exception("singular chemical constraint/orthogonal space");
+                        throw exception("singular chemical constraint/orthogonal space");
                     }
                     
                     //--------------------------------------------------------------
@@ -324,7 +346,7 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
 } while(false)
             
             
-        // INITIALIZE:
+            // INITIALIZE:
             generate_starting(cs, X0, ran, t);
             //std::cerr << "C0=" << C << std::endl;
             
@@ -358,6 +380,7 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
             //std::cerr  << "Cn=" << cs.C << std::endl;
             
             //-- normalize it
+            cs.cleanup_C();
             cs.normalize_C(t);
             std::cerr << "C=" << C << std::endl;
             
