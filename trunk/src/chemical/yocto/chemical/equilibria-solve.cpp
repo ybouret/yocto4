@@ -54,14 +54,12 @@ namespace yocto
                     double &cc = C[i];
                     if(dd>cc)
                     {
-                        //shrink = min_of(shrink,cc/dd);
                         cc /= 2;
                         dd  = 0;
                         cut = true;
                     }
                 }
                 
-                //mkl::mulsub(C, shrink, dC);
                 mkl::sub(C,dC);
 #if !defined(NDEBUG)
                 for(size_t i=M;i>0;--i) { assert(C[i]>=0); }

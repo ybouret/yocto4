@@ -163,7 +163,6 @@ namespace yocto
             if(dof<=0)
             {
                 generate_starting(cs,X0, ran, t);
-                //std::cerr << "C0=" << cs.C << std::endl;
                 cs.cleanup_C();
                 cs.normalize_C(t);
                 cs.restore_topology();
@@ -332,6 +331,53 @@ namespace yocto
             }
             std::cerr << "Z=" << Z << std::endl;
             
+#define COMPUTE_C(toto) do {\
+mkl::set(toto,Xstar); mkl::muladd(toto,Z,U);\
+for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
+} while(false)
+            
+            vector_t U(N,0.0);
+            vector_t &C     = cs.C;
+            vector_t &dC    = cs.dC;
+            matrix_t &W     = cs.W;
+            matrix_t &Phi   = cs.Phi;
+            vector_t &Gamma = cs.Gamma;
+            vector_t &dU    = cs.xi;
+            vector_t  X(M,0.0);
+            
+            //-- make U start
+            generate_starting(cs, X0, ran, t);
+            mkl::mul_trn(U, Z, C);
+            COMPUTE_C(C);
+
+            size_t    count  =  0;
+            for(count=0;count<=8;++count)
+            {
+                std::cerr << std::endl;
+                std::cerr << "U=" << U << std::endl;
+                std::cerr << "C=" << C << std::endl;
+                
+                //--
+                cs.compute_Gamma_and_Phi(t,false);
+                mkl::mul(W, Phi, Z);
+                if( !LU.build(W) )
+                {
+                    // goto START
+                    std::cerr << "Invalid Composition" << std::endl;
+                    exit(1);
+                }
+                mkl::neg(dU,Gamma);
+                LU.solve(W,dU);
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                std::cerr << "dU=" << dU << std::endl;
+                mkl::add(U,dU);
+                mkl::set(X,C);
+                COMPUTE_C(C);
+                std::cerr << "C1=" << C << std::endl;
+                mkl::mul_trn(U, Z, C);
+            }
+            exit(1);
+            
             //__________________________________________________________________
             //
             //
@@ -339,19 +385,11 @@ namespace yocto
             //
             //__________________________________________________________________
             const size_t        min_steps         = STEPS_PER_SPECIES * M;
-            vector_t U(N,0.0);
-            vector_t &C  = cs.C;
-            vector_t &dC = cs.dC;
-            vector_t  X(M,0.0);
             
-            size_t    count  =  0;
+            
             double    oldRMS = -1;
             size_t    trials =  0;
             
-#define COMPUTE_C(toto) do {\
-mkl::set(toto,Xstar); mkl::muladd(toto,Z,U);\
-for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
-} while(false)
             
             
         INITIALIZE:
@@ -430,7 +468,7 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
             //------------------------------------------------------------------
             const double RMS = mkl::rms(X);
             //fp("%g %g\n", double(count), RMS );
-           
+            
             //------------------------------------------------------------------
             // test convergence when allowable
             //------------------------------------------------------------------
