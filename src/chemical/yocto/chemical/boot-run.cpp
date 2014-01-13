@@ -332,6 +332,8 @@ namespace yocto
             // Le us find some concentrations
             //
             //__________________________________________________________________
+            static const size_t STEPS_PER_SPECIES = 2;
+            const size_t        min_steps         = STEPS_PER_SPECIES * M;
             vector_t U(N,0.0);
             vector_t &C  = cs.C;
             vector_t &dC = cs.dC;
@@ -346,9 +348,9 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
 } while(false)
             
             
-            // INITIALIZE:
+        INITIALIZE:
             generate_starting(cs, X0, ran, t);
-            //std::cerr << "C0=" << C << std::endl;
+            std::cerr << "C0=" << C << std::endl;
             
             count  =  0;
             oldRMS = -1;
@@ -381,7 +383,11 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
             
             //-- normalize it
             cs.cleanup_C();
-            cs.normalize_C(t);
+            if(!cs.normalize_C(t))
+            {
+                std::cerr << "invalid composition: try again..." << std::endl;
+                goto INITIALIZE;
+            }
             std::cerr << "C=" << C << std::endl;
             
             //-- compute effective difference
@@ -390,8 +396,9 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
             std::cerr << "dX=" << X << std::endl;
             const double RMS = mkl::rms(X);
             fp("%g %g\n", double(count), RMS );
-            if(++count>10)
+            if(++count>min_steps)
             {
+                assert(oldRMS>=0);
                 if(RMS>=oldRMS)
                     goto FINALIZE;
             }
@@ -400,7 +407,52 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
             goto PROJECTION;
             
         FINALIZE:
-            ;
+            //__________________________________________________________________
+            //
+            // compute the residue/cleanup
+            //__________________________________________________________________
+            
+            //-- compute projected U
+            mkl::mul_trn(U,Z,C);
+            
+            //-- compute X
+            COMPUTE_C(X);
+            std::cerr << "C=" << C << std::endl;
+            std::cerr << "X=" << X << std::endl;
+            
+            //-- compute residue
+            mkl::sub(X,C);
+            for(size_t i=M;i>0;--i)
+            {
+                double err = fabs(X[i]);
+                if(err<=cs.tiny)
+                    err = 0;
+                else
+                    err = pow(10,ceil(log10(err)));
+                X[i] = err;
+            }
+            
+            std::cerr << "R=" << X << std::endl;
+            
+            //-- cleanup
+            for(size_t i=M;i>0;--i)
+            {
+                if( C[i] < X[i] ) C[i] = 0;
+            }
+            
+            std::cerr << "C1=" << C << std::endl;
+            
+            //-- partial normalization
+            if(!cs.normalize_C(t))
+                throw exception("invalid final composition/level-1");
+            
+            std::cerr << "C2=" << C << std::endl;
+            //-- full normalization
+            cs.restore_topology();
+            if(!cs.normalize_C(t))
+                throw exception("invalid final composition/level-2");
+            
+            std::cerr << "C=" << std::endl;
         }
         
         
