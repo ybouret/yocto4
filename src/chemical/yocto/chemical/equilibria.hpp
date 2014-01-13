@@ -28,8 +28,6 @@ namespace yocto
             double ftol;       //!< for Newton Convergence
             double time_scale; //!< for time derivatives, default is 1e-4
             
-            const double tiny;      //!< numeric cutoff: numeric<double>::tiny
-            const double sqrt_tiny; //!< numeric RMS cutoff: numeric<double>::sqrt_tiny
             
             
             vector_t     C;     //!< local concentrations
