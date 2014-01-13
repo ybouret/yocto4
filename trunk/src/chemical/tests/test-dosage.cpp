@@ -96,6 +96,8 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         fp << "\n";
         
         fp << "0";
+        if( S0["H+"]<=0 )
+            throw exception("no H+");
         fp(" %.5e", S0.pH());
         S0.write_values(fp);
         fp << "\n";
@@ -113,6 +115,8 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         
         ios::ocstream fp(fn,true);
         fp("%.5e", i*dV);
+        if( S0["H+"]<=0 )
+            throw exception("no H+");
         fp(" %.5e", S0.pH());
         S0.write_values(fp);
         fp << "\n";

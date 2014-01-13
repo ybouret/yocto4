@@ -26,8 +26,6 @@ namespace yocto
         temperature(standard_temperature),
         ftol( numeric<double>::ftol ),
         time_scale(1e-4),
-        tiny(  numeric<double>::tiny ),
-        sqrt_tiny( numeric<double>::sqrt_tiny ),
         C(),
         dC(),
         nuR(),
@@ -58,7 +56,7 @@ namespace yocto
         {
             for(size_t i=C.size();i>0;--i)
             {
-                if(C[i]<=tiny) C[i] = 0;
+                if(C[i]<=numeric<double>::tiny) C[i] = 0;
                 assert(C[i]>=0);
             }
         }
@@ -244,7 +242,6 @@ namespace yocto
                     
                 }
                 Gamma[i] = Ki*lhs -rhs;
-                //if(Fabs(Gamma[i])<=tiny) Gamma[i] = 0;
             }
             
         }
@@ -341,7 +338,6 @@ namespace yocto
                 {
                     dtGam[i] = dervs( Eq.K, t, time_scale ) * lhs;
                 }
-                //if(Fabs(Gamma[i])<=tiny) Gamma[i] = 0;
             }
             
             
@@ -392,7 +388,7 @@ namespace yocto
         }
         
         
-               
+        
         
         void equilibria:: legalize_dC( double t, bool computeDerivatives)
         {
@@ -406,7 +402,7 @@ namespace yocto
                 mkl::mulsub_trn(dC, Nu, dtGam);
                 for(size_t i=dC.size();i>0;--i)
                 {
-                    if( fixed[i] || (fabs(dC[i]) <= sqrt_tiny) )
+                    if( fixed[i] )
                         dC[i] = 0;
                 }
             }
