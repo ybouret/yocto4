@@ -70,6 +70,8 @@ namespace yocto
             static const T zero;
             static const T one;
             static const T two;
+            
+            static T round_error( T x ) throw();
 		};
 		
         

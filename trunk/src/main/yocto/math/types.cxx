@@ -1,7 +1,7 @@
 
 namespace yocto {
     
-    namespace math 
+    namespace math
     {
         
         real_t Atan2( real_t x, real_t y ) throw()
@@ -13,13 +13,13 @@ namespace yocto {
             {
                 return Atan(y/x);
             }
-            else 
+            else
             {
                 if( x < 0 )
                 {
                     return (y >= 0) ? Atan(y/x) + full_pi : Atan(y/x) - full_pi;
                 }
-                else 
+                else
                 {
                     // undefined for (0,0) => set 0
                     return y > 0 ? half_pi : ( y < 0 ? -half_pi : 0 );
@@ -27,7 +27,22 @@ namespace yocto {
             }
             
             
+            
         }
         
+        
+        template <>
+        real_t numeric<real_t>:: round_error(real_t x) throw()
+        {
+            real_t err = Fabs(x);
+            if(err<= numeric<real_t>::tiny )
+            {
+                return err;
+            }
+            else
+            {
+                return Pow( real_t(10), Ceil( Log10(err) ) );
+            }
+        }
     }
 }

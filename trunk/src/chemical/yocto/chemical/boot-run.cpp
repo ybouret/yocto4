@@ -359,13 +359,18 @@ if(cs.fixed[ii])                 VALUE = X0[ii]; }\
             COMPUTE_C(C);
             std::cerr << "C1=" << C << std::endl;
             
+            ios::ocstream fp("rms.dat",false);
             size_t count = 0;
+            double RMS   = -1; //!< Test on displacement
+            
         NEWTON_STEP:
             // newton step
             cs.compute_Gamma_and_Phi(t,false);
+            const double H0 = cs.Gamma2RMS();
             mkl::mul(W,Phi,Z);
             
             std::cerr << "Gamma=" << Gamma << std::endl;
+            std::cerr << "H0=" << H0 << std::endl;
             if( !LU.build(W) )
             {
                 std::cerr << "invalid comp" << std::endl;
@@ -375,13 +380,17 @@ if(cs.fixed[ii])                 VALUE = X0[ii]; }\
             mkl::neg(dU,Gamma);
             LU.solve(W,dU);
             mkl::mul(dC,Z,dU);
-            
+            for(size_t i=M;i>0;--i)
+            {
+                if(cs.fixed[i]) dC[i] = 0;
+            }
             mkl::set(X,C);
             
             mkl::add(C,dC);
             mkl::mul_trn(U,Z,C);
             COMPUTE_C(C);
             std::cerr << "C2=" << C << std::endl;
+            const double H1 = cs.compute_rms(t);
             
             // effective dC
             mkl::sub(X,C);
@@ -389,10 +398,25 @@ if(cs.fixed[ii])                 VALUE = X0[ii]; }\
             std::cerr << "dC=" << dC << std::endl;
             std::cerr << "dX=" << X  << std::endl;
             
-            if(++count<20)
-                goto NEWTON_STEP;
+            const double newRMS = mkl::rms(X);
+            std::cerr << "rms=" << newRMS << std::endl;
+            fp("%g %g %g\n", double(count), newRMS, H1);
+           
+            if( H1 <= H0 )
+            {
+                // successfull Newtons' Step
+                if(RMS>=0)
+                {
+                    if(newRMS>=RMS)
+                        goto FINALIZE;
+                }
+               
+            }
             
+            RMS = newRMS;
+            goto NEWTON_STEP;
             
+        FINALIZE:
             exit(1);
             
             
