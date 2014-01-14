@@ -131,12 +131,26 @@ namespace yocto
             
             friend std::ostream & operator<<( std::ostream &, const equilibria &);
             
-           
             
             //! compute Gamma Only
             void   compute_Gamma(const double t) throw();
+            
+            //! convert Gamma to a RMS value
             double Gamma2RMS() const throw();
+            
+            //! call compute_Gamma and Gamma2RMS
             double compute_rms(double t) throw();
+            
+            //! try to decrease C with dC
+            /**
+             if(!fixed[i])
+             {
+             safe decrease: if d[i]>=C[i], divide C[i].
+             Otherwise C[i] -= d[i];
+             }
+             \return false is one coordinate was cut
+             */
+            bool full_decrease_C_with( const array<double> &d ) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
