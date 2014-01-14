@@ -331,8 +331,8 @@ namespace yocto
             }
             std::cerr << "Z=" << Z << std::endl;
             
-//if(VALUE<=numeric<double>::tiny) VALUE = 0;    }
-   
+            //if(VALUE<=numeric<double>::tiny) VALUE = 0;    }
+            
 #define COMPUTE_C(toto) do {                     \
 mkl::set(toto,Xstar); mkl::muladd(toto,Z,U);     \
 for(size_t ii=M;ii>0;--ii) {                     \
@@ -349,7 +349,11 @@ if(cs.fixed[ii])                 VALUE = X0[ii]; }\
             vector_t &dU    = cs.xi;
             vector_t  X(M,0.0);
             
-            std::cerr << std::endl << "Starting point" << std::endl;
+            size_t trials=0;
+            
+        INITIALIZE:
+            ++trials;
+            std::cerr << std::endl << "Starting point #" << trials << std::endl;
             generate_starting(cs, X0, ran, t);
             
             std::cerr << "C0=" << C << std::endl;
@@ -360,63 +364,155 @@ if(cs.fixed[ii])                 VALUE = X0[ii]; }\
             std::cerr << "C1=" << C << std::endl;
             
             ios::ocstream fp("rms.dat",false);
-            size_t count = 0;
+            size_t count =  0;
             double RMS   = -1; //!< Test on displacement
             
         NEWTON_STEP:
+            ++count;
             // newton step
             cs.compute_Gamma_and_Phi(t,false);
             const double H0 = cs.Gamma2RMS();
             mkl::mul(W,Phi,Z);
             
             std::cerr << "Gamma=" << Gamma << std::endl;
-            std::cerr << "H0=" << H0 << std::endl;
+            std::cerr << "H0="    << H0    << std::endl;
             if( !LU.build(W) )
             {
-                std::cerr << "invalid comp" << std::endl;
-                exit(2);
+                std::cerr << "invalid composition in newton's step" << std::endl;
+                goto INITIALIZE;
             }
             
             mkl::neg(dU,Gamma);
             LU.solve(W,dU);
             mkl::mul(dC,Z,dU);
+            
+            //-- clean dC
             for(size_t i=M;i>0;--i)
             {
                 if(cs.fixed[i]) dC[i] = 0;
             }
+            
+            // save C
             mkl::set(X,C);
             
             mkl::add(C,dC);
             mkl::mul_trn(U,Z,C);
             COMPUTE_C(C);
-            std::cerr << "C2=" << C << std::endl;
-            const double H1 = cs.compute_rms(t);
-            
-            // effective dC
-            mkl::sub(X,C);
             std::cerr << "U ="  << U << std::endl;
             std::cerr << "dC=" << dC << std::endl;
-            std::cerr << "dX=" << X  << std::endl;
+            std::cerr << "C2=" << C << std::endl;
+            double H1    = cs.compute_rms(t);
+            double alpha = 1;
+            bool   full  = true;
             
-            const double newRMS = mkl::rms(X);
-            std::cerr << "rms=" << newRMS << std::endl;
-            fp("%g %g %g\n", double(count), newRMS, H1);
-           
-            if( H1 <= H0 )
+            while(H1>H0)
             {
-                // successfull Newtons' Step
-                if(RMS>=0)
+                full   = false;
+                alpha *= 0.1;
+                if(alpha < numeric<double>::ftol)
                 {
-                    if(newRMS>=RMS)
-                        goto FINALIZE;
+                    alpha = -1;
+                    break;
                 }
-               
+                mkl::set(C,X);
+                mkl::muladd(C, alpha, dC);
+                mkl::mul_trn(U,Z,C);
+                COMPUTE_C(C);
+                H1 = cs.compute_rms(t);
             }
             
-            RMS = newRMS;
+            
+            if(alpha<0)
+            {
+                std::cerr << "-- [[ Spurious Step ]]" << std::endl;
+                mkl::set(C,X);
+                goto FINALIZE;
+            }
+            
+            if(full)
+            {
+                // effective dC
+                mkl::sub(X,C);
+                
+                std::cerr << "dX=" << X  << std::endl;
+                
+                const double newRMS = mkl::rms(X);
+                std::cerr << "rms=" << newRMS << std::endl;
+                fp("%g %g %g\n", double(count), newRMS, H1);
+                
+                if( H1 <= H0 )
+                {
+                    // successfull Newtons' Step
+                    if(RMS>=0)
+                    {
+                        if(newRMS>=RMS)
+                        {
+                            std::cerr << "-- [[ Converged ]]" << std::endl;
+                            goto FINALIZE;
+                        }
+                    }
+                    
+                }
+                
+                RMS = newRMS;
+            }
+            else
+                RMS = -1;
+            
             goto NEWTON_STEP;
             
         FINALIZE:
+            std::cerr << "C1=" << C << std::endl;
+
+            // Error from non-linear system
+            cs.compute_Gamma_and_Phi(t,false);
+            mkl::mul(W,Phi,Z);
+            if( !LU.build(W) )
+            {
+                std::cerr << "Invalid Final Conc..." << std::endl;
+                goto INITIALIZE;
+            }
+            
+            std::cerr << "Gamma=" << Gamma << std::endl;
+            mkl::set(dU,Gamma);
+            LU.solve(W, dU);
+            mkl::mul(dC,Z,dU);
+            for_each( dC.begin(), dC.end(), numeric<double>::round_error);
+            std::cerr << "dCnl=" << dC << std::endl;
+            for(size_t i=M;i>0;--i)
+            {
+                if( fabs(C[i]) <= max_of(dC[i],numeric<double>::tiny) ) C[i] = 0;
+            }
+            std::cerr << "Cnl=" << C << std::endl;
+
+            
+            // Error from linear system
+            mkl::mul(Mu,P,C);
+            mkl::sub(Mu,Lam);
+            std::cerr << "Mu=" << Mu << std::endl;
+            LU2.solve(P2, Mu);
+            mkl::mul_trn(dC,P,Mu);
+            const double algErr = mkl::rms(dC);
+            std::cerr << "algebraicError=" << algErr << std::endl;
+            for_each( dC.begin(), dC.end(), numeric<double>::round_error);
+            std::cerr << "dClin=" << dC << std::endl;
+            
+            for(size_t i=M;i>0;--i)
+            {
+                if( fabs(C[i]) <= max_of(dC[i],numeric<double>::tiny) ) C[i] = 0;
+            }
+            std::cerr << "Clin=" << C << std::endl;
+            
+            //-- check positive conc
+            for(size_t i=M;i>0;--i)
+            {
+                if( C[i] < 0 )
+                {
+                    std::cerr << "Invalid final composition" << std::endl;
+                    goto INITIALIZE;
+                }
+            }
+            
             exit(1);
             
             

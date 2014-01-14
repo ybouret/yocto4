@@ -40,6 +40,10 @@ namespace yocto
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,Nu,xi);
+                for(size_t i=M;i>0;--i)
+                {
+                    if(fixed[i]) dC[i] = 0;
+                }
                 
                 //______________________________________________________________
                 //

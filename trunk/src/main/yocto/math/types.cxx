@@ -32,16 +32,16 @@ namespace yocto {
         
         
         template <>
-        real_t numeric<real_t>:: round_error(real_t x) throw()
+        void numeric<real_t>:: round_error(real_t &x) throw()
         {
-            real_t err = Fabs(x);
-            if(err<= numeric<real_t>::tiny )
+            x = Fabs(x);
+            if(x<= numeric<real_t>::tiny )
             {
-                return err;
+                x=0;
             }
             else
             {
-                return Pow( real_t(10), Ceil( Log10(err) ) );
+                x = Pow( real_t(10), Ceil( Log10(x) ) );
             }
         }
     }
