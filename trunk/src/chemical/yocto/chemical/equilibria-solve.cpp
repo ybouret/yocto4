@@ -46,48 +46,18 @@ namespace yocto
                 // careful subtraction
                 //______________________________________________________________
                 mkl::set(CC,C);
-                std::cerr << "dC0=" <<dC << std::endl;
-                bool cut = false;
-                for(size_t i=M;i>0;--i)
-                {
-                    double &dd = dC[i];
-                    double &cc = C[i];
-                    if(dd>cc)
-                    {
-                        cc /= 2;
-                        dd  = 0;
-                        cut = true;
-                    }
-                }
+                //std::cerr << "dC0=" <<dC << std::endl;
                 
-                mkl::sub(C,dC);
-#if !defined(NDEBUG)
-                for(size_t i=M;i>0;--i) { assert(C[i]>=0); }
-#endif
-                
-                if(cut)
+                if( !full_decrease_C_with(dC) )
                     goto NEWTON_STEP;
                 
                 //______________________________________________________________
                 //
-                // Effective increase
+                // convergence: test full dC
                 //______________________________________________________________
-                mkl::sub(CC,C);
-                
-                std::cerr << "Gamma  =" << Gamma << std::endl;
-                std::cerr << "dC     =" << CC    << std::endl;
-                //std::cerr << "shrink =" << shrink << std::endl;
-                std::cerr << "C      =" << C      << std::endl;
-                
-                //______________________________________________________________
-                //
-                // convergence
-                //______________________________________________________________
-               
-                
                 for(size_t i=M;i>0;--i)
                 {
-                    double err = fabs(CC[i]);
+                    double err = fabs(dC[i]);
                     if(err<=numeric<double>::tiny) err = 0;
                     if(err> ftol * fabs(C[i]))
                         goto NEWTON_STEP;
@@ -118,16 +88,16 @@ namespace yocto
                 {
                     if( C[i] < dC[i] ) C[i] = 0;
                 }
-                std::cerr << "C   =" << C  << std::endl;
+                //std::cerr << "C   =" << C  << std::endl;
                 //std::cerr << "Cerr=" << dC << std::endl;
                 //std::cerr << std::endl;
                 
             }
             return true;
         }
-
-
+        
+        
     }
-
+    
 }
 

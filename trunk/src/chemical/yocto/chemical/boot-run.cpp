@@ -2,7 +2,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
-//#include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/ocstream.hpp"
 #include "yocto/math/kernel/svd.hpp"
 #include "yocto/auto-clean.hpp"
 
@@ -331,9 +331,13 @@ namespace yocto
             }
             std::cerr << "Z=" << Z << std::endl;
             
-#define COMPUTE_C(toto) do {\
-mkl::set(toto,Xstar); mkl::muladd(toto,Z,U);\
-for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
+//if(VALUE<=numeric<double>::tiny) VALUE = 0;    }
+   
+#define COMPUTE_C(toto) do {                     \
+mkl::set(toto,Xstar); mkl::muladd(toto,Z,U);     \
+for(size_t ii=M;ii>0;--ii) {                     \
+double &VALUE = toto[ii];                        \
+if(cs.fixed[ii])                 VALUE = X0[ii]; }\
 } while(false)
             
             vector_t U(N,0.0);
@@ -345,206 +349,53 @@ for(size_t ii=M;ii>0;--ii) if(cs.fixed[ii]) toto[ii] = X0[ii]; \
             vector_t &dU    = cs.xi;
             vector_t  X(M,0.0);
             
-            //-- make U start
+            std::cerr << std::endl << "Starting point" << std::endl;
             generate_starting(cs, X0, ran, t);
-            mkl::mul_trn(U, Z, C);
-            COMPUTE_C(C);
-
-            size_t    count  =  0;
-            for(count=0;count<=8;++count)
-            {
-                std::cerr << std::endl;
-                std::cerr << "U=" << U << std::endl;
-                std::cerr << "C=" << C << std::endl;
-                
-                //--
-                cs.compute_Gamma_and_Phi(t,false);
-                mkl::mul(W, Phi, Z);
-                if( !LU.build(W) )
-                {
-                    // goto START
-                    std::cerr << "Invalid Composition" << std::endl;
-                    exit(1);
-                }
-                mkl::neg(dU,Gamma);
-                LU.solve(W,dU);
-                std::cerr << "Gamma=" << Gamma << std::endl;
-                std::cerr << "dU=" << dU << std::endl;
-                mkl::add(U,dU);
-                mkl::set(X,C);
-                COMPUTE_C(C);
-                std::cerr << "C1=" << C << std::endl;
-                mkl::mul_trn(U, Z, C);
-            }
-            exit(1);
             
-            //__________________________________________________________________
-            //
-            //
-            // Le us find some concentrations
-            //
-            //__________________________________________________________________
-            const size_t        min_steps         = STEPS_PER_SPECIES * M;
+            std::cerr << "C0=" << C << std::endl;
             
-            
-            double    oldRMS = -1;
-            size_t    trials =  0;
-            
-            
-            
-        INITIALIZE:
-            generate_starting(cs, X0, ran, t);
-            //std::cerr << "C0=" << C << std::endl;
-            
-            count  =  0;
-            oldRMS = -1;
-            ++trials;
-            if( trials > MAX_TRIALS)
-                throw exception("unable to find composition after MAX_TRIALS: check constraints...");
-            
-        PROJECTION:
-            std::cerr << std::endl;
-            std::cerr << "C=" << C << std::endl;
-            
-            //------------------------------------------------------------------
-            //-- compute projected U
-            //------------------------------------------------------------------
+            // projection
             mkl::mul_trn(U,Z,C);
-            //std::cerr << "U=" << U << std::endl;
-            
-            //------------------------------------------------------------------
-            //-- compute projected concentration in dC
-            //------------------------------------------------------------------
-            COMPUTE_C(dC);
-            std::cerr << "C =" << C  << std::endl;
-            std::cerr << "Cp=" << dC << std::endl;
-            
-            //------------------------------------------------------------------
-            //-- compute virtual source term
-            //------------------------------------------------------------------
-            mkl::sub(dC,C);
-            std::cerr << "dC0=" << dC << std::endl;
-            
-            //------------------------------------------------------------------
-            //-- legalize trial move
-            //------------------------------------------------------------------
-            //cs.legalize_dC(t);
-            std::cerr << "dC1=" << dC << std::endl;
-            
-            //------------------------------------------------------------------
-            //-- save C
-            //------------------------------------------------------------------
-            mkl::set(X,C);
-            
-            //------------------------------------------------------------------
-            //-- move C towards projection
-            //------------------------------------------------------------------
-            mkl::add(C,dC);
-            
-            //------------------------------------------------------------------
-            //-- normalize it
-            //------------------------------------------------------------------
-            cs.cleanup_C();
-            std::cerr  << "Cn=" << cs.C << std::endl;
-            
-#if 1
-            if(!cs.normalize_C(t))
-            {
-                std::cerr << "invalid composition: try again..." << std::endl;
-                goto INITIALIZE;
-            }
-            std::cerr << "C=" << C << std::endl;
-#endif
-            
-            //------------------------------------------------------------------
-            //-- compute effective difference
-            //------------------------------------------------------------------
-            mkl::sub(X,C);
-            
-            //std::cerr << "dX=" << X << std::endl;
-            
-            //------------------------------------------------------------------
-            //-- compute distance to previous concentrations
-            //------------------------------------------------------------------
-            const double RMS = mkl::rms(X);
-            //fp("%g %g\n", double(count), RMS );
-            
-            //------------------------------------------------------------------
-            // test convergence when allowable
-            //------------------------------------------------------------------
-            if(++count>min_steps)
-            {
-                assert(oldRMS>=0);
-                if(RMS>=oldRMS)
-                    goto FINALIZE;
-            }
-            
-            oldRMS = RMS;
-            goto PROJECTION;
-            
-        FINALIZE:
+            COMPUTE_C(C);
             std::cerr << "C1=" << C << std::endl;
             
-            //__________________________________________________________________
-            //
-            // compute the residue from the #D.O.F.
-            //__________________________________________________________________
+            size_t count = 0;
+        NEWTON_STEP:
+            // newton step
+            cs.compute_Gamma_and_Phi(t,false);
+            mkl::mul(W,Phi,Z);
             
-            //------------------------------------------------------------------
-            // dC = P'*(P*P')^(-1)*(P*X-Lam)
-            //------------------------------------------------------------------
-            mkl::mul(Mu,P,C);
-            mkl::sub(Mu,Lam);
-            LU2.solve(P2,Mu);
-            mkl::mul_trn(dC,P,Mu);
-            std::cerr << "R=" << dC << std::endl;
-            
-            //------------------------------------------------------------------
-            // normalized rms
-            //------------------------------------------------------------------
-            const double rms = mkl::rms(dC);
-            std::cerr << "rms=" << rms << std::endl;
-            if( rms > math::numeric<double>::ftol )
-                throw exception("inconsistent chemical constraints/RMS is too big");
-            
-            //------------------------------------------------------------------
-            // check rounding
-            //------------------------------------------------------------------
-            for(size_t i=M;i>0;--i)
+            std::cerr << "Gamma=" << Gamma << std::endl;
+            if( !LU.build(W) )
             {
-                double err = fabs(dC[i]);
-                if(err<=numeric<double>::tiny)
-                    err=0;
-                else
-                    err = pow(10.0,ceil(log10(err)));
-                dC[i] = err;
+                std::cerr << "invalid comp" << std::endl;
+                exit(2);
             }
-            std::cerr << "R1=" << dC << std::endl;
             
-            //------------------------------------------------------------------
-            // round
-            //------------------------------------------------------------------
-            for(size_t i=M;i>0;--i)
-            {
-                if(C[i]<=max_of<double>(numeric<double>::tiny,dC[i]))
-                    C[i] = 0;
-            }
+            mkl::neg(dU,Gamma);
+            LU.solve(W,dU);
+            mkl::mul(dC,Z,dU);
+            
+            mkl::set(X,C);
+            
+            mkl::add(C,dC);
+            mkl::mul_trn(U,Z,C);
+            COMPUTE_C(C);
             std::cerr << "C2=" << C << std::endl;
             
-            //------------------------------------------------------------------
-            // partial normalization
-            //------------------------------------------------------------------
-            if( ! cs.normalize_C(t) )
-                throw exception("invalid final composition/partial topology");
-            std::cerr << "C3=" << C << std::endl;
+            // effective dC
+            mkl::sub(X,C);
+            std::cerr << "U ="  << U << std::endl;
+            std::cerr << "dC=" << dC << std::endl;
+            std::cerr << "dX=" << X  << std::endl;
             
-            //------------------------------------------------------------------
-            // full normalization
-            //------------------------------------------------------------------
-            cs.restore_topology();
-            if( ! cs.normalize_C(t) )
-                throw exception("invalid final composition/full topology");
-            std::cerr << "C4=" << C << std::endl;
+            if(++count<20)
+                goto NEWTON_STEP;
+            
+            
+            exit(1);
+            
+            
             
         }
         

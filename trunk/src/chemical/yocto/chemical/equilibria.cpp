@@ -440,6 +440,30 @@ namespace yocto
         }
         
         
+        bool equilibria:: full_decrease_C_with(const array<double> &d) throw()
+        {
+            assert(C.size()==d.size());
+            bool was_full = true;
+            for( size_t i=C.size();i>0;--i)
+            {
+                if(!fixed[i])
+                {
+                    double      &cc = C[i];
+                    const double dd = d[i];
+                    if( dd>cc )
+                    {
+                        cc/=2;
+                        was_full = false;
+                    }
+                    else
+                    {
+                        cc -= dd; if(cc<=0) cc=0;
+                    }
+                }
+            }
+            return was_full;
+        }
+        
     }
     
     
