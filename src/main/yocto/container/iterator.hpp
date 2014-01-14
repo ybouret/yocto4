@@ -15,6 +15,15 @@ namespace yocto
 			reverse
 		};
 	}
+    
+    template <typename ITER,typename FUNC>
+    void for_each( ITER cur, const ITER end, FUNC &func )
+    {
+        for(;cur!=end;++cur)
+        {
+            func( *cur );
+        }
+    }
 	
 }
 
