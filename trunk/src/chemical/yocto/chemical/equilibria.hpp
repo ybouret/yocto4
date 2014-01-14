@@ -152,6 +152,9 @@ namespace yocto
              */
             bool full_decrease_C_with( const array<double> &d ) throw();
             
+            //! kill fixed dC components
+            void update_fixed_dC() throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
             math::derivative<double> dervs;

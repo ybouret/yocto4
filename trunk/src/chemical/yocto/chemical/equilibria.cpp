@@ -464,6 +464,14 @@ namespace yocto
             return was_full;
         }
         
+        void equilibria:: update_fixed_dC() throw()
+        {
+            for( size_t i=dC.size();i>0;--i)
+            {
+                if(fixed[i]) dC[i] = 0;
+            }
+        }
+        
     }
     
     
