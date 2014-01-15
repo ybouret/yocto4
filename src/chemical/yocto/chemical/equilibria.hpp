@@ -14,12 +14,13 @@ namespace yocto
         typedef math::matrix<ptrdiff_t> imatrix_t;
         typedef vector<double>          vector_t;
         typedef math::lu<double>        lu_t;
-        typedef vector<bool>            bvector_t;
         
         //! a database of equilibrium
         class equilibria : public equilibrium::db
         {
         public:
+            static const size_t MAX_NEWTON_STEPS = 256;
+            
             virtual ~equilibria() throw();
             explicit equilibria();
             
@@ -35,15 +36,12 @@ namespace yocto
             imatrix_t    nuR;   //!< reactives, NxM
             imatrix_t    nuP;   //!< products,  NxM
             matrix_t     nu;    //!< algebraic, NxM
-            matrix_t     Nu;    //!< effective Nu
-            bvector_t    fixed; //!< initially all false
             vector_t     Gamma; //!< unrolled equilibria, N
             vector_t     dtGam; //!< time derivative of Gamma
             matrix_t     Phi;   //!< Gamma Jacobian, NxM
             matrix_t     W;     //!< (Phi*nu')^(-1), NxN
             vector_t     xi;    //!< local extent
             lu_t         LU;    //!< for local matrix inversion
-            vector_t     CC;    //!< auxiliary
             
             //! release all memory
             void reset() throw();
@@ -102,12 +100,6 @@ namespace yocto
             //! Copy first C.size() variables into y, y.size() >= C.size()
             void save_C( array<double> &y ) const throw();
             
-            //! update behavior according to fixed components
-            void update_topology() throw();
-            
-            //! activate all
-            void restore_topology() throw();
-            
             //! Reduce dC to a legal step
             /**
              The corresponding concentrations MUST be in C before this call !
@@ -121,12 +113,8 @@ namespace yocto
              */
             void scale_all( double t ) const throw();
             
-            //! build a random valid concentration after scaling
-            /**
-             doesn't touch the fixed components !!
-             use dC as temporary values
-             */
-            void trial( urand32 &ran, double t );
+            //! build a random valid concentration (after scaling)
+            bool trial( urand32 &ran, double t );
             
             
             friend std::ostream & operator<<( std::ostream &, const equilibria &);
@@ -143,17 +131,12 @@ namespace yocto
             
             //! try to decrease C with dC
             /**
-             if(!fixed[i])
-             {
              safe decrease: if d[i]>=C[i], divide C[i].
              Otherwise C[i] -= d[i];
-             }
              \return false is one coordinate was cut
              */
             bool full_decrease_C_with( const array<double> &d ) throw();
             
-            //! kill fixed dC components
-            void update_fixed_dC() throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

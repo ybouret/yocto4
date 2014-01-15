@@ -16,8 +16,10 @@
 \newcommand{\mytrn}[1]{{\!\!~^{\mathsf{t}}{#1}}}
 \newcommand{\myvec}[1]{\overrightarrow{#1}}
 \newcommand{\vecX}{\myvec{\myconc{\mychem{X}}}}
-\newcommand{\dof}{\mathtt{d}}
 \newcommand{\fixed}{\mathtt{f}}
+\newcommand{\kernel}{\mathtt{k}}
+\newcommand{\proj}{\mathtt{p}}
+
 \begin{document}
 \title{Chemical Solution}
 
@@ -74,128 +76,25 @@ This Newton step is to be repeated until
 \end{equation}
 
 \subsubsection{Numerical Problems/Cutoffs}
-We have to control the small concentrations and the small increase of concentration.
-Let us assume that $\tilde\epsilon$ is near the numerical zero. Then any concentration under this value
-should be set to zero. 
+The idea is to not allow the Newton's step to set a negative concentration.
+Different strategies can be implemented.
+
 
 
 \section{Chemical System Initialization}
-\subsection{Remaining Degrees of Freedom}
-\subsubsection{Discriminating between constraints}
-We need $M-N$ supplementary relations to initialize the system. Hopefully, this constraint should be linear
-since they shall express the matter conservation, the charge conservation or a fixed concentration.
-We have
+\subsection{Description}
+We assume that we have $N_c$ linear constraints, that reflects that some quantities are conserved: mass, charge.
+Firstly, we assume that $N_c+N=M$, which is necessary to have a solution.
+There exists a matrix $\mymat{P}\in\mathcal{M}_{M,N_c}$ such that
 $$
-	N_c  = M-N.
-$$
-Among those $N_c$ constraints, we isolate the $\fixed$ "single" component condition that fix $\fixed$ concentrations.
-We have $\dof$ remaining degrees of freedom with
-$$
-	\fixed + \dof = N_c.
-$$
-\subsubsection{Fixed solution}
-Let $\vecX_0$ be the vector of fixed concentrations corresponding to the $\fixed$ single constraints, and with
-a zero values otherwise.
-	
-Since $\fixed$ concentrations are fixed, we define the stoichiometric matrix $\hat{\mymat{\nu}}$
-where the coefficients of all the fixed species are set to zero, and equal to those of $\mymat{\nu}$ otherwise.
-Consequently, all the columns or $\mymat{\Phi}$ corresponding to the fixed concentrations must 
-be set to zero to form the $\hat{\mymat{\Phi}}$ matrix. 
-But $\vec{\Gamma}$ (and the other terms of $\mymat{\Phi}$) must be evaluated with
-the untouched $\mymat{\nu}_r$ and $\mymat{\nu}_p$.
-
-\subsubsection{Remaining linear constraints}
-We are left with a matrix $\mymat{P}\in\mathcal{M}_{\dof,M}$ and a vector $\vec{\Lambda}\in\mathbb{R}^{\dof}$ such
-that the acceptable set of concentration must match
-\begin{equation}
-	\mymat{P}\vecX = \vec{\Lambda}
-\end{equation}
-
-\subsection{Particular Cases}
-\subsubsection{No Reactions}
-In that case, $\mymat{P}$ is a square matrix which must be invertible.
-We get
-$$
-	\vecX = \mymat{P}^{-1}\vec{\Lambda}
-$$
-and we must check that the concentrations are OK.
-
-\subsubsection{No extra degrees of freedom: Newton's algorithm mark-II}
-In that case, we start from a random set of concentrations, but for the fixed values, and
-we apply the Newton's algorithm with $\hat{\mymat{\nu}}$.
-
-\subsection{Generic Case where $N_c<M$}
-\subsubsection{Reference Term}
-If $\fixed$ concentration are fixed, then there exist a othonormal matrix $\mymat{A}\in\mathcal{M}_{M-d,M}$ and
-a set a Lagrange multipliers $\vec{Y}_0\in\mathbb{R}^{M-d}$ such that the solution may be written
-\begin{equation}
-	\vecX = \vecX_0 + \mytrn{\mymat{A}}\vec{Y}_0 + \ldots
-\end{equation}
-Each row of $\mymat{A}$ is zero but for one element corresponding to the index of a non fixed concentration.
-The vector $\vec{Y}_0$ is defined by
-$$
-	\mymat{P}\left(\vecX_0+\mytrn{\mymat{A}}\vec{Y}_0\right) = \vec\Lambda.
-$$
-We define
-$$
-	\mymat{\Psi} = \mymat{P}\mytrn{\mymat{A}}
-$$
-and deduce that
-$$
-	\vec{Y}_0 = \mytrn{\mymat{\Psi}} \left(\mymat{\Psi} \mytrn{\mymat{\Psi}}\right)^{-1}\left( \vec{\Lambda} - \mymat{P}\vecX_0\right).
-$$
-We recognise the Moore-Penrose pseudo-inverse of $\mymat{\Psi}$. If the Gram matrix of $\mymat{\Psi}$ is not invertible then
-the constraints are not valid.
-
-\subsubsection{Acceptable Solutions}
-We define
-$$
-	\vecX^\star = \vecX_0 + \mytrn{\mymat{A}}\vec{Y}_0.
-$$
-We look for $\delta\vecX$.
-Then any acceptable solution must be in
-$$
-	\mathrm{im}(\mytrn{\mymat{A}}) \cap \mathrm{im}(\mytrn{\mymat{P}^\perp}).
-$$
-We note $\mytrn{\mymat{B}}$ the trivial orthonormal base of  $\mytrn{\mymat{A}}^\perp$ (which may be empty)
-and see that and acceptable solution must be in
-$$
-	\left( 
-	\mathrm{im}(\mytrn{\mymat{B}})
-	\cup
-	\mathrm{im}(\mytrn{\mymat{P}})
-	\right)^\perp
-$$
-$\mymat{B}$ has $\fixed$ rows and $\mymat{P}$ has $\dof$ rows, so that the sub-space $\mathrm{im}(\mytrn{\mymat{B}})
-	\cup
-	\mathrm{im}(\mytrn{\mymat{P}})$
-	has a maximal dimension of $N_c=\fixed+\dof<M$.
-But to have a solution, the dimension of this sub-space must be exactly $N_c$.
-The Gram matrix of $\mytrn{\mymat{B}} \oplus \mytrn{\mymat{P}}$ must be invertible.
-In that case, we extract an orthonormal base $\mymat{Z}$ of  $(\mytrn{\mymat{B}} \oplus \mytrn{\mymat{P}})^\perp$
-so that there exists a vector of $N$ Lagrange multipliers $\vec{U}$ where
-$$
-	\vecX = \vecX^\star + \mymat{Z}\vec{U}.
+	\mymat{P}\vecX = \Lambda.
 $$
 
-\subsubsection{Newton's Algorithm Mark-III}
-%We want to solve
-%$$
-%	\vec{\Gamma}(\vecX^\star + \mymat{Z}\vec{U}) = \vec{0}.
-%$$
-%Starting from $\vec{U}_n$ we compute $\delta \vec{U}_n$ such that
-%$$
-%	\vec{\Gamma}(\vecX^\star + \mymat{Z}\vec{U}_n) + \hat{\mymat{\Phi}} \mymat{Z} \delta \vec{U}_n = \vec{0}
-%$$
-\end{document}
-
-
-\subsubsection{Final Error Estimation}
-Let $\vecX_n$ the set of current values. The the error is about
-\begin{equation}
-	\delta \vecX_n = \mytrn{\mymat{Q}}\left(\mymat{\Phi}_n\mytrn{\mymat{Q}}\right)^{-1} \vec{\Gamma}_n
-\end{equation}
-This shall provide the cutoff for small concentrations.
-
+\subsection{For of the solution}
+There exists a matrix $\mymat{Q}$ such that $\mytrn{\mymat{Q}}\in\mytrn{\mymat{P}}^\perp$, so that
+$\mymat{Q}\in\mathcal{M}_{M,N}$, and a set of Lagrange multipliers
+$$
+		\vecX = \mytrn{\mymat{P}}\vec{U} + \mytrn{\mymat{Q}}\vec{V}.
+$$
 
 \end{document}

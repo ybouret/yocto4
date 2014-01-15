@@ -31,15 +31,12 @@ namespace yocto
         nuR(),
         nuP(),
         nu(),
-        Nu(),
-        fixed(),
         Gamma(),
         dtGam(),
         Phi(),
         W(),
         xi(),
         LU(),
-        CC(),
         dervs()
         {
         }
@@ -63,25 +60,21 @@ namespace yocto
         
         
         //! build a random concentration after scaling
-        void equilibria:: trial( urand32 &ran, double t)
+        bool equilibria:: trial( urand32 &ran, double t)
         {
             
             for(size_t i=dC.size();i>0;--i)
             {
-                dC[i] = 0;
+                C[i] = 0;
             }
             
             for( iterator eq=begin();eq!=end();++eq)
             {
-                (**eq).append(dC,ran);
+                (**eq).append(C,ran);
             }
             
-            for(size_t i=dC.size();i>0;--i)
-            {
-                if( !fixed[i] ) C[i] = dC[i];
-            }
             
-            normalize_C(t);
+            return normalize_C(t);
             
         }
         
@@ -111,15 +104,12 @@ namespace yocto
         //======================================================================
         void equilibria:: reset() throw()
         {
-            CC.release();
             LU.release();
             xi.release();
             W.release();
             Phi.release();
             dtGam.release();
             Gamma.release();
-            fixed.release();
-            Nu.release();
             nu.release();
             nuP.release();
             nuR.release();
@@ -166,15 +156,12 @@ namespace yocto
                     nuR.   make(N,M);
                     nuP.   make(N,M);
                     nu.    make(N,M);
-                    Nu.    make(N,M);
-                    fixed. make(M,false);
                     Gamma. make(N,0);
                     dtGam. make(N,0);
                     Phi.   make(N,M);
                     W.     make(N,N);
                     xi.    make(N,0);
-                    LU.    ensure(N);
-                    CC.    make(M,0.0);
+                    LU.    ensure(M);
                     
                     //----------------------------------------------------------
                     // compute topological parts
@@ -195,8 +182,6 @@ namespace yocto
                             nu[i][j] = nuP[i][j] - nuR[i][j];
                         }
                     }
-                    Nu.assign(nu);
-                    
                 }
             }
             catch(...)
@@ -341,49 +326,14 @@ namespace yocto
             }
             
             
-            for(size_t j=M;j>0;--j)
-            {
-                if(fixed[j])
-                {
-                    for(size_t i=N;i>0;--i)
-                    {
-                        Phi[i][j] = 0;
-                    }
-                }
-            }
-            
-            
         }
         
-        
-        void equilibria:: update_topology() throw()
-        {
-            Nu.assign(nu);
-            for(size_t j=fixed.size();j>0;--j)
-            {
-                if(fixed[j])
-                {
-                    for(size_t i=Nu.rows;i>0;--i) Nu[i][j] = 0;
-                }
-            }
-        }
-        
-        
-        //! activate all
-        void equilibria:: restore_topology() throw()
-        {
-            for(size_t j=fixed.size();j>0;--j)
-            {
-                fixed[j] = false;
-            }
-            Nu.assign(nu);
-        }
         
         
         bool equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
-            mkl::mul_rtrn(W, Phi,Nu);
+            mkl::mul_rtrn(W, Phi,nu);
             return LU.build(W);
         }
         
@@ -399,12 +349,7 @@ namespace yocto
                 compute_Gamma_and_W(t,computeDerivatives);
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
-                mkl::mulsub_trn(dC, Nu, dtGam);
-                for(size_t i=dC.size();i>0;--i)
-                {
-                    if( fixed[i] )
-                        dC[i] = 0;
-                }
+                mkl::mulsub_trn(dC, nu, dtGam);
             }
             
         }
@@ -439,38 +384,29 @@ namespace yocto
             }
         }
         
-        
+#if 0
         bool equilibria:: full_decrease_C_with(const array<double> &d) throw()
         {
             assert(C.size()==d.size());
             bool was_full = true;
             for( size_t i=C.size();i>0;--i)
             {
-                if(!fixed[i])
+                
+                double      &cc = C[i];
+                const double dd = d[i];
+                if( dd>cc )
                 {
-                    double      &cc = C[i];
-                    const double dd = d[i];
-                    if( dd>cc )
-                    {
-                        cc/=2;
-                        was_full = false;
-                    }
-                    else
-                    {
-                        cc -= dd; if(cc<=0) cc=0;
-                    }
+                    cc/=2;
+                    was_full = false;
+                }
+                else
+                {
+                    cc -= dd; if(cc<=0) cc=0;
                 }
             }
             return was_full;
         }
-        
-        void equilibria:: update_fixed_dC() throw()
-        {
-            for( size_t i=dC.size();i>0;--i)
-            {
-                if(fixed[i]) dC[i] = 0;
-            }
-        }
+#endif
         
     }
     
