@@ -70,7 +70,11 @@ namespace yocto
                 mkl::mulsub(C, shrink, dC);
                 
                 if(cut)
+                {
+                    std::cerr << "dC=" << dC << std::endl;
+                    std::cerr << "shrink=" << shrink << std::endl;
                     goto NEWTON_STEP;
+                }
                 
                 //______________________________________________________________
                 //
