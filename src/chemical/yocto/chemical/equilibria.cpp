@@ -28,6 +28,7 @@ namespace yocto
         time_scale(1e-4),
         C(),
         dC(),
+        LU(),
         nuR(),
         nuP(),
         nu(),
@@ -36,7 +37,6 @@ namespace yocto
         Phi(),
         W(),
         xi(),
-        LU(),
         dervs()
         {
         }
@@ -104,7 +104,6 @@ namespace yocto
         //======================================================================
         void equilibria:: reset() throw()
         {
-            LU.release();
             xi.release();
             W.release();
             Phi.release();
@@ -113,6 +112,7 @@ namespace yocto
             nu.release();
             nuP.release();
             nuR.release();
+            LU.release();
             dC.release();
             C.release();
         }
@@ -146,6 +146,7 @@ namespace yocto
                 const size_t M = lib.size();
                 C.make(M,0);
                 dC.make(M,0);
+                LU.ensure(M);
                 
                 if(N>0)
                 {

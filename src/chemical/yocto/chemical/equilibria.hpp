@@ -33,6 +33,7 @@ namespace yocto
             
             vector_t     C;     //!< local concentrations
             vector_t     dC;    //!< corrections
+            lu_t         LU;    //!< for local matrix inversion
             imatrix_t    nuR;   //!< reactives, NxM
             imatrix_t    nuP;   //!< products,  NxM
             matrix_t     nu;    //!< algebraic, NxM
@@ -41,7 +42,6 @@ namespace yocto
             matrix_t     Phi;   //!< Gamma Jacobian, NxM
             matrix_t     W;     //!< (Phi*nu')^(-1), NxN
             vector_t     xi;    //!< local extent
-            lu_t         LU;    //!< for local matrix inversion
             
             //! release all memory
             void reset() throw();
