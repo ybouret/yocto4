@@ -90,28 +90,13 @@ namespace yocto
                 /**
                  Used when no equilibria is used
                  
-                 \param P a matrix MxNc (M is the lib.size)
-                 \param Lam a vector Nc
-                 \warning the collection must have updated indices !
+                 \param   P    a matrix MxNc (M is the lib.size)
+                 \param   Lam  a vector Nc
+                 \warning the  collection must have updated indices !
                  */
                 void fill( matrix_t &P, array<double> &Lam) const throw();
                 
                 
-                //! create a reduced matrix of constraints
-                /**
-                 \param  P an empty matrix
-                 \param  Lam an empty vector
-                 \param  fixed an array of boolean
-                 \param  X0    an array of values, to be set
-                 \return the remaining degrees of freedom
-                 when #DOF>0, P is set to (#DOF,M), Lam to #DOF, so
-                 that we must have PX=Lam. X0 have its components set to fixed constraints.
-                 */
-                size_t dispatch( matrix_t &P, vector_t &Lam, array<bool> &fixed, array<double> &X0 ) const;
-                
-                
-                static const size_t STEPS_PER_SPECIES = 2; //! minimum projections step per species
-                static const size_t MAX_TRIALS        = 8; //!< retry after finding an invalid composition
                 
                 //! initialize
                 /**
