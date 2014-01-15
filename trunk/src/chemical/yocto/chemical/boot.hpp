@@ -62,6 +62,7 @@ namespace yocto
             class loader : public constraints
             {
             public:
+                static const size_t MAX_TRIALS_PER_SPECIES = 32;
                 rand32_kiss ran;
                 
                 explicit loader() throw();
@@ -81,7 +82,6 @@ namespace yocto
                 void conserve( const species::ptr &A, const species::ptr &B, const species::ptr &C, const double conc);
                 
                 
-                
                 //! electroneutrality: disabled is no charged species
                 void electroneutrality( const collection &lib );
                 
@@ -97,12 +97,7 @@ namespace yocto
                 void fill( matrix_t &P, array<double> &Lam) const throw();
                 
                 
-                
                 //! initialize
-                /**
-                 best effort initialization.
-                 The topology is restored upon return, no matter what.
-                 */
                 void operator()( equilibria &cs, collection &lib, double t);
                 
                 //! output

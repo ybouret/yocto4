@@ -17,33 +17,6 @@ namespace yocto
         typedef svd<double>     SVD;
         
         
-        namespace
-        {
-            
-            
-            static inline bool has_maximal_rank( const matrix_t &A, lu_t &LU )
-            {
-                const size_t nr = A.rows;
-                const size_t nc = A.cols;
-                assert( LU.capacity() >= max_of(A.rows, A.cols));
-                
-                if(nr>nc)
-                {
-                    matrix_t A2(nc,nc);
-                    mkl::mul_ltrn(A2, A, A);
-                    return LU.build(A2);
-                }
-                else
-                {
-                    matrix_t A2(nr,nr);
-                    mkl::mul_rtrn(A2, A, A);
-                    return LU.build(A2);
-                }
-                
-            }
-            
-        }
-        
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
@@ -70,7 +43,7 @@ namespace yocto
             //__________________________________________________________________
             cs.build_from(lib);
             lu_t     &LU = cs.LU; assert(LU.capacity()>=M);
-            vector_t &C = cs.C;
+            vector_t &C  = cs.C;
             
             //__________________________________________________________________
             //
@@ -96,7 +69,7 @@ namespace yocto
             //__________________________________________________________________
             //
             //
-            // No constraints
+            // No reactions
             //
             //__________________________________________________________________
             if(N<=0)
@@ -118,7 +91,7 @@ namespace yocto
             //__________________________________________________________________
             //
             //
-            // some constraints
+            // Some reactions
             //
             //__________________________________________________________________
             P.make(Nc,M);
@@ -131,7 +104,7 @@ namespace yocto
             //__________________________________________________________________
             //
             //
-            // check sanity
+            // check sanity via Moore-Penrose
             //
             //__________________________________________________________________
             matrix_t P2(Nc,Nc);
@@ -185,6 +158,14 @@ namespace yocto
             }
             std::cerr << "Q=" << Q << std::endl;
             
+            //__________________________________________________________________
+            //
+            //
+            // Newton mark-II
+            //
+            //__________________________________________________________________
+            
+            
 #define RECOMPUTE_C() do {  mkl::mul(V,Q,C); mkl::mul_trn(C,Q,V); mkl::add(C,Xstar); } while(false)
             vector_t V(N,zero);
             vector_t &Gamma = cs.Gamma;
@@ -192,60 +173,78 @@ namespace yocto
             matrix_t &Phi   = cs.Phi;
             vector_t &dC    = cs.dC;
             vector_t  X(M,zero);
-            
+            const size_t max_trials = M * MAX_TRIALS_PER_SPECIES;
+            size_t       trials = 0;
             
             //__________________________________________________________________
             //
             //
-            // generate starting point
+            // Newton, mark II
             //
             //__________________________________________________________________
+            
+            //==================================================================
+            //
+            // Generate a trial valid composition
+            //
+            //==================================================================
         INITIALIZE:
+            if(++trials>max_trials)
+                throw exception("too many chemical::boot trials (%u)", unsigned(max_trials) );
+            
             if( !cs.trial(ran,t) )
             {
-                std::cerr << "invalid trial" << std::endl;
-                exit(1);
-            }
-            std::cerr << "C0=" << C << std::endl;
-            RECOMPUTE_C();
-            std::cerr << "C1=" << C << std::endl;
-            
-            size_t count = 0;
-            
-        NEWTON_STEP:
-            ++count;
-            //-- todo: count max=> bad conc: retry
-            if(count>cs.MAX_NEWTON_STEPS)
-            {
-                std::cerr << "Not Converged: Retry" << std::endl;
+                std::cerr << "-- Newton-II: invalid trial composition" << std::endl;
                 goto INITIALIZE;
             }
             
-            //-- save C
+            RECOMPUTE_C();
+            
+            //==================================================================
+            //
+            // Compute the full Newton's Step
+            //
+            //==================================================================
+            size_t count = 0;
+        NEWTON_STEP:
+            ++count;
+            if(count>cs.MAX_NEWTON_STEPS)
+            {
+                std::cerr << "-- Newton-II: not converged" << std::endl;
+                goto INITIALIZE;
+            }
+            
+            //------------------------------------------------------------------
+            // save C
+            //------------------------------------------------------------------
             mkl::set(X,C);
             
-            //-- compute the Newton's step mark II
+            //------------------------------------------------------------------
+            // compute the Newton's step mark II
+            //------------------------------------------------------------------
             cs.compute_Gamma_and_Phi(t,false);
-            std::cerr << "Gamma=" << Gamma << std::endl;
-            const double H0 = cs.Gamma2RMS();
-            std::cerr << "H0=" << H0 << std::endl;
+            const double H0 = cs.Gamma2RMS();  // pseudo-norm
             mkl::mul_rtrn(W,Phi,Q);
             if( !LU.build(W) )
             {
-                std::cerr << "Invalid compositon" << std::endl;
+                std::cerr << "-- Newton-II: singular composition" << std::endl;
                 goto INITIALIZE;
             }
             
-            //-- compute dV in V...
+            //------------------------------------------------------------------
+            //-- compute dV in V
+            //------------------------------------------------------------------
             mkl::neg(V,Gamma);
             LU.solve(W,V);
             
-            //-- compute dC
+            //------------------------------------------------------------------
+            // compute dC
+            //------------------------------------------------------------------
             mkl::mul_trn(dC, Q, V);
             
-            std::cerr << "dC0=" << dC << std::endl;
-            
-            //-- dC is a decreasing step for |Gamma|
+            //------------------------------------------------------------------
+            // dC is a decreasing step for |Gamma|
+            //------------------------------------------------------------------
             mkl::add(C,dC);
             RECOMPUTE_C();
             double H1    = cs.compute_rms(t);
@@ -253,94 +252,125 @@ namespace yocto
             bool   cut   = false;
             while(H1>H0)
             {
-                cut = true;
+                cut    = true;
                 alpha *= 0.1;
                 if( alpha < numeric<double>::ftol )
                 {
-                    std::cerr << "Spurious Point" << std::endl;
+                    std::cerr << "-- Newton-II: spurious point" << std::endl;
                     goto FINALIZE;
                 }
                 mkl::set(C,X);
                 mkl::muladd(C,alpha,dC);
                 RECOMPUTE_C();
-                //std::cerr << "alpha=" << alpha << "; C=" << C << std::endl;
                 H1 = cs.compute_rms(t);
             }
             
+            //------------------------------------------------------------------
+            // won't stop on a partially reduced step
+            //------------------------------------------------------------------
             if(cut)
                 goto NEWTON_STEP;
             
-            // effective dC
+            //------------------------------------------------------------------
+            // compute effective dC
+            //------------------------------------------------------------------
             mkl::set(dC,X);
             mkl::sub(dC,C);
-            std::cerr << "dC1=" << dC << std::endl;
             
+            //------------------------------------------------------------------
             // test convergence
+            //------------------------------------------------------------------
             for(size_t i=M;i>0;--i)
             {
                 double err = fabs(dC[i]);
                 if(err<=numeric<double>::tiny) err = 0;
                 if(err>numeric<double>::ftol*fabs(C[i]))
                 {
-                    std::cerr << "Not converged" << std::endl;
                     goto NEWTON_STEP;
                 }
             }
             
-            std::cerr << "Converged" << std::endl;
+            std::cerr << "-- Newton-II: converged" << std::endl;
             
+            //==================================================================
+            //
+            // sanity checks
+            //
+            //==================================================================
         FINALIZE:
             std::cerr << "C=" << C << std::endl;
             
-            //-- non linear error
+            //------------------------------------------------------------------
+            // non linear error
+            //------------------------------------------------------------------
             cs.compute_Gamma_and_Phi(t,false);
             mkl::mul_rtrn(W,Phi,Q);
             if( !LU.build(W) )
             {
-                std::cerr << "Invalid Final Compositon: Retry" << std::endl;
+                std::cerr << "-- Newton-II: invalid final composition" << std::endl;
                 goto INITIALIZE;
             }
-            //-- compute dV in V...
+            
+            //------------------------------------------------------------------
+            // compute dV in V
+            //------------------------------------------------------------------
             mkl::neg(V,Gamma);
             LU.solve(W,V);
             
-            //-- compute error in dC
+            //------------------------------------------------------------------
+            // compute error in dC
+            //------------------------------------------------------------------
             mkl::mul_trn(dC, Q, V);
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
-            std::cerr << "Cer1=" << dC << std::endl;
             
+            //------------------------------------------------------------------
+            // cut
+            //------------------------------------------------------------------
             for(size_t i=M;i>0;--i)
             {
                 if(fabs(C[i])<=dC[i]) C[i] = 0;
             }
-            std::cerr << "C1=" << C << std::endl;
             
-            //-- linear error
+            //------------------------------------------------------------------
+            // linear error
+            //------------------------------------------------------------------
             mkl::mul(Mu,P,C);
             mkl::sub(Mu,Lam);
             L2.solve(P2, Mu);
             mkl::mul_trn(dC, P, Mu);
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
-            std::cerr << "Cer2=" << dC << std::endl;
-
+            
+            //------------------------------------------------------------------
             //-- get rid of negative value
+            //------------------------------------------------------------------
             for(size_t i=M;i>0;--i)
             {
                 if(C[i]<=dC[i]) C[i] = 0;
             }
             
+            //------------------------------------------------------------------
+            // are we consistent ?
+            //------------------------------------------------------------------
             if(!cs.normalize_C(t))
             {
+                std::cerr << "-- Newton-II: inconsistent final composition" << std::endl;
                 goto INITIALIZE;
             }
             
+            //------------------------------------------------------------------
             //-- OK, check RMS
+            //------------------------------------------------------------------
             mkl::mul(Mu,P,C);
             mkl::sub(Mu,Lam);
             L2.solve(P2, Mu);
             mkl::mul_trn(dC, P, Mu);
             const double rms = mkl::rms(dC);
+            std::cerr << "C="   << C   << std::endl;
             std::cerr << "RMS=" << rms << std::endl;
+            if(rms>numeric<double>::ftol)
+            {
+                throw exception("ill-conditionned chemical constraints");
+            }
             
         }
         
