@@ -16,8 +16,8 @@ namespace yocto
 		};
 	}
     
-    template <typename ITER,typename FUNC>
-    void for_each( ITER cur, const ITER end, FUNC &func )
+    template <typename ITERATOR,typename FUNC>
+    void for_each( ITERATOR cur, const ITERATOR end, FUNC &func )
     {
         for(;cur!=end;++cur)
         {
