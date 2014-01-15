@@ -110,7 +110,12 @@ YOCTO_UNIT_TEST_IMPL(dosage)
         Vtot += dV;          // increase volume
         S0.mul(1.0/Vtot);    // dissolution
         S0.save(cs.C);       // prepare equilibria
-        cs.normalize_C(0.0); // normalize
+        
+        if(!cs.normalize_C(0.0) )
+        {
+            std::cerr << "bad=" << cs.C << std::endl;
+            throw exception("invalid composition");
+        }
         S0.load(cs.C);
         
         ios::ocstream fp(fn,true);
