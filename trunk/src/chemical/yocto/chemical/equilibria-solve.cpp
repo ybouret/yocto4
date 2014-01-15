@@ -48,34 +48,8 @@ namespace yocto
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,nu,xi);
                 
-                //______________________________________________________________
-                //
-                // careful subtraction
-                //______________________________________________________________
-                double shrink = 1;
-                bool   cut    = false;
-                for( size_t i=M;i>0;--i)
-                {
-                    const double dd = dC[i];
-                    const double cc =  C[i];
-                    if(dd>cc)
-                    {
-                        assert(dd>=0);
-                        const double cc_new = cc/2;
-                        const double dd_new = cc - cc_new;
-                        shrink = min_of(shrink,dd_new/dd);
-                        cut = true;
-                    }
-                }
-                mkl::mulsub(C, shrink, dC);
                 
-                if(cut)
-                {
-                    std::cerr << "dC=" << dC << std::endl;
-                    std::cerr << "shrink=" << shrink << std::endl;
-                    goto NEWTON_STEP;
-                }
-                
+                mkl::sub(C,dC);
                 //______________________________________________________________
                 //
                 // convergence: test full dC
@@ -106,7 +80,8 @@ namespace yocto
                 {
                     if( C[i] < dC[i] ) C[i] = 0;
                 }
-                std::cerr << "C=" << C  << std::endl;
+                //std::cerr << "dC=" << dC << std::endl;
+                //std::cerr << "C=" << C  << std::endl;
                 
             }
             return true;
