@@ -27,23 +27,21 @@ namespace yocto
             if(N>0)
             {
                 
-                std::cerr << "Newton@ftol=" << ftol << std::endl;
                 size_t count = 0;
             NEWTON_STEP:
                 ++count;
                 if(count>MAX_NEWTON_STEPS)
                 {
-                    std::cerr << "Not Converged" << std::endl;
+                    std::cerr << "-- Newton-I: not converged" << std::endl;
                     return false;
                 }
-                std::cerr << "C=" << C << std::endl;
                 //______________________________________________________________
                 //
                 // compute the Newton's step -dC
                 //______________________________________________________________
                 if(!compute_Gamma_and_W(t,false))
                 {
-                    std::cerr << "Newton: Invalid Composition" << std::endl;
+                    std::cerr << "-- Newton-I: invalid composition" << std::endl;
                     return false;
                 }
                 mkl::set(xi,Gamma);
@@ -81,7 +79,8 @@ namespace yocto
                 for(size_t i=M;i>0;--i)
                 {
                     double err = fabs(dC[i]);
-                    if(err<=numeric<double>::tiny) err = 0;
+                    if(err<=numeric<double>::tiny)
+                        err = 0;
                     if(err> ftol * fabs(C[i]))
                         goto NEWTON_STEP;
                 }
@@ -90,9 +89,11 @@ namespace yocto
                 //
                 // check error
                 //______________________________________________________________
-                
                 if(!compute_Gamma_and_W(t,false))
+                {
+                    std::cerr << "-- Newton-I: invalid final composition" << std::endl;
                     return false;
+                }
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,nu,xi);
@@ -101,11 +102,7 @@ namespace yocto
                 {
                     if( C[i] < dC[i] ) C[i] = 0;
                 }
-                std::cerr << "NewtonCount=" << count << std::endl;
-                std::cerr << "C   =" << C  << std::endl;
-                std::cerr << "Cerr=" << dC << std::endl;
-                
-                //std::cerr << std::endl;
+                std::cerr << "C=" << C  << std::endl;
                 
             }
             return true;
