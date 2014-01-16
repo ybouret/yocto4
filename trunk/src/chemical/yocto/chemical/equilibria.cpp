@@ -37,6 +37,7 @@ namespace yocto
         Phi(),
         W(),
         xi(),
+        CC(),
         dervs()
         {
         }
@@ -104,6 +105,7 @@ namespace yocto
         //======================================================================
         void equilibria:: reset() throw()
         {
+            CC.release();
             xi.release();
             W.release();
             Phi.release();
@@ -162,7 +164,7 @@ namespace yocto
                     Phi.   make(N,M);
                     W.     make(N,N);
                     xi.    make(N,0);
-                    LU.    ensure(M);
+                    CC.    make(M,0);
                     
                     //----------------------------------------------------------
                     // compute topological parts

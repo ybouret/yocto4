@@ -20,6 +20,11 @@ namespace yocto
             const size_t N = nu.rows;
             const size_t M = nu.cols;
             
+            //__________________________________________________________________
+            //
+            // We start from a valid composition
+            //__________________________________________________________________
+
 #if !defined(NDEBUG)
             for(size_t i=M;i>0;--i) { assert(C[i]>=0); }
 #endif
@@ -35,6 +40,7 @@ namespace yocto
                     std::cerr << "-- Newton-I: not converged" << std::endl;
                     return false;
                 }
+                
                 //______________________________________________________________
                 //
                 // compute the Newton's step -dC
@@ -44,12 +50,42 @@ namespace yocto
                     std::cerr << "-- Newton-I: invalid composition" << std::endl;
                     return false;
                 }
+                //const double H0 = Gamma2RMS();
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,nu,xi);
                 
+                //______________________________________________________________
+                //
+                // control the step, descent direction for |Gamma"
+                //______________________________________________________________
                 
+                // save C
+                mkl::set(CC,C);
+
+                // full step
                 mkl::sub(C,dC);
+                
+#if 0
+                double H1 = compute_rms(t);
+                
+                // control
+                double alpha = 1;
+                while(H1>H0)
+                {
+                    alpha *= 0.1;
+                    if( alpha < numeric<double>::ftol )
+                    {
+                        std::cerr << "-- Newton-I: spurious point" << std::endl;
+                        goto FINALIZE;
+                    }
+                    //std::cerr << "alpha=" << alpha << " / H0=" << H0 << " / H1=" << H1 << "/ diff=" << H1-H0 << std::endl;
+                    mkl::set(C,CC);
+                    mkl::mulsub(C,alpha,dC);
+                    H1 = compute_rms(t);
+                }
+                
+#endif
                 //______________________________________________________________
                 //
                 // convergence: test full dC
@@ -63,6 +99,7 @@ namespace yocto
                         goto NEWTON_STEP;
                 }
                 
+            FINALIZE:
                 //______________________________________________________________
                 //
                 // check error

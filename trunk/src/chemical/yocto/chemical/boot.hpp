@@ -62,7 +62,7 @@ namespace yocto
             class loader : public constraints
             {
             public:
-                static const size_t MAX_TRIALS_PER_SPECIES = 32;
+                static const size_t MAX_TRIALS_PER_SPECIES = 128;
                 rand32_kiss ran;
                 
                 explicit loader() throw();
