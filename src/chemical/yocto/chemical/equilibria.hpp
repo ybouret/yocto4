@@ -19,7 +19,7 @@ namespace yocto
         class equilibria : public equilibrium::db
         {
         public:
-            static const size_t MAX_NEWTON_STEPS = 256;
+            static const size_t MAX_NEWTON_STEPS = 512;
             
             virtual ~equilibria() throw();
             explicit equilibria();
@@ -42,6 +42,7 @@ namespace yocto
             matrix_t     Phi;   //!< Gamma Jacobian, NxM
             matrix_t     W;     //!< (Phi*nu')^(-1), NxN
             vector_t     xi;    //!< local extent
+            vector_t     CC;    //!< temporary/auxiliary
             
             //! release all memory
             void reset() throw();
