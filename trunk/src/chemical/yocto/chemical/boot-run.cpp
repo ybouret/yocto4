@@ -127,6 +127,15 @@ namespace yocto
             mkl::mul_trn(Xstar, P, Mu);
             std::cerr << "Xstar=" << Xstar << std::endl;
             
+            vector<size_t> neg_index(M,as_capacity);
+            for(size_t i=1;i<=M;++i)
+            {
+                if(Xstar[i]<0)
+                    neg_index.push_back(i);
+            }
+            
+            std::cerr << "neg_index=" << neg_index << std::endl;
+            
             
             //__________________________________________________________________
             //
@@ -157,6 +166,9 @@ namespace yocto
                 }
             }
             std::cerr << "Q=" << Q << std::endl;
+            
+            
+            
             
             //__________________________________________________________________
             //
@@ -199,6 +211,17 @@ namespace yocto
             }
             
             RECOMPUTE_C();
+            {
+                size_t num_neg = 0, num_pos = 0;
+                for(size_t i=M;i>0;--i)
+                {
+                    if( C[i] < 0 ) ++num_neg; else ++num_pos;
+                }
+                if(num_neg>num_pos)
+                    goto INITIALIZE;
+            }
+            
+            //std::cerr << "Cini=" << C << std::endl;
             
             //==================================================================
             //
