@@ -36,11 +36,12 @@ of the \textit{algebraic} stoichiometric coefficients matrix $\mymat{\nu}$ as
 	\forall i \in 1..N, \; \sum_{j\in1..M} \mymat{\nu}_{i,j} \species_j = 0, \; K_i=\prod_{j\in1..M} \myconc{\species_j}^{\mymat{\nu}_{i,j}}
 \end{equation}
 where $K_i$ is the equilibrium constant of the i$^{\text{th}}$ reaction\\
-Accordingly we can define the vector $\vec{\Gamma}$ such that its coordinate $\vec{\Gamma}_i$
+Accordingly we can define the vector $\vec{\Gamma}$ such that its coordinate ${\Gamma}_i$ is
 \begin{equation}
 	\label{eq:Gamma}
-	\forall i \in 1..N, \vec{\Gamma}_i = K_i \prod_{\mymat{\nu}_{i,j}<0} \myconc{\species_j}^{-\nu_{i,j}} - \prod_{\mymat{\nu}_{i,j}>0} \myconc{\species_j}^{\nu_{i,j}} = 0.
+	\forall i \in 1..N, {\Gamma}_i =  \left( K_i \prod_{\mymat{\nu}_{i,j}<0} \myconc{\species_j}^{-\nu_{i,j}} - \prod_{\mymat{\nu}_{i,j}>0} \myconc{\species_j}^{\nu_{i,j}}\right) = 0.
 \end{equation}
+
 The Jacobian matrix of $\vec{\Gamma}$ is
 \begin{equation}
 	\partial_{\vecX} \vec{\Gamma} = \mymat{\Phi}

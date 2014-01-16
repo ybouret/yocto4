@@ -130,14 +130,6 @@ namespace yocto
             //! call compute_Gamma and Gamma2RMS
             double compute_rms(double t) throw();
             
-            //! try to decrease C with dC
-            /**
-             safe decrease: if d[i]>=C[i], divide C[i].
-             Otherwise C[i] -= d[i];
-             \return false is one coordinate was cut
-             */
-            bool full_decrease_C_with( const array<double> &d ) throw();
-            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
