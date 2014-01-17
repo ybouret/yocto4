@@ -101,5 +101,61 @@ YOCTO_UNIT_TEST_IMPL(lu2)
     std::cerr << "sigma=" << sigma << std::endl;
     LU.solve(mu,sigma);
     std::cerr << "r=" << sigma << std::endl;
-}
-YOCTO_UNIT_TEST_DONE()
+    }
+    YOCTO_UNIT_TEST_DONE()
+    
+    template <typename T>
+    static inline void test_inv()
+    {
+        std::cerr << "inv<" << typeid(T).name() << ">" << std::endl;
+        
+        lu<T> LU;
+        for( size_t n=1; n <= 128; n += 1 + alea_lt(8) )
+        {
+            LU.ensure(n);
+            const  T  diag(float(n+1));
+            matrix<T> m(n,n);
+            
+            for( size_t i=1; i <= n; ++i )
+            {
+                for( size_t j=1; j <= n; ++j )
+                {
+                    const T tmp( gen<T>::get() );
+                    m[i][j] = tmp;
+                    if( i == j )
+                        m[i][j] += diag;
+                }
+            }
+            
+            matrix<T> im = m;
+            if( LU.inverse(im) )
+            {
+                matrix<T> p(n,n);
+                algebra<T>::mul(p,im,m);
+                double rms = 0;
+                for(size_t i=n;i>0;--i)
+                {
+                    for(size_t j=n;j>0;--j)
+                    {
+                        T a = p[i][j];
+                        if(i==j) a -= T(1);
+                        const double tmp = Fabs(a);
+                        rms += tmp*tmp;
+                    }
+                }
+                rms /= (n*n);
+                std::cerr << "rms" << n << "=" << rms << std::endl;
+            }
+        }
+        std::cerr << std::endl;
+    }
+    
+    
+    YOCTO_UNIT_TEST_IMPL(inv)
+    {
+        test_inv<float>();
+        test_inv< complex<float> > ();
+        test_inv<double>();
+        test_inv< complex<double> >();
+    }
+    YOCTO_UNIT_TEST_DONE();
