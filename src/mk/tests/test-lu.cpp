@@ -166,7 +166,7 @@ YOCTO_UNIT_TEST_IMPL(lu2)
         std::cerr << "pseudo_inv<" << typeid(T).name() << ">" << std::endl;
         
         lu<T> LU;
-        for( size_t n=1; n <= 8; n += 1 + alea_lt(4) )
+        for( size_t n=1; n <= 32; n += 1 + alea_lt(4) )
         {
             const size_t m = n + (1+alea_lt(n));
             matrix<T>    P(n,m);
@@ -178,12 +178,12 @@ YOCTO_UNIT_TEST_IMPL(lu2)
                     P[i][j] = tmp;
                 }
             }
-            std::cerr << "P=" << P << std::endl;
+            //std::cerr << "P=" << P << std::endl;
             LU.ensure(n);
             matrix<T> M(m,n);
             if( LU.pseudo_inverse(M,P) )
             {
-                std::cerr << "M=" << M << std::endl;
+                //std::cerr << "M=" << M << std::endl;
             }
         }
         
@@ -192,9 +192,9 @@ YOCTO_UNIT_TEST_IMPL(lu2)
     YOCTO_UNIT_TEST_IMPL(pseudo_inv)
     {
         test_pseudo<float>();
-        //test_pseudo< complex<float> > ();
-        //test_pseudo<double>();
-        //test_pseudo< complex<double> >();
+        test_pseudo< complex<float> > ();
+        test_pseudo<double>();
+        test_pseudo< complex<double> >();
     }
     YOCTO_UNIT_TEST_DONE();
     
