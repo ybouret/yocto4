@@ -222,6 +222,7 @@ namespace yocto
 			const size_t c = M.cols;
 			const size_t n = lhs.cols;
 			assert( lhs.cols == rhs.rows );
+            
 			for( size_t i=r; i>0; --i )
 			{
                 const matrix<z_type>::row &lhs_i = lhs[i];
@@ -230,9 +231,11 @@ namespace yocto
 				{
 					z_type sum(0);
 					for( size_t k=n; k>0; --k )
+                    {
 						sum += lhs_i[k] * rhs[k][j];
-                        M_i[j] = sum;
-                        }
+                    }
+                    M_i[j] = sum;
+                }
 			}
 		}
 		
@@ -361,9 +364,9 @@ namespace yocto
         {
             z_type ans(0);
             for(size_t i=u.size();i>0;--i) ans += u[i];
-            return ans;
+                return ans;
         }
-
+        
 	}
     
 }

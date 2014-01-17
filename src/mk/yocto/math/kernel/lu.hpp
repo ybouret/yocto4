@@ -26,6 +26,8 @@ namespace yocto
 			void solve(const matrix<T>     &M,
                        matrix<T>           &Q) const throw();
             
+            bool inverse(matrix<T> &M);
+            
 			explicit lu() throw();
 			explicit lu(size_t);
 			virtual ~lu() throw();

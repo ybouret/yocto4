@@ -194,8 +194,8 @@ namespace yocto
         {
             assert( a.cols   > 0   );
 			assert( a.is_square()  );
-			assert( indx.size() == a.rows );
-            assert( b.size() == a.rows );
+			assert( indx.size()== a.rows );
+            assert( b.size()   == a.rows );
             
             const size_t n = a.rows;
             size_t       ii = 0;
@@ -269,6 +269,24 @@ namespace yocto
 			}
             
         }
+
+        template <>
+        bool lu<z_type>:: inverse(matrix<z_type> &M)
+        {
+            
+            if(!build(M))
+                return false;
+            
+            const size_t   n = M.rows;
+            matrix<z_type> Q(n,n);
+            const z_type __one(1);
+            for(size_t i=n;i>0;--i)
+                Q[i][i] = __one;
+            lu<z_type>::solve(M,Q);
+            M.assign(Q);
+            return true;
+        }
+
         
     }
 }

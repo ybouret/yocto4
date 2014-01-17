@@ -127,14 +127,6 @@ namespace yocto
             mkl::mul_trn(Xstar, P, Mu);
             std::cerr << "Xstar=" << Xstar << std::endl;
             
-            vector<size_t> neg_index(M,as_capacity);
-            for(size_t i=1;i<=M;++i)
-            {
-                if(Xstar[i]<0)
-                    neg_index.push_back(i);
-            }
-            
-            std::cerr << "neg_index=" << neg_index << std::endl;
             
             
             //__________________________________________________________________
@@ -144,30 +136,38 @@ namespace yocto
             //
             //__________________________________________________________________
             matrix_t Q(N,M);
-            {
-                matrix_t F(M,M);
-                for(size_t i=Nc;i>0;--i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        F[j][i] = P[i][j];
-                    }
-                }
-                vector_t __W(M,zero);
-                matrix_t __V(M,M);
-                if( !SVD::build(F, __W, __V))
-                    throw exception("singular constraints: no orthonormal basis");
-                for(size_t i=N;i>0;--i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        Q[i][j] = F[j][i+Nc];
-                    }
-                }
-            }
+            if(!SVD::orthonormal(Q, P))
+                throw exception("chemical::boot: invalid constraints/SVD");
             std::cerr << "Q=" << Q << std::endl;
             
             
+            vector<size_t> neg_index(M,as_capacity);
+            for(size_t i=1;i<=M;++i)
+            {
+                if(Xstar[i]<0)
+                    neg_index.push_back(i);
+            }
+            
+            std::cerr << "neg_index=" << neg_index << std::endl;
+            const size_t nn = neg_index.size();
+            if(nn)
+            {
+                matrix_t A(nn,N);
+                vector_t Xm(nn,zero);
+                for(size_t i=1; i<=nn; ++i)
+                {
+                    const size_t k = neg_index[i];
+                    for(size_t j=1;j<=N;++j)
+                    {
+                        A[i][j] = Q[j][k];
+                    }
+                    Xm[i] = -Xstar[k];
+                }
+                std::cerr << "A=" << A << std::endl;
+                std::cerr << "Xm=" << Xm << std::endl;
+                std::cerr << "V0=A'*inv(A*A')*Xm" << std::endl;
+            }
+        
             
             
             //__________________________________________________________________
