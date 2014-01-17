@@ -128,7 +128,6 @@ namespace yocto
             std::cerr << "Xstar=" << Xstar << std::endl;
             
             
-            
             //__________________________________________________________________
             //
             //
@@ -140,34 +139,6 @@ namespace yocto
                 throw exception("chemical::boot: invalid constraints/SVD");
             std::cerr << "Q=" << Q << std::endl;
             
-            
-            vector<size_t> neg_index(M,as_capacity);
-            for(size_t i=1;i<=M;++i)
-            {
-                if(Xstar[i]<0)
-                    neg_index.push_back(i);
-            }
-            
-            std::cerr << "neg_index=" << neg_index << std::endl;
-            const size_t nn = neg_index.size();
-            if(nn)
-            {
-                matrix_t A(nn,N);
-                vector_t Xm(nn,zero);
-                for(size_t i=1; i<=nn; ++i)
-                {
-                    const size_t k = neg_index[i];
-                    for(size_t j=1;j<=N;++j)
-                    {
-                        A[i][j] = Q[j][k];
-                    }
-                    Xm[i] = -Xstar[k];
-                }
-                std::cerr << "A=" << A << std::endl;
-                std::cerr << "Xm=" << Xm << std::endl;
-                std::cerr << "V0=A'*inv(A*A')*Xm" << std::endl;
-            }
-        
             
             
             //__________________________________________________________________
@@ -186,7 +157,7 @@ namespace yocto
             vector_t &dC    = cs.dC;
             vector_t  X(M,zero);
             const size_t max_trials = M * MAX_TRIALS_PER_SPECIES;
-            size_t       trials = 0;
+            size_t       trials     = 0;
             
             //__________________________________________________________________
             //
