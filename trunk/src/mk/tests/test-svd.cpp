@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(svd)
         matrix<double> U(M,N);
         matrix<double> V(N,N);
         vector<double> W(N,0);
-
+        
         for( size_t i=1; i <= M; ++i )
         {
             for(size_t j=1; j<=N;++j)
@@ -73,7 +73,35 @@ YOCTO_UNIT_TEST_IMPL(svdgs)
     }
     
     
-}
-YOCTO_UNIT_TEST_DONE()
-
-
+    }
+    YOCTO_UNIT_TEST_DONE()
+    
+    static inline void make_ortho( matrix<double> &P, matrix<double> &Q)
+    {
+        std::cerr << std::endl << "// Make Ortho" << std::endl;
+        
+        for(size_t i=1;i<=P.rows;++i)
+        {
+            for(size_t j=1;j<=P.cols;++j)
+            {
+                P[i][j] = 0.5 - alea<double>();
+            }
+        }
+        std::cerr << "P=" << P << std::endl;
+        svd<double>::orthonormal(Q, P);
+        std::cerr << "Q=" << Q << std::endl;
+    }
+    
+    YOCTO_UNIT_TEST_IMPL(ortho)
+    {
+        matrix<double> P;
+        matrix<double> Q;
+        P.make(5,2);
+        
+        make_ortho(P, Q);
+        
+        P.make(2,5);
+        make_ortho(P, Q);
+        
+    }
+    YOCTO_UNIT_TEST_DONE()

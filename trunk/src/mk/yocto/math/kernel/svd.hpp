@@ -44,6 +44,13 @@ namespace yocto
             static
             size_t truncate( array<T> &w, const T ftol );
             
+            //! build a supplementary orthonormal basis
+            /**
+             The rows/or columns of P needs to form a free family
+             P.cols>0, P.rows>0 and P.cols != P.rows
+             */
+            static
+            bool orthonormal( matrix<T> &Q, const matrix<T> &P);
         };
         
     }
