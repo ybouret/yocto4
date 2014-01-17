@@ -55,7 +55,7 @@ namespace yocto
         {
             return maxi_;
         }
-
+        
         
         
         template <>
@@ -108,7 +108,7 @@ namespace yocto
 					const real_t tmp = Fabs( a_i[j] );
 					if ( tmp > piv )
 						piv = tmp;
-				}
+                        }
 				if( piv <= REAL_MIN )
 				{
 					//std::cerr << "-- LU failure level-1" << std::endl;
@@ -129,8 +129,8 @@ namespace yocto
 					z_type               sum = a_i[j];
 					for(size_t k=1;k<i;++k)
 						sum -= a_i[k]*a[k][j];
-					a_i[j]=sum;
-				}
+                        a_i[j]=sum;
+                        }
 				
 				real_t piv  = 0;
 				size_t imax = j;
@@ -141,14 +141,14 @@ namespace yocto
                     z_type sum=a_i[j];
 					for(size_t k=1;k<j;++k)
 						sum -= a_i[k]*a[k][j];
-					a_i[j]=sum;
-                    
-					const real_t tmp = scal[i]*Fabs(sum);
-					if( tmp >= piv )
-					{
-						piv  = tmp;
-						imax = i;
-					}
+                        a_i[j]=sum;
+                        
+                        const real_t tmp = scal[i]*Fabs(sum);
+                        if( tmp >= piv )
+                        {
+                            piv  = tmp;
+                            imax = i;
+                        }
 				}
 				
 				//-- TODO: check ?
@@ -174,7 +174,7 @@ namespace yocto
 					const z_type fac = z1/(a[j][j]);
 					for(size_t i=j+1;i<=n;++i)
 						a[i][j] *= fac;
-				}
+                        }
 			}
 			
 #if !defined(NDEBUG)
@@ -210,12 +210,12 @@ namespace yocto
 				{
 					for( size_t j=ii; j<= i-1; ++j)
 						sum -= a[i][j]*b[j];
-				}
+                        }
 				else
 				{
 					if( Fabs(sum) > 0 )
 						ii=i;
-				}
+                        }
 				b[i]=sum;
 			}
 			
@@ -224,8 +224,8 @@ namespace yocto
 				z_type sum=b[i];
 				for(size_t j=i+1;j<=n;++j)
 					sum -= a[i][j]*b[j];
-				b[i]=sum/a[i][i];
-			}
+                    b[i]=sum/a[i][i];
+                    }
             
         }
         
@@ -252,9 +252,9 @@ namespace yocto
 					
 					for( size_t j=1; j<i;j++)
 						sum -= M[i][j]*Q[j][k];
-					
-					Q[i][k]=sum;
-				}
+                        
+                        Q[i][k]=sum;
+                        }
 			}
 			
 			for( size_t k = m; k>0; --k )
@@ -264,12 +264,12 @@ namespace yocto
 					z_type                sum = Q[i][k];
 					for(size_t j=i+1;j<=n;j++)
 						sum -= M[i][j]*Q[j][k];
-					Q[i][k]=sum/M[i][i];
-				}
+                        Q[i][k]=sum/M[i][i];
+                        }
 			}
             
         }
-
+        
         template <>
         bool lu<z_type>:: inverse(matrix<z_type> &M)
         {
@@ -282,11 +282,53 @@ namespace yocto
             const z_type __one(1);
             for(size_t i=n;i>0;--i)
                 Q[i][i] = __one;
-            lu<z_type>::solve(M,Q);
+            solve(M,Q);
             M.assign(Q);
             return true;
         }
-
+        
+        template <>
+        bool lu<z_type>:: pseudo_inverse(matrix<z_type> &M, const matrix<z_type> &P)
+        {
+            assert(P.rows>0);
+            assert(P.cols>=P.rows);
+            assert(M.cols==P.rows);
+            assert(M.rows==P.cols);
+            
+            const size_t n = P.rows;
+            const size_t m = P.cols;
+            matrix<z_type> P2(n,n);
+            for(size_t i=n;i>0;--i)
+            {
+                for(size_t j=n;j>0;--j)
+                {
+                    z_type sum(0);
+                    for(size_t k=m;k>0;--k)
+                    {
+                        sum += P[i][k] * P[j][k];
+                    }
+                    P2[i][j] = sum;
+                }
+            }
+            if( !inverse(P2) )
+                return false;
+            
+            for(size_t i=m;i>0;--i)
+            {
+                for(size_t j=n;j>0;--j)
+                {
+                    z_type sum(0);
+                    for(size_t k=n;k>0;--k)
+                    {
+                        sum += P[k][i] * P2[k][j];
+                    }
+                    M[i][j] = sum;
+                }
+            }
+            
+            return true;
+        }
+        
         
     }
 }
