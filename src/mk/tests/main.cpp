@@ -30,6 +30,8 @@ YOCTO_UNIT_TEST_INIT(64)
     YOCTO_UNIT_TEST_DECL(trigo);
     
     YOCTO_UNIT_TEST_DECL(svd);
+    YOCTO_UNIT_TEST_DECL(ortho);
+    
 	YOCTO_UNIT_TEST_DECL(bracket);
     YOCTO_UNIT_TEST_DECL(cgrad);
     YOCTO_UNIT_TEST_DECL(cgrad2);

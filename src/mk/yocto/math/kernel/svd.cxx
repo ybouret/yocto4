@@ -3,7 +3,6 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/sequence/vector.hpp"
-
 namespace yocto
 {
     
@@ -313,6 +312,113 @@ namespace yocto
                 }
             }
             return ans;
+        }
+        
+        template <>
+        bool svd<real_t>:: orthonormal(matrix<real_t>       &Q,
+                                       const matrix<real_t> &P)
+        {
+            //------------------------------------------------------------------
+            // sanity check
+            //------------------------------------------------------------------
+            assert(P.cols>0);
+            assert(P.rows>0);
+            assert(P.cols!=P.rows);
+            
+            //------------------------------------------------------------------
+            // check dims
+            //------------------------------------------------------------------
+            const size_t nr  = P.rows;
+            const size_t nc  = P.cols;
+            size_t       dim = 0;
+            size_t       sub = 0;
+            const bool   cols_are_vector = nr>nc;
+            if(cols_are_vector)
+            {
+                dim = nr;
+                sub = nc;
+            }
+            else
+            {
+                dim = nc;
+                sub = nr;
+            }
+            
+            //------------------------------------------------------------------
+            // Q space
+            //------------------------------------------------------------------
+            const size_t dof = dim-sub;
+            if(cols_are_vector)
+            {
+                Q.make(dim,dof);
+            }
+            else
+            {
+                Q.make(dof,dim);
+            }
+            
+            //------------------------------------------------------------------
+            // total space
+            //------------------------------------------------------------------
+            matrix<real_t> F(dim,dim);
+            if(cols_are_vector)
+            {
+                for(size_t v=sub;v>0;--v)
+                {
+                    for(size_t i=dim;i>0;--i)
+                    {
+                        F[i][v] = P[i][v];
+                    }
+                }
+            }
+            else
+            {
+                for(size_t v=sub;v>0;--v)
+                {
+                    for(size_t i=dim;i>0;--i)
+                    {
+                        F[i][v] = P[v][i];
+                    }
+                }
+            }
+            
+            //------------------------------------------------------------------
+            // use SVD
+            //------------------------------------------------------------------
+            {
+                vector<real_t> W(dim,REAL(0.0));
+                matrix<real_t> V(dim,dim);
+                if(!svd<real_t>::build(F,W,V))
+                    return false;
+            }
+            
+            //------------------------------------------------------------------
+            // save
+            //------------------------------------------------------------------
+            if(cols_are_vector)
+            {
+                for(size_t v=dof;v>0;--v)
+                {
+                    for(size_t i=dim;i>0;--i)
+                    {
+                        Q[i][v] = F[i][v+sub];
+                    }
+                }
+            }
+            else
+            {
+                for(size_t v=dof;v>0;--v)
+                {
+                    for(size_t i=dim;i>0;--i)
+                    {
+                        Q[v][i] = F[i][v+sub];
+                    }
+                }
+                
+            }
+            
+            // All done !
+            return true;
         }
     }
 }
