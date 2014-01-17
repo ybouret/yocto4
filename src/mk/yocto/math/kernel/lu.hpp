@@ -26,7 +26,18 @@ namespace yocto
 			void solve(const matrix<T>     &M,
                        matrix<T>           &Q) const throw();
             
+            //! build the inverse of M.
+            /**
+             memory must be allocated before.
+             */
             bool inverse(matrix<T> &M);
+            
+            //! Moore-Penrose pseudo inverse, P.cols >= P.rows
+            /**
+             memory must be allocated before
+             */
+            bool pseudo_inverse(matrix<T> &M, const matrix<T> &P);
+            
             
 			explicit lu() throw();
 			explicit lu(size_t);
