@@ -98,9 +98,10 @@ namespace yocto
                 
                 
                 //! find the fixed components
-                size_t find_fixed( array<double> &X0, uvector_t &ifix ) const;
+                void find_fixed( array<double> &X0, uvector_t &ifix ) const;
                 
                 //! find the kernel components (?)
+                void find_kernel( matrix_t &K, size_t M) const;
                 
                 
                 //! initialize

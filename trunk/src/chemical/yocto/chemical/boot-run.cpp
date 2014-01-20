@@ -176,7 +176,9 @@ namespace yocto
             std::cerr << "nu=" << cs.nu << std::endl;
             std::cerr << "Nu=" << cs.Nu << std::endl;
             
-            
+            matrix_t K;
+            find_kernel(K,M);
+            std::cerr << "K=" << K << std::endl;
             
             
             //__________________________________________________________________
