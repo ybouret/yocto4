@@ -162,7 +162,7 @@ namespace yocto
             
         }
         
-        size_t boot::loader:: find_fixed( array<double> &X0, uvector_t &ifix  ) const
+        void boot::loader:: find_fixed( array<double> &X0, uvector_t &ifix  ) const
         {
             const size_t M   = X0.size();
             const size_t Nc  = size();
@@ -197,12 +197,45 @@ namespace yocto
                     ifix.push_back(j);
                 }
             }
-            quicksort(ifix);
-            return ifix.size();
-            
+            quicksort(ifix);            
         }
         
-        
+        void boot:: loader:: find_kernel( matrix_t &K, size_t M) const
+        {
+            const size_t Nc = size();
+            size_t       nk = 0;
+            for(size_t i=1;i<=Nc;++i)
+            {
+                const constraint &cstr = *(*this)[i];
+                if( cstr.size()>1 && fabs(cstr.value)<=0)
+                {
+                    ++nk;
+                }
+            }
+            if(nk>0)
+            {
+                K.make(nk,M);
+                size_t ik = 0;
+                for(size_t i=1;i<=Nc;++i)
+                {
+                    const constraint &cstr = *(*this)[i];
+                    if( cstr.size()>1 && fabs(cstr.value)<=0)
+                    {
+                        ++ik; assert(ik<=nk);
+                        for( constraint::const_iterator j=cstr.begin(); j!=cstr.end();++j)
+                        {
+                            const constituent &cc = **j;
+                            const size_t k = cc.spec->indx;
+                            const int    w = cc.weight;
+                            assert(k>=1);
+                            assert(k<=K.cols);
+                            K[ik][k] = w;
+                        }
+
+                    }
+                }
+            }
+        }
         
     }
     
