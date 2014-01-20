@@ -103,15 +103,20 @@ namespace yocto
 				void ld1() throw(); //!< pseudo-id if not square
 				void transpose();
 				
+                
 			private:
 				row          *row_;    //!< stride proxy
-				T            *ptr_;    //!< linear space
-				const size_t  len_;    //!< linear size for copy/set operations
+				
+                T            *data;    //!< linear space
+				const size_t  dlen;    //!< linear size for copy/set operations
+                
 				void         *buffer_; //!< dynamic workspace
 				size_t        buflen_; //!< dynamic workspace size
-                size_t       *indx_;   //!< not NULL for square matrices
+                
 				void          build();
-				
+                
+            public:
+                size_t       *indx;   //!< not NULL for square matrices
 			};
 		
 	}

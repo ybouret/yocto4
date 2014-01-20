@@ -44,7 +44,7 @@ namespace yocto
 			assert( c <= cols );
 			return item_[c];
 		}
-
+        
 		template <>
 		matrix<z_type>::row:: row( z_type *item, size_t c ) throw() :
 		cols( c     ),
@@ -96,11 +96,11 @@ namespace yocto
 		cols( 0 ),
 		size( 0 ),
 		row_( NULL ),
-		ptr_( NULL ),
-		len_( 0 ),
+		data( NULL ),
+		dlen( 0 ),
 		buffer_( NULL ),
 		buflen_(0),
-        indx_(NULL)
+        indx(NULL)
 		{
 		}
 		
@@ -112,35 +112,37 @@ namespace yocto
                 //--------------------------------------------------------------
                 // conditional allocation metrics
                 //--------------------------------------------------------------
-                const bool   alloc_indx = (rows == cols);
+                const bool   alloc_indx = rows == cols;
                 const size_t row_offset = 0;
                 const size_t row_length = sizeof(row) * rows;
                 const size_t itm_offset = YOCTO_MEMALIGN(row_length);
-                const size_t itm_length = len_;
+                const size_t itm_length = dlen;
                 const size_t idx_offset = YOCTO_MEMALIGN(itm_length+itm_offset);
                 const size_t idx_length = alloc_indx ? rows * sizeof(size_t) : 0;
-                
+                const size_t tot_length = idx_offset + idx_length;
                 //--------------------------------------------------------------
                 // get buffer
                 //--------------------------------------------------------------
-                buflen_ = idx_offset + idx_length;
+                buflen_ = tot_length;
                 buffer_ = memory::kind<memory::global>::acquire( buflen_ );
                 
                 uint8_t *p = (uint8_t *)buffer_;
                 
-                row_ = (row    *) &p[row_offset];
-                ptr_ = (z_type *) &p[itm_offset];
+                row_  = (row    *) &p[row_offset];
+                data  = (z_type *) &p[itm_offset];
                 if( alloc_indx )
                 {
-                    indx_ = (size_t *)&p[idx_offset];
-                    --indx_;
+                    indx          = (size_t *)&p[idx_offset];
+                    //std::cerr << "dlen=" << dlen << " => ";
+                    (size_t&)dlen = tot_length - itm_offset;
+                    //std::cerr << dlen << std::endl;
                 }
                 
                 //--------------------------------------------------------------
 				//-- construct rows
                 //--------------------------------------------------------------
 				--row_;
-				new ( & row_[1] ) row( ptr_ - 1, cols );
+				new ( & row_[1] ) row( data - 1, cols );
 				for( size_t i = 2; i <= rows; ++i )
 				{
 					new ( & row_[i] ) row( row_[i-1].item_ + cols, cols );
@@ -149,17 +151,18 @@ namespace yocto
 			}
 		}
 		
+        
 		template <>
 		matrix<z_type>:: matrix( size_t r, size_t c ) :
 		rows( r ),
 		cols( make_cols( r,c ) ),
 		size( rows * cols ),
 		row_( NULL ),
-		ptr_( NULL ),
-		len_( size * sizeof(z_type) ),
+		data( NULL ),
+		dlen( size * sizeof(z_type) ),
 		buffer_( NULL ),
 		buflen_(0),
-        indx_(NULL)
+        indx(NULL)
 		{
 			build();
 		}
@@ -170,14 +173,15 @@ namespace yocto
 		cols( M.cols ),
 		size( M.size ),
 		row_( NULL   ),
-		ptr_( NULL   ),
-		len_( M.len_ ),
+		data( NULL   ),
+		dlen( size * sizeof(z_type) ),
 		buffer_( NULL   ),
 		buflen_(0),
-        indx_(NULL)
+        indx(NULL)
 		{
 			build();
-			memcpy( ptr_, M.ptr_, len_ );
+            assert(dlen==M.dlen);
+			memcpy( data, M.data, dlen );
 		}
         
         template <>
@@ -186,11 +190,11 @@ namespace yocto
 		cols( M.rows ),
 		size( M.size ),
 		row_( NULL   ),
-		ptr_( NULL   ),
-		len_( M.len_ ),
-		buffer_( NULL   ),
+		data( NULL   ),
+		dlen( M.dlen ),
+		buffer_(NULL),
 		buflen_(0),
-        indx_(NULL)
+        indx(NULL)
 		{
 			build();
             matrix<z_type> &self = *this;
@@ -210,11 +214,11 @@ namespace yocto
 			cswap_const( cols, M.cols );
 			cswap_const( size, M.size );
 			cswap( row_, M.row_ );
-			cswap( ptr_, M.ptr_ );
-			cswap_const( len_, M.len_ );
+			cswap( data, M.data );
+			cswap_const( dlen, M.dlen );
 			cswap( buffer_, M.buffer_ );
 			cswap( buflen_, M.buflen_ );
-            cswap( indx_,   M.indx_   );
+            cswap( indx,    M.indx    );
         }
 		
 		template <>
@@ -231,9 +235,9 @@ namespace yocto
 			{
 				if( rows == M.rows && cols == M.cols )
 				{
-					assert( size == M.size );
-					assert( len_ == M.len_ );
-					memcpy( ptr_, M.ptr_, len_ );
+					assert( size == M.size  );
+					assert( dlen == M.dlen );
+					memcpy( data, M.data, dlen );
 				}
 				else
 				{
@@ -254,11 +258,11 @@ namespace yocto
 			}
 			else
 			{
-				memset( ptr_, 0, len_ );
+				memset( data, 0, dlen );
 			}
 		}
 		
-				
+        
 		template <>
 		void  matrix<z_type>:: swap_rows( size_t r1, size_t r2 ) throw()
 		{
@@ -292,14 +296,14 @@ namespace yocto
 		template <>
 		void matrix<z_type>:: ldz() throw()
 		{
-			memset(ptr_,0,len_);
+			memset(data,0,dlen);
 		}
 		
 		template <>
 		void matrix<z_type>:: ld1() throw()
 		{
 			static const z_type __one(1);
-			memset(ptr_,0,len_);
+			memset(data,0,dlen);
 			for( size_t i = min_of<size_t>( rows, cols ); i>0; --i )
 			{
 				row_[i][i] = __one;
@@ -310,11 +314,11 @@ namespace yocto
 		void matrix<z_type>:: assign( const matrix &other ) throw()
 		{
 			assert( this != &other );
-			assert( cols == other.cols );
-			assert( rows == other.rows );
-			assert( size == other.size );
-			assert( len_ == other.len_ );
-			memcpy( ptr_, other.ptr_, len_ );
+			assert( cols  == other.cols );
+			assert( rows  == other.rows );
+			assert( size  == other.size );
+			assert( dlen  == other.dlen );
+			memcpy( data, other.data, dlen);
 		}
 		
         template <>
@@ -340,7 +344,7 @@ namespace yocto
             swap_cols(u,v);
             swap_rows(u,v);
         }
-
+        
         
 		
 	}
