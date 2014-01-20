@@ -4,7 +4,6 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/memory/global.hpp"
 #include <cstring>
-#include "yocto/core/offset.hpp"
 #include "yocto/code/unroll.hpp"
 #include "yocto/code/bswap.hpp"
 
@@ -100,7 +99,8 @@ namespace yocto
 		ptr_( NULL ),
 		len_( 0 ),
 		buffer_( NULL ),
-		buflen_(0)
+		buflen_(0),
+        indx_(NULL)
 		{
 		}
 		
@@ -109,20 +109,36 @@ namespace yocto
 		{
 			if( size > 0 )
 			{
-				z_type **p = &ptr_;
-				void   **q = (void **) p;
-				//-- allocate memory
-				memory::embed reg[] =
-				{
-					YOCTO_EMBED( row_, rows ),
-					{ q, len_, 0 }
-				};
-				const size_t num = sizeof(reg)/sizeof(reg[0]);
-				buflen_ = memory::embed::prepare( reg, num );
-				buffer_ = memory::kind<memory::global>::acquire( buflen_ );
-				memory::embed::dispatch( reg, num, buffer_ );
-				
+                //--------------------------------------------------------------
+                // conditional allocation metrics
+                //--------------------------------------------------------------
+                const bool   alloc_indx = (rows == cols);
+                const size_t row_offset = 0;
+                const size_t row_length = sizeof(row) * rows;
+                const size_t itm_offset = YOCTO_MEMALIGN(row_length);
+                const size_t itm_length = len_;
+                const size_t idx_offset = YOCTO_MEMALIGN(itm_length+itm_offset);
+                const size_t idx_length = alloc_indx ? rows * sizeof(size_t) : 0;
+                
+                //--------------------------------------------------------------
+                // get buffer
+                //--------------------------------------------------------------
+                buflen_ = idx_offset + idx_length;
+                buffer_ = memory::kind<memory::global>::acquire( buflen_ );
+                
+                uint8_t *p = (uint8_t *)buffer_;
+                
+                row_ = (row    *) &p[row_offset];
+                ptr_ = (z_type *) &p[itm_offset];
+                if( alloc_indx )
+                {
+                    indx_ = (size_t *)&p[idx_offset];
+                    --indx_;
+                }
+                
+                //--------------------------------------------------------------
 				//-- construct rows
+                //--------------------------------------------------------------
 				--row_;
 				new ( & row_[1] ) row( ptr_ - 1, cols );
 				for( size_t i = 2; i <= rows; ++i )
@@ -142,7 +158,8 @@ namespace yocto
 		ptr_( NULL ),
 		len_( size * sizeof(z_type) ),
 		buffer_( NULL ),
-		buflen_(0)
+		buflen_(0),
+        indx_(NULL)
 		{
 			build();
 		}
@@ -156,7 +173,8 @@ namespace yocto
 		ptr_( NULL   ),
 		len_( M.len_ ),
 		buffer_( NULL   ),
-		buflen_(0)
+		buflen_(0),
+        indx_(NULL)
 		{
 			build();
 			memcpy( ptr_, M.ptr_, len_ );
@@ -171,7 +189,8 @@ namespace yocto
 		ptr_( NULL   ),
 		len_( M.len_ ),
 		buffer_( NULL   ),
-		buflen_(0)
+		buflen_(0),
+        indx_(NULL)
 		{
 			build();
             matrix<z_type> &self = *this;
@@ -195,6 +214,7 @@ namespace yocto
 			cswap_const( len_, M.len_ );
 			cswap( buffer_, M.buffer_ );
 			cswap( buflen_, M.buflen_ );
+            cswap( indx_,   M.indx_   );
         }
 		
 		template <>

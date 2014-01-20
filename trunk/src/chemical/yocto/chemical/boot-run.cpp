@@ -182,7 +182,7 @@ namespace yocto
             std::cerr << "K=" << K << std::endl;
             if(nk>0)
             {
-                
+                std::cerr << "Z=K'*inv(K*K')*K" << std::endl;
             }
             
             

@@ -109,6 +109,7 @@ namespace yocto
 				const size_t  len_;    //!< linear size for copy/set operations
 				void         *buffer_; //!< dynamic workspace
 				size_t        buflen_; //!< dynamic workspace size
+                size_t       *indx_;   //!< not NULL for square matrices
 				void          build();
 				
 			};
