@@ -178,7 +178,12 @@ namespace yocto
             
             matrix_t K;
             find_kernel(K,M);
+            const size_t nk = K.rows;
             std::cerr << "K=" << K << std::endl;
+            if(nk>0)
+            {
+                
+            }
             
             
             //__________________________________________________________________
