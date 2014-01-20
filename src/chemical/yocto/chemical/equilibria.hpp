@@ -13,6 +13,7 @@ namespace yocto
         typedef math::matrix<double>    matrix_t;
         typedef math::matrix<ptrdiff_t> imatrix_t;
         typedef vector<double>          vector_t;
+        typedef vector<size_t>          uvector_t;
         typedef math::lu<double>        lu_t;
         
         //! a database of equilibrium
@@ -33,16 +34,19 @@ namespace yocto
             
             vector_t     C;     //!< local concentrations
             vector_t     dC;    //!< corrections
+            uvector_t    fixed; //!< indices of fixed conc
+            vector_t     Cf;    //!< fixed values
+            vector_t     CC;    //!< temp
             lu_t         LU;    //!< for local matrix inversion
             imatrix_t    nuR;   //!< reactives, NxM
             imatrix_t    nuP;   //!< products,  NxM
             matrix_t     nu;    //!< algebraic, NxM
+            matrix_t     Nu;    //!< algebraic, NxM for effective extent
             vector_t     Gamma; //!< unrolled equilibria, N
             vector_t     dtGam; //!< time derivative of Gamma
             matrix_t     Phi;   //!< Gamma Jacobian, NxM
             matrix_t     W;     //!< (Phi*nu')^(-1), NxN
             vector_t     xi;    //!< local extent
-            vector_t     CC;    //!< temporary/auxiliary
             
             //! release all memory
             void reset() throw();
@@ -129,6 +133,13 @@ namespace yocto
             
             //! call compute_Gamma and Gamma2RMS
             double compute_rms(double t) throw();
+            
+            void fixed_topology() throw(); //!< Nu.assign(nu) and kill fixed
+           
+            void reset_topology() throw(); //!< free fixed and Nu.assign(nu)
+            
+            void fixed_dC() throw(); //!< zero fixed dC
+            void fixed_C()  throw(); //!< correct C
             
             
         private:

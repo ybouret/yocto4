@@ -24,11 +24,12 @@ namespace yocto
             //
             // We start from a valid composition
             //__________________________________________________________________
+            fixed_C();
             
 #if !defined(NDEBUG)
             for(size_t i=M;i>0;--i) { assert(C[i]>=0); }
 #endif
-            
+
             if(N>0)
             {
                 
@@ -50,10 +51,11 @@ namespace yocto
                     std::cerr << "-- Newton-I: invalid composition" << std::endl;
                     return false;
                 }
-                //const double H0 = Gamma2RMS();
+                
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,nu,xi);
+                fixed_dC();
                 
                 //______________________________________________________________
                 //
@@ -65,7 +67,6 @@ namespace yocto
                 
                 // full step
                 mkl::sub(C,dC);
-                
                 //______________________________________________________________
                 //
                 // convergence: test full dC
@@ -92,6 +93,7 @@ namespace yocto
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,nu,xi);
+                fixed_dC();
                 for_each( dC.begin(), dC.end(), numeric<double>::round_error);
                 for(size_t i=M;i>0;--i)
                 {

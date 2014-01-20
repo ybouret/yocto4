@@ -28,16 +28,19 @@ namespace yocto
         time_scale(1e-4),
         C(),
         dC(),
+        fixed(),
+        Cf(),
+        CC(),
         LU(),
         nuR(),
         nuP(),
         nu(),
+        Nu(),
         Gamma(),
         dtGam(),
         Phi(),
         W(),
         xi(),
-        CC(),
         dervs()
         {
         }
@@ -105,16 +108,19 @@ namespace yocto
         //======================================================================
         void equilibria:: reset() throw()
         {
-            CC.release();
             xi.release();
             W.release();
             Phi.release();
             dtGam.release();
             Gamma.release();
+            Nu.release();
             nu.release();
             nuP.release();
             nuR.release();
             LU.release();
+            CC.release();
+            Cf.release();
+            fixed.release();
             dC.release();
             C.release();
         }
@@ -146,9 +152,12 @@ namespace yocto
             {
                 const size_t N = this->size();
                 const size_t M = lib.size();
-                C.make(M,0);
-                dC.make(M,0);
-                LU.ensure(M);
+                C.     make(M,0);
+                dC.    make(M,0);
+                fixed. reserve(M);
+                Cf.    make(M,0);
+                CC.    make(M,0);
+                LU.    ensure(M);
                 
                 if(N>0)
                 {
@@ -159,12 +168,12 @@ namespace yocto
                     nuR.   make(N,M);
                     nuP.   make(N,M);
                     nu.    make(N,M);
+                    Nu.    make(N,M);
                     Gamma. make(N,0);
                     dtGam. make(N,0);
                     Phi.   make(N,M);
                     W.     make(N,N);
                     xi.    make(N,0);
-                    CC.    make(M,0);
                     
                     //----------------------------------------------------------
                     // compute topological parts
@@ -185,6 +194,9 @@ namespace yocto
                             nu[i][j] = nuP[i][j] - nuR[i][j];
                         }
                     }
+                    
+                    //-- default topological parts
+                    Nu.assign(nu);
                 }
             }
             catch(...)
@@ -328,6 +340,17 @@ namespace yocto
                 }
             }
             
+            for( size_t f=fixed.size();f>0;--f)
+            {
+                assert(fixed[f]>0);
+                assert(fixed[f]<=C.size());
+                const size_t j = fixed[f];
+                for(size_t i=N;i>0;--i)
+                {
+                    Phi[i][j] = 0;
+                }
+            }
+            
             
         }
         
@@ -336,7 +359,7 @@ namespace yocto
         bool equilibria:: compute_Gamma_and_W( double t, bool compute_derivatives)
         {
             compute_Gamma_and_Phi(t, compute_derivatives);
-            mkl::mul_rtrn(W, Phi,nu);
+            mkl::mul_rtrn(W, Phi,Nu);
             return LU.build(W);
         }
         
@@ -352,7 +375,7 @@ namespace yocto
                 compute_Gamma_and_W(t,computeDerivatives);
                 mkl::muladd(dtGam, Phi, dC);
                 LU.solve(W,dtGam);
-                mkl::mulsub_trn(dC, nu, dtGam);
+                mkl::mulsub_trn(dC, Nu, dtGam);
             }
             
         }
@@ -383,33 +406,53 @@ namespace yocto
                 compute_Gamma_and_W(t,false);
                 matrix_t tmpPhi(Phi);
                 LU.solve(W, tmpPhi);
-                mkl::mul_ltrn(Chi, nu, tmpPhi);
+                mkl::mul_ltrn(Chi, Nu, tmpPhi);
             }
         }
         
-#if 0
-        bool equilibria:: full_decrease_C_with(const array<double> &d) throw()
+        void equilibria:: fixed_topology() throw()
         {
-            assert(C.size()==d.size());
-            bool was_full = true;
-            for( size_t i=C.size();i>0;--i)
+            Nu.assign(nu);
+            for( size_t f=fixed.size();f>0;--f)
             {
-                
-                double      &cc = C[i];
-                const double dd = d[i];
-                if( dd>cc )
-                {
-                    cc/=2;
-                    was_full = false;
-                }
-                else
-                {
-                    cc -= dd; if(cc<=0) cc=0;
-                }
+                assert(fixed[f]>0);
+                assert(fixed[f]<=Nu.cols);
+                const size_t j = fixed[f];
+                for(size_t i=Nu.rows;i>0;--i)
+                    Nu[i][j] = 0;
             }
-            return was_full;
         }
-#endif
+        
+        void equilibria:: reset_topology() throw()
+        {
+            std::cerr << "\t[[ Reset Topology]]" << std::endl;
+            fixed.free();
+            Nu.assign(nu);
+            
+        }
+        
+        void equilibria:: fixed_dC() throw()
+        {
+            for( size_t f=fixed.size();f>0;--f)
+            {
+                assert(fixed[f]>=1);
+                assert(fixed[f]<=dC.size());
+                dC[ fixed[f] ] = 0;
+            }
+        }
+        
+        void equilibria:: fixed_C()  throw()
+        {
+            for( size_t f=fixed.size();f>0;--f)
+            {
+                assert(fixed[f]>=1);
+                assert(fixed[f]<=dC.size());
+                const size_t i = fixed[f];
+                C[i] = Cf[i]; assert(Cf[i]>=0);
+            }
+
+        }
+
         
     }
     

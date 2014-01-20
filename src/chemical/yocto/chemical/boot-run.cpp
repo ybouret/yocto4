@@ -2,9 +2,11 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/ios/ocstream.hpp"
 #include "yocto/math/kernel/svd.hpp"
+
+#include "yocto/ios/ocstream.hpp"
 #include "yocto/auto-clean.hpp"
+
 
 
 namespace yocto
@@ -16,12 +18,31 @@ namespace yocto
         typedef algebra<double> mkl;
         typedef svd<double>     SVD;
         
-        
+        namespace {
+            
+            static inline
+            void set_fixed(vector_t        &C,
+                           const vector_t  &X0,
+                           const uvector_t &ifix) throw()
+            {
+                assert(C.size()==X0.size());
+                for(size_t i=ifix.size();i>0;--i)
+                {
+                    assert(ifix[i]>0);
+                    assert(ifix[i]<=C.size());
+                    const size_t k = ifix[i];
+                    C[k] = X0[k];
+                }
+            }
+            
+        }
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
             
             static const double zero = numeric<double>::zero;
+            
+            auto_clean<equilibria> onReturn( cs, &equilibria::reset_topology);
             
             //__________________________________________________________________
             //
@@ -135,9 +156,26 @@ namespace yocto
             //
             //__________________________________________________________________
             matrix_t Q(N,M);
-            if(!SVD::orthonormal(Q, P))
+            if(!SVD::orthonormal(Q,P))
                 throw exception("chemical::boot: invalid constraints/SVD");
             std::cerr << "Q=" << Q << std::endl;
+            
+            //__________________________________________________________________
+            //
+            //
+            // alter topology/fixed constraints
+            //
+            //__________________________________________________________________
+            const vector_t  &Cf    = cs.Cf;
+            const uvector_t &fixed = cs.fixed;
+            find_fixed(cs.Cf, cs.fixed);
+            std::cerr << "fixed = " <<  fixed  << std::endl;
+            std::cerr << "Cf    = " <<  Cf     << std::endl;
+            
+            cs.fixed_topology();
+            std::cerr << "nu=" << cs.nu << std::endl;
+            std::cerr << "Nu=" << cs.Nu << std::endl;
+            
             
             
             
@@ -149,7 +187,8 @@ namespace yocto
             //__________________________________________________________________
             
             
-#define RECOMPUTE_C() do {  mkl::mul(V,Q,C); mkl::mul_trn(C,Q,V); mkl::add(C,Xstar); } while(false)
+#define RECOMPUTE_C() do {  cs.fixed_C(); mkl::mul(V,Q,C); mkl::mul_trn(C,Q,V); mkl::add(C,Xstar); cs.fixed_C(); } while(false)
+            
             vector_t V(N,zero);
             vector_t &Gamma = cs.Gamma;
             matrix_t &W     = cs.W;
@@ -180,6 +219,7 @@ namespace yocto
                 std::cerr << "-- Newton-II: invalid trial composition" << std::endl;
                 goto INITIALIZE;
             }
+            std::cerr << "C0=" << C << std::endl;
             
             RECOMPUTE_C();
             {
