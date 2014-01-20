@@ -1,5 +1,6 @@
 #include "yocto/chemical/boot.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -160,6 +161,47 @@ namespace yocto
             }
             
         }
+        
+        size_t boot::loader:: find_fixed( array<double> &X0, uvector_t &ifix  ) const
+        {
+            const size_t M   = X0.size();
+            const size_t Nc  = size();
+            
+            for(size_t i=1;i<=M;++i)
+            {
+                X0[i] = 0;
+            }
+            ifix.free();
+            
+            for(size_t i=1;i<=Nc;++i)
+            {
+                const constraint &cstr = *(*this)[i];
+                if( cstr.size() == 1)
+                {
+                    const constituent &cc = *cstr.front();
+                    const size_t       j  = cc.spec->indx;
+                    const int          w  = cc.weight;
+                    assert(j>=1);
+                    assert(j<=M);
+                    assert(w!=0);
+                    const double rhs  = cstr.value;
+                    const double val  = rhs/w;
+                    if(val<0)
+                        throw exception("invalid fixed concentration for '%s'", cc.spec->name.c_str());
+                    X0[j]    = val;
+                    for(size_t k=1;k<=ifix.size();++k)
+                    {
+                        if(ifix[k]==j)
+                            throw exception("multiple fixed '%s'", cc.spec->name.c_str());
+                    }
+                    ifix.push_back(j);
+                }
+            }
+            quicksort(ifix);
+            return ifix.size();
+            
+        }
+        
         
         
     }

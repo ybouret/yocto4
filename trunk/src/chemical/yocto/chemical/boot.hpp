@@ -97,6 +97,12 @@ namespace yocto
                 void fill( matrix_t &P, array<double> &Lam) const throw();
                 
                 
+                //! find the fixed components
+                size_t find_fixed( array<double> &X0, uvector_t &ifix ) const;
+                
+                //! find the kernel components (?)
+                
+                
                 //! initialize
                 void operator()( equilibria &cs, collection &lib, double t);
                 
