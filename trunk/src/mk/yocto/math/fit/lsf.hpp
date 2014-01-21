@@ -4,7 +4,7 @@
 #include "yocto/math/fit/sample.hpp"
 #include "yocto/math/fcn/derivative.hpp"
 #include "yocto/sequence/lw-arrays.hpp"
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 
 namespace yocto
 {
@@ -34,7 +34,8 @@ namespace yocto
 				T ftol;       //!< fractional tolerance on parameters     (numeric<T>::ftol)
 				T h;          //!< parameters length scale for derivative (1e-4)
 				bool verbose; //!< small printout if needed, false by default 
-			private:
+			
+            private:
 				typedef lw_arrays<T,memory::global> arrays;
 				typedef lw_array<T> array_t;
 				typedef typename numeric<T>::function function_t;
@@ -56,7 +57,7 @@ namespace yocto
 				size_t             iA_;    //!< to compute gradient dF/da[iA]
 				derivative<T>      drvs_;  //!< to compute gradient
 				function_t         grad_;  //!< gradient function wrapper
-				lu<T>              LU;
+				crout<T>           LU;
                 
 				T          grad_fn(T );
 				void       gradient(  T xi );

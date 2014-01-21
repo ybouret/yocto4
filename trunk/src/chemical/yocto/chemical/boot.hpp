@@ -90,11 +90,11 @@ namespace yocto
                 /**
                  Used when no equilibria is used
                  
-                 \param   P    a matrix MxNc (M is the lib.size)
-                 \param   Lam  a vector Nc
+                 \param   A    an integer matrix MxNc (M is the lib.size)
+                 \param   B    a vector Nc
                  \warning the  collection must have updated indices !
                  */
-                void fill( matrix_t &P, array<double> &Lam) const throw();
+                void fill( imatrix_t &A, array<double> &B) const throw();
                 
                 
                 //! find the fixed components

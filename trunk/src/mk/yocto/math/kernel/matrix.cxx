@@ -345,7 +345,22 @@ namespace yocto
             swap_rows(u,v);
         }
         
+        template <>
+        z_type &matrix<z_type>:: operator()(size_t i) throw()
+        {
+            assert(i<size);
+            assert(data);
+            return data[i];
+        }
         
+        template <>
+        const z_type &matrix<z_type>:: operator()(size_t i) const throw()
+        {
+            assert(i<size);
+            assert(data);
+            return data[i];
+        }
+
 		
 	}
 }

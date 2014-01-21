@@ -4,7 +4,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 #include "yocto/code/ipower.hpp"
 
 #include <cerrno>
@@ -288,10 +288,10 @@ namespace yocto
                 //
                 // solve for coefficients
                 //______________________________________________________________
-                lu<real_t> LU(m);
+                crout<real_t> LU(m);
                 if( !LU.build(mu) )
                     throw exception("invalid data @X[%u]=%g", unsigned(i), double(X[i]));
-                LU.solve(mu,a);
+                crout<real_t>::solve(mu,a);
                 Z[i] = a[1];
                 const real_t dz = Z[i] - Y[i];
                 rms += dz*dz;

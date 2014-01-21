@@ -1,7 +1,7 @@
 #include "yocto/math/sig/data-smoother.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 #include "yocto/code/utils.hpp"
 
 namespace yocto {
@@ -88,9 +88,8 @@ namespace yocto {
 			// LU decomposition
 			//
 			//------------------------------------------------------------------
-			//linsys<real_t> lss( ncoeff_ );
-            lu<real_t>     LU(ncoeff_);
-            array<real_t> &rhs = LU.arr;
+            crout<real_t>     LU(ncoeff_);
+            array<real_t> &rhs = LU; assert(rhs.size()==ncoeff_);
             
 			if( !LU.build(mu) )
 				throw exception( "[smoother] singular moments, check kernel" );
@@ -127,7 +126,7 @@ namespace yocto {
 				}
                 
 				//-- solve using internal solver memory
-                LU.solve( mu, rhs );
+                crout<real_t>::solve( mu, rhs );
                 
 				//-- replace column j of filter
 				for( size_t i=ncoeff_; i>0; --i )

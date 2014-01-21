@@ -1,6 +1,5 @@
 #include "yocto/math/fit/lsf.hpp"
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/kernel/lu.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -185,10 +184,10 @@ namespace yocto
 				//--------------------------------------------------------------
 				// memory allocation
 				//--------------------------------------------------------------
-				alpha_.make(nvar_,nvar_);
-				curv_.make(nvar_,nvar_);
-				harr_.prepare(  nvar_  );
-                LU.ensure( nvar_ );
+				alpha_. make(nvar_,nvar_);
+				curv_.  make(nvar_,nvar_);
+				harr_.  prepare(  nvar_  );
+                LU.     prepare( nvar_ );
                 
 				//--------------------------------------------------------------
 				// global init

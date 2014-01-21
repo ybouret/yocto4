@@ -1,8 +1,8 @@
 #ifndef YOCTO_MATH_TRIGONOMETRIC_INCLUDED
 #define YOCTO_MATH_TRIGONOMETRIC_INCLUDED 1
 
-#include "yocto/math/kernel/lu.hpp"
 #include "yocto/math/v2d.hpp"
+#include "yocto/math/kernel/crout.hpp"
 
 namespace yocto
 {
@@ -20,16 +20,15 @@ namespace yocto
              \param theta in 0..2*pi exclusive
              \param solver to perform the LU on the matrix
              */
-            explicit trigonometric( const array<T> &theta, lu<T> &solver );
+            explicit trigonometric( const array<T> &theta, crout<T> &solver );
             virtual ~trigonometric() throw();
             
             //! compute the trigonometric coefficicents
             /**
              \param a the values at points theta from the constructor
-             \param solver the untouched solver used in the constructor
              The values are replaced by the coefficients.
              */
-            void compute( array<T> &a, lu<T> &solver ) const throw();
+            void compute( array<T> &a ) const throw();
             
             T      operator()( T theta, const array<T> &a ) const throw();
             v2d<T> operator()( T theta, const array<T> &ax, const array<T> &ay ) const throw();

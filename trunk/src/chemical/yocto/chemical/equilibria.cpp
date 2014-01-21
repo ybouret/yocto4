@@ -157,7 +157,7 @@ namespace yocto
                 fixed. reserve(M);
                 Cf.    make(M,0);
                 CC.    make(M,0);
-                LU.    ensure(M);
+                LU.    prepare(M);
                 
                 if(N>0)
                 {

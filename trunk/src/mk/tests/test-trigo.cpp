@@ -35,10 +35,10 @@ YOCTO_UNIT_TEST_IMPL(trigo)
     }
     
     // prepare trigo interp
-    lu<double>        solver;
+    crout<double>         solver;
     trigonometric<double> trig(x,solver);
     vector<double>        coef(y);
-    trig.compute(coef, solver);
+    trig.compute(coef);
     {
         ios::ocstream fp("trig1.dat",false);
         const size_t m = 400 + alea_leq(400);
