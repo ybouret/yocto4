@@ -20,6 +20,8 @@ namespace yocto
             explicit crout(size_t);
             virtual ~crout() throw();
             
+            void prepare(size_t n); // this->make(n,0)
+            
             //! crout algorithm
             /**
              \param M a square matrix

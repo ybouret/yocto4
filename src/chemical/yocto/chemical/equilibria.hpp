@@ -2,7 +2,7 @@
 #define YOCTO_CHEMICAL_EQUILIBRIA_INCLUDED 1
 
 #include "yocto/chemical/equilibrium.hpp"
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/fcn/derivative.hpp"
 
 namespace yocto
@@ -14,7 +14,7 @@ namespace yocto
         typedef math::matrix<ptrdiff_t> imatrix_t;
         typedef vector<double>          vector_t;
         typedef vector<size_t>          uvector_t;
-        typedef math::lu<double>        lu_t;
+        typedef math::crout<double>     lu_t;
         
         //! a database of equilibrium
         class equilibria : public equilibrium::db

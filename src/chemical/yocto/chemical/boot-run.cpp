@@ -7,7 +7,7 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/auto-clean.hpp"
 
-
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -18,6 +18,7 @@ namespace yocto
         typedef algebra<double> mkl;
         typedef svd<double>     SVD;
         
+#if 0
         namespace {
             
             static inline
@@ -36,6 +37,111 @@ namespace yocto
             }
             
         }
+#endif
+        
+        static inline bool is_fixed( const array<ptrdiff_t> &u, size_t &j ) throw()
+        {
+            j=0;
+            size_t nf = 0;
+            for(size_t i=u.size();i>0;--i)
+            {
+                if( u[i] != 0 )
+                {
+                    j=i;
+                    ++nf;
+                }
+            }
+            assert(nf>0);
+            if(1==nf)
+                return true;
+            else
+            {
+                j=0;
+                return false;
+            }
+        }
+        
+#if 0
+        static inline bool has_fixed( const size_t j, const vector<size_t> &fixed ) throw()
+        {
+            assert(j>0);
+            for(size_t i=fixed.size();i>0;--i)
+            {
+                if(j==fixed[i])
+                    return true;
+            }
+            return false;
+        }
+#endif
+        
+        static inline
+        void collect_fixed(vector<size_t> &fixed,
+                           array<double>  &Cf,
+                           imatrix_t      &A,
+                           vector_t       &B )
+        {
+            assert(A.rows==B.size());
+            assert(A.cols==Cf.size());
+            const size_t M  = A.cols;
+            const size_t Nc = A.rows;
+            
+            fixed.free();
+            for(size_t i=M;i>0;--i) Cf[i] = 0;
+            
+            // first pass: normalize it
+            bool modified = false;
+            do
+            {
+                modified = false;
+                for(size_t i=1;i<=Nc;++i)
+                {
+                    size_t k = 0;
+                    if(is_fixed(A[i],k))
+                    {
+                        assert(k>0);
+                        assert(k<=M);
+                        assert(A[i][k]!=0);
+                        
+                        B[i]   /= A[i][k]; //! normalize value
+                        A[i][k] = 1;       //! normalize constraint
+                        
+                        if(B[i]<0)
+                            throw exception("fixed constraint will set negative concentration!");
+                        
+                        // do we impact other constraints ?
+                        for(size_t j=1;j<=Nc;++j)
+                        {
+                            if(j!=i)
+                            {
+                                if(A[j][k]!=0)
+                                {
+                                    modified = true;
+                                    B[j]    -= B[i] * A[j][k];
+                                    A[j][k]  = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            while(modified);
+            
+            // second pass: gather fixed indices and concentration
+            for(size_t i=1;i<=Nc;++i)
+            {
+                size_t k = 0;
+                if(is_fixed(A[i],k))
+                {
+                    fixed.push_back(k);
+                    Cf[k] = B[i];
+                }
+            }
+            
+            quicksort(fixed);
+            
+        }
+        
+        
         
         void boot::loader::operator()(equilibria &cs, collection &lib, double t)
         {
@@ -63,7 +169,7 @@ namespace yocto
             //
             //__________________________________________________________________
             cs.build_from(lib);
-            lu_t     &LU = cs.LU; assert(LU.capacity()>=M);
+            lu_t     &LU = cs.LU; assert(LU.size()>=M);
             vector_t &C  = cs.C;
             
             //__________________________________________________________________
@@ -83,9 +189,12 @@ namespace yocto
             // some species
             //
             //__________________________________________________________________
-            matrix_t P;
-            vector_t Lam;
             cs.scale_all(t);
+            
+            imatrix_t A;
+            
+            
+            
             
             //__________________________________________________________________
             //
@@ -95,20 +204,50 @@ namespace yocto
             //__________________________________________________________________
             if(N<=0)
             {
-                P   .make(M,M);
-                Lam .make(M,zero);
-                fill(P,Lam);
-                if(!LU.build(P))
+                A   .make(M,M);
+                fill(A,C);
+                matrix_t F(M,M);
+                for(size_t i=0;i<A.size;++i)
+                {
+                    F(i) = A(i);
+                }
+                if(!LU.build(F))
                     throw exception("invalid full constraints");
-                mkl::set(C,Lam);
-                LU.solve(P,C);
+                lu_t::solve(F,C);
                 for(size_t i=M;i>0;--i)
                 {
                     if(C[i]<=numeric<double>::tiny) C[i] = 0;
                 }
                 return;
             }
+            //__________________________________________________________________
+            //
+            //
+            // Some reactions
+            //
+            //__________________________________________________________________
+            A.make(Nc,M);
+            vector_t B(Nc,zero);
+            fill(A,B);
+            std::cerr << "A0=" << A << std::endl;
+            std::cerr << "B0=" << B << std::endl;
             
+            collect_fixed(cs.fixed,
+                          cs.Cf,
+                          A,
+                          B);
+            
+            const array<size_t> &fixed = cs.fixed;
+            const array<double> &Cf    = cs.Cf;
+            
+            std::cerr << "A=" << A << std::endl;
+            std::cerr << "B=" << B << std::endl;
+            
+            std::cerr << "fixed=" << fixed << std::endl;
+            std::cerr << "Cf   =" << Cf    << std::endl;
+            exit(0);
+            
+#if 0
             //__________________________________________________________________
             //
             //
@@ -412,6 +551,7 @@ namespace yocto
             {
                 throw exception("ill-conditionned chemical constraints");
             }
+#endif
             
         }
         

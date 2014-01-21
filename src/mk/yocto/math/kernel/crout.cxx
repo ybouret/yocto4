@@ -25,6 +25,11 @@ namespace yocto
         {
         }
         
+        template <>
+        void crout<z_type>:: prepare(size_t n)
+        {
+            this->make(n, numeric<real_type>::zero );
+        }
         
         template <>
         bool crout<z_type>:: build( matrix<z_type> &a ) throw()

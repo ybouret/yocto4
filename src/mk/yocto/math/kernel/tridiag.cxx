@@ -3,7 +3,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 #include "yocto/sequence/vector.hpp"
 
 #include <iostream>
@@ -369,7 +369,7 @@ namespace yocto {
             algebra<z_type>::mul_ltrn(H, V, Z);
             for(size_t i=p;i>0;--i) H[i][i] += numeric<z_type>::one;
             
-            lu<z_type> LU(p);
+            crout<z_type> LU(p);
             if( !LU.build(H) )
                 return false;
             
@@ -381,7 +381,7 @@ namespace yocto {
             //-- apply the woodbury formula
             vector<z_type> tVy(p,numeric<z_type>::zero);
             algebra<z_type>::mul_trn(tVy, V, y);
-            LU.solve(H, tVy);
+            crout<z_type>::solve(H, tVy);
             algebra<z_type>::mulsub(y, Z, tVy);
             return true;
         }

@@ -36,7 +36,7 @@ namespace yocto
                 implicit_step<real_t>::prepare(nv);
                 dfdy.make(nv,nv);
                 a.make(nv,nv);
-                LU.ensure(nv);
+                LU.make(nv,0.0);
             }
             
         }

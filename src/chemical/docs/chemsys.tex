@@ -85,7 +85,30 @@ Different strategies can be implemented.
 \section{Chemical System Initialization}
 \subsection{Description}
 We assume that we have $N_c$ linear constraints, that reflects that some quantities are conserved: mass, charge.
-Firstly, we assume that $N_c+N=M$, which is necessary to have a solution.
+Firstly, we assume that $N_c+N=M$, which is \textbf{necessary} to have a solution.
+We divide the solutions in three classes:
+\begin{enumerate}
+	\item The $\fixed$ "fixing" conditions, so that the solution are of the form
+	$$
+		\vecX = \vecX_0 + \mymat{\Psi} \vec{Y}
+	$$
+	with $\vec{Y}\in\mathbb{R}^{M-f}$ and $\Psi\in\mathcal{M}_{M,M-f}$ is an orthogonal matrix with only one
+	unit term per column, corresponding to the not fixed concentrations.
+	\item The $\kernel$ "kernel" conditions so that the exist a matrix $\mymat{K}\in\mathcal{M}_{\kernel,M}$ fixing
+	$$
+		\mymat{K}\vecX = \vec{0}.
+	$$
+	\item The $\proj$ "projection" condition so that
+	$$
+		\mymat{P}\vecX = \myvec{\Lambda}	
+	$$
+	with $\mymat{P}\in\mathcal{M}_{\proj,M}$ and $\forall i,\;\Lambda_i\not=0$. Each row of $\mymat{P}$ has at least two 
+	values which are not zero.
+\end{enumerate}
+
+
+\end{document}
+
 There exists a matrix $\mymat{P}\in\mathcal{M}_{M,N_c}$ such that
 $$
 	\mymat{P}\vecX = \Lambda.

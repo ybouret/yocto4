@@ -9,7 +9,7 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/sequence/vector.hpp"
 
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 
 #include "yocto/code/ipower.hpp"
@@ -159,7 +159,7 @@ namespace yocto
                     }
                 }
                 //std::cerr << "mu=" << mu << std::endl;
-                lu<real_t> LU(K);
+                crout<real_t> LU(K);
                 if( !LU.build(mu) )
                     throw exception("PSD(Invalid Momemts");
                 
@@ -175,7 +175,7 @@ namespace yocto
                     }
                 }
                 //std::cerr << "sig0=" << sig << std::endl;
-                LU.solve(mu, sig);
+                crout<real_t>::solve(mu, sig);
                 //std::cerr << "sigm=" << sig << std::endl;
             }
             

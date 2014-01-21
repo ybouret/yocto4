@@ -109,7 +109,7 @@ namespace yocto
 }
 
 #include "yocto/math/kernel/algebra.hpp"
-#include "yocto/math/kernel/lu.hpp"
+#include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/kernel/diag.hpp"
 
 
@@ -186,7 +186,7 @@ namespace yocto
             //std::cerr << "Sqq = " << Sqq << std::endl;
             //std::cerr << "Sqz = " << Sqz << std::endl;
             //std::cerr << "Szz = " << Szz << std::endl;
-            lu<real_t> LU(3);
+            crout<real_t> LU(3);
             
             matrix<real_t> iSzz(Szz);
             //------------------------------------------------------------------
@@ -205,7 +205,7 @@ namespace yocto
             //------------------------------------------------------------------
             // beta <- inv(Szz)*transpose(Sqz)
             //------------------------------------------------------------------
-            LU.solve(iSzz, beta);
+            crout<real_t>::solve(iSzz, beta);
             
             //------------------------------------------------------------------
             // M <- Sqq - Sqz * beta
@@ -233,7 +233,7 @@ namespace yocto
             //------------------------------------------------------------------
             // M <- inv(C) * M
             //------------------------------------------------------------------
-            LU.solve(I,M);
+            crout<real_t>::solve(I,M);
             //std::cerr.precision(15);
             
             //------------------------------------------------------------------

@@ -9,6 +9,7 @@ diff.lua
 boot.lua 
 boot-no-dof.lua
 boot-ab.lua
+boot-spec.lua
 )
 TARGET_LINK_YOCTO( test-chemical chemical mk lua++ lua)
 

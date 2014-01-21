@@ -103,6 +103,8 @@ namespace yocto
 				void ld1() throw(); //!< pseudo-id if not square
 				void transpose();
 				
+                T       & operator()(size_t i) throw();       //!< in [0:size-1]
+                const T & operator()(size_t i) const throw(); //!< in [0:size-1]
                 
 			private:
 				row          *row_;    //!< stride proxy
