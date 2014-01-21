@@ -81,20 +81,19 @@ namespace
             //==================================================================
             // Create the initializer
             //==================================================================
-            initializer ini;
+            boot::loader ini;
             
             //------------------------------------------------------------------
             //-- electroneutrality
             //------------------------------------------------------------------
-            ini.electroneutrality(*this);
+            collection &lib = *this;
+            ini.electroneutrality(lib);
             
             //------------------------------------------------------------------
             //-- mass conservation
             //------------------------------------------------------------------
             {
-                constraint &fluo = ini.create(C0);
-                fluo["Fl-"] = 1;
-                fluo["FlH"] = 1;
+                ini.conserve( lib["Fl-"], lib["FlH"], C0);
             }
             
             //------------------------------------------------------------------
@@ -104,14 +103,14 @@ namespace
             if(Vb<0)
             {
                 const double ConcCl = (-Vb) * Cb / V0;
-                ini.create(ConcCl)["Cl-"] = 1;                
-                ini.create(0)["Na+"] = 1;
+                ini.define( lib["Cl-"], ConcCl );
+                ini.define( lib["Na+"], 0      );
             }
             else
             {
                 const double ConcNa = Vb * Cb / V0;
-                ini.create(ConcNa)["Na+"] = 1;
-                ini.create(0)["Cl-"] = 1;
+                ini.define( lib["Na+"], ConcNa );
+                ini.define( lib["Cl-"], 0 );
             }
             
             

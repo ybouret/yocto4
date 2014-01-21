@@ -1,7 +1,7 @@
 #ifndef FLUORESCEINE_INCLUDED
 #define FLUORESCEINE_INCLUDED 1
 
-#include "yocto/chemical/initializer.hpp"
+#include "yocto/chemical/boot.hpp"
 #include "yocto/fs/vfs.hpp"
 #include "yocto/exception.hpp"
 
