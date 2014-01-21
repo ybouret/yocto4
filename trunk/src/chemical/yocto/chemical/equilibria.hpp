@@ -4,6 +4,7 @@
 #include "yocto/chemical/equilibrium.hpp"
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/fcn/derivative.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -13,7 +14,7 @@ namespace yocto
         typedef math::matrix<double>    matrix_t;
         typedef math::matrix<ptrdiff_t> imatrix_t;
         typedef vector<double>          vector_t;
-        typedef vector<size_t>          uvector_t;
+        typedef sorted_vector<size_t>   uvector_t;
         typedef math::crout<double>     lu_t;
         
         //! a database of equilibrium

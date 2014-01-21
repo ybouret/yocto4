@@ -77,7 +77,15 @@ namespace yocto
                 (**eq).append(C,ran);
             }
             
-            
+            for(size_t i=fixed.size();i>0;--i)
+            {
+                const size_t k = fixed[i];
+                assert(k>0);
+                assert(k<=C.size());
+                assert(Cf[k]>=0);
+                C[k] = Cf[k];
+            }
+            std::cerr << "Ctrial=" << C << std::endl;
             return normalize_C(t);
             
         }

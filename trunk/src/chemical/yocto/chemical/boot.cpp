@@ -187,15 +187,19 @@ namespace yocto
                     if(val<0)
                         throw exception("invalid fixed concentration for '%s'", cc.spec->name.c_str());
                     X0[j]    = val;
+#if 0
                     for(size_t k=1;k<=ifix.size();++k)
                     {
                         if(ifix[k]==j)
                             throw exception("multiple fixed '%s'", cc.spec->name.c_str());
                     }
-                    ifix.push_back(j);
+#endif
+                    if(!ifix.insert(j))
+                        throw exception("multiple fixed '%s'", cc.spec->name.c_str());
+                        
                 }
             }
-            quicksort(ifix);            
+            //quicksort(ifix);
         }
         
         void boot:: loader:: find_kernel( matrix_t &K, size_t M) const
