@@ -18,26 +18,6 @@ namespace yocto
         typedef algebra<double> mkl;
         typedef svd<double>     SVD;
         
-#if 0
-        namespace {
-            
-            static inline
-            void set_fixed(vector_t        &C,
-                           const vector_t  &X0,
-                           const uvector_t &ifix) throw()
-            {
-                assert(C.size()==X0.size());
-                for(size_t i=ifix.size();i>0;--i)
-                {
-                    assert(ifix[i]>0);
-                    assert(ifix[i]<=C.size());
-                    const size_t k = ifix[i];
-                    C[k] = X0[k];
-                }
-            }
-            
-        }
-#endif
         
         static inline bool is_fixed( const array<ptrdiff_t> &u, size_t &j ) throw()
         {
@@ -61,21 +41,9 @@ namespace yocto
             }
         }
         
-#if 0
-        static inline bool has_fixed( const size_t j, const vector<size_t> &fixed ) throw()
-        {
-            assert(j>0);
-            for(size_t i=fixed.size();i>0;--i)
-            {
-                if(j==fixed[i])
-                    return true;
-            }
-            return false;
-        }
-#endif
         
         static inline
-        void collect_fixed(vector<size_t> &fixed,
+        void collect_fixed(uvector_t      &fixed,
                            array<double>  &Cf,
                            imatrix_t      &A,
                            vector_t       &B )
@@ -126,18 +94,84 @@ namespace yocto
             }
             while(modified);
             
-            // second pass: gather fixed indices and concentration
+            // second pass: check no zero constraint !
+            for(size_t i=1; i<=Nc;++i)
+            {
+                size_t nz = 0;
+                for(size_t j=M;j>0;--j)
+                {
+                    if(A[i][j]!=0) ++nz;
+                }
+                if(nz<=0)
+                    throw exception("multiple fixed constraints detected");
+            }
+            
+            
+            // third pass: gather fixed indices and concentration
             for(size_t i=1;i<=Nc;++i)
             {
                 size_t k = 0;
                 if(is_fixed(A[i],k))
                 {
-                    fixed.push_back(k);
+                    if(!fixed.insert(k))
+                        throw exception("unexpected multipled fixed constraint");
                     Cf[k] = B[i];
                 }
             }
             
-            quicksort(fixed);
+            
+        }
+        
+        static inline
+        void collect_combi(matrix_t        &P,
+                           vector_t        &Lam,
+                           matrix_t        &K,
+                           const imatrix_t &A,
+                           const vector_t  &B)
+        {
+            
+            
+            assert(A.rows==B.size());
+            
+            const size_t M  = A.cols;
+            const size_t Nc = A.rows;
+            
+            vector<size_t> proj(Nc,as_capacity);
+            vector<size_t> kern(Nc,as_capacity);
+            
+            for(size_t i=1;i<=Nc;++i)
+            {
+                size_t k = 0;
+                if(is_fixed(A[i],k))
+                    continue;
+                if(fabs(B[i])<=0)
+                    kern.push_back(i);
+                proj.push_back(i);
+            }
+            
+            const size_t np = proj.size();
+            if(np>0)
+            {
+                P   .make(np,M);
+                Lam .make(np,0.0);
+                for(size_t i=1;i<=np;++i)
+                {
+                    const size_t p = proj[i];
+                    for(size_t j=M;j>0;--j) P[i][j] = A[p][j];
+                    Lam[i] = B[p];
+                }
+            }
+            
+            const size_t nk = kern.size();
+            if(nk>0)
+            {
+                K.make(nk,M);
+                for(size_t i=1;i<=nk;++i)
+                {
+                    const size_t k = kern[i];
+                    for(size_t j=M;j>0;--j) K[i][j] = A[k][j];
+                }
+            }
             
         }
         
@@ -161,6 +195,12 @@ namespace yocto
             const size_t Nc = this->size();
             if( Nc+N != M )
                 throw exception("#species=%u != (#equilibria=%u+#constraints=%u)", unsigned(M), unsigned(N), unsigned(Nc) );
+            
+            //__________________________________________________________________
+            //
+            // parameters
+            //__________________________________________________________________
+            const size_t max_trials = M * MAX_TRIALS_PER_SPECIES;
             
             //__________________________________________________________________
             //
@@ -220,6 +260,7 @@ namespace yocto
                 }
                 return;
             }
+            
             //__________________________________________________________________
             //
             //
@@ -232,12 +273,19 @@ namespace yocto
             std::cerr << "A0=" << A << std::endl;
             std::cerr << "B0=" << B << std::endl;
             
+            
+            //__________________________________________________________________
+            //
+            //
+            // Clean-up constraints
+            //
+            //__________________________________________________________________
             collect_fixed(cs.fixed,
                           cs.Cf,
                           A,
                           B);
             
-            const array<size_t> &fixed = cs.fixed;
+            const uvector_t     &fixed = cs.fixed;
             const array<double> &Cf    = cs.Cf;
             
             std::cerr << "A=" << A << std::endl;
@@ -245,264 +293,250 @@ namespace yocto
             
             std::cerr << "fixed=" << fixed << std::endl;
             std::cerr << "Cf   =" << Cf    << std::endl;
-            exit(0);
-            
-#if 0
-            //__________________________________________________________________
-            //
-            //
-            // Some reactions
-            //
-            //__________________________________________________________________
-            P.make(Nc,M);
-            Lam.make(Nc,zero);
-            fill(P,Lam);
-            
-            std::cerr << "P="   << P   << std::endl;
-            std::cerr << "Lam=" << Lam << std::endl;
-            
-            //__________________________________________________________________
-            //
-            //
-            // check sanity via Moore-Penrose
-            //
-            //__________________________________________________________________
-            matrix_t P2(Nc,Nc);
-            lu_t     L2(Nc);
-            
-            mkl::mul_rtrn(P2, P, P);
-            if( !L2.build(P2) )
-                throw exception("singular set of constraints");
-            
-            //__________________________________________________________________
-            //
-            //
-            // compute Xstar
-            //
-            //__________________________________________________________________
-            vector_t Mu(Nc,zero);
-            mkl::set(Mu,Lam);
-            L2.solve(P2, Mu);
-            vector_t Xstar(M,zero);
-            mkl::mul_trn(Xstar, P, Mu);
-            std::cerr << "Xstar=" << Xstar << std::endl;
-            
-            
-            //__________________________________________________________________
-            //
-            //
-            // compute Q
-            //
-            //__________________________________________________________________
-            matrix_t Q(N,M);
-            if(!SVD::orthonormal(Q,P))
-                throw exception("chemical::boot: invalid constraints/SVD");
-            std::cerr << "Q=" << Q << std::endl;
-            
-            //__________________________________________________________________
-            //
-            //
-            // alter topology/fixed constraints
-            //
-            //__________________________________________________________________
-            const vector_t  &Cf    = cs.Cf;
-            const uvector_t &fixed = cs.fixed;
-            find_fixed(cs.Cf, cs.fixed);
-            std::cerr << "fixed = " <<  fixed  << std::endl;
-            std::cerr << "Cf    = " <<  Cf     << std::endl;
             
             cs.fixed_topology();
             std::cerr << "nu=" << cs.nu << std::endl;
             std::cerr << "Nu=" << cs.Nu << std::endl;
             
-            matrix_t K;
-            find_kernel(K,M);
-            const size_t nk = K.rows;
-            std::cerr << "K=" << K << std::endl;
-            if(nk>0)
+            //__________________________________________________________________
+            //
+            //
+            // All-fixed constraints
+            //
+            //__________________________________________________________________
+            const size_t nf = fixed.size();
+            if( nf == Nc )
             {
-                std::cerr << "Z=K'*inv(K*K')*K" << std::endl;
+                std::cerr << "-- all fixed constraints" << std::endl;
+                for(size_t iter=1;iter<=max_trials;++iter)
+                {
+                    if(cs.trial(ran,t))
+                        return;
+                }
+                throw exception("unable to solved all fixed constraints");
             }
             
+            //__________________________________________________________________
+            //
+            //
+            // Remaining constraints
+            //
+            //__________________________________________________________________
+            matrix_t P;
+            vector_t Lam;
+            matrix_t K;
+            
+            collect_combi(P, Lam, K, A, B);
+            
+            std::cerr << "P="   << P << std::endl;
+            std::cerr << "Lam=" << Lam << std::endl;
+            std::cerr << "K="   << K << std::endl;
+            
+            
+            
+            const size_t Mf = M-nf;
+            matrix_t Psi(M,Mf);
+            {
+                size_t k=0;
+                for(size_t j=1;j<=M;++j)
+                {
+                    if( fixed.search(j) )
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        ++k;
+                        assert(k<=Mf);
+                        Psi[j][k] = 1;
+                    }
+                }
+            }
+            std::cerr << "Psi=" << Psi << std::endl;
+            const size_t np = P.rows;
+            matrix_t P2(np,np);
+            mkl::mul_rtrn(P2, P, P);
+            if( !LU.build(P2))
+                throw exception("singular projection constraints set !");
+            
+            matrix_t alpha(np,Mf);
+            mkl::mul(alpha,P,Psi);
+            std::cerr << "alpha=" << alpha << std::endl;
             
             //__________________________________________________________________
             //
             //
-            // Newton mark-II
+            // check rank and compute Xstar
             //
             //__________________________________________________________________
+            vector_t Xstar(M,zero);
+            vector_t Mu(np,zero);    // temporary for linear constraint
+            {
+                matrix_t alpha2(np,np);
+                mkl::mul_rtrn(alpha2,alpha,alpha);
+                if(!LU.build(alpha2))
+                    throw exception("singular constraints set!");
+                mkl::set(Mu,Lam);
+                mkl::mulsub(Mu, P, Cf);
+                lu_t::solve(alpha2, Mu);
+                vector_t Ystar(Mf,zero);
+                mkl::mul_trn(Ystar, alpha, Mu);
+                mkl::mul(Xstar,Psi,Ystar);
+                std::cerr << "X1=" << Xstar << std::endl;
+                mkl::add(Xstar,Cf);
+            }
+            std::cerr << "Xstar=" << Xstar << std::endl;
             
+            //__________________________________________________________________
+            //
+            //
+            // Finding matrices for solver
+            //
+            //__________________________________________________________________
+            matrix_t beta(N,Mf);
+            if(! SVD::orthonormal(beta,alpha) )
+                throw exception("Unable to find and orthornornmal basis");
             
-#define RECOMPUTE_C() do {  cs.fixed_C(); mkl::mul(V,Q,C); mkl::mul_trn(C,Q,V); mkl::add(C,Xstar); cs.fixed_C(); } while(false)
+            std::cerr << "beta=" << beta << std::endl;
             
-            vector_t V(N,zero);
-            vector_t &Gamma = cs.Gamma;
-            matrix_t &W     = cs.W;
+            matrix_t Theta(N,M);
+            mkl::mul_rtrn(Theta,beta,Psi);
+            std::cerr << "Theta=" << Theta << std::endl;
+            
+            //__________________________________________________________________
+            //
+            //
+            // Algorithm
+            //
+            //__________________________________________________________________
+            vector_t &CC = cs.CC;
+            vector_t &dV    = cs.xi;
+            matrix_t  W     = cs.W;
             matrix_t &Phi   = cs.Phi;
+            vector_t &Gamma = cs.Gamma;
             vector_t &dC    = cs.dC;
-            vector_t  X(M,zero);
-            const size_t max_trials = M * MAX_TRIALS_PER_SPECIES;
-            size_t       trials     = 0;
             
-            //__________________________________________________________________
-            //
-            //
-            // Newton, mark II
-            //
-            //__________________________________________________________________
+            
+            vector_t   V(N,zero);
+            vector_t   X(M,zero);
+
+#define RECOMPUTE_C() do { mkl::set(CC,C); mkl::sub(CC,Xstar); mkl::mul(V,Theta,CC); mkl::set(C,Xstar); mkl::muladd_trn(C,Theta,V); } while(false)
             
             //==================================================================
             //
-            // Generate a trial valid composition
+            // init a trial
             //
             //==================================================================
+
+            size_t trials = 0;
         INITIALIZE:
-            if(++trials>max_trials)
-                throw exception("too many chemical::boot trials (%u)", unsigned(max_trials) );
+            ++trials;
+            if(trials>max_trials)
+            {
+                throw exception("unable to solve system");
+            }
             
             if( !cs.trial(ran,t) )
             {
-                std::cerr << "-- Newton-II: invalid trial composition" << std::endl;
+                std::cerr << "invalid initial concentration" << std::endl;
                 goto INITIALIZE;
             }
-            std::cerr << "C0=" << C << std::endl;
             
             RECOMPUTE_C();
-            {
-                size_t num_neg = 0, num_pos = 0;
-                for(size_t i=M;i>0;--i)
-                {
-                    if( C[i] < 0 ) ++num_neg; else ++num_pos;
-                }
-                if(num_neg>num_pos)
-                    goto INITIALIZE;
-            }
-            
-            //std::cerr << "Cini=" << C << std::endl;
             
             //==================================================================
             //
-            // Compute the full Newton's Step
+            // Perform a Newton's Step
             //
             //==================================================================
             size_t count = 0;
         NEWTON_STEP:
             ++count;
-            if(count>cs.MAX_NEWTON_STEPS)
+            if(count>equilibria::MAX_NEWTON_STEPS)
             {
                 std::cerr << "-- Newton-II: not converged" << std::endl;
                 goto INITIALIZE;
             }
-            
+
             //------------------------------------------------------------------
-            // save C
-            //------------------------------------------------------------------
-            mkl::set(X,C);
-            
-            //------------------------------------------------------------------
-            // compute the Newton's step mark II
+            // numerical step
             //------------------------------------------------------------------
             cs.compute_Gamma_and_Phi(t,false);
-            const double H0 = cs.Gamma2RMS();  // pseudo-norm
-            mkl::mul_rtrn(W,Phi,Q);
-            if( !LU.build(W) )
+            const double H0 = cs.Gamma2RMS();      // approximate norm
+            mkl::mul_rtrn(W,Phi,Theta);
+            if(!LU.build(W))
             {
-                std::cerr << "-- Newton-II: singular composition" << std::endl;
+                std::cerr << "-- Newton-II: invalid composition" << std::endl;
                 goto INITIALIZE;
             }
+            mkl::neg(dV,Gamma);
+            lu_t::solve(W,dV);
+            mkl::mul_trn(dC,Theta,dV);
             
             //------------------------------------------------------------------
-            //-- compute dV in V
+            // test numerical behaviour: dC is a descent direction for |Gamma|
             //------------------------------------------------------------------
-            mkl::neg(V,Gamma);
-            LU.solve(W,V);
-            
-            //------------------------------------------------------------------
-            // compute dC
-            //------------------------------------------------------------------
-            mkl::mul_trn(dC, Q, V);
-            
-            //------------------------------------------------------------------
-            // dC is a decreasing step for |Gamma|
-            //------------------------------------------------------------------
+            mkl::set(X,C);
             mkl::add(C,dC);
-            RECOMPUTE_C();
-            double H1    = cs.compute_rms(t);
-            double alpha = 1;
-            bool   cut   = false;
-            while(H1>H0)
+            RECOMPUTE_C(); // numerical errors
+            double H1  = cs.compute_rms(t);
+            double fac = 1.0;
+            bool   cut = false;
+            while( H1 > H0 )
             {
-                cut    = true;
-                alpha *= 0.1;
-                if( alpha < numeric<double>::ftol )
+                cut  = true;
+                fac *= 0.1;
+                if(fac < numeric<double>::ftol )
                 {
-                    std::cerr << "-- Newton-II: spurious point" << std::endl;
+                    std::cerr << "-- Newton II: spurious point" << std::endl;
                     goto FINALIZE;
                 }
                 mkl::set(C,X);
-                mkl::muladd(C,alpha,dC);
+                mkl::muladd(C,fac,dC);
                 RECOMPUTE_C();
                 H1 = cs.compute_rms(t);
             }
             
-            //------------------------------------------------------------------
-            // won't stop on a partially reduced step
-            //------------------------------------------------------------------
             if(cut)
-                goto NEWTON_STEP;
+                goto NEWTON_STEP; //! won't stop on a partial step
             
             //------------------------------------------------------------------
-            // compute effective dC
+            // Effective Step
             //------------------------------------------------------------------
-            mkl::set(dC,X);
-            mkl::sub(dC,C);
-            
+            mkl::sub(X,C);
+           
             //------------------------------------------------------------------
-            // test convergence
+            // Test convergence
             //------------------------------------------------------------------
             for(size_t i=M;i>0;--i)
             {
-                double err = fabs(dC[i]);
-                if(err<=numeric<double>::tiny) err = 0;
-                if(err>numeric<double>::ftol*fabs(C[i]))
-                {
+                double err = fabs(X[i]);
+                if( err < numeric<double>::tiny ) err = 0;
+                if( err > numeric<double>::ftol * fabs(C[i]))
                     goto NEWTON_STEP;
-                }
             }
             
             std::cerr << "-- Newton-II: converged" << std::endl;
             
-            //==================================================================
-            //
-            // sanity checks
-            //
-            //==================================================================
         FINALIZE:
             std::cerr << "C=" << C << std::endl;
             
             //------------------------------------------------------------------
-            // non linear error
+            // non-linear error
             //------------------------------------------------------------------
             cs.compute_Gamma_and_Phi(t,false);
-            mkl::mul_rtrn(W,Phi,Q);
-            if( !LU.build(W) )
+            mkl::mul_rtrn(W,Phi,Theta);
+            if( ! LU.build(W) )
             {
-                std::cerr << "-- Newton-II: invalid final composition" << std::endl;
+                std::cerr << "-- Newton II: invalid final composition" << std::endl;
                 goto INITIALIZE;
             }
+            mkl::neg(dV,Gamma);
+            lu_t::solve(W,dV);         // error in V
+            mkl::mul_trn(dC,Theta,dV); // error in C
             
-            //------------------------------------------------------------------
-            // compute dV in V
-            //------------------------------------------------------------------
-            mkl::neg(V,Gamma);
-            LU.solve(W,V);
-            
-            //------------------------------------------------------------------
-            // compute error in dC
-            //------------------------------------------------------------------
-            mkl::mul_trn(dC, Q, V);
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
-            
+
             //------------------------------------------------------------------
             // cut
             //------------------------------------------------------------------
@@ -511,12 +545,13 @@ namespace yocto
                 if(fabs(C[i])<=dC[i]) C[i] = 0;
             }
             
+            
             //------------------------------------------------------------------
             // linear error
             //------------------------------------------------------------------
             mkl::mul(Mu,P,C);
             mkl::sub(Mu,Lam);
-            L2.solve(P2, Mu);
+            lu_t::solve(P2, Mu);
             mkl::mul_trn(dC, P, Mu);
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
             
@@ -528,6 +563,8 @@ namespace yocto
                 if(C[i]<=dC[i]) C[i] = 0;
             }
             
+            std::cerr << "C=" << C << std::endl;
+            
             //------------------------------------------------------------------
             // are we consistent ?
             //------------------------------------------------------------------
@@ -536,22 +573,22 @@ namespace yocto
                 std::cerr << "-- Newton-II: inconsistent final composition" << std::endl;
                 goto INITIALIZE;
             }
+
             
             //------------------------------------------------------------------
             //-- OK, check RMS
             //------------------------------------------------------------------
             mkl::mul(Mu,P,C);
             mkl::sub(Mu,Lam);
-            L2.solve(P2, Mu);
+            lu_t::solve(P2, Mu);
             mkl::mul_trn(dC, P, Mu);
             const double rms = mkl::rms(dC);
-            std::cerr << "C="   << C   << std::endl;
             std::cerr << "RMS=" << rms << std::endl;
             if(rms>numeric<double>::ftol)
             {
                 throw exception("ill-conditionned chemical constraints");
             }
-#endif
+
             
         }
         

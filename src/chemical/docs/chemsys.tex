@@ -86,7 +86,9 @@ Different strategies can be implemented.
 \subsection{Description}
 We assume that we have $N_c$ linear constraints, that reflects that some quantities are conserved: mass, charge.
 Firstly, we assume that $N_c+N=M$, which is \textbf{necessary} to have a solution.
-We divide the solutions in three classes:
+
+\subsection{Cleanup}
+We divide the solutions in two classes:
 \begin{enumerate}
 	\item The $\fixed$ "fixing" conditions, so that the solution are of the form
 	$$
@@ -94,38 +96,55 @@ We divide the solutions in three classes:
 	$$
 	with $\vec{Y}\in\mathbb{R}^{M-f}$ and $\Psi\in\mathcal{M}_{M,M-f}$ is an orthogonal matrix with only one
 	unit term per column, corresponding to the not fixed concentrations.
-	\item The $\kernel$ "kernel" conditions so that the exist a matrix $\mymat{K}\in\mathcal{M}_{\kernel,M}$ fixing
-	$$
-		\mymat{K}\vecX = \vec{0}.
-	$$
+
 	\item The $\proj$ "projection" condition so that
 	$$
 		\mymat{P}\vecX = \myvec{\Lambda}	
 	$$
-	with $\mymat{P}\in\mathcal{M}_{\proj,M}$ and $\forall i,\;\Lambda_i\not=0$. Each row of $\mymat{P}$ has at least two 
+	with $\mymat{P}\in\mathcal{M}_{\proj,M}$.
+	 Each row of $\mymat{P}$ has at least two 
 	values which are not zero.
 \end{enumerate}
 
+\begin{quote}
+\centerline{\textbf{Warning !}}
+A work must be done to ensure that for any fixed species, the corresponding coefficient for
+each row of $\mymat{P}$  is zero !!!
+\end{quote}
 
+\subsection{Biased Chemistry}
+While we evaluate $\vec{\Gamma}$ with the normal topology matrix $\mymat{\nu}$, we must use
+the biased topology matrix $\tilde{\mymat{\nu}}$ where all the coefficients corresponding to the
+fixed concentrations are set to zero, and the biased jacobian $\tilde{\mymat{\Phi}}$ where
+all the columns corresponding to the fixed concentrations are set to zero.
+
+\subsection{Restriction}
+The final condition is
+$$
+	\mymat{P}\vecX_0 + \mymat{P}\mymat{\Psi} \vec{Y} = \vec{\Lambda} = \mymat{P}\vecX_0 + \mymat{\alpha} \vec{Y}.
+$$
+Let $\mymat{\beta}\in\mathcal{M}_{N,M-f}$ such that $\mytrn{\mymat{\beta}} \in \mytrn{\mymat{\alpha}}^\perp$.
+So we have a set Lagrange multipliers $\vec{U}\in\mathbb{R}^{p}$ and $\vec{V}\in\mathbb{R}^{N}$
+$$
+	\vec{Y} = \mytrn{\mymat{\alpha}}\vec{U} + \mytrn{\mymat{\beta}}\vec{V}.
+$$
+The projection condition leads to
+$$
+	\mymat{\alpha}\mytrn{\mymat{\alpha}}\vec{U} = \vec{\Lambda} - \mymat{P}\vecX_0
+$$
+and finally
+$$
+	\vecX = \underbrace{\vecX_0 + \mymat{\Psi} \mytrn{\mymat{\alpha}}\left(\mymat{\alpha}\mytrn{\mymat{\alpha}}\right)^{-1}\left(\vec{\Lambda} - \mymat{P}\vecX_0\right)}_{\vec{X}^\star}
+	+\underbrace{\mymat{\Psi}\mytrn{\mymat{\beta}}}_{\mytrn{\mymat{\Theta}}}\vec{V}.
+$$
+By construction,
+$$
+	\mymat{\Theta} = \mymat{\beta}\mytrn{\mymat{\Psi}} \Rightarrow \mymat{\Theta}\mytrn{\mymat{\Theta}} = \mymat{I}
+$$
+We know have to find $\vec{V}$ such that
+$$
+	\vec{\Gamma}(\vec{X}^\star + \mytrn{\mymat{\Theta}}\vec{V}) = \vec{0}
+$$
 \end{document}
 
-There exists a matrix $\mymat{P}\in\mathcal{M}_{M,N_c}$ such that
-$$
-	\mymat{P}\vecX = \Lambda.
-$$
-
-\subsection{For of the solution}
-There exists a matrix $\mymat{Q}$ such that $\mytrn{\mymat{Q}}\in\mytrn{\mymat{P}}^\perp$, so that
-$\mymat{Q}\in\mathcal{M}_{M,N}$, and a set of Lagrange multipliers
-$$
-		\vecX = \mytrn{\mymat{P}}\vec{U} + \mytrn{\mymat{Q}}\vec{V}.
-$$
-Consequently, $\vecX$ writes
-$$
-	\vecX = \vecX^\star + \mytrn{\mymat{Q}}\vec{V}
-$$
-with
-$$
-	\vecX^\star = \mytrn{\mymat{P}} \left(\mymat{P}\mytrn{\mymat{P}}\right)^{-1} \Lambda
-$$
 \end{document}
