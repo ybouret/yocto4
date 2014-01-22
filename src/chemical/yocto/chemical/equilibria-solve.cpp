@@ -54,12 +54,12 @@ namespace yocto
                 
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
-                mkl::mul_trn(dC,nu,xi);
+                mkl::mul_trn(dC,Nu,xi);
                 fixed_dC();
                 
                 //______________________________________________________________
                 //
-                // control the step, descent direction for |Gamma"
+                // control the step, descent direction for |Gamma|
                 //______________________________________________________________
                 
                 // save C
@@ -92,16 +92,13 @@ namespace yocto
                 }
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
-                mkl::mul_trn(dC,nu,xi);
+                mkl::mul_trn(dC,Nu,xi);
                 fixed_dC();
                 for_each( dC.begin(), dC.end(), numeric<double>::round_error);
                 for(size_t i=M;i>0;--i)
                 {
                     if( C[i] < dC[i] ) C[i] = 0;
                 }
-                //std::cerr << "dC=" << dC << std::endl;
-                //std::cerr << "C=" << C  << std::endl;
-                
             }
             return true;
         }
