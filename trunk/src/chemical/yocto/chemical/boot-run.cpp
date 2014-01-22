@@ -8,8 +8,7 @@
 #include "yocto/auto-clean.hpp"
 
 #include "yocto/sort/quick.hpp"
-#include "yocto/math/opt/bracket.hpp"
-#include "yocto/math/opt/minimize.hpp"
+#include "yocto/math/opt/cgrad.hpp"
 
 namespace yocto
 {
@@ -191,7 +190,69 @@ namespace yocto
             
             
             
+            
+            
 #define RECOMPUTE_C() do { mkl::mul(V,Theta,C); mkl::set(C,Xstar); mkl::muladd_trn(C,Theta,V); } while(false)
+            
+            class Energy
+            {
+            public:
+                static inline double E1( double U ) throw () { return (U<0) ? U*U : 0; }
+                static inline double dE1(double U ) throw () { return (U<0) ? U+U : 0; }
+                
+                vector_t       &C;
+                const vector_t &Xstar;
+                const matrix_t &Theta;
+                
+                inline Energy( vector_t      &_C,
+                              const vector_t &_Xstar,
+                              const matrix_t &_Theta) :
+                C(     _C     ),
+                Xstar( _Xstar ),
+                Theta( _Theta )
+                {
+                }
+                
+                inline ~Energy() throw()
+                {
+                    
+                }
+                
+                double Func( const array<double> &V )
+                {
+                    
+                    mkl::set(C,Xstar);
+                    mkl::muladd_trn(C,Theta,V);
+                    double ans = 0;
+                    for(size_t i=C.size();i>0;--i)
+                    {
+                        ans += E1( C[i] );
+                    }
+                    return ans;
+                }
+                
+                void Grad( array<double> &dFdV, const array<double> &V )
+                {
+                    
+                    mkl::set(C,Xstar);
+                    mkl::muladd_trn(C,Theta,V);
+                    
+                    mkl::set(dFdV,0.0);
+                    const size_t M = C.size();
+                    const size_t N = V.size();
+                    for(size_t j=M;j>0;--j)
+                    {
+                        const double fac = dE1( C[j] );
+                        for( size_t i=N;i>0;--i)
+                        {
+                            dFdV[i] += fac * Theta[i][j];
+                        }
+                    }
+                }
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Energy);
+            };
             
             
             
@@ -254,9 +315,7 @@ namespace yocto
             //__________________________________________________________________
             cs.scale_all(t);
             
-            imatrix_t A;
-            
-            
+            imatrix_t A; // global matrix of all constraints
             
             
             //__________________________________________________________________
@@ -354,7 +413,12 @@ namespace yocto
             std::cerr << "Lam=" << Lam << std::endl;
             
             
-            
+            //__________________________________________________________________
+            //
+            //
+            // Restriction matrix Psi
+            //
+            //__________________________________________________________________
             const size_t Mf = M-nf;
             matrix_t Psi(M,Mf);
             {
@@ -380,6 +444,12 @@ namespace yocto
             if( !LU.build(P2))
                 throw exception("singular projection constraints set !");
             
+            //__________________________________________________________________
+            //
+            //
+            // Image matrix alpha = P*Psi
+            //
+            //__________________________________________________________________
             matrix_t alpha(np,Mf);
             mkl::mul(alpha,P,Psi);
             std::cerr << "alpha=" << alpha << std::endl;
@@ -387,7 +457,7 @@ namespace yocto
             //__________________________________________________________________
             //
             //
-            // check rank and compute Xstar
+            // check rank of alpha and compute Xstar
             //
             //__________________________________________________________________
             vector_t Xstar(M,zero);
@@ -403,7 +473,7 @@ namespace yocto
                 vector_t Ystar(Mf,zero);
                 mkl::mul_trn(Ystar, alpha, Mu);
                 mkl::mul(Xstar,Psi,Ystar);
-                std::cerr << "X1=" << Xstar << std::endl;
+                //std::cerr << "X1=" << Xstar << std::endl;
                 mkl::add(Xstar,Cf);
             }
             std::cerr << "Xstar=" << Xstar << std::endl;
@@ -411,7 +481,7 @@ namespace yocto
             //__________________________________________________________________
             //
             //
-            // Finding matrices for solver
+            // Finding orthogonal space to alpha
             //
             //__________________________________________________________________
             matrix_t beta(N,Mf);
@@ -420,6 +490,12 @@ namespace yocto
             
             std::cerr << "beta=" << beta << std::endl;
             
+            //__________________________________________________________________
+            //
+            //
+            // Finding parametric, orthonormal matrix Theta
+            //
+            //__________________________________________________________________
             matrix_t Theta(N,M);
             mkl::mul_rtrn(Theta,beta,Psi);
             std::cerr << "Theta=" << Theta << std::endl;
@@ -441,6 +517,10 @@ namespace yocto
             vector_t   V(N,zero);
             vector_t   X(M,zero);
             
+            Energy E(C,Xstar,Theta);
+            numeric<double>::scalar_field func( &E, & Energy::Func );
+            numeric<double>::vector_field grad( &E, & Energy::Grad );
+
             
             //==================================================================
             //
@@ -456,16 +536,27 @@ namespace yocto
                 throw exception("unable to solve system");
             }
             
+            //------------------------------------------------------------------
+            // generate a random trial point
+            //------------------------------------------------------------------
             if( !cs.trial(ran,t) )
             {
                 std::cerr << "invalid initial concentration" << std::endl;
                 goto INITIALIZE;
             }
             
-            exit(0);
-            //make_acceptable(C, Xstar, Theta, V, dC, CC);
-            
+            //------------------------------------------------------------------
+            // project it to find V
+            //------------------------------------------------------------------
             RECOMPUTE_C();
+            std::cerr << "C0=" << C << std::endl;
+            
+            //------------------------------------------------------------------
+            // optimize for positive components
+            //------------------------------------------------------------------
+            (void)cgrad<double>::optimize(func, grad, V, numeric<double>::ftol, NULL);
+            func(V);
+            std::cerr << "C1=" << C << std::endl;
             
             //==================================================================
             //
@@ -541,9 +632,7 @@ namespace yocto
             
             std::cerr << "-- Newton-II: converged" << std::endl;
             
-        FINALIZE:
-            std::cerr << "C=" << C << std::endl;
-            
+        FINALIZE:            
             //------------------------------------------------------------------
             // non-linear error
             //------------------------------------------------------------------
@@ -558,9 +647,7 @@ namespace yocto
             lu_t::solve(W,dV);         // error in V
             mkl::mul_trn(dC,Theta,dV); // error in C
             
-            std::cerr << "dC_nl0=" << dC << std::endl;
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
-            std::cerr << "dC_nl1=" << dC << std::endl;
             
             //------------------------------------------------------------------
             // cut
