@@ -85,7 +85,7 @@ namespace yocto
                 assert(Cf[k]>=0);
                 C[k] = Cf[k];
             }
-            std::cerr << "Ctrial=" << C << std::endl;
+            //std::cerr << "Ctrial=" << C << std::endl;
             return normalize_C(t);
             
         }
