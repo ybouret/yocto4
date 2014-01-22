@@ -403,13 +403,14 @@ namespace yocto
             mkl::mul_rtrn(Theta,beta,Psi);
             std::cerr << "Theta=" << Theta << std::endl;
             
+            
             //__________________________________________________________________
             //
             //
             // Algorithm
             //
             //__________________________________________________________________
-            vector_t &CC = cs.CC;
+            //vector_t &CC = cs.CC;
             vector_t &dV    = cs.xi;
             matrix_t  W     = cs.W;
             matrix_t &Phi   = cs.Phi;
@@ -420,7 +421,7 @@ namespace yocto
             vector_t   V(N,zero);
             vector_t   X(M,zero);
 
-#define RECOMPUTE_C() do { mkl::set(CC,C); mkl::sub(CC,Xstar); mkl::mul(V,Theta,CC); mkl::set(C,Xstar); mkl::muladd_trn(C,Theta,V); } while(false)
+#define RECOMPUTE_C() do { mkl::mul(V,Theta,C); mkl::set(C,Xstar); mkl::muladd_trn(C,Theta,V); } while(false)
             
             //==================================================================
             //
@@ -535,7 +536,9 @@ namespace yocto
             lu_t::solve(W,dV);         // error in V
             mkl::mul_trn(dC,Theta,dV); // error in C
             
+            std::cerr << "dC_nl0=" << dC << std::endl;
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
+            std::cerr << "dC_nl1=" << dC << std::endl;
 
             //------------------------------------------------------------------
             // cut
