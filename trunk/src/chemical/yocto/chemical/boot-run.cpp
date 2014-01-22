@@ -8,6 +8,8 @@
 #include "yocto/auto-clean.hpp"
 
 #include "yocto/sort/quick.hpp"
+#include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 namespace yocto
 {
@@ -18,162 +20,183 @@ namespace yocto
         typedef algebra<double> mkl;
         typedef svd<double>     SVD;
         
-        
-        static inline bool is_fixed( const array<ptrdiff_t> &u, size_t &j ) throw()
+        namespace
         {
-            j=0;
-            size_t nf = 0;
-            for(size_t i=u.size();i>0;--i)
-            {
-                if( u[i] != 0 )
-                {
-                    j=i;
-                    ++nf;
-                }
-            }
-            assert(nf>0);
-            if(1==nf)
-                return true;
-            else
+            
+            //__________________________________________________________________
+            //
+            // Detect if a row of A is a fixed constraint and set index
+            //__________________________________________________________________
+            static inline
+            bool is_fixed( const array<ptrdiff_t> &u, size_t &j ) throw()
             {
                 j=0;
-                return false;
-            }
-        }
-        
-        
-        static inline
-        void collect_fixed(uvector_t      &fixed,
-                           array<double>  &Cf,
-                           imatrix_t      &A,
-                           vector_t       &B )
-        {
-            assert(A.rows==B.size());
-            assert(A.cols==Cf.size());
-            const size_t M  = A.cols;
-            const size_t Nc = A.rows;
-            
-            fixed.free();
-            for(size_t i=M;i>0;--i) Cf[i] = 0;
-            
-            // first pass: normalize it
-            bool modified = false;
-            do
-            {
-                modified = false;
-                for(size_t i=1;i<=Nc;++i)
+                size_t nf = 0;
+                for(size_t i=u.size();i>0;--i)
                 {
-                    size_t k = 0;
-                    if(is_fixed(A[i],k))
+                    if( u[i] != 0 )
                     {
-                        assert(k>0);
-                        assert(k<=M);
-                        assert(A[i][k]!=0);
-                        
-                        B[i]   /= A[i][k]; //! normalize value
-                        A[i][k] = 1;       //! normalize constraint
-                        
-                        if(B[i]<0)
-                            throw exception("fixed constraint will set negative concentration!");
-                        
-                        // do we impact other constraints ?
-                        for(size_t j=1;j<=Nc;++j)
+                        j=i;
+                        ++nf;
+                    }
+                }
+                assert(nf>0);
+                if(1==nf)
+                    return true;
+                else
+                {
+                    j=0;
+                    return false;
+                }
+            }
+            
+            //__________________________________________________________________
+            //
+            // Reduce the complexity of A
+            //__________________________________________________________________
+            static inline
+            void collect_fixed(uvector_t      &fixed,
+                               array<double>  &Cf,
+                               imatrix_t      &A,
+                               vector_t       &B )
+            {
+                assert(A.rows==B.size());
+                assert(A.cols==Cf.size());
+                const size_t M  = A.cols;
+                const size_t Nc = A.rows;
+                
+                fixed.free();
+                for(size_t i=M;i>0;--i) Cf[i] = 0;
+                
+                //==============================================================
+                //
+                // first pass: normalize it and subtract fixed constraints
+                //
+                //==============================================================
+                bool modified = false;
+                do
+                {
+                    modified = false;
+                    for(size_t i=1;i<=Nc;++i)
+                    {
+                        size_t k = 0;
+                        if(is_fixed(A[i],k))
                         {
-                            if(j!=i)
+                            assert(k>0);
+                            assert(k<=M);
+                            assert(A[i][k]!=0);
+                            
+                            B[i]   /= A[i][k]; //! normalize value
+                            A[i][k] = 1;       //! normalize constraint
+                            
+                            if(B[i]<0)
+                                throw exception("fixed constraint will set negative concentration!");
+                            
+                            // do we impact other constraints ?
+                            for(size_t j=1;j<=Nc;++j)
                             {
-                                if(A[j][k]!=0)
+                                if(j!=i)
                                 {
-                                    modified = true;
-                                    B[j]    -= B[i] * A[j][k];
-                                    A[j][k]  = 0;
+                                    if(A[j][k]!=0)
+                                    {
+                                        modified = true;
+                                        B[j]    -= B[i] * A[j][k];
+                                        A[j][k]  = 0;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            while(modified);
-            
-            // second pass: check no zero constraint !
-            for(size_t i=1; i<=Nc;++i)
-            {
-                size_t nz = 0;
-                for(size_t j=M;j>0;--j)
+                while(modified);
+                
+                //==============================================================
+                //
+                // second pass: check no zero constraint !
+                //
+                //==============================================================
+                for(size_t i=1; i<=Nc;++i)
                 {
-                    if(A[i][j]!=0) ++nz;
+                    size_t nz = 0;
+                    for(size_t j=M;j>0;--j)
+                    {
+                        if(A[i][j]!=0) ++nz;
+                    }
+                    if(nz<=0)
+                        throw exception("multiple fixed constraints detected");
                 }
-                if(nz<=0)
-                    throw exception("multiple fixed constraints detected");
-            }
-            
-            
-            // third pass: gather fixed indices and concentration
-            for(size_t i=1;i<=Nc;++i)
-            {
-                size_t k = 0;
-                if(is_fixed(A[i],k))
+                
+                //==============================================================
+                //
+                // third pass: gather fixed indices and concentration
+                //
+                //==============================================================
+                for(size_t i=1;i<=Nc;++i)
                 {
-                    if(!fixed.insert(k))
-                        throw exception("unexpected multipled fixed constraint");
-                    Cf[k] = B[i];
+                    size_t k = 0;
+                    if(is_fixed(A[i],k))
+                    {
+                        if(!fixed.insert(k))
+                            throw exception("unexpected multipled fixed constraint");
+                        Cf[k] = B[i];
+                    }
                 }
+                
+                
             }
+            
+            //==============================================================
+            //
+            // collect not fixed constraints
+            //
+            //==============================================================
+            static inline
+            void collect_combi(matrix_t        &P,
+                               vector_t        &Lam,
+                               const imatrix_t &A,
+                               const vector_t  &B)
+            {
+                
+                
+                assert(A.rows==B.size());
+                
+                const size_t M  = A.cols;
+                const size_t Nc = A.rows;
+                
+                vector<size_t> proj(Nc,as_capacity);
+                
+                for(size_t i=1;i<=Nc;++i)
+                {
+                    size_t k = 0;
+                    if(is_fixed(A[i],k))
+                        continue;
+                    
+                    proj.push_back(i);
+                }
+                
+                const size_t np = proj.size();
+                if(np>0)
+                {
+                    P   .make(np,M);
+                    Lam .make(np,0.0);
+                    for(size_t i=1;i<=np;++i)
+                    {
+                        const size_t p = proj[i];
+                        for(size_t j=M;j>0;--j) P[i][j] = A[p][j];
+                        Lam[i] = B[p];
+                    }
+                }
+                
+            }
+            
+            
+            
+#define RECOMPUTE_C() do { mkl::mul(V,Theta,C); mkl::set(C,Xstar); mkl::muladd_trn(C,Theta,V); } while(false)
+            
             
             
         }
         
-        static inline
-        void collect_combi(matrix_t        &P,
-                           vector_t        &Lam,
-                           matrix_t        &K,
-                           const imatrix_t &A,
-                           const vector_t  &B)
-        {
-            
-            
-            assert(A.rows==B.size());
-            
-            const size_t M  = A.cols;
-            const size_t Nc = A.rows;
-            
-            vector<size_t> proj(Nc,as_capacity);
-            vector<size_t> kern(Nc,as_capacity);
-            
-            for(size_t i=1;i<=Nc;++i)
-            {
-                size_t k = 0;
-                if(is_fixed(A[i],k))
-                    continue;
-                if(fabs(B[i])<=0)
-                    kern.push_back(i);
-                proj.push_back(i);
-            }
-            
-            const size_t np = proj.size();
-            if(np>0)
-            {
-                P   .make(np,M);
-                Lam .make(np,0.0);
-                for(size_t i=1;i<=np;++i)
-                {
-                    const size_t p = proj[i];
-                    for(size_t j=M;j>0;--j) P[i][j] = A[p][j];
-                    Lam[i] = B[p];
-                }
-            }
-            
-            const size_t nk = kern.size();
-            if(nk>0)
-            {
-                K.make(nk,M);
-                for(size_t i=1;i<=nk;++i)
-                {
-                    const size_t k = kern[i];
-                    for(size_t j=M;j>0;--j) K[i][j] = A[k][j];
-                }
-            }
-            
-        }
         
         
         
@@ -324,13 +347,11 @@ namespace yocto
             //__________________________________________________________________
             matrix_t P;
             vector_t Lam;
-            matrix_t K;
             
-            collect_combi(P, Lam, K, A, B);
+            collect_combi(P, Lam, A, B);
             
             std::cerr << "P="   << P << std::endl;
             std::cerr << "Lam=" << Lam << std::endl;
-            std::cerr << "K="   << K << std::endl;
             
             
             
@@ -410,7 +431,6 @@ namespace yocto
             // Algorithm
             //
             //__________________________________________________________________
-            //vector_t &CC = cs.CC;
             vector_t &dV    = cs.xi;
             matrix_t  W     = cs.W;
             matrix_t &Phi   = cs.Phi;
@@ -420,15 +440,14 @@ namespace yocto
             
             vector_t   V(N,zero);
             vector_t   X(M,zero);
-
-#define RECOMPUTE_C() do { mkl::mul(V,Theta,C); mkl::set(C,Xstar); mkl::muladd_trn(C,Theta,V); } while(false)
+            
             
             //==================================================================
             //
             // init a trial
             //
             //==================================================================
-
+            
             size_t trials = 0;
         INITIALIZE:
             ++trials;
@@ -442,6 +461,9 @@ namespace yocto
                 std::cerr << "invalid initial concentration" << std::endl;
                 goto INITIALIZE;
             }
+            
+            exit(0);
+            //make_acceptable(C, Xstar, Theta, V, dC, CC);
             
             RECOMPUTE_C();
             
@@ -458,7 +480,7 @@ namespace yocto
                 std::cerr << "-- Newton-II: not converged" << std::endl;
                 goto INITIALIZE;
             }
-
+            
             //------------------------------------------------------------------
             // numerical step
             //------------------------------------------------------------------
@@ -505,7 +527,7 @@ namespace yocto
             // Effective Step
             //------------------------------------------------------------------
             mkl::sub(X,C);
-           
+            
             //------------------------------------------------------------------
             // Test convergence
             //------------------------------------------------------------------
@@ -539,7 +561,7 @@ namespace yocto
             std::cerr << "dC_nl0=" << dC << std::endl;
             for_each(dC.begin(), dC.end(), numeric<double>::round_error);
             std::cerr << "dC_nl1=" << dC << std::endl;
-
+            
             //------------------------------------------------------------------
             // cut
             //------------------------------------------------------------------
@@ -576,7 +598,7 @@ namespace yocto
                 std::cerr << "-- Newton-II: inconsistent final composition" << std::endl;
                 goto INITIALIZE;
             }
-
+            
             
             //------------------------------------------------------------------
             //-- OK, check RMS
@@ -591,7 +613,7 @@ namespace yocto
             {
                 throw exception("ill-conditionned chemical constraints");
             }
-
+            
             
         }
         
