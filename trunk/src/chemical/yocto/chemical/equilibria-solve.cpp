@@ -90,6 +90,7 @@ namespace yocto
                     std::cerr << "-- Newton-I: invalid final composition" << std::endl;
                     return false;
                 }
+                
                 mkl::set(xi,Gamma);
                 LU.solve(W, xi);
                 mkl::mul_trn(dC,Nu,xi);

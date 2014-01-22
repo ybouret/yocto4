@@ -436,7 +436,6 @@ namespace yocto
             std::cerr << "\t[[ Reset Topology]]" << std::endl;
             fixed.free();
             Nu.assign(nu);
-            
         }
         
         void equilibria:: fixed_dC() throw()
