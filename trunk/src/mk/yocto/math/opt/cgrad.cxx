@@ -2,6 +2,8 @@
 #include "yocto/math/opt/cgrad.hpp"
 #include "yocto/sequence/vector.hpp"
 
+#include "yocto/sequence/multi-arrays.hpp"
+
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 
@@ -60,11 +62,12 @@ namespace yocto
                                      )
         {
             const size_t nvar = p.size(); assert(nvar>0);
+            multi_arrays<4,real_t,memory::global> arrays(nvar);
+            array<real_t> &g  = arrays.next_array(); assert(g.size()==nvar);
+            array<real_t> &h  = arrays.next_array(); assert(h.size()==nvar);
+            array<real_t> &xi = arrays.next_array(); assert(xi.size()==nvar);
+            array<real_t> &xx = arrays.next_array(); assert(xx.size()==nvar);
             
-            vector<real_t>            g(nvar,0);
-            vector<real_t>            h(nvar,0);
-            vector<real_t>            xi(nvar,0);
-            vector<real_t>            xx(nvar,0);
             cgw                       wrapper( func, p, xi, xx);
             numeric<real_t>::function F( &wrapper, & cgw::compute );
             //------------------------------------------------------------------
