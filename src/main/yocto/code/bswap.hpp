@@ -24,9 +24,6 @@ const TYPE tmp = *(TYPE *)lhs; \
 *(TYPE *)lhs   = *(TYPE *)rhs; \
 *(TYPE *)rhs   = tmp
         
-        
-        
-        
         template <>
         inline void bswap<1>(void *lhs, void *rhs) throw()
         {
