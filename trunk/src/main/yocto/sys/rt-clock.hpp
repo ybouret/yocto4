@@ -17,8 +17,12 @@ namespace yocto
 
 	private:
 		YOCTO_DISABLE_COPY_AND_ASSIGN(rt_clock);
-		int64_t data[4];
-	};
+#if defined(YOCTO_APPLE) || defined(YOCTO_WIN)
+        double freq;
+#else
+        uint64_t freq;
+#endif
+    };
 
 }
 

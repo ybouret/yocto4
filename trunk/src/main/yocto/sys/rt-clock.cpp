@@ -1,8 +1,7 @@
 #include "yocto/sys/rt-clock.hpp"
 #include "yocto/exceptions.hpp"
-#include "yocto/code/cast.hpp"
 #include "yocto/threading/mutex.hpp"
-#include <cstdlib>
+#include <cstring>
 
 #if defined(YOCTO_APPLE)
 #include <mach/mach.h>
@@ -17,11 +16,6 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <iostream>
-#endif
-
-
-#if defined(YOCTO_WIN)
-#include "yocto/exceptions.hpp"
 #endif
 
 namespace yocto
@@ -39,7 +33,7 @@ namespace yocto
 			throw imported::exception("mach_timebase_info","%s",mach_error_string(err));
 		}
 		double conversion_factor = double(timebase.numer) / timebase.denom;
-		*(double *)data = 1e-9 * conversion_factor;
+		freq = 1e-9 * conversion_factor;
 	}
 
 	uint64_t rt_clock:: ticks()
@@ -48,10 +42,9 @@ namespace yocto
 		return mach_absolute_time();
 	}
 
-	double   rt_clock:: operator()( uint64_t num_ticks) const
+	double   rt_clock:: operator()(uint64_t num_ticks) const
 	{
-		const double factor = *(const double *)data;
-		return factor * double(num_ticks);
+		return freq * double(num_ticks);
 	}
 
 #endif
@@ -68,7 +61,7 @@ namespace yocto
 		if(err!=0)
 			throw libc::exception( errno, "clock_getres" );
 		const uint64_t res = __giga64*uint64_t(tp.tv_sec) + uint64_t(tp.tv_nsec); 
-		*(uint64_t*)data = res;
+		data = res;
 	}
 
 	uint64_t rt_clock:: ticks()
@@ -99,8 +92,7 @@ namespace yocto
 		{
 			throw win32::exception( ::GetLastError(), "::QueryPerformanceFrequency" );
 		}
-		const double freq = l_one / static_cast<long double>( F.QuadPart );
-		*(double *)data = freq;
+        freq = l_one / static_cast<long double>( F.QuadPart );
 	}
 
 	uint64_t rt_clock:: ticks() 
@@ -116,7 +108,6 @@ namespace yocto
 
 	double rt_clock:: operator()( uint64_t num_clicks ) const 
 	{
-		const double freq = *static_cast<const double *>(static_cast<const void*>(&data[0]));
 		return freq * double(num_clicks);
 	}
 #endif
@@ -125,9 +116,8 @@ namespace yocto
 #pragma warning ( disable : 4351 )
 #endif
 
-	rt_clock:: rt_clock(): data()
+	rt_clock:: rt_clock() : freq(0)
 	{
-		for(unsigned i=0;i<sizeof(data)/sizeof(data[0]);++i) data[i] = 0;
 		calibrate();
 	}
 
