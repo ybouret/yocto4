@@ -18,13 +18,14 @@ namespace yocto
             public:
                 inline cgw(numeric<real_t>::scalar_field &func,
                            const array<real_t>           &pos,
-                           const array<real_t>           &vec
+                           const array<real_t>           &vec,
+                           array<real_t>                 &tmp
                            ) :
                 _func( func ),
                 _pos( pos ),
                 _vec( vec ),
                 nvar( _pos.size() ),
-                xx( nvar, 0)
+                _tmp( tmp )
                 {
                 }
                 
@@ -35,14 +36,14 @@ namespace yocto
                 const array<real_t>           & _pos;
                 const array<real_t>           & _vec;
                 const size_t                    nvar;
-                vector<real_t>                  xx;
+                array<real_t>                 & _tmp;
                 
                 inline real_t compute( real_t x )
                 {
                     for( size_t i=nvar;i>0;--i)
-                        xx[i] = _pos[i] + x * _vec[i];
+                        _tmp[i] = _pos[i] + x * _vec[i];
                     
-                    return _func(xx);
+                    return _func(_tmp);
                 }
                 
             private:
@@ -63,7 +64,8 @@ namespace yocto
             vector<real_t>            g(nvar,0);
             vector<real_t>            h(nvar,0);
             vector<real_t>            xi(nvar,0);
-            cgw                       wrapper( func, p, xi );
+            vector<real_t>            xx(nvar,0);
+            cgw                       wrapper( func, p, xi, xx);
             numeric<real_t>::function F( &wrapper, & cgw::compute );
             //------------------------------------------------------------------
             // initialize
