@@ -58,19 +58,20 @@ namespace yocto
             if( nvar != size )
             {
                 // allocate new data
-                size_t        new_len = N * sizeof(T);
+                size_t        new_len = N * nvar;
                 mutable_type *new_buf = memory::kind<MEMORY_KIND>:: template acquire_as<mutable_type>(new_len);
                 
                 // release old data
                 memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( buffer, buflen );
+               
+                // assign new memory
                 buffer        = new_buf;
                 buflen        = new_len;
-                
-                // link
                 (size_t&)size = nvar;
                 link();
             }
-            indx = 0;
+            else
+                indx = 0;
         }
         
         
@@ -90,7 +91,7 @@ namespace yocto
             const array_type *a = (array_type *) (&wksp[0]);
             return a[ia];
         }
-
+        
         //! for help
         inline array<T> & next_array() throw()
         {
@@ -105,16 +106,21 @@ namespace yocto
         
         
         const size_t size;  //!< common size
-
+        
     private:
         size_t        buflen; // N * size
-        mutable_type *buffer; // allocated memeory
-        uint64_t      wksp[ YOCTO_U64_FOR_SIZE(N*sizeof(array_type)) ];
-        size_t        indx; //!< free array index
+        mutable_type *buffer; // allocated memory
+        uint64_t      wksp[ YOCTO_U64_FOR_SIZE( (N*sizeof(array_type)) ) ];
+        size_t        indx;   //!< next ready array index
         
         inline void link() throw()
         {
-            //for(size_t i=0;i<sizeof(wksp)/sizeof(wksp[0]);++i) wksp[i] = 0;
+            assert(sizeof(wksp)>=N*sizeof(array_type));
+            for(size_t i=0;i<sizeof(wksp)/sizeof(wksp[0]);++i)
+            {
+                wksp[i] = 0;
+            }
+            
             mutable_type *p = buffer;
             array_type   *a = (array_type *) (&wksp[0]);
             for(size_t i=0;i<N;++i)
@@ -122,6 +128,7 @@ namespace yocto
                 new (a+i) array_type(p,size);
                 p += size;
             }
+            indx = 0;
         }
         
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_arrays);

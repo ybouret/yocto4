@@ -15,7 +15,7 @@ YOCTO_UNIT_TEST_IMPL(multi_arrays)
         M.prepare(1+alea_lt(1000));
         std::cerr << "size=" << M.size << std::endl;
         
-        continue;
+        //continue;
         
         for(size_t i=0;i<M.ARRAYS;++i)
         {
