@@ -61,7 +61,7 @@ namespace yocto
 		if(err!=0)
 			throw libc::exception( errno, "clock_getres" );
 		const uint64_t res = __giga64*uint64_t(tp.tv_sec) + uint64_t(tp.tv_nsec); 
-		data = res;
+		freq = res;
 	}
 
 	uint64_t rt_clock:: ticks()
