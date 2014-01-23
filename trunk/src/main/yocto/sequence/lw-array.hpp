@@ -24,7 +24,7 @@ namespace yocto
 		YOCTO_ARGUMENTS_DECL_T;
 		
 		explicit lw_array( T *addr, size_t num_items ) throw() :
-		item_( (mutable_type *)addr - 1),
+		item_( ((mutable_type *)addr) - 1),
 		size_( num_items )
 		{ assert( !(addr==NULL&&num_items>0) );
 		}
@@ -42,6 +42,7 @@ namespace yocto
 	protected:
 		mutable_type *item_;
 		const size_t  size_;
+        
 	private:
 		virtual const_type *get_item() const throw() { return item_; }
 		YOCTO_DISABLE_COPY_AND_ASSIGN(lw_array);
