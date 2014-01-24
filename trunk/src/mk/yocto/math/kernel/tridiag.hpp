@@ -1,7 +1,7 @@
 #ifndef YOCTO_MATH_KERNEL_TRIDIAG_INCLUDED
 #define YOCTO_MATH_KERNEL_TRIDIAG_INCLUDED 1
 
-#include "yocto/sequence/lw-arrays.hpp"
+#include "yocto/sequence/many-arrays.hpp"
 #include "yocto/math/kernel/matrix.hpp"
 
 namespace yocto {
@@ -52,7 +52,7 @@ namespace yocto {
             void sub( matrix<T> &M ) const throw();
             
         protected:
-            lw_arrays<T,memory::global> arrays;
+            many_arrays<T,memory::global> arrays;
             explicit tridiag_base( size_t nxtra );
             
         public:

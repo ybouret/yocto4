@@ -15,7 +15,7 @@ namespace yocto
             
             template <>
             solver_data<real_t>:: solver_data( real_t user_eps ) : 
-            lw_arrays<real_t, memory_type>( 3 ),
+            Field<real_t>::Arrays( 3 ),
             hmin(0),
             eps( user_eps ),
             TINY( REAL(1e-30) ),

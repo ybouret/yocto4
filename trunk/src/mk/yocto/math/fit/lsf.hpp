@@ -3,7 +3,7 @@
 
 #include "yocto/math/fit/sample.hpp"
 #include "yocto/math/fcn/derivative.hpp"
-#include "yocto/sequence/lw-arrays.hpp"
+#include "yocto/sequence/many-arrays.hpp"
 #include "yocto/math/kernel/crout.hpp"
 
 namespace yocto
@@ -36,8 +36,8 @@ namespace yocto
 				bool verbose; //!< small printout if needed, false by default 
 			
             private:
-				typedef lw_arrays<T,memory::global> arrays;
-				typedef array<T>                    array_t;
+				typedef many_arrays<T,memory::global> arrays;
+				typedef array<T>                      array_t;
 				typedef typename numeric<T>::function function_t;
 				
 				sample<T>         *samp_;
