@@ -14,7 +14,7 @@ namespace yocto
              needs to be prepared before integration
              */
             template <typename T>
-            class explicit_controler : public Field<T>::LW_Arrays
+            class explicit_controler : public Field<T>::Arrays
             {
             public:
                 typedef typename Field<T>::Equation equation;
@@ -46,7 +46,7 @@ namespace yocto
                                         const T           eps,
                                         callback         *cb) = 0;
             protected:
-                explicit explicit_controler(size_t num_arrays);
+                explicit explicit_controler(size_t na);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(explicit_controler);

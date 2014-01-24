@@ -39,7 +39,7 @@ namespace yocto
                 assert( n > 0 );
                 assert( n == dydx.size() );
                 assert( n == yscal.size() );
-                assert( n == common_size() );
+                assert( n == size      );
                 assert( n == dfdy.rows );
                 assert( n == dfdy.cols );
                 assert( n == a.rows );

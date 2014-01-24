@@ -37,8 +37,8 @@ namespace yocto
 				//--------------------------------------------------------------
 				// sanity check
 				//--------------------------------------------------------------
-				assert( common_size()         == n );
-				assert( forward.common_size() == n );
+				assert( size         == n );
+				assert( forward.size == n );
                 //std::cerr << "Stiff: y=" << ystart << ": x1=" << x1 << ", x2=" << x2 << ", h=" << h1 << std::endl;
 				
 				//--------------------------------------------------------------

@@ -37,7 +37,7 @@ namespace yocto
         
         
         //! allocate memory for all
-        inline void prepare(size_t nvar)
+        inline void allocate(size_t nvar)
         {
             if(nvar!=size)
             {
@@ -61,6 +61,18 @@ namespace yocto
             }
         }
         
+        //! release all memory
+        inline void release() throw()
+        {
+            if(size)
+            {
+                memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
+                (size_t&)size=0;
+                link();
+            }
+        }
+
+        
         virtual ~arrays_mgr() throw() { assert(size==0); }
         
         
@@ -82,17 +94,7 @@ namespace yocto
         {
         }
         
-        //! release all memory
-        inline void release() throw()
-        {
-            if(size)
-            {
-                memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
-                (size_t&)size=0;
-                link();
-            }
-        }
-
+       
         
         inline void link() throw()
         {

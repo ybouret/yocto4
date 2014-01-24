@@ -50,8 +50,8 @@ namespace yocto
                 inline void start( size_t nv )
                 {
                     assert(nv>0);
-                    this->prepare( nv ); //-- solver data
-                    step_.prepare( nv ); //-- step data
+                    this->allocate( nv ); //-- solver data
+                    step_.prepare( nv );  //-- step data
                 }
                 
                 void operator()(equation         &derivs,

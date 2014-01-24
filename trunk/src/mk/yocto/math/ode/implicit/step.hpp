@@ -12,7 +12,7 @@ namespace yocto
         {
             
             template <typename T>
-            class implicit_step : public Field<T>::LW_Arrays
+            class implicit_step : public Field<T>::Arrays
             {
             public:
                 typedef typename Field<T>::Equation  equation;

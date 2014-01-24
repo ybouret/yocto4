@@ -29,8 +29,8 @@ YOCTO_UNIT_TEST_IMPL(lw_arrays)
 {
 	lw_arrays<float,memory::global> arrays( 4 );
 	
-	std::cerr << "#arrays="     << arrays.num_arrays() << std::endl;
-	std::cerr << "common_size=" << arrays.size         << std::endl;
+	std::cerr << "#arrays=" << arrays.num_arrays() << std::endl;
+	std::cerr << "size=   " << arrays.size         << std::endl;
 	
 	array<float> &k1 = arrays.next_array();
 	array<float> &k2 = arrays.next_array();
@@ -42,7 +42,7 @@ YOCTO_UNIT_TEST_IMPL(lw_arrays)
 	process_arr(k3);
 	process_arr(k4);
 	
-	arrays.prepare( 10 );
+	arrays.allocate( 10 );
 	
 	process_arr(k1);
 	process_arr(k2);

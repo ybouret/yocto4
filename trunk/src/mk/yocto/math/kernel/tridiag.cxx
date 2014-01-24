@@ -35,13 +35,13 @@ namespace yocto {
         template <>
         void tridiag_base<z_type>:: make(size_t n)
         {
-            arrays.prepare(n);
+            arrays.allocate(n);
         }
         
         template <>
         size_t tridiag_base<z_type>:: size() const throw()
         {
-            return arrays.common_size();
+            return arrays.size;
         }
         
         template <>

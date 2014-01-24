@@ -23,8 +23,7 @@ namespace yocto
                 typedef functor<void,TL3(Array&,T,const Array&)>            Equation; //!< derivs( dydx[], x, y[] );
                 typedef functor<void,TL4(Array&,Matrix&, T, const Array &)> Jacobian; //!< jacobn( dfdx[], dfdy[][], x, y[] );
                 typedef functor<void,TL2(Array&,T)>                         Callback; //!< adjust trials y[]
-                typedef lw_arrays<T,ode::memory_type>                       LW_Arrays;
-                typedef lw_array<T>                                         LW_Array;
+                typedef lw_arrays<T,ode::memory_type>                       Arrays;
 			};
 			
 		}

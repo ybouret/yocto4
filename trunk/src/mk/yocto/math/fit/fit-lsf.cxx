@@ -186,8 +186,8 @@ namespace yocto
 				//--------------------------------------------------------------
 				alpha_. make(nvar_,nvar_);
 				curv_.  make(nvar_,nvar_);
-				harr_.  prepare(  nvar_  );
-                LU.     prepare( nvar_ );
+				harr_.  allocate( nvar_  );
+                LU.     prepare(  nvar_  );
                 
 				//--------------------------------------------------------------
 				// global init

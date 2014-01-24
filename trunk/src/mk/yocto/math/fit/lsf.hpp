@@ -37,7 +37,7 @@ namespace yocto
 			
             private:
 				typedef lw_arrays<T,memory::global> arrays;
-				typedef lw_array<T> array_t;
+				typedef array<T>                    array_t;
 				typedef typename numeric<T>::function function_t;
 				
 				sample<T>         *samp_;

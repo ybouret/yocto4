@@ -45,7 +45,7 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(RK45);
-                typename Field<T>::LW_Array &yerr,&ytmp;
+                array<T> &yerr,&ytmp;
             };
             
             

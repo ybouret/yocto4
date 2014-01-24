@@ -69,9 +69,9 @@ namespace yocto
                 //! allocate all memory
 				inline void start( size_t nvar )
 				{
-					this->prepare( nvar );
-					ctrl_.prepare( nvar );
-					step_.prepare( nvar );
+					this->allocate( nvar );
+					ctrl_.allocate( nvar );
+					step_.allocate( nvar );
 				}
 				
                 //! make a step
