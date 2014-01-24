@@ -7,14 +7,14 @@
 
 namespace yocto
 {
-    namespace math 
+    namespace math
     {
         
         namespace ode
         {
-         
+            
             template <typename T>
-            class solver_data : public Field<T>::LW_Arrays
+            class solver_data : public Field<T>::Arrays
             {
             public:
                 virtual ~solver_data() throw();
@@ -25,8 +25,8 @@ namespace yocto
                 
             protected:
                 explicit solver_data( T user_eps );
-                typename Field<T>::LW_Array &y, &dydx, &yscal;
-
+                array<T> &y, &dydx, &yscal;
+                
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(solver_data);

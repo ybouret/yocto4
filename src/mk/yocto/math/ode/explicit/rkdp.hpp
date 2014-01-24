@@ -19,7 +19,7 @@ namespace yocto
 			public:
 				typedef typename Field<T>::Equation equation;
                 typedef typename Field<T>::Callback callback;
-
+                
 				explicit RKDP();
 				virtual ~RKDP() throw();
 				
@@ -34,7 +34,7 @@ namespace yocto
                                         );
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(RKDP);
-				typename Field<T>::LW_Array &ytmp, &ak2, &ak3, &ak4, &ak5, &ak6, &ak7;
+				array<T> &ytmp, &ak2, &ak3, &ak4, &ak5, &ak6, &ak7;
 			};
 		}
 		

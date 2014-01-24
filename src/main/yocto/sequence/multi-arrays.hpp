@@ -31,7 +31,7 @@ namespace yocto
         explicit multi_arrays(size_t nvar) : mgr_type()
         {
             YOCTO_STATIC_CHECK(N>0,invalid_count);
-            this->prepare(nvar);
+            this->allocate(nvar);
         }
         
         virtual ~multi_arrays() throw() { this->release(); }

@@ -13,7 +13,7 @@ namespace yocto {
         class tridiag_base
         {
         public:
-            typedef lw_array<T> array_type;
+            typedef array<T> array_type;
             virtual ~tridiag_base() throw();
             
             void   make(size_t n);

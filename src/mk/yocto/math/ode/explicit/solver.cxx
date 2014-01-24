@@ -38,9 +38,9 @@ namespace yocto
 				//--------------------------------------------------------------
 				// sanity check
 				//--------------------------------------------------------------
-				assert( common_size()         == n );
-				assert( ctrl.common_size()    == n );
-				assert( forward.common_size() == n );
+				assert( size         == n );
+				assert( ctrl.size    == n );
+				assert( forward.size == n );
 				
 				
 				//--------------------------------------------------------------

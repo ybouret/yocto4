@@ -33,7 +33,7 @@ namespace yocto
             void rosenbrock<real_t>:: prepare( size_t nv )
             {
                 assert(nv>0);
-                implicit_step<real_t>::prepare(nv);
+                allocate(nv);
                 dfdy.make(nv,nv);
                 a.make(nv,nv);
                 LU.make(nv,0.0);

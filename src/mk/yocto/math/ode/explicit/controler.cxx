@@ -12,8 +12,8 @@ namespace yocto
             explicit_controler<real_t>:: ~explicit_controler() throw() {}
             
             template <>
-            explicit_controler<real_t>:: explicit_controler( size_t num_arrays ) :
-            Field<real_t>::LW_Arrays(num_arrays)
+            explicit_controler<real_t>:: explicit_controler( size_t na ) :
+            Field<real_t>::Arrays(na)
             {
             }
             

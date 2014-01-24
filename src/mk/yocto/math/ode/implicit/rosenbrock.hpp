@@ -22,10 +22,10 @@ namespace yocto
                 
             protected:
                 explicit rosenbrock();
-                lw_array<T>    &g1, &g2, &g3, &g4, &dfdx,&err,&ysav,&dysav;
-                matrix<T>      dfdy;
-                matrix<T>      a;
-                crout<T>       LU;
+                array<T>    &g1, &g2, &g3, &g4, &dfdx,&err,&ysav,&dysav;
+                matrix<T>    dfdy;
+                matrix<T>    a;
+                crout<T>     LU;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rosenbrock);

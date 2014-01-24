@@ -14,8 +14,8 @@ namespace yocto
             template <> explicit_step<real_t>:: ~explicit_step() throw() {}
             
             template <>
-            explicit_step<real_t> :: explicit_step( size_t num_arrays ) :
-            Field<real_t>::LW_Arrays(num_arrays)
+            explicit_step<real_t> :: explicit_step( size_t na ) :
+            Field<real_t>::Arrays(na)
             {
             }
             

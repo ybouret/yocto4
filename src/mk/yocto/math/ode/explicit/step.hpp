@@ -14,7 +14,7 @@ namespace yocto
             
             //! memory and method for one step
             template <typename T>
-            class explicit_step : public Field<T>::LW_Arrays
+            class explicit_step : public Field<T>::Arrays
             {
             public:
                 typedef typename Field<T>::Equation equation;
@@ -44,7 +44,7 @@ namespace yocto
                 
                 
             protected:
-                explicit explicit_step(size_t num_arrays);
+                explicit explicit_step(size_t na);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(explicit_step);

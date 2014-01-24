@@ -13,7 +13,7 @@ YOCTO_UNIT_TEST_IMPL(multi_arrays)
     
     for(size_t iter=1;iter<=100;++iter)
     {
-        M.prepare(1+alea_lt(1000));
+        M.allocate(1+alea_lt(1000));
         std::cerr << "size=" << M.size << std::endl;
         
         continue;
