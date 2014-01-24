@@ -5,47 +5,68 @@
 
 namespace yocto
 {
-    //! interface to a set or arrays of same size
-    /**
-     
-     */
+    
+    template <typename T>
+    class arrays_manager
+    {
+    public:
+        typedef T                                     type;
+        typedef typename type_traits<T>::mutable_type mutable_type; //!< internal data type
+        
+        
+        virtual array<T>       &operator[](size_t ia) throw()       = 0;
+        virtual const array<T> &operator[](size_t ia) const throw() = 0;
+        virtual size_t          num_arrays() const throw()          = 0;
+        virtual void allocate(size_t nvar) = 0;
+        virtual void release(void) throw() = 0;
+        
+        const size_t size;
+        
+        virtual ~arrays_manager() throw() { assert(0==size); }
+
+    protected:
+        explicit arrays_manager() throw() : size(0) {}
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(arrays_manager);
+    };
+    
+    //! interface to a handle some arrays of same size
     template<
     typename T,
     typename MEMORY_KIND
     >
-    class multi_arrays
+    class multi_arrays : public arrays_manager<T>
     {
     public:
-        typedef lw_array<T>                           array_type;   //!< interface
-        typedef typename type_traits<T>::mutable_type mutable_type; //!< internal data type
+        typedef lw_array<T>                              array_type;   //!< interface
+        typedef typename arrays_manager<T>::type         type;
+        typedef typename arrays_manager<T>::mutable_type mutable_type;
         
         
-        const size_t size; //!< common size
-        
-        virtual size_t num_arrays() const throw() = 0;
         
         
-        inline array<T> & operator[](size_t ia) throw()
+        virtual array<T> & operator[](size_t ia) throw()
         {
-            assert(ia<num_arrays());
+            assert(ia<this->num_arrays());
             return *(static_cast<array_type *>(arrays_addr())+ia);
         }
         
-        inline const array<T> & operator[](size_t ia) const throw()
+        virtual const array<T> & operator[](size_t ia) const throw()
         {
-            assert(ia<num_arrays());
+            assert(ia<this->num_arrays());
             return *(static_cast<array_type *>(arrays_addr())+ia);
         }
         
         
         
         //! allocate memory for all
-        inline void allocate(size_t nvar)
+        virtual void allocate(size_t nvar)
         {
-            if(nvar!=size)
+            if(nvar!=this->size)
             {
                 // acquire new data
-                size_t        new_count = nvar * num_arrays();
+                size_t        new_count = nvar * this->num_arrays();
                 mutable_type *new_xdata = memory::kind<MEMORY_KIND>:: template acquire_as<mutable_type>( new_count );
 				
                 // release old data
@@ -54,7 +75,7 @@ namespace yocto
                 // link all
                 xdata = new_xdata;
                 count = new_count;
-                (size_t&)size = nvar;
+                (size_t&)(this->size) = nvar;
                 link();
             }
             else
@@ -65,24 +86,24 @@ namespace yocto
         }
         
         //! release all memory
-        inline void release() throw()
+        virtual void release() throw()
         {
-            if(size)
+            if(this->size)
             {
                 memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
-                (size_t&)size=0;
+                (size_t&)(this->size)=0;
                 link();
             }
         }
         
         
-        virtual ~multi_arrays() throw() { assert(size==0); }
+        virtual ~multi_arrays() throw() {}
         
         
         //! one shot helper
         inline array<T> & next_array() throw()
         {
-            assert(indx<num_arrays());
+            assert(indx<this->num_arrays());
             array_type *a = static_cast<array_type *>(arrays_addr());
             return a[indx++];
         }
@@ -90,7 +111,6 @@ namespace yocto
         
     protected:
         explicit multi_arrays() throw() :
-        size(0),
         count(0),
         xdata(0),
         indx(0)
@@ -103,10 +123,10 @@ namespace yocto
         {
             mutable_type *p = xdata;
             array_type   *a = static_cast<array_type *>(arrays_addr());
-            for(size_t i=num_arrays();i>0;--i)
+            for(size_t i=this->num_arrays();i>0;--i)
             {
-                new (a++) array_type(p,size);
-                p += size;
+                new (a++) array_type(p,this->size);
+                p += this->size;
             }
         }
         
