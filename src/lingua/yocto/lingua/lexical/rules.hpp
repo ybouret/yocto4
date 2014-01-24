@@ -36,10 +36,10 @@ namespace yocto
                 
                 //! create a rule
                 /**
-                 \param id   will be rule label
-                 \param p    will be rule motif: taken care of in case of error
-                 \param cb   callback when motif is selected
-                 \param r    will be its role...
+                 \param id       will be rule label
+                 \param p        will be rule motif: taken care of in case of error
+                 \param cb       callback when motif is selected
+                 \param control  will be its role...
                  the id cannot be EOF !
                  */
                 static rule * create( const string &id, pattern *p, const action &cb, bool control);
