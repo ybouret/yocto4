@@ -1,5 +1,6 @@
 #include "yocto/math/kernel/jacobi.hpp"
 #include "yocto/math/ztype.hpp"
+#include "yocto/sequence/multi-arrays.hpp"
 
 namespace yocto {
 	
