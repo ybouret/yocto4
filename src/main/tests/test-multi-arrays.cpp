@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/sequence/multi-arrays.hpp"
+#include "yocto/sequence/some-arrays.hpp"
 #include "yocto/code/rand.hpp"
 
 using namespace yocto;
@@ -7,7 +7,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(multi_arrays)
 {
-    
+#if 0
     multi_arrays<8, double, memory::global> M;
     
     
@@ -28,7 +28,7 @@ YOCTO_UNIT_TEST_IMPL(multi_arrays)
             }
         }
     }
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()

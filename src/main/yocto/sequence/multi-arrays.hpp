@@ -2,54 +2,127 @@
 #define YOCTO_SEQUENCE_MULTI_ARRAYS_INCLUDED 1
 
 #include "yocto/sequence/lw-array.hpp"
-#include "yocto/sequence/arrays-mgr.hpp"
-#include "yocto/code/round.hpp"
-#include "yocto/code/static-check.hpp"
 
 namespace yocto
 {
-    
-    template <
-    size_t   N,
+    //! interface to a set or arrays of same size
+    /**
+     
+     */
+    template<
     typename T,
     typename MEMORY_KIND
     >
-    class multi_arrays : public arrays_mgr<T,MEMORY_KIND>
+    class multi_arrays
     {
     public:
-        typedef arrays_mgr<T,MEMORY_KIND>     mgr_type;
-        typedef typename mgr_type::array_type array_type;
+        typedef lw_array<T>                           array_type;   //!< interface
+        typedef typename type_traits<T>::mutable_type mutable_type; //!< internal data type
         
-        //! build N empty arrays
-        explicit multi_arrays() throw() : mgr_type()
+        
+        const size_t size; //!< common size
+        
+        virtual size_t num_arrays() const throw() = 0;
+        
+        
+        inline array<T> & operator[](size_t ia) throw()
         {
-            YOCTO_STATIC_CHECK(N>0,invalid_count);
-            this->link();
+            assert(ia<num_arrays());
+            return *(static_cast<array_type *>(arrays_addr())+ia);
         }
         
-        //! build N arrays with same size=nvar
-        explicit multi_arrays(size_t nvar) : mgr_type()
+        inline const array<T> & operator[](size_t ia) const throw()
         {
-            YOCTO_STATIC_CHECK(N>0,invalid_count);
-            this->allocate(nvar);
+            assert(ia<num_arrays());
+            return *(static_cast<array_type *>(arrays_addr())+ia);
         }
         
-        virtual ~multi_arrays() throw() { this->release(); }
         
         
-        //! for info
-        virtual size_t num_arrays() const throw() { return N; }
+        //! allocate memory for all
+        inline void allocate(size_t nvar)
+        {
+            if(nvar!=size)
+            {
+                // acquire new data
+                size_t        new_count = nvar * num_arrays();
+                mutable_type *new_xdata = memory::kind<MEMORY_KIND>:: template acquire_as<mutable_type>( new_count );
+				
+                // release old data
+				memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
+                
+                // link all
+                xdata = new_xdata;
+                count = new_count;
+                (size_t&)size = nvar;
+                link();
+            }
+            else
+            {
+                char *p = (char *)xdata;
+                for(size_t i=count*sizeof(T);i>0;--i) *(p++) = 0;
+            }
+        }
         
+        //! release all memory
+        inline void release() throw()
+        {
+            if(size)
+            {
+                memory::kind<MEMORY_KIND>:: template release_as<mutable_type>( xdata, count );
+                (size_t&)size=0;
+                link();
+            }
+        }
+        
+        
+        virtual ~multi_arrays() throw() { assert(size==0); }
+        
+        
+        //! one shot helper
+        inline array<T> & next_array() throw()
+        {
+            assert(indx<num_arrays());
+            array_type *a = static_cast<array_type *>(arrays_addr());
+            return a[indx++];
+        }
+        
+        
+    protected:
+        explicit multi_arrays() throw() :
+        size(0),
+        count(0),
+        xdata(0),
+        indx(0)
+        {
+        }
+        
+        
+        
+        inline void link() throw()
+        {
+            mutable_type *p = xdata;
+            array_type   *a = static_cast<array_type *>(arrays_addr());
+            for(size_t i=num_arrays();i>0;--i)
+            {
+                new (a++) array_type(p,size);
+                p += size;
+            }
+        }
         
         
     private:
-        uint64_t      wksp[ YOCTO_U64_FOR_SIZE( (N*sizeof(array_type)) ) ];
-        virtual void *arrays_addr() const throw() { return (void *)wksp; }
-        
         YOCTO_DISABLE_COPY_AND_ASSIGN(multi_arrays);
+        size_t        count;
+        mutable_type *xdata;
+        size_t        indx;
+        
+        virtual void *arrays_addr() const throw() = 0;
+        
     };
     
 }
+
 
 #endif
 
