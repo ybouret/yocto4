@@ -27,15 +27,7 @@ namespace yocto
             this->link();
         }
         
-        //! build N arrays with same size=nvar
-        explicit some_arrays(size_t nvar) : multi_type()
-        {
-            YOCTO_STATIC_CHECK(N>0,invalid_count);
-            this->allocate(nvar);
-        }
-        
         virtual ~some_arrays() throw() { this->release(); }
-        
         
         //! for info
         virtual size_t num_arrays() const throw() { return N; }
