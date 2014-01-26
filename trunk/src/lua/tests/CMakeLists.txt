@@ -4,7 +4,7 @@ SET(fx test-lua)
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(${fx} main.cpp ${test_srcs})
 TARGET_LINK_YOCTO(${fx} lua)
-SET( HERE "${CMAKE_SOURCE_DIR}/y-lua/tests" )
+SET( HERE "${CMAKE_SOURCE_DIR}/lua/tests" )
 
 ENABLE_TESTING()
 ADD_TEST(Hello   ${fx} "${HERE}/hello.lua" )
