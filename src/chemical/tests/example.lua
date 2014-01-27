@@ -14,10 +14,10 @@ species =
 
 
 function Kam(t)
-    return 10^(-9.2)
+return 10^(-9.2)
 end
 
-eqs = 
+eqs =
 {
     { "water",  1e-14,     { 1, "H+"}, { 1, "HO-" } },
     { "acetic", 10^(-4.8), { 1, "H+"}, { 1, "Ac-" }, { -1, "AcH" } },
@@ -25,7 +25,7 @@ eqs =
 };
 
 
-ini = 
+ini =
 {
     { 0.0001, { 1, "AcH" }, {1, "Ac-" } },
     { 0, {1,"Na+"} },
@@ -35,16 +35,16 @@ ini =
 
 
 -- effector
-effectors = { 
-    { "MCT",                  -- function name
-      { "H+", "Ac-" },        -- input components
-      { "H+", "AcH", "Ac-"}   -- output components
-    }
+effectors = {
+    "MCT"
 };
 
 -- one function for effector
-function MCT(t,zeta,h,am)
-    print( "MCT@t=" .. t .. ", zeta=" .. zeta );
-    print( "h=" .. h .. ", am=" .. am );
-    return 1,2,3;
+function MCT(t,zeta,S,S_out)
+print( "MCT@t=" .. t .. ", zeta=" .. zeta );
+    local h=S["H+"];
+ans = {};
+ans["H+"] = 1;
+ans["HO-"] = 2;
+return ans;
 end

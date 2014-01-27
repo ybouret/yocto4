@@ -46,7 +46,15 @@ YOCTO_UNIT_TEST_IMPL(lua)
     
     chemical::solution ds(s);
     
-    eff.collect(ds, 0, 0, s);
+    chemical::solution S_out(lib);
+    
+    {
+        chemical::effector::ptr *mct = eff.search("MCT");
+        if(mct) (**mct).factor = 0.5;
+    }
+    
+    
+    eff.collect(ds, 0, 0, s, S_out);
     std::cerr << "ds=" << ds << std::endl;
     
 }

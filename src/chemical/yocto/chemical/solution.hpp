@@ -71,12 +71,14 @@ namespace yocto
             const_iterator begin() const throw();
             const_iterator end()   const throw();
             
-            void   ldz() throw(); //!< everyone to zero
+            void   ldz() throw();          //!< everyone to zero
             double sum_zC() const throw(); //!< charge excess, in concentration units
             
             void write_header( ios::ostream & ) const;
             void write_values( ios::ostream & ) const;
             void mix( equilibria &cs, const array<solution> &solutions, const array<double> &weights, double t);
+            
+            component *lookup( const string & ) throw();
             
         private:
             component::db composition;

@@ -22,6 +22,24 @@ namespace yocto
                 lua_rawset(L, -3);
             }
         }
+        
+        void _lua:: push_solution( lua_State *L, const collection &lib, const array<double> &C)
+        {
+            assert(L);
+            assert(C.size()>=lib.size());
+            const size_t nrec = lib.size();
+            lua_createtable(L, 0, nrec);
+            
+            collection::const_iterator i = lib.begin();
+            for(size_t j=1;j<=nrec;++j,++i)
+            {
+                const species &sp = **i;
+                lua_pushlstring(L, sp.name.c_str(), sp.name.size());
+                lua_pushnumber(L, C[j]);
+                lua_rawset(L,-3);
+            }
+        }
 
+        
     }
 }

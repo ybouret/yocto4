@@ -7,8 +7,8 @@ namespace yocto
     
     namespace chemical
     {
-     
         
+#if 0
         class _lua:: effector : public chemical::effector
         {
         public:
@@ -68,7 +68,7 @@ namespace yocto
                     dSdt[ output[i] ] +=  lua_tonumber(L, -1);
                     lua_pop(L,1);
                 }
-
+                
             }
             
         private:
@@ -141,6 +141,91 @@ namespace yocto
             if( !eff.insert(q) )
                 throw exception("multiple effector '%s'", effname);
         }
+#endif
+        
+        
+        class _lua:: effector : public chemical::effector
+        {
+        public:
+            lua_State *L;
+            
+            
+            explicit effector( const string &id, lua_State *vm) :
+            chemical::effector(id),
+            L(vm)
+            {
+            }
+            
+            virtual ~effector() throw()
+            {
+            }
+            
+            virtual void call( solution &dSdt, double t, double zeta, const solution &S, const solution &S_out ) const
+            {
+                //--------------------------------------------------------------
+                // get the function
+                //--------------------------------------------------------------
+                const char *fn = name.c_str();
+                assert(L);
+                lua_settop(L,0);
+                lua_getglobal(L,fn);
+                if( ! lua_isfunction(L, -1) )
+                    throw exception("no effector function '%s'", fn);
+                
+                //--------------------------------------------------------------
+                // push the arguments
+                //--------------------------------------------------------------
+                lua_pushnumber(L, t);
+                lua_pushnumber(L, zeta);
+                _lua::push_solution(L,S);
+                _lua::push_solution(L,S_out);
+                
+                //--------------------------------------------------------------
+                // call the function
+                //--------------------------------------------------------------
+                if( lua_pcall(L,4,1,0) )
+                    throw exception("%s: %s", name.c_str(), lua_tostring(L,-1) );
+                
+                if( !lua_istable(L,-1) )
+                    throw exception("effector '%s' doesn't return a table", name.c_str());
+                
+                //--------------------------------------------------------------
+                // parse the result
+                //--------------------------------------------------------------
+                const int ans = lua_gettop(L); // the result index
+                lua_pushnil(L);  /* first key */
+                while( lua_next(L,ans) != 0) {
+                    /* uses 'key' (at index -2) and 'value' (at index -1) */
+                    //printf("%s - %s\n",lua_typename(L, lua_type(L, -2)),lua_typename(L, lua_type(L, -1)));
+                    
+                    if( !lua_isstring(L,-2) )
+                        throw exception("effector '%s': return key is not 'string' but '%s'", fn, lua_typename(L, lua_type(L, -2)));
+                    
+                    if( !lua_isnumber(L,-1) )
+                        throw exception("effector '%s': return value is not 'number' but '%s'", fn, lua_typename(L, lua_type(L, -1)));
+                    
+                    const string which = lua_tostring(L,-2);
+                    const double rate  = lua_tonumber(L,-1);
+                    std::cerr << "\t modify " << which << " with " << rate << std::endl;
+                    
+                    component *cc = dSdt.lookup(which);
+                    if(!cc)
+                    {
+                        throw exception("No [%s] to modify for effector '%s'", which.c_str(), fn);
+                    }
+                    
+                    cc->concentration = rate;
+                    
+                    /* removes 'value'; keeps 'key' for next iteration */
+                    lua_pop(L, 1);
+                }
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(effector);
+        };
+        
+        
         
         void _lua:: load( lua_State *L, effectors &eff, const string &name)
         {
@@ -152,14 +237,20 @@ namespace yocto
             if( !lua_istable(L, -1) )
                 throw exception("%s is not a LUA_TABLE", table_name);
             
-            const size_t n = lua_rawlen(L, -1);
+            const unsigned n = lua_rawlen(L, -1);
             std::cerr << "Parsing " << n << " effectors" << std::endl;
-            for(size_t i=1; i<=n; ++i)
+            for(unsigned i=1; i<=n; ++i)
             {
                 lua_rawgeti(L,-1,i);
                 
-                __parse_effector(L,eff,table_name,i);
+                if( !lua_isstring(L, -1) )
+                    throw exception("effector #%u: not a string", i);
                 
+                const string id = lua_tostring(L,-1);
+                std::cerr << "\tcreating effector " << id << std::endl;
+                const effector::ptr q(new _lua::effector(id,L) );
+                if( !eff.insert(q) )
+                    throw exception("multiple effector '%s'", id.c_str());
                 lua_pop(L,1);
             }
         }
@@ -169,7 +260,7 @@ namespace yocto
             const string ID(name);
             _lua::load(L,eff,ID);
         }
-
+        
         
     }
 }

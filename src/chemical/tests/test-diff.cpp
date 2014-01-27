@@ -26,6 +26,7 @@ namespace
         chemical::effectors  &eff;
         chemical::solution    S;
         chemical::solution    dSdt;
+        chemical::solution    S_out;
         const size_t          nv;
         vector<double>        yy;
         ODE                   eq;
@@ -41,6 +42,7 @@ namespace
         eff(user_eff),
         S(lib),
         dSdt(lib),
+        S_out(lib),
         nv(lib.size()),
         yy(nv,0),
         eq( this, &ChemDiff::Compute ),
@@ -60,7 +62,7 @@ namespace
         void Compute( array<double> &dydt, double t, const array<double> &y )
         {
             S.load(y);
-            eff.collect(dSdt, t, 0.0, S);
+            eff.collect(dSdt, t, 0.0, S, S_out);
             cs.load_C(y);
             dSdt.save(cs.dC);
             cs.legalize_dC(t);
@@ -143,7 +145,7 @@ YOCTO_UNIT_TEST_IMPL(diff)
     chemical::solution ds(lib);
     
     eff["NaOH"].factor = 1e-3;
-    eff.collect(ds, 0, 0, s);
+    eff.collect(ds, 0, 0, s, s);
     
     std::cerr << "ds=" << ds << std::endl;
     
