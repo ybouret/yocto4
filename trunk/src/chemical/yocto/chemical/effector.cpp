@@ -29,22 +29,30 @@ namespace yocto
         }
         
         
-        void effectors:: collect( solution &dSdt, double t, double zeta, const solution &S ) const
+        void effectors:: collect( solution &dSdt, double t, double zeta, const solution &S, const solution &S_out ) const
         {
             assert(dSdt.components==S.components);
             solution rate(S);
             dSdt.ldz();
             
+            //__________________________________________________________________
+            //
+            // loop over all effectors
+            //__________________________________________________________________
             for( const_iterator i=begin(); i != end(); ++i )
             {
                 const effector &eff = **i;
+                // compute contribution
                 rate.ldz();
-                eff.call(rate, t, zeta,S);
+                eff.call(rate, t, zeta,S, S_out);
+                
+                // add to the global rate with effector factor
+                const double fac = eff.factor;
                 for( solution::iterator j=rate.begin(),k=dSdt.begin();j!=rate.end();++j,++k)
                 {
                     const component &p = (*j);
                     component       &q = (*k);
-                    q.concentration += eff.factor * p.concentration;
+                    q.concentration += fac * p.concentration;
                 }
             }
         }

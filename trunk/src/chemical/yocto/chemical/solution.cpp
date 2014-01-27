@@ -191,6 +191,12 @@ namespace yocto
             }
         }
         
+        component * solution:: lookup( const string &id) throw()
+        {
+            return composition.search(id);
+        }
+
+        
     }
     
 }

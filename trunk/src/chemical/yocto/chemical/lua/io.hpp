@@ -104,8 +104,11 @@ namespace yocto
             // Helpers
             //__________________________________________________________________
             
+            //! push a solution on a a lua stack
             static void push_solution( lua_State *L, const solution &S );
             
+            //! push a solution on a lua stack, assume C is built from lib
+            static void push_solution( lua_State *L, const collection &lib, const array<double> &C);
         };
         
     }
