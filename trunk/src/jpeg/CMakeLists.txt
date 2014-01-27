@@ -19,6 +19,9 @@ ENDFOREACH()
 
 ADD_LIBRARY(y-jpeg STATIC ${JCONFIG} ${SOURCES})
 
+#set to TRUE to perform tests
+IF(FALSE)
+
 IF(NOT MSVC)
 
 ADD_EXECUTABLE(cjpeg 
@@ -81,6 +84,8 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testoutt.jpg ${JROOT}/testorig.jpg
 	COMMENT "Testing jpegtran" )
 ENDIF(NOT MSVC)
+
+ENDIF(FALSE)
 
 INSTALL( FILES 
 	${JROOT}/jconfig.h

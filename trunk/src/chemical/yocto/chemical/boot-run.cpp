@@ -24,7 +24,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Detect if a row of A is a fixed constraint and set index
+            // Detect if a row of A is a single fixed constraint and set index
             //__________________________________________________________________
             static inline
             bool is_fixed( const array<ptrdiff_t> &u, size_t &j ) throw()
@@ -101,29 +101,24 @@ namespace yocto
                                         modified = true;
                                         B[j]    -= B[i] * A[j][k];
                                         A[j][k]  = 0;
+                                        
+                                        size_t nz = 0;
+                                        for(size_t l=M;l>0;--l)
+                                        {
+                                            if(A[j][l]!=0) ++nz;
+                                        }
+                                        if(nz<=0)
+                                            throw exception("multiple fixed constraints detected");
                                     }
                                 }
                             }
+                            
+                            
                         }
                     }
                 }
                 while(modified);
                 
-                //==============================================================
-                //
-                // second pass: check no zero constraint !
-                //
-                //==============================================================
-                for(size_t i=1; i<=Nc;++i)
-                {
-                    size_t nz = 0;
-                    for(size_t j=M;j>0;--j)
-                    {
-                        if(A[i][j]!=0) ++nz;
-                    }
-                    if(nz<=0)
-                        throw exception("multiple fixed constraints detected");
-                }
                 
                 //==============================================================
                 //
@@ -520,7 +515,7 @@ namespace yocto
             Energy E(C,Xstar,Theta);
             numeric<double>::scalar_field func( &E, & Energy::Func );
             numeric<double>::vector_field grad( &E, & Energy::Grad );
-
+            
             
             //==================================================================
             //
@@ -632,7 +627,7 @@ namespace yocto
             
             std::cerr << "-- Newton-II: converged" << std::endl;
             
-        FINALIZE:            
+        FINALIZE:
             //------------------------------------------------------------------
             // non-linear error
             //------------------------------------------------------------------

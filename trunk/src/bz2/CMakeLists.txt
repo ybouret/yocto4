@@ -18,6 +18,8 @@ SOURCE_GROUP( bz2 FILES ${srcs} )
 INSTALL( FILES   yocto/bz2/bzlib.h DESTINATION include/yocto/bz2 )
 INSTALL( TARGETS y-bz2     ARCHIVE DESTINATION lib )
 
+#Set to TRUE to test bz2
+IF(FALSE)
 
 ADD_EXECUTABLE(y_bzip2 yocto/bz2/bzip2.c)
 TARGET_LINK_LIBRARIES(y_bzip2 y-bz2)
@@ -39,4 +41,5 @@ ADD_CUSTOM_COMMAND(
 	COMMAND y_bzip2 ARGS -v -ds < sample3.bz2 > sample3.tst
 	COMMAND ${CMAKE_COMMAND} ARGS -E compare_files sample3.tst ${file3}
 	COMMENT "Testing y_bzip2" )
+ENDIF()
 	
