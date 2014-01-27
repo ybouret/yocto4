@@ -18,7 +18,7 @@ namespace yocto
 		virtual bool search( param_type args ) const throw() = 0;
 		virtual bool insert( param_type args )               = 0;
 		virtual bool remove( param_type args ) throw()       = 0;
-
+        
 	protected:
 		explicit ordered() throw() {}
 		
