@@ -2,6 +2,8 @@
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/memory/buffers.hpp"
 
+#include <cstring>
+
 namespace yocto
 {
     
@@ -35,6 +37,24 @@ namespace yocto
         return *fp;
     }
     
+    
+    static inline
+    void __put_io_key( const mpi::io_key_t k, void *data )
+    {
+        assert(data);
+        const mpi::io_key_t k_net = swap_be_as(k);
+        memcpy(data,&k_net,sizeof(mpi::io_key_t));
+    }
+    
+    static inline
+    mpi::io_key_t __get_io_key( const void *data )
+    {
+        assert(data);
+        mpi::io_key_t k_net(0);
+        memcpy( &k_net, data, sizeof(mpi::io_key_t));
+        return swap_be_as(k_net);
+    }
+    
     void mpi::ostream:: write(char C)
     {
         static const char iosize = sizeof(io_key_t)+1;
@@ -49,7 +69,7 @@ namespace yocto
             for(int r=1;r<MPI.CommWorldSize;++r)
             {
                 MPI.Recv(iobuff,iosize, MPI_BYTE, r, tag, MPI_COMM_WORLD, status);
-                const io_key_t k = swap_be_as<io_key_t>( *(io_key_t *)iobuff );
+                const io_key_t k = __get_io_key(iobuff);
                 if(k!=key)
                     throw yocto::exception("MPI I/O: invalid key during write char");
                 fp->write(iobuff[sizeof(io_key_t)]);
@@ -58,7 +78,8 @@ namespace yocto
         else
         {
             assert(!MPI.IsFirst);
-            *(io_key_t *)iobuff = swap_be_as<io_key_t>(key);
+            __put_io_key(key,iobuff);
+            //*(io_key_t *)iobuff = swap_be_as<io_key_t>(key);
             iobuff[sizeof(io_key_t)]=C;
             MPI.Send(iobuff, iosize, MPI_BYTE, 0, tag, MPI_COMM_WORLD);
         }

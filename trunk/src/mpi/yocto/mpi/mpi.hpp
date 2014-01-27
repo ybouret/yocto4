@@ -69,7 +69,7 @@ namespace yocto
 			
 			virtual const char *what() const throw(); //< Uses MPI_Error_string(...) to format the error code.
 			
-			const int code;
+			const int code; //!< MPI error
 			
 		private:
 			YOCTO_DISABLE_ASSIGN(exception);
@@ -222,7 +222,6 @@ namespace yocto
         }
         
         
-        
         //! bcast ONE integral type
         template <typename T>
         inline void Bcast( T &x, int root, MPI_Comm comm ) const
@@ -249,7 +248,7 @@ namespace yocto
         //
         //======================================================================
         void   Send( const string &s, int dest, int tag, MPI_Comm comm ) const;
-        string Recv( int source, int tag, MPI_Comm comm, MPI_Status &status ) const;
+        string Recv( int source, int tag,  MPI_Comm comm, MPI_Status &status ) const;
         void   Bcast( string &s, int root, MPI_Comm comm) const;
         
         //======================================================================
@@ -274,6 +273,7 @@ namespace yocto
         
         MPI_Datatype get_type( const std::type_info &info ) const;
         MPI_Datatype get_type( const type_spec      &spec ) const;
+       
         template <typename T>
         inline MPI_Datatype get_type() const
         {
