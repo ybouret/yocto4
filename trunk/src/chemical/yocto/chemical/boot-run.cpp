@@ -102,13 +102,14 @@ namespace yocto
                                         B[j]    -= B[i] * A[j][k];
                                         A[j][k]  = 0;
                                         
+                                        //-- check there are some constraints left !
                                         size_t nz = 0;
                                         for(size_t l=M;l>0;--l)
                                         {
                                             if(A[j][l]!=0) ++nz;
                                         }
                                         if(nz<=0)
-                                            throw exception("multiple fixed constraints detected");
+                                            throw exception("redundant fixed constraints detected");
                                     }
                                 }
                             }
@@ -122,7 +123,7 @@ namespace yocto
                 
                 //==============================================================
                 //
-                // third pass: gather fixed indices and concentration
+                // second pass: gather fixed indices and concentration
                 //
                 //==============================================================
                 for(size_t i=1;i<=Nc;++i)
@@ -347,8 +348,8 @@ namespace yocto
             A.make(Nc,M);
             vector_t B(Nc,zero);
             fill(A,B);
-            std::cerr << "A0=" << A << std::endl;
-            std::cerr << "B0=" << B << std::endl;
+            //std::cerr << "A0=" << A << std::endl;
+            //std::cerr << "B0=" << B << std::endl;
             
             
             //__________________________________________________________________
@@ -365,15 +366,15 @@ namespace yocto
             const uvector_t     &fixed = cs.fixed;
             const array<double> &Cf    = cs.Cf;
             
-            std::cerr << "A=" << A << std::endl;
-            std::cerr << "B=" << B << std::endl;
+            //std::cerr << "A=" << A << std::endl;
+            //std::cerr << "B=" << B << std::endl;
             
-            std::cerr << "fixed=" << fixed << std::endl;
-            std::cerr << "Cf   =" << Cf    << std::endl;
+            //std::cerr << "fixed=" << fixed << std::endl;
+            //std::cerr << "Cf   =" << Cf    << std::endl;
             
             cs.fixed_topology();
-            std::cerr << "nu=" << cs.nu << std::endl;
-            std::cerr << "Nu=" << cs.Nu << std::endl;
+            //std::cerr << "nu=" << cs.nu << std::endl;
+            //std::cerr << "Nu=" << cs.Nu << std::endl;
             
             //__________________________________________________________________
             //
@@ -404,8 +405,8 @@ namespace yocto
             
             collect_combi(P, Lam, A, B);
             
-            std::cerr << "P="   << P << std::endl;
-            std::cerr << "Lam=" << Lam << std::endl;
+            ///std::cerr << "P="   << P << std::endl;
+            //std::cerr << "Lam=" << Lam << std::endl;
             
             
             //__________________________________________________________________
@@ -432,7 +433,7 @@ namespace yocto
                     }
                 }
             }
-            std::cerr << "Psi=" << Psi << std::endl;
+            //std::cerr << "Psi=" << Psi << std::endl;
             const size_t np = P.rows;
             matrix_t P2(np,np);
             mkl::mul_rtrn(P2, P, P);
@@ -447,7 +448,7 @@ namespace yocto
             //__________________________________________________________________
             matrix_t alpha(np,Mf);
             mkl::mul(alpha,P,Psi);
-            std::cerr << "alpha=" << alpha << std::endl;
+            //std::cerr << "alpha=" << alpha << std::endl;
             
             //__________________________________________________________________
             //
@@ -471,7 +472,7 @@ namespace yocto
                 //std::cerr << "X1=" << Xstar << std::endl;
                 mkl::add(Xstar,Cf);
             }
-            std::cerr << "Xstar=" << Xstar << std::endl;
+            //std::cerr << "Xstar=" << Xstar << std::endl;
             
             //__________________________________________________________________
             //
@@ -483,7 +484,7 @@ namespace yocto
             if(! SVD::orthonormal(beta,alpha) )
                 throw exception("Unable to find and orthornornmal basis");
             
-            std::cerr << "beta=" << beta << std::endl;
+            //std::cerr << "beta=" << beta << std::endl;
             
             //__________________________________________________________________
             //
@@ -493,7 +494,7 @@ namespace yocto
             //__________________________________________________________________
             matrix_t Theta(N,M);
             mkl::mul_rtrn(Theta,beta,Psi);
-            std::cerr << "Theta=" << Theta << std::endl;
+            //std::cerr << "Theta=" << Theta << std::endl;
             
             
             //__________________________________________________________________
@@ -544,14 +545,14 @@ namespace yocto
             // project it to find V
             //------------------------------------------------------------------
             RECOMPUTE_C();
-            std::cerr << "C0=" << C << std::endl;
+            //std::cerr << "C0=" << C << std::endl;
             
             //------------------------------------------------------------------
             // optimize for positive components
             //------------------------------------------------------------------
             (void)cgrad<double>::optimize(func, grad, V, numeric<double>::ftol, NULL);
             func(V);
-            std::cerr << "C1=" << C << std::endl;
+            //std::cerr << "C1=" << C << std::endl;
             
             //==================================================================
             //
