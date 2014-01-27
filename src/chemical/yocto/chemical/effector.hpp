@@ -46,7 +46,7 @@ namespace yocto
             const effector & operator[](const string &id) const;
             
             
-            //! sum of all the rates times the effector's factor
+            //! sum of all the rates times the effector's factor, ADDED to dSdt
             void collect(solution &dSdt, double t, double zeta, const solution &S, const solution &S_out) const;
             
             friend std::ostream & operator<<( std::ostream &, const effectors &);
