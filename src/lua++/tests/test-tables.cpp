@@ -20,6 +20,10 @@ YOCTO_UNIT_TEST_IMPL(tables)
     
     lua_rawset(L, -3);
     
+    lua_pushstring(L, "H+");
+    lua_pushnumber(L, 1e-4);
+    lua_rawset(L,-3);
+    
     lua_setglobal(L, "toto");
 
     
