@@ -184,7 +184,7 @@ namespace yocto
                 // call the function
                 //--------------------------------------------------------------
                 if( lua_pcall(L,4,1,0) )
-                    throw exception("%s: %s", name.c_str(), lua_tostring(L,-1) );
+                    throw exception("%s.call: %s", fn, lua_tostring(L,-1) );
                 
                 if( !lua_istable(L,-1) )
                     throw exception("effector '%s' doesn't return a table", name.c_str());
@@ -206,7 +206,6 @@ namespace yocto
                     
                     const string which = lua_tostring(L,-2);
                     const double rate  = lua_tonumber(L,-1);
-                    std::cerr << "\t modify " << which << " with " << rate << std::endl;
                     
                     component *cc = dSdt.lookup(which);
                     if(!cc)
