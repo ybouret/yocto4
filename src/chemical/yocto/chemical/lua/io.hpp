@@ -97,6 +97,15 @@ namespace yocto
           
             //! wrapper
             static void load( lua_State *L, effectors &eff, const char *name);
+            
+            
+            //__________________________________________________________________
+            //
+            // Helpers
+            //__________________________________________________________________
+            
+            static void push_solution( lua_State *L, const solution &S );
+            
         };
         
     }
