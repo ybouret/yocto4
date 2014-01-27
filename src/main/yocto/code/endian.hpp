@@ -93,6 +93,12 @@
 
 namespace yocto {
 	
+    
+    //__________________________________________________________________________
+    //
+    // big endian swapping
+    //__________________________________________________________________________
+    
 	inline uint16_t swap_be16( uint16_t x ) throw() {
 		return uint16_t(YOCTO_SWAP_BE16(x));
 	}
@@ -152,8 +158,42 @@ namespace yocto {
 		return alias.item;
 	}
 	
-	
-	
+    template <typename T>
+    inline void store_be( T x, void *addr ) throw()
+    {
+        assert(addr!=0);
+        typedef typename unsigned_int<sizeof(T)>::type uint_T;
+		union {
+			T      item;
+			uint_T bits;
+		} alias = { x };
+		const uint_T y = swap_be<uint_T>(alias.bits);
+        const char  *q = (const char *)&y;
+        char        *p = (char       *)addr;
+        for(size_t i=0;i<sizeof(T);++i)  { p[i] = q[i]; }
+    }
+    
+    template <typename T>
+    inline T query_be(const void *addr) throw()
+    {
+        assert(addr!=0);
+        typedef typename unsigned_int<sizeof(T)>::type uint_T;
+		union {
+			uint_T bits;
+            T      item;
+		} alias = { 0 };
+        const char *q = (const char*)addr;
+        char       *p = (char *) &alias.bits;
+        for(size_t i=0;i<sizeof(T);++i) { p[i] = q[i]; }
+        alias.bits = swap_be<uint_T>(alias.bits);
+        return alias.item;
+    }
+    
+    //__________________________________________________________________________
+    //
+    // little endian swapping
+    //__________________________________________________________________________
+    
 	template <class T> T swap_le( const T &x ) throw();
 	
 	template <>
