@@ -62,7 +62,7 @@ namespace
         void Compute( array<double> &dydt, double t, const array<double> &y )
         {
             S.load(y);
-            eff.collect(dSdt, t, 0.0, S, S_out);
+            eff.append(dSdt, t, 0.0, S, S_out);
             cs.load_C(y);
             dSdt.save(cs.dC);
             cs.legalize_dC(t);
@@ -145,7 +145,7 @@ YOCTO_UNIT_TEST_IMPL(diff)
     chemical::solution ds(lib);
     
     eff["NaOH"].factor = 1e-3;
-    eff.collect(ds, 0, 0, s, s);
+    eff.append(ds, 0, 0, s, s);
     
     std::cerr << "ds=" << ds << std::endl;
     

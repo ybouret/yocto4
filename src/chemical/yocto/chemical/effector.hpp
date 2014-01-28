@@ -20,7 +20,7 @@ namespace yocto
             
             typedef intr_ptr<string,effector> ptr;
             
-            //! compute the rate, without factor
+            //! compute the rate, WITHOUT factor
             virtual void call(solution &dSdt, double t, double zeta, const solution &S, const solution &S_out ) const = 0;
             
             
@@ -47,7 +47,7 @@ namespace yocto
             
             
             //! sum of all the rates times the effector's factor, ADDED to dSdt
-            void collect(solution &dSdt, double t, double zeta, const solution &S, const solution &S_out) const;
+            void append(solution &dSdt, double t, double zeta, const solution &S, const solution &S_out) const;
             
             friend std::ostream & operator<<( std::ostream &, const effectors &);
             

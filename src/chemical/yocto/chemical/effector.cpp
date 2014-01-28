@@ -29,7 +29,7 @@ namespace yocto
         }
         
         
-        void effectors:: collect( solution &dSdt, double t, double zeta, const solution &S, const solution &S_out ) const
+        void effectors:: append( solution &dSdt, double t, double zeta, const solution &S, const solution &S_out ) const
         {
             assert(dSdt.components==S.components);
             solution rate(S);
@@ -52,7 +52,7 @@ namespace yocto
                 {
                     const component &p = (*j);
                     component       &q = (*k);
-                    q.concentration += fac * p.concentration;
+                    q.concentration   += fac * p.concentration;
                 }
             }
         }
