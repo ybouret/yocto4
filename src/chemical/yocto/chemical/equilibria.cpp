@@ -397,11 +397,24 @@ namespace yocto
             for(size_t i=C.size();i>0;--i) C[i] = y[i];
         }
         
+        void equilibria:: load_dC( const array<double> &dy ) throw()
+        {
+            assert(dC.size()<=dy.size());
+            for(size_t i=dC.size();i>0;--i) dC[i] = dy[i];
+        }
+        
         void equilibria:: save_C( array<double> &y ) const throw()
         {
             assert(C.size()<=y.size());
             for(size_t i=C.size();i>0;--i) y[i] = C[i];
         }
+        
+        void equilibria:: save_dC( array<double> &dy ) const throw()
+        {
+            assert(dC.size()<=dy.size());
+            for(size_t i=dC.size();i>0;--i) dy[i] = dC[i];
+        }
+
         
         
         void equilibria:: compute_Chi(matrix_t &Chi, double t)

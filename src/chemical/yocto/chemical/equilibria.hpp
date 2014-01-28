@@ -103,8 +103,15 @@ namespace yocto
             //! Copy first C.size() variables from y, y.size() >= C.size()
             void load_C( const array<double> &y ) throw();
             
+            //! Copy first dC.size() variables from dy, dy.size() >= dC.size()
+            void load_dC( const array<double> &dy ) throw();
+
+            
             //! Copy first C.size() variables into y, y.size() >= C.size()
             void save_C( array<double> &y ) const throw();
+            
+            //! Copy first dC.size() variables into dy, dy.size() >= dC.size()
+            void save_dC( array<double> &dy ) const throw();
             
             //! Reduce dC to a legal step
             /**
