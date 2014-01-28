@@ -33,7 +33,6 @@ namespace yocto
         {
             assert(dSdt.components==S.components);
             solution rate(S);
-            dSdt.ldz();
             
             //__________________________________________________________________
             //

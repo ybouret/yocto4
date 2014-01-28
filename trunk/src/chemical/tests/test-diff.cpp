@@ -62,6 +62,7 @@ namespace
         void Compute( array<double> &dydt, double t, const array<double> &y )
         {
             S.load(y);
+            dSdt.ldz();
             eff.append(dSdt, t, 0.0, S, S_out);
             cs.load_C(y);
             dSdt.save(cs.dC);
