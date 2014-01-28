@@ -2,6 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/code/bswap.hpp"
+#include "yocto/exception.hpp"
 
 //#include <iostream>
 
@@ -19,13 +20,46 @@ namespace yocto {
         
         template <>
         zfind<real_t>:: zfind( real_t default_xerr ) throw() :
-        xerr( default_xerr )
+        xerr( default_xerr ),
+        growth(1.6180339887),
+        trials(50)
         {
             
         }
         
-		template <>
-		void zfind<real_t>::run( numeric<real_t>::function &func, triplet<real_t> &x, triplet<real_t> &f) const {
+        
+        template <>
+        bool zfind<real_t>::lookup(numeric<real_t>::function &func,
+                                   triplet<real_t> &x,
+                                   triplet<real_t> &f) const
+		{
+            assert(growth>0);
+            f.a = x.a;
+            f.c = x.c;
+            
+            size_t count = 0;
+            while( f.a*f.c > 0 )
+            {
+                if(count++>trials)
+                    return false;
+                if( Fabs(f.a) < Fabs(f.c) )
+                {
+                    f.a = func( x.a += growth * (x.a-x.c) );
+                }
+                else
+                {
+                    f.c = func( x.c += growth * (x.c-x.a) );
+                }
+            }
+            
+            return true;
+        }
+        
+        
+        template <>
+		real_t zfind<real_t>::run(numeric<real_t>::function &func,
+                                triplet<real_t>           &x,
+                                triplet<real_t>           &f) const {
 			assert(f.a*f.c<=0.0);
 			assert(this->xerr>=0.0);
             
@@ -237,17 +271,21 @@ namespace yocto {
 				x.b = x.c;
 			}
             
+            return x.b;
 		}
         
         
         
 		template <>
-		real_t zfind<real_t>::get(  numeric<real_t>::function &func, real_t xlo, real_t xhi) const
+		real_t zfind<real_t>::operator()(numeric<real_t>::function &func,
+                                         const real_t xa,
+                                         const real_t xc) const
 		{
-			triplet<real_t> x = { xlo,       REAL(0.0), xhi       };
-			triplet<real_t> f = { func(xlo), REAL(0.0), func(xhi) };
-			zfind<real_t>::run( func, x,f );
-			return x.b;
+            triplet<real_t> x = { xa, REAL(0.0), xc };
+            triplet<real_t> f = {0,0,0};
+            if(!lookup(func, x, f))
+                throw exception("zfind: unable to locate zero");
+            return run(func,x,f);
 		}
         
         

@@ -13,7 +13,8 @@ namespace yocto {
 	
 	namespace math {
 		
-		real_t qerfc( real_t x) throw() {
+		real_t qerfc( real_t x) throw()
+        {
 			const real_t z  = Fabs(x);
 			const real_t t  = REAL(1.0)/(REAL(1.0)+REAL(0.5)*z);
 			const real_t ans= t*Exp(-z*z-REAL(1.26551223)+t*(REAL(1.00002368)+t*(REAL(0.37409196)+t*(REAL(0.09678418)+
@@ -22,7 +23,8 @@ namespace yocto {
 			return x >= REAL(0.0) ? ans : REAL(2.0)-ans;
 		}
 		
-		real_t qerf( real_t x) throw() {
+		real_t qerf( real_t x) throw()
+        {
 			return REAL(1.0)-qerfc( x );
 		}
 		
@@ -45,21 +47,30 @@ namespace yocto {
 			};
 		}
 		
-		real_t iqerf( real_t p ) throw() {
+		real_t iqerf( real_t p ) throw()
+        {
 			assert(p>-1);
 			assert(p<1);
 			const zqerf_type          zqerf_args = { p };
 			numeric<real_t>::function zqerf( &zqerf_args, & zqerf_type::compute_diff_erf );
 			real_t x_lo = -1;
-			while( zqerf(x_lo) >= 0) x_lo += x_lo;
-			real_t x_hi = 1;
-			while( zqerf(x_hi) <= 0) x_hi += x_hi;
-			
-			const zfind<real_t>        solve( max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) );
-			return solve( zqerf, x_lo, x_hi );
-		}
+			while( zqerf(x_lo) >= 0)
+            {
+                x_lo += x_lo;
+            }
+            real_t x_hi = 1;
+            while( zqerf(x_hi) <= 0)
+            {
+                x_hi += x_hi;
+            }
+            
+            
+            const zfind<real_t> solve( max_of<real_t>( REAL(1.0e-5), numeric<real_t>::ftol ) );
+            return solve( zqerf, x_lo, x_hi );
+        }
         
-        real_t iqerfc( real_t p ) throw() {
+        real_t iqerfc( real_t p ) throw()
+        {
 			assert(p>0);
 			assert(p<2);
 			const zqerf_type          zqerfc_args = { p };
