@@ -54,7 +54,7 @@ YOCTO_UNIT_TEST_IMPL(lua)
     }
     
     
-    eff.collect(ds, 0, 0, s, S_out);
+    eff.append(ds, 0, 0, s, S_out);
     std::cerr << "ds=" << ds << std::endl;
     
 }
