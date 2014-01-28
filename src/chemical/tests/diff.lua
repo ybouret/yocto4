@@ -25,17 +25,14 @@ ini =
 
 effectors =
 {
-    {
-        "NaOH",           -- function name
-        { },              -- input components
-        { "Na+", "HO-"}   -- output components
-    }
+    "NaOH"
 };
 
 -- one function for effector
-function NaOH(t,zeta)
-
+function NaOH(t,zeta,S,S_out)
 -- print( "NaOH@t=" .. t .. ", zeta=" .. zeta );
-return 1,1;
-
+ans = {}
+ans["Na+"] = 1;
+ans["HO-"] = 1;
+return ans;
 end
