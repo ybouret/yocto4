@@ -34,8 +34,8 @@ namespace yocto {
                                    triplet<real_t> &f) const
 		{
             assert(growth>0);
-            f.a = x.a;
-            f.c = x.c;
+            f.a = func(x.a);
+            f.c = func(x.c);
             
             size_t count = 0;
             while( f.a*f.c > 0 )
@@ -52,6 +52,7 @@ namespace yocto {
                 }
             }
             
+            //std::cerr << "zfind: between f(" << x.a << ")=" << f.a << " and f(" << x.c << ")=" << f.c << std::endl;
             return true;
         }
         
