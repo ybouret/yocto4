@@ -20,7 +20,7 @@ namespace yocto
             
             typedef intr_ptr<string,effector> ptr;
             
-            //! compute the rate, WITHOUT factor
+            //! compute the appropriate rates, WITHOUT factor
             virtual void call(solution &dSdt, double t, double zeta, const solution &S, const solution &S_out ) const = 0;
             
             
