@@ -22,13 +22,10 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // We start from a valid composition
+            // We don't necessarilyt start from a valid composition
+            // a differential equation step can try a negative concentration
             //__________________________________________________________________
             fixed_C();
-            
-#if !defined(NDEBUG)
-            for(size_t i=M;i>0;--i) { assert(C[i]>=0); }
-#endif
 
             if(N>0)
             {
