@@ -3,7 +3,7 @@ CREATE := ../src/share/create.sh
 all:
 
 clean:
-	@echo "-- removing temporary files" && rm -f *.bin *.dat *.silo *.vtk
+	@echo "-- removing temporary files" && rm -f *.bin *.dat *.silo *.vtk *.xyz
 
 veryclean: clean
 	@echo "-- removing out of sources builds" && cd forge && touch targets && ( cat targets | xargs rm -rf ) && rm -f targets
