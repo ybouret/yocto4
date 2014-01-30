@@ -13,6 +13,7 @@ namespace yocto
     namespace gems
     {
         
+        //! properties, accessible by type or name
         class properties : public object, public counted, public vslot
         {
         public:
@@ -22,12 +23,13 @@ namespace yocto
             virtual ~properties() throw();
             explicit properties(word_t t, const string &n);
             
-            const word_t & key() const throw();
-            const string & subkey() const throw();
+            const word_t & key() const throw();       //!< primary   key: the type
+            const string & subkey() const throw();    //!< secondary key: the name
             
             static void check_pointer(const void *addr, const string &id, const char *label);
             static void check_pointer(const void *addr, word_t        id, const char *label);
             
+            //! prototype to store properties pointer
             template <typename T>
             class table : public dual_set<word_t, string, typename T::pointer,hashing::sfh,allocator>
             {

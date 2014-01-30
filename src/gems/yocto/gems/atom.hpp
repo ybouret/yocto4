@@ -44,7 +44,6 @@ namespace yocto
             v3d<T>                a;
             const T               m; //!< mass
             const T               w; //!< 1/mass
-            const residue<T>     &parent;
             
             explicit atom( const residue<T> &from, word_t u, word_t t) throw();
             virtual ~atom() throw();
@@ -68,6 +67,8 @@ namespace yocto
             
                        
         private:
+            const residue<T> *pp;
+            
             atom& operator=(const atom &);
             atom(const atom &other) throw();
             
