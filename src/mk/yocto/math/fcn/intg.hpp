@@ -17,9 +17,9 @@ namespace yocto
             class range
             {
             public:
-                const T a,b;
+                const T a,b,eps;
                 range *next;
-                range(T,T) throw();
+                range(T,T,T) throw();
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(range);
@@ -42,7 +42,7 @@ namespace yocto
             explicit integrator() throw();
             virtual ~integrator() throw();
             
-            range *query(T,T);
+            range *create(T,T,T);
             void   store(range *r) throw();
             
             
