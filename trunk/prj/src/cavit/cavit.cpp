@@ -1,5 +1,5 @@
 #include "yocto/math/fcn/intg.hpp"
-#include "yocto/fs/vfs.hpp"
+#include "yocto/fs/local-fs.hpp"
 #include "yocto/math/v2d.hpp"
 #include "yocto/ptr/shared.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -59,8 +59,11 @@ public:
         explicit plist() throw() {}
         virtual ~plist() throw()
         {
-            while(size) object::release1<pnode>( pop_back() );
-                }
+            while(size)
+            {
+                object::release1<pnode>( pop_back() );
+            }
+        }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(plist);
@@ -128,8 +131,11 @@ public:
                 c.content = is_liquid;
             }
         }
-        while(bubble.size) liquid.push_back(bubble.pop_back());
-            }
+        while(bubble.size)
+        {
+            liquid.push_back(bubble.pop_back());
+        }
+    }
     
     cavity::plist liquid;
     cavity::plist bubble;
@@ -177,15 +183,41 @@ public:
         return node;
     }
     
-    
-    void run1( const string &output )
+    void save_xyz( const string &config, bool append) const
     {
+        ios::ocstream cf(config,append);
+        cf("%u\n", unsigned(size()));
+        cf("t=%g\n", t_last);
+        for(size_t i=1;i<=size();++i)
+        {
+            const cavity &cv = *(*this)[i];
+            const char   *id = "";
+            switch(cv.content)
+            {
+                case is_liquid: id = "Na"; break;
+                case is_gaz:    id = "Cl"; break;
+            }
+            cf("%s %e %e 0\n", id, cv.r.x, cv.r.y);
+        }
+        
+    }
+    
+    void run1( const string &rootname )
+    {
+        //vfs &fs = local_fs::instance();
+        const string output = rootname + ".dat";
+        const string config = rootname + ".xyz";
         reset();
         ios::ocstream fp(output,false);
+        fp("0 0\n");
+        save_xyz(config, false);
         while( find_next() )
         {
             fp("%e %e\n", t_last, double(bubble.size)/size());
+            save_xyz(config, true);
         }
+        
+        
     }
     
 private:
@@ -232,11 +264,11 @@ int main(int argc, char *argv[])
     try
     {
         
-        device D(12,15);
+        device D(20,30);
         std::cerr << "#liquid=" << D.liquid.size << std::endl;
-        for(int iter=1;iter<=8;++iter)
+        for(int iter=1;iter<=1;++iter)
         {
-            D.run1( vformat("run%d.dat", iter));
+            D.run1( vformat("run%d", iter));
         }
         
         return 0;
