@@ -14,7 +14,7 @@ namespace yocto {
 	namespace math {
         
         template <typename T>
-        struct intg
+        struct integration
         {
             typedef functor<void,TL3(T,T&,T&)> boundaries;
         };
@@ -24,11 +24,11 @@ namespace yocto {
         T integrate( T a, T b, typename  numeric<T>::function &F, T ftol );
         
         template <class T>
-		T integrate(T                               xmin,
-                    T                               xmax,
-                    typename intg<T>::boundaries   &getYs,
-                    typename numeric<T>::function2 &func2,
-                    T                               ftol
+		T integrate(T                                      xmin,
+                    T                                      xmax,
+                    typename integration<T>::boundaries   &getYs,
+                    typename numeric<T>::function2        &func2,
+                    T                                      ftol
                     );
         
     }
