@@ -47,7 +47,7 @@ YOCTO_UNIT_TEST_IMPL(intg)
     std::cerr << "2D integral" << std::endl;
     {
         numeric<double>::function2 func2(  cfunctor2( F2<double> )    );
-        intg<double>::boundaries   bounds( cfunctor3( Bounds<double>) );
+        integration<double>::boundaries   bounds( cfunctor3( Bounds<double>) );
         const double ans = integrate<double>(-1, 1, bounds, func2, 1e-5);
         std::cerr << "circle: " << ans << std::endl;
     }

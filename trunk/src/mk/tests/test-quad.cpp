@@ -1,0 +1,36 @@
+#include "yocto/utest/run.hpp"
+#include "yocto/math/fcn/intg.hpp"
+
+using namespace yocto;
+using namespace math;
+
+namespace
+{
+    struct  functions
+    {
+        size_t count;
+        
+        double _tst( double x )
+        {
+            ++count;
+            return Cos(x);
+        }
+    
+    };
+}
+
+YOCTO_UNIT_TEST_IMPL(integrator)
+{
+    functions fn;
+    
+    numeric<double>::function F( &fn, & functions::_tst );
+    
+    fn.count = 0;
+    double  s=0;
+    bool    flag = integrator<double>::quad(s, 0, numeric<double>::pi, F, 1e-7);
+    std::cerr << "success = " << flag << std::endl;
+    std::cerr << "counts  = " << fn.count << std::endl;
+    std::cerr << "ans     = " << s << std::endl;
+}
+YOCTO_UNIT_TEST_DONE()
+

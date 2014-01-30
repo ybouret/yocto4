@@ -99,9 +99,9 @@ ost = st
             class intg2proxy
             {
             public:
-                inline intg2proxy(intg<real_t>::boundaries     &user_getYs,
-                                  numeric<real_t>::function2   &user_func2,
-                                  real_t                        user_ftol) :
+                inline intg2proxy(integration<real_t>::boundaries &user_getYs,
+                                  numeric<real_t>::function2      &user_func2,
+                                  real_t                           user_ftol) :
                 getYs(user_getYs),
                 func2(user_func2),
                 ftol( user_ftol )
@@ -109,9 +109,9 @@ ost = st
                     
                 }
                 
-                intg<real_t>::boundaries    &getYs;
-                numeric<real_t>::function2  &func2;
-                const real_t                 ftol;
+                integration<real_t>::boundaries  &getYs;
+                numeric<real_t>::function2       &func2;
+                const real_t                      ftol;
                 
                 inline real_t slice( real_t x )
                 {
@@ -129,11 +129,11 @@ ost = st
         }
         
         template <>
-		real_t integrate(real_t                        xmin,
-                         real_t                        xmax,
-                         intg<real_t>::boundaries     &getYs,
-                         numeric<real_t>::function2   &func2,
-                         real_t                        ftol
+		real_t integrate(real_t                           xmin,
+                         real_t                           xmax,
+                         integration<real_t>::boundaries &getYs,
+                         numeric<real_t>::function2      &func2,
+                         real_t                           ftol
                          )
         {
             intg2proxy                intg2( getYs, func2, ftol);
