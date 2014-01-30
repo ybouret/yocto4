@@ -14,7 +14,7 @@ namespace yocto
        
         template <>
         atom<real_t>:: atom( const residue<real_t> &from, word_t u, word_t t) throw() :
-        identifier(u,t), r(),v(),a(),m(0),w(0), parent(from)
+        identifier(u,t), r(),v(),a(),m(0),w(0), pp(&from)
         {
         }
         

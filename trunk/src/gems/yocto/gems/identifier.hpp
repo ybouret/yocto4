@@ -13,8 +13,8 @@ namespace yocto
         class identifier : public virtual object, public counted
         {
         public:
-            const word_t uuid;
-            const word_t type;
+            const word_t uuid; //!< the unique user's ID.
+            const word_t type; //!< the type associated to the uuid.
             
             explicit identifier( word_t u, word_t t) throw();
             virtual ~identifier() throw();
