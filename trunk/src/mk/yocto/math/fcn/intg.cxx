@@ -63,18 +63,6 @@ namespace yocto
         
         namespace
         {
-#if 0
-            static inline real_t pw_quad( numeric<real_t>::function &F, const real_t X, const real_t D, const uint32_t n )
-            {
-                assert(is_a_power_of_two(n));
-                if(n>1) {
-                    const uint32_t h = n>>1; assert(n-h==h);
-                    return pw_quad(F,X,D,h) + pw_quad( F, X + (h*D), D, h );
-                } else {
-                    return F(X);
-                }
-            }
-#endif
             
             template <size_t n>
             inline real_t dyadic_sum( numeric<real_t>::function &F, const real_t X, const real_t D )
@@ -112,8 +100,6 @@ namespace yocto
 #define Y_INTG_PROLOG(N)  \
 st = trpz<N>(st,a,w,F); \
 s = ( REAL(4.0) * st - old_st )/REAL(3.0)
-        
-        //if(N>6) std::cerr << "s" << N << "[" << a << ":" << b << "]=" << s << std::endl
         
 #define Y_INTG_EPILOG()  \
 old_st  = st;            \
@@ -211,7 +197,7 @@ Y_INTG_EPILOG()
                     const real_t b   = rng->b;
                     const real_t eps = rng->eps;
                     pool.store(rng);
-                    std::cerr << "\tintg #" << stk.size << " [" << a << ":" << b << "]/eps=" << eps << std::endl;
+                    //std::cerr << "\tintg #" << stk.size << " [" << a << ":" << b << "]/eps=" << eps << std::endl;
                     if( quad(sum, a, b, F, eps) )
                     {
                         //______________________________________________________

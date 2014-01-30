@@ -28,8 +28,8 @@ YOCTO_UNIT_TEST_IMPL(integrator)
     numeric<double>::function F( &fn, & functions::_tst );
     integrator<double>        intg;
     
-    fn.count = 0;
-    double  s=0;
+    fn.count  = 0;
+    double  s = 0;
     bool    flag = integrator<double>::quad(s, 0, numeric<double>::pi, F, 1e-7);
     std::cerr << "success = " << flag << std::endl;
     std::cerr << "counts  = " << fn.count << std::endl;
