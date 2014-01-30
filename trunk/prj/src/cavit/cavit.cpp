@@ -6,6 +6,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -37,7 +38,7 @@ public:
     {}
     
     virtual ~cavity() throw() {}
-
+    
     class pnode
     {
     public:
@@ -59,7 +60,7 @@ public:
         virtual ~plist() throw()
         {
             while(size) object::release1<pnode>( pop_back() );
-        }
+                }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(plist);
@@ -91,6 +92,7 @@ public:
     ran(),
     intg()
     {
+        ran.wseed();
         reserve(nx*ny);
         for(size_t i=0;i<nx;++i)
         {
@@ -127,7 +129,7 @@ public:
             }
         }
         while(bubble.size) liquid.push_back(bubble.pop_back());
-    }
+            }
     
     cavity::plist liquid;
     cavity::plist bubble;
@@ -141,27 +143,56 @@ public:
         const double delta = -Log(xi);
         double       tau = 0;
         
-        size_t count = 0;
+        // compute next time !
         while(true)
         {
-            const double num = delta - Lambda(tau);
-            const double den = lambda(tau);
-            const double dtau = num/den;
+            const double num = delta - Lambda(t_last+tau);
+            const double lam = lambda(t_last+tau);
+            const double dtau = num/lam;
             tau+=dtau;
-            std::cerr << "tau=" << tau << "; dtau=" <<dtau << std::endl;
-            
-            if(++count>10)
+            if( fabs(lam*dtau)<1e-7)
                 break;
         }
         
-        return 0;
+        // find the cavity
+        t_last += tau;
+        const double level = ran.get<double>() * lambda(t_last);
+        
+        // find the guy
+        cavity::pnode *node = liquid.head;
+        double         curr_lam = 0;
+        while(node->next)
+        {
+            const double next_lam = curr_lam + node->cv.lambda;
+            if( level >= curr_lam && level < next_lam )
+                break;
+            curr_lam = next_lam;
+            node = node->next;
+        }
+        
+        node->cv.content = is_gaz;
+        node->cv.t_boum  = t_last;
+        bubble.push_back( liquid.unlink(node) );
+        
+        return node;
+    }
+    
+    
+    void run1( const string &output )
+    {
+        reset();
+        ios::ocstream fp(output,false);
+        while( find_next() )
+        {
+            fp("%e %e\n", t_last, double(bubble.size)/size());
+        }
     }
     
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(device);
     numeric<double>::function lambda;
     numeric<double>::function Lambda;
-
+    
     rand32_kiss               ran;
     integrator<double>        intg;
     
@@ -187,7 +218,7 @@ private:
     {
         return intg(t_last,t, lambda, 1e-7 );
     }
-
+    
     
     
 };
@@ -203,8 +234,10 @@ int main(int argc, char *argv[])
         
         device D(12,15);
         std::cerr << "#liquid=" << D.liquid.size << std::endl;
-        
-        D.find_next();
+        for(int iter=1;iter<=8;++iter)
+        {
+            D.run1( vformat("run%d.dat", iter));
+        }
         
         return 0;
     }
