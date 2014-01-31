@@ -21,7 +21,7 @@ namespace
     };
 }
 
-YOCTO_UNIT_TEST_IMPL(integrator)
+YOCTO_UNIT_TEST_IMPL(intg)
 {
     functions fn;
     
