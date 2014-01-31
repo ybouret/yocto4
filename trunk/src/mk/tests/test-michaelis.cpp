@@ -41,10 +41,10 @@ namespace
         {
             const double & S  = y[1];
             const double & E  = y[2];
-            const double & ES = y[3];
+            const double & _ES = y[3];
             const double & P  = y[4];
-            const double E0 = E + ES;
-            const double S0 = S + ES + P;
+            const double E0 = E + _ES;
+            const double S0 = S + _ES + P;
             
             const double a  = k1*(1+beta);
             const double b  = k2+beta*(k2+k2*(E0-S0));
@@ -63,12 +63,12 @@ namespace
         {
             const double & S  = y[1];
             const double & E  = y[2];
-            const double & ES = y[3];
+            const double & _ES = y[3];
             const double & P  = y[4];
             
             const double v1 = k1 * S * E;
-            const double v2 = k2 * ES;
-            const double v3 = k3 * ES;
+            const double v2 = k2 * _ES;
+            const double v3 = k3 * _ES;
             const double v4 = k4 * P * E;
             
             double & dSdt  = dydx[1];
@@ -121,12 +121,12 @@ YOCTO_UNIT_TEST_IMPL(michaelis)
     
     double &S  = y[1];
     double &E  = y[2];
-    double &ES = y[3];
+    double &_ES = y[3];
     double &P  = y[4];
     
     S  = 1;
     E  = 0.1 + 0.5*(1+alea<double>());
-    ES = 0;
+    _ES = 0;
     P  = 0;
     
     std::cerr << "Steady State:" << std::endl;
