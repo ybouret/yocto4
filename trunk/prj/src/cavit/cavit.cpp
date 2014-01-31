@@ -1,4 +1,3 @@
-#include "yocto/math/fcn/intg.hpp"
 #include "yocto/fs/local-fs.hpp"
 #include "yocto/math/v2d.hpp"
 #include "yocto/ptr/shared.hpp"
@@ -8,11 +7,13 @@
 #include "yocto/exception.hpp"
 #include "yocto/ios/ocstream.hpp"
 
+#include "yocto/math/types.hpp"
+#include "yocto/math/ode/explicit/driver-ck.hpp"
+
 using namespace yocto;
 using namespace math;
 
 typedef v2d<double> vtx_t;
-
 
 enum content_t
 {
@@ -20,24 +21,50 @@ enum content_t
     is_gaz
 };
 
+
 class cavity : public object
 {
 public:
-    vtx_t     r;
-    content_t content;
-    double    lambda;
-    double    t_boum;
+    const size_t i;
+    const size_t j;
+    vtx_t        r;
+    content_t    content;
+    double       lambda;
+    double       t_boum;
+    size_t       links;
+    cavity      *link[8];
     
     typedef shared_ptr<cavity> pointer;
     
-    explicit cavity() throw() :
+    explicit cavity(size_t ii, size_t jj) throw() :
+    i(ii),
+    j(jj),
     r(),
     content(is_liquid),
     lambda(1),
-    t_boum(-1)
-    {}
+    t_boum(-1),
+    links(0),
+    link()
+    {
+        for(size_t i=0;i<sizeof(link)/sizeof(link[0]);++i)
+        {
+            link[i] = 0;
+        }
+    }
     
     virtual ~cavity() throw() {}
+    
+    void attach( cavity &oc ) throw()
+    {
+        assert(links<sizeof(link)/sizeof(link[0]));
+#if !defined(NDEBUG)
+        for(size_t i=0;i<links;++i)
+        {
+            assert( link[i] != &oc );
+        }
+#endif
+        link[links++] = &oc;
+    }
     
     class pnode
     {
@@ -80,33 +107,124 @@ private:
 class device : public vector< cavity::pointer >
 {
 public:
-    const size_t nx;
-    const size_t ny;
-    double       t_last;
+    const size_t                          nx;
+    const size_t                          ny;
+    uniform_generator<double,rand32_kiss> ran;
+    double                                t_last;
+    cavity::plist                         liquid;
+    cavity::plist                         bubble;
+    numeric<double>::function             lambda;
+    numeric<double>::function             Lambda;
+    
+private:
+    ode::Field<double>::Equation          eqdiff;
+    vector<double>                        Y;
+    ode::driverCK<double>::type           odeint;
+    
+public:
     
     explicit device( size_t Nx, size_t Ny ) :
     nx(Nx),
     ny(Ny),
+    ran(),
     t_last(0),
     liquid(),
     bubble(),
     lambda( this, & device::compute_lambda),
     Lambda( this, & device::compute_Lambda),
-    ran(),
-    intg()
+    eqdiff( this, & device::lambdaODE     ),
+    Y(1,0.0),
+    odeint(1e-7)
     {
-        ran.wseed();
+        //-- memory
         reserve(nx*ny);
+        
+        //-- storage
         for(size_t i=0;i<nx;++i)
         {
             for(size_t j=0;j<ny;++j)
             {
-                cavity               *cv = new cavity();
+                cavity               *cv = new cavity(i,j);
                 const cavity::pointer p( cv );
                 push_back(p);
                 liquid.push_back( new (object::acquire1<cavity::pnode>()) cavity::pnode(*cv) );
             }
         }
+        odeint.start(1);
+        
+        //-- link neighbors
+        for(size_t k=size();k>0;--k)
+        {
+            cavity &cv = *(*this)[k];
+            assert(0==cv.links);
+            const size_t i=cv.i;
+            const size_t j=cv.j;
+            
+            const size_t im=i-1;
+            const size_t ip=i+1;
+            const size_t jm=j-1;
+            const size_t jp=j+1;
+            
+            for(size_t l=size();l>0;--l)
+            {
+                if( l != k )
+                {
+                    cavity &oc = *(*this)[l];
+                    // on the left side
+                    if( im == oc.i )
+                    {
+                        if(j==oc.j)
+                        {
+                            // left
+                            cv.attach(oc);
+                            continue;
+                        }
+                    }
+                    
+                    // on the right size
+                    if( ip == oc.i )
+                    {
+                        if(j==oc.j)
+                        {
+                            //right
+                            cv.attach(oc);
+                            continue;
+                        }
+                    }
+                    
+                    // on the below side
+                    if( jm == oc.j )
+                    {
+                        if(i==oc.i)
+                        {
+                            // below
+                            cv.attach(oc);
+                            continue;
+                        }
+                    }
+                    
+                    // on the above side
+                    if( jp == oc.j )
+                    {
+                        if(i==oc.i)
+                        {
+                            // above
+                            cv.attach(oc);
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+        
+#if 0
+        //-- display
+        for(size_t k=1;k<=size();++k)
+        {
+            const cavity &cv = *(*this)[k];
+            std::cerr << "@(" << cv.i << "," << cv.j << "): #" << cv.links << std::endl;
+        }
+#endif
         reset();
     }
     
@@ -137,23 +255,21 @@ public:
         }
     }
     
-    cavity::plist liquid;
-    cavity::plist bubble;
     
     cavity::pnode *find_next()
     {
         if(liquid.size<=0)
             return NULL;
         
-        const double xi    = ran.get<double>();
+        const double xi    =  ran();
         const double delta = -Log(xi);
         double       tau = 0;
         
         // compute next time !
         while(true)
         {
-            const double num = delta - Lambda(t_last+tau);
-            const double lam = lambda(t_last+tau);
+            const double num  = delta - Lambda(t_last+tau);
+            const double lam  = lambda(t_last+tau);
             const double dtau = num/lam;
             tau+=dtau;
             if( fabs(lam*dtau)<1e-7)
@@ -162,7 +278,7 @@ public:
         
         // find the cavity
         t_last += tau;
-        const double level = ran.get<double>() * lambda(t_last);
+        const double level = ran() * lambda(t_last);
         
         // find the guy
         cavity::pnode *node = liquid.head;
@@ -210,11 +326,11 @@ public:
         reset();
         ios::ocstream fp(output,false);
         fp("0 0\n");
-        save_xyz(config, false);
+        //save_xyz(config, false);
         while( find_next() )
         {
             fp("%e %e\n", t_last, double(bubble.size)/size());
-            save_xyz(config, true);
+            //save_xyz(config, true);
         }
         
         
@@ -222,13 +338,8 @@ public:
     
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(device);
-    numeric<double>::function lambda;
-    numeric<double>::function Lambda;
     
-    rand32_kiss               ran;
-    integrator<double>        intg;
-    
-    double compute_lambda(double t)
+    inline double compute_lambda(double t)
     {
         double sum = 0;
         assert(liquid.size>0);
@@ -236,19 +347,28 @@ private:
         {
             // constant part
             cavity &cv = node->cv;
-            cv.lambda = 1;
+            cv.lambda  = 1;
             
             sum += cv.lambda;
         }
+        
         if(sum<=0)
             throw exception("invalid lambda");
         
         return sum;
     }
     
-    double compute_Lambda(double t)
+    inline void lambdaODE( array<double> &dYdt, double t, const array<double> & )
     {
-        return intg(t_last,t, lambda, 1e-7 );
+        dYdt[1] = compute_lambda(t);
+    }
+    
+    inline double compute_Lambda(double t)
+    {
+        double ctrl = 1e-4;
+        Y[1] = 0;
+        odeint.operator()(eqdiff, Y, t_last, t, ctrl, 0);
+        return Y[1];
     }
     
     
@@ -264,9 +384,9 @@ int main(int argc, char *argv[])
     try
     {
         
-        device D(20,30);
+        device D(5,6);
         std::cerr << "#liquid=" << D.liquid.size << std::endl;
-        for(int iter=1;iter<=1;++iter)
+        for(int iter=1;iter<=4;++iter)
         {
             D.run1( vformat("run%d", iter));
         }
