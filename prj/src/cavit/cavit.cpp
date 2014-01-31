@@ -10,6 +10,10 @@
 #include "yocto/math/types.hpp"
 #include "yocto/math/ode/explicit/driver-ck.hpp"
 
+#include "yocto/lua/lua-state.hpp"
+#include "yocto/lua/lua-config.hpp"
+#include "yocto/lua/lua-maths.hpp"
+
 using namespace yocto;
 using namespace math;
 
@@ -120,10 +124,12 @@ private:
     ode::Field<double>::Equation          eqdiff;
     vector<double>                        Y;
     ode::driverCK<double>::type           odeint;
+    lua_State                            *L;
+    Lua::Function<double>                 lambda0;
     
 public:
     
-    explicit device( size_t Nx, size_t Ny ) :
+    explicit device( size_t Nx, size_t Ny, lua_State *luaVM ) :
     nx(Nx),
     ny(Ny),
     ran(),
@@ -134,7 +140,9 @@ public:
     Lambda( this, & device::compute_Lambda),
     eqdiff( this, & device::lambdaODE     ),
     Y(1,0.0),
-    odeint(1e-7)
+    odeint(1e-7),
+    L(luaVM),
+    lambda0(L,"lambda0")
     {
         //-- memory
         reserve(nx*ny);
@@ -343,11 +351,12 @@ private:
     {
         double sum = 0;
         assert(liquid.size>0);
+        const double lam0 = lambda0(t); assert(lam0>0);
         for( cavity::pnode *node = liquid.head; node; node=node->next )
         {
             // constant part
             cavity &cv = node->cv;
-            cv.lambda  = 1;
+            cv.lambda  = lam0;
             
             sum += cv.lambda;
         }
@@ -383,8 +392,13 @@ int main(int argc, char *argv[])
     
     try
     {
+        if(argc<=1)
+            throw exception("Usage: %s config.lua",prog);
+        Lua::State VM;
+        lua_State *L = VM();
+        Lua::Config::DoFile(L, argv[1]);
         
-        device D(5,6);
+        device D(20,30,L);
         std::cerr << "#liquid=" << D.liquid.size << std::endl;
         for(int iter=1;iter<=4;++iter)
         {
@@ -392,6 +406,11 @@ int main(int argc, char *argv[])
         }
         
         return 0;
+    }
+    catch(const exception &e )
+    {
+        std::cerr << "*** " << e.what() << std::endl;
+        std::cerr << "*** " << e.when() << std::endl;
     }
     catch(...)
     {
