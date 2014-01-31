@@ -126,7 +126,8 @@ private:
     ode::driverCK<double>::type           odeint;
     lua_State                            *L;
     Lua::Function<double>                 lambda0;
-    
+    Lua::Function<double>                 lambda1;
+
 public:
     
     explicit device( size_t Nx, size_t Ny, lua_State *luaVM ) :
@@ -142,7 +143,8 @@ public:
     Y(1,0.0),
     odeint(1e-7),
     L(luaVM),
-    lambda0(L,"lambda0")
+    lambda0(L,"lambda0"),
+    lambda1(L,"lambda1")
     {
         //-- memory
         reserve(nx*ny);
@@ -334,11 +336,11 @@ public:
         reset();
         ios::ocstream fp(output,false);
         fp("0 0\n");
-        //save_xyz(config, false);
+        save_xyz(config, false);
         while( find_next() )
         {
             fp("%e %e\n", t_last, double(bubble.size)/size());
-            //save_xyz(config, true);
+            save_xyz(config, true);
         }
         
         
@@ -349,16 +351,43 @@ private:
     
     inline double compute_lambda(double t)
     {
-        double sum = 0;
         assert(liquid.size>0);
+        
+        //-- the spontaneous probability
         const double lam0 = lambda0(t); assert(lam0>0);
         for( cavity::pnode *node = liquid.head; node; node=node->next )
         {
             // constant part
             cavity &cv = node->cv;
             cv.lambda  = lam0;
-            
-            sum += cv.lambda;
+        }
+        
+        
+        //-- the effect of neighbors
+        for( cavity::pnode *node=bubble.head;node;node=node->next)
+        {
+            cavity &cv = node->cv;
+            assert(t>=cv.t_boum);
+            const double tau = t-cv.t_boum;
+            for(size_t i=0;i<cv.links;++i)
+            {
+                cavity &oc = *cv.link[i];
+                if(is_liquid == oc.content)
+                {
+                    const vtx_t r(cv.r,oc.r);
+                    const double d    = r.norm();
+                    const double lam1 = lambda1(tau,d);
+                    assert(lam1>=0);
+                    oc.lambda += lam1;
+                }
+            }
+        }
+        
+        // final sum
+        double sum = 0;
+        for( cavity::pnode *node = liquid.head; node; node=node->next )
+        {
+            sum += node->cv.lambda;
         }
         
         if(sum<=0)
@@ -400,7 +429,7 @@ int main(int argc, char *argv[])
         
         device D(20,30,L);
         std::cerr << "#liquid=" << D.liquid.size << std::endl;
-        for(int iter=1;iter<=4;++iter)
+        for(int iter=1;iter<=1;++iter)
         {
             D.run1( vformat("run%d", iter));
         }
