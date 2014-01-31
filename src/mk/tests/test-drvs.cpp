@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/fcn/integrate.hpp"
+#include "yocto/math/fcn/intg.hpp"
 #include "yocto/math/fcn/derivative.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include <typeinfo>
@@ -41,7 +41,8 @@ namespace {
 		const T      xmax = numeric<T>::two_pi;
 		const size_t N = 128;
 		dummy<T>     dum;
-		typename numeric<T>::function dF( &dum, & dummy<T>::compute );
+        typename numeric<T>::function dF( &dum, & dummy<T>::compute );
+        integrator<T> intg;
 		const string out = string("drvs-") + typeid(T).name() + ".dat";
 		ios::ocstream fp( out, false );
 		T z = 0;
@@ -51,7 +52,7 @@ namespace {
 			const T x1 = (i*xmax)/N;			
 			const T x0 = ( (i-1) * xmax)/N; 
 			std::cerr << x0 << " -> " << x1 << std::endl;
-			const T y = integrate<T>( x0, x1, dF, 2*numeric<T>::sqrt_epsilon );
+			const T y = intg( x0, x1, dF, 2*numeric<T>::sqrt_epsilon );
 			z += y;
 			std::cerr << "\t" << z << " / " << F<T>(x1) << std::endl;
 			fp("%g %g\n", x1, z );
