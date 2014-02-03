@@ -46,7 +46,7 @@ namespace yocto
                 
                 double value;
                 
-                constraint &weight( const species::ptr &sp, const double w);
+                constraint &weight( const species::ptr &sp, const int w);
                 
                 typedef shared_ptr<constraint> ptr;
                 
