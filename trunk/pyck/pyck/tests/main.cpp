@@ -65,7 +65,6 @@ static void ThreadProc(void *args) throw()
                     std::cerr << "\t\ttmx=" << clk( t-ini ) << std::endl;
                 }
             }
-            return 0;
             
             ////////////////////////////////////////////////////////////////////////
             // Wall Time
@@ -87,6 +86,7 @@ static void ThreadProc(void *args) throw()
                 
                 std::cerr << std::endl;
             }
+            
             
             ////////////////////////////////////////////////////////////////////////
             // C_Array
