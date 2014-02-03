@@ -365,4 +365,6 @@ inline const char *R2String( SEXP r )
 {
     return CHAR(STRING_ELT(r,0));
 }
+
+
 #endif
