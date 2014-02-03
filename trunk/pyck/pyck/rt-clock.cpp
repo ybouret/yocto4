@@ -76,13 +76,15 @@ double RunTimeClock:: operator()( uint64_t num_ticks ) const
 
 
 #if defined(PYCK_WIN)
+#include <windows.h>
+
 void RunTimeClock:: calibrate()
 {
     static const long double l_one = 1;
     LARGE_INTEGER F;
     if( ! :: QueryPerformanceFrequency( &F ) )
     {
-        throw win32::exception( ::GetLastError(), "::QueryPerformanceFrequency" );
+        throw Exception( ::GetLastError(), "::QueryPerformanceFrequency" );
     }
     freq = l_one / static_cast<long double>( F.QuadPart );
 }
@@ -92,7 +94,7 @@ uint64_t RunTimeClock:: Ticks()
     int64_t Q = 0;
     if( ! ::QueryPerformanceCounter( (LARGE_INTEGER *)&Q)  )
     {
-        throw win32::exception( ::GetLastError(), " ::QueryPerformanceCounter" );
+        throw Exception( ::GetLastError(), " ::QueryPerformanceCounter" );
     }
     return uint64_t(Q);
 }
