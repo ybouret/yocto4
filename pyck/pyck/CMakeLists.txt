@@ -8,6 +8,7 @@ SET(pyck_srcs
 	exception.hpp 	exception.cpp
 	lockable.hpp	lockable.cpp
 	mutex.hpp	mutex.cpp
+	rt-clock.hpp    rt-clock.cpp
 	wtime.hpp	wtime.cpp
 	sort.hpp
 	rand32.hpp	rand32.cpp
