@@ -74,7 +74,7 @@ SEXP dumpMat( SEXP args ) throw()
         CMatrix<double> Q(args);
         Rprintf("Q=\n");
         Q.print();
-
+        
         RMatrix<double> q( m.rows, m.cols );
         memcpy( &q[0][0], &m[0][0], sizeof(double) * q.items );
         
@@ -101,6 +101,42 @@ SEXP getList() throw()
         v[0] = 7;
         L.set(1,v);
         return *L;
+    }
+    catch(...)
+    {
+        return R_NilValue;
+    }
+}
+
+extern "C"
+SEXP find_lower( SEXP a_value, SEXP a_vector )
+{
+    try
+    {
+        const double          xx = R2Scalar<double>(a_value);
+        const RVector<double> x(a_vector);
+        RVector<int>          ans(1);
+        if(x.size>=2)
+        {
+            size_t jlo =  0;
+            size_t jhi =  x.size-1;
+            while(jhi-jlo>1)
+            {
+                const size_t mid = (jlo+jhi)>>1;
+                if( x[mid] < xx )
+                {
+                    jlo = mid;
+                }
+                else
+                {
+                    jhi = mid;
+                }
+            }
+            ans[0] = int(jlo)+1;
+        }
+        else
+            ans[0] = -1;
+        return *ans;
     }
     catch(...)
     {

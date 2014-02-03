@@ -1,4 +1,4 @@
-ADD_EXECUTABLE(test-pyck main.cpp)
+ADD_EXECUTABLE(test-pyck main.cpp demo.R)
 TARGET_LINK_LIBRARIES(test-pyck pyck)
 
 IF( CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD" )
