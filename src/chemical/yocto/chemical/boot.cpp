@@ -46,7 +46,7 @@ namespace yocto
         
         boot:: constraint:: ~constraint() throw() {}
         
-        boot::constraint & boot:: constraint:: weight(const species::ptr &sp, const double w)
+        boot::constraint & boot:: constraint:: weight(const species::ptr &sp, const int w)
         {
             const constituent::ptr p( new constituent(sp,w) );
             if(!insert(p))

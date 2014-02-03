@@ -200,10 +200,10 @@ namespace yocto
                 const vector_t &Xstar;
                 const matrix_t &Theta;
                 
-                inline Energy( vector_t      &_C,
+                inline Energy( vector_t      &_Cref,
                               const vector_t &_Xstar,
                               const matrix_t &_Theta) :
-                C(     _C     ),
+                C(     _Cref  ),
                 Xstar( _Xstar ),
                 Theta( _Theta )
                 {
