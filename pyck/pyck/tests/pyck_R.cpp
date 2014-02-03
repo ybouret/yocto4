@@ -144,3 +144,56 @@ SEXP find_lower( SEXP a_value, SEXP a_vector )
     }
 }
 
+extern "C"
+SEXP merge_sorted( SEXP A_vector, SEXP B_vector )
+{
+    try
+    {
+        const RVector<double> A(A_vector);
+        const RVector<double> B(B_vector);
+        const size_t          nA = A.size;
+        const size_t          nB = B.size;
+        RVector<double>       C(nA+nB);
+        
+        size_t iC = 0;
+        size_t iA = 0;
+        size_t iB = 0;
+        while( iA < nA && iB < nB )
+        {
+            const double vA = A[iA];
+            const double vB = B[iB];
+            if(vA<vB)
+            {
+                //Rprintf("C[%u/%u]=A[%u/%u]=%g\n", iC, C.size, iA,nA, vA);
+                C[iC++] = vA;
+                ++iA;
+            }
+            else
+            {
+                //Rprintf("C[%u/%u]=B[%u/%u]=%g\n", iC, C.size, iB,nB, vB);
+                C[iC++] = vB;
+                ++iB;
+            }
+        }
+        
+        //assert(iA>=nA||iB>=nB);
+        while(iA<nA)
+        {
+            //Rprintf("C[%u/%u]=A[%u/%u]=%g\n", iC, C.size, iA,nA, A[iA]);
+            C[iC++] = A[iA++];
+        }
+        
+        while(iB<nB)
+        {
+            //Rprintf("C[%u/%u]=B[%u/%u]=%g\n", iC, C.size, iB,nB, B[iB]);
+            C[iC++] = B[iB++];
+        }
+        
+        return *C;
+    }
+    catch(...)
+    {
+        return R_NilValue;
+    }
+}
+
