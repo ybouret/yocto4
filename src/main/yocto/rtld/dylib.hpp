@@ -6,7 +6,9 @@
 namespace yocto
 {
     
+    //! abstract representation
     struct  dylib;
+    
     enum dylib_flag
     {
         dylib_full,
