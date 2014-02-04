@@ -1,4 +1,4 @@
-#include "rt-clock.hpp"
+#include "./rt-clock.hpp"
 #include "./exception.hpp"
 #include <cstring>
 
@@ -12,6 +12,7 @@
 #endif
 
 #if defined(PYCK_USE_CLOCK_GETTIME)
+#include <time.h>
 #include <sys/time.h>
 #include <errno.h>
 #endif
@@ -53,7 +54,7 @@ void RunTimeClock:: calibrate()
     struct timespec tp  = { 0, 0 };
     const int       err = clock_getres( CLOCK_REALTIME, &tp );
     if(err!=0)
-        throw libc::exception( errno, "clock_getres" );
+        throw Exception( errno, "clock_getres" );
     const uint64_t res = __giga64*uint64_t(tp.tv_sec) + uint64_t(tp.tv_nsec);
     freq = res;
 }
@@ -63,7 +64,7 @@ uint64_t RunTimeClock:: Ticks()
     struct timespec tp  = { 0, 0 };
     const int       err = clock_gettime( CLOCK_REALTIME, &tp );
     if(err!=0)
-        throw libc::exception( errno, "clock_gettime" );
+        throw Exception( errno, "clock_gettime" );
     
     return __giga64*uint64_t(tp.tv_sec) + uint64_t(tp.tv_nsec);
 }
