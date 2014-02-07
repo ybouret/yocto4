@@ -4,7 +4,7 @@
 #include "yocto/memory/buffers.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/threading/proxy.hpp"
+#include "yocto/threading/threads.hpp"
 
 using namespace yocto;
 
@@ -121,9 +121,9 @@ namespace {
         const double nsec  = 0.2;
         t_sum = 0;
         size_t t_count = 0;
-        threading::proxy thr;
-
+        
         mpi::Requests requests(4);
+        threading::threads thr("async");
         
         for( size_t i=0; i <16; ++i )
         {
@@ -133,7 +133,7 @@ namespace {
             MPI.Isend( send_next.ro(), block_size, MPI_BYTE, next, tag, MPI_COMM_WORLD, requests[ir++]);
             MPI.Isend( send_prev.ro(), block_size, MPI_BYTE, prev, tag, MPI_COMM_WORLD, requests[ir++]);
             
-            thr.trigger(mpi_wait_all,requests);
+            thr.start(mpi_wait_all,requests);
             
             MPI.WaitFor(nsec);
             

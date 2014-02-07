@@ -17,7 +17,7 @@ static threading::condition *count_threshold = NULL;
 
 
 static
-void inc_count( void *args ) throw() 
+void inc_count( void *args ) throw()
 {
 	const int id = *(int *)args;
 	
@@ -32,51 +32,55 @@ void inc_count( void *args ) throw()
 			std::cerr << "inc_count:: thread #" << id << " reached threshold!" << std::endl;
 			count_threshold->signal();
 		}
+        std::cerr.flush();
 		count_mutex->unlock();
 		
 		//-- sleep in a while to allow other thread(s) to run
 		wtime::sleep( 0.1 * alea<double>() );
-	}
+    }
 }
 
 static
-void watch_count( void *args ) throw() {
-	const int id = *(int *)args;
-	std::cerr << "start watch_count: from thread #" << id << std::endl;
-	
-	count_mutex->lock();
-	if( count < COUNT_LIMIT ) {
-		//-- unlock mutex and wait
-		count_threshold->wait( *count_mutex );
-		
-		//-- mutex locked after condition is reached
-		//-- go, baby
-		std::cerr << "watch_count: received condition!" << std::endl;
-	}
-	count_mutex->unlock();
-	
-	
+void watch_count( void *args ) throw()
+{
+    const int id = *(int *)args;
+    
+    count_mutex->lock();
+    std::cerr << "start watch_count: from thread #" << id << std::endl;
+    if( count < COUNT_LIMIT )
+    {
+        //-- unlock mutex and wait
+        count_threshold->wait( *count_mutex );
+        
+        //-- mutex locked after condition is reached
+        //-- go, baby
+        std::cerr << "watch_count: received condition!" << std::endl;
+    }
+    count_mutex->unlock();
+    
+    
 }
 
 
 YOCTO_UNIT_TEST_IMPL(condition)
 {
-	std::cerr << "Init mutex/condition" << std::endl;
+    std::cerr << "Init mutex/condition" << std::endl;
     
-	std::cerr << "Init 3 threads" << std::endl;
-	
-	int thread_index[] = { 0, 1, 2 };
-    threading::threads workers("counting",3);
+    
+    int thread_index[] = { 0, 1, 2 };
+    threading::threads   workers("counting",3);
     threading::condition count_threshold_;
-    count_mutex      = &workers.access;
-	count_threshold  = &count_threshold_;
     
-	workers.launch( inc_count,   &thread_index[0] );
+    threading::mutex IO("iomutex");
+    count_mutex      = &IO;
+    count_threshold  = &count_threshold_;
+    
+    workers.launch( inc_count,   &thread_index[0] );
     workers.launch( inc_count,   &thread_index[1] );
-	workers.launch( watch_count, &thread_index[2] );
-
+    workers.launch( watch_count, &thread_index[2] );
     
-	workers.finish();
+    
+    workers.finish();
 }
 YOCTO_UNIT_TEST_DONE()
 
