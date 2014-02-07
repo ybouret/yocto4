@@ -63,8 +63,9 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(crew)
 {
     
-    size_t N=10000;
     
+#if 0
+    size_t N=10000;
     {
         threading::crew nope;
     }
@@ -103,7 +104,7 @@ YOCTO_UNIT_TEST_IMPL(crew)
     }
     const double ell = chrono.query();
     std::cerr << std::endl << "Speed= " << (CYCLES/ell)/1000.0 << " kcycles/s" << std::endl << std::endl;
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
@@ -112,6 +113,7 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(cwin)
 {
+#if 0
     size_t length = 1000;
     if(argc>1)
         length = strconv::to<size_t>(argv[1],"length");
@@ -126,7 +128,7 @@ YOCTO_UNIT_TEST_IMPL(cwin)
     }
     
     team.dispatch<threading::window>(length,1);
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
@@ -153,6 +155,7 @@ namespace {
 
 YOCTO_UNIT_TEST_IMPL(lazy)
 {
+#if 0
     double sleep_total = 1.0;
     
     threading::crew team;
@@ -178,7 +181,7 @@ YOCTO_UNIT_TEST_IMPL(lazy)
         ell += chrono.query();
     }
     std::cerr << "Average time=" << ell/CYCLES << std::endl;
-    
+#endif
 }
 YOCTO_UNIT_TEST_DONE()
 

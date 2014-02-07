@@ -11,8 +11,8 @@ namespace yocto
     namespace threading
     {
         
-                
-               
+#if 0
+        
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -338,6 +338,6 @@ nthr(0)
             return _cast::from<context>((void*)wksp,woff)[rank];
         }
         
-        
+#endif
     }
 }

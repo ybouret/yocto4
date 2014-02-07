@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/threading/thread.hpp"
+#include "yocto/threading/threads.hpp"
 #include "yocto/threading/condition.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sys/wtime.hpp"
@@ -62,22 +62,21 @@ void watch_count( void *args ) throw() {
 YOCTO_UNIT_TEST_IMPL(condition)
 {
 	std::cerr << "Init mutex/condition" << std::endl;
-	threading::mutex     count_mutex_("counting");
-	threading::condition count_threshold_;
-	
-	count_mutex      = &count_mutex_;
-	count_threshold  = &count_threshold_;
-	
+    
 	std::cerr << "Init 3 threads" << std::endl;
 	
 	int thread_index[] = { 0, 1, 2 };
-	threading::thread thr0( inc_count,   &thread_index[0] );
-	threading::thread thr1( inc_count,   &thread_index[1] );
-	threading::thread thr2( watch_count, &thread_index[2] );
-	
-	thr0.join();
-	thr1.join();
-	thr2.join();
+    threading::threads workers("counting",3);
+    threading::condition count_threshold_;
+    count_mutex      = &workers.access;
+	count_threshold  = &count_threshold_;
+    
+	workers.launch( inc_count,   &thread_index[0] );
+    workers.launch( inc_count,   &thread_index[1] );
+	workers.launch( watch_count, &thread_index[2] );
+
+    
+	workers.finish();
 }
 YOCTO_UNIT_TEST_DONE()
 

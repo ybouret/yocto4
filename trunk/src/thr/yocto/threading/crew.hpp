@@ -11,6 +11,8 @@ namespace yocto
     
     namespace threading
     {
+        
+#if 0
         //! make a crew of threads
         class crew : public layout
         {
@@ -76,9 +78,9 @@ namespace yocto
             void create_contexts() throw();
             void delete_contexts() throw();
         };
-        
+#endif
+
     }
-    
 }
 
 #endif

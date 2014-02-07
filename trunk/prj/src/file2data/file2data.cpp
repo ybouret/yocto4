@@ -23,6 +23,7 @@ public:
         
     }
     
+    
     ~Writer() throw(){}
     
     ios::ostream &fp;

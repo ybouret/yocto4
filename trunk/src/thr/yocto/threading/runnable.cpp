@@ -2,6 +2,7 @@
 #include <new>
 #include <cstring>
 
+#if 0
 namespace yocto {
 	
 	namespace threading
@@ -63,3 +64,4 @@ namespace yocto {
 		
 	}
 }
+#endif

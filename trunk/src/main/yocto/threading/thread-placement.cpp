@@ -127,13 +127,14 @@ namespace yocto
 
 		void thread::on_cpu( size_t cpu_id )
 		{
-			assign_cpu( handle_, cpu_id);
+			assign_cpu( handle, cpu_id);
 		}
 
         void assign_current_thread_on( size_t cpu_id )
         {
             thread::assign_cpu( thread::get_current_handle(), cpu_id );
         }
+        
 	}
 
 }

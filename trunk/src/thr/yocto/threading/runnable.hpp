@@ -7,6 +7,7 @@
 #include "yocto/code/round.hpp"
 
 
+#if 0
 
 #define	YOCTO_ARGUMENTS_DECL_SUBKEY                                              \
 typedef SUBKEY                                      subkey_type;                 \
@@ -71,6 +72,6 @@ namespace yocto {
 	}
 	
 }
-
+#endif
 
 #endif
