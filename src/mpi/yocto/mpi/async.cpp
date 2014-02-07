@@ -6,8 +6,6 @@ namespace yocto
     
     void mpi_async:: clear() throw()
     {
-        memset( wksp, 0, sizeof(wksp) );
-        thr = 0;
     }
     
     mpi_async:: ~mpi_async() throw()
@@ -38,7 +36,7 @@ namespace yocto
     void mpi_async:: launch( mpi::Requests &req )
     {
         
-        lock_on_ready();     assert(thr);        
+        lock_on_ready();
         load_requests(&req);
         resume_thread();
         
@@ -54,17 +52,14 @@ namespace yocto
     void mpi_async:: stop() throw()
     {
         
-        lock_on_ready();   assert(thr);
+        lock_on_ready();
         load_requests(0);
         resume_thread();
         
         //----------------------------------------------------------------------
         // final cleanup
         //----------------------------------------------------------------------
-        thr->join();
-        destruct(thr);
-        clear();
-        
+        workers.finish();
     }
     
     void mpi_async:: finish() throw()
@@ -80,14 +75,12 @@ namespace yocto
     MPI( ref ),
     ready(false),
     requests(0),
-    access( "MPI.Async" ),
+    workers("MPI.Async"),
+    access(workers.access),
     enter(),
-    leave(2,"MPI.Async.Barrier"),
-    thr(0),
-    wksp()
+    leave(2,"MPI.Async.Barrier")
     {
-        clear();
-        thr = new( &wksp[0] ) threading::thread( mpi_async::call, this );
+        workers.launch( mpi_async::call,this);
     }
     
     void mpi_async:: call( void *args ) throw()

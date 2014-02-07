@@ -11,11 +11,11 @@ namespace yocto
 	class auto_clean 
 	{
 	public:
-		inline auto_clean( T &host, void (T::*method)(void) throw() ) throw() :
+		inline explicit auto_clean( T &host, void (T::*method)(void) throw() ) throw() :
 		host_( host ),
 		method_( method ) { assert(method_!=NULL); }
 		
-		inline ~auto_clean() throw() { (host_.*method_)(); }
+		inline virtual ~auto_clean() throw() { (host_.*method_)(); }
 		
 	private:
 		T        &host_;

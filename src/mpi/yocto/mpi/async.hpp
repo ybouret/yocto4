@@ -3,8 +3,7 @@
 
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/threading/barrier.hpp"
-#include "yocto/threading/thread.hpp"
-#include "yocto/code/round.hpp"
+#include "yocto/threading/threads.hpp"
 
 namespace yocto
 {
@@ -23,11 +22,10 @@ namespace yocto
         const mpi            & MPI;
         bool                   ready;
         mpi::Requests         *requests;
-        threading::mutex       access;
+        threading::threads     workers; //!< only 1...
+        threading::mutex      &access;
         threading::condition   enter;
         threading::barrier     leave;
-        threading::thread     *thr;
-        uint64_t               wksp[YOCTO_U64_FOR_ITEM(threading::thread)];
         YOCTO_DISABLE_COPY_AND_ASSIGN(mpi_async);
 
         void clear() throw();

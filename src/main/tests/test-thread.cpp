@@ -8,6 +8,7 @@ using namespace threading;
 
 namespace
 {
+#if USE_OLD_THREAD
 	struct thread_data
 	{
 		mutex  *synchro;
@@ -28,10 +29,18 @@ namespace
 			std::cerr << "\tsum=" << d.sum << std::endl;
 		}
 	}
+#endif
+    
+    static inline void simple_proc()
+    {
+        
+    }
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(thread)
 {
+#if USE_OLD_THREAD
 	mutex synchro( "synchro" );
 	thread_data d = { &synchro, 0 };
     
@@ -43,6 +52,13 @@ YOCTO_UNIT_TEST_IMPL(thread)
 	thr2.join();
 	thr3.join();
 	std::cerr << "Final sum=" << d.sum << std::endl;
+#else
+    threading::mutex   mtx("shared");
+    threading::thread *thr = threading::thread::create_with(mtx);
+    thr->start(simple_proc);
+    thr->finish();
+    threading::thread::destruct(thr);
+#endif
 }
 YOCTO_UNIT_TEST_DONE()
 
@@ -60,6 +76,7 @@ static void cpu_proc( size_t cpu_id, void * )
 
 YOCTO_UNIT_TEST_IMPL(place)
 {
+    
 	size_t cpu_id = 0;
 	if( argc > 1 ) cpu_id = atoi(argv[1]);
 	std::cerr << "Placing main thread on CPU #" << cpu_id << std::endl;
@@ -91,14 +108,19 @@ YOCTO_UNIT_TEST_IMPL(place)
 		if( chrono.query() >= 5.0 )
 			break;
 	}
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
 
 namespace {
     
+    static threading::mutex *access = 0;
+    
     static void do_something()
     {
+        assert(access);
+        YOCTO_LOCK(*access);
         std::cerr << "doing something in thread" << std::endl;
     }
     
@@ -106,11 +128,15 @@ namespace {
     {
         void operator()(void)
         {
+            assert(access);
+            YOCTO_LOCK(*access);
             std::cerr << "run something()" << std::endl;
         }
         
         void compute()
         {
+            assert(access);
+            YOCTO_LOCK(*access);
             std::cerr << "run compute()" << std::endl;
         }
         
@@ -118,6 +144,8 @@ namespace {
     
     void do_display( int a )
     {
+        assert(access);
+        YOCTO_LOCK(*access);
         std::cerr << "display: " << a << std::endl;
     }
     
@@ -125,24 +153,30 @@ namespace {
 }
 
 #include "yocto/functor.hpp"
+#include "yocto/threading/threads.hpp"
 
-YOCTO_UNIT_TEST_IMPL(thr_proxy)
+YOCTO_UNIT_TEST_IMPL(threads)
 {
-    threading::proxy thr;
-    thr.trigger( do_something );
-    thr.finish();
-
+    
+    threading::threads workers("workers");
+    access = & workers.access;
+    
+    threading::threads::failsafe guard( workers );
+    
+    workers.start( do_something );
+    
     run_something run;
-    thr.trigger(run);
-    thr.finish();
+    workers.start(run);
+    
+    workers.finish();
     
     functor<void,null_type> fn( &run , & run_something::compute );
-    thr.trigger(fn);
-    thr.finish();
-    
+    workers.start(fn);
     int a = 7;
-    thr.trigger(do_display, a);
-    thr.finish();
+    workers.start(do_display,a);
+    
+    //workers.finish();
+    
 }
 YOCTO_UNIT_TEST_DONE()
 

@@ -21,7 +21,7 @@ namespace {
 	// init of array_
 #pragma warning ( disable : 4351 )
 #endif
-	class computing : public threading::runnable, public object
+	class computing :  public object
 	{
 	public:
 		explicit computing( threading::barrier &b, size_t nw ) throw() :
@@ -99,21 +99,21 @@ YOCTO_UNIT_TEST_IMPL(barrier)
 {
 	
 	threading::barrier        b( THREADS, "barrier" );
-	vector<worker> w( THREADS, as_capacity );
+	vector<worker>            w( THREADS, as_capacity );
 	
 	for( size_t i=1; i <= THREADS; ++i )
 	{
 		std::cerr <<  "creating #" << i << std::endl;
 		worker guy( new computing(b,i) );
 		w.push_back( guy );
-		guy->start(); // WARNING: no failure handled !
+		//guy->start(); // WARNING: no failure handled !
 	}
 	
 	{
 		for( size_t i = 1 ; i <= THREADS; ++i )
 		{
 			std::cerr <<  "waiting for #" << i << std::endl;
-			w[i]->join();
+			//w[i]->join();
 		}
 	}
 }

@@ -2,11 +2,13 @@
 #define YOCTO_THREADING_PROXY_INCLUDED 1
 
 #include "yocto/threading/thread.hpp"
+#include "yocto/code/round.hpp"
 
 namespace yocto
 {
     namespace threading
     {
+#if USE_OLD_THREAD
         //! for cheap threading
         class proxy
         {
@@ -73,7 +75,7 @@ namespace yocto
                 fn(x);
             }
         };
-        
+#endif
     }
     
 }

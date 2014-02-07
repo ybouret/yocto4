@@ -12,6 +12,7 @@ namespace yocto
 {
     namespace threading
     {
+#if USE_OLD_THREAD
         void proxy:: clear() throw()
         {
             memset( xdata, 0, sizeof(xdata) );
@@ -53,6 +54,6 @@ namespace yocto
         {
             _cast::from<threading::thread>( &block[0] )->on_cpu(id);
         }
-
+#endif
     }
 }

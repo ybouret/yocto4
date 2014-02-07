@@ -56,7 +56,7 @@ namespace yocto
             activate<T>();
         }
         
-        void swap_with(vslot &other ) throw();
+        void swap_with(vslot &other) throw();
         
     private:
         void __free() throw();
