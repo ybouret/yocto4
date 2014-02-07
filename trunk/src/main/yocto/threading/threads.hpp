@@ -42,7 +42,7 @@ namespace yocto
             
             //! wrapper
             template <typename FUNC>
-            void start( FUNC &fn )
+            inline void start( FUNC &fn )
             {
                 thread *thr = query();
                 try       { thr->start<FUNC>(fn); push_back(thr); }
@@ -51,11 +51,21 @@ namespace yocto
             
             //! wrapper
             template <typename FUNC, typename T>
-            void start( FUNC &fn, T &x )
+            inline void start( FUNC &fn, T &x )
             {
                 thread *thr = query();
                 try       { thr->start<FUNC,T>(fn,x); push_back(thr); }
                 catch(...){ pool.store(thr); throw; }
+            }
+
+            
+            template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+            inline void call( OBJECT_POINTER pObj, OBJECT_METHOD meth )
+            {
+                thread *thr = query();
+                try       { thr->call<OBJECT_POINTER,OBJECT_METHOD>(pObj,meth); push_back(thr); }
+                catch(...){ pool.store(thr); throw; }
+
             }
             
             //! prepare some memory

@@ -172,11 +172,16 @@ namespace yocto
         // release memory
         //
         //======================================================================
+        thread:: ~thread() throw()
+        {
+            assert(0==next);
+            assert(0==prev);
+            
+        }
         void thread:: destruct( thread *thr ) throw()
         {
             assert(thr);
-            assert(0==thr->next);
-            assert(0==thr->prev);
+            thr->~thread();
             object::release1<thread>(thr);
         }
         
@@ -219,7 +224,7 @@ namespace yocto
             memset( &handle, 0, sizeof(handle) );
             memset( &proc,   0, sizeof(proc)   );
             memset( &data,   0, sizeof(data)   );
-            memset( args,    0, sizeof(args)   );
+            args.free();
             (bool&)stop = true;
         }
         

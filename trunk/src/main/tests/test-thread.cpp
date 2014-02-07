@@ -175,7 +175,7 @@ YOCTO_UNIT_TEST_IMPL(threads)
     int a = 7;
     workers.start(do_display,a);
     
-    //workers.finish();
+    workers.finish();
     
 }
 YOCTO_UNIT_TEST_DONE()

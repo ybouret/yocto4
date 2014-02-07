@@ -2,7 +2,7 @@
 
 #include "yocto/threading/barrier.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/threading/runnable.hpp"
+#include "yocto/threading/threads.hpp"
 #include <iostream>
 #include "yocto/ptr/shared.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -50,7 +50,8 @@ namespace {
 			return INLOOPS + ( rand() % (INLOOPS) );
 		}
 		
-		virtual void run( ) throw()
+    public:
+        void run( ) throw()
 		{
 			/*
 			 * Loop through OUTLOOPS barrier cycles.
@@ -62,59 +63,64 @@ namespace {
 				{
 					scoped_lock guard(IOmutex);
 					std::cout << "run [" << out_loop << "]" << "#" << number_ << "/" << THREADS << " <process status=" << process_status << ">" << std::endl;
-				}
-				/*
-				 * This inner loop just adds a value to each element in
-				 * the working array.
-				 */
-				const size_t in_loop_max = get_rand();
-				for (size_t in_loop = in_loop_max; in_loop>0; --in_loop )
-					for (size_t count = 0; count < ARRAY; count++)
-						array_[count] += 1;
-				
-				{
-					scoped_lock guard(IOmutex);
-					std::cout << "end [" << out_loop << "]" << "#" << number_ << "/" << THREADS << " -- done " << in_loop_max << std::endl;
-				}
-				
-				//-- shared work, only by one thread
-				if( true == barrier_.wait() )
-				{
-					scoped_lock guard(IOmutex);
-					std::cout << "--> performing shared update with #" << number_ << "/" << THREADS << std::endl << std::endl;
-				}
-				
-			}
-			
-		}
-		
-	};
-	
-	threading::mutex computing::IOmutex("IOMutex");
-	typedef shared_ptr<computing> worker;
-	
+                }
+                /*
+                 * This inner loop just adds a value to each element in
+                 * the working array.
+                 */
+                const size_t in_loop_max = get_rand();
+                for (size_t in_loop = in_loop_max; in_loop>0; --in_loop )
+                {
+                    for (size_t count = 0; count < ARRAY; count++)
+                    {
+                        array_[count] += 1;
+                    }
+                }
+                
+                {
+                    scoped_lock guard(IOmutex);
+                    std::cout << "end [" << out_loop << "]" << "#" << number_ << "/" << THREADS << " -- done " << in_loop_max << std::endl;
+                }
+                
+                //-- shared work, only by one thread
+                if( true == barrier_.wait() )
+                {
+                    scoped_lock guard(IOmutex);
+                    std::cout << "--> performing shared update with #" << number_ << "/" << THREADS << std::endl << std::endl;
+                }
+                
+            }
+            
+        }
+        
+    };
+    
+    threading::mutex computing::IOmutex("IOMutex");
+    typedef shared_ptr<computing> worker;
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(barrier)
 {
-	
-	threading::barrier        b( THREADS, "barrier" );
-	vector<worker>            w( THREADS, as_capacity );
-	
-	for( size_t i=1; i <= THREADS; ++i )
-	{
-		std::cerr <<  "creating #" << i << std::endl;
-		worker guy( new computing(b,i) );
-		w.push_back( guy );
-		//guy->start(); // WARNING: no failure handled !
-	}
-	
-	{
-		for( size_t i = 1 ; i <= THREADS; ++i )
-		{
-			std::cerr <<  "waiting for #" << i << std::endl;
-			//w[i]->join();
-		}
-	}
+    threading::threads        workers("workers");
+    threading::barrier        b( THREADS, "barrier" );
+    vector<worker>            w( THREADS, as_capacity );
+    
+    for( size_t i=1; i <= THREADS; ++i )
+    {
+        std::cerr <<  "creating #" << i << std::endl;
+        worker guy( new computing(b,i) );
+        w.push_back( guy );
+    }
+    
+    assert(w.size()==THREADS);
+    threading::threads::failsafe guard(workers);
+    for(size_t i=1; i <= THREADS; ++i )
+    {
+        workers.call( & *w[i], & computing::run );
+    }
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

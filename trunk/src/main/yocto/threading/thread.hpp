@@ -3,6 +3,7 @@
 
 #include "yocto/threading/mutex.hpp"
 #include "yocto/container/vslot.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -52,29 +53,6 @@ namespace yocto
              */
             void finish() throw();
             
-            //! wrapper
-            /**
-             \warning fn must be available until finish
-             */
-            template <typename FUNC>
-            inline void start( FUNC &fn )
-            {
-                args[0] = (void*)&fn;
-                launch( execute<FUNC>, this);
-            }
-            
-            //! wrapper
-            /**
-             \warning fn and x must be available until finish
-             */
-            template <typename FUNC, typename T>
-            inline void start( FUNC &fn, T &x)
-            {
-                args[0] = (void*)&fn;
-                args[1] = (void*)&x;
-                launch( execute2<FUNC,T>, this);
-            }
-            
             
             handle_t        get_handle() const throw();
             static handle_t get_current_handle() throw();
@@ -83,6 +61,53 @@ namespace yocto
             static void assign_cpu( thread::handle_t , size_t cpu_id );
             static void foreach_cpu( thread::handle_t, void (*proc)(size_t cpu_id,void*), void *);
             
+            
+            template <typename FUNC,typename T>
+            class call_start
+            {
+            public:
+                FUNC *func;
+                T    *args;
+                inline  call_start( FUNC &f, T *x ) throw() : func(&f), args(x) {}
+                inline ~call_start() throw() {}
+                inline  call_start( FUNC &f ) throw() : func(&f), args(0) {}
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(call_start);
+            };
+            //! wrapper
+            /**
+             \warning fn must be available until finish
+             */
+            template <typename FUNC>
+            inline void start( FUNC &f )
+            {
+                args.build< call_start<FUNC,void>, FUNC& >(f);
+                launch( execute<FUNC>, this);
+            }
+            
+            //! wrapper
+            /**
+             \warning fn and x must be available until finish
+             */
+            template <typename FUNC, typename T>
+            inline void start( FUNC &f, T &x)
+            {
+                args.build< call_start<FUNC,T>, FUNC&, T* >(f,&x);
+                launch( execute2<FUNC,T>, this);
+            }
+            
+            
+            typedef functor<void,null_type> callback;
+            
+            template <typename OBJECT_POINTER, typename OBJECT_METHOD>
+            inline void call( OBJECT_POINTER pObj, OBJECT_METHOD meth )
+            {
+                args.build< callback, OBJECT_POINTER, OBJECT_METHOD >(pObj,meth);
+                launch( executeCB, this);
+            }
+            
+            
         private:
             thread( mutex &shared_access ) throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(thread);
@@ -90,7 +115,7 @@ namespace yocto
             handle_t handle;
             proc_t   proc;    //!< routine to start
             void    *data;    //!< arguments for the routine
-            void    *args[2]; //!< arguments for wrapper
+            vslot    args;
             
             void     clear() throw();
             
@@ -101,15 +126,9 @@ namespace yocto
                 {
                     assert(args!=0);
                     thread &self = *static_cast<thread *>(args);
-                    assert( self.args[0] );
-                    union
-                    {
-                        void *item;
-                        FUNC *func;
-                    } alias = { self.args[0] };
-                    assert(alias.func);
-                    FUNC &fn = * alias.func;
-                    fn();
+                    call_start<FUNC,void> &call = self.args.as< call_start<FUNC,void> >();
+                    assert(call.args==0);
+                    (*call.func)();
                 }
                 catch(...)
                 {
@@ -123,24 +142,27 @@ namespace yocto
                 {
                     assert(args);
                     thread &self = *static_cast<thread *>(args);
-                    assert( self.args[0] );
-                    assert( self.args[1] );
-                    union
-                    {
-                        void *item;
-                        FUNC *func;
-                    } alias = { self.args[0] };
-                    assert(alias.func);
-                    FUNC &fn = * alias.func;
-                    T    &x  = *(T *) self.args[1];
-                    fn(x);
+                    call_start<FUNC,T> &call = self.args.as< call_start<FUNC,T> >();
+                    assert(call.args!=0);
+                    (*call.func)( * call.args );
                 }
                 catch(...)
                 {
                 }
             }
             
-            
+            static inline void executeCB(void *args) throw()
+            {
+                try
+                {
+                    assert(args);
+                    thread &self = *static_cast<thread *>(args);
+                    self.args.as<callback>()();
+                }
+                catch(...)
+                {
+                }
+            }
             
 #if defined(YOCTO_BSD)
 			static void * entry( void * ) throw();
