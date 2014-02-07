@@ -6,14 +6,16 @@ namespace yocto
     {
         threads:: threads(const char *id) throw() :
         core::list_of<thread>(),
-        access(id)
+        access(id),
+	pool()
         {
             
         }
         
         threads:: threads(const char *id, size_t n) throw() :
         core::list_of<thread>(),
-        access(id)
+        access(id),
+	pool()
         {
             reserve(n);
         }
