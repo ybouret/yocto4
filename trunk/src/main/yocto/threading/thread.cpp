@@ -282,7 +282,7 @@ namespace yocto
             DWORD id32 = 0;
 			handle = ::CreateThread(0 ,
                                     0 ,
-                                    thread::launch,
+                                    thread::entry,
                                     this,
                                     0,
                                     & id32 );
