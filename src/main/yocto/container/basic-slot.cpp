@@ -14,7 +14,7 @@ kill_(0)
     // basic_slot
     //__________________________________________________________________________
     basic_slot:: basic_slot() throw() :
-    YOCTO_BASIC_SLOT_CTOR()
+    YOCTO_BASIC_SLOT_CTOR( )
     {
         
     }
