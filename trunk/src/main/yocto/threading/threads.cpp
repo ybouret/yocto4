@@ -74,26 +74,10 @@ namespace yocto
             YOCTO_THREADS_CREATE(thr, thr->launch(proc,data) );
         }
         
-#if 0
-        void threads:: start(const thread::callback &cb)
-        {
-            thread *thr = query();
-            try
-            {
-                thr->launch(cb);
-                push_back(thr);
-            }
-            catch(...)
-            {
-                pool.store(thr);
-                throw;
-            }
-            
-        }
-#endif
-        
+
         void threads:: reserve(size_t n)
         {
+			YOCTO_LOCK(access);
             while(n-->0) pool.store( thread::create_with(access) );
         }
         
