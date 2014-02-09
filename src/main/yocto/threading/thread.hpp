@@ -20,13 +20,13 @@ namespace yocto
             typedef void (*c_proc)(void);
             
             
-            //! high level
             
+            //! high level
             template <typename FUNCTION>
             class exec0
             {
             public:
-                inline exec0( const FUNCTION &function ) : function_(function)
+                inline exec0( const FUNCTION &function ) : fn_(function)
                 {
                 }
                 
@@ -34,13 +34,41 @@ namespace yocto
                 
                 inline void run()
                 {
-                    function_();
+                    fn_();
                 }
                 
             private:
-                FUNCTION function_;
+                FUNCTION fn_;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(exec0);
             };
+            
+            template <typename FUNCTION, typename T>
+            class exec1
+            {
+            public:
+                inline exec1(const FUNCTION                         &function,
+                             typename type_traits<T>::parameter_type param1
+                             ) :
+                fn_(function),
+                p1_(param1)
+                {
+                }
+                
+                inline ~exec1() throw() {}
+                
+                inline void run()
+                {
+                    fn_(p1_);
+                }
+                
+            private:
+                FUNCTION                              fn_;
+                typename type_traits<T>::mutable_type p1_;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(exec1);
+            };
+
+            
+            
             
 #if defined(YOCTO_BSD)
             //! pthread
@@ -78,6 +106,18 @@ namespace yocto
                 code.build< exec0<FUNCTION>, FUNCTION>( fn );
                 
                 launch( execute0<FUNCTION>, & code.as< exec0<FUNCTION> >() );
+            }
+            
+            template <typename FUNCTION, typename T>
+            void start( const FUNCTION &function, typename type_traits<T>::parameter_type param1 )
+            {
+                YOCTO_LOCK(access);
+                assert(0==proc);
+                assert(0==data);
+            
+                code.build< exec1<FUNCTION,T>, T>( function, param1);
+                
+                launch( execute1<FUNCTION,T>, & code.as< exec1<FUNCTION,T> >() );
             }
             
             
@@ -142,6 +182,22 @@ namespace yocto
                     
                 }
             }
+            
+            template <typename FUNCTION, typename T>
+            static inline
+            void execute1( void *args )
+            {
+                try
+                {
+                    assert(args);
+                    static_cast< exec1<FUNCTION,T> *>(args)->run();
+                }
+                catch(...)
+                {
+                    
+                }
+            }
+
         };
         
         void assign_current_thread_on( size_t cpu_id );
