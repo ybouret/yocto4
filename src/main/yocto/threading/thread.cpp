@@ -150,7 +150,7 @@ namespace yocto
         handle(),
         proc(0),
         data(0),
-        args(),
+        code(),
         stop(true),
         next(0),
         prev(0)
@@ -224,7 +224,7 @@ namespace yocto
             memset( &handle, 0, sizeof(handle) );
             memset( &proc,   0, sizeof(proc)   );
             memset( &data,   0, sizeof(data)   );
-            args.free();
+            code.free();
             (bool&)stop = true;
         }
         
@@ -366,6 +366,65 @@ namespace yocto
         }
         
 #endif
+        
+        //======================================================================
+        //
+        // C++
+        //
+        //======================================================================
+        static inline void execute_code( void *args ) throw()
+        {
+            try
+            {
+                assert(args);
+                thread::callback &cb = *static_cast<thread::callback *>(args);
+                cb();
+            }
+            catch(...)
+            {
+            }
+        }
+        
+        void thread::launch(const callback &cb)
+        {
+            //__________________________________________________________________
+            //
+            // let us get the access
+            //__________________________________________________________________
+            YOCTO_LOCK(access);
+            assert(0==proc);
+            assert(0==data);
+            
+            //__________________________________________________________________
+            //
+            // register the callback
+            //__________________________________________________________________
+            code.make<callback>(cb);
+            
+            //__________________________________________________________________
+            //
+            // low level
+            //__________________________________________________________________
+            launch(execute_code, & code.as<callback>() );
+        }
+        
+        //======================================================================
+        //
+        // C++/C
+        //
+        //======================================================================
+        static inline void execute_proc( void *args ) throw()
+        {
+            try
+            {
+                assert(args);
+                thread::c_proc proc = thread::c_proc(args);
+                proc();
+            }
+            catch(...)
+            {
+            }
+        }
         
 	}
     

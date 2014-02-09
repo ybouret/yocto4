@@ -2,13 +2,13 @@
 #include "yocto/sys/wtime.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/core/list.hpp"
 
 using namespace yocto;
 using namespace threading;
 
 namespace
 {
-#if USE_OLD_THREAD
 	struct thread_data
 	{
 		mutex  *synchro;
@@ -24,17 +24,11 @@ namespace
 		{
 			wtime::sleep( alea<double>() * 0.1 );
 			YOCTO_LOCK(m);
-			std::cerr << "\tId=" << thread::get_current_id() << std::endl;
+			std::cerr << "\tId=" << thread::get_current_handle() << std::endl;
 			d.sum += 1;
 			std::cerr << "\tsum=" << d.sum << std::endl;
 		}
 	}
-#endif
-    
-    static inline void simple_proc()
-    {
-        
-    }
     
 }
 
@@ -54,10 +48,23 @@ YOCTO_UNIT_TEST_IMPL(thread)
 	std::cerr << "Final sum=" << d.sum << std::endl;
 #else
     threading::mutex   mtx("shared");
-    threading::thread *thr = threading::thread::create_with(mtx);
-    thr->start(simple_proc);
-    thr->finish();
-    threading::thread::destruct(thr);
+    thread_data d = { & mtx, 0.0 };
+    
+    core::list_of<threading::thread> Q;
+    for(int i=0;i<3;++i)
+    {
+        Q.push_back(threading::thread::create_with(mtx));
+        Q.tail->launch(thread_proc, &d);
+    }
+    
+    while(Q.size)
+    {
+        threading::thread *thr = Q.pop_back();
+        thr->finish();
+        threading::thread::destruct(thr);
+    }
+    
+    std::cerr << "Final Sum=" << d.sum << std::endl;
 #endif
 }
 YOCTO_UNIT_TEST_DONE()
@@ -117,7 +124,7 @@ namespace {
     
     static threading::mutex *access = 0;
     
-    static void do_something()
+    static void do_something(void*)
     {
         assert(access);
         YOCTO_LOCK(*access);
@@ -163,18 +170,19 @@ YOCTO_UNIT_TEST_IMPL(threads)
     
     threading::threads::failsafe guard( workers );
     
-    workers.start( do_something );
-    
+    workers.launch(do_something,0);
+
     run_something run;
-    workers.start(run);
+    workers.call(run);
     
     workers.finish();
     
+#if 0
     functor<void,null_type> fn( &run , & run_something::compute );
     workers.start(fn);
     int a = 7;
     workers.start(do_display,a);
-    
+#endif
     workers.finish();
     
 }
