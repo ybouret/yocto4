@@ -2,7 +2,6 @@
 #define YOCTO_THREADING_THREAD_INCLUDED 1
 
 #include "yocto/threading/mutex.hpp"
-#include "yocto/functor.hpp"
 #include "yocto/container/vslot.hpp"
 
 namespace yocto
@@ -22,7 +21,26 @@ namespace yocto
             
             
             //! high level
-            typedef functor<void,null_type> callback;
+            
+            template <typename FUNCTION>
+            class exec0
+            {
+            public:
+                inline exec0( const FUNCTION &function ) : function_(function)
+                {
+                }
+                
+                inline ~exec0() throw() {}
+                
+                inline void run()
+                {
+                    function_();
+                }
+                
+            private:
+                FUNCTION function_;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(exec0);
+            };
             
 #if defined(YOCTO_BSD)
             //! pthread
@@ -50,11 +68,18 @@ namespace yocto
              */
             void launch( proc_t user_proc, void *user_data );
             
+            template <typename FUNCTION>
+            void start( const FUNCTION &fn )
+            {
+                YOCTO_LOCK(access);
+                assert(0==proc);
+                assert(0==data);
+                
+                code.build< exec0<FUNCTION>, FUNCTION>( fn );
+                
+                launch( execute0<FUNCTION>, & code.as< exec0<FUNCTION> >() );
+            }
             
-            //! launch a functor after a copy is made
-            void launch( const callback &cb );
-            
-                    
             
             //! help for thread to finish
             /**
@@ -83,7 +108,7 @@ namespace yocto
             handle_t handle;
             proc_t   proc;    //!< routine to start
             void    *data;    //!< arguments for the routine
-            vslot    code;    //!< store functior
+            vslot    code;    //!< store executable code
             
             void     clear() throw();
             
@@ -101,6 +126,22 @@ namespace yocto
             const bool stop; //!< internal flag
             thread    *next;
             thread    *prev;
+            
+        private:
+            template <typename FUNCTION>
+            static inline
+            void execute0( void *args )
+            {
+                try
+                {
+                    assert(args);
+                    static_cast< exec0<FUNCTION> *>(args)->run();
+                }
+                catch(...)
+                {
+                    
+                }
+            }
         };
         
         void assign_current_thread_on( size_t cpu_id );

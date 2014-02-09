@@ -7,7 +7,7 @@ namespace yocto
         threads:: threads(const char *id) throw() :
         core::list_of<thread>(),
         access(id),
-	pool()
+        pool()
         {
             
         }
@@ -15,7 +15,7 @@ namespace yocto
         threads:: threads(const char *id, size_t n) throw() :
         core::list_of<thread>(),
         access(id),
-	pool()
+        pool()
         {
             reserve(n);
         }
@@ -58,6 +58,7 @@ namespace yocto
         
         void threads:: launch( thread::proc_t proc, void *data)
         {
+#if 0
             thread *thr = query();
             try
             {
@@ -69,9 +70,12 @@ namespace yocto
                 pool.store(thr);
                 throw;
             }
+#endif
+            YOCTO_THREADS_CREATE(thr, thr->launch(proc,data) );
         }
         
-        void threads:: launch(const thread::callback &cb)
+#if 0
+        void threads:: start(const thread::callback &cb)
         {
             thread *thr = query();
             try
@@ -84,9 +88,9 @@ namespace yocto
                 pool.store(thr);
                 throw;
             }
-
+            
         }
-        
+#endif
         
         void threads:: reserve(size_t n)
         {
