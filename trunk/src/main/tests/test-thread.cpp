@@ -131,6 +131,13 @@ namespace {
         std::cerr << "doing something in thread" << std::endl;
     }
     
+    static void do_something0(void)
+    {
+        assert(access);
+        YOCTO_LOCK(*access);
+        std::cerr << "doing something0 in thread" << std::endl;
+    }
+    
     struct run_something
     {
         void operator()(void)
@@ -149,7 +156,7 @@ namespace {
         
     };
     
-    void do_display( int a )
+    static void do_display( int a )
     {
         assert(access);
         YOCTO_LOCK(*access);
@@ -171,15 +178,18 @@ YOCTO_UNIT_TEST_IMPL(threads)
     threading::threads::failsafe guard( workers );
     
     workers.launch(do_something,0);
-
+    workers.start<void (*)(void) >(do_something0);
+    
     run_something run;
-    workers.call(run);
+    workers.start(run);
     
     workers.finish();
     
-#if 0
-    functor<void,null_type> fn( &run , & run_something::compute );
+    
+    const functor<void,null_type> fn( &run , & run_something::compute );
     workers.start(fn);
+    
+#if 0
     int a = 7;
     workers.start(do_display,a);
 #endif

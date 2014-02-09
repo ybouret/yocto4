@@ -11,7 +11,13 @@ namespace yocto
     
     namespace threading
     {
-     
+        
+        
+#define YOCTO_THREADS_CREATE(VAR,CODE) do { \
+thread *VAR = query(); \
+try { do { CODE; } while(false); push_back(VAR); } \
+catch(...){ pool.store(VAR); throw; } \
+} while(false)
         
         //! low level memory for threads
         class threads : public core::list_of<thread>
@@ -21,27 +27,24 @@ namespace yocto
             
             //! construct and give name to access
             explicit threads(const char *id) throw();
-
+            
             //! construct, give name to access and reserve(n)
             explicit threads(const char *id, size_t n) throw();
-
+            
             //! finish and clean all
             virtual ~threads() throw();
             
             //! launch a generic procedure
             void launch( thread::proc_t proc, void *data);
             
-            //! launch a C++ callback
-            void launch( const thread::callback &cb );
-            
-            
-            //! launch a C function
-            template <typename FUNCTIONOID>
-            void call(const FUNCTIONOID &func)
+            template <typename FUNCTION>
+            void start( const FUNCTION &fn )
             {
-                const thread::callback cb(func);
-                launch(func);
+                YOCTO_THREADS_CREATE(thr, thr->start<FUNCTION>(fn) );
             }
+            
+            
+            
             
             
             //! finish a specific thread, removed from the list
@@ -66,7 +69,9 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(failsafe);
             };
+            
         private:
+            
             thread *query();
             core::pool_of<thread> pool;
             YOCTO_DISABLE_COPY_AND_ASSIGN(threads);

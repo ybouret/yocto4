@@ -366,7 +366,8 @@ namespace yocto
         }
         
 #endif
-        
+      
+#if 0
         //======================================================================
         //
         // C++
@@ -408,23 +409,49 @@ namespace yocto
             launch(execute_code, & code.as<callback>() );
         }
         
-        //======================================================================
-        //
-        // C++/C
-        //
-        //======================================================================
-        static inline void execute_proc( void *args ) throw()
+        
+        
+        
+        static inline
+        void execute_proc( void *args )
         {
             try
             {
                 assert(args);
-                thread::c_proc proc = thread::c_proc(args);
-                proc();
+                thread::c_proc fn = thread::c_proc(args);
+                fn();
             }
             catch(...)
             {
+                
             }
         }
+        
+        
+        void thread:: launch( const c_proc fn )
+        {
+            //__________________________________________________________________
+            //
+            // let us get the access
+            //__________________________________________________________________
+            YOCTO_LOCK(access);
+            assert(0==proc);
+            assert(0==data);
+            
+            //__________________________________________________________________
+            //
+            // register the callback
+            //__________________________________________________________________
+            code.make<c_proc>(fn);
+            
+            //__________________________________________________________________
+            //
+            // low level
+            //__________________________________________________________________
+            launch(execute_proc, (void*)code.as<c_proc>() );
+
+        }
+#endif
         
 	}
     
