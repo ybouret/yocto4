@@ -31,6 +31,19 @@ namespace yocto
             //! launch a generic procedure
             void launch( thread::proc_t proc, void *data);
             
+            //! launch a C++ callback
+            void launch( const thread::callback &cb );
+            
+            
+            //! launch a C function
+            template <typename FUNCTIONOID>
+            void call(const FUNCTIONOID &func)
+            {
+                const thread::callback cb(func);
+                launch(func);
+            }
+            
+            
             //! finish a specific thread, removed from the list
             void finish( thread *thr ) throw();
             
@@ -39,34 +52,6 @@ namespace yocto
             
             //! release pool
             void trim() throw();
-            
-            //! wrapper
-            template <typename FUNC>
-            inline void start( FUNC &fn )
-            {
-                thread *thr = query();
-                try       { thr->start<FUNC>(fn); push_back(thr); }
-                catch(...){ pool.store(thr); throw; }
-            }
-            
-            //! wrapper
-            template <typename FUNC, typename T>
-            inline void start( FUNC &fn, T &x )
-            {
-                thread *thr = query();
-                try       { thr->start<FUNC,T>(fn,x); push_back(thr); }
-                catch(...){ pool.store(thr); throw; }
-            }
-
-            
-            template <typename OBJECT_POINTER, typename OBJECT_METHOD>
-            inline void call( OBJECT_POINTER pObj, OBJECT_METHOD meth )
-            {
-                thread *thr = query();
-                try       { thr->call<OBJECT_POINTER,OBJECT_METHOD>(pObj,meth); push_back(thr); }
-                catch(...){ pool.store(thr); throw; }
-
-            }
             
             //! prepare some memory
             void reserve(size_t n);
