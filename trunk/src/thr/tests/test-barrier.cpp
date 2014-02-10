@@ -117,7 +117,7 @@ YOCTO_UNIT_TEST_IMPL(barrier)
     threading::threads::failsafe guard(workers);
     for(size_t i=1; i <= THREADS; ++i )
     {
-        //workers.call( & *w[i], & computing::run );
+        workers.call( & *w[i], & computing::run );
     }
     
     

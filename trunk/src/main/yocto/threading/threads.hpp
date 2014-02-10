@@ -56,7 +56,7 @@ namespace yocto
             
             //! the functionoid must be valid during all thread execution
 			template <typename FUNCTION>
-			void start( FUNCTION &fn )
+			inline void start( FUNCTION &fn )
 			{
 				YOCTO_LOCK(access);
 				thread *thr = query();
@@ -64,7 +64,9 @@ namespace yocto
 				{
                     const exec0<FUNCTION> todo(fn);
 					thr->code.make< exec0<FUNCTION> >( todo );
-					launch( execute0<FUNCTION>, & (thr->code.as< exec0<FUNCTION> >()) );
+                    thread::procedure proc = exec0<FUNCTION>::run;
+                    void             *data = & (thr->code.as< exec0<FUNCTION> >());
+					thr->launch(proc,data);
 					push_back(thr);
 				}
 				catch(...) { pool.store(thr); throw; }
@@ -72,8 +74,8 @@ namespace yocto
             
             //! the functionoid and the parameter must be valid during  the whole thread
 			template <typename FUNCTION, typename T>
-			void start(FUNCTION &function,
-                       T        &param1 )
+			inline void start(FUNCTION &function,
+                              T        &param1 )
 			{
 				YOCTO_LOCK(access);
 				thread *thr = query();
@@ -81,11 +83,31 @@ namespace yocto
 				{
                     const exec1<FUNCTION,T> todo(function,param1);
 					thr->code.make< exec1<FUNCTION,T> >( todo );
-					launch( execute1<FUNCTION,T>, &( thr->code.as< exec1<FUNCTION,T> >() ));
+                    thread::procedure proc = exec1<FUNCTION,T>::run;
+                    void             *data = &( thr->code.as< exec1<FUNCTION,T> >() );
+					thr->launch(proc,data);
 					push_back(thr);
 				}
 				catch(...)  { pool.store(thr); throw; }
 			}
+            
+            template <typename OBJECT_POINTER,typename METHOD_POINTER>
+            inline void call(OBJECT_POINTER host, METHOD_POINTER meth)
+            {
+                YOCTO_LOCK(access);
+				thread *thr = query();
+				try
+				{
+                    const call0<OBJECT_POINTER,METHOD_POINTER> todo(host,meth);
+                    thr->code.make< call0<OBJECT_POINTER,METHOD_POINTER> >(todo);
+                    thread::procedure proc = call0<OBJECT_POINTER,METHOD_POINTER>::run;
+                    void             *data = &(thr->code.as< call0<OBJECT_POINTER,METHOD_POINTER> >() );
+                    thr->launch(proc,data);
+					push_back(thr);
+				}
+				catch(...)  { pool.store(thr); throw; }
+                
+            }
             
 		private:
 			thread *query();
@@ -106,25 +128,24 @@ namespace yocto
                 
 				inline void run() { fn_(); }
                 
+                static inline void run(void *args) throw()
+                {
+                    try
+                    {
+                        assert(args);
+                        static_cast< exec0<FUNCTION> *>(args)->fn_();
+                    }
+                    catch(...)
+                    {
+                        
+                    }
+                }
 			private:
 				FUNCTION &fn_;
 				YOCTO_DISABLE_ASSIGN(exec0);
 			};
             
             
-			template <typename FUNCTION>
-			static inline void execute0( void *args ) throw()
-			{
-				try
-				{
-					assert(args);
-					static_cast< exec0<FUNCTION> *>(args)->run();
-				}
-				catch(...)
-				{
-                    
-				}
-			}
             
             //__________________________________________________________________
             //
@@ -142,7 +163,19 @@ namespace yocto
                 
 				inline ~exec1() throw() {}
                 
-				inline void run() { fn_(p1_); }
+                static inline void run( void *args ) throw()
+                {
+                    try
+                    {
+                        assert(args);
+                        exec1 &self = * static_cast<exec1<FUNCTION,T>*>(args);
+                        self.fn_( self.p1_ );
+                    }
+                    catch(...)
+                    {
+                        
+                    }
+                }
                 
 			private:
 				FUNCTION &fn_;
@@ -150,19 +183,40 @@ namespace yocto
 				YOCTO_DISABLE_ASSIGN(exec1);
 			};
             
-			template <typename FUNCTION, typename T>
-			static inline void execute1( void *args ) throw()
-			{
-				try
-				{
-					assert(args);
-					static_cast< exec1<FUNCTION,T> *>(args)->run();
-				}
-				catch(...)
-				{
-                    
-				}
-			}
+			
+            
+            //__________________________________________________________________
+            //
+            // Object+Method
+            //__________________________________________________________________
+            template <typename OBJECT_POINTER, typename METHOD_POINTER>
+            class call0
+            {
+            public:
+                inline call0(OBJECT_POINTER pObj, METHOD_POINTER addr) throw() :
+                host(pObj), meth(addr) {}
+                inline call0( const call0 &other ) throw() :
+                host(other.host), meth(other.meth) {}
+                inline ~call0() throw() {}
+                
+                static inline void run( void *args )
+                {
+                    try
+                    {
+                        assert(args);
+                        call0 &self = *static_cast<call0*>(args);
+                        ( (*self.host).*(self.meth) )();
+                    }
+                    catch(...)
+                    {
+                    }
+                }
+            private:
+                YOCTO_DISABLE_ASSIGN(call0);
+                OBJECT_POINTER host;
+                METHOD_POINTER meth;
+            };
+            
 		};
         
 	}
