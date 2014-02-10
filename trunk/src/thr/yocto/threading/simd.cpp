@@ -284,7 +284,7 @@ wksp(0)
         }
         
         
-        void SIMD:: cycle( Kernel &K )
+        void SIMD:: operator()( Kernel &K )
         {
             //------------------------------------------------------------------
             //-- get a lock on a synchronized crew
@@ -321,7 +321,7 @@ wksp(0)
             //------------------------------------------------------------------
             //-- wait on leave while releasing access lock !
             //------------------------------------------------------------------
-            std::cerr << "[SIMD]: cycle..." << std::endl;
+            //std::cerr << "[SIMD]: cycle..." << std::endl;
             leave.wait(access);
             
             //------------------------------------------------------------------
