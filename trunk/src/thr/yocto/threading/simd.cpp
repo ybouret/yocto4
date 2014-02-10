@@ -9,14 +9,16 @@ namespace yocto
     {
         
 #define YOCTO_SIMD_CTOR() \
-workers( "SIMD" ), \
-access( workers.access ),\
-enter(),\
-leave(),\
-ready(0),\
-activ(0),\
-stop(false),\
-wlen(0),\
+workers( "SIMD" ),        \
+access( workers.access ), \
+enter(),                  \
+leave(),                  \
+ready(0),                 \
+activ(0),                 \
+stop(false),              \
+built(0),                 \
+kproc(0),                 \
+wlen(0),                  \
 wksp(0)
         
         
@@ -51,7 +53,17 @@ wksp(0)
             };
         }
         
+        context       & SIMD:: operator[]( size_t rank ) throw()
+        {
+            assert(rank<size);
+            return (static_cast<member *>(wksp)+rank)->ctx;
+        }
         
+        const context & SIMD:: operator[]( size_t rank ) const throw()
+        {
+            assert(rank<size);
+            return (static_cast<member *>(wksp)+rank)->ctx;
+        }
         
         
         void SIMD:: create_contexts()
@@ -114,6 +126,7 @@ wksp(0)
                 for(size_t rank=0;rank<size;++rank)
                 {
                     workers.launch( SIMD::subroutine, &members[rank] );
+                    ++built;
                 }
                 
                 //______________________________________________________________
@@ -140,17 +153,17 @@ wksp(0)
                 // placement
                 //______________________________________________________________
                 YOCTO_LOCK(access);
-                std::cerr << "Main Thread@" << std::endl;
+                std::cerr << "[SIMD] control" << std::endl;
                 assign_current_thread_on( cpu_index_of(0));
                 
-                std::cerr << "Work Thread@" << std::endl;
+                std::cerr << "[SIMD] workers" << std::endl;
                 size_t iThread = 0;
                 for(thread *thr = workers.head; thr; thr=thr->next)
                 {
                     thr->on_cpu( cpu_index_of(iThread++) );
                 }
                 
-            
+                
             }
             catch(...)
             {
@@ -162,7 +175,28 @@ wksp(0)
         
         void SIMD:: terminate() throw()
         {
+            //------------------------------------------------------------------
+            // write the stop condition
+            //------------------------------------------------------------------
+            {
+                YOCTO_LOCK(access);
+                std::cerr << "[SIMD] terminate" << std::endl;
+                stop = true;
+            }
             
+            //------------------------------------------------------------------
+            // broadcast until everybody comes back !
+            //------------------------------------------------------------------
+            for(;;)
+            {
+                enter.broadcast();
+                YOCTO_LOCK(access);
+                if(built<=0) break;
+            }
+            
+            //------------------------------------------------------------------
+            // release resources
+            //------------------------------------------------------------------
             workers.finish();
             delete_contexts();
         }
@@ -174,7 +208,6 @@ wksp(0)
             member  &m   = *static_cast<member *>(args);
             assert(m.simd);
             m.simd->engine( m.ctx.rank );
-            
         }
         
         
@@ -193,17 +226,17 @@ wksp(0)
             assert(rank == ctx.rank );
             {
                 YOCTO_LOCK(access);
-                std::cerr << "[Start] #" << ctx.indx << "/" << ctx.size << std::endl;
+                std::cerr << "[SIMD] start thread " << ctx.size << "." << ctx.rank << std::endl;
             }
             
             
             access.lock();
         CYCLE:
-            //--------------------------------------------------------------
+            //------------------------------------------------------------------
             //
-            // CYCLE
+            // CYCLE, start on a locked access
             //
-            //--------------------------------------------------------------
+            //------------------------------------------------------------------
             
             //--------------------------------------------------------------
             // LOCKED: update ready status
@@ -211,12 +244,92 @@ wksp(0)
             ++ready;
             
             //--------------------------------------------------------------
-            // UNLOCK and WAIT
+            // UNLOCK and WAIT for a signal
             //--------------------------------------------------------------
             enter.wait(access);
             
+            
+            //--------------------------------------------------------------
+            // LOCKED return: test for stop
+            //--------------------------------------------------------------
+            if( stop )
+            {
+                assert(built>0);
+                --built;
+                std::cerr << "[SIMD] shutdown thread " << ctx.size << "." << ctx.rank << std::endl;
+                access.unlock();
+                return;
+            }
+            
+            //std::cerr << "[SIMD] cycle " << ctx.size << "." << ctx.rank << std::endl;
+            access.unlock();
+            //--------------------------------------------------------------
+            // UNLOCKED: perform task associated to this local context
+            //--------------------------------------------------------------
+            assert(kproc);
+            (*kproc)(ctx);
+            
+            
+            //--------------------------------------------------------------
+            // Get a lock to check that everyone is ok
+            //--------------------------------------------------------------
+            access.lock();
+            assert(activ>0);
+            if( --activ <= 0 )
+            {
+                leave.signal(); // main thread will restart
+            }
+            goto CYCLE; // access is already locked at this point
+            
         }
         
+        
+        void SIMD:: cycle( Kernel &K )
+        {
+            //------------------------------------------------------------------
+            //-- get a lock on a synchronized crew
+            //------------------------------------------------------------------
+            for(;;)
+            {
+                if( access.try_lock() )
+                {
+                    if( ready >= size )
+                    {
+                        break;
+                    }
+                    access.unlock();
+                    // TODO: wait a little bit ?
+                }
+            }
+            
+            //------------------------------------------------------------------
+            //-- the access is locked: init cycle
+            //------------------------------------------------------------------
+            ready = 0;
+            activ = size;
+            
+            //------------------------------------------------------------------
+            //-- prepare the enter condition
+            //------------------------------------------------------------------
+            enter.broadcast();
+            
+            //------------------------------------------------------------------
+            //-- prepare the task to perform
+            //------------------------------------------------------------------
+            kproc = &K;
+            
+            //------------------------------------------------------------------
+            //-- wait on leave while releasing access lock !
+            //------------------------------------------------------------------
+            std::cerr << "[SIMD]: cycle..." << std::endl;
+            leave.wait(access);
+            
+            //------------------------------------------------------------------
+            //-- everybody is done for this cycle
+            //------------------------------------------------------------------
+            access.unlock();
+            
+        }
         
     }
 }

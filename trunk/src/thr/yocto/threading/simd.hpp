@@ -5,18 +5,41 @@
 #include "yocto/threading/layout.hpp"
 #include "yocto/threading/context.hpp"
 #include "yocto/threading/condition.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
     namespace threading
     {
         
+        //! Single Instruction Multiple Data framework
         class SIMD : public layout
         {
         public:
             explicit SIMD(); //!< use layout
             explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< use layout
             virtual ~SIMD() throw();
+        
+            typedef functor<void,TL1(context&)> Kernel;
+            
+            context       & operator[]( size_t rank ) throw();
+            const context & operator[]( const size_t rank) const throw();
+            
+            void cycle( Kernel &K );
+            
+            //! make windows in contexts data
+            template <typename WINDOW>
+            inline void dispatch( size_t length, size_t offset )
+            {
+                SIMD &self = *this;
+                for( size_t rank=0;rank<size;++rank)
+                {
+                    context       &ctx = self[rank];
+                    const WINDOW   win(ctx,length,offset);
+                    ctx.make<WINDOW>(win);
+                }
+            }
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);
@@ -27,6 +50,8 @@ namespace yocto
             size_t     ready;  //!< availability
             size_t     activ;  //!< detect end of work
             bool       stop;   //!< to shutdown threads
+            size_t     built;  //!< global count for terminate
+            Kernel    *kproc;  //!< what to do during the cycle
             
             size_t   wlen; //!< extra memory size
             void    *wksp; //!< extra memory data
