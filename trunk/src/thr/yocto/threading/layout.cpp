@@ -56,7 +56,7 @@ namespace yocto
 				const long  nproc = strtol(text, &field, 10 );
                 
 				if( nproc <= 0 )
-					throw exception("Invalid number of CPU");
+					throw exception("Invalid #CPU");
 				
                 (size_t&)size = size_t(nproc);
 				
@@ -80,6 +80,8 @@ namespace yocto
         size( num_threads   ),
         root( thread_offset )
         {
+            if(num_threads<=0)
+                throw exception("Invalid #CPU");
             
         }
         
