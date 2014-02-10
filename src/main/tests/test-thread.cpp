@@ -195,6 +195,8 @@ YOCTO_UNIT_TEST_IMPL(threads)
     
     workers.finish();
     
+    workers.call( &run, & run_something::compute );
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
