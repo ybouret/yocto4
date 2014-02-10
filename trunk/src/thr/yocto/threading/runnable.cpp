@@ -2,47 +2,44 @@
 #include <new>
 #include <cstring>
 
-#if 0
 namespace yocto {
 	
 	namespace threading
 	{
-#if defined(_MSC_VER)
-#pragma warning ( disable : 4351 )
-#endif
-		
+        
 		void runnable:: cleanup() throw()
 		{
-			assert( NULL == thread_ );
-			memset( layout_, 0, sizeof(layout_) );
 		}
 		
-		runnable:: runnable() throw() :
-		layout_(),
-		thread_(NULL)
+		runnable:: runnable( mutex &access ) throw() :
+		thr(NULL)
 		{
-			cleanup();
+			YOCTO_LOCK(access);
+            thr = thread::create_with(access);
 		}
 		
 		runnable:: ~runnable() throw()
 		{
-			assert( thread_ == NULL );
+            assert(thr);
+            YOCTO_LOCK(thr->access);
+            thread::destruct(thr);
 		}
 		
 		void runnable:: start()
 		{
-			assert( NULL == thread_ );
-			try
-			{
-				thread_ = new (layout_) thread( runnable::execute, this );
-			}
-			catch(...)
-			{
-				cleanup();
-				throw;
-			}
-		}
+            assert(thr);
+            YOCTO_LOCK(thr->access);
+            runnable *self = this;
+            thr->launch(execute,self);
+        }
 		
+        void runnable:: finish() throw()
+        {
+            assert(thr);
+            YOCTO_LOCK(thr->access);
+            
+        }
+        
 		void runnable::execute( void *args ) throw()
 		{
 			assert( args );
@@ -50,18 +47,7 @@ namespace yocto {
 			host->run();
 		}
 		
-		void runnable:: join() throw()
-		{
-			if( thread_ )
-			{
-				thread_->join();
-				destruct( thread_ );
-				thread_ = NULL;
-				cleanup();
-			}
-		}
-		
+        
 		
 	}
 }
-#endif
