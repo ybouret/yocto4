@@ -25,7 +25,7 @@ namespace yocto
             context       & operator[]( size_t rank ) throw();
             const context & operator[]( const size_t rank) const throw();
             
-            void cycle( Kernel &K );
+            void operator()( Kernel &K );
             
             //! make windows in contexts data
             template <typename WINDOW>
@@ -44,7 +44,9 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);
             threads    workers;
+        public:
             mutex     &access;
+        private:
             condition  enter;  //!< cycle synchro
             condition  leave;  //!< main thread wait on it
             size_t     ready;  //!< availability
