@@ -12,6 +12,9 @@ namespace yocto
 	namespace threading
 	{
         
+        //! forward.
+        class SIMD;
+        
 		//! low level memory for threads
 		class threads : public core::list_of<thread>
 		{
@@ -113,6 +116,7 @@ namespace yocto
 			thread *query();
 			core::pool_of<thread> pool;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(threads);
+            friend class SIMD;
             
             //__________________________________________________________________
             //

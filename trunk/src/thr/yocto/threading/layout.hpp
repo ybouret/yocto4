@@ -22,7 +22,9 @@ namespace yocto
 		public:
 			const size_t size; //!< #threads requested
 			const size_t root; //!< #CPU to start.
-			
+			const size_t ncpu; //!< hardware #CPU
+            const size_t scan; //!< min_of(size,ncpu-root)
+            
 			//! parse the environment variable YOCTO_THREADING=#threads[,offset]
 			/**
 			 - if YOCTO_THREADING is undefined then size = hardware::nprocs(), root=0
