@@ -3,6 +3,7 @@
 #include "yocto/string/env.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sys/hw.hpp"
+#include "yocto/code/utils.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -42,7 +43,9 @@ namespace yocto
 		
 		layout:: layout( ) :
 		size( hardware::nprocs() ),
-		root(0)
+		root(0),
+        ncpu(size),
+        scan(ncpu)
 		{
 			const string name = "YOCTO_THREADING";
 			string       value;
@@ -71,23 +74,34 @@ namespace yocto
 						throw exception("Invalid base CPU");
 					(size_t&)root = size_t(ibase);
 				}
-				
+                
+                if(root>=ncpu)
+                    throw exception("Invalid Root=%u", unsigned(root));
+                
+                (size_t &)scan = min_of(size,ncpu-root);
+
+                
 			}
-			std::cerr << "[threading::layout=" << size << "," << root << "]" << std::endl;
+			std::cerr << "[threading::layout=" << size << "," << root << ",scan=" << scan << "]" << std::endl;
 		}
 		
         layout:: layout( size_t num_threads, size_t thread_offset ) :
         size( num_threads   ),
-        root( thread_offset )
+        root( thread_offset ),
+        ncpu( hardware::nprocs() ),
+        scan( min_of(size,ncpu-root) )
         {
             if(num_threads<=0)
                 throw exception("Invalid #CPU");
-            
+            if(root>=ncpu)
+                throw exception("Invalid Root=%u", unsigned(root));
         }
         
 		layout:: layout( const layout &other ) throw() :
 		size( other.size ),
-		root( other.root )
+		root( other.root ),
+        ncpu( other.ncpu ),
+        scan( other.scan )
 		{
 		}
 		
@@ -97,9 +111,12 @@ namespace yocto
 		
         size_t layout:: cpu_index_of( size_t iThread) const throw()
         {
+            
             assert(size>0);
-            const size_t j = root + ( iThread % size );
-            std::cerr << "              |_ assign on CPU #" << j << "/" << size << std::endl;
+            assert(scan>0);
+            assert(root<size);
+            const size_t j = root + ( iThread % scan );
+            std::cerr << "              |_ assign " << iThread << " on CPU #" << j << "/" << size << std::endl;
             return j;
         }
 		

@@ -2,6 +2,7 @@
 #define YOCTO_VSLOT_INCLUDED 1
 
 #include "yocto/container/basic-slot.hpp"
+#include <new>
 
 namespace yocto
 {
@@ -53,6 +54,17 @@ namespace yocto
         {
             prepare_for(sizeof(T));
             new (slot_.data) T(u,v);
+            activate<T>();
+        }
+        
+        //! threa arguments constructor
+        template <typename T,typename U, typename V, typename W>
+        inline void build(typename type_traits<U>::parameter_type u,
+                          typename type_traits<V>::parameter_type v,
+                          typename type_traits<W>::parameter_type w)
+        {
+            prepare_for(sizeof(T));
+            new (slot_.data) T(u,v,w);
             activate<T>();
         }
         
