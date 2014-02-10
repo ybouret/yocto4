@@ -169,13 +169,14 @@ namespace {
 #include "yocto/functor.hpp"
 #include "yocto/threading/threads.hpp"
 
+using namespace threading;
 YOCTO_UNIT_TEST_IMPL(threads)
 {
     
-    threading::threads workers("workers");
+    threads workers("workers");
     access = & workers.access;
     
-    threading::threads::failsafe guard( workers );
+    threads::failsafe guard( workers );
     
     workers.launch(do_something,0);
     workers.start<void (*)(void) >(do_something0);
@@ -189,10 +190,7 @@ YOCTO_UNIT_TEST_IMPL(threads)
     const functor<void,null_type> fn( &run , & run_something::compute );
     workers.start(fn);
     
-#if 0
-    int a = 7;
-    workers.start(do_display,a);
-#endif
+    workers.start<void (*)(int),int>(do_display,7);
     workers.finish();
     
 }

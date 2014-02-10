@@ -56,9 +56,8 @@ namespace yocto
             return pool.size ? pool.query() : thread::create_with(access);
         }
         
-        void threads:: launch( thread::proc_t proc, void *data)
+        void threads:: launch( thread::procedure proc, void *data)
         {
-#if 0
             thread *thr = query();
             try
             {
@@ -70,11 +69,9 @@ namespace yocto
                 pool.store(thr);
                 throw;
             }
-#endif
-            YOCTO_THREADS_CREATE(thr, thr->launch(proc,data) );
         }
         
-
+        
         void threads:: reserve(size_t n)
         {
 			YOCTO_LOCK(access);

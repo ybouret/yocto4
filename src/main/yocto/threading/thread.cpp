@@ -233,7 +233,7 @@ namespace yocto
         // generic launch
         //
         //======================================================================
-        void thread:: launch( proc_t user_proc, void *user_data )
+        void thread:: launch( procedure user_proc, void *user_data )
         {
             assert(user_proc);
             
