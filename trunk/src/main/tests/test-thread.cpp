@@ -122,19 +122,19 @@ YOCTO_UNIT_TEST_DONE()
 
 namespace {
     
-    static threading::mutex *access = 0;
+    static threading::mutex *shared_access = 0;
     
     static void do_something(void*)
     {
-        assert(access);
-        YOCTO_LOCK(*access);
+        assert(shared_access);
+        YOCTO_LOCK(*shared_access);
         std::cerr << "doing something in thread" << std::endl;
     }
     
     static void do_something0(void)
     {
-        assert(access);
-        YOCTO_LOCK(*access);
+        assert(shared_access);
+        YOCTO_LOCK(*shared_access);
         std::cerr << "doing something0 in thread" << std::endl;
     }
     
@@ -142,15 +142,15 @@ namespace {
     {
         void operator()(void)
         {
-            assert(access);
-            YOCTO_LOCK(*access);
+            assert(shared_access);
+            YOCTO_LOCK(*shared_access);
             std::cerr << "run something()" << std::endl;
         }
         
         void compute()
         {
-            assert(access);
-            YOCTO_LOCK(*access);
+            assert(shared_access);
+            YOCTO_LOCK(*shared_access);
             std::cerr << "run compute()" << std::endl;
         }
         
@@ -158,8 +158,8 @@ namespace {
     
     static void do_display( int a )
     {
-        assert(access);
-        YOCTO_LOCK(*access);
+        assert(shared_access);
+        YOCTO_LOCK(*shared_access);
         std::cerr << "display: " << a << std::endl;
     }
     
@@ -174,7 +174,7 @@ YOCTO_UNIT_TEST_IMPL(threads)
 {
     
     threads workers("workers");
-    access = & workers.access;
+    shared_access = & workers.access;
     
     threads::failsafe guard( workers );
     
