@@ -10,11 +10,7 @@ namespace yocto
 	namespace threading
 	{
         
-        
-        //! forward declaration
-		class threads;
-        
-		//! a generic thread
+        //! a generic thread
 		class thread
 		{
 		public:
@@ -77,7 +73,6 @@ namespace yocto
 			handle_t  handle;
 			procedure proc;    //!< routine to start
 			void     *data;    //!< arguments for the routine
-			vslot     code;    //!< store executable code
             
 			void     clear() throw(); //!< cleanup after finish
             
@@ -92,6 +87,7 @@ namespace yocto
             
             
 		public:
+            vslot      code; //!< helper for execution
 			const bool stop; //!< internal flag
 			thread    *next; //!< for threads
 			thread    *prev; //!< for threads
