@@ -179,18 +179,20 @@ YOCTO_UNIT_TEST_IMPL(threads)
     threads::failsafe guard( workers );
     
     workers.launch(do_something,0);
-    workers.start<void (*)(void) >(do_something0);
+    workers.start(do_something0);
     
     run_something run;
     workers.start(run);
     
     workers.finish();
     
-    
-    const functor<void,null_type> fn( &run , & run_something::compute );
+  
+    functor<void,null_type> fn( &run , & run_something::compute );
     workers.start(fn);
+
+    int a=7;
+    workers.start(do_display,a);
     
-    workers.start<void (*)(int),int>(do_display,7);
     workers.finish();
     
 }
