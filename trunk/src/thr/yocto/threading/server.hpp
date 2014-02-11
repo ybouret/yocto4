@@ -3,6 +3,7 @@
 
 #include "yocto/threading/threads.hpp"
 #include "yocto/threading/condition.hpp"
+#include "yocto/threading/layout.hpp"
 #include "yocto/functor.hpp"
 
 namespace yocto
@@ -12,7 +13,7 @@ namespace yocto
         
         
         
-        class server
+        class server : public layout
         {
         public:
             explicit server();
@@ -23,10 +24,11 @@ namespace yocto
             class task
             {
             public:
-                task *next;
-                task *prev;
+                task   *next;
+                task   *prev;
+                job     work;
+                
             private:
-                job   work;
                 task( const job & );
                 ~task() throw();
                 YOCTO_DISABLE_COPY_AND_ASSIGN(task);
@@ -37,15 +39,27 @@ namespace yocto
             
             
         private:
-            threads workers;
+            threads   workers;
+            condition process;
             
         public:
             mutex  &access;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(server);
-            core::list_of<task> tasks;
-            core::pool_of<task> tpool;
+            core::list_of<task> tasks;  //!< tasks to process
+            core::list_of<task> activ;  //!< tasks being processed
+            core::pool_of<task> tpool;  //!< memory
+            size_t              ready;  //!< for first sync
+            bool                dying;  //!< terminating
+            
+            static void thread_entry(void *) throw();
+            
+            void run() throw();
+            
+            void initialize();
+            void terminate() throw();
+            
         };
     }
 }

@@ -6,6 +6,6 @@ using namespace threading;
 
 YOCTO_UNIT_TEST_IMPL(server)
 {
-    
+    server s;
 }
 YOCTO_UNIT_TEST_DONE()
