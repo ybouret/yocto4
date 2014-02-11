@@ -8,6 +8,7 @@ namespace yocto
 {
     namespace threading
     {
+        
         //! context of current thread
         class context : public vslot
         {
@@ -19,6 +20,7 @@ namespace yocto
             
             explicit context( size_t r, size_t s, mutex &lock_ref) throw();
             virtual ~context() throw();
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(context);
