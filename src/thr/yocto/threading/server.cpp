@@ -79,6 +79,12 @@ namespace yocto
             {
                 YOCTO_LOCK(access);
                 dying = true;
+                while( tasks.size )
+                {
+                    task *t = tasks.pop_back();
+                    t->~task();
+                    object::release1<task>(t);
+                }
             }
             
             //------------------------------------------------------------------
@@ -96,7 +102,19 @@ namespace yocto
             // cleanup
             //------------------------------------------------------------------
             workers.finish();
+            assert(activ.size<=0);
             
+            while(tpool.size) object::release1<task>(tpool.query());
+            
+            
+        }
+        
+        void server:: flush() throw()
+        {
+            access.lock();
+            std::cerr << "[server] flushing" << std::endl;
+            synchro.wait(access);
+            access.unlock();
         }
         
         void server:: enqueue( const job &J )
@@ -112,15 +130,6 @@ namespace yocto
                 new (t) task(J);
                 tasks.push_front(t);
                 
-                //______________________________________________________________
-                //
-                // try to start it
-                //______________________________________________________________
-                if(activ.size<size)
-                {
-                    // there should be a waiting thread
-                }
-                
             }
             catch(...)
             {
@@ -128,6 +137,15 @@ namespace yocto
                 throw;
             }
             
+            
+            process.signal();
+            /*
+             if(activ.size<size)
+             {
+             std::cerr << "Signaling" << std::endl;
+             
+             }
+             */
         }
         
         
@@ -147,14 +165,15 @@ namespace yocto
             
             access.lock();
             ++ready;
-        PROCESS_TASK:;
+        PROCESS_TASKS:
             //------------------------------------------------------------------
             // Wait on the LOCKED access
             //------------------------------------------------------------------
             process.wait(access); // and return an unlocked mutex
             
+        CHECK_BEHAVIOR:
             //------------------------------------------------------------------
-            // Locked Return
+            // LOCKED return
             //------------------------------------------------------------------
             if(dying)
             {
@@ -162,6 +181,29 @@ namespace yocto
                 access.unlock();
                 return;
             }
+            
+            //------------------------------------------------------------------
+            // is there a task to run
+            //------------------------------------------------------------------
+            std::cerr << "[server] #tasks=" << tasks.size << std::endl;
+            if(tasks.size)
+            {
+                task *todo = tasks.pop_back();
+                activ.push_back(todo);
+                access.unlock();
+                todo->work();
+                access.lock();
+                
+                activ.unlink(todo);
+                todo->~task();
+                tpool.store(todo);
+                
+                goto CHECK_BEHAVIOR;
+            }
+            
+            
+            synchro.signal();
+            goto PROCESS_TASKS;
         }
         
     }

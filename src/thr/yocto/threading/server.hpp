@@ -36,11 +36,12 @@ namespace yocto
             };
             
             void enqueue( const job &J );
-            
+            void flush() throw();
             
         private:
             threads   workers;
             condition process;
+            condition synchro;
             
         public:
             mutex  &access;
