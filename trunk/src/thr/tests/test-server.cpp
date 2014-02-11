@@ -2,6 +2,7 @@
 #include "yocto/threading/server.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sys/wtime.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace threading;
@@ -9,11 +10,13 @@ using namespace threading;
 
 namespace {
     
+
     class Work
     {
     public:
         int       value;
         lockable &access;
+        static   double secs;
         
         Work( int v, lockable &l ) throw() : value(v), access(l)  {}
         
@@ -23,12 +26,10 @@ namespace {
         
         void operator()(void)
         {
-            double secs=0;
             {
                 YOCTO_LOCK(access);
                 std::cerr << "Working @" << value << "..." << std::endl;
                 std::cerr.flush();
-                secs = 0.2 * alea<double>();
             }
             wtime::sleep(secs);
         }
@@ -36,22 +37,33 @@ namespace {
     private:
         YOCTO_DISABLE_ASSIGN(Work);
     };
+    
+    double Work::secs = 0.1;
 }
 
 YOCTO_UNIT_TEST_IMPL(server)
 {
     
+    size_t nj = 100;
+    if(argc>1)
+    {
+        nj = strconv::to<size_t>(argv[1],"#jobs");
+    }
     
     server s;
     {
-        
-        for(int i=1;i<=100;++i)
+        wtime chrono;
+        chrono.start();
+        for(int i=1;i<=nj;++i)
         {
             Work w(i,s.access);
             const server::job J(w);
             s.enqueue(J);
         }
         s.flush();
+        const double ell = chrono.query();
+        const double tot = nj *  Work::secs;
+        std::cerr << "SpeedUp=" << tot/ell << std::endl;
     }
     
 }
