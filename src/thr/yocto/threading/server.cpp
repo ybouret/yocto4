@@ -26,8 +26,9 @@ namespace yocto
         server:: server() :
         layout(),
         workers( "server", size ),
-        access( workers.access ),
+        access( workers.access  ),
         tasks(),
+        activ(),
         tpool(),
         ready(0),
         dying(false)
@@ -139,13 +140,6 @@ namespace yocto
             
             
             process.signal();
-            /*
-             if(activ.size<size)
-             {
-             std::cerr << "Signaling" << std::endl;
-             
-             }
-             */
         }
         
         
@@ -160,7 +154,7 @@ namespace yocto
         {
             {
                 YOCTO_LOCK(access);
-                std::cerr << "Launching Thread!" << std::endl;
+                std::cerr << "[serverd] launching thread!" << std::endl;
             }
             
             access.lock();
@@ -185,7 +179,7 @@ namespace yocto
             //------------------------------------------------------------------
             // is there a task to run
             //------------------------------------------------------------------
-            std::cerr << "[server] #tasks=" << tasks.size << std::endl;
+            //std::cerr << "[server] #tasks=" << tasks.size << std::endl;
             if(tasks.size)
             {
                 task *todo = tasks.pop_back();
