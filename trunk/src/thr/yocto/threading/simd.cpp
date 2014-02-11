@@ -131,7 +131,7 @@ wksp(0)
                 
                 //______________________________________________________________
                 //
-                // Synchronize
+                // First Synchro
                 //______________________________________________________________
                 for(;;)
                 {
@@ -143,7 +143,7 @@ wksp(0)
                             continue;
                         }
                         access.unlock();
-                        std::cerr << "[SIMD]: synchronized" << std::endl;
+                        std::cerr << "[SIMD] synchronized" << std::endl;
                         break;
                     }
                 }

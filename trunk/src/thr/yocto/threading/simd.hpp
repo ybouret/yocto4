@@ -20,7 +20,9 @@ namespace yocto
             explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< use layout
             virtual ~SIMD() throw();
         
+            //! a Kernel: context dependent function
             typedef functor<void,TL1(context&)> Kernel;
+            
             
             context       & operator[]( size_t rank ) throw();
             const context & operator[]( const size_t rank) const throw();
@@ -43,9 +45,9 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);
-            threads    workers;
+            threads    workers; //!< internal threads
         public:
-            mutex     &access;
+            mutex     &access;  //!< shared access for everyone
         private:
             condition  enter;  //!< cycle synchro
             condition  leave;  //!< main thread wait on it
