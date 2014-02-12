@@ -41,6 +41,9 @@ ADD_TEST(FitEll   test-mk fit_ellipse 10)
 ADD_TEST(Michaelis test-mk michaelis)
 ADD_TEST(Extend    test-mk extend)
 ADD_TEST(ode_expl  test-mk ode_expl)
+ADD_TEST(LSF_Full  test-mk least_squares)
+ADD_TEST(LSF_Poly  test-mk lsf_poly)
+ADD_TEST(LSF_Gauss test-mk lsf_gauss)
 
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
