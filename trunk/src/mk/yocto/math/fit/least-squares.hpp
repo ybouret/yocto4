@@ -68,9 +68,19 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
             };
             
-            typedef array<typename sample::pointer> samples;
+            class samples : public vector<typename sample::pointer>
+            {
+            public:
+                explicit samples() throw();
+                virtual ~samples() throw();
+                void     append(const array<T> &aX, const array<T> &aY, array<T> &aZ);
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(samples);
+            };
             
-            typedef functor<bool,TL2(function &,const samples&)> callback;
+            typedef functor<bool,TL2(function &,const  samples &)> callback;
             
             
             explicit least_squares();
@@ -92,7 +102,7 @@ namespace yocto
             
         private:
             function                        *proc;
-            array<typename sample::pointer> *data;
+            samples                         *data;
             size_t                           nvar;
             size_t                           nums;
             matrix<T>                        alpha;
