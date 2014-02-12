@@ -1,0 +1,83 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{~^{\mathsf{t}}#1}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+\newcommand{\myd}{\mathrm{d}}
+
+\begin{document}
+\title{General Least Squares Fitting}
+\maketitle
+
+\section{Notations}
+We will use a scalar function with $n$ parameters $\vec{u}$
+\begin{equation}
+	F(x,\vec{u})
+\end{equation}
+to simultaneously fit some $S$ samples.
+A sample $S_i$ is defined by a vector of $N_i$ positions $\vec{X}_i$ and
+a vector of values $\vec{Y}_i$.
+Assuming we have a vector of $m\geq n$ unknows, there exist a
+matrix $\mymat{\Gamma}_i\in\mathcal{M}_{n,m}$
+such that
+\begin{equation}
+	\vec{u}_i = \mymat{\Gamma}_i \vec{a}.
+\end{equation}
+The least square value of $S_i$ is
+\begin{equation}
+	D^2_i = \sum_{j=1}^{N_i} \left[ Y_{i,j} - F\left(X_{i,j},\mymat{\Gamma}_i \vec{a}\right)\right]^2.
+\end{equation}
+
+We want to minimize 
+\begin{equation}
+	D^2 = \sum_{i=1}^{S} D_i.
+\end{equation}
+
+\section{Minima}
+We want to find the zero of $\vec{\beta}=-\dfrac{1}{2}\partial D^2 / \partial \vec{a}$
+
+\begin{equation}
+	\beta_{i,k} = -\dfrac{1}{2}\dfrac{\partial D_i^2}{\partial a_k} 
+	= \sum_{j=1}^{N_i} \left[
+	Y_{i,j} - F\left(X_{i,j},\mymat{\Gamma}_i \vec{a}\right)
+	\right] 
+	\left(\dfrac{\partial F(X_{i,j},\mymat{\Gamma}_i \vec{a})}{\partial a_k}\right)
+\end{equation}
+and
+\begin{equation}
+	\beta_k = \sum_{i=1}^{S} \beta_{i,k}.
+\end{equation}
+We use
+\begin{equation}
+	\alpha_{i,k,l} = \dfrac{1}{2} \dfrac{\partial^2 D_i^2}{\partial a_k\partial a_l} =
+	\sum_{j=1}^{N_i} 
+	 \left(\dfrac{\partial F(X_{i,j},\mymat{\Gamma}_i \vec{a})}{\partial a_k}\right) \left(\dfrac{\partial F(X_{i,j},\mymat{\Gamma}_i \vec{a})}{\partial a_l}\right) 
+\end{equation}
+to approximate the curvature of $D_i^2$.
+Using the Newton's algorithm, the step $\delta\vec{a}$ leading to the minimisation is defined by
+\begin{equation}
+	\mymat{\alpha}_{[\lambda]} \delta\vec{a} = \vec{\beta}.
+\end{equation}
+where $\mymat{\alpha}_{[\lambda]}$ is the curvature matrix with the diagonal (positive) element multiplied by $1+\lambda$.
+The $\mymat{\alpha}_i$ matrix is the sum of the Gram matrices
+of
+\begin{equation}
+	\vec{\nabla}_{\vec{a}} F(X_{i,j},\mymat{\Gamma}_i \vec{a})
+	= \mytrn{\mymat{\Gamma}}_i 
+	 \vec{\nabla}_{\vec{u}} F(X_{i,j},\vec{u}_i = \mymat{\Gamma}_i \vec{a}).
+\end{equation}
+
+
+
+
+\end{document}
