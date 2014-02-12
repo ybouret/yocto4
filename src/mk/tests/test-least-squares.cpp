@@ -41,6 +41,7 @@ YOCTO_UNIT_TEST_IMPL(least_squares)
     
     typedef least_squares<double> LSF;
     typedef LSF::sample           Sample;
+    typedef LSF::samples          Samples;
     typedef Sample::pointer       SamplePtr;
     diffusion     diff;
     LSF::function F( &diff, & diffusion::compute );
@@ -73,7 +74,7 @@ YOCTO_UNIT_TEST_IMPL(least_squares)
     
     LSF lsf;
     
-    vector<SamplePtr> samples(2,as_capacity);
+    Samples samples;
     samples.push_back(S1);
     samples.push_back(S2);
     
@@ -157,11 +158,8 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly)
 		}
 	}
 	
-    vector< least_squares<double>::sample::pointer > Samples;
-    {
-        least_squares<double>::sample::pointer S( new least_squares<double>::sample( X, Y, Z ) );
-        Samples.push_back(S);
-    }
+    least_squares<double>::samples Samples;
+    Samples.append(X,Y,Z);
 	Poly<double>            P;
     
 	least_squares<double>::callback cb( &P, & Poly<double>::ToDo );
@@ -289,12 +287,9 @@ YOCTO_UNIT_TEST_IMPL(lsf_gauss)
 	vector<bool>   used(6,true);
 	vector<double> aerr(6,0);
     
-    vector< least_squares<double>::sample::pointer > Samples;
-    {
-        least_squares<double>::sample::pointer S( new least_squares<double>::sample( X, Y, Z ) );
-        Samples.push_back(S);
-    }
-
+    least_squares<double>::samples Samples;
+    Samples.append(X,Y,Z);
+    
 	Gauss<double>                   G;
 	least_squares<double>::function F( &G, & Gauss<double>::Eval );
     least_squares<double>::callback cb( &G, & Gauss<double>::ToDo );
@@ -309,7 +304,8 @@ YOCTO_UNIT_TEST_IMPL(lsf_gauss)
 	
 	
 	LeastSquare.h = 1e-4;
-	
+	LeastSquare.verbose = true;
+    
 	if( LeastSquare( F, Samples, a, used, aerr, &cb) != least_squares_failure )
 	{
 		for( size_t i=1; i <= 6; ++i )

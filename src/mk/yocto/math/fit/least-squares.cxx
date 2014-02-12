@@ -18,7 +18,7 @@ namespace yocto
         
         ////////////////////////////////////////////////////////////////////
         //
-        // samples operations
+        // sample operations
         //
         ////////////////////////////////////////////////////////////////////
         
@@ -193,6 +193,28 @@ namespace yocto
         }
         
         
+        ////////////////////////////////////////////////////////////////////
+        //
+        // samples operations
+        //
+        ////////////////////////////////////////////////////////////////////
+        
+        template <>
+        least_squares<real_t>:: samples:: samples() throw() :
+        vector<sample::pointer>()
+        {
+        }
+        
+        template <>
+        least_squares<real_t>:: samples:: ~samples() throw() {}
+        
+        template <>
+        void least_squares<real_t>:: samples:: append(const array<real_t> &aX, const array<real_t> &aY, array<real_t> &aZ)
+        {
+            const sample::pointer S( new sample(aX,aY,aZ) );
+            push_back(S);
+        }
+
         
         ////////////////////////////////////////////////////////////////////
         //
@@ -297,7 +319,7 @@ namespace yocto
         template <>
         least_squares_result least_squares<real_t>:: operator()
         (function                  &F,
-         array<sample::pointer>    &Samples,
+         samples                   &Samples,
          array<real_t>             &Aorg,
          const array<bool>         &Used,
          array<real_t>             &Aerr,
