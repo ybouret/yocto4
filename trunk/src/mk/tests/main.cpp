@@ -62,6 +62,8 @@ YOCTO_UNIT_TEST_INIT(64)
 
     YOCTO_UNIT_TEST_DECL(crout);
     YOCTO_UNIT_TEST_DECL(least_squares);
+    YOCTO_UNIT_TEST_DECL(lsf_poly);
+    YOCTO_UNIT_TEST_DECL(lsf_gauss);
 
 }
 YOCTO_UNIT_TEST_EXEC()

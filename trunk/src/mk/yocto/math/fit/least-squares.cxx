@@ -74,6 +74,8 @@ namespace yocto
             u.     make(npar,0);
             dFdu.  make(npar,0);
             dFda.  make(nvar,0);
+            
+            if(nvar==npar) Gamma.ld1();
         }
         
         template <>
@@ -224,13 +226,13 @@ namespace yocto
                 }
             }
             
-
+            
             
             for(size_t k=nvar;k>0;--k)
             {
                 if( ! (*used)[k] ) alpha[k][k] = REAL(1.0);
             }
-
+            
             return ans;
         }
         
@@ -298,7 +300,8 @@ namespace yocto
          array<sample::pointer>    &Samples,
          array<real_t>             &Aorg,
          const array<bool>         &Used,
-         array<real_t>             &Aerr
+         array<real_t>             &Aerr,
+         callback                  *cb
          )
         {
             static const char fn[]   = "least_squares";
@@ -322,6 +325,7 @@ namespace yocto
             nums = data->size();
             if(nums<=0)
                 throw exception("[%s] no sample",fn);
+            
             nvar = Aorg.size();
             if(nvar<=0)
                 throw exception("[%s] no variable", fn);
@@ -339,10 +343,16 @@ namespace yocto
             // compute degrees of freedom
             //
             //__________________________________________________________________
-
+            
             size_t ntot = 0;
-            for(size_t i=nums;i>0;--i) ntot += Samples[i]->N;
-            if(ntot<=0) throw exception("[%s] no data",fn);
+            for(size_t i=nums;i>0;--i)
+            {
+                sample &S = *Samples[i];
+                if(S.dFda.size() != nvar )
+                    S.prepare(nvar);
+                ntot += S.N;
+            }
+            if(ntot<=0) throw exception("[%s] no registerd data",fn);
             
             size_t dof = ntot;
             for(size_t i=nvar;i>0;--i)
@@ -409,7 +419,6 @@ namespace yocto
             //
             //__________________________________________________________________
             crout<real_t>::solve(curv,beta);
-            std::cerr << "step=" << beta << std::endl;
             
             //__________________________________________________________________
             //
@@ -448,6 +457,11 @@ namespace yocto
                 //______________________________________________________________
                 
                 mkl::set(*aorg,atmp);
+                if( cb && ! ((*cb)(F,Samples)) )
+                {
+                    return least_squares_failure;
+                }
+
                 if(converged)
                 {
                     if(verbose) std::cerr << "[least_squares] converged" << std::endl;
@@ -463,6 +477,9 @@ namespace yocto
             }
             else
             {
+                // numeric roundoff is likely
+                
+                
                 // increase lambda and go back
                 lambda = max_of(lambda,lambda_min) * lambda_growth;
                 if(lambda>lambda_max)
@@ -476,7 +493,10 @@ namespace yocto
             
         CONVERGED:
             D2 = compute_D2_org();
-            if(verbose) std::cerr << "[least_squares] converged" << std::endl;
+            if( cb && ! ((*cb)(F,Samples)) )
+            {
+                return least_squares_failure;
+            }
             if(verbose) std::cerr << "[least_squares] aorg   = " << *aorg << std::endl;
             if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
             

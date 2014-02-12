@@ -58,8 +58,10 @@ namespace yocto
                 /**
                  \param nvar total number of variables
                  \param npar number of parameters for the fit function
+                 if(nvar==npar) then Gamma is set to identity
                  */
                 void prepare( size_t nvar, size_t npar );
+                inline void prepare(size_t nvar) { prepare(nvar,nvar); }
                 void release() throw();
                 
             private:
@@ -68,20 +70,24 @@ namespace yocto
             
             typedef array<typename sample::pointer> samples;
             
+            typedef functor<bool,TL2(function &,const samples&)> callback;
+            
+            
             explicit least_squares();
             virtual ~least_squares() throw();
             
-            T             D2;    //!< global D2
-            derivative<T> drvs;  //!< to compute derivatives
-            T             h;     //!< for derivatives, default = 1e-4
-            T             ftol;  //!< for convergence, default = numeric<T>::ftol
+            T             D2;      //!< global D2
+            derivative<T> drvs;    //!< to compute derivatives
+            T             h;       //!< for derivatives, default = 1e-4
+            T             ftol;    //!< for convergence, default = numeric<T>::ftol
             bool          verbose; //!< little printout, default is false
             
             least_squares_result operator()(function                        &F,
                                             samples                         &Samples,
                                             array<T>                        &Aorg,
                                             const array<bool>               &Used,
-                                            array<T>                        &Aerr
+                                            array<T>                        &Aerr,
+                                            callback                        *cb = 0
                                             );
             
         private:
