@@ -77,6 +77,20 @@ of
 	 \vec{\nabla}_{\vec{u}} F(X_{i,j},\vec{u}_i = \mymat{\Gamma}_i \vec{a}).
 \end{equation}
 
+\section{Minimisation algorithm}
+We choose a small $\lambda$.
+
+\begin{itemize}
+\item $(\dagger)$ Compute $\mymat{\alpha}_{[\lambda]}$ and $\vec{\beta}$.
+\item Try to inverse $\mymat{\alpha}_{[\lambda]}$. If it is not invertible, then increase $\lambda$. If $\lambda>\lambda_{max}$, 
+stop, we have a singular point. We should restart with some different guest values.
+\item Compute $\delta\vec{a}=\mymat{\alpha}_{[\lambda]}^{-1}\vec{\beta}$ the approximate optimising step.
+\item If $D^2(\vec{a}+\delta\vec{a})<D^2(\vec{a})$, update $\vec{a}$, check for convergence, and decrease $\lambda$.
+Go to $(\dagger)$ is necessary.
+\item If $D^2(\vec{a}+\delta\vec{a})\geq D^2(\vec{a})$, we don't have a good step.
+But we don't know if we went to far, or if it is a roundoff error.
+\end{itemize}
+
 
 
 

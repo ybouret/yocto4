@@ -144,11 +144,20 @@ namespace yocto
             const size_t              n = dFdu.size();
             const size_t              m = dFda.size();
             assert(alpha.cols==m);
+            
+            //__________________________________________________________________
+            //
+            // compute parameters and set D2, beta and alpha to 0
+            //__________________________________________________________________
             mkl::mul(u, Gamma, a);
             D2  = 0;
             mkl::set(beta,0);
             alpha.ldz();
             
+            //__________________________________________________________________
+            //
+            // build D2, beta and alpha
+            //__________________________________________________________________
             for(size_t j=N;j>0;--j)
             {
                 
@@ -185,10 +194,13 @@ namespace yocto
                 
             }
             
+            //__________________________________________________________________
+            //
+            // The beta components for unused variables
+            // and the row/colums of alpha for unused variables are zero !!!
+            //__________________________________________________________________
+
             
-            //std::cerr << "D2=" << D2 << std::endl;
-            //std::cerr << "beta=" << beta << std::endl;
-            //std::cerr << "alpha=" << alpha << std::endl;
             return D2;
         }
         
@@ -235,19 +247,18 @@ namespace yocto
             mkl::set(beta,0);
             for(size_t i=1;i<=nums;++i)
             {
-                //std::cerr << "[LSF]: Sample #" << i << std::endl;
                 sample &S = *(*data)[i];
                 ans += S.compute_D2(*proc, *aorg, *used, drvs, h);
-                mkl::add(beta,S.beta);
+                
                 for(size_t k=nvar;k>0;--k)
                 {
+                    beta[k] += S.beta[k];
                     for(size_t l=nvar;l>0;--l)
                     {
                         alpha[k][l] += S.alpha[k][l];
                     }
                 }
             }
-            
             
             
             for(size_t k=nvar;k>0;--k)
@@ -272,6 +283,7 @@ namespace yocto
         nums(0),
         alpha(),
         beta(),
+        step(),
         aorg(0),
         used(0),
         LU()
@@ -303,7 +315,7 @@ namespace yocto
             
             for(size_t k=nvar;k>0;--k)
             {
-                atmp[k] = (*aorg)[k] + beta[k];
+                atmp[k] = (*aorg)[k] + step[k];
             }
             
             real_t ans = 0;
@@ -357,7 +369,7 @@ namespace yocto
             
             aorg = &Aorg;
             used = &Used;
-            for(size_t k=nvar;k>0;--k) Aerr[k] = 0;
+            mkl::set(Aerr,REAL(0.0));
             
             //__________________________________________________________________
             //
@@ -397,6 +409,7 @@ namespace yocto
             alpha.make(nvar,nvar);
             curv. make(nvar,nvar);
             beta. make(nvar,0);
+            step. make(nvar,0);
             atmp. make(nvar,0);
             LU.   make(nvar,0);
             
@@ -417,6 +430,8 @@ namespace yocto
             D2 = compute_D2_org();
             if(verbose) std::cerr << "[least_squares] aorg   = " << *aorg << std::endl;
             if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
+            
+           
             
             //__________________________________________________________________
             //
@@ -440,7 +455,11 @@ namespace yocto
             // use beta as full Newton's step
             //
             //__________________________________________________________________
-            crout<real_t>::solve(curv,beta);
+            mkl::set(step,beta);
+            crout<real_t>::solve(curv,step);
+            std::cerr << "alpha=" << alpha << std::endl;
+            std::cerr << "beta="  << beta  << std::endl;
+            std::cerr << "step="  << step  << std::endl;
             
             //__________________________________________________________________
             //
@@ -500,7 +519,7 @@ namespace yocto
             else
             {
                 // numeric roundoff is likely
-                
+                std::cerr << "Too Big!!!" << std::endl;
                 
                 // increase lambda and go back
                 lambda = max_of(lambda,lambda_min) * lambda_growth;
