@@ -78,6 +78,16 @@ namespace yocto
             
             if(nvar==npar) Gamma.ld1();
         }
+        template <>
+        void least_squares<real_t>:: sample:: set_parameter(size_t ipar, size_t ivar) throw()
+        {
+            assert(ipar>0);
+            assert(ivar>0);
+            assert(ipar<=Gamma.rows);
+            assert(ivar<=Gamma.cols);
+            Gamma[ipar][ivar] = 1;
+        }
+
         
         template <>
         real_t least_squares<real_t>:: sample:: compute_D2( function &F, const array<real_t> &a )
@@ -249,7 +259,7 @@ namespace yocto
             for(size_t i=1;i<=nums;++i)
             {
                 sample &S = *(*data)[i];
-                ans += S.compute_D2(*proc, *aorg, *used, drvs, h);
+                ans += S.compute_D2(*proc, aorg, used, drvs, h);
                 
                 for(size_t k=nvar;k>0;--k)
                 {
@@ -264,7 +274,7 @@ namespace yocto
             
             for(size_t k=nvar;k>0;--k)
             {
-                if( ! (*used)[k] ) alpha[k][k] = REAL(1.0);
+                if( ! used[k] ) alpha[k][k] = REAL(1.0);
             }
             
             return ans;
@@ -285,8 +295,8 @@ namespace yocto
         alpha(),
         beta(),
         step(),
-        aorg(0),
-        used(0),
+        aorg(),
+        used(),
         LU()
         {
             
@@ -316,7 +326,7 @@ namespace yocto
             
             for(size_t k=nvar;k>0;--k)
             {
-                atmp[k] = (*aorg)[k] + z*step[k];
+                atmp[k] = aorg[k] + z*step[k];
             }
             
             real_t ans = 0;
@@ -367,11 +377,8 @@ namespace yocto
             
             assert(Aorg.size()==Used.size());
             assert(Aerr.size()==Aorg.size());
-            
-            aorg = &Aorg;
-            used = &Used;
-            mkl::set(Aerr,REAL(0.0));
-            
+           
+            mkl::set(Aerr,0);
             //__________________________________________________________________
             //
             //
@@ -411,10 +418,17 @@ namespace yocto
             curv. make(nvar,nvar);
             beta. make(nvar,0);
             step. make(nvar,0);
+            aorg. make(nvar,0);
+            used. make(nvar,true);
             atmp. make(nvar,0);
             LU.   make(nvar,0);
             numeric<real_t>::function probe( this, & least_squares<real_t>::compute_D2_tmp);
             
+            for(size_t k=nvar;k>0;--k)
+            {
+                aorg[k] = Aorg[k];
+                used[k] = Used[k];
+            }
             
             
             //__________________________________________________________________
@@ -429,7 +443,7 @@ namespace yocto
             
         SEARCH:
             D2 = compute_D2_org();
-            if(verbose) std::cerr << "[least_squares] aorg   = " << *aorg << std::endl;
+            if(verbose) std::cerr << "[least_squares] aorg   = " << aorg << std::endl;
             if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
             
             
@@ -476,7 +490,7 @@ namespace yocto
                 bool converged = true;
                 for(size_t k=nvar;k>0;--k)
                 {
-                    const real_t da = Fabs((*aorg)[k]-atmp[k]);
+                    const real_t da = Fabs(aorg[k]-atmp[k]);
                     if( da > ftol * Fabs( atmp[k] ))
                     {
                         converged = false;
@@ -495,7 +509,8 @@ namespace yocto
                 // accept the full step and decrease lambda
                 //______________________________________________________________
                 
-                mkl::set(*aorg,atmp);
+                mkl::set(aorg,atmp);
+                mkl::set(Aorg,aorg);
 #define APPLY_CALLBACK() do { if( cb && ! ((*cb)(F,Samples)) ) return least_squares_failure; } while(false)
                 
                 APPLY_CALLBACK();
@@ -528,7 +543,8 @@ namespace yocto
                     minimize(probe, xx, ff, ftol);
                     const real_t D2_old = D2;
                     D2 = probe(xx.b);
-                    mkl::set(Aorg,atmp);
+                    mkl::set(aorg,atmp);
+                    mkl::set(Aorg,aorg);
                     if(D2>=D2_old)
                     {
                         if(verbose) std::cerr << "[least_squares] spurious" << std::endl;
@@ -553,7 +569,7 @@ namespace yocto
         CONVERGED:
             D2 = compute_D2_org();
             APPLY_CALLBACK();
-            if(verbose) std::cerr << "[least_squares] aorg   = " << *aorg << std::endl;
+            if(verbose) std::cerr << "[least_squares] aorg   = " << aorg << std::endl;
             if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
             
             if( ! LU.build(alpha) )

@@ -6,7 +6,7 @@
 #include "yocto/ptr/arc.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/functor.hpp"
-#include "yocto/math/fcn/derivative.hpp"
+#include "yocto/math/fcn/drvs.hpp"
 #include "yocto/math/kernel/crout.hpp"
 
 namespace yocto
@@ -64,6 +64,10 @@ namespace yocto
                 inline void prepare(size_t nvar) { prepare(nvar,nvar); }
                 void release() throw();
                 
+                //! set parameter ipar to variable ivar
+                void set_parameter(size_t ipar, size_t ivar) throw();
+                
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
             };
@@ -109,8 +113,8 @@ namespace yocto
             matrix<T>                        curv;
             vector<T>                        beta;
             vector<T>                        step;
-            array<T>                        *aorg;
-            const array<bool>               *used;
+            vector<T>                        aorg;
+            vector<bool>                     used;
             vector<T>                        atmp;
             crout<T>                         LU;
             

@@ -123,7 +123,7 @@ namespace
         {
             
             query( handles, "U" ); //! data to exchange
-            dt = math::log_round(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
+            dt = math::log_round_floor(0.1 * min_of( delsq.x, min_of(delsq.y, delsq.z))/max_of(Du,Du));
             num_iter = int(ceil(0.1/dt));
             MPI.Printf(stderr, "Ready (dt=%g|num_iter=%d)\n", dt, num_iter);
         }
