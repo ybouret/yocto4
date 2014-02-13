@@ -1,5 +1,5 @@
 #include "yocto/math/fcn/jacobian.hpp"
-#include "yocto/math/fcn/derivative.hpp"
+#include "yocto/math/fcn/drvs.hpp"
 #include "yocto/math/dat/extrapolate.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/code/utils.hpp"
@@ -10,8 +10,8 @@ namespace yocto
 	namespace math
 	{
 		
-#define kmax_ ( derivative<real_t>:: kmax_ )
-#define hdiv_ ( derivative<real_t>:: hdiv_ )
+#define kmax_ 8
+#define hdiv_ 1.4
 		
 		template <>
 		jacobian<real_t>:: ~jacobian() throw()

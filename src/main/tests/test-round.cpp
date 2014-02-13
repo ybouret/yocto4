@@ -39,7 +39,9 @@ YOCTO_UNIT_TEST_IMPL(log_round)
         std::cerr << "dt=" << dt << std::endl;
         if( dt > 0 )
         {
-            std::cerr << "log_round=" << math::log_round(dt) << std::endl;
+            std::cerr << "log_round_floor=" << math::log_round_floor(dt) << std::endl;
+            std::cerr << "log_round_ceil =" << math::log_round_ceil(dt) << std::endl;
+
         }
         else
             std::cerr << "invalid dt<=0" << std::endl;

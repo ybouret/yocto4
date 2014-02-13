@@ -3,7 +3,7 @@
 
 #include "yocto/chemical/equilibrium.hpp"
 #include "yocto/math/kernel/crout.hpp"
-#include "yocto/math/fcn/derivative.hpp"
+#include "yocto/math/fcn/drvs.hpp"
 #include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
