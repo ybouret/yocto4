@@ -83,7 +83,7 @@ YOCTO_UNIT_TEST_IMPL(least_squares)
     vector<double> aerr( a.size(), 0 );
     
     lsf.verbose = true;
-    lsf.ftol    = 1e-7;
+    lsf.ftol    = 1e-12;
     lsf(F,samples,a,used,aerr);
     
     std::cerr << "aorg=" << a    << std::endl;

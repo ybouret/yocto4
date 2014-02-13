@@ -108,6 +108,7 @@ namespace yocto
             matrix<T>                        alpha;
             matrix<T>                        curv;
             vector<T>                        beta;
+            vector<T>                        step;
             array<T>                        *aorg;
             const array<bool>               *used;
             vector<T>                        atmp;
