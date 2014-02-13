@@ -5,6 +5,7 @@
 #include "yocto/code/utils.hpp"
 
 #include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 
 
@@ -199,7 +200,7 @@ namespace yocto
             // The beta components for unused variables
             // and the row/colums of alpha for unused variables are zero !!!
             //__________________________________________________________________
-
+            
             
             return D2;
         }
@@ -226,7 +227,7 @@ namespace yocto
             const sample::pointer S( new sample(aX,aY,aZ) );
             push_back(S);
         }
-
+        
         
         ////////////////////////////////////////////////////////////////////
         //
@@ -310,12 +311,12 @@ namespace yocto
         }
         
         template <>
-        real_t least_squares<real_t>:: compute_D2_tmp()
+        real_t least_squares<real_t>:: compute_D2_tmp( real_t z )
         {
             
             for(size_t k=nvar;k>0;--k)
             {
-                atmp[k] = (*aorg)[k] + step[k];
+                atmp[k] = (*aorg)[k] + z*step[k];
             }
             
             real_t ans = 0;
@@ -412,7 +413,7 @@ namespace yocto
             step. make(nvar,0);
             atmp. make(nvar,0);
             LU.   make(nvar,0);
-            
+            numeric<real_t>::function probe( this, & least_squares<real_t>::compute_D2_tmp);
             
             
             
@@ -431,7 +432,7 @@ namespace yocto
             if(verbose) std::cerr << "[least_squares] aorg   = " << *aorg << std::endl;
             if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
             
-           
+            
             
             //__________________________________________________________________
             //
@@ -457,9 +458,6 @@ namespace yocto
             //__________________________________________________________________
             mkl::set(step,beta);
             crout<real_t>::solve(curv,step);
-            std::cerr << "alpha=" << alpha << std::endl;
-            std::cerr << "beta="  << beta  << std::endl;
-            std::cerr << "step="  << step  << std::endl;
             
             //__________________________________________________________________
             //
@@ -467,7 +465,7 @@ namespace yocto
             // detect where we are
             //
             //__________________________________________________________________
-            const real_t D2_tmp = compute_D2_tmp();
+            const real_t D2_tmp = probe(1);
             
             if(D2_tmp<D2)
             {
@@ -498,11 +496,10 @@ namespace yocto
                 //______________________________________________________________
                 
                 mkl::set(*aorg,atmp);
-                if( cb && ! ((*cb)(F,Samples)) )
-                {
-                    return least_squares_failure;
-                }
-
+#define APPLY_CALLBACK() do { if( cb && ! ((*cb)(F,Samples)) ) return least_squares_failure; } while(false)
+                
+                APPLY_CALLBACK();
+                
                 if(converged)
                 {
                     if(verbose) std::cerr << "[least_squares] converged" << std::endl;
@@ -518,8 +515,29 @@ namespace yocto
             }
             else
             {
-                // numeric roundoff is likely
-                std::cerr << "Too Big!!!" << std::endl;
+                //______________________________________________________________
+                //
+                // numeric roundoff is likely: try a local minization
+                //______________________________________________________________
+                triplet<real_t> xx = { 0,  0, 1      };
+                triplet<real_t> ff = { D2, 0, D2_tmp };
+                
+                if( bracket<real_t>::inside(probe, xx, ff) )
+                {
+                    
+                    minimize(probe, xx, ff, ftol);
+                    const real_t D2_old = D2;
+                    D2 = probe(xx.b);
+                    mkl::set(Aorg,atmp);
+                    if(D2>=D2_old)
+                    {
+                        if(verbose) std::cerr << "[least_squares] spurious" << std::endl;
+                        ans = least_squares_spurious;
+                        goto CONVERGED;
+                    }
+                    APPLY_CALLBACK();
+                }
+                
                 
                 // increase lambda and go back
                 lambda = max_of(lambda,lambda_min) * lambda_growth;
@@ -534,10 +552,7 @@ namespace yocto
             
         CONVERGED:
             D2 = compute_D2_org();
-            if( cb && ! ((*cb)(F,Samples)) )
-            {
-                return least_squares_failure;
-            }
+            APPLY_CALLBACK();
             if(verbose) std::cerr << "[least_squares] aorg   = " << *aorg << std::endl;
             if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
             
