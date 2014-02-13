@@ -115,7 +115,7 @@ namespace yocto
             crout<T>                         LU;
             
             T    compute_D2_org();
-            T    compute_D2_tmp();
+            T    compute_D2_tmp(T);
             bool build_curvature(T lambda);
         };
         
