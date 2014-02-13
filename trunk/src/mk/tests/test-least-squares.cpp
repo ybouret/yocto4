@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/fit/least-squares.hpp"
 #include "yocto/sequence/lw-array.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -70,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(least_squares)
     vector<bool>   used(3,true);
     a[1] = 0.10;
     a[2] = 0.10;
-    a[3] = 1;
+    a[3] = 0;
     
     LSF lsf;
     
@@ -78,7 +79,11 @@ YOCTO_UNIT_TEST_IMPL(least_squares)
     samples.push_back(S1);
     samples.push_back(S2);
     
-    used[3] = true;
+    if(argc>1)
+    {
+        a[3] = strconv::to<double>( argv[1], "t0");
+        used[3] = false;
+    }
     
     vector<double> aerr( a.size(), 0 );
     
