@@ -61,7 +61,7 @@ namespace yocto
                       array<ptrdiff_t> &nuP) const throw();
 
             //! compute the scaled concentration C
-            void scale(double t) const throw();
+            void scale(double t) const;
 
             //! append scaled concentration
             /**
@@ -80,7 +80,7 @@ namespace yocto
         protected:
             explicit equilibrium( const string &id );
             explicit equilibrium( const char   *id );
-            double   computeK(double) const throw();
+            double   computeK(double) const;
             
         private:
             vector<actor> actors; //!< sorted vector of actors
@@ -103,7 +103,7 @@ namespace yocto
             explicit constant_equilibrium( const char   *id, const double Keq );
             virtual ~constant_equilibrium() throw();
             
-            virtual double getK( double t ) const throw();
+            virtual double getK( double t ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(constant_equilibrium);

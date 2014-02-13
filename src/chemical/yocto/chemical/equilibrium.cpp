@@ -45,7 +45,7 @@ namespace yocto
         }
         
         
-        double equilibrium:: computeK( double t ) const throw()
+        double equilibrium:: computeK( double t ) const
         {
             return getK(t);
         }
@@ -132,7 +132,7 @@ namespace yocto
             return os;
         }
         
-        void equilibrium:: scale(double t) const throw()
+        void equilibrium:: scale(double t) const
         {
             C0 = 1;
             const double K0 = K(t);
@@ -215,7 +215,7 @@ namespace yocto
         {
         }
         
-        double constant_equilibrium::getK(double t) const throw()
+        double constant_equilibrium::getK(double t) const
         {
             return data.as<double>();
         }

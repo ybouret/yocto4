@@ -14,6 +14,7 @@ namespace yocto
                                     const char       *table_name,
                                     const unsigned    table_indx)
         {
+            //std::cerr << "Parsing " << table_name << "[" << table_indx << "]" << std::endl;
             if( !lua_istable(L, -1))
                 throw exception("%s[%u] is not a LUA_TABLE", table_name, table_indx);
             
