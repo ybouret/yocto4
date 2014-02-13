@@ -261,7 +261,7 @@ namespace yocto
         {
             
             static const double zero = numeric<double>::zero;
-            
+            std::cerr << "Booting" << std::endl;
             auto_clean<equilibria> onReturn( cs, &equilibria::reset_topology);
             
             //__________________________________________________________________

@@ -124,7 +124,7 @@ namespace yocto
             /**
              for each equilibirum, call scale(t)
              */
-            void scale_all( double t ) const throw();
+            void scale_all( double t ) const;
             
             //! build a random valid concentration (after scaling)
             bool trial( urand32 &ran, double t );

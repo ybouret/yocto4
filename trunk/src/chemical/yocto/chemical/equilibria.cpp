@@ -45,7 +45,7 @@ namespace yocto
         {
         }
         
-        void equilibria:: scale_all( double t ) const throw()
+        void equilibria:: scale_all( double t ) const
         {
             for( const_iterator eq=begin();eq!=end();++eq)
             {
