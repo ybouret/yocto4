@@ -74,7 +74,7 @@ namespace yocto
                  **/
                 void set_parameter(size_t ipar, size_t ivar) throw();
                 
-                
+                void polynomial( array<T> &aorg, const array<bool> &used, array<T> &aerr, typename numeric<T>::function *transform = 0);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
@@ -107,6 +107,7 @@ namespace yocto
             T             ftol;    //!< for convergence, default = numeric<T>::ftol
             bool          verbose; //!< little printout, default is false
             
+            //! generic call
             least_squares_result operator()(function                        &F,
                                             samples                         &Samples,
                                             array<T>                        &Aorg,
@@ -114,6 +115,9 @@ namespace yocto
                                             array<T>                        &Aerr,
                                             callback                        *cb = 0
                                             );
+            
+           
+            
             
         private:
             function                        *proc;
