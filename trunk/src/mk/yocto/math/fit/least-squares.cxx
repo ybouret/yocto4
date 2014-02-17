@@ -3,6 +3,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/code/ipower.hpp"
 
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
@@ -87,7 +88,7 @@ namespace yocto
             assert(ivar<=Gamma.cols);
             Gamma[ipar][ivar] = 1;
         }
-
+        
         
         template <>
         real_t least_squares<real_t>:: sample:: compute_D2( function &F, const array<real_t> &a )
@@ -216,6 +217,112 @@ namespace yocto
         }
         
         
+        
+        template <>
+        void least_squares<real_t>:: sample:: polynomial(array<real_t>             &aorg,
+                                                         const array<bool>         &used,
+                                                         array<real_t>             &aerr,
+                                                         numeric<real_t>::function *transform)
+        {
+            
+            //__________________________________________________________________
+            //
+            // prepare fit
+            //__________________________________________________________________
+            assert(aorg.size() == used.size());
+            assert(aorg.size() == aerr.size());
+            const size_t n = aorg.size();
+            assert(n>0);
+            prepare(n);
+            crout<real_t> LU(n);
+            size_t dof = N;
+            for(size_t i=n;i>0;--i)
+            {
+                if(used[i])
+                {
+                    if(dof<=0)
+                        throw exception("lsf/polynomial: not enough data");
+                    --dof;
+                }
+            }
+            std::cerr << "#DOF=" << dof << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // compute algebra
+            //__________________________________________________________________
+            alpha.ldz();
+            mkl::set(beta,REAL(0.0));
+            
+            for(size_t i=N;i>0;--i)
+            {
+                const real_t xi = X[i];
+                const real_t yi = (transform != 0) ? (*transform)(Y[i]) : Y[i];
+                for(size_t k=n;k>0;--k)
+                {
+                    if(used[k])
+                    {
+                        const size_t km   = k-1;
+                        const real_t xikm = ipower<real_t>(xi,km);
+                        beta[k] += yi * xikm;
+                        for(size_t l=1;l<=k;++l)
+                        {
+                            if(used[l])
+                            {
+                                alpha[k][l] += xikm * ipower<real_t>(xi,l-1);
+                                alpha[l][k]  = alpha[k][l];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            for(size_t k=n;k>0;--k)
+            {
+                if( !used[k] )
+                {
+                    alpha[k][k] = REAL(1.0);
+                }
+            }
+            
+            //__________________________________________________________________
+            //
+            // solve
+            //__________________________________________________________________
+            std::cerr << "alpha=" << alpha << std::endl;
+            std::cerr << "beta =" << beta  << std::endl;
+            
+            if( !LU.build(alpha) )
+            {
+                throw exception("lsf/polynomial: singular fit");
+            }
+            mkl::set(aorg,beta);
+            crout<real_t>::solve(alpha, aorg);
+            std::cerr << "aorg=" << aorg << std::endl;
+            
+            
+            //__________________________________________________________________
+            //
+            // compute errors by covariance
+            //__________________________________________________________________
+            D2 = 0;
+            for(size_t i=N;i>0;--i)
+            {
+                const real_t xi = X[i];
+                const real_t yi = transform ? (*transform)(Y[i]) : Y[i];
+                Z[i] = 0;
+                for(size_t j=1;j<=n;++j)
+                {
+                    Z[i] += aorg[j] * ipower(xi,j-1);
+                }
+                const real_t dd = yi - Z[i];
+                D2 += dd*dd;
+            }
+            
+            std::cerr << "D2=" << D2 << std::endl;
+        }
+        
+        
         ////////////////////////////////////////////////////////////////////
         //
         // samples operations
@@ -315,7 +422,7 @@ namespace yocto
         
         template <>
         const char least_squares<real_t>::fn[]   = "[least_squares] ";
-
+        
         
         template <>
         bool least_squares<real_t>:: build_curvature(real_t lambda)
@@ -390,7 +497,7 @@ namespace yocto
             
             assert(Aorg.size()==Used.size());
             assert(Aerr.size()==Aorg.size());
-           
+            
             mkl::set(Aerr,0);
             //__________________________________________________________________
             //
@@ -599,7 +706,7 @@ namespace yocto
             //
             // compute errors by covariance matrix
             //__________________________________________________________________
-
+            
             if( ! LU.build(alpha) )
             {
                 throw exception("%sunexpected singular curvature", fn);
@@ -623,7 +730,6 @@ namespace yocto
             
             return ans;
         }
-        
         
         
     }
