@@ -4,7 +4,6 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/sort/quick.hpp"
 #include "yocto/ios/ocstream.hpp"
-#include "yocto/code/ipower.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -23,11 +22,6 @@ save_data( const char *filename, const least_squares<double>::sample &S)
 YOCTO_UNIT_TEST_IMPL(lsf_poly2)
 {
     
-    for(size_t p=0;p<=10;++p)
-    {
-        std::cerr << "0.1^" << p << " = " << ipower<double>(0.1,p) << std::endl;
-    }
-    
     size_t N = 70;
     vector<double> X(N,0);
     vector<double> Y(N,0);
@@ -39,8 +33,6 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly2)
     co_qsort(X,Y);
     vector<double> Z(N,0);
     
-    std::cerr << "X=" << X << std::endl;
-    std::cerr << "Y=" << Y << std::endl;
     least_squares<double>::sample S(X,Y,Z);
     S.prepare(1);
     {
@@ -49,7 +41,7 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly2)
         vector<bool>   used(1,true);
         
         S.polynomial(aorg, used, aerr, NULL);
-        
+        std::cerr << aorg << " +/- " << aerr << std::endl;
         save_data("p0.dat",S);
       
     }
@@ -61,7 +53,7 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly2)
         vector<bool>   used(2,true);
         
         S.polynomial(aorg, used, aerr, NULL);
-        
+        std::cerr << aorg << " +/- " << aerr << std::endl;
         save_data("p1.dat",S);
         
     }
@@ -74,7 +66,7 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly2)
         
         used[1] = false;
         S.polynomial(aorg, used, aerr, NULL);
-        
+        std::cerr << aorg << " +/- " << aerr << std::endl;
         save_data("p1b.dat",S);
         
     }
@@ -85,7 +77,7 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly2)
         vector<bool>   used(3,true);
         
         S.polynomial(aorg, used, aerr, NULL);
-        
+        std::cerr << aorg << " +/- " << aerr << std::endl;
         save_data("p2.dat",S);
         
     }

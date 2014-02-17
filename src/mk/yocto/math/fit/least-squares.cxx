@@ -245,7 +245,6 @@ namespace yocto
                     --dof;
                 }
             }
-            std::cerr << "#DOF=" << dof << std::endl;
             
             //__________________________________________________________________
             //
@@ -253,6 +252,7 @@ namespace yocto
             //__________________________________________________________________
             alpha.ldz();
             mkl::set(beta,REAL(0.0));
+            mkl::set(aerr,REAL(0.0));
             
             for(size_t i=N;i>0;--i)
             {
@@ -289,8 +289,6 @@ namespace yocto
             //
             // solve
             //__________________________________________________________________
-            std::cerr << "alpha=" << alpha << std::endl;
-            std::cerr << "beta =" << beta  << std::endl;
             
             if( !LU.build(alpha) )
             {
@@ -298,7 +296,6 @@ namespace yocto
             }
             mkl::set(aorg,beta);
             crout<real_t>::solve(alpha, aorg);
-            std::cerr << "aorg=" << aorg << std::endl;
             
             
             //__________________________________________________________________
@@ -319,7 +316,21 @@ namespace yocto
                 D2 += dd*dd;
             }
             
-            std::cerr << "D2=" << D2 << std::endl;
+            matrix<real_t> curv(n,n);
+            curv.ld1();
+            crout<real_t>::solve(alpha,curv);
+            if(dof>0)
+            {
+                const real_t residue=D2/dof;
+                for(size_t k=1;k<=n;++k)
+                {
+                    if(used[k])
+                    {
+                        aerr[k] = Sqrt( residue * Fabs(curv[k][k]) );
+                    }
+                }
+            }
+            
         }
         
         
@@ -722,7 +733,7 @@ namespace yocto
                 {
                     if(Used[k])
                     {
-                        Aerr[k] = Sqrt( residue * curv[k][k]);
+                        Aerr[k] = Sqrt( residue * Fabs(curv[k][k]) );
                     }
                 }
             }
