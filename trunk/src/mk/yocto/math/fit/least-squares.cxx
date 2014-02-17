@@ -302,11 +302,25 @@ namespace yocto
             
         }
         
+        template <>
+        void least_squares<real_t>:: cleanup() throw()
+        {
+            LU.    release();
+            used.  release();
+            aorg.  release();
+            step.  release();
+            beta.  release();
+            alpha. release();
+        }
+        
+        template <>
+        const char least_squares<real_t>::fn[]   = "[least_squares] ";
+
         
         template <>
         bool least_squares<real_t>:: build_curvature(real_t lambda)
         {
-            if(verbose) std::cerr << "[least_squares] lambda=" << lambda << std::endl;
+            if(verbose) std::cerr << fn << "lambda = " << lambda << std::endl;
             const real_t fac  = REAL(1.0) + lambda;
             for(size_t k=nvar;k>0;--k)
             {
@@ -349,7 +363,6 @@ namespace yocto
          callback                  *cb
          )
         {
-            static const char fn[]   = "least_squares";
             
             static const real_t lambda_min    = numeric<double>::ftol / 10;
             static const real_t lambda_max    = Pow(REAL(10.0),Floor(Log10(numeric<real_t>::maximum)));
@@ -369,11 +382,11 @@ namespace yocto
             data = &Samples;
             nums = data->size();
             if(nums<=0)
-                throw exception("[%s] no sample",fn);
+                throw exception("%sno sample",fn);
             
             nvar = Aorg.size();
             if(nvar<=0)
-                throw exception("[%s] no variable", fn);
+                throw exception("%sno variable", fn);
             
             assert(Aorg.size()==Used.size());
             assert(Aerr.size()==Aorg.size());
@@ -394,7 +407,7 @@ namespace yocto
                     S.prepare(nvar);
                 ntot += S.N;
             }
-            if(ntot<=0) throw exception("[%s] no registerd data",fn);
+            if(ntot<=0) throw exception("%sno registerd data",fn);
             
             size_t dof = ntot;
             for(size_t i=nvar;i>0;--i)
@@ -402,7 +415,7 @@ namespace yocto
                 if(Used[i])
                 {
                     if(dof<=0)
-                        throw exception("[%s] not enough data",fn);
+                        throw exception("%snot enough data",fn);
                     --dof;
                 }
             }
@@ -413,7 +426,7 @@ namespace yocto
             // extra memory
             //
             //__________________________________________________________________
-            
+            cleanup();
             alpha.make(nvar,nvar);
             curv. make(nvar,nvar);
             beta. make(nvar,0);
@@ -424,6 +437,12 @@ namespace yocto
             LU.   make(nvar,0);
             numeric<real_t>::function probe( this, & least_squares<real_t>::compute_D2_tmp);
             
+            //__________________________________________________________________
+            //
+            //
+            // transfer data
+            //
+            //__________________________________________________________________
             for(size_t k=nvar;k>0;--k)
             {
                 aorg[k] = Aorg[k];
@@ -437,14 +456,14 @@ namespace yocto
             // starting point
             //
             //__________________________________________________________________
-            ftol = Fabs(ftol);
-            real_t lambda = lambda_ini;
-            least_squares_result ans = least_squares_success;
+            ftol                        = Fabs(ftol);
+            real_t               lambda = lambda_ini;
+            least_squares_result ans    = least_squares_success;
             
         SEARCH:
             D2 = compute_D2_org();
-            if(verbose) std::cerr << "[least_squares] aorg   = " << aorg << std::endl;
-            if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
+            if(verbose) std::cerr << fn << "aorg   = " << aorg << std::endl;
+            if(verbose) std::cerr << fn << "D2     = " << D2    << std::endl;
             
             
             
@@ -459,7 +478,7 @@ namespace yocto
                 lambda = max_of(lambda,lambda_min) * lambda_growth;
                 if( lambda > lambda_max )
                 {
-                    if(verbose) std::cerr << "[least_squares] singular point" << std::endl;
+                    if(verbose) std::cerr << fn << "<singular parameters>" << std::endl;
                     return least_squares_failure;
                 }
             }
@@ -467,7 +486,7 @@ namespace yocto
             //__________________________________________________________________
             //
             //
-            // use beta as full Newton's step
+            // compute full Newton's step
             //
             //__________________________________________________________________
             mkl::set(step,beta);
@@ -498,6 +517,10 @@ namespace yocto
                     }
                 }
                 
+                //______________________________________________________________
+                //
+                // check convergence for D2
+                //______________________________________________________________
                 if(!converged)
                 {
                     if( Fabs(D2_tmp-D2) <= ftol * Fabs(D2) )
@@ -517,7 +540,7 @@ namespace yocto
                 
                 if(converged)
                 {
-                    if(verbose) std::cerr << "[least_squares] converged" << std::endl;
+                    if(verbose) std::cerr << fn << "<converged>" << std::endl;
                     goto CONVERGED;
                 }
                 
@@ -547,7 +570,7 @@ namespace yocto
                     mkl::set(Aorg,aorg);
                     if(D2>=D2_old)
                     {
-                        if(verbose) std::cerr << "[least_squares] spurious" << std::endl;
+                        if(verbose) std::cerr << fn << "<spurious level-1>" << std::endl;
                         ans = least_squares_spurious;
                         goto CONVERGED;
                     }
@@ -559,7 +582,7 @@ namespace yocto
                 lambda = max_of(lambda,lambda_min) * lambda_growth;
                 if(lambda>lambda_max)
                 {
-                    if(verbose) std::cerr << "[least_squares] spurious point" << std::endl;
+                    if(verbose) std::cerr << fn << "<spurious level-2>" << std::endl;
                     ans = least_squares_spurious;
                     goto CONVERGED;
                 }
@@ -569,17 +592,22 @@ namespace yocto
         CONVERGED:
             D2 = compute_D2_org();
             APPLY_CALLBACK();
-            if(verbose) std::cerr << "[least_squares] aorg   = " << aorg << std::endl;
-            if(verbose) std::cerr << "[least_squares] D2     = " << D2    << std::endl;
+            if(verbose) std::cerr << fn << "aorg   = " << aorg << std::endl;
+            if(verbose) std::cerr << fn << "D2     = " << D2   << std::endl;
             
+            //__________________________________________________________________
+            //
+            // compute errors by covariance matrix
+            //__________________________________________________________________
+
             if( ! LU.build(alpha) )
             {
-                throw exception("[%s] unexpected singular curvature", fn);
+                throw exception("%sunexpected singular curvature", fn);
             }
             curv.ld1();
             crout<real_t>::solve(alpha,curv);
             
-            if(verbose) std::cerr << "[least_squares] #dof   = " << dof    << std::endl;
+            if(verbose) std::cerr << fn << "#dof   = " << dof    << std::endl;
             if(dof>0)
             {
                 const real_t residue = D2/dof;
