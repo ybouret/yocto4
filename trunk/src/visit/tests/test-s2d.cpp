@@ -79,7 +79,7 @@ namespace
         handles(),
         X(mesh.X()),
         Y(mesh.Y()),
-        alpha( 1e-2 ),
+        alpha( 0.1 ),
         beta( 1e-3 )
         {
             query(handles,"U");

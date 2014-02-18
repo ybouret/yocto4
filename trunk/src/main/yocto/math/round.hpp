@@ -22,19 +22,29 @@ namespace yocto
             assert( a > 0 );
             const T a_log = Floor( Log10(a) );
             const T a_one = Ceil( a * Pow( T(10.0),-a_log));
-            return a_one * Pow( T(10.0),a_log);
+            return  a_one * Pow( T(10.0),a_log);
         }
-
-     
+        
+        
         template <typename T>
         inline void simulation_times( T &dt, T &dt_save, size_t &every )
         {
             assert(dt>0);
-            dt = log_round(dt);
+            dt = log_round_floor(dt);
             if(dt_save<=dt) dt_save = dt;
             every   = size_t(Floor(dt_save/dt));
             if(every<1) every=1;
             dt_save = every * dt;
+        }
+        
+        template <typename T>
+        inline size_t simulation_iter( const T t_run, const T dt, const size_t every )
+        {
+            assert(dt>0);
+            size_t iter = size_t(Ceil(Fabs(t_run/dt)));
+            if(iter<every) iter = every;
+            while( 0 != (iter%every) ) ++iter;
+            return iter;
         }
         
     }
