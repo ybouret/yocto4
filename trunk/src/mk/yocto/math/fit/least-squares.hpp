@@ -120,6 +120,7 @@ namespace yocto
             
             
         private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(least_squares);
             function                        *proc;
             samples                         *data;
             size_t                           nvar;

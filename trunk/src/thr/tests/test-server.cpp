@@ -54,7 +54,7 @@ YOCTO_UNIT_TEST_IMPL(server)
     {
         wtime chrono;
         chrono.start();
-        for(int i=1;i<=nj;++i)
+        for(size_t i=1;i<=nj;++i)
         {
             Work w(i,s.access);
             const server::job J(w);

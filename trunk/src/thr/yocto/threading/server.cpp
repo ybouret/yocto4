@@ -26,6 +26,8 @@ namespace yocto
         server:: server() :
         layout(),
         workers( "server", size ),
+	process(),
+	synchro(),
         access( workers.access  ),
         tasks(),
         activ(),
