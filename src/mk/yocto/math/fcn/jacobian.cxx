@@ -11,7 +11,7 @@ namespace yocto
 	{
 		
 #define kmax_ 8
-#define hdiv_ 1.4
+#define hdiv_ REAL(1.4)
 		
 		template <>
 		jacobian<real_t>:: ~jacobian() throw()
