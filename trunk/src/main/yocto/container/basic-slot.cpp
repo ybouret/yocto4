@@ -9,6 +9,10 @@ slot_(ARGS),\
 info_(0),   \
 kill_(0)
     
+#if defined(_MSC_VER)
+	// no param for macro
+#pragma warning ( disable : 4003 )
+#endif
     //__________________________________________________________________________
     //
     // basic_slot

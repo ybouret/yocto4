@@ -191,7 +191,7 @@ namespace yocto
                 {
                     if(used[k])
                     {
-                        const double g = dFda[k];
+                        const real_t g = dFda[k];
                         beta[k] += dd * g;
                         for(size_t l=1;l<=k;++l)
                         {
@@ -403,7 +403,7 @@ namespace yocto
         least_squares<real_t>:: least_squares() :
         D2(0),
         drvs(),
-        h(1e-4),
+        h(REAL(1.0e-4)),
         ftol(numeric<real_t>::ftol),
         verbose(false),
         proc(0),
@@ -446,7 +446,7 @@ namespace yocto
             {
                 for(size_t l=nvar;l>0;--l)
                 {
-                    const double aa = alpha[k][l];
+                    const real_t aa = alpha[k][l];
                     curv[k][l] = (k == l) ? fac * aa : aa;
                 }
             }
@@ -484,9 +484,9 @@ namespace yocto
          )
         {
             
-            static const real_t lambda_min    = numeric<double>::ftol / 10;
+            static const real_t lambda_min    = numeric<real_t>::ftol / 10;
             static const real_t lambda_max    = Pow(REAL(10.0),Floor(Log10(numeric<real_t>::maximum)));
-            static const real_t lambda_ini    = 1e-3;
+            static const real_t lambda_ini    = REAL(1.0e-3);
             static const real_t lambda_growth = REAL(10.0);
             static const real_t lambda_shrink = REAL(0.1);
             

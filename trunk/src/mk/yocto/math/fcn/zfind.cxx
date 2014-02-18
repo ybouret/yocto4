@@ -21,7 +21,7 @@ namespace yocto {
         template <>
         zfind<real_t>:: zfind( real_t default_xerr ) throw() :
         xerr( default_xerr ),
-        growth(1.6180339887),
+        growth(REAL(1.6180339887)),
         trials(50)
         {
             
