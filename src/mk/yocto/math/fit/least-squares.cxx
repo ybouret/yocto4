@@ -411,10 +411,12 @@ namespace yocto
         nvar(0),
         nums(0),
         alpha(),
+	curv(),
         beta(),
         step(),
         aorg(),
         used(),
+	atmp(),
         LU()
         {
             
