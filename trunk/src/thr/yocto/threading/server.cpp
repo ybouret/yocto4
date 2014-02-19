@@ -26,8 +26,8 @@ namespace yocto
         server:: server() :
         layout(),
         workers( "server", size ),
-	process(),
-	synchro(),
+        process(),
+        synchro(),
         access( workers.access  ),
         tasks(),
         activ(),
@@ -42,13 +42,19 @@ namespace yocto
         {
             try
             {
-                //-- prepare all threads
+                //______________________________________________________________
+                //
+                // prepare all threads
+                //______________________________________________________________
                 for(size_t i=0;i<size;++i)
                 {
                     workers.launch(thread_entry, this);
                 }
                 
-                //-- wait for first syncro
+                //______________________________________________________________
+                //
+                // wait for first syncro
+                //______________________________________________________________
                 for(;;)
                 {
                     if( access.try_lock() )
@@ -61,6 +67,21 @@ namespace yocto
                         else
                         {
                             std::cerr << "[server] threads are ready" << std::endl;
+                            //__________________________________________________
+                            //
+                            // Placement
+                            //__________________________________________________
+                            std::cerr << "[server] control" << std::endl;
+                            assign_current_thread_on( cpu_index_of(0));
+                            
+                            std::cerr << "[server] workers" << std::endl;
+                            size_t iThread = 0;
+                            for(thread *thr = workers.head; thr; thr=thr->next)
+                            {
+                                thr->on_cpu( cpu_index_of(iThread++) );
+                            }
+
+                            
                             access.unlock();
                             break;
                         }
