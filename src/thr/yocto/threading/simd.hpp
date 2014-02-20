@@ -34,11 +34,7 @@ namespace yocto
             template <typename WINDOW>
             inline void dispatch( size_t length, size_t offset )
             {
-                SIMD &self = *this;
-                for( size_t rank=0;rank<size;++rank)
-                {
-                    self[rank].create<WINDOW>(length,offset);
-                }
+                context::dispatch<SIMD,WINDOW>(*this,length,offset);
             }
             
             
