@@ -19,8 +19,10 @@ namespace yocto
             explicit server();
             virtual ~server() throw();
             
+            //! a job a a full fledge functor
             typedef functor<void,null_type> job;
         
+            //! dynamic task, containing the job to do
             class task
             {
             public:
@@ -54,6 +56,7 @@ namespace yocto
             size_t              ready;  //!< for first sync
             bool                dying;  //!< terminating
             
+            //! called with 'this', call the run() function
             static void thread_entry(void *) throw();
             
             void run() throw();

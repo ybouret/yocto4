@@ -27,6 +27,7 @@ namespace yocto
             context       & operator[]( size_t rank ) throw();
             const context & operator[]( const size_t rank) const throw();
             
+            //! execute #threads copy of kernel with different contexts
             void operator()( Kernel &K );
             
             //! make windows in contexts data
