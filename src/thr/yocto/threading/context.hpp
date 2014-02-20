@@ -53,9 +53,13 @@ namespace yocto
             
             const size_t size;
             
+            context       & operator[](size_t rank) throw();
+            const context & operator[](size_t rank) const throw();
+            
+            
         private:
             size_t   cnt; //!< for memory
-            context *ctx;
+            context *ctx; //!< localization
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(context_batch);
         };
