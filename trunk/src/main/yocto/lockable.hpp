@@ -19,6 +19,20 @@ namespace yocto
 		YOCTO_DISABLE_COPY_AND_ASSIGN(lockable);
 	};
 	
+    class faked_lock : public lockable
+    {
+    public:
+        explicit faked_lock() throw();
+        virtual ~faked_lock() throw();
+        virtual void lock()     throw();
+		virtual void unlock()   throw();
+		virtual bool try_lock() throw();
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(faked_lock);
+        int depth;
+    };
+    
 	class scoped_lock
 	{
 	public:

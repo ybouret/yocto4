@@ -110,11 +110,10 @@ YOCTO_UNIT_TEST_IMPL(simd)
         std::cerr << "rank=" << rank << ": " << w.start << " -> " << w.final << " #" << w.count << std::endl;
     }
     
-    context mono(0,1,simd.access);
-    {
-        const window win(mono,N,1);
-        mono.make<window>(win);
-    }
+    
+    
+    single_context mono;
+    mono.create<window>(N,1);
     
     
     wtime chrono;

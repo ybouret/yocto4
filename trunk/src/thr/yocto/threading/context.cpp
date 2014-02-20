@@ -15,6 +15,15 @@ namespace yocto
         access(lock_ref)
         {
         }
+     
+        
+        single_context:: ~single_context() throw() {}
+        
+        single_context:: single_context() throw() :
+        faked_lock(),
+        context(0,1,*this)
+        {
+        }
         
     }
 }
