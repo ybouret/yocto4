@@ -8,7 +8,7 @@ namespace yocto
         
         context:: ~context() throw() {}
         
-        context::  context( size_t r, size_t s, mutex &lock_ref) throw() :
+        context::  context( size_t r, size_t s, lockable &lock_ref) throw() :
         rank(r),
         indx(rank+1),
         size(s),
