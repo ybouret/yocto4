@@ -63,7 +63,7 @@ namespace yocto
             {
                 ctx[--i].~context();
             }
-            memory::kind<memory::global>::release_as<context>(ctx, cnt);
+            memory::kind<memory::global>::release_as<context>(ctx,cnt);
         }
         
         context_batch:: context_batch( size_t n, lockable &lock_ref) :
@@ -71,7 +71,10 @@ namespace yocto
         cnt(size),
         ctx( memory::kind<memory::global>::acquire_as<context>(cnt) )
         {
-            
+            for(size_t rank=0;rank<size;++rank)
+            {
+                new (ctx+rank) context(rank,size,lock_ref);
+            }
         }
     }
 }
