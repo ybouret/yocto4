@@ -6,6 +6,11 @@ namespace yocto
     namespace threading
     {
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // a context: rank/size/access
+        //
+        ////////////////////////////////////////////////////////////////////////
         context:: ~context() throw() {}
         
         context::  context( size_t r, size_t s, lockable &lock_ref) throw() :
@@ -15,8 +20,22 @@ namespace yocto
         access(lock_ref)
         {
         }
-     
         
+    }
+    
+}
+
+
+namespace yocto
+{
+    namespace threading
+    {
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // a self-contained, not threaded context
+        //
+        ////////////////////////////////////////////////////////////////////////
         single_context:: ~single_context() throw() {}
         
         single_context:: single_context() throw() :
@@ -25,5 +44,35 @@ namespace yocto
         {
         }
         
+        
+        
+        
+        
     }
 }
+
+#include "yocto/memory/global.hpp"
+namespace yocto
+{
+    namespace threading
+    {
+        context_batch:: ~context_batch() throw()
+        {
+            size_t i=size;
+            while(i>0)
+            {
+                ctx[--i].~context();
+            }
+            memory::kind<memory::global>::release_as<context>(ctx, cnt);
+        }
+        
+        context_batch:: context_batch( size_t n, lockable &lock_ref) :
+        size( n > 0 ? n : 1),
+        cnt(size),
+        ctx( memory::kind<memory::global>::acquire_as<context>(cnt) )
+        {
+            
+        }
+    }
+}
+

@@ -16,7 +16,7 @@ namespace yocto
             const size_t rank;   //!< 0..size-1
             const size_t indx;   //!< rank+1, for information
             const size_t size;   //!< size of the crew
-            lockable    &access; //!< common mutex for synchronization
+            lockable    &access; //!< common lock for synchronization
             
             explicit context( size_t r, size_t s, lockable &lock_ref) throw();
             virtual ~context() throw();
@@ -40,10 +40,26 @@ namespace yocto
             explicit single_context() throw();
             virtual ~single_context() throw();
             
-            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(single_context);
         };
+        
+        //! for use with server
+        class context_batch
+        {
+        public:
+            explicit context_batch(size_t n, lockable &lock_ref);
+            virtual ~context_batch() throw();
+            
+            const size_t size;
+            
+        private:
+            size_t   cnt; //!< for memory
+            context *ctx;
+            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(context_batch);
+        };
+        
         
     }
 }
