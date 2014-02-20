@@ -19,7 +19,7 @@ namespace yocto
             explicit SIMD(); //!< use layout
             explicit SIMD(size_t num_threads, size_t thread_offset=0); //!< use layout
             virtual ~SIMD() throw();
-        
+            
             //! a Kernel: context dependent function
             typedef functor<void,TL1(context&)> Kernel;
             
@@ -36,12 +36,10 @@ namespace yocto
                 SIMD &self = *this;
                 for( size_t rank=0;rank<size;++rank)
                 {
-                    context       &ctx = self[rank];
-                    const WINDOW   win(ctx,length,offset);
-                    ctx.make<WINDOW>(win);
+                    self[rank].create<WINDOW>(length,offset);
                 }
             }
-
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(SIMD);
@@ -59,7 +57,7 @@ namespace yocto
             
             size_t   wlen; //!< extra memory size
             void    *wksp; //!< extra memory data
-        
+            
             void initialize();
             void terminate() throw();
             
