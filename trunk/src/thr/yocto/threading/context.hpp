@@ -24,7 +24,7 @@ namespace yocto
             explicit context( size_t r, size_t s, lockable &lock_ref) throw();
             virtual ~context() throw();
             
-            // build a window
+            //! build a window
             template <typename WINDOW>
             inline void create( size_t length, size_t offset )
             {

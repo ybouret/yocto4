@@ -5,7 +5,6 @@
 #include "yocto/threading/layout.hpp"
 #include "yocto/threading/context.hpp"
 #include "yocto/threading/condition.hpp"
-#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -21,7 +20,7 @@ namespace yocto
             virtual ~SIMD() throw();
             
             //! a Kernel: context dependent function
-            typedef functor<void,TL1(context&)> Kernel;
+            typedef context::kernel Kernel;
             
             
             context       & operator[]( size_t rank ) throw();
