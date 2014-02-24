@@ -18,12 +18,11 @@ namespace yocto
             virtual bool query( char &C );
             virtual void store( char  C );
             
-
-            list<char> Q;
             
         protected:
             explicit q_codec() throw();
-            
+            list<char> Q;
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(q_codec);
         };
