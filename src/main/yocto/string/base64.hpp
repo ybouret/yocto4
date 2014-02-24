@@ -1,7 +1,7 @@
 #ifndef YOCTO_STRING_BASE64_INCLUDED
 #define YOCTO_STRING_BASE64_INCLUDED 1
 
-#include "yocto/ios/codec.hpp"
+#include "yocto/pack/q-codec.hpp"
 #include "yocto/sequence/list.hpp"
 
 namespace yocto
@@ -10,15 +10,11 @@ namespace yocto
     struct base64
     {
         
-        class common : public ios::codec
+        class common : public pack::q_codec
         {
         public:
             virtual ~common() throw();
             
-            virtual bool query( char &C );
-            virtual void store( char  C );
-            
-            list<char> fifo;
             virtual void       reset() throw();
             
         protected:
