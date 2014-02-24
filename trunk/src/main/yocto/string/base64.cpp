@@ -14,7 +14,7 @@ namespace yocto
 #pragma warning ( disable : 4351 )
 #endif
     base64:: common:: common() throw() :
-    fifo(),
+    q_codec(),
     buf(),
     len(0)
     {
@@ -26,31 +26,16 @@ namespace yocto
     {
         len = 0;
         memset(buf,0,sizeof(buf));
+        Q.free();
     }
     
-    bool base64:: common:: query( char &C )
-    {
-        if( fifo.size() )
-        {
-            C = fifo.front();
-            fifo.pop_front();
-            return true;
-        }
-        else
-            return false;
-    }
-    
-    void base64:: common:: store( char C )
-    {
-        fifo.push_front( C );
-    }
     
     
     ////////////////////////////////////////////////////////////////////////////
     //
     //
     ////////////////////////////////////////////////////////////////////////////
-    const char base64:: encoder:: table_iso[64] = 
+    const char base64:: encoder:: table_iso[64] =
     {
         'A','B','C','D','E','F','G','H',
         'I','J','K','L','M','N','O','P',
@@ -62,7 +47,7 @@ namespace yocto
         '4','5','6','7','8','9','+','/'
     };
     
-    const char base64:: encoder:: table_url[64] = 
+    const char base64:: encoder:: table_url[64] =
     {
         'A','B','C','D','E','F','G','H',
         'I','J','K','L','M','N','O','P',
@@ -112,19 +97,19 @@ namespace yocto
     }
     
 #define __MASK6     0x3F
-#define __MASK4     0x0F 
+#define __MASK4     0x0F
 #define __MASK2     0x03
     
 #define __SHL(A,n) ( (A) << (n) )
 #define __SHR(A,n) ( (A) >> (n) )
     
     //-- byte 0: 6 bits
-#define __BYTE0(X)   uint8_t( __SHR(X,2) & __MASK6 )  
+#define __BYTE0(X)   uint8_t( __SHR(X,2) & __MASK6 )
     
     //-- byte 1: 2 + 4 bits
 #define __BYTE1X(X)  ( __SHL( (X) & __MASK2,4) )
 #define __BYTE1Y(Y)  ( __SHR(Y,4) & __MASK4    )
-#define __BYTE1(X,Y) uint8_t( __BYTE1X(X) | __BYTE1Y(Y) )   
+#define __BYTE1(X,Y) uint8_t( __BYTE1X(X) | __BYTE1Y(Y) )
     
     //-- byte 2: 4 + 2 bits
 #define __BYTE2Y(Y)  ( __SHL((Y)&__MASK4,2)   )
@@ -147,10 +132,10 @@ namespace yocto
                 const uint8_t A1 = __BYTE1(buf[0],buf[1]);  assert(A1<64);
                 const uint8_t A2 = __BYTE2(buf[1],buf[2]);  assert(A2<64);
                 const uint8_t A3 = __BYTE3(buf[2]);         assert(A3<64);
-                fifo.push_back( tab[A0] );
-                fifo.push_back( tab[A1] );
-                fifo.push_back( tab[A2] );
-                fifo.push_back( tab[A3] );
+                Q.push_back( tab[A0] );
+                Q.push_back( tab[A1] );
+                Q.push_back( tab[A2] );
+                Q.push_back( tab[A3] );
             }
                 break;
                 
@@ -159,10 +144,10 @@ namespace yocto
                 const uint8_t A0 = __BYTE0(buf[0]);         assert(A0<64);
                 const uint8_t A1 = __BYTE1(buf[0],buf[1]);  assert(A1<64);
                 const uint8_t A2 = __BYTE2(buf[1],0);       assert(A2<64);
-                fifo.push_back( tab[A0] );
-                fifo.push_back( tab[A1] );
-                fifo.push_back( tab[A2] );
-                if( padding ) fifo.push_back( '=' );
+                Q.push_back( tab[A0] );
+                Q.push_back( tab[A1] );
+                Q.push_back( tab[A2] );
+                if( padding ) Q.push_back( '=' );
             }
                 break;
                 
@@ -170,12 +155,12 @@ namespace yocto
             {
                 const uint8_t A0 = __BYTE0(buf[0]);         assert(A0<64);
                 const uint8_t A1 = __BYTE1(buf[0],0);       assert(A1<64);
-                fifo.push_back( tab[A0] );
-                fifo.push_back( tab[A1] );
-                if( padding ) 
+                Q.push_back( tab[A0] );
+                Q.push_back( tab[A1] );
+                if( padding )
                 {
-                    fifo.push_back( '=' );
-                    fifo.push_back( '=' );
+                    Q.push_back( '=' );
+                    Q.push_back( '=' );
                 }
             }
                 break;
@@ -243,7 +228,7 @@ namespace yocto
     }
     
     
-#define __CODE1X(X)  ( ((X)&63) << 2 ) 
+#define __CODE1X(X)  ( ((X)&63) << 2 )
 #define __CODE1Y(Y)  ( ((Y)&63) >> 4 )
 #define __CODE1(X,Y) uint8_t( __CODE1X(X) | __CODE1Y(Y) )
     
@@ -266,7 +251,7 @@ namespace yocto
             case 2:
             {
                 const uint8_t C0 = __CODE1(buf[0],buf[1]);
-                fifo.push_back(C0);
+                Q.push_back(C0);
             }
                 break;
                 
@@ -274,8 +259,8 @@ namespace yocto
             {
                 const uint8_t C0 = __CODE1(buf[0],buf[1]);
                 const uint8_t C1 = __CODE2(buf[1],buf[2]);
-                fifo.push_back(C0);
-                fifo.push_back(C1);
+                Q.push_back(C0);
+                Q.push_back(C1);
             }
                 break;
                 
@@ -284,10 +269,10 @@ namespace yocto
                 const uint8_t C0 = __CODE1(buf[0],buf[1]);
                 const uint8_t C1 = __CODE2(buf[1],buf[2]);
                 const uint8_t C2 = __CODE3(buf[2],buf[3]);
-
-                fifo.push_back(C0);
-                fifo.push_back(C1);
-                fifo.push_back(C2);
+                
+                Q.push_back(C0);
+                Q.push_back(C1);
+                Q.push_back(C2);
             }
                 break;
                 

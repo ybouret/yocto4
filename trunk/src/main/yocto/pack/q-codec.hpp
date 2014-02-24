@@ -10,19 +10,22 @@ namespace yocto
     namespace pack
     {
         //! implement the istream part
-        class Qcodec : public ios::codec
+        class q_codec : public ios::codec
         {
         public:
-            virtual ~Qcodec() throw();
+            virtual ~q_codec() throw();
             
             virtual bool query( char &C );
             virtual void store( char  C );
             
-        protected:
+
             list<char> Q;
             
+        protected:
+            explicit q_codec() throw();
+            
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(Qcodec);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(q_codec);
         };
     }
     
