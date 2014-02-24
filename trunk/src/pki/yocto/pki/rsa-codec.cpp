@@ -23,30 +23,14 @@ namespace yocto
 		
 		
 		rsa_codec:: rsa_codec( const rsa_key::pointer &handle ) :
-        key( handle ),
-        Q()
+        q_codec(),
+        key( handle )
         {
 			
 		}
         
         
-        bool rsa_codec:: query( char &C )
-        {
-            if( Q.size() <= 0 )
-                return false;
-            else
-            {
-                C = Q.front();
-                Q.pop_front();
-                return true;
-            }
-        }
         
-        void rsa_codec:: store( char C )
-        {
-            Q.push_front(C);
-        }
-		
         
 		////////////////////////////////////////////////////////////////////////
 		//

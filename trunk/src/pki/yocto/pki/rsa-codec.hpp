@@ -3,7 +3,7 @@
 
 #include "yocto/pki/rsa-keys.hpp"
 #include "yocto/ios/bitio.hpp"
-#include "yocto/ios/codec.hpp"
+#include "yocto/pack/q-codec.hpp"
 
 namespace yocto
 {
@@ -12,20 +12,17 @@ namespace yocto
 	{
 		
 		
-		class rsa_codec : public ios::codec
+		class rsa_codec : public pack::q_codec
 		{
 		public:
 			static const size_t prolog = 1;              //!< #random bits before byte
             static const size_t dblock = 1 + prolog + 8; //!< #bits to encode one byte
 			virtual ~rsa_codec() throw();
-			
-            virtual bool query( char &C );
-            virtual void store( char C );
+            
 			
 		protected:
 			explicit rsa_codec( const rsa_key::pointer &);
 			const rsa_key::pointer key;
-            list<char>             Q;
 			
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(rsa_codec);
