@@ -29,7 +29,7 @@ namespace yocto
 #define EVAL()  ( (func(x+hh)-func(x-hh))/(hh+hh) )
         
         template <>
-        real_t derivative<real_t>::diff(typename numeric<real_t>::function &func, real_t x, real_t h, real_t &err)
+        real_t derivative<real_t>::diff(numeric<real_t>::function &func, real_t x, real_t h, real_t &err)
         {
             
             real_t hh = Fabs(h);
