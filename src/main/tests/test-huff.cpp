@@ -14,38 +14,6 @@ YOCTO_UNIT_TEST_IMPL(huff)
     ios::icstream     input( ios::cstdin );
     char C = 0;
     
-#if 0
-    Huffman::Alphabet alpha;
-    Huffman::Tree     tree;
-    size_t            bytes=0;
-    ios::bitio        bio;
-    
-    // first tree
-    alpha.reset();
-    tree.build_for(alpha);
-    
-    size_t emitted = 0;
-    while( input.query(C) )
-    {
-        ++bytes;
-        if(alpha[C].Freq<=0)
-        {
-            alpha[ Huffman::NYT ].emit(bio);
-        }
-        alpha[C].emit(bio);
-        alpha.increase(C);
-        tree.build_for(alpha);
-        emitted += bio.size();
-        bio.free();
-    }
-    alpha[ Huffman::END ].emit(bio);
-    emitted += bio.size();
-    bio.free();
-    
-    std::cerr << alpha << std::endl;
-    std::cerr << "input:  " << bytes*8 << std::endl;
-    std::cerr << "output: " << emitted << std::endl;
-#endif
     
     Huffman::encoder H1;
     Huffman::encoder H2;
