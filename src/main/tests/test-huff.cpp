@@ -59,5 +59,12 @@ YOCTO_UNIT_TEST_IMPL(huff)
     std::cerr << "#input   = " << ni << std::endl;
     std::cerr << "#output1 = " << n1 << std::endl;
     std::cerr << "#output2 = " << n2 << std::endl;
+    
+    std::cerr << "H1:" << std::endl;
+    std::cerr << H1.alphabet() << std::endl;
+    
+    std::cerr << "H2:" << std::endl;
+    std::cerr << H2.alphabet() << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()
