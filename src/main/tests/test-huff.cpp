@@ -68,3 +68,26 @@ YOCTO_UNIT_TEST_IMPL(huff)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(unhuff)
+{
+    
+    ios::icstream     input( ios::cstdin );
+    ios::ocstream     output( ios::cstdout);
+    char C = 0;
+    Huffman::decoder  H;
+    while( input.query(C) )
+    {
+        H.write(C);
+        while(H.query(C))
+        {
+            output.write(C);
+        }
+    }
+    H.flush();
+    while(H.query(C))
+    {
+        output.write(C);
+    }
+}
+YOCTO_UNIT_TEST_DONE()
