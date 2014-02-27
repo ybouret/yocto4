@@ -14,7 +14,7 @@ YOCTO_UNIT_TEST_IMPL(huff)
     ios::icstream     input( ios::cstdin );
     char C = 0;
     
-    bool use2 = false;
+    bool use2 = true;
     
     Huffman::encoder H1;
     Huffman::encoder H2;

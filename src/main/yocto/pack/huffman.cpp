@@ -63,9 +63,9 @@ namespace yocto
             os << ": #=" << it.Freq << " | bits=" << it.Bits;
             // code
             os << " | [";
-            for( size_t i=it.Bits;i>0;--i)
+            for( size_t i=0;i<it.Bits;++i)
             {
-                const Huffman::CodeType b = 1 << (i-1);
+                const Huffman::CodeType b = 1 << (i);
                 if(b&it.Code)
                     os << "1";
                 else
@@ -263,7 +263,7 @@ namespace yocto
             //__________________________________________________________________
             root = h.pop();
             
-            if(true)
+            if(false)
             {
                 ios::ocstream fp("huff.dot",false);
                 fp << "digraph G {\n";
@@ -325,7 +325,9 @@ namespace yocto
                      if(node==parent->right)
                      code |= (1<<bits);
                      */
-                    code |= (node->cbit<<bits);
+                    //code |= (node->cbit<<bits);
+                    code <<= 1;
+                    code  |= node->cbit;
                     ++bits;
                     if(bits>RootBits)
                         return false;
@@ -411,30 +413,19 @@ namespace yocto
             while(bio.size()>=8)
             {
                 const uint8_t b = bio.pop_full<uint8_t>();
-                std::cerr << "Encoded [" << int(b) <<  "]" << std::endl;
                 Q.push_back( b );
             }
             alpha.increase(C);
             tree.build_for(alpha);
-            std::cerr << alpha << std::endl;
         }
         
         void Huffman::encoder::flush()
         {
-            std::cerr << "bio.size=" << bio.size() << std::endl;
-            bio.output(std::cerr, bio.size()); std::cerr << std::endl;
-            std::cerr << "Emitting " << alpha[END] << std::endl;
             alpha[END].emit(bio);
-            std::cerr << "bio.size=" << bio.size() << std::endl;
-            bio.output(std::cerr, bio.size()); std::cerr << std::endl;
-
             bio.fill_to_byte_with(false);
-            std::cerr << "bio.size=" << bio.size() << std::endl;
-            bio.output(std::cerr, bio.size()); std::cerr << std::endl;
             while(bio.size()>=8)
             {
                 const uint8_t b = bio.pop_full<uint8_t>();
-                std::cerr << "Encoded [" << int(b) <<  "]" << std::endl;
                 Q.push_back( b );
             }
             assert(0==bio.size());
@@ -466,11 +457,9 @@ namespace yocto
         
         void Huffman:: decoder:: emit(uint8_t b)
         {
-            std::cerr << "Emitting " << int(b) << std::endl;
             Q.push_back(b);
             alpha.increase(b);
             tree.build_for(alpha);
-            std::cerr << alpha << std::endl;
             node = tree.get_root();
             flag = wait_for1;
         }
@@ -478,13 +467,11 @@ namespace yocto
         void Huffman:: decoder:: write(char C)
         {
             bio.push_full<uint8_t>(C);
-            std::cerr << "Decoding with [" << int(uint8_t(C)) << "]" << std::endl;
             while(true)
             {
                 switch(flag)
                 {
                     case wait_for8:
-                        std::cerr << "Wait8" << std::endl;
                         if( bio.size() >= 8 )
                         {
                             const uint8_t b = bio.pop_full<uint8_t>();
@@ -492,7 +479,6 @@ namespace yocto
                         }
                         else
                         {
-                            std::cerr << "No8" << std::endl;
                             return;
                         }
                         break;
@@ -502,37 +488,31 @@ namespace yocto
                         assert(node->Char==INS);
                         assert(node->left!=0);
                         assert(node->right!=0);
-                        std::cerr << "Wait1" << std::endl;
                         if(bio.size()>0)
                         {
-                            std::cerr << "bio: "; bio.output(std::cerr,bio.size()); std::cerr << std::endl;
                             const bool bit = bio.pop();
-                            std::cerr << "Read<" << bit << ">" << std::endl;
                             node = bit ? node->right : node->left;
                             if(node->Char>=0)
                             {
                                 switch(node->Char)
                                 {
                                     case NYT:
-                                        std::cerr << "NYT" << std::endl;
                                         node = 0;
                                         flag = wait_for8;
                                         break;
                                         
                                     case END:
-                                        //TODO
-                                        std::cerr << std::endl << "TODO: END" << std::endl;exit(-1);
-                                        break;
+                                        bio.free();
+                                        return;
                                         
                                     default:
                                         emit(node->Char);
                                 }
                             }
-                            // else
+                            // else internal node, go on...
                         }
                         else
                         {
-                            std::cerr << "No1" << std::endl;
                             return;
                         }
                         break;
