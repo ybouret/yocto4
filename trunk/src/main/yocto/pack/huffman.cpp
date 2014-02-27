@@ -72,6 +72,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         Huffman:: Alphabet:: Alphabet() :
+        numch(0),
         count( AlphabetSize ),
         items( memory::kind<Memory>::acquire_as<Item>(count) )
         {
@@ -83,9 +84,14 @@ namespace yocto
             memory::kind<Memory>::release_as<Item>(items,count);
         }
         
+        size_t Huffman:: Alphabet::  chars() const throw()
+        {
+            return numch;
+        }
         
         void Huffman:: Alphabet:: reset() throw()
         {
+            numch = 0;
             for(CharType i=0;i<256; ++i)
             {
                 Item *it = new ( &items[i] ) Item(i);
@@ -114,7 +120,9 @@ namespace yocto
         void Huffman:: Alphabet:: increase(uint8_t b) throw()
         {
             Item &item = items[b];
-            ++item.Freq;
+            if(item.Freq++<=0)
+                ++numch;
+            //std::cerr << "+ " << int(b) << std::endl;
         }
         
         void Huffman:: Alphabet:: rescale() throw()
@@ -129,31 +137,23 @@ namespace yocto
                 }
             }
         }
-
-#if 0
-        void Huffman:: Alphabet:: emit(ios::bitio &bin, CharType Ch) const
+        
+        void Huffman:: Alphabet:: check_nyt() throw()
         {
-            assert(Ch>=0);
-            assert(Ch<AlphabetSize);
-            const Item &item = items[Ch];
-            assert(item.Bits>0);
-            bin.push<CodeType>(item.Code,item.Bits);
+            if(numch>=256) items[NYT].Freq = 0;
         }
-#endif
         
         std::ostream & operator<<(std::ostream &os, const Huffman::Alphabet &alpha)
         {
-            size_t nch = 0;
             for(size_t i=0;i<Huffman::AlphabetSize;++i)
             {
                 const Huffman::Item &item = alpha.items[i];
                 if(item.Freq>0)
                 {
-                    ++nch;
                     os << item << std::endl;
                 }
             }
-            os << "#used=" << nch;
+            os << "#used=" << alpha.chars();
             return os;
         }
         
@@ -167,7 +167,8 @@ namespace yocto
         left(0),
         right(0),
         Char(Ch),
-        Freq(Fr)
+        Freq(Fr),
+        cbit(0)
         {
             
         }
@@ -212,7 +213,6 @@ namespace yocto
             for(CharType i=0;i<CharType(AlphabetSize);++i)
             {
                 const Item &item = alpha[i];
-                
                 assert(inode<NodesMax);
                 if(item.Freq>0)
                 {
@@ -230,8 +230,8 @@ namespace yocto
             //__________________________________________________________________
             while(h.size()>1)
             {
-                Node          *left  = h.pop();
-                Node          *right = h.pop();
+                Node          *left  = h.pop(); // smallest frequency
+                Node          *right = h.pop(); // second smallest frequency
                 const FreqType Fr    = left->Freq + right->Freq; // TODO: Check
                 assert(inode<NodesMax);
                 Node *node      = new ( & nodes[inode++] ) Node(INS,Fr);
@@ -239,6 +239,7 @@ namespace yocto
                 node->right     = right;
                 left->parent    = node;
                 right->parent   = node;
+                right->cbit     = 1;
                 h.__push(node);
             }
             
@@ -306,8 +307,11 @@ namespace yocto
                 Node *parent = node->parent;
                 while(parent)
                 {
-                    if(node==parent->right)
-                        code |= (1<<bits);
+                    /*
+                     if(node==parent->right)
+                     code |= (1<<bits);
+                     */
+                    code |= (node->cbit<<bits);
                     ++bits;
                     if(bits>RootBits)
                         return false;
@@ -321,13 +325,46 @@ namespace yocto
         
         void Huffman:: Tree:: build_for( Alphabet &alpha ) throw()
         {
+            alpha.check_nyt();
             while( !try_build_for(alpha) )
             {
                 std::cerr << "RESCALING" << std::endl;
                 alpha.rescale();
             }
         }
-
+        
+        
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // base class Codec
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Huffman::Codec:: Codec() :
+        alpha(),
+        tree(),
+        bio()
+        {
+            tree.build_for(alpha);
+        }
+        
+        Huffman:: Codec:: ~Codec() throw()
+        {
+            
+        }
+        
+        const Huffman:: Alphabet & Huffman:: Codec:: alphabet() const throw()
+        {
+            return alpha;
+        }
+        
+        void Huffman::Codec:: cleanup() throw()
+        {
+            Q.free();
+            bio.free();
+            alpha.reset();
+            tree.build_for(alpha);
+        }
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -335,11 +372,8 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         Huffman::encoder:: encoder() :
-        alpha(),
-        tree(),
-        bio()
+        Codec()
         {
-            tree.build_for(alpha);
         }
         
         Huffman:: encoder:: ~encoder() throw()
@@ -348,10 +382,7 @@ namespace yocto
         
         void Huffman::encoder::reset() throw()
         {
-            Q.free();
-            bio.free();
-            alpha.reset();
-            tree.build_for(alpha);
+            cleanup();
         }
         
         void Huffman::encoder:: write(char C)
@@ -379,6 +410,7 @@ namespace yocto
             {
                 Q.push_back( bio.pop_full<uint8_t>() );
             }
+            assert(0==bio.size());
         }
         
         

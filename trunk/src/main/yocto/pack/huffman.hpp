@@ -61,10 +61,13 @@ namespace yocto
                 friend std::ostream & operator<<( std::ostream &, const Alphabet &);
                 
                 void rescale() throw();
+                size_t chars() const throw(); //!< #active chars, excluding NYT and END
+                void   check_nyt() throw();   //!< switch off NYT is chars()>=256
                 
             private:
-                size_t count;
-                Item  *items;
+                size_t numch; //!< #active chars
+                size_t count; //!< for memory
+                Item  *items; //!< memory
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Alphabet);
             };
             
@@ -77,6 +80,8 @@ namespace yocto
                 Node *right;
                 const CharType Char;
                 const FreqType Freq;
+                CodeType       cbit; //!<code bit, assigned during construction
+                
                 Node(CharType Ch, FreqType Fr) throw();
                 ~Node() throw();
                 struct Comparator
@@ -107,7 +112,26 @@ namespace yocto
 
             };
             
-            class encoder : public q_codec
+            //! base class for codec
+            class Codec : public q_codec
+            {
+            public:
+                virtual ~Codec() throw();
+                const Alphabet &alphabet() const throw();
+                
+            protected:
+                explicit Codec();
+                Alphabet   alpha;
+                Tree       tree;
+                ios::bitio bio;
+                void       cleanup() throw();
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(Codec);
+            };
+            
+            //! encoder
+            class encoder : public Codec
             {
             public:
                 explicit encoder();
@@ -119,11 +143,6 @@ namespace yocto
                 virtual void flush();
                 
             private:
-                Alphabet   alpha;
-                Tree       tree;
-                ios::bitio bio;
-                
-                
                 YOCTO_DISABLE_COPY_AND_ASSIGN(encoder);
             };
             
