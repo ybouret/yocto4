@@ -201,6 +201,11 @@ namespace yocto
             memory::kind<Memory>::release_as<Node>(nodes,count);
         }
         
+        const Huffman:: Node * Huffman:: Tree:: get_root() const throw()
+        {
+            return root;
+        }
+        
         bool Huffman::Tree:: try_build_for(Alphabet &alpha) throw()
         {
             size_t inode = 0;
@@ -389,7 +394,7 @@ namespace yocto
         {
             CharType    Ch   = uint8_t(C);
             const Item &item = alpha[Ch];
-            if(item.Freq<=0)
+            if(item.Freq<=0 && alpha.chars()>0 )
             {
                 alpha[NYT].emit(bio);
             }
@@ -404,6 +409,7 @@ namespace yocto
         
         void Huffman::encoder::flush()
         {
+            std::cerr << "Emitting END!" << std::endl;
             alpha[END].emit(bio);
             bio.fill_to_byte_with(false);
             while(bio.size()>=8)
@@ -414,6 +420,102 @@ namespace yocto
         }
         
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // decoder
+        //
+        ////////////////////////////////////////////////////////////////////////
+        Huffman:: decoder:: decoder() :
+        Codec(),
+        flag(wait_for8),
+        node(0)
+        {
+        }
+        
+        Huffman:: decoder:: ~decoder() throw()
+        {
+        }
+        
+        void Huffman:: decoder:: reset() throw()
+        {
+            cleanup();
+            flag = wait_for8;;
+            node = 0;
+        }
+        
+        void Huffman:: decoder:: emit(uint8_t b)
+        {
+            Q.push_back(b);
+            alpha.increase(b);
+            tree.build_for(alpha);
+            node = tree.get_root();
+            flag = wait_for1;
+        }
+        
+        void Huffman:: decoder:: write(char C)
+        {
+            bio.push_full<uint8_t>(C);
+            std::cerr << "Decoding with [" << int(uint8_t(C)) << "]" << std::endl;
+            while(true)
+            {
+                switch(flag)
+                {
+                    case wait_for8:
+                        std::cerr << "Wait8" << std::endl;
+                        if( bio.size() >= 8 )
+                        {
+                            const uint8_t b = bio.pop_full<uint8_t>();
+                            std::cerr << "Emitting " << int(b) << std::endl;
+                            emit(b);
+                        }
+                        else
+                        {
+                            std::cerr << "No8" << std::endl;
+                            return;
+                        }
+                        break;
+                        
+                    case wait_for1:
+                        assert(node!=0);
+                        assert(node->Char==INS);
+                        assert(node->left!=0);
+                        assert(node->right!=0);
+                        if(bio.size()>0)
+                        {
+                            const bool bit = bio.pop();
+                            node = bit ? node->right : node->left;
+                            if(node->Char>=0)
+                            {
+                                switch(node->Char)
+                                {
+                                    case NYT:
+                                        node = 0;
+                                        flag = wait_for8;
+                                        break;
+                                        
+                                    case END:
+                                        //TODO
+                                        std::cerr << std::endl << "TODO: END" << std::endl;
+                                        break;
+                                        
+                                    default:
+                                        emit(node->Char);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+                        break;
+                }
+            }
+        }
+        
+        void Huffman:: decoder:: flush()
+        {
+            // nothing to do ?
+        }
         
     }
 }

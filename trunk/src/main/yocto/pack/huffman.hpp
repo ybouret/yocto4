@@ -103,6 +103,8 @@ namespace yocto
                 virtual ~Tree() throw();
                 void build_for( Alphabet &alpha ) throw();
                 
+                const Node *get_root() const throw();
+                
             private:
                 Node  *root;
                 heap<Node,Node::Comparator,Memory::allocator> h;
@@ -112,7 +114,7 @@ namespace yocto
 
             };
             
-            //! base class for codec
+            //! base class for encoder/decoder
             class Codec : public q_codec
             {
             public:
@@ -124,11 +126,12 @@ namespace yocto
                 Alphabet   alpha;
                 Tree       tree;
                 ios::bitio bio;
-                void       cleanup() throw();
+                void       cleanup() throw(); //! Q, alpha, bio, tree
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Codec);
             };
+            
             
             //! encoder
             class encoder : public Codec
@@ -146,7 +149,28 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(encoder);
             };
             
-            
+            //! decoder
+            class decoder : public Codec
+            {
+            public:
+                explicit decoder();
+                virtual ~decoder() throw();
+                
+                virtual void reset() throw();
+                virtual void write(char C);
+                virtual void flush();
+                
+            private:
+                enum status
+                {
+                    wait_for8,
+                    wait_for1
+                };
+                void        emit(uint8_t b);
+                status      flag;
+                const Node *node;
+                YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
+            };
         };
     }
 }
