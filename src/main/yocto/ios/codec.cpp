@@ -32,5 +32,26 @@ namespace yocto
             return to_string();
         }
         
+        void codec:: filter( ios::ostream &output, ios::istream &input )
+        {
+            reset();
+            char C = 0;
+            while( input.query(C) )
+            {
+                this->write(C);
+                while( query(C) )
+                {
+                    output.write(C);
+                }
+            }
+            this->flush();
+            while( query(C) )
+            {
+                output.write(C);
+            }
+            output.flush();
+        }
+
+        
     }
 }

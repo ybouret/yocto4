@@ -1,6 +1,5 @@
 #include "yocto/pack/bwt.hpp"
 #include "yocto/sequence/c-array.hpp"
-#include "yocto/sort/heap.hpp"
 #include "yocto/sort/quick.hpp"
 
 #include <cstring>
@@ -24,7 +23,7 @@ namespace yocto
 					if( li == ri )
 						return 0;
 					
-					size_t        ac            = len;
+					size_t ac = len;
 					while( buf[li] == buf[ri] )
 					{
 						li = (li+1) % len;
@@ -44,11 +43,12 @@ namespace yocto
 			
 			for( size_t i=0; i < size; ++i )
 				indices[i] = i;
-			
-			c_array<size_t>  arr( indices, size );
-			rotlexdat        cmp = { buf_in, size };
-			quicksort( arr, cmp );
-			
+			{
+                c_array<size_t>  arr( indices, size );
+                rotlexdat        cmp = { buf_in, size };
+                quicksort( arr, cmp );
+			}
+            
 			size_t pidx=0;
 			for( size_t i=0; i < size; ++i )
 			{
