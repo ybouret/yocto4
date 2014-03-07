@@ -23,6 +23,8 @@ namespace yocto
             string to_string( const void *data, size_t size );
             string to_string( const memory::ro_buffer &data );
             
+            void filter( ios::ostream &output, ios::istream &input );
+            
         protected:
             explicit codec() throw();
             
