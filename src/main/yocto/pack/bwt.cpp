@@ -53,14 +53,26 @@ namespace yocto
                 quicksort( arr, cmp );
 			}
             
-			size_t pidx=0;
-			for( size_t i=0; i < size; ++i )
+            size_t       pidx = 0;
+            const size_t shft = size-1;
+            size_t       ii   = 0;
+            
+			for(; ii < size; ++ii )
 			{
-				const size_t idx = indices[i];
-				buf_out[i] = buf_in[ ((idx+size)  -1) % size];
+				const size_t idx = indices[ii];
+                buf_out[ii] = buf_in[ (idx+shft) % size];
 				if( 0 == idx )
-					pidx=i;
+                {
+					pidx=ii;
+                    break;
+                }
 			}
+            
+            for(;ii<size;++ii)
+            {
+                buf_out[ii] = buf_in[ (indices[ii]+shft) % size];
+            }
+            
             return pidx;
 		}
         

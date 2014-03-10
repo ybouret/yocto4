@@ -85,6 +85,26 @@ namespace yocto
             }
         }
         
+        size_t rle::encoder:: compressed_size( const void *buffer, const size_t buflen )
+        {
+            assert(!(0==buffer&&buflen>0));
+            
+            const char *source = (const char *)buffer;
+            reset();
+            size_t ans = 0;
+            for(size_t i=buflen;i>0;--i)
+            {
+                write( *(source++) );
+                ans += Q.size();
+                Q.free();
+            }
+            flush();
+            ans += Q.size();
+            Q.free();
+            return ans;
+        }
+
+        
         ////////////////////////////////////////////////////////////////////////
         //
         //
@@ -173,6 +193,7 @@ namespace yocto
                     break;
             }
         }
+        
         
         
     }

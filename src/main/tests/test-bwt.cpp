@@ -19,8 +19,19 @@ YOCTO_UNIT_TEST_IMPL(bwt)
     {
         vector<size_t> indices(size,0);
         vector<char>   output(size,0);
+        vector<char>   decode(size,0);
+        
         const size_t pidx = pack::bwt::encode(&output[1], &content[1], size, &indices[1]);
         std::cerr << "pidx=" << pidx << std::endl;
+        
+        pack::bwt::decode(&decode[1], &output[1], size, &indices[1], pidx);
+        
+        for(size_t j=1;j<=size;++j)
+        {
+            if(decode[j]!=content[j])
+                throw exception("BWT failure");
+        }
+        
         size_t done = 0;
         
         {

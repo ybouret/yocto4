@@ -22,6 +22,8 @@ namespace yocto
                 virtual void write(char C);
                 virtual void flush();
                 
+                size_t compressed_size( const void *buffer, const size_t buflen );
+                
             private:
                 int    chr; //!< -1: starting, [0:255] already read
                 size_t num; //!< number of extra current, max=255
@@ -53,6 +55,7 @@ namespace yocto
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
             };
+            
             
         };
         
