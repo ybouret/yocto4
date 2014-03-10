@@ -1,6 +1,7 @@
 #include "yocto/pack/bwt.hpp"
 #include "yocto/sequence/c-array.hpp"
 #include "yocto/sort/quick.hpp"
+#include "yocto/memory/global.hpp"
 
 #include <cstring>
 
@@ -38,6 +39,9 @@ namespace yocto
 		
 		size_t bwt::encode( void *output, const void *input, const size_t size, size_t *indices) throw()
 		{
+            assert(!(NULL==output&&size>0));
+            assert(!(NULL==input&&size>0));
+            
 			const uint8_t    *buf_in  = (const uint8_t *)input;
 			uint8_t          *buf_out = (uint8_t *)output;
 			
@@ -59,9 +63,13 @@ namespace yocto
 			}
             return pidx;
 		}
-		
-		void   bwt:: decode( void *output, const void *input, const size_t size, size_t *indices, size_t primary_index) throw()
+        
+        
+		void   bwt:: decode( void *output, const void *input, const size_t size, size_t *indices, const size_t primary_index) throw()
 		{
+            assert(!(NULL==output&&size>0));
+            assert(!(NULL==input&&size>0));
+            
 			size_t buckets[256];
 			const uint8_t *buf_in  = (const uint8_t *)input;
 			uint8_t       *buf_out = (uint8_t *)output;
@@ -86,7 +94,8 @@ namespace yocto
 			
 			size_t      j = primary_index;
 			uint8_t    *c = buf_out + size;
-			for( size_t i=size;i>0;--i) {
+			for( size_t i=size;i>0;--i)
+            {
 				const uint8_t bj = buf_in[j];
 				*(--c) = bj;
 				j = buckets[bj] + indices[j];
@@ -94,7 +103,37 @@ namespace yocto
             
             
 		}
-		
-	}
+        
+        bwt::common16:: common16() :
+        numindx(65536),
+        indices( memory::kind<memory::global>::acquire_as<size_t>(numindx) )
+        {
+        }
+        
+        bwt:: common16:: ~common16() throw()
+        {
+            memory::kind<memory::global>::release_as<size_t>(indices,numindx);
+        }
+        
+        uint16_t bwt::common16:: encode( void *output, const void *input, const size_t size) throw()
+        {
+            assert(!(NULL==output&&size>0));
+            assert(!(NULL==input&&size>0));
+            assert(size<=65536);
+            return uint16_t( bwt::encode(output, input, size, indices) );
+        }
+
+        
+        void bwt::common16:: decode( void *output, const void *input, const size_t size, const uint16_t primary_index) throw()
+        {
+            assert(!(NULL==output&&size>0));
+            assert(!(NULL==input&&size>0));
+            assert(size<=65536);
+            
+            bwt::decode(output, input, size, indices, primary_index);
+        }
+
+        
+    }
 }
 
