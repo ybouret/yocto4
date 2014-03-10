@@ -34,7 +34,7 @@ namespace yocto
         
         void codec:: filter( ios::ostream &output, ios::istream &input )
         {
-            reset();
+            //reset();
             char C = 0;
             while( input.query(C) )
             {
