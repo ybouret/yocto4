@@ -3,7 +3,6 @@
 #include "yocto/sort/quick.hpp"
 #include "yocto/memory/global.hpp"
 
-#include <cstring>
 
 namespace yocto
 {
@@ -20,7 +19,6 @@ namespace yocto
 				
 				inline int operator()( size_t li, size_t ri ) const throw()
 				{
-					
 					if( li == ri )
 						return 0;
 					
@@ -43,7 +41,7 @@ namespace yocto
             assert(!(NULL==input&&size>0));
             
 			const uint8_t    *buf_in  = (const uint8_t *)input;
-			uint8_t          *buf_out = (uint8_t *)output;
+			uint8_t          *buf_out = (uint8_t       *)output;
 			
 			for( size_t i=0; i < size; ++i )
 				indices[i] = i;
@@ -82,10 +80,10 @@ namespace yocto
             assert(!(NULL==output&&size>0));
             assert(!(NULL==input&&size>0));
             
-			size_t buckets[256];
+			size_t         buckets[256];
 			const uint8_t *buf_in  = (const uint8_t *)input;
 			uint8_t       *buf_out = (uint8_t *)output;
-			memset( buckets, 0, sizeof(buckets) );
+			for(size_t i=0;i<256;++i) buckets[i] = 0;
 			
             
 			for( size_t i=0; i < size; ++i )
