@@ -103,12 +103,21 @@ case $BUILD_TOOLS in
     BUILD_GENERATOR="Visual Studio 9 2008";
     ;;
 
-	"vs10" )
+  "vs10" )
     BUILD_SUBDIR=vs10;
     BUILD_GENERATOR="Visual Studio 10";
     ;;
 
-    
+  "vs11" )
+    BUILD_SUBDIR=vs11;
+    BUILD_GENERATOR="Visual Studio 11";
+    ;; 
+
+  "vs12" )
+    BUILD_SUBDIR=vs12;
+    BUILD_GENERATOR="Visual Studio 12";
+    ;;  
+ 
   *) xerror "Unsuported BuildTools <$BUILD_TOOLS>";;
 esac
 
@@ -132,7 +141,7 @@ BUILD_ROOT=./forge/$BUILD_TARGET/$BUILD_SUBDIR
 cmake -E cmake_echo_color --red --bold "-- creating $BUILD_ROOT";
 cmake -E make_directory $BUILD_ROOT || xerror "Cant' create $BUILD_ROOT";
 case $BUILD_TOOLS in
-  "xcode" | "vs9"  | "vs10") 
+  "xcode" | "vs9"  | "vs10" | "vs11" | "vs12" ) 
     BUILD_UP=../../..
     BUILD_OPT=""
     ;;
@@ -171,7 +180,7 @@ case `uname -s` in
 		NPROCS=`sysctl hw.ncpu | cut -d ' ' -f 2`
 		;;
 		
-	"MINGW32_NT-5.1")
+	"MINGW32_NT-5.1" | "MINGW32_NT-6.1" )
 		NPROCS=`env | grep NUMBER_OF_PROCESSORS | cut -d '=' -f 2`;
 		;;
 
@@ -216,7 +225,7 @@ function xtarget
           codeblocks --no-log --build --target=$tgt *.cbp;
         ;;
 
-        "vs9" | "vs10" )
+        "vs9" | "vs10" | "vs11" | "vs12" )
           [ "all" == "$tgt" ] && tgt="ALL_BUILD";
           cmake --build . --target $tgt --config $BUILD_TYPE || xerror "can't build [$1]";
         ;;

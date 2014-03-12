@@ -33,6 +33,12 @@ vs9:
 vs10:
 	@bash ${CREATE} src vs10 ${BUILD_TYPE}
 
+vs11:
+	@bash ${CREATE} src vs11 ${BUILD_TYPE}
+
+vs12:
+	@bash ${CREATE} src vs12 ${BUILD_TYPE}
+
 gnu:
 	@bash ${CREATE} src gnu ${BUILD_TYPE}
 
