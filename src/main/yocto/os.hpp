@@ -9,7 +9,10 @@
 #if defined(_WIN32)
 #	define YOCTO_PLATFORM "Windows"
 #	define YOCTO_WIN		1
-#	define _WIN32_WINNT    0x0501
+#   if defined(_WIN32_WINNT)
+#     undef  _WIN32_WINNT
+#	  define _WIN32_WINNT    0x0501
+#   endif
 #endif
 
 #if defined(__MACH__) && ( defined(__APPLE__) || defined(__APPLE_CC__) )
