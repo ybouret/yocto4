@@ -33,8 +33,9 @@ namespace yocto
 	//! integer hash
 	uint32_t ihash32( uint32_t );
 	
-	extern const char hexa_char[16];
-	int               hex2dec( char c ) throw();
+	extern const char  hexa_char[16];
+    extern const char *hexa_text[256];
+	int                hex2dec( char c ) throw();
 	
 	template <typename T>
 	inline bool is_a_power_of_two( T v ) throw()
