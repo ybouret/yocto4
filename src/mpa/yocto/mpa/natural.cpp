@@ -120,8 +120,30 @@ namespace yocto
             size = 0;
         }
         
+        bool  natural:: is_zero() const throw()
+        {
+            return size <= 0;
+        }
         
+        bool  natural:: is_one() const throw()
+        {
+            return (1 == size) && (1 == byte[0]);
+        }
         
+        bool natural:: is_two() const throw()
+        {
+            return (1 == size) && (2 == byte[0]);
+        }
+        
+        bool natural:: is_odd() const throw()
+        {
+            return (size>0) && ( 0 != (byte[0] & 1) );
+        }
+        
+        bool natural:: is_even() const throw()
+        {
+            return size <= 0 || !(byte[0]&1);
+        }
         
     }
 }
