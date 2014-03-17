@@ -32,7 +32,11 @@ namespace yocto
             void   ldz() throw();   //!< size to 0
             void   clear() throw(); //!< memory clear
             size_t bits() const throw();
-            
+            bool   is_zero() const throw();
+            bool   is_one()  const throw();
+            bool   is_two()  const throw();
+            bool   is_odd()  const throw();
+            bool   is_even() const throw();
             
 #define YOCTO_MPA_TO ans <<= 8; ans |= get_byte(i-1)
 			template <typename T>
@@ -65,8 +69,19 @@ namespace yocto
             // comparison
             //__________________________________________________________________
             static int compare( const natural &, const natural &) throw();
+#define YOCTO_COMPARE(OP) \
+inline friend bool operator OP (const natural &lhs, const natural &rhs) throw()\
+{\
+return compare(lhs,rhs) OP 0; \
+}
+            YOCTO_COMPARE(==)
+            YOCTO_COMPARE(!=)
+            YOCTO_COMPARE(<)
+            YOCTO_COMPARE(<=)
+            YOCTO_COMPARE(>)
+            YOCTO_COMPARE(>=)
             
-            
+
             //__________________________________________________________________
             //
             // addition
@@ -77,6 +92,17 @@ namespace yocto
             void      inc(uint8_t);
             natural & operator++();     //!< prefix
             natural   operator++ (int); //!< postfix
+            
+            //__________________________________________________________________
+            //
+            // subtraction
+            //__________________________________________________________________
+            static natural sub( const natural &lhs, const natural &rhs );
+            friend natural operator-( const natural &lhs, const natural &rhs );
+            natural & operator-=( const natural &rhs );
+            void      dec(uint8_t);
+            natural & operator--();     //!< prefix
+            natural   operator-- (int); //!< postfix
             
             
         private:
