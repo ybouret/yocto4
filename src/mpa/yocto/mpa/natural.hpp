@@ -29,6 +29,8 @@ namespace yocto
             // basic API
             //__________________________________________________________________
             void   xch( natural &other ) throw();
+            void   ldz() throw();   //!< size to 0
+            void   clear() throw(); //!< memory clear
             size_t bits() const throw();
             
             
@@ -38,11 +40,11 @@ namespace yocto
 				T ans(0);
                 for( size_t i=sizeof(T);i>0;--i)
 				{
-                    ans <<= 8;
-					ans |= T(get_byte(i-1));
-				}
-				return ans;
-			}
+                    ans <<= 8; ans |= get_byte(i-1);
+                }
+                return ans;
+            }
+            
             
             //__________________________________________________________________
             //
@@ -63,9 +65,10 @@ namespace yocto
             //__________________________________________________________________
             static natural add( const natural &lhs, const natural &rhs );
             friend natural operator+( const natural &lhs, const natural &rhs );
-			natural & operator+=( const natural &rhs );
-			natural & operator++();
-            
+            natural & operator+=( const natural &rhs );
+            void      inc(uint8_t);
+            natural & operator++();     //!< prefix
+            natural   operator++ (int); //!< postfix
             
             
         private:

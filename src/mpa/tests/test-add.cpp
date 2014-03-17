@@ -21,8 +21,16 @@ YOCTO_UNIT_TEST_IMPL(add)
         
         if(t64!=s64)
             throw exception("add error");
-        
     }
+    
+    mpn x; //!< zero
+    for(size_t i=1;i<=1000000;++i)
+    {
+        ++x;
+        if( x.to<size_t>() != i )
+            throw exception("++ error");
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
