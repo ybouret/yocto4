@@ -3,6 +3,7 @@
 
 #include "yocto/mpa/types.hpp"
 #include "yocto/memory/buffer.hpp"
+#include <iosfwd>
 
 namespace yocto
 {
@@ -31,6 +32,42 @@ namespace yocto
             size_t bits() const throw();
             
             
+			template <typename T>
+			inline T to() const throw()
+			{
+				T ans(0);
+                for( size_t i=sizeof(T);i>0;--i)
+				{
+                    ans <<= 8;
+					ans |= T(get_byte(i-1));
+				}
+				return ans;
+			}
+            
+            //__________________________________________________________________
+            //
+            // setting values
+            //__________________________________________________________________
+            natural(uint64_t x);
+            natural(const memory::ro_buffer &buf);
+            
+            //__________________________________________________________________
+            //
+            // output
+            //__________________________________________________________________
+            friend std::ostream & operator<<( std::ostream &, const natural &);
+            
+            //__________________________________________________________________
+            //
+            // addition
+            //__________________________________________________________________
+            static natural add( const natural &lhs, const natural &rhs );
+            friend natural operator+( const natural &lhs, const natural &rhs );
+			natural & operator+=( const natural &rhs );
+			natural & operator++();
+            
+            
+            
         private:
             size_t   maxi;
             size_t   size;
@@ -40,6 +77,11 @@ namespace yocto
             void rescan() throw(); //!< start from maxi and adjust
             virtual const void *get_address() const throw(); //!< ro_buffer API
         };
+#define YOCTO_CHECK_MPN(X)    \
+assert((X)->byte);            \
+assert((X)->maxi>0);          \
+assert((X)->size<=(X)->maxi); \
+assert( ! ( (X)->size > 0 && (X)->byte[ (X)->size-1 ] == 0 ) )
         
     }
     

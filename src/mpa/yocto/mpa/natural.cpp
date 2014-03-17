@@ -1,5 +1,6 @@
 #include "yocto/mpa/natural.hpp"
 #include "yocto/code/bswap.hpp"
+#include "yocto/code/utils.hpp"
 
 #include <cstring>
 
@@ -29,6 +30,7 @@ namespace yocto
         size(0),
         byte( memIO::acquire(maxi) )
         {
+            YOCTO_CHECK_MPN(this);
         }
         
         natural:: natural(const size_t n, const as_capacity_t &) :
@@ -36,13 +38,18 @@ namespace yocto
         size(0),
         byte( memIO::acquire(maxi) )
         {
+            YOCTO_CHECK_MPN(this);
         }
         
         void natural:: xch( natural &other ) throw()
         {
+            YOCTO_CHECK_MPN(this);
+            YOCTO_CHECK_MPN(&other);
             cswap(maxi,other.maxi);
             cswap(size,other.size);
             cswap(byte,other.byte);
+            YOCTO_CHECK_MPN(this);
+            YOCTO_CHECK_MPN(&other);
         }
         
         natural:: natural( const natural &other ) :
@@ -50,7 +57,9 @@ namespace yocto
         size( other.size ),
         byte( memIO::acquire(maxi) )
         {
+            YOCTO_CHECK_MPN(&other);
             memcpy(byte,other.byte,size);
+            YOCTO_CHECK_MPN(this);
         }
         
         
@@ -86,6 +95,21 @@ namespace yocto
             }
             return 0;
         }
+        
+        void natural:: update() throw()
+        {
+            while(size>0 && byte[size-1] <= 0 )
+                --size;
+            YOCTO_CHECK_MPN(this);
+        }
+        
+        void natural:: rescan() throw()
+        {
+            size = maxi;
+            update();
+        }
+        
+        
         
         
     }
