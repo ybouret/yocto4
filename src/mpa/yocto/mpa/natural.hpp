@@ -104,6 +104,14 @@ return compare(lhs,rhs) OP 0; \
             natural & operator--();     //!< prefix
             natural   operator-- (int); //!< postfix
             
+            //__________________________________________________________________
+            //
+            // multiplication
+            //__________________________________________________________________
+            static natural mul( const natural &lhs, const natural &rhs );
+            friend natural operator*( const natural &lhs, const natural &rhs);
+            natural & operator*=( const natural &rhs);
+            static natural sqr( const natural &lhs);
             
         private:
             size_t   maxi;

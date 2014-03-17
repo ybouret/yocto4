@@ -1,6 +1,7 @@
 #include "yocto/mpa/natural.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
