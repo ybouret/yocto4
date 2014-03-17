@@ -34,13 +34,14 @@ namespace yocto
             size_t bits() const throw();
             
             
+#define YOCTO_MPA_TO ans <<= 8; ans |= get_byte(i-1)
 			template <typename T>
 			inline T to() const throw()
 			{
 				T ans(0);
                 for( size_t i=sizeof(T);i>0;--i)
 				{
-                    ans <<= 8; ans |= get_byte(i-1);
+                    YOCTO_MPA_TO;
                 }
                 return ans;
             }
@@ -58,6 +59,13 @@ namespace yocto
             // output
             //__________________________________________________________________
             friend std::ostream & operator<<( std::ostream &, const natural &);
+            
+            //__________________________________________________________________
+            //
+            // comparison
+            //__________________________________________________________________
+            static int compare( const natural &, const natural &) throw();
+            
             
             //__________________________________________________________________
             //

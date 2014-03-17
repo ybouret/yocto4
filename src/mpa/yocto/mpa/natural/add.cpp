@@ -8,7 +8,8 @@ namespace yocto
     {
         natural natural:: add( const natural &lhs, const natural &rhs )
         {
-            
+            YOCTO_CHECK_MPN(&lhs);
+            YOCTO_CHECK_MPN(&rhs);
             //------------------------------------------------------------------
             // Organize so that L is the largest one
             //------------------------------------------------------------------
@@ -58,6 +59,7 @@ namespace yocto
             
             
             ans.rescan();
+            YOCTO_CHECK_MPN(&ans);
             return ans;
         }
         
