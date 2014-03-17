@@ -28,9 +28,9 @@ YOCTO_UNIT_TEST_IMPL(sub)
     }
     
     mpn j = _rand.full<uint16_t>();
-    while(j>0)
+    while( !j.is_zero() )
     {
-        
+        --j;
     }
 
 }
