@@ -113,6 +113,14 @@ return compare(lhs,rhs) OP 0; \
             natural & operator*=( const natural &rhs);
             static natural sqr( const natural &lhs);
             
+            //__________________________________________________________________
+            //
+            // bitwise
+            //__________________________________________________________________
+            static natural exp2(size_t n); //!< \return 1 << n
+            natural  &     shr() throw(); //!< optimize right shift
+            
+            
         private:
             size_t   maxi;
             size_t   size;
