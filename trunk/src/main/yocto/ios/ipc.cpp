@@ -12,6 +12,7 @@ namespace yocto
     namespace ios 
     {
         
+#if 0
 #if defined(YOCTO_BSD)
         namespace
         {
@@ -19,6 +20,7 @@ namespace yocto
             static const size_t FD_WRITE = 1;
             static const size_t FD_COUNT = 2;
         }            
+#endif
 #endif
         
     }
