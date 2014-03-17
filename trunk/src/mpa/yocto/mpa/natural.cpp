@@ -109,6 +109,17 @@ namespace yocto
             update();
         }
         
+        void natural:: ldz() throw()
+        {
+            size = 0;
+        }
+        
+        void natural:: clear() throw()
+        {
+            memset(byte,0,maxi);
+            size = 0;
+        }
+        
         
         
         

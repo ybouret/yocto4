@@ -1,5 +1,6 @@
 #include "yocto/mpa/natural.hpp"
 #include "yocto/code/bswap.hpp"
+#include "yocto/code/round.hpp"
 
 namespace yocto
 {
@@ -49,7 +50,7 @@ namespace yocto
 				s[i]   = uint8_t(carry);
 				carry >>= 8;
 			}
-
+            
             //------------------------------------------------------------------
 			// finalize
 			//------------------------------------------------------------------
@@ -75,10 +76,32 @@ namespace yocto
         
         natural & natural:: operator++()
         {
-            throw;
+            inc(1);
             return *this;
         }
+        
+        natural natural:: operator++ (int)
+        {
+            const natural saved( *this );
+            inc(1);
+            return saved;
+        }
+        
+        void natural:: inc( uint8_t b )
+        {
+            if(b)
+            {
+                uint64_t wksp[ YOCTO_U64_FOR_ITEM(natural) ];
+                natural *rhs = (natural *)&wksp[0];
+                rhs->maxi    = 1;
+                rhs->size    = 1;
+                rhs->byte    = &b;
+                natural sum( add(*this,*rhs) );
+                xch(sum);
+            }
+        }
+        
     }
-
+    
 }
 

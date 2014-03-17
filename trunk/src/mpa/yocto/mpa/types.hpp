@@ -17,6 +17,36 @@ namespace yocto
             static void     release(uint8_t * &p, size_t &n) throw();
         };
         
+        //! helper
+        template <typename T>
+        class array_of
+        {
+        public:
+            inline array_of( size_t n ) :
+            bytes( n * sizeof(T) ),
+            addr( (T *) memIO::acquire(bytes) ),
+            size( bytes/sizeof(T) )
+            {
+                assert(size>=n);
+            }
+            
+            inline ~array_of() throw()
+            {
+                uint8_t *p = (uint8_t *)addr;
+                memIO::release(p, bytes);
+            }
+            
+            inline T       & operator[](size_t indx) throw()        { assert(indx<size); return addr[indx]; }
+            inline const T & operator[](size_t indx ) const throw() { assert(indx<size); return addr[indx]; }
+            
+        private:
+            size_t bytes;
+            T     *addr;
+            
+        public:
+            const size_t size;
+        };
+        
     }
     
 }
