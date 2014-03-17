@@ -8,9 +8,11 @@ SET( mpa_srcs ${mpa_decl} ${mpa_impl} )
 INSTALL( FILES ${mpa_decl} DESTINATION include/yocto/mpa )
 SOURCE_GROUP( mpa FILES ${mpa_srcs} )
 
+FILE( GLOB mpn_srcs yocto/mpa/natural/*.cpp )
+SOURCE_GROUP( mpa/natural FILES ${mpn_srcs} )
 
 #gather sources
-SET( srcs ${mpa_srcs} )
+SET( srcs ${mpa_srcs} ${mpn_srcs} )
 INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-mpa STATIC ${srcs} )
