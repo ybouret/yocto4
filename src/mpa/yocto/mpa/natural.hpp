@@ -48,7 +48,8 @@ namespace yocto
             bool   is_even() const throw();
             static natural one();
             static natural two();
-
+            static natural three();
+            
 #define YOCTO_MPA_TO ans <<= 8; ans |= get_byte(i-1)
 			template <typename T>
 			inline T to() const throw()
