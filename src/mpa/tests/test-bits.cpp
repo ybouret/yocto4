@@ -7,6 +7,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(bits)
 {
+    std::cerr << std::hex;
     for(size_t i=0;i<=100;++i)
     {
         mpn x = mpn::exp2(i);
@@ -14,6 +15,22 @@ YOCTO_UNIT_TEST_IMPL(bits)
         while( !x.is_zero() )
         {
             std::cerr << "\t" << x.shr() << std::endl;
+        }
+    }
+    
+    for(size_t i=0;i<100;++i)
+    {
+        uint64_t x64 = _rand.full<uint64_t>();
+        mpn      x   = x64;
+        std::cerr << "x=" << x << ", 0x" << x.bits() << " bits" << std::endl;
+        for(size_t j=alea_leq(12);j>0;--j)
+        {
+            const size_t n = alea_leq(12);
+            x64 >>= n;
+            x   >>= n;
+            std::cerr << "\t" << x << " / " << x64 << std::endl;
+            if( x.to<uint64_t>() != x64 )
+                throw exception("shr failure");
         }
     }
     

@@ -70,26 +70,28 @@ namespace yocto
             return *this;
         }
         
+        const uint8_t  natural:: _bit[8] =
+        {
+            0x01,
+            0x02,
+            0x04,
+            0x08,
+            0x10,
+            0x20,
+            0x40,
+            0x80
+        };
+        
         size_t natural:: bits() const throw()
         {
-            static const size_t msk[8] =
-            {
-                0x01,
-                0x03,
-                0x07,
-                0x0f,
-                0x1f,
-                0x3f,
-                0x7f,
-                0xff
-            };
             if(size)
             {
-                const size_t msb = byte[size-1]; assert(msb);
-                for(size_t i=7;i>0;--i)
+                const size_t top = size-1;
+                const size_t msb = byte[top]; assert(msb);
+                for(int i=7;i>=0;--i)
                 {
-                    if( msk[i] & msb )
-                        return (size<<3) + i;
+                    if( _bit[i] & msb )
+                        return (top<<3) + (i+1);
                 }
                 // critical error
             }
