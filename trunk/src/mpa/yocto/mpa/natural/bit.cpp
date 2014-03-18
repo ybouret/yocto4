@@ -6,19 +6,10 @@ namespace yocto
 {
     namespace mpa
     {
+       
+
         natural natural:: exp2(size_t n)
         {
-            static const uint8_t  _bit[8] =
-            {
-                0x01,
-                0x02,
-                0x04,
-                0x08,
-                0x10,
-                0x20,
-                0x40,
-                0x80
-            };
             
             const size_t nbits = n+1;
 			const size_t bytes = YOCTO_ROUND8(nbits) >> 3;
@@ -47,6 +38,58 @@ namespace yocto
             return *this;
         }
         
+        natural natural::shr( const natural &lhs,  size_t n )
+		{
+			if( n <= 0 )
+				return lhs;
+			else
+			{
+				const size_t l_bits = lhs.bits();
+				if( n >= l_bits )
+				{
+					return natural();
+				}
+				else
+				{
+					assert( n > 0      );
+					assert( n < l_bits );
+					const size_t t_bits = l_bits - n;
+					const size_t t_size = YOCTO_ROUND8(t_bits) >> 3;
+					
+					natural ans( t_size, as_capacity );
+					const  uint8_t *src = lhs.byte;
+					uint8_t        *dst = ans.byte;
+					size_t obit = t_bits;
+					size_t ibit = l_bits;
+					for( size_t i=t_bits; i>0; --i )
+					{
+						--ibit;
+						--obit;
+						if( src[ ibit >> 3 ] & _bit[ ibit & 7 ] )
+						{
+							dst[ obit >> 3 ] |= _bit[ obit & 7];
+						}
+						
+					}
+                    ans.size = t_size;
+					assert( ans.byte[ ans.size - 1] != 0 );
+					return ans;
+				}
+			}
+		}
+        
+        natural natural:: operator>>( size_t n) const
+        {
+            return shr( *this, n );
+        }
+
+        natural & natural:: operator>>=( size_t n )
+        {
+            natural tmp( shr(*this,n) );
+            xch(tmp);
+            return *this;
+        }
+
         
     }
     

@@ -13,6 +13,7 @@ namespace yocto
         class natural : public memory::ro_buffer
         {
         public:
+            static const uint8_t _bit[8];
             //__________________________________________________________________
             //
             // class operations
@@ -118,8 +119,10 @@ return compare(lhs,rhs) OP 0; \
             // bitwise
             //__________________________________________________________________
             static natural exp2(size_t n); //!< \return 1 << n
-            natural  &     shr() throw(); //!< optimize right shift
-            
+            natural  &     shr() throw(); //!< optimized right shift
+            static natural shr( const natural &, size_t n );
+            natural operator>>( size_t n) const;
+			natural & operator>>=( size_t n );
             
         private:
             size_t   maxi;
