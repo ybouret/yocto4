@@ -2,6 +2,8 @@
 #include "yocto/exceptions.hpp"
 #include <cerrno>
 
+#include <iostream>
+
 namespace yocto
 {
     namespace mpa
@@ -103,6 +105,15 @@ namespace yocto
 			return lo;
 		}
         
+    }
+    
+}
+
+namespace yocto
+{
+    
+    namespace mpa
+    {
         
         natural operator%( const natural &lhs, const natural &rhs )
 		{
@@ -119,7 +130,7 @@ namespace yocto
 		natural  natural::modulo( const natural &num, const natural &den )
 		{
 			if( den.is_zero() )
-				throw libc::exception( EDOM, "mod(DIV by Zero)");
+				throw libc::exception( EDOM, "modulo(DIV by Zero)");
 			return __mod( num, den );
 		}
 		
@@ -185,7 +196,73 @@ namespace yocto
 			const natural prod = mul(lo,den); assert( prod <= num );
 			return sub( num, prod );
 		}
+        
+        bool natural:: is_divisible_by( const natural &den ) const
+        {
+            if( den.is_zero() )
+                throw libc::exception( EDOM, "DIV by Zero");
+            
+            const natural &num = *this;
+            
+            //------------------------------------------------------------------
+			//-- get rid of trivial cases
+			//------------------------------------------------------------------
+			switch( int2cmp( compare(num, den) ) )
+			{
+				case natural_is_less:
+                    return num.is_zero();  // easy...
 
+				case natural_is_equal:
+                    return true;    // easy...
+				
+                case natural_is_greater:
+                    break;          // need to test
+			}
+			
+            //------------------------------------------------------------------
+			// Look Up
+			//------------------------------------------------------------------
+			assert( num > den );
+			size_t p = 1;
+			{
+				natural probe = add(den,den); //! 2^(p=1) * den
+				while( compare(probe,num) <= 0 )
+				{
+					++p;
+					probe.shl();
+				}
+				assert( probe > num );
+			}
+			
+			natural hi = natural::exp2(   p ); //assert( num < mul_(hi,den) );
+			natural lo = natural::exp2( --p ); //assert( mul_(lo,den) <= num );
+			
+			
+			while( p-- > 0 )
+			{
+				//--------------------------------------------------------------
+				// Bisection
+				//--------------------------------------------------------------
+				natural mid = add( lo, hi ).shr();
+				const natural tmp = mul( mid, den );
+				switch( int2cmp(compare(tmp,num)) )
+				{
+					case natural_is_less:
+						lo.xch(mid);
+						break;
+						
+					case natural_is_equal:
+						return true; // very special case
+						
+					case natural_is_greater:
+						hi.xch(mid);
+						break;
+				}
+			}
+            const natural prod = mul(lo,den);
+            return 0 == compare(num,prod);
+        }
+        
         
     }
     

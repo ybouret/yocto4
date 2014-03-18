@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(div)
             x *= u.back();
         u.push_back(x);
     }
- 
+    
     const size_t n = u.size();
     for(size_t i=1;i<=n;++i)
     {
@@ -44,6 +44,28 @@ YOCTO_UNIT_TEST_IMPL(div)
                 throw exception("mod2 error");
         }
     }
+    
+    for(size_t i=1;i<=10000;++i)
+    {
+        mpn den    = _rand.full<uint64_t>(); ++den;
+        mpn factor = _rand.full<uint16_t>();
+        mpn num    = factor * den;
+        
+        if( !num.is_divisible_by(den) )
+        {
+            //std::cerr << "num=" << num << ", den=" << den << std::endl;
+            throw exception("divisibility failure, level-1");
+        }
+        ++num;
+        if( num.is_divisible_by(den) )
+        {
+            //std::cerr << "num=" << num << ", den=" << den << std::endl;
+            //std::cerr << "mod=" << mpn::modulo(num,den) << std::endl;
+            throw exception("divisibility failure, level-2");
+        }
+        
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

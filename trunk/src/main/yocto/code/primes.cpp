@@ -7,7 +7,7 @@
 namespace yocto
 {
 	
-	static inline bool _is_prime_above2( size_t n ) throw()
+	static inline bool _is_prime_above2( const size_t n ) throw()
 	{
 		size_t q;
 		assert( n >= 2 );
