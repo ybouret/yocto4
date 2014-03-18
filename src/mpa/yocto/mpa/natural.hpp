@@ -148,7 +148,14 @@ return compare(lhs,rhs) OP 0; \
 			friend natural operator/( const natural &num, const natural &den );
 			natural & operator/=( const natural &den );
 
-            
+            //__________________________________________________________________
+            //
+			// modulo
+            //__________________________________________________________________
+			static natural  __mod( const natural &num, const natural &den ); // assume den > 0
+			static natural  modulo( const natural &num, const natural &den );
+			friend natural  operator%(  const natural &num, const natural &den );
+			natural & operator %= ( const natural &den );
             
         private:
             size_t   maxi;
