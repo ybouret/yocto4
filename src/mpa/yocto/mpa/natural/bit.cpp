@@ -6,8 +6,12 @@ namespace yocto
 {
     namespace mpa
     {
-       
-
+        
+        
+        //______________________________________________________________________
+        //
+        // 2^n
+        //______________________________________________________________________
         natural natural:: exp2(size_t n)
         {
             
@@ -20,6 +24,11 @@ namespace yocto
             
         }
         
+        
+        //______________________________________________________________________
+        //
+        // SHR
+        //______________________________________________________________________
         natural & natural:: shr() throw()
         {
             if( size > 0 )
@@ -82,14 +91,67 @@ namespace yocto
         {
             return shr( *this, n );
         }
-
+        
         natural & natural:: operator>>=( size_t n )
         {
             natural tmp( shr(*this,n) );
             xch(tmp);
             return *this;
         }
+        
+        //______________________________________________________________________
+        //
+        // SHL
+        //______________________________________________________________________
+		natural natural::shl( const natural &lhs,  size_t n )
+		{
+			if( n <= 0 )
+				return lhs;
+			else
+			{
+				const size_t l_bits = lhs.bits();
+				const size_t t_bits = l_bits + n;
+				const size_t t_size = YOCTO_ROUND8(t_bits) >> 3;
+				
+				natural ans( t_size, as_capacity );
+				const  uint8_t *src = lhs.byte;
+				uint8_t        *dst = ans.byte;
+				size_t obit = t_bits;
+				size_t ibit = l_bits;
+				for( size_t i=l_bits; i>0; --i )
+				{
+					--ibit;
+					--obit;
+					if( src[ ibit >> 3 ] & _bit[ ibit & 7 ] )
+					{
+						dst[ obit >> 3 ] |= _bit[ obit & 7];
+					}
+					
+				}
+				ans.rescan();
+				return ans;
+			}
+		}
+		
+		natural  natural:: operator<<( size_t n ) const
+		{
+			return natural::shl( *this, n );
+		}
+		
+        natural  & natural:: operator<<=( size_t n )
+		{
+            natural tmp( shl(*this,n) );
+            xch(tmp);
+            return *this;
+		}
 
+        
+		natural & natural::shl()
+		{
+			natural tmp = shl( *this, 1 );
+			xch( tmp );
+			return *this;
+		}
         
     }
     

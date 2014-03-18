@@ -34,5 +34,21 @@ YOCTO_UNIT_TEST_IMPL(bits)
         }
     }
     
+    for(size_t i=0;i<100;++i)
+    {
+        mpn x = alea_leq(500);
+        for(size_t j=alea_leq(12);j>0;--j)
+        {
+            const size_t n = alea_leq(12);
+            const mpn    y = x;
+            std::cerr << x << " << 0x" << n << " = ";
+            x <<= n;
+            std::cerr << x << std::endl;
+            const mpn    z = mpn::shr(x,n);
+            if( y != z)
+                throw exception("shl failure");
+        }
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()

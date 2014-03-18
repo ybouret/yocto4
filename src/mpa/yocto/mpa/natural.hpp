@@ -116,13 +116,28 @@ return compare(lhs,rhs) OP 0; \
             
             //__________________________________________________________________
             //
-            // bitwise
+            // 2^n
             //__________________________________________________________________
             static natural exp2(size_t n); //!< \return 1 << n
+            
+            //__________________________________________________________________
+            //
+            // SHR
+            //__________________________________________________________________
             natural  &     shr() throw(); //!< optimized right shift
             static natural shr( const natural &, size_t n );
             natural operator>>( size_t n) const;
 			natural & operator>>=( size_t n );
+            
+            //__________________________________________________________________
+            //
+            // SHL
+            //__________________________________________________________________
+            static natural shl( const natural &lhs, size_t n  ); //!< shift left
+			natural operator<<( size_t n) const;
+			natural & shl();         //!< shift left by one
+			natural & operator<<=( size_t n );
+
             
         private:
             size_t   maxi;
