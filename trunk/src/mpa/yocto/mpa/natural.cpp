@@ -163,6 +163,14 @@ namespace yocto
             n.byte[0] = 2;
             return n;
         }
+        
+        natural natural:: three()
+        {
+            natural n;
+            n.size    = 1;
+            n.byte[0] = 3;
+            return n;
+        }
 
         bool natural::bit( const size_t index ) const throw()
 		{
