@@ -38,6 +38,8 @@ namespace yocto
             bool   is_two()  const throw();
             bool   is_odd()  const throw();
             bool   is_even() const throw();
+            static natural one();
+            static natural two();
             
 #define YOCTO_MPA_TO ans <<= 8; ans |= get_byte(i-1)
 			template <typename T>
@@ -138,6 +140,15 @@ return compare(lhs,rhs) OP 0; \
 			natural & shl();         //!< shift left by one
 			natural & operator<<=( size_t n );
 
+            //__________________________________________________________________
+            //
+			// division
+            //__________________________________________________________________
+			static natural  div( const natural &num, const natural &den );
+			friend natural operator/( const natural &num, const natural &den );
+			natural & operator/=( const natural &den );
+
+            
             
         private:
             size_t   maxi;

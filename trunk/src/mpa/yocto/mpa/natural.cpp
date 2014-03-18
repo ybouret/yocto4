@@ -147,5 +147,23 @@ namespace yocto
             return size <= 0 || !(byte[0]&1);
         }
         
+        natural natural:: one()
+        {
+            natural n;
+            n.size    = 1;
+            n.byte[0] = 1;
+            return n;
+        }
+        
+        natural natural:: two()
+        {
+            natural n;
+            n.size    = 1;
+            n.byte[0] = 2;
+            return n;
+        }
+
+        
+        
     }
 }
