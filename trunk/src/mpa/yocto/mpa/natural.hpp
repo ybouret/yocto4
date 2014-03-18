@@ -2,11 +2,18 @@
 #define YOCTO_MPA_NATURAL_INCLUDED 1
 
 #include "yocto/mpa/types.hpp"
-#include "yocto/memory/buffer.hpp"
+#include "yocto/string.hpp"
 #include <iosfwd>
 
 namespace yocto
 {
+    namespace ios
+    {
+        class bitio;
+        class ostream;
+        class istream;
+    }
+    
     namespace mpa
     {
         
@@ -61,12 +68,19 @@ namespace yocto
             //__________________________________________________________________
             natural(uint64_t x);
             natural(const memory::ro_buffer &buf);
+            natural(const void *buf, size_t len);
             
             //__________________________________________________________________
             //
             // output
             //__________________________________________________________________
+            void   out( std::ostream &) const;
             friend std::ostream & operator<<( std::ostream &, const natural &);
+            void           store( ios::bitio &bio, size_t nbits ) const;
+            void           store( ios::bitio &bio) const;
+            static natural query( ios::bitio &, size_t nbits );
+            void           save( ios::ostream &out ) const;
+            static natural load( ios::istream &in  );
             
             //__________________________________________________________________
             //
@@ -172,6 +186,18 @@ return compare(lhs,rhs) OP 0; \
 			static natural gcd( const natural &lhs, const natural &rhs );           //!< greatest common divisor
 			static bool    are_coprime( const natural &lhs, const natural &rhs );   //!< gcd(lhs,rhs) == 1
 
+            
+            //__________________________________________________________________
+            //
+			// parsing
+            //__________________________________________________________________
+            static natural hex( const string & ); // without 0x
+            static natural hex( const char   * ); // without 0x
+            
+            static natural dec( const string & );
+            static natural dec( const char   * ); 
+            
+            static natural parse( const string & );
             
         private:
             size_t   maxi;

@@ -63,6 +63,7 @@ namespace yocto
         }
         
         
+             
         natural & natural:: operator=( const natural &other )
         {
             natural tmp(other);
