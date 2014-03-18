@@ -171,6 +171,7 @@ return compare(lhs,rhs) OP 0; \
 			static natural  modulo( const natural &num, const natural &den );
 			friend natural  operator%(  const natural &num, const natural &den );
 			natural & operator %= ( const natural &den );
+            bool is_divisible_by( const natural &den ) const;
             
             //__________________________________________________________________
             //
@@ -199,6 +200,13 @@ return compare(lhs,rhs) OP 0; \
             
             static natural parse( const string & );
             
+            //__________________________________________________________________
+            //
+			// primality
+            //__________________________________________________________________
+            bool is_prime16() const; //!< slow/sieve
+            bool is_prime24() const; //!< slow/sieve
+
         private:
             size_t   maxi;
             size_t   size;
