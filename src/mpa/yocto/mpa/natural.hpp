@@ -29,6 +29,7 @@ namespace yocto
             //
             // basic API
             //__________________________________________________________________
+            bool   bit( const size_t index ) const throw();
             void   xch( natural &other ) throw();
             void   ldz() throw();   //!< size to 0
             void   clear() throw(); //!< memory clear
@@ -40,7 +41,7 @@ namespace yocto
             bool   is_even() const throw();
             static natural one();
             static natural two();
-            
+
 #define YOCTO_MPA_TO ans <<= 8; ans |= get_byte(i-1)
 			template <typename T>
 			inline T to() const throw()
@@ -156,6 +157,21 @@ return compare(lhs,rhs) OP 0; \
 			static natural  modulo( const natural &num, const natural &den );
 			friend natural  operator%(  const natural &num, const natural &den );
 			natural & operator %= ( const natural &den );
+            
+            //__________________________________________________________________
+            //
+			// modular arithmetic
+            //__________________________________________________________________
+			static natural  mod_inv( const natural &b, const natural &n );                     //!< modular inverse
+			static natural  mod_exp( const natural &b, const natural &e, const natural &n );   //!< modular exponentiation (b^e)[n]
+            
+            //__________________________________________________________________
+            //
+			// arithmetic
+            //__________________________________________________________________
+			static natural gcd( const natural &lhs, const natural &rhs );           //!< greatest common divisor
+			static bool    are_coprime( const natural &lhs, const natural &rhs );   //!< gcd(lhs,rhs) == 1
+
             
         private:
             size_t   maxi;

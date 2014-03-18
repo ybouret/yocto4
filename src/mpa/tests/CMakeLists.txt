@@ -12,3 +12,5 @@ ADD_TEST(Sub  test-mpa sub)
 ADD_TEST(Mul  test-mpa mul)
 ADD_TEST(Bits test-mpa bits)
 ADD_TEST(Div  test-mpa div)
+ADD_TEST(Ari  test-mpa ari)
+
