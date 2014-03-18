@@ -29,5 +29,16 @@ namespace yocto
             update();
         }
         
+        natural:: natural(const void *buf, size_t len ) :
+        maxi( len  ),
+        size( maxi ),
+        byte( memIO::acquire(maxi) )
+        {
+            assert(!(buf==0&&len>0));
+            memcpy(byte,buf,len);
+            update();
+        }
+
+        
     }
 }
