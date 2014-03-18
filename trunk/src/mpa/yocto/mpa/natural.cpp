@@ -163,6 +163,17 @@ namespace yocto
             return n;
         }
 
+        bool natural::bit( const size_t index ) const throw()
+		{
+			const size_t n = index >> 3;
+			if( n >= size )
+				return false;
+			else
+			{
+				return ( byte[n] & _bit[ index & 7 ] ) != 0;
+			}
+		}
+
         
         
     }
