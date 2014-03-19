@@ -2,6 +2,11 @@
 #include <iostream>
 #include "yocto/ios/ocstream.hpp"
 
+#if defined(_MSC_VER)
+#	define snprintf _snprintf
+#	pragma warning ( disable : 4996 )
+#endif
+
 namespace yocto
 {
     namespace pack
