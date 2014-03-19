@@ -25,6 +25,8 @@ namespace yocto
             {
             }
             
+            const as_primes_t as_primes = {};
+            
             //__________________________________________________________________
             //
             // PublicKey
@@ -42,6 +44,16 @@ namespace yocto
                 if(publicExponent>=modulus)
                     throw exception("invalid public key");
             }
+            
+            PublicKey:: PublicKey(const natural &p,
+                                  const natural &q,
+                                  const as_primes_t & ) :
+            Key( p*q ),
+            publicExponent()
+            {
+                
+            }
+            
             
             
             
