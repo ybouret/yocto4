@@ -41,6 +41,7 @@ namespace yocto
             void   xch( natural &other ) throw();
             void   ldz() throw();   //!< size to 0
             void   clear() throw(); //!< memory clear
+            void   __clr() const throw(); //!< force 0
             size_t bits() const throw();
             bool   is_zero() const throw();
             bool   is_one()  const throw();

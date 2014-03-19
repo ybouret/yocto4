@@ -11,8 +11,14 @@ SOURCE_GROUP( mpa FILES ${mpa_srcs} )
 FILE( GLOB mpn_srcs yocto/mpa/natural/*.cpp )
 SOURCE_GROUP( mpa/natural FILES ${mpn_srcs} )
 
+FILE( GLOB rsa_decl yocto/mpa/rsa/*.hpp)
+FILE( GLOB rsa_impl yocto/mpa/rsa/*.cpp)
+SET( rsa_srcs ${rsa_decl} ${rsa_impl} )
+SOURCE_GROUP( mpa/rsa FILES ${rsa_srcs})
+INSTALL( FILES ${rsa_decl} DESTINATION include/yocto/mpa/rsa )
+
 #gather sources
-SET( srcs ${mpa_srcs} ${mpn_srcs} )
+SET( srcs ${mpa_srcs} ${mpn_srcs} ${rsa_srcs} )
 INCLUDE_DIRECTORIES( . ../main )
 
 ADD_LIBRARY( y-mpa STATIC ${srcs} )

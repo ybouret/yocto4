@@ -123,6 +123,13 @@ namespace yocto
             size = 0;
         }
         
+        void natural:: __clr() const throw()
+        {
+            memset((void*)byte,0,maxi);
+            (size_t &)size = 0;
+        }
+        
+        
         bool  natural:: is_zero() const throw()
         {
             return size <= 0;
