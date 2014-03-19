@@ -26,3 +26,45 @@ YOCTO_UNIT_TEST_IMPL(prime)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(rsa)
+{
+    mpn p = _rand.full<uint32_t>();
+    p     = p.next_prime_();
+    std::cerr << "p=" << p << std::endl;
+    mpn q = _rand.full<uint32_t>();
+    q     = q.next_prime_();
+    std::cerr << "q=" << q << std::endl;
+    const mpn n = p*q;
+    mpn p1 = p; --p1;
+    mpn q1 = q; --q1;
+    mpn phi = p1*q1;
+    std::cerr << "phi=" << phi << std::endl;
+    
+    
+    mpn e = _rand.full<uint16_t>();
+    while( !mpn::are_coprime(e, phi) ) ++e;
+    std::cerr << "e=" << e << std::endl;
+    
+    mpn d = mpn::mod_inv(e, phi);
+    std::cerr << "d=" << d << std::endl;
+    const size_t mbits = n.bits() -1;
+    std::cerr << "#n = " << n.bits() << std::endl;
+    for(size_t i=0; i <100; ++i )
+    {
+        const mpn M = mpn::rand(mbits);
+        const mpn C = mpn::mod_exp(M, e, n);
+        const mpn P = mpn::mod_exp(C,d,n);
+        if(false)
+        {
+            std::cerr << "C=" << C << std::endl;
+            std::cerr << "M=" << M << std::endl;
+            std::cerr << "P=" << P << std::endl;
+        }
+        if( P != M)
+            throw exception("rsa failure");
+    }
+    
+    
+    }
+    YOCTO_UNIT_TEST_DONE()

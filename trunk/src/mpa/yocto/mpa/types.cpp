@@ -3,6 +3,7 @@
 #include "yocto/memory/global.hpp"
 #include "yocto/memory/blocks.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/random/bits.hpp"
 
 namespace yocto
 {
@@ -89,6 +90,12 @@ namespace yocto
         {
             static memmgr &mgr = * memmgr::location();
             mgr.release(p,n);
+        }
+        
+        bool memIO:: random_bit()
+        {
+            static Random::Bits &mgr = Random::CryptoBits();
+            return mgr();
         }
         
     }
