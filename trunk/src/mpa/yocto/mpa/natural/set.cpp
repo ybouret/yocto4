@@ -6,6 +6,7 @@ namespace yocto
     namespace mpa
     {
         
+        
         natural:: natural( uint64_t x ) :
         maxi( sizeof(x) ),
         size( maxi ),
@@ -19,6 +20,19 @@ namespace yocto
             update();
         }
         
+        natural & natural:: operator=( uint64_t x) throw()
+        {
+            assert(maxi>=sizeof(x));
+            size = sizeof(x);
+            for(size_t i=0;i<sizeof(x);++i)
+            {
+                byte[i] = uint8_t(x);
+                x >>= 8;
+            }
+            update();
+            return *this;
+        }
+
         
         natural:: natural(const memory::ro_buffer &buf ) :
         maxi( buf.length() ),

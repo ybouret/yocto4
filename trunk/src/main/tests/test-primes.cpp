@@ -29,4 +29,14 @@ YOCTO_UNIT_TEST_IMPL(primes)
 YOCTO_UNIT_TEST_DONE()
 
 
-
+#include "yocto/code/primes-diff.hpp"
+YOCTO_UNIT_TEST_IMPL(Primes)
+{
+    core::Primes::Print();
+    for(size_t i=0;i<=20;++i)
+    {
+        std::cerr << i << " => " << nextPrime(i) << std::endl;
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
