@@ -209,6 +209,12 @@ return compare(lhs,rhs) OP 0; \
             bool     is_prime_() const;
             natural  next_prime_() const;
 
+            //__________________________________________________________________
+            //
+			// Random
+            //__________________________________________________________________
+            static natural rand(size_t nbits);
+            
         private:
             size_t   maxi;
             size_t   size;

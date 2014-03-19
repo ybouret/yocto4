@@ -15,6 +15,7 @@ namespace yocto
         {
             static uint8_t *acquire(size_t &n);
             static void     release(uint8_t * &p, size_t &n) throw();
+            static bool     random_bit();
         };
         
         //! helper
