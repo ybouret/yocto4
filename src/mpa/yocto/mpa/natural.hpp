@@ -30,6 +30,7 @@ namespace yocto
             virtual ~natural() throw();
             natural(const natural &);
             natural & operator=( const natural &);
+            natural & operator=( uint64_t ) throw();
             virtual size_t length() const throw(); //!< ro_buffer API
             
             //__________________________________________________________________
@@ -205,8 +206,8 @@ return compare(lhs,rhs) OP 0; \
             //
 			// primality
             //__________________________________________________________________
-            bool is_prime16() const; //!< slow/sieve
-            bool is_prime24() const; //!< slow/sieve
+            bool     is_prime_() const;
+            natural  next_prime_() const;
 
         private:
             size_t   maxi;

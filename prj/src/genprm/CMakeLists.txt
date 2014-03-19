@@ -1,0 +1,6 @@
+PROJECT(genprm)
+
+ADD_EXECUTABLE(genprm genprm.cpp)
+TARGET_LINK_YOCTO(genprm)
+
+#INSTALL( TARGETS parse-rsa RUNTIME DESTINATION bin )
