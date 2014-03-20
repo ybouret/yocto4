@@ -1,6 +1,5 @@
-#include "yocto/mpa/natural.hpp"
+#include "yocto/mpa/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
-#include "yocto/code/round.hpp"
 
 namespace yocto
 {
@@ -63,6 +62,12 @@ namespace yocto
             return ans;
         }
         
+        
+        natural natural:: add( const natural &lhs, uint64_t x )
+        {
+            const word2mpn w(x);
+            return add(lhs,w.n);
+        }
         
         natural operator+( const natural &lhs, const natural &rhs )
         {
