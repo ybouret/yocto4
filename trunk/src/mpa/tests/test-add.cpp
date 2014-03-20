@@ -31,6 +31,10 @@ YOCTO_UNIT_TEST_IMPL(add)
             throw exception("++ error");
     }
     
+    x += 2;
+    x  = 3 + x;
+    x  = x + 5;
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -63,7 +63,7 @@ namespace yocto
         }
         
         
-        natural natural:: add( const natural &lhs, uint64_t x )
+        natural natural:: add( const natural &lhs, const uint64_t x )
         {
             const word2mpn w(x);
             return add(lhs,w.n);
@@ -74,12 +74,31 @@ namespace yocto
             return natural::add(lhs,rhs);
         }
         
+        natural operator+( const natural &lhs, const uint64_t rhs)
+        {
+            return natural::add(lhs,rhs);
+        }
+        
+        natural operator+( const uint64_t lhs, const natural &rhs )
+        {
+            return natural::add(lhs,rhs);
+        }
+        
         natural & natural:: operator+=( const natural &rhs )
         {
             natural tmp( add(*this,rhs) );
             xch(tmp);
             return *this;
         }
+        
+        natural & natural:: operator+=( const uint64_t rhs )
+        {
+            const word2mpn w(rhs);
+            natural tmp( add(*this,w.n) );
+            xch(tmp);
+            return *this;
+        }
+
         
         natural & natural:: operator++()
         {
