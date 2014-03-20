@@ -24,6 +24,15 @@ YOCTO_UNIT_TEST_IMPL(mul)
         if( sq.to<uint64_t>() != sq64 )
             throw exception("sqr error");
     }
+    
+    mpn x = 1;
+    std::cerr << x << std::endl;
+    x = x * 3;
+    std::cerr << x << std::endl;
+    x = 2 * x;
+    std::cerr << x << std::endl;
+    x *= 4;
+    std::cerr << x << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()
