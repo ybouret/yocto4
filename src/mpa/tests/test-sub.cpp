@@ -32,6 +32,15 @@ YOCTO_UNIT_TEST_IMPL(sub)
     {
         --j;
     }
+    
+    mpn x = 1000;
+    std::cerr << x << std::endl;
+    x     = x - 500;
+    std::cerr << x << std::endl;
+    x     = 700 - x;
+    std::cerr << x << std::endl;
+    x    -= 50;
+    std::cerr << x << std::endl;
 
 }
 YOCTO_UNIT_TEST_DONE()

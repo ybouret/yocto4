@@ -31,10 +31,16 @@ YOCTO_UNIT_TEST_IMPL(add)
             throw exception("++ error");
     }
     
+    std::cerr << std::dec;
+    x  = 0;
+    std::cerr << x << std::endl;
     x += 2;
+    std::cerr << x << std::endl;
     x  = 3 + x;
+    std::cerr << x << std::endl;
     x  = x + 5;
-    
+    std::cerr << x << std::endl;
+
     
 }
 YOCTO_UNIT_TEST_DONE()

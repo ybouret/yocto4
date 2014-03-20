@@ -1,6 +1,5 @@
-#include "yocto/mpa/natural.hpp"
+#include "yocto/mpa/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
-#include "yocto/code/round.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
 
@@ -81,12 +80,43 @@ namespace yocto
         }
         
         
+        
         natural operator-( const natural &lhs, const natural &rhs )
         {
             return natural::sub(lhs,rhs);
         }
         
+        natural natural:: sub( const natural &lhs, const uint64_t x )
+        {
+            word2mpn w(x);
+            return sub(lhs,w.n);
+        }
+
+        
+        natural operator-( const natural &lhs, const uint64_t rhs )
+        {
+            return natural::sub(lhs,rhs);
+        }
+        
+        natural natural:: sub( const uint64_t x, const natural &rhs )
+        {
+            word2mpn w(x);
+            return sub(w.n,rhs);
+        }
+        
+        natural operator-( const uint64_t lhs, const natural &rhs )
+        {
+            return natural::sub(lhs,rhs);
+        }
+        
         natural & natural:: operator-=( const natural &rhs )
+        {
+            natural tmp( sub(*this,rhs) );
+            xch(tmp);
+            return *this;
+        }
+        
+        natural & natural:: operator-=( const uint64_t rhs )
         {
             natural tmp( sub(*this,rhs) );
             xch(tmp);
