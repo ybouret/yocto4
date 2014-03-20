@@ -65,7 +65,16 @@ YOCTO_UNIT_TEST_IMPL(div)
         }
         
     }
+    std::cerr << std::dec;
     
-    
+    mpn x = 1024;
+    std::cerr << x << std::endl;
+    x     = x / 10;
+    std::cerr << x << std::endl;
+    x     = 1024 / x;
+    std::cerr << x << std::endl;
+    x /= 4;
+    std::cerr << x << std::endl;
+
 }
 YOCTO_UNIT_TEST_DONE()

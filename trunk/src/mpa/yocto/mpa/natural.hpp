@@ -178,9 +178,14 @@ return compare(lhs,rhs) OP 0; \
 			// division
             //__________________________________________________________________
 			static natural  div( const natural &num, const natural &den );
+            static natural  div( const natural &num, const uint64_t x   );
+            static natural  div( const uint64_t x,   const natural &den );
 			friend natural operator/( const natural &num, const natural &den );
+            friend natural operator/( const natural &num, const uint64_t den );
+            friend natural operator/( const uint64_t num, const natural &den );
 			natural & operator/=( const natural &den );
-
+            natural & operator/=( const uint64_t den );
+            
             //__________________________________________________________________
             //
 			// modulo
