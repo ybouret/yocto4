@@ -110,7 +110,6 @@ namespace yocto
                 
             private:
                 bool   try_build_tree( Heap &prioQ ) throw();
-
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
             };
             

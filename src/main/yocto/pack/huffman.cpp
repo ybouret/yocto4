@@ -127,7 +127,7 @@ namespace yocto
         const Huffman:: Item & Huffman:: Alphabet:: operator[](CharType Ch) const  throw()
         {
             assert(Ch>=0);
-            assert(Ch<AlphabetSize);
+            assert(Ch<CharType(AlphabetSize));
             return items[Ch];
         }
         

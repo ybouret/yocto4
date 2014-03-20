@@ -106,6 +106,7 @@ namespace yocto
                 const Node *get_root() const throw();
                 
             private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(Tree);
                 Node  *root;
                 heap<Node,Node::Comparator,Memory::allocator> h;
                 size_t count;
