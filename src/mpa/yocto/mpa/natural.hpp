@@ -110,9 +110,13 @@ return compare(lhs,rhs) OP 0; \
             // addition
             //__________________________________________________________________
             static natural add( const natural &lhs, const natural &rhs );
-            static natural add( const natural &lhs, uint64_t x);
+            static natural add( const natural &lhs, const uint64_t x);
             friend natural operator+( const natural &lhs, const natural &rhs );
+            friend natural operator+( const natural &lhs, const uint64_t x   );
+            friend natural operator+( const uint64_t lhs, const natural &rhs );
+
             natural & operator+=( const natural &rhs );
+            natural & operator+=( const uint64_t rhs );
             void      inc(uint8_t);
             natural & operator++();     //!< prefix
             natural   operator++ (int); //!< postfix
