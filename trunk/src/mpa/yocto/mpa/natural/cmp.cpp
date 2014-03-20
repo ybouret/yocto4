@@ -1,6 +1,5 @@
-#include "yocto/mpa/natural.hpp"
+#include "yocto/mpa/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
-#include "yocto/code/round.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto
@@ -37,6 +36,18 @@ namespace yocto
                 }
             }
         }
+        
+        int natural:: compare( const natural  &lhs, const uint64_t rhs) throw()
+        {
+            const word2mpn w(rhs);
+            return compare(lhs,w.n);
+        }
+        
+        int natural:: compare( const uint64_t lhs, const natural &rhs) throw()
+        {
+            const word2mpn w(lhs);
+            return compare(w.n,rhs);
+        }
     }
-
+    
 }
