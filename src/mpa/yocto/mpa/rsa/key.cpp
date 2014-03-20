@@ -25,7 +25,11 @@ namespace yocto
             {
             }
             
-            const as_primes_t as_primes = {};
+            Key:: Key( const Key & other ) :
+            modulus( other.modulus )
+            {
+            }
+            
             
             //__________________________________________________________________
             //
@@ -41,20 +45,27 @@ namespace yocto
             Key(Modulus),
             publicExponent(PublicExponent)
             {
-                if(publicExponent>=modulus)
-                    throw exception("invalid public key");
-            }
-            
-            PublicKey:: PublicKey(const natural &p,
-                                  const natural &q,
-                                  const as_primes_t & ) :
-            Key( p*q ),
-            publicExponent()
-            {
                 
             }
             
+            PublicKey:: PublicKey( const PublicKey &other ) :
+            Key( other ),
+            publicExponent( other.publicExponent )
+            {
+            }
             
+            
+            PublicKey PublicKey:: GenerateFrom( const natural &prime1, const natural &prime2, const natural &exponent )
+            {
+                const natural n = prime1 * prime2;
+                const natural phi = (prime1-1) * (prime2-1);
+                natural e = exponent;
+                if(e<2) e = 2;
+                while( ! mpn::are_coprime(e,phi) )
+                    ++e;
+                return PublicKey(n,e);
+            }
+
             
             
         }
