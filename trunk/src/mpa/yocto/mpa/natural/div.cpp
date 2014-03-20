@@ -110,7 +110,7 @@ namespace yocto
             const word2mpn w(x);
             return div(num,w.n);
         }
-
+        
         natural operator/( const natural &num, const uint64_t den )
         {
             return natural::div(num,den);
@@ -149,6 +149,7 @@ namespace yocto
 			return natural::modulo( lhs, rhs );
 		}
 		
+        
 		natural & natural:: operator%=( const natural &rhs )
 		{
 			natural tmp = modulo( *this, rhs );
@@ -240,10 +241,10 @@ namespace yocto
 			{
 				case natural_is_less:
                     return num.is_zero();  // easy...
-
+                    
 				case natural_is_equal:
                     return true;    // easy...
-				
+                    
                 case natural_is_greater:
                     break;          // need to test
 			}
@@ -293,6 +294,35 @@ namespace yocto
         }
         
         
+        natural  natural:: modulo( const natural &num, const uint64_t x   )
+        {
+            const word2mpn w(x);
+            return modulo(num,w.n);
+        }
+        
+        natural  natural:: modulo( const uint64_t x,   const natural &den )
+        {
+            const word2mpn w(x);
+            return modulo(w.n,den);
+        }
+        
+        
+        natural  operator%(  const natural &num, const uint64_t den )
+        {
+            return natural::modulo(num, den);
+        }
+        
+        natural  operator%(  const uint64_t num, const natural &den )
+        {
+            return natural::modulo(num, den);
+        }
+
+        natural & natural:: operator%=( const uint64_t rhs )
+		{
+			natural tmp = modulo( *this, rhs );
+			xch( tmp );
+			return *this;
+		}
     }
     
 }

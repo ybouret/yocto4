@@ -20,8 +20,7 @@ namespace yocto
             {
                 natural &m = (natural &)n;
                 m.byte = (uint8_t *)&w;
-                m.size = 8;
-                m.maxi = 8;
+                m.size = m.maxi = 8;
                 m.update();
             }
             
