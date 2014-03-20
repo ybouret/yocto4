@@ -81,7 +81,7 @@ namespace yocto
         
         natural operator+( const uint64_t lhs, const natural &rhs )
         {
-            return natural::add(lhs,rhs);
+            return natural::add(rhs,lhs);
         }
         
         natural & natural:: operator+=( const natural &rhs )
