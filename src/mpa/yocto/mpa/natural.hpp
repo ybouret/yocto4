@@ -16,7 +16,9 @@ namespace yocto
     
     namespace mpa
     {
+        class word2mpn;
         
+        //! a little-endian muliple precision natural number
         class natural : public memory::ro_buffer
         {
         public:
@@ -108,6 +110,7 @@ return compare(lhs,rhs) OP 0; \
             // addition
             //__________________________________________________________________
             static natural add( const natural &lhs, const natural &rhs );
+            static natural add( const natural &lhs, uint64_t x);
             friend natural operator+( const natural &lhs, const natural &rhs );
             natural & operator+=( const natural &rhs );
             void      inc(uint8_t);
@@ -224,12 +227,14 @@ return compare(lhs,rhs) OP 0; \
             void update() throw(); //!< start from size and adjust predicted size
             void rescan() throw(); //!< start from maxi and adjust
             virtual const void *get_address() const throw(); //!< ro_buffer API
+            friend class word2mpn;
         };
 #define YOCTO_CHECK_MPN(X)    \
 assert((X)->byte);            \
 assert((X)->maxi>0);          \
 assert((X)->size<=(X)->maxi); \
 assert( ! ( (X)->size > 0 && (X)->byte[ (X)->size-1 ] == 0 ) )
+     
         
     }
     

@@ -26,4 +26,3 @@ YOCTO_UNIT_TEST_IMPL(mem)
     }
 }
 YOCTO_UNIT_TEST_DONE()
-
