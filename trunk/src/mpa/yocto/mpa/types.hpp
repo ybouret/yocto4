@@ -43,7 +43,7 @@ namespace yocto
         private:
             size_t bytes;
             T     *addr;
-            
+            YOCTO_DISABLE_COPY_AND_ASSIGN(array_of);
         public:
             const size_t size;
         };

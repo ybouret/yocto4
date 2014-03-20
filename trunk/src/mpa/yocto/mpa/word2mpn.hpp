@@ -4,6 +4,7 @@
 #include "yocto/mpa/natural.hpp"
 #include "yocto/code/round.hpp"
 #include "yocto/code/endian.hpp"
+#include "yocto/code/cast.hpp"
 
 namespace yocto
 {
@@ -16,7 +17,7 @@ namespace yocto
             inline word2mpn(uint64_t x) throw() :
             w( swap_le(x) ),
             u(),
-            n( *(natural *)&u[0] )
+            n( *(natural *) _cast::load(&u[0]) )
             {
                 natural &m = (natural &)n;
                 m.byte = (uint8_t *)&w;
