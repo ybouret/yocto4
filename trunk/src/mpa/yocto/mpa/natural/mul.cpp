@@ -105,7 +105,6 @@ namespace yocto
 			
         }
         
-#if 1
         static inline
 		void _fft(real_t      *data,
 				  const size_t size
@@ -175,7 +174,6 @@ namespace yocto
 			
 			
         }
-#endif
 		
 		static  inline
 		void _ifft(real_t      *data,
