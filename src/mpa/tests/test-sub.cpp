@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(sub)
         const mpn x = _rand.full<uint64_t>();
         u.push_back(x);
     }
-    quicksort(u, mpn::compare );
+    quicksort(u, mpn::cmp );
     for(size_t i=u.size();i>1;--i)
     {
         const mpn lhs = u[i];

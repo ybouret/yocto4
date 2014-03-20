@@ -91,12 +91,20 @@ namespace yocto
             //
             // comparison
             //__________________________________________________________________
-            static int compare( const natural &, const natural &) throw();
+            static int compare( const natural  &, const natural &) throw();
+            static int compare( const natural  &, const uint64_t ) throw();
+            static int compare( const uint64_t ,  const natural &) throw();
+            
+            //! for arguments disambiguation
+            static inline int cmp( const natural  &lhs, const natural &rhs) throw()
+            {
+                return compare(lhs,rhs);
+            }
 #define YOCTO_COMPARE(OP) \
-inline friend bool operator OP (const natural &lhs, const natural &rhs) throw()\
-{\
-return compare(lhs,rhs) OP 0; \
-}
+inline friend bool operator OP (const natural &lhs, const natural &rhs) throw() { return compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const natural &lhs, const uint64_t rhs) throw() { return compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() { return compare(lhs,rhs) OP 0; }
+            
             YOCTO_COMPARE(==)
             YOCTO_COMPARE(!=)
             YOCTO_COMPARE(<)
@@ -104,7 +112,7 @@ return compare(lhs,rhs) OP 0; \
             YOCTO_COMPARE(>)
             YOCTO_COMPARE(>=)
             
-
+            
             //__________________________________________________________________
             //
             // addition
@@ -114,7 +122,7 @@ return compare(lhs,rhs) OP 0; \
             friend natural operator+( const natural &lhs, const natural &rhs );
             friend natural operator+( const natural &lhs, const uint64_t x   );
             friend natural operator+( const uint64_t lhs, const natural &rhs );
-
+            
             natural & operator+=( const natural &rhs );
             natural & operator+=( const uint64_t rhs );
             void      inc(uint8_t);
@@ -172,7 +180,7 @@ return compare(lhs,rhs) OP 0; \
 			natural operator<<( size_t n) const;
 			natural & shl();         //!< shift left by one
 			natural & operator<<=( size_t n );
-
+            
             //__________________________________________________________________
             //
 			// division
@@ -197,7 +205,7 @@ return compare(lhs,rhs) OP 0; \
 			friend natural  operator%(  const natural &num, const natural &den );
             friend natural  operator%(  const natural &num, const uint64_t den );
 			friend natural  operator%(  const uint64_t num, const natural &den );
-
+            
 			natural & operator %= ( const natural &den );
             natural & operator %= ( const uint64_t den );
             bool is_divisible_by( const natural &den ) const;
@@ -215,7 +223,7 @@ return compare(lhs,rhs) OP 0; \
             //__________________________________________________________________
 			static natural gcd( const natural &lhs, const natural &rhs );           //!< greatest common divisor
 			static bool    are_coprime( const natural &lhs, const natural &rhs );   //!< gcd(lhs,rhs) == 1
-
+            
             
             //__________________________________________________________________
             //
@@ -225,7 +233,7 @@ return compare(lhs,rhs) OP 0; \
             static natural hex( const char   * ); // without 0x
             
             static natural dec( const string & );
-            static natural dec( const char   * ); 
+            static natural dec( const char   * );
             
             static natural parse( const string & );
             
@@ -235,7 +243,7 @@ return compare(lhs,rhs) OP 0; \
             //__________________________________________________________________
             bool     is_prime_() const;
             natural  next_prime_() const;
-
+            
             //__________________________________________________________________
             //
 			// Random
@@ -257,7 +265,7 @@ assert((X)->byte);            \
 assert((X)->maxi>0);          \
 assert((X)->size<=(X)->maxi); \
 assert( ! ( (X)->size > 0 && (X)->byte[ (X)->size-1 ] == 0 ) )
-     
+        
         
     }
     

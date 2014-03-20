@@ -17,7 +17,7 @@ YOCTO_UNIT_TEST_IMPL(cmp)
         u.push_back(x);
     }
     std::cerr << "u=" << u << std::endl;
-    quicksort(u, mpn::compare );
+    quicksort(u, mpn::cmp );
     std::cerr << "u=" << u << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
