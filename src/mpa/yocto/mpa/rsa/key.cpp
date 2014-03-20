@@ -175,11 +175,26 @@ namespace yocto
                 return mpn::mod_exp(C, privateExponent, modulus);
             }
             
+            natural PrivateKey:: decode_with_prv( const natural &C ) const
+            {
+                if( C >= modulus )
+                    throw exception("RSA::PivateKey:: decode_with_prv(Code Too Long)");
+                return CRT(C);
+            }
+
+            
             natural PrivateKey::  encode_with_prv_( const natural &M ) const
             {
                 if(M.bits()>ibits)
                     throw exception("RSA:PrivateKey:: encode_with_prv_(Message Too Long)");
                 return mpn::mod_exp(M,privateExponent,modulus);
+            }
+            
+            natural PrivateKey::  encode_with_prv( const natural &M ) const
+            {
+                if(M.bits()>ibits)
+                    throw exception("RSA:PrivateKey:: encode_with_prv_(Message Too Long)");
+                return CRT(M);
             }
             
             
@@ -210,6 +225,17 @@ namespace yocto
                 
                 return PrivateKey(n, e, d, prime1, prime2, e1, e2, cf);
             }
+            
+            natural PrivateKey:: CRT( const natural &C ) const
+            {
+                mpn       M1 = mpn::mod_exp(C,exponent1,prime1);
+                const mpn M2 = mpn::mod_exp(C,exponent2,prime2);
+                while(M1<M2) M1 += prime1;
+                M1 -= M2;
+                M1 *= coefficient;
+                return M2 + (M1%prime1) * prime2;
+            }
+
             
         }
         

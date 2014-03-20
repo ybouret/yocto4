@@ -7,7 +7,7 @@ using namespace mpa;
 
 YOCTO_UNIT_TEST_IMPL(rsa_keys)
 {
-    for(size_t i=0;i<10;++i)
+    for(size_t i=0;i<8;++i)
     {
         const mpn prime1 = mpn::rand(20).next_prime_();
         std::cerr << "prime1=" << prime1 << std::endl;
@@ -36,12 +36,22 @@ YOCTO_UNIT_TEST_IMPL(rsa_keys)
             const mpn M = mpn::rand( pub.ibits );
             const mpn C = pub.encode_with_pub(M);
             const mpn P = prv.decode_with_prv_(C);
-            std::cerr << M << " => " << C << " => " << P << std::endl;
-            if( P != M )
+            const mpn Q = prv.decode_with_prv(C);
+            //std::cerr << M << " => " << C << " => " << P << " / " << Q << std::endl;
+            if(P!=M)
                 throw exception("RSA Failure");
+            if(P!=Q)
+                throw exception("CRT Failure");
         }
         
-        
+        for(size_t j=0;j<8;++j)
+        {
+            const mpn M = mpn::rand( pub.ibits );
+            const mpn C = prv.encode_with_prv(M);
+            const mpn P = pub.decode_with_pub(C);
+            if(P!=M)
+                throw exception("AUTH Failure");
+        }
     }
     
 }
