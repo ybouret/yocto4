@@ -1,4 +1,4 @@
-#include "yocto/mpa/natural.hpp"
+#include "yocto/mpa/word2mpn.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/code/utils.hpp"
@@ -382,7 +382,29 @@ namespace yocto
                 return natural();
         }
         
+        natural natural:: mul( const natural &lhs, const uint64_t x)
+        {
+            const word2mpn w(x);
+            return mul(lhs,w.n);
+        }
         
+        natural operator*( const natural &lhs, const uint64_t rhs)
+        {
+            return natural::mul(lhs,rhs);
+        }
+        
+        natural operator*( const uint64_t lhs, const natural &rhs)
+        {
+            return natural::mul(rhs,lhs);
+        }
+        
+        natural & natural:: operator*=( const uint64_t rhs)
+        {
+            natural prod( mul(*this,rhs) );
+            xch(prod);
+            return *this;
+        }
+
         
     }
     

@@ -141,8 +141,12 @@ return compare(lhs,rhs) OP 0; \
             // multiplication
             //__________________________________________________________________
             static natural mul( const natural &lhs, const natural &rhs );
+            static natural mul( const natural &lhs, const uint64_t x);
             friend natural operator*( const natural &lhs, const natural &rhs);
+            friend natural operator*( const natural &lhs, const uint64_t rhs);
+            friend natural operator*( const uint64_t lhs, const natural &rhs);
             natural & operator*=( const natural &rhs);
+            natural & operator*=( const uint64_t rhs);
             static natural sqr( const natural &lhs);
             
             //__________________________________________________________________
