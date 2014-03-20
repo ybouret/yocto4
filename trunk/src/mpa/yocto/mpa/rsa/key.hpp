@@ -76,10 +76,14 @@ namespace yocto
                 //! (C^privateExponent) % modulus: C < modulus
                 natural decode_with_prv_( const natural &C ) const;
                 
+                //! (C^privateExponent) % modulus: C < modulus, using CRT
+                natural decode_with_prv( const natural &C ) const;
+                
                 //! M.bits() <= ibits : (M^privateExponent) % modulus
                 natural encode_with_prv_( const natural &M ) const;
                 
-                
+                //! M.bits() <= ibits : (M^privateExponent) % modulus, using CRT
+                natural encode_with_prv( const natural &M ) const;
                 
                 
                 //! Generate a private key
@@ -94,6 +98,7 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_ASSIGN(PrivateKey);
+                natural CRT( const natural &C ) const;
             };
             
         }
