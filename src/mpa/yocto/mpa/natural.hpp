@@ -260,6 +260,7 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             virtual const void *get_address() const throw(); //!< ro_buffer API
             friend class word2mpn;
         };
+        
 #define YOCTO_CHECK_MPN(X)    \
 assert((X)->byte);            \
 assert((X)->maxi>0);          \
