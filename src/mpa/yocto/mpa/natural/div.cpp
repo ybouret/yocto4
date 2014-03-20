@@ -1,4 +1,4 @@
-#include "yocto/mpa/natural.hpp"
+#include "yocto/mpa/word2mpn.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
 
@@ -104,6 +104,35 @@ namespace yocto
 			}
 			return lo;
 		}
+        
+        natural  natural:: div( const natural &num, const uint64_t x   )
+        {
+            const word2mpn w(x);
+            return div(num,w.n);
+        }
+
+        natural operator/( const natural &num, const uint64_t den )
+        {
+            return natural::div(num,den);
+        }
+        
+        natural  natural:: div( const uint64_t x,   const natural &den )
+        {
+            const word2mpn w(x);
+            return div(w.n,den);
+        }
+        
+        natural operator/( const uint64_t num, const natural &den )
+        {
+            return natural:: div(num,den);
+        }
+        
+        natural & natural:: operator/=( const uint64_t den )
+        {
+            natural tmp = div( *this, den );
+			xch( tmp );
+			return *this;
+        }
         
     }
     
