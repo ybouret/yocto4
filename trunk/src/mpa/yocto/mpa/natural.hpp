@@ -126,8 +126,12 @@ return compare(lhs,rhs) OP 0; \
             // subtraction
             //__________________________________________________________________
             static natural sub( const natural &lhs, const natural &rhs );
+            static natural sub( const natural &lhs, const uint64_t x);
+            static natural sub( const uint64_t x,   const natural &rhs);
             friend natural operator-( const natural &lhs, const natural &rhs );
+            friend natural operator-( const natural &lhs, const uint64_t rhs );
             natural & operator-=( const natural &rhs );
+            natural & operator-=( const uint64_t rhs );
             void      dec(uint8_t);
             natural & operator--();     //!< prefix
             natural   operator-- (int); //!< postfix
