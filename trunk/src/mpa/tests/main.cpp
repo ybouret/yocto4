@@ -1,6 +1,6 @@
 #include "yocto/utest/driver.hpp"
 
-YOCTO_UNIT_TEST_INIT(16)
+YOCTO_UNIT_TEST_INIT(32)
 {
     YOCTO_UNIT_TEST_DECL(mem);
     YOCTO_UNIT_TEST_DECL(io);
@@ -16,6 +16,7 @@ YOCTO_UNIT_TEST_INIT(16)
     YOCTO_UNIT_TEST_DECL(rsa);
     YOCTO_UNIT_TEST_DECL(w2m);
     YOCTO_UNIT_TEST_DECL(rsa_keys);
+    YOCTO_UNIT_TEST_DECL(rsa_perf);
 
 }
 YOCTO_UNIT_TEST_EXEC()
