@@ -21,13 +21,13 @@ namespace yocto
                 
             protected:
                 explicit Key( const natural &Modulus);
+                Key(const Key &);
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(Key);
+                YOCTO_DISABLE_ASSIGN(Key);
             };
             
-            struct as_primes_t {};
-            extern const as_primes_t as_primes;
+         
             
             class PublicKey : public Key
             {
@@ -36,10 +36,12 @@ namespace yocto
                 
                 virtual ~PublicKey() throw();
                 explicit PublicKey( const natural &Modulus, const natural &PublicExponent);
-                explicit PublicKey( const natural &prime1, const natural &prime2, const as_primes_t &);
+                PublicKey( const PublicKey &);
+                
+                static PublicKey GenerateFrom( const natural &prime1, const natural &prime2, const natural &exponent );
                 
             private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(PublicKey);
+                YOCTO_DISABLE_ASSIGN(PublicKey);
             };
             
         }
