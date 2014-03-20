@@ -20,8 +20,8 @@ namespace yocto
             n( *(natural *) _cast::load(&u[0]) )
             {
                 natural &m = (natural &)n;
-                m.byte = (uint8_t *)&w;
-                m.size = m.maxi = 8;
+                m.byte     = (uint8_t *)&w;
+                m.size     = m.maxi = 8;
                 m.update();
             }
             
