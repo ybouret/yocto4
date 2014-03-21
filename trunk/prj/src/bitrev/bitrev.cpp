@@ -56,6 +56,18 @@ double perf( size_t p )
     return speed;
 }
 
+static inline
+void output( const array<size_t> &u, ios::ostream &fp )
+{
+    const size_t n = u.size();
+    for(size_t i=1;i<n;++i)
+    {
+        fp("%u, ", unsigned(u[i]-1));
+        if(0==(i%16)) fp("\n");
+    }
+    fp("%u\n", unsigned(u[n]-1));
+}
+
 int main(int argc, char *argv[] )
 {
     
@@ -81,23 +93,29 @@ int main(int argc, char *argv[] )
         
         
         vector<size_t> indx(1024*1024,as_capacity);
+        vector<size_t> jndx(1024*1024,as_capacity);
+        
+        ios::ocstream fp("bitrevtab.cxx",false);
+        
         for( size_t p=0; p <= pmax; ++p )
         {
             indx.free();
-            size_t       imax=0;
+            jndx.free();
+            size_t       imax = 0;
             const size_t size = 1 << p;
             std::cerr << "size=" << size << " | p=" << p << std::endl;
             size_t nops = 0;
             const size_t n    = size << 1;
             {
                 size_t j=1;
-                for (size_t i=1; i<n; i+=2) {
+                for (size_t i=1; i<n; i+=2)
+                {
                     if (j > i)
 					{
                         ++nops;
                         //std::cerr << '(' << i << ',' << j << ')' << ' ';
                         indx.push_back(i);
-                        indx.push_back(j);
+                        jndx.push_back(j);
                         if(i>imax) imax=i;
                         if(j>imax) imax=j;
                     }
@@ -110,7 +128,9 @@ int main(int argc, char *argv[] )
                     j += m;
                 }
             }
-            assert( 2*nops == indx.size());
+            std::cerr << std::endl;
+            assert( nops == indx.size() );
+            assert( nops == jndx.size() );
             const size_t nw = nops * 2;
             std::cerr << "\tnops = " << nops << " =>" <<  nw <<   " words"<< std::endl;
             const size_t nb = nw * sizeof(uint32_t);
@@ -118,6 +138,19 @@ int main(int argc, char *argv[] )
             std::cerr << "\tnb   = " << nb << " / " << double(nb)/(1024.0) << " kBytes" << std::endl;
             //std::cerr << indx << std::endl;
             std::cerr << std::endl;
+            if(nops)
+            {
+                fp("// BitRev for size=%u\n", unsigned(size) );
+                fp("static const unsigned num%u     = %u;\n", unsigned(size), unsigned(nops));
+                fp("static const unsigned idx%u[%u] = {\n", unsigned(size), unsigned(nops) );
+                output( indx, fp );
+                fp("};\n");
+                fp("static const unsigned jdx%u[%u] = {\n", unsigned(size), unsigned(nops) );
+                output( jndx, fp );
+                fp("};\n");
+                fp("\n");
+                
+            }
         }
         
         
