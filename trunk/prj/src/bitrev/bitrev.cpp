@@ -98,6 +98,12 @@ int main(int argc, char *argv[] )
         
         ios::ocstream fp("bitrevtab.cxx",false);
         ios::ocstream src("bitrevcode.cxx",false);
+        
+        src("#define BRSZ 2*sizeof(real_t)\n");
+        src("void __bitrev( real_t *arr, size_t size )\n");
+        src("{\n");
+        src("\tswitch(size)\n");
+        src("\t{\n");
         src("\tcase 0:\n\tcase 1:\n\tcase 2:\n\tbreak;\n");
         for( size_t p=0; p <= pmax; ++p )
         {
@@ -156,14 +162,15 @@ int main(int argc, char *argv[] )
                 src("\tcase %u:\n", unsigned(size));
                 for(size_t i=1;i<=nops;++i)
                 {
-                    src("\t\tcore::bswap<2*sizeof(real_t)>(&arr[%6u], &arr[%6u])\n", unsigned(indx[i]), unsigned(jndx[i]));
+                    src("\t\tcore::bswap<BRSZ>(&arr[%4u], &arr[%4u]);\n", unsigned(indx[i]), unsigned(jndx[i]));
                 }
-                src("\tbreak\n");
+                src("\treturn;\n");
             }
         }
-        
-        
-        
+        src("\tdefault:;\n");
+        src("\t}\n");
+        src("}\n");
+
         return 0;
     }
     catch( const exception &e )

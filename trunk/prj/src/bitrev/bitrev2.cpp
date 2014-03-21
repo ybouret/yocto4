@@ -143,21 +143,28 @@ void bitrev_case( T *arr, size_t size )
     }
 }
 
-template <typename T>
+#define real_t double
+#include "bitrevcode.cxx"
+
 static inline void test( size_t size )
 {
-    
-    vector< complex<T> > u(size,as_capacity);
+    typedef complex<double> cplx;
+    vector< cplx > u(size,as_capacity);
     for(size_t i=1;i<=size;++i)
     {
-        const complex<T> c( i,i );
+        const cplx c( i,i );
         u.push_back(c);
     }
-    vector< complex<T> > v(u);
-    vector< complex<T> > w(u);
+    
+    vector< cplx > v(u);
+    vector< cplx > w(u);
+    vector< cplx > z(u);
+
     
     bitrev_loop( & v[1].re, size );
     bitrev_case( & w[1].re, size );
+    __bitrev( &z[1].re, size);
+    
     for(size_t i=1;i<=size;++i)
     {
         if(v[i]!=w[i])
@@ -172,7 +179,7 @@ static inline void test( size_t size )
         bitrev_loop( & v[1].re, size );
     }
     const double ell_loop = chrono.query();
-    //std::cerr << "loop=" << ell_loop << std::endl;
+    //std::cerr << "\tloop=" << ell_loop << std::endl;
     
     chrono.start();
     for(size_t iter=0;iter<ITER;++iter)
@@ -180,13 +187,19 @@ static inline void test( size_t size )
         bitrev_case( & v[1].re, size );
     }
     const double ell_case = chrono.query();
-    //std::cerr << "case=" << ell_case << std::endl;
+    //std::cerr << "\tcase=" << ell_case << std::endl;
     
-    const double speed_up = ell_loop/ell_case;
-    std::cerr << "speed_up" << size << " = " << speed_up << std::endl;
+    const double case_up = ell_loop/ell_case;
     
-    
-    
+    chrono.start();
+    for(size_t iter=0;iter<ITER;++iter)
+    {
+        __bitrev(& v[1].re, size );
+    }
+    const double ell_code = chrono.query();
+    const double code_up  = ell_loop/ell_code;
+    std::cerr << "case_up" << size << " = " << case_up << " / " << "code_up" << size << " = " << code_up << std::endl;
+
 }
 
 int main(int argc, char *argv[] )
@@ -194,18 +207,10 @@ int main(int argc, char *argv[] )
     
     try
     {
-        std::cerr << "float..." << std::endl;
-        for(size_t p=2;p<=14;++p)
+        for(size_t p=2;p<=10;++p)
         {
             const size_t size = 1 << p;
-            test<float>(size);
-        }
-        
-        std::cerr << "double..." << std::endl;
-        for(size_t p=2;p<=14;++p)
-        {
-            const size_t size = 1 << p;
-            test<double>(size);
+            test(size);
         }
         
         
