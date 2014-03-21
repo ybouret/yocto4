@@ -9,6 +9,7 @@
 #include <typeinfo>
 #include "yocto/string/conv.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/sort/quick.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -96,7 +97,8 @@ int main(int argc, char *argv[] )
         vector<size_t> jndx(1024*1024,as_capacity);
         
         ios::ocstream fp("bitrevtab.cxx",false);
-        
+        ios::ocstream src("bitrevcode.cxx",false);
+        src("\tcase 0:\n\tcase 1:\n\tcase 2:\n\tbreak;\n");
         for( size_t p=0; p <= pmax; ++p )
         {
             indx.free();
@@ -131,6 +133,7 @@ int main(int argc, char *argv[] )
             std::cerr << std::endl;
             assert( nops == indx.size() );
             assert( nops == jndx.size() );
+            co_qsort(indx, jndx);
             const size_t nw = nops * 2;
             std::cerr << "\tnops = " << nops << " =>" <<  nw <<   " words"<< std::endl;
             const size_t nb = nw * sizeof(uint32_t);
@@ -150,6 +153,12 @@ int main(int argc, char *argv[] )
                 fp("};\n");
                 fp("\n");
                 
+                src("\tcase %u:\n", unsigned(size));
+                for(size_t i=1;i<=nops;++i)
+                {
+                    src("\t\tcore::bswap<2*sizeof(real_t)>(&arr[%6u], &arr[%6u])\n", unsigned(indx[i]), unsigned(jndx[i]));
+                }
+                src("\tbreak\n");
             }
         }
         
