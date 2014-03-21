@@ -30,10 +30,11 @@ void bitrev_loop( T *arr, size_t size )
         }
         j += m;
     }
-
+    
 }
 
 namespace {
+#define word_t unsigned
 #include "bitrevtab.cxx"
 }
 
@@ -49,6 +50,7 @@ namespace {
 #define CASE_UNR(N) case N:  YOCTO_LOOP_FUNC_(num##N,BITREV_CODE,0); break
 
 #define CASE CASE_UNR
+//#define CASE CASE_RAW
 
 template <typename T>
 static inline
@@ -93,8 +95,50 @@ void bitrev_case( T *arr, size_t size )
 #define I idx256
 #define J jdx256
             CASE(256);
+#undef I
+#undef J
+#define I idx512
+#define J jdx512
+            CASE(512);
+#undef I
+#undef J
+#define I idx1024
+#define J jdx1024
+            CASE(1024);
+#if 0
+#undef I
+#undef J
+#define I idx2048
+#define J jdx2048
+            CASE(2048);
+#undef I
+#undef J
+#define I idx4096
+#define J jdx4096
+            CASE(4096);
+#endif
         default:
-            throw exception("Not Implemented");
+        {
+            assert( is_a_power_of_two(size) );
+            --arr;
+            const size_t n    = size << 1;
+            size_t j=1;
+            for (size_t i=1; i<n; i+=2)
+            {
+                if (j > i)
+                {
+                    core::bswap<2*sizeof(T)>( &arr[i], &arr[j] );
+                }
+                size_t m = size; // m=  n / 2;
+                while (m >= 2 && j > m)
+                {
+                    j -=  m;
+                    m >>= 1;
+                }
+                j += m;
+            }
+            
+        }
             break;
     }
 }
@@ -129,7 +173,7 @@ static inline void test( size_t size )
     }
     const double ell_loop = chrono.query();
     //std::cerr << "loop=" << ell_loop << std::endl;
-
+    
     chrono.start();
     for(size_t iter=0;iter<ITER;++iter)
     {
@@ -150,11 +194,20 @@ int main(int argc, char *argv[] )
     
     try
     {
-        for(size_t p=2;p<=8;++p)
+        std::cerr << "float..." << std::endl;
+        for(size_t p=2;p<=14;++p)
         {
             const size_t size = 1 << p;
             test<float>(size);
         }
+        
+        std::cerr << "double..." << std::endl;
+        for(size_t p=2;p<=14;++p)
+        {
+            const size_t size = 1 << p;
+            test<double>(size);
+        }
+        
         
         return 0;
     }

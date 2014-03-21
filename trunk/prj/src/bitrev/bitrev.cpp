@@ -141,11 +141,11 @@ int main(int argc, char *argv[] )
             if(nops)
             {
                 fp("// BitRev for size=%u\n", unsigned(size) );
-                fp("static const unsigned num%u     = %u;\n", unsigned(size), unsigned(nops));
-                fp("static const unsigned idx%u[%u] = {\n", unsigned(size), unsigned(nops) );
+                fp("static const size_t   num%u = %u;\n", unsigned(size), unsigned(nops));
+                fp("static const word_t idx%u[%u] = {\n", unsigned(size), unsigned(nops) );
                 output( indx, fp );
                 fp("};\n");
-                fp("static const unsigned jdx%u[%u] = {\n", unsigned(size), unsigned(nops) );
+                fp("static const word_t jdx%u[%u] = {\n", unsigned(size), unsigned(nops) );
                 output( jndx, fp );
                 fp("};\n");
                 fp("\n");
