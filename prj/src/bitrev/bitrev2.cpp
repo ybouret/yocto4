@@ -143,8 +143,12 @@ void bitrev_case( T *arr, size_t size )
     }
 }
 
+#define USE_CODE
+#if defined(USE_CODE)
 #define real_t double
 #include "bitrevcode.cxx"
+#include "bitrevcode2.cxx"
+#endif
 
 static inline void test( size_t size )
 {
@@ -163,13 +167,34 @@ static inline void test( size_t size )
     
     bitrev_loop( & v[1].re, size );
     bitrev_case( & w[1].re, size );
+#if defined(USE_CODE)
     __bitrev( &z[1].re, size);
-    
+#endif
     for(size_t i=1;i<=size;++i)
     {
         if(v[i]!=w[i])
             throw exception("BitRev Failure!");
+#if defined(USE_CODE)
+        if( v[i] != z[i] )
+            throw exception("BitRev Code Failure for size=%u !", unsigned(size) );
+#endif
+        
     }
+#if defined(USE_CODE)
+    for(size_t i=1;i<=size;++i)
+    {
+        w[i] = z[i] = u[i];
+    }
+    __bitrev( &w[1].re, &z[1].re, size);
+    for(size_t i=1;i<=size;++i)
+    {
+        if(v[i]!=w[i])
+            throw exception("BitRev2 Failure 1!");
+        if(v[i]!=z[i])
+            throw exception("BitRev2 Failure 2!");
+    }
+#endif
+    
     
     wtime chrono;
     chrono.start();
@@ -194,7 +219,9 @@ static inline void test( size_t size )
     chrono.start();
     for(size_t iter=0;iter<ITER;++iter)
     {
+#if defined(USE_CODE)
         __bitrev(& v[1].re, size );
+#endif
     }
     const double ell_code = chrono.query();
     const double code_up  = ell_loop/ell_code;
@@ -207,7 +234,7 @@ int main(int argc, char *argv[] )
     
     try
     {
-        for(size_t p=2;p<=10;++p)
+        for(size_t p=2;p<=12;++p)
         {
             const size_t size = 1 << p;
             test(size);
