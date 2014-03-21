@@ -57,18 +57,6 @@ double perf( size_t p )
     return speed;
 }
 
-static inline
-void output( const array<size_t> &u, ios::ostream &fp )
-{
-    const size_t n = u.size();
-    for(size_t i=1;i<n;++i)
-    {
-        fp("%u, ", unsigned(u[i]-1));
-        if(0==(i%16)) fp("\n");
-    }
-    fp("%u\n", unsigned(u[n]-1));
-}
-
 int main(int argc, char *argv[] )
 {
     
@@ -96,18 +84,18 @@ int main(int argc, char *argv[] )
         vector<size_t> indx(1024*1024,as_capacity);
         vector<size_t> jndx(1024*1024,as_capacity);
         
-        ios::ocstream fp("bitrevtab.cxx",false);
+        //ios::ocstream fp("bitrevtab.cxx",false);
         ios::ocstream src("bitrevcode.cxx",false);
         ios::ocstream src2("bitrevcode2.cxx",false);
         
         src("#define BRSZ 2*sizeof(real_t)\n");
-        src("void __bitrev( real_t *arr, size_t size )\n");
+        src("void __bitrev( real_t *arr, const size_t size, const size_t n )\n");
         src("{\n");
         src("\tswitch(size)\n");
         src("\t{\n");
         src("\tcase 0:\n\tcase 1:\n\tcase 2:\n\tbreak;\n");
         
-        src2("void __bitrev( real_t *arr, real_t *brr, size_t size )\n");
+        src2("void __bitrev( real_t *arr, real_t *brr, const size_t size, const size_t n )\n");
         src2("{\n");
         src2("\tswitch(size)\n");
         src2("\t{\n");
@@ -158,23 +146,13 @@ int main(int argc, char *argv[] )
             std::cerr << std::endl;
             if(nops)
             {
-                fp("// BitRev for size=%u\n", unsigned(size) );
-                fp("static const size_t   num%u = %u;\n", unsigned(size), unsigned(nops));
-                fp("static const word_t idx%u[%u] = {\n", unsigned(size), unsigned(nops) );
-                output( indx, fp );
-                fp("};\n");
-                fp("static const word_t jdx%u[%u] = {\n", unsigned(size), unsigned(nops) );
-                output( jndx, fp );
-                fp("};\n");
-                fp("\n");
-                
                 src("\tcase %u:\n", unsigned(size));
                 src2("\tcase %u:\n", unsigned(size));
                 for(size_t i=1;i<=nops;++i)
                 {
-                    src("\t\tcore::bswap<BRSZ>(&arr[%4u], &arr[%4u]);\n", unsigned(indx[i]-1), unsigned(jndx[i]-1));
-                    src2("\t\tcore::bswap<BRSZ>(&arr[%4u], &arr[%4u]);\n", unsigned(indx[i]-1), unsigned(jndx[i]-1));
-                    src2("\t\tcore::bswap<BRSZ>(&brr[%4u], &brr[%4u]);\n", unsigned(indx[i]-1), unsigned(jndx[i]-1));
+                    src("\t\tcore::bswap<BRSZ>(&arr[%4u], &arr[%4u]);\n", unsigned(indx[i]), unsigned(jndx[i]));
+                    src2("\t\tcore::bswap<BRSZ>(&arr[%4u], &arr[%4u]);\n", unsigned(indx[i]), unsigned(jndx[i]));
+                    src2("\t\tcore::bswap<BRSZ>(&brr[%4u], &brr[%4u]);\n", unsigned(indx[i]), unsigned(jndx[i]));
                     
                 }
                 src("\treturn;\n");
@@ -184,16 +162,14 @@ int main(int argc, char *argv[] )
         src("\tdefault:\n");
         src("\t\t{\n");
         src(
-            "\t\t\t--arr;\n"
-            "\t\t\tconst size_t n = size << 1;\n"
-            "\t\t\tsize_t j=1;\n"
-            "\t\t\tfor (size_t i=1; i<n; i+=2)\n"
+            "\t\t\tregister size_t j=1;\n"
+            "\t\t\tfor (register size_t i=1; i<n; i+=2)\n"
             "\t\t\t{\n"
             "\t\t\t\tif (j > i)\n"
             "\t\t\t\t{\n"
             "\t\t\t\t\tcore::bswap<BRSZ>( &arr[i], &arr[j] );\n"
             "\t\t\t\t}\n"
-            "\t\t\t\tsize_t m = size;\n"
+            "\t\t\t\tregister size_t m = size;\n"
             "\t\t\t\twhile (m >= 2 && j > m)\n"
             "\t\t\t\t{\n"
             "\t\t\t\t\tj -=  m;\n"
@@ -210,18 +186,15 @@ int main(int argc, char *argv[] )
         src2("\tdefault:\n");
         src2("\t\t{\n");
         src2(
-             "\t\t\t--arr;\n"
-             "\t\t\t--brr;\n"
-             "\t\t\tconst size_t n = size << 1;\n"
-             "\t\t\tsize_t j=1;\n"
-             "\t\t\tfor (size_t i=1; i<n; i+=2)\n"
+             "\t\t\tregister size_t j=1;\n"
+             "\t\t\tfor (register size_t i=1; i<n; i+=2)\n"
              "\t\t\t{\n"
              "\t\t\t\tif (j > i)\n"
              "\t\t\t\t{\n"
              "\t\t\t\t\tcore::bswap<BRSZ>( &arr[i], &arr[j] );\n"
              "\t\t\t\t\tcore::bswap<BRSZ>( &brr[i], &brr[j] );\n"
              "\t\t\t\t}\n"
-             "\t\t\t\tsize_t m = size;\n"
+             "\t\t\t\tregister size_t m = size;\n"
              "\t\t\t\twhile (m >= 2 && j > m)\n"
              "\t\t\t\t{\n"
              "\t\t\t\t\tj -=  m;\n"
