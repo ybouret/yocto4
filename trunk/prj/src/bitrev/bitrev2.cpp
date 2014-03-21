@@ -49,8 +49,8 @@ namespace {
 
 #define CASE_UNR(N) case N:  YOCTO_LOOP_FUNC_(num##N,BITREV_CODE,0); break
 
-#define CASE CASE_UNR
-//#define CASE CASE_RAW
+//#define CASE CASE_UNR
+#define CASE CASE_RAW
 
 template <typename T>
 static inline
