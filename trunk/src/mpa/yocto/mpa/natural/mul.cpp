@@ -11,6 +11,12 @@ namespace yocto
     {
         typedef double          real_t;
         typedef complex<real_t> cplx_t;
+      
+#define YOCTO_MPA_USE_CODE 1
+#if defined(YOCTO_MPA_USE_CODE)
+#include "bitrevcode.cxx"
+#include "bitrevcode2.cxx"
+#endif
         
         //! simultaneous FFTs
 		static inline
@@ -30,6 +36,10 @@ namespace yocto
             // bit reversal algorithm
             //==================================================================
             const size_t n    = size << 1;
+            
+#if defined(YOCTO_MPA_USE_CODE)
+            __bitrev(data, other, size, n);
+#else
             {
                 size_t j=1;
                 for(size_t i=1; i<n; i+=2)
@@ -48,6 +58,7 @@ namespace yocto
                     j += m;
                 }
             }
+#endif
 			
             //==================================================================
             // Lanczos-Algorithm
@@ -60,7 +71,7 @@ namespace yocto
                     const size_t istep = mmax << 1;
                     const real_t theta = sgn_two_pi/mmax;
                     real_t wtemp       = sin(0.5*theta);
-                    real_t wpr         = - 2.0*wtemp*wtemp;
+                    real_t wpr         = -2.0*wtemp*wtemp;
                     real_t wpi         = sin(theta);
                     real_t wr          = 1.0;
                     real_t wi          = 0.0;
@@ -119,6 +130,9 @@ namespace yocto
             // bit reversal algorithm
             //==================================================================
             const size_t n = size << 1;
+#if defined(YOCTO_MPA_USE_CODE)
+            __bitrev(data,size, n);
+#else
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
@@ -134,6 +148,7 @@ namespace yocto
                     j += m;
                 }
             }
+#endif
 			
             //==================================================================
             // Lanczos-Algorithm
@@ -189,6 +204,9 @@ namespace yocto
             // bit reversal algorithm
             //==================================================================
             const size_t n = size << 1;
+#if defined(YOCTO_MPA_USE_CODE)
+            __bitrev(data,size, n);
+#else
             {
                 size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
@@ -204,6 +222,7 @@ namespace yocto
                     j += m;
                 }
             }
+#endif
 			
             //==================================================================
             // Lanczos-Algorithm
