@@ -12,7 +12,7 @@ namespace yocto
         typedef double          real_t;
         typedef complex<real_t> cplx_t;
       
-#define YOCTO_MPA_USE_CODE 1
+//#define YOCTO_MPA_USE_CODE 1
 #if defined(YOCTO_MPA_USE_CODE)
 #include "bitrevcode.cxx"
 #include "bitrevcode2.cxx"
@@ -41,15 +41,15 @@ namespace yocto
             __bitrev(data, other, size, n);
 #else
             {
-                size_t j=1;
-                for(size_t i=1; i<n; i+=2)
+                register size_t j=1;
+                for(register size_t i=1; i<n; i+=2)
                 {
                     if(j>i)
 					{
                         core::bswap<2*sizeof(real_t)>( data+i,  data+j );
                         core::bswap<2*sizeof(real_t)>( other+i, other+j);
                     }
-                    size_t m = size; // m=  n / 2;
+                    register size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m)
 					{
                         j -= m;

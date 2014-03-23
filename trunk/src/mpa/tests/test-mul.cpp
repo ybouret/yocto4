@@ -33,6 +33,51 @@ YOCTO_UNIT_TEST_IMPL(mul)
     std::cerr << x << std::endl;
     x *= 4;
     std::cerr << x << std::endl;
+    
+}
+YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/sequence/vector.hpp"
+#include "yocto/sys/wtime.hpp"
+
+YOCTO_UNIT_TEST_IMPL(mul_perf)
+{
+    const size_t N =  256;
+    vector<mpn> X(N,as_capacity);
+    vector<mpn> Y(N,as_capacity);
+    wtime       chrono;
+    const size_t ITER = 16;
+    const size_t Bmax = 10;
+    volatile mpn z;
+    double sum = 0;
+    for(size_t i=1;i<=Bmax;++i)
+    {
+        double tot = 0;
+        for(size_t j=i;j<=Bmax;++j)
+        {
+            X.free();
+            Y.free();
+            for(size_t k=0;k<N;++k)
+            {
+                const mpn x = mpn::rand(i*8);
+                const mpn y = mpn::rand(j*8);
+                X.push_back(x);
+                Y.push_back(y);
+            }
+            chrono.start();
+            for(size_t iter=0;iter<ITER;++iter)
+            {
+                for(size_t k=N;k>0;--k)
+                {
+                    (mpn&)z = X[k] * Y[k];
+                }
+            }
+            const double ell = chrono.query();
+            tot += ell;
+        }
+        std::cerr << "time" << i << " = " << tot * 1000.0 << std::endl;
+        sum += tot;
+    }
+    std::cerr << "sum=" << sum * 1000.0 << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

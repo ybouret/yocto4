@@ -15,7 +15,7 @@ namespace yocto
         {
         public:
 			static const size_t chunk_size = 4096;
-            static const size_t limit_size = chunk_size/8;
+            static const size_t limit_size = chunk_size/4;
             
 			static inline void _round( size_t &n ) throw()
 			{
