@@ -31,8 +31,13 @@ namespace yocto
             natural( const size_t n, const as_capacity_t &);
             virtual ~natural() throw();
             natural(const natural &);
+            natural( const string &s );
+            natural( const char   *s );
             natural & operator=( const natural &);
             natural & operator=( uint64_t ) throw();
+            natural & operator=( const string &);
+            natural & operator=( const char   *);
+            
             virtual size_t length() const throw(); //!< ro_buffer API
             
             //__________________________________________________________________
@@ -245,6 +250,9 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             bool     is_prime_() const;
             natural  next_prime_() const;
             
+            bool is_prime() const;
+            
+            
             //__________________________________________________________________
             //
 			// Random
@@ -260,6 +268,7 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             void rescan() throw(); //!< start from maxi and adjust
             virtual const void *get_address() const throw(); //!< ro_buffer API
             friend class word2mpn;
+            void kill() throw();
         };
         
 #define YOCTO_CHECK_MPN(X)    \

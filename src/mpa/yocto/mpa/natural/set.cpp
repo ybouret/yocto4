@@ -53,6 +53,19 @@ namespace yocto
             update();
         }
 
+        natural & natural:: operator=( const string &s )
+        {
+            natural tmp = natural::parse(s);
+            xch(tmp);
+            return *this;
+        }
         
+        natural & natural:: operator=( const char *s )
+        {
+            natural tmp = natural::parse(s);
+            xch(tmp);
+            return *this;
+        }
+
     }
 }

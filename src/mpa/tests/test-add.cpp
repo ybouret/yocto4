@@ -32,7 +32,7 @@ YOCTO_UNIT_TEST_IMPL(add)
     }
     
     std::cerr << std::dec;
-    x  = 0;
+    x  = uint64_t(0);
     std::cerr << x << std::endl;
     x += 2;
     std::cerr << x << std::endl;

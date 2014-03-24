@@ -19,10 +19,16 @@ namespace yocto
             return size;
         }
         
-        natural:: ~natural() throw()
+        
+        void natural:: kill() throw()
         {
             memIO:: release(byte, maxi);
             size = 0;
+        }
+        
+        natural:: ~natural() throw()
+        {
+            kill();
         }
         
         natural:: natural() :
@@ -63,7 +69,7 @@ namespace yocto
         }
         
         
-             
+        
         natural & natural:: operator=( const natural &other )
         {
             natural tmp(other);
@@ -178,7 +184,7 @@ namespace yocto
             n.byte[0] = 3;
             return n;
         }
-
+        
         bool natural::bit( const size_t index ) const throw()
 		{
 			const size_t n = index >> 3;
@@ -189,7 +195,44 @@ namespace yocto
 				return ( byte[n] & _bit[ index & 7 ] ) != 0;
 			}
 		}
-
+        
+        natural:: natural( const string &s) :
+        maxi(0),
+        size(0),
+        byte( memIO::acquire(maxi) )
+        {
+            YOCTO_CHECK_MPN(this);
+            try
+            {
+                mpn tmp = parse(s);
+                xch(tmp);
+            }
+            catch(...)
+            {
+                kill();
+                throw;
+            }
+        }
+        
+        
+        natural:: natural( const char *s ) :
+        maxi(0),
+        size(0),
+        byte( memIO::acquire(maxi) )
+        {
+            YOCTO_CHECK_MPN(this);
+            try
+            {
+                mpn tmp = parse(s);
+                xch(tmp);
+            }
+            catch(...)
+            {
+                kill();
+                throw;
+            }
+        }
+        
         
         
     }
