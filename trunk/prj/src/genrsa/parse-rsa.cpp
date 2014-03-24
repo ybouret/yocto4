@@ -4,16 +4,16 @@
 #include "yocto/associative/map.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/pki/rsa-keys.hpp"
+#include "yocto/mpa/rsa/key.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/hashing/sha1.hpp"
 
 #include <iostream>
 
 using namespace yocto;
-using namespace mpk;
-using namespace pki;
+using namespace mpa;
 
+#if 0
 static inline natural get_value( const string &data )
 {
     string value;
@@ -50,9 +50,32 @@ GATHER:
     //std::cerr << "#" << value << std::endl;
     return is_hex ? natural::hex( value ) : natural::dec( value );
 }
+#endif
 
 
 
+int  main( int argc, char *argv[] )
+{
+    
+    try
+    {
+        
+        return 0;
+    }
+    catch( const exception &e )
+    {
+        std::cerr << e.what() << std::endl;
+        std::cerr << e.when() << std::endl;
+    }
+    catch(...)
+    {
+        std::cerr << "unhandled exception!" << std::endl;
+    }
+    return 1;
+}
+
+
+#if 0
 int  main( int argc, char *argv[] )
 {
     
@@ -151,3 +174,4 @@ int  main( int argc, char *argv[] )
     }
     return 0;
 }
+#endif

@@ -4,7 +4,7 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_INIT(16)
+YOCTO_UNIT_TEST_INIT(32)
 {
     YOCTO_UNIT_TEST_DECL(token);
     YOCTO_UNIT_TEST_DECL(source);
@@ -22,5 +22,6 @@ YOCTO_UNIT_TEST_INIT(16)
     YOCTO_UNIT_TEST_DECL(json);
     YOCTO_UNIT_TEST_DECL(cc);
     YOCTO_UNIT_TEST_DECL(match);
+    YOCTO_UNIT_TEST_DECL(rsa_parser);
 }
 YOCTO_UNIT_TEST_EXEC()
