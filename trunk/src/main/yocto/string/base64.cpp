@@ -124,7 +124,7 @@ namespace yocto
         switch( len )
         {
             case 0:
-                return;
+                break;
                 
             case 3:
             {
@@ -169,7 +169,9 @@ namespace yocto
                 throw exception("base64::encoder(internal error)");
         }
         
-        reset();
+        len = 0;
+        memset(buf,0,sizeof(buf));
+        
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -246,7 +248,7 @@ namespace yocto
         {
             case 0:
             case 1: // junk
-                return;
+                break;
                 
             case 2:
             {
@@ -279,7 +281,8 @@ namespace yocto
             default:
                 throw exception("base64::decoder(internal error)");
         }
-        reset();
+        len = 0;
+        memset(buf,0,sizeof(buf));
     }
     
     
