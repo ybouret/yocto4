@@ -153,7 +153,7 @@ namespace yocto
                         const mpn Exponent1       = mpn::load(fp);
                         const mpn Exponent2       = mpn::load(fp);
                         const mpn Coefficient     = mpn::load(fp);
-
+                        
                         PrivateExponent.__clr();
                         Prime1.         __clr();
                         Prime2.         __clr();
@@ -168,6 +168,11 @@ namespace yocto
                     default: break;
                 }
                 throw exception("Invalid Magic Number");
+            }
+            
+            Key * PublicKey:: clone() const
+            {
+                return new PublicKey(*this);
             }
             
             //__________________________________________________________________
@@ -321,16 +326,36 @@ namespace yocto
                 const mpn Exponent2       = mpn::load(fp);
                 const mpn Coefficient     = mpn::load(fp);
                 
-                const PrivateKey ans(Modulus,PublicExponent,PrivateExponent,Prime1,Prime2,Exponent1,Exponent2,Coefficient);
-                PrivateExponent.__clr();
-                Prime1.         __clr();
-                Prime2.         __clr();
-                Exponent1.      __clr();
-                Exponent2.      __clr();
-                Coefficient.    __clr();
-                return ans;
+                try
+                {
+                    const PrivateKey ans(Modulus,PublicExponent,PrivateExponent,Prime1,Prime2,Exponent1,Exponent2,Coefficient);
+                    PrivateExponent.__clr();
+                    Prime1.         __clr();
+                    Prime2.         __clr();
+                    Exponent1.      __clr();
+                    Exponent2.      __clr();
+                    Coefficient.    __clr();
+                    return ans;
+                }
+                catch(...)
+                {
+                    PrivateExponent.__clr();
+                    Prime1.         __clr();
+                    Prime2.         __clr();
+                    Exponent1.      __clr();
+                    Exponent2.      __clr();
+                    Coefficient.    __clr();
+                    throw;
+                }
             }
-
+            
+            
+            Key * PrivateKey:: clone() const
+            {
+                return new PrivateKey(*this);
+            }
+            
+            
         }
         
         

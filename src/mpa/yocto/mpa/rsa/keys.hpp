@@ -30,6 +30,7 @@ namespace yocto
                 //! C.bits() <= obits, C < modulus, output ibits, checked
                 virtual natural decode( const natural &C ) const = 0;
                 
+                virtual Key *clone() const = 0;
                 
             protected:
                 explicit Key( const natural &Modulus);
@@ -65,6 +66,8 @@ namespace yocto
                 
                 void save_pub( ios::ostream &fp ) const;
                 static PublicKey load_pub( ios::istream &fp );
+                
+                virtual Key *clone() const;
                 
             private:
                 YOCTO_DISABLE_ASSIGN(PublicKey);
@@ -113,6 +116,8 @@ namespace yocto
                 
                 void save_prv( ios::ostream &fp ) const;
                 static PrivateKey load_prv( ios::istream &fp );
+                
+                virtual Key *clone() const;
                 
             private:
                 YOCTO_DISABLE_ASSIGN(PrivateKey);
