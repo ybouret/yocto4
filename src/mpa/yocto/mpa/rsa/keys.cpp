@@ -1,7 +1,9 @@
-#include "yocto/mpa/rsa/key.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/mpa/rsa/keys.hpp"
+#include "yocto/exceptions.hpp"
 #include "yocto/ios/ostream.hpp"
 #include "yocto/ios/istream.hpp"
+
+#include <cerrno>
 
 
 namespace yocto
@@ -105,7 +107,7 @@ namespace yocto
             }
             
             
-            natural PublicKey:: encode_with_pub( const natural &M ) const
+            natural PublicKey:: encode( const natural &M ) const
             {
                 // check message length
                 if(M.bits()>ibits)
@@ -113,7 +115,8 @@ namespace yocto
                 return mpn::mod_exp(M, publicExponent, modulus);
             }
             
-            natural PublicKey::  decode_with_pub( const natural &C ) const
+            
+            natural PublicKey::  decode( const natural &C ) const
             {
                 if( C >= modulus)
                     throw exception("RSA:PublicKey:: decode_with_pub(Code Too Long)");
@@ -189,7 +192,12 @@ namespace yocto
             coefficient(Coefficient)
             {
                 // should check ?
-                
+#define __CHECK_PRV(EXPR) if( !(EXPR) ) throw libc::exception( EINVAL, "rsa_private_key( INVALID %s )", #EXPR )
+                __CHECK_PRV( privateExponent>0 );
+                __CHECK_PRV( prime1>=prime2 );
+                __CHECK_PRV( exponent1   == privateExponent % (prime1 - 1 ) );
+                __CHECK_PRV( exponent2   == privateExponent % (prime2 - 1 ) );
+                __CHECK_PRV( coefficient == natural::mod_inv( prime2, prime1 ) );
             }
             
             
@@ -216,32 +224,32 @@ namespace yocto
             }
             
             
-            natural PrivateKey:: decode_with_prv_( const natural &C ) const
+            natural PrivateKey:: decode_( const natural &C ) const
             {
                 if( C >= modulus )
-                    throw exception("RSA::PivateKey:: decode_with_prv_(Code Too Long)");
+                    throw exception("RSA::PivateKey:: decode_(Code Too Long)");
                 return mpn::mod_exp(C, privateExponent, modulus);
             }
             
-            natural PrivateKey:: decode_with_prv( const natural &C ) const
+            natural PrivateKey:: decode( const natural &C ) const
             {
                 if( C >= modulus )
-                    throw exception("RSA::PivateKey:: decode_with_prv(Code Too Long)");
+                    throw exception("RSA::PivateKey:: decode(Code Too Long)");
                 return CRT(C);
             }
             
             
-            natural PrivateKey::  encode_with_prv_( const natural &M ) const
+            natural PrivateKey::  encode_( const natural &M ) const
             {
                 if(M.bits()>ibits)
-                    throw exception("RSA:PrivateKey:: encode_with_prv_(Message Too Long)");
+                    throw exception("RSA:PrivateKey:: encode_(Message Too Long)");
                 return mpn::mod_exp(M,privateExponent,modulus);
             }
             
-            natural PrivateKey::  encode_with_prv( const natural &M ) const
+            natural PrivateKey::  encode( const natural &M ) const
             {
                 if(M.bits()>ibits)
-                    throw exception("RSA:PrivateKey:: encode_with_prv_(Message Too Long)");
+                    throw exception("RSA:PrivateKey:: encode(Message Too Long)");
                 return CRT(M);
             }
             

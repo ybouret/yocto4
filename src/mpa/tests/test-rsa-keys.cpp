@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/mpa/rsa/key.hpp"
+#include "yocto/mpa/rsa/keys.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
@@ -34,9 +34,9 @@ YOCTO_UNIT_TEST_IMPL(rsa_keys)
         for(size_t j=0;j<8;++j)
         {
             const mpn M = mpn::rand( pub.ibits );
-            const mpn C = pub.encode_with_pub(M);
-            const mpn P = prv.decode_with_prv_(C);
-            const mpn Q = prv.decode_with_prv(C);
+            const mpn C = pub.encode(M);
+            const mpn P = prv.decode_(C);
+            const mpn Q = prv.decode(C);
             if(P!=M)
                 throw exception("RSA Failure");
             if(P!=Q)
@@ -46,8 +46,8 @@ YOCTO_UNIT_TEST_IMPL(rsa_keys)
         for(size_t j=0;j<8;++j)
         {
             const mpn M = mpn::rand( pub.ibits );
-            const mpn C = prv.encode_with_prv(M);
-            const mpn P = pub.decode_with_pub(C);
+            const mpn C = prv.encode(M);
+            const mpn P = pub.decode(C);
             if(P!=M)
                 throw exception("AUTH Failure");
         }
@@ -81,7 +81,7 @@ YOCTO_UNIT_TEST_IMPL(rsa_perf)
         for(size_t i=N;i>0;--i)
         {
             const mpn m = mpn::rand(prv.ibits);
-            const mpn c = prv.encode_with_pub(m);
+            const mpn c = prv.PublicKey::encode(m);
             C.push_back( c );
         }
         
@@ -91,7 +91,7 @@ YOCTO_UNIT_TEST_IMPL(rsa_perf)
         {
             for(size_t i=N;i>0;--i)
             {
-                prv.decode_with_prv_(C[i]);
+                prv.decode_(C[i]);
             }
         }
         const double raw = chrono.query();
@@ -101,7 +101,7 @@ YOCTO_UNIT_TEST_IMPL(rsa_perf)
         {
             for(size_t i=N;i>0;--i)
             {
-                prv.decode_with_prv(C[i]);
+                prv.decode(C[i]);
             }
         }
         const double crt = chrono.query();
