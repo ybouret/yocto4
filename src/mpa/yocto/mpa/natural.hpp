@@ -209,6 +209,7 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
 			natural & operator %= ( const natural &den );
             natural & operator %= ( const uint64_t den );
             bool is_divisible_by( const natural &den ) const;
+            bool is_divisible_by( const uint64_t den ) const;
             
             //__________________________________________________________________
             //
