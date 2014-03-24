@@ -2,7 +2,7 @@
 #define YOCTO_MPA_RSA_KEY_INCLUDED 1
 
 #include "yocto/mpa/natural.hpp"
-
+#include "yocto/code/fourcc.hpp"
 
 namespace yocto
 {
@@ -36,7 +36,10 @@ namespace yocto
             class PublicKey : public Key
             {
             public:
+                static const uint32_t PUB32 = YOCTO_FOURCC('@','P','U','B');
+                
                 const natural publicExponent;
+                
                 
                 virtual ~PublicKey() throw();
                 explicit PublicKey(const natural &Modulus,
@@ -52,6 +55,8 @@ namespace yocto
                 //! C < modulus: (C^publicExponent) % modulus
                 natural decode_with_pub( const natural &C ) const;
                 
+                void save_pub( ios::ostream &fp ) const;
+                static PublicKey load_pub( ios::istream &fp );
                 
             private:
                 YOCTO_DISABLE_ASSIGN(PublicKey);
@@ -60,6 +65,8 @@ namespace yocto
             class PrivateKey : public PublicKey
             {
             public:
+                static const uint32_t PRV32 = YOCTO_FOURCC('@','P','R','V');
+
                 explicit PrivateKey(const natural &Modulus,
                                     const natural &PublicExponent,
                                     const natural &PrivateExponent,
@@ -95,6 +102,9 @@ namespace yocto
                 const natural exponent1;       //!< Chinese Remainder Theoreme exponent1   = d % (prime1-1)
                 const natural exponent2;       //!< Chinese Remainder Theoreme exponent2   = d % (prime2-1)
                 const natural coefficient;     //!< Chinese Remainder Theoreme coefficient = (1/prime2)  % prime1
+                
+                void save_prv( ios::ostream &fp ) const;
+                static PrivateKey load_prv( ios::istream &fp );
                 
             private:
                 YOCTO_DISABLE_ASSIGN(PrivateKey);

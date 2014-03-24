@@ -1,5 +1,7 @@
 #include "yocto/mpa/rsa/key.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/ios/ostream.hpp"
+#include "yocto/ios/istream.hpp"
 
 
 namespace yocto
@@ -118,6 +120,52 @@ namespace yocto
                 return mpn::mod_exp(C, publicExponent, modulus);
             }
             
+            void PublicKey:: save_pub( ios::ostream &fp ) const
+            {
+                fp.emit<uint32_t>( PUB32 );
+                modulus.save(fp);
+                publicExponent.save(fp);
+            }
+            
+            PublicKey PublicKey:: load_pub( ios::istream &fp )
+            {
+                const uint32_t fcc = fp.read<uint32_t>();
+                switch(fcc)
+                {
+                    case PUB32:
+                    {
+                        const mpn Modulus        = mpn::load(fp);
+                        const mpn PublicExponent = mpn::load(fp);
+                        return PublicKey(Modulus,PublicExponent);
+                    }
+                        break;
+                        
+                    case PrivateKey::PRV32:
+                    {
+                        const mpn Modulus         = mpn::load(fp);
+                        const mpn PublicExponent  = mpn::load(fp);
+                        const mpn PrivateExponent = mpn::load(fp);
+                        const mpn Prime1          = mpn::load(fp);
+                        const mpn Prime2          = mpn::load(fp);
+                        const mpn Exponent1       = mpn::load(fp);
+                        const mpn Exponent2       = mpn::load(fp);
+                        const mpn Coefficient     = mpn::load(fp);
+
+                        PrivateExponent.__clr();
+                        Prime1.         __clr();
+                        Prime2.         __clr();
+                        Exponent1.      __clr();
+                        Exponent2.      __clr();
+                        Coefficient.    __clr();
+                        
+                        return PublicKey(Modulus,PublicExponent);
+                    }
+                        break;
+                        
+                    default: break;
+                }
+                throw exception("Invalid Magic Number");
+            }
             
             //__________________________________________________________________
             //
@@ -181,7 +229,7 @@ namespace yocto
                     throw exception("RSA::PivateKey:: decode_with_prv(Code Too Long)");
                 return CRT(C);
             }
-
+            
             
             natural PrivateKey::  encode_with_prv_( const natural &M ) const
             {
@@ -235,8 +283,46 @@ namespace yocto
                 M1 *= coefficient;
                 return M2 + (M1%prime1) * prime2;
             }
-
             
+            void PrivateKey:: save_prv( ios::ostream &fp ) const
+            {
+                fp.emit<uint32_t>( PRV32 );
+                modulus.save(fp);
+                publicExponent.save(fp);
+                privateExponent.save(fp);
+                prime1.save(fp);
+                prime2.save(fp);
+                exponent1.save(fp);
+                exponent2.save(fp);
+                coefficient.save(fp);
+            }
+            
+            
+            PrivateKey PrivateKey:: load_prv( ios::istream &fp)
+            {
+                if( PRV32 != fp.read<uint32_t>() )
+                {
+                    throw exception("Invalid PrivateKey Magic Number");
+                }
+                const mpn Modulus         = mpn::load(fp);
+                const mpn PublicExponent  = mpn::load(fp);
+                const mpn PrivateExponent = mpn::load(fp);
+                const mpn Prime1          = mpn::load(fp);
+                const mpn Prime2          = mpn::load(fp);
+                const mpn Exponent1       = mpn::load(fp);
+                const mpn Exponent2       = mpn::load(fp);
+                const mpn Coefficient     = mpn::load(fp);
+                
+                const PrivateKey ans(Modulus,PublicExponent,PrivateExponent,Prime1,Prime2,Exponent1,Exponent2,Coefficient);
+                PrivateExponent.__clr();
+                Prime1.         __clr();
+                Prime2.         __clr();
+                Exponent1.      __clr();
+                Exponent2.      __clr();
+                Coefficient.    __clr();
+                return ans;
+            }
+
         }
         
         
