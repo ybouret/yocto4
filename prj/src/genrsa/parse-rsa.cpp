@@ -163,12 +163,13 @@ int  main( int argc, char *argv[] )
         const RSA::PrivateKey prv(modulus,publicExponent,privateExponent,prime1,prime2,exponent1,exponent2,coefficient);
         
         hashing::sha1 h;
-        const string filename = vformat( "rsa-key-%08x-%08x.dat", unsigned(prv.obits), h.key<uint32_t>(prv.modulus) );
+        const string filename = vformat( "rsa-key-%08x-%08x.bin", unsigned(prv.obits), h.key<uint32_t>(prv.modulus) );
         {
             ios::ocstream fp( filename, false );
             prv.save_prv( fp );
         }
  
+        std::cerr << std::hex;
         {
             ios::icstream fp( filename );
             RSA::PublicKey pub = RSA::PublicKey::load_pub(fp);

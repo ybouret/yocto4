@@ -4,9 +4,12 @@ then
 	exit 1;
 fi
 
-for L in 128 256 512 1024 2048;
+for L in 128 256 512 1024;
 do
-	sh ./genrsa.sh $L | $1
+	for iter in 1 2 3 4;
+	do
+		sh ./genrsa.sh $L | $1
+	done
 done
 cat rsa-key-*.bin > rsa-keys.bin
 rm -f rsa-key-*.bin

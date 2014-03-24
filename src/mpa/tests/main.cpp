@@ -19,6 +19,7 @@ YOCTO_UNIT_TEST_INIT(32)
     YOCTO_UNIT_TEST_DECL(rsa_perf);
     YOCTO_UNIT_TEST_DECL(mul_perf);
     YOCTO_UNIT_TEST_DECL(primality);
+    YOCTO_UNIT_TEST_DECL(rsa_auth);
 
 }
 YOCTO_UNIT_TEST_EXEC()
