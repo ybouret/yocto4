@@ -4,6 +4,7 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/imstream.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace mpa;
@@ -15,6 +16,11 @@ static const uint8_t rsa_keys[] =
 
 YOCTO_UNIT_TEST_IMPL(rsa_auth)
 {
+    
+    size_t idx = 0;
+    if( argc > 1 )
+        idx = strconv::to<size_t>(argv[1],"#key");
+    
     vector<RSA::PrivateKey> Keys;
     {
         ios::imstream fp(rsa_keys,sizeof(rsa_keys));
@@ -28,9 +34,9 @@ YOCTO_UNIT_TEST_IMPL(rsa_auth)
     }
     std::cerr << "Loaded #" << Keys.size() << " keys" << std::endl;
     
-    string line;
+    string        line;
     ios::icstream inp( ios::cstdin );
-    RSA::encoder  enc(Keys[1]);
+    RSA::encoder  enc(Keys[1+(idx%Keys.size())]);
     while( line.clear(), inp.read_line(line) >= 0 )
     {
         for(size_t iter=1;iter<=4;++iter)

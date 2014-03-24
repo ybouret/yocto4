@@ -100,6 +100,17 @@ namespace yocto
             }
             
             
+            void decoder:: write(char C)
+            {
+                
+            }
+            
+            
+            void decoder:: flush()
+            {
+                
+            }
+            
         }
     }
 }
