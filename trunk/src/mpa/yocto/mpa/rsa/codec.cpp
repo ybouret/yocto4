@@ -102,13 +102,27 @@ namespace yocto
             
             void decoder:: write(char C)
             {
-                
+                I.push_full<uint8_t>(C); // load Input
+                if(I.size()>=key->obits)
+                    emit();
             }
             
             
             void decoder:: flush()
             {
                 
+            }
+            
+            void decoder:: emit()
+            {
+                while(I.size()>=key->obits)
+                {
+                    const mpn C = mpn::query(I,key->obits);
+                    const mpn P = key->decode(C);
+                    if(P.bits()>key->ibits)
+                        throw exception("RSA::decoder(corrupted input)");
+                    P.store(O,key->ibits);
+                }
             }
             
         }

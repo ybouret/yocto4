@@ -36,14 +36,14 @@ YOCTO_UNIT_TEST_IMPL(rsa_auth)
     
     string        line;
     ios::icstream inp( ios::cstdin );
-    RSA::encoder  enc(Keys[1+(idx%Keys.size())]);
-    while( line.clear(), inp.read_line(line) >= 0 )
+    const RSA::PrivateKey &prv = Keys[1+(idx%Keys.size())];
+    const RSA::PublicKey  &pub = prv;
+    RSA::encoder  enc(pub);
+    while( line.clear(), (std::cerr << ">").flush(), inp.read_line(line) >= 0 )
     {
-        for(size_t iter=1;iter<=4;++iter)
-        {
-            const string s_enc = enc.to_string(line);
-            s_enc.output_visible(std::cerr<<"Enc=") << std::endl;
-        }
+        
+        const string s_enc = enc.to_string(line);
+        s_enc.output_visible(std::cerr<<"Enc=") << std::endl;
     }
     
     
