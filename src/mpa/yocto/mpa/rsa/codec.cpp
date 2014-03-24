@@ -115,6 +115,7 @@ namespace yocto
             
             void decoder:: emit()
             {
+                // convert obits => ibit
                 while(I.size()>=key->obits)
                 {
                     const mpn C = mpn::query(I,key->obits);
@@ -123,6 +124,28 @@ namespace yocto
                         throw exception("RSA::decoder(corrupted input)");
                     P.store(O,key->ibits);
                 }
+                
+                while( O.size() )
+                {
+                    if( O.peek() )
+                    {
+                        // we have noise+byte
+                        if(O.size()>(8+rbits))
+                        {
+                            O.pop();
+                            for(size_t i=rbits;i>0;--i)
+                                O.pop();
+                            Q.push_back(O.pop_full<uint8_t>());
+                        }
+                    }
+                    else
+                    {
+                        // END
+                        
+                        return;
+                    }
+                }
+                
             }
             
         }
