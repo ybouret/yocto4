@@ -294,6 +294,12 @@ namespace yocto
         }
         
         
+        bool natural:: is_divisible_by( const uint64_t den ) const
+        {
+            const word2mpn w(den);
+            return is_divisible_by( w.n );
+        }
+        
         natural  natural:: modulo( const natural &num, const uint64_t x   )
         {
             const word2mpn w(x);
