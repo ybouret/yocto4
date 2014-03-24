@@ -108,8 +108,9 @@ YOCTO_UNIT_TEST_IMPL(rsa_perf)
         std::cerr << "crt=" << crt << std::endl;
         ios::ocstream fp("rsa.dat",true);
         fp("%u %g %g %g\n", unsigned(nbits), COUNT/raw, COUNT/crt, raw/crt );
-    }
+        }
         
-}
-YOCTO_UNIT_TEST_DONE()
+        }
+        YOCTO_UNIT_TEST_DONE()
+        
         
