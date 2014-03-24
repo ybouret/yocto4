@@ -8,6 +8,9 @@
 #include "yocto/ptr/auto.hpp"
 #include "yocto/hashing/sha1.hpp"
 
+#include "yocto/string/tokenizer.hpp"
+#include "yocto/code/utils.hpp"
+
 #include <iostream>
 
 using namespace yocto;
@@ -53,12 +56,134 @@ GATHER:
 #endif
 
 
+static inline bool is_col(char C) throw()
+{
+    return C == ':';
+}
+
+static inline bool is_space(char C) throw()
+{
+    return C == ' ' || C == '\t';
+}
+
+static mpn toHex( const string &value )
+{
+    string data;
+    for(size_t i=0;i<value.size();++i)
+    {
+        const char C = value[i];
+        if(isxdigit(C))
+            data += C;
+    }
+    return mpn::hex(data);
+}
+
+static inline void parse_for( associative<string,mpn> &db, const string &line )
+{
+    tokenizer tkn(line);
+    if( !tkn.get_next(is_col) )
+    {
+        throw exception("No Key!");
+    }
+    const string key = tkn.to_string();
+    if( !tkn.get_next(is_space) )
+    {
+        throw exception("No Value for %s!", key.c_str());
+    }
+    const string value = tkn.to_string();
+    if(value.size()>0 && hex2dec(value[0])>=0 )
+    {
+        const mpn x = strchr(value.c_str(), ':') ? toHex(value) : mpn::dec(value);
+        //std::cerr << key << " = " << x << std::endl;
+        if( !db.insert(key,x) )
+            throw exception("Multiple '%s' in DB", key.c_str());
+    }
+    
+}
+
+
+static inline mpn query_mpn( const associative<string, mpn> &db, const char *id )
+{
+    const string name(id);
+    const mpn *p = db.search(name);
+    if( !p )
+    {
+        throw exception("No Key '%s'", name.c_str() );
+    }
+    return *p;
+}
 
 int  main( int argc, char *argv[] )
 {
     
     try
     {
+        //______________________________________________________________________
+        //
+        // Load Lines
+        //______________________________________________________________________
+        vector<string> lines;
+        {
+            string line;
+            ios::icstream input( ios::cstdin );
+            while( line.clear(), input.read_line( line ) > 0 )
+            {
+                if(line.size()<=0)
+                    throw exception("Empty Line!");
+                if(is_space(line[0]))
+                {
+                    if(lines.size()<=0)
+                        throw exception("No Previous Key!");
+                    line.clean(is_space);
+                    lines.back() += line;
+                }
+                else
+                {
+                    lines.push_back(line);
+                }
+            }
+
+        }
+        map<string,mpn> db;
+        for(size_t i=1;i<=lines.size();++i)
+        {
+            parse_for(db, lines[i]);
+        }
+        
+#define __FETCH(NAME) const mpn NAME = query_mpn(db, #NAME )
+        
+        __FETCH(modulus);
+        __FETCH(publicExponent);
+        __FETCH(privateExponent);
+        __FETCH(prime1);
+        __FETCH(prime2);
+        __FETCH(exponent1);
+        __FETCH(exponent2);
+        __FETCH(coefficient);
+        const RSA::PrivateKey prv(modulus,publicExponent,privateExponent,prime1,prime2,exponent1,exponent2,coefficient);
+        
+        hashing::sha1 h;
+        const string filename = vformat( "rsa-key-%08x-%08x.dat", unsigned(prv.obits), h.key<uint32_t>(prv.modulus) );
+        {
+            ios::ocstream fp( filename, false );
+            prv.save_prv( fp );
+        }
+ 
+        {
+            ios::icstream fp( filename );
+            RSA::PublicKey pub = RSA::PublicKey::load_pub(fp);
+            std::cerr << "pub=(" << pub.modulus << "," << pub.publicExponent << ")" << std::endl;
+        }
+        
+        {
+            ios::icstream   fp( filename );
+            RSA::PrivateKey prv = RSA::PrivateKey::load_prv(fp);
+            std::cerr << "prv=(" << prv.modulus << "," << prv.privateExponent << ")" << std::endl;
+        }
+        
+        
+
+        
         
         return 0;
     }
