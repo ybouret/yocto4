@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/mpa/rsa/key.hpp"
+#include "yocto/mpa/rsa/keys.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/imstream.hpp"
 #include "yocto/sequence/vector.hpp"

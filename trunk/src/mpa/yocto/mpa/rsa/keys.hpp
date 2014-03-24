@@ -24,6 +24,13 @@ namespace yocto
                 virtual ~Key() throw();
                 
                 
+                //! M.bits() <= ibits, output C<M, C.bits <= obits
+                virtual natural encode( const natural &M ) const = 0;
+                
+                //! C.bits() <= obits, C < modulus, output ibits, checked
+                virtual natural decode( const natural &C ) const = 0;
+                
+                
             protected:
                 explicit Key( const natural &Modulus);
                 Key(const Key &);
@@ -50,10 +57,11 @@ namespace yocto
                 static PublicKey GenerateFrom( const natural &prime1, const natural &prime2, const natural &exponent );
                 
                 //! M.bits() <= ibits : (M^publicExponent) % modulus
-                natural encode_with_pub( const natural &M ) const;
+                natural encode( const natural &M ) const;
                 
                 //! C < modulus: (C^publicExponent) % modulus
-                natural decode_with_pub( const natural &C ) const;
+                natural decode( const natural &C ) const;
+                
                 
                 void save_pub( ios::ostream &fp ) const;
                 static PublicKey load_pub( ios::istream &fp );
@@ -66,7 +74,7 @@ namespace yocto
             {
             public:
                 static const uint32_t PRV32 = YOCTO_FOURCC('@','P','R','V');
-
+                
                 explicit PrivateKey(const natural &Modulus,
                                     const natural &PublicExponent,
                                     const natural &PrivateExponent,
@@ -81,16 +89,16 @@ namespace yocto
                 virtual ~PrivateKey() throw();
                 
                 //! (C^privateExponent) % modulus: C < modulus
-                natural decode_with_prv_( const natural &C ) const;
+                natural decode_( const natural &C ) const;
                 
                 //! (C^privateExponent) % modulus: C < modulus, using CRT
-                natural decode_with_prv( const natural &C ) const;
+                virtual natural decode( const natural &C ) const;
                 
                 //! M.bits() <= ibits : (M^privateExponent) % modulus
-                natural encode_with_prv_( const natural &M ) const;
+                natural encode_( const natural &M ) const;
                 
                 //! M.bits() <= ibits : (M^privateExponent) % modulus, using CRT
-                natural encode_with_prv( const natural &M ) const;
+                virtual natural encode( const natural &M ) const;
                 
                 
                 //! Generate a private key
