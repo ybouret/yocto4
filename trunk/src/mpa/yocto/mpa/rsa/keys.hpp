@@ -17,6 +17,8 @@ namespace yocto
             public:
                 static const uint64_t MINIMUM_PRIME   = 3;
                 static const uint64_t MINIMUM_MODULUS = MINIMUM_PRIME * MINIMUM_PRIME;
+                static const uint32_t PUB32 = YOCTO_FOURCC('@','P','U','B');
+                static const uint32_t PRV32 = YOCTO_FOURCC('@','P','R','V');
                 
                 const natural modulus;
                 const size_t  obits; //!< (modulus-1).bits() :
@@ -40,43 +42,9 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(Key);
             };
             
-            
-            class PublicKey : public Key
+            class PrivateKey : public Key
             {
             public:
-                static const uint32_t PUB32 = YOCTO_FOURCC('@','P','U','B');
-                
-                const natural publicExponent;
-                
-                
-                virtual ~PublicKey() throw();
-                explicit PublicKey(const natural &Modulus,
-                                   const natural &PublicExponent);
-                PublicKey( const PublicKey &);
-                
-                //! generate a public key
-                static PublicKey GenerateFrom( const natural &prime1, const natural &prime2, const natural &exponent );
-                
-                //! M.bits() <= ibits : (M^publicExponent) % modulus
-                natural encode( const natural &M ) const;
-                
-                //! C < modulus: (C^publicExponent) % modulus
-                natural decode( const natural &C ) const;
-                
-                
-                void save_pub( ios::ostream &fp ) const;
-                static PublicKey load_pub( ios::istream &fp );
-                
-                virtual Key *clone() const;
-                
-            private:
-                YOCTO_DISABLE_ASSIGN(PublicKey);
-            };
-            
-            class PrivateKey : public PublicKey
-            {
-            public:
-                static const uint32_t PRV32 = YOCTO_FOURCC('@','P','R','V');
                 
                 explicit PrivateKey(const natural &Modulus,
                                     const natural &PublicExponent,
@@ -107,6 +75,7 @@ namespace yocto
                 //! Generate a private key
                 static PrivateKey GenerateFrom(const natural &prime1, const natural &prime2, const natural &exponent );
                 
+                const natural publicExponent;  //!< the public exponent
                 const natural privateExponent; //!< (1/publicExponent) %( (prime1-1) * (prime2-1) )
                 const natural prime1;          //!< bigger  prime
                 const natural prime2;          //!< smaller prime
@@ -123,6 +92,40 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(PrivateKey);
                 natural CRT( const natural &C ) const;
             };
+
+            
+            class PublicKey : public Key
+            {
+            public:
+                
+                const natural publicExponent;
+                
+                
+                virtual ~PublicKey() throw();
+                explicit PublicKey(const natural &Modulus,
+                                   const natural &PublicExponent);
+                PublicKey( const PublicKey  &);
+                PublicKey( const PrivateKey &);
+                
+                //! generate a public key
+                static PublicKey GenerateFrom( const natural &prime1, const natural &prime2, const natural &exponent );
+                
+                //! M.bits() <= ibits : (M^publicExponent) % modulus
+                natural encode( const natural &M ) const;
+                
+                //! C < modulus: (C^publicExponent) % modulus
+                natural decode( const natural &C ) const;
+                
+                
+                void save_pub( ios::ostream &fp ) const;
+                static PublicKey load_pub( ios::istream &fp );
+                
+                virtual Key *clone() const;
+                
+            private:
+                YOCTO_DISABLE_ASSIGN(PublicKey);
+            };
+            
             
         }
         
