@@ -16,7 +16,6 @@ namespace yocto
             class Codec : public pack::q_codec
             {
             public:
-                static const size_t rbits = 1; //!< add random bit
                 virtual ~Codec() throw();
                 
                 virtual void reset() throw();
@@ -57,7 +56,6 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(decoder);
-                void emit();
             };
 
             
