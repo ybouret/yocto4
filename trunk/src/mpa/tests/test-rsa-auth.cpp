@@ -41,6 +41,7 @@ YOCTO_UNIT_TEST_IMPL(rsa_auth)
     RSA::encoder  enc(pub);
     RSA::decoder  dec(prv);
     
+	std::cerr << "Using a " << pub.modulus.bits() << " bits key" << std::endl;
     while( line.clear(), (std::cerr << ">").flush(), inp.read_line(line) >= 0 )
     {
         
