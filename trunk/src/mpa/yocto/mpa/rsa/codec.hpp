@@ -23,8 +23,8 @@ namespace yocto
             protected:
                 explicit Codec(const Key & k);
                 auto_ptr<Key> key;
-                ios::bitio    I;
-                ios::bitio    O;
+                ios::bitio    plain;
+                ios::bitio    coded;
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Codec);
