@@ -209,11 +209,11 @@ namespace yocto
             PrivateKey:: ~PrivateKey() throw()
             {
                 privateExponent.__clr();
-                prime1.__clr();
-                prime2.__clr();
-                exponent1.__clr();
-                exponent2.__clr();
-                coefficient.__clr();
+                prime1.         __clr();
+                prime2.         __clr();
+                exponent1.      __clr();
+                exponent2.      __clr();
+                coefficient.    __clr();
             }
             
             
