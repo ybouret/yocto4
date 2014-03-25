@@ -198,15 +198,14 @@ namespace yocto
                                 plain.pop();                              // flag
                                 plain.pop();                              // noise
                                 Q.push_back( plain.pop_full<uint8_t>() ); // byte
-                                std::cerr << "decoded '" << Q.back() << "'" << std::endl;
                             }
                             else
                                 break; // not enough bits
                         }
                         else
                         {
-                            // a flush occured
-                            exit(0);
+                            // a flush occur: the end of plain is garbage
+                            plain.free();
                         }
                     }
                     
