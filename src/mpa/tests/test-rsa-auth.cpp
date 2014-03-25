@@ -37,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(rsa_auth)
     string        line;
     ios::icstream inp( ios::cstdin );
     const RSA::PrivateKey &prv = Keys[1+(idx%Keys.size())];
-    const RSA::PublicKey  &pub = prv;
+    const RSA::PublicKey  pub(prv);
     RSA::encoder  enc(pub);
     RSA::decoder  dec(prv);
     

@@ -72,6 +72,11 @@ namespace yocto
             {
             }
             
+            PublicKey:: PublicKey( const PrivateKey &other ) :
+            Key( other ),
+            publicExponent( other.publicExponent )
+            {
+            }
             
             
             static inline
@@ -143,7 +148,7 @@ namespace yocto
                     }
                         break;
                         
-                    case PrivateKey::PRV32:
+                    case PRV32:
                     {
                         const mpn Modulus         = mpn::load(fp);
                         const mpn PublicExponent  = mpn::load(fp);
@@ -188,7 +193,8 @@ namespace yocto
                                     const natural &Exponent2,
                                     const natural &Coefficient
                                     ) :
-            PublicKey(Modulus,PublicExponent),
+            Key(Modulus),
+            publicExponent(PublicExponent),
             privateExponent(PrivateExponent),
             prime1(Prime1),
             prime2(Prime2),
@@ -218,7 +224,8 @@ namespace yocto
             
             
             PrivateKey:: PrivateKey( const PrivateKey &other ) :
-            PublicKey(other),
+            Key(other),
+            publicExponent(other.publicExponent),
             privateExponent(other.privateExponent),
             prime1(other.prime1),
             prime2(other.prime2),

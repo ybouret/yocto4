@@ -75,13 +75,14 @@ YOCTO_UNIT_TEST_IMPL(rsa_perf)
         const mpn prime2 = mpn::rand(nbits).next_prime_();
         const mpn ee     = mpn::rand(17);
         RSA::PrivateKey prv = RSA::PrivateKey::GenerateFrom(prime1, prime2, ee);
+        RSA::PublicKey  pub(prv);
         
         std::cerr << "encoding..." << std::endl;
         C.free();
         for(size_t i=N;i>0;--i)
         {
             const mpn m = mpn::rand(prv.ibits);
-            const mpn c = prv.PublicKey::encode(m);
+            const mpn c = pub.encode(m);
             C.push_back( c );
         }
         
