@@ -50,22 +50,56 @@ namespace yocto
             
             void encoder:: write( char C )
             {
-                I.push( true );                    // byte
-                for(size_t i=rbits;i>0;--i)        //
-                    I.push( memIO::random_bit() ); // rand
+                //______________________________________________________________
+                //
+                // say a char is coming
+                //______________________________________________________________
+                I.push( true );
+                //______________________________________________________________
+                //
+                // add some noise
+                //______________________________________________________________
+                I.push( memIO::random_bit() );
+                //______________________________________________________________
+                //
+                // write 8 bits
+                //______________________________________________________________
                 I.push_full<uint8_t>(C);
+                
+                //______________________________________________________________
+                //
+                // check enough bits to write
+                //______________________________________________________________
                 if(I.size()>=key->ibits)
                     emit();
             }
             
             void encoder:: emit()
             {
-                assert(I.size()>=key->ibits);
                 while(I.size()>=key->ibits)
                 {
+                    //__________________________________________________________
+                    //
+                    // fetch a message from input bits
+                    //__________________________________________________________
                     const mpn M = mpn::query(I,key->ibits);
+                    
+                    //__________________________________________________________
+                    //
+                    // encode it
+                    //__________________________________________________________
                     const mpn C = key->encode(M); assert(C<key->modulus);
+                    
+                    //__________________________________________________________
+                    //
+                    // store in output bits
+                    //__________________________________________________________
                     C.store(O,key->obits);
+                    
+                    //__________________________________________________________
+                    //
+                    // convert in output bytes
+                    //__________________________________________________________
                     while(O.size()>=8)
                         Q.push_back( O.pop_full<uint8_t>() );
                 }
@@ -75,14 +109,40 @@ namespace yocto
             
             void encoder:: flush()
             {
-                I.push( false );                     // END
-                while( 0 != (I.size()%key->ibits) )  //
-                    I.push( memIO::random_bit() );   // noise
-                emit();                              // encode
-                while( 0 != (O.size() % 8) )         //
-                    O.push( memIO::random_bit() );   // noise
+                //______________________________________________________________
+                //
+                // say the end is coming
+                //______________________________________________________________
+                I.push( false );
+                
+                //______________________________________________________________
+                //
+                // fill for new messages
+                //______________________________________________________________
+                while( 0 != (I.size()%key->ibits) )
+                    I.push( memIO::random_bit() );
+                
+                //______________________________________________________________
+                //
+                // emit all the left message
+                //______________________________________________________________
+                emit();
+                assert(0==I.size());
+                
+                //______________________________________________________________
+                //
+                // round output bits
+                //______________________________________________________________
+                while( 0 != (O.size() % 8) )
+                    O.push( memIO::random_bit() );
+                
+                //______________________________________________________________
+                //
+                // convert into bytes
+                //______________________________________________________________
                 while( O.size()>=8 )
                     Q.push_back( O.pop_full<uint8_t>() );
+                assert(0==O.size());
             }
             
             //__________________________________________________________________
@@ -102,20 +162,16 @@ namespace yocto
             
             void decoder:: write(char C)
             {
-                I.push_full<uint8_t>(C); // load Input
-                if(I.size()>=key->obits)
-                    emit();
-            }
-            
-            
-            void decoder:: flush()
-            {
+                //______________________________________________________________
+                //
+                // fill input bits
+                //______________________________________________________________
+                I.push_full<uint8_t>(C);
                 
-            }
-            
-            void decoder:: emit()
-            {
-                // convert obits => ibit
+                //______________________________________________________________
+                //
+                // decode input bits into output bits
+                //______________________________________________________________
                 while(I.size()>=key->obits)
                 {
                     const mpn C = mpn::query(I,key->obits);
@@ -125,28 +181,17 @@ namespace yocto
                     P.store(O,key->ibits);
                 }
                 
-                while( O.size() )
-                {
-                    if( O.peek() )
-                    {
-                        // we have noise+byte
-                        if(O.size()>(8+rbits))
-                        {
-                            O.pop();
-                            for(size_t i=rbits;i>0;--i)
-                                O.pop();
-                            Q.push_back(O.pop_full<uint8_t>());
-                        }
-                    }
-                    else
-                    {
-                        // END
-                        
-                        return;
-                    }
-                }
+                
+                
                 
             }
+            
+            
+            void decoder:: flush()
+            {
+                
+            }
+            
             
         }
     }
