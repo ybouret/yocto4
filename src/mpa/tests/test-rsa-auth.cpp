@@ -47,7 +47,9 @@ YOCTO_UNIT_TEST_IMPL(rsa_auth)
         const string s_enc = enc.to_string(line);
         s_enc.output_visible(std::cerr<<"Enc=") << std::endl;
         const string s_dec = dec.to_string(s_enc);
-        
+        s_dec.output_visible(std::cerr<<"Dec=") << std::endl;
+        if(s_dec!=line)
+            throw exception("RSA Codec Error!");
     }
     
     
