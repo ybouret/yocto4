@@ -40,6 +40,7 @@ YOCTO_UNIT_TEST_IMPL(rsa_auth)
     const RSA::PublicKey  &pub = prv;
     RSA::encoder  enc(pub);
     RSA::decoder  dec(prv);
+    
     while( line.clear(), (std::cerr << ">").flush(), inp.read_line(line) >= 0 )
     {
         

@@ -82,13 +82,13 @@ namespace yocto
                 // fetch a message from input bits
                 //__________________________________________________________
                 const mpn M = mpn::query(plain,key->ibits);
-                
                 //__________________________________________________________
                 //
                 // encode it
                 //__________________________________________________________
                 const mpn C = key->encode(M); assert(C<key->modulus);
-                
+                std::cerr << "Encoding [" << M << "] -> [" << C << "]" << std::endl;
+
                 //__________________________________________________________
                 //
                 // store in output bits
@@ -179,6 +179,8 @@ namespace yocto
                     if(C>=key->modulus)
                         throw exception("RSA::decoder(Invalid Coded Stream)");
                     const mpn P = key->decode(C);
+                    std::cerr << "Decoding [" << C << "] -> [" << P << "]" << std::endl;
+
                     if(P.bits()>key->ibits)
                         throw exception("RSA::decoder(Invalid Plain Stream)");
                     P.store(plain,key->ibits);
