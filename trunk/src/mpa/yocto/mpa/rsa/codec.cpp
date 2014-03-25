@@ -116,14 +116,14 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // fill for new messages
+                // fill with noise for at least a new message
                 //______________________________________________________________
                 while( 0 != (plain.size()%key->ibits) )
                     plain.push( memIO::random_bit() );
                 
                 //______________________________________________________________
                 //
-                // emit all the left message
+                // emit all the left message(s)
                 //______________________________________________________________
                 while(plain.size()>=key->ibits)
                     emit();
@@ -131,7 +131,7 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // round output bits
+                // round output bits to bytes
                 //______________________________________________________________
                 while( 0 != (coded.size() % 8) )
                     coded.push( memIO::random_bit() );
@@ -160,18 +160,59 @@ namespace yocto
             }
             
             
-            void decoder:: write(char C)
+            void decoder:: write(char chr)
             {
                 //______________________________________________________________
                 //
-                // fill input bits
+                // fill coded bits
                 //______________________________________________________________
-                coded.push_full<uint8_t>(C);
+                coded.push_full<uint8_t>(chr);
                 
                 
-                
+                //______________________________________________________________
+                //
+                // decode if possible
+                //______________________________________________________________
+                while( coded.size() >= key->obits )
+                {
+                    const mpn C = mpn::query(coded,key->obits);
+                    if(C>=key->modulus)
+                        throw exception("RSA::decoder(Invalid Coded Stream)");
+                    const mpn P = key->decode(C);
+                    if(P.bits()>key->ibits)
+                        throw exception("RSA::decoder(Invalid Plain Stream)");
+                    P.store(plain,key->ibits);
+                    
+                    //______________________________________________________________
+                    //
+                    // build bytes
+                    //______________________________________________________________
+                    while(plain.size()>0)
+                    {
+                        if(plain.peek())
+                        {
+                            // a byte
+                            if(plain.size()>=10)
+                            {
+                                plain.pop();                              // flag
+                                plain.pop();                              // noise
+                                Q.push_back( plain.pop_full<uint8_t>() ); // byte
+                                std::cerr << "decoded '" << Q.back() << "'" << std::endl;
+                            }
+                            else
+                                break; // not enough bits
+                        }
+                        else
+                        {
+                            // a flush occured
+                            exit(0);
+                        }
+                    }
+                    
+                    
+                }
+                            
             }
-            
             
             void decoder:: flush()
             {
