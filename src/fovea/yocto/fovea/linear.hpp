@@ -3,51 +3,99 @@
 
 #include "yocto/fovea/types.hpp"
 #include "yocto/counted.hpp"
+#include "yocto/type/args.hpp"
+#include "yocto/string.hpp"
 
 namespace yocto
 {
     namespace fovea
     {
-        //! memory for fields
-        class linear_space : public object, public counted
+        
+        class linear_space : public counted
         {
         public:
-            void           *entry;
-            const size_t    items;
-            const size_t    itmsz;      //!< item size in bytes
-            const size_t    bytes;      //!< items * itmz
-            const type_spec items_type; //!< items class type
-            const type_spec array_type; //!< super class type
-
+            //__________________________________________________________________
+            //
+            // data
+            //__________________________________________________________________
+            const string name;
+            const size_t bytes; //!< linear bytes
+            const size_t itmsz; //!< one item size
+            
+            //__________________________________________________________________
+            //
+            // virtual interface
+            //__________________________________________________________________
             virtual ~linear_space() throw();
             
-            virtual void *array_handle() const throw() = 0; //!< address of superclass
+            virtual const std::type_info &get_typeid() const throw() = 0; //!< typeid  of array
+            virtual void *                get_handle() const throw() = 0; //!< address of array
+            
+            //__________________________________________________________________
+            //
+            // non-virtual interface
+            //__________________________________________________________________
+            const string &key() const throw();  //!< the key for tables
             
             template <typename ARRAY>
-            ARRAY & as() throw()
+            inline ARRAY & as()
             {
-                assert(array_type.match(typeid(ARRAY)));
-                return *static_cast<ARRAY *>(array_handle());
+                check_typeid( typeid(ARRAY) );
+                return *(ARRAY *) get_handle();
             }
             
             template <typename ARRAY>
-            const ARRAY & as() const throw()
+            inline const ARRAY & as() const
             {
-                assert(array_type.match(typeid(ARRAY)));
-                return *static_cast<ARRAY *>(array_handle());
+                check_typeid( typeid(ARRAY) );
+                return *(ARRAY *) get_handle();
             }
+            
+            
             
         protected:
-            explicit linear_space(const size_t     num_items,
-                                  const size_t     item_size,
-                                  const type_spec &items_sp,
-                                  const type_spec &super_sp);
+            size_t buflen;
+            void  *buffer;
+            explicit linear_space(const string &user_name,
+                                  const size_t  num_bytes,
+                                  const size_t  item_size,
+                                  void         *user_data);
+            
             
         private:
-            size_t allocated;
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear_space);
-            void   clear() throw();
+            void check_typeid(const std::type_info&aid) const;
+            
         };
+        
+        template <typename T,typename LAYOUT>
+        class linear : public LAYOUT, public linear_space
+        {
+        public:
+            YOCTO_ARGUMENTS_DECL_T;
+            inline virtual ~linear() throw() {}
+            type *entry;
+            
+            
+            
+        protected:
+            inline explicit linear(const string &user_name,
+                                   const LAYOUT &L,
+                                   void *user_data ) :
+            LAYOUT(L),
+            linear_space(user_name,
+                         this->items * sizeof(T),
+                         sizeof(T),
+                         user_data),
+            entry( (type*)buffer )
+            {
+                assert(entry);
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(linear);
+        };
+        
     }
 }
 

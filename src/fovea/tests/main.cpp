@@ -2,7 +2,10 @@
 
 YOCTO_UNIT_TEST_INIT(16)
 {
-    
+    YOCTO_UNIT_TEST_DECL(layout);
+    YOCTO_UNIT_TEST_DECL(array1d);
+    YOCTO_UNIT_TEST_DECL(array2d);
+
 }
 YOCTO_UNIT_TEST_EXEC()
 
