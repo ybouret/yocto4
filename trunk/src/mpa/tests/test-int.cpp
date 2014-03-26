@@ -15,16 +15,21 @@ YOCTO_UNIT_TEST_IMPL(int)
         std::cerr << "z=" << w.z << std::endl;
     }
     
-    for( int i=-5;i<=5;++i)
+    for( int i=-3;i<=3;++i)
     {
         const mpz x = i;
-        for(int j=-5;j<=5;++j)
+        for(int j=-3;j<=3;++j)
         {
             const mpz y = j;
             const mpz sum = x+y;
             std::cerr << x << " + " << y << " = " << sum << std::endl;
         }
+        mpz u = x;
+        std::cerr << x << " , " << ++u << std::endl;
+        mpz v = u++;
+        std::cerr << v << " , " << u << std::endl;
     }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
