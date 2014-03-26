@@ -1,63 +1,59 @@
 #include "yocto/fovea/linear.hpp"
 #include "yocto/exception.hpp"
 
+
 namespace yocto
 {
     namespace fovea
     {
         
-        void   linear_space:: clear() throw()
-        {
-            (size_t&)bytes = 0;
-            (size_t&)items = 0;
-        }
-        
         linear_space:: ~linear_space() throw()
         {
-            memory::kind<memory::global>::release(entry, allocated);
-            clear();
-        }
-        
-        static inline
-        size_t __check_linear_items( const size_t items )
-        {
-            if(items<=0)
-                throw exception("fovea::linear_space(invalid #items)");
-            return items;
-        }
-        
-        static inline
-        size_t __check_linear_sizeof( const size_t sz )
-        {
-            if(sz<=0)
-                throw exception("fovea::linear_space(invalid item size)");
-            return sz;
-        }
-        
-        
-        linear_space:: linear_space(const size_t     num_items,
-                                    const size_t     item_size,
-                                    const type_spec &items_sp,
-                                    const type_spec &super_sp):
-        entry(0),
-        items( __check_linear_items(num_items)  ),
-        itmsz( __check_linear_sizeof(item_size) ),
-        bytes(items*itmsz),
-        items_type(items_sp),
-        array_type(super_sp),
-        allocated(bytes)
-        {
-            try
+            if(buflen)
             {
-                entry = memory::kind<memory::global>::acquire(allocated);
+                memory::kind<memory_kind>::release(buffer, buflen);
             }
-            catch(...)
+            else
             {
-                clear();
-                throw;
+                buflen = 0;
+            }
+            (size_t&)bytes =0;
+        }
+        
+        linear_space:: linear_space(const string &user_name,
+                                    const size_t  num_bytes,
+                                    const size_t  item_size,
+                                    void *        user_data) :
+        bytes(num_bytes),
+        itmsz(item_size),
+        buflen(0),
+        buffer(0)
+        {
+            if(num_bytes<=0)     throw exception("fovea::linear_space(invalid #bytes)");
+            if(0!=(bytes%itmsz)) throw exception("fovea::linear_space(bytes mismatch sizeof(T))");
+            if( user_data )
+            {
+                buffer = user_data;
+            }
+            else
+            {
+                buflen = bytes;
+                buffer = memory::kind<memory_kind>::acquire(buflen);
             }
         }
+     
+       
         
+        const string & linear_space:: key() const throw()
+        {
+            return name;
+        }
+     
+        void linear_space:: check_typeid(const std::type_info &aid) const
+        {
+            if( aid != get_typeid() )
+                throw exception("wrong type for array '%s'", name.c_str());
+        }
         
         
     }
