@@ -1,4 +1,4 @@
-PROJECT(y-mpa)
+PROJECT(mpa)
 
 #common code
 FILE( GLOB mpa_decl yocto/mpa/*.hpp)

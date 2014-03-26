@@ -1,4 +1,4 @@
-PROJECT(y-lang)
+PROJECT(lingua)
 
 FILE( GLOB decl yocto/lingua/*.hpp)
 FILE( GLOB impl yocto/lingua/*.cpp)

@@ -1,4 +1,4 @@
-PROJECT(y-mk)
+PROJECT(mk)
 
 FILE( GLOB kernel_decl yocto/math/kernel/*.hpp)
 FILE( GLOB kernel_impl yocto/math/kernel/*.cpp)

@@ -1,4 +1,4 @@
-PROJECT(y-mpi)
+PROJECT(mpi)
 
 FIND_PACKAGE(MPI)
 

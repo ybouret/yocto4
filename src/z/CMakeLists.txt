@@ -1,4 +1,4 @@
-PROJECT(y-z)
+PROJECT(z)
 
 SET( decl yocto/zlib/zconf.h yocto/zlib/zlib.h )
 SET( impl

@@ -10,6 +10,7 @@ namespace yocto
     namespace fovea
     {
         
+
         template <typename T>
         class array1D : public linear<T,layout1D>
         {
@@ -46,9 +47,7 @@ namespace yocto
                 return addr[i];
             }
             
-          
-            
-            
+                      
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
             type *addr;

@@ -1,4 +1,4 @@
-PROJECT(y-gems)
+PROJECT(gems)
 
 FILE( GLOB decl yocto/gems/*.hpp)
 FILE( GLOB impl yocto/gems/*.cpp)

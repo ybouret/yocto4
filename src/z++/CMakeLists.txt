@@ -1,4 +1,4 @@
-PROJECT(y-z++)
+PROJECT(z++)
 
 FILE( GLOB decl yocto/z++/*.hpp)
 FILE( GLOB impl yocto/z++/*.cpp)

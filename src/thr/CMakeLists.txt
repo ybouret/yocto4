@@ -1,4 +1,4 @@
-PROJECT(y-thr)
+PROJECT(thr)
 
 FILE( GLOB decl yocto/threading/*.hpp)
 FILE( GLOB impl yocto/threading/*.cpp)

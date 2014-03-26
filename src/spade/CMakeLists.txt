@@ -1,4 +1,4 @@
-PROJECT(y-spade)
+PROJECT(spade)
 
 FILE( GLOB decl yocto/spade/*.hpp)
 FILE( GLOB impl yocto/spade/*.cpp)

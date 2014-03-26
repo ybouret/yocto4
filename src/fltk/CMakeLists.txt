@@ -1,4 +1,4 @@
-PROJECT(y-fltk)
+PROJECT(fltk)
 
 INCLUDE(../share/fltk.cmake)
 

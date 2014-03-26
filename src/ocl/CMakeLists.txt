@@ -2,7 +2,7 @@ INCLUDE(../share/opencl.cmake)
 
 IF(OPENCL_FOUND)
 
-PROJECT(y-ocl)
+PROJECT(ocl)
 
 FILE( GLOB ocl_decl yocto/ocl/*.hpp)
 FILE( GLOB ocl_impl yocto/ocl/*.cpp)

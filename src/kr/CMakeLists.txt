@@ -1,4 +1,4 @@
-PROJECT(y-kr)
+PROJECT(kr)
 
 FILE( GLOB hashing_decl yocto/hashing/*.hpp)
 FILE( GLOB hashing_impl yocto/hashing/*.cpp)
