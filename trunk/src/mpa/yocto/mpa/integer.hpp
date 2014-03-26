@@ -34,13 +34,17 @@ namespace yocto
             void  xch( integer & ) throw();
             integer &operator=(const integer &);
             integer &operator=(const int64_t  );
+            
             //__________________________________________________________________
             //
             // addition
             //__________________________________________________________________
             static integer add( const integer &lhs, const integer &rhs );
             friend integer operator+(const integer &lhs, const integer &rhs);
-            
+            static integer add( const integer &lhs, const int64_t  rhs );
+            friend integer operator+(const integer &lhs, const int64_t  rhs);
+            friend integer operator+(const int64_t  lhs, const integer &rhs);
+
             //__________________________________________________________________
             //
             // helpers

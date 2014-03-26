@@ -271,6 +271,7 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             void rescan() throw(); //!< start from maxi and adjust
             virtual const void *get_address() const throw(); //!< ro_buffer API
             friend class word2mpn;
+            friend class word2mpz;
             void kill() throw();
         };
         
