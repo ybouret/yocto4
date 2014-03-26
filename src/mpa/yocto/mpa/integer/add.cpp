@@ -91,5 +91,21 @@ namespace yocto
             return integer::add(lhs,rhs);
         }
         
+        integer integer::add(const  integer &lhs, const int64_t rhs)
+        {
+            const word2mpz w(rhs);
+            return add(rhs,w.z);
+        }
+        
+        integer operator+(const integer &lhs, const int64_t  rhs)
+        {
+            return integer::add(lhs,rhs);
+        }
+        
+        integer operator+(const int64_t  lhs, const integer &rhs)
+        {
+            return integer::add(rhs,lhs);
+        }
+        
     }
 }
