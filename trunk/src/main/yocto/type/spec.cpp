@@ -69,6 +69,16 @@ namespace yocto {
 		}
 	}
 	
+    bool type_spec:: match( const std::type_info &tid ) const throw()
+    {
+        return *(this->info_) == tid;
+    }
+    
+    bool type_spec:: match( const type_spec &other ) const throw()
+    {
+        return *(this->info_) == *(other.info_);
+    }
+    
 	const void * type_spec:: get_address() const throw()
 	{
 		assert( info_ != NULL );
