@@ -1,4 +1,4 @@
-PROJECT(y-chemical)
+PROJECT(chemical)
 
 FILE( GLOB decl yocto/chemical/*.hpp)
 FILE( GLOB impl yocto/chemical/*.cpp)

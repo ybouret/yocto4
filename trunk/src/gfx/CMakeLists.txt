@@ -1,4 +1,4 @@
-PROJECT(y-gfx)
+PROJECT(gfx)
 
 FILE( GLOB decl yocto/gfx/*.hpp)
 FILE( GLOB impl yocto/gfx/*.cpp)

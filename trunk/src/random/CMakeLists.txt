@@ -1,4 +1,4 @@
-PROJECT(y-random)
+PROJECT(random)
 
 FILE( GLOB random_decl yocto/random/*.hpp)
 FILE( GLOB random_impl yocto/random/*.cpp)

@@ -1,4 +1,4 @@
-PROJECT(y-lua++)
+PROJECT(lua++)
 
 FILE( GLOB lua_decl yocto/lua/*.hpp)
 FILE( GLOB lua_impl yocto/lua/*.cpp)

@@ -1,4 +1,4 @@
-PROJECT(y-main)
+PROJECT(main)
 FILE( GLOB top_decl yocto/*.hpp)
 FILE( GLOB top_impl yocto/*.cpp)
 SET( top_srcs ${top_decl} ${top_impl} )

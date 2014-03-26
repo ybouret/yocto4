@@ -1,4 +1,4 @@
-PROJECT(y-bz2 C)
+PROJECT(bz2 C)
 
 SET( srcs
 	yocto/bz2/bzlib.h 

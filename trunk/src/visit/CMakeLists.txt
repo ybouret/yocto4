@@ -1,4 +1,4 @@
-PROJECT(y-visit)
+PROJECT(visit)
 
 INCLUDE(../share/visit.cmake)
 

@@ -1,4 +1,4 @@
-PROJECT(y-json)
+PROJECT(json)
 
 FILE( GLOB decl yocto/json/*.hpp)
 FILE( GLOB impl yocto/json/*.cpp)

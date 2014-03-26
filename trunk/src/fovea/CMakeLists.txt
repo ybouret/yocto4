@@ -1,4 +1,4 @@
-PROJECT(y-fovea)
+PROJECT(fovea)
 
 
 FILE( GLOB decl yocto/fovea/*.hpp )
