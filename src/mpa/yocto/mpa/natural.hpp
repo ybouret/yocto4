@@ -16,6 +16,9 @@ namespace yocto
     
     namespace mpa
     {
+        
+       
+        
         class word2mpn;
         
         //! a little-endian muliple precision natural number

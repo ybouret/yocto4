@@ -7,18 +7,19 @@ namespace yocto
 {
     namespace mpa
     {
-      
+        enum sign_type
+        {
+            __negative = -1,
+            __zero     =  0,
+            __positive =  1
+        };
+        
+        sign_type int2sign(int) throw();
         
         class integer : public object
         {
         public:
-            enum sign_type
-            {
-                is_negative= -1,
-                is_zero    =  0,
-                is_positive=  1
-            };
-            
+           
             //__________________________________________________________________
             //
             // initialisation
@@ -30,13 +31,15 @@ namespace yocto
             integer(const integer &other);
             integer(const int64_t  x);
             friend std::ostream & operator<<( std::ostream &, const integer &);
-            
+            void  xch( integer & ) throw();
+            integer &operator=(const integer &);
+            integer &operator=(const int64_t  );
             //__________________________________________________________________
             //
             // addition
             //__________________________________________________________________
             static integer add( const integer &lhs, const integer &rhs );
-            
+            friend integer operator+(const integer &lhs, const integer &rhs);
             
             //__________________________________________________________________
             //
@@ -44,11 +47,11 @@ namespace yocto
             //__________________________________________________________________
             static sign_type sgn_of(const int64_t x) throw();
             static uint64_t  abs_of(const int64_t x) throw();
-            
+            static sign_type neg_of(const sign_type) throw();
             
         private:
             void check() throw();
-            
+            integer(const sign_type S, const natural &N );
         };
     }
     
