@@ -44,7 +44,11 @@ namespace yocto
             static integer add( const integer &lhs, const int64_t  rhs );
             friend integer operator+(const integer &lhs, const int64_t  rhs);
             friend integer operator+(const int64_t  lhs, const integer &rhs);
-
+            integer & operator+=( const integer &rhs );
+            integer & operator+=( const int64_t  rhs );
+            integer & operator++();     //!< prefix
+            integer   operator++ (int); //!< postfix
+            
             //__________________________________________________________________
             //
             // helpers

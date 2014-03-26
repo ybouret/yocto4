@@ -107,5 +107,37 @@ namespace yocto
             return integer::add(rhs,lhs);
         }
         
+        
+        integer & integer:: operator+=( const integer &rhs )
+        {
+            integer tmp = add(*this,rhs);
+            xch(tmp);
+            return *this;
+        }
+        
+        integer & integer:: operator+=( const int64_t rhs )
+        {
+            integer tmp = add(*this,rhs);
+            xch(tmp);
+            return *this;
+        }
+        
+        integer & integer:: operator++()
+        {
+            static const word2mpz one(1);
+            integer tmp = add(*this,one.z);
+            xch(tmp);
+            return *this;
+        }
+        
+        integer integer:: operator++ (int)
+        {
+            static const word2mpz one(1);
+            const integer save(*this);
+            integer tmp = add(*this,one.z);
+            xch(tmp);
+            return save;
+        }
+        
     }
 }
