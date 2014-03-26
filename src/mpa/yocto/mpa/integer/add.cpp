@@ -1,4 +1,5 @@
 #include "yocto/mpa/word2mpz.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -14,6 +15,7 @@ namespace yocto
                 case __negative:
                     //__________________________________________________________
                     switch (rhs.s) {
+                            
                         case __negative:
                         {
                             const natural sum = lhs.n + rhs.n;
@@ -24,22 +26,21 @@ namespace yocto
                             return lhs;
                             
                         case __positive:
-                            switch( int2sign( natural::compare(lhs.n, rhs.n)))
-                        {
-                            case __negative:
-                            {
-                                const natural dif = rhs.n - lhs.n;
-                                return integer(__positive,dif);
+                            switch( int2sign( natural::compare(lhs.n, rhs.n))) {
+                                case __negative:
+                                {
+                                    const natural dif = rhs.n - lhs.n;
+                                    return integer(__positive,dif);
+                                }
+                                case __zero:
+                                    return integer();
+                                    
+                                case __positive:
+                                {
+                                    const natural dif = lhs.n - rhs.n;
+                                    return integer(__negative,dif);
+                                }
                             }
-                            case __zero:
-                                return integer();
-                                
-                            case __positive:
-                            {
-                                const natural dif = lhs.n - rhs.n;
-                                return integer(__negative,dif);
-                            }
-                        }
                     }
                     
                     //__________________________________________________________
@@ -54,23 +55,22 @@ namespace yocto
                     //__________________________________________________________
                     switch (rhs.s) {
                         case __negative:
-                            switch( int2sign( natural::compare(lhs.n, rhs.n)))
-                        {
-                            case __negative:
-                            {
-                                const natural dif = rhs.n - lhs.n;
-                                return integer(__negative,dif);
+                            switch( int2sign( natural::compare(lhs.n, rhs.n))) {
+                                case __negative:
+                                {
+                                    const natural dif = rhs.n - lhs.n;
+                                    return integer(__negative,dif);
+                                }
+                                    
+                                case __zero:
+                                    return integer();
+                                    
+                                case __positive:
+                                {
+                                    const natural dif = lhs.n - rhs.n;
+                                    return integer(__positive,dif);
+                                }
                             }
-                                
-                            case __zero:
-                                return integer();
-                                
-                            case __positive:
-                            {
-                                const natural dif = lhs.n - rhs.n;
-                                return integer(__positive,dif);
-                            }
-                        }
                             
                         case __zero:
                             return lhs;
@@ -83,6 +83,7 @@ namespace yocto
                     }
                     
             }
+            throw exception("unexpected integer::add failure");
         }
         
         
