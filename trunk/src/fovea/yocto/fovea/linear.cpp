@@ -24,6 +24,7 @@ namespace yocto
                                     const size_t  num_bytes,
                                     const size_t  item_size,
                                     void *        user_data) :
+        name(user_name),
         bytes(num_bytes),
         itmsz(item_size),
         buflen(0),
