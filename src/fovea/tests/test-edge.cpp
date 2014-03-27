@@ -1,16 +1,17 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/fovea/edge.hpp"
 
 #include "yocto/fovea/mesh/rectilinear.hpp"
 #include "yocto/fovea/mesh/curvilinear.hpp"
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/sequence/vector.hpp"
 
 
 using namespace yocto;
 using namespace fovea;
 
-static inline void show_mesh( const mesh &msh )
+template <typename MESH>
+static inline void show_mesh( const MESH &msh )
 {
     std::cerr << "msh dims     = " << msh.dims     << std::endl;
     std::cerr << "    vertices = " << msh.vertices << std::endl;
@@ -20,18 +21,38 @@ static inline void show_mesh( const mesh &msh )
         const linear_space &l = msh.adb[id];
         std::cerr << "axis " << id << " bytes: " << l.bytes << std::endl;
     }
+    
+    typedef typename MESH::edge_type Edge;
+    
+    vector<Edge> edges;
+    size_t nc = 0;
+    for(size_t i=0;i<msh.vertices;++i)
+    {
+        for(size_t j=0;j<msh.vertices;++j)
+        {
+            if(i!=j)
+            {
+                const Edge E(msh[i],msh[j]);
+                ++nc;
+                edges.push_back(E);
+            }
+        }
+    }
+    std::cerr << "#created edges=" << nc << std::endl;
+    
+    
 }
 
-YOCTO_UNIT_TEST_IMPL(mesh)
+YOCTO_UNIT_TEST_IMPL(edge)
 {
     array_db a;
     
-    const unit_t lox = -unit_t(1 + alea_lt(100));
-    const unit_t hix =  unit_t(1 + alea_lt(100));
-    const unit_t loy = -unit_t(1 + alea_lt(100));
-    const unit_t hiy =  unit_t(1 + alea_lt(100));
-    const unit_t loz = -unit_t(1 + alea_lt(100));
-    const unit_t hiz =  unit_t(1 + alea_lt(100));
+    const unit_t lox = -unit_t(1 + alea_lt(5));
+    const unit_t hix =  unit_t(1 + alea_lt(5));
+    const unit_t loy = -unit_t(1 + alea_lt(5));
+    const unit_t hiy =  unit_t(1 + alea_lt(5));
+    const unit_t loz = -unit_t(1 + alea_lt(5));
+    const unit_t hiz =  unit_t(1 + alea_lt(5));
     
     const layout1D L1(lox,hix);
     
@@ -90,7 +111,6 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     
     { point_mesh<3,float> msh(a,L1); show_mesh(msh); }
     a.free();
-    
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -3,7 +3,7 @@
 
 #include "yocto/fovea/dimensions.hpp"
 #include "yocto/fovea/array-db.hpp"
-#include "yocto/fovea/vertex.hpp"
+#include "yocto/fovea/arrays.hpp"
 
 namespace yocto
 {
@@ -54,11 +54,28 @@ namespace yocto
             
         };
         
-        template <typename T>
+        template <size_t DIM,typename T>
         class mesh_of : public mesh
         {
         public:
-            typedef Vertex<T> VTX;
+            typedef Vertex<DIM,T> VTX;
+            
+            inline VTX & operator[]( size_t v ) throw()
+            {
+                assert(v<vertices);
+                assert(vtx);
+                assert(assigned);
+                return vtx[v];
+            }
+            
+            inline const VTX & operator[]( size_t v ) const throw()
+            {
+                assert(v<vertices);
+                assert(vtx);
+                assert(assigned);
+                return vtx[v];
+            }
+            
             virtual ~mesh_of() throw() {
                 if(assigned)
                 {
@@ -73,11 +90,10 @@ namespace yocto
             
         protected:
             explicit mesh_of(array_db     &a,
-                             const size_t d,
                              const size_t nv,
                              const form_type f
                              ) :
-            mesh(a,d,nv,f,sizeof(T)),
+            mesh(a,DIM,nv,f,sizeof(T)),
             num( vertices ),
             vtx( memory::kind<memory_kind>::acquire_as<VTX>(num) )
             {

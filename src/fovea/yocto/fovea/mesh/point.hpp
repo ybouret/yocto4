@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_POINT_MESH_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/arrays.hpp"
+#include "yocto/fovea/edge.hpp"
 
 namespace yocto
 {
@@ -11,17 +11,19 @@ namespace yocto
     {
         
         template <size_t DIM, typename T>
-        class point_mesh : public mesh_of<T>, public layout1D
+        class point_mesh : public mesh_of<DIM,T>, public layout1D
         {
         public:
-            typedef array1D<T> axis_type;
-            typedef mesh_of<T> mesh_type;
+            typedef array1D<T>              axis_type;
+            typedef mesh_of<DIM,T>          mesh_type;
+            typedef edge<DIM,T>             edge_type;
+            typedef typename mesh_type::VTX VTX;
             
             virtual ~point_mesh() throw() {}
             
             explicit point_mesh(array_db       &a,
                                 const layout1D &L) :
-            mesh_type(a,DIM,L.items,mesh::is_point),
+            mesh_type(a,L.items,mesh::is_point),
             layout1D(L)
             {
                 for(size_t i=0;i<this->dims;++i)
@@ -48,7 +50,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) Vertex<T>(j,aX[i]);
+                    new (this->vtx+j) VTX(j,aX[i]);
                 }
             
             }
@@ -60,7 +62,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) Vertex<T>(j,aX[i],aY[i]);
+                    new (this->vtx+j) VTX(j,aX[i],aY[i]);
                 }
 
             }
@@ -73,7 +75,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) Vertex<T>(j,aX[i],aY[i],aZ[i]);
+                    new (this->vtx+j) VTX(j,aX[i],aY[i],aZ[i]);
                 }
             }
             
