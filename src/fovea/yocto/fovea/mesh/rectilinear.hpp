@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/array1d.hpp"
+#include "yocto/fovea/arrays.hpp"
 
 namespace yocto
 {
@@ -14,8 +14,9 @@ namespace yocto
         class rectilinear_mesh : public mesh, public LAYOUT
         {
         public:
-            typedef array1D<T> axis_type;
-            
+            typedef array1D<T>                                      axis_type;
+            typedef typename array_of<LAYOUT::DIMENSIONS,T>::vertex vertex;
+
             
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :
