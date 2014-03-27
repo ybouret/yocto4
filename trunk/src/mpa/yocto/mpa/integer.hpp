@@ -19,7 +19,7 @@ namespace yocto
         class integer : public object
         {
         public:
-           
+            
             //__________________________________________________________________
             //
             // initialisation
@@ -48,6 +48,24 @@ namespace yocto
             integer & operator+=( const int64_t  rhs );
             integer & operator++();     //!< prefix
             integer   operator++ (int); //!< postfix
+            friend integer operator+(const integer &);
+            
+            //__________________________________________________________________
+            //
+            // subtraction
+            //__________________________________________________________________
+            void   neg() throw();
+            static integer sub(const integer &lhs, const integer &rhs);
+            static integer sub(const int64_t  lhs, const integer &rhs);
+            static integer sub(const integer &lhs, const int64_t  rhs);
+            friend integer operator-(const integer &lhs,const integer &rhs);
+            friend integer operator-(const int64_t  lhs, const integer &rhs);
+            friend integer operator-(const integer &lhs, const int64_t  rhs);
+            friend integer operator-(const integer &);
+            integer & operator-=( const integer &rhs );
+            integer & operator-=( const int64_t  rhs );
+            integer & operator--();     //!< prefix
+            integer   operator-- (int); //!< postfix
             
             //__________________________________________________________________
             //
