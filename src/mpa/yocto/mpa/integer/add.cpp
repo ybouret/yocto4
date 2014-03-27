@@ -6,6 +6,11 @@ namespace yocto
     namespace mpa
     {
         
+        integer operator+(const integer &x)
+        {
+            return x;
+        }
+        
         integer integer::add(const  integer &lhs, const  integer &rhs)
         {
             switch(lhs.s)
