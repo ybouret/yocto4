@@ -31,12 +31,13 @@ namespace yocto
             const size_t    dimensions;
             const form_type form;
             const real_type real;
+            array_db       &adb;
 
             static real_type   sz2fp( const unsigned sz );
             static const char *axis_name( size_t dim );
             
+            
         protected:
-            array_db &adb;
             explicit mesh(array_db       &a,
                           const size_t    d,
                           const form_type f,

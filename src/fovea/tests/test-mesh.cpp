@@ -9,6 +9,12 @@ using namespace fovea;
 static inline void show_mesh( const mesh &msh )
 {
     std::cerr << "msh dim=" << msh.dimensions << std::endl;
+    for(size_t i=0;i<msh.dimensions;++i)
+    {
+        const char *id = mesh::axis_name(i);
+        const linear_space &l = msh.adb[id];
+        std::cerr << "axis " << id << " bytes: " << l.bytes << std::endl;
+    }
 }
 
 YOCTO_UNIT_TEST_IMPL(mesh)
