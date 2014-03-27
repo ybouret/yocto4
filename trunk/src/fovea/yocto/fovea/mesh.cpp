@@ -12,13 +12,17 @@ namespace yocto
         
         mesh::mesh(array_db       &a,
                    const size_t    d,
+                   const size_t    nv,
                    const form_type f,
-                   const real_type r) throw() :
-        dimensions(d),
+                   const size_t    s) throw() :
+        dims(d),
+        vertices(nv),
         form(f),
-        real(r),
+        real(sz2fp(s)),
         adb(a)
         {
+            assert(1==dims||2==dims||3==dims);
+            assert(vertices>0);
         }
         
         mesh::real_type mesh::sz2fp( const unsigned sz )

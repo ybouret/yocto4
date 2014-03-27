@@ -23,12 +23,14 @@ namespace yocto
             enum form_type
             {
                 is_rectilinear,
-                is_curvilinear
+                is_curvilinear,
+                is_point
             };
             
             virtual ~mesh() throw();
             
-            const size_t    dimensions;
+            const size_t    dims;         //!< may be different from layout dimensions
+            const size_t    vertices; //!< #vertices
             const form_type form;
             const real_type real;
             array_db       &adb;
@@ -40,8 +42,9 @@ namespace yocto
         protected:
             explicit mesh(array_db       &a,
                           const size_t    d,
+                          const size_t    nv,
                           const form_type f,
-                          const real_type r) throw();
+                          const size_t    s) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mesh);
