@@ -81,8 +81,18 @@ namespace yocto
             integer operator*=( const integer &rhs );
             integer operator*=( const int64_t  rhs );
             
-            
-            
+            //__________________________________________________________________
+            //
+            // division
+            //__________________________________________________________________
+            static integer div(const integer &num, const integer &den);
+            static integer div(const int64_t  num, const integer &den);
+            static integer div(const integer &num, const int64_t  den);
+            friend integer operator/(const integer &lhs, const integer &rhs);
+            friend integer operator/(const int64_t  lhs, const integer &rhs);
+            friend integer operator/(const integer &lhs, const int64_t  rhs);
+            integer operator/=( const integer &rhs );
+            integer operator/=( const int64_t  rhs );
             
             //__________________________________________________________________
             //
