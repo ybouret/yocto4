@@ -56,6 +56,10 @@ namespace yocto
                 throw exception("wrong type for array '%s'", name.c_str());
         }
         
+        string linear_space:: make_id( unit_t idx ) const
+        {
+            return name + vformat("[%d]", int(idx) );
+        }
         
     }
 }

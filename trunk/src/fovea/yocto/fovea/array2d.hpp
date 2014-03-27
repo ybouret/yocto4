@@ -50,7 +50,7 @@ namespace yocto
                 {
                     while(irow<max_row)
                     {
-                        const string id = this->name + vformat("[%u]", unsigned(irow+this->lower.y));
+                        const string id = this->make_id(irow+this->lower.y);
                         new (rows+irow) row_type(id,row_layout,p);
                         ++irow;
                         p += row_layout.width;
