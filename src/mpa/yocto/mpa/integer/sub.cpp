@@ -7,7 +7,7 @@ namespace yocto
     {
         void integer:: neg() throw()
         {
-            (sign_type&)s = neg_of(s);
+            (sign_type&)s = sign_neg(s);
         }
 
         integer integer:: sub(const integer &lhs, const integer &rhs)
@@ -43,7 +43,7 @@ namespace yocto
         integer operator-(const integer &lhs, const int64_t  rhs) { return integer::sub(lhs,rhs); }
         integer operator-(const integer &x)
         {
-            return integer( integer::neg_of(x.s), x.n );
+            return integer( sign_neg(x.s), x.n );
         }
         
         

@@ -14,7 +14,9 @@ namespace yocto
             __positive =  1
         };
         
-        sign_type int2sign(int) throw();
+        sign_type int2sign(const int) throw();
+        sign_type sign_neg(const sign_type) throw();
+        sign_type sign_mul(const sign_type,const sign_type) throw();
         
         class integer : public object
         {
@@ -69,11 +71,25 @@ namespace yocto
             
             //__________________________________________________________________
             //
+            // multiplication
+            //__________________________________________________________________
+            static integer mul(const integer &lhs, const integer &rhs);
+            static integer mul(const int64_t  lhs, const integer &rhs);
+            friend integer operator*(const integer &lhs, const integer &rhs);
+            friend integer operator*(const int64_t  lhs, const integer &rhs);
+            friend integer operator*(const integer &lhs, const int64_t  rhs);
+            integer operator*=( const integer &rhs );
+            integer operator*=( const int64_t  rhs );
+            
+            
+            
+            
+            //__________________________________________________________________
+            //
             // helpers
             //__________________________________________________________________
             static sign_type sgn_of(const int64_t x) throw();
             static uint64_t  abs_of(const int64_t x) throw();
-            static sign_type neg_of(const sign_type) throw();
             
         private:
             void check() throw();
