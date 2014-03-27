@@ -21,7 +21,8 @@ namespace yocto
                  LAYOUT::DIMENSIONS,
                  mesh::is_curvilinear,
                  mesh::sz2fp( sizeof(T) )
-                 )
+                 ),
+            LAYOUT(L)
             {
                 for(size_t i=0;i<dimensions;++i)
                 {
