@@ -2,7 +2,6 @@
 #define YOCTO_FOVEA_MESH_CURVILINEAR_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/vertex.hpp"
 
 namespace yocto
 {
@@ -11,15 +10,16 @@ namespace yocto
     {
         
         template <typename T,typename LAYOUT>
-        class curvilinear_mesh : public mesh_of<T>, public LAYOUT
+        class curvilinear_mesh : public mesh_of<LAYOUT::DIMENSIONS,T>, public LAYOUT
         {
         public:
             typedef typename types_for<LAYOUT::DIMENSIONS,T>::array_type  array_type;
-            typedef mesh_of<T> mesh_type;
-            
+            typedef typename types_for<LAYOUT::DIMENSIONS,T>::edge_type   edge_type;
+            typedef mesh_of<LAYOUT::DIMENSIONS,T>                         mesh_type;
+            typedef typename mesh_type::VTX                               VTX;
+
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             mesh_type(a,
-                      LAYOUT::DIMENSIONS,
                       L.items,
                       mesh::is_curvilinear),
             LAYOUT(L)
@@ -54,7 +54,7 @@ namespace yocto
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
                 {
-                    new (this->vtx+v) Vertex<T>(v,aX[i] );
+                    new (this->vtx+v) VTX(v,aX[i] );
                 }
                 
             }
@@ -68,7 +68,7 @@ namespace yocto
                 {
                     for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                     {
-                        new (this->vtx+v) Vertex<T>(v,aX[j][i],aY[j][i] );
+                        new (this->vtx+v) VTX(v,aX[j][i],aY[j][i] );
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace yocto
                     {
                         for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                         {
-                            new (this->vtx+v) Vertex<T>(v,aX[k][j][i], aY[k][j][i], aZ[k][j][i] );
+                            new (this->vtx+v) VTX(v,aX[k][j][i], aY[k][j][i], aZ[k][j][i] );
                         }
                     }
                 }

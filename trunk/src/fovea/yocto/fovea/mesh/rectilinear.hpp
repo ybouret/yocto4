@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/arrays.hpp"
+#include "yocto/fovea/edge.hpp"
 
 namespace yocto
 {
@@ -11,18 +11,16 @@ namespace yocto
     {
         
         template <typename T,typename LAYOUT>
-        class rectilinear_mesh : public mesh_of<T>, public LAYOUT
+        class rectilinear_mesh : public mesh_of<LAYOUT::DIMENSIONS,T>, public LAYOUT
         {
         public:
-            typedef array1D<T> axis_type;
-            typedef mesh_of<T> mesh_type;
-            
+            typedef array1D<T>                                            axis_type;
+            typedef mesh_of<LAYOUT::DIMENSIONS,T>                         mesh_type;
+            typedef typename types_for<LAYOUT::DIMENSIONS,T>::edge_type   edge_type;
+            typedef typename mesh_type::VTX                               VTX;
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :
-            mesh_type(a,
-                      LAYOUT::DIMENSIONS,
-                      L.items,
-                      mesh::is_rectilinear),
+            mesh_type(a,L.items,mesh::is_rectilinear),
             LAYOUT(L)
             {
                 for(size_t i=0;i<this->dims;++i)
@@ -52,7 +50,7 @@ namespace yocto
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
                 {
-                    new (this->vtx+v) Vertex<T>(v,aX[i] );
+                    new (this->vtx+v) VTX(v,aX[i] );
                 }
                 
             }
@@ -67,7 +65,7 @@ namespace yocto
                     T &y = aY[j];
                     for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                     {
-                        new (this->vtx+v) Vertex<T>(v,aX[i], y );
+                        new (this->vtx+v) VTX(v,aX[i], y );
                     }
                 }
             }
@@ -86,7 +84,7 @@ namespace yocto
                         T &y = aY[j];
                         for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                         {
-                            new (this->vtx+v) Vertex<T>(v,aX[i], y,z );
+                            new (this->vtx+v) VTX(v,aX[i], y,z );
                         }
                     }
                 }
