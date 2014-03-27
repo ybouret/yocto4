@@ -47,8 +47,11 @@ namespace yocto
                           const form_type f,
                           const size_t    s) throw();
             
+            bool assigned; //!< for VTX cleanup
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mesh);
+            
         };
         
         template <typename T>
@@ -57,6 +60,14 @@ namespace yocto
         public:
             typedef Vertex<T> VTX;
             virtual ~mesh_of() throw() {
+                if(assigned)
+                {
+                    size_t i = vertices;
+                    while(i>0)
+                    {
+                        vtx[--i].~VTX();
+                    }
+                }
                 memory::kind<memory_kind>::release_as<VTX>(vtx,num);
             }
             

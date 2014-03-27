@@ -31,6 +31,8 @@ namespace yocto
                     const layout1D  axis_l( __coord(this->lower,i), __coord(this->upper,i));
                     this->adb.store( new axis_type(axis_n,axis_l) );
                 }
+                assign( int2type<LAYOUT::DIMENSIONS>() );
+                this->assigned = true;
             }
             
             inline virtual ~rectilinear_mesh() throw() {}
@@ -44,6 +46,52 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
+            inline void assign( int2type<1> ) throw()
+            {
+                axis_type &aX = X();
+                size_t v = 0;
+                for(unit_t i=this->lower;i<=this->upper;++i,++v)
+                {
+                    new (this->vtx+v) Vertex<T>( aX[i] );
+                }
+                
+            }
+            
+            inline void assign( int2type<2> ) throw()
+            {
+                axis_type &aX = X();
+                axis_type &aY = Y();
+                size_t v = 0;
+                for(unit_t j=this->lower.y;j<=this->upper.y;++j)
+                {
+                    T &y = aY[j];
+                    for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
+                    {
+                        new (this->vtx+v) Vertex<T>( aX[i], y );
+                    }
+                }
+            }
+            
+            inline void assign( int2type<3> ) throw()
+            {
+                axis_type &aX = X();
+                axis_type &aY = Y();
+                axis_type &aZ = Z();
+                size_t v = 0;
+                for(unit_t k=this->lower.z;k<=this->upper.z;++k)
+                {
+                    T &z = aZ[k];
+                    for(unit_t j=this->lower.y;j<=this->upper.y;++j)
+                    {
+                        T &y = aY[j];
+                        for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
+                        {
+                            new (this->vtx+v) Vertex<T>( aX[i], y,z );
+                        }
+                    }
+                }
+            }
+            
         };
         
         

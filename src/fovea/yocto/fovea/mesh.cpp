@@ -19,7 +19,8 @@ namespace yocto
         vertices(nv),
         form(f),
         real(sz2fp(s)),
-        adb(a)
+        adb(a),
+        assigned(false)
         {
             assert(1==dims||2==dims||3==dims);
             assert(vertices>0);
