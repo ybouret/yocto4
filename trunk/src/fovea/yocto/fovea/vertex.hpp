@@ -12,6 +12,8 @@ namespace yocto
         class Vertex
         {
         public:
+            const size_t index;
+            
 #if 0
             class Handle
             {
@@ -27,14 +29,16 @@ namespace yocto
             };
 #endif
             
-            explicit Vertex(T &cx) throw() :
+            explicit Vertex( size_t idx, T &cx) throw() :
+            index(idx),
             r()
             {
                 r[0] = &cx;
                 r[1] = r[2] = 0;
             }
             
-            explicit Vertex(T &cx, T &cy) throw() :
+            explicit Vertex(size_t idx, T &cx, T &cy) throw() :
+            index(idx),
             r()
             {
                 r[0] = &cx;
@@ -42,7 +46,8 @@ namespace yocto
                 r[2] = 0;
             }
             
-            explicit Vertex(T &cx, T &cy, T &cz) throw() :
+            explicit Vertex(size_t idx, T &cx, T &cy, T &cz) throw() :
+            index(idx),
             r()
             {
                 r[0] = &cx;

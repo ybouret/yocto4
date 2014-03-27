@@ -52,7 +52,7 @@ namespace yocto
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
                 {
-                    new (this->vtx+v) Vertex<T>( aX[i] );
+                    new (this->vtx+v) Vertex<T>(v,aX[i] );
                 }
                 
             }
@@ -67,7 +67,7 @@ namespace yocto
                     T &y = aY[j];
                     for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                     {
-                        new (this->vtx+v) Vertex<T>( aX[i], y );
+                        new (this->vtx+v) Vertex<T>(v,aX[i], y );
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace yocto
                         T &y = aY[j];
                         for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                         {
-                            new (this->vtx+v) Vertex<T>( aX[i], y,z );
+                            new (this->vtx+v) Vertex<T>(v,aX[i], y,z );
                         }
                     }
                 }
