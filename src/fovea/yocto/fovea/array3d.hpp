@@ -50,7 +50,7 @@ namespace yocto
                 {
                     while(islice<max_slices)
                     {
-                        const string id = this->name + vformat("[%u]",unsigned(islice+this->lower.z));
+                        const string id = this->make_id(islice+this->lower.z);
                         new (slices+islice) slice_type(id,slice_layout,p);
                         ++islice;
                         p += slice_layout.items;
