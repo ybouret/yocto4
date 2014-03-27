@@ -53,5 +53,25 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     a.free();
     
     
+    { curvilinear_mesh<double, layout1D> msh(a,L1); show_mesh(msh); }
+    a.free();
+    
+    { curvilinear_mesh<float, layout1D> msh(a,L1);  show_mesh(msh);}
+    a.free();
+    
+    { curvilinear_mesh<double, layout2D> msh(a,L2); show_mesh(msh); }
+    a.free();
+    
+    { curvilinear_mesh<float, layout2D> msh(a,L2);  show_mesh(msh);}
+    a.free();
+    
+    { curvilinear_mesh<double, layout3D> msh(a,L3); show_mesh(msh); }
+    a.free();
+    
+    { curvilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
+    a.free();
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
