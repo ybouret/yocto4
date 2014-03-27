@@ -1,6 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/fovea/mesh/rectilinear.hpp"
 #include "yocto/fovea/mesh/curvilinear.hpp"
+#include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
 
 using namespace yocto;
@@ -8,8 +9,9 @@ using namespace fovea;
 
 static inline void show_mesh( const mesh &msh )
 {
-    std::cerr << "msh dim=" << msh.dimensions << std::endl;
-    for(size_t i=0;i<msh.dimensions;++i)
+    std::cerr << "msh dims     = " << msh.dims     << std::endl;
+    std::cerr << "    vertices = " << msh.vertices << std::endl;
+    for(size_t i=0;i<msh.dims;++i)
     {
         const char *id = mesh::axis_name(i);
         const linear_space &l = msh.adb[id];
@@ -77,6 +79,14 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     { curvilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
     a.free();
     
+    { point_mesh<1,float> msh(a,L1); show_mesh(msh); }
+    a.free();
+    
+    { point_mesh<2,double> msh(a,L1); show_mesh(msh); }
+    a.free();
+    
+    { point_mesh<3,float> msh(a,L1); show_mesh(msh); }
+    a.free();
     
     
 }

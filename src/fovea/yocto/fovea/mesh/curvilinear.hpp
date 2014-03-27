@@ -19,12 +19,13 @@ namespace yocto
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             mesh(a,
                  LAYOUT::DIMENSIONS,
+                 L.items,
                  mesh::is_curvilinear,
-                 mesh::sz2fp( sizeof(T) )
+                 sizeof(T)
                  ),
             LAYOUT(L)
             {
-                for(size_t i=0;i<dimensions;++i)
+                for(size_t i=0;i<dims;++i)
                 {
                     const string array_n = mesh::axis_name(i);
                     adb.store( new array_type(array_n, *this) );
