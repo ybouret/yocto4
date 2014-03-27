@@ -2,6 +2,7 @@
 #define YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
+#include "yocto/fovea/array1d.hpp"
 
 namespace yocto
 {
@@ -12,14 +13,26 @@ namespace yocto
         template <typename T,typename LAYOUT>
         class rectilinear_mesh : public mesh, public LAYOUT
         {
-            
         public:
-            explicit rectilinear_mesh( array_db &a, const LAYOUT &L ) :
-            mesh(a,LAYOUT::DIMENSIONS, mesh::is_rectilinear, mesh::sz2fp(sizeof(T)) )
+            typedef array1D<T> axis_type;
+            
+            
+            inline explicit rectilinear_mesh( array_db &a, const LAYOUT &L ) :
+            mesh(a,
+                 LAYOUT::DIMENSIONS,
+                 mesh::is_rectilinear,
+                 mesh::sz2fp(sizeof(T)) ),
+            LAYOUT(L)
             {
+                for(size_t i=0;i<dimensions;++i)
+                {
+                    const string    axis_n = axis_name(i);
+                    const layout1D  axis_l( __coord(this->lower,i), __coord(this->upper,i));
+                    a.store( new axis_type(axis_n,axis_l) );
+                }
             }
             
-            virtual ~rectilinear_mesh() throw();
+            inline virtual ~rectilinear_mesh() throw() {}
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);

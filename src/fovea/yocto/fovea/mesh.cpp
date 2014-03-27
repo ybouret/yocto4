@@ -36,7 +36,25 @@ namespace yocto
             }
             throw exception("mesh: invalid floating point precision");
         }
-
+        
+        const char * mesh::axis_name( size_t dim )
+        {
+            switch (dim)
+            {
+                case 0:
+                    return "X";
+                    
+                case 1:
+                    return "Y";
+                    
+                case 2:
+                    return "Z";
+                    
+                default:
+                    break;
+            }
+            throw exception("mesh: invalid dimension index");
+        }
         
         
     }

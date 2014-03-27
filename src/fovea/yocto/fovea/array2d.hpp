@@ -39,7 +39,9 @@ namespace yocto
                                     const layout_type L,
                                     void *            user_data=0) :
             linear_type(user_name,L,user_data),
-            row_layout(this->lower.x,this->upper.x)
+            row_layout(this->lower.x,this->upper.x),
+            nrow(0),
+            rows(0)
             {
                 const size_t  max_row = this->width.y;
                 nrow        = max_row;

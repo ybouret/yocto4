@@ -38,7 +38,9 @@ namespace yocto
             linear_type(user_name,L,0),
             slice_lower(this->lower.x,this->lower.y),
             slice_upper(this->upper.x,this->upper.y),
-            slice_layout(slice_lower,slice_upper)
+            slice_layout(slice_lower,slice_upper),
+            nslice(0),
+            slices(0)
             {
                 const size_t max_slices = this->width.z;
                 nslice  = max_slices;
