@@ -6,6 +6,8 @@
 #include "yocto/type/args.hpp"
 #include "yocto/string.hpp"
 
+#include <typeinfo>
+
 namespace yocto
 {
 	namespace fovea
