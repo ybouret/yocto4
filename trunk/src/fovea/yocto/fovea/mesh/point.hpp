@@ -14,7 +14,7 @@ namespace yocto
         class point_mesh : public mesh_of<T>, public layout1D
         {
         public:
-            typedef array1D<T>                       axis_type;
+            typedef array1D<T> axis_type;
             typedef mesh_of<T> mesh_type;
             
             virtual ~point_mesh() throw() {}
@@ -29,6 +29,8 @@ namespace yocto
                     const string    axis_n = this->axis_name(i);
                     this->adb.store( new axis_type(axis_n,*this) );
                 }
+                assign( int2type<DIM>() );
+                this->assigned = true;
             }
             
             inline axis_type       &X()       { return this->adb[ mesh::axis_name(0) ].template as<axis_type>(); }
@@ -40,6 +42,41 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(point_mesh);
+            inline void assign( int2type<1> ) throw()
+            {
+                axis_type &aX = X();
+                unit_t     i  = lower;
+                for(size_t j=0;j<this->vertices;++j,++i)
+                {
+                    new (this->vtx+j) Vertex<T>(aX[i]);
+                }
+            
+            }
+            
+            inline void assign( int2type<2> ) throw()
+            {
+                axis_type &aX = X();
+                axis_type &aY = Y();
+                unit_t     i  = lower;
+                for(size_t j=0;j<this->vertices;++j,++i)
+                {
+                    new (this->vtx+j) Vertex<T>(aX[i],aY[i]);
+                }
+
+            }
+            
+            inline void assign( int2type<3> ) throw()
+            {
+                axis_type &aX = X();
+                axis_type &aY = Y();
+                axis_type &aZ = Z();
+                unit_t     i  = lower;
+                for(size_t j=0;j<this->vertices;++j,++i)
+                {
+                    new (this->vtx+j) Vertex<T>(aX[i],aY[i],aZ[i]);
+                }
+            }
+            
         };
     }
 }

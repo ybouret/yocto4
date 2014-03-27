@@ -29,6 +29,8 @@ namespace yocto
                     const string array_n = this->axis_name(i);
                     this->adb.store( new array_type(array_n, *this) );
                 }
+                assign( int2type<LAYOUT::DIMENSIONS>() );
+                this->assigned = true;
             }
             
             inline virtual ~curvilinear_mesh() throw()
@@ -45,6 +47,50 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(curvilinear_mesh);
+            
+            inline void assign( int2type<1> ) throw()
+            {
+                array_type &aX = X();
+                size_t v = 0;
+                for(unit_t i=this->lower;i<=this->upper;++i,++v)
+                {
+                    new (this->vtx+v) Vertex<T>( aX[i] );
+                }
+                
+            }
+            
+            inline void assign( int2type<2> ) throw()
+            {
+                array_type &aX = X();
+                array_type &aY = Y();
+                size_t v = 0;
+                for(unit_t j=this->lower.y;j<=this->upper.y;++j)
+                {
+                    for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
+                    {
+                        new (this->vtx+v) Vertex<T>( aX[j][i],aY[j][i] );
+                    }
+                }
+            }
+
+            inline void assign( int2type<3> ) throw()
+            {
+                array_type &aX = X();
+                array_type &aY = Y();
+                array_type &aZ = Z();
+                size_t v = 0;
+                for(unit_t k=this->lower.z;k<=this->upper.z;++k)
+                {
+                    for(unit_t j=this->lower.y;j<=this->upper.y;++j)
+                    {
+                        for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
+                        {
+                            new (this->vtx+v) Vertex<T>( aX[k][j][i], aY[k][j][i], aZ[k][j][i] );
+                        }
+                    }
+                }
+
+            }
         };
         
     }
