@@ -2,6 +2,7 @@
 #define YOCTO_FOVEA_MESH_INCLUDED 1
 
 #include "yocto/fovea/dimensions.hpp"
+#include "yocto/fovea/array-db.hpp"
 
 namespace yocto
 {
@@ -15,8 +16,8 @@ namespace yocto
         public:
             enum real_type
             {
-                use_real32, //!< use float vertices
-                use_real64  //!< use double vertices
+                use_float,  //!< use float vertices
+                use_double  //!< use double vertices
             };
             enum form_type
             {
@@ -30,8 +31,12 @@ namespace yocto
             const form_type form;
             const real_type real;
 
+            static real_type sz2fp( const unsigned sz );
+            
         protected:
-            explicit mesh(const size_t    d,
+            array_db &adb;
+            explicit mesh(array_db       &a,
+                          const size_t    d,
                           const form_type f,
                           const real_type r) throw();
             
