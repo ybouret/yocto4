@@ -14,19 +14,22 @@ namespace yocto
         template <typename T>
         struct array_of<1,T>
         {
-            typedef array1D<T> type;
+            typedef array1D<T>                 type;
+            typedef typename vertex1D<T>::type vertex;
         };
         
         template <typename T>
         struct array_of<2,T>
         {
-            typedef array2D<T> type;
+            typedef array2D<T>                 type;
+            typedef typename vertex1D<T>::type vertex;
         };
         
         template <typename T>
         struct array_of<3,T>
         {
-            typedef array3D<T> type;
+            typedef array3D<T>                 type;
+            typedef typename vertex3D<T>::type vertex;
         };
 
         

@@ -14,8 +14,9 @@ namespace yocto
         class curvilinear_mesh : public mesh, public LAYOUT
         {
         public:
-            typedef typename array_of<LAYOUT::DIMENSIONS,T>::type array_type;
-            
+            typedef typename array_of<LAYOUT::DIMENSIONS,T>::type   array_type;
+            typedef typename array_of<LAYOUT::DIMENSIONS,T>::vertex vertex;
+
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             mesh(a,
                  LAYOUT::DIMENSIONS,

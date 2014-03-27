@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_POINT_MESH_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/array1d.hpp"
+#include "yocto/fovea/arrays.hpp"
 
 namespace yocto
 {
@@ -14,7 +14,8 @@ namespace yocto
         class point_mesh : public mesh, public layout1D
         {
         public:
-            typedef array1D<T> axis_type;
+            typedef array1D<T>                       axis_type;
+            typedef typename array_of<DIM,T>::vertex vertex;
             
             virtual ~point_mesh() throw() {}
             
