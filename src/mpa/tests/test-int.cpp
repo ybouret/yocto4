@@ -32,6 +32,10 @@ YOCTO_UNIT_TEST_IMPL(int)
             std::cerr << x << " - " << y << " = " << dif << std::endl;
             const mpz prd = x*y;
             std::cerr << x << " * " << y << " = " << prd << std::endl;
+            if(y.s!= mpa::__zero)
+            {
+                std::cerr << x << " / " << y << " = " << x/y << std::endl;
+            }
 
         }
         {

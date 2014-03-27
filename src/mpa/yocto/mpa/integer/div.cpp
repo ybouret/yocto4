@@ -47,7 +47,7 @@ namespace yocto
             return *this;
         }
         
-        integer integer:: operator*=( const int64_t  rhs )
+        integer integer:: operator/=( const int64_t  rhs )
         {
             integer tmp = div(*this,rhs);
             xch(tmp);
