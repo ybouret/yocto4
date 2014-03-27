@@ -34,6 +34,13 @@ namespace yocto
             
             inline virtual ~rectilinear_mesh() throw() {}
             
+            inline axis_type       &X()       { return adb[ mesh::axis_name(0) ].template as<axis_type>(); }
+            inline const axis_type &X() const { return adb[ mesh::axis_name(0) ].template as<axis_type>(); }
+            inline axis_type       &Y()       { return adb[ mesh::axis_name(1) ].template as<axis_type>(); }
+            inline const axis_type &Y() const { return adb[ mesh::axis_name(1) ].template as<axis_type>(); }
+            inline axis_type       &Z()       { return adb[ mesh::axis_name(2) ].template as<axis_type>(); }
+            inline const axis_type &Z() const { return adb[ mesh::axis_name(2) ].template as<axis_type>(); }
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
         };

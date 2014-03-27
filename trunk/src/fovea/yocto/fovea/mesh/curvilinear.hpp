@@ -35,6 +35,14 @@ namespace yocto
             {
             }
             
+            inline array_type       &X()       { return adb[ mesh::axis_name(0) ].template as<array_type>(); }
+            inline const array_type &X() const { return adb[ mesh::axis_name(0) ].template as<array_type>(); }
+            inline array_type       &Y()       { return adb[ mesh::axis_name(1) ].template as<array_type>(); }
+            inline const array_type &Y() const { return adb[ mesh::axis_name(1) ].template as<array_type>(); }
+            inline array_type       &Z()       { return adb[ mesh::axis_name(2) ].template as<array_type>(); }
+            inline const array_type &Z() const { return adb[ mesh::axis_name(2) ].template as<array_type>(); }
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(curvilinear_mesh);
         };
