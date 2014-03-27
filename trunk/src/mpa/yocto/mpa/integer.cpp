@@ -11,7 +11,7 @@ namespace yocto
         {
             return (s<0) ? __negative : ( (0<s) ? __positive : __zero);
         }
-
+        
         integer:: ~integer() throw()
         {
         }
@@ -46,7 +46,7 @@ namespace yocto
             return x < 0 ? __negative : ( x>0 ? __positive : __zero );
         }
         
-        sign_type integer::neg_of(const sign_type S) throw()
+        sign_type sign_neg(const sign_type S) throw()
         {
             switch(S)
             {
@@ -55,6 +55,30 @@ namespace yocto
                 case __positive: return __negative;
             }
         }
+        
+        sign_type sign_mul(const sign_type lhs,const sign_type rhs) throw()
+        {
+            switch(lhs)
+            {
+                case __negative:
+                    switch(rhs) {
+                        case __negative: return __positive;
+                        case __zero:     return __zero;
+                        case __positive: return __negative;
+                    }
+                    
+                case __zero:
+                    return __zero;
+                    
+                case __positive:
+                    switch(rhs) {
+                        case __negative: return __negative;
+                        case __zero:     return __zero;
+                        case __positive: return __positive;
+                    }
+            }
+        }
+        
         
         uint64_t integer::abs_of(const int64_t x) throw()
         {
@@ -82,7 +106,7 @@ namespace yocto
             cswap_const(s,other.s);
             ((natural &)(n)).xch( (natural &)(other.n) );
         }
-
+        
         integer & integer:: operator=( const integer &other )
         {
             integer tmp(other);
