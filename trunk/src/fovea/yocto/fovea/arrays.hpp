@@ -9,27 +9,27 @@ namespace yocto
     {
         
         template <size_t DIM, typename T>
-        struct array_of;
+        struct types_for;
         
         template <typename T>
-        struct array_of<1,T>
+        struct types_for<1,T>
         {
-            typedef array1D<T>                 type;
-            typedef typename vertex1D<T>::type vertex;
+            typedef array1D<T>                 array_type;
+            typedef typename vertex1D<T>::type vertex_type;
         };
         
         template <typename T>
-        struct array_of<2,T>
+        struct types_for<2,T>
         {
-            typedef array2D<T>                 type;
-            typedef typename vertex1D<T>::type vertex;
+            typedef array2D<T>                 array_type;
+            typedef typename vertex1D<T>::type vertex_type;
         };
         
         template <typename T>
-        struct array_of<3,T>
+        struct types_for<3,T>
         {
-            typedef array3D<T>                 type;
-            typedef typename vertex3D<T>::type vertex;
+            typedef array3D<T>                 array_type;
+            typedef typename vertex3D<T>::type vertex_type;
         };
 
         
