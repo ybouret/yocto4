@@ -19,6 +19,7 @@ namespace yocto
                 use_float,  //!< use float vertices
                 use_double  //!< use double vertices
             };
+            
             enum form_type
             {
                 is_rectilinear,
@@ -31,7 +32,8 @@ namespace yocto
             const form_type form;
             const real_type real;
 
-            static real_type sz2fp( const unsigned sz );
+            static real_type   sz2fp( const unsigned sz );
+            static const char *axis_name( size_t dim );
             
         protected:
             array_db &adb;
