@@ -8,7 +8,7 @@ namespace yocto
     namespace fovea
     {
         
-        void check_edge(size_t,size_t);
+        void check_edge(const VertexBase &a, const VertexBase &b);
         
         //! an edge from an existing mesh
         template <size_t DIM,typename T>
@@ -22,11 +22,10 @@ namespace yocto
             const VTX &v2;
             
             inline Edge( const VTX &a, const VTX &b):
-            v1( a.index < b.index ? a : b ),
-            v2( a.index < b.index ? b : a )
+            v1( a ),
+            v2( b )
             {
-                check_edge(v1.index,v2.index);
-                assert(v1.index<v2.index);
+                check_edge(v1,v2);
             }
             
             inline Edge( const Edge &other ) throw() :
@@ -40,12 +39,14 @@ namespace yocto
             
             friend inline bool operator==( const Edge &lhs, const Edge &rhs ) throw()
             {
-                return (&lhs.v1 == &rhs.v1) && ( &lhs.v2 == &rhs.v2);
+                return
+                ( (&lhs.v1 == &rhs.v1) && ( &lhs.v2 == &rhs.v2) ) ||
+                ( (&lhs.v1 == &rhs.v2) && ( &lhs.v2 == &rhs.v1) );
             }
             
             friend inline bool operator!=( const Edge &lhs, const Edge &rhs ) throw()
             {
-                return (&lhs.v1 != &rhs.v1) || ( &lhs.v2 != &rhs.v2);
+                return ! (lhs==rhs);
             }
             
             inline bool joins( const Edge &other ) const throw()

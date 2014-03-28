@@ -8,23 +8,35 @@ namespace yocto
 {
     namespace fovea
     {
-      
+        
+        class VertexBase
+        {
+        public:
+            virtual ~VertexBase() throw();
+            const size_t index;
+            
+        protected:
+            VertexBase(size_t idx ) throw();
+            VertexBase(const VertexBase &) throw();
+        private:
+            YOCTO_DISABLE_ASSIGN(VertexBase);
+        };
+        
         template <size_t DIM,typename T>
-        class Vertex
+        class Vertex : public VertexBase
         {
         public:
             typedef typename vertex_for<DIM,T>::type vtx;
-            const size_t index;
             
             explicit Vertex( size_t idx, T &cx) throw() :
-            index(idx),
+            VertexBase(idx),
             r()
             {
                 r[0] = &cx;
             }
             
             explicit Vertex(size_t idx, T &cx, T &cy) throw() :
-            index(idx),
+            VertexBase(idx),
             r()
             {
                 r[0] = &cx;
@@ -32,14 +44,21 @@ namespace yocto
             }
             
             explicit Vertex(size_t idx, T &cx, T &cy, T &cz) throw() :
-            index(idx),
+            VertexBase(idx),
             r()
             {
                 r[0] = &cx;
                 r[1] = &cy;
                 r[2] = &cz;
             }
-                        
+            
+            inline Vertex( const Vertex &other ) throw() :
+            VertexBase(other),
+            r()
+            {
+                for(size_t i=0;i<DIM;++i) r[i] = other.r[i];
+            }
+            
             inline ~Vertex() throw() {}
             
             inline T       &x() throw()       { assert(r[0]!=0); return *r[0]; }
