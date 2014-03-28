@@ -6,6 +6,7 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/fovea/line.hpp"
+#include "yocto/ptr/shared.hpp"
 
 using namespace yocto;
 using namespace fovea;
@@ -22,10 +23,11 @@ static inline void show_mesh( const MESH &msh )
         std::cerr << "axis " << id << " bytes: " << l.bytes << std::endl;
     }
     
-#if 0
-    typedef Edge<MESH::DIMS,typename MESH::TYPE> EDGE;
     
-    vector<EDGE> edges;
+    typedef Line<MESH::DIMS,typename MESH::TYPE> LINE;
+    typedef shared_ptr<LINE> LINE_PTR;
+    
+    vector<LINE_PTR> edges;
     size_t nc = 0;
     for(size_t i=0;i<msh.vertices;++i)
     {
@@ -33,14 +35,13 @@ static inline void show_mesh( const MESH &msh )
         {
             if(i!=j)
             {
-                const EDGE E(msh[i],msh[j]);
+                const LINE_PTR p(new LINE(msh[i],msh[j]));
                 ++nc;
-                edges.push_back(E);
+                edges.push_back(p);
             }
         }
     }
     std::cerr << "#created edges=" << nc << std::endl;
-#endif
     
 }
 
