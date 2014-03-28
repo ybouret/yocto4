@@ -2,41 +2,66 @@
 #define YOCTO_FOVEA_CELL_INCLUDED 1
 
 #include "yocto/fovea/vertex.hpp"
-//#include "yocto/container/vslot.hpp"
 
 namespace yocto
 {
     namespace fovea
     {
         
+        size_t check_num_vertices( size_t nv );
+        
         template <size_t DIM,typename T>
         class Cell
         {
         public:
+            //__________________________________________________________________
+            //
+            // types
+            //__________________________________________________________________
             typedef typename vertex_for<DIM,T>::type vertex;
             typedef Vertex<DIM,T>                    VERTEX;
             
-            virtual ~Cell() throw()
-            {
-            }
             
+            //__________________________________________________________________
+            //
+            // public data
+            //__________________________________________________________________
             const size_t vertices;
             
+            //__________________________________________________________________
+            //
+            // API
+            //__________________________________________________________________
+            //! access
+            inline const VERTEX & operator[](size_t iv) const throw()
+            {
+                assert(iv<vertices);
+                assert(p);
+                assert(p[iv]);
+                return *p[iv];
+            }
 
             //! once physical vertices have been set
             virtual void compile() = 0;
             
+            virtual ~Cell() throw()
+            {
+                object::operator delete(p,vertices * sizeof(VERTEX*));
+            }
+            
             
         protected:
-            inline Cell( size_t nv ) throw() :
-            vertices(nv)
+            const VERTEX **p;
+            
+            inline Cell( size_t nv ) :
+            vertices( check_num_vertices(nv) ),
+            p(  (const VERTEX **)(object::operator new(vertices * sizeof(VERTEX*) )) )
             {
             }
             
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
-            virtual const VERTEX **handle() const throw() = 0;
 
         };
         

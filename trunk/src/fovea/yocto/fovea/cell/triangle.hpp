@@ -20,9 +20,9 @@ namespace yocto
             Cell<DIM,T>(3)
             {
                 check_triangle(a,b,c);
-                p[0] = &a;
-                p[1] = &b;
-                p[2] = &c;
+                this->p[0] = &a;
+                this->p[1] = &b;
+                this->p[2] = &c;
             }
             
             virtual ~Triangle() throw()
@@ -36,12 +36,7 @@ namespace yocto
             }
 
         private:
-            const VERTEX *p[3];
             YOCTO_DISABLE_COPY_AND_ASSIGN(Triangle);
-            virtual const VERTEX **handle() const throw()
-            {
-                return (const VERTEX **)p;
-            }
         };
         
     }
