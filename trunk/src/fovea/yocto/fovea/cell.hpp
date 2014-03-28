@@ -1,7 +1,7 @@
 #ifndef YOCTO_FOVEA_CELL_INCLUDED
 #define YOCTO_FOVEA_CELL_INCLUDED 1
 
-#include "yocto/fovea/vertex.hpp"
+#include "yocto/fovea/mesh.hpp"
 
 namespace yocto
 {
@@ -20,7 +20,8 @@ namespace yocto
             //__________________________________________________________________
             typedef typename vertex_for<DIM,T>::type vertex;
             typedef Vertex<DIM,T>                    VERTEX;
-            
+            typedef Edge<DIM,T>                      EDGE;
+            typedef Mesh<DIM,T>                      MESH;
             
             //__________________________________________________________________
             //
@@ -42,7 +43,7 @@ namespace yocto
             }
 
             //! once physical vertices have been set
-            virtual void compile() = 0;
+            virtual void compile( const MESH & ) = 0;
             
             virtual ~Cell() throw()
             {

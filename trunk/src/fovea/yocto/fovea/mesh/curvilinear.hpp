@@ -11,18 +11,19 @@ namespace yocto
     {
         
         template <typename T,typename LAYOUT>
-        class curvilinear_mesh : public mesh_of<LAYOUT::DIMENSIONS,T>, public LAYOUT
+        class curvilinear_mesh : public Mesh<LAYOUT::DIMENSIONS,T>, public LAYOUT
         {
         public:
             typedef typename array_for<LAYOUT::DIMENSIONS,T>::type   array_type;
-            typedef mesh_of<LAYOUT::DIMENSIONS,T>                    mesh_type;
-            typedef typename mesh_type::VERTEX                       VERTEX;
-            typedef typename mesh_type::EDGE                         EDGE;
-
+            typedef Mesh<LAYOUT::DIMENSIONS,T>    MESH;
+            typedef typename MESH::VERTEX         VERTEX;
+            typedef typename MESH::EDGE           EDGE;
+            
+            
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
-            mesh_type(a,
-                      L.items,
-                      mesh::is_curvilinear),
+            MESH(a,
+                 L.items,
+                 mesh::is_curvilinear),
             LAYOUT(L)
             {
                 for(size_t i=0;i<this->dims;++i)
@@ -73,7 +74,7 @@ namespace yocto
                     }
                 }
             }
-
+            
             inline void assign( int2type<3> ) throw()
             {
                 array_type &aX = X();
@@ -90,7 +91,7 @@ namespace yocto
                         }
                     }
                 }
-
+                
             }
         };
         

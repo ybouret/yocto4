@@ -57,7 +57,7 @@ namespace yocto
         };
         
         template <size_t DIM,typename T>
-        class mesh_of : public mesh
+        class Mesh : public mesh
         {
         public:
             static const size_t       DIMS = DIM;
@@ -82,7 +82,7 @@ namespace yocto
                 return vtx[v];
             }
             
-            virtual ~mesh_of() throw() {
+            virtual ~Mesh() throw() {
                 if(assigned)
                 {
                     size_t i = vertices;
@@ -95,10 +95,10 @@ namespace yocto
             }
             
         protected:
-            explicit mesh_of(array_db     &a,
-                             const size_t nv,
-                             const form_type f
-                             ) :
+            explicit Mesh(array_db     &a,
+                          const size_t nv,
+                          const form_type f
+                          ) :
             mesh(a,DIM,nv,f,sizeof(T)),
             num( vertices ),
             vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) )
@@ -109,7 +109,7 @@ namespace yocto
             VERTEX   *vtx; //!< for memory
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(mesh_of);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Mesh);
         public:
             EDGE_DB edb;
             virtual size_t num_edges() const throw() { return edb.size(); }

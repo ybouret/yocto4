@@ -28,9 +28,10 @@ static inline void show_mesh( const MESH &msh )
     typedef Line<MESH::DIMS,typename MESH::TYPE>     LINE;
     typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
 
-    typedef shared_ptr<LINE> LINE_PTR;
+    typedef shared_ptr<LINE>
+    LINE_PTR;
     typedef shared_ptr<TRIANGLE> TRIANGLE_PTR;
-    vector<LINE_PTR>     edges;
+    vector<LINE_PTR>     lines;
     vector<TRIANGLE_PTR> tri;
     
     size_t nc = 0;
@@ -42,7 +43,7 @@ static inline void show_mesh( const MESH &msh )
             {
                 const LINE_PTR p(new LINE(msh[i],msh[j]));
                 ++nc;
-                edges.push_back(p);
+                lines.push_back(p);
             }
         }
     }

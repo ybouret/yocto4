@@ -14,5 +14,11 @@ namespace yocto
                 throw exception("UNEXPECTED Line with same Vertices INDEX!!!");
         }
         
+        
+        void check_edge(const void *addr,const edge_key &ek)
+        {
+            if(!addr)
+                throw exception("no edge for line from Vertex #%u -> Vertex #%u", unsigned(ek.i1), unsigned(ek.i2) );
+        }
     }
 }

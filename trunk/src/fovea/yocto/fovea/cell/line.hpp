@@ -8,14 +8,21 @@ namespace yocto
     namespace fovea
     {
         void check_line(const VertexBase &a, const VertexBase &b);
+        void check_edge(const void *addr,const edge_key &ek);
         
         template <size_t DIM,typename T>
         class Line : public Cell<DIM,T>
         {
         public:
-            typedef Vertex<DIM,T> VERTEX;
+            typedef Cell<DIM,T>           CELL;
+            typedef typename CELL::VERTEX VERTEX;
+            typedef typename CELL::EDGE   EDGE;
+            typedef Mesh<DIM,T>           MESH;
+            
+            const EDGE *edge;
             explicit Line(const VERTEX &a, const VERTEX &b) :
-            Cell<DIM,T>(2)
+            Cell<DIM,T>(2),
+            edge(0)
             {
                 check_line(a,b);
                 this->p[0] = &a;
@@ -26,9 +33,12 @@ namespace yocto
             {
             }
             
-            virtual void compile()
+            virtual void compile( const MESH &m )
             {
-                
+                const CELL &cell = *this;
+                const edge_key ek(cell[0].index,cell[1].index);
+                edge = m.edb.search(ek);
+                check_edge(edge,ek);
             }
             
         private:
