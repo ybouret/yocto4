@@ -1,4 +1,4 @@
-#include "yocto/fovea/line.hpp"
+#include "yocto/fovea/cell/line.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
