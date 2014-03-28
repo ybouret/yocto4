@@ -1,7 +1,7 @@
 #ifndef YOCTO_FOVEA_ARRAY1D_INCLUDED
 #define YOCTO_FOVEA_ARRAY1D_INCLUDED 1
 
-#include "yocto/fovea/dimensions.hpp"
+#include "yocto/fovea/layout.hpp"
 #include "yocto/fovea/linear.hpp"
 
 namespace yocto
@@ -10,6 +10,7 @@ namespace yocto
     namespace fovea
     {
         
+        template <size_t,typename> struct array_for;
 
         template <typename T>
         class array1D : public linear<T,layout1D>
@@ -54,6 +55,8 @@ namespace yocto
             virtual void                 *get_handle() const throw() { return (void*)this; }
             virtual const std::type_info &get_typeid() const throw() { return typeid(varray_type); }
         };
+        
+        template <typename T> struct array_for<1,T> { typedef array1D<T> type; };
         
     }
     

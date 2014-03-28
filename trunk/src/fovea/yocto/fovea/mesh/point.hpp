@@ -2,7 +2,6 @@
 #define YOCTO_FOVEA_POINT_MESH_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/edge.hpp"
 
 namespace yocto
 {
@@ -16,7 +15,6 @@ namespace yocto
         public:
             typedef array1D<T>              axis_type;
             typedef mesh_of<DIM,T>          mesh_type;
-            typedef edge<DIM,T>             edge_type;
             typedef typename mesh_type::VTX VTX;
             
             virtual ~point_mesh() throw() {}

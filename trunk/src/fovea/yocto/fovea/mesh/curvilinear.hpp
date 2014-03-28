@@ -2,6 +2,7 @@
 #define YOCTO_FOVEA_MESH_CURVILINEAR_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
+#include "yocto/fovea/array3d.hpp"
 
 namespace yocto
 {
@@ -13,10 +14,9 @@ namespace yocto
         class curvilinear_mesh : public mesh_of<LAYOUT::DIMENSIONS,T>, public LAYOUT
         {
         public:
-            typedef typename types_for<LAYOUT::DIMENSIONS,T>::array_type  array_type;
-            typedef typename types_for<LAYOUT::DIMENSIONS,T>::edge_type   edge_type;
-            typedef mesh_of<LAYOUT::DIMENSIONS,T>                         mesh_type;
-            typedef typename mesh_type::VTX                               VTX;
+            typedef typename array_for<LAYOUT::DIMENSIONS,T>::type   array_type;
+            typedef mesh_of<LAYOUT::DIMENSIONS,T>                    mesh_type;
+            typedef typename mesh_type::VTX                          VTX;
 
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             mesh_type(a,

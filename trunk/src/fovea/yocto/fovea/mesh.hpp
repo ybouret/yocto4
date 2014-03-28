@@ -1,9 +1,8 @@
 #ifndef YOCTO_FOVEA_MESH_INCLUDED
 #define YOCTO_FOVEA_MESH_INCLUDED 1
 
-#include "yocto/fovea/dimensions.hpp"
 #include "yocto/fovea/array-db.hpp"
-#include "yocto/fovea/arrays.hpp"
+#include "yocto/fovea/vertex.hpp"
 
 namespace yocto
 {
@@ -58,6 +57,8 @@ namespace yocto
         class mesh_of : public mesh
         {
         public:
+            static const size_t   DIMS = DIM;
+            typedef T             TYPE;
             typedef Vertex<DIM,T> VTX;
             
             inline VTX & operator[]( size_t v ) throw()

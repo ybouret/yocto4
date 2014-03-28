@@ -5,7 +5,7 @@
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
-
+#include "yocto/fovea/edge.hpp"
 
 using namespace yocto;
 using namespace fovea;
@@ -22,9 +22,9 @@ static inline void show_mesh( const MESH &msh )
         std::cerr << "axis " << id << " bytes: " << l.bytes << std::endl;
     }
     
-    typedef typename MESH::edge_type Edge;
+    typedef Edge<MESH::DIMS,typename MESH::TYPE> EDGE;
     
-    vector<Edge> edges;
+    vector<EDGE> edges;
     size_t nc = 0;
     for(size_t i=0;i<msh.vertices;++i)
     {
@@ -32,7 +32,7 @@ static inline void show_mesh( const MESH &msh )
         {
             if(i!=j)
             {
-                const Edge E(msh[i],msh[j]);
+                const EDGE E(msh[i],msh[j]);
                 ++nc;
                 edges.push_back(E);
             }
