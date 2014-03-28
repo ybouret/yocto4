@@ -14,9 +14,19 @@ namespace yocto
         class rectilinear_mesh : public mesh_of<LAYOUT::DIMENSIONS,T>, public LAYOUT
         {
         public:
-            typedef array1D<T>                                            axis_type;
-            typedef mesh_of<LAYOUT::DIMENSIONS,T>                         mesh_type;
-            typedef typename mesh_type::VERTEX                            VERTEX;
+            //__________________________________________________________________
+            //
+            // types
+            //__________________________________________________________________
+            typedef array1D<T>                    axis_type;
+            typedef mesh_of<LAYOUT::DIMENSIONS,T> mesh_type;
+            typedef typename mesh_type::VERTEX    VERTEX;
+            typedef typename mesh_type::EDGE      EDGE;
+            
+            //__________________________________________________________________
+            //
+            // initialization
+            //__________________________________________________________________
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :
             mesh_type(a,L.items,mesh::is_rectilinear),
@@ -34,6 +44,10 @@ namespace yocto
             
             inline virtual ~rectilinear_mesh() throw() {}
             
+            //__________________________________________________________________
+            //
+            // get axis
+            //__________________________________________________________________
             inline axis_type       &X()       { return this->adb[ mesh::axis_name(0) ].template as<axis_type>(); }
             inline const axis_type &X() const { return this->adb[ mesh::axis_name(0) ].template as<axis_type>(); }
             inline axis_type       &Y()       { return this->adb[ mesh::axis_name(1) ].template as<axis_type>(); }
@@ -45,6 +59,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
             inline void assign( int2type<1> ) throw()
             {
+                // vertices
                 axis_type &aX = X();
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
@@ -52,6 +67,17 @@ namespace yocto
                     new (this->vtx+v) VERTEX(v,aX[i] );
                 }
                 
+                // edges
+                const size_t edges = this->vertices - 1;
+                this->edb.reserve(edges);
+                for(size_t i1=0,i2=1;i1<edges;++i1,++i2)
+                {
+                    const EDGE edge( this->vtx[i1], this->vtx[i2] );
+                    if( !this->edb.insert(edge) )
+                    {
+                        this->throw_multiple_edges(i1,i2);
+                    }
+                }
             }
             
             inline void assign( int2type<2> ) throw()
