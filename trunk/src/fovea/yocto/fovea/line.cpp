@@ -6,15 +6,13 @@ namespace yocto
     
     namespace fovea
     {
-#if 0
-        void check_edge(const VertexBase &a, const VertexBase &b)
+        void check_line(const VertexBase &a, const VertexBase &b)
         {
             if(&a == &b)
-                throw exception("Edge with same Vertices!");
+                throw exception("Line with same Vertices!");
             if(a.index==b.index)
-                throw exception("UNEXPECTED Edge with same Vertices INDEX!!!");
+                throw exception("UNEXPECTED Line with same Vertices INDEX!!!");
         }
-#endif
         
     }
 }

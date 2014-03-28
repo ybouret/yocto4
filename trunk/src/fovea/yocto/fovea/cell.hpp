@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_CELL_INCLUDED 1
 
 #include "yocto/fovea/vertex.hpp"
-#include "yocto/container/vslot.hpp"
+//#include "yocto/container/vslot.hpp"
 
 namespace yocto
 {
@@ -10,7 +10,7 @@ namespace yocto
     {
         
         template <size_t DIM,typename T>
-        class Cell : public vslot
+        class Cell
         {
         public:
             typedef typename vertex_for<DIM,T>::type vertex;
@@ -22,7 +22,6 @@ namespace yocto
             
             const size_t vertices;
             
-            virtual VERTEX **vtx() const throw() = 0;
 
             //! once physical vertices have been set
             virtual void compile() = 0;
@@ -37,6 +36,8 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
+            virtual const VERTEX **handle() const throw() = 0;
+
         };
         
     }
