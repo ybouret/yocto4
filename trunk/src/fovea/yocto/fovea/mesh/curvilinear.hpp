@@ -16,7 +16,7 @@ namespace yocto
         public:
             typedef typename array_for<LAYOUT::DIMENSIONS,T>::type   array_type;
             typedef mesh_of<LAYOUT::DIMENSIONS,T>                    mesh_type;
-            typedef typename mesh_type::VTX                          VTX;
+            typedef typename mesh_type::VERTEX                       VERTEX;
 
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             mesh_type(a,
@@ -54,7 +54,7 @@ namespace yocto
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
                 {
-                    new (this->vtx+v) VTX(v,aX[i] );
+                    new (this->vtx+v) VERTEX(v,aX[i] );
                 }
                 
             }
@@ -68,7 +68,7 @@ namespace yocto
                 {
                     for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                     {
-                        new (this->vtx+v) VTX(v,aX[j][i],aY[j][i] );
+                        new (this->vtx+v) VERTEX(v,aX[j][i],aY[j][i] );
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace yocto
                     {
                         for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                         {
-                            new (this->vtx+v) VTX(v,aX[k][j][i], aY[k][j][i], aZ[k][j][i] );
+                            new (this->vtx+v) VERTEX(v,aX[k][j][i], aY[k][j][i], aZ[k][j][i] );
                         }
                     }
                 }

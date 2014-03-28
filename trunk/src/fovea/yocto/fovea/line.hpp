@@ -8,6 +8,7 @@ namespace yocto
     namespace fovea
     {
         
+#if 0
         void check_edge(const VertexBase &a, const VertexBase &b);
         
         //! an edge from an existing mesh
@@ -62,7 +63,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_ASSIGN(Edge);
         };
-        
+#endif
     }
 }
 
