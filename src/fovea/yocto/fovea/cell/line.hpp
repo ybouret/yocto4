@@ -1,5 +1,5 @@
-#ifndef YOCTO_FOVEA_LINE_INCLUDED
-#define YOCTO_FOVEA_LINE_INCLUDED 1
+#ifndef YOCTO_FOVEA_CELL_LINE_INCLUDED
+#define YOCTO_FOVEA_CELL_LINE_INCLUDED 1
 
 #include "yocto/fovea/cell.hpp"
 

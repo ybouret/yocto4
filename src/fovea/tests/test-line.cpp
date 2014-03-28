@@ -5,7 +5,7 @@
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/fovea/line.hpp"
+#include "yocto/fovea/cell/line.hpp"
 #include "yocto/ptr/shared.hpp"
 
 using namespace yocto;

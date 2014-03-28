@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/fovea/line.hpp"
+#include "yocto/fovea/cell/line.hpp"
 
 #include "yocto/fovea/mesh/rectilinear.hpp"
 #include "yocto/fovea/mesh/curvilinear.hpp"
