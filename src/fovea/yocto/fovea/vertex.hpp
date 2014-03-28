@@ -8,39 +8,13 @@ namespace yocto
 {
     namespace fovea
     {
-        template <size_t,typename>
-        struct vertex_for;
-        
-        template <typename T> struct vertex_for<1,T>
-        { typedef T type; };
-        
-        template <typename T> struct vertex_for<2,T>
-        { typedef math::v2d<T> type; };
-        
-        template <typename T> struct vertex_for<3,T>
-        { typedef math::v3d<T> type; };
-
+      
         template <size_t DIM,typename T>
         class Vertex
         {
         public:
             typedef typename vertex_for<DIM,T>::type vtx;
             const size_t index;
-            
-#if 0
-            class Handle
-            {
-            public:
-                Handle *next;
-                Handle *prev;
-                Vertex *addr;
-                YOCTO_MAKE_OBJECT
-                inline  Handle( Vertex &v ) throw() : next(0), prev(0), addr(&v) {}
-                inline ~Handle() throw() {}
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(Handle);
-            };
-#endif
             
             explicit Vertex( size_t idx, T &cx) throw() :
             index(idx),
@@ -100,10 +74,6 @@ namespace yocto
             {
                 return vtx(x(),y(),z());
             }
-            
-            
-        public:
-            //core::list_of<Handle> neighbors;
         };
         
     }

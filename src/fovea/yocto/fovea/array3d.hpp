@@ -105,6 +105,8 @@ namespace yocto
             slice_type *slices;
         };
         
+        template <typename T> struct array_for<3,T> { typedef array3D<T> type; };
+
     }
     
 }

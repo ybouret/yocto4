@@ -2,21 +2,47 @@
 #define YOCTO_FOVEA_TYPES_INCLUDED 1
 
 #include "yocto/ordered/sorted-vector.hpp"
+#include "yocto/math/v3d.hpp"
 
 namespace yocto
 {
     namespace fovea
     {
+        //______________________________________________________________________
+        //
+        // definitions
+        //______________________________________________________________________
         typedef ptrdiff_t              unit_t;
         typedef memory::global         memory_kind;
         typedef memory_kind::allocator memory_allocator;
         
-        enum dimension_t
-        {
-            on_x=0,
-            on_y=1,
-            on_z=2
-        };
+        //______________________________________________________________________
+        //
+        // vertex for dimension
+        //______________________________________________________________________
+        template <size_t,typename>
+        struct vertex_for; //! root template
+        
+        template <typename T> struct vertex_for<1,T> { typedef T type; };
+        template <typename T> struct vertex_for<2,T> { typedef math::v2d<T> type; };
+        template <typename T> struct vertex_for<3,T> { typedef math::v3d<T> type; };
+        
+
+        //______________________________________________________________________
+        //
+        // logical coordinates
+        //______________________________________________________________________
+        typedef unit_t            coord1D;
+        typedef math::v2d<unit_t> coord2D;
+        typedef math::v3d<unit_t> coord3D;
+        
+        template <size_t>
+        struct coord_for;
+        template <> struct coord_for<1> { typedef coord1D type; };
+        template <> struct coord_for<2> { typedef coord2D type; };
+        template <> struct coord_for<3> { typedef coord3D type; };
+
+        
         
         //! extract coord from compound COORD
         template <typename COORD>

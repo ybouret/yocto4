@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/fovea/dimensions.hpp"
+#include "yocto/fovea/layout.hpp"
 
 using namespace yocto;
 using namespace fovea;

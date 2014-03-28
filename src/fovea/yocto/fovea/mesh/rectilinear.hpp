@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
-#include "yocto/fovea/edge.hpp"
+#include "yocto/fovea/array1d.hpp"
 
 namespace yocto
 {
@@ -16,7 +16,6 @@ namespace yocto
         public:
             typedef array1D<T>                                            axis_type;
             typedef mesh_of<LAYOUT::DIMENSIONS,T>                         mesh_type;
-            typedef typename types_for<LAYOUT::DIMENSIONS,T>::edge_type   edge_type;
             typedef typename mesh_type::VTX                               VTX;
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :

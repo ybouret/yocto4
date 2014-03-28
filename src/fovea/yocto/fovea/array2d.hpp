@@ -105,6 +105,9 @@ namespace yocto
             size_t    nrow;
             row_type *rows;
         };
+        
+        template <typename T> struct array_for<2,T> { typedef array2D<T> type; };
+
     }
 }
 #endif
