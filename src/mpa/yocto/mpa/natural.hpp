@@ -262,6 +262,40 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             //__________________________________________________________________
             static natural rand(size_t nbits);
             
+            //__________________________________________________________________
+            //
+			// Bitwise
+            //__________________________________________________________________
+            typedef uint8_t  bword_t;
+            typedef bword_t (*bproc)(bword_t,bword_t);
+            static  natural bitwise( const natural &lhs, const natural &rhs, bproc ops );
+            
+            static  natural __and(const natural &lhs, const natural &rhs);
+            static  natural __and(const natural &lhs, const uint64_t rhs);
+            friend  natural operator&(const natural &lhs, const natural &rhs);
+            friend  natural operator&(const natural &lhs, const uint64_t rhs);
+            friend  natural operator&(const uint64_t lhs, const natural &rhs);
+            natural & operator&=(const natural &);
+            natural & operator&=(const uint64_t );
+
+            
+            static  natural __or( const natural &lhs, const natural &rhs);
+            static  natural __or( const natural &lhs, const uint64_t rhs);
+            friend  natural operator|(const natural &lhs, const natural &rhs);
+            friend  natural operator|(const natural &lhs, const uint64_t rhs);
+            friend  natural operator|(const uint64_t lhs, const natural &rhs);
+            natural & operator|=(const natural &);
+            natural & operator|=(const uint64_t );
+            
+            static  natural __xor(const natural &lhs, const natural &rhs);
+            static  natural __xor(const natural &lhs, const uint64_t rhs);
+            friend  natural operator^(const natural &lhs, const natural &rhs);
+            friend  natural operator^(const natural &lhs, const uint64_t rhs);
+            friend  natural operator^(const uint64_t lhs, const natural &rhs);
+            natural & operator^=(const natural &);
+            natural & operator^=(const uint64_t );
+            
+            
         private:
             size_t   maxi;
             size_t   size;
