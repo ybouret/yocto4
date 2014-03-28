@@ -16,7 +16,7 @@ namespace yocto
         public:
             typedef array1D<T>                                            axis_type;
             typedef mesh_of<LAYOUT::DIMENSIONS,T>                         mesh_type;
-            typedef typename mesh_type::VTX                               VTX;
+            typedef typename mesh_type::VERTEX                            VERTEX;
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :
             mesh_type(a,L.items,mesh::is_rectilinear),
@@ -49,7 +49,7 @@ namespace yocto
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
                 {
-                    new (this->vtx+v) VTX(v,aX[i] );
+                    new (this->vtx+v) VERTEX(v,aX[i] );
                 }
                 
             }
@@ -64,7 +64,7 @@ namespace yocto
                     T &y = aY[j];
                     for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                     {
-                        new (this->vtx+v) VTX(v,aX[i], y );
+                        new (this->vtx+v) VERTEX(v,aX[i], y );
                     }
                 }
             }
@@ -83,7 +83,7 @@ namespace yocto
                         T &y = aY[j];
                         for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                         {
-                            new (this->vtx+v) VTX(v,aX[i], y,z );
+                            new (this->vtx+v) VERTEX(v,aX[i], y,z );
                         }
                     }
                 }

@@ -13,9 +13,9 @@ namespace yocto
         class point_mesh : public mesh_of<DIM,T>, public layout1D
         {
         public:
-            typedef array1D<T>              axis_type;
-            typedef mesh_of<DIM,T>          mesh_type;
-            typedef typename mesh_type::VTX VTX;
+            typedef array1D<T>                 axis_type;
+            typedef mesh_of<DIM,T>             mesh_type;
+            typedef typename mesh_type::VERTEX VERTEX;
             
             virtual ~point_mesh() throw() {}
             
@@ -48,7 +48,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) VTX(j,aX[i]);
+                    new (this->vtx+j) VERTEX(j,aX[i]);
                 }
             
             }
@@ -60,7 +60,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) VTX(j,aX[i],aY[i]);
+                    new (this->vtx+j) VERTEX(j,aX[i],aY[i]);
                 }
 
             }
@@ -73,7 +73,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) VTX(j,aX[i],aY[i],aZ[i]);
+                    new (this->vtx+j) VERTEX(j,aX[i],aY[i],aZ[i]);
                 }
             }
             

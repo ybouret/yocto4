@@ -59,9 +59,9 @@ namespace yocto
         public:
             static const size_t   DIMS = DIM;
             typedef T             TYPE;
-            typedef Vertex<DIM,T> VTX;
+            typedef Vertex<DIM,T> VERTEX;
             
-            inline VTX & operator[]( size_t v ) throw()
+            inline VERTEX & operator[]( size_t v ) throw()
             {
                 assert(v<vertices);
                 assert(vtx);
@@ -69,7 +69,7 @@ namespace yocto
                 return vtx[v];
             }
             
-            inline const VTX & operator[]( size_t v ) const throw()
+            inline const VERTEX & operator[]( size_t v ) const throw()
             {
                 assert(v<vertices);
                 assert(vtx);
@@ -83,10 +83,10 @@ namespace yocto
                     size_t i = vertices;
                     while(i>0)
                     {
-                        vtx[--i].~VTX();
+                        vtx[--i].~VERTEX();
                     }
                 }
-                memory::kind<memory_kind>::release_as<VTX>(vtx,num);
+                memory::kind<memory_kind>::release_as<VERTEX>(vtx,num);
             }
             
         protected:
@@ -96,12 +96,12 @@ namespace yocto
                              ) :
             mesh(a,DIM,nv,f,sizeof(T)),
             num( vertices ),
-            vtx( memory::kind<memory_kind>::acquire_as<VTX>(num) )
+            vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) )
             {
             }
             
-            size_t num; //!< for memory
-            VTX   *vtx; //!< for memory
+            size_t    num; //!< for memory
+            VERTEX   *vtx; //!< for memory
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mesh_of);
