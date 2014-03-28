@@ -8,7 +8,7 @@ namespace yocto
 {
     namespace fovea
     {
-        
+        //! an edge from an existing mesh
         template <size_t DIM,typename T>
         class edge
         {
@@ -28,11 +28,6 @@ namespace yocto
                 if(v1.index==v2.index)
                     throw exception("same indices for edge");
                 assert(v1.index<v2.index);
-                /*
-                 const vtx r1 = v1.make_pos();
-                 const vtx r2 = v2.make_pos();
-                 (vtx&)mid    = T(0.5) * (r1+r2);
-                 */
             }
             
             inline edge( const edge &other ) throw() :
