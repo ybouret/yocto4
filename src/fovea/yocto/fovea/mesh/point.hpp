@@ -10,19 +10,20 @@ namespace yocto
     {
         
         template <size_t DIM, typename T>
-        class point_mesh : public mesh_of<DIM,T>, public layout1D
+        class point_mesh : public Mesh<DIM,T>, public layout1D
         {
         public:
-            typedef array1D<T>                 axis_type;
-            typedef mesh_of<DIM,T>             mesh_type;
-            typedef typename mesh_type::VERTEX VERTEX;
-            typedef typename mesh_type::EDGE   EDGE;
+            typedef array1D<T>                    axis_type;
+            typedef Mesh<DIM,T>                   MESH;
+            typedef typename MESH::VERTEX         VERTEX;
+            typedef typename MESH::EDGE           EDGE;
+
 
             virtual ~point_mesh() throw() {}
             
             explicit point_mesh(array_db       &a,
                                 const layout1D &L) :
-            mesh_type(a,L.items,mesh::is_point),
+            MESH(a,L.items,mesh::is_point),
             layout1D(L)
             {
                 for(size_t i=0;i<this->dims;++i)

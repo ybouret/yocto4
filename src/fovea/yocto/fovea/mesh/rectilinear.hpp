@@ -11,7 +11,7 @@ namespace yocto
     {
         
         template <typename T,typename LAYOUT>
-        class rectilinear_mesh : public mesh_of<LAYOUT::DIMENSIONS,T>, public LAYOUT
+        class rectilinear_mesh : public Mesh<LAYOUT::DIMENSIONS,T>, public LAYOUT
         {
         public:
             //__________________________________________________________________
@@ -19,9 +19,9 @@ namespace yocto
             // types
             //__________________________________________________________________
             typedef array1D<T>                    axis_type;
-            typedef mesh_of<LAYOUT::DIMENSIONS,T> mesh_type;
-            typedef typename mesh_type::VERTEX    VERTEX;
-            typedef typename mesh_type::EDGE      EDGE;
+            typedef Mesh<LAYOUT::DIMENSIONS,T>    MESH;
+            typedef typename MESH::VERTEX         VERTEX;
+            typedef typename MESH::EDGE           EDGE;
             
             //__________________________________________________________________
             //
@@ -29,7 +29,7 @@ namespace yocto
             //__________________________________________________________________
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :
-            mesh_type(a,L.items,mesh::is_rectilinear),
+            MESH(a,L.items,mesh::is_rectilinear),
             LAYOUT(L)
             {
                 for(size_t i=0;i<this->dims;++i)

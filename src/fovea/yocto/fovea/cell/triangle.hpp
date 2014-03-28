@@ -14,6 +14,8 @@ namespace yocto
         {
         public:
             typedef  Vertex<DIM,T> VERTEX;
+            typedef Mesh<DIM,T>    MESH;
+
             explicit Triangle(const VERTEX &a,
                               const VERTEX &b,
                               const VERTEX &c) :
@@ -30,7 +32,7 @@ namespace yocto
             }
             
             
-            virtual void compile()
+            virtual void compile(const MESH &)
             {
                 
             }
