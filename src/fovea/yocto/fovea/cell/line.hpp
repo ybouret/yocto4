@@ -8,7 +8,7 @@ namespace yocto
     namespace fovea
     {
         void check_line(const VertexBase &a, const VertexBase &b);
-
+        
         template <size_t DIM,typename T>
         class Line : public Cell<DIM,T>
         {
@@ -18,8 +18,8 @@ namespace yocto
             Cell<DIM,T>(2)
             {
                 check_line(a,b);
-                p[0] = &a;
-                p[1] = &b;
+                this->p[0] = &a;
+                this->p[1] = &b;
             }
             
             virtual ~Line() throw()
@@ -32,12 +32,7 @@ namespace yocto
             }
             
         private:
-            const VERTEX *p[2];
             YOCTO_DISABLE_COPY_AND_ASSIGN(Line);
-            virtual const VERTEX **handle() const throw()
-            {
-                return (const VERTEX **)p;
-            }
         };
         
     }

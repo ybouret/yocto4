@@ -7,6 +7,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/fovea/cell/line.hpp"
 #include "yocto/ptr/shared.hpp"
+#include "yocto/fovea/cell/triangle.hpp"
 
 using namespace yocto;
 using namespace fovea;
@@ -24,10 +25,14 @@ static inline void show_mesh( const MESH &msh )
     }
     
     
-    typedef Line<MESH::DIMS,typename MESH::TYPE> LINE;
+    typedef Line<MESH::DIMS,typename MESH::TYPE>     LINE;
+    typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
+
     typedef shared_ptr<LINE> LINE_PTR;
+    typedef shared_ptr<TRIANGLE> TRIANGLE_PTR;
+    vector<LINE_PTR>     edges;
+    vector<TRIANGLE_PTR> tri;
     
-    vector<LINE_PTR> edges;
     size_t nc = 0;
     for(size_t i=0;i<msh.vertices;++i)
     {
@@ -43,6 +48,20 @@ static inline void show_mesh( const MESH &msh )
     }
     std::cerr << "#created edges=" << nc << std::endl;
     
+    
+    for(size_t i=0;i<100;++i)
+    {
+        size_t i1 = alea_lt(msh.vertices);
+        size_t i2 = i1;
+        while(i2==i1)
+            i2 = alea_lt(msh.vertices);
+        size_t i3 = i1;
+        while(i3==i1||i3==i2)
+            i3 = alea_lt(msh.vertices);
+        const TRIANGLE_PTR p( new TRIANGLE(msh[i1],msh[i2],msh[i3]));
+        tri.push_back(p);
+    }
+    std::cerr << "#created triangles = " << tri.size() << std::endl;
 }
 
 YOCTO_UNIT_TEST_IMPL(line)
