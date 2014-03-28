@@ -2,7 +2,7 @@
 #define YOCTO_FOVEA_MESH_INCLUDED 1
 
 #include "yocto/fovea/array-db.hpp"
-#include "yocto/fovea/vertex.hpp"
+#include "yocto/fovea/edge.hpp"
 
 namespace yocto
 {
@@ -35,6 +35,8 @@ namespace yocto
             const real_type real;
             array_db       &adb;
             
+            virtual size_t num_edges() const throw() = 0;
+            
             static real_type   sz2fp( const unsigned sz ); //!< size to real_type
             static const char *axis_name( size_t dim );
             
@@ -47,6 +49,7 @@ namespace yocto
                           const size_t    s) throw();
             
             bool assigned; //!< for VTX cleanup
+            void throw_multiple_edges(size_t i1, size_t i2);
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mesh);
@@ -57,9 +60,11 @@ namespace yocto
         class mesh_of : public mesh
         {
         public:
-            static const size_t   DIMS = DIM;
-            typedef T             TYPE;
-            typedef Vertex<DIM,T> VERTEX;
+            static const size_t       DIMS = DIM;
+            typedef T                 TYPE;
+            typedef Vertex<DIM,T>     VERTEX;
+            typedef Edge<DIM,T>       EDGE;
+            typedef typename EDGE::DB EDGE_DB;
             
             inline VERTEX & operator[]( size_t v ) throw()
             {
@@ -105,6 +110,9 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mesh_of);
+        public:
+            EDGE_DB edb;
+            virtual size_t num_edges() const throw() { return edb.size(); }
         };
     }
     

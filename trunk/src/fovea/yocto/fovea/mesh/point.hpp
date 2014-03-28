@@ -16,7 +16,8 @@ namespace yocto
             typedef array1D<T>                 axis_type;
             typedef mesh_of<DIM,T>             mesh_type;
             typedef typename mesh_type::VERTEX VERTEX;
-            
+            typedef typename mesh_type::EDGE   EDGE;
+
             virtual ~point_mesh() throw() {}
             
             explicit point_mesh(array_db       &a,

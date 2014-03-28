@@ -61,6 +61,11 @@ namespace yocto
             throw exception("mesh: invalid dimension index");
         }
         
+        void mesh:: throw_multiple_edges(size_t i1, size_t i2)
+        {
+            throw exception("mesh: multiple edges #%u->#%u", unsigned(i1), unsigned(i2) );
+        }
+
         
     }
     

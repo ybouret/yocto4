@@ -17,6 +17,7 @@ namespace yocto
             typedef typename array_for<LAYOUT::DIMENSIONS,T>::type   array_type;
             typedef mesh_of<LAYOUT::DIMENSIONS,T>                    mesh_type;
             typedef typename mesh_type::VERTEX                       VERTEX;
+            typedef typename mesh_type::EDGE                         EDGE;
 
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             mesh_type(a,
