@@ -38,7 +38,8 @@ namespace yocto {
 
         static inline bword bw_and( bword a, bword b ) throw()
         {
-            return (a and b);
+            //return (a and b);
+			return a&b;
         }
         
         natural natural:: __and(const natural &lhs, const natural &rhs )
@@ -87,7 +88,8 @@ namespace yocto {
         //______________________________________________________________________
         static inline bword bw_or( bword a, bword b ) throw()
         {
-            return (a or b);
+            //return (a or b);
+			return a|b;
         }
         
         natural natural:: __or(const natural &lhs, const natural &rhs )
@@ -136,7 +138,8 @@ namespace yocto {
         //______________________________________________________________________
         static inline bword bw_xor( bword a, bword b ) throw()
         {
-            return (a xor b);
+            //return (a xor b);
+			return a^b;
         }
         
         natural natural:: __xor(const natural &lhs, const natural &rhs )
