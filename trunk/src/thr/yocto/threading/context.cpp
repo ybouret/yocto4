@@ -38,6 +38,10 @@ namespace yocto
         ////////////////////////////////////////////////////////////////////////
         single_context:: ~single_context() throw() {}
         
+#if defined(_MSC_VER)
+		// 'this' in constructor
+#pragma warning ( disable : 4355 )
+#endif
         single_context:: single_context() throw() :
         faked_lock(),
         context(0,1,*this)

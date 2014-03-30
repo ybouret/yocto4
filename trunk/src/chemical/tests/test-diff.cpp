@@ -33,6 +33,10 @@ namespace
         ODE_CB                cb;
         size_t                calls;
         
+#if defined(_MSC_VER)
+		// 'this' in constructor
+#pragma warning ( disable : 4355 )
+#endif
         explicit ChemDiff(chemical::collection   &lib,
                           chemical::equilibria   &user_cs,
                           chemical::effectors    &user_eff,
