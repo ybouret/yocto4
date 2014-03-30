@@ -19,6 +19,7 @@ namespace yocto
             typedef typename MESH::VERTEX         VERTEX;
             typedef typename MESH::EDGE           EDGE;
             
+            const LAYOUT & get_layout() const throw() { return *this; }
             
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             MESH(a,

@@ -18,6 +18,8 @@ namespace yocto
             typedef typename MESH::VERTEX         VERTEX;
             typedef typename MESH::EDGE           EDGE;
 
+            const layout1D & get_layout() const throw() { return *this; }
+
 
             virtual ~point_mesh() throw() {}
             
