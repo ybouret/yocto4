@@ -10,9 +10,12 @@
 using namespace yocto;
 using namespace fovea;
 
-static inline void show_mesh( const mesh &msh )
+template <typename MESH>
+static inline void show_mesh( const MESH &msh )
 {
+    std::cerr << "--------------------------------" << std::endl;
     std::cerr << "msh dims     = " << msh.dims        << std::endl;
+    std::cerr << "    layout   = " << msh.get_layout() << std::endl;
     std::cerr << "   #vertices = " << msh.vertices    << std::endl;
     std::cerr << "   #edges    = " << msh.num_edges() << std::endl;
     for(size_t i=0;i<msh.dims;++i)
@@ -21,18 +24,20 @@ static inline void show_mesh( const mesh &msh )
         const linear_space &l = msh.adb[id];
         std::cerr << "axis " << id << " bytes: " << l.bytes << std::endl;
     }
+    std::cerr << "--------------------------------" << std::endl;
+    std::cerr << std::endl;
 }
 
 YOCTO_UNIT_TEST_IMPL(mesh)
 {
     array_db a;
     
-    const unit_t lox = -unit_t(1 + alea_lt(100));
-    const unit_t hix =  unit_t(1 + alea_lt(100));
-    const unit_t loy = -unit_t(1 + alea_lt(100));
-    const unit_t hiy =  unit_t(1 + alea_lt(100));
-    const unit_t loz = -unit_t(1 + alea_lt(100));
-    const unit_t hiz =  unit_t(1 + alea_lt(100));
+    const unit_t lox = -unit_t(1 + alea_lt(20));
+    const unit_t hix =  unit_t(1 + alea_lt(20));
+    const unit_t loy = -unit_t(1 + alea_lt(20));
+    const unit_t hiy =  unit_t(1 + alea_lt(20));
+    const unit_t loz = -unit_t(1 + alea_lt(20));
+    const unit_t hiz =  unit_t(1 + alea_lt(20));
     
     const layout1D L1(lox,hix);
     
@@ -46,6 +51,7 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     
     const layout3D L3(lo3,hi3);
     
+    std::cerr << "RECTILINEAR" << std::endl;
     { rectilinear_mesh<double, layout1D> msh(a,L1); show_mesh(msh); }
     a.free();
     
@@ -65,6 +71,7 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     a.free();
     
     
+    std::cerr << "CURVILINEAR" << std::endl;
     { curvilinear_mesh<double, layout1D> msh(a,L1); show_mesh(msh); }
     a.free();
     
@@ -83,6 +90,8 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     { curvilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
     a.free();
     
+    
+    std::cerr << "POINTMESH" << std::endl;
     { point_mesh<1,float> msh(a,L1); show_mesh(msh); }
     a.free();
     
