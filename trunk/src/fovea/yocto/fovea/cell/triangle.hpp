@@ -8,14 +8,16 @@ namespace yocto
     namespace fovea
     {
         void check_triangle(const VertexBase &a, const VertexBase &b, const VertexBase &c);
-
+        void no_possible_triangle1D();
+        
         template <size_t DIM, typename T>
         class Triangle : public Cell<DIM,T>
         {
         public:
-            typedef  Vertex<DIM,T> VERTEX;
-            typedef Mesh<DIM,T>    MESH;
-
+            typedef Vertex<DIM,T>        VERTEX;
+            typedef Mesh<DIM,T>          MESH;
+            typedef typename VERTEX::vtx vtx;
+            
             explicit Triangle(const VERTEX &a,
                               const VERTEX &b,
                               const VERTEX &c) :
@@ -34,11 +36,26 @@ namespace yocto
             
             virtual void compile(const MESH &)
             {
-                
+                __compile( int2type<DIM>() );
             }
-
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Triangle);
+            inline void __compile( int2type<1> )
+            {
+                no_possible_triangle1D();
+            }
+            
+            inline void __compile( int2type<2> )
+            {
+                
+            }
+            
+            inline void __compile( int2type<3> )
+            {
+                
+            }
+            
         };
         
     }

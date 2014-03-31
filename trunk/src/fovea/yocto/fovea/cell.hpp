@@ -8,10 +8,22 @@ namespace yocto
     namespace fovea
     {
         
-        size_t check_num_vertices( size_t nv );
+        
+        class ICell
+        {
+        public:
+            virtual ~ICell() throw();
+            const size_t vertices;
+            
+        protected:
+            explicit ICell(size_t nv); // check #vertices
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(ICell);
+        };
         
         template <size_t DIM,typename T>
-        class Cell
+        class Cell : public ICell
         {
         public:
             //__________________________________________________________________
@@ -25,12 +37,6 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // public data
-            //__________________________________________________________________
-            const size_t vertices;
-            
-            //__________________________________________________________________
-            //
             // API
             //__________________________________________________________________
             //! access
@@ -41,7 +47,7 @@ namespace yocto
                 assert(p[iv]);
                 return *p[iv];
             }
-
+            
             //! once physical vertices have been set
             virtual void compile( const MESH & ) = 0;
             
@@ -55,7 +61,7 @@ namespace yocto
             const VERTEX **p;
             
             inline Cell( size_t nv ) :
-            vertices( check_num_vertices(nv) ),
+            ICell(nv),
             p(  (const VERTEX **)(object::operator new(vertices * sizeof(VERTEX*) )) )
             {
             }
@@ -63,7 +69,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
-
+            
         };
         
     }
