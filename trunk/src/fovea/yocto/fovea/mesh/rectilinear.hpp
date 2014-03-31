@@ -58,9 +58,10 @@ namespace yocto
             inline axis_type       &Z()       { return this->adb[ mesh::axis_name(2) ].template as<axis_type>(); }
             inline const axis_type &Z() const { return this->adb[ mesh::axis_name(2) ].template as<axis_type>(); }
             
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
-            inline void assign( int2type<1> ) throw()
+            inline void assign( int2type<1> )
             {
                 // vertices
                 axis_type &aX = X();
@@ -73,18 +74,23 @@ namespace yocto
                 // edges
                 const size_t edges = this->vertices - 1;
                 this->edb.reserve(edges);
-                for(size_t i1=0,i2=1;i1<edges;++i1,++i2)
+                
+                for(unit_t i=this->lower,ip=this->lower+1;i<this->upper;++i,++ip)
                 {
-                    const EDGE edge( this->vtx[i1], this->vtx[i2] );
+                    const size_t I0 = this->offset_of(i);
+                    const size_t IP = this->offset_of(ip);
+                    const EDGE edge( this->vtx[I0], this->vtx[IP] );
+                    assert(I0<this->vertices);
+                    assert(IP<this->vertices);
                     if( !this->edb.insert(edge) )
                     {
-                        this->throw_multiple_edges(i1,i2);
+                        this->throw_multiple_edges(I0,IP);
                     }
                 }
                 assert( this->edb.size() == edges );
             }
             
-            inline void assign( int2type<2> ) throw()
+            inline void assign( int2type<2> )
             {
                 axis_type &aX = X();
                 axis_type &aY = Y();
@@ -109,40 +115,48 @@ namespace yocto
                 const size_t edges   = ny * x_edges + nx * y_edges;
                 this->edb.reserve(edges);
                 
-                //! x edges
-                for(size_t j=0;j<ny;++j)
+                //! X edges
+                for(unit_t j=this->lower.y;j<=this->upper.y;++j)
                 {
-                    const size_t joff = j * nx;
-                    for(size_t i1=0,i2=1;i1<x_edges;++i1,++i2)
+                    for(unit_t i=this->lower.x,ip=this->lower.x+1;i<this->upper.x;++i,++ip)
                     {
-                        const size_t I1 = i1+joff;
-                        const size_t I2 = i2+joff;
-                        const EDGE edge( this->vtx[I1], this->vtx[I2] );
+                        const coord2D C0(i,j);
+                        const coord2D C1(ip,j);
+                        const size_t  I0 = this->offset_of(C0);
+                        const size_t  I1 = this->offset_of(C1);
+                        assert(I0<this->vertices);
+                        assert(I1<this->vertices);
+                        const EDGE edge( this->vtx[I0], this->vtx[I1] );
                         if( !this->edb.insert(edge) )
                         {
-                            this->throw_multiple_edges(I1,I2);
+                            this->throw_multiple_edges(I0,I1);
                         }
                     }
                 }
                 
-                //! y edges
-                for(size_t i=0;i<nx;++i)
+                
+                //! Y edges
+                for(unit_t j=this->lower.y,jp=this->lower.y+1;j<this->upper.y;++j,++jp)
                 {
-                    for(size_t j1=0,j2=1;j1<y_edges;++j1,++j2)
+                    for(unit_t i=this->lower.x;i<=this->upper.x;++i)
                     {
-                        const size_t I1 = i + (j1*nx);
-                        const size_t I2 = i + (j2*nx);
-                        const EDGE edge( this->vtx[I1], this->vtx[I2] );
+                        const coord2D C0(i,j);
+                        const coord2D C1(i,jp);
+                        const size_t  I0 = this->offset_of(C0);
+                        const size_t  I1 = this->offset_of(C1);
+                        assert(I0<this->vertices);
+                        assert(I1<this->vertices);
+                        const EDGE edge( this->vtx[I0], this->vtx[I1] );
                         if( !this->edb.insert(edge) )
                         {
-                            this->throw_multiple_edges(I1,I2);
+                            this->throw_multiple_edges(I0,I1);
                         }
                     }
                 }
                 assert( this->edb.size() == edges );
             }
             
-            inline void assign( int2type<3> ) throw()
+            inline void assign( int2type<3> )
             {
                 axis_type &aX = X();
                 axis_type &aY = Y();
@@ -172,26 +186,75 @@ namespace yocto
                 this->edb.reserve(edges);
                 
                 
-                //! x edges
-                const size_t nxy = nx*ny;
-                for(size_t k=0;k<nz;++k)
+                // X edges
+                for(unit_t k=this->lower.z;k<=this->upper.z;++k)
                 {
-                    const size_t koff = k * nxy;
-                    for(size_t j=0;j<ny;++j)
+                    for(unit_t j=this->lower.y;j<=this->upper.y;++j)
                     {
-                        const size_t joff = j * nx + koff;
-                        for(size_t i1=0,i2=1;i1<x_edges;++i1,++i2)
+                        for(unit_t i=this->lower.x,ip=i+1;i<this->upper.x;++i,++ip)
                         {
-                            const size_t I1 = i1+joff;
-                            const size_t I2 = i2+joff;
-                            const EDGE edge( this->vtx[I1], this->vtx[I2] );
+                            const coord3D C0(i, j,k);
+                            const coord3D C1(ip,j,k);
+                            const size_t  I0 = this->offset_of(C0);
+                            const size_t  I1 = this->offset_of(C1);
+                            assert(I0<this->vertices);
+                            assert(I1<this->vertices);
+                            const EDGE edge( this->vtx[I0], this->vtx[I1] );
                             if( !this->edb.insert(edge) )
                             {
-                                this->throw_multiple_edges(I1,I2);
+                                this->throw_multiple_edges(I0,I1);
+                            }
+
+                        }
+                    }
+                }
+                
+                
+                // Y edges
+                for(unit_t k=this->lower.z;k<=this->upper.z;++k)
+                {
+                    for(unit_t j=this->lower.y,jp=j+1;j<this->upper.y;++j,++jp)
+                    {
+                        for(unit_t i=this->lower.x;i<=this->upper.x;++i)
+                        {
+                            const coord3D C0(i,j,k);
+                            const coord3D C1(i,jp,k);
+                            const size_t  I0 = this->offset_of(C0);
+                            const size_t  I1 = this->offset_of(C1);
+                            assert(I0<this->vertices);
+                            assert(I1<this->vertices);
+                            const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                            if( !this->edb.insert(edge) )
+                            {
+                                this->throw_multiple_edges(I0,I1);
+                            }
+
+                        }
+                    }
+                }
+
+                // Z edges
+                for(unit_t k=this->lower.z,kp=k+1;k<this->upper.z;++k,++kp)
+                {
+                    for(unit_t j=this->lower.y;j<=this->upper.y;++j)
+                    {
+                        for(unit_t i=this->lower.x;i<=this->upper.x;++i)
+                        {
+                            const coord3D C0(i,j,k);
+                            const coord3D C1(i,j,kp);
+                            const size_t  I0 = this->offset_of(C0);
+                            const size_t  I1 = this->offset_of(C1);
+                            assert(I0<this->vertices);
+                            assert(I1<this->vertices);
+                            const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                            if( !this->edb.insert(edge) )
+                            {
+                                this->throw_multiple_edges(I0,I1);
                             }
                         }
                     }
                 }
+                assert(edges==this->edb.size());
                 
             }
             

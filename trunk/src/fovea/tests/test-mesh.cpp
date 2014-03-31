@@ -14,6 +14,7 @@ template <typename MESH>
 static inline void show_mesh( const MESH &msh )
 {
     std::cerr << "--------------------------------" << std::endl;
+    std::cerr << msh.form_id() << " mesh:" << std::endl;
     std::cerr << "msh dims     = " << msh.dims        << std::endl;
     std::cerr << "    layout   = " << msh.get_layout() << std::endl;
     std::cerr << "   #vertices = " << msh.vertices    << std::endl;
@@ -70,6 +71,7 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     { rectilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
     a.free();
     
+    return 0;
     
     std::cerr << "CURVILINEAR" << std::endl;
     { curvilinear_mesh<double, layout1D> msh(a,L1); show_mesh(msh); }

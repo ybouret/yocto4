@@ -42,6 +42,23 @@ namespace yocto
             throw exception("mesh: invalid floating point precision");
         }
         
+        const char * mesh:: form2text( form_type f ) throw()
+        {
+            switch(f)
+            {
+                case is_rectilinear: return "rectilinear";
+                case is_curvilinear: return "curvilinear";
+                case is_point:       return "point";
+            }
+            return "";
+        }
+        
+        const char *mesh:: form_id() const throw()
+        {
+            return mesh::form2text(form);
+        }
+
+        
         const char * mesh::axis_name( size_t dim )
         {
             switch (dim)
@@ -65,7 +82,7 @@ namespace yocto
         {
             throw exception("mesh: multiple edges #%u->#%u", unsigned(i1), unsigned(i2) );
         }
-
+        
         
     }
     
