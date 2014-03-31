@@ -36,10 +36,12 @@ YOCTO_UNIT_TEST_IMPL(vtk)
     double d = 2.0;
     unit_t u = -879;
     math::v2d<double> v2(3,4);
+    math::v3d<float>  v3(7,8,9);
     VTK.out(fp,f)  << '\n';
     VTK.out(fp,d)  << '\n';
     VTK.out(fp,u)  << '\n';
     VTK.out(fp,v2) << '\n';
+    VTK.out(fp,v3) << '\n';
 
     
     

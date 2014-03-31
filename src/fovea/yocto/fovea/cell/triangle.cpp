@@ -13,5 +13,9 @@ namespace yocto
                 throw exception("Unexpected Triangle Invalid Vertices INDEX");
         }
 
+        void no_possible_triangle1D()
+        {
+            throw exception("No Possible Triangle1D");
+        }
     }
 }
