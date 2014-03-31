@@ -19,6 +19,8 @@ static inline void show_mesh( const MESH &msh )
     std::cerr << "    layout   = " << msh.get_layout() << std::endl;
     std::cerr << "   #vertices = " << msh.vertices    << std::endl;
     std::cerr << "   #edges    = " << msh.num_edges() << std::endl;
+    std::cerr << "    compiling..." << std::endl;
+    msh.compile();
     for(size_t i=0;i<msh.dims;++i)
     {
         const char *id = mesh::axis_name(i);
