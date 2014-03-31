@@ -3,6 +3,7 @@
 
 #include "yocto/fovea/mesh.hpp"
 #include "yocto/code/bzset.hpp"
+#include "yocto/core/list.hpp"
 
 namespace yocto
 {
@@ -10,7 +11,7 @@ namespace yocto
     {
         
         
-        class ICell
+        class ICell : public object
         {
         public:
             virtual ~ICell() throw();
@@ -37,6 +38,15 @@ namespace yocto
             typedef Edge<DIM,T>                      EDGE;
             typedef Mesh<DIM,T>                      MESH;
             
+            class List : public core::list_of<Cell>
+            {
+            public:
+                explicit List() throw() : core::list_of<Cell>() { }
+                virtual ~List() throw() { while(this->size) delete this->pop_back(); }
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(List);
+            };
+        
             //__________________________________________________________________
             //
             // API
@@ -98,7 +108,7 @@ namespace yocto
                 a = 0;
                 if(lhs>rhs)
                 {
-                    // CCW
+                    // Counter ClockWise
                     a = (lhs-rhs)/2;
                     return 1;
                 }
@@ -106,6 +116,7 @@ namespace yocto
                 {
                     if(lhs<rhs)
                     {
+                        // ClockWise
                         a = (rhs-lhs)/2;
                         return -1;
                     }
@@ -125,7 +136,8 @@ namespace yocto
                     G += this->p[i]->r;
                 }
                 T *g = (T*)&G;
-                for(size_t i=0;i<DIM;++i) g[i] /= vertices;
+                for(size_t i=0;i<DIM;++i)
+                    g[i] /= vertices;
             }
             
         private:
