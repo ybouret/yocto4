@@ -37,8 +37,8 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     const unit_t hix =  unit_t(1 + alea_lt(20));
     const unit_t loy = -unit_t(1 + alea_lt(20));
     const unit_t hiy =  unit_t(1 + alea_lt(20));
-    const unit_t loz = -unit_t(1 + alea_lt(20));
-    const unit_t hiz =  unit_t(1 + alea_lt(20));
+    const unit_t loz = -unit_t(1 + alea_lt(10));
+    const unit_t hiz =  unit_t(1 + alea_lt(10));
     
     const layout1D L1(lox,hix);
     
@@ -71,7 +71,6 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     { rectilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
     a.free();
     
-    return 0;
     
     std::cerr << "CURVILINEAR" << std::endl;
     { curvilinear_mesh<double, layout1D> msh(a,L1); show_mesh(msh); }
