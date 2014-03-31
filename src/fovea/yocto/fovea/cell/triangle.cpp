@@ -17,5 +17,11 @@ namespace yocto
         {
             throw exception("No Possible Triangle1D");
         }
+        
+        
+        void invalid_triangle2D()
+        {
+            throw exception("Invalid Triangle 2D");
+        }
     }
 }

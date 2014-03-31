@@ -19,10 +19,9 @@ namespace yocto
             typedef typename CELL::EDGE   EDGE;
             typedef Mesh<DIM,T>           MESH;
             
-            const EDGE *edge;
             explicit Line(const VERTEX &a, const VERTEX &b) :
             Cell<DIM,T>(2),
-            edge(0)
+            pEdge(0)
             {
                 check_line(a,b);
                 this->p[0] = &a;
@@ -37,11 +36,21 @@ namespace yocto
             {
                 const CELL &cell = *this;
                 const edge_key ek(cell[0].index,cell[1].index);
-                edge = m.edb.search(ek);
-                check_edge(edge,ek);
+                pEdge = m.edb.search(ek);
+                check_edge(pEdge,ek);
+                // the edge has a middle and a length...
             }
             
+            inline const EDGE & edge() const throw()
+            {
+                assert(pEdge);
+                return *pEdge;
+            }
+            
+            
         private:
+            const EDGE *pEdge;
+
             YOCTO_DISABLE_COPY_AND_ASSIGN(Line);
         };
         

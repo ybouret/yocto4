@@ -44,6 +44,7 @@ static inline void show_mesh( const MESH &msh )
                 const LINE_PTR p(new LINE(msh[i],msh[j]));
                 ++nc;
                 lines.push_back(p);
+                lines.back()->barycenter();
             }
         }
     }
@@ -61,6 +62,7 @@ static inline void show_mesh( const MESH &msh )
             i3 = alea_lt(msh.vertices);
         const TRIANGLE_PTR p( new TRIANGLE(msh[i1],msh[i2],msh[i3]));
         tri.push_back(p);
+        tri.back()->barycenter();
     }
     std::cerr << "#created triangles = " << tri.size() << std::endl;
 }
