@@ -102,7 +102,8 @@ namespace yocto
                           ) :
             mesh(a,DIM,nv,f,sizeof(T)),
             num( vertices ),
-            vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) )
+            vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) ),
+	    edb()
             {
             }
             
