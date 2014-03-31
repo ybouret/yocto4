@@ -21,20 +21,21 @@ namespace yocto
         public:
             typedef Vertex<DIM,T>        VERTEX;
             typedef Mesh<DIM,T>          MESH;
+            typedef Edge<DIM,T>          EDGE;
             typedef typename VERTEX::vtx vtx;
             
             explicit Quad(const VERTEX &a,
                           const VERTEX &b,
                           const VERTEX &c,
                           const VERTEX &d) :
-            Cell<DIM,T>(4),
+            Cell<DIM,T>(4,4),
             area(0)
             {
                 check_quad(a,b,c,d);
-                this->p[0] = &a;
-                this->p[1] = &b;
-                this->p[2] = &c;
-                this->p[3] = &d;
+                p[0] = &a;
+                p[1] = &b;
+                p[2] = &c;
+                p[3] = &d;
             }
             
             virtual ~Quad() throw()
@@ -42,16 +43,21 @@ namespace yocto
             }
             
             
-            virtual void compile(const MESH &)
+            virtual void compile(const MESH &m)
             {
                 __compile( int2type<DIM>() );
+                this->get_facet_edges(m);
             }
             
             const T  area;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Quad);
-            
+            const VERTEX *p[4];
+            const EDGE   *e[4];
+            virtual const VERTEX **ppVTX() const throw() { return (const VERTEX **)p; }
+            virtual const EDGE   **ppEDG() const throw() { return (const EDGE   **)e; }
+
             inline void __compile( int2type<1> )
             {
                 no_possible_quad1D();
@@ -64,7 +70,7 @@ namespace yocto
                     invalid_quad2D();
                 if(sa<0)
                 {
-                    cswap<const VERTEX *>( this->p[0], this->p[1]);
+                    cswap<const VERTEX *>(p[1],p[3]);
                 }
                 assert(area>=0);
             }

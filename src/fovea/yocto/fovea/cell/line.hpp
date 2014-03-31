@@ -7,8 +7,8 @@ namespace yocto
 {
     namespace fovea
     {
-        void check_line(const VertexBase &a, const VertexBase &b);
-        void check_edge(const void *addr,const edge_key &ek);
+        void check_line_vertices(const VertexBase &a, const VertexBase &b);
+        void check_line_edge(const void *addr,const edge_key &ek);
         
         template <size_t DIM,typename T>
         class Line : public Cell<DIM,T>
@@ -20,12 +20,11 @@ namespace yocto
             typedef Mesh<DIM,T>           MESH;
             
             explicit Line(const VERTEX &a, const VERTEX &b) :
-            Cell<DIM,T>(2),
-            pEdge(0)
+            Cell<DIM,T>(2,1)
             {
-                check_line(a,b);
-                this->p[0] = &a;
-                this->p[1] = &b;
+                check_line_vertices(a,b);
+                p[0] = &a;
+                p[1] = &b;
             }
             
             virtual ~Line() throw()
@@ -36,21 +35,19 @@ namespace yocto
             {
                 const CELL &cell = *this;
                 const edge_key ek(cell[0].index,cell[1].index);
-                pEdge = m.edb.search(ek);
-                check_edge(pEdge,ek);
-                // the edge has a middle and a length...
+                e[0] = m.edb.search(ek);
+                check_line_edge(e[0],ek);
             }
             
-            inline const EDGE & edge() const throw()
-            {
-                assert(pEdge);
-                return *pEdge;
-            }
             
             
         private:
-            const EDGE *pEdge;
-
+            const VERTEX *p[2];
+            const EDGE   *e[1];
+            
+            virtual const VERTEX **ppVTX() const throw() { return (const VERTEX **)p; }
+            virtual const EDGE   **ppEDG() const throw() { return (const EDGE   **)e; }
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(Line);
         };
         

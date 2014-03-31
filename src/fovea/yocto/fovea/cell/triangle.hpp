@@ -17,18 +17,19 @@ namespace yocto
         public:
             typedef Vertex<DIM,T>        VERTEX;
             typedef Mesh<DIM,T>          MESH;
+            typedef Edge<DIM,T>          EDGE;
             typedef typename VERTEX::vtx vtx;
             
             explicit Triangle(const VERTEX &a,
                               const VERTEX &b,
                               const VERTEX &c) :
-            Cell<DIM,T>(3),
+            Cell<DIM,T>(3,3),
             area(0)
             {
                 check_triangle(a,b,c);
-                this->p[0] = &a;
-                this->p[1] = &b;
-                this->p[2] = &c;
+                p[0] = &a;
+                p[1] = &b;
+                p[2] = &c;
             }
             
             virtual ~Triangle() throw()
@@ -36,15 +37,22 @@ namespace yocto
             }
             
             
-            virtual void compile(const MESH &)
+            virtual void compile(const MESH &m)
             {
                 __compile( int2type<DIM>() );
+                this->get_facet_edges(m);
             }
             
             const T   area;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Triangle);
+            const VERTEX *p[3];
+            const EDGE   *e[3];
+            
+            virtual const VERTEX **ppVTX() const throw() { return (const VERTEX **)p; }
+            virtual const EDGE   **ppEDG() const throw() { return (const EDGE   **)e; }
+
             inline void __compile( int2type<1> )
             {
                 no_possible_triangle1D();
@@ -57,7 +65,7 @@ namespace yocto
                     invalid_triangle2D();
                 if(sa<0)
                 {
-                    cswap<const VERTEX *>( this->p[0], this->p[1]);
+                    cswap<const VERTEX *>(p[0],p[1]);
                 }
                 assert(area>=0);
             }
