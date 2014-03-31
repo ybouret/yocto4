@@ -3,6 +3,7 @@
 
 #include "yocto/fovea/vertex.hpp"
 #include "yocto/associative/set.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
@@ -30,17 +31,22 @@ namespace yocto
         class Edge
         {
         public:
-            typedef Vertex<DIM,T> VERTEX;
-            typedef Edge<DIM,T>   EDGE;
+            typedef Vertex<DIM,T>        VERTEX;
+            typedef Edge<DIM,T>          EDGE;
+            typedef typename VERTEX::vtx vtx;
             
             const VERTEX   &v1;
             const VERTEX   &v2;
             const edge_key  ek;
+            const T         length;
+            const vtx       middle;
             
             inline Edge(const VERTEX &u1, const VERTEX &u2) :
             v1( u1.index < u2.index ? u1 : u2 ),
             v2( u1.index < u2.index ? u2 : u1 ),
-            ek(v1.index,v2.index)
+            ek(v1.index,v2.index),
+            length(0),
+            middle()
             {
                 assert(ek.i1==v1.index);
                 assert(ek.i2==v2.index);
@@ -51,13 +57,27 @@ namespace yocto
             inline Edge( const Edge &other ) throw() :
             v1(other.v1),
             v2(other.v2),
-            ek(other.ek)
+            ek(other.ek),
+            length(other.length),
+            middle(other.middle)
             {
             }
             
-            inline void compile() throw()
+            // once the vertices are loaded
+            inline void load() const throw()
             {
-                
+                T         sum = 0;
+                const vtx dif = v2.r - v1.r;
+                const T  *d   = (T *)&dif;
+                const T  *o   = (T *)&v1.r;
+                T        *m   = (T *)&middle;
+                for(size_t i=0;i<DIM;++i)
+                {
+                    const T dd = d[i];
+                    sum += dd * dd;
+                    m[i] = o[i] + dd/2;
+                }
+                (T &)length = math::Sqrt(sum);
             }
             
             typedef set<edge_key,EDGE,key_hasher<edge_key,hashing::sfh>,memory_allocator> DB;

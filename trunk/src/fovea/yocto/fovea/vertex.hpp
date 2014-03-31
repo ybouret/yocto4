@@ -30,69 +30,78 @@ namespace yocto
             
             explicit Vertex( size_t idx, T &cx) throw() :
             VertexBase(idx),
-            r()
+            r(),
+            q()
             {
-                r[0] = &cx;
+                q[0] = &cx;
             }
             
             explicit Vertex(size_t idx, T &cx, T &cy) throw() :
             VertexBase(idx),
-            r()
+            r(), q()
             {
-                r[0] = &cx;
-                r[1] = &cy;
+                q[0] = &cx;
+                q[1] = &cy;
             }
             
             explicit Vertex(size_t idx, T &cx, T &cy, T &cz) throw() :
             VertexBase(idx),
-            r()
+            r(), q()
             {
-                r[0] = &cx;
-                r[1] = &cy;
-                r[2] = &cz;
+                q[0] = &cx;
+                q[1] = &cy;
+                q[2] = &cz;
             }
             
             inline Vertex( const Vertex &other ) throw() :
             VertexBase(other),
-            r()
+            r(other.r), q()
             {
-                for(size_t i=0;i<DIM;++i) r[i] = other.r[i];
+                for(size_t i=0;i<DIM;++i) q[i] = other.q[i];
             }
             
             inline ~Vertex() throw() {}
             
-            inline T       &x() throw()       { assert(r[0]!=0); return *r[0]; }
-            inline const T &x() const throw() { assert(r[0]!=0); return *r[0]; }
+            inline T       &x() throw()       { assert(q[0]!=0); return *q[0]; }
+            inline const T &x() const throw() { assert(q[0]!=0); return *q[0]; }
             
-            inline T       &y() throw()       { assert(r[1]!=0); return *r[1]; }
-            inline const T &y() const throw() { assert(r[1]!=0); return *r[1]; }
+            inline T       &y() throw()       { assert(q[1]!=0); return *q[1]; }
+            inline const T &y() const throw() { assert(q[1]!=0); return *q[1]; }
             
-            inline T       &z() throw()       { assert(r[2]!=0); return *r[2]; }
-            inline const T &z() const throw() { assert(r[2]!=0); return *r[2]; }
+            inline T       &z() throw()       { assert(q[2]!=0); return *q[2]; }
+            inline const T &z() const throw() { assert(q[2]!=0); return *q[2]; }
             
-            inline vtx make_pos() const throw()
+            void load() const throw()
             {
-                return pos( int2type<DIM>() );
+                load( int2type<DIM>() );
             }
             
+            const vtx r;
         private:
-            T *r[DIM];
+            T *q[DIM];
             YOCTO_DISABLE_ASSIGN(Vertex);
             
-            inline vtx pos( int2type<1> ) const throw()
+            inline
+            void load( int2type<1> ) const throw()
             {
-                return x();
+                (T &)r = x();
             }
             
-            inline vtx pos( int2type<2> ) const throw()
+            inline
+            void load( int2type<2> ) const throw()
             {
-                return vtx(x(),y());
+                (T &)(r.x) = x();
+                (T &)(r.y) = y();
             }
             
-            inline vtx pos( int2type<3> ) const throw()
+            inline
+            void load( int2type<3> ) const throw()
             {
-                return vtx(x(),y(),z());
+                (T &)(r.x) = x();
+                (T &)(r.y) = y();
+                (T &)(r.z) = z();
             }
+            
         };
         
     }

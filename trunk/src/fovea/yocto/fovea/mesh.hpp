@@ -95,6 +95,26 @@ namespace yocto
                 memory::kind<memory_kind>::release_as<VERTEX>(vtx,num);
             }
             
+            inline void compile() const throw()
+            {
+                std::cerr << "-- mesh: loading " << vertices << " vertices" << std::endl;
+                // load all coordinates
+                for(size_t i=0;i<vertices;++i)
+                {
+                    vtx[i].load();
+                }
+                
+                // load all edges
+                std::cerr << "-- mesh: loading " << edb.size() << " edges" << std::endl;
+                for( typename EDGE_DB::const_iterator i = edb.begin(); i != edb.end(); ++i )
+                {
+                    const EDGE &edge = *i;
+                    edge.load();
+                }
+                
+                // compile all shapes...
+            }
+            
         protected:
             explicit Mesh(array_db     &a,
                           const size_t nv,
@@ -103,7 +123,7 @@ namespace yocto
             mesh(a,DIM,nv,f,sizeof(T)),
             num( vertices ),
             vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) ),
-	    edb()
+            edb()
             {
             }
             
