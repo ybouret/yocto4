@@ -24,7 +24,7 @@ namespace yocto
             typedef typename MESH::EDGE           EDGE;
             
             const LAYOUT & get_layout() const throw() { return *this; }
-
+            
             
             //__________________________________________________________________
             //
@@ -160,6 +160,39 @@ namespace yocto
                         }
                     }
                 }
+                
+                //! edges
+                const size_t nx      = this->width.x;
+                const size_t ny      = this->width.y;
+                const size_t nz      = this->width.z;
+                const size_t x_edges = nx - 1;
+                const size_t y_edges = ny - 1;
+                const size_t z_edges = nz - 1;
+                const size_t edges   = nz * (ny * x_edges + nx * y_edges) + (nx*ny) * z_edges;
+                this->edb.reserve(edges);
+                
+                
+                //! x edges
+                const size_t nxy = nx*ny;
+                for(size_t k=0;k<nz;++k)
+                {
+                    const size_t koff = k * nxy;
+                    for(size_t j=0;j<ny;++j)
+                    {
+                        const size_t joff = j * nx + koff;
+                        for(size_t i1=0,i2=1;i1<x_edges;++i1,++i2)
+                        {
+                            const size_t I1 = i1+joff;
+                            const size_t I2 = i2+joff;
+                            const EDGE edge( this->vtx[I1], this->vtx[I2] );
+                            if( !this->edb.insert(edge) )
+                            {
+                                this->throw_multiple_edges(I1,I2);
+                            }
+                        }
+                    }
+                }
+                
             }
             
         };
