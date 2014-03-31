@@ -39,7 +39,8 @@ namespace yocto
             
             static real_type   sz2fp( const unsigned sz ); //!< size to real_type
             static const char *axis_name( size_t dim );
-            
+            static const char *form2text( form_type ) throw();
+            const char        *form_id() const throw();
             
         protected:
             explicit mesh(array_db       &a,
@@ -105,7 +106,9 @@ namespace yocto
             {
             }
             
+        private:
             size_t    num; //!< for memory
+        protected:
             VERTEX   *vtx; //!< for memory
             
         private:
