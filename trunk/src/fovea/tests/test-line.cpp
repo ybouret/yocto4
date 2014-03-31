@@ -8,6 +8,7 @@
 #include "yocto/fovea/cell/line.hpp"
 #include "yocto/ptr/shared.hpp"
 #include "yocto/fovea/cell/triangle.hpp"
+#include "yocto/fovea/cell/quad.hpp"
 
 using namespace yocto;
 using namespace fovea;
@@ -27,6 +28,7 @@ static inline void show_mesh( const MESH &msh )
     
     typedef Line<MESH::DIMS,typename MESH::TYPE>     LINE;
     typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
+    typedef Quad<MESH::DIMS,typename MESH::TYPE>     QUAD;
 
     typedef shared_ptr<LINE>
     LINE_PTR;
@@ -48,7 +50,7 @@ static inline void show_mesh( const MESH &msh )
             }
         }
     }
-    std::cerr << "#created edges=" << nc << std::endl;
+    std::cerr << "#created edges     = " << nc << std::endl;
     
     
     for(size_t i=0;i<100;++i)
@@ -65,6 +67,28 @@ static inline void show_mesh( const MESH &msh )
         tri.back()->barycenter();
     }
     std::cerr << "#created triangles = " << tri.size() << std::endl;
+    
+    typedef shared_ptr<QUAD> QUAD_PTR;
+    vector<QUAD_PTR> quads;
+    for(size_t i=0;i<200;++i)
+    {
+        size_t i1 = alea_lt(msh.vertices);
+        size_t i2 = i1;
+        while(i2==i1)
+            i2 = alea_lt(msh.vertices);
+        size_t i3 = i1;
+        while(i3==i1||i3==i2)
+            i3 = alea_lt(msh.vertices);
+        size_t i4 = i1;
+        while(i4==i1||i4==i2||i4==i3)
+            i4 = alea_lt(msh.vertices);
+        
+        const QUAD_PTR p( new QUAD(msh[i1],msh[i2],msh[i3],msh[i4]));
+        quads.push_back(p);
+        quads.back()->barycenter();
+    }
+    std::cerr << "#created quads     = " << quads.size() << std::endl;
+    
 }
 
 YOCTO_UNIT_TEST_IMPL(line)

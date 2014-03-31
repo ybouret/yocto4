@@ -6,7 +6,7 @@ namespace yocto
     
     namespace fovea
     {
-        void check_line(const VertexBase &a, const VertexBase &b)
+        void check_line_vertices(const VertexBase &a, const VertexBase &b)
         {
             if(&a == &b)
                 throw exception("Line with same Vertices!");
@@ -15,7 +15,7 @@ namespace yocto
         }
         
         
-        void check_edge(const void *addr,const edge_key &ek)
+        void check_line_edge(const void *addr,const edge_key &ek)
         {
             if(!addr)
                 throw exception("no edge for line from Vertex #%u -> Vertex #%u", unsigned(ek.i1), unsigned(ek.i2) );
