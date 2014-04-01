@@ -1,5 +1,5 @@
-#ifndef YOCTO_FOVEA_CELL_INCLUDED
-#define YOCTO_FOVEA_CELL_INCLUDED 1
+#ifndef YOCTO_FOVEA_SHAPE_INCLUDED
+#define YOCTO_FOVEA_SHAPE_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
 
@@ -8,26 +8,26 @@ namespace yocto
     namespace fovea
     {
         
-        class Shape
+        class ShapeBase
         {
         public:
             static const size_t MIN_VERTICES = 2;
             static const size_t MAX_VERTICES = 4;
-            virtual ~Shape() throw();
+            virtual ~ShapeBase() throw();
             
             const size_t vertices; //!< vertices >= 2
             
             virtual const char *name() const throw() = 0;
             
         protected:
-            explicit Shape( size_t nv );
+            explicit ShapeBase( size_t nv );
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(Shape);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(ShapeBase);
         };
     
         template <size_t DIM,typename T>
-        class Cell : public Shape
+        class Shape : public ShapeBase
         {
         public:
             //__________________________________________________________________
@@ -48,7 +48,7 @@ namespace yocto
             //
             // virtual API
             //__________________________________________________________________
-            virtual ~Cell() throw() {}
+            virtual ~Shape() throw() {}
             
             virtual  void load_edges(const MESH &) = 0;
             
@@ -67,8 +67,8 @@ namespace yocto
             }
             
         protected:
-            explicit Cell(size_t nv) :
-            Shape(nv),
+            explicit Shape(size_t nv) :
+            ShapeBase(nv),
             size(0)
             {
             }
@@ -76,7 +76,7 @@ namespace yocto
             virtual const VERTEX **ppVTX() const throw() = 0;
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Shape);
         };
         
         

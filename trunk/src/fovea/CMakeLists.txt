@@ -15,19 +15,19 @@ SET( mesh_srcs ${mesh_decl} ${mesh_impl} )
 INSTALL( FILES ${mesh_decl} DESTINATION include/yocto/fovea/mesh )
 SOURCE_GROUP( fovea/mesh FILES ${mesh_srcs} )
 
-FILE( GLOB cell_decl yocto/fovea/cell/*.hpp )
-FILE( GLOB cell_impl yocto/fovea/cell/*.cpp )
-SET( cell_srcs ${cell_decl} ${cell_impl} )
+FILE( GLOB shape_decl yocto/fovea/shape/*.hpp )
+FILE( GLOB shape_impl yocto/fovea/shape/*.cpp )
+SET( shape_srcs ${shape_decl} ${shape_impl} )
 
-INSTALL( FILES ${cell_decl} DESTINATION include/yocto/fovea/cell )
-SOURCE_GROUP( fovea/cell FILES ${cell_srcs} )
+INSTALL( FILES ${shape_decl} DESTINATION include/yocto/fovea/shape )
+SOURCE_GROUP( fovea/shape FILES ${shape_srcs} )
 
 INCLUDE_DIRECTORIES( . ../main ../mk)
 
 ADD_LIBRARY(y-fovea STATIC 
 	${srcs} 
 	${mesh_srcs} 
-	${cell_srcs} 
+	${shape_srcs} 
 )
 
 INSTALL( TARGETS y-fovea ARCHIVE DESTINATION lib )

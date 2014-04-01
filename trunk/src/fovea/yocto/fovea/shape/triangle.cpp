@@ -1,4 +1,4 @@
-#include "yocto/fovea/cell/triangle.hpp"
+#include "yocto/fovea/shape/triangle.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto

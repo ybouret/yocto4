@@ -3,8 +3,8 @@
 #include "yocto/fovea/mesh/curvilinear.hpp"
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/fovea/cell/line.hpp"
-#include "yocto/fovea/cell/triangle.hpp"
+#include "yocto/fovea/shape/line.hpp"
+#include "yocto/fovea/shape/triangle.hpp"
 
 using namespace yocto;
 using namespace fovea;

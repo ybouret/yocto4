@@ -1,7 +1,7 @@
-#ifndef YOCTO_FOVEA_CELL_LINE_INCLUDED
-#define YOCTO_FOVEA_CELL_LINE_INCLUDED 1
+#ifndef YOCTO_FOVEA_SHAPE_LINE_INCLUDED
+#define YOCTO_FOVEA_SHAPE_LINE_INCLUDED 1
 
-#include "yocto/fovea/cell.hpp"
+#include "yocto/fovea/shape.hpp"
 
 namespace yocto
 {
@@ -17,18 +17,18 @@ namespace yocto
         };
         
         template <size_t DIM, typename T>
-        class Line : public Cell<DIM,T>
+        class Line : public Shape<DIM,T>
         {
         public:
-            typedef Cell<DIM,T>           CELL;
-            typedef typename CELL::VERTEX VERTEX;
-            typedef typename CELL::EDGE   EDGE;
-            typedef typename CELL::MESH   MESH;
+            typedef Shape<DIM,T>           SHAPE;
+            typedef typename SHAPE::VERTEX VERTEX;
+            typedef typename SHAPE::EDGE   EDGE;
+            typedef typename SHAPE::MESH   MESH;
             
             inline virtual ~Line() throw() {}
             
             inline explicit Line( const VERTEX &a, const VERTEX &b) :
-            CELL(2),
+            SHAPE(2),
             p(),
             e(0)
             {
@@ -42,11 +42,11 @@ namespace yocto
             
             inline virtual void load_edges( const MESH &m )
             {
-                const CELL     &cell = *this;
-                const edge_key  ek(cell[0].index,cell[1].index);
+                const SHAPE    &shape = *this;
+                const edge_key  ek(shape[0].index,shape[1].index);
                 const EDGE     *pE = m.edb.search(ek);
                 if(!pE)
-                    LineInfo::NoEdgeFor(cell[0],cell[1]);
+                    LineInfo::NoEdgeFor(shape[0],shape[1]);
                 e = pE;
                 (T&)(this->size) = e->length;
             }

@@ -1,7 +1,7 @@
 #ifndef YOCTO_FOVEA_CELL_TRIANGLE_INCLUDED
 #define YOCTO_FOVEA_CELL_TRIANGLE_INCLUDED 1
 
-#include "yocto/fovea/cell.hpp"
+#include "yocto/fovea/shape.hpp"
 
 namespace yocto
 {
@@ -18,19 +18,19 @@ namespace yocto
         
         
         template <size_t DIM,typename T>
-        class Triangle : public Cell<DIM,T>
+        class Triangle : public Shape<DIM,T>
         {
         public:
-            typedef Cell<DIM,T>           CELL;
-            typedef typename CELL::VERTEX VERTEX;
-            typedef typename CELL::EDGE   EDGE;
-            typedef typename CELL::MESH   MESH;
-            typedef typename VERTEX::vtx  vtx;
+            typedef Shape<DIM,T>           SHAPE;
+            typedef typename SHAPE::VERTEX VERTEX;
+            typedef typename SHAPE::EDGE   EDGE;
+            typedef typename SHAPE::MESH   MESH;
+            typedef typename VERTEX::vtx   vtx;
             
             virtual ~Triangle() throw() {}
             
             explicit Triangle(const VERTEX &a, const VERTEX &b, const VERTEX &c ) :
-            CELL(3)
+            SHAPE(3)
             {
                 TriangleInfo::CheckVertices(a, b, c);
                 p[0] = &a;
