@@ -10,7 +10,7 @@ namespace yocto
     namespace fovea
     {
         
-        //! POD key
+        //! C-style edge isdnetifive
         class edge_key
         {
         public:
@@ -26,7 +26,7 @@ namespace yocto
         };
         
         
-        
+        //! an edge: undirected segment between two vertices
         template <size_t DIM,typename T>
         class Edge
         {
@@ -38,8 +38,8 @@ namespace yocto
             const VERTEX   &v1;
             const VERTEX   &v2;
             const edge_key  ek;
-            const T         length;
-            const vtx       middle;
+            const T         length; //!< the length, computed by load()
+            const vtx       middle; //!< the middle, computed by load()
             
             inline Edge(const VERTEX &u1, const VERTEX &u2) :
             v1( u1.index < u2.index ? u1 : u2 ),
