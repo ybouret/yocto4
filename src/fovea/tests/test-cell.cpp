@@ -3,8 +3,8 @@
 #include "yocto/fovea/mesh/curvilinear.hpp"
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
-#include "yocto/fovea/shape/line.hpp"
-#include "yocto/fovea/shape/triangle.hpp"
+#include "yocto/fovea/cell.hpp"
+
 
 using namespace yocto;
 using namespace fovea;
@@ -29,7 +29,8 @@ static inline void show_mesh( const MESH &msh )
             size_t i2 = i1;
             while(i2==i1)
                 i2 = alea_lt(msh.vertices);
-            const LINE l2(msh[i1],msh[i2]);
+            LINE l2(msh[i1],msh[i2]);
+            l2.compute_barycenter();
             size_t i3=i1;
             while(i3==i1||i3==i2)
                 i3 = alea_lt(msh.vertices);
@@ -39,16 +40,19 @@ static inline void show_mesh( const MESH &msh )
     }
 }
 
+
+#define __SHOW(CLASS,DIMS,TYPE) std::cerr << "sizeof(" << #CLASS << "<" << DIMS << "," << #TYPE  << ">)\t= \t" <<  sizeof(CLASS<DIMS,TYPE>) << std::endl
+
 YOCTO_UNIT_TEST_IMPL(cell)
 {
     array_db a;
     
-    const unit_t lox = -unit_t(1 + alea_lt(20));
-    const unit_t hix =  unit_t(1 + alea_lt(20));
-    const unit_t loy = -unit_t(1 + alea_lt(20));
-    const unit_t hiy =  unit_t(1 + alea_lt(20));
-    const unit_t loz = -unit_t(1 + alea_lt(10));
-    const unit_t hiz =  unit_t(1 + alea_lt(10));
+    const unit_t lox = -unit_t(1 + alea_lt(10));
+    const unit_t hix =  unit_t(1 + alea_lt(10));
+    const unit_t loy = -unit_t(1 + alea_lt(10));
+    const unit_t hiy =  unit_t(1 + alea_lt(10));
+    const unit_t loz = -unit_t(1 + alea_lt(5));
+    const unit_t hiz =  unit_t(1 + alea_lt(5));
     
     const layout1D L1(lox,hix);
     
@@ -112,6 +116,25 @@ YOCTO_UNIT_TEST_IMPL(cell)
     { point_mesh<3,float> msh(a,L1); show_mesh(msh); }
     a.free();
     
+    __SHOW(Line,1,float);
+    __SHOW(Line,1,double);
+    __SHOW(Line,2,float);
+    __SHOW(Line,2,double);
+    __SHOW(Line,3,float);
+    __SHOW(Line,3,double);
+
+    __SHOW(Triangle,1,float);
+    __SHOW(Triangle,1,double);
+    __SHOW(Triangle,2,float);
+    __SHOW(Triangle,2,double);
+    __SHOW(Triangle,3,float);
+    __SHOW(Triangle,3,double);
+
+    
+    __SHOW(Cell,1,float);
+    __SHOW(Cell,1,double);
+    __SHOW(Cell,2,float);
+    __SHOW(Cell,2,double);
     
 }
 YOCTO_UNIT_TEST_DONE()

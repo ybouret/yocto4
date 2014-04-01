@@ -309,6 +309,19 @@ namespace yocto
 			}
 		};
 		
+        template <typename NODE>
+        class list_of_cpp : public list_of<NODE>
+        {
+        public:
+            explicit list_of_cpp() throw() : list_of<NODE>() {}
+            virtual ~list_of_cpp() throw() {
+                while(this->size) delete this->pop_back();
+            }
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(list_of_cpp);
+            
+        };
 		
 	}
 	

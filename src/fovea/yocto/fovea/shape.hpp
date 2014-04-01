@@ -2,13 +2,14 @@
 #define YOCTO_FOVEA_SHAPE_INCLUDED 1
 
 #include "yocto/fovea/mesh.hpp"
+#include "yocto/code/bzset.hpp"
 
 namespace yocto
 {
     namespace fovea
     {
         
-        class ShapeBase
+        class ShapeBase : public object
         {
         public:
             static const size_t MIN_VERTICES = 2;
@@ -25,7 +26,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ShapeBase);
         };
-    
+        
         template <size_t DIM,typename T>
         class Shape : public ShapeBase
         {
@@ -34,22 +35,24 @@ namespace yocto
             //
             // types
             //__________________________________________________________________
-            typedef  Mesh<DIM,T>   MESH;
-            typedef  Vertex<DIM,T> VERTEX;
-            typedef  Edge<DIM,T>   EDGE;
+            typedef  Mesh<DIM,T>          MESH;
+            typedef  Vertex<DIM,T>        VERTEX;
+            typedef  typename VERTEX::vtx vtx;
+            typedef  Edge<DIM,T>          EDGE;
             
             //__________________________________________________________________
             //
             // common data
             //__________________________________________________________________
-            const T  size; //!< length/area/volume to be set by compile_for
-
+            const T   size; //!< length/area/volume to be set by compile_for
+            const vtx G;    //!< barycenter
             //__________________________________________________________________
             //
             // virtual API
             //__________________________________________________________________
             virtual ~Shape() throw() {}
             
+            //! compute all data and load edges, after physical vertices are ok
             virtual  void load_edges(const MESH &) = 0;
             
             
@@ -66,10 +69,25 @@ namespace yocto
                 return *p[iv];
             }
             
+            inline void compute_barycenter() throw()
+            {
+                const Shape &shape = *this;
+                vtx sum;
+                bzset(sum);
+                for(size_t i=0;i<vertices;++i)
+                {
+                    sum += shape[i].r;
+                }
+                T *g = (T*)&G;
+                for(size_t j=0;j<DIM;++j)
+                    g[j] /= vertices;
+            }
+            
         protected:
             explicit Shape(size_t nv) :
             ShapeBase(nv),
-            size(0)
+            size(0),
+            G()
             {
             }
             
