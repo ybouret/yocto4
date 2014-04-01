@@ -99,8 +99,10 @@ namespace yocto
                 const size_t ny      = this->width.y;
                 const size_t x_edges = nx - 1;
                 const size_t y_edges = ny - 1;
-                const size_t edges   = ny * x_edges + nx * y_edges;
+                const size_t c_edges = x_edges * y_edges;
+                const size_t edges   = ny * x_edges + nx * y_edges + c_edges;
                 this->edb.reserve(edges);
+
                 
                 //! X edges
                 for(unit_t j=this->lower.y;j<=this->upper.y;++j)
@@ -140,6 +142,27 @@ namespace yocto
                         }
                     }
                 }
+                
+                //! C edges
+                for(unit_t j=this->lower.y,jp=this->lower.y+1;j<this->upper.y;++j,++jp)
+                {
+                    for(unit_t i=this->lower.x,ip=this->lower.x+1;i<this->upper.x;++i,++ip)
+                    {
+                        const coord2D C00(i,j);
+                        const coord2D C11(ip,jp);
+                        const size_t I00 = this->offset_of(C00);
+                        const size_t I11 = this->offset_of(C11);
+                        assert(I00<this->vertices);
+                        assert(I11<this->vertices);
+                        const EDGE edge( this->vtx[I00], this->vtx[I11] );
+                        if( !this->edb.insert(edge) )
+                        {
+                            this->throw_multiple_edges(I00,I11);
+                        }
+                        
+                    }
+                }
+
                 assert( this->edb.size() == edges );
                 
             }
