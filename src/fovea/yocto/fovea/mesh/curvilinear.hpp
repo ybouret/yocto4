@@ -1,7 +1,7 @@
 #ifndef YOCTO_FOVEA_MESH_CURVILINEAR_INCLUDED
 #define YOCTO_FOVEA_MESH_CURVILINEAR_INCLUDED 1
 
-#include "yocto/fovea/mesh.hpp"
+#include "yocto/fovea/cell.hpp"
 #include "yocto/fovea/array3d.hpp"
 
 namespace yocto
@@ -18,6 +18,8 @@ namespace yocto
             typedef Mesh<LAYOUT::DIMENSIONS,T>    MESH;
             typedef typename MESH::VERTEX         VERTEX;
             typedef typename MESH::EDGE           EDGE;
+            typedef Cell<LAYOUT::DIMENSIONS,T>    CELL;
+            typedef typename CELL::List           CELL_LIST;
             
             const LAYOUT & get_layout() const throw() { return *this; }
             
