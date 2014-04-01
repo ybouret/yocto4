@@ -42,7 +42,7 @@ namespace yocto
             throw exception("mesh: invalid floating point precision");
         }
         
-        const char * mesh:: form2text( form_type f ) throw()
+        const char * mesh:: form2name( form_type f ) throw()
         {
             switch(f)
             {
@@ -50,12 +50,12 @@ namespace yocto
                 case is_curvilinear: return "curvilinear";
                 case is_point:       return "point";
             }
-            return "";
+            return "unknown";
         }
         
-        const char *mesh:: form_id() const throw()
+        const char *mesh:: form_name() const throw()
         {
-            return mesh::form2text(form);
+            return mesh::form2name(form);
         }
 
         

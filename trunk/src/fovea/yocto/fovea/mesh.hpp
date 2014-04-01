@@ -35,12 +35,11 @@ namespace yocto
             const real_type real;
             array_db       &adb;
             
-            virtual size_t num_edges() const throw() = 0;
             
             static real_type   sz2fp( const unsigned sz ); //!< size to real_type
             static const char *axis_name( size_t dim );
-            static const char *form2text( form_type ) throw();
-            const char        *form_id() const throw();
+            static const char *form2name( form_type ) throw();
+            const char        *form_name() const throw();
             
         protected:
             explicit mesh(array_db       &a,
@@ -97,22 +96,24 @@ namespace yocto
             
             inline void compile() const throw()
             {
-                std::cerr << "-- mesh: loading " << vertices << " vertices" << std::endl;
-                // load all coordinates
+                //______________________________________________________________
+                //
+                // load all physical coordinates
+                //______________________________________________________________
                 for(size_t i=0;i<vertices;++i)
                 {
                     vtx[i].load();
                 }
                 
+                //______________________________________________________________
+                //
                 // load all edges
-                std::cerr << "-- mesh: loading " << edb.size() << " edges" << std::endl;
+                //______________________________________________________________
                 for( typename EDGE_DB::const_iterator i = edb.begin(); i != edb.end(); ++i )
                 {
                     const EDGE &edge = *i;
                     edge.load();
                 }
-                
-                // compile all shapes...
             }
             
         protected:
@@ -136,7 +137,6 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(Mesh);
         public:
             EDGE_DB edb;
-            virtual size_t num_edges() const throw() { return edb.size(); }
         };
     }
     
