@@ -80,8 +80,8 @@ namespace yocto
                 //
                 // allocate edges
                 //______________________________________________________________
-                const size_t edges = this->vertices - 1;
-                this->edb.reserve(edges);
+                const size_t num_edges = this->vertices - 1;
+                this->edb.reserve(num_edges);
                 
                 for(unit_t i=this->lower,ip=this->lower+1;i<this->upper;++i,++ip)
                 {
@@ -95,7 +95,12 @@ namespace yocto
                         this->throw_multiple_edges(I0,IP);
                     }
                 }
-                assert( this->edb.size() == edges );
+                assert( this->edb.size() == num_edges );
+                //______________________________________________________________
+                //
+                // allocate cells
+                //______________________________________________________________
+                
             }
             
             inline void assign( int2type<2> )
