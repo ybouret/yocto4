@@ -63,7 +63,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
             inline void assign( int2type<1> )
             {
-                // vertices
+                //______________________________________________________________
+                //
+                // allocate vertices
+                //______________________________________________________________
                 axis_type &aX = X();
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
@@ -71,7 +74,10 @@ namespace yocto
                     new (this->vtx+v) VERTEX(v,aX[i] );
                 }
                 
-                // edges
+                //______________________________________________________________
+                //
+                // allocate edges
+                //______________________________________________________________
                 const size_t edges = this->vertices - 1;
                 this->edb.reserve(edges);
                 
@@ -95,8 +101,10 @@ namespace yocto
                 axis_type &aX = X();
                 axis_type &aY = Y();
                 
-                //! vertices
-                // vertex index: (i-lower.x) + witdh.x * (j-lower.y)
+                //______________________________________________________________
+                //
+                // allocate vertices
+                //______________________________________________________________
                 size_t v = 0;
                 for(unit_t j=this->lower.y;j<=this->upper.y;++j)
                 {
@@ -107,12 +115,16 @@ namespace yocto
                     }
                 }
                 
-                //! edges
+                //______________________________________________________________
+                //
+                // allocate edges
+                //______________________________________________________________
                 const size_t nx      = this->width.x;
                 const size_t ny      = this->width.y;
                 const size_t x_edges = nx - 1;
                 const size_t y_edges = ny - 1;
-                const size_t edges   = ny * x_edges + nx * y_edges;
+                const size_t c_edges = x_edges * y_edges;
+                const size_t edges   = ny * x_edges + nx * y_edges + c_edges;
                 this->edb.reserve(edges);
                 
                 //! X edges
@@ -151,6 +163,26 @@ namespace yocto
                         {
                             this->throw_multiple_edges(I0,I1);
                         }
+                    }
+                }
+                
+                //! C edges
+                for(unit_t j=this->lower.y,jp=this->lower.y+1;j<this->upper.y;++j,++jp)
+                {
+                    for(unit_t i=this->lower.x,ip=this->lower.x+1;i<this->upper.x;++i,++ip)
+                    {
+                        const coord2D C00(i,j);
+                        const coord2D C11(ip,jp);
+                        const size_t I00 = this->offset_of(C00);
+                        const size_t I11 = this->offset_of(C11);
+                        assert(I00<this->vertices);
+                        assert(I11<this->vertices);
+                        const EDGE edge( this->vtx[I00], this->vtx[I11] );
+                        if( !this->edb.insert(edge) )
+                        {
+                            this->throw_multiple_edges(I00,I11);
+                        }
+
                     }
                 }
                 assert( this->edb.size() == edges );
