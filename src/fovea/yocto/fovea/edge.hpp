@@ -63,7 +63,7 @@ namespace yocto
             {
             }
             
-            // once the vertices are loaded
+            //! once the physical vertices are loaded
             inline void load() const throw()
             {
                 T         sum = 0;
@@ -78,6 +78,21 @@ namespace yocto
                     m[i] = o[i] + dd/2;
                 }
                 (T &)length = math::Sqrt(sum);
+            }
+            
+            //!
+            inline bool joins( const Edge &other ) const throw()
+            {
+                if(this!=&other)
+                {
+                    return
+                    &v1 == &other.v1 ||
+                    &v1 == &other.v2 ||
+                    &v2 == &other.v1 ||
+                    &v2 == &other.v2;
+                }
+                else
+                    return false;
             }
             
             typedef set<edge_key,EDGE,key_hasher<edge_key,hashing::sfh>,memory_allocator> DB;

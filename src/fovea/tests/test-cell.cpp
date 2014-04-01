@@ -3,7 +3,8 @@
 #include "yocto/fovea/mesh/curvilinear.hpp"
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
-
+#include "yocto/fovea/cell/line.hpp"
+#include "yocto/fovea/cell/triangle.hpp"
 
 using namespace yocto;
 using namespace fovea;
@@ -11,25 +12,34 @@ using namespace fovea;
 template <typename MESH>
 static inline void show_mesh( const MESH &msh )
 {
-    std::cerr << "--------------------------------" << std::endl;
-    std::cerr << msh.form_name() << " mesh:" << std::endl;
-    std::cerr << "msh dims     = " << msh.dims        << std::endl;
-    std::cerr << "    layout   = " << msh.get_layout() << std::endl;
-    std::cerr << "   #vertices = " << msh.vertices    << std::endl;
-    std::cerr << "   #edges    = " << msh.edb.size()  << std::endl;
-    std::cerr << "    compiling..." << std::endl;
-    msh.compile();
-    for(size_t i=0;i<msh.dims;++i)
+    typedef typename MESH::EDGE EDGE;
+    typedef Line<MESH::DIMS,typename MESH::TYPE> LINE;
+    typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
+    
+    std::cerr << "mesh is " << msh.form_name() << std::endl;
+    std::cerr << "#VERTEX=" << msh.vertices    << std::endl;
+    std::cerr << "#EDGE  =" << msh.edb.size()  << std::endl;
+    if(msh.edb.size()>2)
     {
-        const char *id = mesh::axis_name(i);
-        const linear_space &l = msh.adb[id];
-        std::cerr << "axis " << id << " bytes: " << l.bytes << std::endl;
+        const EDGE &e1 = msh.edb.front();
+        LINE  l(e1.v1,e1.v2);
+        l.load_edges(msh);
+        {
+            const size_t i1 = alea_lt(msh.vertices);
+            size_t i2 = i1;
+            while(i2==i1)
+                i2 = alea_lt(msh.vertices);
+            const LINE l2(msh[i1],msh[i2]);
+            size_t i3=i1;
+            while(i3==i1||i3==i2)
+                i3 = alea_lt(msh.vertices);
+            const TRIANGLE t(msh[i1],msh[i2],msh[i3]);
+        }
+        
     }
-    std::cerr << "--------------------------------" << std::endl;
-    std::cerr << std::endl;
 }
 
-YOCTO_UNIT_TEST_IMPL(mesh)
+YOCTO_UNIT_TEST_IMPL(cell)
 {
     array_db a;
     
