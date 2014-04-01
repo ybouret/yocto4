@@ -22,12 +22,15 @@ namespace yocto
             typedef typename CELL::List           CELL_LIST;
             
             const LAYOUT & get_layout() const throw() { return *this; }
+            CELL_LIST cells;
+            
             
             inline explicit curvilinear_mesh( array_db &a, const LAYOUT &L ) :
             MESH(a,
                  L.items,
                  mesh::is_curvilinear),
-            LAYOUT(L)
+            LAYOUT(L),
+            cells()
             {
                 for(size_t i=0;i<this->dims;++i)
                 {
@@ -70,13 +73,16 @@ namespace yocto
                 {
                     const size_t I0 = this->offset_of(i);
                     const size_t IP = this->offset_of(ip);
-                    const EDGE edge( this->vtx[I0], this->vtx[IP] );
+                    const VERTEX &v0 = this->vtx[I0];
+                    const VERTEX &v1 = this->vtx[IP];
+                    const EDGE edge( v0, v1 );
                     assert(I0<this->vertices);
                     assert(IP<this->vertices);
                     if( !this->edb.insert(edge) )
                     {
                         this->throw_multiple_edges(I0,IP);
                     }
+                    cells.push_back( new CELL(v0,v1) );
                 }
                 assert( this->edb.size() == edges );
                 
@@ -104,7 +110,7 @@ namespace yocto
                 const size_t c_edges = x_edges * y_edges;
                 const size_t edges   = ny * x_edges + nx * y_edges + c_edges;
                 this->edb.reserve(edges);
-
+                
                 
                 //! X edges
                 for(unit_t j=this->lower.y;j<=this->upper.y;++j)
@@ -164,7 +170,7 @@ namespace yocto
                         
                     }
                 }
-
+                
                 assert( this->edb.size() == edges );
                 
             }
