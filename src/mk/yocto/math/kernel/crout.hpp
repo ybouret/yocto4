@@ -48,6 +48,7 @@ namespace yocto
              */
             bool inverse( matrix<T> &a );
             
+            
             //! Moore-Penrose pseudo inverse, P.cols >= P.rows
             /**
              memory must be allocated before

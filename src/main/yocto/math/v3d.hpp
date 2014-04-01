@@ -65,6 +65,8 @@ namespace yocto {
 			v3d( Random::Uniform &ran, const T radius) throw();
 			
 			static v3d mul_( const T, const v3d & ) throw();
+            static v3d div_( const v3d &, const T );
+
 			static T   dot_( const v3d &, const v3d & ) throw();
 			static v3d cross_( const v3d &, const v3d & ) throw();
 			void output( std::ostream & ) const;

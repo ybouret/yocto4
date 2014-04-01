@@ -22,7 +22,7 @@ SET( cell_srcs ${cell_decl} ${cell_impl} )
 INSTALL( FILES ${cell_decl} DESTINATION include/yocto/fovea/cell )
 SOURCE_GROUP( fovea/cell FILES ${cell_srcs} )
 
-INCLUDE_DIRECTORIES( . ../main )
+INCLUDE_DIRECTORIES( . ../main ../mk)
 
 ADD_LIBRARY(y-fovea STATIC 
 	${srcs} 

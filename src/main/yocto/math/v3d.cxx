@@ -29,7 +29,7 @@ namespace yocto {
         {
             x=y=z=0;
         }
-
+        
 		template <>
 		v3d<real_t> &v3d<real_t>::operator=( const v3d<real_t> &v ) throw() {
 			x = v.x;
@@ -90,6 +90,12 @@ namespace yocto {
 			return v3d<real_t>(a *v.x, a * v.y, a * v.z);
 		}
 		
+        template <>
+        v3d<real_t> v3d<real_t>::div_( const v3d<real_t> &v, const real_t a)
+        {
+            return mul_( real_t(1)/a, v );
+        }
+        
 		template <>
 		real_t v3d<real_t>::dot_( const v3d<real_t> &A, const v3d<real_t> &B ) throw() {
 			return A.x * B.x + A.y * B.y + A.z * B.z;
