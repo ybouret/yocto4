@@ -1,7 +1,7 @@
 #ifndef YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED
 #define YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED 1
 
-#include "yocto/fovea/mesh.hpp"
+#include "yocto/fovea/cell.hpp"
 #include "yocto/fovea/array1d.hpp"
 
 namespace yocto
@@ -22,6 +22,8 @@ namespace yocto
             typedef Mesh<LAYOUT::DIMENSIONS,T>    MESH;
             typedef typename MESH::VERTEX         VERTEX;
             typedef typename MESH::EDGE           EDGE;
+            typedef Cell<LAYOUT::DIMENSIONS,T>    CELL;
+            typedef typename CELL::List           CELL_LIST;
             
             const LAYOUT & get_layout() const throw() { return *this; }
             
