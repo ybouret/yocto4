@@ -52,8 +52,13 @@ namespace yocto
             //__________________________________________________________________
             virtual ~Shape() throw() {}
             
-            //! compute all data and load edges, after physical vertices are ok
-            virtual  void load_edges(const MESH &) = 0;
+            //! compute all data
+            /**
+             assuming that the physical edges are loaded,
+             that all the edges are compiled.
+             Must compute the barycenter and the size attribute.
+             */
+            virtual  void compile_for(const MESH &) = 0;
             
             
             //__________________________________________________________________

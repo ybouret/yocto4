@@ -58,7 +58,7 @@ namespace yocto
             
             inline virtual const char * name() const throw() { return TetraInfo::Name(); }
             
-            virtual void load_edges( const MESH &m )
+            virtual void compile_for( const MESH &m )
             {
                 //______________________________________________________________
                 //
@@ -79,6 +79,18 @@ namespace yocto
                         ++k;
                     }
                 }
+                
+                //______________________________________________________________
+                //
+                // get all the facets
+                //______________________________________________________________
+                this->compute_barycenter();
+                for(size_t i=0;i<3;++i)
+                {
+                    FACET &ff = *f[i];
+                    ff.compile_for(m);
+                }
+                
                 
             }
             
