@@ -107,12 +107,12 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // load all edges
+                // compile all edges
                 //______________________________________________________________
                 for( typename EDGE_DB::const_iterator i = edges.begin(); i != edges.end(); ++i )
                 {
                     const EDGE &edge = *i;
-                    edge.load();
+                    edge.compile();
                 }
                 
                 
