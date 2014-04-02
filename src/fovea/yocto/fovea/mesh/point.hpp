@@ -17,9 +17,11 @@ namespace yocto
             typedef Mesh<DIM,T>                   MESH;
             typedef typename MESH::VERTEX         VERTEX;
             typedef typename MESH::EDGE           EDGE;
-
+            typedef Cell<DIM,T>                   CELL;
+            typedef typename CELL::List           CELL_LIST;
+           
             const layout1D & get_layout() const throw() { return *this; }
-
+            CELL_LIST cells;
 
             virtual ~point_mesh() throw() {}
             

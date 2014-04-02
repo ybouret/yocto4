@@ -9,7 +9,7 @@ namespace yocto
 {
     namespace fovea
     {
-       
+        
         template <typename MESH>
         class structured
         {
@@ -34,6 +34,7 @@ namespace yocto
                 const size_t num_edges = m.vertices - 1;
                 EDGE_DB &edges = m.edges;
                 edges.reserve(num_edges);
+                CELL_LIST &cells = m.cells;
                 
                 for(unit_t i=m.lower,ip=m.lower+1;i<m.upper;++i,++ip)
                 {
@@ -50,9 +51,85 @@ namespace yocto
                         m.throw_multiple_edges(I0,IP);
                     }
                     
+                    cells.push_back( new CELL(v0,v1) );
+                    
+                }
+                assert( edges.size() == num_edges );
+                
+            }
+            
+            static void __assign( MESH &m, int2type<2> )
+            {
+                EDGE_DB &edges = m.edges;
+                const size_t nx        = m.width.x;
+                const size_t ny        = m.width.y;
+                const size_t x_edges   = nx - 1;
+                const size_t y_edges   = ny - 1;
+                const size_t c_edges   = x_edges * y_edges;
+                const size_t num_edges = ny * x_edges + nx * y_edges + c_edges;
+                m.edges.reserve(num_edges);
+                
+                //! X edges
+                for(unit_t j=m.lower.y;j<=m.upper.y;++j)
+                {
+                    for(unit_t i=m.lower.x,ip=m.lower.x+1;i<m.upper.x;++i,++ip)
+                    {
+                        const coord2D C0(i,j);
+                        const coord2D C1(ip,j);
+                        const size_t  I0 = m.offset_of(C0);
+                        const size_t  I1 = m.offset_of(C1);
+                        assert(I0<m.vertices);
+                        assert(I1<m.vertices);
+                        const EDGE edge( m[I0], m[I1] );
+                        if( !m.edges.insert(edge) )
+                        {
+                            m.throw_multiple_edges(I0,I1);
+                        }
+                    }
+                }
+                
+                
+                //! Y edges
+                for(unit_t j=m.lower.y,jp=m.lower.y+1;j<m.upper.y;++j,++jp)
+                {
+                    for(unit_t i=m.lower.x;i<=m.upper.x;++i)
+                    {
+                        const coord2D C0(i,j);
+                        const coord2D C1(i,jp);
+                        const size_t  I0 = m.offset_of(C0);
+                        const size_t  I1 = m.offset_of(C1);
+                        assert(I0<m.vertices);
+                        assert(I1<m.vertices);
+                        const EDGE edge( m[I0], m[I1] );
+                        if( !m.edges.insert(edge) )
+                        {
+                            m.throw_multiple_edges(I0,I1);
+                        }
+                    }
+                }
+                
+                //! C edges
+                for(unit_t j=m.lower.y,jp=m.lower.y+1;j<m.upper.y;++j,++jp)
+                {
+                    for(unit_t i=m.lower.x,ip=m.lower.x+1;i<m.upper.x;++i,++ip)
+                    {
+                        const coord2D C00(i,j);
+                        const coord2D C11(ip,jp);
+                        const size_t I00 = m.offset_of(C00);
+                        const size_t I11 = m.offset_of(C11);
+                        assert(I00<m.vertices);
+                        assert(I11<m.vertices);
+                        const EDGE edge( m[I00], m[I11] );
+                        if( !m.edges.insert(edge) )
+                        {
+                            m.throw_multiple_edges(I00,I11);
+                        }
+                        
+                    }
                 }
                 assert( edges.size() == num_edges );
 
+                
             }
             
         };
