@@ -12,7 +12,7 @@ namespace yocto
             if( &a==&b || &a==&c || &b==&c )
                 throw exception("Triangle(Same Vertices)");
             
-            if(a.index==b.index)
+            if(a.index==b.index || a.index==c.index || b.index == c.index)
                 throw exception("Unexpected Same Triangle Vertices INDEX");
         }
         

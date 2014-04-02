@@ -16,7 +16,7 @@ namespace yocto
             static void NoTriangle1D();
             static void MissingEdge( const edge_key &ek );
             static void ZeroLength( const VertexBase &a, const VertexBase &b );
-
+            
         };
         
         
@@ -51,7 +51,7 @@ namespace yocto
             
             inline virtual void load_edges( const MESH &m )
             {
-                __load(int2type<DIM>());
+                // load edges
                 for(size_t i=0;i<3;++i)
                 {
                     const VERTEX &v1 = *p[i];
@@ -61,7 +61,11 @@ namespace yocto
                     if( !e[i] )
                         TriangleInfo:: MissingEdge(ek);
                 }
-                __normals( int2type<DIM>() );
+                
+                
+                // compute specific data
+                __update(int2type<DIM>());
+                
             }
             
             
@@ -81,12 +85,7 @@ namespace yocto
             //
             // 1D triangle: does not exist
             //__________________________________________________________________
-            inline void __load( int2type<1> )
-            {
-                TriangleInfo:: NoTriangle1D();
-            }
-            
-            inline void __normals( int2type<1> )
+            inline void __update( int2type<1> )
             {
                 TriangleInfo:: NoTriangle1D();
             }
@@ -101,7 +100,7 @@ namespace yocto
                 rhs += ip.x * i.y;
             }
             
-            inline void __load( int2type<2> )
+            inline void __update( int2type<2> )
             {
                 //______________________________________________________________
                 //
@@ -131,12 +130,10 @@ namespace yocto
                     else
                         area = 0;
                 }
-                
-            }
-            
-            inline void __normals( int2type<2> )
-            {
-                
+                //______________________________________________________________
+                //
+                // compute normals
+                //______________________________________________________________
                 for(size_t i=0;i<3;++i)
                 {
                     const VERTEX &v1  = *p[i];
@@ -150,20 +147,18 @@ namespace yocto
                     n.y = -vv.x/len;
                 }
                 (T&)(sn.z) = 1;
+                
             }
             
             //__________________________________________________________________
             //
-            // 3D triangle: compute normal...
+            // 3D triangle: compute area and normals
             //__________________________________________________________________
-            inline void __load( int2type<3> )
+            inline void __update( int2type<3> )
             {
                 
             }
             
-            inline void __normals( int2type<3> )
-            {
-            }
         };
     }
     

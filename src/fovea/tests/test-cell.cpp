@@ -42,6 +42,35 @@ static inline void show_mesh( const MESH &msh )
 }
 
 
+template <typename MESH>
+static inline void show3d(const MESH &msh )
+{
+    typedef typename MESH::EDGE EDGE;
+    typedef Line<MESH::DIMS,typename MESH::TYPE> LINE;
+    typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
+    typedef Tetra<typename MESH::TYPE> TETRA;
+    
+    if( msh.vertices>=4 )
+    {
+        const size_t i1 = alea_lt(msh.vertices);
+        size_t i2 = i1;
+        while(i2==i1)
+            i2 = alea_lt(msh.vertices);
+        LINE l2(msh[i1],msh[i2]);
+        l2.compute_barycenter();
+        size_t i3=i1;
+        while(i3==i1||i3==i2)
+            i3 = alea_lt(msh.vertices);
+        const TRIANGLE td(msh[i1],msh[i2],msh[i3]);
+        size_t i4=i1;
+        while(i4==i1||i4==i2||i4==i3)
+            i4 = alea_lt(msh.vertices);
+        const TETRA th(msh[i1],msh[i2],msh[i3],msh[i4]);
+    }
+    
+    
+}
+
 #define __SHOW(CLASS,DIMS,TYPE) std::cerr << "sizeof(" << #CLASS << "<" << DIMS << "," << #TYPE  << ">)\t= \t" <<  sizeof(CLASS<DIMS,TYPE>) << std::endl
 
 YOCTO_UNIT_TEST_IMPL(cell)
@@ -80,10 +109,10 @@ YOCTO_UNIT_TEST_IMPL(cell)
     { rectilinear_mesh<float, layout2D> msh(a,L2);  show_mesh(msh);}
     a.free();
     
-    { rectilinear_mesh<double, layout3D> msh(a,L3); show_mesh(msh); }
+    { rectilinear_mesh<double, layout3D> msh(a,L3); show_mesh(msh); show3d(msh); }
     a.free();
     
-    { rectilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
+    { rectilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh); show3d(msh);}
     a.free();
     
     
@@ -100,10 +129,10 @@ YOCTO_UNIT_TEST_IMPL(cell)
     { curvilinear_mesh<float, layout2D> msh(a,L2);  show_mesh(msh);}
     a.free();
     
-    { curvilinear_mesh<double, layout3D> msh(a,L3); show_mesh(msh); }
+    { curvilinear_mesh<double, layout3D> msh(a,L3); show_mesh(msh); show3d(msh); }
     a.free();
     
-    { curvilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh);}
+    { curvilinear_mesh<float, layout3D> msh(a,L3);  show_mesh(msh); show3d(msh);}
     a.free();
     
     
@@ -114,7 +143,7 @@ YOCTO_UNIT_TEST_IMPL(cell)
     { point_mesh<2,double> msh(a,L1); show_mesh(msh); }
     a.free();
     
-    { point_mesh<3,float> msh(a,L1); show_mesh(msh); }
+    { point_mesh<3,float> msh(a,L1); show_mesh(msh); show3d(msh);}
     a.free();
     
     __SHOW(Line,1,float);
