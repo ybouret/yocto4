@@ -26,6 +26,7 @@ namespace yocto
             typedef typename MESH::EDGE           EDGE;
             typedef Cell<LAYOUT::DIMENSIONS,T>    CELL;
             typedef typename CELL::List           CELL_LIST;
+            typedef Box<LAYOUT::DIMENSIONS,T>     BOX;
             
             // public data
             const LAYOUT & get_layout() const throw() { return *this; }
@@ -62,6 +63,38 @@ namespace yocto
             inline axis_type       &Z()       { return this->adb[ mesh::axis_name(2) ].template as<axis_type>(); }
             inline const axis_type &Z() const { return this->adb[ mesh::axis_name(2) ].template as<axis_type>(); }
             
+            inline axis_type & get_axis(size_t dim)
+            {return this->adb[ mesh::axis_name(dim) ].template as<axis_type>();}
+            
+            inline const axis_type & get_axis(size_t dim) const
+            {return this->adb[ mesh::axis_name(dim) ].template as<axis_type>();}
+
+            //__________________________________________________________________
+            //
+            // mapping+compile
+            //__________________________________________________________________
+            inline void map_to( const BOX &box )
+            {
+                const T *pmin = (T*)&(box.vmin);
+                const T *pmax = (T*)&(box.vmax);
+                const T *plen = (T*)&(box.length);
+
+                for(size_t d=0;d<MESH::DIMS;++d)
+                {
+                    axis_type &A = get_axis(d);
+                    const T qmin = pmin[d];
+                    const T qmax = pmax[d];
+                    A[ A.lower ] = qmin;
+                    A[ A.upper ] = qmax;
+                    const T      qlen = plen[d];
+                    const size_t na   = A.upper - A.lower;
+                    for(unit_t i=A.lower+1;i<A.upper;++i)
+                    {
+                        A[ i ] = qmin + ( (i-A.lower) * qlen ) / na;
+                    }
+                }
+                this->compile();
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rectilinear_mesh);
