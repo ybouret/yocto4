@@ -23,7 +23,13 @@ YOCTO_UNIT_TEST_IMPL(tri2d)
         v2d<double> D( gen_coord(), -1+gen_coord() );
         v2d<double> P = (A+B+C)/3.0;
         v2d<double> Q = (B+C+D)/3.0;
-        const v2d<double> *V[6] = { &A, &B, &C, &D, &P, &Q };
+        v2d<double> I = (B+C)/2.0;
+        
+        v2d<double> *V[6] = { &A, &B, &C, &D, &P, &Q };
+        for(size_t i=0;i<6;++i)
+        {
+            *V[i] -= I;
+        }
         for(size_t i=0;i<6;++i)
         {
             const v2d<double> &v = *V[i];

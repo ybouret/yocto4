@@ -68,7 +68,10 @@ namespace yocto
                 const size_t c_edges   = x_edges * y_edges;
                 const size_t num_edges = ny * x_edges + nx * y_edges + c_edges;
                 m.edges.reserve(num_edges);
-                
+                //--------------------------------------------------------------
+                // first pass: all edges
+                //--------------------------------------------------------------
+
                 //! X edges
                 for(unit_t j=m.lower.y;j<=m.upper.y;++j)
                 {
@@ -129,7 +132,36 @@ namespace yocto
                 }
                 assert( edges.size() == num_edges );
 
-                
+                //--------------------------------------------------------------
+                // second pass: all cells
+                //--------------------------------------------------------------
+                CELL_LIST &cells = m.cells;
+                for(unit_t j=m.lower.y,jp=m.lower.y+1;j<m.upper.y;++j,++jp)
+                {
+                    for(unit_t i=m.lower.x,ip=m.lower.x+1;i<m.upper.x;++i,++ip)
+                    {
+                        const coord2D C00(i,j);
+                        const coord2D C01(i,jp);
+                        const coord2D C10(ip,j);
+                        const coord2D C11(ip,jp);
+                        const size_t I00 = m.offset_of(C00);
+                        const size_t I01 = m.offset_of(C01);
+                        const size_t I10 = m.offset_of(C10);
+                        const size_t I11 = m.offset_of(C11);
+                        assert(I00<m.vertices);
+                        assert(I01<m.vertices);
+                        assert(I10<m.vertices);
+                        assert(I11<m.vertices);
+                        const VERTEX &v00 = m[I00];
+                        const VERTEX &v01 = m[I01];
+                        const VERTEX &v10 = m[I10];
+                        const VERTEX &v11 = m[I11];
+
+                        // make two CCW triangles
+                        cells.push_back( new CELL(v00,v01,v10) );
+                        cells.push_back( new CELL(v10,v11,v01) );
+                    }
+                }
             }
             
         };

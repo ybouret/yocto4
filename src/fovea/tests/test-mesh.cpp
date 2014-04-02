@@ -12,7 +12,7 @@ template <typename MESH>
 static inline void show_mesh( const MESH &msh )
 {
     std::cerr << "--------------------------------" << std::endl;
-    std::cerr << msh.form_name() << " mesh:" << std::endl;
+    std::cerr << msh.form_name() << " mesh:" << " " << msh.DIMS << "D" << std::endl;
     std::cerr << "msh dims     = " << msh.dims          << std::endl;
     std::cerr << "    layout   = " << msh.get_layout()  << std::endl;
     std::cerr << "   #vertices = " << msh.vertices      << std::endl;
