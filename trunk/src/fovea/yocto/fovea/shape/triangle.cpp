@@ -36,5 +36,10 @@ namespace yocto
             throw exception("Zero Length for Triangle Edge #%u <-> #%u", unsigned(a.index), unsigned(b.index) );
         }
         
+        void TriangleInfo:: EmptyTriangle3D()
+        {
+            throw exception("Empty Triangle3D");
+        }
+        
     }
 }

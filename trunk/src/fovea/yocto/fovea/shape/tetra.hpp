@@ -89,6 +89,8 @@ namespace yocto
                 {
                     FACET &ff = *f[i];
                     ff.compile_for(m);
+                    const vtx GF(this->G,ff.G);
+                    if( GF*ff.sn < 0 ) ff.flip_normal();
                 }
                 
                 

@@ -16,7 +16,7 @@ namespace yocto
             static void NoTriangle1D();
             static void MissingEdge( const edge_key &ek );
             static void ZeroLength( const VertexBase &a, const VertexBase &b );
-            
+            static void EmptyTriangle3D();
         };
         
         
@@ -51,6 +51,9 @@ namespace yocto
             
             inline virtual void compile_for( const MESH &m )
             {
+                // compute specific data: area and normals
+                __update(int2type<DIM>());
+                
                 // load edges
                 for(size_t i=0;i<3;++i)
                 {
@@ -62,9 +65,8 @@ namespace yocto
                         TriangleInfo:: MissingEdge(ek);
                 }
                 
-                
-                // compute specific data
-                __update(int2type<DIM>());
+                // compute barycenter
+                this->compute_barycenter();
                 
             }
             
@@ -75,6 +77,10 @@ namespace yocto
             const vtx     en[3]; //!< edge normals
         public:
             const vtx3    sn;    //!< surface normal
+            void flip_normal() throw()
+            {
+                (vtx3 &)sn = -sn;
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Triangle);
@@ -118,14 +124,14 @@ namespace yocto
                 {
                     // ClockWise
                     cswap(p[0],p[1]);
-                    area = rhs - lhs;
+                    area = (rhs - lhs)/2;
                 }
                 else
                 {
                     if(lhs>rhs)
                     {
                         // Counter ClockWise
-                        area = lhs - rhs;
+                        area = (lhs - rhs)/2;
                     }
                     else
                         area = 0;
@@ -139,7 +145,7 @@ namespace yocto
                     const VERTEX &v1  = *p[i];
                     const VERTEX &v2  = *p[(i+1)%3];
                     const vtx     vv  = v2.r - v1.r;
-                    const T       len = e[i]->length;
+                    const T       len = vv.norm();
                     if(len<=0)
                         TriangleInfo::ZeroLength(v1,v2);
                     vtx &n = (vtx &)(en[i]);
@@ -156,7 +162,17 @@ namespace yocto
             //__________________________________________________________________
             inline void __update( int2type<3> )
             {
+                const vtx3 v1(p[0]->r,p[1]->r);
+                const vtx3 v2(p[2]->r,p[1]->r);
                 
+                // compute a normal
+                const vtx3 v   = vtx3::cross_(v1,v2);
+                const T    len = v.norm();
+                if(len<=0)
+                    TriangleInfo::EmptyTriangle3D();
+                (vtx3 &)sn = v/len;
+                
+                // compute the area
             }
             
         };
