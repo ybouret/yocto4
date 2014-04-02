@@ -4,6 +4,7 @@
 
 #include "yocto/fovea/cell.hpp"
 #include "yocto/fovea/array3d.hpp"
+#include "yocto/fovea/box.hpp"
 
 namespace yocto
 {
