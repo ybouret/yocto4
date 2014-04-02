@@ -16,9 +16,10 @@ static inline void show_mesh( const MESH &msh )
     typedef Line<MESH::DIMS,typename MESH::TYPE> LINE;
     typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
     
-    std::cerr << "mesh is " << msh.form_name() << std::endl;
-    std::cerr << "#VERTEX=" << msh.vertices    << std::endl;
+    std::cerr << "mesh is " << msh.form_name()   << " " << msh.DIMS << "D" << std::endl;
+    std::cerr << "#VERTEX=" << msh.vertices      << std::endl;
     std::cerr << "#EDGE  =" << msh.edges.size()  << std::endl;
+    std::cerr << "#CELLS =" << msh.cells.size    << std::endl;
     if(msh.edges.size()>2)
     {
         const EDGE &e1 = msh.edges.front();
