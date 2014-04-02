@@ -24,7 +24,7 @@ static inline void show_mesh( const MESH &msh )
     {
         const EDGE &e1 = msh.edges.front();
         LINE  l(e1.v1,e1.v2);
-        l.load_edges(msh);
+        l.compile_for(msh);
         {
             const size_t i1 = alea_lt(msh.vertices);
             size_t i2 = i1;

@@ -49,7 +49,7 @@ namespace yocto
             inline virtual const char * name() const throw() { return TriangleInfo::Name(); }
             
             
-            inline virtual void load_edges( const MESH &m )
+            inline virtual void compile_for( const MESH &m )
             {
                 // load edges
                 for(size_t i=0;i<3;++i)

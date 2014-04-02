@@ -40,7 +40,7 @@ namespace yocto
             
             inline virtual const char * name() const throw() { return LineInfo::Name(); }
             
-            inline virtual void load_edges( const MESH &m )
+            inline virtual void compile_for( const MESH &m )
             {
                 const SHAPE    &shape = *this;
                 const edge_key  ek(shape[0].index,shape[1].index);
@@ -48,6 +48,7 @@ namespace yocto
                 if(!pE)
                     LineInfo::NoEdgeFor(shape[0],shape[1]);
                 e = pE;
+                this->compute_barycenter();
                 (T&)(this->size) = e->length;
             }
             
