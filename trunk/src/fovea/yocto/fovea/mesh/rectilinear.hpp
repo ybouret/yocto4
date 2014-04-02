@@ -1,8 +1,8 @@
 #ifndef YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED
 #define YOCTO_FOVEA_MESH_RECTILINEAR_INCLUDED 1
 
-#include "yocto/fovea/cell.hpp"
-#include "yocto/fovea/array1d.hpp"
+#include "yocto/fovea/mesh/structured.hpp"
+
 
 namespace yocto
 {
@@ -18,6 +18,8 @@ namespace yocto
             //
             // types
             //__________________________________________________________________
+            typedef LAYOUT                        layout_type;
+            typedef rectilinear_mesh<T,LAYOUT>    mesh_type;
             typedef array1D<T>                    axis_type;
             typedef Mesh<LAYOUT::DIMENSIONS,T>    MESH;
             typedef typename MESH::VERTEX         VERTEX;
@@ -26,7 +28,6 @@ namespace yocto
             typedef typename CELL::List           CELL_LIST;
             
             const LAYOUT & get_layout() const throw() { return *this; }
-            
             
             //__________________________________________________________________
             //
@@ -44,7 +45,6 @@ namespace yocto
                     this->adb.store( new axis_type(axis_n,axis_l) );
                 }
                 assign( int2type<LAYOUT::DIMENSIONS>() );
-                this->assigned = true;
             }
             
             inline virtual ~rectilinear_mesh() throw() {}
@@ -73,33 +73,15 @@ namespace yocto
                 size_t v = 0;
                 for(unit_t i=this->lower;i<=this->upper;++i,++v)
                 {
-                    new (this->vtx+v) VERTEX(v,aX[i] );
+                    new (this->pvtx+v) VERTEX(v,aX[i] );
                 }
+                this->assigned = true;
                 
                 //______________________________________________________________
                 //
-                // allocate edges + cells
+                // allocate edges+cells
                 //______________________________________________________________
-                const size_t num_edges = this->vertices - 1;
-                this->edges.reserve(num_edges);
-                
-                for(unit_t i=this->lower,ip=this->lower+1;i<this->upper;++i,++ip)
-                {
-                    const size_t I0 = this->offset_of(i);
-                    const size_t IP = this->offset_of(ip);
-                    assert(I0<this->vertices);
-                    assert(IP<this->vertices);
-                    const VERTEX &v0 = this->vtx[I0];
-                    const VERTEX &v1 = this->vtx[IP];
-                    const EDGE edge( v0, v1 );
-                    
-                    if( !this->edges.insert(edge) )
-                    {
-                        this->throw_multiple_edges(I0,IP);
-                    }
-                    
-                }
-                assert( this->edges.size() == num_edges );
+                structured<mesh_type>::assign(*this);
                 
             }
             
@@ -118,7 +100,7 @@ namespace yocto
                     T &y = aY[j];
                     for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                     {
-                        new (this->vtx+v) VERTEX(v,aX[i], y );
+                        new (this->pvtx+v) VERTEX(v,aX[i], y );
                     }
                 }
                 
@@ -134,6 +116,7 @@ namespace yocto
                 const size_t num_edges = ny * x_edges + nx * y_edges + c_edges;
                 this->edges.reserve(num_edges);
                 
+                const MESH &m = *this;
                 //! X edges
                 for(unit_t j=this->lower.y;j<=this->upper.y;++j)
                 {
@@ -145,7 +128,7 @@ namespace yocto
                         const size_t  I1 = this->offset_of(C1);
                         assert(I0<this->vertices);
                         assert(I1<this->vertices);
-                        const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                        const EDGE edge( m[I0], m[I1] );
                         if( !this->edges.insert(edge) )
                         {
                             this->throw_multiple_edges(I0,I1);
@@ -165,7 +148,7 @@ namespace yocto
                         const size_t  I1 = this->offset_of(C1);
                         assert(I0<this->vertices);
                         assert(I1<this->vertices);
-                        const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                        const EDGE edge( this->pvtx[I0], this->pvtx[I1] );
                         if( !this->edges.insert(edge) )
                         {
                             this->throw_multiple_edges(I0,I1);
@@ -184,7 +167,7 @@ namespace yocto
                         const size_t I11 = this->offset_of(C11);
                         assert(I00<this->vertices);
                         assert(I11<this->vertices);
-                        const EDGE edge( this->vtx[I00], this->vtx[I11] );
+                        const EDGE edge( this->pvtx[I00], this->pvtx[I11] );
                         if( !this->edges.insert(edge) )
                         {
                             this->throw_multiple_edges(I00,I11);
@@ -209,7 +192,7 @@ namespace yocto
                         T &y = aY[j];
                         for(unit_t i=this->lower.x;i<=this->upper.x;++i,++v)
                         {
-                            new (this->vtx+v) VERTEX(v,aX[i], y,z );
+                            new (this->pvtx+v) VERTEX(v,aX[i], y,z );
                         }
                     }
                 }
@@ -238,7 +221,7 @@ namespace yocto
                             const size_t  I1 = this->offset_of(C1);
                             assert(I0<this->vertices);
                             assert(I1<this->vertices);
-                            const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                            const EDGE edge( this->pvtx[I0], this->pvtx[I1] );
                             if( !this->edges.insert(edge) )
                             {
                                 this->throw_multiple_edges(I0,I1);
@@ -262,7 +245,7 @@ namespace yocto
                             const size_t  I1 = this->offset_of(C1);
                             assert(I0<this->vertices);
                             assert(I1<this->vertices);
-                            const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                            const EDGE edge( this->pvtx[I0], this->pvtx[I1] );
                             if( !this->edges.insert(edge) )
                             {
                                 this->throw_multiple_edges(I0,I1);
@@ -285,7 +268,7 @@ namespace yocto
                             const size_t  I1 = this->offset_of(C1);
                             assert(I0<this->vertices);
                             assert(I1<this->vertices);
-                            const EDGE edge( this->vtx[I0], this->vtx[I1] );
+                            const EDGE edge( this->pvtx[I0], this->pvtx[I1] );
                             if( !this->edges.insert(edge) )
                             {
                                 this->throw_multiple_edges(I0,I1);
