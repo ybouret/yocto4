@@ -63,8 +63,8 @@ namespace yocto
             {
             }
             
-            //! once the physical vertices are loaded
-            inline void load() const throw()
+            //! once the physical vertices are loaded, compute auxiliary data
+            inline void compile() const throw()
             {
                 T         sum = 0;
                 const vtx dif = v2.r - v1.r;
