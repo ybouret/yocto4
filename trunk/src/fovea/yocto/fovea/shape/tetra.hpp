@@ -1,7 +1,7 @@
 #ifndef YOCTO_FOVEA_SHAPE_TETRA_INCLUDED
 #define YOCTO_FOVEA_SHAPE_TETRA_INCLUDED 1
 
-#include "yocto/fovea/shape.hpp"
+#include "yocto/fovea/shape/triangle.hpp"
 
 namespace yocto
 {
@@ -27,16 +27,22 @@ namespace yocto
             typedef typename SHAPE::EDGE           EDGE;
             typedef typename SHAPE::MESH           MESH;
             typedef typename VERTEX::vtx           vtx;
+            typedef Triangle<3,T>                  FACET;
             
             virtual ~Tetra() throw() {}
             
             explicit Tetra(const VERTEX &a,
                            const VERTEX &b,
                            const VERTEX &c,
-                           const VERTEX &d ) :
+                           const VERTEX &d) :
             SHAPE(4),
             p(),
-            e()
+            e(),
+            f0(a,b,c),
+            f1(a,b,d),
+            f2(a,c,d),
+            f3(b,c,d),
+            f()
             {
                 TetraInfo::CheckVertices(a, b, c,d);
                 p[0] = &a;
@@ -44,14 +50,46 @@ namespace yocto
                 p[2] = &c;
                 p[3] = &d;
                 e[0] = e[1] = e[2] = e[3] = e[4] = e[5] = 0;
+                f[0] = &f0;
+                f[1] = &f1;
+                f[2] = &f2;
+                f[3] = &f3;
             }
             
             inline virtual const char * name() const throw() { return TetraInfo::Name(); }
+            
+            virtual void load_edges( const MESH &m )
+            {
+                //______________________________________________________________
+                //
+                // get all the edges
+                //______________________________________________________________
+                size_t k=0;
+                for(size_t i=0;i<3;++i)
+                {
+                    const VERTEX &v1 = *p[i];
+                    for(size_t j=i+1;j<4;++j)
+                    {
+                        const VERTEX &v2 = *p[j];
+                        const edge_key ek(v1.index,v2.index);
+                        assert(k<6);
+                        e[k] = m.edges.search(ek);
+                        if( !e[k] )
+                            TetraInfo:: MissingEdge(ek);
+                        ++k;
+                    }
+                }
+                
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Tetra);
             const VERTEX *p[4];
             const EDGE   *e[6];
+            FACET         f0,f1,f2,f3;
+            FACET        *f[4];
+            
+            virtual const VERTEX **ppVTX() const throw() { return (const VERTEX **)p; }
             
         };
         

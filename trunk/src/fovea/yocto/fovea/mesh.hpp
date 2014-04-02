@@ -93,6 +93,7 @@ namespace yocto
                 memory::kind<memory_kind>::release_as<VERTEX>(pvtx,nvtx);
             }
             
+            // once all physical coordinates are set
             inline void compile() const throw()
             {
                 //______________________________________________________________
@@ -113,6 +114,8 @@ namespace yocto
                     const EDGE &edge = *i;
                     edge.load();
                 }
+                
+                
             }
             
         protected:
