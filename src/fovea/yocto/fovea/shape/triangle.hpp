@@ -57,7 +57,7 @@ namespace yocto
                     const VERTEX &v1 = *p[i];
                     const VERTEX &v2 = *p[(i+1)%3];
                     const edge_key ek(v1.index,v2.index);
-                    e[i] = m.edb.search(ek);
+                    e[i] = m.edges.search(ek);
                     if( !e[i] )
                         TriangleInfo:: MissingEdge(ek);
                 }

@@ -66,25 +66,25 @@ namespace yocto
                 }
                 
                 // edges
-                const size_t edges = this->vertices - 1;
-                this->edb.reserve(edges);
+                const size_t num_edges = this->vertices - 1;
+                this->edges.reserve(num_edges);
                 
                 for(unit_t i=this->lower,ip=this->lower+1;i<this->upper;++i,++ip)
                 {
                     const size_t I0 = this->offset_of(i);
                     const size_t IP = this->offset_of(ip);
+                    assert(I0<this->vertices);
+                    assert(IP<this->vertices);
                     const VERTEX &v0 = this->vtx[I0];
                     const VERTEX &v1 = this->vtx[IP];
                     const EDGE edge( v0, v1 );
-                    assert(I0<this->vertices);
-                    assert(IP<this->vertices);
-                    if( !this->edb.insert(edge) )
+                    if( !this->edges.insert(edge) )
                     {
                         this->throw_multiple_edges(I0,IP);
                     }
                     cells.push_back( new CELL(v0,v1) );
                 }
-                assert( this->edb.size() == edges );
+                assert( this->edges.size() == num_edges );
                 
                 
             }
@@ -103,13 +103,13 @@ namespace yocto
                 }
                 
                 //! edges
-                const size_t nx      = this->width.x;
-                const size_t ny      = this->width.y;
-                const size_t x_edges = nx - 1;
-                const size_t y_edges = ny - 1;
-                const size_t c_edges = x_edges * y_edges;
-                const size_t edges   = ny * x_edges + nx * y_edges + c_edges;
-                this->edb.reserve(edges);
+                const size_t nx        = this->width.x;
+                const size_t ny        = this->width.y;
+                const size_t x_edges   = nx - 1;
+                const size_t y_edges   = ny - 1;
+                const size_t c_edges   = x_edges * y_edges;
+                const size_t num_edges = ny * x_edges + nx * y_edges + c_edges;
+                this->edges.reserve(num_edges);
                 
                 
                 //! X edges
@@ -124,7 +124,7 @@ namespace yocto
                         assert(I0<this->vertices);
                         assert(I1<this->vertices);
                         const EDGE edge( this->vtx[I0], this->vtx[I1] );
-                        if( !this->edb.insert(edge) )
+                        if( !this->edges.insert(edge) )
                         {
                             this->throw_multiple_edges(I0,I1);
                         }
@@ -144,7 +144,7 @@ namespace yocto
                         assert(I0<this->vertices);
                         assert(I1<this->vertices);
                         const EDGE edge( this->vtx[I0], this->vtx[I1] );
-                        if( !this->edb.insert(edge) )
+                        if( !this->edges.insert(edge) )
                         {
                             this->throw_multiple_edges(I0,I1);
                         }
@@ -163,7 +163,7 @@ namespace yocto
                         assert(I00<this->vertices);
                         assert(I11<this->vertices);
                         const EDGE edge( this->vtx[I00], this->vtx[I11] );
-                        if( !this->edb.insert(edge) )
+                        if( !this->edges.insert(edge) )
                         {
                             this->throw_multiple_edges(I00,I11);
                         }
@@ -171,7 +171,7 @@ namespace yocto
                     }
                 }
                 
-                assert( this->edb.size() == edges );
+                assert( this->edges.size() == num_edges );
                 
             }
             
@@ -193,14 +193,14 @@ namespace yocto
                 }
                 
                 //! edges
-                const size_t nx      = this->width.x;
-                const size_t ny      = this->width.y;
-                const size_t nz      = this->width.z;
-                const size_t x_edges = nx - 1;
-                const size_t y_edges = ny - 1;
-                const size_t z_edges = nz - 1;
-                const size_t edges   = nz * (ny * x_edges + nx * y_edges) + (nx*ny) * z_edges;
-                this->edb.reserve(edges);
+                const size_t nx        = this->width.x;
+                const size_t ny        = this->width.y;
+                const size_t nz        = this->width.z;
+                const size_t x_edges   = nx - 1;
+                const size_t y_edges   = ny - 1;
+                const size_t z_edges   = nz - 1;
+                const size_t num_edges = nz * (ny * x_edges + nx * y_edges) + (nx*ny) * z_edges;
+                this->edges.reserve(num_edges);
                 
                 
                 // X edges
@@ -217,7 +217,7 @@ namespace yocto
                             assert(I0<this->vertices);
                             assert(I1<this->vertices);
                             const EDGE edge( this->vtx[I0], this->vtx[I1] );
-                            if( !this->edb.insert(edge) )
+                            if( !this->edges.insert(edge) )
                             {
                                 this->throw_multiple_edges(I0,I1);
                             }
@@ -241,7 +241,7 @@ namespace yocto
                             assert(I0<this->vertices);
                             assert(I1<this->vertices);
                             const EDGE edge( this->vtx[I0], this->vtx[I1] );
-                            if( !this->edb.insert(edge) )
+                            if( !this->edges.insert(edge) )
                             {
                                 this->throw_multiple_edges(I0,I1);
                             }
@@ -264,14 +264,14 @@ namespace yocto
                             assert(I0<this->vertices);
                             assert(I1<this->vertices);
                             const EDGE edge( this->vtx[I0], this->vtx[I1] );
-                            if( !this->edb.insert(edge) )
+                            if( !this->edges.insert(edge) )
                             {
                                 this->throw_multiple_edges(I0,I1);
                             }
                         }
                     }
                 }
-                assert(edges==this->edb.size());
+                assert(num_edges==this->edges.size());
             }
         };
         

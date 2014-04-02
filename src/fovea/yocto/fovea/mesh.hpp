@@ -109,7 +109,7 @@ namespace yocto
                 //
                 // load all edges
                 //______________________________________________________________
-                for( typename EDGE_DB::const_iterator i = edb.begin(); i != edb.end(); ++i )
+                for( typename EDGE_DB::const_iterator i = edges.begin(); i != edges.end(); ++i )
                 {
                     const EDGE &edge = *i;
                     edge.load();
@@ -124,7 +124,7 @@ namespace yocto
             mesh(a,DIM,nv,f,sizeof(T)),
             num( vertices ),
             vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) ),
-            edb()
+            edges()
             {
             }
             
@@ -136,7 +136,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Mesh);
         public:
-            EDGE_DB edb;
+            EDGE_DB edges;
         };
     }
     

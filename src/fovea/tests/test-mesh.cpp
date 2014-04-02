@@ -13,10 +13,10 @@ static inline void show_mesh( const MESH &msh )
 {
     std::cerr << "--------------------------------" << std::endl;
     std::cerr << msh.form_name() << " mesh:" << std::endl;
-    std::cerr << "msh dims     = " << msh.dims        << std::endl;
-    std::cerr << "    layout   = " << msh.get_layout() << std::endl;
-    std::cerr << "   #vertices = " << msh.vertices    << std::endl;
-    std::cerr << "   #edges    = " << msh.edb.size()  << std::endl;
+    std::cerr << "msh dims     = " << msh.dims          << std::endl;
+    std::cerr << "    layout   = " << msh.get_layout()  << std::endl;
+    std::cerr << "   #vertices = " << msh.vertices      << std::endl;
+    std::cerr << "   #edges    = " << msh.edges.size()  << std::endl;
     std::cerr << "    compiling..." << std::endl;
     msh.compile();
     for(size_t i=0;i<msh.dims;++i)
