@@ -44,7 +44,7 @@ namespace yocto
             {
                 const SHAPE    &shape = *this;
                 const edge_key  ek(shape[0].index,shape[1].index);
-                const EDGE     *pE = m.edb.search(ek);
+                const EDGE     *pE = m.edges.search(ek);
                 if(!pE)
                     LineInfo::NoEdgeFor(shape[0],shape[1]);
                 e = pE;

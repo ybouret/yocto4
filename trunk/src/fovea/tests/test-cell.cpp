@@ -18,10 +18,10 @@ static inline void show_mesh( const MESH &msh )
     
     std::cerr << "mesh is " << msh.form_name() << std::endl;
     std::cerr << "#VERTEX=" << msh.vertices    << std::endl;
-    std::cerr << "#EDGE  =" << msh.edb.size()  << std::endl;
-    if(msh.edb.size()>2)
+    std::cerr << "#EDGE  =" << msh.edges.size()  << std::endl;
+    if(msh.edges.size()>2)
     {
-        const EDGE &e1 = msh.edb.front();
+        const EDGE &e1 = msh.edges.front();
         LINE  l(e1.v1,e1.v2);
         l.load_edges(msh);
         {
