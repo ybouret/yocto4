@@ -40,7 +40,8 @@ namespace yocto
             static const char *axis_name( size_t dim );
             static const char *form2name( form_type ) throw();
             const char        *form_name() const throw();
-            
+            void               throw_multiple_edges(size_t i1, size_t i2);
+
         protected:
             explicit mesh(array_db       &a,
                           const size_t    d,
@@ -48,8 +49,7 @@ namespace yocto
                           const form_type f,
                           const size_t    s) throw();
             
-            bool assigned; //!< for VTX cleanup
-            void throw_multiple_edges(size_t i1, size_t i2);
+            bool assigned; //!< for vtx cleanup
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(mesh);
@@ -69,17 +69,16 @@ namespace yocto
             inline VERTEX & operator[]( size_t v ) throw()
             {
                 assert(v<vertices);
-                assert(vtx);
+                assert(pvtx);
                 assert(assigned);
-                return vtx[v];
+                return pvtx[v];
             }
             
             inline const VERTEX & operator[]( size_t v ) const throw()
             {
                 assert(v<vertices);
-                assert(vtx);
-                assert(assigned);
-                return vtx[v];
+                assert(pvtx);
+                return pvtx[v];
             }
             
             virtual ~Mesh() throw() {
@@ -88,10 +87,10 @@ namespace yocto
                     size_t i = vertices;
                     while(i>0)
                     {
-                        vtx[--i].~VERTEX();
+                        pvtx[--i].~VERTEX();
                     }
                 }
-                memory::kind<memory_kind>::release_as<VERTEX>(vtx,num);
+                memory::kind<memory_kind>::release_as<VERTEX>(pvtx,nvtx);
             }
             
             inline void compile() const throw()
@@ -102,7 +101,7 @@ namespace yocto
                 //______________________________________________________________
                 for(size_t i=0;i<vertices;++i)
                 {
-                    vtx[i].load();
+                    pvtx[i].load();
                 }
                 
                 //______________________________________________________________
@@ -122,16 +121,16 @@ namespace yocto
                           const form_type f
                           ) :
             mesh(a,DIM,nv,f,sizeof(T)),
-            num( vertices ),
-            vtx( memory::kind<memory_kind>::acquire_as<VERTEX>(num) ),
+            nvtx( vertices ),
+            pvtx( memory::kind<memory_kind>::acquire_as<VERTEX>(nvtx) ),
             edges()
             {
             }
             
         private:
-            size_t    num; //!< for memory
+            size_t    nvtx;    //!< for memory
         protected:
-            VERTEX   *vtx; //!< for memory
+            VERTEX   *pvtx; //!< for memory
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Mesh);

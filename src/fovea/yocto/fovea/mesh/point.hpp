@@ -52,7 +52,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) VERTEX(j,aX[i]);
+                    new (this->pvtx+j) VERTEX(j,aX[i]);
                 }
             
             }
@@ -64,7 +64,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) VERTEX(j,aX[i],aY[i]);
+                    new (this->pvtx+j) VERTEX(j,aX[i],aY[i]);
                 }
 
             }
@@ -77,7 +77,7 @@ namespace yocto
                 unit_t     i  = lower;
                 for(size_t j=0;j<this->vertices;++j,++i)
                 {
-                    new (this->vtx+j) VERTEX(j,aX[i],aY[i],aZ[i]);
+                    new (this->pvtx+j) VERTEX(j,aX[i],aY[i],aZ[i]);
                 }
             }
             
