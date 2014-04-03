@@ -231,13 +231,53 @@ namespace yocto
             //==================================================================
             inline void __map_to( const Box<1,T> &box )
             {
-                
+                const T      xmin = box.vmin;
+                const T      xmax = box.vmax;
+                const T      xlen = box.length;
+                array_type  &xx   = X();
+                const unit_t imin = this->lower;
+                const unit_t imax = this->upper;
+                const unit_t ilen = imax - imin;
+                xx[imin] = xmin;
+                xx[imax] = xmax;
+                for(unit_t i=imin+1;i<imax;++i)
+                {
+                    xx[i] = xmin + ((i-imin)*xlen)/ilen;
+                }
             }
             
             inline void __map_to( const Box<2,T> &box )
             {
+                const T      xmin = box.vmin.x;
+                //const T      xmax = box.vmax.x;
+                const T      xlen = box.length.x;
+                const T      ymin = box.vmin.y;
+                //const T      ymax = box.vmax.y;
+                const T      ylen = box.length.y;
+                array_type  &xx   = X();
+                array_type  &yy   = Y();
+                const unit_t imin = this->lower.x;
+                const unit_t imax = this->upper.x;
+                const unit_t ilen = imax - imin;
+                
+                const unit_t jmin = this->lower.y;
+                const unit_t jmax = this->upper.y;
+                const unit_t jlen = jmax - jmin;
+                
+                for(unit_t j=jmin;j<=jmax;++j)
+                {
+                    const T yj = ymin + ( (j-jmin) * ylen )/jlen;
+                    for(unit_t i=imin;i<=imax;++i)
+                    {
+                        const T xi = xmin + ( (i-imin) * xlen )/ilen;
+                        xx[j][i] = xi;
+                        yy[j][i] = yj;
+                    }
+                }
                 
             }
+            
+            
         };
         
     }
