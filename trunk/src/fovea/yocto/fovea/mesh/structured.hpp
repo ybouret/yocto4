@@ -188,6 +188,14 @@ namespace yocto
             static void __assign( MESH &m, int2type<3> )
             {
                 EDGE_DB &edges = m.edges;
+                //! edges
+                const size_t nx         = m.width.x;
+                const size_t ny         = m.width.y;
+                const size_t nz         = m.width.z;
+                const size_t x_edges    = nx - 1;
+                const size_t y_edges    = ny - 1;
+                const size_t z_edges    = nz - 1;
+                const size_t cube_edges = nz * (ny * x_edges + nx * y_edges) + (nx*ny) * z_edges;
                 
             }
         };
