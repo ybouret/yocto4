@@ -7,6 +7,7 @@
 
 using namespace yocto;
 using namespace fovea;
+using namespace math;
 
 #define gen_coord() (alea<double>()-0.5)
 #define gen_coordf() (alea<float>()-0.5f)
@@ -18,6 +19,8 @@ static inline void show_mesh( const MESH &msh )
     std::cerr << "#VERTEX=" << msh.vertices      << std::endl;
     std::cerr << "#EDGE  =" << msh.edges.size()  << std::endl;
     std::cerr << "#CELLS =" << msh.cells.size    << std::endl;
+    
+    std::cerr << std::endl;
 }
 
 YOCTO_UNIT_TEST_IMPL(mapping)
@@ -48,6 +51,10 @@ YOCTO_UNIT_TEST_IMPL(mapping)
     const Box<1,float>  B1f( gen_coordf(), gen_coordf() );
     const Box<1,double> B1d( gen_coord(),  gen_coord()  );
 
+    const Box<2,float>   B2f( v2d<float>(gen_coordf(), gen_coordf()),  v2d<float>(gen_coordf(), gen_coordf()));
+    const Box<2,double>  B2d( v2d<double>(gen_coord(), gen_coord()),  v2d<double>(gen_coord(), gen_coord()));
+
+    // RECTILINEAR 1D
     {
         rectilinear_mesh<float,layout1D> msh(a,L1);
         msh.map_to(B1f);
@@ -61,6 +68,53 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         show_mesh(msh);
     }
     a.free();
+    
+    // RECTILINEAR 2D
+    {
+        rectilinear_mesh<float,layout2D> msh(a,L2);
+        msh.map_to(B2f);
+        show_mesh(msh);
+    }
+    a.free();
+    
+    
+    {
+        rectilinear_mesh<double,layout2D> msh(a,L2);
+        msh.map_to(B2d);
+        show_mesh(msh);
+    }
+    a.free();
+
+    // CURVILINEAR 1D
+    {
+        curvilinear_mesh<float,layout1D> msh(a,L1);
+        msh.map_to(B1f);
+        show_mesh(msh);
+    }
+    a.free();
+    
+    {
+        curvilinear_mesh<double,layout1D> msh(a,L1);
+        msh.map_to(B1d);
+        show_mesh(msh);
+    }
+    a.free();
+
+    // CURVILINEAR 2D
+    {
+        curvilinear_mesh<float,layout2D> msh(a,L2);
+        msh.map_to(B2f);
+        show_mesh(msh);
+    }
+    a.free();
+    
+    {
+        curvilinear_mesh<double,layout2D> msh(a,L2);
+        msh.map_to(B2d);
+        show_mesh(msh);
+    }
+    a.free();
+    
     
     
 }

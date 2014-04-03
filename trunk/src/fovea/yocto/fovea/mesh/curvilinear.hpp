@@ -22,7 +22,8 @@ namespace yocto
             typedef typename MESH::EDGE           EDGE;
             typedef Cell<LAYOUT::DIMENSIONS,T>    CELL;
             typedef typename CELL::List           CELL_LIST;
-            
+            typedef Box<LAYOUT::DIMENSIONS,T>     BOX;
+
             // public data
             const LAYOUT & get_layout() const throw() { return *this; }
             CELL_LIST      cells;
@@ -56,9 +57,26 @@ namespace yocto
             inline const array_type &Z() const { return this->adb[ mesh::axis_name(2) ].template as<array_type>(); }
             
             
+            //__________________________________________________________________
+            //
+            // mapping+compile
+            //__________________________________________________________________
+            inline void map_to( const BOX &box )
+            {
+                __map_to(box);
+                this->compile();
+            }
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(curvilinear_mesh);
             
+            
+            //==================================================================
+            //
+            // construction
+            //
+            //==================================================================
             inline void assign( int2type<1> )
             {
                 //______________________________________________________________
@@ -204,6 +222,21 @@ namespace yocto
                     }
                 }
                 assert(num_edges==this->edges.size());
+            }
+            
+            //==================================================================
+            //
+            // mapping
+            //
+            //==================================================================
+            inline void __map_to( const Box<1,T> &box )
+            {
+                
+            }
+            
+            inline void __map_to( const Box<2,T> &box )
+            {
+                
             }
         };
         
