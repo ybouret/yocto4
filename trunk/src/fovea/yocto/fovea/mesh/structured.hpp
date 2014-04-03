@@ -36,7 +36,7 @@ namespace yocto
             // 1D
             //
             //__________________________________________________________________
-
+            
             static void __assign( MESH &m, int2type<1> )
             {
                 const size_t num_edges = m.vertices - 1;
@@ -86,7 +86,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 // first pass: all edges
                 //--------------------------------------------------------------
-
+                
                 //! X edges
                 for(unit_t j=m.lower.y;j<=m.upper.y;++j)
                 {
@@ -146,7 +146,7 @@ namespace yocto
                     }
                 }
                 assert( edges.size() == num_edges );
-
+                
                 //--------------------------------------------------------------
                 // second pass: all cells
                 //--------------------------------------------------------------
@@ -171,7 +171,7 @@ namespace yocto
                         const VERTEX &v01 = m[I01];
                         const VERTEX &v10 = m[I10];
                         const VERTEX &v11 = m[I11];
-
+                        
                         // make two CCW triangles
                         cells.push_back( new CELL(v00,v01,v10) );
                         cells.push_back( new CELL(v10,v11,v01) );
@@ -188,6 +188,7 @@ namespace yocto
             static void __assign( MESH &m, int2type<3> )
             {
                 EDGE_DB &edges = m.edges;
+                
                 //! edges
                 const size_t nx         = m.width.x;
                 const size_t ny         = m.width.y;
@@ -196,6 +197,96 @@ namespace yocto
                 const size_t y_edges    = ny - 1;
                 const size_t z_edges    = nz - 1;
                 const size_t cube_edges = nz * (ny * x_edges + nx * y_edges) + (nx*ny) * z_edges;
+                
+                const size_t xy_quads    = x_edges * y_edges * nz;
+                const size_t xz_quads    = x_edges * z_edges * ny;
+                const size_t yz_quads    = y_edges * z_edges * nx;
+                const size_t diag_edges  = xy_quads + xz_quads + yz_quads;
+                
+                const size_t num_edges   = cube_edges + diag_edges;
+                edges.reserve(num_edges);
+                
+                // X edges
+                for(unit_t k=m.lower.z;k<=m.upper.z;++k)
+                {
+                    for(unit_t j=m.lower.y;j<=m.upper.y;++j)
+                    {
+                        for(unit_t i=m.lower.x,ip=i+1;i<m.upper.x;++i,++ip)
+                        {
+                            const coord3D C0(i, j,k);
+                            const coord3D C1(ip,j,k);
+                            const size_t  I0 = m.offset_of(C0);
+                            const size_t  I1 = m.offset_of(C1);
+                            assert(I0<m.vertices);
+                            assert(I1<m.vertices);
+                            const EDGE edge( m[I0], m[I1] );
+                            if( !edges.insert(edge) )
+                            {
+                                m.throw_multiple_edges(I0,I1);
+                            }
+                            
+                        }
+                    }
+                }
+                
+                
+                // Y edges
+                for(unit_t k=m.lower.z;k<=m.upper.z;++k)
+                {
+                    for(unit_t j=m.lower.y,jp=j+1;j<m.upper.y;++j,++jp)
+                    {
+                        for(unit_t i=m.lower.x;i<=m.upper.x;++i)
+                        {
+                            const coord3D C0(i,j,k);
+                            const coord3D C1(i,jp,k);
+                            const size_t  I0 = m.offset_of(C0);
+                            const size_t  I1 = m.offset_of(C1);
+                            assert(I0<m.vertices);
+                            assert(I1<m.vertices);
+                            const EDGE edge( m[I0], m[I1] );
+                            if( !edges.insert(edge) )
+                            {
+                                m.throw_multiple_edges(I0,I1);
+                            }
+                        }
+                    }
+                }
+                
+                // Z edges
+                for(unit_t k=m.lower.z,kp=k+1;k<m.upper.z;++k,++kp)
+                {
+                    for(unit_t j=m.lower.y;j<=m.upper.y;++j)
+                    {
+                        for(unit_t i=m.lower.x;i<=m.upper.x;++i)
+                        {
+                            const coord3D C0(i,j,k);
+                            const coord3D C1(i,j,kp);
+                            const size_t  I0 = m.offset_of(C0);
+                            const size_t  I1 = m.offset_of(C1);
+                            assert(I0<m.vertices);
+                            assert(I1<m.vertices);
+                            const EDGE edge( m[I0], m[I1] );
+                            if( !edges.insert(edge) )
+                            {
+                                m.throw_multiple_edges(I0,I1);
+                            }
+                        }
+                    }
+                }
+                
+                // Diagonal edges
+                for(unit_t k=m.lower.z,kp=k+1;k<m.upper.z;++k,++kp)
+                {
+                    for(unit_t j=m.lower.y,jp=j+1;j<m.upper.y;++j,++jp)
+                    {
+                        for(unit_t i=m.lower.x,ip=i+1;i<m.upper.x;++i,++ip)
+                        {
+                            
+                        }
+                    }
+                }
+                
+                //assert(num_edges==edges.size());
                 
             }
         };
