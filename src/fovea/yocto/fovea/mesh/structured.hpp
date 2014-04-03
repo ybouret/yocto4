@@ -185,6 +185,12 @@ namespace yocto
             // 3D
             //
             //__________________________________________________________________
+            
+            struct e_index
+            {
+                size_t i1,i2;
+            };
+            
             static void __assign( MESH &m, int2type<3> )
             {
                 EDGE_DB &edges = m.edges;
@@ -198,89 +204,71 @@ namespace yocto
                 const size_t z_edges    = nz - 1;
                 const size_t cube_edges = nz * (ny * x_edges + nx * y_edges) + (nx*ny) * z_edges;
                 
-                const size_t xy_quads    = x_edges * y_edges * nz;
-                const size_t xz_quads    = x_edges * z_edges * ny;
-                const size_t yz_quads    = y_edges * z_edges * nx;
+                const size_t xy_quads    = (x_edges * y_edges) * nz;
+                const size_t xz_quads    = (x_edges * z_edges) * ny;
+                const size_t yz_quads    = (y_edges * z_edges) * nx;
                 const size_t diag_edges  = xy_quads + xz_quads + yz_quads;
                 
                 const size_t num_edges   = cube_edges + diag_edges;
                 edges.reserve(num_edges);
+                std::cerr << "predicting cube_edges = " << cube_edges << std::endl;
+                std::cerr << "           diag_edges = " << diag_edges << std::endl;
+                std::cerr << "            num_edges = " <<  num_edges << std::endl;
+
                 
-                // X edges
-                for(unit_t k=m.lower.z;k<=m.upper.z;++k)
+               
+                
+                // all edges
+                for(unit_t k=m.lower.z,kp=k+1;k<m.upper.z;++k,++kp)
                 {
-                    for(unit_t j=m.lower.y;j<=m.upper.y;++j)
+                    for(unit_t j=m.lower.y,jp=j+1;j<m.upper.y;++j,++jp)
                     {
                         for(unit_t i=m.lower.x,ip=i+1;i<m.upper.x;++i,++ip)
                         {
-                            const coord3D C0(i, j,k);
-                            const coord3D C1(ip,j,k);
-                            const size_t  I0 = m.offset_of(C0);
-                            const size_t  I1 = m.offset_of(C1);
-                            assert(I0<m.vertices);
-                            assert(I1<m.vertices);
-                            const EDGE edge( m[I0], m[I1] );
-                            if( !edges.insert(edge) )
-                            {
-                                m.throw_multiple_edges(I0,I1);
-                            }
+                            const coord3D C000(i,  j,  k  ); // 0
+                            const coord3D C001(i,  j,  kp ); // 1
+                            const coord3D C010(i,  jp, k  ); // 2
+                            const coord3D C011(i,  jp, kp ); // 3
+                            const coord3D C100(ip, j,  k  ); // 4
+                            const coord3D C101(ip, j,  kp ); // 5
+                            const coord3D C110(ip, jp, k  ); // 6
+                            const coord3D C111(ip, jp, kp ); // 7
                             
-                        }
-                    }
-                }
-                
-                
-                // Y edges
-                for(unit_t k=m.lower.z;k<=m.upper.z;++k)
-                {
-                    for(unit_t j=m.lower.y,jp=j+1;j<m.upper.y;++j,++jp)
-                    {
-                        for(unit_t i=m.lower.x;i<=m.upper.x;++i)
-                        {
-                            const coord3D C0(i,j,k);
-                            const coord3D C1(i,jp,k);
-                            const size_t  I0 = m.offset_of(C0);
-                            const size_t  I1 = m.offset_of(C1);
-                            assert(I0<m.vertices);
-                            assert(I1<m.vertices);
-                            const EDGE edge( m[I0], m[I1] );
-                            if( !edges.insert(edge) )
+                            const VERTEX &v000 = m[ m.offset_of(C000) ];
+                            const VERTEX &v001 = m[ m.offset_of(C001) ];
+                            const VERTEX &v010 = m[ m.offset_of(C010) ];
+                            const VERTEX &v011 = m[ m.offset_of(C011) ];
+                            const VERTEX &v100 = m[ m.offset_of(C100) ];
+                            const VERTEX &v101 = m[ m.offset_of(C101) ];
+                            const VERTEX &v110 = m[ m.offset_of(C110) ];
+                            const VERTEX &v111 = m[ m.offset_of(C111) ];
+                            
+                            const VERTEX *V[8] = {
+                                &v000, &v001, &v010, &v011,
+                                &v100, &v101, &v110, &v111
+                            };
+                            
+                            static const e_index q[18] =
                             {
-                                m.throw_multiple_edges(I0,I1);
-                            }
-                        }
-                    }
-                }
-                
-                // Z edges
-                for(unit_t k=m.lower.z,kp=k+1;k<m.upper.z;++k,++kp)
-                {
-                    for(unit_t j=m.lower.y;j<=m.upper.y;++j)
-                    {
-                        for(unit_t i=m.lower.x;i<=m.upper.x;++i)
-                        {
-                            const coord3D C0(i,j,k);
-                            const coord3D C1(i,j,kp);
-                            const size_t  I0 = m.offset_of(C0);
-                            const size_t  I1 = m.offset_of(C1);
-                            assert(I0<m.vertices);
-                            assert(I1<m.vertices);
-                            const EDGE edge( m[I0], m[I1] );
-                            if( !edges.insert(edge) )
+                                {0,2}, {2,6}, {6,4}, {4,0}, // face (x4)
+                                {1,3}, {3,7}, {7,5}, {5,1}, // face (x4)
+                                {0,1}, {4,5}, {2,3}, {6,7}, // side (x4)
+                                {0,3}, {0,6}, {3,6},        // diag (x3)
+                                {5,3}, {5,6}, {5,0}         // diag (x3)
+                            };
+                            
+                            for(size_t l=12;l<18;++l)
                             {
-                                m.throw_multiple_edges(I0,I1);
+                                const VERTEX &v1 = *V[ q[l].i1 ];
+                                const VERTEX &v2 = *V[ q[l].i2 ];
+                                const EDGE      edge(v1,v2);
+                                const edge_key &ek = edge.ek;
+                                if(edges.search(ek)) continue;
+                                if(!edges.insert(edge))
+                                {
+                                    m.throw_multiple_edges(ek.i1,ek.i1);
+                                }
                             }
-                        }
-                    }
-                }
-                
-                // Diagonal edges
-                for(unit_t k=m.lower.z,kp=k+1;k<m.upper.z;++k,++kp)
-                {
-                    for(unit_t j=m.lower.y,jp=j+1;j<m.upper.y;++j,++jp)
-                    {
-                        for(unit_t i=m.lower.x,ip=i+1;i<m.upper.x;++i,++ip)
-                        {
                             
                         }
                     }
