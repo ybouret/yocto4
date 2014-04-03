@@ -11,6 +11,7 @@ namespace yocto
     namespace fovea
     {
         
+        //! automatice cell type computation
         template <size_t DIM,typename T>
         struct CellBase;
         
