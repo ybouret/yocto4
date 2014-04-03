@@ -185,7 +185,11 @@ namespace yocto
             // 3D
             //
             //__________________________________________________________________
-            
+            static void __assign( MESH &m, int2type<3> )
+            {
+                EDGE_DB &edges = m.edges;
+                
+            }
         };
         
     }

@@ -150,6 +150,10 @@ namespace yocto
             
             inline void assign( int2type<3> )
             {
+                //______________________________________________________________
+                //
+                // allocate vertices
+                //______________________________________________________________
                 axis_type &aX = X();
                 axis_type &aY = Y();
                 axis_type &aZ = Z();
@@ -166,6 +170,9 @@ namespace yocto
                         }
                     }
                 }
+                
+                structured<mesh_type>::assign(*this);
+
                 
                 //! edges
                 const size_t nx      = this->width.x;
