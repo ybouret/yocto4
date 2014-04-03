@@ -37,6 +37,17 @@ YOCTO_UNIT_TEST_IMPL(mul)
 }
 YOCTO_UNIT_TEST_DONE()
 
+YOCTO_UNIT_TEST_IMPL(pow)
+{
+    for(mpn n=2;n<=8;++n)
+    {
+        mpn n2 = n*(n-1);
+        mpn m = mpn::power(n2,n);
+        std::cerr << n2 << "^" << n << " = " << m << std::endl;
+    }
+}
+YOCTO_UNIT_TEST_DONE()
+
 #include "yocto/sequence/vector.hpp"
 #include "yocto/sys/wtime.hpp"
 
@@ -81,3 +92,5 @@ YOCTO_UNIT_TEST_IMPL(mul_perf)
     std::cerr << "sum=" << sum * 1000.0 << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
+        
+
