@@ -3,6 +3,7 @@
 
 #include "yocto/fovea/array-db.hpp"
 #include "yocto/fovea/edge.hpp"
+#include "yocto/type/spec.hpp"
 
 namespace yocto
 {
@@ -29,19 +30,23 @@ namespace yocto
             
             virtual ~mesh() throw();
             
-            const size_t    dims;     //!< may be different from layout dimensions
-            const size_t    vertices; //!< #vertices
-            const form_type form;
-            const real_type real;
-            array_db       &adb;
-            
+            const size_t          dims;     //!< may be different from layout dimensions
+            const size_t          vertices; //!< #vertices
+            const form_type       form;     //!<
+            const real_type       real;     //!< float|double
+            array_db             &adb;      //!< for memory
+            const size_t          rsz;      //!< sizeof(real)
+            const type_spec       rsp;      //!< typeid(float) | typedif(float)
             
             static real_type   sz2fp( const unsigned sz ); //!< size to real_type
             static const char *axis_name( size_t dim );
             static const char *form2name( form_type ) throw();
             const char        *form_name() const throw();
             void               throw_multiple_edges(size_t i1, size_t i2);
-
+            const char        *real_name() const throw();
+            
+            virtual const void *get_vertex_address( size_t iv ) const throw() = 0;
+            
         protected:
             explicit mesh(array_db       &a,
                           const size_t    d,
@@ -81,6 +86,14 @@ namespace yocto
                 return pvtx[v];
             }
             
+            virtual const void *get_vertex_address( size_t iv ) const throw()
+            {
+                assert(iv<vertices);
+                assert(pvtx);
+                return &(pvtx[iv].r);
+            }
+
+            
             virtual ~Mesh() throw() {
                 if(assigned)
                 {
@@ -115,6 +128,10 @@ namespace yocto
                     edge.compile();
                 }
                 
+                //______________________________________________________________
+                //
+                // compile all cells
+                //______________________________________________________________
                 
             }
             
