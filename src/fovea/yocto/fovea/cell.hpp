@@ -46,9 +46,19 @@ namespace yocto
             
             
             explicit Cell( const VERTEX &a, const VERTEX &b, const VERTEX &c) :
-            CellType(a,b,c)
+            CellType(a,b,c),
+            next(0),
+            prev(0)
             {
             }
+            
+            explicit Cell( const VERTEX &a, const VERTEX &b, const VERTEX &c, const VERTEX &d) :
+            CellType(a,b,c,d),
+            next(0),
+            prev(0)
+            {
+            }
+            
             
             const ShapeBase *get_next() const throw()
             {

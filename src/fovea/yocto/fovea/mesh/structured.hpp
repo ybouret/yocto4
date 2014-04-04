@@ -89,7 +89,7 @@ namespace yocto
                 const size_t y_edges   = ny - 1;
                 const size_t c_edges   = x_edges * y_edges;
                 const size_t num_edges = ny * x_edges + nx * y_edges + c_edges;
-                m.edges.reserve(num_edges);
+                edges.reserve(num_edges);
                 //--------------------------------------------------------------
                 // first pass: all edges
                 //--------------------------------------------------------------
@@ -106,7 +106,7 @@ namespace yocto
                         assert(I0<m.vertices);
                         assert(I1<m.vertices);
                         const EDGE edge( m[I0], m[I1] );
-                        if( !m.edges.insert(edge) )
+                        if( !edges.insert(edge) )
                         {
                             m.throw_multiple_edges(I0,I1);
                         }
