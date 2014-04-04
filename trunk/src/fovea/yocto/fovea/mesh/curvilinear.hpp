@@ -188,10 +188,8 @@ namespace yocto
             inline void __map_to( const Box<2,T> &box )
             {
                 const T      xmin = box.vmin.x;
-                //const T      xmax = box.vmax.x;
                 const T      xlen = box.length.x;
                 const T      ymin = box.vmin.y;
-                //const T      ymax = box.vmax.y;
                 const T      ylen = box.length.y;
                 array_type  &xx   = X();
                 array_type  &yy   = Y();
@@ -215,6 +213,53 @@ namespace yocto
                 }
                 
             }
+            
+            inline void __map_to( const Box<3,T> &box )
+            {
+                const T      xmin = box.vmin.x;
+                const T      xlen = box.length.x;
+                
+                const T      ymin = box.vmin.y;
+                const T      ylen = box.length.y;
+                
+                const T      zmin = box.vmin.z;
+                const T      zlen = box.length.z;
+                
+                array_type  &xx   = X();
+                array_type  &yy   = Y();
+                array_type  &zz   = Z();
+                const unit_t imin = this->lower.x;
+                const unit_t imax = this->upper.x;
+                const unit_t ilen = imax - imin;
+                
+                const unit_t jmin = this->lower.y;
+                const unit_t jmax = this->upper.y;
+                const unit_t jlen = jmax - jmin;
+                
+                const unit_t kmin = this->lower.z;
+                const unit_t kmax = this->upper.z;
+                const unit_t klen = kmax - kmin;
+                
+                for(unit_t k=kmin;k<=kmax;++k)
+                {
+                    const T zk = zmin + ( (k-kmin) * zlen )/klen;
+                    for(unit_t j=jmin;j<=jmax;++j)
+                    {
+                        const T yj = ymin + ( (j-jmin) * ylen )/jlen;
+                        for(unit_t i=imin;i<=imax;++i)
+                        {
+                            const T xi = xmin + ( (i-imin) * xlen )/ilen;
+                            xx[k][j][i] = xi;
+                            yy[k][j][i] = yj;
+                            zz[k][j][i] = zk;
+                        }
+                    }
+                }
+                
+            }
+            
+            
+            
             
             
         };

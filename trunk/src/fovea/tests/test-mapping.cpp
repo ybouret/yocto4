@@ -48,13 +48,19 @@ YOCTO_UNIT_TEST_IMPL(mapping)
     const coord3D hi3(hix,hiy,hiz);
     
     const layout3D L3(lo3,hi3);
-
-    const Box<1,float>  B1f( gen_coordf(), gen_coordf() );
-    const Box<1,double> B1d( gen_coord(),  gen_coord()  );
-
+    
+    const Box<1,float>   B1f( gen_coordf(), gen_coordf() );
+    const Box<1,double>  B1d( gen_coord(),  gen_coord()  );
+    
     const Box<2,float>   B2f( v2d<float>(gen_coordf(), gen_coordf()),  v2d<float>(gen_coordf(), gen_coordf()));
     const Box<2,double>  B2d( v2d<double>(gen_coord(), gen_coord()),  v2d<double>(gen_coord(), gen_coord()));
-
+    
+    const Box<3,float>   B3f(v3d<float>(gen_coordf(),gen_coordf(),gen_coordf()),
+                             v3d<float>(gen_coordf(),gen_coordf(),gen_coordf()));
+    
+    const Box<3,double>   B3d(v3d<double>(gen_coord(),gen_coord(),gen_coord()),
+                              v3d<double>(gen_coord(),gen_coord(),gen_coord()));
+    
     VTK & vtk = VTK::instance();
     
     // RECTILINEAR 1D
@@ -95,7 +101,30 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         vtk.write_mesh(fp,msh,"r2dd");
     }
     a.free();
-
+    
+    
+    // RECTILINEAR 3D
+    {
+        rectilinear_mesh<float,layout3D> msh(a,L3);
+        msh.map_to(B3f);
+        show_mesh(msh);
+        ios::ocstream fp("r3df.vtk",false);
+        vtk.write_mesh(fp,msh,"r3df");
+    }
+    a.free();
+    
+    {
+        rectilinear_mesh<double,layout3D> msh(a,L3);
+        msh.map_to(B3d);
+        show_mesh(msh);
+        ios::ocstream fp("r3dd.vtk",false);
+        vtk.write_mesh(fp,msh,"r3dd");
+    }
+    a.free();
+    
+    
+    
+    
     // CURVILINEAR 1D
     {
         curvilinear_mesh<float,layout1D> msh(a,L1);
@@ -112,10 +141,10 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         show_mesh(msh);
         ios::ocstream fp("c1dd.vtk",false);
         vtk.write_mesh(fp,msh,"c1dd");
-
+        
     }
     a.free();
-
+    
     // CURVILINEAR 2D
     {
         curvilinear_mesh<float,layout2D> msh(a,L2);
@@ -135,6 +164,25 @@ YOCTO_UNIT_TEST_IMPL(mapping)
     }
     a.free();
     
+    // CURVILINEAR 3D
+    {
+        curvilinear_mesh<float,layout3D> msh(a,L3);
+        msh.map_to(B3f);
+        show_mesh(msh);
+        ios::ocstream fp("c3df.vtk",false);
+        vtk.write_mesh(fp,msh,"c3df");
+    }
+    a.free();
+    
+    {
+        curvilinear_mesh<double,layout3D> msh(a,L3);
+        msh.map_to(B3d);
+        show_mesh(msh);
+        ios::ocstream fp("c3dd.vtk",false);
+        vtk.write_mesh(fp,msh,"c3dd");
+    }
+    a.free();
+
     
     
 }
