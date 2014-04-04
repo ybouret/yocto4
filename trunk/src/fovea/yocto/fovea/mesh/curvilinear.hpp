@@ -57,6 +57,11 @@ namespace yocto
             inline const array_type &Z() const { return this->adb[ mesh::axis_name(2) ].template as<array_type>(); }
             
             
+            virtual size_t num_cells() const throw()
+            {
+                return cells.size;
+            }
+            
             //__________________________________________________________________
             //
             // mapping+compile

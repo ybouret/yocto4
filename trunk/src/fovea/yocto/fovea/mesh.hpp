@@ -45,7 +45,11 @@ namespace yocto
             void               throw_multiple_edges(size_t i1, size_t i2);
             const char        *real_name() const throw();
             
+            //! abstract vertex
             virtual const void *get_vertex_address( size_t iv ) const throw() = 0;
+            
+            //! abstract cells
+            virtual size_t num_cells() const throw() = 0;
             
         protected:
             explicit mesh(array_db       &a,
