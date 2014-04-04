@@ -208,6 +208,7 @@ namespace yocto
                         cb(fp,*this,v);
                         fp << ' ';
                         v += m.rsz;
+                        cb(fp,*this,v);
                         fp << "\n";
                     }
                     break;
