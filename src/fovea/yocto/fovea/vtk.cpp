@@ -221,7 +221,8 @@ namespace yocto
         //______________________________________________________________________
         void VTK:: write_mesh_cells( ios::ostream &fp, const mesh &m ) const
         {
-            static int  cell_types[3] = {
+            static int  cell_types[3] =
+            {
                 3, // VTK_LINE
                 5, // VTK_TRIANGLE
                 10 // VTK_TETRA
@@ -233,10 +234,19 @@ namespace yocto
             fp("CELLS %u %u\n", unsigned(num_cells), unsigned(cells_size) );
             for(const ShapeBase *cell = m.get_first_cell(); cell; cell = cell->get_next() )
             {
+                const size_t nv = cell->vertices;
+                if(nv!=vtx_per_cell)
+                    throw exception("cell size mismatch");
                 
+                fp("%u", unsigned(nv));
+                for(size_t i=0;i<nv;++i)
+                {
+                    fp(" %u", unsigned(cell->index_of(i)));
+                }
+                fp("\n");
             }
             fp << "\n";
-
+            
             const int cell_type      = cell_types[m.dims-1];
             fp("CELL_TYPES %u\n", unsigned(num_cells));
             for(size_t i=0;i<num_cells;++i)
@@ -255,6 +265,7 @@ namespace yocto
         {
             write_header(fp,title);
             write_mesh_vertices(fp,m);
+            write_mesh_cells(fp,m);
         }
         
         
