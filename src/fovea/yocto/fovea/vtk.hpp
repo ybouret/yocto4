@@ -41,6 +41,7 @@ namespace yocto
             
             void write_header( ios::ostream &fp, const string &title ) const;
             void write_mesh_vertices( ios::ostream &fp, const mesh &m ) const;
+            void write_mesh_cells( ios::ostream &fp, const mesh & ) const;
             
             void write_mesh( ios::ostream &fp, const mesh &, const string &title ) const;
             

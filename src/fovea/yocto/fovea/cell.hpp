@@ -50,6 +50,10 @@ namespace yocto
             {
             }
             
+            const ShapeBase *get_next() const throw()
+            {
+                return next;
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);

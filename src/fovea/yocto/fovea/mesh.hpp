@@ -11,6 +11,7 @@ namespace yocto
     namespace fovea
     {
         
+        class ShapeBase;
         
         class mesh
         {
@@ -50,6 +51,9 @@ namespace yocto
             
             //! abstract cells
             virtual size_t num_cells() const throw() = 0;
+            
+            //! get first cell
+            virtual const ShapeBase *get_first_cell() const throw() = 0;
             
         protected:
             explicit mesh(array_db       &a,

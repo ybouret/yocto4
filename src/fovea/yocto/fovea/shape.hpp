@@ -18,8 +18,9 @@ namespace yocto
             
             const size_t vertices; //!< vertices >= 2
             
-            virtual const char *name() const throw() = 0;
-            virtual size_t      index_of( size_t iv ) const throw() = 0;
+            virtual const char      *name() const throw() = 0;
+            virtual size_t           index_of( size_t iv ) const throw() = 0;
+            virtual const ShapeBase *get_next() const throw() = 0;
             
         protected:
             explicit ShapeBase( size_t nv );
@@ -54,6 +55,7 @@ namespace yocto
             //__________________________________________________________________
             virtual ~Shape() throw() {}
             
+           
             //! compute all data
             /**
              assuming that the physical edges are loaded,
@@ -69,7 +71,11 @@ namespace yocto
                 assert(p[iv]!=0);
                 return p[iv]->index;
             }
-
+            
+            const ShapeBase *get_next() const throw()
+            {
+                return 0;
+            }
             
             //__________________________________________________________________
             //
