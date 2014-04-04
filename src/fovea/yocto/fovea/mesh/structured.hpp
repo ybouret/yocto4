@@ -14,9 +14,19 @@ namespace yocto
         struct quad_edge_index
         {
             size_t i1, i2;
+            static const size_t count = 19;
         };
         
-        extern const quad_edge_index quad_edge_indices[18];
+        extern const quad_edge_index quad_edge_indices[ quad_edge_index::count ];
+        
+        struct tetra_edge_index
+        {
+            size_t i1,i2,i3,i4;
+            static const size_t count = 6;
+        };
+        extern const tetra_edge_index tetra_edge_indices[ tetra_edge_index::count ];
+
+        
         
         template <typename MESH>
         class structured
@@ -210,8 +220,9 @@ namespace yocto
                 const size_t xz_quads    = (x_edges * z_edges) * ny;
                 const size_t yz_quads    = (y_edges * z_edges) * nx;
                 const size_t diag_edges  = xy_quads + xz_quads + yz_quads;
+                const size_t maxi_edges  = (x_edges * y_edges * z_edges ); // 1 per "cube"
                 
-                const size_t num_edges   = cube_edges + diag_edges;
+                const size_t num_edges   = cube_edges + diag_edges + maxi_edges;
                 edges.reserve(num_edges);
                 
                 // all edges
@@ -245,10 +256,11 @@ namespace yocto
                             };
                            
                             // test/insert edges
-                            for(size_t l=0;l<18;++l)
+                            for(size_t l=0;l<quad_edge_index::count;++l)
                             {
-                                const VERTEX &v1 = *V[ quad_edge_indices[l].i1 ];
-                                const VERTEX &v2 = *V[ quad_edge_indices[l].i2 ];
+                                const quad_edge_index &q =quad_edge_indices[l];
+                                const VERTEX &v1 = *V[ q.i1 ];
+                                const VERTEX &v2 = *V[ q.i2 ];
                                 const EDGE      edge(v1,v2);
                                 const edge_key &ek = edge.ek;
                                 if(edges.search(ek)) continue;
@@ -259,7 +271,15 @@ namespace yocto
                             }
                             
                             // ready for tetraedrons
-                            
+                            for(size_t t=0;t<tetra_edge_index::count;++t)
+                            {
+                                const tetra_edge_index &q = tetra_edge_indices[t];
+                                const VERTEX &v1 = *V[q.i1];
+                                const VERTEX &v2 = *V[q.i2];
+                                const VERTEX &v3 = *V[q.i3];
+                                const VERTEX &v4 = *V[q.i4];
+                                m.cells.push_back( new CELL(v1,v2,v3,v4) );
+                            }
                         }
                     }
                 }
