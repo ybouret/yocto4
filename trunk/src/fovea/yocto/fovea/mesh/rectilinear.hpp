@@ -39,7 +39,8 @@ namespace yocto
             inline explicit rectilinear_mesh(array_db     &a,
                                              const LAYOUT &L ) :
             MESH(a,L.items,mesh::is_rectilinear),
-            LAYOUT(L)
+            LAYOUT(L),
+            cells()
             {
                 for(size_t i=0;i<this->dims;++i)
                 {

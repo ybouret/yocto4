@@ -45,7 +45,7 @@ static inline void show_mesh( const MESH &msh )
 template <typename MESH>
 static inline void show3d(const MESH &msh )
 {
-    typedef typename MESH::EDGE EDGE;
+    //typedef typename MESH::EDGE EDGE;
     typedef Line<MESH::DIMS,typename MESH::TYPE> LINE;
     typedef Triangle<MESH::DIMS,typename MESH::TYPE> TRIANGLE;
     typedef Tetra<typename MESH::TYPE> TETRA;

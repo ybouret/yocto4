@@ -28,7 +28,8 @@ namespace yocto
             explicit point_mesh(array_db       &a,
                                 const layout1D &L) :
             MESH(a,L.items,mesh::is_point),
-            layout1D(L)
+            layout1D(L),
+            cells()
             {
                 for(size_t i=0;i<this->dims;++i)
                 {

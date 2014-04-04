@@ -37,7 +37,8 @@ namespace yocto
             SHAPE(3),
             p(),
             e(),
-            en()
+            en(),
+            sn()
             {
                 TriangleInfo::CheckVertices(a, b, c);
                 p[0] = &a;
