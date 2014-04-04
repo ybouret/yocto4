@@ -17,8 +17,8 @@ static inline void show_type( const char *name )
 
 YOCTO_UNIT_TEST_IMPL(vtk)
 {
-    vtk & VTK = vtk::instance();
-    std::cerr << "using " << VTK.get_name() << std::endl;
+    VTK & vtk = VTK::instance();
+    std::cerr << "using " << vtk.get_name() << std::endl;
     
     SHOW_TYPE(int8_t);
     SHOW_TYPE(int16_t);
@@ -37,11 +37,11 @@ YOCTO_UNIT_TEST_IMPL(vtk)
     unit_t u = -879;
     math::v2d<double> v2(3,4);
     math::v3d<float>  v3(7,8,9);
-    VTK.out(fp,f)  << '\n';
-    VTK.out(fp,d)  << '\n';
-    VTK.out(fp,u)  << '\n';
-    VTK.out(fp,v2) << '\n';
-    VTK.out(fp,v3) << '\n';
+    vtk.out(fp,f)  << '\n';
+    vtk.out(fp,d)  << '\n';
+    vtk.out(fp,u)  << '\n';
+    vtk.out(fp,v2) << '\n';
+    vtk.out(fp,v3) << '\n';
 
     
     

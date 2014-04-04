@@ -3,7 +3,8 @@
 #include "yocto/fovea/mesh/curvilinear.hpp"
 #include "yocto/fovea/mesh/point.hpp"
 #include "yocto/code/rand.hpp"
-
+#include "yocto/fovea/vtk.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace fovea;
@@ -54,11 +55,15 @@ YOCTO_UNIT_TEST_IMPL(mapping)
     const Box<2,float>   B2f( v2d<float>(gen_coordf(), gen_coordf()),  v2d<float>(gen_coordf(), gen_coordf()));
     const Box<2,double>  B2d( v2d<double>(gen_coord(), gen_coord()),  v2d<double>(gen_coord(), gen_coord()));
 
+    VTK & vtk = VTK::instance();
+    
     // RECTILINEAR 1D
     {
         rectilinear_mesh<float,layout1D> msh(a,L1);
         msh.map_to(B1f);
         show_mesh(msh);
+        ios::ocstream fp("r1df.vtk",false);
+        vtk.write_mesh(fp,msh,"r1df");
     }
     a.free();
     

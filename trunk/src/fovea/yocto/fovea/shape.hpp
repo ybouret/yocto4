@@ -19,6 +19,7 @@ namespace yocto
             const size_t vertices; //!< vertices >= 2
             
             virtual const char *name() const throw() = 0;
+            virtual size_t      index_of( size_t iv ) const throw() = 0;
             
         protected:
             explicit ShapeBase( size_t nv );
@@ -46,6 +47,7 @@ namespace yocto
             //__________________________________________________________________
             const T   size; //!< length/area/volume to be set by compile_for
             const vtx G;    //!< barycenter
+         
             //__________________________________________________________________
             //
             // virtual API
@@ -58,8 +60,16 @@ namespace yocto
              that all the edges are compiled.
              Must compute the barycenter and the size attribute.
              */
-            virtual  void compile_for(const MESH &) = 0;
-            
+            virtual void   compile_for(const MESH &) = 0;
+            virtual size_t index_of( size_t iv ) const throw()
+            {
+                assert(iv<vertices);
+                const VERTEX **p = ppVTX();
+                assert(p);
+                assert(p[iv]!=0);
+                return p[iv]->index;
+            }
+
             
             //__________________________________________________________________
             //

@@ -20,6 +20,8 @@ namespace yocto
         form(f),
         real(sz2fp(s)),
         adb(a),
+        rsz(s),
+        rsp( real == use_float ? typeid(float) : typeid(double) ),
         assigned(false)
         {
             assert(1==dims||2==dims||3==dims);
@@ -57,7 +59,7 @@ namespace yocto
         {
             return mesh::form2name(form);
         }
-
+        
         
         const char * mesh::axis_name( size_t dim )
         {
@@ -81,6 +83,18 @@ namespace yocto
         void mesh:: throw_multiple_edges(size_t i1, size_t i2)
         {
             throw exception("mesh: multiple edges #%u->#%u", unsigned(i1), unsigned(i2) );
+        }
+        
+        const char * mesh:: real_name() const throw()
+        {
+            switch(real)
+            {
+                case use_float:
+                    return "float";
+                case use_double:
+                    return "double";
+            }
+            return "";
         }
         
         
