@@ -1,4 +1,5 @@
 #include "yocto/fovea/vtk.hpp"
+#include "yocto/fovea/shape.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto
@@ -14,7 +15,7 @@ namespace yocto
         //
         // callbacks
         //______________________________________________________________________
-
+        
         namespace
         {
             static inline
@@ -211,8 +212,40 @@ namespace yocto
                     }
                     break;
             }
-            
+            fp << "\n";
         }
+        
+        //______________________________________________________________________
+        //
+        // write a the mesh cells
+        //______________________________________________________________________
+        void VTK:: write_mesh_cells( ios::ostream &fp, const mesh &m ) const
+        {
+            static int  cell_types[3] = {
+                3, // VTK_LINE
+                5, // VTK_TRIANGLE
+                10 // VTK_TETRA
+            };
+            
+            const size_t vtx_per_cell   = 1 + m.dims;
+            const size_t num_cells      = m.num_cells();
+            const size_t cells_size      = num_cells * ( 1+vtx_per_cell);
+            fp("CELLS %u %u\n", unsigned(num_cells), unsigned(cells_size) );
+            for(const ShapeBase *cell = m.get_first_cell(); cell; cell = cell->get_next() )
+            {
+                
+            }
+            fp << "\n";
+
+            const int cell_type      = cell_types[m.dims-1];
+            fp("CELL_TYPES %u\n", unsigned(num_cells));
+            for(size_t i=0;i<num_cells;++i)
+            {
+                fp("%d\n", cell_type);
+            }
+            fp << "\n";
+        }
+        
         
         //______________________________________________________________________
         //
@@ -224,6 +257,6 @@ namespace yocto
             write_mesh_vertices(fp,m);
         }
         
-    
+        
     }
 }

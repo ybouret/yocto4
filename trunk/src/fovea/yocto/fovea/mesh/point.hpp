@@ -51,6 +51,10 @@ namespace yocto
                 return cells.size;
             }
 
+            const ShapeBase *get_first_cell() const throw()
+            {
+                return cells.head;
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(point_mesh);
