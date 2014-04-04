@@ -11,6 +11,13 @@ namespace yocto
     namespace fovea
     {
         
+        struct quad_edge_index
+        {
+            size_t i1, i2;
+        };
+        
+        extern const quad_edge_index quad_edge_indices[18];
+        
         template <typename MESH>
         class structured
         {
@@ -186,11 +193,6 @@ namespace yocto
             //
             //__________________________________________________________________
             
-            struct e_index
-            {
-                size_t i1,i2;
-            };
-            
             static void __assign( MESH &m, int2type<3> )
             {
                 EDGE_DB &edges = m.edges;
@@ -211,12 +213,6 @@ namespace yocto
                 
                 const size_t num_edges   = cube_edges + diag_edges;
                 edges.reserve(num_edges);
-                std::cerr << "predicting cube_edges = " << cube_edges << std::endl;
-                std::cerr << "           diag_edges = " << diag_edges << std::endl;
-                std::cerr << "            num_edges = " <<  num_edges << std::endl;
-
-                
-               
                 
                 // all edges
                 for(unit_t k=m.lower.z,kp=k+1;k<m.upper.z;++k,++kp)
@@ -247,20 +243,12 @@ namespace yocto
                                 &v000, &v001, &v010, &v011,
                                 &v100, &v101, &v110, &v111
                             };
-                            
-                            static const e_index q[18] =
+                           
+                            // test/insert edges
+                            for(size_t l=0;l<18;++l)
                             {
-                                {0,2}, {2,6}, {6,4}, {4,0}, // face (x4)
-                                {1,3}, {3,7}, {7,5}, {5,1}, // face (x4)
-                                {0,1}, {4,5}, {2,3}, {6,7}, // side (x4)
-                                {0,3}, {0,6}, {3,6},        // diag (x3)
-                                {5,3}, {5,6}, {5,0}         // diag (x3)
-                            };
-                            
-                            for(size_t l=12;l<18;++l)
-                            {
-                                const VERTEX &v1 = *V[ q[l].i1 ];
-                                const VERTEX &v2 = *V[ q[l].i2 ];
+                                const VERTEX &v1 = *V[ quad_edge_indices[l].i1 ];
+                                const VERTEX &v2 = *V[ quad_edge_indices[l].i2 ];
                                 const EDGE      edge(v1,v2);
                                 const edge_key &ek = edge.ek;
                                 if(edges.search(ek)) continue;
@@ -270,11 +258,13 @@ namespace yocto
                                 }
                             }
                             
+                            // ready for tetraedrons
+                            
                         }
                     }
                 }
                 
-                //assert(num_edges==edges.size());
+                assert(num_edges==edges.size());
                 
             }
         };
