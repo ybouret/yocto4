@@ -71,6 +71,8 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         rectilinear_mesh<double,layout1D> msh(a,L1);
         msh.map_to(B1d);
         show_mesh(msh);
+        ios::ocstream fp("r1dd.vtk",false);
+        vtk.write_mesh(fp,msh,"r1dd");
     }
     a.free();
     
@@ -79,6 +81,8 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         rectilinear_mesh<float,layout2D> msh(a,L2);
         msh.map_to(B2f);
         show_mesh(msh);
+        ios::ocstream fp("r2df.vtk",false);
+        vtk.write_mesh(fp,msh,"r2df");
     }
     a.free();
     
@@ -87,6 +91,8 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         rectilinear_mesh<double,layout2D> msh(a,L2);
         msh.map_to(B2d);
         show_mesh(msh);
+        ios::ocstream fp("r2dd.vtk",false);
+        vtk.write_mesh(fp,msh,"r2dd");
     }
     a.free();
 
@@ -95,6 +101,8 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         curvilinear_mesh<float,layout1D> msh(a,L1);
         msh.map_to(B1f);
         show_mesh(msh);
+        ios::ocstream fp("c1df.vtk",false);
+        vtk.write_mesh(fp,msh,"c1df");
     }
     a.free();
     
@@ -102,6 +110,9 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         curvilinear_mesh<double,layout1D> msh(a,L1);
         msh.map_to(B1d);
         show_mesh(msh);
+        ios::ocstream fp("c1dd.vtk",false);
+        vtk.write_mesh(fp,msh,"c1dd");
+
     }
     a.free();
 
@@ -110,6 +121,8 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         curvilinear_mesh<float,layout2D> msh(a,L2);
         msh.map_to(B2f);
         show_mesh(msh);
+        ios::ocstream fp("c2df.vtk",false);
+        vtk.write_mesh(fp,msh,"c2df");
     }
     a.free();
     
@@ -117,6 +130,8 @@ YOCTO_UNIT_TEST_IMPL(mapping)
         curvilinear_mesh<double,layout2D> msh(a,L2);
         msh.map_to(B2d);
         show_mesh(msh);
+        ios::ocstream fp("c2dd.vtk",false);
+        vtk.write_mesh(fp,msh,"c1dd");
     }
     a.free();
     
