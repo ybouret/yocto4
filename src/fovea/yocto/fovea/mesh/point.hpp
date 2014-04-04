@@ -46,6 +46,12 @@ namespace yocto
             inline axis_type       &Z()       { return this->adb[ mesh::axis_name(2) ].template as<axis_type>(); }
             inline const axis_type &Z() const { return this->adb[ mesh::axis_name(2) ].template as<axis_type>(); }
             
+            virtual size_t num_cells() const throw()
+            {
+                return cells.size;
+            }
+
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(point_mesh);
             inline void assign( int2type<1> ) throw()

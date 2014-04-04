@@ -52,6 +52,12 @@ namespace yocto
             
             inline virtual ~rectilinear_mesh() throw() {}
             
+            virtual size_t num_cells() const throw()
+            {
+                return cells.size;
+            }
+
+            
             //__________________________________________________________________
             //
             // get axis
