@@ -17,12 +17,7 @@ namespace yocto
         
         const tetra_edge_index tetra_edge_indices[ tetra_edge_index::count ] =
         {
-            { 0,2,3,7 },
-            { 0,2,6,7 },
-            { 0,4,6,7 },
-            { 0,6,1,2 },
-            { 0,6,1,4 },
-            { 5,6,1,4 }
+            { 0,7,4,6 }
         };
     }
 }
