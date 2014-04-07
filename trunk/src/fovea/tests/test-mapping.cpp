@@ -10,8 +10,8 @@ using namespace yocto;
 using namespace fovea;
 using namespace math;
 
-#define gen_coord() (alea<double>()-0.5)
-#define gen_coordf() (alea<float>()-0.5f)
+#define gen_coord()  (alea<double>()+1.0)
+#define gen_coordf() (alea<float>()+1.0f)
 
 template <typename MESH>
 static inline void show_mesh( const MESH &msh )
@@ -28,14 +28,16 @@ YOCTO_UNIT_TEST_IMPL(mapping)
 {
     array_db a;
     
+    const size_t nxmax = 5;
+    const size_t nymax = 5;
+    const size_t nzmax = 5;
     
-    
-    const unit_t lox = -unit_t(1 + alea_lt(20));
-    const unit_t hix =  unit_t(1 + alea_lt(20));
-    const unit_t loy = -unit_t(1 + alea_lt(20));
-    const unit_t hiy =  unit_t(1 + alea_lt(20));
-    const unit_t loz = -unit_t(1 + alea_lt(10));
-    const unit_t hiz =  unit_t(1 + alea_lt(10));
+    const unit_t lox = -unit_t(1 + alea_lt(nxmax));
+    const unit_t hix =  unit_t(1 + alea_lt(nxmax));
+    const unit_t loy = -unit_t(1 + alea_lt(nymax));
+    const unit_t hiy =  unit_t(1 + alea_lt(nymax));
+    const unit_t loz = -unit_t(1 + alea_lt(nzmax));
+    const unit_t hiz =  unit_t(1 + alea_lt(nzmax));
     
     const layout1D L1(lox,hix);
     
@@ -49,16 +51,16 @@ YOCTO_UNIT_TEST_IMPL(mapping)
     
     const layout3D L3(lo3,hi3);
     
-    const Box<1,float>   B1f( gen_coordf(), gen_coordf() );
-    const Box<1,double>  B1d( gen_coord(),  gen_coord()  );
+    const Box<1,float>   B1f( -gen_coordf(), gen_coordf() );
+    const Box<1,double>  B1d( -gen_coord(),  gen_coord()  );
     
-    const Box<2,float>   B2f( v2d<float>(gen_coordf(), gen_coordf()),  v2d<float>(gen_coordf(), gen_coordf()));
-    const Box<2,double>  B2d( v2d<double>(gen_coord(), gen_coord()),  v2d<double>(gen_coord(), gen_coord()));
+    const Box<2,float>   B2f( v2d<float>(-gen_coordf(), -gen_coordf()),  v2d<float>( gen_coordf(), gen_coordf()));
+    const Box<2,double>  B2d( v2d<double>(-gen_coord(), -gen_coord()),   v2d<double>(gen_coord(),  gen_coord()));
     
-    const Box<3,float>   B3f(v3d<float>(gen_coordf(),gen_coordf(),gen_coordf()),
+    const Box<3,float>   B3f(v3d<float>(-gen_coordf(),-gen_coordf(),-gen_coordf()),
                              v3d<float>(gen_coordf(),gen_coordf(),gen_coordf()));
     
-    const Box<3,double>   B3d(v3d<double>(gen_coord(),gen_coord(),gen_coord()),
+    const Box<3,double>   B3d(v3d<double>(-gen_coord(),-gen_coord(),-gen_coord()),
                               v3d<double>(gen_coord(),gen_coord(),gen_coord()));
     
     VTK & vtk = VTK::instance();

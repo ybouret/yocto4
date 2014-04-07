@@ -25,7 +25,7 @@ namespace yocto
             static const size_t count = 6;
         };
         extern const tetra_edge_index tetra_edge_indices[ tetra_edge_index::count ];
-
+        
         
         
         template <typename MESH>
@@ -254,7 +254,7 @@ namespace yocto
                                 &v000, &v001, &v010, &v011,
                                 &v100, &v101, &v110, &v111
                             };
-                           
+                            
                             // test/insert edges
                             for(size_t l=0;l<quad_edge_index::count;++l)
                             {
@@ -271,7 +271,8 @@ namespace yocto
                             }
                             
                             // ready for tetraedrons
-                            for(size_t t=0;t<tetra_edge_index::count;++t)
+                            // for(size_t t=0;t<tetra_edge_index::count;++t)
+                            for(size_t t=0;t<1;++t)
                             {
                                 const tetra_edge_index &q = tetra_edge_indices[t];
                                 const VERTEX &v1 = *V[q.i1];
