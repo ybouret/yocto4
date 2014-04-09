@@ -85,10 +85,11 @@ namespace yocto {
         //
         //==================================================================
         virtual entry::attribute query_attribute( const string &path, bool &is_link ) const throw() = 0;
-        virtual void             create_dir(  const string &dirname, const bool allow_already_exists ) = 0;
-        virtual void             remove_dir(  const string &dirname  ) = 0 ;
-        virtual void             remove_file( const string &filename ) = 0;
-        virtual scanner *        new_scanner( const string &dirname ) const = 0;
+        virtual void             create_dir(    const string &dirname, const bool allow_already_exists ) = 0;
+        virtual void             remove_dir(    const string &dirname  ) = 0 ;
+        virtual void             remove_file(   const string &filename ) = 0;
+        virtual scanner *        new_scanner(   const string &dirname ) const = 0;
+        virtual uint64_t         get_file_size( const string &path ) const = 0;
         
         //==================================================================
         //

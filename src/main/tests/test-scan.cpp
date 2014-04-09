@@ -16,3 +16,24 @@ YOCTO_UNIT_TEST_IMPL(scan)
 }
 YOCTO_UNIT_TEST_DONE()
 
+YOCTO_UNIT_TEST_IMPL(file_size)
+{
+    local_fs    &fs  = local_fs::instance();
+    for(size_t i=1;i<argc;++i)
+    {
+        try
+        {
+            const string fn = argv[i];
+            std::cerr << "file_size(" << fn << ")=";
+            std::cerr.flush();
+            std::cerr << fs.get_file_size(fn);
+            std::cerr << std::endl;
+        }
+        catch(const exception &e)
+        {
+            std::cerr << e.what() << std::endl;
+            std::cerr << e.when() << std::endl;
+        }
+    }
+}
+YOCTO_UNIT_TEST_DONE()

@@ -15,7 +15,8 @@ namespace yocto
 			virtual void     remove_dir(  const string &dirname   );
 			virtual void     remove_file( const string &filename );
 			virtual scanner *new_scanner( const string &dirname ) const;
-			
+			virtual uint64_t get_file_size( const string &path ) const;
+            
 		private:
 			explicit local_fs() throw();
 			virtual ~local_fs() throw();

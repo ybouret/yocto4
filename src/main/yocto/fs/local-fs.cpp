@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <cerrno>
+#include <cstring>
 #endif
 
 #if defined(YOCTO_WIN)
@@ -153,5 +154,33 @@ namespace yocto
         }
 #endif
     }
+    
+    uint64_t local_fs:: get_file_size( const string &path ) const
+    {
+        YOCTO_GIANT_LOCK();
+        
+#if defined(YOCTO_BSD)
+#  if defined(YOCTO_APPLE)
+#    define Y_FS_STAT stat
+#  else
+#    define Y_FS_STAT stat64
+#  endif
+        struct Y_FS_STAT s;
+        memset((void*)&s,0,sizeof(s));
+        if( Y_FS_STAT( path.c_str(), &s) != 0 )
+        {
+            throw libc::exception( errno, "stat");
+        }
+        if( ! S_ISREG(s.st_mode) )
+            throw libc::exception( EINVAL, "stat: not a regular file");
+        return s.st_size;
+#endif
+        
+#if defined(YOCTO_WIN)
+        
+#endif
+        throw exception("get_file_size not implemented");
+    }
+    
     
 }
