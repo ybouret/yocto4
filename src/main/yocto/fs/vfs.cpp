@@ -10,6 +10,8 @@ namespace yocto
     vfs::  vfs() throw() {}
     vfs:: ~vfs() throw() {}
     
+   
+    
     void vfs:: create_sub_dir( const string &dirName )
     {
         string            org = dirName;
