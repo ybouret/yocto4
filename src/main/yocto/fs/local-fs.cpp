@@ -160,7 +160,7 @@ namespace yocto
 		YOCTO_GIANT_LOCK();
 
 #if defined(YOCTO_BSD)
-#  if defined(YOCTO_APPLE)
+#  if defined(YOCTO_APPLE) || defined(YOCTO_FREEBSD)
 #    define Y_FS_STAT stat
 #  else
 #    define Y_FS_STAT stat64
@@ -180,7 +180,7 @@ namespace yocto
 			LARGE_INTEGER nLargeInteger = { 0 } ;
 			HANDLE hFile = CreateFile(path.c_str(),
 				GENERIC_READ,
-				FILE_SHARE_READ, 
+				FILE_SHARE_READ,
 				NULL,
 				OPEN_EXISTING,
 				FILE_ATTRIBUTE_READONLY,
