@@ -7,13 +7,34 @@ namespace yocto {
     {
         return is_reg == attr;
     }
-   
+    
     bool vfs::entry:: is_directory()   const throw()
     {
         return is_dir == attr;
     }
     
-
+    bool vfs:: entry:: is_dot()  const throw()
+    {
+        assert(base_name);
+        return is_dir == attr && 0 == strcmp(".",base_name);
+    }
+    
+    bool vfs:: entry:: is_ddot()  const throw()
+    {
+        assert(base_name);
+        return is_dir == attr && 0 == strcmp("..",base_name);
+    }
+    
+    bool vfs::entry:: is_dot_or_ddot() const throw()
+    {
+        assert(base_name);
+        return is_dir == attr && ( 0 == strcmp(".",base_name) || 0 == strcmp("..",base_name));
+    }
+    
+    bool vfs::entry::  is_subdir() const throw()
+    {
+        return is_dir == attr && 0 != strcmp(".",base_name) && 0 != strcmp(".",base_name);
+    }
     
     
     vfs::entry:: entry( const string &vfs_path, const vfs &vfs_from ) :
@@ -57,7 +78,7 @@ namespace yocto {
             return (extension!=0) && (strcmp(ext,extension) == 0);
         }
     }
-
+    
     
     void vfs:: foreach_in( const string &dirname,  vfs::entry::callback &on_entry ) const
     {

@@ -44,7 +44,10 @@ namespace yocto {
             bool is_directory() const throw();
             bool has_extension( const string &ext ) const throw();
             bool has_extension( const char   *ext ) const throw();
-            
+            bool is_dot()  const throw();
+            bool is_ddot() const throw();
+            bool is_dot_or_ddot() const throw();
+            bool is_subdir() const throw(); //!< a directory not '.' or '..'
         private:
             YOCTO_DISABLE_ASSIGN(entry);
         };

@@ -175,6 +175,20 @@ namespace yocto
             return ans;
         }
         
+        void raw_file:: copy( const string &target, const string &source)
+        {
+            raw_file input(source,readable);
+            raw_file output(target,writable);
+            char     buffer[BUFSIZ];
+            while(true)
+            {
+                size_t done = 0;
+                input.get(buffer, sizeof(buffer), done);
+                if(!done)
+                    break;
+                output.put_all(buffer,done);
+            }
+        }
 		
 	}
 }

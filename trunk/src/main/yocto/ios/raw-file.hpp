@@ -74,6 +74,9 @@ namespace yocto
             //! for pipe behavior
             explicit raw_file( handle_t user_handle, size_t user_access ) throw();
             
+            //! helper
+            static void copy( const string &target, const string &source);
+            
         private:
             handle_t       handle;
             
