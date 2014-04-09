@@ -19,7 +19,7 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(file_size)
 {
     local_fs    &fs  = local_fs::instance();
-    for(size_t i=1;i<argc;++i)
+    for(int i=1;i<argc;++i)
     {
         try
         {
