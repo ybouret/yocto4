@@ -290,7 +290,7 @@ namespace yocto
                 //______________________________________________________________
                 crout<real_t> LU(m);
                 if( !LU.build(mu) )
-                    throw exception("invalid data @X[%u]=%g", unsigned(i), double(X[i]));
+                    throw exception("singular extended data @X[%u]=%g", unsigned(i), double(X[i]));
                 crout<real_t>::solve(mu,a);
                 Z[i] = a[1];
                 const real_t dz = Z[i] - Y[i];
