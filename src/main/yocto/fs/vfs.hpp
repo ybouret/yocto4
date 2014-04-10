@@ -104,7 +104,7 @@ namespace yocto {
         bool         is_dir( const string &path ) const throw();
         void         remove_files( const string &dirname, entry::callback &filter );
         void         remove_files( const string &dirname, bool (*filter)( const entry &) );
-        void         remove_files_with_extensions( const string &dirname, const string &extension);
+        void         remove_files_with_extension_in( const string &dirname, const string &extension);
         
         //==================================================================
         //

@@ -81,14 +81,14 @@ namespace yocto
             
             inline bool has_ext( const vfs::entry &ep ) throw()
             {
-                return  ep.has_extension(ext);
+                return  ep.is_regular() && ep.has_extension(ext);
             }
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(rm_wrapper);
         };
     }
     
-    void vfs:: remove_files_with_extensions( const string &dirname, const string &extension)
+    void vfs:: remove_files_with_extension_in( const string &dirname, const string &extension)
     {
         rm_wrapper w(extension);
         entry::callback cb( &w, & rm_wrapper::has_ext );
