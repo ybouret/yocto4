@@ -50,7 +50,7 @@ YOCTO_UNIT_TEST_IMPL(wallpaper)
                     ext[i] = tolower(ext[i]);
                 if( !(ext=="png" || ext == "jpg" ) )
                     continue;
-                const size_t nb = fs.get_file_size(img->path);
+                const uint64_t nb = fs.get_file_size(img->path);
                 if(nb>sz)
                 {
                     sz = nb;
