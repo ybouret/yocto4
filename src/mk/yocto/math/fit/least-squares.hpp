@@ -74,6 +74,7 @@ namespace yocto
                  **/
                 void set_parameter(size_t ipar, size_t ivar) throw();
                 
+                //! perform a polynomial fit
                 void polynomial( array<T> &aorg, const array<bool> &used, array<T> &aerr, typename numeric<T>::function *transform = 0);
                 
             private:

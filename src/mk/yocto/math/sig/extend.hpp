@@ -86,6 +86,7 @@ namespace yocto
             explicit extend2(extend_mode both) throw();
             virtual ~extend2() throw();
             
+            //! two pass filtering
             /**
              smooth function and evaluate derivative
              \return the RMS between Z (filtered) and Y
@@ -98,6 +99,20 @@ namespace yocto
                          const size_t    degree,
                          array<T>       &dZdX) const;
             
+            //! symetric wrapper
+            inline
+            T operator()(array<T>       &Z,
+                         const array<T> &X,
+                         const array<T> &Y,
+                         const T         dt,
+                         const size_t    degree,
+                         array<T>       &dZdX) const
+            {
+                const extend2  &self = *this;
+                const T  half = dt/2;
+                return self(Z,X,Y,half,half,degree,dZdX);
+
+            }
             
         private:
             YOCTO_DISABLE_ASSIGN(extend2);
