@@ -19,15 +19,18 @@ namespace yocto
         
         
         
-        template <> extend<real_t>:: ~extend() throw() {}
+        template <>
+        extend<real_t>:: ~extend() throw() {}
         
-        template <> extend<real_t>:: extend(extend_mode lo,
-                                            extend_mode up) throw() :
+        template <>
+        extend<real_t>:: extend(extend_mode lo,
+                                extend_mode up) throw() :
         lower(lo),
         upper(up)
         {}
         
-        template <> extend<real_t>:: extend( extend_mode both ) throw() :
+        template <>
+        extend<real_t>:: extend( extend_mode both ) throw() :
         lower( both ),
         upper( both )
         {
@@ -133,7 +136,7 @@ namespace yocto
                     return Y[i];
                 }
             }
-		return 0;
+            return 0;
         }
         
         
@@ -168,6 +171,10 @@ namespace yocto
         {
             assert(X.size()==Y.size());
             assert(Z.size()==Y.size());
+            //__________________________________________________________________
+            //
+            // setup
+            //__________________________________________________________________
             const bool drvs = dZdX != 0;
             size_t nmin = 0;
             if(drvs)
@@ -176,7 +183,10 @@ namespace yocto
                 nmin = 1;
             }
             
-            //-- sort out sizes
+            //__________________________________________________________________
+            //
+            // sort out sizes
+            //__________________________________________________________________
             switch( X.size() )
             {
                 case 0:
@@ -192,8 +202,10 @@ namespace yocto
                     break;
             }
             
-            
-            
+            //__________________________________________________________________
+            //
+            // Generic Case
+            //__________________________________________________________________
             const ptrdiff_t N = ptrdiff_t(X.size());
             if(N<=0)
                 throw libc::exception( ERANGE, "integer overflow in extend()");
@@ -207,10 +219,14 @@ namespace yocto
             for(ptrdiff_t i=1;i<=N;++i)
             {
                 v.free();
-                const real_t xi = X[i];
-                v2d<real_t> tmp(0,Y[i]);
+                const real_t xi = X[i];  // central point
+                v2d<real_t> tmp(0,Y[i]); // central valye
                 v.push_back(tmp);
                 
+                //______________________________________________________________
+                //
+                // Everybody looks to the left...
+                //______________________________________________________________
                 size_t nl = 0;
                 for(ptrdiff_t j=i-1;;--j)
                 {
@@ -225,6 +241,10 @@ namespace yocto
                     ++nl;
                 }
                 
+                //______________________________________________________________
+                //
+                // Everybody looks to the right...
+                //______________________________________________________________
                 size_t nr = 0;
                 for(ptrdiff_t j=i+1;;++j)
                 {
@@ -237,11 +257,16 @@ namespace yocto
                     v.push_back(tmp);
                     ++nr;
                 }
+                
+                //______________________________________________________________
+                //
+                // We have a window size
+                //______________________________________________________________
                 const size_t W = v.size(); assert(W>=1+2*nmin);
                 
                 //______________________________________________________________
                 //
-                // number of coefficients
+                // and a number of coefficients
                 //______________________________________________________________
                 const size_t m = min_of<size_t>(ncoef,W);
                 
@@ -292,6 +317,11 @@ namespace yocto
                 if( !LU.build(mu) )
                     throw exception("singular extended data @X[%u]=%g", unsigned(i), double(X[i]));
                 crout<real_t>::solve(mu,a);
+                
+                //______________________________________________________________
+                //
+                // get the approximated central value
+                //______________________________________________________________
                 Z[i] = a[1];
                 const real_t dz = Z[i] - Y[i];
                 rms += dz*dz;
