@@ -22,6 +22,8 @@ namespace yocto
         class extend
         {
         public:
+            //! TODO: bug with cyclic conditions !!!! => same values in local array...
+
             explicit extend( extend_mode lo, extend_mode up) throw();
             explicit extend( extend_mode both ) throw();
             
