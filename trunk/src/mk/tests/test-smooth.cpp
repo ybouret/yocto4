@@ -194,8 +194,8 @@ YOCTO_UNIT_TEST_IMPL(exdiff)
     vector<double>  y(n,0.0);
     vector<double>  z(n,0.0);
     
-    double dt = 0.2;
-    size_t degree = 2;
+    double dt     = 0.2;
+    size_t degree =   2;
     
     if(argc>1)
     {
