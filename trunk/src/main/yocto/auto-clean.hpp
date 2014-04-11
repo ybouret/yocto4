@@ -22,6 +22,24 @@ namespace yocto
 		void (T::*method_)(void) throw(); 
 		YOCTO_DISABLE_COPY_AND_ASSIGN(auto_clean);
 	};
+    
+    template <typename T>
+    class auto_release
+    {
+    public:
+        inline explicit auto_release( T &host, void (*proc)(T &host) ) throw() :
+        host_( host ),
+        proc_( proc )
+        {
+        }
+        
+        inline virtual ~auto_release() throw() { proc_( host_ ); }
+        
+    private:
+        T     &host_;
+        void (*proc_)(T&);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(auto_release);
+    };
 	
 }
 
