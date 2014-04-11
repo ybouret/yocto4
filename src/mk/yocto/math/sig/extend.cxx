@@ -270,6 +270,8 @@ namespace yocto
                 //______________________________________________________________
                 const size_t m = min_of<size_t>(ncoef,W);
                 
+                //std::cerr << "v=" << v << std::endl;
+                
                 matrix<real_t>  mu(m,m);
                 vector<real_t>  a(m,0.0);
                 
@@ -327,6 +329,10 @@ namespace yocto
                 rms += dz*dz;
                 if(drvs)
                 {
+                    //______________________________________________________________
+                    //
+                    // get the approximated derivative
+                    //______________________________________________________________
                     (*dZdX)[i] = a[2];
                 }
             }
