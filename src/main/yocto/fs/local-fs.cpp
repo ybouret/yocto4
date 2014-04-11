@@ -160,7 +160,7 @@ namespace yocto
 		YOCTO_GIANT_LOCK();
         
 #if defined(YOCTO_BSD)
-#  if defined(YOCTO_APPLE) || defined(YOCTO_FREEBSD)
+#  if defined(YOCTO_APPLE) || defined(YOCTO_FREEBSD) || defined(YOCTO_OPENBSD)
 #    define Y_FS_STAT stat
 #  else
 #    define Y_FS_STAT stat64
