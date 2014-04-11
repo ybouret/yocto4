@@ -17,13 +17,15 @@ namespace yocto
             extend_even        //!< assume even/boundary
         };
         
+        extend_mode extend_mode_for_derivative( extend_mode m ) throw();
+        
         
         template <typename T>
         class extend
         {
         public:
             //! TODO: bug with cyclic conditions !!!! => same values in local array...
-
+            
             explicit extend( extend_mode lo, extend_mode up) throw();
             explicit extend( extend_mode both ) throw();
             
@@ -35,6 +37,7 @@ namespace yocto
             v2d<T> at( ptrdiff_t i, const array<T> &X, const array<T> &Y ) const;
             
             
+            ///! asymetric operator
             T operator()(array<T>       &Z,
                          const array<T> &X,
                          const array<T> &Y,
@@ -45,6 +48,7 @@ namespace yocto
                          ) const;
             
             
+            //! centered operator
             inline T operator()(array<T>       &Z,
                                 const array<T> &X,
                                 const array<T> &Y,
@@ -66,10 +70,39 @@ namespace yocto
                            const size_t   degree) const;
             
             
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(extend);
             T get_x(ptrdiff_t i, const array<T> &X, const ptrdiff_t N, const T L) const throw();
             T get_y(ptrdiff_t i, const array<T> &Y, const ptrdiff_t N) const throw();
+        };
+        
+        //! for accompanying derivatives
+        template <typename T>
+        class extend2
+        {
+        public:
+            explicit extend2(extend_mode lo, extend_mode up) throw();
+            explicit extend2(extend_mode both) throw();
+            virtual ~extend2() throw();
+            
+            /**
+             smooth function and evaluate derivative
+             \return the RMS between Z (filtered) and Y
+             */
+            T operator()(array<T>       &Z,
+                         const array<T> &X,
+                         const array<T> &Y,
+                         const T         dt_prev,
+                         const T         dt_next,
+                         const size_t    degree,
+                         array<T>       &dZdX) const;
+            
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(extend2);
+            extend<T> func;
+            extend<T> diff;
         };
         
     }

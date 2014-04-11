@@ -18,7 +18,11 @@ namespace yocto
     {
         
         
-        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // extend
+        //
+        ////////////////////////////////////////////////////////////////////////
         template <>
         extend<real_t>:: ~extend() throw() {}
         
@@ -370,6 +374,45 @@ namespace yocto
                 }
             }
         }
+        
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // extend
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <> extend2<real_t>:: ~extend2()  throw() {}
+        
+        template <>
+        extend2<real_t>:: extend2(extend_mode lo, extend_mode up) throw() :
+        func(lo,up),
+        diff(extend_mode_for_derivative(lo),extend_mode_for_derivative(up))
+        {
+            
+        }
+        
+        template <>
+        extend2<real_t>:: extend2(extend_mode both) throw() :
+        func(both),
+        diff(extend_mode_for_derivative(both))
+        {
+        }
+        
+        template <>
+        real_t extend2<real_t>::operator()(array<real_t>       &Z,
+                                           const array<real_t> &X,
+                                           const array<real_t> &Y,
+                                           const real_t         dt_prev,
+                                           const real_t         dt_next,
+                                           const size_t         degree,
+                                           array<real_t>       &dZdX) const
+        {
+            vector<real_t> approx( X.size(), REAL(0.0) );
+            const real_t ans = func(Z,X,Y,dt_prev,dt_next,degree,&approx);
+            diff( dZdX, X, approx,dt_prev,dt_next, (degree>=1) ? degree-1 : 0, 0);
+            return ans;
+        }
+        
+        
         
         
     }

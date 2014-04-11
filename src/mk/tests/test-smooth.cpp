@@ -231,23 +231,19 @@ YOCTO_UNIT_TEST_IMPL(exdiff)
         }
     }
     
-    extend<double> fn_cyclic(extend_cyclic,extend_cyclic);
-    extend<double> df_cyclic(extend_cyclic,extend_cyclic);
+    extend2<double> fn_cyclic(extend_cyclic,extend_cyclic);
     
-    extend<double> fn_natural(extend_odd,extend_odd);
-    extend<double> df_natural(extend_even,extend_even);
+    extend2<double> fn_natural(extend_odd,extend_odd);
     
     std::cerr << "degree=" << degree << std::endl;
     vector<double> zc(n,0.0);  // cyclic filtered value
-    vector<double> wc1(n,0.0); // cyclic first pass derivative
     vector<double> wc(n,0.0);
-    fn_cyclic(zc,x,z,dt/2,dt/2,degree,&wc1);
-    df_cyclic(wc,x,wc1,dt/2,dt/2,max_of<size_t>(degree,1)-1,NULL);
+    fn_cyclic(zc,x,z,dt/2,dt/2,degree,wc);
     {
         ios::ocstream fp("xw_cyclic.dat",false);
         for(size_t i=1;i<=n;++i)
         {
-            fp("%g %g %g %g\n",x[i],zc[i],wc1[i],wc[i]);
+            fp("%g %g %g\n",x[i],zc[i],wc[i]);
         }
     }
     
