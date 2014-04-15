@@ -1,5 +1,4 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/math/sig/data-smoother.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/types.hpp"
@@ -9,67 +8,8 @@
 using namespace yocto;
 using namespace math;
 
-YOCTO_UNIT_TEST_IMPL(smooth)
-{
-    
-    size_t nf = 5;
-    size_t d  = 2;
-    
-    if( argc > 1 )
-    {
-        nf = strconv::to_size(argv[1],"nf");
-    }
-    
-    if( argc > 2 )
-    {
-        d = strconv::to_size(argv[2],"d");
-    }
-    
-    const size_t    n=200;
-    vector<double>  x(n,0.0);
-    vector<double>  y(n,0.0);
-    vector<double>  z(n,0.0);
-    
-    for( size_t i=1; i <= n; ++i )
-    {
-        x[i] = numeric<double>::two_pi * (i-1) / double(n);
-        y[i] = sin(x[i]) + sin(3*x[i]);
-        z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
-    }
-    z[1] = y[1];
-    z[n] = y[n];
-    
-    {
-        ios::ocstream fp("rdata.dat", false);
-        for( size_t i=1; i<=n; ++i )
-        {
-            fp("%g %g %g\n", x[i], y[i], z[i]);
-        }
-    }
-    
-    
-    extender<double> Ex(z,extension_cyclic,extension_cyclic);
-    smoother<double> Sm_u(nf,nf,smoother<double>::uniform,d);
-    smoother<double> Sm_g(nf,nf,smoother<double>::gaussian,d);
-    vector<double>   s_u(n,0.0);
-    vector<double>   s_g(n,0.0);
-    Sm_u.run(s_u,Ex,0);
-    Sm_g.run(s_g,Ex,0);
-    
-    {
-        ios::ocstream fp("smooth.dat", false);
-        for( size_t i=1; i<=n; ++i )
-        {
-            fp("%g %g %g\n", x[i], s_u[i], s_g[i]);
-        }
-    }
-    
-    
-    
-}
-YOCTO_UNIT_TEST_DONE()
 
-#include "yocto/math/sig/extend.hpp"
+#include "yocto/math/sig/extender.hpp"
 
 YOCTO_UNIT_TEST_IMPL(extend)
 {
@@ -107,6 +47,21 @@ YOCTO_UNIT_TEST_IMPL(extend)
     z[1] = y[1];
     z[n] = y[n];
     
+    extender<double> xtd1(extend_constant,extend_constant);
+    extender<double> xtd2(extend_cyclic,extend_cyclic);
+    extender<double> xtd3(extend_odd,extend_odd);
+    extender<double> xtd4(extend_even,extend_even);
+    
+    std::cerr << "x1[0]=" << xtd1.get_x(0,x,n) << std::endl;
+    std::cerr << "x2[0]=" << xtd2.get_x(0,x,n) << std::endl;
+    std::cerr << "x3[0]=" << xtd3.get_x(0,x,n) << std::endl;
+    std::cerr << "x4[0]=" << xtd4.get_x(0,x,n) << std::endl;
+
+    //std::cerr << "x2[0]=" << xtd2.at(0,x,z).x << std::endl;
+    //std::cerr << "x3[0]=" << xtd3.at(0,x,z).x << std::endl;
+    //std::cerr << "x4[0]=" << xtd4.at(0,x,z).x << std::endl;
+    
+#if 0
     // y: original values
     // z: noisy values
     std::cerr << "value@" << x[1] <<  " = " << z[1] << std::endl;
@@ -205,84 +160,86 @@ YOCTO_UNIT_TEST_IMPL(extend)
             fp("%g %g\n", pdx[i], rms[i]);
         }
     }
+#endif
     
-    }
-    YOCTO_UNIT_TEST_DONE()
-    
+}
+YOCTO_UNIT_TEST_DONE()
+
 #include "yocto/code/utils.hpp"
-    YOCTO_UNIT_TEST_IMPL(exdiff)
+YOCTO_UNIT_TEST_IMPL(exdiff)
+{
+    const size_t    n=150;
+    vector<double>  x(n,0.0);
+    vector<double>  y(n,0.0);
+    vector<double>  z(n,0.0);
+    
+    double dt     = 0.2;
+    size_t degree =   2;
+    
+    if(argc>1)
     {
-        const size_t    n=150;
-        vector<double>  x(n,0.0);
-        vector<double>  y(n,0.0);
-        vector<double>  z(n,0.0);
-        
-        double dt     = 0.2;
-        size_t degree =   2;
-        
-        if(argc>1)
+        dt = strconv::to<double>(argv[1],"dt");
+    }
+    
+    if(argc>2)
+    {
+        degree = strconv::to<size_t>(argv[2],"degree");
+    }
+    
+    for( size_t i=2; i <= n; ++i )
+    {
+        x[i] = x[i-1] + 0.5 + alea<double>();
+    }
+    
+    const double fac = n*(numeric<double>::two_pi / x[n])/double(n+1);
+    
+    for( size_t i=1; i <= n; ++i )
+    {
+        x[i] *= fac;
+        y[i] = sin(x[i]) + sin(3*x[i]);
+        z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
+    }
+    z[1] = y[1];
+    z[n] = y[n];
+    
+    {
+        ios::ocstream fp("xdata.dat", false);
+        for( size_t i=1; i<=n; ++i )
         {
-            dt = strconv::to<double>(argv[1],"dt");
+            fp("%g %g %g\n", x[i], y[i], z[i]);
         }
-        
-        if(argc>2)
+    }
+    
+#if 0
+    extend2<double> fn_cyclic(extend_cyclic,extend_cyclic);
+    extend2<double> fn_natural(extend_odd,extend_odd);
+    extend<double>  natural(extend_odd);
+    
+    std::cerr << "degree=" << degree << std::endl;
+    vector<double> zf(n,0.0);  // filtered value
+    vector<double> wf(n,0.0);  // filtered derivative
+    fn_cyclic(zf,x,z,dt/2,dt/2,degree,wf);
+    {
+        ios::ocstream fp("xw_cyclic.dat",false);
+        for(size_t i=1;i<=n;++i)
         {
-            degree = strconv::to<size_t>(argv[2],"degree");
+            fp("%g %g %g\n",x[i],zf[i],wf[i]);
         }
-        
-        for( size_t i=2; i <= n; ++i )
+    }
+    
+    vector<double> w1(n,0.0);
+    natural(zf,x,z,dt/2,dt/2,degree,&w1);
+    fn_natural(zf,x,z,dt/2,dt/2,degree,wf);
+    
+    {
+        ios::ocstream fp("xw_natural.dat",false);
+        for(size_t i=1;i<=n;++i)
         {
-            x[i] = x[i-1] + 0.5 + alea<double>();
+            fp("%g %g %g %g\n",x[i],zf[i],wf[i],w1[i]);
         }
-        
-        const double fac = n*(numeric<double>::two_pi / x[n])/double(n+1);
-        
-        for( size_t i=1; i <= n; ++i )
-        {
-            x[i] *= fac;
-            y[i] = sin(x[i]) + sin(3*x[i]);
-            z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
-        }
-        z[1] = y[1];
-        z[n] = y[n];
-        
-        {
-            ios::ocstream fp("xdata.dat", false);
-            for( size_t i=1; i<=n; ++i )
-            {
-                fp("%g %g %g\n", x[i], y[i], z[i]);
-            }
-        }
-        
-        extend2<double> fn_cyclic(extend_cyclic,extend_cyclic);
-        extend2<double> fn_natural(extend_odd,extend_odd);
-        extend<double>  natural(extend_odd);
-        
-        std::cerr << "degree=" << degree << std::endl;
-        vector<double> zf(n,0.0);  // filtered value
-        vector<double> wf(n,0.0);  // filtered derivative
-        fn_cyclic(zf,x,z,dt/2,dt/2,degree,wf);
-        {
-            ios::ocstream fp("xw_cyclic.dat",false);
-            for(size_t i=1;i<=n;++i)
-            {
-                fp("%g %g %g\n",x[i],zf[i],wf[i]);
-            }
-        }
-        
-        vector<double> w1(n,0.0);
-        natural(zf,x,z,dt/2,dt/2,degree,&w1);
-        fn_natural(zf,x,z,dt/2,dt/2,degree,wf);
-        
-        {
-            ios::ocstream fp("xw_natural.dat",false);
-            for(size_t i=1;i<=n;++i)
-            {
-                fp("%g %g %g %g\n",x[i],zf[i],wf[i],w1[i]);
-            }
-        }
-        
-        
+    }
+    
+#endif
     }
     YOCTO_UNIT_TEST_DONE()
     
@@ -319,6 +276,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
             z[i] = y[i] + 0.1 * ( 0.5 - alea<double>() );
         }
         
+#if 0
         extend2<double> xtd(extend_odd);
         vector<double>  zf(n,0.0);  // filtered value
         vector<double>  wf(n,0.0);  // filtered derivative
@@ -334,7 +292,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
             }
         }
         
-        
+#endif
     }
     YOCTO_UNIT_TEST_DONE()
     
