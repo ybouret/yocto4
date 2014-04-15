@@ -39,11 +39,11 @@ namespace yocto
         
         
         template <>
-        real_t smoother<real_t>:: operator()(size_t i,
-                                             const array<real_t>    &X,
-                                             const array<real_t>    &Y,
-                                             const extender<real_t> &E,
-                                             real_t                 *dYdX)
+        real_t smoother<real_t>:: get(size_t i,
+                                      const array<real_t>    &X,
+                                      const array<real_t>    &Y,
+                                      const extender<real_t> &E,
+                                      real_t                 *dYdX)
         {
             assert(X.size()==Y.size());
             assert(i>0);
@@ -56,7 +56,6 @@ namespace yocto
             // Initialize
             //__________________________________________________________________
             const ptrdiff_t N = ptrdiff_t(X.size());
-            v.free();
             switch(N)
             {
                 case 0:
@@ -71,6 +70,7 @@ namespace yocto
                     break;
             }
             
+            v.free();
             vtx_t tmp(0,Y[i]);
             v.push_back(tmp);
             const real_t xi = X[i];
@@ -105,7 +105,7 @@ namespace yocto
                     {
                         const real_t xj = E.get_x(j, X, N);
                         const real_t dx = xj - xi;
-                        if( nr >= nmin && Fabs(dx) > lower_range)
+                        if( nr >= nmin && Fabs(dx) > upper_range)
                             break;
                         tmp.x = dx;
                         tmp.y = E.get_y(j,Y,N);
@@ -118,7 +118,59 @@ namespace yocto
             }
             else
             {
-                throw exception("not implemented");
+                // fill in lower
+                ptrdiff_t jlo = i-1;
+                for(;jlo>0;--jlo)
+                {
+                    const real_t xj = X[jlo];
+                    const real_t dx = xj - xi;
+                    if( Fabs(dx) > lower_range )
+                        break;
+                    tmp.x = dx;
+                    tmp.y = Y[jlo];
+                    v.push_back(tmp);
+                }
+                
+                // fill in upper
+                ptrdiff_t jup = i+1;
+                for(;jup<=N;++jup)
+                {
+                    const real_t xj = X[jup];
+                    const real_t dx = xj - xi;
+                    if( Fabs(dx) > upper_range )
+                        break;
+                    tmp.x = dx;
+                    tmp.y = Y[jup];
+                    v.push_back(tmp);
+                }
+                
+                // and complete for derivatives if necessary
+                if(dYdX)
+                {
+                    if( Fabs(xi-X[1])<=Fabs(xi-X[N]))
+                    {
+                        // go up
+                        while( v.size() < 3 )
+                        {
+                            tmp.x = E.get_x(jup, X, N) - xi;
+                            tmp.y = E.get_y(jup, Y, N);
+                            ++jup;
+                        }
+                    }
+                    else
+                    {
+                        // go lo
+                        while( v.size() < 3 )
+                        {
+                            tmp.x = E.get_x(jlo, X, N) - xi;
+                            tmp.y = E.get_y(jlo, Y, N);
+                            --jlo;
+                        }
+                        
+                    }
+                }
+                
+                
             }
             
             //__________________________________________________________________
@@ -182,7 +234,7 @@ namespace yocto
             if( !lu.build(mu) )
                 throw exception("singular smoothing window around X[%d]=%g", int(i), xi);
             crout<real_t>::solve(mu,a);
-            //std::cerr << "a=" << a << std::endl;
+            
             if( dYdX )
             {
                 assert(m>=2);
@@ -208,30 +260,69 @@ namespace yocto
         
         
         template <>
-        void smoother<real_t>:: operator()(array<real_t>          &Z,
-                                           const array<real_t>    &X,
-                                           const array<real_t>    &Y,
-                                           const extender<real_t> &E,
-                                           array<real_t>          *dZdX)
+        void smoother<real_t>:: run(array<real_t>          &Z,
+                                    const array<real_t>    &X,
+                                    const array<real_t>    &Y,
+                                    const extender<real_t> &E,
+                                    array<real_t>          *dZdX)
         {
             assert(Z.size()==X.size());
             assert(Z.size()==Y.size());
             const size_t N = Z.size();
-            smoother<real_t> &self = *this;
+            std::cerr << "run dZdX@" << (void*)dZdX << std::endl;
             if(dZdX)
             {
                 assert(dZdX->size()==Z.size());
                 array<real_t> &diff = *dZdX;
                 for(size_t i=1;i<=N;++i)
-                    Z[i] = self(i,X,Y,E, &diff[i]);
+                    Z[i] = get(i,X,Y,E, &diff[i]);
             }
             else
             {
                 for(size_t i=1;i<=N;++i)
-                    Z[i] = self(i,X,Y,E, 0);
+                    Z[i] = get(i,X,Y,E, 0);
             }
             
         }
+        
+        namespace
+        {
+            static inline
+            extension_type drvs_ext( extension_type t )
+            {
+                switch(t)
+                {
+                    case extend_cyclic:
+                        return extend_cyclic;
+                        
+                    case extend_odd:
+                        return extend_even;
+                        
+                    case extend_even:
+                        return extend_odd;
+                        
+                    case extend_constant:
+                    case extend_zero:
+                        break;
+                }
+                return extend_zero;
+            }
+        }
+        
+        template <>
+        void smoother<real_t>:: full(array<real_t>          &Z,
+                                     const array<real_t>    &X,
+                                     const array<real_t>    &Y,
+                                     const extender<real_t> &E,
+                                     array<real_t>           dZdX)
+        {
+            const size_t N = Z.size();
+            vector<real_t> diff(N,REAL(0.0));
+            run(Z,X,Y,E,&diff);
+            //const extender<real_t> D( drvs_ext(E.lower), drvs_ext(E.upper) );
+            run(dZdX,X,diff,E,0);
+        }
+        
         
     }
 }

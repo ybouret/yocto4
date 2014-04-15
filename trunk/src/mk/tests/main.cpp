@@ -23,8 +23,7 @@ YOCTO_UNIT_TEST_INIT(64)
     
     YOCTO_UNIT_TEST_DECL(linear);
     YOCTO_UNIT_TEST_DECL(extend);
-    YOCTO_UNIT_TEST_DECL(exdiff);
-    YOCTO_UNIT_TEST_DECL(exdiff2);
+    YOCTO_UNIT_TEST_DECL(extend2);
 
     YOCTO_UNIT_TEST_DECL(trigo);
     
