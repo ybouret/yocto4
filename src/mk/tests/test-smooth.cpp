@@ -101,12 +101,15 @@ YOCTO_UNIT_TEST_IMPL(extend)
     for( size_t i=1; i <= n; ++i )
     {
         x[i] *= fac;
-        y[i] = sin(x[i]) + sin(3*x[i]);
+        y[i] = 0.2+sin(x[i]) + sin(3*x[i]);
         z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
     }
     z[1] = y[1];
     z[n] = y[n];
     
+    // y: original values
+    // z: noisy values
+    std::cerr << "value@" << x[1] <<  " = " << z[1] << std::endl;
     {
         ios::ocstream fp("xdata.dat", false);
         for( size_t i=1; i<=n; ++i )
@@ -119,24 +122,44 @@ YOCTO_UNIT_TEST_IMPL(extend)
     extend<double> xtd2(extend_cyclic,extend_cyclic);
     extend<double> xtd3(extend_odd,extend_odd);
     extend<double> xtd4(extend_even,extend_even);
-
+    
+    {
+        std::cerr << "x1[0]=" << xtd1.at(0,x,z).x << std::endl;
+        std::cerr << "x2[0]=" << xtd2.at(0,x,z).x << std::endl;
+        std::cerr << "x3[0]=" << xtd3.at(0,x,z).x << std::endl;
+        std::cerr << "x4[0]=" << xtd4.at(0,x,z).x << std::endl;
+        
+    }
+    
+    
     
     {
         ios::ocstream fp("xivtx.dat",false);
         for( ptrdiff_t i= -ptrdiff_t(2*n); i <= ptrdiff_t(n+2*n); ++i)
         {
-            v2d<double> v1 = xtd1.at(i,x,z);
-            fp("%g %g", v1.x, v1.y);
+            if(true)
+            {
+                v2d<double> v1 = xtd1.at(i,x,z);
+                fp("%g %g", v1.x, v1.y);
+            }
             
-            v2d<double> v2 = xtd2.at(i,x,z);
-            fp(" %g %g", v2.x, v2.y);
+            if(true)
+            {
+                v2d<double> v2 = xtd2.at(i,x,z);
+                fp(" %g %g", v2.x, v2.y);
+            }
             
-            v2d<double> v3 = xtd3.at(i,x,z);
-            fp(" %g %g", v3.x, v3.y);
+            if(true)
+            {
+                v2d<double> v3 = xtd3.at(i,x,z);
+                fp(" %g %g", v3.x, v3.y);
+            }
             
-            v2d<double> v4 = xtd4.at(i,x,z);
-            fp(" %g %g", v4.x, v4.y);
-            
+            if(true)
+            {
+                v2d<double> v4 = xtd4.at(i,x,z);
+                fp(" %g %g", v4.x, v4.y);
+            }
             fp("\n");
         }
     }
@@ -145,7 +168,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     vector<double> w1(n,0.0);
     
     xtd1(z1, x,z, dt/2, dt/2, degree, &w1);
-
+    
     {
         ios::ocstream fp("xz1.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -153,7 +176,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
             fp("%g %g %g\n", x[i], z1[i], w1[i]);
         }
     }
-        
+    
     xtd2(z1, x,z, dt/2, dt/2, degree, &w1);
     {
         ios::ocstream fp("xz2.dat", false);
@@ -183,71 +206,71 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
-}
-YOCTO_UNIT_TEST_DONE()
-
+    }
+    YOCTO_UNIT_TEST_DONE()
+    
 #include "yocto/code/utils.hpp"
-YOCTO_UNIT_TEST_IMPL(exdiff)
-{
-    const size_t    n=150;
-    vector<double>  x(n,0.0);
-    vector<double>  y(n,0.0);
-    vector<double>  z(n,0.0);
-    
-    double dt     = 0.2;
-    size_t degree =   2;
-    
-    if(argc>1)
+    YOCTO_UNIT_TEST_IMPL(exdiff)
     {
-        dt = strconv::to<double>(argv[1],"dt");
-    }
-    
-    if(argc>2)
-    {
-        degree = strconv::to<size_t>(argv[2],"degree");
-    }
-    
-    for( size_t i=2; i <= n; ++i )
-    {
-        x[i] = x[i-1] + 0.5 + alea<double>();
-    }
-    
-    const double fac = n*(numeric<double>::two_pi / x[n])/double(n+1);
-    
-    for( size_t i=1; i <= n; ++i )
-    {
-        x[i] *= fac;
-        y[i] = sin(x[i]) + sin(3*x[i]);
-        z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
-    }
-    z[1] = y[1];
-    z[n] = y[n];
-    
-    {
-        ios::ocstream fp("xdata.dat", false);
-        for( size_t i=1; i<=n; ++i )
+        const size_t    n=150;
+        vector<double>  x(n,0.0);
+        vector<double>  y(n,0.0);
+        vector<double>  z(n,0.0);
+        
+        double dt     = 0.2;
+        size_t degree =   2;
+        
+        if(argc>1)
         {
-            fp("%g %g %g\n", x[i], y[i], z[i]);
+            dt = strconv::to<double>(argv[1],"dt");
         }
-    }
-    
-    extend2<double> fn_cyclic(extend_cyclic,extend_cyclic);
-    
-    extend2<double> fn_natural(extend_odd,extend_odd);
-    
-    std::cerr << "degree=" << degree << std::endl;
-    vector<double> zc(n,0.0);  // cyclic filtered value
-    vector<double> wc(n,0.0);
-    fn_cyclic(zc,x,z,dt/2,dt/2,degree,wc);
-    {
-        ios::ocstream fp("xw_cyclic.dat",false);
-        for(size_t i=1;i<=n;++i)
+        
+        if(argc>2)
         {
-            fp("%g %g %g\n",x[i],zc[i],wc[i]);
+            degree = strconv::to<size_t>(argv[2],"degree");
         }
+        
+        for( size_t i=2; i <= n; ++i )
+        {
+            x[i] = x[i-1] + 0.5 + alea<double>();
+        }
+        
+        const double fac = n*(numeric<double>::two_pi / x[n])/double(n+1);
+        
+        for( size_t i=1; i <= n; ++i )
+        {
+            x[i] *= fac;
+            y[i] = sin(x[i]) + sin(3*x[i]);
+            z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
+        }
+        z[1] = y[1];
+        z[n] = y[n];
+        
+        {
+            ios::ocstream fp("xdata.dat", false);
+            for( size_t i=1; i<=n; ++i )
+            {
+                fp("%g %g %g\n", x[i], y[i], z[i]);
+            }
+        }
+        
+        extend2<double> fn_cyclic(extend_cyclic,extend_cyclic);
+        
+        extend2<double> fn_natural(extend_odd,extend_odd);
+        
+        std::cerr << "degree=" << degree << std::endl;
+        vector<double> zc(n,0.0);  // cyclic filtered value
+        vector<double> wc(n,0.0);
+        fn_cyclic(zc,x,z,dt/2,dt/2,degree,wc);
+        {
+            ios::ocstream fp("xw_cyclic.dat",false);
+            for(size_t i=1;i<=n;++i)
+            {
+                fp("%g %g %g\n",x[i],zc[i],wc[i]);
+            }
+        }
+        
     }
+    YOCTO_UNIT_TEST_DONE()
     
-}
-YOCTO_UNIT_TEST_DONE()
-
-
+    
