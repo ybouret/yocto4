@@ -33,6 +33,11 @@ YOCTO_UNIT_TEST_IMPL(extend)
         degree = strconv::to<size_t>(argv[2],"degree");
     }
     
+    if(argc>3)
+    {
+        NOISE = strconv::to<double>(argv[3],"NOISE");
+    }
+    
     for( size_t i=2; i <= n; ++i )
     {
         x[i] = x[i-1] + 0.5 + alea<double>();
@@ -170,6 +175,11 @@ YOCTO_UNIT_TEST_IMPL(extend2)
         degree = strconv::to<size_t>(argv[2],"degree");
     }
     
+    if(argc>3)
+    {
+        NOISE = strconv::to<double>(argv[3],"NOISE");
+    }
+    
     for( size_t i=2; i <= n; ++i )
     {
         x[i] = x[i-1] + 0.5 + alea<double>();
@@ -192,7 +202,7 @@ YOCTO_UNIT_TEST_IMPL(extend2)
     
     vector<double> zf(n,0.0);
     vector<double> wf(n,0.0);
-    sm.run(zf,x,z,xtd,&wf);
+    sm.full(zf,x,z,xtd,wf);
     
     {
         ios::ocstream fp("xdata2.dat",false);
