@@ -74,7 +74,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(extend);
-            T get_x(ptrdiff_t i, const array<T> &X, const ptrdiff_t N, const T L) const throw();
+            T get_x(ptrdiff_t i, const array<T> &X, const ptrdiff_t N) const throw();
             T get_y(ptrdiff_t i, const array<T> &Y, const ptrdiff_t N) const throw();
         };
         
