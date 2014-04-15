@@ -9,7 +9,7 @@ using namespace yocto;
 using namespace math;
 
 
-#include "yocto/math/sig/extender.hpp"
+#include "yocto/math/sig/smoother.hpp"
 
 YOCTO_UNIT_TEST_IMPL(extend)
 {
@@ -36,7 +36,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
         x[i] = x[i-1] + 0.5 + alea<double>();
     }
     
-    const double fac = n*(numeric<double>::two_pi / x[n])/double(n+1);
+    const double fac = (numeric<double>::two_pi / x[n]);
     
     for( size_t i=1; i <= n; ++i )
     {
@@ -44,6 +44,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
         y[i] = 0.2+sin(x[i]) + sin(3*x[i]);
         z[i] = y[i] + 0.5 * ( 0.5 - alea<double>() );
     }
+    y[n] = y[1];
     z[1] = y[1];
     z[n] = y[n];
     
@@ -92,6 +93,26 @@ YOCTO_UNIT_TEST_IMPL(extend)
             fp("\n");
         }
     }
+    
+    smoother<double> sm;
+    
+    sm.upper_range = dt/2;
+    sm.lower_range = dt/2;
+    sm.degree      = degree;
+    
+    
+    vector<double> z2(n,0.0);
+    vector<double> w2(n,0.0);
+    sm(z2,x,z,xtd2,&w2);
+    {
+        ios::ocstream fp("xz2.dat", false);
+        for(size_t i=1; i<=n; ++i )
+        {
+            fp("%g %g %g\n", x[i], z2[i], w2[i]);
+        }
+    }
+
+    
 #if 0
     vector<double> z1(n,0.0);
     vector<double> w1(n,0.0);
@@ -107,13 +128,6 @@ YOCTO_UNIT_TEST_IMPL(extend)
     }
     
     xtd2(z1, x,z, dt/2, dt/2, degree, &w1);
-    {
-        ios::ocstream fp("xz2.dat", false);
-        for(size_t i=1; i<=n; ++i )
-        {
-            fp("%g %g\n", x[i], z1[i]);
-        }
-    }
     
     xtd3(z1, x,z, dt/2, dt/2, degree, &w1);
     {

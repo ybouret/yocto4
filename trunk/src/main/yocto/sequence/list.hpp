@@ -6,6 +6,7 @@
 #include "yocto/core/pool.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/container/iter-linked.hpp"
+#include "yocto/sort/merge.hpp"
 #include <iostream>
 
 namespace yocto
@@ -166,6 +167,13 @@ namespace yocto
 			return os;
 		}
         
+        template <typename FUNC>
+        inline void sort( FUNC &cmp )
+        {
+            void *args = (void *)&cmp;
+            core::merging<node_type>:: template sort<core::list_of>(list_,__compare_nodes<FUNC>,args);
+        }
+        
 	protected:
 		core::list_of<node_type> list_;
 		core::pool_of<node_type> pool_;
@@ -188,6 +196,15 @@ namespace yocto
 		
 		virtual const_type &get_front() const throw() { assert(list_.size>0); return list_.head->data; }
 		virtual const_type &get_back()  const throw() { assert(list_.size>0); return list_.tail->data; }
+        
+        template <typename FUNC>
+        static inline
+        int __compare_nodes( const node_type *lhs, const node_type *rhs, void *args)
+        {
+            assert(args);
+            FUNC &cmp = *(FUNC *)args;
+            return cmp(lhs->data,rhs->data);
+        }
 	};
 	
 }
