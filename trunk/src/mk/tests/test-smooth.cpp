@@ -56,15 +56,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     std::cerr << "x2[0]=" << xtd2.get_x(0,x,n) << std::endl;
     std::cerr << "x3[0]=" << xtd3.get_x(0,x,n) << std::endl;
     std::cerr << "x4[0]=" << xtd4.get_x(0,x,n) << std::endl;
-
-    //std::cerr << "x2[0]=" << xtd2.at(0,x,z).x << std::endl;
-    //std::cerr << "x3[0]=" << xtd3.at(0,x,z).x << std::endl;
-    //std::cerr << "x4[0]=" << xtd4.at(0,x,z).x << std::endl;
     
-#if 0
-    // y: original values
-    // z: noisy values
-    std::cerr << "value@" << x[1] <<  " = " << z[1] << std::endl;
     {
         ios::ocstream fp("xdata.dat", false);
         for( size_t i=1; i<=n; ++i )
@@ -73,20 +65,6 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
-    extend<double> xtd1(extend_constant,extend_constant);
-    extend<double> xtd2(extend_cyclic,extend_cyclic);
-    extend<double> xtd3(extend_odd,extend_odd);
-    extend<double> xtd4(extend_even,extend_even);
-    
-    {
-        std::cerr << "x1[0]=" << xtd1.at(0,x,z).x << std::endl;
-        std::cerr << "x2[0]=" << xtd2.at(0,x,z).x << std::endl;
-        std::cerr << "x3[0]=" << xtd3.at(0,x,z).x << std::endl;
-        std::cerr << "x4[0]=" << xtd4.at(0,x,z).x << std::endl;
-        
-    }
-    
-    
     
     {
         ios::ocstream fp("xivtx.dat",false);
@@ -94,31 +72,27 @@ YOCTO_UNIT_TEST_IMPL(extend)
         {
             if(true)
             {
-                v2d<double> v1 = xtd1.at(i,x,y);
-                fp("%g %g", v1.x, v1.y);
+                fp("%g %g", xtd1.get_x(i,x, n), xtd1.get_y(i,y,n));
             }
             
             if(true)
             {
-                v2d<double> v2 = xtd2.at(i,x,y);
-                fp(" %g %g", v2.x, v2.y);
+                fp(" %g %g", xtd2.get_x(i,x, n), xtd2.get_y(i,y,n));
             }
             
             if(true)
             {
-                v2d<double> v3 = xtd3.at(i,x,y);
-                fp(" %g %g", v3.x, v3.y);
+                fp(" %g %g", xtd3.get_x(i,x, n), xtd3.get_y(i,y,n));
             }
             
             if(true)
             {
-                v2d<double> v4 = xtd4.at(i,x,y);
-                fp(" %g %g", v4.x, v4.y);
+                fp(" %g %g", xtd4.get_x(i,x, n), xtd4.get_y(i,y,n));
             }
             fp("\n");
         }
     }
-    
+#if 0
     vector<double> z1(n,0.0);
     vector<double> w1(n,0.0);
     
