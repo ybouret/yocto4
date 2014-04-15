@@ -139,25 +139,25 @@ YOCTO_UNIT_TEST_IMPL(extend)
         {
             if(true)
             {
-                v2d<double> v1 = xtd1.at(i,x,z);
+                v2d<double> v1 = xtd1.at(i,x,y);
                 fp("%g %g", v1.x, v1.y);
             }
             
             if(true)
             {
-                v2d<double> v2 = xtd2.at(i,x,z);
+                v2d<double> v2 = xtd2.at(i,x,y);
                 fp(" %g %g", v2.x, v2.y);
             }
             
             if(true)
             {
-                v2d<double> v3 = xtd3.at(i,x,z);
+                v2d<double> v3 = xtd3.at(i,x,y);
                 fp(" %g %g", v3.x, v3.y);
             }
             
             if(true)
             {
-                v2d<double> v4 = xtd4.at(i,x,z);
+                v2d<double> v4 = xtd4.at(i,x,y);
                 fp(" %g %g", v4.x, v4.y);
             }
             fp("\n");

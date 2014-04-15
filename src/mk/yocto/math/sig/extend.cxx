@@ -44,7 +44,7 @@ namespace yocto
         
         
         template <>
-        real_t extend<real_t>:: get_x( ptrdiff_t i, const array<real_t> &X, const ptrdiff_t N, const real_t L ) const throw()
+        real_t extend<real_t>:: get_x(ptrdiff_t i, const array<real_t> &X, const ptrdiff_t N) const throw()
         {
             if(i<1)
             {
@@ -52,19 +52,10 @@ namespace yocto
                 {
                         
                     case extend_cyclic:
-                    {
-                        real_t dx = 0;
-                        while(i<1)
-                        {
-                            i  += N;
-                            dx += L;
-                        }
-                        assert(i<=N);
-                        return X[i] - dx;
-                    }
+                        return get_x(i+N-1,X,N) - (X[N]-X[1]);
                         
                     default:
-                        return X[1]+(X[1] - get_x(2-i, X, N, L));
+                        return X[1]+(X[1] - get_x(2-i, X, N));
                 }
             }
             else
@@ -74,19 +65,10 @@ namespace yocto
                     switch(upper)
                     {
                         case extend_cyclic:
-                        {
-                            real_t dx =0;
-                            while(i>N)
-                            {
-                                i -=N;
-                                dx+=L;
-                            }
-                            assert(i>=1);
-                            return X[i] + dx;
-                        }
+                            return get_x(i-N+1,X,N)+(X[N]-X[1]);
                             
                         default:
-                            return X[N] + (X[N] - get_x(N+N-i,X,N,L));
+                            return X[N] + (X[N] - get_x(N+N-i,X,N));
                     }
                 }
                 else
@@ -109,7 +91,7 @@ namespace yocto
                         return Y[1];
                         
                     case extend_cyclic:
-                        return get_y(i+N,Y,N);
+                        return get_y(i+N-1,Y,N);
                         
                     case extend_odd:
                         return Y[1] - (get_y(2-i,Y,N)-Y[1]);
@@ -131,7 +113,7 @@ namespace yocto
                             return Y[N];
                             
                         case extend_cyclic:
-                            return get_y(i-N,Y,N);
+                            return get_y(i-N+1,Y,N);
                             
                         case extend_odd:
                             return Y[N] - (get_y(N+N-i,Y,N)-Y[N]);
@@ -161,11 +143,8 @@ namespace yocto
             
             if(N<=0)
                 throw libc::exception( ERANGE, "integer overflow in extend()");
-            const real_t L = X[N] - X[1];
             v2d<real_t> ans;
-            ans.x = get_x(i, X, N, L);
-            ans.y = get_y(i, Y, N );
-            return ans;
+            return v2d<real_t>( get_x(i, X, N ), get_y(i, Y, N ) );
         }
         
         template <>
@@ -220,7 +199,6 @@ namespace yocto
                 throw libc::exception( ERANGE, "integer overflow in extend()");
             real_t       rms   = 0;             // compute RMS smooth vs. signal
             const size_t ncoef = degree+1;      // desired #polynomial coefficients
-            const real_t L     = X[N] - X[1];   // interval length
             dt_prev = Fabs(dt_prev);
             dt_next = Fabs(dt_next);
             vector< v2d<real_t> > v(64,as_capacity); // local approximation
@@ -239,7 +217,7 @@ namespace yocto
                 size_t nl = 0;
                 for(ptrdiff_t j=i-1;;--j)
                 {
-                    const real_t xj = get_x(j, X, N, L);
+                    const real_t xj = get_x(j, X, N);
                     const real_t dx = xj-xi;
                     if( nl>=nmin && Fabs(dx) > dt_prev )
                         break;
@@ -257,7 +235,7 @@ namespace yocto
                 size_t nr = 0;
                 for(ptrdiff_t j=i+1;;++j)
                 {
-                    const real_t xj = get_x(j, X, N, L);
+                    const real_t xj = get_x(j, X, N);
                     const real_t dx = xj-xi;
                     if( nr>=nmin && Fabs(dx) > dt_next )
                         break;
@@ -278,7 +256,7 @@ namespace yocto
                 // and a number of coefficients
                 //______________________________________________________________
                 const size_t m = min_of<size_t>(ncoef,W);
-                                
+                
                 matrix<real_t>  mu(m,m);
                 vector<real_t>  a(m,0.0);
                 
@@ -336,12 +314,25 @@ namespace yocto
                 rms += dz*dz;
                 if(drvs)
                 {
-                    //______________________________________________________________
+                    //__________________________________________________________
                     //
                     // get the approximated derivative
-                    //______________________________________________________________
+                    //__________________________________________________________
                     (*dZdX)[i] = a[2];
                 }
+                
+#if 0
+                {
+                    ios::ocstream fp("window.dat",false);
+                    for(size_t j=1;j<=W;++j)
+                    {
+                        const v2d<real_t> &q = v[j];
+                        fp("%g %g %g\n",q.x+xi,q.y,a[1]);
+                    }
+                    exit(0);
+                }
+#endif
+                
             }
             return Sqrt( rms/N );
         }
