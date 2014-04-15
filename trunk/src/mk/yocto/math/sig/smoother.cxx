@@ -39,11 +39,11 @@ namespace yocto
         
         
         template <>
-        real_t smoother<real_t>:: get(size_t i,
-                                      const array<real_t>    &X,
-                                      const array<real_t>    &Y,
-                                      const extender<real_t> &E,
-                                      real_t                 *dYdX)
+        real_t smoother<real_t>:: operator()(size_t i,
+                                             const array<real_t>    &X,
+                                             const array<real_t>    &Y,
+                                             const extender<real_t> &E,
+                                             real_t                 *dYdX)
         {
             assert(X.size()==Y.size());
             assert(i>0);
@@ -240,8 +240,8 @@ namespace yocto
                 assert(m>=2);
                 *dYdX = a[2];
             }
-           
-#if 0 
+            
+#if 0
             if(i==1||i==N||i==N/2)
             {
                 
@@ -256,33 +256,34 @@ namespace yocto
                 }
             }
 #endif
-       
+            
             return a[1];
         }
         
         
         template <>
-        void smoother<real_t>:: run(array<real_t>          &Z,
-                                    const array<real_t>    &X,
-                                    const array<real_t>    &Y,
-                                    const extender<real_t> &E,
-                                    array<real_t>          *dZdX)
+        void smoother<real_t>:: operator()(array<real_t>          &Z,
+                                           const array<real_t>    &X,
+                                           const array<real_t>    &Y,
+                                           const extender<real_t> &E,
+                                           array<real_t>          *dZdX)
         {
             assert(Z.size()==X.size());
             assert(Z.size()==Y.size());
             const size_t N = Z.size();
-
+            smoother<real_t> &self = *this;
+            
             if(dZdX)
             {
                 assert(dZdX->size()==Z.size());
                 array<real_t> &diff = *dZdX;
                 for(size_t i=1;i<=N;++i)
-                    Z[i] = get(i,X,Y,E, &diff[i]);
+                    Z[i] = self(i,X,Y,E, &diff[i]);
             }
             else
             {
                 for(size_t i=1;i<=N;++i)
-                    Z[i] = get(i,X,Y,E, 0);
+                    Z[i] = self(i,X,Y,E, 0);
             }
             
         }
@@ -312,17 +313,18 @@ namespace yocto
         }
         
         template <>
-        void smoother<real_t>:: full(array<real_t>          &Z,
-                                     const array<real_t>    &X,
-                                     const array<real_t>    &Y,
-                                     const extender<real_t> &E,
-                                     array<real_t>          &dZdX)
+        void smoother<real_t>:: operator()(array<real_t>          &Z,
+                                           const array<real_t>    &X,
+                                           const array<real_t>    &Y,
+                                           const extender<real_t> &E,
+                                           array<real_t>          &dZdX)
         {
+            smoother<real_t> &self = *this;
             const size_t N = Z.size();
             vector<real_t> diff(N,REAL(0.0));
-            run(Z,X,Y,E,&diff);
+            self(Z,X,Y,E,&diff);
             const extender<real_t> D( drvs_ext(E.lower), drvs_ext(E.upper) );
-            run(dZdX,X,diff,D,0);
+            self(dZdX,X,diff,D,0);
         }
         
         
