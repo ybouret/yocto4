@@ -110,7 +110,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     
     vector<double> z2(n,0.0);
     vector<double> w2(n,0.0);
-    sm.run(z2,x,z,xtd2,&w2);
+    sm(z2,x,z,xtd2,&w2);
     {
         ios::ocstream fp("xz2.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -121,7 +121,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     
     vector<double> z1(n,0.0);
     vector<double> w1(n,0.0);
-    sm.run(z1,x,z,xtd1,&w1);
+    sm(z1,x,z,xtd1,&w1);
     {
         ios::ocstream fp("xz1.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -132,7 +132,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
     
     vector<double> z3(n,0.0);
     vector<double> w3(n,0.0);
-    sm.run(z3,x,z,xtd3,&w3);
+    sm(z3,x,z,xtd3,&w3);
     {
         ios::ocstream fp("xz3.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -141,7 +141,7 @@ YOCTO_UNIT_TEST_IMPL(extend)
         }
     }
     
-    sm.full(z2,x,z,xtd2,w2);
+    sm(z2,x,z,xtd2,w2);
     {
         ios::ocstream fp("xw2.dat", false);
         for(size_t i=1; i<=n; ++i )
@@ -202,7 +202,7 @@ YOCTO_UNIT_TEST_IMPL(extend2)
     
     vector<double> zf(n,0.0);
     vector<double> wf(n,0.0);
-    sm.full(zf,x,z,xtd,wf);
+    sm(zf,x,z,xtd,wf);
     
     {
         ios::ocstream fp("xdata2.dat",false);
