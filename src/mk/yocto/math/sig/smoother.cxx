@@ -271,7 +271,7 @@ namespace yocto
             assert(Z.size()==X.size());
             assert(Z.size()==Y.size());
             const size_t N = Z.size();
-            std::cerr << "run dZdX@" << (void*)dZdX << std::endl;
+
             if(dZdX)
             {
                 assert(dZdX->size()==Z.size());
@@ -321,8 +321,8 @@ namespace yocto
             const size_t N = Z.size();
             vector<real_t> diff(N,REAL(0.0));
             run(Z,X,Y,E,&diff);
-            //const extender<real_t> D( drvs_ext(E.lower), drvs_ext(E.upper) );
-            run(dZdX,X,diff,E,0);
+            const extender<real_t> D( drvs_ext(E.lower), drvs_ext(E.upper) );
+            run(dZdX,X,diff,D,0);
         }
         
         
