@@ -270,6 +270,15 @@ YOCTO_UNIT_TEST_IMPL(extend)
             }
         }
         
+        fn_natural(zc,x,z,dt/2,dt/2,degree,wc);
+        {
+            ios::ocstream fp("xw_natural.dat",false);
+            for(size_t i=1;i<=n;++i)
+            {
+                fp("%g %g %g\n",x[i],zc[i],wc[i]);
+            }
+        }
+        
     }
     YOCTO_UNIT_TEST_DONE()
     
