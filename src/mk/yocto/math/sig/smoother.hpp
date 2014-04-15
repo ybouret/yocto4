@@ -43,7 +43,7 @@ namespace yocto
                       const array<T>    &X,
                       const array<T>    &Y,
                       const extender<T> &E,
-                      array<T>          dZdX);
+                      array<T>          &dZdX);
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(smoother);

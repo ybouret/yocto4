@@ -240,7 +240,8 @@ namespace yocto
                 assert(m>=2);
                 *dYdX = a[2];
             }
-            
+           
+#if 0 
             if(i==1||i==N||i==N/2)
             {
                 
@@ -254,7 +255,8 @@ namespace yocto
                     fp("%g %g %g\n", q.x+xi, q.y,f);
                 }
             }
-            
+#endif
+       
             return a[1];
         }
         
@@ -314,7 +316,7 @@ namespace yocto
                                      const array<real_t>    &X,
                                      const array<real_t>    &Y,
                                      const extender<real_t> &E,
-                                     array<real_t>           dZdX)
+                                     array<real_t>          &dZdX)
         {
             const size_t N = Z.size();
             vector<real_t> diff(N,REAL(0.0));
