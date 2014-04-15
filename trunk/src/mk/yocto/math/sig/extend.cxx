@@ -28,16 +28,22 @@ namespace yocto
         
         template <>
         extend<real_t>:: extend(extend_mode lo,
-                                extend_mode up) throw() :
+                                extend_mode up) :
         lower(lo),
         upper(up)
-        {}
+        {
+            const bool valid = (upper==extend_cyclic&&lower==extend_cyclic) || (upper!=extend_cyclic&&lower!=extend_cyclic);
+            if(!valid)
+                throw exception("extend: both sides are cyclic or not");
+            
+        }
         
         template <>
         extend<real_t>:: extend( extend_mode both ) throw() :
         lower( both ),
         upper( both )
         {
+            
         }
         
         
@@ -147,7 +153,7 @@ namespace yocto
             return v2d<real_t>( get_x(i, X, N ), get_y(i, Y, N ) );
         }
         
-
+        
         namespace
         {
             static inline int __compare_x( const v2d<real_t> &lhs, const v2d<real_t> &rhs ) throw()
@@ -219,39 +225,48 @@ namespace yocto
                 v2d<real_t> tmp(0,Y[i]); // central value
                 v.push_back(tmp);
                 
-                //______________________________________________________________
-                //
-                // Everybody looks to the left...
-                //______________________________________________________________
-                size_t nl = 0;
-                for(ptrdiff_t j=i-1;;--j)
+                if(extend_cyclic==lower)
                 {
-                    const real_t xj = get_x(j, X, N);
-                    const real_t dx = xj-xi;
-                    if( nl>=nmin && Fabs(dx) > dt_prev )
-                        break;
+                    assert(extend_cyclic==upper);
+                    //______________________________________________________________
+                    //
+                    // Everybody looks to the left...
+                    //______________________________________________________________
+                    size_t nl = 0;
+                    for(ptrdiff_t j=i-1;;--j)
+                    {
+                        const real_t xj = get_x(j, X, N);
+                        const real_t dx = xj-xi;
+                        if( nl>=nmin && Fabs(dx) > dt_prev )
+                            break;
+                        
+                        tmp.x = dx;
+                        tmp.y = get_y(j, Y, N);
+                        v.push_back(tmp);
+                        ++nl;
+                    }
                     
-                    tmp.x = dx;
-                    tmp.y = get_y(j, Y, N);
-                    v.push_back(tmp);
-                    ++nl;
+                    //______________________________________________________________
+                    //
+                    // Everybody looks to the right...
+                    //______________________________________________________________
+                    size_t nr = 0;
+                    for(ptrdiff_t j=i+1;;++j)
+                    {
+                        const real_t xj = get_x(j, X, N);
+                        const real_t dx = xj-xi;
+                        if( nr>=nmin && Fabs(dx) > dt_next )
+                            break;
+                        tmp.x = dx;
+                        tmp.y = get_y(j, Y, N);
+                        v.push_back(tmp);
+                        ++nr;
+                    }
                 }
-                
-                //______________________________________________________________
-                //
-                // Everybody looks to the right...
-                //______________________________________________________________
-                size_t nr = 0;
-                for(ptrdiff_t j=i+1;;++j)
+                else
                 {
-                    const real_t xj = get_x(j, X, N);
-                    const real_t dx = xj-xi;
-                    if( nr>=nmin && Fabs(dx) > dt_next )
-                        break;
-                    tmp.x = dx;
-                    tmp.y = get_y(j, Y, N);
-                    v.push_back(tmp);
-                    ++nr;
+                    // calibrate w.r.t to the closest side
+                    throw exception("not implemented");
                 }
                 
                 //______________________________________________________________
@@ -423,6 +438,7 @@ namespace yocto
             vector<real_t> approx( X.size(), REAL(0.0) );
             const real_t ans = func(Z,X,Y,dt_prev,dt_next,degree,&approx);
             diff( dZdX, X, approx,dt_prev,dt_next, (degree>=1) ? degree-1 : 0, 0);
+            //diff( dZdX, X, approx,dt_prev,dt_next, degree, 0);
             return ans;
         }
         
