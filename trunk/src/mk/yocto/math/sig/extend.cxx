@@ -102,6 +102,9 @@ namespace yocto
             {
                 switch(lower)
                 {
+                    case extend_zero:
+                        return 0;
+                        
                     case extend_constant:
                         return Y[1];
                         
@@ -121,6 +124,9 @@ namespace yocto
                 {
                     switch(upper)
                     {
+                        case extend_zero:
+                            return 0;
+                            
                         case extend_constant:
                             return Y[N];
                             
@@ -140,7 +146,7 @@ namespace yocto
                     return Y[i];
                 }
             }
-            return 0;
+            return 0; // never get here
         }
         
         
@@ -159,7 +165,6 @@ namespace yocto
             v2d<real_t> ans;
             ans.x = get_x(i, X, N, L);
             ans.y = get_y(i, Y, N );
-            
             return ans;
         }
         
@@ -184,7 +189,7 @@ namespace yocto
             if(drvs)
             {
                 assert(dZdX->size() == X.size());
-                nmin = 1;
+                nmin = 1; // take at least one point on each side
             }
             
             //__________________________________________________________________
@@ -213,18 +218,18 @@ namespace yocto
             const ptrdiff_t N = ptrdiff_t(X.size());
             if(N<=0)
                 throw libc::exception( ERANGE, "integer overflow in extend()");
-            real_t       rms   = 0;
-            const size_t ncoef = degree+1;
-            const real_t L     = X[N] - X[1];
+            real_t       rms   = 0;             // compute RMS smooth vs. signal
+            const size_t ncoef = degree+1;      // desired #polynomial coefficients
+            const real_t L     = X[N] - X[1];   // interval length
             dt_prev = Fabs(dt_prev);
             dt_next = Fabs(dt_next);
-            vector< v2d<real_t> > v(64,as_capacity);
+            vector< v2d<real_t> > v(64,as_capacity); // local approximation
             
             for(ptrdiff_t i=1;i<=N;++i)
             {
                 v.free();
                 const real_t xi = X[i];  // central point
-                v2d<real_t> tmp(0,Y[i]); // central valye
+                v2d<real_t> tmp(0,Y[i]); // central value
                 v.push_back(tmp);
                 
                 //______________________________________________________________
@@ -273,9 +278,7 @@ namespace yocto
                 // and a number of coefficients
                 //______________________________________________________________
                 const size_t m = min_of<size_t>(ncoef,W);
-                
-                //std::cerr << "v=" << v << std::endl;
-                
+                                
                 matrix<real_t>  mu(m,m);
                 vector<real_t>  a(m,0.0);
                 

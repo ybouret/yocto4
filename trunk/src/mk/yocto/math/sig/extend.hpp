@@ -11,6 +11,7 @@ namespace yocto
         
         enum extend_mode
         {
+            extend_zero,        //!< send zero
             extend_constant,   //!< send extremal value
             extend_cyclic,     //!< assume cyclic value
             extend_odd,        //!< assume oddity/boundary

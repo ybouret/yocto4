@@ -35,9 +35,11 @@ namespace yocto
             match & operator=( const char   * );
             match & operator=( const match &other );
             
+            //! returns NULL is no pattern is allocated
             pattern *safe_clone() const;
             
-            bool operator()( const memory::ro_buffer &buf, mode_type flag );
+            bool operator()( const memory::ro_buffer &buf,
+                            mode_type flag );
             
             string last_accepted() const;
             

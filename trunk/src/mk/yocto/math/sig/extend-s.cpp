@@ -9,7 +9,8 @@ namespace yocto
         {
             switch(m)
             {
-                case extend_constant: return extend_constant;
+                case extend_zero:
+                case extend_constant: return extend_zero;
                 case extend_cyclic:   return extend_cyclic;
                 case extend_even:     return extend_odd;
                 case extend_odd:      return extend_even;
