@@ -25,19 +25,25 @@ namespace yocto
             
             list<vtx_t> v;
             
-            T operator()(size_t             i,
-                         const array<T>    &X,
-                         const array<T>    &Y,
-                         const extender<T> &E,
-                         T                 *dYdX);
+            T get(size_t             i,
+                  const array<T>    &X,
+                  const array<T>    &Y,
+                  const extender<T> &E,
+                  T                 *dYdX);
             
-            void operator()(array<T>          &Z,
-                            const array<T>    &X,
-                            const array<T>    &Y,
-                            const extender<T> &E,
-                            array<T>          *dZdX);
+            //! single pass
+            void run(array<T>          &Z,
+                     const array<T>    &X,
+                     const array<T>    &Y,
+                     const extender<T> &E,
+                     array<T>          *dZdX);
             
-            
+            //! double pass
+            void full(array<T>          &Z,
+                      const array<T>    &X,
+                      const array<T>    &Y,
+                      const extender<T> &E,
+                      array<T>          dZdX);
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(smoother);
