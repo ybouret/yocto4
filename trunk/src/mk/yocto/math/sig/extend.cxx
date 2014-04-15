@@ -166,8 +166,8 @@ namespace yocto
         real_t extend<real_t>:: operator()(array<real_t>       &Z,
                                            const array<real_t> &X,
                                            const array<real_t> &Y,
-                                           real_t               dt_prev,
-                                           real_t               dt_next,
+                                           const real_t         dt_prev,
+                                           const real_t         dt_next,
                                            const size_t         degree,
                                            array<real_t>       *dZdX
                                            ) const
@@ -184,6 +184,8 @@ namespace yocto
             {
                 assert(dZdX->size() == X.size());
                 nmin = 1; // take at least one point on each side
+                if(extend_cyclic!=lower)
+                    nmin = 2; // 2 on one side
             }
             
             //__________________________________________________________________
@@ -214,10 +216,12 @@ namespace yocto
                 throw libc::exception( ERANGE, "integer overflow in extend()");
             real_t       rms   = 0;             // compute RMS smooth vs. signal
             const size_t ncoef = degree+1;      // desired #polynomial coefficients
-            dt_prev = Fabs(dt_prev);
-            dt_next = Fabs(dt_next);
+            const real_t adt_prev = Fabs(dt_prev);
+            const real_t adt_next = Fabs(dt_next);
             vector< v2d<real_t> > v(64,as_capacity); // local approximation
             
+            const real_t t_lo = X[1];
+            const real_t t_up = X[N];
             for(ptrdiff_t i=1;i<=N;++i)
             {
                 v.free();
@@ -237,7 +241,7 @@ namespace yocto
                     {
                         const real_t xj = get_x(j, X, N);
                         const real_t dx = xj-xi;
-                        if( nl>=nmin && Fabs(dx) > dt_prev )
+                        if( nl>=nmin && Fabs(dx) > adt_prev )
                             break;
                         
                         tmp.x = dx;
@@ -255,25 +259,139 @@ namespace yocto
                     {
                         const real_t xj = get_x(j, X, N);
                         const real_t dx = xj-xi;
-                        if( nr>=nmin && Fabs(dx) > dt_next )
+                        if( nr>=nmin && Fabs(dx) > adt_next )
                             break;
                         tmp.x = dx;
                         tmp.y = get_y(j, Y, N);
                         v.push_back(tmp);
                         ++nr;
                     }
+                    
+                    assert(v.size()>=1+2*nmin);
                 }
                 else
                 {
-                    // calibrate w.r.t to the closest side
-                    throw exception("not implemented");
+                    //__________________________________________________________
+                    //
+                    // clip w.r.t to the closest side
+                    //__________________________________________________________
+                    const real_t xi = X[i];
+                    const real_t max_prev = xi-t_lo;
+                    const real_t max_next = t_up-xi;
+                    real_t       at_prev = adt_prev;
+                    real_t       at_next = adt_next;
+
+                    if(max_prev<=max_next)
+                    {
+                        //______________________________________________________
+                        //
+                        // prev cutoff
+                        //______________________________________________________
+                        
+                        //------------------------------------------------------
+                        // fill prev
+                        //------------------------------------------------------
+                        if(max_prev<=adt_prev)
+                        {
+                            // special case: we hit the lower bound
+                            at_prev  = max_prev;
+                            at_next += (adt_prev-max_prev);
+                            for(ptrdiff_t j=1;j<i;++j)
+                            {
+                                tmp.x = X[j] - xi;
+                                tmp.y = Y[j];
+                                v.push_back(tmp);
+                            }
+                        }
+                        else
+                        {
+                            // generic prev lookup
+                            for(ptrdiff_t j=i-1;j>0;--j)
+                            {
+                                const real_t xj = X[j];
+                                const real_t dx = xj-xi;
+                                if(Fabs(dx)>at_prev)
+                                    break;
+                                tmp.x = dx;
+                                tmp.y = Y[j];
+                                v.push_back(tmp);
+                            }
+                        }
+                        
+                        //------------------------------------------------------
+                        // fill next
+                        //------------------------------------------------------
+                        for(ptrdiff_t j=i+1;;++j)
+                        {
+                            const real_t xj = get_x(j, X, N);
+                            const real_t dx = xj-xi;
+                            if( v.size()>=nmin && Fabs(dx) > at_next )
+                                break;
+                            tmp.x = dx;
+                            tmp.y = get_y(j, Y, N);
+                            v.push_back(tmp);
+                        }
+
+                    }
+                    else
+                    {
+                        //______________________________________________________
+                        //
+                        // next cutoff
+                        //______________________________________________________
+                        if(max_next<=adt_next)
+                        {
+                            // special case: we hit the upper bound
+                            at_next = max_next;
+                            at_prev += (adt_next-max_next);
+                            for(ptrdiff_t j=i+1;j<=N;++j)
+                            {
+                                tmp.x = X[j] - xi;
+                                tmp.y = Y[j];
+                                v.push_back(tmp);
+                            }
+                        }
+                        else
+                        {
+                            // generic next lookup
+                            for(ptrdiff_t j=i+1;j<=N;++j)
+                            {
+                                const real_t xj = X[j];
+                                const real_t dx = xj-xi;
+                                if(Fabs(dx)>at_next)
+                                    break;
+                                tmp.x = dx;
+                                tmp.y = Y[j];
+                                v.push_back(tmp);
+                            }
+                        }
+                        
+                        //------------------------------------------------------
+                        // fill prev
+                        //------------------------------------------------------
+                        for(ptrdiff_t j=i-1;;--j)
+                        {
+                            const real_t xj = get_x(j, X, N);
+                            const real_t dx = xj-xi;
+                            if( v.size()>=nmin && Fabs(dx) > at_prev )
+                                break;
+                            tmp.x = dx;
+                            tmp.y = get_y(j, Y, N);
+                            v.push_back(tmp);
+                        }
+
+                    }
+                    
+                    assert(v.size()>=nmin);
+                    
+                    
                 }
                 
                 //______________________________________________________________
                 //
                 // We have a window size
                 //______________________________________________________________
-                const size_t W = v.size(); assert(W>=1+2*nmin);
+                const size_t W = v.size();
                 
                 //______________________________________________________________
                 //
