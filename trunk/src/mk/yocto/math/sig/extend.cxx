@@ -147,6 +147,15 @@ namespace yocto
             return v2d<real_t>( get_x(i, X, N ), get_y(i, Y, N ) );
         }
         
+
+        namespace
+        {
+            static inline int __compare_x( const v2d<real_t> &lhs, const v2d<real_t> &rhs ) throw()
+            {
+                return (lhs.x < rhs.x) ? -1 : (rhs.x<lhs.x? 1 : 0);
+            }
+            
+        }
         template <>
         real_t extend<real_t>:: operator()(array<real_t>       &Z,
                                            const array<real_t> &X,
@@ -324,10 +333,21 @@ namespace yocto
 #if 0
                 {
                     ios::ocstream fp("window.dat",false);
+                    quicksort(v,__compare_x);
                     for(size_t j=1;j<=W;++j)
                     {
                         const v2d<real_t> &q = v[j];
-                        fp("%g %g %g\n",q.x+xi,q.y,a[1]);
+                        real_t ans = a[1];
+                        for(size_t k=2;k<=m;++k)
+                        {
+                            ans += a[k] * ipower(q.x,k-1);
+                        }
+                        real_t tg = 0;
+                        if(m>=2)
+                        {
+                            tg = a[1] + q.x * a[2];
+                        }
+                        fp("%g %g %g %g\n",q.x+xi,q.y,ans,tg);
                     }
                     exit(0);
                 }
