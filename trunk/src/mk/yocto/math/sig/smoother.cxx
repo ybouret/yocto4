@@ -197,7 +197,9 @@ namespace yocto
                 for(list<vtx_t>::iterator i=v.begin();i!=v.end();++i)
                 {
                     const vtx_t &q = *i;
-                    fp("%g %g\n", q.x+xi, q.y);
+                    real_t f = a[1];
+                    for(size_t k=2;k<=m;++k) f += a[k] * ipower(q.x,k-1);
+                    fp("%g %g %g\n", q.x+xi, q.y,f);
                 }
             }
             
