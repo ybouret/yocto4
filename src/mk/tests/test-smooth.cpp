@@ -324,8 +324,8 @@ YOCTO_UNIT_TEST_IMPL(extend)
         vector<double>  wf(n,0.0);  // filtered derivative
         extend<double>  natural(extend_odd);
         vector<double>  w1(n,0.0);
-        natural(zf,x,y,dt,degree,&w1);
-        xtd(zf,x,y,dt,degree,wf);
+        natural(zf,x,z,dt,degree,&w1);
+        xtd(zf,x,z,dt,degree,wf);
         {
             ios::ocstream fp("xdata2.dat", false);
             for( size_t i=1; i<=n; ++i )
