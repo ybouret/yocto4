@@ -327,3 +327,26 @@ YOCTO_UNIT_TEST_IMPL(lsf_gauss)
 YOCTO_UNIT_TEST_DONE()
 
 
+YOCTO_UNIT_TEST_IMPL(pade)
+{
+	const size_t   N = 10 + alea_leq(1000);
+	vector<double> X( N, 0 );
+	vector<double> Y( N, 0 );
+	vector<double> Z( N, 0 );
+    
+    for(size_t i=1;i<=N;++i)
+    {
+        X[i] = double(i-1)/(N-1);
+        Y[i] = exp(-1.1*X[i]);
+    }
+    
+    least_squares<double>::sample Sample(X,Y,Z);
+    vector<double> P(3,0);
+    vector<double> Q(2,0);
+    
+    Sample.Pade(P, Q);
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+

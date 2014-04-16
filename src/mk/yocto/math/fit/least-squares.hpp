@@ -77,6 +77,9 @@ namespace yocto
                 //! perform a polynomial fit
                 void polynomial( array<T> &aorg, const array<bool> &used, array<T> &aerr, typename numeric<T>::function *transform = 0);
                 
+                //! perform a Pade fit
+                void Pade( array<T> &P, array<T> &Q  );
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
             };
