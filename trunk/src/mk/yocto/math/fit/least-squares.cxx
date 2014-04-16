@@ -18,11 +18,11 @@ namespace yocto
         typedef algebra<real_t> mkl;
         
         
-        ////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         //
         // sample operations
         //
-        ////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         template <>
         least_squares<real_t>:: sample:: ~sample() throw()
@@ -333,12 +333,89 @@ namespace yocto
             
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Pade
+        //
+        ////////////////////////////////////////////////////////////////////////
+        template <>
+        void least_squares<real_t>:: sample:: Pade(array<real_t> &P,
+                                                   array<real_t> &Q)
+        {
+            const size_t p   = P.size(); //!< denominator
+            const size_t q   = Q.size(); //!< numerator
+            const size_t dim = p+q;      //!< total dimension
+            
+            prepare(dim);
+            
+            
+            // rhs
+            for(size_t r=1;r<=p;++r)
+            {
+                real_t       s  = 0;
+                const size_t pw = r-1;
+                for(size_t i=1;i<=N;++i)
+                {
+                    s += Y[i] * ipower(X[i], pw);
+                }
+                beta[r] = s;
+            }
+            
+            for(size_t r=1;r<=q;++r)
+            {
+                real_t s  = 0;
+                for(size_t i=1;i<=N;++i)
+                {
+                    const real_t yi = Y[i];
+                    s += (yi*yi) * ipower(X[i],r);
+                }
+                beta[r+p] = s;
+            }
+            std::cerr << "rhs=" << beta << std::endl;
+            
+            
+            // top left quadrant
+            for(size_t r=1;r<=p;++r)
+            {
+                for(size_t c=r;c<=p;++c)
+                {
+                    real_t       s  = 0;
+                    const size_t pw = r+c-2;
+                    for(size_t i=1;i<=N;++i)
+                    {
+                        const real_t xi = X[i];
+                        s += ipower(xi,pw);
+                    }
+                    alpha[r][c] = alpha[c][r] = s;
+                }
+            }
+            
+            
+            // bottom right quadrant
+            for(size_t r=1;r<=q;++r)
+            {
+                for(size_t c=r;c<=q;++c)
+                {
+                    real_t       s = 0;
+                    const size_t pw = c+r;
+                    for(size_t i=1;i<=N;++i)
+                    {
+                        const real_t yi = Y[i];
+                        s += (yi*yi) * ipower(X[i],pw);
+                    }
+                    alpha[r+p][c+p] = alpha[c+p][r+p] = s;
+                }
+            }
+            std::cerr << "alpha=" << alpha << std::endl;
+        }
         
-        ////////////////////////////////////////////////////////////////////
+        
+        
+        ////////////////////////////////////////////////////////////////////////
         //
         // samples operations
         //
-        ////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         template <>
         least_squares<real_t>:: samples:: samples() throw() :
@@ -411,12 +488,12 @@ namespace yocto
         nvar(0),
         nums(0),
         alpha(),
-	curv(),
+        curv(),
         beta(),
         step(),
         aorg(),
         used(),
-	atmp(),
+        atmp(),
         LU()
         {
             

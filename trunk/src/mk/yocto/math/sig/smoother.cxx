@@ -34,12 +34,11 @@ namespace yocto
             {
                 return (lhs.x < rhs.x) ? -1 : (rhs.x<lhs.x? 1 : 0);
             }
-            
         }
         
         
         template <>
-        real_t smoother<real_t>:: operator()(size_t i,
+        real_t smoother<real_t>:: operator()(size_t                  i,
                                              const array<real_t>    &X,
                                              const array<real_t>    &Y,
                                              const extender<real_t> &E,
