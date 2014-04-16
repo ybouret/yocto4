@@ -337,15 +337,31 @@ YOCTO_UNIT_TEST_IMPL(pade)
     for(size_t i=1;i<=N;++i)
     {
         X[i] = double(i-1)/(N-1);
-        Y[i] = exp(-1.1*X[i]);
+        Y[i] = cos(3*X[i]);
     }
     
+    size_t p=0;
+    size_t q=0;
+    if( argc > 1 )
+        p = strconv::to_size(argv[1],"p");
+        
+    if( argc > 2 )
+        q = strconv::to_size(argv[2],"q");
+    
     least_squares<double>::sample Sample(X,Y,Z);
-    vector<double> P(3,0);
-    vector<double> Q(2,0);
+    vector<double> P(p,0);
+    vector<double> Q(q,0);
     
     Sample.Pade(P, Q);
     
+    std::cerr << "P=" << P << std::endl;
+    std::cerr << "Q=" << Q << std::endl;
+    
+    ios::ocstream fp("pade.dat",false);
+    for( size_t i=1; i <= N; ++i )
+    {
+        fp("%g %g %g\n", X[i], Y[i], Z[i] );
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()
