@@ -1,0 +1,65 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+
+\begin{document}
+\title{Padé Least Square}
+We want to fit the sample $(x_i,y_i)_{1\leq i \leq N}$
+with
+$$
+	R(x) = \dfrac{\displaystyle\sum_{k=1}^p a_k x^{(k-1)}}{\displaystyle 1+\sum_{l=1}^q b_l x^{l}}.
+$$
+We want to minimize
+$$
+	S^2 = \dfrac{1}{2}\sum_{i=1}^N \left[ \left(\sum_{k=1}^p a_k x_i^{(k-1)}\right) - \left(1+\sum_{l=1}^{q} b_l x_i^l)\right)y_i  \right]^2.
+$$
+We want	$\partial S^2/\partial a_j=0$, leading to a first set of $p$ equations:
+$$
+	\sum_{k=1}^{p} a_k \left(\sum_{i=1}^{N}x_i^{(j+k-2)}\right) - 
+	\sum_{l=1}^{q} b_l \left(\sum_{i=1}^N y_i x_i^{(l+j-1)} \right) = \sum_{i=1}^N y_i x_i^{(j-1)}.
+$$
+
+We want $\partial S^2/\partial b_m=0$, leading to a second set of $q$ equations:
+$$
+	\sum_{k=1}^p a_k \left(\sum_{i=1}^N y_ix_i^{(k+l-1)}\right) - 
+	\sum_{l=1}^q b_l \left(\sum_{i=1}^N y_i^2 x_i^{(l+m)}\right) = \sum_{i=1}^N y_i^2 x_i^{m}.
+$$
+We obtain the form
+$$
+	\begin{pmatrix}
+	A & -\!\!^tC\\
+	 C & B\\
+	\end{pmatrix}
+	\begin{pmatrix}
+	\vec{a} \\
+	\vec{b} \\
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+	\vec{\alpha}\\
+	\vec{\beta} \\
+	\end{pmatrix}.
+$$
+With $A\in\mathcal{M}_{p,p}$ and
+$$
+	A_{j,k} = A_{k,j} = \sum_{i=1}^N x_i^{(j+k-2)}
+$$
+and
+$$
+	\alpha_j = \sum_{i=1}^N y_ix_i^{(j-1)}.
+$$
+With $B\in\mathcal{M}_{q,q}$ and
+$$
+	B_{l,m} = B_{m,l} = \sum_{i=1}^N y_i^2x_i^{(l+m)}
+$$
+and
+$$
+	\beta_m = \sum_{i=1}^N y_i^2 x_i^{m}.
+$$
+\end{document}
