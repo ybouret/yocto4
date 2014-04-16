@@ -394,8 +394,10 @@ namespace yocto
             // bottom right quadrant
             for(size_t r=1;r<=q;++r)
             {
+                const size_t ir = r+p;
                 for(size_t c=r;c<=q;++c)
                 {
+                    const real_t ic = c+p;
                     real_t       s = 0;
                     const size_t pw = c+r;
                     for(size_t i=1;i<=N;++i)
@@ -403,7 +405,7 @@ namespace yocto
                         const real_t yi = Y[i];
                         s += (yi*yi) * ipower(X[i],pw);
                     }
-                    alpha[r+p][c+p] = alpha[c+p][r+p] = s;
+                    alpha[ir][ic] = alpha[ic][ir] = -s;
                 }
             }
             
@@ -412,13 +414,14 @@ namespace yocto
             {
                 for(size_t c=1;c<=q;++c)
                 {
+                    const real_t ic = c+p;
                     real_t s = 0;
                     const size_t pw = r+c-1;
                     for(size_t i=1;i<=N;++i)
                     {
                         s += Y[i] * ipower( X[i], pw);
                     }
-                    alpha[r][c+p] = -(alpha[c+p][r] = s );
+                    alpha[r][ic] = -(alpha[ic][r] = s );
                 }
             }
             
@@ -430,6 +433,7 @@ namespace yocto
             crout<real_t>::solve(alpha, beta);
             for(size_t i=1;i<=p;++i) P[i] = beta[i];
             for(size_t i=1;i<=q;++i) Q[i] = beta[p+i];
+            
             for(size_t i=1;i<=N;++i)
             {
                 const real_t xi = X[i];
