@@ -406,7 +406,39 @@ namespace yocto
                     alpha[r+p][c+p] = alpha[c+p][r+p] = s;
                 }
             }
+            
+            // extra
+            for(size_t r=1;r<=p;++r)
+            {
+                for(size_t c=1;c<=q;++c)
+                {
+                    real_t s = 0;
+                    const size_t pw = r+c-1;
+                    for(size_t i=1;i<=N;++i)
+                    {
+                        s += Y[i] * ipower( X[i], pw);
+                    }
+                    alpha[r][c+p] = -(alpha[c+p][r] = s );
+                }
+            }
+            
             std::cerr << "alpha=" << alpha << std::endl;
+            
+            crout<real_t> lu(dim);
+            if( !lu.build(alpha) )
+                throw exception("Singular Pade Approximant");
+            crout<real_t>::solve(alpha, beta);
+            for(size_t i=1;i<=p;++i) P[i] = beta[i];
+            for(size_t i=1;i<=q;++i) Q[i] = beta[p+i];
+            for(size_t i=1;i<=N;++i)
+            {
+                const real_t xi = X[i];
+                real_t num = 0;
+                for(size_t j=1;j<=p;++j) num += P[j]*ipower(xi,j-1);
+                real_t den = 1;
+                for(size_t j=1;j<=q;++j) den += Q[j]*ipower(xi,j);
+                Z[i] = num/den;
+            }
         }
         
         
