@@ -235,6 +235,10 @@ namespace yocto
                 throw exception("singular smoothing window around X[%d]=%g", int(i), xi);
             crout<real_t>::solve(mu,a);
             
+            //__________________________________________________________________
+            //
+            // store the derivative if necessary
+            //__________________________________________________________________
             if( dYdX )
             {
                 assert(m>=2);
@@ -256,7 +260,10 @@ namespace yocto
                 }
             }
 #endif
-            
+            //__________________________________________________________________
+            //
+            // return the smoothed value
+            //__________________________________________________________________
             return a[1];
         }
         
@@ -291,7 +298,7 @@ namespace yocto
         namespace
         {
             static inline
-            extension_type drvs_ext( extension_type t )
+            extension_type __drvs_ext( extension_type t )
             {
                 switch(t)
                 {
@@ -323,8 +330,11 @@ namespace yocto
             const size_t N = Z.size();
             vector<real_t> diff(N,REAL(0.0));
             self(Z,X,Y,E,&diff);
-            const extender<real_t> D( drvs_ext(E.lower), drvs_ext(E.upper) );
-            self(dZdX,X,diff,D,0);
+            const extender<real_t> D( __drvs_ext(E.lower), __drvs_ext(E.upper) );
+            const size_t backup = degree;
+            if(degree>0) --degree;
+            
+            try { self(dZdX,X,diff,D,0); degree=backup; }catch(...){ degree=backup; throw; }
         }
         
         
