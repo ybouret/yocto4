@@ -41,6 +41,7 @@ namespace yocto
         YOCTO_DISABLE_COPY_AND_ASSIGN(auto_release);
     };
 	
+#define YOCTO_FAILSAFE(CODE,FINALIZE) do { try { CODE; FINALIZE; }catch(...){ FINALIZE; throw; } } while(false)
 }
 
 #endif

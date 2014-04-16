@@ -294,6 +294,15 @@ namespace yocto
             }
             
         }
+    }
+}
+
+#include "yocto/auto-clean.hpp"
+
+namespace yocto
+{
+    namespace math
+    {
         
         namespace
         {
@@ -334,7 +343,8 @@ namespace yocto
             const size_t backup = degree;
             if(degree>0) --degree;
             
-            try { self(dZdX,X,diff,D,0); degree=backup; }catch(...){ degree=backup; throw; }
+            YOCTO_FAILSAFE(self(dZdX,X,diff,D,0),degree=backup);
+            // try { self(dZdX,X,diff,D,0); degree=backup; }catch(...){ degree=backup; throw; }
         }
         
         
