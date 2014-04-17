@@ -48,5 +48,21 @@ YOCTO_UNIT_TEST_IMPL(poly)
     P = Poly::primitive(P);
     std::cerr << "iP=" << P << std::endl;
     
+    P.clear();
+    Q.clear();
+    
+    P.add(0,1);
+    P.add(1,2);
+    P.add(2,3);
+    
+    Q = P;
+    
+    std::cerr << "P=" << P << std::endl;
+    std::cerr << "Q=" << Q << std::endl;
+    Poly::derivative(P,Q);
+    std::cerr << P << "/" << Q << std::endl;
+    
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()

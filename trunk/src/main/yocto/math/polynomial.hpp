@@ -51,7 +51,11 @@ namespace yocto
             void xch( polynomial &other ) throw();
             polynomial & operator=( const polynomial &other );
             
-            
+            //__________________________________________________________________
+            //
+            // ADD
+            //__________________________________________________________________
+
             static polynomial add( const polynomial &lhs, const polynomial &rhs );
             
             inline friend polynomial operator+( const polynomial &lhs, const polynomial &rhs )
@@ -66,13 +70,22 @@ namespace yocto
                 return *this;
             }
 
-            inline polynomial operator+( const polynomial &rhs )
+            inline friend polynomial operator+( const polynomial &rhs )
             {
                 return rhs;
             }
             
+            //__________________________________________________________________
+            //
+            // SUB
+            //__________________________________________________________________
             static polynomial sub(const polynomial &lhs, const polynomial &rhs);
            
+            inline friend polynomial operator-( const polynomial &lhs, const polynomial &rhs )
+            {
+                return sub(lhs,rhs);
+            }
+            
             inline polynomial & operator-=( const polynomial &rhs )
             {
                 polynomial ans = sub(*this,rhs);
@@ -80,13 +93,17 @@ namespace yocto
                 return *this;
             }
             
-            inline polynomial operator-( const polynomial &rhs )
+            inline friend polynomial operator-( const polynomial &rhs )
             {
                 polynomial z;
                 return sub(z,rhs);
             }
 
             
+            //__________________________________________________________________
+            //
+            // MUL
+            //__________________________________________________________________
             
             static polynomial mul( const polynomial &lhs, const polynomial &rhs );
             static polynomial mul( const polynomial &lhs, T a );
@@ -114,9 +131,18 @@ namespace yocto
                 return *this;
             }
             
+            //__________________________________________________________________
+            //
+            // Differential
+            //__________________________________________________________________
             static polynomial derivative(const polynomial &other);
             static polynomial primitive(const polynomial &other);
+            static void       derivative(polynomial &num,polynomial &den);
             
+            //__________________________________________________________________
+            //
+            // Evaluation
+            //__________________________________________________________________
             T operator()( T X ) const throw();
             
             
