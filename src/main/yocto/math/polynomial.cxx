@@ -161,7 +161,7 @@ namespace yocto
             for(const term *r=rhs.terms.head;r;r=r->next)
             {
                 P.add(r->p,r->a);
-
+                
             }
             
             return P;
@@ -186,7 +186,7 @@ namespace yocto
             
             return P;
         }
-
+        
         
         template <>
         polynomial<z_type> polynomial<z_type>:: mul( const polynomial &lhs, const polynomial &rhs )
@@ -239,8 +239,8 @@ namespace yocto
             
             return P;
         }
+        
         template <>
-
         z_type polynomial<z_type>:: operator()( z_type X ) const throw()
         {
             z_type ans(0);
@@ -250,7 +250,19 @@ namespace yocto
             }
             return ans;
         }
-
+        
+        template <>
+        void polynomial<z_type>::derivative(polynomial &num,polynomial &den)
+        {
+            const polynomial d_num = derivative(num);
+            const polynomial d_den = derivative(den);
+            polynomial P     = (d_num*den) - (num*d_den);
+            polynomial Q     = den*den;
+            num.xch(P);
+            den.xch(Q);
+        }
+        
+        
         
     }
 }
