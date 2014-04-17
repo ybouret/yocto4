@@ -314,8 +314,12 @@ namespace yocto
         {
         public:
             explicit list_of_cpp() throw() : list_of<NODE>() {}
-            virtual ~list_of_cpp() throw() {
+            inline void clear() throw() {
                 while(this->size) delete this->pop_back();
+            }
+            
+            virtual ~list_of_cpp() throw() {
+                clear();
             }
             
         private:
