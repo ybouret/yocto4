@@ -40,5 +40,11 @@ YOCTO_UNIT_TEST_IMPL(ari)
     }
     
 
+    for(int i=0;i<=20;++i)
+    {
+        const mpn n = mpn::factorial(i);
+        std::cerr << i << "! = " << n << std::endl;
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
