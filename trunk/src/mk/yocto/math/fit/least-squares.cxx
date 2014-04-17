@@ -232,7 +232,7 @@ namespace yocto
             assert(aorg.size() == used.size());
             assert(aorg.size() == aerr.size());
             const size_t n = aorg.size();
-            assert(n>0);
+            if(n<=0) throw exception("not enough coefficients for polynomial fit");
             prepare(n);
             crout<real_t> LU(n);
             size_t dof = N;
@@ -248,7 +248,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // compute algebra
+            // First Pass: compute algebra
             //__________________________________________________________________
             alpha.ldz();
             mkl::set(beta,REAL(0.0));
@@ -260,28 +260,44 @@ namespace yocto
                 const real_t yi = (transform != 0) ? (*transform)(Y[i]) : Y[i];
                 for(size_t k=n;k>0;--k)
                 {
-                    if(used[k])
+                    const size_t km   = k-1;
+                    const real_t xikm = ipower<real_t>(xi,km);
+                    beta[k] += yi * xikm;
+                    for(size_t l=1;l<=k;++l)
                     {
-                        const size_t km   = k-1;
-                        const real_t xikm = ipower<real_t>(xi,km);
-                        beta[k] += yi * xikm;
-                        for(size_t l=1;l<=k;++l)
-                        {
-                            if(used[l])
-                            {
-                                alpha[k][l] += xikm * ipower<real_t>(xi,l-1);
-                                alpha[l][k]  = alpha[k][l];
-                            }
-                        }
+                        
+                        alpha[k][l] += xikm * ipower<real_t>(xi,l-1);
+                        alpha[l][k]  = alpha[k][l];
                     }
                 }
             }
             
-            for(size_t k=n;k>0;--k)
+            
+            //__________________________________________________________________
+            //
+            // Second Pass: used variables
+            //__________________________________________________________________
+           
+            // for each row
+            for(size_t j=n;j>0;--j)
             {
-                if( !used[k] )
+                if(!used[j])
                 {
-                    alpha[k][k] = REAL(1.0);
+                    for(size_t k=n;k>0;--k)
+                        alpha[j][k] = 0;
+                    alpha[j][j] = 1;
+                    beta[j]     = aorg[j];
+                    continue;
+                }
+                
+                //for each used line
+                for(size_t k=n;k>0;--k)
+                {
+                    if(!used[k])
+                    {
+                        beta[j]    -= alpha[j][k]*aorg[k];
+                        alpha[j][k] = 0;
+                    }
                 }
             }
             
@@ -345,11 +361,17 @@ namespace yocto
             const size_t p   = P.size(); //!< denominator
             const size_t q   = Q.size(); //!< numerator
             const size_t dim = p+q;      //!< total dimension
-            
+            if(dim<=0) throw exception("not enough coefficients for Pade");
             prepare(dim);
+            size_t dof = N;
+            if(dof<=0)
+                throw exception("Not Enough D.O.F. for Pade");
             
             
+            //__________________________________________________________________
+            //
             // rhs
+            //__________________________________________________________________
             for(size_t r=1;r<=p;++r)
             {
                 real_t       s  = 0;
@@ -371,10 +393,12 @@ namespace yocto
                 }
                 beta[r+p] = s;
             }
-            std::cerr << "rhs=" << beta << std::endl;
+            //std::cerr << "rhs=" << beta << std::endl;
             
-            
+            //__________________________________________________________________
+            //
             // top left quadrant
+            //__________________________________________________________________
             for(size_t r=1;r<=p;++r)
             {
                 for(size_t c=r;c<=p;++c)
@@ -390,15 +414,17 @@ namespace yocto
                 }
             }
             
-            
+            //__________________________________________________________________
+            //
             // bottom right quadrant
+            //__________________________________________________________________
             for(size_t r=1;r<=q;++r)
             {
                 const size_t ir = r+p;
                 for(size_t c=r;c<=q;++c)
                 {
                     const real_t ic = c+p;
-                    real_t       s = 0;
+                    real_t       s  = 0;
                     const size_t pw = c+r;
                     for(size_t i=1;i<=N;++i)
                     {
@@ -409,13 +435,16 @@ namespace yocto
                 }
             }
             
-            // extra
+            //__________________________________________________________________
+            //
+            // extra diagonal
+            //__________________________________________________________________
             for(size_t r=1;r<=p;++r)
             {
                 for(size_t c=1;c<=q;++c)
                 {
                     const real_t ic = c+p;
-                    real_t s = 0;
+                    real_t       s  = 0;
                     const size_t pw = r+c-1;
                     for(size_t i=1;i<=N;++i)
                     {
@@ -425,15 +454,27 @@ namespace yocto
                 }
             }
             
-            std::cerr << "alpha=" << alpha << std::endl;
-            
+            //std::cerr << "alpha=" << alpha << std::endl;
+            //__________________________________________________________________
+            //
+            // solve the system
+            //__________________________________________________________________
             crout<real_t> lu(dim);
             if( !lu.build(alpha) )
-                throw exception("Singular Pade Approximant");
+                throw exception("singular Pade approximant");
             crout<real_t>::solve(alpha, beta);
             
+            //__________________________________________________________________
+            //
+            // dispatch coefficients
+            //__________________________________________________________________
             for(size_t i=1;i<=p;++i) P[i] = beta[i];
             for(size_t i=1;i<=q;++i) Q[i] = beta[p+i];
+            
+            //__________________________________________________________________
+            //
+            // compute the fit values
+            //__________________________________________________________________
             
             for(size_t i=1;i<=N;++i)
             {
