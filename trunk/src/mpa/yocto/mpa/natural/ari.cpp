@@ -27,6 +27,27 @@ namespace yocto
 			}
 		}
 		
+        void natural:: simplify( natural &lhs, natural &rhs )
+        {
+            const natural d = gcd(lhs,rhs);
+            natural       L = lhs/d;
+            natural       R = rhs/d;
+            lhs.xch(L);
+            rhs.xch(R);
+        }
+        
+        natural natural:: factorial( uint64_t n )
+        {
+            natural ans = one();
+            while(n>0)
+            {
+                ans *= n;
+                --n;
+            }
+            return ans;
+        }
+        
+        
 		bool natural::are_coprime( const natural &x, const natural &y )
 		{
 			if( x.size > 0 && y.size > 0 )

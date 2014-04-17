@@ -232,7 +232,8 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             //__________________________________________________________________
 			static natural gcd( const natural &lhs, const natural &rhs );           //!< greatest common divisor
 			static bool    are_coprime( const natural &lhs, const natural &rhs );   //!< gcd(lhs,rhs) == 1
-            
+            static void    simplify( natural &lhs, natural &rhs ); //!< divide by gcd
+            static natural factorial( uint64_t n );
             
             //__________________________________________________________________
             //
