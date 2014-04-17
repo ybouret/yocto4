@@ -83,6 +83,20 @@ YOCTO_UNIT_TEST_IMPL(lsf_poly2)
     }
 
     
+    {
+        vector<double> aorg(3,0);
+        vector<double> aerr(3,0);
+        vector<bool>   used(3,true);
+        
+        aorg[1] = 0;
+        used[1] = false;
+        
+        S.polynomial(aorg, used, aerr, NULL);
+        std::cerr << aorg << " +/- " << aerr << std::endl;
+        save_data("p2bis.dat",S);
+        
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

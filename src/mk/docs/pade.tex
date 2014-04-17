@@ -10,6 +10,27 @@
 
 \begin{document}
 \title{Padé Least Square}
+\section{Polynomial}
+We want to fit the sample $(x_i,y_i)_{1\leq i \leq N}$
+with
+$$
+	P(x) = \sum_{k=1}^p a_k x^{(k-1)}.
+$$
+We minimize
+$$
+	S^2 = \dfrac{1}{2} \sum_{i=1}^N \left[  \sum_{k=1}^p a_k x^{(k-1)} - y_i \right]^2.
+$$
+We have
+$$
+	\dfrac{\partial S^2}{\partial a_j} = \sum_{i=1}^{N} \left[  \sum_{k=1}^p a_k x^{(j+k-2)} - y_ix_i^{(j-1)} \right] 
+$$
+so we want to find
+$$
+	\sum_{k=1}^p a_k \left( \sum_{i=1}^{N} x^{(j+k-2)}\right)  = \sum_{i=1}^{N} y_ix_i^{(j-1)}.
+$$
+We must take care of fixed coefficients.
+
+\section{Pad\'e}
 We want to fit the sample $(x_i,y_i)_{1\leq i \leq N}$
 with
 $$
