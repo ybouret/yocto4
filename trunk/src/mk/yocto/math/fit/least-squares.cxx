@@ -277,7 +277,7 @@ namespace yocto
             //
             // Second Pass: used variables
             //__________________________________________________________________
-           
+            
             // for each row
             for(size_t j=n;j>0;--j)
             {
@@ -355,22 +355,52 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         template <>
-        void least_squares<real_t>:: sample:: Pade(array<real_t> &P,
-                                                   array<real_t> &Q)
+        void least_squares<real_t>:: sample:: Pade(array<real_t>     &P,
+                                                   const array<bool> &usedP,
+                                                   array<real_t>     &Q,
+                                                   const array<bool> &usedQ)
         {
+            assert( P.size() == usedP.size() );
+            assert( Q.size() == usedQ.size() );
             const size_t p   = P.size(); //!< denominator
             const size_t q   = Q.size(); //!< numerator
             const size_t dim = p+q;      //!< total dimension
-            if(dim<=0) throw exception("not enough coefficients for Pade");
-            prepare(dim);
-            size_t dof = N;
-            if(dof<=0)
-                throw exception("Not Enough D.O.F. for Pade");
+            if(dim<=0)
+                throw exception("not enough coefficients for Pade");
             
+            prepare(dim);
+            array<real_t>  &aorg = dFda; assert(aorg.size()==dim);
+            vector<bool>    used(dim,true);
+            
+            size_t dof = N;
+            for(size_t i=1;i<=p;++i)
+            {
+                if(usedP[i])
+                {
+                    if(dof<=0)
+                        throw exception("Pade: not enough data");
+                    --dof;
+                }
+                aorg[i] = P[i];
+                used[i] = usedP[i];
+            }
+            
+            for(size_t i=1;i<=q;++i)
+            {
+                if(usedQ[i])
+                {
+                    if(dof<=0)
+                        throw exception("Pade: not enough data");
+                    --dof;
+                }
+                const size_t j = p+i;
+                aorg[j] = Q[i];
+                used[j] = usedQ[i];
+            }
             
             //__________________________________________________________________
             //
-            // rhs
+            // Right Hand Side
             //__________________________________________________________________
             for(size_t r=1;r<=p;++r)
             {
@@ -393,7 +423,6 @@ namespace yocto
                 }
                 beta[r+p] = s;
             }
-            //std::cerr << "rhs=" << beta << std::endl;
             
             //__________________________________________________________________
             //
@@ -454,7 +483,38 @@ namespace yocto
                 }
             }
             
+            //__________________________________________________________________
+            //
+            // Regularizing
+            //__________________________________________________________________
+            // for each row
+            for(size_t j=dim;j>0;--j)
+            {
+                if(!used[j])
+                {
+                    for(size_t k=dim;k>0;--k)
+                        alpha[j][k] = 0;
+                    alpha[j][j] = 1;
+                    beta[j]     = aorg[j];
+                    continue;
+                }
+                
+                //for each used line
+                for(size_t k=dim;k>0;--k)
+                {
+                    if(!used[k])
+                    {
+                        beta[j]    -= alpha[j][k]*aorg[k];
+                        alpha[j][k] = 0;
+                    }
+                }
+            }
+            
+            
+            
             //std::cerr << "alpha=" << alpha << std::endl;
+            
+            
             //__________________________________________________________________
             //
             // solve the system

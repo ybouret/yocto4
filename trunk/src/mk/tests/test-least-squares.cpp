@@ -343,26 +343,49 @@ YOCTO_UNIT_TEST_IMPL(pade)
     size_t p=0;
     size_t q=0;
     if( argc > 1 )
+    {
         p = strconv::to_size(argv[1],"p");
-        
+    }
+    
     if( argc > 2 )
+    {
         q = strconv::to_size(argv[2],"q");
+    }
     
     least_squares<double>::sample Sample(X,Y,Z);
     vector<double> P(p,0);
     vector<double> Q(q,0);
-    
-    Sample.Pade(P, Q);
+    vector<bool>   usedP(p,true);
+    vector<bool>   usedQ(q,true);
+    Sample.Pade(P, usedP, Q, usedQ);
     
     std::cerr << "P=" << P << std::endl;
     std::cerr << "Q=" << Q << std::endl;
     
-    ios::ocstream fp("pade.dat",false);
-    for( size_t i=1; i <= N; ++i )
     {
-        fp("%g %g %g\n", X[i], Y[i], Z[i] );
+        ios::ocstream fp("pade.dat",false);
+        for( size_t i=1; i <= N; ++i )
+        {
+            fp("%g %g %g\n", X[i], Y[i], Z[i] );
+        }
     }
     
-}
-YOCTO_UNIT_TEST_DONE()
-
+    usedP[1] = false;
+    P[1]     = 1;
+    
+    Sample.Pade(P, usedP, Q, usedQ);
+    
+    std::cerr << "Pbis=" << P << std::endl;
+    std::cerr << "Qbis=" << Q << std::endl;
+    
+    {
+        ios::ocstream fp("padebis.dat",false);
+        for( size_t i=1; i <= N; ++i )
+        {
+            fp("%g %g %g\n", X[i], Y[i], Z[i] );
+        }
+    }
+    
+    }
+    YOCTO_UNIT_TEST_DONE()
+    

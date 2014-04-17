@@ -65,7 +65,7 @@ namespace yocto
                  */
                 void prepare( size_t nvar, size_t npar );
                 void release() throw();
-
+                
                 inline void prepare(size_t nvar) { prepare(nvar,nvar); }
                 
                 //! set parameter ipar to variable ivar
@@ -78,7 +78,10 @@ namespace yocto
                 void polynomial( array<T> &aorg, const array<bool> &used, array<T> &aerr, typename numeric<T>::function *transform = 0);
                 
                 //! perform a Pade fit
-                void Pade( array<T> &P, array<T> &Q  );
+                void Pade(array<T>          &P,
+                          const array<bool> &usedP,
+                          array<T>          &Q,
+                          const array<bool> &usedQ);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(sample);
@@ -120,11 +123,11 @@ namespace yocto
                                             callback                        *cb = 0
                                             );
             
-           
+            
             
             
         private:
-		YOCTO_DISABLE_COPY_AND_ASSIGN(least_squares);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(least_squares);
             function                        *proc;
             samples                         *data;
             size_t                           nvar;
