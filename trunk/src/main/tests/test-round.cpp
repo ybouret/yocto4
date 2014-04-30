@@ -22,6 +22,11 @@ YOCTO_UNIT_TEST_IMPL(round)
 	(void)dummy;
 	std::cerr << "sizeof(dummy)=" << sizeof(dummy) << std::endl;
 
+    for(size_t bits=0;bits<=33;++bits)
+    {
+        std::cerr << "#Bits= " << bits << " => " << YOCTO_BYTES_FOR(bits) << " bytes" << std::endl;
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
