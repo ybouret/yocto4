@@ -28,6 +28,12 @@ namespace yocto
         {
         }
         
+        integer:: integer(const natural &N) :
+        s( N.is_zero() ? __zero : __positive),
+        n(N)
+        {
+        }
+        
         void integer:: check() throw()
         {
             if( n.is_zero() ) (sign_type &)s = __zero;
@@ -117,6 +123,13 @@ namespace yocto
         integer & integer:: operator=( const int64_t other )
         {
             integer tmp(other);
+            xch(tmp);
+            return *this;
+        }
+        
+        integer & integer::operator=(const natural &N )
+        {
+            integer tmp(N);
             xch(tmp);
             return *this;
         }

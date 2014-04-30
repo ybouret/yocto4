@@ -17,4 +17,6 @@ ADD_TEST(Prime test-mpa prime)
 ADD_TEST(RSA   test-mpa rsa)
 ADD_TEST(Keys  test-mpa rsa_keys)
 ADD_TEST(Pow   test-mpa pow)
+ADD_TEST(Int   test-mpa int)
+
 

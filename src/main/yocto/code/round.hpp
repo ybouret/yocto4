@@ -33,6 +33,7 @@
 //! 256 bytes | 2048 bits
 #define YOCTO_ROUND256(N)  YOCTO_ROUND(8,N)
 
+//! internal memory alignment
 #define YOCTO_MEMALIGN(N)  YOCTO_ROUND16(N)
 
 #define YOCTO_U64_FOR_SIZE(N) ( YOCTO_ROUND8(N) >> 3 )
@@ -40,6 +41,8 @@
 
 #define YOCTO_U32_FOR_SIZE(N) ( YOCTO_ROUND4(N) >> 2 )
 #define YOCTO_U32_FOR_ITEM(T) YOCTO_U32_FOR_SIZE(sizeof(T))
+
+#define YOCTO_BYTES_FOR(BITS) ( (size_t)(YOCTO_ROUND(3,BITS)) >>3 )
 
 namespace yocto
 {

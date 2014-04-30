@@ -32,10 +32,12 @@ namespace yocto
             virtual ~integer() throw();
             integer(const integer &other);
             integer(const int64_t  x);
+            integer(const natural &N);
             friend std::ostream & operator<<( std::ostream &, const integer &);
             void  xch( integer & ) throw();
             integer &operator=(const integer &);
             integer &operator=(const int64_t  );
+            integer &operator=(const natural &);
             
             //__________________________________________________________________
             //
