@@ -65,7 +65,6 @@ YOCTO_BUILD(chemical)
 YOCTO_BUILD(visit)
 YOCTO_BUILD(fltk)
 YOCTO_BUILD(jpeg)
-YOCTO_BUILD(png)
 YOCTO_BUILD(fovea)
 
 MESSAGE( STATUS "---------------- </modules> ----------------" )
