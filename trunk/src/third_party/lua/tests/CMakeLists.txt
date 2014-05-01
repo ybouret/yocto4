@@ -6,6 +6,8 @@ ADD_EXECUTABLE(${fx} main.cpp ${test_srcs})
 TARGET_LINK_YOCTO(${fx} lua)
 SET( HERE "${CMAKE_SOURCE_DIR}/third_party/lua/tests" )
 
+IF(NOT MSVC)
+
 ADD_CUSTOM_COMMAND(
 	TARGET ${fx}
 	POST_BUILD
@@ -15,4 +17,6 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${fx} "${HERE}/sort.lua"
 	COMMENT "Auto Testing Lua"
 )
+
+ENDIF(NOT MSVC)
 
