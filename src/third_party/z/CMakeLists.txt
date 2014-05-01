@@ -37,11 +37,11 @@ ADD_LIBRARY(y-z STATIC ${srcs})
 INSTALL( TARGETS y-z ARCHIVE DESTINATION lib )
 
 #Set to TRUE to enable zlib testing
-IF(FALSE)
+IF(NOT MSVC)
 ADD_EXECUTABLE(test-z yocto/zlib/example.c)
 TARGET_LINK_LIBRARIES(test-z y-z)
 ADD_CUSTOM_COMMAND( TARGET test-z
 	COMMAND test-z
-	COMMENT "Testing zlib...")
-ENDIF()
+	COMMENT "Auto Testing zlib...")
+ENDIF(NOT MSVC)
 
