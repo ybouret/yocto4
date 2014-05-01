@@ -6,7 +6,7 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/z++ )
 SOURCE_GROUP( z++ FILES ${srcs} )
 
-INCLUDE_DIRECTORIES( . ../main ../z )
+INCLUDE_DIRECTORIES( . ../main ../third_party/z )
 
 ADD_LIBRARY( y-z++ STATIC ${srcs} )
 INSTALL( TARGETS y-z++ ARCHIVE DESTINATION lib )
