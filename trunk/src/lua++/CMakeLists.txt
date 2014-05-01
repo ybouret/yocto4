@@ -13,7 +13,7 @@ INSTALL( FILES ${xlua_decl} DESTINATION include/yocto/lua/x )
 SOURCE_GROUP( lua/x FILES ${xlua_srcs} )
 
 
-INCLUDE_DIRECTORIES( . ../main  ../lua/yocto/lua )
+INCLUDE_DIRECTORIES( . ../main  ../third_party/lua/yocto/lua )
 
 ADD_LIBRARY( y-lua++ STATIC ${lua_srcs} ${xlua_srcs})
 INSTALL( TARGETS y-lua++ ARCHIVE DESTINATION lib )

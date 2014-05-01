@@ -1,5 +1,5 @@
 PROJECT(lua C)
-INCLUDE_DIRECTORIES(../main .)
+INCLUDE_DIRECTORIES(../../main .)
 
 SET(lua_root yocto/lua)
 
