@@ -19,9 +19,6 @@ ENDFOREACH()
 
 ADD_LIBRARY(y-jpeg STATIC ${JCONFIG} ${SOURCES})
 
-#set to TRUE to perform tests
-IF(FALSE)
-
 IF(NOT MSVC)
 
 ADD_EXECUTABLE(cjpeg 
@@ -63,7 +60,7 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testout.bmp ${JROOT}/testimg.bmp
 	COMMAND djpeg -dct int -ppm -outfile ${CMAKE_CURRENT_BINARY_DIR}/testoutp.ppm ${JROOT}/testprog.jpg
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testoutp.ppm ${JROOT}/testimg.ppm
-	COMMENT "Testing djpeg"
+	COMMENT "Auto Testing djpeg"
 	)
 
 
@@ -74,7 +71,7 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testout.jpg ${JROOT}/testimg.jpg
 	COMMAND cjpeg -dct int -progressive -opt -outfile ${CMAKE_CURRENT_BINARY_DIR}/testoutp.jpg ${JROOT}/testimg.ppm
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testoutp.jpg ${JROOT}/testimgp.jpg
-	COMMENT "Testing cjpeg"
+	COMMENT "Auto Testing cjpeg"
 	)
 	
 ADD_CUSTOM_COMMAND(
@@ -82,10 +79,8 @@ ADD_CUSTOM_COMMAND(
 	POST_BUILD
 	COMMAND jpegtran -outfile ${CMAKE_CURRENT_BINARY_DIR}/testoutt.jpg ${JROOT}/testprog.jpg
 	COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/testoutt.jpg ${JROOT}/testorig.jpg
-	COMMENT "Testing jpegtran" )
+	COMMENT "Auto Testing jpegtran" )
 ENDIF(NOT MSVC)
-
-ENDIF(FALSE)
 
 INSTALL( FILES 
 	${JROOT}/jconfig.h
