@@ -18,7 +18,6 @@ SOURCE_GROUP( bz2 FILES ${srcs} )
 INSTALL( FILES   yocto/bz2/bzlib.h DESTINATION include/yocto/bz2 )
 INSTALL( TARGETS y-bz2     ARCHIVE DESTINATION lib )
 
-#Set to TRUE to test bz2
 IF(NOT MSVC)
 
 ADD_EXECUTABLE(y_bzip2 yocto/bz2/bzip2.c)
