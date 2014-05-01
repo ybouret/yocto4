@@ -1,4 +1,4 @@
-#include "yocto/threading/proxy.hpp"
+#include "yocto/threading/thread.hpp"
 #include "yocto/sys/wtime.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
@@ -34,19 +34,6 @@ namespace
 
 YOCTO_UNIT_TEST_IMPL(thread)
 {
-#if USE_OLD_THREAD
-	mutex synchro( "synchro" );
-	thread_data d = { &synchro, 0 };
-    
-	thread thr1( thread_proc, &d );
-	thread thr2( thread_proc, &d );
-	thread thr3( thread_proc, &d );
-    
-	thr1.join();
-	thr2.join();
-	thr3.join();
-	std::cerr << "Final sum=" << d.sum << std::endl;
-#else
     threading::mutex   mtx("shared");
     thread_data d = { & mtx, 0.0 };
     
@@ -65,7 +52,6 @@ YOCTO_UNIT_TEST_IMPL(thread)
     }
     
     std::cerr << "Final Sum=" << d.sum << std::endl;
-#endif
 }
 YOCTO_UNIT_TEST_DONE()
 
