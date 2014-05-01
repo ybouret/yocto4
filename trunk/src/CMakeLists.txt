@@ -43,6 +43,7 @@ ENDMACRO(YOCTO_BUILD)
 ########################################################################
 MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <modules>  ----------------" )
+
 YOCTO_BUILD(thr)
 YOCTO_BUILD(lingua)
 YOCTO_BUILD(kr)
@@ -56,7 +57,6 @@ YOCTO_BUILD(lua)
 YOCTO_BUILD(lua++)
 YOCTO_BUILD(z)
 YOCTO_BUILD(z++)
-YOCTO_BUILD(lzo)
 YOCTO_BUILD(bz2)
 YOCTO_BUILD(bz2++)
 YOCTO_BUILD(mpi)
@@ -72,6 +72,16 @@ YOCTO_BUILD(fovea)
 
 MESSAGE( STATUS "---------------- </modules> ----------------" )
 MESSAGE( STATUS "" )
+
+########################################################################
+# Record third_party
+########################################################################
+MESSAGE( STATUS "" )
+MESSAGE( STATUS "---------------- <third_party>  ----------------" )
+ADD_SUBDIRECTORY(third_party)
+MESSAGE( STATUS "---------------- </third_party>  ----------------" )
+MESSAGE( STATUS "" )
+
 
 INSTALL( FILES 
 	share/create.sh 

@@ -16,14 +16,17 @@ ADD_LIBRARY(y-lzo STATIC ${srcs})
 INSTALL( TARGETS y-lzo ARCHIVE DESTINATION lib )
 
 #set to TRUE to enable auto-test
-IF(FALSE)
+IF(NOT MSVC)
 
 ADD_EXECUTABLE(testmini yocto/lzo/testmini.c)
 TARGET_LINK_LIBRARIES(testmini y-lzo)
 
-ADD_CUSTOM_COMMAND( TARGET testmini
+ADD_CUSTOM_COMMAND( 
+	TARGET  testmini
+	POST_BUILD
 	COMMAND testmini
 	COMMENT "Testing minilzo..."
 )
-ENDIF()
+
+ENDIF(NOT MSVC)
 
