@@ -44,7 +44,6 @@ ENDMACRO(YOCTO_BUILD)
 MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <modules>  ----------------" )
 
-YOCTO_BUILD(thr)
 YOCTO_BUILD(lingua)
 YOCTO_BUILD(kr)
 YOCTO_BUILD(net)
