@@ -10,7 +10,7 @@ IF(MPI_FOUND)
   
   SET( srcs ${decl} ${impl} )
 
-  INCLUDE_DIRECTORIES( . ../main ../thr)
+  INCLUDE_DIRECTORIES( . ../main )
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 
 
