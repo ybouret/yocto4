@@ -19,7 +19,7 @@ using namespace yocto;
 
 static inline void test_random( Random::Uniform &ran )
 {
-	const size_t   n = 10000;
+	const size_t   n = 100000;
 	vector<double> r(n,0);
 	for( size_t i=1; i <=n; ++i ) r[i] = ran();
 	hsort( r );
@@ -64,7 +64,7 @@ YOCTO_UNIT_TEST_IMPL(dist)
 	Random::Uniform3     ran3(   Random::SimpleBits() );
 	Random::UniformMT    ranMT(  Random::SimpleBits() );
 	Random::Uniform64BJ  ranBJ(  Random::SimpleBits() );
-	Random::Uniform64BJ  ranNR(  Random::SimpleBits() );
+	Random::Uniform64NR  ranNR(  Random::SimpleBits() );
 
 	Random:: Uniform * reg[] = { &ran_d, &ran_if, & ran_ic, &ran0, &ran1, &ran2, &ran3, &ranMT, &ranBJ, &ranNR };
 	const size_t       num   = sizeof(reg)/sizeof(reg[0]);
