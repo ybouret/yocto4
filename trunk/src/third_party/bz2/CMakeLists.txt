@@ -18,6 +18,8 @@ SOURCE_GROUP( bz2 FILES ${srcs} )
 INSTALL( FILES   yocto/bz2/bzlib.h DESTINATION include/yocto/bz2 )
 INSTALL( TARGETS y-bz2     ARCHIVE DESTINATION lib )
 
+IF(YOCTO_AUTO_TEST)
+
 IF(NOT MSVC)
 
 ADD_EXECUTABLE(y_bzip2 yocto/bz2/bzip2.c)
@@ -41,4 +43,6 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${CMAKE_COMMAND} ARGS -E compare_files sample3.tst ${file3}
 	COMMENT "Auto Testing BZ2..." )
 ENDIF(NOT MSVC)
+
+ENDIF(YOCTO_AUTO_TEST)
 	
