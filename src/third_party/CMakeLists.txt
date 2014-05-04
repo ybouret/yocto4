@@ -1,4 +1,7 @@
 #Directory for third party libraries
+
+SET(YOCTO_AUTO_TEST OFF)
+
 MACRO(YOCTO_THIRD_PARTY dir)
 	MESSAGE( STATUS "===>>> third_party/${dir}" )
 	ADD_SUBDIRECTORY(${dir})

@@ -6,6 +6,8 @@ ADD_EXECUTABLE(${fx} main.cpp ${test_srcs})
 TARGET_LINK_YOCTO(${fx} lua)
 SET( HERE "${CMAKE_SOURCE_DIR}/third_party/lua/tests" )
 
+IF(YOCTO_AUTO_TEST)
+
 IF(NOT MSVC)
 
 ADD_CUSTOM_COMMAND(
@@ -19,4 +21,6 @@ ADD_CUSTOM_COMMAND(
 )
 
 ENDIF(NOT MSVC)
+
+ENDIF(YOCTO_AUTO_TEST)
 
