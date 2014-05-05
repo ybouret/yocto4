@@ -113,13 +113,14 @@ YOCTO_UNIT_TEST_INIT(128)
     YOCTO_UNIT_TEST_DECL(file_size);
     YOCTO_UNIT_TEST_DECL(wallpaper);
     YOCTO_UNIT_TEST_DECL(poly);
-
+    
 	YOCTO_UNIT_TEST_DECL(condition);
-        YOCTO_UNIT_TEST_DECL(barrier);
-        YOCTO_UNIT_TEST_DECL(simd);
+    YOCTO_UNIT_TEST_DECL(barrier);
+    YOCTO_UNIT_TEST_DECL(simd);
 	YOCTO_UNIT_TEST_DECL(server);
 	
 	YOCTO_UNIT_TEST_DECL(dist);
+    YOCTO_UNIT_TEST_DECL(binary);
 }
 YOCTO_UNIT_TEST_EXEC()
 
