@@ -44,9 +44,7 @@ YOCTO_UNIT_TEST_IMPL(binary)
     __test_reverse_bits<uint8_t>(256);
     __test_reverse_bits<uint16_t>(65536);
     __test_reverse_bits<uint32_t>(100000);
-    __test_reverse_bits<uint64_t>(100000);
-
-    
+    __test_reverse_bits<uint64_t>(100000);    
     
 }
 YOCTO_UNIT_TEST_DONE()
