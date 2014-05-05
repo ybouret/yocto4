@@ -16,8 +16,19 @@ namespace yocto
 	size_t bits_for( const size_t n ) throw();
 
 	extern const uint8_t ceil_ln2_table[256];
-
-
+    
+    template <typename T>
+    inline T reverse_bits( const T x ) throw()
+    {
+        static const T __one__(1);
+        T ans = 0;
+        for(int i=sizeof(T)*8-1,j=0;i>=0;--i,++j)
+        {
+            ans |= ((x & (__one__<<i) ) >> i) << j;
+            ans |= ((x & (__one__<<j) ) >> j) << i;
+        }
+        return ans;
+    }
 
 
 	template <typename T>

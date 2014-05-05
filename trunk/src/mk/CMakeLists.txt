@@ -6,6 +6,12 @@ SET( kernel_srcs ${kernel_decl} ${kernel_impl} )
 INSTALL( FILES ${kernel_decl} DESTINATION include/yocto/math/kernel )
 SOURCE_GROUP( math/kernel FILES ${kernel_srcs} )
 
+FILE( GLOB sparse_decl yocto/math/sparse/*.hpp)
+FILE( GLOB sparse_impl yocto/math/sparse/*.cpp)
+SET( sparse_srcs ${sparse_decl} ${sparse_impl} )
+INSTALL( FILES ${sparse_decl} DESTINATION include/yocto/math/sparse )
+SOURCE_GROUP( math/sparse FILES ${sparse_srcs} )
+
 FILE( GLOB dat_decl yocto/math/dat/*.hpp)
 FILE( GLOB dat_impl yocto/math/dat/*.cpp)
 SET( dat_srcs ${dat_decl} ${dat_impl} )
@@ -78,7 +84,21 @@ SET( fft_srcs ${fft_decl} ${fft_impl} )
 INSTALL( FILES ${fft_decl} DESTINATION include/yocto/math/fft )
 SOURCE_GROUP( math/fft FILES ${fft_srcs} )
 
-SET( srcs ${kernel_srcs} ${dat_srcs} ${fcn_srcs} ${opt_srcs} ${sig_srcs} ${io_srcs} ${ode_srcs} ${ode_explicit_srcs} ${ode_implicit_srcs} ${fit_srcs} ${stat_srcs} ${alg_srcs} ${fft_srcs})
+SET( srcs
+${kernel_srcs}
+${sparse_srcs}
+${dat_srcs}
+${fcn_srcs}
+${opt_srcs}
+${sig_srcs}
+${io_srcs}
+${ode_srcs}
+${ode_explicit_srcs}
+${ode_implicit_srcs}
+${fit_srcs}
+${stat_srcs}
+${alg_srcs}
+${fft_srcs})
 
 INCLUDE_DIRECTORIES( . ../main )
 
