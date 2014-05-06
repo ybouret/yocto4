@@ -16,10 +16,17 @@ namespace
         inline AKey(int c) throw() : code(c) {}
         virtual ~AKey() throw() {}
         AKey( const AKey &a ) throw() : code(a.code) {}
+        
         friend inline bool operator==( const AKey &l, const AKey &r ) throw()
         {
             return l.code == r.code;
         }
+        
+        friend inline bool operator<( const AKey &l, const AKey &r) throw()
+        {
+            return l.code < r.code;
+        }
+        
         
         class Hasher
         {
@@ -82,8 +89,8 @@ namespace
 YOCTO_UNIT_TEST_IMPL(lexicon)
 {
     
-    SHOWSZ((lexicon<AKey,AObj>));
-    SHOWSZ((lexicon<AKey,AReal>));
+    SHOWSZ((lexicon<AKey,AObj,AKey::Hasher>));
+    SHOWSZ((lexicon<AKey,AReal,AKey::Hasher>));
     
     lexicon<AKey,AObj,AKey::Hasher> lx;
     const AKey k(1);
@@ -105,7 +112,7 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
     std::cerr << std::endl;
     
     lx.release();
-    for(size_t i=1;i<=33;++i)
+    for(size_t i=33;i>0;--i)
     {
         const AObj obj(i,"hello");
         if( !lx.insert(obj) )
@@ -126,6 +133,12 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
         
         if( !lx.remove(key) )
             throw exception("can't remove key #%d", key.code);
+        SHOW(lx);
+        for( lexicon<AKey,AObj,AKey::Hasher>::iterator j=lx.begin();j!=lx.end();++j)
+        {
+            std::cerr << " " << (*j).code;
+        }
+        std::cerr << std::endl;
     }
     
 }
