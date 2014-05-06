@@ -448,7 +448,7 @@ namespace yocto
             hmask = new_hmask;
         }
         
-        //
+        // look up a key
         inline DataNode *lookup(const_key &k) const throw()
         {
             if(nslot<=0)
