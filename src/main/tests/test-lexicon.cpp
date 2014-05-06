@@ -86,6 +86,16 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
             throw exception("can't insert object into lexicon");
         SHOW(lx);
     }
+    std::cerr << std::endl;
+    
+    lx.release();
+    for(size_t i=1;i<=33;++i)
+    {
+        const AObj obj(i,"hello");
+        if( !lx.insert(obj) )
+            throw exception("can't insert object into lexicon");
+        SHOW(lx);
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()
