@@ -252,7 +252,50 @@ namespace yocto
             }
             
             // put data in list
-            klist.push_back(dnode);
+            const_key &key = dnode->key();
+            if(klist.size<=0)
+            {
+                klist.push_back(dnode);
+            }
+            else
+            {
+                if(key<klist.head->key())
+                {
+                    // smallest key
+                    klist.push_front(dnode);
+                }
+                else
+                {
+                    if(klist.tail->key()<key)
+                    {
+                        // biggest key
+                        klist.push_back(dnode);
+                    }
+                    else
+                    {
+                        // generic case
+                        assert(klist.size>=2);
+                        DataNode *prev = klist.head;
+                        DataNode *next = prev->next;
+                        assert(next);
+                        while(next)
+                        {
+                            if(key<next->key())
+                            {
+                                prev->next  = dnode;
+                                next->prev  = dnode;
+                                dnode->prev = prev;
+                                dnode->next = next;
+                                ++klist.size;
+                                break;
+                            }
+                            prev=next;
+                            next=next->next;
+                        }
+                    }
+                }
+            }
+            
             
             return true;
         }
