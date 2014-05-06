@@ -24,7 +24,9 @@ namespace yocto
     {
     public:
         YOCTO_ASSOCIATIVE_KEY_T;
-        static const size_t LOAD = 4;
+        static const size_t LOAD      = 4;
+        static const size_t MIN_SLOTS = 4;
+        
         //======================================================================
         // dynamic node to store data
         //======================================================================
@@ -77,10 +79,18 @@ namespace yocto
                 pool.store( object::acquire1<DataNode>() );
             }
             
+            inline void yield() throw()
+            {
+                assert(pool.size>0);
+                object::release1( pool.query() );
+            }
+            
+            inline size_t size() const throw() { return pool.size; }
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(DataNodePool);
             core::pool_of<DataNode> pool;
-
+            
         };
         
         
@@ -125,6 +135,13 @@ namespace yocto
                 pool.store( object::acquire1<HashNode>() );
             }
             
+            inline void yield() throw()
+            {
+                assert(pool.size>0);
+                object::release1( pool.query() );
+            }
+            
+            inline size_t size() const throw() { return pool.size; }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(HashNodePool);
@@ -154,22 +171,26 @@ namespace yocto
         
         inline void free() throw() { __free(); }
         
-        inline type * search( param_key k )
+        inline type * search( param_key key ) throw()
         {
-            const size_t h    = hash(k);
-            HashSlot    *slot = 0;
-            DataNode    *node = lookup(h, k, slot);
-            if(node)
-            {
-                return & (node->data);
-            }
-            else
-            {
-                return 0;
-            }
+            DataNode    *node = lookup(key);
+            return node ? &(node->data) : 0;
         }
         
+        inline const_type * search( param_key key ) const throw()
+        {
+            DataNode    *node = lookup(key);
+            return node ? &(node->data) : 0;
+        }
         
+        inline size_t size()      const throw() { return ldata.size; }
+        inline size_t capacity()  const throw() { return ldata.size + data_nodes.size(); }
+        inline size_t num_slots() const throw() { return nslot; }
+        inline void   reserve(size_t n)
+        {
+            if(n>0)
+                grow(n);
+        }
         
     private:
         core::list_of<DataNode>       ldata;  //!< key ordered data
@@ -179,7 +200,7 @@ namespace yocto
         size_t                        count;  //!< for memory
         
         DataNodePool                  data_nodes;
-        core::pool_of<HashNode>       hash_nodes;
+        HashNodePool      hash_nodes;
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon);
@@ -192,7 +213,10 @@ namespace yocto
             for(size_t i=0;i<nslot;++i)
             {
                 HashSlot &src = slots[i];
-                while(src.size) hash_nodes.store(src.pop_back());
+                while(src.size)
+                {
+                    hash_nodes.store(src.pop_back());
+                }
             }
             while(ldata.size)
             {
@@ -211,28 +235,27 @@ namespace yocto
         //! reserve supplementary #nodes
         inline void reserve_nodes( size_t n )
         {
-            assert(data_nodes.pool.size==hash_nodes.pool.size);
+            assert(data_nodes.size()==hash_nodes.size());
             while(n-->0)
             {
-                {
-                    data_nodes.cache();
-                }
+                data_nodes.cache();
                 try
                 {
                     hash_nodes.cache();
                 }
                 catch(...)
                 {
-                    object::release1( data_nodes.pool.query() );
+                    data_nodes.yield();
                     throw;
                 }
             }
         }
         
+        //! make new slots
         inline void rescale_slots( const size_t n )
         {
             // acquire new slots
-            const size_t new_nslot = next_power_of_two( max_of<size_t>(n,16) );
+            const size_t new_nslot = next_power_of_two( max_of<size_t>(n,MIN_SLOTS) );
             size_t       new_count = new_nslot;
             HashSlot    *new_slots = hmem.template acquire_as<HashSlot>(new_count);
             const size_t new_hmask = new_nslot - 1;
@@ -257,17 +280,15 @@ namespace yocto
             hmask = new_hmask;
         }
         
-        inline DataNode *lookup( const size_t h, const_key &k, HashSlot * &slot ) const throw()
+        inline DataNode *lookup(const_key &k) const throw()
         {
-            assert(0==slot);
             if(nslot<=0)
             {
                 return 0;
             }
             else
             {
-                slot = &slots[ h & hmask ];
-                for( const HashNode *node = slot->head;node;node=node->next)
+                for( const HashNode *node = slots[hash(k)&hmask].head;node;node=node->next)
                 {
                     assert(node->addr);
                     const DataNode *dn = node->addr;
@@ -280,6 +301,28 @@ namespace yocto
             }
         }
         
+        inline void grow(size_t n)
+        {
+            assert(n>0);
+            assert(nslot>=capacity()/LOAD);
+            assert(data_nodes.size() == hash_nodes.size());
+            const size_t num_nodes = data_nodes.size();
+            try
+            {
+                reserve_nodes(n);
+                const size_t new_cap   = capacity();
+                const size_t new_nslot = max_of<size_t>(new_cap/LOAD,MIN_SLOTS);
+                if(new_nslot>nslot)
+                    rescale_slots(new_nslot);
+                assert(nslot>=capacity()/LOAD);
+            }
+            catch(...)
+            {
+                while( data_nodes.size() >= num_nodes ) data_nodes.yield();
+                while( hash_nodes.size() >= num_nodes ) hash_nodes.yield();
+                throw;
+            }
+        }
         
     };
     
