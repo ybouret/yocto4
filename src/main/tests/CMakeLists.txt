@@ -87,5 +87,7 @@ ADD_TEST(Condition   test-main condition)
 ADD_TEST(Barrier     test-main barrier)
 ADD_TEST(Crew        test-main simd)
 ADD_TEST(Server      test-main server)
+ADD_TEST(Dist        test-main dist)
+ADD_TEST(Lexicon     test-main lexicon)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
