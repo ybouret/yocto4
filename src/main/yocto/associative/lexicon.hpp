@@ -19,6 +19,22 @@ namespace yocto
     namespace hidden
     {
         extern const char lexicon_name[];
+        void lexicon_hasher_is_invalid();
+        template <typename KEY>
+        class lexicon_hasher
+        {
+        public:
+            YOCTO_ARGUMENTS_DECL_KEY;
+            inline  lexicon_hasher() throw() {}
+            inline ~lexicon_hasher() throw() {}
+            inline size_t operator()(const_key &) const
+            {
+                lexicon_hasher_is_invalid();
+                return 0;
+            }
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon_hasher);
+        };
     }
     
     //! each object IS a key
@@ -28,7 +44,7 @@ namespace yocto
     template <
     typename KEY,
     typename T,
-    typename KEY_HASHER = key_hasher<KEY>,
+    typename KEY_HASHER = hidden::lexicon_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
     class lexicon : public container
     {
@@ -287,7 +303,7 @@ namespace yocto
         inline const_type &front() const throw() { assert(klist.head); return klist.head->data; }
         inline type       &back()        throw() { assert(klist.head); return klist.tail->data; }
         inline const_type &back()  const throw() { assert(klist.head); return klist.tail->data; }
-
+        
         
     private:
         core::list_of<DataNode>       klist;  //!< key ordered data
@@ -361,7 +377,7 @@ namespace yocto
             size_t       new_count = new_nslot;
             HashSlot    *new_slots = hmem.template acquire_as<HashSlot>(new_count);
             const size_t new_hmask = new_nslot - 1;
-
+            
             //__________________________________________________________________
             //
             // transfert nodes
