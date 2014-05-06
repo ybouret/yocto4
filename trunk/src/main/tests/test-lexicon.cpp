@@ -23,7 +23,7 @@ namespace
     private:
         YOCTO_DISABLE_ASSIGN(AKey);
     };
-
+    
     class AObj : public AKey
     {
     public:
@@ -40,14 +40,45 @@ namespace
         YOCTO_DISABLE_ASSIGN(AObj);
     };
     
+    class AReal : public AKey
+    {
+    public:
+        double value;
+        
+        explicit AReal(int c, double s) throw(): AKey(c), value(s) {}
+        virtual ~AReal() throw() {}
+        
+        AReal( const AReal &a ) throw() : AKey(a), value(a.value) {}
+        
+        
+        
+    private:
+        YOCTO_DISABLE_ASSIGN(AObj);
+        
+    };
+    
     
 }
 
+#define SHOWSZ(TYPE) std:: cerr << "sizeof" << #TYPE << "\t=\t" << sizeof TYPE << std::endl;
+#define SHOW(LX) std::cerr << "size=" << LX.size() << ", capa=" << LX.capacity() << ", #slots=" << LX.num_slots() << std::endl;
+
 YOCTO_UNIT_TEST_IMPL(lexicon)
 {
+    
+    SHOWSZ((lexicon<AKey,AObj>));
+    SHOWSZ((lexicon<AKey,AReal>));
+    
     lexicon<AKey,AObj> lx;
     const AKey k(1);
     lx.search(k);
+    
+    for(size_t i=1;i<=20;++i)
+    {
+        lx.reserve(1);
+        SHOW(lx);
+    }
+    
     
     
 }
