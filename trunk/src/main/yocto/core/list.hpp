@@ -314,11 +314,14 @@ namespace yocto
         {
         public:
             explicit list_of_cpp() throw() : list_of<NODE>() {}
-            inline void clear() throw() {
-                while(this->size) delete this->pop_back();
+            
+            inline void clear() throw()
+            {
+                this->auto_delete();
             }
             
-            virtual ~list_of_cpp() throw() {
+            virtual ~list_of_cpp() throw()
+            {
                 clear();
             }
             

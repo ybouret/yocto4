@@ -66,8 +66,7 @@ namespace yocto
                 {
                     {
                         const item_type it(i,j,numeric<z_type>::zero);
-                        if(!items.insert(it))
-                            throw exception("unexpected sparse item insertion failure @(%u,%u)", unsigned(i), unsigned(j));
+                        items.insert__(it);
                     }
                     p = items.search(k);
                     assert(0!=p);
@@ -104,7 +103,7 @@ namespace yocto
         {
             return items.size();
         }
-
+        
         template <>
         void  spmatrix<z_type>:: output( std::ostream &os ) const
         {
@@ -120,6 +119,32 @@ namespace yocto
             }
             os << "]";
         }
+        
+        template <>
+        void spmatrix<z_type>:: ldz() throw()
+        {
+            items.free();
+            for(size_t i=size;i>0;--i)
+            {
+                sa[i] = numeric<z_type>::zero;
+            }
+        }
+        
+        template <>
+        void spmatrix<z_type>:: ld1() throw()
+        {
+            items.free();
+            for(size_t i=size;i>0;--i)
+            {
+                sa[i] = numeric<z_type>::zero;
+            }
+        }
+        
+        template <>
+        void spmatrix<z_type>:: transpose()
+        {
+        }
+        
     }
     
 }
