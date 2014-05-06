@@ -3,10 +3,15 @@
 
 #include "yocto/type/key.hpp"
 #include "yocto/associative/key-hasher.hpp"
+
+#include "yocto/container/container.hpp"
+#include "yocto/container/iter-linked.hpp"
+
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
 #include "yocto/code/utils.hpp"
-#include "yocto/container/container.hpp"
+
+#include <iostream>
 
 namespace yocto
 {
@@ -159,7 +164,7 @@ namespace yocto
         // API
         //======================================================================
         inline explicit lexicon() throw() :
-        ldata(),
+        klist(),
         nslot(0),
         hmask(nslot-1),
         slots(0),
@@ -174,8 +179,8 @@ namespace yocto
         inline virtual const char *name() const throw() { return hidden::lexicon_name; }
         inline virtual void        free() throw() { __free(); }
         inline virtual void        release() throw() { __release(); }
-        inline virtual size_t      size()      const throw() { return ldata.size; }
-        inline virtual size_t      capacity()  const throw() { return ldata.size + data_nodes.size(); }
+        inline virtual size_t      size()      const throw() { return klist.size; }
+        inline virtual size_t      capacity()  const throw() { return klist.size + data_nodes.size(); }
         inline         size_t      num_slots() const throw() { return nslot; }
         inline virtual void        reserve(size_t n) { if(n>0) grow(n); }
         
@@ -205,7 +210,7 @@ namespace yocto
             assert( nslot>0  );
             assert( slots!=0 );
             
-            const_key   &akey  = args;
+            const_key   &akey = args;
             const size_t hkey = hash(akey);
             HashSlot    &slot = slots[ hkey & hmask ];
             for(const HashNode *node = slot.head;node;node=node->next)
@@ -231,14 +236,61 @@ namespace yocto
             }
             
             // put data in list
-            ldata.push_back(dnode);
+            klist.push_back(dnode);
             
             return true;
         }
         
+        inline bool remove( param_key key ) throw()
+        {
+            if(slots)
+            {
+                HashSlot    &slot = slots[hash(key)&hmask];
+                for( HashNode *node = slot.head;node;node=node->next)
+                {
+                    DataNode *dn = node->addr;
+                    if( dn->key() == key )
+                    {
+                        data_nodes.store( klist.unlink(dn)  );
+                        hash_nodes.store( slot.unlink(node) );
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        
+        //======================================================================
+		// iterators
+		//======================================================================
+		typedef iterating::linked<type,DataNode,iterating::forward> iterator;
+		inline iterator begin() throw() { return iterator(klist.head); }
+		inline iterator end()   throw() { return iterator(0);          }
+        
+        typedef iterating::linked<type,DataNode,iterating::reverse> reverse_iterator;
+		inline reverse_iterator rbegin() throw() { return reverse_iterator(klist.tail); }
+		inline reverse_iterator rend()   throw() { return reverse_iterator(0);          }
+		
+		typedef iterating::linked<const_type,const DataNode,iterating::forward> const_iterator;
+		inline const_iterator begin() const throw() { return const_iterator(klist.head); }
+		inline const_iterator end()   const throw() { return const_iterator(0);          }
+        
+        typedef iterating::linked<const_type,const DataNode,iterating::reverse> const_reverse_iterator;
+		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator(klist.head); }
+		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator(0);          }
+        
+        //======================================================================
+        // fast access
+        //======================================================================
+        inline type       &front()       throw() { assert(klist.head); return klist.head->data; }
+        inline const_type &front() const throw() { assert(klist.head); return klist.head->data; }
+        inline type       &back()        throw() { assert(klist.head); return klist.tail->data; }
+        inline const_type &back()  const throw() { assert(klist.head); return klist.tail->data; }
+
         
     private:
-        core::list_of<DataNode>       ldata;  //!< key ordered data
+        core::list_of<DataNode>       klist;  //!< key ordered data
         size_t                        nslot;  //!< a power of two >= data_list/LOAD;
         size_t                        hmask;  //!< num_slots-1
         HashSlot                     *slots;  //!< memory
@@ -263,9 +315,9 @@ namespace yocto
                     hash_nodes.store(src.pop_back());
                 }
             }
-            while(ldata.size)
+            while(klist.size)
             {
-                data_nodes.store( ldata.pop_back() );
+                data_nodes.store( klist.pop_back() );
             }
         }
         
@@ -301,25 +353,35 @@ namespace yocto
         //! make new slots
         inline void rescale_slots( const size_t n )
         {
+            //__________________________________________________________________
+            //
             // acquire new slots
+            //__________________________________________________________________
             const size_t new_nslot = next_power_of_two( max_of<size_t>(n,MIN_SLOTS) );
             size_t       new_count = new_nslot;
             HashSlot    *new_slots = hmem.template acquire_as<HashSlot>(new_count);
             const size_t new_hmask = new_nslot - 1;
-            
+
+            //__________________________________________________________________
+            //
             // transfert nodes
+            //__________________________________________________________________
             for(size_t i=0;i<nslot;++i)
             {
                 HashSlot &src = slots[i];
                 while(src.size)
                 {
                     HashNode *node = src.pop_front();
+                    assert( i == (node->hkey & hmask) );
                     HashSlot &tgt  = new_slots[ node->hkey & new_hmask ];
                     tgt.push_back(node);
                 }
             }
             
+            //__________________________________________________________________
+            //
             // exchange memory
+            //__________________________________________________________________
             hmem.template release_as<HashSlot>(slots,count);
             nslot = new_nslot;
             slots = new_slots;
@@ -371,7 +433,7 @@ namespace yocto
                 const size_t new_nslot = max_of<size_t>(opt_cap/LOAD,MIN_SLOTS);
                 if(new_nslot>nslot)
                     rescale_slots(new_nslot);
-                assert(nslot>=capacity()/LOAD);
+                assert(nslot*LOAD>=capacity());
             }
             catch(...)
             {
