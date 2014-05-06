@@ -202,6 +202,8 @@ namespace yocto
             }
             assert( data_nodes.size() > 0 );
             assert( data_nodes.size() == hash_nodes.size() );
+            assert( nslot>0  );
+            assert( slots!=0 );
             
             const_key   &akey  = args;
             const size_t hkey = hash(akey);
@@ -270,6 +272,8 @@ namespace yocto
         inline void __release() throw()
         {
             __free();
+            data_nodes.clear();
+            hash_nodes.clear();
             hmem.template release_as<HashSlot>(slots,count);
             nslot = 0;
             hmask = nslot-1;
