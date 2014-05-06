@@ -6,10 +6,15 @@
 #include "yocto/core/list.hpp"
 #include "yocto/core/pool.hpp"
 #include "yocto/code/utils.hpp"
+#include "yocto/container/container.hpp"
 
 namespace yocto
 {
     
+    namespace hidden
+    {
+        extern const char lexicon_name[];
+    }
     
     //! each object IS a key
     /**
@@ -20,7 +25,7 @@ namespace yocto
     typename T,
     typename KEY_HASHER = key_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
-    class lexicon
+    class lexicon : public container
     {
     public:
         YOCTO_ASSOCIATIVE_KEY_T;
@@ -104,7 +109,7 @@ namespace yocto
             HashNode    *prev;
             const size_t hkey;
             DataNode    *addr;
-            inline  HashNode( size_t h, void *p ) throw() : next(0), prev(0), hkey(h), addr(p) { assert(p); }
+            inline  HashNode( size_t h, DataNode *p ) throw() : next(0), prev(0), hkey(h), addr(p) { assert(p); }
             inline ~HashNode() throw() {}
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(HashNode);
@@ -164,12 +169,16 @@ namespace yocto
         {
         }
         
-        inline virtual ~lexicon() throw()
-        {
-            __release();
-        }
+        inline virtual ~lexicon() throw() {  __release();  }
         
-        inline void free() throw() { __free(); }
+        inline virtual const char *name() const throw() { return hidden::lexicon_name; }
+        inline virtual void        free() throw() { __free(); }
+        inline virtual void        release() throw() { __release(); }
+        inline virtual size_t      size()      const throw() { return ldata.size; }
+        inline virtual size_t      capacity()  const throw() { return ldata.size + data_nodes.size(); }
+        inline         size_t      num_slots() const throw() { return nslot; }
+        inline virtual void        reserve(size_t n) { if(n>0) grow(n); }
+        
         
         inline type * search( param_key key ) throw()
         {
@@ -183,14 +192,48 @@ namespace yocto
             return node ? &(node->data) : 0;
         }
         
-        inline size_t size()      const throw() { return ldata.size; }
-        inline size_t capacity()  const throw() { return ldata.size + data_nodes.size(); }
-        inline size_t num_slots() const throw() { return nslot; }
-        inline void   reserve(size_t n)
+        
+        
+        inline bool insert( param_type args )
         {
-            if(n>0)
-                grow(n);
+            if( data_nodes.size() <= 0 )
+            {
+                grow( next_increase(size()) );
+            }
+            assert( data_nodes.size() > 0 );
+            assert( data_nodes.size() == hash_nodes.size() );
+            
+            const_key   &akey  = args;
+            const size_t hkey = hash(akey);
+            HashSlot    &slot = slots[ hkey & hmask ];
+            for(const HashNode *node = slot.head;node;node=node->next)
+            {
+                const DataNode *dn   = node->addr;
+                if(dn->key()==akey)
+                    return false;
+            }
+            
+            // get a data node, copy args
+            DataNode *dnode  = data_nodes.query(args);
+            
+            // get a hash node and put it in its slot
+            try
+            {
+                HashNode *hnode  = hash_nodes.query(hkey,dnode);
+                slot.push_front(hnode);
+            }
+            catch(...)
+            {
+                data_nodes.store(dnode);
+                throw;
+            }
+            
+            // put data in list
+            ldata.push_back(dnode);
+            
+            return true;
         }
+        
         
     private:
         core::list_of<DataNode>       ldata;  //!< key ordered data
@@ -200,7 +243,7 @@ namespace yocto
         size_t                        count;  //!< for memory
         
         DataNodePool                  data_nodes;
-        HashNodePool      hash_nodes;
+        HashNodePool                  hash_nodes;
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon);
@@ -280,6 +323,7 @@ namespace yocto
             hmask = new_hmask;
         }
         
+        //
         inline DataNode *lookup(const_key &k) const throw()
         {
             if(nslot<=0)
@@ -288,30 +332,39 @@ namespace yocto
             }
             else
             {
-                for( const HashNode *node = slots[hash(k)&hmask].head;node;node=node->next)
+                HashSlot &slot = slots[hash(k)&hmask];
+                for(HashNode *node = slot.head;node;node=node->next)
                 {
                     assert(node->addr);
-                    const DataNode *dn = node->addr;
+                    DataNode *dn = node->addr;
                     if(dn->key() == k)
                     {
-                        return (DataNode *)dn;
+                        slot.move_to_front(node);
+                        return dn;
                     }
                 }
                 return 0;
             }
         }
         
+        static inline size_t __load_align( size_t n ) throw()
+        {
+            while(0!=(n%LOAD)) ++n;
+            return n;
+        }
+        
         inline void grow(size_t n)
         {
             assert(n>0);
-            assert(nslot>=capacity()/LOAD);
+            assert(LOAD*nslot>=capacity());
             assert(data_nodes.size() == hash_nodes.size());
             const size_t num_nodes = data_nodes.size();
             try
             {
                 reserve_nodes(n);
                 const size_t new_cap   = capacity();
-                const size_t new_nslot = max_of<size_t>(new_cap/LOAD,MIN_SLOTS);
+                const size_t opt_cap   = __load_align(new_cap);
+                const size_t new_nslot = max_of<size_t>(opt_cap/LOAD,MIN_SLOTS);
                 if(new_nslot>nslot)
                     rescale_slots(new_nslot);
                 assert(nslot>=capacity()/LOAD);

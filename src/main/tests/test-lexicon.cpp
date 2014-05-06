@@ -79,7 +79,13 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
         SHOW(lx);
     }
     
-    
+    for(size_t i=1;i<=33;++i)
+    {
+        const AObj obj(i,"hello");
+        if( !lx.insert(obj) )
+            throw exception("can't insert object into lexicon");
+        SHOW(lx);
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()

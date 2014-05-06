@@ -2,5 +2,9 @@
 
 namespace yocto
 {
-    
+    namespace hidden
+    {
+        const char lexicon_name[] = "lexicon";
+        
+    }
 }
