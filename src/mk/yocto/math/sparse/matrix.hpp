@@ -37,6 +37,10 @@ namespace yocto
                 return os;
             }
             
+            void ldz() throw();
+            void ld1() throw(); 
+            void transpose();
+            
         private:
             YOCTO_DISABLE_ASSIGN(spmatrix);
             typedef set<sp_key,item_type,sp_key::hasher,allocator> item_set;
