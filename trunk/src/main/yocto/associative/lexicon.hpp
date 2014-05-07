@@ -10,6 +10,8 @@
 #include "yocto/core/list.hpp"
 #include "yocto/memory/slab.hpp"
 #include "yocto/code/htable.hpp"
+#include "yocto/sort/quick.hpp"
+#include "yocto/sequence/lw-array.hpp"
 
 #include <iostream>
 
@@ -76,7 +78,7 @@ namespace yocto
         slot(0),
         slots(0),
         pool(0,0),
-	hook(0),
+        hook(0),
         hash(),
         hmem(),
         wlen(0),
@@ -90,7 +92,7 @@ namespace yocto
         slot(0),
         slots(0),
         pool(0,0),
-	hook(0),
+        hook(0),
         hash(),
         hmem(),
         wlen(0),
@@ -136,10 +138,12 @@ namespace yocto
         inline void __insert( const size_t hkey, param_type args )
         {
             assert(items<itmax);
+            assert(pool.available() == itmax - items);
             assert(!find( args.key() ));
             assert(slot);
             assert(slots);
             register_hook( append_to( &slot[hkey%slots],hkey,args) );
+            assert(items<=itmax);
         }
         
         //! try to insert a new object
@@ -176,9 +180,11 @@ namespace yocto
             }
             else
             {
-                assert(itmax==0);
+                assert(0==itmax);
+                assert(0==items);
                 build(1); // minimal lexicon
                 __insert(hkey,args);
+                assert(1==items);
                 return true;
             }
         }
@@ -188,7 +194,7 @@ namespace yocto
         typedef iterating::handle<type,iterating::forward> iterator;
         inline iterator begin() throw() { return iterator(hook);       }
         inline iterator end()   throw() { return iterator(hook+items); }
-            
+        
         
     private:
         size_t items;  //!< current size
@@ -266,7 +272,7 @@ namespace yocto
             {
                 hook[i] = 0;
             }
-            
+            assert(pool.available()==itmax);
             items = 0;
         }
         
@@ -320,55 +326,65 @@ namespace yocto
             swap_with(tmp);
         }
         
+        
+        static int compare_hook_by_keys( const Hook &lhs, const Hook &rhs ) throw()
+        {
+            const_key &L = lhs->key();
+            const_key &R = rhs->key();
+            return L < R ? -1 : ( R < L ? 1 : 0 );
+        }
+            
         //______________________________________________________________________
         //
         // fast duplication
         //______________________________________________________________________
-        inline void duplicate_into( lexicon &lx ) const
+        inline void duplicate_into( lexicon &target ) const
         {
-            std::cerr << "dup.init" << std::endl;
-            assert(0==lx.size());
-            assert(lx.capacity()>=this->size());
+            assert(0==target.size());
+            assert(target.capacity()>=this->size());
             
+            //__________________________________________________________________
+            //
             // for all slots
-            size_t j = 0;
+            //__________________________________________________________________
             for(size_t i=0;i<slots;++i)
             {
-                // for all node
+                //______________________________________________________________
+                //
+                // for all nodes
+                //______________________________________________________________
                 assert(slot);
                 for( const Node *node = slot[i].head;node;node=node->next)
                 {
                     const size_t hkey = node->hkey;
-                    lx.hook[j] = lx.append_to( lx.slot + (hkey%lx.slots), hkey, node->data);
-                    ++j;
-                    // the hooks are not sorted
+                    Slot        *stgt = target.slot + (hkey%target.slots);
+                    target.hook[target.items] = target.append_to( stgt , hkey, node->data);
+                    ++target.items;
+                    // the target hooks are not sorted
                 }
             }
-            assert(items==j);
-            std::cerr << "dup.done" << std::endl;
-
+            assert(items==target.items);
+            lw_array<Hook> hooks(target.hook,target.items);
+            quicksort(hooks,compare_hook_by_keys);
         }
         
         //______________________________________________________________________
         //
-        // append a hook
+        // register a hook and increase #items
         //______________________________________________________________________
         inline void register_hook( type *addr ) throw()
         {
             assert(hook);
             assert(items<itmax);
             assert(addr!=0);
-        
-            //append addr at the end of hooks
-            size_t i = items;
-            hook[i]  = addr;
             
-            ++items;
+            //append addr at the end of hooks
+            hook[items++] = addr;
         }
         
         //______________________________________________________________________
         //
-        //
+        // make data and insert its node
         //______________________________________________________________________
         inline type *append_to( Slot *s, const size_t hkey, param_type args)
         {
@@ -385,7 +401,7 @@ namespace yocto
                 pool.store(node);
                 throw;
             }
-            return & node->data;
+            return & (node->data);
         }
         
     };
