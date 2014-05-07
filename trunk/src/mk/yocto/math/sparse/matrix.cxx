@@ -1,7 +1,9 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/sparse/matrix.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/exceptions.hpp"
+
+#include <cerrno>
 
 namespace yocto
 {
@@ -11,44 +13,28 @@ namespace yocto
         template <>
         spmatrix<z_type>:: ~spmatrix() throw()
         {
-            if(size>0)
-            {
-                assert(na>0);
-                ++sa;
-                memory::kind<memory::global>::release_as<z_type>(sa,na);
-                (size_t&)size = 0;
-            }
         }
         
-        template <>
-        void spmatrix<z_type>::build()
-        {
-            if(size>0)
-            {
-                na = size;
-                sa = memory::kind<memory::global>::acquire_as<z_type>(na)-1;
-            }
-            
-        }
         
         template <>
         spmatrix<z_type>:: spmatrix() throw() :
-        size(0),
-        sa(0),
-        na(0),
+        rows(0),
+        cols(0),
+        nmax(0),
         items()
         {
             
         }
         
         template <>
-        spmatrix<z_type>:: spmatrix(size_t n) :
-        size(n),
-        sa(0),
-        na(0),
+        spmatrix<z_type>:: spmatrix(size_t nr,size_t nc) :
+        rows(nr),
+        cols(nc),
+        nmax(rows*cols),
         items()
         {
-            build();
+            if ( (nr<=0&&nc>0) || (nr>0&&nc<=0) )
+                throw libc::exception(EINVAL,"invalid sparse matrix dimension");
         }
         
         template <>
@@ -56,27 +42,19 @@ namespace yocto
         {
             assert(i>0);
             assert(j>0);
-            assert(i<=size);
-            assert(j<=size);
-            if(i!=j)
+            assert(i<=rows);
+            assert(j<=cols);
+            const sp_key key(i,j);
+            item_type *p = items.search(key);
+            if(!p)
             {
-                const sp_key k(i,j);
-                item_type   *p = items.search(k);
-                if(!p)
-                {
-                    {
-                        const item_type it(i,j,numeric<z_type>::zero);
-                        items.insert__(it);
-                    }
-                    p = items.search(k);
-                    assert(0!=p);
-                }
-                return p->value;
+                const item_type it(i,j,numeric<z_type>::zero);
+                if(!items.insert(it))
+                    throw exception("unexpected sparse matrix insertion failure");
+                p = items.search(key);
+                assert(p);
             }
-            else
-            {
-                return sa[i];
-            }
+            return p->value;
         }
         
         template <>
@@ -84,66 +62,46 @@ namespace yocto
         {
             assert(i>0);
             assert(j>0);
-            assert(i<=size);
-            assert(j<=size);
-            if(i!=j)
-            {
-                const sp_key     k(i,j);
-                const item_type *p = items.search(k);
-                return p ? p->value : numeric<z_type>::zero;
-            }
-            else
-            {
-                return sa[i];
-            }
+            assert(i<=rows);
+            assert(j<=cols);
+            const sp_key key(i,j);
+            const item_type *p = items.search(key);
+            return p ? p->value : numeric<z_type>::zero;
         }
         
-        template <>
-        size_t spmatrix<z_type>::extras() const throw()
-        {
-            return items.size();
-        }
+        
         
         template <>
         void  spmatrix<z_type>:: output( std::ostream &os ) const
         {
             const spmatrix<z_type> &self = *this;
             os << "[";
-            for(size_t i=1;i<=size;++i)
+            for(size_t i=1;i<=rows;++i)
             {
-                for(size_t j=1;j<=size;++j)
+                for(size_t j=1;j<=cols;++j)
                 {
                     os << ' ' << self(i,j);
                 }
-                if(i<size) os << ';';
+                if(i<rows) os << ';';
             }
             os << "]";
         }
         
         template <>
+        void spmatrix<z_type>:: ensure(size_t num_items)
+        {
+            if(num_items>nmax) num_items = nmax;
+            if(num_items>items.capacity())
+                items.reserve(num_items-items.capacity());
+        }
+
+        
+        template <>
         void spmatrix<z_type>:: ldz() throw()
         {
             items.free();
-            for(size_t i=size;i>0;--i)
-            {
-                sa[i] = numeric<z_type>::zero;
-            }
         }
-        
-        template <>
-        void spmatrix<z_type>:: ld1() throw()
-        {
-            items.free();
-            for(size_t i=size;i>0;--i)
-            {
-                sa[i] = numeric<z_type>::zero;
-            }
-        }
-        
-        template <>
-        void spmatrix<z_type>:: transpose()
-        {
-        }
+
         
     }
     
