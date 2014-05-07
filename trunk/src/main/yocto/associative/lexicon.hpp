@@ -5,37 +5,23 @@
 #include "yocto/associative/key-hasher.hpp"
 
 #include "yocto/container/container.hpp"
-#include "yocto/container/iter-linked.hpp"
+#include "yocto/container/iter-handle.hpp"
 
 #include "yocto/core/list.hpp"
-#include "yocto/core/pool.hpp"
-#include "yocto/code/utils.hpp"
+#include "yocto/memory/slab.hpp"
+#include "yocto/code/htable.hpp"
 
 #include <iostream>
 
 namespace yocto
 {
     
+    
     namespace hidden
     {
         extern const char lexicon_name[];
-        void lexicon_hasher_is_invalid();
-        template <typename KEY>
-        class lexicon_hasher
-        {
-        public:
-            YOCTO_ARGUMENTS_DECL_KEY;
-            inline  lexicon_hasher() throw() {}
-            inline ~lexicon_hasher() throw() {}
-            inline size_t operator()(const_key &) const
-            {
-                lexicon_hasher_is_invalid();
-                return 0;
-            }
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon_hasher);
-        };
     }
+    
     
     //! each object IS a key
     /**
@@ -44,462 +30,360 @@ namespace yocto
     template <
     typename KEY,
     typename T,
-    typename KEY_HASHER = hidden::lexicon_hasher<KEY>,
+    typename KEY_HASHER = key_hasher<KEY>,
 	typename ALLOCATOR  = memory::global::allocator >
     class lexicon : public container
     {
     public:
         YOCTO_ASSOCIATIVE_KEY_T;
-        static const size_t LOAD      = 4;
-        static const size_t MIN_SLOTS = 4;
         
-        //======================================================================
-        // dynamic node to store data
-        //======================================================================
-        class DataNode
+        class Node
         {
         public:
-            DataNode     *next;
-            DataNode     *prev;
-            mutable_type  data;
-            inline const_key & key() const throw() { return data; }
-            
-            inline  DataNode( param_type args ) : next(0), prev(0), data(args) {}
-            inline ~DataNode() throw() {}
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(DataNode);
-        };
-        
-        class DataNodePool
-        {
-        public:
-            inline  DataNodePool() throw() {}
-            inline ~DataNodePool() throw() { clear(); }
-            
-            inline void clear() throw() { while(pool.size) object::release1( pool.query() ); }
-            inline void store( DataNode *alive ) throw()
-            {
-                assert(alive);
-                alive->data.~mutable_type();
-                pool.store(alive);
-            }
-            
-            inline DataNode *query( param_type args )
-            {
-                DataNode *node = pool.size ? pool.query() : object::acquire1<DataNode>();
-                try
-                {
-                    new (&(node->data)) mutable_type(args);
-                }
-                catch(...)
-                {
-                    pool.store(node);
-                    throw;
-                }
-                return node;
-            }
-            
-            inline void cache()
-            {
-                pool.store( object::acquire1<DataNode>() );
-            }
-            
-            inline void yield() throw()
-            {
-                assert(pool.size>0);
-                object::release1( pool.query() );
-            }
-            
-            inline size_t size() const throw() { return pool.size; }
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(DataNodePool);
-            core::pool_of<DataNode> pool;
-            
-        };
-        
-        
-        //======================================================================
-        // dynamic node to store hash key
-        //======================================================================
-        class HashNode
-        {
-        public:
-            HashNode    *next;
-            HashNode    *prev;
+            Node        *next;
+            Node        *prev;
             const size_t hkey;
-            DataNode    *addr;
-            inline  HashNode( size_t h, DataNode *p ) throw() : next(0), prev(0), hkey(h), addr(p) { assert(p); }
-            inline ~HashNode() throw() {}
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(HashNode);
-        };
-        
-        class HashNodePool
-        {
-        public:
-            inline  HashNodePool() throw() : pool() {}
-            inline ~HashNodePool() throw() {clear();}
+            type         data;
+            inline  Node(const size_t k, param_type &args) :
+            next(0),
+            prev(0),
+            hkey(k),
+            data(args) {}
             
-            inline void clear() throw() { while(pool.size) object::release1(pool.query()); }
-            inline void store(HashNode *node) throw()
-            {
-                assert(node);
-                node->addr = 0;
-                pool.store(node);
-            }
+            inline ~Node() throw() {}
             
-            inline HashNode *query( size_t hkey, DataNode *addr )
-            {
-                assert(addr);
-                return new ( pool.size ? pool.query() : object::acquire1<HashNode>() ) HashNode(hkey,addr);
-            }
-            
-            inline void cache()
-            {
-                pool.store( object::acquire1<HashNode>() );
-            }
-            
-            inline void yield() throw()
-            {
-                assert(pool.size>0);
-                object::release1( pool.query() );
-            }
-            
-            inline size_t size() const throw() { return pool.size; }
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(HashNodePool);
-            core::pool_of<HashNode> pool;
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Node);
         };
         
-        typedef core::list_of<HashNode> HashSlot;
-        
-        //======================================================================
-        // API
-        //======================================================================
-        inline explicit lexicon() throw() :
-        klist(),
-        nslot(0),
-        hmask(nslot-1),
-        slots(0),
-        count(0),
-        hash(),
-        hmem()
-        {
-        }
-        
-        inline virtual ~lexicon() throw() {  __release();  }
+        typedef core::list_of<Node>   Slot;
+        typedef memory::slab_of<Node> Pool;
+        typedef mutable_type         *Hook;
         
         inline virtual const char *name() const throw() { return hidden::lexicon_name; }
-        inline virtual void        free() throw() { __free(); }
-        inline virtual void        release() throw() { __release(); }
-        inline virtual size_t      size()      const throw() { return klist.size; }
-        inline virtual size_t      capacity()  const throw() { return klist.size + data_nodes.size(); }
-        inline         size_t      num_slots() const throw() { return nslot; }
-        inline virtual void        reserve(size_t n) { if(n>0) grow(n); }
+        inline virtual size_t size()      const throw() { return items; }
+        inline virtual size_t capacity()  const throw() { return itmax; }
+        inline         size_t num_lists() const throw() { return slots; }
+        inline virtual void   reserve(size_t n) { if(n) grow(n); }
+        inline virtual void   free() throw() { __free(); }
+        inline virtual void   release() throw() { __release(); }
+        inline         size_t bytes() const throw() { return wlen; }
+        
+        inline explicit lexicon() throw() :
+        items(0),
+        itmax(0),
+        slot(0),
+        slots(0),
+        pool(0,0),
+        hash(),
+        hmem(),
+        wlen(0),
+        wksp(0)
+        {
+        }
+        
+        inline explicit lexicon(size_t n) :
+        items(0),
+        itmax(0),
+        slot(0),
+        slots(0),
+        pool(0,0),
+        hash(),
+        hmem(),
+        wlen(0),
+        wksp(0)
+        {
+            build(n);
+        }
         
         
+        
+        
+        inline virtual ~lexicon() throw()
+        {
+            __release();
+        }
+        
+        //! no-throw swap
+        inline void swap_with( lexicon &other ) throw()
+        {
+            cswap(items, other.items);
+            cswap(itmax, other.itmax);
+            cswap(slot,  other.slot);
+            cswap(slots, other.slots);
+            pool.swap_with(other.pool);
+            cswap(hook,other.hook);
+            cswap(wlen,other.wlen);
+            cswap(wksp,other.wksp);
+        }
+        
+        //! no throw search
         inline type * search( param_key key ) throw()
         {
-            DataNode    *node = lookup(key);
-            return node ? &(node->data) : 0;
+            return find(key);
         }
         
+        //! no throw search
         inline const_type * search( param_key key ) const throw()
         {
-            DataNode    *node = lookup(key);
-            return node ? &(node->data) : 0;
+            return find(key);
         }
         
+        //! insert a new key/hkey, assuming enough room
+        inline void __insert( const size_t hkey, param_type args )
+        {
+            assert(items<itmax);
+            assert(!find( args.key() ));
+            assert(slot);
+            assert(slots);
+            register_hook( append_to( &slot[hkey%slots],hkey,args) );
+        }
         
-        
+        //! try to insert a new object
         inline bool insert( param_type args )
         {
-            if( data_nodes.size() <= 0 )
+            const_key   &key  = args.key();
+            const size_t hkey = hash(key);
+            if(slots)
             {
-                grow( next_increase(size()) );
-            }
-            assert( data_nodes.size() > 0 );
-            assert( data_nodes.size() == hash_nodes.size() );
-            assert( nslot>0  );
-            assert( slots!=0 );
-            
-            const_key   &akey = args;
-            const size_t hkey = hash(akey);
-            HashSlot    &slot = slots[ hkey & hmask ];
-            for(const HashNode *node = slot.head;node;node=node->next)
-            {
-                const DataNode *dn   = node->addr;
-                if(dn->key()==akey)
-                    return false;
-            }
-            
-            // get a data node, copy args
-            DataNode *dnode  = data_nodes.query(args);
-            
-            // get a hash node and put it in its slot
-            try
-            {
-                HashNode *hnode  = hash_nodes.query(hkey,dnode);
-                slot.push_front(hnode);
-            }
-            catch(...)
-            {
-                data_nodes.store(dnode);
-                throw;
-            }
-            
-            // put data in list
-            const_key &key = dnode->key();
-            if(klist.size<=0)
-            {
-                klist.push_back(dnode);
-            }
-            else
-            {
-                if(key<klist.head->key())
+                // look up
+                Slot *s = &slot[ hkey % slots ];
+                for(const Node *node = s->head;node;node=node->next)
                 {
-                    // smallest key
-                    klist.push_front(dnode);
+                    if(node->data.key() == key )
+                    {
+                        return false;
+                    }
+                }
+                
+                // key was not found
+                if(items>=itmax)
+                {
+                    lexicon tmp( this->next_capacity(itmax) );
+                    duplicate_into(tmp);
+                    tmp.__insert(hkey,args);
+                    swap_with(tmp);
                 }
                 else
                 {
-                    if(klist.tail->key()<key)
-                    {
-                        // biggest key
-                        klist.push_back(dnode);
-                    }
-                    else
-                    {
-                        // generic case
-                        assert(klist.size>=2);
-                        DataNode *prev = klist.head;
-                        DataNode *next = prev->next;
-                        assert(next);
-                        while(next)
-                        {
-                            if(key<next->key())
-                            {
-                                prev->next  = dnode;
-                                next->prev  = dnode;
-                                dnode->prev = prev;
-                                dnode->next = next;
-                                ++klist.size;
-                                break;
-                            }
-                            prev=next;
-                            next=next->next;
-                        }
-                    }
+                    assert(pool.available()>0);
+                    register_hook( append_to(s, hkey, args) );
                 }
-            }
-            
-            
-            return true;
-        }
-        
-        inline bool remove( param_key key ) throw()
-        {
-            if(slots)
-            {
-                HashSlot    &slot = slots[hash(key)&hmask];
-                for( HashNode *node = slot.head;node;node=node->next)
-                {
-                    DataNode *dn = node->addr;
-                    if( dn->key() == key )
-                    {
-                        data_nodes.store( klist.unlink(dn)  );
-                        hash_nodes.store( slot.unlink(node) );
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        
-        
-        //======================================================================
-		// iterators
-		//======================================================================
-		typedef iterating::linked<type,DataNode,iterating::forward> iterator;
-		inline iterator begin() throw() { return iterator(klist.head); }
-		inline iterator end()   throw() { return iterator(0);          }
-        
-        typedef iterating::linked<type,DataNode,iterating::reverse> reverse_iterator;
-		inline reverse_iterator rbegin() throw() { return reverse_iterator(klist.tail); }
-		inline reverse_iterator rend()   throw() { return reverse_iterator(0);          }
-		
-		typedef iterating::linked<const_type,const DataNode,iterating::forward> const_iterator;
-		inline const_iterator begin() const throw() { return const_iterator(klist.head); }
-		inline const_iterator end()   const throw() { return const_iterator(0);          }
-        
-        typedef iterating::linked<const_type,const DataNode,iterating::reverse> const_reverse_iterator;
-		inline const_reverse_iterator rbegin() const throw() { return const_reverse_iterator(klist.head); }
-		inline const_reverse_iterator rend()   const throw() { return const_reverse_iterator(0);          }
-        
-        //======================================================================
-        // fast access
-        //======================================================================
-        inline type       &front()       throw() { assert(klist.head); return klist.head->data; }
-        inline const_type &front() const throw() { assert(klist.head); return klist.head->data; }
-        inline type       &back()        throw() { assert(klist.head); return klist.tail->data; }
-        inline const_type &back()  const throw() { assert(klist.head); return klist.tail->data; }
-        
-        
-    private:
-        core::list_of<DataNode>       klist;  //!< key ordered data
-        size_t                        nslot;  //!< a power of two >= data_list/LOAD;
-        size_t                        hmask;  //!< num_slots-1
-        HashSlot                     *slots;  //!< memory
-        size_t                        count;  //!< for memory
-        
-        DataNodePool                  data_nodes;
-        HashNodePool                  hash_nodes;
-        
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon);
-        
-        mutable KEY_HASHER            hash;
-        ALLOCATOR                     hmem;
-        
-        inline void __free() throw()
-        {
-            for(size_t i=0;i<nslot;++i)
-            {
-                HashSlot &src = slots[i];
-                while(src.size)
-                {
-                    hash_nodes.store(src.pop_back());
-                }
-            }
-            while(klist.size)
-            {
-                data_nodes.store( klist.pop_back() );
-            }
-        }
-        
-        inline void __release() throw()
-        {
-            __free();
-            data_nodes.clear();
-            hash_nodes.clear();
-            hmem.template release_as<HashSlot>(slots,count);
-            nslot = 0;
-            hmask = nslot-1;
-        }
-        
-        //! reserve supplementary #nodes
-        inline void reserve_nodes( size_t n )
-        {
-            assert(data_nodes.size()==hash_nodes.size());
-            while(n-->0)
-            {
-                data_nodes.cache();
-                try
-                {
-                    hash_nodes.cache();
-                }
-                catch(...)
-                {
-                    data_nodes.yield();
-                    throw;
-                }
-            }
-        }
-        
-        //! make new slots
-        inline void rescale_slots( const size_t n )
-        {
-            //__________________________________________________________________
-            //
-            // acquire new slots
-            //__________________________________________________________________
-            const size_t new_nslot = next_power_of_two( max_of<size_t>(n,MIN_SLOTS) );
-            size_t       new_count = new_nslot;
-            HashSlot    *new_slots = hmem.template acquire_as<HashSlot>(new_count);
-            const size_t new_hmask = new_nslot - 1;
-            
-            //__________________________________________________________________
-            //
-            // transfert nodes
-            //__________________________________________________________________
-            for(size_t i=0;i<nslot;++i)
-            {
-                HashSlot &src = slots[i];
-                while(src.size)
-                {
-                    HashNode *node = src.pop_front();
-                    assert( i == (node->hkey & hmask) );
-                    HashSlot &tgt  = new_slots[ node->hkey & new_hmask ];
-                    tgt.push_back(node);
-                }
-            }
-            
-            //__________________________________________________________________
-            //
-            // exchange memory
-            //__________________________________________________________________
-            hmem.template release_as<HashSlot>(slots,count);
-            nslot = new_nslot;
-            slots = new_slots;
-            count = new_count;
-            hmask = new_hmask;
-        }
-        
-        // look up a key
-        inline DataNode *lookup(const_key &k) const throw()
-        {
-            if(nslot<=0)
-            {
-                return 0;
+                return true;
             }
             else
             {
-                HashSlot &slot = slots[hash(k)&hmask];
-                for(HashNode *node = slot.head;node;node=node->next)
-                {
-                    assert(node->addr);
-                    DataNode *dn = node->addr;
-                    if(dn->key() == k)
-                    {
-                        slot.move_to_front(node);
-                        return dn;
-                    }
-                }
-                return 0;
+                assert(itmax==0);
+                build(1); // minimal lexicon
+                __insert(hkey,args);
+                return true;
             }
         }
         
-        static inline size_t __load_align( size_t n ) throw()
+        
+        //! forward iterator
+        typedef iterating::handle<type,iterating::forward> iterator;
+        inline iterator begin() throw() { return iterator(hook);       }
+        inline iterator end()   throw() { return iterator(hook+items); }
+            
+        
+    private:
+        size_t items;  //!< current size
+        size_t itmax;  //!< maximum capacity
+        Slot  *slot;   //!< where slots are
+        size_t slots;  //!< #slots
+        Pool   pool;   //!< pool of embedded nodes
+        Hook  *hook;   //!< array of hook
+        
+        
+        mutable KEY_HASHER hash;
+        ALLOCATOR          hmem;
+        
+        size_t wlen;  //!< total allocated bytes
+        void  *wksp;  //!< where memory is
+        YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon);
+        
+        //______________________________________________________________________
+        //
+        // allocate and prepare memory
+        //______________________________________________________________________
+        void build(size_t n)
         {
-            while(0!=(n%LOAD)) ++n;
-            return n;
+            assert(0==items);
+            if(n>0)
+            {
+                // compute memory needs
+                size_t       num_items   = n;
+                const size_t num_slots   = htable::compute_slots_for(num_items);
+                const size_t slot_offset = 0;
+                const size_t slot_length = num_slots * sizeof(Slot);
+                
+                const size_t pool_offset = memory::align(slot_offset+slot_length);
+                const size_t pool_length = Pool::bytes_for(num_items);
+                
+                const size_t hook_offset = memory::align(pool_offset+pool_length);
+                const size_t hook_length = num_items * sizeof(Hook);
+                
+                // allocate
+                wlen = memory::align(hook_offset+hook_length);
+                wksp = hmem.acquire(wlen);
+                
+                //dispatch
+                uint8_t *p = (uint8_t *)wksp;
+                slot       = (Slot *) &p[slot_offset];
+                pool.         format( &p[pool_offset], num_items);
+                hook       = (Hook *) &p[hook_offset];
+                
+                // finish
+                itmax = num_items;
+                slots = num_slots;
+                
+                assert(pool.available()==itmax);
+            }
         }
         
+        //______________________________________________________________________
+        //
+        // free content, keep memory
+        //______________________________________________________________________
+        inline void __free() throw()
+        {
+            for(size_t i=0;i<slots;++i)
+            {
+                Slot &s = slot[i];
+                while(s.size)
+                {
+                    Node *node = s.pop_back();
+                    node->~Node();
+                    pool.store(node);
+                }
+            }
+            
+            for(size_t i=0;i<itmax;++i)
+            {
+                hook[i] = 0;
+            }
+            
+            items = 0;
+        }
+        
+        //______________________________________________________________________
+        //
+        // free content and memory
+        //______________________________________________________________________
+        inline void __release() throw()
+        {
+            __free();
+            pool.format(0,0);
+            itmax = 0;
+            slots = 0;
+            slot  = 0;
+            hook  = 0;
+            hmem.release(wksp,wlen);
+        }
+        
+        //______________________________________________________________________
+        //
+        // find an item
+        //______________________________________________________________________
+        inline type * find( param_key key ) const throw()
+        {
+            if(slots)
+            {
+                assert(slot);
+                Slot &s = slot[ hash(key) % slots ];
+                for(Node *node = s.head;node;node=node->next)
+                {
+                    if( node->data.key() == key )
+                    {
+                        //s.move_to_front(node);
+                        return & (node->data);
+                    }
+                }
+                
+            }
+            return 0;
+        }
+        
+        //______________________________________________________________________
+        //
+        // grow
+        //______________________________________________________________________
         inline void grow(size_t n)
         {
             assert(n>0);
-            assert(LOAD*nslot>=capacity());
-            assert(data_nodes.size() == hash_nodes.size());
-            const size_t num_nodes = data_nodes.size();
+            lexicon tmp( itmax+n );
+            duplicate_into(tmp);
+            swap_with(tmp);
+        }
+        
+        //______________________________________________________________________
+        //
+        // fast duplication
+        //______________________________________________________________________
+        inline void duplicate_into( lexicon &lx ) const
+        {
+            std::cerr << "dup.init" << std::endl;
+            assert(0==lx.size());
+            assert(lx.capacity()>=this->size());
+            
+            // for all slots
+            size_t j = 0;
+            for(size_t i=0;i<slots;++i)
+            {
+                // for all node
+                assert(slot);
+                for( const Node *node = slot[i].head;node;node=node->next)
+                {
+                    const size_t hkey = node->hkey;
+                    lx.hook[j] = lx.append_to( lx.slot + (hkey%lx.slots), hkey, node->data);
+                    ++j;
+                    // the hooks are not sorted
+                }
+            }
+            assert(items==j);
+            std::cerr << "dup.done" << std::endl;
+
+        }
+        
+        //______________________________________________________________________
+        //
+        // append a hook
+        //______________________________________________________________________
+        inline void register_hook( type *addr ) throw()
+        {
+            assert(hook);
+            assert(items<itmax);
+            assert(addr!=0);
+        
+            //append addr at the end of hooks
+            size_t i = items;
+            hook[i]  = addr;
+            
+            ++items;
+        }
+        
+        //______________________________________________________________________
+        //
+        //
+        //______________________________________________________________________
+        inline type *append_to( Slot *s, const size_t hkey, param_type args)
+        {
+            assert(s);
+            assert(slot+(hkey%slots)==s);
+            assert(pool.available()>0);
+            Node *node = pool.query();
             try
             {
-                reserve_nodes(n);
-                const size_t new_cap   = capacity();
-                const size_t opt_cap   = __load_align(new_cap);
-                const size_t new_nslot = max_of<size_t>(opt_cap/LOAD,MIN_SLOTS);
-                if(new_nslot>nslot)
-                    rescale_slots(new_nslot);
-                assert(nslot*LOAD>=capacity());
+                s->push_front( new (node) Node(hkey,args) );
             }
             catch(...)
             {
-                while( data_nodes.size() >= num_nodes ) data_nodes.yield();
-                while( hash_nodes.size() >= num_nodes ) hash_nodes.yield();
+                pool.store(node);
                 throw;
             }
+            return & node->data;
         }
         
     };
