@@ -7,139 +7,51 @@ using namespace yocto;
 
 namespace
 {
-    
-    class AKey
+    class AObj
     {
     public:
         const int code;
+        string    value;
         
-        inline AKey(int c) throw() : code(c) {}
-        virtual ~AKey() throw() {}
-        AKey( const AKey &a ) throw() : code(a.code) {}
-        
-        friend inline bool operator==( const AKey &l, const AKey &r ) throw()
+        inline AObj(int c, const char *s) :
+        code(c),
+        value(s)
         {
-            return l.code == r.code;
         }
         
-        friend inline bool operator<( const AKey &l, const AKey &r) throw()
-        {
-            return l.code < r.code;
-        }
+        inline ~AObj() throw() {}
         
+        inline const int & key() const throw() { return code; }
         
-        class Hasher
-        {
-        public:
-            Hasher() throw() {}
-            ~Hasher() throw() {}
-            
-            size_t operator()( const AKey &key ) const throw()
-            {
-                return key.code;
-            }
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(Hasher);
-        };
+        inline AObj( const AObj &other ) : code(other.code), value(other.value) {}
         
-    private:
-        YOCTO_DISABLE_ASSIGN(AKey);
-    };
-    
-    class AObj : public AKey
-    {
-    public:
-        string value;
-        
-        explicit AObj(int c, const char *s) : AKey(c), value(s) {}
-        virtual ~AObj() throw() {}
-        
-        AObj( const AObj &a ) : AKey(a), value(a.value) {}
-        
-        
-        
-    private:
-        YOCTO_DISABLE_ASSIGN(AObj);
-    };
-    
-    class AReal : public AKey
-    {
-    public:
-        double value;
-        
-        explicit AReal(int c, double s) throw(): AKey(c), value(s) {}
-        virtual ~AReal() throw() {}
-        
-        AReal( const AReal &a ) throw() : AKey(a), value(a.value) {}
-        
-        
-        
-    private:
         YOCTO_DISABLE_ASSIGN(AObj);
         
     };
-    
     
 }
 
-#define SHOWSZ(TYPE) std:: cerr << "sizeof" << #TYPE << "\t=\t" << sizeof TYPE << std::endl;
-#define SHOW(LX) std::cerr << "size=" << LX.size() << ", capa=" << LX.capacity() << ", #slots=" << LX.num_slots() << std::endl;
+#define SHOWLX(LX) std::cerr << "size=" << LX.size() << ", maxi=" << LX.capacity() << ", #lists=" << LX.num_lists() << ", allocated=" << LX.bytes() << std::endl
 
 YOCTO_UNIT_TEST_IMPL(lexicon)
 {
+    { lexicon<int,AObj> lx0; }
     
-    SHOWSZ((lexicon<AKey,AObj,AKey::Hasher>));
-    SHOWSZ((lexicon<AKey,AReal,AKey::Hasher>));
+    lexicon<int,AObj> lx(10);
     
-    lexicon<AKey,AObj,AKey::Hasher> lx;
-    const AKey k(1);
-    lx.search(k);
-    
-    for(size_t i=1;i<=20;++i)
+    SHOWLX(lx);
+    for(int i=50;i>0;--i)
     {
-        lx.reserve(1);
-        SHOW(lx);
-    }
-    
-    for(size_t i=1;i<=33;++i)
-    {
-        const AObj obj(i,"hello");
-        if( !lx.insert(obj) )
-            throw exception("can't insert object into lexicon");
-        SHOW(lx);
-    }
-    std::cerr << std::endl;
-    
-    lx.release();
-    for(size_t i=33;i>0;--i)
-    {
-        const AObj obj(i,"hello");
-        if( !lx.insert(obj) )
-            throw exception("can't insert object into lexicon");
-        SHOW(lx);
-        for( lexicon<AKey,AObj,AKey::Hasher>::iterator j=lx.begin();j!=lx.end();++j)
-        {
-            std::cerr << " " << (*j).code;
-        }
-        std::cerr << std::endl;
-    }
-    
-    for(size_t i=1;i<=33;++i)
-    {
-        const AKey key(i);
-        if(!lx.search(key) )
-            throw exception("Can't find key #%d", key.code);
+        const AObj a(i,"Hello");
+        if(!lx.insert(a) )
+            throw exception("can't insert #%d", i);
         
-        if( !lx.remove(key) )
-            throw exception("can't remove key #%d", key.code);
-        SHOW(lx);
-        for( lexicon<AKey,AObj,AKey::Hasher>::iterator j=lx.begin();j!=lx.end();++j)
+        SHOWLX(lx);
+        for( lexicon<int, AObj>::iterator j=lx.begin();j!=lx.end();++j)
         {
             std::cerr << " " << (*j).code;
         }
         std::cerr << std::endl;
     }
-    
 }
 YOCTO_UNIT_TEST_DONE()
