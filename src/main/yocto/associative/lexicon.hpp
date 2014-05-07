@@ -201,6 +201,12 @@ namespace yocto
         inline iterator begin() throw() { return iterator(hook);       }
         inline iterator end()   throw() { return iterator(hook+items); }
         
+        //! forward const iterator
+        typedef iterating::handle<const_type,iterating::forward> const_iterator;
+        inline const_iterator begin() const throw() { return const_iterator(hook);       }
+        inline const_iterator end()   const throw() { return const_iterator(hook+items); }
+
+        
         
     private:
         size_t items;  //!< current size
