@@ -257,6 +257,7 @@ namespace yocto
         //______________________________________________________________________
         inline void __free() throw()
         {
+            // destruct nodes+data
             for(size_t i=0;i<slots;++i)
             {
                 Slot &s = slot[i];
@@ -267,12 +268,11 @@ namespace yocto
                     pool.store(node);
                 }
             }
-            
-            for(size_t i=0;i<itmax;++i)
+            // clear hooks
+            for(size_t i=0;i<items;++i)
             {
                 hook[i] = 0;
             }
-            assert(pool.available()==itmax);
             items = 0;
         }
         
