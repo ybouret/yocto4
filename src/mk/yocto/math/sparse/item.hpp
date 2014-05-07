@@ -23,6 +23,11 @@ namespace yocto
                 return lhs.row == rhs.row && lhs.col == rhs.col;
             }
             
+            friend inline bool operator<( const sp_key &lhs, const sp_key &rhs ) throw()
+            {
+                return lhs.row < rhs.row || (lhs.row==rhs.row && lhs.col<rhs.col);
+            }
+            
             //! dedicated hasher
             class hasher
             {
@@ -47,7 +52,6 @@ namespace yocto
             sp_key(r,c),
             value(x)
             {
-                assert(row!=col);
             }
             inline virtual ~sp_item() throw() {}
             
