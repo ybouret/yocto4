@@ -28,6 +28,7 @@ namespace yocto
     //! each object IS a key
     /**
      The key part of each object MUST be constant...
+     The keys MUST have an operator== and and operator<.
      */
     template <
     typename KEY,
@@ -153,7 +154,10 @@ namespace yocto
             const size_t hkey = hash(key);
             if(slots)
             {
+                //______________________________________________________________
+                //
                 // look up
+                //______________________________________________________________
                 Slot *s = &slot[ hkey % slots ];
                 for(const Node *node = s->head;node;node=node->next)
                 {
@@ -163,7 +167,10 @@ namespace yocto
                     }
                 }
                 
+                //______________________________________________________________
+                //
                 // key was not found
+                //______________________________________________________________
                 if(items>=itmax)
                 {
                     lexicon tmp( this->next_capacity(itmax) );
@@ -184,7 +191,6 @@ namespace yocto
                 assert(0==items);
                 build(1); // minimal lexicon
                 __insert(hkey,args);
-                assert(1==items);
                 return true;
             }
         }
@@ -221,7 +227,10 @@ namespace yocto
             assert(0==items);
             if(n>0)
             {
+                //______________________________________________________________
+                //
                 // compute memory needs
+                //______________________________________________________________
                 size_t       num_items   = n;
                 const size_t num_slots   = htable::compute_slots_for(num_items);
                 const size_t slot_offset = 0;
@@ -233,21 +242,29 @@ namespace yocto
                 const size_t hook_offset = memory::align(pool_offset+pool_length);
                 const size_t hook_length = num_items * sizeof(Hook);
                 
+                //______________________________________________________________
+                //
                 // allocate
+                //______________________________________________________________
                 wlen = memory::align(hook_offset+hook_length);
                 wksp = hmem.acquire(wlen);
                 
+                //______________________________________________________________
+                //
                 //dispatch
+                //______________________________________________________________
                 uint8_t *p = (uint8_t *)wksp;
                 slot       = (Slot *) &p[slot_offset];
                 pool.         format( &p[pool_offset], num_items);
                 hook       = (Hook *) &p[hook_offset];
                 
+                //______________________________________________________________
+                //
                 // finish
+                //______________________________________________________________
                 itmax = num_items;
                 slots = num_slots;
                 
-                assert(pool.available()==itmax);
             }
         }
         
@@ -305,11 +322,9 @@ namespace yocto
                 {
                     if( node->data.key() == key )
                     {
-                        //s.move_to_front(node);
                         return & (node->data);
                     }
                 }
-                
             }
             return 0;
         }
@@ -379,7 +394,19 @@ namespace yocto
             assert(addr!=0);
             
             //append addr at the end of hooks
-            hook[items++] = addr;
+            size_t j = items++;
+            hook[j]  = addr;
+            while(j>0)
+            {
+                Hook &curr = hook[j];
+                Hook &prev = hook[--j];
+                if( curr->key()<prev->key() )
+                {
+                    cswap(curr,prev);
+                }
+                else
+                    return;
+            }
         }
         
         //______________________________________________________________________
