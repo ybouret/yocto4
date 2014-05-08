@@ -54,7 +54,7 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
         std::cerr << std::endl;
     }
     
-    for(int i=1;i<=10;i+=2)
+    for(int i=1;i<=50;i+=2)
     {
         if( ! lx.search(i) )
             throw exception("Missing #%d",i);
@@ -67,6 +67,12 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
         }
         std::cerr << std::endl;
     }
+    for(int i=1;i<=50;++i)
+    {
+        if( lx.search(i) && !lx.remove(i) )
+            throw exception("Can't remove #%d",i);
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
