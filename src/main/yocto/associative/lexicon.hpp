@@ -495,8 +495,6 @@ namespace yocto
                     {
                         bmove(hook[i], hook[i+1]);
                     }
-                    
-                   
                     return;
                 }
                 else
