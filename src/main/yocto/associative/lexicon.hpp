@@ -25,8 +25,9 @@ namespace yocto
     }
     
     
-    //! each object IS a key
+    //! compact set
     /**
+     Each object must have a 'const_key &key() const throw()' function.
      The key part of each object MUST be constant...
      The keys MUST have an operator== and and operator<.
      */
@@ -135,7 +136,7 @@ namespace yocto
             return find(key);
         }
         
-        //! insert a new key/hkey, assuming enough room
+        //! insert a NEW key/hkey, assuming enough room
         inline void __insert( const size_t hkey, param_type args )
         {
             assert(items<itmax);
@@ -195,6 +196,24 @@ namespace yocto
             }
         }
         
+        inline bool remove( param_key key ) throw()
+        {
+            if(slots)
+            {
+                const size_t hkey = hash(key);
+                Slot *s = &slot[hkey%slots];
+                for(Node *node = s->head;node;node=node->next)
+                {
+                    if(key == node->data.key() )
+                    {
+                        __remove( s->unlink(node) );
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
         
         //! forward iterator
         typedef iterating::handle<type,iterating::forward> iterator;
@@ -205,7 +224,7 @@ namespace yocto
         typedef iterating::handle<const_type,iterating::forward> const_iterator;
         inline const_iterator begin() const throw() { return const_iterator(hook);       }
         inline const_iterator end()   const throw() { return const_iterator(hook+items); }
-
+        
         
         
     private:
@@ -352,9 +371,9 @@ namespace yocto
         {
             const_key &L = lhs->key();
             const_key &R = rhs->key();
-            return L < R ? -1 : ( R < L ? 1 : 0 );
+            return (L < R) ? -1 : ( R < L ? 1 : 0 );
         }
-            
+        
         //______________________________________________________________________
         //
         // fast duplication
@@ -411,7 +430,9 @@ namespace yocto
                     cswap(curr,prev);
                 }
                 else
+                {
                     return;
+                }
             }
         }
         
@@ -437,6 +458,61 @@ namespace yocto
             return & (node->data);
         }
         
+        //______________________________________________________________________
+        //
+        // make data and insert its node
+        //______________________________________________________________________
+        inline void __remove(Node *node) throw()
+        {
+            assert(items>0);
+            const_key &key = node->data.key();
+            
+            //__________________________________________________________________
+            //
+            // locate the handle
+            //__________________________________________________________________
+            size_t lo = 0;
+            size_t hi = items-1;
+            while(true)
+            {
+                const size_t mid = lo+((hi-lo)>>1);
+                const Hook   h   = hook[mid];
+                if(h->key() == key )
+                {
+                    //__________________________________________________________
+                    //
+                    // remove node/data
+                    //__________________________________________________________
+                    node->~Node();
+                    pool.store(node);
+                    
+                    //__________________________________________________________
+                    //
+                    // move data
+                    //__________________________________________________________
+                    --items;
+                    for(size_t i=mid;i<items;++i)
+                    {
+                        bmove(hook[i], hook[i+1]);
+                    }
+                    
+                   
+                    return;
+                }
+                else
+                {
+                    if(h->key()<key )
+                    {
+                        lo = mid+1;
+                    }
+                    else
+                    {
+                        hi = mid-1;
+                    }
+                }
+            }
+            
+        }
     };
     
     

@@ -53,5 +53,20 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
         }
         std::cerr << std::endl;
     }
+    
+    for(int i=1;i<=10;i+=2)
+    {
+        if( ! lx.search(i) )
+            throw exception("Missing #%d",i);
+        if( !lx.remove(i) )
+            throw exception("can't remove #%d",i);
+        SHOWLX(lx);
+        for( lexicon<int, AObj>::iterator j=lx.begin();j!=lx.end();++j)
+        {
+            std::cerr << " " << (*j).code;
+        }
+        std::cerr << std::endl;
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
