@@ -2,6 +2,7 @@
 #include "yocto/math/sparse/matrix.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/sequence/vector.hpp"
 
 #include <cerrno>
 
@@ -11,13 +12,13 @@ namespace yocto
     namespace math
     {
         template <>
-        spmatrix<z_type>:: ~spmatrix() throw()
+        sp_matrix<z_type>:: ~sp_matrix() throw()
         {
         }
         
         
         template <>
-        spmatrix<z_type>:: spmatrix() throw() :
+        sp_matrix<z_type>:: sp_matrix() throw() :
         rows(0),
         cols(0),
         nmax(0),
@@ -27,7 +28,7 @@ namespace yocto
         }
         
         template <>
-        spmatrix<z_type>:: spmatrix(size_t nr,size_t nc) :
+        sp_matrix<z_type>:: sp_matrix(size_t nr,size_t nc) :
         rows(nr),
         cols(nc),
         nmax(rows*cols),
@@ -38,7 +39,7 @@ namespace yocto
         }
         
         template <>
-        z_type & spmatrix<z_type>:: operator()(size_t i,size_t j)
+        z_type & sp_matrix<z_type>:: operator()(size_t i,size_t j)
         {
             assert(i>0);
             assert(j>0);
@@ -58,7 +59,7 @@ namespace yocto
         }
         
         template <>
-        z_type spmatrix<z_type>:: operator()(size_t i, size_t j) const throw()
+        z_type sp_matrix<z_type>:: operator()(size_t i, size_t j) const throw()
         {
             assert(i>0);
             assert(j>0);
@@ -72,9 +73,9 @@ namespace yocto
         
         
         template <>
-        void  spmatrix<z_type>:: output( std::ostream &os ) const
+        void  sp_matrix<z_type>:: output( std::ostream &os ) const
         {
-            const spmatrix<z_type> &self = *this;
+            const sp_matrix<z_type> &self = *this;
             os << "[";
             for(size_t i=1;i<=rows;++i)
             {
@@ -88,20 +89,41 @@ namespace yocto
         }
         
         template <>
-        void spmatrix<z_type>:: ensure(size_t num_items)
+        void sp_matrix<z_type>:: ensure(size_t n)
         {
-            if(num_items>nmax) num_items = nmax;
-            if(num_items>items.capacity())
-                items.reserve(num_items-items.capacity());
+            if(n >nmax) n = nmax;
+            if(n >items.capacity())
+                items.reserve(n-items.capacity());
         }
-
+        
         
         template <>
-        void spmatrix<z_type>:: ldz() throw()
+        void sp_matrix<z_type>:: ldz() throw()
         {
             items.free();
         }
-
+        
+        
+        template <>
+        void sp_matrix<z_type>::cleanup( real_type threshold ) throw()
+        {
+            vector<sp_key> keys;
+            // collect keys
+            for(size_t i=items.size();i>0;--i)
+            {
+                const item_type &it = items[i];
+                if( Fabs(it.value) <= threshold)
+                {
+                    keys.push_back(it);
+                }
+            }
+            // remove keys
+            for(size_t i=keys.size();i>0;--i)
+            {
+                (void) items.remove( keys[i] );
+            }
+        }
+        
         
     }
     
