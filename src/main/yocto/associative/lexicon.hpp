@@ -81,6 +81,7 @@ namespace yocto
         slots(0),
         pool(0,0),
         hook(0),
+        hvec(0),
         hash(),
         hmem(),
         wlen(0),
@@ -95,6 +96,7 @@ namespace yocto
         slots(0),
         pool(0,0),
         hook(0),
+        hvec(0),
         hash(),
         hmem(),
         wlen(0),
@@ -120,6 +122,7 @@ namespace yocto
             cswap(slots, other.slots);
             pool.swap_with(other.pool);
             cswap(hook,other.hook);
+            cswap(hvec,other.hvec);
             cswap(wlen,other.wlen);
             cswap(wksp,other.wksp);
         }
@@ -225,6 +228,25 @@ namespace yocto
         inline const_iterator begin() const throw() { return const_iterator(hook);       }
         inline const_iterator end()   const throw() { return const_iterator(hook+items); }
         
+        //! fast access
+        inline type & operator[](size_t i) throw()
+        {
+            assert(i>=1);
+            assert(i<=items);
+            assert(hvec);
+            assert(hvec[i]);
+            return *hvec[i];
+        }
+        
+        //! fast access
+        inline const_type & operator[](size_t i) const throw()
+        {
+            assert(i>=1);
+            assert(i<=items);
+            assert(hvec);
+            assert(hvec[i]);
+            return *hvec[i];
+        }
         
         
     private:
@@ -234,7 +256,7 @@ namespace yocto
         size_t slots;  //!< #slots
         Pool   pool;   //!< pool of embedded nodes
         Hook  *hook;   //!< array of hook
-        
+        Hook  *hvec;   //!< hook-1, for access
         
         mutable KEY_HASHER hash;
         ALLOCATOR          hmem;
@@ -247,7 +269,7 @@ namespace yocto
         //
         // allocate and prepare memory
         //______________________________________________________________________
-        void build(size_t n)
+        inline void build(size_t n)
         {
             assert(0==items);
             if(n>0)
@@ -282,6 +304,7 @@ namespace yocto
                 slot       = (Slot *) &p[slot_offset];
                 pool.         format( &p[pool_offset], num_items);
                 hook       = (Hook *) &p[hook_offset];
+                hvec       = hook-1;
                 
                 //______________________________________________________________
                 //
@@ -499,6 +522,10 @@ namespace yocto
                 }
                 else
                 {
+                    //__________________________________________________________
+                    //
+                    // bisection part
+                    //__________________________________________________________
                     if(h->key()<key )
                     {
                         lo = mid+1;

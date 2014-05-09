@@ -9,11 +9,11 @@ using namespace math;
 template <typename T>
 static inline void __test_sp()
 {
-    { spmatrix<T> S0; }
+    { sp_matrix<T> S0; }
     
     for(size_t n=1;n<=10;++n)
     {
-        spmatrix<T> S(n,n);
+        sp_matrix<T> S(n,n);
         const size_t n2 = S.rows * S.cols;
         for(size_t k=n2/2;k>0;--k)
         {
