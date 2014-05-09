@@ -26,9 +26,12 @@ namespace yocto
             const size_t cols;
             const size_t nmax;
             
+            virtual ~sp_matrix() throw();
+
             explicit sp_matrix() throw();
             explicit sp_matrix(size_t nr,size_t nc);
-            virtual ~sp_matrix() throw();
+            sp_matrix(const sp_matrix &M);
+            sp_matrix(const matrix<T> &M, real_type threshold);
             
             T & operator()(size_t i,size_t j);
             T   operator()(size_t i,size_t j) const throw();
@@ -42,6 +45,7 @@ namespace yocto
             }
             
             void ldz() throw();
+            void transpose() throw();
             
             void ensure(size_t n);
             void cleanup( real_type threshold ) throw();

@@ -105,6 +105,23 @@ namespace yocto
             build(n);
         }
         
+        inline lexicon( const lexicon &other ) :
+        items(0),
+        itmax(0),
+        slot(0),
+        slots(0),
+        pool(0,0),
+        hook(0),
+        hvec(0),
+        hash(),
+        hmem(),
+        wlen(0),
+        wksp(0)
+        {
+            lexicon tmp( other.size() );
+            other.duplicate_into(tmp);
+            swap_with(tmp);
+        }
         
         
         
@@ -248,6 +265,39 @@ namespace yocto
             return *hvec[i];
         }
         
+        //! dangerous but funny method...
+        inline void alter_keys( void (*alter_key)(key_type &) ) throw()
+        {
+            assert(alter_key);
+            //__________________________________________________________________
+            //
+            // collect all active nodes
+            //__________________________________________________________________
+            Slot db;
+            for(size_t i=0;i<slots;++i)
+            {
+                db.merge_back( slot[i] );
+            }
+            
+            //__________________________________________________________________
+            //
+            // alter all keys and redispatch
+            //__________________________________________________________________
+            while(db.size)
+            {
+                Node *node = db.pop_back();
+                const_key &key = node->data.key();
+                alter_key( (key_type&)key );
+                (size_t&)(node->hkey) = hash(key);
+                slot[ node->hkey % slots ].push_back(node);
+            }
+            
+            //__________________________________________________________________
+            //
+            // resort hooks
+            //__________________________________________________________________
+            sort_hooks_of(*this);
+        }
         
     private:
         size_t items;  //!< current size
@@ -263,7 +313,7 @@ namespace yocto
         
         size_t wlen;  //!< total allocated bytes
         void  *wksp;  //!< where memory is
-        YOCTO_DISABLE_COPY_AND_ASSIGN(lexicon);
+        YOCTO_DISABLE_ASSIGN(lexicon);
         
         //______________________________________________________________________
         //
@@ -389,12 +439,22 @@ namespace yocto
             swap_with(tmp);
         }
         
+        //______________________________________________________________________
+        //
+        // hook sorting
+        //______________________________________________________________________
         
         static int compare_hook_by_keys( const Hook &lhs, const Hook &rhs ) throw()
         {
             const_key &L = lhs->key();
             const_key &R = rhs->key();
             return (L < R) ? -1 : ( R < L ? 1 : 0 );
+        }
+        
+        inline static void sort_hooks_of( lexicon &target )
+        {
+            lw_array<Hook> hooks(target.hook,target.items);
+            quicksort(hooks,compare_hook_by_keys);
         }
         
         //______________________________________________________________________
@@ -427,8 +487,7 @@ namespace yocto
                 }
             }
             assert(items==target.items);
-            lw_array<Hook> hooks(target.hook,target.items);
-            quicksort(hooks,compare_hook_by_keys);
+            sort_hooks_of(target);
         }
         
         //______________________________________________________________________

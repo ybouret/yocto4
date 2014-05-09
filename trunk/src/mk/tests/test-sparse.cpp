@@ -13,7 +13,7 @@ static inline void __test_sp()
     
     for(size_t n=1;n<=10;++n)
     {
-        sp_matrix<T> S(n,n);
+        sp_matrix<T> S(1+alea_leq(n),1+alea_leq(n));
         const size_t n2 = S.rows * S.cols;
         for(size_t k=n2/2;k>0;--k)
         {
@@ -21,7 +21,9 @@ static inline void __test_sp()
             const size_t j = 1 + alea_lt(S.cols);
             S(i,j) = T(alea<float>());
         }
-        std::cerr << "S" << n << " = " << S << std::endl;
+        std::cerr << "S" << n << "  = " << S << std::endl;
+        S.transpose();
+        std::cerr << "S" << n << "' ="  << S << std::endl;
     }
     
     
