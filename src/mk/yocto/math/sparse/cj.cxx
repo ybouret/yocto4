@@ -2,6 +2,8 @@
 #include "yocto/math/sparse/cj.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/math/sparse/algebra.hpp"
+#include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 namespace yocto
 {
@@ -106,6 +108,7 @@ namespace yocto
             assert(A.rows==b.size());
             assert(A.cols==p.size());
             
+            static const real_t ftol = 1e-5;
             
             const size_t n = p.size();
             g.make(n,0);
@@ -121,19 +124,64 @@ namespace yocto
             //
             // initialize algorithm
             //__________________________________________________________________
-            real_t fp = Phi(A,p,b,xi);
+            real_t f0 = Phi(A,p,b,xi);
             for(size_t j=n;j>0;--j)
             {
                 g[j] = -xi[j];
                 xi[j]=h[j]=g[j];
             }
+            
+            
             while(true)
             {
                 //______________________________________________________________
                 //
                 // line minimisation of phi along xi
                 //______________________________________________________________
+                triplet<real_t> xx = { 0,  1,         0 };
+                triplet<real_t> ff = { f0, phi(xx.b), 0 };
+                bracket<real_t>::expand(phi, xx, ff);
+                minimize<real_t>(phi, xx, ff, ftol);
+                for(size_t j=n;j>0;--j)
+                {
+                     p[j] += xx.b * xi[j];
+                }
+                const real_t f1 = Phi(A,p,b,xi); // gradient is recomputed in xi
                 
+                //______________________________________________________________
+                //
+                // test convergence
+                //______________________________________________________________
+                
+                //______________________________________________________________
+                //
+                // conjugated direction
+                //______________________________________________________________
+                real_t gg  = 0;
+                real_t dgg = 0;
+                for(size_t j=n;j>0;--j)
+                {
+                    gg  += g[j] * g[j];
+                    dgg += (xi[j]+g[j])*g[j];
+                }
+                
+                if(gg<=0)
+                {
+                    return; //! special numeric case
+                }
+                
+                const real_t gam = dgg/gg;
+                for(size_t j=n;j>0;--j)
+                {
+                    g[j] = -xi[j];
+                    xi[j]=h[j]=g[j]+gam*h[j];
+                }
+                
+                //______________________________________________________________
+                //
+                // continue
+                //______________________________________________________________
+                f0 = f1;
             }
         }
         
