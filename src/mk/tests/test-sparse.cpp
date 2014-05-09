@@ -34,9 +34,8 @@ YOCTO_UNIT_TEST_IMPL(sparse)
 {
     __test_sp<float>();
     __test_sp<double>();
-    __test_sp< complex<float> >();
+    __test_sp< complex<float>  >();
     __test_sp< complex<double> >();
-
 }
 YOCTO_UNIT_TEST_DONE()
 
