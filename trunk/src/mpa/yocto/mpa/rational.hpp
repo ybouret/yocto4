@@ -23,12 +23,23 @@ namespace yocto
             void xch(rational &other) throw();
             rational(const int64_t __num);
             rational(const int64_t __num,const uint64_t __den);
-            
+            rational( const integer &N, const natural &D); //simplify
+
             // ADD
             static rational add( const rational &lhs, const rational &rhs);
             inline friend rational operator+(const rational &lhs, const rational &rhs)
             {
                 return add(lhs,rhs);
+            }
+            inline friend rational operator+(const rational &lhs, const int64_t rhs)
+            {
+                const rational R(rhs);
+                return add(lhs,R);
+            }
+            inline friend rational operator+(const int64_t lhs, const rational &rhs)
+            {
+                const rational L(lhs);
+                return add(L,rhs);
             }
             
             inline rational & operator+=( const rational &rhs )
@@ -37,6 +48,14 @@ namespace yocto
                 xch(tmp);
                 return *this;
             }
+            
+            inline rational & operator+=( const int64_t rhs )
+            {
+                rational tmp = add(*this,rhs);
+                xch(tmp);
+                return *this;
+            }
+
             
             
             // SUB
@@ -82,7 +101,6 @@ namespace yocto
             
             
         private:
-            explicit rational( const integer &N, const natural &D); //simplify
         };
         
     }
