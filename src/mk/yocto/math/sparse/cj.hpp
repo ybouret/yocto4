@@ -20,7 +20,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(sp_cgrad);
-            vector<T> g,h,xi,z,q;
+            vector<T> g,h,xi,z,q,r;
         };
         
     }

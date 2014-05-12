@@ -227,7 +227,7 @@ H(), db(16,as_capacity)
                 //--------------------------------------------------------------
                 const int64_t  rcoff = rc->tell();
                 
-                std::cerr << "rc: #" << i << "@" << int(rcoff) << "+" << int(rclen) << std::endl;
+                //std::cerr << "rc: #" << i << "@" << int(rcoff) << "+" << int(rclen) << std::endl;
                 // create resource
                 const item it( rcname, rcoff, rclen );
                 if( !db.insert(it) )

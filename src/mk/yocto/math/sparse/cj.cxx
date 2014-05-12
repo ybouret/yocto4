@@ -22,7 +22,7 @@ namespace yocto
         
         template <>
         sp_cgrad<real_t>:: sp_cgrad() throw() :
-        g(),h(),xi(),z()
+        g(),h(),xi(),z(),r()
         {
             
         }
@@ -33,7 +33,8 @@ namespace yocto
         h(n,as_capacity),
         xi(n,as_capacity),
         z(n,as_capacity),
-        q(n,as_capacity)
+        q(n,as_capacity),
+        r(n,as_capacity)
         {
             
         }
@@ -44,17 +45,21 @@ namespace yocto
             real_t Phi(const sp_matrix<real_t> &A,
                        const array<real_t>     &p,
                        const array<real_t>     &b,
-                       array<real_t>           &gr )
+                       array<real_t>           &grad,
+                       array<real_t>           &r)
             {
+                // residual
+                mkl::neg(r,b);
+                skl::muladd(r,A,p);
+                
                 // gradient
-                mkl::neg(gr,b);
-                skl::muladd(gr,A,p);
+                skl::mul_trn(grad, A, r);
                 
                 // phi
                 real_t ans = REAL(0.0);
-                for(size_t i=gr.size();i>0;--i)
+                for(size_t i=r.size();i>0;--i)
                 {
-                    const real_t xx  = gr[i];
+                    const real_t xx  = r[i];
                     ans += xx*xx;
                 }
                 return REAL(0.5) * ans;
@@ -69,13 +74,15 @@ namespace yocto
                              const array<real_t>     &pref,
                              array<real_t>           &qref,
                              const array<real_t>     &xiref,
-                             array<real_t>           &zref) throw() :
+                             array<real_t>           &zref,
+                             array<real_t>           &rref) throw() :
                 A(Aref),
                 b(bref),
                 p(pref),
                 q(qref),
                 xi(xiref),
-                z(zref)
+                z(zref),
+                r(rref)
                 {
                 }
                 
@@ -85,6 +92,7 @@ namespace yocto
                 array<real_t>           &q;
                 const array<real_t>     &xi;
                 array<real_t>           &z;
+                array<real_t>           &r;
                 
                 real_t phi( real_t lam )
                 {
@@ -92,7 +100,7 @@ namespace yocto
                     {
                         q[i] = p[i] + lam * xi[i];
                     }
-                    return Phi(A,q,b,z);
+                    return Phi(A,q,b,z,r);
                 }
                 
             private:
@@ -116,15 +124,16 @@ namespace yocto
             xi.make(n,0);
             z.make(n,0);
             q.make(n,0);
+            r.make(n,0);
             
-            spcj                      wrapper(A,b,p,q,xi,z);
+            spcj                      wrapper(A,b,p,q,xi,z,r);
             numeric<real_t>::function phi( &wrapper, & spcj::phi );
             
             //__________________________________________________________________
             //
             // initialize algorithm
             //__________________________________________________________________
-            real_t f0 = Phi(A,p,b,xi);
+            real_t f0 = Phi(A,p,b,xi,r);
             for(size_t j=n;j>0;--j)
             {
                 g[j] = -xi[j];
@@ -132,6 +141,7 @@ namespace yocto
             }
             
             
+            size_t count = 0;
             while(true)
             {
                 //______________________________________________________________
@@ -146,7 +156,7 @@ namespace yocto
                 {
                      p[j] += xx.b * xi[j];
                 }
-                const real_t f1 = Phi(A,p,b,xi); // gradient is recomputed in xi
+                const real_t f1 = Phi(A,p,b,xi,r); // gradient is recomputed in xi
                 
                 //______________________________________________________________
                 //
@@ -182,6 +192,8 @@ namespace yocto
                 // continue
                 //______________________________________________________________
                 f0 = f1;
+                if(++count>10)
+                    break;
             }
         }
         

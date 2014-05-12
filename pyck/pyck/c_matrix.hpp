@@ -4,6 +4,7 @@
 #include "./exception.hpp"
 #include <new>
 #include <iostream>
+#include <fstream>
 
 template <typename T>
 class C_Matrix
@@ -105,6 +106,26 @@ public:
 		os << "]";
 		return os;
 	}
+    
+    inline void save_ascii( const char *filename ) const
+    {
+        assert(filename);
+        std::ofstream fp(filename);
+        if(fp.is_open())
+        {
+            fp << rows << "\n";
+            fp << cols << "\n";
+            for( size_t i=0; i < rows; ++i )
+            {
+                for(size_t j=0; j < cols; ++j )
+                {
+                    fp << (*this)[i][j] << "\n";
+                }
+            }
+            fp.close();
+        }
+        else throw Exception("couldn't open '%s'",filename);
+    }
     
 private:
 	uint8_t *wksp;
