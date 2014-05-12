@@ -243,7 +243,7 @@ opidx(0)
                                     lx->label.c_str(),
                                     s.c_str() );
                 }
-                std::cerr << "[[ SUCCESS ]]" << std::endl;
+                //std::cerr << "[[ SUCCESS ]]" << std::endl;
                 return root.yield(); // may be null => empty
             }
             //==================================================================

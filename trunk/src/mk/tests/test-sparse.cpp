@@ -40,3 +40,23 @@ YOCTO_UNIT_TEST_IMPL(sparse)
 YOCTO_UNIT_TEST_DONE()
 
 
+template <typename T>
+static inline void sp_solve()
+{
+    
+    const size_t n = 5;
+    sp_matrix<T> A(n,n);
+    for(size_t i=1;i<=n;++i)
+    {
+        A(i,i) = alea<double>() > 0.5 ? n : -n;
+    }
+    
+}
+
+YOCTO_UNIT_TEST_IMPL(spcj)
+{
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+
