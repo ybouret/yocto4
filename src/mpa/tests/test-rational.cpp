@@ -13,8 +13,6 @@ YOCTO_UNIT_TEST_IMPL(rational)
     std::cerr << "p=" << p << std::endl;
     std::cerr << "p+q=" << p+q << std::endl;
     
-    p = mpq::binomial(20,5);
-    std::cerr << "p=" << p << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
