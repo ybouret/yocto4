@@ -43,6 +43,18 @@ namespace yocto
             simplify();
         }
         
+        rational:: rational( const integer & __num ) :
+        num(__num),
+        den(1)
+        {
+        }
+        
+        rational:: rational( const natural & __num ) :
+        num(__num),
+        den(1)
+        {
+        }
+
         
         
         rational:: ~rational() throw()

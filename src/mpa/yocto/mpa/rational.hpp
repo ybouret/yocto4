@@ -23,7 +23,9 @@ namespace yocto
             void xch(rational &other) throw();
             rational(const int64_t __num);
             rational(const int64_t __num,const uint64_t __den);
-            rational( const integer &N, const natural &D); //simplify
+            rational(const integer &N, const natural &D); //simplify
+            rational(const integer &N);
+            rational(const natural &N);
 
             // ADD
             static rational add( const rational &lhs, const rational &rhs);
@@ -31,17 +33,29 @@ namespace yocto
             {
                 return add(lhs,rhs);
             }
-            inline friend rational operator+(const rational &lhs, const int64_t rhs)
-            {
-                const rational R(rhs);
-                return add(lhs,R);
-            }
-            inline friend rational operator+(const int64_t lhs, const rational &rhs)
-            {
-                const rational L(lhs);
-                return add(L,rhs);
-            }
             
+#define YOCTO_MPQ_FRIEND_LHS(OP,CALL,TYPE) \
+inline friend rational operator OP ( const TYPE lhs, const rational &rhs ) \
+{ const rational L(lhs); return CALL(L,rhs); }
+           
+#define YOCTO_MPQ_FRIENDS_LHS(OP,CALL) \
+YOCTO_MPQ_FRIEND_LHS(OP,CALL,int64_t)  \
+YOCTO_MPQ_FRIEND_LHS(OP,CALL,integer&) \
+YOCTO_MPQ_FRIEND_LHS(OP,CALL,natural&)
+            
+#define YOCTO_MPQ_FRIEND_RHS(OP,CALL,TYPE) \
+inline friend rational operator OP ( const rational &lhs, const TYPE rhs ) \
+{ const rational R(rhs); return CALL(lhs,R); }
+            
+#define YOCTO_MPQ_FRIENDS_RHS(OP,CALL) \
+YOCTO_MPQ_FRIEND_RHS(OP,CALL,int64_t)  \
+YOCTO_MPQ_FRIEND_RHS(OP,CALL,integer&) \
+YOCTO_MPQ_FRIEND_RHS(OP,CALL,natural&)
+
+            
+            YOCTO_MPQ_FRIENDS_LHS(+, add)
+            YOCTO_MPQ_FRIENDS_RHS(+, add)
+
             inline rational & operator+=( const rational &rhs )
             {
                 rational tmp = add(*this,rhs);

@@ -103,6 +103,26 @@ namespace yocto
             static sign_type sgn_of(const int64_t x) throw();
             static uint64_t  abs_of(const int64_t x) throw();
             
+            //__________________________________________________________________
+            //
+            // comparison
+            //__________________________________________________________________
+            static int compare( const integer &lhs, const integer &rhs ) throw();
+            static int compare( const integer &lhs, const int64_t  rhs ) throw();
+            static int compare( const int64_t  lhs, const integer &rhs ) throw();
+
+#define YOCTO_COMPARE_MPZ(OP) \
+inline friend bool operator OP (const integer &lhs, const integer &rhs) throw() { return compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const integer &lhs, const int64_t  rhs) throw() { return compare(lhs,rhs) OP 0; } \
+inline friend bool operator OP (const int64_t  lhs, const integer &rhs) throw() { return compare(lhs,rhs) OP 0; }
+            
+            YOCTO_COMPARE_MPZ(==)
+            YOCTO_COMPARE_MPZ(!=)
+            YOCTO_COMPARE_MPZ(<)
+            YOCTO_COMPARE_MPZ(<=)
+            YOCTO_COMPARE_MPZ(>)
+            YOCTO_COMPARE_MPZ(>=)
+
         private:
             void check() throw();
             integer(const sign_type S, const natural &N );
