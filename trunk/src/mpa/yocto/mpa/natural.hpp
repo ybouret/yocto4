@@ -108,17 +108,17 @@ namespace yocto
             {
                 return compare(lhs,rhs);
             }
-#define YOCTO_COMPARE(OP) \
+#define YOCTO_COMPARE_MPN(OP) \
 inline friend bool operator OP (const natural &lhs, const natural &rhs) throw() { return compare(lhs,rhs) OP 0; } \
 inline friend bool operator OP (const natural &lhs, const uint64_t rhs) throw() { return compare(lhs,rhs) OP 0; } \
 inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() { return compare(lhs,rhs) OP 0; }
             
-            YOCTO_COMPARE(==)
-            YOCTO_COMPARE(!=)
-            YOCTO_COMPARE(<)
-            YOCTO_COMPARE(<=)
-            YOCTO_COMPARE(>)
-            YOCTO_COMPARE(>=)
+            YOCTO_COMPARE_MPN(==)
+            YOCTO_COMPARE_MPN(!=)
+            YOCTO_COMPARE_MPN(<)
+            YOCTO_COMPARE_MPN(<=)
+            YOCTO_COMPARE_MPN(>)
+            YOCTO_COMPARE_MPN(>=)
             
             
             //__________________________________________________________________
