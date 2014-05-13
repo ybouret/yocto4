@@ -28,6 +28,10 @@ YOCTO_MPQ_FRIEND_RHS(OP,CALL,int64_t)  \
 YOCTO_MPQ_FRIEND_RHS(OP,CALL,integer&) \
 YOCTO_MPQ_FRIEND_RHS(OP,CALL,natural&)
 
+#define YOCTO_MPQ_FRIENDS(OP,CALL) \
+YOCTO_MPQ_FRIENDS_LHS(OP,CALL)     \
+YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
+
         class rational
         {
         public:
@@ -61,9 +65,8 @@ YOCTO_MPQ_FRIEND_RHS(OP,CALL,natural&)
             }
 
             
-            YOCTO_MPQ_FRIENDS_LHS(+, add)
-            YOCTO_MPQ_FRIENDS_RHS(+, add)
-
+            YOCTO_MPQ_FRIENDS(+,add)
+            
             inline rational & operator+=( const rational &rhs )
             {
                 rational tmp = add(*this,rhs);
@@ -99,8 +102,7 @@ YOCTO_MPQ_FRIEND_RHS(OP,CALL,natural&)
                 return sub(lhs,rhs);
             }
             
-            YOCTO_MPQ_FRIENDS_LHS(-, sub)
-            YOCTO_MPQ_FRIENDS_RHS(-, sub)
+            YOCTO_MPQ_FRIENDS(-,sub)
             
             inline rational & operator-=( const rational &rhs )
             {
@@ -136,8 +138,7 @@ YOCTO_MPQ_FRIEND_RHS(OP,CALL,natural&)
                 return mul(lhs,rhs);
             }
             
-            YOCTO_MPQ_FRIENDS_LHS(*, mul)
-            YOCTO_MPQ_FRIENDS_RHS(*, mul)
+            YOCTO_MPQ_FRIENDS(*,mul)
             
             inline  rational &operator*=(const rational &rhs)
             {
