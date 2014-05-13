@@ -1,21 +1,41 @@
 #include "yocto/code/combination.hpp"
+#include "yocto/exceptions.hpp"
+#include <cerrno>
+#include "yocto/memory/global.hpp"
+#include <iostream>
 
 namespace yocto
 {
     
-    void combination:: init( size_t comb[], const size_t k, const size_t n ) throw()
+    
+    combination:: combination( size_t an, size_t ak ) :
+    n(an),
+    k(ak),
+    comb(0),
+    nmk(ptrdiff_t(n)-ptrdiff_t(k))
+    {
+        if(k>n||k<=0) throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(k), unsigned(n) );
+        comb = static_cast<size_t *>(memory::global:: __calloc(k,sizeof(size_t)));
+        init();
+    }
+    
+    combination:: ~combination() throw()
+    {
+        memory::global::__free(comb);
+    }
+    
+    void combination:: init() throw()
     {
         assert(comb!=0);
         assert(k<=n);
         for(size_t i=0;i<k;++i) comb[i] = i;
     }
     
-    bool combination:: next( size_t comb[], const size_t k, const size_t n ) throw()
+    bool combination:: next() throw()
     {
         assert(comb!=0);
         assert(k<=n);
-        const ptrdiff_t nmk = n-k;
-        ptrdiff_t       i   = ptrdiff_t(k) - 1;
+        ptrdiff_t i = ptrdiff_t(k) - 1;
         ++comb[i];
         while ((i >= 0) && (comb[i] >= nmk + 1 + i)) {
             --i;
@@ -27,10 +47,26 @@ namespace yocto
         
         /* comb now looks like (..., x, n, n, n, ..., n).
          Turn it into (..., x, x + 1, x + 2, ...) */
-        for (i = i + 1; i < k; ++i)
-            comb[i] = comb[i - 1] + 1;
+        for (i=i+1; i<k; ++i)
+            comb[i] = comb[i-1] + 1;
         
         return true;
+
+    }
+ 
+    size_t combination:: operator[](size_t i) const throw()
+    {
+        assert(i<k);
+        assert(comb);
+        return comb[i];
+    }
+
+    std::ostream & operator<<( std::ostream &os, const combination &C )
+    {
+        os << "[";
+        for(size_t i=0;i<C.k;++i) os << " " << C.comb[i];
+        os << " ]'";
+        return os;
     }
     
 }
