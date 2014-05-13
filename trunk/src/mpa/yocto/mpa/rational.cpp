@@ -54,7 +54,7 @@ namespace yocto
         den(1)
         {
         }
-
+        
         
         
         rational:: ~rational() throw()
@@ -105,14 +105,14 @@ namespace yocto
             const natural D = rhs.den * lhs.den;
             return rational(N,D);
         }
-
+        
         //______________________________________________________________________
         //
         // MUL
         //______________________________________________________________________
         rational rational:: mul(const rational &lhs, const rational &rhs )
         {
-
+            
             const integer N = lhs.num * rhs.num;
             const natural D = lhs.den * rhs.den;
             return rational(N,D);
@@ -136,6 +136,67 @@ namespace yocto
             return os;
         }
         
+        
+        //______________________________________________________________________
+        //
+        // DIV
+        //______________________________________________________________________
+        rational rational:: div(const rational &lhs, const rational &rhs)
+        {
+            if(rhs.num.s == __zero)
+                throw libc::exception( EDOM, "rational division by zero");
+            const integer Rden = rhs.den;
+            const integer Lden = lhs.den;
+            integer iN   = lhs.num * Rden;
+            integer iD   = rhs.num * Lden;
+            if(sign_mul(iN.s, iD.s) == __negative )
+                iN.neg();
+            
+            return rational(iN,iD.n);
+        }
+        
+        // conversion
+        double rational:: to_double() const
+        {
+            double ans = 0;
+            if(num.s==__zero) return ans;
+            
+            natural       n = num.n;
+            // integer part
+            natural       q = n/den;
+            if(q>0)
+            {
+                for(size_t i=0;i<q.length();++i)
+                {
+                    ans *= 256.0;
+                    ans += q.get_byte(i);
+                }
+            }
+            
+            // keep fractional part
+            n -= q * den;
+            assert(n<den);
+            const natural ten = 10;
+            double factor     = 0.1;
+            for(size_t i=0;i<15;++i)
+            {
+                n *= ten;
+                q  = n/den;
+                double f = 0;
+                for(size_t i=0;i<q.length();++i)
+                {
+                    f *= 256.0;
+                    f += q.get_byte(i);
+                }
+                ans += f * factor;
+                factor *= 0.1;
+                n -= q*den;
+            }
+            return num.s == __negative ? -ans : ans;
+        }
+        
+        
     }
+    
     
 }

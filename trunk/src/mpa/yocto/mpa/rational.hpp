@@ -27,11 +27,26 @@ inline friend rational operator OP ( const rational &lhs, const TYPE rhs ) \
 YOCTO_MPQ_FRIEND_RHS(OP,CALL,int64_t)  \
 YOCTO_MPQ_FRIEND_RHS(OP,CALL,integer&) \
 YOCTO_MPQ_FRIEND_RHS(OP,CALL,natural&)
-
+        
 #define YOCTO_MPQ_FRIENDS(OP,CALL) \
 YOCTO_MPQ_FRIENDS_LHS(OP,CALL)     \
 YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
-
+        
+        
+#define YOCTO_MPQ_COMPACT_FOR(OP,CALL,TYPE) \
+inline rational & operator OP ( const TYPE rhs ) \
+{\
+const rational R(rhs); \
+rational tmp = CALL(*this,rhs);\
+xch(tmp); \
+return *this; \
+}
+        
+#define YOCTO_MPQ_COMPACT(OP,CALL)      \
+YOCTO_MPQ_COMPACT_FOR(OP,CALL,int64_t)  \
+YOCTO_MPQ_COMPACT_FOR(OP,CALL,integer&) \
+YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
+        
         class rational
         {
         public:
@@ -52,7 +67,7 @@ YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
             rational(const integer &N, const natural &D);
             rational(const integer &N);
             rational(const natural &N);
-
+            
             //__________________________________________________________________
             //
             // ADD
@@ -63,9 +78,10 @@ YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
             {
                 return add(lhs,rhs);
             }
-
+            
             
             YOCTO_MPQ_FRIENDS(+,add)
+            
             
             inline rational & operator+=( const rational &rhs )
             {
@@ -73,24 +89,7 @@ YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
                 xch(tmp);
                 return *this;
             }
-            
-            
-            inline rational & operator+=( const integer &rhs )
-            {
-                const rational R(rhs);
-                rational tmp = add(*this,R);
-                xch(tmp);
-                return *this;
-            }
-            
-            inline rational & operator+=( const int64_t rhs )
-            {
-                const rational R(rhs);
-                rational tmp = add(*this,R);
-                xch(tmp);
-                return *this;
-            }
-
+            YOCTO_MPQ_COMPACT(+=,add)
             
             //__________________________________________________________________
             //
@@ -110,23 +109,15 @@ YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
                 xch(tmp);
                 return *this;
             }
+            
+            YOCTO_MPQ_COMPACT(-=,sub)
+           
+            friend rational operator-(const rational &q)
+            {
+                const integer N = -q.num;
+                return rational(N,q.den);
+            }
 
-            inline rational & operator-=( const integer &rhs )
-            {
-                const rational R(rhs);
-                rational tmp = sub(*this,R);
-                xch(tmp);
-                return *this;
-            }
-            
-            inline rational & operator-=( const int64_t rhs )
-            {
-                const rational R(rhs);
-                rational tmp = sub(*this,R);
-                xch(tmp);
-                return *this;
-            }
-            
             
             //__________________________________________________________________
             //
@@ -146,29 +137,39 @@ YOCTO_MPQ_FRIENDS_RHS(OP,CALL)
                 xch(tmp);
                 return *this;
             }
-          
-            inline rational & operator*=( const integer &rhs )
+            
+            YOCTO_MPQ_COMPACT(*=,mul)
+
+            
+            
+            //__________________________________________________________________
+            //
+            // DIV
+            //__________________________________________________________________
+            static rational div( const rational &lhs, const rational &rhs);
+            inline friend rational operator/(const rational &lhs, const rational &rhs)
             {
-                const rational R(rhs);
-                rational tmp = mul(*this,R);
+                return div(lhs,rhs);
+            }
+            YOCTO_MPQ_FRIENDS(/,mul)
+            
+            inline  rational &operator/=(const rational &rhs)
+            {
+                rational tmp = div(*this,rhs);
                 xch(tmp);
                 return *this;
             }
             
-            inline rational & operator*=( const int64_t rhs )
-            {
-                const rational R(rhs);
-                rational tmp = mul(*this,R);
-                xch(tmp);
-                return *this;
-            }
-            
+            YOCTO_MPQ_COMPACT(/=,div)
+
             
             //! power
             static rational power( const rational &q, uint64_t p );
             
+            //! output
             friend std::ostream & operator<<(std::ostream &, const rational &q);
             
+            double to_double() const;
             
         private:
             //! automatically called
