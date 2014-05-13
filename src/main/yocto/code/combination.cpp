@@ -12,7 +12,8 @@ namespace yocto
     n(an),
     k(ak),
     comb(0),
-    nmk(ptrdiff_t(n)-ptrdiff_t(k))
+    nmk(ptrdiff_t(n)-ptrdiff_t(k)),
+    nmkp1(nmk+1)
     {
         if(k>n||k<=0) throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(k), unsigned(n) );
         comb = static_cast<size_t *>(memory::global:: __calloc(k,sizeof(size_t)));
@@ -37,17 +38,18 @@ namespace yocto
         assert(k<=n);
         ptrdiff_t i = ptrdiff_t(k) - 1;
         ++comb[i];
-        while ((i >= 0) && (comb[i] >= nmk + 1 + i)) {
+        while ((i >= 0) && (comb[i] >= nmkp1 + i))
+        {
             --i;
             ++comb[i];
         }
         
-        if (comb[0] > nmk) /* Combination (n-k, n-k+1, ..., n) reached */
-            return false; /* No more combinations can be generated */
+        if (comb[0]>nmk)  // Combination (n-k, n-k+1, ..., n) reached
+            return false; // No more combinations can be generated
         
-        /* comb now looks like (..., x, n, n, n, ..., n).
-         Turn it into (..., x, x + 1, x + 2, ...) */
-        for (i=i+1; i<k; ++i)
+        // comb now looks like (..., x, n, n, n, ..., n).
+        // Turn it into (..., x, x + 1, x + 2, ...)
+        for (++i; i<k; ++i)
             comb[i] = comb[i-1] + 1;
         
         return true;

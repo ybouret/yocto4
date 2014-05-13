@@ -7,6 +7,7 @@
 namespace yocto
 {
     
+    //! C-style combination
     class combination
     {
     public:
@@ -16,6 +17,7 @@ namespace yocto
         void init() throw();
         bool next() throw();
         
+        //! n>0,k>0,k<=n
         explicit combination(const size_t an, const size_t ak);
         virtual ~combination() throw();
         
@@ -28,6 +30,7 @@ namespace yocto
         YOCTO_DISABLE_ASSIGN(combination);
         size_t         *comb;
         const ptrdiff_t nmk;
+        const ptrdiff_t nmkp1;
     };
     
 }
