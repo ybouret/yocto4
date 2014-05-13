@@ -117,17 +117,6 @@ namespace yocto
             const natural D = lhs.den * rhs.den;
             return rational(N,D);
         }
-
-        rational rational:: binomial( uint64_t n, uint64_t p )
-        {
-            if(p>n) throw libc::exception( EDOM, "invalid binomial coefficients");
-            natural NN = natural::factorial(n);
-            natural D  = natural::factorial(p);
-            natural::simplify(NN, D);
-            D  *= natural::factorial(n-p);
-            const integer N(NN);
-            return rational(N,D);
-        }
         
         rational rational:: power( const rational &q, uint64_t p )
         {

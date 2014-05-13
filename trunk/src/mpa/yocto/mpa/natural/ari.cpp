@@ -1,6 +1,7 @@
 #include "yocto/mpa/natural.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -45,6 +46,29 @@ namespace yocto
                 --n;
             }
             return ans;
+        }
+        
+        natural natural:: binomial(uint64_t n, uint64_t p)
+        {
+            if(p>n) throw libc::exception( EDOM, "natural::binomial(p>n)");
+            natural  N = one();
+            uint64_t A = p;
+            uint64_t B = n-p;
+            if(A>B) cswap(A,B);
+            assert(A<=B);
+            natural D = factorial(A);
+            for(uint64_t i=n;i>1;--i)
+            {
+                N *= i;
+                simplify(N,D);
+            }
+            for(uint64_t i=B;i>1;--i)
+            {
+                D *= i;
+                simplify(N, D);
+            }
+            assert(D==1);
+            return N;
         }
         
         

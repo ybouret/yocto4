@@ -234,6 +234,7 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
 			static bool    are_coprime( const natural &lhs, const natural &rhs );   //!< gcd(lhs,rhs) == 1
             static void    simplify( natural &lhs, natural &rhs ); //!< divide by gcd
             static natural factorial( uint64_t n );
+            static natural binomial(uint64_t n, uint64_t p);
             
             //__________________________________________________________________
             //
