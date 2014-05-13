@@ -7,15 +7,12 @@
 namespace yocto
 {
     
-    class combination
+    struct combination
     {
-    public:
+        
         static void init( size_t comb[], const size_t k, const size_t n ) throw();
         static bool next( size_t comb[], const size_t k, const size_t n ) throw();
         
-    private:
-        YOCTO_DISABLE_ASSIGN(combination);
-       
     };
     
 }
