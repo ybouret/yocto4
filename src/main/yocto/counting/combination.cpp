@@ -12,6 +12,7 @@ namespace yocto
     combination:: combination( size_t an, size_t ak ) :
     n(an),
     k(ak),
+    id(0),
     comb(0),
     nmk(ptrdiff_t(n)-ptrdiff_t(k)),
     nmkp1(nmk+1)
@@ -30,6 +31,7 @@ namespace yocto
     {
         assert(k<=n);
         for(size_t i=0;i<k;++i) comb[i] = i;
+        (uint64_t&)id = 1;
     }
     
     bool combination:: next() throw()
@@ -51,7 +53,7 @@ namespace yocto
         // Turn it into (..., x, x + 1, x + 2, ...)
         for (++i; i<k; ++i)
             comb[i] = comb[i-1] + 1;
-        
+        ++ ( (uint64_t&)id );
         return true;
 
     }

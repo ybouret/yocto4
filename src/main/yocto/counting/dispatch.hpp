@@ -9,16 +9,17 @@ namespace yocto
     class dispatch
     {
     public:
-        const size_t socks;   //!< positive
-        const size_t drawers; //!< >=2
-        const size_t walls;   //!< drawers-1
-        const size_t meta;    //!< socks+walls
+        const size_t   socks;   //!< positive
+        const size_t   drawers; //!< >=2
+        const size_t   walls;   //!< drawers-1
+        const size_t   meta;    //!< socks+walls
         
         explicit dispatch(size_t num_socks, size_t num_drawers);
         virtual ~dispatch() throw();
         
-        void init() throw();
-        bool next() throw();
+        void     init() throw();
+        bool     next() throw();
+        uint64_t id() const throw();
         
         //! drawer<drawers
         inline size_t operator[](size_t drawer) const throw()
