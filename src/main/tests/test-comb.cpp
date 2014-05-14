@@ -25,6 +25,38 @@ YOCTO_UNIT_TEST_IMPL(comb)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/sys/wtime.hpp"
+#include "yocto/ios/ocstream.hpp"
+
+YOCTO_UNIT_TEST_IMPL(comb_perf)
+{
+    wtime chrono;
+    ios::ocstream fp("comb_perf.dat",false);
+    for(unsigned n=1;n<=5;++n)
+    {
+        for(unsigned p=1;p<=n;++p)
+        {
+            combination C(n,p);
+            chrono.start();
+            double ell = 0;
+            size_t num = 0;
+            do
+            {
+                C.count_all();
+                ell = chrono.query();
+                ++num;
+            } while(ell<1);
+            const double speed = 1e-6 * double(num)/ell;
+            std::cerr << "speed C(" << n << "," << p << ")=" << speed << " M/s" << std::endl;
+            
+            fp("%u %g\n", p, speed);
+        }
+        fp("\n");
+    }
+}
+YOCTO_UNIT_TEST_DONE()
+
+
 #include "yocto/counting/dispatch.hpp"
 YOCTO_UNIT_TEST_IMPL(dispatch)
 {
@@ -33,8 +65,8 @@ YOCTO_UNIT_TEST_IMPL(dispatch)
     dispatch D(socks,drawers);
     do
     {
-        std::cerr << "D=" << D << std::endl;
-    }
-    while(D.next());
-}
-YOCTO_UNIT_TEST_DONE()
+        std::cerr << "D" <<  D.id() << " = " << D << std::endl;
+        }
+        while(D.next());
+        }
+        YOCTO_UNIT_TEST_DONE()

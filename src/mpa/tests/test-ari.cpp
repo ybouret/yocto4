@@ -46,13 +46,24 @@ YOCTO_UNIT_TEST_IMPL(ari)
         std::cerr << i << "! = " << n << std::endl;
     }
     
-    for(uint64_t n=1;n<=24;++n)
+    for(uint64_t n=1;n<=10;++n)
     {
         for(uint64_t p=0;p<=n;++p)
         {
             std::cerr << " " << mpn::binomial(n, p);
         }
         std::cerr << std::endl;
+    }
+    
+    for(uint64_t n=1;n<=24;++n)
+    {
+        std::cerr << "n=" << n << std::endl;
+        for(uint64_t p=0;p<=n;++p)
+        {
+            const mpn num_combi = mpn::binomial(n, p);
+            const mpn num_items = p * num_combi;
+            std::cerr << "\tp=" << p << " #combi=" << num_combi << " #items=" << num_items << std::endl;
+        }
     }
     
 }

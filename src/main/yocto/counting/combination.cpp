@@ -29,15 +29,12 @@ namespace yocto
     
     void combination:: init() throw()
     {
-        assert(k<=n);
         for(size_t i=0;i<k;++i) comb[i] = i;
         (uint64_t&)id = 1;
     }
     
     bool combination:: next() throw()
     {
-        assert(comb);
-        assert(k<=n);
         ptrdiff_t i = ptrdiff_t(k) - 1;
         ++comb[i];
         while( (i>=0) && (comb[i]>=nmkp1+i) )
@@ -52,7 +49,9 @@ namespace yocto
         // comb now looks like (..., x, n, n, n, ..., n).
         // Turn it into (..., x, x + 1, x + 2, ...)
         for (++i; i<k; ++i)
+        {
             comb[i] = comb[i-1] + 1;
+        }
         ++ ( (uint64_t&)id );
         return true;
 
@@ -67,5 +66,15 @@ namespace yocto
         os << " ]'";
         return os;
     }
+    
+    
+    uint64_t combination:: count_all() throw()
+    {
+        init();
+        while(next())
+            ;
+        return id;
+    }
+
     
 }
