@@ -6,7 +6,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(comb)
 {
-        
+    
     
     size_t n = (argc > 1) ? strconv::to<size_t>(argv[1],"n") : 10 ;
     size_t k = (argc > 2) ? strconv::to<size_t>(argv[2],"k") :  3 ;
@@ -22,5 +22,19 @@ YOCTO_UNIT_TEST_IMPL(comb)
     
     std::cerr << "C(" << n << "," << k << ")=" << count << std::endl;
     
+}
+YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/counting/dispatch.hpp"
+YOCTO_UNIT_TEST_IMPL(dispatch)
+{
+    size_t socks   = (argc > 1) ? strconv::to<size_t>(argv[1],"socks") : 1 ;
+    size_t drawers = (argc > 2) ? strconv::to<size_t>(argv[2],"drawers") :  3 ;
+    dispatch D(socks,drawers);
+    do
+    {
+        std::cerr << "D=" << D << std::endl;
+    }
+    while(D.next());
 }
 YOCTO_UNIT_TEST_DONE()

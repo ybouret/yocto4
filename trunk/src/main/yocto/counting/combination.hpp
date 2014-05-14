@@ -11,8 +11,8 @@ namespace yocto
     class combination
     {
     public:
-        const size_t n;
-        const size_t k;
+        const size_t n; //!< the number of elements, >0
+        const size_t k; //!< the size of the set, >0
         
         void init() throw();
         bool next() throw();
@@ -22,7 +22,12 @@ namespace yocto
         virtual ~combination() throw();
         
         //! value of comb[0<=i<k]
-        size_t operator[](size_t i) const throw();
+        inline size_t operator[](size_t i) const throw()
+        {
+            assert(i<k);
+            assert(comb);
+            return comb[i];
+        }
         
         friend std::ostream & operator<<( std::ostream &os, const combination &C );
         
