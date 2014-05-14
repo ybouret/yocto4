@@ -123,6 +123,8 @@ inline friend bool operator OP (const int64_t  lhs, const integer &rhs) throw() 
             YOCTO_COMPARE_MPZ(>)
             YOCTO_COMPARE_MPZ(>=)
 
+            double to_double() const;
+            
         private:
             void check() throw();
             integer(const sign_type S, const natural &N );

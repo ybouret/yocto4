@@ -134,6 +134,13 @@ namespace yocto
             return *this;
         }
         
+        double integer:: to_double() const
+        {
+            double ans = n.to_double();
+            return (s == __negative) ? -ans : ans;
+        }
+
+        
     }
 }
 

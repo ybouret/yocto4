@@ -233,6 +233,16 @@ namespace yocto
             }
         }
         
+        double natural:: to_double() const
+        {
+            double ans = 0;
+            for(size_t i=0;i<size;++i)
+            {
+                ans *= 256.0;
+                ans += byte[i];
+            }
+            return ans;
+        }
         
         
     }
