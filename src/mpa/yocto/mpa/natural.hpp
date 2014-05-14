@@ -304,6 +304,7 @@ inline friend bool operator OP (const uint64_t lhs, const natural &rhs) throw() 
             static natural power( const natural &n, const natural &e);
             static natural power( const natural &n, const uint64_t e);
 
+            double to_double() const;
             
         private:
             size_t   maxi;

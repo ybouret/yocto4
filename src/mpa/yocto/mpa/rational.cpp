@@ -166,11 +166,7 @@ namespace yocto
             natural       q = n/den;
             if(q>0)
             {
-                for(size_t i=0;i<q.length();++i)
-                {
-                    ans *= 256.0;
-                    ans += q.get_byte(i);
-                }
+                ans = q.to_double();
             }
             
             // keep fractional part
@@ -182,13 +178,7 @@ namespace yocto
             {
                 n *= ten;
                 q  = n/den;
-                double f = 0;
-                for(size_t i=0;i<q.length();++i)
-                {
-                    f *= 256.0;
-                    f += q.get_byte(i);
-                }
-                ans += f * factor;
+                ans += q.to_double() * factor;
                 factor *= 0.1;
                 n -= q*den;
             }
