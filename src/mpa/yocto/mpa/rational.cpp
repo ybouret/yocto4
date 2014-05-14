@@ -55,6 +55,14 @@ namespace yocto
         {
         }
         
+        rational:: rational( const integer &N, const natural &D,int2type<false>):
+        num(N),
+        den(D)
+        {
+            // do not simply nor check
+            assert(D>0);
+            assert(natural::are_coprime(num.n,den));
+        }
         
         
         rational:: ~rational() throw()
@@ -127,7 +135,7 @@ namespace yocto
                 N *= q.num;
                 D *= q.den;
             }
-            return rational(N,D);
+            return rational(N,D,int2type<false>());
         }
         
         std::ostream & operator<<(std::ostream &os, const rational &q)

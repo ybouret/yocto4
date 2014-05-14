@@ -16,6 +16,9 @@ YOCTO_UNIT_TEST_IMPL(rational)
     q = 1;
     std::cerr << "q=" << q << " => " << q.to_double() << std::endl;
     
+    mpq p7 = mpq::power(p,7);
+    std::cerr << "p^7=" << p7 << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()
 

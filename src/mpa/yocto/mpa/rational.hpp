@@ -151,7 +151,7 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
             {
                 return div(lhs,rhs);
             }
-            YOCTO_MPQ_FRIENDS(/,mul)
+            YOCTO_MPQ_FRIENDS(/,div)
             
             inline  rational &operator/=(const rational &rhs)
             {
@@ -174,6 +174,7 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
         private:
             //! automatically called
             void simplify();
+            explicit rational( const integer &, const natural &,int2type<false>);
         };
         
     }
