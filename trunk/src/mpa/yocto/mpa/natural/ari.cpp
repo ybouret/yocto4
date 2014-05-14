@@ -30,11 +30,27 @@ namespace yocto
 		
         void natural:: simplify( natural &lhs, natural &rhs )
         {
-            const natural d = gcd(lhs,rhs);
-            natural       L = lhs/d;
-            natural       R = rhs/d;
-            lhs.xch(L);
-            rhs.xch(R);
+            if(lhs.size>0 && rhs.size>0)
+            {
+                natural a(lhs);
+                {
+                    natural b(rhs);
+                    while(b.size>0)
+                    {
+                        natural r( __mod(a,b) );
+                        a.xch(b);
+                        b.xch(r);
+                    }
+                }
+                if(a>1)
+                {
+                    natural       L = natural::div(lhs,a);
+                    natural       R = natural::div(rhs,a);
+                    lhs.xch(L);
+                    rhs.xch(R);
+                }
+            }
+            
         }
         
         natural natural:: factorial( uint64_t n )
