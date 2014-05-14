@@ -55,6 +55,7 @@ YOCTO_UNIT_TEST_IMPL(ari)
         std::cerr << std::endl;
     }
     
+#if 0
     for(uint64_t n=1;n<=24;++n)
     {
         std::cerr << "n=" << n << std::endl;
@@ -65,6 +66,7 @@ YOCTO_UNIT_TEST_IMPL(ari)
             std::cerr << "\tp=" << p << " #combi=" << num_combi << " #items=" << num_items << std::endl;
         }
     }
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
