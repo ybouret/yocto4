@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(comb)
     }
     while( C.next() );
     
-    std::cerr << "C(" << n << "," << k << ")=" << count << std::endl;
+    std::cerr << "C(" << n << "," << k << ")=" << count << " / " << C.id << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()

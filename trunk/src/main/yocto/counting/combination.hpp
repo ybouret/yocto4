@@ -11,9 +11,9 @@ namespace yocto
     class combination
     {
     public:
-        const size_t n; //!< the number of elements, >0
-        const size_t k; //!< the size of the set, >0
-        
+        const size_t   n;  //!< the number of elements, >0
+        const size_t   k;  //!< the size of the set, >0
+        const uint64_t id; //!< identifier
         void init() throw();
         bool next() throw();
         

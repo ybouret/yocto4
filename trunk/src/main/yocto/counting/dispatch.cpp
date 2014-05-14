@@ -94,6 +94,10 @@ namespace yocto
         return os;
     }
     
+    uint64_t dispatch::id() const throw()
+    {
+        return C.id;
+    }
 
     
 }
