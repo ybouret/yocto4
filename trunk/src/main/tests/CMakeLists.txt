@@ -89,5 +89,9 @@ ADD_TEST(Crew        test-main simd)
 ADD_TEST(Server      test-main server)
 ADD_TEST(Dist        test-main dist)
 ADD_TEST(Lexicon     test-main lexicon)
+ADD_TEST(Comb        test-main comb)
+ADD_TEST(Dispatch    test-main dispatch)
+
+
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
