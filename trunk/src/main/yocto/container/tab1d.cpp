@@ -1,31 +1,18 @@
 #include "yocto/container/tab1d.hpp"
-#include "yocto/exception.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
     
     ITableau:: ~ITableau() throw() {}
-    
-    void ITableau::Check(size_t __imin, size_t __imax)
+  
+    ITableau:: ITableau(size_t __imin, size_t __imax) throw() :
+    imin( min_of(__imin,__imax) ),
+    imax( max_of(__imin,__imax) ),
+    cols(imax-imin+1)
     {
-        
-        if(__imax<__imin)
-            throw exception("Invalid Tableau Indices");
-    }
-
-    ITableau:: ITableau(size_t __imin, size_t __imax) :
-    imin(__imin),
-    imax(__imax)
-    {
-       Check(imin,imax);
     }
     
-    
-    size_t ITableau::SizeOf(size_t __imin, size_t __imax)
-    {
-        Check(__imin, __imax);
-        return __imax+1-__imin;
-    }
     
     
 }
