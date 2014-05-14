@@ -16,7 +16,7 @@ namespace yocto
     nmk(ptrdiff_t(n)-ptrdiff_t(k)),
     nmkp1(nmk+1)
     {
-        if(k>n||k<=0) throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(k), unsigned(n) );
+        if(k<=0||k>n) throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(n), unsigned(k) );
         comb = static_cast<size_t *>(memory::global:: __calloc(k,sizeof(size_t)));
         init();
     }
@@ -28,14 +28,13 @@ namespace yocto
     
     void combination:: init() throw()
     {
-        assert(comb!=0);
         assert(k<=n);
         for(size_t i=0;i<k;++i) comb[i] = i;
     }
     
     bool combination:: next() throw()
     {
-        assert(comb!=0);
+        assert(comb);
         assert(k<=n);
         ptrdiff_t i = ptrdiff_t(k) - 1;
         ++comb[i];
@@ -57,17 +56,12 @@ namespace yocto
 
     }
  
-    size_t combination:: operator[](size_t i) const throw()
-    {
-        assert(i<k);
-        assert(comb);
-        return comb[i];
-    }
+   
 
     std::ostream & operator<<( std::ostream &os, const combination &C )
     {
         os << "[";
-        for(size_t i=0;i<C.k;++i) os << " " << C.comb[i];
+        for(size_t i=0;i<C.k;++i) os << ' ' << C.comb[i];
         os << " ]'";
         return os;
     }
