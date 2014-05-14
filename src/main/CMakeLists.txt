@@ -128,11 +128,11 @@ SET( rtld_srcs ${rtld_decl} ${rtld_impl} )
 INSTALL( FILES ${rtld_decl} DESTINATION include/yocto/rtld )
 SOURCE_GROUP( rtld FILES ${rtld_srcs} )
 
-#FILE( GLOB geom_decl yocto/geom/*.hpp)
-#FILE( GLOB geom_impl yocto/geom/*.cpp)
-#SET( geom_srcs ${geom_decl} ${geom_impl} )
-#INSTALL( FILES ${geom_decl} DESTINATION include/yocto/geom )
-#SOURCE_GROUP( geom FILES ${geom_srcs} )
+FILE( GLOB counting_decl yocto/counting/*.hpp)
+FILE( GLOB counting_impl yocto/counting/*.cpp)
+SET( counting_srcs ${counting_decl} ${counting_impl} )
+INSTALL( FILES ${counting_decl} DESTINATION include/yocto/counting )
+SOURCE_GROUP( counting FILES ${counting_srcs} )
 
 #FILE( GLOB ramp_decl yocto/geom/ramp/*.hpp)
 #FILE( GLOB ramp_impl yocto/geom/ramp/*.cpp)
@@ -152,8 +152,8 @@ SET( pack_srcs ${pack_decl} ${pack_impl} )
 INSTALL( FILES ${pack_decl} DESTINATION include/yocto/pack )
 SOURCE_GROUP( pack FILES ${pack_srcs} )
 
-SET( decl ${top_decl} ${type_decl} ${ptr_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${fs_decl} ${pack_decl} ${sort_decl} ${sys_decl})
-SET( srcs ${top_srcs} ${type_srcs} ${ptr_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${fs_srcs} ${pack_srcs} ${sort_srcs} ${sys_srcs})
+SET( decl ${top_decl} ${type_decl} ${ptr_decl} ${code_decl} ${threading_decl} ${core_decl} ${mem_decl} ${string_decl} ${container_decl} ${sequence_decl} ${hashing_decl} ${ios_decl} ${random_decl} ${associative_decl} ${stock_decl} ${ordered_decl} ${fragment_decl}  ${math_decl} ${rtld_decl} ${fs_decl} ${pack_decl} ${sort_decl} ${sys_decl} ${counting_decl})
+SET( srcs ${top_srcs} ${type_srcs} ${ptr_srcs} ${code_srcs} ${threading_srcs} ${core_srcs} ${mem_srcs} ${string_srcs} ${container_srcs} ${sequence_srcs} ${hashing_srcs} ${ios_srcs} ${random_srcs} ${associative_srcs} ${stock_srcs} ${ordered_srcs} ${fragment_srcs}  ${math_srcs} ${rtld_srcs} ${fs_srcs} ${pack_srcs} ${sort_srcs} ${sys_srcs} ${counting_srcs})
 
 INCLUDE_DIRECTORIES( . )
 

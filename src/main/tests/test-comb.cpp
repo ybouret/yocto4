@@ -1,5 +1,5 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/code/combination.hpp"
+#include "yocto/counting/combination.hpp"
 #include "yocto/string/conv.hpp"
 
 using namespace yocto;

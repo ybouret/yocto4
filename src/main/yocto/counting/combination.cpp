@@ -1,6 +1,7 @@
-#include "yocto/code/combination.hpp"
+#include "yocto/counting/combination.hpp"
 #include "yocto/exceptions.hpp"
 #include <cerrno>
+
 #include "yocto/memory/global.hpp"
 #include <iostream>
 
@@ -38,7 +39,7 @@ namespace yocto
         assert(k<=n);
         ptrdiff_t i = ptrdiff_t(k) - 1;
         ++comb[i];
-        while ((i >= 0) && (comb[i] >= nmkp1 + i))
+        while( (i>=0) && (comb[i]>=nmkp1+i) )
         {
             --i;
             ++comb[i];
