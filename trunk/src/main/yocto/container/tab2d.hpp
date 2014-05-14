@@ -36,10 +36,10 @@ namespace yocto
             return row[j];
         }
         
-        explicit Tableau2D(size_t   __imin,
-                           size_t   __imax,
-                           size_t   __jmin,
+        explicit Tableau2D(size_t   __jmin,
                            size_t   __jmax,
+                           size_t   __imin,
+                           size_t   __imax,
                            param_type args) :
         ITableau(__imin,__imax),
         jmin( min_of(__jmin,__jmax) ),
