@@ -14,15 +14,16 @@ namespace yocto
         virtual ~ITableau() throw();
         const size_t imin;
         const size_t imax;
+        const size_t cols;
         
-        static size_t SizeOf(size_t __imin, size_t __imax);
-        static void   Check(size_t __imin,size_t __imax);
     protected:
-        explicit ITableau(size_t __imin, size_t __imax);
+        explicit ITableau(size_t __imin, size_t __imax) throw();
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(ITableau);
     };
+    
+    template <typename> class Tableau2D;
     
     template <typename T>
     class TableauOf : public ITableau
@@ -36,18 +37,21 @@ namespace yocto
         
         inline virtual ~TableauOf() throw() {}
         
-        inline explicit TableauOf(size_t      __imin,
-                                  size_t      __imax,
-                                  mutable_type *base ) throw() :
-        ITableau(__imin,__imax),
-        addr(base-imin)
-        {
-            assert(imax>=imin);
-            assert(base!=0);
-        }
         
     protected:
         mutable_type *addr;
+        inline explicit TableauOf(size_t      __imin,
+                                  size_t      __imax) throw() :
+        ITableau(__imin,__imax), addr(0) {}
+      
+        inline void attach(mutable_type *base) throw()
+        {
+            assert(base);
+            assert(!addr);
+            addr = base-imin;
+        }
+        
+        friend class Tableau2D<T>;
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(TableauOf);
@@ -63,9 +67,9 @@ namespace yocto
                            size_t   __imax,
                            param_type args ) :
         TableauOf<T>(__imin,
-                     __imax,
-                     (mutable_type *)memory::global::__calloc( ITableau::SizeOf(__imin,__imax), sizeof(T)))
+                     __imax)
         {
+            this->attach( (mutable_type *)memory::global::__calloc( this->cols,sizeof(T)));
             size_t i=this->imin;
             try
             {

@@ -3,6 +3,7 @@
 
 #include "yocto/container/tab1d.hpp"
 #include "yocto/code/round.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -15,7 +16,6 @@ namespace yocto
         
         const size_t jmin;
         const size_t jmax;
-        const size_t cols;
         const size_t rows;
         const size_t items;
         
@@ -42,11 +42,10 @@ namespace yocto
                            size_t   __jmax,
                            param_type args) :
         ITableau(__imin,__imax),
-        jmin(__jmin),
-        jmax(__jmax),
-        cols( SizeOf(imin,imax) ),
-        rows( SizeOf(jmin,jmax) ),
-        items(cols*rows),
+        jmin( min_of(__jmin,__jmax) ),
+        jmax( max_of(__jmin,__jmax) ),
+        rows( jmax+1-jmin ),
+        items( this->cols*rows),
         row(0),
         ptr(0),
         wlen(0),
@@ -89,7 +88,8 @@ namespace yocto
             size_t c = 0;
             for(size_t r=0;r<rows;++r,c+=cols)
             {
-                new (row+r) Row(imin,imax,&ptr[c]);
+                Row *rr = new (row+r) Row(this->imin,this->imax);
+                rr->attach( &ptr[c] );
             }
             row -= jmin;
         }

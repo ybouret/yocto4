@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/container/tab2d.hpp"
+#include "yocto/string.hpp"
 
 using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(tab)
@@ -12,6 +13,7 @@ YOCTO_UNIT_TEST_IMPL(tab)
     
     Tableau2D<float> tf(1,4,0,6, 0.0f);
     
+    Tableau2D<string> ts(1,2,3,4, "Hello, World!");
 
 }
 YOCTO_UNIT_TEST_DONE()
