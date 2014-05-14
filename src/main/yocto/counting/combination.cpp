@@ -17,8 +17,11 @@ namespace yocto
     nmk(ptrdiff_t(n)-ptrdiff_t(k)),
     nmkp1(nmk+1)
     {
-        if(k<=0||k>n) throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(n), unsigned(k) );
+        if(k<=0||k>n)
+            throw libc::exception( EDOM, "invalid combination(%u,%u)", unsigned(n), unsigned(k) );
+        
         comb = static_cast<size_t *>(memory::global:: __calloc(k,sizeof(size_t)));
+        assert(comb);
         init();
     }
     
@@ -29,18 +32,21 @@ namespace yocto
     
     void combination:: init() throw()
     {
-        for(size_t i=0;i<k;++i) comb[i] = i;
+        for(size_t i=0;i<k;++i)
+        {
+            comb[i] = i;
+        }
         (uint64_t&)id = 1;
     }
     
     bool combination:: next() throw()
     {
         ptrdiff_t i = ptrdiff_t(k) - 1;
-        ++comb[i];
-        while( (i>=0) && (comb[i]>=nmkp1+i) )
+        //++comb[i];
+        while( (i>=0) && (++comb[i]>=nmkp1+i) )
         {
             --i;
-            ++comb[i];
+            //++comb[i];
         }
         
         if (comb[0]>nmk)  // Combination (n-k, n-k+1, ..., n) reached
