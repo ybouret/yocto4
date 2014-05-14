@@ -9,6 +9,7 @@
 
 namespace yocto
 {
+    
     static inline
     size_t check_drawers(const size_t drawers)
     {
@@ -43,10 +44,12 @@ namespace yocto
     
     void dispatch:: update() throw()
     {
+        //______________________________________________________________________
+        //
         //the combination holds the position of the walls
+        //______________________________________________________________________
         size_t   last = C[0];
         count[0] = last;
-        //std::cerr << "#drawer[0]=" << count[0] << std::endl;
 #if !defined(NDEBUG)
         size_t sum = count[0];
 #endif
@@ -54,15 +57,12 @@ namespace yocto
         {
             const size_t curr = C[i];
             count[i] = (curr-last)-1;
-            //std::cerr << "#drawer[" << i << "]=" << count[i] << std::endl;
             last = curr;
 #if !defined(NDEBUG)
             sum += count[i];
 #endif
         }
         count[walls] = meta-(++last);
-        //std::cerr << "#drawer[" << walls << "]=" << count[walls] << std::endl;
-
 #if !defined(NDEBUG)
         sum += count[walls];
         assert(socks==sum);
@@ -98,6 +98,6 @@ namespace yocto
     {
         return C.id;
     }
-
+    
     
 }

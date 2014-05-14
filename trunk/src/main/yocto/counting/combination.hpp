@@ -31,6 +31,8 @@ namespace yocto
         
         friend std::ostream & operator<<( std::ostream &os, const combination &C );
         
+        uint64_t count_all() throw();
+        
     private:
         YOCTO_DISABLE_ASSIGN(combination);
         size_t         *comb;
