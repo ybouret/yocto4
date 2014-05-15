@@ -63,6 +63,7 @@ YOCTO_BUILD(visit)
 YOCTO_BUILD(fltk)
 YOCTO_BUILD(fovea)
 YOCTO_BUILD(python)
+YOCTO_BUILD(R)
 
 MESSAGE( STATUS "---------------- </modules> ----------------" )
 MESSAGE( STATUS "" )
