@@ -11,6 +11,7 @@ clean:
 	@${MAKE} -s -C src/chemical/docs   clean
 	@${MAKE} -s -C src/gems/docs       clean
 	@${MAKE} -s -C prj                 clean
+	@${MAKE} -s -C src/R               clean
 ifdef WINDIR
 
 else
