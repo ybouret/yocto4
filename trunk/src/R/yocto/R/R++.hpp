@@ -3,6 +3,8 @@
 
 #include <R.h>
 #include <Rinternals.h>
+#include <new>
+
 #include "yocto/exception.hpp"
 
 namespace yocto
