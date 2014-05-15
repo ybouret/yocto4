@@ -12,12 +12,12 @@ namespace yocto
     {
     public:
         virtual ~ITableau() throw();
-        const size_t imin;
-        const size_t imax;
+        const size_t cmin;
+        const size_t cmax;
         const size_t cols;
         
     protected:
-        explicit ITableau(size_t __imin, size_t __imax) throw();
+        explicit ITableau(size_t imin, size_t imax) throw();
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(ITableau);
@@ -32,23 +32,23 @@ namespace yocto
         YOCTO_ARGUMENTS_DECL_T;
         
         
-        inline type       & operator[](size_t i) throw()       { assert(i>=imin); assert(i<=imax); return addr[i]; }
-        inline const_type & operator[](size_t i) const throw() { assert(i>=imin); assert(i<=imax); return addr[i]; }
+        inline type       & operator[](size_t i) throw()       { assert(i>=cmin); assert(i<=cmax); return addr[i]; }
+        inline const_type & operator[](size_t i) const throw() { assert(i>=cmin); assert(i<=cmax); return addr[i]; }
         
         inline virtual ~TableauOf() throw() {}
         
         
     protected:
         mutable_type *addr;
-        inline explicit TableauOf(size_t      __imin,
-                                  size_t      __imax) throw() :
-        ITableau(__imin,__imax), addr(0) {}
+        inline explicit TableauOf(size_t      imin,
+                                  size_t      imax) throw() :
+        ITableau(imin,imax), addr(0) {}
       
         inline void attach(mutable_type *base) throw()
         {
             assert(base);
             assert(!addr);
-            addr = base-imin;
+            addr = base-cmin;
         }
         
         friend class Tableau2D<T>;
@@ -63,17 +63,17 @@ namespace yocto
     public:
         YOCTO_ARGUMENTS_DECL_T;
         
-        explicit Tableau1D(size_t   __imin,
-                           size_t   __imax,
+        explicit Tableau1D(size_t   imin,
+                           size_t   imax,
                            param_type args ) :
-        TableauOf<T>(__imin,
-                     __imax)
+        TableauOf<T>(imin,
+                     imax)
         {
             this->attach( (mutable_type *)memory::global::__calloc( this->cols,sizeof(T)));
-            size_t i=this->imin;
+            size_t i=this->cmin;
             try
             {
-                while(i<this->imax)
+                while(i<this->cmax)
                 {
                     new (this->addr+i) mutable_type(args);
                     ++i;
@@ -81,7 +81,7 @@ namespace yocto
             }
             catch(...)
             {
-                for(size_t j=this->imin;j<i;++j)
+                for(size_t j=this->cmin;j<i;++j)
                 {
                     this->addr[j].~mutable_type();
                 }
@@ -93,7 +93,7 @@ namespace yocto
         
         virtual ~Tableau1D() throw()
         {
-            for(size_t i=this->imin;i<=this->imax;++i)
+            for(size_t i=this->cmin;i<=this->cmax;++i)
             {
                 this->addr[i].~mutable_type();
             }
@@ -102,7 +102,7 @@ namespace yocto
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Tableau1D);
-        inline void kill() throw() { memory::global::__free(this->addr+=this->imin); }
+        inline void kill() throw() { memory::global::__free(this->addr+=this->cmin); }
     };
     
     

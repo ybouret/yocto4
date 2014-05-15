@@ -6,10 +6,10 @@ namespace yocto
     
     ITableau:: ~ITableau() throw() {}
   
-    ITableau:: ITableau(size_t __imin, size_t __imax) throw() :
-    imin( min_of(__imin,__imax) ),
-    imax( max_of(__imin,__imax) ),
-    cols(imax-imin+1)
+    ITableau:: ITableau(size_t imin, size_t imax) throw() :
+    cmin( min_of(imin,imax) ),
+    cmax( max_of(imin,imax) ),
+    cols(cmax-cmin+1)
     {
     }
     

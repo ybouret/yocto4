@@ -6,7 +6,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(tab)
 {
     Tableau1D<int> ti(0,5,0);
-    for(size_t i=ti.imin;i<=ti.imax;++i)
+    for(size_t i=ti.cmin;i<=ti.cmax;++i)
     {
         ti[i] = int(i);
     }

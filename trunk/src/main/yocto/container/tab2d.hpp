@@ -14,8 +14,8 @@ namespace yocto
     public:
         YOCTO_ARGUMENTS_DECL_T;
         
-        const size_t jmin;
-        const size_t jmax;
+        const size_t rmin;
+        const size_t rmax;
         const size_t rows;
         const size_t items;
         
@@ -24,15 +24,15 @@ namespace yocto
         
         Row & operator[](size_t j) throw()
         {
-            assert(j>=jmin);
-            assert(j<=jmax);
+            assert(j>=rmin);
+            assert(j<=rmax);
             return row[j];
         }
         
         const Row & operator[](size_t j) const throw()
         {
-            assert(j>=jmin);
-            assert(j<=jmax);
+            assert(j>=rmin);
+            assert(j<=rmax);
             return row[j];
         }
         
@@ -42,9 +42,9 @@ namespace yocto
                            size_t   __imax,
                            param_type args) :
         ITableau(__imin,__imax),
-        jmin( min_of(__jmin,__jmax) ),
-        jmax( max_of(__jmin,__jmax) ),
-        rows( jmax+1-jmin ),
+        rmin( min_of(__jmin,__jmax) ),
+        rmax( max_of(__jmin,__jmax) ),
+        rows( rmax+1-rmin ),
         items( this->cols*rows),
         row(0),
         ptr(0),
@@ -88,10 +88,10 @@ namespace yocto
             size_t c = 0;
             for(size_t r=0;r<rows;++r,c+=cols)
             {
-                Row *rr = new (row+r) Row(this->imin,this->imax);
+                Row *rr = new (row+r) Row(this->cmin,this->cmax);
                 rr->attach( &ptr[c] );
             }
-            row -= jmin;
+            row -= rmin;
         }
         
         
