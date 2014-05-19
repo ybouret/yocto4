@@ -1,6 +1,8 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/mpa/natural.hpp"
 #include "yocto/code/rand.hpp"
+#include "yocto/ios/ocstream.hpp"
+#include <cmath>
 
 using namespace yocto;
 
@@ -39,7 +41,7 @@ YOCTO_UNIT_TEST_IMPL(ari)
         std::cerr << x << " and " << y << " are coprime" << std::endl;
     }
     
-
+    
     for(int i=0;i<=20;++i)
     {
         const mpn n = mpn::factorial(i);
@@ -67,6 +69,22 @@ YOCTO_UNIT_TEST_IMPL(ari)
         }
     }
 #endif
+    
+    {
+        ios::ocstream fp("max_comb.dat",false);
+        for(uint64_t n=1;n<=25;++n)
+        {
+            const mpn max_comb = mpn::binomial(n,n/2);
+            if(max_comb.bits()<=64)
+            {
+                const uint64_t m = max_comb.to<uint64_t>();
+                const double   x = m;
+                fp("%llu %llu %g\n", n,m, log(x));
+            }
+        }
+    }
+    
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

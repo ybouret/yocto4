@@ -39,11 +39,19 @@ namespace yocto
         //! reset and count all
         uint64_t count_all() throw();
         
+        void * save(void *) const;
+        
     private:
         YOCTO_DISABLE_ASSIGN(combination);
         size_t         *comb;
         const ptrdiff_t nmk;
         const ptrdiff_t nmkp1;
+        
+    public:
+        const size_t bytes_per_index; //!< bytes_for(n-1)
+        const size_t bytes_per_frame; //!< byte_per_index * k
+        
+        
     };
     
 }

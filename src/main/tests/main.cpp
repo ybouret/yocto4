@@ -125,6 +125,7 @@ YOCTO_UNIT_TEST_INIT(128)
     YOCTO_UNIT_TEST_DECL(lexicon);
     YOCTO_UNIT_TEST_DECL(comb);
     YOCTO_UNIT_TEST_DECL(comb_perf);
+    YOCTO_UNIT_TEST_DECL(comb_io);
     YOCTO_UNIT_TEST_DECL(dispatch);
     YOCTO_UNIT_TEST_DECL(tab);
     YOCTO_UNIT_TEST_DECL(mpi_split);
