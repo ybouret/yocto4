@@ -105,6 +105,7 @@ namespace yocto
         }
         
     private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(Tableau2D);
         Row          *row;
         mutable_type *ptr;
         size_t wlen;

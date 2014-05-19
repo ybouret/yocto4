@@ -1,4 +1,5 @@
 #include "yocto/core/mpi-split.hpp"
+#include "yocto/mpa/rational.hpp"
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;
@@ -11,7 +12,7 @@ namespace {
     {
         const T global_offset(1);
         const T global_length(100);
-    
+        
         for(size_t size=1;size<=6;++size)
         {
             std::cerr << "size=" << size << ": " << global_offset << " -> " << global_length+global_offset-1  << std::endl;
@@ -30,11 +31,12 @@ namespace {
 }
 
 
-YOCTO_UNIT_TEST_IMPL(mpi_split)
+YOCTO_UNIT_TEST_IMPL(split)
 {
-    __test_split<int>();
-    __test_split<size_t>();
-    
+    __test_split<mpn>();
+    __test_split<mpz>();
+    __test_split<mpq>();
+
 }
 YOCTO_UNIT_TEST_DONE()
 

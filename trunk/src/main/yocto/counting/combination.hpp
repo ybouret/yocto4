@@ -34,7 +34,7 @@ namespace yocto
         uint64_t count_all() throw();
         
     private:
-        YOCTO_DISABLE_ASSIGN(combination);
+        YOCTO_DISABLE_COPY_AND_ASSIGN(combination);
         size_t         *comb;
         const ptrdiff_t nmk;
         const ptrdiff_t nmkp1;
