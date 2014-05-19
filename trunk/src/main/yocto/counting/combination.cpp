@@ -25,6 +25,21 @@ namespace yocto
         init();
     }
     
+    combination:: combination(const combination &C ) :
+    n(C.n),
+    k(C.k),
+    id(C.id),
+    comb(0),
+    nmk(C.nmk),
+    nmkp1(C.nmkp1)
+    {
+        comb = static_cast<size_t *>(memory::global:: __calloc(k,sizeof(size_t)));
+        for(size_t i=0;i<k;++i)
+        {
+            comb[i] = C.comb[i];
+        }
+    }
+    
     combination:: ~combination() throw()
     {
         memory::global::__free(comb);
@@ -64,6 +79,8 @@ namespace yocto
     }
  
    
+    
+
 
     std::ostream & operator<<( std::ostream &os, const combination &C )
     {

@@ -19,7 +19,12 @@ namespace yocto
         
         //! n>0,k>0,k<=n
         explicit combination(const size_t an, const size_t ak);
+        
+        //! cleanup
         virtual ~combination() throw();
+        
+        //! copy the current combination
+        combination(const combination &);
         
         //! value of comb[0<=i<k]
         inline size_t operator[](size_t i) const throw()
@@ -31,10 +36,11 @@ namespace yocto
         
         friend std::ostream & operator<<( std::ostream &os, const combination &C );
         
+        //! reset and count all
         uint64_t count_all() throw();
         
     private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(combination);
+        YOCTO_DISABLE_ASSIGN(combination);
         size_t         *comb;
         const ptrdiff_t nmk;
         const ptrdiff_t nmkp1;

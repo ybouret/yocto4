@@ -101,6 +101,26 @@ namespace yocto
             return rational(N,D);
         }
         
+        rational & rational::operator++()
+        {
+            const rational __one__(1);
+            rational tmp = add(*this,__one__);
+            xch(tmp);
+            return *this;
+        }
+        
+        rational  rational:: operator++ (int)
+        {
+            const rational save(*this);
+            
+            const rational __one__(1);
+            rational tmp = add(*this,__one__);
+            xch(tmp);
+            
+            return save;
+        }
+
+        
         //______________________________________________________________________
         //
         // SUB
@@ -113,6 +133,26 @@ namespace yocto
             const natural D = rhs.den * lhs.den;
             return rational(N,D);
         }
+        
+        rational & rational::operator--()
+        {
+            const rational __one__(1);
+            rational tmp = sub(*this,__one__);
+            xch(tmp);
+            return *this;
+        }
+        
+        rational  rational:: operator-- (int)
+        {
+            const rational save(*this);
+            
+            const rational __one__(1);
+            rational tmp = sub(*this,__one__);
+            xch(tmp);
+            
+            return save;
+        }
+
         
         //______________________________________________________________________
         //
