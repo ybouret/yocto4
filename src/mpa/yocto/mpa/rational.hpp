@@ -82,7 +82,6 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
             
             YOCTO_MPQ_FRIENDS(+,add)
             
-            
             inline rational & operator+=( const rational &rhs )
             {
                 rational tmp = add(*this,rhs);
@@ -90,6 +89,9 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
                 return *this;
             }
             YOCTO_MPQ_COMPACT(+=,add)
+            
+            rational & operator++();     //!< prefix
+            rational   operator++ (int); //!< postfix
             
             //__________________________________________________________________
             //
@@ -118,6 +120,8 @@ YOCTO_MPQ_COMPACT_FOR(OP,CALL,natural&)
                 return rational(N,q.den);
             }
 
+            rational & operator--();     //!< prefix
+            rational   operator-- (int); //!< postfix
             
             //__________________________________________________________________
             //
