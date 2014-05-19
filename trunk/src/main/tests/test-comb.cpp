@@ -101,3 +101,16 @@ YOCTO_UNIT_TEST_IMPL(dispatch)
     while(D.next());
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(comb_io)
+{
+    size_t n = (argc > 1) ? strconv::to<size_t>(argv[1],"n") : 10 ;
+    size_t k = (argc > 2) ? strconv::to<size_t>(argv[2],"k") :  3 ;
+    combination C(n,k);
+    std::cerr << "bytes_per_frame(" << n << "," << k <<") = " << C.bytes_per_frame << std::endl;
+    const uint64_t card = C.count_all();
+    std::cerr << "#combi=" << card << std::endl;
+    std::cerr << "bytes =" << card*C.bytes_per_frame << std::endl;
+}
+YOCTO_UNIT_TEST_DONE()
+
