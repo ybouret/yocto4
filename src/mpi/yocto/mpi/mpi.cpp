@@ -52,10 +52,13 @@ namespace yocto
 	{
 		static int *    mpi_argc_ = NULL;
 		static char *** mpi_argv_ = NULL;
+        static int      mpi_level_ = -1;
+        
 		static void mpi_reset_() throw()
 		{
 			mpi_argc_ = NULL;
 			mpi_argv_ = NULL;
+            mpi_level_ = -1;
 		}
 	}
 	
@@ -89,7 +92,6 @@ namespace yocto
         
     }
     
-    int mpi:: RequestedThreadLevel = MPI_THREAD_SINGLE;
     
 	mpi:: mpi() :
 	CommWorldSize(0),
@@ -119,7 +121,7 @@ namespace yocto
             //==================================================================
             // MPI basic setup
             //==================================================================
-			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , RequestedThreadLevel, (int*)&ThreadLevel);
+			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , mpi_level_, (int*)&ThreadLevel);
 			if( err != MPI_SUCCESS )
 			{
 				throw mpi::exception( err, "MPI_Init_thread()");
@@ -166,7 +168,7 @@ namespace yocto
         }
     }
     
-    mpi & mpi:: init( int * argc, char ***argv )
+    mpi & mpi:: init( int * argc, char ***argv, int requestedThreadLevel)
     {
         YOCTO_LOCK(access);
         if( NULL == argc || NULL == argv )
@@ -174,8 +176,9 @@ namespace yocto
             throw yocto::exception("yocto::mpi::Init( INVALID ARGS )");
         }
         
-        mpi_argc_ = argc;
-        mpi_argv_ = argv;
+        mpi_argc_  = argc;
+        mpi_argv_  = argv;
+        mpi_level_ = requestedThreadLevel;
         mpi & ans = mpi::instance();
         mpi_reset_();
         return ans;

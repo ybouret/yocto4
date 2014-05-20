@@ -77,7 +77,7 @@ namespace yocto
 		};
 		
         //! MPI_Init wrapper
-		static mpi & init( int * argc, char ***argv );
+		static mpi & init( int * argc, char ***argv, int requestedThreadLevel );
 		void   Finalize() throw();
 		
         
@@ -92,8 +92,6 @@ namespace yocto
 		const char       ProcessorName[MPI_MAX_PROCESSOR_NAME]; //!< from MPI_Get_Processor_name(...)
 		const int        ThreadLevel;      //!< Information
         const string     CommWorldID;      //!< size.rank, formatted as %d
-        
-        static int       RequestedThreadLevel; //!< default is MPI_THREAD_SINGLE
         
         
         const char *ThreadLevelName() const throw();
@@ -387,7 +385,7 @@ namespace yocto
 	
 }
 
-#define YOCTO_MPI   const mpi & MPI = mpi::init(&argc,&argv)
+#define YOCTO_MPI(LEVEL)   const mpi & MPI = mpi::init(&argc,&argv,MPI_THREAD_##LEVEL)
 
 #define MPI_CTIME_DEBUG 0
 

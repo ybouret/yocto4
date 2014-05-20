@@ -24,7 +24,7 @@ static inline void save_curve( double dX, const array1D<double> &Y )
 
 YOCTO_UNIT_TEST_IMPL(h1d)
 {
-    const mpi &    MPI  = mpi::init( &argc, &argv );
+    const mpi &    MPI  = mpi::init( &argc, &argv, MPI_THREAD_SINGLE );
     const int      rank = MPI.CommWorldRank;
     const int      size = MPI.CommWorldSize;
     const int      last = size-1;

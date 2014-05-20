@@ -18,7 +18,7 @@ YOCTO_UNIT_TEST_IMPL(ping)
 	strncpy( obuff, "Hello", sizeof(obuff) );
 	
 	
-	mpi & MPI = mpi::init( &argc, &argv );	
+	mpi & MPI = mpi::init( &argc, &argv , MPI_THREAD_SINGLE);
 	const int atSelf  = MPI.CommWorldRank;
 	const int atRight = MPI.CommWorldNext();
 	const int atLeft  = MPI.CommWorldPrev();

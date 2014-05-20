@@ -7,7 +7,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(init)
 {
 	
-    YOCTO_MPI;
+    YOCTO_MPI(SINGLE);
     MPI.CloseStdIO();
     MPI.Printf(stderr, "'%s' is ready\n",MPI.ProcessorName);
 	MPI.Printf0(stderr, "ThreadLevel= %s\n", MPI.ThreadLevelName());
