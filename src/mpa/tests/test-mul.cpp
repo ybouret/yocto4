@@ -57,14 +57,14 @@ YOCTO_UNIT_TEST_IMPL(mul_perf)
     vector<mpn> X(N,as_capacity);
     vector<mpn> Y(N,as_capacity);
     wtime       chrono;
-    const size_t ITER = 16;
-    const size_t Bmax = 10;
+    const size_t ITER = 32;
+    const size_t Bmax = 16;
     volatile mpn z;
     double sum = 0;
     for(size_t i=1;i<=Bmax;++i)
     {
         double tot = 0;
-        for(size_t j=i;j<=Bmax;++j)
+        for(size_t j=1;j<=Bmax;++j)
         {
             X.free();
             Y.free();
@@ -80,17 +80,18 @@ YOCTO_UNIT_TEST_IMPL(mul_perf)
             {
                 for(size_t k=N;k>0;--k)
                 {
-                    (mpn&)z = X[k] * Y[k];
+                    (void) mpn::mul(X[k],Y[k]);
                 }
             }
             const double ell = chrono.query();
             tot += ell;
         }
-        std::cerr << "time" << i << " = " << tot * 1000.0 << std::endl;
+        std::cerr << "time" << i << " = " << tot * 1000.0 << " ms" << std::endl;
         sum += tot;
     }
+    sum /= ITER;
     std::cerr << "sum=" << sum * 1000.0 << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
-        
+
 
