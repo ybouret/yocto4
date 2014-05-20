@@ -31,6 +31,7 @@ namespace yocto
         friend std::ostream & operator<<( std::ostream &os, const dispatch &D );
         
     private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(dispatch);
         combination  C;       //!< C(meta,walls)
         size_t      *count;   //!< socks in drawer #i is count[i]
         void         update() throw(); //!< after a new combination is computed
