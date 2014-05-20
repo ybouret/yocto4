@@ -11,8 +11,8 @@ namespace yocto
     {
         typedef double          real_t;
         typedef complex<real_t> cplx_t;
-      
-//#define YOCTO_MPA_USE_CODE 1
+        
+        //#define YOCTO_MPA_USE_CODE 1
 #if defined(YOCTO_MPA_USE_CODE)
 #include "bitrevcode.cxx"
 #include "bitrevcode2.cxx"
@@ -66,12 +66,20 @@ namespace yocto
             {
                 static const real_t sgn_two_pi = numeric<real_t>::two_pi;
                 size_t              mmax       = 2;
+                size_t              mln2       = 1;
                 while (n > mmax)
                 {
+                    if( (1<<mln2) != mmax )
+                    {
+                        std::cerr << "Bad ln2" << std::endl;
+                        exit(0);
+                    }
                     const size_t istep = mmax << 1;
+                    const size_t isln2 = mln2+1;
                     const real_t theta = sgn_two_pi/mmax;
-                    real_t wtemp       = sin(0.5*theta);
-                    real_t wpr         = -2.0*wtemp*wtemp;
+                    real_t       wtemp = sin(0.5*theta);
+                    const real_t wsq   = wtemp*wtemp;
+                    real_t wpr         = -(wsq+wsq);
                     real_t wpi         = sin(theta);
                     real_t wr          = 1.0;
                     real_t wi          = 0.0;
@@ -110,6 +118,7 @@ namespace yocto
                         wi=wi*wpr+wtemp*wpi+wi;
                     }
                     mmax=istep;
+                    mln2=isln2;
                 }
             }
 			
@@ -264,7 +273,6 @@ namespace yocto
 			
         }
         
-        
         natural natural:: mul( const natural &lhs, const natural &rhs )
         {
             const size_t nL = lhs.size;
@@ -293,7 +301,7 @@ namespace yocto
                 for(size_t i=0;i<nL;++i) L[i].re = real_t(l[i]);
                 for(size_t i=0;i<nR;++i) R[i].re = real_t(r[i]);
 				
-				//--------------------------------------------------------------
+                //--------------------------------------------------------------
                 //-- forward
 				//--------------------------------------------------------------
                 _xfft( &L[0].re, &R[0].re, nN   );
@@ -421,7 +429,7 @@ namespace yocto
             xch(prod);
             return *this;
         }
-
+        
         
     }
     
