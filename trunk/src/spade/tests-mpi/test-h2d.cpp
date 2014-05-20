@@ -34,7 +34,7 @@ void save_fields( const array<string> &var , const Workspace &W, vtk_writer &vtk
 
 YOCTO_UNIT_TEST_IMPL(h2d)
 {
-    const mpi & MPI  = mpi::init( &argc, &argv );
+    const mpi & MPI  = mpi::init( &argc, &argv , MPI_THREAD_SINGLE);
     const int   rank = MPI.CommWorldRank;
     const int   size = MPI.CommWorldSize;
     const int   last = MPI.CommWorldLast;

@@ -36,7 +36,7 @@ void __check_ops(const mpi &MPI, const char *fmt)
 YOCTO_UNIT_TEST_IMPL(ops)
 {
 	
-    YOCTO_MPI;
+    YOCTO_MPI(SINGLE);
     MPI.CloseStdIO();
  
     MPI.Printf0(stderr, "Checking DataBase, #items=%u\n", unsigned( MPI.db.size() ) );

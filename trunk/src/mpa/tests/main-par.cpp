@@ -8,7 +8,7 @@ int main(int argc, char *argv[] )
     alea_init();
     try
     {
-        YOCTO_MPI;
+        YOCTO_MPI(SINGLE);
         //MPI.CloseStdIO();
         
         mpn n = MPI.CommWorldRank;

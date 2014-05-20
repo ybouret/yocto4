@@ -5,7 +5,7 @@ using namespace yocto;
 
 YOCTO_UNIT_TEST_IMPL(ios)
 {
-    YOCTO_MPI;
+    YOCTO_MPI(SINGLE);
     {
         mpi::ostream fp( MPI, "foo.dat", false );
         if(MPI.IsFirst)
