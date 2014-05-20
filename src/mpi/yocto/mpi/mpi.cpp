@@ -9,6 +9,11 @@ namespace yocto
        
     
     
+    //==========================================================================
+    //
+    // mpi exceptions
+    //
+    //==========================================================================
 #if defined(_MSC_VER)
 	// init of string_
 #pragma warning ( disable : 4351 )
@@ -113,7 +118,7 @@ namespace yocto
             //==================================================================
             // MPI basic setup
             //==================================================================
-			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , MPI_THREAD_MULTIPLE, (int*)&ThreadLevel);
+			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , MPI_THREAD_SINGLE, (int*)&ThreadLevel);
 			if( err != MPI_SUCCESS )
 			{
 				throw mpi::exception( err, "MPI_Init()");
