@@ -4,6 +4,7 @@
 #include "yocto/mpi/mpi.hpp"
 #include "yocto/mpa/rational.hpp"
 #include "yocto/memory/buffers.hpp"
+#include "yocto/memory/pooled.hpp"
 
 namespace yocto
 {
@@ -27,7 +28,7 @@ namespace yocto
                 const size_t length =  MPI.Recv<size_t>(source, tag, comm, status);
                 if(length)
                 {
-                    memory::buffer_of<char,memory::global> buf(length);
+                    memory::buffer_of<char,memory::pooled> buf(length);
                     MPI.Recv(buf.rw(), length, MPI_BYTE, source, tag, comm, status);
                     natural ans(buf);
                     return ans;
@@ -62,7 +63,7 @@ namespace yocto
                            int        source,
                            MPI_Comm   comm )
             {
-                MPI_Status   status;
+                MPI_Status    status;
                 const int8_t  s = MPI.Recv<int8_t>(source,tag,comm,status);
                 const natural n = recv_n(MPI,source,comm);
                 integer       z(n);
