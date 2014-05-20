@@ -4,6 +4,7 @@
 #include "yocto/memory/blocks.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/random/bits.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
@@ -97,6 +98,18 @@ namespace yocto
             static Random::Bits &mgr = Random::CryptoBits();
             return mgr();
         }
+        
+#define SIN_OF(LN2) sin(math::numeric<double>::two_pi/(size_t(1)<<(LN2)))
+        const double memIO::sin_table[32] =
+        {
+            SIN_OF(0),  SIN_OF(1),  SIN_OF(2),  SIN_OF(3),  SIN_OF(4),
+            SIN_OF(5),  SIN_OF(6),  SIN_OF(7),  SIN_OF(8),  SIN_OF(9),
+            SIN_OF(10), SIN_OF(11), SIN_OF(12), SIN_OF(13), SIN_OF(14),
+            SIN_OF(15), SIN_OF(16), SIN_OF(17), SIN_OF(18), SIN_OF(19),
+            SIN_OF(20), SIN_OF(21), SIN_OF(22), SIN_OF(23), SIN_OF(24),
+            SIN_OF(25), SIN_OF(26), SIN_OF(27), SIN_OF(28), SIN_OF(29),
+            SIN_OF(30), SIN_OF(31)
+        };
         
     }
     
