@@ -75,20 +75,21 @@ namespace yocto
     
     bool combination:: next() throw()
     {
-        ptrdiff_t i = ptrdiff_t(k) - 1;
+	const ptrdiff_t sk = ptrdiff_t(k);
+        ptrdiff_t       i  = sk - 1;
         //++comb[i];
-        while( (i>=0) && (++comb[i]>=nmkp1+i) )
+        while( (i>=0) && (ptrdiff_t(++comb[i])>=nmkp1+i) )
         {
             --i;
             //++comb[i];
         }
         
-        if (comb[0]>nmk)  // Combination (n-k, n-k+1, ..., n) reached
+        if (ptrdiff_t(comb[0])>nmk)  // Combination (n-k, n-k+1, ..., n) reached
             return false; // No more combinations can be generated
         
         // comb now looks like (..., x, n, n, n, ..., n).
         // Turn it into (..., x, x + 1, x + 2, ...)
-        for (++i; i<k; ++i)
+        for (++i; i<sk; ++i)
         {
             comb[i] = comb[i-1] + 1;
         }
