@@ -142,14 +142,15 @@ namespace yocto
             // Lanczos-Algorithm
             //==================================================================
             {
-                static const real_t sgn_two_pi = numeric<real_t>::two_pi;
                 size_t              mmax       = 2;
+                size_t              mln2       = 1;
                 while (n > mmax) {
                     const size_t istep = mmax << 1;
-                    const real_t theta = sgn_two_pi/mmax;
-                    real_t wtemp       = sin(0.5*theta);
-                    real_t wpr         = - 2.0*wtemp*wtemp;
-                    real_t wpi         = sin(theta);
+                    const size_t isln2 = mln2+1;
+                    real_t       wtemp = memIO::sin_table[isln2]; //sin(0.5*theta);
+                    const real_t wsq   = wtemp*wtemp;
+                    real_t wpr         = -(wsq+wsq);
+                    real_t wpi         = memIO::sin_table[mln2]; //sin(theta);
                     real_t wr          = 1.0;
                     real_t wi          = 0.0;
                     
@@ -172,6 +173,7 @@ namespace yocto
                         wi=wi*wpr+wtemp*wpi+wi;
                     }
                     mmax=istep;
+                    mln2=isln2;
                 }
             }
             
