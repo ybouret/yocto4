@@ -89,6 +89,7 @@ namespace yocto
         
     }
     
+    int mpi:: RequestedThreadLevel = MPI_THREAD_SINGLE;
     
 	mpi:: mpi() :
 	CommWorldSize(0),
@@ -118,10 +119,10 @@ namespace yocto
             //==================================================================
             // MPI basic setup
             //==================================================================
-			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , MPI_THREAD_SINGLE, (int*)&ThreadLevel);
+			int err = MPI_Init_thread( mpi_argc_, mpi_argv_ , RequestedThreadLevel, (int*)&ThreadLevel);
 			if( err != MPI_SUCCESS )
 			{
-				throw mpi::exception( err, "MPI_Init()");
+				throw mpi::exception( err, "MPI_Init_thread()");
 			}
 			
 			err = MPI_Comm_size( MPI_COMM_WORLD, (int *) & CommWorldSize );

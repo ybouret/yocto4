@@ -93,6 +93,9 @@ namespace yocto
 		const int        ThreadLevel;      //!< Information
         const string     CommWorldID;      //!< size.rank, formatted as %d
         
+        static int       RequestedThreadLevel; //!< default is MPI_THREAD_SINGLE
+        
+        
         const char *ThreadLevelName() const throw();
         int Comm_rank( MPI_Comm comm ) const;
         

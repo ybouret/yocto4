@@ -13,6 +13,7 @@ YOCTO_UNIT_TEST_IMPL(async)
 	_rand.wseed();
     hashing::sha1 H;
     
+    mpi::RequestedThreadLevel = MPI_THREAD_MULTIPLE;
     YOCTO_MPI;
     MPI.CloseStdIO();
     
