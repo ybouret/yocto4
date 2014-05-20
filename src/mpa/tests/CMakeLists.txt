@@ -21,3 +21,18 @@ ADD_TEST(Int   test-mpa int)
 ADD_TEST(Rational test-mpa rational)
 ADD_TEST(Split   test-mpa  split)
 
+FIND_PACKAGE(MPI)
+
+IF(MPI_FOUND)
+INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+INCLUDE_DIRECTORIES(../../mpi)
+
+ADD_EXECUTABLE(test-mpa-par main-par.cpp)
+TARGET_LINK_YOCTO(test-mpa-par mpa mpi)
+TARGET_LINK_LIBRARIES(test-mpa-par ${MPI_LIBRARIES})
+
+
+
+ENDIF(MPI_FOUND)
+
+
