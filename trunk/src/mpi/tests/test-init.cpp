@@ -8,9 +8,10 @@ YOCTO_UNIT_TEST_IMPL(init)
 {
 	
     YOCTO_MPI;
-    MPI.CloseStdIO();
-    MPI.Printf(stderr, "'%s' is ready\n",MPI.ProcessorName);
-	MPI.Printf0(stderr, "ThreadLevel= %s\n", MPI.ThreadLevelName());
+    //MPI.CloseStdIO();
+    //MPI.Printf(stderr, "'%s' is ready\n",MPI.ProcessorName);
+	//MPI.Printf0(stderr, "ThreadLevel= %s\n", MPI.ThreadLevelName());
+    
 }
 
 YOCTO_UNIT_TEST_DONE()
