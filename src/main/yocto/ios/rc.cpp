@@ -215,7 +215,7 @@ H(), db(16,as_capacity)
                 //--------------------------------------------------------------
                 const string rcname = rc->load_string();
                 H( rcname );
-                std::cerr << "rc: load '" << rcname << "'" << std::endl;
+                //std::cerr << "rc: load '" << rcname << "'" << std::endl;
                 
                 //--------------------------------------------------------------
                 // read resource length
