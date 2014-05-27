@@ -1,6 +1,7 @@
 #include "yocto/json/json.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/exceptions.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -258,22 +259,84 @@ return * data._##TYPE; }
         // Array
         //
         ////////////////////////////////////////////////////////////////////////
-        Array:: Array() throw() : values() {}
-        Array:: ~Array() throw() {}
         
-        Array:: Array( const Array &other ) : values( other.values ) {}
+        static inline Value *makeValue( const ValueType of )
+        {
+            Value *v = object::acquire1<Value>();
+            try
+            {
+                return new (v) Value(of);
+            }
+            catch(...)
+            {
+                object::release1<Value>(v);
+                throw;
+            }
+        }
+        
+        static inline Value *copyValue(const Value &other )
+        {
+            Value *v = object::acquire1<Value>();
+            try
+            {
+                return new (v) Value(other);
+            }
+            catch(...)
+            {
+                object::release1<Value>(v);
+                throw;
+            }
+            
+        }
+        
+        Array:: Array() throw() : values() {}
+        
+        void Array::kill() throw()
+        {
+            while(values.size())
+            {
+                Value *v  = values.back();
+                v->~Value();
+                object::release1<Value>(v);
+                values.pop_back();
+            }
+        }
+        
+        Array:: ~Array() throw() { kill(); }
+        
+        Array:: Array( const Array &other ) : values( other.values.size(), as_capacity )
+        {
+            try
+            {
+                for(size_t i=1;i<=other.values.size();++i)
+                {
+                    auto_ptr<Value> ptr( copyValue( *other.values[i]) );
+                    values.push_back( ptr.__get() );
+                    ptr.forget();
+                }
+            }
+            catch(...)
+            {
+                kill();
+                throw;
+            }
+        }
         
         size_t Array:: length() const throw() { return values.size(); }
         
         Value &Array:: operator[]( size_t index )
         {
             if( index < length() )
-                return values[index+1];
+                return *values[index+1];
             else
             {
-                const Value nil;
-                while( index < length() ) values.push_back( nil );
-                return values[index+1];
+                while( index < length() )
+                {
+                    auto_ptr<Value>   ptr( makeValue(IsNull) );
+                    values.push_back( ptr.__get() );
+                    ptr.forget();
+                }
+                return *values[index+1];
             }
         }
         
@@ -281,18 +344,30 @@ return * data._##TYPE; }
         {
             if( index >= length() )
                 throw exception("const JSON::Array[%u>=%u]", unsigned( index ), unsigned( length() ) );
-            return values[index+1];
+            return *values[index+1];
         }
         
-        void Array:: push( const Value &v ) { values.push_back( v ); }
-        void Array:: pop()   { if( length() <= 0 ) throw exception("JSON::Array::pop(EMPTY)");   values.pop_back();  }
-        void Array:: shift() { if( length() <= 0 ) throw exception("JSON::Array::shift(EMPTY)"); values.pop_front(); }
-        void Array:: unshift( const Value &v ) { values.push_front(v); }
+        void Array:: push( const Value &v )
+        {
+            auto_ptr<Value> ptr( copyValue(v) );
+            values.push_back( ptr.__get() );
+            ptr.forget();
+        }
+        
+        void Array:: pop()   { if( length() <= 0 ) throw exception("JSON::Array::pop(EMPTY)");   values.back()->~Value();  object::release1<Value>(values.back());  values.pop_back();  }
+        void Array:: shift() { if( length() <= 0 ) throw exception("JSON::Array::shift(EMPTY)"); values.front()->~Value(); object::release1<Value>(values.front()); values.pop_front(); }
+        void Array:: unshift( const Value &v )
+        {
+            auto_ptr<Value> ptr( copyValue(v) );
+            values.push_front(ptr.__get());
+            ptr.forget();
+        }
+        
         void Array:: reverse() throw()
         {
             if( length() > 0 )
             {
-                mreverse<Value>( &values[1], values.size() );
+                mreverse<Value *>( &values[1], values.size() );
             }
         }
         
