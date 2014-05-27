@@ -91,7 +91,6 @@ namespace yocto
             inline const T &as() const
             {
                 return *(T*)address_of( typeid(T) );
-
             }
             
         private:
@@ -143,7 +142,7 @@ namespace yocto
             
             //! valid for Array/Object/String/Number
             template <typename T>
-            T & append()
+            inline T & append()
             {
                 push( Value::TypeFor( typeid(T) ) );
                 return values.back().as<T>();
@@ -212,7 +211,7 @@ namespace yocto
             
             //! Array/Object/String/Number
             template <typename T>
-            T &insert( const String &key )
+            inline T &insert( const String &key )
             {
                 insert(key, Value::TypeFor(typeid(T)));
                 return pairs.back().value.as<T>();
@@ -220,7 +219,7 @@ namespace yocto
             
             //! Array/Object/String/Number
             template <typename T>
-            T &insert( const char *key )
+            inline T &insert( const char *key )
             {
                 insert(key, Value::TypeFor(typeid(T)));
                 return pairs.back().value.as<T>();
