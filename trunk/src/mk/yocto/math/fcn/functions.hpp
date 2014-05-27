@@ -35,11 +35,6 @@ namespace yocto {
 		double beta_i( double a, double b, double x );//! incomlete beta function
         
         
-        float  bessel_I0( float  x );
-        double bessel_I0( double x );
-
-        float  bessel_K0( float  x);
-        double bessel_K0( double x);
 	}
 
 }
