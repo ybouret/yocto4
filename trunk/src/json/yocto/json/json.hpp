@@ -6,7 +6,7 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ostream.hpp"
 
-namespace yocto 
+namespace yocto
 {
     
     namespace JSON
@@ -91,7 +91,7 @@ namespace yocto
             static void out( const Array  &, ios::ostream &, size_t depth );
             static void out( const Object &, ios::ostream &, size_t depth );
             static string j2s( const String &);
-            union 
+            union
             {
                 String *_String;
                 Number  _Number;
@@ -108,7 +108,7 @@ YOCTO_SUPPORT_BITWISE_OPS(JSON::Value)
 
 namespace yocto
 {
-    namespace JSON 
+    namespace JSON
     {
         
         //! an Array with a little JavaScript API
@@ -121,7 +121,7 @@ namespace yocto
             size_t length() const throw();
             
             Value &       operator[]( size_t index );       //!< 0..length-1, or create if necessary
-            const Value & operator[]( size_t index ) const; //!< 0..length-1 
+            const Value & operator[]( size_t index ) const; //!< 0..length-1
             
             void push( const Value & );
             void pop();
@@ -129,14 +129,18 @@ namespace yocto
             void unshift( const Value & );
             void reverse() throw();
             
+            Value & push( const ValueType of );
+            
+            
         private:
             YOCTO_DISABLE_ASSIGN(Array);
-            vector<Value> values;
+            vector<Value *> values;
+            void kill() throw();
         };
         
         
         //! a name/value Pair for the Object
-        class Pair 
+        class Pair
         {
         public:
             const String name;
@@ -155,7 +159,7 @@ namespace yocto
         
         
         //! JavaScript like Object
-        class Object 
+        class Object
         {
         public:
             explicit Object() throw();
