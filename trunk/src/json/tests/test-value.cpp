@@ -13,7 +13,7 @@ YOCTO_UNIT_TEST_IMPL(value)
     std::cerr << v.type_name() << std::endl;
     std::cerr << "length=" << v.length() << std::endl;
     
-    for( JSON::Object::iterator i = v.asObject().begin(); i != v.asObject().end(); ++i )
+    for( JSON::Object::iterator i = v.as<JSON::Object>().begin(); i != v.as<JSON::Object>().end(); ++i )
     {
         std::cerr << (*i).name << std::endl;
         

@@ -88,6 +88,73 @@ namespace yocto
             }
         }
         
+        bool Value:: is_same_type_than( const std::type_info &tid ) const throw()
+        {
+            switch(type)
+            {
+                case IsString:
+                    return tid == typeid(String);
+                case IsNumber:
+                    return tid == typeid(Number);
+                case IsArray:
+                    return tid == typeid(Array);
+                case IsObject:
+                    return tid == typeid(Object);
+                case IsNull:
+                case IsFalse:
+                case IsTrue:
+                    // impossible cases
+                    break;
+            }
+            return false;
+        }
+
+        
+        void * Value:: address_of(const std::type_info &tid) const
+        {
+            switch(type)
+            {
+                case IsString:
+                    if(tid==typeid(String)) return (void*)(data._String);
+                    break;
+                    
+                case IsNumber:
+                    if( tid == typeid(Number) ) return (void*)(&data._Number);
+                    break;
+                    
+                case IsArray:
+                    if (tid == typeid(Array)) return (void*)(data._Array);
+                    break;
+                    
+                case IsObject:
+                    if(tid == typeid(Object)) return (void*)(data._Object);
+                    break;
+                    
+                case IsNull:
+                case IsFalse:
+                case IsTrue:
+                    // impossible cases
+                    break;
+
+            }
+            throw exception("JSON(invalid type conversion for '%s')", this->type_name());
+        }
+        
+        
+        ValueType Value:: TypeFor( const std::type_info &tid )
+        {
+            if(tid==typeid(String))
+                return IsString;
+            if(tid==typeid(Array))
+                return IsArray;
+            if(tid==typeid(Number))
+                return IsNumber;
+            if(tid==typeid(Object))
+                return IsObject;
+            throw exception("JSON::TypeFor(none for '%s')", tid.name());
+        }
+
+        
 #define YJSON_COPY(TYPE) case Is##TYPE: data._##TYPE = new TYPE( *(other.data._##TYPE) ); break
         
         Value:: Value( const Value &other ) :
@@ -206,6 +273,7 @@ namespace yocto
         }
         
         
+#if 0
 #define YJSON_AS(TYPE) \
 TYPE & Value::as##TYPE () {\
 if( type != Is##TYPE ) throw exception( "as" #TYPE "(%s)", type_name() ); \
@@ -231,7 +299,7 @@ return * data._##TYPE; }
                 throw exception("asNumber(%s) const", type_name());
             return data._Number;
         }
-        
+#endif
         
         Value & Value:: operator=( const String &txt )
         {
@@ -313,14 +381,33 @@ return * data._##TYPE; }
             }
         }
         
-        void Array:: push_swap( Value &v )
+        
+        void Array:: push( const ValueType of )
         {
-            const Value nil;
-            values.push_back(nil);
-            values.back().swap_with(v);
+            {
+                const Value  nil;
+                values.push_back(nil);
+            }
+            try
+            {
+                Value tmp(of);
+                values.back().swap_with(tmp);
+            }
+            catch(...)
+            {
+                values.pop_back();
+                throw;
+            }
         }
-
-
+        
+        
+        Value & Array:: append(const ValueType of)
+        {
+            push(of);
+            return values.back();
+        }
+        
+              
         
         ////////////////////////////////////////////////////////////////////////
         //
@@ -415,6 +502,31 @@ return * data._##TYPE; }
             Value tmp( of ); swap_with(tmp);
         }
         
+        void Object:: insert(const String &key, const ValueType of)
+        {
+            {
+                const Pair p(key);
+                if(!pairs.insert(p))
+                    throw exception("JSON::Object.insert(multiple '%s')", key.c_str() );
+            }
+            try
+            {
+                Value tmp(of);
+                assert(pairs.back().key() == key );
+                pairs.back().value.swap_with(tmp);
+            }
+            catch(...)
+            {
+                (void) pairs.remove(key);
+                throw;
+            }
+        }
+       
+        void Object:: insert( const char *k, const ValueType of)
+        {
+            const string key(k);
+            insert(key,of);
+        }
         
     }
     
