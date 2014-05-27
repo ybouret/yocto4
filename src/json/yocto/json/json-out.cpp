@@ -57,12 +57,12 @@ namespace yocto
             switch( type )
             {
                 case IsNumber:
-                    fp( "%.15g", asNumber() );
+                    fp( "%.15g", data._Number );
                     break;
                     
                 case IsString:
                 {
-                    const string s = j2s( asString() );
+                    const string s = j2s( *data._String );
                     fp << s;
                 }
                     break;
@@ -80,11 +80,11 @@ namespace yocto
                     break;
                     
                 case IsArray:
-                    out( asArray(), fp, depth );
+                    out( *data._Array, fp, depth );
                     break;
                     
                 case IsObject:
-                    out( asObject(), fp, depth );
+                    out( *data._Object, fp, depth );
                     break;
             }
             

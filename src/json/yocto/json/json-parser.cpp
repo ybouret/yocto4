@@ -248,21 +248,21 @@ namespace yocto
                 if( label == "ARRAY")
                 {
                     value.make( IsArray );
-                    walk_array( value.asArray(), node->children() );
+                    walk_array( value.as<Array>(), node->children() );
                     return;
                 }
                 
                 if( label == "OBJECT" )
                 {
                     value.make( IsObject );
-                    walk_object( value.asObject(), node->children() );
+                    walk_object( value.as<Object>(), node->children() );
                     return;
                 }
                 
                 if( label == "JSON::String" )
                 {
                     value.make( IsString );
-                    string &str = value.asString();
+                    string &str = value.as<String>();
                     const lexeme *lx = node->lex();
                     for( t_char *t = lx->head; t; t=t->next )
                     {
@@ -277,7 +277,7 @@ namespace yocto
                 {
                     value.make( IsNumber );
                     const string str = node->lex()->to_string();
-                    value.asNumber() = strconv::to_real<double>( str, "JSON::Number");
+                    value.as<Number>() = strconv::to_real<double>( str, "JSON::Number");
                     return;
                 }
                 

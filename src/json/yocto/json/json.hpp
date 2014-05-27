@@ -6,6 +6,8 @@
 #include "yocto/sequence/vector.hpp"
 #include "yocto/ios/ostream.hpp"
 
+#include <typeinfo>
+
 namespace yocto
 {
     
@@ -67,17 +69,6 @@ namespace yocto
             Value & operator[]( const char * );              //!< Object wrapper
             const Value & operator[]( const char * ) const;  //!< Object wrapper
             
-            Object       &asObject();
-            const Object &asObject() const;
-            
-            Array        &asArray();
-            const Array  &asArray() const;
-            
-            String       &asString();
-            const String &asString() const;
-            
-            Number       &asNumber();
-            const Number &asNumber() const;
             
             const ValueType type;
             
@@ -85,6 +76,23 @@ namespace yocto
             void make( const ValueType of );
             
             void output( ios::ostream &fp ) const;
+            
+            
+            bool             is_same_type_than( const std::type_info &tid ) const throw();
+            static ValueType TypeFor( const std::type_info &tid );
+            
+            template <typename T>
+            inline T &as()
+            {
+                return *(T*)address_of( typeid(T) );
+            }
+            
+            template <typename T>
+            inline const T &as() const
+            {
+                return *(T*)address_of( typeid(T) );
+
+            }
             
         private:
             void out( ios::ostream &, size_t depth ) const;
@@ -98,6 +106,8 @@ namespace yocto
                 Object *_Object;
                 Array  *_Array;
             } data;
+            void *address_of( const std::type_info &tid ) const;
+            
         };
         
     }
@@ -129,12 +139,21 @@ namespace yocto
             void unshift( const Value & );
             void reverse() throw();
             
-            void push_swap( Value & );
+            void push( const ValueType of );
+            
+            //! valid for Array/Object/String/Number
+            template <typename T>
+            T & append()
+            {
+                push( Value::TypeFor( typeid(T) ) );
+                return values.back().as<T>();
+            }
             
             
         private:
             YOCTO_DISABLE_ASSIGN(Array);
             vector<Value> values;
+            Value & append(const ValueType of);
         };
         
         
@@ -188,6 +207,24 @@ namespace yocto
             inline const_iterator end()   const throw() { return pairs.end();   }
             
             bool has( const String &key ) const throw();
+            void insert( const String &key, const ValueType of);
+            void insert( const char   *key, const ValueType of);
+            
+            //! Array/Object/String/Number
+            template <typename T>
+            T &insert( const String &key )
+            {
+                insert(key, Value::TypeFor(typeid(T)));
+                return pairs.back().value.as<T>();
+            }
+            
+            //! Array/Object/String/Number
+            template <typename T>
+            T &insert( const char *key )
+            {
+                insert(key, Value::TypeFor(typeid(T)));
+                return pairs.back().value.as<T>();
+            }
             
         private:
             pairs_type pairs;
