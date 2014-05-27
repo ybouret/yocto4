@@ -97,7 +97,7 @@ namespace yocto
                 y=2.0/x;
                 ans=(exp(-x)/sqrt(x))*(1.25331414+y*(-0.7832358e-1 +y*(0.2189568e-1+y*(-0.1062446e-1+y*(0.587872e-2 +y*(-0.251540e-2+y*0.53208e-3))))));
             }
-            return ans;
+            return real_t(ans);
         }
         
     }

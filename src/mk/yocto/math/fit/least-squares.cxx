@@ -452,7 +452,7 @@ namespace yocto
                 const size_t ir = r+p;
                 for(size_t c=r;c<=q;++c)
                 {
-                    const real_t ic = c+p;
+                    const size_t ic = c+p;
                     real_t       s  = 0;
                     const size_t pw = c+r;
                     for(size_t i=1;i<=N;++i)
@@ -472,7 +472,7 @@ namespace yocto
             {
                 for(size_t c=1;c<=q;++c)
                 {
-                    const real_t ic = c+p;
+                    const size_t ic = c+p;
                     real_t       s  = 0;
                     const size_t pw = r+c-1;
                     for(size_t i=1;i<=N;++i)
