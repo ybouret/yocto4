@@ -129,13 +129,12 @@ namespace yocto
             void unshift( const Value & );
             void reverse() throw();
             
-            Value & push( const ValueType of );
+            void push_swap( Value & );
             
             
         private:
             YOCTO_DISABLE_ASSIGN(Array);
-            vector<Value *> values;
-            void kill() throw();
+            vector<Value> values;
         };
         
         
