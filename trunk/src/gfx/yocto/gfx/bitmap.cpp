@@ -4,6 +4,7 @@
 #include <cstring>
 #include "yocto/exceptions.hpp"
 #include <iostream>
+#include "yocto/code/bswap.hpp"
 
 namespace yocto
 {
@@ -125,6 +126,46 @@ namespace yocto
                 }
                 return 0;
             }
+            
+            
+            
+            static inline
+            void swap3(void *a,void *b) throw()
+            {
+                uint8_t *p = (uint8_t*)a;
+                uint8_t *q = (uint8_t*)b;
+                core::bswap<1>(&p[0], &q[0]);
+                core::bswap<1>(&p[1], &q[1]);
+                core::bswap<1>(&p[2], &q[2]);
+            }
+            
+            
+            
+            
+            bitmap::swap_proc __get_swap( const unit_t depth ) throw()
+            {
+                switch(depth)
+                {
+                    case 1:
+                        return core::bswap<1>;
+                        
+                    case 2:
+                        return core::bswap<2>;
+                        
+                    case 3:
+                        return swap3;
+                        
+                    case 4:
+                        return core::bswap<4>;
+                        
+                    case 8:
+                        return core::bswap<8>;
+                    case 16:
+                        return core::bswap<16>;
+                }
+                return 0;
+            }
+            
         }
         
         bitmap:: bitmap(unit_t depth, unit_t width, unit_t height) :
@@ -135,6 +176,7 @@ namespace yocto
         stride( pitch ),
         entry(0),
         peek( __get_peek(d) ),
+        swap( __get_swap(d) ),
         model( memory_allocated )
         {
             try
@@ -166,6 +208,7 @@ namespace yocto
         stride( bmp->stride ),
         entry(0),
         peek(bmp->peek),
+        swap(bmp->swap),
         model(memory_is_shared)
         {
             try
@@ -198,6 +241,7 @@ namespace yocto
         stride(pitch ),
         entry(0),
         peek(bmp.peek),
+        swap(bmp.swap),
         model(memory_allocated)
         {
             try
@@ -237,6 +281,7 @@ namespace yocto
         stride(data_stride),
         entry(0),
         peek(__get_peek(depth)),
+        swap(__get_swap(depth)),
         model(memory_from_user)
         {
             if(data_stride<pitch)
