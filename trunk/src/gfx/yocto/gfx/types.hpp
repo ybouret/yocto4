@@ -3,6 +3,7 @@
 
 #include "yocto/string.hpp"
 #include "yocto/math/v2d.hpp"
+#include <cmath>
 
 namespace yocto
 {
@@ -11,7 +12,7 @@ namespace yocto
         
         typedef ptrdiff_t unit_t;
         
-        struct __conv
+        struct conv
         {
             template <typename T> static inline
             string binary(T X)
@@ -23,7 +24,18 @@ namespace yocto
                 }
                 return ans;
             }
+            
+            static inline uint8_t to_byte( const float f ) throw()
+            {
+                return uint8_t( floorf(f*255.0f + 0.5f) );
+            }
+
             static string b2s(uint8_t);
+            
+            static const float unit_float[256];
+            static float       greyscale_f(uint8_t r,uint8_t g,uint8_t b) throw();
+            static uint8_t     greyscale(uint8_t r,uint8_t g,uint8_t b) throw();
+
         };
         
     }

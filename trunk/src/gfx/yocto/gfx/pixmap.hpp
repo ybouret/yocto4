@@ -4,6 +4,7 @@
 #include "yocto/gfx/bitmap.hpp"
 #include "yocto/type/args.hpp"
 #include "yocto/memory/global.hpp"
+#include "yocto/functor.hpp"
 
 namespace yocto
 {
@@ -61,7 +62,7 @@ namespace yocto
             
             inline virtual ~pixmap() throw()
             {
-                memory::kind<memory::global>::release_as<row>(rows,nrow);
+                kill_rows();
             }
             
             //! in memory pixmap
@@ -85,6 +86,19 @@ namespace yocto
                 build_rows();
             }
             
+            template <typename U>
+            pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
+            bitmap(sizeof(T),w,h)
+            {
+                build_rows();
+                for(unit_t j=0;j<h;++j)
+                {
+                    row                           &tgt = rows[j];
+                    const typename pixmap<U>::row &src = px[j];
+                    for(unit_t i=0;i<w;++i)
+                        tgt[i] = filter(src[i]);
+                }
+            }
             
             
         private:
@@ -101,6 +115,11 @@ namespace yocto
                     new (rows+y) row(p,w);
                     p += stride;
                 }
+            }
+            
+            void kill_rows() throw()
+            {
+                memory::kind<memory::global>::release_as<row>(rows,nrow);
             }
             
         };
