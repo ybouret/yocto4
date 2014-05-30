@@ -7,7 +7,7 @@
 #include "yocto/spade/in2d.hpp"
 #include "yocto/spade/memory.hpp"
 
-#include "yocto/gfx/ramp/types.hpp"
+//#include "yocto/gfx/ramp/types.hpp"
 #include "yocto/ios/ocstream.hpp"
 
 #if defined(_MSC_VER)
@@ -104,7 +104,7 @@ namespace yocto
                 }
             }
             
-            
+#if 0
             //! save a raw ppm
 			void ppm(const string        &filename,
 					 const string        &comment,
@@ -160,7 +160,7 @@ namespace yocto
                 const string cm(comment);
                 this->ppm(fn,cm,area,vproc,colors,vmin,vmax);
             }
-            
+#endif
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array2D);

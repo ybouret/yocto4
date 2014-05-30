@@ -4,6 +4,7 @@
 #include "yocto/spade/rmesh.hpp"
 #include "yocto/spade/vtk/writer.hpp"
 #include "yocto/spade/variables.hpp"
+#include <cmath>
 
 using namespace yocto;
 using namespace spade;
