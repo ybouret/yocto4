@@ -78,6 +78,13 @@ namespace yocto
                 build_rows();
             }
             
+            //! from user
+            pixmap(unit_t w, unit_t h, void *data, unit_t data_stride ) :
+            bitmap( sizeof(T),w,h,data,data_stride)
+            {
+                build_rows();
+            }
+            
             
             
         private:
