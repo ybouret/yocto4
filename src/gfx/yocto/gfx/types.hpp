@@ -11,6 +11,7 @@ namespace yocto
     {
         
         typedef ptrdiff_t unit_t;
+        typedef uint32_t  pixel_t;
         
         struct conv
         {
@@ -20,7 +21,7 @@ namespace yocto
                 string ans;
                 for(unsigned i=0;i<sizeof(T);++i)
                 {
-                    ans += bs2( (X >> (((sizeof(T)-1)-i)<<3) ) & 0xff );
+                    ans += b2s( (X >> (((sizeof(T)-1)-i)<<3) ) & 0xff );
                 }
                 return ans;
             }
