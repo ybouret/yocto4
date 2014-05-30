@@ -33,6 +33,7 @@ namespace yocto
             };
             
             typedef void * (*peek_proc)(const void *, unit_t dx);
+            typedef void   (*swap_proc)(void *,void *);
             
             const unit_t      d;      //!< depth (in bytes)
             const unit_t      w;      //!< width
@@ -41,6 +42,7 @@ namespace yocto
             const unit_t      stride; //!< stride >= pitch: jump one row
             void             *entry;  //!< the (0,0) coordinate for this bitmap
             const peek_proc   peek;
+            const swap_proc   swap;
             const memory_type model;
             
             virtual ~bitmap() throw();
