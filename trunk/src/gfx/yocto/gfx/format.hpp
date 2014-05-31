@@ -2,6 +2,7 @@
 #define YOCTO_GFX_FORMAT_INCLUDED 1
 
 #include "yocto/gfx/rgb.hpp"
+#include "yocto/gfx/metrics.hpp"
 
 namespace yocto
 {
@@ -12,16 +13,10 @@ namespace yocto
         typedef rgba<uint32_t> mask_t;
         
         
-        class format
+        class format : public metrics
         {
         public:
-            typedef pixel_t (*get_proc)(const void *);
-            typedef void    (*put_proc)(void *,pixel_t);
-           
             const mask_t   mask;
-            const size_t   depth;
-            const get_proc get_pixel;
-            const put_proc put_pixel;
             const rgba_t   bits;
             const rgba_t   shift;
             const rgba_t   loss;
