@@ -20,13 +20,13 @@ namespace yocto  {
             }
             
             
-            size_t __get_depth( const mask_t &mask ) throw()
+            size_t __get_depth(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask  ) throw()
             {
                 size_t ans = 1;
-                ans        = max_of(ans,__bytes_for(mask.r));
-                ans        = max_of(ans,__bytes_for(mask.g));
-                ans        = max_of(ans,__bytes_for(mask.b));
-                ans        = max_of(ans,__bytes_for(mask.a));
+                ans        = max_of(ans,__bytes_for(Rmask));
+                ans        = max_of(ans,__bytes_for(Gmask));
+                ans        = max_of(ans,__bytes_for(Bmask));
+                ans        = max_of(ans,__bytes_for(Amask));
                 return ans;
             }
             
@@ -72,25 +72,12 @@ namespace yocto  {
             }
             
             
-            format::get_proc __load_get_pixel(size_t depth )
-            {
-                return 0;
-            }
-            
-            
-            format::put_proc __load_put_pixel(size_t depth )
-            {
-                return 0;
-            }
-            
             
         }
         
         format:: format( uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) :
+        metrics( __get_depth(Rmask,Gmask,Bmask,Amask)),
         mask(Rmask,Gmask,Bmask,Amask),
-        depth( __get_depth(mask) ),
-        get_pixel( __load_get_pixel(depth) ),
-        put_pixel( __load_put_pixel(depth) ),
         bits(),
         shift(),
         loss(),
@@ -130,10 +117,8 @@ namespace yocto  {
         }
         
         format:: format(const format &other ) throw() :
+        metrics(other),
         mask( other.mask ),
-        depth(other.depth),
-        get_pixel(other.get_pixel),
-        put_pixel(other.put_pixel),
         bits(other.bits),
         shift(other.shift),
         loss(other.loss),
