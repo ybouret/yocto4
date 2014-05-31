@@ -71,11 +71,26 @@ namespace yocto  {
                 if(A&B) throw exception("overlapping %s and %s mask", fieldA, fieldB);
             }
             
+            
+            format::get_proc __load_get_pixel(size_t depth )
+            {
+                return 0;
+            }
+            
+            
+            format::put_proc __load_put_pixel(size_t depth )
+            {
+                return 0;
+            }
+            
+            
         }
         
         format:: format( uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) :
         mask(Rmask,Gmask,Bmask,Amask),
         depth( __get_depth(mask) ),
+        get_pixel( __load_get_pixel(depth) ),
+        put_pixel( __load_put_pixel(depth) ),
         bits(),
         shift(),
         loss(),
@@ -117,6 +132,8 @@ namespace yocto  {
         format:: format(const format &other ) throw() :
         mask( other.mask ),
         depth(other.depth),
+        get_pixel(other.get_pixel),
+        put_pixel(other.put_pixel),
         bits(other.bits),
         shift(other.shift),
         loss(other.loss),
