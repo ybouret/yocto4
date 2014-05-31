@@ -26,9 +26,12 @@ namespace yocto
             ~format() throw();
             format( const format &fmt ) throw();
             
-           
-            
-            
+            rgb_t   get_rgb(pixel_t C) const throw();
+            rgba_t  get_rgba(pixel_t C) const throw();
+            pixel_t map_rgb(const rgb_t &C) const throw();//!< assuming opaque
+            pixel_t map_rgb(const rgb_t &C, uint8_t A) const throw();
+            pixel_t map_rgba(const rgba_t &C) const throw();//!< assuming opaque
+
         private:
             YOCTO_DISABLE_ASSIGN(format);
             
