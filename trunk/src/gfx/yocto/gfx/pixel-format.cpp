@@ -1,4 +1,4 @@
-#include "yocto/gfx/format.hpp"
+#include "yocto/gfx/pixel-format.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exceptions.hpp"
 
@@ -75,7 +75,7 @@ namespace yocto  {
             
         }
         
-        format:: format( uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) :
+        pixel_format:: pixel_format( uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) :
         metrics( __get_depth(Rmask,Gmask,Bmask,Amask)),
         mask(Rmask,Gmask,Bmask,Amask),
         bits(),
@@ -112,11 +112,11 @@ namespace yocto  {
             
         }
         
-        format:: ~format() throw()
+        pixel_format:: ~pixel_format() throw()
         {
         }
         
-        format:: format(const format &other ) throw() :
+        pixel_format:: pixel_format(const pixel_format &other ) throw() :
         metrics(other),
         mask( other.mask ),
         bits(other.bits),
@@ -127,7 +127,7 @@ namespace yocto  {
             
         }
         
-        rgb_t format:: get_rgb(pixel_t C) const throw()
+        rgb_t pixel_format:: get_rgb(pixel_t C) const throw()
         {
             const pixel_t r = ((C&mask.r)>>shift.r) << loss.r;
             const pixel_t g = ((C&mask.g)>>shift.g) << loss.g;
@@ -135,7 +135,7 @@ namespace yocto  {
             return rgb_t(uint8_t(r),uint8_t(g),uint8_t(b));
         }
         
-        rgba_t format:: get_rgba(pixel_t C) const throw()
+        rgba_t pixel_format:: get_rgba(pixel_t C) const throw()
         {
             const pixel_t r = ((C&mask.r)>>shift.r) << loss.r;
             const pixel_t g = ((C&mask.g)>>shift.g) << loss.g;
@@ -145,7 +145,7 @@ namespace yocto  {
             return rgba_t(uint8_t(r),uint8_t(g),uint8_t(b),uint8_t(a));
         }
         
-        pixel_t format:: map_rgb(const rgb_t &C) const throw()
+        pixel_t pixel_format:: map_rgb(const rgb_t &C) const throw()
         {
             const pixel_t R = ( pixel_t(C.r)  >> loss.r ) << shift.r;
             const pixel_t G = ( pixel_t(C.g)  >> loss.g ) << shift.g;
@@ -154,7 +154,7 @@ namespace yocto  {
             return R | G | B | A;
         }
         
-        pixel_t format:: map_rgb(const rgb_t &C, uint8_t a) const throw()
+        pixel_t pixel_format:: map_rgb(const rgb_t &C, uint8_t a) const throw()
         {
             const pixel_t R = ( pixel_t(C.r)  >> loss.r ) << shift.r;
             const pixel_t G = ( pixel_t(C.g)  >> loss.g ) << shift.g;
@@ -163,7 +163,7 @@ namespace yocto  {
             return R | G | B | A;
         }
         
-        pixel_t format:: map_rgba(const rgba_t &C) const throw()
+        pixel_t pixel_format:: map_rgba(const rgba_t &C) const throw()
         {
             const pixel_t R = ( pixel_t(C.r)  >> loss.r ) << shift.r;
             const pixel_t G = ( pixel_t(C.g)  >> loss.g ) << shift.g;
@@ -173,34 +173,34 @@ namespace yocto  {
         }
         
         
-        format format::RGB24()
+        pixel_format RGB24()
         {
-            return format(0x00ff0000,0x0000ff00,0x000000ff,0x00000000);
+            return pixel_format(0x00ff0000,0x0000ff00,0x000000ff,0x00000000);
         }
         
-        format format::ARGB32()
+        pixel_format ARGB32()
         {
-            return format(0x00ff0000,0x0000ff00,0x000000ff,0xff000000);
+            return pixel_format(0x00ff0000,0x0000ff00,0x000000ff,0xff000000);
         }
         
-        format format::RGBA32()
+        pixel_format RGBA32()
         {
-            return format(0xff000000,0x00ff0000,0x0000ff00,0x000000ff);
+            return pixel_format(0xff000000,0x00ff0000,0x0000ff00,0x000000ff);
         }
         
         
-        format format::RGBA16()
+        pixel_format RGBA16()
         {
-            return format(0x0000f000,0x00000f00,0x000000f0,0x0000000f);
+            return pixel_format(0x0000f000,0x00000f00,0x000000f0,0x0000000f);
         }
         
-        format format:: ARGB16()
+        pixel_format ARGB16()
         {
-            return format(0x00000f00,0x000000f0,0x0000000f,0x0000f000);
+            return pixel_format(0x00000f00,0x000000f0,0x0000000f,0x0000f000);
         }
-
         
-        std::ostream & operator<<( std::ostream &os, const format &fmt )
+        
+        std::ostream & operator<<( std::ostream &os, const pixel_format &fmt )
         {
             os << "R     = " << conv::binary(fmt.mask.r) << std::endl;
             os << "G     = " << conv::binary(fmt.mask.g) << std::endl;
