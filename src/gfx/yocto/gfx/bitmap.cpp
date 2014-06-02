@@ -302,5 +302,41 @@ namespace yocto
             return peek( ( (uint8_t *) entry ) + y*stride, x);
         }
         
+        void  bitmap:: flip_horz() throw()
+        {
+            uint8_t     *line = (uint8_t *)entry;
+            const unit_t half = w/2;
+            for(unit_t j=0;j<h;++j,line += stride)
+            {
+                uint8_t *p = line;
+                uint8_t *q = line+pitch;
+                for(unit_t i=0;i<half;++i)
+                {
+                    q -= d;
+                    swap(p,q);
+                    p += d;
+                }
+            }
+        }
+        
+        void bitmap:: flip_vert() throw()
+        {
+            const unit_t half = h/2;
+            uint8_t     *p    = (uint8_t *)entry;
+            uint8_t     *q    = ((uint8_t *)entry) + h*stride;
+            for(unit_t j=0;j<half;++j)
+            {
+                q -= stride;
+                uint8_t *src = q;
+                uint8_t *tgt = p;
+                for(unit_t i=w;i>0;--i,++src,++tgt)
+                {
+                    cswap(*src,*tgt);
+                }
+                p += stride;
+            }
+        }
+        
+        
     }
 }
