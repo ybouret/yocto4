@@ -32,6 +32,14 @@ namespace yocto
             pixel_t map_rgb(const rgb_t &C, uint8_t A) const throw();
             pixel_t map_rgba(const rgba_t &C) const throw();//!< assuming opaque
 
+            static format RGB24();
+            static format RGBA32();
+            static format ARGB32();
+            static format RGBA16();
+            static format ARGB16();
+            
+            friend std::ostream & operator<<( std::ostream &, const format &fmt );
+            
         private:
             YOCTO_DISABLE_ASSIGN(format);
             

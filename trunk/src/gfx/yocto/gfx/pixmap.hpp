@@ -86,17 +86,26 @@ namespace yocto
                 build_rows();
             }
             
+            //! conversion
             template <typename U>
             pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
             bitmap(sizeof(T),w,h)
             {
                 build_rows();
-                for(unit_t j=0;j<h;++j)
+                try
                 {
-                    row                           &tgt = rows[j];
-                    const typename pixmap<U>::row &src = px[j];
-                    for(unit_t i=0;i<w;++i)
-                        tgt[i] = filter(src[i]);
+                    for(unit_t j=0;j<h;++j)
+                    {
+                        row                           &tgt = rows[j];
+                        const typename pixmap<U>::row &src = px[j];
+                        for(unit_t i=0;i<w;++i)
+                            tgt[i] = filter(src[i]);
+                    }
+                }
+                catch(...)
+                {
+                    kill_rows();
+                    throw;
                 }
             }
             

@@ -84,16 +84,16 @@ namespace yocto  {
         bpp(0)
         {
             static const char *field[4] = { "red", "green", "blue", "alpha" };
-           
+            
             __check_mask(mask.r,field[0],mask.g,field[1]);
             __check_mask(mask.r,field[0],mask.b,field[2]);
             __check_mask(mask.r,field[0],mask.a,field[3]);
-           
+            
             __check_mask(mask.g,field[1],mask.b,field[2]);
             __check_mask(mask.g,field[1],mask.a,field[3]);
-
+            
             __check_mask(mask.b,field[2],mask.a,field[3]);
-
+            
             
             __get_bits_and_shift(bits.r,shift.r,mask.r,field[0]);
             __get_bits_and_shift(bits.g,shift.g,mask.g,field[1]);
@@ -141,10 +141,10 @@ namespace yocto  {
             const pixel_t g = ((C&mask.g)>>shift.g) << loss.g;
             const pixel_t b = ((C&mask.b)>>shift.b) << loss.b;
             const pixel_t a = ((C&mask.a)>>shift.a) << loss.a;
-
+            
             return rgba_t(uint8_t(r),uint8_t(g),uint8_t(b),uint8_t(a));
         }
-       
+        
         pixel_t format:: map_rgb(const rgb_t &C) const throw()
         {
             const pixel_t R = ( pixel_t(C.r)  >> loss.r ) << shift.r;
@@ -162,7 +162,7 @@ namespace yocto  {
             const pixel_t A = ( pixel_t(a)    >> loss.a ) << shift.a;
             return R | G | B | A;
         }
-
+        
         pixel_t format:: map_rgba(const rgba_t &C) const throw()
         {
             const pixel_t R = ( pixel_t(C.r)  >> loss.r ) << shift.r;
@@ -171,8 +171,56 @@ namespace yocto  {
             const pixel_t A = ( pixel_t(C.a)  >> loss.a ) << shift.a;
             return R | G | B | A;
         }
+        
+        
+        format format::RGB24()
+        {
+            return format(0x00ff0000,0x0000ff00,0x000000ff,0x00000000);
+        }
+        
+        format format::ARGB32()
+        {
+            return format(0x00ff0000,0x0000ff00,0x000000ff,0xff000000);
+        }
+        
+        format format::RGBA32()
+        {
+            return format(0xff000000,0x00ff0000,0x0000ff00,0x000000ff);
+        }
+        
+        
+        format format::RGBA16()
+        {
+            return format(0x0000f000,0x00000f00,0x000000f0,0x0000000f);
+        }
+        
+        format format:: ARGB16()
+        {
+            return format(0x00000f00,0x000000f0,0x0000000f,0x0000f000);
+        }
 
         
+        std::ostream & operator<<( std::ostream &os, const format &fmt )
+        {
+            os << "R     = " << conv::binary(fmt.mask.r) << std::endl;
+            os << "G     = " << conv::binary(fmt.mask.g) << std::endl;
+            os << "B     = " << conv::binary(fmt.mask.b) << std::endl;
+            os << "A     = " << conv::binary(fmt.mask.a) << std::endl;
+            os << "bits  = "
+            << int(fmt.bits.r) << " "
+            << int(fmt.bits.g) << " "
+            << int(fmt.bits.b) << " "
+            << int(fmt.bits.a) << std::endl;
+            os << "loss  = "
+            << int(fmt.loss.r) << " "
+            << int(fmt.loss.g) << " "
+            << int(fmt.loss.b) << " "
+            << int(fmt.loss.a) << std::endl;
+            os << "depth = " << fmt.depth << std::endl;
+            os << "bpp   = " << fmt.bpp;
+            
+            return os;
+        }
     }
     
 }
