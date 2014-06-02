@@ -12,7 +12,7 @@ namespace yocto
         typedef rgba<uint8_t>  rgba_t;
         typedef rgba<uint32_t> mask_t;
         
-        
+        //! default RGBA format
         class format : public metrics
         {
         public:
