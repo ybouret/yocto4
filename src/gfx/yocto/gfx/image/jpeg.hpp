@@ -15,7 +15,7 @@ namespace yocto
             
             virtual bool lossless() const throw();
             
-            void load(const string &filename) const;
+            surface *load(const string &filename, const pixel_format fmt) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(jpeg_format);

@@ -14,6 +14,7 @@ YOCTO_UNIT_TEST_DONE()
 
 
 #include "yocto/gfx/image/jpeg.hpp"
+#include "yocto/ptr/auto.hpp"
 
 YOCTO_UNIT_TEST_IMPL(load_jpeg)
 {
@@ -21,7 +22,7 @@ YOCTO_UNIT_TEST_IMPL(load_jpeg)
     {
         const string     filename = argv[1];
         gfx::jpeg_format jpg;
-        jpg.load(filename);
+        auto_ptr<gfx::surface> surf( jpg.load(filename, gfx::ARGB32()) );
     }
 }
 YOCTO_UNIT_TEST_DONE()
