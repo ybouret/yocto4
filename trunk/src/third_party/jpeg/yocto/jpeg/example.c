@@ -376,7 +376,7 @@ read_JPEG_file (char * filename)
      */
     (void) jpeg_read_scanlines(&cinfo, buffer, 1);
     /* Assume put_scanline_someplace wants a pointer and sample count. */
-    put_scanline_someplace(buffer[0], row_stride);
+    //put_scanline_someplace(buffer[0], row_stride);
   }
 
   /* Step 7: Finish decompression */
