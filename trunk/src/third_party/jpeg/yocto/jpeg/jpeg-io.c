@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     if(argc>1)
     {
         read_JPEG_file(argv[1]);
-        write_JPEG_file("toto.jpg", 70);
+        //write_JPEG_file("toto.jpg", 70);
     }
     
     return 0;
