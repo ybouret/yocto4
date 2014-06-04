@@ -8,6 +8,7 @@ extern "C"
 #include "yocto/ios/icstream.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/memory/buffers.hpp"
+#include "yocto/ptr/auto.hpp"
 
 #include <setjmp.h>
 
@@ -62,7 +63,7 @@ namespace yocto
         
         
         
-        void jpeg_format:: load(const string &filename) const
+        surface *jpeg_format:: load(const string &filename, const pixel_format fmt ) const
         {
             static const char fn[] = "jpeg::load";
             YOCTO_GIANT_LOCK();
@@ -118,50 +119,58 @@ namespace yocto
              * with the stdio data source.
              */
             
-            const unit_t width  = cinfo.output_width;
-            const unit_t height = cinfo.output_height;
-            std::cerr << "width=" << width << ", height=" << height << std::endl;
-            
-            /* JSAMPLEs per row in output buffer */
-            buflen = cinfo.output_width * cinfo.output_components;
-            buffer = memory::kind<memory::global>::acquire_as<JSAMPLE>(buflen);
-            
-            /* Step 6: while (scan lines remain to be read) */
-            /*           jpeg_read_scanlines(...); */
-            
-            /* Here we use the library's state variable cinfo.output_scanline as the
-             * loop counter, so that we don't have to keep track ourselves.
-             */
-            unit_t j = height-1;
-            while (cinfo.output_scanline < cinfo.output_height) {
-                /* jpeg_read_scanlines expects an array of pointers to scanlines.
-                 * Here the array is only one element long, but you could ask for
-                 * more than one scanline at a time if that's more convenient.
-                 */
-                (void) jpeg_read_scanlines(&cinfo, &buffer, 1);
-                /* Assume put_scanline_someplace wants a pointer and sample count. */
-                for(unit_t i=0;i<width;++i)
+            try
+            {
+                const unit_t width  = cinfo.output_width;
+                const unit_t height = cinfo.output_height;
+                const unit_t depth  = cinfo.output_components;
+                std::cerr << "width=" << width << ", height=" << height << std::endl;
+                if(width<=0||height<=0)
+                    throw exception("%s(invalid witdh/height)", fn);
+                
+                if(depth!=3)
+                    throw exception("%s(unsupported image depth=%d)",fn,int(depth));
+                
+                auto_ptr<surface> surf( new surface(fmt,width,height) );
+                
+                buflen = cinfo.output_width * cinfo.output_components;
+                buffer = memory::kind<memory::global>::acquire_as<JSAMPLE>(buflen);
+                
+                unit_t j = height-1;
+                while (cinfo.output_scanline < cinfo.output_height)
                 {
-                    const unit_t   i3 = 3*i;
-                    const JSAMPLE *b  = &buffer[i3];
-                    const rgba_t C(b[0],b[1],b[2],0xff);
+                    (void) jpeg_read_scanlines(&cinfo, &buffer, 1);
+                    surface::row &r = (*surf)[j];
+                    for(unit_t i=0;i<width;++i)
+                    {
+                        const unit_t   i3 = 3*i;
+                        const JSAMPLE *b  = &buffer[i3];
+                        const rgb_t    C(b[0],b[1],b[2]);
+                        surf->put(r[i],C);
+                    }
+                    --j;
                 }
-                --j;
+                
+                /* Step 7: Finish decompression */
+                
+                (void) jpeg_finish_decompress(&cinfo);
+                /* We can ignore the return value since suspension is not possible
+                 * with the stdio data source.
+                 */
+                
+                /* Step 8: Release JPEG decompression object */
+                
+                /* This is an important step since it will release a good deal of memory. */
+                memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
+                jpeg_destroy_decompress(&cinfo);
+                return surf.yield();
             }
-            
-            /* Step 7: Finish decompression */
-            
-            (void) jpeg_finish_decompress(&cinfo);
-            /* We can ignore the return value since suspension is not possible
-             * with the stdio data source.
-             */
-            
-            /* Step 8: Release JPEG decompression object */
-            
-            /* This is an important step since it will release a good deal of memory. */
-            memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
-            jpeg_destroy_decompress(&cinfo);
-            
+            catch(...)
+            {
+                memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
+                jpeg_destroy_decompress(&cinfo);
+                throw;
+            }
         }
     }
 }
