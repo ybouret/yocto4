@@ -56,49 +56,6 @@ namespace yocto
             
             
             
-            class DecompressJPEG
-            {
-            public:
-                inline DecompressJPEG( struct jpeg_decompress_struct *user_cinfo ) :
-                cinfo(user_cinfo)
-                {
-                    assert(cinfo);
-                    if(!jpeg_start_decompress(cinfo))
-                        throw exception("jpeg_start_decompress failure");
-                }
-                
-                inline ~DecompressJPEG() throw()
-                {
-                    jpeg_finish_decompress(cinfo);
-                    jpeg_destroy_decompress(cinfo);
-                }
-                
-                
-            private:
-                struct jpeg_decompress_struct *cinfo;
-                YOCTO_DISABLE_COPY_AND_ASSIGN(DecompressJPEG);
-            };
-            
-            class RowJPEG
-            {
-            public:
-                size_t   buflen;
-                JSAMPLE *buffer;
-                
-                inline RowJPEG(int row_stride) :
-                buflen( row_stride ),
-                buffer( memory::kind<memory::global>::acquire_as<JSAMPLE>(buflen) )
-                {
-                }
-                
-                inline ~RowJPEG() throw()
-                {
-                    memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
-                }
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(RowJPEG);
-            };
             
         }
         
@@ -113,87 +70,97 @@ namespace yocto
             ios::icstream                 fp(filename);
             struct jpeg_decompress_struct cinfo;
             struct my_error_mgr           jerr;
-            memset( &cinfo, 0, sizeof(cinfo) );
-            memset( &jerr,  0, sizeof(jerr)  );
+            size_t   buflen = 0;
+            JSAMPLE *buffer = 0;
+            memset(&cinfo,0,sizeof(cinfo));
+            memset(&jerr,0,sizeof(jerr));
             
-            //__________________________________________________________________
-            //
-            // Error handler
-            //__________________________________________________________________
-            cinfo.err           = jpeg_std_error(&jerr.pub);
+            /* We set up the normal JPEG error routines, then override error_exit. */
+            cinfo.err = jpeg_std_error(&jerr.pub);
             jerr.pub.error_exit = my_error_exit;
             
             /* Establish the setjmp return context for my_error_exit to use. */
-            if( setjmp(jerr.setjmp_buffer) )
-            {
+            if (setjmp(jerr.setjmp_buffer)) {
                 /* If we get here, the JPEG code has signaled an error.
                  * We need to clean up the JPEG object, close the input file, and return.
                  */
                 jpeg_destroy_decompress(&cinfo);
-                throw exception("libjpeg error");
+                memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
+                throw exception("%s(failure)",fn);
             }
             
-            
+            /* Now we can initialize the JPEG decompression object. */
             jpeg_create_decompress(&cinfo);
+            
+            /* Step 2: specify data source (eg, a file) */
             jpeg_stdio_src(&cinfo, fp.__get());
             
-            //__________________________________________________________________
-            //
-            // Read header
-            //__________________________________________________________________
-            std::cerr << "reading header" << std::endl;
-            (void)jpeg_read_header(&cinfo, TRUE);
             
-            //__________________________________________________________________
-            //
-            // start decompression
-            //__________________________________________________________________
-            DecompressJPEG __start(&cinfo);
+            /* Step 3: read file parameters with jpeg_read_header() */
+            
+            (void) jpeg_read_header(&cinfo, TRUE);
+            /* We can ignore the return value from jpeg_read_header since
+             *   (a) suspension is not possible with the stdio data source, and
+             *   (b) we passed TRUE to reject a tables-only JPEG file as an error.
+             * See libjpeg.doc for more info.
+             */
+            
+            /* Step 4: set parameters for decompression */
+            
+            /* In this example, we don't need to change any of the defaults set by
+             * jpeg_read_header(), so we do nothing here.
+             */
+            
+            /* Step 5: Start decompressor */
+            
+            (void) jpeg_start_decompress(&cinfo);
+            /* We can ignore the return value since suspension is not possible
+             * with the stdio data source.
+             */
             
             const unit_t width  = cinfo.output_width;
             const unit_t height = cinfo.output_height;
-            std::cerr << "w=" << width << ", h=" << height << std::endl;
-            if(width<=0||height<=0)
-            {
-                throw exception("invalid width/height");
-            }
-            if (cinfo.output_components != 3)
-                throw exception("%s(unsupported output_components=%d)", fn, cinfo.output_components);
+            std::cerr << "width=" << width << ", height=" << height << std::endl;
             
-            //__________________________________________________________________
-            //
-            // buffer for one scan line
-            //__________________________________________________________________
-            const size_t row_stride = width * cinfo.output_components;
-            RowJPEG    __row(row_stride);
-            JSAMPLE   *buffer = __row.buffer;
+            /* JSAMPLEs per row in output buffer */
+            buflen = cinfo.output_width * cinfo.output_components;
+            buffer = memory::kind<memory::global>::acquire_as<JSAMPLE>(buflen);
             
+            /* Step 6: while (scan lines remain to be read) */
+            /*           jpeg_read_scanlines(...); */
             
-            //__________________________________________________________________
-            //
-            // read and process
-            //__________________________________________________________________
+            /* Here we use the library's state variable cinfo.output_scanline as the
+             * loop counter, so that we don't have to keep track ourselves.
+             */
             unit_t j = height-1;
-            while (cinfo.output_scanline < cinfo.output_height)
-            {
-                if(jpeg_read_scanlines(&cinfo,&buffer,1)!=1)
+            while (cinfo.output_scanline < cinfo.output_height) {
+                /* jpeg_read_scanlines expects an array of pointers to scanlines.
+                 * Here the array is only one element long, but you could ask for
+                 * more than one scanline at a time if that's more convenient.
+                 */
+                (void) jpeg_read_scanlines(&cinfo, &buffer, 1);
+                /* Assume put_scanline_someplace wants a pointer and sample count. */
+                for(unit_t i=0;i<width;++i)
                 {
-                    
-                }
-                for(unit_t i=0;i<cinfo.output_width;++i)
-                {
-                    const unit_t i3 = 3*i;
-                    const rgba_t C(i3,i3+1,i3+2,0xff);
-                    /*
-                     image[j*cinfo.output_width+i].r = buffer[3*i];
-                     image[j*cinfo.output_width+i].g = buffer[3*i+1];
-                     image[j*cinfo.output_width+i].b = buffer[3*i+2];
-                     image[j*cinfo.output_width+i].a = 255;
-                     */
+                    const unit_t   i3 = 3*i;
+                    const JSAMPLE *b  = &buffer[i3];
+                    const rgba_t C(b[0],b[1],b[2],0xff);
                 }
                 --j;
             }
             
+            /* Step 7: Finish decompression */
+            
+            (void) jpeg_finish_decompress(&cinfo);
+            /* We can ignore the return value since suspension is not possible
+             * with the stdio data source.
+             */
+            
+            /* Step 8: Release JPEG decompression object */
+            
+            /* This is an important step since it will release a good deal of memory. */
+            memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
+            jpeg_destroy_decompress(&cinfo);
             
         }
     }
