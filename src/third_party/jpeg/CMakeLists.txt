@@ -94,6 +94,9 @@ INSTALL( FILES
  DESTINATION include/yocto/jpeg )
 INSTALL( TARGETS y-jpeg ARCHIVE DESTINATION lib )
 
+ADD_EXECUTABLE(jpeg-io ${JROOT}/jpeg-io.c ${JROOT}/example.c)
+TARGET_LINK_LIBRARIES(jpeg-io y-jpeg)
+
 
 MESSAGE( STATUS "---------------- </jpeg> ----------------" )
 MESSAGE( STATUS "" )
