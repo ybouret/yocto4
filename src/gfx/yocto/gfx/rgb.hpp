@@ -3,6 +3,7 @@
 
 
 #include "yocto/gfx/types.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -24,6 +25,12 @@ namespace yocto
                 g = other.g;
                 b = other.b;
                 return *this;
+            }
+            
+            friend inline std::ostream & operator<<( std::ostream &os, const rgb<T> &C )
+            {
+                os << '[' << double(C.r) << ' ' << double(C.g) << ' ' << double(C.b) << ']';
+                return os;
             }
             
         };
@@ -55,7 +62,11 @@ namespace yocto
                 a = other.a;
                 return *this;
             }
-            
+            friend inline std::ostream & operator<<( std::ostream &os, const rgba<T> &C )
+            {
+                os << '[' << double(C.r) << ' ' << double(C.g) << ' ' << double(C.b) << ' ' << double(C.a) << ']';
+                return os;
+            }
         };
         
     }

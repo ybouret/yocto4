@@ -42,9 +42,15 @@ namespace yocto
             }
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Loading
+        //
+        ////////////////////////////////////////////////////////////////////////
+
         surface * image::format:: load_surface(const string &filename, const pixel_format fmt ) const
         {
-            const bitmap::pointer bmp( load(filename,fmt.depth, fmt.callback, &fmt) );
+            const bitmap::pointer bmp( load(filename,fmt.depth, fmt.put_rgba_cb, &fmt) );
             return new surface(fmt,bmp,0);
         }
 
@@ -93,6 +99,19 @@ namespace yocto
         {
             const bitmap::pointer bmp( load(filename,sizeof(float),pxgs_f,0) );
             return bmp;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Saving
+        //
+        ////////////////////////////////////////////////////////////////////////
+
+        void image::format:: save_surface(const string  &filename,
+                                          const surface &surf,
+                                          const char    *options) const
+        {
+            save(filename, surf, surf.format.get_rgba_cb, &surf.format, options);
         }
 
 
