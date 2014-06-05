@@ -24,15 +24,16 @@ YOCTO_UNIT_TEST_IMPL(load_jpeg)
         const string                filename = argv[1];
         const gfx::jpeg_format      jpg;
         auto_ptr<gfx::surface>      surf32( jpg.load_surface(filename, gfx::ARGB32() ) );
-        
-#if 0
+        auto_ptr<gfx::surface>      surf16( jpg.load_surface(filename, gfx::ARGB16() ) );
+
         gfx::pixmap<gfx::rgb_t>     pix3(   jpg.load_bitmap3(filename) );
         gfx::pixmap<gfx::rgba_t>    pix4(   jpg.load_bitmap4(filename) );
         gfx::pixmap<uint8_t>        pixgs(  jpg.load_greyscale(filename) );
         gfx::pixmap<float>          pixf(   jpg.load_greyscale_f(filename) );
-#endif
-        jpg.save_surface("toto.jpg", *surf32,NULL);
-        
+
+        jpg.save_surface("toto32.jpg", *surf32,NULL);
+        jpg.save_surface("toto16.jpg", *surf16,NULL);
+
     }
 }
 YOCTO_UNIT_TEST_DONE()
