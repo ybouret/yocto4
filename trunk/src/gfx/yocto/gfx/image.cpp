@@ -11,7 +11,7 @@ namespace yocto
             
         }
         
-        image:: image()
+        image:: image() : db()
         {
         }
         
