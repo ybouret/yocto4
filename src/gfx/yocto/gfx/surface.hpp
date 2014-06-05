@@ -32,13 +32,18 @@ namespace yocto
             
             virtual ~surface() throw();
             explicit surface( const pixel_format fmt, unit_t width, unit_t height);
+            explicit surface( const pixel_format fmt, const bitmap::pointer &bmp, const rectangle *rect=0 );
             
             row & operator[](unit_t j) throw();
             const row & operator[](unit_t j) const throw();
             
-            void put(void *addr, const pixel_t C);
-            void put(void *addr, const rgb_t  &C);
-            void put(void *addr, const rgba_t &C);
+            void put_pixel(void *addr, const pixel_t C);
+            void put_pixel(void *addr, const rgb_t  &C);
+            void put_pixel(void *addr, const rgba_t &C);
+            pixel_t get_pixel(const void *addr) const;
+            rgb_t   get_rgb(const void *addr) const;
+            rgba_t  get_rgba(const void *addr) const;
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(surface);

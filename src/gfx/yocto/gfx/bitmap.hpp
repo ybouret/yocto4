@@ -1,4 +1,4 @@
-#ifndef YOCTO_GFX_BITPAP_INCLUDED
+#ifndef YOCTO_GFX_BITMAP_INCLUDED
 #define YOCTO_GFX_BITMAP_INCLUDED 1
 
 #include "yocto/gfx/rectangle.hpp"
@@ -70,6 +70,8 @@ namespace yocto
             void *get(unit_t x, unit_t y) const throw(); //!< \warning no check
             void  flip_horz() throw();
             void  flip_vert() throw();
+            
+            static void check_depths( const char *lhs_name, const int lhs, const char *rhs_name, const int rhs);
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(bitmap);

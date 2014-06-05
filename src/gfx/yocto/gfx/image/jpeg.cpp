@@ -62,8 +62,10 @@ namespace yocto
         
         
         
-        
-        surface *jpeg_format:: load(const string &filename, const pixel_format fmt ) const
+        bitmap  * jpeg_format:: load(const string         &filename,
+                                     unit_t                depth,
+                                     image::put_rgba_proc  proc,
+                                     const void           *args ) const
         {
             static const char fn[] = "jpeg::load";
             YOCTO_GIANT_LOCK();
@@ -76,11 +78,18 @@ namespace yocto
             memset(&cinfo,0,sizeof(cinfo));
             memset(&jerr,0,sizeof(jerr));
             
-            /* We set up the normal JPEG error routines, then override error_exit. */
+            //__________________________________________________________________
+            //
+            // We set up the normal JPEG error routines,
+            // then override error_exit
+            //__________________________________________________________________
             cinfo.err = jpeg_std_error(&jerr.pub);
             jerr.pub.error_exit = my_error_exit;
             
-            /* Establish the setjmp return context for my_error_exit to use. */
+            //__________________________________________________________________
+            //
+            // Establish the setjmp return context for my_error_exit to use.
+            //__________________________________________________________________
             if (setjmp(jerr.setjmp_buffer)) {
                 /* If we get here, the JPEG code has signaled an error.
                  * We need to clean up the JPEG object, close the input file, and return.
@@ -90,14 +99,24 @@ namespace yocto
                 throw exception("%s(failure)",fn);
             }
             
-            /* Now we can initialize the JPEG decompression object. */
+            //__________________________________________________________________
+            //
+            // Now we can initialize the JPEG decompression object
+            //__________________________________________________________________
             jpeg_create_decompress(&cinfo);
             
-            /* Step 2: specify data source (eg, a file) */
+            //__________________________________________________________________
+            //
+            // Step 2: specify data source (eg, a file)
+            //__________________________________________________________________
             jpeg_stdio_src(&cinfo, fp.__get());
             
             
-            /* Step 3: read file parameters with jpeg_read_header() */
+            //__________________________________________________________________
+            //
+            // Read file parameters with jpeg_read_header()
+            //__________________________________________________________________
+            
             
             (void) jpeg_read_header(&cinfo, TRUE);
             /* We can ignore the return value from jpeg_read_header since
@@ -106,13 +125,10 @@ namespace yocto
              * See libjpeg.doc for more info.
              */
             
-            /* Step 4: set parameters for decompression */
-            
-            /* In this example, we don't need to change any of the defaults set by
-             * jpeg_read_header(), so we do nothing here.
-             */
-            
-            /* Step 5: Start decompressor */
+            //__________________________________________________________________
+            //
+            // Step 5: Start decompressor
+            //__________________________________________________________________
             
             (void) jpeg_start_decompress(&cinfo);
             /* We can ignore the return value since suspension is not possible
@@ -123,15 +139,14 @@ namespace yocto
             {
                 const unit_t width  = cinfo.output_width;
                 const unit_t height = cinfo.output_height;
-                const unit_t depth  = cinfo.output_components;
                 std::cerr << "width=" << width << ", height=" << height << std::endl;
                 if(width<=0||height<=0)
                     throw exception("%s(invalid witdh/height)", fn);
                 
-                if(depth!=3)
-                    throw exception("%s(unsupported image depth=%d)",fn,int(depth));
+                if(cinfo.output_components!=3)
+                    throw exception("%s(unsupported image depth=%d)",fn,int(cinfo.output_components));
                 
-                auto_ptr<surface> surf( new surface(fmt,width,height) );
+                auto_ptr<bitmap> bmp( new bitmap(depth,width,height) );
                 
                 buflen = cinfo.output_width * cinfo.output_components;
                 buffer = memory::kind<memory::global>::acquire_as<JSAMPLE>(buflen);
@@ -140,13 +155,15 @@ namespace yocto
                 while (cinfo.output_scanline < cinfo.output_height)
                 {
                     (void) jpeg_read_scanlines(&cinfo, &buffer, 1);
-                    surface::row &r = (*surf)[j];
+                    //surface::row &r = (*surf)[j];
+                    uint8_t *p = static_cast<uint8_t*>(bmp->get_line(j));
                     for(unit_t i=0;i<width;++i)
                     {
                         const unit_t   i3 = 3*i;
                         const JSAMPLE *b  = &buffer[i3];
                         const rgb_t    C(b[0],b[1],b[2]);
-                        surf->put(r[i],C);
+                        
+                        p += depth;
                     }
                     --j;
                 }
@@ -158,12 +175,9 @@ namespace yocto
                  * with the stdio data source.
                  */
                 
-                /* Step 8: Release JPEG decompression object */
-                
-                /* This is an important step since it will release a good deal of memory. */
                 memory::kind<memory::global>::release_as<JSAMPLE>(buffer, buflen);
                 jpeg_destroy_decompress(&cinfo);
-                return surf.yield();
+                return bmp.yield();
             }
             catch(...)
             {
@@ -171,6 +185,15 @@ namespace yocto
                 jpeg_destroy_decompress(&cinfo);
                 throw;
             }
+            
+        }
+        
+        void jpeg_format:: save(const string        &filename,
+                                const bitmap        &bmp,
+                                image::get_rgba_proc proc,
+                                const void          *args) const
+        {
+            
         }
     }
 }

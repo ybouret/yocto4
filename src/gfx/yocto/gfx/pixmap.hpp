@@ -86,6 +86,15 @@ namespace yocto
                 build_rows();
             }
             
+            //! from shared bitmap
+            pixmap( const bitmap::pointer &bmp, const rectangle *rect=0) :
+            bitmap(bmp,rect)
+            {
+                check_depths("pixmap", sizeof(T), "bitmap", bmp->d);
+                build_rows();
+            }
+            
+            
             //! conversion
             template <typename U>
             pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
