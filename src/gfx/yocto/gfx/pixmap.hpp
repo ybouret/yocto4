@@ -67,28 +67,36 @@ namespace yocto
             
             //! in memory pixmap
             pixmap(unit_t w, unit_t h) :
-            bitmap(sizeof(T),w,h)
+            bitmap(sizeof(T),w,h),
+            nrow(0),
+            rows(0)
             {
                 build_rows();
             }
             
             //! hard copy
             pixmap( const pixmap &px, const rectangle *rect = 0 ) :
-            bitmap( px, rect )
+            bitmap( px, rect ),
+            nrow(0),
+            rows(0)
             {
                 build_rows();
             }
             
             //! from user
             pixmap(unit_t w, unit_t h, void *data, unit_t data_stride ) :
-            bitmap( sizeof(T),w,h,data,data_stride)
+            bitmap( sizeof(T),w,h,data,data_stride),
+            nrow(0),
+            rows(0)
             {
                 build_rows();
             }
             
             //! from shared bitmap
             pixmap( const bitmap::pointer &bmp, const rectangle *rect=0) :
-            bitmap(bmp,rect)
+            bitmap(bmp,rect),
+            nrow(0),
+            rows(0)
             {
                 check_depths("pixmap", sizeof(T), "bitmap", bmp->d);
                 build_rows();
@@ -98,7 +106,9 @@ namespace yocto
             //! conversion
             template <typename U>
             pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
-            bitmap(sizeof(T),w,h)
+            bitmap(sizeof(T),w,h),
+            nrow(0),
+            rows(0)
             {
                 build_rows();
                 try
@@ -108,7 +118,9 @@ namespace yocto
                         row                           &tgt = rows[j];
                         const typename pixmap<U>::row &src = px[j];
                         for(unit_t i=0;i<w;++i)
+                        {
                             tgt[i] = filter(src[i]);
+                        }
                     }
                 }
                 catch(...)
