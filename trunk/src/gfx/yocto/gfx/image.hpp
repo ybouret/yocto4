@@ -45,6 +45,18 @@ namespace yocto
                 const bitmap::pointer load_greyscale(const string &filename) const;   //!< for pixmap<uin8t_t>
                 const bitmap::pointer load_greyscale_f(const string &filename) const; //!< for pixmap<float>
                 
+                
+                virtual void     save(const string        &filename,
+                                      const bitmap        &bmp,
+                                      image::get_rgba_proc proc,
+                                      const void          *args,
+                                      const char          *options) const = 0;
+                
+                void save_surface(const string &filename,
+                                  const surface &surf,
+                                  const char    *options) const;
+                
+                
             protected:
                 explicit format(const char *id);
                 

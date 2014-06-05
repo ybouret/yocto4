@@ -4,6 +4,7 @@
 #include "yocto/gfx/rgb.hpp"
 #include "yocto/gfx/metrics.hpp"
 
+
 namespace yocto
 {
     namespace gfx
@@ -35,10 +36,16 @@ namespace yocto
             
             
             friend std::ostream & operator<<( std::ostream &, const pixel_format &fmt );
-            static void callback(void *addr, const rgba_t &C, const void *args)
+            static inline void put_rgba_cb(void *addr, const rgba_t &C, const void *args) throw()
             {
                 const pixel_format &fmt = *(pixel_format *)args;
                 fmt.put_pixel(addr,fmt.map_rgba(C));
+            }
+            
+            static inline rgba_t get_rgba_cb(const void *addr, const void *args) throw()
+            {
+                const pixel_format &fmt = *(pixel_format *)args;
+                return fmt.get_rgba( fmt.get_pixel(addr) );
             }
             
         private:

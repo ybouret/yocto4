@@ -22,7 +22,8 @@ namespace yocto
             virtual void     save(const string        &filename,
                                   const bitmap        &bmp,
                                   image::get_rgba_proc proc,
-                                  const void          *args) const;
+                                  const void          *args,
+                                  const char          *options) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(jpeg_format);
