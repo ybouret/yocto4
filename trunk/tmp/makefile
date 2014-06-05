@@ -25,4 +25,5 @@ all: $(OBJS)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean:
-	rm -f *.o
+	rm -f *.o a.out a.exe
+
