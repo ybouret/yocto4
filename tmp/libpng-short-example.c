@@ -175,7 +175,7 @@ void process_file(void)
         }
 }
 
-#if 0
+#if 1
 int main(int argc, char **argv)
 {
         if (argc != 3)
