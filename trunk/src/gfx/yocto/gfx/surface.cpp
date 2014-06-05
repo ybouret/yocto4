@@ -1,4 +1,5 @@
 #include "yocto/gfx/surface.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -42,6 +43,16 @@ namespace yocto
             make_rows();
         }
         
+        surface:: surface( const pixel_format fmt, const bitmap::pointer &bmp, const rectangle *rect ) :
+        bitmap( bmp, rect),
+        format( fmt ),
+        nrow(0),
+        rows(0)
+        {
+            check_depths("surface", fmt.depth, "bitmap", this->d);
+            make_rows();
+        }
+        
         void surface:: kill_rows() throw()
         {
             memory::kind<memory::global>::release_as<row>(rows, nrow);
@@ -72,24 +83,37 @@ namespace yocto
             return rows[j];
         }
        
-        void surface:: put(void *addr, const pixel_t C)
+        void surface:: put_pixel(void *addr, const pixel_t C)
         {
             format.put_pixel(addr,C);
         }
         
-        void surface:: put(void *addr, const rgb_t &C)
+        void surface:: put_pixel(void *addr, const rgb_t &C)
         {
             format.put_pixel(addr,format.map_rgb(C));
         }
         
-        void surface:: put(void *addr, const rgba_t &C)
+        void surface:: put_pixel(void *addr, const rgba_t &C)
         {
             format.put_pixel(addr,format.map_rgba(C));
         }
 
+        pixel_t surface:: get_pixel(const void *addr) const
+        {
+            return format.get_pixel(addr);
+        }
+        
+        rgb_t surface::get_rgb(const void *addr) const
+        {
+            return format.get_rgb( format.get_pixel(addr) );
+        }
 
+        rgba_t surface::get_rgba(const void *addr) const
+        {
+            return format.get_rgba( format.get_pixel(addr) );
+        }
         
-        
+    
 
         
     }

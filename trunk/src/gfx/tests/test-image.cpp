@@ -1,5 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/gfx/image.hpp"
+#include "yocto/gfx/pixmap.hpp"
 
 using namespace yocto;
 
@@ -20,9 +21,13 @@ YOCTO_UNIT_TEST_IMPL(load_jpeg)
 {
     if(argc>1)
     {
-        const string     filename = argv[1];
-        gfx::jpeg_format jpg;
-        auto_ptr<gfx::surface> surf( jpg.load(filename, gfx::ARGB32()) );
+        const string                filename = argv[1];
+        const gfx::jpeg_format      jpg;
+        auto_ptr<gfx::surface>      surf32( jpg.load_surface(filename, gfx::ARGB32() ) );
+        gfx::pixmap<gfx::rgb_t>     pix3(   jpg.load_bitmap3(filename) );
+        gfx::pixmap<gfx::rgba_t>    pix4(   jpg.load_bitmap4(filename) );
+        gfx::pixmap<uint8_t>        pixgs(  jpg.load_greyscale(filename) );
+        gfx::pixmap<float>          pixf(   jpg.load_greyscale_f(filename) );
     }
 }
 YOCTO_UNIT_TEST_DONE()

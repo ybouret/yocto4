@@ -35,6 +35,11 @@ namespace yocto
             
             
             friend std::ostream & operator<<( std::ostream &, const pixel_format &fmt );
+            static void callback(void *addr, const rgba_t &C, const void *args)
+            {
+                const pixel_format &fmt = *(pixel_format *)args;
+                fmt.put_pixel(addr,fmt.map_rgba(C));
+            }
             
         private:
             YOCTO_DISABLE_ASSIGN(pixel_format);

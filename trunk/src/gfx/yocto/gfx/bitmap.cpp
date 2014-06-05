@@ -337,6 +337,16 @@ namespace yocto
             }
         }
         
+        void bitmap:: check_depths(const char *lhs_name,
+                                   const int   lhs,
+                                   const char *rhs_name,
+                                   const int   rhs)
+        {
+            assert(lhs_name);
+            assert(rhs_name);
+            if(lhs != rhs )
+                throw imported::exception("mismatch bitmap depths", "%s=%d != %s=%d", lhs_name, lhs, rhs_name, rhs);
+        }
         
     }
 }
