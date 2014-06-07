@@ -106,7 +106,7 @@ namespace yocto
             //! conversion
             template <typename U>
             pixmap( const pixmap<U> &px, functor<T,TL1(U)> &filter ) :
-            bitmap(sizeof(T),w,h),
+            bitmap(sizeof(T),px.w,px.h),
             nrow(0),
             rows(0)
             {
