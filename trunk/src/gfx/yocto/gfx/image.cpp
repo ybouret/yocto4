@@ -35,7 +35,9 @@ namespace yocto
         
         void image:: declare( format *fmt )
         {
+            assert(fmt);
             const format::pointer ptr(fmt);
+            std::cerr << "declare '" << ptr->name << "'" << std::endl;
             if( !db.insert(fmt) )
             {
                 throw exception("already has image::format '%s'", ptr->name.c_str());
