@@ -1,6 +1,8 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/gfx/image.hpp"
 #include "yocto/gfx/pixmap.hpp"
+#include "yocto/gfx/image/jpeg.hpp"
+#include "yocto/gfx/image/png.hpp"
 
 using namespace yocto;
 
@@ -10,11 +12,13 @@ YOCTO_UNIT_TEST_IMPL(image)
     
     std::cerr << IMG.get_name() << std::endl;
     
+    IMG.declare( new gfx::jpeg_format() );
+    IMG.declare( new gfx::png_format()  );
+
 }
 YOCTO_UNIT_TEST_DONE()
 
 
-#include "yocto/gfx/image/jpeg.hpp"
 #include "yocto/ptr/auto.hpp"
 
 YOCTO_UNIT_TEST_IMPL(load_jpeg)
@@ -37,3 +41,17 @@ YOCTO_UNIT_TEST_IMPL(load_jpeg)
     }
 }
 YOCTO_UNIT_TEST_DONE()
+
+YOCTO_UNIT_TEST_IMPL(load_png)
+{
+    if(argc>1)
+    {
+        const string                filename = argv[1];
+        const gfx::png_format       png;
+        png.load(filename, 3, NULL, NULL);
+        
+    }
+
+}
+YOCTO_UNIT_TEST_DONE()
+
