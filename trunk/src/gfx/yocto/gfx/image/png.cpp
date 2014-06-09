@@ -56,11 +56,59 @@ namespace yocto
                     throw exception("%s(file is not recognized as PNG)", fn);
             }
             
-            png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+            //__________________________________________________________________
+            //
+            // prepare to read
+            //__________________________________________________________________
+            png_structp png_ptr  = 0; png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+            png_infop   info_ptr = 0;
+
+            png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
             if(!png_ptr)
                 throw exception("couldn't create PNG read struct");
             
+            info_ptr = png_create_info_struct(png_ptr);
+            if(!info_ptr)
+            {
+                png_destroy_read_struct(&png_ptr, NULL, NULL);
+                throw exception("could't create PNG info struct");
+            }
             
+            //__________________________________________________________________
+            //
+            //  Init I/O
+            //__________________________________________________________________
+            if (setjmp(png_jmpbuf(png_ptr)))
+            {
+                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+                throw exception("I/O failure for PNG");
+            }
+            
+            png_init_io(png_ptr, fp.__get());
+            png_set_sig_bytes(png_ptr, 8);
+            
+            png_read_info(png_ptr, info_ptr);
+            
+            const unit_t     width      = png_get_image_width(png_ptr, info_ptr);
+            const unit_t     height     = png_get_image_height(png_ptr, info_ptr);
+            const png_byte   color_type = png_get_color_type(png_ptr, info_ptr);
+            const png_byte   bit_depth  = png_get_bit_depth(png_ptr, info_ptr);
+            
+            const int number_of_passes = png_set_interlace_handling(png_ptr);
+            png_read_update_info(png_ptr, info_ptr);
+            
+            std::cerr
+            << "width=" << width
+            << ", height=" << height
+            << ", color_type=" << int(color_type)
+            << ", bit_depth=" << int(bit_depth)
+            << ", #passes=" << number_of_passes << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // cleanup
+            //__________________________________________________________________
+            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
             return 0;
         }
         
