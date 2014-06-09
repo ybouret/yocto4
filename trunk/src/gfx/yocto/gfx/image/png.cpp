@@ -104,6 +104,9 @@ namespace yocto
             << ", bit_depth=" << int(bit_depth)
             << ", #passes=" << number_of_passes << std::endl;
             
+            
+            
+            
             //__________________________________________________________________
             //
             // cleanup
