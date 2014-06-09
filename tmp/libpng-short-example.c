@@ -147,7 +147,7 @@ void write_png_file(char* file_name)
         /* cleanup heap allocation */
         for (y=0; y<height; y++)
                 free(row_pointers[y]);
-        free(row_pointers);
+    free(row_pointers);
 
         fclose(fp);
 }
