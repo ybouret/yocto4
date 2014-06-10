@@ -54,14 +54,17 @@ namespace yocto
                 {
                     const size_t rows_offset = 0;
                     const size_t rows_length = sizeof(png_bytep) * height;
-                    const unit_t row_bytes   = 4 * width;
+                    
                     const size_t data_offset = memory::align(rows_length+rows_offset);
+                    const unit_t row_bytes   = 4 * width;
                     const size_t data_length = height * row_bytes * sizeof(png_byte);
+                    
                     wlen = memory::align(data_offset+data_length);
                     wksp = memory::kind<memory::global>::acquire(wlen);
                     
                     uint8_t *addr = (uint8_t *)wksp;
                     rows = (png_bytep *)&addr[rows_offset];
+                    
                     uint8_t *data = &addr[data_offset];
                     for(unit_t i=0;i<height;++i)
                     {
@@ -88,7 +91,6 @@ namespace yocto
             //
             // open file
             //__________________________________________________________________
-            
             ios::icstream fp(filename);
             
             //__________________________________________________________________
@@ -202,7 +204,7 @@ namespace yocto
             for(unit_t j=0;j<height;++j)
             {
                 const png_byte *q = mem.rows[j];
-                uint8_t *p = static_cast<uint8_t*>(bmp->get_line(j));
+                uint8_t        *p = static_cast<uint8_t*>(bmp->get_line(j));
                 for(unit_t i=0;i<width;++i,q += 4, p += depth)
                 {
                     const rgba_t C( q[0], q[1], q[2], q[3]);
