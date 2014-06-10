@@ -9,6 +9,7 @@ extern "C"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/fs/vfs.hpp"
 
 #include <setjmp.h>
 
@@ -24,6 +25,8 @@ namespace yocto
         {
             
         }
+        
+        
         
         bool jpeg_format::lossless() const throw()
         {

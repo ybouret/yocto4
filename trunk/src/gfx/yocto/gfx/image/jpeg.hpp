@@ -25,6 +25,7 @@ namespace yocto
                                   const void          *args,
                                   const char          *options) const;
             
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(jpeg_format);
         };

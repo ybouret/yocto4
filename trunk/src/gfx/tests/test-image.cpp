@@ -49,7 +49,9 @@ YOCTO_UNIT_TEST_IMPL(load_png)
         const string                filename = argv[1];
         const gfx::png_format       png;
         auto_ptr<gfx::surface>      surf32( png.load_surface(filename, gfx::ARGB32() ) );
-        auto_ptr<gfx::surface>      surf16( png.load_surface(filename, gfx::ARGB16() ) );
+        //auto_ptr<gfx::surface>      surf16( png.load_surface(filename, gfx::ARGB16() ) );
+        const gfx::jpeg_format      jpg;
+        jpg.save_surface("toto32.jpg", *surf32,NULL);
 
     }
 

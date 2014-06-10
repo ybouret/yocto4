@@ -31,26 +31,36 @@ namespace yocto
                 typedef intr_ptr<string,format>         pointer;
                 typedef lexicon<string,format::pointer> database;
                 
+                
+                //______________________________________________________________
+                //
+                // virtual API
+                //______________________________________________________________
+
                 virtual bool     lossless() const throw() = 0;
                 virtual bitmap  *load(const string         &filename,
                                       unit_t                depth,
                                       image::put_rgba_proc  proc,
                                       const void           *args) const = 0;
                 
+                virtual void     save(const string        &filename,
+                                      const bitmap        &bmp,
+                                      image::get_rgba_proc proc,
+                                      const void          *args,
+                                      const char          *options) const = 0;
                 
                 
+                //______________________________________________________________
+                //
+                // non virtual API
+                //______________________________________________________________
                 surface *             load_surface(const string &filename, const pixel_format fmt ) const;
                 const bitmap::pointer load_bitmap3(const string &filename) const;     //!< for pixmap<rgb_t>
                 const bitmap::pointer load_bitmap4(const string &filename) const;     //!< for pixmap<rgba_t>
                 const bitmap::pointer load_greyscale(const string &filename) const;   //!< for pixmap<uin8t_t>
                 const bitmap::pointer load_greyscale_f(const string &filename) const; //!< for pixmap<float>
                 
-                
-                virtual void     save(const string        &filename,
-                                      const bitmap        &bmp,
-                                      image::get_rgba_proc proc,
-                                      const void          *args,
-                                      const char          *options) const = 0;
+              
                 
                 void save_surface(const string &filename,
                                   const surface &surf,
