@@ -112,7 +112,7 @@ namespace yocto
             //
             // prepare to read
             //__________________________________________________________________
-            png_structp png_ptr  = 0; 
+            png_structp png_ptr  = 0;
             png_infop   info_ptr = 0;
             
             png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -143,24 +143,16 @@ namespace yocto
             
             const unit_t     width            = png_get_image_width(png_ptr, info_ptr);
             const unit_t     height           = png_get_image_height(png_ptr, info_ptr);
-            const png_byte   color_type       = png_get_color_type(png_ptr, info_ptr);
+            //const png_byte   color_type       = png_get_color_type(png_ptr, info_ptr);
             png_byte         bit_depth        = png_get_bit_depth(png_ptr, info_ptr);
             const int        number_of_passes = png_set_interlace_handling(png_ptr);
             
-            std::cerr
-            << "width=" << width
-            << ", height=" << height
-            << ", color_type=" << int(color_type)
-            << ", bit_depth=" << int(bit_depth)
-            << ", #passes=" << number_of_passes << std::endl;
-            
             
             png_set_strip_16(png_ptr); //!< strip 16->8 bits
-            png_set_packing(png_ptr);
+            png_set_packing(png_ptr);  //!< expand channels
             png_set_expand(png_ptr);   //!< expand all to RGBA...
             png_read_update_info(png_ptr, info_ptr);
             const unit_t num_channels = png_get_channels(png_ptr, info_ptr);
-            std::cerr << "#channels=" << num_channels << std::endl;
             bit_depth  = png_get_bit_depth(png_ptr, info_ptr);
             
             if(bit_depth!=8)
