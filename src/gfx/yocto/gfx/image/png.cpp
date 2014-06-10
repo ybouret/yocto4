@@ -81,7 +81,7 @@ namespace yocto
                                    const void            *args) const
         {
             static const char fn[] = "png::load";
-            //assert(proc);
+            assert(proc);
             YOCTO_GIANT_LOCK();
             
             //__________________________________________________________________
@@ -199,7 +199,16 @@ namespace yocto
             //
             // processing...
             //__________________________________________________________________
-            
+            for(unit_t j=0;j<height;++j)
+            {
+                const png_byte *q = mem.rows[j];
+                uint8_t *p = static_cast<uint8_t*>(bmp->get_line(j));
+                for(unit_t i=0;i<width;++i,q += 4, p += depth)
+                {
+                    const rgba_t C( q[0], q[1], q[2], q[3]);
+                    proc(p,C,args);
+                }
+            }
             
             //__________________________________________________________________
             //
