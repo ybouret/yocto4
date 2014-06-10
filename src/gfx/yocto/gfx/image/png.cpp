@@ -5,6 +5,7 @@
 
 #include "yocto/png/png.h"
 #include "yocto/code/round.hpp"
+#include "yocto/ptr/auto.hpp"
 
 namespace yocto
 {
@@ -24,7 +25,7 @@ namespace yocto
             return false;
         }
         
-
+        
         
         namespace
         {
@@ -49,10 +50,11 @@ namespace yocto
                 size_t     wlen;
                 void      *wksp;
                 
-                void allocate( unit_t height, unit_t row_bytes )
+                void allocate( unit_t width, unit_t height )
                 {
                     const size_t rows_offset = 0;
                     const size_t rows_length = sizeof(png_bytep) * height;
+                    const unit_t row_bytes   = 4 * width;
                     const size_t data_offset = memory::align(rows_length+rows_offset);
                     const size_t data_length = height * row_bytes * sizeof(png_byte);
                     wlen = memory::align(data_offset+data_length);
@@ -86,7 +88,7 @@ namespace yocto
             //
             // open file
             //__________________________________________________________________
-
+            
             ios::icstream fp(filename);
             
             //__________________________________________________________________
@@ -110,7 +112,7 @@ namespace yocto
             //__________________________________________________________________
             png_structp png_ptr  = 0; png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
             png_infop   info_ptr = 0;
-
+            
             png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
             if(!png_ptr)
                 throw exception("%s(couldn't create PNG read struct)",fn);
@@ -137,14 +139,11 @@ namespace yocto
             
             png_read_info(png_ptr, info_ptr);
             
-            const unit_t     width      = png_get_image_width(png_ptr, info_ptr);
-            const unit_t     height     = png_get_image_height(png_ptr, info_ptr);
-            const png_byte   color_type = png_get_color_type(png_ptr, info_ptr);
-            const png_byte   bit_depth  = png_get_bit_depth(png_ptr, info_ptr);
-            
-            const int number_of_passes = png_set_interlace_handling(png_ptr);
-            png_read_update_info(png_ptr, info_ptr);
-            
+            const unit_t     width            = png_get_image_width(png_ptr, info_ptr);
+            const unit_t     height           = png_get_image_height(png_ptr, info_ptr);
+            const png_byte   color_type       = png_get_color_type(png_ptr, info_ptr);
+            png_byte         bit_depth        = png_get_bit_depth(png_ptr, info_ptr);
+            const int        number_of_passes = png_set_interlace_handling(png_ptr);
             
             std::cerr
             << "width=" << width
@@ -153,38 +152,37 @@ namespace yocto
             << ", bit_depth=" << int(bit_depth)
             << ", #passes=" << number_of_passes << std::endl;
             
+            
+            png_set_strip_16(png_ptr); //!< strip 16->8 bits
+            png_set_expand(png_ptr);   //!< expand all to RGBA...
+            png_read_update_info(png_ptr, info_ptr);
+            bit_depth  = png_get_bit_depth(png_ptr, info_ptr);
+            if(bit_depth!=8)
+            {
+                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+                throw exception("%s(unstripped 16 bits!)",fn);
+            }
+            
             if(number_of_passes>1)
             {
                 png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
                 throw exception("%s(unhandled #passes=%d)",fn, number_of_passes);
             }
             
-            unit_t row_bytes  = 0;
-            switch(bit_depth)
-            {
-                case 16:
-                    row_bytes = width * 8;
-                    break;
-                    
-                case 8:
-                    row_bytes = width * 4;
-                    break;
-                    
-                default:
-                    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                    throw exception("%s(unhandled bit depth=%d)", fn, int(bit_depth) );
-            }
             
-            PNG_Mem __mem;
+            auto_ptr<bitmap> bmp;
+            PNG_Mem          mem;
             try
             {
-                __mem.allocate(height, row_bytes);
+                bmp.reset(new bitmap(depth,width,height));
+                mem.allocate(width,height);
             }
             catch(...)
             {
                 png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
                 throw;
             }
+            
             //__________________________________________________________________
             //
             // read file
@@ -195,8 +193,12 @@ namespace yocto
                 throw exception("%s(I/O failure)",fn);
             }
             
-            png_read_image(png_ptr, __mem.rows);
-
+            png_read_image(png_ptr,mem.rows);
+            
+            //__________________________________________________________________
+            //
+            // processing...
+            //__________________________________________________________________
             
             
             //__________________________________________________________________
@@ -204,7 +206,7 @@ namespace yocto
             // cleanup
             //__________________________________________________________________
             png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            return 0;
+            return bmp.yield();
         }
         
         

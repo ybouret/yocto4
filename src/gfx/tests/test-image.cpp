@@ -48,8 +48,7 @@ YOCTO_UNIT_TEST_IMPL(load_png)
     {
         const string                filename = argv[1];
         const gfx::png_format       png;
-        png.load(filename, 3, NULL, NULL);
-        
+        auto_ptr<gfx::bitmap>       bmp(png.load(filename, 3, NULL, NULL));
     }
 
 }
