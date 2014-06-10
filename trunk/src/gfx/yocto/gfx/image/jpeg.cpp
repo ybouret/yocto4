@@ -26,7 +26,12 @@ namespace yocto
             
         }
         
-        
+        const char ** jpeg_format:: extensions() const throw()
+        {
+            static const char *__ext[] = { "jpg", "jpeg", 0 };
+            return __ext;
+        }
+
         
         bool jpeg_format::lossless() const throw()
         {
@@ -143,7 +148,7 @@ namespace yocto
             {
                 const unit_t width  = cinfo.output_width;
                 const unit_t height = cinfo.output_height;
-                std::cerr << "width=" << width << ", height=" << height << std::endl;
+                //std::cerr << "width=" << width << ", height=" << height << std::endl;
                 if(width<=0||height<=0)
                     throw exception("%s(invalid witdh/height)", fn);
                 

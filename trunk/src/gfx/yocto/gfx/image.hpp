@@ -60,21 +60,30 @@ namespace yocto
                 const bitmap::pointer load_greyscale(const string &filename) const;   //!< for pixmap<uin8t_t>
                 const bitmap::pointer load_greyscale_f(const string &filename) const; //!< for pixmap<float>
                 
-              
                 
                 void save_surface(const string &filename,
                                   const surface &surf,
                                   const char    *options) const;
                 
                 
+                bool can_handle(const string &filename) const throw();
+                
             protected:
                 explicit format(const char *id);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(format);
+                virtual const char **extensions() const throw() = 0;
             };
             
+            
             void declare( format *fmt );
+            bitmap *load(const string         &filename,
+                         unit_t                depth,
+                         image::put_rgba_proc  proc,
+                         const void           *args) const;
+            
+            surface *load_surface(const string &filename, const pixel_format fmt ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(image);
@@ -84,6 +93,7 @@ namespace yocto
             static const threading::longevity life_time = 100;
             static const char                 name[];
             format::database db;
+            const format &get_format_for( const string &filename) const;
         };
     }
     

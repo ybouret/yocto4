@@ -242,8 +242,8 @@ namespace yocto
         
         //! forward const iterator
         typedef iterating::handle<const_type,iterating::forward> const_iterator;
-        inline const_iterator begin() const throw() { return const_iterator(hook);       }
-        inline const_iterator end()   const throw() { return const_iterator(hook+items); }
+        inline const_iterator begin() const throw() { return const_iterator((const type **)hook);       }
+        inline const_iterator end()   const throw() { return const_iterator((const_type **)hook+items); }
         
         //! fast access
         inline type & operator[](size_t i) throw()
