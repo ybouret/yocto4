@@ -218,8 +218,21 @@ namespace yocto
                 uint8_t        *p = static_cast<uint8_t*>(bmp->get_line(--y));
                 for(unit_t i=0;i<width;++i,q += num_channels, p += depth)
                 {
-                    const rgba_t C( q[0], q[1], q[2], q[3]);
-                    proc(p,C,args);
+                    switch(num_channels)
+                    {
+                        case 3: {
+                            const rgba_t C( q[0], q[1], q[2], 0xff);
+                            proc(p,C,args); }
+                            break;
+                            
+                        case 4: {
+                            const rgba_t C( q[0], q[1], q[2], q[3]);
+                            proc(p,C,args); }
+                            break;
+                            
+                        default:
+                            ;
+                    }
                 }
             }
             
