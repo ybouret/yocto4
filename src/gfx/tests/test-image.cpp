@@ -3,6 +3,7 @@
 #include "yocto/gfx/pixmap.hpp"
 #include "yocto/gfx/image/jpeg.hpp"
 #include "yocto/gfx/image/png.hpp"
+#include "yocto/ptr/auto.hpp"
 
 using namespace yocto;
 
@@ -14,12 +15,15 @@ YOCTO_UNIT_TEST_IMPL(image)
     
     IMG.declare( new gfx::jpeg_format() );
     IMG.declare( new gfx::png_format()  );
+    if(argc>1)
+    {
+        auto_ptr<gfx::surface> surf32( IMG.load_surface(argv[1], gfx::ARGB32() ) );
+    }
 
 }
 YOCTO_UNIT_TEST_DONE()
 
 
-#include "yocto/ptr/auto.hpp"
 
 YOCTO_UNIT_TEST_IMPL(load_jpeg)
 {
@@ -35,8 +39,8 @@ YOCTO_UNIT_TEST_IMPL(load_jpeg)
         gfx::pixmap<uint8_t>        pixgs(  jpg.load_greyscale(filename) );
         gfx::pixmap<float>          pixf(   jpg.load_greyscale_f(filename) );
 
-        jpg.save_surface("toto32.jpg", *surf32,NULL);
-        jpg.save_surface("toto16.jpg", *surf16,NULL);
+        jpg.save_surface("img32.jpg", *surf32,NULL);
+        jpg.save_surface("img16.jpg", *surf16,NULL);
 
     }
 }

@@ -25,7 +25,12 @@ namespace yocto
             return false;
         }
         
-        
+        const char ** png_format:: extensions() const throw()
+        {
+            static const char *__ext[] = { "png", 0 };
+            return __ext;
+        }
+
         
         namespace
         {
@@ -376,7 +381,6 @@ namespace yocto
             png_destroy_write_struct(&png_ptr,&info_ptr);
             
         }
-        
         
     }
     

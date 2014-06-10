@@ -28,6 +28,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(png_format);
+            virtual const char **extensions() const throw();
         };
     }
 }
