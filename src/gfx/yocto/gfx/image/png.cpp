@@ -112,7 +112,7 @@ namespace yocto
             //
             // prepare to read
             //__________________________________________________________________
-            png_structp png_ptr  = 0; png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+            png_structp png_ptr  = 0; 
             png_infop   info_ptr = 0;
             
             png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
