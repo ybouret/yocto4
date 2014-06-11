@@ -15,9 +15,9 @@ YOCTO_UNIT_TEST_IMPL(image)
     
     IMG.declare( new gfx::jpeg_format() );
     IMG.declare( new gfx::png_format()  );
-    if(argc>1)
+    for(int i=1;i<argc;++i)
     {
-        auto_ptr<gfx::surface> surf32( IMG.load_surface(argv[1], gfx::ARGB32() ) );
+        auto_ptr<gfx::surface> surf32( IMG.load_surface(argv[i], gfx::ARGB32() ) );
     }
 
 }
