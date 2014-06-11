@@ -30,7 +30,7 @@ namespace yocto
             static const char *__ext[] = { "png", 0 };
             return __ext;
         }
-
+        
         
         namespace
         {
@@ -172,10 +172,16 @@ namespace yocto
                 throw exception("%s(unhandled #passes=%d)",fn, number_of_passes);
             }
             
-            if(num_channels<3)
+            switch(num_channels)
             {
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                throw exception("%s(unhandled #channels=%d)",fn, int(num_channels));
+                case 1:
+                case 3:
+                case 4:
+                    break;
+                    
+                default:
+                    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+                    throw exception("%s(unhandled #channels=%d)",fn, int(num_channels));
             }
             
             
@@ -217,6 +223,10 @@ namespace yocto
                 {
                     switch(num_channels)
                     {
+                        case 1: {
+                            const rgba_t C(q[0],q[0],q[0],0xff);
+                            proc(p,C,args); }
+                            break;
                         case 3: {
                             const rgba_t C( q[0], q[1], q[2], 0xff);
                             proc(p,C,args); }
@@ -228,6 +238,7 @@ namespace yocto
                             break;
                             
                         default:
+                            // never get here
                             ;
                     }
                 }
