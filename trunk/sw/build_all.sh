@@ -40,18 +40,27 @@ VERSION=2.0.3
 ARCHIVE=SDL2-${VERSION}.tar.gz
 BUILD_DIR=SDL2-${VERSION}
 
-#Test Archive
-test -e ${ARCHIVE} || wget http://www.libsdl.org/release/${ARCHIVE} || xerror "Couldn't Download ${ARCHIVE}";
-
-#Test Directory
-test -d ${BUILD_DIR} || ( tar xfvz ${ARCHIVE} || (xerror "Couldn't extract ${ARCHIVE}")) ;
-
 function configure_SDL2
 {
 	echo "Configuring SDL2";
-	cd ${BUILD_DIR} && ./configure --prefix=${INSTALL_DIR} --disable-shared
+	(cd ${BUILD_DIR} && ./configure --prefix=${INSTALL_DIR} --disable-shared) || xerror "SDL2 Configure Failure";
 	return 0;
 }
 
-#Test Makefile
-(test -e ${BUILD_DIR}/Makefile || configure_SDL2 )
+function build_SDL2
+{
+	#Test Archive
+	test -e ${ARCHIVE} || wget http://www.libsdl.org/release/${ARCHIVE} || xerror "Couldn't Download ${ARCHIVE}";
+
+	#Test Directory
+	test -d ${BUILD_DIR} || tar xfvz ${ARCHIVE} ||xerror "Couldn't Extract ${ARCHIVE}";
+
+
+	#Test Makefile and configure if needed
+	(test -e ${BUILD_DIR}/Makefile || configure_SDL2 )
+
+	#Build...
+	make -s -C ${BUILD_DIR} all || xerror "Couldn Build ${BUILD_DIR}";
+}
+
+build_SDL2;
