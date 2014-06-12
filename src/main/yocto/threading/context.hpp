@@ -11,6 +11,10 @@ namespace yocto
     {
         
         //! context of current thread
+        /**
+         information about rank and size, 
+         and uses the vslot class to hold user extra information if needed.
+         */
         class context : public vslot
         {
         public:
@@ -60,34 +64,6 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(single_context);
         };
-        
-        //! for use with server
-        class context_batch
-        {
-        public:
-            explicit context_batch(size_t n, lockable &lock_ref);
-            virtual ~context_batch() throw();
-            
-            const size_t size;
-            
-            context       & operator[](size_t rank) throw();
-            const context & operator[](size_t rank) const throw();
-            
-            //! make windows in contexts data
-            template <typename WINDOW>
-            inline void dispatch( size_t length, size_t offset )
-            {
-                context::dispatch<context_batch,WINDOW>(*this,length,offset);
-            }
-
-            
-        private:
-            size_t   cnt; //!< for memory
-            context *ctx; //!< localization
-            
-            YOCTO_DISABLE_COPY_AND_ASSIGN(context_batch);
-        };
-        
         
     }
 }
