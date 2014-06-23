@@ -8,6 +8,7 @@
 #include "yocto/ptr/intr.hpp"
 #include "yocto/counted.hpp"
 #include "yocto/associative/set.hpp"
+#include "yocto/associative/lexicon.hpp"
 
 #include "yocto/math/types.hpp"
 
@@ -36,8 +37,9 @@ namespace yocto
             
             
             typedef intr_ptr<string,species> ptr; //!< smart pointer
-            typedef set<string,ptr>          db;  //!< database of smart pointers
-            
+            //typedef set<string,ptr>          db;  //!< database of smart pointers
+            typedef lexicon<string,ptr>      db;  //!< database of smart pointers
+
             friend std::ostream & operator<<( std::ostream &, const species &);
             
         private:
