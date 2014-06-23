@@ -89,7 +89,7 @@ namespace yocto
         {
         }
         
-        inline explicit lexicon(size_t n) :
+        inline explicit lexicon(size_t n, const as_capacity_t &) :
         items(0),
         itmax(0),
         slot(0),
@@ -118,7 +118,7 @@ namespace yocto
         wlen(0),
         wksp(0)
         {
-            lexicon tmp( other.size() );
+            lexicon tmp( other.size(), as_capacity);
             other.duplicate_into(tmp);
             swap_with(tmp);
         }
@@ -194,7 +194,7 @@ namespace yocto
                 //______________________________________________________________
                 if(items>=itmax)
                 {
-                    lexicon tmp( this->next_capacity(itmax) );
+                    lexicon tmp( this->next_capacity(itmax), as_capacity );
                     duplicate_into(tmp);
                     tmp.__insert(hkey,args);
                     swap_with(tmp);
@@ -434,7 +434,7 @@ namespace yocto
         inline void grow(size_t n)
         {
             assert(n>0);
-            lexicon tmp( itmax+n );
+            lexicon tmp( itmax+n, as_capacity);
             duplicate_into(tmp);
             swap_with(tmp);
         }

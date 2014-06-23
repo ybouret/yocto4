@@ -37,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(lexicon)
 {
     { lexicon<int,AObj> lx0; }
     
-    lexicon<int,AObj> lx(10);
+    lexicon<int,AObj> lx(10,as_capacity);
     
     SHOWLX(lx);
     for(int i=50;i>0;--i)
