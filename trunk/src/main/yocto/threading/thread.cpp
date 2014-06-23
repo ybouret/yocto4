@@ -338,7 +338,7 @@ namespace yocto
         
         //======================================================================
         //
-        // finish a running thread
+        // get the system handle for a running thread
         //
         //======================================================================
         thread::handle_t thread:: get_handle() const throw()
@@ -350,7 +350,7 @@ namespace yocto
         
         //======================================================================
         //
-        // finish a running thread
+        // get the current thread handle
         //
         //======================================================================
         thread::handle_t thread:: get_current_handle() throw()
