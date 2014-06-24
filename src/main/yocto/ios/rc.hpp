@@ -100,7 +100,7 @@ namespace yocto
             public:
                 explicit rc_channel( const shared_ptr<raw_file> &fp, const int64_t pos, const uint64_t len ) throw();
                 virtual ~rc_channel() throw();
-                virtual void get( void *data, size_t size, size_t &done );
+                virtual size_t get( void *data, size_t size );
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rc_channel);

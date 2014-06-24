@@ -21,7 +21,7 @@ namespace yocto
 #endif
 		
 		static type       invalid() throw();
-		static void       get( type handle, void       *data, size_t size, size_t &done );
+		static size_t     get( type handle, void       *data, size_t size);
 		static void       put( type handle, const void *data, size_t size, size_t &done );
 		static error_type close(type handle) throw();
 	};

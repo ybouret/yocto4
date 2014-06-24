@@ -4,7 +4,7 @@
 #include "yocto/associative/map.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/mpa/rsa/key.hpp"
+#include "yocto/mpa/rsa/keys.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/hashing/sha1.hpp"
 

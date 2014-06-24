@@ -13,8 +13,9 @@ namespace yocto
 		{
 		public:
 			virtual ~ichannel() throw();
-			virtual void get( void *data, size_t size, size_t &done ) = 0;
-			
+            
+            virtual size_t get( void *data, size_t size) = 0;
+            
 		protected:
 			explicit ichannel() throw();
 			

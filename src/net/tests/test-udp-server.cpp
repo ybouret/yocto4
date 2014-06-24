@@ -19,9 +19,8 @@ static inline void handle_udp_server( socket_address &ip )
 	bool run = true;
 	while( run )
 	{
-		size_t done=0;
 		memset( iobuff.rw(), 0, iobuff.length() );
-		srv.get( iobuff.rw(), iobuff.length()-1, done);
+		const size_t done = srv.get( iobuff.rw(), iobuff.length()-1);
 		const string msg( iobuff(), done );
 		std::cerr << "from " << srv.peer() << std::endl;
 		std::cerr << "'" << msg << "'" << std::endl;

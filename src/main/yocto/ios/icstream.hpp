@@ -17,9 +17,9 @@ namespace yocto
 			icstream( const cstdin_t &);
 			virtual ~icstream() throw();
 			
-			virtual bool query( char &C );
-			virtual void store( char  C );
-			virtual void get( void *data, size_t size, size_t &done );
+			virtual bool  query( char &C );
+			virtual void   store( char  C );
+			virtual size_t get( void *data, size_t size );
 			
 			bool gets( string &line );
 			

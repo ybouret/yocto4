@@ -30,22 +30,22 @@ namespace yocto
             return uint8_t(C);
         }
         
-		void istream:: get( void *data, size_t size, size_t &done )
+		size_t istream:: get( void *data, size_t size  )
 		{
 			assert( !(data==NULL&&size>0) );
 			char  *C = static_cast<char*> (data);
-			done = 0;
+			size_t done = 0;
 			while( done < size )
 			{
-				if( !query( *(C++) ) ) return;
+				if( !query( *(C++) ) ) return done;
 				++done;
 			}
+            return done;
 		}
 		
 		void istream:: load( void *buffer, size_t buflen )
 		{
-			size_t loaded = 0;
-			get(buffer,buflen,loaded);
+			const size_t loaded = get(buffer,buflen);
 			if(  loaded < buflen )
 				throw libc::exception( EIO, "istream::load( %u < %u )", unsigned(loaded), unsigned(buflen));
 		}

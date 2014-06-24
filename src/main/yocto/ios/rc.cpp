@@ -10,7 +10,7 @@
 
 namespace yocto
 {
-    namespace ios 
+    namespace ios
     {
         ////////////////////////////////////////////////////////////////////////
         //
@@ -80,10 +80,9 @@ H(), db(16,as_capacity)
             uint64_t written_length = 0;
             {
                 char   buff[ BUFSIZ ];
-                size_t done = 0;
                 while(true)
                 {
-                    source.get(buff,sizeof(buff),done);
+                    const size_t done = source.get(buff,sizeof(buff));
                     if( done <= 0 )
                         break;
                     file_.put_all(buff, done);
@@ -108,7 +107,7 @@ H(), db(16,as_capacity)
             assert( db.size() == count );
         }
         
-        resources:: packer:: ~packer() throw() 
+        resources:: packer:: ~packer() throw()
         {
             try
             {
@@ -134,7 +133,7 @@ H(), db(16,as_capacity)
         resources::item:: item( const string &id, int64_t at, uint64_t nb ) :
         label(id),
         start(at),
-        bytes(nb) 
+        bytes(nb)
         {
         }
         
@@ -160,7 +159,7 @@ H(), db(16,as_capacity)
         resources:: ~resources() throw() {}
         
         resources:: resources( const string &filename ) :
-        rc( new raw_file(filename, ios::readable) ), 
+        rc( new raw_file(filename, ios::readable) ),
         H(),
         db()
         {
@@ -187,8 +186,8 @@ H(), db(16,as_capacity)
             const int64_t epilog_size = sizeof(count) + sizeof(start) + sizeof(magic);
             
             rc->seek(-epilog_size, from_end);
-            start = rc->read<int64_t>();  
-            count = rc->read<uint32_t>(); 
+            start = rc->read<int64_t>();
+            count = rc->read<uint32_t>();
             magic = rc->read<uint32_t>();
             if( MAGIC != magic )
                 throw exception("resources: invalid MAGIC tag");
@@ -269,23 +268,15 @@ H(), db(16,as_capacity)
         {
         }
         
-        void resources:: rc_channel:: get( void *data, size_t size, size_t &done )
+        size_t resources:: rc_channel:: get( void *data, size_t size)
         {
             assert( !(size>0 && data==0) );
             volatile scoped_lock guard( *rc );
             rc->seek( curr, from_set );
-            done = 0;
             const uint64_t to_read = min_of<uint64_t>(size,last-curr);
-            try 
-            {
-                rc->get(data, size_t(to_read), done);
-                curr += done;
-            }
-            catch(...)
-            {
-                curr += done;
-                throw;
-            }
+            const size_t done = rc->get(data, size_t(to_read) );
+            curr += done;
+            return done;
         }
         
         ios::ichannel *resources:: load_channel( const string &rcname ) const
@@ -336,7 +327,7 @@ H(), db(16,as_capacity)
         void resources:: load_chars( sequence<char> &seq, const string &rcname, size_t num_pad ) const
         {
             const item *it = db.search(rcname);
-            if( !it ) 
+            if( !it )
                 throw exception("resources(no chars '%s')", rcname.c_str() );
             const size_t len = size_t( it->bytes );
             seq.free();
@@ -353,10 +344,10 @@ H(), db(16,as_capacity)
             load_chars(seq, rcname, num_pad);
         }
         
-        void resources:: load_string(string &str, const string &rcname ) const 
+        void resources:: load_string(string &str, const string &rcname ) const
         {
             const item *it = db.search(rcname);
-            if( !it ) 
+            if( !it )
                 throw exception("resources(no string '%s')", rcname.c_str() );
             const size_t len = size_t( it->bytes );
             str.clear();
@@ -367,7 +358,7 @@ H(), db(16,as_capacity)
             str.swap_with(tmp);
         }
         
-        void resources:: load_string(string &str, const char *id ) const 
+        void resources:: load_string(string &str, const char *id ) const
         {
             const string rcname(id);
             load_string(str, rcname);

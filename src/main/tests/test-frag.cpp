@@ -118,10 +118,9 @@ YOCTO_UNIT_TEST_IMPL(frag_queue)
 			{
 				H.set();
 				char   buffer[512];
-				size_t buflen = 0;
 				while( Q.bytes() )
 				{
-					Q.get( buffer, 1+alea_lt(sizeof(buffer)), buflen );
+					const size_t buflen = Q.get( buffer, 1+alea_lt(sizeof(buffer)) );
 					//std::cerr << "+" << buflen << std::endl;
 					H.run( buffer, buflen );
 				}

@@ -42,11 +42,12 @@ namespace yocto
 			}
 		}
 		
-		void icstream:: get( void *buffer, size_t buflen, size_t &done )
+		size_t icstream:: get( void *buffer, size_t buflen  )
 		{
-			done = fread( buffer, 1, buflen, handle );
+			const size_t done = fread( buffer, 1, buflen, handle );
 			if( ferror(handle) )
 				throw libc::exception( EIO, "icstream::get(%u)", unsigned(buflen) );
+            return done;
 		}
 		
 		
