@@ -31,7 +31,7 @@ namespace yocto
 			virtual void write( char C );
 			virtual void flush();
 			
-			virtual size_t get( void *data, size_t size);
+			virtual void get( void *data, size_t size, size_t &done );
 			virtual bool query( char &C );
 			virtual void store( char  C );
 			

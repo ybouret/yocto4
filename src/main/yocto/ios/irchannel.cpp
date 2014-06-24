@@ -22,9 +22,9 @@ namespace yocto
 			
 		}
 		
-		size_t irchannel:: get( void *data, size_t size )
+		void irchannel:: get( void *data, size_t size, size_t &done )
 		{
-			return h.get( data, size );
+			h.get( data, size, done );
 		}
 		
         

@@ -21,9 +21,9 @@ namespace yocto
 	namespace ios
 	{
 		
-		size_t raw_file:: get( void *data, size_t size )
+		void raw_file:: get( void *data, size_t size, size_t &done )
 		{
-			return _fd::get(handle,data,size);
+			_fd::get(handle,data,size,done);			
 		}
 		
 		
@@ -132,7 +132,8 @@ namespace yocto
 			while( n > 0 )
 			{
 				const size_t to_read = min_of<size_t>(n,BUFSIZ);
-				const size_t done    = get(p,to_read);
+				size_t       done    = 0;
+				get(p,to_read,done);
 				p += done;
 				n -= done;
 				if( done <= 0 )
@@ -181,7 +182,8 @@ namespace yocto
             char     buffer[BUFSIZ];
             while(true)
             {
-                const size_t done = input.get(buffer, sizeof(buffer));
+                size_t done = 0;
+                input.get(buffer, sizeof(buffer), done);
                 if(!done)
                     break;
                 output.put_all(buffer,done);
