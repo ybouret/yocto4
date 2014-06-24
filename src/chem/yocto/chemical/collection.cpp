@@ -1,6 +1,7 @@
 #include "yocto/chemical/collection.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
+#include <iostream>
 
 namespace yocto
 {
@@ -48,6 +49,12 @@ namespace yocto
             return *p;
         }
         
+        species & collection::add( const char *name, const int charge)
+        {
+            const string id(name);
+            return add(id,charge);
+        }
+        
         void collection:: remove( const string &name )
         {
             if(count>0)
@@ -55,10 +62,18 @@ namespace yocto
             if(db.remove(name))
             {
                 rebuild_indices();
-                
+                find_max_name_length();
             }
             
         }
+        
+        
+        void collection:: remove( const char *name )
+        {
+            const string id(name);
+            remove(id);
+        }
+        
         
         species::pointer & collection:: operator[](const string &name)
         {
@@ -121,7 +136,43 @@ namespace yocto
             }
         }
         
-        
+        void collection:: find_max_name_length() const throw()
+        {
+            const_iterator i = db.begin();
+            const size_t   n = db.size();
+            size_t         m = 0;
+            for(size_t j=1;j<=n;++j,++i)
+            {
+                const species &sp = **i;
+                if(sp.name.size()>m)
+                {
+                    m = sp.name.size();
+                }
+            }
+            (size_t&)max_name_length = m;
+        }
+
+        void collection:: output( std::ostream &os ) const
+        {
+            os << "{" << std::endl;
+            for(const_iterator i=begin();i!=end();++i)
+            {
+                os << "\t";
+                const species &sp = **i;
+                os << sp.name;
+                const size_t ns = sp.name.size();
+                assert(ns<=max_name_length);
+                const size_t blanks = max_name_length-ns;
+                for(size_t j=0;j<blanks;++j)
+                {
+                    os << ' ';
+                }
+                os << " : " << sp.z << std::endl;
+            }
+            
+            os << "}";
+        }
+
         
     }
 }
