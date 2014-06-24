@@ -7,7 +7,9 @@ namespace yocto
         
         species:: species(const string &id, const int charge) :
         name(id),
-        z(charge)
+        z(charge),
+        indx(0),
+        data()
         {
         }
         

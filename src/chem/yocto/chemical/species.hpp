@@ -20,20 +20,16 @@ namespace yocto
         class species : public counted_object
         {
         public:
-            explicit species(const string &id, const int charge);
+            explicit species(const string &id,
+                             const int     charge);
             virtual ~species() throw();
             
-            const string name;
-            const int    z;
-            vslot        data;
+            const string name; //!< unique name
+            const int    z;    //!< algebraic charge
+            const size_t indx; //!< index in collection
+            vslot        data; //!< whatever...
+            
             const string & key() const throw();
-            
-            template <typename T>
-            inline T &get() { return data.as<T>(); }
-            
-            template <typename T>
-            inline const T &get() const { return data.as<T>(); }
-            
             
             typedef intr_ptr<string,species> pointer;
             typedef set<string,pointer>      database;
