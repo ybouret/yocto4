@@ -22,7 +22,7 @@ namespace yocto
 			
 			virtual void write( char C ) = 0;
 			virtual void flush()         = 0;
-			virtual void put( const void *data, size_t size, size_t &done);
+			virtual size_t put( const void *data, size_t size);
 			
 			void save( const void *buffer, size_t buflen ); //!< put all
 			
