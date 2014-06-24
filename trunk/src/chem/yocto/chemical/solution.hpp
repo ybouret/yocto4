@@ -17,7 +17,22 @@ namespace yocto
             virtual ~solution() throw();
             const collection &lib;
             
-            virtual size_t size() const throw();
+            virtual const char *name() const throw();
+            virtual size_t      size() const throw();
+            virtual size_t      capacity() const throw();
+            virtual void        reserve(size_t );
+            virtual void        free() throw();
+            virtual void        release() throw();
+            
+            double       & operator[]( const string &id );
+            const double & operator[]( const string &id ) const;
+
+            void output( std::ostream &) const;
+            inline friend std::ostream & operator<<( std::ostream &os, const solution &self)
+            {
+                self.output(os);
+                return os;
+            }
             
             
         private:
@@ -26,6 +41,7 @@ namespace yocto
             double      *C; //!< conc
             
             YOCTO_DISABLE_ASSIGN(solution);
+            virtual const double *get_item() const throw();
         };
     }
 }
