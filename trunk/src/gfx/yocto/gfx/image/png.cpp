@@ -104,7 +104,8 @@ namespace yocto
             //__________________________________________________________________
             {
                 unsigned char header[8];
-                const size_t  done = fp.get(header, 8);
+                size_t        done;
+                fp.get(header, 8, done);
                 if(done!=8)
                     throw exception("%s(missing header bytes)",fn);
                 

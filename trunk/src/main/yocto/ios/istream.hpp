@@ -22,7 +22,7 @@ namespace yocto
             uint8_t      read_byte(const char *field=0);
             
 			//! get at most buflen bytes
-			virtual size_t get( void *data, size_t size);
+			virtual void get( void *data, size_t size, size_t &done );
 			
 			//! must get exactly buflen bytes
 			void load( void *buffer, size_t buflen );

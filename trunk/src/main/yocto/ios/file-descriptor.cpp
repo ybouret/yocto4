@@ -66,7 +66,7 @@ namespace yocto
 	
 	
 	
-	size_t _fd:: get( type handle, void *data, size_t size )
+	void _fd:: get( type handle, void *data, size_t size, size_t &done )
 	{
 		assert( !(data==NULL&&size>0) );
 		uint8_t   *ptr = (uint8_t *)data;
@@ -127,11 +127,11 @@ namespace yocto
 		}
 		
 	DONE_GET:
+		done = static_cast<size_t>(ptr - (uint8_t *)data);
 		if( ans != 0 )
 		{
 			throw os_exception( ans, "_fd::get" );
 		}
-        return static_cast<size_t>(ptr - (uint8_t *)data);
 		
 	}
 	

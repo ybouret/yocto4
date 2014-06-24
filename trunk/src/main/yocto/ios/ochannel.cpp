@@ -22,12 +22,12 @@ namespace yocto
 			assert( !(data==NULL&&size>0 ) );
 			const uint8_t *p       = (const uint8_t *)data;
 			size_t         towrite = size;
+			size_t         written = 0;
 			done = 0;
-            size_t written = 0;
 			try {
 				while( towrite > 0 )
 				{
-					written  = put( p, towrite );
+					put( p, towrite, written );
 					done    += written;
 					p       += written;
 					towrite -= written;

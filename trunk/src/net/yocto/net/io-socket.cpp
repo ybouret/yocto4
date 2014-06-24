@@ -14,9 +14,10 @@ namespace yocto
 			done = this->send( ptr, len );
 		}
 		
-		size_t io_socket:: get( void *ptr, size_t len )
+		void io_socket:: get( void *ptr, size_t len, size_t &done )
 		{
-			return this->recv( ptr, len );
+			done = 0;
+			done = this->recv( ptr, len );
 		}
 		
 		

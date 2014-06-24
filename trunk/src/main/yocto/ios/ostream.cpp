@@ -19,13 +19,11 @@ namespace yocto
 		ostream:: ~ostream() throw() {}
 		ostream:: ostream() throw()  {}
 		
-		size_t ostream:: put( const void *data, size_t size)
+		void ostream:: put( const void *data, size_t size, size_t &done )
 		{
 			assert(!(NULL==data&&size>0) );
 			const char *C = (const char *)data;
-            size_t done = 0;
 			for( done=0; done < size; ++done) write( *(C++) );
-            return done;
 		}
 		
 		void ostream:: save( const void *buffer, size_t buflen )

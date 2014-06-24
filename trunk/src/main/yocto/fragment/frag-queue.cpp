@@ -134,7 +134,7 @@ namespace yocto
 			return bytes_;
 		}
 		
-		size_t queue:: get( void *data, size_t size )
+		void queue:: get( void *data, size_t size, size_t &done )
 		{
 			assert(!(data==NULL&&size>0) );
 			uint8_t *p = (uint8_t *)data;
@@ -154,15 +154,16 @@ namespace yocto
 				}
 			}
 			
-			const size_t done    = size - n;
+			done    = size - n;
 			assert( done <= bytes_ );
 			bytes_ -= done;
-            return done;
 		}
 		
 		bool queue:: query( char &C )
 		{
-			return get( &C, 1) !=0 ;
+			size_t nr = 0;
+			get( &C, 1, nr );
+			return nr > 0;
 		}
 		
 		void queue:: store( char C )

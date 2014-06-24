@@ -18,7 +18,7 @@ namespace yocto
 		{
 		public:
 			virtual ~ochannel() throw();
-			virtual size_t put( const void *data, size_t size ) = 0;
+			virtual void put( const void *data, size_t size, size_t &done ) = 0;
 			
 			void put_all( const void *data, size_t size, size_t &done );
 			void put_all( const memory::ro_buffer &, size_t &done );

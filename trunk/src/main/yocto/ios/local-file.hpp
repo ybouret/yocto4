@@ -6,15 +6,14 @@
 
 namespace yocto
 {
-    
+
 	namespace ios
 	{
-        
+
 		//! local_file handling
 		/**
-         smart pointer to an internal mutex
-         depending on the type of used local file.
-         */
+			smart pointer to an internal mutex
+		*/
 		class local_file :  public lockable
 		{
 		public:
@@ -26,18 +25,18 @@ namespace yocto
 				is_stderr,
                 is_pipe
 			};
-            
+
 			typedef int2type<is_stdin>  cstdin_t;
 			typedef int2type<is_stdout> cstdout_t;
 			typedef int2type<is_stderr> cstderr_t;
-            
+
 			virtual ~local_file() throw();
-			explicit local_file( type_t t );
-            
+			explicit local_file( type_t t );			
+
 			inline virtual void lock()     throw() { assert(access_); access_->lock();   }
 			inline virtual void unlock()   throw() { assert(access_); access_->unlock(); }
 			inline virtual bool try_lock() throw() { assert(access_); return access_->try_lock(); }
-            
+
 			const   type_t            type;
 			
 		private:
@@ -45,11 +44,11 @@ namespace yocto
 			static  threading::mutex  stdio_lock;
 			YOCTO_DISABLE_COPY_AND_ASSIGN(local_file);
 		};
-        
+
 		extern const local_file::cstdin_t  cstdin;
 		extern const local_file::cstdout_t cstdout;
 		extern const local_file::cstderr_t cstderr;
-        
+
 	}
 }
 
