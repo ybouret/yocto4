@@ -22,8 +22,8 @@ namespace yocto
 			
 			
 			
-			virtual void put( const void *ptr, size_t len, size_t &done ); //!< ios::ochannel implementation
-			virtual void get( void       *ptr, size_t len, size_t &done ); //!< ios::ichannel implementation
+			virtual void   put( const void *ptr, size_t len, size_t &done ); //!< ios::ochannel implementation
+			virtual size_t get( void       *ptr, size_t len); //!< ios::ichannel implementation
 			
 			
 		protected:

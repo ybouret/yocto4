@@ -152,10 +152,10 @@ namespace yocto
 			clear_recv();
 		}
 		
-		void io_queue:: get( void *data, size_t size, size_t &done )
+		size_t io_queue:: get( void *data, size_t size )
 		{
 			uint8_t *p = (uint8_t *)data;
-			done = 0;
+			size_t done = 0;
 			try
 			{
 				while( recv_blocks.size > 0 )
@@ -175,7 +175,7 @@ namespace yocto
 						{
 							//-- update length and return
 							(size_t&)recv_length += done;
-							return;
+							return done;
 						}
 					}
 					else
@@ -191,7 +191,7 @@ namespace yocto
 						
 						//-- update length and return
 						(size_t&)recv_length += done;
-						return;
+						return done;
 					}
 				}
 			}
@@ -200,6 +200,7 @@ namespace yocto
 				(size_t&)recv_length += done;
 				throw;
 			}
+            return done;
 		}
 		
 		

@@ -109,10 +109,9 @@ YOCTO_UNIT_TEST_IMPL(hashing)
 				h_reg[i]->set();
 			}
 			char   buf[512];
-			size_t len = 0;
 			for(;;)
 			{
-				input.get(buf,sizeof(buf),len);
+				const size_t len = input.get(buf,sizeof(buf));
 				if(!len) break;
 				for( size_t i=0; i < h_num; ++i )
 				{

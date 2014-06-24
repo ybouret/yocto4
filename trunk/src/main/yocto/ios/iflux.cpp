@@ -37,8 +37,7 @@ namespace yocto
 		bool iflux:: fetch()
 		{
 			last_ = curr_ = init_;
-			size_t  done  = 0;
-			in_.get( init_, size_, done );
+			const size_t  done  = in_.get( init_, size_ );
 			if( done > 0 )
 			{
 				last_ = init_ + done;

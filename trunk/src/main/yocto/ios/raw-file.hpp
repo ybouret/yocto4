@@ -47,7 +47,7 @@ namespace yocto
 			
 			typedef _fd::type handle_t;
 			
-			void get( void *data, size_t size, size_t &done );
+			size_t get( void *data, size_t size );
 			void put( const void *data, size_t size, size_t &done );
 			
 			offset_t seek( offset_t delta, whence_t whence );

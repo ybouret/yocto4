@@ -3,7 +3,7 @@
 #include "yocto/ios/imstream.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/fs/vfs.hpp"
-#include "yocto/mpk/natural.hpp"
+#include "yocto/mpa/natural.hpp"
 
 #include "yocto/exception.hpp"
 

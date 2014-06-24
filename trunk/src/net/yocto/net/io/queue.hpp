@@ -42,10 +42,10 @@ namespace yocto
 			//------------------------------------------------------------------
 			// use recv blocks
 			//------------------------------------------------------------------
-			virtual bool query( char &C );                             //!< from the head recv blocks.
-			virtual void store( char  C );                             //!< into the head recv blocks
-			virtual void get( void *data, size_t size, size_t &done ); //!< gather recv blocks
-			void         clear_recv() throw();                         //!< no more recv blocks...
+			virtual bool   query( char &C );                             //!< from the head recv blocks.
+			virtual void   store( char  C );                             //!< into the head recv blocks
+			virtual size_t get( void *data, size_t size);                //!< gather recv blocks
+			void           clear_recv() throw();                         //!< no more recv blocks...
 			
 			//------------------------------------------------------------------
 			// use send blocks

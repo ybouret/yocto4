@@ -70,10 +70,9 @@ YOCTO_UNIT_TEST_IMPL(hash)
 	{
 		ios::icstream input( argv[1] );
 		char buffer[512];
-		size_t loaded = 0;
 		for(;;)
 		{
-			input.get(buffer,sizeof(buffer), loaded);
+			const size_t loaded = input.get(buffer,sizeof(buffer) );
 			if( !loaded ) break;
 			for( size_t i=0; i < h_num; ++i ) h_reg[i]->run(buffer, loaded);
 		}

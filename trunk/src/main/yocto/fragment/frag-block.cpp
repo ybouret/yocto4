@@ -143,8 +143,7 @@ assert( (B)->last <= (B)->final )
 		bool block:: recv( ios::ichannel &input )
 		{
 			YFRAG_CHECK(this);
-			size_t nr = 0;
-			input.get( last, unused(), nr );
+			const size_t nr = input.get( last, unused() );
 			assert(nr<=unused());
 			last  += nr;
 			YFRAG_CHECK(this);

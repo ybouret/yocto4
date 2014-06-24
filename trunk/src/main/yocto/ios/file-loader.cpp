@@ -20,8 +20,7 @@ namespace yocto
             size_t count = 0;
             while(count<sz)
             {
-                size_t done = 0;
-                fp.get(buffer, sizeof(buffer), done);
+                const size_t done = fp.get(buffer, sizeof(buffer) );
                 if(!done)
                     throw exception("file_loader(missing bytes for '%s')", filename.c_str());
                 for(size_t i=0;i<done;++i) content.push_back(buffer[i]);

@@ -24,7 +24,7 @@ YOCTO_UNIT_TEST_IMPL(raw_file)
 	{
 		ios::raw_file fp( "foo.raw", ios::readable | ios::writable );
 		
-		fp.get( buffer, 5, done );
+		done = fp.get( buffer, 5);
 		const string str( buffer, done );
 		std::cerr << "<" << str << ">" << std::endl;
 		buffer[0] = '&';
@@ -40,7 +40,7 @@ YOCTO_UNIT_TEST_IMPL(raw_file)
         scoped_lock guard( in.handle() );
         
 		do {
-			in.get( buffer, sizeof(buffer), done );
+			done = in.get( buffer, sizeof(buffer)  );
 			std::cerr.write( buffer, done );
 		} while( done > 0 );
 	}
