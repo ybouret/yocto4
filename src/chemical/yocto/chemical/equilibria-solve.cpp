@@ -22,7 +22,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // We don't necessarilyt start from a valid composition
+            // We don't necessarily start from a valid composition
             // a differential equation step can try a negative concentration
             //__________________________________________________________________
             fixed_C();

@@ -113,6 +113,8 @@ namespace
                 ini.define( lib["Cl-"], 0 );
             }
             
+            std::cerr << "ini=" << std::endl;
+            std::cerr << ini << std::endl;
             
             
             //==================================================================
