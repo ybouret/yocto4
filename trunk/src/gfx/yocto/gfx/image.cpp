@@ -1,6 +1,7 @@
 #include "yocto/gfx/image.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/fs/vfs.hpp"
+#include <cstring>
 
 namespace yocto
 {
@@ -161,7 +162,7 @@ namespace yocto
             {
                 const char *txt = *arr;
                 //std::cerr << "testing " << txt << std::endl;
-                const char  num = strlen(txt);
+                const size_t  num = strlen(txt);
                 if(len==num)
                 {
                     bool match = true;
