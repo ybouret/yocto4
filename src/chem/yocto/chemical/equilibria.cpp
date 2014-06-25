@@ -1,4 +1,5 @@
 #include "yocto/chemical/equilibria.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -31,6 +32,14 @@ namespace yocto
         void equilibria:: startup(const collection &lib)
         {
             cleanup();
+           
+            for( iterator k=begin();k!=end();++k)
+            {
+                const equilibrium &eq = **k;
+                if(!eq.is_valid())
+                    throw exception("Invalid Equilibrium '%s'", eq.name.c_str());
+            }
+
             
             (size_t &)M = lib.size();
             (size_t &)N = this->size();
@@ -41,6 +50,7 @@ namespace yocto
                 {
                     Nu.make(N,M);
                     NuR.make(N,M);
+                    NuP.make(N,M);
                     K.make(N,0.0);
                     Gamma.make(N,0.0);
                     Phi.make(N,M);
@@ -56,7 +66,9 @@ namespace yocto
                         ++i;
                         eq.fill(Nu[i], NuR[i], NuP[i]);
                     }
-                    
+                    std::cerr << "Nu=" << Nu << std::endl;
+                    std::cerr << "NuR=" << NuR << std::endl;
+                    std::cerr << "NuP=" << NuP << std::endl;
                 }
                 
             }

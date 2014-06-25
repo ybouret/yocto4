@@ -27,7 +27,11 @@ namespace yocto
         {
         }
         
-        
+        int equilibrium::actor:: compare(const actor &lhs, const actor &rhs) throw()
+        {
+            return string::compare(lhs.sp->name, rhs.sp->name);
+        }
+
         
         //______________________________________________________________________
         //
@@ -40,6 +44,7 @@ namespace yocto
         equilibrium:: equilibrium(const string &id ) :
         name(id),
         data(),
+        K(this, & equilibrium::computeK),
         actors(4,as_capacity),
         DeltaNu(0)
         {
@@ -148,8 +153,12 @@ namespace yocto
             (int &)DeltaNu = d;
         }
         
-        //! store info
-        
+        double equilibrium::computeK(double t) const
+        {
+            return getK(t);
+        }
+
+                
         void equilibrium:: fill( array<double> &Nu, array<ptrdiff_t> &NuR, array<ptrdiff_t> &NuP) const throw()
         {
             assert(Nu.size()==NuR.size());
@@ -159,7 +168,7 @@ namespace yocto
             {
                 const actor &A = actors[i];
                 const size_t j = A.sp->indx; assert(j>0);assert(j<=Nu.size());
-                const int    nu =  A.nu; assert(nu>0);
+                const int    nu =  A.nu; assert(nu!=0);
                 Nu[j] = nu;
                 if(nu>0)
                 {

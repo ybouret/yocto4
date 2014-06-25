@@ -22,7 +22,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Dynamic Quantities
+            // Dynamic Quantities, allocated with startup...
             //__________________________________________________________________
             const size_t M; //!< #species from collection
             const size_t N; //!< #reactions
