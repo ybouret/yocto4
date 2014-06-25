@@ -123,13 +123,13 @@ namespace yocto
         
         void solution:: load( const array<double> &X) throw()
         {
-            assert(X.size()==size());
+            assert(X.size()>=size());
             for(size_t i=n;i>0;--i) C[i] = X[i];
         }
         
         void solution::save( array<double> &X ) const throw()
         {
-            assert(X.size()==size());
+            assert(X.size()>=size());
             for(size_t i=n;i>0;--i) X[i] = C[i];
         }
         
