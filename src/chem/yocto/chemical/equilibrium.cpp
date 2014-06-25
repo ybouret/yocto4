@@ -147,7 +147,32 @@ namespace yocto
             }
             (int &)DeltaNu = d;
         }
-
+        
+        //! store info
+        
+        void equilibrium:: fill( array<double> &Nu, array<ptrdiff_t> &NuR, array<ptrdiff_t> &NuP) const throw()
+        {
+            assert(Nu.size()==NuR.size());
+            assert(Nu.size()==NuP.size());
+            
+            for(size_t i=actors.size();i>0;--i)
+            {
+                const actor &A = actors[i];
+                const size_t j = A.sp->indx; assert(j>0);assert(j<=Nu.size());
+                const int    nu =  A.nu; assert(nu>0);
+                Nu[j] = nu;
+                if(nu>0)
+                {
+                    NuP[j] = nu;
+                }
+                else
+                {
+                    NuR[i] = -nu;
+                }
+            }
+            
+        }
+        
         
         //______________________________________________________________________
         //

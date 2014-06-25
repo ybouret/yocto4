@@ -64,6 +64,8 @@ namespace yocto
             //! get the constant at a given time
             virtual double getK( double t ) const = 0;
             
+            //! store info
+            void fill( array<double> &Nu, array<ptrdiff_t> &NuR, array<ptrdiff_t> &NuP) const throw();
             
         protected:
             explicit equilibrium( const string &id );

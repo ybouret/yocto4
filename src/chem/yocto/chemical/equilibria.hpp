@@ -11,6 +11,7 @@ namespace yocto
         
         typedef math::matrix<double>    matrix_t;
         typedef math::matrix<ptrdiff_t> imatrix_t;
+        typedef vector<double>          vector_t;
         
         class equilibria : public equilibrium::database
         {
@@ -19,7 +20,33 @@ namespace yocto
             explicit equilibria();
             virtual ~equilibria() throw();
             
+            //__________________________________________________________________
+            //
+            // Dynamic Quantities
+            //__________________________________________________________________
+            const size_t M; //!< #species from collection
+            const size_t N; //!< #reactions
             
+            matrix_t     Nu;    //!< NxM
+            imatrix_t    NuR;   //!< NxM, reactants coefficients
+            imatrix_t    NuP;   //!< NxM, products  coefficients
+            vector_t     K;     //!< N constants at time t,
+            vector_t     Gamma; //!< N constraints
+            vector_t     Phi;   //!< NxM dGamma/dX, 
+            
+            //__________________________________________________________________
+            //
+            // API
+            //__________________________________________________________________
+            void  startup( const collection &lib);
+            void  cleanup() throw();
+            
+            void output( std::ostream & ) const;
+            inline friend std::ostream & operator<<( std::ostream &os, const equilibria &eqs)
+            {
+                eqs.output(os);
+                return os;
+            }
             
             
         private:
