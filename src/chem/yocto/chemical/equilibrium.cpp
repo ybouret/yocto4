@@ -40,7 +40,8 @@ namespace yocto
         equilibrium:: equilibrium(const string &id ) :
         name(id),
         data(),
-        actors(4,as_capacity)
+        actors(4,as_capacity),
+        DeltaNu(0)
         {
             
         }
@@ -125,7 +126,7 @@ namespace yocto
                             assert(actors.back().sp->name == spec->name);
                             actors.pop_back();
                         }
-                        
+                        update_delta();
                         return;
                     }
                 }
@@ -133,10 +134,20 @@ namespace yocto
                 // new actor
                 const actor B(spec,coef);
                 actors.push_back(B);
+                update_delta();
             }
         }
         
-        
+        void equilibrium:: update_delta() throw()
+        {
+            int d = 0;
+            for(size_t i=actors.size();i>0;--i)
+            {
+                d += actors[i].nu;
+            }
+            (int &)DeltaNu = d;
+        }
+
         
         //______________________________________________________________________
         //

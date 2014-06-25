@@ -12,6 +12,9 @@ namespace yocto
         class equilibrium : public counted_object
         {
         public:
+            typedef intr_ptr<string,equilibrium> pointer;
+            typedef set<string,pointer>          database;
+            
             virtual ~equilibrium() throw();
             
             const string name;
@@ -68,6 +71,10 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
             vector<actor> actors;
+            void update_delta() throw();
+            
+        public:
+            const int DeltaNu;
         };
         
         
