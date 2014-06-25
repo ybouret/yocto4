@@ -1,6 +1,7 @@
 #include "yocto/chemical/solution.hpp"
 #include "yocto/exception.hpp"
 #include <iostream>
+#include <cmath>
 
 namespace yocto
 {
@@ -22,6 +23,18 @@ namespace yocto
             lib.increase();
         }
         
+        solution::solution(const solution &other) :
+        lib( other.lib ),
+        n( lib.size()  ),
+        m(n),
+        C( memory::kind<memory::global>::acquire_as<double>(m) - 1 )
+        {
+            lib.increase();
+            for(size_t i=n;i>0;--i) C[i] = other.C[i];
+        }
+        
+        
+        
         size_t solution:: size() const throw()
         {
             return n;
@@ -36,7 +49,7 @@ namespace yocto
         {
             return "chemical::solution";
         }
-
+        
         const double * solution:: get_item() const throw()
         {
             return C;
@@ -47,18 +60,23 @@ namespace yocto
             throw exception("%s: no possible reserve", name());
         }
         
+        void solution:: ldz() throw()
+        {
+            for(size_t i=n;i>0;--i) C[i] = 0;
+        }
+        
         
         void solution:: free() throw()
         {
-            for(size_t i=1;i<=n;++i) C[i] = 0;
+            ldz();
         }
         
         void solution:: release() throw()
         {
-            this->free();
+            ldz();
         }
-
-        double & solution:: operator[]( const string &id )
+        
+        double & solution:: operator()( const string &id )
         {
             const species::pointer &p = lib[id];
             assert(p->indx>=1);
@@ -66,13 +84,27 @@ namespace yocto
             return C[p->indx];
         }
         
-        const double & solution:: operator[]( const string &id ) const
+        const double & solution:: operator()( const string &id ) const
         {
             const species::pointer &p = lib[id];
             assert(p->indx>=1);
             assert(p->indx<=n);
             return C[p->indx];
         }
+        
+        
+        double       & solution:: operator()( const char   *id )
+        {
+            const string ID(id);
+            return (*this)(ID);
+        }
+        
+        const double       & solution:: operator()( const char   *id ) const
+        {
+            const string ID(id);
+            return (*this)(ID);
+        }
+        
         
         void solution:: output(std::ostream &os) const
         {
@@ -87,6 +119,41 @@ namespace yocto
                 os << " = " << C[i] << std::endl;
             }
             os << "}" << std::endl;
+        }
+        
+        void solution:: load( const array<double> &X) throw()
+        {
+            assert(X.size()==size());
+            for(size_t i=n;i>0;--i) C[i] = X[i];
+        }
+        
+        void solution::save( array<double> &X ) const throw()
+        {
+            assert(X.size()==size());
+            for(size_t i=n;i>0;--i) X[i] = C[i];
+        }
+        
+        
+        solution & solution :: operator=( const solution & other )
+        {
+            if( &lib != &other.lib)
+                throw exception("solutions from different collection");
+            assert(this->size()==other.size());
+            for(size_t i=n;i>0;--i) C[i] = other.C[i];
+            return *this;
+        }
+        
+        solution & solution :: operator=( const array<double> &X ) throw()
+        {
+            load(X);
+            return *this;
+        }
+        
+        double solution:: pH() const
+        {
+            const species::pointer &p = lib["H+"];
+            const array<double>    &X = *this;
+            return -log10(X[p->indx]);
         }
         
     }
