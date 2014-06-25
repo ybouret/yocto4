@@ -1,7 +1,7 @@
 #ifndef YOCTO_CHEM_LUA_INCLUDED
 #define YOCTO_CHEM_LUA_INCLUDED 1
 
-#include "yocto/chemical/collection.hpp"
+#include "yocto/chemical/equilibria.hpp"
 #include "yocto/functor.hpp"
 
 extern "C"
@@ -42,6 +42,26 @@ namespace yocto
             //! wrapper
             static void load( lua_State *L, collection &lib, const char   *name, species_ctor *cb =0 );
             
+            
+            //__________________________________________________________________
+            //
+            // equilibria API
+            //__________________________________________________________________
+            
+            //! forward lua equilibrium
+            class equilibrium;
+            
+            //! append equilibria to a chemical system
+            /**
+             \param L a valid lua_State
+             \param lib collection of species
+             \param cs  the equilibria
+             \param name the name of the lua table
+             */
+            static void load( lua_State *L, const collection &lib, equilibria &cs, const string &name );
+            
+            //! wrapper
+            static void load( lua_State *L, const collection &lib, equilibria &cs, const char   *name );
         };
         
         
