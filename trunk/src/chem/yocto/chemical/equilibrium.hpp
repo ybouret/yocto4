@@ -3,11 +3,14 @@
 
 #include "yocto/chemical/collection.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/math/types.hpp"
 
 namespace yocto
 {
     namespace chemical
     {
+        
+        typedef math::numeric<double>::function function_type;
         
         class equilibrium : public counted_object
         {
@@ -17,9 +20,10 @@ namespace yocto
             
             virtual ~equilibrium() throw();
             
-            const string name;
-            vslot        data;
-            
+            const string  name; //!< key for database
+            vslot         data; //!< for specific data
+            function_type K;    //!< a functor
+
             const string & key() const throw();
             
             //! one actor
@@ -33,12 +37,8 @@ namespace yocto
                 const species::pointer sp;
                 const int              nu;
                 
-                
-                static int compare( const actor &lhs, const actor &rhs) throw()
-                {
-                    return string::compare(lhs.sp->name, rhs.sp->name);
-                }
-                
+                static int compare( const actor &lhs, const actor &rhs) throw();
+                               
             private:
                 YOCTO_DISABLE_ASSIGN(actor);
             };
@@ -74,9 +74,10 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
             vector<actor> actors;
             void update_delta() throw();
+            double computeK(double) const;
             
         public:
-            const int DeltaNu;
+            const int     DeltaNu;
         };
         
         

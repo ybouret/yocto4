@@ -23,5 +23,8 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     
     _lua::load(L,lib,cs,"eqs");
     std::cerr << cs << std::endl;
+    
+    cs.startup(lib);
+    
 }
 YOCTO_UNIT_TEST_DONE()
