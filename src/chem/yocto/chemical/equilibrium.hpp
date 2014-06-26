@@ -4,6 +4,7 @@
 #include "yocto/chemical/collection.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
@@ -62,6 +63,23 @@ namespace yocto
                 YOCTO_DISABLE_ASSIGN(instr);
             };
             
+            class d_instr : public counted_object
+            {
+            public:
+                explicit d_instr(const size_t i,const size_t nu,const size_t nmax);
+                virtual ~d_instr() throw();
+                
+                typedef arc_ptr<d_instr> pointer;
+                
+                const double  indx; //!< the index of derivated species
+                const double  coef; //!< its former coefficient
+                vector<instr> code; //!< the remaining instruction code
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(d_instr);
+            };
+            
+            typedef d_instr::pointer j_instr;
             
             
             //! check validity, best effort
@@ -95,14 +113,22 @@ namespace yocto
             double computeGamma(double t, const array<double> &C, double &KK);
             double updateGamma(const array<double> &C, const double KK) const throw();
             
+            //! compute Gamma and Phi while initializing K
+            double computeGammaAndPhi( array<double> &Phi, double t, const array<double> &C, double &KK);
+            double updateGammaAndPhi( array<double> &Phi, const array<double> &C, const double KK) const throw();
+            
         protected:
             explicit equilibrium( const string &id );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
-            vector<actor> actors;
-            vector<instr> r_code; //!< instruction for reactants
-            vector<instr> p_code; //!< instruction for products
+            vector<actor>   actors;
+            vector<instr>   r_code;  //!< instruction  for reactants
+            vector<instr>   p_code;  //!< instruction  for products
+            vector<j_instr> rj_code; //!< instruction  for Jacobian/reactants
+            vector<j_instr> pj_code; //!< instructions for Jacobian/products
+            
+            void precompute( vector<j_instr> &jcode, const vector<instr> &code);
             
             void update_delta() throw();
             

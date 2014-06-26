@@ -26,8 +26,18 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     
     cs.startup(lib);
     solution S(lib);
-    cs.computeGamma(0,S);
+    for(size_t i=1;i<=S.size();++i) S[i] = i * 1e-5;
+    
     std::cerr << "S=" << S << std::endl;
+
+    cs.computeGamma(0,S);
     std::cerr << "Gamma=" << cs.Gamma << std::endl;
+    
+    cs.computeGammaAndPhi(0,S);
+    std::cerr << "Gamma=" << cs.Gamma << std::endl;
+    std::cerr << "Phi="   << cs.Phi   << std::endl;
+
+    
+
 }
 YOCTO_UNIT_TEST_DONE()

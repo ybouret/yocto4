@@ -30,7 +30,7 @@ namespace yocto
             matrix_t     Nu;    //!< NxM
             vector_t     K;     //!< N constants at time t,
             vector_t     Gamma; //!< N constraints
-            vector_t     Phi;   //!< NxM dGamma/dX, 
+            matrix_t     Phi;   //!< NxM dGamma/dX,
             
             //__________________________________________________________________
             //
@@ -48,6 +48,7 @@ namespace yocto
             
             void computeGamma(double t, const array<double> &C );
             void updateGamma(const array<double> &C);
+            void computeGammaAndPhi(double t, const array<double> &C);
             
             
         private:
