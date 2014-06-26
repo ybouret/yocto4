@@ -2,6 +2,7 @@
 #define YOCTO_CHEM_LUA_INCLUDED 1
 
 #include "yocto/chemical/equilibria.hpp"
+#include "yocto/chemical/solution.hpp"
 #include "yocto/functor.hpp"
 
 extern "C"

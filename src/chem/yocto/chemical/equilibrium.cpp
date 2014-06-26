@@ -1,6 +1,7 @@
 #include "yocto/chemical/equilibrium.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/code/bswap.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -31,7 +32,29 @@ namespace yocto
         {
             return string::compare(lhs.sp->name, rhs.sp->name);
         }
-
+        
+        //______________________________________________________________________
+        //
+        // instr
+        //______________________________________________________________________
+        equilibrium::instr:: instr( const size_t indx, const size_t coef) throw() :
+        i(indx),
+        p(coef)
+        {
+            assert(i>0);
+            assert(p>0);
+        }
+        
+        equilibrium::instr:: ~instr() throw() {}
+        
+        equilibrium:: instr:: instr( const instr &other ) throw() :
+        i( other.i ),
+        p( other.p )
+        {
+        }
+        
+        
+        
         
         //______________________________________________________________________
         //
@@ -46,6 +69,8 @@ namespace yocto
         data(),
         K(this, & equilibrium::computeK),
         actors(4,as_capacity),
+        r_code(),
+        p_code(),
         DeltaNu(0)
         {
             
@@ -157,31 +182,96 @@ namespace yocto
         {
             return getK(t);
         }
-
-                
-        void equilibrium:: fill( array<double> &Nu, array<ptrdiff_t> &NuR, array<ptrdiff_t> &NuP) const throw()
+        
+        
+        void equilibrium:: compile( array<double> &Nu, const collection &lib)
         {
-            assert(Nu.size()==NuR.size());
-            assert(Nu.size()==NuP.size());
             
+            //__________________________________________________________________
+            //
+            // first pass: fill Nu and count reactants/products
+            //__________________________________________________________________
+            size_t nr = 0, np = 0;
             for(size_t i=actors.size();i>0;--i)
             {
-                const actor &A = actors[i];
-                const size_t j = A.sp->indx; assert(j>0);assert(j<=Nu.size());
-                const int    nu =  A.nu; assert(nu!=0);
+                const actor &A  = actors[i];
+                const size_t j  = A.sp->indx; assert(j>0);assert(j<=Nu.size());
+                const int    nu = A.nu; assert(nu!=0);
                 Nu[j] = nu;
                 if(nu>0)
                 {
-                    NuP[j] = nu;
+                    ++np; //NuP[j] = nu;
                 }
                 else
                 {
-                    NuR[i] = -nu;
+                    ++nr; //NuR[i] = -nu;
                 }
             }
             
+            //__________________________________________________________________
+            //
+            // allocate resources
+            //__________________________________________________________________
+            p_code.release();
+            r_code.release();
+            
+            r_code.ensure(nr);
+            p_code.ensure(np);
+            
+            //__________________________________________________________________
+            //
+            // second pass: compile codes
+            //__________________________________________________________________
+            for(size_t i=actors.size();i>0;--i)
+            {
+                const actor &A  = actors[i];
+                const size_t j  = A.sp->indx; assert(j>0);assert(j<=Nu.size());
+                const int    nu = A.nu;
+                if(nu>0)
+                {
+                    const instr I(j,nu);
+                    p_code.push_back(I);
+                }
+                else
+                {
+                    const instr I(j,-nu);
+                    r_code.push_back(I);
+                }
+            }
+            std::cerr << "<code name='" << name << "'>" << std::endl;
+            std::cerr << "r_code=" << r_code << std::endl;
+            std::cerr << "p_code=" << p_code << std::endl;
+            std::cerr << "</code>" << std::endl;
+            
         }
         
+        
+        double equilibrium:: computeGamma(double t, const array<double> &C, double &KK)
+        {
+            KK = getK(t);
+            return updateGamma(C,KK);
+            
+        }
+        
+        double equilibrium:: updateGamma(const array<double> &C, const double KK) const throw()
+        {
+            double lhs = KK;
+            for(size_t i=r_code.size();i>0;--i)
+            {
+                const instr &I = r_code[i];
+                lhs *= ipower(C[I.i],I.p);
+            }
+            
+            double rhs = 1;
+            for(size_t i=p_code.size();i>0;--i)
+            {
+                const instr &I = p_code[i];
+                rhs *= ipower(C[I.i],I.p);
+            }
+            
+            return lhs - rhs;
+        }
+
         
         //______________________________________________________________________
         //
