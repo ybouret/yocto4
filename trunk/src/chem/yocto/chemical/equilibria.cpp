@@ -23,8 +23,6 @@ namespace yocto
             Phi.release();
             Gamma.release();
             K.release();
-            NuP.release();
-            NuR.release();
             Nu.release();
         }
         
@@ -49,8 +47,6 @@ namespace yocto
                 if(N>0)
                 {
                     Nu.make(N,M);
-                    NuR.make(N,M);
-                    NuP.make(N,M);
                     K.make(N,0.0);
                     Gamma.make(N,0.0);
                     Phi.make(N,M);
@@ -62,13 +58,11 @@ namespace yocto
                     size_t i = 0;
                     for( iterator k=begin();k!=end();++k)
                     {
-                        const equilibrium &eq = **k;
+                        equilibrium &eq = **k;
                         ++i;
-                        eq.fill(Nu[i], NuR[i], NuP[i]);
+                        eq.compile(Nu[i],lib);
                     }
                     std::cerr << "Nu=" << Nu << std::endl;
-                    std::cerr << "NuR=" << NuR << std::endl;
-                    std::cerr << "NuP=" << NuP << std::endl;
                 }
                 
             }
@@ -91,6 +85,30 @@ namespace yocto
             }
             for(size_t i=0;i<nsep;++i) os << '#';
 
+        }
+
+        
+        void equilibria:: computeGamma(double t, const array<double> &C )
+        {
+            iterator     k = begin();
+            const size_t n = N;
+            for(size_t i=1;i<=n;++i,++k)
+            {
+                equilibrium &eq = **k;
+                Gamma[i] = eq.computeGamma(t, C, K[i]);
+            }
+        }
+        
+        void equilibria:: updateGamma(const array<double> &C)
+        {
+            iterator     k = begin();
+            const size_t n = N;
+            for(size_t i=1;i<=n;++i,++k)
+            {
+                equilibrium &eq = **k;
+                Gamma[i] = eq.updateGamma(C,K[i]);
+            }
+            
         }
 
         

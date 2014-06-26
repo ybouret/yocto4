@@ -25,6 +25,9 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     std::cerr << cs << std::endl;
     
     cs.startup(lib);
-    
+    solution S(lib);
+    cs.computeGamma(0,S);
+    std::cerr << "S=" << S << std::endl;
+    std::cerr << "Gamma=" << cs.Gamma << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

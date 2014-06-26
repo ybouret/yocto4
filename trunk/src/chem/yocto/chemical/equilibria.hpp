@@ -28,8 +28,6 @@ namespace yocto
             const size_t N; //!< #reactions
             
             matrix_t     Nu;    //!< NxM
-            imatrix_t    NuR;   //!< NxM, reactants coefficients
-            imatrix_t    NuP;   //!< NxM, products  coefficients
             vector_t     K;     //!< N constants at time t,
             vector_t     Gamma; //!< N constraints
             vector_t     Phi;   //!< NxM dGamma/dX, 
@@ -47,6 +45,9 @@ namespace yocto
                 eqs.output(os);
                 return os;
             }
+            
+            void computeGamma(double t, const array<double> &C );
+            void updateGamma(const array<double> &C);
             
             
         private:
