@@ -63,6 +63,7 @@ namespace yocto
             };
             
             
+            
             //! check validity, best effort
             /**
              - charge conservation...
