@@ -58,8 +58,22 @@ namespace yocto
         {
             return __compare<size_t>(lhs.i,rhs.i);
         }
-
         
+        
+        //______________________________________________________________________
+        //
+        // d_instr
+        //______________________________________________________________________
+        equilibrium:: d_instr:: ~d_instr() throw() {}
+        
+        equilibrium:: d_instr:: d_instr( const size_t i,const size_t nu,const size_t nmax ) :
+        indx(i),
+        coef(nu),
+        code(nmax,as_capacity)
+        {
+            assert(indx>0);
+            assert(coef>0);
+        }
         
         
         //______________________________________________________________________
@@ -192,7 +206,6 @@ namespace yocto
         
         void equilibrium:: compile( array<double> &Nu, const collection &lib)
         {
-            
             //__________________________________________________________________
             //
             // first pass: fill Nu and count reactants/products
@@ -218,6 +231,8 @@ namespace yocto
             //
             // allocate resources
             //__________________________________________________________________
+            pj_code.release();
+            rj_code.release();
             p_code.release();
             r_code.release();
             
@@ -232,7 +247,7 @@ namespace yocto
             {
                 const actor &A  = actors[i];
                 const size_t j  = A.sp->indx; assert(j>0);assert(j<=Nu.size());
-                const int    nu = A.nu;
+                const int    nu = A.nu; assert(nu!=0);
                 if(nu>0)
                 {
                     const instr I(j,nu);
@@ -250,8 +265,41 @@ namespace yocto
             std::cerr << "<code name='" << name << "'>" << std::endl;
             std::cerr << "r_code=" << r_code << std::endl;
             std::cerr << "p_code=" << p_code << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // third pass: jacobian codes
+            //__________________________________________________________________
+            precompute(rj_code, r_code);
+            precompute(pj_code, p_code);
             std::cerr << "</code>" << std::endl;
             
+        }
+        
+        void equilibrium:: precompute( vector<j_instr> &jcode, const vector<instr> &code)
+        {
+            std::cerr << "Creating Jacobian Code from " << code << std::endl;
+            const size_t nc = code.size();
+            jcode.free();
+            for(size_t i=1;i<=nc;++i)
+            {
+                const instr &cc = code[i];
+                assert(cc.p>0);
+                j_instr pJ( new d_instr(cc.i,cc.p,nc) );
+                jcode.push_back(pJ);
+                if(cc.p>1)
+                {
+                    const instr tmp(cc.i,cc.p-1);
+                    pJ->code.push_back(tmp);
+                }
+                for(size_t j=1;j<=nc;++j)
+                {
+                    if(j!=i)
+                        pJ->code.push_back(code[j]);
+                }
+                quicksort(pJ->code,instr::compare);
+                std::cerr << "\tdGamma/dC" << cc.i << " = " << pJ->coef << " * " << pJ->code << std::endl;
+            }
         }
         
         
@@ -280,7 +328,66 @@ namespace yocto
             
             return lhs - rhs;
         }
+        
+        double equilibrium:: computeGammaAndPhi(array<double>       &Phi,
+                                                double               t,
+                                                const array<double> &C,
+                                                double              &KK)
+        {
+            const double localK = (KK = getK(t));
+            return updateGammaAndPhi(Phi,C,localK);
+        }
+        
+        double equilibrium:: updateGammaAndPhi( array<double> &Phi,const array<double> &C, const double KK ) const throw()
+        {
+            for(size_t i=Phi.size();i>0;--i)
+                Phi[i] = 0;
+            
+            // reactant jacobian
+            for(size_t k=rj_code.size();k>0;--k)
+            {
+                const d_instr      &J    = *rj_code[k];
+                double              prod = KK * J.coef;
+                const array<instr> &code = J.code;
+                
+                assert(J.indx>0);
+                assert(J.indx<=Phi.size());
+                
+                for(size_t j=code.size();j>0;--j)
+                {
+                    const instr &cc = code[j];
+                    prod *= ipower( C[cc.i], cc.p );
+                }
+                
+                Phi[J.indx] += prod;
+            }
+            
+            // products jacobian
+            for(size_t k=pj_code.size();k>0;--k)
+            {
+                const d_instr      &J    = *pj_code[k];
+                double              prod =  J.coef;
+                const array<instr> &code = J.code;
+                
+                assert(J.indx>0);
+                assert(J.indx<=Phi.size());
+                
+                for(size_t j=code.size();j>0;--j)
+                {
+                    const instr &cc = code[j];
+                    prod *= ipower( C[cc.i], cc.p );
+                }
+                
+                Phi[J.indx] -= prod;
+            }
 
+            
+            
+            return updateGamma(C,KK);
+        }
+        
+        
+        
         
         //______________________________________________________________________
         //
