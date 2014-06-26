@@ -341,13 +341,18 @@ namespace yocto
         double equilibrium:: updateGammaAndPhi( array<double> &Phi,const array<double> &C, const double KK ) const throw()
         {
             for(size_t i=Phi.size();i>0;--i)
+            {
                 Phi[i] = 0;
+            }
             
+            //__________________________________________________________________
+            //
             // reactant jacobian
+            //__________________________________________________________________
             for(size_t k=rj_code.size();k>0;--k)
             {
                 const d_instr      &J    = *rj_code[k];
-                double              prod = KK * J.coef;
+                double              prod = J.coef * KK;
                 const array<instr> &code = J.code;
                 
                 assert(J.indx>0);
@@ -362,11 +367,14 @@ namespace yocto
                 Phi[J.indx] += prod;
             }
             
+            //__________________________________________________________________
+            //
             // products jacobian
+            //__________________________________________________________________
             for(size_t k=pj_code.size();k>0;--k)
             {
                 const d_instr      &J    = *pj_code[k];
-                double              prod =  J.coef;
+                double              prod = J.coef;
                 const array<instr> &code = J.code;
                 
                 assert(J.indx>0);
@@ -381,8 +389,10 @@ namespace yocto
                 Phi[J.indx] -= prod;
             }
 
-            
-            
+            //__________________________________________________________________
+            //
+            // then Gamma
+            //__________________________________________________________________
             return updateGamma(C,KK);
         }
         
