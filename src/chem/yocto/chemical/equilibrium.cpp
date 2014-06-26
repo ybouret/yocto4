@@ -2,6 +2,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/code/bswap.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -53,6 +54,11 @@ namespace yocto
         {
         }
         
+        int equilibrium::instr:: compare( const instr &lhs, const instr &rhs) throw()
+        {
+            return __compare<size_t>(lhs.i,rhs.i);
+        }
+
         
         
         
@@ -238,6 +244,9 @@ namespace yocto
                     r_code.push_back(I);
                 }
             }
+            
+            quicksort(p_code,instr::compare);
+            quicksort(r_code,instr::compare);
             std::cerr << "<code name='" << name << "'>" << std::endl;
             std::cerr << "r_code=" << r_code << std::endl;
             std::cerr << "p_code=" << p_code << std::endl;

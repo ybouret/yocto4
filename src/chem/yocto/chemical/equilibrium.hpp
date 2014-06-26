@@ -57,6 +57,7 @@ namespace yocto
                     os << 'C' << I.i << '^' << I.p;
                     return os;
                 }
+                static int compare( const instr &, const instr &) throw();
             private:
                 YOCTO_DISABLE_ASSIGN(instr);
             };
