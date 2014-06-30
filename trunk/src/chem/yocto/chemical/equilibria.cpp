@@ -1,10 +1,13 @@
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/math/kernel/algebra.hpp"
 
 namespace yocto
 {
     namespace chemical
     {
+        typedef math::algebra<double> mkl;
+        
         equilibria:: ~equilibria() throw()
         {
         }
@@ -20,10 +23,17 @@ namespace yocto
             (size_t &)M = 0;
             (size_t &)M = 0;
             
+            Ctry.release();
+            dC.release();
+            LU.release();
+            xi.release();
+            W.release();
             Phi.release();
             Gamma.release();
             K.release();
+            Nu0.release();
             Nu.release();
+            
         }
         
         
@@ -47,9 +57,13 @@ namespace yocto
                 if(N>0)
                 {
                     Nu.make(N,M);
+                    Nu0.make(N,M);
                     K.make(N,0.0);
                     Gamma.make(N,0.0);
                     Phi.make(N,M);
+                    W.make(N,N);
+                    xi.make(N,0.0);
+                    LU.make(N,0.0);
                     
                     //__________________________________________________________
                     //
@@ -63,7 +77,16 @@ namespace yocto
                         eq.compile(Nu[i],lib);
                     }
                     std::cerr << "Nu=" << Nu << std::endl;
+                    
+                    //__________________________________________________________
+                    //
+                    // copy the full topology
+                    //__________________________________________________________
+                    Nu0.assign(Nu);
+                    
                 }
+                dC.make(M,0.0);
+                Ctry.make(M,0.0);
                 
             }
             catch(...)
@@ -122,7 +145,49 @@ namespace yocto
 
         }
 
+        void equilibria:: updateGammaAndPhi(const array<double> &C) throw()
+        {
+            iterator     k = begin();
+            const size_t n = N;
+            for(size_t i=1;i<=n;++i,++k)
+            {
+                equilibrium &eq = **k;
+                Gamma[i] = eq.updateGammaAndPhi(Phi[i],C,K[i]);
+            }
+
+        }
         
+        bool equilibria:: computeNewtonStep() throw()
+        {
+            
+            mkl::mul_rtrn(W, Phi, Nu);
+            
+            if(LU.build(W))
+            {
+                mkl::neg(xi, Gamma);
+                LU.solve(W,xi);
+                mkl::mul_trn(dC, Nu, xi);
+                return true;
+            }
+            else
+            {
+                //mkl::set(xi,0.0);
+                mkl::set(dC,0.0);
+                return false;
+            }
+        }
+
+        double equilibria:: getF() const throw()
+        {
+            double ans = 0;
+            for(size_t i=N;i>0;--i)
+            {
+                const double g = Gamma[i];
+                ans += g*g;
+            }
+            return 0.5 * ans;
+        }
+
         
     }
 }
