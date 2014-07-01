@@ -338,7 +338,7 @@ namespace yocto
             return updateGammaAndPhi(Phi,C,localK);
         }
         
-        double equilibrium:: updateGammaAndPhi( array<double> &Phi,const array<double> &C, const double KK ) const throw()
+        void equilibrium:: updatePhi( array<double> &Phi, const array<double> &C, const double KK) const throw()
         {
             for(size_t i=Phi.size();i>0;--i)
             {
@@ -389,6 +389,12 @@ namespace yocto
                 Phi[J.indx] -= prod;
             }
 
+        }
+
+        
+        double equilibrium:: updateGammaAndPhi( array<double> &Phi,const array<double> &C, const double KK ) const throw()
+        {
+            updatePhi(Phi,C,KK);
             //__________________________________________________________________
             //
             // then Gamma
@@ -396,7 +402,7 @@ namespace yocto
             return updateGamma(C,KK);
         }
         
-        
+
         
         
         //______________________________________________________________________

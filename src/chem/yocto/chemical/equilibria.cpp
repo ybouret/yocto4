@@ -152,16 +152,22 @@ namespace yocto
 
         double equilibria:: updateGammaAndPhi(const array<double> &C) throw()
         {
+            updatePhi(C);
+            return getF();
+        }
+        
+        void equilibria:: updatePhi(const array<double> &C) throw()
+        {
             iterator     k = begin();
             const size_t n = N;
             for(size_t i=1;i<=n;++i,++k)
             {
                 equilibrium &eq = **k;
-                Gamma[i] = eq.updateGammaAndPhi(Phi[i],C,K[i]);
+                eq.updatePhi(Phi[i], C, K[i]);
             }
             mkl::mul_trn(grad, Phi, Gamma);
-            return getF();
         }
+        
         
         bool equilibria:: computeNewtonStep() throw()
         {

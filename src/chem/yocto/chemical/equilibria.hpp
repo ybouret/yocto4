@@ -66,6 +66,10 @@ namespace yocto
             //! recompute Gamma and Phi for the same constants (also gradient), return getF()
             double updateGammaAndPhi(const array<double> &C) throw();
             
+            //! update only Phi and the gradient part
+            void updatePhi(const array<double> &C) throw();
+            
+            
             //! compute the advancement getting back to Gamma=0
             /**
              compute W = Phi * Nu' and xi = -W^(-1).Gamma,
@@ -83,7 +87,6 @@ namespace yocto
             
         private:
             double computeTrialFrom(const array<double> &C, const double lambda) throw();
-            
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };
         

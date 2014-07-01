@@ -118,6 +118,9 @@ namespace yocto
             //! compute Gamma and Phi while initializing K
             double computeGammaAndPhi( array<double> &Phi, double t, const array<double> &C, double &KK);
             
+            //! compute Phi only
+            void updatePhi( array<double> &Phi, const array<double> &C, const double KK) const throw();
+            
             //! compute Gamma and Phi whith a pre-computed constant
             double updateGammaAndPhi( array<double> &Phi, const array<double> &C, const double KK) const throw();
             
