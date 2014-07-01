@@ -37,6 +37,7 @@ namespace yocto
             vector_t     xi;    //!< N extent
             lu_t         LU;
             vector_t     dC;    //!< M concentrations increase (Newton's Step)
+            vector_t     grad;  //!< M, 1/2 Gamma^2 gradient
             vector_t     Ctry;  //!< M trial concentration
             
             //__________________________________________________________________
@@ -53,17 +54,17 @@ namespace yocto
                 return os;
             }
             
-            //! initilialize K and compute Gamma
-            void computeGamma(double t, const array<double> &C );
+            //! initilialize K and compute Gamma, return F
+            double computeGamma(double t, const array<double> &C );
             
-            //! compute Gamma once K is computed
-            void updateGamma(const array<double> &C);
+            //! compute Gamma once K is computed, return F
+            double updateGamma(const array<double> &C);
             
-            //! initialize K, compute Gamma and Phi
-            void computeGammaAndPhi(double t, const array<double> &C);
+            //! initialize K, compute Gamma,Phi and gradient, return getF
+            double computeGammaAndPhi(double t, const array<double> &C);
             
-            //! recompute Gamma and Phi for the same constants
-            void updateGammaAndPhi(const array<double> &C) throw();
+            //! recompute Gamma and Phi for the same constants (also gradient), return getF()
+            double updateGammaAndPhi(const array<double> &C) throw();
             
             //! compute the advancement getting back to Gamma=0
             /**
@@ -76,9 +77,13 @@ namespace yocto
             //! objective function : 1/2 Gamma^2
             double getF() const throw();
             
+            //! normalize system at time t
+            bool  normalize( double t, array<double> &C );
             
             
         private:
+            double computeTrialFrom(const array<double> &C, const double lambda) throw();
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };
         

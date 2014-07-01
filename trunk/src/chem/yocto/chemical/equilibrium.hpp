@@ -111,11 +111,18 @@ namespace yocto
             
             //! compute Gamma and initialize K
             double computeGamma(double t, const array<double> &C, double &KK);
+            
+            //! compute Gamma from a pre-computed constant
             double updateGamma(const array<double> &C, const double KK) const throw();
             
             //! compute Gamma and Phi while initializing K
             double computeGammaAndPhi( array<double> &Phi, double t, const array<double> &C, double &KK);
+            
+            //! compute Gamma and Phi whith a pre-computed constant
             double updateGammaAndPhi( array<double> &Phi, const array<double> &C, const double KK) const throw();
+            
+            //! compute a scaling concentration
+            double computeScalingConcentration(const double KK) const throw();
             
         protected:
             explicit equilibrium( const string &id );
