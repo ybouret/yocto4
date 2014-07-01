@@ -47,6 +47,11 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
         std::cerr << "singular" << std::endl;
     }
     
+    if( cs.normalize(0.0, S))
+    {
+        
+    }
+    
 
 }
 YOCTO_UNIT_TEST_DONE()

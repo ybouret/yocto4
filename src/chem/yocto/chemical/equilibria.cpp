@@ -24,6 +24,7 @@ namespace yocto
             (size_t &)M = 0;
             
             Ctry.release();
+            grad.release();
             dC.release();
             LU.release();
             xi.release();
@@ -86,6 +87,7 @@ namespace yocto
                     
                 }
                 dC.make(M,0.0);
+                grad.make(M,0);
                 Ctry.make(M,0.0);
                 
             }
@@ -111,7 +113,7 @@ namespace yocto
         }
 
         
-        void equilibria:: computeGamma(double t, const array<double> &C )
+        double equilibria:: computeGamma(double t, const array<double> &C )
         {
             iterator     k = begin();
             const size_t n = N;
@@ -120,9 +122,10 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.computeGamma(t, C, K[i]);
             }
+            return getF();
         }
         
-        void equilibria:: updateGamma(const array<double> &C)
+        double equilibria:: updateGamma(const array<double> &C)
         {
             iterator     k = begin();
             const size_t n = N;
@@ -131,9 +134,10 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.updateGamma(C,K[i]);
             }
+            return getF();
         }
 
-        void equilibria:: computeGammaAndPhi(double t, const array<double> &C)
+        double equilibria:: computeGammaAndPhi(double t, const array<double> &C)
         {
             iterator     k = begin();
             const size_t n = N;
@@ -142,10 +146,11 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.computeGammaAndPhi(Phi[i],t,C,K[i]);
             }
-
+            mkl::mul_trn(grad, Phi, Gamma);
+            return getF();
         }
 
-        void equilibria:: updateGammaAndPhi(const array<double> &C) throw()
+        double equilibria:: updateGammaAndPhi(const array<double> &C) throw()
         {
             iterator     k = begin();
             const size_t n = N;
@@ -154,7 +159,8 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.updateGammaAndPhi(Phi[i],C,K[i]);
             }
-
+            mkl::mul_trn(grad, Phi, Gamma);
+            return getF();
         }
         
         bool equilibria:: computeNewtonStep() throw()
@@ -171,7 +177,6 @@ namespace yocto
             }
             else
             {
-                //mkl::set(xi,0.0);
                 mkl::set(dC,0.0);
                 return false;
             }
