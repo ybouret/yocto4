@@ -1,6 +1,8 @@
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 
+#include "yocto/code/utils.hpp"
+
 namespace yocto
 {
     namespace chemical
@@ -21,13 +23,18 @@ namespace yocto
         
         bool  equilibria:: normalize( double t, array<double> &C )
         {
-            static const double ALPHA = 1e-4;
+            static const double ALPHA         = 1e-4;
+            static const double BACKTRACK_MIN = 0.1;
+            
+            if(N<=0)
+                return true;
+            
             //__________________________________________________________________
             //
             // First starting point: compute Gamma, Phi, Gradient and constants
             //__________________________________________________________________
-            double F0 = computeGammaAndPhi(t,C);
-            std::cerr << "F0=" << F0 << " @" << C << std::endl;
+            double g0 = computeGammaAndPhi(t,C);
+            std::cerr << "g0=" << g0 << " @" << C << std::endl;
             if( !computeNewtonStep() )
             {
                 std::cerr << "-- Normalize: Singular Composition Level 0" << std::endl;
@@ -38,7 +45,7 @@ namespace yocto
             // Loop On Newton's Step
             //__________________________________________________________________
             size_t count = 0;
-            while(true)
+        CHECK_STEP:
             {
                 //______________________________________________________________
                 //
@@ -60,10 +67,10 @@ namespace yocto
                 {
                     Ctry[i] = C[i] + dC[i];
                 }
-                const double F1 = updateGamma(Ctry);
-                std::cerr << "F1=" << F1 << " @" << Ctry << std::endl;
+                double g1 = updateGamma(Ctry);
+                std::cerr << "F1=" << g1 << " @" << Ctry << std::endl;
                 std::cerr << "Gamma=" << Gamma << std::endl;
-                if( F1 <= F0 + rate * ALPHA )
+                if( g1 <= g0 + rate * ALPHA )
                 {
                     std::cerr << "Accept Newton's Step" << std::endl;
                     mkl::set(C,Ctry);
@@ -72,28 +79,52 @@ namespace yocto
                     // Test convergence
                     //__________________________________________________________
                     
-                    //__________________________________________________________
-                    //
-                    // Compute Next Newton's step:
-                    // Gamma is already up to date, only need to recompute Phi
-                    // and copy the F value
-                    //__________________________________________________________
-                    updatePhi(C);
-                    if(!computeNewtonStep())
-                    {
-                        std::cerr << "-- Normalize: Singular Composition Level-1" << std::endl;
-                        return false;
-                    }
-                    F0 = F1;
+                    // blah blah
+                    
                     if(++count>10)
-                        break;
+                    {
+                        std::cerr << "COUNT MAX" << std::endl;
+                        goto CONVERGED;
+                    }
                 }
                 else
                 {
+                    //__________________________________________________________
+                    //
+                    // We want to backtrack until g1 <= g0 - (-rate * ALPHA) * lam
+                    // But we allow to decrease only down to BACKTRACK_MIN
+                    //__________________________________________________________
+                    
                     std::cerr << "Need Backtracking" << std::endl;
-                    exit(1);
+                    const double slope = -rate * ALPHA; assert(slope>0);
+                    double lam = 1;
+                    do
+                    {
+                        lam /= 2;
+                        g1   = computeTrialFrom(C, lam);
+                        std::cerr << "g(" << lam << ")=" << g1 << " @" << Ctry << std::endl;
+                    } while( (g1>g0-slope*lam) && lam>BACKTRACK_MIN);
+                    
+                    std::cerr << "lam=" << lam << std::endl;
+                    mkl::set(C,Ctry);
                 }
                 
+                //__________________________________________________________
+                //
+                // Compute Next Newton's step: at this point,
+                // Gamma is already up to date, only need to recompute Phi
+                // and copy the g value
+                //__________________________________________________________
+                updatePhi(C);
+                if(!computeNewtonStep())
+                {
+                    std::cerr << "-- Normalize: Singular Composition Level-1" << std::endl;
+                    return false;
+                }
+                g0 = g1;
+                
+                
+                goto CHECK_STEP;
             }
             
         CONVERGED:
