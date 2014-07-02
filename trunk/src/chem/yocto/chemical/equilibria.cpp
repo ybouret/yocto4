@@ -23,9 +23,12 @@ namespace yocto
             (size_t &)M = 0;
             (size_t &)M = 0;
             
-            Ctry.release();
+            Cbad.release();
+            Cold.release();
+            Ctmp.release();
             grad.release();
             dC.release();
+            spe.release();
             LU.release();
             xi.release();
             W.release();
@@ -65,6 +68,7 @@ namespace yocto
                     W.make(N,N);
                     xi.make(N,0.0);
                     LU.make(N,0.0);
+                    spe.make(N,0);
                     
                     //__________________________________________________________
                     //
@@ -88,7 +92,10 @@ namespace yocto
                 }
                 dC.make(M,0.0);
                 grad.make(M,0);
-                Ctry.make(M,0.0);
+                Ctmp.make(M,0.0);
+                Cold.make(M,0.0);
+                Cbad.make(M,0.0);
+                
                 
             }
             catch(...)
@@ -197,6 +204,22 @@ namespace yocto
                 ans += g*g;
             }
             return 0.5 * ans;
+        }
+
+        void   equilibria:: update_topologies() throw()
+        {
+            for(size_t i=N;i>0;--i)
+            {
+                const array<double> &Nu_i = Nu[i];
+                size_t count = 0;
+                for(size_t j=M;j>0;--j)
+                {
+                    const double Nu_ij = Nu_i[j];
+                    if(Nu_ij>0||Nu_ij<0) ++count;
+                }
+                spe[i] = count;
+            }
+            std::cerr << "SpeciesPerEq=" << spe << std::endl;
         }
 
         
