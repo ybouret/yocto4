@@ -15,19 +15,19 @@ namespace yocto
             // build up a trial composition
             for(size_t i=M;i>0;--i)
             {
-                Ctry[i] = C[i] + lambda * dC[i];
+                Ctmp[i] = C[i] + lambda * dC[i];
             }
-            return updateGamma(Ctry);
+            return updateGamma(Ctmp);
         }
         
         
         bool  equilibria:: normalize( double t, array<double> &C )
         {
-            static const double ALPHA         = 1e-4;
-            static const double BACKTRACK_MIN = 0.1;
             
             if(N<=0)
                 return true;
+            
+            // TODO: correct
             
             //__________________________________________________________________
             //
@@ -38,96 +38,41 @@ namespace yocto
             if( !computeNewtonStep() )
             {
                 std::cerr << "-- Normalize: Singular Composition Level 0" << std::endl;
+                return false;
             }
             
+            size_t count = 0;
+        CHECK:
             //__________________________________________________________________
             //
-            // Loop On Newton's Step
+            // Moving Full Newton's Step
             //__________________________________________________________________
-            size_t count = 0;
-        CHECK_STEP:
+            for(size_t i=M;i>0;--i)
             {
-                //______________________________________________________________
-                //
-                // compute descent rate
-                //______________________________________________________________
-                const double rate = mkl::dot(grad,dC);
-                std::cerr << "rate=" << rate << std::endl;
-                if(rate>=0)
-                {
-                    std::cerr << "-- Normalize: descente rate round off reached !" << std::endl;
-                    goto CONVERGED;
-                }
-                
-                //______________________________________________________________
-                //
-                // Move to full Newton's step
-                //______________________________________________________________
-                for(size_t i=M;i>0;--i)
-                {
-                    Ctry[i] = C[i] + dC[i];
-                }
-                double g1 = updateGamma(Ctry);
-                std::cerr << "F1=" << g1 << " @" << Ctry << std::endl;
-                std::cerr << "Gamma=" << Gamma << std::endl;
-                if( g1 <= g0 + rate * ALPHA )
-                {
-                    std::cerr << "Accept Newton's Step" << std::endl;
-                    mkl::set(C,Ctry);
-                    //__________________________________________________________
-                    //
-                    // Test convergence
-                    //__________________________________________________________
-                    
-                    // blah blah
-                    
-                    if(++count>10)
-                    {
-                        std::cerr << "COUNT MAX" << std::endl;
-                        goto CONVERGED;
-                    }
-                }
-                else
-                {
-                    //__________________________________________________________
-                    //
-                    // We want to backtrack until g1 <= g0 - (-rate * ALPHA) * lam
-                    // But we allow to decrease only down to BACKTRACK_MIN
-                    //__________________________________________________________
-                    
-                    std::cerr << "Need Backtracking" << std::endl;
-                    const double slope = -rate * ALPHA; assert(slope>0);
-                    double lam = 1;
-                    do
-                    {
-                        lam /= 2;
-                        g1   = computeTrialFrom(C, lam);
-                        std::cerr << "g(" << lam << ")=" << g1 << " @" << Ctry << std::endl;
-                    } while( (g1>g0-slope*lam) && lam>BACKTRACK_MIN);
-                    
-                    std::cerr << "lam=" << lam << std::endl;
-                    mkl::set(C,Ctry);
-                }
-                
-                //__________________________________________________________
-                //
-                // Compute Next Newton's step: at this point,
-                // Gamma is already up to date, only need to recompute Phi
-                // and copy the g value
-                //__________________________________________________________
-                updatePhi(C);
-                if(!computeNewtonStep())
-                {
-                    std::cerr << "-- Normalize: Singular Composition Level-1" << std::endl;
-                    return false;
-                }
-                g0 = g1;
-                
-                
-                goto CHECK_STEP;
+                Cold[i] = C[i];
+                C[i]   += dC[i];
+            }
+            std::cerr << "C=" << C << std::endl;
+            if(!is_valid(C))
+            {
+                std::cerr << "Should correct !" << std::endl;
+                compute_corrector(C);
+                std::cerr << "cor=" << dC << std::endl;
+                exit(1);
             }
             
-        CONVERGED:
+            double g1 = updateGammaAndPhi(C);
+            (void)g1;
+            // blah blah convergence
+            if( !computeNewtonStep() )
+            {
+                std::cerr << "-- Normalize: Singular Composition Level 1" << std::endl;
+                return false;
+            }
+            if( ++count >10 )
+                return true;
+            goto CHECK;
+            
             return true;
         }
         

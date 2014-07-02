@@ -3,6 +3,7 @@
 \usepackage{amssymb,amsfonts,amsmath,amsthm}
 \usepackage{chemarr}
 \usepackage{bm}
+\usepackage{bbm}
 \usepackage{pslatex}
 \usepackage{mathptmx}
 \usepackage{xfrac}
@@ -62,7 +63,15 @@ $$
 $$
 Of course, the $M\times M$ matrix $\mytrn{\mymat{\nu}} \mymat{\nu}$ has a rank $N$, meaning that
 only $N$ independent combinations of concentrations may be corrected.
-
+We obtain
+$$
+	\vec{C}_{k+1} = \vec{C}_{k} + u \mytrn{\mymat{\nu}} \mymat{\nu}
+	\begin{bmatrix}
+	C_1 \cdot \mathbbm{1}_{C_1<0}\\
+	\vdots\\
+	C_M \cdot \mathbbm{1}_{C_M<0}\\
+	\end{bmatrix} 
+$$
 \section{Finding some equilibria}
 
 Let us assume that we start from a valid but out-of-equilibrium state $\vec{C}$.

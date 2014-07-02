@@ -28,17 +28,20 @@ namespace yocto
             const size_t M; //!< #species from collection
             const size_t N; //!< #reactions
             
-            matrix_t     Nu;    //!< NxM, may be reduced in case of fixed species
-            matrix_t     Nu0;   //!< NxM, full topology
-            vector_t     K;     //!< N constants at time t,
-            vector_t     Gamma; //!< N constraints
-            matrix_t     Phi;   //!< NxM dGamma/dX,
-            matrix_t     W;     //!< Phi*Nu'
-            vector_t     xi;    //!< N extent
-            lu_t         LU;
-            vector_t     dC;    //!< M concentrations increase (Newton's Step)
-            vector_t     grad;  //!< M, 1/2 Gamma^2 gradient
-            vector_t     Ctry;  //!< M trial concentration
+            matrix_t       Nu;    //!< NxM, may be reduced in case of fixed species
+            matrix_t       Nu0;   //!< NxM, full topology
+            vector_t       K;     //!< N constants at time t,
+            vector_t       Gamma; //!< N constraints
+            matrix_t       Phi;   //!< NxM dGamma/dX,
+            matrix_t       W;     //!< Phi*Nu'
+            vector_t       xi;    //!< N extent
+            lu_t           LU;    //!< N
+            vector<size_t> spe;   //!< N species per equilibrium
+            vector_t       dC;    //!< M concentrations increase (Newton's Step)
+            vector_t       grad;  //!< M, 1/2 Gamma^2 gradient
+            vector_t       Ctmp;  //!< M temp concentrations
+            vector_t       Cold;  //!< M old concentrations
+            vector<bool>   Cbad;  //!< M flags
             
             //__________________________________________________________________
             //
@@ -53,6 +56,9 @@ namespace yocto
                 eqs.output(os);
                 return os;
             }
+            
+            bool is_valid( const array<double> &C ) throw();
+            void compute_corrector( const array<double> &C ) throw();
             
             //! initilialize K and compute Gamma, return F
             double computeGamma(double t, const array<double> &C );
@@ -83,10 +89,14 @@ namespace yocto
             
             //! normalize system at time t
             bool  normalize( double t, array<double> &C );
-            
+           
+            //! update species per equilibrium etc..
+            void   update_topologies() throw();
+
             
         private:
             double computeTrialFrom(const array<double> &C, const double lambda) throw();
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };
         
