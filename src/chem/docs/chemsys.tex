@@ -1,0 +1,78 @@
+\documentclass[aps]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+\newcommand{\mymat}[1]{\bm{#1}}
+\newcommand{\mytrn}[1]{~^{\mathsf{T}}{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+
+\begin{document}
+\title{Chemical Solutions}
+
+\section{Description}
+Let us assume that we have $A_1,\ldots,A_M$ chemical species coupled by
+$N$ equilibria such that
+\begin{equation}
+	\forall i \in [1;N], \;\; \sum_{j=1}^{M} \nu_{i,j} C_i = 0, \;\; K_i(t) = \prod_{i=1}^{M} C_i^{\nu_{i,j}}.
+\end{equation}
+We remove the singularities by assuming that the equilibria are met when
+\begin{equation}
+	\forall i \in [1;N], \;\; \Gamma_i(t,\vec{C}) = K_i(t) \prod_{\nu_{i,j}<0}  C_i^{-\nu_{i,j}} -  \prod_{\nu_{i,j}>0} C_i^{\nu_{i,j}} 
+\end{equation}
+or
+\begin{equation}
+	\vec{\Gamma}(t,\vec{C}) = \vec{0}.
+\end{equation}
+We also naturally have the topology matrix $\mymat{\nu}$.
+
+\section{Acceptable Compositions}
+Normally, each concentration must be positive. If not, then this should be corrected.
+
+\subsection{Correcting by chemical extent}
+We define the $\mathcal{C}^1$ function
+$$
+	E(x) = \left\lbrace
+	\begin{array}{rcl}
+	-\frac{1}{2} x^2 & \text{if} & x<0\\
+	0                & \text{if} & x\geq0\\
+	\end{array}
+	\right.
+$$
+and the total function
+$$
+	\mathcal{E}(\vec{C}) = \sum_{i=1}^M E(C_i)
+$$
+which is globally minimised for any acceptable set of concentrations.
+Starting from a concentration $\vec{C}_k$, we want to find a chemical extent $\vec{\xi}_k$ such that
+$\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}_k$ goes towards an acceptable set.
+This may be done by finding a minimum of $\mathcal{E}$.
+We have the $N$ dimensional gradient
+$$
+	\mygrad_{\vec{\xi}} \mathcal{E} = \mymat{\nu} \mygrad_{\vec{C}} \mathcal{E}.
+$$
+In a steepest descent algorithm, we should look at a minimum of $\mathcal{E}$
+by finding $u$ such that
+$$
+	\vec{C}_{k+1} = \vec{C}_{k} - u \mytrn{\mymat{\nu}} \mymat{\nu} \mygrad_{\vec{C}} \mathcal{E}.
+$$
+Of course, the $M\times M$ matrix $\mytrn{\mymat{\nu}} \mymat{\nu}$ has a rank $N$, meaning that
+only $N$ independent combinations of concentrations may be corrected.
+
+\section{Finding some equilibria}
+
+Let us assume that we start from a valid but out-of-equilibrium state $\vec{C}$.
+Then the system can evolve only by a $N$ dimensional chemical advancement $\vec{\xi}$
+\begin{equation}
+	\vec{C}_{eq} = \vec{C} + \mytrn{\mymat{\nu}}\vec{\xi}
+\end{equation}
+Starting from a value $\vec{C}_{k}$, the Newton algorithm yields
+\begin{equation}
+	\vec{0} = \vec{\Gamma}(t,\vec{C}_k) + \mymat{\Phi}(t,\vec{C}_k) \mytrn{\mymat{\nu}}\vec{\xi}_k
+\end{equation}
+
+\end{document}
