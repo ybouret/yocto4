@@ -25,7 +25,6 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     std::cerr << cs << std::endl;
     
     cs.startup(lib);
-    cs.update_topologies();
     solution S(lib);
     for(size_t i=1;i<=S.size();++i) S[i] = i * 1e-5;
     
@@ -38,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     std::cerr << "Gamma=" << cs.Gamma << std::endl;
     std::cerr << "Phi="   << cs.Phi   << std::endl;
     
-    if( cs.computeNewtonStep() )
+    if( cs.computeNewtonStep(S) )
     {
         std::cerr << "xi=" << cs.xi << std::endl;
         std::cerr << "dC=" << cs.dC << std::endl;
@@ -51,6 +50,7 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     
     S[3] = S[4] = 0;
     //S[3] = 0.1;
+    std::cerr << "S=" << S << std::endl;
     if( cs.normalize(0.0, S))
     {
         

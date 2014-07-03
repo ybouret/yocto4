@@ -9,17 +9,27 @@ namespace yocto
     {
         typedef math::algebra<double> mkl;
         
-        //! Warning: Gamma is overwritten !
-        double equilibria:: computeTrialFrom(const array<double> &C, const double lambda) throw()
+        bool equilibria:: computeNewtonStep( const array<double> &C ) throw()
         {
-            // build up a trial composition
-            for(size_t i=M;i>0;--i)
+            
+            mkl::mul_rtrn(W, Phi, Nu);
+            
+            if(LU.build(W))
             {
-                Ctmp[i] = C[i] + lambda * dC[i];
+                mkl::neg(xi, Gamma);
+                LU.solve(W,xi);
+                
+                correct_xi(C);
+                
+                mkl::mul_trn(dC, Nu, xi);
+                return true;
             }
-            return updateGamma(Ctmp);
+            else
+            {
+                mkl::set(dC,0.0);
+                return false;
+            }
         }
-        
         
         bool  equilibria:: normalize( double t, array<double> &C )
         {
@@ -35,7 +45,7 @@ namespace yocto
             //__________________________________________________________________
             double g0 = computeGammaAndPhi(t,C);
             std::cerr << "g0=" << g0 << " @" << C << std::endl;
-            if( !computeNewtonStep() )
+            if( !computeNewtonStep(C) )
             {
                 std::cerr << "-- Normalize: Singular Composition Level 0" << std::endl;
                 return false;
@@ -45,32 +55,21 @@ namespace yocto
         CHECK:
             //__________________________________________________________________
             //
-            // Moving Full Newton's Step
+            // Full corrected Newton's step
             //__________________________________________________________________
-            for(size_t i=M;i>0;--i)
-            {
-                Cold[i] = C[i];
-                C[i]   += dC[i];
-            }
-            std::cerr << "C=" << C << std::endl;
-            if(!is_valid(C))
-            {
-                std::cerr << "Should correct !" << std::endl;
-                compute_corrector(C);
-                std::cerr << "cor=" << dC << std::endl;
-                exit(1);
-            }
-            
-            double g1 = updateGammaAndPhi(C);
+            std::cerr << "xi=" << xi << std::endl;
+            std::cerr << "dC=" << dC << std::endl;
+            mkl::add(C,dC);
+            const double g1 = updateGammaAndPhi(C);
+            std::cerr << "g1=" << g1 << " @" << C << std::endl;
             (void)g1;
-            // blah blah convergence
-            if( !computeNewtonStep() )
+            
+            if(!computeNewtonStep(C))
             {
                 std::cerr << "-- Normalize: Singular Composition Level 1" << std::endl;
                 return false;
             }
-            if( ++count >10 )
-                return true;
+            if(++count>10) return true;
             goto CHECK;
             
             return true;

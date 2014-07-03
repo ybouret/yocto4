@@ -23,12 +23,13 @@ namespace yocto
             (size_t &)M = 0;
             (size_t &)M = 0;
             
-            Cbad.release();
-            Cold.release();
             Ctmp.release();
-            grad.release();
             dC.release();
-            spe.release();
+            
+            xi_max.release();
+            has_max.release();
+            xi_min.release();
+            has_min.release();
             LU.release();
             xi.release();
             W.release();
@@ -68,7 +69,10 @@ namespace yocto
                     W.make(N,N);
                     xi.make(N,0.0);
                     LU.make(N,0.0);
-                    spe.make(N,0);
+                    has_min.make(N,false);
+                    xi_min.make(N,0.0);
+                    has_max.make(N,false);
+                    xi_max.make(N,0.0);
                     
                     //__________________________________________________________
                     //
@@ -91,12 +95,7 @@ namespace yocto
                     
                 }
                 dC.make(M,0.0);
-                grad.make(M,0);
                 Ctmp.make(M,0.0);
-                Cold.make(M,0.0);
-                Cbad.make(M,0.0);
-                
-                
             }
             catch(...)
             {
@@ -153,7 +152,6 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.computeGammaAndPhi(Phi[i],t,C,K[i]);
             }
-            mkl::mul_trn(grad, Phi, Gamma);
             return getF();
         }
 
@@ -172,28 +170,10 @@ namespace yocto
                 equilibrium &eq = **k;
                 eq.updatePhi(Phi[i], C, K[i]);
             }
-            mkl::mul_trn(grad, Phi, Gamma);
         }
         
         
-        bool equilibria:: computeNewtonStep() throw()
-        {
-            
-            mkl::mul_rtrn(W, Phi, Nu);
-            
-            if(LU.build(W))
-            {
-                mkl::neg(xi, Gamma);
-                LU.solve(W,xi);
-                mkl::mul_trn(dC, Nu, xi);
-                return true;
-            }
-            else
-            {
-                mkl::set(dC,0.0);
-                return false;
-            }
-        }
+       
 
         double equilibria:: getF() const throw()
         {
@@ -205,23 +185,6 @@ namespace yocto
             }
             return 0.5 * ans;
         }
-
-        void   equilibria:: update_topologies() throw()
-        {
-            for(size_t i=N;i>0;--i)
-            {
-                const array<double> &Nu_i = Nu[i];
-                size_t count = 0;
-                for(size_t j=M;j>0;--j)
-                {
-                    const double Nu_ij = Nu_i[j];
-                    if(Nu_ij>0||Nu_ij<0) ++count;
-                }
-                spe[i] = count;
-            }
-            std::cerr << "SpeciesPerEq=" << spe << std::endl;
-        }
-
         
     }
 }
