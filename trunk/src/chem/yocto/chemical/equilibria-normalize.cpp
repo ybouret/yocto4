@@ -9,28 +9,6 @@ namespace yocto
     {
         typedef math::algebra<double> mkl;
         
-        bool equilibria:: computeNewtonStep( const array<double> &C ) throw()
-        {
-            
-            mkl::mul_rtrn(W, Phi, Nu);
-            
-            if(LU.build(W))
-            {
-                mkl::neg(xi, Gamma);
-                LU.solve(W,xi);
-                
-                correct_xi(C);
-                
-                mkl::mul_trn(dC, Nu, xi);
-                return true;
-            }
-            else
-            {
-                mkl::set(dC,0.0);
-                return false;
-            }
-        }
-        
         bool  equilibria:: normalize( double t, array<double> &C )
         {
             
@@ -38,6 +16,9 @@ namespace yocto
                 return true;
             
             // TODO: validate concentrations
+            validate(C);
+            
+            exit(1);
             
             //__________________________________________________________________
             //
@@ -71,7 +52,8 @@ namespace yocto
             //
             // correct extent
             //__________________________________________________________________
-            correct_xi(C);
+            limits_of(C);
+            correct_xi();
             
             //__________________________________________________________________
             //

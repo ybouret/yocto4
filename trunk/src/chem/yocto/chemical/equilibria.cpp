@@ -93,6 +93,14 @@ namespace yocto
                     //__________________________________________________________
                     Nu0.assign(Nu);
                     
+                    //__________________________________________________________
+                    //
+                    // Topology must have a maximal rank
+                    //__________________________________________________________
+                    mkl::mul_rtrn(W, Nu, Nu);
+                    if( !LU.build(W) )
+                        throw exception("equilibria: invalid rank");
+                    
                 }
                 dC.make(M,0.0);
                 Ctmp.make(M,0.0);

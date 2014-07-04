@@ -2,6 +2,7 @@
 #include "yocto/math/kernel/algebra.hpp"
 
 #include "yocto/code/utils.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -12,7 +13,7 @@ namespace yocto
         
         
         
-        void  equilibria:: limits_of( const array<double> &C) throw()
+        void  equilibria:: limits_of(const array<double> &C) throw()
         {
             assert(C.size()>=M);
             
@@ -78,10 +79,8 @@ namespace yocto
         }
         
         
-        void equilibria:: correct_xi( const array<double> &C ) throw()
+        void equilibria:: correct_xi() throw()
         {
-            assert(C.size()>=M);
-            limits_of(C);
             std::cerr << "xi0=" << xi << std::endl;
             for(size_t i=1;i<=N;++i)
             {
@@ -98,10 +97,59 @@ namespace yocto
                     std::cerr << "\tmax=" << xi_max[i];
                     Xi = min_of<double>(Xi,xi_max[i]);
                 }
-
+                
                 std::cerr << std::endl;
             }
             std::cerr << "xi1=" << xi << std::endl;
+            
+        }
+        
+        
+        void equilibria:: validate( array<double> &C )
+        {
+            assert(C.size()>=M);
+            
+            bool must_correct = false;
+            for(size_t i=M;i>0;--i)
+            {
+                if(C[i]<0)
+                {
+                    must_correct = true;
+                    break;
+                }
+            }
+            
+            if(!must_correct)
+                return;
+            
+            if(N>0)
+            {
+                //__________________________________________________________________
+                //
+                // find out the limits
+                //__________________________________________________________________
+                limits_of(C);
+                
+                //__________________________________________________________________
+                //
+                // try not to move
+                //__________________________________________________________________
+                mkl::set(xi,0);
+                
+                //__________________________________________________________________
+                //
+                // find what must be done
+                //__________________________________________________________________
+                correct_xi();
+                
+                //__________________________________________________________________
+                //
+                // compute the corrected concentrations
+                //__________________________________________________________________
+                mkl::muladd_trn(C, Nu, xi);
+                std::cerr << "Corr=" << C << std::endl;
+            }
+            
             
         }
         
