@@ -74,16 +74,6 @@ namespace yocto
             void updatePhi(const array<double> &C) throw();
             
             
-            //! from Phi and Gamma, compute the advancement getting back to Gamma=0
-            /**
-             The concentration is needed to compute the corrected xi.
-             - compute W = Phi * Nu' and xi = -W^(-1).Gamma,
-             - correct xi
-             - then dC = Nu' * xi.
-             \return false for a singular compositon
-             */
-            bool computeNewtonStep( const array<double> &C ) throw();
-            
             //! objective function : 1/2 Gamma^2
             double getF() const throw();
             
@@ -94,8 +84,9 @@ namespace yocto
             void  limits_of(const array<double> &C) throw();
             
             //! correct xi w.r.t. the limits
-            void correct_xi( const array<double> &C) throw();
+            void correct_xi() throw();
 
+            void validate( array<double> &C );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

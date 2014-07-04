@@ -42,44 +42,6 @@ It has to be computed.
 \section{Acceptable Compositions}
 Normally, each concentration must be positive. If not, then this should be corrected.
 
-\subsection{Correcting by chemical extent}
-We define the $\mathcal{C}^1$ function
-$$
-	E(x) = \left\lbrace
-	\begin{array}{rcl}
-	-\frac{1}{2} x^2 & \text{if} & x<0\\
-	0                & \text{if} & x\geq0\\
-	\end{array}
-	\right.
-$$
-and the total function
-$$
-	\mathcal{E}(\vec{C}) = \sum_{i=1}^M E(C_i)
-$$
-which is globally minimised for any acceptable set of concentrations.
-Starting from a concentration $\vec{C}_k$, we want to find a chemical extent $\vec{\xi}_k$ such that
-$\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}_k$ goes towards an acceptable set.
-This may be done by finding a minimum of $\mathcal{E}$.
-We have the $N$ dimensional gradient
-$$
-	\mygrad_{\vec{\xi}} \mathcal{E} = \mymat{\nu} \mygrad_{\vec{C}} \mathcal{E}.
-$$
-In a steepest descent algorithm, we should look at a minimum of $\mathcal{E}$
-by finding $u$ such that
-$$
-	\vec{C}_{k+1} = \vec{C}_{k} - u \mytrn{\mymat{\nu}} \mymat{\nu} \mygrad_{\vec{C}} \mathcal{E}.
-$$
-Of course, the $M\times M$ matrix $\mytrn{\mymat{\nu}} \mymat{\nu}$ has a rank $N$, meaning that
-only $N$ independent combinations of concentrations may be corrected.
-We obtain
-$$
-	\vec{C}_{k+1} = \vec{C}_{k} + u \mytrn{\mymat{\nu}} \mymat{\nu}
-	\begin{bmatrix}
-	C_1 \cdot \mathbbm{1}_{C_1<0}\\
-	\vdots\\
-	C_M \cdot \mathbbm{1}_{C_M<0}\\
-	\end{bmatrix} 
-$$
 \section{Finding some equilibria}
 
 Let us assume that we start from a valid but out-of-equilibrium state $\vec{C}$.
