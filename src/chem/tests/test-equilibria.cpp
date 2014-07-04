@@ -37,16 +37,6 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     std::cerr << "Gamma=" << cs.Gamma << std::endl;
     std::cerr << "Phi="   << cs.Phi   << std::endl;
     
-    if( cs.computeNewtonStep(S) )
-    {
-        std::cerr << "xi=" << cs.xi << std::endl;
-        std::cerr << "dC=" << cs.dC << std::endl;
-    }
-    else
-    {
-        std::cerr << "singular" << std::endl;
-    }
-    
     
     S[3] = S[4] = 0;
     //S[3] = 0.1;
