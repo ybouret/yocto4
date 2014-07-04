@@ -42,7 +42,7 @@ namespace yocto
                         const double value = -C_j/nu_j;
                         if(got_min)
                         {
-                            the_min = max_of<double>(-C_j/nu_j,the_min);
+                            the_min = max_of<double>(value,the_min);
                         }
                         else
                         {
@@ -70,6 +70,14 @@ namespace yocto
                     assert(0==nu_j);
                 }
                 
+                if(got_max&&got_min)
+                {
+                    // special case: block the reaction
+                    if(the_max<=the_min)
+                    {
+                        the_max = the_min = 0;
+                    }
+                }
                 has_min[i] = got_min;
                 xi_min[i]  = the_min;
                 has_max[i] = got_max;
