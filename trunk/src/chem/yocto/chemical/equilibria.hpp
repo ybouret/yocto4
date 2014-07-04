@@ -58,7 +58,6 @@ namespace yocto
             }
             
             
-            
             //! initilialize K and compute Gamma, return F
             double computeGamma(double t, const array<double> &C );
             
@@ -71,15 +70,16 @@ namespace yocto
             //! recompute Gamma and Phi for the same constants, return getF()
             double updateGammaAndPhi(const array<double> &C) throw();
             
-            //! update only Phi and the gradient part
+            //! update only Phi
             void updatePhi(const array<double> &C) throw();
             
             
             //! from Phi and Gamma, compute the advancement getting back to Gamma=0
             /**
-             The concentration is needed to compute the corrected xi
-             compute W = Phi * Nu' and xi = -W^(-1).Gamma,
-             then dC = Nu' * xi.
+             The concentration is needed to compute the corrected xi.
+             - compute W = Phi * Nu' and xi = -W^(-1).Gamma,
+             - correct xi
+             - then dC = Nu' * xi.
              \return false for a singular compositon
              */
             bool computeNewtonStep( const array<double> &C ) throw();
@@ -93,7 +93,7 @@ namespace yocto
             //! compute min/max extent
             void  limits_of(const array<double> &C) throw();
             
-            
+            //! correct xi w.r.t. the limits
             void correct_xi( const array<double> &C) throw();
 
             

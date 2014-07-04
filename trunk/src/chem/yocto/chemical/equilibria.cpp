@@ -45,14 +45,14 @@ namespace yocto
         void equilibria:: startup(const collection &lib)
         {
             cleanup();
-           
+            
             for( iterator k=begin();k!=end();++k)
             {
                 const equilibrium &eq = **k;
                 if(!eq.is_valid())
                     throw exception("Invalid Equilibrium '%s'", eq.name.c_str());
             }
-
+            
             
             (size_t &)M = lib.size();
             (size_t &)N = this->size();
@@ -115,9 +115,9 @@ namespace yocto
                 os << "# " << eq << std::endl;
             }
             for(size_t i=0;i<nsep;++i) os << '#';
-
+            
         }
-
+        
         
         double equilibria:: computeGamma(double t, const array<double> &C )
         {
@@ -142,7 +142,7 @@ namespace yocto
             }
             return getF();
         }
-
+        
         double equilibria:: computeGammaAndPhi(double t, const array<double> &C)
         {
             iterator     k = begin();
@@ -154,12 +154,19 @@ namespace yocto
             }
             return getF();
         }
-
+        
         double equilibria:: updateGammaAndPhi(const array<double> &C) throw()
         {
-            updatePhi(C);
+            iterator     k = begin();
+            const size_t n = N;
+            for(size_t i=1;i<=n;++i,++k)
+            {
+                equilibrium &eq = **k;
+                Gamma[i] = eq.updateGammaAndPhi(Phi[i],C,K[i]);
+            }
             return getF();
         }
+        
         
         void equilibria:: updatePhi(const array<double> &C) throw()
         {
@@ -173,8 +180,8 @@ namespace yocto
         }
         
         
-       
-
+        
+        
         double equilibria:: getF() const throw()
         {
             double ans = 0;

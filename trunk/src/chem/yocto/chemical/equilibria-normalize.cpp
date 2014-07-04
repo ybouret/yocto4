@@ -37,39 +37,61 @@ namespace yocto
             if(N<=0)
                 return true;
             
-            // TODO: correct
+            // TODO: validate concentrations
             
             //__________________________________________________________________
             //
-            // First starting point: compute Gamma, Phi, Gradient and constants
+            // First starting point: compute Gamma, Phi constants
             //__________________________________________________________________
             double g0 = computeGammaAndPhi(t,C);
-            std::cerr << "g0=" << g0 << " @" << C << std::endl;
-            if( !computeNewtonStep(C) )
-            {
-                std::cerr << "-- Normalize: Singular Composition Level 0" << std::endl;
-                return false;
-            }
+            std::cerr << "K=" << K << std::endl;
+            std::cerr << "@" << C << "; g0=" << g0 <<std::endl;
+            std::cerr << "Gamma=" << Gamma << std::endl;
             
             size_t count = 0;
         CHECK:
             //__________________________________________________________________
             //
-            // Full corrected Newton's step
+            // Prepare Newton's setp
             //__________________________________________________________________
-            std::cerr << "xi=" << xi << std::endl;
-            std::cerr << "dC=" << dC << std::endl;
-            mkl::add(C,dC);
-            const double g1 = updateGammaAndPhi(C);
-            std::cerr << "g1=" << g1 << " @" << C << std::endl;
-            (void)g1;
-            
-            if(!computeNewtonStep(C))
+            mkl::mul_rtrn(W, Phi, Nu);
+            if(!LU.build(W))
             {
-                std::cerr << "-- Normalize: Singular Composition Level 1" << std::endl;
-                return false;
+                std::cerr << "-- Normalize: singular solution..." << std::endl;
             }
-            if(++count>10) return true;
+            
+            //__________________________________________________________________
+            //
+            // compute extent
+            //__________________________________________________________________
+            mkl::neg(xi, Gamma);
+            LU.solve(W,xi);
+            
+            //__________________________________________________________________
+            //
+            // correct extent
+            //__________________________________________________________________
+            correct_xi(C);
+            
+            //__________________________________________________________________
+            //
+            // Deduce corrected Newton's step
+            //__________________________________________________________________
+            mkl::mul_trn(dC, Nu, xi);
+            
+            //__________________________________________________________________
+            //
+            // Move
+            //__________________________________________________________________
+            mkl::add(C,dC);
+            const double g1 = updateGamma(C);
+            std::cerr << "@" << C << "; g1=" << g1 <<std::endl;
+            std::cerr << "Gamma=" << Gamma << std::endl;
+            if(++count>3)
+            {
+                return true;
+            }
+            updatePhi(C);
             goto CHECK;
             
             return true;
