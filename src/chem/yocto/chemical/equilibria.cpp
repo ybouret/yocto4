@@ -26,6 +26,7 @@ namespace yocto
             Ctmp.release();
             dC.release();
             
+            active.release();
             xi_max.release();
             has_max.release();
             xi_min.release();
@@ -73,6 +74,7 @@ namespace yocto
                     xi_min.make(N,0.0);
                     has_max.make(N,false);
                     xi_max.make(N,0.0);
+                    active.make(N,false);
                     
                     //__________________________________________________________
                     //

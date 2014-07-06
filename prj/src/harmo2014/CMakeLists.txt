@@ -1,0 +1,8 @@
+PROJECT(harmo2014)
+
+ADD_EXECUTABLE(harmo2014 harmonize.cpp)
+TARGET_LINK_YOCTO(harmo2014 mk lua++ lua)
+
+INSTALL( TARGETS harmo2014 RUNTIME DESTINATION bin )
+
+

@@ -36,9 +36,10 @@ namespace yocto
             matrix_t       W;      //!< Phi*Nu'
             vector_t       xi;     //!< N extent
             lu_t           LU;     //!<
-            vector<bool>   has_min; //!< if xi is limited
-            vector_t       xi_min;  //!< the min values
-            vector<bool>   has_max; //!< if xi is limited
+            vector<bool>   has_min; //!< [N] if xi is limited
+            vector_t       xi_min;  //!< [N] the min values
+            vector<bool>   has_max; //!< [N] if xi is limited
+            vector<bool>   active;  //!< [N] if may be active
             vector_t       xi_max;  //!< the max values
             vector_t       dC;      //!< M concentrations increase (Newton's Step)
             vector_t       Ctmp;    //!< M temp concentrations
@@ -81,7 +82,10 @@ namespace yocto
             bool  normalize( double t, array<double> &C );
             
             //! compute min/max extent
-            void  limits_of(const array<double> &C) throw();
+            /**
+             \return the number of active reaction.
+             */
+            size_t  limits_of(const array<double> &C) throw();
             
             //! correct xi w.r.t. the limits
             void correct_xi() throw();
@@ -89,6 +93,8 @@ namespace yocto
             void validate( array<double> &C );
             
         private:
+            bool must_correct( const array<double> &C ) const throw();
+            
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };
         
