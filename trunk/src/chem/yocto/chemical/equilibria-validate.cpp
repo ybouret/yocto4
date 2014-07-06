@@ -13,10 +13,11 @@ namespace yocto
         
         
         
-        void  equilibria:: limits_of(const array<double> &C) throw()
+        size_t  equilibria:: limits_of(const array<double> &C) throw()
         {
             assert(C.size()>=M);
             
+            size_t count = 0;
             for(size_t i=N;i>0;--i)
             {
                 const array<double> &nu = Nu[i];
@@ -24,7 +25,7 @@ namespace yocto
                 double the_max = 0;
                 bool   got_min = false;
                 bool   got_max = false;
-                
+                active[i]      = true;
                 
                 for(size_t j=M;j>0;--j)
                 {
@@ -70,20 +71,24 @@ namespace yocto
                     assert(0==nu_j);
                 }
                 
+                ++count;
                 if(got_max&&got_min)
                 {
                     // special case: block the reaction
                     if(the_max<=the_min)
                     {
                         the_max = the_min = 0;
+                        active[i] = false;
+                        --count;
                     }
                 }
+                
                 has_min[i] = got_min;
                 xi_min[i]  = the_min;
                 has_max[i] = got_max;
                 xi_max[i]  = the_max;
             }
-            
+            return count;
         }
         
         
@@ -94,6 +99,7 @@ namespace yocto
             {
                 double &Xi= xi[i];
                 std::cerr << "#" << i;
+                std::cerr << " " << (active[i]? " ON: " : "OFF:");
                 if(has_min[i])
                 {
                     std::cerr << "\tmin=" << xi_min[i];
@@ -112,49 +118,70 @@ namespace yocto
             
         }
         
+        bool equilibria:: must_correct( const array<double> &C ) const throw()
+        {
+            assert(C.size()>=M);
+            
+            for(size_t i=M;i>0;--i)
+            {
+                if(C[i]<0) return true;
+            }
+            return false;
+        }
+        
         
         void equilibria:: validate( array<double> &C )
         {
             assert(C.size()>=M);
             
-            bool must_correct = false;
-            for(size_t i=M;i>0;--i)
-            {
-                if(C[i]<0)
-                {
-                    must_correct = true;
-                    break;
-                }
-            }
-            
-            if(!must_correct)
+            if(!must_correct(C))
                 return;
             
             if(N>0)
             {
-                //__________________________________________________________________
+                //______________________________________________________________
                 //
                 // find out the limits
-                //__________________________________________________________________
-                limits_of(C);
+                //______________________________________________________________
+                if(limits_of(C)<=0)
+                    throw exception("equilibria.validate(no active reaction)");
                 
-                //__________________________________________________________________
+                //______________________________________________________________
                 //
                 // try not to move
-                //__________________________________________________________________
+                //______________________________________________________________
                 mkl::set(xi,0);
                 
-                //__________________________________________________________________
+                //______________________________________________________________
                 //
                 // find what must be done
-                //__________________________________________________________________
+                //______________________________________________________________
                 correct_xi();
                 
-                //__________________________________________________________________
+                //______________________________________________________________
                 //
                 // compute the corrected concentrations
-                //__________________________________________________________________
+                //______________________________________________________________
                 mkl::muladd_trn(C, Nu, xi);
+                
+                //______________________________________________________________
+                //
+                // correct roundoff for active reactions
+                //______________________________________________________________
+                for(size_t i=N;i>0;--i)
+                {
+                    if(active[i])
+                    {
+                        const array<double> &nu = Nu[i];
+                        for(size_t j=M;j>0;--j)
+                        {
+                            if( (0!=nu[j]) && (C[j]<0.0) )
+                            {
+                                C[j] = 0.0;
+                            }
+                        }
+                    }
+                }
                 std::cerr << "Corr=" << C << std::endl;
             }
             
