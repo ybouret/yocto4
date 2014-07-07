@@ -206,6 +206,8 @@ namespace yocto
             return 0.5 * ans;
         }
         
+        
+        
         void  equilibria:: find_active_species() throw()
         {
             for(size_t j=M;j>0;--j) active[j] = false;

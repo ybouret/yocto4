@@ -41,8 +41,12 @@ namespace yocto {
 			}
 			assert( !is_separator( *curr_ ) );
 			token_ = curr_;
-			units_ = 1;
+			
+            units_ = 1;
 			++curr_;
+
+            
+            
 			for(;;)
 			{
 				if( curr_ >= last_)
