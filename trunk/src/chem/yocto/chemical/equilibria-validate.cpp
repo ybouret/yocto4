@@ -124,7 +124,11 @@ namespace yocto
             
             for(size_t i=M;i>0;--i)
             {
-                if( active[i] && (C[i]<0) ) return true;
+                if( active[i] && (C[i]<0) )
+                {
+                    assert(N>0);
+                    return true;
+                }
             }
             return false;
         }
@@ -178,6 +182,7 @@ namespace yocto
                         {
                             if( (0!=int(nu[j])) && (C[j]<0.0) )
                             {
+                                assert(active[j]);
                                 C[j] = 0.0;
                             }
                         }
