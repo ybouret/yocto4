@@ -25,7 +25,7 @@ namespace yocto
                 double the_max = 0;
                 bool   got_min = false;
                 bool   got_max = false;
-                active[i]      = true;
+                online[i]      = true;
                 
                 for(size_t j=M;j>0;--j)
                 {
@@ -78,7 +78,7 @@ namespace yocto
                     if(the_max<=the_min)
                     {
                         the_max = the_min = 0;
-                        active[i] = false;
+                        online[i] = false;
                         --count;
                     }
                 }
@@ -99,7 +99,7 @@ namespace yocto
             {
                 double &Xi= xi[i];
                 std::cerr << "#" << i;
-                std::cerr << " " << (active[i]? " ON: " : "OFF:");
+                std::cerr << " " << (online[i]? " ON: " : "OFF:");
                 if(has_min[i])
                 {
                     std::cerr << "\tmin=" << xi_min[i];
@@ -124,7 +124,7 @@ namespace yocto
             
             for(size_t i=M;i>0;--i)
             {
-                if(C[i]<0) return true;
+                if( active[i] && (C[i]<0) ) return true;
             }
             return false;
         }
@@ -170,12 +170,13 @@ namespace yocto
                 //______________________________________________________________
                 for(size_t i=N;i>0;--i)
                 {
-                    if(active[i])
+                    if(online[i])
                     {
+                        // this reaction is active
                         const array<double> &nu = Nu[i];
                         for(size_t j=M;j>0;--j)
                         {
-                            if( (0!=nu[j]) && (C[j]<0.0) )
+                            if( (0!=int(nu[j])) && (C[j]<0.0) )
                             {
                                 C[j] = 0.0;
                             }
