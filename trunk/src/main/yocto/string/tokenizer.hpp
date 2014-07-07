@@ -36,7 +36,7 @@ namespace yocto {
 				const T *curr_;
 				const T *last_;
 				const T *token_; //!< token position
-				size_t   units_; //!< token length
+				size_t   units_; //!< token length, may be 0
 				size_t   count_; //!< token count
 			};
 		

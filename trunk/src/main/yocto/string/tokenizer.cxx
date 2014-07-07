@@ -2,9 +2,9 @@
 
 namespace yocto {
 	
-	namespace core 
+	namespace core
 	{
-	
+        
 		template <>
 		tokenizer<yCH>:: ~tokenizer() throw()
 		{
@@ -23,6 +23,8 @@ namespace yocto {
 		template <>
 		bool tokenizer<yCH>:: get_next( bool (*is_separator)( yCH ) throw() ) throw()
 		{
+            
+#if 1
 			assert(NULL!=is_separator);
 			token_ = NULL;
 			units_ = 0;
@@ -44,14 +46,14 @@ namespace yocto {
 			
             units_ = 1;
 			++curr_;
-
+            
             
             
 			for(;;)
 			{
 				if( curr_ >= last_)
 					break;
-					
+                
 				if( is_separator(*curr_) )
 				{
 					++curr_;
@@ -63,8 +65,11 @@ namespace yocto {
 			}
 			++count_;
 			return true;
+#endif
 		}
-	
+        
+        
+        
 		template <>
 		void tokenizer<yCH>::split( sequence< basic::string<yCH> > &seq, const basic::string<yCH> &input, bool (*is_separator)( yCH ) throw())
 		{
@@ -78,7 +83,7 @@ namespace yocto {
 		}
 		
 		
-
+        
 		
 	}
 	

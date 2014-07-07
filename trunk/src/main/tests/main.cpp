@@ -130,6 +130,9 @@ YOCTO_UNIT_TEST_INIT(128)
     YOCTO_UNIT_TEST_DECL(tab);
     YOCTO_UNIT_TEST_DECL(mpi_split);
     YOCTO_UNIT_TEST_DECL(ipower);
+    
+    YOCTO_UNIT_TEST_DECL(tokenizer);
+    
 }
 YOCTO_UNIT_TEST_EXEC()
 
