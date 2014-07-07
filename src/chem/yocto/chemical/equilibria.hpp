@@ -76,7 +76,6 @@ namespace yocto
             //! update only Phi
             void updatePhi(const array<double> &C) throw();
             
-            
             //! objective function : 1/2 Gamma^2
             double getF() const throw();
             
@@ -85,7 +84,9 @@ namespace yocto
             
             //! compute min/max extent
             /**
-             \return the number of active reaction.
+             check min/max extent, set the *_min and *_max arrays
+             and declare online reactions.
+             \return the number of ONLINE reactions.
              */
             size_t  limits_of(const array<double> &C) throw();
             
