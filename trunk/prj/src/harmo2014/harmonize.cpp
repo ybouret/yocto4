@@ -7,6 +7,8 @@
 #include "yocto/ios/icstream.hpp"
 #include "yocto/ios/ocstream.hpp"
 
+#include "yocto/string/tokenizer.hpp"
+
 using namespace yocto;
 
 
@@ -14,13 +16,13 @@ class Student
 {
 public:
     const string name;
-    string       whom;
+    int          whom;
     const int    indx;
     double       grade;
     
-    inline Student( const string &id ) :
+    inline Student( const string &id, int by) :
     name(id),
-    whom(),
+    whom(by),
     indx(++Counter),
     grade(0)
     {
@@ -44,6 +46,11 @@ private:
 
 int Student::Counter = 0;
 
+
+static inline bool is_sep(char C) throw()
+{
+    return C == ';';
+}
 
 int main(int argc, char *argv[] )
 {
@@ -71,13 +78,15 @@ int main(int argc, char *argv[] )
         vector<Student> students;
         
         {
+            vector<string> words(4,as_capacity);
             ios::icstream fp(names);
             string line;
             while( fp.gets(line) )
             {
                 std::cerr << '<' << line << '>' << std::endl;
-                const Student tmp(line);
-                students.push_back(tmp);
+                words.free();
+                tokenizer::split(words, line, is_sep);
+                std::cerr << "#words=" << words.size() << std::endl;
             }
         }
         std::cerr << "Got " << students.size() << " students..." << std::endl;
