@@ -25,8 +25,9 @@ namespace yocto
             
             Ctmp.release();
             dC.release();
-            
             active.release();
+            
+            online.release();
             xi_max.release();
             has_max.release();
             xi_min.release();
@@ -74,7 +75,7 @@ namespace yocto
                     xi_min.make(N,0.0);
                     has_max.make(N,false);
                     xi_max.make(N,0.0);
-                    active.make(N,false);
+                    online.make(N,false);
                     
                     //__________________________________________________________
                     //
@@ -104,8 +105,10 @@ namespace yocto
                         throw exception("equilibria: invalid rank");
                     
                 }
+                active.make(M,false);
                 dC.make(M,0.0);
                 Ctmp.make(M,0.0);
+                find_active_species();
             }
             catch(...)
             {
@@ -202,6 +205,24 @@ namespace yocto
             }
             return 0.5 * ans;
         }
+        
+        void  equilibria:: find_active_species() throw()
+        {
+            for(size_t j=M;j>0;--j) active[j] = false;
+            for(size_t i=N;i>0;--i)
+            {
+                const array<double> &nu = Nu[i];
+                for(size_t j=M;j>0;--j)
+                {
+                    if(int(nu[j])!=0)
+                    {
+                        active[j] = true;
+                    }
+                }
+            }
+        }
+        
+
         
     }
 }
