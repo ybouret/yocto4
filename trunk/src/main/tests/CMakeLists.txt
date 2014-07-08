@@ -93,6 +93,8 @@ ADD_TEST(Comb        test-main comb)
 ADD_TEST(Dispatch    test-main dispatch)
 ADD_TEST(MPI_Split   test-main mpi_split)
 ADD_TEST(Ipower      test-main ipower)
+ADD_TEST(Tuple       test-main tuple)
+
 
 
 

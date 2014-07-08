@@ -34,9 +34,50 @@ We also naturally have the topology matrix $\mymat{\nu}$.
 \section{Acceptable Extent}
 If an extent is to be applied to a set of concentrations, we must have
 a final positive concentration of \textbf{active} species (namely implied in one or more reactions).
-
-\section{Acceptable Compositions}
-Normally, each concentration must be positive. If not, then this should be corrected.
+We use the function
+$$
+	E(C) = 
+	\left\lbrace
+	\begin{array}{rcl}
+	-\frac{1}{2} C^2 & \text{if} & C < 0\\
+	0 & \text{if} & C \geq 0\\
+	\end{array}
+	\right.
+$$
+and the objective function
+$$
+	\mathcal{E}(\vec{C}) = \sum_{j\in\text{active species}} E(C_j).
+$$
+Starting from a possibly invalid concentration $\vec{C}_k$, 
+we want to minimise (even set to zero) $\mathcal{E}$ by using a chemical transformation $\vec{\xi}_k$, so 
+that $\vec{\xi}_k$ minimises 
+$$
+	\mathcal{E}(\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}).
+$$
+The gradient of this function is
+$$
+	\mygrad_{\vec{\xi}} \mathcal{E} = \mymat{\nu} \cdot
+	\begin{bmatrix}
+	-C_1 \cdot \mathbbm{1}_{C_1<0} \\
+	\vdots\\
+	-C_M \cdot \mathbbm{1}_{C_M<0}\\
+	\end{bmatrix}.
+$$
+The structure of $\mymat{\nu}$ allows the writing of the right vector without taking care of active/inactive species.
+A simple steepest descent algorithm shall find $u$ such that
+$$
+	\vec{C}_{k+1} = \vec{C}_k - u \mytrn{\mymat{\nu}} \mymat{\nu} \begin{bmatrix}
+	-C_1 \cdot \mathbbm{1}_{C_1<0} \\
+	\vdots\\
+	-C_M \cdot \mathbbm{1}_{C_M<0}\\
+	\end{bmatrix} =
+	\vec{C}_k + u \mytrn{\mymat{\nu}} \mymat{\nu} \begin{bmatrix}
+	C_1 \cdot \mathbbm{1}_{C_1<0} \\
+	\vdots\\
+	C_M \cdot \mathbbm{1}_{C_M<0}\\
+	\end{bmatrix}
+	.
+$$
 
 \section{Finding some equilibria}
 

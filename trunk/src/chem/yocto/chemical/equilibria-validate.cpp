@@ -11,188 +11,166 @@ namespace yocto
         
         typedef math::algebra<double> mkl;
         
+        //______________________________________________________________________
+        //
+        // eqs. info
+        //______________________________________________________________________
+
+        equilibria:: eqinfo:: eqinfo() throw() :
+        hasMin(false),
+        xi_min(0.0),
+        hasMax(false),
+        xi_max(0.0)
+        {
+        }
+        
+        equilibria:: eqinfo :: ~eqinfo() throw()
+        {}
         
         
-        size_t  equilibria:: limits_of(const array<double> &C) throw()
+        equilibria:: eqinfo:: eqinfo( const eqinfo &other ) throw() :
+        hasMin( other.hasMin ),
+        xi_min( other.xi_min ),
+        hasMax( other.hasMax ),
+        xi_max( other.xi_max )
+        {
+            
+        }
+        
+        //______________________________________________________________________
+        //
+        // limits
+        //______________________________________________________________________
+
+        void equilibria:: find_limits_of(const array<double> &C) throw()
         {
             assert(C.size()>=M);
-            
-            size_t count = 0;
             for(size_t i=N;i>0;--i)
             {
-                const array<double> &nu = Nu[i];
-                double the_min = 0;
-                double the_max = 0;
-                bool   got_min = false;
-                bool   got_max = false;
-                online[i]      = true;
+                eqinfo              &info = limits[i];
+                const array<double> &nu   = Nu[i];
+                info.hasMin = info.hasMax = false;
+                info.xi_min = info.xi_max = 0;
                 
                 for(size_t j=M;j>0;--j)
                 {
-                    const int    nu_j = int(nu[j]);
-                    const double C_j  = C[j];
-                    
-                    //__________________________________________________________
-                    //
-                    // we must have C_j + nu *xi >= 0
-                    //__________________________________________________________
-                    
-                    
-                    if(nu_j>0)
+                    const int    coef = int(nu[j]);
+                    const double Cj   = C[j];
+                    if(coef>0)
                     {
-                        const double value = -C_j/nu_j;
-                        if(got_min)
+                        if(info.hasMin)
                         {
-                            the_min = max_of<double>(value,the_min);
+                            info.xi_min = max_of<double>(info.xi_min,-Cj/coef);
                         }
                         else
                         {
-                            got_min = true;
-                            the_min = value;
+                            info.hasMin = true;
+                            info.xi_min = -Cj/coef;
                         }
                         continue;
                     }
                     
-                    if(nu_j<0)
+                    if(coef<0)
                     {
-                        const double value = C_j/(-nu_j);
-                        if(got_max)
+                        if(info.hasMax)
                         {
-                            the_max = min_of<double>(value,the_max);
+                            info.xi_max = min_of<double>(info.xi_max,Cj/(-coef));
                         }
                         else
                         {
-                            got_max = true;
-                            the_max = value;
+                            info.hasMax = true;
+                            info.xi_max = Cj/(-coef);
                         }
                         continue;
                     }
                     
-                    assert(0==nu_j);
+                    assert(!coef);
                 }
-                
-                ++count;
-                if(got_max&&got_min)
-                {
-                    // special case: block the reaction
-                    if(the_max<=the_min)
-                    {
-                        the_max = the_min = 0;
-                        online[i] = false;
-                        --count;
-                    }
-                }
-                
-                has_min[i] = got_min;
-                xi_min[i]  = the_min;
-                has_max[i] = got_max;
-                xi_max[i]  = the_max;
             }
-            return count;
+            
         }
         
-        
-        void equilibria:: correct_xi() throw()
+        void  equilibria:: clip_extents() throw()
         {
-            std::cerr << "xi0=" << xi << std::endl;
+            std::cerr << "xi_init=" << xi << std::endl;
             for(size_t i=1;i<=N;++i)
             {
-                double &Xi= xi[i];
-                std::cerr << "#" << i;
-                std::cerr << " " << (online[i]? " ON: " : "OFF:");
-                if(has_min[i])
+                const eqinfo &info = limits[i];
+                double       &Xi   = xi[i];
+                std::cerr << "eq" << i << ": ";
+                if(info.hasMin)
                 {
-                    std::cerr << "\tmin=" << xi_min[i];
-                    Xi = max_of<double>(Xi,xi_min[i]);
+                    std::cerr << "\tmin=" << info.xi_min;
+                    Xi = max_of<double>(Xi,info.xi_min);
                 }
                 
-                if(has_max[i])
+                if(info.hasMax)
                 {
-                    std::cerr << "\tmax=" << xi_max[i];
-                    Xi = min_of<double>(Xi,xi_max[i]);
+                    std::cerr << "\tmax=" << info.xi_max;
                 }
                 
                 std::cerr << std::endl;
             }
-            std::cerr << "xi1=" << xi << std::endl;
-            
+            std::cerr << "xi_clip=" << xi << std::endl;
         }
+
         
-        bool equilibria:: must_correct( const array<double> &C ) const throw()
+        static inline
+        size_t count_bad( const array<bool> &active, const array<double> &C, size_t M ) throw()
         {
-            assert(C.size()>=M);
-            
-            for(size_t i=M;i>0;--i)
+            size_t nbad = 0;
+            for(size_t j=M;j>0;--j)
             {
-                if( active[i] && (C[i]<0) )
+                if( active[j] && (C[j]<0) )
                 {
-                    assert(N>0);
-                    return true;
+                    ++nbad;
                 }
             }
-            return false;
+            return nbad;
         }
         
-        
-        void equilibria:: validate( array<double> &C )
+        bool  equilibria:: validate( array<double> &C ) throw()
         {
+            
             assert(C.size()>=M);
             
-            if(!must_correct(C))
-                return;
+            find_limits_of(C);
             
-            if(N>0)
+            size_t nbad = count_bad(active, C, M);
+            while(nbad>0)
             {
+                std::cerr << "#bad=" << nbad << std::endl;
                 //______________________________________________________________
                 //
-                // find out the limits
+                // create the concentration vector
                 //______________________________________________________________
-                if(limits_of(C)<=0)
-                    throw exception("equilibria.validate(no active reaction)");
-                
-                //______________________________________________________________
-                //
-                // try not to move
-                //______________________________________________________________
-                mkl::set(xi,0);
-                
-                //______________________________________________________________
-                //
-                // find what must be done
-                //______________________________________________________________
-                correct_xi();
-                
-                //______________________________________________________________
-                //
-                // compute the corrected concentrations
-                //______________________________________________________________
-                mkl::muladd_trn(C, Nu, xi);
-                
-                //______________________________________________________________
-                //
-                // correct roundoff for active reactions
-                //______________________________________________________________
-                for(size_t i=N;i>0;--i)
+                for(size_t j=M;j>0;--j)
                 {
-                    if(online[i])
-                    {
-                        // this reaction is active
-                        const array<double> &nu = Nu[i];
-                        for(size_t j=M;j>0;--j)
-                        {
-                            if( (0!=int(nu[j])) && (C[j]<0.0) )
-                            {
-                                assert(active[j]);
-                                C[j] = 0.0;
-                            }
-                        }
-                    }
+                    const double Cj = C[j];
+                    dC[j] = (Cj < 0) ? -Cj : 0;
                 }
-                std::cerr << "Corr=" << C << std::endl;
+                
+                std::cerr << "Cbad=" << dC << std::endl;
+                //______________________________________________________________
+                //
+                // create the calibration xi
+                //______________________________________________________________
+                mkl::mul(xi,Nu,dC);
+                std::cerr << "xi_bad=" << xi << std::endl;
+                clip_extents();
+                //______________________________________________________________
+                //
+                // create the search direction
+                //______________________________________________________________
+                mkl::mul_trn(dC, Nu, xi);
+                std::cerr << "dC=" << dC << std::endl;
+                return false;
             }
             
             
+            return true;
         }
+
         
     }
 }

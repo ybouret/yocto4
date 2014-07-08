@@ -33,22 +33,27 @@ YOCTO_UNIT_TEST_IMPL(validate)
         if( !cs.insert(eq) )
             throw exception("multiple '%s'", eq->name.c_str());
     }
-
+    
     
     std::cerr << cs << std::endl;
     
     cs.startup(lib);
     
     solution S(lib);
-
+    
     S("H+")  = -0.1;
     S("HO-") = 0.05;
     S("AH")  = 0.01;
     
     std::cerr << "S0=" << S << std::endl;
-    cs.validate(S);
-    std::cerr << "S1=" << S << std::endl;
-
+    if(cs.validate(S))
+    {
+        std::cerr << "S1=" << S << std::endl;
+    }
+    else
+    {
+        std::cerr << "unable to validate!" << std::endl;
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()
