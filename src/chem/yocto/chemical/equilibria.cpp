@@ -27,12 +27,8 @@ namespace yocto
             dC.release();
             active.release();
             
-            online.release();
-            xi_max.release();
-            has_max.release();
-            xi_min.release();
-            has_min.release();
             LU.release();
+            limits.release();
             xi.release();
             W.release();
             Phi.release();
@@ -70,12 +66,10 @@ namespace yocto
                     Phi.make(N,M);
                     W.make(N,N);
                     xi.make(N,0.0);
+                    const eqinfo eq0;
+                    limits.make(N,eq0);
                     LU.make(N,0.0);
-                    has_min.make(N,false);
-                    xi_min.make(N,0.0);
-                    has_max.make(N,false);
-                    xi_max.make(N,0.0);
-                    online.make(N,false);
+                    
                     
                     //__________________________________________________________
                     //
@@ -210,7 +204,11 @@ namespace yocto
         
         void  equilibria:: find_active_species() throw()
         {
-            for(size_t j=M;j>0;--j) active[j] = false;
+            for(size_t j=M;j>0;--j)
+            {
+                active[j] = false;
+            }
+            
             for(size_t i=N;i>0;--i)
             {
                 const array<double> &nu = Nu[i];

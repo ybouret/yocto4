@@ -5,7 +5,7 @@
 
 #include "yocto/math/types.hpp"
 #include "yocto/sequence/vector.hpp"
-#include "yocto/sort/heap.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto {
 	
@@ -117,7 +117,7 @@ namespace yocto {
                     typename  SEQ::const_iterator j = seq.begin();
                     for( size_t i=1; i <= n; ++i, ++j ) data[i] = *j;
                 }
-                hsort( data );
+                quicksort( data );
                 const size_t im = n >> 1;
                 if( 0 != (im & 1) )
                     median = data[im+1];
