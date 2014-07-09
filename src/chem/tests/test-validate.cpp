@@ -44,7 +44,7 @@ YOCTO_UNIT_TEST_IMPL(validate)
     S("H+")  = -0.1;
     S("HO-") = 0.05;
     S("AH")  = 0.01;
-    
+
     std::cerr << "S0=" << S << std::endl;
     if(cs.validate(S))
     {

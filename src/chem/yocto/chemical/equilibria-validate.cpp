@@ -39,9 +39,8 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // limits
+        // find xi limits
         //______________________________________________________________________
-
         void equilibria:: find_limits_of(const array<double> &C) throw()
         {
             assert(C.size()>=M);
@@ -49,6 +48,8 @@ namespace yocto
             {
                 eqinfo              &info = limits[i];
                 const array<double> &nu   = Nu[i];
+                
+                //-- initialize info
                 info.hasMin = info.hasMax = false;
                 info.xi_min = info.xi_max = 0;
                 
