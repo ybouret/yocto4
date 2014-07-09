@@ -4,14 +4,12 @@
 #include "yocto/type/traits.hpp"
 #include <iostream>
 
-#define YOCTO_PAIR(CLASS,T1,N1,T2,N2) \
+#define YOCTO_PAIR_DECL(CLASS,T1,N1,T2,N2) \
 class CLASS \
 { \
 public:\
 typedef typename type_traits<T1>::parameter_type PARAM1;\
 typedef typename type_traits<T2>::parameter_type PARAM2;\
-T1 N1;\
-T2 N2;\
 inline CLASS( PARAM1 P1, PARAM2 P2) :\
 N1(P1),N2(P2) {} \
 inline CLASS(const CLASS &other) : \
@@ -23,20 +21,19 @@ std::ostream & operator<<( std::ostream &os, const CLASS &self )\
 os << '(' << self.N1 << ',' << self.N2 << ')';\
 return os;\
 }\
-YOCTO_DISABLE_ASSIGN(CLASS);\
-}
+T1 N1;\
+T2 N2
+
+#define YOCTO_PAIR_END() }
 
 
-#define YOCTO_TRIPLE(CLASS,T1,N1,T2,N2,T3,N3) \
+#define YOCTO_TRIPLE_DECL(CLASS,T1,N1,T2,N2,T3,N3) \
 class CLASS \
 { \
 public:\
 typedef typename type_traits<T1>::parameter_type PARAM1;\
 typedef typename type_traits<T2>::parameter_type PARAM2;\
 typedef typename type_traits<T3>::parameter_type PARAM3;\
-T1 N1;\
-T2 N2;\
-T3 N3; \
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3) :\
 N1(P1),N2(P2),N3(P3) {} \
 inline CLASS(const CLASS &other) : \
@@ -48,8 +45,11 @@ std::ostream & operator<<( std::ostream &os, const CLASS &self )\
 os << '(' << self.N1 << ',' << self.N2 << ',' << self.N3 << ')';\
 return os;\
 }\
-YOCTO_DISABLE_ASSIGN(CLASS);\
-}
+T1 N1;\
+T2 N2;\
+T3 N3
+
+#define YOCTO_TRIPLE_END() }
 
 
 #endif

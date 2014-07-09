@@ -3,9 +3,16 @@
 
 using namespace yocto;
 
-YOCTO_PAIR(Coord,int,x,double,y);
+YOCTO_PAIR_DECL(Coord,int,x,double,y);
 
-YOCTO_TRIPLE(Coord3,int,x,const double,y,long,z);
+YOCTO_DISABLE_ASSIGN(Coord);
+YOCTO_PAIR_END();
+
+YOCTO_TRIPLE_DECL(Coord3,int,x,const double,y,long,z);
+
+YOCTO_DISABLE_ASSIGN(Coord3);
+YOCTO_TRIPLE_END();
+
 
 
 YOCTO_UNIT_TEST_IMPL(tuple)
