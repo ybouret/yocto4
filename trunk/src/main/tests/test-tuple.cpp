@@ -13,6 +13,14 @@ YOCTO_TRIPLE_DECL(Coord3,int,x,const double,y,long,z);
 YOCTO_DISABLE_ASSIGN(Coord3);
 YOCTO_TRIPLE_END();
 
+YOCTO_QUAD_DECL(Qat,int,x,const double,y,long,z,float,w);
+
+inline Qat() throw() : x(0), y(0), z(0), w(0) {}
+
+YOCTO_DISABLE_ASSIGN(Qat);
+YOCTO_QUAD_END();
+
+
 
 
 YOCTO_UNIT_TEST_IMPL(tuple)
@@ -30,5 +38,7 @@ YOCTO_UNIT_TEST_IMPL(tuple)
     std::cerr << "X1=" << X1 << std::endl;
     std::cerr << "X2=" << X2 << std::endl;
 
+    Qat Q1;
+    Qat Q2(Q1);
 }
 YOCTO_UNIT_TEST_DONE()
