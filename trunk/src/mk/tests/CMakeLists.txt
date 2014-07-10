@@ -44,5 +44,6 @@ ADD_TEST(LSF_Poly  test-mk lsf_poly)
 ADD_TEST(LSF_Gauss test-mk lsf_gauss)
 ADD_TEST(LSF_Poly2 test-mk lsf_poly2)
 ADD_TEST(Pade      test-mk pade 3 2)
+ADD_TEST(Det       test-mk det )
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )

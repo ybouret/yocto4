@@ -15,6 +15,7 @@ namespace yocto
         typedef vector<double>          vector_t;
         typedef math::crout<double>     lu_t;
         
+        
         class equilibria : public equilibrium::database
         {
         public:
@@ -22,21 +23,21 @@ namespace yocto
             explicit equilibria();
             virtual ~equilibria() throw();
             
-            class eqinfo
-            {
-            public:
-                eqinfo() throw();
-                ~eqinfo() throw();
-                eqinfo(const eqinfo &) throw();
-                bool   hasMin;
-                double xi_min;
-                bool   hasMax;
-                double xi_max;
-                
-                
-            private:
-                YOCTO_DISABLE_ASSIGN(eqinfo);
-            };
+            YOCTO_PENTUPLE_DECL(extent,
+                                bool,  has_forward_limit,
+                                double,max_forward_value,
+                                bool,  has_reverse_limit,
+                                double,max_reverse_value,
+                                bool,  blocked);
+            inline extent() throw() :
+            has_forward_limit(false),
+            max_forward_value(0.0),
+            has_reverse_limit(false),
+            max_reverse_value(0.0),
+            blocked(false){}
+            YOCTO_DISABLE_ASSIGN(extent);
+            YOCTO_TUPLE_END();
+            
             
             //__________________________________________________________________
             //
@@ -46,15 +47,15 @@ namespace yocto
             const size_t N; //!< #reactions
             
             matrix_t       Nu;          //!< [NxM], may be reduced in case of fixed species
-            matrix_t       Nu0;         //!< [NxM], full topology
+            matrix_t       Nu0;         //!< [NxM], full initial topology
             vector_t       K;           //!< [N] constants at time t,
             vector_t       Gamma;       //!< [N] constraints
             matrix_t       Phi;         //!< [NxM] dGamma/dX,
             matrix_t       W;           //!< [NxN] Phi*Nu'
             vector_t       xi;          //!< [N] extent
-            vector<eqinfo> limits;      //!< [N] infos
+            vector<extent> limits;      //!< [N] infos
             lu_t           LU;          //!< [N] solver
-            vector<bool>   active;      //!< [M] if species is in one of the reaction
+            vector<size_t> active;      //!< [M] number or reaction involving each species
             vector_t       dC;          //!< M concentrations increase (Newton's Step)
             vector_t       Ctmp;        //!< M temp concentrations
             
@@ -66,7 +67,7 @@ namespace yocto
             void  find_active_species() throw(); //!< fill active from Nu
             void  cleanup() throw();
             
-            bool  validate( array<double> &C ) throw();
+            bool  validate( array<double> &C );
             
             
             void output( std::ostream & ) const;
@@ -106,7 +107,6 @@ namespace yocto
             
             
         private:
-            bool must_correct( const array<double> &C ) const throw();
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };
