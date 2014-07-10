@@ -67,6 +67,9 @@ YOCTO_UNIT_TEST_INIT(64)
 
     YOCTO_UNIT_TEST_DECL(sparse);
     YOCTO_UNIT_TEST_DECL(spcj);
+    
+    YOCTO_UNIT_TEST_DECL(det);
+    
 }
 YOCTO_UNIT_TEST_EXEC()
 

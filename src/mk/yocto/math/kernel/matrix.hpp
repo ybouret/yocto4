@@ -106,6 +106,8 @@ namespace yocto
                 T       & operator()(size_t i) throw();       //!< in [0:size-1]
                 const T & operator()(size_t i) const throw(); //!< in [0:size-1]
                 
+                void minor_of( const matrix &M, size_t I, size_t J) throw();
+                
 			private:
 				row          *row_;    //!< stride proxy
 				
