@@ -14,6 +14,7 @@ YOCTO_UNIT_TEST_IMPL(validate)
     lib.add("HO-", -1);
     lib.add("AH",   0);
     lib.add("A-",  -1);
+    lib.add("Na+", 1);
     
     equilibria cs;
     
@@ -43,8 +44,9 @@ YOCTO_UNIT_TEST_IMPL(validate)
     
     S("H+")  = -0.1;
     S("HO-") = 0.05;
-    S("AH")  = 0.01;
-
+    S("AH")  = 0.02;
+    //S("A-")  = -0.001;
+    
     std::cerr << "S0=" << S << std::endl;
     if(cs.validate(S))
     {

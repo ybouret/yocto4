@@ -66,8 +66,8 @@ namespace yocto
                     Phi.make(N,M);
                     W.make(N,N);
                     xi.make(N,0.0);
-                    const eqinfo eq0;
-                    limits.make(N,eq0);
+                    const extent ex0;
+                    limits.make(N,ex0);
                     LU.make(N,0.0);
                     
                     
@@ -206,7 +206,7 @@ namespace yocto
         {
             for(size_t j=M;j>0;--j)
             {
-                active[j] = false;
+                active[j] = 0;
             }
             
             for(size_t i=N;i>0;--i)
@@ -216,10 +216,11 @@ namespace yocto
                 {
                     if(int(nu[j])!=0)
                     {
-                        active[j] = true;
+                        ++active[j];
                     }
                 }
             }
+            std::cerr << "active=" << active << std::endl;
         }
         
 

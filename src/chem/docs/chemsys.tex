@@ -32,53 +32,39 @@ or
 We also naturally have the topology matrix $\mymat{\nu}$.
 
 \section{Acceptable Extent}
-If an extent is to be applied to a set of concentrations, we must have
-a final positive concentration of \textbf{active} species (namely implied in one or more reactions).
-We use the function
-$$
-	E(C) = 
-	\left\lbrace
-	\begin{array}{rcl}
-	-\frac{1}{2} C^2 & \text{if} & C < 0\\
-	0 & \text{if} & C \geq 0\\
-	\end{array}
-	\right.
-$$
-and the objective function
-$$
-	\mathcal{E}(\vec{C}) = \sum_{j\in\text{active species}} E(C_j).
-$$
-Starting from a possibly invalid concentration $\vec{C}_k$, 
-we want to minimise (even set to zero) $\mathcal{E}$ by using a chemical transformation $\vec{\xi}_k$, so 
-that $\vec{\xi}_k$ minimises 
-$$
-	\mathcal{E}(\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}).
-$$
-The gradient of this function is
-$$
-	\mygrad_{\vec{\xi}} \mathcal{E} = \mymat{\nu} \cdot
-	\begin{bmatrix}
-	-C_1 \cdot \mathbbm{1}_{C_1<0} \\
-	\vdots\\
-	-C_M \cdot \mathbbm{1}_{C_M<0}\\
-	\end{bmatrix}.
-$$
-The structure of $\mymat{\nu}$ allows the writing of the right vector without taking care of active/inactive species.
-A simple steepest descent algorithm shall find $u$ such that
-$$
-	\vec{C}_{k+1} = \vec{C}_k - u \mytrn{\mymat{\nu}} \mymat{\nu} \begin{bmatrix}
-	-C_1 \cdot \mathbbm{1}_{C_1<0} \\
-	\vdots\\
-	-C_M \cdot \mathbbm{1}_{C_M<0}\\
-	\end{bmatrix} =
-	\vec{C}_k + u \mytrn{\mymat{\nu}} \mymat{\nu} \begin{bmatrix}
-	C_1 \cdot \mathbbm{1}_{C_1<0} \\
-	\vdots\\
-	C_M \cdot \mathbbm{1}_{C_M<0}\\
-	\end{bmatrix}
-	.
-$$
+Each reaction, depending on the initial concentrations, may have a maximum extent in the forward and/or the reverse way.
+A negative or zero concentration blocks one way. The equilibrium is blocked when both ways are blocks.
+In any case, each equilibrium imposes a range of valid extent.
 
+\section{Validation a set of concentration}
+A trial concentration vector $\vec{C}_k$ may be invalid: an \textbf{active} species (namely a species involved in an equilibria)
+may be negative. In that case, we must look for the minimal extent that brings back the concentrations to a valid set, if that
+is possible.
+Hence, we build the \textit{target concentration vector}
+$$
+	\vec{C}'_k
+$$
+with a zero value for the corresponding valid concentrations, and  the negative otherwise
+This defines a set of $N$ constraints
+$$
+	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}_k.
+$$
+We introduce the vector of $N$ Lagrange multipliers $\vec{\lambda}_k$ to minimise
+$$
+	\dfrac{1}{2} \vec{\xi}^2 - \vec{\lambda}_k \cdot \left( \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}\right)
+$$
+leading to a guess value of
+$$
+	\vec{\xi}'_k = \mymat{\nu}\vec{\lambda}_k
+$$
+defining
+$$
+	\vec{\lambda}_k = - \left(\mymat{\nu}\mytrn{\mymat{\nu}}\right)^{-1} \vec{C}'_k
+$$
+and
+$$
+	\vec{\xi}'_k = - \mymat{\nu} \left(\mymat{\nu}\mytrn{\mymat{\nu}}\right)^{-1} \vec{C}'_k
+$$
 \section{Finding some equilibria}
 
 Let us assume that we start from a valid but out-of-equilibrium state $\vec{C}$.
