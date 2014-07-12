@@ -15,6 +15,9 @@
 #include "yocto/math/fcn/intg.hpp"
 #include "yocto/math/dat/linear.hpp"
 #include "yocto/math/fcn/zfind.hpp"
+#include "yocto/associative/map.hpp"
+
+#include "yocto/code/utils.hpp"
 
 using namespace yocto;
 
@@ -27,13 +30,15 @@ public:
     const int    indx;
     double       grade;
     double       score;
+    double       final;
     
     inline Student( const string &id, size_t by, double result) :
     name(id),
     whom(by),
     indx(++Counter),
     grade(result),
-    score(0)
+    score(0),
+    final(0)
     {
     }
     
@@ -44,7 +49,8 @@ public:
     whom( other.whom ),
     indx( other.indx ),
     grade( other.grade ),
-    score( other.score )
+    score( other.score ),
+    final(0)
     {
     }
     
@@ -112,7 +118,7 @@ public:
     
     double get_final( double y )
     {
-        return ceil( solve_final(y) * 2)/2;
+        return ceil( solve_final(y) * 4)/4;
     }
     
     
@@ -145,7 +151,68 @@ private:
     
 };
 
+typedef vector<string> strings;
 
+#if 0
+
+void load_db( lua_State *L, strings &names )
+{
+    std::cerr << "-- Loading special grades" << std::endl;
+    
+    names.free();
+    
+    lua_getglobal(L, "db");
+    if( !lua_istable(L, -1) )
+        throw exception(" 'db' is not a TABLE");
+    
+    const int n = lua_rawlen(L, -1);
+    for( int i=1; i<=n; ++i )
+    {
+        lua_rawgeti(L, -1, i);
+        if( !lua_isstring(L, -1) )
+        {
+            throw exception("name #%d is not a STRING",i);
+        }
+        const string id = lua_tostring(L, -1);
+        names.push_back(id);
+        lua_pop(L,1);
+    }
+    
+    quicksort(names);
+    std::cerr << "-- Grades for: " << names << std::endl;
+    
+}
+#endif
+
+
+void check_db( const vector<Student> &students, const strings &names )
+{
+    for(size_t i=1;i<=names.size();++i)
+    {
+        const string &id    = names[i];
+        bool          found = false;
+        for(size_t j=1;j<=students.size();++j)
+        {
+            if( students[j].name == id )
+            {
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+            throw exception("no '%s' in students", id.c_str());
+    }
+}
+
+bool is_special( const Student &s, const strings &names )
+{
+    for(size_t i=1;i<=names.size();++i)
+    {
+        if( s.name == names[i] )
+            return true;
+    }
+    return false;
+}
 
 int main(int argc, char *argv[] )
 {
@@ -221,12 +288,35 @@ int main(int argc, char *argv[] )
         std::cerr << "Got " << students.size() << " students..." << std::endl;
         std::cerr << "Got " << whom_max << " examiners..." << std::endl;
         
+        
+        
+        //______________________________________________________________________
+        //
+        // Prepare the final distribution
+        //______________________________________________________________________
+        GradeDist G(L,"pdf");
+        {
+            ios::ocstream fp("g.dat",false);
+            for(size_t i=0;i<=100;++i)
+            {
+                const double X = G.vMin + (i*(G.vMax-G.vMin))/100;
+                fp("%g %g %g\n", X, G.compute_pdf(X), G.compute_cdf(X));
+            }
+        }
+        
+        
         //______________________________________________________________________
         //
         // compute scores
         //______________________________________________________________________
         const size_t   N = students.size();
         vector<double> scores(N,as_capacity);
+        
+        strings db;
+        //load_db(L, db);
+        
+        
+        const double vTop = Lua::Config::Get<lua_Number>(L,"vTop");
         
         for(size_t w=1;w<=whom_max;++w)
         {
@@ -237,6 +327,10 @@ int main(int argc, char *argv[] )
                 if(s.whom==w)
                 {
                     grades.push_back(s.grade);
+                    if(s.grade>=vTop)
+                    {
+                        db.push_back(s.name);
+                    }
                 }
             }
             const size_t M = grades.size();
@@ -261,13 +355,20 @@ int main(int argc, char *argv[] )
                 Student &s = students[i];
                 if(s.whom==w)
                 {
-                    s.score = (s.grade-median)/absdev;
-                    scores.push_back(s.score);
+                    if(s.grade<vTop)
+                    {
+                        s.score = (s.grade-median)/absdev;
+                        scores.push_back(s.score);
+                    }
                 }
             }
         }
+        quicksort(db);
+        check_db(students,db);
         
-        const size_t P = scores.size();
+        
+        
+        const size_t P = scores.size() + db.size();
         std::cerr << "#Present=" << P << std::endl;
         
         quicksort(scores);
@@ -321,30 +422,57 @@ int main(int argc, char *argv[] )
         //
         // inverse the population
         //______________________________________________________________________
-
-        GradeDist G(L,"pdf");
-        {
-            ios::ocstream fp("g.dat",false);
-            for(size_t i=0;i<=100;++i)
-            {
-                const double X = G.vMin + (i*(G.vMax-G.vMin))/100;
-                fp("%g %g %g\n", X, G.compute_pdf(X), G.compute_cdf(X));
-            }
-        }
+        
+        
         
         
         vector<double> finals(N,as_capacity);
+        
+        vector<double> up_max(whom_max,0);
+        vector<double> lo_max(whom_max,0);
+        vector<Student*> up_max_id(whom_max,0);
+        vector<Student*> lo_max_id(whom_max,0);
         
         for(size_t i=1;i<=N;++i)
         {
             Student &s = students[i];
             if(s.whom<=0)
                 continue;
-            const double value = math::linear(s.score, scr, cdf);
-            std::cerr << s.name << ": score=" << s.score << " => cdf=" << value << std::endl;
-            const double final = G.get_final(value);
-            std::cerr << "\tfinal= " << final << std::endl;
-            finals.push_back(final);;
+            std::cerr << s.name << ": score=" << s.score;
+            if( is_special(s, db) )
+            {
+                const double final = s.grade;
+                std::cerr << "\tfinal= " << final << " \tSPECIAL";
+                finals.push_back(final);
+                s.final = s.grade;
+            }
+            else
+            {
+                const double value = math::linear(s.score, scr, cdf);
+                const double final = G.get_final(value);
+                std::cerr << "\tfinal= " << final << " <= " << s.grade;
+                finals.push_back(final);
+                s.final = final;
+                const double delta = final - s.grade;
+                if(delta>=0)
+                {
+                    if(delta>=up_max[s.whom])
+                    {
+                        up_max[s.whom]    = delta;
+                        up_max_id[s.whom] = &s;
+                    }
+                }
+                else
+                {
+                    if(delta<=lo_max[s.whom])
+                    {
+                        lo_max[s.whom]    = delta;
+                        lo_max_id[s.whom] = &s;
+                    }
+                }
+                
+            }
+            std::cerr << std::endl;
         }
         
         if(finals.size()>1)
@@ -355,6 +483,23 @@ int main(int argc, char *argv[] )
             std::cerr << "Final Average=" << final_ave << std::endl;
             std::cerr << "Final Std_Dev=" << final_sig << std::endl;
         }
+        
+        for(size_t i=1;i<=whom_max;++i)
+        {
+            std::cerr << "Examiner #" << i << std::endl;
+            const Student *s = up_max_id[i];
+            if(s)
+            {
+                std::cerr << "\tUpMax: " << s->grade << " => " << s->final << " is " << s->name << " (+" << up_max[i] << ")" << std::endl;
+            }
+            s= lo_max_id[i];
+            if(s)
+            {
+                std::cerr << "\tLoMax: " << s->grade << " => " << s->final << " is " << s->name << " (" << lo_max[i] << ")" << std::endl;
+            }
+        }
+        
+        
         
         vector<double> H(20,0);
         vector<double> bins(20,0);
