@@ -4,6 +4,9 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 
+#include "yocto/math/kernel/svd.hpp"
+#include "yocto/sort/index.hpp"
+
 namespace yocto
 {
     namespace chemical
@@ -126,118 +129,66 @@ namespace yocto
         }
         
         
-        
+        static int compare_abs(const double lhs, const double rhs) throw()
+        {
+            const double L = fabs(lhs);
+            const double R = fabs(rhs);
+            return ((L<R) ? -1 : ( (R<L) ? 1 : 0));
+        }
         
         bool  equilibria:: validate( array<double> &C )
         {
             
             assert(C.size()>=M);
             
-            vector<size_t> bad(M,as_capacity);
-            vector<size_t> rxn(N,as_capacity);
+            find_limits_of(C);
             
-            for(size_t count=1;count<=2;++count)
+            matrix_t U(M,M);
+            mkl::mul_ltrn(U, Nu, Nu);
+            matrix_t V(M,M);
+            vector_t w(M,0);
+            vector<size_t> iw(M,0);
+            vector_t lam(M,0);
+            
+            std::cerr << "G=" << U << std::endl;
+
+            if( ! math::svd<double>::build(U, w, V) )
             {
-               
-                //______________________________________________________________
-                //
-                // find bad concentrations
-                //______________________________________________________________
-                bad.free();
+                std::cerr << "cannot SVD flow" << std::endl;
+                return false;
+            }
+            make_index(w, iw, compare_abs);
+            std::cerr << "U=" << U << std::endl;
+            std::cerr << "V=" << V << std::endl;
+            std::cerr << "w=" << w << std::endl;
+            std::cerr << "iw=" << iw << std::endl;
+            for(size_t i=1;i<=(M-N);++i) w[iw[i]] = 0;
+            std::cerr << "w=" << w << std::endl;
+            {
+                size_t nbad = 0;
                 for(size_t j=1;j<=M;++j)
                 {
-                    if(active[j]>0 && (C[j]<0))
-                        bad.push_back(j);
+                    dC[j] = 0;
+                    if( active[j] && (C[j]<0) )
+                    {
+                        ++nbad;
+                        dC[j] = -C[j];
+                    }
                 }
-                std::cerr << "bad=" << bad << std::endl;
                 
-                const size_t B = bad.size();
-                if(B<=0)
+                if(nbad<=0)
                     return true;
                 
-                //______________________________________________________________
-                //
-                // find extent limits
-                //______________________________________________________________
-                find_limits_of(C);
-                
-                //______________________________________________________________
-                //
-                // find not blocked reactions
-                //______________________________________________________________
-                rxn.free();
-                for(size_t i=1;i<=N;++i)
-                {
-                    if( ! limits[i].blocked )
-                    {
-                        rxn.push_back(i);
-                    }
-                }
-                std::cerr << "rxn=" << rxn << std::endl;
-                const size_t R = rxn.size();
-                if(R<=0)
-                {
-                    return false;
-                }
-                
-                
-                // find variation according to Nu'
-                assert(N>0);
-                matrix_t     mu(B,R);
-                for(size_t k=1;k<=B;++k)
-                {
-                    const size_t i = bad[k];
-                    for(size_t j=1;j<=R;++j)
-                    {
-                        mu[k][j] = Nu[rxn[j]][i];
-                    }
-                }
-                std::cerr << "mu=" << mu << std::endl;
-                matrix_t mu2(B,B);
-                mkl::mul_rtrn(mu2, mu, mu);
-                std::cerr << "mu2=" << mu2 << std::endl;
-                lu_t     solver(B);
-                if(!solver.build(mu2))
-                {
-                    std::cerr << "-- validate: invalid subsystem" << std::endl;
-                    return 0;
-                }
-                vector_t lam(B,0.0);
-                for(size_t k=1;k<=B;++k)
-                {
-                    lam[k] = -C[ bad[k] ];
-                }
-                lu_t::solve(mu2, lam);
+                std::cerr << "dC=" << dC << std::endl;
+                math::svd<double>::solve(U, w, V, dC, lam);
                 std::cerr << "lam=" << lam << std::endl;
-                vector_t     Xi(R,0.0);
-                mkl::mul_trn(Xi, mu, lam);
-                std::cerr << "Xi=" << Xi << std::endl;
-                mkl::set(xi,0);
-                for(size_t k=1;k<=R;++k)
-                {
-                    xi[rxn[k]] = Xi[k];
-                }
+                mkl::mul(xi, Nu, lam);
                 std::cerr << "xi=" << xi << std::endl;
                 clip_extents();
                 mkl::mul_trn(dC, Nu, xi);
                 std::cerr << "dC=" << dC << std::endl;
-                
-                // carefull addition
-                for(size_t j=M;j>0;--j)
-                {
-                    double &Cj = C[j];
-                    if(Cj>=0)
-                    {
-                        Cj = max_of<double>(0.0,Cj + dC[j]);
-                    }
-                    else
-                    {
-                        Cj += dC[j];
-                    }
-                }
-                std::cerr << "Cnew=" << C << std::endl;
-                
             }
+            
             
             return true;
         }
