@@ -122,9 +122,9 @@ namespace yocto
             
         }
         
-        void  equilibria:: clip_extents() throw()
+        void  equilibria:: clip_extents(const double scaling) throw()
         {
-            std::cerr << "xi_init=" << xi << std::endl;
+            std::cerr << "xi_init=" << xi << "/" << scaling << ";" << std::endl;
             for(size_t i=1;i<=N;++i)
             {
                 const extent &ex = limits[i];
@@ -134,9 +134,10 @@ namespace yocto
                 if(ex.has_forward_limit)
                 {
                     std::cerr << "\tmax_fwd=" << ex.max_forward_value;
-                    if(Xi>0 && Xi>ex.max_forward_value)
+                    const double top = ex.max_forward_value*scaling;
+                    if(Xi>0 && Xi>top)
                     {
-                        Xi=ex.max_forward_value;
+                        Xi=top;
                     }
                 }
                 
@@ -144,9 +145,10 @@ namespace yocto
                 if(ex.has_reverse_limit)
                 {
                     std::cerr << "\tmax_rev=" << ex.max_reverse_value;
-                    if(Xi<0 && (-Xi)>ex.max_reverse_value)
+                    const double top = ex.max_reverse_value*scaling;
+                    if(Xi<0 && (-Xi)>top)
                     {
-                        Xi = -ex.max_reverse_value;
+                        Xi = -top;
                     }
                 }
                 
@@ -156,7 +158,7 @@ namespace yocto
                 }
                 std::cerr << std::endl;
             }
-            std::cerr << "xi_clip=" << xi << std::endl;
+            std::cerr << "xi_clip=" << xi << "/" << scaling << ";" << std::endl;
         }
         
 #if 1
@@ -185,18 +187,18 @@ namespace yocto
         static inline bool accept_coef(const int alpha, const array<double> &F)
         {
             assert(alpha>0);
-            double errmax = 0;
-            std::cerr << "\talpha=" << alpha << std::endl;
+            //std::cerr << "\talpha=" << alpha << " => errmax=" << errmax << std::endl;
             for(size_t i=F.size();i>0;--i)
             {
-                const double f    = fabs(F[i]);
-                const double g     = __rint(alpha*f);
-                const double err   = fabs(f-g/alpha);
-                std::cerr << "\t\tf=" << f << " -> g=" << g << "-> err=" << err << std::endl;
-                if(err>errmax) errmax = err;
+                const double f     = fabs(F[i]);
+                const double af    = alpha*f;
+                const double g     = __rint(af);
+                const int    r     = int(__rint(fabs(alpha * (af - g))));
+                //std::cerr << "\t\tf=" << f << " -> g=" << g << "-> r=" << r << std::endl;
+                if(r>0)
+                    return false;
             }
-            std::cerr << "errmax=" << errmax << std::endl;
-            return false;
+            return true;
         }
 #endif
         
@@ -259,13 +261,23 @@ namespace yocto
 
             quicksort(F);
             //F.reverse();
-            std::cerr << "F=" << F << std::endl;
+            std::cerr << "F=" << F << ";" << std::endl;
             
-#if 0
-            int alpha = 0;
+#if 1
+            int alpha = 1;
             while( alpha <= 40 && !accept_coef(++alpha, F) )
                 ;
-            std::cerr << "alpha=" << alpha << std::endl;
+            std::cerr << "alpha0=" << alpha << ";" << std::endl;
+            
+            //-- regularize J
+            for(size_t i=M;i>0;--i)
+            {
+                for(size_t j=M;j>0;--j)
+                {
+                    J[i][j] = __rint(alpha*J[i][j]);
+                }
+            }
+            std::cerr << "J1=" << J << std::endl;
 #endif
             
             
@@ -285,9 +297,28 @@ namespace yocto
             
             std::cerr << "dC=" << dC << std::endl;
             
+            //build lambda * alpha
             
+            vector_t lambda(M,0);
+            mkl::mul(lambda, J, dC);
+            std::cerr << "lam0=" << lambda << std::endl;
             
+            for(size_t j=M;j>0;--j)
+            {
+                //if( active[j]<=0 || (C[j]>=0) ) lambda[j] = 0;
+            }
+            std::cerr << "lam1=" << lambda << std::endl;
             
+            // build xi*alpha
+            mkl::mul(xi,Nu,lambda);
+            std::cerr << "xi0=" << xi << std::endl;
+            
+            clip_extents(alpha);
+            
+            // build dC*alpha
+            mkl::mul_trn(dC, Nu, xi);
+            
+            std::cerr << "delta=" << dC << "/" << alpha << std::endl;
             return false;
             
             
