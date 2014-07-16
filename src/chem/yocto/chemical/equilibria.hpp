@@ -13,6 +13,7 @@ namespace yocto
         typedef math::matrix<double>    matrix_t;
         typedef math::matrix<ptrdiff_t> imatrix_t;
         typedef vector<double>          vector_t;
+        typedef vector<ptrdiff_t>       ivector_t;
         typedef math::crout<double>     lu_t;
         
         
@@ -101,6 +102,9 @@ namespace yocto
             
             //! find limits of extents
             void  find_limits_of( const array<double> &C ) throw();
+            
+            //! to debug
+            void  show_limits() const;
             
             //! apply limits to current extents xi
             void  clip_extents() throw();
