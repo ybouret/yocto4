@@ -7,14 +7,29 @@ using namespace yocto;
 using namespace chemical;
 
 
+static inline
+double my_round(double x)
+{
+    return floor(x+0.5);
+}
+
 YOCTO_UNIT_TEST_IMPL(validate)
 {
     collection lib;
+    
+    bool add_extra = true;
+    
     lib.add("H+",   1);
     lib.add("HO-", -1);
     lib.add("AH",   0);
     lib.add("A-",  -1);
-    lib.add("Na+", 1);
+    //lib.add("Na+", 1);
+    
+    if(add_extra)
+    {
+        lib.add("XH2",0);
+        lib.add("X--",-2);
+    }
     
     equilibria cs;
     
@@ -33,6 +48,17 @@ YOCTO_UNIT_TEST_IMPL(validate)
         eq->add( lib["A-"], 1);
         if( !cs.insert(eq) )
             throw exception("multiple '%s'", eq->name.c_str());
+    }
+    
+    if(add_extra)
+    {
+        equilibrium::pointer eq( new const_equilibrium("acid2",pow(10.0,-6.4)));
+        eq->add( lib["XH2"], -1);
+        eq->add( lib["H+"],   2);
+        eq->add( lib["X--"],  1);
+        if( !cs.insert(eq) )
+            throw exception("multiple '%s'", eq->name.c_str());
+
     }
     
     
@@ -56,6 +82,14 @@ YOCTO_UNIT_TEST_IMPL(validate)
     {
         std::cerr << "unable to validate!" << std::endl;
     }
+    
+    
+    const double xx[] = { 7.99, -7.99, 7.01, -7.01 };
+    for(size_t i=0; i < sizeof(xx)/sizeof(xx[0]);++i )
+    {
+        std::cerr << "round(" << xx[i] << ")=" << my_round(xx[i]) << std::endl;
+    }
+
     
 }
 YOCTO_UNIT_TEST_DONE()

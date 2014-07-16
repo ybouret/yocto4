@@ -500,6 +500,44 @@ int main(int argc, char *argv[] )
         }
         
         
+        // final check
+        std::cerr << "Validating..." << std::endl;
+        size_t count10 = 0;
+        for(size_t i=1;i<=N;++i)
+        {
+            const Student &si = students[i];
+            const size_t   wi = si.whom;
+            std::cerr << '.';
+            std::cerr.flush();
+            if(wi>0)
+            {
+            
+                const double gi = si.grade;
+                const double fi = si.final;
+                if(fi>=10.0)
+                {
+                    ++count10;
+                }
+                
+                for(size_t j=i+1;j<=N;++j)
+                {
+                    const Student &sj = students[j];
+                    const size_t   wj = sj.whom;
+                    if(wi==wj)
+                    {
+                        const double gj = sj.grade;
+                        const double fj = sj.final;
+                        if( (gj-gi)*(fj-fi) < 0 )
+                        {
+                            throw exception("grade inversion for '%s' and '%s'", si.name.c_str(), sj.name.c_str());
+                        }
+                        
+                    }
+                }
+            }
+        }
+        std::cerr << std::endl << "OK!" << std::endl;
+        std::cerr << "Above 10: " << count10 << " / " << P << std::endl;
         
         vector<double> H(20,0);
         vector<double> bins(20,0);
@@ -514,6 +552,37 @@ int main(int argc, char *argv[] )
             }
         }
         
+        {
+            ios::ocstream fp("final.csv",false);
+            
+            for(size_t i=1;i<=N;++i)
+            {
+                const Student &s = students[i];
+                fp << s.name;
+                if(s.whom>0)
+                {
+                    string f = vformat("%5.2f",s.final);
+                    for(size_t i=0;i<f.size();++i)
+                    {
+                        if(f[i]=='.') f[i] = ',';
+                    }
+                    fp << ';' << f;
+                    
+                    string g = vformat("%5.2f",s.grade);
+                    for(size_t i=0;i<g.size();++i)
+                    {
+                        if(g[i]=='.') g[i] = ',';
+                    }
+                    fp << ';' << g;
+                }
+                else
+                {
+                    fp << ";;";
+                }
+                fp <<";\n";
+            }
+            
+        }
         
         
         

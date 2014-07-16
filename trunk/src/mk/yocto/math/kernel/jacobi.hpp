@@ -1,8 +1,8 @@
 /** \file  jacobi.hpp
  */
 
-#ifndef _YOCTO_JACOBI_HPP_
-#define _YOCTO_JACOBI_HPP_ 1
+#ifndef YOCTO_MATH_JACOBI_INCLUDED
+#define YOCTO_MATH_JACOBI_INCLUDED 1
 
 
 #include "yocto/math/kernel/matrix.hpp"
