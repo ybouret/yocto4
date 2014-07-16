@@ -56,10 +56,11 @@ namespace yocto
             vector_t       xi;          //!< [N] extent
             vector<extent> limits;      //!< [N] infos
             lu_t           LU;          //!< [N] solver
+            vector<size_t> online;      //!< [N] online reactions
             vector<size_t> active;      //!< [M] number or reaction involving each species
-            vector_t       dC;          //!< M concentrations increase (Newton's Step)
-            vector_t       Ctmp;        //!< M temp concentrations
-            
+            vector_t       dC;          //!< [M] concentrations increase (Newton's Step)
+            vector_t       Ctmp;        //!< [M] temp concentrations
+            vector<size_t> bad;         //!< [M] bad concentrations indices
             //__________________________________________________________________
             //
             // API
@@ -68,6 +69,7 @@ namespace yocto
             void  find_active_species() throw(); //!< fill active from Nu
             void  cleanup() throw();
             
+            bool  validate_old( array<double> &C );
             bool  validate( array<double> &C );
             
             
@@ -107,7 +109,7 @@ namespace yocto
             void  show_limits() const;
             
             //! apply limits to current extents xi/scaling
-            void  clip_extents(const double scaling=1) throw();
+            void  clip_extents(const ptrdiff_t scaling=1) throw();
             
             
         private:

@@ -122,7 +122,7 @@ namespace yocto
             
         }
         
-        void  equilibria:: clip_extents(const double scaling) throw()
+        void  equilibria:: clip_extents(const ptrdiff_t scaling) throw()
         {
             std::cerr << "xi_init=" << xi << "/" << scaling << ";" << std::endl;
             for(size_t i=1;i<=N;++i)
@@ -161,15 +161,13 @@ namespace yocto
             std::cerr << "xi_clip=" << xi << "/" << scaling << ";" << std::endl;
         }
         
-#if 1
+#if 0
         static int compare_abs(const double lhs, const double rhs) throw()
         {
             const double L = fabs(lhs);
             const double R = fabs(rhs);
             return ((L<R) ? -1 : ( (R<L) ? 1 : 0));
         }
-        
-        static inline double __rint(double x) { return floor(x+0.5); }
         double round_score( int alpha, const array<double> &F )
         {
             double sum = 0;
@@ -183,8 +181,12 @@ namespace yocto
             }
             return 0;
         }
+#endif
         
-        static inline bool accept_coef(const int alpha, const array<double> &F)
+        
+        static inline double __rint(double x) throw() { return floor(x+0.5); }
+
+        static inline bool accept_coef(const int alpha, const array<double> &F) throw()
         {
             assert(alpha>0);
             //std::cerr << "\talpha=" << alpha << " => errmax=" << errmax << std::endl;
@@ -200,11 +202,10 @@ namespace yocto
             }
             return true;
         }
-#endif
         
         
         
-        bool  equilibria:: validate( array<double> &C )
+        bool  equilibria:: validate_old( array<double> &C )
         {
             
             assert(C.size()>=M);
@@ -323,6 +324,139 @@ namespace yocto
             
             
             return true;
+        }
+        
+        bool  equilibria:: validate( array<double> &C )
+        {
+            
+            assert(C.size()>=M);
+            
+            {
+                //-- find bad species
+                bad.free();
+                for(size_t j=1;j<=M;++j)
+                {
+                    if( (active[j]>0) && (C[j]<0) )
+                    {
+                        bad.push_back(j);
+                        dC[j] = -C[j];
+                    }
+                }
+                const size_t Mb = bad.size();
+                if(Mb<=0)
+                    return true;
+                std::cerr << "bad=" << bad << std::endl;
+                
+                //-- find online reactions from limits
+                find_limits_of(C);
+                show_limits();
+                
+                online.free();
+                for(size_t i=1;i<=N;++i)
+                {
+                    if( !limits[i].blocked )
+                        online.push_back(i);
+                }
+                const size_t Nq = online.size();
+                if(Nq<=0)
+                {
+                    return false;
+                }
+                std::cerr << "online=" << online << std::endl;
+                // build sub topology
+                matrix_t nu(Nq,M);
+                for(size_t i=1;i<=Nq;++i)
+                {
+                    const size_t k=online[i];
+                    for(size_t j=M;j>0;--j)
+                    {
+                        nu[i][j] = Nu[k][j];
+                    }
+                }
+                std::cerr << "nu=" << nu << std::endl;
+                
+                // build expansion matrix
+                matrix_t beta(Mb,Nq);
+                for(size_t j=1;j<=Mb;++j)
+                {
+                    const size_t jj = bad[j];
+                    for(size_t i=1;i<=Nq;++i)
+                    {
+                        const size_t ii = online[i];
+                        beta[j][i] = Nu[ii][jj];
+                    }
+                }
+                
+                std::cerr << "beta=" << beta << std::endl;
+                matrix_t U(Mb,Mb);
+                mkl::mul_rtrn(U, beta, beta);
+                std::cerr << "U=" << U <<std::endl;
+                ptrdiff_t detU = int(math::determinant_of(U));
+                std::cerr << "detU=" << detU << std::endl;
+                if( !detU )
+                {
+                    throw exception("Singular subsystem, unexpected");
+                }
+                
+                matrix_t V(Mb,Mb);
+                math::adjoint(V, U);
+                std::cerr << "V=" << V << std::endl;
+                vector_t deltaC(Mb,0);
+                for(size_t j=Mb;j>0;--j)
+                {
+                    deltaC[j] = -C[bad[j]];
+                }
+                std::cerr << "deltaC=" << deltaC << std::endl;
+                vector_t lambda(Mb,0);
+                
+                // lambda*detU
+                mkl::mul(lambda,V,deltaC);
+                std::cerr << "lambda=" << lambda << "/" << detU << std::endl;
+                
+                // xi_prime * detU
+                vector_t xi_prime(Nq,0);
+                mkl::mul_trn(xi_prime, beta, lambda);
+                std::cerr << "xi_prime=" << xi_prime << "/" << detU << std::endl;
+                
+                // build Xi*detU
+                mkl::set(xi,0.0);
+                for(size_t i=Nq;i>0;--i)
+                {
+                    xi[ online[i] ] = xi_prime[i];
+                }
+                if(detU<0)
+                {
+                    mkl::neg(xi, xi);
+                    detU = -detU;
+                    std::cerr << "xi="<< xi << "/" << detU << std::endl;
+                }
+                clip_extents(detU);
+                
+                // build dC * detU
+                mkl::mul_trn(dC, Nu, xi);
+                std::cerr << "dC=" << dC << std::endl;
+                
+                // add carefully
+                for(size_t j=M;j>0;--j)
+                {
+                    if(active[j]>0)
+                    {
+                        if(C[j]<0)
+                        {
+                            
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+                }
+            }
+            
+            
+            
+            
+            return false;
         }
         
         

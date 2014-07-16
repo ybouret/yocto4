@@ -23,10 +23,12 @@ namespace yocto
             (size_t &)M = 0;
             (size_t &)M = 0;
             
+            bad.release();
             Ctmp.release();
             dC.release();
             active.release();
             
+            online.release();
             LU.release();
             limits.release();
             xi.release();
@@ -69,7 +71,7 @@ namespace yocto
                     const extent ex0;
                     limits.make(N,ex0);
                     LU.make(N,0.0);
-                    
+                    online.ensure(N);
                     
                     //__________________________________________________________
                     //
@@ -102,6 +104,7 @@ namespace yocto
                 active.make(M,false);
                 dC.make(M,0.0);
                 Ctmp.make(M,0.0);
+                bad.ensure(M);
                 find_active_species();
             }
             catch(...)
