@@ -106,8 +106,8 @@ namespace yocto
             //! to debug
             void  show_limits() const;
             
-            //! apply limits to current extents xi
-            void  clip_extents() throw();
+            //! apply limits to current extents xi/scaling
+            void  clip_extents(const double scaling=1) throw();
             
             
         private:
