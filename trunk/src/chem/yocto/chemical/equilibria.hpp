@@ -109,7 +109,7 @@ namespace yocto
             void  show_limits() const;
             
             //! apply limits to current extents xi/scaling
-            void  clip_extents(const ptrdiff_t scaling=1) throw();
+            void  clip_extents(const unsigned scaling=1) throw();
             
             
         private:
