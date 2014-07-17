@@ -23,7 +23,7 @@ YOCTO_UNIT_TEST_IMPL(validate)
     lib.add("HO-", -1);
     lib.add("AH",   0);
     lib.add("A-",  -1);
-    //lib.add("Na+", 1);
+    lib.add("Na+", 1);
     
     if(add_extra)
     {
