@@ -33,34 +33,52 @@ We also naturally have the topology matrix $\mymat{\nu}$.
 
 \section{Acceptable Extent}
 Each reaction, depending on the initial concentrations, may have a maximum extent in the forward and/or the reverse way.
-A negative or zero concentration blocks one way. The equilibrium is blocked when both ways are blocks.
+A negative or zero concentration blocks one way. The equilibrium is blocked when both ways are blocked.
 In any case, each equilibrium imposes a range of valid extent.
+Any chemical transformation is deduced from $\vec{C}$ and a chemical extent $\vec{\xi}$ by
+$$
+	\vec{C} + \mytrn{\mymat{\nu}}\vec{\xi}.
+$$
 
 \section{Validation a set of concentration}
 A trial concentration vector $\vec{C}_k$ may be invalid: an \textbf{active} species (namely a species involved in an equilibria)
 may be negative. In that case, we must look for the minimal extent that brings back the concentrations to a valid set, if that
 is possible.
-Hence, we build the \textit{target concentration vector}
+Let $Q$ be the number of online (aka not blocked) reactions, corresponding to the online $Q\times M$ topology $\mymat{\nu}'$
+and to the online $Q$-dimensional extent $\vec{\xi}'$. We also have a set of $B$ 'bad' concentrations (active and negative) $\vec{C}'$.
+Thus we search $\vec{\xi}'$ such that
 $$
-	\vec{C}'_k
+	\vec{C}' + \mymat{\beta} \vec{\xi}' = \vec{0}
 $$
-with a zero value for the corresponding valid concentrations, and  the negative otherwise
-This defines a set of $N$ constraints
+where $\beta$ is a $B\times Q$ matrix corresponding to a sub-matrix of $\mytrn{\mymat{\nu}}$.
+We can this this last vectorial equation as a set of $B$ constraints. This we define a set
+$\vec{\lambda}$ of $B$ Lagrange multipliers and we minimise
 $$
-	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}_k.
+	\dfrac{1}{2} \vec{\xi}^2 - \vec{\lambda}\cdot\left(\vec{C}' + \mymat{\beta} \vec{\xi}'\right)
 $$
-We introduce the vector of $N$ Lagrange multipliers $\vec{\lambda}_k$ to minimise
-$$
-	\dfrac{1}{2} \vec{\xi}^2 - \vec{\lambda}_k \cdot \left( \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}\right)
-$$
-leading to a guess value of
-$$
-	\vec{\xi}'_k = \mymat{\nu}\vec{\lambda}_k
-$$
-defining
-$$
-	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\mymat{\nu}\vec{\lambda}_k
-$$
+	
+
+%Hence, we build the \textit{target concentration vector}
+%$$
+%	\vec{C}'_k
+%$$
+%with a zero value for the corresponding valid concentrations, and  the negative otherwise
+%This defines a set of $N$ constraints
+%$$
+%	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}_k.
+%$$
+%We introduce the vector of $N$ Lagrange multipliers $\vec{\lambda}_k$ to minimise
+%$$
+%	\dfrac{1}{2} \vec{\xi}^2 - \vec{\lambda}_k \cdot \left( \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}\right)
+%$$
+%leading to a guess value of
+%$$
+%	\vec{\xi}'_k = \mymat{\nu}\vec{\lambda}_k
+%$$
+%defining
+%$$
+%	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\mymat{\nu}\vec{\lambda}_k
+%$$
 
 
 
