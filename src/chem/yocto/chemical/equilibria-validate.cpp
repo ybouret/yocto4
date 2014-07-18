@@ -125,16 +125,16 @@ namespace yocto
         
         void  equilibria:: clip_extents() throw()
         {
-            std::cerr << "xi_init=" << xi << ";" << std::endl;
+            //std::cerr << "xi_init=" << xi << ";" << std::endl;
             for(size_t i=1;i<=N;++i)
             {
                 const extent &ex = limits[i];
                 double       &Xi = xi[i];
-                std::cerr << "\tEq" << i << ": ";
+                //std::cerr << "\tEq" << i << ": ";
                 
                 if(ex.has_forward_limit)
                 {
-                    std::cerr << "\tmax_fwd=" << ex.max_forward_value;
+                    //std::cerr << "\tmax_fwd=" << ex.max_forward_value;
                     const double top = ex.max_forward_value;
                     if(Xi>0 && Xi>top)
                     {
@@ -145,7 +145,7 @@ namespace yocto
                 
                 if(ex.has_reverse_limit)
                 {
-                    std::cerr << "\tmax_rev=" << ex.max_reverse_value;
+                    //std::cerr << "\tmax_rev=" << ex.max_reverse_value;
                     const double top = ex.max_reverse_value;
                     if(Xi<0 && (-Xi)>top)
                     {
@@ -155,12 +155,12 @@ namespace yocto
                 
                 if( ex.blocked )
                 {
-                    std::cerr << " | BLOCKED";
+                    //std::cerr << " | BLOCKED";
                     Xi = 0.0;
                 }
-                std::cerr << std::endl;
+                //std::cerr << std::endl;
             }
-            std::cerr << "xi_clip=" << xi << ";" << std::endl;
+            //std::cerr << "xi_clip=" << xi << ";" << std::endl;
         }
         
         
