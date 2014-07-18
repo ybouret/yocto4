@@ -37,7 +37,7 @@ namespace yocto
             computeGammaAndPhi(t,C);
             std::cerr << "K=" << K << std::endl;
             std::cerr << "C=" << C << std::endl;
-            for(size_t count=1;count<=20;++count)
+            for(size_t count=1;/* count<=20 */;++count)
             {
                 //______________________________________________________________
                 //
@@ -55,11 +55,11 @@ namespace yocto
                
                 //______________________________________________________________
                 //
-                // cleanup
+                // shall clip xi to control
                 //______________________________________________________________
                 find_limits_of(C);
-                //show_limits();
                 clip_extents();
+                std::cerr << "xi_clip=" << xi << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -71,13 +71,19 @@ namespace yocto
                 //
                 // add carefully: MUST be >=0, since xi is clipped
                 //______________________________________________________________
+                bool converged = true;
+                
                 for(size_t j=M;j>0;--j)
                 {
                     if(active[j]>0)
                     {
                         const double Cj = C[j];
-                        C[j] = max_of<double>(0.0, Cj+dC[j]);
-                        dC[j] = C[j] - Cj;
+                        const double cc = fabs( (C[j]  = max_of<double>(0.0, Cj+dC[j])) );
+                        const double dd = fabs( (dC[j] = C[j] - Cj) );
+                        if( dd > fabs(math::numeric<double>::ftol * cc) )
+                        {
+                            converged = false;
+                        }
                     }
                     else
                     {
@@ -86,10 +92,15 @@ namespace yocto
                 }
                 std::cerr << "C1=" << C << std::endl;
                 std::cerr << "dC=" << dC << std::endl;
+                if(converged)
+                {
+                    std::cerr << "converged in " << count << " step" << (count>1? "s" : "") << std::endl;
+                    break;
+                }
                 updateGammaAndPhi(C);
             }
             
-            return false;
+            return true;
         }
         
     }
