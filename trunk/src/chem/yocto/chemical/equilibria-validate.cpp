@@ -123,9 +123,9 @@ namespace yocto
             
         }
         
-        void  equilibria:: clip_extents(const unsigned scaling) throw()
+        void  equilibria:: clip_extents() throw()
         {
-            std::cerr << "xi_init=" << xi << "/" << scaling << ";" << std::endl;
+            std::cerr << "xi_init=" << xi << ";" << std::endl;
             for(size_t i=1;i<=N;++i)
             {
                 const extent &ex = limits[i];
@@ -135,7 +135,7 @@ namespace yocto
                 if(ex.has_forward_limit)
                 {
                     std::cerr << "\tmax_fwd=" << ex.max_forward_value;
-                    const double top = ex.max_forward_value*scaling;
+                    const double top = ex.max_forward_value;
                     if(Xi>0 && Xi>top)
                     {
                         Xi=top;
@@ -146,7 +146,7 @@ namespace yocto
                 if(ex.has_reverse_limit)
                 {
                     std::cerr << "\tmax_rev=" << ex.max_reverse_value;
-                    const double top = ex.max_reverse_value*scaling;
+                    const double top = ex.max_reverse_value;
                     if(Xi<0 && (-Xi)>top)
                     {
                         Xi = -top;
@@ -156,10 +156,11 @@ namespace yocto
                 if( ex.blocked )
                 {
                     std::cerr << " | BLOCKED";
+                    Xi = 0.0;
                 }
                 std::cerr << std::endl;
             }
-            std::cerr << "xi_clip=" << xi << "/" << scaling << ";" << std::endl;
+            std::cerr << "xi_clip=" << xi << ";" << std::endl;
         }
         
         
@@ -194,11 +195,11 @@ namespace yocto
 #endif
         
         
-        void  equilibria:: validate( array<double> &C )
+        bool  equilibria:: validate( array<double> &C )
         {
-            static const char fn[] = "equilibria.validate";
             assert(C.size()>=M);
             
+            while(true)
             {
                 //______________________________________________________________
                 //
@@ -220,7 +221,7 @@ namespace yocto
                     //
                     // everything is fine !
                     //__________________________________________________________
-                    return;
+                    return true;
                 }
                 std::cerr << "bad=" << bad << std::endl;
                 
@@ -240,7 +241,8 @@ namespace yocto
                 const size_t Q = online.size();
                 if(Q<=0)
                 {
-                    throw exception("%s: no available reactions",fn);
+                    std::cerr << "-- Validate: no available reactions" << std::endl;
+                    return false;
                 }
                 std::cerr << "online=" << online << std::endl;
                 
@@ -282,7 +284,8 @@ namespace yocto
                     lu_t solver(B);
                     if(!solver.build(J))
                     {
-                        throw exception("%s: singular sub-system",fn);
+                        std::cerr << "-- Validate: singular sub-system" << std::endl;
+                        return false;
                     }
                     std::cerr << "deltaC=" << lambda << std::endl;
                     solver.solve(J,lambda);
@@ -310,7 +313,7 @@ namespace yocto
                 //
                 // clip extents
                 //______________________________________________________________
-                clip_extents(1);
+                clip_extents();
                 
                 //______________________________________________________________
                 //
