@@ -14,6 +14,8 @@ double my_round(double x)
 }
 #endif
 
+
+
 YOCTO_UNIT_TEST_IMPL(validate)
 {
     collection lib;
@@ -59,7 +61,7 @@ YOCTO_UNIT_TEST_IMPL(validate)
         eq->add( lib["X--"],  1);
         if( !cs.insert(eq) )
             throw exception("multiple '%s'", eq->name.c_str());
-
+        
     }
     
     
@@ -73,17 +75,34 @@ YOCTO_UNIT_TEST_IMPL(validate)
     S("HO-") = 0.05;
     S("AH")  = 0.02;
     S("A-")  = -0.001;
-    
-    std::cerr << "S0=" << S << std::endl;
-    try
+    if( add_extra )
     {
-        cs.validate(S);
+        S("XH2") = 1e-4;
+    }
+    std::cerr << "S0=" << S << std::endl;
+    
+    if(cs.validate(S))
+    {
         std::cerr << "S1=" << S << std::endl;
     }
-    catch (const exception &e)
+    else
     {
-        std::cerr << e.what() << std::endl;
-        std::cerr << e.when() << std::endl;
+        std::cerr << "couldn't validate" << std::endl;
+    }
+    
+    if(add_extra)
+    {
+        S("XH2") = 0.0;
+        S("X--") = -0.001;
+        std::cerr << "S02=" << S << std::endl;
+        if(cs.validate(S))
+        {
+            std::cerr << "S12=" << S << std::endl;
+        }
+        else
+        {
+            std::cerr << "couldn't validate" << std::endl;
+        }
     }
     
 #if 0
