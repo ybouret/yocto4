@@ -72,32 +72,14 @@ is not invertible, then the system cannot be normalised.
 Otherwise, the Cholesky decomposition may be used to compute $\vec{\lambda}$ then 
 $\vec{\xi}'$.
 A full extent $\vec{\xi}$ can be deduced from $\vec{\xi}'$.
-The we must deduce the concentration increase, taking into account the acceptable extents.
-
-%Hence, we build the \textit{target concentration vector}
-%$$
-%	\vec{C}'_k
-%$$
-%with a zero value for the corresponding valid concentrations, and  the negative otherwise
-%This defines a set of $N$ constraints
-%$$
-%	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}_k.
-%$$
-%We introduce the vector of $N$ Lagrange multipliers $\vec{\lambda}_k$ to minimise
-%$$
-%	\dfrac{1}{2} \vec{\xi}^2 - \vec{\lambda}_k \cdot \left( \vec{C}'_k + \mytrn{\mymat{\nu}}\vec{\xi}\right)
-%$$
-%leading to a guess value of
-%$$
-%	\vec{\xi}'_k = \mymat{\nu}\vec{\lambda}_k
-%$$
-%defining
-%$$
-%	\vec{0} = \vec{C}'_k + \mytrn{\mymat{\nu}}\mymat{\nu}\vec{\lambda}_k
-%$$
-
-
-
+The we must deduce the concentration increase, taking into account the acceptable extents,
+and numerical roundoff.
+Especially, since $\vec{\xi}$ is optimised and clipped,
+\begin{itemize}
+\item a negative concentration can never become strictly positive
+\item a positive concentration can never become strictly negative.
+\end{itemize}
+                 
 
 \section{Finding some equilibria}
 
