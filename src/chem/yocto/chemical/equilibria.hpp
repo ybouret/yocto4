@@ -69,8 +69,7 @@ namespace yocto
             void  find_active_species() throw(); //!< fill active from Nu
             void  cleanup() throw();
             
-            bool  validate_old( array<double> &C );
-            bool  validate( array<double> &C );
+            void  validate( array<double> &C );
             
             
             void output( std::ostream & ) const;

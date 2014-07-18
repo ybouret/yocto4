@@ -162,47 +162,10 @@ namespace yocto
             std::cerr << "xi_clip=" << xi << "/" << scaling << ";" << std::endl;
         }
         
+        
 #if 0
-        static int compare_abs(const double lhs, const double rhs) throw()
-        {
-            const double L = fabs(lhs);
-            const double R = fabs(rhs);
-            return ((L<R) ? -1 : ( (R<L) ? 1 : 0));
-        }
-        double round_score( int alpha, const array<double> &F )
-        {
-            double sum = 0;
-            for(size_t i=F.size();i>0;--i)
-            {
-                const double f = fabs(F[i]);
-                const double g = __rint(alpha*f);
-                std::cerr << "f=" << f << " -> g=" << g << std::endl;
-                const double d = fabs(alpha*f-g);
-                sum += d;
-            }
-            return 0;
-        }
-#endif
-        
-        
         static inline double __rint(double x) throw() { return floor(x+0.5); }
         
-        static inline bool accept_coef(const int alpha, const array<double> &F) throw()
-        {
-            assert(alpha>0);
-            //std::cerr << "\talpha=" << alpha << " => errmax=" << errmax << std::endl;
-            for(size_t i=F.size();i>0;--i)
-            {
-                const double f     = fabs(F[i]);
-                const double af    = alpha*f;
-                const double g     = __rint(af);
-                const int    r     = int(__rint(fabs(alpha * (af - g))));
-                //std::cerr << "\t\tf=" << f << " -> g=" << g << "-> r=" << r << std::endl;
-                if(r>0)
-                    return false;
-            }
-            return true;
-        }
         
         static inline bool accept_coef(const unsigned alpha, const matrix_t &J) throw()
         {
@@ -228,12 +191,12 @@ namespace yocto
             
             return true;
         }
+#endif
         
         
-        
-        bool  equilibria:: validate( array<double> &C )
+        void  equilibria:: validate( array<double> &C )
         {
-            
+            static const char fn[] = "equilibria.validate";
             assert(C.size()>=M);
             
             {
@@ -252,7 +215,13 @@ namespace yocto
                 }
                 const size_t B = bad.size();
                 if(B<=0)
-                    return true;
+                {
+                    //__________________________________________________________
+                    //
+                    // everything is fine !
+                    //__________________________________________________________
+                    return;
+                }
                 std::cerr << "bad=" << bad << std::endl;
                 
                 //______________________________________________________________
@@ -271,13 +240,23 @@ namespace yocto
                 const size_t Q = online.size();
                 if(Q<=0)
                 {
-                    return false;
+                    throw exception("%s: no available reactions",fn);
                 }
                 std::cerr << "online=" << online << std::endl;
                 
                 //______________________________________________________________
                 //
-                // build expansion matrix
+                // prepare the Lagrange multipliers
+                //______________________________________________________________
+                vector_t lambda(B,0.0);
+                for(size_t i=B;i>0;--i)
+                {
+                    lambda[i] = -C[ bad[i] ];
+                }
+                
+                //______________________________________________________________
+                //
+                // build the expansion matrix from Nu'
                 //______________________________________________________________
                 matrix_t beta(B,Q);
                 for(size_t j=1;j<=B;++j)
@@ -294,93 +273,26 @@ namespace yocto
                 //
                 // Find the Lagrange multipliers
                 //______________________________________________________________
-                std::cerr << "beta=" << beta << std::endl;
-                matrix_t J(B,B);
-                mkl::mul_rtrn(J, beta, beta);
-                std::cerr << "J=" << J <<std::endl;
-                matrix_t V(B,B);
-                vector_t d(B,0);
-                
-                if( ! math::jacobi<double>::build(J,d,V) )
                 {
-                    std::cerr << "invalid sub-system" << std::endl;
-                    return false;
-                }
-                
-                //std::cerr << "d=" << d << std::endl;
-                //std::cerr << "V=" << V << std::endl;
-                for(size_t j=B;j>0;--j)
-                {
-                    if( fabs(d[j]) <= 0 )
+                    
+                    std::cerr << "beta=" << beta << std::endl;
+                    matrix_t J(B,B);
+                    mkl::mul_rtrn(J, beta, beta);
+                    std::cerr << "J=" << J <<std::endl;
+                    lu_t solver(B);
+                    if(!solver.build(J))
                     {
-                        std::cerr << "invalid expansion matrix" << std::endl;
+                        throw exception("%s: singular sub-system",fn);
                     }
-                    d[j] = 1.0 / d[j];
+                    std::cerr << "deltaC=" << lambda << std::endl;
+                    solver.solve(J,lambda);
+                    std::cerr << "lambda=" << lambda << std::endl;
                 }
-
-                for(size_t i=B;i>0;--i)
-                {
-                    for(size_t j=i;j>0;--j)
-                    {
-                        double sum = 0;
-                        for(size_t k=B;k>0;--k)
-                        {
-                            sum += V[i][k] * d[k] * V[j][k];
-                        }
-                        J[i][j] = J[j][i] = sum;
-                    }
-                }
-                std::cerr << "iJ=" << J << std::endl;
-                
-                unsigned alpha = 1;
-                while( ! accept_coef(++alpha, J) )
-                    ;
-                std::cerr << "alpha=" << alpha << std::endl;
-                bool is_pair = true;
-                for(size_t i=B;i>0;--i)
-                {
-                    for(size_t j=i;j>0;--j)
-                    {
-                        const int jj = int( __rint(alpha*J[i][j]) );
-                        J[i][j] = J[j][i] = jj;
-                        if( 0!= (jj&1) )
-                            is_pair = false;
-                    }
-                }
-                std::cerr << "J1=" << J << std::endl;
-                std::cerr << "is_pair=" << is_pair << std::endl;
-                if( false && is_pair && (2==alpha) )
-                {
-                    alpha = 1;
-                    for(size_t i=B;i>0;--i)
-                    {
-                        for(size_t j=i;j>0;--j)
-                        {
-                            J[i][j] = J[j][i] = int(J[i][j])/2;
-                        }
-                    }
-                    std::cerr << "alpha=" << alpha << std::endl;
-                    std::cerr << "J1=" << J << std::endl;
-                }
-                
-                vector_t deltaC(B,0);
-                for(size_t j=B;j>0;--j)
-                {
-                    deltaC[j] = -C[bad[j]];
-                }
-                std::cerr << "deltaC=" << deltaC << std::endl;
-                
-                // compute lambda * alpha
-                vector_t lambda(B,0);
-                mkl::mul(lambda,J,deltaC);
-                
-                std::cerr << "lambda=" << lambda << "/" << alpha << std::endl;
                 
                 
                 //______________________________________________________________
                 //
-                // compute xi*alpha from
-                // beta and lambda*alpha (xi_prime=beta'*lambda)
+                // compute xi from beta and lambda
                 //______________________________________________________________
                 for(size_t i=N;i>0;--i) xi[i] = 0;
                 for(size_t i=Q;i>0;--i)
@@ -392,21 +304,20 @@ namespace yocto
                     }
                     xi[ online[i] ] = sum;
                 }
-                std::cerr << "xi=" << xi << "/" << alpha << std::endl;
+                std::cerr << "xi=" << xi << std::endl;
                 
                 //______________________________________________________________
                 //
                 // clip extents
                 //______________________________________________________________
-                clip_extents(alpha);
+                clip_extents(1);
                 
                 //______________________________________________________________
                 //
                 // compute dC*alpha = Nu'*xi*alpha
                 //______________________________________________________________
-
+                
                 mkl::mul_trn(dC, Nu, xi);
-                for(size_t j=M;j>0;--j) dC[j] /= alpha;
                 std::cerr << "C0=" << C << std::endl;
                 std::cerr << "dC=" << dC <<  std::endl;
                 
@@ -440,10 +351,6 @@ namespace yocto
                 std::cerr << "C=" << C << std::endl;
             }
             
-            
-            
-            
-            return false;
         }
         
         

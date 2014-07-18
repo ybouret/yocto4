@@ -6,12 +6,13 @@
 using namespace yocto;
 using namespace chemical;
 
-
+#if 0
 static inline
 double my_round(double x)
 {
     return floor(x+0.5);
 }
+#endif
 
 YOCTO_UNIT_TEST_IMPL(validate)
 {
@@ -74,22 +75,24 @@ YOCTO_UNIT_TEST_IMPL(validate)
     S("A-")  = -0.001;
     
     std::cerr << "S0=" << S << std::endl;
-    if(cs.validate(S))
+    try
     {
+        cs.validate(S);
         std::cerr << "S1=" << S << std::endl;
     }
-    else
+    catch (const exception &e)
     {
-        std::cerr << "unable to validate!" << std::endl;
+        std::cerr << e.what() << std::endl;
+        std::cerr << e.when() << std::endl;
     }
     
-    
+#if 0
     const double xx[] = { 7.99, -7.99, 7.01, -7.01 };
     for(size_t i=0; i < sizeof(xx)/sizeof(xx[0]);++i )
     {
         std::cerr << "round(" << xx[i] << ")=" << my_round(xx[i]) << std::endl;
     }
-
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
