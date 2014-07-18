@@ -36,6 +36,8 @@ namespace yocto
             //__________________________________________________________________
             computeGammaAndPhi(t,C);
             std::cerr << "K=" << K << std::endl;
+            std::cerr << "C=" << C << std::endl;
+            for(size_t count=1;count<=20;++count)
             {
                 //______________________________________________________________
                 //
@@ -50,13 +52,13 @@ namespace yocto
                 mkl::neg(xi, Gamma);
                 lu_t::solve(W, xi);
                 std::cerr << "xi_full=" << xi << std::endl;
-                
+               
                 //______________________________________________________________
                 //
                 // cleanup
                 //______________________________________________________________
                 find_limits_of(C);
-                show_limits();
+                //show_limits();
                 clip_extents();
                 
                 //______________________________________________________________
@@ -65,7 +67,26 @@ namespace yocto
                 //______________________________________________________________
                 mkl::mul_trn(dC, Nu, xi);
                 
-                
+                //______________________________________________________________
+                //
+                // add carefully: MUST be >=0, since xi is clipped
+                //______________________________________________________________
+                for(size_t j=M;j>0;--j)
+                {
+                    if(active[j]>0)
+                    {
+                        const double Cj = C[j];
+                        C[j] = max_of<double>(0.0, Cj+dC[j]);
+                        dC[j] = C[j] - Cj;
+                    }
+                    else
+                    {
+                        assert(fabs(dC[j])<=0);
+                    }
+                }
+                std::cerr << "C1=" << C << std::endl;
+                std::cerr << "dC=" << dC << std::endl;
+                updateGammaAndPhi(C);
             }
             
             return false;

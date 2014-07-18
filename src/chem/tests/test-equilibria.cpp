@@ -39,7 +39,7 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
     
     
     S[3] = S[4] = 0;
-    //S[3] = 0.1;
+    S[3] = 0.1;
     std::cerr << "S=" << S << std::endl;
     std::cerr << "Normalizing..." << std::endl;
     if( cs.normalize(0.0, S))
