@@ -4,6 +4,7 @@
 #include "yocto/chemical/collection.hpp"
 #include "yocto/sequence/vector.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/math/fcn/drvs.hpp"
 #include "yocto/ptr/arc.hpp"
 
 namespace yocto
@@ -12,6 +13,7 @@ namespace yocto
     {
         
         typedef math::numeric<double>::function function_type;
+        typedef math::derivative<double>        drvs_type;
         
         class equilibrium : public counted_object
         {
@@ -117,6 +119,9 @@ namespace yocto
             
             //! compute Gamma and Phi while initializing K
             double computeGammaAndPhi( array<double> &Phi, double t, const array<double> &C, double &KK);
+            
+            //! compute dGamma/dt and Phi
+            double computeGammaPrimeAndPhi( array<double> &Phi, double t, const array<double> &C, drvs_type &drvs, double h );
             
             //! compute Phi only
             void updatePhi( array<double> &Phi, const array<double> &C, const double KK) const throw();

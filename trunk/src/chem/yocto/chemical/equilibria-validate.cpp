@@ -4,15 +4,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/exception.hpp"
 
-#include "yocto/math/kernel/svd.hpp"
-#include "yocto/math/kernel/jacobi.hpp"
-#include "yocto/math/kernel/det.hpp"
-#include "yocto/math/kernel/cholesky.hpp"
-
-#include "yocto/sort/index.hpp"
-#include "yocto/sort/quick.hpp"
-
-#include "yocto/ios/ocstream.hpp"
+//#include "yocto/ios/ocstream.hpp"
 
 namespace yocto
 {

@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-config.hpp"
+#include "yocto/code/rand.hpp"
 
 using namespace yocto;
 using namespace chemical;
@@ -47,6 +48,14 @@ YOCTO_UNIT_TEST_IMPL(equilibria)
         std::cerr << "S=" << S << std::endl;
     }
     
-
+    solution dS(S);
+    for(size_t i=dS.size();i>0;--i)
+    {
+        dS[i] = (1e-4*i)*(alea<double>()-0.5);
+    }
+    std::cerr << "dS0=" << dS << std::endl;
+    cs.absorb(0.0, dS, S);
+    std::cerr << "dS1=" << dS << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()

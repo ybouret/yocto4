@@ -338,6 +338,26 @@ namespace yocto
             return updateGammaAndPhi(Phi,C,localK);
         }
         
+        
+        double equilibrium:: computeGammaPrimeAndPhi( array<double> &Phi,
+                                                     double t,
+                                                     const array<double> &C,
+                                                     drvs_type &drvs,
+                                                     double     h
+                                                     )
+        {
+            const double KK = getK(t);
+            double ans = drvs( K, t, h);
+            for(size_t i=r_code.size();i>0;--i)
+            {
+                const instr &I = r_code[i];
+                ans *= ipower(C[I.i],I.p);
+            }
+            updatePhi(Phi, C, KK);
+            return ans;
+        }
+
+        
         void equilibrium:: updatePhi( array<double> &Phi, const array<double> &C, const double KK) const throw()
         {
             for(size_t i=Phi.size();i>0;--i)

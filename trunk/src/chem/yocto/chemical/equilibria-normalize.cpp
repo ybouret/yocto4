@@ -47,6 +47,7 @@ namespace yocto
                 mkl::mul_rtrn(W, Phi, Nu);
                 if(!LU.build(W))
                 {
+                    std::cerr << "-- Newton-I: singular composition" << std::endl;
                     return false;
                 }
                 mkl::neg(xi, Gamma);
@@ -99,6 +100,7 @@ namespace yocto
                 }
                 updateGammaAndPhi(C);
             }
+            
             
             return true;
         }

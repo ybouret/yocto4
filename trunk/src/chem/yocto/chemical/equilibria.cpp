@@ -14,8 +14,16 @@ namespace yocto
         
         equilibria:: equilibria() :
         M(0),
-        N(0)
+        N(0),
+        drvs(),
+        h(1e-4)
         {
+        }
+        
+        
+        double equilibria:: derivate( function_type &f, const double t )
+        {
+            return drvs(f,t,h);
         }
         
         void equilibria:: cleanup() throw()
@@ -24,7 +32,6 @@ namespace yocto
             (size_t &)M = 0;
             
             bad.release();
-            Ctmp.release();
             dC.release();
             active.release();
             
@@ -103,7 +110,6 @@ namespace yocto
                 }
                 active.make(M,false);
                 dC.make(M,0.0);
-                Ctmp.make(M,0.0);
                 bad.ensure(M);
                 find_active_species();
             }
