@@ -114,5 +114,14 @@ $$
 	\vec{\rho}' = \vec{\rho} -  \mytrn{\mymat{\nu}}\left(\mymat{\Phi}\mytrn{\mymat{\nu}}\right)^{-1}\left(\mymat{\Phi}\vec{\rho}+\partial_t\vec{\Gamma}\right)
 $$
 
+\section{Initial compositions}
+Since we have $M$ species and $N$ relations to match, we need
+a set of $R=M-N$ other relations to find determine a unique set of concentrations.
+We assume that all those relations (electroneutrality, mass conservation, constant concentrations)
+may we written as a $R\times M$ matrix $\mymat{P}$ such that
+$$
+	\mymat{P}\vec{C} = \vec{\Lambda}
+$$
+
 
 \end{document}
