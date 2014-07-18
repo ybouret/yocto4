@@ -5,6 +5,7 @@
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/container/tuple.hpp"
 
+
 namespace yocto
 {
     namespace chemical
@@ -59,12 +60,17 @@ namespace yocto
             vector<size_t> online;      //!< [N] online reactions
             vector<size_t> active;      //!< [M] number or reaction involving each species
             vector_t       dC;          //!< [M] concentrations increase (Newton's Step)
-            vector_t       Ctmp;        //!< [M] temp concentrations
             vector<size_t> bad;         //!< [M] bad concentrations indices
+            
+            drvs_type drvs;
+            double    h;    //!< scaling for derivative, initial 1e-4
+            
             //__________________________________________________________________
             //
             // API
             //__________________________________________________________________
+            double derivate( function_type &f, const double t);
+            
             void  startup( const collection &lib);
             void  find_active_species() throw(); //!< fill active from Nu
             void  cleanup() throw();
@@ -109,6 +115,13 @@ namespace yocto
             
             //! apply limits to current extents xi/scaling
             void  clip_extents() throw();
+            
+            //! compute dGamma/dt (in xi) and Phi
+            void computeGammaPrimeAndPhi(double t, const array<double> &C);
+            
+            
+            //! assume that C is normalized and W is computed: aborb a part of X at time t
+            void  absorb(double t, array<double> &X, const array<double> &C);
             
             
         private:
