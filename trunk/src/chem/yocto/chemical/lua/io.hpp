@@ -1,7 +1,7 @@
 #ifndef YOCTO_CHEM_LUA_INCLUDED
 #define YOCTO_CHEM_LUA_INCLUDED 1
 
-#include "yocto/chemical/equilibria.hpp"
+#include "yocto/chemical/boot.hpp"
 #include "yocto/chemical/solution.hpp"
 #include "yocto/functor.hpp"
 
@@ -63,6 +63,20 @@ namespace yocto
             
             //! wrapper
             static void load( lua_State *L, const collection &lib, equilibria &cs, const char   *name );
+            
+            //__________________________________________________________________
+            //
+            // boot API
+            //__________________________________________________________________
+            //! append boot conditions to a boot loader
+            /**
+             \param L       a valid lua_State
+             \param lib     collection of species
+             \param loader  the boot loader
+             \param name    the name of the lua table
+             */
+            static void load( lua_State *L, const collection &lib, boot &loader, const string &name);
+            
         };
         
         
