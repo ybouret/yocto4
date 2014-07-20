@@ -86,6 +86,20 @@ namespace yocto
             return os;
         }
         
+        void boot::constraint:: fill( array<integer_t> &P ) const
+        {
+            const size_t M = P.size();
+            for( const_iterator i=begin();i!=end();++i)
+            {
+                const item  &it = *i;
+                const size_t j  = it.spec->indx;
+                if(j<1||j>M)
+                    throw exception("invalid index for '%s'", it.spec->name.c_str());
+                P[j] = it.coef;
+            }
+        }
+
+        
         ////////////////////////////////////////////////////////////////////////
         //
         // boot
@@ -145,7 +159,7 @@ namespace yocto
         }
         
         
-        void boot:: electroneutrality( const collection &lib )
+        bool boot:: electroneutrality( const collection &lib )
         {
             bool has_charge = false;
             for( collection::const_iterator i = lib.begin(); i != lib.end(); ++i )
@@ -167,7 +181,10 @@ namespace yocto
                     if(z!=0)
                         CC.weight(sp, z);
                 }
+                return true;
             }
+            else
+                return false;
         }
         
     }

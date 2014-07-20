@@ -232,6 +232,12 @@ namespace yocto
             std::cerr << "active=" << active << std::endl;
         }
         
+        void equilibria:: restore_topology() throw()
+        {
+            Nu.assign(Nu0);
+            find_active_species();
+        }
+
 
         
     }
