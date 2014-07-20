@@ -44,8 +44,11 @@ namespace yocto
                 constraint &weight( const species::pointer &p, const int w );
                 
                 typedef arc_ptr<constraint> pointer;
-                
+
                 friend std::ostream & operator<<(std::ostream &os, const constraint &cc);
+                
+                void fill( array<integer_t> &P) const;
+                
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
@@ -56,6 +59,7 @@ namespace yocto
             explicit boot();
             virtual ~boot() throw();
             
+            //! create a new constraint
             constraint &create(const double value);
             
             //! conserve one species
@@ -67,10 +71,15 @@ namespace yocto
             //! conserve the sum of three species
             void conserve(const species::pointer &sp1, const species::pointer &sp2, const species::pointer &sp3, const double C);
 
-            
-            void electroneutrality( const collection &lib );
+            //! set electroneutrality fron a collection
+            /**
+             \treturn false if no charged species was found...
+             */
+            bool electroneutrality( const collection &lib );
             
             friend std::ostream & operator<<( std::ostream &os, const boot &ini);
+            
+            void operator()( array<double> &C, const collection &lib, equilibria &cs, double t );
             
             
         private:

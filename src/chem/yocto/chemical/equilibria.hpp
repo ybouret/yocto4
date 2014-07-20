@@ -12,7 +12,8 @@ namespace yocto
     {
         
         typedef math::matrix<double>    matrix_t;
-        typedef math::matrix<ptrdiff_t> imatrix_t;
+        typedef ptrdiff_t               integer_t;
+        typedef math::matrix<integer_t> imatrix_t;
         typedef vector<double>          vector_t;
         typedef vector<ptrdiff_t>       ivector_t;
         typedef math::crout<double>     lu_t;
@@ -71,10 +72,20 @@ namespace yocto
             //__________________________________________________________________
             double derivate( function_type &f, const double t);
             
+            //! allocate memory, find Nu0 and Nu, find_active_species()
             void  startup( const collection &lib);
-            void  find_active_species() throw(); //!< fill active from Nu
+            
+            //! find active species from Nu
+            void  find_active_species() throw();
+            
+            //! release memory
             void  cleanup() throw();
             
+            //! restore from Nu0
+            void restore_topology() throw();
+            
+            
+            //! try to find valid concentrations
             bool  validate( array<double> &C );
             
             
@@ -120,7 +131,7 @@ namespace yocto
             void computeGammaPrimeAndPhi(double t, const array<double> &C);
             
             
-            //! assume that C is normalized and W is computed: aborb a part of X at time t
+            //! assume that C is normalized: aborb a part of X at time t
             void  absorb(double t, array<double> &X, const array<double> &C);
             
             
