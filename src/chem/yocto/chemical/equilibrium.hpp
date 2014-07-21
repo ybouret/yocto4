@@ -148,7 +148,7 @@ namespace yocto
             void update_delta() throw();
             
         public:
-            const int     DeltaNu;
+            const int     DeltaNu; //!< to find the dimension of K
         };
         
         

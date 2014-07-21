@@ -43,6 +43,7 @@ namespace yocto
             Phi.release();
             Gamma.release();
             K.release();
+            dNu.release();
             Nu0.release();
             Nu.release();
             
@@ -70,6 +71,7 @@ namespace yocto
                 {
                     Nu.make(N,M);
                     Nu0.make(N,M);
+                    dNu.make(N,0);
                     K.make(N,0.0);
                     Gamma.make(N,0.0);
                     Phi.make(N,M);
@@ -90,9 +92,10 @@ namespace yocto
                         equilibrium &eq = **k;
                         ++i;
                         eq.compile(Nu[i],lib);
+                        dNu[i] = eq.DeltaNu;
                     }
                     std::cerr << "Nu=" << Nu << std::endl;
-                    
+                    std::cerr << "dNu=" << dNu << std::endl;
                     //__________________________________________________________
                     //
                     // copy the full topology
@@ -134,8 +137,19 @@ namespace yocto
             
         }
         
-        
-        double equilibria:: computeGamma(double t, const array<double> &C )
+        void equilibria:: computeK(double t)
+        {
+            iterator     k = begin();
+            const size_t n = N;
+            for(size_t i=1;i<=n;++i,++k)
+            {
+                equilibrium &eq = **k;
+                K[i] = eq.K(t);
+            }
+
+        }
+
+        void equilibria:: computeGamma(double t, const array<double> &C )
         {
             iterator     k = begin();
             const size_t n = N;
@@ -144,10 +158,9 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.computeGamma(t, C, K[i]);
             }
-            return getF();
         }
         
-        double equilibria:: updateGamma(const array<double> &C)
+        void equilibria:: updateGamma(const array<double> &C)
         {
             iterator     k = begin();
             const size_t n = N;
@@ -156,10 +169,9 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.updateGamma(C,K[i]);
             }
-            return getF();
         }
         
-        double equilibria:: computeGammaAndPhi(double t, const array<double> &C)
+        void equilibria:: computeGammaAndPhi(double t, const array<double> &C)
         {
             iterator     k = begin();
             const size_t n = N;
@@ -168,10 +180,9 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.computeGammaAndPhi(Phi[i],t,C,K[i]);
             }
-            return getF();
         }
         
-        double equilibria:: updateGammaAndPhi(const array<double> &C) throw()
+        void equilibria:: updateGammaAndPhi(const array<double> &C) throw()
         {
             iterator     k = begin();
             const size_t n = N;
@@ -180,7 +191,6 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.updateGammaAndPhi(Phi[i],C,K[i]);
             }
-            return getF();
         }
         
         
@@ -194,21 +204,6 @@ namespace yocto
                 eq.updatePhi(Phi[i], C, K[i]);
             }
         }
-        
-        
-        
-        
-        double equilibria:: getF() const throw()
-        {
-            double ans = 0;
-            for(size_t i=N;i>0;--i)
-            {
-                const double g = Gamma[i];
-                ans += g*g;
-            }
-            return 0.5 * ans;
-        }
-        
         
         
         void  equilibria:: find_active_species() throw()

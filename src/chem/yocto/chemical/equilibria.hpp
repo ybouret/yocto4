@@ -51,6 +51,7 @@ namespace yocto
             
             matrix_t       Nu;          //!< [NxM], may be reduced in case of fixed species
             matrix_t       Nu0;         //!< [NxM], full initial topology
+            vector_t       dNu;         //!< [N], Delta_r Nu
             vector_t       K;           //!< [N] constants at time t,
             vector_t       Gamma;       //!< [N] constraints
             matrix_t       Phi;         //!< [NxM] dGamma/dX,
@@ -96,25 +97,24 @@ namespace yocto
                 return os;
             }
             
+            // initialize K
+            void computeK(double t);
             
             //! initilialize K and compute Gamma, return F
-            double computeGamma(double t, const array<double> &C );
+            void computeGamma(double t, const array<double> &C );
             
             //! compute Gamma once K is computed, return F
-            double updateGamma(const array<double> &C);
+            void updateGamma(const array<double> &C);
             
             //! initialize K, compute Gamma,Phi  return getF
-            double computeGammaAndPhi(double t, const array<double> &C);
+            void computeGammaAndPhi(double t, const array<double> &C);
             
             //! recompute Gamma and Phi for the same constants, return getF()
-            double updateGammaAndPhi(const array<double> &C) throw();
+            void updateGammaAndPhi(const array<double> &C) throw();
             
             //! update only Phi
             void updatePhi(const array<double> &C) throw();
-            
-            //! objective function : 1/2 Gamma^2
-            double getF() const throw();
-            
+         
             //! normalize system at time t
             bool  normalize( double t, array<double> &C );
             
