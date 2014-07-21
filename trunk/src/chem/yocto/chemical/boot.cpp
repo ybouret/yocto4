@@ -86,9 +86,10 @@ namespace yocto
             return os;
         }
         
-        void boot::constraint:: fill( array<integer_t> &P ) const
+        void boot::constraint:: fill( array<double> &P ) const
         {
             const size_t M = P.size();
+            for(size_t i=M;i>0;--i) P[i] = 0;
             for( const_iterator i=begin();i!=end();++i)
             {
                 const item  &it = *i;
@@ -106,7 +107,7 @@ namespace yocto
         //
         ////////////////////////////////////////////////////////////////////////
         
-        boot:: boot(): constraints()
+        boot:: boot(): constraints(), ran()
         {
         }
         

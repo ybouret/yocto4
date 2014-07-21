@@ -2,6 +2,7 @@
 #define YOCTO_CHEMICAL_BOOT_INCLUDED 1
 
 #include "yocto/chemical/equilibria.hpp"
+#include "yocto/code/rand.hpp"
 
 namespace yocto
 {
@@ -47,7 +48,7 @@ namespace yocto
 
                 friend std::ostream & operator<<(std::ostream &os, const constraint &cc);
                 
-                void fill( array<integer_t> &P) const;
+                void fill( array<double> &P) const;
                 
                 
             private:
@@ -85,6 +86,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(boot);
             vector<constraint::pointer> constraints;
+        public:
+            uniform_generator<double> ran;
         };
         
     }
