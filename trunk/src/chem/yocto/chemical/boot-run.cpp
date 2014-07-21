@@ -8,6 +8,8 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/math/kernel/svd.hpp"
 
+#include "yocto/code/utils.hpp"
+
 
 namespace yocto
 {
@@ -259,14 +261,14 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // Compute the Cstar concentration
+                // Compute the Xstar concentration
                 //______________________________________________________________
                 vector_t U(Nc,0);
                 mkl::mul(U,AP2,Lambda);
-                vector_t Cstar(M,0);
-                mkl::mul_trn(Cstar, P, U);
-                for(size_t j=M;j>0;--j) Cstar[j] /= detP2;
-                std::cerr << "Cstar=" << Cstar << std::endl;
+                vector_t Xstar(M,0);
+                mkl::mul_trn(Xstar, P, U);
+                for(size_t j=M;j>0;--j) Xstar[j] /= detP2;
+                std::cerr << "Xstar=" << Xstar << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -321,70 +323,75 @@ namespace yocto
                 std::cerr << "K="     << cs.K  << std::endl;
                 std::cerr << "Cscal=" << Cscal << std::endl;
                 
-                matrix_t &Phi   = cs.Phi;
-                vector_t &Gamma = cs.Gamma;
-                matrix_t &W     = cs.W;
-                vector_t &dX    = cs.dC;
-                vector_t &xi    = cs.xi;
-                vector_t  X(M,0);
+                vector_t X(M,0.0);
+                vector_t dX(M,0.0);
+                vector_t dL(Nc,0.0);
                 
-                vector_t dL(Nc,0);
+                vector_t       &V     = cs.xi;
+                const vector_t &Gamma = cs.Gamma;
+                const matrix_t &Phi   = cs.Phi;
+                matrix_t       &W     = cs.W;
                 
-                for(size_t iter=0;iter<1;++iter)
                 {
-                    // create a trial point
-                    for(size_t j=M;j>0;--j)
-                    {
-                        X[j] = 0;
-                    }
-                    for(size_t j=Nf;j>0;--j)
-                    {
-                        X[ ifixed[j] ] = Cfixed[j];
-                    }
+                    // gen a trial conc
+                    for(size_t j=M;j>0;--j) X[j] = 0;
                     for(size_t i=N;i>0;--i)
                     {
                         const double cc = Cscal[i];
                         for(size_t j=M;j>0;--j)
                         {
-                            if(cs.active[j]>0)
+                            if(int(Nu[i][j])!=0)
                             {
                                 X[j] += ran() * cc;
                             }
                         }
                     }
-                    
-                    for(size_t sub=0;sub<2;++sub)
+                    for(size_t k=Nf;k>0;--k)
                     {
-                        if( !cs.normalize(t, X))
-                        {
-                            throw exception("Beuh");
-                        }
+                        X[ ifixed[k] ] = Cfixed[k];
+                    }
+                    std::cerr << "Xr=" << X << std::endl;
+                    
+                    for( size_t sub=1;sub<=2;++sub)
+                    {
+                        if(!cs.normalize(t, X))
+                            throw exception("unable to normalize");
                         
-                        std::cerr << "X=" << X << std::endl;
+                        //-- first dX: P'*U
                         mkl::set(dL,Lambda);
                         mkl::mulsub(dL, P, X);
-                        std::cerr << "dL=" << dL << std::endl;
                         mkl::mul(U,AP2,dL);
-                        mkl::mul_trn(dX, P, U);
+                        mkl::mul_trn(dX,P,U);
+                        for(size_t j=M;j>0;--j) dX[j] /= detP2;
+                        std::cerr << "dX1=" << dX << std::endl;
+                        
+                        //-- second dX: Q'*V
+                        mkl::neg(V,Gamma);
+                        mkl::mulsub(V, Phi, dX);
+                        
+                        std::cerr << "Vrhs=" << V << std::endl;
+                        std::cerr << "Phi=" << Phi << std::endl;
+                        std::cerr << "Q=" << Q << std::endl;
+                        
+                        mkl::mul_rtrn(W,Phi,Q);
+                        if( !cs.LU.build(W) )
+                        {
+                            throw exception( "singular composition" );
+                        }
+                        lu_t::solve(W,V);
+                        std::cerr << "V=" << V << std::endl;
+                        
+                        //-- second dX
+                        mkl::muladd_trn(dX, Q, V);
                         std::cerr << "dX=" << dX << std::endl;
                         
-                        cs.updateGammaAndPhi(X);
-                        mkl::mul_rtrn(W, Phi, Nu);
-                        if(!cs.LU.build(W))
-                        {
-                            std::cerr << "invalid composition" << std::endl;
-                            return;
-                        }
-                        mkl::neg(cs.xi, Gamma);
-                        mkl::mulsub(xi, Phi, dX);
-                        lu_t::solve(W, xi);
-                        std::cerr << "xi=" << xi << std::endl;
-                        mkl::muladd_trn(dX, Nu, xi);
-                        std::cerr << "dX1=" << dX << std::endl;
                         mkl::add(X,dX);
-                        std::cerr << "X1=" << X << std::endl;
+                        std::cerr << "Xnew=" << X << std::endl;
                     }
+                    
+                    
                 }
+                
                 
                 
                 cs.restore_topology();
