@@ -188,5 +188,15 @@ namespace yocto
                 return false;
         }
         
+        
+        size_t boot:: size() const throw() { return constraints.size(); }
+        
+        const boot::constraint & boot:: operator[](size_t ic) const throw()
+        {
+            assert(ic>0);
+            assert(ic<=size());
+            return *constraints[ic];
+        }
+        
     }
 }

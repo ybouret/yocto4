@@ -9,9 +9,10 @@ namespace yocto
     {
         typedef math::algebra<double> mkl;
         
-        bool  equilibria:: normalize( double t, array<double> &C )
+        bool  equilibria:: normalize( double t, array<double> &C, bool recomputeK )
         {
             
+            assert(C.size()>=M);
             //__________________________________________________________________
             //
             // do we need to normalize ?
@@ -34,7 +35,14 @@ namespace yocto
             // Now we start from a valid set of concentration: initialize
             // first step
             //__________________________________________________________________
-            computeGammaAndPhi(t,C);
+            if(recomputeK)
+            {
+                computeGammaAndPhi(t,C);
+            }
+            else
+            {
+                updateGammaAndPhi(C);
+            }
             std::cerr << "K=" << K << std::endl;
             std::cerr << "C=" << C << std::endl;
             for(size_t count=1;/* count<=20 */;++count)
@@ -53,7 +61,7 @@ namespace yocto
                 mkl::neg(xi, Gamma);
                 lu_t::solve(W, xi);
                 std::cerr << "xi_full=" << xi << std::endl;
-               
+                
                 //______________________________________________________________
                 //
                 // shall clip xi to control
