@@ -35,6 +35,7 @@ namespace yocto
             dC.release();
             active.release();
             
+            scaled.release();
             online.release();
             LU.release();
             limits.release();
@@ -81,7 +82,7 @@ namespace yocto
                     limits.make(N,ex0);
                     LU.make(N,0.0);
                     online.ensure(N);
-                    
+                    scaled.make(N,0);
                     //__________________________________________________________
                     //
                     // fill constant parts
@@ -146,9 +147,55 @@ namespace yocto
                 equilibrium &eq = **k;
                 K[i] = eq.K(t);
             }
-
+            
         }
-
+        
+        void equilibria:: compute_scaled_concentrations() throw()
+        {
+            for(size_t i=N;i>0;--i)
+            {
+                const double KK = K[i];
+                const int    dd = dNu[i];
+                if(dd!=0)
+                {
+                    scaled[i] = pow(KK,1.0/dd);
+                }
+                else
+                {
+                    scaled[i] = 1.0;
+                }
+            }
+            
+        }
+        
+        bool equilibria:: compute_trial( array<double> &C, alea_t &ran)
+        {
+            assert(C.size()>=M);
+            for(size_t j=M;j>0;--j)
+            {
+                if(active[j]>0)
+                {
+                    C[j] = 0.0;
+                }
+            }
+            
+            for(size_t i=N;i>0;--i)
+            {
+                const double cc = scaled[i];
+                for(size_t j=M;j>0;--j)
+                {
+                    if(active[j]>0)
+                    {
+                        C[j] += ran() * cc;
+                    }
+                }
+            }
+            
+            return normalize(-1, C, false);
+            
+        }
+        
+        
         void equilibria:: computeGamma(double t, const array<double> &C )
         {
             iterator     k = begin();
@@ -180,6 +227,7 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.computeGammaAndPhi(Phi[i],t,C,K[i]);
             }
+            cleanPhi();
         }
         
         void equilibria:: updateGammaAndPhi(const array<double> &C) throw()
@@ -191,8 +239,23 @@ namespace yocto
                 equilibrium &eq = **k;
                 Gamma[i] = eq.updateGammaAndPhi(Phi[i],C,K[i]);
             }
+            cleanPhi();
         }
         
+        
+        void equilibria:: cleanPhi() throw()
+        {
+            for(size_t j=M;j>0;--j)
+            {
+                if(active[j]<=0)
+                {
+                    for(size_t i=N;i>0;--i)
+                    {
+                        Phi[i][j] = 0;
+                    }
+                }
+            }
+        }
         
         void equilibria:: updatePhi(const array<double> &C) throw()
         {
@@ -203,6 +266,7 @@ namespace yocto
                 equilibrium &eq = **k;
                 eq.updatePhi(Phi[i], C, K[i]);
             }
+            cleanPhi();
         }
         
         
@@ -232,8 +296,8 @@ namespace yocto
             Nu.assign(Nu0);
             find_active_species();
         }
-
-
+        
+        
         
     }
 }

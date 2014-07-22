@@ -4,6 +4,7 @@
 #include "yocto/chemical/equilibrium.hpp"
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/container/tuple.hpp"
+#include "yocto/code/rand.hpp"
 
 
 namespace yocto
@@ -11,13 +12,15 @@ namespace yocto
     namespace chemical
     {
         
-        typedef math::matrix<double>    matrix_t;
-        typedef ptrdiff_t               integer_t;
-        typedef math::matrix<integer_t> imatrix_t;
-        typedef vector<double>          vector_t;
-        typedef vector<ptrdiff_t>       ivector_t;
-        typedef math::crout<double>     lu_t;
+        typedef math::matrix<double>      matrix_t;
+        typedef ptrdiff_t                 integer_t;
+        typedef math::matrix<integer_t>   imatrix_t;
+        typedef vector<double>            vector_t;
+        typedef vector<integer_t>         ivector_t;
+        typedef math::crout<double>       lu_t;
+        typedef uniform_generator<double> alea_t;
         
+        class boot;
         
         class equilibria : public equilibrium::database
         {
@@ -51,7 +54,7 @@ namespace yocto
             
             matrix_t       Nu;          //!< [NxM], may be reduced in case of fixed species
             matrix_t       Nu0;         //!< [NxM], full initial topology
-            vector_t       dNu;         //!< [N], Delta_r Nu
+            ivector_t      dNu;         //!< [N], Delta_r Nu
             vector_t       K;           //!< [N] constants at time t,
             vector_t       Gamma;       //!< [N] constraints
             matrix_t       Phi;         //!< [NxM] dGamma/dX,
@@ -60,6 +63,7 @@ namespace yocto
             vector<extent> limits;      //!< [N] infos
             lu_t           LU;          //!< [N] solver
             vector<size_t> online;      //!< [N] online reactions
+            vector<double> scaled;      //!< [N] scaled concentration
             vector<size_t> active;      //!< [M] number or reaction involving each species
             vector_t       dC;          //!< [M] concentrations increase (Newton's Step)
             vector<size_t> bad;         //!< [M] bad concentrations indices
@@ -97,8 +101,18 @@ namespace yocto
                 return os;
             }
             
-            // initialize K
+            //! initialize K
             void computeK(double t);
+            
+            //! compute scaled concentrations, once K is computed
+            void  compute_scaled_concentrations() throw();
+
+            //! compute a trial from ACTIVE and PRE-SCALED concentrations
+            /**
+             Non active-concentration are left untouched...
+             */
+            bool compute_trial(array<double> &C, alea_t &ran);
+            
             
             //! initilialize K and compute Gamma, return F
             void computeGamma(double t, const array<double> &C );
@@ -116,7 +130,7 @@ namespace yocto
             void updatePhi(const array<double> &C) throw();
          
             //! normalize system at time t
-            bool  normalize( double t, array<double> &C );
+            bool  normalize( double t, array<double> &C, bool recomputeK=true );
             
             //! find limits of extents
             void  find_limits_of( const array<double> &C ) throw();
@@ -134,8 +148,14 @@ namespace yocto
             //! assume that C is normalized: aborb a part of X at time t
             void  absorb(double t, array<double> &X, const array<double> &C);
             
+            void initialize_with(const boot       &loader,
+                                 const collection &lib,
+                                 const double      t,
+                                 array<double>     &C0);
             
         private:
+            //! remove unactive column
+            void cleanPhi() throw();
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };

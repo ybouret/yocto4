@@ -2,7 +2,6 @@
 #define YOCTO_CHEMICAL_BOOT_INCLUDED 1
 
 #include "yocto/chemical/equilibria.hpp"
-#include "yocto/code/rand.hpp"
 
 namespace yocto
 {
@@ -82,12 +81,14 @@ namespace yocto
             
             void operator()( array<double> &C, const collection &lib, equilibria &cs, double t );
             
+            size_t size() const throw(); //!< #constraints
+            const constraint & operator[](size_t ic) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(boot);
             vector<constraint::pointer> constraints;
         public:
-            uniform_generator<double> ran;
+            mutable alea_t ran;
         };
         
     }
