@@ -8,6 +8,8 @@ namespace yocto
     namespace chemical
     {
         
+        
+        
         class boot
         {
         public:
@@ -54,6 +56,11 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(constraint);
             };
             
+            // integer gram-schmidt
+            /**
+             assume coefficients are integer
+             */
+            static void igs( matrix_t &A );
             
             
             explicit boot();

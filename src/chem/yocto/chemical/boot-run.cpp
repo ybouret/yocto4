@@ -49,340 +49,98 @@ namespace yocto
             }
             return count;
         }
-                
-        void boot:: operator()(array<double>    &C,
-                               const collection &lib,
-                               equilibria       &cs,
-                               double            t )
+        
+        static inline integer_t __inorm_sq( const array<double> &v ) throw()
         {
-            cs.startup(lib);
-            try
+            integer_t ans = 0;
+            for(size_t j=v.size();j>0;--j)
             {
-                const size_t N = cs.N;
-                const size_t M = cs.M;
-                assert(C.size()>=M);
-                if(N>M)
-                    throw exception("too many reactions");
-                
-                const size_t Nc = constraints.size();
-                if(Nc+N!=M)
-                    throw exception("#species=%u != #reactions=%u + #constraints=%u ", unsigned(M), unsigned(N), unsigned(Nc));
-                
-                if(Nc<=0)
+                const integer_t ii = __rint(v[j]);
+                ans += ii*ii;
+            }
+            return ans;
+        }
+        
+        static inline integer_t __idot( const array<double> &v, const array<double> &u) throw()
+        {
+            integer_t ans = 0;
+            assert(u.size()==v.size());
+            for(size_t j=v.size();j>0;--j)
+            {
+                ans += __rint(v[j]) * __rint(u[j]);
+            }
+            return ans;
+        }
+        
+        static inline void __simplify( array<integer_t> &w ) throw()
+        {
+            integer_t g = 0;
+            const size_t n = w.size();
+            for(size_t i=n;i>0;--i)
+            {
+                const integer_t wi = w[i];
+                const integer_t ai = wi < 0 ? -wi : wi;
+                if(!ai)
+                    continue;
+
+                for(size_t j=i;j>0;--j)
                 {
-                    std::cerr << "NOT IMPLEMENTED : NO CONSTRAINTS" << std::endl;
-                    return;
-                }
-                
-                //______________________________________________________________
-                //
-                // Fill the P matrix and Lambda vector
-                //______________________________________________________________
-                matrix_t  P(Nc,M);
-                vector_t  Lambda(Nc,0.0);
-                for(size_t i=1;i<=Nc;++i)
-                {
-                    const constraint &cc = *constraints[i];
-                    Lambda[i] = cc.sum;
-                    cc.fill(P[i]);
-                }
-                
-                std::cerr << "P0="      << P      << std::endl;
-                std::cerr << "Lambda0=" << Lambda << std::endl;
-                
-                
-                //______________________________________________________________
-                //
-                // optimize with singleton(s)
-                //______________________________________________________________
-                matrix_t             &Nu = cs.Nu;
-                sorted_vector<size_t> single(Nc,as_capacity);
-                
-                vector<double>        Cfixed(Nc,as_capacity);
-                vector<size_t>        ifixed(Nc,as_capacity);
-                bool                  changed = false;
-                
-                for(size_t i=1;i<=Nc;++i)
-                {
-                    //__________________________________________________________
-                    //
-                    // how many not zero items...
-                    //__________________________________________________________
-                    size_t       s     = 0;
-                    const size_t count = count_items(s,P[i]);
-                    
-                    //__________________________________________________________
-                    //
-                    // None: bad
-                    //__________________________________________________________
-                    if(count<=0)
-                        throw exception("unexpected empty constraint[%u]!", unsigned(i));
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    // general case
-                    //__________________________________________________________
-                    if(count>1)
+                    const integer_t wj  = w[j];
+                    const integer_t aj  = wj < 0 ? -wj : wj;
+                    if(!aj)
                         continue;
                     
-                    //__________________________________________________________
-                    //
-                    // a singleton !
-                    //__________________________________________________________
-                    assert(1==count);
-                    if( !single.insert(s) )
-                        throw exception("multiple single constraint on species #%u", unsigned(s) );
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    // simplify the projection matrix
-                    //__________________________________________________________
-                    changed = true;
-                    
-                    assert(0!=P[i][s]);
-                    const double lhs = (Lambda[i] /= P[i][s]);
-                    P[i][s] = 1;
-                    Cfixed.push_back(lhs);
-                    ifixed.push_back(s);
-                    
-                    //__________________________________________________________
-                    //
-                    // simplify P: inform other rows of that case
-                    //__________________________________________________________
-                    for(size_t k=1;k<=Nc;++k)
+                    const integer_t gij = gcd_of(ai,aj);
+                    if(g<=0)
                     {
-                        if(i!=k)
-                        {
-                            array<double>    &Pk = P[k];
-                            double           &p  = Pk[s];
-                            if(p>0)
-                            {
-                                Lambda[k] -= p*lhs;
-                                p          = 0.0;
-                                if( !check_valid(Pk) )
-                                    throw exception("degenerate constraints");
-                            }
-                        }
-                    }
-                    
-                    //__________________________________________________________
-                    //
-                    // simplify Nu from fixed species
-                    //__________________________________________________________
-                    for(size_t k=N;k>0;--k)
-                    {
-                        Nu[k][s] = 0;
-                    }
-                    
-                    
-                }
-                if(changed)
-                {
-                    std::cerr << "#has changed..." << std::endl;
-                    std::cerr << "Nu0=" << cs.Nu0 << std::endl;
-                    std::cerr << "Nu=" << Nu << std::endl;
-                    cs.find_active_species();
-                    std::cerr << "P=" << P << std::endl;
-                    std::cerr << "Lambda=" << Lambda << std::endl;
-                    
-                    co_qsort(ifixed, Cfixed);
-                    std::cerr << "ifixed=" << ifixed << std::endl;
-                    std::cerr << "Cfixed=" << Cfixed << std::endl;
-                }
-                const size_t Nf = ifixed.size();
-                
-                //______________________________________________________________
-                //
-                // Check rank using the Gramian matrix
-                //______________________________________________________________
-                matrix_t P2(Nc,Nc);
-                for(size_t i=Nc;i>0;--i)
-                {
-                    for(size_t j=i;j>0;--j)
-                    {
-                        double sum = 0;
-                        for(size_t k=M;k>0;--k)
-                        {
-                            sum += P[i][k] * P[j][k];
-                        }
-                        P2[i][j] = P2[j][i] = sum;
-                    }
-                }
-                std::cerr << "P2=" << P2 << std::endl;
-                matrix_t AP2(P2);
-                const int detP2 = __rint(math::__determinant_of(AP2));
-                std::cerr << "detP2=" << detP2 << std::endl;
-                if(!detP2)
-                {
-                    throw exception("singular set of constraints!");
-                }
-                
-                //______________________________________________________________
-                //
-                // Compute the adjoint matrix to avoid precision lost
-                //______________________________________________________________
-                math::adjoint(AP2,P2);
-                for(size_t i=1;i<=Nc;++i)
-                {
-                    for(size_t j=1;j<=Nc;++j)
-                    {
-                        AP2[i][j] = __rint(AP2[i][j]);
-                    }
-                }
-                std::cerr << "AP2=" << AP2 << std::endl;
-                
-                //______________________________________________________________
-                //
-                // Compute the Xstar concentration
-                //______________________________________________________________
-                vector_t U(Nc,0);
-                mkl::mul(U,AP2,Lambda);
-                vector_t Xstar(M,0);
-                mkl::mul_trn(Xstar, P, U);
-                for(size_t j=M;j>0;--j) Xstar[j] /= detP2;
-                std::cerr << "Xstar=" << Xstar << std::endl;
-                
-                //______________________________________________________________
-                //
-                // Compute the orthogonal space
-                //______________________________________________________________
-                matrix_t Q(N,M);
-                {
-                    matrix_t F(M,M);
-                    for(size_t i=1;i<=Nc;++i)
-                    {
-                        for(size_t j=1;j<=M;++j)
-                        {
-                            F[j][i] = P[i][j];
-                        }
-                    }
-                    vector_t svd_w(M,0.0);
-                    matrix_t svd_V(M,M);
-                    if(!math::svd<double>::build(F,svd_w, svd_V))
-                    {
-                        throw exception("cannot find orthonormal basis");
-                    }
-                    for(size_t i=1;i<=N;++i)
-                    {
-                        for(size_t j=1;j<=M;++j)
-                        {
-                            Q[i][j] = F[j][Nc+i];
-                        }
-                    }
-                }
-                std::cerr << "Q=" << Q << std::endl;
-                
-                
-                //______________________________________________________________
-                //
-                // Compute the scaling from constants etc
-                //______________________________________________________________
-                cs.computeK(t);
-                vector_t Cscal(N,0);
-                for(size_t i=1;i<=N;++i)
-                {
-                    const double K   = cs.K[i];
-                    const int    dNu = cs.dNu[i];
-                    if(dNu!=0)
-                    {
-                        Cscal[i] = pow(K,1.0/dNu);
+                        g = gij;
                     }
                     else
                     {
-                        Cscal[i] = 0;
+                        g = min_of(g,gij);
                     }
                 }
-                std::cerr << "K="     << cs.K  << std::endl;
-                std::cerr << "Cscal=" << Cscal << std::endl;
-                
-                
-                //______________________________________________________________
-                //
-                // Compute a trial point
-                //______________________________________________________________
-                vector_t X(M,0);
-                vector_t dL(Nc,0.0);
-                vector_t &dX = cs.dC;
-                
-                for(size_t i=N;i>0;--i)
-                {
-                    const double cc = Cscal[i];
-                    for(size_t j=M;j>0;--j)
-                    {
-                        if(cs.active[j]>0)
-                        {
-                            X[j] += ran() * cc;
-                        }
-                    }
-                }
-                for(size_t j=Nf;j>0;--j)
-                {
-                    X[ifixed[j]] = Cfixed[j];
-                }
-                std::cerr << "X0=" << X << std::endl;
-                
-                for(unsigned sub=1;sub<=10;++sub)
-                {
-                    if( !cs.normalize(t, X))
-                    {
-                        throw exception("Bad point");
-                    }
-                    cs.updateGammaAndPhi(X);
-                    std::cerr << "X1=" << X << std::endl;
-                    mkl::mul_rtrn(cs.W, cs.Phi, Nu);
-                    if(!cs.LU.build(cs.W))
-                    {
-                        throw exception("singular point v2");
-                    }
-                    mkl::set(dL,Lambda);
-                    mkl::mulsub(dL, P, C);
-                    mkl::mul(U, AP2, dL);
-                    std::cerr << "U=" << U << "/" << detP2 << std::endl;
-                    mkl::mul_trn(dX, P, U);
-                    std::cerr << "dX0=" << dX << std::endl;
-                    mkl::mul(cs.xi,cs.Phi,dX);
-                    mkl::add(cs.xi,cs.Gamma);
-                    mkl::neg(cs.xi,cs.xi);
-                    cs.LU.solve(cs.W, cs.xi);
-                    for(size_t i=N;i>0;--i)
-                    {
-                        cs.xi[i] /= detP2;
-                    }
-                    std::cerr << "xi0=" << cs.xi << std::endl;
-                    cs.find_limits_of(X);
-                    cs.show_limits();
-                    cs.clip_extents();
-                    std::cerr << "xi1=" << cs.xi << std::endl;
-                    mkl::mul_trn(dX, Nu, cs.xi);
-                    std::cerr << "dX1=" << dX << std::endl;
-                    
-                    for(size_t j=M;j>0;--j)
-                    {
-                        if(cs.active[j]>0)
-                        {
-                            X[j] = max_of<double>(0.0,X[j]+dX[j]);
-                        }
-                        else
-                        {
-                            assert(fabs(dX[j])<=0);
-                        }
-                    }
-                    std::cerr << "Xnew=" << X << std::endl;
-                    
-                }
-                
-                
-                cs.restore_topology();
-                
             }
-            catch(...)
+            if(g>0)
             {
-                cs.restore_topology();
-                throw;
+                for(size_t i=n;i>0;--i)
+                {
+                    w[i] /= g;
+                }
             }
         }
+        
+        void boot:: igs( matrix_t &A )
+        {
+            const size_t dim = A.cols;
+            const size_t num = A.rows;
+            ivector_t    usq(num,0);
+            ivector_t    w(dim,0);
+            
+            for(size_t i=1;i<=num;++i)
+            {
+                array<double> &v  = A[i];
+                for(size_t k=1;k<i;++k)
+                {
+                    const array<double> &u  = A[k];
+                    const integer_t      u2 = usq[k];
+                    const integer_t      uv = __idot(u,v);
+                    // construct integer vector
+                    for(size_t j=dim;j>0;--j)
+                    {
+                        w[j] = u2*__rint(v[j]) - uv * __rint(u[j]);
+                    }
+                    __simplify(w);
+                    for(size_t j=dim;j>0;--j)
+                    {
+                        v[j] = w[j];
+                    }
+                }
+                usq[i] = __inorm_sq(v);
+            }
+            
+        }
+        
         
         
         void equilibria::initialize_with(const boot       &loader,
@@ -423,7 +181,7 @@ namespace yocto
                 
                 std::cerr << "P0="      << P      << std::endl;
                 std::cerr << "Lambda0=" << Lambda << std::endl;
-
+                
                 //______________________________________________________________
                 //
                 // optimize with singleton(s)
@@ -564,7 +322,27 @@ namespace yocto
                     }
                 }
                 std::cerr << "AP2=" << AP2 << std::endl;
-
+                
+                matrix_t F(M,M);
+                for(size_t i=Nc;i>0;--i)
+                {
+                    for(size_t j=M;j>0;--j)
+                    {
+                        F[i][j] = P[i][j];
+                    }
+                }
+                for(size_t i=N;i>0;--i)
+                {
+                    for(size_t j=M;j>0;--j)
+                    {
+                        F[Nc+i][j] = Nu[i][j];
+                    }
+                }
+                std::cerr << "F0=" << F << std::endl;
+                boot::igs(F);
+                std::cerr << "F=" << F << std::endl;
+                exit(1);
+                
                 //______________________________________________________________
                 //
                 // Compute Xstar
@@ -638,7 +416,7 @@ namespace yocto
                 // All Done ! Restore Topology
                 //______________________________________________________________
                 restore_topology();
-
+                
             }
             catch(...)
             {
