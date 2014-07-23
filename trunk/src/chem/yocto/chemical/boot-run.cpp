@@ -153,6 +153,12 @@ namespace yocto
             try
             {
                 
+                //______________________________________________________________
+                //
+                //
+                // Find what to do
+                //
+                //______________________________________________________________
                 if(N>M)
                     throw exception("too many reactions");
                 
@@ -168,7 +174,9 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
+                //
                 // Fill the P matrix and Lambda vector
+                //
                 //______________________________________________________________
                 matrix_t  P(Nc,M);
                 vector_t  Lambda(Nc,0.0);
@@ -184,104 +192,115 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // optimize with singleton(s)
+                // optimize with singleton(s): find fixed species
                 //______________________________________________________________
-                sorted_vector<size_t> single(Nc,as_capacity);
                 vector<double>        Cfixed(Nc,as_capacity);
                 vector<size_t>        ifixed(Nc,as_capacity);
                 bool                  changed = false;
                 
-                for(size_t i=1;i<=Nc;++i)
                 {
-                    //__________________________________________________________
-                    //
-                    // how many not zero items...
-                    //__________________________________________________________
-                    size_t       s     = 0;
-                    const size_t count = count_items(s,P[i]);
-                    
-                    //__________________________________________________________
-                    //
-                    // None: bad
-                    //__________________________________________________________
-                    if(count<=0)
-                        throw exception("unexpected empty constraint[%u]!", unsigned(i));
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    // general case
-                    //__________________________________________________________
-                    if(count>1)
-                        continue;
-                    
-                    //__________________________________________________________
-                    //
-                    // a singleton !
-                    //__________________________________________________________
-                    assert(1==count);
-                    if( !single.insert(s) )
-                        throw exception("multiple single constraint on species #%u", unsigned(s) );
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    // simplify the projection matrix
-                    //__________________________________________________________
-                    changed = true;
-                    
-                    assert(0!=P[i][s]);
-                    const double lhs = (Lambda[i] /= P[i][s]);
-                    P[i][s] = 1;
-                    Cfixed.push_back(lhs);
-                    ifixed.push_back(s);
-                    
-                    //__________________________________________________________
-                    //
-                    // simplify P: inform other rows of that case
-                    //__________________________________________________________
-                    for(size_t k=1;k<=Nc;++k)
+                    sorted_vector<size_t> single(Nc,as_capacity);
+                    for(size_t i=1;i<=Nc;++i)
                     {
-                        if(i!=k)
+                        //______________________________________________________
+                        //
+                        // how many not zero items...
+                        //______________________________________________________
+                        size_t       s     = 0;
+                        const size_t count = count_items(s,P[i]);
+                        
+                        //______________________________________________________
+                        //
+                        // None: bad
+                        //______________________________________________________
+                        if(count<=0)
+                            throw exception("unexpected empty constraint[%u]!", unsigned(i));
+                        
+                        
+                        //______________________________________________________
+                        //
+                        // general case
+                        //______________________________________________________
+                        if(count>1)
+                            continue;
+                        
+                        //______________________________________________________
+                        //
+                        // a singleton !
+                        //______________________________________________________
+                        assert(1==count);
+                        if( !single.insert(s) )
+                            throw exception("multiple single constraint on species #%u", unsigned(s) );
+                        
+                        
+                        //______________________________________________________
+                        //
+                        // simplify the projection matrix
+                        //______________________________________________________
+                        changed = true;
+                        
+                        assert(0!=P[i][s]);
+                        const double lhs = (Lambda[i] /= P[i][s]);
+                        P[i][s] = 1;
+                        Cfixed.push_back(lhs);
+                        ifixed.push_back(s);
+                        
+                        //______________________________________________________
+                        //
+                        // simplify P: inform other rows of that case
+                        //______________________________________________________
+                        for(size_t k=1;k<=Nc;++k)
                         {
-                            array<double>    &Pk = P[k];
-                            double           &p  = Pk[s];
-                            if(p>0)
+                            if(i!=k)
                             {
-                                Lambda[k] -= p*lhs;
-                                p          = 0.0;
-                                if( !check_valid(Pk) )
-                                    throw exception("degenerate constraints");
+                                array<double>    &Pk = P[k];
+                                double           &p  = Pk[s];
+                                if(p>0)
+                                {
+                                    Lambda[k] -= p*lhs;
+                                    p          = 0.0;
+                                    if( !check_valid(Pk) )
+                                        throw exception("degenerate constraints");
+                                }
                             }
                         }
+                        
+                        //______________________________________________________
+                        //
+                        // simplify Nu from fixed species
+                        //______________________________________________________
+                        for(size_t k=N;k>0;--k)
+                        {
+                            Nu[k][s] = 0;
+                        }
+                        
+                        
                     }
-                    
-                    //__________________________________________________________
-                    //
-                    // simplify Nu from fixed species
-                    //__________________________________________________________
-                    for(size_t k=N;k>0;--k)
-                    {
-                        Nu[k][s] = 0;
-                    }
-                    
-                    
                 }
+                std::cerr << "Nu0=" << Nu0 << std::endl;
+                
                 if(changed)
                 {
                     std::cerr << "#has changed..." << std::endl;
-                    std::cerr << "Nu0=" << Nu0 << std::endl;
-                    std::cerr << "Nu="  << Nu << std::endl;
                     find_active_species();
-                    std::cerr << "P=" << P << std::endl;
-                    std::cerr << "Lambda=" << Lambda << std::endl;
-                    
                     co_qsort(ifixed, Cfixed);
                     std::cerr << "ifixed=" << ifixed << std::endl;
                     std::cerr << "Cfixed=" << Cfixed << std::endl;
                 }
+                std::cerr << "Nu="  << Nu << std::endl;
+                std::cerr << "P=" << P << std::endl;
+                std::cerr << "Lambda=" << Lambda << std::endl;
+                
+                //______________________________________________________________
+                //
+                //
+                // Fixed species and D.O.F
+                //
+                //______________________________________________________________
                 const size_t Nf = ifixed.size();
                 std::cerr << "#fixed=" << Nf << std::endl;
+                
+                
                 const size_t dof = M-Nf;
                 vector<size_t> idof(dof,as_capacity);
                 for(size_t j=1;j<=M;++j)
@@ -300,9 +319,12 @@ namespace yocto
                 }
                 std::cerr << "idof=" << idof << std::endl;
                 
+                
                 //______________________________________________________________
                 //
+                //
                 // Check rank using the Gramian matrix
+                //
                 //______________________________________________________________
                 matrix_t P2(Nc,Nc);
                 for(size_t i=Nc;i>0;--i)
@@ -319,6 +341,11 @@ namespace yocto
                 }
                 std::cerr << "P2=" << P2 << std::endl;
                 matrix_t AP2(P2);
+                
+                //______________________________________________________________
+                //
+                // Compute the determinant...
+                //______________________________________________________________
                 const int detP2 = __rint(math::__determinant_of(AP2));
                 std::cerr << "detP2=" << detP2 << std::endl;
                 if(!detP2)
@@ -342,12 +369,18 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // Compute the orthogonal space
+                //
+                // Compute the orthogonal space Q
+                //
                 //______________________________________________________________
                 matrix_t Q(N,M);
                 
+                //______________________________________________________________
+                //
+                // using P (+) Nu
+                //______________________________________________________________
+                matrix_t F(M,M);
                 {
-                    matrix_t F(M,M);
                     for(size_t i=Nc;i>0;--i)
                     {
                         for(size_t j=M;j>0;--j)
@@ -378,6 +411,11 @@ namespace yocto
                     }
                 }
                 std::cerr << "Q=" << Q << std::endl;
+                
+                //______________________________________________________________
+                //
+                // find the diagonal terms
+                //______________________________________________________________
                 ivector_t q(N,0);
                 for(size_t i=N;i>0;--i)
                 {
@@ -387,7 +425,9 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
+                //
                 // Compute Xstar
+                //
                 //______________________________________________________________
                 vector_t Xstar(M,0.0);
                 vector_t U(Nc,0.0);
@@ -396,17 +436,23 @@ namespace yocto
                 for(size_t j=M;j>0;--j) Xstar[j]/=detP2;
                 std::cerr << "Xstar=" << Xstar << std::endl;
                 
-                
-                
+                //______________________________________________________________
+                //
+                //
+                // Compute the scaled concentrations
+                //
+                //______________________________________________________________
                 computeK(t);
                 compute_scaled_concentrations();
                 std::cerr << "K=" << K << std::endl;
                 std::cerr << "scaled=" << scaled << std::endl;
                 
-            
+                
                 //______________________________________________________________
                 //
+                //
                 // Let us start
+                //
                 //______________________________________________________________
                 vector_t X(M,0.0);
                 vector_t dL(Nc,0.0);
@@ -424,82 +470,67 @@ namespace yocto
                 {
                     
                 }
+     
                 
-                //______________________________________________________________
-                //
-                // project
-                //______________________________________________________________
-                std::cerr << "X0=" << X << std::endl;
-                mkl::mul(V,Q,X);
-                for(size_t i=N;i>0;--i)
+                matrix_t incr(Nc,M);       //!< each row is an increase
+                matrix_t J0(M,Nc);         //!< auxiliary
+                mkl::mul_ltrn(J0, P, AP2); //!< once and for all
+                matrix_t J(M,Nc);          //!< the constraint matrix
+                matrix_t PhiJ0(N,Nc);
+                
+                std::cerr << "J0=" << J0 << std::endl;
                 {
-                    V[i] /= q[i];
-                }
-                
-                mkl::set(X,Xstar);
-                mkl::muladd_trn(X,Q,V);
-                std::cerr << "V=" << V << std::endl;
-                std::cerr << "X1=" <<X << std::endl;
-                
-                // use Q as topology!
-                Nu.assign(Q);
-                find_active_species();
-                
-                if( !normalize(-1, X, false) )
-                {
+                    updateGammaAndPhi(X);
+                    std::cerr << "Gamma=" << Gamma << std::endl;
+                    std::cerr << "Phi=" << Phi << std::endl;
                     
-                }
-                
-                
-                
-#if 0
-                for(unsigned sub=1;sub<=2;++sub)
-                {
-                    mkl::set(X,Xstar);
-                    mkl::muladd_trn(X,Q,V);
-                    std::cerr << "V=" << V << std::endl;
-                    std::cerr << "X1=" <<X << std::endl;
+                    // compute dL = Lambda - P*C
+                    mkl::set(dL,Lambda);
+                    mkl::mulsub(dL, P, X);
                     
+                    // compute J*detP2 = J0 - Q'*inv(Phi*Q')*Phi * J0
+                    mkl::mul_rtrn(W, Phi, Q);
+                    if(!LU.build(W))
+                    {
+                        throw exception("singular composition...");
+                    }
+                    
+                    mkl::mul(PhiJ0,Phi,J0);
+                    std::cerr << "PhiJ0=" << PhiJ0 << std::endl;
+                    lu_t::solve(W, PhiJ0);
+                    std::cerr << "WPhiJ0=" << PhiJ0 << std::endl;
+                    
+                    mkl::mul_ltrn(J,Q,PhiJ0);
+                    std::cerr << "J1=" << J << std::endl;
                     for(size_t j=M;j>0;--j)
                     {
-                        dX[j] = 0;
-                    }
-                    
-                    for(size_t i=dof;i>0;--i)
-                    {
-                        const size_t j = idof[i];
-                        const double Xj = X[j];
-                        if(Xj<0)
+                        for(size_t i=Nc;i>0;--i)
                         {
-                            dX[j] = -Xj;
+                            J[j][i] = J0[j][i] - J[j][i];
                         }
                     }
+                    std::cerr << "J=" << J << std::endl;
                     
-                    std::cerr << "Cbad=" << dX << std::endl;
-                    mkl::mul(dV,Q,dX);
-                    std::cerr << "dV=" << dV << std::endl;
-                    mkl::mul_trn(dX,Q,dV);
-                    std::cerr << "G=" << dX << std::endl;
-                    double alpha = 1.0;
-                    for(size_t i=dof;i>0;--i)
+                    // compute individual increases
+                    for(size_t i=Nc;i>0;--i)
                     {
-                        const size_t j = idof[i];
-                        const double Xj = X[j];
-                        const double Gj = dX[j];
-                        if(Xj>=0&& -Gj>Xj)
+                        for(size_t k=Nc;k>0;--k)
                         {
-                            alpha = min_of(alpha,Xj/-Gj);
+                            dU[k] = (i!=k) ? 0 : dL[k];
                         }
-                        
+                        std::cerr << "dU" << i << "=" << dU << std::endl;
+                        array<double> &dd = incr[i];
+                        mkl::mul(dd,J,dU);
+                        for(size_t j=M;j>0;--j)
+                        {
+                            dd[j] /= detP2;
+                        }
                     }
-                    std::cerr << "alpha = " << alpha << std::endl;
-                    
-                    mkl::muladd(V,alpha,dV);
-                    mkl::mul_trn(dX,Q,dV);
-                    
+                    std::cerr << "incr=" << incr << std::endl;
                     
                 }
-#endif
+                
+                
                 
                 //______________________________________________________________
                 //
