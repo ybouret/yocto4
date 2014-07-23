@@ -82,7 +82,7 @@ namespace yocto
                 const integer_t ai = wi < 0 ? -wi : wi;
                 if(!ai)
                     continue;
-
+                
                 for(size_t j=i;j>0;--j)
                 {
                     const integer_t wj  = w[j];
@@ -323,42 +323,12 @@ namespace yocto
                 }
                 std::cerr << "AP2=" << AP2 << std::endl;
                 
-                matrix_t F(M,M);
-                for(size_t i=Nc;i>0;--i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        F[i][j] = P[i][j];
-                    }
-                }
-                for(size_t i=N;i>0;--i)
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        F[Nc+i][j] = Nu[i][j];
-                    }
-                }
-                std::cerr << "F0=" << F << std::endl;
-                boot::igs(F);
-                std::cerr << "F=" << F << std::endl;
-                exit(1);
-                
-                //______________________________________________________________
-                //
-                // Compute Xstar
-                //______________________________________________________________
-                vector_t Xstar(M,0.0);
-                vector_t U(Nc,0.0);
-                mkl::mul(U,AP2,Lambda);
-                mkl::mul_trn(Xstar, P, U);
-                for(size_t j=M;j>0;--j) Xstar[j]/=detP2;
-                std::cerr << "Xstar=" << Xstar << std::endl;
-                
                 //______________________________________________________________
                 //
                 // Compute the orthogonal space
                 //______________________________________________________________
                 matrix_t Q(N,M);
+#if 0
                 {
                     matrix_t F(M,M);
                     for(size_t i=1;i<=Nc;++i)
@@ -383,6 +353,58 @@ namespace yocto
                     }
                 }
                 std::cerr << "Q=" << Q << std::endl;
+#endif
+                
+                {
+                    matrix_t F(M,M);
+                    for(size_t i=Nc;i>0;--i)
+                    {
+                        for(size_t j=M;j>0;--j)
+                        {
+                            F[i][j] = P[i][j];
+                        }
+                    }
+                    for(size_t i=N;i>0;--i)
+                    {
+                        for(size_t j=M;j>0;--j)
+                        {
+                            F[Nc+i][j] = Nu[i][j];
+                        }
+                    }
+                    std::cerr << "F0=" << F << std::endl;
+                    if( __rint(math::determinant_of(F)) == 0)
+                    {
+                        throw exception("constraints are colinear to reactions");
+                    }
+                    boot::igs(F);
+                    std::cerr << "F=" << F << std::endl;
+                    for(size_t i=N;i>0;--i)
+                    {
+                        for(size_t j=M;j>0;--j)
+                        {
+                            Q[i][j] = F[Nc+i][j];
+                        }
+                    }
+                }
+                std::cerr << "Q=" << Q << std::endl;
+                ivector_t q(N,0);
+                for(size_t i=N;i>0;--i)
+                {
+                    q[i] = __inorm_sq(Q[i]);
+                }
+                std::cerr << "q=" << q << std::endl;
+                
+                //______________________________________________________________
+                //
+                // Compute Xstar
+                //______________________________________________________________
+                vector_t Xstar(M,0.0);
+                vector_t U(Nc,0.0);
+                mkl::mul(U,AP2,Lambda);
+                mkl::mul_trn(Xstar, P, U);
+                for(size_t j=M;j>0;--j) Xstar[j]/=detP2;
+                std::cerr << "Xstar=" << Xstar << std::endl;
+                
                 
                 
                 computeK(t);
@@ -390,7 +412,8 @@ namespace yocto
                 std::cerr << "K=" << K << std::endl;
                 std::cerr << "scaled=" << scaled << std::endl;
                 
-                
+            
+#if 0
                 //______________________________________________________________
                 //
                 // Let us start
@@ -407,7 +430,7 @@ namespace yocto
                 {
                     
                 }
-                
+#endif
                 
                 
                 
