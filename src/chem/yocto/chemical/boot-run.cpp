@@ -282,6 +282,23 @@ namespace yocto
                 }
                 const size_t Nf = ifixed.size();
                 std::cerr << "#fixed=" << Nf << std::endl;
+                const size_t dof = M-Nf;
+                vector<size_t> idof(dof,as_capacity);
+                for(size_t j=1;j<=M;++j)
+                {
+                    bool is_dof = true;
+                    for(size_t i=ifixed.size();i>0;--i)
+                    {
+                        if( j == ifixed[i] )
+                        {
+                            is_dof = false;
+                            break;
+                        }
+                    }
+                    if(is_dof)
+                        idof.push_back(j);
+                }
+                std::cerr << "idof=" << idof << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -328,32 +345,6 @@ namespace yocto
                 // Compute the orthogonal space
                 //______________________________________________________________
                 matrix_t Q(N,M);
-#if 0
-                {
-                    matrix_t F(M,M);
-                    for(size_t i=1;i<=Nc;++i)
-                    {
-                        for(size_t j=1;j<=M;++j)
-                        {
-                            F[j][i] = P[i][j];
-                        }
-                    }
-                    vector_t svd_w(M,0.0);
-                    matrix_t svd_V(M,M);
-                    if(!math::svd<double>::build(F,svd_w, svd_V))
-                    {
-                        throw exception("cannot find orthonormal basis");
-                    }
-                    for(size_t i=1;i<=N;++i)
-                    {
-                        for(size_t j=1;j<=M;++j)
-                        {
-                            Q[i][j] = F[j][Nc+i];
-                        }
-                    }
-                }
-                std::cerr << "Q=" << Q << std::endl;
-#endif
                 
                 {
                     matrix_t F(M,M);
@@ -413,7 +404,6 @@ namespace yocto
                 std::cerr << "scaled=" << scaled << std::endl;
                 
             
-#if 0
                 //______________________________________________________________
                 //
                 // Let us start
@@ -422,6 +412,10 @@ namespace yocto
                 vector_t dL(Nc,0.0);
                 vector_t dU(Nc,0);
                 vector_t dX(M,0);
+                vector_t V(N,0);
+                vector_t dV(N,0);
+                
+                //-- prepare a valid sample
                 for(size_t j=Nf;j>0;--j)
                 {
                     X[ ifixed[j] ] = Cfixed[j];
@@ -430,14 +424,88 @@ namespace yocto
                 {
                     
                 }
+                
+                //______________________________________________________________
+                //
+                // project
+                //______________________________________________________________
+                std::cerr << "X0=" << X << std::endl;
+                mkl::mul(V,Q,X);
+                for(size_t i=N;i>0;--i)
+                {
+                    V[i] /= q[i];
+                }
+                
+                mkl::set(X,Xstar);
+                mkl::muladd_trn(X,Q,V);
+                std::cerr << "V=" << V << std::endl;
+                std::cerr << "X1=" <<X << std::endl;
+                
+                // use Q as topology!
+                Nu.assign(Q);
+                find_active_species();
+                
+                if( !normalize(-1, X, false) )
+                {
+                    
+                }
+                
+                
+                
+#if 0
+                for(unsigned sub=1;sub<=2;++sub)
+                {
+                    mkl::set(X,Xstar);
+                    mkl::muladd_trn(X,Q,V);
+                    std::cerr << "V=" << V << std::endl;
+                    std::cerr << "X1=" <<X << std::endl;
+                    
+                    for(size_t j=M;j>0;--j)
+                    {
+                        dX[j] = 0;
+                    }
+                    
+                    for(size_t i=dof;i>0;--i)
+                    {
+                        const size_t j = idof[i];
+                        const double Xj = X[j];
+                        if(Xj<0)
+                        {
+                            dX[j] = -Xj;
+                        }
+                    }
+                    
+                    std::cerr << "Cbad=" << dX << std::endl;
+                    mkl::mul(dV,Q,dX);
+                    std::cerr << "dV=" << dV << std::endl;
+                    mkl::mul_trn(dX,Q,dV);
+                    std::cerr << "G=" << dX << std::endl;
+                    double alpha = 1.0;
+                    for(size_t i=dof;i>0;--i)
+                    {
+                        const size_t j = idof[i];
+                        const double Xj = X[j];
+                        const double Gj = dX[j];
+                        if(Xj>=0&& -Gj>Xj)
+                        {
+                            alpha = min_of(alpha,Xj/-Gj);
+                        }
+                        
+                    }
+                    std::cerr << "alpha = " << alpha << std::endl;
+                    
+                    mkl::muladd(V,alpha,dV);
+                    mkl::mul_trn(dX,Q,dV);
+                    
+                    
+                }
 #endif
-                
-                
                 
                 //______________________________________________________________
                 //
                 // All Done ! Restore Topology
                 //______________________________________________________________
+                std::cerr << "#DONE" << std::endl;
                 restore_topology();
                 
             }
