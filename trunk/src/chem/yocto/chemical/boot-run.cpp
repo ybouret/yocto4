@@ -7,6 +7,7 @@
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/math/kernel/svd.hpp"
+#include "yocto/math/kernel/jacobi.hpp"
 
 #include "yocto/code/utils.hpp"
 
@@ -456,7 +457,7 @@ namespace yocto
                 //______________________________________________________________
                 vector_t X(M,0.0);
                 vector_t dL(Nc,0.0);
-                vector_t dU(Nc,0);
+                vector_t dU(Nc,0.0);
                 vector_t dX(M,0);
                 vector_t V(N,0);
                 vector_t dV(N,0);
@@ -470,66 +471,83 @@ namespace yocto
                 {
                     
                 }
-     
                 
-                matrix_t incr(Nc,M);       //!< each row is an increase
-                matrix_t J0(M,Nc);         //!< auxiliary
-                mkl::mul_ltrn(J0, P, AP2); //!< once and for all
-                matrix_t J(M,Nc);          //!< the constraint matrix
-                matrix_t PhiJ0(N,Nc);
+                std::cerr << "Nu=" << Nu << std::endl;
+                std::cerr << "P=" << P << std::endl;
+                std::cerr << "Lambda=" << Lambda << std::endl;
+                std::cerr << "Q=" << Q << std::endl;
+                std::cerr << "Xstar=" << Xstar << std::endl;
                 
-                std::cerr << "J0=" << J0 << std::endl;
+                
+                matrix_t J(M,Nc);
+                matrix_t Jq(M,M);
+                
+                
                 {
                     updateGammaAndPhi(X);
                     std::cerr << "Gamma=" << Gamma << std::endl;
-                    std::cerr << "Phi=" << Phi << std::endl;
+                    std::cerr << "Phi="   << Phi << std::endl;
                     
-                    // compute dL = Lambda - P*C
-                    mkl::set(dL,Lambda);
-                    mkl::mulsub(dL, P, X);
-                    
-                    // compute J*detP2 = J0 - Q'*inv(Phi*Q')*Phi * J0
                     mkl::mul_rtrn(W, Phi, Q);
                     if(!LU.build(W))
                     {
-                        throw exception("singular composition...");
+                        throw exception("singular composition");
                     }
+                    mkl::set(dL,Lambda);
+                    mkl::mulsub(dL,P,X);
+                    mkl::mul(U,AP2,dL);
                     
-                    mkl::mul(PhiJ0,Phi,J0);
-                    std::cerr << "PhiJ0=" << PhiJ0 << std::endl;
-                    lu_t::solve(W, PhiJ0);
-                    std::cerr << "WPhiJ0=" << PhiJ0 << std::endl;
-                    
-                    mkl::mul_ltrn(J,Q,PhiJ0);
-                    std::cerr << "J1=" << J << std::endl;
+                    //! Phi <- inv(Phi*Q')*Phi
+                    lu_t::solve(W, Phi);
+                    mkl::mul_ltrn(Jq, Q, Phi);
+                    mkl::mul_rtrn(J,Jq,P);
                     for(size_t j=M;j>0;--j)
                     {
                         for(size_t i=Nc;i>0;--i)
                         {
-                            J[j][i] = J0[j][i] - J[j][i];
+                            J[j][i] = P[i][j] - J[j][i];
+                        }
+                    }
+                    //std::cerr << "J0=" << J << std::endl;
+                    for(size_t i=Nc;i>0;--i)
+                    {
+                        const double fac = U[i];
+                        for(size_t j=M;j>0;--j)
+                        {
+                            J[j][i] = (fac*J[j][i])/detP2;
                         }
                     }
                     std::cerr << "J=" << J << std::endl;
                     
-                    // compute individual increases
+                    matrix_t J2(Nc,Nc);
+                    mkl::mul_ltrn(J2, J, J);
+                    std::cerr << "J2=" << J2 << std::endl;
+                    matrix_t Z(Nc,Nc);
+                    vector_t D(Nc,0.0);
+                    if( !math::jacobi<double>::build(J2,D,Z) )
+                    {
+                        throw exception("singular J...");
+                    }
+                    math::jacobi<double>::eigsrt(D, Z);
+                    std::cerr << "D=" << D << std::endl;
+                    std::cerr << "Z=" << Z << std::endl;
+                    if( D[1] <= 0 )
+                        throw exception("singular J...");
+                    
+                    matrix_t iJ2(Nc,Nc);
                     for(size_t i=Nc;i>0;--i)
                     {
-                        for(size_t k=Nc;k>0;--k)
+                        for(size_t j=Nc;j>0;--j)
                         {
-                            dU[k] = (i!=k) ? 0 : dL[k];
-                        }
-                        std::cerr << "dU" << i << "=" << dU << std::endl;
-                        array<double> &dd = incr[i];
-                        mkl::mul(dd,J,dU);
-                        for(size_t j=M;j>0;--j)
-                        {
-                            dd[j] /= detP2;
+                            iJ2[i][j] = Z[i][1] * Z[j][1] / D[1];
                         }
                     }
-                    std::cerr << "incr=" << incr << std::endl;
+                    std::cerr << "iJ2=" << iJ2 << std::endl;
+                    
+                    
+                    
                     
                 }
-                
                 
                 
                 //______________________________________________________________
