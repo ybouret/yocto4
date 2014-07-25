@@ -10,6 +10,7 @@
 #include "yocto/math/kernel/jacobi.hpp"
 
 #include "yocto/code/utils.hpp"
+#include "yocto/math/opt/cgrad.hpp"
 
 
 namespace yocto
@@ -51,65 +52,78 @@ namespace yocto
             return count;
         }
         
-        static inline integer_t __inorm_sq( const array<double> &v ) throw()
-        {
-            integer_t ans = 0;
-            for(size_t j=v.size();j>0;--j)
-            {
-                const integer_t ii = __rint(v[j]);
-                ans += ii*ii;
-            }
-            return ans;
-        }
         
-        static inline integer_t __idot( const array<double> &v, const array<double> &u) throw()
-        {
-            integer_t ans = 0;
-            assert(u.size()==v.size());
-            for(size_t j=v.size();j>0;--j)
-            {
-                ans += __rint(v[j]) * __rint(u[j]);
-            }
-            return ans;
-        }
         
-        static inline void __simplify( array<integer_t> &w ) throw()
+        
+        //======================================================================
+        //
+        // integer Gram-Schmidt
+        //
+        //======================================================================
+        namespace
         {
-            integer_t g = 0;
-            const size_t n = w.size();
-            for(size_t i=n;i>0;--i)
+            static inline integer_t __inorm_sq( const array<double> &v ) throw()
             {
-                const integer_t wi = w[i];
-                const integer_t ai = wi < 0 ? -wi : wi;
-                if(!ai)
-                    continue;
-                
-                for(size_t j=i;j>0;--j)
+                integer_t ans = 0;
+                for(size_t j=v.size();j>0;--j)
                 {
-                    const integer_t wj  = w[j];
-                    const integer_t aj  = wj < 0 ? -wj : wj;
-                    if(!aj)
-                        continue;
-                    
-                    const integer_t gij = gcd_of(ai,aj);
-                    if(g<=0)
-                    {
-                        g = gij;
-                    }
-                    else
-                    {
-                        g = min_of(g,gij);
-                    }
+                    const integer_t ii = __rint(v[j]);
+                    ans += ii*ii;
                 }
+                return ans;
             }
-            if(g>0)
+            
+            static inline integer_t __idot( const array<double> &v, const array<double> &u) throw()
             {
+                integer_t ans = 0;
+                assert(u.size()==v.size());
+                for(size_t j=v.size();j>0;--j)
+                {
+                    ans += __rint(v[j]) * __rint(u[j]);
+                }
+                return ans;
+            }
+            
+            static inline void __simplify( array<integer_t> &w ) throw()
+            {
+                integer_t g = 0;
+                const size_t n = w.size();
                 for(size_t i=n;i>0;--i)
                 {
-                    w[i] /= g;
+                    const integer_t wi = w[i];
+                    const integer_t ai = wi < 0 ? -wi : wi;
+                    if(!ai)
+                        continue;
+                    
+                    for(size_t j=i;j>0;--j)
+                    {
+                        const integer_t wj  = w[j];
+                        const integer_t aj  = wj < 0 ? -wj : wj;
+                        if(!aj)
+                            continue;
+                        
+                        const integer_t gij = gcd_of(ai,aj);
+                        if(g<=0)
+                        {
+                            g = gij;
+                        }
+                        else
+                        {
+                            g = min_of(g,gij);
+                        }
+                    }
+                }
+                if(g>0)
+                {
+                    for(size_t i=n;i>0;--i)
+                    {
+                        w[i] /= g;
+                    }
                 }
             }
         }
+        
+        
         
         void boot:: igs( matrix_t &A )
         {
@@ -139,6 +153,95 @@ namespace yocto
                 }
                 usq[i] = __inorm_sq(v);
             }
+            
+        }
+        
+        //======================================================================
+        //
+        // special CG
+        //
+        //======================================================================
+        
+        namespace
+        {
+            
+            class CCJ
+            {
+            public:
+                const array<double>  &Xstar;
+                array<double>        &X;
+                array<double>        &dEdX;
+                const matrix_t       &Q;
+                const size_t          M;
+                const array<size_t>  &idof;
+                const size_t          ndof;
+                array<double>        &V0;
+                array<double>        &V1;
+                
+                inline CCJ(const array<double> &userXstar,
+                           array<double>       &userX,
+                           array<double>       &userdEdX,
+                           const matrix_t      &userQ,
+                           const array<size_t> &user_idof,
+                           array<double>       &userV0,
+                           array<double>       &userV1) :
+                Xstar(userXstar),
+                X(userX),
+                dEdX(userdEdX),
+                Q(userQ),
+                M(X.size()),
+                idof( user_idof ),
+                ndof( idof.size() ),
+                V0(userV0),
+                V1(userV1)
+                {
+                }
+                
+                inline ~CCJ() throw()
+                {
+                }
+                
+                inline double GetH( const array<double> &V )
+                {
+                    mkl::set(X,Xstar);
+                    mkl::set(V0,V);
+                    mkl::muladd_trn(X,Q,V0);
+                    double sum = 0;
+                    for(size_t i=ndof;i>0;--i)
+                    {
+                        const double Xj = X[ idof[i] ];
+                        if(Xj<0)
+                            sum += Xj*Xj;
+                    }
+                    return sum*0.5;
+                }
+                
+                //! assume X is computed
+                inline void GetG( array<double> &G, const array<double> &V )
+                {
+                    mkl::set(X,Xstar);
+                    mkl::set(V0,V);
+                    mkl::muladd_trn(X,Q,V0);
+                    for(size_t j=M;j>0;--j) dEdX[j] = 0;
+                    for(size_t i=ndof;i>0;--i)
+                    {
+                        const size_t j  = idof[i];
+                        const double Xj = X[j];
+                        if(Xj<0)
+                        {
+                            dEdX[j] = -Xj;
+                        }
+                    }
+                    std::cerr << "dEdX=" << dEdX << std::endl;
+                    mkl::mul(G,Q,dEdX);
+                }
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(CCJ);
+            };
+         
+            
             
         }
         
@@ -302,8 +405,8 @@ namespace yocto
                 std::cerr << "#fixed=" << Nf << std::endl;
                 
                 
-                const size_t dof = M-Nf;
-                vector<size_t> idof(dof,as_capacity);
+                const size_t   ndof = M-Nf;
+                vector<size_t> idof(ndof,as_capacity);
                 for(size_t j=1;j<=M;++j)
                 {
                     bool is_dof = true;
@@ -456,11 +559,15 @@ namespace yocto
                 //
                 //______________________________________________________________
                 vector_t X(M,0.0);
+                vector_t dEdX(M,0.0);
+                vector_t G(N,0.0);
                 vector_t dL(Nc,0.0);
                 vector_t dU(Nc,0.0);
                 vector_t dX(M,0);
                 vector_t V(N,0);
                 vector_t dV(N,0);
+                vector_t V0(N,0);
+                vector_t V1(N,0);
                 
                 //-- prepare a valid sample
                 for(size_t j=Nf;j>0;--j)
@@ -471,7 +578,35 @@ namespace yocto
                 {
                     
                 }
+                std::cerr << "Nu=" << Nu << std::endl;
+                std::cerr << "P=" << P << std::endl;
+                std::cerr << "Lambda=" << Lambda << std::endl;
+                std::cerr << "Q=" << Q << std::endl;
+                std::cerr << "Xstar=" << Xstar << std::endl;
                 
+                
+                //-- find its projection
+                mkl::mul(V,Q,X);
+                for(size_t i=N;i>0;--i) V[i] /= q[i];
+                
+                std::cerr << "V=" << V << std::endl;
+                mkl::set(X,Xstar);
+                mkl::muladd_trn(X, Q, V);
+                std::cerr << "X=" << X << std::endl;
+                
+                CCJ ccj(Xstar,X,dEdX,Q,idof,V0,V1);
+                std::cerr << "H=" << ccj.GetH(V) << std::endl;
+                
+                math::numeric<double>::scalar_field FF( &ccj, & CCJ::GetH );
+                math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
+                
+                math::cgrad<double>::optimize(FF,GG,V,1e-5,NULL);
+                std::cerr << "Vopt=" << V << std::endl;
+                mkl::set(X,Xstar);
+                mkl::muladd_trn(X, Q, V);
+                std::cerr << "Xopt=" << X << std::endl;
+                
+#if 0
                 std::cerr << "Nu=" << Nu << std::endl;
                 std::cerr << "P=" << P << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
@@ -546,9 +681,8 @@ namespace yocto
                     
                     
                     
-                    
                 }
-                
+#endif
                 
                 //______________________________________________________________
                 //
