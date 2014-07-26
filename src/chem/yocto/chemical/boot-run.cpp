@@ -19,7 +19,11 @@ namespace yocto
     {
         
         typedef math::algebra<double> mkl;
-        
+        static inline int __rint( double x ) throw()
+        {
+            return int( floor(x+0.5) );
+        }
+
         static inline
         bool check_valid( const array<double> &P ) throw()
         {
@@ -31,10 +35,6 @@ namespace yocto
             return false;
         }
         
-        static inline int __rint( double x ) throw()
-        {
-            return int( floor(x+0.5) );
-        }
         
         static inline
         size_t count_items( size_t &s, const array<double> &P ) throw()
@@ -52,7 +52,101 @@ namespace yocto
             return count;
         }
         
-        
+        static inline
+        bool factorize(matrix_t              &P,
+                       vector_t              &Lambda,
+                       matrix_t              &Nu,
+                       sorted_vector<size_t> &single,
+                       vector_t              &Cfixed,
+                       vector<size_t>        &ifixed )
+        {
+            bool         changed = false;
+            const size_t Nc      = P.rows;
+            const size_t N       = Nu.rows;
+            
+            for(size_t i=1;i<=Nc;++i)
+            {
+                //______________________________________________________
+                //
+                // how many not zero items...
+                //______________________________________________________
+                size_t       s     = 0;
+                const size_t count = count_items(s,P[i]);
+                
+                //______________________________________________________
+                //
+                // None: bad
+                //______________________________________________________
+                if(count<=0)
+                    throw exception("unexpected empty constraint[%u]!", unsigned(i));
+                
+                
+                //______________________________________________________
+                //
+                // general case
+                //______________________________________________________
+                if(count>1)
+                    continue;
+                
+                //______________________________________________________
+                //
+                // a singleton !
+                //______________________________________________________
+                assert(1==count);
+               
+                if( !single.insert(s) )
+                {
+                    continue;
+                    // already dectected singleton
+                }
+                
+                
+                //______________________________________________________
+                //
+                // simplify the projection matrix
+                //______________________________________________________
+                changed = true;
+                
+                assert(0!=P[i][s]);
+                const double lhs = (Lambda[i] /= P[i][s]);
+                P[i][s] = 1;
+                Cfixed.push_back(lhs);
+                ifixed.push_back(s);
+                
+                //______________________________________________________
+                //
+                // simplify P: inform other rows of that case
+                //______________________________________________________
+                for(size_t k=1;k<=Nc;++k)
+                {
+                    if(i!=k)
+                    {
+                        array<double>    &Pk = P[k];
+                        double           &p  = Pk[s];
+                        if(p>0)
+                        {
+                            Lambda[k] -= p*lhs;
+                            p          = 0.0;
+                            if( !check_valid(Pk) )
+                                throw exception("degenerate constraints");
+                        }
+                    }
+                }
+                
+                //______________________________________________________
+                //
+                // simplify Nu from fixed species
+                //______________________________________________________
+                for(size_t k=N;k>0;--k)
+                {
+                    Nu[k][s] = 0;
+                }
+                
+                
+            }
+            
+            return changed;
+        }
         
         
         //======================================================================
@@ -175,25 +269,19 @@ namespace yocto
                 const size_t          M;
                 const array<size_t>  &idof;
                 const size_t          ndof;
-                array<double>        &V0;
-                array<double>        &V1;
                 
                 inline CCJ(const array<double> &userXstar,
                            array<double>       &userX,
                            array<double>       &userdEdX,
                            const matrix_t      &userQ,
-                           const array<size_t> &user_idof,
-                           array<double>       &userV0,
-                           array<double>       &userV1) :
+                           const array<size_t> &user_idof) :
                 Xstar(userXstar),
                 X(userX),
                 dEdX(userdEdX),
                 Q(userQ),
                 M(X.size()),
                 idof( user_idof ),
-                ndof( idof.size() ),
-                V0(userV0),
-                V1(userV1)
+                ndof( idof.size() )
                 {
                 }
                 
@@ -204,8 +292,7 @@ namespace yocto
                 inline double GetH( const array<double> &V )
                 {
                     mkl::set(X,Xstar);
-                    mkl::set(V0,V);
-                    mkl::muladd_trn(X,Q,V0);
+                    mkl::muladd_trn(X,Q,V);
                     double sum = 0;
                     for(size_t i=ndof;i>0;--i)
                     {
@@ -220,9 +307,12 @@ namespace yocto
                 inline void GetG( array<double> &G, const array<double> &V )
                 {
                     mkl::set(X,Xstar);
-                    mkl::set(V0,V);
-                    mkl::muladd_trn(X,Q,V0);
-                    for(size_t j=M;j>0;--j) dEdX[j] = 0;
+                    mkl::muladd_trn(X,Q,V);
+                    for(size_t j=M;j>0;--j)
+                    {
+                        dEdX[j] = 0;
+                    }
+                    
                     for(size_t i=ndof;i>0;--i)
                     {
                         const size_t j  = idof[i];
@@ -232,15 +322,21 @@ namespace yocto
                             dEdX[j] = -Xj;
                         }
                     }
+                    
                     std::cerr << "dEdX=" << dEdX << std::endl;
                     mkl::mul(G,Q,dEdX);
                 }
                 
+                inline bool callback( const array<double> &V )
+                {
+                    std::cerr << "cbV=" << V << std::endl;
+                    return true;
+                }
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(CCJ);
             };
-         
+            
             
             
         }
@@ -293,104 +389,25 @@ namespace yocto
                 
                 std::cerr << "P0="      << P      << std::endl;
                 std::cerr << "Lambda0=" << Lambda << std::endl;
+                std::cerr << "Nu0    =" << Nu << std::endl;
                 
                 //______________________________________________________________
                 //
                 // optimize with singleton(s): find fixed species
                 //______________________________________________________________
-                vector<double>        Cfixed(Nc,as_capacity);
+                vector_t              Cfixed(Nc,as_capacity);
                 vector<size_t>        ifixed(Nc,as_capacity);
-                bool                  changed = false;
-                
                 {
                     sorted_vector<size_t> single(Nc,as_capacity);
-                    for(size_t i=1;i<=Nc;++i)
-                    {
-                        //______________________________________________________
-                        //
-                        // how many not zero items...
-                        //______________________________________________________
-                        size_t       s     = 0;
-                        const size_t count = count_items(s,P[i]);
-                        
-                        //______________________________________________________
-                        //
-                        // None: bad
-                        //______________________________________________________
-                        if(count<=0)
-                            throw exception("unexpected empty constraint[%u]!", unsigned(i));
-                        
-                        
-                        //______________________________________________________
-                        //
-                        // general case
-                        //______________________________________________________
-                        if(count>1)
-                            continue;
-                        
-                        //______________________________________________________
-                        //
-                        // a singleton !
-                        //______________________________________________________
-                        assert(1==count);
-                        if( !single.insert(s) )
-                            throw exception("multiple single constraint on species #%u", unsigned(s) );
-                        
-                        
-                        //______________________________________________________
-                        //
-                        // simplify the projection matrix
-                        //______________________________________________________
-                        changed = true;
-                        
-                        assert(0!=P[i][s]);
-                        const double lhs = (Lambda[i] /= P[i][s]);
-                        P[i][s] = 1;
-                        Cfixed.push_back(lhs);
-                        ifixed.push_back(s);
-                        
-                        //______________________________________________________
-                        //
-                        // simplify P: inform other rows of that case
-                        //______________________________________________________
-                        for(size_t k=1;k<=Nc;++k)
-                        {
-                            if(i!=k)
-                            {
-                                array<double>    &Pk = P[k];
-                                double           &p  = Pk[s];
-                                if(p>0)
-                                {
-                                    Lambda[k] -= p*lhs;
-                                    p          = 0.0;
-                                    if( !check_valid(Pk) )
-                                        throw exception("degenerate constraints");
-                                }
-                            }
-                        }
-                        
-                        //______________________________________________________
-                        //
-                        // simplify Nu from fixed species
-                        //______________________________________________________
-                        for(size_t k=N;k>0;--k)
-                        {
-                            Nu[k][s] = 0;
-                        }
-                        
-                        
-                    }
-                }
-                std::cerr << "Nu0=" << Nu0 << std::endl;
-                
-                if(changed)
-                {
-                    std::cerr << "#has changed..." << std::endl;
+                    while( factorize(P, Lambda, Nu, single, Cfixed, ifixed) )
+                        ;
                     find_active_species();
                     co_qsort(ifixed, Cfixed);
                     std::cerr << "ifixed=" << ifixed << std::endl;
                     std::cerr << "Cfixed=" << Cfixed << std::endl;
                 }
+                std::cerr << "Nu0=" << Nu0 << std::endl;
+
                 std::cerr << "Nu="  << Nu << std::endl;
                 std::cerr << "P=" << P << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
@@ -566,8 +583,6 @@ namespace yocto
                 vector_t dX(M,0);
                 vector_t V(N,0);
                 vector_t dV(N,0);
-                vector_t V0(N,0);
-                vector_t V1(N,0);
                 
                 //-- prepare a valid sample
                 for(size_t j=Nf;j>0;--j)
@@ -594,95 +609,20 @@ namespace yocto
                 mkl::muladd_trn(X, Q, V);
                 std::cerr << "X=" << X << std::endl;
                 
-                CCJ ccj(Xstar,X,dEdX,Q,idof,V0,V1);
+                CCJ ccj(Xstar,X,dEdX,Q,idof);
                 std::cerr << "H=" << ccj.GetH(V) << std::endl;
                 
                 math::numeric<double>::scalar_field FF( &ccj, & CCJ::GetH );
                 math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
+                math::cgrad<double>::callback       CB( &ccj, & CCJ::callback);
                 
-                math::cgrad<double>::optimize(FF,GG,V,1e-5,NULL);
+                math::cgrad<double>::optimize(FF,GG,V,0,&CB);
+                
                 std::cerr << "Vopt=" << V << std::endl;
                 mkl::set(X,Xstar);
                 mkl::muladd_trn(X, Q, V);
                 std::cerr << "Xopt=" << X << std::endl;
                 
-#if 0
-                std::cerr << "Nu=" << Nu << std::endl;
-                std::cerr << "P=" << P << std::endl;
-                std::cerr << "Lambda=" << Lambda << std::endl;
-                std::cerr << "Q=" << Q << std::endl;
-                std::cerr << "Xstar=" << Xstar << std::endl;
-                
-                
-                matrix_t J(M,Nc);
-                matrix_t Jq(M,M);
-                
-                
-                {
-                    updateGammaAndPhi(X);
-                    std::cerr << "Gamma=" << Gamma << std::endl;
-                    std::cerr << "Phi="   << Phi << std::endl;
-                    
-                    mkl::mul_rtrn(W, Phi, Q);
-                    if(!LU.build(W))
-                    {
-                        throw exception("singular composition");
-                    }
-                    mkl::set(dL,Lambda);
-                    mkl::mulsub(dL,P,X);
-                    mkl::mul(U,AP2,dL);
-                    
-                    //! Phi <- inv(Phi*Q')*Phi
-                    lu_t::solve(W, Phi);
-                    mkl::mul_ltrn(Jq, Q, Phi);
-                    mkl::mul_rtrn(J,Jq,P);
-                    for(size_t j=M;j>0;--j)
-                    {
-                        for(size_t i=Nc;i>0;--i)
-                        {
-                            J[j][i] = P[i][j] - J[j][i];
-                        }
-                    }
-                    //std::cerr << "J0=" << J << std::endl;
-                    for(size_t i=Nc;i>0;--i)
-                    {
-                        const double fac = U[i];
-                        for(size_t j=M;j>0;--j)
-                        {
-                            J[j][i] = (fac*J[j][i])/detP2;
-                        }
-                    }
-                    std::cerr << "J=" << J << std::endl;
-                    
-                    matrix_t J2(Nc,Nc);
-                    mkl::mul_ltrn(J2, J, J);
-                    std::cerr << "J2=" << J2 << std::endl;
-                    matrix_t Z(Nc,Nc);
-                    vector_t D(Nc,0.0);
-                    if( !math::jacobi<double>::build(J2,D,Z) )
-                    {
-                        throw exception("singular J...");
-                    }
-                    math::jacobi<double>::eigsrt(D, Z);
-                    std::cerr << "D=" << D << std::endl;
-                    std::cerr << "Z=" << Z << std::endl;
-                    if( D[1] <= 0 )
-                        throw exception("singular J...");
-                    
-                    matrix_t iJ2(Nc,Nc);
-                    for(size_t i=Nc;i>0;--i)
-                    {
-                        for(size_t j=Nc;j>0;--j)
-                        {
-                            iJ2[i][j] = Z[i][1] * Z[j][1] / D[1];
-                        }
-                    }
-                    std::cerr << "iJ2=" << iJ2 << std::endl;
-                    
-                    
-                    
-                }
-#endif
                 
                 //______________________________________________________________
                 //
