@@ -15,6 +15,9 @@ namespace yocto
         namespace
         {
             // conjugated gradient wrapper
+            /**
+             evaluate a scalar field along a given direction
+             */
             class cgw
             {
             public:
@@ -43,8 +46,9 @@ namespace yocto
                 inline real_t compute( real_t x )
                 {
                     for( size_t i=nvar;i>0;--i)
+                    {
                         _tmp[i] = _pos[i] + x * _vec[i];
-                    
+                    }
                     return _func(_tmp);
                 }
                 
@@ -72,7 +76,9 @@ namespace yocto
             cgw                       wrapper( func, p, xi, xx);
             numeric<real_t>::function F( &wrapper, & cgw::compute );
             //------------------------------------------------------------------
-            // initialize
+            //
+            // initialize: value and gradient
+            //
             //------------------------------------------------------------------
             if( cb && !(*cb)(p) )
                 return false;
@@ -89,12 +95,14 @@ namespace yocto
             //std::cerr << "f  =" << fp << std::endl;
             
             //------------------------------------------------------------------
+            //
             // conjugated gradient loop
+            //
             //------------------------------------------------------------------
             for(;;)
             {
                 //std::cerr << "xi =" << xi << std::endl;
-
+                
                 //--------------------------------------------------------------
                 // initialize line minimzation
                 //--------------------------------------------------------------
