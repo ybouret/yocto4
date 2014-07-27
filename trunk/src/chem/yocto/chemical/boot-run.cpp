@@ -623,6 +623,15 @@ namespace yocto
                 mkl::muladd_trn(X, Q, V);
                 std::cerr << "Xopt=" << X << std::endl;
                 
+                if( ! validate(X) )
+                {
+                    std::cerr << "Couldn't validate" << std::endl;
+                }
+                else
+                {
+                    std::cerr << "Xval=" << X << std::endl;
+                }
+                
                 
                 //______________________________________________________________
                 //

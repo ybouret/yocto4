@@ -117,16 +117,13 @@ namespace yocto
         
         void  equilibria:: clip_extents() throw()
         {
-            //std::cerr << "xi_init=" << xi << ";" << std::endl;
             for(size_t i=1;i<=N;++i)
             {
                 const extent &ex = limits[i];
                 double       &Xi = xi[i];
-                //std::cerr << "\tEq" << i << ": ";
                 
                 if(ex.has_forward_limit)
                 {
-                    //std::cerr << "\tmax_fwd=" << ex.max_forward_value;
                     const double top = ex.max_forward_value;
                     if(Xi>0 && Xi>top)
                     {
@@ -137,7 +134,6 @@ namespace yocto
                 
                 if(ex.has_reverse_limit)
                 {
-                    //std::cerr << "\tmax_rev=" << ex.max_reverse_value;
                     const double top = ex.max_reverse_value;
                     if(Xi<0 && (-Xi)>top)
                     {
@@ -147,44 +143,11 @@ namespace yocto
                 
                 if( ex.blocked )
                 {
-                    //std::cerr << " | BLOCKED";
                     Xi = 0.0;
                 }
-                //std::cerr << std::endl;
             }
-            //std::cerr << "xi_clip=" << xi << ";" << std::endl;
         }
         
-        
-#if 0
-        static inline double __rint(double x) throw() { return floor(x+0.5); }
-        
-        
-        static inline bool accept_coef(const unsigned alpha, const matrix_t &J) throw()
-        {
-            assert(alpha>0);
-            assert(J.is_square());
-            const size_t n = J.rows;
-            //std::cerr << "\talpha=" << alpha << std::endl;
-            for(size_t i=n;i>0;--i)
-            {
-                for(size_t j=i;j>0;--j)
-                {
-                    const double f     = fabs(J[i][j]);
-                    const double af    = alpha*f;
-                    const double g     = __rint(af);
-                    const double rf    = fabs(alpha * (af - g));
-                    const int    r     = int(__rint(rf));
-                    //std::cerr << "\t\tf=" << f << " -> g=" << g << " -> rf=" << rf << "-> r=" << r << std::endl;
-                    if(r>0)
-                        return false;
-                }
-            }
-            //std::cerr << "\tok" << std::endl;
-            
-            return true;
-        }
-#endif
         
         
         bool  equilibria:: validate( array<double> &C )
