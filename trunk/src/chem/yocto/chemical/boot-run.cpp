@@ -23,7 +23,7 @@ namespace yocto
         {
             return int( floor(x+0.5) );
         }
-
+        
         static inline
         bool check_valid( const array<double> &P ) throw()
         {
@@ -93,7 +93,7 @@ namespace yocto
                 // a singleton !
                 //______________________________________________________
                 assert(1==count);
-               
+                
                 if( !single.insert(s) )
                 {
                     continue;
@@ -342,12 +342,31 @@ namespace yocto
         }
         
         
+#define __genXfromV() do { mkl::set(X,Xstar); mkl::muladd_trn(X,Q,V); } while(false)
+        
+        static inline
+        void ___project(vector_t        &X,
+                        const vector_t  &Xstar,
+                        const matrix_t  &Q,
+                        const ivector_t &q,
+                        vector_t        &V ) throw()
+        {
+            mkl::mul(V,Q,X);
+            for(size_t i=q.size();i>0;--i)
+            {
+                V[i] /= q[i];
+            }
+            __genXfromV();
+        }
+        
+#define __project() ___project(X,Xstar,Q,q,V)
         
         void equilibria::initialize_with(const boot       &loader,
                                          const collection &lib,
                                          const double      t,
                                          array<double>     &C0)
         {
+            static const char fn[] = "chemical::boot: ";
             startup(lib);
             assert(C0.size()>=M);
             try
@@ -360,17 +379,20 @@ namespace yocto
                 //
                 //______________________________________________________________
                 if(N>M)
-                    throw exception("too many reactions");
+                {
+                    throw exception("%stoo many reactions",fn);
+                }
                 
                 const size_t Nc = loader.size();
                 if(Nc+N!=M)
-                    throw exception("#species=%u != #reactions=%u + #constraints=%u ", unsigned(M), unsigned(N), unsigned(Nc));
-                
-                if(Nc<=0)
                 {
-                    std::cerr << "NOT IMPLEMENTED : NO CONSTRAINTS" << std::endl;
-                    return;
+                    throw exception("%s#species=%u != #reactions=%u + #constraints=%u ", fn,unsigned(M), unsigned(N), unsigned(Nc));
                 }
+                
+                if(M<=0)
+                    return;
+                
+                // if Nc==0 -> special case
                 
                 //______________________________________________________________
                 //
@@ -407,10 +429,33 @@ namespace yocto
                     std::cerr << "Cfixed=" << Cfixed << std::endl;
                 }
                 std::cerr << "Nu0=" << Nu0 << std::endl;
-
+                
                 std::cerr << "Nu="  << Nu << std::endl;
                 std::cerr << "P=" << P << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
+                
+                //______________________________________________________________
+                //
+                //
+                // special case
+                //
+                //______________________________________________________________
+                if( Nc <= 0 )
+                {
+                    assert(P.is_square());
+                    if(M>0)
+                    {
+                        lu_t solver(M);
+                        if( !solver.build(P) )
+                        {
+                            throw exception("%ssingular full constraints",fn);
+                        }
+                        mkl::set(C0,Lambda);
+                        lu_t::solve(P,C0);
+                        
+                    }
+                    return;
+                }
                 
                 //______________________________________________________________
                 //
@@ -465,18 +510,18 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // Compute the determinant...
+                // Compute the determinant using AP2
                 //______________________________________________________________
                 const int detP2 = __rint(math::__determinant_of(AP2));
                 std::cerr << "detP2=" << detP2 << std::endl;
                 if(!detP2)
                 {
-                    throw exception("singular set of constraints!");
+                    throw exception("%s:singular set of constraints",fn);
                 }
                 
                 //______________________________________________________________
                 //
-                // Compute the adjoint matrix to avoid precision lost
+                // Compute the adjoint matrix to avoid precision loss
                 //______________________________________________________________
                 math::adjoint(AP2,P2);
                 for(size_t i=1;i<=Nc;++i)
@@ -547,14 +592,17 @@ namespace yocto
                 //______________________________________________________________
                 //
                 //
-                // Compute Xstar
+                // Compute Xstar such that P.Xstar = Lamba and Q.Xstar = 0
                 //
                 //______________________________________________________________
                 vector_t Xstar(M,0.0);
                 vector_t U(Nc,0.0);
                 mkl::mul(U,AP2,Lambda);
                 mkl::mul_trn(Xstar, P, U);
-                for(size_t j=M;j>0;--j) Xstar[j]/=detP2;
+                for(size_t j=M;j>0;--j)
+                {
+                    Xstar[j]/=detP2;
+                }
                 std::cerr << "Xstar=" << Xstar << std::endl;
                 
                 //______________________________________________________________
@@ -576,23 +624,31 @@ namespace yocto
                 //
                 //______________________________________________________________
                 vector_t X(M,0.0);
-                vector_t dEdX(M,0.0);
-                vector_t G(N,0.0);
-                vector_t dL(Nc,0.0);
-                vector_t dU(Nc,0.0);
+                vector_t X0(M,0.0);
+                vector_t G(M,0.0);
                 vector_t dX(M,0);
                 vector_t V(N,0);
-                vector_t dV(N,0);
                 
+                CCJ ccj(Xstar,X,G,Q,idof);
+                math::numeric<double>::scalar_field FF( &ccj, & CCJ::GetH );
+                math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
+                math::cgrad<double>::callback       CB( &ccj, & CCJ::callback);
+                
+            PREPARE_CONC:
                 //-- prepare a valid sample
                 for(size_t j=Nf;j>0;--j)
                 {
                     X[ ifixed[j] ] = Cfixed[j];
                 }
+                generate(X,loader.ran);
+                
+#if 0
                 if(!compute_trial(X,loader.ran))
                 {
                     
                 }
+#endif
+                std::cerr << "#" << std::endl;
                 std::cerr << "Nu=" << Nu << std::endl;
                 std::cerr << "P=" << P << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
@@ -601,36 +657,51 @@ namespace yocto
                 
                 
                 //-- find its projection
-                mkl::mul(V,Q,X);
-                for(size_t i=N;i>0;--i) V[i] /= q[i];
+                __project();
                 
-                std::cerr << "V=" << V << std::endl;
-                mkl::set(X,Xstar);
-                mkl::muladd_trn(X, Q, V);
-                std::cerr << "X=" << X << std::endl;
-                
-                CCJ ccj(Xstar,X,dEdX,Q,idof);
                 std::cerr << "H=" << ccj.GetH(V) << std::endl;
                 
-                math::numeric<double>::scalar_field FF( &ccj, & CCJ::GetH );
-                math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
-                math::cgrad<double>::callback       CB( &ccj, & CCJ::callback);
                 
                 math::cgrad<double>::optimize(FF,GG,V,0,&CB);
                 
                 std::cerr << "Vopt=" << V << std::endl;
-                mkl::set(X,Xstar);
-                mkl::muladd_trn(X, Q, V);
+                __genXfromV();
                 std::cerr << "Xopt=" << X << std::endl;
                 
+#if 1
                 if( ! validate(X) )
                 {
                     std::cerr << "Couldn't validate" << std::endl;
+                    goto PREPARE_CONC;
                 }
-                else
+                std::cerr << "Xval=" << X << std::endl;
+#endif
+                
+                // Newton
+                mkl::set(X0,X);
+                updateGammaAndPhi(X);
+                std::cerr << "Gamma=" << Gamma << std::endl;
+                std::cerr << "Phi="   << Phi   << std::endl;
+                mkl::mul_rtrn(W,Phi,Q);
+                if(!LU.build(W))
                 {
-                    std::cerr << "Xval=" << X << std::endl;
+                    std::cerr << "singular solution" << std::endl;
+                    goto PREPARE_CONC;
                 }
+                mkl::neg(xi,Gamma);
+                lu_t::solve(W, xi);
+                std::cerr << "dV=" << xi << std::endl;
+                mkl::mul_trn(dX,Q, xi);
+                std::cerr << "dX=" << dX << std::endl;
+                mkl::add(X,dX);
+                std::cerr << "X1=" << X << std::endl;
+                __project();
+                std::cerr << "X2=" << X << std::endl;
+                
+                // positive-it
+                math::cgrad<double>::optimize(FF,GG,V,0,&CB);
+                __genXfromV();
+                std::cerr << "X3=" << X << std::endl;
                 
                 
                 //______________________________________________________________
