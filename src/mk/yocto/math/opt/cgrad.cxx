@@ -75,6 +75,7 @@ namespace yocto
             
             cgw                       wrapper( func, p, xi, xx);
             numeric<real_t>::function F( &wrapper, & cgw::compute );
+            
             //------------------------------------------------------------------
             //
             // initialize: value and gradient
@@ -91,8 +92,6 @@ namespace yocto
                 xi[j]=h[j]=g[j];
             }
             
-            //std::cerr << "pos=" << p  << std::endl;
-            //std::cerr << "f  =" << fp << std::endl;
             
             //------------------------------------------------------------------
             //
@@ -101,7 +100,6 @@ namespace yocto
             //------------------------------------------------------------------
             for(;;)
             {
-                //std::cerr << "xi =" << xi << std::endl;
                 
                 //--------------------------------------------------------------
                 // initialize line minimzation

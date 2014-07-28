@@ -13,6 +13,8 @@ namespace yocto
         {
             typedef functor<bool,TL1(const array<T>)> callback;
             
+            
+            //! return false only if callback returns false !
             static bool optimize(typename numeric<T>::scalar_field &func,
                                  typename numeric<T>::vector_field &grad,
                                  array<T>                          &p,

@@ -109,9 +109,17 @@ namespace yocto
 
             //! compute a trial from ACTIVE and PRE-SCALED concentrations
             /**
-             Non active-concentration are left untouched...
+             Non active-concentrations are left untouched...
              */
             bool compute_trial(array<double> &C, alea_t &ran);
+            
+            
+            //! generate a set of positive ACTIVE and PRE-SCALED concentrations
+            /**
+             Non-active concentrations are left untouched
+             */
+            void generate(array<double> &C, alea_t &ran) throw();
+            
             
             
             //! initilialize K and compute Gamma, return F

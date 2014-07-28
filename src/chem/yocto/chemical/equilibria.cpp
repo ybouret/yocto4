@@ -168,7 +168,7 @@ namespace yocto
             
         }
         
-        bool equilibria:: compute_trial( array<double> &C, alea_t &ran)
+        void equilibria:: generate(array<double> &C, alea_t &ran) throw()
         {
             assert(C.size()>=M);
             for(size_t j=M;j>0;--j)
@@ -181,18 +181,23 @@ namespace yocto
             
             for(size_t i=N;i>0;--i)
             {
-                const double cc = scaled[i];
+                const double cc = scaled[i] * ran();
                 for(size_t j=M;j>0;--j)
                 {
                     if(active[j]>0)
                     {
-                        C[j] += ran() * cc;
+                        C[j] +=  cc;
                     }
                 }
             }
             
-            return normalize(-1, C, false);
             
+        }
+        
+        bool equilibria:: compute_trial( array<double> &C, alea_t &ran)
+        {
+            generate(C,ran);
+            return normalize(-1, C, false);
         }
         
         
