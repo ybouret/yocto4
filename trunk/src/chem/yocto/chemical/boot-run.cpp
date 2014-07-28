@@ -342,25 +342,6 @@ namespace yocto
         }
         
         
-#define __genXfromV() do { mkl::set(X,Xstar); mkl::muladd_trn(X,Q,V); } while(false)
-        
-        static inline
-        void ___project(vector_t        &X,
-                        const vector_t  &Xstar,
-                        const matrix_t  &Q,
-                        const ivector_t &q,
-                        vector_t        &V ) throw()
-        {
-            mkl::mul(V,Q,X);
-            for(size_t i=q.size();i>0;--i)
-            {
-                V[i] /= q[i];
-            }
-            __genXfromV();
-        }
-        
-#define __project() ___project(X,Xstar,Q,q,V)
-        
         void equilibria::initialize_with(const boot       &loader,
                                          const collection &lib,
                                          const double      t,
@@ -645,15 +626,6 @@ namespace yocto
                 math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
                 math::cgrad<double>::callback       CB( &ccj, & CCJ::callback);
                 
-#define GEN_X_FROM_V() do { mkl::set(X,Xstar); mkl::muladd_trn(X,Q,V); } while(false)
-                
-#define VPROJECT_X()   do {  mkl::mul(V,Q,X); for(size_t ii=q.size();ii>0;--ii) V[ii] /= q[ii]; GEN_X_FROM_V(); } while(false)
-                
-#define VALIDATE_V()   do { (void)math::cgrad<double>::optimize(FF,GG,V,0,&CB); GEN_X_FROM_V();\
-std::cerr << "Xopt=" << X << std::endl; if( !validate(X) ) { goto PREPARE_CONC; } } while(false)
-                
-#define COMPUTE_DY() do { mkl::set(dL,Lambda); mkl::mulsub(dL,P,X); mkl::mul(dU,AP2,dL); mkl::mul_trn(dY,P,dU);\
-for(size_t ii=M;ii>0;--ii) dY[ii] /= detP2; } while(false)
                 
             PREPARE_CONC:
                 //-- prepare a valid sample
@@ -662,70 +634,85 @@ for(size_t ii=M;ii>0;--ii) dY[ii] /= detP2; } while(false)
                     X[ ifixed[j] ] = Cfixed[j];
                 }
                 generate(X,loader.ran);
-                
-#if 0
-                VPROJECT_X();
-                VALIDATE_V();
-                std::cerr << "Xval=" << X << std::endl;
+                std::cerr << "X=" << X << std::endl;
                 
                 for(size_t sub=1;;++sub)
                 {
+                    mkl::set(X0,X);
                     updateGammaAndPhi(X);
+                    std::cerr << "Gamma=" << Gamma << std::endl;
                     mkl::mul_rtrn(W, Phi, Q);
                     if( !LU.build(W))
                     {
                         std::cerr << "singular concentrations" << std::endl;
                         goto PREPARE_CONC;
                     }
-                    mkl::set(X0,X);
-                    COMPUTE_DY();
-                    std::cerr << "dY=" << dY << std::endl;
+                    // compute dU * detP2 = AdjointP2 * (Lambda-P*X)
+                    mkl::set(dL,Lambda);
+                    mkl::mulsub(dL,P,X);
+                    mkl::mul(dU,AP2,dL);
+                    
+                    // compute dX = P'*dU
+                    mkl::mul_trn(dX,P,dU);
+                    for(size_t ii=M;ii>0;--ii) dX[ii]/=detP2;
+                    
+                    // compute xi=-(Gamma+Phi*dX)
                     mkl::neg(xi,Gamma);
-                    std::cerr << "xi0=" << xi << std::endl;
-                    mkl::mulsub(xi,Phi, dY);
-                    std::cerr << "xi1=" << xi << std::endl;
+                    mkl::mulsub(xi, Phi, dX);
+                    
+                    // compute dY = Q'*inv(Phi*Q') * xi
                     lu_t::solve(W,xi);
-                    std::cerr << "dV=" << xi << std::endl;
-                    mkl::mul_trn(dX, Q, xi);
-                    std::cerr << "dX=" << dX << std::endl;
+                    mkl::mul_trn(dY,Q,xi);
+                    //std::cerr << "dX0=" << dX << std::endl;
+                    //std::cerr << "dY=" << dY << std::endl;
+                    
                     mkl::add(dX,dY);
+                    //std::cerr << "dX=" << dX << std::endl;
+                    
                     mkl::add(X,dX);
-                    std::cerr << "X1=" << X << std::endl;
-                    VALIDATE_V();
-                    mkl::vec(dX, X0, X);
-                    std::cerr << "ddX=" << dX << std::endl;
+                    mkl::vec(dX,X0,X);
+                    std::cerr << "X=" << X << std::endl;
+                    //std::cerr << "ddX=" << dX << std::endl;
                     bool converged = true;
                     for(size_t j=M;j>0;--j)
                     {
-                        if(fabs(dX[j])>0)
+                        if( fabs(dX[j])>0 )
                         {
                             converged = false;
                             break;
                         }
-                        
                     }
                     if(converged)
+                    {
+                        if( !normalize(-1, X, false) )
+                        {
+                            std::cerr << "-- invalid solution" << std::endl;
+                            goto PREPARE_CONC;
+                        }
                         break;
+                    }
+                    
                 }
                 
                 updateGamma(X);
                 std::cerr << "Gamma=" << Gamma << std::endl;
-#endif
-                
                 //______________________________________________________________
                 //
-                // All Done ! Restore Topology
+                // All Done ! Restore Topology after catch
                 //______________________________________________________________
-                std::cerr << "#DONE, restoring topology" << std::endl;
-                restore_topology();
-                
+                for(size_t j=M;j>0;--j) C0[j] = X[j];
             }
             catch(...)
             {
                 restore_topology();
                 throw;
             }
-            
+            std::cerr << "#DONE, restoring topology" << std::endl;
+            restore_topology();
+            if( !normalize(-1,C0,false) )
+            {
+                throw exception("-- unexpected full topology failure");
+            }
         }
         
         
