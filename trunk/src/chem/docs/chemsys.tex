@@ -69,7 +69,7 @@ $$
 	\mymat{J} = \mymat{\beta}\mytrn{\mymat{\beta}}
 $$	
 is not invertible, then the system cannot be normalised.
-Otherwise, the Cholesky decomposition may be used to compute $\vec{\lambda}$ then 
+Otherwise, we can compute $\vec{\lambda}$ then 
 $\vec{\xi}'$.
 A full extent $\vec{\xi}$ can be deduced from $\vec{\xi}'$.
 The we must deduce the concentration increase, taking into account the acceptable extents,
@@ -92,6 +92,8 @@ Starting from a value $\vec{C}_{k}$, the Newton algorithm yields
 \begin{equation}
 	\vec{0} = \vec{\Gamma}(t,\vec{C}_k) + \mymat{\Phi}(t,\vec{C}_k) \mytrn{\mymat{\nu}}\vec{\xi}_k
 \end{equation}
+Here, the extent has to be clipped to be acceptable.
+
 
 \section{Absorbing a perturbation}
 We start from time $t$ and make a perturbation $\delta\vec{C}$ to a valid set of concentration $\vec{C}$ such that 
@@ -120,8 +122,46 @@ a set of $R=M-N$ other relations to find determine a unique set of concentration
 We assume that all those relations (electroneutrality, mass conservation, constant concentrations)
 may we written as a $R\times M$ matrix $\mymat{P}$ such that
 $$
-	\mymat{P}\vec{C} = \vec{\Lambda}
+	\mymat{P}\vec{C} = \vec{\Lambda}.
 $$
+This means that any concentration may be written as
+$$
+	\vec{C} = \vec{C}^\star + \mytrn{\mymat{P}} \vec{U} + \mytrn{\mymat{Q}} \vec{V}
+$$
+with
+$$
+	\vec{C}^\star = \mytrn{\mymat{P}} \left(\mymat{P}\mytrn{\mymat{P}}\right)^{-1}\vec{\Lambda}
+$$
+and $\mymat{Q}$ is a matrix whose rows are orthogonal to the rows of $\mymat{P}$.\\
+Since $\mymat{P}$ and $\mymat{\nu}$ must be a base of $\mathbb{R}^{M}$ (otherwise $\mymat{P}$ is invalid), we can 
+use an integer version of the Gram-Schmidt's orthogonalisation to find $\mymat{Q}$.
+Starting from 
+$$
+	\vec{C}_k = \vec{C}^\star + \mytrn{\mymat{P}} \vec{U}_k + \mytrn{\mymat{Q}} \vec{V}_k
+$$
+we want to find $\vec{C}_{k+1}$ such that
+$$
+	\vec{\Gamma}(\vec{C}_{k+1}) \simeq \vec{0}.
+$$
+The respect of the contraints imposes
+$$
+	\delta\vec{X}_k = \mytrn{\mymat{P}} 
+	\left(\mymat{P}\mytrn{\mymat{P}}\right)^{-1} \left(\vec{\Lambda} - \mymat{P}\vec{C}_k\right).
+$$
+Now we expand
+$$
+	\vec{\Gamma}\left(\vec{C}_{k+1}\right) \simeq \vec{\Gamma}_k + \mymat{\Phi}_k\left(\delta\vec{X}_k+\mytrn{\mymat{Q}} \delta\vec{V}_k\right)
+$$
+and find
+$$
+	\delta\vec{Y}_k = -\mytrn{\mymat{Q}} \left(\mymat{\Phi}_k\mytrn{\mymat{Q}}\right)^{-1} \left(\vec{\Gamma}_k+\mymat{\Phi}_k \delta\vec{X}_k\right).
+$$
+The total Newton's step is $\delta\vec{C}_k=\delta\vec{X}_k+\delta\vec{Y}_k$.\\
+Numerically,
+$$
+	\mymat{P}\vec{C}_{k+1} = \vec{\Lambda}.
+$$
+
 
 
 \end{document}

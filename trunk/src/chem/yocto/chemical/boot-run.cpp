@@ -6,11 +6,8 @@
 
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/algebra.hpp"
-#include "yocto/math/kernel/svd.hpp"
-#include "yocto/math/kernel/jacobi.hpp"
 
 #include "yocto/code/utils.hpp"
-#include "yocto/math/opt/cgrad.hpp"
 #include "yocto/math/opt/minimize.hpp"
 #include "yocto/math/opt/bracket.hpp"
 
@@ -66,6 +63,8 @@ namespace yocto
             
             size_t i   = 1; // active line    index
             size_t top = 0; // last singleton index
+            Cfixed.free();
+            ifixed.free();
             while(i<=Nc)
             {
                 //______________________________________________________________
@@ -81,7 +80,6 @@ namespace yocto
                 //______________________________________________________________
                 if(count<=0)
                     throw exception("unexpected empty constraint[%u]!", unsigned(i));
-                
                 
                 //______________________________________________________________
                 //
@@ -148,7 +146,6 @@ namespace yocto
                     Nu[k][s] = 0;
                 }
                 ++i;
-                
             }
             
             
@@ -264,98 +261,31 @@ namespace yocto
         
         namespace
         {
-            
-            class CCJ
+
+            static inline double __RMS( const array<double> &G ) throw()
             {
-            public:
-                const array<double>  &Xstar;
-                array<double>        &X;
-                array<double>        &dEdX;
-                const matrix_t       &Q;
-                const size_t          M;
-                const array<size_t>  &idof;
-                const size_t          ndof;
-                
-                inline CCJ(const array<double> &userXstar,
-                           array<double>       &userX,
-                           array<double>       &userdEdX,
-                           const matrix_t      &userQ,
-                           const array<size_t> &user_idof) :
-                Xstar(userXstar),
-                X(userX),
-                dEdX(userdEdX),
-                Q(userQ),
-                M(X.size()),
-                idof( user_idof ),
-                ndof( idof.size() )
+                const size_t M = G.size();
+                double sum_sq = 0;
+                for(size_t i=M;i>0;--i)
                 {
+                    const double g = G[i];
+                    sum_sq += g*g;
                 }
-                
-                inline ~CCJ() throw()
-                {
-                }
-                
-                inline double GetH( const array<double> &V )
-                {
-                    mkl::set(X,Xstar);
-                    mkl::muladd_trn(X,Q,V);
-                    double sum = 0;
-                    for(size_t i=ndof;i>0;--i)
-                    {
-                        const double Xj = X[ idof[i] ];
-                        if(Xj<0)
-                            sum += Xj*Xj;
-                    }
-                    return sum*0.5;
-                }
-                
-                //! assume X is computed
-                inline void GetG( array<double> &G, const array<double> &V )
-                {
-                    mkl::set(X,Xstar);
-                    mkl::muladd_trn(X,Q,V);
-                    for(size_t j=M;j>0;--j)
-                    {
-                        dEdX[j] = 0;
-                    }
-                    
-                    for(size_t i=ndof;i>0;--i)
-                    {
-                        const size_t j  = idof[i];
-                        const double Xj = X[j];
-                        if(Xj<0)
-                        {
-                            dEdX[j] = -Xj;
-                        }
-                    }
-                    
-                    std::cerr << "dEdX=" << dEdX << std::endl;
-                    mkl::mul(G,Q,dEdX);
-                }
-                
-                inline bool callback( const array<double> &V )
-                {
-                    std::cerr << "cbV=" << V << std::endl;
-                    return true;
-                }
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(CCJ);
-            };
-            
+                return sqrt(sum_sq/M);
+            }
             
             class LinMin
             {
             public:
-                const vector_t &X0;
+                const vector_t &X;
                 const vector_t &dX;
                 vector_t       &X1;
                 equilibria     &cs;
-                explicit LinMin(const vector_t &user_X0,
+                explicit LinMin(const vector_t &user_X,
                                 const vector_t &user_dX,
                                 vector_t       &user_X1,
                                 equilibria     &user_cs) throw() :
-                X0( user_X0 ),
+                X( user_X ),
                 dX( user_dX ),
                 X1( user_X1 ),
                 cs( user_cs )
@@ -367,18 +297,12 @@ namespace yocto
                     
                 }
                 
-                double F( double u )
+                inline double F( double u )
                 {
-                    mkl::set(X1,X0);
+                    mkl::set(X1,X);
                     mkl::muladd(X1,u,dX);
                     cs.updateGamma(X1);
-                    double sum = 0;
-                    for(size_t i=cs.Gamma.size();i>0;--i)
-                    {
-                        const double dG = cs.Gamma[i] / cs.gammaC[i];
-                        sum += dG * dG;
-                    }
-                    return sqrt(sum);
+                    return __RMS(cs.Gamma);
                 }
                 
                 
@@ -662,14 +586,12 @@ namespace yocto
                 vector_t dU(Nc,0);
                 vector_t dY(M,0.0);
                 
-                LinMin                          Opt(X0,dX,X1,*this);
+                vector_t dV(N,0.0);
+                vector_t V(N,0.0);
+                
+                
+                LinMin                          Opt(X,dX,X1,*this);
                 math::numeric<double>::function Fopt( &Opt, &LinMin::F);
-#if 0
-                CCJ ccj(Xstar,X,G,Q,idof);
-                math::numeric<double>::scalar_field FF( &ccj, & CCJ::GetH );
-                math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
-                math::cgrad<double>::callback       CB( &ccj, & CCJ::callback);
-#endif
                 
                 
             PREPARE_CONC:
@@ -681,72 +603,119 @@ namespace yocto
                 generate(X,loader.ran);
                 std::cerr << "X=" << X << std::endl;
                 mkl::set(X0,X);
-                double F0 = Fopt(0);
-                std::cerr << "F=" << F0 << std::endl;
                 
                 for(size_t sub=1;;++sub)
                 {
+                    //__________________________________________________________
+                    //
+                    // prepare Gamma and Phi
+                    //__________________________________________________________
                     updateGammaAndPhi(X);
                     std::cerr << "Gamma=" << Gamma << std::endl;
+                    std::cerr << "Phi  =" << Phi   << std::endl;
+                    
+                    //__________________________________________________________
+                    //
+                    // set W = inv(Phi*Q')
+                    //__________________________________________________________
+
                     mkl::mul_rtrn(W, Phi, Q);
                     if( !LU.build(W))
                     {
                         std::cerr << "singular concentrations" << std::endl;
                         goto PREPARE_CONC;
                     }
+                    
+                    //__________________________________________________________
+                    //
                     // compute dU * detP2 = AdjointP2 * (Lambda-P*X)
+                    //__________________________________________________________
                     mkl::set(dL,Lambda);
                     mkl::mulsub(dL,P,X);
                     mkl::mul(dU,AP2,dL);
                     
+                    //__________________________________________________________
+                    //
                     // compute dX = P'*dU
+                    //__________________________________________________________
                     mkl::mul_trn(dX,P,dU);
                     for(size_t ii=M;ii>0;--ii) dX[ii]/=detP2;
+                    std::cerr << "delX=" << dX << std::endl;
                     
+                    //__________________________________________________________
+                    //
                     // compute xi=-(Gamma+Phi*dX)
+                    //__________________________________________________________
                     mkl::neg(xi,Gamma);
                     mkl::mulsub(xi, Phi, dX);
                     
+                    //__________________________________________________________
+                    //
                     // compute dY = Q'*inv(Phi*Q') * xi
+                    //__________________________________________________________
                     lu_t::solve(W,xi);
                     mkl::mul_trn(dY,Q,xi);
-                    //std::cerr << "dX0=" << dX << std::endl;
-                    //std::cerr << "dY=" << dY << std::endl;
+                    std::cerr << "delY=" << dY << std::endl;
                     
+                    //__________________________________________________________
+                    //
                     // compute the full Newton's step dX
+                    //__________________________________________________________
                     mkl::add(dX,dY);
                     
-                    // test the values
-                    double F1 = Fopt(1.0);
-                    std::cerr << "F=" << F1 << std::endl;
-                    
-                    if(F1<F0)
-                    {
-                        mkl::add(X,dX);
-                    }
-                    else
-                    {
-                        //std::cerr << "bad Newton's step" << std::endl;
-                        math::triplet<double> XX = { 0,  0,  1  };
-                        math::triplet<double> FF = { F0, F0, F1 };
-                        if(!math::bracket<double>::inside(Fopt, XX, FF))
-                        {
-                            std::cerr << "can't bracket..." << std::endl;
-                            exit(12);
-                        }
-                        math::minimize<double>(Fopt, XX, FF, 0);
-                        //std::cerr << "XX=" << XX << std::endl;
-                        //std::cerr << "FF=" << FF << std::endl;
-                        
-                        const double alpha = XX.b;
-                        F1                 = FF.b;
-                        std::cerr << "alpha=" << alpha << std::endl;
-                        mkl::muladd(X,alpha,dX);
-                    }
-                    mkl::vec(dX,X0,X);
+                    //__________________________________________________________
+                    //
+                    // move at the full Newton's step
+                    //__________________________________________________________
+                    mkl::add(X, dX);
                     std::cerr << "X=" << X << std::endl;
-                    //std::cerr << "dX=" << dX << std::endl;
                     
+                    //__________________________________________________________
+                    //
+                    // at this, point, the constraints PX=Lambda
+                    // are numerically OK
+                    //__________________________________________________________
+                    mkl::set(X0,X);
+                    
+                    
+                    //__________________________________________________________
+                    //
+                    // Check the Q step
+                    //__________________________________________________________
+                    updateGammaAndPhi(X);
+                    std::cerr << "Gamma=" << Gamma << std::endl;
+                    std::cerr << "Phi  =" << Phi   << std::endl;
+                    
+                    // Q only
+                    mkl::mul_rtrn(W, Phi, Q);
+                    if( ! LU.build(W) )
+                    {
+                        std::cerr << "invalid solution" << std::endl;
+                        goto PREPARE_CONC;
+                    }
+                    mkl::neg(dV,Gamma);
+                    lu_t::solve(W, dV);
+                    mkl::mul_trn(dX,Q,dV);
+                    std::cerr << "dXq=" << dX << std::endl;
+                    
+                    const double F0 = __RMS(Gamma);
+                    const double F1 = Fopt(1.0);
+                    std::cerr << "F0=" << F0 << std::endl;
+                    std::cerr << "F1=" << F1 << std::endl;
+                    
+                    math::triplet<double> XX = { 0,  1,  1 };
+                    math::triplet<double> FF = { F0, F1, F1};
+                    math::bracket<double>::expand(Fopt, XX, FF);
+                    math::minimize(Fopt, XX, FF, 0.0);
+                    const double alpha=XX.b;
+                    std::cerr << "alpha=" << XX.b << std::endl;
+                    
+                    mkl::muladd(X,alpha,dX);
+                    
+                    
+                    
+                    mkl::vec(dX,X0,X);
+                    std::cerr << "dX=" << dX << std::endl;
                     bool converged = true;
                     for(size_t j=M;j>0;--j)
                     {
@@ -769,7 +738,6 @@ namespace yocto
                     }
                     
                     mkl::set(X0,X);
-                    F0 = F1;
                 }
                 
                 updateGamma(X);
