@@ -55,6 +55,7 @@ namespace yocto
             matrix_t       Nu;          //!< [NxM], may be reduced in case of fixed species
             matrix_t       Nu0;         //!< [NxM], full initial topology
             ivector_t      dNu;         //!< [N], Delta_r Nu
+            ivector_t      dNuP;        //!< [N], Delta_r Nu_{products}
             vector_t       K;           //!< [N] constants at time t,
             vector_t       Gamma;       //!< [N] constraints
             matrix_t       Phi;         //!< [NxM] dGamma/dX,
@@ -63,7 +64,8 @@ namespace yocto
             vector<extent> limits;      //!< [N] infos
             lu_t           LU;          //!< [N] solver
             vector<size_t> online;      //!< [N] online reactions
-            vector<double> scaled;      //!< [N] scaled concentration
+            vector_t       scaled;      //!< [N] scaled concentration
+            vector_t       gammaC;      //!< [N] scaling factor for Gamma
             vector<size_t> active;      //!< [M] number or reaction involving each species
             vector_t       dC;          //!< [M] concentrations increase (Newton's Step)
             vector<size_t> bad;         //!< [M] bad concentrations indices

@@ -1,6 +1,8 @@
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-chem main.cpp ${test_srcs} 
 sample.lua
+sample2.lua
+boot-spec.lua
 )
 TARGET_LINK_YOCTO( test-chem chem mk lua++ lua)
 
