@@ -51,7 +51,7 @@ namespace yocto
                 //
                 // compute the full Newton's extent
                 //______________________________________________________________
-                std::cerr << "Gamma=" << Gamma << std::endl;
+                //std::cerr << "Gamma=" << Gamma << std::endl;
                 mkl::mul_rtrn(W, Phi, Nu);
                 if(!LU.build(W))
                 {
@@ -60,7 +60,7 @@ namespace yocto
                 }
                 mkl::neg(xi, Gamma);
                 lu_t::solve(W, xi);
-                std::cerr << "xi_full=" << xi << std::endl;
+                //std::cerr << "xi_full=" << xi << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -68,7 +68,7 @@ namespace yocto
                 //______________________________________________________________
                 find_limits_of(C);
                 clip_extents();
-                std::cerr << "xi_clip=" << xi << std::endl;
+                //std::cerr << "xi_clip=" << xi << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -99,8 +99,8 @@ namespace yocto
                         assert(fabs(dC[j])<=0);
                     }
                 }
-                std::cerr << "C1=" << C << std::endl;
-                std::cerr << "dC=" << dC << std::endl;
+                //std::cerr << "C1=" << C << std::endl;
+                //std::cerr << "dC=" << dC << std::endl;
                 if(converged)
                 {
                     std::cerr << "#converged in " << count << " step" << (count>1? "s" : "") << std::endl;

@@ -178,14 +178,14 @@ namespace yocto
                     //__________________________________________________________
                     return true;
                 }
-                std::cerr << "bad=" << bad << std::endl;
+                //std::cerr << "bad=" << bad << std::endl;
                 
                 //______________________________________________________________
                 //
                 // find online reactions from limits
                 //______________________________________________________________
                 find_limits_of(C);
-                show_limits();
+                //show_limits();
                 
                 online.free();
                 for(size_t i=1;i<=N;++i)
@@ -199,7 +199,7 @@ namespace yocto
                     std::cerr << "-- Validate: no available reactions" << std::endl;
                     return false;
                 }
-                std::cerr << "online=" << online << std::endl;
+                //std::cerr << "online=" << online << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -232,19 +232,19 @@ namespace yocto
                 //______________________________________________________________
                 {
                     
-                    std::cerr << "beta=" << beta << std::endl;
+                    //std::cerr << "beta=" << beta << std::endl;
                     matrix_t J(B,B);
                     mkl::mul_rtrn(J, beta, beta);
-                    std::cerr << "J=" << J <<std::endl;
+                    //std::cerr << "J=" << J <<std::endl;
                     lu_t solver(B);
                     if(!solver.build(J))
                     {
                         std::cerr << "-- Validate: singular sub-system" << std::endl;
                         return false;
                     }
-                    std::cerr << "deltaC=" << lambda << std::endl;
+                    //std::cerr << "deltaC=" << lambda << std::endl;
                     solver.solve(J,lambda);
-                    std::cerr << "lambda=" << lambda << std::endl;
+                    //std::cerr << "lambda=" << lambda << std::endl;
                 }
                 
                 
@@ -262,7 +262,7 @@ namespace yocto
                     }
                     xi[ online[i] ] = sum;
                 }
-                std::cerr << "xi=" << xi << std::endl;
+                //std::cerr << "xi=" << xi << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -276,8 +276,8 @@ namespace yocto
                 //______________________________________________________________
                 
                 mkl::mul_trn(dC, Nu, xi);
-                std::cerr << "C0=" << C << std::endl;
-                std::cerr << "dC=" << dC <<  std::endl;
+                //std::cerr << "C0=" << C << std::endl;
+                //std::cerr << "dC=" << dC <<  std::endl;
                 
                 //______________________________________________________________
                 //
@@ -306,7 +306,7 @@ namespace yocto
                         assert(fabs(dC[j])<=0);
                     }
                 }
-                std::cerr << "C=" << C << std::endl;
+                //std::cerr << "C=" << C << std::endl;
             }
             
         }
