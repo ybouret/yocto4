@@ -374,15 +374,16 @@ namespace yocto
                 __factorize(P, Lambda, Nu, Cfixed, ifixed);
                 find_active_species();
                 co_qsort(ifixed, Cfixed);
+
+#if 0
                 std::cerr << "ifixed=" << ifixed << std::endl;
                 std::cerr << "Cfixed=" << Cfixed << std::endl;
                 
                 std::cerr << "Nu0=" << Nu0 << std::endl;
-                
                 std::cerr << "Nu="  << Nu << std::endl;
                 std::cerr << "P=" << P << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
-                
+#endif
                 //______________________________________________________________
                 //
                 //
@@ -413,7 +414,7 @@ namespace yocto
                 //
                 //______________________________________________________________
                 const size_t Nf = ifixed.size();
-                std::cerr << "#fixed=" << Nf << std::endl;
+                //std::cerr << "#fixed=" << Nf << std::endl;
                 
                 
                 const size_t   ndof = M-Nf;
@@ -432,7 +433,7 @@ namespace yocto
                     if(is_dof)
                         idof.push_back(j);
                 }
-                std::cerr << "idof=" << idof << std::endl;
+                //std::cerr << "idof=" << idof << std::endl;
                 
                 
                 //______________________________________________________________
@@ -454,7 +455,7 @@ namespace yocto
                         P2[i][j] = P2[j][i] = sum;
                     }
                 }
-                std::cerr << "P2=" << P2 << std::endl;
+                //std::cerr << "P2=" << P2 << std::endl;
                 matrix_t AP2(P2);
                 
                 //______________________________________________________________
@@ -462,7 +463,7 @@ namespace yocto
                 // Compute the determinant using AP2
                 //______________________________________________________________
                 const int detP2 = __rint(math::__determinant_of(AP2));
-                std::cerr << "detP2=" << detP2 << std::endl;
+                //std::cerr << "detP2=" << detP2 << std::endl;
                 if(!detP2)
                 {
                     throw exception("%s:singular set of constraints",fn);
@@ -480,7 +481,7 @@ namespace yocto
                         AP2[i][j] = __rint(AP2[i][j]);
                     }
                 }
-                std::cerr << "AP2=" << AP2 << std::endl;
+                //std::cerr << "AP2=" << AP2 << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -511,13 +512,13 @@ namespace yocto
                                 F[Nc+i][j] = Nu[i][j];
                             }
                         }
-                        std::cerr << "F0=" << F << std::endl;
+                        //std::cerr << "F0=" << F << std::endl;
                         if( __rint(math::determinant_of(F)) == 0)
                         {
                             throw exception("constraints are colinear to reactions");
                         }
                         boot::igs(F);
-                        std::cerr << "F=" << F << std::endl;
+                        //std::cerr << "F=" << F << std::endl;
                         for(size_t i=N;i>0;--i)
                         {
                             for(size_t j=M;j>0;--j)
@@ -529,6 +530,7 @@ namespace yocto
                 }
                 std::cerr << "Q=" << Q << std::endl;
                 
+#if 0
                 //______________________________________________________________
                 //
                 // find the diagonal terms
@@ -539,6 +541,7 @@ namespace yocto
                     q[i] = __inorm_sq(Q[i]);
                 }
                 std::cerr << "q=" << q << std::endl;
+#endif
                 
                 //______________________________________________________________
                 //
@@ -564,9 +567,9 @@ namespace yocto
                 //______________________________________________________________
                 computeK(t);
                 compute_scaled_concentrations();
-                std::cerr << "K=" << K << std::endl;
-                std::cerr << "scaled=" << scaled << std::endl;
-                std::cerr << "gammaC=" << gammaC << std::endl;
+                //std::cerr << "K=" << K << std::endl;
+                //std::cerr << "scaled=" << scaled << std::endl;
+                //std::cerr << "gammaC=" << gammaC << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -580,14 +583,11 @@ namespace yocto
                 vector_t X(M,0.0);
                 vector_t X0(M,0.0);
                 vector_t X1(M,0.0);
-                vector_t G(M,0.0);
-                vector_t dX(M,0);
                 vector_t dL(Nc,0);
                 vector_t dU(Nc,0);
-                vector_t dY(M,0.0);
-                
+                vector_t dX(M,0);
                 vector_t dV(N,0.0);
-                vector_t V(N,0.0);
+                vector_t dY(M,0.0);
                 
                 
                 LinMin                          Opt(X,dX,X1,*this);
@@ -595,13 +595,15 @@ namespace yocto
                 
                 
             PREPARE_CONC:
-                //-- prepare a valid sample
+                //______________________________________________________________
+                //
+                // prepare a valid sample
+                //______________________________________________________________
                 for(size_t j=Nf;j>0;--j)
                 {
                     X[ ifixed[j] ] = Cfixed[j];
                 }
                 generate(X,loader.ran);
-                std::cerr << "X=" << X << std::endl;
                 mkl::set(X0,X);
                 
                 for(size_t sub=1;;++sub)
@@ -611,8 +613,8 @@ namespace yocto
                     // prepare Gamma and Phi
                     //__________________________________________________________
                     updateGammaAndPhi(X);
-                    std::cerr << "Gamma=" << Gamma << std::endl;
-                    std::cerr << "Phi  =" << Phi   << std::endl;
+                    //std::cerr << "Gamma=" << Gamma << std::endl;
+                    //std::cerr << "Phi  =" << Phi   << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -639,8 +641,11 @@ namespace yocto
                     // compute dX = P'*dU
                     //__________________________________________________________
                     mkl::mul_trn(dX,P,dU);
-                    for(size_t ii=M;ii>0;--ii) dX[ii]/=detP2;
-                    std::cerr << "delX=" << dX << std::endl;
+                    for(size_t ii=M;ii>0;--ii)
+                    {
+                        dX[ii]/=detP2;
+                    }
+                    //std::cerr << "delX=" << dX << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -655,7 +660,7 @@ namespace yocto
                     //__________________________________________________________
                     lu_t::solve(W,xi);
                     mkl::mul_trn(dY,Q,xi);
-                    std::cerr << "delY=" << dY << std::endl;
+                    //std::cerr << "delY=" << dY << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -668,11 +673,11 @@ namespace yocto
                     // move at the full Newton's step
                     //__________________________________________________________
                     mkl::add(X, dX);
-                    std::cerr << "X=" << X << std::endl;
+                    //std::cerr << "X=" << X << std::endl;
                     
                     //__________________________________________________________
                     //
-                    // at this, point, the constraints PX=Lambda
+                    // at this, point, the constraints P*X=Lambda
                     // are numerically OK
                     //__________________________________________________________
                     mkl::set(X0,X);
@@ -683,10 +688,7 @@ namespace yocto
                     // Check the Q step
                     //__________________________________________________________
                     updateGammaAndPhi(X);
-                    std::cerr << "Gamma=" << Gamma << std::endl;
-                    std::cerr << "Phi  =" << Phi   << std::endl;
                     
-                    // Q only
                     mkl::mul_rtrn(W, Phi, Q);
                     if( ! LU.build(W) )
                     {
@@ -696,26 +698,26 @@ namespace yocto
                     mkl::neg(dV,Gamma);
                     lu_t::solve(W, dV);
                     mkl::mul_trn(dX,Q,dV);
-                    std::cerr << "dXq=" << dX << std::endl;
                     
                     const double F0 = __RMS(Gamma);
                     const double F1 = Fopt(1.0);
-                    std::cerr << "F0=" << F0 << std::endl;
-                    std::cerr << "F1=" << F1 << std::endl;
+                    //std::cerr << "F0=" << F0 << std::endl;
+                    //std::cerr << "F1=" << F1 << std::endl;
                     
                     math::triplet<double> XX = { 0,  1,  1 };
                     math::triplet<double> FF = { F0, F1, F1};
                     math::bracket<double>::expand(Fopt, XX, FF);
                     math::minimize(Fopt, XX, FF, 0.0);
                     const double alpha=XX.b;
-                    std::cerr << "alpha=" << XX.b << std::endl;
+                    //std::cerr << "alpha=" << XX.b << std::endl;
                     
                     mkl::muladd(X,alpha,dX);
-                    
+                    std::cerr << "X=" << X << std::endl;
+
                     
                     
                     mkl::vec(dX,X0,X);
-                    std::cerr << "dX=" << dX << std::endl;
+                    //std::cerr << "dX=" << dX << std::endl;
                     bool converged = true;
                     for(size_t j=M;j>0;--j)
                     {
@@ -737,23 +739,23 @@ namespace yocto
                         break;
                     }
                     
-                    mkl::set(X0,X);
                 }
                 
                 updateGamma(X);
                 std::cerr << "Gamma=" << Gamma << std::endl;
+                
                 //______________________________________________________________
                 //
                 // All Done ! Restore Topology after catch
                 //______________________________________________________________
                 for(size_t j=M;j>0;--j) C0[j] = X[j];
-                std::cerr << "C0=" << C0 << std::endl;
+                std::cerr << "C0="     << C0 << std::endl;
                 std::cerr << "#"       << std::endl;
-                std::cerr << "Nu="     << Nu << std::endl;
-                std::cerr << "P="      << P << std::endl;
+                std::cerr << "Nu="     << Nu     << std::endl;
+                std::cerr << "P="      << P      << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
-                std::cerr << "Q="      << Q << std::endl;
-                std::cerr << "Xstar="  << Xstar << std::endl;
+                std::cerr << "Q="      << Q      << std::endl;
+                std::cerr << "Xstar="  << Xstar  << std::endl;
                 
             }
             catch(...)
