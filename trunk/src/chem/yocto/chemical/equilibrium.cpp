@@ -204,7 +204,7 @@ namespace yocto
         }
         
         
-        void equilibrium:: compile( array<double> &Nu, const collection &lib)
+        int equilibrium:: compile( array<double> &Nu, const collection &lib)
         {
             //__________________________________________________________________
             //
@@ -273,6 +273,7 @@ namespace yocto
             precompute(rj_code, r_code);
             precompute(pj_code, p_code);
             std::cerr << "</code>" << std::endl;
+            return np;
             
         }
         

@@ -11,6 +11,8 @@
 
 #include "yocto/code/utils.hpp"
 #include "yocto/math/opt/cgrad.hpp"
+#include "yocto/math/opt/minimize.hpp"
+#include "yocto/math/opt/bracket.hpp"
 
 
 namespace yocto
@@ -25,7 +27,7 @@ namespace yocto
         }
         
         static inline
-        bool check_valid( const array<double> &P ) throw()
+        bool __check_valid( const array<double> &P ) throw()
         {
             for(size_t j=P.size();j>0;--j)
             {
@@ -37,7 +39,7 @@ namespace yocto
         
         
         static inline
-        size_t count_items( size_t &s, const array<double> &P ) throw()
+        size_t __count_items( size_t &s, const array<double> &P ) throw()
         {
             size_t count = 0;
             s = 0;
@@ -53,83 +55,87 @@ namespace yocto
         }
         
         static inline
-        bool factorize(matrix_t              &P,
-                       vector_t              &Lambda,
-                       matrix_t              &Nu,
-                       sorted_vector<size_t> &single,
-                       vector_t              &Cfixed,
-                       vector<size_t>        &ifixed )
+        void __factorize(matrix_t              &P,
+                         vector_t              &Lambda,
+                         matrix_t              &Nu,
+                         vector_t              &Cfixed,
+                         vector<size_t>        &ifixed )
         {
-            bool         changed = false;
             const size_t Nc      = P.rows;
             const size_t N       = Nu.rows;
             
-            for(size_t i=1;i<=Nc;++i)
+            size_t i   = 1; // active line    index
+            size_t top = 0; // last singleton index
+            while(i<=Nc)
             {
-                //______________________________________________________
+                //______________________________________________________________
                 //
-                // how many not zero items...
-                //______________________________________________________
+                // count how many valid items
+                //______________________________________________________________
                 size_t       s     = 0;
-                const size_t count = count_items(s,P[i]);
+                const size_t count = __count_items(s,P[i]);
                 
-                //______________________________________________________
+                //______________________________________________________________
                 //
                 // None: bad
-                //______________________________________________________
+                //______________________________________________________________
                 if(count<=0)
                     throw exception("unexpected empty constraint[%u]!", unsigned(i));
                 
                 
-                //______________________________________________________
+                //______________________________________________________________
                 //
                 // general case
-                //______________________________________________________
+                //______________________________________________________________
                 if(count>1)
-                    continue;
-                
-                //______________________________________________________
-                //
-                // a singleton !
-                //______________________________________________________
-                assert(1==count);
-                
-                if( !single.insert(s) )
                 {
+                    ++i; // next line
                     continue;
-                    // already dectected singleton
                 }
                 
-                
-                //______________________________________________________
+                //______________________________________________________________
                 //
-                // simplify the projection matrix
-                //______________________________________________________
-                changed = true;
+                // ok, this is a singleton => fixed
+                // find its new position
+                //______________________________________________________________
+                ++top; assert(top<=Nc); assert(top<=i);
                 
+                //______________________________________________________________
+                //
+                // rearrange the rows and Lambda
+                //______________________________________________________________
+                while(i>top)
+                {
+                    const size_t j = i-1;
+                    P.swap_rows(i, j);
+                    cswap(Lambda[i],Lambda[j]);
+                    i=j;
+                }
+                
+                //______________________________________________________________
+                //
+                // simplify the singleton row
+                //______________________________________________________________
                 assert(0!=P[i][s]);
                 const double lhs = (Lambda[i] /= P[i][s]);
                 P[i][s] = 1;
                 Cfixed.push_back(lhs);
                 ifixed.push_back(s);
                 
-                //______________________________________________________
+                //______________________________________________________________
                 //
-                // simplify P: inform other rows of that case
-                //______________________________________________________
-                for(size_t k=1;k<=Nc;++k)
+                // propagate the information to the rows below
+                //______________________________________________________________
+                for(size_t k=i+1;k<=Nc;++k)
                 {
-                    if(i!=k)
+                    array<double>    &Pk = P[k];
+                    double           &p  = Pk[s];
+                    if(p>0)
                     {
-                        array<double>    &Pk = P[k];
-                        double           &p  = Pk[s];
-                        if(p>0)
-                        {
-                            Lambda[k] -= p*lhs;
-                            p          = 0.0;
-                            if( !check_valid(Pk) )
-                                throw exception("degenerate constraints");
-                        }
+                        Lambda[k] -= p*lhs;
+                        p          = 0.0;
+                        if( !__check_valid(Pk) )
+                            throw exception("degenerated constraints");
                     }
                 }
                 
@@ -141,11 +147,11 @@ namespace yocto
                 {
                     Nu[k][s] = 0;
                 }
-                
+                ++i;
                 
             }
             
-            return changed;
+            
         }
         
         
@@ -338,6 +344,47 @@ namespace yocto
             };
             
             
+            class LinMin
+            {
+            public:
+                const vector_t &X0;
+                const vector_t &dX;
+                vector_t       &X1;
+                equilibria     &cs;
+                explicit LinMin(const vector_t &user_X0,
+                                const vector_t &user_dX,
+                                vector_t       &user_X1,
+                                equilibria     &user_cs) throw() :
+                X0( user_X0 ),
+                dX( user_dX ),
+                X1( user_X1 ),
+                cs( user_cs )
+                {
+                }
+                
+                inline ~LinMin() throw()
+                {
+                    
+                }
+                
+                double F( double u )
+                {
+                    mkl::set(X1,X0);
+                    mkl::muladd(X1,u,dX);
+                    cs.updateGamma(X1);
+                    double sum = 0;
+                    for(size_t i=cs.Gamma.size();i>0;--i)
+                    {
+                        const double dG = cs.Gamma[i] / cs.gammaC[i];
+                        sum += dG * dG;
+                    }
+                    return sqrt(sum);
+                }
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(LinMin);
+            };
             
         }
         
@@ -400,15 +447,12 @@ namespace yocto
                 //______________________________________________________________
                 vector_t              Cfixed(Nc,as_capacity);
                 vector<size_t>        ifixed(Nc,as_capacity);
-                {
-                    sorted_vector<size_t> single(Nc,as_capacity);
-                    while( factorize(P, Lambda, Nu, single, Cfixed, ifixed) )
-                        ;
-                    find_active_species();
-                    co_qsort(ifixed, Cfixed);
-                    std::cerr << "ifixed=" << ifixed << std::endl;
-                    std::cerr << "Cfixed=" << Cfixed << std::endl;
-                }
+                __factorize(P, Lambda, Nu, Cfixed, ifixed);
+                find_active_species();
+                co_qsort(ifixed, Cfixed);
+                std::cerr << "ifixed=" << ifixed << std::endl;
+                std::cerr << "Cfixed=" << Cfixed << std::endl;
+                
                 std::cerr << "Nu0=" << Nu0 << std::endl;
                 
                 std::cerr << "Nu="  << Nu << std::endl;
@@ -526,34 +570,36 @@ namespace yocto
                 //
                 // using P (+) Nu
                 //______________________________________________________________
-                matrix_t F(M,M);
                 {
-                    for(size_t i=Nc;i>0;--i)
+                    matrix_t F(M,M);
                     {
-                        for(size_t j=M;j>0;--j)
+                        for(size_t i=Nc;i>0;--i)
                         {
-                            F[i][j] = P[i][j];
+                            for(size_t j=M;j>0;--j)
+                            {
+                                F[i][j] = P[i][j];
+                            }
                         }
-                    }
-                    for(size_t i=N;i>0;--i)
-                    {
-                        for(size_t j=M;j>0;--j)
+                        for(size_t i=N;i>0;--i)
                         {
-                            F[Nc+i][j] = Nu[i][j];
+                            for(size_t j=M;j>0;--j)
+                            {
+                                F[Nc+i][j] = Nu[i][j];
+                            }
                         }
-                    }
-                    std::cerr << "F0=" << F << std::endl;
-                    if( __rint(math::determinant_of(F)) == 0)
-                    {
-                        throw exception("constraints are colinear to reactions");
-                    }
-                    boot::igs(F);
-                    std::cerr << "F=" << F << std::endl;
-                    for(size_t i=N;i>0;--i)
-                    {
-                        for(size_t j=M;j>0;--j)
+                        std::cerr << "F0=" << F << std::endl;
+                        if( __rint(math::determinant_of(F)) == 0)
                         {
-                            Q[i][j] = F[Nc+i][j];
+                            throw exception("constraints are colinear to reactions");
+                        }
+                        boot::igs(F);
+                        std::cerr << "F=" << F << std::endl;
+                        for(size_t i=N;i>0;--i)
+                        {
+                            for(size_t j=M;j>0;--j)
+                            {
+                                Q[i][j] = F[Nc+i][j];
+                            }
                         }
                     }
                 }
@@ -596,7 +642,7 @@ namespace yocto
                 compute_scaled_concentrations();
                 std::cerr << "K=" << K << std::endl;
                 std::cerr << "scaled=" << scaled << std::endl;
-                
+                std::cerr << "gammaC=" << gammaC << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -605,26 +651,25 @@ namespace yocto
                 //
                 //______________________________________________________________
                 
-                std::cerr << "#"       << std::endl;
-                std::cerr << "Nu="     << Nu << std::endl;
-                std::cerr << "P="      << P << std::endl;
-                std::cerr << "Lambda=" << Lambda << std::endl;
-                std::cerr << "Q="      << Q << std::endl;
-                std::cerr << "Xstar="  << Xstar << std::endl;
+               
                 
                 vector_t X(M,0.0);
                 vector_t X0(M,0.0);
+                vector_t X1(M,0.0);
                 vector_t G(M,0.0);
                 vector_t dX(M,0);
-                vector_t V(N,0);
                 vector_t dL(Nc,0);
                 vector_t dU(Nc,0);
                 vector_t dY(M,0.0);
                 
+                LinMin                          Opt(X0,dX,X1,*this);
+                math::numeric<double>::function Fopt( &Opt, &LinMin::F);
+#if 0
                 CCJ ccj(Xstar,X,G,Q,idof);
                 math::numeric<double>::scalar_field FF( &ccj, & CCJ::GetH );
                 math::numeric<double>::vector_field GG( &ccj, & CCJ::GetG );
                 math::cgrad<double>::callback       CB( &ccj, & CCJ::callback);
+#endif
                 
                 
             PREPARE_CONC:
@@ -635,10 +680,12 @@ namespace yocto
                 }
                 generate(X,loader.ran);
                 std::cerr << "X=" << X << std::endl;
+                mkl::set(X0,X);
+                double F0 = Fopt(0);
+                std::cerr << "F=" << F0 << std::endl;
                 
                 for(size_t sub=1;;++sub)
                 {
-                    mkl::set(X0,X);
                     updateGammaAndPhi(X);
                     std::cerr << "Gamma=" << Gamma << std::endl;
                     mkl::mul_rtrn(W, Phi, Q);
@@ -666,13 +713,40 @@ namespace yocto
                     //std::cerr << "dX0=" << dX << std::endl;
                     //std::cerr << "dY=" << dY << std::endl;
                     
+                    // compute the full Newton's step dX
                     mkl::add(dX,dY);
-                    //std::cerr << "dX=" << dX << std::endl;
                     
-                    mkl::add(X,dX);
+                    // test the values
+                    double F1 = Fopt(1.0);
+                    std::cerr << "F=" << F1 << std::endl;
+                    
+                    if(F1<F0)
+                    {
+                        mkl::add(X,dX);
+                    }
+                    else
+                    {
+                        //std::cerr << "bad Newton's step" << std::endl;
+                        math::triplet<double> XX = { 0,  0,  1  };
+                        math::triplet<double> FF = { F0, F0, F1 };
+                        if(!math::bracket<double>::inside(Fopt, XX, FF))
+                        {
+                            std::cerr << "can't bracket..." << std::endl;
+                            exit(12);
+                        }
+                        math::minimize<double>(Fopt, XX, FF, 0);
+                        //std::cerr << "XX=" << XX << std::endl;
+                        //std::cerr << "FF=" << FF << std::endl;
+                        
+                        const double alpha = XX.b;
+                        F1                 = FF.b;
+                        std::cerr << "alpha=" << alpha << std::endl;
+                        mkl::muladd(X,alpha,dX);
+                    }
                     mkl::vec(dX,X0,X);
                     std::cerr << "X=" << X << std::endl;
-                    //std::cerr << "ddX=" << dX << std::endl;
+                    //std::cerr << "dX=" << dX << std::endl;
+                    
                     bool converged = true;
                     for(size_t j=M;j>0;--j)
                     {
@@ -682,8 +756,10 @@ namespace yocto
                             break;
                         }
                     }
+                    
                     if(converged)
                     {
+                        std::cerr << "# Newton II converged" << std::endl;
                         if( !normalize(-1, X, false) )
                         {
                             std::cerr << "-- invalid solution" << std::endl;
@@ -692,6 +768,8 @@ namespace yocto
                         break;
                     }
                     
+                    mkl::set(X0,X);
+                    F0 = F1;
                 }
                 
                 updateGamma(X);
@@ -701,6 +779,14 @@ namespace yocto
                 // All Done ! Restore Topology after catch
                 //______________________________________________________________
                 for(size_t j=M;j>0;--j) C0[j] = X[j];
+                std::cerr << "C0=" << C0 << std::endl;
+                std::cerr << "#"       << std::endl;
+                std::cerr << "Nu="     << Nu << std::endl;
+                std::cerr << "P="      << P << std::endl;
+                std::cerr << "Lambda=" << Lambda << std::endl;
+                std::cerr << "Q="      << Q << std::endl;
+                std::cerr << "Xstar="  << Xstar << std::endl;
+                
             }
             catch(...)
             {

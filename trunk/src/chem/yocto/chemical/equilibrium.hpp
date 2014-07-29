@@ -105,8 +105,8 @@ namespace yocto
             //! get the constant at a given time
             virtual double getK( double t ) const = 0;
             
-            //! compile information
-            void compile( array<double> &Nu, const collection &lib);
+            //! compile information, return Delta_r Nu_products
+            int compile( array<double> &Nu, const collection &lib);
 
             //! wrapper for the virtual function
             double computeK(double) const;

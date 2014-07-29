@@ -1,6 +1,7 @@
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/algebra.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -35,6 +36,7 @@ namespace yocto
             dC.release();
             active.release();
             
+            gammaC.release();
             scaled.release();
             online.release();
             LU.release();
@@ -44,6 +46,7 @@ namespace yocto
             Phi.release();
             Gamma.release();
             K.release();
+            dNuP.release();
             dNu.release();
             Nu0.release();
             Nu.release();
@@ -73,6 +76,7 @@ namespace yocto
                     Nu.make(N,M);
                     Nu0.make(N,M);
                     dNu.make(N,0);
+                    dNuP.make(N,0);
                     K.make(N,0.0);
                     Gamma.make(N,0.0);
                     Phi.make(N,M);
@@ -82,7 +86,8 @@ namespace yocto
                     limits.make(N,ex0);
                     LU.make(N,0.0);
                     online.ensure(N);
-                    scaled.make(N,0);
+                    scaled.make(N,0.0);
+                    gammaC.make(N,0.0);
                     //__________________________________________________________
                     //
                     // fill constant parts
@@ -92,11 +97,12 @@ namespace yocto
                     {
                         equilibrium &eq = **k;
                         ++i;
-                        eq.compile(Nu[i],lib);
-                        dNu[i] = eq.DeltaNu;
+                        dNuP[i] = eq.compile(Nu[i],lib);
+                        dNu[i]  = eq.DeltaNu;
                     }
                     std::cerr << "Nu=" << Nu << std::endl;
                     std::cerr << "dNu=" << dNu << std::endl;
+                    std::cerr << "dNuP=" << dNuP << std::endl;
                     //__________________________________________________________
                     //
                     // copy the full topology
@@ -164,6 +170,7 @@ namespace yocto
                 {
                     scaled[i] = 1.0;
                 }
+                gammaC[i] = ipower(scaled[i],size_t(dNuP[i]));
             }
             
         }
