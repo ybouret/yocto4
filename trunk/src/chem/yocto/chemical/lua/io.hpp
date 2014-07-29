@@ -77,6 +77,16 @@ namespace yocto
              */
             static void load( lua_State *L, const collection &lib, boot &loader, const string &name);
             
+            //__________________________________________________________________
+            //
+            // solution API
+            //__________________________________________________________________
+            //! push solution on stack
+            static void push( lua_State *L, const solution &S);
+            
+            //! read solution on stack
+            static void load( lua_State *L, solution &S);
+            
         };
         
         
