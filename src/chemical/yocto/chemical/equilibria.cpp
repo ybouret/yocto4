@@ -125,7 +125,6 @@ namespace yocto
             nu.release();
             nuP.release();
             nuR.release();
-            LU.release();
             CC.release();
             Cf.release();
             fixed.release();
@@ -165,7 +164,6 @@ namespace yocto
                 fixed. reserve(M);
                 Cf.    make(M,0);
                 CC.    make(M,0);
-                LU.    prepare(M);
                 
                 if(N>0)
                 {

@@ -234,7 +234,6 @@ namespace yocto
             const size_t n = aorg.size();
             if(n<=0) throw exception("not enough coefficients for polynomial fit");
             prepare(n);
-            crout<real_t> LU(n);
             size_t dof = N;
             for(size_t i=n;i>0;--i)
             {
@@ -306,7 +305,7 @@ namespace yocto
             // solve
             //__________________________________________________________________
             
-            if( !LU.build(alpha) )
+            if( !crout<real_t>::build(alpha) )
             {
                 throw exception("lsf/polynomial: singular fit");
             }
@@ -519,8 +518,7 @@ namespace yocto
             //
             // solve the system
             //__________________________________________________________________
-            crout<real_t> lu(dim);
-            if( !lu.build(alpha) )
+            if( !crout<real_t>::build(alpha) )
                 throw exception("singular Pade approximant");
             crout<real_t>::solve(alpha, beta);
             
@@ -640,7 +638,7 @@ namespace yocto
         template <>
         void least_squares<real_t>:: cleanup() throw()
         {
-            LU.    release();
+            //LU.    release();
             used.  release();
             aorg.  release();
             step.  release();
@@ -769,7 +767,7 @@ namespace yocto
             aorg. make(nvar,0);
             used. make(nvar,true);
             atmp. make(nvar,0);
-            LU.   make(nvar,0);
+            //LU.   make(nvar,0);
             numeric<real_t>::function probe( this, & least_squares<real_t>::compute_D2_tmp);
             
             //__________________________________________________________________

@@ -186,13 +186,12 @@ namespace yocto
             //std::cerr << "Sqq = " << Sqq << std::endl;
             //std::cerr << "Sqz = " << Sqz << std::endl;
             //std::cerr << "Szz = " << Szz << std::endl;
-            crout<real_t> LU(3);
             
             matrix<real_t> iSzz(Szz);
             //------------------------------------------------------------------
             // iSzz <- inv(Szz)
             //------------------------------------------------------------------
-            if( !LU.build(iSzz) )
+            if( !crout<real_t>::build(iSzz) )
             {
                 throw exception("%s(invalid points)",fn);
             }
@@ -225,7 +224,7 @@ namespace yocto
             //------------------------------------------------------------------
             matrix<real_t> I(C);
             //std::cerr << "C=" << I << std::endl;
-            if( !LU.build(I) )
+            if( !crout<real_t>::build(I) )
             {
                 throw exception("%s(invalid constraint)", fn);
             }

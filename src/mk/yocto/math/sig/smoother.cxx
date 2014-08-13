@@ -229,8 +229,7 @@ namespace yocto
             //
             // solve the polynomial coefficients
             //__________________________________________________________________
-            crout<real_t> lu(m);
-            if( !lu.build(mu) )
+            if( !crout<z_type>::build(mu) )
                 throw exception("singular smoothing window around X[%d]=%g", int(i), xi);
             crout<real_t>::solve(mu,a);
             

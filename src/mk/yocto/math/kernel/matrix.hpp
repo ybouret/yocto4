@@ -22,10 +22,14 @@ namespace yocto
         extern const matrix_normal_t    matrix_normal;
         extern const matrix_transpose_t matrix_transpose;
         
+        
+        
+        
 		template <typename T>
 		class matrix : public object
 			{
 			public:
+                
 				class row : public array<T>
 				{
 				public:
@@ -121,6 +125,8 @@ namespace yocto
                 
             public:
                 size_t       *indx;   //!< not NULL for square matrices
+                mutable T    *scal;   //!< not NULL for square matrices
+                
 			};
 		
 	}

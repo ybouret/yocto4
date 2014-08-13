@@ -10,24 +10,14 @@ namespace yocto
     namespace math
     {
         template <typename T>
-        class crout : public vector< typename real_of<T>::type >
+        class crout
         {
         public:
-            typedef typename real_of<T>::type real_type;
-            typedef vector<real_type>         scal_type;
-            
-            explicit crout() throw();
-            explicit crout(size_t);
-            virtual ~crout() throw();
-            
-            void prepare(size_t n); // this->make(n,0)
-            
             //! crout algorithm
             /**
              \param M a square matrix
-             \warning this->size() >= M.rows
              */
-            bool build( matrix<T> &M ) throw();
+            static bool build( matrix<T> &M, bool *dneg = 0 ) throw();
             
             
             //! solve by backsubstitution
@@ -43,23 +33,17 @@ namespace yocto
             
             
             //! solve the inverse matrix
-            /**
-             memory must be allocated before
-             */
-            bool inverse( matrix<T> &a );
+            static bool inverse( matrix<T> &a );
             
             
             //! Moore-Penrose pseudo inverse, P.cols >= P.rows
-            /**
-             memory must be allocated before
-             */
-            bool pseudo_inverse(matrix<T> &M, const matrix<T> &P);
+            static bool pseudo_inverse(matrix<T> &M, const matrix<T> &P);
             
-            bool dneg; //!< a flag for determinant sign
-            
+            //! improve x for A*x = b
+            static void improve( array<T> &x, const matrix<T> &A, const matrix<T> &ALU, const array<T> &b ) throw();
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(crout);
+            
         };
         
         

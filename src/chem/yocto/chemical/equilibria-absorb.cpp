@@ -31,7 +31,7 @@ namespace yocto
             //__________________________________________________________________
             computeGammaPrimeAndPhi(t,C); // xi holds dGamma/dt
             mkl::mul_rtrn(W, Phi, Nu);
-            if(!LU.build(W))
+            if(!lu_t::build(W))
             {
                 throw exception("invalid composition for absorbing");
             }

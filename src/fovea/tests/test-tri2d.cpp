@@ -12,7 +12,6 @@ using namespace math;
 YOCTO_UNIT_TEST_IMPL(tri2d)
 {
     matrix<double> M(6,6);
-    crout<double>  LU(6);
     vector<double> coeff_x(4,0);
     vector<double> coeff_y(4,0);
 
@@ -42,7 +41,7 @@ YOCTO_UNIT_TEST_IMPL(tri2d)
             m[6] = 0.5*v.y*v.y;
         }
         std::cerr << "M=" << M << std::endl;
-        if( ! LU.inverse(M) )
+        if( ! crout<double>::inverse(M) )
         {
             throw exception("inversion error");
         }

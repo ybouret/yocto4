@@ -346,7 +346,7 @@ namespace yocto {
         }
         
         template <>
-        bool tridiag<z_type>:: woodbury( array<z_type>       &x,
+        bool tridiag<z_type>:: woodbury(array<z_type>        &x,
                                         const matrix<z_type> &U,
                                         const matrix<z_type> &V,
                                         const array<z_type>  &r ) const
@@ -369,8 +369,7 @@ namespace yocto {
             algebra<z_type>::mul_ltrn(H, V, Z);
             for(size_t i=p;i>0;--i) H[i][i] += numeric<z_type>::one;
             
-            crout<z_type> LU(p);
-            if( !LU.build(H) )
+            if( !crout<z_type>::build(H) )
                 return false;
             
             //-- solve the auxiliary problem A.y = r
