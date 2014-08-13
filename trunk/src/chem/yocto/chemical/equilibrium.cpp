@@ -4,6 +4,8 @@
 #include "yocto/code/ipower.hpp"
 #include "yocto/sort/quick.hpp"
 
+#include <cstdlib>
+
 namespace yocto
 {
     namespace chemical
@@ -91,6 +93,8 @@ namespace yocto
         actors(4,as_capacity),
         r_code(),
         p_code(),
+	rj_code(),
+	pj_code(),
         DeltaNu(0)
         {
             

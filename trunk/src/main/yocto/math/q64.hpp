@@ -5,6 +5,7 @@
 #include "yocto/exceptions.hpp"
 
 #include <iostream>
+#include <cerrno>
 
 namespace yocto
 {
