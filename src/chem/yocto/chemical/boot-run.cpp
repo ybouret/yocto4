@@ -18,6 +18,8 @@ namespace yocto
     {
         
         typedef math::algebra<double> mkl;
+        
+        
         static inline int __rint( double x ) throw()
         {
             return int( floor(x+0.5) );
@@ -375,7 +377,7 @@ namespace yocto
                 find_active_species();
                 co_qsort(ifixed, Cfixed);
 
-#if 0
+#if 1
                 std::cerr << "ifixed=" << ifixed << std::endl;
                 std::cerr << "Cfixed=" << Cfixed << std::endl;
                 
@@ -414,7 +416,6 @@ namespace yocto
                 //
                 //______________________________________________________________
                 const size_t Nf = ifixed.size();
-                //std::cerr << "#fixed=" << Nf << std::endl;
                 
                 
                 const size_t   ndof = M-Nf;
@@ -433,7 +434,9 @@ namespace yocto
                     if(is_dof)
                         idof.push_back(j);
                 }
-                //std::cerr << "idof=" << idof << std::endl;
+                std::cerr << "#fixed=" << Nf << std::endl;
+                std::cerr << "#dof=" << ndof << std::endl;
+                std::cerr << "idof=" << idof << std::endl;
                 
                 
                 //______________________________________________________________
