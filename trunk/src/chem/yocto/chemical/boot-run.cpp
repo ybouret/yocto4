@@ -639,11 +639,11 @@ namespace yocto
                 vector_t X(M,0.0);
                 vector_t X0(M,0.0);
                 vector_t X1(M,0.0);
-                vector_t r(Nc,0.0);
+                vector_t dL(Nc,0.0);
                 vector_t dX(M,0);
                 vector_t V(N,0.0);
                 vector_t dY(M,0.0);
-                
+                matrix_t PhiQ(N,N);
                 
                 LinMin                          Opt(X,dX,X1,*this);
                 math::numeric<double>::function Fopt( &Opt, &LinMin::FS);
@@ -677,6 +677,7 @@ namespace yocto
                     //__________________________________________________________
                     
                     mkl::mul_rtrn(W, Phi, Q);
+                    PhiQ.assign(W);
                     if( !lu_t::build(W))
                     {
                         std::cerr << "singular concentrations" << std::endl;
@@ -687,13 +688,13 @@ namespace yocto
                     //
                     // compute U * detP2 = AdjointP2 * (Lambda-P*X)
                     //__________________________________________________________
-                    mkl::set(r,Lambda);
-                    mkl::mulsub(r,P,X);
-                    mkl::mul(U,AP2,r);
+                    mkl::set(dL,Lambda);
+                    mkl::mulsub(dL,P,X);
+                    mkl::mul(U,AP2,dL);
                     
                     //__________________________________________________________
                     //
-                    // compute dX = P'*U
+                    // compute dX = P'*U/detP2
                     //__________________________________________________________
                     mkl::mul_trn(dX,P,U);
                     for(size_t ii=M;ii>0;--ii)
@@ -708,12 +709,14 @@ namespace yocto
                     //__________________________________________________________
                     mkl::neg(xi,Gamma);
                     mkl::mulsub(xi, Phi, dX);
+                    mkl::set(V,xi); // save for linear improvement
                     
                     //__________________________________________________________
                     //
                     // compute dY = Q'*inv(Phi*Q') * xi
                     //__________________________________________________________
                     lu_t::solve(W,xi);
+                    lu_t::improve(xi, PhiQ, W, V);
                     mkl::mul_trn(dY,Q,xi);
                     //std::cerr << "delY=" << dY << std::endl;
                     
@@ -745,13 +748,16 @@ namespace yocto
                     updateGammaAndPhi(X);
                     
                     mkl::mul_rtrn(W, Phi, Q);
+                    PhiQ.assign(W);
                     if( ! lu_t::build(W) )
                     {
                         std::cerr << "invalid solution" << std::endl;
                         goto PREPARE_CONC;
                     }
                     mkl::neg(V,Gamma);
+                    mkl::set(xi,V);  // save for improvement
                     lu_t::solve(W, V);
+                    lu_t::improve(V,PhiQ,W,xi);
                     mkl::mul_trn(dX,Q,V);
                     
                     const double F0 = Fopt(0.0);
