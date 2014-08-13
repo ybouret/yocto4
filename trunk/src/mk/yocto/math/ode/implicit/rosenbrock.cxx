@@ -14,7 +14,7 @@ namespace yocto
             
             template <>
             rosenbrock<real_t>:: rosenbrock() : 
-            implicit_step<real_t>( 10 ),
+            implicit_step<real_t>( 9 ),
             g1(    next_array() ),
             g2(    next_array() ),
             g3(    next_array() ),
@@ -24,8 +24,7 @@ namespace yocto
             ysav(  next_array() ),
             dysav( next_array() ),
             dfdy(),
-            a(),
-            LU()
+            a()
             {
             }
             
@@ -36,7 +35,6 @@ namespace yocto
                 allocate(nv);
                 dfdy.make(nv,nv);
                 a.make(nv,nv);
-                LU.make(nv,0.0);
             }
             
         }

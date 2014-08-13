@@ -236,14 +236,13 @@ namespace yocto
                     matrix_t J(B,B);
                     mkl::mul_rtrn(J, beta, beta);
                     //std::cerr << "J=" << J <<std::endl;
-                    lu_t solver(B);
-                    if(!solver.build(J))
+                    if(!lu_t::build(J))
                     {
                         std::cerr << "-- Validate: singular sub-system" << std::endl;
                         return false;
                     }
                     //std::cerr << "deltaC=" << lambda << std::endl;
-                    solver.solve(J,lambda);
+                    lu_t::solve(J,lambda);
                     //std::cerr << "lambda=" << lambda << std::endl;
                 }
                 

@@ -14,31 +14,48 @@
 
 namespace yocto
 {
+    
+    using namespace math;
+    
     namespace chemical
     {
         
         typedef math::algebra<double> mkl;
         
-        
+        //----------------------------------------------------------------------
+        //
+        // nearest integer
+        //
+        //----------------------------------------------------------------------
         static inline int __rint( double x ) throw()
         {
             return int( floor(x+0.5) );
         }
         
+        //----------------------------------------------------------------------
+        //
+        // check at least one argument is not zero
+        //
+        //----------------------------------------------------------------------
         static inline
         bool __check_valid( const array<double> &P ) throw()
         {
             for(size_t j=P.size();j>0;--j)
             {
-                if(0!=int(P[j]))
+                if( 0 != __rint(P[j]) )
                     return true;
             }
             return false;
         }
         
         
+        //----------------------------------------------------------------------
+        //
+        // count not zero items, storing last index position
+        //
+        //----------------------------------------------------------------------
         static inline
-        size_t __count_items( size_t &s, const array<double> &P ) throw()
+        size_t __count_not_zero_items( size_t &s, const array<double> &P ) throw()
         {
             size_t count = 0;
             s = 0;
@@ -53,12 +70,17 @@ namespace yocto
             return count;
         }
         
+        //----------------------------------------------------------------------
+        //
+        // refactor the constraint matrix
+        //
+        //----------------------------------------------------------------------
         static inline
-        void __factorize(matrix_t              &P,
-                         vector_t              &Lambda,
-                         matrix_t              &Nu,
-                         vector_t              &Cfixed,
-                         vector<size_t>        &ifixed )
+        void __refactor(matrix_t              &P,
+                        vector_t              &Lambda,
+                        matrix_t              &Nu,
+                        vector_t              &Cfixed,
+                        vector<size_t>        &ifixed )
         {
             const size_t Nc      = P.rows;
             const size_t N       = Nu.rows;
@@ -74,7 +96,7 @@ namespace yocto
                 // count how many valid items
                 //______________________________________________________________
                 size_t       s     = 0;
-                const size_t count = __count_items(s,P[i]);
+                const size_t count = __count_not_zero_items(s,P[i]);
                 
                 //______________________________________________________________
                 //
@@ -161,32 +183,48 @@ namespace yocto
         //======================================================================
         namespace
         {
+            
+            //------------------------------------------------------------------
+            //! <v|v>
+            //------------------------------------------------------------------
             static inline integer_t __inorm_sq( const array<double> &v ) throw()
             {
                 integer_t ans = 0;
+                
                 for(size_t j=v.size();j>0;--j)
                 {
                     const integer_t ii = __rint(v[j]);
                     ans += ii*ii;
                 }
+                
                 return ans;
             }
             
+            //------------------------------------------------------------------
+            //! <u|v>
+            //------------------------------------------------------------------
             static inline integer_t __idot( const array<double> &v, const array<double> &u) throw()
             {
-                integer_t ans = 0;
                 assert(u.size()==v.size());
+
+                integer_t ans = 0;
+
                 for(size_t j=v.size();j>0;--j)
                 {
                     ans += __rint(v[j]) * __rint(u[j]);
                 }
+                
                 return ans;
             }
             
+            //------------------------------------------------------------------
+            // simplify an integer row
+            //------------------------------------------------------------------
             static inline void __simplify( array<integer_t> &w ) throw()
             {
-                integer_t g = 0;
+                integer_t    g = 0;
                 const size_t n = w.size();
+                
                 for(size_t i=n;i>0;--i)
                 {
                     const integer_t wi = w[i];
@@ -212,6 +250,7 @@ namespace yocto
                         }
                     }
                 }
+                
                 if(g>0)
                 {
                     for(size_t i=n;i>0;--i)
@@ -255,15 +294,11 @@ namespace yocto
             
         }
         
-        //======================================================================
-        //
-        // special CG
-        //
-        //======================================================================
         
         namespace
         {
-
+            
+            
             static inline double __RMS( const array<double> &G ) throw()
             {
                 const size_t M = G.size();
@@ -275,6 +310,19 @@ namespace yocto
                 }
                 return sqrt(sum_sq/M);
             }
+            
+            static inline double __RMS( const array<double> &G, const array<double> &Scale ) throw()
+            {
+                const size_t M = G.size();
+                double sum_sq = 0;
+                for(size_t i=M;i>0;--i)
+                {
+                    const double g = G[i]/Scale[i];
+                    sum_sq += g*g;
+                }
+                return sqrt(sum_sq/M);
+            }
+            
             
             class LinMin
             {
@@ -307,6 +355,13 @@ namespace yocto
                     return __RMS(cs.Gamma);
                 }
                 
+                inline double FS(double u)
+                {
+                    mkl::set(X1,X);
+                    mkl::muladd(X1,u,dX);
+                    cs.updateGamma(X1);
+                    return __RMS(cs.Gamma,cs.gammaC);
+                }
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(LinMin);
@@ -373,17 +428,17 @@ namespace yocto
                 //______________________________________________________________
                 vector_t              Cfixed(Nc,as_capacity);
                 vector<size_t>        ifixed(Nc,as_capacity);
-                __factorize(P, Lambda, Nu, Cfixed, ifixed);
+                __refactor(P, Lambda, Nu, Cfixed, ifixed);
                 find_active_species();
                 co_qsort(ifixed, Cfixed);
-
+                
 #if 1
                 std::cerr << "ifixed=" << ifixed << std::endl;
                 std::cerr << "Cfixed=" << Cfixed << std::endl;
                 
-                std::cerr << "Nu0=" << Nu0 << std::endl;
-                std::cerr << "Nu="  << Nu << std::endl;
-                std::cerr << "P=" << P << std::endl;
+                std::cerr << "Nu0="    << Nu0    << std::endl;
+                std::cerr << "Nu="     << Nu     << std::endl;
+                std::cerr << "P="      << P      << std::endl;
                 std::cerr << "Lambda=" << Lambda << std::endl;
 #endif
                 //______________________________________________________________
@@ -397,8 +452,7 @@ namespace yocto
                     assert(P.is_square());
                     if(M>0)
                     {
-                        lu_t solver(M);
-                        if( !solver.build(P) )
+                        if( !lu_t::build(P) )
                         {
                             throw exception("%ssingular full constraints",fn);
                         }
@@ -515,13 +569,12 @@ namespace yocto
                                 F[Nc+i][j] = Nu[i][j];
                             }
                         }
-                        //std::cerr << "F0=" << F << std::endl;
                         if( __rint(math::determinant_of(F)) == 0)
                         {
                             throw exception("constraints are colinear to reactions");
                         }
+                        
                         boot::igs(F);
-                        //std::cerr << "F=" << F << std::endl;
                         for(size_t i=N;i>0;--i)
                         {
                             for(size_t j=M;j>0;--j)
@@ -570,9 +623,9 @@ namespace yocto
                 //______________________________________________________________
                 computeK(t);
                 compute_scaled_concentrations();
-                //std::cerr << "K=" << K << std::endl;
-                //std::cerr << "scaled=" << scaled << std::endl;
-                //std::cerr << "gammaC=" << gammaC << std::endl;
+                std::cerr << "K=" << K << std::endl;
+                std::cerr << "scaled=" << scaled << std::endl;
+                std::cerr << "gammaC=" << gammaC << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -581,20 +634,19 @@ namespace yocto
                 //
                 //______________________________________________________________
                 
-               
+                
                 
                 vector_t X(M,0.0);
                 vector_t X0(M,0.0);
                 vector_t X1(M,0.0);
-                vector_t dL(Nc,0);
-                vector_t dU(Nc,0);
+                vector_t r(Nc,0.0);
                 vector_t dX(M,0);
-                vector_t dV(N,0.0);
+                vector_t V(N,0.0);
                 vector_t dY(M,0.0);
                 
                 
                 LinMin                          Opt(X,dX,X1,*this);
-                math::numeric<double>::function Fopt( &Opt, &LinMin::F);
+                math::numeric<double>::function Fopt( &Opt, &LinMin::FS);
                 
                 
             PREPARE_CONC:
@@ -616,16 +668,16 @@ namespace yocto
                     // prepare Gamma and Phi
                     //__________________________________________________________
                     updateGammaAndPhi(X);
-                    //std::cerr << "Gamma=" << Gamma << std::endl;
-                    //std::cerr << "Phi  =" << Phi   << std::endl;
+                    std::cerr << "Gamma=" << Gamma << std::endl;
+                    std::cerr << "Phi  =" << Phi   << std::endl;
                     
                     //__________________________________________________________
                     //
                     // set W = inv(Phi*Q')
                     //__________________________________________________________
-
+                    
                     mkl::mul_rtrn(W, Phi, Q);
-                    if( !LU.build(W))
+                    if( !lu_t::build(W))
                     {
                         std::cerr << "singular concentrations" << std::endl;
                         goto PREPARE_CONC;
@@ -633,17 +685,17 @@ namespace yocto
                     
                     //__________________________________________________________
                     //
-                    // compute dU * detP2 = AdjointP2 * (Lambda-P*X)
+                    // compute U * detP2 = AdjointP2 * (Lambda-P*X)
                     //__________________________________________________________
-                    mkl::set(dL,Lambda);
-                    mkl::mulsub(dL,P,X);
-                    mkl::mul(dU,AP2,dL);
+                    mkl::set(r,Lambda);
+                    mkl::mulsub(r,P,X);
+                    mkl::mul(U,AP2,r);
                     
                     //__________________________________________________________
                     //
-                    // compute dX = P'*dU
+                    // compute dX = P'*U
                     //__________________________________________________________
-                    mkl::mul_trn(dX,P,dU);
+                    mkl::mul_trn(dX,P,U);
                     for(size_t ii=M;ii>0;--ii)
                     {
                         dX[ii]/=detP2;
@@ -693,30 +745,30 @@ namespace yocto
                     updateGammaAndPhi(X);
                     
                     mkl::mul_rtrn(W, Phi, Q);
-                    if( ! LU.build(W) )
+                    if( ! lu_t::build(W) )
                     {
                         std::cerr << "invalid solution" << std::endl;
                         goto PREPARE_CONC;
                     }
-                    mkl::neg(dV,Gamma);
-                    lu_t::solve(W, dV);
-                    mkl::mul_trn(dX,Q,dV);
+                    mkl::neg(V,Gamma);
+                    lu_t::solve(W, V);
+                    mkl::mul_trn(dX,Q,V);
                     
-                    const double F0 = __RMS(Gamma);
+                    const double F0 = Fopt(0.0);
                     const double F1 = Fopt(1.0);
-                    //std::cerr << "F0=" << F0 << std::endl;
-                    //std::cerr << "F1=" << F1 << std::endl;
+                    std::cerr << "F0=" << F0 << std::endl;
+                    std::cerr << "F1=" << F1 << std::endl;
                     
-                    math::triplet<double> XX = { 0,  1,  1 };
-                    math::triplet<double> FF = { F0, F1, F1};
-                    math::bracket<double>::expand(Fopt, XX, FF);
-                    math::minimize(Fopt, XX, FF, 0.0);
+                    triplet<double> XX = {  0,  1,  1 };
+                    triplet<double> FF = { F0, F1, F1 };
+                    bracket<double>::expand(Fopt, XX, FF);
+                    minimize(Fopt, XX, FF, 0.0);
                     const double alpha=XX.b;
-                    //std::cerr << "alpha=" << XX.b << std::endl;
+                    std::cerr << "alpha=" << XX.b << std::endl;
                     
                     mkl::muladd(X,alpha,dX);
                     std::cerr << "X=" << X << std::endl;
-
+                    
                     
                     
                     mkl::vec(dX,X0,X);

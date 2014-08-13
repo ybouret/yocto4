@@ -159,8 +159,7 @@ namespace yocto
                     }
                 }
                 //std::cerr << "mu=" << mu << std::endl;
-                crout<real_t> LU(K);
-                if( !LU.build(mu) )
+                if( !crout<real_t>::build(mu) )
                     throw exception("PSD(Invalid Momemts");
                 
                 //--------------------------------------------------------------

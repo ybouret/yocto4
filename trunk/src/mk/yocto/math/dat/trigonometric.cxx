@@ -32,7 +32,7 @@ namespace yocto
         nn( is_even ? n2-1:n2 ),
         M()
 		{
-			solver.make(n,REAL(0.0));
+			//solver.make(n,REAL(0.0));
 			M.make(n,n);
             
 			//------------------------------------------------------------------

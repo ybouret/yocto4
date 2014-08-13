@@ -289,7 +289,6 @@ namespace yocto
             //
             //__________________________________________________________________
             cs.build_from(lib);
-            lu_t     &LU = cs.LU; assert(LU.size()>=M);
             vector_t &C  = cs.C;
             
             //__________________________________________________________________
@@ -329,7 +328,7 @@ namespace yocto
                 {
                     F(i) = A(i);
                 }
-                if(!LU.build(F))
+                if(!lu_t::build(F))
                     throw exception("invalid full constraints");
                 lu_t::solve(F,C);
                 for(size_t i=M;i>0;--i)
@@ -437,7 +436,7 @@ namespace yocto
             const size_t np = P.rows;
             matrix_t P2(np,np);
             mkl::mul_rtrn(P2, P, P);
-            if( !LU.build(P2))
+            if( !lu_t::build(P2))
                 throw exception("singular projection constraints set !");
             
             //__________________________________________________________________
@@ -461,7 +460,7 @@ namespace yocto
             {
                 matrix_t alpha2(np,np);
                 mkl::mul_rtrn(alpha2,alpha,alpha);
-                if(!LU.build(alpha2))
+                if(!lu_t::build(alpha2))
                     throw exception("singular constraints set!");
                 mkl::set(Mu,Lam);
                 mkl::mulsub(Mu, P, Cf);
@@ -574,7 +573,7 @@ namespace yocto
             cs.compute_Gamma_and_Phi(t,false);
             const double H0 = cs.Gamma2RMS();      // approximate norm
             mkl::mul_rtrn(W,Phi,Theta);
-            if(!LU.build(W))
+            if(!lu_t::build(W))
             {
                 std::cerr << "-- Newton-II: invalid composition" << std::endl;
                 goto INITIALIZE;
@@ -634,7 +633,7 @@ namespace yocto
             //------------------------------------------------------------------
             cs.compute_Gamma_and_Phi(t,false);
             mkl::mul_rtrn(W,Phi,Theta);
-            if( ! LU.build(W) )
+            if( ! lu_t::build(W) )
             {
                 std::cerr << "-- Newton II: invalid final composition" << std::endl;
                 goto INITIALIZE;

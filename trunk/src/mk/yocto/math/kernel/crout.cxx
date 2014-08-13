@@ -6,69 +6,46 @@ namespace yocto
 {
     namespace math
     {
-        template <>
-        crout<z_type>:: crout() throw() :
-        scal_type(),
-        dneg(false)
-        {
-        }
         
         template <>
-        crout<z_type>:: crout(size_t n) :
-        scal_type(n,numeric<real_type>::zero),
-        dneg(false)
-        {
-        }
-        
-        template <>
-        crout<z_type>:: ~crout() throw()
-        {
-        }
-        
-        template <>
-        void crout<z_type>:: prepare(size_t n)
-        {
-            this->make(n, numeric<real_type>::zero );
-        }
-        
-        template <>
-        bool crout<z_type>:: build( matrix<z_type> &a ) throw()
+        bool crout<z_type>:: build( matrix<z_type> &a, bool *dneg ) throw()
         {
             
             static const z_type z1(1);
             assert( a.cols   > 0   );
 			assert( a.is_square()  );
             assert( a.indx != NULL );
-			const size_t      n    = a.rows;
-			array<real_t>    &scal = *this;   assert( this->size() >= a.rows );
-            lw_array<size_t>  indx( a.indx, n);
+            assert( a.scal != NULL );
+			const size_t     n    = a.rows;
+            lw_array<size_t> indx( a.indx, n);
+            lw_array<real_t> scal( (real_t *)&a.scal[0], n);
+            
             
 			//------------------------------------------------------------------
 			//
 			// initialize implicit pivots
 			//
 			//------------------------------------------------------------------
-            dneg = false;
-			for( size_t i=n;i>0;--i)
-			{
-				const matrix<z_type>::row & a_i = a[i];
-				real_t                      piv = 0;
-				
-				for( size_t j=n;j>0;--j)
-				{
-					const real_t tmp = Fabs( a_i[j] );
-					if ( tmp > piv )
+            if(dneg) *dneg = false;
+                for( size_t i=n;i>0;--i)
+                {
+                    const matrix<z_type>::row & a_i = a[i];
+                    real_t                      piv = 0;
+                    
+                    for( size_t j=n;j>0;--j)
                     {
-						piv = tmp;
+                        const real_t tmp = Fabs( a_i[j] );
+                        if ( tmp > piv )
+                        {
+                            piv = tmp;
+                        }
                     }
+                    if( piv <= REAL_MIN )
+                    {
+                        return false;
+                    }
+                    scal[i] = REAL(1.0)/piv;
                 }
-				if( piv <= REAL_MIN )
-				{
-					//std::cerr << "-- LU failure level-1" << std::endl;
-					return false;
-				}
-				scal[i] = REAL(1.0)/piv;
-			}
 			
 			
 			//------------------------------------------------------------------
@@ -114,9 +91,9 @@ namespace yocto
 				if (j != imax)
 				{
 					a.swap_rows( j, imax );
-					dneg = !dneg;
-					scal[imax]=scal[j];
-				}
+					if(dneg) *dneg = ! *dneg;
+                        scal[imax]=scal[j];
+                        }
 				
 				indx[j]=imax;
 				
@@ -297,6 +274,95 @@ namespace yocto
             return true;
         }
         
+        template <>
+        void crout<z_type>:: improve(array<z_type>        &x,
+                                     const matrix<z_type> &A,
+                                     const matrix<z_type> &ALU,
+                                     const array<z_type>  &b ) throw()
+        {
+            assert(A.is_square());
+            assert(ALU.is_square());
+            assert(x.size() == A.cols);
+            assert(b.size() == A.rows);
+            assert(ALU.rows == A.rows);
+            assert(A.scal!=NULL);
+            
+            const size_t      n = A.rows;
+            lw_array<z_type>  r(A.scal,n);
+            lw_array<z_type>  y(ALU.scal,n);
+            
+            //__________________________________________________________________
+            //
+            // build the initial residual
+            //__________________________________________________________________
+            real_t old_rsq = 0;
+            for(size_t i=n;i>0;--i)
+            {
+                z_type sum = numeric<z_type>::zero;
+                for(size_t j=n;j>0;--j)
+                {
+                    sum += A[i][j] * x[j];
+                }
+                const real_t d = Fabs( (r[i] = sum-b[i]) );
+                old_rsq += d*d;
+            }
+            
+            while(true)
+            {
+                //______________________________________________________________
+                //
+                // solve the residual
+                //______________________________________________________________
+                crout<z_type>::solve(ALU,r);
+                
+                //______________________________________________________________
+                //
+                // dispatch the new value and save the old one
+                //______________________________________________________________
+                for(size_t i=n;i>0;--i)
+                {
+                    y[i]  = x[i];
+                    x[i] -= r[i];
+                }
+                
+                //______________________________________________________________
+                //
+                // compute the new residual while preparing next step...
+                //______________________________________________________________
+                real_t new_rsq = 0;
+                for(size_t i=n;i>0;--i)
+                {
+                    z_type sum = numeric<z_type>::zero;
+                    for(size_t j=n;j>0;--j)
+                    {
+                        sum += A[i][j] * x[j];
+                    }
+                    const real_t d = Fabs( (r[i] = sum-b[i]) );
+                    new_rsq += d*d;
+                }
+                
+                //______________________________________________________________
+                //
+                // Test improvement
+                //______________________________________________________________
+                if(new_rsq>=old_rsq)
+                {
+                    //__________________________________________________________
+                    //
+                    //restore previous
+                    //__________________________________________________________
+                    for(size_t i=n;i>0;--i)
+                    {
+                        x[i] = y[i];
+                    }
+                    return;
+                }
+                
+                old_rsq = new_rsq;
+                
+            }
+            
+        }
         
         
     }

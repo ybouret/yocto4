@@ -2,13 +2,13 @@
 #include "yocto/exceptions.hpp"
 #include "yocto/code/utils.hpp"
 
-namespace yocto 
+namespace yocto
 {
     namespace math
     {
-        namespace ode 
+        namespace ode
         {
-            template <> STIFF_STEP<real_t>:: STIFF_STEP() 
+            template <> STIFF_STEP<real_t>:: STIFF_STEP()
             {
             }
             
@@ -16,7 +16,7 @@ namespace yocto
             {
             }
             
-            template <> 
+            template <>
             void STIFF_STEP<real_t>:: operator()(array<real_t>       &y,
                                                  array<real_t>       &dydx,
                                                  real_t              &x,
@@ -50,9 +50,9 @@ namespace yocto
                 //==============================================================
                 real_t xsav = x;
                 for(size_t i=n;i>0;--i)
-                { 
+                {
                     ysav[i]  =    y[i];
-                    dysav[i] = dydx[i]; 
+                    dysav[i] = dydx[i];
                 }
                 
                 //==============================================================
@@ -70,14 +70,14 @@ namespace yocto
                         a[i][i] += __diag;
                     }
                     
-                    if( !LU.build(a) )
+                    if( !crout<real_t>::build(a) )
                     {
                         throw exception("%s step: singular jacobian", STIFF_NAME);
                     }
                     
                     for( size_t i=n; i>0 ; --i )
                         g1[i]=dysav[i]+h*C1X*dfdx[i];
-                    LU.solve(a,g1);
+                    crout<real_t>::solve(a,g1);
                     for (size_t i=1;i<=n;i++)
                         y[i]=ysav[i]+A21*g1[i];
                     
@@ -85,7 +85,7 @@ namespace yocto
                     derivs(dydx,x,y);
                     for( size_t i=n; i>0 ; --i )
                         g2[i]=dydx[i]+h*C2X*dfdx[i]+C21*g1[i]/h;
-                    LU.solve(a,g2);
+                    crout<real_t>::solve(a,g2);
                     for( size_t i=n; i>0 ; --i )
                         y[i]=ysav[i]+A31*g1[i]+A32*g2[i];
                     
@@ -93,11 +93,11 @@ namespace yocto
                     derivs(dydx,x,y);
                     for( size_t i=n; i>0 ; --i )
                         g3[i]=dydx[i]+h*C3X*dfdx[i]+(C31*g1[i]+C32*g2[i])/h;
-                    LU.solve(a,g3);
+                    crout<real_t>::solve(a,g3);
                     
                     for( size_t i=n; i>0 ; --i )
                         g4[i]=dydx[i]+h*C4X*dfdx[i]+(C41*g1[i]+C42*g2[i]+C43*g3[i])/h;
-                    LU.solve(a,g4);
+                    crout<real_t>::solve(a,g4);
                     
                     for( size_t i=n; i>0 ; --i )
                     {
@@ -121,7 +121,7 @@ namespace yocto
                         hnext = (errmax > ERRCON ? SAFETY*h*Pow(errmax,PGROW) : GROW*h);
                         return;
                     }
-                    else 
+                    else
                     {
                         hnext=SAFETY*h*Pow(errmax,PSHRNK);
                         h=(h >= REAL(0.0) ? max_of<real_t>(hnext,SHRNK*h) : min_of<real_t>(hnext,SHRNK*h));

@@ -62,7 +62,6 @@ namespace yocto
             matrix_t       W;           //!< [NxN] Phi*Nu'
             vector_t       xi;          //!< [N] extent
             vector<extent> limits;      //!< [N] infos
-            lu_t           LU;          //!< [N] solver
             vector<size_t> online;      //!< [N] online reactions
             vector_t       scaled;      //!< [N] scaled concentration
             vector_t       gammaC;      //!< [N] scaling factor for Gamma

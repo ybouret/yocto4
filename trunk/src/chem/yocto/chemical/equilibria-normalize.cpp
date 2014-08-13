@@ -53,7 +53,7 @@ namespace yocto
                 //______________________________________________________________
                 //std::cerr << "Gamma=" << Gamma << std::endl;
                 mkl::mul_rtrn(W, Phi, Nu);
-                if(!LU.build(W))
+                if(!lu_t::build(W))
                 {
                     std::cerr << "-- Newton-I: singular composition" << std::endl;
                     return false;

@@ -101,7 +101,8 @@ namespace yocto
 		dlen( 0 ),
 		buffer_( NULL ),
 		buflen_(0),
-        indx(NULL)
+        indx(NULL),
+        scal(NULL)
 		{
 		}
 		
@@ -113,14 +114,17 @@ namespace yocto
                 //--------------------------------------------------------------
                 // conditional allocation metrics
                 //--------------------------------------------------------------
-                const bool   alloc_indx = rows == cols;
+                const bool   allocExtra = rows == cols;
                 const size_t row_offset = 0;
                 const size_t row_length = sizeof(row) * rows;
                 const size_t itm_offset = YOCTO_MEMALIGN(row_length);
                 const size_t itm_length = dlen;
                 const size_t idx_offset = YOCTO_MEMALIGN(itm_length+itm_offset);
-                const size_t idx_length = alloc_indx ? rows * sizeof(size_t) : 0;
-                const size_t tot_length = idx_offset + idx_length;
+                const size_t idx_length = allocExtra ? rows * sizeof(size_t) : 0;
+                const size_t scl_offset = YOCTO_MEMALIGN(idx_length+idx_offset);
+                const size_t scl_length = allocExtra ? rows * sizeof(z_type) : 0;
+                const size_t tot_length = scl_offset + scl_length;
+                
                 //--------------------------------------------------------------
                 // get buffer
                 //--------------------------------------------------------------
@@ -131,12 +135,11 @@ namespace yocto
                 
                 row_  = (row    *) &p[row_offset];
                 data  = (z_type *) &p[itm_offset];
-                if( alloc_indx )
+                if( allocExtra )
                 {
                     indx          = (size_t *)&p[idx_offset];
-                    //std::cerr << "dlen=" << dlen << " => ";
-                    (size_t&)dlen = tot_length - itm_offset;
-                    //std::cerr << dlen << std::endl;
+                    (size_t&)dlen = scl_offset - itm_offset;  // copy item+indx
+                    scal          = (z_type *)&p[scl_offset];
                 }
                 
                 //--------------------------------------------------------------
@@ -163,7 +166,8 @@ namespace yocto
 		dlen( size * sizeof(z_type) ),
 		buffer_( NULL ),
 		buflen_(0),
-        indx(NULL)
+        indx(NULL),
+        scal(NULL)
 		{
 			build();
 		}
@@ -178,7 +182,8 @@ namespace yocto
 		dlen( size * sizeof(z_type) ),
 		buffer_( NULL   ),
 		buflen_(0),
-        indx(NULL)
+        indx(NULL),
+        scal(NULL)
 		{
 			build();
             assert(dlen==M.dlen);
@@ -195,7 +200,8 @@ namespace yocto
 		dlen( M.dlen ),
 		buffer_(NULL),
 		buflen_(0),
-        indx(NULL)
+        indx(NULL),
+        scal(NULL)
 		{
 			build();
             matrix<z_type> &self = *this;
@@ -254,6 +260,7 @@ namespace yocto
 			cswap( buffer_, M.buffer_ );
 			cswap( buflen_, M.buflen_ );
             cswap( indx,    M.indx    );
+            cswap( scal,    M.scal    );
         }
 		
 		template <>

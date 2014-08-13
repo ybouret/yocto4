@@ -39,7 +39,6 @@ namespace yocto
             gammaC.release();
             scaled.release();
             online.release();
-            LU.release();
             limits.release();
             xi.release();
             W.release();
@@ -84,7 +83,6 @@ namespace yocto
                     xi.make(N,0.0);
                     const extent ex0;
                     limits.make(N,ex0);
-                    LU.make(N,0.0);
                     online.ensure(N);
                     scaled.make(N,0.0);
                     gammaC.make(N,0.0);
@@ -114,7 +112,7 @@ namespace yocto
                     // Topology must have a maximal rank
                     //__________________________________________________________
                     mkl::mul_rtrn(W, Nu, Nu);
-                    if( !LU.build(W) )
+                    if( !lu_t::build(W) )
                         throw exception("equilibria: invalid rank");
                     
                 }
