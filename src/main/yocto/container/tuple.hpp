@@ -11,8 +11,8 @@
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef typename type_traits<T1>::parameter_type PARAM1;\
-typedef typename type_traits<T2>::parameter_type PARAM2;\
+typedef type_traits<T1>::parameter_type PARAM1;\
+typedef type_traits<T2>::parameter_type PARAM2;\
 inline CLASS( PARAM1 P1, PARAM2 P2) :\
 N1(P1),N2(P2) {} \
 inline CLASS(const CLASS &other) : \
@@ -34,9 +34,9 @@ T2 N2
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef typename type_traits<T1>::parameter_type PARAM1;\
-typedef typename type_traits<T2>::parameter_type PARAM2;\
-typedef typename type_traits<T3>::parameter_type PARAM3;\
+typedef type_traits<T1>::parameter_type PARAM1;\
+typedef type_traits<T2>::parameter_type PARAM2;\
+typedef type_traits<T3>::parameter_type PARAM3;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3) :\
 N1(P1),N2(P2),N3(P3) {} \
 inline CLASS(const CLASS &other) : \
@@ -58,10 +58,10 @@ T3 N3
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef typename type_traits<T1>::parameter_type PARAM1;\
-typedef typename type_traits<T2>::parameter_type PARAM2;\
-typedef typename type_traits<T3>::parameter_type PARAM3;\
-typedef typename type_traits<T4>::parameter_type PARAM4;\
+typedef type_traits<T1>::parameter_type PARAM1;\
+typedef type_traits<T2>::parameter_type PARAM2;\
+typedef type_traits<T3>::parameter_type PARAM3;\
+typedef type_traits<T4>::parameter_type PARAM4;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3, PARAM4 P4) :\
 N1(P1),N2(P2),N3(P3),N4(P4) {} \
 inline CLASS(const CLASS &other) : \
@@ -85,11 +85,11 @@ T4 N4
 class CLASS \
 YOCTO_TUPLE_INI() \
 public:\
-typedef typename type_traits<T1>::parameter_type PARAM1;\
-typedef typename type_traits<T2>::parameter_type PARAM2;\
-typedef typename type_traits<T3>::parameter_type PARAM3;\
-typedef typename type_traits<T4>::parameter_type PARAM4;\
-typedef typename type_traits<T5>::parameter_type PARAM5;\
+typedef type_traits<T1>::parameter_type PARAM1;\
+typedef type_traits<T2>::parameter_type PARAM2;\
+typedef type_traits<T3>::parameter_type PARAM3;\
+typedef type_traits<T4>::parameter_type PARAM4;\
+typedef type_traits<T5>::parameter_type PARAM5;\
 inline CLASS( PARAM1 P1, PARAM2 P2, PARAM3 P3, PARAM4 P4, PARAM5 P5) :\
 N1(P1),N2(P2),N3(P3),N4(P4),N5(P5) {} \
 inline CLASS(const CLASS &other) : \
