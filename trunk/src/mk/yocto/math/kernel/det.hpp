@@ -2,6 +2,7 @@
 #define YOCTO_DET_INCLUDED 1
 
 #include "yocto/math/kernel/matrix.hpp"
+#include "yocto/sequence/lw-array.hpp"
 #include "yocto/math/types.hpp"
 
 namespace yocto
@@ -127,9 +128,81 @@ namespace yocto
                     }
                     
                 }
-                    
             }
+        }
+        
+        //! linear improvement
+        /**
+         we solve M.x = b using x = (A*b)/detM
+         Then we improve
+         */
+        template <typename T>
+        inline void improve(array<T>        &x,
+                            const matrix<T> &M,
+                            const matrix<T> &A,
+                            const T          detM,
+                            const array<T>   &b ) throw()
+        {
+            typedef typename real_of<T>::type real_t;
+            assert(M.is_square());
+            assert(A.is_square());
+            assert(M.rows==A.rows);
+            const size_t n = M.rows;
+            lw_array<T>  r(M.scal,n);
+            lw_array<T>  y(A.scal,n);
             
+            real_t old_rsq = 0;
+            for(size_t i=n;i>0;--i)
+            {
+                T tmp = numeric<T>::zero;
+                for(size_t j=n;j>0;--j)
+                {
+                    tmp += M[i][j] * x[j];
+                }
+                const real_t d = Fabs( (r[i]=tmp-b[i]));
+                old_rsq += d * d;
+            }
+            std::cerr << "old_rsq=" << old_rsq << std::endl;
+            
+            while(true)
+            {
+                // TODO: finish ?
+                // solve y => error
+                for(size_t i=n;i>0;--i)
+                {
+                    T sum = numeric<T>::zero;
+                    for(size_t j=n;j>0;--j)
+                    {
+                        sum += A[i][j] * r[j];
+                    }
+                    y[i]  = x[i];
+                    x[i] -= sum/detM;
+                }
+                
+                real_t new_rsq = 0;
+                for(size_t i=n;i>0;--i)
+                {
+                    T tmp = numeric<T>::zero;
+                    for(size_t j=n;j>0;--j)
+                    {
+                        tmp += M[i][j] * x[j];
+                    }
+                    const real_t d = Fabs( (r[i]=tmp-b[i]));
+                    new_rsq += d * d;
+                }
+                std::cerr << "new_rsq=" << new_rsq << std::endl;
+                if(new_rsq>=old_rsq)
+                {
+                    for(size_t i=n;i>0;--i)
+                    {
+                        x[i] = y[i];
+                    }
+                    return;
+                }
+                
+                old_rsq = new_rsq;
+                
+            }
         }
         
         

@@ -691,6 +691,9 @@ namespace yocto
                     mkl::set(dL,Lambda);
                     mkl::mulsub(dL,P,X);
                     mkl::mul(U,AP2,dL);
+                    for(size_t i=Nc;i>0;--i) U[i] /= detP2;
+                    improve<double>(U,P2,AP2,detP2,dL);
+                    
                     
                     //__________________________________________________________
                     //
@@ -699,7 +702,7 @@ namespace yocto
                     mkl::mul_trn(dX,P,U);
                     for(size_t ii=M;ii>0;--ii)
                     {
-                        dX[ii]/=detP2;
+                        //dX[ii]/=detP2;
                     }
                     //std::cerr << "delX=" << dX << std::endl;
                     
