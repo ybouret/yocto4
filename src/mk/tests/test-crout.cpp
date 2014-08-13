@@ -141,7 +141,7 @@ namespace {
     static inline
     void test_improve()
     {
-        for(size_t n=1;n<=10;n += (1+alea_leq(5)))
+        for(size_t n=1;n<=15;n += (1+alea_leq(5)))
         {
             const T diag( float(n+1) );
             matrix<T> A(n,n);
