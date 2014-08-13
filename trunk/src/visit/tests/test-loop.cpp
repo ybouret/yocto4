@@ -98,7 +98,8 @@ YOCTO_UNIT_TEST_IMPL(loop)
     const string sim_comment = "Simulation Comment";
     const string sim_path    = ".";
     const string sim_ui      = "loop.ui";
-    mpi &MPI = mpi::init( &argc, &argv );
+    YOCTO_MPI(SINGLE);
+    
     const string       trace_name = "trace.dat";
     VisIt:: TraceFile  trace_file( MPI.CommWorldRank, trace_name );
     

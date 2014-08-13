@@ -8,6 +8,9 @@
 #include "yocto/code/rand.hpp"
 #include "yocto/spade/array2d.hpp"
 #include "yocto/spade/region2d.hpp"
+
+#include <cmath>
+
 using namespace yocto;
 using namespace spade;
 
@@ -300,7 +303,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // initialize MPI
     //--------------------------------------------------------------------------
-    mpi &MPI = mpi::init( &argc, &argv );
+    YOCTO_MPI(SINGLE);
     const int sim_rank = MPI.CommWorldRank;
     const int sim_size = MPI.CommWorldSize;
     
