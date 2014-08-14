@@ -168,6 +168,8 @@ namespace yocto
             return (a<b) ? -1 : ( (b<a) ? 1 : 0 );
         }
         
+        inline ptrdiff_t RInt( float  x ) throw() { return ptrdiff_t( floorf(x+0.5f) ); }
+        inline ptrdiff_t RInt( double x ) throw() { return ptrdiff_t( floor( x+0.5 ) ); }
 	}
 	
 }

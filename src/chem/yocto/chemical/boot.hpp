@@ -24,7 +24,7 @@ namespace yocto
                 virtual ~item() throw();
                 item(const item &other) throw();
                 const string &key() const throw();
-            
+                
                 typedef set<string,item> db;
                 
             private:
@@ -46,7 +46,7 @@ namespace yocto
                 constraint &weight( const species::pointer &p, const int w );
                 
                 typedef arc_ptr<constraint> pointer;
-
+                
                 friend std::ostream & operator<<(std::ostream &os, const constraint &cc);
                 
                 void fill( array<double> &P) const;
@@ -77,23 +77,27 @@ namespace yocto
             
             //! conserve the sum of three species
             void conserve(const species::pointer &sp1, const species::pointer &sp2, const species::pointer &sp3, const double C);
-
-            //! set electroneutrality fron a collection
+            
+            //! set electroneutrality from a collection
             /**
-             \treturn false if no charged species was found...
+             \return false if no charged species was found...
              */
             bool electroneutrality( const collection &lib );
             
+            //! output, mainly to debug
             friend std::ostream & operator<<( std::ostream &os, const boot &ini);
             
-            void operator()( array<double> &C, const collection &lib, equilibria &cs, double t );
+            
+            void operator()( array<double> &C0, const collection &lib, equilibria &cs, double t );
             
             size_t size() const throw(); //!< #constraints
+            
             const constraint & operator[](size_t ic) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(boot);
             vector<constraint::pointer> constraints;
+            
         public:
             mutable alea_t ran;
         };

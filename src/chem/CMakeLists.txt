@@ -12,9 +12,11 @@ SET( srcs_lua ${decl_lua} ${impl_lua} )
 #INSTALL( FILES ${decl_lua} DESTINATION include/yocto/chemical/lua )
 SOURCE_GROUP( chemical/lua FILES ${srcs_lua} )
 
+FILE( GLOB srcs_boot yocto/chemical/boot/*.cpp)
+SOURCE_GROUP( chemical/boot FILES ${srcs_boot} )
 INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/lua ../lua++ )
 
-ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} )
+ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} ${srcs_boot})
 #INSTALL( TARGETS y-chemical ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
