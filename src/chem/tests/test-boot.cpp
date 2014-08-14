@@ -32,7 +32,9 @@ YOCTO_UNIT_TEST_IMPL(boot)
     std::cerr << loader << std::endl;
     
     solution S(lib);
-    cs.initialize_with(loader, lib, 0.0, S);
+    //cs.initialize_with(loader, lib, 0.0, S);
+    loader(S,lib,cs,0.0);
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
