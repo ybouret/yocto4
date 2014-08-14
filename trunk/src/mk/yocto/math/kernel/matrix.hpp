@@ -124,9 +124,17 @@ namespace yocto
 				void          build();
                 
             public:
-                size_t       *indx;   //!< not NULL for square matrices
+                size_t       *indx;   //!< not NULL for square matrices, enough room for (T *) !!
                 mutable T    *scal;   //!< not NULL for square matrices
+                template <typename U>
+                inline U * get_aux() const throw()
+                {
+                    assert(sizeof(U)<=sizeof(T));
+                    return static_cast<U*>( indx_addr() );
+                }
                 
+            private:
+                void *indx_addr() const throw();
 			};
 		
 	}

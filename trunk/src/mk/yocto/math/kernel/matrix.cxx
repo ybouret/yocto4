@@ -109,18 +109,20 @@ namespace yocto
 		template <>
 		void matrix<z_type>:: build()
 		{
+            static const size_t indx_size = max_of<size_t>( sizeof(size_t), sizeof(z_type) );
 			if( size > 0 )
 			{
+                assert(dlen == size * sizeof(z_type) );
                 //--------------------------------------------------------------
                 // conditional allocation metrics
                 //--------------------------------------------------------------
-                const bool   allocExtra = rows == cols;
+                const bool   allocExtra = (rows == cols);
                 const size_t row_offset = 0;
                 const size_t row_length = sizeof(row) * rows;
                 const size_t itm_offset = YOCTO_MEMALIGN(row_length);
                 const size_t itm_length = dlen;
                 const size_t idx_offset = YOCTO_MEMALIGN(itm_length+itm_offset);
-                const size_t idx_length = allocExtra ? rows * sizeof(size_t) : 0;
+                const size_t idx_length = allocExtra ? rows * sizeof(indx_size) : 0;
                 const size_t scl_offset = YOCTO_MEMALIGN(idx_length+idx_offset);
                 const size_t scl_length = allocExtra ? rows * sizeof(z_type) : 0;
                 const size_t tot_length = scl_offset + scl_length;
@@ -137,8 +139,12 @@ namespace yocto
                 data  = (z_type *) &p[itm_offset];
                 if( allocExtra )
                 {
+                    const size_t  indx_bytes = rows * sizeof(size_t);
+                    const size_t  copy_bytes = (idx_offset+indx_bytes) - itm_offset;
+                    assert(copy_bytes>= size * sizeof(z_type) + rows * sizeof(size_t) );
+                    
                     indx          = (size_t *)&p[idx_offset];
-                    (size_t&)dlen = scl_offset - itm_offset;  // copy item+indx
+                    (size_t&)dlen = copy_bytes;  // copy item+indx
                     scal          = (z_type *)&p[scl_offset];
                 }
                 
@@ -197,7 +203,7 @@ namespace yocto
 		size( M.size ),
 		row_( NULL   ),
 		data( NULL   ),
-		dlen( M.dlen ),
+		dlen( size*sizeof(z_type) ),
 		buffer_(NULL),
 		buflen_(0),
         indx(NULL),
@@ -403,6 +409,12 @@ namespace yocto
             return data[i];
         }
 
-		
+        template <>
+        void * matrix<z_type>:: indx_addr() const throw()
+        {
+            return (void*)indx;
+        }
+
+        
 	}
 }

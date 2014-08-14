@@ -4,6 +4,7 @@
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/math/types.hpp"
+#include "yocto/sort/quick.hpp"
 
 namespace yocto
 {
@@ -133,8 +134,13 @@ namespace yocto
         
         //! linear improvement
         /**
-         we solve M.x = b using x = (A*b)/detM
-         Then we improve
+         assuming that
+         we solved M.x = b using x = (A*b)/detM
+         \param x a trial solution
+         \param M the original matrix
+         \param A the adjoint matrix
+         \param D the determinant of M
+         \param b the right hand argument
          */
         template <typename T>
         inline void improve(array<T>        &x,
@@ -150,7 +156,12 @@ namespace yocto
             const size_t n = M.rows;
             lw_array<T>  r(M.scal,n);
             lw_array<T>  y(A.scal,n);
+            lw_array<T>  s(M.template get_aux<T>(),n);
             
+            //__________________________________________________________________
+            //
+            // compute the initial residual
+            //__________________________________________________________________
             real_t old_rsq = 0;
             for(size_t i=n;i>0;--i)
             {
@@ -162,23 +173,34 @@ namespace yocto
                 const real_t d = Fabs( (r[i]=tmp-b[i]));
                 old_rsq += d * d;
             }
-            std::cerr << "old_rsq=" << old_rsq << std::endl;
+            //std::cerr << "old_rsq=" << old_rsq << std::endl;
             
             while(true)
             {
-                // TODO: finish ?
-                // solve y => error
+                //______________________________________________________________
+                //
+                // solve the residual, save x in y and update x
+                //______________________________________________________________
                 for(size_t i=n;i>0;--i)
                 {
-                    T sum = numeric<T>::zero;
                     for(size_t j=n;j>0;--j)
                     {
-                        sum += A[i][j] * r[j];
+                        s[j] = A[i][j] * r[j];
+                    }
+                    quicksort(s,CompareModules<T>);
+                    T sum = numeric<T>::zero;
+                    for(size_t j=1;j<=n;++j)
+                    {
+                        sum += s[j];
                     }
                     y[i]  = x[i];
                     x[i] -= sum/detM;
                 }
                 
+                //______________________________________________________________
+                //
+                // compute the new residual
+                //______________________________________________________________
                 real_t new_rsq = 0;
                 for(size_t i=n;i>0;--i)
                 {
@@ -190,7 +212,8 @@ namespace yocto
                     const real_t d = Fabs( (r[i]=tmp-b[i]));
                     new_rsq += d * d;
                 }
-                std::cerr << "new_rsq=" << new_rsq << std::endl;
+                
+                //std::cerr << "new_rsq=" << new_rsq << std::endl;
                 if(new_rsq>=old_rsq)
                 {
                     for(size_t i=n;i>0;--i)
