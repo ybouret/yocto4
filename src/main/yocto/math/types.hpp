@@ -161,6 +161,12 @@ namespace yocto
                 return (absb <= 0.0 ? 0.0 : absb*Sqrt(1.0+Square(absa/absb)));
         }
         
+        template <typename T>
+        inline int CompareModules( const T &x, const T &y ) throw()
+        {
+            typename real_of<T>::type a = Fabs(x), b = Fabs(y);
+            return (a<b) ? -1 : ( (b<a) ? 1 : 0 );
+        }
         
 	}
 	
