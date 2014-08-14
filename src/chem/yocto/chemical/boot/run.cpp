@@ -186,7 +186,7 @@ namespace yocto
                 vector_t          Lambda;
                 vector_t          Cfixed;
                 vector<size_t>    ifixed;
-                vector_t          X;
+                vector_t          C;
                 const size_t      nfix;
                 const size_t      ndof;
                 vector<size_t>    idof;
@@ -194,6 +194,15 @@ namespace yocto
                 const integer_t   D;
                 matrix_t          A;
                 matrix_t          Q;
+                matrix_t          PA;
+                vector_t          dL;
+                vector_t          dX;
+                matrix_t          PhiQ;
+                matrix_t          iPhiQ;
+                vector_t          rhs;
+                vector_t          dV;
+                vector_t          dY;
+                vector_t          C0;
                 
                 static const char fn[];
                 
@@ -211,14 +220,23 @@ namespace yocto
                 Lambda(),
                 Cfixed(),
                 ifixed(),
-                X(),
+                C(),
                 nfix(0),
                 ndof(0),
                 idof(),
                 J(),
                 D(0),
                 A(),
-                Q()
+                Q(),
+                PA(),
+                dL(),
+                dX(),
+                PhiQ(),
+                iPhiQ(),
+                rhs(),
+                dV(),
+                dY(),
+                C0()
                 {
                     //__________________________________________________________
                     //
@@ -267,85 +285,208 @@ namespace yocto
                     Cfixed.ensure(Nc);
                     ifixed.ensure(Nc);
                     
-                    //__________________________________________________________
-                    //
-                    // Optimize It
-                    //__________________________________________________________
-                    __refactor(P, Lambda, eqs.Nu, Cfixed, ifixed);
-                    
-                    eqs.find_active_species();
-                    
-#if 1
-                    std::cerr << "ifixed=" << ifixed << std::endl;
-                    std::cerr << "Cfixed=" << Cfixed << std::endl;
-                    
-                    std::cerr << "Nu0="    << eqs.Nu0  << std::endl;
-                    std::cerr << "Nu="     << eqs.Nu   << std::endl;
-                    std::cerr << "P="      << P        << std::endl;
-                    std::cerr << "Lambda=" << Lambda   << std::endl;
-#endif
-                    
-                    //__________________________________________________________
-                    //
-                    // Solution in any case...
-                    //__________________________________________________________
-                    X.make(M,0.0);
-                    
-                    //__________________________________________________________
-                    //
-                    // special case: no reaction
-                    //__________________________________________________________
-                    if( N <= 0 )
+                    try
                     {
-                        assert(P.is_square());
-                        Q.make(M,M);
-                        Q.assign(P);
-                        if(M>0)
+                        //______________________________________________________
+                        //
+                        // Optimize It
+                        //______________________________________________________
+                        __refactor(P, Lambda, eqs.Nu, Cfixed, ifixed);
+                        
+                        
+                        
+#if 1
+                        std::cerr << "ifixed=" << ifixed << std::endl;
+                        std::cerr << "Cfixed=" << Cfixed << std::endl;
+                        
+                        std::cerr << "Nu0="    << eqs.Nu0  << std::endl;
+                        std::cerr << "Nu="     << eqs.Nu   << std::endl;
+                        std::cerr << "P="      << P        << std::endl;
+                        std::cerr << "Lambda=" << Lambda   << std::endl;
+#endif
+                        
+                        //______________________________________________________
+                        //
+                        // Reduce Nu
+                        //______________________________________________________
+                        eqs.find_active_species();
+                        
+                        //______________________________________________________
+                        //
+                        // Solution in any case...
+                        //______________________________________________________
+                        C.make(M,0.0);
+                        
+                        //______________________________________________________
+                        //
+                        // special case: no reaction
+                        //______________________________________________________
+                        if( N <= 0 )
                         {
-                            if( !crout<double>::build(P) )
+                            assert(P.is_square());
+                            Q.make(M,M);
+                            Q.assign(P);
+                            if(M>0)
                             {
-                                throw exception("%ssingular full constraints",fn);
+                                if( !crout<double>::build(P) )
+                                {
+                                    throw exception("%ssingular full constraints",fn);
+                                }
+                                mkl::set(C,Lambda);
+                                crout<double>::solve(P,C);
+                                crout<double>::improve(C, Q, P, Lambda);
                             }
-                            mkl::set(X,Lambda);
-                            crout<double>::solve(P,X);
-                            crout<double>::improve(X, Q, P, Lambda);
+                            eqs.restore_topology();
+                            return;
                         }
-                        return;
+                        
+                        //______________________________________________________
+                        //
+                        // special case: no constraints
+                        //______________________________________________________
+                        eqs.computeK(t);
+                        eqs.compute_scaled_concentrations();
+                        std::cerr << "K     =" << eqs.K      << std::endl;
+                        std::cerr << "scaled=" << eqs.scaled << std::endl;
+                        std::cerr << "gammaC=" << eqs.gammaC << std::endl;
+                        
+                        //______________________________________________________
+                        //
+                        // Fixed species and D.O.F
+                        //______________________________________________________
+                        findDOF();
+                        std::cerr << "#fix=" << nfix << std::endl;
+                        std::cerr << "#dof=" << ndof << std::endl;
+                        std::cerr << "idof=" << idof << std::endl;
+                        
+                        //______________________________________________________
+                        //
+                        // Gramian Matrix to check P rank as well
+                        //______________________________________________________
+                        buildJ();
+                        
+                        //______________________________________________________
+                        //
+                        // Orthogonal matrix Q to P
+                        //______________________________________________________
+                        buildQ();
+                        std::cerr << "Q=" << Q << std::endl;
+                        
+                        //______________________________________________________
+                        //
+                        // Auxiliary matrices
+                        //______________________________________________________
+                        PA.make(M,Nc);
+                        mkl::mul_ltrn(PA, P, A);
+                        std::cerr << "PA=" << PA << std::endl;
+                        rint_matrix(PA);
+                        
+                        dL.make(Nc,0.0);
+                        dX.make(M,0.0);
+                        PhiQ.make(N,N);
+                        iPhiQ.make(N,N);
+                        rhs.make(N,0.0);
+                        dV.make(N,0.0);
+                        dY.make(M,0.0);
+                        C0.make(M,0.0);
+                        
+                        prepareC();
+                        mkl::set(C0,C);
+                        
+                        
+                        for(size_t count=1;count<=5;++count)
+                        {
+                            //__________________________________________________
+                            //
+                            // Initialize Gamma and Phi for non linear part
+                            //__________________________________________________
+                            eqs.updateGammaAndPhi(C);
+                            std::cerr << "C=" << C << std::endl;
+                            std::cerr << "Gamma=" << eqs.Gamma << std::endl;
+                            std::cerr << "Phi  =" << eqs.Phi   << std::endl;
+                            std::cerr << "RMS=" << RMS() << std::endl;
+                            mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
+                            iPhiQ.assign(PhiQ);
+                            if(! crout<double>::build(iPhiQ) )
+                            {
+                                std::cerr << "# invalid concentration level I" << std::endl;
+                                exit(1);
+                            }
+                            
+                            //__________________________________________________
+                            //
+                            // Compute the linear part : dL = Lambda - P*C
+                            //__________________________________________________
+                            mkl::set(dL,Lambda);
+                            mkl::mulsub(dL,P,C);
+                            mkl::mul(dX,PA,dL);
+                            for(size_t j=M;j>0;--j) dX[j] /= D;
+                            std::cerr << "dX=" << dX << std::endl;
+
+                            //__________________________________________________
+                            //
+                            // prepare the arguments -(Gamma+Phi*dX)
+                            //__________________________________________________
+                            mkl::neg(rhs,eqs.Gamma);
+                            mkl::mulsub(rhs,eqs.Phi,dX);
+                            mkl::set(dV,rhs);
+                            
+                            //__________________________________________________
+                            //
+                            // solve dV and compute dY
+                            //__________________________________________________
+                            crout<double>::solve(iPhiQ,dV);
+                            crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                            std::cerr << "dV=" << dV << std::endl;
+                            mkl::mul_trn(dY,Q, dV);
+                            std::cerr << "dY=" << dY << std::endl;
+                            
+                            mkl::add(C,dX);
+                            mkl::add(C,dY);
+                            
+                            mkl::vec(dX, C0, C);
+                            std::cerr << "C="  << C  << std::endl;
+                            std::cerr << "dC=" << dX << std::endl;
+                            
+                            //__________________________________________________
+                            //
+                            // Phase II, assuming P*C=Lambda --> only Q
+                            //__________________________________________________
+                            eqs.updateGammaAndPhi(C);
+                            std::cerr << "Gamma2=" << eqs.Gamma << std::endl;
+                            std::cerr << "Phi2  =" << eqs.Phi   << std::endl;
+                            mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
+                            iPhiQ.assign(PhiQ);
+                            if(! crout<double>::build(iPhiQ) )
+                            {
+                                std::cerr << "# invalid concentration, level II" << std::endl;
+                                exit(1);
+                            }
+                            
+
+                            mkl::neg(rhs,eqs.Gamma);
+                            mkl::set(dV,rhs);
+                            std::cerr << "rhs=" << dV << std::endl;
+                            //__________________________________________________
+                            //
+                            // solve dV and compute dY
+                            //__________________________________________________
+                            crout<double>::solve(iPhiQ,dV);
+                            //crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                            std::cerr << "dV2=" << dV << std::endl;
+                            mkl::mul_trn(dY,Q, dV);
+                            std::cerr << "dY2=" << dY << std::endl;
+                            
+                        }
+                        
+                        
                     }
-                    
-                    //__________________________________________________________
-                    //
-                    // special case: no constraints
-                    //__________________________________________________________
-                    eqs.computeK(t);
-                    eqs.compute_scaled_concentrations();
-                    std::cerr << "K     =" << eqs.K      << std::endl;
-                    std::cerr << "scaled=" << eqs.scaled << std::endl;
-                    std::cerr << "gammaC=" << eqs.gammaC << std::endl;
-                    
-                    //______________________________________________________________
-                    //
-                    // Fixed species and D.O.F
-                    //______________________________________________________________
-                    findDOF();
-                    std::cerr << "#fix=" << nfix << std::endl;
-                    std::cerr << "#dof=" << ndof << std::endl;
-                    std::cerr << "idof=" << idof << std::endl;
-                    
-                    //__________________________________________________________
-                    //
-                    // Gramian Matrix to check P rank as well
-                    //__________________________________________________________
-                    buildJ();
-                    
-                    //__________________________________________________________
-                    //
-                    // Orthogonal matrix Q to P
-                    //__________________________________________________________
-                    buildQ();
-                    std::cerr << "Q=" << Q << std::endl;
-                    
-                    
+                    catch(...)
+                    {
+                        eqs.restore_topology();
+                        throw;
+                    }
+                    eqs.restore_topology();
                     
                     
                 }
@@ -422,7 +563,7 @@ namespace yocto
                     }
                     
                     boot::igs(F);
-                    
+                    //std::cerr << "F=" << F << std::endl;
                     for(size_t i=N;i>0;--i)
                     {
                         for(size_t j=M;j>0;--j)
@@ -430,21 +571,33 @@ namespace yocto
                             Q[i][j] = F[Nc+i][j];
                         }
                     }
+                    
                 }
                 
-                inline void prepareX()
+                inline void prepareC()
                 {
+                    eqs.generate(C,loader.ran);
                     for(size_t j=nfix;j>0;--j)
                     {
-                        X[ ifixed[j] ] = Cfixed[j];
+                        C[ ifixed[j] ] = Cfixed[j];
                     }
-                    eqs.generate(X,loader.ran);
                 }
                 
+                
+                inline double RMS() const throw()
+                {
+                    double sum = 0;
+                    for(size_t i=N;i>0;--i)
+                    {
+                        const double d = eqs.Gamma[i] / eqs.gammaC[i];
+                        sum += d*d;
+                    }
+                    return sqrt(sum/N);
+                }
             };
             
             const char BootManager::fn[] = "chemical::boot: ";
-
+            
             
         }
         
@@ -457,7 +610,7 @@ namespace yocto
             BootManager mgr(lib,cs,*this,t);
             for(size_t i=lib.size();i>0;--i)
             {
-                C0[i] = mgr.X[i];
+                C0[i] = mgr.C[i];
             }
             
         }
