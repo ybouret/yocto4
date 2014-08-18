@@ -390,6 +390,10 @@ namespace yocto
                         dY.make(M,0.0);
                         C0.make(M,0.0);
                         
+                        //______________________________________________________
+                        //
+                        // Starting point
+                        //______________________________________________________
                         prepareC();
                         mkl::set(C0,C);
                         
@@ -500,6 +504,10 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
+                //______________________________________________________________
+                //
+                // Find D.O.F from fixed indices
+                //______________________________________________________________
                 void findDOF()
                 {
                     (size_t&)nfix = ifixed.size();
@@ -521,6 +529,11 @@ namespace yocto
                     }
                 }
                 
+                //______________________________________________________________
+                //
+                // build the J=P*P' matrix
+                // and its adjoint A such that J*A=Id * D
+                //______________________________________________________________
                 void buildJ()
                 {
                     J.make(Nc,Nc);
@@ -537,6 +550,10 @@ namespace yocto
                     std::cerr << "A=" << A << std::endl;
                 }
                 
+                //______________________________________________________________
+                //
+                // buil the exact integer orthogonal matrix to P
+                //______________________________________________________________
                 inline void buildQ()
                 {
                     Q.make(N,M);
@@ -574,6 +591,10 @@ namespace yocto
                     
                 }
                 
+                //______________________________________________________________
+                //
+                // Prepare a concentration
+                //______________________________________________________________
                 inline void prepareC()
                 {
                     eqs.generate(C,loader.ran);
