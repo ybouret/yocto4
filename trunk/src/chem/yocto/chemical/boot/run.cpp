@@ -203,6 +203,7 @@ namespace yocto
                 vector_t          dV;
                 vector_t          dY;
                 vector_t          C0;
+                vector_t          C1;
                 
                 static const char fn[];
                 
@@ -236,7 +237,8 @@ namespace yocto
                 rhs(),
                 dV(),
                 dY(),
-                C0()
+                C0(),
+                C1()
                 {
                     //__________________________________________________________
                     //
@@ -389,6 +391,7 @@ namespace yocto
                         dV.make(N,0.0);
                         dY.make(M,0.0);
                         C0.make(M,0.0);
+                        C1.make(M,0.0);
                         
                         //______________________________________________________
                         //
@@ -405,10 +408,10 @@ namespace yocto
                             // Initialize Gamma and Phi for non linear part
                             //__________________________________________________
                             eqs.updateGammaAndPhi(C);
-                            std::cerr << "C=" << C << std::endl;
+                            std::cerr << "C0="    << C << std::endl;
                             std::cerr << "Gamma=" << eqs.Gamma << std::endl;
                             std::cerr << "Phi  =" << eqs.Phi   << std::endl;
-                            std::cerr << "RMS=" << RMS() << std::endl;
+                            std::cerr << "RMS="   << RMS() << std::endl;
                             mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
                             iPhiQ.assign(PhiQ);
                             if(! crout<double>::build(iPhiQ) )
@@ -419,14 +422,21 @@ namespace yocto
                             
                             //__________________________________________________
                             //
-                            // Compute the linear part : dL = Lambda - P*C
+                            // project on the linear part: dL = Lambda - P*C
                             //__________________________________________________
-                            mkl::set(dL,Lambda);
-                            mkl::mulsub(dL,P,C);
-                            mkl::mul(dX,PA,dL);
-                            for(size_t j=M;j>0;--j) dX[j] /= D;
+                            projectC();
+                            std::cerr << "C=" << C << std::endl;
+                            
+                            //__________________________________________________
+                            //
+                            // compute dX from C0 and projected C
+                            //__________________________________________________
+                            for(size_t j=M;j>0;--j)
+                            {
+                                dX[j] = C[j] - C0[j];
+                            }
                             std::cerr << "dX=" << dX << std::endl;
-
+                            
                             //__________________________________________________
                             //
                             // prepare the arguments -(Gamma+Phi*dX)
@@ -445,42 +455,19 @@ namespace yocto
                             mkl::mul_trn(dY,Q, dV);
                             std::cerr << "dY=" << dY << std::endl;
                             
-                            mkl::add(C,dX);
                             mkl::add(C,dY);
-                            
-                            mkl::vec(dX, C0, C);
-                            std::cerr << "C="  << C  << std::endl;
-                            std::cerr << "dC=" << dX << std::endl;
+                            std::cerr << "C1=" << C << std::endl;
                             
                             //__________________________________________________
                             //
-                            // Phase II, assuming P*C=Lambda --> only Q
+                            // numerically re-project
                             //__________________________________________________
-                            eqs.updateGammaAndPhi(C);
-                            std::cerr << "Gamma2=" << eqs.Gamma << std::endl;
-                            std::cerr << "Phi2  =" << eqs.Phi   << std::endl;
-                            mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
-                            iPhiQ.assign(PhiQ);
-                            if(! crout<double>::build(iPhiQ) )
-                            {
-                                std::cerr << "# invalid concentration, level II" << std::endl;
-                                exit(1);
-                            }
+                            projectC();
+                            std::cerr << "C2=" << C << std::endl;
+                            exit(1);
                             
 
-                            mkl::neg(rhs,eqs.Gamma);
-                            mkl::set(dV,rhs);
-                            std::cerr << "rhs=" << dV << std::endl;
-                            //__________________________________________________
-                            //
-                            // solve dV and compute dY
-                            //__________________________________________________
-                            crout<double>::solve(iPhiQ,dV);
-                            //crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                            std::cerr << "dV2=" << dV << std::endl;
-                            mkl::mul_trn(dY,Q, dV);
-                            std::cerr << "dY2=" << dY << std::endl;
-                            
+                            mkl::set(C0,C);
                         }
                         
                         
@@ -604,7 +591,63 @@ namespace yocto
                     }
                 }
                 
+                //______________________________________________________________
+                //
+                // dX to project C on P*C-Lambda=0
+                //______________________________________________________________
+                inline void compute_dL() throw()
+                {
+                    mkl::set(dL,Lambda);
+                    mkl::mulsub(dL,P,C);
+                }
                 
+                //______________________________________________________________
+                //
+                // numerically solve P*C=Lambda
+                //______________________________________________________________
+                inline double prjrms()  throw()
+                {
+                    compute_dL();
+                    double sq = 0;
+                    for(size_t i=Nc;i>0;--i)
+                    {
+                        sq += Square(dL[i]);
+                    }
+                    return sqrt(sq/Nc);
+                }
+                
+                inline void projectC()
+                {
+                    
+                    // initialize
+                    double old_rms = prjrms();
+                    while(true)
+                    {
+                        mkl::mul(dX,PA,dL);
+                        for(size_t j=M;j>0;--j)
+                        {
+                            const double Cj = C[j];
+                            C1[j] = Cj;
+                            C[j] = (D*Cj+dX[j])/D;
+                        }
+                    
+                        const double new_rms = prjrms();
+                        //std::cerr << "old_rms=" << old_rms << "; new_rms=" << new_rms << ";" << std::endl;
+                        if(new_rms>=old_rms)
+                        {
+                            mkl::set(C,C1);
+                            return;
+                        }
+                        old_rms = new_rms;
+                    }
+                    
+                }
+                
+                
+                //______________________________________________________________
+                //
+                // preconditionned RMS
+                //______________________________________________________________
                 inline double RMS() const throw()
                 {
                     double sum = 0;
