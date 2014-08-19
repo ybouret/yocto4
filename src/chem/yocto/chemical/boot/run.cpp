@@ -7,6 +7,7 @@
 #include "yocto/math/round.hpp"
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
+#include "yocto/math/opt/cgrad.hpp"
 
 #include <cstdlib>
 
@@ -209,7 +210,6 @@ namespace yocto
                 vector_t          rhs;
                 vector_t          dV;
                 vector_t          V0;
-                vector_t          dY;
                 vector_t          C0;
                 
                 static const char fn[];
@@ -246,7 +246,6 @@ namespace yocto
                 rhs(),
                 dV(),
                 V0(),
-                dY(),
                 C0()
                 {
                     //__________________________________________________________
@@ -406,6 +405,40 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
                 
+                double cg_scalar( const array<double> &Vtry )
+                {
+                    mkl::set(C,Cstar);
+                    mkl::muladd_trn(C,Q,Vtry);
+                    double f = 0;
+                    for(size_t j=M;j>0;--j)
+                    {
+                        if(eqs.active[j]>0&&C[j]<0)
+                        {
+                            f += Square(C[j]);
+                        }
+                    }
+                    return f*0.5;
+                }
+                
+                void cg_vector( array<double> &g, const array<double> &Vtry )
+                {
+                    mkl::set(C,Cstar);
+                    mkl::muladd_trn(C,Q,Vtry);
+                    array<double> &df = dX;
+                    for(size_t j=M;j>0;--j)
+                    {
+                        if(eqs.active[j]>0&&C[j]<0)
+                        {
+                            df[j] = C[j];
+                        }
+                        else
+                        {
+                            df[j] = 0;
+                        }
+                    }
+                    mkl::mul(g,Q,df);
+                }
+                
                 //______________________________________________________________
                 //
                 // compute the RMS of Lambda-P*Cstar
@@ -489,7 +522,7 @@ namespace yocto
                     PA.make(M,Nc);
                     mkl::mul_ltrn(PA, P, A);
                     rint_matrix(PA);
-                    std::cerr << "PA=" << PA << std::endl;
+                    //std::cerr << "PA=" << PA << std::endl;
                     
                     Cstar.make(M,0.0);
                     V.make(N,0.0);
@@ -501,10 +534,10 @@ namespace yocto
                     rhs.make(N,0.0);
                     dV.make(N,0.0);
                     V0.make(N,0.0);
-                    dY.make(M,0.0);
                     C0.make(M,0.0);
                     compute_Cstar();
                     std::cerr << "Cstar=" << Cstar << std::endl;
+                    
                     
                     //__________________________________________________________
                     //
@@ -514,11 +547,19 @@ namespace yocto
                     
                     //__________________________________________________________
                     //
+                    // Find a good starting point
+                    //__________________________________________________________
+                    numeric<double>::scalar_field CG_FUNC(this, &BootManager::cg_scalar);
+                    numeric<double>::vector_field CG_GRAD(this, &BootManager::cg_vector);
+                    
+                    //__________________________________________________________
+                    //
                     // compute initial V and C
                     //__________________________________________________________
                 PREPARE_C:
                     prepareC(); // a random composition
                     computeV(); // its V factor
+                    cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol);
                     computeC(); // a compatible composition
                     
                     mkl::set(C0,C);             // save C
@@ -528,6 +569,7 @@ namespace yocto
                     for(unsigned count=1;
                         ;++count)
                     {
+                        //std::cerr << "C=" << C << std::endl;
                         //______________________________________________________
                         //
                         // Compute the full Newton's step
@@ -588,9 +630,9 @@ namespace yocto
                         
                     }
                     
-                    std::cerr << "#Newton II converged: check..." << std::endl;
-                    std::cerr << "C1="     << C << std::endl;
-                    std::cerr << "Gamma=" << eqs.Gamma << std::endl;
+                    //std::cerr << "#Newton II converged: check..." << std::endl;
+                    //std::cerr << "C1="     << C << std::endl;
+                    //std::cerr << "Gamma=" << eqs.Gamma << std::endl;
                     
                     //__________________________________________________________
                     //

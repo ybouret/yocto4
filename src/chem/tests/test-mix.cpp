@@ -49,12 +49,13 @@ YOCTO_UNIT_TEST_IMPL(mix)
     solution S(lib);
     const size_t NMAX = 200;
     ios::ocstream fp("mix.dat",false);
+    std::cerr << "Computing " << NMAX+1 << " pH..." << std::endl;
     for(size_t i=0;i<=NMAX;++i)
     {
         weights[2] = double(i)/NMAX;
         weights[1] = double(NMAX-i)/NMAX;
         cs.mix(S,sols,weights,0.0);
-        std::cerr << "pH=" << S.pH() << std::endl;
+        //std::cerr << "pH=" << S.pH() << std::endl;
         fp("%g %g\n",weights[2],S.pH());
     }
     
