@@ -196,7 +196,7 @@ namespace yocto
                 const size_t Q = online.size();
                 if(Q<=0)
                 {
-                    std::cerr << "-- Validate: no available reactions" << std::endl;
+                    std::cerr << "#validate: no available reactions" << std::endl;
                     return false;
                 }
                 //std::cerr << "online=" << online << std::endl;
@@ -238,7 +238,7 @@ namespace yocto
                     //std::cerr << "J=" << J <<std::endl;
                     if(!lu_t::build(J))
                     {
-                        std::cerr << "-- Validate: singular sub-system" << std::endl;
+                        std::cerr << "#validate: singular sub-system" << std::endl;
                         return false;
                     }
                     //std::cerr << "deltaC=" << lambda << std::endl;
