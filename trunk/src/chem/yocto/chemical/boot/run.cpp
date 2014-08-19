@@ -288,10 +288,10 @@ namespace yocto
                         cc.fill(P[i]);
                     }
                     
+#if 0
                     std::cerr << "P0     =" << P       << std::endl;
                     std::cerr << "Lambda0=" << Lambda  << std::endl;
-                    std::cerr << "Nu0    =" << eqs.Nu0 << std::endl;
-                    
+#endif
                     Cfixed.ensure(Nc);
                     ifixed.ensure(Nc);
                     
@@ -306,7 +306,7 @@ namespace yocto
                         
                         
                         
-#if 1
+#if 0
                         std::cerr << "#fix=" << nfix << std::endl;
                         std::cerr << "ifixed=" << ifixed << std::endl;
                         std::cerr << "Cfixed=" << Cfixed << std::endl;
@@ -358,10 +358,11 @@ namespace yocto
                         //______________________________________________________
                         eqs.computeK(t);
                         eqs.compute_scaled_concentrations();
+#if 0
                         std::cerr << "K     =" << eqs.K      << std::endl;
                         std::cerr << "scaled=" << eqs.scaled << std::endl;
                         std::cerr << "gammaC=" << eqs.gammaC << std::endl;
-                        
+#endif
                         if(Nc<=0)
                         {
                             std::cerr << "Not Implemented" << std::endl;
@@ -380,8 +381,8 @@ namespace yocto
                         // Orthogonal matrix Q to P
                         //______________________________________________________
                         buildQ();
-                        std::cerr << "Q=" << Q << std::endl;
-                        std::cerr << "q=" << q << std::endl;
+                        //std::cerr << "Q=" << Q << std::endl;
+                        //std::cerr << "q=" << q << std::endl;
                         Method2();
                         
                         
@@ -477,7 +478,6 @@ namespace yocto
                         const double new_rms = starRMS();
                         if(new_rms>=old_rms)
                         {
-                            //std::cerr << "starRMS=" << old_rms << std::endl;
                             mkl::set(Cstar,C1);
                             return;
                         }
@@ -536,7 +536,7 @@ namespace yocto
                     V0.make(N,0.0);
                     C0.make(M,0.0);
                     compute_Cstar();
-                    std::cerr << "Cstar=" << Cstar << std::endl;
+                    //std::cerr << "Cstar=" << Cstar << std::endl;
                     
                     
                     //__________________________________________________________
@@ -559,7 +559,7 @@ namespace yocto
                 PREPARE_C:
                     prepareC(); // a random composition
                     computeV(); // its V factor
-                    cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol);
+                    (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol);
                     computeC(); // a compatible composition
                     
                     mkl::set(C0,C);             // save C
@@ -778,12 +778,12 @@ namespace yocto
                     (integer_t &)D = RInt(determinant_of(J)); //!< J is preserved
                     if(!D)
                         throw exception("%ssingular constraints",fn);
-                    std::cerr << "J=" << J << std::endl;
-                    std::cerr << "D=" << D << std::endl;
+                    //std::cerr << "J=" << J << std::endl;
+                    //std::cerr << "D=" << D << std::endl;
                     A.make(Nc,Nc);
                     adjoint(A,J);
                     rint_matrix(A);
-                    std::cerr << "A=" << A << std::endl;
+                    //std::cerr << "A=" << A << std::endl;
                 }
                 
                 //______________________________________________________________
@@ -934,29 +934,6 @@ namespace yocto
                 }
                 
                 
-                inline void CutActive()
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        if(eqs.active[j]>0 && C[j]<=0)
-                        {
-                            C[j] = 0;
-                        }
-                    }
-                }
-                
-                inline bool NeedToValidate() const throw()
-                {
-                    for(size_t j=M;j>0;--j)
-                    {
-                        if(eqs.active[j]>0 && C[j]<0)
-                        {
-                            return true;
-                        }
-                        
-                    }
-                    return false;
-                }
             };
             
             const char BootManager::fn[] = "chemical::boot: ";
