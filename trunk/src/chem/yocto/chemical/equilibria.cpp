@@ -16,6 +16,22 @@ namespace yocto
         equilibria:: equilibria() :
         M(0),
         N(0),
+        Nu(),
+        Nu0(),
+        dNu(),
+        dNuP(),
+        K(),
+        Gamma(),
+        Phi(),
+        W(),
+        xi(),
+        limits(),
+        online(),
+        scaled(),
+        gammaC(),
+        active(),
+        dC(),
+        bad(),
         drvs(),
         h(1e-4)
         {

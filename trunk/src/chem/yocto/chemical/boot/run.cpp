@@ -400,18 +400,24 @@ namespace yocto
                         prepareC();
                         mkl::set(C0,C);
                         
-                        
-                        for(size_t count=1;count<=5;++count)
+                       
+                        for(size_t count=1;;++count)
                         {
                             //__________________________________________________
                             //
                             // Initialize Gamma and Phi for non linear part
                             //__________________________________________________
                             eqs.updateGammaAndPhi(C);
-                            std::cerr << "C0="    << C << std::endl;
+                           
+                            std::cerr << "C0   =" << C         << std::endl;
                             std::cerr << "Gamma=" << eqs.Gamma << std::endl;
                             std::cerr << "Phi  =" << eqs.Phi   << std::endl;
-                            std::cerr << "RMS="   << RMS() << std::endl;
+                            std::cerr << "RMS="   << RMS()     << std::endl;
+                            
+                            //__________________________________________________
+                            //
+                            // Compute Phi*Q' and check numerically OK
+                            //__________________________________________________
                             mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
                             iPhiQ.assign(PhiQ);
                             if(! crout<double>::build(iPhiQ) )
@@ -422,14 +428,13 @@ namespace yocto
                             
                             //__________________________________________________
                             //
-                            // project on the linear part: dL = Lambda - P*C
+                            // solve the linear part by projection
                             //__________________________________________________
                             projectC();
-                            std::cerr << "C=" << C << std::endl;
-                            
+
                             //__________________________________________________
                             //
-                            // compute dX from C0 and projected C
+                            // compute the effective dX from C0 and projected C
                             //__________________________________________________
                             for(size_t j=M;j>0;--j)
                             {
@@ -451,22 +456,36 @@ namespace yocto
                             //__________________________________________________
                             crout<double>::solve(iPhiQ,dV);
                             crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                            std::cerr << "dV=" << dV << std::endl;
+                            //std::cerr << "dV=" << dV << std::endl;
                             mkl::mul_trn(dY,Q, dV);
-                            std::cerr << "dY=" << dY << std::endl;
+                            //std::cerr << "dY=" << dY << std::endl;
                             
                             mkl::add(C,dY);
-                            std::cerr << "C1=" << C << std::endl;
+                            std::cerr << "C2=" << C << std::endl;
                             
                             //__________________________________________________
                             //
                             // numerically re-project
                             //__________________________________________________
                             projectC();
-                            std::cerr << "C2=" << C << std::endl;
-                            exit(1);
+                            std::cerr << "C3=" << C << std::endl;
                             
-
+                            //__________________________________________________
+                            //
+                            // Compute the effective total delta C
+                            //__________________________________________________
+                            for(size_t j=M;j>0;--j)
+                            {
+                                dX[j] = C[j] - C0[j];
+                            }
+                            std::cerr << "dC=" << dX << std::endl;
+                            const double err = StepRMS();
+                            std::cerr << "err=" << err << std::endl;
+                            if(err<=0)
+                            {
+                                std::cerr << "#Precision was reached" << std::endl;
+                                break;
+                            }
                             mkl::set(C0,C);
                         }
                         
@@ -567,7 +586,6 @@ namespace yocto
                     }
                     
                     boot::igs(F);
-                    //std::cerr << "F=" << F << std::endl;
                     for(size_t i=N;i>0;--i)
                     {
                         for(size_t j=M;j>0;--j)
@@ -646,7 +664,7 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // preconditionned RMS
+                // preconditionned Gamma RMS
                 //______________________________________________________________
                 inline double RMS() const throw()
                 {
@@ -658,6 +676,22 @@ namespace yocto
                     }
                     return sqrt(sum/N);
                 }
+                
+                //______________________________________________________________
+                //
+                // Step RMS
+                //______________________________________________________________
+                inline double StepRMS() const throw()
+                {
+                    double sq = 0;
+                    for(size_t j=M;j>0;--j)
+                    {
+                        sq += Square(dX[j]);
+                    }
+                    
+                    return sqrt(sq/M);
+                }
+                
             };
             
             const char BootManager::fn[] = "chemical::boot: ";
