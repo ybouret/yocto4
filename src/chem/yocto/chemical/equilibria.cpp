@@ -97,8 +97,10 @@ namespace yocto
                     Phi.make(N,M);
                     W.make(N,N);
                     xi.make(N,0.0);
-                    const extent ex0;
-                    limits.make(N,ex0);
+                    {
+                        const extent ex0;
+                        limits.make(N,ex0);
+                    }
                     online.ensure(N);
                     scaled.make(N,0.0);
                     gammaC.make(N,0.0);
