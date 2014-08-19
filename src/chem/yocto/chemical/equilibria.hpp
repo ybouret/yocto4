@@ -20,7 +20,7 @@ namespace yocto
         typedef math::crout<double>       lu_t;
         typedef uniform_generator<double> alea_t;
         
-        class boot;
+        class solution;
         
         class equilibria : public equilibrium::database
         {
@@ -151,9 +151,15 @@ namespace yocto
             //! assume that C is normalized: aborb a part of X at time t
             void  absorb(double t, array<double> &X, const array<double> &C);
             
+            //! mix
+            void mix(array<double>         &C,
+                     const array<solution> &solutions,
+                     const array<double>   &weights,
+                     const double t);
+            
             
         private:
-            //! remove unactive column
+            //! remove unactive columns
             void cleanPhi() throw();
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
