@@ -5,6 +5,8 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/round.hpp"
+#include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 #include <cstdlib>
 
@@ -195,16 +197,20 @@ namespace yocto
                 const integer_t   D;
                 matrix_t          A;
                 matrix_t          Q;
+                ivector_t         q;
                 matrix_t          PA;
+                vector_t          Cstar;
+                vector_t          V;
                 vector_t          dL;
                 vector_t          dX;
+                vector_t          C1;
                 matrix_t          PhiQ;
                 matrix_t          iPhiQ;
                 vector_t          rhs;
                 vector_t          dV;
+                vector_t          V0;
                 vector_t          dY;
                 vector_t          C0;
-                vector_t          C1;
                 
                 static const char fn[];
                 
@@ -228,16 +234,20 @@ namespace yocto
                 D(0),
                 A(),
                 Q(),
+                q(),
                 PA(),
+                Cstar(),
+                V(),
                 dL(),
                 dX(),
+                C1(),
                 PhiQ(),
                 iPhiQ(),
                 rhs(),
                 dV(),
+                V0(),
                 dY(),
-                C0(),
-                C1()
+                C0()
                 {
                     //__________________________________________________________
                     //
@@ -365,20 +375,9 @@ namespace yocto
                         //______________________________________________________
                         buildQ();
                         std::cerr << "Q=" << Q << std::endl;
+                        std::cerr << "q=" << q << std::endl;
+                        Method2();
                         
-                        //______________________________________________________
-                        //
-                        // Auxliary quantities
-                        //______________________________________________________
-                        PA.make(M,Nc);
-                        mkl::mul_ltrn(PA, P, A);
-                        rint_matrix(PA);
-                        std::cerr << "PA=" << PA << std::endl;
-
-                        
-                        exit(21);
-                        
-                        //Method1();
                         
                     }
                     catch(...)
@@ -399,270 +398,306 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
-                
-                void Method1()
+                double starRMS()
                 {
-                    //______________________________________________________
+                    mkl::set(dL,Lambda);
+                    mkl::mulsub(dL,P,Cstar);
+                    double sq = 0;
+                    for(size_t i=Nc;i>0;--i)
+                    {
+                        sq += Square(dL[i]);
+                    }
+                    return sqrt(sq/Nc);
+                }
+                
+                void compute_Cstar()
+                {
+                    mkl::mul(Cstar,PA,Lambda);
+                    for(size_t j=M;j>0;--j) Cstar[j] /= D;
+                    
+                    double old_rms = starRMS();
+                    for(;;)
+                    {
+                        mkl::mul(dX,PA,dL);
+                        for(size_t j=M;j>0;--j)
+                        {
+                            const double Cj = Cstar[j];
+                            C1[j]     = Cj;
+                            Cstar[j]  = (D*Cj + dX[j])/D;
+                        }
+                        const double new_rms = starRMS();
+                        if(new_rms>=old_rms)
+                        {
+                            std::cerr << "starRMS=" << old_rms << std::endl;
+                            mkl::set(Cstar,C1);
+                            return;
+                        }
+                        old_rms = new_rms;
+                    }
+                    
+                }
+                
+                inline void computeC() throw()
+                {
+                    mkl::set(C,Cstar);
+                    mkl::muladd_trn(C, Q, V);
+                    
+                }
+                
+                inline void computeV() throw()
+                {
+                    for(size_t j=M;j>0;--j)
+                    {
+                        dX[j] = C[j] - Cstar[j];
+                    }
+                    mkl::mul(V,Q,dX);
+                    for(size_t i=N;i>0;--i) V[i] /= q[i];
+                }
+                
+                
+                
+                void Method2()
+                {
+                    //__________________________________________________________
                     //
-                    // Auxiliary matrices
-                    //______________________________________________________
+                    // compute Cstar
+                    //__________________________________________________________
                     PA.make(M,Nc);
                     mkl::mul_ltrn(PA, P, A);
                     rint_matrix(PA);
                     std::cerr << "PA=" << PA << std::endl;
+                    
+                    Cstar.make(M,0.0);
+                    V.make(N,0.0);
                     dL.make(Nc,0.0);
                     dX.make(M,0.0);
+                    C1.make(M,0.0);
                     PhiQ.make(N,N);
                     iPhiQ.make(N,N);
                     rhs.make(N,0.0);
                     dV.make(N,0.0);
+                    V0.make(N,0.0);
                     dY.make(M,0.0);
                     C0.make(M,0.0);
-                    C1.make(M,0.0);
+                    compute_Cstar();
+                    std::cerr << "Cstar=" << Cstar << std::endl;
                     
-                    //______________________________________________________
+                    numeric<double>::function F(this,&BootManager::Func);
+                    
+                    //__________________________________________________________
                     //
-                    // Starting point
-                    //______________________________________________________
-                    double old_err = -1;
+                    // compute initial V and C
+                    //__________________________________________________________
                 PREPARE_C:
                     prepareC();
+                    computeV();
+                    computeC();
                     mkl::set(C0,C);
-                    old_err = -1;
+                    eqs.updateGammaAndPhi(C);
+                    double F0 = GammaRMS();
                     
                     for(unsigned count=1;
                         ;++count)
                     {
-                        //__________________________________________________
+                        //std::cerr << "########### iter=" <<count << std::endl;
+                        //std::cerr << "C="    << C << std::endl;
+                        //std::cerr << "Gamma=" << eqs.Gamma << std::endl;
+                        //std::cerr << "GamRMS=" << GammaRMS() << std::endl;
+                        //______________________________________________________
                         //
-                        // Initialize Gamma and Phi for non linear part
-                        //__________________________________________________
-                        eqs.updateGammaAndPhi(C);
-                        
-                        //__________________________________________________
-                        //
-                        // Compute Phi*Q' and check numerically OK
-                        //__________________________________________________
-                        mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
-                        iPhiQ.assign(PhiQ);
-                        if(! crout<double>::build(iPhiQ) )
+                        // Compute the full Newton's step
+                        //______________________________________________________
+                        if(!computeNewtondV())
                         {
-                            std::cerr << "# invalid concentration level I" << std::endl;
+                            std::cerr << "#singular concentrations, level-1" << std::endl;
                             goto PREPARE_C;
                         }
                         
-                        //__________________________________________________
+                        mkl::set(V0,V);
+                        double       alpha = 1.0;
+                        const double F1    = F(alpha);
+                        //std::cerr << "F0=" << F0 << std::endl;
+                        //std::cerr << "F1=" << F1 << std::endl;
+                        //______________________________________________________
                         //
-                        // solve the linear part by projection
-                        //__________________________________________________
-                        projectC();
+                        // Don't go too fast
+                        //______________________________________________________
+                        if(F1>=F0)
+                        {
+                            std::cerr << "#Need to optimise" << std::endl;
+                            triplet<double> XX = { 0, 1, 1};
+                            triplet<double> FF = { F0, F1, F1};
+                            (void)bracket<double>::inside(F, XX, FF);
+                            minimize<double>(F, XX, FF, 0);
+                            alpha = XX.b;
+                            std::cerr << "alpha=" << alpha << std::endl;
+                        }
                         
-                        //__________________________________________________
+                        //______________________________________________________
                         //
-                        // compute the effective dX from C0 and projected C
-                        //__________________________________________________
+                        // compute the new value
+                        //______________________________________________________
+                        for(size_t i=N;i>0;--i) { V[i] = V0[i] + alpha * dV[i]; }
+                        computeC();
+                        eqs.updateGammaAndPhi(C);
                         for(size_t j=M;j>0;--j)
                         {
                             dX[j] = C[j] - C0[j];
                         }
+                        //std::cerr << "dX=" << dX << std::endl;
                         
-                        //__________________________________________________
+                        //______________________________________________________
                         //
-                        // prepare the arguments -(Gamma+Phi*dX)
-                        //__________________________________________________
-                        mkl::neg(rhs,eqs.Gamma);
-                        mkl::mulsub(rhs,eqs.Phi,dX);
-                        mkl::set(dV,rhs);
-                        
-                        //__________________________________________________
-                        //
-                        // solve dV and compute dY
-                        //__________________________________________________
-                        crout<double>::solve(iPhiQ,dV);
-                        crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                        mkl::mul_trn(dY,Q, dV);
-                        
-                        //__________________________________________________
-                        //
-                        // Finalize the new concentration
-                        //__________________________________________________
-                        mkl::add(C,dY);
-                        
-                        
-                        //__________________________________________________
-                        //
-                        // Compute the effective total delta C
-                        //__________________________________________________
-                        for(size_t j=M;j>0;--j)
+                        // until numerical underflow
+                        //______________________________________________________
+                        const double newRMS = StepRMS();
+                        if(newRMS<=0)
                         {
-                            dX[j] = C[j] - C0[j];
-                        }
-                        //std::cerr << "dC=" << dX << std::endl;
-                        
-                        //__________________________________________________
-                        //
-                        // Compute the step error
-                        //__________________________________________________
-                        const double err = StepRMS();
-                        if(err<=0)
-                        {
-                            //std::cerr << "#Precision was reached Level-1" << std::endl;
                             break;
                         }
                         
-                        
-                        if((count>1)                         &&
-                           (old_err < numeric<double>::ftol) &&
-                           (err >= old_err)
-                           )
-                        {
-                            //std::cerr << "#Precision was reached Level-2" << std::endl;
-                            break;
-                        }
-                        
+                        F0 = GammaRMS();
                         mkl::set(C0,C);
-                        old_err = err;
+                        
                     }
                     
-                    //______________________________________________________
+                    std::cerr << "#Newton II converged: check..." << std::endl;
+                    std::cerr << "C1="     << C << std::endl;
+                    std::cerr << "Gamma=" << eqs.Gamma << std::endl;
+                    
+                    //__________________________________________________________
                     //
-                    // At this point, we numerically have P*C = Lambda
-                    // and we are close to Gamma=0
-                    // Check that the value may be normalised
-                    // with the reduced Nu matrix
-                    //______________________________________________________
-                    std::cerr << "C1=" << C << std::endl;
-                    if( !eqs.normalize(-1, C, false) )
+                    // compute the approximated errors
+                    //__________________________________________________________
+                    if( !computeNewtondV() )
                     {
-                        std::cerr << "#couldn't normalize" << std::endl;
+                        std::cerr << "#unexpected singular concentrations, level-2" << std::endl;
                         goto PREPARE_C;
                     }
-                    std::cerr << "C2=" << C << std::endl;
-                    
-                    //______________________________________________________
-                    //
-                    // compute the linear error
-                    //______________________________________________________
-                    compute_dL();
-                    mkl::mul(dX,PA,dL);
+                    mkl::mul_trn(dX, Q, dV);
                     for(size_t j=M;j>0;--j)
                     {
-                        dX[j] /= D;
-                    }
-                    
-                    //______________________________________________________
-                    //
-                    // compute the non-linear error
-                    //______________________________________________________
-                    eqs.updateGammaAndPhi(C);
-                    mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
-                    iPhiQ.assign(PhiQ);
-                    if(!crout<double>::build(iPhiQ))
-                    {
-                        std::cerr << "#invalid pre-final concentrations" << std::endl;
-                        goto PREPARE_C;
-                    }
-                    
-                    mkl::neg(rhs,eqs.Gamma);
-                    mkl::muladd(rhs, eqs.Phi,dX);
-                    mkl::set(dV,rhs);
-                    crout<double>::solve(iPhiQ, dV);
-                    crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                    mkl::mul_trn(dY, Q, dV);
-                    
-                    //______________________________________________________
-                    //
-                    // compute the cut-off values
-                    //______________________________________________________
-                    for(size_t j=M;j>0;--j)
-                    {
-                        double dd = Fabs(dX[j]) + Fabs(dY[j]);
-                        if(dd>0)
+                        const double d = fabs(dX[j]);
+                        if(d>0)
                         {
-                            dX[j] = math::log_round_ceil(dd);
+                            dX[j] = log_round_ceil(d);
                         }
                         else
                         {
                             dX[j] = 0;
                         }
                     }
-                    std::cerr << "Cerr=" << dX << std::endl;
+                    std::cerr << "dC=" << dX << std::endl;
                     
-                    
-                    //______________________________________________________
+                    //__________________________________________________________
                     //
-                    // Cut-off
-                    //______________________________________________________
+                    // cut-off
+                    //__________________________________________________________
                     for(size_t j=M;j>0;--j)
                     {
-                        if(eqs.active[j]>0)
+                        if((eqs.active[j]>0) &&
+                           fabs(C[j]) <= dX[j]
+                           )
                         {
-                            if( C[j] < dX[j])
-                            {
-                                C[j] = 0.0;
-                            }
+                            C[j] = 0.0;
                         }
                     }
-                    std::cerr << "C=" << C << std::endl;
+                    std::cerr << "C2=" << C << std::endl;
                     
                     
                     //__________________________________________________________
                     //
-                    // Final Non-Linear Check
+                    // check convergence
                     //__________________________________________________________
-                    std::cerr << "#restoring topology" << std::endl;
+                    if( !eqs.normalize(-1,C,false) )
+                    {
+                        std::cerr << "#invalid final concentrations" << std::endl;
+                        goto PREPARE_C;
+                    }
+                    std::cerr << "C3=" << C << std::endl;
+                    
+                    //__________________________________________________________
+                    //
+                    // full convergence
+                    //__________________________________________________________
                     eqs.restore_topology();
-                    if( !eqs.normalize(-1, C,false) )
+                    if( !eqs.normalize(-1,C,false) )
                     {
-                        throw exception("%sunexpected last normalisation failure!!",fn);
+                        throw exception("%s(unexpected singular concentrations)", fn);
                     }
                     
                     //__________________________________________________________
                     //
-                    // Final Linear Check
+                    // linear compliance
                     //__________________________________________________________
-                    const double linearRMS = prjrms();
-                    if(linearRMS>numeric<double>::ftol)
+                    const double linearRMS = computeNormalizedRMS();
+                    //std::cerr << "linearRMS=" << linearRMS << std::endl;
+                    if( linearRMS > numeric<double>::ftol )
                     {
-                        throw exception("%sunable to match linear constraints(RMS=%g)",fn,linearRMS);
+                        throw exception("%s(unable to match linear constraints: RMS=%g)", fn, linearRMS);
                     }
-                    
                 }
                 
+                inline double computeNormalizedRMS()
+                {
+                    double sq = 0;
+                    for(size_t i=Nc;i>0;--i)
+                    {
+                        const array<double> &Pi = P[i];
+                        double sumP2 = 0;
+                        double sumPC = 0;
+                        for(size_t j=M;j>0;--j)
+                        {
+                            const double Pij = Pi[j];
+                            sumP2 += Pij*Pij;
+                            sumPC += Pij * C[j];
+                        }
+                        sumPC -= Lambda[i];
+                        const double d2 = sumPC * sumPC;
+                        sq += d2/sumP2;
+                    }
+                    return sqrt(sq/Nc);
+                }
                 
-#if 0
                 //______________________________________________________________
                 //
-                // Find D.O.F from fixed indices
+                // Compute the Newton's step with improved precision
                 //______________________________________________________________
-                void findDOF()
+                inline bool computeNewtondV()
                 {
-                    (size_t&)nfix = ifixed.size();
-                    (size_t&)ndof = M-nfix;
-                    idof.ensure(ndof);
-                    for(size_t j=1;j<=M;++j)
+                    mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
+                    iPhiQ.assign(PhiQ);
+                    if( !crout<double>::build(iPhiQ) )
                     {
-                        bool is_dof = true;
-                        for(size_t i=ifixed.size();i>0;--i)
-                        {
-                            if( j == ifixed[i] )
-                            {
-                                is_dof = false;
-                                break;
-                            }
-                        }
-                        if(is_dof)
-                            idof.push_back(j);
+                        std::cerr << "#unexpected singular concentrations, level-2" << std::endl;
+                        return false;
                     }
+                    mkl::neg(rhs,eqs.Gamma);
+                    mkl::set(dV,rhs);
+                    crout<double>::solve(iPhiQ,dV);
+                    crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                    return true;
                 }
-#endif
+                
+                double Func(const double alpha)
+                {
+                    for(size_t i=N;i>0;--i)
+                    {
+                        V[i] = V0[i] + alpha * dV[i];
+                    }
+                    computeC();
+                    eqs.updateGamma(C);
+                    return GammaRMS();
+                }
+                
+                
                 
                 //______________________________________________________________
                 //
                 // build the J=P*P' matrix
                 // and its adjoint A such that J*A=Id * D
                 //______________________________________________________________
-                void buildJ()
+                inline void buildJ()
                 {
                     J.make(Nc,Nc);
                     mkl::mul_rtrn(J,P,P);
@@ -714,6 +749,17 @@ namespace yocto
                         {
                             Q[i][j] = F[Nc+i][j];
                         }
+                    }
+                    q.make(N,0);
+                    for(size_t i=N;i>0;--i)
+                    {
+                        integer_t sum = 0;
+                        for(size_t j=M;j>0;--j)
+                        {
+                            const integer_t Qi = integer_t(Q[i][j]);
+                            sum += Qi * Qi;
+                        }
+                        q[i] = sum;
                     }
                     
                 }
