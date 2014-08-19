@@ -151,10 +151,6 @@ namespace yocto
             //! assume that C is normalized: aborb a part of X at time t
             void  absorb(double t, array<double> &X, const array<double> &C);
             
-            void initialize_with(const boot       &loader,
-                                 const collection &lib,
-                                 const double      t,
-                                 array<double>     &C0);
             
         private:
             //! remove unactive column
