@@ -93,8 +93,8 @@ namespace yocto
         actors(4,as_capacity),
         r_code(),
         p_code(),
-	rj_code(),
-	pj_code(),
+        rj_code(),
+        pj_code(),
         DeltaNu(0)
         {
             
@@ -266,9 +266,9 @@ namespace yocto
             
             quicksort(p_code,instr::compare);
             quicksort(r_code,instr::compare);
-            std::cerr << "<code name='" << name << "'>" << std::endl;
-            std::cerr << "r_code=" << r_code << std::endl;
-            std::cerr << "p_code=" << p_code << std::endl;
+            //std::cerr << "<code name='" << name << "'>" << std::endl;
+            //std::cerr << "r_code=" << r_code << std::endl;
+            //std::cerr << "p_code=" << p_code << std::endl;
             
             //__________________________________________________________________
             //
@@ -276,14 +276,14 @@ namespace yocto
             //__________________________________________________________________
             precompute(rj_code, r_code);
             precompute(pj_code, p_code);
-            std::cerr << "</code>" << std::endl;
+            //std::cerr << "</code>" << std::endl;
             return np;
             
         }
         
         void equilibrium:: precompute( vector<j_instr> &jcode, const vector<instr> &code)
         {
-            std::cerr << "Creating Jacobian Code from " << code << std::endl;
+            //std::cerr << "Creating Jacobian Code from " << code << std::endl;
             const size_t nc = code.size();
             jcode.free();
             for(size_t i=1;i<=nc;++i)
@@ -303,7 +303,7 @@ namespace yocto
                         pJ->code.push_back(code[j]);
                 }
                 quicksort(pJ->code,instr::compare);
-                std::cerr << "\tdGamma/dC" << cc.i << " = " << pJ->coef << " * " << pJ->code << std::endl;
+                //std::cerr << "\tdGamma/dC" << cc.i << " = " << pJ->coef << " * " << pJ->code << std::endl;
             }
         }
         
@@ -361,7 +361,7 @@ namespace yocto
             updatePhi(Phi, C, KK);
             return ans;
         }
-
+        
         
         void equilibrium:: updatePhi( array<double> &Phi, const array<double> &C, const double KK) const throw()
         {
@@ -413,9 +413,9 @@ namespace yocto
                 
                 Phi[J.indx] -= prod;
             }
-
+            
         }
-
+        
         
         double equilibrium:: updateGammaAndPhi( array<double> &Phi,const array<double> &C, const double KK ) const throw()
         {
@@ -427,7 +427,7 @@ namespace yocto
             return updateGamma(C,KK);
         }
         
-
+        
         
         
         //______________________________________________________________________

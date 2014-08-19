@@ -116,9 +116,9 @@ namespace yocto
                         dNuP[i] = eq.compile(Nu[i],lib);
                         dNu[i]  = eq.DeltaNu;
                     }
-                    std::cerr << "Nu=" << Nu << std::endl;
-                    std::cerr << "dNu=" << dNu << std::endl;
-                    std::cerr << "dNuP=" << dNuP << std::endl;
+                    //std::cerr << "Nu=" << Nu << std::endl;
+                    //std::cerr << "dNu=" << dNu << std::endl;
+                    //std::cerr << "dNuP=" << dNuP << std::endl;
                     //__________________________________________________________
                     //
                     // copy the full topology
