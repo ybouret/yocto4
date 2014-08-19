@@ -44,6 +44,7 @@ YOCTO_UNIT_TEST_IMPL(mix)
         std::cerr << "S" << i << "=" << sols[i] << std::endl;
     }
     
+    
     vector<double> weights(nw,1.0);
     solution S(lib);
     const size_t NMAX = 200;
