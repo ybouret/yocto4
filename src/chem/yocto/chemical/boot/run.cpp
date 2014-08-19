@@ -363,6 +363,13 @@ namespace yocto
                         std::cerr << "scaled=" << eqs.scaled << std::endl;
                         std::cerr << "gammaC=" << eqs.gammaC << std::endl;
                         
+                        if(Nc<=0)
+                        {
+                            std::cerr << "Not Implemented" << std::endl;
+                            exit(1);
+                        }
+                        
+                        
                         //______________________________________________________
                         //
                         // Gramian Matrix to check P rank as well
@@ -398,7 +405,12 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
-                double starRMS()
+                
+                //______________________________________________________________
+                //
+                // compute the RMS of Lambda-P*Cstar
+                //______________________________________________________________
+                inline double starRMS() throw()
                 {
                     mkl::set(dL,Lambda);
                     mkl::mulsub(dL,P,Cstar);
@@ -410,7 +422,11 @@ namespace yocto
                     return sqrt(sq/Nc);
                 }
                 
-                void compute_Cstar()
+                //______________________________________________________________
+                //
+                // Carefully compute Cstar
+                //______________________________________________________________
+                inline void compute_Cstar() throw()
                 {
                     mkl::mul(Cstar,PA,Lambda);
                     for(size_t j=M;j>0;--j) Cstar[j] /= D;
@@ -428,7 +444,7 @@ namespace yocto
                         const double new_rms = starRMS();
                         if(new_rms>=old_rms)
                         {
-                            std::cerr << "starRMS=" << old_rms << std::endl;
+                            //std::cerr << "starRMS=" << old_rms << std::endl;
                             mkl::set(Cstar,C1);
                             return;
                         }
@@ -437,6 +453,10 @@ namespace yocto
                     
                 }
                 
+                //______________________________________________________________
+                //
+                // compute C = Cstar + Q'*V
+                //______________________________________________________________
                 inline void computeC() throw()
                 {
                     mkl::set(C,Cstar);
@@ -444,6 +464,10 @@ namespace yocto
                     
                 }
                 
+                //______________________________________________________________
+                //
+                // compute V = inv(Q*Q')*Q*(C-Cstar)
+                //______________________________________________________________
                 inline void computeV() throw()
                 {
                     for(size_t j=M;j>0;--j)
@@ -482,6 +506,10 @@ namespace yocto
                     compute_Cstar();
                     std::cerr << "Cstar=" << Cstar << std::endl;
                     
+                    //__________________________________________________________
+                    //
+                    // Objective Function
+                    //__________________________________________________________
                     numeric<double>::function F(this,&BootManager::Func);
                     
                     //__________________________________________________________
@@ -489,20 +517,17 @@ namespace yocto
                     // compute initial V and C
                     //__________________________________________________________
                 PREPARE_C:
-                    prepareC();
-                    computeV();
-                    computeC();
-                    mkl::set(C0,C);
-                    eqs.updateGammaAndPhi(C);
-                    double F0 = GammaRMS();
+                    prepareC(); // a random composition
+                    computeV(); // its V factor
+                    computeC(); // a compatible composition
+                    
+                    mkl::set(C0,C);             // save C
+                    eqs.updateGammaAndPhi(C);   // initialize Gamma and Phi
+                    double F0 = GammaRMS();     // objective function
                     
                     for(unsigned count=1;
                         ;++count)
                     {
-                        //std::cerr << "########### iter=" <<count << std::endl;
-                        //std::cerr << "C="    << C << std::endl;
-                        //std::cerr << "Gamma=" << eqs.Gamma << std::endl;
-                        //std::cerr << "GamRMS=" << GammaRMS() << std::endl;
                         //______________________________________________________
                         //
                         // Compute the full Newton's step
@@ -513,24 +538,27 @@ namespace yocto
                             goto PREPARE_C;
                         }
                         
+                        //______________________________________________________
+                        //
+                        // save V0 to look V=V0+alpha*dV
+                        //______________________________________________________
                         mkl::set(V0,V);
                         double       alpha = 1.0;
                         const double F1    = F(alpha);
-                        //std::cerr << "F0=" << F0 << std::endl;
-                        //std::cerr << "F1=" << F1 << std::endl;
+                        
                         //______________________________________________________
                         //
                         // Don't go too fast
                         //______________________________________________________
                         if(F1>=F0)
                         {
-                            std::cerr << "#Need to optimise" << std::endl;
+                            //std::cerr << "#Need to optimise" << std::endl;
                             triplet<double> XX = { 0, 1, 1};
                             triplet<double> FF = { F0, F1, F1};
                             (void)bracket<double>::inside(F, XX, FF);
                             minimize<double>(F, XX, FF, 0);
                             alpha = XX.b;
-                            std::cerr << "alpha=" << alpha << std::endl;
+                            //std::cerr << "alpha=" << alpha << std::endl;
                         }
                         
                         //______________________________________________________
@@ -544,7 +572,6 @@ namespace yocto
                         {
                             dX[j] = C[j] - C0[j];
                         }
-                        //std::cerr << "dX=" << dX << std::endl;
                         
                         //______________________________________________________
                         //
@@ -587,7 +614,7 @@ namespace yocto
                             dX[j] = 0;
                         }
                     }
-                    std::cerr << "dC=" << dX << std::endl;
+                    //std::cerr << "dC=" << dX << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -602,7 +629,7 @@ namespace yocto
                             C[j] = 0.0;
                         }
                     }
-                    std::cerr << "C2=" << C << std::endl;
+                    //std::cerr << "C2=" << C << std::endl;
                     
                     
                     //__________________________________________________________
@@ -614,7 +641,7 @@ namespace yocto
                         std::cerr << "#invalid final concentrations" << std::endl;
                         goto PREPARE_C;
                     }
-                    std::cerr << "C3=" << C << std::endl;
+                    //std::cerr << "C3=" << C << std::endl;
                     
                     //__________________________________________________________
                     //
@@ -638,7 +665,11 @@ namespace yocto
                     }
                 }
                 
-                inline double computeNormalizedRMS()
+                //______________________________________________________________
+                //
+                // compute RMS of P*C-Lambda, scaling by each row norm
+                //______________________________________________________________
+                inline double computeNormalizedRMS() throw()
                 {
                     double sq = 0;
                     for(size_t i=Nc;i>0;--i)
@@ -663,7 +694,7 @@ namespace yocto
                 //
                 // Compute the Newton's step with improved precision
                 //______________________________________________________________
-                inline bool computeNewtondV()
+                inline bool computeNewtondV() throw()
                 {
                     mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
                     iPhiQ.assign(PhiQ);
@@ -679,7 +710,7 @@ namespace yocto
                     return true;
                 }
                 
-                double Func(const double alpha)
+                inline double Func(const double alpha) throw()
                 {
                     for(size_t i=N;i>0;--i)
                     {

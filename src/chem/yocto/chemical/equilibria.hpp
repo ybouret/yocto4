@@ -155,7 +155,7 @@ namespace yocto
             void mix(array<double>         &C,
                      const array<solution> &solutions,
                      const array<double>   &weights,
-                     const double t);
+                     const double           t);
             
             
         private:

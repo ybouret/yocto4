@@ -102,7 +102,7 @@ namespace yocto
                 }
                 if(converged)
                 {
-                    std::cerr << "#converged in " << count << " step" << (count>1? "s" : "") << std::endl;
+                    //std::cerr << "#converged in " << count << " step" << (count>1? "s" : "") << std::endl;
                     break;
                 }
                 updateGammaAndPhi(C);
