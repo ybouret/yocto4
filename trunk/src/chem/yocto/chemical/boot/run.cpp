@@ -400,7 +400,7 @@ namespace yocto
                         //
                         // Starting point
                         //______________________________________________________
-                        ios::ocstream fp("err.dat",false);
+                        //ios::ocstream fp("err.dat",false);
                         double old_err = -1;
                     PREPARE_C:
                         prepareC();
@@ -415,10 +415,10 @@ namespace yocto
                             // Initialize Gamma and Phi for non linear part
                             //__________________________________________________
                             eqs.updateGammaAndPhi(C);
-                            std::cerr << "active=" << eqs.active << std::endl;
-                            std::cerr << "C0   =" << C         << std::endl;
-                            std::cerr << "Gamma=" << eqs.Gamma << std::endl;
-                            std::cerr << "Phi  =" << eqs.Phi   << std::endl;
+                            //std::cerr << "active=" << eqs.active << std::endl;
+                            //std::cerr << "C0   =" << C         << std::endl;
+                            //std::cerr << "Gamma=" << eqs.Gamma << std::endl;
+                            //std::cerr << "Phi  =" << eqs.Phi   << std::endl;
                             //std::cerr << "RMS="   << RMS()     << std::endl;
                             
                             //__________________________________________________
@@ -465,7 +465,7 @@ namespace yocto
                             mkl::mul_trn(dY,Q, dV);
                             
                             mkl::add(C,dY);
-                            std::cerr << "C2=" << C << std::endl;
+                            //std::cerr << "C2=" << C << std::endl;
                             
                             
                             //__________________________________________________
@@ -476,7 +476,7 @@ namespace yocto
                             {
                                 dX[j] = C[j] - C0[j];
                             }
-                            std::cerr << "dC=" << dX << std::endl;
+                            //std::cerr << "dC=" << dX << std::endl;
                             
                             //__________________________________________________
                             //
@@ -491,10 +491,13 @@ namespace yocto
                             }
                             else
                             {
-                                fp("%u %g\n", count, -log10(err) );
+                                //fp("%u %g\n", count, -log10(err) );
                             }
                             
-                            if(count>1 && old_err < numeric<double>::ftol && err >= old_err)
+                            if((count>1)                         &&
+                               (old_err < numeric<double>::ftol) &&
+                               (err >= old_err)
+                               )
                             {
                                 std::cerr << "#Precision was reached Level-2" << std::endl;
                                 break;
@@ -502,6 +505,19 @@ namespace yocto
                             
                             mkl::set(C0,C);
                             old_err = err;
+                        }
+                        
+                        //______________________________________________________
+                        //
+                        // At this point, we numerically have P*C = Lambda
+                        // and we are close to Gamma=0:
+                        // Try to normalise with constrained Nu
+                        //______________________________________________________
+                        std::cerr << "C0=" << C << std::endl;
+                        if( !eqs.normalize(-1, C, false) )
+                        {
+                            std::cerr << "#couldn't normalize" << std::endl;
+                            goto PREPARE_C;
                         }
                         
                         
@@ -512,21 +528,12 @@ namespace yocto
                         throw;
                     }
                     
-                    //__________________________________________________
-                    //
-                    // At this point, we numerically have P*C = Lambda
-                    // and we are close to Gamma=0
-                    //__________________________________________________
-                    {
-                        eqs.updateGammaAndPhi(C);
-                        std::cerr << "Gamma=" << eqs.Gamma << std::endl;
-                        std::cerr << "Phi  =" << eqs.Phi   << std::endl;
-                    }
-                    
-                    exit(1);
-                    
+                    std::cerr << "#restoring topology" << std::endl;
                     eqs.restore_topology();
-                    
+                    if( !eqs.normalize(-1, C,false) )
+                    {
+                        throw exception("%sunexpected last normalisation failure!!",fn);
+                    }
                     
                 }
                 
