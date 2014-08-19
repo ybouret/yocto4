@@ -368,209 +368,17 @@ namespace yocto
                         
                         //______________________________________________________
                         //
-                        // Auxiliary matrices
+                        // Auxliary quantities
                         //______________________________________________________
                         PA.make(M,Nc);
                         mkl::mul_ltrn(PA, P, A);
                         rint_matrix(PA);
                         std::cerr << "PA=" << PA << std::endl;
+
                         
-                        dL.make(Nc,0.0);
-                        dX.make(M,0.0);
-                        PhiQ.make(N,N);
-                        iPhiQ.make(N,N);
-                        rhs.make(N,0.0);
-                        dV.make(N,0.0);
-                        dY.make(M,0.0);
-                        C0.make(M,0.0);
-                        C1.make(M,0.0);
+                        exit(21);
                         
-                        //______________________________________________________
-                        //
-                        // Starting point
-                        //______________________________________________________
-                        double old_err = -1;
-                    PREPARE_C:
-                        prepareC();
-                        mkl::set(C0,C);
-                        old_err = -1;
-                        
-                        for(unsigned count=1;
-                            ;++count)
-                        {
-                            //__________________________________________________
-                            //
-                            // Initialize Gamma and Phi for non linear part
-                            //__________________________________________________
-                            eqs.updateGammaAndPhi(C);
-                            
-                            //__________________________________________________
-                            //
-                            // Compute Phi*Q' and check numerically OK
-                            //__________________________________________________
-                            mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
-                            iPhiQ.assign(PhiQ);
-                            if(! crout<double>::build(iPhiQ) )
-                            {
-                                std::cerr << "# invalid concentration level I" << std::endl;
-                                goto PREPARE_C;
-                            }
-                            
-                            //__________________________________________________
-                            //
-                            // solve the linear part by projection
-                            //__________________________________________________
-                            projectC();
-                            
-                            //__________________________________________________
-                            //
-                            // compute the effective dX from C0 and projected C
-                            //__________________________________________________
-                            for(size_t j=M;j>0;--j)
-                            {
-                                dX[j] = C[j] - C0[j];
-                            }
-                            
-                            //__________________________________________________
-                            //
-                            // prepare the arguments -(Gamma+Phi*dX)
-                            //__________________________________________________
-                            mkl::neg(rhs,eqs.Gamma);
-                            mkl::mulsub(rhs,eqs.Phi,dX);
-                            mkl::set(dV,rhs);
-                            
-                            //__________________________________________________
-                            //
-                            // solve dV and compute dY
-                            //__________________________________________________
-                            crout<double>::solve(iPhiQ,dV);
-                            crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                            mkl::mul_trn(dY,Q, dV);
-                            
-                            //__________________________________________________
-                            //
-                            // Finalize the new concentration
-                            //__________________________________________________
-                            mkl::add(C,dY);
-                            
-                            
-                            //__________________________________________________
-                            //
-                            // Compute the effective total delta C
-                            //__________________________________________________
-                            for(size_t j=M;j>0;--j)
-                            {
-                                dX[j] = C[j] - C0[j];
-                            }
-                            //std::cerr << "dC=" << dX << std::endl;
-                            
-                            //__________________________________________________
-                            //
-                            // Compute the step error
-                            //__________________________________________________
-                            const double err = StepRMS();
-                            if(err<=0)
-                            {
-                                //std::cerr << "#Precision was reached Level-1" << std::endl;
-                                break;
-                            }
-                            
-                            
-                            if((count>1)                         &&
-                               (old_err < numeric<double>::ftol) &&
-                               (err >= old_err)
-                               )
-                            {
-                                //std::cerr << "#Precision was reached Level-2" << std::endl;
-                                break;
-                            }
-                            
-                            mkl::set(C0,C);
-                            old_err = err;
-                        }
-                        
-                        //______________________________________________________
-                        //
-                        // At this point, we numerically have P*C = Lambda
-                        // and we are close to Gamma=0
-                        // Check that the value may be normalised
-                        // with the reduced Nu matrix
-                        //______________________________________________________
-                        std::cerr << "C1=" << C << std::endl;
-                        if( !eqs.normalize(-1, C, false) )
-                        {
-                            std::cerr << "#couldn't normalize" << std::endl;
-                            goto PREPARE_C;
-                        }
-                        std::cerr << "C2=" << C << std::endl;
-                        
-                        //______________________________________________________
-                        //
-                        // compute the linear error
-                        //______________________________________________________
-                        compute_dL();
-                        mkl::mul(dX,PA,dL);
-                        for(size_t j=M;j>0;--j)
-                        {
-                            dX[j] /= D;
-                        }
-                        
-                        //______________________________________________________
-                        //
-                        // compute the non-linear error
-                        //______________________________________________________
-                        eqs.updateGammaAndPhi(C);
-                        mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
-                        iPhiQ.assign(PhiQ);
-                        if(!crout<double>::build(iPhiQ))
-                        {
-                            std::cerr << "#invalid pre-final concentrations" << std::endl;
-                            goto PREPARE_C;
-                        }
-                        
-                        mkl::neg(rhs,eqs.Gamma);
-                        mkl::muladd(rhs, eqs.Phi,dX);
-                        mkl::set(dV,rhs);
-                        crout<double>::solve(iPhiQ, dV);
-                        crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                        mkl::mul_trn(dY, Q, dV);
-                        
-                        //______________________________________________________
-                        //
-                        // compute the cut-off values
-                        //______________________________________________________
-                        for(size_t j=M;j>0;--j)
-                        {
-                            double dd = Fabs(dX[j]) + Fabs(dY[j]);
-                            if(dd>0)
-                            {
-                                dX[j] = math::log_round_ceil(dd);
-                            }
-                            else
-                            {
-                                dX[j] = 0;
-                            }
-                        }
-                        std::cerr << "Cerr=" << dX << std::endl;
-                        
-                        
-                        //______________________________________________________
-                        //
-                        // Cut-off
-                        //______________________________________________________
-                        for(size_t j=M;j>0;--j)
-                        {
-                            if(eqs.active[j]>0)
-                            {
-                                if( C[j] < dX[j])
-                                {
-                                    C[j] = 0.0;
-                                }
-                            }
-                        }
-                        std::cerr << "C=" << C << std::endl;
-                        
-                        
+                        //Method1();
                         
                     }
                     catch(...)
@@ -578,6 +386,225 @@ namespace yocto
                         eqs.restore_topology();
                         throw;
                     }
+                    
+                    
+                }
+                
+                inline ~BootManager() throw()
+                {
+                    
+                }
+                
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
+                
+                void Method1()
+                {
+                    //______________________________________________________
+                    //
+                    // Auxiliary matrices
+                    //______________________________________________________
+                    PA.make(M,Nc);
+                    mkl::mul_ltrn(PA, P, A);
+                    rint_matrix(PA);
+                    std::cerr << "PA=" << PA << std::endl;
+                    dL.make(Nc,0.0);
+                    dX.make(M,0.0);
+                    PhiQ.make(N,N);
+                    iPhiQ.make(N,N);
+                    rhs.make(N,0.0);
+                    dV.make(N,0.0);
+                    dY.make(M,0.0);
+                    C0.make(M,0.0);
+                    C1.make(M,0.0);
+                    
+                    //______________________________________________________
+                    //
+                    // Starting point
+                    //______________________________________________________
+                    double old_err = -1;
+                PREPARE_C:
+                    prepareC();
+                    mkl::set(C0,C);
+                    old_err = -1;
+                    
+                    for(unsigned count=1;
+                        ;++count)
+                    {
+                        //__________________________________________________
+                        //
+                        // Initialize Gamma and Phi for non linear part
+                        //__________________________________________________
+                        eqs.updateGammaAndPhi(C);
+                        
+                        //__________________________________________________
+                        //
+                        // Compute Phi*Q' and check numerically OK
+                        //__________________________________________________
+                        mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
+                        iPhiQ.assign(PhiQ);
+                        if(! crout<double>::build(iPhiQ) )
+                        {
+                            std::cerr << "# invalid concentration level I" << std::endl;
+                            goto PREPARE_C;
+                        }
+                        
+                        //__________________________________________________
+                        //
+                        // solve the linear part by projection
+                        //__________________________________________________
+                        projectC();
+                        
+                        //__________________________________________________
+                        //
+                        // compute the effective dX from C0 and projected C
+                        //__________________________________________________
+                        for(size_t j=M;j>0;--j)
+                        {
+                            dX[j] = C[j] - C0[j];
+                        }
+                        
+                        //__________________________________________________
+                        //
+                        // prepare the arguments -(Gamma+Phi*dX)
+                        //__________________________________________________
+                        mkl::neg(rhs,eqs.Gamma);
+                        mkl::mulsub(rhs,eqs.Phi,dX);
+                        mkl::set(dV,rhs);
+                        
+                        //__________________________________________________
+                        //
+                        // solve dV and compute dY
+                        //__________________________________________________
+                        crout<double>::solve(iPhiQ,dV);
+                        crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                        mkl::mul_trn(dY,Q, dV);
+                        
+                        //__________________________________________________
+                        //
+                        // Finalize the new concentration
+                        //__________________________________________________
+                        mkl::add(C,dY);
+                        
+                        
+                        //__________________________________________________
+                        //
+                        // Compute the effective total delta C
+                        //__________________________________________________
+                        for(size_t j=M;j>0;--j)
+                        {
+                            dX[j] = C[j] - C0[j];
+                        }
+                        //std::cerr << "dC=" << dX << std::endl;
+                        
+                        //__________________________________________________
+                        //
+                        // Compute the step error
+                        //__________________________________________________
+                        const double err = StepRMS();
+                        if(err<=0)
+                        {
+                            //std::cerr << "#Precision was reached Level-1" << std::endl;
+                            break;
+                        }
+                        
+                        
+                        if((count>1)                         &&
+                           (old_err < numeric<double>::ftol) &&
+                           (err >= old_err)
+                           )
+                        {
+                            //std::cerr << "#Precision was reached Level-2" << std::endl;
+                            break;
+                        }
+                        
+                        mkl::set(C0,C);
+                        old_err = err;
+                    }
+                    
+                    //______________________________________________________
+                    //
+                    // At this point, we numerically have P*C = Lambda
+                    // and we are close to Gamma=0
+                    // Check that the value may be normalised
+                    // with the reduced Nu matrix
+                    //______________________________________________________
+                    std::cerr << "C1=" << C << std::endl;
+                    if( !eqs.normalize(-1, C, false) )
+                    {
+                        std::cerr << "#couldn't normalize" << std::endl;
+                        goto PREPARE_C;
+                    }
+                    std::cerr << "C2=" << C << std::endl;
+                    
+                    //______________________________________________________
+                    //
+                    // compute the linear error
+                    //______________________________________________________
+                    compute_dL();
+                    mkl::mul(dX,PA,dL);
+                    for(size_t j=M;j>0;--j)
+                    {
+                        dX[j] /= D;
+                    }
+                    
+                    //______________________________________________________
+                    //
+                    // compute the non-linear error
+                    //______________________________________________________
+                    eqs.updateGammaAndPhi(C);
+                    mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
+                    iPhiQ.assign(PhiQ);
+                    if(!crout<double>::build(iPhiQ))
+                    {
+                        std::cerr << "#invalid pre-final concentrations" << std::endl;
+                        goto PREPARE_C;
+                    }
+                    
+                    mkl::neg(rhs,eqs.Gamma);
+                    mkl::muladd(rhs, eqs.Phi,dX);
+                    mkl::set(dV,rhs);
+                    crout<double>::solve(iPhiQ, dV);
+                    crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                    mkl::mul_trn(dY, Q, dV);
+                    
+                    //______________________________________________________
+                    //
+                    // compute the cut-off values
+                    //______________________________________________________
+                    for(size_t j=M;j>0;--j)
+                    {
+                        double dd = Fabs(dX[j]) + Fabs(dY[j]);
+                        if(dd>0)
+                        {
+                            dX[j] = math::log_round_ceil(dd);
+                        }
+                        else
+                        {
+                            dX[j] = 0;
+                        }
+                    }
+                    std::cerr << "Cerr=" << dX << std::endl;
+                    
+                    
+                    //______________________________________________________
+                    //
+                    // Cut-off
+                    //______________________________________________________
+                    for(size_t j=M;j>0;--j)
+                    {
+                        if(eqs.active[j]>0)
+                        {
+                            if( C[j] < dX[j])
+                            {
+                                C[j] = 0.0;
+                            }
+                        }
+                    }
+                    std::cerr << "C=" << C << std::endl;
+                    
                     
                     //__________________________________________________________
                     //
@@ -597,21 +624,12 @@ namespace yocto
                     const double linearRMS = prjrms();
                     if(linearRMS>numeric<double>::ftol)
                     {
-                        throw exception("%sunable to math linear constraints(RMS=%g)",fn,linearRMS);
+                        throw exception("%sunable to match linear constraints(RMS=%g)",fn,linearRMS);
                     }
                     
-                    
-                }
-                
-                inline ~BootManager() throw()
-                {
-                    
                 }
                 
                 
-                
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
 #if 0
                 //______________________________________________________________
                 //
