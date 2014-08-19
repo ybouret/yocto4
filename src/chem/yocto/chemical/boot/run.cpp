@@ -5,6 +5,8 @@
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/math/kernel/det.hpp"
 
+#include <cstdlib>
+
 namespace yocto
 {
     
