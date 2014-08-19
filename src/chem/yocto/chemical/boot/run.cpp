@@ -4,7 +4,7 @@
 #include "yocto/sort/quick.hpp"
 #include "yocto/math/kernel/algebra.hpp"
 #include "yocto/math/kernel/det.hpp"
-#include "yocto/ios/ocstream.hpp"
+#include "yocto/math/round.hpp"
 
 #include <cstdlib>
 
@@ -191,8 +191,6 @@ namespace yocto
                 vector<size_t>    ifixed;
                 vector_t          C;
                 const size_t      nfix;
-                const size_t      ndof;
-                vector<size_t>    idof;
                 matrix_t          J;
                 const integer_t   D;
                 matrix_t          A;
@@ -226,8 +224,6 @@ namespace yocto
                 ifixed(),
                 C(),
                 nfix(0),
-                ndof(0),
-                idof(),
                 J(),
                 D(0),
                 A(),
@@ -297,10 +293,12 @@ namespace yocto
                         // Optimize It
                         //______________________________________________________
                         __refactor(P, Lambda, eqs.Nu, Cfixed, ifixed);
+                        (size_t&)nfix = ifixed.size();
                         
                         
                         
 #if 1
+                        std::cerr << "#fix=" << nfix << std::endl;
                         std::cerr << "ifixed=" << ifixed << std::endl;
                         std::cerr << "Cfixed=" << Cfixed << std::endl;
                         
@@ -312,7 +310,7 @@ namespace yocto
                         
                         //______________________________________________________
                         //
-                        // Reduce Nu
+                        // Reduced Nu => new active species
                         //______________________________________________________
                         eqs.find_active_species();
                         
@@ -357,15 +355,6 @@ namespace yocto
                         
                         //______________________________________________________
                         //
-                        // Fixed species and D.O.F
-                        //______________________________________________________
-                        findDOF();
-                        std::cerr << "#fix=" << nfix << std::endl;
-                        std::cerr << "#dof=" << ndof << std::endl;
-                        std::cerr << "idof=" << idof << std::endl;
-                        
-                        //______________________________________________________
-                        //
                         // Gramian Matrix to check P rank as well
                         //______________________________________________________
                         buildJ();
@@ -383,8 +372,8 @@ namespace yocto
                         //______________________________________________________
                         PA.make(M,Nc);
                         mkl::mul_ltrn(PA, P, A);
-                        std::cerr << "PA=" << PA << std::endl;
                         rint_matrix(PA);
+                        std::cerr << "PA=" << PA << std::endl;
                         
                         dL.make(Nc,0.0);
                         dX.make(M,0.0);
@@ -400,7 +389,6 @@ namespace yocto
                         //
                         // Starting point
                         //______________________________________________________
-                        //ios::ocstream fp("err.dat",false);
                         double old_err = -1;
                     PREPARE_C:
                         prepareC();
@@ -415,11 +403,6 @@ namespace yocto
                             // Initialize Gamma and Phi for non linear part
                             //__________________________________________________
                             eqs.updateGammaAndPhi(C);
-                            //std::cerr << "active=" << eqs.active << std::endl;
-                            //std::cerr << "C0   =" << C         << std::endl;
-                            //std::cerr << "Gamma=" << eqs.Gamma << std::endl;
-                            //std::cerr << "Phi  =" << eqs.Phi   << std::endl;
-                            //std::cerr << "RMS="   << RMS()     << std::endl;
                             
                             //__________________________________________________
                             //
@@ -464,8 +447,11 @@ namespace yocto
                             crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
                             mkl::mul_trn(dY,Q, dV);
                             
+                            //__________________________________________________
+                            //
+                            // Finalize the new concentration
+                            //__________________________________________________
                             mkl::add(C,dY);
-                            //std::cerr << "C2=" << C << std::endl;
                             
                             
                             //__________________________________________________
@@ -480,26 +466,22 @@ namespace yocto
                             
                             //__________________________________________________
                             //
-                            // Compute the error
+                            // Compute the step error
                             //__________________________________________________
                             const double err = StepRMS();
-                            std::cerr << "err=" << err << std::endl;
                             if(err<=0)
                             {
-                                std::cerr << "#Precision was reached Level-1" << std::endl;
+                                //std::cerr << "#Precision was reached Level-1" << std::endl;
                                 break;
                             }
-                            else
-                            {
-                                //fp("%u %g\n", count, -log10(err) );
-                            }
+                            
                             
                             if((count>1)                         &&
                                (old_err < numeric<double>::ftol) &&
                                (err >= old_err)
                                )
                             {
-                                std::cerr << "#Precision was reached Level-2" << std::endl;
+                                //std::cerr << "#Precision was reached Level-2" << std::endl;
                                 break;
                             }
                             
@@ -510,15 +492,84 @@ namespace yocto
                         //______________________________________________________
                         //
                         // At this point, we numerically have P*C = Lambda
-                        // and we are close to Gamma=0:
-                        // Try to normalise with constrained Nu
+                        // and we are close to Gamma=0
+                        // Check that the value may be normalised
+                        // with the reduced Nu matrix
                         //______________________________________________________
-                        std::cerr << "C0=" << C << std::endl;
+                        std::cerr << "C1=" << C << std::endl;
                         if( !eqs.normalize(-1, C, false) )
                         {
                             std::cerr << "#couldn't normalize" << std::endl;
                             goto PREPARE_C;
                         }
+                        std::cerr << "C2=" << C << std::endl;
+                        
+                        //______________________________________________________
+                        //
+                        // compute the linear error
+                        //______________________________________________________
+                        compute_dL();
+                        mkl::mul(dX,PA,dL);
+                        for(size_t j=M;j>0;--j)
+                        {
+                            dX[j] /= D;
+                        }
+                        
+                        //______________________________________________________
+                        //
+                        // compute the non-linear error
+                        //______________________________________________________
+                        eqs.updateGammaAndPhi(C);
+                        mkl::mul_rtrn(PhiQ, eqs.Phi, Q);
+                        iPhiQ.assign(PhiQ);
+                        if(!crout<double>::build(iPhiQ))
+                        {
+                            std::cerr << "#invalid pre-final concentrations" << std::endl;
+                            goto PREPARE_C;
+                        }
+                        
+                        mkl::neg(rhs,eqs.Gamma);
+                        mkl::muladd(rhs, eqs.Phi,dX);
+                        mkl::set(dV,rhs);
+                        crout<double>::solve(iPhiQ, dV);
+                        crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                        mkl::mul_trn(dY, Q, dV);
+                        
+                        //______________________________________________________
+                        //
+                        // compute the cut-off values
+                        //______________________________________________________
+                        for(size_t j=M;j>0;--j)
+                        {
+                            double dd = Fabs(dX[j]) + Fabs(dY[j]);
+                            if(dd>0)
+                            {
+                                dX[j] = math::log_round_ceil(dd);
+                            }
+                            else
+                            {
+                                dX[j] = 0;
+                            }
+                        }
+                        std::cerr << "Cerr=" << dX << std::endl;
+                        
+                        
+                        //______________________________________________________
+                        //
+                        // Cut-off
+                        //______________________________________________________
+                        for(size_t j=M;j>0;--j)
+                        {
+                            if(eqs.active[j]>0)
+                            {
+                                if( C[j] < dX[j])
+                                {
+                                    C[j] = 0.0;
+                                }
+                            }
+                        }
+                        std::cerr << "C=" << C << std::endl;
+                        
                         
                         
                     }
@@ -528,12 +579,28 @@ namespace yocto
                         throw;
                     }
                     
+                    //__________________________________________________________
+                    //
+                    // Final Non-Linear Check
+                    //__________________________________________________________
                     std::cerr << "#restoring topology" << std::endl;
                     eqs.restore_topology();
                     if( !eqs.normalize(-1, C,false) )
                     {
                         throw exception("%sunexpected last normalisation failure!!",fn);
                     }
+                    
+                    //__________________________________________________________
+                    //
+                    // Final Linear Check
+                    //__________________________________________________________
+                    const double linearRMS = prjrms();
+                    std::cerr << "linearRMS=" << linearRMS << std::endl;
+                    if(linearRMS>numeric<double>::ftol)
+                    {
+                        throw exception("%sunable to math linear constraints!!",fn);
+                    }
+                    
                     
                 }
                 
@@ -546,6 +613,7 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
+#if 0
                 //______________________________________________________________
                 //
                 // Find D.O.F from fixed indices
@@ -570,6 +638,7 @@ namespace yocto
                             idof.push_back(j);
                     }
                 }
+#endif
                 
                 //______________________________________________________________
                 //

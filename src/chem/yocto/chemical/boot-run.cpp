@@ -11,7 +11,7 @@
 #include "yocto/math/opt/minimize.hpp"
 #include "yocto/math/opt/bracket.hpp"
 
-
+#if 0
 namespace yocto
 {
     
@@ -721,3 +721,5 @@ namespace yocto
         
     }
 }
+#endif
+
