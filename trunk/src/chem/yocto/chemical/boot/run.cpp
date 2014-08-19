@@ -595,10 +595,9 @@ namespace yocto
                     // Final Linear Check
                     //__________________________________________________________
                     const double linearRMS = prjrms();
-                    std::cerr << "linearRMS=" << linearRMS << std::endl;
                     if(linearRMS>numeric<double>::ftol)
                     {
-                        throw exception("%sunable to math linear constraints!!",fn);
+                        throw exception("%sunable to math linear constraints(RMS=%g)",fn,linearRMS);
                     }
                     
                     

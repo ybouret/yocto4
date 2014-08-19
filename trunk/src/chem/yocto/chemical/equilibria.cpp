@@ -309,7 +309,7 @@ namespace yocto
                     }
                 }
             }
-            std::cerr << "active=" << active << std::endl;
+            //std::cerr << "active=" << active << std::endl;
         }
         
         void equilibria:: restore_topology() throw()
