@@ -9,7 +9,9 @@ namespace yocto
     {
         typedef math::algebra<double> mkl;
         
-        bool  equilibria:: normalize( double t, array<double> &C, bool recomputeK )
+        bool  equilibria:: normalize(double         t,
+                                     array<double> &C,
+                                     bool           recomputeK )
         {
             
             assert(C.size()>=M);
@@ -26,7 +28,7 @@ namespace yocto
             //__________________________________________________________________
             if(!validate(C))
             {
-                std::cerr << "Newton-I: invalid set of initial concentrations" << std::endl;
+                std::cerr << "#Newton-I: invalid set of initial concentrations" << std::endl;
                 return false;
             }
             
@@ -55,7 +57,7 @@ namespace yocto
                 mkl::mul_rtrn(W, Phi, Nu);
                 if(!lu_t::build(W))
                 {
-                    std::cerr << "-- Newton-I: singular composition" << std::endl;
+                    std::cerr << "#Newton-I: singular composition" << std::endl;
                     return false;
                 }
                 mkl::neg(xi, Gamma);
