@@ -45,15 +45,14 @@ namespace yocto
             {
                 updateGammaAndPhi(C);
             }
-            std::cerr << "K=" << K << std::endl;
-            std::cerr << "C=" << C << std::endl;
+            //std::cerr << "K=" << K << std::endl;
+            //std::cerr << "C=" << C << std::endl;
             for(size_t count=1;/* count<=20 */;++count)
             {
                 //______________________________________________________________
                 //
                 // compute the full Newton's extent
                 //______________________________________________________________
-                //std::cerr << "Gamma=" << Gamma << std::endl;
                 mkl::mul_rtrn(W, Phi, Nu);
                 if(!lu_t::build(W))
                 {
@@ -101,8 +100,6 @@ namespace yocto
                         assert(fabs(dC[j])<=0);
                     }
                 }
-                //std::cerr << "C1=" << C << std::endl;
-                //std::cerr << "dC=" << dC << std::endl;
                 if(converged)
                 {
                     std::cerr << "#converged in " << count << " step" << (count>1? "s" : "") << std::endl;
