@@ -120,7 +120,9 @@ namespace yocto
                     p[i] += dp;
                     const real_t p_new  = p[i];
                     if( Fabs(p_new-p_old) > Fabs(ftol*(Fabs(p_old)+Fabs(p_new))) )
+                    {
                         converged = false;
+                    }
                 }
                 const real_t fp_new = f.b;
                 //--------------------------------------------------------------
