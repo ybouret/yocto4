@@ -107,12 +107,6 @@ namespace yocto
             
             //! compute scaled concentrations, once K is computed
             void  compute_scaled_concentrations() throw();
-
-            //! compute a trial from ACTIVE and PRE-SCALED concentrations
-            /**
-             Non active-concentrations are left untouched...
-             */
-            bool compute_trial(array<double> &C, alea_t &ran);
             
             
             //! generate a set of positive ACTIVE and PRE-SCALED concentrations

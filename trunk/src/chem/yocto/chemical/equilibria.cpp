@@ -217,13 +217,6 @@ namespace yocto
             
         }
         
-        bool equilibria:: compute_trial( array<double> &C, alea_t &ran)
-        {
-            generate(C,ran);
-            return normalize(-1, C, false);
-        }
-        
-        
         void equilibria:: computeGamma(double t, const array<double> &C )
         {
             iterator     k = begin();
