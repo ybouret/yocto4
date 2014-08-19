@@ -35,7 +35,7 @@ namespace yocto
         {
         public:
             explicit solution( const collection &lib );
-            solution( const solution &other);
+            solution(const solution &other);
             virtual ~solution() throw();
             
             //! number of components..

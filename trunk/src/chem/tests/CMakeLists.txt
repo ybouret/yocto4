@@ -4,6 +4,7 @@ sample.lua
 sample2.lua
 boot-spec.lua
 co2.lua
+mix.lua
 )
 TARGET_LINK_YOCTO( test-chem chem mk lua++ lua)
 
@@ -14,3 +15,5 @@ ADD_TEST(Collection  test-chem collection ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua
 ADD_TEST(Solution    test-chem solution)
 ADD_TEST(Equilibrium test-chem equilibrium)
 ADD_TEST(Equilibria  test-chem equilibria)
+ADD_TEST(Mix         test-chem mix ${CMAKE_CURRENT_SOURCE_DIR}/mix.lua)
+
