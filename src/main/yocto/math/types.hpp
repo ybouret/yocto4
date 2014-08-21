@@ -11,28 +11,21 @@ namespace yocto
 {
 	namespace math
 	{
+        //! default "real" type: type itself
 		template <typename T>
-		struct real_of;
-		
-		template <>
-		struct real_of<float>
-		{
-			typedef float type;
-		};
-		
-		template <>
-		struct real_of<double>
-		{
-			typedef double type;
-		};
-		
-		
+		struct real_of
+        {
+            typedef T type;
+        };
+        
+        //! special case: complex float
 		template <>
 		struct real_of< complex<float> >
 		{
 			typedef float type;
 		};
 		
+        //! special case: complex double
 		template <>
 		struct real_of< complex<double> >
 		{
