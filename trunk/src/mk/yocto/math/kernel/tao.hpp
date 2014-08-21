@@ -181,6 +181,60 @@ for(size_t j=nr;j>0;--j) sum += M[j][I]
             //
             //------------------------------------------------------------------
             
+            //! a=b*c
+            template <typename AMAT, typename BMAT, typename CMAT>
+            static inline void mmul(AMAT &a, const BMAT &b, const CMAT &c) throw()
+            {
+                assert(a.rows==b.rows);
+                assert(a.cols==c.cols);
+                assert(b.cols==c.rows);
+                const size_t nr = a.rows;
+                const size_t nc = a.cols;
+                const size_t ns = b.cols;
+                for(size_t i=nr;i>0;--i)
+                {
+                    const array<typename BMAT::type> &bi = b[i];
+                    for(size_t j=nc;j>0;--j)
+                    {
+                        typename AMAT::type sum(0);
+                        for(size_t k=ns;k>0;--k)
+                        {
+                            sum += static_cast<typename AMAT::type>(bi[k]) * static_cast<typename AMAT::type>(c[k][j]);
+                        }
+                        a[i][j] = sum;
+                    }
+                }
+            }
+            
+            //! a=b*c'
+            template <typename AMAT, typename BMAT, typename CMAT>
+            static inline void mmul_rtrn(AMAT &a, const BMAT &b, const CMAT &c) throw()
+            {
+                assert(a.rows==b.rows);
+                assert(a.cols==c.rows);
+                assert(b.cols==c.cols);
+                const size_t nr = a.rows;
+                const size_t nc = a.cols;
+                const size_t ns = b.cols;
+                for(size_t i=nr;i>0;--i)
+                {
+                    const array<typename BMAT::type> &bi = b[i];
+                    for(size_t j=nc;j>0;--j)
+                    {
+                        typename AMAT::type sum(0);
+                        const array<typename CMAT::type> &cj = c[j];
+                        for(size_t k=ns;k>0;--k)
+                        {
+                            sum += static_cast<typename AMAT::type>(bi[k]) * static_cast<typename AMAT::type>(cj[k]);
+                        }
+                        a[i][j] = sum;
+                    }
+                }
+            }
+
+            
+            
+            
         };
         
     }
