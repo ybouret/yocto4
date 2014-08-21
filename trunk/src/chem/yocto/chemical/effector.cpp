@@ -10,7 +10,7 @@ namespace yocto
      
         effector::effector( const string &id ) :
         name(id),
-        Vmax(0)
+        Vmax(1)
         {
             
         }
