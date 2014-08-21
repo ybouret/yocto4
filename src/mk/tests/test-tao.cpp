@@ -36,6 +36,10 @@ void test_tao(const size_t N, const size_t M)
     tao::mul_add(vt,m,vu); std::cerr << vt << std::endl;
     tao::mul_sub(vt,m,vu); std::cerr << vt << std::endl;
     
+    tao::mul_trn(vu, m, vt);     std::cerr << vu << std::endl;
+    tao::mul_add_trn(vu, m, vt); std::cerr << vu << std::endl;
+    tao::mul_sub_trn(vu, m, vt); std::cerr << vu << std::endl;
+
     
 }
 
