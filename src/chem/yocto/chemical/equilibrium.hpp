@@ -12,7 +12,7 @@ namespace yocto
     namespace chemical
     {
         
-        typedef math::numeric<double>::function function_type;
+        typedef math::numeric<double>::function func_type;
         typedef math::derivative<double>        drvs_type;
         
         class equilibrium : public counted_object
@@ -25,7 +25,7 @@ namespace yocto
             
             const string  name; //!< key for database
             vslot         data; //!< for specific data
-            function_type K;    //!< a functor
+            func_type     K;    //!< a functor
 
             const string & key() const throw();
             

@@ -76,7 +76,7 @@ namespace yocto
             //
             // API
             //__________________________________________________________________
-            double derivate( function_type &f, const double t);
+            double derivate( func_type &f, const double t);
             
             //! allocate memory, find Nu0 and Nu, find_active_species()
             void  startup( const collection &lib);
