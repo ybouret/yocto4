@@ -41,6 +41,13 @@ void test_tao(const size_t N, const size_t M)
     tao::mul_add_trn(vu, m, vt); std::cerr << vu << std::endl;
     tao::mul_sub_trn(vu, m, vt); std::cerr << vu << std::endl;
 
+    const size_t ns = 1 + alea_leq(10);
+    matrix<V> b(N,ns);
+    matrix<V> c(ns,M);
+    tao::mmul(m,b,c);
+    matrix<V> d(M,ns);
+    tao::mmul_rtrn(m,b,d);
+    
     
 }
 
