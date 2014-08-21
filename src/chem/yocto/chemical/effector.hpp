@@ -37,6 +37,8 @@ namespace yocto
             explicit effectors() throw();
             virtual ~effectors() throw();
             
+            void compute_rate( array<double> &dSdt, double t, const array<double> &S, const array<double> &S_out );
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
         };
