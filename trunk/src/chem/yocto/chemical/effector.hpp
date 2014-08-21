@@ -8,6 +8,8 @@ namespace yocto
     namespace chemical
     {
         
+#define YOCTO_CHEMICAL_EFFECTOR_ARGS solution &dSdt, const double t, const double zeta, const solution &S, const solution &S_out
+        
         class effector : public counted_object
         {
         public:
@@ -21,7 +23,7 @@ namespace yocto
             typedef set<string,pointer>       database;
             
             //! compute the rate WITHOUT the Vmax
-            virtual void call( array<double> &dSdt, double t, const array<double> &S, const array<double> &S_out ) const = 0;
+            virtual void call( YOCTO_CHEMICAL_EFFECTOR_ARGS ) const = 0;
             
         protected:
             explicit effector( const string & );
@@ -37,7 +39,7 @@ namespace yocto
             explicit effectors() throw();
             virtual ~effectors() throw();
             
-            void compute_rate( array<double> &dSdt, double t, const array<double> &S, const array<double> &S_out );
+            void compute_rate( YOCTO_CHEMICAL_EFFECTOR_ARGS, solution &Stmp );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
