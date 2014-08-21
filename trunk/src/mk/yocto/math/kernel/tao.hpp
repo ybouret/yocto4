@@ -105,7 +105,8 @@ namespace yocto
             {
                 assert(a.size()>=M.rows);
                 assert(b.size()>=M.cols);
-#define Y_TAO_MULROW(I) a[I] = dot(M[I],b)
+                
+#define Y_TAO_MULROW(I) a[I] = static_cast<typename ARR::type>(dot(M[I],b));
                 YOCTO_TAO_LOOP(M.rows,MULROW);
             }
             
@@ -114,7 +115,8 @@ namespace yocto
             {
                 assert(a.size()>=M.rows);
                 assert(b.size()>=M.cols);
-#define Y_TAO_MULADDROW(I) a[I] += dot(M[I],b)
+#define Y_TAO_MULADDROW(I) a[I] += static_cast<typename ARR::type>(dot(M[I],b))
+                
                 YOCTO_TAO_LOOP(M.rows,MULADDROW);
             }
             
@@ -123,11 +125,46 @@ namespace yocto
             {
                 assert(a.size()>=M.rows);
                 assert(b.size()>=M.cols);
-#define Y_TAO_MULSUBROW(I) a[I] -= dot(M[I],b)
+#define Y_TAO_MULSUBROW(I) a[I] -= static_cast<typename ARR::type>(dot(M[I],b))
+                
                 YOCTO_TAO_LOOP(M.rows,MULSUBROW);
             }
-
             
+            
+            template <typename ARR, typename MAT, typename BRR>
+            static inline void mul_trn( ARR &a, const MAT &M, const BRR &b ) throw()
+            {
+                assert(a.size()>=M.cols);
+                assert(b.size()>=M.rows);
+                const size_t nr = M.rows;
+#define Y_TAO_MULTRN_CORE(I)           \
+typename MAT::type sum(0);             \
+for(size_t j=nr;j>0;--j) sum += M[j][I]
+#define Y_TAO_MULTRN(I) Y_TAO_MULTRN_CORE(I); a[I] = static_cast<typename ARR::type>(sum)
+                
+                YOCTO_TAO_LOOP(M.cols,MULTRN);
+            }
+            
+            template <typename ARR, typename MAT, typename BRR>
+            static inline void mul_add_trn( ARR &a, const MAT &M, const BRR &b ) throw()
+            {
+                assert(a.size()>=M.cols);
+                assert(b.size()>=M.rows);
+                const size_t nr = M.rows;
+#define Y_TAO_MULADDTRN(I) Y_TAO_MULTRN_CORE(I); a[I] += static_cast<typename ARR::type>(sum)
+                YOCTO_TAO_LOOP(M.cols,MULADDTRN);
+            }
+            
+            template <typename ARR, typename MAT, typename BRR>
+            static inline void mul_sub_trn( ARR &a, const MAT &M, const BRR &b ) throw()
+            {
+                assert(a.size()>=M.cols);
+                assert(b.size()>=M.rows);
+                const size_t nr = M.rows;
+#define Y_TAO_MULSUBTRN(I) Y_TAO_MULTRN_CORE(I); a[I] -= static_cast<typename ARR::type>(sum)
+                
+                YOCTO_TAO_LOOP(M.cols,MULSUBTRN);
+            }
             
         };
         
