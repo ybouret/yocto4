@@ -29,11 +29,11 @@ namespace yocto
 		class matrix : public object
 			{
 			public:
-                
+                YOCTO_ARGUMENTS_DECL_T;
+
 				class row : public array<T>
 				{
 				public:
-					YOCTO_ARGUMENTS_DECL_T;
 					const size_t cols;
 					virtual type       & operator[]( size_t c ) throw();
 					virtual const_type & operator[]( size_t c ) const throw();
