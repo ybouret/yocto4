@@ -95,6 +95,15 @@ namespace yocto
                 return ans;
             }
             
+            //! sum
+            template <typename ARR>
+            static inline typename ARR::type dot( const ARR &a ) throw()
+            {
+                typename ARR::type ans(0);
+#define Y_TAO_SUM(I) ans += a[I]
+                YOCTO_TAO_LOOP(a.size(),SUM);
+            }
+            
             //------------------------------------------------------------------
             //
             // Level 2: matrix/vector operations
@@ -165,6 +174,12 @@ for(size_t j=nr;j>0;--j) sum += M[j][I]
                 
                 YOCTO_TAO_LOOP(M.cols,MULSUBTRN);
             }
+            
+            //------------------------------------------------------------------
+            //
+            // Level 3: matrix/matrix operations
+            //
+            //------------------------------------------------------------------
             
         };
         
