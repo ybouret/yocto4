@@ -60,7 +60,7 @@ void test_tao(const size_t N, const size_t M)
             if(alea<double>()>0.5) vt[i] = fac * T(int( 16.0 * (alea<double>() - 0.5) ));
         }
         std::cerr << "v0=" << vt << std::endl;
-        tao::simplify(vt);
+        (void)tao::simplify(vt);
         std::cerr << "v1=" << vt << std::endl;
     }
 }
