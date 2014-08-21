@@ -32,7 +32,8 @@ void test_tao(const size_t N, const size_t M)
         }
     }
     std::cerr << "m=" << m << std::endl;
-    tao::mul(vt, m, vu);   std::cerr << vt << std::endl;
+    
+    tao::mul(vt,m,vu);     std::cerr << vt << std::endl;
     tao::mul_add(vt,m,vu); std::cerr << vt << std::endl;
     tao::mul_sub(vt,m,vu); std::cerr << vt << std::endl;
     
