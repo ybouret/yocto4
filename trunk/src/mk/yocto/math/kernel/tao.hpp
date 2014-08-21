@@ -107,7 +107,7 @@ namespace yocto
             
             //! simplify assuming integer coefficients
             template <typename ARR>
-            static inline void simplify( ARR &w ) throw()
+            static inline ptrdiff_t simplify( ARR &w ) throw()
             {
                 ptrdiff_t     g = 0;
                 const size_t  n = w.size();
@@ -125,7 +125,6 @@ namespace yocto
                         const ptrdiff_t aj = wj < 0 ? -wj : wj;
                         if(!aj)
                             continue;
-                        
                         const ptrdiff_t gij = gcd_of(ai,aj);
                         if(g<=0)
                         {
@@ -137,7 +136,6 @@ namespace yocto
                         }
                     }
                 }
-                
                 if(g>0)
                 {
                     for(size_t i=n;i>0;--i)
@@ -145,7 +143,7 @@ namespace yocto
                         w[i] /= g;
                     }
                 }
-
+                return g;
             }
             
             //------------------------------------------------------------------
