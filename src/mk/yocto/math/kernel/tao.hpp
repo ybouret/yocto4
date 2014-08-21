@@ -5,6 +5,7 @@
 #include "yocto/type/traits.hpp"
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/code/unroll.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -102,6 +103,49 @@ namespace yocto
                 typename ARR::type ans(0);
 #define Y_TAO_SUM(I) ans += a[I]
                 YOCTO_TAO_LOOP(a.size(),SUM);
+            }
+            
+            //! simplify assuming integer coefficients
+            template <typename ARR>
+            static inline void simplify( ARR &w ) throw()
+            {
+                ptrdiff_t     g = 0;
+                const size_t  n = w.size();
+                
+                for(size_t i=n;i>0;--i)
+                {
+                    const ptrdiff_t wi = (w[i] = RInt(w[i]));
+                    const ptrdiff_t ai = wi < 0 ? -wi : wi;
+                    if(!ai)
+                        continue;
+                    
+                    for(size_t j=i;j>0;--j)
+                    {
+                        const ptrdiff_t wj = (w[j] = RInt(w[j]) );
+                        const ptrdiff_t aj = wj < 0 ? -wj : wj;
+                        if(!aj)
+                            continue;
+                        
+                        const ptrdiff_t gij = gcd_of(ai,aj);
+                        if(g<=0)
+                        {
+                            g = gij;
+                        }
+                        else
+                        {
+                            g = min_of(g,gij);
+                        }
+                    }
+                }
+                
+                if(g>0)
+                {
+                    for(size_t i=n;i>0;--i)
+                    {
+                        w[i] /= g;
+                    }
+                }
+
             }
             
             //------------------------------------------------------------------

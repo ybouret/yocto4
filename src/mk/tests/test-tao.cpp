@@ -40,15 +40,29 @@ void test_tao(const size_t N, const size_t M)
     tao::mul_trn(vu, m, vt);     std::cerr << vu << std::endl;
     tao::mul_add_trn(vu, m, vt); std::cerr << vu << std::endl;
     tao::mul_sub_trn(vu, m, vt); std::cerr << vu << std::endl;
-
-    const size_t ns = 1 + alea_leq(10);
-    matrix<V> b(N,ns);
-    matrix<V> c(ns,M);
-    tao::mmul(m,b,c);
-    matrix<V> d(M,ns);
-    tao::mmul_rtrn(m,b,d);
     
+    for(size_t iter=1;iter<=10;++iter)
+    {
+        const size_t ns = 1 + alea_leq(N+M);
+        matrix<V> b(N,ns);
+        matrix<V> c(ns,M);
+        tao::mmul(m,b,c);
+        matrix<V> d(M,ns);
+        tao::mmul_rtrn(m,b,d);
+    }
     
+    for(size_t iter=1;iter<=3;++iter)
+    {
+        const T fac( int( 16.0 * (alea<double>() - 0.5) ) );
+        for(size_t i=N;i>0;--i)
+        {
+            vt[i] = T(0);
+            if(alea<double>()>0.5) vt[i] = fac * T(int( 16.0 * (alea<double>() - 0.5) ));
+        }
+        std::cerr << "v0=" << vt << std::endl;
+        tao::simplify(vt);
+        std::cerr << "v1=" << vt << std::endl;
+    }
 }
 
 
@@ -57,6 +71,6 @@ YOCTO_UNIT_TEST_IMPL(tao)
     test_tao<double,float,double>(10,12);
     test_tao<double,int,float>(8,10);
     
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
