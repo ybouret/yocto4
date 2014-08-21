@@ -19,6 +19,11 @@ INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/lua ../lua++ )
 FILE( GLOB srcs_eqs yocto/chemical/eqs/*.cpp )
 SOURCE_GROUP( chemical/eqs FILES ${srcs_eqs} )
 
+FILE( GLOB srcs_eff yocto/chemical/eff/*.cpp )
+SOURCE_GROUP( chemical/eff FILES ${srcs_eff} )
+
+
+
 ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} ${srcs_boot} ${srcs_eqs} )
 #INSTALL( TARGETS y-chemical ARCHIVE DESTINATION lib )
 

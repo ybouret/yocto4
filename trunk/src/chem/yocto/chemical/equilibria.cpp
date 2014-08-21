@@ -38,7 +38,7 @@ namespace yocto
         }
         
         
-        double equilibria:: derivate( function_type &f, const double t )
+        double equilibria:: derivate( func_type &f, const double t )
         {
             return drvs(f,t,h);
         }
