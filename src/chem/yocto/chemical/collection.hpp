@@ -2,11 +2,13 @@
 #define YOCTO_CHEMICAL_COLLECTION_INCLUDED 1
 
 #include "yocto/chemical/species.hpp"
+#include "yocto/associative/map.hpp"
 
 namespace yocto
 {
     namespace chemical
     {
+        
         
         //! a collection of species
         /**
@@ -53,8 +55,11 @@ namespace yocto
                 return os;
             }
             
+            size_t index_of(const string &name) const;
+            size_t index_of(const char   *name) const;
+            
         private:
-            species::database db;
+            species::database  db;
             YOCTO_DISABLE_COPY_AND_ASSIGN(collection);
             
         public:

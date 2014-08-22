@@ -2,13 +2,21 @@
 #define YOCTO_CHEMICAL_EFFECTOR_INCLUDED 1
 
 #include "yocto/chemical/solution.hpp"
+#include "yocto/chemical/collection.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
     namespace chemical
     {
         
-#define YOCTO_CHEMICAL_EFFECTOR_ARGS solution &dSdt, const double t, const double zeta, const solution &S, const solution &S_out
+#define YOCTO_CHEMICAL_EFFECTOR_ARGS \
+array<double>      &dSdt,   \
+const double        t,      \
+const double        zeta,   \
+const array<double> &S,     \
+const array<double> &S_out, \
+const collection    &lib
         
         class effector : public counted_object
         {
@@ -39,10 +47,11 @@ namespace yocto
             explicit effectors() throw();
             virtual ~effectors() throw();
             
-            void compute_rate( YOCTO_CHEMICAL_EFFECTOR_ARGS, solution &Stmp );
+            void compute_rate( YOCTO_CHEMICAL_EFFECTOR_ARGS );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(effectors);
+            vector<double> tmp;
         };
         
     }
