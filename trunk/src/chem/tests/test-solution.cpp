@@ -30,7 +30,9 @@ YOCTO_UNIT_TEST_IMPL(solution)
     std::cerr << "S_lua=" << S << std::endl;
     
     _lua::push(L,S,lib);
-    
+    S.ldz();
+    _lua::load(L,S,lib);
+    std::cerr << "S_lua=" << S << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
