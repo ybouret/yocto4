@@ -24,6 +24,27 @@ namespace yocto
             }
         }
         
+        void _lua:: push( lua_State *L, const array<double> &S, const collection &lib)
+        {
+            std::cerr << "pushing array as solution" << std::endl;
+            assert(L);
+            assert(S.size()>=lib.size());
+            const size_t M = lib.size();
+            lua_createtable(L, 0, M);
+            collection::const_iterator j = lib.begin();
+            for(size_t i=1;i<=M;++i,++j)
+            {
+                const species &sp = **j; assert(sp.indx==i);
+                const string  &key   = sp.name;
+                const double   value = S[i];
+                lua_pushlstring(L, key.c_str(), key.size());
+                lua_pushnumber(L,value);
+                lua_rawset(L, -3);
+            }
+        }
+        
+        
+        
         
         void _lua:: load(lua_State *L, solution &S )
         {
