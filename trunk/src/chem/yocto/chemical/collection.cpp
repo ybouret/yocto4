@@ -174,5 +174,15 @@ namespace yocto
         }
 
         
+        size_t collection:: index_of(const string &name) const
+        {
+            return (*this)[name]->indx;
+        }
+        
+        size_t collection:: index_of(const char *name) const
+        {
+            return (*this)[name]->indx;
+        }
+        
     }
 }
