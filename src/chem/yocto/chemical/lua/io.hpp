@@ -83,10 +83,15 @@ namespace yocto
             //__________________________________________________________________
             //! push solution on stack
             static void push( lua_State *L, const solution &S);
+            
+            //! push array as a solution
             static void push( lua_State *L, const array<double> &S, const collection &lib);
             
             //! read solution on stack
             static void load( lua_State *L, solution &S);
+            
+            //! read solution on stack
+            static void load( lua_State *L, array<double> &S, const collection &lib);
             
         };
         
