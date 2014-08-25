@@ -83,7 +83,7 @@ namespace yocto
         void _lua:: load( lua_State *L, array<double> &S, const collection &lib)
         {
             static const char fn[] = "_lua::load(array as solution): ";
-            
+            assert(S.size()<=lib.size());
             if(!lua_istable(L,-1))
                 throw exception("%sno  LUA_TABLE but '%s'", fn, lua_typename(L, lua_type(L, -1)));
             
@@ -105,10 +105,8 @@ namespace yocto
                 const string which  = lua_tostring(L,-2);
                 const double value  = lua_tonumber(L,-1);
                 const size_t indx   = lib.index_of(which);
-                if(indx>S.size())
-                {
-                    throw exception("%sarray is too small",fn);
-                }
+                assert(indx>0);
+                assert(indx<=lib.size());
                 S[indx] = value;
                 
                 /* removes 'value'; keeps 'key' for next iteration */
