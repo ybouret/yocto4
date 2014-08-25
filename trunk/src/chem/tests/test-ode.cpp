@@ -18,13 +18,15 @@ namespace
         collection       lib;
         equilibria       eqs;
         vector<solution> sol;
+        vector<double>   C;
         
         Cell( const string &filename ) :
         VM(),
         L( Lua::Config::DoFile(VM(),filename) ),
         lib(),
         eqs(),
-        sol(4,as_capacity)
+        sol(4,as_capacity),
+        C()
         {
             _lua::load(L,lib,"species");
             std::cerr << "lib=" << lib << std::endl;
@@ -35,6 +37,9 @@ namespace
             std::cerr << "inside=" << sol.back() << std::endl;
             prepare("outside");
             std::cerr << "outside=" << sol.back() << std::endl;
+            
+            C.make(lib.size()+2,0.0);
+            sol[1].save(C);
         }
         
         ~Cell() throw()
