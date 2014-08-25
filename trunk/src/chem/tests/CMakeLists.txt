@@ -6,6 +6,7 @@ boot-spec.lua
 co2.lua
 mix.lua
 eff.lua
+ode.lua
 )
 TARGET_LINK_YOCTO( test-chem chem mk lua++ lua)
 
@@ -17,4 +18,6 @@ ADD_TEST(Solution    test-chem solution)
 ADD_TEST(Equilibrium test-chem equilibrium)
 ADD_TEST(Equilibria  test-chem equilibria)
 ADD_TEST(Mix         test-chem mix ${CMAKE_CURRENT_SOURCE_DIR}/mix.lua)
-ADD_TEST(Effectors   test-chem eff ${CMAKE_CURRENT_SOURCE_DOR}/eff.lua)
+ADD_TEST(Effectors   test-chem eff ${CMAKE_CURRENT_SOURCE_DIR}/eff.lua)
+ADD_TEST(ODE         test-chem ode ${CMAKE_CURRENT_SOURCE_DIR}/ode.lua)
+
