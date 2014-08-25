@@ -30,7 +30,7 @@ const collection    &lib
             typedef intr_ptr<string,effector> pointer;
             typedef set<string,pointer>       database;
             
-            //! compute the rate WITHOUT the Vmax
+            //! compute the rates WITHOUT the Vmax
             virtual void call( YOCTO_CHEMICAL_EFFECTOR_ARGS ) const = 0;
             
         protected:
