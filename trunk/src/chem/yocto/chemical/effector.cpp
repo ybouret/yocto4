@@ -15,6 +15,10 @@ namespace yocto
             
         }
         
+        const string & effector:: key() const throw()
+        {
+            return name;
+        }
         
         //======================================================================
         //
@@ -40,6 +44,7 @@ namespace yocto
             for( size_t i=neff;i>0;--i,++iter)
             {
                 const effector &eff = **iter;
+                for(size_t j=M;j>0;--j) tmp[j] = 0.0;
                 eff.call(tmp, t, zeta, S, S_out, lib);
                 const double fac = eff.Vmax;
                 for(size_t j=M;j>0;--j)

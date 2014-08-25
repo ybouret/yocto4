@@ -34,17 +34,3 @@ ini =
 };
 
 
--- effector
-effectors = {
-    "MCT"
-};
-
--- one function for effector
-function MCT(t,zeta,S,S_out)
-print( "MCT@t=" .. t .. ", zeta=" .. zeta );
-    local h=S["H+"];
-ans = {};
-ans["H+"] = 1;
-ans["HO-"] = 2;
-return ans;
-end
