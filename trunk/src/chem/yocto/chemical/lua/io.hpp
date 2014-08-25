@@ -2,7 +2,7 @@
 #define YOCTO_CHEM_LUA_INCLUDED 1
 
 #include "yocto/chemical/boot.hpp"
-#include "yocto/chemical/solution.hpp"
+#include "yocto/chemical/effector.hpp"
 #include "yocto/functor.hpp"
 
 extern "C"
@@ -93,6 +93,14 @@ namespace yocto
             //! read solution on stack
             static void load( lua_State *L, array<double> &S, const collection &lib);
             
+            //__________________________________________________________________
+            //
+            // effector(s) API
+            //__________________________________________________________________
+            class effector; //!< forward lua effector
+            
+            //! load an effector into the database
+            static void load( lua_State *L, effectors &edb, const string &name, const collection &lib);
         };
         
         
