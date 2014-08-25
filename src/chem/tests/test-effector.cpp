@@ -38,7 +38,11 @@ YOCTO_UNIT_TEST_IMPL(effector)
         const effector &eff = **i;
         std::cerr << eff.name << std::endl;
         dSdt.ldz();
-        for(size_t j=S.size();j>0;--j) dSdt[j] = j;
+        for(size_t j=S.size();j>0;--j)
+        {
+            dSdt[j] = j;
+        }
+        
         eff.call(dSdt, 0.0, 0.001, S, S_out, lib);
         std::cerr << "dSdt=" << dSdt << std::endl;
     }

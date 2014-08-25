@@ -7,7 +7,7 @@ namespace yocto
         effector:: ~effector() throw()
         {
         }
-     
+        
         effector::effector( const string &id ) :
         name(id),
         Vmax(1)
@@ -39,6 +39,10 @@ namespace yocto
         {
             const size_t M = lib.size();
             tmp.make(M,0.0);
+            for(size_t j=M;j>0;--j)
+            {
+                dSdt[j] = 0;
+            }
             const size_t neff = size();
             iterator     iter = begin();
             for( size_t i=neff;i>0;--i,++iter)
@@ -53,7 +57,7 @@ namespace yocto
                 }
             }
         }
-    
+        
         
     }
 }
