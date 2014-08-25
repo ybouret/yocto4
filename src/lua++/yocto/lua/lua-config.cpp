@@ -82,7 +82,7 @@ namespace yocto
 		
 		
 		
-		void Config:: DoFile( lua_State *L, const string &filename )
+		lua_State *Config:: DoFile( lua_State *L, const string &filename )
 		{
 			assert(L);
 			lua_settop(L,0);
@@ -90,12 +90,13 @@ namespace yocto
 			{
 				throw exception("luaL_dofile( %s )", lua_tostring( L, -1 ) ); 
 			}
+            return L;
 		}
         
-        void Config:: DoFile( lua_State *L, const char *fn )
+        lua_State * Config:: DoFile( lua_State *L, const char *fn )
 		{
             const string filename = fn;
-            Config::DoFile(L,filename);
+            return Config::DoFile(L,filename);
         }
 		
 		void Config:: DoString( lua_State *L, const string &str  )

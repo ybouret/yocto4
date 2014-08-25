@@ -22,8 +22,8 @@ namespace yocto
 			template <typename T>
 			static void GetTable( lua_State *L, const string &name, sequence<T> &seq );
 			
-			static void DoFile( lua_State *L, const string &filename );
-            static void DoFile( lua_State *L, const char   *filename );
+			static lua_State *DoFile( lua_State *L, const string &filename );
+            static lua_State *DoFile( lua_State *L, const char   *filename );
             
 			static void DoString( lua_State *L, const string &code );
 			static void DoString( lua_State *L, const char   *code );
