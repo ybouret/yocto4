@@ -68,7 +68,7 @@ namespace yocto
             if( !lua_isstring(L, -1) ) throw exception("%s[%u][1] is not a string", table_name, table_indx);
             const string name = lua_tostring(L, -1);
             lua_pop(L,1);
-            std::cerr << "__parsing '" << name << "'" << std::endl;
+            //std::cerr << "__parsing '" << name << "'" << std::endl;
             
             //------------------------------------------------------------------
             // get the constant
@@ -80,7 +80,7 @@ namespace yocto
             {
                 case LUA_TNUMBER:
                 {
-                    std::cerr << "\tCONSTANT" << std::endl;
+                    //std::cerr << "\tCONSTANT" << std::endl;
                     const equilibrium::pointer p( new const_equilibrium(name, lua_tonumber(L,-1)));
                     if(!cs.insert(p))
                     {
@@ -91,7 +91,7 @@ namespace yocto
                     
                 case LUA_TSTRING:
                 {
-                    std::cerr << "\tFUNCTION" << std::endl;
+                    //std::cerr << "\tFUNCTION" << std::endl;
                     const string fn = lua_tostring(L, -1);
                     lua_getglobal(L, fn.c_str());
                     if( !lua_isfunction(L, -1))
@@ -136,6 +136,7 @@ namespace yocto
                 if(!lua_isnumber(L, -1))
                     throw exception("%s[%s]  invalid stochiometric #%u", table_name, eq_name, ia);
                 const int coef = int(lua_tonumber(L,-1));
+                
                 //-- pop factor
                 lua_pop(L,1);
                 

@@ -13,13 +13,28 @@ namespace
     class Cell
     {
     public:
-        Lua::State  VM;
-        lua_State  *L;
+        Lua::State       VM;
+        lua_State       *L;
+        collection       lib;
+        equilibria       eqs;
+        vector<solution> sol;
         
         Cell( const string &filename ) :
         VM(),
-        L( Lua::Config::DoFile(VM(),filename) )
+        L( Lua::Config::DoFile(VM(),filename) ),
+        lib(),
+        eqs(),
+        sol(4,as_capacity)
         {
+            _lua::load(L,lib,"species");
+            std::cerr << "lib=" << lib << std::endl;
+            _lua::load(L,lib, eqs, "eqs");
+            std::cerr << "eqs="<< std::endl << eqs << std::endl;
+            
+            prepare("inside");
+            std::cerr << "inside=" << sol.back() << std::endl;
+            prepare("outside");
+            std::cerr << "outside=" << sol.back() << std::endl;
         }
         
         ~Cell() throw()
@@ -29,6 +44,16 @@ namespace
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
+        void prepare( const string &bootname)
+        {
+            boot loader;
+            loader.electroneutrality(lib);
+            _lua::load(L,lib,loader,bootname);
+            std::cerr << loader << std::endl;
+            solution tmp(lib);
+            loader(tmp,lib,eqs,0.0);
+            sol.push_back(tmp);
+        }
     };
     
     
