@@ -50,3 +50,10 @@ outside =
     { 0.00, {1,"NH4+"}, { 1, "NH3" } },
     { CC, { 1, "CO2"}, {1, "HCO3-" }, { 1, "CO3--" } }
 };
+
+eff = { "Eff1" };
+
+function Eff1(t,zeta,S,S_out)
+ans = {}
+return ans;
+end

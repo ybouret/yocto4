@@ -100,7 +100,15 @@ namespace yocto
             class effector; //!< forward lua effector
             
             //! load an effector into the database
-            static void load( lua_State *L, effectors &edb, const string &name, const collection &lib);
+            static void load1( lua_State *L, effectors &edb, const string &name, const collection &lib);
+            
+            //! wrapper
+            static void load1( lua_State *L, effectors &edb, const char   *name, const collection &lib);
+
+            static void load( lua_State *L, effectors &edb, const string &list_name, const collection &lib);
+
+            //! wrapper
+            static void load( lua_State *L, effectors &edb, const char *list_name, const collection &lib);
         };
         
         
