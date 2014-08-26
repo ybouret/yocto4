@@ -2,6 +2,7 @@
 #define YOCTO_CHEMICAL_EQUILIBRIA_INCLUDED 1
 
 #include "yocto/chemical/equilibrium.hpp"
+#include "yocto/chemical/ode.hpp"
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/container/tuple.hpp"
 #include "yocto/code/rand.hpp"
@@ -68,9 +69,9 @@ namespace yocto
             vector<size_t> active;      //!< [M] number or reaction involving each species
             vector_t       dC;          //!< [M] concentrations increase (Newton's Step)
             vector<size_t> bad;         //!< [M] bad concentrations indices
-            
-            drvs_type drvs;
-            double    h;    //!< scaling for derivative, initial 1e-4
+            drvs_type      drvs;
+            double         h;    //!< scaling for derivative, initial 1e-4
+            diff_callback  callback;
             
             //__________________________________________________________________
             //
@@ -161,6 +162,7 @@ namespace yocto
         private:
             //! remove unactive columns
             void cleanPhi() throw();
+            void odecb(array<double> &Y,double t);
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
         };

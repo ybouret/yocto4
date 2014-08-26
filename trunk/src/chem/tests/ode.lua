@@ -55,5 +55,8 @@ eff = { "Eff1" };
 
 function Eff1(t,zeta,S,S_out)
 ans = {}
+local d = 1e-5;
+ans["H+"]  = d;
+ans["Cl-"] = d;
 return ans;
 end

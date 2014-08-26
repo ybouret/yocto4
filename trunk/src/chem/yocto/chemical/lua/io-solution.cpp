@@ -26,7 +26,7 @@ namespace yocto
         
         void _lua:: push( lua_State *L, const array<double> &S, const collection &lib)
         {
-            std::cerr << "pushing array as solution" << std::endl;
+            //std::cerr << "pushing array as solution" << std::endl;
             assert(L);
             assert(S.size()>=lib.size());
             const size_t M = lib.size();
