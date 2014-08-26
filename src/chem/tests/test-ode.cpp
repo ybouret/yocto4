@@ -70,10 +70,18 @@ namespace
             S.load(Y);
             const double zeta = Y[iZ];
             
-            //compute rates
+            
+            
+            //compute chemical rates
             edb.compute_rate(dYdt, t, zeta, S, sol[2],lib);
             
+            // append other
+            
+            
             //modify rates
+            //std::cerr << "rates0="<< dYdt << std::endl;
+            eqs.absorb(t, dYdt, Y);
+            //std::cerr << "rates1="<< dYdt << std::endl;
         }
         
     private:
@@ -104,6 +112,22 @@ YOCTO_UNIT_TEST_IMPL(ode)
     vector<double> C(cell.nvar,0);
     cell.sol[1].save(C);
     std::cerr << "C="<< C << std::endl;
+    diff_solver odeint(1e-7);
+    odeint.start(cell.nvar);
+    
+    double h1=1e-4;
+    diff_equation Eq( &cell, & Cell::rates );
+    
+    const double dt = 1e-2;
+    double t = 0;
+    while( t <= 1.0 )
+    {
+        const double t_next = t+dt;
+        odeint(Eq,C,t,t_next,h1,&cell.eqs.callback);
+        t = t_next;
+        std::cerr << "C="<< C << std::endl;
+    }
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

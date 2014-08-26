@@ -33,10 +33,17 @@ namespace yocto
         dC(),
         bad(),
         drvs(),
-        h(1e-4)
+        h(1e-4),
+        callback(this,& equilibria::odecb )
         {
         }
         
+        
+        void equilibria:: odecb(array<double> &Y, double t)
+        {
+            if(!normalize(t,Y,true))
+                throw exception("ODE: unable to normalize trial concentrations");
+        }
         
         double equilibria:: derivate( func_type &f, const double t )
         {
