@@ -3,6 +3,7 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/chemical/lua/io.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 using namespace yocto;
 using namespace chemical;
@@ -118,14 +119,18 @@ YOCTO_UNIT_TEST_IMPL(ode)
     double h1=1e-4;
     diff_equation Eq( &cell, & Cell::rates );
     
-    const double dt = 1e-2;
+    ios::ocstream fp("out.dat",false);
+    const double dt = 5e-2;
     double t = 0;
-    while( t <= 1.0 )
+    fp("%g %g\n", t, cell.sol[1].pH() );
+    while( t <= 10.0 )
     {
         const double t_next = t+dt;
         odeint(Eq,C,t,t_next,h1,&cell.eqs.callback);
+        cell.sol[1].load(C);
         t = t_next;
         std::cerr << "C="<< C << std::endl;
+        fp("%g %g\n", t, cell.sol[1].pH() );
     }
     
     
