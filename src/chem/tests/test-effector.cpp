@@ -27,7 +27,7 @@ YOCTO_UNIT_TEST_IMPL(effector)
     std::cerr << "S="<< S << std::endl;
     
     effectors edb;
-    _lua::load(L, edb, "eff1", lib);
+    _lua::load1(L, edb, "eff1", lib);
     
     std::cerr << "Effectors: " << std::endl;
     vector<double> S_out(S.size(),0.0);

@@ -17,19 +17,33 @@ namespace
         lua_State       *L;
         collection       lib;
         equilibria       eqs;
+        effectors        edb;
         vector<solution> sol;
-        vector<double>   C;
+        const size_t     M;
+        const size_t     iZ;
+        const size_t     iV;
+        const size_t     nvar;
         
         Cell( const string &filename ) :
         VM(),
         L( Lua::Config::DoFile(VM(),filename) ),
         lib(),
         eqs(),
+        edb(),
         sol(4,as_capacity),
-        C()
+        M(0),
+        iZ(0),
+        iV(0),
+        nvar(0)
         {
             _lua::load(L,lib,"species");
             std::cerr << "lib=" << lib << std::endl;
+            size_t   count = lib.size();
+            (size_t&)M    = count;
+            (size_t&)iZ   = ++count;
+            (size_t&)iV   = ++count;
+            (size_t&)nvar = count;
+            
             _lua::load(L,lib, eqs, "eqs");
             std::cerr << "eqs="<< std::endl << eqs << std::endl;
             
@@ -38,14 +52,29 @@ namespace
             prepare("outside");
             std::cerr << "outside=" << sol.back() << std::endl;
             
-            C.make(lib.size()+2,0.0);
-            sol[1].save(C);
+            {
+                solution tmp(lib);
+                sol.push_back(tmp);
+            }
+            
+            _lua::load(L,edb,"eff",lib);
         }
         
         ~Cell() throw()
         {
         }
         
+        void rates( array<double> &dYdt, double t, const array<double> &Y )
+        {
+            solution &S = sol[3];
+            S.load(Y);
+            const double zeta = Y[iZ];
+            
+            //compute rates
+            edb.compute_rate(dYdt, t, zeta, S, sol[2],lib);
+            
+            //modify rates
+        }
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
@@ -71,6 +100,10 @@ YOCTO_UNIT_TEST_IMPL(ode)
         throw exception("need a filename");
     }
     Cell cell(argv[1]);
+    
+    vector<double> C(cell.nvar,0);
+    cell.sol[1].save(C);
+    std::cerr << "C="<< C << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -36,7 +36,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 //-- push the arguments
                 //--------------------------------------------------------------
-
+                
                 // push time
                 lua_pushnumber(L,t);
                 
@@ -66,13 +66,12 @@ namespace yocto
             
         };
         
-        void _lua:: load( lua_State *L, effectors &edb, const string &name, const collection &lib)
+        void _lua:: load1( lua_State *L, effectors &edb, const string &name, const collection &lib)
         {
-            static const char fn[] = "_lua.load_effector: ";
+            static const char fn[] = "load_effector: ";
             assert(L);
             
             // get the name
-            lua_settop(L,0);
             const char *id = name.c_str();
             lua_getglobal(L,id);
             if( !lua_isfunction(L, -1) )
@@ -83,10 +82,41 @@ namespace yocto
             if( !edb.insert(eff) )
                 throw exception("%smultiple effector '%s'",fn,id);
             
-            // done...
+            lua_pop(L,1);
         }
         
+        void _lua::load1( lua_State *L, effectors &edb, const char   *name, const collection &lib)
+        {
+            const string Name(name);
+            load1(L, edb, Name, lib);
+        }
         
+        void _lua:: load(lua_State *L, effectors &edb, const string &list_name, const collection &lib)
+        {
+            static const char fn[] = "load_effectors: ";
+            assert(L);
+            const char *id = list_name.c_str();
+            lua_getglobal(L,id);
+            if( !lua_istable(L,-1) )
+            {
+                throw exception("%s%s is not a table",fn,id);
+            }
+            const size_t n = lua_rawlen(L,-1);
+            for(size_t i=1;i<=n;++i)
+            {
+                // get the effector name
+                lua_rawgeti(L, -1, i);
+                std::cerr << "New Effector: {" << lua_tostring(L, -1) << "}" << std::endl;
+                load1(L, edb, lua_tostring(L, -1), lib);
+                lua_pop(L, 1);
+            }
+        }
+        
+        void _lua:: load(lua_State *L, effectors &edb, const char *list_name, const collection &lib)
+        {
+            const string ListName(list_name);
+            load(L,edb,ListName,lib);
+        }
     }
     
 }
