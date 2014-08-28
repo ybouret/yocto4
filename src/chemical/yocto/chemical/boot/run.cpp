@@ -213,6 +213,8 @@ namespace yocto
                 vector_t          dV;
                 vector_t          V0;
                 vector_t          C0;
+                numeric<double>::scalar_field CG_FUNC;
+                numeric<double>::vector_field CG_GRAD;
                 
                 static const char fn[];
                 
@@ -248,7 +250,9 @@ namespace yocto
                 rhs(),
                 dV(),
                 V0(),
-                C0()
+                C0(),
+                CG_FUNC(this, &BootManager::cg_scalar),
+                CG_GRAD(this, &BootManager::cg_vector)
                 {
                     //__________________________________________________________
                     //
@@ -383,8 +387,10 @@ namespace yocto
                         // Orthogonal matrix Q to P
                         //______________________________________________________
                         buildQ();
-                        //std::cerr << "Q=" << Q << std::endl;
-                        //std::cerr << "q=" << q << std::endl;
+#if defined(Y_SHOW_CHEM_BOOT)
+                        std::cerr << "Q=" << Q << std::endl;
+                        std::cerr << "q=" << q << std::endl;
+#endif
                         Method2();
                         
                         
@@ -442,6 +448,12 @@ namespace yocto
                     mkl::mul(g,Q,df);
                 }
                 
+                inline
+                void optimizeV()
+                {
+                    (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
+                }
+                
                 //______________________________________________________________
                 //
                 // compute the RMS of Lambda-P*Cstar
@@ -496,7 +508,6 @@ namespace yocto
                 {
                     mkl::set(C,Cstar);
                     mkl::muladd_trn(C, Q, V);
-                    
                 }
                 
                 //______________________________________________________________
@@ -551,18 +562,17 @@ namespace yocto
                     //
                     // Find a good starting point
                     //__________________________________________________________
-                    numeric<double>::scalar_field CG_FUNC(this, &BootManager::cg_scalar);
-                    numeric<double>::vector_field CG_GRAD(this, &BootManager::cg_vector);
+                    
                     
                     //__________________________________________________________
                     //
                     // compute initial V and C
                     //__________________________________________________________
                 PREPARE_C:
-                    prepareC(); // a random composition
-                    computeV(); // its V factor
-                    (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
-                    computeC(); // a compatible composition
+                    prepareC();  // a random composition
+                    computeV();  // its V factor
+                    optimizeV(); // make a mostly positive C
+                    computeC();  // a compatible composition
                     
                     mkl::set(C0,C);             // save C
                     eqs.updateGammaAndPhi(C);   // initialize Gamma and Phi
@@ -597,21 +607,23 @@ namespace yocto
                         //______________________________________________________
                         if(F1>=F0)
                         {
-                            //std::cerr << "#Need to optimise" << std::endl;
                             triplet<double> XX = { 0,  1,  1};
                             triplet<double> FF = { F0, F1, F1};
                             (void)bracket<double>::inside(F, XX, FF);
                             minimize<double>(F, XX, FF, 0);
                             alpha = XX.b;
-                            //std::cerr << "alpha=" << alpha << std::endl;
                         }
                         
                         //______________________________________________________
                         //
                         // compute the new value
                         //______________________________________________________
-                        for(size_t i=N;i>0;--i) { V[i] = V0[i] + alpha * dV[i]; }
-                        (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
+                        std::cerr << "alpha=" << alpha << std::endl;
+                        for(size_t i=N;i>0;--i)
+                        {
+                            V[i] = V0[i] + alpha * dV[i];
+                        }
+                        optimizeV();
                         computeC();
                         eqs.updateGammaAndPhi(C); // prepare for next step
                         for(size_t j=M;j>0;--j)
@@ -619,10 +631,13 @@ namespace yocto
                             dX[j] = C[j] - C0[j];
                         }
                         
+                        
+                        
                         //______________________________________________________
                         //
                         // until numerical underflow
                         //______________________________________________________
+                        std::cerr << "dX="<< dX << std::endl;
                         const double newRMS = StepRMS();
                         if(newRMS<=0)
                         {
@@ -764,6 +779,7 @@ namespace yocto
                     {
                         V[i] = V0[i] + alpha * dV[i];
                     }
+                    optimizeV();
                     computeC();
                     eqs.updateGamma(C);
                     return GammaRMS();
