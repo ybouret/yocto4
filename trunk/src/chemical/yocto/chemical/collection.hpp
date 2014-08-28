@@ -65,6 +65,7 @@ namespace yocto
         public:
             const size_t max_name_length;
             void find_max_name_length() const throw();
+            bool is_consistent() const throw();
             
         };
     }

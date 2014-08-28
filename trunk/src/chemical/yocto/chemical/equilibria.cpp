@@ -38,6 +38,15 @@ namespace yocto
         {
         }
         
+        equilibrium & equilibria:: add( const string &id, const double Konst)
+        {
+            equilibrium::pointer p( new const_equilibrium(id,Konst) );
+            if( !insert(p) )
+                throw exception("equilibria::add(multiple '%s')", id.c_str() );
+            return *p;
+        }
+
+        
         
         void equilibria:: odecb(array<double> &Y, double t)
         {
