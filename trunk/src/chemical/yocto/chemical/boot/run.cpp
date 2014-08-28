@@ -178,6 +178,8 @@ namespace yocto
                 }
             }
             
+#define Y_SHOW_CHEM_BOOT
+            
             class BootManager
             {
             public:
@@ -288,7 +290,7 @@ namespace yocto
                         cc.fill(P[i]);
                     }
                     
-#if 0
+#if defined(Y_SHOW_CHEM_BOOT)
                     std::cerr << "P0     =" << P       << std::endl;
                     std::cerr << "Lambda0=" << Lambda  << std::endl;
 #endif
@@ -306,7 +308,7 @@ namespace yocto
                         
                         
                         
-#if 0
+#if defined(Y_SHOW_CHEM_BOOT)
                         std::cerr << "#fix=" << nfix << std::endl;
                         std::cerr << "ifixed=" << ifixed << std::endl;
                         std::cerr << "Cfixed=" << Cfixed << std::endl;
@@ -358,7 +360,7 @@ namespace yocto
                         //______________________________________________________
                         eqs.computeK(t);
                         eqs.compute_scaled_concentrations();
-#if 0
+#if defined(Y_SHOW_CHEM_BOOT)
                         std::cerr << "K     =" << eqs.K      << std::endl;
                         std::cerr << "scaled=" << eqs.scaled << std::endl;
                         std::cerr << "gammaC=" << eqs.gammaC << std::endl;
@@ -406,7 +408,7 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(BootManager);
                 
-                double cg_scalar( const array<double> &Vtry )
+                inline double cg_scalar( const array<double> &Vtry ) throw()
                 {
                     mkl::set(C,Cstar);
                     mkl::muladd_trn(C,Q,Vtry);
@@ -421,7 +423,7 @@ namespace yocto
                     return f*0.5;
                 }
                 
-                void cg_vector( array<double> &g, const array<double> &Vtry )
+                inline void cg_vector( array<double> &g, const array<double> &Vtry ) throw()
                 {
                     mkl::set(C,Cstar);
                     mkl::muladd_trn(C,Q,Vtry);
@@ -536,7 +538,7 @@ namespace yocto
                     V0.make(N,0.0);
                     C0.make(M,0.0);
                     compute_Cstar();
-                    //std::cerr << "Cstar=" << Cstar << std::endl;
+                    std::cerr << "Cstar=" << Cstar << std::endl;
                     
                     
                     //__________________________________________________________
@@ -569,7 +571,7 @@ namespace yocto
                     for(unsigned count=1;
                         ;++count)
                     {
-                        //std::cerr << "C=" << C << std::endl;
+                        std::cerr << "C=" << C << std::endl;
                         //______________________________________________________
                         //
                         // Compute the full Newton's step
