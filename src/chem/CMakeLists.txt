@@ -3,7 +3,7 @@ PROJECT(chem)
 FILE( GLOB decl yocto/chemical/*.hpp)
 FILE( GLOB impl yocto/chemical/*.cpp)
 SET( srcs ${decl} ${impl} )
-#INSTALL( FILES ${decl} DESTINATION include/yocto/chemical )
+INSTALL( FILES ${decl} DESTINATION include/yocto/chemical )
 SOURCE_GROUP( chemical FILES ${srcs} )
 
 FILE( GLOB decl_lua yocto/chemical/lua/*.hpp)
