@@ -77,6 +77,7 @@ namespace yocto
             //
             // API
             //__________________________________________________________________
+           
             //! helper
             equilibrium & add( const string &id, const double Konst);
             
@@ -93,7 +94,7 @@ namespace yocto
             //! release memory
             void  cleanup() throw();
             
-            //! restore from Nu0
+            //! restore from Nu0 and find_active_species()
             void restore_topology() throw();
             
             
