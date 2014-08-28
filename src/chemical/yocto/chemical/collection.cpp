@@ -46,6 +46,7 @@ namespace yocto
             {
                 (size_t&)max_name_length = name.size();
             }
+            assert(is_consistent());
             return *p;
         }
         
@@ -64,7 +65,7 @@ namespace yocto
                 rebuild_indices();
                 find_max_name_length();
             }
-            
+            assert(is_consistent());
         }
         
         
@@ -138,6 +139,7 @@ namespace yocto
         
         void collection:: find_max_name_length() const throw()
         {
+            assert(is_consistent());
             const_iterator i = db.begin();
             const size_t   n = db.size();
             size_t         m = 0;
@@ -154,6 +156,7 @@ namespace yocto
 
         void collection:: output( std::ostream &os ) const
         {
+            assert(is_consistent());
             os << "{" << std::endl;
             for(const_iterator i=begin();i!=end();++i)
             {
@@ -176,13 +179,27 @@ namespace yocto
         
         size_t collection:: index_of(const string &name) const
         {
+            assert(is_consistent());
             return (*this)[name]->indx;
         }
         
         size_t collection:: index_of(const char *name) const
         {
+            assert(is_consistent());
             return (*this)[name]->indx;
         }
+        
+        bool collection:: is_consistent() const throw()
+        {
+            size_t j=1;
+            for(const_iterator i=begin();i!=end();++i,++j)
+            {
+                if( (*i)->indx != j )
+                    return false;
+            }
+            return true;
+        }
+
         
     }
 }

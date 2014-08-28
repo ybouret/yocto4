@@ -77,6 +77,11 @@ namespace yocto
             //
             // API
             //__________________________________________________________________
+            //! helper
+            equilibrium & add( const string &id, const double Konst);
+            
+            
+            //! function derivative using internal derivator
             double derivate( func_type &f, const double t);
             
             //! allocate memory, find Nu0 and Nu, find_active_species()

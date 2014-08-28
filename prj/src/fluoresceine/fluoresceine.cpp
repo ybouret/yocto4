@@ -61,7 +61,7 @@ namespace
                 fluo.add( lib["Fl-"], 1);
             }
             
-            cs.build_from(lib);
+            cs.startup(lib);
             
             
             
@@ -81,7 +81,7 @@ namespace
             //==================================================================
             // Create the initializer
             //==================================================================
-            boot::loader ini;
+            boot  ini;
             
             //------------------------------------------------------------------
             //-- electroneutrality
@@ -103,14 +103,14 @@ namespace
             if(Vb<0)
             {
                 const double ConcCl = (-Vb) * Cb / V0;
-                ini.define( lib["Cl-"], ConcCl );
-                ini.define( lib["Na+"], 0      );
+                ini.conserve( lib["Cl-"], ConcCl );
+                ini.conserve( lib["Na+"], 0      );
             }
             else
             {
                 const double ConcNa = Vb * Cb / V0;
-                ini.define( lib["Na+"], ConcNa );
-                ini.define( lib["Cl-"], 0 );
+                ini.conserve( lib["Na+"], ConcNa );
+                ini.conserve( lib["Cl-"], 0 );
             }
             
             std::cerr << "ini=" << std::endl;
@@ -125,13 +125,9 @@ namespace
             //------------------------------------------------------------------
             //-- initialize cs.C at time=0
             //------------------------------------------------------------------
-            ini(cs,*this,0.0);
+            ini(s,lib,cs,0.0);
             //ini.find(cs,*this,0.0);
             
-            //------------------------------------------------------------------
-            //-- fetch
-            //------------------------------------------------------------------
-            s.load(cs.C);
             
             //std::cerr << s << std::endl;
             //std::cerr << "pH=" << s.pH() << std::endl;

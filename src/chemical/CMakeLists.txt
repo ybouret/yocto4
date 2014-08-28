@@ -24,7 +24,7 @@ SOURCE_GROUP( chemical/eff FILES ${srcs_eff} )
 
 
 
-ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} ${srcs_boot} ${srcs_eqs} )
+ADD_LIBRARY( y-chemical STATIC ${srcs} ${srcs_lua} ${srcs_boot} ${srcs_eqs} )
 INSTALL( TARGETS y-chemical ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
