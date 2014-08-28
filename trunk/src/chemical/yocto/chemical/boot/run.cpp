@@ -11,6 +11,8 @@
 
 #include <cstdlib>
 
+#include "yocto/ios/ocstream.hpp"
+
 namespace yocto
 {
     
@@ -178,7 +180,7 @@ namespace yocto
                 }
             }
             
-#define Y_SHOW_CHEM_BOOT
+//#define Y_SHOW_CHEM_BOOT
             
             class BootManager
             {
@@ -451,7 +453,15 @@ namespace yocto
                 inline
                 void optimizeV()
                 {
-                    (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
+                    computeC();
+                    for(size_t j=M;j>0;--j)
+                    {
+                        if(eqs.active[j]>0&&C[j]<0)
+                        {
+                            cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
+                            return;
+                        }
+                    }
                 }
                 
                 //______________________________________________________________
@@ -549,7 +559,7 @@ namespace yocto
                     V0.make(N,0.0);
                     C0.make(M,0.0);
                     compute_Cstar();
-                    std::cerr << "Cstar=" << Cstar << std::endl;
+                    //std::cerr << "Cstar=" << Cstar << std::endl;
                     
                     
                     //__________________________________________________________
@@ -578,11 +588,12 @@ namespace yocto
                     eqs.updateGammaAndPhi(C);   // initialize Gamma and Phi
                     double F0 = GammaRMS();     // objective function
                     
+                    //ios::ocstream fp("rms.dat",false);
                     for(unsigned count=1;
-                        //count <= 3
+                        count <= 20
                         ;++count)
                     {
-                        std::cerr << "C=" << C << std::endl;
+                        //std::cerr << "C=" << C << std::endl;
                         //______________________________________________________
                         //
                         // Compute the full Newton's step
@@ -618,38 +629,45 @@ namespace yocto
                         //
                         // compute the new value
                         //______________________________________________________
-                        std::cerr << "alpha=" << alpha << std::endl;
+                        
                         for(size_t i=N;i>0;--i)
                         {
                             V[i] = V0[i] + alpha * dV[i];
                         }
+                        
                         optimizeV();
                         computeC();
                         eqs.updateGammaAndPhi(C); // prepare for next step
+                        if(fabs(alpha)<=0)
+                        {
+                            break;
+                        }
                         for(size_t j=M;j>0;--j)
                         {
                             dX[j] = C[j] - C0[j];
                         }
                         
                         
-                        
                         //______________________________________________________
                         //
                         // until numerical underflow
                         //______________________________________________________
-                        std::cerr << "dX="<< dX << std::endl;
                         const double newRMS = StepRMS();
                         if(newRMS<=0)
                         {
                             break;
                         }
-                        
-                        F0 = GammaRMS();
+                        const double F2 = GammaRMS();
+                        if(F2>=F0)
+                        {
+                            break;
+                        }
+                        F0 = F2;
+                        //fp("%u %g %g\n", count, log10(newRMS), F0);
                         mkl::set(C0,C);
                         
                     }
                     
-                    //exit(1);
                     
                     //std::cerr << "#Newton II converged: check..." << std::endl;
                     //std::cerr << "C1="     << C << std::endl;
@@ -765,220 +783,220 @@ namespace yocto
                     {
                         std::cerr << "#unexpected singular concentrations, level-2" << std::endl;
                         return false;
-                    }
-                    mkl::neg(rhs,eqs.Gamma);
-                    mkl::set(dV,rhs);
-                    crout<double>::solve(iPhiQ,dV);
-                    crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
-                    return true;
-                }
-                
-                inline double Func(const double alpha) throw()
-                {
-                    for(size_t i=N;i>0;--i)
-                    {
-                        V[i] = V0[i] + alpha * dV[i];
-                    }
-                    optimizeV();
-                    computeC();
-                    eqs.updateGamma(C);
-                    return GammaRMS();
-                }
-                
-                
-                
-                //______________________________________________________________
-                //
-                // build the J=P*P' matrix
-                // and its adjoint A such that J*A=Id * D
-                //______________________________________________________________
-                inline void buildJ()
-                {
-                    J.make(Nc,Nc);
-                    mkl::mul_rtrn(J,P,P);
-                    rint_matrix(J);
-                    (integer_t &)D = RInt(determinant_of(J)); //!< J is preserved
-                    if(!D)
-                        throw exception("%ssingular constraints",fn);
-                    //std::cerr << "J=" << J << std::endl;
-                    //std::cerr << "D=" << D << std::endl;
-                    A.make(Nc,Nc);
-                    adjoint(A,J);
-                    rint_matrix(A);
-                    //std::cerr << "A=" << A << std::endl;
-                }
-                
-                //______________________________________________________________
-                //
-                // buil the exact integer orthogonal matrix to P
-                //______________________________________________________________
-                inline void buildQ()
-                {
-                    Q.make(N,M);
-                    matrix_t F(M,M);
-                    for(size_t i=Nc;i>0;--i)
-                    {
-                        for(size_t j=M;j>0;--j)
-                        {
-                            F[i][j] = P[i][j];
                         }
-                    }
-                    
-                    for(size_t i=N;i>0;--i)
-                    {
-                        for(size_t j=M;j>0;--j)
-                        {
-                            F[Nc+i][j] = eqs.Nu[i][j];
-                        }
-                    }
-                    
-                    if( RInt(determinant_of(F)) == 0)
-                    {
-                        throw exception("%sconstraints are colinear to reactions",fn);
-                    }
-                    
-                    boot::igs(F);
-                    for(size_t i=N;i>0;--i)
-                    {
-                        for(size_t j=M;j>0;--j)
-                        {
-                            Q[i][j] = F[Nc+i][j];
-                        }
-                    }
-                    q.make(N,0);
-                    for(size_t i=N;i>0;--i)
-                    {
-                        integer_t sum = 0;
-                        for(size_t j=M;j>0;--j)
-                        {
-                            const integer_t Qi = integer_t(Q[i][j]);
-                            sum += Qi * Qi;
-                        }
-                        q[i] = sum;
-                    }
-                    
-                }
-                
-                //______________________________________________________________
-                //
-                // Prepare a concentration
-                //______________________________________________________________
-                inline void prepareC()
-                {
-                    eqs.generate(C,loader.ran);
-                    for(size_t j=nfix;j>0;--j)
-                    {
-                        C[ ifixed[j] ] = Cfixed[j];
-                    }
-                }
-                
-                //______________________________________________________________
-                //
-                // dX to project C on P*C-Lambda=0
-                //______________________________________________________________
-                inline void compute_dL() throw()
-                {
-                    mkl::set(dL,Lambda);
-                    mkl::mulsub(dL,P,C);
-                }
-                
-                //______________________________________________________________
-                //
-                // numerically solve P*C=Lambda
-                //______________________________________________________________
-                inline double prjrms()  throw()
-                {
-                    compute_dL();
-                    double sq = 0;
-                    for(size_t i=Nc;i>0;--i)
-                    {
-                        sq += Square(dL[i]);
-                    }
-                    return sqrt(sq/Nc);
-                }
-                
-                inline void projectC()
-                {
-                    
-                    // initialize
-                    double old_rms = prjrms();
-                    while(true)
-                    {
-                        mkl::mul(dX,PA,dL);
-                        for(size_t j=M;j>0;--j)
-                        {
-                            const double Cj = C[j];
-                            C1[j] = Cj;
-                            C[j] = (D*Cj+dX[j])/D;
+                        mkl::neg(rhs,eqs.Gamma);
+                        mkl::set(dV,rhs);
+                        crout<double>::solve(iPhiQ,dV);
+                        crout<double>::improve(dV, PhiQ, iPhiQ, rhs);
+                        return true;
                         }
                         
-                        const double new_rms = prjrms();
-                        //std::cerr << "old_rms=" << old_rms << "; new_rms=" << new_rms << ";" << std::endl;
-                        if(new_rms>=old_rms)
+                        inline double Func(const double alpha) throw()
                         {
-                            mkl::set(C,C1);
-                            return;
+                            for(size_t i=N;i>0;--i)
+                            {
+                                V[i] = V0[i] + alpha * dV[i];
+                            }
+                            optimizeV();
+                            computeC();
+                            eqs.updateGamma(C);
+                            return GammaRMS();
                         }
-                        old_rms = new_rms;
-                    }
-                    
-                }
-                
-                
-                //______________________________________________________________
-                //
-                // preconditionned Gamma RMS
-                //______________________________________________________________
-                inline double GammaRMS() const throw()
-                {
-                    double sum = 0;
-                    for(size_t i=N;i>0;--i)
-                    {
-                        const double d = eqs.Gamma[i] / eqs.gammaC[i];
-                        sum += d*d;
-                    }
-                    return sqrt(sum/N);
-                }
-                
-                //______________________________________________________________
-                //
-                // Step RMS
-                //______________________________________________________________
-                inline double StepRMS() const throw()
-                {
-                    double sq = 0;
-                    for(size_t j=M;j>0;--j)
-                    {
-                        sq += Square(dX[j]);
-                    }
-                    
-                    return sqrt(sq/M);
-                }
-                
-                
-            };
-            
-            const char BootManager::fn[] = "chemical::boot: ";
-            
-            
-        }
-        
-        void boot:: operator()(array<double>    &C0,
-                               const collection &lib,
-                               equilibria       &cs,
-                               double            t )
-        {
-            assert(C0.size()>=lib.size());
-            BootManager mgr(lib,cs,*this,t);
-            for(size_t i=lib.size();i>0;--i)
-            {
-                C0[i] = mgr.C[i];
-            }
-            
-        }
-        
-        
-    }
-    
-    
-}
+                        
+                        
+                        
+                        //______________________________________________________________
+                        //
+                        // build the J=P*P' matrix
+                        // and its adjoint A such that J*A=Id * D
+                        //______________________________________________________________
+                        inline void buildJ()
+                        {
+                            J.make(Nc,Nc);
+                            mkl::mul_rtrn(J,P,P);
+                            rint_matrix(J);
+                            (integer_t &)D = RInt(determinant_of(J)); //!< J is preserved
+                            if(!D)
+                                throw exception("%ssingular constraints",fn);
+                            //std::cerr << "J=" << J << std::endl;
+                            //std::cerr << "D=" << D << std::endl;
+                            A.make(Nc,Nc);
+                            adjoint(A,J);
+                            rint_matrix(A);
+                            //std::cerr << "A=" << A << std::endl;
+                        }
+                        
+                        //______________________________________________________________
+                        //
+                        // buil the exact integer orthogonal matrix to P
+                        //______________________________________________________________
+                        inline void buildQ()
+                        {
+                            Q.make(N,M);
+                            matrix_t F(M,M);
+                            for(size_t i=Nc;i>0;--i)
+                            {
+                                for(size_t j=M;j>0;--j)
+                                {
+                                    F[i][j] = P[i][j];
+                                }
+                            }
+                            
+                            for(size_t i=N;i>0;--i)
+                            {
+                                for(size_t j=M;j>0;--j)
+                                {
+                                    F[Nc+i][j] = eqs.Nu[i][j];
+                                }
+                            }
+                            
+                            if( RInt(determinant_of(F)) == 0)
+                            {
+                                throw exception("%sconstraints are colinear to reactions",fn);
+                            }
+                            
+                            boot::igs(F);
+                            for(size_t i=N;i>0;--i)
+                            {
+                                for(size_t j=M;j>0;--j)
+                                {
+                                    Q[i][j] = F[Nc+i][j];
+                                }
+                            }
+                            q.make(N,0);
+                            for(size_t i=N;i>0;--i)
+                            {
+                                integer_t sum = 0;
+                                for(size_t j=M;j>0;--j)
+                                {
+                                    const integer_t Qi = integer_t(Q[i][j]);
+                                    sum += Qi * Qi;
+                                }
+                                q[i] = sum;
+                            }
+                            
+                        }
+                        
+                        //______________________________________________________________
+                        //
+                        // Prepare a concentration
+                        //______________________________________________________________
+                        inline void prepareC()
+                        {
+                            eqs.generate(C,loader.ran);
+                            for(size_t j=nfix;j>0;--j)
+                            {
+                                C[ ifixed[j] ] = Cfixed[j];
+                            }
+                        }
+                        
+                        //______________________________________________________________
+                        //
+                        // dX to project C on P*C-Lambda=0
+                        //______________________________________________________________
+                        inline void compute_dL() throw()
+                        {
+                            mkl::set(dL,Lambda);
+                            mkl::mulsub(dL,P,C);
+                        }
+                        
+                        //______________________________________________________________
+                        //
+                        // numerically solve P*C=Lambda
+                        //______________________________________________________________
+                        inline double prjrms()  throw()
+                        {
+                            compute_dL();
+                            double sq = 0;
+                            for(size_t i=Nc;i>0;--i)
+                            {
+                                sq += Square(dL[i]);
+                            }
+                            return sqrt(sq/Nc);
+                        }
+                        
+                        inline void projectC()
+                        {
+                            
+                            // initialize
+                            double old_rms = prjrms();
+                            while(true)
+                            {
+                                mkl::mul(dX,PA,dL);
+                                for(size_t j=M;j>0;--j)
+                                {
+                                    const double Cj = C[j];
+                                    C1[j] = Cj;
+                                    C[j] = (D*Cj+dX[j])/D;
+                                }
+                                
+                                const double new_rms = prjrms();
+                                //std::cerr << "old_rms=" << old_rms << "; new_rms=" << new_rms << ";" << std::endl;
+                                if(new_rms>=old_rms)
+                                {
+                                    mkl::set(C,C1);
+                                    return;
+                                }
+                                old_rms = new_rms;
+                            }
+                            
+                        }
+                        
+                        
+                        //______________________________________________________________
+                        //
+                        // preconditionned Gamma RMS
+                        //______________________________________________________________
+                        inline double GammaRMS() const throw()
+                        {
+                            double sum = 0;
+                            for(size_t i=N;i>0;--i)
+                            {
+                                const double d = eqs.Gamma[i] / eqs.gammaC[i];
+                                sum += d*d;
+                            }
+                            return sqrt(sum/N);
+                        }
+                        
+                        //______________________________________________________________
+                        //
+                        // Step RMS
+                        //______________________________________________________________
+                        inline double StepRMS() const throw()
+                        {
+                            double sq = 0;
+                            for(size_t j=M;j>0;--j)
+                            {
+                                sq += Square(dX[j]);
+                            }
+                            
+                            return sqrt(sq/M);
+                        }
+                        
+                        
+                        };
+                        
+                        const char BootManager::fn[] = "chemical::boot: ";
+                        
+                        
+                        }
+                        
+                        void boot:: operator()(array<double>    &C0,
+                                               const collection &lib,
+                                               equilibria       &cs,
+                                               double            t )
+                        {
+                            assert(C0.size()>=lib.size());
+                            BootManager mgr(lib,cs,*this,t);
+                            for(size_t i=lib.size();i>0;--i)
+                            {
+                                C0[i] = mgr.C[i];
+                            }
+                            
+                        }
+                        
+                        
+                        }
+                        
+                        
+                        }
