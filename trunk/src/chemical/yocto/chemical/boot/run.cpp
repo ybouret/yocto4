@@ -611,8 +611,8 @@ namespace yocto
                         // compute the new value
                         //______________________________________________________
                         for(size_t i=N;i>0;--i) { V[i] = V0[i] + alpha * dV[i]; }
-                        computeC();
                         (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
+                        computeC();
                         eqs.updateGammaAndPhi(C); // prepare for next step
                         for(size_t j=M;j>0;--j)
                         {
