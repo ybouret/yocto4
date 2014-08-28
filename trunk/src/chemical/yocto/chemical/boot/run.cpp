@@ -561,7 +561,7 @@ namespace yocto
                 PREPARE_C:
                     prepareC(); // a random composition
                     computeV(); // its V factor
-                    (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol);
+                    (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
                     computeC(); // a compatible composition
                     
                     mkl::set(C0,C);             // save C
@@ -569,6 +569,7 @@ namespace yocto
                     double F0 = GammaRMS();     // objective function
                     
                     for(unsigned count=1;
+                        //count <= 3
                         ;++count)
                     {
                         std::cerr << "C=" << C << std::endl;
@@ -597,7 +598,7 @@ namespace yocto
                         if(F1>=F0)
                         {
                             //std::cerr << "#Need to optimise" << std::endl;
-                            triplet<double> XX = { 0, 1, 1};
+                            triplet<double> XX = { 0,  1,  1};
                             triplet<double> FF = { F0, F1, F1};
                             (void)bracket<double>::inside(F, XX, FF);
                             minimize<double>(F, XX, FF, 0);
@@ -611,7 +612,8 @@ namespace yocto
                         //______________________________________________________
                         for(size_t i=N;i>0;--i) { V[i] = V0[i] + alpha * dV[i]; }
                         computeC();
-                        eqs.updateGammaAndPhi(C);
+                        (void)cgrad<double>::optimize(CG_FUNC, CG_GRAD, V, numeric<double>::ftol, NULL);
+                        eqs.updateGammaAndPhi(C); // prepare for next step
                         for(size_t j=M;j>0;--j)
                         {
                             dX[j] = C[j] - C0[j];
@@ -631,6 +633,8 @@ namespace yocto
                         mkl::set(C0,C);
                         
                     }
+                    
+                    //exit(1);
                     
                     //std::cerr << "#Newton II converged: check..." << std::endl;
                     //std::cerr << "C1="     << C << std::endl;
