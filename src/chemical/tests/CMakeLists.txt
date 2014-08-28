@@ -7,6 +7,7 @@ co2.lua
 mix.lua
 eff.lua
 ode.lua
+fluo.lua
 )
 TARGET_LINK_YOCTO( test-chemical chemical mk lua++ lua)
 
