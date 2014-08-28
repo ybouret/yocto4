@@ -13,6 +13,9 @@ namespace yocto
         typedef math::ode::Field<double>::Equation diff_equation;
         typedef math::ode::Field<double>::Callback diff_callback;
         
+        //! u/(exp(u)-1)
+        double Psi(double u) throw();
+        
     }
 }
 
