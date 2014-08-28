@@ -9,7 +9,7 @@ SOURCE_GROUP( chemical FILES ${srcs} )
 FILE( GLOB decl_lua yocto/chemical/lua/*.hpp)
 FILE( GLOB impl_lua yocto/chemical/lua/*.cpp)
 SET( srcs_lua ${decl_lua} ${impl_lua} )
-#INSTALL( FILES ${decl_lua} DESTINATION include/yocto/chemical/lua )
+INSTALL( FILES ${decl_lua} DESTINATION include/yocto/chemical/lua )
 SOURCE_GROUP( chemical/lua FILES ${srcs_lua} )
 
 FILE( GLOB srcs_boot yocto/chemical/boot/*.cpp)
@@ -25,7 +25,7 @@ SOURCE_GROUP( chemical/eff FILES ${srcs_eff} )
 
 
 ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} ${srcs_boot} ${srcs_eqs} )
-#INSTALL( TARGETS y-chemical ARCHIVE DESTINATION lib )
+INSTALL( TARGETS y-chemical ARCHIVE DESTINATION lib )
 
 ADD_SUBDIRECTORY(tests)
 
