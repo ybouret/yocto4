@@ -4,7 +4,7 @@ namespace yocto
     namespace lang
     {
         
-        t_char *t_char:: acquire(int value)
+        t_char *t_char:: acquire(code_type value)
         {
             t_char *ans = object::acquire1<t_char>();
             ans->code   = value;

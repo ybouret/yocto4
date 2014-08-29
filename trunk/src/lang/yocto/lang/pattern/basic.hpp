@@ -22,16 +22,26 @@ namespace yocto
             explicit one_char(const uint32_t user_type) throw();
             
         private:
-            virtual bool is_valid( int C ) const throw() = 0;
+            virtual bool is_valid( const code_type C ) const throw() = 0;
             YOCTO_DISABLE_COPY_AND_ASSIGN(one_char);
         };
         
+        //______________________________________________________________________
+        //
+        // accept any char
+        //______________________________________________________________________
         class any1 : public one_char
         {
         public:
+            static const uint32_t tag = YOCTO_FOURCC('A', 'N', 'Y', '1');
+            virtual ~any1() throw();
+            static  pattern *create();
+            virtual pattern *clone() const;
             
         private:
-            YOCTO_DISABLE_ASSIGN(any1);
+            explicit any1() throw();
+            virtual bool is_valid( const code_type ) const throw(); //!< true
+            YOCTO_DISABLE_COPY_AND_ASSIGN(any1);
         };
         
         
@@ -45,19 +55,104 @@ namespace yocto
             static const uint32_t tag = YOCTO_FOURCC('S', 'N', 'G', 'L');
             virtual ~single() throw();
             
-            YOCTO_LANG_PATTERN_API();
             
             const int value; //!< data = &value
-            static single *create( const int val );
             
+            static  pattern *create( const int val );
+            virtual pattern *clone() const;
+
         private:
-            virtual bool is_valid( int C ) const throw();
-            explicit single( const int which) throw();
+            virtual bool is_valid( const code_type ) const throw();
+            explicit single(const int which) throw();
             
-            YOCTO_DISABLE_ASSIGN(single);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(single);
             
         };
         
+        
+        //______________________________________________________________________
+        //
+        // matching a range of char
+        //______________________________________________________________________
+        class range : public one_char
+        {
+        public:
+            static const uint32_t tag = YOCTO_FOURCC('R', 'A', 'N', 'G');
+            virtual ~range() throw();
+            
+            const code_type lower;
+            const code_type upper;
+            
+            static  pattern *create( const code_type lo, const code_type up);
+            virtual pattern *clone() const;
+            
+        private:
+            explicit range(const int lo, const int up) throw();
+            YOCTO_DISABLE_COPY_AND_ASSIGN(range);
+            virtual bool is_valid( const code_type ) const throw();
+        };
+        
+        //______________________________________________________________________
+        //
+        // using a choice of char
+        //______________________________________________________________________
+        class choice : public one_char
+        {
+        public:
+            virtual ~choice() throw();
+            
+            bytes_store db;
+            
+        protected:
+            explicit choice(const uint32_t id);
+            choice(const choice &other);
+
+        private:
+            YOCTO_DISABLE_ASSIGN(choice);
+        };
+        
+        //______________________________________________________________________
+        //
+        // within a choice of char
+        //______________________________________________________________________
+        class within : public choice
+        {
+        public:
+            static const uint32_t tag = YOCTO_FOURCC('W', '/', ' ', ' ');
+            virtual ~within() throw();
+            
+            static  choice  *create();
+            virtual pattern *clone() const;
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(within);
+            explicit within();
+            within(const within&);
+            virtual bool is_valid(const code_type) const throw();
+            
+        };
+        
+        //______________________________________________________________________
+        //
+        // none in choice of char
+        //______________________________________________________________________
+        class none : public choice
+        {
+        public:
+            static const uint32_t tag = YOCTO_FOURCC('N', 'O', 'N', 'E');
+            virtual ~none() throw();
+            
+            static  choice  *create();
+            virtual pattern *clone() const;
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(none);
+            explicit none();
+            none(const none&);
+            virtual bool is_valid(const code_type) const throw();
+            
+        };
+
         
         
     }

@@ -1,6 +1,7 @@
 #ifndef YOCTO_LANG_TOKEN_INCLUDED
 #define YOCTO_LANG_TOKEN_INCLUDED 1
 
+#include "yocto/lang/types.hpp"
 #include "yocto/string.hpp"
 #include "yocto/core/list.hpp"
 
@@ -13,12 +14,12 @@ namespace yocto
         class t_char
         {
         public:
-            t_char *next;
-            t_char *prev;
-            int     code;
+            t_char  *next;
+            t_char   *prev;
+            code_type code;
             
             
-            static t_char *acquire(int value=0);
+            static t_char *acquire(code_type value=0);
             static void    release(t_char *ch) throw();
             
         private:
