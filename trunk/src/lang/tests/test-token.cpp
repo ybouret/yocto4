@@ -11,5 +11,10 @@ YOCTO_UNIT_TEST_IMPL(token)
     lang::token t1 = "Hello";
     std::cerr << "t1=" << t1 << std::endl;
     
+    lang::token t2(t1);
+    lang::token t3;
+    t3 = t2;
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
