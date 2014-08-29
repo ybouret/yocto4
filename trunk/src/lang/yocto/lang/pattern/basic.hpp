@@ -10,7 +10,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // interface for pattern returning one valid char
+        //! interface for pattern returning one valid char
         //______________________________________________________________________
         class one_char : public pattern
         {
@@ -28,7 +28,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // accept any char
+        //! accept any char
         //______________________________________________________________________
         class any1 : public one_char
         {
@@ -47,7 +47,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // matching a single char
+        //! matching a single char
         //______________________________________________________________________
         class single : public one_char
         {
@@ -72,7 +72,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // matching a range of char
+        //! matching a range of char
         //______________________________________________________________________
         class range : public one_char
         {
@@ -94,7 +94,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // using a choice of char
+        //! using a choice of char
         //______________________________________________________________________
         class choice : public one_char
         {
@@ -113,7 +113,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // within a choice of char
+        //! within a choice of char
         //______________________________________________________________________
         class within : public choice
         {
@@ -134,7 +134,7 @@ namespace yocto
         
         //______________________________________________________________________
         //
-        // none in choice of char
+        //! none in choice of char
         //______________________________________________________________________
         class none : public choice
         {
