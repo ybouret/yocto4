@@ -3,6 +3,8 @@
 
 #include "yocto/lang/source.hpp"
 #include "yocto/core/meta-list.hpp"
+#include "yocto/code/fourcc.hpp"
+
 
 namespace yocto
 {
@@ -32,6 +34,7 @@ namespace yocto
             pattern       *next;
             pattern       *prev;
             const uint32_t type; //!< UUID
+            void          *data; //!< to handle private data
             
         protected:
             explicit pattern( const uint32_t user_type ) throw();
@@ -40,10 +43,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
         };
         
-#define YOCTO_LANG_PATTERN_API \
-virtual pattern *clone() const; \
-vortual bool     match(source&,ios::istream&)
-        
+#define YOCTO_LANG_PATTERN_API() \
+virtual pattern *clone() const
         
         typedef core::meta_list<pattern> p_list;
         
