@@ -30,7 +30,7 @@ namespace yocto
         typedef core::list_of<t_char> t_list;
 
         //! a dynamic token
-        class token : public t_list
+        class token : public object, public t_list
         {
         public:
             token() throw();                    //!< default ctor

@@ -1,8 +1,8 @@
 #include "yocto/lang/pattern/basic.hpp"
 #include "yocto/lang/pattern/joker.hpp"
+#include "yocto/lang/pattern/logic.hpp"
 #include "yocto/utest/run.hpp"
 
-#include "yocto/ios/icstream.hpp"
 
 
 using namespace yocto;
@@ -21,6 +21,11 @@ YOCTO_UNIT_TEST_IMPL(pattern)
     patterns.push_back( lang::zero_or_more( lang::single::create('z') ) );
     patterns.push_back( lang::one_or_more( lang::single::create('w') ) );
     patterns.push_back( lang::counting::create( lang::single::create('k'),1,3 ) );
-
+    {
+        lang::logical *p = lang::AND::create();
+        patterns.push_back(p);
+        p->operands.push_back( lang::any1::create()  );
+        
+    }
 }
 YOCTO_UNIT_TEST_DONE()
