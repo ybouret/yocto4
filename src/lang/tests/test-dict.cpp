@@ -15,7 +15,6 @@ YOCTO_UNIT_TEST_IMPL(dict)
     p_dict dict;
     
     dict.add("Z", single::create('Z') );
-    //dict.add("Z", single::create('Z') );
     pattern *p = dict["Z"];
     delete p;
     
