@@ -1,4 +1,4 @@
-#include "yocto/lang/dict.hpp"
+#include "yocto/lang/pattern/dict.hpp"
 #include "yocto/exception.hpp"
 
 namespace yocto

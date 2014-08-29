@@ -1,7 +1,7 @@
 #include "yocto/lang/pattern/basic.hpp"
 #include "yocto/lang/pattern/joker.hpp"
 #include "yocto/lang/pattern/logic.hpp"
-#include "yocto/lang/dict.hpp"
+#include "yocto/lang/pattern/dict.hpp"
 #include "yocto/utest/run.hpp"
 
 
