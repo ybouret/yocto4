@@ -13,7 +13,8 @@ namespace yocto
         token(),
         next(0),
         prev(0),
-        type(user_type)
+        type(user_type),
+        data(0)
         {
         }
         
