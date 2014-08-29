@@ -53,6 +53,11 @@ namespace yocto
             return new AND(*this);
         }
         
+        logical * AND:: create()
+        {
+            return new AND();
+        }
+        
         bool AND:: match(source &src, ios::istream &fp)
         {
             assert(0==size);
@@ -92,6 +97,11 @@ namespace yocto
             return new OR(*this);
         }
         
+        logical * OR:: create()
+        {
+            return new OR();
+        }
+        
         bool OR:: match(source &src, ios::istream &fp)
         {
             assert(0==size);
@@ -126,6 +136,11 @@ namespace yocto
         pattern * NOT:: clone() const
         {
             return new NOT(*this);
+        }
+        
+        logical * NOT:: create()
+        {
+            return new NOT();
         }
         
         bool NOT:: match(source &src, ios::istream &fp)
