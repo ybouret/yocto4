@@ -45,6 +45,7 @@ MESSAGE( STATUS "" )
 MESSAGE( STATUS "---------------- <modules>  ----------------" )
 
 YOCTO_BUILD(lingua)
+YOCTO_BUILD(lang)
 YOCTO_BUILD(kr)
 YOCTO_BUILD(net)
 YOCTO_BUILD(mpa)
