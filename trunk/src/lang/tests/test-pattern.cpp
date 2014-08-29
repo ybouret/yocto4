@@ -18,6 +18,9 @@ YOCTO_UNIT_TEST_IMPL(pattern)
     patterns.push_back( lang::none::create()         );
     patterns.push_back( lang::optional::create( lang::single::create('B') ) );
     patterns.push_back( lang::at_least::create( lang::single::create('q'),0) );
-                       
+    patterns.push_back( lang::zero_or_more( lang::single::create('z') ) );
+    patterns.push_back( lang::one_or_more( lang::single::create('w') ) );
+    patterns.push_back( lang::counting::create( lang::single::create('k'),1,3 ) );
+
 }
 YOCTO_UNIT_TEST_DONE()
