@@ -12,7 +12,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <windows.h>
-
 #if defined(__DMC__)
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #endif
@@ -177,7 +176,7 @@ namespace yocto
 #endif
         
 #if defined(YOCTO_WIN)
-        LARGE_INTEGER nLargeInteger = { 0 } ;
+        LARGE_INTEGER nLargeInteger;// = { 0 } ;
         HANDLE hFile = CreateFile(path.c_str(),
                                   GENERIC_READ,
                                   FILE_SHARE_READ,
