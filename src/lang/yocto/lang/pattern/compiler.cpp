@@ -14,7 +14,8 @@ namespace yocto
                 const char   *curr;
                 const char   *last;
                 const p_dict *dict;
-                
+                int           level;
+
                 inline ~Compiler() throw()
                 {
                 
@@ -23,7 +24,8 @@ namespace yocto
                 inline Compiler(const char *usrCurr, const char *usrLast, const p_dict *usrDict) throw() :
                 curr(usrCurr),
                 last(usrLast),
-                dict(usrDict)
+                dict(usrDict),
+				level(0)
                 {
                 }
                 
