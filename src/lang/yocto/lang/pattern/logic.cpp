@@ -221,8 +221,6 @@ namespace yocto
         bool NOT:: match(source &src, ios::istream &fp)
         {
             assert(0==size);
-            
-            
             for(pattern *op=operands.head;op;op=op->next)
             {
                 if(op->match(src,fp))
@@ -235,7 +233,7 @@ namespace yocto
             return true;
         }
 
-        void NOT:: viz( ios::ostream &fp) const
+        void NOT:: viz(ios::ostream &fp) const
         {
             fp.viz(this); fp << " [ label=\"!=\"];\n";
             __viz(this,fp);
