@@ -53,60 +53,22 @@ namespace yocto
                 // Main Loop
                 //
                 //--------------------------------------------------------------
-                inline void Process()
+                void Process()
                 {
                     
-                    //__________________________________________________________
-                    //
-                    //
-                    // outer loop
-                    //
-                    //__________________________________________________________
                     while(curr<last)
                     {
                         char C = *curr;
-                        switch(C)
-                        {
-                            default:
-                                stack.push_back(SubExpr());
-                        };
-                    }
-                    
-                    
-                    //__________________________________________________________
-                    //
-                    //
-                    // done: analyse result
-                    //
-                    //__________________________________________________________
-                    if(stack.size<=0)
-                    {
-                        throw exception("empty regexp");
-                    }
-                }
-                
-                //--------------------------------------------------------------
-                //
-                // logical AND from a non controlling char
-                //
-                //--------------------------------------------------------------
-                pattern *SubExpr()
-                {
-                    auto_ptr<logical> p( AND::create() );
-                    while(curr<last)
-                    {
-                        char C = *curr;
-                        switch(C)
-                        {
-                            
-                            default:
-                                p->append( single::create(C) );
-                                ++curr;
-                        }
                         
+                        switch(C)
+                        {
+                               
+                            default:
+                                
+                                ++curr;
+                                
+                        }
                     }
-                    
-                    return p.yield();
                 }
                 
                 
