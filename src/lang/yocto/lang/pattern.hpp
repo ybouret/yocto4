@@ -4,7 +4,7 @@
 #include "yocto/lang/source.hpp"
 #include "yocto/core/meta-list.hpp"
 #include "yocto/code/fourcc.hpp"
-
+#include "yocto/ios/ostream.hpp"
 
 namespace yocto
 {
@@ -16,8 +16,16 @@ namespace yocto
         public:
             virtual ~pattern() throw();
             
+            pattern       *next;
+            pattern       *prev;
+            const uint32_t type; //!< UUID
+            void          *data; //!< to handle private data
+            
             //! clone interface
             virtual pattern * clone() const = 0;
+            
+            //! GraphViz interface
+            virtual void viz( ios::ostream & ) const = 0;
             
             //! true is a match is possible
             /**
@@ -31,11 +39,16 @@ namespace yocto
              */
             virtual void      reset() throw();
             
-            pattern       *next;
-            pattern       *prev;
-            const uint32_t type; //!< UUID
-            void          *data; //!< to handle private data
+           
+            //! output a readable GraphViz label
+            static void outviz( const char C, ios::ostream &fp );
             
+            //! save a directed graph of the pattern
+            void graphviz( const string &filename ) const;
+            
+            //! save a directed graph of the pattern
+            void graphviz( const char   *fn ) const;
+
         protected:
             explicit pattern( const uint32_t user_type ) throw();
             

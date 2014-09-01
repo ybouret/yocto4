@@ -40,7 +40,7 @@ namespace yocto
             
 			virtual void operator()(const char *fmt,...) YOCTO_PRINTF_CHECK(2,3);
 			
-            //! emit a GraphViz atg
+            //! emit a GraphViz tag
             void viz( const void *p );
             
 		protected:

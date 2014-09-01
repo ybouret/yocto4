@@ -26,6 +26,11 @@ namespace yocto
             this->clear();
         }
         
+        void joker:: __viz( const void *parent, ios::ostream &fp ) const
+        {
+            motif->viz(fp);
+            fp.viz(parent); fp << " -> "; fp.viz(motif); fp << ";\n";
+        }
         
     }
     
@@ -76,6 +81,12 @@ namespace yocto
             return true;
         }
         
+        void optional:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=\"?\"];\n";
+            __viz(this, fp);
+        }
+
     }
     
 }
@@ -138,6 +149,14 @@ namespace yocto
                 return false;
             }
         }
+        
+        void at_least:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp(" [label=\">=%u\"];\n", unsigned(value));
+            __viz(this, fp);
+        }
+
         
         pattern * zero_or_more(pattern *p)
         {
@@ -218,6 +237,14 @@ namespace yocto
             
             return true;
         }
+        
+        void counting:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp(" [label=\"{%u,%u}\"];\n", unsigned(n), unsigned(m));
+            __viz(this, fp);
+        }
+
     }
     
 }

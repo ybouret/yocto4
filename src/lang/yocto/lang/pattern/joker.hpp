@@ -20,6 +20,7 @@ namespace yocto
         protected:
             explicit joker( const uint32_t id, pattern *p ) throw();
             pattern *motif;
+            void __viz( const void *parent, ios::ostream &fp ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(joker);
@@ -32,7 +33,7 @@ namespace yocto
         class optional : public joker
         {
         public:
-            static const uint32_t tag = YOCTO_FOURCC('?', ' ', ' ',' ');
+            static const uint32_t tag = YOCTO_FOURCC('@', '?', '@',' ');
             virtual ~optional() throw();
             
             //! the pointer is taken care of
@@ -40,7 +41,8 @@ namespace yocto
             
             //! clone
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
             //! 0 or 1 exactly
             virtual bool match( source &, ios::istream &fp );
             
@@ -57,7 +59,7 @@ namespace yocto
         class at_least : public joker
         {
         public:
-            static const uint32_t tag = YOCTO_FOURCC('*', '|', '|', '+');
+            static const uint32_t tag = YOCTO_FOURCC('@', '>', '=', '@');
             const size_t value;
             
             virtual ~at_least() throw();
@@ -67,7 +69,8 @@ namespace yocto
             
             //! clone
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
             //! true is count >= value
             virtual bool match( source &, ios::istream &);
             
@@ -86,7 +89,7 @@ namespace yocto
         class counting : public joker
         {
         public:
-            static const uint32_t tag =  YOCTO_FOURCC('{', ' ', ' ', '}');
+            static const uint32_t tag =  YOCTO_FOURCC('@', '{', '}', '@');
             
             const size_t n;
             const size_t m;
@@ -97,7 +100,8 @@ namespace yocto
             
             //! clone
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
             //! true if a count of at least n and max m is found
             virtual bool match(source &, ios::istream &);
             

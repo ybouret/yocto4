@@ -37,6 +37,7 @@ namespace yocto
             virtual ~any1() throw();
             static  pattern *create();
             virtual pattern *clone() const;
+            virtual void     viz( ios::ostream & ) const;
             
         private:
             explicit any1() throw();
@@ -60,6 +61,7 @@ namespace yocto
             
             static  pattern *create( const int val );
             virtual pattern *clone() const;
+            virtual void     viz( ios::ostream & ) const;
 
         private:
             virtual bool is_valid( const code_type ) const throw();
@@ -77,7 +79,7 @@ namespace yocto
         class range : public one_char
         {
         public:
-            static const uint32_t tag = YOCTO_FOURCC('R', 'A', 'N', 'G');
+            static const uint32_t tag = YOCTO_FOURCC('R', 'N', 'G', 'E' );
             virtual ~range() throw();
             
             const code_type lower;
@@ -85,9 +87,10 @@ namespace yocto
             
             static  pattern *create( const code_type lo, const code_type up);
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
         private:
-            explicit range(const int lo, const int up) throw();
+            explicit range(const code_type lo, const code_type up) throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(range);
             virtual bool is_valid( const code_type ) const throw();
         };
@@ -101,11 +104,13 @@ namespace yocto
         public:
             virtual ~choice() throw();
             
-            bytes_store db;
+            bytes_store chars;
+            void append(char,char);   //!< append a range
             
         protected:
             explicit choice(const uint32_t id);
             choice(const choice &other);
+            void __viz( ios::ostream &fp ) const;
 
         private:
             YOCTO_DISABLE_ASSIGN(choice);
@@ -118,12 +123,13 @@ namespace yocto
         class within : public choice
         {
         public:
-            static const uint32_t tag = YOCTO_FOURCC('W', '/', ' ', ' ');
+            static const uint32_t tag = YOCTO_FOURCC('W', '/', 'I', 'N');
             virtual ~within() throw();
             
             static  choice  *create();
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
         private:
             YOCTO_DISABLE_ASSIGN(within);
             explicit within();
@@ -144,7 +150,8 @@ namespace yocto
             
             static  choice  *create();
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
         private:
             YOCTO_DISABLE_ASSIGN(none);
             explicit none();
