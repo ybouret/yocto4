@@ -20,8 +20,8 @@ namespace yocto
             void add( const string &name, pattern *p);
             void add( const char   *name, pattern *p);
             
-            pattern * operator[](const string &name) const;
-            pattern * operator[](const char   *name) const;
+            pattern * create(const string &name) const;
+            pattern * create(const char   *name) const;
 
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(p_dict);

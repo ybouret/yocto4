@@ -8,6 +8,8 @@
 
 #include "yocto/exception.hpp"
 #include "yocto/ptr/auto.hpp"
+#include "yocto/string/conv.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -301,13 +303,13 @@ namespace yocto
                                 throw exception("%s(Range: Bad Left Type)",fn);
                             
                             pattern *q = p->remove();
-                            assert(q->data);
-                            const int lower = *static_cast<char *>(q->data);
+                            assert(q->self);
+                            const int lower = static_cast<single *>(q->self)->value;
                             delete q;
                             
                             q = next_single(curr, last);
-                            assert(q->data);
-                            const int upper = *static_cast<char *>(q->data);
+                            assert(q->self);
+                            const int upper = static_cast<single *>(q->self)->value;
                             delete q;
                             YRX(std::cerr << "[GRP] New range " << char(lower) << ", " << char(upper) << std::endl);
                             p->append( range::create(lower,upper) );
@@ -333,8 +335,9 @@ namespace yocto
 				if(p->operands.size<=0)
 					throw exception("%s(Empty Group)", fn );
                 
-                p->optimize();
-                return pattern::collapse(p.yield());
+                //p->optimize();
+                //return pattern::collapse(p.yield());
+                return p.yield();
 			}
             
             
