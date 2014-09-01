@@ -15,7 +15,7 @@ namespace yocto
         next(0),
         prev(0),
         type(user_type),
-        data(0)
+        self(0)
         {
         }
         

@@ -107,9 +107,9 @@ namespace yocto
     {
         AND:: ~AND() throw() {}
         
-        AND:: AND() throw() : logical(tag) {}
+        AND:: AND() throw() : logical(tag) { self = (AND *)this; }
         
-        AND:: AND( const AND &other ) : logical(other) {}
+        AND:: AND( const AND &other ) : logical(other) { self = (AND *)this; }
         
         pattern * AND:: clone() const
         {
@@ -157,9 +157,9 @@ namespace yocto
     {
         OR:: ~OR() throw() {}
         
-        OR:: OR() throw() : logical(tag) {}
+        OR:: OR() throw() : logical(tag) { self = (OR *)this; }
         
-        OR:: OR( const OR &other ) : logical(other) {}
+        OR:: OR( const OR &other ) : logical(other) { self = (OR *)this; }
         
         pattern * OR:: clone() const
         {
@@ -204,9 +204,9 @@ namespace yocto
     {
         NOT:: ~NOT() throw() {}
         
-        NOT:: NOT() throw() : logical(tag) {}
+        NOT:: NOT() throw() : logical(tag) { self = (NOT *)this; }
         
-        NOT:: NOT( const NOT &other ) : logical(other) {}
+        NOT:: NOT( const NOT &other ) : logical(other) { self = (NOT *)this;  }
         
         pattern * NOT:: clone() const
         {

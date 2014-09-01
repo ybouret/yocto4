@@ -19,7 +19,7 @@ namespace yocto
             pattern       *next;
             pattern       *prev;
             const uint32_t type; //!< UUID
-            void          *data; //!< to handle private data
+            void          *self; //!< class corresponding to type
             
             //! clone interface
             virtual pattern * clone() const = 0;
