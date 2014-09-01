@@ -39,7 +39,7 @@ namespace yocto
             }
         }
         
-        pattern * p_dict:: operator[](const string &name) const
+        pattern * p_dict:: create(const string &name) const
         {
             const pattern_ptr *pp = search(name);
             if(!pp)
@@ -47,10 +47,10 @@ namespace yocto
             return (*pp)->clone();
         }
 
-        pattern * p_dict:: operator[](const char *name) const
+        pattern * p_dict:: create(const char *name) const
         {
             const string Name(name);
-            return (*this)[Name];
+            return create(Name);
         }
     }
     
