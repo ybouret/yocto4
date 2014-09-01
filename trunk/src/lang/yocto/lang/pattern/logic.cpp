@@ -32,11 +32,74 @@ namespace yocto
             }
         }
         
+        void logical:: __viz(const void *parent, ios::ostream &fp) const
+        {
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                p->viz(fp);
+            }
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                fp.viz(parent); fp << " -> ";  fp.viz(p); fp << ";\n";
+            }
+        }
+
+        void logical:: append( pattern *p ) throw()
+        {
+            operands.push_back(p);
+        }
+
+    }
+    
+    
+}
+
+#include "yocto/lang/pattern/basic.hpp"
+#include "yocto/exception.hpp"
+#include "yocto/ptr/auto.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+        
+        pattern *logical:: EQUAL(const string &s)
+        {
+            const size_t n = s.size();
+            if(n<=0) throw exception("lingua::EQUAL(no char)");
+            auto_ptr<logical> p( AND::create() );
+            for(size_t i=0; i <n; ++i )
+                p->operands.push_back( single::create( s[i] ) );
+            return p.yield();
+        }
+        
+        pattern *logical:: EQUAL(const char *s)
+        {
+            const string tmp(s);
+            return EQUAL(tmp);
+        }
+        
+        pattern *logical:: AMONG(const string &s)
+        {
+            const size_t n = s.size();
+            if(n<=0) throw exception("lingua::AMONG(no char)");
+            auto_ptr<logical> p( OR::create() );
+            for(size_t i=0; i <n; ++i )
+                p->operands.push_back( single::create( s[i] ) );
+            return p.yield();
+        }
+        
+        pattern *logical:: AMONG(const char *s)
+        {
+            const string tmp(s);
+            return AMONG(tmp);
+        }
         
     }
     
     
 }
+
 
 namespace yocto
 {
@@ -77,6 +140,12 @@ namespace yocto
             return true;
         }
         
+        void AND:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [ label=\"&&\"];\n";
+            __viz(this,fp);
+        }
+
         
     }
 
@@ -118,7 +187,13 @@ namespace yocto
             
             return false;
         }
-        
+     
+        void OR:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [ label=\"||\"];\n";
+            __viz(this,fp);
+        }
+
     }
     
 }
@@ -159,7 +234,13 @@ namespace yocto
             
             return true;
         }
-        
+
+        void NOT:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [ label=\"!=\"];\n";
+            __viz(this,fp);
+        }
+
     }
     
 }

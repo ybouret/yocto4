@@ -59,6 +59,10 @@ namespace yocto
         
         bool any1:: is_valid(const code_type) const throw() { return true; }
         
+        void any1:: viz(ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=ANY1];\n";
+        }
     }
     
 }
@@ -92,6 +96,14 @@ namespace yocto
         {
             return C == value;
         }
+        
+        void single:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=\"'";
+            outviz(value, fp);
+            fp << "'\"];\n";
+        }
+
     }
 
 }
@@ -105,7 +117,7 @@ namespace yocto
         range:: ~range() throw()
         {}
         
-        range:: range( const int lo, const int up) throw() :
+        range:: range( const code_type lo, const code_type up) throw() :
         one_char(tag),
         lower( min_of(lo,up) ),
         upper( max_of(lo,up) )
@@ -127,6 +139,16 @@ namespace yocto
         {
             return new range(lo,up);
         }
+        
+        void range:: viz( ios::ostream &fp) const
+        {
+            fp.viz(this); fp << " [label=\"['";
+            outviz(lower, fp);
+            fp << "'-'";
+            outviz(upper,fp);
+            fp << "']\"];\n";
+        }
+
     }
     
 }
@@ -142,15 +164,35 @@ namespace yocto
         
         choice:: choice( const uint32_t id ) :
         one_char(id),
-        db()
+        chars()
         {
-            data = (void*) &db;
+            data = (void*) &chars;
         }
         
         choice:: choice(const choice &other ) :
         one_char(other.type),
-        db( other.db )
+        chars( other.chars )
         {
+        }
+        
+        void choice:: __viz( ios::ostream &fp ) const
+        {
+            
+            for(size_t i=1; i <= chars.size(); ++i)
+            {
+                outviz(chars[i], fp);
+            }
+            
+        }
+
+        void choice:: append(char lo, char up)
+        {
+            if(lo>up) cswap(lo, up);
+            for(size_t n = size_t(up-lo)+1;n>0;--n,++lo)
+            {
+                (void) chars.insert(lo);
+            }
+            
         }
         
         
@@ -186,9 +228,17 @@ namespace yocto
         
         bool within:: is_valid(const code_type C) const throw()
         {
-            return db.search(C);
+            return chars.search(C);
         }
         
+        void within:: viz(ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp << " [ label=\"[";
+            __viz(fp);
+            fp << "]\"];\n";
+        }
+
     }
     
 }
@@ -223,9 +273,17 @@ namespace yocto
         
         bool none:: is_valid(const code_type C) const throw()
         {
-            return !db.search(C);
+            return !chars.search(C);
         }
-        
+     
+        void none:: viz(ios::ostream &fp) const
+        {
+            fp.viz(this);
+            fp << " [ label=\"[^";
+            __viz(fp);
+            fp << "]\"];\n";
+        }
+
     }
     
 }

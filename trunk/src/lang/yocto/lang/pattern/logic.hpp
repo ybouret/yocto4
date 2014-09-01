@@ -16,14 +16,22 @@ namespace yocto
         {
         public:
             p_list operands;
+            void append( pattern *p ) throw();
+            
             
             virtual ~logical() throw();
             virtual void reset() throw();
             
+            static pattern *EQUAL(const string &s);
+            static pattern *EQUAL(const char   *s);
+            static pattern *AMONG(const string &s);
+            static pattern *AMONG(const char   *s);
+            
         protected:
             explicit logical(const uint32_t id) throw();
             logical(const logical &other);
-            
+            void __viz( const void *parent, ios::ostream &fp ) const;
+
         private:
             YOCTO_DISABLE_ASSIGN(logical);
         };
@@ -41,6 +49,7 @@ namespace yocto
             
             static  logical *create();
             virtual pattern *clone() const;
+            virtual void     viz( ios::ostream & ) const;
             virtual bool     match(source &src, ios::istream &fp);
             
         private:
@@ -61,6 +70,7 @@ namespace yocto
             
             static  logical *create();
             virtual pattern *clone() const;
+            virtual void     viz( ios::ostream & ) const;
             virtual bool     match(source &src, ios::istream &fp);
             
         private:
@@ -81,7 +91,8 @@ namespace yocto
             
             static  logical *create();
             virtual pattern *clone() const;
-            
+            virtual void     viz( ios::ostream & ) const;
+
             //! always empty...
             virtual bool     match(source &src, ios::istream &fp);
             
