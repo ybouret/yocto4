@@ -16,7 +16,6 @@ namespace yocto
         motif(p)
         {
             assert(motif);
-            data = (void*)motif;
         }
         
         void joker:: reset() throw()
@@ -49,6 +48,7 @@ namespace yocto
         optional:: optional(pattern *p) throw() :
         joker(tag,p)
         {
+            self = (optional *)this;
         }
         
         pattern * optional:: create( pattern * p )
@@ -189,6 +189,7 @@ namespace yocto
         n( min_of(lo,up) ),
         m( max_of(lo,up) )
         {
+            self = (counting *)this;
         }
         
         pattern *counting:: create( pattern *p, const size_t lo, const size_t up )

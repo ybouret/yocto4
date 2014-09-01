@@ -48,6 +48,7 @@ namespace yocto
         
         any1:: any1() throw() : one_char( tag )
         {
+            self = (any1 *)this;
         }
         
         pattern * any1:: create() { return new any1(); }
@@ -79,7 +80,7 @@ namespace yocto
         one_char(tag),
         value(which)
         {
-            data = (void*)&value;
+            self= (single *)this;
         }
         
         pattern * single:: create( const int val )
@@ -122,7 +123,7 @@ namespace yocto
         lower( min_of(lo,up) ),
         upper( max_of(lo,up) )
         {
-            data = (void*)&lower;
+            self = (range *)this;
         }
         
         bool range:: is_valid(const code_type C) const throw()
@@ -166,7 +167,7 @@ namespace yocto
         one_char(id),
         chars()
         {
-            data = (void*) &chars;
+            
         }
         
         choice:: choice(const choice &other ) :
@@ -208,11 +209,13 @@ namespace yocto
         within:: within() :
         choice(tag)
         {
+            self = (within *)this;
         }
         
         within:: within( const within &other ) :
         choice(other)
         {
+            self = (within *)this;
         }
         
         
@@ -253,11 +256,13 @@ namespace yocto
         none:: none() :
         choice(tag)
         {
+            self = (none *)this;
         }
         
         none:: none( const none &other ) :
         choice(other)
         {
+            self = (none *)this;
         }
         
         
