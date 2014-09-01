@@ -16,8 +16,8 @@ namespace yocto
         {
         public:
             p_list operands;
-            void append( pattern *p ) throw();
-            
+            void     append( pattern *p ) throw();
+            pattern *remove() throw();
             
             virtual ~logical() throw();
             virtual void reset() throw();

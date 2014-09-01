@@ -46,9 +46,15 @@ namespace yocto
 
         void logical:: append( pattern *p ) throw()
         {
+            assert(p);
             operands.push_back(p);
         }
 
+        pattern * logical:: remove() throw()
+        {
+            assert(operands.size>0);
+            return operands.pop_back();
+        }
     }
     
     
