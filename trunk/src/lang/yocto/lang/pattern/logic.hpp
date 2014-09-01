@@ -86,7 +86,7 @@ namespace yocto
         class NOT : public logical
         {
         public:
-            static const uint32_t tag = YOCTO_FOURCC('@', '!', '!', '@');
+            static const uint32_t tag = YOCTO_FOURCC('@', '!', '=', '@');
             virtual ~NOT() throw();
             
             static  logical *create();
