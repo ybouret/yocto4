@@ -6,10 +6,11 @@ namespace yocto
     {
         namespace lexical
         {
-            rule:: rule(const string &id, pattern *pp, const action &cb ) :
+            rule:: rule(const string &id, pattern *pp, const action &cb, const bool flag ) :
             label(id),
             motif(pp),
             deed(cb),
+            ctrl(flag),
             next(0),
             prev(0)
             {
@@ -25,12 +26,12 @@ namespace yocto
                 motif = 0;
             }
             
-            rule * rule:: create(const string &id, pattern *pp, const action &cb)
+            rule * rule:: create(const string &id, pattern *pp, const action &cb, const bool flag)
             {
                 assert(pp);
                 try
                 {
-                    return new rule(id,pp,cb);
+                    return new rule(id,pp,cb,flag);
                 }
                 catch(...)
                 {

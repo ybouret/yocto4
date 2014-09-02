@@ -90,39 +90,53 @@ namespace yocto
                         }
                     }
                     
+                    if(blen<=0)
+                    {
+                        throw exception("%d: empty lexeme, corrupted <%s>",line, name.c_str());
+                    }
+                    
                     //__________________________________________________________
                     //
                     // take action
                     //__________________________________________________________
-                    const action_result res = from->deed(*best);
+                    const bool produce = from->deed(*best);
                     src.skip(blen);
-                    
-                    switch(res)
+                    if( from->ctrl )
                     {
-                        case produce: {
-                            //--------------------------------------------------
-                            // return a new lexeme
-                            //--------------------------------------------------
+                        // this is a control rule
+                        if(produce)
+                            throw exception("unexpected producing control rule '%s'", from->label.c_str());
+                        
+                        // discard content
+                        best->reset();
+                        
+                        // set info
+                        is_control = true;
+                        
+                        // stop looking
+                        return 0;
+                    }
+                    else
+                    {
+                        if(produce)
+                        {
                             lexeme *lex = new lexeme(from->label,line);
                             lex->swap_with(*best);
                             return lex;
-                        } break;
-                            
-                        case discard:
-                            //--------------------------------------------------
-                            // discard content and take a new loop
-                            //--------------------------------------------------
+                        }
+                        else
+                        {
+                            // silently discard
                             best->reset();
-                            break;
-                            
-                        case control:
-                            //--------------------------------------------------
-                            // discard content and return control flag
-                            //--------------------------------------------------
-                            is_control = true;
-                            return 0;
+                            // and go on...
+                        }
                     }
+                    //__________________________________________________________
+                    //
+                    // next search after a discard
+                    //__________________________________________________________
                 }
+                
             }
             
         }
