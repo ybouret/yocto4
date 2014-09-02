@@ -52,7 +52,7 @@ namespace yocto
             //! refactor a pattern, default is do nothing
             virtual void refactor() throw();
             
-            //! optimize the structure of a pattern
+            //! refactor and optimize recursively the structure of a pattern
             static pattern *optimize(pattern *p) throw();
             
             //! not thread safe to debug
