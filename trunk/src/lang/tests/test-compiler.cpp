@@ -4,6 +4,7 @@
 
 using namespace yocto;
 using namespace lang;
+#include <cstdlib>
 
 YOCTO_UNIT_TEST_IMPL(compiler)
 {

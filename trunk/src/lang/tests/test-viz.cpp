@@ -7,6 +7,8 @@
 
 #include "yocto/ptr/auto.hpp"
 
+#include <cstdlib>
+
 using namespace yocto;
 using namespace lang;
 
