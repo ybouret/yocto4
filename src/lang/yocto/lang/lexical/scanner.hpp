@@ -14,6 +14,7 @@ namespace yocto
         namespace lexical
         {
             
+            
             class scanner : public object, public counted
             {
             public:
@@ -36,10 +37,32 @@ namespace yocto
                 //! append a rule while checking name, delete upon error
                 void append( rule *r );
                 
+                //! create/return a dictionary if needed
                 p_dict & dict();
+                
+                //! delete the dictionary
                 void     no_dict() throw();
                 
+                
+                //! lexeme scanning protocol
+                /**
+                 find the first longest matching pattern and make
+                 a lexeme out of it.
+                 - if returns != NULL, a valid lexeme
+                 - if returns NULL: 
+                 -- if is_control==false => EOF
+                 -- if is_control==true  => control rule was met
+                 */
                 lexeme *get( source &src, ios::istream &fp, bool &is_control );
+                
+                //--------------------------------------------------------------
+                //
+                // make rules: simple undertaken actions
+                //
+                //--------------------------------------------------------------
+                void make(const string  &label,
+                          const string  &regex,
+                          const action  &cb );
                 
                 
             private:
