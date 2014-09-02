@@ -17,7 +17,7 @@ namespace yocto
             virtual ~joker() throw();
             virtual void reset() throw();
 
-            virtual void refactor();
+            virtual void refactor() throw();
             
         protected:
             explicit joker( const uint32_t id, pattern *p ) throw();
