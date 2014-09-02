@@ -23,12 +23,12 @@ namespace yocto
         {
             p_list &ops = l->operands;
             operands_optimize(ops);
-            //std::cerr << "\t#ops="<< ops.size << std::endl;
             if(ops.size==1)
             {
                 pattern *p = ops.pop_back();
                 delete   l;
-                return   p;
+                p->refactor();
+                return   pattern::optimize(p);
             }
             else
             {
@@ -46,7 +46,6 @@ namespace yocto
         pattern * pattern:: optimize(pattern *p) throw()
         {
             assert(p);
-            //std::cerr << "optimize <" << p->fourcc() << ">" << std::endl;
             assert(p->self);
             switch(p->type)
             {
