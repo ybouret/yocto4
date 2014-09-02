@@ -58,7 +58,40 @@ namespace yocto
             cache.merge_front(tmp);
         }
 
-
+        const t_char *source:: peek( ios::istream &fp )
+        {
+            if(cache.size>0)
+            {
+                return cache.head;
+            }
+            else
+            {
+                t_char *ch = t_char::acquire();
+                char C;
+                try
+                {
+                    if( !fp.query(C) )
+                    {
+                        t_char::release(ch);
+                        return false;
+                    }
+                    ch->code = C;
+                    cache.push_back(ch);
+                    return ch;
+                }
+                catch(...)
+                {
+                    t_char::release(ch);
+                    throw;
+                }
+            }
+        }
+        
+        void source:: skip(size_t n) throw()
+        {
+            assert(n<=cache.size);
+            while(n-->0) delete cache.pop_front();
+        }
         
     }
     

@@ -23,6 +23,8 @@ namespace yocto
             void    uncpy(const token&);      //!< unread a copy
             
             void reset() throw(); //!< empty cache
+            const t_char *peek(ios::istream &); //!< some more input ?
+            void skip(size_t n) throw();        //!< skip cache.size>=n
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(source);

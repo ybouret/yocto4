@@ -130,7 +130,7 @@ namespace yocto
                             return 0; // do something with this control pattern
                         
                         //------------------------------------------------------
-                        // regular pattern was discarde -> continue
+                        // else regular pattern was discarded -> continue
                         //------------------------------------------------------
                     }
                 }
