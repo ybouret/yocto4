@@ -55,3 +55,24 @@ namespace yocto
     }
     
 }
+
+#include "yocto/lang/pattern/compiler.hpp"
+
+namespace yocto
+{
+    namespace lang
+    {
+        void p_dict:: add( const string &name, const string &regex)
+        {
+            pattern *p = compile(regex,this);
+            add(name,p);
+        }
+
+        void p_dict:: add( const char *name, const char *regex)
+        {
+            const string Name(name);
+            const string Regex(regex);
+            add(Name,Regex);
+        }
+    }
+}

@@ -90,7 +90,10 @@ namespace yocto
         void source:: skip(size_t n) throw()
         {
             assert(n<=cache.size);
-            while(n-->0) delete cache.pop_front();
+            while(n-->0)
+            {
+                t_char::release(cache.pop_front());
+            }
         }
         
     }
