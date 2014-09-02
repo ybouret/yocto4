@@ -46,7 +46,12 @@ namespace yocto
             graphviz(filename);
         }
 
-        
+        void pattern:: refactor()
+        {
+            
+        }
         
     }
 }
+
+

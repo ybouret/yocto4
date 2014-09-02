@@ -31,6 +31,11 @@ namespace yocto
             fp.viz(parent); fp << " -> "; fp.viz(motif); fp << ";\n";
         }
         
+        
+        void joker:: refactor()
+        {
+            motif->refactor();
+        }
     }
     
 }
@@ -87,6 +92,7 @@ namespace yocto
             __viz(this, fp);
         }
 
+        
     }
     
 }
