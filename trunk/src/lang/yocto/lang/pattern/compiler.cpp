@@ -335,7 +335,7 @@ namespace yocto
 				if(p->operands.size<=0)
 					throw exception("%s(Empty Group)", fn );
                 
-                p->refactor();
+                //p->refactor();
                 return pattern::optimize(p.yield());
 			}
             
@@ -612,7 +612,7 @@ namespace yocto
 				if(p->operands.size<=0)
 					throw exception("%s(Empty SubExpression)",fn);
                 
-                p->refactor();
+                //p->refactor();
                 return pattern::optimize(p.yield());
             }
             

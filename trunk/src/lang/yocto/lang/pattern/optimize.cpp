@@ -27,11 +27,12 @@ namespace yocto
             {
                 pattern *p = ops.pop_back();
                 delete   l;
-                p->refactor();
-                return   pattern::optimize(p);
+                return   p;
             }
             else
             {
+                // operands may have changed
+                l->refactor();
                 return l;
             }
         }
@@ -47,6 +48,7 @@ namespace yocto
         {
             assert(p);
             assert(p->self);
+            p->refactor();
             switch(p->type)
             {
                     

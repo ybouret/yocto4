@@ -75,7 +75,7 @@ namespace yocto
                 p->append( upper() );
                 p->append( digit() );
                 p->append( single::create( '_') );
-				return p;
+                return p;
 			}
 			catch (...) {
 				delete p;
