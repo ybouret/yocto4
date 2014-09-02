@@ -111,6 +111,7 @@ namespace yocto
         joker(tag,p),
         value(val)
         {
+            self = (at_least *)this;
         }
         
         pattern * at_least:: clone() const
