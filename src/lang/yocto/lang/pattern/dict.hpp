@@ -19,6 +19,8 @@ namespace yocto
             virtual ~p_dict() throw();
             void add( const string &name, pattern *p);
             void add( const char   *name, pattern *p);
+            void add( const string &name, const string &regex);
+            void add( const char   *name, const char   *regex);
             
             pattern * create(const string &name) const;
             pattern * create(const char   *name) const;

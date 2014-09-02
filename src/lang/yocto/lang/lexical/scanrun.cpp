@@ -32,11 +32,13 @@ namespace yocto
                     
                     for(rule *r=rules.head;r;r=r->next)
                     {
-                        pattern *curr = r->motif;
+                        pattern *curr = r->motif; assert(curr);
                         
                         if(!curr->match(src,fp))
+                        {
                             continue;
-                        
+                        }
+
                         const size_t clen = curr->size;
                         
                         if(!best)
@@ -101,6 +103,7 @@ namespace yocto
                     //__________________________________________________________
                     const bool produce = from->deed(*best);
                     src.skip(blen);
+
                     if( from->ctrl )
                     {
                         // this is a control rule

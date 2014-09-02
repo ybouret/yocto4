@@ -32,7 +32,7 @@ namespace yocto
                 
                 const string & key() const throw(); //!< return the name
                 
-                void reset() throw(); //!< reset all motif from content
+                void reset() throw(); //!< reset all motif from content, set line=1
                 
                 //! append a rule while checking name, delete upon error
                 void append( rule *r );
@@ -49,7 +49,7 @@ namespace yocto
                  find the first longest matching pattern and make
                  a lexeme out of it.
                  - if returns != NULL, a valid lexeme
-                 - if returns NULL: 
+                 - if returns NULL:
                  -- if is_control==false => EOF
                  -- if is_control==true  => control rule was met
                  */
@@ -64,11 +64,54 @@ namespace yocto
                           const string  &regex,
                           const action  &cb );
                 
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void make(const string   &label,
+                          const string   &regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const action cb(host,method);
+                    make(label,regex,cb);
+                }
+                
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void make(const char     *label,
+                          const char     *regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const string L(label);
+                    const string R(regex);
+                    make(L,R,host,method);
+                }
+                
+                void forward(const string &label, const string &regex);
+                void forward(const char   *label, const char   *regex);
+                
+                void discard(const string &label, const string &regex);
+                void discard(const char   *label, const char   *regex);
+                
+                
+                bool    emit( const token & );
+                bool    drop(const token & );
+                bool    newline(const token &);        //!< increase #line, discard
+                bool    newline_emit(const token &);   //!< increase #line, forward
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list  rules;
                 p_dict *dict_;
+                
+                
+            public:
+                bool echo;
+                
             };
             
         }
