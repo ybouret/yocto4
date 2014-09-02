@@ -74,7 +74,8 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual bool     match(source &src, ios::istream &fp);
-            
+            virtual void     refactor() throw();
+
         private:
             explicit OR() throw();
             OR(const OR &);
@@ -97,7 +98,8 @@ namespace yocto
 
             //! always empty...
             virtual bool     match(source &src, ios::istream &fp);
-            
+            virtual void     refactor() throw();
+
         private:
             explicit NOT() throw();
             NOT(const NOT &);

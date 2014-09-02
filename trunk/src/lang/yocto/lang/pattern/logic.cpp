@@ -223,6 +223,32 @@ namespace yocto
             __viz(this,fp);
         }
         
+        void OR:: refactor() throw()
+        {
+            p_list ops;
+            while(operands.size)
+            {
+                pattern *p = operands.pop_front();
+                p->refactor();
+                switch(p->type)
+                {
+                    case OR::tag: {
+                        assert(p->self);
+                        OR *sub = static_cast<OR *>(p->self);
+                        ops.merge_back(sub->operands);
+                        delete p;
+                    } break;
+                        
+                    default:
+                        ops.push_back(p);
+                        break;
+                }
+            }
+            ops.swap_with(operands);
+        }
+
+        
+        
     }
     
 }
@@ -266,6 +292,14 @@ namespace yocto
         {
             fp.viz(this); fp << " [ label=\"!=\"];\n";
             __viz(this,fp);
+        }
+        
+        void NOT:: refactor() throw()
+        {
+            for(pattern *p = operands.head;p;p=p->next)
+            {
+                p->refactor();
+            }
         }
         
     }
