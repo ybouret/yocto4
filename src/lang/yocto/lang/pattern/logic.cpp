@@ -152,7 +152,7 @@ namespace yocto
             __viz(this,fp);
         }
         
-        void AND:: refactor()
+        void AND:: refactor() throw()
         {
             p_list ops;
             while(operands.size)

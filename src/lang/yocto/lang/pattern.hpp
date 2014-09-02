@@ -55,6 +55,9 @@ namespace yocto
             //! optimize the structure of a pattern
             static pattern *optimize(pattern *p) throw();
             
+            //! not thread safe to debug
+            const char *fourcc() const throw();
+            
         protected:
             explicit pattern( const uint32_t user_type ) throw();
             

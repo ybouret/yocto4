@@ -18,10 +18,10 @@ namespace yocto
             virtual void reset() throw();
 
             virtual void refactor() throw();
-            
+            pattern *motif;
+
         protected:
             explicit joker( const uint32_t id, pattern *p ) throw();
-            pattern *motif;
             void __viz( const void *parent, ios::ostream &fp ) const;
             
         private:
