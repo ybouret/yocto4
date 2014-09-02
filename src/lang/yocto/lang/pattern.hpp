@@ -50,7 +50,7 @@ namespace yocto
             void graphviz( const char   *fn ) const;
 
             //! refactor a pattern, default is do nothing
-            virtual void refactor();
+            virtual void refactor() throw();
             
             //! optimize the structure of a pattern
             static pattern *optimize(pattern *p) throw();

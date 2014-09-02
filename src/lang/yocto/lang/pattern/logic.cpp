@@ -4,7 +4,7 @@ namespace yocto
 {
     namespace lang
     {
-
+        
         logical:: ~logical() throw()
         {
         }
@@ -43,13 +43,13 @@ namespace yocto
                 fp.viz(parent); fp << " -> ";  fp.viz(p); fp << ";\n";
             }
         }
-
+        
         void logical:: append( pattern *p ) throw()
         {
             assert(p);
             operands.push_back(p);
         }
-
+        
         pattern * logical:: remove() throw()
         {
             assert(operands.size>0);
@@ -151,10 +151,33 @@ namespace yocto
             fp.viz(this); fp << " [ label=\"&&\"];\n";
             __viz(this,fp);
         }
-
+        
+        void AND:: refactor()
+        {
+            p_list ops;
+            while(operands.size)
+            {
+                pattern *p = operands.pop_front();
+                p->refactor();
+                switch(p->type)
+                {
+                    case AND::tag: {
+                        assert(p->self);
+                        AND *sub = static_cast<AND *>(p->self);
+                        ops.merge_back(sub->operands);
+                        delete p;
+                    } break;
+                        
+                    default:
+                        ops.push_back(p);
+                        break;
+                }
+            }
+            ops.swap_with(operands);
+        }
         
     }
-
+    
 }
 
 namespace yocto
@@ -193,13 +216,13 @@ namespace yocto
             
             return false;
         }
-     
+        
         void OR:: viz( ios::ostream &fp) const
         {
             fp.viz(this); fp << " [ label=\"||\"];\n";
             __viz(this,fp);
         }
-
+        
     }
     
 }
@@ -238,13 +261,13 @@ namespace yocto
             
             return true;
         }
-
+        
         void NOT:: viz(ios::ostream &fp) const
         {
             fp.viz(this); fp << " [ label=\"!=\"];\n";
             __viz(this,fp);
         }
-
+        
     }
     
 }

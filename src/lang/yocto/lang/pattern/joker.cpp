@@ -32,8 +32,9 @@ namespace yocto
         }
         
         
-        void joker:: refactor()
+        void joker:: refactor() throw()
         {
+            assert(motif);
             motif->refactor();
         }
     }

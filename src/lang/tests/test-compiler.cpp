@@ -14,7 +14,9 @@ YOCTO_UNIT_TEST_IMPL(compiler)
         const string expr = argv[1];
         std::cerr << "compiling '" << expr << "'" << std::endl;
         auto_ptr<pattern> q( compile(expr,NULL)  );
+        std::cerr << "saving expr.dot" << std::endl;
         q->graphviz("expr.dot");
+        std::cerr << "rendering expr.png" << std::endl;
         system("dot -Tpng -o expr.png expr.dot");
         
     }

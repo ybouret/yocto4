@@ -31,7 +31,8 @@ namespace yocto
             explicit logical(const uint32_t id) throw();
             logical(const logical &other);
             void __viz( const void *parent, ios::ostream &fp ) const;
-
+        
+            
         private:
             YOCTO_DISABLE_ASSIGN(logical);
         };
@@ -51,6 +52,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual bool     match(source &src, ios::istream &fp);
+            virtual void     refactor() throw();
             
         private:
             explicit AND() throw();
