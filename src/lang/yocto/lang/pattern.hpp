@@ -49,6 +49,12 @@ namespace yocto
             //! save a directed graph of the pattern
             void graphviz( const char   *fn ) const;
 
+            //! refactor a pattern, default is do nothing
+            virtual void refactor();
+            
+            //! optimize the structure of a pattern
+            static pattern *optimize(pattern *p) throw();
+            
         protected:
             explicit pattern( const uint32_t user_type ) throw();
             

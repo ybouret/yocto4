@@ -29,7 +29,7 @@ namespace yocto
         
 #define LBRACK '['
 #define RBRACK ']'
-     
+        
         namespace
         {
             
@@ -335,9 +335,8 @@ namespace yocto
 				if(p->operands.size<=0)
 					throw exception("%s(Empty Group)", fn );
                 
-                //p->optimize();
-                //return pattern::collapse(p.yield());
-                return p.yield();
+                p->refactor();
+                return pattern::optimize(p.yield());
 			}
             
             
@@ -613,15 +612,13 @@ namespace yocto
 				if(p->operands.size<=0)
 					throw exception("%s(Empty SubExpression)",fn);
                 
-                
-				//p->optimize();
-                //return pattern::collapse(p.yield());
-                return p.yield();
+                p->refactor();
+                return pattern::optimize(p.yield());
             }
             
             
 		}
-
+        
         
         
 		pattern *compile( const string &expr, const p_dict *dict)
