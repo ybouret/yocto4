@@ -20,6 +20,7 @@ public:
         forward("FLT", "{INT}[.]{INT}?f");
         discard("BLANKS", "[:blank:]+");
         make("ENDL","[:endl:]",this, & lexical::scanner::newline);
+        
     }
     
     virtual ~MyScanner() throw()
