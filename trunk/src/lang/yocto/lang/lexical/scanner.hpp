@@ -32,7 +32,7 @@ namespace yocto
                 
                 const string & key() const throw(); //!< return the name
                 
-                void reset() throw(); //!< reset all motif from content, set line=1
+                void reset() throw(); //!< reset all motif from content
                 
                 //! append a rule while checking name, delete upon error
                 void append( rule *r );

@@ -58,13 +58,16 @@ namespace yocto
             //! refactor and optimize recursively the structure of a pattern
             static pattern *optimize(pattern *p) throw();
             
-            //! not thread safe to debug
+            //! not thread safe
             static const char *fourcc_of(uint32_t tag) throw();
+            
+            //! not thread safe
             const char *fourcc() const throw();
             
             //! using the save function;
             string to_binary() const;
             
+            //! reloading a pattern
             static pattern *load(ios::istream &);
             
             

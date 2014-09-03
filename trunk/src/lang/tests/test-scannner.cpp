@@ -41,7 +41,7 @@ private:
 
 YOCTO_UNIT_TEST_IMPL(scanner)
 {
-    int       line = 0;
+    int       line = 1;
     MyScanner scan(line);
    
     

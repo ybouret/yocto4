@@ -46,7 +46,6 @@ name(id), line(line_ref), rules(), dict_(0), echo(false)
 
             void scanner:: reset() throw()
             {
-                line = 1;
                 for(rule *r=rules.head;r;r=r->next)
                 {
                     r->motif->reset();
