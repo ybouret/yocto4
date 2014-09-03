@@ -6,6 +6,7 @@
 
 
 #include "yocto/ptr/auto.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 #include <cstdlib>
 
@@ -21,14 +22,23 @@ void doviz( const char *name, pattern *p )
     fn += ".dot";
 	string img = name;
 	img += ".png";
-
+    
     q->graphviz(fn);
-
+    
 	string cmd = "dot -Tpng -o " + img + " " + fn;
 	std::cerr << "Executing '" << cmd << "'" << std::endl;
 	system( cmd.c_str() );
-
+    
+    string bn = name;
+    bn += ".bin";
+    
+    {
+        ios::ocstream fp(bn,false);
+        p->save(fp);
+    }
 }
+
+
 
 #define YVIZ(NAME) doviz( #NAME, posix:: NAME() )
 
@@ -47,6 +57,6 @@ YOCTO_UNIT_TEST_IMPL(viz)
 	YVIZ(dot);
 	YVIZ(cstring);
 	YVIZ(endl);
-
+    
 }
 YOCTO_UNIT_TEST_DONE()
