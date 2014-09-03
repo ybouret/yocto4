@@ -38,7 +38,7 @@ namespace  {
             Main2.make("ENDL", "[:endl:]", &Main, &lexical::scanner::newline);
             
             lexical::scanner &COM = declare("COM");
-            COM.forward("CONTENT", ".");
+            COM.discard("CONTENT", ".");
             COM.back("[:endl:]", this, &MyLexer::NewLine);
             
             
@@ -80,7 +80,7 @@ namespace  {
         
         void OnCall( const token &t )
         {
-            std::cerr << "Calling" << t << std::endl;
+            //std::cerr << "Calling" << t << std::endl;
         }
     };
     

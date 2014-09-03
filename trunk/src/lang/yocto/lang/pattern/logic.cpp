@@ -346,8 +346,16 @@ namespace yocto
                     return false;
                 }
             }
-            
-            return true;
+            t_char *ch = src.get(fp);
+            if(ch)
+            {
+                push_back( ch );
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         
         void NOT:: viz(ios::ostream &fp) const
