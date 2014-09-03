@@ -23,8 +23,10 @@ namespace yocto
             explicit first_chars();
             virtual ~first_chars() throw();
             first_chars(const first_chars &);
-            void add(code_type);
-            void add(const first_chars&fc); //!< leave accept_empty untouched
+            void add(code_type);                     //!< add one code
+            void add(const first_chars&fc);          //!< leave accept_empty untouched
+            void sub(code_type) throw();             //!< remove one code
+            void sub(const first_chars &fc) throw(); //!< leave accept_empty untouched
             
         private:
             YOCTO_DISABLE_ASSIGN(first_chars);
