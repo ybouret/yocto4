@@ -61,6 +61,10 @@ namespace yocto
             //! not thread safe to debug
             const char *fourcc() const throw();
             
+            //! using the save function;
+            string to_binary() const;
+            
+            
         protected:
             explicit pattern( const uint32_t user_type ) throw();
             
