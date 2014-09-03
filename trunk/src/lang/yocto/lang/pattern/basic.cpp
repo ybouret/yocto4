@@ -64,6 +64,13 @@ namespace yocto
         {
             fp.viz(this); fp << " [label=ANY1];\n";
         }
+        
+        void any1:: save( ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            
+        }
+
     }
     
 }
@@ -103,6 +110,12 @@ namespace yocto
             fp.viz(this); fp << " [label=\"'";
             outviz(value, fp);
             fp << "'\"];\n";
+        }
+        
+        void single:: save( ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            fp.emit(value);
         }
 
     }
@@ -149,6 +162,13 @@ namespace yocto
             outviz(upper,fp);
             fp << "']\"];\n";
         }
+        
+        void range:: save( ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            fp.emit(lower);
+            fp.emit(upper);
+        }
 
     }
     
@@ -186,6 +206,17 @@ namespace yocto
             
         }
 
+        
+        void choice:: __save( ios::ostream &fp ) const
+        {
+            const uint32_t n = chars.size();
+            fp.emit<uint32_t>(n);
+            for(uint32_t i=1; i <= n; ++i)
+            {
+                fp.emit(chars[i]);
+            }
+        }
+        
         void choice:: append(char lo, char up)
         {
             if(lo>up) cswap(lo, up);
@@ -193,7 +224,6 @@ namespace yocto
             {
                 (void) chars.insert(lo);
             }
-            
         }
         
         
@@ -242,6 +272,11 @@ namespace yocto
             fp << "]\"];\n";
         }
 
+        void within:: save( ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            __save(fp);
+        }
     }
     
 }
@@ -288,6 +323,13 @@ namespace yocto
             __viz(fp);
             fp << "]\"];\n";
         }
+        
+        void none:: save( ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            __save(fp);
+        }
+
 
     }
     

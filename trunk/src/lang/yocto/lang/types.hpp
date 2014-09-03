@@ -15,6 +15,19 @@ namespace yocto
         comparator<code_type>,
         memory::global::allocator> bytes_store;
         
+        //! pattern first possible chars
+        class first_chars : public bytes_store
+        {
+        public:
+            bool accept_empty; //!< if an empty pattern is ok
+            explicit first_chars();
+            virtual ~first_chars() throw();
+            first_chars(const first_chars &);
+            
+        private:
+            YOCTO_DISABLE_ASSIGN(first_chars);
+        };
+        
         
     }
 }

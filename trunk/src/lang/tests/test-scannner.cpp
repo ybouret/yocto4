@@ -15,7 +15,8 @@ public:
         
         p_dict &d = dict();
         d.add("INT", "[:digit:]+");
-        forward("INT",    "{INT}");
+        make("ID", "[:alpha:][:word:]*", this, & MyScanner::OnId );
+        forward("INT", "{INT}");
         forward("DBL", "{INT}[.]{INT}?");
         forward("FLT", "{INT}[.]{INT}?f");
         discard("BLANKS", "[:blank:]+");
@@ -25,6 +26,12 @@ public:
     
     virtual ~MyScanner() throw()
     {
+    }
+    
+    inline bool OnId( const token &tkn ) throw()
+    {
+        
+        return true;
     }
     
     
@@ -54,7 +61,6 @@ YOCTO_UNIT_TEST_IMPL(scanner)
         std::cerr << lx->label << ":["<< *lx << "]"<< std::endl;
         lxm.push_back(lx);
         lxm.kill();
-        
     }
 }
 YOCTO_UNIT_TEST_DONE()

@@ -27,6 +27,9 @@ namespace yocto
             //! GraphViz interface
             virtual void viz( ios::ostream & ) const = 0;
             
+            //! save interface
+            virtual void save( ios::ostream & ) const = 0;
+            
             //! true is a match is possible
             /**
              must left the source untouched otherwise !
