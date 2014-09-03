@@ -19,5 +19,18 @@ namespace yocto
         {
         }
         
+        void first_chars:: add(code_type c)
+        {
+            (void)insert(c);
+        }
+
+        void first_chars:: add(const first_chars&fc)
+        {
+            for(size_t i=fc.size();i>0;--i)
+            {
+                add( fc[i] );
+            }
+        }
+        
     }
 }

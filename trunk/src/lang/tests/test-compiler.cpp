@@ -20,6 +20,14 @@ YOCTO_UNIT_TEST_IMPL(compiler)
         std::cerr << "rendering expr.png" << std::endl;
         system("dot -Tpng -o expr.png expr.dot");
         
+        first_chars fc;
+        q->detect(fc);
+        std::cerr << "first_chars=[";
+        for(size_t i=1;i<=fc.size();++i)
+        {
+            std::cerr << make_visible(fc[i]);
+        }
+        std::cerr << "] " << (fc.accept_empty  ? "ACCEPT EMPTY" : "NEVER EMPTY" ) << std::endl;
     }
     
 }

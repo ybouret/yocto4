@@ -16,11 +16,19 @@ namespace yocto
         public:
             virtual ~pattern() throw();
             
+            //__________________________________________________________________
+            //
+            // data
+            //__________________________________________________________________
             pattern       *next;
             pattern       *prev;
             const uint32_t type; //!< UUID
             void          *self; //!< class corresponding to type
             
+            //__________________________________________________________________
+            //
+            // virtual interface
+            //__________________________________________________________________
             //! clone interface
             virtual pattern * clone() const = 0;
             
@@ -36,13 +44,24 @@ namespace yocto
              */
             virtual bool      match( source &src, ios::istream & ) = 0;
             
+            //! detect first chars
+            virtual void      detect( first_chars &fc ) const = 0;
+            
             //! clear all internal data
             /**
              default is this->clear
              */
             virtual void      reset() throw();
             
-           
+            
+            //! refactor a pattern, default is do nothing
+            virtual void refactor() throw();
+            
+            //__________________________________________________________________
+            //
+            // non virtual interface
+            //__________________________________________________________________
+            
             //! output a readable GraphViz label
             static void outviz( const char C, ios::ostream &fp );
             
@@ -51,9 +70,6 @@ namespace yocto
             
             //! save a directed graph of the pattern
             void graphviz( const char   *fn ) const;
-
-            //! refactor a pattern, default is do nothing
-            virtual void refactor() throw();
             
             //! refactor and optimize recursively the structure of a pattern
             static pattern *optimize(pattern *p) throw();
@@ -78,9 +94,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
         };
         
-#define YOCTO_LANG_PATTERN_API() \
-virtual pattern *clone() const
-        
+        //! a list of patterns
         typedef core::meta_list<pattern> p_list;
         
     }

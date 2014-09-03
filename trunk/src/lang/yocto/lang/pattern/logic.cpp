@@ -191,6 +191,30 @@ namespace yocto
             ops.swap_with(operands);
         }
         
+        
+        void AND:: detect(first_chars &fc) const
+        {
+            fc.free();
+            fc.accept_empty = true;
+            // merge until a not empty accepting pattern
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                first_chars tmp;
+                p->detect(tmp);
+                if(fc.accept_empty)
+                {
+                    fc.add(tmp);
+                }
+                if(!tmp.accept_empty)
+                {
+                    fc.accept_empty = false;
+                    break;
+                }
+            }
+            
+        }
+        
+        
     }
     
 }
@@ -244,6 +268,15 @@ namespace yocto
             __save(fp);
         }
 
+        void OR:: detect(first_chars &fc) const
+        {
+            fc.free();
+            fc.accept_empty = true;
+            
+            exit(1);
+            
+        }
+        
         
         void OR:: refactor() throw()
         {
@@ -329,6 +362,15 @@ namespace yocto
                 p->refactor();
             }
         }
+        
+        void NOT:: detect(first_chars &fc) const
+        {
+            fc.free();
+            fc.accept_empty = true;
+            
+            exit(1);
+        }
+
         
     }
     
