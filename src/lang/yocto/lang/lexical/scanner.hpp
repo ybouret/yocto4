@@ -380,7 +380,7 @@ namespace yocto
                 typename OBJECT_POINTER,
                 typename METHOD_POINTER
                 >
-                inline void back(pattern *motif,
+                inline void back(pattern       *motif,
                                  OBJECT_POINTER Object,
                                  METHOD_POINTER Method)
                 {
@@ -393,12 +393,12 @@ namespace yocto
                 typename OBJECT_POINTER,
                 typename METHOD_POINTER
                 >
-                inline void back(const string &regex,
+                inline void back(const string  &regex,
                                  OBJECT_POINTER Object,
                                  METHOD_POINTER Method)
                 {
                     const callback onBack(Object,Method);
-                    back( compile(regex,dict), onBack);
+                    back( regex, onBack);
                 }
                 
                 template <
@@ -410,7 +410,7 @@ namespace yocto
                                  METHOD_POINTER Method)
                 {
                     const callback onBack(Object,Method);
-                    back( compile(regex,dict), onBack);
+                    back( regex, onBack);
                 }
                 
             private:
@@ -418,7 +418,7 @@ namespace yocto
                 r_list        rules;
                 lexer        *mylex;
                 const p_dict *dict;
-                int iBack;
+                int           iBack;
                 
             };
             

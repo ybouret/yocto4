@@ -23,7 +23,8 @@ namespace  {
             Main.make("ID",  "[:alpha:][:word:]*",this, &MyLexer::OnID);
             Main.make("INT", "[:digit:]+",       this, &MyLexer::OnINT);
             Main.jump("Main2", "@2", this, &MyLexer::OnJump);
-            Main.call("COM", "//",  this, &MyLexer::OnCall);
+            Main.call("COM",   "//",   this, &MyLexer::OnCall);
+            Main.call("COM_C", "/\\*", this, &MyLexer::OnCall);
             Main.make("BLANK", "[:blank:]",discard);
             Main.make("ENDL", "[:endl:]", this, &MyLexer::OnNewLine);
             
@@ -34,12 +35,18 @@ namespace  {
             Main2.make("INT", "[:digit:]+",       this, &MyLexer::OnINT);
             Main2.jump("Main", "@1", this, &MyLexer::OnJump);
             Main2.call("COM", "//",  this, &MyLexer::OnCall);
+            Main2.call("COM_C", "/\\*", this, &MyLexer::OnCall);
             Main2.make("BLANK", "[:blank:]",discard);
             Main2.make("ENDL", "[:endl:]", &Main, &lexical::scanner::newline);
             
             lexical::scanner &COM = declare("COM");
             COM.make("CONTENT", ".", discard);
             COM.back("[:endl:]", this, &MyLexer::NewLine);
+            
+            lexical::scanner &COM_C = declare("COM_C");
+            COM_C.make("CONTENT",".",discard);
+            COM_C.make("ENDL", "[:endl:]", this, &MyLexer::OnNewLine);
+            COM_C.back("\\*/",this,&MyLexer::OnCall);
             
         }
         
