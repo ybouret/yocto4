@@ -84,11 +84,11 @@ namespace yocto
                         const code_type  C  = ch->code;
                         if(C>=32 && C<127)
                         {
-                            throw exception("%d: unexpected '%c", line, char(C) );
+                            throw exception("%d: unexpected '%c' in <%s>", line, char(C), name.c_str() );
                         }
                         else
                         {
-                            throw exception("%d: unexpected character 0x%02d", line, int(C));
+                            throw exception("%d: unexpected character 0x%02d in <%s>", line, int(C), name.c_str());
                         }
                     }
                     
@@ -109,7 +109,7 @@ namespace yocto
                         case rule::is_control:
                             // this is a control rule
                             if(produce)
-                                throw exception("unexpected producing control rule '%s'", from->label.c_str());
+                                throw exception("unexpected producing control rule '%s' in <%s>", from->label.c_str(), name.c_str());
                             
                             // discard content
                             best->reset();

@@ -110,6 +110,7 @@ namespace yocto
                 bool    newline(const token &);        //!< increase #line, discard
                 bool    newline_emit(const token &);   //!< increase #line, forward
                 
+                
                 //--------------------------------------------------------------
                 //
                 // jump: jumping to a lexer's subscanner
@@ -120,6 +121,34 @@ namespace yocto
                 void jump(const string   &target,
                           const string   &regex,
                           const callback &onJump);
+                
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void jump(const string   &target,
+                          const string   &regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const callback onJump(host,method);
+                    jump(target,regex,onJump);
+                }
+                
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void jump(const char     *target,
+                          const char     *regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const string Target(target);
+                    const string Regex(regex);
+                    jump(Target,Regex,host,method);
+                }
+                
                 
                 
                 //--------------------------------------------------------------
@@ -133,6 +162,33 @@ namespace yocto
                           const string   &regex,
                           const callback &onJump);
                 
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void call(const string   &target,
+                          const string   &regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const callback onCall(host,method);
+                    call(target,regex,onCall);
+                }
+                
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void call(const char     *target,
+                          const char     *regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const string Target(target);
+                    const string Regex(regex);
+                    call(Target,Regex,host,method);
+                }
+                
                 
                 //--------------------------------------------------------------
                 //
@@ -141,6 +197,31 @@ namespace yocto
                 //--------------------------------------------------------------
                 void back(const string   &regex,
                           const callback &onBack);
+                
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void back(const string   &regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const callback onBack(host,method);
+                    back(regex,onBack);
+                }
+                
+                template <
+                typename OBJECT_POINTER,
+                typename METHOD_POINTER
+                >
+                void back( const char    *regex,
+                          OBJECT_POINTER  host,
+                          METHOD_POINTER  method)
+                {
+                    const string Regex(regex);
+                    back(Regex,host,method);
+                }
+
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);

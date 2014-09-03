@@ -28,7 +28,7 @@ namespace yocto
             ptr->link_to(*this);
             
             if( !scanners.insert(ptr) )
-                throw exception("lexer {%s}: multiple scanner '%s'", name.c_str(), id.c_str());
+                throw exception("lexer {%s}: multiple scanner <%s>", name.c_str(), id.c_str());
             lexical::scanner &ref = *ptr;
             if(!root)
             {
@@ -37,28 +37,21 @@ namespace yocto
             }
             return ref;
         }
-
+        
         lexical::scanner & lexer:: declare(const char   *id)
         {
             const string ID(id);
             return declare(ID);
         }
-
         
-        void lexer:: set_root(const string &id)
-        {
-            lexical::scanner::pointer *ppScan = scanners.search(id);
-            if(!ppScan)
-                throw exception("{%s}.set_root(no '%s')", name.c_str(), id.c_str());
-            root = & (**ppScan);
-            scan = root;
-        }
+        
+        
         
         bool lexer:: has( const string &id) const throw()
         {
             return scanners.search(id) != 0;
         }
-
+        
         void lexer:: initialize() throw()
         {
             line = 1;
@@ -73,7 +66,7 @@ namespace yocto
         void lexer::jump(const string &id)
         {
             lexical::scanner::pointer *ppScan = scanners.search(id);
-            if(!ppScan) throw exception("{%s}.jump(NO '%s')", name.c_str(), id.c_str());
+            if(!ppScan) throw exception("{%s}.jump(NO <%s>)", name.c_str(), id.c_str());
             scan = & (**ppScan);
         }
         
@@ -81,7 +74,7 @@ namespace yocto
         {
             assert(scan);
             lexical::scanner::pointer *ppScan = scanners.search(id);
-            if(!ppScan) throw exception("{%s}.call(NO '%s')", name.c_str(), id.c_str());
+            if(!ppScan) throw exception("{%s}.call(NO <%s>)", name.c_str(), id.c_str());
             history.push_back(scan);
             scan = & (**ppScan);
         }
@@ -96,6 +89,53 @@ namespace yocto
             history.pop_back();
         }
         
+        
+        lexeme * lexer:: get(source &src, ios::istream &fp)
+        {
+            if(!scan)
+                throw exception("no active scanner");
+            
+            if(cache.size>0)
+            {
+                return cache.pop_front();
+            }
+            else
+            {
+                bool is_control  = false;
+                while(true)
+                {
+                    lexeme *lx = scan->get(src, fp, is_control);
+                    if(!lx)
+                    {
+                        if(!is_control)
+                        {
+                            // EOF
+                            return 0;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    assert(!is_control);
+                    return lx;
+                }
+                
+            }
+        }
+        
+        void lexer:: unget(lexeme *lx ) throw()
+        {
+            assert(lx!=0);
+            cache.push_front(lx);
+        }
+        
+        const lexical::scanner & lexer:: current() const throw()
+        {
+            assert(scan);
+            return *scan;
+        }
+
         
     }
 }
