@@ -3,6 +3,7 @@
 #include "yocto/lang/pattern/logic.hpp"
 
 #include "yocto/exception.hpp"
+#include "yocto/ios/imstream.hpp"
 
 namespace yocto
 {
@@ -96,6 +97,13 @@ namespace yocto
             }
             throw exception("pattern.load(unknown tag %08x <=> [%s])",tag,fourcc_of(tag));
             
+        }
+        
+        
+        pattern * pattern::load( const memory::ro_buffer &buff )
+        {
+            ios::imstream fp(buff);
+            return pattern::load(fp);
         }
     }
 }
