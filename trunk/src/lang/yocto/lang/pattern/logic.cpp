@@ -271,9 +271,16 @@ namespace yocto
         void OR:: detect(first_chars &fc) const
         {
             fc.free();
-            fc.accept_empty = true;
+            fc.accept_empty = (operands.size <= 0);
             
-            exit(1);
+            for(const pattern *p=operands.head;p;p=p->next)
+            {
+                first_chars tmp;
+                p->detect(tmp);
+                fc.add(tmp);
+                if(tmp.accept_empty)
+                    fc.accept_empty = true;
+            }
             
         }
         
