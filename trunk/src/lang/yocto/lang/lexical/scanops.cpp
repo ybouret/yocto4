@@ -10,14 +10,31 @@ namespace yocto
         namespace lexical
         {
             
-            void scanner:: make(const string &label,
-                                const string &regex,
-                                const action &cb)
+            void scanner:: __build(const string  &label,
+                                   const string  &regex,
+                                   const action  &todo,
+                                   const bool     is_control )
             {
                 pattern *p = compile(regex,dict_);
-                rule    *r = rule::create(label,p,cb,false);
+                rule    *r = rule::create(label,p,todo,is_control);
                 append( r );
             }
+            
+            void scanner:: make(const string &label,
+                                const string &regex,
+                                const action &todo)
+            {
+               
+                __build(label, regex, todo,false);
+            }
+            
+            void scanner:: ctrl(const string &label,
+                                const string &regex,
+                                const action &todo)
+            {
+                __build(label, regex, todo,true);
+            }
+            
             
             
             void scanner:: forward(const string &label, const string &regex)
@@ -52,7 +69,7 @@ namespace yocto
                 
                 discard(L,R);
             }
-
+            
             
             bool scanner:: drop(const token &tkn )
             {
