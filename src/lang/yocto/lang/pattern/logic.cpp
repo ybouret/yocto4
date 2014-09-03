@@ -373,9 +373,19 @@ namespace yocto
         void NOT:: detect(first_chars &fc) const
         {
             fc.free();
-            fc.accept_empty = true;
-            
-            exit(1);
+            fc.accept_empty = false;
+            fc.ensure(256);
+            for(size_t i=0;i<256;++i)
+            {
+                fc.add(code_type(i));
+            }
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                first_chars tmp;
+                p->detect(tmp);
+                fc.sub(tmp);
+            }
+            fc.accept_empty = fc.size() <= 0;
         }
 
         

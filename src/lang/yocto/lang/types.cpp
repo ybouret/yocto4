@@ -32,5 +32,19 @@ namespace yocto
             }
         }
         
+        void first_chars:: sub(code_type c) throw()
+        {
+            (void)remove(c);
+        }
+        
+        
+        void first_chars:: sub(const first_chars &fc) throw()
+        {
+            for(size_t i=fc.size();i>0;--i)
+            {
+                sub( fc[i] );
+            }
+        }
+        
     }
 }
