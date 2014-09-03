@@ -10,18 +10,17 @@ using namespace lang;
 class MyScanner : public lexical:: scanner
 {
 public:
-    explicit MyScanner(int &lr ) : lexical::scanner( "Main", lr )
+    explicit MyScanner(int &lr, p_dict &d ) : lexical::scanner( "Main", lr, d)
     {
         
-        p_dict &d = dict();
         d.add("INT", "[:digit:]+");
-        make("ID", "[:alpha:][:word:]*", this, & MyScanner::OnId );
-        forward("INT", "{INT}");
-        forward("DBL", "{INT}[.]{INT}?");
-        forward("FLT", "{INT}[.]{INT}?f");
-        discard("BLANKS", "[:blank:]+");
-        make("ENDL","[:endl:]",this, & lexical::scanner::newline);
         
+        make("ID",     "[:alpha:][:word:]*", this, & MyScanner::OnId );
+        make("INT",    "{INT}",              this, &lexical::scanner::emit);
+        make("DBL",    "{INT}[.]{INT}?",     this, &lexical::scanner::emit);
+        make("FLT",    "{INT}[.]{INT}?f",    this, &lexical::scanner::emit);
+        make("BLANKS", "[:blank:]+",         this, &lexical::scanner::drop);
+        make("ENDL",   "[:endl:]",           this, &lexical::scanner::newline);
     }
     
     virtual ~MyScanner() throw()
@@ -42,7 +41,8 @@ private:
 YOCTO_UNIT_TEST_IMPL(scanner)
 {
     int       line = 1;
-    MyScanner scan(line);
+    p_dict    dict;
+    MyScanner scan(line,dict);
    
     
     ios::icstream fp( ios::cstdin );
@@ -50,7 +50,6 @@ YOCTO_UNIT_TEST_IMPL(scanner)
     
     lexemes lxm;
     bool    ctl = false;
-    scan.echo   = true;
     scan.reset();
     
     for(;;)

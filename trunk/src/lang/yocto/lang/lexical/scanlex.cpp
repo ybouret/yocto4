@@ -80,25 +80,27 @@ namespace yocto
             
             
             void scanner:: jump(const string   &target,
-                                const string   &regex,
+                                pattern        *motif,
                                 const callback &onJump)
             {
+                auto_ptr<pattern> q(motif);
                 if(!mylex) throw exception("'%s' has no linked lexer",name.c_str());
                 LexerMake<DoJump> host(*mylex,target,onJump);
-                const action A(host);
+                const action which(host);
                 const string label = "jump@" + target;
-                ctrl(label,regex,A);
+                append(label, q.yield(), which, rule::is_control);
             }
             
             void scanner:: call(const string   &target,
-                                const string   &regex,
+                                pattern        *motif,
                                 const callback &onCall)
             {
+                auto_ptr<pattern> q(motif);
                 if(!mylex) throw exception("'%s' has no linked lexer",name.c_str());
                 const LexerMake<DoCall> host(*mylex,target,onCall);
-                const action A(host);
+                const action which(host);
                 const string label = "call@" + target;
-                ctrl(label,regex,A);
+                append(label, q.yield(), which, rule::is_control);
             }
             
             namespace
@@ -127,7 +129,7 @@ namespace yocto
                     {
                         
                     }
-
+                    
                     inline bool operator()(const token &tkn)
                     {
                         parent.back();
@@ -140,14 +142,15 @@ namespace yocto
                 };
             }
             
-            void scanner:: back(const string   &regex,
+            void scanner:: back(pattern        *motif,
                                 const callback &onBack)
             {
+                auto_ptr<pattern> q(motif);
                 if(!mylex) throw exception("'%s' has no linked lexer",name.c_str());
                 const LexerBack host(*mylex,onBack);
-                const action    A(host);
+                const action    which(host);
                 const string    label = vformat("back#%d",++iBack);
-                ctrl(label,regex,A);
+                append(label, q.yield(), which, rule::is_control);
             }
             
         }

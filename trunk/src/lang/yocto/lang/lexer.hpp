@@ -51,6 +51,17 @@ namespace yocto
             lexical::scanner *root;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
+        public:
+            p_dict dict;
+            bool   echo;
+            const lexical::action forward;
+            const lexical::action discard;
+            
+            bool emit(const token&) throw();
+            bool drop(const token&) throw();
+            void newline() throw();      //!< ++line
+            bool newline_drop(const token&) throw(); //!< newline, return false
+            bool newline_emit(const token&) throw(); //!< newline, return true
         };
         
     }
