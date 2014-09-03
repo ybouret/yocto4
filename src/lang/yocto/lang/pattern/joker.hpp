@@ -41,11 +41,11 @@ namespace yocto
             //! the pointer is taken care of
             static  pattern *create( pattern *p );
             
-            //! clone
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save(ios::ostream & ) const;
-            
+            virtual void     detect(first_chars &) const;
+
             //! 0 or 1 exactly
             virtual bool match( source &, ios::istream &fp );
             
@@ -74,7 +74,8 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save(ios::ostream & ) const;
-            
+            virtual void     detect(first_chars &) const;
+
             //! true is count >= value
             virtual bool match( source &, ios::istream &);
             
@@ -106,7 +107,8 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save(ios::ostream & ) const;
-            
+            virtual void     detect(first_chars &) const;
+
             //! true if a count of at least n and max m is found
             virtual bool match(source &, ios::istream &);
             

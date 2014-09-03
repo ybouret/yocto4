@@ -50,8 +50,9 @@ namespace yocto
             
             static  logical *create();
             virtual pattern *clone() const;
-            virtual void     viz( ios::ostream &) const;
-            virtual void     save(ios::ostream &) const;
+            virtual void     viz( ios::ostream &)  const;
+            virtual void     save(ios::ostream &)  const;
+            virtual void     detect(first_chars &) const;
 
             virtual bool     match(source &src, ios::istream &fp);
             virtual void     refactor() throw();
@@ -74,8 +75,10 @@ namespace yocto
             
             static  logical *create();
             virtual pattern *clone() const;
-            virtual void     viz( ios::ostream &) const;
-            virtual void     save(ios::ostream &) const;
+            virtual void     viz( ios::ostream &)  const;
+            virtual void     save(ios::ostream &)  const;
+            virtual void     detect(first_chars &) const;
+
             virtual bool     match(source &src, ios::istream &fp);
             virtual void     refactor() throw();
 
@@ -97,8 +100,9 @@ namespace yocto
             
             static  logical *create();
             virtual pattern *clone() const;
-            virtual void     viz( ios::ostream &) const;
-            virtual void     save(ios::ostream &) const;
+            virtual void     viz( ios::ostream &)  const;
+            virtual void     save(ios::ostream &)  const;
+            virtual void     detect(first_chars &) const;
 
             //! always empty...
             virtual bool     match(source &src, ios::istream &fp);

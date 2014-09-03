@@ -39,6 +39,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save(ios::ostream & ) const;
+            virtual void     detect( first_chars &) const;
 
         private:
             explicit any1() throw();
@@ -64,6 +65,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save( ios::ostream & ) const;
+            virtual void     detect( first_chars &) const;
             
         private:
             virtual bool is_valid( const code_type ) const throw();
@@ -89,9 +91,9 @@ namespace yocto
             
             static  pattern *create( const code_type lo, const code_type up);
             virtual pattern *clone() const;
-            virtual void     viz( ios::ostream & ) const;
-            virtual void     save( ios::ostream & ) const;
-
+            virtual void     viz( ios::ostream &)  const;
+            virtual void     save(ios::ostream &)  const;
+            virtual void     detect(first_chars &) const;
         private:
             explicit range(const code_type lo, const code_type up) throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(range);
@@ -133,6 +135,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save(ios::ostream & ) const;
+            virtual void     detect(first_chars &) const;
 
         private:
             YOCTO_DISABLE_ASSIGN(within);
@@ -156,6 +159,7 @@ namespace yocto
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save(ios::ostream & ) const;
+            virtual void     detect(first_chars &) const;
 
         private:
             YOCTO_DISABLE_ASSIGN(none);

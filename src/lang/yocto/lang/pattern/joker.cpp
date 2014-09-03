@@ -99,6 +99,14 @@ namespace yocto
             motif->save(fp);
         }
         
+        void optional:: detect(first_chars &fc) const
+        {
+            fc.free();
+            motif->detect(fc);
+            fc.accept_empty = true;
+        }
+
+        
     }
     
 }
@@ -176,6 +184,17 @@ namespace yocto
             fp.emit<uint32_t>(value);
             motif->save(fp);
         }
+        
+        void at_least:: detect(first_chars &fc) const
+        {
+            fc.free();
+            motif->detect(fc);
+            if(fc.accept_empty==false&&value<=0)
+            {
+                fc.accept_empty = true;
+            }
+        }
+        
         
         
         pattern * zero_or_more(pattern *p)
@@ -272,6 +291,16 @@ namespace yocto
             fp.emit<uint32_t>(n);
             fp.emit<uint32_t>(m);
             motif->save(fp);
+        }
+        
+        void counting:: detect(first_chars &fc) const
+        {
+            fc.free();
+            motif->detect(fc);
+            if(fc.accept_empty==false&&n<=0)
+            {
+                fc.accept_empty = true;
+            }
         }
         
     }

@@ -17,7 +17,7 @@ namespace yocto
         {
             assert( 0 == size );
             t_char *ch = src.get(fp);
-           
+            
             if(ch)
             {
                 if( is_valid(ch->code) )
@@ -69,7 +69,15 @@ namespace yocto
         {
             fp.emit(tag);
         }
-
+        
+        void any1::detect( first_chars &fc ) const
+        {
+            fc.free();
+            fc.ensure(256);
+            fc.accept_empty = false;
+            for(int i=255;i>=0;--i) fc.add(code_type(i));
+        }
+        
     }
     
 }
@@ -116,9 +124,17 @@ namespace yocto
             fp.emit(tag);
             fp.emit<code_type>(value);
         }
-
+        
+        void single:: detect(first_chars &fc) const
+        {
+            fc.free();
+            fc.ensure(1);
+            fc.accept_empty = false;
+            fc.add(value);
+        }
+        
     }
-
+    
 }
 
 #include "yocto/code/utils.hpp"
@@ -168,7 +184,19 @@ namespace yocto
             fp.emit(lower);
             fp.emit(upper);
         }
-
+        
+        void range:: detect(first_chars &fc) const
+        {
+            fc.free();
+            fc.accept_empty = false;
+            const size_t n = size_t(upper-lower)+1;
+            code_type    c = lower;
+            for(size_t i=n;i>0;--i,++c)
+            {
+                fc.add(c);
+            }
+        }
+        
     }
     
 }
@@ -204,7 +232,7 @@ namespace yocto
             }
             
         }
-
+        
         
         void choice:: __save( ios::ostream &fp ) const
         {
@@ -270,11 +298,27 @@ namespace yocto
             __viz(fp);
             fp << "]\"];\n";
         }
-
+        
         void within:: save( ios::ostream &fp) const
         {
             fp.emit(tag);
             __save(fp);
+        }
+        
+        void within:: detect(first_chars &fc) const
+        {
+            fc.free();
+            const size_t n = chars.size();
+            if(n>0)
+            {
+                fc.accept_empty = false;
+                fc.ensure(n);
+                for(size_t i=1;i<=n;++i) fc.add( chars[i] );
+            }
+            else
+            {
+                fc.accept_empty = true;
+            }
         }
     }
     
@@ -314,7 +358,7 @@ namespace yocto
         {
             return !chars.search(C);
         }
-     
+        
         void none:: viz(ios::ostream &fp) const
         {
             fp.viz(this);
@@ -328,8 +372,29 @@ namespace yocto
             fp.emit(tag);
             __save(fp);
         }
-
-
+        
+        void none:: detect(first_chars &fc) const
+        {
+            fc.free();
+            const size_t n = chars.size();
+            if(n>=256)
+            {
+                fc.accept_empty = true;
+            }
+            else
+            {
+                fc.ensure(256-n);
+                for(int i=0;i<=255;++i)
+                {
+                    const code_type c(i);
+                    if( chars.search(c) )
+                        continue;
+                    fc.add(c);
+                }
+            }
+        }
+        
+        
     }
     
 }
