@@ -9,22 +9,21 @@ namespace yocto
         {
             scanner:: ~scanner() throw()
             {
-                no_dict();
             }
             
 #define Y_SCANNER_CTOR() \
-name(id), line(line_ref), rules(), mylex(0), dict_(0), echo(false), iBack(0)
+name(id), line(line_ref), rules(), mylex(0), dict( &dict_ref), iBack(0)
             
-            scanner:: scanner( const string &id, int &line_ref ) :
+            scanner:: scanner( const string &id, int &line_ref, const p_dict &dict_ref ) :
             Y_SCANNER_CTOR()
             {
             }
             
-            scanner:: scanner( const char *id, int &line_ref ) :
+            scanner:: scanner( const char *id, int &line_ref, const p_dict &dict_ref  ) :
             Y_SCANNER_CTOR()
             {
             }
-
+            
             const string & scanner:: key() const throw()
             {
                 return name;
@@ -43,7 +42,26 @@ name(id), line(line_ref), rules(), mylex(0), dict_(0), echo(false), iBack(0)
                 }
                 rules.push_back(r);
             }
-
+            
+            void scanner:: append(const string    &label,
+                                  pattern         *motif,
+                                  const action    &which,
+                                  const rule::kind flag)
+            {
+                assert(motif);
+                append( rule::create(label,motif,which,flag) );
+            }
+            
+            void scanner:: append(const char      *label,
+                                  pattern         *motif,
+                                  const action    &which,
+                                  const rule::kind flag)
+            {
+                auto_ptr<pattern> q( motif );
+                const string Label(label);
+                append( Label, q.yield(), which, flag);
+            }
+            
             void scanner:: reset() throw()
             {
                 for(rule *r=rules.head;r;r=r->next)
@@ -52,22 +70,7 @@ name(id), line(line_ref), rules(), mylex(0), dict_(0), echo(false), iBack(0)
                 }
             }
             
-            p_dict & scanner:: dict()
-            {
-                if(!dict_) dict_ = new p_dict();
-                return *dict_;
-            }
-
-            void scanner:: no_dict() throw()
-            {
-                if(dict_)
-                {
-                    delete dict_;
-                    dict_ = 0;
-                }
-            }
             
-                       
         }
     }
 }

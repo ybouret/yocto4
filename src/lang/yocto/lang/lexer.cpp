@@ -6,11 +6,21 @@ namespace yocto
     namespace lang
     {
         
+        bool  lexer:: emit(const token &) throw() { return true;  }
+        bool  lexer:: drop(const token &) throw() { return false; }
+        void  lexer:: newline() throw() { ++line; }
+        bool  lexer:: newline_drop(const token&) throw() { newline(); return false; }
+        bool  lexer:: newline_emit(const token&) throw() { newline(); return true;  }
+
+        
         lexer:: ~lexer() throw()
         {
         }
         
-#define Y_LEXER_CTOR() name(id), line(1), scan(0), scanners(2,as_capacity), root(0)
+#define Y_LEXER_CTOR() \
+name(id), line(1), scan(0), scanners(2,as_capacity), root(0), dict(), \
+forward(this, &lexer::emit ),\
+discard(this, &lexer::drop )
         
         lexer:: lexer(const string &id) :
         Y_LEXER_CTOR()
@@ -24,7 +34,7 @@ namespace yocto
         
         lexical::scanner & lexer:: declare(const string &id)
         {
-            lexical::scanner::pointer ptr( new lexical::scanner(id,line) );
+            lexical::scanner::pointer ptr( new lexical::scanner(id,line,dict) );
             ptr->link_to(*this);
             
             if( !scanners.insert(ptr) )

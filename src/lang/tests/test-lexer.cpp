@@ -24,7 +24,7 @@ namespace  {
             Main.make("INT", "[:digit:]+",       this, &MyLexer::OnINT);
             Main.jump("Main2", "@2", this, &MyLexer::OnJump);
             Main.call("COM", "//",  this, &MyLexer::OnCall);
-            Main.discard("BLANK", "[:blank:]");
+            Main.make("BLANK", "[:blank:]",discard);
             Main.make("ENDL", "[:endl:]", this, &MyLexer::OnNewLine);
             
             
@@ -34,13 +34,12 @@ namespace  {
             Main2.make("INT", "[:digit:]+",       this, &MyLexer::OnINT);
             Main2.jump("Main", "@1", this, &MyLexer::OnJump);
             Main2.call("COM", "//",  this, &MyLexer::OnCall);
-            Main2.discard("BLANK", "[:blank:]");
+            Main2.make("BLANK", "[:blank:]",discard);
             Main2.make("ENDL", "[:endl:]", &Main, &lexical::scanner::newline);
             
             lexical::scanner &COM = declare("COM");
-            COM.discard("CONTENT", ".");
+            COM.make("CONTENT", ".", discard);
             COM.back("[:endl:]", this, &MyLexer::NewLine);
-            
             
         }
         
