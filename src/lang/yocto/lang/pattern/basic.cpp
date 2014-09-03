@@ -68,7 +68,6 @@ namespace yocto
         void any1:: save( ios::ostream &fp) const
         {
             fp.emit(tag);
-            
         }
 
     }
@@ -90,7 +89,7 @@ namespace yocto
             self= (single *)this;
         }
         
-        pattern * single:: create( const int val )
+        pattern * single:: create( const code_type val )
         {
             return new single(val);
         }
@@ -115,7 +114,7 @@ namespace yocto
         void single:: save( ios::ostream &fp) const
         {
             fp.emit(tag);
-            fp.emit(value);
+            fp.emit<code_type>(value);
         }
 
     }
@@ -210,7 +209,7 @@ namespace yocto
         void choice:: __save( ios::ostream &fp ) const
         {
             const uint32_t n = chars.size();
-            fp.emit<uint32_t>(n);
+            fp.emit(n);
             for(uint32_t i=1; i <= n; ++i)
             {
                 fp.emit(chars[i]);
