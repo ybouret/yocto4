@@ -13,7 +13,7 @@ namespace yocto
             }
             
 #define Y_SCANNER_CTOR() \
-name(id), line(line_ref), rules(), dict_(0), echo(false)
+name(id), line(line_ref), rules(), mylex(0), dict_(0), echo(false), iBack(0)
             
             scanner:: scanner( const string &id, int &line_ref ) :
             Y_SCANNER_CTOR()
@@ -67,7 +67,7 @@ name(id), line(line_ref), rules(), dict_(0), echo(false)
                 }
             }
             
-            
+                       
         }
     }
 }

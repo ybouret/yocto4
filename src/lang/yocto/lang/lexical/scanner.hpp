@@ -11,9 +11,12 @@ namespace yocto
 {
     namespace lang
     {
+        class lexer;
+        
         namespace lexical
         {
             
+            typedef functor<void,TL1(const token &)> callback;
             
             class scanner : public object, public counted
             {
@@ -55,6 +58,10 @@ namespace yocto
                  */
                 lexeme *get( source &src, ios::istream &fp, bool &is_control );
                 
+                //! link to a lexer
+                void link_to( lexer & );
+                
+                
                 //--------------------------------------------------------------
                 //
                 // make rules: simple undertaken actions
@@ -62,7 +69,7 @@ namespace yocto
                 //--------------------------------------------------------------
                 void make(const string  &label,
                           const string  &regex,
-                          const action  &cb );
+                          const action  &todo );
                 
                 template <
                 typename OBJECT_POINTER,
@@ -103,14 +110,58 @@ namespace yocto
                 bool    newline(const token &);        //!< increase #line, discard
                 bool    newline_emit(const token &);   //!< increase #line, forward
                 
+                //--------------------------------------------------------------
+                //
+                // jump: jumping to a lexer's subscanner
+                //
+                //--------------------------------------------------------------
+                
+                //! change lexer's scanner with a jump
+                void jump(const string   &target,
+                          const string   &regex,
+                          const callback &onJump);
+                
+                
+                //--------------------------------------------------------------
+                //
+                // call: calling a lexer's subscanner
+                //
+                //--------------------------------------------------------------
+                
+                //! change lexer's scanner with a call
+                void call(const string   &target,
+                          const string   &regex,
+                          const callback &onJump);
+                
+                
+                //--------------------------------------------------------------
+                //
+                // back: returning to a lexer's calling subscanner
+                //
+                //--------------------------------------------------------------
+                void back(const string   &regex,
+                          const callback &onBack);
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
                 r_list  rules;
+                lexer  *mylex;
                 p_dict *dict_;
                 
+                void ctrl(const string  &label,
+                          const string  &regex,
+                          const action  &todo );
+                
+                void __build(const string  &label,
+                             const string  &regex,
+                             const action  &todo,
+                             const bool     is_control );
                 
             public:
                 bool echo;
+                
+            private:
+                int iBack;
                 
             };
             
