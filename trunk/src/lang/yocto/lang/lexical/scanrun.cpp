@@ -38,7 +38,7 @@ namespace yocto
                         {
                             continue;
                         }
-
+                        
                         const size_t clen = curr->size;
                         
                         if(!best)
@@ -103,37 +103,40 @@ namespace yocto
                     //__________________________________________________________
                     const bool produce = from->deed(*best);
                     src.skip(blen);
-
-                    if( from->ctrl )
+                    
+                    switch( from->type )
                     {
-                        // this is a control rule
-                        if(produce)
-                            throw exception("unexpected producing control rule '%s'", from->label.c_str());
-                        
-                        // discard content
-                        best->reset();
-                        
-                        // set info
-                        is_control = true;
-                        
-                        // stop looking
-                        return 0;
-                    }
-                    else
-                    {
-                        if(produce)
-                        {
-                            lexeme *lex = new lexeme(from->label,line);
-                            lex->swap_with(*best);
-                            return lex;
-                        }
-                        else
-                        {
-                            // silently discard
+                        case rule::is_control:
+                            // this is a control rule
+                            if(produce)
+                                throw exception("unexpected producing control rule '%s'", from->label.c_str());
+                            
+                            // discard content
                             best->reset();
-                            // and go on...
-                        }
+                            
+                            // set info
+                            is_control = true;
+                            
+                            // stop looking
+                            return 0;
+                            
+                            
+                        case rule::is_regular:
+                            if(produce)
+                            {
+                                lexeme *lex = new lexeme(from->label,line);
+                                lex->swap_with(*best);
+                                return lex;
+                            }
+                            else
+                            {
+                                // silently discard
+                                best->reset();
+                                // and go on...
+                            }
+                            break;
                     }
+                    
                     //__________________________________________________________
                     //
                     // next search after a discard

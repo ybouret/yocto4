@@ -13,6 +13,7 @@ namespace yocto
         {
             
             
+            
             //! a lexical action
             /**
              Do something with a matching token
@@ -23,19 +24,24 @@ namespace yocto
             class rule : public object
             {
             public:
+                enum kind
+                {
+                    is_regular,
+                    is_control
+                };
                 const string label;    //!< unique label, transmitted to lexeme
                 pattern     *motif;    //!< the accepting pattern
                 action       deed;     //!< what to do when the motif wins
-                const bool   ctrl;     //!< a control rule ?
+                const kind   type;     //!< a control rule ?
                 rule        *next;     //!< for the list
                 rule        *prev;     //!< for the list
                 
                 virtual ~rule() throw();
                 
-                static   rule *create(const string &id, pattern *p, const action &cb, const bool flag);
+                static   rule *create(const string &id, pattern *p, const action &cb, const kind flag);
                 
             private:
-                rule(const string &id, pattern *pp, const action &cb, const bool flag );
+                rule(const string &id, pattern *pp, const action &cb, const kind flag );
                 
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
             };

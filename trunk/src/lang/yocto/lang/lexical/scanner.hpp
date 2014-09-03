@@ -152,10 +152,10 @@ namespace yocto
                           const string  &regex,
                           const action  &todo );
                 
-                void __build(const string  &label,
-                             const string  &regex,
-                             const action  &todo,
-                             const bool     is_control );
+                void __build(const string    &label,
+                             const string    &regex,
+                             const action    &todo,
+                             const rule::kind flag );
                 
             public:
                 bool echo;
