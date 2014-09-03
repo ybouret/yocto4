@@ -13,13 +13,13 @@ YOCTO_UNIT_TEST_IMPL(compiler)
     {
         p_dict dict;
         const string expr = argv[1];
-        std::cerr << "compiling '" << expr << "'" << std::endl;
+        std::cerr << "-- compiling '" << expr << "'" << std::endl;
         auto_ptr<pattern> q( compile(expr,NULL)  );
-        std::cerr << "saving expr.dot" << std::endl;
+        std::cerr << "-- saving expr.dot" << std::endl;
         q->graphviz("expr.dot");
-        std::cerr << "rendering expr.png" << std::endl;
+        std::cerr << "-- rendering expr.png" << std::endl;
         system("dot -Tpng -o expr.png expr.dot");
-        
+        std::cerr << "-- detecting first chars" << std::endl;
         first_chars fc;
         q->detect(fc);
         std::cerr << "first_chars=[";
@@ -28,6 +28,15 @@ YOCTO_UNIT_TEST_IMPL(compiler)
             std::cerr << make_visible(fc[i]);
         }
         std::cerr << "] " << (fc.accept_empty  ? "ACCEPT EMPTY" : "NEVER EMPTY" ) << std::endl;
+        
+        std::cerr << "-- binary codes..." << std::endl;
+        const string org = q->to_binary();
+        auto_ptr<pattern> r( pattern::load(org) );
+        const string str = r->to_binary();
+        if(org!=str)
+            throw exception("binary code mismatch");
+        
+        
     }
     
 }

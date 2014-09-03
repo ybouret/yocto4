@@ -85,7 +85,7 @@ namespace yocto
             
             //! reloading a pattern
             static pattern *load(ios::istream &);
-            
+            static pattern *load(const memory::ro_buffer &);
             
         protected:
             explicit pattern( const uint32_t user_type ) throw();
