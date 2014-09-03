@@ -38,7 +38,8 @@ namespace yocto
             static  pattern *create();
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
-            
+            virtual void     save(ios::ostream & ) const;
+
         private:
             explicit any1() throw();
             virtual bool is_valid( const code_type ) const throw(); //!< true
@@ -62,7 +63,8 @@ namespace yocto
             static  pattern *create( const int val );
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
-
+            virtual void     save( ios::ostream & ) const;
+            
         private:
             virtual bool is_valid( const code_type ) const throw();
             explicit single(const int which) throw();
@@ -88,6 +90,7 @@ namespace yocto
             static  pattern *create( const code_type lo, const code_type up);
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
+            virtual void     save( ios::ostream & ) const;
 
         private:
             explicit range(const code_type lo, const code_type up) throw();
@@ -110,8 +113,8 @@ namespace yocto
         protected:
             explicit choice(const uint32_t id);
             choice(const choice &other);
-            void __viz( ios::ostream &fp ) const;
-
+            void __viz( ios::ostream &) const;
+            void __save(ios::ostream &) const;
         private:
             YOCTO_DISABLE_ASSIGN(choice);
         };
@@ -129,6 +132,7 @@ namespace yocto
             static  choice  *create();
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
+            virtual void     save(ios::ostream & ) const;
 
         private:
             YOCTO_DISABLE_ASSIGN(within);
@@ -151,6 +155,7 @@ namespace yocto
             static  choice  *create();
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
+            virtual void     save(ios::ostream & ) const;
 
         private:
             YOCTO_DISABLE_ASSIGN(none);
@@ -159,7 +164,7 @@ namespace yocto
             virtual bool is_valid(const code_type) const throw();
             
         };
-
+        
         
         
     }

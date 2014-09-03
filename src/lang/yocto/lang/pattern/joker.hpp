@@ -16,10 +16,10 @@ namespace yocto
         public:
             virtual ~joker() throw();
             virtual void reset() throw();
-
+            
             virtual void refactor() throw();
             pattern *motif;
-
+            
         protected:
             explicit joker( const uint32_t id, pattern *p ) throw();
             void __viz( const void *parent, ios::ostream &fp ) const;
@@ -44,7 +44,8 @@ namespace yocto
             //! clone
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
-
+            virtual void     save(ios::ostream & ) const;
+            
             //! 0 or 1 exactly
             virtual bool match( source &, ios::istream &fp );
             
@@ -72,7 +73,8 @@ namespace yocto
             //! clone
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
-
+            virtual void     save(ios::ostream & ) const;
+            
             //! true is count >= value
             virtual bool match( source &, ios::istream &);
             
@@ -103,7 +105,8 @@ namespace yocto
             //! clone
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
-
+            virtual void     save(ios::ostream & ) const;
+            
             //! true if a count of at least n and max m is found
             virtual bool match(source &, ios::istream &);
             

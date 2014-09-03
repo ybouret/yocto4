@@ -44,6 +44,15 @@ namespace yocto
             }
         }
         
+        void logical:: __save(ios::ostream &fp) const
+        {
+            fp.emit<uint32_t>(operands.size);
+            for(const pattern *p = operands.head;p;p=p->next)
+            {
+                p->save(fp);
+            }
+        }
+        
         void logical:: append( pattern *p ) throw()
         {
             assert(p);
@@ -152,6 +161,12 @@ namespace yocto
             __viz(this,fp);
         }
         
+        void AND:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            __save(fp);
+        }
+        
         void AND:: refactor() throw()
         {
             p_list ops;
@@ -223,6 +238,13 @@ namespace yocto
             __viz(this,fp);
         }
         
+        void OR:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            __save(fp);
+        }
+
+        
         void OR:: refactor() throw()
         {
             p_list ops;
@@ -292,6 +314,12 @@ namespace yocto
         {
             fp.viz(this); fp << " [ label=\"!=\"];\n";
             __viz(this,fp);
+        }
+        
+        void NOT:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            __save(fp);
         }
         
         void NOT:: refactor() throw()

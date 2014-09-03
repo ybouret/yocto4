@@ -93,6 +93,11 @@ namespace yocto
             __viz(this, fp);
         }
 
+        void optional:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            motif->save(fp);
+        }
         
     }
     
@@ -165,6 +170,13 @@ namespace yocto
             __viz(this, fp);
         }
 
+        void at_least:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            fp.emit<uint32_t>(value);
+            motif->save(fp);
+        }
+        
         
         pattern * zero_or_more(pattern *p)
         {
@@ -254,6 +266,14 @@ namespace yocto
             __viz(this, fp);
         }
 
+        void counting:: save(ios::ostream &fp) const
+        {
+            fp.emit(tag);
+            fp.emit<uint32_t>(n);
+            fp.emit<uint32_t>(m);
+            motif->save(fp);
+        }
+        
     }
     
 }
