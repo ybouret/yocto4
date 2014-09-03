@@ -7,6 +7,7 @@
 
 #include "yocto/ptr/auto.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/ios/icstream.hpp"
 
 #include <cstdlib>
 
@@ -36,6 +37,20 @@ void doviz( const char *name, pattern *p )
         ios::ocstream fp(bn,false);
         p->save(fp);
     }
+    
+    
+    {
+        std::cerr << "reloading " << name << std::endl;
+        ios::icstream fp(bn);
+        auto_ptr<pattern> r( pattern::load(fp) );
+        const string ps = p->to_binary();
+        const string rs = r->to_binary();
+        if(ps!=rs)
+        {
+            throw exception("corrupted load of %s", name);
+        }
+    }
+    
 }
 
 

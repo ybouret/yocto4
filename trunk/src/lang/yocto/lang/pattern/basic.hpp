@@ -58,9 +58,9 @@ namespace yocto
             virtual ~single() throw();
             
             
-            const int value; //!< data = &value
+            const code_type value;
             
-            static  pattern *create( const int val );
+            static  pattern *create( const code_type val );
             virtual pattern *clone() const;
             virtual void     viz( ios::ostream & ) const;
             virtual void     save( ios::ostream & ) const;

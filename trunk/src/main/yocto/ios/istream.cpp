@@ -42,12 +42,13 @@ namespace yocto
 			}
 		}
 		
-		void istream:: load( void *buffer, size_t buflen )
+		void istream:: load( void *buffer, size_t buflen, const char *which )
 		{
 			size_t loaded = 0;
 			get(buffer,buflen,loaded);
+            const char *target = which ? which : "data";
 			if(  loaded < buflen )
-				throw libc::exception( EIO, "istream::load( %u < %u )", unsigned(loaded), unsigned(buflen));
+				throw libc::exception( EIO, "istream::load( %u < %u ) for '%s'", unsigned(loaded), unsigned(buflen),target);
 		}
 		
 		int istream:: read_line( string &line ) { return read_line::scan( *this, line ); }

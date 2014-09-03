@@ -25,11 +25,11 @@ namespace yocto
 			virtual void get( void *data, size_t size, size_t &done );
 			
 			//! must get exactly buflen bytes
-			void load( void *buffer, size_t buflen );
+			void load( void *buffer, size_t buflen, const char *which = NULL);
 			
 			//! read a BigEndian integral type
 			template <typename T>
-			inline T read() { T x(0); load(&x, sizeof(T)); return swap_be_as<T>(x);}
+			inline T read(const char *which = NULL) { T x(0); load(&x, sizeof(T), which); return swap_be_as<T>(x);}
 			
 			//! use the read_line API
 			int read_line( string &s );

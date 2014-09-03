@@ -59,10 +59,13 @@ namespace yocto
             static pattern *optimize(pattern *p) throw();
             
             //! not thread safe to debug
+            static const char *fourcc_of(uint32_t tag) throw();
             const char *fourcc() const throw();
             
             //! using the save function;
             string to_binary() const;
+            
+            static pattern *load(ios::istream &);
             
             
         protected:

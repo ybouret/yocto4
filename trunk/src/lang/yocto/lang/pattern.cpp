@@ -1,6 +1,7 @@
 #include "yocto/lang/pattern.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/ios/osstream.hpp"
+#include "yocto/chars.hpp"
 
 namespace yocto
 {
@@ -52,15 +53,20 @@ namespace yocto
             
         }
         
-        const char *pattern:: fourcc() const throw()
+        const char *pattern:: fourcc_of(uint32_t tag)  throw()
         {
             static char cc[8];
             memset(cc,0,sizeof(cc));
-            cc[0] = char((type>>24) & 0xff);
-            cc[1] = char((type>>16) & 0xff);
-            cc[2] = char((type>>8 ) & 0xff);
-            cc[3] = char((type)     & 0xff);
+            cc[0] = make_visible(char((tag>>24) & 0xff));
+            cc[1] = make_visible(char((tag>>16) & 0xff));
+            cc[2] = make_visible(char((tag>>8 ) & 0xff));
+            cc[3] = make_visible(char((tag)     & 0xff));
             return cc;
+        }
+        
+        const char *pattern:: fourcc() const throw()
+        {
+            return fourcc_of(type);
         }
 
         string pattern:: to_binary() const
