@@ -41,6 +41,8 @@ namespace yocto
             //! back into cache
             void    unget( lexeme *lx ) throw();
             
+            //! back into cache, using the scanner name
+            void    unget( const lexical::scanner &parent, const string &content);
             
             
             //! information

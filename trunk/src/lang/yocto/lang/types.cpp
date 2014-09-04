@@ -9,7 +9,7 @@ namespace yocto
         {
         }
         
-        first_chars:: first_chars() : bytes_store(), accept_empty(false)
+        first_chars:: first_chars() throw() : bytes_store(), accept_empty(false)
         {
         }
         

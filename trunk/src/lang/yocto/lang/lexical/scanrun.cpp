@@ -102,9 +102,10 @@ namespace yocto
                     switch( from->type )
                     {
                         case rule::is_control:
-                            // this is a control rule
                             if(produce)
+                            {
                                 throw exception("unexpected producing control rule '%s' in <%s>", from->label.c_str(), name.c_str());
+                            }
                             
                             // discard content
                             best->reset();
