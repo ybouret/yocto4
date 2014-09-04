@@ -49,7 +49,10 @@ namespace yocto
                 syntax::xtree Node = 0;
                 if( sub.match(Lexer, Source, Input, Node))
                 {
-                    grow(Tree,Node);
+                    if(Node)
+                    {
+                        grow(Tree,Node);
+                    }
                 }
                 return true;
             }
@@ -86,10 +89,8 @@ namespace yocto
                 
                 for(;;)
                 {
-                    syntax::xtree Node = 0;
-                    if( sub.match(Lexer,Source,Input,Node) )
+                    if( sub.match(Lexer,Source,Input,SubTree) )
                     {
-                        SubTree->add(Node);
                         continue;
                     }
                     else
