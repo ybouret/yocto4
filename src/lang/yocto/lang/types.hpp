@@ -20,7 +20,7 @@ namespace yocto
         {
         public:
             bool accept_empty; //!< if an empty pattern is ok
-            explicit first_chars();
+            explicit first_chars() throw();
             virtual ~first_chars() throw();
             first_chars(const first_chars &);
             void add(code_type);                     //!< add one code

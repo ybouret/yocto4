@@ -178,6 +178,22 @@ discard(this, &lexer::drop )
             cache.push_front(lx);
         }
         
+        void lexer:: unget( const lexical::scanner &parent, const string &content)
+        {
+            lexeme *lx = new lexeme(parent.name,line);
+            try
+            {
+                *static_cast<token *>(lx) = content;
+            }
+            catch(...)
+            {
+                delete lx;
+                throw;
+            }
+            unget(lx);
+            
+        }
+        
         const lexical::scanner & lexer:: current() const throw()
         {
             assert(scan);

@@ -32,14 +32,34 @@ name(id), line(line_ref), rules(), mylex(0), dict( &dict_ref), iBack(0)
             void scanner:: append( rule *r )
             {
                 assert(r);
+                // check no empty
+                first_chars fc;
+                try
+                {
+                    assert(r->motif);
+                    r->motif->detect(fc);
+                }
+                catch(...)
+                {
+                    delete r;
+                    throw;
+                }
+                if(fc.accept_empty)
+                {
+                    throw exception("<%s>.append('%s' accept empty expression!)", name.c_str(), r->label.c_str());
+                }
+            
+                // check no multiple
                 for(const rule *i=rules.head;i;i=i->next)
                 {
                     if(i->label ==  r->label )
                     {
                         delete r;
-                        throw exception("lexical.scanner<%s>.append(multiple rule '%s')", name.c_str(), i->label.c_str());
+                        throw exception("<%s>.append(multiple rule '%s')", name.c_str(), i->label.c_str());
                     }
                 }
+                
+                // ok
                 rules.push_back(r);
             }
             
