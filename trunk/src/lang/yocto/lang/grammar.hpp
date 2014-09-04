@@ -3,6 +3,7 @@
 
 #include "yocto/lang/syntax/terminal.hpp"
 #include "yocto/lang/syntax/joker.hpp"
+#include "yocto/lang/syntax/logic.hpp"
 
 namespace yocto
 {
@@ -39,6 +40,10 @@ namespace yocto
             syntax::at_least & zero_or_more(const char *label,syntax::rule & );
             syntax::at_least & one_or_more( const char *label, syntax::rule & );
             
+			//! aggregate
+			syntax::aggregate & agg(const string &label);
+
+
             //! get a rule
             syntax::rule & operator[](const string &label);
             
