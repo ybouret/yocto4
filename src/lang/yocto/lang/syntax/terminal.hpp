@@ -19,13 +19,15 @@ namespace yocto
                 
                 static rule * create(const string &id);
                 
+                YOCTO_LANG_SYNTAX_RULE_MATCH_DECL();
+                
             private:
                 explicit terminal(const string &id);
                 YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
             };
             
         }
-    
+        
     }
 }
 

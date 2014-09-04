@@ -10,6 +10,15 @@ namespace yocto
         namespace syntax
         {
             
+#define YOCTO_LANG_SYNTAX_RULE_ARGS \
+lexer &Lexer, source &Source, ios::istream &Input, xtree &Tree
+            
+#define YOCTO_LANG_SYNTAX_RULE_MATCH_DECL() \
+virtual bool match(YOCTO_LANG_SYNTAX_RULE_ARGS)
+            
+#define YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(CLASS) \
+bool CLASS:: match(YOCTO_LANG_SYNTAX_RULE_ARGS)
+            
             class rule : public object
             {
             public:
@@ -19,8 +28,18 @@ namespace yocto
                 
                 virtual ~rule() throw();
                 
+                //! set tree to node or append node to tree
+                static void grow( xtree &Tree, xtree &Node) throw();
+                
+                //! matching interface
+                /**
+                 if doesn't match, must restore what was get from Lexer
+                 */
+                YOCTO_LANG_SYNTAX_RULE_MATCH_DECL() = 0;
+                
             protected:
                 explicit rule(const string &id );
+                
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);

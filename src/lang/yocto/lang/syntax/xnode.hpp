@@ -21,7 +21,7 @@ namespace yocto
             {
             public:
                 typedef core::list_of<xnode> child_list;
-               
+                
                 const string &label;    //!< refering to the creating rule
                 xnode        *next;     //!< for children
                 xnode        *prev;     //!< for children
@@ -41,18 +41,32 @@ namespace yocto
                 //! create a new non terminal node
                 static xnode *create( const string &rule_label );
                 
-                void add( xnode *child ) throw();       //!< register a new child
-                void graphviz( const string &fn) const; //!< make a GraphViz file
-                void graphviz( const char   *fn) const; //!< make a GraphViz file
+                //! register a new child
+                void add( xnode *child ) throw();
+                
+                
+                //! make a GraphViz file
+                void graphviz( const string &fn) const;
+                
+                //! make a GraphViz file
+                void graphviz( const char   *fn) const;
+                
+                //! restore a node to the lexer and delete it
+                static void restore( lexer &Lexer, xnode *node ) throw();
                 
             private:
                 explicit xnode(const string &rule_label, lexeme *lx) throw();
                 explicit xnode(const string &rule_label) throw();
                 void viz( ios::ostream &fp ) const;
+                void clr() throw();
                 
                 uint64_t wksp[YOCTO_U64_FOR_ITEM(child_list)];
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xnode);
             };
+            
+            typedef xnode *xtree;
+
+            
         }
         
     }

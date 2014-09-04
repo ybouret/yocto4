@@ -18,7 +18,20 @@ namespace yocto
             }
             
             
-            
+            void rule:: grow( xtree &Tree, xtree &Node) throw()
+            {
+                assert(Node);
+                if(!Tree)
+                {
+                    Tree = Node;
+                }
+                else
+                {
+                    assert( ! Tree->terminal );
+                    Tree->add(Node);
+                }
+                Node = NULL;
+            }
         }
 
     }
