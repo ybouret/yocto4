@@ -134,6 +134,14 @@ optIndex(0)
             return at_least(label,other,1);
         }
         
-        
+		//----------------------------------------------------------------------
+        syntax::aggregate & grammar:: agg(const string &label)
+		{
+			ensure_no(label);
+			syntax::aggregate *r = new syntax::aggregate(label);
+			rules.push_back(r);
+			return *r;
+		}
+
     }
 }
