@@ -17,7 +17,7 @@ namespace yocto
             {
             }
             
-            rule * terminal:: create(const string &id)
+            terminal * terminal:: create(const string &id)
             {
                 return new terminal(id);
             }
