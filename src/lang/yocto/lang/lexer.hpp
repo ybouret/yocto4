@@ -23,6 +23,10 @@ namespace yocto
             
             lexical::scanner & declare(const string &id); //!< a new scanner
             lexical::scanner & declare(const char   *id); //!< a new scanner
+            
+            const lexical::scanner & operator[](const string &id) const;
+            const lexical::scanner & operator[](const char   *id) const;
+            
             bool has( const string &id) const throw();    //!< check
             
             void initialize() throw(); //!< line=1, scan=root, reset scanners and history
@@ -33,10 +37,12 @@ namespace yocto
             
             //! find next lexeme
             lexeme *get( source &src, ios::istream &);
-           
+            
             //! back into cache
             void    unget( lexeme *lx ) throw();
-
+            
+            
+            
             //! information
             const lexical::scanner &current() const throw();
             
@@ -47,13 +53,19 @@ namespace yocto
             lexical::scanner *scan;
             lexemes           cache;
             history_type      history;
+            
+        public:
+            string last_label; //!< saved after a NEW lexeme
+            string last_token; //!< saved after a NEW lexeme
+            
+        private:
             scanDB            scanners;
             lexical::scanner *root;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
+            
         public:
             p_dict dict;
-            bool   echo;
             const lexical::action forward;
             const lexical::action discard;
             
