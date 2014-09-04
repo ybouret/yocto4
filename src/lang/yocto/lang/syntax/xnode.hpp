@@ -22,11 +22,11 @@ namespace yocto
             public:
                 typedef core::list_of<xnode> child_list;
                
-                const string &label; //!< refering to the creating rule
-                xnode        *next;
-                xnode        *prev;
-                xnode        *parent;
-                const bool    terminal;
+                const string &label;    //!< refering to the creating rule
+                xnode        *next;     //!< for children
+                xnode        *prev;     //!< for children
+                xnode        *parent;   //!< for tree structure
+                const bool    terminal; //!< terminal or not
                 
                 virtual ~xnode() throw();
                 
@@ -41,13 +41,14 @@ namespace yocto
                 //! create a new non terminal node
                 static xnode *create( const string &rule_label );
                 
-                //! register a new child
-                void add( xnode *child ) throw();
-                
+                void add( xnode *child ) throw();       //!< register a new child
+                void graphviz( const string &fn) const; //!< make a GraphViz file
+                void graphviz( const char   *fn) const; //!< make a GraphViz file
                 
             private:
                 explicit xnode(const string &rule_label, lexeme *lx) throw();
                 explicit xnode(const string &rule_label) throw();
+                void viz( ios::ostream &fp ) const;
                 
                 uint64_t wksp[YOCTO_U64_FOR_ITEM(child_list)];
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xnode);
