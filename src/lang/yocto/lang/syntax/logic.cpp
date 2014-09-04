@@ -24,7 +24,7 @@ namespace yocto
             {
                 operands.push_back( new operand(sub) );
             }
-
+            
             logical:: operand:: operand( rule &r ) throw() :
             sub(r),
             next(0),
@@ -46,6 +46,8 @@ namespace yocto
     
 }
 
+#include "yocto/exception.hpp"
+
 namespace yocto
 {
     namespace lang
@@ -63,13 +65,44 @@ namespace yocto
                 
             }
             
-
+            
             aggregate & aggregate:: operator+=( rule &r )
             {
                 append(r);
                 return *this;
             }
-
+            
+            YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(aggregate)
+            {
+                if(operands.size<=0)
+                {
+                    throw exception("empty syntax::aggregate '%s')", label.c_str() );
+                }
+                
+                syntax::xtree SubTree = syntax::xnode::create(label);
+                
+                // try to accept all of them
+                for(operand *op = operands.head; op; op=op->next )
+                {
+                    if( ! op->sub.match(Lexer, Source, Input, SubTree) )
+                    {
+                        syntax::xnode::restore(Lexer,SubTree);
+                        return false;
+                    }
+                }
+                
+                // done
+                if( SubTree->children().size>0)
+                {
+                    grow(Tree,SubTree);
+                }
+                else
+                {
+                    delete SubTree;
+                }
+                
+                return true;
+            }
         }
     }
 }
