@@ -64,6 +64,27 @@ namespace yocto
         }
         
         
+        void grammar:: ensure_no(const string &label) const
+        {
+            if(find_rule(label))
+                throw exception("((%s)) multiple rule '%s", name.c_str(), label.c_str() );
+        }
+        
+        //----------------------------------------------------------------------
+        syntax::terminal & grammar:: term( const string &label )
+        {
+            ensure_no(label);
+            syntax::terminal *r = syntax::terminal::create(label);
+            rules.push_back( r );
+            return *r;
+        }
+        
+        syntax::terminal & grammar:: term( const char *label )
+        {
+            const string Label(label);
+            return term(Label);
+        }
+        
         
     }
 }

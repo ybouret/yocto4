@@ -24,6 +24,9 @@ namespace yocto
             //! declare a new terminal
             syntax::terminal & term( const string &label);
             
+            //! declare a new terminal
+            syntax::terminal & term( const char   *label);
+            
             //! get a rule
             syntax::rule & operator[](const string &label);
             
@@ -37,12 +40,15 @@ namespace yocto
             //! set root
             void set_root( const char   *label );
             
+            syntax::xtree accept( lexer &Lexer, source &Source, ios::istream &Input );
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(grammar);
             
             syntax::r_list rules;
             
             syntax::rule *find_rule(const string &label ) const throw();
+            void          ensure_no(const string &label) const;
         };
         
     }

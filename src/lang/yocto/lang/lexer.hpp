@@ -36,7 +36,7 @@ namespace yocto
             void back();                   //!< change current scanner with last of history
             
             //! find next lexeme
-            lexeme *get( source &src, ios::istream &);
+            lexeme *get( source &, ios::istream &);
             
             //! back into cache
             void    unget( lexeme *lx ) throw();
@@ -44,6 +44,7 @@ namespace yocto
             //! back into cache, using the scanner name
             void    unget( const lexical::scanner &parent, const string &content);
             
+            const lexeme *peek(source &,ios::istream&);
             
             //! information
             const lexical::scanner &current() const throw();
@@ -70,12 +71,13 @@ namespace yocto
             p_dict dict;
             const lexical::action forward;
             const lexical::action discard;
+            const lexical::action newline;
             
             bool emit(const token&) throw();
             bool drop(const token&) throw();
-            void newline() throw();      //!< ++line
-            bool newline_drop(const token&) throw(); //!< newline, return false
-            bool newline_emit(const token&) throw(); //!< newline, return true
+            void on_newline() throw();      //!< ++line
+            bool on_newline_drop(const token&) throw(); //!< newline, return false
+            bool on_newline_emit(const token&) throw(); //!< newline, return true
         };
         
     }

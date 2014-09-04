@@ -17,7 +17,7 @@ namespace yocto
             public:
                 virtual ~terminal() throw();
                 
-                static rule * create(const string &id);
+                static terminal * create(const string &id);
                 
                 YOCTO_LANG_SYNTAX_RULE_MATCH_DECL();
                 

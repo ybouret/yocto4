@@ -8,9 +8,9 @@ namespace yocto
         
         bool  lexer:: emit(const token &) throw() { return true;  }
         bool  lexer:: drop(const token &) throw() { return false; }
-        void  lexer:: newline() throw() { ++line; }
-        bool  lexer:: newline_drop(const token&) throw() { newline(); return false; }
-        bool  lexer:: newline_emit(const token&) throw() { newline(); return true;  }
+        void  lexer:: on_newline() throw() { ++line; }
+        bool  lexer:: on_newline_drop(const token&) throw() { on_newline(); return false; }
+        bool  lexer:: on_newline_emit(const token&) throw() { on_newline(); return true;  }
         
         
         const lexical::scanner & lexer:: operator[](const string &id) const
@@ -37,7 +37,8 @@ namespace yocto
 #define Y_LEXER_CTOR() \
 name(id), line(1), scan(0), scanners(2,as_capacity), root(0), dict(), \
 forward(this, &lexer::emit ),\
-discard(this, &lexer::drop )
+discard(this, &lexer::drop ),\
+newline(this, &lexer::on_newline_drop )
         
         lexer:: lexer(const string &id) :
         Y_LEXER_CTOR()
@@ -171,6 +172,29 @@ discard(this, &lexer::drop )
                 throw;
             }
         }
+        
+        const lexeme * lexer:: peek(source &src,ios::istream&fp)
+        {
+            if(cache.size>0)
+            {
+                return cache.head;
+            }
+            else
+            {
+                lexeme *lx = get(src, fp);
+                if(!lx)
+                {
+                    return 0;
+                }
+                else
+                {
+                    cache.push_front(lx);
+                    assert(1==cache.size);
+                    return cache.head;
+                }
+            }
+        }
+        
         
         void lexer:: unget(lexeme *lx ) throw()
         {
