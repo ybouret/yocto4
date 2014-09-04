@@ -82,14 +82,9 @@ namespace yocto
                     {
                         const t_char    *ch = src.peek(fp); assert(ch);
                         const code_type  C  = ch->code;
-                        if(C>=32 && C<127)
-                        {
-                            throw exception("%d: unexpected '%c' in <%s>", line, char(C), name.c_str() );
-                        }
-                        else
-                        {
-                            throw exception("%d: unexpected character 0x%02d in <%s>", line, int(C), name.c_str());
-                        }
+                        string           s  = (C>=32 && C<127) ? vformat("'%c'",C) : vformat("character 0x%02d",C);
+                        append_context_to(s);
+                        throw exception("%d: in <%s>, unexpected %s", line, name.c_str(), s.c_str() );
                     }
                     
                     if(blen<=0)

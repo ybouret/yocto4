@@ -11,7 +11,24 @@ namespace yocto
         void  lexer:: newline() throw() { ++line; }
         bool  lexer:: newline_drop(const token&) throw() { newline(); return false; }
         bool  lexer:: newline_emit(const token&) throw() { newline(); return true;  }
-
+        
+        
+        const lexical::scanner & lexer:: operator[](const string &id) const
+        {
+            const lexical::scanner::pointer *ppScan = scanners.search(id);
+            if(!ppScan)
+            {
+                throw exception("no {%s}.<%s>", name.c_str(), id.c_str());
+            }
+            return **ppScan;
+        }
+        
+        const lexical::scanner & lexer:: operator[](const char *id) const
+        {
+            const string ID(id);
+            return (*this)[ID];
+        }
+        
         
         lexer:: ~lexer() throw()
         {
@@ -71,6 +88,8 @@ discard(this, &lexer::drop )
                 (**i).reset();
             }
             history.free();
+            last_label.clear();
+            last_token.clear();
         }
         
         void lexer::jump(const string &id)
@@ -103,18 +122,20 @@ discard(this, &lexer::drop )
         lexeme * lexer:: get(source &src, ios::istream &fp)
         {
             if(!scan)
-                throw exception("no active scanner");
+                throw exception("{%s} has no active scanner", name.c_str());
             
+            lexeme *lx = 0;
             if(cache.size>0)
             {
-                return cache.pop_front();
+                lx = cache.pop_front();
+                goto RETURN_LEXEME;
             }
             else
             {
                 bool is_control  = false;
                 while(true)
                 {
-                    lexeme *lx = scan->get(src, fp, is_control);
+                    lx = scan->get(src, fp, is_control);
                     if(!lx)
                     {
                         if(!is_control)
@@ -128,9 +149,26 @@ discard(this, &lexer::drop )
                         }
                     }
                     assert(!is_control);
-                    return lx;
+                    goto RETURN_LEXEME;
                 }
-                
+            }
+            
+        RETURN_LEXEME:
+            assert(lx);
+            try
+            {
+                last_label = lx->label;
+                last_token.clear();
+                for(const t_char *ch=lx->head;ch;ch=ch->next)
+                {
+                    last_token.append(ch->code);
+                }
+                return lx;
+            }
+            catch(...)
+            {
+                cache.push_front(lx);
+                throw;
             }
         }
         
@@ -145,7 +183,7 @@ discard(this, &lexer::drop )
             assert(scan);
             return *scan;
         }
-
+        
         
     }
 }

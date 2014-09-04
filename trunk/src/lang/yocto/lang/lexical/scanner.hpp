@@ -419,7 +419,7 @@ namespace yocto
                 lexer        *mylex;
                 const p_dict *dict;
                 int           iBack;
-                
+                void append_context_to( string &s ) const;
             };
             
         }
