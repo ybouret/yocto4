@@ -11,10 +11,26 @@ namespace yocto
             
         }
         
+#define Y_LANG_GRAMMAR_CTOR() \
+name(id),\
+rules(), \
+optIndex(0)
+        
+        
         grammar:: grammar(const string &id) :
-        name(id),
-        rules()
+        Y_LANG_GRAMMAR_CTOR()
         {
+        }
+        
+        void grammar:: show_rules() const
+        {
+            std::cerr << "((" << name << ")):" << std::endl;
+            std::cerr << "{" << std::endl;
+            for(const syntax::rule *r=rules.head;r;r=r->next)
+            {
+                std::cerr << "\t" << r->label << std::endl;
+            }
+            std::cerr << "}" << std::endl;
         }
         
         
@@ -30,22 +46,20 @@ namespace yocto
             return 0;
         }
         
-        void grammar:: set_root( const string &label )
+        void grammar:: set_root( const syntax::rule &root )
         {
-            syntax::rule *r = find_rule(label);
-            if(!r)
+            for(syntax::rule *r = rules.head; r; r=r->next)
             {
-                throw exception("((%s)).set_root(no '%s')", name.c_str(), label.c_str());
+                if( r == &root )
+                {
+                    rules.move_to_front(r);
+                    return;
+                }
             }
-            rules.move_to_front(r);
+            
+            throw exception("((%s)).set_root(not found)", name.c_str());
         }
         
-        
-        void grammar:: set_root( const char *label )
-        {
-            const string Label(label);
-            set_root(Label);
-        }
         
         syntax::rule & grammar:: operator[](const string &label)
         {
@@ -74,7 +88,7 @@ namespace yocto
         syntax::terminal & grammar:: term( const string &label )
         {
             ensure_no(label);
-            syntax::terminal *r = syntax::terminal::create(label);
+            syntax::terminal *r = new syntax::terminal(label);
             rules.push_back( r );
             return *r;
         }
@@ -83,6 +97,41 @@ namespace yocto
         {
             const string Label(label);
             return term(Label);
+        }
+        
+        //----------------------------------------------------------------------
+        syntax::optional & grammar:: opt( syntax::rule &other )
+        {
+            const string      label = name + ":" + other.label + vformat("?/#%d",++optIndex);
+            ensure_no(label);
+            syntax::optional *r     = new syntax::optional(label,other);
+            rules.push_back(r);
+            return *r;
+        }
+        
+        //----------------------------------------------------------------------
+        syntax::at_least & grammar:: at_least( const string &label, syntax::rule &other, size_t count)
+        {
+            ensure_no(label);
+            syntax::at_least *r = new syntax::at_least(label,other,count);
+            rules.push_back(r);
+            return *r;
+        }
+        
+        syntax::at_least & grammar:: at_least( const char *label, syntax::rule &other, size_t count)
+        {
+            const string Label(label);
+            return at_least(Label,other,count);
+        }
+        
+        syntax::at_least & grammar:: zero_or_more( const char *label, syntax::rule &other )
+        {
+            return at_least(label,other,0);
+        }
+        
+        syntax::at_least & grammar:: one_or_more( const char *label, syntax::rule &other )
+        {
+            return at_least(label,other,1);
         }
         
         

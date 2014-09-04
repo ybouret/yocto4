@@ -16,13 +16,12 @@ namespace yocto
             {
             public:
                 virtual ~terminal() throw();
-                
-                static terminal * create(const string &id);
+                explicit terminal(const string &id);
+
                 
                 YOCTO_LANG_SYNTAX_RULE_MATCH_DECL();
                 
             private:
-                explicit terminal(const string &id);
                 YOCTO_DISABLE_COPY_AND_ASSIGN(terminal);
             };
             

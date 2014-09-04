@@ -17,10 +17,7 @@ namespace yocto
             {
             }
             
-            terminal * terminal:: create(const string &id)
-            {
-                return new terminal(id);
-            }
+          
             
             YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(terminal)
             {
