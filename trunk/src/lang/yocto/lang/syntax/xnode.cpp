@@ -1,5 +1,7 @@
 #include "yocto/lang/syntax/xnode.hpp"
 
+#include <cstring>
+
 namespace yocto
 {
     namespace lang
@@ -7,16 +9,32 @@ namespace yocto
         
         namespace syntax
         {
+            void xnode:: clr() throw()
+            {
+                memset(wksp,0,sizeof(wksp));
+            }
+            
             xnode:: ~xnode() throw()
             {
+                assert(NULL==parent);
+                assert(NULL==next);
+                assert(NULL==prev);
                 if(terminal)
                 {
-                    delete lxm();
+                    lexeme *lx = lxm();
+                    if(lx) delete lx;
                 }
                 else
                 {
-                    children().auto_delete();
+                    child_list &ch = children();
+                    while(ch.size)
+                    {
+                        xnode *node  = ch.pop_back();
+                        node->parent = NULL;
+                        delete node;
+                    }
                 }
+                clr();
             }
             
             xnode::child_list & xnode::children() throw()
@@ -49,6 +67,7 @@ namespace yocto
             terminal(true)
             {
                 assert(lx);
+                clr();
                 lxm() = lx;
             }
             
@@ -60,7 +79,7 @@ namespace yocto
             parent(0),
             terminal(false)
             {
-                children().reset();
+                clr();
             }
             
             
@@ -94,7 +113,27 @@ namespace yocto
                 child->parent = this;
             }
             
-            
+            void xnode:: restore( lexer &Lexer, xnode *node ) throw()
+            {
+                assert(node);
+                if(node->terminal)
+                {
+                    Lexer.unget(node->lxm());
+                    node->lxm() = NULL;
+                }
+                else
+                {
+                    child_list &ch = node->children();
+                    while( ch.size )
+                    {
+                        xnode *sub  = ch.pop_back();
+                        sub->parent = NULL;
+                        xnode::restore(Lexer,sub);
+                    }
+                }
+                delete node;
+            }
+
            
             
         }
