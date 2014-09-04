@@ -19,6 +19,8 @@ YOCTO_UNIT_TEST_IMPL(xnode)
     auto_ptr<syntax::xnode> pOther( syntax::xnode::create(otherID) );
     pOther->add( pTerm.yield() );
     
+    pOther->graphviz("xnode.dot");
+    system("dot -Tpng -o xnode.png xnode.dot");
     
 }
 YOCTO_UNIT_TEST_DONE()
