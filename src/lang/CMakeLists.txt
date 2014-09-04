@@ -17,8 +17,14 @@ SET(lexical_srcs ${lexical_decl} ${lexical_impl})
 INSTALL(FILES ${lexical_decl} DESTINATION include/yocto/lang/lexical)
 SOURCE_GROUP(lang/lexical FILES ${lexical_srcs})
 
+FILE(GLOB syntax_decl yocto/lang/syntax/*.hpp)
+FILE(GLOB syntax_impl yocto/lang/syntax/*.cpp)
+SET(syntax_srcs ${syntax_decl} ${syntax_impl})
+INSTALL(FILES ${syntax_decl} DESTINATION include/yocto/lang/syntax)
+SOURCE_GROUP(lang/syntax FILES ${syntax_srcs})
+
 INCLUDE_DIRECTORIES(../main .)
-ADD_LIBRARY(y-lang STATIC ${lang_srcs} ${pattern_srcs} ${lexical_srcs} )
+ADD_LIBRARY(y-lang STATIC ${lang_srcs} ${pattern_srcs} ${lexical_srcs} ${syntax_srcs})
 
 ADD_SUBDIRECTORY(tests)
 
