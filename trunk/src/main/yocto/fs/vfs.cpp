@@ -10,7 +10,7 @@ namespace yocto
     vfs::  vfs() throw() {}
     vfs:: ~vfs() throw() {}
     
-   
+    
     
     void vfs:: create_sub_dir( const string &dirName )
     {
@@ -94,6 +94,18 @@ namespace yocto
         entry::callback cb( &w, & rm_wrapper::has_ext );
         remove_files(dirname,cb);
     }
-
+    
+    
+    void vfs::try_remove_file( const string &path) throw()
+    {
+        try
+        {
+            remove_file(path);
+        }
+        catch(...)
+        {
+            
+        }
+    }
     
 }

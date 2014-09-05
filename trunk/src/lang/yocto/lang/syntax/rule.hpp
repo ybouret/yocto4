@@ -30,6 +30,7 @@ bool CLASS:: match(YOCTO_LANG_SYNTAX_RULE_ARGS)
                 
                 //! set tree to node or append node to tree
                 static void grow( xtree &Tree, xtree &Node) throw();
+                void        check( const xtree Tree ) const;
                 
                 //! matching interface
                 /**

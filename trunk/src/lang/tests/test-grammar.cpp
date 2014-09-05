@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 
 #include "yocto/ios/icstream.hpp"
+#include "yocto/fs/local-fs.hpp"
 
 #include <cstdlib>
 
@@ -40,7 +41,11 @@ namespace
 YOCTO_UNIT_TEST_IMPL(grammar)
 {
     
+    vfs &fs = local_fs::instance();
     
+    fs.try_remove_file("xnode.dot");
+    fs.try_remove_file("xnode.png");
+
     ios::icstream Input( ios::cstdin );
     source        Source;
     MyLex         Lexer;
@@ -81,10 +86,6 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     {
         Tree->graphviz("xnode.dot");
         system("dot -Tpng -o xnode.png xnode.dot");
-    }
-    else
-    {
-        
     }
     
     

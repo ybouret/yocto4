@@ -102,6 +102,7 @@ namespace yocto {
         void         create_sub_dir( const string &dirname );
         bool         is_reg( const string &path ) const throw();
         bool         is_dir( const string &path ) const throw();
+        void         try_remove_file( const string &path) throw();
         void         remove_files( const string &dirname, entry::callback &filter );
         void         remove_files( const string &dirname, bool (*filter)( const entry &) );
         void         remove_files_with_extension_in( const string &dirname, const string &extension);
