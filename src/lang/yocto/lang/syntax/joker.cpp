@@ -85,15 +85,18 @@ namespace yocto
             YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(at_least)
             {
                 check(Tree);
-                syntax::xtree SubTree = syntax::xnode::create(label,is_regular);
-                syntax::x_ptr guard(SubTree);
+                xtree SubTree = xnode::create(label,is_regular);
+                x_ptr guard(SubTree);
                 
                 for(;;)
                 {
-                    syntax::xtree Node=0;
+                    xtree Node=0;
                     if( sub.match(Lexer,Source,Input,Node) )
                     {
-                        SubTree->add(Node);
+                        if(Node)
+                        {
+                            SubTree->add(Node);
+                        }
                         continue;
                     }
                     else
@@ -101,15 +104,20 @@ namespace yocto
                 }
                 
                 guard.forget();
-                const size_t nch = SubTree->children().size;
+                size_t nch = SubTree->count();
                 if(nch>=value)
                 {
-                    if(nch>0)
+                    if(!Tree)
                     {
-                        grow(Tree,SubTree);
+                        Tree = SubTree;
                     }
                     else
                     {
+                        assert(false==Tree->terminal);
+                        while(nch-->0)
+                        {
+                            Tree->add( SubTree->pop() );
+                        }
                         delete SubTree;
                     }
                     return true;

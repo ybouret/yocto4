@@ -81,7 +81,7 @@ namespace yocto
                     throw exception("empty syntax::aggregate '%s'", label.c_str() );
                 }
                 
-                syntax::xtree SubTree = syntax::xnode::create(label,is_regular);
+                syntax::xtree SubTree = syntax::xnode::create(label,behavior);
                 syntax::x_ptr guard(SubTree);
                 
                 //______________________________________________________________
@@ -90,16 +90,13 @@ namespace yocto
                 //______________________________________________________________
                 for(operand *op = operands.head; op; op=op->next )
                 {
-                    syntax::xtree Node = 0;
-                    if( ! op->sub.match(Lexer, Source, Input, Node) )
+                    if( ! op->sub.match(Lexer, Source, Input, SubTree) )
                     {
-                        assert(0==Node);
                         guard.forget();
                         syntax::xnode::restore(Lexer,SubTree);
                         return false;
                     }
-                    if(Node)
-                        SubTree->add(Node);
+                   
                 }
                 
                 //______________________________________________________________

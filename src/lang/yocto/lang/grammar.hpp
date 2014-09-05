@@ -36,10 +36,16 @@ namespace yocto
             
             //! at_least
             syntax::at_least & at_least(const string &label,syntax::rule &, size_t count);
+            
+            //! at_least wrapper
             syntax::at_least & at_least(const char   *label,syntax::rule &, size_t count);
 
-            syntax::at_least & zero_or_more(const char *label,syntax::rule & );
-            syntax::at_least & one_or_more( const char *label,syntax::rule & );
+            //! at least >=0
+            syntax::at_least & zero_or_more(syntax::rule &,const char *label=NULL);
+            
+            //! at least >=0
+            syntax::at_least & one_or_more(syntax::rule &,const char *label=NULL);
+            
             
 			//! aggregate of rule
 			syntax::aggregate & agg(const string &label, const syntax::property ppty = syntax::is_regular);
@@ -75,8 +81,8 @@ namespace yocto
             void          ensure_no(const string &label) const;
             
             syntax::r_list rules;
-            int            optIndex; //!< to generate optional  names
-            int            altIndex; //!< to generate alternate names
+        protected:
+            int            counter; //!< internal counter for auto labeling
         };
         
     }

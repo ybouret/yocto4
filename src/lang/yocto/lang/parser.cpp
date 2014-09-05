@@ -59,7 +59,22 @@ return term(label,syntax:: PPTY);\
         YOCTO_LANG_PARSER_TERM_IMPL(jettison,is_discardable)
         YOCTO_LANG_PARSER_TERM_IMPL(univocal,is_specialized)
         
+        syntax::aggregate & parser::assemble(const string &label)
+        {
+            return agg(label,syntax::is_regular);
+        }
+        
+        syntax::aggregate & parser::assemble(const char   *label)
+        {
+            const string Label(label);
+            return assemble(Label);
+        }
 
+        syntax::aggregate & parser:: merge()
+        {
+            const string label = vformat("@blend/%d",++counter);
+            return agg(label,syntax::is_merging_all);
+        }
 
     }
 }

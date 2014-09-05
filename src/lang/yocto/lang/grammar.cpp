@@ -14,8 +14,7 @@ namespace yocto
 #define Y_LANG_GRAMMAR_CTOR() \
 name(id),\
 rules(), \
-optIndex(0), altIndex(0)
-        
+counter(0)
         
         grammar:: grammar(const string &id) :
         Y_LANG_GRAMMAR_CTOR()
@@ -107,7 +106,7 @@ optIndex(0), altIndex(0)
         //----------------------------------------------------------------------
         syntax::optional & grammar:: opt( syntax::rule &other )
         {
-            const string      label = name + ":" + other.label + vformat("?/#%d",++optIndex);
+            const string      label = "@optional " + other.label + vformat("/%d",++counter);
             ensure_no(label);
             syntax::optional *r     = new syntax::optional(label,other);
             rules.push_back(r);
@@ -129,14 +128,31 @@ optIndex(0), altIndex(0)
             return at_least(Label,other,count);
         }
         
-        syntax::at_least & grammar:: zero_or_more( const char *label, syntax::rule &other )
+        syntax::at_least & grammar:: zero_or_more( syntax::rule &other, const char *label )
         {
-            return at_least(label,other,0);
+            if(label)
+            {
+                return at_least(label,other,0);
+            }
+            else
+            {
+                const string Label = "@zero_or_more " + other.label +  vformat("/%d",++counter);
+                return at_least(Label,other,0);
+            }
         }
         
-        syntax::at_least & grammar:: one_or_more( const char *label, syntax::rule &other )
+        syntax::at_least & grammar:: one_or_more( syntax::rule &other, const char *label  )
         {
-            return at_least(label,other,1);
+            if(label)
+            {
+                return at_least(label,other,0);
+            }
+            else
+            {
+                const string Label = "@one_or_more " + other.label +  vformat("/%d",++counter);
+                return at_least(Label,other,0);
+            }
+
         }
         
 		//----------------------------------------------------------------------
@@ -157,7 +173,7 @@ optIndex(0), altIndex(0)
         //----------------------------------------------------------------------
         syntax::alternate & grammar:: alt()
         {
-            const string      label = name +  vformat("||/#%d",++altIndex);
+            const string      label =  vformat("@alternate/%d",++counter);
             ensure_no(label);
             syntax::alternate *r    = new syntax::alternate(label);
             rules.push_back(r);

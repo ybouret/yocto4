@@ -117,6 +117,23 @@ namespace yocto
                 child->parent = this;
             }
             
+            
+            xnode * xnode:: pop() throw()
+            {
+                assert(!terminal);
+                assert(children().size>0);
+                xnode *node  = children().pop_front();
+                node->parent = 0;
+                return node;
+            }
+
+            size_t xnode:: count()    const throw()
+            {
+                assert(!terminal);
+                return children().size;
+            }
+
+            
             void xnode:: restore( lexer &Lexer, xnode *node ) throw()
             {
                 assert(node);
