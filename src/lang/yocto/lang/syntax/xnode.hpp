@@ -64,8 +64,8 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(xnode);
             };
             
-            typedef xnode *xtree;
-
+            typedef xnode *         xtree;
+            typedef auto_ptr<xnode> x_ptr;
             
         }
         

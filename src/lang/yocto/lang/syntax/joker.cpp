@@ -46,13 +46,12 @@ namespace yocto
             
             YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(optional)
             {
+                check(Tree);
                 syntax::xtree Node = 0;
                 if( sub.match(Lexer, Source, Input, Node))
                 {
-                    if(Node)
-                    {
-                        grow(Tree,Node);
-                    }
+                    // node might be NULL
+                    grow(Tree,Node);
                 }
                 return true;
             }
@@ -85,18 +84,23 @@ namespace yocto
             
             YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(at_least)
             {
+                check(Tree);
                 syntax::xtree SubTree = syntax::xnode::create(label);
+                syntax::x_ptr guard(SubTree);
                 
                 for(;;)
                 {
-                    if( sub.match(Lexer,Source,Input,SubTree) )
+                    syntax::xtree Node=0;
+                    if( sub.match(Lexer,Source,Input,Node) )
                     {
+                        SubTree->add(Node);
                         continue;
                     }
                     else
                         break;
                 }
                 
+                guard.forget();
                 if(SubTree->children().size>=value)
                 {
                     grow(Tree,SubTree);

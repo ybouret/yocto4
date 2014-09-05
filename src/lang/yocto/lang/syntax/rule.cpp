@@ -1,4 +1,5 @@
 #include "yocto/lang/syntax/rule.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -20,20 +21,32 @@ namespace yocto
             
             void rule:: grow( xtree &Tree, xtree &Node) throw()
             {
-                assert(Node);
-                if(!Tree)
+                if(Node)
                 {
-                    Tree = Node;
+                    if(!Tree)
+                    {
+                        Tree = Node;
+                    }
+                    else
+                    {
+                        assert(!Tree->terminal);
+                        Tree->add(Node);
+                        Node->parent = Tree;
+                    }
+                    Node = NULL;
                 }
-                else
-                {
-                    assert( ! Tree->terminal );
-                    Tree->add(Node);
-                }
-                Node = NULL;
             }
+            
+            void rule:: check( const xtree Tree ) const
+            {
+                if( Tree && Tree->terminal)
+                {
+                    throw exception("syntax.rule '%s': unexpected tree=terminal '%s'!!", label.c_str(), Tree->label.c_str());
+                }
+            }
+
         }
-
+        
     }
-
+    
 }

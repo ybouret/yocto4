@@ -21,6 +21,7 @@ namespace yocto
             
             YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(terminal)
             {
+                check(Tree);
                 lexeme *lx = Lexer.get(Source, Input);
                 if(lx)
                 {
