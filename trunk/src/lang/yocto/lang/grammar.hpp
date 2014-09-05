@@ -26,10 +26,10 @@ namespace yocto
             const string name;
             
             //! declare a new terminal, whose label MUST match a lexical rule
-            syntax::terminal & term(const string &label, const syntax::xnode_ppty ppty = syntax::is_regular);
+            syntax::terminal & term(const string &label, const syntax::property ppty = syntax::is_regular);
             
             //! declare a new terminal, wrapper
-            syntax::terminal & term(const char   *label, const syntax::xnode_ppty ppty = syntax::is_regular);
+            syntax::terminal & term(const char   *label, const syntax::property ppty = syntax::is_regular);
             
             //! declare an optional rule
             syntax::optional & opt( syntax::rule &r );
@@ -42,10 +42,10 @@ namespace yocto
             syntax::at_least & one_or_more( const char *label,syntax::rule & );
             
 			//! aggregate of rule
-			syntax::aggregate & agg(const string &label, const syntax::xnode_ppty ppty = syntax::is_regular);
+			syntax::aggregate & agg(const string &label, const syntax::property ppty = syntax::is_regular);
             
             //! wrapper
-            syntax::aggregate & agg(const char *label, const syntax::xnode_ppty ppty = syntax::is_regular);
+            syntax::aggregate & agg(const char *label, const syntax::property ppty = syntax::is_regular);
             
             //! alternate rule
             syntax::alternate & alt();

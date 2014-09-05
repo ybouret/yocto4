@@ -12,7 +12,7 @@ namespace yocto
             {
             }
             
-            terminal:: terminal(const string &id, const xnode_ppty ppty) :
+            terminal:: terminal(const string &id, const property ppty) :
             rule(id),
             semantic(ppty)
             {

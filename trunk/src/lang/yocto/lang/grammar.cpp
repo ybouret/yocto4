@@ -90,7 +90,7 @@ optIndex(0), altIndex(0)
         }
         
         //----------------------------------------------------------------------
-        syntax::terminal & grammar:: term( const string &label, const syntax::xnode_ppty ppty )
+        syntax::terminal & grammar:: term( const string &label, const syntax::property ppty )
         {
             ensure_no(label);
             syntax::terminal *r = new syntax::terminal(label,ppty);
@@ -98,7 +98,7 @@ optIndex(0), altIndex(0)
             return *r;
         }
         
-        syntax::terminal & grammar:: term( const char *label, const syntax::xnode_ppty ppty )
+        syntax::terminal & grammar:: term( const char *label, const syntax::property ppty )
         {
             const string Label(label);
             return term(Label,ppty);
@@ -140,7 +140,7 @@ optIndex(0), altIndex(0)
         }
         
 		//----------------------------------------------------------------------
-        syntax::aggregate & grammar:: agg(const string &label, const syntax::xnode_ppty ppty)
+        syntax::aggregate & grammar:: agg(const string &label, const syntax::property ppty)
 		{
 			ensure_no(label);
 			syntax::aggregate *r = new syntax::aggregate(label,ppty);
@@ -148,7 +148,7 @@ optIndex(0), altIndex(0)
 			return *r;
 		}
         
-        syntax::aggregate & grammar:: agg(const char *label, const syntax::xnode_ppty ppty)
+        syntax::aggregate & grammar:: agg(const char *label, const syntax::property ppty)
 		{
             const string Label(label);
             return agg(Label,ppty);
