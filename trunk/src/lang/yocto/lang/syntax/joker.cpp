@@ -101,9 +101,17 @@ namespace yocto
                 }
                 
                 guard.forget();
-                if(SubTree->children().size>=value)
+                const size_t nch = SubTree->children().size;
+                if(nch>=value)
                 {
-                    grow(Tree,SubTree);
+                    if(nch>0)
+                    {
+                        grow(Tree,SubTree);
+                    }
+                    else
+                    {
+                        delete SubTree;
+                    }
                     return true;
                 }
                 else

@@ -24,7 +24,7 @@ namespace yocto
         
         syntax::xnode * parser:: run( ios::istream &input )
         {
-            return accept(*this, src, input);
+            return syntax::xnode::ast(accept(*this, src, input));
         }
         
         
