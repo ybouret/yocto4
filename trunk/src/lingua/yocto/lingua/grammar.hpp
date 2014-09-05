@@ -26,10 +26,10 @@ namespace yocto
             //! default ctor
             virtual ~grammar() throw();
             
-            //! new terminal
+            //! new terminal, MUST match a lexeme's label
             syntax::terminal &term( const string &id, syntax::node_property = syntax::is_regular);
             
-            //! new terminal
+            //! wrapper
             syntax::terminal &term( const char   *id, syntax::node_property = syntax::is_regular);
 
             //! new aggregate

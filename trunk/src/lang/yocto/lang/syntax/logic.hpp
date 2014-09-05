@@ -48,7 +48,8 @@ namespace yocto
 			class aggregate : public logical
 			{
 			public:
-				explicit aggregate(const string &id);
+                const syntax::xnode_ppty behavior;
+				explicit aggregate(const string &id,const syntax::xnode_ppty ppty);
 				virtual ~aggregate() throw();
 
 				aggregate & operator+=( rule & );

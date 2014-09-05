@@ -11,7 +11,7 @@ namespace yocto
     {
 
         //! transform an input into a source of lexemes
-        class lexer
+        class lexer : public virtual object
         {
         public:
             explicit lexer(const string &id);
