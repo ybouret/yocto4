@@ -80,7 +80,7 @@ namespace yocto
                     throw exception("empty syntax::aggregate '%s')", label.c_str() );
                 }
                 
-                syntax::xtree SubTree = syntax::xnode::create(label);
+                syntax::xtree SubTree = syntax::xnode::create(label,is_regular);
                 syntax::x_ptr guard(SubTree);
                 
                 //______________________________________________________________

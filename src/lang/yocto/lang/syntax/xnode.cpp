@@ -59,12 +59,14 @@ namespace yocto
             }
             
             
-            xnode:: xnode(const string &rule_label, lexeme *lx) throw():
+            xnode:: xnode(const string &rule_label, lexeme *lx, const xnode_ppty ppty) throw():
             label(rule_label),
             next(0),
             prev(0),
             parent(0),
-            terminal(true)
+            terminal(true),
+            property(ppty),
+            wksp()
             {
                 assert(lx);
                 clr();
@@ -72,12 +74,14 @@ namespace yocto
             }
             
             
-            xnode:: xnode(const string &rule_label) throw():
+            xnode:: xnode(const string &rule_label, const xnode_ppty ppty) throw():
             label(rule_label),
             next(0),
             prev(0),
             parent(0),
-            terminal(false)
+            terminal(false),
+            property(ppty),
+            wksp()
             {
                 clr();
             }
@@ -85,11 +89,11 @@ namespace yocto
             
             
             
-            xnode * xnode:: create( const string &rule_label, lexeme *lx )
+            xnode * xnode:: create( const string &rule_label, lexeme *lx, const xnode_ppty ppty )
             {
                 try
                 {
-                    return new xnode(rule_label, lx);
+                    return new xnode(rule_label,lx,ppty);
                 }
                 catch(...)
                 {
@@ -99,9 +103,9 @@ namespace yocto
             }
             
             
-            xnode * xnode:: create( const string &rule_label )
+            xnode * xnode:: create( const string &rule_label,const xnode_ppty ppty)
             {
-                return new xnode(rule_label);
+                return new xnode(rule_label,ppty);
             }
             
             void xnode:: add( xnode *child ) throw()
