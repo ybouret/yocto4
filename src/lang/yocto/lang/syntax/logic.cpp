@@ -55,7 +55,7 @@ namespace yocto
         
 		namespace syntax
 		{
-			aggregate:: aggregate(const string &id, const syntax::xnode_ppty ppty) :
+			aggregate:: aggregate(const string &id, const syntax::property ppty) :
             logical(id),
             behavior(ppty)
             {

@@ -16,7 +16,7 @@ namespace yocto
                 
                 if(node->terminal)
                 {
-                    switch(node->property)
+                    switch(node->modifier)
                     {
                         case is_regular:
                             return node;

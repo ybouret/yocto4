@@ -13,7 +13,7 @@ namespace yocto
         {
            
            
-            enum xnode_ppty
+            enum property
             {
                 is_regular,          //!< a regular node
                 is_specialized = 1,  //!< univocal, erase content
@@ -35,7 +35,8 @@ namespace yocto
                 xnode           *prev;     //!< for children
                 xnode           *parent;   //!< for tree structure
                 const bool       terminal; //!< terminal or not
-                const xnode_ppty property;
+                const property   modifier; //!< be more precise
+                
                 virtual ~xnode() throw();
                 
                 child_list       &children() throw();
@@ -44,10 +45,10 @@ namespace yocto
                 const lexeme *   &lxm() const throw();
                 
                 //!create a new terminal node
-                static xnode *create( const string &rule_label, lexeme *lx, const xnode_ppty ppty);
+                static xnode *create( const string &rule_label, lexeme *lx, const property ppty);
                 
                 //! create a new non terminal node
-                static xnode *create( const string &rule_label, const xnode_ppty ppty);
+                static xnode *create( const string &rule_label, const property ppty);
                 
                 //! register a new child
                 void add( xnode *child ) throw();
@@ -66,8 +67,8 @@ namespace yocto
                 static xnode *ast( xnode *node ) throw();
                 
             private:
-                explicit xnode(const string &rule_label, lexeme *lx, const xnode_ppty ppty) throw();
-                explicit xnode(const string &rule_label, const xnode_ppty ppty) throw();
+                explicit xnode(const string &rule_label, lexeme *lx, const property ppty) throw();
+                explicit xnode(const string &rule_label, const property ppty) throw();
                 void viz( ios::ostream &fp ) const;
                 void clr() throw();
                 
