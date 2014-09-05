@@ -14,10 +14,15 @@ namespace yocto
 #define Y_LANG_GRAMMAR_CTOR() \
 name(id),\
 rules(), \
-optIndex(0)
+optIndex(0), altIndex(0)
         
         
         grammar:: grammar(const string &id) :
+        Y_LANG_GRAMMAR_CTOR()
+        {
+        }
+        
+        grammar:: grammar(const char *id) :
         Y_LANG_GRAMMAR_CTOR()
         {
         }
@@ -135,13 +140,31 @@ optIndex(0)
         }
         
 		//----------------------------------------------------------------------
-        syntax::aggregate & grammar:: agg(const string &label)
+        syntax::aggregate & grammar:: agg(const string &label, const syntax::xnode_ppty ppty)
 		{
 			ensure_no(label);
-			syntax::aggregate *r = new syntax::aggregate(label);
+			syntax::aggregate *r = new syntax::aggregate(label,ppty);
 			rules.push_back(r);
 			return *r;
 		}
+        
+        syntax::aggregate & grammar:: agg(const char *label, const syntax::xnode_ppty ppty)
+		{
+            const string Label(label);
+            return agg(Label,ppty);
+        }
+        
+        //----------------------------------------------------------------------
+        syntax::alternate & grammar:: alt()
+        {
+            const string      label = name +  vformat("||/#%d",++altIndex);
+            ensure_no(label);
+            syntax::alternate *r    = new syntax::alternate(label);
+            rules.push_back(r);
+            return *r;
+
+        }
+
 
     }
 }

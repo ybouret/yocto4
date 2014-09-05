@@ -55,8 +55,9 @@ namespace yocto
         
 		namespace syntax
 		{
-			aggregate:: aggregate(const string &id) :
-            logical(id)
+			aggregate:: aggregate(const string &id, const syntax::xnode_ppty ppty) :
+            logical(id),
+            behavior(ppty)
             {
             }
             
@@ -77,7 +78,7 @@ namespace yocto
                 check(Tree);
                 if(operands.size<=0)
                 {
-                    throw exception("empty syntax::aggregate '%s')", label.c_str() );
+                    throw exception("empty syntax::aggregate '%s'", label.c_str() );
                 }
                 
                 syntax::xtree SubTree = syntax::xnode::create(label,is_regular);
@@ -138,7 +139,7 @@ namespace yocto
                 check(Tree);
 				if(operands.size<=0)
 				{
-					throw exception("empty syntax::alternate '%s')", label.c_str() );
+					throw exception("empty syntax::alternate '%s'", label.c_str() );
 				}
                 
                 //______________________________________________________________
