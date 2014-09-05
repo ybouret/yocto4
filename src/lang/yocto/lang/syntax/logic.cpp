@@ -98,6 +98,8 @@ namespace yocto
                         syntax::xnode::restore(Lexer,SubTree);
                         return false;
                     }
+                    if(Node)
+                        SubTree->add(Node);
                 }
                 
                 //______________________________________________________________

@@ -28,7 +28,7 @@ namespace yocto
                 {
                     if(lx->label==label)
                     {
-                        xtree Node = xnode::create(label,lx,is_regular);
+                        xtree Node = xnode::create(label,lx,semantic);
                         grow(Tree,Node);
                         return true;
                     }

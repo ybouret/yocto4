@@ -18,32 +18,35 @@ namespace
     public:
         MyParser() : parser("my parser", "main")
         {
-            //
-            syntax::alternate &VectorOrList = alt();
             
-            syntax::terminal &INT    = terminal("INT", "[:digit:]+");
-            syntax::terminal &COMMA  = jettison("COMMA", ',');
-            syntax::terminal &LBRACK = jettison("LBRACK",'[');
-            syntax::terminal &RBRACK = jettison("RBRACK",']');
+            Terminal &LBRACK = jettison("LBRACK", '[');
+            Terminal &RBRACK = jettison("RBRACK", ']');
+            Terminal &INT    = terminal("INT", "[:digit:]+");
+            Terminal &ID     = terminal("ID", "[:alpha:][:word:]+");
+            Terminal &COMMA  = jettison("COMMA", ',');
             
-            syntax::alternate &Content = alt();
-            Content << INT;
+            Alternate &ITEM = alt();
+            ITEM << INT << ID;
             
-            syntax::aggregate &EmptyVec = agg("EmptyVec");
-            EmptyVec << LBRACK << RBRACK;
+            Aggregate &EXTRA_ITEM = agg("EXTRA_ITEM");
+            EXTRA_ITEM << COMMA << ITEM;
             
-            syntax::aggregate &Vec = agg("Vec");
-            Vec << LBRACK << Content;
-            
-            Vec << RBRACK;
-            
-            syntax::alternate &SomeVector = alt();
-            SomeVector << EmptyVec;
+            Aggregate &CONTENT = agg("CONTENT");
+            CONTENT << ITEM << zero_or_more("EXTRA_ITEMS",EXTRA_ITEM);
             
             
-            VectorOrList << SomeVector;
+            Aggregate &ZeroVector = agg("ZeroVector");
+            ZeroVector << LBRACK << RBRACK;
             
-            set_root( zero_or_more("items", VectorOrList) );
+            Aggregate &SomeVector = agg("SomeVector");
+            SomeVector << LBRACK << CONTENT << RBRACK;
+            
+            Alternate &Vector = alt();
+            Vector << ZeroVector << SomeVector;
+            
+            ITEM << Vector;
+            
+            set_root( zero_or_more("Data",Vector) );
             
             // final
             scanner.make("BLANK", "[:blank:]",discard);

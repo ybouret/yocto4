@@ -21,6 +21,10 @@ syntax::terminal & FUNCTION(const char   *label,const char   C)
         class parser : public grammar, public lexer
         {
         public:
+            typedef syntax::terminal  Terminal;
+            typedef syntax::aggregate Aggregate;
+            typedef syntax::alternate Alternate;
+            
             explicit parser( const string &title, const string &mainScanner);
             virtual ~parser() throw();
             

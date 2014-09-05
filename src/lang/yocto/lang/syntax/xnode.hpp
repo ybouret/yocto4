@@ -62,6 +62,9 @@ namespace yocto
                 //! restore a node to the lexer and delete it
                 static void restore( lexer &Lexer, xnode *node ) throw();
                 
+                //! cleanup
+                static xnode *ast( xnode *node ) throw();
+                
             private:
                 explicit xnode(const string &rule_label, lexeme *lx, const xnode_ppty ppty) throw();
                 explicit xnode(const string &rule_label, const xnode_ppty ppty) throw();
