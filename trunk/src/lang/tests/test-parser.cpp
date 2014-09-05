@@ -28,11 +28,11 @@ namespace
             Alternate &ITEM = alt();
             ITEM << INT << ID;
             
-            Aggregate &EXTRA_ITEM = agg("EXTRA_ITEM");
+            Aggregate &EXTRA_ITEM = merge();
             EXTRA_ITEM << COMMA << ITEM;
             
-            Aggregate &CONTENT = agg("CONTENT");
-            CONTENT << ITEM << zero_or_more("EXTRA_ITEMS",EXTRA_ITEM);
+            Aggregate &CONTENT = merge();
+            CONTENT << ITEM << zero_or_more(EXTRA_ITEM);
             
             
             Aggregate &ZeroVector = agg("ZeroVector");
@@ -46,7 +46,7 @@ namespace
             
             ITEM << Vector;
             
-            set_root( zero_or_more("Data",Vector) );
+            set_root( zero_or_more(Vector,"Data") );
             
             // final
             scanner.make("BLANK", "[:blank:]",discard);

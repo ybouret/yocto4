@@ -9,6 +9,66 @@ namespace yocto
         namespace syntax
         {
             
+            static inline xnode *ast_terminal(xnode *node) throw()
+            {
+                assert(node);
+                assert(node->terminal);
+                switch(node->modifier)
+                {
+                    case is_discardable:
+                        delete node;
+                        return 0;
+                        
+                    case is_specialized:
+                        node->lxm()->clear();
+                        return node;
+                        
+                    default:
+                        break;
+                }
+                return node;
+            }
+            
+            
+            static inline xnode *ast_compound(xnode *node) throw()
+            {
+                assert(node);
+                assert(!node->terminal);
+                xnode::child_list tmp;
+                while( node->count() )
+                {
+                    xnode *child = xnode::ast( node->pop() );
+                    if(!child)
+                        continue;
+                    
+                    if(child->terminal)
+                    {
+                        child->parent = node;
+                        tmp.push_back(child);
+                    }
+                    else
+                    {
+                        switch(child->modifier)
+                        {
+                            case is_merging_all:
+                                while(child->count())
+                                {
+                                    xnode *sub = child->pop();
+                                    sub->parent = node;
+                                    tmp.push_back(sub);
+                                }
+                                delete child;
+                                break;
+                                
+                            default:
+                                child->parent = node;
+                                tmp.push_back(child);
+                        }
+                    }
+                }
+                node->children().swap_with(tmp);
+                return node;
+            }
             
             xnode * xnode::ast( xnode *node ) throw()
             {
@@ -16,44 +76,11 @@ namespace yocto
                 
                 if(node->terminal)
                 {
-                    switch(node->modifier)
-                    {
-                        case is_regular:
-                            return node;
-                            
-                        case is_discardable:
-                            // shouldn't happen
-                            delete node;
-                            return 0;
-                            
-                        case is_specialized:
-                            node->lxm()->clear();
-                            return node;
-                            
-                        default:
-                            // shouldn't happen
-                        ;
-                    }
+                    return ast_terminal(node);
                 }
                 else
                 {
-                    child_list &ch  = node->children();
-                    {
-                        child_list  tmp;
-                        while(ch.size)
-                        {
-                            xnode *sub  = ch.pop_front();
-                            sub->parent = 0;
-                            xnode *res  = ast(sub);
-                            if(res)
-                            {
-                                res->parent = node;
-                                tmp.push_back(res);
-                            }
-                        }
-                        ch.swap_with(tmp);
-                    }
-                    return node;
+                    return ast_compound(node);
                 }
             }
             

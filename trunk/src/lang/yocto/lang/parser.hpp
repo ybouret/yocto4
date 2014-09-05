@@ -32,6 +32,14 @@ syntax::terminal & FUNCTION(const char   *label,const char   C)
             YOCTO_LANG_PARSER_TERM_PROTO(jettison);
             YOCTO_LANG_PARSER_TERM_PROTO(univocal);
             
+            //! a named aggregate => syntax::is_regular
+            syntax::aggregate &assemble(const string &label);
+            syntax::aggregate &assemble(const char   *label);
+            
+            //! an all merging aggregate => syntax::is_merging_all
+            syntax::aggregate &merge();
+            
+            
             syntax::xnode *run( ios::istream &input );
             
         protected:

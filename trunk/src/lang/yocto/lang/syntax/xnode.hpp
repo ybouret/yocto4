@@ -17,7 +17,8 @@ namespace yocto
             {
                 is_regular,          //!< a regular node
                 is_specialized = 1,  //!< univocal, erase content
-                is_discardable = 2   //!< syntax only
+                is_discardable = 2,  //!< syntax only
+                is_merging_all = 4   //!< a temporary list, merge with parent if possible
             };
             
             //! a syntax node, terminal or not
@@ -41,6 +42,14 @@ namespace yocto
                 
                 child_list       &children() throw();
                 const child_list &children() const throw();
+                size_t            count()    const throw(); //!< #children
+                
+                //! register a new child with no parent/next/prev.
+                void   add( xnode *child ) throw();
+                
+                //! children().pop_front() and set no parent
+                xnode *pop() throw();
+                
                 lexeme *         &lxm() throw();
                 const lexeme *   &lxm() const throw();
                 
@@ -50,8 +59,6 @@ namespace yocto
                 //! create a new non terminal node
                 static xnode *create( const string &rule_label, const property ppty);
                 
-                //! register a new child
-                void add( xnode *child ) throw();
                 
                 
                 //! make a GraphViz file

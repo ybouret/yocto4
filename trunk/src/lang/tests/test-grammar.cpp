@@ -54,8 +54,8 @@ YOCTO_UNIT_TEST_IMPL(grammar)
     syntax::rule &identifier = G.term("identifier");
 	syntax::rule &number     = G.term("number");
     syntax::rule &optid      = G.opt(identifier);
-    syntax::rule &z_id       = G.zero_or_more("zom_id",identifier);
-    syntax::rule &o_id       = G.one_or_more("oom_id",identifier);
+    syntax::rule &z_id       = G.zero_or_more(identifier);
+    syntax::rule &o_id       = G.one_or_more(identifier);
     syntax::aggregate &numid = G.agg("numid");
 	
 	numid << identifier << number;

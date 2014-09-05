@@ -2,7 +2,7 @@
 
 CODE : (INT|ID)+;
 
-ID : "[:word:]"+;
+ID : "[:alpha:][:word:]"+;
 INT : "[:digit:]"+;
 
 WS   :  "[ \t]" [];
