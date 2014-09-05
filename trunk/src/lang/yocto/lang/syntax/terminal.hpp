@@ -16,8 +16,8 @@ namespace yocto
             {
             public:
                 virtual ~terminal() throw();
-                explicit terminal(const string &id);
-
+                explicit terminal(const string &id, const xnode_ppty ppty);
+                const xnode_ppty semantic;
                 
                 YOCTO_LANG_SYNTAX_RULE_MATCH_DECL();
                 

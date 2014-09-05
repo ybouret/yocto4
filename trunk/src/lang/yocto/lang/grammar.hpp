@@ -25,10 +25,10 @@ namespace yocto
             const string name;
             
             //! declare a new terminal
-            syntax::terminal & term( const string &label);
+            syntax::terminal & term(const string &label, const syntax::xnode_ppty ppty = syntax::is_regular);
             
             //! declare a new terminal
-            syntax::terminal & term( const char   *label);
+            syntax::terminal & term(const char   *label, const syntax::xnode_ppty ppty = syntax::is_regular);
             
             //! declare an optional rule
             syntax::optional & opt( syntax::rule &r );

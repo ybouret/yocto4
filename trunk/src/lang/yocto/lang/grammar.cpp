@@ -85,18 +85,18 @@ optIndex(0)
         }
         
         //----------------------------------------------------------------------
-        syntax::terminal & grammar:: term( const string &label )
+        syntax::terminal & grammar:: term( const string &label, const syntax::xnode_ppty ppty )
         {
             ensure_no(label);
-            syntax::terminal *r = new syntax::terminal(label);
+            syntax::terminal *r = new syntax::terminal(label,ppty);
             rules.push_back( r );
             return *r;
         }
         
-        syntax::terminal & grammar:: term( const char *label )
+        syntax::terminal & grammar:: term( const char *label, const syntax::xnode_ppty ppty )
         {
             const string Label(label);
-            return term(Label);
+            return term(Label,ppty);
         }
         
         //----------------------------------------------------------------------

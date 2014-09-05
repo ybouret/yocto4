@@ -12,8 +12,9 @@ namespace yocto
             {
             }
             
-            terminal:: terminal(const string &id) :
-            rule(id)
+            terminal:: terminal(const string &id, const xnode_ppty ppty) :
+            rule(id),
+            semantic(ppty)
             {
             }
             
@@ -27,7 +28,7 @@ namespace yocto
                 {
                     if(lx->label==label)
                     {
-                        xtree Node = xnode::create(label,lx);
+                        xtree Node = xnode::create(label,lx,is_regular);
                         grow(Tree,Node);
                         return true;
                     }

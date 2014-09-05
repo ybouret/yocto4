@@ -85,7 +85,7 @@ namespace yocto
             YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(at_least)
             {
                 check(Tree);
-                syntax::xtree SubTree = syntax::xnode::create(label);
+                syntax::xtree SubTree = syntax::xnode::create(label,is_regular);
                 syntax::x_ptr guard(SubTree);
                 
                 for(;;)
