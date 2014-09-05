@@ -28,12 +28,19 @@ syntax::terminal & FUNCTION(const char   *label,const char   C)
             explicit parser( const string &title, const string &mainScanner);
             virtual ~parser() throw();
             
+            //! regular terminal(s)
             YOCTO_LANG_PARSER_TERM_PROTO(terminal);
+            
+            //! syntax only terminal(s)
             YOCTO_LANG_PARSER_TERM_PROTO(jettison);
+            
+            //! regular terminals withing meaningless content
             YOCTO_LANG_PARSER_TERM_PROTO(univocal);
             
             //! a named aggregate => syntax::is_regular
             syntax::aggregate &assemble(const string &label);
+            
+            //! wrapper
             syntax::aggregate &assemble(const char   *label);
             
             //! an all merging aggregate => syntax::is_merging_all
@@ -41,6 +48,10 @@ syntax::terminal & FUNCTION(const char   *label,const char   C)
             
             
             syntax::xnode *run( ios::istream &input );
+            
+            //! create a new EOL comment for current target
+            void EndOfLineComment(const string &trigger);
+            
             
         protected:
             lexical::scanner &scanner; //!< default scanner
