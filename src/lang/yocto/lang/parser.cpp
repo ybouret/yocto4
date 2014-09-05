@@ -76,5 +76,11 @@ return term(label,syntax:: PPTY);\
             return agg(label,syntax::is_merging_all);
         }
 
+        
+        void parser:: EndOfLineComment(const string &trigger)
+        {
+            
+        }
+        
     }
 }
