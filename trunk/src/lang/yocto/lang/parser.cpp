@@ -79,7 +79,12 @@ return term(label,syntax:: PPTY);\
         
         void parser:: EndOfLineComment(const string &trigger)
         {
-            
+            const string com = "@Comment:" + trigger;
+			if(!has(com))
+			{
+				//create the new scanner
+			}
+			target->jump(com,trigger);
         }
         
     }
