@@ -1,5 +1,6 @@
 #include "yocto/lang/parser.hpp"
 #include "yocto/lang/pattern/basic.hpp"
+#include "yocto/lang/pattern/posix.hpp"
 
 namespace yocto
 {
@@ -83,8 +84,13 @@ return term(label,syntax:: PPTY);\
 			if(!has(com))
 			{
 				//create the new scanner
+				lexical::scanner &sub = declare(com);
+				sub.make("CHAR", posix::dot(), discard);
+				sub.back(posix::endl(),endl_cb);
 			}
-			target->jump(com,trigger,nothing);
+
+			// call the comment upon trigger
+			target->call(com,trigger,nothing);
         }
         
     }

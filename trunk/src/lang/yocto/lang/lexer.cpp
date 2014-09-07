@@ -8,9 +8,9 @@ namespace yocto
         
         bool  lexer:: emit(const token &) throw() { return true;  }
         bool  lexer:: drop(const token &) throw() { return false; }
-        void  lexer:: on_newline() throw() { ++line; }
-        bool  lexer:: on_newline_drop(const token&) throw() { on_newline(); return false; }
-        bool  lexer:: on_newline_emit(const token&) throw() { on_newline(); return true;  }
+        void  lexer:: on_newline(const token &) throw() { ++line; }
+        bool  lexer:: on_newline_drop(const token&t) throw() { on_newline(t); return false; }
+        bool  lexer:: on_newline_emit(const token&t) throw() { on_newline(t); return true;  }
 		void  lexer:: do_nothing(const token &) throw() {}
         
         const lexical::scanner & lexer:: operator[](const string &id) const
@@ -43,7 +43,8 @@ name(id), line(1), scan(0), scanners(2,as_capacity), root(0), dict(), \
 forward(this, &lexer::emit ),\
 discard(this, &lexer::drop ),\
 newline(this, &lexer::on_newline_drop ),\
-nothing(this, &lexer::do_nothing)
+nothing(this, &lexer::do_nothing),\
+endl_cb(this, &lexer::on_newline)
         
         lexer:: lexer(const string &id) :
         Y_LEXER_CTOR()
