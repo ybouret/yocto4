@@ -73,11 +73,11 @@ namespace yocto
             const lexical::action   discard;       //!< drop token
             const lexical::action   newline;       //!< increase line, no lexeme
 			const lexical::callback nothing;
-		
+			const lexical::callback endl_cb;
 
             bool emit(const token&) throw();
             bool drop(const token&) throw();
-            void on_newline() throw();      //!< ++line
+            void on_newline(const token&) throw();      //!< ++line
 			void do_nothing(const token &) throw();
             bool on_newline_drop(const token&) throw(); //!< newline, return false
             bool on_newline_emit(const token&) throw(); //!< newline, return true
