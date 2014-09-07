@@ -84,7 +84,7 @@ return term(label,syntax:: PPTY);\
 			{
 				//create the new scanner
 			}
-			target->jump(com,trigger);
+			target->jump(com,trigger,nothing);
         }
         
     }

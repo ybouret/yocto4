@@ -69,13 +69,15 @@ namespace yocto
             
         public:
             p_dict dict;
-            const lexical::action forward;
-            const lexical::action discard;
-            const lexical::action newline;
-            
+            const lexical::action   forward;
+            const lexical::action   discard;
+            const lexical::action   newline;
+			const lexical::callback nothing;
+
             bool emit(const token&) throw();
             bool drop(const token&) throw();
             void on_newline() throw();      //!< ++line
+			void do_nothing(const token &) throw();
             bool on_newline_drop(const token&) throw(); //!< newline, return false
             bool on_newline_emit(const token&) throw(); //!< newline, return true
         };
