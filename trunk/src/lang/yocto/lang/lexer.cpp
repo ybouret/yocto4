@@ -11,7 +11,7 @@ namespace yocto
         void  lexer:: on_newline() throw() { ++line; }
         bool  lexer:: on_newline_drop(const token&) throw() { on_newline(); return false; }
         bool  lexer:: on_newline_emit(const token&) throw() { on_newline(); return true;  }
-        
+		void  lexer:: do_nothing(const token &) throw() {}
         
         const lexical::scanner & lexer:: operator[](const string &id) const
         {
@@ -34,11 +34,16 @@ namespace yocto
         {
         }
         
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4355 )
+#endif
+
 #define Y_LEXER_CTOR() \
 name(id), line(1), scan(0), scanners(2,as_capacity), root(0), dict(), \
 forward(this, &lexer::emit ),\
 discard(this, &lexer::drop ),\
-newline(this, &lexer::on_newline_drop )
+newline(this, &lexer::on_newline_drop ),\
+nothing(this, &lexer::do_nothing)
         
         lexer:: lexer(const string &id) :
         Y_LEXER_CTOR()
