@@ -53,11 +53,10 @@ namespace yocto
             //! information
             const lexical::scanner &current() const throw();
             
-            
+                      
         private:
             typedef set<string,lexical::scanner::pointer> scanDB;
             typedef list<lexical::scanner*>               history_type;
-            typedef set<string,lexical::plugin::pointer>  plugDB;
             lexical::scanner *scan;
             lexemes           cache;
             history_type      history;
@@ -66,10 +65,11 @@ namespace yocto
             string last_label; //!< saved after a NEW lexeme
             string last_token; //!< saved after a NEW lexeme
             
-        private:
+        protected:
             scanDB            scanners;
+            
+        private:
             lexical::scanner *root;
-            plugDB            plugins;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             friend class plugin;

@@ -15,7 +15,7 @@ namespace yocto
             {
             public:
                 virtual ~cstring() throw();
-                explicit cstring(const string &id);
+                explicit cstring(const string &id, lexer &parent);
                 
                 virtual pattern *trigger() const;
                 

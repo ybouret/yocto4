@@ -79,11 +79,11 @@ namespace yocto
             
             
             syntax::rule * find_rule(const string &label ) const throw();
-            void           ensure_no(const string &label) const;
             syntax::r_list rules;
             
         protected:
             int            counter; //!< internal counter for auto labeling
+            void           ensure_no(const string &label) const;
         };
         
     }

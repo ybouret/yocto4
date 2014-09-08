@@ -11,7 +11,7 @@ namespace yocto
             cstring:: ~cstring() throw() {}
             
             
-            //cstring:: cstring( const string &id ) : plugin(id) {}
+            cstring:: cstring( const string &id, lexer &parent ) : plugin(id,parent) {}
             
             
         }

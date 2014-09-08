@@ -6,6 +6,8 @@
 
 #include <cstdlib>
 
+#include "yocto/lang/lexical/plugin-comment.hpp"
+
 using namespace yocto;
 using namespace lang;
 
@@ -26,7 +28,7 @@ namespace
             Terminal &COMMA  = jettison("COMMA", ',');
             
             Alternate &ITEM = alt();
-            ITEM << INT << ID << cstring("STRING");
+            ITEM << INT << ID;
             
             Aggregate &EXTRA_ITEM = merge();
             EXTRA_ITEM << COMMA << ITEM;
@@ -49,8 +51,9 @@ namespace
             set_root( zero_or_more(Vector,"Data") );
             
             // somme comment
-            end_of_line_comment("//");
-            
+            //end_of_line_comment("//");
+            plug( new lexical::comment("COMMENT", *this, "//") );
+                 
             // final
             scanner.make("BLANK", "[:blank:]", discard);
             scanner.make("ENDL",  "[:endl:]",  newline);

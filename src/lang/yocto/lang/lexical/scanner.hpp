@@ -71,6 +71,7 @@ namespace yocto
                 
                 //! link to a lexer
                 void link_to( lexer & );
+                bool linked_to( const lexer &) const throw();
                 
                 //--------------------------------------------------------------
                 //
@@ -165,6 +166,7 @@ namespace yocto
                 
                 bool    emit(const token &);
                 bool    drop(const token &);
+                void    on_newline(const token &);
                 bool    newline(const token &);        //!< increase #line, discard
                 bool    newline_emit(const token &);   //!< increase #line, forward
                 
@@ -414,11 +416,12 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(scanner);
+                void append_context_to( string &s ) const;
                 r_list        rules;
                 lexer        *mylex;
-                const p_dict *dict;
                 int           ibck; //!< index for automatic 'back' rules numbering
-                void append_context_to( string &s ) const;
+            protected:
+                const p_dict *dict;
             };
             
         }

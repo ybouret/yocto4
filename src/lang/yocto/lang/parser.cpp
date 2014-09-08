@@ -18,8 +18,7 @@ namespace yocto
         lexer(  title+ ".lexer"  ),
         scanner( declare(mainScanner) ),
         target( &scanner ),
-        src(),
-        str()
+        src()
         {
         }
         
@@ -114,47 +113,45 @@ namespace yocto
     }
 }
 
+
+#include "yocto/exception.hpp"
+
 namespace yocto
 {
     namespace lang
     {
-     
         
-        void parser:: str_init(const token &) throw()
+        syntax:: rule & parser:: plug( lexical::plugin *plugin )
         {
-            str.clear();
-        }
         
-        void parser::str_quit(const token & )
-        {
-            std::cerr << "str='" << str << "'" << std::endl;
-        }
-        
-        bool parser:: str_emit(const token &t)
-        {
-            //std::cerr << "str+="<<t<<std::endl;
-            for(const t_char *ch = t.head;ch;ch=ch->next)
+            assert(plugin);
+            //__________________________________________________________________
+            //
+            // lexical rules...
+            //__________________________________________________________________
+            const lexical::scanner::pointer q(plugin);
+            if( !plugin->linked_to(*this) )
             {
-                str.append( ch->code );
+                throw exception("plugin<%s> not linked to {%s}",plugin->name.c_str(), lexer::name.c_str());
             }
-            return false;
-        }
-        
-        syntax::rule & parser:: cstring(const string &label)
-        {
-            if( !has(label) )
+            
+            if(!scanners.insert(q))
             {
-                lexical::scanner &sub = declare(label);
-                sub.back( single::create('"'), this, &parser:: str_quit);
-                sub.make("CHAR", posix::dot(), this, &parser:: str_emit);
+                throw exception("{%s}.insert(multiple plugin <%s>)", lexer::name.c_str(), plugin->name.c_str() );
             }
-            target->call(label, single::create('"'), this, & parser:: str_init );
-        
-            return term(label,syntax::is_standard);
+            
+            target->call(plugin->name, plugin->trigger(),plugin, &lexical::plugin::enter);
+            
+            //__________________________________________________________________
+            //
+            // syntactic rule
+            //__________________________________________________________________
+            syntax::rule &r = term(plugin->name);
+            return r;
         }
+        
         
     }
     
 }
-
 
