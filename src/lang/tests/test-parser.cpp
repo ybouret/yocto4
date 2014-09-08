@@ -26,7 +26,7 @@ namespace
             Terminal &COMMA  = jettison("COMMA", ',');
             
             Alternate &ITEM = alt();
-            ITEM << INT << ID;
+            ITEM << INT << ID << cstring("STRING");
             
             Aggregate &EXTRA_ITEM = merge();
             EXTRA_ITEM << COMMA << ITEM;
