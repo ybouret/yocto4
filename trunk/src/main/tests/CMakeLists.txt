@@ -95,6 +95,7 @@ ADD_TEST(MPI_Split   test-main mpi_split)
 ADD_TEST(Ipower      test-main ipower)
 ADD_TEST(Tuple       test-main tuple)
 ADD_TEST(Q64         test-main q64)
+ADD_TEST(Factory     test-main factory)
 
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
