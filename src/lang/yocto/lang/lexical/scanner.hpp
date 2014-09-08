@@ -164,11 +164,11 @@ namespace yocto
                 }
                 
                 
-                bool    emit(const token &);
-                bool    drop(const token &);
-                void    on_newline(const token &);
-                bool    newline(const token &);        //!< increase #line, discard
-                bool    newline_emit(const token &);   //!< increase #line, forward
+                bool    forward(const token &);
+                bool    discard(const token &);
+                void    newline(const token &);
+                bool    forward_newline(const token &);  //!< increase #line, forward
+                bool    discard_newline(const token &);  //!< increase #line, discard
                 
                 
                 //--------------------------------------------------------------

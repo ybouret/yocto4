@@ -12,34 +12,33 @@ namespace yocto
             
                        
             
-            bool scanner:: emit( const token &tkn )
+            bool scanner:: forward( const token &tkn )
             {
-                //if(echo) std::cerr << tkn << std::endl;
                 return true;
             }
             
             
             
-            bool scanner:: drop(const token &tkn )
+            bool scanner:: discard(const token &tkn )
             {
                 //if(echo) std::cerr << tkn << std::endl;
                 return false;
             }
             
-            void scanner:: on_newline(const token &)
+            void scanner:: newline(const token &)
             {
                 ++line;
             }
             
-            bool scanner:: newline(const token &t)
+            bool scanner:: discard_newline(const token &t)
             {
-                on_newline(t);
+                newline(t);
                 return false;
             }
             
-            bool scanner:: newline_emit(const token &t)
+            bool scanner:: forward_newline(const token &t)
             {
-                on_newline(t);
+                newline(t);
                 return true;
             }
         }
