@@ -1,6 +1,7 @@
 #include "yocto/lang/lexical/plugin-cstring.hpp"
 #include "yocto/lang/pattern/basic.hpp"
 #include "yocto/lang/pattern/posix.hpp"
+#include "yocto/lang/lexer.hpp"
 
 namespace yocto
 {
@@ -46,7 +47,7 @@ namespace yocto
             void cstring:: leave( const token & )
             {
                 std::cerr << "cstring=" << content << std::endl;
-                exit(1);
+				mylex->unget(*this,content);
             }
             
         }
