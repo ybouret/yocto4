@@ -15,9 +15,9 @@ namespace yocto
            
             enum property
             {
-                is_regular,          //!< a regular node
-                is_specialized = 1,  //!< univocal, erase content
-                is_discardable = 2,  //!< syntax only
+                is_standard,      //!< a standard node
+                is_univocal = 1,  //!< univocal, erase content
+                is_jettison = 2,  //!< syntax only
                 is_merging_all = 4   //!< a temporary list, merge with parent if possible
             };
             

@@ -15,11 +15,11 @@ namespace yocto
                 assert(node->terminal);
                 switch(node->modifier)
                 {
-                    case is_discardable:
+                    case is_jettison:
                         delete node;
                         return 0;
                         
-                    case is_specialized:
+                    case is_univocal:
                         node->lxm()->clear();
                         return node;
                         

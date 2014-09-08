@@ -56,13 +56,13 @@ return term(label,syntax:: PPTY);\
 }
 
         
-        YOCTO_LANG_PARSER_TERM_IMPL(terminal,is_regular)
-        YOCTO_LANG_PARSER_TERM_IMPL(jettison,is_discardable)
-        YOCTO_LANG_PARSER_TERM_IMPL(univocal,is_specialized)
+        YOCTO_LANG_PARSER_TERM_IMPL(terminal,is_standard)
+        YOCTO_LANG_PARSER_TERM_IMPL(jettison,is_jettison)
+        YOCTO_LANG_PARSER_TERM_IMPL(univocal,is_univocal)
         
         syntax::aggregate & parser::assemble(const string &label)
         {
-            return agg(label,syntax::is_regular);
+            return agg(label,syntax::is_standard);
         }
         
         syntax::aggregate & parser::assemble(const char   *label)
