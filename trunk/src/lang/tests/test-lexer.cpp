@@ -37,7 +37,7 @@ namespace  {
             Main2.call("COM", "//",  this, &MyLexer::OnCall);
             Main2.call("COM_C", "/\\*", this, &MyLexer::OnCall);
             Main2.make("BLANK", "[:blank:]",discard);
-            Main2.make("ENDL", "[:endl:]", &Main, &lexical::scanner::newline);
+            Main2.make("ENDL", "[:endl:]", &Main, &lexical::scanner::discard_newline);
             
             lexical::scanner &COM = declare("COM");
             COM.make("CONTENT", ".", discard);

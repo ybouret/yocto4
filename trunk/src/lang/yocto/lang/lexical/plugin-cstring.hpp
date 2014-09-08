@@ -18,9 +18,15 @@ namespace yocto
                 explicit cstring(const string &id, lexer &parent);
                 
                 virtual pattern *trigger() const;
+                virtual void     enter(const token &);
+                
                 
             private:
+                string content;
                 YOCTO_DISABLE_COPY_AND_ASSIGN(cstring);
+                void leave(const token & );
+                bool gather(const token &);
+                
             };
             
         }
