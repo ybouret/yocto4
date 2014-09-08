@@ -78,7 +78,7 @@ return term(label,syntax:: PPTY);\
         }
 
         
-        void parser:: EndOfLineComment(const string &trigger)
+        void parser:: end_of_line_comment(const string &trigger)
         {
             const string com = "@Comment:" + trigger;
 			if(!has(com))
@@ -92,6 +92,13 @@ return term(label,syntax:: PPTY);\
 			// call the comment upon trigger
 			target->call(com,trigger,nothing);
         }
+        
+        void parser:: end_of_line_comment(const char   *trigger)
+        {
+            const string Trigger(trigger);
+            end_of_line_comment(Trigger);
+        }
+
         
     }
 }

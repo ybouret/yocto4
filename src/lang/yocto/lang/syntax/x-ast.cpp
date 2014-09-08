@@ -34,6 +34,7 @@ namespace yocto
             {
                 assert(node);
                 assert(!node->terminal);
+                bool run_again = false;
                 xnode::child_list tmp;
                 while( node->count() )
                 {
@@ -58,6 +59,7 @@ namespace yocto
                                     tmp.push_back(sub);
                                 }
                                 delete child;
+                                run_again = true;
                                 break;
                                 
                             default:
@@ -67,7 +69,8 @@ namespace yocto
                     }
                 }
                 node->children().swap_with(tmp);
-                return node;
+                
+                return run_again ? ast_compound(node) : node;
             }
             
             xnode * xnode::ast( xnode *node ) throw()

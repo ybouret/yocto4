@@ -50,8 +50,8 @@ syntax::terminal & FUNCTION(const char   *label,const char   C)
             syntax::xnode *run( ios::istream &input );
             
             //! create a new EOL comment for current target
-            void EndOfLineComment(const string &trigger);
-            
+            void end_of_line_comment(const string &trigger);
+            void end_of_line_comment(const char   *trigger);
             
         protected:
             lexical::scanner &scanner; //!< default scanner

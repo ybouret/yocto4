@@ -48,6 +48,9 @@ namespace
             
             set_root( zero_or_more(Vector,"Data") );
             
+            // somme comment
+            end_of_line_comment("//");
+            
             // final
             scanner.make("BLANK", "[:blank:]",discard);
             scanner.make("ENDL",  "[:endl:]", newline);
