@@ -26,15 +26,20 @@ namespace yocto
                 return false;
             }
             
-            bool scanner:: newline(const token &)
+            void scanner:: on_newline(const token &)
             {
                 ++line;
+            }
+            
+            bool scanner:: newline(const token &t)
+            {
+                on_newline(t);
                 return false;
             }
             
-            bool scanner:: newline_emit(const token &)
+            bool scanner:: newline_emit(const token &t)
             {
-                ++line;
+                on_newline(t);
                 return true;
             }
         }

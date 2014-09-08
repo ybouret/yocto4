@@ -12,7 +12,8 @@ namespace yocto
     {
         void factory_reg_failure( const char *interface, const char *spec_name );
         void factory_get_failure( const char *interface, const char *spec_name );
-
+        void factory_null_address(const char *interface);
+        
         template <typename INTERFACE,typename TLIST>
         struct factory_settings;
         
@@ -75,20 +76,20 @@ namespace yocto
         //! zero argument build
         inline INTERFACE * operator()( const std::type_info &t ) const
         {
-            return get(t)();
+            return check_addr(get(t)());
         }
         
         
         //! one argument build
         inline INTERFACE * operator()( const std::type_info &t, param1 p1) const
         {
-            return get(t)(p1);
+            return check_addr(get(t)(p1));
         }
         
         //! two arguments build
         inline INTERFACE * operator()( const std::type_info &t, param1 p1, param2 p2) const
         {
-            return get(t)(p1,p2);
+            return check_addr(get(t)(p1,p2));
         }
         
         
@@ -98,7 +99,14 @@ namespace yocto
     private:
         YOCTO_DISABLE_ASSIGN(factory);
         
-        
+        INTERFACE * check_addr( INTERFACE *I ) const
+        {
+            if(!I)
+            {
+                hidden::factory_null_address(typeid(*this).name());
+            }
+            return I;
+        }
         inline const creator & get( const std::type_info &t ) const
         {
             const type_spec spec(t);

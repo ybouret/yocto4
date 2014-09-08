@@ -25,6 +25,12 @@ namespace yocto
                 mylex = &lex;
             }
             
+            bool scanner:: linked_to( const lexer &lx ) const throw()
+            {
+                return &lx == mylex;
+            }
+
+            
             namespace
             {
                 enum  MakeType

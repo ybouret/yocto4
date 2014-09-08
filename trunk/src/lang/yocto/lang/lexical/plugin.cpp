@@ -17,7 +17,6 @@ namespace yocto
             {
                 link_to(parent);
                 
-                
             }
             
         }
