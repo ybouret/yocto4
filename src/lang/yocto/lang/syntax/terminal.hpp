@@ -17,6 +17,8 @@ namespace yocto
             public:
                 virtual ~terminal() throw();
                 explicit terminal(const string &id, const property ppty);
+                
+                //! will set xnode's modifier to this value
                 const property semantic;
                 
                 YOCTO_LANG_SYNTAX_RULE_MATCH_DECL();

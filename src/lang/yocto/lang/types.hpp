@@ -8,7 +8,10 @@ namespace yocto
     namespace lang
     {
         
+        //! dynamic char content
         typedef uint8_t  code_type;
+        
+        //! a store of 0..255 bytes
         typedef
         sorted_vector<
         code_type,
@@ -19,10 +22,10 @@ namespace yocto
         class first_chars : public bytes_store
         {
         public:
-            bool accept_empty; //!< if an empty pattern is ok
-            explicit first_chars() throw();
-            virtual ~first_chars() throw();
-            first_chars(const first_chars &);
+            bool accept_empty;                       //!< if an empty pattern is ok
+            explicit first_chars() throw();          //!< default ctor
+            virtual ~first_chars() throw();          //!< default dtor
+            first_chars(const first_chars &);        //!< copy all
             void add(code_type);                     //!< add one code
             void add(const first_chars&fc);          //!< leave accept_empty untouched
             void sub(code_type) throw();             //!< remove one code

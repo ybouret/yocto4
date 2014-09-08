@@ -11,6 +11,7 @@ namespace yocto
     namespace lang
     {
         
+        //! a regex pattern
         class pattern : public token
         {
         public:
@@ -22,7 +23,7 @@ namespace yocto
             //__________________________________________________________________
             pattern       *next;
             pattern       *prev;
-            const uint32_t type; //!< UUID
+            const uint32_t type; //!< UUID for I/O
             void          *self; //!< class corresponding to type
             
             //__________________________________________________________________
@@ -41,6 +42,7 @@ namespace yocto
             //! true is a match is possible
             /**
              must left the source untouched otherwise !
+             and the final content must be stored in this
              */
             virtual bool      match( source &src, ios::istream & ) = 0;
             
@@ -94,7 +96,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(pattern);
         };
         
-        //! a list of patterns
+        //! a list of cloneable patterns
         typedef core::meta_list<pattern> p_list;
         
     }

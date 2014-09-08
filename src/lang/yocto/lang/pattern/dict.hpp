@@ -9,8 +9,9 @@ namespace yocto
 {
     namespace lang
     {
-        typedef shared_ptr<pattern>     pattern_ptr;
-        typedef map<string,pattern_ptr> p_dict_type;
+        
+        typedef shared_ptr<pattern>     pattern_ptr; //!< for dynamical handling
+        typedef map<string,pattern_ptr> p_dict_type; //!< base type
         
         class p_dict : public p_dict_type
         {

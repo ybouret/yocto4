@@ -101,7 +101,12 @@ namespace yocto
                     
                     switch( from->type )
                     {
+                        
                         case rule::is_control:
+                            //__________________________________________________
+                            //
+                            // a control rule => info for lexer
+                            //__________________________________________________
                             if(produce)
                             {
                                 throw exception("unexpected producing control rule '%s' in <%s>", from->label.c_str(), name.c_str());
@@ -118,6 +123,10 @@ namespace yocto
                             
                             
                         case rule::is_regular:
+                            //__________________________________________________
+                            //
+                            // a regular rule => may produce a lexeme
+                            //__________________________________________________
                             if(produce)
                             {
                                 lexeme *lex = new lexeme(from->label,line);

@@ -11,6 +11,9 @@ namespace yocto
     {
 
         //! transform an input into a source of lexemes
+        /**
+         may use mutliple dedicated scanners
+         */
         class lexer : public virtual object
         {
         public:
@@ -27,7 +30,7 @@ namespace yocto
             const lexical::scanner & operator[](const string &id) const;
             const lexical::scanner & operator[](const char   *id) const;
             
-            bool has( const string &id) const throw();    //!< check
+            bool has(const string &id) const throw();    //!< check
             
             void initialize() throw(); //!< line=1, scan=root, reset scanners and history
             
@@ -44,6 +47,7 @@ namespace yocto
             //! back into cache, using the scanner name
             void    unget( const lexical::scanner &parent, const string &content);
             
+            //! is there a next lexeme
             const lexeme *peek(source &,ios::istream&);
             
             //! information
@@ -52,7 +56,7 @@ namespace yocto
             
         private:
             typedef set<string,lexical::scanner::pointer> scanDB;
-            typedef list<lexical::scanner*> history_type;
+            typedef list<lexical::scanner*>               history_type;
             lexical::scanner *scan;
             lexemes           cache;
             history_type      history;
@@ -68,12 +72,12 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
             
         public:
-            p_dict dict;
+            p_dict                  dict;          //!< a shared dictionary
             const lexical::action   forward;       //!< emit token => lexeme
             const lexical::action   discard;       //!< drop token
             const lexical::action   newline;       //!< increase line, no lexeme
-			const lexical::callback nothing;
-			const lexical::callback endl_cb;
+			const lexical::callback noop_cb;       //!< do nothing callback
+			const lexical::callback endl_cb;       //!< increase line count on callback
 
             bool emit(const token&) throw();
             bool drop(const token&) throw();

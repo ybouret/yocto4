@@ -22,7 +22,7 @@ namespace yocto
             void    unget(token  &) throw();  //!< unread the token
             void    uncpy(const token&);      //!< unread a copy
             
-            void reset() throw(); //!< empty cache
+            void reset() throw();               //!< empty cache
             const t_char *peek(ios::istream &); //!< some more input ?
             void skip(size_t n) throw();        //!< skip cache.size>=n
             

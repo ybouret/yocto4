@@ -90,7 +90,7 @@ return term(label,syntax:: PPTY);\
 			}
 
 			// call the comment upon trigger
-			target->call(com,trigger,nothing);
+			target->call(com,trigger,noop_cb);
         }
         
         void parser:: end_of_line_comment(const char   *trigger)

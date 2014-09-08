@@ -43,7 +43,7 @@ name(id), line(1), scan(0), scanners(2,as_capacity), root(0), dict(), \
 forward(this, &lexer::emit ),\
 discard(this, &lexer::drop ),\
 newline(this, &lexer::on_newline_drop ),\
-nothing(this, &lexer::do_nothing),\
+noop_cb(this, &lexer::do_nothing),\
 endl_cb(this, &lexer::on_newline)
         
         lexer:: lexer(const string &id) :
