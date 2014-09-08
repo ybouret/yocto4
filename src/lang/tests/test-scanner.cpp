@@ -16,11 +16,11 @@ public:
         d.add("INT", "[:digit:]+");
         
         make("ID",     "[:alpha:][:word:]*", this, & MyScanner::OnId );
-        make("INT",    "{INT}",              this, &lexical::scanner::emit);
-        make("DBL",    "{INT}[.]{INT}?",     this, &lexical::scanner::emit);
-        make("FLT",    "{INT}[.]{INT}?f",    this, &lexical::scanner::emit);
-        make("BLANKS", "[:blank:]+",         this, &lexical::scanner::drop);
-        make("ENDL",   "[:endl:]",           this, &lexical::scanner::newline);
+        make("INT",    "{INT}",              this, &scanner::forward);
+        make("DBL",    "{INT}[.]{INT}?",     this, &scanner::forward);
+        make("FLT",    "{INT}[.]{INT}?f",    this, &scanner::forward);
+        make("BLANKS", "[:blank:]+",         this, &scanner::discard);
+        make("ENDL",   "[:endl:]",           this, &scanner::discard_newline);
     }
     
     virtual ~MyScanner() throw()
