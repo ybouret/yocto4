@@ -25,7 +25,7 @@ namespace yocto
         // Effectors
         //
         //======================================================================
-        effectors:: effectors() throw() : effector::database()
+        effectors:: effectors() throw() : effector::database(), tmp()
         {
             
         }
