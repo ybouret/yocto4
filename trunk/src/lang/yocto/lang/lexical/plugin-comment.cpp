@@ -20,8 +20,8 @@ namespace yocto
             plugin(id,parent),
             regexp(expr)
             {
-                make("CHAR", posix::dot(), this, & scanner::drop );
-                back(posix::endl(),this, & scanner::on_newline);
+                make("CHAR", posix::dot(), this, & scanner::discard);
+                back(posix::endl(),        this, & scanner::newline);
             }
             
             pattern * comment:: trigger() const
