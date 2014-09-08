@@ -52,7 +52,7 @@ namespace yocto
 			syntax::aggregate & agg(const string &label, const syntax::property ppty = default_ppty);
             
             //! wrapper
-            syntax::aggregate & agg(const char *label, const syntax::property ppty = default_ppty);
+            syntax::aggregate & agg(const char   *label, const syntax::property ppty = default_ppty);
             
             //! alternate rule
             syntax::alternate & alt();
