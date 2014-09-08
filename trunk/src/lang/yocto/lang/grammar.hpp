@@ -18,6 +18,7 @@ namespace yocto
         class grammar : public virtual object
         {
         public:
+            static const syntax::property default_ppty = syntax::is_standard;
             virtual ~grammar() throw();
             
             explicit grammar(const string &id);
@@ -26,10 +27,10 @@ namespace yocto
             const string name;
             
             //! declare a new terminal, whose label MUST match a lexical rule
-            syntax::terminal & term(const string &label, const syntax::property ppty = syntax::is_regular);
+            syntax::terminal & term(const string &label, const syntax::property ppty = default_ppty);
             
             //! declare a new terminal, wrapper
-            syntax::terminal & term(const char   *label, const syntax::property ppty = syntax::is_regular);
+            syntax::terminal & term(const char   *label, const syntax::property ppty = default_ppty);
             
             //! declare an optional rule
             syntax::optional & opt( syntax::rule &r );
@@ -48,10 +49,10 @@ namespace yocto
             
             
 			//! aggregate of rule
-			syntax::aggregate & agg(const string &label, const syntax::property ppty = syntax::is_regular);
+			syntax::aggregate & agg(const string &label, const syntax::property ppty = default_ppty);
             
             //! wrapper
-            syntax::aggregate & agg(const char *label, const syntax::property ppty = syntax::is_regular);
+            syntax::aggregate & agg(const char *label, const syntax::property ppty = default_ppty);
             
             //! alternate rule
             syntax::alternate & alt();
