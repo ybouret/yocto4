@@ -1,7 +1,7 @@
 #ifndef YOCTO_LANG_LEXER_INCLUDED
 #define YOCTO_LANG_LEXER_INCLUDED 1
 
-#include "yocto/lang/lexical/scanner.hpp"
+#include "yocto/lang/lexical/plugin.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/sequence/list.hpp"
 
@@ -57,6 +57,7 @@ namespace yocto
         private:
             typedef set<string,lexical::scanner::pointer> scanDB;
             typedef list<lexical::scanner*>               history_type;
+            typedef set<string,lexical::plugin::pointer>  plugDB;
             lexical::scanner *scan;
             lexemes           cache;
             history_type      history;
@@ -68,8 +69,10 @@ namespace yocto
         private:
             scanDB            scanners;
             lexical::scanner *root;
+            plugDB            plugins;
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(lexer);
+            friend class plugin;
             
         public:
             p_dict                  dict;          //!< a shared dictionary
