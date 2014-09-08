@@ -39,7 +39,9 @@ namespace yocto
 #endif
 
 #define Y_LEXER_CTOR() \
-name(id), line(1), scan(0), scanners(2,as_capacity), root(0), dict(), \
+name(id), line(1), scan(0), cache(), history(),\
+last_label(),last_token(),\
+scanners(2,as_capacity), root(0), dict(), \
 forward(this, &lexer::emit ),\
 discard(this, &lexer::drop ),\
 newline(this, &lexer::on_newline_drop ),\
