@@ -158,7 +158,7 @@ namespace yocto
                 if(!mylex) throw exception("<%s> has no linked lexer",name.c_str());
                 const LexerBack host(*mylex,onBack);
                 const action    which(host);
-                const string    label = vformat("back#%d",++iBack);
+                const string    label = vformat("back#%d",++ibck);
                 append(label, q.yield(), which, rule::is_control);
             }
             

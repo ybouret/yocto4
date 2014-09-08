@@ -19,6 +19,7 @@ virtual bool match(YOCTO_LANG_SYNTAX_RULE_ARGS)
 #define YOCTO_LANG_SYNTAX_RULE_MATCH_IMPL(CLASS) \
 bool CLASS:: match(YOCTO_LANG_SYNTAX_RULE_ARGS)
             
+            //! a syntax rule
             class rule : public object
             {
             public:
@@ -28,7 +29,7 @@ bool CLASS:: match(YOCTO_LANG_SYNTAX_RULE_ARGS)
                 
                 virtual ~rule() throw();
                 
-                //! set tree to node or append node to tree
+                //! generic set tree to node or append node to tree
                 static void grow( xtree &Tree, xtree &Node) throw();
                 void        check( const xtree Tree ) const;
                 
@@ -46,6 +47,7 @@ bool CLASS:: match(YOCTO_LANG_SYNTAX_RULE_ARGS)
                 YOCTO_DISABLE_COPY_AND_ASSIGN(rule);
             };
             
+            //! a simple list or rules
             typedef core::list_of_cpp<rule> r_list;
             
         }

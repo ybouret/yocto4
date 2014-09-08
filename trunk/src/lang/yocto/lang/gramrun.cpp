@@ -14,10 +14,10 @@ namespace yocto
             syntax::rule *Root = rules.head; assert(Root);
             if(!Root->match(Lexer,Source,Input,Tree))
             {
-                throw exception("((%s)) can't accept", name.c_str());
+                throw exception("((%s)) accept failure", name.c_str());
             }
             
-            auto_ptr<syntax::xnode> SafeTree(Tree);
+            auto_ptr<syntax::xnode> TreeGuard(Tree);
             const lexeme *lx = Lexer.peek(Source, Input);
             if(lx)
             {
@@ -29,7 +29,7 @@ namespace yocto
                                 Root->label.c_str());
             }
             
-            return SafeTree.yield();
+            return TreeGuard.yield();
             
         }
         

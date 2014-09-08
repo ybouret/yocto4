@@ -30,14 +30,15 @@ namespace yocto
                 
                 //! default ctor
                 explicit scanner( const char   *id, int &line_ref, const p_dict &dict_ref );
+                
+                //! default dto
                 virtual ~scanner() throw();
                 
-                const string name; //!< its name for lexer
-                int         &line; //!< a line number reference
-                
+                const string   name; //!< its name for lexer
+                int          & line; //!< a line number reference
                 const string & key() const throw(); //!< return the name
                 
-                void reset() throw(); //!< reset all motif from content
+                void reset() throw(); //!< reset all motifs
                 
                 //! append a rule while checking name, delete upon error
                 void append( rule *r );
@@ -64,14 +65,12 @@ namespace yocto
                  - if returns != NULL, a valid lexeme
                  - if returns NULL:
                  -- if is_control==false => EOF
-                 -- if is_control==true  => control rule was met
+                 -- if is_control==true  => control rule was met (info for lexer)
                  */
                 lexeme *get( source &src, ios::istream &fp, bool &is_control );
                 
                 //! link to a lexer
                 void link_to( lexer & );
-                
-                
                 
                 //--------------------------------------------------------------
                 //
@@ -418,7 +417,7 @@ namespace yocto
                 r_list        rules;
                 lexer        *mylex;
                 const p_dict *dict;
-                int           iBack;
+                int           ibck; //!< index for automatic 'back' rules numbering
                 void append_context_to( string &s ) const;
             };
             

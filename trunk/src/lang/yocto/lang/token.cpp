@@ -102,7 +102,7 @@ namespace yocto
             }
         }
         
-        token:: token( const int code ) : t_list()
+        token:: token( const code_type code ) : t_list()
         {
             push_back( t_char::acquire(code) );
         }
@@ -121,7 +121,7 @@ namespace yocto
             return *this;
         }
 
-        token & token:: operator=( const int s )
+        token & token:: operator=( const code_type s )
         {
             token tmp(s);
             swap_with(tmp);

@@ -52,8 +52,8 @@ namespace
             end_of_line_comment("//");
             
             // final
-            scanner.make("BLANK", "[:blank:]",discard);
-            scanner.make("ENDL",  "[:endl:]", newline);
+            scanner.make("BLANK", "[:blank:]", discard);
+            scanner.make("ENDL",  "[:endl:]",  newline);
         }
         
         virtual ~MyParser() throw()

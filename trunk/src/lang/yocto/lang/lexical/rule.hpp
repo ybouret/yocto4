@@ -13,7 +13,6 @@ namespace yocto
         {
             
             
-            
             //! a lexical action
             /**
              Do something with a matching token

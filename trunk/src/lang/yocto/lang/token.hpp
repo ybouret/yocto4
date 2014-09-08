@@ -14,15 +14,15 @@ namespace yocto
         class t_char
         {
         public:
-            t_char  *next;
+            t_char   *next;
             t_char   *prev;
             code_type code;
-            
             
             static t_char *acquire(code_type value=0);
             static void    release(t_char *ch) throw();
             
         private:
+            t_char(); ~t_char() throw();
             YOCTO_DISABLE_COPY_AND_ASSIGN(t_char);
         };
         
@@ -39,13 +39,13 @@ namespace yocto
             token & operator=( const token & ); //!< assign content
             void clear() throw();               //!< clear all
             
-            token( const string & ); //!< copy string
-            token( const char   * ); //!< copy string
-            token( const int      ); //!< copy code
+            token( const string &  ); //!< copy string
+            token( const char   *  ); //!< copy string
+            token( const code_type ); //!< copy code
             
-            token & operator=( const string & ); //!< assign string
-            token & operator=( const char   * ); //!< assign string
-            token & operator=( const int      ); //!< assign code
+            token & operator=( const string &  ); //!< assign string
+            token & operator=( const char   *  ); //!< assign string
+            token & operator=( const code_type ); //!< assign code
             
             string to_string(size_t nskip=0,size_t ntrim=0) const;
             void   skip(size_t n) throw();
