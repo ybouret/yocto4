@@ -28,7 +28,7 @@ namespace yocto
                 return single::create('"');
             }
 
-            void cstring:: enter( const token & )
+            void cstring:: on_call( const token & )
             {
                 std::cerr << "entering " << name << std::endl;
                 content.clear();

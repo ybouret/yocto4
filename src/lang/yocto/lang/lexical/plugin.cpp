@@ -16,7 +16,6 @@ namespace yocto
             scanner(id, parent.line, parent.dict )
             {
                 link_to(parent);
-                
             }
             
         }

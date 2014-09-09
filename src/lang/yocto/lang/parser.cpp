@@ -140,7 +140,7 @@ namespace yocto
                 throw exception("{%s}.insert(multiple plugin <%s>)", lexer::name.c_str(), plugin->name.c_str() );
             }
             
-            target->call(plugin->name, plugin->trigger(),plugin, &lexical::plugin::enter);
+            target->call(plugin->name, plugin->trigger(),plugin, &lexical::plugin::on_call);
             
             //__________________________________________________________________
             //

@@ -21,7 +21,7 @@ namespace yocto
                 virtual ~comment() throw();
                 
                 virtual pattern *trigger() const;
-                virtual void     enter(const token &);
+                virtual void     on_call(const token &);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(comment);
