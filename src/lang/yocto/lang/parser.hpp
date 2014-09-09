@@ -49,13 +49,14 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             
             syntax::xnode *run( ios::istream &input );
             
-            //! create a new EOL comment for current target scanner
-            void end_of_line_comment(const string &trigger);
-            void end_of_line_comment(const char   *trigger);
+            //! plugin: current target call the plugin upon its trigger
+            /**
+             assume that the plugin ungets a TERMINAL lexeme (e.g.: string)
+             */
+            syntax::rule &plug_term( lexical::plugin *plugin );
             
-            //! plugins: current target call the plugin upon its trigger
-            syntax::rule &plug( lexical::plugin *plugin );
-            
+            //! meta data plugin, no grammatical sense (e.g. comment)
+            void          plug_meta( lexical::plugin *plugin );
             
             
         protected:

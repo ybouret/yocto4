@@ -81,6 +81,7 @@ return term(label,syntax:: PPTY);\
     
 }
 
+#if 0
 namespace yocto
 {
     namespace lang
@@ -112,7 +113,7 @@ namespace yocto
         
     }
 }
-
+#endif
 
 #include "yocto/exception.hpp"
 
@@ -121,9 +122,8 @@ namespace yocto
     namespace lang
     {
         
-        syntax:: rule & parser:: plug( lexical::plugin *plugin )
+        void parser:: plug_meta( lexical::plugin *plugin )
         {
-        
             assert(plugin);
             //__________________________________________________________________
             //
@@ -142,6 +142,12 @@ namespace yocto
             
             target->call(plugin->name, plugin->trigger(),plugin, &lexical::plugin::on_call);
             
+        }
+        
+        syntax:: rule & parser:: plug_term( lexical::plugin *plugin )
+        {
+            
+            plug_meta(plugin);
             //__________________________________________________________________
             //
             // syntactic rule

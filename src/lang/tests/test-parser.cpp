@@ -29,7 +29,7 @@ namespace
             Terminal &COMMA  = jettison("COMMA", ',');
             
             Alternate &ITEM = alt();
-            ITEM << INT << ID << plug( new lexical::cstring("CSTRING",*this) );
+            ITEM << INT << ID << plug_term( new lexical::cstring("CSTRING",*this) );
             
             Aggregate &EXTRA_ITEM = merge();
             EXTRA_ITEM << COMMA << ITEM ;
@@ -52,8 +52,7 @@ namespace
             set_root( zero_or_more(Vector,"Data") );
             
             // somme comment
-            //end_of_line_comment("//");
-            (void) plug( new lexical::comment("COMMENT", *this, "//") );
+            plug_meta( new lexical::comment("COMMENT", *this, "//") );
                  
             // final
             scanner.make("BLANK", "[:blank:]", discard);
