@@ -1,4 +1,4 @@
-#include "yocto/lang/lexical/plugin-cstring.hpp"
+#include "yocto/lang/lexical/plugin/cstring.hpp"
 #include "yocto/lang/pattern/basic.hpp"
 #include "yocto/lang/pattern/posix.hpp"
 #include "yocto/lang/lexer.hpp"

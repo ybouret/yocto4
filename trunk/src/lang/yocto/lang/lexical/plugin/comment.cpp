@@ -1,5 +1,5 @@
 #include "yocto/lang/lexer.hpp"
-#include "yocto/lang/lexical/plugin-comment.hpp"
+#include "yocto/lang/lexical/plugin/comment.hpp"
 
 #include "yocto/lang/pattern/posix.hpp"
 
