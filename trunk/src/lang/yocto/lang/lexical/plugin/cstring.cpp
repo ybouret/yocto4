@@ -1,6 +1,7 @@
 #include "yocto/lang/lexical/plugin/cstring.hpp"
 #include "yocto/lang/pattern/basic.hpp"
 #include "yocto/lang/pattern/posix.hpp"
+#include "yocto/lang/pattern/logic.hpp"
 #include "yocto/lang/lexer.hpp"
 
 namespace yocto
@@ -18,20 +19,60 @@ namespace yocto
             plugin(id,parent),
             content()
             {
+                static const char esc_id[] = "cstring escape sequence";
+                static const char esc_rx[] = "\\\\";
+                
                 pattern *chars = compile("[\\x20-\\x21\\x23-\\x5b\\x5d-\\x7e]");
-                //pattern *chars = posix::word();
                 make("CHAR",chars,this, & cstring::gather );
+                
+                
+                call(esc_id,compile(esc_rx), this, & cstring::esc );
                 
                 pattern *quote = compile("\\x22");
                 back(quote, this, & cstring::leave );
-                
-                chars->graphviz("chars.dot");
-                system("dot -Tpng -o chars.png chars.dot");
-                quote->graphviz("quote.dot");
-                system("dot -Tpng -o quote.png quote.dot");
 
+                //______________________________________________________________
+                //
+                // on the fly creation: escape sequence
+                //______________________________________________________________
+                scanner &esc = parent[esc_id];
+                esc.back( "[\\x22\\x27\\x3f\\x5c]", this, & cstring::escape1 );
+                esc.back( "[0abfnrtv]",             this, & cstring::escape2 );
+                
+                
+                
             }
             
+            
+            void cstring:: esc(const token &) throw()
+            {
+                // start any escape sequence => do nothing
+            }
+            
+            void cstring:: escape1( const token &t )
+            {
+                assert(t.size==1);
+                content.append(t.head->code);
+            }
+            
+            void cstring:: escape2( const token &t )
+            {
+                assert(t.size==1);
+                switch(t.head->code)
+                {
+                    case '0': content.append(char(0)); break;
+                    case 'a': content.append('\a');break;
+                    case 'b': content.append('\b');break;
+                    case 'f': content.append('\f');break;
+                    case 'n': content.append('\n');break;
+                    case 'r': content.append('\r');break;
+                    case 't': content.append('\t');break;
+                    case 'v': content.append('\v');break;
+                    default:
+                        ;
+                }
+            }
+
             
             pattern * cstring:: trigger() const
             {

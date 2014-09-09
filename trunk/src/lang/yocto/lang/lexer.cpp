@@ -29,6 +29,24 @@ namespace yocto
             return (*this)[ID];
         }
         
+        lexical::scanner & lexer:: operator[](const string &id)
+        {
+            lexical::scanner::pointer *ppScan = scanners.search(id);
+            if(ppScan)
+            {
+                return **ppScan;
+            }
+            else
+            {
+                return declare(id);
+            }
+        }
+        
+        lexical::scanner & lexer:: operator[](const char *id )
+        {
+            const string ID(id);
+            return (*this)[ID];
+        }
         
         lexer:: ~lexer() throw()
         {
@@ -89,6 +107,12 @@ endl_cb(this, &lexer::on_newline)
             return scanners.search(id) != 0;
         }
         
+        bool lexer:: has(const char   *id) const
+        {
+            const string ID(id);
+            return has(ID);
+        }
+        
         void lexer:: initialize() throw()
         {
             line = 1;
@@ -135,13 +159,26 @@ endl_cb(this, &lexer::on_newline)
                 throw exception("{%s} has no active scanner", name.c_str());
             
             lexeme *lx = 0;
+            //__________________________________________________________________
+            //
+            // scan cache or input
+            //__________________________________________________________________
+        NEXT_LEXEME:
             if(cache.size>0)
             {
+                //______________________________________________________________
+                //
+                // least effort...
+                //______________________________________________________________
                 lx = cache.pop_front();
                 goto RETURN_LEXEME;
             }
             else
             {
+                //______________________________________________________________
+                //
+                // probe input
+                //______________________________________________________________
                 bool is_control  = false;
                 while(true)
                 {
@@ -150,12 +187,19 @@ endl_cb(this, &lexer::on_newline)
                     {
                         if(!is_control)
                         {
+                            //__________________________________________________
+                            //
                             // EOF
+                            //__________________________________________________
                             return 0;
                         }
                         else
                         {
-                            continue;
+                            //__________________________________________________
+                            //
+                            // a control lexeme may produce a real lexeme !
+                            //__________________________________________________
+                            goto NEXT_LEXEME;
                         }
                     }
                     assert(!is_control);
