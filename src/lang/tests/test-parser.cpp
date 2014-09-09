@@ -80,15 +80,31 @@ YOCTO_UNIT_TEST_IMPL(parser)
     
     MyParser prs;
     prs.show_rules();
-    
     ios::icstream fp( ios::cstdin );
-    syntax::x_ptr Tree( prs.run(fp) );
     
-    if(Tree.is_valid())
+    if(argc>1 && 0 == strcmp("lex",argv[1]) )
     {
-        std::cerr << "rendering tree..." << std::endl;
-        Tree->graphviz("xnode.dot");
-        system("dot -Tpng -o xnode.png xnode.dot");
+        while(true)
+        {
+            source src;
+            lexeme *lx = prs.get( src, fp );
+            if(!lx)
+                break;
+            
+            auto_ptr<lexeme> LX(lx);
+            std::cerr << lx->label << " : '" << *lx << "'" << std::endl;
+        }
+    }
+    else
+    {
+        syntax::x_ptr Tree( prs.run(fp) );
+        
+        if(Tree.is_valid())
+        {
+            std::cerr << "rendering tree..." << std::endl;
+            Tree->graphviz("xnode.dot");
+            system("dot -Tpng -o xnode.png xnode.dot");
+        }
     }
     
 }
