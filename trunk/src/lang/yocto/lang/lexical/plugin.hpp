@@ -19,7 +19,7 @@ namespace yocto
                 virtual ~plugin() throw();
                 
                 virtual pattern *trigger() const = 0;
-                virtual void     enter(const token &) = 0;
+                virtual void     on_call(const token &) = 0;
                 
             protected:
                 explicit plugin(const string &id,lexer &parent);

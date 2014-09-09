@@ -18,7 +18,7 @@ namespace yocto
                 explicit cstring(const string &id, lexer &parent);
                 
                 virtual pattern *trigger() const;
-                virtual void     enter(const token &);
+                virtual void     on_call(const token &);
                 
                 
             private:

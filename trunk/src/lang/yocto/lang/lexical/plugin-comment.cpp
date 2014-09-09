@@ -29,7 +29,7 @@ namespace yocto
                 return compile(regexp,dict);
             }
             
-            void comment:: enter(const token &)
+            void comment:: on_call(const token &)
             {
                 // do nothing
                 std::cerr << "entering comment '" << regexp << "' @line " << line << std::endl;
