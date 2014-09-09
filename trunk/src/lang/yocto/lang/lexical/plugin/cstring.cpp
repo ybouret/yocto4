@@ -4,6 +4,8 @@
 #include "yocto/lang/pattern/logic.hpp"
 #include "yocto/lang/lexer.hpp"
 
+#include "yocto/code/utils.hpp"
+
 namespace yocto
 {
     
@@ -19,18 +21,32 @@ namespace yocto
             plugin(id,parent),
             content()
             {
-                static const char esc_id[] = "cstring escape sequence";
-                static const char esc_rx[] = "\\\\";
+                
                 
                 pattern *chars = compile("[\\x20-\\x21\\x23-\\x5b\\x5d-\\x7e]");
                 make("CHAR",chars,this, & cstring::gather );
+               
+                static const char hex_esc_id[] = "string hexadecimal escape sequence";
+                static const char hex_esc_rx[] = "\\\\x";
+                call(hex_esc_id,compile(hex_esc_rx,NULL), this, & cstring::esc);
+                
+                static const char esc_id[] = "string escape sequence";
+                static const char esc_rx[] = "\\\\";
+                call(esc_id,compile(esc_rx,NULL), this, & cstring::esc );
                 
                 
-                call(esc_id,compile(esc_rx), this, & cstring::esc );
+               
                 
                 pattern *quote = compile("\\x22");
                 back(quote, this, & cstring::leave );
 
+                //______________________________________________________________
+                //
+                // on the fly creation: hexadecimal escape sequence
+                //______________________________________________________________
+                scanner &hex_esc = parent[hex_esc_id];
+                hex_esc.back("[:xdigit:][:xdigit:]", this, & cstring::escapeX);
+                
                 //______________________________________________________________
                 //
                 // on the fly creation: escape sequence
@@ -73,6 +89,15 @@ namespace yocto
                 }
             }
 
+            void cstring:: escapeX(const token &t)
+            {
+                assert(t.size==2);
+                const unsigned hi = hex2dec(t.head->code);
+                const unsigned lo = hex2dec(t.tail->code);
+                const unsigned C  = (hi<<4) | lo;
+                content.append(char(C));
+            }
+            
             
             pattern * cstring:: trigger() const
             {
