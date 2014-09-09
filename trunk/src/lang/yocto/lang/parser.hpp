@@ -24,6 +24,7 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             typedef syntax::terminal  Terminal;
             typedef syntax::aggregate Aggregate;
             typedef syntax::alternate Alternate;
+            typedef syntax::rule      Rule;
             
             explicit parser( const string &title, const string &mainScanner);
             virtual ~parser() throw();
@@ -43,9 +44,30 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             //! wrapper
             syntax::aggregate &assemble(const char   *label);
             
+            //! wrapper with 2 rules
+            syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2 );
+            
+            //! wrapper with 3 rules
+            syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2, Rule &r3 );
+
+            
+            
             //! an all merging aggregate => syntax::is_merging_all
             syntax::aggregate &merge();
             
+            //! wrapper with 2 rules
+            syntax::aggregate &merge(Rule &r1, Rule &r2);
+
+            //! wrapper with 3 rules
+            syntax::aggregate &merge(Rule &r1, Rule &r2, Rule &r3);
+            
+            
+            //! wrapper with 2 rules
+            syntax::alternate &choose(Rule &r1,Rule &r2);
+            
+            //! wrapper with 3 rules
+            syntax::alternate &choose(Rule &r1,Rule &r2, Rule &r3);
+
             
             syntax::xnode *run( ios::istream &input );
             
