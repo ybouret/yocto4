@@ -71,11 +71,58 @@ return term(label,syntax:: PPTY);\
             return assemble(Label);
         }
         
+        
+        syntax::aggregate & parser:: assemble(const char *label, Rule &r1, Rule &r2 )
+        {
+            Aggregate &ans = assemble(label);
+            ans << r1 << r2;
+            return ans;
+        }
+        
+        syntax::aggregate & parser:: assemble(const char *label, Rule &r1, Rule &r2, Rule &r3 )
+        {
+            Aggregate &ans = assemble(label);
+            ans << r1 << r2 << r3;
+            return ans;
+        }
+        
         syntax::aggregate & parser:: merge()
         {
             const string label = vformat("@blend/%d",++counter);
             return agg(label,syntax::is_merging_all);
         }
+        
+        syntax::aggregate &parser:: merge(Rule &r1, Rule &r2)
+        {
+            Aggregate &ans = merge();
+            ans << r1 << r2;
+            return ans;
+        }
+        
+        syntax::aggregate &parser:: merge(Rule &r1, Rule &r2, Rule &r3)
+        {
+            Aggregate &ans = merge();
+            ans << r1 << r2 << r3;
+            return ans;
+        }
+        
+        
+        syntax::alternate & parser:: choose(Rule &r1,Rule &r2)
+        {
+            Alternate &ans = alt();
+            ans << r1 << r2;
+            return ans;
+        }
+        
+        syntax::alternate & parser:: choose(Rule &r1,Rule &r2,Rule &r3)
+        {
+            Alternate &ans = alt();
+            ans << r1 << r2 << r3;
+            return ans;
+        }
+        
+        
+
         
     }
     

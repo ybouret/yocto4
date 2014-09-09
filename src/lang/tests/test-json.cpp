@@ -24,10 +24,14 @@ namespace
             Terminal &LBRACK = jettison("LBRACK", '[');
             Terminal &RBRACK = jettison("RBRACK", ']');
             Terminal &COMMA  = jettison("COMMA",  ',');
+            Terminal &COLUMN = jettison("COLUMN", ':');
+            Terminal &LBRACE = jettison("LBRACE", '{');
+            Terminal &RBRACE = jettison("RBRACE", '}');
+            Rule     &STRING = plug_term(new lexical::cstring("string",*this));
             
             // initialize value
             Alternate &value = alt();
-            value |= plug_term( new lexical::cstring("string",*this) );
+            value |= STRING;
             value |= univocal("null",  "null");
             value |= univocal("false", "false");
             value |= univocal("true",  "true");
@@ -35,38 +39,56 @@ namespace
             //const char number_expr[] =  "[:digit:]+";
             pattern   *number_code   = compile(number_expr,NULL);
             value |= terminal("number",number_code);
-            number_code->graphviz("number.dot");
-            system("dot -Tpng -o number.png number.dot");
+            //number_code->graphviz("number.dot");
+            //system("dot -Tpng -o number.png number.dot");
             
             
             // arrays
+            Alternate &arrays = alt();
             {
-                Alternate &arrays = alt();
                 {
+                    Aggregate &empty_array = assemble("empty_array");
+                    empty_array << LBRACK << RBRACK;
+                    arrays |= empty_array;
+                }
+                
+                {
+                    Aggregate &array       = assemble("array");
+                    array << LBRACK << value;
                     {
-                        Aggregate &empty_array = assemble("empty_array");
-                        empty_array << LBRACK << RBRACK;
-                        arrays |= empty_array;
+                        Aggregate &extra_value  = merge();
+                        extra_value << COMMA << value;
+                        array << zero_or_more(extra_value);
                     }
                     
-                    {
-                        Aggregate &array       = assemble("array");
-                        array << LBRACK << value;
-                        {
-                            Aggregate &extra_value  = merge();
-                            extra_value << COMMA << value;
-                            array << zero_or_more(extra_value);
-                        }
-                        
-                        array << RBRACK;
-                        
-                        arrays |= array;
-                    }
+                    array << RBRACK;
+                    
+                    arrays |= array;
                 }
-                value |= arrays;
+            }
+            value |= arrays;
+            
+            // object
+            Alternate &objects = alt();
+            {
+                Aggregate &empty_object = assemble("empty_object",LBRACE,RBRACE);
+                objects |= empty_object;
             }
             
-            set_root( zero_or_more(value) );
+            {
+                Aggregate &heavy_object = assemble("object");
+                heavy_object << LBRACE;
+                {
+                    Aggregate &Pair      = assemble("pair",STRING,COLUMN,value);
+                    Aggregate &ExtraPair = merge(COMMA,Pair);
+                    heavy_object << Pair << zero_or_more(ExtraPair);
+                }
+                heavy_object << RBRACE;
+                objects |= heavy_object;
+            }
+            value |= objects;
+            
+            set_root( choose(objects,arrays) );
             
             // final
             scanner.make("BLANK", "[:blank:]", discard);

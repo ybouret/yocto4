@@ -106,7 +106,7 @@ namespace yocto
 
             void cstring:: on_call( const token & )
             {
-                std::cerr << "entering " << name << std::endl;
+                //std::cerr << "entering " << name << std::endl;
                 content.clear();
             }
             
@@ -122,7 +122,7 @@ namespace yocto
             
             void cstring:: leave( const token & )
             {
-                std::cerr << "cstring=" << content << std::endl;
+                //std::cerr << "cstring=" << content << std::endl;
 				mylex->unget(*this,content);
             }
             
