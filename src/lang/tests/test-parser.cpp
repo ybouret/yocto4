@@ -6,8 +6,8 @@
 
 #include <cstdlib>
 
-#include "yocto/lang/lexical/plugin-comment.hpp"
-#include "yocto/lang/lexical/plugin-cstring.hpp"
+#include "yocto/lang/lexical/plugin/comment.hpp"
+#include "yocto/lang/lexical/plugin/cstring.hpp"
 
 using namespace yocto;
 using namespace lang;
