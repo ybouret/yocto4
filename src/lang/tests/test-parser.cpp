@@ -8,6 +8,7 @@
 
 #include "yocto/lang/lexical/plugin/comment.hpp"
 #include "yocto/lang/lexical/plugin/cstring.hpp"
+#include "yocto/lang/lexical/plugin/ccomment.hpp"
 
 using namespace yocto;
 using namespace lang;
@@ -53,7 +54,8 @@ namespace
             
             // somme comment
             plug_meta( new lexical::comment("COMMENT", *this, "//") );
-                 
+            plug_meta( new lexical::C_comment("C_COM", *this)       );
+            
             // final
             scanner.make("BLANK", "[:blank:]", discard);
             scanner.make("ENDL",  "[:endl:]",  newline);
