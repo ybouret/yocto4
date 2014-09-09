@@ -152,8 +152,7 @@ namespace yocto
             //
             // syntactic rule
             //__________________________________________________________________
-            syntax::rule &r = term(plugin->name);
-            return r;
+            return term(plugin->name);
         }
         
         

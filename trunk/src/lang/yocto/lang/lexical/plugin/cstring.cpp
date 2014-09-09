@@ -18,8 +18,18 @@ namespace yocto
             plugin(id,parent),
             content()
             {
-                make("CHAR","[:word:]",this, & cstring::gather );
-                back(single::create('"'), this, & cstring::leave );
+                pattern *chars = compile("[\\x20-\\x21\\x23-\\x5b\\x5d-\\x7e]");
+                //pattern *chars = posix::word();
+                make("CHAR",chars,this, & cstring::gather );
+                
+                pattern *quote = compile("\\x22");
+                back(quote, this, & cstring::leave );
+                
+                chars->graphviz("chars.dot");
+                system("dot -Tpng -o chars.png chars.dot");
+                quote->graphviz("quote.dot");
+                system("dot -Tpng -o quote.png quote.dot");
+
             }
             
             
@@ -36,12 +46,12 @@ namespace yocto
             
             bool cstring:: gather( const token &t )
             {
-                std::cerr << "content += " << t << std::endl;
+                //std::cerr << "content += " << t << std::endl;
                 for(t_char *ch = t.head;ch;ch=ch->next)
                 {
                     content.append(ch->code);
                 }
-                return true;
+                return false;
             }
             
             void cstring:: leave( const token & )
