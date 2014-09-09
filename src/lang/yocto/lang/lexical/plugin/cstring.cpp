@@ -45,7 +45,7 @@ namespace yocto
                 // on the fly creation: hexadecimal escape sequence
                 //______________________________________________________________
                 scanner &hex_esc = parent[hex_esc_id];
-                hex_esc.back("[:xdigit:][:xdigit:]", this, & cstring::escapeX);
+                hex_esc.back("[:xdigit:][:xdigit:]", this, & cstring::escape_hex);
                 
                 //______________________________________________________________
                 //
@@ -89,7 +89,7 @@ namespace yocto
                 }
             }
 
-            void cstring:: escapeX(const token &t)
+            void cstring:: escape_hex(const token &t)
             {
                 assert(t.size==2);
                 const unsigned hi = hex2dec(t.head->code);

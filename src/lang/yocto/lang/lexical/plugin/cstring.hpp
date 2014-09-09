@@ -29,7 +29,7 @@ namespace yocto
                 void esc(const token &) throw();
                 void escape1(const token &); //!< direct escape sequence
                 void escape2(const token &); //!< coded  escape sequence
-                void escapeX(const token &); //!< hexadecimal
+                void escape_hex(const token &); //!< hexadecimal
             };
             
         }
