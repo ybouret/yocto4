@@ -9,7 +9,7 @@ namespace yocto
 {
     namespace lang
     {
-
+        
         //! transform an input into a source of lexemes
         /**
          may use mutliple dedicated scanners
@@ -27,10 +27,14 @@ namespace yocto
             lexical::scanner & declare(const string &id); //!< a new scanner
             lexical::scanner & declare(const char   *id); //!< a new scanner
             
+            
+            lexical::scanner & operator[](const string &id); //!< on the fly creation
+            lexical::scanner & operator[](const char   *id); //!< on the fly creation
             const lexical::scanner & operator[](const string &id) const;
             const lexical::scanner & operator[](const char   *id) const;
             
             bool has(const string &id) const throw();    //!< check
+            bool has(const char   *id) const;            //!< check
             
             void initialize() throw(); //!< line=1, scan=root, reset scanners and history
             
@@ -53,7 +57,7 @@ namespace yocto
             //! information
             const lexical::scanner &current() const throw();
             
-                      
+            
         private:
             typedef set<string,lexical::scanner::pointer> scanDB;
             typedef list<lexical::scanner*>               history_type;
@@ -81,7 +85,7 @@ namespace yocto
             const lexical::action   newline;       //!< increase line, no lexeme
 			const lexical::callback noop_cb;       //!< do nothing callback
 			const lexical::callback endl_cb;       //!< increase line count on callback
-
+            
             bool emit(const token&) throw();
             bool drop(const token&) throw();
             void on_newline(const token&) throw();      //!< ++line

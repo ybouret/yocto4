@@ -26,7 +26,10 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(cstring);
                 void leave(const token & );
                 bool gather(const token &);
-                
+                void esc(const token &) throw();
+                void escape1(const token &); //!< direct escape sequence
+                void escape2(const token &); //!< coded  escape sequence
+
             };
             
         }
