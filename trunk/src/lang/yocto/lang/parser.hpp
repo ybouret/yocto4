@@ -17,7 +17,7 @@ syntax::terminal & FUNCTION(const string &label,const string &regex);\
 syntax::terminal & FUNCTION(const char   *label,const char   *regex);\
 syntax::terminal & FUNCTION(const char   *label,const char    C)
         
-        //! high level
+        //! high level parser
         class parser : public grammar, public lexer
         {
         public:
@@ -50,8 +50,6 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             //! wrapper with 3 rules
             syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2, Rule &r3 );
 
-            
-            
             //! an all merging aggregate => syntax::is_merging_all
             syntax::aggregate &merge();
             
@@ -84,7 +82,7 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
         protected:
             lexical::scanner &scanner; //!< default scanner
             lexical::scanner *target;  //!< target scanner
-            source             src;
+            source            src;     //!< inside source
             
        
         private:
