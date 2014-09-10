@@ -58,7 +58,7 @@ namespace yocto
         
 #define Y_LEXER_CTOR() \
 name(id), line(1), scan(0), cache(), history(),\
-last_label(),last_token(),\
+last_label(),last_token(),last_line(0),\
 scanners(2,as_capacity), root(0),\
 dict(), \
 forward(this, &lexer::emit ),\
@@ -124,6 +124,7 @@ endl_cb(this, &lexer::on_newline)
             history.free();
             last_label.clear();
             last_token.clear();
+            last_line = 0;
         }
         
         void lexer::jump(const string &id)
@@ -217,6 +218,7 @@ endl_cb(this, &lexer::on_newline)
                 {
                     last_token.append(ch->code);
                 }
+                last_line = lx->line;
                 return lx;
             }
             catch(...)
