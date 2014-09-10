@@ -23,7 +23,7 @@ namespace yocto
                 
             protected:
                 explicit plugin(const string &id,lexer &parent);
-                
+                explicit plugin(const char   *id,lexer &parent);
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(plugin);
