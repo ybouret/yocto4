@@ -8,7 +8,7 @@ namespace yocto
 	
 	struct UTF8
 	{
-		static void        Encode( utf8_t U, string &out );           //!< append  code point to out
+		static bool        Encode( utf8_t U, string &out );                //!< append  code point to out
 		static utf8_t      Decode( const char * &curr, const char *last ); //!< decode (multi-)byte(s)
 		
 		static string      Encode( const wstring & ws );

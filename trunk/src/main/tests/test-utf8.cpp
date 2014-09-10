@@ -57,7 +57,8 @@ YOCTO_UNIT_TEST_IMPL(utf8)
 	{
 		out.clear();
 		const utf8_t U = cp[i];
-		UTF8::Encode( U, out);
+		if(UTF8::Encode( U, out))
+            throw exception("invalid UTF8 value");
 		fprintf( stderr, "0x%8x =>", unsigned(U) );
 		for( size_t j=0; j < out.size(); ++j )
 		{
