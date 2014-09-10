@@ -1,18 +1,18 @@
 #include "yocto/json/parser.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/lingua/parser.hpp"
+#include "yocto/lang/parser.hpp"
+#include "yocto/lang/lexical/plugin/cstring.hpp"
 #include "yocto/ptr/auto.hpp"
 #include "yocto/string/conv.hpp"
 
 //#define Y_JSON_OUTPUT 1
 #if defined(Y_JSON_OUTPUT)
-#include "yocto/ios/ocstream.hpp"
 #include <cstdlib>
 #endif
 
 namespace yocto
 {
-    using namespace lingua;
+    using namespace lang;
     
     namespace JSON
     {
@@ -21,132 +21,103 @@ namespace yocto
         class Parser :: Impl : public parser
         {
         public:
-            source             src;
-            lexical::scanner  &jstr;
-            string             _str;
             
             Impl() :
-            parser( "JSON::Lexer" , "JSON::Parser" ),
-            src(),
-            jstr( declare("JSON::String") ),
-            _str()
+            parser( "JSON", "instance")
             {
-                
-                
-                //--------------------------------------------------------------
+                //______________________________________________________________
                 //
-                // declare JSON Grammar
                 //
-                //--------------------------------------------------------------
+                // JSON Grammar
+                //
+                //______________________________________________________________
+             
+                //______________________________________________________________
+                //
+                // declare terminals
+                //______________________________________________________________
+                Terminal &LBRACK = jettison("LBRACK", '[');
+                Terminal &RBRACK = jettison("RBRACK", ']');
+                Terminal &COMMA  = jettison("COMMA",  ',');
+                Terminal &COLUMN = jettison("COLUMN", ':');
+                Terminal &LBRACE = jettison("LBRACE", '{');
+                Terminal &RBRACE = jettison("RBRACE", '}');
+                Rule     &STRING = plug_term(new lexical::cstring("string",*this));
                 
-                //-- main rule
-                syntax::alternative & INSTANCE = alt("INSTANCE");
-                
-                //--------------------------------------------------------------
-                // terminals
-                //--------------------------------------------------------------
-                syntax::terminal &LBRACK = jettison( "LBRACK", '[');
-                syntax::terminal &RBRACK = jettison( "RBRACK", ']');
-                syntax::terminal &LBRACE = jettison( "LBRACE", '{' );
-                syntax::terminal &RBRACE = jettison( "RBRACE", '}' );
-                syntax::terminal &COMMA  = jettison( "COMMA",  ',' );
-                syntax::terminal &NUMBER = terminal( "NUMBER", "-?[1-9][0-9]*([.][0-9]+)?([e|E][-+]?[0-9]+)?" );
-                syntax::terminal &Null   = univocal( "null",  "null");
-                syntax::terminal &True   = univocal( "true",  "true");
-                syntax::terminal &False  = univocal( "false", "false");
-                syntax::terminal &STRING = term( "JSON::String" );
-                syntax::terminal &COLUMN = jettison( "COLUMN", ':');
-                
-                
-                //--------------------------------------------------------------
-                // other main rules
-                //--------------------------------------------------------------
-                scanner.call("JSON::String",  "\"", this, &Impl::OnEnterString);
-                Y_LEX_DISCARD(scanner,"BLANKS","[ \t]+");
-                Y_LEX_NO_ENDL(scanner);
-                
-                //--------------------------------------------------------------
-                // JSON:: String
-                //--------------------------------------------------------------
-                jstr.back("\"", this, &Impl::OnLeaveString);
-                jstr.make( "ESC",   "\\x5c.", this, &Impl::OnEscape);
-                jstr.make( "1CHAR", ".",      this, &Impl::OnChar);
-                
-                
-                
-                //--------------------------------------------------------------
+                //______________________________________________________________
+                //
                 // initialize value
-                //--------------------------------------------------------------
-                syntax::alternative &VALUE = alt("VALUE");
-                VALUE |= NUMBER;
-                VALUE |= STRING;
-                VALUE |= Null;
-                VALUE |= True;
-                VALUE |= False;
+                //______________________________________________________________
+                Alternate &value = alt();
+                value |= STRING;
+                value |= univocal("null",  "null");
+                value |= univocal("false", "false");
+                value |= univocal("true",  "true");
+                const char number_expr[] = "-?(0|([1-9][:digit:]*))(\\.[:digit:]*([eE]-?[:digit:]+)?)?";
+                pattern   *number_code   = compile(number_expr,NULL);
+                value |= terminal("number",number_code);
                 
-                //--------------------------------------------------------------
-                // ARRAY
-                //--------------------------------------------------------------
-                syntax::alternative &ARRAYS = alt( "ARRAYS" );
                 
+                //______________________________________________________________
+                //
+                // arrays
+                //______________________________________________________________
+                Alternate &arrays = alt();
                 {
                     {
-                        syntax::aggregate &EMPTY_ARRAY = agg( "EMPTY_ARRAY" );
-                        EMPTY_ARRAY += LBRACK;
-                        EMPTY_ARRAY += RBRACK;
-                        ARRAYS |= EMPTY_ARRAY;
-                    }
-                    {
-                        syntax::aggregate &ARRAY       = agg( "ARRAY" );
-                        syntax::aggregate &TAIL_VALUE  = agg( "TAIL_VALUE", syntax::is_merging_all );
-                        TAIL_VALUE += COMMA;
-                        TAIL_VALUE += VALUE;
-                        
-                        ARRAY += LBRACK;
-                        ARRAY += VALUE;
-                        ARRAY += rep( "ZERO_OR_MORE_TAIL_VALUE", TAIL_VALUE, 0 );
-                        ARRAY += RBRACK;
-                        
-                        ARRAYS |= ARRAY;
-                    }
-                }
-                
-                VALUE |= ARRAYS;
-                
-                //--------------------------------------------------------------
-                // OBJECT
-                //--------------------------------------------------------------
-                syntax::alternative &OBJECTS = alt("OBJECTS");
-                {
-                    {
-                        syntax::aggregate &EMPTY_OBJECT = agg( "EMPTY_OBJECT" );
-                        EMPTY_OBJECT += LBRACE;
-                        EMPTY_OBJECT += RBRACE;
-                        OBJECTS |= EMPTY_OBJECT;
+                        Aggregate &empty_array = assemble("empty_array");
+                        empty_array << LBRACK << RBRACK;
+                        arrays |= empty_array;
                     }
                     
                     {
-                        syntax::aggregate &PAIR = agg("PAIR");
-                        PAIR += STRING;
-                        PAIR += COLUMN;
-                        PAIR += VALUE;
-                        syntax::aggregate &TAIL_PAIR = agg("TAIL_PAIR", syntax::is_merging_all);
-                        TAIL_PAIR += COMMA;
-                        TAIL_PAIR += PAIR;
-                        syntax::aggregate &OBJECT = agg("OBJECT");
-                        OBJECT += LBRACE;
-                        OBJECT += PAIR;
-                        OBJECT += rep("ZERO_OR_MORE_TAIL_PAIR", TAIL_PAIR, 0 );
-                        OBJECT += RBRACE;
+                        Aggregate &array       = assemble("array");
+                        array << LBRACK << value;
+                        {
+                            Aggregate &extra_value  = merge();
+                            extra_value << COMMA << value;
+                            array << zero_or_more(extra_value);
+                        }
                         
-                        OBJECTS |= OBJECT;
+                        array << RBRACK;
+                        
+                        arrays |= array;
                     }
-                    
                 }
-                VALUE |= OBJECTS;
+                value |= arrays;
                 
-                INSTANCE |= ARRAYS;
-                INSTANCE |= OBJECTS;
+                //______________________________________________________________
+                //
+                // object
+                //______________________________________________________________
+                
+                Alternate &objects = alt();
+                {
+                    Aggregate &empty_object = assemble("empty_object",LBRACE,RBRACE);
+                    objects |= empty_object;
+                }
+                
+                {
+                    Aggregate &heavy_object = assemble("object");
+                    heavy_object << LBRACE;
+                    {
+                        Aggregate &Pair      = assemble("pair",STRING,COLUMN,value);
+                        Aggregate &ExtraPair = merge(COMMA,Pair);
+                        heavy_object << Pair << zero_or_more(ExtraPair);
+                    }
+                    heavy_object << RBRACE;
+                    objects |= heavy_object;
+                }
+                value |= objects;
+                
+                set_root( choose(objects,arrays) );
+                
+                //______________________________________________________________
+                //
+                // final
+                //______________________________________________________________
+                scanner.make("BLANK", "[:blank:]", discard);
+                scanner.make("ENDL",  "[:endl:]",  newline);
                 
             }
             
@@ -155,70 +126,28 @@ namespace yocto
                 
             }
             
-            inline void OnEnterString( const token & ){ _str.clear();        }
-            inline void OnLeaveString( const token & ){ emit( jstr, _str);   }
-            
-            inline bool OnChar( const token &t )
-            {
-                for( t_char *ch = t.head; ch; ch=ch->next )
-                    _str.append( ch->data );
-                
-                return false; // not a lexeme !
-            }
-            
-            inline bool OnEscape( const token &t )
-            {
-                assert(t.size==2);
-                char C = t.tail->data;
-                switch( C )
-                {
-                    case '\\':
-                    case '/':
-                    case '"':
-                        break;
-                        
-                    case 'b': C = '\b'; break;
-                    case 'f': C = '\f'; break;
-                    case 'n': C = '\n'; break;
-                    case 'r': C = '\r'; break;
-                    case 't': C = '\t'; break;
-                        
-                    default:
-                        throw exception("%s: line %u: invalid escaped char '%c'", jstr.name.c_str(), unsigned(line), C );
-                }
-                _str.append( C );
-                return false; // not a lexeme
-            }
             
             //==================================================================
             // main call
             //==================================================================
-            void call( Value &value, lingua::input &in )
+            void call( Value &value, ios::istream &in )
             {
                 value.nullify(); //! make a null value
-                reset();         //! lexer reset
-                src.attach(in);  //! source reset
+                initialize();
                 
-                try
-                {
-                    auto_ptr<syntax::xnode> tree( run(src) );
-                    
+                
+                auto_ptr<syntax::xnode> tree( run(in) );
+                
 #if defined (Y_JSON_OUTPUT)
-                    std::cerr << "Saving tree..." << std::endl;
-                    {
-                        tree->graphviz("json.dot");
-                    }
-                    system( "dot -Tpng json.dot -o json.png" );
-#endif
-                    
-                    src.detach();
-                    walk( value, tree.__get() );
-                }
-                catch(...)
+                std::cerr << "Saving tree..." << std::endl;
                 {
-                    src.detach();
-                    throw;
+                    tree->graphviz("json.dot");
                 }
+                system( "dot -Tpng json.dot -o json.png" );
+#endif
+                
+                walk( value, tree.__get() );
+                
             }
             
             
@@ -233,50 +162,50 @@ namespace yocto
                 
                 const string &label = node->label;
                 
-                if( label == "EMPTY_OBJECT" )
+                if( label == "empty_object" )
                 {
                     value.make( IsObject );
                     return;
                 }
                 
-                if( label == "EMPTY_ARRAY" )
+                if( label == "empty_array" )
                 {
                     value.make( IsArray );
                     return;
                 }
                 
-                if( label == "ARRAY")
+                if( label == "array")
                 {
                     value.make( IsArray );
                     walk_array( value.as<Array>(), node->children() );
                     return;
                 }
                 
-                if( label == "OBJECT" )
+                if( label == "object" )
                 {
                     value.make( IsObject );
                     walk_object( value.as<Object>(), node->children() );
                     return;
                 }
                 
-                if( label == "JSON::String" )
+                if( label == "string" )
                 {
                     value.make( IsString );
                     string &str = value.as<String>();
-                    const lexeme *lx = node->lex();
+                    const lexeme *lx = node->lxm();
                     for( t_char *t = lx->head; t; t=t->next )
                     {
-                        const char C = t->data;
+                        const char C = t->code;
                         str.append(C);
                     }
                     
                     return;
                 }
                 
-                if( label == "NUMBER" )
+                if( label == "number" )
                 {
                     value.make( IsNumber );
-                    const string str = node->lex()->to_string();
+                    const string str = node->lxm()->to_string();
                     value.as<Number>() = strconv::to_real<double>( str, "JSON::Number");
                     return;
                 }
@@ -314,15 +243,15 @@ namespace yocto
             {
                 for( const syntax::xnode *node = children.head; node; node=node->next )
                 {
-                    assert( node->label == "PAIR" );
+                    assert( node->label == "pair" );
                     assert( ! node->terminal );
                     const syntax::xnode::child_list &pair = node->children();
                     assert( pair.size == 2);
-                    assert(pair.head->label == "JSON::String" );
+                    assert(pair.head->label == "string" );
                     assert(pair.head->terminal);
-                    const String key = pair.head->lex()->to_string();
+                    const String key = pair.head->lxm()->to_string();
                     if( obj.has( key ) )
-                        throw exception("JSON: multiple object key '%s', line %u", key.c_str(), unsigned(pair.head->lex()->line) );
+                        throw exception("JSON: multiple object key '%s', line %u", key.c_str(), unsigned(pair.head->lxm()->line) );
                     {
                         const Pair   P( key );
                         obj.push(P);
@@ -349,7 +278,7 @@ namespace yocto
         {
         }
         
-        Value & Parser:: operator()( lingua::input &in )
+        Value & Parser:: operator()( ios::istream &in )
         {
             impl->call(value,in);
             return value;
