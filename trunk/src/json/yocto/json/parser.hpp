@@ -2,7 +2,7 @@
 #define YOCTO_JSON_PARSER_INCLUDED 1
 
 #include "yocto/json/json.hpp"
-#include "yocto/lingua/source.hpp"
+#include "yocto/ios/istream.hpp"
 
 namespace yocto 
 {
@@ -16,7 +16,7 @@ namespace yocto
             explicit Parser();
             virtual ~Parser() throw();
             
-            Value & operator()( lingua::input & );
+            Value & operator()( ios::istream &fp );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Parser);

@@ -15,8 +15,10 @@ namespace yocto
             
             if(!Root->match(Lexer,Source,Input,Tree))
             {
-                std::cerr << "Grammar Failure..." << std::endl;
-                std::cerr << "\t#lexemes=" << Lexer.cache_size() << std::endl;
+                //______________________________________________________________
+                //
+                // syntax error...
+                //______________________________________________________________
                 const lexeme *last = Lexer.cache_tail();
                 switch( Lexer.cache_size() )
                 {
@@ -51,6 +53,11 @@ namespace yocto
                 
             }
             
+            //__________________________________________________________________
+            //
+            // other syntax error: TODO set a stop flag....
+            //__________________________________________________________________
+
             auto_ptr<syntax::xnode> TreeGuard(Tree);
             const lexeme *lx = Lexer.peek(Source, Input);
             if(lx)
