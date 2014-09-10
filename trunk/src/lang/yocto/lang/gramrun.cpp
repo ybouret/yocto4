@@ -55,12 +55,11 @@ namespace yocto
             const lexeme *lx = Lexer.peek(Source, Input);
             if(lx)
             {
-                throw exception("%d: ((%s)): unexpected %s '%s' after root %s",
-                                Lexer.line,
+                throw exception("%d: ((%s)): unexpected extra %s '%s'",
+                                lx->line,
                                 name.c_str(),
                                 Lexer.last_label.c_str(),
-                                Lexer.last_token.c_str(),
-                                Root->label.c_str());
+                                Lexer.last_token.c_str());
             }
             
             return TreeGuard.yield();
