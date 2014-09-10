@@ -57,6 +57,9 @@ namespace yocto
             //! information
             const lexical::scanner &current() const throw();
             
+            size_t        cache_size() const throw() { return cache.size; }
+            const lexeme *cache_tail() const throw() { return cache.tail; }
+            
             
         private:
             typedef set<string,lexical::scanner::pointer> scanDB;
