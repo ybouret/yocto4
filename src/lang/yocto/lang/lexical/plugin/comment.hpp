@@ -18,6 +18,11 @@ namespace yocto
                 explicit comment(const string &id,
                                  lexer        &parent,
                                  const string &expr);
+                
+                explicit comment(const char  * id,
+                                 lexer       & parent,
+                                 const char  * expr);
+                
                 virtual ~comment() throw();
                 
                 virtual pattern *trigger() const;
@@ -26,6 +31,7 @@ namespace yocto
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(comment);
                 const string regexp;
+                void setup();
             };
             
         }

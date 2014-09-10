@@ -19,9 +19,14 @@ namespace yocto
                                   lexer        &parent) :
             plugin(id,parent)
             {
-                back( logical::EQUAL("*/"), this, & C_comment::on_call); // on call does nothing...
-                make("CHAR", posix::dot(),  this, & scanner::discard);
-                make("ENDL", posix::endl(), this, & scanner::discard_newline);
+                setup();
+            }
+            
+            C_comment:: C_comment(const char   * id,
+                                  lexer        & parent) :
+            plugin(id,parent)
+            {
+                setup();
             }
             
             pattern * C_comment:: trigger() const
@@ -32,6 +37,13 @@ namespace yocto
             void C_comment:: on_call(const token &)
             {
                 // do nothing
+            }
+            
+            void C_comment:: setup()
+            {
+                back( logical::EQUAL("*/"), this, & C_comment::on_call); // on call does nothing...
+                make("CHAR", posix::dot(),  this, & scanner::discard);
+                make("ENDL", posix::endl(), this, & scanner::discard_newline);
             }
         }
     }

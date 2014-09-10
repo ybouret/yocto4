@@ -20,8 +20,16 @@ namespace yocto
             plugin(id,parent),
             regexp(expr)
             {
-                make("CHAR", posix::dot(), this, & scanner::discard);
-                back(posix::endl(),        this, & scanner::newline);
+                setup();
+            }
+            
+            comment:: comment(const char  * id,
+                              lexer       & parent,
+                              const char  * expr) :
+            plugin(id,parent),
+            regexp(expr)
+            {
+                setup();
             }
             
             pattern * comment:: trigger() const
@@ -34,6 +42,13 @@ namespace yocto
                 // do nothing
                 std::cerr << "entering comment '" << regexp << "' @line " << line << std::endl;
             }
+            
+            void comment:: setup()
+            {
+                make("CHAR", posix::dot(), this, & scanner::discard);
+                back(posix::endl(),        this, & scanner::newline);
+            }
+            
         }
     }
 }

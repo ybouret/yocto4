@@ -17,6 +17,10 @@ namespace yocto
             public:
                 explicit C_comment(const string &id,
                                    lexer        &parent);
+                
+                explicit C_comment(const char   * id,
+                                   lexer        & parent);
+                
                 virtual ~C_comment() throw();
                 
                 virtual pattern *trigger() const;
@@ -24,6 +28,7 @@ namespace yocto
                 
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(C_comment);
+                void setup();
             };
             
         }

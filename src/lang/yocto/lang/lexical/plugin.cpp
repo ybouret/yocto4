@@ -4,7 +4,7 @@ namespace yocto
 {
     namespace lang
     {
-    
+        
         namespace lexical
         {
             
@@ -13,6 +13,12 @@ namespace yocto
             }
             
             plugin:: plugin( const string &id, lexer &parent ) :
+            scanner(id, parent.line, parent.dict )
+            {
+                link_to(parent);
+            }
+            
+            plugin:: plugin( const char *id, lexer &parent ) :
             scanner(id, parent.line, parent.dict )
             {
                 link_to(parent);

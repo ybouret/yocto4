@@ -35,39 +35,24 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             //! syntax only terminal(s)
             YOCTO_LANG_PARSER_TERM_PROTO(jettison);
             
-            //! regular terminals withing meaningless content
+            //! regular terminals with meaningless content
             YOCTO_LANG_PARSER_TERM_PROTO(univocal);
             
-            //! a named aggregate => syntax::is_regular
-            syntax::aggregate &assemble(const string &label);
+            syntax::aggregate &assemble(const string &label);                              //!< a named aggregate => syntax::is_regular
+            syntax::aggregate &assemble(const char   *label);                              //!< wrapper
+            syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2 );           //!< wrapper with 2 rules
+            syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2, Rule &r3 ); //!< wrapper with 3 rules
             
-            //! wrapper
-            syntax::aggregate &assemble(const char   *label);
+            syntax::aggregate &merge();                             //!< an all merging aggregate => syntax::is_merging_all
+            syntax::aggregate &merge(Rule &r1, Rule &r2);           //!< wrapper with 2 rules
+            syntax::aggregate &merge(Rule &r1, Rule &r2, Rule &r3); //!< wrapper with 3 rules
             
-            //! wrapper with 2 rules
-            syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2 );
-            
-            //! wrapper with 3 rules
-            syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2, Rule &r3 );
+            syntax::alternate &choose(Rule &r1,Rule &r2);           //!< wrapper with 2 rules
+            syntax::alternate &choose(Rule &r1,Rule &r2, Rule &r3); //!< wrapper with 3 rules
 
-            //! an all merging aggregate => syntax::is_merging_all
-            syntax::aggregate &merge();
             
-            //! wrapper with 2 rules
-            syntax::aggregate &merge(Rule &r1, Rule &r2);
+            syntax::xnode *run( ios::istream &input ); //!< main code
 
-            //! wrapper with 3 rules
-            syntax::aggregate &merge(Rule &r1, Rule &r2, Rule &r3);
-            
-            
-            //! wrapper with 2 rules
-            syntax::alternate &choose(Rule &r1,Rule &r2);
-            
-            //! wrapper with 3 rules
-            syntax::alternate &choose(Rule &r1,Rule &r2, Rule &r3);
-
-            //! main code
-            syntax::xnode *run( ios::istream &input );
             
             //! plugin: current target call the plugin upon its trigger
             /**
@@ -84,11 +69,11 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             lexical::scanner *target;  //!< target scanner
             source            src;     //!< inside source
             
-       
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);
             
-        
+            
         };
     }
 }
