@@ -27,11 +27,13 @@ namespace yocto
                 void leave(const token & );
                 bool gather(const token &);
                 void esc(const token &) throw();
-                void escape1(const token &); //!< direct escape sequence
-                void escape2(const token &); //!< coded  escape sequence
+                void escape1(const token &);    //!< direct escape sequence
+                void escape2(const token &);    //!< coded  escape sequence
                 void escape_hex(const token &); //!< hexadecimal
-                
+                void escape_u(const token &);   //!< unicode 16 bits
+                void escape_U(const token &);   //!< unicode 32 bits
                 void setup(lexer &parent);
+                unsigned count;                 //!< for counting escaped length
             };
             
         }

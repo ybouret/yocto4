@@ -12,7 +12,7 @@ namespace yocto
 	const char UTF8::Valid12to16RX[]  = "[\\xE0-\\xEF]" Y_UTF8_SUB Y_UTF8_SUB ;
 	const char UTF8::Valid17to21RX[]  = "[\\xF0-\\xF7]" Y_UTF8_SUB Y_UTF8_SUB Y_UTF8_SUB;
 	
-	void UTF8::Encode( utf8_t U, string &out )
+	bool UTF8::Encode( utf8_t U, string &out )
 	{
 		
 		if( U < (1<<7) )
@@ -58,11 +58,13 @@ namespace yocto
 					}
 					else
 					{
-						throw libc::exception( ERANGE, "UTF8 code point 0x%08x too big", (unsigned) U );
+						//throw libc::exception( ERANGE, "UTF8 code point 0x%08x too big", (unsigned) U );
+                        return false;
 					}
 				}
 			}
 		}
+        return true;
 	}
 	
 	static inline
@@ -137,7 +139,7 @@ namespace yocto
 	{
 		string ans;
 		const utf8_t *W = ws.c_str();
-		YOCTO_LOOP(ws.size(), UTF8::Encode( *(W++), ans ) );
+		YOCTO_LOOP(ws.size(), if(!UTF8::Encode( *(W++), ans )) throw exception("invalid UTF8 string") );
 		return ans;
 	}
 	

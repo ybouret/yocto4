@@ -5,6 +5,8 @@
 #include "yocto/lang/lexer.hpp"
 
 #include "yocto/code/utils.hpp"
+#include "yocto/string/utf8.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -19,7 +21,8 @@ namespace yocto
             
             cstring:: cstring( const string &id, lexer &parent ) :
             plugin(id,parent),
-            content()
+            content(),
+            count(0)
             {
                 setup(parent);
             }
@@ -27,14 +30,16 @@ namespace yocto
             
             cstring:: cstring(const char   *id, lexer &parent) :
             plugin(id,parent),
-            content()
+            content(),
+            count(0)
             {
                 setup(parent);
             }
             
             void cstring:: esc(const token &) throw()
             {
-                // start any escape sequence => do nothing
+                // start any escape sequence
+                count = 0;
             }
             
             void cstring:: escape1( const token &t )
@@ -112,9 +117,19 @@ namespace yocto
                 static const char esc_rx[] = "\\\\";
                 call(esc_id,compile(esc_rx,NULL), this, & cstring::esc );
                 
+                static const char u2_id[] = "unicode+nnnn sequence";
+                static const char u2_rx[] = "\\\\u";
+                call(u2_id,compile(u2_rx,NULL), this, &cstring::esc);
                 
                 
+                static const char u4_id[] = "unicode+nnnnnnnn sequence";
+                static const char u4_rx[] = "\\\\U";
+                call(u4_id,compile(u4_rx,NULL), this, &cstring::esc);
                 
+                //______________________________________________________________
+                //
+                // default: back on quote
+                //______________________________________________________________
                 pattern *quote = compile("\\x22");
                 back(quote, this, & cstring::leave );
                 
@@ -122,17 +137,65 @@ namespace yocto
                 //
                 // on the fly creation: hexadecimal escape sequence
                 //______________________________________________________________
-                scanner &hex_esc = parent[hex_esc_id];
-                hex_esc.back("[:xdigit:][:xdigit:]", this, & cstring::escape_hex);
+                {
+                    scanner &hex_esc = parent[hex_esc_id];
+                    hex_esc.back("[:xdigit:][:xdigit:]", this, & cstring::escape_hex);
+                }
                 
                 //______________________________________________________________
                 //
                 // on the fly creation: escape sequence
                 //______________________________________________________________
-                scanner &esc = parent[esc_id];
-                esc.back( "[\\x22\\x27\\x3f\\x5c]", this, & cstring::escape1 );
-                esc.back( "[0abfnrtv]",             this, & cstring::escape2 );
+                {
+                    scanner &esc = parent[esc_id];
+                    esc.back( "[\\x22\\x27\\x3f\\x5c]", this, & cstring::escape1 );
+                    esc.back( "[0abfnrtv]",             this, & cstring::escape2 );
+                }
                 
+                //______________________________________________________________
+                //
+                // on the fly creation: u+nnnn sequence
+                //______________________________________________________________
+                {
+                    scanner &u2 = parent[u2_id];
+                    u2.back( "[:xdigit:][:xdigit:][:xdigit:][:xdigit:]", this, & cstring::escape_u);
+                }
+                
+                //______________________________________________________________
+                //
+                // on the fly creation: u+nnnn sequence
+                //______________________________________________________________
+                {
+                    scanner &u4 = parent[u4_id];
+                    u4.back( "[:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:]", this, & cstring::escape_U);
+                }
+
+            }
+            
+            void cstring:: escape_u(const token &t)
+            {
+                assert(4==t.size);
+                uint32_t w = 0;
+                for(const t_char *ch = t.head;ch;ch=ch->next)
+                {
+                    w <<= 4;
+                    w  |= hex2dec(ch->code);
+                }
+                if(!UTF8::Encode(w,content))
+                    throw exception("%d: invalid UTF8 u%04x", line, w);
+            }
+            
+            void cstring::escape_U(const token &t)
+            {
+                assert(8==t.size);
+                uint32_t w = 0;
+                for(const t_char *ch = t.head;ch;ch=ch->next)
+                {
+                    w <<= 4;
+                    w  |= hex2dec(ch->code);
+                }
+                if(!UTF8::Encode(w,content))
+                    throw exception("%d: invalid UTF8 u%08x", line, w);
             }
             
         }
