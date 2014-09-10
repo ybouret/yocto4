@@ -10,9 +10,9 @@ namespace yocto
             
             void scanner:: append_context_to( string &s ) const
             {
-                if(mylex&&mylex->last_label.size()>0)
+                if(mylex&&mylex->last_line>0)
                 {
-                    const string ctx = vformat(" after %s '%s' ", mylex->last_label.c_str(), mylex->last_token.c_str() );
+                    const string ctx = vformat(" after %s '%s' (line %d)", mylex->last_label.c_str(), mylex->last_token.c_str(), mylex->last_line);
                     s.append(ctx);
                 }
             }

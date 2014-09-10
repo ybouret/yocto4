@@ -68,6 +68,7 @@ namespace yocto
         public:
             string last_label; //!< saved after a NEW lexeme
             string last_token; //!< saved after a NEW lexeme
+            int    last_line;  //!< saved after a NEW lexeme
             
         protected:
             scanDB            scanners;
