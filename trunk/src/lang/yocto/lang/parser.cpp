@@ -22,10 +22,15 @@ namespace yocto
         {
         }
         
+        void parser:: rewrite(syntax::xnode *) const throw()
+        {
+        }
         
         syntax::xnode * parser:: run( ios::istream &input )
         {
-            return syntax::xnode::ast(accept(*this, src, input));
+            syntax::xnode *node = syntax::xnode::ast(accept(*this, src, input));
+            rewrite(node);
+            return node;
         }
         
         
@@ -122,45 +127,12 @@ return term(label,syntax:: PPTY);\
         }
         
         
-
+        
         
     }
     
 }
 
-#if 0
-namespace yocto
-{
-    namespace lang
-    {
-        
-        void parser:: end_of_line_comment(const string &trigger)
-        {
-            const string com = "@Comment:" + trigger;
-			if(!has(com))
-			{
-				//create the new scanner
-				lexical::scanner &sub = declare(com);
-				sub.make("CHAR", posix::dot(), discard);
-				sub.back(posix::endl(),endl_cb);
-			}
-            
-			// call the comment upon trigger
-			target->call(com,trigger,noop_cb);
-        }
-        
-        void parser:: end_of_line_comment(const char   *trigger)
-        {
-            const string Trigger(trigger);
-            end_of_line_comment(Trigger);
-        }
-        
-        
-        
-        
-    }
-}
-#endif
 
 #include "yocto/exception.hpp"
 

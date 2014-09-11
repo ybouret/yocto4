@@ -40,7 +40,6 @@ namespace yocto
             void comment:: on_call(const token &)
             {
                 // do nothing
-                std::cerr << "entering comment '" << regexp << "' @line " << line << std::endl;
             }
             
             void comment:: setup()

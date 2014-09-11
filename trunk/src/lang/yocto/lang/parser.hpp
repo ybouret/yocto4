@@ -38,15 +38,27 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             //! regular terminals with meaningless content
             YOCTO_LANG_PARSER_TERM_PROTO(univocal);
             
+            //__________________________________________________________________
+            //
+            // Aggregates with name
+            //__________________________________________________________________
             syntax::aggregate &assemble(const string &label);                              //!< a named aggregate => syntax::is_regular
             syntax::aggregate &assemble(const char   *label);                              //!< wrapper
             syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2 );           //!< wrapper with 2 rules
             syntax::aggregate &assemble(const char *label, Rule &r1, Rule &r2, Rule &r3 ); //!< wrapper with 3 rules
             
+            //__________________________________________________________________
+            //
+            // Aggregates that will merge with parent
+            //__________________________________________________________________
             syntax::aggregate &merge();                             //!< an all merging aggregate => syntax::is_merging_all
             syntax::aggregate &merge(Rule &r1, Rule &r2);           //!< wrapper with 2 rules
             syntax::aggregate &merge(Rule &r1, Rule &r2, Rule &r3); //!< wrapper with 3 rules
             
+            //__________________________________________________________________
+            //
+            // Alternates
+            //__________________________________________________________________
             syntax::alternate &choose(Rule &r1,Rule &r2);           //!< wrapper with 2 rules
             syntax::alternate &choose(Rule &r1,Rule &r2, Rule &r3); //!< wrapper with 3 rules
 
@@ -68,11 +80,12 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             lexical::scanner &scanner; //!< default scanner
             lexical::scanner *target;  //!< target scanner
             source            src;     //!< inside source
-            
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);
-            
+            virtual void rewrite(syntax::xnode *) const throw();
+
             
         };
     }
