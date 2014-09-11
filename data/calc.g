@@ -18,7 +18,7 @@ ID 	: "[:word:]"+;
 INT 	: "[:digit:]"+;
 NEWLINE : "[:endl:]" ;
 WS	: "[ \t]";
-PLUS    : '+' [toto];
+PLUS    : '+' ;
 MINUS   : '-'    ;
 MULT    : '*'    ;
 DIV     : '/'    ;

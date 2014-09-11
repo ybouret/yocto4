@@ -105,6 +105,7 @@ namespace yocto
                 //______________________________________________________________
                 guard.forget();
                 grow(Tree,SubTree);
+                //std::cerr << " ==> AGG '" << label << "'" << std::endl;
                 return true;
             }
 		}
@@ -151,6 +152,7 @@ namespace yocto
 					if(  op->sub.match(Lexer, Source, Input, Node) )
 					{
                         grow(Tree,Node);
+                        //std::cerr << " ==> ALT '" << label << "'" << std::endl;
 						return true;
 					}
                     assert(0==Node);

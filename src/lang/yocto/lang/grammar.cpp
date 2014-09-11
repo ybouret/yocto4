@@ -145,12 +145,12 @@ counter(0)
         {
             if(label)
             {
-                return at_least(label,other,0);
+                return at_least(label,other,1);
             }
             else
             {
                 const string Label = "@one_or_more " + other.label +  vformat("/%d",++counter);
-                return at_least(Label,other,0);
+                return at_least(Label,other,1);
             }
 
         }

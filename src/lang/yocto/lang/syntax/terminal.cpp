@@ -28,6 +28,7 @@ namespace yocto
                 {
                     if(lx->label==label)
                     {
+                        //std::cerr << " ==> TERM '" << label << "'" << std::endl;
                         xtree Node = xnode::create(label,lx,semantic);
                         grow(Tree,Node);
                         return true;

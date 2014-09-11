@@ -51,6 +51,7 @@ namespace yocto
                 if( sub.match(Lexer, Source, Input, Node))
                 {
                     // node might be NULL
+                    //std::cerr << " ==> OPT '" << label << "'" << std::endl;
                     grow(Tree,Node);
                 }
                 return true;
@@ -107,6 +108,7 @@ namespace yocto
                 size_t nch = SubTree->count();
                 if(nch>=value)
                 {
+                    //std::cerr << " ==> >=" << value <<  "'" << label << "'" << std::endl;
                     if(!Tree)
                     {
                         Tree = SubTree;

@@ -18,6 +18,7 @@ namespace yocto
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(generator);
+            virtual void rewrite(syntax::xnode *) const throw();
         };
         
     }
