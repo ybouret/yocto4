@@ -43,17 +43,17 @@ namespace yocto
                 Aggregate   & ATOMS = agg("ATOMS", syntax::is_merging_one);
                 ATOMS += one_or_more(ATOM);
                 ATOMS += zero_or_more(assemble("OR",PIPE,ATOMS));
-
+                
                 GROUP += jettison("left paren",  '(');
                 GROUP += ATOMS;
                 GROUP += jettison("right paren", ')');
                 
                 RULE += ATOMS;
-
+                
             }
             
             RULE += STOP;
-            set_root( zero_or_more(RULE) );
+            set_root( zero_or_more(RULE,"RULES") );
             
             //__________________________________________________________________
             //
@@ -69,8 +69,65 @@ namespace yocto
         
         void generator:: rewrite(syntax::xnode *node) const throw()
         {
-            if(node)
+            if(node&& !node->terminal)
             {
+                XList tmp;
+                //______________________________________________________________
+                //
+                // Recursivity
+                //______________________________________________________________
+                while(node->count())
+                {
+                    XNode *child = node->pop();
+                    tmp.push_back(child);
+                    rewrite(child);
+                }
+                
+                //______________________________________________________________
+                //
+                // tree rotations
+                //______________________________________________________________
+                while(tmp.size)
+                {
+                    XNode *child = tmp.pop_front();
+                    if("ATOMS"        == child->label &&
+                       child->count() >  1 &&
+                       "OR" == child->children().tail->label)
+                    {
+                        XNode *Or = child->children().pop_back();
+                        Or->parent = 0;
+                        Or->children().push_front(child);
+                        child->parent = Or;
+                        node->add(Or);
+                    }
+                    else
+                    {
+                        node->add(child);
+                    }
+                }
+                
+                //______________________________________________________________
+                //
+                // fusion
+                //______________________________________________________________
+                if( "OR" == node->label )
+                {
+                    while(node->count())
+                    {
+                        XNode *child = node->pop();
+                        if( "OR" == child->label )
+                        {
+                            while(child->count())
+                            {
+                                tmp.push_back( child->pop() );
+                            }
+                            delete child;
+                        }
+                        else
+                            tmp.push_back(child);
+                    }
+                    while(tmp.size) node->add(tmp.pop_front());
+                }
             }
         }
         

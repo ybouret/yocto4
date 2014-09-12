@@ -39,7 +39,7 @@ namespace yocto
             class xnode : public object
             {
             public:
-                typedef core::list_of<xnode> child_list;
+                typedef core::list_of_cpp<xnode> child_list;
                 
                 const string    &label;    //!< refering to the creating rule
                 xnode           *next;     //!< for children

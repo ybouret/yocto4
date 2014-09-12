@@ -25,6 +25,8 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             typedef syntax::aggregate Aggregate;
             typedef syntax::alternate Alternate;
             typedef syntax::rule      Rule;
+            typedef syntax::xnode     XNode;
+            typedef XNode::child_list XList;
             
             explicit parser( const string &title, const string &mainScanner);
             virtual ~parser() throw();
