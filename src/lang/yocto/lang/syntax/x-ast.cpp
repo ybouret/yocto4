@@ -62,6 +62,18 @@ namespace yocto
                                 run_again = true;
                                 break;
                                 
+                            case is_merging_one:
+                                if(1==child->count())
+                                {
+                                    xnode *sub = child->pop();
+                                    sub->parent = node;
+                                    tmp.push_back(sub);
+                                    delete child;
+                                    run_again = true;
+                                    break;
+                                }
+                                // else default...
+                                
                             default:
                                 child->parent = node;
                                 tmp.push_back(child);

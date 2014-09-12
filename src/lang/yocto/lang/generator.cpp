@@ -21,37 +21,35 @@ namespace yocto
             //__________________________________________________________________
             Terminal  &ID     = terminal("ID","[_[:alpha:]][:word:]*");
             Terminal  &COLON  = jettison("separator",':');
-            Terminal  &STOP   = jettison("stop",';');
+            Terminal  &STOP   = jettison("end of rule",';');
             Rule      &EXPR   = plug_term(new lexical::cstring("string",*this) );
             Terminal  &PIPE   = jettison("alternate",'|');
-            Terminal  &CHAR   = terminal("char","'.'");
-            Aggregate &RULE   = assemble("rule");
+            Terminal  &CHAR   = terminal("CHAR","'.'");
+            Aggregate &RULE   = assemble("RULE");
             
             RULE += ID;
             RULE += COLON;
             
+            
             {
-                Aggregate   & GROUP = agg( "group" );
-                Alternate   & CORE  = alt();
+                Aggregate   & GROUP = merge();
+                Alternate   & CORE = alt();
                 CORE |= ID;
                 CORE |= EXPR;
                 CORE |= CHAR;
                 CORE |= GROUP;
-                
-                syntax::aggregate &ATOM = merge();
-                ATOM += CORE;
-                ATOM += opt( terminal("attr", "[+?*]"));
-                
-                syntax::aggregate &ATOMS    = merge();
+                Aggregate   & JOKER = assemble("JOKER", CORE, terminal("attr", "[+?*]") );
+                Alternate   & ATOM  = choose(JOKER,CORE);
+                Aggregate   & ATOMS = agg("ATOMS", syntax::is_merging_one);
                 ATOMS += one_or_more(ATOM);
-                ATOMS += zero_or_more(assemble("or",PIPE,ATOMS));
-                
+                ATOMS += zero_or_more(assemble("OR",PIPE,ATOMS));
+
                 GROUP += jettison("left paren",  '(');
                 GROUP += ATOMS;
                 GROUP += jettison("right paren", ')');
                 
                 RULE += ATOMS;
-                
+
             }
             
             RULE += STOP;
@@ -61,7 +59,7 @@ namespace yocto
             //
             // Lexical
             //__________________________________________________________________
-            plug_meta( new lexical::comment("COMMENT",*this,"//") );
+            plug_meta( new lexical::comment("comment",*this,"//") );
             scanner.make("blank", "[:blank:]", discard);
             scanner.make("endl" , "[:endl:]",  newline);
             

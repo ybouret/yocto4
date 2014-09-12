@@ -15,10 +15,20 @@ namespace yocto
            
             enum property
             {
-                is_standard,      //!< a standard node
-                is_univocal = 1,  //!< univocal, erase content
-                is_jettison = 2,  //!< syntax only
-                is_merging_all = 4   //!< a temporary list, merge with parent if possible
+                //______________________________________________________________
+                //
+                // for terminals
+                //______________________________________________________________
+                is_standard,         //!< a standard node
+                is_univocal    = 1,  //!< univocal, erase content
+                is_jettison    = 2,  //!< syntax only
+                
+                //______________________________________________________________
+                //
+                // for non terminals
+                //______________________________________________________________
+                is_merging_all = 4,  //!< a temporary list, merge with parent if possible
+                is_merging_one = 8   //!< for grouping rules, merge is size==1
             };
             
             //! a syntax node, terminal or not

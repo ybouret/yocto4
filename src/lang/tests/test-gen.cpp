@@ -28,14 +28,30 @@ YOCTO_UNIT_TEST_IMPL(gen)
     
     generator     G;
     ios::icstream fp( ios::cstdin );
-    
-    auto_ptr<syntax::xnode> Tree( G.run(fp) );
-    if(Tree.is_valid())
+    if(argc>1 && 0 == strcmp("lex",argv[1]) )
     {
-        Tree->graphviz("xnode.dot");
-        system("dot -Tpng -o xnode.png xnode.dot");
+        while(true)
+        {
+            source src;
+            lexeme *lx = G.get( src, fp );
+            if(!lx)
+                break;
+            
+            auto_ptr<lexeme> LX(lx);
+            std::cerr << lx->label << " : '" << *lx << "'" << std::endl;
+        }
     }
-
+    else
+    {
+        
+        auto_ptr<syntax::xnode> Tree( G.run(fp) );
+        if(Tree.is_valid())
+        {
+            Tree->graphviz("xnode.dot");
+            system("dot -Tpng -o xnode.png xnode.dot");
+        }
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
