@@ -79,6 +79,7 @@ namespace yocto
             
             if(nvar==npar) Gamma.ld1();
         }
+        
         template <>
         void least_squares<real_t>:: sample:: set_parameter(size_t ipar, size_t ivar) throw()
         {
@@ -88,7 +89,6 @@ namespace yocto
             assert(ivar<=Gamma.cols);
             Gamma[ipar][ivar] = 1;
         }
-        
         
         template <>
         real_t least_squares<real_t>:: sample:: compute_D2( function &F, const array<real_t> &a )
