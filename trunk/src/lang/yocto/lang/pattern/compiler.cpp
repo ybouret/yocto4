@@ -33,7 +33,7 @@ namespace yocto
         namespace
         {
             
-            static const char fn[] = "lingua::compile";
+            static const char fn[] = "pattern compiler";
             
             ////////////////////////////////////////////////////////////////////
             //
