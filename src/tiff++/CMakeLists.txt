@@ -3,7 +3,7 @@ PROJECT(tiff++)
 FIND_PACKAGE(TIFF)
 
 IF(TIFF_FOUND)
-
+	MESSAGE( STATUS "Found Tiff...")
 	FILE( GLOB decl yocto/tiff++/*.hpp)
 	FILE( GLOB impl yocto/tiff++/*.cpp)
 	SET( srcs ${decl} ${impl} )
