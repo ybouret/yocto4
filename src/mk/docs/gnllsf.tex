@@ -53,6 +53,38 @@ $$
 $$
 and
 $$
-	\beta_{i,k} =	 \sum_{j=1}^{N_i}\left[Y_{i,j} - F_i\left(X_{i,j},\vec{u}_i\right) \right]\dfrac{\partial F_i}{\partial u_{i,k}}
+	\forall 1 \leq k \leq M_i, \;\; \beta_{i,k} =	 \sum_{j=1}^{N_i}\left[Y_{i,j} - F_i\left(X_{i,j},\vec{u}_i\right) \right]\dfrac{\partial F_i}{\partial u_{i,k}}
 $$
+
+\section{Pseudo Newton Equation}
+To find a zero of the gradient, we need to estimate the Jacobian of $\beta$, namely the Hessian of $D$, since
+$$
+	 \vec\beta\left(\vec{a}+\delta\vec{a}\right) \simeq \vec\beta\left(\vec{a}\right) + \partial_{\vec{a}} \vec{\beta} \cdot \delta\vec{a}
+$$
+We define the $M_i \times M_i$ partial symmetric curvature  matrix 
+$$
+	\mymat{C}_i = -\partial_{\vec{u}_i} \vec{\beta}_i
+$$
+so that
+$$
+	\mymat{C}_{i,k,l} = \sum_{j=1}^{N_i} \left(\dfrac{\partial F_i}{\partial u_{i,k}}\right) \left(\dfrac{\partial F_i}{\partial u_{i,l}}\right)
+$$
+and the $M\times M$ curvature matrix
+$$
+	\mymat{C} = \sum_{i=1}^{S} \mytrn{\mymat{\Gamma}}_i \mymat{C}_i \mymat{\Gamma}_i.
+$$
+We should solve
+$$
+	\vec{\beta} = \mymat{C} \delta\vec{a}
+$$
+but both $\vec{\beta}$ and $\mymat{C}$ are approximate values...arising from the derivatives and the Hessian truncation.
+
+
+\section{Levenberg-Marquardt Setup}
+By using $\lambda>0$, there should exists an invertible matrix $\mymat{C}_\lambda$: this is $\mymat{C}$ but
+the diagonal elements which are increased by $1+\lambda$. Otherwise the system is singular.
+In that case, $\delta\vec{a} = \mymat{C}_\lambda^{-1}$ is an approximation of
+the Newton's step.
+
+
 \end{document}
