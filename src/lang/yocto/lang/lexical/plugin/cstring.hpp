@@ -33,7 +33,12 @@ namespace yocto
                 void escape_u(const token &);   //!< unicode 16 bits
                 void escape_U(const token &);   //!< unicode 32 bits
                 void setup(lexer &parent);
-                unsigned count;                 //!< for counting escaped length
+                
+                bool invalid_esc(const token &);
+                bool invalid_hex(const token &);
+                bool invalid_u(const token &);
+                bool invalid_U(const token &);
+                
             };
             
         }

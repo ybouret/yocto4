@@ -28,8 +28,8 @@ namespace yocto
             lexical::scanner & declare(const char   *id); //!< a new scanner
             
             
-            lexical::scanner & operator[](const string &id); //!< on the fly creation
-            lexical::scanner & operator[](const char   *id); //!< on the fly creation
+            lexical::scanner       & operator[](const string &id);
+            lexical::scanner       & operator[](const char   *id);
             const lexical::scanner & operator[](const string &id) const;
             const lexical::scanner & operator[](const char   *id) const;
             

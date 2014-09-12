@@ -21,8 +21,7 @@ namespace yocto
             
             cstring:: cstring( const string &id, lexer &parent ) :
             plugin(id,parent),
-            content(),
-            count(0)
+            content()
             {
                 setup(parent);
             }
@@ -30,8 +29,7 @@ namespace yocto
             
             cstring:: cstring(const char   *id, lexer &parent) :
             plugin(id,parent),
-            content(),
-            count(0)
+            content()
             {
                 setup(parent);
             }
@@ -39,7 +37,6 @@ namespace yocto
             void cstring:: esc(const token &) throw()
             {
                 // start any escape sequence
-                count = 0;
             }
             
             void cstring:: escape1( const token &t )
@@ -137,37 +134,45 @@ namespace yocto
                 //
                 // on the fly creation: hexadecimal escape sequence
                 //______________________________________________________________
+                if(!parent.has(hex_esc_id))
                 {
-                    scanner &hex_esc = parent[hex_esc_id];
+                    scanner &hex_esc = parent.declare(hex_esc_id);
                     hex_esc.back("[:xdigit:][:xdigit:]", this, & cstring::escape_hex);
+                    hex_esc.make( "invalid hexadecimal", any1::create(), this, & cstring::invalid_hex);
                 }
                 
                 //______________________________________________________________
                 //
                 // on the fly creation: escape sequence
                 //______________________________________________________________
+                if(!parent.has(esc_id))
                 {
-                    scanner &esc = parent[esc_id];
+                    scanner &esc = parent.declare(esc_id);
                     esc.back( "[\\x22\\x27\\x3f\\x5c]", this, & cstring::escape1 );
                     esc.back( "[0abfnrtv]",             this, & cstring::escape2 );
+                    esc.make( "invalid escape", any1::create(), this, & cstring::invalid_esc);
                 }
                 
                 //______________________________________________________________
                 //
                 // on the fly creation: u+nnnn sequence
                 //______________________________________________________________
+                if(!parent.has(u2_id))
                 {
-                    scanner &u2 = parent[u2_id];
+                    scanner &u2 = parent.declare(u2_id);
                     u2.back( "[:xdigit:][:xdigit:][:xdigit:][:xdigit:]", this, & cstring::escape_u);
+                    u2.make( "invalid u+nnnn", any1::create(), this, & cstring::invalid_u);
                 }
                 
                 //______________________________________________________________
                 //
                 // on the fly creation: u+nnnn sequence
                 //______________________________________________________________
+                if(!parent.has(u4_id))
                 {
-                    scanner &u4 = parent[u4_id];
+                    scanner &u4 = parent.declare(u4_id);
                     u4.back( "[:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:][:xdigit:]", this, & cstring::escape_U);
+                    u4.make( "invalid U+nnnnnnnn", any1::create(), this, & cstring::invalid_U);
                 }
 
             }
@@ -197,6 +202,65 @@ namespace yocto
                 if(!UTF8::Encode(w,content))
                     throw exception("%d: invalid UTF8 u%08x", line, w);
             }
+         
+            bool cstring:: invalid_esc(const token &t)
+            {
+                assert(1==t.size);
+                const code_type C = t.head->code;
+                if(C>=32&&C<127)
+                {
+                    throw exception("%d: invalid escape char '%c'in %s", line, C, name.c_str());
+                }
+                else
+                {
+                    throw exception("%d: invalid escape char 0x%02u in %s", line, unsigned(C), name.c_str());
+                }
+            }
+            
+            bool cstring:: invalid_hex(const token &t)
+            {
+                assert(1==t.size);
+                const code_type C = t.head->code;
+                if(C>=32&&C<127)
+                {
+                    throw exception("%d: invalid hexadecimal sequence after '%c'in %s", line, C, name.c_str());
+                }
+                else
+                {
+                    throw exception("%d: invalid hexadecimal sequence after 0x%02u in %s", line, unsigned(C), name.c_str());
+                }
+            }
+
+            bool cstring:: invalid_u(const token &t)
+            {
+                assert(1==t.size);
+                const code_type C = t.head->code;
+                if(C>=32&&C<127)
+                {
+                    throw exception("%d: invalid 16 bits unicode after '%c'in %s", line, C, name.c_str());
+                }
+                else
+                {
+                    throw exception("%d: invalid 16 bits unicode after 0x%02u in %s", line, unsigned(C), name.c_str());
+                }
+            }
+            
+            bool cstring:: invalid_U(const token &t)
+            {
+                assert(1==t.size);
+                const code_type C = t.head->code;
+                if(C>=32&&C<127)
+                {
+                    throw exception("%d: invalid 32 bits unicode after '%c'in %s", line, C, name.c_str());
+                }
+                else
+                {
+                    throw exception("%d: invalid 32 bits unicode after 0x%02u in %s", line, unsigned(C), name.c_str());
+                }
+            }
+
+
+
             
         }
     }
