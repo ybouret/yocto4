@@ -14,7 +14,7 @@ atom 	:	INT
 		|	ID
 		|	LPAREN expr RPAREN;
 
-ID 	: "[:word:]"+;
+ID 	: "[_[:alpha:]][:word:]*";
 INT 	: "[:digit:]"+;
 NEWLINE : "[:endl:]" ;
 WS	: "[ \t]";
