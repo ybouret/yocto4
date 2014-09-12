@@ -1,0 +1,58 @@
+\documentclass[aps,twocolumn]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+%% concentration notations
+\newcommand{\mymat}[1]{\boldsymbol{#1}}
+\newcommand{\mytrn}[1]{~^{\mathsf{t}}#1}
+\newcommand{\myvec}[1]{\overrightarrow{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+\newcommand{\myhess}{\mathcal{H}}
+\newcommand{\myd}{\mathrm{d}}
+
+\begin{document}
+\title{General Non Linear Least Squares Fitting}
+\maketitle
+
+\section{Problem Description}
+We define the sample $S_i$ the collection of $N_i$ data points $(X_{i,1},\ldots,X_{i,N_i})$
+and their respective values $(Y_{i,1},\ldots,Y_{i,N_i})$.
+We want to least-squares fit this points by the function $F(x,\vec{u}_i)$
+where $\vec{u}_i$ is a subset of $M_i$ parameters among the total $M$ parameters $\vec{a}$.
+Accordingly, there exist a $M_i \times M$ matrix $\mymat{\Gamma}_i$ such that
+$$
+	\vec{u}_i = \mymat{\Gamma}_i \vec{a}.
+$$
+The least-squares estimator $D_i$ is defined by
+$$
+	D_i = \sum_{j=1}^{N_i} \left[Y_{i,j} - F_i\left(X_{i,j},\vec{u}_i\right) \right]^2.
+$$
+If we have $S$ samples,
+the quantity we want to minimise is
+$$
+	D\left(\vec{a}\right) = \sum_{i=1}^S D_i
+$$
+
+\section{Gradient Expression}
+We want to find the zero gradient of $D(\vec{a})$.
+$$
+	\partial_{\vec{a}} D = \sum_{i=1}^{S} \partial_{\vec{a}} D_i.
+$$
+So we define 
+$$
+	\vec{\beta} = -\dfrac{1}{2} \partial_{\vec{a}} D = \sum_{i=1}^{S} \mytrn{\mymat{\Gamma}}_i \vec{\beta}_i
+$$
+with
+$$
+	\vec{\beta}_{i} = -\dfrac{1}{2} \partial_{\vec{u}_i} D_i 
+$$
+and
+$$
+	\beta_{i,k} =	 \sum_{j=1}^{N_i}\left[Y_{i,j} - F_i\left(X_{i,j},\vec{u}_i\right) \right]\dfrac{\partial F_i}{\partial u_{i,k}}
+$$
+\end{document}
