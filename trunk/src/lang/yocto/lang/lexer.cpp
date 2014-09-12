@@ -18,7 +18,7 @@ namespace yocto
             const lexical::scanner::pointer *ppScan = scanners.search(id);
             if(!ppScan)
             {
-                throw exception("no {%s}.<%s>", name.c_str(), id.c_str());
+                throw exception("no const {%s}.<%s>", name.c_str(), id.c_str());
             }
             return **ppScan;
         }
@@ -32,14 +32,8 @@ namespace yocto
         lexical::scanner & lexer:: operator[](const string &id)
         {
             lexical::scanner::pointer *ppScan = scanners.search(id);
-            if(ppScan)
-            {
-                return **ppScan;
-            }
-            else
-            {
-                return declare(id);
-            }
+            if(!ppScan) throw exception("no {%s}.<%s>", name.c_str(), id.c_str());
+            return **ppScan;
         }
         
         lexical::scanner & lexer:: operator[](const char *id )
