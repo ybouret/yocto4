@@ -65,8 +65,13 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             syntax::alternate &choose(Rule &r1,Rule &r2, Rule &r3); //!< wrapper with 3 rules
 
             
-            syntax::xnode *run( ios::istream &input ); //!< main code
-
+            //! main code
+            /**
+             once the abstract tree is built, the private
+             virtual function rewrite is called.
+             */
+            syntax::xnode *run( ios::istream &input );
+            
             
             //! plugin: current target call the plugin upon its trigger
             /**

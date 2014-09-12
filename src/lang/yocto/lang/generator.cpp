@@ -19,7 +19,7 @@ namespace yocto
             //
             // Generator Grammar
             //__________________________________________________________________
-            Terminal  &ID     = terminal("ID","[_[:alpha:]][:word:]*");
+            Terminal  &ID     = terminal("ID","@?[_[:alpha:]][:word:]*");
             Terminal  &COLON  = jettison("separator",':');
             Terminal  &STOP   = jettison("end of rule",';');
             Rule      &EXPR   = plug_term(new lexical::cstring("string",*this) );
@@ -67,6 +67,24 @@ namespace yocto
         }
         
         
+        static inline
+        void check_single_atom_of(syntax::xnode *node)
+        {
+            syntax::xnode::child_list tmp;
+            while(node->count())
+            {
+                syntax::xnode *child = node->pop();
+                if( "ATOMS" == child->label && 1 == child->count())
+                {
+                    tmp.push_back(child->pop());
+                    delete child;
+                }
+                else
+                    tmp.push_back(child);
+            }
+            while(tmp.size) node->add(tmp.pop_front());
+        }
+        
         void generator:: rewrite(syntax::xnode *node) const throw()
         {
             if(node&& !node->terminal)
@@ -74,7 +92,7 @@ namespace yocto
                 XList tmp;
                 //______________________________________________________________
                 //
-                // Recursivity
+                // Pass 1: Recursivity
                 //______________________________________________________________
                 while(node->count())
                 {
@@ -85,7 +103,7 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // tree rotations
+                // Pass 2: Tree rotations
                 //______________________________________________________________
                 while(tmp.size)
                 {
@@ -99,6 +117,7 @@ namespace yocto
                         Or->children().push_front(child);
                         child->parent = Or;
                         node->add(Or);
+                        check_single_atom_of(Or);
                     }
                     else
                     {
@@ -108,7 +127,7 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // fusion
+                // Pass 3: fusion
                 //______________________________________________________________
                 if( "OR" == node->label )
                 {
@@ -127,7 +146,12 @@ namespace yocto
                             tmp.push_back(child);
                     }
                     while(tmp.size) node->add(tmp.pop_front());
+                    
+                    
                 }
+                
+                
+                
             }
         }
         
