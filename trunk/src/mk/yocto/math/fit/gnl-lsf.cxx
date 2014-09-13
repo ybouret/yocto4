@@ -94,6 +94,13 @@ namespace yocto
 		}
 
 		template <>
+		void LeastSquares<real_t>::Sample::prepare(size_t nvar)
+		{
+			prepare(nvar,nvar);
+			Gamma.ld1();
+		}
+
+		template <>
 		real_t LeastSquares<real_t>::Sample:: compute_D( Function &F, const Array &a)
 		{
 			// Evaluate u from a

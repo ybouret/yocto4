@@ -58,7 +58,10 @@ namespace yocto
 
                 //! set N and memory
                 void prepare(size_t local_nvar, size_t global_nvar);
-                
+				void prepare(size_t nvar);		
+
+
+
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(Sample);
 				class Wrapper
