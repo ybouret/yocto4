@@ -30,7 +30,7 @@ $$
 $$
 The least-squares estimator $D_i$ is defined by
 $$
-	D_i = \sum_{j=1}^{N_i} \left[Y_{i,j} - F_i\left(X_{i,j},\vec{u}_i\right) \right]^2.
+	D_i = \sum_{j=1}^{N_i} \left[Y_{i,j} - F\left(X_{i,j},\vec{u}_i\right) \right]^2.
 $$
 If we have $S$ samples,
 the quantity we want to minimise is
@@ -53,7 +53,7 @@ $$
 $$
 and
 $$
-	\forall 1 \leq k \leq M_i, \;\; \beta_{i,k} =	 \sum_{j=1}^{N_i}\left[Y_{i,j} - F_i\left(X_{i,j},\vec{u}_i\right) \right]\dfrac{\partial F_i}{\partial u_{i,k}}
+	\forall 1 \leq k \leq M_i, \;\; \beta_{i,k} =	 \sum_{j=1}^{N_i}\left[Y_{i,j} - F\left(X_{i,j},\vec{u}_i\right) \right]\dfrac{\partial F}{\partial u_{i,k}}
 $$
 
 \section{Pseudo Newton Equation}
@@ -67,7 +67,7 @@ $$
 $$
 so that
 $$
-	\mymat{C}_{i,k,l} = \sum_{j=1}^{N_i} \left(\dfrac{\partial F_i}{\partial u_{i,k}}\right) \left(\dfrac{\partial F_i}{\partial u_{i,l}}\right)
+	\mymat{C}_{i,k,l} = \sum_{j=1}^{N_i} \left(\dfrac{\partial F}{\partial u_{i,k}}\right) \left(\dfrac{\partial F}{\partial u_{i,l}}\right)
 $$
 and the $M\times M$ curvature matrix
 $$

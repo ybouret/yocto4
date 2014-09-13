@@ -155,6 +155,29 @@ namespace yocto
 
 }
 
+namespace yocto
+{
+	namespace math
+	{
+
+
+		template <>
+		LeastSquares<real_t>:: Samples:: Samples() throw() {}
+
+		template <>
+		LeastSquares<real_t>:: Samples:: ~Samples() throw() {}
+
+		template <>
+		LeastSquares<real_t>::Sample & LeastSquares<real_t>:: Samples:: append(const Array &X, const Array &Y, Array &Z)
+		{
+			Sample::Pointer ptr( new Sample(X,Y,Z) );
+			push_back(ptr);
+			return *ptr;
+		}
+
+	}
+
+}
 
 
 namespace yocto

@@ -79,6 +79,18 @@ namespace yocto
 				Function1            f; //!< for gradient evaluation
             };
             
+			//! a set of samples
+			class Samples : public vector<typename Sample::Pointer>
+			{
+			public:
+				explicit Samples() throw();
+				virtual ~Samples() throw();
+				Sample & append( const Array &X, const Array &Y, Array &Z );
+
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
+			};
+
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);

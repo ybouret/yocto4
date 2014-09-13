@@ -40,5 +40,13 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	vector<double> z1(t1.size(),0);
 	vector<double> z2(t2.size(),0);
 
+	typedef LeastSquares<double> LS;
+	typedef LS::Sample Sample;
+	typedef LS::Samples Samples;
+
+	Samples samples;
+	Sample &s1 = samples.append(t1,x1,z1);
+
+
 }
 YOCTO_UNIT_TEST_DONE()
