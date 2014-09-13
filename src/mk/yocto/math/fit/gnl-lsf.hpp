@@ -68,9 +68,9 @@ namespace yocto
 					virtual ~Wrapper() throw();
 					Sample   &S;
 					Function *F;
-					real_t    x;
+					T         x;
 					size_t    q;
-					real_t    Eval(real_t U);
+					T        Eval(T U);
 
 				private:
 					YOCTO_DISABLE_COPY_AND_ASSIGN(Wrapper);
@@ -78,7 +78,6 @@ namespace yocto
 				Wrapper              w;
 				Function1            f; //!< for gradient evaluation
             };
-            
             
             
         private:
