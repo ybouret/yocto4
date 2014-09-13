@@ -16,6 +16,7 @@ namespace yocto
 #define SAFE REAL(2.0)
 #define BIG  (REAL_MAX/SAFE)
         
+#if 0
         static inline real_t __fix_drvs( const real_t x, real_t h)
         {
             volatile real_t temp = x+Fabs(h);
@@ -25,7 +26,8 @@ namespace yocto
             }
             return h;
         }
-        
+#endif
+
 #define EVAL()  ( (func(x+hh)-func(x-hh))/(hh+hh) )
         
         template <>
@@ -73,9 +75,9 @@ namespace yocto
         hopt( log_round_ceil(Pow( numeric<real_t>::epsilon,REAL(1.0)/REAL(3.0))) ),
         hmin( log_round_ceil(numeric<real_t>::epsilon) )
         {
-            std::cerr << "dtol=" << dtol << "/" << numeric<real_t>::sqrt_epsilon << std::endl;
-            std::cerr << "hopt=" << hopt << std::endl;
-            std::cerr << "hmin=" << hmin << std::endl;
+            //std::cerr << "dtol=" << dtol << "/" << numeric<real_t>::sqrt_epsilon << std::endl;
+            //std::cerr << "hopt=" << hopt << std::endl;
+            //std::cerr << "hmin=" << hmin << std::endl;
         }
         
         template <>
