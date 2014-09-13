@@ -47,6 +47,18 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	Samples samples;
 	Sample &s1 = samples.append(t1,x1,z1);
 
+	diffusion xp;
+
+	LS::Function F(&xp, &diffusion::compute);
+
+	vector<double> a(2,0);
+
+	a[1] = 1.0;
+	a[2] = 2.0;
+
+	s1.prepare(2);
+	std::cerr << "D1=" << s1.compute_D(F,a) << std::endl;
+
 
 }
 YOCTO_UNIT_TEST_DONE()
