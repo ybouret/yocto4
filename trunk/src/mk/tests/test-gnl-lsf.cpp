@@ -68,6 +68,7 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	std::cerr << "alpha=" << s1.alpha << std::endl;
 	std::cerr << "Gamma=" << s1.Gamma << std::endl;
 	std::cerr << "__ag="  << s1.__ag  << std::endl;
+	std::cerr << "curv="  << s1.curv  << std::endl;
 
 	vector<double> Beta( a.size(), 0);
 	matrix<double> Alpha( a.size(), a.size() );
