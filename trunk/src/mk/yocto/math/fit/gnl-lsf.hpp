@@ -12,45 +12,45 @@
 
 namespace yocto
 {
-    namespace math
-    {
-        
-        template <typename T>
-        class LeastSquares
-        {
-        public:
-            typedef array<T>                        Array;
-            typedef vector<T>                       Vector;
-            typedef matrix<T>                       Matrix;
-            typedef matrix<ptrdiff_t>               iMatrix;
-            typedef functor<T,TL2(T,const Array &)> Function;
+	namespace math
+	{
+
+		template <typename T>
+		class LeastSquares
+		{
+		public:
+			typedef array<T>                        Array;
+			typedef vector<T>                       Vector;
+			typedef matrix<T>                       Matrix;
+			typedef matrix<ptrdiff_t>               iMatrix;
+			typedef functor<T,TL2(T,const Array &)> Function;
 			typedef typename numeric<T>::function   Function1;
 
-            virtual  ~LeastSquares() throw();
-            explicit  LeastSquares();
+			virtual  ~LeastSquares() throw();
+			explicit  LeastSquares();
 
-            
-            //! a sample to wrap data+local memory
-            class Sample : public object, public counted
-            {
-            public:
-                virtual ~Sample() throw();
-                explicit Sample(const Array &userX,
-                                const Array &userY,
-                                Array       &userZ);
-                
-                typedef arc_ptr<Sample> Pointer;
-                
-                const Array &X;
-                const Array &Y;
-                Array       &Z;
-                const size_t N;      //!< initially 0, #data
-                const size_t Q;      //!< initially 0, #local variables
-                const size_t M;      //!< initially 0, #global variables
-                iMatrix      Gamma;  //!< [QxM]
-                Vector       u;      //!< [Q] local variables
-                Vector       dFdu;   //!< [Q] local function gradient
-                Vector       beta;   //!< [Q] local least square gradient
+
+			//! a sample to wrap data+local memory
+			class Sample : public object, public counted
+			{
+			public:
+				virtual ~Sample() throw();
+				explicit Sample(const Array &userX,
+					const Array &userY,
+					Array       &userZ);
+
+				typedef arc_ptr<Sample> Pointer;
+
+				const Array &X;
+				const Array &Y;
+				Array       &Z;
+				const size_t N;      //!< initially 0, #data
+				const size_t Q;      //!< initially 0, #local variables
+				const size_t M;      //!< initially 0, #global variables
+				iMatrix      Gamma;  //!< [QxM], local variables from global variables
+				Vector       u;      //!< [Q] local variables
+				Vector       dFdu;   //!< [Q] local function gradient
+				Vector       beta;   //!< [Q] local least square gradient
 				Matrix       alpha;  //!< [QxQ] local curvature
 				Matrix       __ag;   //!< [Q*M] alpha * Gamma
 				Matrix       curv;   //!< [MxM] Gamma'*__ag
@@ -58,8 +58,8 @@ namespace yocto
 				T compute_D(Function &F, const Array &a);
 				T compute_D(Function &F, const Array &a, derivative<T> &drvs, T h);
 
-                //! set N and memory
-                void prepare(size_t local_nvar, size_t global_nvar);
+				//! set N and memory
+				void prepare(size_t local_nvar, size_t global_nvar);
 
 				//! set N and memory, Gamma=Id
 				void prepare(size_t nvar);		
@@ -67,8 +67,8 @@ namespace yocto
 				void collect( Matrix &Alpha, Array &Beta ) const throw();
 
 
-            private:
-                YOCTO_DISABLE_COPY_AND_ASSIGN(Sample);
+			private:
+				YOCTO_DISABLE_COPY_AND_ASSIGN(Sample);
 				class Wrapper
 				{
 				public:
@@ -85,8 +85,8 @@ namespace yocto
 				};
 				Wrapper              w;
 				Function1            f; //!< for gradient evaluation
-            };
-            
+			};
+
 			//! a set of samples
 			class Samples : public vector<typename Sample::Pointer>
 			{
@@ -99,8 +99,9 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
 			};
 
-        
-			void fit(Samples      &user_S,
+
+			void operator()(
+				Samples           &user_S,
 				Function          &user_F,
 				Array             &user_aorg,
 				const array<bool> &user_used,
@@ -108,8 +109,8 @@ namespace yocto
 
 
 
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);
+		private:
+			YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);
 			Samples      *S;
 			Function     *F;
 			size_t        ns;   //! #samples
@@ -118,15 +119,17 @@ namespace yocto
 			vector<bool>  used;
 			Vector        aerr;
 			Vector        beta;
-			Matrix        curv;
+			Matrix        alpha;
+			Matrix        curv;  //!< from alpha with lam
 			Vector        step;
 			derivative<T> drvs;
 			T             h;
 
 			T       computeD();
-        };
-        
-    }
+			bool    build_curvature(T lam); //!< curv from alpha and try lu
+		};
+
+	}
 }
 
 #endif

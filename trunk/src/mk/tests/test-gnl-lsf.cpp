@@ -75,5 +75,14 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	s1.collect(Alpha,Beta);
 	std::cerr << "Alpha=" << Alpha << std::endl;
 	std::cerr << "Beta="  << Beta  << std::endl;
+
+	LS fit;
+	vector<bool> used(a.size(),true);
+	used[3] = false;
+	vector<double> aerr(a.size(),0);
+
+	fit(samples,F,a,used,aerr);
+
+
 }
 YOCTO_UNIT_TEST_DONE()

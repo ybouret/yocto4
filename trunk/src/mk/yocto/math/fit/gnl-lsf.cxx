@@ -180,6 +180,8 @@ namespace yocto
 		template <>
 		void  LeastSquares<real_t>::Sample::collect( Matrix &Alpha, Array &Beta ) const throw()
 		{
+			//std::cerr << "Alpha.rows=" << Alpha.rows <<  ", M=" << M << std::endl;
+			//std::cerr << "Alpha.cols=" << Alpha.cols <<  ", M=" << M << std::endl;
 			assert(Alpha.rows == M);
 			assert(Alpha.cols == M);
 			assert(Beta.size() >= Q);
@@ -220,6 +222,8 @@ namespace yocto
 
 }
 
+#include "yocto/math/kernel/crout.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -241,42 +245,6 @@ namespace yocto
 		}
 
 		template <>
-		void LeastSquares<real_t>:: fit(
-			Samples           &user_S,
-			Function          &user_F,
-			Array             &user_aorg,
-			const array<bool> &user_used,
-			Array             &user_aerr)
-		{
-			// prepare variables
-			S    = &user_S;
-			F    = &user_F;
-			ns   = S->size();
-			nvar = aorg.size();
-			assert(user_used.size()>=nvar);
-			assert(user_aerr.size()>=nvar);
-
-			// allocate memory
-			aorg.make(nvar,0);
-			used.make(nvar,true);
-			aerr.make(nvar,0);
-			beta.make(nvar,0);
-			curv.make(nvar,nvar);
-			step.make(nvar,0);
-
-			// initialize local variables
-			for(size_t i=nvar;i>=0;--i)
-			{
-				aorg[i] = user_aorg[i];
-				used[i] = user_used[i];
-				aerr[i] = user_aerr[i];
-			}
-
-			// starting point
-			real_t Dorg = computeD();
-		}
-
-		template <>
 		real_t LeastSquares<real_t>:: computeD()
 		{
 			real_t ans(0);
@@ -285,11 +253,86 @@ namespace yocto
 			for(size_t k=ns;k>0;--k)
 			{
 				Sample &s = *(*S)[k];
-				ans += s.compute_D(*F,aorg,drvs,h);
+				//ans += s.compute_D(*F,aorg,drvs,h);
 				s.collect(curv,beta);
 			}
 			return ans;
 		}
 
+		template <>
+		bool LeastSquares<real_t>:: build_curvature(real_t lam)
+		{
+			const real_t fac = REAL(1.0) + lam;
+			curv.assign(alpha);
+			for(size_t i=nvar;i>0;--i)
+			{
+				curv[i][i] *= fac;
+			}
+			return crout<real_t>::build(curv);
+		}
+
+		template <>
+		void LeastSquares<real_t>:: operator()(
+			Samples           &user_S,
+			Function          &user_F,
+			Array             &user_aorg,
+			const array<bool> &user_used,
+			Array             &user_aerr)
+		{
+			const int    LAMBDA_MIN_POW10 = int(Floor(Log10(numeric<real_t>::epsilon)));
+			const int    LAMBDA_MAX_POW10 = int(Ceil(Log10(numeric<real_t>::maximum)));
+			const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
+
+			int lam_pow10 = LAMBDA_INI_POW10;
+			real_t lam    = ipower(REAL(10.0),lam_pow10);
+
+			// prepare variables
+			S    = &user_S;
+			F    = &user_F;
+			ns   = S->size();
+			nvar = user_aorg.size();
+			assert(user_used.size()>=nvar);
+			assert(user_aerr.size()>=nvar);
+
+			// allocate memory
+			aorg  .make(nvar,0);
+			used  .make(nvar,true);
+			aerr  .make(nvar,0);
+			beta  .make(nvar,0);
+			alpha .make(nvar,nvar);
+			curv  .make(nvar,nvar);
+			step  .make(nvar,0);
+
+			// initialize local variables
+			for(size_t i=nvar;i>0;--i)
+			{
+				aorg[i] = user_aorg[i];
+				used[i] = user_used[i];
+				aerr[i] = user_aerr[i];
+			}
+
+
+				
+			// starting point
+			real_t Dorg = computeD();
+			
+			// find lambda
+			while( !build_curvature(lam) )
+			{
+				++lam_pow10;
+				if(lam_pow10>LAMBDA_MAX_POW10)
+				{
+					exit(1);
+				}
+			}
+
+
+
+		}
+
+
+
+
+		
 	}
 }
