@@ -98,7 +98,7 @@ namespace yocto
             
             //! sum
             template <typename ARR>
-            static inline typename ARR::type dot( const ARR &a ) throw()
+            static inline typename ARR::type sum( const ARR &a ) throw()
             {
                 typename ARR::type ans(0);
 #define Y_TAO_SUM(I) ans += a[I]
@@ -114,14 +114,14 @@ namespace yocto
                 
                 for(size_t i=n;i>0;--i)
                 {
-                    const ptrdiff_t wi = (w[i] = RInt(w[i]));
+                    const ptrdiff_t wi = static_cast<ptrdiff_t>(w[i] = RInt(w[i]));
                     const ptrdiff_t ai = wi < 0 ? -wi : wi;
                     if(!ai)
                         continue;
                     
                     for(size_t j=i;j>0;--j)
                     {
-                        const ptrdiff_t wj = (w[j] = RInt(w[j]) );
+                        const ptrdiff_t wj = static_cast<ptrdiff_t>(w[j] = RInt(w[j]) );
                         const ptrdiff_t aj = wj < 0 ? -wj : wj;
                         if(!aj)
                             continue;
@@ -189,9 +189,9 @@ namespace yocto
                 assert(b.size()>=M.rows);
                 const size_t nr = M.rows;
 #define Y_TAO_MULTRN_CORE(I)           \
-typename MAT::type sum(0);             \
-for(size_t j=nr;j>0;--j) sum += M[j][I]
-#define Y_TAO_MULTRN(I) Y_TAO_MULTRN_CORE(I); a[I] = static_cast<typename ARR::type>(sum)
+typename ARR::type __sum(0);             \
+for(register size_t j=nr;j>0;--j) __sum += static_cast<typename ARR::type>(M[j][I]) * static_cast<typename ARR::type>(b[j])
+#define Y_TAO_MULTRN(I) Y_TAO_MULTRN_CORE(I); a[I] = __sum
                 
                 YOCTO_TAO_LOOP(M.cols,MULTRN);
             }
@@ -202,7 +202,7 @@ for(size_t j=nr;j>0;--j) sum += M[j][I]
                 assert(a.size()>=M.cols);
                 assert(b.size()>=M.rows);
                 const size_t nr = M.rows;
-#define Y_TAO_MULADDTRN(I) Y_TAO_MULTRN_CORE(I); a[I] += static_cast<typename ARR::type>(sum)
+#define Y_TAO_MULADDTRN(I) Y_TAO_MULTRN_CORE(I); a[I] += __sum
                 YOCTO_TAO_LOOP(M.cols,MULADDTRN);
             }
             
@@ -212,7 +212,7 @@ for(size_t j=nr;j>0;--j) sum += M[j][I]
                 assert(a.size()>=M.cols);
                 assert(b.size()>=M.rows);
                 const size_t nr = M.rows;
-#define Y_TAO_MULSUBTRN(I) Y_TAO_MULTRN_CORE(I); a[I] -= static_cast<typename ARR::type>(sum)
+#define Y_TAO_MULSUBTRN(I) Y_TAO_MULTRN_CORE(I); a[I] -= __sum
                 
                 YOCTO_TAO_LOOP(M.cols,MULSUBTRN);
             }

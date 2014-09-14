@@ -44,22 +44,26 @@ namespace yocto
                 const Array &X;
                 const Array &Y;
                 Array       &Z;
-                const size_t N;     //!< initially 0, #data
-                const size_t Q;     //!< initially 0, #local variables
-                const size_t M;     //!< initially 0, #global variables
-                iMatrix      Gamma; //!< [QxM]
-                Vector       u;     //!< [Q] local variables
-                Vector       dFdu;  //!< [Q] local function gradient
-                Vector       beta;  //!< [Q] local least square gradient
-				Matrix       Curv;  //!< [QxQ] local curvature
+                const size_t N;      //!< initially 0, #data
+                const size_t Q;      //!< initially 0, #local variables
+                const size_t M;      //!< initially 0, #global variables
+                iMatrix      Gamma;  //!< [QxM]
+                Vector       u;      //!< [Q] local variables
+                Vector       dFdu;   //!< [Q] local function gradient
+                Vector       beta;   //!< [Q] local least square gradient
+				Matrix       alpha;  //!< [QxQ] local curvature
+				Matrix       __ag;   //!< [Q*M] alpha * Gamma
 
 				T compute_D(Function &F, const Array &a);
-				T compute_curvature(Function &F, const Array &a, derivative<T> &drvs, T h);
+				T compute_D(Function &F, const Array &a, derivative<T> &drvs, T h);
 
                 //! set N and memory
                 void prepare(size_t local_nvar, size_t global_nvar);
+
+				//! set N and memory, Gamma=Id
 				void prepare(size_t nvar);		
 
+				void collect( Matrix &Alpha, Array &Beta ) const throw();
 
 
             private:

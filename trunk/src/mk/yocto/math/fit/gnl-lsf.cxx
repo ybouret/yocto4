@@ -86,11 +86,12 @@ namespace yocto
 			(size_t &)Q = local_nvar;
 			(size_t &)M = global_nvar;
 
-			Gamma.make(Q,M);
-			u    .make(Q,0);
-			dFdu .make(Q,0);
-			beta .make(Q,0);
-			Curv .make(Q,Q);
+			Gamma .make(Q,M);
+			u     .make(Q,0);
+			dFdu  .make(Q,0);
+			beta  .make(Q,0);
+			alpha .make(Q,Q);
+			__ag  .make(Q,M);
 		}
 
 		template <>
@@ -118,7 +119,7 @@ namespace yocto
 		}
 
 		template <>
-		real_t LeastSquares<real_t>::Sample:: compute_curvature(Function &F, const Array &a, derivative<real_t> &drvs, real_t h)
+		real_t LeastSquares<real_t>::Sample:: compute_D(Function &F,const Array &a, derivative<real_t> &drvs, real_t h)
 		{
 			// Evaluate u from a
 			tao::mul(u,Gamma,a);
@@ -126,8 +127,9 @@ namespace yocto
 			// initialize
 			w.F = &F;
 			tao::ld(beta,REAL(0.0));
-			Curv.ldz();
+			alpha.ldz();
 
+			// accumulate
 			real_t ans = 0;
 			for(size_t i=N;i>0;--i)
 			{
@@ -142,22 +144,42 @@ namespace yocto
 					dFdu[q]  = g;
 					beta[q] += d * g; 
 				}
-				
+
 				for(size_t j=Q;j>0;--j)
 				{
 					for(size_t k=j;k>0;--k)
 					{
-						Curv[j][k] += dFdu[j] * dFdu[k];
+						alpha[j][k] += dFdu[j] * dFdu[k];
 					}
 				}
 
 				ans += d*d;
 			}
+
+			// symmetric part
+			for(size_t j=Q;j>0;--j)
+			{
+				for(size_t k=j-1;k>0;--k)
+				{
+					alpha[k][j] = alpha[j][k];
+				}
+			}
+
+			// compute alpha * Gamma
+			tao::mmul(__ag,alpha,Gamma);
+
 			return ans;
 		}
 
-		
 
+		template <>
+		void  LeastSquares<real_t>::Sample::collect( Matrix &Alpha, Array &Beta ) const throw()
+		{
+			assert(Alpha.rows == M);
+			assert(Alpha.cols == M);
+			assert(Beta.size() >= Q);
+			tao::mul_add_trn(Beta,Gamma,beta);
+		}
 	}
 
 }
