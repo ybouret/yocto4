@@ -34,7 +34,7 @@ namespace yocto
             static inline void set( ARR &a, const BRR &b ) throw()
             {
                 assert(a.size()<=b.size());
-#define Y_TAO_SET(I) a[I] = b[I]
+#define Y_TAO_SET(I) a[I] = static_cast<typename ARR::type>(b[I])
                 YOCTO_TAO_LOOP(a.size(),SET);
             }
             
@@ -157,7 +157,7 @@ namespace yocto
                 assert(a.size()>=M.rows);
                 assert(b.size()>=M.cols);
                 
-#define Y_TAO_MULROW(I) a[I] = static_cast<typename ARR::type>(dot(M[I],b));
+#define Y_TAO_MULROW(I) a[I] = static_cast<typename ARR::type>(dot(b,M[I]));
                 YOCTO_TAO_LOOP(M.rows,MULROW);
             }
             
@@ -166,7 +166,7 @@ namespace yocto
             {
                 assert(a.size()>=M.rows);
                 assert(b.size()>=M.cols);
-#define Y_TAO_MULADDROW(I) a[I] += static_cast<typename ARR::type>(dot(M[I],b))
+#define Y_TAO_MULADDROW(I) a[I] += static_cast<typename ARR::type>(dot(b,M[I]))
                 
                 YOCTO_TAO_LOOP(M.rows,MULADDROW);
             }
@@ -176,7 +176,7 @@ namespace yocto
             {
                 assert(a.size()>=M.rows);
                 assert(b.size()>=M.cols);
-#define Y_TAO_MULSUBROW(I) a[I] -= static_cast<typename ARR::type>(dot(M[I],b))
+#define Y_TAO_MULSUBROW(I) a[I] -= static_cast<typename ARR::type>(dot(b,M[I]))
                 
                 YOCTO_TAO_LOOP(M.rows,MULSUBROW);
             }
