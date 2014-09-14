@@ -234,10 +234,62 @@ namespace yocto
 		}
 
 		template <>
-		LeastSquares<real_t>:: LeastSquares()
+		LeastSquares<real_t>:: LeastSquares() :
+		drvs(),
+			h(REAL(1e-4))
 		{
 		}
 
+		template <>
+		void LeastSquares<real_t>:: fit(
+			Samples           &user_S,
+			Function          &user_F,
+			Array             &user_aorg,
+			const array<bool> &user_used,
+			Array             &user_aerr)
+		{
+			// prepare variables
+			S    = &user_S;
+			F    = &user_F;
+			ns   = S->size();
+			nvar = aorg.size();
+			assert(user_used.size()>=nvar);
+			assert(user_aerr.size()>=nvar);
+
+			// allocate memory
+			aorg.make(nvar,0);
+			used.make(nvar,true);
+			aerr.make(nvar,0);
+			beta.make(nvar,0);
+			curv.make(nvar,nvar);
+			step.make(nvar,0);
+
+			// initialize local variables
+			for(size_t i=nvar;i>=0;--i)
+			{
+				aorg[i] = user_aorg[i];
+				used[i] = user_used[i];
+				aerr[i] = user_aerr[i];
+			}
+
+			// starting point
+			real_t Dorg = computeD();
+		}
+
+		template <>
+		real_t LeastSquares<real_t>:: computeD()
+		{
+			real_t ans(0);
+			tao::ld(beta,0);
+			curv.ldz();
+			for(size_t k=ns;k>0;--k)
+			{
+				Sample &s = *(*S)[k];
+				ans += s.compute_D(*F,aorg,drvs,h);
+				s.collect(curv,beta);
+			}
+			return ans;
+		}
 
 	}
 }

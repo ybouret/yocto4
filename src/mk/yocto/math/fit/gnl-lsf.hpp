@@ -99,9 +99,31 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
 			};
 
-            
+        
+			void fit(Samples      &user_S,
+				Function          &user_F,
+				Array             &user_aorg,
+				const array<bool> &user_used,
+				Array             &user_aerr);
+
+
+
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);
+			Samples      *S;
+			Function     *F;
+			size_t        ns;   //! #samples
+			size_t        nvar; //! #variables
+			Vector        aorg;
+			vector<bool>  used;
+			Vector        aerr;
+			Vector        beta;
+			Matrix        curv;
+			Vector        step;
+			derivative<T> drvs;
+			T             h;
+
+			T       computeD();
         };
         
     }
