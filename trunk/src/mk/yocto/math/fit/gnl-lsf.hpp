@@ -108,6 +108,9 @@ namespace yocto
 				Array             &user_aerr);
 
 
+			static const int LAMBDA_MIN_POW10;
+			static const int LAMBDA_MAX_POW10;
+			static T compute_lam(int p) throw();
 
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);

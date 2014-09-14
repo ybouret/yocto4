@@ -254,8 +254,23 @@ namespace yocto
 			{
 				Sample &s = *(*S)[k];
 				//ans += s.compute_D(*F,aorg,drvs,h);
-				s.collect(curv,beta);
+				s.collect(alpha,beta);
 			}
+
+			for(size_t i=nvar;i>0;--i)
+			{
+				if( !used[i] )
+				{
+					beta[i] = 0.0;
+					for(size_t j=nvar;j>0;--j)
+					{
+						alpha[i][j] = 0;
+						alpha[j][i] = 0;
+					}
+					alpha[i][i] = 1.0;
+				}
+			}
+
 			return ans;
 		}
 
@@ -272,19 +287,36 @@ namespace yocto
 		}
 
 		template <>
+		const int LeastSquares<real_t>:: LAMBDA_MIN_POW10 = int(Ceil(Log10(numeric<real_t>::epsilon)));
+	
+		template <>
+		const int LeastSquares<real_t>:: LAMBDA_MAX_POW10 = int(Ceil(Log10(numeric<real_t>::maximum)));
+
+		template<>
+		real_t  LeastSquares<real_t>::  compute_lam(int p)  throw()
+		{
+			if(p<LAMBDA_MIN_POW10)
+			{
+				return 0;
+			}
+			else 
+			{
+				return ipower(REAL(10.0),p);
+			}
+		}
+
+
+		template <>
 		void LeastSquares<real_t>:: operator()(
 			Samples           &user_S,
 			Function          &user_F,
 			Array             &user_aorg,
 			const array<bool> &user_used,
 			Array             &user_aerr)
-		{
-			const int    LAMBDA_MIN_POW10 = int(Floor(Log10(numeric<real_t>::epsilon)));
-			const int    LAMBDA_MAX_POW10 = int(Ceil(Log10(numeric<real_t>::maximum)));
-			const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
+		{ 
+			static const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
 
-			int lam_pow10 = LAMBDA_INI_POW10;
-			real_t lam    = ipower(REAL(10.0),lam_pow10);
+			int     p = LAMBDA_INI_POW10;
 
 			// prepare variables
 			S    = &user_S;
@@ -315,16 +347,25 @@ namespace yocto
 				
 			// starting point
 			real_t Dorg = computeD();
-			
+			std::cerr << "alpha=" << alpha << std::endl;
+			std::cerr << "beta="  << beta  << std::endl;
+
 			// find lambda
-			while( !build_curvature(lam) )
+			while( !build_curvature(compute_lam(p)) )
 			{
-				++lam_pow10;
-				if(lam_pow10>LAMBDA_MAX_POW10)
+				++p;
+				if(p>LAMBDA_MAX_POW10)
 				{
+					std::cerr << "singular" << std::endl;
 					exit(1);
 				}
 			}
+			std::cerr << "p=" << p << std::endl;
+
+			// compute step
+			tao::set(step,beta);
+			crout<real_t>::solve(curv,step);
+			std::cerr << "step=" << step << std::endl;
 
 
 
