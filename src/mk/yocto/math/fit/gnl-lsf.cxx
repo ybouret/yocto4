@@ -65,6 +65,8 @@ namespace yocto
 			u(),
 			dFdu(),
 			beta(),
+			alpha(),
+			curv(),
 			w(*this),
 			f(&w,&Wrapper::Eval)
 		{
@@ -92,6 +94,7 @@ namespace yocto
 			beta  .make(Q,0);
 			alpha .make(Q,Q);
 			__ag  .make(Q,M);
+			curv  .make(M,M);
 		}
 
 		template <>
@@ -168,6 +171,8 @@ namespace yocto
 			// compute alpha * Gamma
 			tao::mmul(__ag,alpha,Gamma);
 
+			// compute curv = Gamma'*alpha
+			tao::mmul_ltrn(curv,Gamma,__ag);
 			return ans;
 		}
 
@@ -179,6 +184,13 @@ namespace yocto
 			assert(Alpha.cols == M);
 			assert(Beta.size() >= Q);
 			tao::mul_add_trn(Beta,Gamma,beta);
+			for(size_t i=M;i>0;--i)
+			{
+				for(size_t j=M;j>0;--j)
+				{
+					Alpha[i][j] += curv[i][j];
+				}
+			}
 		}
 	}
 
