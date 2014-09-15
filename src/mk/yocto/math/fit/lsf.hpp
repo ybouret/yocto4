@@ -47,21 +47,22 @@ namespace yocto
                 
 				typedef arc_ptr<Sample> Pointer;
                 
-				const Array &X;
-				const Array &Y;
-				Array       &Z;
-				const size_t N;      //!< initially 0, #data
-				const size_t Q;      //!< initially 0, #local variables
-				const size_t M;      //!< initially 0, #global variables
-				iMatrix      Gamma;  //!< [QxM], local variables from global variables
-				Vector       u;      //!< [Q] local variables
-				Vector       dFdu;   //!< [Q] local function gradient
-				Vector       beta;   //!< [Q] local least square gradient
-				Matrix       alpha;  //!< [QxQ] local curvature
-				Matrix       __ag;   //!< [Q*M] alpha * Gamma
-				Matrix       Alpha;  //!< [MxM] Gamma'*__ag
+				const Array   &X;
+				const Array   &Y;
+				Array         &Z;
+				const size_t   N;      //!< initially 0, #data
+				const size_t   Q;      //!< initially 0, #local variables
+				const size_t   M;      //!< initially 0, #global variables
+				iMatrix        Gamma;  //!< [QxM], local variables from global variables
+                Vector         u;      //!< [Q] local variables
+				Vector         dFdu;   //!< [Q] local function gradient
+				Vector         beta;   //!< [Q] local least square gradient
+				Matrix         alpha;  //!< [QxQ] local curvature
+				Matrix         __ag;   //!< [Q*M] alpha * Gamma
+				Matrix         Alpha;  //!< [MxM] Gamma'*__ag
+                T              D;      //!< last D value
                 
-				T compute_D(Function &F, const Array &a);
+				T compute_D(Function &F, const Array &a) const;
 				T compute_D(Function &F, const Array &a, derivative<T> &drvs, T h);
                 
 				//! set N and memory
@@ -73,9 +74,14 @@ namespace yocto
                 //! append Alpha and Gamma'*beta
 				void collect( Matrix &global_alpha, Array &global_beta ) const throw();
                 
+                //! set appropriate coefficient
+                void connect( size_t local_ivar, size_t gloval_ivar ) throw();
+                
                 
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Sample);
+                
+                //! for gradient computation
 				class Wrapper
 				{
 				public:
@@ -83,8 +89,8 @@ namespace yocto
 					virtual ~Wrapper() throw();
 					Sample   &S;
 					Function *F;
-					T         x;
-					size_t    q;
+					T         x; //!< current x value
+					size_t    q; //!< current variable
 					T        Eval(T U);
                     
 				private:
@@ -108,6 +114,10 @@ namespace yocto
                 void prepare(size_t local_nvar, size_t global_nvar);
 				void prepare(size_t nvar);
                 
+                T computeD(Function &F, const Array &) const;
+                T corr() const;
+                
+                
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
 			};
@@ -129,7 +139,7 @@ namespace yocto
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);
             
-            T       computeD();
+            T       computeD();             //!< D, beta, alpha
 			bool    build_curvature(T lam); //!< curv from alpha and try lu
             T       evalD(T x);             //!< Atmp = Aorg+x*step
             
@@ -148,8 +158,8 @@ namespace yocto
             Function1     scan;  //!< evalD(x)
             
         public:
-			T             h;     //!< derivative step guest
-            
+			T             h;       //!< derivative step guest, default 1e-4
+            bool          verbose; //!< default: false
             
 		};
         

@@ -159,8 +159,8 @@ namespace yocto {
 					mean_x         += delta_x / i;
 					mean_y         += delta_y / i;
 				}
-				const T pop_sd_x = std::sqrt( sum_sq_x / n );
-				const T pop_sd_y = std::sqrt( sum_sq_y / n );
+				const T pop_sd_x = Sqrt( sum_sq_x / n );
+				const T pop_sd_y = Sqrt( sum_sq_y / n );
 				const T cov_x_y  = sum_coproduct / n;
 				return  cov_x_y / (pop_sd_x * pop_sd_y);
 			}
