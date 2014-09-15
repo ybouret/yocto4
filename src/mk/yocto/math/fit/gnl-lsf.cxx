@@ -309,6 +309,7 @@ namespace yocto
 		real_t LeastSquares<real_t>:: computeD()
 		{
 			real_t ans(0);
+            
             // full evaluation
 			tao::ld(beta,0);
 			alpha.ldz();
@@ -319,7 +320,7 @@ namespace yocto
 				s.collect(alpha,beta);
 			}
             
-            // alpha correction
+            // alpha and beta correction
 			for(size_t i=nvar;i>0;--i)
 			{
 				if( !used[i] )
@@ -465,9 +466,8 @@ namespace yocto
             //__________________________________________________________________
             const real_t Dtmp = evalD(1.0);
             std::cerr << "Dtmp="<< Dtmp << std::endl;
-            
-            //const real_t rate = tao::dot(beta,step);
-            //std::cerr << "rate="<< rate << std::endl;
+            const double dD = Fabs(Dtmp-Dorg);
+            std::cerr << "dD  ="<< dD << std::endl;
             
             //__________________________________________________________________
             //
@@ -500,20 +500,20 @@ namespace yocto
                 // successfull step
                 //______________________________________________________________
                 p = max_of(--p,LAMBDA_MIN_POW10);
-                std::cerr << "aold=" << aorg << std::endl;
                 for(size_t i=nvar;i>0;--i)
                 {
+                    atmp[i]  = aorg[i];
                     aorg[i] += XX.b * step[i];
+                    atmp[i] -= aorg[i];
                 }
                 std::cerr << "aorg=" << aorg << std::endl;
+                std::cerr << "diff=" << atmp << std::endl;
                 const real_t Dnew = computeD();
                
                 //______________________________________________________________
                 //
                 // Test convergence on least squares value
                 //______________________________________________________________
-                const double dD = Fabs(Dorg-Dnew);
-                std::cerr << "dD=" << dD << std::endl;
                 
                 
                 Dorg = Dnew;
