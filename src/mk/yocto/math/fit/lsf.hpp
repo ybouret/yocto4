@@ -47,9 +47,9 @@ namespace yocto
                 
 				typedef arc_ptr<Sample> Pointer;
                 
-				const Array   &X;
-				const Array   &Y;
-				Array         &Z;
+				const Array   &X;      //!< the X data
+				const Array   &Y;      //!< the Y data
+				Array         &Z;      //!< will be F(Z)
 				const size_t   N;      //!< initially 0, #data
 				const size_t   Q;      //!< initially 0, #local variables
 				const size_t   M;      //!< initially 0, #global variables
@@ -77,6 +77,9 @@ namespace yocto
                 //! set appropriate coefficient
                 void connect( size_t local_ivar, size_t gloval_ivar ) throw();
                 
+                //! full polynomial fit
+                void polynomial( Array &aorg, const array<bool> &used, Array &aerr, typename numeric<T>::function *transform = 0);
+
                 
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Sample);
