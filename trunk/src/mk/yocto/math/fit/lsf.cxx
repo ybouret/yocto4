@@ -1,5 +1,5 @@
 #include "yocto/math/ztype.hpp"
-#include "yocto/math/fit/gnl-lsf.hpp"
+#include "yocto/math/fit/lsf.hpp"
 #include "yocto/math/kernel/tao.hpp"
 
 
@@ -67,6 +67,7 @@ namespace yocto
         beta(),
         alpha(),
         Alpha(),
+        D(0),
         w(*this),
         f(&w,&Wrapper::Eval)
 		{
@@ -109,13 +110,13 @@ namespace yocto
 		}
         
 		template <>
-		real_t LeastSquares<real_t>::Sample:: compute_D( Function &F, const Array &a)
+		real_t LeastSquares<real_t>::Sample:: compute_D( Function &F, const Array &a) const
 		{
             //__________________________________________________________________
             //
 			// Evaluate u from a
             //__________________________________________________________________
-			tao::mul(u,Gamma,a);
+			tao::mul((Vector&)u,Gamma,a);
             
             //__________________________________________________________________
             //
@@ -202,6 +203,8 @@ namespace yocto
 			// compute curv = Gamma'*alpha
             //__________________________________________________________________
 			tao::mmul_ltrn(Alpha,Gamma,__ag);
+            
+            D = ans;
 			return ans;
 		}
         
@@ -209,8 +212,6 @@ namespace yocto
 		template <>
 		void  LeastSquares<real_t>::Sample::collect( Matrix &user_alpha, Array &user_beta ) const throw()
 		{
-			//std::cerr << "Alpha.rows=" << Alpha.rows <<  ", M=" << M << std::endl;
-			//std::cerr << "Alpha.cols=" << Alpha.cols <<  ", M=" << M << std::endl;
 			assert(user_alpha.rows == M);
 			assert(user_alpha.cols == M);
 			assert(user_beta.size() >= Q);
@@ -223,6 +224,21 @@ namespace yocto
 				}
 			}
 		}
+        
+        template <>
+        void LeastSquares<real_t>::Sample:: connect( size_t local_ivar, size_t global_ivar ) throw()
+        {
+            assert(local_ivar  >  0);
+            assert(global_ivar >  0);
+            assert(local_ivar  <= global_ivar);
+            assert(local_ivar  <= Q);
+            assert(global_ivar <= M);
+            for(size_t j=1;j<=M;++j) Gamma[local_ivar][j] = 0;
+            Gamma[local_ivar][global_ivar] = 1;
+        
+        }
+
+        
 	}
     
 }
@@ -261,7 +277,72 @@ namespace yocto
         {
             prepare(nvar, nvar);
         }
+
+        template <>
+        real_t  LeastSquares<real_t>:: Samples:: computeD(Function &F, const Array &a) const
+        {
+            real_t D = 0;
+            for(size_t i=size();i>0;--i)
+            {
+                const Sample &sample = *(*this)[i];
+                D += sample.compute_D(F,a);
+            }
+            return D;
+        }
         
+        template <>
+        real_t  LeastSquares<real_t>:: Samples::corr() const
+        {
+            size_t n = 0;
+            real_t mean_y = 0;
+            real_t mean_z = 0;
+            
+            for(size_t i=size();i>0;--i)
+            {
+                const Sample &sample = *(*this)[i];
+                const size_t  N = sample.N;
+                n += N;
+                for(size_t j=N;j>0;--j)
+                {
+                    mean_y += sample.Y[j];
+                    mean_z += sample.Z[j];
+                }
+            }
+            if(n<=1)
+            {
+                throw exception("Samples correlation: no data!");
+            }
+            mean_y /= n;
+            mean_z /= n;
+            
+            real_t sum_dy2 = 0;
+            real_t sum_dz2 = 0;
+            real_t sum_dyz = 0;
+            
+            for(size_t i=size();i>0;--i)
+            {
+                const Sample &sample = *(*this)[i];
+                const size_t  N = sample.N;
+                for(size_t j=N;j>0;--j)
+                {
+                    const real_t dy = sample.Y[j] - mean_y;
+                    const real_t dz = sample.Z[j] - mean_z;
+                    sum_dy2 += dy*dy;
+                    sum_dz2 += dz*dz;
+                    sum_dyz += dy*dz;
+                }
+            }
+            const real_t sig_y = Sqrt(sum_dy2/n);
+            const real_t sig_z = Sqrt(sum_dz2/n);
+            const real_t covyz = sum_dyz / n;
+            const real_t den   = sig_y * sig_z;
+            if(den<=0)
+            {
+                throw exception("Samples correlation: singular deviation");
+            }
+            return covyz/den;
+        }
+
         
 	}
     
@@ -288,20 +369,15 @@ namespace yocto
 		real_t LeastSquares<real_t>:: evalD(real_t x)
 		{
             tao::setprobe(Atmp, Aorg, x, step);
-            real_t ans(0);
-            for(size_t k=ns;k>0;--k)
-            {
-                Sample &s = *(*S)[k];
-                ans += s.compute_D(*F,Atmp);
-            }
-            return ans;
+            return S->computeD(*F,Atmp);
         }
         
 		template <>
 		LeastSquares<real_t>:: LeastSquares() :
 		drvs(),
         scan(this, & LeastSquares<real_t>::evalD),
-        h(REAL(1e-4))
+        h(REAL(1e-4)),
+        verbose(false)
 		{
 		}
         
@@ -310,7 +386,10 @@ namespace yocto
 		{
 			real_t ans(0);
             
+            //__________________________________________________________________
+            //
             // full evaluation
+            //__________________________________________________________________
 			tao::ld(beta,0);
 			alpha.ldz();
 			for(size_t k=ns;k>0;--k)
@@ -320,7 +399,10 @@ namespace yocto
 				s.collect(alpha,beta);
 			}
             
+            //__________________________________________________________________
+            //
             // alpha and beta correction
+            //__________________________________________________________________
 			for(size_t i=nvar;i>0;--i)
 			{
 				if( !Used[i] )
@@ -351,6 +433,8 @@ namespace yocto
 			}
 			return crout<real_t>::build(curv);
 		}
+        
+        
         
 		template <>
 		const int LeastSquares<real_t>:: LAMBDA_MIN_POW10 = int(Floor(Log10(numeric<real_t>::epsilon)));
@@ -433,15 +517,19 @@ namespace yocto
             int p = LAMBDA_INI_POW10;
             
             
+#define Y_LSF_CB() do { if(cb && !(*cb)(*F,*S) ) return false; } while(false)
             //__________________________________________________________________
             //
             // starting point
             //__________________________________________________________________
-#define Y_LSF_CB() do { if(cb && !(*cb)(*F,*S) ) return false; } while(false)
-            
             real_t Dorg  = computeD();
-            std::cerr << "Dorg ="  << Dorg  << std::endl;
-            
+            size_t n_ok  = 0;
+            if(verbose)
+            {
+                std::cerr << "#init" << std::endl;
+                std::cerr << "a=" << Aorg << std::endl;
+                std::cerr << "D=" << Dorg << std::endl;
+            }
             
             
             //__________________________________________________________________
@@ -456,12 +544,14 @@ namespace yocto
                 ++p;
                 if(p>LAMBDA_MAX_POW10)
                 {
-                    std::cerr << "singular" << std::endl;
+                    if(verbose)
+                    {
+                        std::cerr << "#Fit: singular system" << std::endl;
+                    }
                     return result;
                 }
                 goto UPDATE_LAMBDA;
             }
-            std::cerr << "p=" << p << std::endl;
             
             //__________________________________________________________________
             //
@@ -469,16 +559,12 @@ namespace yocto
             //__________________________________________________________________
             tao::set(step,beta);
             crout<real_t>::solve(curv,step);
-            std::cerr << "Aorg=" << Aorg << std::endl;
-            std::cerr << "beta=" << beta << std::endl;
-            std::cerr << "step=" << step << std::endl;
             
             //__________________________________________________________________
             //
             // compute full step trial
             //__________________________________________________________________
             const real_t Dtmp = evalD(1.0);
-            std::cerr << "Dtmp=" << Dtmp << std::endl;
             
             //__________________________________________________________________
             //
@@ -514,9 +600,14 @@ namespace yocto
                     Atmp[i] -= Aorg[i];
                     aorg[i]  = Aorg[i]; //!< a good point
                 }
-                std::cerr << "diff=" << Atmp << std::endl;
                 const real_t Dnew = computeD();
-                
+                ++n_ok;
+                if(verbose)
+                {
+                    std::cerr << "#step " << n_ok << std::endl;
+                    std::cerr << "a=" << Aorg << std::endl;
+                    std::cerr << "D=" << Dorg << std::endl;
+                }
                 
                 //______________________________________________________________
                 //
@@ -534,8 +625,11 @@ namespace yocto
                 
                 if(cvg)
                 {
-                    std::cerr << "SUCCESS: variables numerically converged" << std::endl;
                     result = true;
+                    if( verbose )
+                    {
+                        std::cerr << "#Fit: variables convergence" << std::endl;
+                    }
                     goto COMPUTE_ERROR;
                 }
                 
@@ -548,12 +642,14 @@ namespace yocto
                 //
                 // must increase lambda, from the same starting point
                 //______________________________________________________________
-                std::cerr << "must decrease step" << std::endl;
                 const real_t dD = Fabs(Dorg-Dtmp);
                 
                 if( dD<=0 || ++p>LAMBDA_MAX_POW10)
                 {
-                    std::cerr << "spurious" << std::endl;
+                    if(verbose)
+                    {
+                        std::cerr << "#Fit: least squares convergence (spurious)" << std::endl;
+                    }
                     result = true;
                     goto COMPUTE_ERROR;
                     
@@ -602,8 +698,6 @@ namespace yocto
                     aerr[i] = 0;
                 }
             }
-            std::cerr << "aorg=" << aorg << std::endl;
-            std::cerr << "aerr=" << aerr << std::endl;
             return result;
             
         }
