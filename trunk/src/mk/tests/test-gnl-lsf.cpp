@@ -60,21 +60,26 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	s1.Gamma[1][1] = 1;
 	s1.Gamma[2][2] = 1;
 	derivative<double> drvs;
-	std::cerr << "D1=" << s1.compute_D(F,a) << std::endl;
-	std::cerr << "D1=" << s1.compute_D(F,a,drvs,1e-4) << std::endl;
-	std::cerr << "a =" << a << std::endl;
-	std::cerr << "u =" << s1.u << std::endl;
-	std::cerr << "beta="  << s1.beta  << std::endl;
-	std::cerr << "alpha=" << s1.alpha << std::endl;
-	std::cerr << "Gamma=" << s1.Gamma << std::endl;
-	std::cerr << "__ag="  << s1.__ag  << std::endl;
-	std::cerr << "curv="  << s1.curv  << std::endl;
+	std::cerr << "D1    = " << s1.compute_D(F,a) << std::endl;
+	std::cerr << "D1    = " << s1.compute_D(F,a,drvs,1e-4) << std::endl;
+	std::cerr << "a     = " << a << std::endl;
+	std::cerr << "u     = " << s1.u << std::endl;
+	std::cerr << "beta  = " << s1.beta  << std::endl;
+	std::cerr << "alpha = " << s1.alpha << std::endl;
+	std::cerr << "Gamma = " << s1.Gamma << std::endl;
+	std::cerr << "__ag  = " << s1.__ag  << std::endl;
+	std::cerr << "Alpha = " << s1.Alpha  << std::endl;
 
+    std::cerr << std::endl;
+    
 	vector<double> Beta( a.size(), 0);
 	matrix<double> Alpha( a.size(), a.size() );
+    std::cerr << "LAMBDA_MIN_POW10=" << LS::LAMBDA_MIN_POW10 << std::endl;
+    std::cerr << "LAMBDA_MAX_POW10=" << LS::LAMBDA_MAX_POW10 << std::endl;
+
 	s1.collect(Alpha,Beta);
-	std::cerr << "Alpha=" << Alpha << std::endl;
-	std::cerr << "Beta="  << Beta  << std::endl;
+	std::cerr << "Alpha = " << Alpha << std::endl;
+	std::cerr << "Beta  = "  << Beta  << std::endl;
 
 	LS fit;
 	vector<bool> used(a.size(),true);

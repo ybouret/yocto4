@@ -53,7 +53,7 @@ namespace yocto
 				Vector       beta;   //!< [Q] local least square gradient
 				Matrix       alpha;  //!< [QxQ] local curvature
 				Matrix       __ag;   //!< [Q*M] alpha * Gamma
-				Matrix       curv;   //!< [MxM] Gamma'*__ag
+				Matrix       Alpha;  //!< [MxM] Gamma'*__ag
 
 				T compute_D(Function &F, const Array &a);
 				T compute_D(Function &F, const Array &a, derivative<T> &drvs, T h);
@@ -64,7 +64,7 @@ namespace yocto
 				//! set N and memory, Gamma=Id
 				void prepare(size_t nvar);		
 
-				void collect( Matrix &Alpha, Array &Beta ) const throw();
+				void collect( Matrix &global_alpha, Array &global_beta ) const throw();
 
 
 			private:
