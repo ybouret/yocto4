@@ -3,6 +3,9 @@
 #include "yocto/sequence/lw-array.hpp"
 #include "yocto/string/conv.hpp"
 
+#include "yocto/ios/ocstream.hpp"
+
+
 using namespace yocto;
 using namespace math;
 
@@ -22,6 +25,16 @@ namespace
 	};
 }
 
+
+static inline void save(const char *fn, const array<double> &x, const array<double> &y)
+{
+    ios::ocstream fp(fn,false);
+    for(size_t i=1;i<=x.size();++i)
+    {
+        fp("%g %g\n", x[i], y[i]);
+    }
+}
+
 YOCTO_UNIT_TEST_IMPL(gnl)
 {
 
@@ -37,11 +50,15 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	const lw_array<double> t2( (double*)_t2, sizeof(_t2)/sizeof(_t2[0]) );
 	const lw_array<double> x2( (double*)_x2, sizeof(_x2)/sizeof(_x2[0]) );
 
+    save("d1.dat",t1,x1);
+    save("d2.dat",t2,x2);
+    
+    
 	vector<double> z1(t1.size(),0);
 	vector<double> z2(t2.size(),0);
 
 	typedef LeastSquares<double> LS;
-	typedef LS::Sample Sample;
+	typedef LS::Sample  Sample;
 	typedef LS::Samples Samples;
 
 	Samples samples;
@@ -53,8 +70,8 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 
 	vector<double> a(3,0);
 
-	a[1] = 1.0;
-	a[2] = 2.0;
+	a[1] = 0.15;
+	a[2] = -100;
 
 	s1.prepare(2,3);
 	s1.Gamma[1][1] = 1;

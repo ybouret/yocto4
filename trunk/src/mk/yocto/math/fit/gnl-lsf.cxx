@@ -299,6 +299,20 @@ namespace yocto
 			return ans;
 		}
         
+        template <>
+		real_t LeastSquares<real_t>:: evalD(real_t x)
+		{
+            tao::setprobe(atmp, aorg, x, step);
+            real_t ans(0);
+            for(size_t k=ns;k>0;--k)
+            {
+                Sample &s = *(*S)[k];
+                ans += s.compute_D(*F,atmp);
+            }
+            return ans;
+        }
+        
+        
 		template <>
 		bool LeastSquares<real_t>:: build_curvature(real_t lam)
 		{
@@ -358,6 +372,7 @@ namespace yocto
             //__________________________________________________________________
 			aorg  .make(nvar,0);
 			used  .make(nvar,true);
+            atmp  .make(nvar,0);
 			aerr  .make(nvar,0);
 			beta  .make(nvar,0);
 			alpha .make(nvar,nvar);
@@ -410,6 +425,9 @@ namespace yocto
 			tao::set(step,beta);
 			crout<real_t>::solve(curv,step);
 			std::cerr << "step=" << step << std::endl;
+            
+            real_t Dtmp = evalD(1.0);
+            std::cerr << "Dtmp="<< Dtmp << std::endl;
             
             
             

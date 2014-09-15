@@ -74,6 +74,15 @@ namespace yocto
 #define Y_TAO_MULSUB(I) a[I] -= x*static_cast<typename ARR::type>(b[I])
 				YOCTO_TAO_LOOP(a.size(),MULSUB);
 			}
+            
+            template <typename ARR, typename BRR, typename CRR>
+            static inline void setprobe( ARR &a, const BRR &b, typename ARR::param_type x, const CRR &c) throw()
+            {
+                assert(a.size()<=b.size());
+                assert(a.size()<=c.size());
+#define Y_TAO_SETPROBE(I) a[I] = static_cast<typename ARR::type>(b[I]) + x * static_cast<typename ARR::type>(c[I])
+                YOCTO_TAO_LOOP(a.size(),SETPROBE);
+            }
 
 			//! a*a for scalar type
 			template <typename ARR>
