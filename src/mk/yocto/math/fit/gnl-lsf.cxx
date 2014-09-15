@@ -249,6 +249,8 @@ namespace yocto
 
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/math/opt/bracket.hpp"
+#include "yocto/math/opt/minimize.hpp"
 
 namespace yocto
 {
@@ -262,9 +264,23 @@ namespace yocto
 		{
 		}
         
+        template <>
+		real_t LeastSquares<real_t>:: evalD(real_t x)
+		{
+            tao::setprobe(atmp, aorg, x, step);
+            real_t ans(0);
+            for(size_t k=ns;k>0;--k)
+            {
+                Sample &s = *(*S)[k];
+                ans += s.compute_D(*F,atmp);
+            }
+            return ans;
+        }
+
 		template <>
 		LeastSquares<real_t>:: LeastSquares() :
 		drvs(),
+        scan(this, & LeastSquares<real_t>::evalD),
         h(REAL(1e-4))
 		{
 		}
@@ -299,18 +315,6 @@ namespace yocto
 			return ans;
 		}
         
-        template <>
-		real_t LeastSquares<real_t>:: evalD(real_t x)
-		{
-            tao::setprobe(atmp, aorg, x, step);
-            real_t ans(0);
-            for(size_t k=ns;k>0;--k)
-            {
-                Sample &s = *(*S)[k];
-                ans += s.compute_D(*F,atmp);
-            }
-            return ans;
-        }
         
         
 		template <>
@@ -326,7 +330,7 @@ namespace yocto
 		}
         
 		template <>
-		const int LeastSquares<real_t>:: LAMBDA_MIN_POW10 = int(Ceil(Log10(numeric<real_t>::epsilon)));
+		const int LeastSquares<real_t>:: LAMBDA_MIN_POW10 = int(Floor(Log10(numeric<real_t>::epsilon)));
         
 		template <>
 		const int LeastSquares<real_t>:: LAMBDA_MAX_POW10 = int(Ceil(Log10(numeric<real_t>::maximum)))/2;
@@ -334,7 +338,7 @@ namespace yocto
 		template<>
 		real_t  LeastSquares<real_t>::  compute_lam(int p)  throw()
 		{
-			if(p<LAMBDA_MIN_POW10)
+			if(p<=LAMBDA_MIN_POW10)
 			{
 				return 0;
 			}
@@ -396,7 +400,8 @@ namespace yocto
             //
 			// starting point
             //__________________________________________________________________
-			real_t Dorg = computeD();
+			real_t Dorg  = computeD();
+            size_t count = 0;
             std::cerr << "Dorg ="  << Dorg  << std::endl;
 			std::cerr << "alpha="  << alpha << std::endl;
 			std::cerr << "beta ="  << beta  << std::endl;
@@ -407,7 +412,9 @@ namespace yocto
             //
 			// find lambda
             //__________________________________________________________________
-            while( !build_curvature(compute_lam(p)) )
+        UPDATE_LAMBDA:
+            ++count;
+            if( !build_curvature( compute_lam(p) ) )
 			{
 				++p;
 				if(p>LAMBDA_MAX_POW10)
@@ -415,6 +422,7 @@ namespace yocto
 					std::cerr << "singular" << std::endl;
 					exit(1);
 				}
+                goto UPDATE_LAMBDA;
 			}
             std::cerr << "p=" << p << std::endl;
             
@@ -429,7 +437,46 @@ namespace yocto
             real_t Dtmp = evalD(1.0);
             std::cerr << "Dtmp="<< Dtmp << std::endl;
             
-            
+            if(Dtmp<Dorg)
+            {
+                std::cerr << "must optimize" << std::endl;
+                triplet<real_t> XX = { 0,    1,    1    };
+                triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
+                if( bracket<real_t>::inside(scan, XX, DD) )
+                {
+                    std::cerr << "\tother local: XX=" << XX << ",  DD=" << DD << std::endl;
+                    minimize<real_t>(scan, XX, DD, 0);
+                }
+                else
+                {
+                    std::cerr << "\tno other local minimum" << std::endl;
+                    XX.b = 1.0;
+                    DD.b = Dtmp;
+                }
+                std::cerr << "min@" << XX.b << " = " << DD.b << std::endl;
+                
+                //______________________________________________________________
+                //
+                // successfull step
+                //______________________________________________________________
+                p = max_of(--p,LAMBDA_MIN_POW10);
+                for(size_t i=nvar;i>0;--i)
+                {
+                    aorg[i] += XX.b * step[i];
+                }
+                std::cerr << "aorg=" << aorg << std::endl;
+                Dorg = computeD();
+            }
+            else
+            {
+                std::cerr << "must decrease step" << std::endl;
+                if(++p>LAMBDA_MAX_POW10)
+                {
+                    std::cerr << "spurious" << std::endl;
+                    exit(2);
+                }
+                goto UPDATE_LAMBDA;
+            }
             
 		}
         
