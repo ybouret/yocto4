@@ -73,7 +73,7 @@ namespace yocto
                     if( !fp.query(C) )
                     {
                         t_char::release(ch);
-                        return false;
+                        return 0;
                     }
                     ch->code = C;
                     cache.push_back(ch);

@@ -50,7 +50,7 @@ namespace yocto
         typedef typename settings::creator                creator;
         typedef map<type_spec,creator>                    database;
         typedef typename type_traits<typename tl::safe_type_at<TLIST,0,empty_type>::result>::parameter_type param1;
-		typedef typename type_traits<typename tl::safe_type_at<TLIST,1,empty_type>::result>::parameter_type param2;
+	typedef typename type_traits<typename tl::safe_type_at<TLIST,1,empty_type>::result>::parameter_type param2;
 
         inline virtual ~factory() throw() {}
         
@@ -92,7 +92,9 @@ namespace yocto
             return check_addr(get(t)(p1,p2));
         }
         
-        
+       
+	inline explicit factory() : creators() {}
+ 
     protected:
         database creators;
         
