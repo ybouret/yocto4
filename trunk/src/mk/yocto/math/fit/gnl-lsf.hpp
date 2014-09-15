@@ -94,7 +94,9 @@ namespace yocto
 				explicit Samples() throw();
 				virtual ~Samples() throw();
 				Sample & append( const Array &X, const Array &Y, Array &Z );
-                
+                void prepare(size_t local_nvar, size_t global_nvar);
+				void prepare(size_t nvar);
+
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
 			};

@@ -71,7 +71,7 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	vector<double> a(3,0);
 
 	a[1] = 0.15;
-	a[2] = -100;
+	a[2] = -150;
 
 	s1.prepare(2,3);
 	s1.Gamma[1][1] = 1;
@@ -106,6 +106,118 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 
 	fit(samples,F,a,used,aerr);
 
+    save("f1.dat",t1,z1);
+    
 
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+#include "yocto/code/ipower.hpp"
+
+namespace
+{
+	
+	
+	
+	template <typename T>
+	class Poly
+	{
+	public:
+		explicit Poly() throw() {}
+		virtual ~Poly() throw() {}
+		
+		inline T Eval( double x, const array<T> &a )
+		{
+			T ans = 0;
+			for( size_t i=1; i <= a.size(); ++i )
+			{
+				ans += a[i] * ipower(x,i-1);
+			}
+			return ans;
+		}
+		
+#if 0
+		bool ToDo(typename       least_squares<T>::function &F,
+                  const typename least_squares<T>::samples  &Samples)
+		{
+			
+			return true;
+		}
+#endif
+        
+		
+	private:
+		YOCTO_DISABLE_COPY_AND_ASSIGN(Poly);
+	};
+	
+}
+
+#include "yocto/code/rand.hpp"
+#include "yocto/sort/quick.hpp"
+
+YOCTO_UNIT_TEST_IMPL(fit_poly)
+{
+	
+	const size_t   N = 10 + alea_leq(290);
+	vector<double> X( N, 0 );
+	vector<double> Y( N, 0 );
+	vector<double> Z( N, 0 );
+	
+	for( size_t i=1; i <= N; ++i )
+	{
+		X[i] = 6.14 * alea<double>();
+		Y[i] = Cos( X[i] ) + 0.2 * (0.5 - alea<double>() );
+		
+	}
+	
+	{
+		co_qsort(X,Y);
+		save("poly.dat",X,Y);
+	}
+	
+    LeastSquares<double>::Samples samples;
+    samples.append(X,Y,Z);
+	Poly<double> P;
+    
+	//least_squares<double>::callback cb( &P, & Poly<double>::ToDo );
+	LeastSquares<double>::Function F(  &P, & Poly<double>::Eval );
+    LeastSquares<double> Fit;
+	
+    
+	for( size_t nv = 1; nv <= 5; ++nv )
+	{
+		std::cerr << "-- nvar=" << nv << std::endl;
+		vector<double> aorg(nv,0);
+		vector<bool>   used(nv,true);
+		vector<double> aerr(nv,0);
+		
+		if( nv > 2 && alea<double>() > 0.7 )
+        {
+			//used[ 1 + alea_lt(nv) ] = false;
+        }
+        
+        samples.prepare(nv);
+		Fit(samples, F, aorg, used, aerr );
+		
+#if 0
+        //LeastSquare.ftol = 1e-7;
+		if(    != least_squares_failure )
+		{
+			for( size_t i=1; i <= nv; ++i )
+			{
+				std::cerr << "a[" << i << "]=" << aorg[i] << " +/- " << aerr[i] << std::endl;
+			}
+			ios::ocstream fp( vformat("lsf.%u.dat", unsigned(nv)), false );
+			for( size_t i=1; i <= N; ++i )
+			{
+				fp("%g %g %g\n", X[i], Y[i], Z[i] );
+			}
+		}
+#endif
+	}
+	
+	
+}
+YOCTO_UNIT_TEST_DONE()
+
