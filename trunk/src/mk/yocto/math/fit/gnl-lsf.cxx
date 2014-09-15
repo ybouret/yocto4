@@ -287,12 +287,12 @@ namespace yocto
         template <>
 		real_t LeastSquares<real_t>:: evalD(real_t x)
 		{
-            tao::setprobe(atmp, aorg, x, step);
+            tao::setprobe(Atmp, Aorg, x, step);
             real_t ans(0);
             for(size_t k=ns;k>0;--k)
             {
                 Sample &s = *(*S)[k];
-                ans += s.compute_D(*F,atmp);
+                ans += s.compute_D(*F,Atmp);
             }
             return ans;
         }
@@ -316,14 +316,14 @@ namespace yocto
 			for(size_t k=ns;k>0;--k)
 			{
 				Sample &s = *(*S)[k];
-				ans += s.compute_D(*F,aorg,drvs,h);
+				ans += s.compute_D(*F,Aorg,drvs,h);
 				s.collect(alpha,beta);
 			}
             
             // alpha and beta correction
 			for(size_t i=nvar;i>0;--i)
 			{
-				if( !used[i] )
+				if( !Used[i] )
 				{
 					beta[i] = 0.0;
 					for(size_t j=nvar;j>0;--j)
@@ -373,12 +373,11 @@ namespace yocto
         
         
         template <>
-        fit_status LeastSquares<real_t>:: operator()(
-                                                     Samples           &user_S,
-                                                     Function          &user_F,
-                                                     Array             &user_aorg,
-                                                     const array<bool> &user_used,
-                                                     Array             &user_aerr)
+        bool LeastSquares<real_t>:: operator()(Samples           &user_S,
+                                               Function          &user_F,
+                                               Array             &aorg,
+                                               const array<bool> &used,
+                                               Array             &aerr)
         {
             static const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
             
@@ -389,18 +388,33 @@ namespace yocto
             S    = &user_S;
             F    = &user_F;
             ns   = S->size();
-            nvar = user_aorg.size();
-            assert(user_used.size()>=nvar);
-            assert(user_aerr.size()>=nvar);
+            nvar = aorg.size();
+            assert(used.size()>=nvar);
+            assert(aerr.size()>=nvar);
+            
+            size_t ndata = 0;
+            for(size_t i=ns;i>0;--i)
+            {
+                ndata += (*S)[i]->N;
+            }
+            size_t param = nvar;
+            for(size_t i=nvar;i>0;--i)
+            {
+                if(!used[i])
+                    --param;
+            }
+            if(param>ndata)
+            {
+                throw exception("Fit: not enough #data=%u for #param=%u", unsigned(ndata), unsigned(param));
+            }
             
             //__________________________________________________________________
             //
             // allocate memory
             //__________________________________________________________________
-            aorg  .make(nvar,0);
-            used  .make(nvar,true);
-            atmp  .make(nvar,0);
-            aerr  .make(nvar,0);
+            Aorg  .make(nvar,0);
+            Used  .make(nvar,true);
+            Atmp  .make(nvar,0);
             beta  .make(nvar,0);
             alpha .make(nvar,nvar);
             curv  .make(nvar,nvar);
@@ -412,9 +426,8 @@ namespace yocto
             //__________________________________________________________________
             for(size_t i=nvar;i>0;--i)
             {
-                aorg[i] = user_aorg[i];
-                used[i] = user_used[i];
-                aerr[i] = user_aerr[i];
+                Aorg[i] = aorg[i];
+                Used[i] = used[i];
             }
             int p = LAMBDA_INI_POW10;
             
@@ -435,7 +448,7 @@ namespace yocto
             //
             // for a given alpha matrix
             //__________________________________________________________________
-            fit_status result = fit_failure;
+            bool result = false;
         UPDATE_LAMBDA:
             ++count;
             if( !build_curvature( compute_lam(p) ) )
@@ -456,7 +469,7 @@ namespace yocto
             //__________________________________________________________________
             tao::set(step,beta);
             crout<real_t>::solve(curv,step);
-            std::cerr << "aorg=" << aorg << std::endl;
+            std::cerr << "Aorg=" << Aorg << std::endl;
             std::cerr << "beta=" << beta << std::endl;
             std::cerr << "step=" << step << std::endl;
             
@@ -496,11 +509,12 @@ namespace yocto
                 p = max_of(--p,LAMBDA_MIN_POW10);
                 for(size_t i=nvar;i>0;--i)
                 {
-                    atmp[i]  = aorg[i];
-                    aorg[i] += XX.b * step[i];
-                    atmp[i] -= aorg[i];
+                    Atmp[i]  = Aorg[i];
+                    Aorg[i] += XX.b * step[i];
+                    Atmp[i] -= Aorg[i];
+                    aorg[i]  = Aorg[i]; //!< a good point
                 }
-                std::cerr << "diff=" << atmp << std::endl;
+                std::cerr << "diff=" << Atmp << std::endl;
                 const real_t Dnew = computeD();
                 
                 
@@ -511,7 +525,7 @@ namespace yocto
                 bool cvg = true;
                 for(size_t i=nvar;i>0;--i)
                 {
-                    if( Fabs(atmp[i])>0 )
+                    if( Fabs(Atmp[i])>0 )
                     {
                         cvg = false;
                         break;
@@ -521,7 +535,7 @@ namespace yocto
                 if(cvg)
                 {
                     std::cerr << "SUCCESS: variables numerically converged" << std::endl;
-                    result = fit_success;
+                    result = true;
                     goto COMPUTE_ERROR;
                 }
                 
@@ -537,10 +551,10 @@ namespace yocto
                 std::cerr << "must decrease step" << std::endl;
                 const real_t dD = Fabs(Dorg-Dtmp);
                 
-                if(dD<=0 || ++p>LAMBDA_MAX_POW10)
+                if( dD<=0 || ++p>LAMBDA_MAX_POW10)
                 {
                     std::cerr << "spurious" << std::endl;
-                    result = fit_spurious;
+                    result = true;
                     goto COMPUTE_ERROR;
                     
                 }
@@ -549,7 +563,45 @@ namespace yocto
             }
             
         COMPUTE_ERROR:
+            //__________________________________________________________________
+            //
+            //
+            // compute errors
+            //
+            //__________________________________________________________________
             
+            //__________________________________________________________________
+            //
+            // compute covariance matrix in alpha
+            //__________________________________________________________________
+            if(!build_curvature(0))
+            {
+                throw exception("Fit: unexpected singular curvature");
+            }
+            
+            alpha.ld1();
+            crout<real_t>::solve(curv, alpha);
+            
+            //__________________________________________________________________
+            //
+            // deduce individual errors
+            //__________________________________________________________________
+            const size_t ndof    = 1 + (ndata-param);
+            const real_t residue = Dorg/ndof;
+            for(size_t i=nvar;i>0;--i)
+            {
+                if(Used[i])
+                {
+                    aerr[i] = Sqrt( residue * Fabs(alpha[i][i]) );
+                    aorg[i] = Aorg[i];
+                }
+                else
+                {
+                    aerr[i] = 0;
+                }
+            }
+            std::cerr << "aorg=" << aorg << std::endl;
+            std::cerr << "aerr=" << aerr << std::endl;
             return result;
             
         }

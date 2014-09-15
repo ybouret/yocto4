@@ -14,17 +14,15 @@ namespace yocto
 {
 	namespace math
 	{
-        enum fit_status
-        {
-            fit_success,
-            fit_failure,
-            fit_spurious
-        };
         
 		template <typename T>
 		class LeastSquares
 		{
 		public:
+            //__________________________________________________________________
+            //
+            // local types
+            //__________________________________________________________________
 			typedef array<T>                        Array;
 			typedef vector<T>                       Vector;
 			typedef matrix<T>                       Matrix;
@@ -35,8 +33,10 @@ namespace yocto
 			virtual  ~LeastSquares() throw();
 			explicit  LeastSquares();
             
-            
+            //__________________________________________________________________
+            //
 			//! a sample to wrap data+local memory
+            //__________________________________________________________________
 			class Sample : public object, public counted
 			{
 			public:
@@ -94,7 +94,11 @@ namespace yocto
 				Function1            f; //!< for gradient evaluation
 			};
             
+            
+            //__________________________________________________________________
+            //
 			//! a set of samples
+            //__________________________________________________________________
 			class Samples : public vector<typename Sample::Pointer>
 			{
 			public:
@@ -109,12 +113,11 @@ namespace yocto
 			};
             
             
-			fit_status operator()(
-                                  Samples           &user_S,
-                                  Function          &user_F,
-                                  Array             &user_aorg,
-                                  const array<bool> &user_used,
-                                  Array             &user_aerr);
+			bool operator()(Samples           & user_S,
+                            Function          & user_F,
+                            Array             & aorg,
+                            const array<bool> & used,
+                            Array             & aerr);
             
             
 			static const int LAMBDA_MIN_POW10;
@@ -126,22 +129,22 @@ namespace yocto
             
             T       computeD();
 			bool    build_curvature(T lam); //!< curv from alpha and try lu
-            T       evalD(T x);             //!< atmp = aorg+x*step
+            T       evalD(T x);             //!< Atmp = Aorg+x*step
             
 			Samples      *S;
 			Function     *F;
 			size_t        ns;    //! #samples
 			size_t        nvar;  //! #variables
-			Vector        aorg;  //!< current values
-			vector<bool>  used;  //!< which one are used
-            Vector        atmp;  //!< for function evaluation
-			Vector        aerr;  //!< error
+			Vector        Aorg;  //!< current values
+			vector<bool>  Used;  //!< which one are used
+            Vector        Atmp;  //!< for function evaluation
 			Vector        beta;  //!< reduced gradient
 			Matrix        alpha; //!< approx. curvature
 			Matrix        curv;  //!< from alpha with lam
 			Vector        step;  //!< approx. step
 			derivative<T> drvs;  //!< structure for derivatives
             Function1     scan;  //!< evalD(x)
+            
         public:
 			T             h;     //!< derivative step guest
             
