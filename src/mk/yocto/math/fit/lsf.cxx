@@ -66,6 +66,7 @@ namespace yocto
         dFdu(),
         beta(),
         alpha(),
+	__ag(),
         Alpha(),
         D(0),
         w(*this),
@@ -374,10 +375,21 @@ namespace yocto
         
 		template <>
 		LeastSquares<real_t>:: LeastSquares() :
+		S(0),
+		F(0),
+		ns(0),
+		nvar(0),
+		Aorg(),
+		Used(),
+		Atmp(),
+		beta(),
+		alpha(),
+		curv(),
+		step(),
 		drvs(),
-        scan(this, & LeastSquares<real_t>::evalD),
-        h(REAL(1e-4)),
-        verbose(false)
+        	scan(this, & LeastSquares<real_t>::evalD),
+        	h(REAL(1e-4)),
+        	verbose(false)
 		{
 		}
         
