@@ -309,8 +309,9 @@ namespace yocto
 		real_t LeastSquares<real_t>:: computeD()
 		{
 			real_t ans(0);
+            // full evaluation
 			tao::ld(beta,0);
-			curv.ldz();
+			alpha.ldz();
 			for(size_t k=ns;k>0;--k)
 			{
 				Sample &s = *(*S)[k];
@@ -318,6 +319,7 @@ namespace yocto
 				s.collect(alpha,beta);
 			}
             
+            // alpha correction
 			for(size_t i=nvar;i>0;--i)
 			{
 				if( !used[i] )
@@ -364,158 +366,183 @@ namespace yocto
 			}
 			else
 			{
-                return p < 0 ? ipower(REAL(0.1),-p) : ipower(REAL(10.0),p);
-                }
-                }
-                
-                
-                template <>
-                void LeastSquares<real_t>:: operator()(
-                                                       Samples           &user_S,
-                                                       Function          &user_F,
-                                                       Array             &user_aorg,
-                                                       const array<bool> &user_used,
-                                                       Array             &user_aerr)
+                return (p < 0) ? ipower(REAL(0.1),-p) : ipower(REAL(10.0),p);
+            }
+        }
+        
+        
+        template <>
+        fit_status LeastSquares<real_t>:: operator()(
+                                                     Samples           &user_S,
+                                                     Function          &user_F,
+                                                     Array             &user_aorg,
+                                                     const array<bool> &user_used,
+                                                     Array             &user_aerr)
+        {
+            static const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
+            
+            //__________________________________________________________________
+            //
+            // prepare variables
+            //__________________________________________________________________
+            S    = &user_S;
+            F    = &user_F;
+            ns   = S->size();
+            nvar = user_aorg.size();
+            assert(user_used.size()>=nvar);
+            assert(user_aerr.size()>=nvar);
+            
+            //__________________________________________________________________
+            //
+            // allocate memory
+            //__________________________________________________________________
+            aorg  .make(nvar,0);
+            used  .make(nvar,true);
+            atmp  .make(nvar,0);
+            aerr  .make(nvar,0);
+            beta  .make(nvar,0);
+            alpha .make(nvar,nvar);
+            curv  .make(nvar,nvar);
+            step  .make(nvar,0);
+            
+            //__________________________________________________________________
+            //
+            // initialize local variables
+            //__________________________________________________________________
+            for(size_t i=nvar;i>0;--i)
+            {
+                aorg[i] = user_aorg[i];
+                used[i] = user_used[i];
+                aerr[i] = user_aerr[i];
+            }
+            int p = LAMBDA_INI_POW10;
+            
+            
+            //__________________________________________________________________
+            //
+            // starting point
+            //__________________________________________________________________
+            real_t Dorg  = computeD();
+            size_t count = 0;
+            std::cerr << "Dorg ="  << Dorg  << std::endl;
+            std::cerr << "alpha="  << alpha << std::endl;
+            std::cerr << "beta ="  << beta  << std::endl;
+            
+            
+            
+            //__________________________________________________________________
+            //
+            // for a given alpha matrix
+            //__________________________________________________________________
+            fit_status result = fit_failure;
+        UPDATE_LAMBDA:
+            ++count;
+            if( !build_curvature( compute_lam(p) ) )
+            {
+                ++p;
+                if(p>LAMBDA_MAX_POW10)
                 {
-                    static const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
-                    
-                    //__________________________________________________________________
-                    //
-                    // prepare variables
-                    //__________________________________________________________________
-                    S    = &user_S;
-                    F    = &user_F;
-                    ns   = S->size();
-                    nvar = user_aorg.size();
-                    assert(user_used.size()>=nvar);
-                    assert(user_aerr.size()>=nvar);
-                    
-                    //__________________________________________________________________
-                    //
-                    // allocate memory
-                    //__________________________________________________________________
-                    aorg  .make(nvar,0);
-                    used  .make(nvar,true);
-                    atmp  .make(nvar,0);
-                    aerr  .make(nvar,0);
-                    beta  .make(nvar,0);
-                    alpha .make(nvar,nvar);
-                    curv  .make(nvar,nvar);
-                    step  .make(nvar,0);
-                    
-                    //__________________________________________________________________
-                    //
-                    // initialize local variables
-                    //__________________________________________________________________
-                    for(size_t i=nvar;i>0;--i)
-                    {
-                        aorg[i] = user_aorg[i];
-                        used[i] = user_used[i];
-                        aerr[i] = user_aerr[i];
-                    }
-                    int p = LAMBDA_INI_POW10;
-                    
-                    
-                    //__________________________________________________________________
-                    //
-                    // starting point
-                    //__________________________________________________________________
-                    real_t Dorg  = computeD();
-                    size_t count = 0;
-                    std::cerr << "Dorg ="  << Dorg  << std::endl;
-                    std::cerr << "alpha="  << alpha << std::endl;
-                    std::cerr << "beta ="  << beta  << std::endl;
-                    
-                    
-                    
-                    //__________________________________________________________________
-                    //
-                    // for a given alpha matrix
-                    //__________________________________________________________________
-                UPDATE_LAMBDA:
-                    ++count;
-                    if( !build_curvature( compute_lam(p) ) )
-                    {
-                        ++p;
-                        if(p>LAMBDA_MAX_POW10)
-                        {
-                            std::cerr << "singular" << std::endl;
-                            exit(1);
-                        }
-                        goto UPDATE_LAMBDA;
-                    }
-                    std::cerr << "p=" << p << std::endl;
-                    
-                    //__________________________________________________________________
-                    //
-                    // compute step
-                    //__________________________________________________________________
-                    tao::set(step,beta);
-                    crout<real_t>::solve(curv,step);
-                    std::cerr << "beta=" << beta << std::endl;
-                    std::cerr << "step=" << step << std::endl;
-                    
-                    real_t Dtmp = evalD(1.0);
-                    std::cerr << "Dtmp="<< Dtmp << std::endl;
-                    
-                    if(Dtmp<Dorg)
-                    {
-                        //______________________________________________________________
-                        //
-                        // Don't go too fast
-                        //______________________________________________________________
-                        std::cerr << "must optimize" << std::endl;
-                        triplet<real_t> XX = { 0,    1,    1    };
-                        triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
-                        if( bracket<real_t>::inside(scan, XX, DD) )
-                        {
-                            std::cerr << "\tother local: XX=" << XX << ",  DD=" << DD << std::endl;
-                            minimize<real_t>(scan, XX, DD, 0);
-                        }
-                        else
-                        {
-                            std::cerr << "\tno other local minimum" << std::endl;
-                            XX.b = 1.0;
-                            DD.b = Dtmp;
-                        }
-                        std::cerr << "min@" << XX.b << " = " << DD.b << std::endl;
-                        
-                        //______________________________________________________________
-                        //
-                        // successfull step
-                        //______________________________________________________________
-                        p = max_of(--p,LAMBDA_MIN_POW10);
-                        for(size_t i=nvar;i>0;--i)
-                        {
-                            aorg[i] += XX.b * step[i];
-                        }
-                        std::cerr << "aorg=" << aorg << std::endl;
-                        const real_t Dnew = computeD();
-                        
-                        Dorg = Dnew;
-                        if(++count>20) return;
-                        goto UPDATE_LAMBDA;
-                    }
-                    else
-                    {
-                        //______________________________________________________________
-                        //
-                        // must increase lambda, from the same starting point
-                        //______________________________________________________________
-                        std::cerr << "must decrease step" << std::endl;
-                        if(++p>LAMBDA_MAX_POW10)
-                        {
-                            std::cerr << "spurious" << std::endl;
-                            exit(2);
-                        }
-                        goto UPDATE_LAMBDA;
-                    }
-                    
+                    std::cerr << "singular" << std::endl;
+                    return result;
                 }
-                
-                
-                
-                
-                
+                goto UPDATE_LAMBDA;
+            }
+            std::cerr << "p=" << p << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // compute step
+            //__________________________________________________________________
+            tao::set(step,beta);
+            crout<real_t>::solve(curv,step);
+
+            std::cerr << "beta=" << beta << std::endl;
+            std::cerr << "step=" << step << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // compute full step trial
+            //__________________________________________________________________
+            const real_t Dtmp = evalD(1.0);
+            std::cerr << "Dtmp="<< Dtmp << std::endl;
+            
+            //const real_t rate = tao::dot(beta,step);
+            //std::cerr << "rate="<< rate << std::endl;
+            
+            //__________________________________________________________________
+            //
+            // take action
+            //__________________________________________________________________
+            if(Dtmp<Dorg)
+            {
+                //______________________________________________________________
+                //
+                // Don't go too fast
+                //______________________________________________________________
+                std::cerr << "must optimize" << std::endl;
+                triplet<real_t> XX = { 0,    1,    1    };
+                triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
+                if( bracket<real_t>::inside(scan, XX, DD) )
+                {
+                    std::cerr << "\tother local: XX=" << XX << ",  DD=" << DD << std::endl;
+                    minimize<real_t>(scan, XX, DD, 0);
                 }
+                else
+                {
+                    std::cerr << "\tno other local minimum" << std::endl;
+                    XX.b = 1.0;
+                    DD.b = Dtmp;
                 }
+                std::cerr << "min@" << XX.b << " = " << DD.b << std::endl;
+                
+                //______________________________________________________________
+                //
+                // successfull step
+                //______________________________________________________________
+                p = max_of(--p,LAMBDA_MIN_POW10);
+                std::cerr << "aold=" << aorg << std::endl;
+                for(size_t i=nvar;i>0;--i)
+                {
+                    aorg[i] += XX.b * step[i];
+                }
+                std::cerr << "aorg=" << aorg << std::endl;
+                const real_t Dnew = computeD();
+               
+                //______________________________________________________________
+                //
+                // Test convergence on least squares value
+                //______________________________________________________________
+                const double dD = Fabs(Dorg-Dnew);
+                std::cerr << "dD=" << dD << std::endl;
+                
+                
+                Dorg = Dnew;
+                if(++count>20)
+                {
+                    return fit_success;
+                }
+                goto UPDATE_LAMBDA;
+            }
+            else
+            {
+                //______________________________________________________________
+                //
+                // must increase lambda, from the same starting point
+                //______________________________________________________________
+                std::cerr << "must decrease step" << std::endl;
+                if(++p>LAMBDA_MAX_POW10)
+                {
+                    std::cerr << "spurious" << std::endl;
+                    return fit_spurious;
+                }
+                goto UPDATE_LAMBDA;
+            }
+            
+        }
+        
+        
+        
+        
+        
+    }
+}
