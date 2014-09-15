@@ -198,7 +198,7 @@ YOCTO_UNIT_TEST_IMPL(fit_poly)
 		
 		if( nv > 2 && alea<double>() > 0.7 )
         {
-			//used[ 1 + alea_lt(nv) ] = false;
+			used[ 1 + alea_lt(nv) ] = false;
         }
         
         samples.prepare(nv);
@@ -211,8 +211,16 @@ YOCTO_UNIT_TEST_IMPL(fit_poly)
             save(vformat("lsf%u.dat", unsigned(nv)), X, Z);
             std::cerr << "R" << nv << "=" << samples.corr() << std::endl;
         }
-    
 		
+        samples[1]->polynomial(aorg, used, aerr);
+        for( size_t i=1; i <= nv; ++i )
+        {
+            std::cerr << "a[" << i << "]=" << aorg[i] << " +/- " << aerr[i] << std::endl;
+        }
+        save(vformat("lsf_p%u.dat", unsigned(nv)), X, Z);
+        std::cerr << "R" << nv << "=" << samples.corr() << std::endl;
+        
+        
 	}
 	
 	
