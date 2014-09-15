@@ -367,8 +367,8 @@ YOCTO_UNIT_TEST_IMPL(fit_pade)
         Y[i] = cos(3*X[i]);
     }
     
-    size_t p=0;
-    size_t q=0;
+    size_t p=1;
+    size_t q=1;
     if( argc > 1 )
     {
         p = strconv::to_size(argv[1],"p");
