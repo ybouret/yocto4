@@ -219,3 +219,131 @@ YOCTO_UNIT_TEST_IMPL(fit_poly)
 }
 YOCTO_UNIT_TEST_DONE()
 
+namespace
+{
+    static inline double gaussian( double x, double mu, double sig )
+    {
+        const double dx = x-mu;
+        return Exp( - (dx*dx)/(sig+sig) );
+    }
+    
+    template <typename T>
+    class Gauss
+    {
+    public:
+        
+        Gauss() throw()
+        {
+        }
+        
+        ~Gauss() throw()
+        {
+        }
+        
+        T Eval( T x, const array<T> &a )
+        {
+            const size_t nexp = a.size()/3;
+            size_t i=1;
+            T ans(0);
+            for( size_t j=1; j <= nexp; ++j )
+            {
+                const T A   = a[i++];
+                const T mu  = a[i++];
+                const T sig = a[i++];
+                ans += A * gaussian(x, mu, sig);
+            }
+            return ans;
+        }
+        
+        bool ToDo(typename       LeastSquares<T>::Function &F,
+                  const typename LeastSquares<T>::Samples  &Samples)
+        {
+            const array<T> &a = Samples[1]->u;
+            const size_t nexp = a.size()/3;
+            size_t i=1;
+            for( size_t j=1; j <= nexp; ++j )
+            {
+                const T A   = a[i++];
+                const T mu  = a[i++];
+                const T sig = a[i++];
+                if(j>1) std::cerr << "+";
+                std::cerr << "(" << A << ")*G(" << mu << "," << sig << ")";
+            }
+            std::cerr << std::endl;
+            return true;
+        }
+    };
+    
+}
+
+YOCTO_UNIT_TEST_IMPL(fit_gauss)
+{
+	const size_t   N = 10 + alea_leq(1000);
+	vector<double> X( N, 0 );
+	vector<double> Y( N, 0 );
+	vector<double> Z( N, 0 );
+	
+	const double x1 = 0.21;
+	const double s1 = 0.02;
+	const double a1 = 1.1;
+	
+	const double x2 = 0.78;
+	const double s2 = 0.01;
+	const double a2 = 2.3;
+	
+	for( size_t i=1; i <= N; ++i )
+	{
+		X[i] = double(i-1)/(N-1);
+		Y[i] = a1 * gaussian( X[i], x1, s1) + a2 * gaussian( X[i], x2, s2 ) + 0.2 * ( 0.5 - alea<double>());
+		
+	}
+	
+	{
+		ios::ocstream fp( "mexp.dat", false );
+		for( size_t i=1; i <= N; ++i )
+		{
+			fp("%g %g\n", X[i], Y[i] );
+		}
+	}
+	
+	vector<double> a(6,0);
+	vector<bool>   used(6,true);
+	vector<double> aerr(6,0);
+    
+    LeastSquares<double>::Samples Samples;
+    Samples.append(X,Y,Z);
+    Samples.prepare(6);
+    
+	Gauss<double>                   G;
+	LeastSquares<double>::Function F(  &G, & Gauss<double>::Eval );
+    LeastSquares<double>::Callback cb( &G, & Gauss<double>::ToDo );
+	LeastSquares<double>           Fit;
+	a[1] = 1;
+	a[2] = 0.25;
+	a[3] = 0.01;
+	
+	a[4] = 1;
+	a[5] = 0.75;
+	a[6] = 0.01;
+	
+	
+	Fit.h       = 1e-4;
+	Fit.verbose = true;
+    
+	if( Fit( Samples, F, a, used, aerr, &cb) )
+	{
+		for( size_t i=1; i <= 6; ++i )
+		{
+			std::cerr << "a[" << i << "]=" << a[i] << " +/- " << aerr[i] << std::endl;
+		}
+		ios::ocstream fp( "mexp.6.dat", false );
+		for( size_t i=1; i <= N; ++i )
+		{
+			fp("%g %g %g\n", X[i], Y[i], Z[i] );
+		}
+        std::cerr << "#corr=" << Samples.corr() << std::endl;
+	}
+}
+YOCTO_UNIT_TEST_DONE()
+
+
