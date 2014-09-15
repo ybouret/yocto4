@@ -456,7 +456,7 @@ namespace yocto
             //__________________________________________________________________
             tao::set(step,beta);
             crout<real_t>::solve(curv,step);
-
+            std::cerr << "aorg=" << aorg << std::endl;
             std::cerr << "beta=" << beta << std::endl;
             std::cerr << "step=" << step << std::endl;
             
@@ -465,9 +465,7 @@ namespace yocto
             // compute full step trial
             //__________________________________________________________________
             const real_t Dtmp = evalD(1.0);
-            std::cerr << "Dtmp="<< Dtmp << std::endl;
-            const double dD = Fabs(Dtmp-Dorg);
-            std::cerr << "dD  ="<< dD << std::endl;
+            std::cerr << "Dtmp=" << Dtmp << std::endl;
             
             //__________________________________________________________________
             //
@@ -479,21 +477,17 @@ namespace yocto
                 //
                 // Don't go too fast
                 //______________________________________________________________
-                std::cerr << "must optimize" << std::endl;
                 triplet<real_t> XX = { 0,    1,    1    };
                 triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
                 if( bracket<real_t>::inside(scan, XX, DD) )
                 {
-                    std::cerr << "\tother local: XX=" << XX << ",  DD=" << DD << std::endl;
                     minimize<real_t>(scan, XX, DD, 0);
                 }
                 else
                 {
-                    std::cerr << "\tno other local minimum" << std::endl;
                     XX.b = 1.0;
                     DD.b = Dtmp;
                 }
-                std::cerr << "min@" << XX.b << " = " << DD.b << std::endl;
                 
                 //______________________________________________________________
                 //
@@ -506,21 +500,32 @@ namespace yocto
                     aorg[i] += XX.b * step[i];
                     atmp[i] -= aorg[i];
                 }
-                std::cerr << "aorg=" << aorg << std::endl;
                 std::cerr << "diff=" << atmp << std::endl;
                 const real_t Dnew = computeD();
-               
+                
+                
                 //______________________________________________________________
                 //
-                // Test convergence on least squares value
+                // Test convergence on values
                 //______________________________________________________________
+                bool cvg = true;
+                for(size_t i=nvar;i>0;--i)
+                {
+                    if( Fabs(atmp[i])>0 )
+                    {
+                        cvg = false;
+                        break;
+                    }
+                }
                 
+                if(cvg)
+                {
+                    std::cerr << "SUCCESS: variables numerically converged" << std::endl;
+                    result = fit_success;
+                    goto COMPUTE_ERROR;
+                }
                 
                 Dorg = Dnew;
-                if(++count>20)
-                {
-                    return fit_success;
-                }
                 goto UPDATE_LAMBDA;
             }
             else
@@ -530,13 +535,22 @@ namespace yocto
                 // must increase lambda, from the same starting point
                 //______________________________________________________________
                 std::cerr << "must decrease step" << std::endl;
-                if(++p>LAMBDA_MAX_POW10)
+                const real_t dD = Fabs(Dorg-Dtmp);
+                
+                if(dD<=0 || ++p>LAMBDA_MAX_POW10)
                 {
                     std::cerr << "spurious" << std::endl;
-                    return fit_spurious;
+                    result = fit_spurious;
+                    goto COMPUTE_ERROR;
+                    
                 }
+                
                 goto UPDATE_LAMBDA;
             }
+            
+        COMPUTE_ERROR:
+            
+            return result;
             
         }
         
