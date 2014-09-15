@@ -65,7 +65,7 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	Samples samples;
     Sample::Pointer p1( new Sample(t1,x1,z1) );
     Sample::Pointer p2( new Sample(t2,x2,z2) );
-
+    
     
 	diffusion      xp;
 	LS::Function   F(&xp, &diffusion::compute);
@@ -111,10 +111,10 @@ YOCTO_UNIT_TEST_IMPL(gnl)
     samples.push_back(p2);
     used[2] = true;
     fit(samples,F,a,used,aerr);
-
+    
     save("f1a.dat",t1,z1);
     save("f2a.dat",t2,z2);
-
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
@@ -354,4 +354,70 @@ YOCTO_UNIT_TEST_IMPL(fit_gauss)
 }
 YOCTO_UNIT_TEST_DONE()
 
-
+YOCTO_UNIT_TEST_IMPL(fit_pade)
+{
+    const size_t   N = 10 + alea_leq(1000);
+    vector<double> X( N, 0 );
+    vector<double> Y( N, 0 );
+    vector<double> Z( N, 0 );
+    
+    for(size_t i=1;i<=N;++i)
+    {
+        X[i] = double(i-1)/(N-1);
+        Y[i] = cos(3*X[i]);
+    }
+    
+    size_t p=0;
+    size_t q=0;
+    if( argc > 1 )
+    {
+        p = strconv::to_size(argv[1],"p");
+    }
+    
+    if( argc > 2 )
+    {
+        q = strconv::to_size(argv[2],"q");
+    }
+    
+    
+    LeastSquares<double>::Sample Sample(X,Y,Z);
+    vector<double> P(p,0);
+    vector<double> Q(q,0);
+    vector<bool>   usedP(p,true);
+    vector<bool>   usedQ(q,true);
+    
+    Sample.Pade(P, usedP, Q, usedQ);
+    
+    
+    std::cerr << "P=" << P << std::endl;
+    std::cerr << "Q=" << Q << std::endl;
+    
+    
+    {
+        ios::ocstream fp("pade.dat",false);
+        for( size_t i=1; i <= N; ++i )
+        {
+            fp("%g %g %g\n", X[i], Y[i], Z[i] );
+        }
+    }
+    
+    usedP[1] = false;
+    P[1]     = 1;
+    
+    Sample.Pade(P, usedP, Q, usedQ);
+    
+    std::cerr << "Pbis=" << P << std::endl;
+    std::cerr << "Qbis=" << Q << std::endl;
+    
+    {
+        ios::ocstream fp("padebis.dat",false);
+        for( size_t i=1; i <= N; ++i )
+        {
+            fp("%g %g %g\n", X[i], Y[i], Z[i] );
+        }
+    }
+    
+    }
+    YOCTO_UNIT_TEST_DONE()
+    
+    

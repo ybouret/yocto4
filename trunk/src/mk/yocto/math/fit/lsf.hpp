@@ -51,16 +51,16 @@ namespace yocto
 				const Array   &Y;      //!< the Y data
 				Array         &Z;      //!< will be F(Z)
 				const size_t   N;      //!< initially 0, #data
-				const size_t   Q;      //!< initially 0, #local variables
+				const size_t   L;      //!< initially 0, #local variables
 				const size_t   M;      //!< initially 0, #global variables
-				iMatrix        Gamma;  //!< [QxM], local variables from global variables
-                Vector         u;      //!< [Q] local variables
-				Vector         dFdu;   //!< [Q] local function gradient
-				Vector         beta;   //!< [Q] local least square gradient
-				Matrix         alpha;  //!< [QxQ] local curvature
-				Matrix         __ag;   //!< [Q*M] alpha * Gamma
+				iMatrix        Gamma;  //!< [LxM], local variables from global variables
+                Vector         u;      //!< [L] local variables
+				Vector         dFdu;   //!< [L] local function gradient
+				Vector         beta;   //!< [L] local least square gradient
+				Matrix         alpha;  //!< [LxL] local curvature
+				Matrix         __ag;   //!< [L*M] alpha * Gamma
 				Matrix         Alpha;  //!< [MxM] Gamma'*__ag
-                T              D;      //!< last D value
+                T              D;      //!< last D value, mostly for callbacks
                 
 				T compute_D(Function &F, const Array &a) const;
 				T compute_D(Function &F, const Array &a, derivative<T> &drvs, T h);
@@ -79,7 +79,12 @@ namespace yocto
                 
                 //! full polynomial fit
                 void polynomial( Array &aorg, const array<bool> &used, Array &aerr, typename numeric<T>::function *transform = 0);
-
+                
+                //! perform a Pade fit
+                void Pade(Array              & P,
+                          const array<bool>  & usedP,
+                          Array              & Q,
+                          const array<bool>  & usedQ);
                 
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Sample);
