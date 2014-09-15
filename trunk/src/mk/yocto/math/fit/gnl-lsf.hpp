@@ -14,6 +14,12 @@ namespace yocto
 {
 	namespace math
 	{
+        enum fit_status
+        {
+            fit_success,
+            fit_failure,
+            fit_spurious
+        };
         
 		template <typename T>
 		class LeastSquares
@@ -64,6 +70,7 @@ namespace yocto
 				//! set N and memory, Gamma=Id
 				void prepare(size_t nvar);
                 
+                //! append Alpha and Gamma'*beta
 				void collect( Matrix &global_alpha, Array &global_beta ) const throw();
                 
                 
@@ -96,18 +103,18 @@ namespace yocto
 				Sample & append( const Array &X, const Array &Y, Array &Z );
                 void prepare(size_t local_nvar, size_t global_nvar);
 				void prepare(size_t nvar);
-
+                
 			private:
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
 			};
             
             
-			void operator()(
-                            Samples           &user_S,
-                            Function          &user_F,
-                            Array             &user_aorg,
-                            const array<bool> &user_used,
-                            Array             &user_aerr);
+			fit_status operator()(
+                                  Samples           &user_S,
+                                  Function          &user_F,
+                                  Array             &user_aorg,
+                                  const array<bool> &user_used,
+                                  Array             &user_aerr);
             
             
 			static const int LAMBDA_MIN_POW10;
@@ -120,7 +127,7 @@ namespace yocto
             T       computeD();
 			bool    build_curvature(T lam); //!< curv from alpha and try lu
             T       evalD(T x);             //!< atmp = aorg+x*step
-
+            
 			Samples      *S;
 			Function     *F;
 			size_t        ns;    //! #samples
@@ -138,7 +145,7 @@ namespace yocto
         public:
 			T             h;     //!< derivative step guest
             
-			         
+            
 		};
         
 	}
