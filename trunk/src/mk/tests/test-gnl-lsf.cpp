@@ -77,6 +77,7 @@ YOCTO_UNIT_TEST_IMPL(gnl)
 	s1.Gamma[1][1] = 1;
 	s1.Gamma[2][2] = 1;
 	derivative<double> drvs;
+    
 	std::cerr << "D1    = " << s1.compute_D(F,a) << std::endl;
 	std::cerr << "D1    = " << s1.compute_D(F,a,drvs,1e-4) << std::endl;
 	std::cerr << "a     = " << a << std::endl;

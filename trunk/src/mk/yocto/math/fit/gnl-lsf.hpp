@@ -114,6 +114,11 @@ namespace yocto
             
 		private:
 			YOCTO_DISABLE_COPY_AND_ASSIGN(LeastSquares);
+            
+            T       computeD();
+			bool    build_curvature(T lam); //!< curv from alpha and try lu
+            T       evalD(T x);             //!< atmp = aorg+x*step
+
 			Samples      *S;
 			Function     *F;
 			size_t        ns;    //! #samples
@@ -126,13 +131,12 @@ namespace yocto
 			Matrix        alpha; //!< approx. curvature
 			Matrix        curv;  //!< from alpha with lam
 			Vector        step;  //!< approx. step
-			derivative<T> drvs;
-			T             h;
+			derivative<T> drvs;  //!< structure for derivatives
+            Function1     scan;  //!< evalD(x)
+        public:
+			T             h;     //!< derivative step guest
             
-			T       computeD();
-			bool    build_curvature(T lam); //!< curv from alpha and try lu
-            T       evalD(T x);             //!< atmp = aorg+x*step
-            
+			         
 		};
         
 	}
