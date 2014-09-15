@@ -59,14 +59,14 @@ namespace yocto
         Y( userY ),
         Z( userZ ),
         N(0),
-        Q(0),
+        L(0),
         M(0),
         Gamma(),
         u(),
         dFdu(),
         beta(),
         alpha(),
-	__ag(),
+        __ag(),
         Alpha(),
         D(0),
         w(*this),
@@ -87,18 +87,18 @@ namespace yocto
 			{
 				throw exception("too many variables");
 			}
-			(size_t &)Q = local_nvar;
+			(size_t &)L = local_nvar;
 			(size_t &)M = global_nvar;
             
-			Gamma .make(Q,M);
-			u     .make(Q,0);
-			dFdu  .make(Q,0);
-			beta  .make(Q,0);
-			alpha .make(Q,Q);
-			__ag  .make(Q,M);
+			Gamma .make(L,M);
+			u     .make(L,0);
+			dFdu  .make(L,0);
+			beta  .make(L,0);
+			alpha .make(L,L);
+			__ag  .make(L,M);
 			Alpha  .make(M,M);
             
-            if(Q==M)
+            if(L==M)
             {
                 Gamma.ld1();
             }
@@ -162,7 +162,7 @@ namespace yocto
 				Z[i]            = F(Xi,u);
 				const real_t d = Y[i] - Z[i];
 				w.x = Xi;
-				for(size_t q=Q;q>0;--q)
+				for(size_t q=L;q>0;--q)
 				{
 					w.q = q;
 					const real_t g = drvs(f,u[q],h);
@@ -170,7 +170,7 @@ namespace yocto
 					beta[q] += d * g;
 				}
                 
-				for(size_t j=Q;j>0;--j)
+				for(size_t j=L;j>0;--j)
 				{
 					for(size_t k=j;k>0;--k)
 					{
@@ -185,7 +185,7 @@ namespace yocto
             //
 			// symmetric part
             //__________________________________________________________________
-			for(size_t j=Q;j>0;--j)
+			for(size_t j=L;j>0;--j)
 			{
 				for(size_t k=j-1;k>0;--k)
 				{
@@ -215,7 +215,7 @@ namespace yocto
 		{
 			assert(user_alpha.rows == M);
 			assert(user_alpha.cols == M);
-			assert(user_beta.size() >= Q);
+			assert(user_beta.size() >= L);
 			tao::mul_add_trn(user_beta,Gamma,beta);
 			for(size_t i=M;i>0;--i)
 			{
@@ -232,13 +232,13 @@ namespace yocto
             assert(local_ivar  >  0);
             assert(global_ivar >  0);
             assert(local_ivar  <= global_ivar);
-            assert(local_ivar  <= Q);
+            assert(local_ivar  <= L);
             assert(global_ivar <= M);
             for(size_t j=1;j<=M;++j) Gamma[local_ivar][j] = 0;
             Gamma[local_ivar][global_ivar] = 1;
-        
+            
         }
-
+        
         
 	}
     
@@ -278,7 +278,7 @@ namespace yocto
         {
             prepare(nvar, nvar);
         }
-
+        
         template <>
         real_t  LeastSquares<real_t>:: Samples:: computeD(Function &F, const Array &a) const
         {
@@ -343,7 +343,7 @@ namespace yocto
             }
             return covyz/den;
         }
-
+        
         
 	}
     
@@ -387,9 +387,9 @@ namespace yocto
 		curv(),
 		step(),
 		drvs(),
-        	scan(this, & LeastSquares<real_t>::evalD),
-        	h(REAL(1e-4)),
-        	verbose(false)
+        scan(this, & LeastSquares<real_t>::evalD),
+        h(REAL(1e-4)),
+        verbose(false)
 		{
 		}
         
