@@ -377,7 +377,8 @@ namespace yocto
                                                Function          &user_F,
                                                Array             &aorg,
                                                const array<bool> &used,
-                                               Array             &aerr)
+                                               Array             &aerr,
+                                               Callback          *cb)
         {
             static const int    LAMBDA_INI_POW10 =  LAMBDA_MIN_POW10/2;
             
@@ -436,11 +437,10 @@ namespace yocto
             //
             // starting point
             //__________________________________________________________________
+#define Y_LSF_CB() do { if(cb && !(*cb)(*F,*S) ) return false; } while(false)
+            
             real_t Dorg  = computeD();
-            size_t count = 0;
             std::cerr << "Dorg ="  << Dorg  << std::endl;
-            std::cerr << "alpha="  << alpha << std::endl;
-            std::cerr << "beta ="  << beta  << std::endl;
             
             
             
@@ -450,7 +450,7 @@ namespace yocto
             //__________________________________________________________________
             bool result = false;
         UPDATE_LAMBDA:
-            ++count;
+            Y_LSF_CB();
             if( !build_curvature( compute_lam(p) ) )
             {
                 ++p;
@@ -569,6 +569,8 @@ namespace yocto
             // compute errors
             //
             //__________________________________________________________________
+            Dorg = computeD();
+            Y_LSF_CB();
             
             //__________________________________________________________________
             //

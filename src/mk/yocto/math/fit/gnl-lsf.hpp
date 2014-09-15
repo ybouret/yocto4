@@ -112,12 +112,14 @@ namespace yocto
 				YOCTO_DISABLE_COPY_AND_ASSIGN(Samples);
 			};
             
+            typedef functor<bool,TL2(Function &,const Samples &)> Callback;
             
 			bool operator()(Samples           & user_S,
                             Function          & user_F,
                             Array             & aorg,
                             const array<bool> & used,
-                            Array             & aerr);
+                            Array             & aerr,
+                            Callback          * cb = 0);
             
             
 			static const int LAMBDA_MIN_POW10;
