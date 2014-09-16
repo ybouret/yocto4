@@ -13,7 +13,7 @@ namespace yocto
         void LeastSquares<real_t>:: Sample:: polynomial(Array             &aorg,
                                                         const array<bool> &used,
                                                         Array             &aerr,
-                                                        typename numeric<real_t>::function *transform)
+                                                        numeric<real_t>::function *transform)
         {
             //__________________________________________________________________
             //
