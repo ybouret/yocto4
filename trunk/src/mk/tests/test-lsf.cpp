@@ -188,7 +188,7 @@ YOCTO_UNIT_TEST_IMPL(fit_poly)
 	LeastSquares<double>::Function F(  &P, & Poly<double>::Eval );
     LeastSquares<double> Fit;
 	
-    Fit.verbose = true;
+    //Fit.verbose = true;
 	for( size_t nv = 1; nv <= 5; ++nv )
 	{
 		std::cerr << "-- nvar=" << nv << std::endl;
@@ -202,7 +202,7 @@ YOCTO_UNIT_TEST_IMPL(fit_poly)
         }
         
         samples.prepare(nv);
-		if(Fit(samples, F, aorg, used, aerr, &cb))
+		if(Fit(samples, F, aorg, used, aerr, 0))
         {
             for( size_t i=1; i <= nv; ++i )
 			{
@@ -336,7 +336,7 @@ YOCTO_UNIT_TEST_IMPL(fit_gauss)
 	
 	
 	Fit.h       = 1e-4;
-	Fit.verbose = true;
+	//Fit.verbose = true;
     
 	if( Fit( Samples, F, a, used, aerr, &cb) )
 	{

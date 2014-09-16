@@ -336,11 +336,7 @@ namespace yocto
             const real_t sig_y = Sqrt(sum_dy2/n);
             const real_t sig_z = Sqrt(sum_dz2/n);
             const real_t covyz = sum_dyz / n;
-            const real_t den   = sig_y * sig_z;
-            if(den<=0)
-            {
-                throw exception("Samples correlation: singular deviation");
-            }
+            const real_t den   = (sig_y * sig_z + numeric<double>::tiny);
             return covyz/den;
         }
         
@@ -351,8 +347,11 @@ namespace yocto
 
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/code/ipower.hpp"
+
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
+
+#include "yocto/math/kernel/jacobi.hpp"
 
 namespace yocto
 {
@@ -466,6 +465,7 @@ namespace yocto
                 return (p < 0) ? ipower(REAL(0.1),-p) : ipower(REAL(10.0),p);
             }
         }
+        
         
         
         template <>
@@ -586,7 +586,7 @@ namespace yocto
             {
                 //______________________________________________________________
                 //
-                // Don't go too fast
+                // Don't go too fast, since all is approximate
                 //______________________________________________________________
                 triplet<real_t> XX = { 0,    1,    1    };
                 triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
@@ -680,6 +680,18 @@ namespace yocto
             Dorg = computeD();
             Y_LSF_CB();
             
+#if 1
+            //std::cerr << "alpha=" << alpha << std::endl;
+            Matrix  Alpha(alpha);
+            Matrix  Eigv(nvar,nvar);
+            Vector  Eig(nvar,0);
+            if( ! jacobi<real_t>::build(Alpha, Eig, Eigv) )
+            {
+                throw exception("Fit: invalid final curvature");
+            }
+            
+            std::cerr << "Eig=" << Eig << std::endl;
+#endif
             //__________________________________________________________________
             //
             // compute covariance matrix in alpha

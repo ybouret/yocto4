@@ -151,8 +151,8 @@ namespace yocto
 			bool    build_curvature(T lam); //!< curv from alpha and try lu
             T       evalD(T x);             //!< Atmp = Aorg+x*step
             
-			Samples      *S;
-			Function     *F;
+			Samples      *S;     //!< samples
+			Function     *F;     //!< the function
 			size_t        ns;    //! #samples
 			size_t        nvar;  //! #variables
 			Vector        Aorg;  //!< current values
