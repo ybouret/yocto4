@@ -140,6 +140,13 @@ namespace yocto
                 return children().size;
             }
 
+            const xnode * xnode:: head() const throw()
+            {
+                assert(!terminal);
+                return children().head;
+            }
+
+            
             
             void xnode:: restore( lexer &Lexer, xnode *node ) throw()
             {

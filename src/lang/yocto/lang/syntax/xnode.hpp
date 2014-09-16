@@ -60,6 +60,9 @@ namespace yocto
                 //! children().pop_front() and set no parent
                 xnode *pop() throw();
                 
+                //! children().head
+                const xnode *head() const throw();
+                
                 lexeme *         &lxm() throw();
                 const lexeme *   &lxm() const throw();
                 
