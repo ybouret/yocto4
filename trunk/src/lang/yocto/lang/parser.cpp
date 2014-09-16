@@ -22,14 +22,12 @@ namespace yocto
         {
         }
         
-        void parser:: rewrite(syntax::xnode *) const throw()
-        {
-        }
+        //void parser:: rewrite(syntax::xnode *) const throw() {}
         
         syntax::xnode * parser:: run( ios::istream &input )
         {
             syntax::xnode *node = syntax::xnode::ast(accept(*this, src, input));
-            rewrite(node);
+            //rewrite(node);
             return node;
         }
         

@@ -43,13 +43,7 @@ YOCTO_UNIT_TEST_IMPL(gen)
     }
     else
     {
-        
-        auto_ptr<syntax::xnode> Tree( G.run(fp) );
-        if(Tree.is_valid())
-        {
-            Tree->graphviz("xnode.dot");
-            system("dot -Tpng -o xnode.png xnode.dot");
-        }
+        G.process(fp);
     }
     
 }
