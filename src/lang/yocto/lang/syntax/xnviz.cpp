@@ -14,7 +14,7 @@ namespace yocto
             {
                 ios::ocstream fp(id,false);
                 fp << "digraph " << "G" << "{\n";
-                fp << "rankdir=TB;\n";
+                fp << "rankdir=LR;\n";
                 fp << "ordering=out;\n";
                 viz(fp);
                 fp << "}\n";

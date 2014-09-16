@@ -85,7 +85,14 @@ namespace yocto
             while(tmp.size) node->add(tmp.pop_front());
         }
         
-        void generator:: rewrite(syntax::xnode *node) const throw()
+        void generator:: rewrite(syntax::xnode *root) const throw()
+        {
+            assert(root);
+            assert("RULES" == root->label );
+            reshape(root);
+        }
+        
+        void generator:: reshape(syntax::xnode *node) const throw()
         {
             if(node&& !node->terminal)
             {
@@ -98,7 +105,7 @@ namespace yocto
                 {
                     XNode *child = node->pop();
                     tmp.push_back(child);
-                    rewrite(child);
+                    reshape(child);
                 }
                 
                 //______________________________________________________________
@@ -149,11 +156,14 @@ namespace yocto
                     
                     
                 }
-                
-                
-                
             }
+            
+            
+            
         }
+        
+        
+        
         
     }
     

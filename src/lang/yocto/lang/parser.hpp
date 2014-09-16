@@ -91,9 +91,6 @@ syntax::terminal & FUNCTION(const char   *label,const char    C)
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(parser);
-            virtual void rewrite(syntax::xnode *) const throw();
-
-            
         };
     }
 }

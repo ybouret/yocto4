@@ -16,9 +16,15 @@ namespace yocto
             virtual ~generator() throw();
             
             
+            void process( ios::istream &fp );
+            void rewrite(syntax::xnode *root) const throw();
+            
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(generator);
-            virtual void rewrite(syntax::xnode *) const throw();
+            void reshape(syntax::xnode *) const throw(); //!< shouldn't be called directly
+
         };
         
     }
