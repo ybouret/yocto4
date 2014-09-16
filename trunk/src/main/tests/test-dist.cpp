@@ -36,11 +36,17 @@ static inline void test_random( Random::Uniform &ran )
 	std::cerr << "-- normal:   ave= " << ave << "| sig= " << sig << std::endl;
 	
 	Random::Gaussian gran( ran );
+    double sq = 0;
 	for( size_t i=1; i <=n; ++i ) r[i] = gran();
 	hsort( r );
 	ave = 0;
-	for( size_t i=1; i <=n; ++i ) ave += r[i];
+	for( size_t i=1; i <=n; ++i )
+    {
+        ave += r[i];
+        sq  += r[i] * r[i];
+    }
 	ave /= n;
+    sq  /= n;
 	sig = 0;
 	for( size_t i=1; i <=n; ++i )
 	{
@@ -48,7 +54,7 @@ static inline void test_random( Random::Uniform &ran )
 		sig += dr*dr;
 	}
 	sig = sqrt( sig/(n-1) );
-	std::cerr << "-- gaussian: ave= " << ave << "| sig= " << sig << std::endl;
+	std::cerr << "-- gaussian: ave= " << ave << "| sig= " << sig << " | <sq>=" << sq << std::endl;
 	
 	std::cerr << std::endl;
 }
