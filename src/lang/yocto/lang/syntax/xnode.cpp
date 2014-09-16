@@ -37,25 +37,32 @@ namespace yocto
                 clr();
             }
             
+            namespace
+            {
+                static inline void       *addr2addr(void       *p) throw() { return p; }
+                static inline const void *addr2addr(const void *p) throw() { return p; }
+
+            }
+            
             xnode::child_list & xnode::children() throw()
             {
-                return *(child_list *) &wksp[0];
+                return *(child_list *) addr2addr(&wksp[0]);
             }
             
             const xnode::child_list & xnode::children() const throw()
             {
-                return *(child_list *) &wksp[0];
+                return *(child_list *) addr2addr(&wksp[0]);
             }
             
             
             lexeme *         & xnode:: lxm() throw()
             {
-                return *(lexeme **) &wksp[0];
+                return *(lexeme **) addr2addr(&wksp[0]);
             }
             
             const lexeme *   & xnode:: lxm() const throw()
             {
-                return *(const lexeme **) &wksp[0];
+                return *(const lexeme **) addr2addr(&wksp[0]);
             }
             
             
