@@ -9,6 +9,33 @@ namespace yocto
         namespace
         {
             
+            class vrule;
+            
+            class vrule_node : public object
+            {
+            public:
+                vrule_node  *next;
+                vrule_node  *prev;
+                const vrule *handle;
+                
+                explicit vrule_node(vrule *h) throw() :
+                next(0), prev(0), handle(h)
+                {
+                    assert(handle);
+                }
+                
+                virtual ~vrule_node() throw()
+                {
+                }
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(vrule_node);
+            };
+            
+            typedef core::list_of_cpp<vrule_node> vrule_list;
+            
+            
             class vrule : public object, public counted
             {
             public:
@@ -29,12 +56,14 @@ namespace yocto
                 typedef intr_ptr<string,vrule> pointer;
                 typedef set<string,pointer>    database;
                 
+                vrule_list parents;
+                vrule_list children;
+                
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(vrule);
                 
             };
-            
-            
             
         }
         
@@ -80,9 +109,27 @@ namespace yocto
                         {
                             throw exception("multiple rule '%s'", p->name.c_str());
                         }
+                        continue;
                     }
+                    
+                    throw exception("cannot process '%s'", node->label.c_str());
                 }
             }
+            
+            //__________________________________________________________________
+            //
+            // second pass: dependency and terminals
+            //__________________________________________________________________
+            for( vrule::database::iterator i=vdb.begin();i!=vdb.end();++i)
+            {
+                vrule *parent = &(**i);
+                std::cerr << "\tprocessing " << parent->name << std::endl;
+                for(const syntax::xnode *node = parent->node->next; node; node=node->next)
+                {
+                    std::cerr << "\t\t" << node->label << std::endl;
+                }
+            }
+            
             
         }
         
