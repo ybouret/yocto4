@@ -2,6 +2,8 @@
 #include "yocto/associative/set.hpp"
 #include "yocto/exception.hpp"
 
+#include <cstdlib>
+
 namespace yocto
 {
     namespace lang
