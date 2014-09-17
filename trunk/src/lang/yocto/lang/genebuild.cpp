@@ -78,6 +78,12 @@ namespace yocto
                 //______________________________________________________________
                 inline void collect_rules_from(const syntax::xnode *root )
                 {
+                    
+                    // TODO: better
+                    if(root->count()<=0)
+                        throw exception("no rules");
+                    
+                    // first pass: named rules
                     for(const syntax::xnode *r=root->head();r;r=r->next)
                     {
                         if( "RULE" == r->label )
@@ -96,13 +102,37 @@ namespace yocto
                         
                         throw exception("can't handle %s", r->label.c_str());
                     }
+                    
+                    // second pass: virtual tree
+                    build(vr.head);
+                    
+                    
                 }
                 
                 //______________________________________________________________
                 //
                 // virtual tree building 
                 //______________________________________________________________
+                inline void build(vnode *vn)
+                {
+                    assert(vn);
+                    switch(vn->type)
+                    {
+                        case vnode_rule:
+                            build_rule(vn);
+                            break;
+                            
+                        default:
+                            throw exception("can't handle this type");
+                    }
+                }
                 
+                inline void build_rule(vnode *vn)
+                {
+                    assert(vn);
+                    assert(vnode_rule==vn->type);
+                
+                }
                 
                 
             private:
