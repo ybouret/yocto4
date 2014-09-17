@@ -55,36 +55,54 @@ namespace yocto
             typedef map<string,vnode::ptr> vmap;
             
             
-            static inline std::ostream & indent(std::ostream &fp, int n)
+            class vcontext
             {
-                for(int i=0;i<=n;++i) fp << "    ";
-                return fp;
-            }
-            
-            static inline void build_rule(vnode *vn,
-                                          vmap  &vm,
-                                          vlist &vl,
-                                          const int depth )
-            {
+            public:
+                vlist vr; //!< virtual top level rules
+                vmap  vm; //!< named rules
+                vlist vl; //!< local rules
                 
-            }
-            
-            static inline
-            void build( vnode *vn, vmap &vm, vlist &vl, const int depth)
-            {
-                assert(vn);
-                indent(std::cerr,depth) << "build '" << vn->name << "'" << std::endl;
-                switch(vn->type)
+                explicit vcontext()
                 {
-                    case vnode_rule:
-                        build_rule(vn,vm,vl,depth+1);
-                        break;
-                        
-                    default:
-                        throw exception("not handled");
+                    
                 }
                 
-            }
+                virtual ~vcontext() throw()
+                {
+                    
+                }
+                
+                //______________________________________________________________
+                //
+                // top level rules collection
+                //______________________________________________________________
+                inline void collect_rules_from(const syntax::xnode *root )
+                {
+                    for(const syntax::xnode *r=root->head();r;r=r->next)
+                    {
+                        if( "RULE" == r->label )
+                        {
+                            const syntax::xnode *nd = r->head();
+                            assert("ID"==nd->label);
+                            vnode *vn = new vnode(nd);
+                            vr.push_back(vn);
+                            if(!vm.insert(vn->name,vn))
+                            {
+                                throw exception("multiple top level rule '%s'", vn->name.c_str());
+                            }
+                            std::cerr << "registered '" << vr.tail->name << "'" << std::endl;
+                            continue;
+                        }
+                        
+                        throw exception("can't handle %s", r->label.c_str());
+                    }
+                }
+                
+                
+                
+            private:
+                YOCTO_DISABLE_COPY_AND_ASSIGN(vcontext);
+            };
             
             
         }
@@ -113,37 +131,14 @@ namespace yocto
             //
             // Let's rebuild the tree: gather top level rules
             //__________________________________________________________________
-            vlist vr;
-            vmap  vm;
-            
-            for(const syntax::xnode *r=root->head();r;r=r->next)
-            {
-                if( "RULE" == r->label )
-                {
-                    const syntax::xnode *nd = r->head();
-                    assert("ID"==nd->label);
-                    vnode *vn = new vnode(nd);
-                    vr.push_back(vn);
-                    if(!vm.insert(vn->name,vn))
-                    {
-                        throw exception("multiple top level rule '%s'", vn->name.c_str());
-                    }
-                    std::cerr << "registered '" << vr.tail->name << "'" << std::endl;
-                    continue;
-                }
-                
-                throw exception("can't handle %s", r->label.c_str());
-            }
+            vcontext ctx;
+            ctx.collect_rules_from(root);
             
             //__________________________________________________________________
             //
             // Then recursively collect rule content
             //__________________________________________________________________
-            vlist vl; // list of local nodes, for memory
-            for(vnode *vn=vr.head;vn;vn=vn->next)
-            {
-                build(vn,vm,vl,0);
-            }
+            
             
             
             //__________________________________________________________________
