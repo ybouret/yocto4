@@ -62,12 +62,12 @@ namespace yocto
                 vmap  vm; //!< named rules
                 vlist vl; //!< local rules
                 
-                explicit vcontext()
+                inline vcontext() : vr(), vm(), vl()
                 {
                     
                 }
                 
-                virtual ~vcontext() throw()
+                inline ~vcontext() throw()
                 {
                     
                 }
