@@ -47,12 +47,44 @@ namespace yocto
                 
                 virtual ~vnode() throw() {}
                 
+                
             private:
                 YOCTO_DISABLE_COPY_AND_ASSIGN(vnode);
             };
             
             typedef map<string,vnode::ptr> vmap;
             
+            
+            static inline std::ostream & indent(std::ostream &fp, int n)
+            {
+                for(int i=0;i<=n;++i) fp << "    ";
+                return fp;
+            }
+            
+            static inline void build_rule(vnode *vn,
+                                          vmap  &vm,
+                                          vlist &vl,
+                                          const int depth )
+            {
+                
+            }
+            
+            static inline
+            void build( vnode *vn, vmap &vm, vlist &vl, const int depth)
+            {
+                assert(vn);
+                indent(std::cerr,depth) << "build '" << vn->name << "'" << std::endl;
+                switch(vn->type)
+                {
+                    case vnode_rule:
+                        build_rule(vn,vm,vl,depth+1);
+                        break;
+                        
+                    default:
+                        throw exception("not handled");
+                }
+                
+            }
             
             
         }
@@ -107,10 +139,10 @@ namespace yocto
             //
             // Then recursively collect rule content
             //__________________________________________________________________
+            vlist vl; // list of local nodes, for memory
             for(vnode *vn=vr.head;vn;vn=vn->next)
             {
-                std::cerr << "\tcompiling " << vn->name << std::endl;
-                
+                build(vn,vm,vl,0);
             }
             
             
@@ -121,7 +153,7 @@ namespace yocto
             //auto_ptr<parser> P( new parser("generated","scanner") );
             
             
-
+            
             
         }
         
