@@ -105,9 +105,13 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Then collect rule content
+            // Then recursively collect rule content
             //__________________________________________________________________
-            
+            for(vnode *vn=vr.head;vn;vn=vn->next)
+            {
+                std::cerr << "\tcompiling " << vn->name << std::endl;
+                
+            }
             
             
             //__________________________________________________________________
