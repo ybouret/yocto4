@@ -336,7 +336,7 @@ namespace yocto
             const real_t sig_y = Sqrt(sum_dy2/n);
             const real_t sig_z = Sqrt(sum_dz2/n);
             const real_t covyz = sum_dyz / n;
-            const real_t den   = (sig_y * sig_z + numeric<double>::tiny);
+            const real_t den   = (sig_y * sig_z + numeric<real_t>::tiny);
             return covyz/den;
         }
         
