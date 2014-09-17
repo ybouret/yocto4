@@ -680,7 +680,7 @@ namespace yocto
             Dorg = computeD();
             Y_LSF_CB();
             
-#if 1
+#if 0
             //std::cerr << "alpha=" << alpha << std::endl;
             Matrix  Alpha(alpha);
             Matrix  Eigv(nvar,nvar);
