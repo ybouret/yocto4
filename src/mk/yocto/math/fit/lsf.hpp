@@ -1,8 +1,6 @@
 #ifndef YOCTO_MATH_FIT_GNL_LSF_INCLUDED
 #define YOCTO_MATH_FIT_GNL_LSF_INCLUDED 1
 
-
-
 #include "yocto/counted.hpp"
 #include "yocto/ptr/arc.hpp"
 #include "yocto/sequence/vector.hpp"
