@@ -7,6 +7,7 @@
 #include "yocto/math/ode/explicit/driver-ck.hpp"
 
 #include "yocto/math/kernel/tao.hpp"
+#include "yocto/string/conv.hpp"
 
 using namespace yocto;
 using namespace math;
@@ -81,10 +82,14 @@ namespace {
 
 YOCTO_UNIT_TEST_IMPL(fit_vol)
 {
-	size_t icol = 2;
+	
 
 	if(argc>1)
 	{
+		size_t icol = 2;
+		if(argc>2)
+			icol = strconv:: to_size(argv[2],"column index");
+
 		// read data
 		vector<double> t;
 		vector<double> V;
