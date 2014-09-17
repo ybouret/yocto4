@@ -91,7 +91,7 @@ namespace yocto
                     const syntax::xnode *nd = r->head();
                     assert("ID"==nd->label);
                     vnode *vn = new vnode(nd);
-                    vr.push_back( vn );
+                    vr.push_back(vn);
                     if(!vm.insert(vn->name,vn))
                     {
                         throw exception("multiple top level rule '%s'", vn->name.c_str());
