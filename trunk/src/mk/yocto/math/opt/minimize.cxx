@@ -28,7 +28,6 @@ namespace yocto {
 			static const real_t C    = REAL(1.0)-R;
 			
 			
-			//ftol = Fabs( ftol );
 			const real_t xtol = max_of<real_t>( fmax, Fabs(ftol) );
 			
 			real_t       x0   = x.a, x1, x2, x3 = x.c;
