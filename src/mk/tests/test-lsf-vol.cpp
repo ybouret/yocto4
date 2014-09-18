@@ -142,6 +142,12 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
 			throw exception("unable to fit volume");
 		}
         
+        std::cerr << std::endl;
+        std::cerr << "Fit Results: " << std::endl;
+        std::cerr << "aorg=" << aorg << std::endl;
+        std::cerr << "aerr=" << aerr << std::endl;
+        std::cerr << "corr=" << samples.corr() << std::endl;
+        
 		{
 			ios::ocstream fp(vformat("outvol%u.dat",unsigned(icol)),false);
 			for(size_t i=1;i<=N;++i)

@@ -677,6 +677,10 @@ namespace yocto
             // compute errors
             //
             //__________________________________________________________________
+            if(verbose)
+            {
+                std::cerr << "#Fit: computing error estimates" << std::endl;
+            }
             Dorg = computeD();
             Y_LSF_CB();
             
