@@ -1,5 +1,5 @@
 #include "yocto/chemical/equilibria.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -7,8 +7,8 @@ namespace yocto
 {
     namespace chemical
     {
-        typedef math::algebra<double> mkl;
-        
+        using math::tao;
+
         void equilibria:: computeGammaPrimeAndPhi(double t, const array<double> &C)
         {
             iterator     k = begin();
@@ -30,7 +30,7 @@ namespace yocto
             // compute Phi*rho + dGamma/dt
             //__________________________________________________________________
             computeGammaPrimeAndPhi(t,C); // xi holds dGamma/dt
-            mkl::mul_rtrn(W, Phi, Nu);
+			tao::mmul_rtrn(W,Phi,Nu);
             if(!lu_t::build(W))
             {
                 throw exception("invalid composition for absorbing");
@@ -57,7 +57,7 @@ namespace yocto
             //
             // compute dC = Nu'*inv(Phi*Nu')*(dtGamma+Phi*rho)
             //__________________________________________________________________
-            mkl::mul_trn(dC, Nu, xi);
+            tao::mul_trn(dC, Nu, xi);
             
             //__________________________________________________________________
             //

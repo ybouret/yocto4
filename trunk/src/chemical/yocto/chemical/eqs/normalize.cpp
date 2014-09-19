@@ -1,5 +1,5 @@
 #include "yocto/chemical/equilibria.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 
 #include "yocto/code/utils.hpp"
 
@@ -7,8 +7,8 @@ namespace yocto
 {
     namespace chemical
     {
-        typedef math::algebra<double> mkl;
-        
+        using math::tao;
+
         bool  equilibria:: normalize(double         t,
                                      array<double> &C,
                                      bool           recomputeK )
@@ -53,13 +53,13 @@ namespace yocto
                 //
                 // compute the full Newton's extent
                 //______________________________________________________________
-                mkl::mul_rtrn(W, Phi, Nu);
+                tao::mmul_rtrn(W, Phi, Nu);
                 if(!lu_t::build(W))
                 {
                     std::cerr << "#Newton-I: singular composition" << std::endl;
                     return false;
                 }
-                mkl::neg(xi, Gamma);
+                tao::neg(xi, Gamma);
                 lu_t::solve(W, xi);
                 //std::cerr << "xi_full=" << xi << std::endl;
                 
@@ -75,7 +75,7 @@ namespace yocto
                 //
                 // find dC
                 //______________________________________________________________
-                mkl::mul_trn(dC, Nu, xi);
+                tao::mul_trn(dC, Nu, xi);
                 
                 //______________________________________________________________
                 //
