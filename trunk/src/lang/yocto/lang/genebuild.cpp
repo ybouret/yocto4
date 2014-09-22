@@ -105,8 +105,6 @@ namespace yocto
                     
                     // second pass: virtual tree
                     build(vr.head);
-                    
-                    
                 }
                 
                 //______________________________________________________________
@@ -131,7 +129,7 @@ namespace yocto
                 {
                     assert(vn);
                     assert(vnode_rule==vn->type);
-                
+                    
                 }
                 
                 
