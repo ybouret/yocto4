@@ -69,6 +69,27 @@ mpn generate_mpn(size_t length)
     return x;
 }
 
+#include <cmath>
+
+static inline
+void ave_and_rms( double &ave, double &rms, const array<double> &v )
+{
+    ave = 0;
+    rms = 0;
+    const size_t n = v.size();
+    for(size_t i=n;i>0;--i)
+    {
+        ave += v[i];
+    }
+    ave /= n;
+    for(size_t i=n;i>0;--i)
+    {
+        const double d = v[i] - ave;
+        rms += d*d;
+    }
+    rms = sqrt(rms/n);
+}
+
 YOCTO_UNIT_TEST_IMPL(add_perf)
 {
     volatile mpn sum;
@@ -76,16 +97,14 @@ YOCTO_UNIT_TEST_IMPL(add_perf)
     wtime        chrono;
     vector<mpn>  lhs;
     vector<mpn>  rhs;
-    const size_t nperf  = 1000;
-    const size_t abits  = 512;
-    const size_t cycles = 8;
+    const size_t nperf  = 2048;
+    const size_t abits  = 1024;
+    const size_t cycles = 32;
     
     const size_t bytes = abits/8;
     
-    vector<double> tmx(cycles,as_capacity);
-    vector<double> ws(cycles,as_capacity);
+    vector<double> spd(cycles,as_capacity);
     chrono.start();
-    
     for(size_t k=1;k<=cycles;++k)
     {
         double ave = 0;
@@ -100,7 +119,6 @@ YOCTO_UNIT_TEST_IMPL(add_perf)
         }
         ave /= (nperf*2);
         std::cerr << "bits=" << ave << std::endl;
-        ws.push_back(ave);
         
         double ell = 0;
         for(size_t i=nperf;i>0;--i)
@@ -109,17 +127,17 @@ YOCTO_UNIT_TEST_IMPL(add_perf)
             (mpn &)sum = mpn::add(lhs[i],rhs[i]);
             ell += chrono.query() - mark;
         }
+        ell/=nperf;
         std::cerr << "ell=" << ell << std::endl;
-        tmx.push_back(ell);
-        std::cerr << "\tspd=" << ws[k]/tmx[k] << std::endl;
+        
+        spd.push_back( 1e-6*ave/ell );
+        double speed = 0;
+        double rms   = 0;
+        ave_and_rms(speed,rms,spd);
+        const double err = rms/sqrt(double(k));
+        std::cerr << "\tSPEED = " << speed << " Mbits/s, +/- " << err << std::endl;
     }
-    double speed = 0;
-    for(size_t k=1;k<=cycles;++k)
-    {
-        speed += ws[k]/tmx[k];
-    }
-    speed /= cycles;
-    std::cerr << "speed = " << speed << " bits/s" << std::endl;
+    
     
 }
 YOCTO_UNIT_TEST_DONE()
