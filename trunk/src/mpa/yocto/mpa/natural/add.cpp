@@ -1,7 +1,7 @@
 #include "yocto/mpa/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
 
-//#define Y_MPA_UNROLL 1
+#define Y_MPA_UNROLL 1
 
 #if defined(Y_MPA_UNROLL)
 #include "yocto/code/unroll.hpp"
@@ -55,10 +55,8 @@ namespace yocto
             {
                 l += com_size;
                 s += com_size;
-#define Y_MPA_ADD2(I) carry += l[I]; s[I] = uint8_t(carry); carry >>= 8
-                std::cerr << "\tstart" << std::endl;
-                YOCTO_LOOP_FUNC(ntop, Y_MPA_ADD2,0);
-                std::cerr << "\tend" << std::endl;
+#define Y_MPA_ADD2(I) assert(com_size+(I) < top_size); carry += l[I]; s[I] = uint8_t(carry); carry >>= 8
+                //YOCTO_LOOP_FUNC(ntop, Y_MPA_ADD2,0);
             }
             
 #else
