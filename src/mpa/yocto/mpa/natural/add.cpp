@@ -50,13 +50,19 @@ namespace yocto
             // top loop
             //------------------------------------------------------------------
             const size_t ntop = top_size - com_size;
-            std::cerr << "ntop=" << ntop << std::endl;
+            //std::cerr << "ntop=" << ntop << std::endl;
             if(ntop>0)
             {
-                l += com_size;
-                s += com_size;
+                //l += com_size;
+                //s += com_size;
 #define Y_MPA_ADD2(I) assert(com_size+(I) < top_size); carry += l[I]; s[I] = uint8_t(carry); carry >>= 8
                 //YOCTO_LOOP_FUNC(ntop, Y_MPA_ADD2,0);
+                for( size_t i=com_size; i < top_size; ++i )
+                {
+                    carry  += l[i];
+                    s[i]    = uint8_t(carry);
+                    carry >>= 8;
+                }
             }
             
 #else
