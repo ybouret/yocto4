@@ -11,6 +11,7 @@ namespace yocto
     namespace mpa
     {
         class    memmgr;
+        
         struct   memIO
         {
             static uint8_t *acquire(size_t &n);
@@ -19,7 +20,7 @@ namespace yocto
             static const  double sin_table[32];
         };
         
-        //! helper
+        //! helper for FFT
         template <typename T>
         class array_of
         {
