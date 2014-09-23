@@ -7,9 +7,21 @@ namespace yocto
         
         natural natural:: rand(size_t nbits)
         {
-            if(nbits)
+            if(0!=nbits)
             {
-                natural ans;
+                size_t nbytes = nbits/8;
+                if(8*nbytes<nbits) ++nbytes;
+                
+                natural ans(nbytes,as_capacity);
+                for(size_t i=0;i<nbits;++i)
+                {
+                    if( memIO::random_bit())
+                    {
+                        ans.byte[i>>3] |= (1 << (i&7) );
+                    }
+                }
+                
+#if 0
                 for(size_t i=nbits;i>0;--i)
                 {
                     ans <<= 1;
@@ -19,10 +31,15 @@ namespace yocto
                         ans.rescan();
                     }
                 }
+#endif
+                
+                ans.rescan();
                 return ans;
             }
             else
+            {
                 return natural();
+            }
         }
         
     }

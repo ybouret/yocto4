@@ -51,25 +51,14 @@ YOCTO_UNIT_TEST_DONE()
 static inline
 mpn generate_mpn(size_t length)
 {
-    mpn x;
-    const size_t m = length/2;
-    
-    for(size_t i=0;i<m;++i)
-    {
-        x <<= 8;
-        x  += uint8_t(alea_leq(255));
-    }
-    
-    for(size_t i=alea_leq(length);i>0;--i)
-    {
-        x <<= 8;
-        x  += uint8_t(alea_leq(255));
-    }
-    
-    return x;
+    const size_t lb = length * 8;
+    const size_t nb = lb/2 + alea_leq(lb);
+    return mpn::rand(nb);
 }
 
 #include <cmath>
+#include "yocto/code/utils.hpp"
+
 
 static inline
 void ave_and_rms( double &ave, double &rms, const array<double> &v )
@@ -90,50 +79,80 @@ void ave_and_rms( double &ave, double &rms, const array<double> &v )
     rms = sqrt(rms/n);
 }
 
+static inline
+double gen_sample( vector<mpn> &lhs, vector<mpn> &rhs, size_t nperf, size_t bytes)
+{
+    double ave = 0;
+    lhs.free();
+    rhs.free();
+    for(size_t i=nperf;i>0;--i)
+    {
+        const mpn x = generate_mpn(bytes);
+        lhs.push_back(x);
+        rhs.push_back(x);
+        ave += x.bits();
+    }
+    return ave/nperf;
+}
+
 YOCTO_UNIT_TEST_IMPL(add_perf)
 {
     volatile mpn sum;
+#if 0
+    for(size_t nb=1;nb<=32;++nb)
+    {
+        double ab = 0;
+        for(size_t i=0;i<10;++i)
+        {
+            const mpn x = mpn::rand(nb);
+            std::cerr << " " << x;
+            ab += x.bits();
+        }
+        ab /= 10;
+        std::cerr << " <" << ab << "/" << nb <<  ">" << std::endl;
+    }
+    
+    return 0;
+#endif
     
     wtime        chrono;
     
     const size_t nperf  = 2048;
     const size_t abits  = 1024;
-    const size_t cycles = 32;
+    const size_t cycles = 64;
     vector<mpn>  lhs(nperf,as_capacity);
     vector<mpn>  rhs(nperf,as_capacity);
     
     const size_t bytes = abits/8;
     
     vector<double> spd(cycles,as_capacity);
+    
     chrono.start();
+
     for(size_t k=1;k<=cycles;++k)
     {
-        lhs.free();
-        rhs.free();
-        double ave = 0;
-        for(size_t i=0;i<nperf;++i)
-        {
-            const mpn l = generate_mpn(bytes);
-            lhs.push_back(l);
-            ave += l.bits();
-            const mpn r = generate_mpn(bytes);
-            rhs.push_back(r);
-            ave += r.bits();
-            std::cerr << "l bytes=" << l.length() << " / r bytes=" << r.length() << std::endl;
-            std::cerr << "l bits =" << l.bits()   << std::endl;
-        }
-        exit(1);
-        ave /= (nperf*2);
-        std::cerr << "bits=" << ave << std::endl;
-        
-        double ell = 0;
+        const double ave = gen_sample(lhs, rhs, nperf, bytes);
+        double       ell = 0;
+        size_t       na  = 0;
         for(size_t i=nperf;i>0;--i)
         {
+            const mpn &l = lhs[i];
+            const mpn &r = rhs[i];
+            double tsub =0;
             const double mark = chrono.query();
-            (mpn &)sum = mpn::add(lhs[i],rhs[i]);
+            do
+            {
+                (mpn &)sum = mpn::add(l,r);
+                tsub = chrono.query() - mark;
+                ++na;
+            }
+            while(tsub<5e-4);
+            
             ell += chrono.query() - mark;
         }
-        ell/=nperf;
+        ell/=na;
+        std::cerr << "add=" << na  << std::endl;
+        std::cerr << "ave=" << ave << std::endl;
         std::cerr << "ell=" << ell << std::endl;
         
         spd.push_back( 1e-6*ave/ell );
