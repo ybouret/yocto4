@@ -95,11 +95,12 @@ YOCTO_UNIT_TEST_IMPL(add_perf)
     volatile mpn sum;
     
     wtime        chrono;
-    vector<mpn>  lhs;
-    vector<mpn>  rhs;
+    
     const size_t nperf  = 2048;
     const size_t abits  = 1024;
     const size_t cycles = 32;
+    vector<mpn>  lhs(nperf,as_capacity);
+    vector<mpn>  rhs(nperf,as_capacity);
     
     const size_t bytes = abits/8;
     
@@ -107,6 +108,8 @@ YOCTO_UNIT_TEST_IMPL(add_perf)
     chrono.start();
     for(size_t k=1;k<=cycles;++k)
     {
+        lhs.free();
+        rhs.free();
         double ave = 0;
         for(size_t i=0;i<nperf;++i)
         {

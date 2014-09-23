@@ -1,6 +1,14 @@
 #include "yocto/mpa/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
 
+//#define Y_MPA_UNROLL 1
+
+#if defined(Y_MPA_UNROLL)
+#include "yocto/code/unroll.hpp"
+#endif
+
+#include <iostream>
+
 namespace yocto
 {
     namespace mpa
@@ -26,35 +34,59 @@ namespace yocto
             
             
             //------------------------------------------------------------------
-			// Initialize
-			//------------------------------------------------------------------
-			unsigned carry = 0;
+            // Initialize
+            //------------------------------------------------------------------
+            unsigned carry = 0;
+            
+            
+#if defined(Y_MPA_UNROLL)
+            //------------------------------------------------------------------
+            // common loop
+            //------------------------------------------------------------------
+#define Y_MPA_ADD(I) carry += l[I] + r[I]; s[I] = uint8_t(carry); carry >>= 8
+            YOCTO_LOOP_FUNC(com_size,Y_MPA_ADD,0);
             
             //------------------------------------------------------------------
-			// common loop
-			//------------------------------------------------------------------
+            // top loop
+            //------------------------------------------------------------------
+            const size_t ntop = top_size - com_size;
+            std::cerr << "ntop=" << ntop << std::endl;
+            if(ntop>0)
+            {
+                l += com_size;
+                s += com_size;
+#define Y_MPA_ADD2(I) carry += l[I]; s[I] = uint8_t(carry); carry >>= 8
+                std::cerr << "\tstart" << std::endl;
+                YOCTO_LOOP_FUNC(ntop, Y_MPA_ADD2,0);
+                std::cerr << "\tend" << std::endl;
+            }
+            
+#else
+            //------------------------------------------------------------------
+            // common loop
+            //------------------------------------------------------------------
             size_t   i     = 0;
-			for( ; i < com_size; ++i )
-			{
-				carry += l[i] + r[i];
-				s[i]   = uint8_t(carry);
-				carry >>= 8;
-			}
-			
+            for( ; i < com_size; ++i )
+            {
+                carry += l[i] + r[i];
+                s[i]   = uint8_t(carry);
+                carry >>= 8;
+            }
             //------------------------------------------------------------------
-			// top loop
-			//------------------------------------------------------------------
-			for( ; i < top_size; ++i )
-			{
-				carry += l[i];
-				s[i]   = uint8_t(carry);
-				carry >>= 8;
-			}
+            // top loop
+            //------------------------------------------------------------------
+            for( ; i < top_size; ++i )
+            {
+                carry  += l[i];
+                s[i]    = uint8_t(carry);
+                carry >>= 8;
+            }
+#endif
             
             //------------------------------------------------------------------
-			// finalize
-			//------------------------------------------------------------------
-			s[top_size] = uint8_t(carry);
+            // finalize
+            //------------------------------------------------------------------
+            s[top_size] = uint8_t(carry);
             
             
             ans.rescan();
@@ -98,7 +130,7 @@ namespace yocto
             xch(tmp);
             return *this;
         }
-
+        
         
         natural & natural:: operator++()
         {
