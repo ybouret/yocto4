@@ -1,12 +1,5 @@
 #include "yocto/mpa/word2mpn.hpp"
 #include "yocto/code/bswap.hpp"
-
-//#define Y_MPA_UNROLL 1
-
-#if defined(Y_MPA_UNROLL)
-#include "yocto/code/unroll.hpp"
-#endif
-
 #include <iostream>
 
 namespace yocto
@@ -36,39 +29,35 @@ namespace yocto
             //------------------------------------------------------------------
             // Initialize
             //------------------------------------------------------------------
-            unsigned carry = 0;
+            register unsigned carry = 0;
             
-            
-#if defined(Y_MPA_UNROLL)
-            //------------------------------------------------------------------
+#if 0
             // common loop
-            //------------------------------------------------------------------
-#define Y_MPA_ADD_COM(I) carry += unsigned(l[I]) + unsigned(r[I]); s[I] = uint8_t(carry); carry >>= 8
-            YOCTO_LOOP_FUNC(com_size,Y_MPA_ADD_COM,0);
-            
-            //------------------------------------------------------------------
-            // top loop
-            //------------------------------------------------------------------
-            const size_t ntop = top_size - com_size;
-            l           += com_size;
-            uint8_t *__s = s+com_size;
-            if(ntop>0)
+            for(size_t i=com_size;i>0;--i)
             {
-#define Y_MPA_ADD_TOP(I) carry += unsigned(l[I]); __s[I] = uint8_t(carry); carry >>= 8
-                YOCTO_LOOP_FUNC_(ntop, Y_MPA_ADD_TOP,0);
+                carry += unsigned(*(l++)) + unsigned( *(r++) );
+                *(s++) = uint8_t(carry);
+                carry >>= 8;
             }
-            //------------------------------------------------------------------
-            // finalize
-            //------------------------------------------------------------------
-            s[top_size] = uint8_t(carry);
+            
+            // top loop
+            for(size_t i=top_size-com_size;i>0;--i)
+            {
+                carry += unsigned(*(l++));
+                *(s++) = uint8_t(carry);
+                carry >>= 8;
+            }
+            
+            // final
+            *s = uint8_t(carry);
 #else
             //------------------------------------------------------------------
             // common loop
             //------------------------------------------------------------------
-            size_t   i     = 0;
+            register size_t   i     = 0;
             for( ; i < com_size; ++i )
             {
-                carry += l[i] + r[i];
+                carry += unsigned(l[i]) + unsigned(r[i]);
                 s[i]   = uint8_t(carry);
                 carry >>= 8;
             }
@@ -77,7 +66,7 @@ namespace yocto
             //------------------------------------------------------------------
             for( ; i < top_size; ++i )
             {
-                carry  += l[i];
+                carry  += unsigned(l[i]);
                 s[i]    = uint8_t(carry);
                 carry >>= 8;
             }
@@ -86,8 +75,6 @@ namespace yocto
             //------------------------------------------------------------------
             s[top_size] = uint8_t(carry);
 #endif
-            
-            
             
             ans.rescan();
             YOCTO_CHECK_MPN(&ans);
