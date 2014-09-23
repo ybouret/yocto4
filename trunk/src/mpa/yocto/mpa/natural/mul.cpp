@@ -14,19 +14,19 @@ namespace yocto
         
         
         //! simultaneous FFTs
-		static inline
+        static inline
         void _xfft(real_t      *data,
                    real_t      *other,
                    const size_t size
                    ) throw()
         {
             assert( data  != NULL );
-			assert( other != NULL );
+            assert( other != NULL );
             assert( is_a_power_of_two(size) );
-			
+            
             --data;
-			--other;
-			
+            --other;
+            
             //==================================================================
             // bit reversal algorithm
             //==================================================================
@@ -36,20 +36,20 @@ namespace yocto
                 for(register size_t i=1; i<n; i+=2)
                 {
                     if(j>i)
-					{
+                    {
                         core::bswap<2*sizeof(real_t)>( data+i,  data+j );
                         core::bswap<2*sizeof(real_t)>( other+i, other+j);
                     }
                     register size_t m = size; // m=  n / 2;
                     while (m >= 2 && j > m)
-					{
+                    {
                         j -= m;
                         m >>= 1;
                     }
                     j += m;
                 }
             }
-			
+            
             //==================================================================
             // Lanczos-Algorithm
             //==================================================================
@@ -308,8 +308,8 @@ namespace yocto
                     carry         +=  L[i].re/nN + half;
                     const real_t q = size_t( carry / 256.0 );
                     const real_t r = carry - 256.0 * q;
-                    prod[i]   = uint8_t(r);
-                    carry     = q;
+                    prod[i]        = uint8_t(r);
+                    carry          = q;
                 }
                 prod[top] = uint8_t(carry);
                 
