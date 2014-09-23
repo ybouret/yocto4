@@ -14,7 +14,7 @@
 /** N > 0 */
 #define YOCTO_LOOP_(N,CODE)   do                       \
 /*	*/	{                                              \
-/*	*/		const    size_t iter_ = N;                 \
+/*	*/		const register size_t iter_ = (N);         \
 /*	*/		assert(iter_>0);                           \
 /*	*/		{                                          \
 /*	*/			register size_t loop_ = (iter_+7)>>3;  \
@@ -36,7 +36,7 @@
 /**  N >= 0 */
 #define YOCTO_LOOP(N,CODE)   do                       \
 /*	*/	{                                             \
-/*	*/		const    size_t iter_ = N;                \
+/*	*/		const register size_t iter_ = (N);        \
 /*	*/		if(iter_>0)                               \
 /*	*/		{                                         \
 /*	*/			register size_t loop_ = (iter_+7)>>3; \
@@ -58,12 +58,12 @@
 /** loop from SHIFT to (N-1+SHIFT), N>=0 */
 #define YOCTO_LOOP_FUNC(N,FUNC,SHIFT)     do                      \
 {                                                                 \
-const    size_t iter_ = N;                                        \
+const register size_t iter_ = (N);                                \
 if(iter_>0)                                                       \
 {                                                                 \
-register size_t loop_ = (iter_+0x7)>>0x3;                         \
-const    size_t jump_ = iter_&0x7;                                \
-register size_t indx_ = jump_-(0x8-SHIFT);                        \
+register size_t       loop_ = (iter_+0x7)>>0x3;                   \
+const register size_t jump_ = iter_&0x7;                          \
+register size_t       indx_ = jump_-(0x8-SHIFT);                  \
 switch (jump_) {                                                  \
 case 0: do { { const size_t i0_ = (indx_ +=0x8); { FUNC(i0_); } } \
 case 7:      { const size_t i1_ = indx_+0x1;     { FUNC(i1_); } } \
@@ -81,12 +81,12 @@ case 1:      { const size_t i7_ = indx_+0x7;     { FUNC(i7_); } } \
 /** loop from SHIFT to (N-1+SHIFT), N>0 */
 #define YOCTO_LOOP_FUNC_(N,FUNC,SHIFT) do                         \
 {                                                                 \
-const    size_t iter_ = N;                                        \
+const register size_t iter_ = (N);                                \
 assert(iter_>0);                                                  \
 {                                                                 \
-register size_t loop_ = (iter_+0x7)>>0x3;                         \
-const    size_t jump_ = iter_&0x7;                                \
-register size_t indx_ = jump_-(0x8-SHIFT);                        \
+register size_t       loop_ = (iter_+0x7)>>0x3;                   \
+const register size_t jump_ = iter_&0x7;                          \
+register size_t       indx_ = jump_-(0x8-SHIFT);                  \
 switch (jump_) {                                                  \
 case 0: do { { const size_t i0_ = (indx_ +=0x8); { FUNC(i0_); } } \
 case 7:      { const size_t i1_ = indx_+0x1;     { FUNC(i1_); } } \
