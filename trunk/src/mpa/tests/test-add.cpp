@@ -119,7 +119,10 @@ YOCTO_UNIT_TEST_IMPL(add_perf)
             const mpn r = generate_mpn(bytes);
             rhs.push_back(r);
             ave += r.bits();
+            std::cerr << "l bytes=" << l.length() << " / r bytes=" << r.length() << std::endl;
+            std::cerr << "l bits =" << l.bits()   << std::endl;
         }
+        exit(1);
         ave /= (nperf*2);
         std::cerr << "bits=" << ave << std::endl;
         
