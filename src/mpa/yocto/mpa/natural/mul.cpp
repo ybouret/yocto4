@@ -123,7 +123,7 @@ namespace yocto
             //==================================================================
             const size_t n = size << 1;
             {
-                size_t j=1;
+                register size_t j=1;
                 for (size_t i=1; i<n; i+=2) {
                     if (j > i)
                     {
