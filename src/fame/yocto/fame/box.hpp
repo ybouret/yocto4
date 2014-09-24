@@ -59,13 +59,55 @@ namespace yocto
             
             //! map each dimension of the array
             template <typename U>
-            void map( const typename array_for<DIM,U>::type &arr ) const throw()
+            void map( array1D<U> &x ) const throw()
             {
-                
+                const T *qmin = (const T *)&vmin;
+                const T *qmax = (const T *)&vmax;
+                const T *qlen = (const T *)&length;
+                map1<U>(x.entry,x.items,qmin[0],qmax[0],qlen[0]);
             }
+            
+            
+            //! map each dimension of the arrays
+            template <typename U>
+            void map( array1D<U> &x, array1D<U> &y) const throw()
+            {
+                const T *qmin = (const T *)&vmin;
+                const T *qmax = (const T *)&vmax;
+                const T *qlen = (const T *)&length;
+                map1<U>(x.entry,x.items,qmin[0],qmax[0],qlen[0]);
+                map1<U>(y.entry,y.items,qmin[1],qmax[1],qlen[1]);
+            }
+            
+            //! map each dimension of the array
+            template <typename U>
+            void map( array1D<U> &x, array1D<U> &y, array1D<U> &z) const throw()
+            {
+                const T *qmin = (const T *)&vmin;
+                const T *qmax = (const T *)&vmax;
+                const T *qlen = (const T *)&length;
+                map1<U>(x.entry,x.items,qmin[0],qmax[0],qlen[0]);
+                map1<U>(y.entry,y.items,qmin[1],qmax[1],qlen[1]);
+                map1<U>(z.entry,z.items,qmin[2],qmax[2],qlen[2]);
+            }
+            
             
         private:
             YOCTO_DISABLE_ASSIGN(box);
+            template <typename U>
+            static inline void map1( U *u, size_t n, const U umin, const U umax, const U ulen ) throw()
+            {
+                assert(u);
+                assert(n>0);
+                *u = umin;
+                --n;
+                for(size_t i=1;i<n;++i)
+                {
+                    ++u;
+                    *u = umin + (i*ulen)/n; // actually n-1
+                }
+                *u = umax;
+            }
         };
     }
 }
