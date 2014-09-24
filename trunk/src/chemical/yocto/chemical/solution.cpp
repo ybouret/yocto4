@@ -156,5 +156,17 @@ namespace yocto
             return -log10(X[p->indx]);
         }
         
+        double solution:: charge() const throw()
+        {
+            double ans = 0;
+            collection::const_iterator j=lib.begin();
+            for(size_t i=1;i<=n;++i,++j)
+            {
+                ans += C[i] * (**j).z;
+            }
+            return ans;
+        }
+        
+        
     }
 }

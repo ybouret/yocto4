@@ -44,13 +44,14 @@ namespace yocto
             
             solution & operator=( const solution & ); //!< checking compatible
             solution & operator=( const array<double> &) throw();
+            double     charge() const throw();
             
             double pH() const; //!< "H+" must exists...
             
             
         private:
-            const size_t n;
-            size_t       m; //!< memory
+            const size_t n; //!< #components
+            size_t       m; //!< for memory
             double      *C; //!< conc
             
             virtual const double *get_item() const throw();
