@@ -24,9 +24,9 @@ namespace yocto
         template <size_t,typename>
         struct vertex_for; //! root template
         
-        template <typename T> struct vertex_for<1,T> { typedef T type; };
-        template <typename T> struct vertex_for<2,T> { typedef math::v2d<T> type; };
-        template <typename T> struct vertex_for<3,T> { typedef math::v3d<T> type; };
+        template <typename T> struct vertex_for<1,T> { typedef T            type; typedef T           args; };
+        template <typename T> struct vertex_for<2,T> { typedef math::v2d<T> type; typedef const type &args; };
+        template <typename T> struct vertex_for<3,T> { typedef math::v3d<T> type; typedef const type &args; };
         
         
         //______________________________________________________________________
