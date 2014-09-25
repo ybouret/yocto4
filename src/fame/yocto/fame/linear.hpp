@@ -80,6 +80,14 @@ namespace yocto
             inline virtual ~linear() throw() {}
             type *entry;
             
+            inline void ld( param_type value)
+            {
+                for(size_t i=0;i<this->items;++i)
+                {
+                    entry[i] = value;
+                }
+            }
+            
         protected:
             inline explicit linear(const string &user_name,
                                    const LAYOUT &L,

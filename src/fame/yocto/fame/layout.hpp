@@ -117,6 +117,8 @@ namespace yocto
                 return has(sub.lower) && has(sub.upper);
             }
             
+            inline const layout_of & __layout() const throw() { return *this; }
+            
         private:
             YOCTO_DISABLE_ASSIGN(layout_of);
         };

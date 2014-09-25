@@ -48,6 +48,17 @@ namespace yocto
                 return addr[i];
             }
             
+            inline std::ostream & display( std::ostream &os ) const
+            {
+                os << '[';
+                for(unit_t i=this->lower;i<=this->upper;++i)
+                {
+                    os << ' ' << (*this)[i];
+                }
+                os << ']';
+                return os;
+            }
+            
                       
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
