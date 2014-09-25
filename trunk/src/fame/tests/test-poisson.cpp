@@ -41,7 +41,7 @@ namespace {
         Cs( "Cs", *this),
         dX(B.length/(items-1)),
         epsilon( Y_EPSILON0 * 78.5 ),
-        alpha( 1000.0 * Y_FARADAY / epsilon),
+        alpha( (1000.0 * Y_FARADAY) / epsilon),
         dX2(dX*dX)
         {
             B.map(X);
@@ -66,11 +66,15 @@ namespace {
         }
         
         
-        double getErr0(unit_t i) const throw()
+        double Laplacian(unit_t i) const throw()
         {
             const double mid = Psi[i];
-            const double lap = (Psi[i-1] - (mid+mid) + Psi[i+1]) / dX2;
-            return mid - lambda*lambda * lap;
+            return (Psi[i-1] - (mid+mid) + Psi[i+1]) / dX2;
+        }
+        
+        double getErr0(unit_t i) const throw()
+        {
+            return Psi[i] - (lambda*lambda) * Laplacian(i);
         }
         
         double getRMS0() const throw()
@@ -157,9 +161,7 @@ namespace {
         
         double getErr1(unit_t i) const throw()
         {
-            const double mid = Psi[i];
-            const double lap = (Psi[i-1] - (mid+mid) + Psi[i+1]) / dX2;
-            return lap - Cs[i];
+            return Laplacian(i) - Cs[i];
         }
         
         double getRMS1() const throw()
@@ -230,7 +232,7 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(poisson)
 {
     
-    Cell cell( layout1D(0,500), 1e-7 );
+    Cell cell( layout1D(0,5000), 1e-6 );
     
     cell.Na.ld(0.01);
     cell.Cl.ld(0.01);
@@ -249,14 +251,14 @@ YOCTO_UNIT_TEST_IMPL(poisson)
         }
     }
     
-    cell.solve1();
+    cell.compute_Cs();
+    std::cerr << "rms1=" <<  cell.getRMS1() << std::endl;
     {
-        ios::ocstream fp("Psi1.dat",false);
-        for(unit_t i=cell.lower;i<=cell.upper;++i)
+        ios::ocstream fp("Curv.dat",false);
+        for(unit_t i=cell.lower+1;i<cell.upper;++i)
         {
-            fp("%g %g %g %g\n", cell.X[i], cell.Psi[i], cell.Na[i], cell.Cl[i]);
+            fp("%g %g %g\n", cell.X[i], cell.Laplacian(i), cell.Cs[i]);
         }
     }
-    
 }
 YOCTO_UNIT_TEST_DONE()
