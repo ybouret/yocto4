@@ -240,7 +240,7 @@ YOCTO_UNIT_TEST_IMPL(poisson)
     cell.compute_lambda();
     
     cell.Psi[cell.lower] = 60e-3;
-    cell.Psi[cell.upper] = 0;
+    cell.Psi[cell.upper] = -cell.Psi[cell.lower];
     
     cell.solve0();
     {
