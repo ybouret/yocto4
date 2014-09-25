@@ -2,6 +2,8 @@
 #define YOCTO_FAME_BOX_INCLUDED 1
 
 #include "yocto/fame/array3d.hpp"
+#include "yocto/fame/arrays.hpp"
+
 
 namespace yocto
 {
@@ -59,7 +61,7 @@ namespace yocto
             
             //! map each dimension of the array
             template <typename U>
-            void map( array1D<U> &x ) const throw()
+            inline void map( array1D<U> &x ) const throw()
             {
                 const T *qmin = (const T *)&vmin;
                 const T *qmax = (const T *)&vmax;
@@ -70,7 +72,7 @@ namespace yocto
             
             //! map each dimension of the arrays
             template <typename U>
-            void map( array1D<U> &x, array1D<U> &y) const throw()
+            inline void map( array1D<U> &x, array1D<U> &y) const throw()
             {
                 const T *qmin = (const T *)&vmin;
                 const T *qmax = (const T *)&vmax;
@@ -81,7 +83,7 @@ namespace yocto
             
             //! map each dimension of the array
             template <typename U>
-            void map( array1D<U> &x, array1D<U> &y, array1D<U> &z) const throw()
+            inline void map( array1D<U> &x, array1D<U> &y, array1D<U> &z) const throw()
             {
                 const T *qmin = (const T *)&vmin;
                 const T *qmax = (const T *)&vmax;
@@ -89,6 +91,21 @@ namespace yocto
                 map1<U>(x.entry,x.items,qmin[0],qmax[0],qlen[0]);
                 map1<U>(y.entry,y.items,qmin[1],qmax[1],qlen[1]);
                 map1<U>(z.entry,z.items,qmin[2],qmax[2],qlen[2]);
+            }
+            
+            //! map X/Y/Z in the arrays
+            template <typename U>
+            inline void map( arrays &adb )
+            {
+                const T *qmin = (const T *)&vmin;
+                const T *qmax = (const T *)&vmax;
+                const T *qlen = (const T *)&length;
+                for(size_t d=0;d<DIM;++d)
+                {
+                    const char id[4] = { char('X'+d), 0, 0, 0 };
+                    array1D<U> &axis = adb[id].as< array1D<U> >();
+                    map1<U>(axis.entry,axis.items,qmin[d],qmax[d],qlen[d]);
+                }
             }
             
             
