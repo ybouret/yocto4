@@ -27,9 +27,13 @@ namespace {
         const double    dX;
         double          I;
         double          lambda;
+        double          lam0;
         const double    epsilon;
         const double    alpha;
         const double    dX2;
+        double          CNa;
+        double          CCl;
+        
         explicit Cell( const layout1D l, double length) :
         layout1D(l),
         B(0,length),
@@ -40,15 +44,23 @@ namespace {
         Cl( "Cl", *this),
         Cs( "Cs", *this),
         dX(B.length/(items-1)),
+        I(0),
+        lambda(0),
+        lam0(0),
         epsilon( Y_EPSILON0 * 78.5 ),
         alpha( (1000.0 * Y_FARADAY) / epsilon),
-        dX2(dX*dX)
+        dX2(dX*dX),
+        CNa(0),
+        CCl(0)
         {
             B.map(X);
             std::cerr << "B="     << B     << std::endl;
             std::cerr << "X="     << X     << std::endl;
             std::cerr << "dX="    << dX    << std::endl;
             std::cerr << "alpha=" << alpha << std::endl;
+            
+            lam0 = Sqrt( (Y_R*298*epsilon)/(Square(Y_FARADAY)*1000.0) );
+            std::cerr << "lam0=" << lam0  << std::endl;
         }
         
         virtual ~Cell() throw()
@@ -57,11 +69,11 @@ namespace {
         
         void compute_lambda()
         {
-            const double CNa = int1D(X, Na)/B.space;
-            const double CCl = int1D(X, Cl)/B.space;
+            CNa = int1D(X, Na)/B.space;
+            CCl = int1D(X, Cl)/B.space;
             I = (CNa+CCl)/2;
             const double ksq = 2000.0 * Square(Y_FARADAY)/(Y_R*298*epsilon) * I;
-            lambda = 1.0/Sqrt(ksq);
+            lambda = 1.0/Sqrt(2*ksq);
             std::cerr << "lambda=" << lambda << std::endl;
         }
         
@@ -175,50 +187,52 @@ namespace {
         }
         
         
+        void solveNewton(unit_t i)
+        {
+            const double fac = Y_FARADAY/(Y_R*298);
+            const double y   =  fac * (Psi[i-1]+Psi[i+1]);
+            
+            double zeta_i    =  fac * Psi[i];
+            const  double ratio = Square(dX/lam0);
+            
+            for(;;)
+            {
+                double f  = zeta_i+zeta_i - ratio * (CNa*exp(-zeta_i) - CCl*exp(zeta_i));
+                double fp = 2 + ratio * (CNa*exp(-zeta_i)+CCl*exp(zeta_i));
+                const double zold = zeta_i;
+                zeta_i += (y-f)/fp;
+                const double dzeta = zold-zeta_i;
+                if(Fabs(dzeta)<=numeric<double>::ftol*(Fabs(zeta_i)) )
+                {
+                    break;
+                }
+            }
+            std::cerr << "zeta[" << i << "]=" << zeta_i << std::endl;
+            Psi[i] = zeta_i/fac;
+        }
+        
         double rb1()
         {
-            const double OMEGA=0.5;
-            
             for(unit_t i=lower+1;i<upper;i += 2)
             {
-                Psi[i] = (1.0-OMEGA)*Psi[i] + OMEGA * (Psi[i-1]+Psi[i+1] - dX2*Cs[i])/2;
+                solveNewton(i);
             }
             
             for(unit_t i=lower+2;i<upper;i += 2)
             {
-                Psi[i] = (1.0-OMEGA)*Psi[i] + OMEGA*(Psi[i-1]+Psi[i+1] - dX2*Cs[i])/2;
+                solveNewton(i);
             }
             
-            return getRMS1();
+            return 0;
         }
-        
         
         void solve1()
         {
-            compute_Cs();
-            double old_rms = rb1();
-            double new_rms = old_rms;
+            CNa = int1D(X, Na)/B.space;
+            CCl = int1D(X, Cl)/B.space;
+            std::cerr << "lam0=" << lam0 << std::endl;
             
-            std::cerr << std::endl << "SOLVING LEVEL 1" << std::endl;
-            
-            while( (new_rms=rb1()) >= old_rms )
-            {
-                dispatch( Na,1);
-                dispatch( Cl,-1);
-                compute_Cs();
-            };
-            
-            
-            size_t count=0;
-            while( (new_rms=rb1()) < old_rms )
-            {
-                old_rms = new_rms;
-                std::cerr << "rms=" << new_rms << std::endl;
-                dispatch( Na,1);
-                dispatch( Cl,-1);
-                compute_Cs();
-                if(++count>10000) break;
-            }
+            rb1();
             
         }
         
@@ -240,7 +254,7 @@ YOCTO_UNIT_TEST_IMPL(poisson)
     cell.compute_lambda();
     
     cell.Psi[cell.lower] = 60e-3;
-    cell.Psi[cell.upper] = -cell.Psi[cell.lower];
+    cell.Psi[cell.upper] = 0;
     
     cell.solve0();
     {
@@ -251,14 +265,7 @@ YOCTO_UNIT_TEST_IMPL(poisson)
         }
     }
     
-    cell.compute_Cs();
-    std::cerr << "rms1=" <<  cell.getRMS1() << std::endl;
-    {
-        ios::ocstream fp("Curv.dat",false);
-        for(unit_t i=cell.lower+1;i<cell.upper;++i)
-        {
-            fp("%g %g %g\n", cell.X[i], cell.Laplacian(i), cell.Cs[i]);
-        }
-    }
+    
+    cell.solve1();
 }
 YOCTO_UNIT_TEST_DONE()
