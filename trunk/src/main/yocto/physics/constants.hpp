@@ -9,4 +9,13 @@
 #define Y_kB                1.3806488e-23
 #define Y_R                 8.3144621
 
+#if 0
+// for octave
+F=96485.3399;
+R=8.3144621;
+T=298;
+eps0=8.85418782e-12;
+
+#endif
+
 #endif
