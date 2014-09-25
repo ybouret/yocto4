@@ -118,9 +118,9 @@ namespace yocto
                 assert(n>0);
                 *u = umin;
                 --n;
-                for(size_t i=1;i<n;++i)
+                ++u;
+                for(size_t i=1;i<n;++i,++u)
                 {
-                    ++u;
                     *u = umin + (i*ulen)/n; // actually n-1
                 }
                 *u = umax;

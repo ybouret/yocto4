@@ -35,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(box)
     array1D<double> y("y",layout1D(-6,6));
     std::cerr << "b2=" << b2 << std::endl;
     b2.map(x,y);
-    std::cerr << "y=" << x << std::endl;
+    std::cerr << "y=" << y << std::endl;
     display(x);
     display(y);
     
@@ -43,7 +43,11 @@ YOCTO_UNIT_TEST_IMPL(box)
     array1D<double> z("z",layout1D(-10,10));
     std::cerr << "b3=" << b3 << std::endl;
     b3.map(x,y,z);
-    
+    std::cerr << "z=" << z << std::endl;
+    display(x);
+    display(y);
+    display(z);
+
     arrays adb(8);
     adb.store( new array1D<double>("X",layout1D(-5,5)) );
     adb.store( new array1D<double>("Y",layout1D(-6,6)) );
