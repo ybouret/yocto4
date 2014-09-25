@@ -14,6 +14,10 @@ namespace yocto
         {
         }
         
+        arrays:: arrays(size_t n) : arrays_type(n,as_capacity)
+        {
+        }
+        
         void arrays:: store(linear_space *l)
         {
             assert(l);
