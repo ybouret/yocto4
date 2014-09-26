@@ -145,6 +145,12 @@ namespace yocto
                 assert(!terminal);
                 return children().head;
             }
+            
+            xnode * xnode:: head() throw()
+            {
+                assert(!terminal);
+                return children().head;
+            }
 
             
             

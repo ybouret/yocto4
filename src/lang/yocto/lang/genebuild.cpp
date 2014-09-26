@@ -1,8 +1,8 @@
 #include "yocto/lang/generator.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/associative/map.hpp"
 #include "yocto/sequence/addr-list.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 
 #include <cstdlib>
@@ -16,7 +16,8 @@ namespace yocto
             enum vnode_type
             {
                 vnode_rule,
-                vnode_term,
+                vnode_expr,
+                vnode_char,
                 vnode_joker
             };
             
@@ -33,14 +34,14 @@ namespace yocto
                 typedef vnode *                  ptr;
                 
                 const string         name;
-                const syntax::xnode *node;
+                syntax::xnode       *node;
                 const vnode_type     type;
                 vnode               *next;
                 vnode               *prev;
                 alist                children;
                 
                 //! a rule
-                explicit vnode(const string &id, const syntax::xnode *nd,  vnode_type nt ) :
+                explicit vnode(const string &id, syntax::xnode *nd,  vnode_type nt ) :
                 name(id),
                 node(nd),
                 type(nt),
@@ -58,19 +59,19 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(vnode);
             };
             
-            typedef map<string,vnode::ptr> vmap;
+            //typedef map<string,vnode::ptr> vmap;
             
             
             class vcontext
             {
             public:
                 vlist  vr;   //!< virtual top level rules
-                vlist  vl;   //!< local rules
-                vmap   vm;   //!< global map
+                vlist  vs;   //!< virtual string rules
+                vlist  vc;   //!< virtual char   rules
+                vlist  vj;   //!< virtual joker  rules
                 int    vi;   //!< index for rule naming
-                p_dict dict; //!< for storing patterns
-                
-                inline vcontext() : vr(), vl(), vi(0), dict()
+
+                inline vcontext() : vr(), vs(), vc(), vj(), vi(0)
                 {
                     
                 }
@@ -80,7 +81,7 @@ namespace yocto
                     
                 }
                 
-                vnode *find_in( vlist &l, const string &id ) throw()
+                inline vnode *find_in( vlist &l, const string &id ) throw()
                 {
                     for(vnode *vn = l.head; vn; vn=vn->next)
                     {
@@ -89,11 +90,22 @@ namespace yocto
                     return 0;
                 }
                 
-                vnode *find_rule(const string &id) throw()
+                inline vnode *find_rule(const string &id) throw()
                 {
                     return find_in(vr,id);
                 }
                 
+                inline vnode *find_expr(const string &expr) throw()
+                {
+                    return find_in(vs,expr);
+                }
+                
+                inline vnode *find_char(const string &expr) throw()
+                {
+                    return find_in(vc,expr);
+                }
+                
+                // register a top level rule
                 inline void register_rule(const syntax::xnode *xn)
                 {
                     assert(xn);
@@ -109,16 +121,116 @@ namespace yocto
                 }
                 
                 
-                inline void collect_rules( const syntax::xnode *rules )
+                
+                // compile rules
+                inline void compile_rules( syntax::xnode *rules )
                 {
+                    //-- first pass: register all the named rules
                     assert( !rules->terminal );
                     assert("RULES" == rules->label );
-                    for( const syntax::xnode *xn = rules->head(); xn; xn=xn->next)
+                    for( syntax::xnode *xn = rules->head(); xn; xn=xn->next)
                     {
                         assert("RULE" == xn->label);
                         register_rule(xn->head());
+                    }
+                    
+                    //-- second pass: build tree
+                    for( vnode *parent = vr.head; parent; parent=parent->next )
+                    {
+                        build(parent,parent->node);
+                    }
+                }
+                
+                
+                inline void build( vnode *parent, syntax::xnode *xn)
+                {
+                    std::cerr << "building '" << parent->name << "'" << std::endl;
+                    for(;xn;xn=xn->next)
+                    {
+                        const string &label = xn->label;
+                        std::cerr << "\t" << label << std::endl;
+                        
+                        if( "ID" == label )
+                        {
+                            //__________________________________________________
+                            //
+                            // this is a sub rule
+                            //__________________________________________________
+                            const string child_name = xn->lxm()->to_string();
+                            vnode       *child_addr = find_rule(child_name);
+                            std::cerr << "\t|_" << child_name << std::endl;
+                            if(!child_addr)
+                            {
+                                throw exception("%d: unknown sub-rule '%s' in '%s'", xn->lxm()->line, child_name.c_str(),parent->name.c_str());
+                            }
+                            parent->children.append(child_addr);
+                            continue;
+                        }
+                        
+                        if( "ATOMS" == label )
+                        {
+                            //__________________________________________________
+                            //
+                            // this is a set of rules to append to parent
+                            //__________________________________________________
+                            build(parent,xn->head());
+                            continue;
+                        }
+                        
+                        
+                        if( "STRING" == label )
+                        {
+                            //__________________________________________________
+                            //
+                            // and expression to compile
+                            //__________________________________________________
+                            const string expr = xn->lxm()->to_string();
+                            std::cerr << "\t|_<" << expr << ">" << std::endl;
+                            vnode *vn = find_expr(expr);
+                            if(!vn)
+                            {
+                                vn = new vnode(expr,NULL,vnode_expr);
+                                vs.push_back(vn);
+                            }
+                            parent->children.append(vn);
+                            continue;
+                        }
+                        
+                        if( "CHAR" == label )
+                        {
+                            const string expr = xn->lxm()->to_string();
+                            assert(1==expr.size());
+                            std::cerr << "\t|_'" << expr << "'" << std::endl;
+                            vnode *vn = find_char(expr);
+                            if(!vn)
+                            {
+                                vn = new vnode(expr,NULL,vnode_char);
+                                vc.push_back(vn);
+                            }
+                            parent->children.append(vn);
+                            continue;
+                            
+                        }
+                        
+                        if( "JOKER" == label )
+                        {
+                            const string jname = vformat("joker#%d",++vi);
+                            vnode *jk = new vnode(jname,xn,vnode_joker);
+                            vj.push_back(jk);
+                            parent->children.append(jk);
+                            build(jk,xn->children().tail);
+                            continue;
+                        }
                         
                     }
+                    
+                }
+                
+                
+                void graphviz(const string &fn)
+                {
+                    ios::ocstream fp(fn,false);
+                    
                 }
                 
             private:
@@ -148,18 +260,9 @@ namespace yocto
             system("dot -Tpng -o xnode.png xnode.dot");
             
             
-            //__________________________________________________________________
-            //
-            // Let's rebuild the tree: gather top level rules
-            //__________________________________________________________________
+            
             vcontext ctx;
-            ctx.collect_rules(root);
-            
-            //__________________________________________________________________
-            //
-            // Then recursively collect rule content
-            //__________________________________________________________________
-            
+            ctx.compile_rules(root);
             
             
             //__________________________________________________________________

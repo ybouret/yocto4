@@ -22,7 +22,7 @@ namespace yocto
             Terminal  &ID     = terminal("ID","@?[_[:alpha:]][:word:]*");
             Terminal  &COLON  = jettison("separator",':');
             Terminal  &STOP   = jettison("end of rule",';');
-            Rule      &EXPR   = plug_term(new lexical::cstring("string",*this) );
+            Rule      &EXPR   = plug_term(new lexical::cstring("STRING",*this) );
             Terminal  &PIPE   = jettison("alternate",'|');
             Terminal  &CHAR   = terminal("CHAR","'.'");
             Aggregate &RULE   = assemble("RULE");
@@ -38,7 +38,7 @@ namespace yocto
                 CORE |= EXPR;
                 CORE |= CHAR;
                 CORE |= GROUP;
-                Aggregate   & JOKER = assemble("JOKER", CORE, terminal("attr", "[+?*]") );
+                Aggregate   & JOKER = assemble("JOKER", CORE, terminal("ATTR", "[+?*]") );
                 Alternate   & ATOM  = choose(JOKER,CORE);
                 Aggregate   & ATOMS = agg("ATOMS", syntax::is_merging_one);
                 ATOMS += one_or_more(ATOM);
@@ -94,7 +94,7 @@ namespace yocto
         
         void generator:: reshape(syntax::xnode *node) const throw()
         {
-            if(node&& !node->terminal)
+            if(node && !node->terminal)
             {
                 XList tmp;
                 //______________________________________________________________
@@ -153,8 +153,11 @@ namespace yocto
                             tmp.push_back(child);
                     }
                     while(tmp.size) node->add(tmp.pop_front());
-                    
-                    
+                }
+                
+                if( "JOKER" == node->label )
+                {
+                    node->children().reverse();
                 }
             }
             
