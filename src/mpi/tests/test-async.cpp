@@ -13,7 +13,7 @@ YOCTO_UNIT_TEST_IMPL(async)
 	_rand.wseed();
     hashing::sha1 H;
     
-    YOCTO_MPI(MULTIPLE);
+    YOCTO_MPI(MPI_THREAD_MULTIPLE);
     MPI.CloseStdIO();
     
     mpi::Requests   requests( 2 );

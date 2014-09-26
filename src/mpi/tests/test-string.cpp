@@ -8,7 +8,7 @@ YOCTO_UNIT_TEST_IMPL(string)
 {
 	const int tag = 1010;
 	
-    YOCTO_MPI(SINGLE);
+    YOCTO_MPI_ENV();
     MPI.CloseStdIO();
 	
     if( MPI.IsParallel )

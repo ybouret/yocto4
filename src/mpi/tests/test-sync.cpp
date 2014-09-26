@@ -9,7 +9,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(sync)
 {
 	
-	YOCTO_MPI(SINGLE);
+    YOCTO_MPI_ENV();
 	std::cerr.flush();
 	MPI.Printf( stderr, "From rank %d\n", MPI.CommWorldRank );
 	std::cerr.flush();
