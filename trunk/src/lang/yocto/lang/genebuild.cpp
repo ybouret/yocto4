@@ -1,8 +1,9 @@
 #include "yocto/lang/generator.hpp"
 #include "yocto/associative/set.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/sequence/list.hpp"
 #include "yocto/associative/map.hpp"
+#include "yocto/sequence/addr-list.hpp"
+
 
 #include <cstdlib>
 
@@ -21,7 +22,7 @@ namespace yocto
             class vnode;
             
             typedef core::list_of_cpp<vnode> vlist;
-            
+            typedef addr_list<vnode>         alist;
             
             class vnode : public object
             {
@@ -33,7 +34,7 @@ namespace yocto
                 const vnode_type     type;
                 vnode               *next;
                 vnode               *prev;
-                vlist                children;
+                alist                children;
                 
                 explicit vnode( const syntax::xnode *nd ) :
                 node(nd),
@@ -135,20 +136,30 @@ namespace yocto
                     assert(vnode_rule==vn->type);
                     std::cerr << "building from rule " << vn->name << std::endl;
                     const syntax::xnode *xn = vn->node;
+                    
+                    //__________________________________________________________
+                    //
                     // first xnode must be ID since it's a rule
+                    //__________________________________________________________
+
                     assert("ID"==xn->label);
                     for(xn=xn->next;xn;xn=xn->next)
                     {
                         const string &label = xn->label;
                         std::cerr << "\t\t" << label << std::endl;
-                        //______________________________________________________
-                        //
-                        // a sub rule
-                        //______________________________________________________
+                        
                         if( "ID" == label )
                         {
-                            
+                            //__________________________________________________
+                            //
+                            // a sub rule
+                            //__________________________________________________
+                            const string id = xn->lxm()->to_string();
+                            std::cerr << "\t\t|_" << id << std::endl;
+                            continue;
                         }
+                        
+                        
                         
                     }
                 }
