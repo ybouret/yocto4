@@ -25,7 +25,9 @@ namespace yocto
             
             pattern * create(const string &name) const;
             pattern * create(const char   *name) const;
-
+            bool      has(const string &name) const throw();
+            bool      has(const char   *name) const;
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(p_dict);
         };
