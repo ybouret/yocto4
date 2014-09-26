@@ -52,6 +52,7 @@ namespace yocto
                 vnode               *next;
                 vnode               *prev;
                 alist                children;
+                bool                 linked;
                 
                 explicit vnode(const string &id, syntax::xnode *nd,  vnode_type nt ) :
                 name(id),
@@ -59,7 +60,8 @@ namespace yocto
                 type(nt),
                 next(0),
                 prev(0),
-                children()
+                children(),
+                linked(false)
                 {
                     
                 }
@@ -277,6 +279,11 @@ namespace yocto
                         throw exception("unhandled %s", label.c_str());
                     }
                     
+                    for(anode *an = parent->children.head;an;an=an->next)
+                    {
+                        an->addr->linked = true;
+                    }
+                    
                 }
                 
                 
@@ -313,7 +320,6 @@ namespace yocto
                     
                     
                     // make links
-                    
                     for(const vnode *vn = vr.head; vn; vn=vn->next)
                     {
                         link(fp,vn);
