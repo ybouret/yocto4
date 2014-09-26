@@ -272,6 +272,7 @@ namespace yocto
                             vnode *Or = new vnode(oname,xn,vnode_or);
                             vo.push_back(Or);
                             parent->children.append(Or);
+                            // need to make sub-nodes !!!!
                             build(Or,xn->head());
                             continue;
                         }
