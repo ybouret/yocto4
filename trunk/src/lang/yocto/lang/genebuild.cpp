@@ -22,10 +22,11 @@ namespace yocto
             //__________________________________________________________________
             enum vnode_type
             {
-                vnode_rule, //!< a rule
-                vnode_expr, //!< an expression
-                vnode_char, //!< a  single char
-                vnode_joker //!< a  joker node
+                vnode_rule,  //!< a rule
+                vnode_expr,  //!< an expression
+                vnode_char,  //!< a  single char
+                vnode_joker, //!< a  joker node
+                vnode_or
             };
             
             //__________________________________________________________________
@@ -84,9 +85,10 @@ namespace yocto
                 vlist  vs;   //!< virtual string rules
                 vlist  vc;   //!< virtual char   rules
                 vlist  vj;   //!< virtual joker  rules
+                vlist  vo;   //!< virtual or     rules
                 int    vi;   //!< index for rule naming
 
-                inline vcontext() : vr(), vs(), vc(), vj(), vi(0)
+                inline vcontext() : vr(), vs(), vc(), vj(), vo(), vi(0)
                 {
                     
                 }
@@ -229,6 +231,10 @@ namespace yocto
                         
                         if( "CHAR" == label )
                         {
+                            //__________________________________________________
+                            //
+                            // a single char to compile
+                            //__________________________________________________
                             const string expr = xn->lxm()->to_string(1,1);
                             std::cerr << "\t|_'" << expr << "'" << std::endl;
                             assert(1==expr.size());
@@ -245,9 +251,12 @@ namespace yocto
                         
                         if( "JOKER" == label )
                         {
+                            //__________________________________________________
+                            //
+                            // a joker of sub rules
+                            //__________________________________________________
                             const string attr  = xn->head()->lxm()->to_string();
-                            //std::cerr << "ATTR=<" << attr << ">" << std::endl;
-                            const string jname = attr + vformat("#%d",++vi);
+                            const string jname = attr;
                             vnode *jk = new vnode(jname,xn,vnode_joker);
                             vj.push_back(jk);
                             parent->children.append(jk);
@@ -255,6 +264,17 @@ namespace yocto
                             continue;
                         }
                         
+                        if( "OR" == label )
+                        {
+                            const string oname = "OR";
+                            vnode *Or = new vnode(oname,xn,vnode_or);
+                            vo.push_back(Or);
+                            parent->children.append(Or);
+                            build(Or,xn->head());
+                            continue;
+                        }
+                        
+                        throw exception("unhandled %s", label.c_str());
                     }
                     
                 }
@@ -286,6 +306,12 @@ namespace yocto
                         fp.viz(vn); fp(" [label=\"%s\",shape=diamond];\n", vn->name.c_str());
                     }
                     
+                    for(const vnode *vn = vo.head; vn; vn=vn->next)
+                    {
+                        fp.viz(vn); fp(" [label=\"%s\",shape=house];\n", vn->name.c_str());
+                    }
+                    
+                    
                     // make links
                     
                     for(const vnode *vn = vr.head; vn; vn=vn->next)
@@ -306,6 +332,7 @@ namespace yocto
                         switch(sub->type)
                         {
                             case vnode_joker:
+                            case vnode_or:
                                 link(fp,sub);
                                 break;
                                 
