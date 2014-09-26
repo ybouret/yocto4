@@ -78,8 +78,13 @@ namespace yocto
 		
         //! MPI_Init wrapper
 		static mpi & init( int * argc, char ***argv, int requestedThreadLevel );
-		void   Finalize() throw();
 		
+        //! MPI_Finalize wrapper
+        void   Finalize() throw();
+		
+        //! get thread level from env 'YOCTO_MPI', default is MPI_THREAD_SINGLE
+        static int EnvThreadLevel();
+        
         
 		const int        CommWorldSize;    //!< size of MPI_COMM_WORLD
 		const int        CommWorldRank;    //!< rank in MPI_COMM_WORLD
@@ -385,7 +390,8 @@ namespace yocto
 	
 }
 
-#define YOCTO_MPI(LEVEL)   const mpi & MPI = mpi::init(&argc,&argv,MPI_THREAD_##LEVEL)
+#define YOCTO_MPI(THE_LEVEL) const mpi & MPI = mpi::init(&argc,&argv,THE_LEVEL)
+#define YOCTO_MPI_ENV()             YOCTO_MPI( mpi::EnvThreadLevel() )
 
 #define MPI_CTIME_DEBUG 0
 

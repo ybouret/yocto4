@@ -230,5 +230,29 @@ namespace yocto
         while( Wtime() - stamp < nsec )
             ;
     }
+}
+
+#include "yocto/string/env.hpp"
+
+
+namespace yocto
+{
+    int mpi:: EnvThreadLevel()
+    {
+        string       value;
+        const string name = "YOCTO_MPI";
+        
+        if(!environment::get(value,name))
+        {
+            return MPI_THREAD_SINGLE;
+        }
+        
+        if( "SINGLE"     == value ) return MPI_THREAD_SINGLE;
+        if( "MULTIPLE"   == value ) return MPI_THREAD_MULTIPLE;
+        if( "FUNNELED"   == value ) return MPI_THREAD_FUNNELED;
+        if( "SERIALIZED" == value ) return MPI_THREAD_SERIALIZED;
+        
+        throw yocto::exception("unknown MPI_THREAD_%s", value.c_str());
+    }
     
 }

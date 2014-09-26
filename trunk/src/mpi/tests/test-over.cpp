@@ -152,7 +152,7 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(over)
 {
 	
-    YOCTO_MPI(MULTIPLE);
+    YOCTO_MPI(MPI_THREAD_MULTIPLE);
     MPI.CloseStdIO();
     if( MPI.IsParallel )
     {

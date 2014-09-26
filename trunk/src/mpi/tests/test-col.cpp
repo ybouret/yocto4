@@ -8,7 +8,7 @@ using namespace yocto;
 YOCTO_UNIT_TEST_IMPL(bcast)
 {
 	
-    YOCTO_MPI(SINGLE);
+    YOCTO_MPI_ENV();
     MPI.CloseStdIO();
     
 	const int rank = MPI.CommWorldRank;
@@ -60,7 +60,7 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(scatter)
 {
 	
-    YOCTO_MPI(SINGLE);
+    YOCTO_MPI_ENV();
     MPI.CloseStdIO();
     
 	const int rank = MPI.CommWorldRank;
