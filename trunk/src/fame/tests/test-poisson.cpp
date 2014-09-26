@@ -13,6 +13,7 @@ using namespace math;
 
 namespace {
     
+    static const double Temp = 298;
     
     class Cell : public layout1D
     {
@@ -33,6 +34,8 @@ namespace {
         const double    dX2;
         double          CNa;
         double          CCl;
+        const double    RT;
+        const double    FiRT;
         
         explicit Cell( const layout1D l, double length) :
         layout1D(l),
@@ -51,7 +54,9 @@ namespace {
         alpha( (1000.0 * Y_FARADAY) / epsilon),
         dX2(dX*dX),
         CNa(0),
-        CCl(0)
+        CCl(0),
+        RT(Y_R*Temp),
+        FiRT(Y_FARADAY/RT)
         {
             B.map(X);
             std::cerr << "B="     << B     << std::endl;
@@ -59,7 +64,7 @@ namespace {
             std::cerr << "dX="    << dX    << std::endl;
             std::cerr << "alpha=" << alpha << std::endl;
             
-            lam0 = Sqrt( (Y_R*298*epsilon)/(Square(Y_FARADAY)*1000.0) );
+            lam0 = Sqrt( (RT*epsilon)/(Square(Y_FARADAY)*1000.0) );
             std::cerr << "lam0=" << lam0  << std::endl;
         }
         
@@ -72,7 +77,7 @@ namespace {
             CNa = int1D(X, Na)/B.space;
             CCl = int1D(X, Cl)/B.space;
             I = (CNa+CCl)/2;
-            const double ksq = 2000.0 * Square(Y_FARADAY)/(Y_R*298*epsilon) * I;
+            const double ksq = 2000.0 * Square(Y_FARADAY)/(RT*epsilon) * I;
             lambda = 1.0/Sqrt(2*ksq);
             std::cerr << "lambda=" << lambda << std::endl;
         }
@@ -116,7 +121,7 @@ namespace {
         
         static inline double weight( double v, int z )  throw()
         {
-            return exp(-(z*Y_FARADAY*v)/(Y_R*298) );
+            return exp(-z*(Y_FARADAY*v)/(Y_R*Temp));
         }
         
         void dispatch( array1D<double> &C, const int z)
@@ -163,17 +168,12 @@ namespace {
         }
         
         
-        void compute_Cs()
-        {
-            for(unit_t i=lower;i<=upper;++i)
-            {
-                Cs[i] = -alpha*(Na[i] - Cl[i]);
-            }
-        }
         
         double getErr1(unit_t i) const throw()
         {
-            return Laplacian(i) - Cs[i];
+            const double v   = Psi[i];
+            const double rhs = -alpha * ( CNa * exp(-FiRT*v) - CCl * exp(FiRT*v));
+            return Laplacian(i) - rhs;
         }
         
         double getRMS1() const throw()
@@ -189,26 +189,25 @@ namespace {
         
         void solveNewton(unit_t i)
         {
-            const double fac = Y_FARADAY/(Y_R*298);
-            const double y   =  fac * (Psi[i-1]+Psi[i+1]);
+            const double y   = FiRT * (Psi[i-1]+Psi[i+1]);
             
-            double zeta_i    =  fac * Psi[i];
-            const  double ratio = Square(dX/lam0);
+            double        zeta_i = FiRT * Psi[i];
+            const  double kappa  = Square(dX/lam0);
             
             for(;;)
             {
-                double f  = zeta_i+zeta_i - ratio * (CNa*exp(-zeta_i) - CCl*exp(zeta_i));
-                double fp = 2 + ratio * (CNa*exp(-zeta_i)+CCl*exp(zeta_i));
-                const double zold = zeta_i;
-                zeta_i += (y-f)/fp;
-                const double dzeta = zold-zeta_i;
-                if(Fabs(dzeta)<=numeric<double>::ftol*(Fabs(zeta_i)) )
-                {
+                const double xCNa = CNa * exp( - zeta_i );
+                const double xCCl = CCl * exp( + zeta_i );
+                const double f    = zeta_i + zeta_i - kappa *(xCNa-xCCl);
+                const double fp   = 2.0 + kappa*(xCNa+xCCl);
+                const double dz   = (y-f)/fp;
+                const double zeta_o = zeta_i;
+                zeta_i += dz;
+                const double dzeta = Fabs(zeta_i-zeta_o);
+                if(dzeta<=1e-8)
                     break;
-                }
             }
-            std::cerr << "zeta[" << i << "]=" << zeta_i << std::endl;
-            Psi[i] = zeta_i/fac;
+            Psi[i] = zeta_i/FiRT;
         }
         
         double rb1()
@@ -223,7 +222,7 @@ namespace {
                 solveNewton(i);
             }
             
-            return 0;
+            return getRMS1();
         }
         
         void solve1()
@@ -231,9 +230,20 @@ namespace {
             CNa = int1D(X, Na)/B.space;
             CCl = int1D(X, Cl)/B.space;
             std::cerr << "lam0=" << lam0 << std::endl;
+        
+            double old_rms = rb1();
+            double new_rms = old_rms;
             
-            rb1();
+            while( (new_rms=rb1()) >= old_rms )
+                ;
             
+            while( (new_rms=rb1()) < old_rms )
+            {
+                old_rms = new_rms;
+                std::cerr << "rms1=" << new_rms << std::endl;
+            }
+            dispatch( Na,1);
+            dispatch( Cl,-1);
         }
         
     private:
@@ -246,7 +256,7 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(poisson)
 {
     
-    Cell cell( layout1D(0,5000), 1e-6 );
+    Cell cell( layout1D(0,500), 1e-7 );
     
     cell.Na.ld(0.01);
     cell.Cl.ld(0.01);
@@ -267,5 +277,13 @@ YOCTO_UNIT_TEST_IMPL(poisson)
     
     
     cell.solve1();
+    {
+        ios::ocstream fp("Psi1.dat",false);
+        for(unit_t i=cell.lower;i<=cell.upper;++i)
+        {
+            fp("%g %g %g %g\n", cell.X[i], cell.Psi[i], cell.Na[i], cell.Cl[i]);
+        }
+    }
+
 }
 YOCTO_UNIT_TEST_DONE()
