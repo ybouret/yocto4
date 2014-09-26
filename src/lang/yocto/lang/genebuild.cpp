@@ -125,11 +125,23 @@ namespace yocto
                     }
                 }
                 
+                //______________________________________________________________
+                //
+                // parsing a rule
+                //______________________________________________________________
                 inline void build_rule(vnode *vn)
                 {
                     assert(vn);
                     assert(vnode_rule==vn->type);
-                    
+                    std::cerr << "building from rule " << vn->name << std::endl;
+                    const syntax::xnode *xn = vn->node;
+                    // first xnode must be ID since it's a rule
+                    assert("ID"==xn->label);
+                    for(xn=xn->next;xn;xn=xn->next)
+                    {
+                        std::cerr << "\t\t" << xn->label << std::endl;
+                        
+                    }
                 }
                 
                 
