@@ -52,6 +52,19 @@ namespace yocto
             const string Name(name);
             return create(Name);
         }
+        
+        bool p_dict:: has(const string &name) const throw()
+        {
+            return search(name) != 0;
+        }
+
+        
+        bool p_dict::has(const char *name) const
+        {
+            const string ID(name);
+            return has(ID);
+        }
+        
     }
     
 }

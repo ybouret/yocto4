@@ -35,13 +35,30 @@ namespace yocto
                 vnode               *next;
                 vnode               *prev;
                 alist                children;
+                bool                 built;
                 
+                //! a rule
                 explicit vnode( const syntax::xnode *nd ) :
                 node(nd),
                 name(nd->lxm()->to_string()),
                 type(vnode_rule),
                 next(0),
-                prev(0)
+                prev(0),
+                children(),
+                built(false)
+                {
+                    
+                }
+                
+                //! a terminal = expression
+                explicit vnode( const syntax::xnode *nd, const string &expr ) :
+                node(nd),
+                name(expr),
+                type(vnode_term),
+                next(0),
+                prev(0),
+                children(),
+                built(true)
                 {
                     
                 }
@@ -59,11 +76,13 @@ namespace yocto
             class vcontext
             {
             public:
-                vlist vr; //!< virtual top level rules
-                vmap  vm; //!< named rules
-                vlist vl; //!< local rules
+                vlist  vr;   //!< virtual top level rules
+                vmap   vm;   //!< named rules
+                vlist  vl;   //!< local rules
+                int    vi;   //!< index for rule naming
+                p_dict dict; //!< for storing patterns
                 
-                inline vcontext() : vr(), vm(), vl()
+                inline vcontext() : vr(), vm(), vl(), vi(0), dict()
                 {
                     
                 }
@@ -110,7 +129,7 @@ namespace yocto
                 
                 //______________________________________________________________
                 //
-                // virtual tree building 
+                // virtual tree building
                 //______________________________________________________________
                 inline void build(vnode *vn)
                 {
@@ -134,16 +153,23 @@ namespace yocto
                 {
                     assert(vn);
                     assert(vnode_rule==vn->type);
-                    std::cerr << "building from rule " << vn->name << std::endl;
                     const syntax::xnode *xn = vn->node;
                     
                     //__________________________________________________________
                     //
                     // first xnode must be ID since it's a rule
                     //__________________________________________________________
-
                     assert("ID"==xn->label);
-                    for(xn=xn->next;xn;xn=xn->next)
+                    if(!vn->built)
+                    {
+                        std::cerr << "building rule " << vn->name << std::endl;
+                        build_children(vn,xn->next);
+                    }
+                }
+                
+                inline void build_children(vnode *parent, const syntax::xnode *xn)
+                {
+                    for(;xn;xn=xn->next)
                     {
                         const string &label = xn->label;
                         std::cerr << "\t\t" << label << std::endl;
@@ -156,13 +182,40 @@ namespace yocto
                             //__________________________________________________
                             const string id = xn->lxm()->to_string();
                             std::cerr << "\t\t|_" << id << std::endl;
+                            vnode::ptr *ppvn = vm.search(id);
+                            if(!ppvn)
+                            {
+                                throw exception("'%s' refers to unknown rule '%s'",  parent->name.c_str(), id.c_str() );
+                            }
+                            vnode::ptr vn = *ppvn;
+                            parent->children.append(vn);
+                            build_rule(vn); // recursive
                             continue;
                         }
                         
                         
-                        
+                        if( "string" == label )
+                        {
+                            //__________________________________________________
+                            //
+                            // a string to be compiled
+                            //__________________________________________________
+                            const string expr = xn->lxm()->to_string();
+                            std::cerr << "\t\t|_'" << expr << "'" << std::endl;
+                            if( !dict.has(expr) )
+                            {
+                                dict.add(expr,expr);
+                            }
+                            
+                            vnode *vn = new vnode(xn,expr);
+                            vl.push_back(vn);
+                            parent->children.append(vn);
+                            continue;
+                        }
                     }
+                    parent->built = true;
                 }
+                
                 
                 
             private:
