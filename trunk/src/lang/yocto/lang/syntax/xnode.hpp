@@ -62,7 +62,10 @@ namespace yocto
                 
                 //! children().head
                 const xnode *head() const throw();
-                
+
+                //! children().head
+                xnode *head() throw();
+
                 lexeme *         &lxm() throw();
                 const lexeme *   &lxm() const throw();
                 
@@ -71,7 +74,6 @@ namespace yocto
                 
                 //! create a new non terminal node
                 static xnode *create( const string &rule_label, const property ppty);
-                
                 
                 
                 //! make a GraphViz file

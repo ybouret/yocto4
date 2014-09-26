@@ -284,7 +284,7 @@ namespace yocto
             inline void reverse() throw()
             {
                 list_of tmp;
-                while( size ) tmp.push_back( pop_front() );
+                while( size ) tmp.push_back( pop_back() );
                 swap_with(tmp);
             }
             
