@@ -13,20 +13,32 @@ namespace yocto
     {
         namespace
         {
+            
+            //__________________________________________________________________
+            //
+            //
+            // virtual node type
+            //
+            //__________________________________________________________________
             enum vnode_type
             {
-                vnode_rule,
-                vnode_expr,
-                vnode_char,
-                vnode_joker
+                vnode_rule, //!< a rule
+                vnode_expr, //!< an expression
+                vnode_char, //!< a  single char
+                vnode_joker //!< a  joker node
             };
             
-            
-            
+            //__________________________________________________________________
+            //
+            //
+            // a virtual node
+            //
+            //__________________________________________________________________
             class vnode;
             
             typedef core::list_of_cpp<vnode> vlist;
             typedef addr_list<vnode>         alist;
+            typedef alist::node_type         anode;
             
             class vnode : public object
             {
@@ -40,7 +52,6 @@ namespace yocto
                 vnode               *prev;
                 alist                children;
                 
-                //! a rule
                 explicit vnode(const string &id, syntax::xnode *nd,  vnode_type nt ) :
                 name(id),
                 node(nd),
@@ -59,9 +70,13 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(vnode);
             };
             
-            //typedef map<string,vnode::ptr> vmap;
             
-            
+            //__________________________________________________________________
+            //
+            //
+            // a context to build the generator tree
+            //
+            //__________________________________________________________________
             class vcontext
             {
             public:
@@ -105,7 +120,12 @@ namespace yocto
                     return find_in(vc,expr);
                 }
                 
+                //______________________________________________________________
+                //
+                //
                 // register a top level rule
+                //
+                //______________________________________________________________
                 inline void register_rule(const syntax::xnode *xn)
                 {
                     assert(xn);
@@ -121,11 +141,18 @@ namespace yocto
                 }
                 
                 
-                
+                //______________________________________________________________
+                //
+                //
                 // compile rules
+                //
+                //______________________________________________________________
                 inline void compile_rules( syntax::xnode *rules )
                 {
-                    //-- first pass: register all the named rules
+                    //__________________________________________________________
+                    //
+                    // first pass: register all the named rules
+                    //__________________________________________________________
                     assert( !rules->terminal );
                     assert("RULES" == rules->label );
                     for( syntax::xnode *xn = rules->head(); xn; xn=xn->next)
@@ -134,11 +161,15 @@ namespace yocto
                         register_rule(xn->head());
                     }
                     
-                    //-- second pass: build tree
+                    //__________________________________________________________
+                    //
+                    // second pass: build tree
+                    //__________________________________________________________
                     for( vnode *parent = vr.head; parent; parent=parent->next )
                     {
                         build(parent,parent->node);
                     }
+                    
                 }
                 
                 
@@ -198,9 +229,9 @@ namespace yocto
                         
                         if( "CHAR" == label )
                         {
-                            const string expr = xn->lxm()->to_string();
-                            assert(1==expr.size());
+                            const string expr = xn->lxm()->to_string(1,1);
                             std::cerr << "\t|_'" << expr << "'" << std::endl;
+                            assert(1==expr.size());
                             vnode *vn = find_char(expr);
                             if(!vn)
                             {
@@ -214,7 +245,9 @@ namespace yocto
                         
                         if( "JOKER" == label )
                         {
-                            const string jname = vformat("joker#%d",++vi);
+                            const string attr  = xn->head()->lxm()->to_string();
+                            //std::cerr << "ATTR=<" << attr << ">" << std::endl;
+                            const string jname = attr + vformat("#%d",++vi);
                             vnode *jk = new vnode(jname,xn,vnode_joker);
                             vj.push_back(jk);
                             parent->children.append(jk);
@@ -227,10 +260,59 @@ namespace yocto
                 }
                 
                 
-                void graphviz(const string &fn)
+                inline void graphviz(const string &fn) const
                 {
                     ios::ocstream fp(fn,false);
+                    fp("digraph G {\n");
                     
+                    // write all rules
+                    for(const vnode *vn = vr.head; vn; vn=vn->next)
+                    {
+                        fp.viz(vn); fp(" [label=\"%s\",shape=oval];\n", vn->name.c_str());
+                    }
+                    
+                    for(const vnode *vn = vs.head; vn; vn=vn->next)
+                    {
+                        fp.viz(vn); fp(" [label=\"%s\",shape=box];\n", vn->name.c_str());
+                    }
+                    
+                    for(const vnode *vn = vc.head; vn; vn=vn->next)
+                    {
+                        fp.viz(vn); fp(" [label=\"%s\",shape=square];\n", vn->name.c_str());
+                    }
+                    
+                    for(const vnode *vn = vj.head; vn; vn=vn->next)
+                    {
+                        fp.viz(vn); fp(" [label=\"%s\",shape=diamond];\n", vn->name.c_str());
+                    }
+                    
+                    // make links
+                    
+                    for(const vnode *vn = vr.head; vn; vn=vn->next)
+                    {
+                        link(fp,vn);
+                    }
+                    
+                    fp("}\n");
+                    
+                }
+                
+                inline void link(ios::ostream &fp, const vnode *vn ) const
+                {
+                    for(const anode *an = vn->children.head; an; an=an->next)
+                    {
+                        const vnode *sub = an->addr;
+                        fp("\t"); fp.viz(vn); fp(" -> "); fp.viz(sub); fp(";\n");
+                        switch(sub->type)
+                        {
+                            case vnode_joker:
+                                link(fp,sub);
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                    }
                 }
                 
             private:
@@ -264,6 +346,8 @@ namespace yocto
             vcontext ctx;
             ctx.compile_rules(root);
             
+            ctx.graphviz("gnode.dot");
+            system("dot -Tpng -o gnode.png gnode.dot");
             
             //__________________________________________________________________
             //
