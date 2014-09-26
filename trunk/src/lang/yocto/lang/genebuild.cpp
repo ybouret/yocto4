@@ -139,7 +139,16 @@ namespace yocto
                     assert("ID"==xn->label);
                     for(xn=xn->next;xn;xn=xn->next)
                     {
-                        std::cerr << "\t\t" << xn->label << std::endl;
+                        const string &label = xn->label;
+                        std::cerr << "\t\t" << label << std::endl;
+                        //______________________________________________________
+                        //
+                        // a sub rule
+                        //______________________________________________________
+                        if( "ID" == label )
+                        {
+                            
+                        }
                         
                     }
                 }
