@@ -25,8 +25,9 @@ namespace yocto
                 vnode_rule,  //!< a rule
                 vnode_expr,  //!< an expression
                 vnode_char,  //!< a  single char
-                vnode_joker, //!< a  joker node
-                vnode_or
+                vnode_jk,    //!< a  joker node
+                vnode_or,
+                vnode_group
             };
             
             //__________________________________________________________________
@@ -259,7 +260,7 @@ namespace yocto
                             //__________________________________________________
                             const string attr  = xn->head()->lxm()->to_string();
                             const string jname = attr;
-                            vnode *jk = new vnode(jname,xn,vnode_joker);
+                            vnode *jk = new vnode(jname,xn,vnode_jk);
                             vj.push_back(jk);
                             parent->children.append(jk);
                             build(jk,xn->children().tail);
@@ -272,8 +273,15 @@ namespace yocto
                             vnode *Or = new vnode(oname,xn,vnode_or);
                             vo.push_back(Or);
                             parent->children.append(Or);
-                            // need to make sub-nodes !!!!
-                            build(Or,xn->head());
+                            
+                            int i=0;
+                            for(syntax::xnode *sub=xn->head();sub;sub=sub->next)
+                            {
+                                const string grp_id = vformat("group#%d",++i);
+                                vnode *grp = new vnode(grp_id,sub,vnode_group);
+                                vo.push_back(grp);
+                                Or->children.append(grp);
+                            }
                             continue;
                         }
                         
@@ -338,8 +346,9 @@ namespace yocto
                         fp("\t"); fp.viz(vn); fp(" -> "); fp.viz(sub); fp(";\n");
                         switch(sub->type)
                         {
-                            case vnode_joker:
+                            case vnode_jk:
                             case vnode_or:
+                            case vnode_group:
                                 link(fp,sub);
                                 break;
                                 
