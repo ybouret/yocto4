@@ -24,3 +24,5 @@ MULT    : '*'    ;
 DIV     : '/'    ;
 ASSIGN  : '='    ;
 END     : ';'    ;
+LPAREN  : '(';
+RPAREN  : ')';
