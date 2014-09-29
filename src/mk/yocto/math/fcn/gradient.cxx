@@ -96,6 +96,7 @@ namespace yocto
             
             const real_t twoFx = Fx+Fx;
             
+			// get gradient and diagonal terms
             for(size_t i=n;i>0;--i)
             {
                 const real_t xmid = var[i];
@@ -109,6 +110,19 @@ namespace yocto
                 dFdx[i] = (Fp[i]-Fm[i])/(step+step);
                 H[i][i] = (Fp[i] - twoFx + Fm[i])/(step*step);
             }
+
+			for(size_t i=n;i>0;--i)
+			{
+				const real_t xi = dx[i]/2;
+				const real_t xi2 = xi*xi;
+				for(size_t j=i-1;j>0;--j)
+				{
+					H[i][j] = H[j][i] = 0;
+					const real_t yj  = dx[j]/2;
+					const real_t yj2 = yj*yj;
+					const real_t sum_xi2yj2 = REAL(4.0) * xi2 * yj2;  
+				}
+			}
             
             
         }
