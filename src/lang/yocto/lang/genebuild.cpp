@@ -90,7 +90,7 @@ namespace yocto
                 vlist  vj;   //!< virtual joker  rules
                 vlist  vo;   //!< virtual or     rules
                 int    vi;   //!< index for rule naming
-
+                
                 inline vcontext() : vr(), vs(), vc(), vj(), vo(), vi(0)
                 {
                     
@@ -202,7 +202,7 @@ namespace yocto
                                 throw exception("%d: unknown sub-rule '%s' in '%s'", xn->lxm()->line, child_name.c_str(),parent->name.c_str());
                             }
                             parent->children.append(child_addr);
-                            goto CLEAR;
+                            continue;
                         }
                         
                         //------------------------------------------------------
@@ -214,7 +214,7 @@ namespace yocto
                             // this is a set of rules to append to parent
                             //__________________________________________________
                             build(parent,xn->head());
-                            goto CLEAR;
+                            continue;
                         }
                         
                         //------------------------------------------------------
@@ -234,7 +234,7 @@ namespace yocto
                                 vs.push_back(vn);
                             }
                             parent->children.append(vn);
-                            goto CLEAR;
+                            continue;
                         }
                         
                         //------------------------------------------------------
@@ -255,12 +255,11 @@ namespace yocto
                                 vc.push_back(vn);
                             }
                             parent->children.append(vn);
-                            goto CLEAR;
-                            
+                            continue;
                         }
                         
                         //------------------------------------------------------
-
+                        
                         if( "JOKER" == label )
                         {
                             //__________________________________________________
@@ -273,7 +272,7 @@ namespace yocto
                             vj.push_back(jk);
                             parent->children.append(jk);
                             build(jk,xn->children().tail);
-                            goto CLEAR;
+                            continue;
                         }
                         
                         //------------------------------------------------------
@@ -289,25 +288,28 @@ namespace yocto
                             syntax::xnode::child_list tmp;
                             while(xn->count())
                             {
-                                auto_ptr<syntax::xnode> p( xn->pop() );
+                                syntax::xnode *sub = xn->pop();
+                                auto_ptr<syntax::xnode> p( sub );
                                 const string grp_id = vformat("group#%d",++i);
                                 vnode *grp = new vnode(grp_id,p.__get(),vnode_group);
                                 vo.push_back(grp);
                                 Or->children.append(grp);
+                                build(grp,sub);
+                                tmp.push_back( p.yield() );
                             }
-                            
-                            goto CLEAR;
+                            while(tmp.size)
+                            {
+                                xn->add(tmp.pop_front());
+                            }
+                            continue;
                         }
                         
                         throw exception("unhandled %s", label.c_str());
-                        
-                    CLEAR:
-                        xn->clear();
                     }
                     
                     //__________________________________________________________
                     //
-                    // markc children as linked
+                    // mark children as linked
                     //__________________________________________________________
                     for(anode *an = parent->children.head;an;an=an->next)
                     {
@@ -321,6 +323,7 @@ namespace yocto
                 {
                     ios::ocstream fp(fn,false);
                     fp("digraph G {\n");
+                    fp("\tordering=out;\n");
                     
                     // write all rules
                     for(const vnode *vn = vr.head; vn; vn=vn->next)
@@ -345,7 +348,7 @@ namespace yocto
                     
                     for(const vnode *vn = vo.head; vn; vn=vn->next)
                     {
-                        fp.viz(vn); fp(" [label=\"%s\",shape=house];\n", vn->name.c_str());
+                        fp.viz(vn); fp(" [label=\"%s\",shape=egg];\n", vn->name.c_str());
                     }
                     
                     
@@ -361,10 +364,18 @@ namespace yocto
                 
                 inline void link(ios::ostream &fp, const vnode *vn ) const
                 {
+                    int num=0;
                     for(const anode *an = vn->children.head; an; an=an->next)
                     {
                         const vnode *sub = an->addr;
-                        fp("\t"); fp.viz(vn); fp(" -> "); fp.viz(sub); fp(";\n");
+                        fp("\t");
+                        fp.viz(vn); fp(" -> "); fp.viz(sub);
+                        if(vn->type == vnode_or )
+                        {
+                            fp( "[label=\"%d\"]", ++num);
+                        }
+                        
+                        fp(";\n");
                         switch(sub->type)
                         {
                             case vnode_jk:
