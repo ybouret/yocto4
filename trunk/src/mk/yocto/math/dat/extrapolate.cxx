@@ -151,3 +151,72 @@ namespace yocto {
 		
 	}
 }
+
+#include "yocto/code/ipower.hpp"
+#include "yocto/sequence/vector.hpp"
+#include "yocto/math/kernel/crout.hpp"
+
+#include "yocto/ios/ocstream.hpp"
+
+namespace yocto
+{
+    namespace math
+    {
+        template <>
+        real_t extrapolate<real_t>:: zpade( const array<real_t> &xa, const array<real_t> &ya )
+        {
+            assert(xa.size()==ya.size());
+            const size_t n = xa.size();
+            matrix<real_t> W(n,n);
+            vector<real_t> a(n,0);
+            const size_t q = n/2;
+            const size_t p = (n&1) ? q+1 : q;
+            assert(p+q==n);
+            for(size_t k=n;k>0;--k)
+            {
+                a[k] = ya[k];
+                for(size_t i=p;i>0;--i)
+                {
+                    W[k][i] = ipower(xa[k],i-1);
+                }
+                for(size_t i=q;i>0;--i)
+                {
+                    W[k][i+p] = -ipower(xa[k],i)*ya[k];
+                }
+            }
+            std::cerr << "W=" << W << std::endl;
+            if(!crout<real_t>::build(W))
+                throw exception("singular matrix in zpade");
+            crout<real_t>::solve(W,a);
+            std::cerr << "a=" << a << std::endl;
+            {
+                real_t xmax = xa[1];
+                for(size_t i=2;i<=n;++i)
+                {
+                    xmax = max_of(xmax,xa[i]);
+                }
+                
+                ios::ocstream fp( vformat("zpade%u.dat", unsigned(n)), false );
+                for(size_t i=0;i<=100;++i)
+                {
+                    real_t num = 0;
+                    real_t den = 1;
+                    const real_t xx = (i*xmax)/100;
+                    for(size_t j=p;j>0;--j)
+                    {
+                        num += a[j] * ipower(xx,j-1);
+                    }
+                    for(size_t j=q;j>0;--j)
+                    {
+                        den += a[j+p] * ipower(xx,j);
+                    }
+                    fp("%g %g\n", xx, num/den);
+                }
+            }
+            return 0;
+        }
+
+    }
+}
+
+

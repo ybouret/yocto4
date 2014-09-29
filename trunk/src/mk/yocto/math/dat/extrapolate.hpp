@@ -39,6 +39,10 @@ namespace yocto {
 				\param d    1..nmax:1..nvar, auxiliary matrix.
 			*/
 			static void get( array<T> &yxtr, array<T> &yerr, const array<T> &xa, const matrix<T> &ya, size_t n, matrix<T> &c, matrix<T> &d ) throw();
+            
+            //! using Pade approximant
+            static T zpade( const array<T> &xa, const array<T> &ya );
+            
 		};
 
 	} // math
