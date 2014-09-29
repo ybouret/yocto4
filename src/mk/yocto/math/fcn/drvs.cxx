@@ -16,18 +16,6 @@ namespace yocto
 #define SAFE REAL(2.0)
 #define BIG  (REAL_MAX/SAFE)
         
-#if 0
-        static inline real_t __fix_drvs( const real_t x, real_t h)
-        {
-            volatile real_t temp = x+Fabs(h);
-            while( (h = (temp-x) ) <= 0 )
-            {
-                
-            }
-            return h;
-        }
-#endif
-
 #define EVAL()  ( (func(x+hh)-func(x-hh))/(hh+hh) )
         
         template <>

@@ -46,5 +46,7 @@ ADD_TEST(FitGNL    test-mk gnl)
 ADD_TEST(FitPoly   test-mk fit_poly)
 ADD_TEST(FitGauss  test-mk fit_gauss)
 ADD_TEST(FitPade   test-mk fit_pade 3 2)
+ADD_TEST(Gradient  test-mk grad)
+ADD_TEST(Extr      test-mk extr)
 
 #ADD_CUSTOM_TARGET(check-mk COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test-mk )
