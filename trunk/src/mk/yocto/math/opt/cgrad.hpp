@@ -21,6 +21,15 @@ namespace yocto
                                  const T                            ftol,
                                  callback                          *cb = 0
                                  );
+            
+            //! return false only if callback returns false !
+            static bool optimize(typename numeric<T>::scalar_field &func,
+                                 array<T>                          &p,
+                                 const array<T>                    &dp,
+                                 const T                            ftol,
+                                 callback                          *cb = 0
+                                 );
+
         };
         
     }

@@ -414,6 +414,12 @@ namespace yocto
         {
             return (void*)indx;
         }
+        
+        template <>
+        void * matrix<z_type>:: scal_addr() const throw()
+        {
+            return (void*)scal;
+        }
 
         
 	}
