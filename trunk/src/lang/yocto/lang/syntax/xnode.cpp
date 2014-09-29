@@ -41,7 +41,7 @@ namespace yocto
             {
                 static inline void       *addr2addr(void       *p) throw() { return p; }
                 static inline const void *addr2addr(const void *p) throw() { return p; }
-
+                
             }
             
             xnode::child_list & xnode::children() throw()
@@ -133,13 +133,13 @@ namespace yocto
                 node->parent = 0;
                 return node;
             }
-
+            
             size_t xnode:: count()    const throw()
             {
                 assert(!terminal);
                 return children().size;
             }
-
+            
             const xnode * xnode:: head() const throw()
             {
                 assert(!terminal);
@@ -151,7 +151,7 @@ namespace yocto
                 assert(!terminal);
                 return children().head;
             }
-
+            
             
             
             void xnode:: restore( lexer &Lexer, xnode *node ) throw()
@@ -174,8 +174,21 @@ namespace yocto
                 }
                 delete node;
             }
-
-           
+            
+            
+            void xnode:: clear() throw()
+            {
+                if(terminal)
+                {
+                    lxm()->clear();
+                }
+                else
+                {
+                    while( count() ) delete pop();
+                }
+            }
+            
+            
             
         }
         

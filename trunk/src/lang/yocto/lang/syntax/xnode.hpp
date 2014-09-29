@@ -66,8 +66,14 @@ namespace yocto
                 //! children().head
                 xnode *head() throw();
 
+                //! get the lexeme
                 lexeme *         &lxm() throw();
+                
+                //! get the lexeme
                 const lexeme *   &lxm() const throw();
+                
+                //! free maximum of memory
+                void clear() throw();
                 
                 //!create a new terminal node
                 static xnode *create( const string &rule_label, lexeme *lx, const property ppty);

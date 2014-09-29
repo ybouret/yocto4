@@ -186,6 +186,8 @@ namespace yocto
                         const string &label = xn->label;
                         std::cerr << "\t" << label << std::endl;
                         
+                        //------------------------------------------------------
+                        
                         if( "ID" == label )
                         {
                             //__________________________________________________
@@ -200,8 +202,10 @@ namespace yocto
                                 throw exception("%d: unknown sub-rule '%s' in '%s'", xn->lxm()->line, child_name.c_str(),parent->name.c_str());
                             }
                             parent->children.append(child_addr);
-                            continue;
+                            goto CLEAR;
                         }
+                        
+                        //------------------------------------------------------
                         
                         if( "ATOMS" == label )
                         {
@@ -210,9 +214,10 @@ namespace yocto
                             // this is a set of rules to append to parent
                             //__________________________________________________
                             build(parent,xn->head());
-                            continue;
+                            goto CLEAR;
                         }
                         
+                        //------------------------------------------------------
                         
                         if( "STRING" == label )
                         {
@@ -229,8 +234,10 @@ namespace yocto
                                 vs.push_back(vn);
                             }
                             parent->children.append(vn);
-                            continue;
+                            goto CLEAR;
                         }
+                        
+                        //------------------------------------------------------
                         
                         if( "CHAR" == label )
                         {
@@ -248,10 +255,12 @@ namespace yocto
                                 vc.push_back(vn);
                             }
                             parent->children.append(vn);
-                            continue;
+                            goto CLEAR;
                             
                         }
                         
+                        //------------------------------------------------------
+
                         if( "JOKER" == label )
                         {
                             //__________________________________________________
@@ -264,8 +273,10 @@ namespace yocto
                             vj.push_back(jk);
                             parent->children.append(jk);
                             build(jk,xn->children().tail);
-                            continue;
+                            goto CLEAR;
                         }
+                        
+                        //------------------------------------------------------
                         
                         if( "OR" == label )
                         {
@@ -275,19 +286,29 @@ namespace yocto
                             parent->children.append(Or);
                             
                             int i=0;
-                            for(syntax::xnode *sub=xn->head();sub;sub=sub->next)
+                            syntax::xnode::child_list tmp;
+                            while(xn->count())
                             {
+                                auto_ptr<syntax::xnode> p( xn->pop() );
                                 const string grp_id = vformat("group#%d",++i);
-                                vnode *grp = new vnode(grp_id,sub,vnode_group);
+                                vnode *grp = new vnode(grp_id,p.__get(),vnode_group);
                                 vo.push_back(grp);
                                 Or->children.append(grp);
                             }
-                            continue;
+                            
+                            goto CLEAR;
                         }
                         
                         throw exception("unhandled %s", label.c_str());
+                        
+                    CLEAR:
+                        xn->clear();
                     }
                     
+                    //__________________________________________________________
+                    //
+                    // markc children as linked
+                    //__________________________________________________________
                     for(anode *an = parent->children.head;an;an=an->next)
                     {
                         an->addr->linked = true;
