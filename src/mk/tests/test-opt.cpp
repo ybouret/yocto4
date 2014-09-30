@@ -10,7 +10,8 @@ using namespace math;
 template <typename T>
 static inline T F( T x )
 {
-    return -Cos(x+T(0.23)) + T(7);
+    //return -Cos(x+T(0.23)) + T(7);
+    return -Cos(x-0.1);
 }
 
 template <typename T>
@@ -33,10 +34,10 @@ static inline void optim()
 YOCTO_UNIT_TEST_IMPL(opt)
 {
     std::cerr << "Float: " << std::endl;
-    optim<float>();
+    //optim<float>();
     
     std::cerr << "Double: " << std::endl;
-    //optim<double>();
+    optim<double>();
 }
 YOCTO_UNIT_TEST_DONE()
 
