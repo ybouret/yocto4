@@ -11,9 +11,8 @@ namespace
     {
         const double x=var[1];
         const double y=var[2];
-        const double t=0.5*(x+y);
-        const double u=0.6*(x-y);
-        return 1+2*t*t+3*u*u;
+       
+        return 1+2*x+3*y+4*x*x+5*x*y+6*y*y;
     }
 }
 
@@ -24,9 +23,9 @@ YOCTO_UNIT_TEST_IMPL(grad)
     numeric<double>::scalar_field FF(proc);
     
     const size_t n = 2;
-    vector<double> var(n,0);
-    vector<double> G(n,0);
-    vector<double> dvar(n,1e-4);
+    vector<double>   var(n,0);
+    vector<double>   G(n,0);
+    vector<double>   dvar(n,1e-4);
     gradient<double> grad;
     matrix<double>   H(n,n);
     
@@ -35,11 +34,6 @@ YOCTO_UNIT_TEST_IMPL(grad)
     
     grad.compute(FF, var, G, dvar);
     std::cerr << "grad="  << G << std::endl;
-    
-    grad.compute(FF, var, FF(var), G, dvar, H);
-    std::cerr << "grad=" << G << std::endl;
-    std::cerr << "hess=" << H << std::endl;
-    
     
     
 }
