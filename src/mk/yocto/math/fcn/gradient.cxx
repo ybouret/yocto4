@@ -9,14 +9,39 @@ namespace yocto
     {
         
         template <>
-        gradient<real_t>:: gradient() throw() : var() {}
+        real_t gradient<real_t>:: eval(real_t u)
+        {
+            assert(pF);
+            assert(px);
+            assert(ix>0);
+            assert(ix<=px->size());
+            array<real_t> &xx = *px;
+            const real_t   x0 = xx[ix];
+            xx[ix] = u;
+            const real_t ans = (*pF)(xx);
+            xx[ix] = x0;
+            return ans;
+        }
+        
+        
+        template <>
+        gradient<real_t>:: gradient() :
+        derivative<real_t>(),
+        pF(0),
+        ix(0),
+        px(0),
+        gf(this, & gradient<real_t>::eval )
+        {}
         
         template <>
         gradient<real_t>:: ~gradient() throw() {}
         
+        
+        
+        
         template <>
         void gradient<real_t>:: compute(numeric<real_t>::scalar_field &F,
-                                        const array<real_t>           &x,
+                                        array<real_t>                 &x,
                                         const real_t                   Fx,
                                         array<real_t>                &dFdx,
                                         const array<real_t>          &dx)
@@ -25,106 +50,60 @@ namespace yocto
             assert(x.size()==dFdx.size());
             assert(x.size()==dx.size());
             
-            var.make(n,0);
-            for(size_t i=n;i>0;--i)
-            {
-                var[i] = x[i];
-            }
             
             for(size_t i=n;i>0;--i)
             {
-                const real_t save = var[i];
+                const real_t xmid = x[i];
                 const real_t step = dx[i];
-                var[i] += step;
-                const real_t Ft = F(var);
+                x[i];
+                const real_t Ft = F(x);
                 dFdx[i] = (Ft-Fx)/step;
-                var[i] = save;
+                x[i] = xmid;
             }
             
         }
         
         template <>
         void gradient<real_t>:: compute(numeric<real_t>::scalar_field &F,
-                                        const array<real_t>           &x,
+                                        array<real_t>                 &x,
                                         array<real_t>                 &dFdx,
                                         const array<real_t>           &dx)
         {
             const size_t n = x.size();
             assert(x.size()==dFdx.size());
-            var.make(n,0);
-            for(size_t i=n;i>0;--i)
-            {
-                var[i] = x[i];
-            }
             
             for(size_t i=n;i>0;--i)
             {
-                const real_t mid  = var[i];
+                const real_t xmid  = x[i];
                 const real_t step = dx[i];
-                var[i] = mid+step;
-                const real_t Fp = F(var);
-                var[i] = mid-step;
-                const real_t Fm = F(var);
-                var[i] = mid;
+                x[i] = xmid+step;
+                const real_t Fp = F(x);
+                x[i] = xmid-step;
+                const real_t Fm = F(x);
+                x[i] = xmid;
                 dFdx[i] = (Fp-Fm)/(step+step);
             }
             
         }
         
         template <>
-        void gradient<real_t>:: compute( numeric<real_t>::scalar_field &F,
-                                        const array<real_t>            &x,
-                                        const real_t                    Fx,
-                                        array<real_t>                  &dFdx,
-                                        const array<real_t>            &dx,
-                                        matrix<real_t>                 &H)
+        void gradient<real_t>:: operator()(scalar_field        &F,
+                                           array<real_t>       &x,
+                                           array<real_t>       &dFdx,
+                                           const array<real_t> &dx)
         {
-            const size_t n = x.size();
-            assert(x.size() == dFdx.size());
-            assert(x.size() ==   dx.size());
-            assert(H.rows   ==   x.size());
-            assert(H.cols   ==   x.size());
-            lw_array<real_t> Fp( H.get_aux<real_t>(),  n );
-            lw_array<real_t> Fm( H.get_aux2<real_t>(), n );
-
-            var.make(n,0);
-            for(size_t i=n;i>0;--i)
-            {
-                var[i] = x[i];
-            }
-            H.ldz();
+            assert(x.size()    == dx.size());
+            assert(dFdx.size() == x.size() );
+            const size_t n=x.size();
             
-            const real_t twoFx = Fx+Fx;
-            
-			// get gradient and diagonal terms
-            for(size_t i=n;i>0;--i)
+            pF = &F;
+            px = &x;
+            derivative<real_t> &drvs = *this;
+            for(ix=n;ix>0;--ix)
             {
-                const real_t xmid = var[i];
-                const real_t step = dx[i];
-                var[i] = xmid+step;
-                Fp[i]  = F(var);
-                var[i] = xmid-step;
-                Fm[i]  = F(var);
-                var[i] = xmid;
                 
-                dFdx[i] = (Fp[i]-Fm[i])/(step+step);
-                H[i][i] = (Fp[i] - twoFx + Fm[i])/(step*step);
+                dFdx[ix] = drvs(gf,x[ix],dx[ix]);
             }
-
-			for(size_t i=n;i>0;--i)
-			{
-				const real_t xi = dx[i]/2;
-				const real_t xi2 = xi*xi;
-				for(size_t j=i-1;j>0;--j)
-				{
-					H[i][j] = H[j][i] = 0;
-					const real_t yj  = dx[j]/2;
-					const real_t yj2 = yj*yj;
-					const real_t sum_xi2yj2 = REAL(4.0) * xi2 * yj2;  
-				}
-			}
-            
-            
         }
         
         
