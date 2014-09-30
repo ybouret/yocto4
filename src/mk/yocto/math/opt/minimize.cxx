@@ -39,6 +39,20 @@ namespace yocto {
 #endif
         
         
+        static inline
+        real_t __getErr( real_t f0, real_t f1, real_t f2, real_t f3 )
+        {
+            netsort<real_t>::level4(f0, f1, f2, f3);
+            return Fabs(f2-f0);
+        }
+        
+        static inline
+        real_t __getErr( real_t f0, real_t f1, real_t f2 )
+        {
+            netsort<real_t>::level3(f0, f1, f2);
+            return Fabs(f2-f0);
+        }
+        
         template <>
         void minimize<real_t>(numeric<real_t>::function &func,
                               triplet<real_t>           &x,
@@ -122,25 +136,9 @@ namespace yocto {
                     assert(x0<=x1); assert(x1<=x2); assert(x2<=x3);
                 }
                 
-                //const real_t mu = compute_curv(x0, x1, x2, x3, f0, f1, f2, f3);
-                //const real_t h  = Square(w/2);
                 
-                if( f1 <= f2 )
-                {
-                    x.a = x0; f.a = f0;
-                    x.b = x1; f.b = f1;
-                    x.c = x2; f.c = f2;
-                }
-                else
-                {
-                    x.a = x1; f.a = f1;
-                    x.b = x2; f.b = f2;
-                    x.c = x3; f.c = f3;
-                }
-
-                std::cerr << "x=" << x << std::endl;
-                std::cerr << "f=" << f << std::endl;
-                //std::cerr << "mu=" << mu << ", h=" << h << ", err=" << mu*h << std::endl;
+                std::cerr << "Error=" << __getErr(f0,f1,f2,f3) << std::endl;
+                
                 
             }
             
@@ -231,6 +229,7 @@ namespace yocto {
                         f.b = fu;
                     }
                 }
+                std::cerr << "Error2=" << __getErr(f.a, f.b, f.c) << std::endl;
                 //std::cerr << "x=" << x << std::endl;
                 //std::cerr << "f=" << f << std::endl;
             }
