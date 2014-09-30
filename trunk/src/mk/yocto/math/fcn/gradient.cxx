@@ -101,7 +101,6 @@ namespace yocto
             derivative<real_t> &drvs = *this;
             for(ix=n;ix>0;--ix)
             {
-                
                 dFdx[ix] = drvs(gf,x[ix],dx[ix]);
             }
         }
