@@ -122,6 +122,52 @@ static inline void test_netsort()
 }
 
 
+template <typename T, typename U>
+static inline void test_co_netsort()
+{
+    std::cerr << "-- co_sorting network" << std::endl;
+
+    const size_t n = 1 + alea_leq( 20 );
+    vector<T> ra(6,as_capacity);
+    vector<U> rb(6,as_capacity);
+    
+    for(size_t i=0;i<n;++i)
+    {
+        ra.free();
+        rb.free();
+        for(size_t j=0;j<2;++j) {
+            const T tmp( gen<T>::get() ); ra.push_back(tmp);
+            const U ump( gen<U>::get() ); rb.push_back(ump);
+        }
+        std::cerr << "rawA=" << ra << std::endl;
+        std::cerr << "rawB=" << rb << std::endl;
+        netsort<T>::template co_level2<U>( &ra[1], &rb[1]);
+        std::cerr << "srtA=" << ra << std::endl;
+        std::cerr << "srtB=" << rb << std::endl;
+        check_sorted(ra, "co_netsort2");
+    }
+
+    
+    for(size_t i=0;i<n;++i)
+    {
+        ra.free();
+        rb.free();
+        for(size_t j=0;j<3;++j) {
+            const T tmp( gen<T>::get() ); ra.push_back(tmp);
+            const U ump( gen<U>::get() ); rb.push_back(ump);
+        }
+        std::cerr << "rawA=" << ra << std::endl;
+        std::cerr << "rawB=" << rb << std::endl;
+        netsort<T>::template co_level3<U>( &ra[1], &rb[1]);
+        std::cerr << "srtA=" << ra << std::endl;
+        std::cerr << "srtB=" << rb << std::endl;
+        check_sorted(ra, "co_netsort3");
+    }
+
+    
+}
+
+
 YOCTO_UNIT_TEST_IMPL(sort)
 {
 	test_sort<int>();
@@ -129,6 +175,8 @@ YOCTO_UNIT_TEST_IMPL(sort)
 	test_sort<string>();
 	test_cosort<int,string>();
     test_netsort<float>();
+    test_co_netsort<int, float>();
+    
 }
 YOCTO_UNIT_TEST_DONE()
 

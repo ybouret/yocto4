@@ -25,7 +25,8 @@ namespace yocto {
             
             static const real_t fmax = Sqrt(numeric<real_t>::ftol); //!< numeric constraint
             //static const real_t dmax = numeric<real_t>::tiny;       //!< numeric constraint
-            static const real_t R    = REAL(0.618033988749895);
+            //static const real_t R    = REAL(0.618033988749895);
+            static const real_t R    = 0.5;
             static const real_t C    = REAL(1.0)-R;
             
             
@@ -53,7 +54,8 @@ namespace yocto {
                 }
                 assert(Fabs(x0-x1)<=Fabs(x2-x3));
             }
-            
+            assert( (f1<=f0&&f1<=f3) || (f2<=f0&&f2<=f3) );
+
             std::cerr << "x0=" << x0 << ", x1=" << x1 << ", x2=" << x2 << ", x3=" << x3 << std::endl;
             std::cerr << "f0=" << f0 << ", f1=" << f1 << ", f2=" << f2 << ", f3=" << f3 << std::endl;
             
@@ -67,13 +69,29 @@ namespace yocto {
                 assert( (f1<=f0&&f1<=f3) || (f2<=f0&&f2<=f3) );
                 if( f2 < f1 )
                 {
-                    SHIFT3(x0,x1,x2,R*x1+C*x3);
-                    SHIFT3(f0,f1,f2,func(x2));
+                    x0 = x1;
+                    f0 = f1;
+                    
+                    x1 = x2;
+                    f1 = f2;
+                    
+                    //x2 = R*x1+C*x3;
+                    x2 = x3 + R*(x1-x3);
+                    f2 = func(x2);
+                    
                 }
                 else
                 {
-                    SHIFT3(x3,x2,x1,R*x2+C*x0);
-                    SHIFT3(f3,f2,f1,func(x1));
+                    x3 = x2;
+                    f3 = f2;
+                    
+                    x2 = x1;
+                    f2 = f1;
+                    
+                    //x1 = C*x0+R*x2;
+                    //x1 = R*x2+C*x0;
+                    x1 = x0 + R*(x2-x0);
+                    f1 = func(x1);
                 }
                 std::cerr << "x0=" << x0 << ", x1=" << x1 << ", x2=" << x2 << ", x3=" << x3 << std::endl;
                 std::cerr << "f0=" << f0 << ", f1=" << f1 << ", f2=" << f2 << ", f3=" << f3 << std::endl;
