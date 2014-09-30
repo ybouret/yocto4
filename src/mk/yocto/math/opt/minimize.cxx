@@ -106,6 +106,7 @@ namespace yocto {
             // Main Loop
             //__________________________________________________________________
             real_t w = 0;
+			real_t E = __getErr(f0,f1,f2,f3);
             while( (w=max_of<real_t>(x3-x0,0)) > xtol )
             {
                 assert( (f1<=f0&&f1<=f3) || (f2<=f0&&f2<=f3) );
@@ -135,9 +136,9 @@ namespace yocto {
                     f1 = func(x1);
                     assert(x0<=x1); assert(x1<=x2); assert(x2<=x3);
                 }
+                const real_t new_err = __getErr(f0,f1,f2,f3);
                 
-                
-                std::cerr << "Error=" << __getErr(f0,f1,f2,f3) << std::endl;
+                std::cerr << "Error=" << new_err << std::endl;
                 
                 
             }
