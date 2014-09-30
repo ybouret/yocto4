@@ -7,18 +7,23 @@
 using namespace yocto;
 using namespace math;
 
+static size_t call_counts = 0;
+
 template <typename T>
 static inline T F( T x )
 {
-    //return -Cos(x+T(0.23)) + T(7);
-    return -Cos(x-0.1);
+    ++call_counts;
+    return 7.1-Cos(x+T(0.23));
+    //return 1-Cos(x+0.1);
+    
 }
 
-template <typename T>
-static inline void optim()
+template <typename T,typename PROC>
+static inline void optim(PROC &proc, T xtol)
 {
+    call_counts = 0;
     typename numeric<T>::function func( cfunctor(F<float>) );
-    triplet<T> x = { -1, 0 , 1};
+    triplet<T> x = { 1, 0 , -1};
     triplet<T> f = { func(x.a), 0, func(x.c) };
     if( ! bracket<T>::inside( func, x, f ) )
     {
@@ -27,35 +32,28 @@ static inline void optim()
     std::cerr << "x=" << x << std::endl;
     std::cerr << "f=" << f << std::endl;
     
-    minimize<T>( func,x,f,1e-8);
+    proc( func,x,f,xtol);
     std::cerr << "min@" << x.b << " = " << f.b << std::endl;
+    std::cerr << "\t\t#calls=" << call_counts << std::endl;
 }
+
+#include "yocto/string/conv.hpp"
+
 
 YOCTO_UNIT_TEST_IMPL(opt)
 {
-    std::cerr << "Float: " << std::endl;
+    //std::cerr << "Float: " << std::endl;
     //optim<float>();
     
+    double xtol = 1e-4;
+    if(argc>1)
+    {
+        xtol = strconv::to_double(argv[1],"xtol");
+    }
     std::cerr << "Double: " << std::endl;
-    optim<double>();
+    optim<double>(minimize<double>,xtol);
+    optim<double>(minimize2<double>,xtol);
+    //optim<double>(minimize3<double>,xtol);
 }
 YOCTO_UNIT_TEST_DONE()
 
-YOCTO_UNIT_TEST_IMPL(opt2)
-{
-    numeric<double>::function func( cfunctor(F<double>) );
-    triplet<double> x = { -1, 0 , 1};
-    triplet<double> f = { func(x.a), 0, func(x.c) };
-    if( ! bracket<double>::inside( func, x, f ) )
-    {
-        throw exception("Couldn't bracket !");
-    }
-    std::cerr << "x=" << x << std::endl;
-    std::cerr << "f=" << f << std::endl;
-    
-    minimize2<double>( func,x,f,1e-6f);
-    std::cerr << "min@" << x.b << " = " << f.b << std::endl;
-    
-    
-    }
-    YOCTO_UNIT_TEST_DONE()
