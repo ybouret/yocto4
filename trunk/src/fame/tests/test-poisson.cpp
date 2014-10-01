@@ -7,6 +7,7 @@
 
 #include "yocto/ios/ocstream.hpp"
 
+
 using namespace yocto;
 using namespace fame;
 using namespace math;
@@ -161,7 +162,7 @@ namespace {
             while( (new_rms=rb0()) < old_rms )
             {
                 old_rms = new_rms;
-                std::cerr << "rms=" << new_rms << std::endl;
+                //std::cerr << "rms=" << new_rms << std::endl;
             }
             dispatch( Na,1);
             dispatch( Cl,-1);
@@ -230,7 +231,7 @@ namespace {
             CNa = int1D(X, Na)/B.space;
             CCl = int1D(X, Cl)/B.space;
             std::cerr << "lam0=" << lam0 << std::endl;
-        
+            
             double old_rms = rb1();
             double new_rms = old_rms;
             
@@ -246,6 +247,23 @@ namespace {
             dispatch( Cl,-1);
         }
         
+        
+        double Energy( double PsiWall )
+        {
+            Psi[upper] = PsiWall;
+            solve0();
+            double ans = 0;
+            for(unit_t i=lower;i<=upper;++i)
+            {
+                const double cna = Na[i];
+                const double ccl = Cl[i];
+                ans += cna * log(cna) + ccl * log(ccl) + FiRT * Psi[i] * (cna-ccl);
+                //ans += Fabs( cna - ccl );
+            }
+            return ans;
+        }
+        
+        
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
     };
@@ -256,15 +274,17 @@ namespace {
 YOCTO_UNIT_TEST_IMPL(poisson)
 {
     
-    Cell cell( layout1D(0,500), 1e-7 );
+    Cell cell( layout1D(0,1000), 1e-6 );
     
     cell.Na.ld(0.01);
     cell.Cl.ld(0.01);
     
     cell.compute_lambda();
     
-    cell.Psi[cell.lower] = 60e-3;
+    const double Em      = 60e-3;
+    cell.Psi[cell.lower] = Em;
     cell.Psi[cell.upper] = 0;
+    
     
     cell.solve0();
     {
@@ -275,15 +295,34 @@ YOCTO_UNIT_TEST_IMPL(poisson)
         }
     }
     
-    
-    cell.solve1();
     {
-        ios::ocstream fp("Psi1.dat",false);
-        for(unit_t i=cell.lower;i<=cell.upper;++i)
+        ios::ocstream::overwrite("E.dat");
+        size_t N = 200;
+        const double Emin = -70e-3;
+        const double Emax =  70e-3;
+        for(size_t i=0;i<=N;++i)
         {
-            fp("%g %g %g %g\n", cell.X[i], cell.Psi[i], cell.Na[i], cell.Cl[i]);
+            const double p = Emin + (i*(Emax-Emin))/N;
+            const double E = cell.Energy(p);
+            std::cerr << "E[" << p << "]=" << E << std::endl;
+            {
+                ios::ocstream fp("E.dat",true);
+                fp("%g %g\n", p, E);
+            }
+            const int mV = int(1000.0 * p);
+            const string fn = vformat("psi%+04d.dat",mV);
+            std::cerr << fn << std::endl;
+            {
+                ios::ocstream fp2(fn,false);
+                for(unit_t i=cell.lower;i<=cell.upper;++i)
+                {
+                    fp2("%g %g %g %g\n", cell.X[i], cell.Psi[i], cell.Na[i], cell.Cl[i]);
+                }
+                
+            }
         }
     }
-
+    
+    
 }
 YOCTO_UNIT_TEST_DONE()
