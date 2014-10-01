@@ -59,8 +59,16 @@ struct pot2
     }
 };
 
+#include "yocto/string/conv.hpp"
 YOCTO_UNIT_TEST_IMPL(cgrad)
 {
+    
+    double ftol = 1e-7;
+    if( argc > 1 )
+    {
+        ftol = strconv::to<double>(argv[1],"ftol");
+    }
+    
     pot2 P = { 0.3, 0.9, 0.4, 1.2 };
     numeric<double>::scalar_field Func( &P, &pot2::func );
     numeric<double>::vector_field Grad( &P, &pot2::grad );
@@ -70,7 +78,7 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     { ios::ocstream fp("cgrad.dat",false); }
     
     cgrad<double>::callback cb( &P, &pot2::cb);
-    cgrad<double>::optimize(Func, Grad, X, 1e-7, &cb);
+    cgrad<double>::optimize(Func, Grad, X, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()

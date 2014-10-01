@@ -111,7 +111,8 @@ namespace yocto
                 //--------------------------------------------------------------
                 // perform line minimization
                 //--------------------------------------------------------------
-                minimize<real_t>(F, x, f, ftol);
+                minimize<real_t>(F, x, f, 0);
+                
                 bool converged = true;
                 for( size_t i=nvar;i>0;--i)
                 {
