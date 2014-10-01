@@ -47,7 +47,6 @@ namespace yocto {
             //
             // Prepare control points
             //__________________________________________________________________
-            
             real_t       x0   = x.a, x1, x2, x3 = x.c;
             real_t       f0   = f.a, f1, f2, f3 = f.c;
             {
@@ -77,7 +76,6 @@ namespace yocto {
             // Main Loop
             //__________________________________________________________________
             real_t w = 0;
-			//real_t E = __getErr(f0,f1,f2,f3);
             while( (w=max_of<real_t>(x3-x0,0)) > xtol )
             {
                 assert( (f1<=f0&&f1<=f3) || (f2<=f0&&f2<=f3) );
@@ -107,12 +105,11 @@ namespace yocto {
                     f1 = func(x1);
                     assert(x0<=x1); assert(x1<=x2); assert(x2<=x3);
                 }
-                const real_t new_err = __getErr(f0,f1,f2,f3);
-                
-                std::cerr << x0 << ' ' << x1 << ' ' << x2 << ' ' << x3 << std::endl;
-                std::cerr << f0 << ' ' << f1 << ' ' << f2 << ' ' << f3 << std::endl;
-                std::cerr << "Error=" << new_err << std::endl;
-                
+
+                //const real_t new_err = __getErr(f0,f1,f2,f3);
+                //std::cerr << x0 << ' ' << x1 << ' ' << x2 << ' ' << x3 << std::endl;
+                //std::cerr << f0 << ' ' << f1 << ' ' << f2 << ' ' << f3 << std::endl;
+                //std::cerr << "Error=" << new_err << std::endl;
                 
             }
             
@@ -222,12 +219,11 @@ namespace yocto {
             while(max_of<real_t>(x.c-x.a,0)>xtol)
             {
                 minstep(func,x,f);
-                std::cerr << "Error2=" << __error_on(f) << " @" << x.b << std::endl;
             }
             
         }
         
-        
+#if 0
         template <>
         void minimize3<real_t>(numeric<real_t>::function &func,
                                triplet<real_t>           &x,
@@ -247,6 +243,10 @@ namespace yocto {
             real_t ac=0;
             while((ac=max_of<real_t>(x.c-x.a,0))>xtol)
             {
+                assert(x.a<=x.b);
+                assert(x.b<=x.c);
+                assert(f.b<=f.a);
+                assert(f.b<=f.c);
                 const real_t ab  = max_of<real_t>(x.b-x.a,0);
                 const real_t bc  = max_of<real_t>(x.c-x.b,0);
                 const real_t lam = (f.a-f.b)*ac + (f.c-f.a) * ab;
@@ -256,16 +256,47 @@ namespace yocto {
                     // not really a max
                     break;
                 }
-                const real_t mu = (f.a-f.b) * ab * bc;
+                const real_t mu   = (f.a-f.c)*ab*bc;
+                real_t       fu   = 0;
+                const real_t xu   = clamp(x.a, REAL(0.5)*((x.a+x.c) +  mu/lam), x.c);
+                fu = func(xu);
                 
-                return;
+                std::cerr << "xu=" << xu << ", fu=" << fu << std::endl;
+                if(fu>=f.b)
+                {
+                    // b stays the winner
+                    if(xu<=x.b)
+                    {
+                        x.a = xu;
+                        f.a = fu;
+                    }
+                    else
+                    {
+                        x.c = xu;
+                        f.c = fu;
+                    }
+                }
+                else
+                {
+                    // u is the new winner
+                    if(xu<=x.b)
+                    {
+                        x.c = x.b;
+                        f.c = f.b;
+                    }
+                    else
+                    {
+                        x.a = x.b;
+                        f.a = f.b;
+                    }
+                    x.b = xu;
+                    f.b = fu;
+                }
+                std::cerr << "x=" << x << ", f=" << f << ", w=" << x.c-x.a << std::endl;
             }
             
-            
-            
-            
         }
-        
+#endif
         
     } // math
     
