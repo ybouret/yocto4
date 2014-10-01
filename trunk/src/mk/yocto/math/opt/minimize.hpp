@@ -25,7 +25,7 @@ namespace yocto {
         void minimize2( typename numeric<T>::function &func, triplet<T> &x, triplet<T> &f, T xtol);
 
         
-#if 0
+#if 1
         //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
         template <typename T>
         void minimize3( typename numeric<T>::function &func, triplet<T> &x, triplet<T> &f, T xtol);
