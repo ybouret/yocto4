@@ -17,10 +17,12 @@ namespace yocto {
             return Fabs(f2-f0);
         }
         
+#define XTOL numeric<real_t>::sqrt_ftol
+        
         static inline
-        real_t __compute_xtol(real_t xtol) throw()
+        real_t __compute_ftol(real_t ftol) throw()
         {
-            return max_of(Fabs(xtol),numeric<real_t>::sqrt_ftol);;
+            return max_of(Fabs(ftol),XTOL);
         }
         
         
@@ -28,7 +30,7 @@ namespace yocto {
         void minimize<real_t>(numeric<real_t>::function &func,
                               triplet<real_t>           &x,
                               triplet<real_t>           &f,
-                              real_t                     xtol )
+                              real_t                     ftol )
         {
             assert(x.is_ordered());
             netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
@@ -40,8 +42,7 @@ namespace yocto {
             static const real_t R    = REAL(0.618033988749895);
             static const real_t C    = REAL(1.0)-R;
             
-            xtol = __compute_xtol(xtol);
-            
+            ftol = __compute_ftol(ftol)/2;
             
             //__________________________________________________________________
             //
@@ -49,6 +50,7 @@ namespace yocto {
             //__________________________________________________________________
             real_t       x0   = x.a, x1, x2, x3 = x.c;
             real_t       f0   = f.a, f1, f2, f3 = f.c;
+            real_t       dx   = 0;
             {
                 const real_t bc = max_of<real_t>(x.c - x.b,0);
                 const real_t ab = max_of<real_t>(x.b - x.a,0);
@@ -58,6 +60,7 @@ namespace yocto {
                     f1 = f.b;
                     x2 = min_of<real_t>(x.b + C * bc,x3);
                     f2 = func( x2 );
+                    dx = max_of<real_t>(x2-x0,0);
                 }
                 else
                 {
@@ -65,9 +68,9 @@ namespace yocto {
                     f2 = f.b;
                     x1 = max_of<real_t>(x.b - C * ab,x0);
                     f1 = func( x1 );
+                    dx = max_of<real_t>(x3-x1,0);
                 }
                 assert(x0<=x1); assert(x1<=x2); assert(x2<=x3);
-                assert(Fabs(x0-x1)<=Fabs(x2-x3));
             }
             assert( (f1<=f0&&f1<=f3) || (f2<=f0&&f2<=f3) );
             
@@ -75,26 +78,32 @@ namespace yocto {
             //
             // Main Loop
             //__________________________________________________________________
-            real_t w = 0;
-            while( (w=max_of<real_t>(x3-x0,0)) > xtol )
+            
+            while( dx > max_of(ftol*(Fabs(x1)+Fabs(x2)),XTOL) )
             {
                 assert( (f1<=f0&&f1<=f3) || (f2<=f0&&f2<=f3) );
                 if( f2 < f1 )
                 {
+                    
+                    
                     x0 = x1;
                     f0 = f1;
                     
                     x1 = x2;
                     f1 = f2;
                     
+                    
                     x2 = min_of<real_t>(R*x1+C*x3,x3);
                     f2 = func(x2);
                     assert(x0<=x1); assert(x1<=x2); assert(x2<=x3);
+                    dx = max_of<real_t>(0,x3-x1);
                     
                 }
                 else
                 {
                     assert(f1<=f2);
+                    
+                    
                     x3 = x2;
                     f3 = f2;
                     
@@ -104,13 +113,15 @@ namespace yocto {
                     x1 = max_of<real_t>(C*x0+R*x2,x0);
                     f1 = func(x1);
                     assert(x0<=x1); assert(x1<=x2); assert(x2<=x3);
+                    dx=max_of<real_t>(0,x2-x0);
                 }
-
+                
+                
                 //const real_t new_err = __getErr(f0,f1,f2,f3);
                 //std::cerr << x0 << ' ' << x1 << ' ' << x2 << ' ' << x3 << std::endl;
                 //std::cerr << f0 << ' ' << f1 << ' ' << f2 << ' ' << f3 << std::endl;
                 //std::cerr << "Error=" << new_err << std::endl;
-                
+                //dx = max_of<real_t>(x3-x0,0);
             }
             
             //__________________________________________________________________
@@ -135,17 +146,12 @@ namespace yocto {
         
         namespace
         {
-            static real_t __error_on(const triplet<real_t> &f) throw()
-            {
-                real_t fa = f.a, fb = f.b, fc=f.c;
-                netsort<real_t>::level3(fa,fb,fc);
-                return Fabs(fc-fa);
-            }
+            
             
             static inline
-            void minstep(numeric<real_t>::function &func,
-                         triplet<real_t>           &x,
-                         triplet<real_t>           &f)
+            void minstep2(numeric<real_t>::function &func,
+                          triplet<real_t>           &x,
+                          triplet<real_t>           &f)
             {
                 assert(x.a<=x.b);
                 assert(x.b<=x.c);
@@ -206,7 +212,7 @@ namespace yocto {
         void minimize2<real_t>(numeric<real_t>::function &func,
                                triplet<real_t>           &x,
                                triplet<real_t>           &f,
-                               real_t                     xtol )
+                               real_t                     ftol )
         {
             assert(x.is_ordered());
             netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
@@ -214,11 +220,11 @@ namespace yocto {
             assert(x.b<=x.c);
             assert(f.b<=f.a);
             assert(f.b<=f.c);
-            xtol =  __compute_xtol(xtol);
+            ftol =  __compute_ftol(ftol);
             
-            while(max_of<real_t>(x.c-x.a,0)>xtol)
+            while( max_of<real_t>(x.c-x.a,0) > max_of(ftol*Fabs(x.b),XTOL) )
             {
-                minstep(func,x,f);
+                minstep2(func,x,f);
             }
             
         }
