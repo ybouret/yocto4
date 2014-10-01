@@ -22,6 +22,7 @@ static inline void show_values( const char *name )
 	SHOW(two_pi);
 	SHOW(dig);
 	SHOW(ftol);
+    SHOW(sqrt_ftol);
 	SHOW(min_exp);
 	SHOW(max_exp);
     SHOW(tiny);
