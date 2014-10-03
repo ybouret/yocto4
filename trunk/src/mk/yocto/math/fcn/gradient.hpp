@@ -21,31 +21,36 @@ namespace yocto
             virtual ~gradient() throw();
             
             //! one evaluation per component
-            static void compute(scalar_field    &F,
-                                array<T>        &x,
-                                const T          Fx,
-                                array<T>        &dFdx,
-                                const array<T>  &dx);
+            static void compute1(scalar_field    &F,
+                                 array<T>        &x,
+                                 const T          Fx,
+                                 array<T>        &dFdx,
+                                 const array<T>  &dx);
             
             //! two evaluations per component
-            static void compute(scalar_field   &F,
-                                array<T>       &x,
-                                array<T>       &dFdx,
-                                const array<T> &dx);
+            static void compute2(scalar_field   &F,
+                                 array<T>       &x,
+                                 array<T>       &dFdx,
+                                 const array<T> &dx);
             
             
+            //! using partial derivatives
+            void compute(scalar_field   &F,
+                         array<T>       &x,
+                         array<T>       &dFdx,
+                         const array<T> &dx);
             
-            void operator()(scalar_field   &F,
-                            array<T>       &x,
-                            array<T>       &dFdx,
-                            const array<T> &dx);
             
-            
+        protected:
+            scalar_field   *pF;
+            //! using pF
+            void __compute(array<T>       &x,
+                           array<T>       &dFdx,
+                           const array<T> &dx);
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(gradient);
             typedef typename numeric<T>::function scalar_function;
-            scalar_field   *pF;
             size_t          ix;
             array<T>       *px;
             scalar_function gf;

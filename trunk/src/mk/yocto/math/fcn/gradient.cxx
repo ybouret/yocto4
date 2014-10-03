@@ -40,11 +40,11 @@ namespace yocto
         
         
         template <>
-        void gradient<real_t>:: compute(numeric<real_t>::scalar_field &F,
-                                        array<real_t>                 &x,
-                                        const real_t                   Fx,
-                                        array<real_t>                &dFdx,
-                                        const array<real_t>          &dx)
+        void gradient<real_t>:: compute1(numeric<real_t>::scalar_field &F,
+                                         array<real_t>                 &x,
+                                         const real_t                   Fx,
+                                         array<real_t>                &dFdx,
+                                         const array<real_t>          &dx)
         {
             const size_t n = x.size();
             assert(x.size()==dFdx.size());
@@ -64,10 +64,10 @@ namespace yocto
         }
         
         template <>
-        void gradient<real_t>:: compute(numeric<real_t>::scalar_field &F,
-                                        array<real_t>                 &x,
-                                        array<real_t>                 &dFdx,
-                                        const array<real_t>           &dx)
+        void gradient<real_t>:: compute2(numeric<real_t>::scalar_field &F,
+                                         array<real_t>                 &x,
+                                         array<real_t>                 &dFdx,
+                                         const array<real_t>           &dx)
         {
             const size_t n = x.size();
             assert(x.size()==dFdx.size());
@@ -87,16 +87,15 @@ namespace yocto
         }
         
         template <>
-        void gradient<real_t>:: operator()(scalar_field        &F,
-                                           array<real_t>       &x,
-                                           array<real_t>       &dFdx,
-                                           const array<real_t> &dx)
+        void gradient<real_t>:: __compute(array<real_t>       &x,
+                                          array<real_t>       &dFdx,
+                                          const array<real_t> &dx)
         {
             assert(x.size()    == dx.size());
             assert(dFdx.size() == x.size() );
+            assert(0!=pF);
             const size_t n=x.size();
             
-            pF = &F;
             px = &x;
             derivative<real_t> &drvs = *this;
             for(ix=n;ix>0;--ix)
@@ -104,6 +103,21 @@ namespace yocto
                 dFdx[ix] = drvs(gf,x[ix],dx[ix]);
             }
         }
+
+        
+        template <>
+        void gradient<real_t>:: compute(scalar_field        &F,
+                                        array<real_t>       &x,
+                                        array<real_t>       &dFdx,
+                                        const array<real_t> &dx)
+        {
+            assert(x.size()    == dx.size());
+            assert(dFdx.size() == x.size() );
+            pF = &F;
+            __compute(x, dFdx, dx);
+        }
+        
+        
         
         
         

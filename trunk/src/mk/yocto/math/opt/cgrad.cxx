@@ -169,6 +169,45 @@ namespace yocto
             }
         }
         
+        template <>
+        void cgrad<real_t>:: compute_gradient(array<real_t> &dFdx, const array<real_t> &x)
+        {
+            assert(pF);
+            assert(pdp);
+            return __compute( (array<real_t> &)x, dFdx, *pdp);
+        }
+        
+        template <>
+        cgrad<real_t>:: cgrad() :
+        gradient<real_t>(),
+        G( this, & cgrad<real_t>::compute_gradient)
+        {
+            
+        }
+        
+        template <>
+        cgrad<real_t>:: ~cgrad() throw()
+        {
+            
+        }
+        
+       
+        
+        template <>
+        bool cgrad<real_t>:: run(numeric<real_t>::scalar_field  &F,
+                                 array<real_t>                  &p,
+                                 const array<real_t>            &dp,
+                                 const real_t                    ftol,
+                                 callback                       *cb)
+        {
+            //-- prepare data
+            pF  = &F;
+            pdp = &dp;
+            return optimize(F, G, p, ftol,cb);
+        }
+        
+        
+        
         
     } // math
 } // yocto
