@@ -54,6 +54,7 @@ struct pot2
     bool cb( const array<double> &X  )
     {
         ios::ocstream fp("cgrad.dat",true);
+        std::cerr << "\t" << X << std::endl;
         fp("%g %g\n", X[1], X[2]);
         return true;
     }
@@ -80,6 +81,14 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     cgrad<double>::callback cb( &P, &pot2::cb);
     cgrad<double>::optimize(Func, Grad, X, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
+    
+    X[1] = 0;
+    X[2] = 0;
+    vector<double> dX( X.size(), 1e-4 );
+    cgrad<double> cg;
+    cg.run(Func, X, dX, ftol, &cb);
+    std::cerr << "X=" << X << std::endl;
+    
 }
 YOCTO_UNIT_TEST_DONE()
 
