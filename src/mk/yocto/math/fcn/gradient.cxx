@@ -24,6 +24,9 @@ namespace yocto
         }
         
         
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4355 )
+#endif
         template <>
         gradient<real_t>:: gradient() :
         derivative<real_t>(),
