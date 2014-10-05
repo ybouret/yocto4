@@ -13,6 +13,9 @@ namespace yocto
         {
         }
         
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4355 )
+#endif
         equilibria:: equilibria() :
         M(0),
         N(0),

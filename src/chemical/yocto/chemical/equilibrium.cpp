@@ -86,6 +86,9 @@ namespace yocto
         {
         }
         
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4355 )
+#endif
         equilibrium:: equilibrium(const string &id ) :
         name(id),
         data(),
