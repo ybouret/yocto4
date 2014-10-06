@@ -295,6 +295,28 @@ __sum += static_cast<typename ARR::type>(M[j][I]) * static_cast<typename ARR::ty
 #undef  Y_TAO_MULSUBTRN
 			}
             
+            
+            template <typename MAT, typename ARR>
+            static inline typename ARR::type quadratic( const MAT &M, const ARR&a ) throw()
+            {
+                assert(M.is_square());
+                assert(a.size()==M.rows);
+                const size_t n = M.rows;
+                typename ARR::type q(0);
+                typename ARR::type p(0);
+                for(size_t i=n;i>0;--i)
+                {
+                    const array<typename ARR::type> &Mi = M[i];
+                    const typename ARR::type         ai = a[i];
+                    q += Mi[i] * ai*ai;
+                    for(size_t j=n;j>i;--j)
+                    {
+                        p += Mi[j] * ai * a[j];
+                    }
+                }
+                return q+(p+p);
+            }
+            
 			//------------------------------------------------------------------
 			//
 			// Level 3: matrix/matrix operations

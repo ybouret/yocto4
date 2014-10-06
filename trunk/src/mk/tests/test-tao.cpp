@@ -63,6 +63,26 @@ void test_tao(const size_t N, const size_t M)
         (void)tao::simplify(vt);
         std::cerr << "v1=" << vt << std::endl;
     }
+    
+    for(size_t iter=1;iter<=3;++iter)
+    {
+        matrix<T> H(N,N);
+        vector<T> X(N,0);
+        for(size_t i=N;i>0;--i)
+        {
+            for(size_t j=N;j>=i;--j)
+            {
+                H[i][j] = H[j][i] = V(int( 10.0 * (alea<double>() - 0.5) ));
+            }
+            X[i] = T(10*(alea<double>()-(0.5)));
+        }
+        const T q = tao::quadratic(H, X);
+        vector<T> tmp(N,0);
+        tao::mul(tmp, H, X);
+        const T d = tao::dot(tmp, X);
+        std::cerr << "q=" << q << std::endl;
+        std::cerr << "d=" << d << std::endl;
+    }
 }
 
 
