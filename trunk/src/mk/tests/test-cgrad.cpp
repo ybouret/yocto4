@@ -85,7 +85,7 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     X[1] = 0;
     X[2] = 0;
     vector<double> dX( X.size(), 1e-4 );
-    cgrad<double> cg;
+    cgrad<double>  cg;
     cg.run(Func, X, dX, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
     

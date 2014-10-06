@@ -17,13 +17,17 @@ namespace yocto
             virtual ~derivative() throw();
             
             T diff( typename numeric<T>::function &F, T x, T h, T &err);
+            void diff( T &dFdx, T &d2Fdx2, typename numeric<T>::function &F, T x, const T Fx, T h, T &err);
             
             T operator()( typename numeric<T>::function &F, T x, T h );
+            
+            void operator()(T &dFdx, T &d2Fdx2, typename numeric<T>::function &F, T x, const T Fx, T h);
             
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(derivative);
             matrix<T> a;
+            matrix<T> b;
             
         public:
             const T dtol; //!< approx minimal fractional tolerance on dFdx

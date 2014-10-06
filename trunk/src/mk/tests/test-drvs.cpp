@@ -12,7 +12,7 @@ namespace {
 	template <typename T>
 	static inline T F(T x )
 	{
-		return Sin(x);
+		return Sin(0.3*x);
 	}
 	
 	template <typename T>
@@ -79,7 +79,7 @@ YOCTO_UNIT_TEST_IMPL(drvs)
     derivative<double> drvs;
     
     const double xmax = 10;
-    const double step = 0.1;
+    const double step = 0.02;
     numeric<double>::function F = cfunctor( Cos2<double> );
     {
         double err = 0;
@@ -101,6 +101,20 @@ YOCTO_UNIT_TEST_IMPL(drvs)
             fp("%g %g %g %u\n", x, F(x), dFdx, Counts);
         }
 
+    }
+    
+    {
+        ios::ocstream fp("diff3.dat",false);
+        for( double x=0; x <= xmax; x += step)
+        {
+            Counts = 0;
+            const double Fx = F(x);
+            double dFdx   = 0;
+            double d2Fdx2 = 0;
+            drvs(dFdx,d2Fdx2,F,x,Fx,0.001);
+            fp("%g %g %g %g %u\n", x, F(x), dFdx, d2Fdx2, Counts);
+        }
+        
     }
     
 }
