@@ -27,7 +27,6 @@ namespace yocto {
             }
             
             
-            
         }
         
         
@@ -35,7 +34,7 @@ namespace yocto {
         void numeric<real_t>:: round_error(real_t &x) throw()
         {
             x = Fabs(x);
-            if(x<= numeric<real_t>::tiny )
+            if(x<=numeric<real_t>::tiny)
             {
                 x=0;
             }
@@ -44,5 +43,13 @@ namespace yocto {
                 x = Pow( real_t(10), Ceil( Log10(x) ) );
             }
         }
+        
+        template <>
+        real_t numeric<real_t>:: min_space(const real_t x) throw()
+        {
+            
+            return 0;
+        }
+        
     }
 }

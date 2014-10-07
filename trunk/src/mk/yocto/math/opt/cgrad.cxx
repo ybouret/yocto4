@@ -7,6 +7,8 @@
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
 
+#include "yocto/math/kernel/tao.hpp"
+
 namespace yocto
 {
     namespace math
@@ -100,7 +102,6 @@ namespace yocto
             //------------------------------------------------------------------
             for(;;)
             {
-                
                 //--------------------------------------------------------------
                 // initialize line minimzation
                 //--------------------------------------------------------------

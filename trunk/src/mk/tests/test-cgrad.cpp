@@ -24,8 +24,10 @@ double dMorse( double r )
 struct pot2
 {
     double xa,xe,ya,ye;
+    int count;
     double func( const array<double> &X )
     {
+        ++count;
         assert( X.size() == 2);
         const double x = X[1];
         const double y = X[2];
@@ -76,18 +78,22 @@ YOCTO_UNIT_TEST_IMPL(cgrad)
     vector<double> X(2,0);
     X[1] = 0;
     X[2] = 0;
+    P.count = 0;
     { ios::ocstream fp("cgrad.dat",false); }
     
     cgrad<double>::callback cb( &P, &pot2::cb);
     cgrad<double>::optimize(Func, Grad, X, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
+    std::cerr << "#calls=" << P.count << std::endl;
     
+    P.count = 0;
     X[1] = 0;
     X[2] = 0;
     vector<double> dX( X.size(), 1e-4 );
     cgrad<double>  cg;
     cg.run(Func, X, dX, ftol, &cb);
     std::cerr << "X=" << X << std::endl;
+    std::cerr << "#calls=" << P.count << std::endl;
     
 }
 YOCTO_UNIT_TEST_DONE()
