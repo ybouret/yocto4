@@ -396,9 +396,14 @@ namespace yocto
                         const vnode *sub = an->addr;
                         fp("\t");
                         fp.viz(vn); fp(" -> "); fp.viz(sub);
-                        if(vn->type == vnode_or )
+                        if(vn->type == vnode_or)
                         {
-                            fp( "[label=\"%d\"]", ++num);
+                            fp( "[label=\"%d\",arrowhead=onormal]", ++num);
+                        }
+                        
+                        if(vn->type==vnode_group)
+                        {
+                            fp( "[label=\"%d\",labelfont=\"Helvetica\"]", ++num);
                         }
                         
                         fp(";\n");
