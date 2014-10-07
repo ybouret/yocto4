@@ -253,14 +253,12 @@ namespace {
             Psi[upper] = PsiWall;
             solve0();
             double ans = 0;
-            for(unit_t i=lower;i<=upper;++i)
+            for(unit_t i=lower+1;i<upper;++i)
             {
-                const double cna = Na[i];
-                const double ccl = Cl[i];
-                ans += cna * log(cna) + ccl * log(ccl) + FiRT * Psi[i] * (cna-ccl);
-                //ans += Fabs( cna - ccl );
+                const double E = (Psi[i+1]-Psi[i-1])/(X[i+1]-X[i-1]);
+                ans += E*E;
             }
-            return ans;
+            return 0.5*Y_EPSILON0*ans;
         }
         
         
@@ -297,9 +295,9 @@ YOCTO_UNIT_TEST_IMPL(poisson)
     
     {
         ios::ocstream::overwrite("E.dat");
-        size_t N = 200;
-        const double Emin = -70e-3;
-        const double Emax =  70e-3;
+        size_t  N = 100;
+        const double Emin = -20e-3;
+        const double Emax =  20e-3;
         for(size_t i=0;i<=N;++i)
         {
             const double p = Emin + (i*(Emax-Emin))/N;
@@ -309,8 +307,8 @@ YOCTO_UNIT_TEST_IMPL(poisson)
                 ios::ocstream fp("E.dat",true);
                 fp("%g %g\n", p, E);
             }
-            const int mV = int(1000.0 * p);
-            const string fn = vformat("psi%+04d.dat",mV);
+            const int muV = int(1e6 * p);
+            const string fn = vformat("psi%+07dmuV.dat",muV);
             std::cerr << fn << std::endl;
             {
                 ios::ocstream fp2(fn,false);
