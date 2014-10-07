@@ -89,9 +89,8 @@ namespace yocto
                 vlist  vc;   //!< virtual char   rules
                 vlist  vj;   //!< virtual joker  rules
                 vlist  vo;   //!< virtual or     rules
-                int    vi;   //!< index for rule naming
                 
-                inline vcontext() : vr(), vs(), vc(), vj(), vo(), vi(0)
+                inline vcontext() : vr(), vs(), vc(), vj(), vo()
                 {
                     
                 }
@@ -180,7 +179,15 @@ namespace yocto
                 
                 inline void build( vnode *parent, syntax::xnode *xn)
                 {
-                    std::cerr << "building '" << parent->name << "'" << std::endl;
+                    //__________________________________________________________
+                    //
+                    // prepare a new parent node
+                    //__________________________________________________________
+
+                    const string & parent_name = parent->name;
+                    std::cerr << "building '" << parent_name << "'" << std::endl;
+                    int or_index = 0;
+                    
                     for(;xn;xn=xn->next)
                     {
                         const string &label = xn->label;
@@ -280,7 +287,7 @@ namespace yocto
                         
                         if( "OR" == label )
                         {
-                            const string oname = "OR";
+                            const string oname = parent_name + vformat(".or%d",++or_index);
                             vnode *Or = new vnode(oname,xn,vnode_or);
                             vo.push_back(Or);
                             parent->children.append(Or);
@@ -291,14 +298,20 @@ namespace yocto
                             {
                                 syntax::xnode *sub = xn->pop();
                                 auto_ptr<syntax::xnode> p( sub );
-                                //-- prepare a new group
-                                const string grp_id = vformat("group#%d",++i);
+                                //______________________________________________
+                                //
+                                // prepare a new group
+                                //______________________________________________
+                                const string grp_id = oname + vformat(".group%d",++i);
                                 vnode *grp = new vnode(grp_id,p.__get(),vnode_group);
                                 vo.push_back(grp);
                                 Or->children.append(grp);
                                 build(grp,sub);
                                 
-                                //-- reduce complexity
+                                //______________________________________________
+                                //
+                                // reduce complexity
+                                //______________________________________________
                                 if(grp->children.size==1)
                                 {
                                     vnode *content = grp->children.head->addr;
