@@ -21,7 +21,7 @@ namespace yocto
              \param func an objective function
              \param grad its gradient
              \param p starting point
-             \param ftol fractional tolerance on f/p
+             \param ftol fractional tolerance on f and p
              \param cb   an optional callback
              */
             static bool optimize(typename numeric<T>::scalar_field &func,
