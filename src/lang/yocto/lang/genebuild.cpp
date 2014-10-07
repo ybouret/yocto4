@@ -26,8 +26,8 @@ namespace yocto
                 vnode_expr,  //!< an expression
                 vnode_char,  //!< a  single char
                 vnode_jk,    //!< a  joker node
-                vnode_or,
-                vnode_group
+                vnode_or,    //!< an alternation node
+                vnode_group  //!< a sub rule
             };
             
             //__________________________________________________________________
@@ -53,7 +53,7 @@ namespace yocto
                 vnode               *next;
                 vnode               *prev;
                 alist                children;
-                bool                 linked;
+                unsigned             linked;
                 
                 explicit vnode(const string &id, syntax::xnode *nd,  vnode_type nt ) :
                 name(id),
@@ -62,7 +62,7 @@ namespace yocto
                 next(0),
                 prev(0),
                 children(),
-                linked(false)
+                linked(0)
                 {
                     
                 }
@@ -202,6 +202,7 @@ namespace yocto
                                 throw exception("%d: unknown sub-rule '%s' in '%s'", xn->lxm()->line, child_name.c_str(),parent->name.c_str());
                             }
                             parent->children.append(child_addr);
+                            child_addr->linked++;
                             continue;
                         }
                         
@@ -290,11 +291,22 @@ namespace yocto
                             {
                                 syntax::xnode *sub = xn->pop();
                                 auto_ptr<syntax::xnode> p( sub );
+                                //-- prepare a new group
                                 const string grp_id = vformat("group#%d",++i);
                                 vnode *grp = new vnode(grp_id,p.__get(),vnode_group);
                                 vo.push_back(grp);
                                 Or->children.append(grp);
                                 build(grp,sub);
+                                
+                                //-- reduce complexity
+                                if(grp->children.size==1)
+                                {
+                                    vnode *content = grp->children.head->addr;
+                                    delete Or->children.pop_back();
+                                    delete vo.pop_back();
+                                    Or->children.append(content);
+                                }
+                                
                                 tmp.push_back( p.yield() );
                             }
                             while(tmp.size)
@@ -306,16 +318,17 @@ namespace yocto
                         
                         throw exception("unhandled %s", label.c_str());
                     }
-                    
+                   
+#if 0
                     //__________________________________________________________
                     //
                     // mark children as linked
                     //__________________________________________________________
                     for(anode *an = parent->children.head;an;an=an->next)
                     {
-                        an->addr->linked = true;
+                        an->addr->linked++;
                     }
-                    
+#endif
                 }
                 
                 
@@ -328,7 +341,7 @@ namespace yocto
                     // write all rules
                     for(const vnode *vn = vr.head; vn; vn=vn->next)
                     {
-                        fp.viz(vn); fp(" [label=\"%s\",shape=oval];\n", vn->name.c_str());
+                        fp.viz(vn); fp(" [label=\"%s$%u\",shape=oval];\n", vn->name.c_str(),vn->linked);
                     }
                     
                     for(const vnode *vn = vs.head; vn; vn=vn->next)
