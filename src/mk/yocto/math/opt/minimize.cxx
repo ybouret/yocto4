@@ -9,13 +9,14 @@ namespace yocto {
     
     namespace math {
         
-        
+#if 0
         static inline
         real_t __getErr( real_t f0, real_t f1, real_t f2, real_t f3 ) throw()
         {
             netsort<real_t>::level4(f0, f1, f2, f3);
             return Fabs(f2-f0);
         }
+#endif
         
 #define XTOL numeric<real_t>::sqrt_ftol
         
@@ -33,6 +34,10 @@ namespace yocto {
                               real_t                     ftol )
         {
             assert(x.is_ordered());
+            //__________________________________________________________________
+            //
+            // ensure left to right
+            //__________________________________________________________________
             netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
             assert(x.a<=x.b);
             assert(x.b<=x.c);

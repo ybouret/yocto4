@@ -141,6 +141,14 @@ namespace yocto
 #undef  Y_TAO_NORMSQ
 			}
             
+            //! euclidean norm
+            template <typename ARR>
+            static inline typename ARR::type norm( const ARR &a ) throw()
+            {
+                return Sqrt( Fabs( norm_sq(a) ) );
+            }
+            
+            
 			//! a*b for scalar type, a is the leading type
 			template<typename ARR, typename BRR>
 			static inline typename ARR::type dot( const ARR &a, const BRR &b ) throw()

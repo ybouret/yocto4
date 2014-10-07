@@ -17,7 +17,12 @@ namespace yocto
             
             //! return false only if callback returns false !
             /**
-             this is the standalone version
+             this is the standalone version.
+             \param func an objective function
+             \param grad its gradient
+             \param p starting point
+             \param ftol fractional tolerance on f/p
+             \param cb   an optional callback
              */
             static bool optimize(typename numeric<T>::scalar_field &func,
                                  typename numeric<T>::vector_field &grad,
@@ -31,6 +36,14 @@ namespace yocto
             virtual ~cgrad() throw();
             
             //! return false only if callback returns false !
+            /**
+             The gradient is internally computed.
+             \param func an objective function
+             \param p   starting point
+             \param dp  scaling for derivatives evaluation
+             \param cb  an optional callback
+
+             */
             bool run(typename numeric<T>::scalar_field &func,
                      array<T>                          &p,
                      const array<T>                    &dp,

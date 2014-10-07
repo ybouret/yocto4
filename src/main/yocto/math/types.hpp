@@ -66,6 +66,9 @@ namespace yocto
             static const T two;
             
             static void round_error( T &x ) throw();
+            
+            //! returns value h such that x+h!=x and x-h!=x
+            static T    min_space(const T x) throw();
 		};
 		
         
