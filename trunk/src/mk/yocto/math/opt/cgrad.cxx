@@ -27,11 +27,11 @@ namespace yocto
                            const array<real_t>           &pos,
                            const array<real_t>           &vec,
                            array<real_t>                 &tmp
-                           ) :
+                           ) throw() :
                 _func( func ),
                 _pos( pos ),
                 _vec( vec ),
-                nvar( _pos.size() ),
+                _num( _pos.size() ),
                 _tmp( tmp )
                 {
                 }
@@ -42,12 +42,12 @@ namespace yocto
                 numeric<real_t>::scalar_field & _func;
                 const array<real_t>           & _pos;
                 const array<real_t>           & _vec;
-                const size_t                    nvar;
+                const size_t                    _num;
                 array<real_t>                 & _tmp;
                 
                 inline real_t compute( real_t x )
                 {
-                    for( size_t i=nvar;i>0;--i)
+                    for( size_t i=_num;i>0;--i)
                     {
                         _tmp[i] = _pos[i] + x * _vec[i];
                     }

@@ -71,13 +71,13 @@ namespace yocto
         }
         
         template <>
-        void derivative<real_t>::diff(real_t                    &dFdx,
-                                      real_t                    &d2Fdx2,
-                                      numeric<real_t>::function &func,
-                                      real_t                     x,
-                                      const real_t               Fx,
-                                      real_t                     h,
-                                      real_t                    &err)
+        void derivative2<real_t>::diff(real_t                    &dFdx,
+                                       real_t                    &d2Fdx2,
+                                       numeric<real_t>::function &func,
+                                       real_t                     x,
+                                       const real_t               Fx,
+                                       real_t                     h,
+                                       real_t                    &err)
         {
             real_t hh = Fabs(h);
             assert(hh>0);
@@ -114,7 +114,7 @@ namespace yocto
                     break;
                 }
             }
-
+            
             dFdx   = ans1;
             d2Fdx2 = ans2;
             
@@ -124,7 +124,6 @@ namespace yocto
         template <>
         derivative<real_t>:: derivative() :
         a(NTAB,NTAB),
-        b(NTAB,NTAB),
         dtol( log_round_ceil( numeric<real_t>::sqrt_epsilon) ),
         hopt( log_round_ceil(Pow( numeric<real_t>::epsilon,REAL(1.0)/REAL(3.0))) ),
         hmin( log_round_ceil(numeric<real_t>::epsilon) )
@@ -169,8 +168,30 @@ namespace yocto
             
         }
         
+        
+        
+        
+    }
+}
+
+
+namespace yocto
+{
+    namespace math
+    {
         template <>
-        void derivative<real_t>:: operator()(real_t &dFdx, real_t &d2Fdx2, numeric<real_t>::function &F, real_t x, const real_t Fx, real_t h)
+        derivative2<real_t>:: ~derivative2() throw() {}
+        
+        template <>
+        derivative2<real_t>:: derivative2() :
+        derivative<real_t>(),
+        b(NTAB,NTAB)
+        {
+        }
+        
+        
+        template <>
+        void derivative2<real_t>:: operator()(real_t &dFdx, real_t &d2Fdx2, numeric<real_t>::function &F, real_t x, const real_t Fx, real_t h)
         {
             volatile real_t temp = 0;
             h = Fabs(h);
@@ -196,10 +217,10 @@ namespace yocto
                 d2Fdx2 = new_d2Fdx2;
             }
             
-
+            
         }
-
-        
         
     }
 }
+
+

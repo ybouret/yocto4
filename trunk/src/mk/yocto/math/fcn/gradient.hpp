@@ -43,6 +43,7 @@ namespace yocto
             
         protected:
             scalar_field   *pF;
+            
             //! using pF
             void __compute(array<T>       &x,
                            array<T>       &dFdx,
@@ -51,9 +52,9 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(gradient);
             typedef typename numeric<T>::function scalar_function;
-            size_t          ix;
-            array<T>       *px;
-            scalar_function gf;
+            size_t          ix; //used by compute
+            array<T>       *px; //used by compute
+            scalar_function gf; // (this, & eval )
             
             T eval(T u);
             

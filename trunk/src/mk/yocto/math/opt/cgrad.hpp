@@ -42,7 +42,6 @@ namespace yocto
              \param p   starting point
              \param dp  scaling for derivatives evaluation
              \param cb  an optional callback
-
              */
             bool run(typename numeric<T>::scalar_field &func,
                      array<T>                          &p,

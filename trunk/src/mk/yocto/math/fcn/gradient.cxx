@@ -106,7 +106,7 @@ namespace yocto
                 dFdx[ix] = drvs(gf,x[ix],dx[ix]);
             }
         }
-
+        
         
         template <>
         void gradient<real_t>:: compute(scalar_field        &F,

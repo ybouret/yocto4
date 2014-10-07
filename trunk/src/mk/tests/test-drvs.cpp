@@ -103,6 +103,7 @@ YOCTO_UNIT_TEST_IMPL(drvs)
 
     }
     
+    derivative2<double> drvs2;
     {
         ios::ocstream fp("diff3.dat",false);
         for( double x=0; x <= xmax; x += step)
@@ -111,7 +112,7 @@ YOCTO_UNIT_TEST_IMPL(drvs)
             const double Fx = F(x);
             double dFdx   = 0;
             double d2Fdx2 = 0;
-            drvs(dFdx,d2Fdx2,F,x,Fx,0.001);
+            drvs2(dFdx,d2Fdx2,F,x,Fx,0.001);
             fp("%g %g %g %g %u\n", x, F(x), dFdx, d2Fdx2, Counts);
         }
         
