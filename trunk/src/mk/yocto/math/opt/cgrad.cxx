@@ -68,12 +68,12 @@ namespace yocto
                                      )
         {
             const size_t nvar = p.size(); assert(nvar>0);
-            some_arrays<4,real_t,memory::global> arrays;
+            some_arrays<7,real_t,memory::global> arrays;
             arrays.allocate(nvar);
-            array<real_t> &g  = arrays.next_array(); assert(g.size()==nvar);
-            array<real_t> &h  = arrays.next_array(); assert(h.size()==nvar);
-            array<real_t> &xi = arrays.next_array(); assert(xi.size()==nvar);
-            array<real_t> &xx = arrays.next_array(); assert(xx.size()==nvar);
+            array<real_t> &g     = arrays.next_array();
+            array<real_t> &h     = arrays.next_array(); 
+            array<real_t> &xi    = arrays.next_array();
+            array<real_t> &xx    = arrays.next_array();
             
             cgw                       wrapper( func, p, xi, xx);
             numeric<real_t>::function F( &wrapper, & cgw::compute );
@@ -90,8 +90,8 @@ namespace yocto
             grad(xi,p);
             for( size_t j=nvar;j>0;--j)
             {
-                g[j] = -xi[j];
-                xi[j]=h[j]=g[j];
+                g[j]  = -xi[j];
+                xi[j] = h[j]=g[j];
             }
             
             
@@ -121,7 +121,7 @@ namespace yocto
                     const real_t p_old  = p[i];
                     p[i] += dp;
                     const real_t p_new  = p[i];
-                    if( Fabs(p_new-p_old) > Fabs(ftol*(Fabs(p_old)+Fabs(p_new))) )
+                    if( Fabs( (p_new-p_old) ) > Fabs(ftol*(Fabs(p_old)+Fabs(p_new))) )
                     {
                         converged = false;
                     }
@@ -163,11 +163,13 @@ namespace yocto
                 const real_t gam = dgg / gg;
                 for( size_t i=nvar;i>0;--i)
                 {
-                    g[i] = -xi[i];
-                    xi[i]=h[i]=g[i]+gam*h[i];
+                    g[i]  = -xi[i];
+                    xi[i] =h[i]=g[i]+gam*h[i];
                 }
                 
-            }
+                
+                
+            };
         }
         
         template <>
@@ -189,10 +191,8 @@ namespace yocto
         template <>
         cgrad<real_t>:: ~cgrad() throw()
         {
-            
         }
         
-       
         
         template <>
         bool cgrad<real_t>:: run(numeric<real_t>::scalar_field  &F,
