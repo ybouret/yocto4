@@ -8,7 +8,7 @@ YOCTO_UNIT_TEST_IMPL(unroll)
 {
     static const size_t count_max = 1000;
     static const size_t shift_max = 1000;
-    int i=0;
+    size_t i=0;
     
     std::cerr << "Testing LOOP" << std::endl;
     for(size_t count=0;count<=count_max;++count)

@@ -50,7 +50,7 @@ namespace yocto
                 lua_rawgeti(L, -1, 1);
                 if(!lua_isnumber(L, -1))
                     throw exception("'%s' #%u: item[%u][1] is not a LUA_NUMBER",id,idx,i);
-                const int weight = lua_tonumber(L, -1);
+                const int weight = int(lua_tonumber(L, -1));
                 //__________________________________________________________
                 //
                 // remove the first item
