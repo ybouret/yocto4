@@ -180,10 +180,14 @@ namespace yocto
             return __compute( (array<real_t> &)x, dFdx, *pdp);
         }
         
+#if defined(_MSC_VER)
+#pragma warning ( disable : 4355 )
+#endif
         template <>
         cgrad<real_t>:: cgrad() :
         gradient<real_t>(),
-        G( this, & cgrad<real_t>::compute_gradient)
+        G( this, & cgrad<real_t>::compute_gradient),
+	pdp(0)
         {
             
         }

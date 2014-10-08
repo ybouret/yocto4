@@ -73,7 +73,7 @@ namespace yocto
                 
                 typedef arc_ptr<d_instr> pointer;
                 
-                const double  indx; //!< the index of derivated species
+                const size_t  indx; //!< the index of derivated species
                 const double  coef; //!< its former coefficient
                 vector<instr> code; //!< the remaining instruction code
                 
