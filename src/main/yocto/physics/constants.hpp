@@ -10,7 +10,7 @@
 #define Y_R                 8.3144621
 
 #if 0
-// for octave
+// for octave/scilab/matlab
 F=96485.3399;
 R=8.3144621;
 T=298;
