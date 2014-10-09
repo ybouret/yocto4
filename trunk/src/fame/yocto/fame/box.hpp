@@ -17,10 +17,10 @@ namespace yocto
             typedef typename vertex_for<DIM,T>::type vtx_type;
             typedef typename vertex_for<DIM,T>::args vtx_args;
             
-            const vtx_type vmin;
-            const vtx_type vmax;
-            const vtx_type length;
-            const T        space;
+            const vtx_type vmin;   //!< lower coordinates
+            const vtx_type vmax;   //!< upper coordinates
+            const vtx_type length; //!< differences
+            const T        space;  //!< product
             
             inline explicit box( vtx_args u, vtx_args v ) throw() :
             vmin(u),
