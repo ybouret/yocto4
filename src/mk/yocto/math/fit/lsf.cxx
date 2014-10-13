@@ -535,11 +535,12 @@ namespace yocto
             // starting point
             //__________________________________________________________________
             real_t Dorg  = computeD();
+            size_t count = 0;
             if(verbose)
             {
                 std::cerr << "#init" << std::endl;
-                std::cerr << "a=" << Aorg << std::endl;
-                std::cerr << "D=" << Dorg << std::endl;
+                std::cerr << "\ta=" << Aorg << std::endl;
+                std::cerr << "\tD=" << Dorg << std::endl;
             }
             
             
@@ -576,16 +577,13 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // compute full step trial, keep information
+            // compute full step trial, keep information to change p
             //__________________________________________________________________
             const real_t Dtmp = evalD(1.0);
-            if(verbose)
-            {
-            }
             
             //__________________________________________________________________
             //
-            // Line minimize for numerical optimum
+            // Line minimize for numerical optimum, may get back !
             //__________________________________________________________________
             triplet<real_t> XX = { 0,    1,    1    };
             triplet<real_t> DD = { Dorg, Dtmp, Dtmp };
@@ -604,9 +602,10 @@ namespace yocto
                 Atmp[i] -= Aorg[i];
                 aorg[i]  = Aorg[i];
             }
+            
             if(verbose)
             {
-                //std::cerr << "#Fit: p=" << p << ", D0=" << Dorg << ", D1=" << Dtmp << ", D" << XX.b << "=" << DD.b << std::endl;
+                std::cerr << "#step " << ++count << std::endl;
                 std::cerr << "\ta=" << aorg << std::endl;
                 std::cerr << "\tD=" << DD.b << std::endl;
             }
@@ -636,7 +635,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Test convergence on D
+            // Test convergence on D, using the minimised value
             //__________________________________________________________________
             if(DD.b>=Dorg)
             {
@@ -647,6 +646,10 @@ namespace yocto
                 goto COMPUTE_ERROR;
             }
             
+            //__________________________________________________________________
+            //
+            // Apply Levenberg-Marquardt criterion
+            //__________________________________________________________________
             if(Dtmp>=Dorg)
             {
                 if(++p>LAMBDA_MAX_POW10)
@@ -663,6 +666,10 @@ namespace yocto
                 p = max_of(--p,LAMBDA_MIN_POW10);
             }
             
+            //__________________________________________________________________
+            //
+            // Full update and go on
+            //__________________________________________________________________
             Dorg = computeD();
             goto UPDATE_LAMBDA;
             

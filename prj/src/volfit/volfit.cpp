@@ -78,7 +78,6 @@ namespace
         YOCTO_DISABLE_COPY_AND_ASSIGN(Volume);
     };
     
-    
 }
 
 #include "yocto/fs/vfs.hpp"
