@@ -103,7 +103,8 @@ namespace yocto {
             //-----------------------------------------------------------------
             x.c = x.b + GOLD * (x.b - x.a);
             f.c = func(x.c);
-            
+            //std::cerr << "xinit:  " << x << std::endl;
+            //std::cerr << "finit:  " << f << std::endl;
             
             while( f.b > f.c )
             {
