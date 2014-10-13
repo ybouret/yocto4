@@ -17,6 +17,7 @@ namespace yocto
         typedef memory::global         memory_kind;
         typedef memory_kind::allocator memory_allocator;
         
+        
         //______________________________________________________________________
         //
         // vertex for dimension
