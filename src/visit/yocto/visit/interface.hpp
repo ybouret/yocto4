@@ -72,7 +72,7 @@ namespace yocto
             const int  par_rank;  //!< alias MPI.CommWorldRank
             const int  par_size;  //!< alias MPI.CommWorldSize
             const int  par_last;  //!< alias MPI.CommWorldLast
-            const bool parallel;  //!< alias for MPI.IsParalll
+            const bool parallel;  //!< alias for MPI.IsParallel
             const bool is_first;  //!< 0 == par_rank
             const bool is_final;  //!< par_last == par_rank
             
