@@ -366,7 +366,7 @@ YOCTO_UNIT_TEST_IMPL(s3d)
     //----------------------------------------------------------------------
     // initialize MPI
     //----------------------------------------------------------------------
-    YOCTO_MPI(SINGLE);
+    YOCTO_MPI(MPI_THREAD_SINGLE);
     const int rank = MPI.CommWorldRank;
     const int size = MPI.CommWorldSize;
     

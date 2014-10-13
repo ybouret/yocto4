@@ -303,7 +303,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     //--------------------------------------------------------------------------
     // initialize MPI
     //--------------------------------------------------------------------------
-    YOCTO_MPI(SINGLE);
+    YOCTO_MPI(MPI_THREAD_SINGLE);
     const int sim_rank = MPI.CommWorldRank;
     const int sim_size = MPI.CommWorldSize;
     
