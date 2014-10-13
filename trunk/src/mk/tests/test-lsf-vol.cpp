@@ -133,7 +133,11 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
 		aorg[2] = 0.1;  // K
 		aorg[3] = 1.2;  // Cs
         
-       
+        
+        aorg[1] = 23;   // t0
+        aorg[2] = 0.1;  // K
+        aorg[3] = 2.0;  // Cosm
+
         
 		fit.verbose = true;
         
