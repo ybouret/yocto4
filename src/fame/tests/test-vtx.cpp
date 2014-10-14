@@ -16,7 +16,7 @@ YOCTO_UNIT_TEST_IMPL(vtx)
     adb.store( new array1D<double>("Y",layout1D(-6,6)) );
     adb.store( new array1D<double>("Z",layout1D(-10,10)) );
     
-    box<3,float> B(math::v3d<float>(1,-2,1.2), math::v3d<float>(-1,3,-0.7) );
+    box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
     B.map<double>(adb);
     
     Vertex<1,double>::List v1;
