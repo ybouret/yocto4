@@ -609,8 +609,8 @@ namespace yocto
             if(verbose)
             {
                 std::cerr << "#step " << ++count << std::endl;
-                std::cerr << "\ta=" << aorg << std::endl;
-                std::cerr << "\tD=" << DD.b << std::endl;
+                std::cerr << "\ta="   << aorg << std::endl;
+                std::cerr << "\tD="   << DD.b << std::endl;
             }
 
             //__________________________________________________________________
@@ -651,7 +651,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // Apply Levenberg-Marquardt criterion
+            // Apply Levenberg-Marquardt update for the full step
             //__________________________________________________________________
             if(Dtmp>=Dorg)
             {
@@ -723,6 +723,7 @@ namespace yocto
                     aerr[i] = 0;
                 }
             }
+            
             if(verbose)
             {
                 for(size_t i=1;i<=nvar;++i)
@@ -730,6 +731,7 @@ namespace yocto
                     std::cerr << "\ta[" << i << "]=" << aorg[i]  << " +/-" << aerr[i] << std::endl;
                 }
             }
+            
             return true;
             
         }
