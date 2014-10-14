@@ -50,6 +50,7 @@ YOCTO_UNIT_TEST_IMPL(opt)
     {
         xtol = strconv::to_double(argv[1],"xtol");
     }
+ 
     std::cerr << "Double: " << std::endl;
     optim<double>(minimize<double>,xtol);
     optim<double>(minimize2<double>,xtol);

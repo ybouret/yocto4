@@ -391,7 +391,8 @@ namespace yocto
         drvs(),
         scan(this, & LeastSquares<real_t>::evalD),
         h(REAL(1e-4)),
-        verbose(false)
+        verbose(false),
+        fast(false)
         {
         }
         
@@ -583,6 +584,7 @@ namespace yocto
             // compute full step trial, keep information to change p
             //__________________________________________________________________
             const real_t Dtmp = evalD(1.0);
+            const bool   isOK = Dtmp <= Dorg;
             
             //__________________________________________________________________
             //
@@ -608,52 +610,59 @@ namespace yocto
             
             if(verbose)
             {
-                std::cerr << "#step " << ++count << std::endl;
+                std::cerr << "#step " << ++count << ", p=" << p << std::endl;
                 std::cerr << "\ta="   << aorg << std::endl;
                 std::cerr << "\tD="   << DD.b << std::endl;
             }
-
+            
             //__________________________________________________________________
             //
             // Test convergence on values
             //__________________________________________________________________
-            bool cvg = true;
-            for(size_t i=nvar;i>0;--i)
+            if(fast||isOK)
             {
-                if( Fabs(Atmp[i])>0 )
+                //std::cerr << "Testing convergence" << std::endl;
+                bool cvg = true;
+                for(size_t i=nvar;i>0;--i)
                 {
-                    cvg = false;
-                    break;
+                    if( Fabs(Atmp[i])>0 )
+                    {
+                        cvg = false;
+                        break;
+                    }
+                }
+                
+                if(cvg)
+                {
+                    if( verbose )
+                    {
+                        std::cerr << "#Fit: variables convergence" << std::endl;
+                    }
+                    goto COMPUTE_ERROR;
+                }
+                
+                //__________________________________________________________________
+                //
+                // Test convergence on D, using the minimised value
+                //__________________________________________________________________
+                if(DD.b>=Dorg)
+                {
+                    if(verbose)
+                    {
+                        std::cerr << "#Fit: least squares convergence" << std::endl;
+                    }
+                    goto COMPUTE_ERROR;
                 }
             }
-            
-            if(cvg)
+            else
             {
-                if( verbose )
-                {
-                    std::cerr << "#Fit: variables convergence" << std::endl;
-                }
-                goto COMPUTE_ERROR;
+                //std::cerr << "NOT testing convergence" << std::endl;
             }
-            
-            //__________________________________________________________________
-            //
-            // Test convergence on D, using the minimised value
-            //__________________________________________________________________
-            if(DD.b>=Dorg)
-            {
-                if(verbose)
-                {
-                    std::cerr << "#Fit: least squares convergence" << std::endl;
-                }
-                goto COMPUTE_ERROR;
-            }
-            
             //__________________________________________________________________
             //
             // Apply Levenberg-Marquardt update for the full step
             //__________________________________________________________________
-            if(Dtmp>=Dorg)
+            if(!isOK)
             {
                 if(++p>LAMBDA_MAX_POW10)
                 {
@@ -728,7 +737,15 @@ namespace yocto
             {
                 for(size_t i=1;i<=nvar;++i)
                 {
-                    std::cerr << "\ta[" << i << "]=" << aorg[i]  << " +/-" << aerr[i] << std::endl;
+                    
+                    const real_t AA = aorg[i];
+                    const real_t AE = aerr[i];
+                    std::cerr << "\ta[" << i << "]=" << AA  << " +/-" << AE;
+                    if(Fabs(AA)>0)
+                    {
+                        std::cerr << " (" << (REAL(100.0)*AE/Fabs(AA)) << "%)";
+                    }
+                    std::cerr << std::endl;
                 }
             }
             
