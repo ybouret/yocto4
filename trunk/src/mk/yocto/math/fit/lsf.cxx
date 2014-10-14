@@ -161,6 +161,10 @@ namespace yocto
                 const real_t Xi = X[i];
                 Z[i]            = F(Xi,u);
                 const real_t d = Y[i] - Z[i];
+                //______________________________________________________________
+                //
+                // compute gradient @Xi
+                //______________________________________________________________
                 w.x = Xi;
                 for(size_t q=L;q>0;--q)
                 {
@@ -213,8 +217,8 @@ namespace yocto
         template <>
         void  LeastSquares<real_t>::Sample::collect( Matrix &user_alpha, Array &user_beta ) const throw()
         {
-            assert(user_alpha.rows == M);
-            assert(user_alpha.cols == M);
+            assert(user_alpha.rows  == M);
+            assert(user_alpha.cols  == M);
             assert(user_beta.size() >= L);
             tao::mul_add_trn(user_beta,Gamma,beta);
             for(size_t i=M;i>0;--i)
@@ -236,7 +240,6 @@ namespace yocto
             assert(global_ivar <= M);
             for(size_t j=1;j<=M;++j) Gamma[local_ivar][j] = 0;
             Gamma[local_ivar][global_ivar] = 1;
-            
         }
         
         

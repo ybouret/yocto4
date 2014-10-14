@@ -9,7 +9,7 @@
 
 namespace yocto {
     
-	namespace math {
+    namespace math {
         
         
         //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
@@ -29,9 +29,16 @@ namespace yocto {
                        triplet<T> &x,
                        triplet<T> &f,
                        T ftol);
-       
         
-	}
+        //! (x.a <= x.b <= x.c) || (x.a>=x.b>=x.c) and f.b <= f.a and f.b <= f.c
+        template <typename T>
+        void minimize3(typename numeric<T>::function &func,
+                       triplet<T>                    &x,
+                       triplet<T>                    &f,
+                       T                              ftol);
+        
+        
+    }
     
 }
 
