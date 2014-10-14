@@ -53,13 +53,19 @@ namespace yocto
      MPI_Scatterv
      */
     
+    //__________________________________________________________________________
+    //
     //! MPI functions wrappers
+    //__________________________________________________________________________
     class mpi : public singleton<mpi>
     {
     public:
         typedef hashing::sha1 hashing_function;
         
+        //______________________________________________________________________
+        //
         //! dedicated error handling
+        //______________________________________________________________________
         class exception : public yocto::exception
         {
         public:
@@ -372,14 +378,18 @@ namespace yocto
             ios::ostream *fp;
         };
         
-        
+        //======================================================================
+        //
         //! information relay
+        //
+        //======================================================================
         class comm_world
         {
         public:
             explicit comm_world ( const mpi & );
             virtual ~comm_world () throw();
             
+            const mpi        &MPI;
             const int        &size;
             const int        &rank;
             const int        &last;
