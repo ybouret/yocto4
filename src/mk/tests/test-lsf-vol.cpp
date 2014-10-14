@@ -96,6 +96,8 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
 		if(argc>2)
 			icol = strconv:: to_size(argv[2],"column index");
         
+       
+        
 		// read data
 		vector<double> t;
 		vector<double> V;
@@ -122,6 +124,10 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
         
         
 		LeastSquares<double>          fit;
+        if(argc>3&&0==strcmp(argv[3],"fast"))
+        {
+            fit.fast = true;
+        }
 		LeastSquares<double>::Samples samples;
         
 		samples.append(t,V,Vf);

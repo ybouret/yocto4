@@ -85,6 +85,10 @@ YOCTO_UNIT_TEST_IMPL(gnl)
     
     
 	LS fit;
+    if(argc>1&&0==strcmp(argv[1],"fast"))
+    {
+        fit.fast = true;
+    }
 	vector<bool> used(a.size(),true);
 	vector<double> aerr(a.size(),0);
     
@@ -188,7 +192,12 @@ YOCTO_UNIT_TEST_IMPL(fit_poly)
 	LeastSquares<double>::Function F(  &P, & Poly<double>::Eval );
     LeastSquares<double> Fit;
 	
-    //Fit.verbose = true;
+    if(argc>1&&0==strcmp(argv[1],"fast"))
+    {
+        Fit.fast = true;
+    }
+    
+    Fit.verbose = true;
 	for( size_t nv = 1; nv <= 5; ++nv )
 	{
 		std::cerr << "-- nvar=" << nv << std::endl;
@@ -336,7 +345,11 @@ YOCTO_UNIT_TEST_IMPL(fit_gauss)
 	
 	
 	Fit.h       = 1e-4;
-	//Fit.verbose = true;
+    if(argc>1&&0==strcmp(argv[1],"fast"))
+    {
+        Fit.fast = true;
+    }
+	Fit.verbose = true;
     
 	if( Fit( Samples, F, a, used, aerr, &cb) )
 	{

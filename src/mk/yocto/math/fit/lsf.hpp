@@ -166,7 +166,7 @@ namespace yocto
         public:
 			T             h;       //!< derivative step guest, default 1e-4
             bool          verbose; //!< default: false
-            
+            bool          fast;    //!< default: false, test every step convergence
 		};
         
 	}
