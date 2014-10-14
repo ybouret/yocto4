@@ -275,8 +275,8 @@ namespace yocto {
                             //
                             // do we accept the move ?
                             //__________________________________________________
-                            std::cerr << "w=" << x.c - x.a << std::endl;
-                            
+                            std::cerr << "ac=" << x.c - x.a << std::endl;
+                            std::cerr << "bu=" << Fabs(xu-x.b) << std::endl;
                             const real_t fu = func(xu);
                             std::cerr << "\tf(" << xu << ") = " << fu << std::endl;
                             
