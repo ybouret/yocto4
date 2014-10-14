@@ -230,6 +230,7 @@ namespace yocto {
                           triplet<real_t>           &x,
                           triplet<real_t>           &f)
             {
+                static const real_t C = REAL(0.5); //REAL(0.381966011250105);
                 assert(x.a<=x.b);
                 assert(x.b<=x.c);
                 assert(f.b<=f.a);
@@ -237,135 +238,11 @@ namespace yocto {
                 std::cerr << "min3: " << f << " @ " << x << std::endl;
                 const real_t ab    = max_of<real_t>(x.b - x.a,0);
                 const real_t bc    = max_of<real_t>(x.c - x.b,0);
-                const real_t famfb = max_of<real_t>(f.a - f.b,0);
-                const real_t fcmfb = max_of<real_t>(f.c - f.b,0);
-                const real_t mu    = bc*famfb+ab*fcmfb;
-                const real_t den   = mu+mu; assert(den>=0);
-                std::cerr << "curv=" << den << std::endl;
-                if(ab<=0||bc<=0||den<=0)
-                {
-                    std::cerr << "failsafe step" << std::endl;
-                    //__________________________________________________________
-                    //
-                    // take a naive step
-                    //__________________________________________________________
-                    if(bc>ab)
-                    {
-                        //______________________________________________________
-                        //
-                        // probe at right
-                        //______________________________________________________
-                        const real_t xu = clamp(x.b,REAL(0.5)*(x.b+x.c),x.c);
-                        const real_t fu = func(xu);
-                        if(fu>=f.b)
-                        {
-                            // move c->u
-                            x.c = xu;
-                            f.c = fu;
-                        }
-                        else
-                        {
-                            // move a->b, b->u
-                            x.a = x.b;
-                            f.a = f.b;
-                            x.b = xu;
-                            f.b = fu;
-                        }
-                    }
-                    else
-                    {
-                        //______________________________________________________
-                        //
-                        // probe at left
-                        //______________________________________________________
-                        const real_t xu = clamp(x.a,REAL(0.5)*(x.a+x.b),x.b);
-                        const real_t fu = func(xu);
-                        if(fu>=f.b)
-                        {
-                            // move a->u
-                            x.a = xu;
-                            f.a = fu;
-                        }
-                        else
-                        {
-                            // move c->b, b->u
-                            x.c = x.b;
-                            f.c = f.b;
-                            x.b = xu;
-                            f.b = fu;
-                        }
-                    }
-                    
-                }
-                else
-                {
-                    //__________________________________________________________
-                    //
-                    // take a parabolic step
-                    //__________________________________________________________
-                    std::cerr << "parabolic step" << std::endl;
-                    const real_t num = bc*bc*famfb - ab*ab*fcmfb;
-                    
-                    // xu = xb + num/den
-                    if(num <= -ab*den)
-                    {
-                        std::cerr << "\tgo to x.a" << std::endl;
-                        x.b=x.a;
-                        f.b=f.a;
-                    }
-                    else
-                    {
-                        if(num>=bc*den)
-                        {
-                            std::cerr << "\tgo to x.c" << std::endl;
-                            x.b=x.c;
-                            f.b=f.c;
-                        }
-                        else
-                        {
-                            const real_t xu = clamp(x.a,x.b + num/den,x.c);
-                            const real_t fu = func(xu);
-                            std::cerr << "xu=" << xu << ", fu=" << fu << std::endl;
-                            if(fu<f.b)
-                            {
-                                //______________________________________________
-                                //
-                                // u is the new winner
-                                //______________________________________________
-                                if(xu<=x.b)
-                                {
-                                    x.c = x.b;
-                                    f.c = f.b;
-                                }
-                                else
-                                {
-                                    x.a = x.b;
-                                    f.a = f.b;
-                                }
-                                x.b = xu;
-                                f.b = fu;
-                            }
-                            else
-                            {
-                                //______________________________________________
-                                //
-                                // b is still the winner
-                                //______________________________________________
-                                if(xu<=x.b)
-                                {
-                                    x.a = xu;
-                                    f.a = fu;
-                                }
-                                else
-                                {
-                                    x.c = xu;
-                                    f.c = fu;
-                                }
-                            }
-                        }
-                    }
-                    
-                }
+                
+                const bool   at_left = bc>ab;
+                const real_t xm      = ( at_left ? min_of(x.c, x.b+C*bc) : max_of(x.a, x.b-C*ab));
+                const real_t fm      = func(xm);
+                exit(1);
                 
             }
             
