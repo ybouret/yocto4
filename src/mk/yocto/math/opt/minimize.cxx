@@ -242,7 +242,7 @@ namespace yocto {
                 const bool   at_left = bc>ab;
                 const real_t xm      = ( at_left ? min_of(x.c, x.b+C*bc) : max_of(x.a, x.b-C*ab));
                 const real_t fm      = func(xm);
-                exit(1);
+                //exit(1);
                 
             }
             
