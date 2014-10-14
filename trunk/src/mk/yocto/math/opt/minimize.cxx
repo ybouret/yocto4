@@ -246,6 +246,7 @@ namespace yocto {
                 const real_t hd    = p+q; assert(hd>=0);
                 if(ab<=0||bc<=0||hd<=0)
                 {
+                    std::cerr << "Failsafe..." << std::endl;
                     goto FAILSAFE;
                 }
                 else
@@ -269,6 +270,15 @@ namespace yocto {
                         {
                             const real_t xu = clamp(x.a,x.b+num/den,x.c);
                             std::cerr << "\tat " << xu << std::endl;
+                            
+                            //__________________________________________________
+                            //
+                            // do we accept the move ?
+                            //__________________________________________________
+                            std::cerr << "w=" << x.c - x.a << std::endl;
+                            
+                            const real_t fu = func(xu);
+                            std::cerr << "\tf(" << xu << ") = " << fu << std::endl;
                             
                         }
                     }
