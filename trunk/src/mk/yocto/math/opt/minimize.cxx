@@ -270,19 +270,46 @@ namespace yocto {
                         {
                             const real_t xu = clamp(x.a,x.b+num/den,x.c);
                             std::cerr << "\tat " << xu << std::endl;
-                            
-                            //__________________________________________________
-                            //
-                            // do we accept the move ?
-                            //__________________________________________________
-                            std::cerr << "ac=" << x.c - x.a << std::endl;
-                            std::cerr << "bu=" << Fabs(xu-x.b) << std::endl;
                             const real_t fu = func(xu);
-                            std::cerr << "\tf(" << xu << ") = " << fu << std::endl;
+                            if(fu>f.b)
+                            {
+                                //______________________________________________
+                                //
+                                // b is still the winner: move one side
+                                //______________________________________________
+                                if(xu<=x.b)
+                                {
+                                    x.a = xu;
+                                    f.a = fu;
+                                }
+                                else
+                                {
+                                    x.c = xu;
+                                    f.c = fu;
+                                }
+                            }
+                            else
+                            {
+                                //______________________________________________
+                                //
+                                // u is the new winner
+                                //______________________________________________
+                                if(xu <= x.b )
+                                {
+                                    x.c = x.b;
+                                    f.c = f.b;
+                                }
+                                else
+                                {
+                                    x.a = x.b;
+                                    f.a = f.b;
+                                }
+                                x.b = xu;
+                                f.b = fu;
+                            }
                             
                         }
                     }
-                    goto FAILSAFE;
                     return;
                 }
                 
