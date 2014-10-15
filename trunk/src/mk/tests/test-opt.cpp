@@ -42,8 +42,6 @@ static inline void optim(PROC &proc, T xtol)
 
 YOCTO_UNIT_TEST_IMPL(opt)
 {
-    //std::cerr << "Float: " << std::endl;
-    //optim<float>();
     
     double xtol = 1e-4;
     if(argc>1)
@@ -52,9 +50,8 @@ YOCTO_UNIT_TEST_IMPL(opt)
     }
  
     std::cerr << "Double: " << std::endl;
+    optim<double>(minimize_safe<double>,xtol);
     optim<double>(minimize<double>,xtol);
-    optim<double>(minimize2<double>,xtol);
-    optim<double>(minimize3<double>,xtol);
 }
 YOCTO_UNIT_TEST_DONE()
 

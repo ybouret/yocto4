@@ -16,7 +16,7 @@ namespace yocto
         
         namespace
         {
-            // conjugated gradient wrapper
+            //! conjugated gradient wrapper
             /**
              evaluate a scalar field along a given direction
              */
@@ -31,7 +31,6 @@ namespace yocto
                 _func( func ),
                 _pos( pos ),
                 _vec( vec ),
-                _num( _pos.size() ),
                 _tmp( tmp )
                 {
                 }
@@ -42,15 +41,11 @@ namespace yocto
                 numeric<real_t>::scalar_field & _func;
                 const array<real_t>           & _pos;
                 const array<real_t>           & _vec;
-                const size_t                    _num;
                 array<real_t>                 & _tmp;
                 
                 inline real_t compute( real_t x )
                 {
-                    for( size_t i=_num;i>0;--i)
-                    {
-                        _tmp[i] = _pos[i] + x * _vec[i];
-                    }
+                    tao::setprobe(_tmp, _pos, x, _vec);
                     return _func(_tmp);
                 }
                 
@@ -68,10 +63,10 @@ namespace yocto
                                      )
         {
             const size_t nvar = p.size(); assert(nvar>0);
-            some_arrays<7,real_t,memory::global> arrays;
+            some_arrays<4,real_t,memory::global> arrays;
             arrays.allocate(nvar);
             array<real_t> &g     = arrays.next_array();
-            array<real_t> &h     = arrays.next_array(); 
+            array<real_t> &h     = arrays.next_array();
             array<real_t> &xi    = arrays.next_array();
             array<real_t> &xx    = arrays.next_array();
             
@@ -187,7 +182,7 @@ namespace yocto
         cgrad<real_t>:: cgrad() :
         gradient<real_t>(),
         G( this, & cgrad<real_t>::compute_gradient),
-	pdp(0)
+        pdp(0)
         {
             
         }
