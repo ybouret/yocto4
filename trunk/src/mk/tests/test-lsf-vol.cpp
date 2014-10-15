@@ -146,6 +146,7 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
 
         
 		fit.verbose = true;
+        //fit.fast    = true;
         
 		if( !fit(samples,vol.fitter,aorg,used,aerr,NULL) )
 		{
@@ -165,6 +166,13 @@ YOCTO_UNIT_TEST_IMPL(fit_vol)
 				fp("%g %g %g\n", t[i], V[i], Vf[i]);
 			}
 		}
+        {
+            ios::ocstream fp(vformat("fitvol%u.dat",unsigned(icol)),false);
+            for(double tt=0;tt<=t[N];tt+=1)
+            {
+                fp("%g %g\n", tt, vol.fitVolume(tt,aorg) );
+            }
+        }
 	}
     
 }

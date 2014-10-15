@@ -69,7 +69,7 @@ namespace
         double fitVolume(double t, const array<double> &a )
         {
             tao::set(param,a);
-            return computeVolume(t);
+            return param[4] * computeVolume(t);
         }
         
         
@@ -90,12 +90,12 @@ int main( int argc, char *argv[] )
     try
     {
         
-        if(argc<3)
+        if(argc<4)
         {
-            throw exception("usage: %s datafile #columns_to_process",prog);
+            throw exception("usage: %s datafile #columns_to_process time_limit",prog);
         }
         
-        const size_t   nvar = 3;
+        const size_t   nvar = 4;
         Volume         vol(nvar);
         vector<double> aorg(nvar,0);
         vector<double> aerr(nvar,0);
@@ -108,17 +108,21 @@ int main( int argc, char *argv[] )
         
         LeastSquares<double>          fit;
         fit.verbose = true;
+        fit.fast    = true;
         
         LeastSquares<double>::Samples samples;
-
+        
         const string fn   = argv[1];
         const size_t ncol = strconv::to<size_t>(argv[2],"#columns");
+        const double tmax = strconv::to<double>(argv[3],"time_limit");
         std::cerr << "Fitting " << ncol << " column" << (ncol>1? "s" : "") << " of '" << fn << "'" << std::endl;
         
         
         vector<double> t,V,Vf;
-        const string logfile = vformat("fit.log");
+        const string logfile = fn + vformat(".fit.log");
         ios::ocstream::overwrite(logfile);
+        
+        vector<double> torg,Vorg;
         
         for(size_t c=1;c<=ncol;++c)
         {
@@ -131,14 +135,35 @@ int main( int argc, char *argv[] )
                 ios::icstream fp(fn);
                 ds.load(fp);
             }
-            const size_t n=t.size();
+            size_t n=t.size();
             Vf.make(n,0);
+            torg.make(n,0);
+            Vorg.make(n,0);
+            for(size_t i=1;i<=n;++i)
+            {
+                torg[i] = t[i];
+                Vorg[i] = V[i];
+            }
+            
+            if(tmax>0)
+            {
+                while(t.size()>0 && t.back() > tmax)
+                {
+                    t.pop_back();
+                    V.pop_back();
+                    Vf.pop_back();
+                }
+                
+                n = t.size();
+            }
+            
             samples.append(t,V,Vf);
             samples.prepare(nvar);
-
+            
             aorg[1] = 23;   // t0
-            aorg[2] = 0.1;  // K
-            aorg[3] = 2.0;  // Cosm
+            aorg[2] = 0.03;  // K
+            aorg[3] = 0.5;  // Cosm
+            aorg[4] = V[1]; // scaling
             
             if( !fit(samples,vol.fitter,aorg,used,aerr,NULL) )
             {
@@ -150,12 +175,13 @@ int main( int argc, char *argv[] )
             std::cerr << "corr=" << samples.corr() << std::endl;
             
             //const string output = fn + vformat(".%u.fit", unsigned(c));
-            const string output = vformat("fit%u.dat",unsigned(c));
+            const double scaling = aorg[4];
+            const string output = fn + vformat(".fit%u.dat",unsigned(c));
             {
                 ios::ocstream fp(output,false);
                 for(size_t i=1;i<=n;++i)
                 {
-                    fp("%g %g %g\n", t[i], V[i], Vf[i] );
+                    fp("%g %g %g\n", t[i], V[i]/scaling, Vf[i]/scaling );
                 }
             }
             

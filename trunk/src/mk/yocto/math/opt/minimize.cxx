@@ -143,9 +143,9 @@ namespace yocto {
             
             
             static inline
-            void minstep_safe(numeric<real_t>::function &func,
-                              triplet<real_t>           &x,
-                              triplet<real_t>           &f)
+            void minstep(numeric<real_t>::function &func,
+                         triplet<real_t>           &x,
+                         triplet<real_t>           &f)
             {
                 static const real_t C = REAL(0.381966011250105);
                 assert(x.a<=x.b);
@@ -204,10 +204,10 @@ namespace yocto {
         }
         
         template <>
-        void minimize_safe<real_t>(numeric<real_t>::function &func,
-                                   triplet<real_t>           &x,
-                                   triplet<real_t>           &f,
-                                   real_t                     ftol )
+        void minimize<real_t>(numeric<real_t>::function &func,
+                              triplet<real_t>           &x,
+                              triplet<real_t>           &f,
+                              real_t                     ftol )
         {
             assert(x.is_ordered());
             netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
@@ -219,7 +219,7 @@ namespace yocto {
             
             while( max_of<real_t>(x.c-x.a,0) > max_of(ftol*Fabs(x.b),XTOL) )
             {
-                minstep_safe(func,x,f);
+                minstep(func,x,f);
             }
             
         }
@@ -227,9 +227,9 @@ namespace yocto {
         namespace {
             
             static inline
-            void minstep(numeric<real_t>::function &func,
-                         triplet<real_t>           &x,
-                         triplet<real_t>           &f)
+            void minstep_para(numeric<real_t>::function &func,
+                              triplet<real_t>           &x,
+                              triplet<real_t>           &f)
             {
                 static const real_t C = REAL(0.381966011250105);
                 assert(x.a<=x.b);
@@ -376,10 +376,10 @@ namespace yocto {
         }
         
         template <>
-        void minimize<real_t>(numeric<real_t>::function &func,
-                               triplet<real_t>           &x,
-                               triplet<real_t>           &f,
-                               real_t                     ftol )
+        void minimize_para<real_t>(numeric<real_t>::function &func,
+                                   triplet<real_t>           &x,
+                                   triplet<real_t>           &f,
+                                   real_t                     ftol )
         {
             assert(x.is_ordered());
             netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
