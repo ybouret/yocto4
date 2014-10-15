@@ -17,7 +17,7 @@ namespace yocto {
             return max_of(Fabs(ftol),XTOL);
         }
         
-        
+#if 0
         template <>
         void minimize<real_t>(numeric<real_t>::function &func,
                               triplet<real_t>           &x,
@@ -136,16 +136,16 @@ namespace yocto {
             }
             
         }
-        
+#endif
         
         namespace
         {
             
             
             static inline
-            void minstep2(numeric<real_t>::function &func,
-                          triplet<real_t>           &x,
-                          triplet<real_t>           &f)
+            void minstep_safe(numeric<real_t>::function &func,
+                              triplet<real_t>           &x,
+                              triplet<real_t>           &f)
             {
                 static const real_t C = REAL(0.381966011250105);
                 assert(x.a<=x.b);
@@ -204,10 +204,10 @@ namespace yocto {
         }
         
         template <>
-        void minimize2<real_t>(numeric<real_t>::function &func,
-                               triplet<real_t>           &x,
-                               triplet<real_t>           &f,
-                               real_t                     ftol )
+        void minimize_safe<real_t>(numeric<real_t>::function &func,
+                                   triplet<real_t>           &x,
+                                   triplet<real_t>           &f,
+                                   real_t                     ftol )
         {
             assert(x.is_ordered());
             netsort<real_t>::co_level3<real_t>( &x.a, &f.a);
@@ -219,7 +219,7 @@ namespace yocto {
             
             while( max_of<real_t>(x.c-x.a,0) > max_of(ftol*Fabs(x.b),XTOL) )
             {
-                minstep2(func,x,f);
+                minstep_safe(func,x,f);
             }
             
         }
@@ -227,9 +227,9 @@ namespace yocto {
         namespace {
             
             static inline
-            void minstep3(numeric<real_t>::function &func,
-                          triplet<real_t>           &x,
-                          triplet<real_t>           &f)
+            void minstep(numeric<real_t>::function &func,
+                         triplet<real_t>           &x,
+                         triplet<real_t>           &f)
             {
                 static const real_t C = REAL(0.381966011250105);
                 assert(x.a<=x.b);
@@ -376,7 +376,7 @@ namespace yocto {
         }
         
         template <>
-        void minimize3<real_t>(numeric<real_t>::function &func,
+        void minimize<real_t>(numeric<real_t>::function &func,
                                triplet<real_t>           &x,
                                triplet<real_t>           &f,
                                real_t                     ftol )
@@ -391,7 +391,7 @@ namespace yocto {
             
             while( max_of<real_t>(x.c-x.a,0) > max_of(ftol*Fabs(x.b),XTOL) )
             {
-                minstep3(func,x,f);
+                minstep(func,x,f);
             }
             
         }

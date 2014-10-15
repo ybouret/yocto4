@@ -105,12 +105,14 @@ struct Param
 {
     vtx    tau;
     double len;
+    int    count;
     
-    inline Param() : tau(), len(0) {}
+    inline Param() : tau(), len(0), count(0) {}
     
     double func( const array<double> &var )
     {
         assert( var.size() == 2);
+        ++count;
         const vtx a( var[1], var[2]);
         const double an = a.norm();
         const double as = a*tau;
@@ -152,6 +154,14 @@ struct Param
 
 YOCTO_UNIT_TEST_IMPL(cgrad2)
 {
+    
+    double ftol = 1e-7;
+    if( argc > 1 )
+    {
+        ftol = strconv::to<double>(argv[1],"ftol");
+    }
+
+    
     Param param;
     param.tau.x = 1;
     param.tau.y = 1;
@@ -170,8 +180,9 @@ YOCTO_UNIT_TEST_IMPL(cgrad2)
     { ios::ocstream fp("cgrad2.dat",false); }
     
     cgrad<double>::callback cb( &param, &Param::cb );
-    cgrad<double>::optimize(Func,Grad,var,1e-5,&cb);
+    cgrad<double>::optimize(Func,Grad,var,ftol,&cb);
     std::cerr << "var=" << var << std::endl;
+    std::cerr << "count=" << param.count << std::endl;
 }
 YOCTO_UNIT_TEST_DONE()
 
