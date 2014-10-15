@@ -236,7 +236,7 @@ namespace yocto {
                 assert(x.b<=x.c);
                 assert(f.b<=f.a);
                 assert(f.b<=f.c);
-                std::cerr << "min3: " << f << " @ " << x << std::endl;
+                //std::cerr << "min3: " << f << " @ " << x << std::endl;
                 const real_t ab    = max_of<real_t>(x.b - x.a,0);
                 const real_t bc    = max_of<real_t>(x.c - x.b,0);
                 const real_t famfb = f.a - f.b;
@@ -246,30 +246,40 @@ namespace yocto {
                 const real_t hd    = p+q; assert(hd>=0);
                 if(ab<=0||bc<=0||hd<=0)
                 {
-                    std::cerr << "Failsafe..." << std::endl;
+                    //std::cerr << "Failsafe..." << std::endl;
                     goto FAILSAFE;
                 }
                 else
                 {
-                    std::cerr << "try parabolic step" << std::endl;
+                    //std::cerr << "try parabolic step" << std::endl;
                     const real_t den = hd+hd;
                     const real_t num = bc*p - ab*q;
                     if(num<= -ab*den)
                     {
-                        std::cerr << "\t!at left!" << std::endl;
+                        //std::cerr << "\t!at left!" << std::endl;
                         goto FAILSAFE;
                     }
                     else
                     {
                         if(num>=bc*den)
                         {
-                            std::cerr << "\t!at right!" << std::endl;
+                            //std::cerr << "\t!at right!" << std::endl;
                             goto FAILSAFE;
                         }
                         else
                         {
                             const real_t xu = clamp(x.a,x.b+num/den,x.c);
-                            std::cerr << "\tat " << xu << std::endl;
+                            //std::cerr << "\tat " << xu << std::endl;
+                            const real_t xm = (x.a+x.c) * REAL(0.5);
+                            const real_t moved = Fabs(xm-xu);
+                            const real_t width = Fabs(x.c - x.a);
+                            const real_t ratio = moved/width;
+                            //std::cerr << "\t\tratio=" << ratio << std::endl;
+                            if(ratio>REAL(0.5))
+                            {
+                                goto FAILSAFE;
+                            }
+                            
                             const real_t fu = func(xu);
                             if(fu>f.b)
                             {
