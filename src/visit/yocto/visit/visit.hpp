@@ -10,9 +10,9 @@
 namespace yocto
 {
     //! libSim wrapper, assuming compiled with MPI...
-    struct VisIt
+    class VisIt
     {
-        
+    public:
         //======================================================================
         //
         // Auxiliary classes
@@ -70,13 +70,13 @@ namespace yocto
          \param sim_path    simulation path
          \param sim_ui      optional simulation UI file
          */
-        static void SetupParallel(const mpi &   MPI,
+        static void SetupParallel(const mpi    &MPI,
                                   const string &sim_name,
                                   const string &sim_comment,
                                   const string &sim_path,
                                   const string *sim_ui = 0
                                   );
-
+        
         
         //======================================================================
         //
@@ -114,6 +114,16 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
         };
+        
+        //======================================================================
+        //
+        // RunTime API
+        //
+        //======================================================================
+        static void Loop( Simulation &sim );
+        static void Execute( Simulation &sim, const string &code );
+        
+        
     };
     
 }

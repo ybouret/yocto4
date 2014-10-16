@@ -62,7 +62,8 @@ namespace yocto
         else
         {
             /* Note: only through the SlaveProcessCallback callback
-             * above can the rank 0 process send a VISIT_COMMAND_PROCESS * instruction to the non-rank 0 processes. */
+             * above can the rank 0 process send a VISIT_COMMAND_PROCESS 
+             * instruction to the non-rank 0 processes. */
             while(true)
             {
                 BroadcastSlaveCommand(&command);
