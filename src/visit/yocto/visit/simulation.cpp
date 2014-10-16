@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 
+#if 0
 namespace yocto
 {
     
@@ -206,3 +207,5 @@ namespace yocto
     
     
 }
+#endif
+

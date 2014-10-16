@@ -2,16 +2,17 @@
 #include "yocto/visit/interface.hpp"
 #include "yocto/sys/wtime.hpp"
 
-#include "yocto/spade/visit.hpp"
-#include "yocto/spade/mpi/exchange.hpp"
-#include "yocto/spade/mpi/workspace.hpp"
-#include "yocto/code/rand.hpp"
-#include "yocto/spade/array2d.hpp"
-#include "yocto/spade/region2d.hpp"
+//#include "yocto/spade/visit.hpp"
+//#include "yocto/spade/mpi/exchange.hpp"
+//#include "yocto/spade/mpi/workspace.hpp"
+//#include "yocto/code/rand.hpp"
+//#include "yocto/spade/array2d.hpp"
+//#include "yocto/spade/region2d.hpp"
 
 #include <cmath>
 
 using namespace yocto;
+#if 0
 using namespace spade;
 
 typedef double                           Real;
@@ -290,9 +291,12 @@ namespace
     
 }
 
+#endif
+
 YOCTO_UNIT_TEST_IMPL(s2d)
 {
     
+#if 0
     //--------------------------------------------------------------------------
     //info for VisIt
     //--------------------------------------------------------------------------
@@ -360,7 +364,7 @@ YOCTO_UNIT_TEST_IMPL(s2d)
     sim.wait_exchange();
     
     VisIt:: MainLoop(sim);
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()

@@ -1,11 +1,10 @@
 
-INCLUDE_DIRECTORIES(../../spade)
+#INCLUDE_DIRECTORIES(../../spade)
 
 FILE(GLOB test_srcs test-*.cpp)
 ADD_EXECUTABLE(test-visit main.cpp ${test_srcs})
 
 TARGET_LINK_VISIT( test-visit )
-#TARGET_LINK_VISIT_SILO( test-visit )
 TARGET_LINK_YOCTO( test-visit spade )
 
 VISIT_CUSTOM_UI( test-visit loop.ui )

@@ -4,7 +4,7 @@
 
 using namespace yocto;
 
-
+#if 0
 static void
 ui_run_clicked(void *cbdata)
 {
@@ -54,6 +54,7 @@ void ui_do_nothing(int,void*)
     
 }
 
+
 class MySim : public VisIt:: Simulation
 {
 public:
@@ -91,9 +92,12 @@ private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
 };
 
+#endif
+
 YOCTO_UNIT_TEST_IMPL(loop)
 {
-        
+
+#if 0
     const string sim_name    = "Simulation";
     const string sim_comment = "Simulation Comment";
     const string sim_path    = ".";
@@ -116,7 +120,7 @@ YOCTO_UNIT_TEST_IMPL(loop)
     VisItUI_valueChanged("progressBar", ui_do_nothing, &sim);
     
     VisIt:: MainLoop( sim );
-    
+#endif
     
 }
 YOCTO_UNIT_TEST_DONE()
