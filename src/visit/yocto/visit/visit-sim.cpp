@@ -14,6 +14,7 @@ namespace yocto
     runMode( VISIT_SIMMODE_STOPPED ),
     runTime(0),
     done(false),
+    iobuff( IOLength ),
     console(useConsole),
     MPI(ref),
     par_size( MPI.CommWorldSize ),

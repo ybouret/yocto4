@@ -109,8 +109,8 @@ namespace yocto
         void ProcessConsole( VisIt:: Simulation &sim )
         {
             const mpi &  MPI = mpi::instance();
-            char         cmd[1024];
-            const size_t len = sizeof(cmd);
+            char        *cmd = sim.iobuff(0);
+            const size_t len = sim.iobuff.length();
             size_t       num = 0;
             memset(cmd,len,0);
             
@@ -159,7 +159,7 @@ namespace yocto
             // forward to the simulation with a local string
             //__________________________________________________________________
             const string code(cmd,num);
-            MPI.Printf0(stderr, "[VisIt::Console] '%s'\n", code.c_str());
+            MPI.Printf(stderr, "[VisIt::Console] '%s'\n", code.c_str());
             VisIt::Execute(sim,code);
         }
         

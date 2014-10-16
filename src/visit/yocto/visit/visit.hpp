@@ -5,7 +5,7 @@
 #include <VisItDataInterface_V2.h>
 
 #include "yocto/mpi/mpi.hpp"
-
+#include "yocto/memory/buffers.hpp"
 
 namespace yocto
 {
@@ -86,6 +86,9 @@ namespace yocto
         class Simulation
         {
         public:
+            typedef memory::buffer_of<char,memory::global> IOBuffer;
+            static  const size_t                           IOLength = 1024;
+            
             explicit Simulation( const mpi &, bool useConsole=true );
             virtual ~Simulation() throw();
             
@@ -93,10 +96,11 @@ namespace yocto
             //
             // dynamic variables
             //__________________________________________________________________
-            int    cycle;    //!< modified by main loop
-            int    runMode;  //!< halted/runningm initially halted
-            double runTime;  //!< user run time
-            bool   done;     //!< initially true, stop when user set false
+            int      cycle;    //!< modified by main loop
+            int      runMode;  //!< halted/runningm initially halted
+            double   runTime;  //!< user run time
+            bool     done;     //!< initially true, stop when user set false
+            IOBuffer iobuff;
             
             //__________________________________________________________________
             //
