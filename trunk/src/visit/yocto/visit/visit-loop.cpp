@@ -80,7 +80,7 @@ namespace yocto
         
         
         
-        
+        // a command from the gui...
         static inline void ControlCommandCallback(const char *cmd,
                                                   const char *args,
                                                   void       *cbdata)
@@ -164,14 +164,60 @@ namespace yocto
         }
         
         
+        //______________________________________________________________________
+        //
+        //
+        // SimGetMetaData callback
+        //
+        //______________________________________________________________________
+        static visit_handle SimGetMetaData(void *cbdata)
+        {
+            assert(cbdata!=NULL);
+            visit_handle       md  = VISIT_INVALID_HANDLE;
+            VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+            
+            
+            if( VisIt_SimulationMetaData_alloc(&md) == VISIT_OKAY)
+            {
+                assert( VISIT_INVALID_HANDLE != md );
+                
+                /* Meta Data for Simulation */
+                VisIt_SimulationMetaData_setMode(md,sim.runMode);
+                VisIt_SimulationMetaData_setCycleTime(md,sim.cycle,sim.runTime);
+                
+                /* Create Generic Interface/Commands */
+                for(register size_t i = 0; i <  VisIt::Simulation::GenericCommandNum; ++i)
+                {
+                    visit_handle cmd = VISIT_INVALID_HANDLE;
+                    if(VisIt_CommandMetaData_alloc(&cmd) == VISIT_OKAY)
+                    {
+                        const char *cmd_name = VisIt::Simulation::GenericCommandReg[i];
+                        VisIt_CommandMetaData_setName(cmd, cmd_name);
+                        VisIt_SimulationMetaData_addGenericCommand(md, cmd);
+                    }
+                }
+                
+                /* Specific Meta Data for the simulation */
+                //sim.get_meta_data(md);
+            }
+            
+            return md;
+        }
         
         
-        static inline
-        void setup_callbacks(void *cbdata) throw()
+        //______________________________________________________________________
+        //
+        //
+        // SimGetMesg callback
+        //
+        //______________________________________________________________________
+        
+        
+        static inline void setup_callbacks(void *cbdata) throw()
         {
             VisItSetSlaveProcessCallback(SlaveProcessCallback);
             VisItSetCommandCallback(ControlCommandCallback,cbdata);
-            //VisItSetGetMetaData(SimGetMetaData,cbdata);
+            VisItSetGetMetaData(SimGetMetaData,cbdata);
             //VisItSetGetMesh(SimGetMesh, cbdata);
             //VisItSetGetDomainList(SimGetDomainList,cbdata);
             //VisItSetGetVariable(SimGetVariable,cbdata);
@@ -205,8 +251,6 @@ namespace yocto
         }
         
         
-        //void *cbdata     = &sim; // passed on every callbacks
-        
         //______________________________________________________________________
         //
         //
@@ -232,8 +276,6 @@ namespace yocto
             //__________________________________________________________________
             MPI.Bcast(visitstate,0,MPI_COMM_WORLD);
             
-            MPI.Printf0(stderr, "VisIt State=%d\n", visitstate);
-            
             //__________________________________________________________________
             //
             // Now, every one acts depending on visitstate
@@ -246,7 +288,7 @@ namespace yocto
                     //
                     // There was no input from VisIt, return control to sim.
                     //__________________________________________________________
-                    MPI.Printf0(stderr,"-- Perform one step...");
+                    MPI.Printf0(stderr,"-- Perform one step...\n");
                     break;
                     
                 case 1:

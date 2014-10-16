@@ -3,16 +3,23 @@
 
 namespace yocto
 {
+    
+    // format is 'cmd ARG1;...;ARGN'
+    static inline
+    string __parse_code(const string &code, vector<string> &args )
+    {
+        return code;
+    }
+    
     void VisIt:: Execute(Simulation &sim, const string &code)
     {
         const mpi &MPI = sim.MPI;
         MPI.Printf(stderr, "[VisIt]: executing <%s>\n", code.c_str() );
+        vector<string> args(16,as_capacity);
         
-        if( code == "quit" )
-        {
-            sim.done = true;
-            return;
-        }
+        const string cmd = __parse_code(code,args);
+        
+        sim.execute_all(cmd,args);
         
         
         if( VisItIsConnected() )
