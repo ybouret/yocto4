@@ -4,9 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#if 0
 namespace yocto
 {
-    
     
     
     VisIt:: TraceFile:: TraceFile( int rank, const string &filename  ) :
@@ -60,15 +60,7 @@ namespace yocto
     {
         MPI.Printf( stderr, "[Visit] SetupParallel %d.%d\n", MPI.CommWorldSize, MPI.CommWorldRank);
         
-#if 0
-        //----------------------------------------------------------------------
-        // startup VisIt
-        //----------------------------------------------------------------------
-        if( !VisItSetupEnvironment() )
-        {
-            //throw exception("VisItSetupEnvironment(%s)", VisItGetLastError());
-        }
-#endif
+
         
         //----------------------------------------------------------------------
         // Install callback functions for global communication.
@@ -92,7 +84,6 @@ namespace yocto
         if( ui_file )
             MPI.Printf0( stderr, "[Visit] UI file     = '%s'\n", ui_file );
         
-#if 1
         //----------------------------------------------------------------------
         // startup VisIt, version 2
         //----------------------------------------------------------------------
@@ -110,7 +101,6 @@ namespace yocto
         
         if(env) free(env);
         
-#endif
         
         if(  MPI.IsFirst )
         {
@@ -125,3 +115,5 @@ namespace yocto
         }
     }
 }
+#endif
+

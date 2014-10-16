@@ -1,6 +1,7 @@
-#include "yocto/spade/array3d.hpp"
-#include "yocto/spade/visit.hpp"
-#include "yocto/spade/ops/laplacian.hpp"
+#if 0
+//#include "yocto/spade/array3d.hpp"
+//#include "yocto/spade/visit.hpp"
+//#include "yocto/spade/ops/laplacian.hpp"
 
 #include "yocto/code/rand.hpp"
 #include "yocto/spade/mpi/workspace.hpp"
@@ -9,10 +10,13 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/math/round.hpp"
 #include "yocto/sys/pid.hpp"
+#endif
 
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;
+
+#if 0
 using namespace spade;
 
 typedef coord3D  Coord;
@@ -345,9 +349,11 @@ static void display_cpu( size_t cpu_id, void *args)
     cpu_list += vformat(" %u", unsigned(cpu_id));
     
 }
+#endif
 
 YOCTO_UNIT_TEST_IMPL(s3d)
 {
+#if 0
     if( argc <= 3 )
         throw exception("usage: simu Nx Ny Nz");
     const size_t Nx = strconv::to_size( argv[1], "Nx");
@@ -456,6 +462,6 @@ YOCTO_UNIT_TEST_IMPL(s3d)
     MPI.Printf( stderr, "Synchronizing/MPI: %s\n" , sim.do_sync ? "TRUE" : "FALSE" );
     VisIt::MainLoop(sim);
     
-    return 0;
+#endif
 }
 YOCTO_UNIT_TEST_DONE()

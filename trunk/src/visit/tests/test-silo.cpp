@@ -1,14 +1,16 @@
 #include "yocto/utest/run.hpp"
-#include "yocto/spade/visit-silo.hpp"
-#include "yocto/spade/array2d.hpp"
-#include "yocto/spade/rmesh.hpp"
-#include "yocto/spade/region2d.hpp"
+//#include "yocto/spade/visit-silo.hpp"
+//#include "yocto/spade/array2d.hpp"
+//#include "yocto/spade/rmesh.hpp"
+//#include "yocto/spade/region2d.hpp"
 
 using namespace yocto;
+#if 0
 using namespace spade;
 
 typedef vertex2D<float>::type  V2f;
 typedef vertex2D<double>::type V2d;
+#endif
 
 YOCTO_UNIT_TEST_IMPL(silo)
 {

@@ -1,6 +1,7 @@
 #ifndef YOCTO_VISIT_INCLUDED
 #define YOCTO_VISIT_INCLUDED 1
 
+#if 0
 #include <VisItControlInterface_V2.h>
 #include <VisItDataInterface_V2.h>
 
@@ -169,5 +170,6 @@ namespace yocto
     
     
 }
+#endif
 
 #endif
