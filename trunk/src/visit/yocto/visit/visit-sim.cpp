@@ -31,13 +31,14 @@ namespace yocto
     par_rank( MPI.CommWorldRank ),
     par_last( MPI.CommWorldLast ),
     parallel( MPI.IsParallel    ),
-    is_first( MPI.IsFirst ),
-    is_final( MPI.IsFinal )
+    is_first( MPI.IsFirst       ),
+    is_final( MPI.IsFinal       )
     {
     }
     
     
-    void VisIt:: Simulation:: add_generic_command(const string &name, visit_handle &md) const
+    void VisIt:: Simulation:: add_generic_command(const string &name,
+                                                  visit_handle &md) const
     {
         assert(VISIT_INVALID_HANDLE != md );
         visit_handle cmd = VISIT_INVALID_HANDLE;
@@ -50,14 +51,17 @@ namespace yocto
             throw exception("add_generic_command('%s') FAILURE", name.c_str());
     }
     
-    void VisIt:: Simulation:: add_generic_command(const char *name, visit_handle &md) const
+    
+    void VisIt:: Simulation:: add_generic_command(const char  *name,
+                                                  visit_handle &md) const
     {
         const string NAME(name);
         add_generic_command(NAME,md);
     }
     
     
-    void VisIt:: Simulation:: execute_all(const string cmd, const array<string> &args)
+    void VisIt:: Simulation:: execute_all(const string         cmd,
+                                          const array<string> &args)
     {
         string show = "Visit.Simulation.execute_all ";
         show += "'" + cmd +  "'";
@@ -116,6 +120,7 @@ namespace yocto
         MPI.Printf0(stderr, "[VisIt.Simulation.execute] '%s'\n", cmd.c_str());
     }
     
+    
     void VisIt::Simulation:: get_meta_data( visit_handle &md ) const
     {
         if(VISIT_INVALID_HANDLE==md)
@@ -123,17 +128,20 @@ namespace yocto
         
     }
     
+    
     visit_handle VisIt::Simulation:: get_mesh( int domain, const string &name) const
     {
         MPI.Printf(stderr,"get_mesh(%d,'%s')", domain, name.c_str() );
         return VISIT_INVALID_HANDLE;
     }
     
+    
     visit_handle VisIt:: Simulation:: get_variable( int domain, const string &name ) const
     {
         MPI.Printf(stderr,"get_variable(%d,'%s')", domain, name.c_str() );
         return VISIT_INVALID_HANDLE;
     }
+    
     
     visit_handle  VisIt:: Simulation::get_curve(const string &name) const
     {
