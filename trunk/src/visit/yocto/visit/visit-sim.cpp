@@ -59,7 +59,13 @@ namespace yocto
     
     void VisIt:: Simulation:: execute_all(const string cmd, const array<string> &args)
     {
-        MPI.Printf(stderr, "[VisIt.Simulation.execute_all] '%s'\n", cmd.c_str());
+        string show = "Visit.Simulation.execute_all ";
+        show += "'" + cmd +  "'";
+        for(size_t i=1;i<=args.size();++i)
+        {
+            show += '/' + args[i];
+        }
+        MPI.Printf0(stderr, "%s\n", show.c_str() );
         
         if(  cmd == "run"  )
         {
@@ -81,12 +87,28 @@ namespace yocto
         
         if( cmd == "step" )
         {
-         
+            size_t n=1;
+            if(args.size()>0)
+            {
+                const char *param = args[1].c_str();
+                n = atol(param);
+            }
+            while(n-- > 0)
+            {
+                VisIt::OneStep(*this);
+            }
             return;
         }
         
         execute(cmd,args);
         
+    }
+    
+    
+    void VisIt:: Simulation:: step()
+    {
+        const char *run_mode = VisItIsConnected() ? "[VisIt ONLINE ]" : "[Visit OFFLINE]";
+        MPI.Printf0(stderr, "%s cycle= %6d\n", run_mode, cycle);
     }
     
     void VisIt:: Simulation:: execute(const string cmd, const array<string> &args)
@@ -100,7 +122,24 @@ namespace yocto
             throw yocto::exception("Invalid VisIt Handle in sim.get_meta_data");
         
     }
-
     
+    visit_handle VisIt::Simulation:: get_mesh( int domain, const string &name) const
+    {
+        MPI.Printf(stderr,"get_mesh(%d,'%s')", domain, name.c_str() );
+        return VISIT_INVALID_HANDLE;
+    }
+    
+    visit_handle VisIt:: Simulation:: get_variable( int domain, const string &name ) const
+    {
+        MPI.Printf(stderr,"get_variable(%d,'%s')", domain, name.c_str() );
+        return VISIT_INVALID_HANDLE;
+    }
+    
+    visit_handle  VisIt:: Simulation::get_curve(const string &name) const
+    {
+        MPI.Printf(stderr,"get_curve('%s')", name.c_str() );
+        return VISIT_INVALID_HANDLE;
+    }
     
 }
+

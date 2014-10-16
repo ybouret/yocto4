@@ -98,4 +98,11 @@ namespace yocto
     }
 
     
+    void VisIt:: OneStep(Simulation &sim)
+    {
+        ++sim.cycle;
+        sim.step();
+    }
+    
+    
 }
