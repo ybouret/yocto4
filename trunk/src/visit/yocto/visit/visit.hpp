@@ -56,7 +56,7 @@ namespace yocto
         
         //======================================================================
         //
-        // API
+        // Setup API
         //
         //======================================================================
         static void SetDirectory( const string &path );      //!< VisItSetDirectory
@@ -78,6 +78,42 @@ namespace yocto
                                   );
 
         
+        //======================================================================
+        //
+        // Simulation class
+        //
+        //======================================================================
+        class Simulation
+        {
+        public:
+            explicit Simulation( const mpi &, bool useConsole=true );
+            virtual ~Simulation() throw();
+            
+            //__________________________________________________________________
+            //
+            // dynamic variables
+            //__________________________________________________________________
+            int    cycle;    //!< modified by main loop
+            int    runMode;  //!< halted/runningm initially halted
+            double runTime;  //!< user run time
+            bool   done;     //!< initially true, stop when user set false
+            
+            //__________________________________________________________________
+            //
+            // constant info
+            //__________________________________________________________________
+            const bool console;  //!< use the interactive console ?
+            const mpi &MPI;      //!< the MPI instance
+            const int  par_size; //!< the comm world size
+            const int  par_rank; //!< the comm world rank
+            const int  par_last; //!< the comm world last
+            const bool parallel; //!< par_size>0
+            const bool is_first; //!< 0 == par_rank
+            const bool is_final; //!< par_last == par_rank
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
+        };
     };
     
 }
