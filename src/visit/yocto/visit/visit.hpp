@@ -115,8 +115,47 @@ namespace yocto
             const bool is_first; //!< 0 == par_rank
             const bool is_final; //!< par_last == par_rank
             
+            
+            //__________________________________________________________________
+            //
+            // methods to interact with VisIt
+            //__________________________________________________________________
+            //! adds a generic command to UI
+            void add_generic_command( const string &name, visit_handle &md ) const;
+            
+            //! adds a generic command to UI
+            void add_generic_command( const char   *name, visit_handle &md ) const;
+            
+            
+            //! provide meta data information
+            /**
+             meta data for meshes, specific commands...
+             default does nothing.
+             */
+            virtual void get_meta_data( visit_handle &md ) const;
+
+            
+            
+            //__________________________________________________________________
+            //
+            // handling user or UI commands
+            //__________________________________________________________________
+            virtual void execute(const string cmd, const array<string> &args);
+            
+            //__________________________________________________________________
+            //
+            // Generic UI commands
+            //__________________________________________________________________
+            static const char * GenericCommandReg[];
+            static const size_t GenericCommandNum;
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(Simulation);
+            
+            //! intercept generic commands, then call execute
+            void execute_all(const string cmd, const array<string> &args );
+            
+            friend class   VisIt;
         };
         
         //======================================================================
