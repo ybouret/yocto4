@@ -13,6 +13,12 @@ namespace yocto
     struct VisIt
     {
         
+        //======================================================================
+        //
+        // Auxiliary classes
+        //
+        //======================================================================
+        
         //______________________________________________________________________
         //
         //! dedicated exception class
@@ -47,6 +53,31 @@ namespace yocto
             void initialize(const string &filename);
         };
 
+        
+        //======================================================================
+        //
+        // API
+        //
+        //======================================================================
+        static void SetDirectory( const string &path );      //!< VisItSetDirectory
+        static void SetOption(const string &options);        //!< VisItSetOptions
+        
+        //! prepare simulation
+        /**
+         \param MPI         a MPI instance
+         \param sim_name    simulation name
+         \param sim_comment simulation comment
+         \param sim_path    simulation path
+         \param sim_ui      optional simulation UI file
+         */
+        static void SetupParallel(const mpi &   MPI,
+                                  const string &sim_name,
+                                  const string &sim_comment,
+                                  const string &sim_path,
+                                  const string *sim_ui = 0
+                                  );
+
+        
     };
     
 }
