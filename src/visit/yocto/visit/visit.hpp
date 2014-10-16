@@ -52,7 +52,7 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(TraceFile);
             void initialize(const string &filename);
         };
-
+        
         
         //======================================================================
         //
@@ -118,6 +118,12 @@ namespace yocto
             
             //__________________________________________________________________
             //
+            // computation step
+            //__________________________________________________________________
+            virtual void step();
+            
+            //__________________________________________________________________
+            //
             // methods to interact with VisIt
             //__________________________________________________________________
             //! adds a generic command to UI
@@ -128,13 +134,16 @@ namespace yocto
             
             
             //! provide meta data information
-            /**
-             meta data for meshes, specific commands...
-             default does nothing.
-             */
             virtual void get_meta_data( visit_handle &md ) const;
-
             
+            //! provide a mesh for a domain
+            virtual visit_handle get_mesh( int domain, const string &name) const;
+            
+            //! provide a variable for a domain
+            virtual visit_handle get_variable( int domain, const string &name ) const;
+            
+            //! provides a curve for a domain
+            virtual visit_handle get_curve(const string &name) const;
             
             //__________________________________________________________________
             //
@@ -165,6 +174,7 @@ namespace yocto
         //======================================================================
         static void Loop( Simulation &sim );
         static void Execute( Simulation &sim, const string &code );
+        static void OneStep( Simulation &sim );
         
         
     };

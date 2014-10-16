@@ -198,7 +198,7 @@ namespace yocto
                 }
                 
                 /* Specific Meta Data for the simulation */
-                //sim.get_meta_data(md);
+                sim.get_meta_data(md);
             }
             
             return md;
@@ -208,20 +208,58 @@ namespace yocto
         //______________________________________________________________________
         //
         //
-        // SimGetMesg callback
+        // SimGetMesh callback
         //
         //______________________________________________________________________
+        static inline
+        visit_handle SimGetMesh( int domain, const char *name, void *cbdata )
+        {
+            assert(cbdata);
+            VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+            const string mesh_name(name);
+            return sim.get_mesh( domain, mesh_name );
+        }
         
+        
+        //______________________________________________________________________
+        //
+        //
+        // SimGetVariable callback
+        //
+        //______________________________________________________________________
+        static
+        visit_handle SimGetVariable(int domain, const char *name, void *cbdata)
+        {
+            assert(cbdata);
+            VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+            const string       id(name);
+            return sim.get_variable(domain, id);
+        }
+
+        //______________________________________________________________________
+        //
+        //
+        // SimGetCurve callback
+        //
+        //______________________________________________________________________
+        static inline
+        visit_handle SimGetCurve( const char *name, void *cbdata )
+        {
+            VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+            const string       id(name);
+            return sim.get_curve(id);
+        }
+
         
         static inline void setup_callbacks(void *cbdata) throw()
         {
             VisItSetSlaveProcessCallback(SlaveProcessCallback);
             VisItSetCommandCallback(ControlCommandCallback,cbdata);
             VisItSetGetMetaData(SimGetMetaData,cbdata);
-            //VisItSetGetMesh(SimGetMesh, cbdata);
+            VisItSetGetMesh(SimGetMesh, cbdata);
             //VisItSetGetDomainList(SimGetDomainList,cbdata);
-            //VisItSetGetVariable(SimGetVariable,cbdata);
-            //VisItSetGetCurve(SimGetCurve,cbdata);
+            VisItSetGetVariable(SimGetVariable,cbdata);
+            VisItSetGetCurve(SimGetCurve,cbdata);
         }
     }
     
@@ -288,7 +326,7 @@ namespace yocto
                     //
                     // There was no input from VisIt, return control to sim.
                     //__________________________________________________________
-                    MPI.Printf0(stderr,"-- Perform one step...\n");
+                    VisIt::OneStep(sim);
                     break;
                     
                 case 1:
@@ -353,7 +391,6 @@ namespace yocto
         }
         VisItDisconnect();
         MPI.Printf0(stderr, "[VisIt] End Loop\n");
-        
     }
     
 }
