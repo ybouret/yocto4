@@ -24,6 +24,7 @@ namespace yocto
     runMode( VISIT_SIMMODE_STOPPED ),
     runTime(0),
     done(false),
+    ellapsed(0),
     iobuff( IOLength ),
     console(useConsole),
     MPI(ref),
