@@ -95,7 +95,7 @@ namespace yocto
                 todo += args;
             }
             static const mpi &MPI = sim.MPI;
-            MPI.Printf0(stderr,"[VisIt::Command] '%s'\n", todo.c_str());
+            MPI.Printf0(stderr,"[VisIt] [Command] '%s'\n", todo.c_str());
             VisIt::Execute(sim,todo);
         }
         
@@ -159,7 +159,7 @@ namespace yocto
             // forward to the simulation with a local string
             //__________________________________________________________________
             const string code(cmd,num);
-            MPI.Printf(stderr, "[VisIt::Console] '%s'\n", code.c_str());
+            MPI.Printf0(stderr, "[VisIt] [Console] '%s'\n", code.c_str());
             VisIt::Execute(sim,code);
         }
         
@@ -224,6 +224,45 @@ namespace yocto
         //______________________________________________________________________
         //
         //
+        // SimGetDomainList
+        //
+        //______________________________________________________________________
+        static visit_handle SimGetDomainList(const char *name, void *cbdata)
+        {
+            assert(cbdata);
+            VisIt::Simulation &sim = *(VisIt::Simulation *)cbdata;
+            visit_handle h = VISIT_INVALID_HANDLE;
+            if(VisIt_DomainList_alloc(&h) != VISIT_ERROR)
+            {
+#if 0
+                visit_handle hdl = 0;
+                int *iptr = NULL;
+                
+                iptr  = (int *)malloc(sizeof(int));
+                *iptr = sim.par_rank;
+                
+                if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
+                {
+                    VisIt_VariableData_setDataI(hdl, VISIT_OWNER_VISIT, 1, 1, iptr);
+                    VisIt_DomainList_setDomains(h, sim.par_size, hdl);
+                }
+#endif
+                visit_handle hdl = VISIT_INVALID_HANDLE;
+                if(VisIt_VariableData_alloc(&hdl) == VISIT_OKAY)
+                {
+                    VisIt_VariableData_setDataI(hdl, VISIT_OWNER_SIM, 1, 1, (int*)& sim.par_rank);
+                    VisIt_DomainList_setDomains(h, sim.par_size, hdl);
+                }
+                
+            }
+            return h;
+        }
+
+        
+        
+        //______________________________________________________________________
+        //
+        //
         // SimGetVariable callback
         //
         //______________________________________________________________________
@@ -257,7 +296,7 @@ namespace yocto
             VisItSetCommandCallback(ControlCommandCallback,cbdata);
             VisItSetGetMetaData(SimGetMetaData,cbdata);
             VisItSetGetMesh(SimGetMesh, cbdata);
-            //VisItSetGetDomainList(SimGetDomainList,cbdata);
+            VisItSetGetDomainList(SimGetDomainList,cbdata);
             VisItSetGetVariable(SimGetVariable,cbdata);
             VisItSetGetCurve(SimGetCurve,cbdata);
         }
@@ -285,7 +324,7 @@ namespace yocto
         const int  fd         = sim.console ? fileno(stdin) : -1;
         if( sim.console )
         {
-            MPI.Printf0(stderr, "[VisIt] \tConsole is Active\n");
+            MPI.Printf0(stderr, "[VisIt] Console is Active\n");
         }
         
         
@@ -337,7 +376,7 @@ namespace yocto
                     MPI.Printf0(stderr,"[VisIt] Connecting...\n");
                     if( VisItAttemptToCompleteConnection() )
                     {
-                        MPI.Printf0(stderr, "[VisIt] \tConnected\n");
+                        MPI.Printf0(stderr, "[VisIt] ...Connected\n");
                         // setup visit callbacks
                         setup_callbacks( &sim );
                         
@@ -349,7 +388,7 @@ namespace yocto
                     }
                     else
                     {
-                        MPI.Printf0(stderr, "[VisIt] \tConnection Failure: %s\n", VisItGetLastError() );
+                        MPI.Printf0(stderr, "[VisIt] ...Connection Failure: %s\n", VisItGetLastError() );
                     }
                     
                 case 2:

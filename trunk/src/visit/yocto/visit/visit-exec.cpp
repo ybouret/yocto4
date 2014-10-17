@@ -31,7 +31,7 @@ namespace yocto
     void VisIt:: Execute(Simulation &sim, const string &code)
     {
         const mpi &MPI = sim.MPI;
-        MPI.Printf(stderr, "[VisIt]: executing <%s>\n", code.c_str() );
+        MPI.Printf0(stderr, "[VisIt]: executing <%s>\n", code.c_str() );
         vector<string> args(16,as_capacity);
         
         const string cmd = __parse_code(code,args);

@@ -33,6 +33,13 @@ namespace yocto
         }
     }
     
+    
+    //__________________________________________________________________________
+    //
+    //
+    // Setup functions
+    //
+    //__________________________________________________________________________
     void VisIt:: SetupParallel(const mpi    &MPI ,
                                const string &sim_name,
                                const string &sim_comment,
@@ -97,7 +104,13 @@ namespace yocto
         }
     }
 
-    
+
+    //__________________________________________________________________________
+    //
+    //
+    // executing one step of simulation
+    //
+    //__________________________________________________________________________
     void VisIt:: OneStep(Simulation &sim)
     {
         ++sim.cycle;
