@@ -114,7 +114,12 @@ namespace yocto
     void VisIt:: OneStep(Simulation &sim)
     {
         ++sim.cycle;
+        const double enter = MPI_Wtime();
         sim.step();
+        sim.ellapsed = MPI_Wtime() - enter;
+        
+        VisItTimeStepChanged();
+        VisItUpdatePlots();
     }
     
     

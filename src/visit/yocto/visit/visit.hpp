@@ -96,10 +96,11 @@ namespace yocto
             //
             // dynamic variables
             //__________________________________________________________________
-            int      cycle;    //!< modified by main loop
-            int      runMode;  //!< halted/runningm initially halted
-            double   runTime;  //!< user run time
-            bool     done;     //!< initially true, stop when user set false
+            int      cycle;     //!< modified by main loop
+            int      runMode;   //!< halted/runningm initially halted
+            double   runTime;   //!< user run time
+            double   ellapsed;  //!< last step wall time
+            bool     done;      //!< initially true, stop when user set false
             IOBuffer iobuff;
             
             //__________________________________________________________________
