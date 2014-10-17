@@ -21,12 +21,14 @@ namespace yocto
             
             inline Vertex( T &X ) throw() : next(0), prev(0), q()
             {
+                assert(1==DIM);
                 clr();
                 q[0] = &X;
             }
             
             inline Vertex( T &X, T &Y ) throw() : next(0), prev(0), q()
             {
+                assert(2==DIM);
                 clr();
                 q[0] = &X;
                 q[1] = &Y;
@@ -34,6 +36,7 @@ namespace yocto
             
             inline Vertex( T &X, T &Y, T &Z ) throw() : next(0), prev(0), q()
             {
+                assert(3==DIM);
                 clr();
                 q[0] = &X;
                 q[1] = &Y;

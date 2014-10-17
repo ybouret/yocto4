@@ -8,14 +8,16 @@ namespace yocto
 {
     
     template <typename T>
-    class addr_node : public object
+    class addr_node
     {
     public:
+        YOCTO_MAKE_OBJECT
+        
         addr_node *next; //!< for list
         addr_node *prev; //!< for list
         T         *addr; //!< for pipo
-        explicit addr_node( T *ptr ) throw() : next(0), prev(0), addr(ptr) {}
-        virtual ~addr_node() throw() {}
+        inline addr_node( T *ptr ) throw() : next(0), prev(0), addr(ptr) {}
+        inline ~addr_node() throw() {}
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(addr_node);
