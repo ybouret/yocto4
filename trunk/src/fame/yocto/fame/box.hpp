@@ -102,7 +102,7 @@ namespace yocto
                 const T *qlen = (const T *)&length;
                 for(size_t d=0;d<DIM;++d)
                 {
-                    const char id[4] = { char('X'+d), 0, 0, 0 };
+                    const char *id = get_axis_name(d);
                     array1D<U> &axis = adb[id].as< array1D<U> >();
                     map1<U>(axis.entry,axis.items,qmin[d],qmax[d],qlen[d]);
                 }
