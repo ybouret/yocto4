@@ -63,6 +63,11 @@ public:
         
     }
     
+    virtual void get_meta_dat( visit_handle &md ) const
+    {
+        add_generic_command("quit",md);
+    }
+    
     virtual ~MySim() throw() 
     {
         

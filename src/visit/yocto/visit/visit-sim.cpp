@@ -23,8 +23,8 @@ namespace yocto
     cycle(0),
     runMode( VISIT_SIMMODE_STOPPED ),
     runTime(0),
-    done(false),
     ellapsed(0),
+    done(false),
     iobuff( IOLength ),
     console(useConsole),
     MPI(ref),
@@ -117,6 +117,7 @@ namespace yocto
             {
                 n = get_tolerant_count(args[1]);
             }
+            runMode = VISIT_SIMMODE_STOPPED;
             while(n-- > 0)
             {
                 VisIt::OneStep(*this);
