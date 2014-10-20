@@ -6,6 +6,19 @@ namespace yocto
     {
         
         
+        const char *get_axis_name(size_t dim) throw()
+        {
+            switch(dim)
+            {
+                case 0: return "X";
+                case 1: return "Y";
+                case 2: return "Z";
+                default:
+                    break;
+            }
+            return "";
+        }
+        
         offsets_list:: ~offsets_list() throw()
         {
         }

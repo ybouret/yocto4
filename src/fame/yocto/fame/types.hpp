@@ -17,6 +17,8 @@ namespace yocto
         typedef memory::global         memory_kind;
         typedef memory_kind::allocator memory_allocator;
         
+        const char *get_axis_name(size_t dim) throw(); //!< dim in [0..2]
+        
         
         //______________________________________________________________________
         //
