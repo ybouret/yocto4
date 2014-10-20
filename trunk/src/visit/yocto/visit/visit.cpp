@@ -103,8 +103,8 @@ namespace yocto
                 throw exception("VisItInitializeSocketAndDumpSimFile");
         }
     }
-
-
+    
+    
     //__________________________________________________________________________
     //
     //
@@ -118,8 +118,11 @@ namespace yocto
         sim.step();
         sim.ellapsed = MPI_Wtime() - enter;
         
-        VisItTimeStepChanged();
-        VisItUpdatePlots();
+        if(VisItIsConnected())
+        {
+            VisItTimeStepChanged();
+            VisItUpdatePlots();
+        }
     }
     
     
