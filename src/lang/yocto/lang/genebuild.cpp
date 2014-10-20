@@ -25,7 +25,7 @@ namespace yocto
                 vnode_rule,  //!< a rule
                 vnode_expr,  //!< an expression
                 vnode_char,  //!< a  single char
-                vnode_jk,    //!< a  joker node
+                vnode_joker, //!< a  joker node
                 vnode_or,    //!< an alternation node
                 vnode_group  //!< a sub rule
             };
@@ -276,7 +276,7 @@ namespace yocto
                             //__________________________________________________
                             const string attr  = xn->head()->lxm()->to_string();
                             const string jname = attr;
-                            vnode *jk = new vnode(jname,xn,vnode_jk);
+                            vnode *jk = new vnode(jname,xn,vnode_joker);
                             vj.push_back(jk);
                             parent->children.append(jk);
                             build(jk,xn->children().tail);
@@ -332,16 +332,7 @@ namespace yocto
                         throw exception("unhandled %s", label.c_str());
                     }
                    
-#if 0
-                    //__________________________________________________________
-                    //
-                    // mark children as linked
-                    //__________________________________________________________
-                    for(anode *an = parent->children.head;an;an=an->next)
-                    {
-                        an->addr->linked++;
-                    }
-#endif
+                    
                 }
                 
                 
@@ -409,7 +400,7 @@ namespace yocto
                         fp(";\n");
                         switch(sub->type)
                         {
-                            case vnode_jk:
+                            case vnode_joker:
                             case vnode_or:
                             case vnode_group:
                                 link(fp,sub);
@@ -460,8 +451,6 @@ namespace yocto
             // generate parser
             //__________________________________________________________________
             //auto_ptr<parser> P( new parser("generated","scanner") );
-            
-            
             
             
         }
