@@ -45,7 +45,7 @@ namespace yocto
             class vnode : public object
             {
             public:
-                typedef vnode *                  ptr;
+                typedef vnode *      ptr;
                 
                 const string         name;
                 syntax::xnode       *node;
@@ -100,6 +100,12 @@ namespace yocto
                     
                 }
                 
+                //______________________________________________________________
+                //
+                //
+                // searching rules
+                //
+                //______________________________________________________________
                 inline vnode *find_in( vlist &l, const string &id ) throw()
                 {
                     for(vnode *vn = l.head; vn; vn=vn->next)
@@ -336,6 +342,12 @@ namespace yocto
                 }
                 
                 
+                //______________________________________________________________
+                //
+                //
+                // output
+                //
+                //______________________________________________________________
                 inline void graphviz(const string &fn) const
                 {
                     ios::ocstream fp(fn,false);
