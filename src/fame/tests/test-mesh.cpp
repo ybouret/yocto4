@@ -12,6 +12,12 @@ namespace {
     {
         std::cerr << "Mesh DIM="   << MESH::DIMENSIONS << std::endl;
         std::cerr << "#vertices="  << mesh.vertices.size << std::endl;
+        for(size_t i=0;i<mesh.dimensions;++i)
+        {
+            std::cerr << "\tlabel"  << i << " = " << mesh.get_label(i) << std::endl;
+            std::cerr << "\tunits"  << i << " = " << mesh.get_units(i) << std::endl;
+
+        }
     }
 }
 
