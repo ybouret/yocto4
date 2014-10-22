@@ -31,8 +31,9 @@ namespace yocto
         }
         
         
-        MeshInfo:: MeshInfo(size_t DIM) :
+        MeshInfo:: MeshInfo(size_t DIM,const string &id) :
         dimensions(DIM),
+        name(id),
         wksp(),
         label(  (string *)wksp,   3),
         units( ((string *)wksp)+3,3)

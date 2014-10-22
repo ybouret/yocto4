@@ -15,15 +15,11 @@ namespace yocto
         public:
             typedef typename Mesh<DIM,T>::Axis Axis;
             
-            explicit RectilinearMesh( arrays &adb ) :
-            Mesh<DIM, T>(adb),
+            explicit RectilinearMesh( arrays &adb, const string &id) :
+            Mesh<DIM, T>(adb,id),
             ap()
             {
-                for(size_t i=0;i<DIM;++i)
-                {
-                    ap[i] = & adb[ get_axis_name(i) ].as<Axis>();
-                }
-                build( int2type<DIM>() );
+                initialize_vertices( adb );
             }
             
             
@@ -46,6 +42,15 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(RectilinearMesh);
             Axis *ap[DIM];
+            
+            inline void initialize_vertices( arrays &adb )
+            {
+                for(size_t i=0;i<DIM;++i)
+                {
+                    ap[i] = & adb[ get_axis_name(i) ].as<Axis>();
+                }
+                build( int2type<DIM>() );
+            }
             
             inline void build( int2type<1> )
             {

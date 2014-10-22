@@ -14,10 +14,11 @@ namespace yocto
         class MeshInfo
         {
         public:
-            explicit MeshInfo(size_t DIM);
+            explicit MeshInfo(size_t DIM, const string &id);
             virtual ~MeshInfo() throw();
             
             const size_t dimensions;
+            const string name;
             
             string       & XLabel() throw();
             const string & XLabel() const throw();
@@ -59,8 +60,8 @@ namespace yocto
             
             Vertices vertices;
             
-            inline   Mesh( arrays &adb ) :
-            MeshInfo(DIM),
+            inline   Mesh( arrays &adb, const string &id ) :
+            MeshInfo(DIM,id),
             vertices()
             {
                 
