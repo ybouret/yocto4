@@ -1,19 +1,43 @@
 #include "yocto/fame/visit.hpp"
 #include "yocto/utest/run.hpp"
 
+#include "yocto/fame/mesh/rectilinear.hpp"
+
 using namespace yocto;
+using namespace fame;
 
 namespace
 {
     
-    
-    
-    class MySim : public VisIt::Simulation
+    class MyData : public arrays
     {
     public:
         
-        explicit MySim() :
-        VisIt::Simulation( *mpi::location() )
+        MyData()
+        {
+            this->store( new array1D<double>("X",layout1D(-5,5)) );
+            this->store( new array1D<double>("Y",layout1D(-6,6)) );
+            this->store( new array1D<double>("Z",layout1D(-7,7)) );
+        }
+        
+        virtual ~MyData() throw() {}
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(MyData);
+        
+    };
+    
+    
+    
+    class MySim : public MyData, public VisIt::Simulation
+    {
+    public:
+        
+        explicit MySim( const mpi &ref) :
+        MyData(),
+        VisIt::Simulation( ref ),
+        m2(*this,"mesh2d"),
+        m3(*this,"mesh3d")
         {
             
         }
@@ -23,9 +47,19 @@ namespace
         //! sending meta data
         virtual void get_meta_data( visit_handle &md ) const
         {
+            //
             add_generic_command("quit",md);
+            
+            // meshes
+            visit::add_mesh_meta_data(md, m2);
+            
+            visit::add_mesh_meta_data(md, m3);
+            
         }
         
+        RectilinearMesh<2,double> m2;
+        RectilinearMesh<3,double> m3;
+
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
@@ -47,7 +81,7 @@ YOCTO_UNIT_TEST_IMPL(fame)
     VisIt::TraceFile trace(MPI,"trace.dat");
     VisIt::SetupParallel(MPI,sim_name,sim_comment,sim_path,NULL);
     
-    MySim sim;
+    MySim sim(MPI);
     
     VisIt::Loop(sim);
     
