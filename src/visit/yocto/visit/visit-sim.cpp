@@ -49,7 +49,9 @@ namespace yocto
             VisIt_SimulationMetaData_addGenericCommand(md, cmd);
         }
         else
+        {
             throw exception("add_generic_command('%s') FAILURE", name.c_str());
+        }
     }
     
     

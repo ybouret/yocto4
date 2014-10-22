@@ -17,7 +17,6 @@ namespace yocto
         if( tkn.get_next(is_space) )
         {
             cmd = tkn.to_string();
-            //std::cerr << "Cmd=<" << cmd << ">" <<std::endl;
             while(tkn.get_next(is_sep) )
             {
                 const string a = tkn.to_string();

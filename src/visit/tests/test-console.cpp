@@ -28,7 +28,7 @@ ui_step_clicked(void *cbdata)
     VisIt::Simulation *sim = (VisIt::Simulation *)cbdata;
     sim->MPI.Printf(stderr,"ui_step_clicked\n");
     sim->runMode = VISIT_SIMMODE_STOPPED;
-    //VisIt::OneStep( *sim );
+    VisIt::OneStep( *sim );
     VisItTimeStepChanged();
 }
 
