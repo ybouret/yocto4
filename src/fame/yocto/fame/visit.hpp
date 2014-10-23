@@ -66,9 +66,7 @@ namespace yocto
                         const typename RectilinearMesh<DIM,T>::Axis &a = mesh.get_axis(i);
                         hook_data(hh,a.items,a.entry);
                     }
-                    
                     set_coordinates(h, hc, int2type<DIM>() );
-                    
                 }
                 return h;
             }
