@@ -91,7 +91,7 @@ namespace yocto
         protected:
             inline explicit linear(const string &user_name,
                                    const LAYOUT &L,
-                                   void *user_data ) :
+                                   void         *user_data ) :
             LAYOUT(L),
             linear_space(user_name,
                          this->items * sizeof(T),

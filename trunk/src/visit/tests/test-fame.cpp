@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 
 #include "yocto/fame/mesh/rectilinear.hpp"
+#include "yocto/fame/box.hpp"
 
 using namespace yocto;
 using namespace fame;
@@ -39,7 +40,8 @@ namespace
         m2(*this,"mesh2d"),
         m3(*this,"mesh3d")
         {
-            
+            box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
+            B.map<double>(*this);
         }
         
         virtual ~MySim() throw() {}
@@ -56,6 +58,24 @@ namespace
             visit::add_mesh_meta_data(md, m3);
             
         }
+        
+        
+        virtual visit_handle get_mesh( int domain, const string &name) const
+        {
+            
+            if(name=="mesh2d")
+            {
+                return visit::get_mesh(m2);
+            }
+            
+            if(name=="mesh3d")
+            {
+                return visit::get_mesh(m3);
+            }
+            
+            return VISIT_INVALID_HANDLE;
+        }
+        
         
         RectilinearMesh<2,double> m2;
         RectilinearMesh<3,double> m3;

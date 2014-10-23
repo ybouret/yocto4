@@ -22,7 +22,7 @@ namespace yocto
                     case 3:
                         VisIt_MeshMetaData_setZUnits(mmd, mesh.ZUnits().c_str() );
                         VisIt_MeshMetaData_setZLabel(mmd, mesh.ZLabel().c_str() );
-
+                        
                     case 2:
                         VisIt_MeshMetaData_setYUnits(mmd, mesh.YUnits().c_str() );
                         VisIt_MeshMetaData_setYLabel(mmd, mesh.YLabel().c_str() );
@@ -51,10 +51,49 @@ namespace yocto
                 }
             }
             
+            template <size_t DIM,typename T> static inline
+            visit_handle get_mesh( const RectilinearMesh<DIM,T> &mesh )
+            {
+                visit_handle h = VISIT_INVALID_HANDLE;
+                
+                if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
+                {
+                    visit_handle hc[DIM];
+                    for(size_t i=0;i<DIM;++i)
+                    {
+                        visit_handle &hh = hc[i];
+                        VisIt_VariableData_alloc( &hh );
+                        const typename RectilinearMesh<DIM,T>::Axis &a = mesh.get_axis(i);
+                        hook_data(hh,a.items,a.entry);
+                    }
+                    
+                    set_coordinates(h, hc, int2type<DIM>() );
+                    
+                }
+                return h;
+            }
             
             
         private:
+            static inline void hook_data(visit_handle &h, size_t num, float *reg)
+            {
+                VisIt_VariableData_setDataF(h, VISIT_OWNER_SIM, 1, num, reg);
+            }
             
+            static inline void hook_data(visit_handle &h, size_t num, double *reg)
+            {
+                VisIt_VariableData_setDataD(h, VISIT_OWNER_SIM, 1, num, reg);
+            }
+
+            static inline void set_coordinates(visit_handle &h, visit_handle *hc, int2type<2>)
+            {
+                VisIt_RectilinearMesh_setCoordsXY(h,hc[0], hc[1]);
+            }
+            
+            static inline void set_coordinates(visit_handle &h, visit_handle *hc, int2type<3>)
+            {
+                VisIt_RectilinearMesh_setCoordsXYZ(h,hc[0], hc[1], hc[2]);
+            }
         };
         
     }
