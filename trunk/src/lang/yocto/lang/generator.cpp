@@ -15,6 +15,8 @@ namespace yocto
         generator:: generator() :
         parser("generator","scanning")
         {
+            
+            
             //__________________________________________________________________
             //
             // Generator Grammar
@@ -27,6 +29,12 @@ namespace yocto
             Terminal  &CHAR   = terminal("CHAR","'.'");
             Aggregate &RULE   = assemble("RULE");
             
+            
+            
+            //__________________________________________________________________
+            //
+            // Make rules
+            //__________________________________________________________________
             RULE += ID;
             RULE += COLON;
             
