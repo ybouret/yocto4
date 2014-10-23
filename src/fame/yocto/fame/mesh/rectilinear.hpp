@@ -36,7 +36,11 @@ namespace yocto
             inline const Axis &Z() const throw() { assert(DIM>=3); return *ap[2]; }
             inline Axis       &Z() throw()       { assert(DIM>=3); return *ap[2]; }
             
-            
+            const Axis &get_axis(size_t dim) const throw()
+            {
+                assert(dim<DIM);
+                return *ap[dim];
+            }
             
             
         private:
