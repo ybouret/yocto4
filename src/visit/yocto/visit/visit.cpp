@@ -1,5 +1,6 @@
 #include "yocto/visit/visit.hpp"
 
+#include <cstdlib>
 
 namespace yocto
 {

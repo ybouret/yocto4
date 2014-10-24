@@ -1,5 +1,5 @@
 #include "yocto/visit/visit.hpp"
-
+#include <cstdarg>
 
 namespace yocto
 {
