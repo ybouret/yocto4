@@ -6,20 +6,29 @@
 
 using namespace yocto;
 using namespace fame;
+using namespace math;
 
 namespace
 {
-    
-    class MyData : public arrays
+    typedef array2D<double>       ScalarField2D;
+    typedef array2D<v2d<double> > VectorField2D;
+
+    class MyData : public layout3D, public arrays
     {
     public:
+        const layout2D l2;
         
-        MyData()
+        MyData() : layout3D( coord3D(-5,-6,-7), coord3D(5,6,7 ) ),
+        l2( coord2D(lower.x,lower.y), coord2D(upper.x,upper.y) )
         {
-            this->store( new array1D<double>("X",layout1D(-5,5)) );
-            this->store( new array1D<double>("Y",layout1D(-6,6)) );
-            this->store( new array1D<double>("Z",layout1D(-7,7)) );
+            this->store( new array1D<double>("X",layout1D(lower.x,upper.x)) );
+            this->store( new array1D<double>("Y",layout1D(lower.y,upper.y)) );
+            this->store( new array1D<double>("Z",layout1D(lower.z,upper.z)) );
+            this->store( new ScalarField2D("A2",l2) );
+            this->store( new VectorField2D("V2",l2) );
         }
+        
+
         
         virtual ~MyData() throw() {}
         
@@ -38,7 +47,9 @@ namespace
         MyData(),
         VisIt::Simulation( ref ),
         m2(*this,"mesh2d"),
-        m3(*this,"mesh3d")
+        m3(*this,"mesh3d"),
+        A2( (*this)["A2"].as<ScalarField2D>() ),
+        V2( (*this)["V2"].as<VectorField2D>() )
         {
             box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
             B.map<double>(*this);
@@ -56,6 +67,8 @@ namespace
             visit::add_mesh_meta_data(md, m2);
             
             visit::add_mesh_meta_data(md, m3);
+            
+            // data
             
         }
         
@@ -79,7 +92,8 @@ namespace
         
         RectilinearMesh<2,double> m2;
         RectilinearMesh<3,double> m3;
-
+        ScalarField2D            &A2;
+        VectorField2D            &V2;
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
