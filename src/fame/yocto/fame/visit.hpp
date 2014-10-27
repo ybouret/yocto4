@@ -59,7 +59,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // declaring data
+            // declaring variable meta data
             //__________________________________________________________________
             template <typename ARRAY> static inline
             void add_variable_meta_data(visit_handle &md,
@@ -78,6 +78,11 @@ namespace yocto
                 }
             }
             
+            
+            //__________________________________________________________________
+            //
+            // sending variable data
+            //__________________________________________________________________
             template <typename ARRAY> static inline
             visit_handle get_variable_data( int ndomain, const ARRAY &a )
             {
@@ -92,6 +97,10 @@ namespace yocto
                 return h;
             }
             
+            //__________________________________________________________________
+            //
+            // declaring curve meta data
+            //__________________________________________________________________
             
             
             
