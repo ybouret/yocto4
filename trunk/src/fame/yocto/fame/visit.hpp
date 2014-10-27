@@ -78,6 +78,22 @@ namespace yocto
                 }
             }
             
+            template <typename ARRAY> static inline
+            visit_handle get_variable_data( int ndomain, const ARRAY &a )
+            {
+                visit_handle h = VISIT_INVALID_HANDLE;
+                if( VisIt_VariableData_alloc(&h) == VISIT_OKAY )
+                {
+                    set_variable_data(h,
+                                      type2type< typename ARRAY::type>(),
+                                      a.entry,
+                                      a.items);
+                }
+                return h;
+            }
+            
+            
+            
             
         private:
             //__________________________________________________________________
@@ -146,7 +162,14 @@ namespace yocto
             {
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR );
             }
-           
+            
+            static inline
+            void set_variable_meta_data( visit_handle &vmd, type2type<int> )
+            {
+                VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_SCALAR );
+            }
+            
+            
             static inline
             void set_variable_meta_data( visit_handle &vmd, type2type< math::v2d<float> > )
             {
@@ -160,7 +183,7 @@ namespace yocto
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_VECTOR );
                 VisIt_VariableMetaData_setNumComponents(vmd, 2);
             }
-
+            
             static inline
             void set_variable_meta_data( visit_handle &vmd, type2type< math::v3d<float> > )
             {
@@ -174,6 +197,71 @@ namespace yocto
                 VisIt_VariableMetaData_setType(vmd, VISIT_VARTYPE_VECTOR );
                 VisIt_VariableMetaData_setNumComponents(vmd, 3);
             }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type<float>,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataF(h,VISIT_OWNER_SIM, 1, items, (float *)entry);
+            }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type<double>,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataD(h,VISIT_OWNER_SIM, 1, items, (double *)entry);
+            }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type<int>,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataI(h,VISIT_OWNER_SIM, 1, items, (int *)entry);
+            }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type< math::v2d<float> >,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataF(h,VISIT_OWNER_SIM, 2, items, (float *)entry);
+            }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type< math::v2d<double> >,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataD(h,VISIT_OWNER_SIM, 2, items, (double *)entry);
+            }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type< math::v3d<float> >,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataF(h,VISIT_OWNER_SIM, 3, items, (float *)entry);
+            }
+            
+            static inline
+            void set_variable_data(visit_handle &h,
+                                   type2type< math::v3d<double> >,
+                                   const void  *entry,
+                                   const size_t items)
+            {
+                VisIt_VariableData_setDataD(h,VISIT_OWNER_SIM, 3, items, (double *)entry);
+            }
+
+
             
             
         };
