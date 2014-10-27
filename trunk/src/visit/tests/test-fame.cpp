@@ -58,8 +58,13 @@ namespace
         A2( (*this)["A2"].as<ScalarField2D>() ),
         V2( (*this)["V2"].as<VectorField2D>() ),
         A3( (*this)["A3"].as<ScalarField3D>() ),
-        V3( (*this)["V3"].as<VectorField3D>() )
+        V3( (*this)["V3"].as<VectorField3D>() ),
+        curv("the_curve"),
+        cx("cx",layout1D(lower.x,upper.x)),
+        cy("cy",cx)
         {
+            assert(cx.items==cy.items);
+            
             box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
             B.map<double>(*this);
             
@@ -120,6 +125,10 @@ namespace
          
             visit::add_variable_meta_data(md, V3, m3.name);
 
+            // curv
+            visit:: add_curv_meta_data(md, curv);
+            
+            
         }
         
         
@@ -165,6 +174,26 @@ namespace
             return VISIT_INVALID_HANDLE;
         }
         
+        virtual visit_handle get_curve( const string &name ) const
+        {
+            
+            if(name == "the_curve" )
+            {
+                return visit::get_curv(cx, cy);
+            }
+            return VISIT_INVALID_HANDLE;
+        }
+        
+        virtual void step()
+        {
+            runTime = cycle;
+            for(unit_t i=cx.lower;i<=cx.upper;++i)
+            {
+                cx[i] = static_cast<float>(m2.X()[i]);
+                cy[i] = sin( cx[i] + 0.1 * runTime );
+            }
+        }
+        
         
         RectilinearMesh<2,double> m2;
         RectilinearMesh<3,double> m3;
@@ -172,7 +201,10 @@ namespace
         VectorField2D            &V2;
         ScalarField3D            &A3;
         VectorField3D            &V3;
-
+        CurvInfo                  curv;
+        array1D<float>            cx;
+        array1D<float>            cy;
+        
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
     };
@@ -194,6 +226,7 @@ YOCTO_UNIT_TEST_IMPL(fame)
     VisIt::SetupParallel(MPI,sim_name,sim_comment,sim_path,NULL);
     
     MySim sim(MPI);
+    sim.step();
     
     VisIt::Loop(sim);
     

@@ -17,6 +17,8 @@ namespace yocto
             virtual ~CurvInfo() throw();
             
             const string name;
+            string       XLabel;
+            string       YLabel;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(CurvInfo);
