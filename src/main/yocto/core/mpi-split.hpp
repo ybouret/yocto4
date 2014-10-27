@@ -11,7 +11,7 @@ namespace yocto
         inline void mpi_split(size_t rank,
                               size_t size,
                               T     &offset,
-                              T     &length)
+                              T     &length) throw()
         {
             assert(size>0);
             assert(rank<size);
