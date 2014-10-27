@@ -87,7 +87,7 @@ namespace
                         const double x  = m3.X()[i];
                         const double mg = exp(-(x*x+y*y+z*z)/2 );
                         A3[k][j][i]     = mg;
-                        v3d<double> &v = V3[k][k][i];
+                        v3d<double> &v = V3[k][j][i];
                         v.x = mg;
                         v.y = mg/2;
                         v.z = mg/3;
@@ -117,7 +117,9 @@ namespace
             visit::add_variable_meta_data(md, V2, m2.name);
             
             visit::add_variable_meta_data(md, A3, m3.name);
-            
+         
+            visit::add_variable_meta_data(md, V3, m3.name);
+
         }
         
         
@@ -153,6 +155,11 @@ namespace
             if( name == "A3" )
             {
                 return visit::get_variable_data(ndomain, A3);
+            }
+            
+            if( name == "V3" )
+            {
+                return visit::get_variable_data(ndomain, V3);
             }
             
             return VISIT_INVALID_HANDLE;
