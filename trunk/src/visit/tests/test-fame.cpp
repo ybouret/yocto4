@@ -13,7 +13,10 @@ namespace
 {
     typedef array2D<double>       ScalarField2D;
     typedef array2D<v2d<double> > VectorField2D;
-
+    
+    typedef array3D<double>       ScalarField3D;
+    typedef array3D<v3d<double> > VectorField3D;
+    
     class MyData : public layout3D, public arrays
     {
     public:
@@ -27,9 +30,10 @@ namespace
             this->store( new array1D<double>("Z",layout1D(lower.z,upper.z)) );
             this->store( new ScalarField2D("A2",l2) );
             this->store( new VectorField2D("V2",l2) );
+            this->store( new ScalarField3D("A3",*this) );
         }
         
-
+        
         
         virtual ~MyData() throw() {}
         
@@ -50,7 +54,8 @@ namespace
         m2(*this,"mesh2d"),
         m3(*this,"mesh3d"),
         A2( (*this)["A2"].as<ScalarField2D>() ),
-        V2( (*this)["V2"].as<VectorField2D>() )
+        V2( (*this)["V2"].as<VectorField2D>() ),
+        A3( (*this)["A3"].as<ScalarField3D>() )
         {
             box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
             B.map<double>(*this);
@@ -64,9 +69,25 @@ namespace
                     const double mg =exp(-(x*x+y*y)/2 );
                     A2[j][i]   = mg;
                     V2[j][i].x = mg;
-                    V2[j][i].y = sin(3*y);
+                    V2[j][i].y = sin(3*(y+x));
                 }
             }
+            
+            for(unit_t k=A3.lower.z;k<=A3.upper.z;++k)
+            {
+                const double z = m3.Z()[k];
+                for(unit_t j=A3.lower.y;j<=A3.upper.y;++j)
+                {
+                    const double y = m3.Y()[j];
+                    for(unit_t i=A3.lower.x;i<=A3.upper.x;++i)
+                    {
+                        const double x  = m3.X()[i];
+                        const double mg = exp(-(x*x+y*y+z*z)/2 );
+                        A3[k][j][i]     = mg;
+                    }
+                }
+            }
+            
             
         }
         
@@ -87,7 +108,9 @@ namespace
             visit::add_variable_meta_data(md, A2, m2.name);
             
             visit::add_variable_meta_data(md, V2, m2.name);
-
+            
+            visit::add_variable_meta_data(md, A3, m3.name);
+            
         }
         
         
@@ -119,7 +142,11 @@ namespace
             {
                 return visit::get_variable_data(ndomain, V2);
             }
-
+            
+            if( name == "A3" )
+            {
+                return visit::get_variable_data(ndomain, A3);
+            }
             
             return VISIT_INVALID_HANDLE;
         }
@@ -129,6 +156,7 @@ namespace
         RectilinearMesh<3,double> m3;
         ScalarField2D            &A2;
         VectorField2D            &V2;
+        ScalarField3D            &A3;
         
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
