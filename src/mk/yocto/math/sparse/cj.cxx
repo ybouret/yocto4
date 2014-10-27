@@ -116,7 +116,7 @@ namespace yocto
             assert(A.rows==b.size());
             assert(A.cols==p.size());
             
-            static const real_t ftol = 1e-5;
+            static const real_t ftol = REAL(1e-5);
             
             const size_t n = p.size();
             g.make(n,0);
