@@ -3,6 +3,8 @@
 
 #include "yocto/visit/visit.hpp"
 #include "yocto/fame/mesh/rectilinear.hpp"
+#include "yocto/fame/curv.hpp"
+
 
 namespace yocto
 {
@@ -101,6 +103,40 @@ namespace yocto
             //
             // declaring curve meta data
             //__________________________________________________________________
+            static inline
+            void add_curv_meta_data(visit_handle   &md,
+                                    const CurvInfo &curv
+                                    )
+            {
+                visit_handle h = VISIT_INVALID_HANDLE;
+                if( VisIt_CurveMetaData_alloc(&h) == VISIT_OKAY )
+                {
+                    VisIt_CurveMetaData_setName(h,   curv.name.c_str()   );
+                    VisIt_CurveMetaData_setXLabel(h, curv.XLabel.c_str() );
+                    VisIt_CurveMetaData_setYLabel(h, curv.YLabel.c_str() );
+                    
+                    VisIt_SimulationMetaData_addCurve(md, h);
+                }
+            }
+            
+            template <typename T> static inline
+            visit_handle get_curv( const array1D<T> &cx, const array1D<T> &cy )
+            {
+                visit_handle h = VISIT_INVALID_HANDLE;
+                
+                if( (cx.items == cy.items) && VisIt_CurveData_alloc(&h) == VISIT_OKAY )
+                {
+                    visit_handle hxc, hyc;
+                    VisIt_VariableData_alloc(&hxc);
+                    VisIt_VariableData_alloc(&hyc);
+                    hook_data(hxc, cx.items, cx.entry);
+                    hook_data(hyc, cy.items, cy.entry);
+                    VisIt_CurveData_setCoordsXY(h, hxc, hyc);
+                    return h;
+                }
+                return h;
+            }
+            
             
             
             
