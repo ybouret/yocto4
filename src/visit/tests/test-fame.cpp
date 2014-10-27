@@ -22,7 +22,7 @@ namespace
     public:
         const layout2D l2;
         
-        MyData() : layout3D( coord3D(-5,-6,-7), coord3D(5,6,7 ) ),
+        MyData() : layout3D( coord3D(-20,-15,-10), coord3D(20,15,10 ) ),
         l2( coord2D(lower.x,lower.y), coord2D(upper.x,upper.y) )
         {
             this->store( new array1D<double>("X",layout1D(lower.x,upper.x)) );
