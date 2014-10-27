@@ -3,6 +3,7 @@
 
 #include "yocto/fame/mesh/rectilinear.hpp"
 #include "yocto/fame/box.hpp"
+#include <cmath>
 
 using namespace yocto;
 using namespace fame;
@@ -53,6 +54,20 @@ namespace
         {
             box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
             B.map<double>(*this);
+            
+            for(unit_t j=A2.lower.y;j<=A2.upper.y;++j)
+            {
+                const double y = m2.Y()[j];
+                for(unit_t i=A2.lower.x;i<=A2.upper.x;++i)
+                {
+                    const double x = m2.X()[i];
+                    const double mg =exp(-(x*x+y*y)/2 );
+                    A2[j][i]   = mg;
+                    V2[j][i].x = mg;
+                    V2[j][i].y = sin(3*y);
+                }
+            }
+            
         }
         
         virtual ~MySim() throw() {}
@@ -69,7 +84,10 @@ namespace
             visit::add_mesh_meta_data(md, m3);
             
             // data
+            visit::add_variable_meta_data(md, A2, m2.name);
             
+            visit::add_variable_meta_data(md, V2, m2.name);
+
         }
         
         
@@ -85,6 +103,23 @@ namespace
             {
                 return visit::get_mesh(m3);
             }
+            
+            return VISIT_INVALID_HANDLE;
+        }
+        
+        virtual visit_handle get_variable( int ndomain, const string &name ) const
+        {
+            
+            if( name == "A2" )
+            {
+                return visit::get_variable_data(ndomain, A2);
+            }
+            
+            if( name == "V2" )
+            {
+                return visit::get_variable_data(ndomain, V2);
+            }
+
             
             return VISIT_INVALID_HANDLE;
         }
