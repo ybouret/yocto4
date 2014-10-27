@@ -274,8 +274,8 @@ namespace yocto {
                             const real_t moved = Fabs(xm-xu);
                             const real_t width = Fabs(x.c - x.a);
                             const real_t ratio = moved/width;
-                            //std::cerr << "\t\tratio=" << ratio << std::endl;
-                            if(ratio>REAL(0.5))
+                            std::cerr << "\t\tratio=" << ratio << std::endl;
+                            if(ratio>REAL(0.25))
                             {
                                 goto FAILSAFE;
                             }
@@ -391,7 +391,7 @@ namespace yocto {
             
             while( max_of<real_t>(x.c-x.a,0) > max_of(ftol*Fabs(x.b),XTOL) )
             {
-                minstep(func,x,f);
+                minstep_para(func,x,f);
             }
             
         }
