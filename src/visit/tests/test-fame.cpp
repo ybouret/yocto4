@@ -31,6 +31,8 @@ namespace
             this->store( new ScalarField2D("A2",l2) );
             this->store( new VectorField2D("V2",l2) );
             this->store( new ScalarField3D("A3",*this) );
+            this->store( new VectorField3D("V3",*this) );
+
         }
         
         
@@ -55,7 +57,8 @@ namespace
         m3(*this,"mesh3d"),
         A2( (*this)["A2"].as<ScalarField2D>() ),
         V2( (*this)["V2"].as<VectorField2D>() ),
-        A3( (*this)["A3"].as<ScalarField3D>() )
+        A3( (*this)["A3"].as<ScalarField3D>() ),
+        V3( (*this)["V3"].as<VectorField3D>() )
         {
             box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
             B.map<double>(*this);
@@ -84,6 +87,10 @@ namespace
                         const double x  = m3.X()[i];
                         const double mg = exp(-(x*x+y*y+z*z)/2 );
                         A3[k][j][i]     = mg;
+                        v3d<double> &v = V3[k][k][i];
+                        v.x = mg;
+                        v.y = mg/2;
+                        v.z = mg/3;
                     }
                 }
             }
@@ -157,7 +164,8 @@ namespace
         ScalarField2D            &A2;
         VectorField2D            &V2;
         ScalarField3D            &A3;
-        
+        VectorField3D            &V3;
+
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
     };
