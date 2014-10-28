@@ -19,10 +19,10 @@ inline CLASS(const CLASS &other) : \
 N1(other.N1), N2(other.N2) {}\
 inline ~CLASS() throw() {} \
 friend inline \
-std::ostream & operator<<( std::ostream &os, const CLASS &self )\
+std::ostream & operator<<( std::ostream &pair_os, const CLASS &self )\
 {\
-os << '(' << self.N1 << ',' << self.N2 << ')';\
-return os;\
+pair_os << '(' << self.N1 << ',' << self.N2 << ')';\
+return pair_os;\
 }\
 T1 N1;\
 T2 N2
