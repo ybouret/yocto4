@@ -26,9 +26,10 @@ YOCTO_UNIT_TEST_IMPL(split)
     {
         std::cerr << std::endl;
         std::cerr << "size="  << size << " : full= " << l2 << std::endl;
-        for(int rank=0;rank<1;++rank)
+        for(int rank=0;rank<size;++rank)
         {
             const layout2D l = Split(l2, rank, size, true, lx, true, ly);
+            std::cerr << "\trank=" << rank << " : " << l << ",\txlinks=" <<lx << ",\tylinks=" << ly << std::endl;
         }
     }
     
