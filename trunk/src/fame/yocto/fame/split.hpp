@@ -31,6 +31,12 @@ namespace yocto
                 return os;
             }
             
+            void set_rank(int r) throw()
+            {
+                assert(r>=0);
+                (int&)rank = r;
+            }
+            
         private:
             YOCTO_DISABLE_ASSIGN(Link);
         };
@@ -62,6 +68,10 @@ namespace yocto
                 os << " ]]";
                 return os;
             }
+            
+            Link       & operator[](size_t i) throw()       { assert(i<count); return link[i]; }
+            const Link & operator[](size_t i) const throw() { assert(i<count); return link[i]; }
+            
             
         private:
             Link link[2];
