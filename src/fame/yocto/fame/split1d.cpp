@@ -39,13 +39,16 @@ namespace yocto
             assert(rank>=0);
             assert(size>0);
             links.reset();
+            if(size>full_layout.items)
+            {
+                throw libc::exception( EDOM, "layout is too small");
+            }
             
             if(size>1)
             {
                 unit_t offset = full_layout.lower;
                 unit_t length = full_layout.items;
-                if(length<=0)
-                    throw libc::exception( EDOM, "layout is too small");
+                assert(length>0);
                 core::mpi_split(rank, size, offset, length);
                 if(rank==0)
                 {

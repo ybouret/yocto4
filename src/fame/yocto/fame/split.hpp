@@ -68,13 +68,20 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(Links);
         };
         
+        
         layout1D Split(const layout1D &full_layout,
                        int             rank,
                        int             size,
                        bool            pbc,
                        Links          &links);
         
-        
+        layout2D Split(const layout2D &full_layout,
+                       int rank,
+                       int size,
+                       bool   xpbc,
+                       Links &xlinks,
+                       bool   ypbc,
+                       Links &ylinks);
         
     }
     
