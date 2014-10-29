@@ -67,8 +67,10 @@ namespace yocto
                        bool    xpbc,
                        Links & xlinks,
                        bool    ypbc,
-                       Links & ylinks)
+                       Links & ylinks,
+                       int    *ranks)
         {
+            
             //__________________________________________________________________
             //
             // Extracting full 1D layouts
@@ -91,13 +93,18 @@ namespace yocto
             const int rx = rank % nx;
             assert(ry*nx+rx==rank);
             //std::cerr << "rank="  << rank << " => rx=" << rx << ", ry=" << ry << std::endl;
+            if(ranks)
+            {
+                ranks[0] = rx;
+                ranks[1] = ry;
+            }
             
             //__________________________________________________________________
             //
             // 1 D split in x, and compute effective rank
             //__________________________________________________________________
-
-            const layout1D xl = Split(xfull,rx,nx,xpbc,xlinks);
+            
+            const layout1D xl = Split(xfull,rx,nx,xpbc,xlinks,NULL);
             for(size_t i=0; i<xlinks.count; ++i)
             {
                 xlinks[i].set_rank( ry * nx + xlinks[i].rank );
@@ -108,7 +115,7 @@ namespace yocto
             //
             // 1 D split in y, and compute effective rank
             //__________________________________________________________________
-            const layout1D yl = Split(yfull,ry,ny,ypbc,ylinks);
+            const layout1D yl = Split(yfull,ry,ny,ypbc,ylinks,NULL);
             for(size_t i=0;i<ylinks.count;++i)
             {
                 ylinks[i].set_rank( ylinks[i].rank * nx + rx );
