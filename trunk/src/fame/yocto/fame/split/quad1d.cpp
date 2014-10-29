@@ -94,6 +94,23 @@ namespace yocto
             return layout1D(offset,(offset+length)-1);
         }
         
+        
+        layout1D quad1d:: outline(const layout1D   &sub,
+                                  const int         rank,
+                                  const quad_links &links,
+                                  const int         ng)
+        {
+            if(ng<=0)
+            {
+                return sub;
+            }
+            else
+            {
+                
+                return sub;
+            }
+        }
+        
     }
     
 }
