@@ -20,6 +20,13 @@ namespace yocto
             rank = l.rank;
             return *this;
         }
+       
+        std::ostream & operator<<(std::ostream &os, const quad_link &l)
+        {
+            os << l.rank << "@" << ((l.pos==quad_link::is_prev) ? "prev" : "next");
+            return os;
+        }
+        
         
     }
     
@@ -61,9 +68,21 @@ namespace yocto
             assert(i<count);
             return link[i];
         }
-
-
         
+        void quad_links::reset() throw() { (size_t&)count=0; }
+        
+        
+        std::ostream & operator<<(std::ostream &os, const quad_links &l)
+        {
+            os << "[[";
+            for(size_t i=0;i<l.count;++i)
+            {
+                os << ' ' << l.link[i];
+            }
+            os << " ]]";
+            return os;
+        }
+
         
     }
 }

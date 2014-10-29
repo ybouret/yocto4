@@ -24,6 +24,10 @@ namespace yocto
             ~quad_link() throw();
             quad_link(const quad_link &) throw();
             quad_link &operator=(const quad_link &) throw();
+            
+            friend std::ostream & operator<<(std::ostream &,const quad_link &);
+            
+            
         };
         
         //! quad links in one direction
@@ -38,6 +42,10 @@ namespace yocto
             
             quad_link & operator[](size_t i) throw();
             const quad_link & operator[](size_t i) const throw();
+            void reset() throw();
+            
+            friend std::ostream & operator<<(std::ostream &,const quad_links &);
+
             
         private:
             quad_link link[2];
