@@ -29,11 +29,11 @@ namespace yocto
         }
         
         
-        layout1D quad_split(const layout1D &full,
-                            const int       rank,
-                            const int       size,
-                            const bool      pbc,
-                            quad_links     &links )
+        layout1D quad1d::split(const layout1D &full,
+                               const int       rank,
+                               const int       size,
+                               const bool      pbc,
+                               quad_links     &links )
         {
             
             assert(size>0);

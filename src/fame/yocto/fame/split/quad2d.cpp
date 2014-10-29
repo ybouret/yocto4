@@ -39,15 +39,15 @@ namespace yocto
             
         }
         
-        layout2D quad_split(const layout2D &full,
-                            const int       rank,
-                            const int       size,
-                            const bool      xpbc,
-                            quad_links     &xlinks,
-                            const bool      ypbc,
-                            quad_links     &ylinks,
-                            coord2D        &ranks,
-                            coord2D        &sizes)
+        layout2D quad2d:: split(const layout2D &full,
+                                const int       rank,
+                                const int       size,
+                                const bool      xpbc,
+                                quad_links     &xlinks,
+                                const bool      ypbc,
+                                quad_links     &ylinks,
+                                coord2D        &ranks,
+                                coord2D        &sizes)
         {
             
             assert(size>0);
@@ -57,7 +57,7 @@ namespace yocto
             const unit_t Ny = full.width.y;
             
             find_sizes(sizes,Nx,Ny,size);
-        
+            
             //__________________________________________________________________
             //
             // rank = nx * ry + rx
@@ -76,7 +76,7 @@ namespace yocto
             // 1D X split
             //__________________________________________________________________
             const layout1D xfull(full.lower.x,full.upper.x);
-            const layout1D xsub = quad_split(xfull, rx, nx, xpbc, xlinks);
+            const layout1D xsub = quad1d::split(xfull, rx, nx, xpbc, xlinks);
             for(size_t i=0;i<xlinks.count;++i)
             {
                 xlinks[i].rank = nx * ry + xlinks[i].rank;
@@ -87,7 +87,7 @@ namespace yocto
             // 1D Y split
             //__________________________________________________________________
             const layout1D yfull(full.lower.y,full.upper.y);
-            const layout1D ysub = quad_split(yfull, ry, ny, ypbc, ylinks);
+            const layout1D ysub = quad1d::split(yfull, ry, ny, ypbc, ylinks);
             for(size_t i=0;i<ylinks.count;++i)
             {
                 ylinks[i].rank = nx * ylinks[i].rank + rx;
