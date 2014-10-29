@@ -9,6 +9,7 @@ namespace yocto
     namespace fame
     {
         
+        //! information for one link
         class Link
         {
         public:
@@ -41,6 +42,7 @@ namespace yocto
             YOCTO_DISABLE_ASSIGN(Link);
         };
         
+        //! links in one direction
         class Links
         {
         public:
@@ -79,19 +81,26 @@ namespace yocto
         };
         
         
+        
+
+        
+        //! create a 1D sub layout
         layout1D Split(const layout1D &full_layout,
                        int             rank,
                        int             size,
                        bool            pbc,
-                       Links          &links);
+                       Links          &links,
+                       int            *ranks);
         
+        //! create a 2D sub layout
         layout2D Split(const layout2D &full_layout,
-                       int rank,
-                       int size,
-                       bool   xpbc,
-                       Links &xlinks,
-                       bool   ypbc,
-                       Links &ylinks);
+                       int             rank,
+                       int             size,
+                       bool            xpbc,
+                       Links          &xlinks,
+                       bool            ypbc,
+                       Links          &ylinks,
+                       int            *ranks);
         
     }
     
