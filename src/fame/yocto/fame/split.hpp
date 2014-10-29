@@ -96,6 +96,12 @@ namespace yocto
                        Links          &links,
                        int            *ranks);
         
+        //! create the outline for num ghosts and links
+        layout1D Outline(const layout1D &inside,
+                         const Links    &links,
+                         const size_t    ng);
+        
+        
         //! create a 2D sub layout
         layout2D Split(const layout2D &full_layout,
                        int             rank,
