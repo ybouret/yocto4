@@ -20,7 +20,7 @@ YOCTO_UNIT_TEST_IMPL(split)
             std::cerr << "size=" << size << ", full=" << l1 << std::endl;
             for(int rank=0;rank<size;++rank)
             {
-                const layout1D s = quad_split(l1, rank, size, true,xlinks);
+                const layout1D s = quad1d::split(l1, rank, size, true,xlinks);
                 std::cerr << "\trank=" << rank << ",\t sub=" << s << ",\t links=" << xlinks << std::endl;
             }
         }
@@ -38,7 +38,7 @@ YOCTO_UNIT_TEST_IMPL(split)
             std::cerr << "size=" << size << ", full=" << l2 << std::endl;
             for(int rank=0;rank<size;++rank)
             {
-                const layout2D s = quad_split(l2, rank, size, true,xlinks, true,ylinks,ranks,sizes);
+                const layout2D s = quad2d::split(l2, rank, size, true,xlinks, true,ylinks,ranks,sizes);
                 std::cerr << "\trank = " << rank << " : " << ranks << " / " << sizes << ", sub=" << s
                 << " xlinks=" << xlinks << ", ylinks=" << ylinks
                 << std::endl;

@@ -9,16 +9,19 @@ namespace yocto
     
     namespace fame
     {
-        
-        layout2D quad_split(const layout2D &full,
-                            const int       rank,
-                            const int       size,
-                            const bool      xpbc,
-                            quad_links     &xlinks,
-                            const bool      ypbc,
-                            quad_links     &ylinks,
-                            coord2D        &ranks,
-                            coord2D        &sizes);
+        struct quad2d
+        {
+            static
+            layout2D split(const layout2D &full,
+                           const int       rank,
+                           const int       size,
+                           const bool      xpbc,
+                           quad_links     &xlinks,
+                           const bool      ypbc,
+                           quad_links     &ylinks,
+                           coord2D        &ranks,
+                           coord2D        &sizes);
+        };
         
     }
     

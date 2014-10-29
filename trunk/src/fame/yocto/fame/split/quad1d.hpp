@@ -10,11 +10,17 @@ namespace yocto
     namespace fame
     {
         
-        layout1D quad_split(const layout1D &full,
-                            const int       rank,
-                            const int       size,
-                            const bool      pbc,
-                            quad_links     &links );
+        struct quad1d
+        {
+            static
+            layout1D split(const layout1D &full,
+                           const int       rank,
+                           const int       size,
+                           const bool      pbc,
+                           quad_links     &links );
+            
+        };
+        
         
     }
     
