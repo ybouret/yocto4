@@ -19,6 +19,11 @@ namespace yocto
                            const bool      pbc,
                            quad_links     &links );
             
+            static
+            layout1D outline(const layout1D   &sub,
+                             const int         rank,
+                             const quad_links &links,
+                             const int         ng);
         };
         
         
