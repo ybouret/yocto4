@@ -95,11 +95,13 @@ namespace yocto
         }
         
         
-        layout1D quad1d:: outline_of(const layout1D   &sub,
-                                     const int         rank,
-                                     const quad_links &links,
-                                     const int         ng)
+        layout1D quad1d:: outline_of(const layout1D     &sub,
+                                     const int           rank,
+                                     const quad_links   &links,
+                                     const int           ng,
+                                     local_ghosts::list &lg)
         {
+            lg.clear();
             if(ng<=0)
             {
                 // shouldn't be...
@@ -176,7 +178,10 @@ namespace yocto
                         //
                         // exchange data for pbc
                         //______________________________________________________
-                        
+                        const layout1D source_layout(source_lower[i],source_upper[i]);
+                        const layout1D target_layout(target_lower[i],target_upper[i]);
+                        std::cerr << "new local ghost: " << source_layout << " --> " << target_layout << std::endl;
+                        lg.push_back( new local_quad_ghosts<1>(outline,source_layout,target_layout));
                     }
                     else
                     {

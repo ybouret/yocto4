@@ -12,6 +12,9 @@ namespace yocto
         
         struct quad1d
         {
+            typedef local_quad_ghosts<1> local_ghosts;
+            
+            //! links are always order prev->next
             static
             layout1D split(const layout1D &full,
                            const int       rank,
@@ -20,10 +23,11 @@ namespace yocto
                            quad_links     &links );
             
             static
-            layout1D outline_of(const layout1D   &sub,
-                                const int         rank,
-                                const quad_links &links,
-                                const int         ng);
+            layout1D outline_of(const layout1D    &sub,
+                                const int          rank,
+                                const quad_links  &links,
+                                const int           ng,
+                                local_ghosts::list &lg);
         };
         
         
