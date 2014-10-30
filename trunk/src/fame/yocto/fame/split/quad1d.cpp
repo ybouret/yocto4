@@ -94,6 +94,17 @@ namespace yocto
             return layout1D(offset,(offset+length)-1);
         }
         
+    }
+    
+}
+
+#include "yocto/fame/split/quad-build-ghosts.hpp"
+
+namespace yocto
+{
+    
+    namespace fame
+    {
         
         layout1D quad1D:: outline_of(const layout1D     &sub,
                                      const int           rank,

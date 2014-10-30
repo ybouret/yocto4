@@ -9,6 +9,7 @@ namespace yocto
 {
     namespace fame
     {
+        
      
         template <size_t DIM>
         class quad_ghost : public ghost
@@ -70,6 +71,8 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(local_quad_ghosts);
         };
+        
+      
         
         
     }
