@@ -29,7 +29,7 @@ namespace yocto
         }
         
         
-        layout1D quad1d::split(const layout1D &full,
+        layout1D quad1D::split(const layout1D &full,
                                const int       rank,
                                const int       size,
                                const bool      pbc,
@@ -95,7 +95,7 @@ namespace yocto
         }
         
         
-        layout1D quad1d:: outline_of(const layout1D     &sub,
+        layout1D quad1D:: outline_of(const layout1D     &sub,
                                      const int           rank,
                                      const quad_links   &links,
                                      const int           ng,
@@ -116,7 +116,6 @@ namespace yocto
                 //
                 // first pass, compute outline
                 //______________________________________________________________
-
                 unit_t lower = sub.lower;
                 unit_t upper = sub.upper;
                 
