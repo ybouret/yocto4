@@ -10,7 +10,7 @@ namespace yocto
     namespace fame
     {
         
-        struct quad1d
+        struct quad1D
         {
             typedef local_quad_ghosts<1> local_ghosts;
             
