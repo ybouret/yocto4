@@ -95,19 +95,97 @@ namespace yocto
         }
         
         
-        layout1D quad1d:: outline(const layout1D   &sub,
-                                  const int         rank,
-                                  const quad_links &links,
-                                  const int         ng)
+        layout1D quad1d:: outline_of(const layout1D   &sub,
+                                     const int         rank,
+                                     const quad_links &links,
+                                     const int         ng)
         {
             if(ng<=0)
             {
+                // shouldn't be...
                 return sub;
             }
             else
             {
+                assert(ng>0);
+                const int gshift = ng-1;
                 
-                return sub;
+                //______________________________________________________________
+                //
+                // first pass, compute outline
+                //______________________________________________________________
+
+                unit_t lower = sub.lower;
+                unit_t upper = sub.upper;
+                
+                if(ng>sub.width)
+                {
+                    throw libc::exception( EDOM, "not enough width for quad1d::outline");
+                }
+                
+                
+                unit_t source_upper[2] = {0,0};
+                unit_t source_lower[2] = {0,0};
+                
+                unit_t target_lower[2] = {0,0};
+                unit_t target_upper[2] = {0,0};
+                
+                for(int i=0;i<links.count;++i)
+                {
+                    const quad_link &link  = links[i];
+                    //const bool       local = link.rank == rank;
+                    switch(link.pos)
+                    {
+                        case quad_link::is_prev:
+                        {
+                            lower -= ng;
+                            
+                            target_lower[i] = lower;
+                            target_upper[i] = lower + gshift;
+                            
+                            source_upper[i] = sub.upper;
+                            source_lower[i] = sub.upper - gshift;
+                            
+                        } break;
+                            
+                        case quad_link::is_next:
+                        {
+                            upper += ng;
+                            
+                            target_upper[i] = upper;
+                            target_lower[i] = upper - gshift;
+                            
+                            source_lower[i] = sub.lower;
+                            source_upper[i] = sub.lower + gshift;
+                            
+                        } break;
+                    }
+                }
+                const  layout1D outline(lower,upper);
+                //______________________________________________________________
+                //
+                // second pass, compute ghosts
+                //______________________________________________________________
+                for(int i=0;i<links.count;++i)
+                {
+                    const quad_link &link  = links[i];
+                    const bool       local = link.rank == rank;
+                    if(local)
+                    {
+                        //______________________________________________________
+                        //
+                        // exchange data for pbc
+                        //______________________________________________________
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                }
+                
+                
+                return outline;
             }
         }
         

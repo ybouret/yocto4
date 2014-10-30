@@ -9,6 +9,7 @@ namespace yocto
     namespace fame
     {
         
+#if 0
         // ghost in one direction
         class quad_ghost : public ghost
         {
@@ -20,6 +21,7 @@ namespace yocto
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(quad_ghost);
         };
+#endif
         
     }
 }

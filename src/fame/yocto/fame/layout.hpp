@@ -117,7 +117,13 @@ namespace yocto
                 return has(sub.lower) && has(sub.upper);
             }
             
+            //! helper
             inline const layout_of & __layout() const throw() { return *this; }
+            
+            void store_offsets_of( const layout_of &sub, offsets_list &offsets ) const
+            {
+                assert(this->contains(sub));
+            }
             
         private:
             YOCTO_DISABLE_ASSIGN(layout_of);
@@ -127,6 +133,13 @@ namespace yocto
         typedef layout_of<coord2D> layout2D;
         typedef layout_of<coord3D> layout3D;
         
+        template <size_t DIM>
+        struct layout_for;
+        
+        template <> struct layout_for<1> { typedef layout1D type; };
+        template <> struct layout_for<2> { typedef layout2D type; };
+        template <> struct layout_for<3> { typedef layout3D type; };
+
         
     }
 }

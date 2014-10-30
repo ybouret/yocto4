@@ -2,7 +2,7 @@
 #define YOCTO_FAME_SPLIT_QUAD1D_INCLUDED 1
 
 #include "yocto/fame/split/quad-links.hpp"
-#include "yocto/fame/layout.hpp"
+#include "yocto/fame/split/quad-ghosts.hpp"
 
 namespace yocto
 {
@@ -20,10 +20,10 @@ namespace yocto
                            quad_links     &links );
             
             static
-            layout1D outline(const layout1D   &sub,
-                             const int         rank,
-                             const quad_links &links,
-                             const int         ng);
+            layout1D outline_of(const layout1D   &sub,
+                                const int         rank,
+                                const quad_links &links,
+                                const int         ng);
         };
         
         

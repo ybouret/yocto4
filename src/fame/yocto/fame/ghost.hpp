@@ -11,7 +11,6 @@ namespace yocto
         class ghost : public offsets_list
         {
         public:
-            explicit ghost() throw();
             explicit ghost(size_t n);
             virtual ~ghost() throw();
             
