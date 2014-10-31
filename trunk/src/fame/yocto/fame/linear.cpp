@@ -7,6 +7,10 @@ namespace yocto
     namespace fame
     {
         
+        void * linear_space:: data()  throw() { return buffer; }
+        const void * linear_space:: data() const throw() { return buffer; }
+
+        
         linear_space:: ~linear_space() throw()
         {
             if(buflen)

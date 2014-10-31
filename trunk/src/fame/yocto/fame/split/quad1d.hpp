@@ -2,7 +2,7 @@
 #define YOCTO_FAME_SPLIT_QUAD1D_INCLUDED 1
 
 #include "yocto/fame/split/quad-links.hpp"
-#include "yocto/fame/split/quad-ghosts.hpp"
+#include "yocto/fame/layout.hpp"
 
 namespace yocto
 {
@@ -12,7 +12,6 @@ namespace yocto
         
         struct quad1D
         {
-            typedef local_quad_ghosts<1> local_ghosts;
             
             //! links are always order prev->next
             static
@@ -22,12 +21,7 @@ namespace yocto
                            const bool      pbc,
                            quad_links     &links );
             
-            static
-            layout1D outline_of(const layout1D    &sub,
-                                const int          rank,
-                                const quad_links  &links,
-                                const int           ng,
-                                local_ghosts::list &lg);
+            
         };
         
         
