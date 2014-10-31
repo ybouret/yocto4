@@ -10,14 +10,11 @@ namespace yocto
     namespace fame
     {
         
-     
-        template <size_t DIM>
+        
+        template <typename Layout>
         class quad_ghost : public ghost
         {
         public:
-            typedef typename layout_for<DIM>::type Layout;
-            //typedef typename LAYOUT::coord         Coord;
-            
             
             inline quad_ghost(const Layout &outline,
                               const Layout &zone ) : ghost( zone.items )
@@ -37,25 +34,25 @@ namespace yocto
         
         
         
-        template <size_t DIM>
-        class local_quad_ghosts : public object
+        
+        template <typename Layout>
+        class quad_ghosts : public object
         {
         public:
-            typedef local_quad_ghosts      Ghosts;
-            typedef quad_ghost<DIM>        Ghost;
-            typedef typename Ghost::Layout Layout;;
+            typedef quad_ghosts        Ghosts;
+            typedef quad_ghost<Layout> Ghost;
             
-            const   quad_ghost<DIM> source;
-            const   quad_ghost<DIM> target;
+            const   Ghost source;
+            const   Ghost target;
             
-            local_quad_ghosts<DIM> *next;
-            local_quad_ghosts<DIM> *prev;
+            Ghosts *next;
+            Ghosts *prev;
             
-            typedef core::list_of_cpp< local_quad_ghosts<DIM> > list;
+            typedef core::list_of_cpp< Ghosts > list;
             
-            explicit local_quad_ghosts(const Layout outline,
-                                       const Layout source_layout,
-                                       const Layout target_layout):
+            explicit quad_ghosts(const Layout outline,
+                                 const Layout source_layout,
+                                 const Layout target_layout):
             source(outline,source_layout),
             target(outline,target_layout),
             next(0),
@@ -64,15 +61,15 @@ namespace yocto
                 assert( source.size() == target.size() );
             }
             
-            virtual ~local_quad_ghosts() throw()
+            virtual ~quad_ghosts() throw()
             {
             }
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(local_quad_ghosts);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(quad_ghosts);
         };
         
-      
+        
         
         
     }

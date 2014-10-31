@@ -14,7 +14,8 @@ YOCTO_UNIT_TEST_IMPL(split)
     quad_links &xlinks = links[0];
     {
         const layout1D l1 = layout1D(1,12);
-        quad1D::local_ghosts::list lg;
+        quad_ghosts<layout1D>::list lg;
+        quad_ghosts<layout1D>::list ag;
 
         for(int size=1;size<=8;++size)
         {
@@ -24,7 +25,7 @@ YOCTO_UNIT_TEST_IMPL(split)
             {
                 const layout1D s = quad1D::split(l1, rank, size, true,xlinks);
                 std::cerr << "\trank   =" << rank << ",\t sub=" << s << ",\t links=" << xlinks << std::endl;
-                const layout1D s_out = build_quad_ghosts<1>::outline_for(rank, s, 1, links, lg);
+                const layout1D s_out = build_quad_ghosts<layout1D>::outline_for(rank, s, 1, links, lg,ag);
                 std::cerr << "\t\toutline=" << s_out << std::endl;
             }
         }
@@ -35,7 +36,8 @@ YOCTO_UNIT_TEST_IMPL(split)
     
     {
         const layout2D l2 = layout2D( coord2D(1,1), coord2D(10,12) );
-        quad2D::local_ghosts::list lg;
+        quad_ghosts<layout2D>::list lg;
+        quad_ghosts<layout2D>::list ag;
 
         coord2D    sizes;
         coord2D    ranks;
@@ -49,7 +51,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 std::cerr << "\trank = " << rank << " : " << ranks << " / " << sizes << ", sub=" << s
                 << " xlinks=" << xlinks << ", ylinks=" << ylinks
                 << std::endl;
-                const layout2D s_out = build_quad_ghosts<2>::outline_for(rank, s, 1, links, lg);
+                const layout2D s_out = build_quad_ghosts<layout2D>::outline_for(rank, s, 1, links, lg,ag);
                 std::cerr << "\t\toutline=" << s_out << std::endl;
 
             }

@@ -10,20 +10,22 @@ namespace yocto
     namespace fame
     {
         
-        template <size_t DIM>
+        template <typename Layout>
         struct build_quad_ghosts
         {
-            typedef typename layout_for<DIM>::type Layout;
+            static const size_t DIMENSIONS = Layout::DIMENSIONS;
+            
             typedef typename Layout::coord         Coord;
-            typedef  local_quad_ghosts<DIM>        LocalGhosts;
-            typedef typename LocalGhosts::list     LocalGhostsList;
+            typedef quad_ghosts<Layout>            Ghosts;
+            typedef typename Ghosts::list          GhostsList;
             
             static inline
             Layout outline_for(const int         rank,
                                const Layout     &inside,
                                const int         ng,
                                const quad_links *links,
-                               LocalGhostsList  &lg)
+                               GhostsList       &lg,
+                               GhostsList       &ag)
             {
                 assert(links);
                 lg.clear();
@@ -39,7 +41,7 @@ namespace yocto
                 //______________________________________________________________
                 Coord lower = inside.lower;
                 Coord upper = inside.upper;
-                for(size_t dim=0;dim<DIM;++dim)
+                for(size_t dim=0;dim<DIMENSIONS;++dim)
                 {
                     unit_t           &lo = __coord(lower,dim);
                     unit_t           &up = __coord(upper,dim);
@@ -69,7 +71,7 @@ namespace yocto
                 //
                 // Second Pass: build ghosts
                 //______________________________________________________________
-                for(size_t dim=0;dim<DIM;++dim)
+                for(size_t dim=0;dim<DIMENSIONS;++dim)
                 {
                     const quad_links &the_links = links[dim];
                     for(size_t i=0;i<the_links.count;++i)
@@ -88,11 +90,25 @@ namespace yocto
                                 std::cerr << "\t\t" << get_axis_name(dim) << "ghost@prev: " << target << std::endl;
                                 if(local)
                                 {
-                                    
+                                    // take data and the 'next' side
+                                    const unit_t source_up    = __coord(inside.upper,dim);
+                                    const unit_t source_lo    = source_up - gshift;
+                                    const Coord  source_lower = replace_coord(source_lo, outline.lower, dim);
+                                    const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
+                                    const Layout source(source_lower,source_upper);
+                                    std::cerr << "\t\t+" << get_axis_name(dim) << "local <-- " << source << std::endl;
+                                    lg.push_back( new Ghosts(outline,source,target) );
                                 }
                                 else
                                 {
-                                    
+                                    // take data on the same side, to be sent
+                                    const unit_t source_lo    = __coord(inside.lower,dim);
+                                    const unit_t source_up    = source_lo + gshift;
+                                    const Coord  source_lower = replace_coord(source_lo, outline.lower, dim);
+                                    const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
+                                    const Layout source(source_lower,source_upper);
+                                    std::cerr << "\t\t+" << get_axis_name(dim) << "async <--  " << source << std::endl;
+                                    ag.push_back( new Ghosts(outline,source,target));
                                 }
                                 
                             }   break;
@@ -107,11 +123,25 @@ namespace yocto
                                 std::cerr << "\t\t" << get_axis_name(dim) << "ghost@next: " << target << std::endl;
                                 if(local)
                                 {
-                                    
+                                    // take data on the 'prev' side
+                                    const unit_t source_lo = __coord(inside.lower,dim);
+                                    const unit_t source_up = source_lo + gshift;
+                                    const Coord  source_lower = replace_coord(source_lo, outline.lower, dim);
+                                    const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
+                                    const Layout source(source_lower,source_upper);
+                                    std::cerr << "\t\t+" << get_axis_name(dim) << "local <--  " << source << std::endl;
+                                    lg.push_back( new Ghosts(outline,source,target) );
                                 }
                                 else
                                 {
-                                    
+                                    // take data on the same side, to be sent
+                                    const unit_t source_up    = __coord(inside.upper,dim);
+                                    const unit_t source_lo    = source_up - gshift;
+                                    const Coord  source_lower = replace_coord(source_lo, outline.lower, dim);
+                                    const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
+                                    const Layout source(source_lower,source_upper);
+                                    std::cerr << "\t\t+" << get_axis_name(dim) << "async <-- " << source << std::endl;
+                                    ag.push_back( new Ghosts(outline,source,target) );
                                 }
                             }  break;
                         }

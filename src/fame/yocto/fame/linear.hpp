@@ -57,6 +57,10 @@ namespace yocto
             
             string make_id( unit_t idx ) const;
             
+            void *       data() throw();
+            const void * data() const throw();
+            
+            
         protected:
             size_t buflen;
             void  *buffer;
