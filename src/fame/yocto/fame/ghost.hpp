@@ -23,10 +23,13 @@ namespace yocto
                              const ghost        &gsrc) throw();
             
             //! save content of one ghost of a linear space
-            void save(array<uint8_t> &dst, const linear_space &src) const throw();
+            /**
+             \param offset should be 1 initially
+             */
+            void save(array<uint8_t> &dst, const linear_space &src, size_t &offset) const throw();
             
             //! load some data in one ghost of a linear space
-            void load(linear_space &dst, const array<uint8_t> &src) const throw();
+            void load(linear_space &dst, const array<uint8_t> &src, size_t &offset) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
