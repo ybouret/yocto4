@@ -28,6 +28,37 @@ namespace yocto
             }
         }
         
+        
+        void ghost:: save(array<uint8_t> &dst, const linear_space &src) const throw()
+        {
+            const size_t n = size();
+            const size_t w = src.itmsz;
+            assert(n*w<=dst.size());
+            size_t         offset = 1;
+            const uint8_t *data   = static_cast<const uint8_t *>(src.data());
+            for(size_t i=0;i<n;++i,offset += w)
+            {
+                const size_t s = (*this)[i];
+                memcpy( &dst[offset], &data[s*w], w);
+            }
+        }
+        
+        void ghost:: load(linear_space &dst, const array<uint8_t> &src) const throw()
+        {
+            const size_t n = size();
+            const size_t w = dst.itmsz;
+            assert(n*w<=src.size());
+            size_t   offset = 1;
+            uint8_t *data   = static_cast<uint8_t *>(dst.data());
+            for(size_t i=0;i<n;++i,offset += w)
+            {
+                const size_t d = (*this)[i];
+                memcpy( &data[d*w], &src[offset], w);
+            }
+            
+        }
+
+        
     }
     
 }
