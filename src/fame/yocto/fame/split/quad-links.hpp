@@ -40,7 +40,7 @@ namespace yocto
             
             void append( quad_link::position pos, int rank ) throw();
             
-            quad_link & operator[](size_t i) throw();
+            quad_link       & operator[](size_t i) throw();
             const quad_link & operator[](size_t i) const throw();
             void reset() throw();
             

@@ -65,9 +65,17 @@ namespace yocto
             {
             }
             
+            inline void local_update(linear_space       &tgt,
+                                     const linear_space &src) const throw()
+            {
+                ghost::copy(tgt, target, src, source);
+            }
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(quad_ghosts);
         };
+        
         
         
         
