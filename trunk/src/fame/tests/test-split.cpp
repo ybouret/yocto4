@@ -1,6 +1,7 @@
 #include "yocto/fame/split/quad1d.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/fame/split/quad2d.hpp"
+#include "yocto/fame/split/build-quad-ghosts.hpp"
 
 using namespace yocto;
 using namespace fame;
@@ -9,7 +10,8 @@ using namespace fame;
 
 YOCTO_UNIT_TEST_IMPL(split)
 {
-    quad_links                 xlinks;
+    quad_links                 links[3];
+    quad_links &xlinks = links[0];
     {
         const layout1D l1 = layout1D(1,12);
         quad1D::local_ghosts::list lg;
@@ -22,14 +24,14 @@ YOCTO_UNIT_TEST_IMPL(split)
             {
                 const layout1D s = quad1D::split(l1, rank, size, true,xlinks);
                 std::cerr << "\trank   =" << rank << ",\t sub=" << s << ",\t links=" << xlinks << std::endl;
-                const layout1D s_out = quad1D::outline_of(s, rank, xlinks, 1, lg);
-                std::cerr << "\toutline=" << s_out << std::endl;
+                const layout1D s_out = build_quad_ghosts<1>::outline_for(rank, s, 1, links, lg);
+                std::cerr << "\t\toutline=" << s_out << std::endl;
             }
         }
     }
     
     
-    quad_links ylinks;
+    quad_links &ylinks = links[1];
     
     {
         const layout2D l2 = layout2D( coord2D(1,1), coord2D(10,12) );
@@ -47,8 +49,9 @@ YOCTO_UNIT_TEST_IMPL(split)
                 std::cerr << "\trank = " << rank << " : " << ranks << " / " << sizes << ", sub=" << s
                 << " xlinks=" << xlinks << ", ylinks=" << ylinks
                 << std::endl;
-                const layout2D s_out = quad2D::outline_of(s,rank, xlinks, ylinks, 1, lg);
-                std::cerr << "\toutline=" << s_out << std::endl;
+                const layout2D s_out = build_quad_ghosts<2>::outline_for(rank, s, 1, links, lg);
+                std::cerr << "\t\toutline=" << s_out << std::endl;
+
             }
             
         }

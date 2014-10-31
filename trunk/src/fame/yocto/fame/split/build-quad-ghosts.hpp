@@ -19,18 +19,114 @@ namespace yocto
             typedef typename LocalGhosts::list     LocalGhostsList;
             
             static inline
-            void on(const Layout     &inside,
-                    const Layout     &outline,
-                    const size_t      dim,
-                    const quad_links &links,
-                    LocalGhostsList  &lg)
+            Layout outline_for(const int         rank,
+                               const Layout     &inside,
+                               const int         ng,
+                               const quad_links *links,
+                               LocalGhostsList  &lg)
             {
+                assert(links);
                 lg.clear();
+                if(ng<=0)
+                {
+                    return inside;
+                }
+                //const int gshift = ng-1;
                 
+                //______________________________________________________________
+                //
+                // First Pass: build outline
+                //______________________________________________________________
+                Coord lower = inside.lower;
+                Coord upper = inside.upper;
+                for(size_t dim=0;dim<DIM;++dim)
+                {
+                    unit_t           &lo = __coord(lower,dim);
+                    unit_t           &up = __coord(upper,dim);
+                    const quad_links &the_links = links[dim];
+                    for(size_t i=0;i<the_links.count;++i)
+                    {
+                        const quad_link &link = the_links[i];
+                        switch(link.pos)
+                        {
+                            case quad_link::is_prev:
+                                lo -= ng;
+                                break;
+                                
+                            case quad_link::is_next:
+                                up += ng;
+                                break;
+                                
+                        }
+                        
+                    }
+                }
+                
+                const Layout outline(lower,upper);
+                const int gshift = ng-1;
+                
+                //______________________________________________________________
+                //
+                // Second Pass: build ghosts
+                //______________________________________________________________
+                for(size_t dim=0;dim<DIM;++dim)
+                {
+                    const quad_links &the_links = links[dim];
+                    for(size_t i=0;i<the_links.count;++i)
+                    {
+                        const quad_link &link  = the_links[i];
+                        const bool       local = link.rank == rank;
+                        switch(link.pos)
+                        {
+                            case quad_link::is_prev:
+                            {
+                                const unit_t target_lo    = __coord(outline.lower,dim);
+                                const unit_t target_up    = target_lo + gshift;
+                                const Coord  target_lower = replace_coord(target_lo, outline.lower, dim);
+                                const Coord  target_upper = replace_coord(target_up, outline.upper, dim);
+                                const Layout target(target_lower,target_upper);
+                                std::cerr << "\t\t" << get_axis_name(dim) << "ghost@prev: " << target << std::endl;
+                                if(local)
+                                {
+                                    
+                                }
+                                else
+                                {
+                                    
+                                }
+                                
+                            }   break;
+                                
+                            case quad_link::is_next:
+                            {
+                                const unit_t target_up    = __coord(outline.upper,dim);
+                                const unit_t target_lo    = target_up - gshift;
+                                const Coord  target_lower = replace_coord(target_lo, outline.lower, dim);
+                                const Coord  target_upper = replace_coord(target_up, outline.upper, dim);
+                                const Layout target(target_lower,target_upper);
+                                std::cerr << "\t\t" << get_axis_name(dim) << "ghost@next: " << target << std::endl;
+                                if(local)
+                                {
+                                    
+                                }
+                                else
+                                {
+                                    
+                                }
+                            }  break;
+                        }
+                    }
+                }
+                
+                return outline;
             }
             
-            
-            
+            static inline Coord replace_coord(unit_t value, const Coord &C, size_t dim) throw()
+            {
+                Coord ans = C;
+                __coord(ans,dim) = value;
+                return ans;
+            }
             
         };
         

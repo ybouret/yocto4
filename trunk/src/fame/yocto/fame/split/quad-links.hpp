@@ -51,6 +51,9 @@ namespace yocto
             quad_link link[2];
             YOCTO_DISABLE_COPY_AND_ASSIGN(quad_links);
         };
+        
+        
+        
     }
 }
 

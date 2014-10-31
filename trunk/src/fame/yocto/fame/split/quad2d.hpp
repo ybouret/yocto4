@@ -24,13 +24,7 @@ namespace yocto
                            coord2D        &ranks,
                            coord2D        &sizes);
             
-            static
-            layout2D outline_of(const layout2D     &sub,
-                                const int           rank,
-                                const quad_links   &xlinks,
-                                const quad_links   &ylinks,
-                                const int           ng,
-                                local_ghosts::list &lg);
+            
         };
         
     }
