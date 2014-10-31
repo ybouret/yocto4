@@ -98,7 +98,7 @@ namespace yocto
     
 }
 
-#include "yocto/fame/split/quad-build-ghosts.hpp"
+#include "yocto/fame/split/build-quad-ghosts.hpp"
 
 namespace yocto
 {
