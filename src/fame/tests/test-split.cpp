@@ -75,9 +75,13 @@ YOCTO_UNIT_TEST_IMPL(split)
             std::cerr << "size=" << size << ", full=" << l3 << std::endl;
             for(int rank=0;rank<size;++rank)
             {
-                
                 const layout3D s = quad3D::split(l3, rank, size, true,xlinks, true,ylinks,true,zlinks,ranks,sizes);
-                
+                std::cerr << "\trank " << rank << " : " << ranks << " / " << sizes
+                << ", sub=" << s << std::endl
+                << "\t\txlinks=" << xlinks << ", ylinks=" << ylinks << ", zlinks=" << zlinks
+                << std::endl;
+                const layout3D s_out = build_quad_ghosts<layout3D>::outline_for(rank, s, 1, links, lg, ag);
+                std::cerr << "\t\toutline=" << s_out << std::endl;
             }
         }
         
