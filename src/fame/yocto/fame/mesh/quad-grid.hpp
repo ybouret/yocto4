@@ -1,5 +1,5 @@
-#ifndef YOCTO_FAME_QUADMESH_INCLUDED
-#define YOCTO_FAME_QUADMESH_INCLUDED 1
+#ifndef YOCTO_FAME_QUADGRID_INCLUDED
+#define YOCTO_FAME_QUADGRID_INCLUDED 1
 
 #include "yocto/fame/mesh.hpp"
 #include "yocto/fame/split/quad1d.hpp"
@@ -11,7 +11,7 @@ namespace yocto
         
         //! 
         template <typename Layout>
-        class QuadMesh : public Layout
+        class QuadGrid : public Layout
         {
         public:
             
