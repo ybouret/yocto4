@@ -17,199 +17,244 @@ namespace
     typedef array3D<double>       ScalarField3D;
     typedef array3D<v3d<double> > VectorField3D;
     
-    class MyData : public layout3D, public arrays
+    
+    class MyDataDB
     {
     public:
-        const layout2D l2;
-        
-        MyData() : layout3D( coord3D(-20,-15,-10), coord3D(20,15,10 ) ),
-        l2( coord2D(lower.x,lower.y), coord2D(upper.x,upper.y) )
+        explicit MyDataDB() : db2(), db3(), pbc()
         {
-            this->store( new array1D<double>("X",layout1D(lower.x,upper.x)) );
-            this->store( new array1D<double>("Y",layout1D(lower.y,upper.y)) );
-            this->store( new array1D<double>("Z",layout1D(lower.z,upper.z)) );
-            this->store( new ScalarField2D("A2",l2) );
-            this->store( new VectorField2D("V2",l2) );
-            this->store( new ScalarField3D("A3",*this) );
-            this->store( new VectorField3D("V3",*this) );
-
+            pbc[0] = pbc[1] = pbc[2] = true;
+        }
+        
+        arrays db2, db3;
+        bool   pbc[3];
+        
+        virtual ~MyDataDB() throw() {}
+        
+    private:
+        YOCTO_DISABLE_COPY_AND_ASSIGN(MyDataDB);
+    };
+    
+    class MyData : public MyDataDB
+    {
+    public:
+        RectilinearMesh<layout2D,float>  m2;
+        RectilinearMesh<layout3D,double> m3;
+        
+        explicit MyData(const layout2D &full2,
+                        const layout3D &full3,
+                        const int rank,
+                        const int size
+                        ):
+        m2( db2, "mesh2", full2, pbc, rank, size, 1),
+        m3( db3, "mesh3", full3, pbc, rank, size, 1)
+        {
+            db2.store( new ScalarField2D("A2",m2.outline) );
         }
         
         
         
-        virtual ~MyData() throw() {}
-        
     private:
         YOCTO_DISABLE_COPY_AND_ASSIGN(MyData);
-        
     };
     
     
     
-    class MySim : public MyData, public VisIt::Simulation
+    class MySim : public VisIt::Simulation, public MyData
     {
     public:
         
-        explicit MySim( const mpi &ref) :
-        MyData(),
-        VisIt::Simulation( ref ),
-        m2(*this,"mesh2d"),
-        m3(*this,"mesh3d"),
-        A2( (*this)["A2"].as<ScalarField2D>() ),
-        V2( (*this)["V2"].as<VectorField2D>() ),
-        A3( (*this)["A3"].as<ScalarField3D>() ),
-        V3( (*this)["V3"].as<VectorField3D>() ),
+        
+        explicit MySim(const mpi &ref,
+                       const layout2D &full2d,
+                       const layout3D &full3d ) :
+        VisIt::Simulation(ref),
+        MyData(full2d,full3d,par_rank,par_size),
+        A2( db2["A2"].as<ScalarField2D>() ),
         curv("the_curve"),
-        cx("cx",layout1D(lower.x,upper.x)),
+        cx("cx",layout1D(1,10)),
         cy("cy",cx)
         {
             assert(cx.items==cy.items);
             
-            box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
-            B.map_rect<double>(*this);
+            std::cerr << "m2.outline=" << m2.outline << std::endl;
+            std::cerr << "m3.outline=" << m3.outline << std::endl;
             
-            for(unit_t j=A2.lower.y;j<=A2.upper.y;++j)
+            for(unit_t k=m3.outline.lower.z;k<=m3.outline.upper.z;++k)
             {
-                const double y = m2.Y()[j];
-                for(unit_t i=A2.lower.x;i<=A2.upper.x;++i)
-                {
-                    const double x = m2.X()[i];
-                    const double mg =exp(-(x*x+y*y)/2 );
-                    A2[j][i]   = mg;
-                    V2[j][i].x = mg;
-                    V2[j][i].y = sin(3*(y+x));
-                }
+                m3.Z()[k] = k;
             }
             
-            for(unit_t k=A3.lower.z;k<=A3.upper.z;++k)
+            for(unit_t j=m3.outline.lower.y;j<=m3.outline.upper.y;++j)
             {
-                const double z = m3.Z()[k];
-                for(unit_t j=A3.lower.y;j<=A3.upper.y;++j)
-                {
-                    const double y = m3.Y()[j];
-                    for(unit_t i=A3.lower.x;i<=A3.upper.x;++i)
-                    {
-                        const double x  = m3.X()[i];
-                        const double mg = exp(-(x*x+y*y+z*z)/2 );
-                        A3[k][j][i]     = mg;
-                        v3d<double> &v = V3[k][j][i];
-                        v.x = mg;
-                        v.y = mg/2;
-                        v.z = mg/3;
-                    }
-                }
+                m3.Y()[j] = j;
+            }
+            
+            for(unit_t i=m3.outline.lower.x;i<=m3.outline.upper.x;++i)
+            {
+                m3.X()[i] = i;
             }
             
             
+            for(unit_t j=m2.outline.lower.y;j<=m2.outline.upper.y;++j)
+            {
+                m2.Y()[j] = j;
+            }
+            
+            for(unit_t i=m2.outline.lower.x;i<=m2.outline.upper.x;++i)
+            {
+                m2.X()[i] = i;
+            }
+            
+        
+        
+#if 0
+        box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
+        B.map_rect<double>(*this);
+        
+        for(unit_t j=A2.lower.y;j<=A2.upper.y;++j)
+        {
+            const double y = m2.Y()[j];
+            for(unit_t i=A2.lower.x;i<=A2.upper.x;++i)
+            {
+                const double x = m2.X()[i];
+                const double mg =exp(-(x*x+y*y)/2 );
+                A2[j][i]   = mg;
+                V2[j][i].x = mg;
+                V2[j][i].y = sin(3*(y+x));
+            }
         }
         
-        virtual ~MySim() throw() {}
-        
-        //! sending meta data
-        virtual void get_meta_data( visit_handle &md ) const
+        for(unit_t k=A3.lower.z;k<=A3.upper.z;++k)
         {
-            //
-            add_generic_command("quit",md);
-            
-            // meshes
-            visit::add_mesh_meta_data(md, m2);
-            
-            visit::add_mesh_meta_data(md, m3);
-            
-            // data
-            visit::add_variable_meta_data(md, A2, m2.name);
-            
-            visit::add_variable_meta_data(md, V2, m2.name);
-            
-            visit::add_variable_meta_data(md, A3, m3.name);
-         
-            visit::add_variable_meta_data(md, V3, m3.name);
+            const double z = m3.Z()[k];
+            for(unit_t j=A3.lower.y;j<=A3.upper.y;++j)
+            {
+                const double y = m3.Y()[j];
+                for(unit_t i=A3.lower.x;i<=A3.upper.x;++i)
+                {
+                    const double x  = m3.X()[i];
+                    const double mg = exp(-(x*x+y*y+z*z)/2 );
+                    A3[k][j][i]     = mg;
+                    v3d<double> &v = V3[k][j][i];
+                    v.x = mg;
+                    v.y = mg/2;
+                    v.z = mg/3;
+                }
+            }
+        }
+#endif
+        
+    }
+    
+    virtual ~MySim() throw() {}
+    
+    //! sending meta data
+    virtual void get_meta_data( visit_handle &md ) const
+    {
+        //
+        add_generic_command("quit",md);
+        
+        // meshes
+        visit::add_mesh_meta_data(md, m2);
+        
+        visit::add_mesh_meta_data(md, m3);
+        
+#if 0
+        // data
+        visit::add_variable_meta_data(md, A2, m2.name);
+        
+        visit::add_variable_meta_data(md, V2, m2.name);
+        
+        visit::add_variable_meta_data(md, A3, m3.name);
+        
+        visit::add_variable_meta_data(md, V3, m3.name);
+#endif
+        
+        // curv
+        visit:: add_curv_meta_data(md, curv);
+        
+        
+    }
+    
+    
+    virtual visit_handle get_mesh( int domain, const string &name) const
+    {
+        
+#if 1
+        if(name=="mesh2d")
+        {
+            return visit::get_mesh(m2);
+        }
+        
+        if(name=="mesh3d")
+        {
+            return visit::get_mesh(m3);
+        }
+#endif
+        
+        return VISIT_INVALID_HANDLE;
+    }
+    
+    virtual visit_handle get_variable( int ndomain, const string &name ) const
+    {
+        
+#if 0
+        if( name == "A2" )
+        {
+            return visit::get_variable_data(ndomain, A2);
+        }
+        
+        if( name == "V2" )
+        {
+            return visit::get_variable_data(ndomain, V2);
+        }
+        
+        if( name == "A3" )
+        {
+            return visit::get_variable_data(ndomain, A3);
+        }
+        
+        if( name == "V3" )
+        {
+            return visit::get_variable_data(ndomain, V3);
+        }
+#endif
+        
+        return VISIT_INVALID_HANDLE;
+    }
+    
+    virtual visit_handle get_curve( const string &name ) const
+    {
+        
+        if(name == "the_curve" )
+        {
+            return visit::get_curv(cx, cy);
+        }
+        return VISIT_INVALID_HANDLE;
+    }
+    
+    virtual void step()
+    {
+        runTime = cycle;
+        for(unit_t i=cx.lower;i<=cx.upper;++i)
+        {
+            cx[i] = static_cast<float>(i);
+            cy[i] = sin( cx[i] + 0.1 * runTime );
+        }
+    }
+    
+    
+    ScalarField2D               &A2;
+    CurvInfo                     curv;
+    array1D<float>               cx;
+    array1D<float>               cy;
+    
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
+};
 
-            // curv
-            visit:: add_curv_meta_data(md, curv);
-            
-            
-        }
-        
-        
-        virtual visit_handle get_mesh( int domain, const string &name) const
-        {
-            
-            if(name=="mesh2d")
-            {
-                return visit::get_mesh(m2);
-            }
-            
-            if(name=="mesh3d")
-            {
-                return visit::get_mesh(m3);
-            }
-            
-            return VISIT_INVALID_HANDLE;
-        }
-        
-        virtual visit_handle get_variable( int ndomain, const string &name ) const
-        {
-            
-            if( name == "A2" )
-            {
-                return visit::get_variable_data(ndomain, A2);
-            }
-            
-            if( name == "V2" )
-            {
-                return visit::get_variable_data(ndomain, V2);
-            }
-            
-            if( name == "A3" )
-            {
-                return visit::get_variable_data(ndomain, A3);
-            }
-            
-            if( name == "V3" )
-            {
-                return visit::get_variable_data(ndomain, V3);
-            }
-            
-            return VISIT_INVALID_HANDLE;
-        }
-        
-        virtual visit_handle get_curve( const string &name ) const
-        {
-            
-            if(name == "the_curve" )
-            {
-                return visit::get_curv(cx, cy);
-            }
-            return VISIT_INVALID_HANDLE;
-        }
-        
-        virtual void step()
-        {
-            runTime = cycle;
-            for(unit_t i=cx.lower;i<=cx.upper;++i)
-            {
-                cx[i] = static_cast<float>(m2.X()[i]);
-                cy[i] = sin( cx[i] + 0.1 * runTime );
-            }
-        }
-        
-        
-        OldRectilinearMesh<2,double> m2;
-        OldRectilinearMesh<3,double> m3;
-        ScalarField2D               &A2;
-        VectorField2D               &V2;
-        ScalarField3D            &A3;
-        VectorField3D            &V3;
-        CurvInfo                  curv;
-        array1D<float>            cx;
-        array1D<float>            cy;
-        
-    private:
-        YOCTO_DISABLE_COPY_AND_ASSIGN(MySim);
-    };
-    
-    
+
 }
 
 
@@ -225,7 +270,10 @@ YOCTO_UNIT_TEST_IMPL(fame)
     VisIt::TraceFile trace(MPI,"trace.dat");
     VisIt::SetupParallel(MPI,sim_name,sim_comment,sim_path,NULL);
     
-    MySim sim(MPI);
+    const layout3D full3( coord3D(1,1,1), coord3D(10,20,30) );
+    const layout2D full2( coord2D(full3.lower.x,full3.lower.y), coord2D(full3.upper.x,full3.upper.y) );
+    
+    MySim sim(MPI,full2,full3);
     sim.step();
     
     VisIt::Loop(sim);
