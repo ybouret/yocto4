@@ -66,7 +66,11 @@ namespace yocto
             {
                 
             }
-            virtual ~Mesh() throw() {}
+            
+            virtual ~Mesh() throw()
+            {
+                
+            }
             
             
             
