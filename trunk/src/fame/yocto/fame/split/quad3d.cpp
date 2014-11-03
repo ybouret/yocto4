@@ -72,14 +72,72 @@ namespace yocto
             assert(rank>=0);
             assert(rank<size);
             
+            //__________________________________________________________________
+            //
+            // computing the best sizes
+            //__________________________________________________________________
             const unit_t Nx = full.width.x;
             const unit_t Ny = full.width.y;
             const unit_t Nz = full.width.z;
             
             find_size(sizes,Nx,Ny,Nz,size);
-            std::cerr << "best sizes="  << sizes << std::endl;
             
-            return full;
+            //__________________________________________________________________
+            //
+            // local ranks rank =  (ny*nx) * rz + (nx * ry) + rx
+            //__________________________________________________________________
+            const unit_t nx   = sizes.x;
+            const unit_t ny   = sizes.y;
+            const unit_t nxny = nx * ny;
+            const unit_t nz   = sizes.z;
+            
+            const unit_t rz   = rank / nxny;
+            const unit_t uy   = rank % nxny;
+            const unit_t ry   = uy   / nx  ;
+            const unit_t rx   = uy   % nx  ;
+            
+            ranks.x = rx;
+            ranks.z = rz;
+            ranks.y = ry;
+            
+            
+            assert( rank == nxny * rz + nx * ry + rx);
+            
+            //__________________________________________________________________
+            //
+            // 1D X split
+            //__________________________________________________________________
+            const layout1D xfull(full.lower.x,full.upper.x);
+            const layout1D xsub = quad1D::split(xfull, rx, nx, xpbc, xlinks);
+            for(size_t i=0;i<xlinks.count;++i)
+            {
+                xlinks[i].rank = nxny * rz +  nx * ry + xlinks[i].rank;
+            }
+            
+            //__________________________________________________________________
+            //
+            // 1D Y split
+            //__________________________________________________________________
+            const layout1D yfull(full.lower.y,full.upper.y);
+            const layout1D ysub = quad1D::split(yfull, ry, ny, ypbc, ylinks);
+            for(size_t i=0;i<ylinks.count;++i)
+            {
+                ylinks[i].rank = nxny*rz + nx * ylinks[i].rank + rx;
+            }
+            
+            
+            //__________________________________________________________________
+            //
+            // 1D Z split
+            //__________________________________________________________________
+            const layout1D zfull(full.lower.z,full.upper.z);
+            const layout1D zsub = quad1D::split(zfull, rz, nz, zpbc, zlinks);
+            for(size_t i=0;i<zlinks.count;++i)
+            {
+                zlinks[i].rank = nx*ny * zlinks[i].rank + nx * ry + rx;
+            }
+            
+            return layout3D( coord3D(xsub.lower,ysub.lower,zsub.lower), coord3D(xsub.upper,ysub.upper,zsub.upper) );
         }
         
     }
