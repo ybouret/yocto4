@@ -21,7 +21,7 @@ namespace yocto
             // declaring mesh meta data
             //__________________________________________________________________
             template <size_t DIM,typename T> static inline
-            void add_mesh_meta_data( visit_handle &md, const RectilinearMesh<DIM,T> &mesh )
+            void add_mesh_meta_data( visit_handle &md, const OldRectilinearMesh<DIM,T> &mesh )
             {
                 visit_handle mmd = VISIT_INVALID_HANDLE;
                 if( VisIt_MeshMetaData_alloc(&mmd) == VISIT_OKAY)
@@ -40,7 +40,7 @@ namespace yocto
             // sending mesh data
             //__________________________________________________________________
             template <size_t DIM,typename T> static inline
-            visit_handle get_mesh( const RectilinearMesh<DIM,T> &mesh )
+            visit_handle get_mesh( const OldRectilinearMesh<DIM,T> &mesh )
             {
                 visit_handle h = VISIT_INVALID_HANDLE;
                 
@@ -51,7 +51,7 @@ namespace yocto
                     {
                         visit_handle &hh = hc[i];
                         VisIt_VariableData_alloc( &hh );
-                        const typename RectilinearMesh<DIM,T>::Axis &a = mesh.get_axis(i);
+                        const typename OldRectilinearMesh<DIM,T>::Axis &a = mesh.get_axis(i);
                         hook_data(hh,a.items,a.entry);
                     }
                     set_coordinates(h, hc, int2type<DIM>() );

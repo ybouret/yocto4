@@ -10,12 +10,12 @@ namespace yocto
         
         
         template <size_t DIM,typename T>
-        class RectilinearMesh : public Mesh<DIM,T>
+        class OldRectilinearMesh : public Mesh<DIM,T>
         {
         public:
-            typedef typename Mesh<DIM,T>::Axis Axis;
+            typedef array1D<T> Axis;
             
-            explicit RectilinearMesh( arrays &adb, const string &id) :
+            explicit OldRectilinearMesh( arrays &adb, const string &id) :
             Mesh<DIM, T>(adb,id),
             ap()
             {
@@ -23,7 +23,7 @@ namespace yocto
             }
             
             
-            virtual ~RectilinearMesh() throw()
+            virtual ~OldRectilinearMesh() throw()
             {
             }
             
@@ -44,7 +44,7 @@ namespace yocto
             
             
         private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(RectilinearMesh);
+            YOCTO_DISABLE_COPY_AND_ASSIGN(OldRectilinearMesh);
             Axis *ap[DIM];
             
             inline void initialize_vertices( arrays &adb )

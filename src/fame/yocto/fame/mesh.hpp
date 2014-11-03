@@ -56,7 +56,6 @@ namespace yocto
             
             typedef Vertex<DIM,T>      VTX;
             typedef typename VTX::List Vertices;
-            typedef array1D<T>         Axis;
             
             Vertices vertices;
             

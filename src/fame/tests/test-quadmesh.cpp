@@ -1,4 +1,4 @@
-#include "yocto/fame/mesh/quad-grid.hpp"
+#include "yocto/fame/mesh/quad-mesh.hpp"
 #include "yocto/utest/run.hpp"
 
 using namespace yocto;
@@ -7,7 +7,7 @@ using namespace fame;
 YOCTO_UNIT_TEST_IMPL(grid)
 {
     
-    int ng = 1;
+    int ng = 2;
     
     const bool periodic[3] = { true, true, true };
     
@@ -26,7 +26,6 @@ YOCTO_UNIT_TEST_IMPL(grid)
         }
     }
     
-    return 0;
     
     {
         const layout2D L( coord2D(1,1), coord2D(30,40) );
@@ -42,6 +41,8 @@ YOCTO_UNIT_TEST_IMPL(grid)
             }
         }
     }
+    
+    
     
     {
     

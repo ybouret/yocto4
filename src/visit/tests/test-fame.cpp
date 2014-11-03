@@ -195,10 +195,10 @@ namespace
         }
         
         
-        RectilinearMesh<2,double> m2;
-        RectilinearMesh<3,double> m3;
-        ScalarField2D            &A2;
-        VectorField2D            &V2;
+        OldRectilinearMesh<2,double> m2;
+        OldRectilinearMesh<3,double> m3;
+        ScalarField2D               &A2;
+        VectorField2D               &V2;
         ScalarField3D            &A3;
         VectorField3D            &V3;
         CurvInfo                  curv;
