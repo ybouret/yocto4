@@ -29,7 +29,7 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     adb.store( new array1D<double>("Z",layout1D(-10,10)) );
     
     box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
-    B.map<double>(adb);
+    B.map_rect<double>(adb);
 
     OldRectilinearMesh<1,double> rm1(adb,"mesh1d"); display_mesh(rm1);
     OldRectilinearMesh<2,double> rm2(adb,"mesh2d"); display_mesh(rm2);

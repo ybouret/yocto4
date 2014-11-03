@@ -62,10 +62,11 @@ namespace yocto
             const Layout outline;
             
             explicit QuadGrid(const Layout &full,
+                              const bool   *pbc,
                               const int     user_rank,
                               const int     user_size,
-                              const int     ng,
-                              const bool   *pbc) :
+                              const int     ng
+                              ) :
             QuadGridData<Layout>(user_rank,user_size),
             Layout( __split(full,this->rank,this->size,pbc, this->qlinks, this->ranks, this->sizes, int2type<DIMENSIONS>() ) ),
             local_ghosts(),

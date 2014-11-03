@@ -95,7 +95,7 @@ namespace yocto
             
             //! map X/Y/Z in the arrays
             template <typename U>
-            inline void map( arrays &adb )
+            inline void map_rect( arrays &adb )
             {
                 const T *qmin = (const T *)&vmin;
                 const T *qmax = (const T *)&vmax;

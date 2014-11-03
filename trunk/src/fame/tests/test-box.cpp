@@ -37,7 +37,7 @@ YOCTO_UNIT_TEST_IMPL(box)
     adb.store( new array1D<double>("Z",layout1D(-10,10)) );
     
     box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
-    B.map<double>(adb);
+    B.map_rect<double>(adb);
     
 }
 YOCTO_UNIT_TEST_DONE()

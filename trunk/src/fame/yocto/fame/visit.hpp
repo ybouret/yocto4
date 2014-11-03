@@ -35,6 +35,23 @@ namespace yocto
                 }
             }
             
+            template <typename Layout,typename T> static inline
+            void add_mesh_meta_data( visit_handle &md, const RectilinearMesh<Layout,T> &mesh )
+            {
+                visit_handle mmd = VISIT_INVALID_HANDLE;
+                const size_t dim = mesh.dimensions;
+                if( VisIt_MeshMetaData_alloc(&mmd) == VISIT_OKAY)
+                {
+                    set_mesh_info(mmd,mesh);
+                    VisIt_MeshMetaData_setMeshType(mmd, VISIT_MESHTYPE_RECTILINEAR);
+                    VisIt_MeshMetaData_setTopologicalDimension(mmd,dim);
+                    VisIt_MeshMetaData_setSpatialDimension(mmd,dim);
+                    
+                    VisIt_SimulationMetaData_addMesh(md, mmd);
+                }
+            }
+            
+            
             //__________________________________________________________________
             //
             // sending mesh data
@@ -58,6 +75,27 @@ namespace yocto
                 }
                 return h;
             }
+            
+            template <typename Layout,typename T> static inline
+            visit_handle get_mesh( const RectilinearMesh<Layout,T> &mesh )
+            {
+                visit_handle h = VISIT_INVALID_HANDLE;
+                
+                if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
+                {
+                    visit_handle hc[Layout::DIMENSIONS];
+                    for(size_t i=0;i<Layout::DIMENSIONS;++i)
+                    {
+                        visit_handle &hh = hc[i];
+                        VisIt_VariableData_alloc( &hh );
+                        const typename RectilinearMesh<Layout,T>::Axis &a = mesh.get_axis(i);
+                        hook_data(hh,a.items,a.entry);
+                    }
+                    set_coordinates(h, hc, int2type<Layout::DIMENSIONS>() );
+                }
+                return h;
+            }
+
             
             //__________________________________________________________________
             //
