@@ -1,6 +1,8 @@
 #include "yocto/fame/split/quad1d.hpp"
 #include "yocto/utest/run.hpp"
 #include "yocto/fame/split/quad2d.hpp"
+#include "yocto/fame/split/quad3d.hpp"
+
 #include "yocto/fame/split/build-quad-ghosts.hpp"
 
 using namespace yocto;
@@ -57,6 +59,29 @@ YOCTO_UNIT_TEST_IMPL(split)
             }
             
         }
+    }
+    
+    quad_links &zlinks = links[2];
+    {
+        const layout3D l3 = layout3D( coord3D(1,1,1), coord3D(10,12,14) );
+        quad_ghosts<layout3D>::list lg;
+        quad_ghosts<layout3D>::list ag;
+        
+        coord3D    sizes;
+        coord3D    ranks;
+        for(size_t size=1;size<=9;++size)
+        {
+            std::cerr << std::endl;
+            std::cerr << "size=" << size << ", full=" << l3 << std::endl;
+            for(int rank=0;rank<size;++rank)
+            {
+                
+                const layout3D s = quad3D::split(l3, rank, size, true,xlinks, true,ylinks,true,zlinks,ranks,sizes);
+                
+            }
+        }
+        
+
     }
     
 }
