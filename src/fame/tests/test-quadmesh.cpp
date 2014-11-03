@@ -19,7 +19,7 @@ YOCTO_UNIT_TEST_IMPL(grid)
             std::cerr << "size=" << size << " : full=" << L << std::endl;
             for(int rank=0;rank<size;++rank)
             {
-                QuadGrid<layout1D> grid(L,rank,size,ng,periodic);
+                QuadGrid<layout1D> grid(L,periodic,rank,size,ng);
                 std::cerr << "\trank=" << rank << " is " << grid.ranks << "/" << grid.sizes << std::endl;
                 std::cerr << grid << std::endl;
             }
@@ -35,7 +35,7 @@ YOCTO_UNIT_TEST_IMPL(grid)
             std::cerr << "size=" << size << " : full=" << L << std::endl;
             for(int rank=0;rank<size;++rank)
             {
-                QuadGrid<layout2D> grid(L,rank,size,ng,periodic);
+                QuadGrid<layout2D> grid(L,periodic,rank,size,ng);
                 std::cerr << "\trank=" << rank << " is " << grid.ranks << "/" << grid.sizes << std::endl;
                 std::cerr << grid << std::endl;
             }
@@ -53,7 +53,7 @@ YOCTO_UNIT_TEST_IMPL(grid)
             std::cerr << "size=" << size << " : full=" << L << std::endl;
             for(int rank=0;rank<size;++rank)
             {
-                QuadGrid<layout3D> grid(L,rank,size,ng,periodic);
+                QuadGrid<layout3D> grid(L,periodic,rank,size,ng);
                 std::cerr << "\trank=" << rank << " is " << grid.ranks << "/" << grid.sizes << std::endl;
                 std::cerr << grid << std::endl;
             }

@@ -59,7 +59,7 @@ namespace yocto
             
             Vertices vertices;
             
-            inline   Mesh( arrays &adb, const string &id ) :
+            inline   Mesh( const string &id ) :
             MeshInfo(DIM,id),
             vertices()
             {

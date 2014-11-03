@@ -66,7 +66,7 @@ namespace
             assert(cx.items==cy.items);
             
             box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
-            B.map<double>(*this);
+            B.map_rect<double>(*this);
             
             for(unit_t j=A2.lower.y;j<=A2.upper.y;++j)
             {
