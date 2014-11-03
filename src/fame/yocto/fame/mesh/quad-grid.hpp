@@ -17,9 +17,23 @@ namespace yocto
         class QuadGridData
         {
         public:
-            explicit QuadGridData() throw() : ranks(), sizes(), qlinks()  {}
-            virtual ~QuadGridData() throw() {}
+            explicit QuadGridData(const int user_rank, const int user_size) throw() :
+            rank(user_rank),
+            size(user_size),
+            ranks(),
+            sizes(),
+            qlinks()
+            {
+                assert(rank>=0);
+                assert(size>0);
+                assert(rank<size);
+            }
             
+            virtual ~QuadGridData() throw()
+            {}
+            
+            const int                    rank;
+            const int                    size;
             const typename Layout::coord ranks;
             const typename Layout::coord sizes;
             
@@ -48,19 +62,40 @@ namespace yocto
             const Layout outline;
             
             explicit QuadGrid(const Layout &full,
-                              const int     rank,
-                              const int     size,
+                              const int     user_rank,
+                              const int     user_size,
                               const int     ng,
                               const bool   *pbc) :
-            QuadGridData<Layout>(),
-            Layout( __split(full,rank,size,pbc, this->qlinks, this->ranks, this->sizes, int2type<DIMENSIONS>() ) ),
+            QuadGridData<Layout>(user_rank,user_size),
+            Layout( __split(full,this->rank,this->size,pbc, this->qlinks, this->ranks, this->sizes, int2type<DIMENSIONS>() ) ),
             local_ghosts(),
             async_ghosts(),
-            outline( build_quad_ghosts<Layout>::outline_for(rank, *this, 1, this->qlinks, local_ghosts, async_ghosts ) )
+            outline( build_quad_ghosts<Layout>::outline_for(this->rank, *this, 1, this->qlinks, local_ghosts, async_ghosts ) )
             {
-                
+                assert(outline.contains(*this));
             }
             
+            virtual ~QuadGrid() throw()
+            {
+            }
+            
+            friend inline std::ostream & operator<<( std::ostream &os, const QuadGrid &G )
+            {
+                os << "layout  =" << G.__layout() << std::endl;
+                os << "outline =" << G.outline    << std::endl;
+                os << "#local ghosts=" << G.local_ghosts.size << std::endl;
+                for( const Ghosts *g = G.local_ghosts.head; g;g=g->next)
+                {
+                    assert(g->peer == G.rank);
+                    os << "\t" << g->source.zone << " --> " << g->target.zone << std::endl;
+                }
+                os << "#async ghosts=" << G.async_ghosts.size << std::endl;
+                for( const Ghosts *g = G.async_ghosts.head; g;g=g->next)
+                {
+                    os << "\t @peer=" << g->peer << " : send=" << g->source.zone << ", recv=" << g->target.zone << std::endl;
+                }
+                return os;
+            }
             
             
         private:
@@ -114,7 +149,7 @@ namespace yocto
                 const bool zpbc = has_pbc ? pbc[2] : false;
                 return quad3D::split(full, rank, size, xpbc, links[0], ypbc, links[1], zpbc, links[2], (Coord &)__ranks, (Coord &)__sizes);
             }
-
+            
             
             
         };

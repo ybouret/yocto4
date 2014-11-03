@@ -90,14 +90,14 @@ namespace yocto
                                 //std::cerr << "\t\t" << get_axis_name(dim) << "ghost@prev: " << target << std::endl;
                                 if(local)
                                 {
-                                    // take data and the 'next' side
+                                    // take data from the 'next' side
                                     const unit_t source_up    = __coord(inside.upper,dim);
                                     const unit_t source_lo    = source_up - gshift;
                                     const Coord  source_lower = replace_coord(source_lo, outline.lower, dim);
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "local <-- " << source << std::endl;
-                                    lg.push_back( new Ghosts(outline,source,target) );
+                                    lg.push_back( new Ghosts(outline,link.rank,source,target) );
                                 }
                                 else
                                 {
@@ -108,7 +108,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "async <--  " << source << std::endl;
-                                    ag.push_back( new Ghosts(outline,source,target));
+                                    ag.push_back( new Ghosts(outline,link.rank,source,target));
                                 }
                                 
                             }   break;
@@ -130,7 +130,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "local <--  " << source << std::endl;
-                                    lg.push_back( new Ghosts(outline,source,target) );
+                                    lg.push_back( new Ghosts(outline,link.rank,source,target) );
                                 }
                                 else
                                 {
@@ -141,7 +141,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "async <-- " << source << std::endl;
-                                    ag.push_back( new Ghosts(outline,source,target) );
+                                    ag.push_back( new Ghosts(outline,link.rank,source,target) );
                                 }
                             }  break;
                         }
