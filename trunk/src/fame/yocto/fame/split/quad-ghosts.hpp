@@ -15,9 +15,11 @@ namespace yocto
         class quad_ghost : public ghost
         {
         public:
-            
+            const Layout zone;
             inline quad_ghost(const Layout &outline,
-                              const Layout &zone ) : ghost( zone.items )
+                              const Layout &gzone  ) :
+            ghost(gzone.items),
+            zone(gzone)
             {
                 outline.store_offsets_of(zone,*this);
             }
@@ -42,6 +44,7 @@ namespace yocto
             typedef quad_ghosts        Ghosts;
             typedef quad_ghost<Layout> Ghost;
             
+            const   int   peer;
             const   Ghost source;
             const   Ghost target;
             
@@ -51,8 +54,10 @@ namespace yocto
             typedef core::list_of_cpp< Ghosts > list;
             
             explicit quad_ghosts(const Layout outline,
+                                 const int    peer_rank,
                                  const Layout source_layout,
                                  const Layout target_layout):
+            peer(peer_rank),
             source(outline,source_layout),
             target(outline,target_layout),
             next(0),
