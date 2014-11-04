@@ -60,8 +60,9 @@ namespace yocto
             
             string make_id( unit_t idx ) const;
             
-            void *       data() throw();
-            const void * data() const throw();
+            virtual void *       data( size_t offset )       throw() = 0;
+            virtual const void * data( size_t offset ) const throw() = 0;
+            
             
             
         protected:
@@ -111,6 +112,20 @@ namespace yocto
                 assert(offset>=0);
                 assert(offset<this->items);
                 return entry[offset];
+            }
+            
+            virtual void * data( size_t offset )       throw()
+            {
+                assert(offset>=0);
+                assert(offset<this->items);
+                return &entry[offset];
+            }
+            
+            virtual const void * data( size_t offset ) const throw()
+            {
+                assert(offset>=0);
+                assert(offset<this->items);
+                return &entry[offset];
             }
             
         protected:

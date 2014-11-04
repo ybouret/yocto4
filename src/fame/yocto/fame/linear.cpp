@@ -7,10 +7,20 @@ namespace yocto
     namespace fame
     {
         
-        void * linear_space:: data()  throw() { return buffer; }
-        const void * linear_space:: data() const throw() { return buffer; }
+        void *       linear_space:: data( size_t offset )      throw()
+        {
+            assert(offset < bytes/itmsz );
+            return static_cast<uint8_t *>(buffer) + offset*itmsz;
+        }
+        
+        const void * linear_space:: data( size_t offset) const throw()
+        {
+            assert(offset < bytes/itmsz );
+            return static_cast<const uint8_t *>(buffer) + offset*itmsz;
+        }
 
         
+ 
         linear_space:: ~linear_space() throw()
         {
             if(buflen)
