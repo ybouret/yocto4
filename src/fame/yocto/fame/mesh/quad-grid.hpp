@@ -71,7 +71,7 @@ namespace yocto
             Layout( __split(full,this->rank,this->size,pbc, this->qlinks, this->ranks, this->sizes, int2type<DIMENSIONS>() ) ),
             local_ghosts(),
             async_ghosts(),
-            outline( build_quad_ghosts<Layout>::outline_for(this->rank, *this, 1, this->qlinks, local_ghosts, async_ghosts ) )
+            outline( build_quad_ghosts<Layout>::outline_for(this->rank, this->__layout(), 1, this->qlinks, local_ghosts, async_ghosts ) )
             {
                 assert(outline.contains(*this));
             }

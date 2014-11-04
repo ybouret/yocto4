@@ -295,7 +295,7 @@ namespace yocto
             VisItSetSlaveProcessCallback(SlaveProcessCallback);
             VisItSetCommandCallback(ControlCommandCallback,cbdata);
             VisItSetGetMetaData(SimGetMetaData,cbdata);
-            VisItSetGetMesh(SimGetMesh, cbdata);
+            VisItSetGetMesh(SimGetMesh,cbdata);
             VisItSetGetDomainList(SimGetDomainList,cbdata);
             VisItSetGetVariable(SimGetVariable,cbdata);
             VisItSetGetCurve(SimGetCurve,cbdata);
