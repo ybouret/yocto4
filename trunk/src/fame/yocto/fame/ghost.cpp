@@ -16,48 +16,18 @@ namespace yocto
             assert(gdst.size()==gsrc.size());
             assert(dst.itmsz==src.itmsz);
             
-            uint8_t       *target = static_cast<uint8_t *>(dst.data());
-            const uint8_t *source = static_cast<const uint8_t *>(src.data());
-            const size_t   itmsz  = dst.itmsz;
             const size_t   n      = gdst.size();
+            const size_t   w      = dst.itmsz;
             for(size_t i=0;i<n;++i)
             {
                 const size_t t = gdst[i];
                 const size_t s = gsrc[i];
-                memcpy( &target[t*itmsz], &source[s*itmsz], itmsz);
+                memcpy( dst.data(t), src.data(s), w);
             }
         }
         
         
-        void ghost:: save(array<uint8_t> &dst, const linear_space &src, size_t &offset) const throw()
-        {
-            const size_t n = size();
-            const size_t w = src.itmsz;
-            assert(offset>0);
-            assert(n*w+offset-1<=dst.size());
-            const uint8_t *data   = static_cast<const uint8_t *>(src.data());
-            for(size_t i=0;i<n;++i,offset += w)
-            {
-                const size_t s = (*this)[i];
-                memcpy( &dst[offset], &data[s*w], w);
-            }
-        }
         
-        void ghost:: load(linear_space &dst, const array<uint8_t> &src, size_t &offset) const throw()
-        {
-            const size_t n = size();
-            const size_t w = dst.itmsz;
-            assert(offset>0);
-            assert(n*w+offset-1<=src.size());
-            uint8_t *data   = static_cast<uint8_t *>(dst.data());
-            for(size_t i=0;i<n;++i,offset += w)
-            {
-                const size_t d = (*this)[i];
-                memcpy( &data[d*w], &src[offset], w);
-            }
-            
-        }
-
         size_t ghost:: chunk_size_of( const array<linear_handle> &handles ) throw()
         {
             size_t ans = 0;
@@ -69,16 +39,32 @@ namespace yocto
             return ans;
         }
         
-        size_t ghost:: save(uint8_t                    *dst,
+        size_t ghost:: save(void                       *dst,
                             const size_t                num,
                             const array<linear_handle> &handles ) const throw()
         {
-            assert(this->size()*chunk_size_of(handles)<=num);
 
             const size_t n     = size();
-            size_t       count = 0;
+            const size_t h     = handles.size();
             
-            return count;
+            size_t chunk_size = 0;
+            for(size_t i=h;i>0;--i)
+            {
+                assert(handles[i]!=NULL);
+                const linear_space &l = *handles[i];
+                chunk_size += l.itmsz;
+            }
+            assert(chunk_size*n<=num);
+            
+            const sorted_offsets &self = *this;
+            for(size_t j=n;j>0;--j)
+            {
+                const size_t k = self[j];
+                
+                
+            }
+            
+            return n*chunk_size;
         }
 
         
