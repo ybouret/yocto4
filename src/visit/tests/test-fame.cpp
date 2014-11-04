@@ -18,6 +18,17 @@ namespace
     typedef array3D<v3d<double> > VectorField3D;
     
     
+    template <typename ARR>
+    static inline void display1D( const ARR &arr )
+    {
+        std::cerr << "[";
+        for(unit_t i=arr.lower;i<=arr.upper;++i)
+        {
+            std::cerr << " " << arr[i];
+        }
+        std::cerr << " ]" << std::endl;
+    }
+    
     class MyDataDB
     {
     public:
@@ -46,8 +57,8 @@ namespace
                         const int rank,
                         const int size
                         ):
-        m2( db2, "mesh2", full2, pbc, rank, size, 1),
-        m3( db3, "mesh3", full3, pbc, rank, size, 1)
+        m2( db2, "mesh2d", full2, pbc, rank, size, 1),
+        m3( db3, "mesh3d", full3, pbc, rank, size, 1)
         {
             db2.store( new ScalarField2D("A2",m2.outline) );
         }
@@ -106,6 +117,9 @@ namespace
                 m2.X()[i] = i;
             }
             
+            std::cerr << "m2.X="; display1D(m2.X());
+            std::cerr << "m2.Y="; display1D(m2.Y());
+
         
         
 #if 0
@@ -181,7 +195,6 @@ namespace
     virtual visit_handle get_mesh( int domain, const string &name) const
     {
         
-#if 1
         if(name=="mesh2d")
         {
             return visit::get_mesh(m2);
@@ -191,7 +204,6 @@ namespace
         {
             return visit::get_mesh(m3);
         }
-#endif
         
         return VISIT_INVALID_HANDLE;
     }
