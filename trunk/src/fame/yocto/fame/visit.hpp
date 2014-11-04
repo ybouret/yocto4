@@ -21,8 +21,12 @@ namespace yocto
             // declaring mesh meta data
             //__________________________________________________________________
             template <typename Layout,typename T> static inline
-            void add_mesh_meta_data( visit_handle &md, const RectilinearMesh<Layout,T> &mesh )
+            void add_mesh_meta_data( visit_handle                   &md,
+                                    const RectilinearMesh<Layout,T> &mesh,
+                                    const int num_domains
+                                    )
             {
+                assert(num_domains>0);
                 visit_handle mmd = VISIT_INVALID_HANDLE;
                 const size_t dim = Layout::DIMENSIONS;
                 if( VisIt_MeshMetaData_alloc(&mmd) == VISIT_OKAY)
@@ -31,6 +35,7 @@ namespace yocto
                     VisIt_MeshMetaData_setMeshType(mmd, VISIT_MESHTYPE_RECTILINEAR);
                     VisIt_MeshMetaData_setTopologicalDimension(mmd,dim);
                     VisIt_MeshMetaData_setSpatialDimension(mmd,dim);
+                    VisIt_MeshMetaData_setNumDomains(mmd,num_domains);
                     
                     VisIt_SimulationMetaData_addMesh(md, mmd);
                 }
