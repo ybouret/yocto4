@@ -58,6 +58,29 @@ namespace yocto
             
         }
 
+        size_t ghost:: chunk_size_of( const array<linear_handle> &handles ) throw()
+        {
+            size_t ans = 0;
+            for(size_t i=handles.size();i>0;--i)
+            {
+                assert(handles[i]!=NULL);
+                ans += handles[i]->itmsz;
+            }
+            return ans;
+        }
+        
+        size_t ghost:: save(uint8_t                    *dst,
+                            const size_t                num,
+                            const array<linear_handle> &handles ) const throw()
+        {
+            assert(this->size()*chunk_size_of(handles)<=num);
+
+            const size_t n     = size();
+            size_t       count = 0;
+            
+            return count;
+        }
+
         
     }
     
