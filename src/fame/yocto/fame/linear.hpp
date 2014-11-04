@@ -2,9 +2,12 @@
 #define YOCTO_FAME_LINEAR_INCLUDED 1
 
 #include "yocto/fame/types.hpp"
+#include "yocto/fame/types-io.hpp"
+
 #include "yocto/counted.hpp"
 #include "yocto/type/args.hpp"
 #include "yocto/string.hpp"
+#include "yocto/ptr/intr.hpp"
 #include <typeinfo>
 
 namespace yocto
@@ -75,6 +78,10 @@ namespace yocto
             void check_typeid(const std::type_info&aid) const;
             
         };
+        
+        typedef intr_ptr<string,linear_space> linear_ptr;
+        typedef linear_space                 *linear_handle;
+        
         
         template <typename T,typename LAYOUT>
         class linear : public LAYOUT, public linear_space
