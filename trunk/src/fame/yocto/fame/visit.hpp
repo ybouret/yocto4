@@ -47,10 +47,10 @@ namespace yocto
             // sending mesh data
             //__________________________________________________________________
             template <typename Layout,typename T> static inline
-            visit_handle get_mesh( const RectilinearMesh<Layout,T> &mesh )
+            visit_handle get_mesh(const RectilinearMesh<Layout,T> &mesh,
+                                  const int )
             {
                 visit_handle h = VISIT_INVALID_HANDLE;
-                
                 if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
                 {
                     visit_handle hc[Layout::DIMENSIONS];
@@ -94,7 +94,7 @@ namespace yocto
             // sending variable data
             //__________________________________________________________________
             template <typename ARRAY> static inline
-            visit_handle get_variable_data( int ndomain, const ARRAY &a )
+            visit_handle get_variable_data( const ARRAY &a, int )
             {
                 visit_handle h = VISIT_INVALID_HANDLE;
                 if( VisIt_VariableData_alloc(&h) == VISIT_OKAY )

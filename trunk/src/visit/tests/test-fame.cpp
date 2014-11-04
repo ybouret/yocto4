@@ -167,27 +167,27 @@ namespace
             
             if(name=="mesh2d")
             {
-                return visit::get_mesh(m2);
+                return visit::get_mesh(m2,domain);
             }
             
             if(name=="mesh3d")
             {
-                return visit::get_mesh(m3);
+                return visit::get_mesh(m3,domain);
             }
             
             return VISIT_INVALID_HANDLE;
         }
         
-        virtual visit_handle get_variable( int ndomain, const string &name ) const
+        virtual visit_handle get_variable( int domain, const string &name ) const
         {
             if( name == "A2" )
             {
-                return visit::get_variable_data(ndomain, A2);
+                return visit::get_variable_data(A2,domain);
             }
             
             if( name == "A3" )
             {
-                return visit::get_variable_data(ndomain, A3);
+                return visit::get_variable_data(A3,domain);
             }
 #if 0
            
@@ -224,7 +224,7 @@ namespace
             for(unit_t i=cx.lower;i<=cx.upper;++i)
             {
                 cx[i] = static_cast<float>(i);
-                cy[i] = sin( cx[i] + 0.1 * runTime );
+                cy[i] = sin( 0.1*cx[i] + 0.1 * runTime );
             }
         }
         
@@ -255,7 +255,7 @@ YOCTO_UNIT_TEST_IMPL(fame)
     VisIt::TraceFile trace(MPI,"trace.dat");
     VisIt::SetupParallel(MPI,sim_name,sim_comment,sim_path,NULL);
     
-    const layout3D full3( coord3D(1,1,1), coord3D(10,20,30) );
+    const layout3D full3( coord3D(1,1,1), coord3D(30,40,50) );
     const layout2D full2( coord2D(full3.lower.x,full3.lower.y), coord2D(full3.upper.x,full3.upper.y) );
     
     MySim sim(MPI,full2,full3);

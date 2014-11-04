@@ -92,6 +92,20 @@ namespace yocto
                 }
             }
             
+            type & operator()(unit_t offset) throw()
+            {
+                assert(offset>=0);
+                assert(offset<this->items);
+                return entry[offset];
+            }
+            
+            const_type & operator()(unit_t offset) const throw()
+            {
+                assert(offset>=0);
+                assert(offset<this->items);
+                return entry[offset];
+            }
+            
         protected:
             inline explicit linear(const string &user_name,
                                    const LAYOUT &L,
