@@ -9,10 +9,10 @@ namespace yocto
         ghost:: ~ghost() throw() {}
         ghost:: ghost(size_t n) : offsets_list(n) {}
         
-        void copy(linear_space       &dst,
-                  const ghost        &gdst,
-                  const linear_space &src,
-                  const ghost        &gsrc) throw()
+        void ghost::copy(linear_space       &dst,
+                         const ghost        &gdst,
+                         const linear_space &src,
+                         const ghost        &gsrc) throw()
         {
             assert(gdst.size()==gsrc.size());
             assert(dst.itmsz==src.itmsz);
@@ -48,7 +48,7 @@ namespace yocto
             }
             
         }
-       
+        
         void   ghost:: load(linear_handles &handles, void *src) const
         {
             const size_t n     = size();
@@ -63,10 +63,10 @@ namespace yocto
                     handles[i].load(k,src);
                 }
             }
-
+            
         }
         
-
+        
         
 #if 0
         void ghost:: load(void *src, const size_t num, array<linear_handle> &handles ) const
