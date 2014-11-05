@@ -44,9 +44,10 @@ namespace yocto
             void release() throw();
             void ensure(size_t interleaved_bytes);
             
+            
         protected:
-            void          *ibuffer;
-            void          *obuffer;
+            void          *sbuffer; //!< send buffer
+            void          *rbuffer; //!< recv buffer
             const size_t   io_size;
             
         private:
@@ -65,9 +66,10 @@ namespace yocto
             typedef quad_ghosts        Ghosts;
             typedef quad_ghost<Layout> Ghost;
             
-            const   int   peer;
-            const   Ghost source;
-            const   Ghost target;
+            const   int    peer;
+            const   Ghost  source;
+            const   Ghost  target;
+            const   size_t size;
             
             Ghosts *next;
             Ghosts *prev;
@@ -81,6 +83,7 @@ namespace yocto
             peer(peer_rank),
             source(outline,source_layout),
             target(outline,target_layout),
+            size(source.size()),
             next(0),
             prev(0)
             {
@@ -91,12 +94,36 @@ namespace yocto
             {
             }
             
-            inline void local_update(linear_space       &tgt,
-                                     const linear_space &src) const throw()
+            
+            //! put source zone into target zone for all handles
+            inline void local_update( linear_handles &handles ) const throw()
             {
-                ghost::copy(tgt, target, src, source);
+                for(size_t i=handles.size();i>0;--i)
+                {
+                    linear_space &l = handles[i];
+                    ghost::copy(l,target,l,source);
+                }
             }
             
+            //! memory of I/O
+            inline void allocate_for( const linear_handles &handles )
+            {
+                ensure( size * handles.chunk_size );
+            }
+            
+            inline void recv_dispatch( linear_handles &handles ) throw()
+            {
+                assert(io_size>=size*handles.chunk_size);
+                target.load(handles,rbuffer);
+            }
+            
+            inline void send_assemble( const linear_handles &handles ) throw()
+            {
+                assert(io_size>=size*handles.chunk_size);
+                source.save(sbuffer,handles);
+            }
+            
+           
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(quad_ghosts);
