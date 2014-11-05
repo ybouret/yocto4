@@ -26,6 +26,7 @@ namespace yocto
             const linear_space & operator[](const string &id ) const;
             const linear_space & operator[](const char   *id ) const;
             
+            bool has( const linear_space &l ) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(arrays);

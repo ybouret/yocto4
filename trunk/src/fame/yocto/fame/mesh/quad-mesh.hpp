@@ -36,9 +36,6 @@ const int    ng   = 0
             MESH(id)
             {
                 // then rect/curv will generates Axis...
-                //std::cerr << "\tfull=" << full << std::endl;
-                //std::cerr << "\tthis=" << this->__layout() << std::endl;
-                //std::cerr << "\toutl=" << this->outline    << std::endl;
             }
             
             virtual ~QuadMesh() throw()

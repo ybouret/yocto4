@@ -44,7 +44,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 
                 for(quad_ghosts<layout1D> *g = ag.head;g;g=g->next)
                 {
-                    g->allocate_for(handles);
+                    g->allocate_for(handles.chunk_size);
                     g->send_assemble(handles);
                     g->recv_dispatch(handles);
                 }
@@ -86,7 +86,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 
                 for(quad_ghosts<layout2D> *g = ag.head;g;g=g->next)
                 {
-                    g->allocate_for(handles);
+                    g->allocate_for(handles.chunk_size);
                     g->send_assemble(handles);
                     g->recv_dispatch(handles);
                 }
@@ -129,7 +129,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 
                 for(quad_ghosts<layout3D> *g = ag.head;g;g=g->next)
                 {
-                    g->allocate_for(handles);
+                    g->allocate_for(handles.chunk_size);
                     g->send_assemble(handles);
                     g->recv_dispatch(handles);
                 }

@@ -106,9 +106,9 @@ namespace yocto
             }
             
             //! memory of I/O
-            inline void allocate_for( const linear_handles &handles )
+            inline void allocate_for( const size_t chunk_size  )
             {
-                ensure( size * handles.chunk_size );
+                ensure( size * chunk_size );
             }
             
             inline void recv_dispatch( linear_handles &handles ) throw()

@@ -98,6 +98,14 @@ namespace yocto
                 return os;
             }
             
+            inline void allocate_async_for( const size_t chunk_size )
+            {
+                for( Ghosts *g = async_ghosts.head;g;g=g->next)
+                {
+                    g->allocate_for(chunk_size);
+                }
+            }
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(QuadGrid);
