@@ -35,10 +35,31 @@ namespace yocto
         };
         
         
+        class quad_ghosts_io : public object
+        {
+        public:
+            explicit quad_ghosts_io() throw();
+            virtual ~quad_ghosts_io() throw();
+            
+            void release() throw();
+            void ensure(size_t interleaved_bytes);
+            
+        protected:
+            void          *ibuffer;
+            void          *obuffer;
+            const size_t   io_size;
+            
+        private:
+            size_t   iobytes;
+            void io_update() throw();
+            
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(quad_ghosts_io);
+        };
         
         
         template <typename Layout>
-        class quad_ghosts : public object
+        class quad_ghosts : public quad_ghosts_io
         {
         public:
             typedef quad_ghosts        Ghosts;

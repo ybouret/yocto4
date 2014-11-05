@@ -28,36 +28,13 @@ namespace yocto
         
         
         
-        size_t ghost:: chunk_size_of( const array<linear_handle> &handles ) throw()
-        {
-            size_t ans = 0;
-            for(size_t i=handles.size();i>0;--i)
-            {
-                assert(handles[i]!=NULL);
-                ans += handles[i]->itmsz;
-            }
-            return ans;
-        }
         
-        size_t ghost:: save(void                       *dst,
-                            const size_t                num,
-                            const array<linear_handle> &handles ) const
+        void ghost:: save(void                 *dst,
+                          const linear_handles &handles ) const
         {
-
-            assert(! (dst==NULL&&num>0) );
+            
             const size_t n     = size();
             const size_t h     = handles.size();
-            
-            size_t chunk_size = 0;
-            for(size_t i=h;i>0;--i)
-            {
-                assert(handles[i]!=NULL);
-                const linear_space &l = *handles[i];
-                chunk_size += l.itmsz;
-            }
-            
-            if(chunk_size*n>num)
-                throw exception("ghost save overflow");
             
             const sorted_offsets &self = *this;
             for(size_t j=n;j>0;--j)
@@ -65,14 +42,33 @@ namespace yocto
                 const size_t k = self[j];
                 for(size_t i=h;i>0;--i)
                 {
-                    handles[i]->save(dst,k);
+                    handles[i].save(dst,k);
                 }
                 
             }
             
-            return n*chunk_size;
         }
+       
+        void   ghost:: load(linear_handles &handles, void *src) const
+        {
+            const size_t n     = size();
+            const size_t h     = handles.size();
+            
+            const sorted_offsets &self = *this;
+            for(size_t j=n;j>0;--j)
+            {
+                const size_t k = self[j];
+                for(size_t i=h;i>0;--i)
+                {
+                    handles[i].load(k,src);
+                }
+            }
 
+        }
+        
+
+        
+#if 0
         void ghost:: load(void *src, const size_t num, array<linear_handle> &handles ) const
         {
             assert(! (src==NULL&&num>0) );
@@ -86,8 +82,11 @@ namespace yocto
                 const linear_space &l = *handles[i];
                 chunk_size += l.itmsz;
             }
-
+            
+            // blah blah
+            
         }
+#endif
         
     }
     

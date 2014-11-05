@@ -66,6 +66,7 @@ namespace yocto
             virtual void save( void * &dst, size_t offset ) const throw() = 0;
             virtual void load( size_t offset, void * &src ) throw()       = 0;
             
+            
         protected:
             size_t buflen;
             void  *buffer;
@@ -82,7 +83,20 @@ namespace yocto
         };
         
         typedef intr_ptr<string,linear_space> linear_ptr;
-        typedef linear_space                 *linear_handle;
+        
+        class linear_comparator
+        {
+        public:
+            linear_comparator() throw() {}
+            ~linear_comparator() throw() {}
+            int operator()(const linear_ptr &lhs, const linear_ptr &rhs) throw()
+            {
+                return string::compare(lhs->name,rhs->name);
+            }
+        private:
+            YOCTO_DISABLE_COPY_AND_ASSIGN(linear_comparator);
+        };
+
         
         
         template <typename T,typename LAYOUT>
