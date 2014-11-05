@@ -63,7 +63,8 @@ namespace yocto
             virtual void *       data( size_t offset )       throw() = 0;
             virtual const void * data( size_t offset ) const throw() = 0;
             
-            
+            virtual void save( void * &dst, size_t offset ) const throw() = 0;
+            virtual void load( size_t offset, void * &src ) throw()       = 0;
             
         protected:
             size_t buflen;
@@ -116,16 +117,26 @@ namespace yocto
             
             virtual void * data( size_t offset )       throw()
             {
-                assert(offset>=0);
                 assert(offset<this->items);
                 return &entry[offset];
             }
             
             virtual const void * data( size_t offset ) const throw()
             {
-                assert(offset>=0);
                 assert(offset<this->items);
                 return &entry[offset];
+            }
+            
+            virtual void save( void * &dst, size_t offset ) const throw()
+            {
+                assert(offset<this->items);
+                type_io<T>::put(dst, &entry[offset] );
+            }
+            
+            virtual void load( size_t offset, void * &src ) throw()
+            {
+                assert(offset<this->items);
+                type_io<T>::get( &entry[offset], src );
             }
             
         protected:
