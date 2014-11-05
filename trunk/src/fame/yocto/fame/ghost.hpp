@@ -1,8 +1,7 @@
 #ifndef YOCTO_FAME_GHOST_INCLUDED
 #define YOCTO_FAME_GHOST_INCLUDED 1
 
-#include "yocto/fame/linear.hpp"
-#include "yocto/sequence/array.hpp"
+#include "yocto/fame/linear-handles.hpp"
 
 namespace yocto
 {
@@ -16,7 +15,6 @@ namespace yocto
             explicit ghost(size_t n);
             virtual ~ghost() throw();
             
-            static size_t chunk_size_of( const array<linear_handle> &handles ) throw();
             
             //! copy local data
             static void copy(linear_space       &dst,
@@ -24,14 +22,15 @@ namespace yocto
                              const linear_space &src,
                              const ghost        &gsrc) throw();
             
+            
+            
+            
             //! save interleaved data into an array of bytes
             /**
-             \param  dst the adress of the array
-             \param  num number of bytes
+             \param  dst the adress of the array >= this->size() * handles.chunk_size
              \param  handles the collection of linear spaces
-             \return the number of bytes, for MPI
              */
-            size_t save(void *dst, const size_t num, const array<linear_handle> &handles ) const;
+            void save(void *dst, const linear_handles &handles ) const;
             
             
             //! load interleaved data from an array of bytes
@@ -40,7 +39,7 @@ namespace yocto
              \param num the number of interleaved bytes
              \param handles the collecton of linear spaces
              */
-            void   load(void *src, const size_t num, array<linear_handle> &handles ) const;
+            void   load(linear_handles &handles, void *src) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(ghost);
