@@ -1,4 +1,5 @@
 #include "yocto/fame/ghost.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -15,7 +16,6 @@ namespace yocto
         {
             assert(gdst.size()==gsrc.size());
             assert(dst.itmsz==src.itmsz);
-            
             const size_t   n      = gdst.size();
             const size_t   w      = dst.itmsz;
             for(size_t i=0;i<n;++i)
@@ -41,9 +41,10 @@ namespace yocto
         
         size_t ghost:: save(void                       *dst,
                             const size_t                num,
-                            const array<linear_handle> &handles ) const throw()
+                            const array<linear_handle> &handles ) const
         {
 
+            assert(! (dst==NULL&&num>0) );
             const size_t n     = size();
             const size_t h     = handles.size();
             
@@ -54,19 +55,39 @@ namespace yocto
                 const linear_space &l = *handles[i];
                 chunk_size += l.itmsz;
             }
-            assert(chunk_size*n<=num);
+            
+            if(chunk_size*n>num)
+                throw exception("ghost save overflow");
             
             const sorted_offsets &self = *this;
             for(size_t j=n;j>0;--j)
             {
                 const size_t k = self[j];
-                
+                for(size_t i=h;i>0;--i)
+                {
+                    handles[i]->save(dst,k);
+                }
                 
             }
             
             return n*chunk_size;
         }
 
+        void ghost:: load(void *src, const size_t num, array<linear_handle> &handles ) const
+        {
+            assert(! (src==NULL&&num>0) );
+            const size_t n     = size();
+            const size_t h     = handles.size();
+            
+            size_t chunk_size = 0;
+            for(size_t i=h;i>0;--i)
+            {
+                assert(handles[i]!=NULL);
+                const linear_space &l = *handles[i];
+                chunk_size += l.itmsz;
+            }
+
+        }
         
     }
     
