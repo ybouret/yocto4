@@ -24,7 +24,6 @@ namespace yocto
             
             
             
-            
             //! save interleaved data into an array of bytes
             /**
              \param  dst the adress of the array >= this->size() * handles.chunk_size
