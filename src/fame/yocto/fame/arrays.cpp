@@ -54,6 +54,19 @@ namespace yocto
             return (*this)[ID];
         }
         
+        bool arrays:: has( const linear_space &l ) const throw()
+        {
+            const linear_ptr *pp = search(l.name);
+            if(pp)
+            {
+                const linear_space &r = **pp;
+                if( &r == &l )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         
     }
 }
