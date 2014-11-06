@@ -59,7 +59,17 @@ namespace yocto
                 return os;
             }
             
-                      
+            inline void set_value( param_type value, const layout1D &sub )
+            {
+                assert(this->contains(sub));
+                for(unit_t i=sub.lower;i<=sub.upper;++i)
+                {
+                    addr[i] = value;
+                }
+            }
+
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(array1D);
             type *addr;

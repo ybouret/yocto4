@@ -17,7 +17,7 @@ INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(../../mpi)
 
 ADD_EXECUTABLE(test-fame-par main-par.cpp)
-TARGET_LINK_YOCTO(test-fame-par mpa mpi)
+TARGET_LINK_YOCTO(test-fame-par mk fame mpi)
 TARGET_LINK_LIBRARIES(test-fame-par ${MPI_LIBRARIES})
 
 
