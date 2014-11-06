@@ -125,7 +125,32 @@ namespace yocto
                 source.save(sbuffer,handles);
             }
             
-           
+            // to store by dimension
+            class pointers
+            {
+            public:
+                const size_t count; //!< 0/1/2
+                inline  pointers() throw() : count(0), gptr() {}
+                inline ~pointers() throw() {}
+                
+                inline void append( quad_ghosts *g ) throw()
+                {
+                    assert(count<2);
+                    assert(g);
+                    gptr[count] = g;
+                    ++ (size_t &)count;
+                }
+                
+                inline quad_ghosts &operator[](size_t i) throw()
+                {
+                    assert(i<count);
+                    assert(0!=gptr[i]);
+                    return *gptr[i];
+                }
+                
+            private:
+                quad_ghosts *gptr[2];
+            };
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(quad_ghosts);

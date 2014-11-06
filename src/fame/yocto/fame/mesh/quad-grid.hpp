@@ -51,15 +51,16 @@ namespace yocto
         {
         public:
             static const size_t DIMENSIONS = Layout::DIMENSIONS;
-            typedef typename Layout::coord Coord;
-            typedef quad_ghosts<Layout>    Ghosts;
-            typedef typename Ghosts::list  GhostsList;
-            
+            typedef typename Layout::coord    Coord;
+            typedef quad_ghosts<Layout>       Ghosts;
+            typedef typename Ghosts::list     GhostsList;
+            typedef typename Ghosts::pointers GhostsPtrs;
             
         public:
             GhostsList   local_ghosts;
             GhostsList   async_ghosts;
             const Layout outline;
+            GhostsPtrs   asynchronous[3];
             
             explicit QuadGrid(const Layout &full,
                               const bool   *pbc,
@@ -71,9 +72,11 @@ namespace yocto
             Layout( __split(full,this->rank,this->size,pbc, this->qlinks, this->ranks, this->sizes, int2type<DIMENSIONS>() ) ),
             local_ghosts(),
             async_ghosts(),
-            outline( build_quad_ghosts<Layout>::outline_for(this->rank, this->__layout(), 1, this->qlinks, local_ghosts, async_ghosts ) )
+            outline( build_quad_ghosts<Layout>::outline_for(this->rank, this->__layout(), 1, this->qlinks, local_ghosts, async_ghosts ) ),
+            asynchronous()
             {
                 assert(outline.contains(*this));
+                fill_async();
             }
             
             virtual ~QuadGrid() throw()
@@ -159,6 +162,13 @@ namespace yocto
                 return quad3D::split(full, rank, size, xpbc, links[0], ypbc, links[1], zpbc, links[2], (Coord &)__ranks, (Coord &)__sizes);
             }
             
+            inline void fill_async() throw()
+            {
+                for( Ghosts *g = async_ghosts.head;g;g=g->next)
+                {
+                    asynchronous[g->dim].append(g);
+                }
+            }
             
             
         };
