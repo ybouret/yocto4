@@ -59,7 +59,7 @@ namespace yocto
                 return os;
             }
             
-            inline void set_value( param_type value, const layout1D &sub )
+            inline void fill( param_type value, const layout1D &sub )
             {
                 assert(this->contains(sub));
                 for(unit_t i=sub.lower;i<=sub.upper;++i)

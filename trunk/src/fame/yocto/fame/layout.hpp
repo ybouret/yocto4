@@ -123,6 +123,7 @@ namespace yocto
             void store_offsets_of( const layout_of &sub, offsets_list &offsets ) const
             {
                 assert(this->contains(sub));
+                
             }
             
         private:
