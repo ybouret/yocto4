@@ -60,7 +60,7 @@ namespace yocto
             GhostsList   local_ghosts;
             GhostsList   async_ghosts;
             const Layout outline;
-            GhostsPtrs   asynchronous[3];
+            GhostsPtrs   asynchronous[DIMENSIONS];
             
             explicit QuadGrid(const Layout &full,
                               const bool   *pbc,
