@@ -123,11 +123,50 @@ namespace yocto
             void store_offsets_of( const layout_of &sub, offsets_list &offsets ) const
             {
                 assert(this->contains(sub));
-                
+                __store_in(offsets, *this, sub, int2type<DIMENSIONS>() );
             }
             
         private:
             YOCTO_DISABLE_ASSIGN(layout_of);
+            static inline
+            void __store_in(offsets_list &off, const layout_of &top, const layout_of &sub, int2type<1> )
+            {
+                for(unit_t i=sub.lower;i<=sub.upper;++i)
+                {
+                    off.store( top.offset_of(i) );
+                }
+            }
+            
+            static inline
+            void __store_in(offsets_list &off, const layout_of &top, const layout_of &sub, int2type<2> )
+            {
+                for(unit_t j=sub.lower.y;j<=sub.upper.y;++j)
+                {
+                    for(unit_t i=sub.lower.x;i<=sub.upper.x;++i)
+                    {
+                        const_coord c(i,j);
+                        off.store( top.offset_of(c) );
+                    }
+                }
+            }
+            
+            static inline
+            void __store_in(offsets_list &off, const layout_of &top, const layout_of &sub, int2type<3> )
+            {
+                for(unit_t k=sub.lower.z;k<=sub.upper.z;++k)
+                {
+                    for(unit_t j=sub.lower.y;j<=sub.upper.y;++j)
+                    {
+                        for(unit_t i=sub.lower.x;i<=sub.upper.x;++i)
+                        {
+                            const_coord c(i,j,k);
+                            off.store( top.offset_of(c) );
+                        }
+                    }
+                }
+                
+            }
+            
         };
         
         typedef layout_of<coord1D> layout1D;
@@ -140,7 +179,7 @@ namespace yocto
         template <> struct layout_for<1> { typedef layout1D type; };
         template <> struct layout_for<2> { typedef layout2D type; };
         template <> struct layout_for<3> { typedef layout3D type; };
-
+        
         
     }
 }

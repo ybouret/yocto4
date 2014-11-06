@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
         //______________________________________________________________________
         {
             
-            const layout1D full(1,100);
-            RectilinearMesh<layout1D,double> mesh(adb,"m2",full,pbc,rank,size,2);
+            const layout1D full(1,16);
+            RectilinearMesh<layout1D,double> mesh(adb,"m2",full,pbc,rank,size,1);
             for(unit_t i=mesh.outline.lower;i<=mesh.outline.upper;++i)
             {
                 mesh.X()[i] = i;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
             array1D<double> &C = adb["C"].as< array1D<double> >();
             array1D<float>  &D = adb["D"].as< array1D<float>  >();
             
-            const int rv = rank * 1024;
+            const int rv = rank * 4;
             C.ld( rv  );
             D.ld( rv );
             

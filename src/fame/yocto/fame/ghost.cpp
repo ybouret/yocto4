@@ -18,7 +18,7 @@ namespace yocto
             assert(dst.itmsz==src.itmsz);
             const size_t   n      = gdst.size();
             const size_t   w      = dst.itmsz;
-            for(size_t i=0;i<n;++i)
+            for(size_t i=n;i>0;--i)
             {
                 const size_t t = gdst[i];
                 const size_t s = gsrc[i];
