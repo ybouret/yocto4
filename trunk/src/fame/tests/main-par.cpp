@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
                 {
                     C.fill( rv + shift, g->source.zone );
                     C.fill( rv - shift, g->target.zone );
-                   
+                    
                     D.fill( rv + shift, g->source.zone );
                     D.fill( rv - shift, g->target.zone );
-
+                    
                 }
                 
                 for( quad_ghosts<layout1D> *g = mesh.async_ghosts.head;g;g=g->next,++shift)
@@ -85,11 +85,35 @@ int main(int argc, char *argv[])
             handles.append( &C );
             handles.append( &D );
             
+            mesh.allocate_async_for(handles.chunk_size);
+            
             // data exchange
             MPI.Printf0(stderr, "Exchanging...\n");
             for( quad_ghosts<layout1D> *g = mesh.local_ghosts.head;g;g=g->next)
             {
                 g->local_update(handles);
+            }
+            
+            // one dim
+            {
+                quad_ghosts<layout1D>::pointers &asyncs = mesh.asynchronous[0];
+                mpi::Requests requests(asyncs.count*2);
+                size_t ir = 0;
+                for(size_t i=0;i<asyncs.count;++i)
+                {
+                    quad_ghosts<layout1D> &g = asyncs[i];
+                    g.send_assemble(handles);
+                    
+                    const size_t bytes = g.items * handles.chunk_size;
+                    MPI.Isend(g.sbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
+                    MPI.Irecv(g.rbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
+                }
+                MPI.Waitall(requests);
+                for(size_t i=0;i<asyncs.count;++i)
+                {
+                    quad_ghosts<layout1D> &g = asyncs[i];
+                    g.recv_dispatch(handles);
+                }
             }
             
             {

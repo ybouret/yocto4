@@ -44,7 +44,6 @@ namespace yocto
             void ensure(size_t interleaved_bytes);
             
             
-        protected:
             void          *sbuffer; //!< send buffer
             void          *rbuffer; //!< recv buffer
             const size_t   io_size;
