@@ -103,6 +103,15 @@ namespace yocto
 		}
 	}
     
+    void mpi:: Newline( FILE *fp ) const
+    {
+        if( IsFirst )
+        {
+            assert(fp!=NULL);
+            fprintf(fp,"\n");
+            fflush(fp);
+        }
+    }
     
     
 	

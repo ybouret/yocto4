@@ -10,7 +10,6 @@ namespace yocto
     namespace fame
     {
         
-        
         template <typename Layout>
         class quad_ghost : public ghost
         {
@@ -66,10 +65,11 @@ namespace yocto
             typedef quad_ghosts        Ghosts;
             typedef quad_ghost<Layout> Ghost;
             
-            const   int    peer;
-            const   Ghost  source;
-            const   Ghost  target;
-            const   size_t size;
+            const   int    peer;    //!< whom am I talking to ?
+            const   int    dim;     //!< 0,1,2
+            const   Ghost  source;  //!< data from rank
+            const   Ghost  target;  //!< data from peer
+            const   size_t size;    //!< common data size
             
             Ghosts *next;
             Ghosts *prev;
@@ -78,9 +78,11 @@ namespace yocto
             
             explicit quad_ghosts(const Layout outline,
                                  const int    peer_rank,
+                                 const int    which_dim,
                                  const Layout source_layout,
                                  const Layout target_layout):
             peer(peer_rank),
+            dim(which_dim),
             source(outline,source_layout),
             target(outline,target_layout),
             size(source.size()),

@@ -33,7 +33,6 @@ namespace yocto
                 {
                     return inside;
                 }
-                //const int gshift = ng-1;
                 
                 //______________________________________________________________
                 //
@@ -97,7 +96,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "local <-- " << source << std::endl;
-                                    lg.push_back( new Ghosts(outline,link.rank,source,target) );
+                                    lg.push_back( new Ghosts(outline,link.rank,dim,source,target) );
                                 }
                                 else
                                 {
@@ -108,7 +107,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "async <--  " << source << std::endl;
-                                    ag.push_back( new Ghosts(outline,link.rank,source,target));
+                                    ag.push_back( new Ghosts(outline,link.rank,dim,source,target));
                                 }
                                 
                             }   break;
@@ -130,7 +129,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "local <--  " << source << std::endl;
-                                    lg.push_back( new Ghosts(outline,link.rank,source,target) );
+                                    lg.push_back( new Ghosts(outline,link.rank,dim,source,target) );
                                 }
                                 else
                                 {
@@ -141,7 +140,7 @@ namespace yocto
                                     const Coord  source_upper = replace_coord(source_up, outline.upper, dim);
                                     const Layout source(source_lower,source_upper);
                                     //std::cerr << "\t\t+" << get_axis_name(dim) << "async <-- " << source << std::endl;
-                                    ag.push_back( new Ghosts(outline,link.rank,source,target) );
+                                    ag.push_back( new Ghosts(outline,link.rank,dim,source,target) );
                                 }
                             }  break;
                         }

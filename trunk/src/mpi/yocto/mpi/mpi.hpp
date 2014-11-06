@@ -178,6 +178,9 @@ namespace yocto
         //! printf only on rank 0
         void Printf0( FILE *fp, const char *fmt, ... ) const YOCTO_PRINTF_CHECK(3,4);
         
+        //! newline only on rank 0
+        void Newline( FILE *fp ) const;
+        
         //! close standard I/O on rank>0
         void CloseStdIO() const;
         
