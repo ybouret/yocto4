@@ -69,7 +69,7 @@ namespace yocto
             const   int    dim;     //!< 0,1,2
             const   Ghost  source;  //!< data from rank
             const   Ghost  target;  //!< data from peer
-            const   size_t size;    //!< common data size
+            const   size_t items;   //!< common data size
             
             Ghosts *next;
             Ghosts *prev;
@@ -85,7 +85,7 @@ namespace yocto
             dim(which_dim),
             source(outline,source_layout),
             target(outline,target_layout),
-            size(source.size()),
+            items(source.size()),
             next(0),
             prev(0)
             {
@@ -103,6 +103,7 @@ namespace yocto
                 for(size_t i=handles.size();i>0;--i)
                 {
                     linear_space &l = handles[i];
+                    std::cerr << "local copy " << source.zone << " --> " << target.zone << ", #items=" << items << std::endl;
                     ghost::copy(l,target,l,source);
                 }
             }
@@ -110,18 +111,18 @@ namespace yocto
             //! memory of I/O
             inline void allocate_for( const size_t chunk_size  )
             {
-                ensure( size * chunk_size );
+                ensure( items * chunk_size );
             }
             
             inline void recv_dispatch( linear_handles &handles ) throw()
             {
-                assert(io_size>=size*handles.chunk_size);
+                assert(io_size>=items*handles.chunk_size);
                 target.load(handles,rbuffer);
             }
             
             inline void send_assemble( const linear_handles &handles ) throw()
             {
-                assert(io_size>=size*handles.chunk_size);
+                assert(io_size>=items*handles.chunk_size);
                 source.save(sbuffer,handles);
             }
             
