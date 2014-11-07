@@ -1,5 +1,5 @@
 #include "yocto/fame/mesh/rectilinear.hpp"
-#include "yocto/mpi/mpi.hpp"
+#include "yocto/fame/split/mpi-quad-exchange.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 
@@ -132,16 +132,14 @@ int main(int argc, char *argv[])
                     quad_ghosts<layout1D> &g = asyncs[i];
                     g.send_assemble(handles);
                     
-                    const size_t bytes = g.items * handles.chunk_size;
-                    MPI.Isend(g.sbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
-                    //MPI.Irecv(g.rbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
+                    MPI.Isend(g.sbuffer, g.stored, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
                 }
                 
                 // receiving from the other direction
                 for(int i=asyncs.count-1;i>=0;--i)
                 {
                     quad_ghosts<layout1D> &g = asyncs[i];
-                    MPI.Irecv(g.rbuffer, g.items * handles.chunk_size, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
+                    MPI.Irecv(g.rbuffer, g.stored, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
                 }
                 
                 MPI.Waitall(requests);
@@ -151,6 +149,10 @@ int main(int argc, char *argv[])
                     quad_ghosts<layout1D> &g = asyncs[i];
                     g.recv_dispatch(handles);
                 }
+            }
+            
+            {
+                quad_exchange::data(mesh, handles, MPI);
             }
             
             {

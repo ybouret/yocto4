@@ -69,7 +69,7 @@ namespace yocto
             const   Ghost  source;     //!< data from rank
             const   Ghost  target;     //!< data from peer
             const   size_t items;      //!< common data size
-            //size_t         last_count; //!< store the send_assemble result
+            size_t         stored;     //!< last stored #bytes
             
             Ghosts *next;
             Ghosts *prev;
@@ -87,7 +87,8 @@ namespace yocto
             target(outline,target_layout),
             items(source.size()),
             next(0),
-            prev(0)
+            prev(0),
+            stored(0)
             {
                 assert( source.size() == target.size() );
             }
@@ -122,7 +123,8 @@ namespace yocto
             
             inline void send_assemble( const linear_handles &handles ) throw()
             {
-                assert(io_size>=items*handles.chunk_size);
+                stored = items * handles.chunk_size;
+                assert(io_size>=stored);
                 source.save(sbuffer,handles);
             }
             
