@@ -1,5 +1,6 @@
 #include "yocto/fame/mesh/rectilinear.hpp"
 #include "yocto/fame/split/mpi-quad-exchange.hpp"
+#include "yocto/fame/array2d.hpp"
 
 #include "yocto/ios/ocstream.hpp"
 
@@ -50,7 +51,7 @@ int main(int argc, char *argv[])
         {
             
             const layout1D full(1,16);
-            RectilinearMesh<layout1D,double> mesh(adb,"m2",full,pbc,rank,size,1);
+            RectilinearMesh<layout1D,double> mesh(adb,"m1",full,pbc,rank,size,1);
             for(unit_t i=mesh.outline.lower;i<=mesh.outline.upper;++i)
             {
                 mesh.X()[i] = i;
@@ -113,8 +114,9 @@ int main(int argc, char *argv[])
             mesh.allocate_async_for(handles.chunk_size);
             
             // data exchange
-            MPI.Printf0(stderr, "Exchanging...\n");
+            MPI.Printf0(stderr, "Exchanging 1D...\n");
             
+#if 0
             // local
             for( quad_ghosts<layout1D> *g = mesh.local_ghosts.head;g;g=g->next)
             {
@@ -150,9 +152,10 @@ int main(int argc, char *argv[])
                     g.recv_dispatch(handles);
                 }
             }
+#endif
             
             {
-                quad_exchange::data(mesh, handles, MPI);
+                mpi_quad_exchange::data(mesh, handles, MPI);
             }
             
             {
@@ -165,6 +168,64 @@ int main(int argc, char *argv[])
             
         }
         
+        MPI.Newline(stderr);
+        
+        adb.free();
+        
+        { // 2D
+            
+            const layout2D full( coord2D(1,1), coord2D(20,20) );
+            
+            RectilinearMesh<layout2D,double> mesh(adb,"m2",full,pbc,rank,size,1);
+           
+            for(unit_t i=mesh.outline.lower.x;i<=mesh.outline.upper.x;++i)
+            {
+                mesh.X()[i] = i;
+            }
+            
+            for(unit_t j=mesh.outline.lower.y;j<=mesh.outline.upper.y;++j)
+            {
+                mesh.Y()[j] = j;
+            }
+
+            MPI.Printf(stderr, "layout : %2d,%2d --> %2d,%2d\n", (int)mesh.lower.x,(int)mesh.lower.y, (int)mesh.upper.x, (int)mesh.upper.y);
+            MPI.Printf(stderr, "outline: %2d,%2d --> %2d,%2d\n", (int)mesh.outline.lower.x,(int)mesh.outline.lower.y, (int)mesh.outline.upper.x, (int)mesh.outline.upper.y);
+
+            MPI.Printf(stderr, "#local ghost: %2d | #async ghost: %2d\n", (int) mesh.local_ghosts.size, (int) mesh.async_ghosts.size );
+
+            
+            adb.store( new array2D<double>("C", mesh.outline) );
+            adb.store( new array2D< math::v2d<float> >("D",mesh.outline)   );
+            
+            array2D<double>              &C = adb["C"].as< array2D<double> >();
+            array2D< math::v2d<float> >  &D = adb["D"].as<   array2D< math::v2d<float> > >();
+            
+            assert( C.same_layout_than(mesh.outline) );
+            assert( D.same_layout_than(mesh.outline) );
+
+            for(unit_t j=mesh.lower.y;j<=mesh.upper.y;++j)
+            {
+                for(unit_t i=mesh.lower.x;i<=mesh.upper.x;++i)
+                {
+                    C[j][i]   = 1+i+j;
+                    D[j][i].x = 1+i;
+                    D[j][i].y = 1+j;
+                }
+            }
+            
+            
+            linear_handles handles;
+            handles.append( &C );
+            handles.append( &D );
+            
+            mesh.allocate_async_for(handles.chunk_size);
+            
+            
+            MPI.Printf0(stderr, "Exchanging 2D...\n");
+            mpi_quad_exchange::data(mesh, handles, MPI);
+
+            
+        }
         
         return 0;
     }

@@ -31,9 +31,9 @@ YOCTO_UNIT_TEST_IMPL(mesh)
     box<3,float> B(math::v3d<float>(1.0f,-2.0f,1.2f), math::v3d<float>(-1.0f,3.0f,-0.7f) );
     B.map_rect<double>(adb);
 
-    OldRectilinearMesh<1,double> rm1(adb,"mesh1d"); display_mesh(rm1);
-    OldRectilinearMesh<2,double> rm2(adb,"mesh2d"); display_mesh(rm2);
-    OldRectilinearMesh<3,double> rm3(adb,"mesh3d"); display_mesh(rm3);
+    //RectilinearMesh<layout1D,double> rm1(adb,"mesh1d"); display_mesh(rm1);
+    //OldRectilinearMesh<2,double> rm2(adb,"mesh2d"); display_mesh(rm2);
+    //OldRectilinearMesh<3,double> rm3(adb,"mesh3d"); display_mesh(rm3);
 
 }
 YOCTO_UNIT_TEST_DONE()

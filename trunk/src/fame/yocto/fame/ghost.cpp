@@ -66,28 +66,6 @@ namespace yocto
             
         }
         
-        
-        
-#if 0
-        void ghost:: load(void *src, const size_t num, array<linear_handle> &handles ) const
-        {
-            assert(! (src==NULL&&num>0) );
-            const size_t n     = size();
-            const size_t h     = handles.size();
-            
-            size_t chunk_size = 0;
-            for(size_t i=h;i>0;--i)
-            {
-                assert(handles[i]!=NULL);
-                const linear_space &l = *handles[i];
-                chunk_size += l.itmsz;
-            }
-            
-            // blah blah
-            
-        }
-#endif
-        
     }
     
 }
