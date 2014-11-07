@@ -67,30 +67,33 @@ int main(int argc, char *argv[])
             array1D<double> &C = adb["C"].as< array1D<double> >();
             array1D<float>  &D = adb["D"].as< array1D<float>  >();
             
-            const int rv = rank * 4;
-            C.ld( rv  );
-            D.ld( rv );
+            
+            for(unit_t i=mesh.lower;i<=mesh.upper;++i)
+            {
+                C[i] = 1+i;
+                D[i] = 1+i;
+            }
+            
             
             // fill ghosts
             {
-                int shift = 1;
-                for( quad_ghosts<layout1D> *g = mesh.local_ghosts.head;g;g=g->next,++shift)
+                for( quad_ghosts<layout1D> *g = mesh.local_ghosts.head;g;g=g->next)
                 {
-                    C.fill( rv + shift, g->source.zone );
-                    C.fill( rv - shift, g->target.zone );
+                    //C.fill( -rank, g->source.zone );
+                    C.fill( -rank, g->target.zone );
                     
-                    D.fill( rv + shift, g->source.zone );
-                    D.fill( rv - shift, g->target.zone );
+                    //D.fill(  -rank, g->source.zone );
+                    D.fill(  -rank, g->target.zone );
                     
                 }
                 
-                for( quad_ghosts<layout1D> *g = mesh.async_ghosts.head;g;g=g->next,++shift)
+                for( quad_ghosts<layout1D> *g = mesh.async_ghosts.head;g;g=g->next)
                 {
-                    C.fill( rv + shift, g->source.zone );
-                    C.fill( rv - shift, g->target.zone );
+                    //C.fill( -rank, g->source.zone );
+                    C.fill( -rank, g->target.zone );
                     
-                    D.fill( rv + shift, g->source.zone );
-                    D.fill( rv - shift, g->target.zone );
+                    //D.fill(  -rank, g->source.zone );
+                    D.fill(  -rank, g->target.zone );
                 }
             }
             
