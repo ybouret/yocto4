@@ -109,6 +109,8 @@ namespace yocto
                 }
             }
             
+            inline size_t required_mpi_requests() const throw() { return async_ghosts.size * 2; }
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(QuadGrid);
