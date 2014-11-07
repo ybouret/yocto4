@@ -29,6 +29,8 @@ namespace yocto
             linear_space       & operator[](size_t i) throw();
             const linear_space & operator[](const size_t i) const throw();
             
+            void single( linear_space *l );
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(linear_handles);
             sorted_vector<linear_ptr,linear_comparator> handles;

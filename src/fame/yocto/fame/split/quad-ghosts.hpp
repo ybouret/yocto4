@@ -86,9 +86,9 @@ namespace yocto
             source(outline,source_layout),
             target(outline,target_layout),
             items(source.size()),
+            stored(0),
             next(0),
-            prev(0),
-            stored(0)
+            prev(0)
             {
                 assert( source.size() == target.size() );
             }
@@ -104,7 +104,7 @@ namespace yocto
                 for(size_t i=handles.size();i>0;--i)
                 {
                     linear_space &l = handles[i];
-                    std::cerr << "local copy " << source.zone << " --> " << target.zone << ", #items=" << items << std::endl;
+                    //std::cerr << "local copy " << source.zone << " --> " << target.zone << ", #items=" << items << std::endl;
                     ghost::copy(l,target,l,source);
                 }
             }

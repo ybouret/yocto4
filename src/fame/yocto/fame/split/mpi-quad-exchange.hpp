@@ -9,7 +9,7 @@ namespace yocto
     namespace fame
     {
         
-        struct quad_exchange
+        struct mpi_quad_exchange
         {
             
             template <typename QUADGRID>  static inline
@@ -17,15 +17,18 @@ namespace yocto
                       linear_handles &handles,
                       const mpi      &MPI)
             {
+                MPI.Printf0(stderr, "\tlocal exchange\n");
                 //! first pass: local exchange
                 for(const typename QUADGRID::Ghosts *g = grid.local_ghosts.head;g;g=g->next)
                 {
                     g->local_update(handles);
                 }
                 
+                
                 //! exchange by dimension
                 for(size_t dim=0;dim<QUADGRID::DIMENSIONS;++dim)
                 {
+                    MPI.Printf0(stderr, "\tasync exchange %s\n", get_axis_name(dim));
                     MPI_Request request[4];
                     size_t ir = 0;
                     typename QUADGRID::GhostsPtrs &asyncs = grid.asynchronous[dim];

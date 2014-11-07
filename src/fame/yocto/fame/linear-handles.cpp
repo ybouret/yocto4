@@ -59,5 +59,12 @@ namespace yocto
 
         size_t linear_handles:: size() const throw() { return handles.size(); }
 
+        void linear_handles:: single( linear_space *l )
+        {
+            free();
+            append(l);
+        }
+
+        
     }
 }
