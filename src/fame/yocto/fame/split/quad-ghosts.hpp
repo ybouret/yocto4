@@ -64,11 +64,12 @@ namespace yocto
             typedef quad_ghosts        Ghosts;
             typedef quad_ghost<Layout> Ghost;
             
-            const   int    peer;    //!< whom am I talking to ?
-            const   int    dim;     //!< 0,1,2
-            const   Ghost  source;  //!< data from rank
-            const   Ghost  target;  //!< data from peer
-            const   size_t items;   //!< common data size
+            const   int    peer;       //!< whom am I talking to ?
+            const   int    dim;        //!< 0,1,2
+            const   Ghost  source;     //!< data from rank
+            const   Ghost  target;     //!< data from peer
+            const   size_t items;      //!< common data size
+            //size_t         last_count; //!< store the send_assemble result
             
             Ghosts *next;
             Ghosts *prev;
@@ -129,7 +130,7 @@ namespace yocto
             class pointers
             {
             public:
-                const size_t count; //!< 0/1/2
+                const int count; //!< 0/1/2
                 inline  pointers() throw() : count(0), gptr() {}
                 inline ~pointers() throw() {}
                 

@@ -12,6 +12,28 @@ int main(int argc, char *argv[])
 {
     
     bool pbc[3] = { true, true, true };
+    for(int i=1;i<argc;++i)
+    {
+        if( strcmp(argv[i],"-x") == 0 )
+        {
+            pbc[0] = false;
+            continue;
+        }
+        
+        if( strcmp(argv[i],"-y") == 0 )
+        {
+            pbc[1] = false;
+            continue;
+        }
+        
+        if( strcmp(argv[i],"-z") == 0 )
+        {
+            pbc[2] = false;
+            continue;
+        }
+        
+        
+    }
     
     try
     {
@@ -89,6 +111,8 @@ int main(int argc, char *argv[])
             
             // data exchange
             MPI.Printf0(stderr, "Exchanging...\n");
+            
+            // local
             for( quad_ghosts<layout1D> *g = mesh.local_ghosts.head;g;g=g->next)
             {
                 g->local_update(handles);
@@ -99,16 +123,26 @@ int main(int argc, char *argv[])
                 quad_ghosts<layout1D>::pointers &asyncs = mesh.asynchronous[0];
                 mpi::Requests requests(asyncs.count*2);
                 size_t ir = 0;
-                for(size_t i=0;i<asyncs.count;++i)
+                //sending in one direction
+                for(int i=0;i<asyncs.count;++i)
                 {
                     quad_ghosts<layout1D> &g = asyncs[i];
                     g.send_assemble(handles);
                     
                     const size_t bytes = g.items * handles.chunk_size;
                     MPI.Isend(g.sbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
-                    MPI.Irecv(g.rbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
+                    //MPI.Irecv(g.rbuffer, bytes, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
                 }
+                
+                // receiving from the other direction
+                for(int i=asyncs.count-1;i>=0;--i)
+                {
+                    quad_ghosts<layout1D> &g = asyncs[i];
+                    MPI.Irecv(g.rbuffer, g.items * handles.chunk_size, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
+                }
+                
                 MPI.Waitall(requests);
+                
                 for(size_t i=0;i<asyncs.count;++i)
                 {
                     quad_ghosts<layout1D> &g = asyncs[i];
