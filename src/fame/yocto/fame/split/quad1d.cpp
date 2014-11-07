@@ -54,7 +54,7 @@ namespace yocto
             
             //__________________________________________________________________
             //
-            // split
+            // load balancing
             //__________________________________________________________________
             core::mpi_split(rank, size, offset, length);
             assert(length>0);
@@ -63,31 +63,45 @@ namespace yocto
             //
             // building links
             //__________________________________________________________________
-            if(rank==0)
+            if(size>1)
             {
-                if(pbc)
+                
+                if(rank==0)
                 {
-                    links.append(quad_link::is_prev,__get_prev(rank,size));
-                }
-                links.append(quad_link::is_next, __get_next(rank,size));
-            }
-            else
-            {
-                if(size-1==rank)
-                {
-                    links.append(quad_link::is_prev,__get_prev(rank,size));
                     if(pbc)
                     {
-                        links.append(quad_link::is_next, __get_next(rank,size));
+                        links.append(quad_link::is_prev,__get_prev(rank,size));
                     }
+                    links.append(quad_link::is_next, __get_next(rank,size));
                 }
                 else
                 {
-                    assert(rank>0);
-                    assert(size>1);
-                    assert(rank<size-1);
-                    links.append(quad_link::is_prev,rank-1);
-                    links.append(quad_link::is_next,rank+1);
+                    if(size-1==rank)
+                    {
+                        links.append(quad_link::is_prev,__get_prev(rank,size));
+                        if(pbc)
+                        {
+                            links.append(quad_link::is_next, __get_next(rank,size));
+                        }
+                    }
+                    else
+                    {
+                        assert(rank>0);
+                        assert(size>1);
+                        assert(rank<size-1);
+                        links.append(quad_link::is_prev,rank-1);
+                        links.append(quad_link::is_next,rank+1);
+                    }
+                }
+            }
+            else
+            {
+                assert(1==size);
+                assert(0==rank);
+                if(pbc)
+                {
+                    links.append(quad_link::is_prev,0);
+                    links.append(quad_link::is_next,0);
                 }
             }
             
@@ -95,5 +109,5 @@ namespace yocto
         }
         
     }
-
+    
 }
