@@ -63,6 +63,10 @@ namespace
             std::cerr << "sim rank=" << rank << std::endl;
             db2.store( new ScalarField2D("A2",m2.outline) );
             db3.store( new ScalarField3D("A3",m3.outline) );
+            
+            db2.store( new VectorField2D("V2",m2.outline) );
+            db3.store( new VectorField3D("V3",m3.outline) );
+            
         }
         
         
@@ -85,6 +89,8 @@ namespace
         MyData(full2d,full3d,par_rank,par_size),
         A2( db2["A2"].as<ScalarField2D>() ),
         A3( db3["A3"].as<ScalarField3D>() ),
+        V2( db2["V2"].as<VectorField2D>() ),
+        V3( db3["V3"].as<VectorField3D>() ),
         curv("the_curve"),
         cx("cx",layout1D(1,10)),
         cy("cy",cx)
@@ -121,6 +127,7 @@ namespace
             std::cerr << "m2.Y="; display1D(m2.Y());
             
             MPI.Printf(stderr, "Loading rank=%d\n", par_rank);
+            
             A2.ld(par_rank);
             A3.ld(par_rank);
             
@@ -147,13 +154,11 @@ namespace
             //data
             visit::add_variable_meta_data(md, A3, m3.name);
 
-#if 0
             // data
             visit::add_variable_meta_data(md, V2, m2.name);
             
             
             visit::add_variable_meta_data(md, V3, m3.name);
-#endif
             
             // curv
             visit:: add_curv_meta_data(md, curv);
@@ -189,21 +194,19 @@ namespace
             {
                 return visit::get_variable_data(A3,domain);
             }
-#if 0
            
             
             if( name == "V2" )
             {
-                return visit::get_variable_data(ndomain, V2);
+                return visit::get_variable_data(V2,domain);
             }
             
            
             
             if( name == "V3" )
             {
-                return visit::get_variable_data(ndomain, V3);
+                return visit::get_variable_data(V3,domain);
             }
-#endif
             
             return VISIT_INVALID_HANDLE;
         }
@@ -231,6 +234,8 @@ namespace
         
         ScalarField2D               &A2;
         ScalarField3D               &A3;
+        VectorField2D               &V2;
+        VectorField3D               &V3;
         CurvInfo                     curv;
         array1D<float>               cx;
         array1D<float>               cy;
