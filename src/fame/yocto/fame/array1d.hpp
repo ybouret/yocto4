@@ -12,6 +12,11 @@ namespace yocto
         
         template <size_t,typename> struct array_for;
 
+        //______________________________________________________________________
+        //
+        //! one dimensional array
+        //______________________________________________________________________
+
         template <typename T>
         class array1D : public linear<T,layout1D>
         {

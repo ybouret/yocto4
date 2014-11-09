@@ -8,7 +8,10 @@ namespace yocto
     namespace fame
     {
         
-        
+        //______________________________________________________________________
+        //
+        //! a ghost is a list of offset for some linear spaces
+        //______________________________________________________________________
         class ghost : public offsets_list
         {
         public:

@@ -8,7 +8,10 @@ namespace yocto
     
     namespace fame
     {
-        
+        //______________________________________________________________________
+        //
+        //! two dimensional array
+        //______________________________________________________________________
         template <typename T>
         class array2D : public linear<T,layout2D>
         {
