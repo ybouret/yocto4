@@ -11,6 +11,10 @@ namespace yocto
         
         typedef set<string,linear_ptr>        arrays_type;
         
+        //______________________________________________________________________
+        //
+        //! database one linear spaces
+        //______________________________________________________________________
         class arrays : public arrays_type
         {
         public:
