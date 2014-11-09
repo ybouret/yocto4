@@ -131,6 +131,36 @@ namespace
             A2.ld(par_rank);
             A3.ld(par_rank);
             
+            for(unit_t j=m2.outline.lower.y;j<=m2.outline.upper.y;++j)
+            {
+                for(unit_t i=m2.outline.lower.x;i<=m2.outline.upper.x;++i)
+                {
+                    const double x = m2.X()[i];
+                    const double y = m2.Y()[j];
+                    const double fac = 1.0/sqrt(1.0+x*x+y*y);
+                    V2[j][i].x = x/fac;
+                    V2[j][i].y = y/fac;
+                }
+            }
+            
+            for(unit_t k=m3.outline.lower.z;k<=m3.outline.upper.z;++k)
+            {
+                for(unit_t j=m3.outline.lower.y;j<=m3.outline.upper.y;++j)
+                {
+                    for(unit_t i=m3.outline.lower.x;i<=m3.outline.upper.x;++i)
+                    {
+                        const double x = m3.X()[i];
+                        const double y = m3.Y()[j];
+                        const double z = m3.Z()[k];
+                        const double fac = 1.0/sqrt(1+x*x+y*y+z*z);
+                        V3[k][j][i].x = x/fac;
+                        V3[k][j][i].y = y/fac;
+                        V3[k][j][i].z = z/fac;
+
+                    }
+                }
+                
+            }
             
             
         }
