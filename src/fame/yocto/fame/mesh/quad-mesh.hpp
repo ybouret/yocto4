@@ -25,9 +25,6 @@ const int    ng   = 0
             typedef QuadGrid<Layout>   QUADGRID;
             typedef Mesh<DIMENSIONS,T> MESH;
             
-            typedef typename array_for<DIMENSIONS,T>::type     ScalarField;
-            typedef typename vertex_for<DIMENSIONS,T>::type    vtx;
-            typedef typename array_for<DIMENSIONS,vtx>::type   VectorField;
             
             explicit QuadMesh(const string &id,
                               Y_FAME_QUAD_MESH_ARGS
