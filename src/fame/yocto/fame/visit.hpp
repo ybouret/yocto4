@@ -53,6 +53,7 @@ namespace yocto
                 visit_handle h = VISIT_INVALID_HANDLE;
                 if( VisIt_RectilinearMesh_alloc(&h) == VISIT_OKAY )
                 {
+                    // raw parameters
                     visit_handle hc[Layout::DIMENSIONS];
                     for(size_t i=0;i<Layout::DIMENSIONS;++i)
                     {
@@ -62,10 +63,36 @@ namespace yocto
                         hook_data(hh,a.items,a.entry);
                     }
                     set_coordinates(h, hc, int2type<Layout::DIMENSIONS>() );
+                    
+                    // ghosts zone
+                    int minRealIndex[Layout::DIMENSIONS];
+                    int maxRealIndex[Layout::DIMENSIONS];
+                    
+                    for(size_t dim=0;dim<Layout::DIMENSIONS;++dim)
+                    {
+                        minRealIndex[dim] = 0;
+                        maxRealIndex[dim] = __coord(mesh.outline.width,dim) - 1;
+                        
+                        if(__coord(mesh.ranks,dim)>0)
+                        {
+                            const quad_links &links = mesh.links(dim);
+                            for(size_t i=0;i<links.count;++i)
+                            {
+                                if(links[i].pos==quad_link::is_prev)
+                                {
+                                    minRealIndex[dim] = 1; // TODO: check delta outline/layout
+                                }
+                            }
+                        }
+                    }
+                    
+                    
+                    VisIt_RectilinearMesh_setRealIndices(h, minRealIndex, maxRealIndex);
+                    
                 }
                 return h;
             }
-
+            
             
             //__________________________________________________________________
             //
@@ -313,8 +340,8 @@ namespace yocto
             {
                 VisIt_VariableData_setDataD(h,VISIT_OWNER_SIM, 3, items, (double *)entry);
             }
-
-
+            
+            
             
             
         };

@@ -37,6 +37,11 @@ namespace yocto
             const typename Layout::coord ranks;
             const typename Layout::coord sizes;
             
+            inline const quad_links &links(size_t dim) const throw()
+            {
+                assert(dim<Layout::DIMENSIONS);
+                return qlinks[dim];
+            }
             
         protected:
             quad_links qlinks[ Layout::DIMENSIONS ];
