@@ -23,6 +23,7 @@ namespace yocto
             QuadMesh<Layout,T>(id,Y_FAME_QUAD_MESH_INIT),
             ap()
             {
+                std::cerr << "Creating Axis" << std::endl;
                 //______________________________________________________________
                 //
                 // build axis
@@ -39,17 +40,18 @@ namespace yocto
                 //
                 // build vertices
                 //______________________________________________________________
+                std::cerr << "Building " << this->items << " Vertices..." << std::endl;
                 build( int2type<DIMENSIONS>() );
             }
             
-            inline const Axis &X() const throw() { assert(DIMENSIONS>=1); return *ap[0]; }
-            inline Axis       &X() throw()       { assert(DIMENSIONS>=1); return *ap[0]; }
+            inline const Axis &getX() const throw() { assert(DIMENSIONS>=1); return *ap[0]; }
+            inline Axis       &getX() throw()       { assert(DIMENSIONS>=1); return *ap[0]; }
             
-            inline const Axis &Y() const throw() { assert(DIMENSIONS>=2); return *ap[1]; }
-            inline Axis       &Y() throw()       { assert(DIMENSIONS>=2); return *ap[1]; }
+            inline const Axis &getY() const throw() { assert(DIMENSIONS>=2); return *ap[1]; }
+            inline Axis       &getY() throw()       { assert(DIMENSIONS>=2); return *ap[1]; }
             
-            inline const Axis &Z() const throw() { assert(DIMENSIONS>=3); return *ap[2]; }
-            inline Axis       &Z() throw()       { assert(DIMENSIONS>=3); return *ap[2]; }
+            inline const Axis &getZ() const throw() { assert(DIMENSIONS>=3); return *ap[2]; }
+            inline Axis       &getZ() throw()       { assert(DIMENSIONS>=3); return *ap[2]; }
             
             const Axis &get_axis(size_t dim) const throw()
             {
@@ -76,7 +78,7 @@ namespace yocto
             //__________________________________________________________________
             inline void build( int2type<1> )
             {
-                Axis &XX = X();
+                Axis &XX = getX();
                 for(unit_t i=XX.lower;i<=XX.upper;++i)
                 {
                     this->vertices.append( XX[i] );
@@ -85,8 +87,8 @@ namespace yocto
             
             inline void build( int2type<2> )
             {
-                Axis &XX = X();
-                Axis &YY = Y();
+                Axis &XX = getX();
+                Axis &YY = getY();
                 for(unit_t j=YY.lower;j<=YY.upper;++j)
                 {
                     for(unit_t i=XX.lower;i<=XX.upper;++i)
@@ -99,9 +101,9 @@ namespace yocto
             
             inline void build( int2type<3> )
             {
-                Axis &XX = X();
-                Axis &YY = Y();
-                Axis &ZZ = Z();
+                Axis &XX = getX();
+                Axis &YY = getY();
+                Axis &ZZ = getZ();
                 
                 for(unit_t k=ZZ.lower;k<=ZZ.upper;++k)
                 {

@@ -22,6 +22,7 @@ namespace yocto
             QuadMesh<Layout,T>(id,Y_FAME_QUAD_MESH_INIT),
             ap()
             {
+                std::cerr << "Creating Axis..." << std::endl;
                 //______________________________________________________________
                 //
                 // build axis
@@ -37,6 +38,7 @@ namespace yocto
                 //
                 // build vertices
                 //______________________________________________________________
+                std::cerr << "Building " << this->items << " Vertices" << std::endl;
                 build( int2type<DIMENSIONS>() );
             }
             

@@ -75,8 +75,10 @@ namespace yocto
             outline( build_quad_ghosts<Layout>::outline_for(this->rank, this->__layout(), ng, this->qlinks, local_ghosts, async_ghosts ) ),
             asynchronous()
             {
+                std::cerr << "Filling Ghosts" << std::endl;
                 assert(outline.contains(*this));
                 fill_async();
+                std::cerr << "Done..." << std::endl;
             }
             
             virtual ~QuadGrid() throw()

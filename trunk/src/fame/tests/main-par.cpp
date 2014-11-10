@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
             RectilinearMesh<layout1D,double> mesh(adb,"m1",full,pbc,rank,size,1);
             for(unit_t i=mesh.outline.lower;i<=mesh.outline.upper;++i)
             {
-                mesh.X()[i] = i;
+                mesh.getX()[i] = i;
             }
             MPI.Printf(stderr, "layout:  %d->%d\n", (int)mesh.lower, (int)mesh.upper);
             MPI.Newline(stderr);
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
                 ios::ocstream fp( "ini" + pfx + ".dat", false);
                 for(unit_t i=mesh.outline.lower;i<=mesh.outline.upper;++i)
                 {
-                    fp("%g %g %g\n", mesh.X()[i], C[i], D[i]);
+                    fp("%g %g %g\n", mesh.getX()[i], C[i], D[i]);
                 }
             }
             
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
                 ios::ocstream fp( "end" + pfx + ".dat", false);
                 for(unit_t i=mesh.outline.lower;i<=mesh.outline.upper;++i)
                 {
-                    fp("%g %g %g\n", mesh.X()[i], C[i], D[i]);
+                    fp("%g %g %g\n", mesh.getX()[i], C[i], D[i]);
                 }
             }
             
@@ -147,12 +147,12 @@ int main(int argc, char *argv[])
             
             for(unit_t i=mesh.outline.lower.x;i<=mesh.outline.upper.x;++i)
             {
-                mesh.X()[i] = i;
+                mesh.getX()[i] = i;
             }
             
             for(unit_t j=mesh.outline.lower.y;j<=mesh.outline.upper.y;++j)
             {
-                mesh.Y()[j] = j;
+                mesh.getY()[j] = j;
             }
             
             MPI.Printf(stderr, "layout : %2d,%2d --> %2d,%2d\n", (int)mesh.lower.x,(int)mesh.lower.y, (int)mesh.upper.x, (int)mesh.upper.y);
@@ -207,17 +207,17 @@ int main(int argc, char *argv[])
             
             for(unit_t i=mesh.outline.lower.x;i<=mesh.outline.upper.x;++i)
             {
-                mesh.X()[i] = i;
+                mesh.getX()[i] = i;
             }
             
             for(unit_t j=mesh.outline.lower.y;j<=mesh.outline.upper.y;++j)
             {
-                mesh.Y()[j] = j;
+                mesh.getY()[j] = j;
             }
             
             for(unit_t k=mesh.outline.lower.z;k<=mesh.outline.upper.z;++k)
             {
-                mesh.Z()[k] = k;
+                mesh.getZ()[k] = k;
             }
             
             

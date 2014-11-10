@@ -99,32 +99,32 @@ namespace
             
             for(unit_t k=m3.outline.lower.z;k<=m3.outline.upper.z;++k)
             {
-                m3.Z()[k] = k;
+                m3.getZ()[k] = k;
             }
             
             for(unit_t j=m3.outline.lower.y;j<=m3.outline.upper.y;++j)
             {
-                m3.Y()[j] = j;
+                m3.getY()[j] = j;
             }
             
             for(unit_t i=m3.outline.lower.x;i<=m3.outline.upper.x;++i)
             {
-                m3.X()[i] = i;
+                m3.getX()[i] = i;
             }
             
             
             for(unit_t j=m2.outline.lower.y;j<=m2.outline.upper.y;++j)
             {
-                m2.Y()[j] = j;
+                m2.getY()[j] = j;
             }
             
             for(unit_t i=m2.outline.lower.x;i<=m2.outline.upper.x;++i)
             {
-                m2.X()[i] = i;
+                m2.getX()[i] = i;
             }
             
-            std::cerr << "m2.X="; display1D(m2.X());
-            std::cerr << "m2.Y="; display1D(m2.Y());
+            std::cerr << "m2.X="; display1D(m2.getX());
+            std::cerr << "m2.Y="; display1D(m2.getY());
             
             MPI.Printf(stderr, "Loading rank=%d\n", par_rank);
             
@@ -135,8 +135,8 @@ namespace
             {
                 for(unit_t i=m2.outline.lower.x;i<=m2.outline.upper.x;++i)
                 {
-                    const double x = m2.X()[i];
-                    const double y = m2.Y()[j];
+                    const double x = m2.getX()[i];
+                    const double y = m2.getY()[j];
                     const double fac = 1.0/sqrt(1.0+x*x+y*y);
                     V2[j][i].x = x/fac;
                     V2[j][i].y = y/fac;
@@ -149,9 +149,9 @@ namespace
                 {
                     for(unit_t i=m3.outline.lower.x;i<=m3.outline.upper.x;++i)
                     {
-                        const double x = m3.X()[i];
-                        const double y = m3.Y()[j];
-                        const double z = m3.Z()[k];
+                        const double x = m3.getX()[i];
+                        const double y = m3.getY()[j];
+                        const double z = m3.getZ()[k];
                         const double fac = 1.0/sqrt(1+x*x+y*y+z*z);
                         V3[k][j][i].x = x/fac;
                         V3[k][j][i].y = y/fac;
