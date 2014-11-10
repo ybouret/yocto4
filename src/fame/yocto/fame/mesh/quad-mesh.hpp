@@ -33,6 +33,7 @@ const int    ng   = 0
             MESH(id)
             {
                 // then rect/curv will generates Axis...
+                std::cerr << "QuadMesh is built..." << std::endl;
             }
             
             virtual ~QuadMesh() throw()

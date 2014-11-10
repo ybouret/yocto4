@@ -4,7 +4,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/code/ipower.hpp"
-#include "yocto/fame/array2d.hpp"
+#include "yocto/fame/array3d.hpp"
 
 #include <cmath>
 
@@ -14,11 +14,11 @@ using namespace fame;
 
 namespace
 {
-    typedef layout2D                       Layout;
-    typedef coord2D                        Coord;
+    typedef layout3D                       Layout;
+    typedef coord3D                        Coord;
     typedef RectilinearMesh<Layout,double> MeshType;
     
-    static const bool the_pbc[2] = { true, true };
+    static const bool the_pbc[3] = { true, true, true };
     
     class Heat : public arrays, public MeshType
     {
@@ -29,8 +29,9 @@ namespace
         arrays(),
         MeshType( *this, "mesh",full,the_pbc,sim_rank,sim_size,1)
         {
-            store( new array2D<double>("T",outline) );
-            store( new array2D<double>("L",outline) );
+            std::cerr << "Allocating Arrays with " << outline.items << " items" << std::endl;
+            store( new array3D<double>("T",outline) );
+            store( new array3D<double>("L",outline) );
         }
         
         virtual ~Heat() throw()
@@ -52,12 +53,15 @@ namespace
         Heat(full,par_rank,par_size),
         X( getX() ),
         Y( getY() ),
-        T( (*this)["T"].as< array2D<double> >() ),
-        L( (*this)["L"].as< array2D<double> >() ),
+        Z( getZ() ),
+        T( (*this)["T"].as< array3D<double> >() ),
+        L( (*this)["L"].as< array3D<double> >() ),
         dx( 1.0 / full.width.x),
         dy( 1.0 / full.width.y),
+        dz( 1.0 / full.width.z),
         handles()
         {
+            MPI.Printf(stderr,"initiliazing...\n");
             for(unit_t i=outline.lower.x;i<=outline.upper.x;++i)
             {
                 X[i] = (i-1)*dx;
@@ -66,6 +70,11 @@ namespace
             for(unit_t j=outline.lower.y;j<=outline.upper.y;++j)
             {
                 Y[j] = (j-1)*dy;
+            }
+            
+            for(unit_t k=outline.lower.z;k<=outline.upper.z;++k)
+            {
+                Z[k] = (k-1)*dz;
             }
             
             handles.append(&T);
@@ -82,10 +91,12 @@ namespace
         
         array1D<double> &X;
         array1D<double> &Y;
-        array2D<double> &T;
-        array2D<double> &L;
+        array1D<double> &Z;
+        array3D<double> &T;
+        array3D<double> &L;
         const double     dx;
         const double     dy;
+        const double     dz;
         linear_handles   handles;
         
         void exchange()
@@ -96,11 +107,17 @@ namespace
         void reset()
         {
             MPI.Printf(stderr, "reset...\n");
-            for(unit_t j=lower.y;j<=upper.y;++j)
+            for(unit_t k=lower.z;k<=upper.z;++k)
             {
-                for(unit_t i=lower.x;i<=upper.x;++i)
+                const double dz = Z[k] - 0.5;
+                for(unit_t j=lower.y;j<=upper.y;++j)
                 {
-                    T[j][i] = sin( 2*M_PI*X[i] ) * sin( 2*M_PI*Y[j]) + 0.05 * (0.5-ran());
+                    const double dy = Y[j] - 0.5;
+                    for(unit_t i=lower.x;i<=upper.x;++i)
+                    {
+                        const double dx = X[i] - 0.5;
+                        T[k][j][i] = exp(- (dx*dx+dy*dy+dz*dz)/3 ) + 0.05 * (0.5-ran());
+                    }
                 }
             }
             exchange();
@@ -159,40 +176,50 @@ namespace
         virtual void step()
         {
             runTime = cycle;
-            const double lrho = ipower(dx/dy,2);
+            const double rhoy = ipower(dx/dy,2);
+            const double rhoz = ipower(dx/dz,2);
             // we start from a valid state
-            for(unit_t j=lower.y;j<=upper.y;++j)
+            for(unit_t k=lower.z;k<=upper.z;++k)
             {
-                for(unit_t i=lower.x;i<=upper.x;++i)
+                for(unit_t j=lower.y;j<=upper.y;++j)
                 {
-                    L[j][i] = (T[j][i-1] - 2.0 *T[j][i] + T[j][i+1])
-                    + lrho * ( T[j-1][i] - 2.0 * T[j][i] + T[j+1][i]);
+                    for(unit_t i=lower.x;i<=upper.x;++i)
+                    {
+                        L[k][j][i] = (T[k][j][i-1] - 2.0 *T[k][j][i] + T[k][j][i+1])
+                        + rhoy * ( T[k][j-1][i] - 2.0 * T[k][j][i] + T[k][j+1][i])
+                        + rhoz * ( T[k-1][j][i] - 2.0 * T[k][j][i] + T[k+1][j][i]);
+                    }
                 }
             }
             
-            
-            for(unit_t j=lower.y;j<=upper.y;++j)
+            for(unit_t k=lower.z;k<=upper.z;++k)
             {
-                for(unit_t i=lower.x;i<=upper.x;++i)
+                for(unit_t j=lower.y;j<=upper.y;++j)
                 {
-                    T[j][i] += 0.02 * L[j][i];
-                }
-            }
-            
-            exchange();
-            
-            
-            for(unit_t j=lower.y;j<=upper.y;++j)
-            {
-                for(unit_t i=lower.x;i<=upper.x;++i)
-                {
-                    const double u =T[j][i];
-                    T[j][i] += 0.04 * (u-u*u*u);
+                    for(unit_t i=lower.x;i<=upper.x;++i)
+                    {
+                        T[k][j][i] += 0.02 * L[k][j][i];
+                    }
                 }
             }
             
             exchange();
             
+            if(false)
+            {
+                for(unit_t k=lower.z;k<=upper.z;++k)
+                {
+                    for(unit_t j=lower.y;j<=upper.y;++j)
+                    {
+                        for(unit_t i=lower.x;i<=upper.x;++i)
+                        {
+                            const double u =T[k][j][i];
+                            T[k][j][i] += 0.04 * (u-u*u*u);
+                        }
+                    }
+                }
+                exchange();
+            }
         }
         
     private:
@@ -201,24 +228,27 @@ namespace
     
 }
 
-YOCTO_UNIT_TEST_IMPL(h2d)
+YOCTO_UNIT_TEST_IMPL(h3d)
 {
-    const string sim_name    = "Heat2D";
-    const string sim_comment = "Visit+Fame=>Heat 2D";
+    const string sim_name    = "Heat3D";
+    const string sim_comment = "Visit+Fame=>Heat 3D";
     const string sim_path    = ".";
     
     YOCTO_MPI(MPI_THREAD_SINGLE);
     
+    int Nx=10;
+    int Ny=12;
+    int Nz=14;
     
     VisIt::TraceFile trace(MPI,"trace.dat");
     VisIt::SetupParallel(MPI,sim_name,sim_comment,sim_path,NULL);
     
-    const Layout full( Coord(1,1), Coord(100,110) );
+    const Layout full( Coord(1,1,1), Coord(Nx,Ny,Nz) );
+    
     
     HeatSim sim(MPI,full);
-    //MPI.Printf(stderr, "sizes= %d x %d\n", sim.sizes.x, sim.sizes.y);
+    MPI.Printf0(stderr, "sizes= %d x %d x %d\n", (int)sim.sizes.x,(int)sim.sizes.y, (int)sim.sizes.z);
     
-    //return 0;
     
     VisIt::Loop(sim);
     

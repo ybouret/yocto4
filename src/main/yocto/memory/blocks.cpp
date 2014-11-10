@@ -57,7 +57,8 @@ namespace yocto
 				{
 					lo = mid+1;
 				}
-				else {
+				else
+                {
 					if( mid->block_size > block_size )
 					{
 						hi = mid-1;
@@ -66,7 +67,6 @@ namespace yocto
 					{
 						return mid;
 					}
-					
 				}
 				
 			}

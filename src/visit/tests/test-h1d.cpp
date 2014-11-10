@@ -50,6 +50,7 @@ namespace
         explicit HeatSim( const mpi &ref , const Layout &full) :
         VisIt::Simulation(ref),
         Heat(full,par_rank,par_size),
+        X( getX() ),
         T( (*this)["T"].as< array1D<double> >() ),
         L( (*this)["L"].as< array1D<double> >() ),
         handles()
@@ -57,7 +58,7 @@ namespace
             const double dx = 1.0 / full.width;
             for(unit_t i=outline.lower;i<=outline.upper;++i)
             {
-                X()[i] = (i-1)*dx;
+                X[i] = (i-1)*dx;
             }
             
             handles.append(&T);
@@ -72,6 +73,7 @@ namespace
         {
         }
         
+        array1D<double> &X;
         array1D<double> &T;
         array1D<double> &L;
         linear_handles   handles;
@@ -86,7 +88,7 @@ namespace
             MPI.Printf(stderr, "reset...\n");
             for(unit_t i=lower;i<=upper;++i)
             {
-                T[i] = ipower(sin( 2*M_PI*X()[i] ),1) + 0.05 * (0.5-ran());
+                T[i] = ipower(sin( 2*M_PI*X[i] ),1) + 0.05 * (0.5-ran());
             }
             exchange();
             cycle=0;
@@ -112,7 +114,7 @@ namespace
             
             if(name == "T" )
             {
-                return visit::get_curv(X(),T);
+                return visit::get_curv(X,T);
             }
             return VISIT_INVALID_HANDLE;
         }
