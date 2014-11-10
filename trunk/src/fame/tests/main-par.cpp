@@ -64,10 +64,12 @@ int main(int argc, char *argv[])
             MPI.Printf(stderr, "#local async x ghosts: %d\n", int(mesh.asynchronous[0].count));
             adb.store( new array1D<double>("C", mesh.outline) );
             adb.store( new array1D<float>("D",mesh.outline)   );
-            
+            adb.store( new array1D<double>("G", mesh.outline) );
+
             array1D<double> &C = adb["C"].as< array1D<double> >();
             array1D<float>  &D = adb["D"].as< array1D<float>  >();
-            
+            //array1D<double> &G = adb["G"].as< array1D<double> >();
+
             
             for(unit_t i=mesh.lower;i<=mesh.upper;++i)
             {
@@ -116,47 +118,12 @@ int main(int argc, char *argv[])
             // data exchange
             MPI.Printf0(stderr, "Exchanging 1D...\n");
             
-#if 0
-            // local
-            for( quad_ghosts<layout1D> *g = mesh.local_ghosts.head;g;g=g->next)
-            {
-                g->local_update(handles);
-            }
-            
-            // one dim
-            {
-                quad_ghosts<layout1D>::pointers &asyncs = mesh.asynchronous[0];
-                mpi::Requests requests(asyncs.count*2);
-                size_t ir = 0;
-                //sending in one direction
-                for(int i=0;i<asyncs.count;++i)
-                {
-                    quad_ghosts<layout1D> &g = asyncs[i];
-                    g.send_assemble(handles);
-                    
-                    MPI.Isend(g.sbuffer, g.stored, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
-                }
-                
-                // receiving from the other direction
-                for(int i=asyncs.count-1;i>=0;--i)
-                {
-                    quad_ghosts<layout1D> &g = asyncs[i];
-                    MPI.Irecv(g.rbuffer, g.stored, MPI_BYTE, g.peer, 0, MPI_COMM_WORLD, requests[ir++]);
-                }
-                
-                MPI.Waitall(requests);
-                
-                for(size_t i=0;i<asyncs.count;++i)
-                {
-                    quad_ghosts<layout1D> &g = asyncs[i];
-                    g.recv_dispatch(handles);
-                }
-            }
-#endif
             
             {
                 mpi_quad_exchange::data(mesh, handles, MPI);
             }
+            
+            //mesh.gradient(G,C);
             
             {
                 ios::ocstream fp( "end" + pfx + ".dat", false);
@@ -196,10 +163,12 @@ int main(int argc, char *argv[])
             
             adb.store( new array2D<double>("C", mesh.outline) );
             adb.store( new array2D< math::v2d<float> >("D",mesh.outline)   );
-            
+            adb.store( new array2D<double>("G", mesh.outline) );
+
             array2D<double>              &C = adb["C"].as< array2D<double> >();
             array2D< math::v2d<float> >  &D = adb["D"].as<   array2D< math::v2d<float> > >();
-            
+            //array2D<double>              &G = adb["G"].as< array2D<double> >();
+
             for(unit_t j=mesh.lower.y;j<=mesh.upper.y;++j)
             {
                 for(unit_t i=mesh.lower.x;i<=mesh.upper.x;++i)
@@ -221,6 +190,7 @@ int main(int argc, char *argv[])
             MPI.Printf0(stderr, "Exchanging 2D...\n");
             mpi_quad_exchange::data(mesh, handles, MPI);
             
+            //mesh.gradient(G, C);
             
         }
         
@@ -259,10 +229,12 @@ int main(int argc, char *argv[])
             
             adb.store( new array3D<double>("C", mesh.outline) );
             adb.store( new array3D< math::v3d<float> >("D",mesh.outline)   );
-            
+            adb.store( new array3D<double>("G", mesh.outline) );
+
             array3D<double>              &C = adb["C"].as< array3D<double> >();
             array3D< math::v3d<float> >  &D = adb["D"].as<   array3D< math::v3d<float> > >();
-            
+            //array3D<double>              &G = adb["G"].as< array3D<double> >();
+
             for(unit_t k=mesh.lower.z;k<=mesh.upper.z;++k)
             {
                 for(unit_t j=mesh.lower.y;j<=mesh.upper.y;++j)
@@ -288,6 +260,7 @@ int main(int argc, char *argv[])
             MPI.Printf0(stderr, "Exchanging 3D...\n");
             mpi_quad_exchange::data(mesh, handles, MPI);
             
+            //mesh.gradient(G,C);
             
         }
         
