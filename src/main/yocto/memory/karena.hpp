@@ -21,6 +21,15 @@ namespace yocto
             void *acquire();
             void  release(void *p) throw();
             
+            enum ownership
+            {
+                prevChunk,
+                selfChunk,
+                nextChunk
+            };
+            
+            ownership is_owner(const kChunk *ch, const void *addr) const throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(kArena);
             size_t  available; //! bookeeping
