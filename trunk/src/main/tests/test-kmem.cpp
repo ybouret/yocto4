@@ -107,7 +107,19 @@ namespace
     void test_kArena(const size_t block_size, size_t chunk_size)
     {
         kArena A(block_size,chunk_size);
+        size_t num_blocks = 40000;
+        block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
         
+        size_t nb = 0;
+        for(size_t i=0;i<num_blocks;++i)
+        {
+            blk[nb].size = block_size;
+            blk[nb].addr = A.acquire();
+            ++nb;
+        }
+        
+        kind<global>::release_as(blk, num_blocks);
+        std::cerr << "block_size=" << block_size << ", " << nb << std::endl;
     }
     
 }

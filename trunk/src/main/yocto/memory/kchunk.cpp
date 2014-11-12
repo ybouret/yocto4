@@ -25,13 +25,8 @@ namespace yocto
             //
             // compute all parameters, using blockIncrement as block_round
             //__________________________________________________________________
-            std::cerr << "\tblock_size  = " << block_size  << std::endl;
-            std::cerr << "\tblock_round = " << block_round << std::endl;
             (uint16_t &)stillAvailable = min_of<size_t>(65535,chunk_size/block_round);
-            std::cerr << "\tnum_blocks  = " << stillAvailable << std::endl;
-            
             (uint16_t &)blockIncrement = block_round>>1;
-            std::cerr << "\tblock_incr  = " << blockIncrement << std::endl;
             
             //__________________________________________________________________
             //
