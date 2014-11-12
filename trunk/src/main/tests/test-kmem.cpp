@@ -15,7 +15,7 @@ namespace
     };
     
     static inline
-    void test_kChunk(const size_t block_size, size_t chunk_size )
+    void test_kChunk(const size_t block_size, size_t chunk_size)
     {
         std::cerr << "block_size=" << block_size << std::endl;
         void *data = kind<global>::acquire(chunk_size);
@@ -82,6 +82,7 @@ namespace
 YOCTO_UNIT_TEST_IMPL(kChunk)
 {
     size_t chunk_size = 1024;
+    
     if(argc>1)
     {
         chunk_size = atol(argv[1]);
@@ -95,4 +96,39 @@ YOCTO_UNIT_TEST_IMPL(kChunk)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+
+
+#include "yocto/memory/karena.hpp"
+
+namespace
+{
+    static inline
+    void test_kArena(const size_t block_size, size_t chunk_size)
+    {
+        kArena A(block_size,chunk_size);
+        
+    }
+    
+}
+
+YOCTO_UNIT_TEST_IMPL(kArena)
+{
+    size_t chunk_size = 1024;
+    
+    if(argc>1)
+    {
+        chunk_size = atol(argv[1]);
+    }
+    
+    
+    for(size_t block_size=1;block_size<=128;++block_size)
+    {
+        test_kArena(block_size, chunk_size);
+    }
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
+
 

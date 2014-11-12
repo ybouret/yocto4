@@ -12,11 +12,11 @@ namespace yocto
         {
         public:
             
-            
             uint16_t          *data;            //!< first byte of data
             uint16_t           firstAvailable;  //!< bookeeping
             uint16_t           stillAvailable;  //!< bookeeping
             const uint16_t     blockIncrement;  //!< for
+            
             
             //! prepare a chunk
             /**
