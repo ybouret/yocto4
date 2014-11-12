@@ -84,6 +84,75 @@ YOCTO_UNIT_TEST_IMPL(blocks)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/core/list.hpp"
+
+namespace
+{
+    template <size_t N>
+    struct node_type
+    {
+        node_type *prev;
+        node_type *next;
+        char       data[N];
+    };
+
+    template <size_t N>
+    static inline
+    void test_blocks_perf(size_t num)
+    {
+        
+        typedef node_type<N>  node_t;
+        core::list_of<node_t> nodes;
+        std::cerr << "N=" << N << " / sizeof(node_type)=" << sizeof(node_type<N>) << std::endl;
+        
+        blocks blk(4096);
+        for(size_t i=0;i<num;++i)
+        {
+            node_t *node = (node_t *)(blk.acquire(sizeof(node_t)));
+            nodes.push_back(node);
+        }
+        
+        while(nodes.size) blk.release(nodes.pop_front(), sizeof(node_t));
+        
+    }
+    
+}
+
+#include "yocto/sys/wtime.hpp"
+#include "yocto/ios/ocstream.hpp"
+
+YOCTO_UNIT_TEST_IMPL(blocks_perf)
+{
+    
+    wtime chrono;
+    chrono.start();
+    
+    ios::ocstream::overwrite("blocks_perf.dat");
+    
+    for(size_t num=1024;num<=100000;num <<= 1)
+    {
+        double tmx = chrono.query();
+        test_blocks_perf<8>(num);
+        const double ell8 = chrono.query() - tmx;
+        
+        tmx = chrono.query();
+        test_blocks_perf<16>(num);
+        const double ell16 = chrono.query() - tmx;
+        
+        tmx = chrono.query();
+        test_blocks_perf<24>(num);
+        const double ell24 = chrono.query() - tmx;
+        
+        
+        ios::ocstream fp("blocks_perf.dat",true);
+        fp("%u %g %g %g\n",(unsigned)num,ell8,ell16,ell24);
+    }
+    
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
 
 #include "yocto/object.hpp"
 
