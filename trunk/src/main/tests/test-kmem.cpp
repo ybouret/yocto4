@@ -117,9 +117,15 @@ namespace
             blk[nb].addr = A.acquire();
             ++nb;
         }
+        std::cerr << "block_size=" << block_size << ", " << nb << std::endl;
+        
+        while(nb>0)
+        {
+            --nb;
+            A.release(blk[nb].addr);
+        }
         
         kind<global>::release_as(blk, num_blocks);
-        std::cerr << "block_size=" << block_size << ", " << nb << std::endl;
     }
     
 }
