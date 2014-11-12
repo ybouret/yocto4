@@ -123,7 +123,8 @@ namespace yocto
             }
             else
             {
-                assert(acquiring);
+                assert(acquiring); // never NULL after first acquire
+                
                 //______________________________________________________________
                 //
                 //
@@ -223,7 +224,8 @@ namespace yocto
             }
             else
             {
-                const uint16_t *last = (const uint16_t *)((const uint8_t *)addr+chunk_size);
+                const uint8_t  *top  = static_cast<const uint8_t *>(addr)+chunk_size;
+                const uint16_t *last = (const uint16_t *)top;
                 if(q>=last)
                 {
                     return nextChunk;
@@ -237,15 +239,69 @@ namespace yocto
         }
         
         
-        void kArena:: release(void *p) throw()
+        void kArena:: release(void *addr) throw()
         {
-            assert(p);
+            assert(addr);
             assert(acquiring); // previously acquired
+            
             if(!releasing)
             {
                 releasing = acquiring;
             }
             
+            // initialize search
+            
+            kChunk *lo = chunks;            assert(releasing>=lo);
+            kChunk *up = chunks+num_chunks; assert(releasing<up);
+
+            
+            std::cerr << "num_chunks=" << num_chunks << std::endl;
+            std::cerr << "releasing@"  <<static_cast<ptrdiff_t>(releasing-lo) << std::endl;
+            switch (is_owner(releasing,addr))
+            {
+                case prevChunk:
+                    std::cerr << "Releasing@Prev" << std::endl;
+                    up = releasing;
+                    std::cerr << "addr-base=" << static_cast<ptrdiff_t>( (uint16_t *)addr - releasing->data) << std::endl;
+                    break;
+                    
+                case selfChunk:
+                    // cached !
+                    std::cerr << "Releasing: Cached" << std::endl;
+                    goto FOUND;
+                    
+                case nextChunk:
+                    std::cerr << "Releasing@Next" << std::endl;
+                    lo = releasing+1;
+                    break;
+            }
+            
+            --up;
+            assert(lo<=up);
+            while(true)
+            {
+                kChunk *mid = lo + (static_cast<ptrdiff_t>(up-lo))/2;
+                std::cerr << "lo@" << (void*)lo << ", mid=" << mid << ", up=" << (void*)up << std::endl;
+
+                switch(is_owner(mid, addr) )
+                {
+                    case prevChunk:
+                        up = mid-1;
+                        break;
+                        
+                    case selfChunk:
+                        goto FOUND;
+                        
+                    case nextChunk:
+                        lo = mid+1;
+                        break;
+                }
+            }
+            
+        FOUND:
+            assert(releasing);
+            assert(selfChunk==is_owner(releasing,addr));
+            ;
             
         }
 
