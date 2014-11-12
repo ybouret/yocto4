@@ -23,7 +23,7 @@ namespace yocto
 					  ) throw() :
 		data( static_cast<uint8_t *>( data_entry ) ),
 		firstAvailable(0),
-		stillAvailable( num_blocks ),
+		stillAvailable( num_blocks     ),
 		providedNumber( stillAvailable )
 		{
 			assert( block_size >  0 );
