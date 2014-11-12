@@ -16,7 +16,7 @@ namespace yocto
         data( static_cast<uint16_t *>(data_entry) ),
         firstAvailable(0),
         stillAvailable(0),
-        blockIncrement( YOCTO_ROUND2(block_size))
+        blockIncrement( YOCTO_ROUND2(block_size) )
         {
             assert(block_size>0);
             
