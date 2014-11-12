@@ -6,6 +6,7 @@
 #include "yocto/memory/global.hpp"
 
 #include <cstring>
+#include <iostream>
 
 namespace yocto
 {
@@ -41,6 +42,12 @@ namespace yocto
         //======================================================================
         kArena:: ~kArena() throw()
         {
+            while(num_chunks>0)
+            {
+                kChunk &chk = chunks[--num_chunks];
+                memory::global::__free(chk.data);
+            }
+            kind<global>::release_as(chunks, max_chunks);
         }
         
         //======================================================================
@@ -91,13 +98,12 @@ namespace yocto
                     max_chunks = new_max_chunks;
                     chunks     = new_chunks;
                 }
-                
+                assert(num_chunks<max_chunks);
                 //--------------------------------------------------------------
                 // allocate a chunk of memory
                 //--------------------------------------------------------------
-                size_t  buflen = chunk_size;
-                void   *buffer = kind<global>::acquire(buflen);
-                acquiring = new (chunks+num_chunks) kChunk(buffer,block_size,buflen);
+                void   *buffer = memory::global::__calloc(1, chunk_size);
+                acquiring = new (chunks+num_chunks) kChunk(buffer,block_size,chunk_size);
                 assert(acquiring->stillAvailable>0);
                 ++num_chunks;
                 available += acquiring->stillAvailable-1;
@@ -189,6 +195,18 @@ namespace yocto
             
         }
         
+        
+        //======================================================================
+        //
+        // release memory
+        //
+        //======================================================================
+        void kArena:: release(void *p) throw()
+        {
+            assert(p);
+            
+        }
+
         
     }
 }

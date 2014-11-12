@@ -19,6 +19,7 @@ namespace yocto
             const size_t chunk_size; //!< chunk size for every chunk
             
             void *acquire();
+            void  release(void *p) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(kArena);
