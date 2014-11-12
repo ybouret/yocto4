@@ -5,6 +5,7 @@
 #include "yocto/code/utils.hpp"
 #include "yocto/memory/global.hpp"
 
+#include "yocto/code/bswap.hpp"
 #include <cstring>
 #include <iostream>
 
@@ -107,6 +108,17 @@ namespace yocto
                 assert(acquiring->stillAvailable>0);
                 ++num_chunks;
                 available += acquiring->stillAvailable-1;
+                
+                //--------------------------------------------------------------
+                // ordering by increasing memory
+                //--------------------------------------------------------------
+                kChunk *prevChunk = acquiring;
+                while( (acquiring>chunks) && (--prevChunk)->data<acquiring->data)
+                {
+                    bswap<kChunk>(*prevChunk,*acquiring);
+                    --acquiring;
+                }
+                
                 return acquiring->acquire(block_size);
             }
             else
@@ -201,9 +213,39 @@ namespace yocto
         // release memory
         //
         //======================================================================
+        kArena::ownership kArena::is_owner(const kChunk *ch, const void *addr) const throw()
+        {
+            const uint16_t *q = (const uint16_t *)addr;
+            const uint16_t *base = ch->data;
+            if(q<base)
+            {
+                return prevChunk;
+            }
+            else
+            {
+                const uint16_t *last = (const uint16_t *)((const uint8_t *)addr+chunk_size);
+                if(q>=last)
+                {
+                    return nextChunk;
+                }
+                else
+                {
+                    return selfChunk;
+                }
+            }
+            
+        }
+        
+        
         void kArena:: release(void *p) throw()
         {
             assert(p);
+            assert(acquiring); // previously acquired
+            if(!releasing)
+            {
+                releasing = acquiring;
+            }
+            
             
         }
 
