@@ -129,7 +129,7 @@ namespace yocto
                 return entry[offset];
             }
             
-            virtual void * data( size_t offset )       throw()
+            virtual void * data( size_t offset ) throw()
             {
                 assert(offset<this->items);
                 return &entry[offset];

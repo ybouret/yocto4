@@ -236,9 +236,12 @@ YOCTO_UNIT_TEST_IMPL(h3d)
     
     YOCTO_MPI(MPI_THREAD_SINGLE);
     
-    int Nx=10;
-    int Ny=12;
-    int Nz=14;
+    int Nx=20;
+    int Ny=22;
+    int Nz=24;
+    
+    
+    
     
     VisIt::TraceFile trace(MPI,"trace.dat");
     VisIt::SetupParallel(MPI,sim_name,sim_comment,sim_path,NULL);

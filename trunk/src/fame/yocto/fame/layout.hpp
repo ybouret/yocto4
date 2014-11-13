@@ -131,40 +131,69 @@ namespace yocto
             static inline
             void __store_in(offsets_list &off, const layout_of &top, const layout_of &sub, int2type<1> )
             {
+                //std::cerr << "Storing 1D offsets" << std::endl;
                 for(unit_t i=sub.lower;i<=sub.upper;++i)
                 {
-                    off.store( top.offset_of(i) );
+                    const unit_t u = top.offset_of(i);
+                    assert(u>=0);
+                    assert(u<top.items);
+                    off.store( u );
                 }
+                for(size_t i=off.size();i>0;--i)
+                {
+                    assert(off[i]>=0);
+                    assert(off[i]<top.items);
+                }
+                //std::cerr << "offsets1D=" << off << std::endl;
             }
             
             static inline
             void __store_in(offsets_list &off, const layout_of &top, const layout_of &sub, int2type<2> )
             {
-                for(unit_t j=sub.lower.y;j<=sub.upper.y;++j)
+                //std::cerr << "Storing 2D offsets" << std::endl;
+                coord c;
+                for(c.y=sub.lower.y;c.y<=sub.upper.y;++c.y)
                 {
-                    for(unit_t i=sub.lower.x;i<=sub.upper.x;++i)
+                    for(c.x=sub.lower.x;c.x<=sub.upper.x;++c.x)
                     {
-                        const_coord c(i,j);
-                        off.store( top.offset_of(c) );
+                        const unit_t u = top.offset_of(c);
+                        assert(u>=0);
+                        assert(u<top.items);
+                        off.store( u );
                     }
                 }
+                for(size_t i=off.size();i>0;--i)
+                {
+                    assert(off[i]>=0);
+                    assert(off[i]<top.items);
+                }
+                //std::cerr << "offsets2D=" << off << std::endl;
             }
             
             static inline
             void __store_in(offsets_list &off, const layout_of &top, const layout_of &sub, int2type<3> )
             {
-                for(unit_t k=sub.lower.z;k<=sub.upper.z;++k)
+                //std::cerr << "Storing 3D offsets" << std::endl;
+                coord c;
+                for(c.z=sub.lower.z;c.z<=sub.upper.z;++c.z)
                 {
-                    for(unit_t j=sub.lower.y;j<=sub.upper.y;++j)
+                    for(c.y=sub.lower.y;c.y<=sub.upper.y;++c.y)
                     {
-                        for(unit_t i=sub.lower.x;i<=sub.upper.x;++i)
+                        for(c.x=sub.lower.x;c.x<=sub.upper.x;++c.x)
                         {
-                            const_coord c(i,j,k);
-                            off.store( top.offset_of(c) );
+                            const unit_t u = top.offset_of(c);
+                            assert(u>=0);
+                            assert(u<top.items);
+                            off.store( u );
                         }
                     }
                 }
-                
+                for(size_t i=off.size();i>0;--i)
+                {
+                    assert(off[i]>=0);
+                    assert(off[i]<top.items);
+                }
+                //std::cerr << "offsets3D=" << off << std::endl;
             }
             
         };
