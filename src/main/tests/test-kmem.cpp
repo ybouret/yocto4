@@ -123,22 +123,25 @@ namespace
         }
         std::cerr << "block_size=" << block_size << ", " << nb << ", chunk_size=" << chunk_size << std::endl;
         
-        c_shuffle(blk,nb);
-        for(size_t i=nb/2;i>0;--i)
+        for(size_t iter=0;iter<8;++iter)
         {
-            --nb;
-            A.release(blk[nb].addr);
+            c_shuffle(blk,nb);
+            for(size_t i=nb/2;i>0;--i)
+            {
+                --nb;
+                A.release(blk[nb].addr);
+            }
+            
+            while(nb<num_blocks)
+            {
+                blk[nb].size = block_size;
+                blk[nb].addr = A.acquire();
+                ++nb;
+            }
         }
         
-        while(nb<num_blocks)
-        {
-            blk[nb].size = block_size;
-            blk[nb].addr = A.acquire();
-            ++nb;
-        }
-        
         c_shuffle(blk,nb);
-
+        
         
         while(nb>0)
         {
