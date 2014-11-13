@@ -78,7 +78,6 @@ YOCTO_UNIT_TEST_INIT(150)
     YOCTO_UNIT_TEST_DECL(cached);
     YOCTO_UNIT_TEST_DECL(hlist);
     YOCTO_UNIT_TEST_DECL(geom);
-    YOCTO_UNIT_TEST_DECL(in_stack);
     YOCTO_UNIT_TEST_DECL(labelled);
     YOCTO_UNIT_TEST_DECL(bswap);
     YOCTO_UNIT_TEST_DECL(log_round);
@@ -134,7 +133,6 @@ YOCTO_UNIT_TEST_INIT(150)
     
     YOCTO_UNIT_TEST_DECL(tokenizer);
     YOCTO_UNIT_TEST_DECL(tuple);
-    YOCTO_UNIT_TEST_DECL(q64);
     YOCTO_UNIT_TEST_DECL(factory);
     
     YOCTO_UNIT_TEST_DECL(kChunk);

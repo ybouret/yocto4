@@ -2,7 +2,6 @@
 #define YOCTO_MATH_ZTYPE_INCLUDED 1
 
 #include "yocto/math/complex.hpp"
-#include "yocto/math/q64.hpp"
 
 #include <cfloat>
 
@@ -87,10 +86,6 @@ namespace yocto
 		typedef ptrdiff_t real_t;
 #	endif
 		
-#   if YOCTO_ZTYPE == 'Q'
-        typedef q64_t real_t;
-#   endif
-        
 #if !defined(YOCTO_ZTYPE)
 #	error	"YOCTO_ZTYPE is not defined!"
 #endif

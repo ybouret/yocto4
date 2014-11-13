@@ -3,6 +3,7 @@
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
