@@ -2,6 +2,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/exceptions.hpp"
 #include "yocto/code/unroll.hpp"
+#include "yocto/code/utils.hpp"
 
 namespace yocto {
 	

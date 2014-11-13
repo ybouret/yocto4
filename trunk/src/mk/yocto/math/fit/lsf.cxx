@@ -1,7 +1,7 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/fit/lsf.hpp"
 #include "yocto/math/kernel/tao.hpp"
-
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
