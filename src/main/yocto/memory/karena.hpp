@@ -29,15 +29,17 @@ namespace yocto
             
             ownership is_owner(const kChunk *ch, const void *addr) const throw();
             
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(kArena);
-            size_t  available; //! bookeeping
-            kChunk *acquiring;
-            kChunk *releasing;
-            size_t  max_chunks;
-            size_t  num_chunks;
-            kChunk *chunks;
-            const size_t add_chunks;
+            size_t  available;       //!< bookeeping
+            kChunk *acquiring;       //!< acquiring cache
+            kChunk *releasing;       //!< releasing cache
+            kChunk *lastEmpty;       //!< last Empty chunk
+            size_t  max_chunks;      //!< max chunks for memory
+            size_t  num_chunks;      //!< current #active chunks
+            kChunk *chunks;          //!< linear memory of chunks
+            const size_t add_chunks; //!< increase of #chunks per re-alloc
         };
         
     }
