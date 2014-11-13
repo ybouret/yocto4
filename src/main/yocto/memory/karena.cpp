@@ -1,5 +1,4 @@
 #include "yocto/memory/karena.hpp"
-#include "yocto/memory/kchunk.hpp"
 
 #include "yocto/code/round.hpp"
 #include "yocto/code/utils.hpp"
@@ -119,7 +118,7 @@ namespace yocto
                     --acquiring;
                 }
                 
-                return acquiring->acquire(block_size);
+                return acquiring->acquire();
             }
             else
             {
@@ -138,7 +137,7 @@ namespace yocto
                     // cached !
                     //__________________________________________________________
                     --available;
-                    return acquiring->acquire(block_size);
+                    return acquiring->acquire();
                 }
                 else
                 {
@@ -201,7 +200,7 @@ namespace yocto
                 SCAN_DONE:
                     assert(acquiring&&acquiring->stillAvailable>0);
                     --available;
-                    return acquiring->acquire(block_size);
+                    return acquiring->acquire();
                 }
             }
             
@@ -216,6 +215,7 @@ namespace yocto
         //======================================================================
         kArena::ownership kArena::is_owner(const kChunk *ch, const void *addr) const throw()
         {
+#if 0
             const uint16_t *q = (const uint16_t *)addr;
             const uint16_t *base = ch->data;
             if(q<base)
@@ -235,7 +235,7 @@ namespace yocto
                     return selfChunk;
                 }
             }
-            
+#endif
         }
         
         
@@ -262,7 +262,7 @@ namespace yocto
                 case prevChunk:
                     std::cerr << "Releasing@Prev" << std::endl;
                     up = releasing;
-                    std::cerr << "addr-base=" << static_cast<ptrdiff_t>( (uint16_t *)addr - releasing->data) << std::endl;
+                    //std::cerr << "addr-base=" << static_cast<ptrdiff_t>( (uint16_t *)addr - releasing->data) << std::endl;
                     break;
                     
                 case selfChunk:
