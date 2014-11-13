@@ -13,12 +13,14 @@ namespace yocto
         class tChunk
         {
         public:
-            typedef T word_type;
-            static const size_t MaxBlocks = limit_of<word_type>::maximum;
+            typedef T            word_type;
+            static  const size_t MaxBlocks = limit_of<word_type>::maximum;
+            
             word_type          *data;            //!< first byte of data
             word_type           firstAvailable;  //!< bookeeping
             word_type           stillAvailable;  //!< bookeeping
             const word_type     blockIncrement;  //!< for memory access
+            const word_type     providedNumber;  //!< initial count
             
             inline tChunk(void        *data_entry,
                           const size_t block_size,
@@ -26,7 +28,8 @@ namespace yocto
             data( (word_type *)data_entry ),
             firstAvailable(0),
             stillAvailable(0),
-            blockIncrement(0)
+            blockIncrement(0),
+            providedNumber(0)
             {
                 //______________________________________________________________
                 //
@@ -37,13 +40,14 @@ namespace yocto
                 
                 const size_t top_blocks     = chunk_size/block_round;
                 stillAvailable              = (MaxBlocks < top_blocks) ? MaxBlocks : top_blocks;
+                (word_type &)providedNumber = stillAvailable;
                 
                 //______________________________________________________________
                 //
                 // format the chunk
                 //______________________________________________________________
-                word_type *q = data;
-                for( size_t i=0; i != stillAvailable; q += blockIncrement )
+                word_type  *q = data;
+                for(size_t  i = 0; i != stillAvailable; q += blockIncrement )
                 {
                     *q = ++i;
                 }
@@ -56,6 +60,7 @@ namespace yocto
             inline void *acquire() throw()
             {
                 assert(stillAvailable>0);
+                assert(stillAvailable<=providedNumber);
                 word_type     *p = &data[firstAvailable*blockIncrement];
                 firstAvailable   = *p;
                 
@@ -72,7 +77,8 @@ namespace yocto
             //! release a previously allocated piece of memory
             inline void release(void *addr) throw()
             {
-                assert( addr != NULL  );
+                assert(NULL!=addr);
+                assert(stillAvailable<providedNumber);
                 word_type *to_release = (word_type *)addr;
                 assert( static_cast<ptrdiff_t>(to_release - data) % blockIncrement == 0 );
                 

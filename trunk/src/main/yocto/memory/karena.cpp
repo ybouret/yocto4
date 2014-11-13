@@ -256,8 +256,10 @@ namespace yocto
                 releasing = acquiring;
             }
             
+            //__________________________________________________________________
+            //
             // initialize search
-            
+            //__________________________________________________________________
             kChunk *lo = chunks;            assert(releasing>=lo);
             kChunk *up = chunks+num_chunks; assert(releasing<up);
 
@@ -280,6 +282,10 @@ namespace yocto
                     break;
             }
             
+            //__________________________________________________________________
+            //
+            // finalize search
+            //__________________________________________________________________
             --up;
             assert(lo<=up);
             while(true)
@@ -304,8 +310,8 @@ namespace yocto
         FOUND:
             assert(releasing);
             assert(selfChunk==is_owner(releasing,addr));
-            ;
-            
+            releasing->release(addr);
+            ++available;
         }
 
         
