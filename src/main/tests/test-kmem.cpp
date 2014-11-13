@@ -196,6 +196,7 @@ YOCTO_UNIT_TEST_IMPL(kBlocks)
     
     block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
     
+    std::cerr << "Playing with " << num_blocks << " blocks, chunk_size=" << chunk_size << std::endl;
     size_t nb=0;
     {
         while(nb<num_blocks)
