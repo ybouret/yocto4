@@ -106,6 +106,8 @@ namespace yocto
                 {
                     linear_space &l = handles[i];
                     std::cerr << "local copy " << source.zone << " --> " << target.zone << ", #items=" << items << std::endl;
+                    std::cerr << "src=" << source << std::endl;
+                    std::cerr << "dst=" << target << std::endl;
                     ghost::copy(l,target,l,source);
                 }
             }

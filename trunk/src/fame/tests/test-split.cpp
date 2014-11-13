@@ -105,13 +105,14 @@ YOCTO_UNIT_TEST_IMPL(split)
         
         coord3D    sizes;
         coord3D    ranks;
-        for(size_t size=1;size<=9;++size)
+        for(size_t size=1;size<=8;++size)
         {
-            handles.free();
             std::cerr << std::endl;
             std::cerr << "size=" << size << ", full=" << l3 << std::endl;
             for(int rank=0;rank<size;++rank)
             {
+                handles.free();
+
                 const layout3D s = quad3D::split(l3, rank, size, true,xlinks, true,ylinks,true,zlinks,ranks,sizes);
                 std::cerr << "\trank " << rank << " : " << ranks << " / " << sizes
                 << ", sub=" << s << std::endl
@@ -130,7 +131,6 @@ YOCTO_UNIT_TEST_IMPL(split)
                 
                 for(quad_ghosts<layout3D> *g = ag.head;g;g=g->next)
                 {
-                    break;
                     g->allocate_for(handles.chunk_size);
                     g->send_assemble(handles);
                     g->recv_dispatch(handles);
