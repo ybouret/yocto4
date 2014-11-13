@@ -5,6 +5,10 @@
 using namespace yocto;
 using namespace threading;
 
+
+#define __TEST_ALIGN_SIZE(BYTES,N) std::cerr << "Align " << N << " on " << BYTES << " : " << YOCTO_ALIGN_FOR_SIZE(BYTES,N) << std::endl
+#define __TEST_ALIGN_ITEM(T,N)     std::cerr << "Align " << N << " on " << #T    << " : " << YOCTO_ALIGN_FOR_ITEM(T,N) << std::endl
+
 YOCTO_UNIT_TEST_IMPL(round)
 {
 	for( size_t i=0; i < 10; ++i )
@@ -26,6 +30,18 @@ YOCTO_UNIT_TEST_IMPL(round)
     {
         std::cerr << "#Bits= " << bits << " => " << YOCTO_BYTES_FOR(bits) << " bytes" << std::endl;
     }
+    
+    std::cerr << std::endl;
+    __TEST_ALIGN_SIZE(1,9);
+    __TEST_ALIGN_SIZE(2,13);
+    __TEST_ALIGN_SIZE(4,6);
+    __TEST_ALIGN_SIZE(8,13);
+    
+    std::cerr << std::endl;
+    __TEST_ALIGN_ITEM(char,17);
+    __TEST_ALIGN_ITEM(short,19);
+    __TEST_ALIGN_ITEM(size_t,11);
+    
     
 }
 YOCTO_UNIT_TEST_DONE()

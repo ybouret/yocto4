@@ -1,6 +1,8 @@
 #ifndef YOCTO_ROUND_INCLUDED
 #define YOCTO_ROUND_INCLUDED 1
 
+#include "yocto/code/ilog2.hpp"
+
 #define YOCTO_ROUND_BYTE( ROUND_LN2 ) ( (size_t)( 1 << (ROUND_LN2) ) )
 #define YOCTO_ROUND_MASK( ROUND_LN2 ) ( (size_t)(YOCTO_ROUND_BYTE( ROUND_LN2 )-0x1) )
 #define YOCTO_ROUND_NOT2( ROUND_LN2 ) ( (size_t)(~YOCTO_ROUND_MASK( ROUND_LN2 ) )   )
@@ -43,6 +45,12 @@
 #define YOCTO_U32_FOR_ITEM(T) YOCTO_U32_FOR_SIZE(sizeof(T))
 
 #define YOCTO_BYTES_FOR(BITS) ( (size_t)(YOCTO_ROUND(3,BITS)) >>3 )
+
+//! align on a power of two BYTES
+#define YOCTO_ALIGN_FOR_SIZE(BYTES,N) YOCTO_ROUND(ilog2<BYTES>::value,N)
+
+//! align on a primitive type, which has a power of two size
+#define YOCTO_ALIGN_FOR_ITEM(T,N)     YOCTO_ROUND(ilog2_of<T>::value,N)
 
 namespace yocto
 {
