@@ -29,6 +29,9 @@ namespace yocto
             
             ownership is_owner(const kChunk *ch, const void *addr) const throw();
             
+            size_t get_num_chunks() const throw();
+            size_t get_max_chunks() const throw();
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(kArena);

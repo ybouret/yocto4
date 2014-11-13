@@ -148,8 +148,9 @@ namespace
             --nb;
             A.release(blk[nb].addr);
         }
+        std::cerr << "Final #num_chunks=" << A.get_num_chunks() << " / " << A.get_max_chunks() << std::endl;
         
-        kind<global>::release_as(blk, num_blocks);
+        kind<global>::release_as(blk,num_blocks);
     }
     
 }
