@@ -179,7 +179,7 @@ YOCTO_UNIT_TEST_DONE()
 YOCTO_UNIT_TEST_IMPL(kBlocks)
 {
     size_t chunk_size = 1024;
-    size_t num_blocks = 2000;
+    size_t num_blocks = 20000;
     
     if(argc>1)
     {

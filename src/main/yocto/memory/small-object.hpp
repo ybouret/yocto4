@@ -3,7 +3,7 @@
 
 
 #include "yocto/threading/singleton.hpp"
-#include "yocto/memory/blocks.hpp"
+#include "yocto/memory/kblocks.hpp"
 #include "yocto/memory/global.hpp"
 
 namespace yocto
@@ -90,7 +90,7 @@ namespace yocto
 				
 				YOCTO_DISABLE_COPY_AND_ASSIGN(provider);
 				
-				blocks blocks_;
+				kBlocks blocks_;
 				friend class singleton<provider>;
 				static const char name[];
 				
