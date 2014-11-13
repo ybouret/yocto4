@@ -12,7 +12,7 @@ namespace yocto
 {
     namespace memory
     {
-
+        
         //======================================================================
         //
         // ctor
@@ -25,6 +25,7 @@ namespace yocto
         available(0),
         acquiring(0),
         releasing(0),
+        lastEmpty(0),
         max_chunks( 0 ),
         num_chunks( 0 ),
         chunks( 0 ),
@@ -66,7 +67,7 @@ namespace yocto
                 // no free blocks
                 //
                 //______________________________________________________________
-               
+                
                 //--------------------------------------------------------------
                 // check memory
                 //--------------------------------------------------------------
@@ -261,7 +262,7 @@ namespace yocto
             //__________________________________________________________________
             kChunk *lo = chunks;            assert(releasing>=lo);
             kChunk *up = chunks+num_chunks; assert(releasing<up);
-
+            
             
             switch (is_owner(releasing,addr))
             {
@@ -311,8 +312,24 @@ namespace yocto
             assert(selfChunk==is_owner(releasing,addr));
             releasing->release(addr);
             ++available;
+            
+            //__________________________________________________________________
+            //
+            // memory trimming
+            //__________________________________________________________________
+            if(releasing->is_emtpty())
+            {
+                if(lastEmpty)
+                {
+                    
+                }
+                else
+                {
+                    lastEmpty = releasing;
+                }
+            }
         }
-
+        
         
     }
 }

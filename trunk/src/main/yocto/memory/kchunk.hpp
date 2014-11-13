@@ -93,11 +93,16 @@ namespace yocto
                 ++stillAvailable;
             }
             
+            //! to debug
             inline bool owns(const void *addr) const throw()
             {
                 const word_type *p = (const word_type *)addr;
-                return p >= data && p < data+providedNumber*blockIncrement;
+                return (p >= data) && (p < data+providedNumber*blockIncrement);
             }
+            
+            inline bool is_emtpty() const throw() { return providedNumber == stillAvailable; }
+            
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(tChunk);
