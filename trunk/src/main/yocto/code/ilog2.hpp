@@ -14,7 +14,10 @@ namespace
 	template <> struct ilog2<32>  { enum { value = 5  }; };
 	template <> struct ilog2<64>  { enum { value = 6 }; };
 	template <> struct ilog2<128> { enum { value = 7 }; };
-
+    
+    template <typename T>
+    struct ilog2_of { enum { value = ilog2<sizeof(T)>::value }; };
+    
 
 }
 #endif
