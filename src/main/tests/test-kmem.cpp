@@ -122,13 +122,10 @@ namespace
         }
         std::cerr << "block_size=" << block_size << ", " << nb << std::endl;
         
-        if(true)
+        while(nb>0)
         {
-            while(nb>0)
-            {
-                --nb;
-                A.release(blk[nb].addr);
-            }
+            --nb;
+            A.release(blk[nb].addr);
         }
         
         kind<global>::release_as(blk, num_blocks);

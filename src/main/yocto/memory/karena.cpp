@@ -224,22 +224,21 @@ namespace yocto
         //======================================================================
         kArena::ownership kArena::is_owner(const kChunk *ch, const void *addr) const throw()
         {
-            const kChunk::word_type *q    = (const kChunk::word_type *)addr;
-            const kChunk::word_type *base = ch->data;
-            if(q<base)
+            const uint8_t *p = (const uint8_t *)addr;
+            const uint8_t *base = (const uint8_t *)(ch->data);
+            if(p<base)
             {
                 return prevChunk;
             }
             else
             {
-                const uint8_t  *top  = static_cast<const uint8_t *>(addr)+chunk_size;
-                const uint16_t *last = (const uint16_t *)top;
-                if(q>=last)
+                if(p>=base+chunk_size)
                 {
                     return nextChunk;
                 }
                 else
                 {
+                    assert(ch->owns(addr));
                     return selfChunk;
                 }
             }
