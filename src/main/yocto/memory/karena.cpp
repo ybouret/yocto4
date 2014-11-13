@@ -359,6 +359,18 @@ namespace yocto
             }
         }
         
+        size_t kArena:: get_num_chunks() const throw()
+        {
+            return num_chunks;
+        }
+
+        size_t kArena:: get_max_chunks() const throw()
+        {
+            return max_chunks;
+        }
+
+        
+        
         
     }
 }
