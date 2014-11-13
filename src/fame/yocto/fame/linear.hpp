@@ -131,6 +131,10 @@ namespace yocto
             
             virtual void * data( size_t offset ) throw()
             {
+                if(offset>=this->items)
+                {
+                    std::cerr << "mutable data offset=" << offset << " / " << this->items << std::endl;
+                }
                 assert(offset<this->items);
                 return &entry[offset];
             }
