@@ -26,8 +26,8 @@ namespace yocto
         acquiring(0),
         releasing(0),
         lastEmpty(0),
-        max_chunks( 0 ),
-        num_chunks( 0 ),
+        max_chunks(0),
+        num_chunks(0),
         chunks( 0 ),
         add_chunks( chunk_size/sizeof(kChunk) )
         {
@@ -67,6 +67,7 @@ namespace yocto
                 // no free blocks
                 //
                 //______________________________________________________________
+                assert(NULL==lastEmpty);
                 
                 //--------------------------------------------------------------
                 // check memory
@@ -90,17 +91,24 @@ namespace yocto
                     {
                         releasing = new_chunks + static_cast<ptrdiff_t>(releasing-chunks);
                     }
+                    
                     if(acquiring)
                     {
                         acquiring = new_chunks + static_cast<ptrdiff_t>(acquiring-chunks);
                     }
+                    
+                    
+                    //__________________________________________________________
+                    //
+                    // cleaning
+                    //__________________________________________________________
                     kind<global>::release_as<kChunk>(chunks,max_chunks);
                     
                     max_chunks = new_max_chunks;
                     chunks     = new_chunks;
-                    //std::cerr << "max_chunks=" << max_chunks << std::endl;
                 }
                 assert(num_chunks<max_chunks);
+
                 //--------------------------------------------------------------
                 // allocate a chunk of memory
                 //--------------------------------------------------------------
@@ -147,6 +155,7 @@ namespace yocto
                     // cached !
                     //__________________________________________________________
                     --available;
+                    if(lastEmpty==acquiring) lastEmpty=0;
                     return acquiring->acquire();
                 }
                 else
@@ -210,6 +219,7 @@ namespace yocto
                 SCAN_DONE:
                     assert(acquiring&&acquiring->stillAvailable>0);
                     --available;
+                    if(lastEmpty==acquiring) lastEmpty=0;
                     return acquiring->acquire();
                 }
             }
@@ -319,14 +329,34 @@ namespace yocto
             //__________________________________________________________________
             if(releasing->is_emtpty())
             {
-                if(lastEmpty)
+                if(lastEmpty && (releasing != lastEmpty) )
                 {
+                    assert(num_chunks>=2);
+                    //----------------------------------------------------------
+                    // select the highest memory
+                    //----------------------------------------------------------
+                    assert(lastEmpty->is_emtpty());
+                    if(releasing>lastEmpty)
+                    {
+                        cswap(releasing,lastEmpty);
+                    }
+                    assert(lastEmpty>releasing);
+                    assert(available>=lastEmpty->providedNumber);
+                    
+                    //----------------------------------------------------------
+                    // remove the blocks
+                    //----------------------------------------------------------
+                    available -= lastEmpty->providedNumber;
+                    memory::global::__free(lastEmpty->data);
+                    
+                    const size_t idx = static_cast<size_t>(lastEmpty-chunks);
+                    --num_chunks;
+                    memmove(lastEmpty, lastEmpty+1, (num_chunks-idx) * sizeof(kChunk) );
+                    acquiring = chunks+(num_chunks-1);
                     
                 }
-                else
-                {
-                    lastEmpty = releasing;
-                }
+
+                lastEmpty = releasing;
             }
         }
         

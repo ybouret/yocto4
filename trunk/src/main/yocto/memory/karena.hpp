@@ -35,7 +35,7 @@ namespace yocto
             size_t  available;       //!< bookeeping
             kChunk *acquiring;       //!< acquiring cache
             kChunk *releasing;       //!< releasing cache
-            kChunk *lastEmpty;       //!< last Empty chunk
+            kChunk *lastEmpty;       //!< for memory trimming
             size_t  max_chunks;      //!< max chunks for memory
             size_t  num_chunks;      //!< current #active chunks
             kChunk *chunks;          //!< linear memory of chunks
