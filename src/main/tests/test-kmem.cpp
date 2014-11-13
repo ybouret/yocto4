@@ -2,6 +2,7 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/memory/global.hpp"
 #include "yocto/code/rand.hpp"
+#include <cstdlib>
 
 using namespace yocto;
 using namespace memory;
