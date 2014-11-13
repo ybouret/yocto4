@@ -3,7 +3,7 @@
 using namespace yocto;
 
 
-YOCTO_UNIT_TEST_INIT(128)
+YOCTO_UNIT_TEST_INIT(150)
 {
 	
 	YOCTO_UNIT_TEST_DECL(platform);
@@ -139,6 +139,7 @@ YOCTO_UNIT_TEST_INIT(128)
     
     YOCTO_UNIT_TEST_DECL(kChunk);
     YOCTO_UNIT_TEST_DECL(kArena);
+    YOCTO_UNIT_TEST_DECL(kBlocks);
 
 }
 YOCTO_UNIT_TEST_EXEC()
