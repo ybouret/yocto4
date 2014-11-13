@@ -1,14 +1,13 @@
 #ifndef YOCTO_MEMORY_kARENA_INCLUDED
 #define YOCTO_MEMORY_kARENA_INCLUDED 1
 
-#include "yocto/os.hpp"
+#include "yocto/memory/kchunk.hpp"
 
 namespace yocto
 {
     namespace memory
     {
         
-        class kChunk;
         class kArena
         {
         public:
