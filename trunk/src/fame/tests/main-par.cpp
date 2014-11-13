@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
         
         { // 3D
             
-            const layout3D full( coord3D(1,1,1), coord3D(20,20,20) );
+            const layout3D full( coord3D(1,1,1), coord3D(30,30,30) );
             
             RectilinearMesh<layout3D,double> mesh(adb,"m3",full,pbc,rank,size,1);
             MPI.Printf0(stderr, "sizes: %d,%d,%d\n", (int)mesh.sizes.x, (int)mesh.sizes.y, (int)mesh.sizes.z);

@@ -70,6 +70,13 @@ YOCTO_UNIT_TEST_IMPL(vtx)
             }
         }
     }
+    
+    std::cerr << "sizeof(Vertex<1,float>)=" << sizeof(Vertex<1,float>) << std::endl;
+    std::cerr << "sizeof(Vertex<1,double>)=" << sizeof(Vertex<1,double>) << std::endl;
+    std::cerr << "sizeof(Vertex<2,float>)=" << sizeof(Vertex<2,float>) << std::endl;
+    std::cerr << "sizeof(Vertex<2,double>)=" << sizeof(Vertex<2,double>) << std::endl;
+    std::cerr << "sizeof(Vertex<3,float>)=" << sizeof(Vertex<3,float>) << std::endl;
+    std::cerr << "sizeof(Vertex<3,double>)=" << sizeof(Vertex<3,double>) << std::endl;
 
     
 }
