@@ -121,7 +121,7 @@ namespace
             blk[nb].addr = A.acquire();
             ++nb;
         }
-        std::cerr << "block_size=" << block_size << ", " << nb << std::endl;
+        std::cerr << "block_size=" << block_size << ", " << nb << ", chunk_size=" << chunk_size << std::endl;
         
         c_shuffle(blk,nb);
         for(size_t i=nb/2;i>0;--i)

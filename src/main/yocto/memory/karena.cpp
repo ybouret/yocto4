@@ -277,17 +277,14 @@ namespace yocto
             switch (is_owner(releasing,addr))
             {
                 case prevChunk:
-                    //std::cerr << "Releasing@Prev" << std::endl;
                     up = releasing;
                     break;
                     
                 case selfChunk:
                     // cached !
-                    //std::cerr << "Releasing: Cached" << std::endl;
                     goto FOUND;
                     
                 case nextChunk:
-                    //std::cerr << "Releasing@Next" << std::endl;
                     lo = releasing+1;
                     break;
             }
@@ -352,8 +349,10 @@ namespace yocto
                     const size_t idx = static_cast<size_t>(lastEmpty-chunks);
                     --num_chunks;
                     memmove(lastEmpty, lastEmpty+1, (num_chunks-idx) * sizeof(kChunk) );
-                    acquiring = chunks+(num_chunks-1);
-                    
+                    if(acquiring>=lastEmpty&&acquiring>=chunks)
+                    {
+                        --acquiring;
+                    }
                 }
 
                 lastEmpty = releasing;
