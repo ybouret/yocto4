@@ -9,6 +9,7 @@ namespace yocto
     namespace memory
     {
         
+        
         template <typename T>
         class tChunk
         {
@@ -90,6 +91,12 @@ namespace yocto
                 
                 // update status
                 ++stillAvailable;
+            }
+            
+            inline bool owns(const void *addr) const throw()
+            {
+                const word_type *p = (const word_type *)addr;
+                return p >= data && p < data+providedNumber*blockIncrement;
             }
             
         private:
