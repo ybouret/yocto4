@@ -98,5 +98,6 @@ ADD_TEST(Q64         test-main q64)
 ADD_TEST(Factory     test-main factory)
 ADD_TEST(kChunk      test-main kChunk)
 ADD_TEST(kArena      test-main kArena)
+ADD_TEST(kBlocks     test-main kBlocks)
 
 #ADD_CUSTOM_TARGET(check-main COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS test-main)
