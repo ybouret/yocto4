@@ -97,8 +97,10 @@ namespace yocto
             inline unit_t offset_of( param_coord c ) const throw()
             {
                 unit_t ans = __coord(c,0) - __coord(lower,0);
-                for( size_t i=1; i < DIMENSIONS; ++i )
-                    ans += __coord(pitch,i) * ( __coord(c,i) - __coord(lower,i) );
+                for( size_t dim=1; dim < DIMENSIONS; ++dim )
+                {
+                    ans += __coord(pitch,dim) * ( __coord(c,dim) - __coord(lower,dim) );
+                }
                 return ans;
             }
             

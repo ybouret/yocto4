@@ -35,7 +35,7 @@ namespace yocto
             
             const size_t n     = size();
             const size_t h     = handles.size();
-            
+            std::cerr << "saving using offsets=" << *this << std::endl;
             const sorted_offsets &self = *this;
             for(size_t j=n;j>0;--j)
             {

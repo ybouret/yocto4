@@ -13,8 +13,8 @@ using namespace fame;
 
 YOCTO_UNIT_TEST_IMPL(split)
 {
-    quad_links  links[3];
-    quad_links &xlinks = links[0];
+    quad_links     links[3];
+    quad_links    &xlinks = links[0];
     linear_handles handles;
     
     {
@@ -44,9 +44,10 @@ YOCTO_UNIT_TEST_IMPL(split)
                 
                 for(quad_ghosts<layout1D> *g = ag.head;g;g=g->next)
                 {
+                    //break;
                     g->allocate_for(handles.chunk_size);
                     g->send_assemble(handles);
-                    g->recv_dispatch(handles);
+                    //g->recv_dispatch(handles);
                 }
                 
             }
@@ -129,6 +130,7 @@ YOCTO_UNIT_TEST_IMPL(split)
                 
                 for(quad_ghosts<layout3D> *g = ag.head;g;g=g->next)
                 {
+                    break;
                     g->allocate_for(handles.chunk_size);
                     g->send_assemble(handles);
                     g->recv_dispatch(handles);

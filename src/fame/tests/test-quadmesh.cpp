@@ -14,6 +14,7 @@ YOCTO_UNIT_TEST_IMPL(grid)
     linear_handles handles;
     const bool periodic[3] = { true, true, true };
     
+    std::cerr << "-- 1D" << std::endl << std::endl;
     {
         const layout1D L(1,30);
         for(int size=1;size<=4;++size)
@@ -38,6 +39,8 @@ YOCTO_UNIT_TEST_IMPL(grid)
     }
     
     
+    std::cerr << "-- 2D" << std::endl << std::endl;
+
     {
         const layout2D L( coord2D(1,1), coord2D(30,40) );
         for(int size=1;size<=8;++size)
@@ -62,11 +65,11 @@ YOCTO_UNIT_TEST_IMPL(grid)
     }
     
     
-    
+    std::cerr << "-- 3D" << std::endl << std::endl;
     {
     
         const layout3D L( coord3D(1,1,1), coord3D(30,40,50) );
-        for(int size=1;size<=9;++size)
+        for(int size=1;size<=8;++size)
         {
             std::cerr << std::endl;
             std::cerr << "size=" << size << " : full=" << L << std::endl;

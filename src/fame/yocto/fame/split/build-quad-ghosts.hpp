@@ -29,6 +29,7 @@ namespace yocto
             {
                 assert(links);
                 lg.clear();
+                ag.clear();
                 if(ng<=0)
                 {
                     return inside;
@@ -59,7 +60,6 @@ namespace yocto
                                 break;
                                 
                         }
-                        
                     }
                 }
                 
