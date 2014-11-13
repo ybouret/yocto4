@@ -90,43 +90,8 @@ namespace yocto
             YOCTO_DISABLE_COPY_AND_ASSIGN(tChunk);
         };
         
-        typedef tChunk<uint8_t> kChunk;
+        typedef tChunk<uint16_t> kChunk;
         
-        
-#if 0
-        class kChunk
-        {
-        public:
-            typedef uint16_t    word_type;
-            word_type          *data;            //!< first byte of data
-            word_type           firstAvailable;  //!< bookeeping
-            word_type           stillAvailable;  //!< bookeeping
-            const word_type     blockIncrement;  //!< for memory access
-            
-            
-            //! prepare a chunk
-            /**
-             \param data_entry an area of chunk_size bytes
-             \param block_size > 0
-             \param chunk_size available data size
-             the maximum number of blocks is computed in stillAvailable
-             */
-            kChunk(void        *data_entry,
-                   const size_t block_size,
-                   const size_t chunk_size) throw();
-            
-            ~kChunk() throw();
-            
-            //! acquire zeroed memory for programmed block size
-            void *acquire() throw();
-            
-            //! release memory for block_size
-            void release(void *p) throw();
-            
-        private:
-            YOCTO_DISABLE_COPY_AND_ASSIGN(kChunk);
-        };
-#endif
         
     }
 }

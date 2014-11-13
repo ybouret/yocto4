@@ -18,12 +18,12 @@ namespace
     static inline
     void test_tChunk(const size_t block_size, size_t chunk_size)
     {
-        std::cerr << "block_size=" << block_size << std::endl;
+        std::cerr << "block_size=" << block_size << ", sizeof(tChunk)=" << sizeof(tChunk<T>) << std::endl;
         void *data = kind<global>::acquire(chunk_size);
         std::cerr << "\tchunk_size  = " << chunk_size << " bytes" << std::endl;
         tChunk<T> ch(data,block_size,chunk_size);
         size_t num_blocks = ch.stillAvailable;
-        std::cerr << "\tnum_blocks=" << num_blocks << std::endl;
+        std::cerr << "\tnum_blocks  = " << num_blocks << std::endl;
         block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
         
         size_t nb = 0;
@@ -89,7 +89,7 @@ YOCTO_UNIT_TEST_IMPL(kChunk)
         chunk_size = atol(argv[1]);
     }
     
-    for(size_t block_size=1;block_size<=12;++block_size)
+    for(size_t block_size=1;block_size<=128;++block_size)
     {
         test_tChunk<uint8_t> (block_size, chunk_size);
         test_tChunk<uint16_t>(block_size, chunk_size);
@@ -122,10 +122,13 @@ namespace
         }
         std::cerr << "block_size=" << block_size << ", " << nb << std::endl;
         
-        while(nb>0)
+        if(true)
         {
-            --nb;
-            A.release(blk[nb].addr);
+            while(nb>0)
+            {
+                --nb;
+                A.release(blk[nb].addr);
+            }
         }
         
         kind<global>::release_as(blk, num_blocks);

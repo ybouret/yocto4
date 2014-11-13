@@ -79,7 +79,7 @@ namespace yocto
                     size_t  new_max_chunks = max_chunks + add_chunks;
                     kChunk *new_chunks     = kind<global>::acquire_as<kChunk>(new_max_chunks);
                     
-                    memcpy(new_chunks,chunks,num_chunks*sizeof(chunks));
+                    memcpy(new_chunks,chunks,num_chunks*sizeof(kChunk));
                     
                     //__________________________________________________________
                     //
@@ -97,6 +97,7 @@ namespace yocto
                     
                     max_chunks = new_max_chunks;
                     chunks     = new_chunks;
+                    //std::cerr << "max_chunks=" << max_chunks << std::endl;
                 }
                 assert(num_chunks<max_chunks);
                 //--------------------------------------------------------------
@@ -104,20 +105,28 @@ namespace yocto
                 //--------------------------------------------------------------
                 void   *buffer = memory::global::__calloc(1, chunk_size);
                 acquiring = new (chunks+num_chunks) kChunk(buffer,block_size,chunk_size);
-                assert(acquiring->stillAvailable>0);
+                const size_t added_blocks = acquiring->stillAvailable;
+                assert(added_blocks>0);
                 ++num_chunks;
-                available += acquiring->stillAvailable-1;
+                available += added_blocks;
                 
                 //--------------------------------------------------------------
-                // ordering by increasing memory
+                // ordering by increasing memory address
                 //--------------------------------------------------------------
-                kChunk *prevChunk = acquiring;
-                while( (acquiring>chunks) && (--prevChunk)->data<acquiring->data)
+                while(acquiring>chunks)
                 {
-                    bswap<kChunk>(*prevChunk,*acquiring);
+                    kChunk *prevChunk = acquiring-1; assert(prevChunk>=chunks);
+                    if(prevChunk->data<acquiring->data)
+                        break;
+                    bswap(*prevChunk,*acquiring);
                     --acquiring;
                 }
+                assert(added_blocks == acquiring->stillAvailable);
                 
+                //--------------------------------------------------------------
+                // direct acquire
+                //--------------------------------------------------------------
+                --available;
                 return acquiring->acquire();
             }
             else
@@ -215,9 +224,8 @@ namespace yocto
         //======================================================================
         kArena::ownership kArena::is_owner(const kChunk *ch, const void *addr) const throw()
         {
-#if 0
-            const uint16_t *q = (const uint16_t *)addr;
-            const uint16_t *base = ch->data;
+            const kChunk::word_type *q    = (const kChunk::word_type *)addr;
+            const kChunk::word_type *base = ch->data;
             if(q<base)
             {
                 return prevChunk;
@@ -235,7 +243,6 @@ namespace yocto
                     return selfChunk;
                 }
             }
-#endif
         }
         
         
@@ -255,23 +262,20 @@ namespace yocto
             kChunk *up = chunks+num_chunks; assert(releasing<up);
 
             
-            std::cerr << "num_chunks=" << num_chunks << std::endl;
-            std::cerr << "releasing@"  <<static_cast<ptrdiff_t>(releasing-lo) << std::endl;
             switch (is_owner(releasing,addr))
             {
                 case prevChunk:
-                    std::cerr << "Releasing@Prev" << std::endl;
+                    //std::cerr << "Releasing@Prev" << std::endl;
                     up = releasing;
-                    //std::cerr << "addr-base=" << static_cast<ptrdiff_t>( (uint16_t *)addr - releasing->data) << std::endl;
                     break;
                     
                 case selfChunk:
                     // cached !
-                    std::cerr << "Releasing: Cached" << std::endl;
+                    //std::cerr << "Releasing: Cached" << std::endl;
                     goto FOUND;
                     
                 case nextChunk:
-                    std::cerr << "Releasing@Next" << std::endl;
+                    //std::cerr << "Releasing@Next" << std::endl;
                     lo = releasing+1;
                     break;
             }
@@ -281,8 +285,6 @@ namespace yocto
             while(true)
             {
                 kChunk *mid = lo + (static_cast<ptrdiff_t>(up-lo))/2;
-                std::cerr << "lo@" << (void*)lo << ", mid=" << mid << ", up=" << (void*)up << std::endl;
-
                 switch(is_owner(mid, addr) )
                 {
                     case prevChunk:
@@ -290,6 +292,7 @@ namespace yocto
                         break;
                         
                     case selfChunk:
+                        releasing = mid;
                         goto FOUND;
                         
                     case nextChunk:
