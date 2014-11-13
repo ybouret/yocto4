@@ -46,6 +46,12 @@ namespace yocto
             while(num_chunks>0)
             {
                 kChunk &chk = chunks[--num_chunks];
+#if !defined(NDEBUG)
+                if(chk.stillAvailable<chk.providedNumber)
+                {
+                    std::cerr << "[memory::arena.block_size=" << block_size <<"] missing " << size_t(chk.providedNumber-chk.stillAvailable) << " blocks" << std::endl;
+                }
+#endif
                 memory::global::__free(chk.data);
             }
             kind<global>::release_as(chunks, max_chunks);
