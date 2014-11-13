@@ -20,7 +20,7 @@ namespace yocto
             ghost(gzone.items),
             zone(gzone)
             {
-                std::cerr << "\t\tGhost is " << zone << " of " << outline << std::endl;
+                //std::cerr << "\t\tGhost is " << zone << " of " << outline << std::endl;
                 outline.store_offsets_of(zone,*this);
             }
             
@@ -105,9 +105,9 @@ namespace yocto
                 for(size_t i=handles.size();i>0;--i)
                 {
                     linear_space &l = handles[i];
-                    std::cerr << "local copy " << source.zone << " --> " << target.zone << ", #items=" << items << std::endl;
-                    std::cerr << "src=" << source << std::endl;
-                    std::cerr << "dst=" << target << std::endl;
+                    //std::cerr << "local copy " << source.zone << " --> " << target.zone << ", #items=" << items << std::endl;
+                    //std::cerr << "src=" << source << std::endl;
+                    //std::cerr << "dst=" << target << std::endl;
                     ghost::copy(l,target,l,source);
                 }
             }
