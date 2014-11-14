@@ -35,7 +35,7 @@ namespace yocto
                 assert(node);
                 assert(NULL==node->prev);
                 assert(NULL==node->next);
-                assert(!this->owns(node));
+                //assert(!this->owns(node));
                 switch( size )
                 {
                     case 0:
@@ -64,7 +64,7 @@ namespace yocto
                 assert(node);
                 assert(NULL==node->prev);
                 assert(NULL==node->next);
-                assert(!this->owns(node));
+                //assert(!this->owns(node));
                 switch( size )
                 {
                     case 0:
