@@ -29,7 +29,10 @@ namespace yocto
 						
 			inline void push_back( NODE *node ) throw()
 			{
-				assert(NULL!=node); assert(NULL==node->next); assert(NULL==node->prev); assert( !owns(node));
+				assert(NULL!=node);
+                assert(NULL==node->next);
+                assert(NULL==node->prev);
+                //assert( !owns(node));
 				if( size <= 0 )
 				{
 					push_first(node);
@@ -46,7 +49,10 @@ namespace yocto
 			
 			inline void push_front( NODE *node ) throw()
 			{
-				assert(NULL!=node); assert(NULL==node->next); assert(NULL==node->prev); assert( !owns(node));
+				assert(NULL!=node);
+                assert(NULL==node->next);
+                assert(NULL==node->prev);
+                //assert( !owns(node));
 				if( size <= 0 )
 				{
 					push_first(node);
@@ -63,7 +69,9 @@ namespace yocto
 			
 			inline NODE *pop_back() throw()
 			{
-				assert(size>0); assert(head!=NULL);assert(tail!=NULL);
+				assert(size>0);
+                assert(head!=NULL);
+                assert(tail!=NULL);
 				if( size <= 1 )
 					return pop_last();
 				else
@@ -80,7 +88,9 @@ namespace yocto
 			
 			inline NODE *pop_front() throw()
 			{
-				assert(size>0); assert(head!=NULL);assert(tail!=NULL);
+				assert(size>0);
+                assert(head!=NULL);
+                assert(tail!=NULL);
 				if( size <= 1 )
 					return pop_last();
 				else

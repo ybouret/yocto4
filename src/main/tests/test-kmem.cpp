@@ -258,7 +258,7 @@ YOCTO_UNIT_TEST_IMPL(kObject)
     {
         while(nb<num_blocks)
         {
-            blk[nb].size = 1+alea_lt(100);
+            blk[nb].size = 1+alea_lt(2*object::limit_size);
             blk[nb].addr = object::operator new(blk[nb].size);
             ++nb;
         }
@@ -274,7 +274,7 @@ YOCTO_UNIT_TEST_IMPL(kObject)
             
             while(nb<num_blocks)
             {
-                blk[nb].size = 1+alea_lt(100);
+                blk[nb].size =  1+alea_lt(2*object::limit_size);
                 blk[nb].addr = object::operator new(blk[nb].size);
                 ++nb;
             }
@@ -292,4 +292,91 @@ YOCTO_UNIT_TEST_IMPL(kObject)
     
 }
 YOCTO_UNIT_TEST_DONE()
+
+#include "yocto/core/list.hpp"
+#include "yocto/sys/wtime.hpp"
+
+namespace
+{
+    template <size_t N>
+    class raw_node
+    {
+    public:
+        raw_node *next;
+        raw_node *prev;
+        char      data[N];
+        inline raw_node() throw() : next(0), prev(0), data() {}
+        inline ~raw_node() throw() {}
+        YOCTO_DISABLE_COPY_AND_ASSIGN(raw_node);
+    };
+    
+    template <size_t N>
+    class obj_node
+    {
+    public:
+        YOCTO_MAKE_OBJECT
+        obj_node *next;
+        obj_node *prev;
+        char      data[N];
+        inline  obj_node() throw() : next(0), prev(0), data() {}
+        inline ~obj_node() throw() {}
+        YOCTO_DISABLE_COPY_AND_ASSIGN(obj_node);
+    };
+    
+    template <typename NODE>
+    static inline
+    double test_node_perf(const size_t num)
+    {
+        std::cerr << "sizeof node=" << sizeof(NODE) << std::endl;
+        wtime chrono;
+        chrono.start();
+        core::list_of_cpp<NODE> L;
+        const double tmx = chrono.query();
+        for(size_t i=num;i>0;--i)
+        {
+            if( alea<double>()>0.5 )
+            {
+                L.push_back( new NODE() );
+            }
+            else
+            {
+                L.push_front( new NODE() );
+            }
+        }
+        L.clear();
+        return double(num)/(chrono.query()-tmx);
+    }
+ 
+    template <size_t N>
+    static inline
+    double speed_up(const size_t num)
+    {
+        const double rt = test_node_perf< raw_node<N> >(num);
+        const double ot = test_node_perf< obj_node<N> >(num);
+        const double sp = ot/rt;
+        std::cerr << "raw_speed=" << rt << std::endl;
+        std::cerr << "obj_speed=" << ot << std::endl;
+        std::cerr << "\tspeed_up" << sizeof(raw_node<N>) << " = " << sp << std::endl;
+        return sp;
+    }
+    
+}
+
+YOCTO_UNIT_TEST_IMPL(kObjPerf)
+{
+    size_t num_blocks = 10000;
+    if(argc>1)
+    {
+        num_blocks = atol(argv[1]);
+    }
+    
+    speed_up<1>(num_blocks);
+    speed_up<10>(num_blocks);
+    speed_up<40>(num_blocks);
+
+    
+    
+}
+YOCTO_UNIT_TEST_DONE()
+
 
