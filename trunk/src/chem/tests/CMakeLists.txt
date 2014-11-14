@@ -1,12 +1,13 @@
 FILE(GLOB test_srcs test-*.cpp)
-ADD_EXECUTABLE(test-chem main.cpp ${test_srcs} 
+ADD_EXECUTABLE(test-chem main.cpp ${test_srcs}
+sample.lua
 )
 TARGET_LINK_YOCTO( test-chem chem mk lua++ lua)
 
 ENABLE_TESTING()
 
 ADD_TEST(Species     test-chemical species)
-#ADD_TEST(Collection  test-chemical collection ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
+ADD_TEST(Library     test-chemical lib ${CMAKE_CURRENT_SOURCE_DIR}/sample.lua)
 #ADD_TEST(Solution    test-chemical solution)
 #ADD_TEST(Equilibrium test-chemical equilibrium)
 #ADD_TEST(Equilibria  test-chemical equilibria)
