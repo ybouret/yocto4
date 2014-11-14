@@ -236,9 +236,9 @@ YOCTO_UNIT_TEST_IMPL(h3d)
     
     YOCTO_MPI(MPI_THREAD_SINGLE);
     
-    int Nx=20;
-    int Ny=22;
-    int Nz=24;
+    int Nx=40;
+    int Ny=42;
+    int Nz=44;
     
     
     
