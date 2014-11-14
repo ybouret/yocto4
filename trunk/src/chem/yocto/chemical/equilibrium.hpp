@@ -48,7 +48,7 @@ namespace yocto
             
             const string &key() const throw();
             typedef intr_ptr<string,equilibrium> pointer;
-            typedef set<string,equilibrium>      database;
+            typedef set<string,pointer>          database;
             
             void add( const species::pointer &sp, const int nu);
             void output( std::ostream &os ) const;
@@ -58,7 +58,9 @@ namespace yocto
             //
             // Chemistry
             //__________________________________________________________________
-           
+            void initialize( array<ptrdiff_t> &Nu ) const throw();
+            
+            
             //! compute Gamma and K(t)
             double computeGamma( double t, const array<double> &C, double &Kt ) const;
             
