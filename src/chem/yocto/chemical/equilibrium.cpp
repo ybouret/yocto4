@@ -154,6 +154,26 @@ namespace yocto
         }
         
         
+        void equilibrium:: initialize( array<ptrdiff_t> &Nu ) const throw()
+        {
+            for(const actor *a=reac.head;a;a=a->next)
+            {
+                const size_t j = a->sp->indx;
+                assert(j>=1);
+                assert(j<=Nu.size());
+                Nu[j] = a->nu;
+            }
+            
+            for(const actor *a=prod.head;a;a=a->next)
+            {
+                const size_t j = a->sp->indx;
+                assert(j>=1);
+                assert(j<=Nu.size());
+                Nu[j] = a->nu;
+            }
+        }
+
+        
         double equilibrium:: computeGamma( double t, const array<double> &C, double &Kt ) const
         {
             Kt = callK(t);
