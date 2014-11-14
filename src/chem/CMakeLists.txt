@@ -14,7 +14,7 @@ SET( srcs_lua ${decl_lua} ${impl_lua} )
 INSTALL( FILES ${decl_lua} DESTINATION include/yocto/chemical/lua )
 SOURCE_GROUP( chemical/lua FILES ${srcs_lua} )
 
-INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/lua ../lua++ )
+INCLUDE_DIRECTORIES( . ../main ../mk ../third_party/lua/yocto/lua ../lua++ )
 
 #specific
 ADD_LIBRARY( y-chem STATIC ${srcs} ${srcs_lua} ${srcs_boot} ${srcs_eqs} )
