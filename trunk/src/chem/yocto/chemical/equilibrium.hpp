@@ -3,7 +3,7 @@
 
 #include "yocto/chemical/species.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/sequence/vector.hpp"
+#include "yocto/core/list.hpp"
 
 namespace yocto
 {
@@ -19,18 +19,24 @@ namespace yocto
             class actor
             {
             public:
+                YOCTO_MAKE_OBJECT
                 const species::pointer sp;
                 const int              nu;
+                actor                 *prev;
+                actor                 *next;
+                
                 actor(const species::pointer &a_sp, const int a_nu) throw();
                 ~actor() throw();
-                actor(const actor &a) throw();
                 
-                static int compare( const actor &lhs, const actor &rhs ) throw();
                 
             private:
-                YOCTO_DISABLE_ASSIGN(actor);
+                YOCTO_DISABLE_COPY_AND_ASSIGN(actor);
             };
             
+            //__________________________________________________________________
+            //
+            // Administrativia
+            //__________________________________________________________________
             //! default ctor
             explicit equilibrium(const string &id);
             
@@ -48,12 +54,22 @@ namespace yocto
             void output( std::ostream &os ) const;
             friend inline std::ostream &operator<<(std::ostream &os, const equilibrium &eq) { eq.output(os); return os; }
             
+            //__________________________________________________________________
+            //
+            // Chemistry
+            //__________________________________________________________________
+           
+            //! compute Gamma and K(t)
+            double computeGamma( double t, const array<double> &C, double &Kt ) const;
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
             virtual double getK(double t) const = 0;
             double callK(double) const;
-            vector<actor> actors;
+            typedef core::list_of_cpp<actor> actors;
+            actors reac;
+            actors prod;
         };
         
         class const_equilibrium : public equilibrium

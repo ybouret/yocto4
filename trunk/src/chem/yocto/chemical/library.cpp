@@ -16,6 +16,8 @@ namespace yocto
         {
         }
         
+        size_t library::size() const throw() { return db.size(); }
+        
         library::iterator library::begin() throw()
         {
             return db.begin();
@@ -92,7 +94,10 @@ namespace yocto
             {
                 species &sp = **i;
                 (size_t &)(sp.indx) = ++j;
-                if(sp.name.length()>max_name_length) max_name_length = sp.name.length();
+                if(sp.name.length()>max_name_length)
+                {
+                    max_name_length = sp.name.length();
+                }
             }
         }
         
@@ -100,6 +105,7 @@ namespace yocto
         {
             if( refcount() > 0 )
                 throw exception("library is locked while removind '%s'", name.c_str());
+            
             if( db.remove(name) )
             {
                 find_max_name_length();
