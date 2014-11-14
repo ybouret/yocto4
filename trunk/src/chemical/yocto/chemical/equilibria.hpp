@@ -168,6 +168,8 @@ namespace yocto
         private:
             //! remove unactive columns
             void cleanPhi() throw();
+            
+            //! callback for a differential equation
             void odecb(array<double> &Y,double t);
             
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

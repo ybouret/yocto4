@@ -6,9 +6,9 @@ namespace yocto
     namespace chemical
     {
         
-        double Psi(double x) throw()
+        double GHK_Psi(double x) throw()
         {
-            if(fabs(x)>=0.2)
+            if(fabs(x)>=0.1)
             {
                 return x/(exp(x)-1.0);
             }

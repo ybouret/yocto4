@@ -14,7 +14,7 @@ namespace yocto
         typedef math::ode::Field<double>::Callback diff_callback;
         
         //! u/(exp(u)-1)
-        double Psi(double u) throw();
+        double GHK_Psi(double u) throw();
         
     }
 }
