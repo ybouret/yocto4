@@ -78,6 +78,7 @@ YOCTO_UNIT_TEST_IMPL(grid)
                 QuadGrid<layout3D> grid(L,periodic,rank,size,ng);
                 std::cerr << "\trank=" << rank << " is " << grid.ranks << "/" << grid.sizes << std::endl;
                 std::cerr << grid << std::endl;
+                handles.free();
                 
                 handles.append( new array3D<double>("A3",grid.outline) );
                 

@@ -178,25 +178,31 @@ YOCTO_UNIT_TEST_DONE()
 
 YOCTO_UNIT_TEST_IMPL(kBlocks)
 {
-    size_t chunk_size = 1024;
+    
+    
     size_t num_blocks = 20000;
+    size_t chunk_size = 4096;
     
     if(argc>1)
     {
-        chunk_size = atol(argv[1]);
+        num_blocks = atol(argv[1]);
     }
     
     if(argc>2)
     {
-        num_blocks = atol(argv[2]);
+        chunk_size = atol(argv[2]);
     }
+    
+   
     
     kBlocks B(chunk_size);
     
     
     block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
     
-    std::cerr << "Playing with " << num_blocks << " blocks, chunk_size=" << chunk_size << std::endl;
+#define __PRINT_INFO \
+std::cerr << "ChunkSize=" << chunk_size << ", playing with " << num_blocks << " blocks" << std::endl
+    __PRINT_INFO;
     size_t nb=0;
     {
         while(nb<num_blocks)
@@ -237,5 +243,53 @@ YOCTO_UNIT_TEST_IMPL(kBlocks)
 }
 YOCTO_UNIT_TEST_DONE()
 
+#include "yocto/object.hpp"
 
+YOCTO_UNIT_TEST_IMPL(kObject)
+{
+    size_t num_blocks = 20000;
+    if(argc>1)
+    {
+        num_blocks = atol(argv[1]);
+    }
+    
+    block_t *blk = kind<global>::acquire_as<block_t>(num_blocks);
+    size_t nb=0;
+    {
+        while(nb<num_blocks)
+        {
+            blk[nb].size = 1+alea_lt(100);
+            blk[nb].addr = object::operator new(blk[nb].size);
+            ++nb;
+        }
+        
+        for(size_t iter=0;iter<8;++iter)
+        {
+            c_shuffle(blk,nb);
+            for(size_t i=nb/2;i>0;--i)
+            {
+                --nb;
+                object::operator delete(blk[nb].addr,blk[nb].size);
+            }
+            
+            while(nb<num_blocks)
+            {
+                blk[nb].size = 1+alea_lt(100);
+                blk[nb].addr = object::operator new(blk[nb].size);
+                ++nb;
+            }
+        }
+        
+        c_shuffle(blk,nb);
+        while(nb>0)
+        {
+            --nb;
+            object::operator delete(blk[nb].addr,blk[nb].size);
+        }
+    }
+    
+    kind<global>::release_as(blk, num_blocks);
+    
+}
+YOCTO_UNIT_TEST_DONE()
 
