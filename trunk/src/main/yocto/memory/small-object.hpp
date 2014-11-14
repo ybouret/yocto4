@@ -4,7 +4,6 @@
 
 #include "yocto/threading/singleton.hpp"
 #include "yocto/memory/kblocks.hpp"
-#include "yocto/memory/blocks.hpp"
 #include "yocto/memory/global.hpp"
 
 namespace yocto

@@ -1,7 +1,7 @@
 #include "yocto/mpa/types.hpp"
 #include "yocto/threading/singleton.hpp"
 #include "yocto/memory/global.hpp"
-#include "yocto/memory/blocks.hpp"
+#include "yocto/memory/kblocks.hpp"
 #include "yocto/code/utils.hpp"
 #include "yocto/random/bits.hpp"
 #include "yocto/math/types.hpp"
@@ -61,7 +61,7 @@ namespace yocto
             
             
         private:
-            memory::blocks blocks_;
+            memory::kBlocks blocks_;
             
             explicit memmgr() :
             blocks_( chunk_size )
