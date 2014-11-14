@@ -24,10 +24,10 @@ namespace yocto
             virtual ~library() throw();
             size_t size() const throw(); //!< #species
             
-            species &      operator[](const string &id);
-            const species &operator[](const string &id) const;
-            species &      operator[](const char   *id);
-            const species &operator[](const char   *id) const;
+            species::pointer       &operator[](const string &id);
+            const species::pointer &operator[](const string &id) const;
+            species::pointer       &operator[](const char   *id);
+            const species::pointer &operator[](const char   *id) const;
             
             species & add(const string &name, const int z);
             species & add(const char   *name, const int z);

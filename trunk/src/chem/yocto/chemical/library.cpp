@@ -36,29 +36,29 @@ namespace yocto
             return db.end();
         }
         
-        species & library:: operator[](const string &id )
+        species::pointer & library:: operator[](const string &id )
         {
             species::pointer *pp = db.search(id);
             if(!pp)
                 throw exception("no library['%s']", id.c_str());
-            return **pp;
+            return *pp;
         }
         
-        const species & library:: operator[](const string &id ) const
+        const species::pointer & library:: operator[](const string &id ) const
         {
             const species::pointer *pp = db.search(id);
             if(!pp)
                 throw exception("no const library['%s']", id.c_str());
-            return **pp;
+            return *pp;
         }
         
-        species & library:: operator[](const char   *id)
+        species::pointer & library:: operator[](const char   *id)
         {
             const string ID(id);
             return (*this)[ID];
         }
         
-        const species & library:: operator[](const char   *id) const 
+        const species::pointer & library:: operator[](const char   *id) const
         {
             const string ID(id);
             return (*this)[ID];

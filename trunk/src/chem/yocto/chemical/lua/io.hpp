@@ -1,6 +1,7 @@
 #ifndef YOCTO_CHEMICAL_LUA_IO_INCLUDED
 #define YOCTO_CHEMICAL_LUA_IO_INCLUDED 1
 
+#include "yocto/chemical/equilibrium.hpp"
 #include "yocto/chemical/library.hpp"
 #include "lua.hpp"
 #include "yocto/functor.hpp"
