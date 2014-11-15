@@ -136,6 +136,11 @@ namespace yocto
             os << "}";
         }
 
+        bool library:: has(const string &name) const throw()
+        {
+            return 0 != db.search(name);
+        }
+
         
     }
 

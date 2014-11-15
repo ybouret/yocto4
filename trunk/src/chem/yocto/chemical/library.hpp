@@ -49,6 +49,8 @@ namespace yocto
                 return os;
             }
             
+            bool has(const string &name) const throw();
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(library);
             species::database db;
