@@ -4,6 +4,7 @@
 #include "yocto/chemical/species.hpp"
 #include "yocto/math/types.hpp"
 #include "yocto/core/list.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
@@ -46,9 +47,7 @@ namespace yocto
             const string name; //!< the name
             func_type    K;    //!< a functor, calling callK(), which calls the virtual getK()
             
-            const string &key() const throw();
-            typedef intr_ptr<string,equilibrium> pointer;
-            typedef set<string,pointer>          database;
+            typedef arc_ptr<equilibrium> pointer;
             
             void add( const species::pointer &sp, const int nu);
             void output( std::ostream &os ) const;
@@ -58,7 +57,7 @@ namespace yocto
             //
             // Chemistry
             //__________________________________________________________________
-            void initialize( array<ptrdiff_t> &Nu ) const throw();
+            void initialize( array<ptrdiff_t> &Nu, array<bool> &active ) const throw();
             
             
             //! compute Gamma and K(t)

@@ -154,14 +154,17 @@ namespace yocto
         }
         
         
-        void equilibrium:: initialize( array<ptrdiff_t> &Nu ) const throw()
+        void equilibrium:: initialize( array<ptrdiff_t> &Nu, array<bool> &active) const throw()
         {
+            assert(Nu.size()==active.size());
+            
             for(const actor *a=reac.head;a;a=a->next)
             {
                 const size_t j = a->sp->indx;
                 assert(j>=1);
                 assert(j<=Nu.size());
-                Nu[j] = a->nu;
+                Nu[j]     = a->nu;
+                active[j] = true;
             }
             
             for(const actor *a=prod.head;a;a=a->next)
@@ -169,7 +172,8 @@ namespace yocto
                 const size_t j = a->sp->indx;
                 assert(j>=1);
                 assert(j<=Nu.size());
-                Nu[j] = a->nu;
+                Nu[j]     = a->nu;
+                active[j] = true;
             }
         }
 
