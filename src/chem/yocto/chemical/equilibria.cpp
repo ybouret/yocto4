@@ -18,6 +18,18 @@ namespace yocto
             
         }
         
+        
+        void equilibria:: output(std::ostream &os) const
+        {
+            static const size_t ns = 64;
+            os << '/'; for(size_t i=0;i<ns;++i) os << '-'; os << std::endl;
+            for(size_t i=1;i<=N;++i)
+            {
+                os << '|' << ' ' << *eqs[i] << std::endl;
+            }
+            os << '\\';for(size_t i=0;i<ns;++i) os << '-';
+        }
+        
         equilibrium &equilibria:: add( equilibrium *pEq )
         {
             assert(pEq);
@@ -61,6 +73,7 @@ namespace yocto
             K.      release();
             
             active. release();
+            C.      release();
         }
    
         void equilibria:: compile_for( const library &lib )
@@ -74,7 +87,8 @@ namespace yocto
                 if(M<=0)
                     throw exception("equilibria: no species");
                 
-                active.make(M,false);
+                C.      make(M,0.0);
+                active. make(M,false);
                 
                 if(N>0)
                 {

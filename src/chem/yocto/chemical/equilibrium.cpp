@@ -180,7 +180,12 @@ namespace yocto
         
         double equilibrium:: computeGamma( double t, const array<double> &C, double &Kt ) const
         {
-            Kt = callK(t);
+            return updateGamma(C, (Kt=callK(t)) );
+        }
+
+        
+        double equilibrium:: updateGamma( const array<double> &C, const double Kt ) const
+        {
             double p_prod = 1;
             double r_prod = Kt;
             
@@ -204,7 +209,67 @@ namespace yocto
             return r_prod - p_prod;
         }
 
+        double equilibrium:: computeGammaAndPhi( double t, const array<double> &C, double &Kt, array<double> &Phi ) const
+        {
+            return updateGammaAndPhi(C, (Kt=callK(t)), Phi);
+        }
         
+        double equilibrium:: updateGammaAndPhi(const array<double> &C, const double Kt, array<double> &Phi) const
+        {
+            assert(C.size()>=Phi.size());
+            double p_prod = 1;
+            double r_prod = Kt;
+            const size_t M = Phi.size();
+            for(size_t i=M;i>0;--i) Phi[i] = 0.0;
+            
+            for(const actor *a=reac.head;a;a=a->next)
+            {
+                const size_t i = a->sp->indx;
+                assert(i>=1);
+                assert(i<=C.size());
+                assert(i<=Phi.size());
+                assert(a->nu<0);
+                const size_t q = (-a->nu);
+                r_prod *= ipower(C[i],q);
+                
+                double phi = q*ipower(C[i],q-1);
+                for(const actor *b=reac.head;b;b=b->next)
+                {
+                    if(a!=b)
+                    {
+                        const size_t j = b->sp->indx;
+                        phi *= ipower(C[j],(-b->nu));
+                    }
+                }
+                Phi[i] += Kt * phi;
+            }
+            
+            for(const actor *a=prod.head;a;a=a->next)
+            {
+                const size_t i = a->sp->indx;
+                assert(i>=1);
+                assert(i<=C.size());
+                assert(a->nu>0);
+                const size_t q = a->nu;
+                p_prod *= ipower(C[i],q);
+                
+                double phi = q*ipower(C[i],q-1);
+                for(const actor *b=prod.head;b;b=b->next)
+                {
+                    if(a!=b)
+                    {
+                        const size_t j = b->sp->indx;
+                        phi *= ipower(C[j],(-b->nu));
+                    }
+                }
+                Phi[i] -= phi;
+            }
+            
+            
+            return r_prod - p_prod;
+
+        }
+
     }
     
 }

@@ -25,8 +25,10 @@ namespace yocto
             
             const size_t M; //!< compiled #species
             const size_t N; //!< compiled #equilibria
-            
+        
+            vector_t     C;      //!< [M] local conc
             vector<bool> active; //!< [M] reactive species
+        
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     xi;     //!< [N] extents
@@ -39,6 +41,13 @@ namespace yocto
             void compile_for( const library &lib );
             
             void clear() throw();
+            
+            void output( std::ostream &os ) const;
+            friend inline std::ostream & operator<<( std::ostream &os, const equilibria &eqs )
+            {
+                eqs.output(os);
+                return os;
+            }
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

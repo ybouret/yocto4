@@ -63,6 +63,14 @@ namespace yocto
             //! compute Gamma and K(t)
             double computeGamma( double t, const array<double> &C, double &Kt ) const;
             
+            //! update Gamma from a previous K(t)
+            double updateGamma( const array<double> &C, const double Kt ) const;
+            
+            //! compute Gamma, Phi and K(t)
+            double computeGammaAndPhi( double t, const array<double> &C, double &Kt, array<double> &Phi ) const;
+            
+            //! update Gamma and Phi from a previous K(t)
+            double updateGammaAndPhi( const array<double> &C, const double Kt, array<double> &Phi ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
