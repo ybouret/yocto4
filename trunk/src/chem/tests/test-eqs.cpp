@@ -26,5 +26,7 @@ YOCTO_UNIT_TEST_IMPL(eqs)
     
     __lua::load(L,eqs,"eqs", lib);
     std::cerr << eqs << std::endl;
+    
+    eqs.compile_for(lib);
 }
 YOCTO_UNIT_TEST_DONE()
