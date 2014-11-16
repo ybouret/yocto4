@@ -28,7 +28,8 @@ namespace yocto
         
             vector_t     C;      //!< [M] local conc
             vector<bool> active; //!< [M] reactive species
-        
+            vector_t     Cneg;   //!< [M] store negative concentration
+            
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     xi;     //!< [N] extents
@@ -49,9 +50,15 @@ namespace yocto
                 return os;
             }
             
+            bool balance( array<double> &C0 );
+            
+            
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
             vector<equilibrium::pointer> eqs;
+            
+            //! count negative concentration
+            size_t count_negative() throw();
         };
         
     }

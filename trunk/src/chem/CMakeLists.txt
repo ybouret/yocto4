@@ -7,6 +7,13 @@ SET( srcs ${decl} ${impl} )
 INSTALL( FILES ${decl} DESTINATION include/yocto/chemical )
 SOURCE_GROUP( chemical FILES ${srcs} )
 
+#equilibria specs
+FILE( GLOB decl_eqs yocto/chemical/eqs/*.hpp)
+FILE( GLOB impl_eqs yocto/chemical/eqs/*.cpp)
+SET( srcs_eqs ${decl_eqs} ${impl_eqs} )
+INSTALL( FILES ${decl_eqs} DESTINATION include/yocto/chemical/eqs )
+SOURCE_GROUP( chemical/eqs FILES ${srcs_eqs} )
+
 #encoding with lua
 FILE( GLOB decl_lua yocto/chemical/lua/*.hpp)
 FILE( GLOB impl_lua yocto/chemical/lua/*.cpp)

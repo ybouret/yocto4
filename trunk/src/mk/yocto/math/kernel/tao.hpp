@@ -37,7 +37,7 @@ namespace yocto
 #undef Y_TAO_LD
             }
             
-            //! a = b
+            //! a = b, a.size() <= b.size()
             template <typename ARR, typename BRR>
             static inline void set( ARR &a, const BRR &b ) throw()
             {
