@@ -13,7 +13,7 @@ namespace yocto
         {
         }
         
-       
+        
         
         equilibrium:: actor:: ~actor() throw() {}
         
@@ -24,6 +24,8 @@ namespace yocto
 
 #include "yocto/sort/merge.hpp"
 #include "yocto/code/ipower.hpp"
+#include "yocto/exception.hpp"
+
 
 namespace yocto
 {
@@ -33,8 +35,8 @@ namespace yocto
         equilibrium::equilibrium(const string &id ):
         name(id),
         K(this,&equilibrium::callK),
-        xi_rev(0),
-        xi_fwd(0)
+        forward(false,false,-1),
+        reverse(false,false,-1)
         {
         }
         
@@ -150,7 +152,7 @@ namespace yocto
                     os << " + ";
                 }
             }
-
+            
             os << " | K=" << callK(0);
             
         }
@@ -178,13 +180,13 @@ namespace yocto
                 active[j] = true;
             }
         }
-
+        
         
         double equilibrium:: computeGamma( double t, const array<double> &C, double &Kt ) const
         {
             return updateGamma(C, (Kt=callK(t)) );
         }
-
+        
         
         double equilibrium:: updateGamma( const array<double> &C, const double Kt ) const
         {
@@ -210,7 +212,7 @@ namespace yocto
             
             return r_prod - p_prod;
         }
-
+        
         double equilibrium:: computeGammaAndPhi( double t, const array<double> &C, double &Kt, array<double> &Phi ) const
         {
             return updateGammaAndPhi(C, (Kt=callK(t)), Phi);
@@ -269,13 +271,47 @@ namespace yocto
             
             
             return r_prod - p_prod;
-
+            
         }
         
         
+        static inline
+        void __update( equilibrium::xi_ctrl &ctrl, const double Ci, const int nu)
+        {
+            assert(nu>0);
+            if(Ci<=0)
+            {
+                ctrl.blocked = true;
+                ctrl.limited = true;
+                ctrl.maximum = 0;
+            }
+            else
+            {
+                if(!ctrl.blocked)
+                {
+                    const double xi = Ci/nu;
+                    if(ctrl.limited)
+                    {
+                        assert(ctrl.maximum>=0);
+                        if(xi<ctrl.maximum)
+                        {
+                            ctrl.maximum = xi;
+                        }
+                    }
+                    else
+                    {
+                        ctrl.maximum = xi;
+                        ctrl.limited = true;
+                    }
+                }
+            }
+        }
+        
         void equilibrium:: compute_limits( const array<double> &C )  throw()
         {
-            xi_rev = xi_fwd = 0;
+            forward.blocked = reverse.blocked = false;
+            forward.limited = reverse.limited = false;
+            forward.maximum = reverse.maximum = -1;
             
             // from reactant, max fwd
             for(const actor *a=reac.head;a;a=a->next)
@@ -284,20 +320,9 @@ namespace yocto
                 assert(i>=1);
                 assert(i<=C.size());
                 assert(a->nu<0);
-                const double Ci = C[i];
-                if(Ci>0)
-                {
-                    const double xi = Ci/(-a->nu);
-                    if(xi_fwd<=0)
-                    {
-                        xi_fwd = xi;
-                    }
-                    else
-                    {
-                        if(xi<xi_fwd) xi_fwd = xi;
-                    }
-                }
+                __update(forward, C[i], -a->nu);
             }
+            
             
             // from products, max rev
             for(const actor *a=prod.head;a;a=a->next)
@@ -306,23 +331,58 @@ namespace yocto
                 assert(i>=1);
                 assert(i<=C.size());
                 assert(a->nu>0);
-                const double Ci = C[i];
-                if(Ci>0)
-                {
-                    const double xi = Ci/(a->nu);
-                    if(xi_rev<=0)
-                    {
-                        xi_rev = xi;
-                    }
-                    else
-                    {
-                        if(xi<xi_rev) xi_rev = xi;
-                    }
-                }
+                __update(reverse,C[i],a->nu);
             }
             
         }
-
+        
+        void equilibrium:: validate() const
+        {
+            //-- check for zero charge
+            int z = 0;
+            for(const actor *a=reac.head;a;a=a->next)
+            {
+                z += a->nu * a->sp->z;
+            }
+            
+            for(const actor *a=prod.head;a;a=a->next)
+            {
+                z += a->nu * a->sp->z;
+            }
+            
+            if(z)
+            {
+                throw exception("%s is creating a net charge of %d",name.c_str(),z);
+            }
+        }
+        
+        
+        static inline
+        void __show_limits( const equilibrium::xi_ctrl &ctrl, std::ostream &os )
+        {
+            if(ctrl.blocked)
+            {
+                os << "BLOCKED";
+            }
+            else
+            {
+                if(ctrl.limited)
+                {
+                    os << ctrl.maximum;
+                }
+                else
+                {
+                    os << "unlimited";
+                }
+            }
+        }
+        
+        void equilibrium:: show_limits( std::ostream &os ) const
+        {
+            os << "\tforward: "; __show_limits(forward, os); os << std::endl;
+            os << "\treverse: "; __show_limits(reverse, os); os << std::endl;
+        }
+        
 
     }
     

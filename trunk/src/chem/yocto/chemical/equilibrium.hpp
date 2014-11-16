@@ -5,6 +5,7 @@
 #include "yocto/math/types.hpp"
 #include "yocto/core/list.hpp"
 #include "yocto/ptr/arc.hpp"
+#include "yocto/container/tuple.hpp"
 
 namespace yocto
 {
@@ -35,6 +36,12 @@ namespace yocto
                 YOCTO_DISABLE_COPY_AND_ASSIGN(actor);
             };
             
+            YOCTO_TRIPLE_DECL(xi_ctrl,
+                            bool,   blocked,
+                            bool,   limited,
+                            double, maximum);
+            YOCTO_TRIPLE_END();
+            
             //__________________________________________________________________
             //
             // Administrativia
@@ -47,8 +54,8 @@ namespace yocto
             
             const string name;   //!< the name
             func_type    K;      //!< a functor, calling callK(), which calls the virtual getK()
-            double       xi_rev; //!< max xi_rev
-            double       xi_fwd; //!< max xi_fwd
+            xi_ctrl      forward;
+            xi_ctrl      reverse;
             
             
             void add( const species::pointer &sp, const int nu);
@@ -59,6 +66,8 @@ namespace yocto
             //
             // Chemistry
             //__________________________________________________________________
+            void validate() const;
+            
             void initialize( array<ptrdiff_t> &Nu, array<bool> &active ) const throw();
             
             
@@ -76,6 +85,9 @@ namespace yocto
             
             //! max extents
             void compute_limits( const array<double> &C )  throw();
+            
+            void show_limits( std::ostream &os ) const;
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);

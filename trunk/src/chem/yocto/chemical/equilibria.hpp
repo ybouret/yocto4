@@ -53,6 +53,8 @@ namespace yocto
             void compute_limits() throw();
             bool balance( array<double> &C0 );
             
+            equilibrium       & operator[](size_t i) throw();
+            const equilibrium & operator[](size_t i) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

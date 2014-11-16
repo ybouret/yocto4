@@ -2,6 +2,7 @@
 #include "yocto/chemical/lua/io.hpp"
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/lua/lua-state.hpp"
+#include "yocto/code/rand.hpp"
 
 using namespace yocto;
 using namespace chemical;
@@ -28,5 +29,23 @@ YOCTO_UNIT_TEST_IMPL(eqs)
     std::cerr << eqs << std::endl;
     
     eqs.compile_for(lib);
+    
+    for(size_t i=1;i<=eqs.M;++i)
+    {
+        eqs.C[i] = alea<double>() - 0.5;
+    }
+    std::cerr << "C=" << eqs.C << std::endl;
+    
+    eqs.compute_limits();
+    
+    for(size_t i=1;i<=eqs.N;++i)
+    {
+        const equilibrium &eq = eqs[i];
+        std::cerr << eq.name << std::endl;
+        eq.show_limits(std::cerr);
+        
+        
+    }
+    
 }
 YOCTO_UNIT_TEST_DONE()
