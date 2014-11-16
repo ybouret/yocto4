@@ -43,6 +43,7 @@ namespace yocto
             assert(C0.size()>=M);
             
             tao::set(C,C0);
+            std::cerr << "C=" << C << std::endl;
             
             if(count_negative())
             {

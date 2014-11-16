@@ -82,6 +82,11 @@ namespace yocto
             (size_t &)M = lib.size();
             assert(N==eqs.size());
             
+            for(size_t i=1;i<=N;++i)
+            {
+                eqs[i]->validate();
+            }
+            
             try
             {
                 if(M<=0)
@@ -111,6 +116,19 @@ namespace yocto
                 throw;
             }
         }
+        
+        equilibrium       & equilibria:: operator[](size_t i) throw()
+        {
+            assert(i>=1);assert(i<=eqs.size());assert(N==eqs.size());
+            return *eqs[i];
+        }
+        const equilibrium & equilibria:: operator[](size_t i) const throw()
+        {
+            assert(i>=1);assert(i<=eqs.size());assert(N==eqs.size());
+            return *eqs[i];
+        }
+
+
 
     
     }
