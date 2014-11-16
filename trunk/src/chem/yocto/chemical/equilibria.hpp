@@ -50,6 +50,7 @@ namespace yocto
                 return os;
             }
             
+            void compute_limits() throw();
             bool balance( array<double> &C0 );
             
             

@@ -32,7 +32,9 @@ namespace yocto
         
         equilibrium::equilibrium(const string &id ):
         name(id),
-        K(this,&equilibrium::callK)
+        K(this,&equilibrium::callK),
+        xi_rev(0),
+        xi_fwd(0)
         {
         }
         
@@ -269,6 +271,58 @@ namespace yocto
             return r_prod - p_prod;
 
         }
+        
+        
+        void equilibrium:: compute_limits( const array<double> &C )  throw()
+        {
+            xi_rev = xi_fwd = 0;
+            
+            // from reactant, max fwd
+            for(const actor *a=reac.head;a;a=a->next)
+            {
+                const size_t i = a->sp->indx;
+                assert(i>=1);
+                assert(i<=C.size());
+                assert(a->nu<0);
+                const double Ci = C[i];
+                if(Ci>0)
+                {
+                    const double xi = Ci/(-a->nu);
+                    if(xi_fwd<=0)
+                    {
+                        xi_fwd = xi;
+                    }
+                    else
+                    {
+                        if(xi<xi_fwd) xi_fwd = xi;
+                    }
+                }
+            }
+            
+            // from products, max rev
+            for(const actor *a=prod.head;a;a=a->next)
+            {
+                const size_t i = a->sp->indx;
+                assert(i>=1);
+                assert(i<=C.size());
+                assert(a->nu>0);
+                const double Ci = C[i];
+                if(Ci>0)
+                {
+                    const double xi = Ci/(a->nu);
+                    if(xi_rev<=0)
+                    {
+                        xi_rev = xi;
+                    }
+                    else
+                    {
+                        if(xi<xi_rev) xi_rev = xi;
+                    }
+                }
+            }
+            
+        }
+
 
     }
     

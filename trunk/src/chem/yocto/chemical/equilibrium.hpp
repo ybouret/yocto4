@@ -15,8 +15,9 @@ namespace yocto
         class equilibrium : public counted_object
         {
         public:
+            typedef arc_ptr<equilibrium> pointer;
             
-            // an actor
+            //! an actor
             class actor
             {
             public:
@@ -44,10 +45,11 @@ namespace yocto
             //! default dtor
             virtual ~equilibrium() throw();
             
-            const string name; //!< the name
-            func_type    K;    //!< a functor, calling callK(), which calls the virtual getK()
+            const string name;   //!< the name
+            func_type    K;      //!< a functor, calling callK(), which calls the virtual getK()
+            double       xi_rev; //!< max xi_rev
+            double       xi_fwd; //!< max xi_fwd
             
-            typedef arc_ptr<equilibrium> pointer;
             
             void add( const species::pointer &sp, const int nu);
             void output( std::ostream &os ) const;
@@ -71,6 +73,9 @@ namespace yocto
             
             //! update Gamma and Phi from a previous K(t)
             double updateGammaAndPhi( const array<double> &C, const double Kt, array<double> &Phi ) const;
+            
+            //! max extents
+            void compute_limits( const array<double> &C )  throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);
