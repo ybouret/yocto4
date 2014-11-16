@@ -86,8 +86,10 @@ namespace yocto
             //! max extents
             void compute_limits( const array<double> &C )  throw();
             
+            //! display computed limits
             void show_limits( std::ostream &os ) const;
             
+            bool has_species_index( const size_t idx) const throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);

@@ -27,6 +27,7 @@ namespace yocto
             const size_t N; //!< compiled #equilibria
         
             vector_t     C;      //!< [M] local conc
+            vector_t     dC;     //!< [M] local dC
             vector<bool> active; //!< [M] reactive species
             vector_t     Cneg;   //!< [M] store negative concentration
             
@@ -35,6 +36,10 @@ namespace yocto
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM], dGamma/dC
+            imatrix_t    Nu2;    //!< [NxN] Nu*Nu'
+            imatrix_t    ANu2;   //!< [NxN] adjoint of Nu2
+            ptrdiff_t    dNu2;   //!< determinant(Nu2)
+            imatrix_t    iNu2;   //!< [NxM], More-Penrose pseudo inverse * det(Nu2)
             
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
@@ -50,7 +55,9 @@ namespace yocto
                 return os;
             }
             
-            void compute_limits() throw();
+            void compute_limits() throw(); //!< from internal C
+            void enforce_limits() throw(); //!< update xi
+            
             bool balance( array<double> &C0 );
             
             equilibrium       & operator[](size_t i) throw();
