@@ -1,0 +1,44 @@
+\documentclass[aps]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb,amsfonts,amsmath,amsthm}
+\usepackage{chemarr}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{pslatex}
+\usepackage{mathptmx}
+\usepackage{xfrac}
+
+\newcommand{\mymat}[1]{\bm{#1}}
+\newcommand{\mytrn}[1]{~^{\mathsf{T}}{#1}}
+\newcommand{\mygrad}{\vec{\nabla}}
+
+\begin{document}
+\title{Chemical Solutions}
+
+\section{Description}
+Let us assume that we have $A_1,\ldots,A_M$ chemical species coupled by
+$N$ equilibria such that
+\begin{equation}
+	\forall i \in [1;N], \;\; \sum_{j=1}^{M} \nu_{i,j} C_i = 0, \;\; K_i(t) = \prod_{i=1}^{M} C_i^{\nu_{i,j}}.
+\end{equation}
+We remove the singularities by assuming that the equilibria are met when
+\begin{equation}
+	\forall i \in [1;N], \;\; \Gamma_i(t,\vec{C}) = K_i(t) \prod_{\nu_{i,j}<0}  C_i^{-\nu_{i,j}} -  \prod_{\nu_{i,j}>0} C_i^{\nu_{i,j}} 
+\end{equation}
+or
+\begin{equation}
+	\vec{\Gamma}(t,\vec{C}) = \vec{0}.
+\end{equation}
+We also naturally have the topology matrix $\mymat{\nu}$, such that
+any chemical shift is defined by a  chemical extent vector $\vec{\xi}$ and
+produces a shift
+$$
+	\mytrn{\mymat{\nu}}\vec{\xi}
+$$
+
+\section{Chemical balancing}
+A transformation may bring some active (aka involved in a reaction) concentrations to a negative value.
+We want to find the smallest extent $\vec{\xi}$ that re-balances the reactive system.
+
+
+\end{document}
