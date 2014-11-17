@@ -52,11 +52,11 @@ namespace yocto
             //! default dtor
             virtual ~equilibrium() throw();
             
-            const string name;   //!< the name
-            func_type    K;      //!< a functor, calling callK(), which calls the virtual getK()
-            xi_ctrl      forward;
-            xi_ctrl      reverse;
-            
+            const string name;    //!< the name
+            func_type    K;       //!< a functor, calling callK(), which calls the virtual getK()
+            xi_ctrl      forward; //!< status
+            xi_ctrl      reverse; //!< status
+            bool         online;  //!< for balancing
             
             void add( const species::pointer &sp, const int nu);
             void output( std::ostream &os ) const;
@@ -89,7 +89,8 @@ namespace yocto
             //! display computed limits
             void show_limits( std::ostream &os ) const;
             
-            bool has_species_index( const size_t idx) const throw();
+            //! find is species #indx is involved            
+            void check_online_for(const size_t indx) throw();
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);

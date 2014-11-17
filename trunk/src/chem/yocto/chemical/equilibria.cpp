@@ -121,6 +121,7 @@ namespace yocto
                 for(size_t i=1;i<=N;++i)
                 {
                     eqs[i]->initialize(Nu[i],active);
+                    eqs[i]->online = true;
                 }
                 
                 if(N>0)

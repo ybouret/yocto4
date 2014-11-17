@@ -6,7 +6,7 @@ namespace yocto
 {
     namespace chemical
     {
-
+        
         using namespace math;
         
         
@@ -17,39 +17,46 @@ namespace yocto
             {
                 double &xx = xi[i];
                 const equilibrium &eq = *eqs[i];
-                //std::cerr << "checking " << xx << " for " << eq.name << std::endl;
-                if(xx>=0)
+                if(eq.online)
                 {
-                    if(eq.forward.blocked)
+                    //std::cerr << "checking " << xx << " for " << eq.name << std::endl;
+                    if(xx>=0)
                     {
-                        xx = 0;
+                        if(eq.forward.blocked)
+                        {
+                            xx = 0;
+                        }
+                        else
+                        {
+                            if(eq.forward.limited && xx>=eq.forward.maximum)
+                            {
+                                xx = eq.forward.maximum;
+                            }
+                        }
                     }
                     else
                     {
-                        if(eq.forward.limited && xx>=eq.forward.maximum)
+                        assert(xx<0);
+                        if(eq.reverse.blocked)
                         {
-                            xx = eq.forward.maximum;
+                            xx = 0;
+                        }
+                        else
+                        {
+                            if(eq.reverse.limited && (-xx)>=eq.reverse.maximum)
+                            {
+                                xx = -eq.reverse.maximum;
+                            }
                         }
                     }
                 }
                 else
                 {
-                    assert(xx<0);
-                    if(eq.reverse.blocked)
-                    {
-                        xx = 0;
-                    }
-                    else
-                    {
-                        if(eq.reverse.limited && (-xx)>=eq.reverse.maximum)
-                        {
-                            xx = -eq.reverse.maximum;
-                        }
-                    }
+                    xx = 0;
                 }
             }
         }
-
+        
         void equilibria:: compute_limits() throw()
         {
             assert(M>0);
@@ -65,6 +72,12 @@ namespace yocto
         {
             size_t ans=0;
             assert(M==C.size());
+            
+            for(size_t j=N;j>0;--j)
+            {
+                eqs[j]->online = false;
+            }
+            
             for(size_t i=M;i>0;--i)
             {
                 if(active[i])
@@ -74,11 +87,17 @@ namespace yocto
                     {
                         ++ans;
                         Cneg[i] = -Ci;
+                        // check if the species #i is involved in eq #j
+                        for(size_t j=N;j>0;--j)
+                        {
+                            eqs[j]->check_online_for(i);
+                        }
                     }
                 }
             }
             return ans;
         }
+        
         
         bool equilibria:: balance( array<double> &C0 )
         {
@@ -96,8 +115,12 @@ namespace yocto
                 //______________________________________________________________
                 compute_limits();
                 std::cerr << "Cneg=" << Cneg << std::endl;
-                
-                
+#if 0
+                for(size_t j=N;j>0;--j)
+                {
+                    std::cerr << eqs[j]->name << " : " << ( eqs[j]->online ? "ON" : "OFF") << std::endl;
+                }
+#endif
                 //______________________________________________________________
                 //
                 // compute xi
@@ -113,21 +136,15 @@ namespace yocto
                 enforce_limits();
                 std::cerr << "xi1=" << xi << std::endl;
                 
-                //______________________________________________________________
-                //
-                // discard not involved species
-                //______________________________________________________________
-                enforce_limits();
-                std::cerr << "xi2=" << xi << std::endl;
-
+                
                 //______________________________________________________________
                 //
                 // compute dC
                 //______________________________________________________________
-
+                
                 tao::mul_trn(dC, Nu, xi);
-                std::cerr << "dC=" << dC << std::endl;
-               
+                std::cerr << "dC  =" << dC << std::endl;
+                std::cerr << "oldC=" << C << std::endl;
                 //______________________________________________________________
                 //
                 // append dC carefully
@@ -142,6 +159,10 @@ namespace yocto
                         if(Ci>=0)
                         {
                             C[i] = max_of<double>(0.0,newC);
+                        }
+                        else
+                        {
+                            C[i] = newC;
                         }
                     }
                     else
@@ -159,7 +180,7 @@ namespace yocto
             return true;
         }
         
-
+        
     }
-
+    
 }

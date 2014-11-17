@@ -379,29 +379,33 @@ namespace yocto
         
         void equilibrium:: show_limits( std::ostream &os ) const
         {
-            os << "limits(" << name << ")" << std::endl;
+            os << "limits(" << name << ") / " << (online ? "ONLINE" : "OFFLINE" ) << std::endl;
             os << "\tforward: "; __show_limits(forward, os); os << std::endl;
             os << "\treverse: "; __show_limits(reverse, os); os << std::endl;
         }
         
-        bool equilibrium:: has_species_index( const size_t idx) const throw()
+        
+        void equilibrium:: check_online_for(const size_t indx) throw()
         {
             for(const actor *a=reac.head;a;a=a->next)
             {
-                if(a->sp->indx==idx)
-                    return true;
+                if(a->sp->indx==indx)
+                {
+                    online = true;
+                    return;
+                }
             }
             
             for(const actor *a=prod.head;a;a=a->next)
             {
-                if(a->sp->indx==idx)
-                    return true;
+                if(a->sp->indx==indx)
+                {
+                    online = true;
+                    return;
+                }
             }
             
-            
-            return false;
         }
-
         
     }
     
