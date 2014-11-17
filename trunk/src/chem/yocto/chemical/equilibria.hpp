@@ -13,13 +13,14 @@ namespace yocto
     namespace chemical
     {
         
-        typedef math::matrix<double>    matrix_t;
-        typedef vector<double>          vector_t;
-        typedef vector<bool>            bvector_t;
-        typedef vector<size_t>          uvector_t;
-        typedef math::matrix<ptrdiff_t> imatrix_t;
+        typedef math::matrix<double>         matrix_t;
+        typedef vector<double>               vector_t;
         
+        typedef vector<bool>                 bvector_t;
+        typedef vector<size_t>               uvector_t;
+        typedef math::matrix<ptrdiff_t>      imatrix_t;
         typedef vector<equilibrium::pointer> evector_t;
+        typedef vector<ptrdiff_t>            ivector_t;
         
         class equilibria
         {
@@ -65,7 +66,7 @@ namespace yocto
             equilibrium       & operator[](size_t i) throw();
             const equilibrium & operator[](size_t i) const throw();
             
-            double computeE( array<double> &dEdC );
+            double computeE( array<ptrdiff_t> &dEdC );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
