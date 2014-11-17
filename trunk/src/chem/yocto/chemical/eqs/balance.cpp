@@ -34,6 +34,7 @@ namespace yocto
             
             for(size_t i=1;i<=M;++i)
             {
+                flag[i] = false;
                 if(active[i])
                 {
                     const double Ci = C[i];
@@ -41,6 +42,7 @@ namespace yocto
                     {
                         ++ans;
                         Ineg.push_back(i);
+                        flag[i] = true;
                     }
                 }
             }
@@ -48,67 +50,93 @@ namespace yocto
             return ans;
         }
         
+        double equilibria:: computeE( array<double> &dEdC )
+        {
+            assert(M==dEdC.size());
+            Ineg.free();
+            double ans = 0;
+            for(size_t i=1;i<=M;++i)
+            {
+                dEdC[i] = 0;
+                flag[i] = false;
+                if(active[i])
+                {
+                    const double Ci = C[i];
+                    if(Ci<0)
+                    {
+                        Ineg.push_back(i);
+                        ans += Ci*Ci;
+                        dEdC[i] = Ci;
+                        flag[i]  = true;
+                    }
+                }
+                
+            }
+            return 0.5*ans;
+        }
         
         
         bool equilibria:: balance( array<double> &C0 )
         {
             assert(M>0);
             assert(C0.size()>=M);
+            if(N<=0)
+                return true;
             
             tao::set(C,C0);
             std::cerr << "balanceC=" << C << std::endl;
             
-            size_t  Mb=0;
+            vector_t dEdC(M,0); //!< dE/dC
+            vector_t beta(N,0); //!< min dir
             
-            
-            while( (Mb=count_negative()) > 0 )
+            double E = 0;
+            while( (E=computeE(dEdC)) > 0 )
             {
-                //______________________________________________________________
-                //
-                // detected negative conc among active
-                //______________________________________________________________
-                std::cerr << "Ineg=" << Ineg << std::endl;
-                const size_t Q = Ineg.size();
+                const size_t Q =Ineg.size(); assert(Q>0);
+                tao::mul(beta,Nu,dEdC);
+                tao::neg(beta,beta);
+                std::cerr << "E=" << E << std::endl;
+                std::cerr << "dEdC=" << dEdC << std::endl;
+                std::cerr << "beta0=" << beta << std::endl;
                 
-                //______________________________________________________________
-                //
-                // find online equilibria
-                //______________________________________________________________
                 online.free();
                 for(size_t i=1;i<=N;++i)
                 {
                     equilibrium::pointer &pEq = eqs[i];
-                    for(size_t j=Mb;j>0;--j)
+                    bool                  isOn = false;
+                    for(size_t j=Q;j>0;--j)
                     {
-                        if(pEq->involves( Ineg[j] ) )
+                        if(pEq->involves(Ineg[j]))
                         {
-                            online.push_back(pEq);
+                            // the equilibrium MAY be online
                             pEq->compute_limits(C);
-                            online[i]->show_limits(std::cerr);
+                            pEq->show_limits(std::cerr);
+                            isOn = ! pEq->blocked;
                             break;
                         }
                     }
-                }
-                const size_t R = online.size();
-                assert(R>0);
-                
-                imatrix_t Beta(Q,R);
-                for(size_t i=1;i<=R;++i)
-                {
-                    const size_t ii = online[i]->indx;
-                    for(size_t j=1;j<=Q;++j)
+                    if(isOn)
                     {
-                        const size_t jj = Ineg[j];
-                        Beta[j][i] = Nu[ii][jj];
-                        
+                        std::cerr << "\t" << pEq->name << " is ONLINE" << std::endl;
+                        online.push_back(pEq);
+                    }
+                    else
+                    {
+                        std::cerr << "\t" << pEq->name << " is OFFLINE or BLOCKED" << std::endl;
+                        beta[i] = 0;
                     }
                 }
-                std::cerr << "Beta=" << Beta << std::endl;
+                const size_t R=online.size();
+                if(R<=0)
+                    throw exception("no d.o.f. to balance equilibria");
+                
+                std::cerr << "beta1=" << beta << std::endl;
+                double alpha = 1.0;
+                
                 
                 
                 break;
             }
-            
             
             
             

@@ -80,6 +80,7 @@ namespace yocto
             Gamma.  release();
             K.      release();
             
+            flag.   release();
             Isub.   release();
             Ineg.   release();
             active. release();
@@ -108,6 +109,7 @@ namespace yocto
                 active. make(M,0.0);
                 Ineg.   ensure(M);
                 Isub.   ensure(M);
+                flag.   make(M,0.0);
                 
                 if(N>0)
                 {
