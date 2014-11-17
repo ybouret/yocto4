@@ -50,7 +50,7 @@ namespace yocto
             return ans;
         }
         
-        double equilibria:: computeE( array<double> &dEdC )
+        double equilibria:: computeE( array<ptrdiff_t> &dEdC )
         {
             assert(M==dEdC.size());
             Ineg.free();
@@ -65,9 +65,9 @@ namespace yocto
                     if(Ci<0)
                     {
                         Ineg.push_back(i);
-                        ans += Ci*Ci;
-                        dEdC[i] = Ci;
-                        flag[i]  = true;
+                        ans -= Ci;
+                        dEdC[i] = 1;
+                        flag[i] = true;
                     }
                 }
                 
@@ -86,15 +86,15 @@ namespace yocto
             tao::set(C,C0);
             std::cerr << "balanceC=" << C << std::endl;
             
-            vector_t dEdC(M,0); //!< dE/dC
-            vector_t beta(N,0); //!< min dir
+            ivector_t  dEdC(M,0); //!< dE/dC
+            ivector_t  beta(N,0); //!< minimize dir
+            ivector_t  incr(M,0); //!< the final increment
             
             double E = 0;
             while( (E=computeE(dEdC)) > 0 )
             {
                 const size_t Q =Ineg.size(); assert(Q>0);
                 tao::mul(beta,Nu,dEdC);
-                tao::neg(beta,beta);
                 std::cerr << "E=" << E << std::endl;
                 std::cerr << "dEdC=" << dEdC << std::endl;
                 std::cerr << "beta0=" << beta << std::endl;
@@ -131,10 +131,12 @@ namespace yocto
                     throw exception("no d.o.f. to balance equilibria");
                 
                 std::cerr << "beta1=" << beta << std::endl;
-                double alpha = 1.0;
                 
+                tao::mul_trn(incr,Nu,beta);
                 
-                
+                std::cerr << "incr0=" << incr << std::endl;
+                (void) tao::simplify(incr);
+                std::cerr << "incr=" << incr << std::endl;
                 break;
             }
             

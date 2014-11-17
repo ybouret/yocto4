@@ -180,14 +180,16 @@ namespace yocto
                 
                 for(register size_t i=n;i>0;--i)
                 {
-                    const ptrdiff_t wi = static_cast<ptrdiff_t>(w[i] = RInt(w[i]));
+                    w[i] = Rint(w[i]);
+                    const ptrdiff_t wi = static_cast<ptrdiff_t>(w[i]);
                     const ptrdiff_t ai = wi < 0 ? -wi : wi;
                     if(!ai)
                         continue;
                     
                     for(register size_t j=i;j>0;--j)
                     {
-                        const ptrdiff_t wj = static_cast<ptrdiff_t>(w[j] = RInt(w[j]) );
+                        w[j] = Rint(w[j]);
+                        const ptrdiff_t wj = static_cast<ptrdiff_t>(w[j]);
                         const ptrdiff_t aj = wj < 0 ? -wj : wj;
                         if(!aj)
                             continue;
