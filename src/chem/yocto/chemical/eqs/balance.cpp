@@ -1,6 +1,9 @@
 #include "yocto/chemical/equilibria.hpp"
 
 #include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/kernel/det.hpp"
+
+#include "yocto/exception.hpp"
 
 namespace yocto
 {
@@ -10,52 +13,6 @@ namespace yocto
         using namespace math;
         
         
-        void equilibria:: enforce_limits() throw()
-        {
-            assert(xi.size()==N);
-            for(size_t i=N;i>0;--i)
-            {
-                double &xx = xi[i];
-                const equilibrium &eq = *eqs[i];
-                if(eq.online)
-                {
-                    //std::cerr << "checking " << xx << " for " << eq.name << std::endl;
-                    if(xx>=0)
-                    {
-                        if(eq.forward.blocked)
-                        {
-                            xx = 0;
-                        }
-                        else
-                        {
-                            if(eq.forward.limited && xx>=eq.forward.maximum)
-                            {
-                                xx = eq.forward.maximum;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        assert(xx<0);
-                        if(eq.reverse.blocked)
-                        {
-                            xx = 0;
-                        }
-                        else
-                        {
-                            if(eq.reverse.limited && (-xx)>=eq.reverse.maximum)
-                            {
-                                xx = -eq.reverse.maximum;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    xx = 0;
-                }
-            }
-        }
         
         void equilibria:: compute_limits() throw()
         {
@@ -73,12 +30,9 @@ namespace yocto
             size_t ans=0;
             assert(M==C.size());
             
-            for(size_t j=N;j>0;--j)
-            {
-                eqs[j]->online = false;
-            }
+            Ineg.free();
             
-            for(size_t i=M;i>0;--i)
+            for(size_t i=1;i<=M;++i)
             {
                 if(active[i])
                 {
@@ -86,17 +40,14 @@ namespace yocto
                     if(Ci<0)
                     {
                         ++ans;
-                        Cneg[i] = -Ci;
-                        // check if the species #i is involved in eq #j
-                        for(size_t j=N;j>0;--j)
-                        {
-                            eqs[j]->check_online_for(i);
-                        }
+                        Ineg.push_back(i);
                     }
                 }
             }
+            assert(Ineg.size()==ans);
             return ans;
         }
+        
         
         
         bool equilibria:: balance( array<double> &C0 )
@@ -107,72 +58,57 @@ namespace yocto
             tao::set(C,C0);
             std::cerr << "balanceC=" << C << std::endl;
             
-            if(count_negative()>0)
+            size_t  Mb=0;
+            
+            
+            while( (Mb=count_negative()) > 0 )
             {
                 //______________________________________________________________
                 //
-                // how can we move
+                // detected negative conc among active
                 //______________________________________________________________
-                compute_limits();
-                std::cerr << "Cneg=" << Cneg << std::endl;
-#if 0
-                for(size_t j=N;j>0;--j)
+                std::cerr << "Ineg=" << Ineg << std::endl;
+                const size_t Q = Ineg.size();
+                
+                //______________________________________________________________
+                //
+                // find online equilibria
+                //______________________________________________________________
+                online.free();
+                for(size_t i=1;i<=N;++i)
                 {
-                    std::cerr << eqs[j]->name << " : " << ( eqs[j]->online ? "ON" : "OFF") << std::endl;
-                }
-#endif
-                //______________________________________________________________
-                //
-                // compute xi
-                //______________________________________________________________
-                tao::mul(xi, iNu2, Cneg);
-                for(size_t i=N;i>0;--i) xi[i] /= dNu2;
-                std::cerr << "xi0=" << xi << std::endl;
-                
-                //______________________________________________________________
-                //
-                // check xi
-                //______________________________________________________________
-                enforce_limits();
-                std::cerr << "xi1=" << xi << std::endl;
-                
-                
-                //______________________________________________________________
-                //
-                // compute dC
-                //______________________________________________________________
-                
-                tao::mul_trn(dC, Nu, xi);
-                std::cerr << "dC  =" << dC << std::endl;
-                std::cerr << "oldC=" << C << std::endl;
-                //______________________________________________________________
-                //
-                // append dC carefully
-                //______________________________________________________________
-                for(size_t i=M;i>0;--i)
-                {
-                    if(active[i])
+                    equilibrium::pointer &pEq = eqs[i];
+                    for(size_t j=Mb;j>0;--j)
                     {
-                        const double Ci   = C[i];
-                        const double dCi  = dC[i];
-                        const double newC = Ci+dCi;
-                        if(Ci>=0)
+                        if(pEq->involves( Ineg[j] ) )
                         {
-                            C[i] = max_of<double>(0.0,newC);
-                        }
-                        else
-                        {
-                            C[i] = newC;
+                            online.push_back(pEq);
+                            pEq->compute_limits(C);
+                            online[i]->show_limits(std::cerr);
+                            break;
                         }
                     }
-                    else
+                }
+                const size_t R = online.size();
+                assert(R>0);
+                
+                imatrix_t Beta(Q,R);
+                for(size_t i=1;i<=R;++i)
+                {
+                    const size_t ii = online[i]->indx;
+                    for(size_t j=1;j<=Q;++j)
                     {
-                        assert(Fabs(dC[i])<=0);
+                        const size_t jj = Ineg[j];
+                        Beta[j][i] = Nu[ii][jj];
+                        
                     }
                 }
-                std::cerr << "C=" << C << std::endl;
+                std::cerr << "Beta=" << Beta << std::endl;
                 
+                
+                break;
             }
+            
             
             
             

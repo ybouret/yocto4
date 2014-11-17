@@ -6,6 +6,7 @@
 
 #include "yocto/math/kernel/matrix.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ordered/sorted-vector.hpp"
 
 namespace yocto
 {
@@ -14,7 +15,11 @@ namespace yocto
         
         typedef math::matrix<double>    matrix_t;
         typedef vector<double>          vector_t;
+        typedef vector<bool>            bvector_t;
+        typedef vector<size_t>          uvector_t;
         typedef math::matrix<ptrdiff_t> imatrix_t;
+        
+        typedef vector<equilibrium::pointer> evector_t;
         
         class equilibria
         {
@@ -28,19 +33,16 @@ namespace yocto
         
             vector_t     C;      //!< [M] local conc
             vector_t     dC;     //!< [M] local dC
-            vector<bool> active; //!< [M] reactive species
-            vector_t     Cneg;   //!< [M] store negative concentration
-            
+            bvector_t    active; //!< [M] reactive species
+            uvector_t    Ineg;   //!< [0..M] indices of negative concentration
+            uvector_t    Isub;   //!< [0..M] indices of involved concentrations for balancing
+
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM], dGamma/dC
-            imatrix_t    Nu2;    //!< [NxN] Nu*Nu'
-            imatrix_t    ANu2;   //!< [NxN] adjoint of Nu2
-            ptrdiff_t    dNu2;   //!< determinant(Nu2)
-            imatrix_t    iNu2;   //!< [NxM], More-Penrose pseudo inverse * det(Nu2)
-            
+            evector_t    online; //!< [0..N], online eqs for balancing
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
             
@@ -56,7 +58,6 @@ namespace yocto
             }
             
             void compute_limits() throw(); //!< from internal C
-            void enforce_limits() throw(); //!< update xi
             
             bool balance( array<double> &C0 );
             

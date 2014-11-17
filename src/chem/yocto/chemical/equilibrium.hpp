@@ -6,6 +6,7 @@
 #include "yocto/core/list.hpp"
 #include "yocto/ptr/arc.hpp"
 #include "yocto/container/tuple.hpp"
+#include "yocto/sequence/vector.hpp"
 
 namespace yocto
 {
@@ -56,7 +57,7 @@ namespace yocto
             func_type    K;       //!< a functor, calling callK(), which calls the virtual getK()
             xi_ctrl      forward; //!< status
             xi_ctrl      reverse; //!< status
-            bool         online;  //!< for balancing
+            const size_t indx;    //!< in equilibria
             
             void add( const species::pointer &sp, const int nu);
             void output( std::ostream &os ) const;
@@ -66,6 +67,7 @@ namespace yocto
             //
             // Chemistry
             //__________________________________________________________________
+            //! best effort validation
             void validate() const;
             
             void initialize( array<ptrdiff_t> &Nu, array<bool> &active ) const throw();
@@ -89,8 +91,13 @@ namespace yocto
             //! display computed limits
             void show_limits( std::ostream &os ) const;
             
-            //! find is species #indx is involved            
-            void check_online_for(const size_t indx) throw();
+            double apply_limits( const double xi ) const throw();
+            
+            //! Does species #indx is involved
+            bool involves(const size_t indx) const throw();
+            
+            //! collect all involved species
+            void collect( vector<size_t> &involved ) const;
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibrium);

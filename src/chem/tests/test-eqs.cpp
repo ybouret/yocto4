@@ -30,14 +30,11 @@ YOCTO_UNIT_TEST_IMPL(eqs)
     
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
-    std::cerr << "Nu2=" << eqs.Nu2 << std::endl;
-    std::cerr << "dNu2=" << eqs.dNu2 << std::endl;
-    std::cerr << "ANu2=" << eqs.ANu2 << std::endl;
-    std::cerr << "iNu2=" << eqs.iNu2 << std::endl;
 
     for(size_t i=1;i<=eqs.M;++i)
     {
         eqs.C[i] = alea<double>() - 0.5;
+        if(i>2) eqs.C[i] = 0;
     }
     std::cerr << "C=" << eqs.C << std::endl;
     

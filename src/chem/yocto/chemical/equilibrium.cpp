@@ -25,7 +25,7 @@ namespace yocto
 #include "yocto/sort/merge.hpp"
 #include "yocto/code/ipower.hpp"
 #include "yocto/exception.hpp"
-
+#include "yocto/code/utils.hpp"
 
 namespace yocto
 {
@@ -36,7 +36,8 @@ namespace yocto
         name(id),
         K(this,&equilibrium::callK),
         forward(false,false,-1),
-        reverse(false,false,-1)
+        reverse(false,false,-1),
+        indx(0)
         {
         }
         
@@ -379,20 +380,71 @@ namespace yocto
         
         void equilibrium:: show_limits( std::ostream &os ) const
         {
-            os << "limits(" << name << ") / " << (online ? "ONLINE" : "OFFLINE" ) << std::endl;
+            os << "limits(" << name << ")" << std::endl;
             os << "\tforward: "; __show_limits(forward, os); os << std::endl;
             os << "\treverse: "; __show_limits(reverse, os); os << std::endl;
         }
         
         
-        void equilibrium:: check_online_for(const size_t indx) throw()
+        double equilibrium:: apply_limits( const double xi ) const throw()
+        {
+            if(xi>=0)
+            {
+                //______________________________________________________________
+                //
+                // Reaction wants to go forward
+                //______________________________________________________________
+                if(forward.blocked)
+                {
+                    return 0;
+                }
+                else
+                {
+                    if(forward.limited)
+                    {
+                        
+                        return min_of(forward.maximum,xi);
+                    }
+                    else
+                    {
+                        return xi;
+                    }
+                }
+
+            }
+            else
+            {
+                //______________________________________________________________
+                //
+                // Reaction wants to go reverse
+                //______________________________________________________________
+                if(reverse.blocked)
+                {
+                    return 0;
+                }
+                else
+                {
+                    if(reverse.limited)
+                    {
+                        return -min_of(reverse.maximum,-xi);
+                    }
+                    else
+                    {
+                        return xi;
+                    }
+                }
+            }
+            
+        }
+        
+        
+        bool equilibrium:: involves(const size_t indx) const throw()
         {
             for(const actor *a=reac.head;a;a=a->next)
             {
                 if(a->sp->indx==indx)
                 {
-                    online = true;
-                    return;
+                    return true;
                 }
             }
             
@@ -400,12 +452,36 @@ namespace yocto
             {
                 if(a->sp->indx==indx)
                 {
-                    online = true;
-                    return;
+                    return true;
                 }
             }
             
+            return false;
         }
+        
+        static inline void __involve( vector<size_t> &a, const size_t idx )
+        {
+            for(size_t i=a.size();i>0;--i)
+            {
+                if(idx==a[i])
+                    return;
+            }
+            a.push_back(idx);
+        }
+        
+        void equilibrium:: collect( vector<size_t> &involved ) const
+        {
+            for(const actor *a=reac.head;a;a=a->next)
+            {
+                __involve(involved,a->sp->indx);
+            }
+            
+            for(const actor *a=prod.head;a;a=a->next)
+            {
+                __involve(involved,a->sp->indx);
+            }
+        }
+
         
     }
     
