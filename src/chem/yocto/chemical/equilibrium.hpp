@@ -57,6 +57,7 @@ namespace yocto
             func_type    K;       //!< a functor, calling callK(), which calls the virtual getK()
             xi_ctrl      forward; //!< status
             xi_ctrl      reverse; //!< status
+            bool         blocked; //!< fully blocked !
             const size_t indx;    //!< in equilibria
             
             void add( const species::pointer &sp, const int nu);
@@ -91,6 +92,7 @@ namespace yocto
             //! display computed limits
             void show_limits( std::ostream &os ) const;
             
+            //! correct the advancing
             double apply_limits( const double xi ) const throw();
             
             //! Does species #indx is involved

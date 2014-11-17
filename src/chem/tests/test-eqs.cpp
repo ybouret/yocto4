@@ -34,7 +34,7 @@ YOCTO_UNIT_TEST_IMPL(eqs)
     for(size_t i=1;i<=eqs.M;++i)
     {
         eqs.C[i] = alea<double>() - 0.5;
-        if(i>2) eqs.C[i] = 0;
+        //if(i>2) eqs.C[i] = 0;
     }
     std::cerr << "C=" << eqs.C << std::endl;
     

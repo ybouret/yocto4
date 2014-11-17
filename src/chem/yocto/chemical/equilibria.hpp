@@ -36,7 +36,8 @@ namespace yocto
             bvector_t    active; //!< [M] reactive species
             uvector_t    Ineg;   //!< [0..M] indices of negative concentration
             uvector_t    Isub;   //!< [0..M] indices of involved concentrations for balancing
-
+            bvector_t    flag;   //!< [M] flag for ops
+            
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     xi;     //!< [N] extents
@@ -63,6 +64,8 @@ namespace yocto
             
             equilibrium       & operator[](size_t i) throw();
             const equilibrium & operator[](size_t i) const throw();
+            
+            double computeE( array<double> &dEdC );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);

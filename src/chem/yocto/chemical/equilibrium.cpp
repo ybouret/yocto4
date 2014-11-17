@@ -37,6 +37,7 @@ namespace yocto
         K(this,&equilibrium::callK),
         forward(false,false,-1),
         reverse(false,false,-1),
+        blocked(false),
         indx(0)
         {
         }
@@ -335,6 +336,7 @@ namespace yocto
                 __update(reverse,C[i],a->nu);
             }
             
+            blocked = forward.blocked && reverse.blocked;
         }
         
         void equilibrium:: validate() const
