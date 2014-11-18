@@ -1,7 +1,7 @@
 #include "yocto/utest/run.hpp"
 #include "../../main/tests/support.hpp"
 #include <typeinfo>
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/crout.hpp"
 
 using namespace yocto;
@@ -64,7 +64,7 @@ namespace {
             }
             
             crout<T>::solve( mLU,x );
-            algebra<T>::mul(R,m,x);
+            tao::mul(R,m,x);
             
             double rms = __RMS(R,b);
             std::cerr << "rms1 [" << n << "x" << n << "]=" << rms << std::endl;
@@ -77,7 +77,7 @@ namespace {
             
             matrix<T> p(n,n);
             
-            algebra<T>::mul(p,mInv,m);
+            tao::mmul(p,mInv,m);
             
             rms = 0;
             for(size_t i=1; i <=n; ++i )
@@ -94,7 +94,7 @@ namespace {
             mInv = m;
             if( crout<T>::inverse(mInv) )
             {
-                algebra<T>::mul(p,mInv,m);
+                tao::mmul(p,mInv,m);
                 
                 rms = 0;
                 for(size_t i=1; i <=n; ++i )
@@ -170,7 +170,7 @@ namespace {
             }
             crout<T>::solve(ALU,x);
             
-            algebra<double>::mul(c, A, x);
+            tao::mul(c, A, x);
             std::cerr << "A="  << A << std::endl;
             std::cerr << "b="  << b << std::endl;
             std::cerr << "x="  << x << std::endl;
@@ -179,7 +179,7 @@ namespace {
             
             
             crout<T>::improve(x,A,ALU,b);
-            algebra<double>::mul(c, A, x);
+            tao::mul(c, A, x);
             std::cerr << "rms" << 1 << "=" << __RMS(b,c) << std::endl;
             std::cerr << "x=" << x << std::endl;
             

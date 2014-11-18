@@ -10,7 +10,7 @@
 #include "yocto/sequence/vector.hpp"
 
 #include "yocto/math/kernel/crout.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 
 #include "yocto/code/ipower.hpp"
 
@@ -198,7 +198,9 @@ namespace yocto
                 //-- compute the coefficients
                 //--------------------------------------------------------------
                 if(K>0)
-                    algebra<real_t>::mul(a, sig, F);
+                {
+                   tao::mul(a, sig, F);
+                }
                 //std::cerr << "a=" << a <<  std::endl;
                 
                 //--------------------------------------------------------------

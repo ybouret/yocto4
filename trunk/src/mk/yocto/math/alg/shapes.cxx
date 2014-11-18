@@ -108,7 +108,7 @@ namespace yocto
     
 }
 
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/math/kernel/diag.hpp"
 
@@ -117,7 +117,6 @@ namespace yocto
 {
     namespace math
     {
-        typedef algebra<real_t> mkl;
         
         template <>
         fit_conic<real_t>:: ~fit_conic() throw() {}
@@ -210,7 +209,7 @@ namespace yocto
             // M <- Sqq - Sqz * beta
             //------------------------------------------------------------------
             matrix<real_t> M(3,3);
-            mkl::mul(M, Sqz, beta);
+            tao::mmul(M, Sqz, beta);
             for(size_t i=3;i>0;--i)
             {
                 for(size_t j=3;j>0;--j)
@@ -269,8 +268,8 @@ namespace yocto
             for(size_t i=1; i <= 3; ++i)
             {
                 const array<real_t> &v = evec[i];
-                mkl::mul(wi,C,v);
-                const real_t tmp = mkl::dot(wi,v);
+                tao::mul(wi,C,v);
+                const real_t tmp = tao::dot(wi,v);
                 if(tmp>0)
                 {
                     ia[na] = i;
@@ -300,7 +299,7 @@ namespace yocto
             // compute the second part
             //------------------------------------------------------------------
             array<real_t> &B = wi;
-            mkl::mul(B,beta,A);
+            tao::mul(B,beta,A);
             for(size_t i=3;i>0;--i) B[i] = -B[i];
             //std::cerr << "B=" << B << std::endl;
             

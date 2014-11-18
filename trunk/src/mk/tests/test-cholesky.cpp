@@ -1,6 +1,6 @@
 #include "yocto/utest/run.hpp"
 #include "yocto/math/kernel/cholesky.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/sequence/vector.hpp"
 
@@ -41,9 +41,9 @@ void perform()
             {
                 for( size_t i=1; i <= n; ++i ) b[i] = T(0.5) - alea<T>();
                 cholesky<T>::solve( M,d,b,x);
-                algebra<T>::mul(r,A,x); // compute estimated solution
-                algebra<T>::sub(r,b);   // compute residue
-                std::cerr << "norm" << n << "=" << algebra<T>::norm_L2(r) << std::endl;
+                tao::mul(r,A,x); // compute estimated solution
+                tao::sub(r,b);   // compute residue
+                std::cerr << "norm" << n << "=" << tao::norm(r) << std::endl;
             }
             else {
                 std::cerr << "// FAILURE" << std::endl;
@@ -56,9 +56,9 @@ void perform()
 YOCTO_UNIT_TEST_IMPL(cholesky)
 {
     std::cerr << "float" << std::endl;
-	perform<float>();
+    perform<float>();
     
     std::cerr << "double" << std::endl;
-	perform<double>();
+    perform<double>();
 }
 YOCTO_UNIT_TEST_DONE()

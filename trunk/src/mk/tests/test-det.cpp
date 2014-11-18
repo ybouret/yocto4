@@ -2,7 +2,7 @@
 #include "yocto/utest/run.hpp"
 
 #include "yocto/code/rand.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/sequence/vector.hpp"
 
 using namespace yocto;
@@ -31,7 +31,7 @@ void perform_det()
     std::cerr << "A=" << A << std::endl;
     
     matrix<T> P(n,n);
-    algebra<T>::mul(P, A, M);
+    tao::mmul(P, A, M);
     std::cerr << "P=" << P << std::endl;
     
     if( Fabs(D) > 0 )
@@ -44,7 +44,7 @@ void perform_det()
             b[i] = T( int(10*(alea<double>()-0.5)) );
         }
         std::cerr << "b=" << b << std::endl;
-        algebra<T>::mul(x,A,b);
+        tao::mul(x,A,b);
         for(size_t i=1;i<=n;++i) x[i] /= D;
         std::cerr << "x0=" << x << std::endl;
         improve(x, M, A, D, b);
