@@ -63,14 +63,15 @@ namespace yocto
                 return os;
             }
             
-            void compute_limits() throw(); //!< from internal C
+            //! compute all limits for equilibria
+            void compute_limits() throw();
             
+            //! balance concentration
             bool balance( array<double> &C0 );
             
             equilibrium       & operator[](size_t i) throw();
             const equilibrium & operator[](size_t i) const throw();
             
-            double computeE( array<ptrdiff_t> &dEdC );
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(equilibria);
@@ -78,6 +79,10 @@ namespace yocto
             
             //! count negative concentration
             size_t count_negative() throw();
+            
+            //! evaluate energy and compute descent direction
+            double computeE( array<ptrdiff_t> & );
+
         };
         
     }
