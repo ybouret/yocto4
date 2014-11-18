@@ -75,6 +75,7 @@ namespace yocto
             
             xip.    release();
             online. release();
+            W.      release();
             Phi.    release();
             Nu.     release();
             xi.     release();
@@ -124,6 +125,7 @@ namespace yocto
                     xi.     make(N,0.0);
                     Nu.     make(N,M);
                     Phi.    make(N,M);
+                    W.      make(N,N);
                     online. ensure(N);
                     xip.    make(N,0);
                 }

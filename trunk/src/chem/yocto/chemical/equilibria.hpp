@@ -46,6 +46,7 @@ namespace yocto
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM] dGamma/dC
+            matrix_t     W;      //!< [NxN]
             evector_t    online; //!< [0..N] balancing: online eqs for balancing
             ivector_t    xip;    //!< [N]    balancing: integer descent extent
             
@@ -71,6 +72,17 @@ namespace yocto
             
             equilibrium       & operator[](size_t i) throw();
             const equilibrium & operator[](size_t i) const throw();
+            
+            //! compute all constantes
+            void computeK(double t);
+            void computeGammaAndPhi(double t);
+            void updateGammaAndPhi();
+            void updateGamma();
+            
+            
+            //! balance and normalize
+            bool normalize( array<double> &C0, double t, bool recomputeK );
+            
             
             
         private:
