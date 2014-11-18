@@ -16,7 +16,6 @@ YOCTO_UNIT_TEST_INIT(64)
 
     
 	YOCTO_UNIT_TEST_DECL(cholesky);
-	YOCTO_UNIT_TEST_DECL(algebra);
     
     YOCTO_UNIT_TEST_DECL(stiff);
     YOCTO_UNIT_TEST_DECL(stat);
