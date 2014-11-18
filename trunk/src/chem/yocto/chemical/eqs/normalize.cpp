@@ -60,7 +60,36 @@ namespace yocto
             }
         }
         
+        double equilibria:: GammaNorm()
+        {
+            double ans = 0;
+            for(size_t i=N;i>0;--i)
+            {
+                const equilibrium &eq = *eqs[i];
+                double g = fabs(Gamma[i]);
+                if(eq.SumNuP>0)
+                {
+                    g = pow(g,1.0/eq.SumNuP);
+                }
+                ans += g;
+            }
+            return ans/N;
+        }
+
         
+        double equilibria:: H(double U)
+        {
+            for(size_t j=M;j>0;--j)
+            {
+                C[j] = Cs[j] + U * dC[j];
+                if(active[j])
+                {
+                    if(C[j]<=0) C[j] = 0;
+                }
+            }
+            updateGamma();
+            return GammaNorm();
+        }
         
         bool equilibria:: normalize( array<double> &C0, double t, bool recomputeK )
         {
@@ -93,6 +122,9 @@ namespace yocto
                 updateGammaAndPhi();
             }
             
+            //computeGammaScaling();
+            //std::cerr << "Scaling=" << GamSF << std::endl;
+            
             size_t count = 0;
             while(true)
             {
@@ -116,40 +148,60 @@ namespace yocto
                     std::cerr << "-- Normalize: singular concentrations" << std::endl;
                     return false;
                 }
-                tao::neg(xs,Gamma);
-                crout<double>::solve(W,xs);
+                tao::neg(xi,Gamma);
+                crout<double>::solve(W,xi);
                 
-                std::cerr << "xs=" << xs << std::endl;
+                std::cerr << "xi0=" << xi << std::endl;
                 
                 //______________________________________________________________
                 //
-                // prepare constraints@starting point
+                // clip constraints
                 //______________________________________________________________
                 for(size_t i=N;i>0;--i)
                 {
                     eqs[i]->compute_limits(Cs);
+                    xi[i] = eqs[i]->apply_limits(xi[i]);
+                }
+                std::cerr << "xi1=" << xi << std::endl;
+
+                //______________________________________________________________
+                //
+                // initial dC
+                //______________________________________________________________
+                tao::mul_trn(dC, Nu, xi);
+                std::cerr << "dC=" << dC << std::endl;
+                
+                const double F0 = GammaNorm();
+                
+                func_type    Fn(this,&equilibria::H);
+                const double F1 = Fn(1);
+                
+                std::cerr << "F: " << F0 << " --> " << F1 << std::endl;
+                
+                if( F1>= F0 )
+                {
+                    std::cerr << "Need To Backtrack" << std::endl;
+                    triplet<double> U = {0, 1, 1 };
+                    triplet<double> F = {F0,F1,F1};
+                    if(!bracket<double>::inside(Fn,U,F))
+                    {
+                        std::cerr << "-- Bracketing Failure..." << std::endl;
+                        return false;
+                    }
+                    minimize<double>(Fn, U, F, 0);
+                    std::cerr << "U=" << U.b << std::endl;
+                    Fn(U.b);
                 }
                 
-                func_type Fopt( this, &equilibria::H);
-                const double    F0 = tao::norm_sq(Gamma);
-                const double    F1 = H(1);
-                triplet<double> U = { 0,  1,  1 };
-                triplet<double> F = { F0, F1, F1};
-                
-                bracket<double>::expand(Fopt, U, F);
-                minimize<double>(Fopt, U, F, 0);
-                
-                std::cerr << "U=" << U.b << std::endl;
-                
-                (void)H(U.b);
+                // compute effective dC
                 for(size_t j=M;j>0;--j)
                 {
                     dC[j] = C[j] - Cs[j];
                 }
-                std::cerr << "dC=" << dC << std::endl;
+                std::cerr << "delta=" << dC << std::endl;
                 
                 updateGammaAndPhi();
-                if(++count>20)
+                if(++count>10)
                     break;
             }
             

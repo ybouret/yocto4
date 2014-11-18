@@ -171,6 +171,7 @@ namespace yocto
 #undef  Y_TAO_SUM
             }
             
+            
             //! simplify assuming integer coefficients
             template <typename ARR>
             static inline ptrdiff_t simplify( ARR &w ) throw()

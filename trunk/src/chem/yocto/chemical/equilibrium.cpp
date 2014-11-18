@@ -41,7 +41,8 @@ namespace yocto
         indx(0),
         reac(),
         prod(),
-        nu_p(0)
+        SumNuP(0),
+        DeltaNu(0)
         {
         }
         
@@ -124,12 +125,18 @@ namespace yocto
                 L->push_back(new actor(sp,nu));
                 core::merging<actor>::sort(*L,__compare_actors,0);
             }
-            int sum_nu_p = 0;
+            int tmp = 0;
             for(const actor *a=prod.head;a;a=a->next)
             {
-                sum_nu_p += a->nu;
+                tmp  += a->nu;
             }
-            (int&)nu_p = sum_nu_p;
+            (int&)SumNuP = tmp;
+            tmp = 0;
+            for(const actor *a=reac.head;a;a=a->next)
+            {
+                tmp  += a->nu;
+            }
+            (int&)DeltaNu = SumNuP - tmp;
         }
         
         void equilibrium:: output( std::ostream &os ) const
