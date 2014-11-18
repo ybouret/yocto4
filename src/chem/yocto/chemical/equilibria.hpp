@@ -44,8 +44,8 @@ namespace yocto
             
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
+            vector_t     GamSF;  //!< [N] Gamma Scaling Factor
             vector_t     xi;     //!< [N] extents
-            vector_t     xs;     //!< [N] starting extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM] dGamma/dC
             matrix_t     W;      //!< [NxN]
@@ -77,6 +77,7 @@ namespace yocto
             
             //! compute all constantes
             void computeK(double t);
+            void computeGammaScaling();
             void computeGammaAndPhi(double t);
             void updateGammaAndPhi();
             void updateGamma();
@@ -100,8 +101,9 @@ namespace yocto
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
             
-            double H(double u);
+            double H(double U);
             
+            double GammaNorm();
             
         };
         

@@ -110,8 +110,8 @@ namespace yocto
             actors prod;
             
         public:
-            const int     nu_p; //!< sum of products coefficietns
-            double rescale(double Gamma) const throw();
+            const int     SumNuP;   //!< sum of products coefficients
+            const int     DeltaNu;  //!< created #mols
         };
         
         class const_equilibrium : public equilibrium

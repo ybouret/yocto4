@@ -1,6 +1,7 @@
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/tao.hpp"
+#include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
@@ -78,8 +79,8 @@ namespace yocto
             W.      release();
             Phi.    release();
             Nu.     release();
-            xs.     release();
             xi.     release();
+            GamSF.  release();
             Gamma.  release();
             K.      release();
             
@@ -125,8 +126,8 @@ namespace yocto
                 {
                     K.      make(N,0.0);
                     Gamma.  make(N,0.0);
+                    GamSF.  make(N,0.0);
                     xi.     make(N,0.0);
-                    xs.     make(N,0.0);
                     Nu.     make(N,M);
                     Phi.    make(N,M);
                     W.      make(N,N);
@@ -160,7 +161,15 @@ namespace yocto
             return *eqs[i];
         }
 
-
+        void equilibria:: computeGammaScaling()
+        {
+            for(size_t i=N;i>0;--i)
+            {
+                const equilibrium &Eq = *eqs[i];
+                const double       Ck = (Eq.DeltaNu != 0) ? pow(K[i], 1.0/Eq.DeltaNu) : 1;
+                GamSF[i] = 1.0 / ipower(Ck,Eq.SumNuP);
+            }
+        }
 
     
     }
