@@ -36,13 +36,19 @@ namespace yocto
             vector_t     dC;     //!< [M] local dC
             bvector_t    active; //!< [M] reactive species
             uvector_t    Jneg;   //!< [0..M] indices of negative concentration
+            ivector_t    beta;   //!< [M]    balancing: dE/dC
+            ivector_t    dCp;    //!< [M]    balancing: integer descent direction
+            vector_t     alpha;  //!< [0..M] balancing: max scaling
+            uvector_t    aindx;  //!< [0..M] balancing: associated #species
             
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     xi;     //!< [N] extents
             imatrix_t    Nu;     //!< [NxM] current topology
-            matrix_t     Phi;    //!< [NxM], dGamma/dC
-            evector_t    online; //!< [0..N], online eqs for balancing
+            matrix_t     Phi;    //!< [NxM] dGamma/dC
+            evector_t    online; //!< [0..N] balancing: online eqs for balancing
+            ivector_t    xip;    //!< [N]    balancing: integer descent extent
+            
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
             

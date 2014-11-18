@@ -36,9 +36,51 @@ $$
 	\mytrn{\mymat{\nu}}\vec{\xi}
 $$
 
+\section{Limiting extents}
+For each equilibrium, depending on the concentration of each components, a 
+maximum and a minimum extent may appear, or may
+appear unlimited (i.e. for water).
+If both way are blocked, then the equilibrium is blocked.
+
+
+
 \section{Chemical balancing}
 A transformation may bring some active (aka involved in a reaction) concentrations to a negative value.
-We want to find the smallest extent $\vec{\xi}$ that re-balances the reactive system.
+Let $\vec{C}$ be a set of concentrations. We define the objective function
+$$
+	\mathcal{E}(\vec{C}) = \sum_j 
+	\left
+	\lbrace
+		\begin{array}{rl}
+		-C_j & \text{if species \#}j\text{ is active and } C_j<0\\
+		0    & \text{otherwise.}\\
+		\end{array} 
+	\right.
+$$
+The steepest integer descent direction is
+$$
+	\vec{\beta} = -\vec{\nabla}_{\vec{C}} \mathcal{E} = 
+	\left\lbrack
+		\begin{array}{c}
+		\vdots\\
+		\mathbbm{1}_{\text{\#}j=\text{active and } C_j<0}\\
+		\vdots
+		\end{array}
+	\right\rbrack
+$$
+with translate into an integer descent extent
+$$
+	\vec{\xi}' = \mymat{\nu} \vec{\beta}.
+$$
+The extent of the blocked equilibria must be set to zero !\\
+Then the integer change of concentration direction is
+$$
+	\delta\vec{C}' = \mytrn{\mymat{\nu}}\vec{\xi}'.
+$$
+We must then analyse the maximum step that brings us to the
+first zero concentration, while taking care of the addition and subtraction rounding.
+If this step is successful, then at least one of the negative species is exactly zero...
+
 
 
 \end{document}

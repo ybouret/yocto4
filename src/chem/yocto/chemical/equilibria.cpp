@@ -73,12 +73,18 @@ namespace yocto
         {
             (size_t &)M = 0;
             
+            xip.    release();
             online. release();
             Phi.    release();
             Nu.     release();
             xi.     release();
             Gamma.  release();
             K.      release();
+            
+            aindx.  release();
+            alpha.  release();
+            dCp.    release();
+            beta.   release();
             
             Jneg.   release();
             active. release();
@@ -90,15 +96,15 @@ namespace yocto
         {
             clear();
             (size_t &)M = lib.size();
-            assert(N==eqs.size());
-            
-            for(size_t i=1;i<=N;++i)
-            {
-                eqs[i]->validate();
-            }
             
             try
             {
+                assert(N==eqs.size());
+                for(size_t i=1;i<=N;++i)
+                {
+                    eqs[i]->validate();
+                }
+
                 if(M<=0)
                     throw exception("equilibria: no species");
                 
@@ -106,7 +112,10 @@ namespace yocto
                 dC.     make(M,0.0);
                 active. make(M,0.0);
                 Jneg.   make(M,0);
-                
+                beta.   make(M,0.0);
+                dCp.    make(M,0.0);
+                alpha.  make(M,0);
+                aindx.  make(M,0);
                 
                 if(N>0)
                 {
@@ -116,6 +125,7 @@ namespace yocto
                     Nu.     make(N,M);
                     Phi.    make(N,M);
                     online. ensure(N);
+                    xip.    make(N,0);
                 }
                 
                 for(size_t i=1;i<=N;++i)
