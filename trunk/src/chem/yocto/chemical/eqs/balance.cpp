@@ -78,30 +78,43 @@ namespace yocto
             if(N<=0)
                 return true;
             
+            //__________________________________________________________________
+            //
+            // load the concentration
+            //__________________________________________________________________
             tao::set(C,C0);
-            std::cerr << "balanceC=" << C << std::endl;
             
-            ivector_t  dEdC(M,0); //!< dE/dC is a flag...
-            ivector_t  beta(N,0); //!< minimize dir
-            ivector_t  incr(M,0); //!< the final increment
-            vector_t   alpha(M,as_capacity);
-            vector_t   aindx(M,as_capacity);
             
             double E     = 0;
             size_t count = 0;
-            while( (E=computeE(dEdC)) > 0 )
+            
+            //__________________________________________________________________
+            //
+            // compute the Energy and the descent direction in beta
+            //__________________________________________________________________
+            while( (E=computeE(beta)) > 0 )
             {
                 ++count;
-                std::cerr << "==== #" << count << std::endl;
+                if(count>M)
+                {
+                    std::cerr << "-- Too Many Iterations in Equilibria.Balance" << std::endl;
+                    return false;
+                }
                 
-                const size_t Q =Jneg.size(); assert(Q>0);
-                tao::mul(beta,Nu,dEdC);
-                std::cerr << "E=" << E << std::endl;
-                std::cerr << "dEdC=" << dEdC << std::endl;
-                std::cerr << "beta0=" << beta << std::endl;
                 
+                //______________________________________________________________
+                //
+                // compute the integer descent extern xip = Nu*beta
+                //______________________________________________________________
+                tao::mul(xip,Nu,beta);
+                
+                //______________________________________________________________
+                //
+                // analyse equilibria to remove blocked ones
+                //______________________________________________________________
                 online.free();
-                for(size_t i=1;i<=N;++i)
+                const size_t Q =Jneg.size(); assert(Q>0);
+                for(size_t i=N;i>0;--i)
                 {
                     equilibrium::pointer &pEq = eqs[i];
                     bool                  isOn = false;
@@ -109,22 +122,26 @@ namespace yocto
                     {
                         if(pEq->involves(Jneg[j]))
                         {
+                            //__________________________________________________
+                            //
                             // the equilibrium MAY be online
+                            //__________________________________________________
                             pEq->compute_limits(C);
-                            pEq->show_limits(std::cerr);
+                            //pEq->show_limits(std::cerr);
                             isOn = ! pEq->blocked;
                             break;
                         }
                     }
+                    
                     if(isOn)
                     {
-                        std::cerr << "\t" << pEq->name << " is ONLINE" << std::endl;
+                        //std::cerr << "\t" << pEq->name << " is ONLINE" << std::endl;
                         online.push_back(pEq);
                     }
                     else
                     {
-                        std::cerr << "\t" << pEq->name << " is OFFLINE or BLOCKED" << std::endl;
-                        beta[i] = 0;
+                        //std::cerr << "\t" << pEq->name << " is OFFLINE or BLOCKED" << std::endl;
+                        xip[i] = 0;
                     }
                 }
                 const size_t R=online.size();
@@ -134,13 +151,18 @@ namespace yocto
                     return false;
                 }
                 
+                //______________________________________________________________
+                //
+                // compute the integer concentration decrease direction:
+                // dCp = Nu' * xip
+                //______________________________________________________________
+                tao::mul_trn(dCp,Nu,xip);
                 
-                std::cerr << "beta1=" << beta << std::endl;
                 
-                tao::mul_trn(incr,Nu,beta);
-                
-                std::cerr << "incr=" << incr << std::endl;
-                
+                //______________________________________________________________
+                //
+                // Find how far we go: first zeroed conc
+                //______________________________________________________________
                 alpha.free();
                 aindx.free();
                 
@@ -149,7 +171,7 @@ namespace yocto
                     if(active[j])
                     {
                         const double Cj = C[j];
-                        const double Dj = incr[j];
+                        const double Dj = dCp[j];
                         if(Cj<0)
                         {
                             if(Dj<0)
@@ -179,17 +201,18 @@ namespace yocto
                     return false;
                 }
                 co_qsort(alpha, aindx);
-                std::cerr << "aindx=" << aindx << std::endl;
-                std::cerr << "alpha=" << alpha << std::endl;
+
+                //______________________________________________________________
+                //
+                // compute with careful updates
+                //______________________________________________________________
                 const double fac = alpha[1];
-                
-                // compute with carefull addition
-                for(size_t j=1;j<=M;++j)
+                for(size_t j=M;j>0;--j)
                 {
                     dC[j] = 0;
                     if(active[j])
                     {
-                        const ptrdiff_t scale = incr[j];
+                        const ptrdiff_t scale = dCp[j];
                         const double    Cj    = C[j]; // save old value
                         const double    delta = (dC[j]=scale*fac);
                         C[j] += delta;          // compute new value
@@ -203,17 +226,17 @@ namespace yocto
                             {
                                 if(Cj>=0&&C[j]<=0) C[j] = 0;
                             }
-                            // else do nothing
+                            else
+                            {
+                                assert(0==scale);
+                            }
                         }
                     }
                     
                 }
                 
                 C[aindx[1]] = 0;
-                std::cerr << "dC=" << dC << std::endl;
-                std::cerr << "C="  << C  << std::endl;
-                
-                
+                std::cerr << "C" << count << "=" << C << std::endl;
             }
             
             tao::set(C0,C);

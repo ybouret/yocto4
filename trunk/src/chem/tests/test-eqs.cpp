@@ -38,7 +38,14 @@ YOCTO_UNIT_TEST_IMPL(eqs)
     }
     std::cerr << "C=" << eqs.C << std::endl;
     
-    eqs.balance(eqs.C);
+    if(eqs.balance(eqs.C))
+    {
+        std::cerr << "Balanced=" << eqs.C << std::endl;
+    }
+    else
+    {
+        std::cerr << "Unable to balance" << std::endl;
+    }
     
 }
 YOCTO_UNIT_TEST_DONE()
