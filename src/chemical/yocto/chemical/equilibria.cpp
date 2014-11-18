@@ -1,13 +1,13 @@
 #include "yocto/chemical/equilibria.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/code/ipower.hpp"
 
 namespace yocto
 {
     namespace chemical
     {
-        typedef math::algebra<double> mkl;
+        using namespace math;
         
         equilibria:: ~equilibria() throw()
         {
@@ -148,7 +148,7 @@ namespace yocto
                     //
                     // Topology must have a maximal rank
                     //__________________________________________________________
-                    mkl::mul_rtrn(W, Nu, Nu);
+                    tao::mmul_rtrn(W, Nu, Nu);
                     if( !lu_t::build(W) )
                         throw exception("equilibria: invalid rank");
                     

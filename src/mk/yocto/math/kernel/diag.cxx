@@ -379,7 +379,7 @@ namespace yocto
 #include "yocto/sequence/vector.hpp"
 #include "yocto/code/rand.hpp"
 #include "yocto/math/kernel/svd.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/sort/index.hpp"
 
@@ -389,13 +389,6 @@ namespace yocto {
     {
         
         
-        
-        ////////////////////////////////////////////////////////////////////////
-        //
-        //
-        //
-        ////////////////////////////////////////////////////////////////////////
-        typedef algebra<real_t> mkl;
         
         static inline int __compare_fabs( const real_t lhs, const real_t rhs) throw()
         {
@@ -411,8 +404,8 @@ namespace yocto {
                         array<real_t>         &r
                         )
         {
-            mkl::mul(r, B, y);
-            mkl::mul(z, A, y);
+            tao::mul(r, B, y);
+            tao::mul(z, A, y);
             real_t zy  = 0;
             real_t ry  = 0;
             real_t den = 0;
@@ -498,7 +491,7 @@ namespace yocto {
                     //----------------------------------------------------------
                     // improve tau
                     //----------------------------------------------------------
-                    const real_t dtau = REAL(1.0) / mkl::dot(y,z);
+                    const real_t dtau = REAL(1.0) / tao::dot(y,z);
                     wr[iv] += dtau;
                 }
                 

@@ -1,7 +1,7 @@
 #include "yocto/math/kernel/tridiag.hpp"
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/types.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 
 #include "yocto/math/kernel/crout.hpp"
 #include "yocto/sequence/vector.hpp"
@@ -333,8 +333,8 @@ namespace yocto {
             array<z_type> &Z = rr;
             if( !__tridiag(a, b, c, g, Z, U) ) return false;
             if( !__tridiag(a, b, c, g, Y, R) ) return false;
-            const z_type num = algebra<z_type>::dot(V,Y);
-            const z_type den = numeric<z_type>::one +  algebra<z_type>::dot(V,Z);
+            const z_type num = tao::dot(V,Y);
+            const z_type den = numeric<z_type>::one +  tao::dot(V,Z);
             if( Fabs(den) <= REAL_MIN)
                 return false;
             const z_type fac = num / den;
@@ -366,7 +366,7 @@ namespace yocto {
             
             //-- compute the H matrix
             matrix<z_type> H(p,p);
-            algebra<z_type>::mul_ltrn(H, V, Z);
+            tao::mmul_ltrn(H, V, Z);
             for(size_t i=p;i>0;--i) H[i][i] += numeric<z_type>::one;
             
             if( !crout<z_type>::build(H) )
@@ -379,9 +379,9 @@ namespace yocto {
             
             //-- apply the woodbury formula
             vector<z_type> tVy(p,numeric<z_type>::zero);
-            algebra<z_type>::mul_trn(tVy, V, y);
+            tao::mul_trn(tVy, V, y);
             crout<z_type>::solve(H, tVy);
-            algebra<z_type>::mulsub(y, Z, tVy);
+            tao::mul_sub(y, Z, tVy);
             return true;
         }
 

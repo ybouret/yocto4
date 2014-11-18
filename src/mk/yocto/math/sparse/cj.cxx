@@ -1,6 +1,6 @@
 #include "yocto/math/ztype.hpp"
 #include "yocto/math/sparse/cj.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/sparse/algebra.hpp"
 #include "yocto/math/opt/bracket.hpp"
 #include "yocto/math/opt/minimize.hpp"
@@ -11,7 +11,6 @@ namespace yocto
     namespace math
     {
         
-        typedef algebra<real_t>    mkl;
         typedef sp_algebra<real_t> skl;
         
         template <>
@@ -49,7 +48,7 @@ namespace yocto
                        array<real_t>           &r)
             {
                 // residual
-                mkl::neg(r,b);
+                tao::neg(r,b);
                 skl::muladd(r,A,p);
                 
                 // gradient

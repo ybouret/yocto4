@@ -3,7 +3,7 @@
 #include "yocto/sequence/vector.hpp"
 
 #include "yocto/math/kernel/svd.hpp"
-#include "yocto/math/kernel/algebra.hpp"
+#include "yocto/math/kernel/tao.hpp"
 #include "yocto/code/utils.hpp"
 
 #include "yocto/math/opt/bracket.hpp"
@@ -36,7 +36,6 @@ namespace yocto
             class newton
             {
             public:
-                typedef algebra<real_t>   mkl;
                 Newton<real_t>::Function &func;
                 Newton<real_t>::Jacobian &fjac;
                 array<real_t>            &X;    //!< user's X
@@ -223,13 +222,13 @@ namespace yocto
                             //--------------------------------------------------
                             // compute the full Newton's step in h
                             //--------------------------------------------------
-                            mkl::neg(g,F);
+                            tao::neg(g,F);
                             svd<real_t>::solve(J, W, V, g, h);
                             
                             //--------------------------------------------------
                             // try it...will initialize XX and FF
                             //--------------------------------------------------
-                            const real_t rho   = -mkl::dot(xi,h);
+                            const real_t rho   = -tao::dot(xi,h);
                             const real_t slope = alpha*rho;
                             const real_t fc    = f0-slope;
                             const real_t f1    = H(1);
