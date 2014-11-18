@@ -90,10 +90,15 @@ namespace yocto
             ivector_t  beta(N,0); //!< minimize dir
             ivector_t  incr(M,0); //!< the final increment
             vector_t   alpha(M,as_capacity);
+            vector_t   aindx(M,as_capacity);
             
-            double E = 0;
+            double E     = 0;
+            size_t count = 0;
             while( (E=computeE(dEdC)) > 0 )
             {
+                ++count;
+                std::cerr << "==== #" << count << std::endl;
+                
                 const size_t Q =Ineg.size(); assert(Q>0);
                 tao::mul(beta,Nu,dEdC);
                 std::cerr << "E=" << E << std::endl;
@@ -129,7 +134,11 @@ namespace yocto
                 }
                 const size_t R=online.size();
                 if(R<=0)
-                    throw exception("no d.o.f. to balance equilibria");
+                {
+                    std::cerr << "-- No D.O.F to Balance..." << std::endl;
+                    return false;
+                }
+                
                 
                 std::cerr << "beta1=" << beta << std::endl;
                 
@@ -138,19 +147,78 @@ namespace yocto
                 std::cerr << "incr=" << incr << std::endl;
                 
                 alpha.free();
-                for(size_t j=1;j<=Q;++j)
+                aindx.free();
+                
+                for(size_t j=1;j<=M;++j)
                 {
-                    const size_t    jj    = Ineg[j];
-                    const double    Cj    = C[j];
-                    const ptrdiff_t Dj    = incr[jj];
-                    if(Dj)
+                    if(active[j])
                     {
-                        const double    Aj    = -Cj/Dj;
-                        std::cerr << "C[" << jj << "]=" << Cj << ", Dj=" << Dj << " --> "  << Aj << std::endl;
+                        const double Cj = C[j];
+                        const double Dj = incr[j];
+                        if(Cj<0)
+                        {
+                            if(Dj<0)
+                            {
+                                throw exception("equilibria.balance: arithmetic failure!!!");
+                            }
+                            if(Dj>0)
+                            {
+                                alpha.push_back( (-Cj)/Dj );
+                                aindx.push_back(j);
+                            }
+                        }
+                        else
+                        {
+                            assert(Cj>=0);
+                            if(Dj<0)
+                            {
+                                alpha.push_back( Cj/(-Dj) );
+                                aindx.push_back(j);
+                            }
+                        }
                     }
                 }
+                if(alpha.size()<=0)
+                {
+                    std::cerr << "-- No possible increase" << std::endl;
+                    return false;
+                }
+                co_qsort(alpha, aindx);
+                std::cerr << "aindx=" << aindx << std::endl;
+                std::cerr << "alpha=" << alpha << std::endl;
+                const double fac = alpha[1];
                 
-                break;
+                // compute with carefull addition
+                for(size_t j=1;j<=M;++j)
+                {
+                    dC[j] = 0;
+                    if(active[j])
+                    {
+                        const ptrdiff_t scale = incr[j];
+                        const double    Cj    = C[j]; // save old value
+                        const double    delta = (dC[j]=scale*fac);
+                        C[j] += delta;          // compute new value
+                        if(scale>0)
+                        {
+                            if(Cj<=0&&C[j]>=0) C[j] = 0;
+                        }
+                        else
+                        {
+                            if(scale<0)
+                            {
+                                if(Cj>=0&&C[j]<=0) C[j] = 0;
+                            }
+                            // else do nothing
+                        }
+                    }
+                    
+                }
+                
+                C[aindx[1]] = 0;
+                std::cerr << "dC=" << dC << std::endl;
+                std::cerr << "C="  << C  << std::endl;
+                
+                
             }
             
             
