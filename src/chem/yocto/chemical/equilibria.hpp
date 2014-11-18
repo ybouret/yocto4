@@ -35,6 +35,7 @@ namespace yocto
             vector_t     C;      //!< [M] local conc
             vector_t     dC;     //!< [M] local dC
             bvector_t    active; //!< [M] reactive species
+            vector_t     Cs;     //!< [M] starting point for probing
             uvector_t    Jneg;   //!< [0..M] indices of negative concentration
             ivector_t    beta;   //!< [M]    balancing: dE/dC
             ivector_t    dCp;    //!< [M]    balancing: integer descent direction
@@ -44,6 +45,7 @@ namespace yocto
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
             vector_t     xi;     //!< [N] extents
+            vector_t     xs;     //!< [N] starting extents
             imatrix_t    Nu;     //!< [NxM] current topology
             matrix_t     Phi;    //!< [NxM] dGamma/dC
             matrix_t     W;      //!< [NxN]
@@ -83,6 +85,9 @@ namespace yocto
             //! balance and normalize
             bool normalize( array<double> &C0, double t, bool recomputeK );
             
+            //! clip xi according to C
+            void clip_extents();
+            
             
             
         private:
@@ -94,7 +99,10 @@ namespace yocto
             
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
-
+            
+            double H(double u);
+            
+            
         };
         
     }

@@ -108,6 +108,10 @@ namespace yocto
             typedef core::list_of_cpp<actor> actors;
             actors reac;
             actors prod;
+            
+        public:
+            const int     nu_p; //!< sum of products coefficietns
+            double rescale(double Gamma) const throw();
         };
         
         class const_equilibrium : public equilibrium
