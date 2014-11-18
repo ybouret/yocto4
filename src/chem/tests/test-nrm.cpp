@@ -7,7 +7,7 @@
 using namespace yocto;
 using namespace chemical;
 
-YOCTO_UNIT_TEST_IMPL(eqs)
+YOCTO_UNIT_TEST_IMPL(nrm)
 {
     library    lib;
     equilibria eqs;
@@ -30,20 +30,21 @@ YOCTO_UNIT_TEST_IMPL(eqs)
     
     eqs.compile_for(lib);
     std::cerr << "Nu=" << eqs.Nu << std::endl;
-
+    
     for(size_t i=1;i<=eqs.M;++i)
     {
-        eqs.C[i] = alea<double>() - 0.01;
+        eqs.C[i] = alea<double>() - 0.5;
+        //if(i>2) eqs.C[i] = 0;
     }
     std::cerr << "C=" << eqs.C << std::endl;
     
-    if(eqs.balance(eqs.C))
+    if(eqs.normalize(eqs.C,0,true))
     {
-        std::cerr << "Balanced=" << eqs.C << std::endl;
+        std::cerr << "Normalized=" << eqs.C << std::endl;
     }
     else
     {
-        std::cerr << "Unable to balance" << std::endl;
+        std::cerr << "Unable to normalize" << std::endl;
     }
     
 }

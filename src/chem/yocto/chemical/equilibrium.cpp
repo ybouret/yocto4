@@ -223,10 +223,13 @@ namespace yocto
         double equilibrium:: updateGammaAndPhi(const array<double> &C, const double Kt, array<double> &Phi) const
         {
             assert(C.size()>=Phi.size());
-            double p_prod = 1;
             double r_prod = Kt;
+            double p_prod = 1;
             const size_t M = Phi.size();
-            for(size_t i=M;i>0;--i) Phi[i] = 0.0;
+            for(size_t i=M;i>0;--i)
+            {
+                Phi[i] = 0.0;
+            }
             
             for(const actor *a=reac.head;a;a=a->next)
             {
@@ -236,9 +239,10 @@ namespace yocto
                 assert(i<=Phi.size());
                 assert(a->nu<0);
                 const size_t q = (-a->nu);
-                r_prod *= ipower(C[i],q);
+                const double Ci = C[i];
+                r_prod *= ipower(Ci,q);
                 
-                double phi = q*ipower(C[i],q-1);
+                double phi = q*ipower(Ci,q-1);
                 for(const actor *b=reac.head;b;b=b->next)
                 {
                     if(a!=b)
@@ -256,24 +260,24 @@ namespace yocto
                 assert(i>=1);
                 assert(i<=C.size());
                 assert(a->nu>0);
-                const size_t q = a->nu;
-                p_prod *= ipower(C[i],q);
+                const size_t q  = a->nu;
+                const double Ci = C[i];
+                p_prod *= ipower(Ci,q);
                 
-                double phi = q*ipower(C[i],q-1);
+                double phi = q*ipower(Ci,q-1);
                 for(const actor *b=prod.head;b;b=b->next)
                 {
                     if(a!=b)
                     {
                         const size_t j = b->sp->indx;
-                        phi *= ipower(C[j],(-b->nu));
+                        phi *= ipower(C[j],(b->nu));
                     }
                 }
                 Phi[i] -= phi;
             }
             
-            
-            return r_prod - p_prod;
-            
+            const double g = r_prod - p_prod;
+            return g;
         }
         
         
