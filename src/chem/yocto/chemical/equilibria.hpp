@@ -35,9 +35,7 @@ namespace yocto
             vector_t     C;      //!< [M] local conc
             vector_t     dC;     //!< [M] local dC
             bvector_t    active; //!< [M] reactive species
-            uvector_t    Ineg;   //!< [0..M] indices of negative concentration
-            uvector_t    Isub;   //!< [0..M] indices of involved concentrations for balancing
-            bvector_t    flag;   //!< [M] flag for ops
+            uvector_t    Jneg;   //!< [0..M] indices of negative concentration
             
             vector_t     K;      //!< [N] constants
             vector_t     Gamma;  //!< [N] Gamma
