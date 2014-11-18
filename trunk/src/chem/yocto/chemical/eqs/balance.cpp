@@ -86,9 +86,10 @@ namespace yocto
             tao::set(C,C0);
             std::cerr << "balanceC=" << C << std::endl;
             
-            ivector_t  dEdC(M,0); //!< dE/dC
+            ivector_t  dEdC(M,0); //!< dE/dC is a flag...
             ivector_t  beta(N,0); //!< minimize dir
             ivector_t  incr(M,0); //!< the final increment
+            vector_t   alpha(M,as_capacity);
             
             double E = 0;
             while( (E=computeE(dEdC)) > 0 )
@@ -134,9 +135,21 @@ namespace yocto
                 
                 tao::mul_trn(incr,Nu,beta);
                 
-                std::cerr << "incr0=" << incr << std::endl;
-                (void) tao::simplify(incr);
                 std::cerr << "incr=" << incr << std::endl;
+                
+                alpha.free();
+                for(size_t j=1;j<=Q;++j)
+                {
+                    const size_t    jj    = Ineg[j];
+                    const double    Cj    = C[j];
+                    const ptrdiff_t Dj    = incr[jj];
+                    if(Dj)
+                    {
+                        const double    Aj    = -Cj/Dj;
+                        std::cerr << "C[" << jj << "]=" << Cj << ", Dj=" << Dj << " --> "  << Aj << std::endl;
+                    }
+                }
+                
                 break;
             }
             
