@@ -79,8 +79,20 @@ $$
 $$
 We must then analyse the maximum step that brings us to the
 first zero concentration, while taking care of the addition and subtraction rounding.
-If this step is successful, then at least one of the negative species is exactly zero...
+If this step is successful, then at least one of the negative species is exactly zero...\\
 
+The use of this $\mathcal{E}$ make a non vanishing $\delta\vec{C}'$.
 
+\section{Newton's algorithm}
+Let us start from a balanced concentration $\vec{C}_k$.
+We want to find
+$$
+	\vec{\Gamma}(\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}_k) = \vec{0}.
+$$
+The first order expansion provides
+$$
+	\vec{\Gamma}(\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}_k) \simeq 
+	\vec{\Gamma}_k + \mymat{\Phi}\mytrn{\mymat{\nu}} \vec{\xi}_k
+$$
 
 \end{document}

@@ -390,53 +390,59 @@ namespace yocto
         
         double equilibrium:: apply_limits( const double xi ) const throw()
         {
-            if(xi>=0)
+            if(blocked)
             {
-                //______________________________________________________________
-                //
-                // Reaction wants to go forward
-                //______________________________________________________________
-                if(forward.blocked)
-                {
-                    return 0;
-                }
-                else
-                {
-                    if(forward.limited)
-                    {
-                        
-                        return min_of(forward.maximum,xi);
-                    }
-                    else
-                    {
-                        return xi;
-                    }
-                }
-
+                return 0;
             }
             else
             {
-                //______________________________________________________________
-                //
-                // Reaction wants to go reverse
-                //______________________________________________________________
-                if(reverse.blocked)
+                if(xi>=0)
                 {
-                    return 0;
-                }
-                else
-                {
-                    if(reverse.limited)
+                    //______________________________________________________________
+                    //
+                    // Reaction wants to go forward
+                    //______________________________________________________________
+                    if(forward.blocked)
                     {
-                        return -min_of(reverse.maximum,-xi);
+                        return 0;
                     }
                     else
                     {
-                        return xi;
+                        if(forward.limited)
+                        {
+                            
+                            return min_of(forward.maximum,xi);
+                        }
+                        else
+                        {
+                            return xi;
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    //______________________________________________________________
+                    //
+                    // Reaction wants to go reverse
+                    //______________________________________________________________
+                    if(reverse.blocked)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        if(reverse.limited)
+                        {
+                            return -min_of(reverse.maximum,-xi);
+                        }
+                        else
+                        {
+                            return xi;
+                        }
                     }
                 }
-            }
-            
+            }            
         }
         
         
@@ -483,7 +489,7 @@ namespace yocto
                 __involve(involved,a->sp->indx);
             }
         }
-
+        
         
     }
     
