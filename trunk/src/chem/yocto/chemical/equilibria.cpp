@@ -78,6 +78,7 @@ namespace yocto
             W.      release();
             Phi.    release();
             Nu.     release();
+            xs.     release();
             xi.     release();
             Gamma.  release();
             K.      release();
@@ -88,6 +89,7 @@ namespace yocto
             beta.   release();
             
             Jneg.   release();
+            Cs.     release();
             active. release();
             dC.     release();
             C.      release();
@@ -112,6 +114,7 @@ namespace yocto
                 C.      make(M,0.0);
                 dC.     make(M,0.0);
                 active. make(M,0.0);
+                Cs.     make(M,0.0);
                 Jneg.   make(M,0);
                 beta.   make(M,0.0);
                 dCp.    make(M,0.0);
@@ -123,6 +126,7 @@ namespace yocto
                     K.      make(N,0.0);
                     Gamma.  make(N,0.0);
                     xi.     make(N,0.0);
+                    xs.     make(N,0.0);
                     Nu.     make(N,M);
                     Phi.    make(N,M);
                     W.      make(N,N);

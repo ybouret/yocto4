@@ -239,8 +239,11 @@ namespace yocto
                 std::cerr << "C" << count << "=" << C << std::endl;
             }
             
-            tao::set(C0,C);
-            
+
+            for(size_t j=M;j>0;--j)
+            {
+                C0[j] = C[j];
+            }
             
             
             return true;
