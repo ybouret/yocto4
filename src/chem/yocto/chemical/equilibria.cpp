@@ -135,11 +135,7 @@ namespace yocto
                     xip.    make(N,0);
                 }
                 
-                for(size_t i=1;i<=N;++i)
-                {
-                    eqs[i]->initialize(Nu[i],active);
-                }
-                
+                restore_topology();
                 
                 
             }
@@ -150,11 +146,20 @@ namespace yocto
             }
         }
         
+        void equilibria:: restore_topology()
+        {
+            for(size_t i=N;i>0;--i)
+            {
+                eqs[i]->initialize(Nu[i],active);
+            }
+        }
+        
         equilibrium       & equilibria:: operator[](size_t i) throw()
         {
             assert(i>=1);assert(i<=eqs.size());assert(N==eqs.size());
             return *eqs[i];
         }
+        
         const equilibrium & equilibria:: operator[](size_t i) const throw()
         {
             assert(i>=1);assert(i<=eqs.size());assert(N==eqs.size());

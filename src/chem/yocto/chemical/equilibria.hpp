@@ -56,6 +56,7 @@ namespace yocto
             void         remove(const string &name);
             
             void compile_for( const library &lib );
+            void restore_topology();
             
             void clear() throw();
             
@@ -101,7 +102,7 @@ namespace yocto
             //! evaluate energy and compute descent direction
             double computeE( array<ptrdiff_t> & );
             
-            double H(double omega);
+            
             
             
         };
