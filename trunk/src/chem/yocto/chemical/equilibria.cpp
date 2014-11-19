@@ -112,13 +112,13 @@ namespace yocto
                 if(M<=0)
                     throw exception("equilibria: no species");
                 
-                C.      make(M,0.0);
-                dC.     make(M,0.0);
-                active. make(M,0.0);
-                Cs.     make(M,0.0);
+                C.      make(M,0);
+                dC.     make(M,0);
+                active. make(M,0);
+                Cs.     make(M,0);
                 Jneg.   make(M,0);
-                beta.   make(M,0.0);
-                dCp.    make(M,0.0);
+                beta.   make(M,0);
+                dCp.    make(M,0);
                 alpha.  make(M,0);
                 aindx.  make(M,0);
                 
