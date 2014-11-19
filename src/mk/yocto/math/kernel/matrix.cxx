@@ -224,7 +224,7 @@ namespace yocto
         
         
         template <>
-		void matrix<z_type>::minor_of( const matrix &M, size_t I, size_t J) throw()
+		void matrix<z_type>::minor_of(const matrix &M, size_t I, size_t J) throw()
         {
             assert(M.rows>1);
             assert(M.cols>1);
