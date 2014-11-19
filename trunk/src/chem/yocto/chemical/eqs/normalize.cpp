@@ -101,10 +101,6 @@ namespace yocto
                 //______________________________________________________________
                 tao::mmul_rtrn(W,Phi,Nu);
                 
-                //std::cerr << std::endl;
-                //std::cerr << "// Loop #" << count << std::endl;
-                //std::cerr << "Gamma=" << Gamma << std::endl;
-                
                 if(! LU::build(W) )
                 {
                     std::cerr << "-- Normalize: singular concs..." << std::endl;
@@ -113,12 +109,9 @@ namespace yocto
                 
                 tao::neg(xi,Gamma);
                 LU::solve(W, xi);
-                //std::cerr << "xi0=" << xi << std::endl;
                 clip_extents();
-                //std::cerr << "xi="  << xi << std::endl;
                 
                 tao::mul_trn(dC, Nu, xi);
-                //std::cerr << "dC=" << dC << std::endl;
                 bool converged = true;
                 for(size_t j=M;j>0;--j)
                 {
@@ -144,7 +137,7 @@ namespace yocto
                  
                     
                 }
-                //std::cerr << "dC=" << dC << std::endl;
+
                 if(converged)
                 {
                     std::cerr << "// CONVERGED in " << count << " Loops" << std::endl;

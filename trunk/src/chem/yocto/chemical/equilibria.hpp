@@ -22,6 +22,9 @@ namespace yocto
         typedef vector<equilibrium::pointer> evector_t;
         typedef vector<ptrdiff_t>            ivector_t;
         
+        
+        class boot;
+        
         class equilibria
         {
         public:
@@ -51,6 +54,8 @@ namespace yocto
             matrix_t     W;      //!< [NxN]
             evector_t    online; //!< [0..N] balancing: online eqs for balancing
             ivector_t    xip;    //!< [N]    balancing: integer descent extent
+            
+            
             
             equilibrium &add( equilibrium *pEq );
             void         remove(const string &name);
@@ -90,6 +95,8 @@ namespace yocto
             //! clip xi according to C
             void clip_extents();
             
+            
+            void solve( const boot &loader );
             
             
         private:

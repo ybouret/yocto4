@@ -328,67 +328,6 @@ __sum += static_cast<typename ARR::type>(M[j][I]) * static_cast<typename ARR::ty
                 return q+(p+p);
             }
             
-#if 0
-            template <typename MAT, typename ARR, typename BRR>
-            static inline void set_outer_product( MAT &M, const ARR &a, const BRR &b) throw()
-            {
-                assert(M.is_square());
-                assert(a.size()==M.rows);
-                const size_t n = M.rows;
-                for(size_t i=n;i>0;--i)
-                {
-                    array<typename MAT::type> &Mi = M[i];
-                    const typename MAT::type   ai = static_cast<typename MAT::type>(a[i]);
-                    for(size_t j=i;j>0;--j)
-                    {
-                        const typename MAT::type bj   = static_cast<typename MAT::type>(b[j]);
-                        const typename MAT::type aibj = ai*bj;
-                        M[j][i] = Mi[j] = aibj;
-                    }
-                }
-            }
-            
-            template <typename MAT, typename ARR, typename BRR>
-            static inline void set_scaled_outer_product( MAT &M, const typename MAT::type scale, const ARR &a, const BRR &b) throw()
-            {
-                assert(M.is_square());
-                assert(a.size()==M.rows);
-                const size_t n = M.rows;
-                for(size_t i=n;i>0;--i)
-                {
-                    array<typename MAT::type> &Mi = M[i];
-                    const typename MAT::type   ai = static_cast<typename MAT::type>(a[i]);
-                    for(size_t j=i;j>0;--j)
-                    {
-                        const typename MAT::type bj   = static_cast<typename MAT::type>(b[j]);
-                        const typename MAT::type aibj = ai*bj;
-                        M[j][i] = Mi[j] = scale * aibj;
-                    }
-                }
-            }
-            
-            
-            
-            template <typename MAT, typename ARR, typename BRR>
-            static inline void add_outer_product( MAT &M, const ARR &a, const BRR &b) throw()
-            {
-                assert(M.is_square());
-                assert(a.size()==M.rows);
-                const size_t n = M.rows;
-                for(size_t i=n;i>0;--i)
-                {
-                    array<typename MAT::type> &Mi = M[i];
-                    const typename ARR::type   ai = a[i];
-                    for(size_t j=i;j>0;--j)
-                    {
-                        const typename ARR::type aibj = ai*b[j];
-                        Mi[j]  += aibj;
-                        M[j][i] = Mi[j];;
-                    }
-                }
-            }
-#endif
-            
             
             
             //------------------------------------------------------------------

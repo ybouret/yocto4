@@ -92,7 +92,28 @@ $$
 The first order expansion provides
 $$
 	\vec{\Gamma}(\vec{C}_k + \mytrn{\mymat{\nu}}\vec{\xi}_k) \simeq 
-	\vec{\Gamma}_k + \mymat{\Phi}\mytrn{\mymat{\nu}} \vec{\xi}_k
+	\vec{\Gamma}_k + \mymat{\Phi}_k\mytrn{\mymat{\nu}} \vec{\xi}_k
 $$
+For a valid composition, the Newton's extent is
+$$
+		\vec{\xi}_k = -\left(\mymat{\Phi}_k\mytrn{\mymat{\nu}}\right)^{-1}\,\vec{\Gamma}_K
+$$
+which must be clamped to deduce the modified Newton's step
+$$
+	\delta{\vec{C_k}} = \mytrn{\mymat{\nu}} \vec{\xi}_k^\star
+$$
+
+\section{Booting Algorithm}
+We have $M$ species, $N$ equilibria, 
+so we must have $M\geq N$ and $Nc=M-N$ other conditions
+to obtain a starting value.
+Let us assume that we deal only with linear constraints (electroneutrality, mass conservation...).
+This may be written in terms of an integer matrix $\mymat{P}$
+such that
+$$
+	\mymat{P}\vec{C} = \vec{\Lambda}
+$$
+
+
 
 \end{document}
