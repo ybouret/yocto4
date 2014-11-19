@@ -34,28 +34,33 @@ YOCTO_UNIT_TEST_IMPL(nrm)
     const size_t M = eqs.M;
     vector<double> C0(M,0);
     
-    for(size_t i=1;i<=M;++i)
+    size_t iter = 0;
+    while(iter<100)
     {
-        C0[i] = alea<double>() - 0.1;
-        //if(i>2) eqs.C[i] = 0;
-    }
-    std::cerr << "C0=" << C0 << std::endl;
-    
-    if(eqs.balance(C0))
-    {
-        std::cerr << "Balanced=" << C0 << std::endl;
-        if( eqs.normalize(C0, 0, true) )
+        for(size_t i=1;i<=M;++i)
         {
-            std::cerr << "Normalized=" << C0 << std::endl;
+            C0[i] = alea<double>() - 0.2;
+            //if(i>2) C0[i] = 0;
+        }
+        std::cerr << "C0=" << C0 << std::endl;
+        
+        if(eqs.balance(C0))
+        {
+            std::cerr << "Balanced=" << C0 << std::endl;
+            if( eqs.normalize(C0, 0, true) )
+            {
+                ++iter;
+                std::cerr << "Normalized=" << C0 << std::endl;
+            }
+            else
+            {
+                std::cerr << "Not Normalized" << std::endl;
+            }
         }
         else
         {
-            std::cerr << "Not Normalized" << std::endl;
+            std::cerr << "Not Balanced" << std::endl;
         }
-    }
-    else
-    {
-        std::cerr << "Not Balanced" << std::endl;
     }
     
     

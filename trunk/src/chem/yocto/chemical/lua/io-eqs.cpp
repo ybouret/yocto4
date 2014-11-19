@@ -17,7 +17,7 @@ namespace yocto
                                          lua_State    *L,
                                          const string &fn) :
                 equilibrium(id),
-                F(L,fn,true)
+                F(L,fn,false)
                 {
                 }
                 
@@ -104,6 +104,13 @@ namespace yocto
                 if( lua_isnumber(L, -1) )
                 {
                     pEq = new const_equilibrium(name,lua_tonumber(L, -1));
+                    goto CHECK_EQ;
+                }
+                
+                if( lua_isstring(L,-1) )
+                {
+                    const string fn = lua_tostring(L, -1);
+                    pEq = new lua_equilibrium(name,L,fn);
                     goto CHECK_EQ;
                 }
                 

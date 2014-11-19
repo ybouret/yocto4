@@ -3,9 +3,8 @@
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
-//#include "yocto/math/opt/bracket.hpp"
-//#include "yocto/math/opt/minimize.hpp"
 #include "yocto/sort/index.hpp"
+#include "yocto/code/ipower.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -60,7 +59,7 @@ namespace yocto
                 xi[i] = eq.apply_limits(xi[i]);
             }
         }
-        
+#if 0
         void equilibria:: adjust( equilibrium &eq )
         {
             const size_t   i   = eq.indx;
@@ -106,6 +105,29 @@ namespace yocto
             }
             
         }
+#endif
+        
+        double equilibria:: H(double omega)
+        {
+            const array<double> &oldC = Cs;
+            const array<double> &newC = dC;
+            const double omw = 1.0 - omega;
+            for(size_t j=M;j>0;--j)
+            {
+                if(active[j])
+                {
+                    C[j] = omw * oldC[j] + omega * newC[j];
+                }
+                else
+                {
+                    C[j] = oldC[j];
+                }
+            }
+            updateGamma();
+            return tao::norm(Gamma);
+        }
+        
+        
         
         bool equilibria:: normalize( array<double> &C0, double t, bool recomputeK )
         {
@@ -127,31 +149,6 @@ namespace yocto
             
             
             std::cerr << "C=" << C << std::endl;
-#if 0
-            //__________________________________________________________________
-            //
-            // initializing constants
-            //__________________________________________________________________
-            if(recomputeK)
-            {
-                computeK(t);
-            }
-            
-            //__________________________________________________________________
-            //
-            // indexing
-            //__________________________________________________________________
-            uvector_t Kid(N,0);
-            make_index(K,Kid,__compare<size_t> );
-            std::cerr << "K="   << K   << std::endl;
-            std::cerr << "Kid=" << Kid << std::endl;
-            for(size_t i=N;i>0;--i)
-            {
-                adjust( *eqs[ Kid[i] ] );
-                //exit(1);
-            }
-#endif
-            
             
             if(recomputeK)
             {
@@ -162,67 +159,78 @@ namespace yocto
                 updateGammaAndPhi();
             }
             
+            typedef crout<double> LU;
             size_t count = 0;
+            matrix_t J(N,N);
+            
             while(true)
             {
-                
+                ++count;
                 //______________________________________________________________
                 //
                 // Gamma And Phi are computed: compute Jacobian W=Phi*Nu'
                 //______________________________________________________________
                 tao::mmul_rtrn(W,Phi,Nu);
-                std::cerr << std::endl;
-                std::cerr << "Gamma=" << Gamma << std::endl;
-                std::cerr << "Phi="   << Phi   << std::endl;
-                std::cerr << "W=" << W << std::endl;
                 
+                //std::cerr << std::endl;
+                //std::cerr << "// Loop #" << count << std::endl;
+                //std::cerr << "Gamma=" << Gamma << std::endl;
                 
-                //______________________________________________________________
-                //
-                // Compute full Newton's step = -inv(W)*Gamma
-                //______________________________________________________________
-                if( !crout<double>::build(W) )
+                if(! LU::build(W) )
                 {
-                    std::cerr << "-- Normalize: singular system" << std::endl;
+                    std::cerr << "-- Normalize: singular concs..." << std::endl;
                     return false;
                 }
                 
                 tao::neg(xi,Gamma);
-                crout<double>::solve(W,xi);
-                std::cerr << "xi0=" << xi << std::endl;
+                LU::solve(W, xi);
+                //std::cerr << "xi0=" << xi << std::endl;
                 clip_extents();
-                std::cerr << "xi="  << xi << std::endl;
+                //std::cerr << "xi="  << xi << std::endl;
                 
-                //______________________________________________________________
-                //
-                // estimate dC
-                //______________________________________________________________
                 tao::mul_trn(dC, Nu, xi);
-                std::cerr << "dC=" << dC << std::endl;
+                //std::cerr << "dC=" << dC << std::endl;
+                bool converged = true;
                 for(size_t j=M;j>0;--j)
                 {
                     Cs[j] = C[j];
                     if(active[j])
                     {
                         C[j] += dC[j];
-                        if(C[j]<=0) C[j] = 0;
+                        if(C[j]<=0)
+                        {
+                            C[j] = 0;
+                        }
+                        const double Cj = C[j];
+                        const double Dj = dC[j] = fabs(Cj-Cs[j]);
+                        if( Dj > Cj * numeric<double>::ftol )
+                        {
+                            converged = false;
+                        }
                     }
                     else
                     {
                         assert(fabs(dC[j])<=0);
                     }
-                    dC[j] = fabs(C[j] - Cs[j]);
+                 
+                    
                 }
-                std::cerr << "C=" << C << std::endl;
-                std::cerr << "err=" << dC << std::endl;
-                if(++count>20)
+                //std::cerr << "dC=" << dC << std::endl;
+                if(converged)
+                {
+                    std::cerr << "// CONVERGED in " << count << " Loops" << std::endl;
                     break;
-                
+                }
                 updateGammaAndPhi();
+               
             }
             
+            for(size_t j=M;j>0;--j)
+            {
+                C0[j] = C[j];
+            }
             
-            return false;
+            return true;
         }
         
         
