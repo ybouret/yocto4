@@ -1,10 +1,7 @@
 #include "yocto/chemical/equilibria.hpp"
 
 #include "yocto/math/kernel/tao.hpp"
-#include "yocto/math/kernel/det.hpp"
 #include "yocto/math/kernel/crout.hpp"
-#include "yocto/sort/index.hpp"
-#include "yocto/code/ipower.hpp"
 
 #include "yocto/exception.hpp"
 
@@ -59,73 +56,6 @@ namespace yocto
                 xi[i] = eq.apply_limits(xi[i]);
             }
         }
-#if 0
-        void equilibria:: adjust( equilibrium &eq )
-        {
-            const size_t   i   = eq.indx;
-            array<double> &phi = Phi[i];
-            const double   Ki  = K[i];
-            vector<double> nu(M,0);
-            for(size_t j=M;j>0;--j) nu[j] = Nu[i][j];
-            std::cerr << "-------- [[ " << eq.name << " ]] --------" << std::endl;
-            std::cerr << "C" << i << "=" << C << std::endl;
-            std::cerr << "nu=" << nu << std::endl;
-            
-            size_t count = 0;
-            while(true)
-            {
-                const double G = eq.updateGammaAndPhi(C, Ki, phi);
-                std::cerr << "\tG=" << G << std::endl;
-                std::cerr << "\tphi=" << phi << std::endl;
-                const double sig = tao::dot(phi, nu);
-                std::cerr << "\tsig=" << sig << std::endl;
-                if(sig>=0)
-                {
-                    return;
-                }
-                const double xnewt = G/(-sig);
-                std::cerr << "\txnewt=" << xnewt << std::endl;
-                eq.compute_limits(C);
-                eq.show_limits(std::cerr);
-                const double x = eq.apply_limits(xnewt);
-                std::cerr << "\tx=" << x << std::endl;
-                if(fabs(x)<=0)
-                    return;
-                for(size_t j=M;j>0;--j)
-                {
-                    if(active[j])
-                    {
-                        C[j] += nu[j] * x;
-                        if(C[j]<=0) C[j] = 0;
-                    }
-                }
-                std::cerr << "C" << i << "=" << C << std::endl;
-                if(++count>20)
-                    break;
-            }
-            
-        }
-#endif
-        
-        double equilibria:: H(double omega)
-        {
-            const array<double> &oldC = Cs;
-            const array<double> &newC = dC;
-            const double omw = 1.0 - omega;
-            for(size_t j=M;j>0;--j)
-            {
-                if(active[j])
-                {
-                    C[j] = omw * oldC[j] + omega * newC[j];
-                }
-                else
-                {
-                    C[j] = oldC[j];
-                }
-            }
-            updateGamma();
-            return tao::norm(Gamma);
-        }
         
         
         
@@ -148,7 +78,6 @@ namespace yocto
             }
             
             
-            std::cerr << "C=" << C << std::endl;
             
             if(recomputeK)
             {
