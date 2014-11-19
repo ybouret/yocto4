@@ -70,10 +70,11 @@ namespace yocto
             {
                 d *= M[i][i];
             }
-            //std::cerr << "Mdet=" << M << std::endl;
-            //std::cerr << "ddet=" << d*s << std::endl;
+            
             return s*d;
         }
+        
+        
         
         //! M is not destroyed on output
         template <typename T>
@@ -91,6 +92,12 @@ namespace yocto
             }
             const T tdet( __determinant_of(MM) );
             return tdet;
+        }
+        
+        template <typename T>
+        inline T ideterminant_of( const matrix<T> &M )
+        {
+            return Rint( determinant_of(M) );
         }
         
         
@@ -116,6 +123,7 @@ namespace yocto
                 return M[1][1];
             }
         }
+        
         
         
         
