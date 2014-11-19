@@ -116,7 +116,7 @@ namespace yocto
             if(M.rows>1)
             {
                 m.template minor_of(M,I,J);
-                const T ddet = __determinant_of(m);
+                const T ddet(__determinant_of(m));
                 const T mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
                 return mdet;
             }
@@ -137,8 +137,8 @@ namespace yocto
             assert(m.rows==M.rows-1);
             if(M.rows>1)
             {
-                m.minor_of(M,I,J);
-                const ptrdiff_t ddet = RInt(__determinant_of(m));
+                m.template minor_of(M,I,J);
+                const ptrdiff_t ddet(RInt(__determinant_of(m)));
                 const ptrdiff_t mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
                 return mdet;
             }
