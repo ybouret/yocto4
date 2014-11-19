@@ -38,6 +38,8 @@ YOCTO_UNIT_TEST_IMPL(boot)
     __lua::load(L,loader, "ini", lib);
     
     std::cerr << loader << std::endl;
+    
+    eqs.solve(loader);
 
 }
 YOCTO_UNIT_TEST_DONE()

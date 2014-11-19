@@ -12,6 +12,7 @@ namespace yocto
     namespace chemical
     {
         
+        
         //! a chemical species
         /**
          all specific data (but the charge)
@@ -24,10 +25,10 @@ namespace yocto
                              const int     charge);
             virtual ~species() throw();
             
-            const string name; //!< unique name
-            const int    z;    //!< algebraic charge
-            const size_t indx; //!< index in collection
-            vslot        data; //!< whatever...
+            const string    name; //!< unique name
+            const int       z;    //!< algebraic charge
+            const size_t    indx; //!< index in collection
+            vslot           data; //!< whatever...
             
             const string & key() const throw();
             

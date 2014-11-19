@@ -13,7 +13,8 @@ namespace yocto
     namespace chemical
     {
         typedef math::numeric<double>::function func_type;
-        
+        typedef ptrdiff_t integer_t;
+
         class equilibrium : public counted_object
         {
         public:

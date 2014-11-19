@@ -74,6 +74,7 @@ namespace yocto
         {
             (size_t &)M = 0;
             
+            
             xip.    release();
             online. release();
             W.      release();

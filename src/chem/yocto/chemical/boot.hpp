@@ -2,8 +2,8 @@
 #define YOCTO_CHEMICAL_BOOT_INCLUDED 1
 
 #include "yocto/chemical/library.hpp"
-#include "yocto/ptr/arc.hpp"
 #include "yocto/sequence/vector.hpp"
+#include "yocto/ptr/arc.hpp"
 
 namespace yocto
 {
@@ -70,6 +70,7 @@ namespace yocto
             void conserve( const double Ctot, const species::pointer &A, const species::pointer &B);
             void conserve( const double Ctot, const species::pointer &A, const species::pointer &B, const species::pointer &C);
 
+            
             
         private:
             YOCTO_DISABLE_COPY_AND_ASSIGN(boot);
