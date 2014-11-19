@@ -12,14 +12,13 @@ namespace yocto
     {
         
         //! M is destroyed on ouput
-        template <typename T>
-        inline T __determinant_of( matrix<T> &M ) throw()
+        inline double __determinant_of( matrix<double> &M ) throw()
         {
             assert(M.is_square());
             assert(M.rows>0);
             
-            T s(1);
-            const size_t n  = M.rows;
+            double       s = 1.0;
+            const size_t n = M.rows;
             for(size_t i=1,i1=i+1;i<=n;++i,++i1)
             {
                 //______________________________________________________________
@@ -27,11 +26,11 @@ namespace yocto
                 // find max pivot
                 // if i==n, just check no singular matrix
                 //______________________________________________________________
-                T       piv = Fabs(M[i][i]);
+                double  piv = fabs(M[i][i]);
                 size_t  ipv = i;
                 for(size_t k=i1;k<=n;++k)
                 {
-                    const T tmp = Fabs(M[k][i]);
+                    const double tmp = fabs(M[k][i]);
                     if( tmp > piv )
                     {
                         piv = tmp;
@@ -50,10 +49,10 @@ namespace yocto
                     s=-s;
                     M.swap_rows(ipv,i);
                 }
-                const T pivot(M[i][i]);
+                const double pivot = M[i][i];
                 for(size_t k=i1;k<=n;++k)
                 {
-                    const T coef = M[k][i];
+                    const double coef = M[k][i];
                     M[k][i] = 0;
                     for(size_t j=i1;j<=n;++j)
                     {
@@ -66,40 +65,58 @@ namespace yocto
             //
             // Compute determinant
             //__________________________________________________________________
-            T d(1);
+            double d(1);
             for(size_t i=n;i>0;--i)
             {
                 d *= M[i][i];
             }
-            
+            //std::cerr << "Mdet=" << M << std::endl;
+            //std::cerr << "ddet=" << d*s << std::endl;
             return s*d;
         }
         
-        //! M is not destroyed on ouput
+        //! M is not destroyed on output
         template <typename T>
         inline T determinant_of( const matrix<T> &M )
         {
-            matrix<T> MM(M);
-            return __determinant_of<T>(MM);
+            matrix<double> MM(M.rows,M.cols);
+            for(size_t i=M.rows;i>0;--i)
+            {
+                array<double>  &MMi = MM[i];
+                const array<T> &Mi  = M[i];
+                for(size_t j=M.cols;j>0;--j)
+                {
+                    MMi[j] = double(Mi[j]);
+                }
+            }
+            const T tdet( __determinant_of(MM) );
+            return tdet;
         }
         
+        
         template <typename T>
-        inline T cofactor_of( const matrix<T> &M, size_t I, size_t J, matrix<T> &m )
+        inline T cofactor_of(const matrix<T> &M,
+                             const size_t     I,
+                             const size_t     J,
+                             matrix<double>  &m )
         {
             assert(M.is_square());
             assert(M.rows>=1);
             assert(m.rows==M.rows-1);
             if(M.rows>1)
             {
-                m.minor_of(M,I,J);
-                const T det = __determinant_of(m);
-                return ( ((I+J)&1) != 0 ) ? -det : det;
+                m.template minor_of(M,I,J);
+                const T ddet = T(__determinant_of(m));
+                const T mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
+                std::cerr << "ddet=" << ddet << "=> mdet=" << mdet << std::endl;
+                return mdet;
             }
             else
             {
                 return M[1][1];
             }
         }
+        
         
         
         template <typename T>
@@ -118,9 +135,9 @@ namespace yocto
                     return;
                     
                 default: {
-                    const size_t n  = M.rows;
-                    const size_t n1 = n-1;
-                    matrix<T>    m(n1,n1);
+                    const size_t   n  = M.rows;
+                    const size_t   n1 = n-1;
+                    matrix<double> m(n1,n1);
                     for(size_t i=n;i>0;--i)
                     {
                         for(size_t j=n;j>0;--j)
@@ -132,6 +149,9 @@ namespace yocto
                 }
             }
         }
+        
+        
+        
         
         //! linear improvement
         /**

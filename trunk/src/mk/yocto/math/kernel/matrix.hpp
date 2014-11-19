@@ -112,6 +112,37 @@ namespace yocto
                 
                 void minor_of( const matrix &M, size_t I, size_t J) throw();
                 
+                template <typename U>
+                inline void minor_of(const matrix<U> &M,
+                                     const size_t     I,
+                                     const size_t     J) throw()
+                {
+                    assert(M.rows>1);
+                    assert(M.cols>1);
+                    assert(rows==M.rows-1);
+                    assert(cols==M.cols-1);
+                    
+                    matrix &self = *this;
+                    const size_t nr = M.rows;
+                    const size_t nc = M.cols;
+                    for(size_t i=1,ir=1;i<=nr;++i)
+                    {
+                        if(i!=I)
+                        {
+                            for(size_t j=1,jr=1;j<=nc;++j)
+                            {
+                                if(j!=J)
+                                {
+                                    self[ir][jr] = T(M[i][j]);
+                                    ++jr;
+                                }
+                            }
+                            ++ir;
+                        }
+                    }
+
+                }
+                
 			private:
 				row          *row_;    //!< stride proxy
 				
