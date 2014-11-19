@@ -12,12 +12,16 @@ namespace yocto
     {
         
         //! M is destroyed on ouput
-        inline double __determinant_of( matrix<double> &M ) throw()
+        /**
+         T: float, double, complex<>
+         */
+        template <typename T>
+        inline T __determinant_of( matrix<T> &M ) throw()
         {
             assert(M.is_square());
             assert(M.rows>0);
             
-            double       s = 1.0;
+            T       s(1);
             const size_t n = M.rows;
             for(size_t i=1,i1=i+1;i<=n;++i,++i1)
             {
@@ -26,11 +30,11 @@ namespace yocto
                 // find max pivot
                 // if i==n, just check no singular matrix
                 //______________________________________________________________
-                double  piv = fabs(M[i][i]);
-                size_t  ipv = i;
+                typename real_of<T>::type piv = Fabs(M[i][i]);
+                size_t                    ipv = i;
                 for(size_t k=i1;k<=n;++k)
                 {
-                    const double tmp = fabs(M[k][i]);
+                    const typename real_of<T>::type tmp = Fabs(M[k][i]);
                     if( tmp > piv )
                     {
                         piv = tmp;
@@ -49,11 +53,11 @@ namespace yocto
                     s=-s;
                     M.swap_rows(ipv,i);
                 }
-                const double pivot = M[i][i];
+                const T pivot(M[i][i]);
                 for(size_t k=i1;k<=n;++k)
                 {
-                    const double coef = M[k][i];
-                    M[k][i] = 0;
+                    const T coef(M[k][i]);
+                    M[k][i] = T(0);
                     for(size_t j=i1;j<=n;++j)
                     {
                         M[k][j] -= (M[i][j]*coef)/pivot;
@@ -65,7 +69,7 @@ namespace yocto
             //
             // Compute determinant
             //__________________________________________________________________
-            double d(1);
+            T d(1);
             for(size_t i=n;i>0;--i)
             {
                 d *= M[i][i];
@@ -80,32 +84,31 @@ namespace yocto
         template <typename T>
         inline T determinant_of( const matrix<T> &M )
         {
+            matrix<T> MM(M);
+            return __determinant_of(MM);
+        }
+        
+        template <>
+        inline ptrdiff_t determinant_of<ptrdiff_t>( const matrix<ptrdiff_t> &M )
+        {
             matrix<double> MM(M.rows,M.cols);
             for(size_t i=M.rows;i>0;--i)
             {
-                array<double>  &MMi = MM[i];
-                const array<T> &Mi  = M[i];
                 for(size_t j=M.cols;j>0;--j)
                 {
-                    MMi[j] = double(Mi[j]);
+                    MM[i][j] = M[i][j];
                 }
             }
-            const T tdet( __determinant_of(MM) );
-            return tdet;
-        }
-        
-        template <typename T>
-        inline T ideterminant_of( const matrix<T> &M )
-        {
-            return Rint( determinant_of(M) );
+            std::cerr << "ideterminant" << std::endl;
+            return Rint( __determinant_of(MM) );
         }
         
         
-        template <typename T>
+        template <typename T,typename U>
         inline T cofactor_of(const matrix<T> &M,
                              const size_t     I,
                              const size_t     J,
-                             matrix<double>  &m )
+                             matrix<U>       &m )
         {
             assert(M.is_square());
             assert(M.rows>=1);
@@ -113,9 +116,30 @@ namespace yocto
             if(M.rows>1)
             {
                 m.template minor_of(M,I,J);
-                const T ddet = T(__determinant_of(m));
+                const T ddet = __determinant_of(m);
                 const T mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
-                std::cerr << "ddet=" << ddet << "=> mdet=" << mdet << std::endl;
+                return mdet;
+            }
+            else
+            {
+                return M[1][1];
+            }
+        }
+        
+        template <>
+        inline ptrdiff_t cofactor_of(const matrix<ptrdiff_t> &M,
+                                     const size_t             I,
+                                     const size_t             J,
+                                     matrix<double>          &m)
+        {
+            assert(M.is_square());
+            assert(M.rows>=1);
+            assert(m.rows==M.rows-1);
+            if(M.rows>1)
+            {
+                m.minor_of(M,I,J);
+                const ptrdiff_t ddet = RInt(__determinant_of(m));
+                const ptrdiff_t mdet = ( ((I+J)&1) != 0 ) ? -ddet : ddet;
                 return mdet;
             }
             else
@@ -145,6 +169,38 @@ namespace yocto
                 default: {
                     const size_t   n  = M.rows;
                     const size_t   n1 = n-1;
+                    matrix<T>      m(n1,n1);
+                    for(size_t i=n;i>0;--i)
+                    {
+                        for(size_t j=n;j>0;--j)
+                        {
+                            A[i][j] = cofactor_of(M, j, i, m);
+                        }
+                    }
+                    
+                }
+            }
+        }
+        
+        template <>
+        inline void adjoint<ptrdiff_t>( matrix<ptrdiff_t> &A, const matrix<ptrdiff_t> &M )
+        {
+            std::cerr << "iadjoint" << std::endl;
+            assert(M.is_square());
+            assert(A.is_square());
+            assert(M.rows==A.rows);
+            switch(M.rows)
+            {
+                case 0:
+                    return;
+                    
+                case 1:
+                    A[1][1] = 1;
+                    return;
+                    
+                default: {
+                    const size_t   n  = M.rows;
+                    const size_t   n1 = n-1;
                     matrix<double> m(n1,n1);
                     for(size_t i=n;i>0;--i)
                     {
@@ -157,6 +213,7 @@ namespace yocto
                 }
             }
         }
+
         
         
         

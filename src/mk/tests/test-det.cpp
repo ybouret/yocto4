@@ -57,6 +57,9 @@ void perform_det()
 YOCTO_UNIT_TEST_IMPL(det)
 {
     perform_det<double>();
+    perform_det<float>();
+    perform_det< complex<float> >();
+    perform_det<ptrdiff_t>();
     
 }
 YOCTO_UNIT_TEST_DONE()
