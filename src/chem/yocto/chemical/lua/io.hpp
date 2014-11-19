@@ -2,6 +2,8 @@
 #define YOCTO_CHEMICAL_LUA_IO_INCLUDED 1
 
 #include "yocto/chemical/equilibria.hpp"
+#include "yocto/chemical/boot.hpp"
+
 #include "lua.hpp"
 #include "yocto/functor.hpp"
 
@@ -27,8 +29,15 @@ namespace yocto
             //! wrapper
             static void load(lua_State *L, library &lib, const char   *id, species_callback *cb = 0 );
             
-            //! append equilibria
+            //! append to equilibria
             static void load(lua_State *L, equilibria &eqs,  const string &id , const library &lib);
+            
+            //! append to equilibria, wrapper
+            static void load(lua_State *L, equilibria &eqs,  const char *id , const library &lib);
+            
+            //! append to boot
+            static void load(lua_State *L, boot &loader, const string &id, const library &lib);
+            
         };
         
     }

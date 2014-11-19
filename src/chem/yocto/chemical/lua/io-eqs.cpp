@@ -161,6 +161,12 @@ namespace yocto
             }
         }
         
+        void __lua:: load(lua_State *L, equilibria &eqs,  const char *id , const library &lib)
+        {
+            const string ID(id);
+            return load(L,eqs,ID,lib);
+        }
+        
         
     }
     
